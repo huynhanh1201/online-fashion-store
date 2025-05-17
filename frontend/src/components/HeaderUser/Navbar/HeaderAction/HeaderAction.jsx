@@ -28,6 +28,8 @@ const HeaderAction = () => {
   const navigate = useNavigate()
   const currentUser = useSelector(selectCurrentUser)
 
+  console.log('currentUser', currentUser)
+
   // Lấy giỏ hàng từ Redux store
   const cartItems = useSelector((state) => state.cart.cartItems)
   const cartCount = cartItems.reduce((total, item) => total + item.quantity, 0)

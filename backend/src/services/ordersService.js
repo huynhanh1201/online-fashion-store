@@ -221,6 +221,8 @@ const getOrderList = async () => {
       .populate('userId shippingAddressId couponId')
       .lean()
 
+    console.log('result: ', result)
+
     return result
   } catch (err) {
     throw err
