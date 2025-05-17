@@ -8,7 +8,10 @@ import {
   CircularProgress
 } from '@mui/material'
 import TransactionRow from './TransactionRow'
-
+import {
+  StyledTableCell,
+  StyledTableRow
+} from '../UserManagement/UserTableStyles.js'
 const TransactionTable = ({
   transactions,
   loading,
@@ -16,44 +19,54 @@ const TransactionTable = ({
   onEdit,
   onDelete
 }) => {
-  console.log('data', transactions)
   return (
     <Table>
       <TableHead>
-        <TableRow>
-          <TableCell>Mã giao dịch</TableCell>
-          <TableCell>Đơn hàng</TableCell>
-          <TableCell>Phương thức</TableCell>
-          <TableCell>Trạng thái</TableCell>
-          <TableCell>Số tiền</TableCell>
-          <TableCell>Ghi chú</TableCell>
-          <TableCell>Ngày tạo</TableCell>
-          <TableCell>Hành động</TableCell>
-        </TableRow>
+        <StyledTableRow>
+          <StyledTableCell sx={{ textAlign: 'center', width: '50px' }}>
+            STT
+          </StyledTableCell>
+          <StyledTableCell>Mã giao dịch</StyledTableCell>
+          <StyledTableCell>Đơn hàng</StyledTableCell>
+          <StyledTableCell>Phương thức</StyledTableCell>
+          <StyledTableCell>Trạng thái</StyledTableCell>
+          <StyledTableCell>Số tiền</StyledTableCell>
+          <StyledTableCell sx={{ width: '100px', maxWidth: '100px' }}>
+            Ghi chú
+          </StyledTableCell>
+          <StyledTableCell>Ngày tạo</StyledTableCell>
+          <StyledTableCell sx={{ maxWidth: '130px', width: '130px' }}>
+            Hành động
+          </StyledTableCell>
+        </StyledTableRow>
       </TableHead>
       <TableBody>
         {loading ? (
-          <TableRow>
-            <TableCell colSpan={8} align='center'>
+          <StyledTableRow>
+            <StyledTableCell colSpan={9} align='center'>
               <CircularProgress size={24} />
-            </TableCell>
-          </TableRow>
-        ) : transactions.length > 0 ? (
-          transactions.map((transaction) => (
-            <TransactionRow
-              key={transaction._id}
-              transaction={transaction}
-              onView={onView}
-              onEdit={onEdit}
-              onDelete={onDelete}
-            />
-          ))
+            </StyledTableCell>
+          </StyledTableRow>
+        ) : transactions.filter((transaction) => !transaction.destroy).length >
+          0 ? (
+          transactions
+            .filter((transaction) => !transaction.destroy)
+            .map((transaction, index) => (
+              <TransactionRow
+                key={transaction._id}
+                index={index}
+                transaction={transaction}
+                onView={onView}
+                onEdit={onEdit}
+                onDelete={onDelete}
+              />
+            ))
         ) : (
-          <TableRow>
-            <TableCell colSpan={8} align='center'>
+          <StyledTableRow>
+            <StyledTableCell colSpan={9} align='center'>
               Không có giao dịch nào.
-            </TableCell>
-          </TableRow>
+            </StyledTableCell>
+          </StyledTableRow>
         )}
       </TableBody>
     </Table>

@@ -171,30 +171,33 @@ const AddProductModal = ({ open, onClose, onSuccess }) => {
                 helperText={errors.description?.message}
                 sx={StyleAdmin.InputCustom}
               />
-              <TextField
-                label='Giá (VNĐ)'
-                type='number'
-                fullWidth
-                margin='normal'
-                {...register('price', {
-                  required: 'Giá không được bỏ trống'
-                })}
-                error={!!errors.price}
-                helperText={errors.price?.message}
-                sx={StyleAdmin.InputCustom}
-              />
-              <TextField
-                label='Số lượng'
-                type='number'
-                fullWidth
-                margin='normal'
-                {...register('quantity', {
-                  required: 'Số lượng không được bỏ trống'
-                })}
-                error={!!errors.quantity}
-                helperText={errors.quantity?.message}
-                sx={StyleAdmin.InputCustom}
-              />
+              <Box sx={{ display: 'flex', gap: 2 }}>
+                <TextField
+                  label='Giá (VNĐ)'
+                  type='number'
+                  fullWidth
+                  margin='normal'
+                  {...register('price', {
+                    required: 'Giá không được bỏ trống'
+                  })}
+                  error={!!errors.price}
+                  helperText={errors.price?.message}
+                  sx={StyleAdmin.InputCustom}
+                />
+                <TextField
+                  label='Số lượng'
+                  type='number'
+                  fullWidth
+                  margin='normal'
+                  {...register('quantity', {
+                    required: 'Số lượng không được bỏ trống'
+                  })}
+                  error={!!errors.quantity}
+                  helperText={errors.quantity?.message}
+                  sx={StyleAdmin.InputCustom}
+                />
+              </Box>
+
               <TextField
                 label='Xuất xứ'
                 fullWidth
@@ -206,73 +209,74 @@ const AddProductModal = ({ open, onClose, onSuccess }) => {
                 helperText={errors.origin?.message}
                 sx={StyleAdmin.InputCustom}
               />
-              <FormControl
-                fullWidth
-                margin='normal'
-                error={!!errors.sizes}
-                sx={StyleAdmin.FormSelect}
-              >
-                <InputLabel>Kích cỡ</InputLabel>
-                <Controller
-                  name='sizes'
-                  control={control}
-                  rules={{ required: 'Kích cỡ không được bỏ trống' }}
-                  render={({ field }) => (
-                    <Select
-                      {...field}
-                      label='Kích cỡ'
-                      multiple
-                      MenuProps={{
-                        PaperProps: { sx: StyleAdmin.FormSelect.SelectMenu }
-                      }}
-                    >
-                      {['S', 'M', 'L', 'XL', 'XXL'].map((size) => (
-                        <MenuItem key={size} value={size}>
-                          {size}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                  )}
-                />
-                <Typography variant='caption' color='error'>
-                  {errors.sizes?.message}
-                </Typography>
-              </FormControl>
-              <FormControl
-                fullWidth
-                margin='normal'
-                error={!!errors.colors}
-                sx={StyleAdmin.FormSelect}
-              >
-                <InputLabel>Màu sắc</InputLabel>
-                <Controller
-                  name='colors'
-                  control={control}
-                  rules={{ required: 'Màu sắc không được bỏ trống' }}
-                  render={({ field }) => (
-                    <Select
-                      {...field}
-                      label='Màu sắc'
-                      multiple
-                      MenuProps={{
-                        PaperProps: { sx: StyleAdmin.FormSelect.SelectMenu }
-                      }}
-                    >
-                      {['Đỏ', 'Xanh dương', 'Đen', 'Trắng', 'Vàng'].map(
-                        (color) => (
-                          <MenuItem key={color} value={color}>
-                            {color}
+              <Box sx={{ display: 'flex', gap: 2 }}>
+                <FormControl
+                  fullWidth
+                  margin='normal'
+                  error={!!errors.sizes}
+                  sx={StyleAdmin.FormSelect}
+                >
+                  <InputLabel>Kích cỡ</InputLabel>
+                  <Controller
+                    name='sizes'
+                    control={control}
+                    rules={{ required: 'Kích cỡ không được bỏ trống' }}
+                    render={({ field }) => (
+                      <Select
+                        {...field}
+                        label='Kích cỡ'
+                        multiple
+                        MenuProps={{
+                          PaperProps: { sx: StyleAdmin.FormSelect.SelectMenu }
+                        }}
+                      >
+                        {['S', 'M', 'L', 'XL', 'XXL'].map((size) => (
+                          <MenuItem key={size} value={size}>
+                            {size}
                           </MenuItem>
-                        )
-                      )}
-                    </Select>
-                  )}
-                />
-                <Typography variant='caption' color='error'>
-                  {errors.colors?.message}
-                </Typography>
-              </FormControl>
-
+                        ))}
+                      </Select>
+                    )}
+                  />
+                  <Typography variant='caption' color='error'>
+                    {errors.sizes?.message}
+                  </Typography>
+                </FormControl>
+                <FormControl
+                  fullWidth
+                  margin='normal'
+                  error={!!errors.colors}
+                  sx={StyleAdmin.FormSelect}
+                >
+                  <InputLabel>Màu sắc</InputLabel>
+                  <Controller
+                    name='colors'
+                    control={control}
+                    rules={{ required: 'Màu sắc không được bỏ trống' }}
+                    render={({ field }) => (
+                      <Select
+                        {...field}
+                        label='Màu sắc'
+                        multiple
+                        MenuProps={{
+                          PaperProps: { sx: StyleAdmin.FormSelect.SelectMenu }
+                        }}
+                      >
+                        {['Đỏ', 'Xanh dương', 'Đen', 'Trắng', 'Vàng'].map(
+                          (color) => (
+                            <MenuItem key={color} value={color}>
+                              {color}
+                            </MenuItem>
+                          )
+                        )}
+                      </Select>
+                    )}
+                  />
+                  <Typography variant='caption' color='error'>
+                    {errors.colors?.message}
+                  </Typography>
+                </FormControl>
+              </Box>
               <FormControl
                 fullWidth
                 margin='normal'
@@ -338,7 +342,7 @@ const AddProductModal = ({ open, onClose, onSuccess }) => {
                     <Box
                       sx={{
                         width: '100%',
-                        height: '200px',
+                        height: '150px',
                         borderRadius: 1,
                         border: '1px solid #000',
                         overflow: 'hidden',

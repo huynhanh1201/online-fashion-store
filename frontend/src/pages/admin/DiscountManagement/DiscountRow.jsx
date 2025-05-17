@@ -1,6 +1,6 @@
 import React from 'react'
 import IconButton from '@mui/material/IconButton'
-import { Stack } from '@mui/material'
+import { Stack, Chip } from '@mui/material'
 import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye'
 import BorderColorIcon from '@mui/icons-material/BorderColor'
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever'
@@ -30,7 +30,11 @@ const DiscountRow = ({ discount, index, onAction }) => {
       <StyledTableCell>{discount.usageLimit}</StyledTableCell>
       <StyledTableCell>{remaining >= 0 ? remaining : 0}</StyledTableCell>
       <StyledTableCell>
-        {discount.isActive ? 'Đang hoạt động' : 'Dừng hoạt động'}
+        <Chip
+          label={discount.status !== 'active' ? 'Hoạt động' : 'Ngừng hoạt động'}
+          color={discount.status !== 'active' ? 'success' : 'error'}
+          size='small'
+        />
       </StyledTableCell>
       <StyledTableCell>
         {discount.validFrom
@@ -45,13 +49,13 @@ const DiscountRow = ({ discount, index, onAction }) => {
       <StyledTableCell>
         <Stack direction='row' spacing={1}>
           <IconButton onClick={() => onAction('view', discount)} size='small'>
-            <RemoveRedEyeIcon />
+            <RemoveRedEyeIcon color='primary' />
           </IconButton>
           <IconButton onClick={() => onAction('edit', discount)} size='small'>
-            <BorderColorIcon />
+            <BorderColorIcon color='warning' />
           </IconButton>
           <IconButton onClick={() => onAction('delete', discount)} size='small'>
-            <DeleteForeverIcon />
+            <DeleteForeverIcon color='error' />
           </IconButton>
         </Stack>
       </StyledTableCell>

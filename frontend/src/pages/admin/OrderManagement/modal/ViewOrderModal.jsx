@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import {
   Dialog,
   DialogTitle,
@@ -19,34 +19,55 @@ import {
   TableBody
 } from '@mui/material'
 import dayjs from 'dayjs'
+import useProducts from '~/hook/useProducts'
 import styleAdmin from '~/components/StyleAdmin.jsx'
 
-const ViewOrderModal = ({
+function ViewOrderModal({
   open,
   onClose,
   order,
   histories = [],
   orderDetails = []
-}) => {
-  const [tab, setTab] = React.useState(0)
+}) {
+  const [tab, setTab] = useState(0)
+  const { fetchProductById } = useProducts()
+  const [productMap, setProductMap] = useState({})
+
+  useEffect(() => {
+    const fetchAllProducts = async () => {
+      const map = {}
+      for (const item of orderDetails) {
+        if (item.productId) {
+          try {
+            const product = await fetchProductById(item.productId)
+            map[item._id] = product
+          } catch (err) {
+            console.error('Lỗi khi lấy thông tin sản phẩm:', err)
+          }
+        }
+      }
+      setProductMap(map)
+    }
+
+    if (orderDetails?.length > 0) {
+      fetchAllProducts()
+    }
+  }, [orderDetails])
 
   if (!order) return null
+  const handleTabChange = (_, newValue) => setTab(newValue)
 
-  const {
-    _id,
-    total,
-    paymentMethod,
-    paymentStatus,
-    discountAmount,
-    shippingAddressId,
-    userId,
-    status,
-    isDelivered,
-    createdAt,
-    updatedAt,
-    note
-  } = order
-  const handleTabChange = (e, newValue) => setTab(newValue)
+  const renderStatusLabel = (status) => {
+    const map = {
+      Pending: 'Đang chờ',
+      Processing: 'Đang xử lý',
+      Shipped: 'Đã gửi hàng',
+      Delivered: 'Đã giao',
+      Cancelled: 'Đã hủy'
+    }
+    return map[status] || '—'
+  }
+
   return (
     <Dialog
       open={open}
@@ -61,33 +82,23 @@ const ViewOrderModal = ({
           flexDirection: 'column'
         }
       }}
-      BackdropProps={{
-        sx: styleAdmin.OverlayModal
-      }}
+      BackdropProps={{ sx: styleAdmin.OverlayModal }}
     >
       <DialogTitle>Xem chi tiết đơn hàng</DialogTitle>
       <Divider />
-      <DialogContent dividers>
+      <DialogContent dividers sx={{ flex: 1, overflowY: 'auto' }}>
         <Tabs
           value={tab}
           onChange={handleTabChange}
           sx={{
-            position: 'relative',
-            top: '-6px',
             mb: 2,
-            marginBottom: '16px', // vẫn cần mb cho spacing, sẽ override màu bằng color
-            borderBottom: '1px solid #001f5d', // nếu bạn muốn có gạch dưới
-            '& .MuiTab-root': {
-              color: '#000', // màu chữ bình thường
-              textTransform: 'none'
-            },
+            borderBottom: '1px solid #001f5d',
+            '& .MuiTab-root': { color: '#000', textTransform: 'none' },
             '& .Mui-selected': {
-              color: '#001f5d !important', // màu chữ khi được chọn
+              color: '#001f5d !important',
               fontWeight: '900'
             },
-            '& .MuiTabs-indicator': {
-              backgroundColor: '#001f5d' // màu gạch dưới tab đang active
-            }
+            '& .MuiTabs-indicator': { backgroundColor: '#001f5d' }
           }}
         >
           <Tab label='Thông tin đơn hàng' />
@@ -95,46 +106,44 @@ const ViewOrderModal = ({
           <Tab label='Danh sách sản phẩm' />
         </Tabs>
 
-        {/* Tab 1: Thông tin đơn hàng */}
         {tab === 0 && (
           <Stack spacing={2}>
             <Typography>
-              <strong>Mã đơn hàng:</strong> {_id}
+              <strong>Mã đơn hàng:</strong> {order._id}
             </Typography>
             <Typography>
-              {' '}
-              <strong>Người nhận:</strong> {shippingAddressId?.fullName}
+              <strong>Người nhận:</strong> {order.shippingAddressId?.fullName}
             </Typography>
             <Typography>
-              <strong>SĐT: </strong>
-              {shippingAddressId?.phone}
+              <strong>SĐT:</strong> {order.shippingAddressId?.phone}
             </Typography>
             <Typography>
-              <strong>Địa chỉ giao hàng: </strong>
-              {`${shippingAddressId?.address}, ${shippingAddressId?.ward}, ${shippingAddressId?.district}, ${shippingAddressId?.city}`}
+              <strong>Địa chỉ giao hàng:</strong>{' '}
+              {`${order.shippingAddressId?.address}, ${order.shippingAddressId?.ward}, ${order.shippingAddressId?.district}, ${order.shippingAddressId?.city}`}
             </Typography>
             <Typography>
               <strong>Phương thức thanh toán:</strong>{' '}
-              {paymentMethod?.toUpperCase()}
+              {order.paymentMethod?.toUpperCase()}
             </Typography>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+
+            <Box display='flex' alignItems='center' gap={1}>
               <Typography component='span'>
                 <strong>Trạng thái thanh toán:</strong>
               </Typography>
               <Chip
                 label={
-                  paymentStatus === 'Pending'
+                  order.paymentStatus === 'Pending'
                     ? 'Đang chờ'
-                    : paymentStatus === 'Completed'
+                    : order.paymentStatus === 'Completed'
                       ? 'Đã thanh toán'
-                      : paymentStatus === 'Failed'
+                      : order.paymentStatus === 'Failed'
                         ? 'Thất bại'
                         : '—'
                 }
                 color={
-                  paymentStatus === 'Completed'
+                  order.paymentStatus === 'Completed'
                     ? 'success'
-                    : paymentStatus === 'Failed'
+                    : order.paymentStatus === 'Failed'
                       ? 'error'
                       : 'warning'
                 }
@@ -142,114 +151,76 @@ const ViewOrderModal = ({
               />
             </Box>
 
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <Box display='flex' alignItems='center' gap={1}>
               <Typography component='span'>
                 <strong>Trạng thái đơn hàng:</strong>
               </Typography>
               <Chip
-                label={
-                  status === 'Pending'
-                    ? 'Đang chờ'
-                    : status === 'Processing'
-                      ? 'Đang xử lý'
-                      : status === 'Shipped'
-                        ? 'Đã gửi hàng'
-                        : status === 'Delivered'
-                          ? 'Đã giao'
-                          : status === 'Cancelled'
-                            ? 'Đã hủy'
-                            : '—'
-                }
+                label={renderStatusLabel(order.status)}
                 color={
-                  status === 'Pending'
-                    ? 'warning'
-                    : status === 'Cancelled'
-                      ? 'error'
+                  order.status === 'Cancelled'
+                    ? 'error'
+                    : order.status === 'Pending'
+                      ? 'warning'
                       : 'success'
                 }
                 size='small'
               />
             </Box>
 
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <Box display='flex' alignItems='center' gap={1}>
               <Typography component='span'>
                 <strong>Giao hàng:</strong>
               </Typography>
               <Chip
-                label={isDelivered ? 'Đã giao' : 'Chưa giao'}
-                color={isDelivered ? 'success' : 'default'}
+                label={order.isDelivered ? 'Đã giao' : 'Chưa giao'}
+                color={order.isDelivered ? 'success' : 'default'}
                 size='small'
               />
             </Box>
+
             <Typography>
               <strong>Giảm giá:</strong>{' '}
-              {discountAmount > 0
-                ? `- ${discountAmount.toLocaleString()}₫`
+              {order.discountAmount > 0
+                ? `- ${order.discountAmount.toLocaleString()}₫`
                 : 'Không có'}
             </Typography>
             <Typography>
-              {' '}
-              <strong>Tổng tiền: </strong> {total.toLocaleString()}₫
+              <strong>Tổng tiền:</strong> {order.total.toLocaleString()}₫
             </Typography>
             <Typography>
-              <strong>Lời nhắn: </strong>
-              {note || 'Không có'}
+              <strong>Lời nhắn:</strong> {order.note || 'Không có'}
             </Typography>
             <Typography>
-              <strong>Ngày tạo: </strong>{' '}
-              {dayjs(createdAt).format('DD/MM/YYYY HH:mm')}
+              <strong>Ngày tạo:</strong>{' '}
+              {dayjs(order.createdAt).format('DD/MM/YYYY HH:mm')}
             </Typography>
             <Typography>
-              <strong>Ngày cập nhật: </strong>{' '}
-              {dayjs(updatedAt).format('DD/MM/YYYY HH:mm')}
+              <strong>Ngày cập nhật:</strong>{' '}
+              {dayjs(order.updatedAt).format('DD/MM/YYYY HH:mm')}
             </Typography>
           </Stack>
         )}
 
-        {/* Tab 2: Lịch sử đơn hàng */}
         {tab === 1 && (
           <Box>
             {histories.length === 0 ? (
               <Typography>Không có lịch sử cập nhật.</Typography>
             ) : (
-              histories.map((history) => (
-                <Box key={history._id} mb={2} p={1} border={1} borderRadius={2}>
+              histories.map((h) => (
+                <Box key={h._id} mb={2} p={1} border={1} borderRadius={2}>
                   <Typography>
-                    <strong>Trạng thái:</strong>{' '}
-                    {history.status === 'Pending'
-                      ? 'Đang chờ'
-                      : history.status === 'Processing'
-                        ? 'Đang xử lý'
-                        : history.status === 'Shipped'
-                          ? 'Đã gửi hàng'
-                          : history.status === 'Delivered'
-                            ? 'Đã giao'
-                            : history.status === 'Cancelled'
-                              ? 'Đã hủy'
-                              : '—'}
+                    <strong>Trạng thái:</strong> {renderStatusLabel(h.status)}
                   </Typography>
                   <Typography>
-                    <strong>Ghi chú:</strong> {history.note || 'Không có'}
+                    <strong>Ghi chú:</strong> {h.note || 'Không có'}
                   </Typography>
                   <Typography>
-                    <strong>Người cập nhật:</strong>{' '}
-                    {userId?.name
-                      ?.toLowerCase()
-                      .split(' ')
-                      .map(
-                        (word) => word.charAt(0).toUpperCase() + word.slice(1)
-                      )
-                      .join(' ') ||
-                      '' ||
-                      history.updatedBy}
-                  </Typography>
-                  <Typography>
-                    <strong>Quyền: </strong>
-                    {userId.role === 'admin' ? 'QUẢN TRỊ' : 'KHÁCH HÀNG'}
+                    <strong>Người cập nhật:</strong> {order.userId.name || '—'}
                   </Typography>
                   <Typography>
                     <strong>Thời gian:</strong>{' '}
-                    {dayjs(history.updatedAt).format('DD/MM/YYYY HH:mm')}
+                    {dayjs(h.updatedAt).format('DD/MM/YYYY HH:mm')}
                   </Typography>
                 </Box>
               ))
@@ -257,7 +228,6 @@ const ViewOrderModal = ({
           </Box>
         )}
 
-        {/* Tab 3: Danh sách sản phẩm */}
         {tab === 2 && (
           <Box>
             {orderDetails.length === 0 ? (
@@ -276,7 +246,7 @@ const ViewOrderModal = ({
                   {orderDetails.map((item) => (
                     <TableRow key={item._id}>
                       <TableCell>
-                        {item.product?.name || 'Không có tên'}
+                        {productMap[item._id]?.name || 'Không có tên'}
                       </TableCell>
                       <TableCell align='right'>{item.quantity}</TableCell>
                       <TableCell align='right'>
@@ -294,8 +264,8 @@ const ViewOrderModal = ({
         )}
       </DialogContent>
       <Divider />
-      <DialogActions sx={{ padding: '16px 24px' }}>
-        <Button onClick={onClose} variant='contained' color='error'>
+      <DialogActions sx={{ px: 3, py: 2 }}>
+        <Button variant='contained' color='error' onClick={onClose}>
           Đóng
         </Button>
       </DialogActions>

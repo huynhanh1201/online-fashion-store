@@ -8,11 +8,7 @@ import {
   CircularProgress,
   Typography
 } from '@mui/material'
-import {
-  modalPaperProps,
-  dialogTitleStyle,
-  cancelButtonStyle
-} from './StyleModal.js'
+import { dialogTitleStyle, cancelButtonStyle } from './StyleModal.js'
 import styleAdmin from '~/components/StyleAdmin.jsx'
 
 const DeleteUserModal = React.memo(({ open, onClose, user, onDelete }) => {

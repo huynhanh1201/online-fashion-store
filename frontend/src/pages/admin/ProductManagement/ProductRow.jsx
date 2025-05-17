@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import CloseIcon from '@mui/icons-material/Close'
-import { TableCell, Stack, IconButton, Box } from '@mui/material'
+import { TableCell, Stack, IconButton, Box, Chip } from '@mui/material'
 import {
   StyledTableCell,
   StyledTableRow
@@ -66,7 +66,11 @@ const ProductRow = ({ index, product, handleOpenModal }) => {
         <StyledTableCell>{product.origin}</StyledTableCell>
         <StyledTableCell>{product.categoryId.name}</StyledTableCell>
         <StyledTableCell>
-          {product.destroy ? 'Ngừng bán' : 'Đang bán'}
+          <Chip
+            label={product.destroy ? 'Ngừng bán' : 'Đang bán'}
+            color={product.destroy ? 'error' : 'success'}
+            size='small'
+          />
         </StyledTableCell>
         <StyledTableCell sx={{ maxWidth: '130px', width: '130px' }}>
           <Stack direction='row' spacing={1} sx={styles.groupIcon}>
@@ -74,19 +78,19 @@ const ProductRow = ({ index, product, handleOpenModal }) => {
               onClick={() => handleOpenModal('view', product)}
               size='small'
             >
-              <RemoveRedEyeIcon />
+              <RemoveRedEyeIcon color='primary' />
             </IconButton>
             <IconButton
               onClick={() => handleOpenModal('edit', product)}
               size='small'
             >
-              <BorderColorIcon />
+              <BorderColorIcon color='warning' />
             </IconButton>
             <IconButton
               onClick={() => handleOpenModal('delete', product)}
               size='small'
             >
-              <DeleteForeverIcon />
+              <DeleteForeverIcon color='error' />
             </IconButton>
           </Stack>
         </StyledTableCell>

@@ -8,7 +8,8 @@ import {
   Box,
   Grid,
   Typography,
-  Divider
+  Divider,
+  Chip
 } from '@mui/material'
 import StyleAdmin from '~/components/StyleAdmin.jsx'
 
@@ -189,9 +190,12 @@ const ViewProductModal = ({ open, onClose, product }) => {
                 Trạng thái
               </Typography>
               <Typography variant='body1'>
-                {product.destroy ? 'Ngừng bán' : 'Đang bán'}
+                <Chip
+                  label={product.destroy ? 'Ngừng bán' : 'Đang bán'}
+                  color={product.destroy ? 'error' : 'success'}
+                  size='small'
+                />
               </Typography>
-              <Divider sx={{ my: 1 }} />
             </Box>
           </Grid>
         </Grid>

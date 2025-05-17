@@ -5,7 +5,7 @@ import OrderPagination from './OrderPagination'
 import ViewOrderModal from './modal/ViewOrderModal'
 import EditOrderModal from './modal/EditOrderModal' // import modal sửa
 import DeleteOrderModal from './modal/DeleteOrderModal' // import modal xoá
-import useOrders from '~/hook/useOrders'
+import useOrderAdmin from '~/hook/useOrderAdmin.js'
 import { deleteOrderById } from '~/services/orderService'
 
 const OrderManagement = () => {
@@ -26,7 +26,7 @@ const OrderManagement = () => {
     getOrderHistoriesByOrderId,
     getOrderDetailsByOrderId,
     updateOrderById
-  } = useOrders()
+  } = useOrderAdmin()
 
   // Mở modal xem
   const handleOpenModalView = async (order) => {

@@ -3,8 +3,11 @@ import React from 'react'
 import Typography from '@mui/material/Typography'
 import ProductTable from './ProductTable'
 import ProductPagination from './ProductPagination'
-import useProducts from '~/hook/useProducts'
-import { updateProduct, deleteProduct } from '~/services/productService'
+import useProducts from '~/hook/admin/useProducts'
+import {
+  updateProduct,
+  deleteProduct
+} from '~/services/admin/productService.js'
 
 const AddProductModal = React.lazy(() => import('./modal/AddProductModal.jsx'))
 const EditProductModal = React.lazy(

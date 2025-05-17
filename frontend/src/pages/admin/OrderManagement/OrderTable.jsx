@@ -13,7 +13,6 @@ import {
   StyledTableRow,
   StyledTableContainer
 } from '~/pages/admin/CategorieManagement/CategoryTableStyles.jsx'
-
 const OrderTable = ({
   orders = [],
   loading = false,
@@ -22,19 +21,20 @@ const OrderTable = ({
   onDelete
 }) => {
   const columnsCount = 9
+
   return (
     <StyledTableContainer component={Paper} sx={{ maxHeight: 600 }}>
       <Table stickyHeader>
         <TableHead>
           <StyledTableRow>
-            <StyledTableCell>Mã đơn</StyledTableCell>
-            <StyledTableCell>Thanh toán</StyledTableCell>
-            <StyledTableCell>Trạng thái thanh toán</StyledTableCell>
+            <StyledTableCell sx={{ textAlign: 'center', width: '50px' }}>
+              STT
+            </StyledTableCell>
+            <StyledTableCell>Mã đơn hàng</StyledTableCell>
+            <StyledTableCell>Tên khách hàng</StyledTableCell>
             <StyledTableCell>Trạng thái đơn hàng</StyledTableCell>
-            <StyledTableCell>Trạng thái giao hàng</StyledTableCell>
-            <StyledTableCell>Giảm giá</StyledTableCell>
-            <StyledTableCell>Tổng tiền</StyledTableCell>
-            <StyledTableCell>Ngày tạo</StyledTableCell>
+            <StyledTableCell>Trạng thái thanh toán</StyledTableCell>
+            <StyledTableCell>Ngày đặt hàng</StyledTableCell>
             <StyledTableCell sx={{ maxWidth: '130px', width: '130px' }}>
               Hành động
             </StyledTableCell>
@@ -54,13 +54,14 @@ const OrderTable = ({
               </StyledTableCell>
             </StyledTableRow>
           ) : (
-            orders.map((order) => (
+            orders.map((order, index) => (
               <OrderRow
                 key={order._id}
                 order={order}
                 onView={onView}
                 onEdit={onEdit}
                 onDelete={onDelete}
+                index={index}
               />
             ))
           )}
