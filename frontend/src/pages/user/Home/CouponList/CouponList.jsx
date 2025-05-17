@@ -49,7 +49,7 @@ const CouponList = () => {
 
   return (
     <Box sx={{ p: 3 }}>
-      <Grid container spacing={2} justifyContent='center'>
+      <Grid container spacing={2} justifyContent='start'>
         {coupons.map((coupon) => {
           const isPercent = coupon.type === 'percent'
           const valueText = isPercent

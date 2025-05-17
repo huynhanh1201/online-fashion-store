@@ -62,7 +62,6 @@ const ProductList = () => {
   return (
     <Box
       sx={{
-        backgroundColor: '#03235e',
         p: 2,
         borderRadius: 3,
         m: 2,
@@ -108,7 +107,10 @@ const ProductList = () => {
       </Grid>
 
       <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
-        <Button href='/product' sx={{ color: 'white' }}>
+        <Button
+          href='/product'
+          sx={{ color: '#fff', backgroundColor: '#1A3C7B' }}
+        >
           Xem tất cả
         </Button>
       </Box>
