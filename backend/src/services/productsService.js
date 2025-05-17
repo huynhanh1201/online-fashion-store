@@ -83,13 +83,6 @@ const getProductList = async (reqQuery) => {
       }
     }
 
-    // const result = await ProductModel.find({ destroy: false })
-    //   .populate({
-    //     path: 'categoryId',
-    //     select: 'name description slug _id'
-    //   })
-    //   .lean()
-
     return result || []
   } catch (err) {
     throw err

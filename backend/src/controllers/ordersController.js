@@ -4,8 +4,14 @@ import { ordersService } from '~/services/ordersService'
 
 const createOrder = async (req, res, next) => {
   try {
+    const ipAddr = req.headers['x-forwarded-for'] || req.socket.remoteAddress
+
     // Lấy Danh mục sản phẩm mới tạo từ tầng Service chuyển qua
-    const result = await ordersService.createOrder(req.jwtDecoded._id, req.body)
+    const result = await ordersService.createOrder(
+      req.jwtDecoded._id,
+      req.body,
+      ipAddr
+    )
 
     // Có kết quả thì trả về Client
     res.status(StatusCodes.CREATED).json(result)
@@ -66,10 +72,32 @@ const deleteOrder = async (req, res, next) => {
   }
 }
 
+// Thanh toán VNPAY
+
+const vnpayIPN = async (req, res, next) => {
+  try {
+    const result = await ordersService.vnpayIPN(req)
+    res.status(200).json(result)
+  } catch (err) {
+    next(err)
+  }
+}
+
+const vnpayReturn = async (req, res, next) => {
+  try {
+    const resultCode = await ordersService.vnpayReturn(req)
+    res.render('success', { code: resultCode })
+  } catch (err) {
+    next(err)
+  }
+}
+
 export const ordersController = {
   createOrder,
   getOrderList,
   getOrder,
   updateOrder,
-  deleteOrder
+  deleteOrder,
+  vnpayIPN,
+  vnpayReturn
 }

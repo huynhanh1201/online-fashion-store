@@ -20,6 +20,10 @@ Router.route('/').get(
   ordersController.getOrderList
 )
 
+// Thanh toán VNPAY
+Router.route('/vnpay_ipn').get(ordersController.vnpayIPN)
+Router.route('/vnpay_return').get(ordersController.vnpayReturn)
+
 // Lấy thông tin một Đơn hàng.
 Router.route('/:orderId').get(
   authMiddleware.isAuthorized,

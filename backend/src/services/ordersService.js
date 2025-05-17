@@ -10,127 +10,211 @@ import { OrderItemModel } from '~/models/OrderItemModel'
 import { OrderStatusHistoryModel } from '~/models/OrderStatusHistoryModel'
 import { PaymentTransactionModel } from '~/models/PaymentTransactionModel'
 
-const createOrder = async (userId, reqBody) => {
+import { generatePaymentUrl, verifyChecksum } from '~/utils/vnpay'
+import { env } from '~/config/environment'
+
+const createOrder = async (userId, reqBody, ipAddr) => {
   // eslint-disable-next-line no-useless-catch
   try {
-    // Kiểm tra giỏ hàng
-    const cart = await CartModel.findOne({ userId })
+    const {
+      cartItems,
+      shippingAddressId,
+      total,
+      couponId,
+      couponCode,
+      paymentMethod,
+      note
+    } = reqBody
 
-    if (!cart || cart.cartItems.length === 0) {
+    // Kiểm tra cartItems
+    if (!Array.isArray(cartItems) || cartItems.length === 0) {
       throw new ApiError(
         StatusCodes.BAD_REQUEST,
-        'Giỏ hàng trống hoặc không tồn tại.'
+        'Giỏ hàng trống hoặc không hợp lệ.'
       )
     }
 
     // Kiểm tra địa chỉ giao hàng
     const address = await ShippingAddressModel.findOne({
-      _id: reqBody.shippingAddressId,
+      _id: shippingAddressId,
       userId
     })
-    if (!address)
+    if (!address) {
       throw new ApiError(
         StatusCodes.NOT_FOUND,
         'Địa chỉ giao hàng không tồn tại.'
       )
+    }
 
-    // Kiểm tra mã giảm giá
-    const productIds = cart.cartItems.map((i) => i.productId)
-
+    // Lấy thông tin sản phẩm
+    const productIds = cartItems.map((item) => item.productId)
     const products = await ProductModel.find({
       _id: { $in: productIds }
     }).lean()
-
     const productMap = new Map(products.map((p) => [p._id.toString(), p]))
 
+    // Tính toán tổng tiền
     let calculatedSubtotal = 0
-    for (const item of cart.cartItems) {
+    for (const item of cartItems) {
       const product = productMap.get(item.productId.toString())
-
+      if (!product) {
+        throw new ApiError(
+          StatusCodes.NOT_FOUND,
+          `Sản phẩm với ID ${item.productId} không tồn tại.`
+        )
+      }
       calculatedSubtotal += product.price * item.quantity
     }
 
+    // Xác thực mã giảm giá
     const validateCoupon = await couponsService.validateCoupon(userId, {
-      couponCode: reqBody.couponCode,
+      couponCode,
       cartTotal: calculatedSubtotal
     })
 
-    if (!validateCoupon.valid && reqBody?.couponCode) {
+    if (!validateCoupon.valid && couponCode) {
       throw new ApiError(StatusCodes.BAD_REQUEST, validateCoupon.message)
     }
 
     const cartTotal = validateCoupon.newTotal || calculatedSubtotal
     const discountAmount = validateCoupon.discountAmount || 0
 
-    // Kiểm tra cartToal FE gửi lên
-    if (cartTotal !== reqBody.total) {
+    // Kiểm tra tổng tiền từ FE
+    if (cartTotal !== total) {
       throw new ApiError(
         StatusCodes.UNPROCESSABLE_ENTITY,
-        'Tổng tiền giỏ hàng không chính xác.'
+        'Tổng tiền không chính xác.'
       )
     }
 
+    // Tạo đơn hàng
     const newOrder = {
-      userId: userId,
-      shippingAddressId: reqBody.shippingAddressId,
+      userId,
+      shippingAddressId,
       total: cartTotal,
-      couponId: reqBody.couponId,
-      paymentMethod: reqBody.paymentMethod,
-      couponCode: reqBody.couponCode,
-      note: reqBody.note,
-
-      discountAmount: discountAmount,
+      couponId,
+      paymentMethod,
+      couponCode,
+      note,
+      discountAmount,
       status: 'Pending',
       isPaid: false,
       paymentStatus: 'Pending',
       isDelivered: false
     }
 
-    // Lưu vào Order
-    const Order = await OrderModel.create(newOrder)
+    const order = await OrderModel.create(newOrder)
 
-    // Lưu vào OrderItems
-    for (const item of cart.cartItems) {
-      const product = await ProductModel.findOne({
-        _id: item.productId,
-        destroy: false
-      })
-
-      const orderItemData = {
-        orderId: Order._id,
+    // Tạo OrderItems
+    const orderItems = cartItems.map((item) => {
+      const product = productMap.get(item.productId.toString())
+      return {
+        orderId: order._id,
         productId: product._id,
         quantity: item.quantity,
         priceAtOrder: product.price
       }
+    })
 
-      // Lưu vào OrderItem trong DB
-      await OrderItemModel.create(orderItemData)
-    }
+    await OrderItemModel.insertMany(orderItems)
 
-    // Cập nhật lại số lượng sản phẩm trong DB
-
-    // Xóa sản phẩm trong giỏ hàng
-    await CartModel.updateOne({ userId }, { $set: { cartItems: [] } })
-
-    // Tạo Payment Transaction
+    // Tạo giao dịch thanh toán
     const paymentTransactionInfo = {
-      orderId: Order._id,
-      method: reqBody.paymentMethod,
+      orderId: order._id,
+      method: paymentMethod,
       transactionId: null,
       status: 'Pending',
       paidAt: null,
-      note: reqBody.note || null
+      note: note || null
     }
 
     await PaymentTransactionModel.create(paymentTransactionInfo)
 
-    return Order
+    // Xóa sản phẩm trong giỏ hàng
+    await CartModel.updateOne(
+      { userId },
+      {
+        $pull: {
+          cartItems: {
+            productId: { $in: productIds }
+          }
+        }
+      }
+    )
+
+    // Xử lý thanh toán VNPAY
+    if (paymentMethod === 'vnpay') {
+      const dayjs = require('dayjs')
+      const crypto = require('crypto')
+      const querystring = require('qs')
+
+      const createDate = dayjs().format('YYYYMMDDHHmmss')
+      const orderId = order._id.toString() // ID đơn hàng MongoDB
+      const amount = total // Tổng tiền đơn đã được validate
+
+      const bankCode = reqBody.bankCode || '' // lấy nếu FE gửi
+      const orderInfo = `Thanh toán đơn hàng ${cartItems.length} sản phẩm, tổng: ${amount} VND, coupon: ${couponCode || 'Không'}, ghi chú: ${note || 'Không có'}`
+      const orderType = 'other' // Có thể lấy từ reqBody nếu FE có truyền
+      const locale = reqBody.language || 'vn'
+
+      // Lấy config VNPAY
+      const tmnCode = env.VNP_TMNCODE
+      const secretKey = env.VNP_HASHSECRET
+      const vnpUrl = env.VNP_URL
+      const returnUrl = env.VNP_RETURN_URL
+
+      let vnp_Params = {
+        vnp_Version: '2.1.0',
+        vnp_Command: 'pay',
+        vnp_TmnCode: tmnCode,
+        vnp_Locale: locale,
+        vnp_CurrCode: 'VND',
+        vnp_TxnRef: orderId,
+        vnp_OrderInfo: orderInfo,
+        vnp_OrderType: orderType,
+        vnp_Amount: amount * 100,
+        vnp_ReturnUrl: returnUrl,
+        vnp_IpAddr: ipAddr,
+        vnp_CreateDate: createDate
+      }
+
+      if (bankCode) {
+        vnp_Params['vnp_BankCode'] = bankCode
+      }
+
+      // Sắp xếp tham số
+      vnp_Params = Object.keys(vnp_Params)
+        .sort()
+        .reduce((acc, key) => {
+          acc[key] = vnp_Params[key]
+          return acc
+        }, {})
+
+      // Tạo chuỗi signData
+      const signData = querystring.stringify(vnp_Params, { encode: false })
+
+      // Tạo chữ ký HMAC SHA512
+      const hmac = crypto.createHmac('sha512', secretKey)
+      const signed = hmac.update(Buffer.from(signData, 'utf-8')).digest('hex')
+
+      vnp_Params['vnp_SecureHash'] = signed
+
+      // Tạo url thanh toán đầy đủ
+      const urlPayment =
+        vnpUrl + '?' + querystring.stringify(vnp_Params, { encode: false })
+
+      console.log('urlPayment', urlPayment)
+
+      return urlPayment
+    }
+
+    return order
   } catch (err) {
     throw err
   }
 }
 
-const getOrderList = async (userId) => {
+const getOrderList = async () => {
   // eslint-disable-next-line no-useless-catch
   try {
     const result = await OrderModel.find({})
@@ -215,10 +299,42 @@ const deleteOrder = async (orderId) => {
   }
 }
 
+// Thanh toán VNPAY
+
+const vnpayIPN = async (req) => {
+  const vnp_Params = { ...req.query }
+  const isValid = verifyChecksum(vnp_Params)
+  if (isValid) {
+    const orderId = vnp_Params['vnp_TxnRef']
+    const rspCode = vnp_Params['vnp_ResponseCode']
+
+    // Ở đây bạn nên cập nhật trạng thái đơn hàng trong DB dựa vào orderId & rspCode
+    // Ví dụ:
+    // if (rspCode === '00') thì update đơn hàng thành công
+    // else thì update trạng thái thất bại, hoặc chờ xử lý
+
+    return { RspCode: '00', Message: 'success' }
+  }
+  return { RspCode: '97', Message: 'Fail checksum' }
+}
+
+const vnpayReturn = async (req) => {
+  const vnp_Params = { ...req.query }
+  const isValid = verifyChecksum(vnp_Params)
+  if (isValid) {
+    // Ở đây bạn có thể lấy mã response để FE hiển thị thông báo thành công/thất bại
+    // Nếu cần thiết có thể kiểm tra thêm trạng thái đơn hàng trong DB rồi trả về
+    return vnp_Params['vnp_ResponseCode']
+  }
+  return '97'
+}
+
 export const ordersService = {
   createOrder,
   getOrderList,
   getOrder,
   updateOrder,
-  deleteOrder
+  deleteOrder,
+  vnpayIPN,
+  vnpayReturn
 }

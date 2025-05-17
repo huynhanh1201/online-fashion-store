@@ -16,6 +16,15 @@ const verifyId = (req, res, next) => {
 const order = async (req, res, next) => {
   // Xác thực dữ liệu đầu vào correctCondition: điều kiện đúng
   const correctCondition = Joi.object({
+    cartItems: Joi.array()
+      .items(
+        Joi.object({
+          productId: Joi.string().length(24).hex().required(),
+          quantity: Joi.number().integer().min(1).required()
+        })
+      )
+      .min(1)
+      .required(),
     couponId: Joi.string().hex().length(24).allow(null),
 
     couponCode: Joi.string()

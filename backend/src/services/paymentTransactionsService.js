@@ -1,9 +1,4 @@
-import { StatusCodes } from 'http-status-codes'
-
 import { PaymentTransactionModel } from '~/models/PaymentTransactionModel'
-import ApiError from '~/utils/ApiError'
-import { slugify } from '~/utils/formatters'
-import mongoose from 'mongoose'
 
 const getPaymentTransactionList = async (orderId) => {
   // eslint-disable-next-line no-useless-catch
