@@ -21,21 +21,30 @@ const ProductCard = ({ product, handleAddToCart, isAdding }) => {
   return (
     <Card
       sx={{
-        width: 290,
-        height: 420,
+        width: 283,
+        height: 470,
         display: 'flex',
         flexDirection: 'column'
       }}
     >
-      <a href={`/productdetail/${product._id}`} style={{ textDecoration: 'none' }}>
-        <CardMedia
-          component="img"
-          height="294"
-          image={product.image?.[0] || '/default.jpg'}
-          alt={product.name}
-        />
-      </a>
-      <CardContent>
+      <div
+        style={{ padding: '10px', backgroundColor: '#fff', height: '350px' }}
+      >
+        <a
+          href={`/productdetail/${product._id}`}
+          style={{ textDecoration: 'none' }}
+        >
+          <CardMedia
+            component='img'
+            height='100%'
+            width='100%'
+            image={product.image?.[0] || '/default.jpg'}
+            alt={product.name}
+            sx={{ objectFit: 'contain' }}
+          />
+        </a>
+      </div>
+      <CardContent sx={{ mb: -2 }}>
         <a
           href={`/productdetail/${product._id}`}
           style={{ textDecoration: 'none', color: 'black', fontWeight: 'bold' }}
@@ -45,18 +54,19 @@ const ProductCard = ({ product, handleAddToCart, isAdding }) => {
         </a>
       </CardContent>
       <CardActions disableSpacing>
-        <IconButton aria-label="add to favorites">
+        <IconButton aria-label='add to favorites'>
           <FavoriteIcon />
         </IconButton>
         <IconButton
           onClick={() => handleAddToCart(product)}
           disabled={isAdding}
-          aria-label="add to cart"
+          aria-label='add to cart'
+          sx={{ color: '#403535' }}
         >
           <AddShoppingCartIcon />
         </IconButton>
         <Box sx={{ ml: 'auto', pr: 1 }}>
-          <Typography variant="subtitle1" fontWeight="bold">
+          <Typography variant='subtitle1' fontWeight='bold'>
             {product.price ? `${product.price.toLocaleString()}₫` : '---'}
           </Typography>
         </Box>

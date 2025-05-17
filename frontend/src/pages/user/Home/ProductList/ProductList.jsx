@@ -8,7 +8,7 @@ import ProductCard from '~/components/ProductCards/ProductCards'
 
 const ProductList = () => {
   const { products, fetchProducts } = useProducts()
-  const [snackbar, setSnackbar] = useState(null) // { type: 'success' | 'error' | 'warning', message: string }
+  const [snackbar, setSnackbar] = useState(null)
   const [isAdding, setIsAdding] = useState({})
   const dispatch = useDispatch()
 
@@ -55,53 +55,53 @@ const ProductList = () => {
     }
   }
 
-  // Chia products thành 2 nhóm mỗi nhóm 4 sản phẩm
-  const first4Products = Array.isArray(products) ? products.slice(0, 4) : []
-  const next4Products = Array.isArray(products) ? products.slice(4, 8) : []
+  const maxDisplayProducts = 15
+  const displayedProducts = Array.isArray(products)
+    ? products.slice(0, maxDisplayProducts)
+    : []
 
   return (
     <Box
       sx={{
+        justifyContent: 'center',
         p: 2,
-        borderRadius: 3,
-        m: 2,
-        boxShadow: 3
+        m: 2
       }}
     >
-      {/* 4 products */}
       <Grid
         container
-        justifyContent='center'
-        alignItems='center'
-        spacing={2}
+        justifyContent='start'
+        alignItems='stretch'
+        spacing={1}
         sx={{ mt: 5 }}
       >
-        {first4Products.map((product) => (
-          <Grid item xs={12} sm={6} md={3} key={product._id}>
-            <ProductCard
-              product={product}
-              handleAddToCart={handleAddToCart}
-              isAdding={!!isAdding[product._id]}
-            />
-          </Grid>
-        ))}
-      </Grid>
-
-      {/* 4 products */}
-      <Grid
-        container
-        justifyContent='center'
-        alignItems='center'
-        spacing={2}
-        sx={{ mt: 3 }}
-      >
-        {next4Products.map((product) => (
-          <Grid item xs={12} sm={6} md={3} key={product._id}>
-            <ProductCard
-              product={product}
-              handleAddToCart={handleAddToCart}
-              isAdding={!!isAdding[product._id]}
-            />
+        {displayedProducts.map((product) => (
+          <Grid item key={product._id}>
+            <Box
+              sx={{
+                height: '100%',
+                display: 'flex',
+                flexDirection: 'column',
+                minHeight: 300,
+                maxHeight: 450,
+                transition: 'all 0.3s ease-in-out',
+                '&:hover': {
+                  transform: 'translateY(-5px)',
+                  boxShadow: '0 12px 24px rgba(0,0,0,0.15)'
+                },
+                borderRadius: 2,
+                overflow: 'hidden',
+                backgroundColor: '#fff',
+                border: '1px solid #e0e0e0'
+              }}
+            >
+              <ProductCard
+                product={product}
+                handleAddToCart={handleAddToCart}
+                isAdding={!!isAdding[product._id]}
+                showHoverActions
+              />
+            </Box>
           </Grid>
         ))}
       </Grid>
