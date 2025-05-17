@@ -55,4 +55,4 @@ const CouponSchema = new Schema(
 )
 
 // Tạo Model
-export const CouponModel = model('ListCoupon', CouponSchema)
+export const CouponModel = model('Coupon', CouponSchema)

@@ -36,28 +36,28 @@ const validateCoupon = async (userId, reqBody) => {
       $expr: { $lte: ['$usedCount', '$usageLimit'] }
     })
 
-    if (!coupon || reqBody.cartTotal < coupon.minOrderValue) {
+    if (coupon && reqBody.cartTotal >= coupon.minOrderValue) {
+      let discountAmount
+      if (coupon.type === 'fixed') {
+        discountAmount = coupon.amount
+      } else if (coupon.type === 'percent') {
+        discountAmount = reqBody.cartTotal * (coupon.amount / 100)
+      }
+
+      const newTotal = reqBody.cartTotal - discountAmount
+      const message = `Áp dụng thành công mã ${coupon.code}`
+
+      return {
+        valid: true, // Mã hợp lệ
+        discountAmount,
+        newTotal,
+        message
+      }
+    } else {
       return {
         valid: false, // Mã sai hoặc hết hạn
         message: 'Mã không hợp lệ hoặc đã hết hạn'
       }
-    }
-
-    let discountAmount
-    if (coupon.type === 'fixed') {
-      discountAmount = coupon.amount
-    } else if (coupon.type === 'percent') {
-      discountAmount = reqBody.cartTotal * (coupon.amount / 100)
-    }
-
-    const newTotal = reqBody.cartTotal - discountAmount
-    const message = `Áp dụng thành công mã ${coupon.code}`
-
-    return {
-      valid: true, // Mã hợp lệ
-      discountAmount,
-      newTotal,
-      message
     }
   } catch (err) {
     throw err
