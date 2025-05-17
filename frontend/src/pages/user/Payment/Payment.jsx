@@ -106,7 +106,7 @@ const Payment = () => {
     }
 
     try {
-      const response = await handleApplyVoucher(voucherInput, subTotal)
+      const response = await handleApplyVoucher(voucherInput.trim(), subTotal)
 
       if (response?.valid) {
         setVoucherApplied(true)
@@ -116,17 +116,11 @@ const Payment = () => {
           message: response.message || 'Áp dụng mã giảm giá thành công'
         })
       } else {
-        setVoucherApplied(false)
-        setSnackbar({
-          open: true,
-          severity: 'error',
-          message: response?.message || 'Mã giảm giá không hợp lệ hoặc đã hết hạn'
-        })
+        throw new Error(response?.message || 'Mã giảm giá không hợp lệ hoặc đã hết hạn')
       }
     } catch (err) {
       setVoucherApplied(false)
-      const errorMessage =
-        err?.response?.data?.message || err.message || 'Có lỗi xảy ra khi áp dụng mã'
+      const errorMessage = err?.message || 'Có lỗi xảy ra khi áp dụng mã giảm giá'
       setSnackbar({
         open: true,
         severity: 'error',
@@ -134,6 +128,7 @@ const Payment = () => {
       })
     }
   }
+
 
 
 

@@ -14,25 +14,33 @@ import ProductCard from '~/components/ProductCards/ProductCards'
 
 const ProductList = () => {
   const { products, fetchProducts } = useProducts()
-  const [snackbar, setSnackbar] = useState(null) // { type: 'success' | 'error' | 'warning', message: string }
+  const [snackbar, setSnackbar] = useState(null)
   const [isAdding, setIsAdding] = useState({})
+  const [cartItems, setLocalCartItems] = useState([])
   const dispatch = useDispatch()
 
   useEffect(() => {
     fetchProducts()
-  }, [fetchProducts])
-
-  
+    // Lấy giỏ hàng 1 lần khi load
+    const loadCart = async () => {
+      try {
+        const res = await getCart()
+        const items = res?.cartItems || []
+        setLocalCartItems(items)
+        dispatch(setCartItems(items))
+      } catch (error) {
+        console.error('Lỗi lấy giỏ hàng:', error)
+      }
+    }
+    loadCart()
+  }, [])
 
   const handleAddToCart = async (product) => {
     if (isAdding[product._id]) return
     setIsAdding(prev => ({ ...prev, [product._id]: true }))
 
     try {
-      const updatedCart = await getCart()
-      const existingItem = updatedCart?.cartItems?.find(
-        item => item.productId._id === product._id
-      )
+      const existingItem = cartItems.find(item => item.productId._id === product._id)
       const currentQty = existingItem?.quantity || 0
       const maxQty = product.quantity
 
@@ -45,7 +53,10 @@ const ProductList = () => {
         cartItems: [{ productId: product._id, quantity: 1 }]
       })
 
-      dispatch(setCartItems(res?.cartItems || updatedCart?.cartItems || []))
+      const updatedItems = res?.cartItems || []
+      setLocalCartItems(updatedItems)
+      dispatch(setCartItems(updatedItems))
+
       setSnackbar({ type: 'success', message: 'Thêm sản phẩm vào giỏ hàng thành công!' })
     } catch (error) {
       console.error('Thêm vào giỏ hàng lỗi:', error)
@@ -57,13 +68,11 @@ const ProductList = () => {
     }
   }
 
-  // Chia products thành 2 nhóm mỗi nhóm 4 sản phẩm
   const first4Products = products.slice(0, 4)
   const next4Products = products.slice(4, 8)
 
   return (
     <Box sx={{ backgroundColor: '#03235e', p: 2, borderRadius: 3, m: 2, boxShadow: 3 }}>
-      {/* 4 products */}
       <Grid container justifyContent="center" alignItems="center" spacing={2} sx={{ mt: 5 }}>
         {first4Products.map(product => (
           <Grid item xs={12} sm={6} md={3} key={product._id}>
@@ -76,7 +85,6 @@ const ProductList = () => {
         ))}
       </Grid>
 
-      {/* 4 products */}
       <Grid container justifyContent="center" alignItems="center" spacing={2} sx={{ mt: 3 }}>
         {next4Products.map(product => (
           <Grid item xs={12} sm={6} md={3} key={product._id}>
