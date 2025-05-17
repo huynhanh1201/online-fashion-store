@@ -5,7 +5,8 @@ import {
   Snackbar, Alert
 } from '@mui/material'
 import { styled } from '@mui/system'
-import { AddressModal } from './Modal/AddressModal'
+import { ChooseAddressModal } from './Modal/ChooseAddressModal'
+
 import { useAddress } from '~/hook/useAddress'
 import useCoupon from '~/hook/useCoupon'
 import { useCart } from '~/hook/useCarts'
@@ -77,13 +78,12 @@ const Payment = () => {
   const total = subTotal - discount
 
   useEffect(() => {
-    if (!addresses || addresses.length === 0) {
-      fetchAddresses()
-    } else {
+    if (addresses.length > 0 && !selectedAddress) {
       const defaultAddr = addresses.find(addr => addr.isDefault)
       setSelectedAddress(defaultAddr || addresses[0])
     }
   }, [addresses])
+
 
 
   const handleOpenAddressModal = () => setOpenAddressModal(true)
@@ -340,7 +340,7 @@ const Payment = () => {
           </Grid>
         )}
 
-        <AddressModal
+        <ChooseAddressModal
           open={openAddressModal}
           onClose={handleCloseAddressModal}
           onConfirm={handleAddressConfirm}
