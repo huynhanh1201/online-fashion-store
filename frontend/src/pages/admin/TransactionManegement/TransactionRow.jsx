@@ -1,37 +1,96 @@
-import React from 'react'
-import { TableCell, TableRow, IconButton, Tooltip } from '@mui/material'
-import VisibilityIcon from '@mui/icons-material/Visibility'
-import EditIcon from '@mui/icons-material/Edit'
-import DeleteIcon from '@mui/icons-material/Delete'
+import React, { useEffect, useState } from 'react'
+import { TableCell, TableRow, IconButton, Tooltip, Chip } from '@mui/material'
+import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye'
+import BorderColorIcon from '@mui/icons-material/BorderColor'
+import DeleteForeverIcon from '@mui/icons-material/DeleteForever'
+import useOrderAdmin from '~/hook/admin/useOrder.js'
+import {
+  StyledTableCell,
+  StyledTableRow
+} from '../UserManagement/UserTableStyles.js'
+const TransactionRow = ({ transaction, onView, onEdit, onDelete, index }) => {
+  const [orderTotal, setOrderTotal] = useState(null)
+  const { getOrderId } = useOrderAdmin()
 
-const TransactionRow = ({ transaction, onView, onEdit, onDelete }) => {
+  useEffect(() => {
+    const fetchOrder = async () => {
+      try {
+        const order = await getOrderId(transaction.orderId)
+        setOrderTotal(order?.total)
+      } catch (error) {
+        console.error('Lỗi khi lấy đơn hàng:', error)
+      }
+    }
+
+    if (transaction.orderId) {
+      fetchOrder()
+    }
+  }, [transaction.orderId])
   return (
-    <TableRow>
-      <TableCell>{transaction._id}</TableCell>
-      <TableCell>{transaction.orderId}</TableCell>
-      <TableCell>{transaction.method}</TableCell>
-      <TableCell>{transaction.status}</TableCell>
-      <TableCell>{transaction.amount?.toLocaleString()}₫</TableCell>
-      <TableCell>{transaction.note || '-'}</TableCell>
-      <TableCell>{new Date(transaction.createdAt).toLocaleString()}</TableCell>
-      <TableCell>
+    <StyledTableRow>
+      <StyledTableCell sx={{ textAlign: 'center' }}>
+        {index + 1}
+      </StyledTableCell>
+      <StyledTableCell>{transaction._id}</StyledTableCell>
+      <StyledTableCell>{transaction.orderId}</StyledTableCell>
+      <StyledTableCell>{transaction.method}</StyledTableCell>
+      <StyledTableCell>
+        <Chip
+          label={
+            transaction.status === 'Pending'
+              ? 'Đang xử lý'
+              : transaction.status === 'Completed'
+                ? 'Thành công'
+                : transaction.status === 'Failed'
+                  ? 'Thất bại'
+                  : '—'
+          }
+          color={
+            transaction.status === 'Completed'
+              ? 'success'
+              : transaction.status === 'Failed'
+                ? 'error'
+                : 'warning'
+          }
+          size='small'
+        />
+      </StyledTableCell>
+      <StyledTableCell>
+        {orderTotal !== null
+          ? `${orderTotal.toLocaleString()} VNĐ`
+          : 'Đang tải...'}
+      </StyledTableCell>
+      <StyledTableCell
+        sx={{
+          maxWidth: '130px',
+          whiteSpace: 'nowrap',
+          overflow: 'hidden',
+          textOverflow: 'ellipsis'
+        }}
+      >
+        {transaction.note || '-'}
+      </StyledTableCell>
+      <StyledTableCell>
+        {new Date(transaction.createdAt).toLocaleString()}
+      </StyledTableCell>
+      <StyledTableCell>
         <Tooltip title='Xem'>
           <IconButton onClick={() => onView(transaction)}>
-            <VisibilityIcon color='primary' />
+            <RemoveRedEyeIcon color='primary' />
           </IconButton>
         </Tooltip>
         <Tooltip title='Sửa'>
           <IconButton onClick={() => onEdit(transaction)}>
-            <EditIcon color='warning' />
+            <BorderColorIcon color='warning' />
           </IconButton>
         </Tooltip>
         <Tooltip title='Xoá'>
           <IconButton onClick={() => onDelete(transaction)}>
-            <DeleteIcon color='error' />
+            <DeleteForeverIcon color='error' />
           </IconButton>
         </Tooltip>
-      </TableCell>
-    </TableRow>
+      </StyledTableCell>
+    </StyledTableRow>
   )
 }
 

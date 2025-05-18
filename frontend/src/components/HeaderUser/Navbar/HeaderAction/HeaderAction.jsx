@@ -12,7 +12,11 @@ import PersonIcon from '@mui/icons-material/Person'
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart'
 import { Link, useNavigate } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
-import { logoutUserAPI, selectCurrentUser } from '~/redux/user/userSlice'
+import {
+  logoutUserAPI,
+  selectCurrentUser,
+  loginUserAPI
+} from '~/redux/user/userSlice'
 import { clearCart } from '~/redux/cart/cartSlice'
 import { getProfileUser } from '~/services/userService'
 import { toast } from 'react-toastify'
@@ -23,15 +27,19 @@ const HeaderAction = () => {
   const dispatch = useDispatch()
   const navigate = useNavigate()
   const currentUser = useSelector(selectCurrentUser)
-  
+
+  console.log('currentUser', currentUser)
+
   // Lấy giỏ hàng từ Redux store
-  const cartItems = useSelector(state => state.cart.cartItems)
+  const cartItems = useSelector((state) => state.cart.cartItems)
   const cartCount = cartItems.reduce((total, item) => total + item.quantity, 0)
   const [tokenUpdated, setTokenUpdated] = useState(
     localStorage.getItem('token')
   ) // Theo dõi token
 
   useEffect(() => {
+    const token = localStorage.getItem('token')
+
     const fetchProfile = async () => {
       try {
         const profileData = await getProfileUser()
@@ -52,13 +60,12 @@ const HeaderAction = () => {
       }
     }
 
-    // Gọi API nếu có token
-    const token = localStorage.getItem('token')
-    if (token) {
+    // Chỉ fetch profile nếu có token và chưa có currentUser
+    if (token && !currentUser) {
       setTokenUpdated(token)
       fetchProfile()
     }
-  }, [dispatch, tokenUpdated])
+  }, [dispatch, currentUser])
 
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget)
@@ -118,14 +125,22 @@ const HeaderAction = () => {
       >
         {currentUser ? (
           <>
-            <MenuItem component={Link} to='/profile'>Hồ sơ</MenuItem>
+            <MenuItem component={Link} to='/profile'>
+              Hồ sơ
+            </MenuItem>
             <MenuItem onClick={handleLogout}>Đăng xuất</MenuItem>
           </>
         ) : (
-          <MenuItem component={Link} to='/login'>Đăng nhập</MenuItem>
+          <MenuItem component={Link} to='/login'>
+            Đăng nhập
+          </MenuItem>
         )}
-        <MenuItem component={Link} to='/cart'>Giỏ hàng</MenuItem>
-        <MenuItem component={Link} to='/order'>Thông tin đơn hàng</MenuItem>
+        <MenuItem component={Link} to='/cart'>
+          Giỏ hàng
+        </MenuItem>
+        <MenuItem component={Link} to='/order'>
+          Thông tin đơn hàng
+        </MenuItem>
       </Menu>
 
       <IconButton color='inherit' component={Link} to='/cart'>

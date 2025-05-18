@@ -51,19 +51,19 @@ export default function CategoryRow({ category, idx, handleOpenModal }) {
             onClick={() => handleOpenModal('view', category)}
             size='small'
           >
-            <RemoveRedEyeIcon />
+            <RemoveRedEyeIcon color='primary' />
           </IconButton>
           <IconButton
             onClick={() => handleOpenModal('edit', category)}
             size='small'
           >
-            <BorderColorIcon />
+            <BorderColorIcon color='warning' />
           </IconButton>
           <IconButton
             onClick={() => handleOpenModal('delete', category)}
             size='small'
           >
-            <DeleteForeverIcon />
+            <DeleteForeverIcon color='error' />
           </IconButton>
         </Stack>
       </StyledTableCell>

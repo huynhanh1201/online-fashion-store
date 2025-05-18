@@ -5,11 +5,16 @@ const TransactionPagination = ({ page, totalPages, onChange }) => {
   return (
     <Stack spacing={2} alignItems='center' mt={2}>
       <Pagination
-        color='primary'
         count={totalPages}
         page={page}
         onChange={(e, value) => onChange(value)}
-        shape='rounded'
+        sx={{
+          '& .Mui-selected': {
+            backgroundColor: '#001f5d !important',
+            color: '#fff',
+            fontWeight: 'bold'
+          }
+        }}
       />
     </Stack>
   )

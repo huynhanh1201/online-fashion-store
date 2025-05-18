@@ -16,6 +16,7 @@ import {
 } from '@mui/material'
 import { useForm, Controller } from 'react-hook-form'
 import styleAdmin from '~/components/StyleAdmin.jsx'
+import StyleAdmin from '~/components/StyleAdmin.jsx'
 
 const statusOptions = [
   'Pending',
@@ -130,18 +131,23 @@ const EditOrderModal = ({ open, onClose, order, onUpdate, loading }) => {
       <DialogContent dividers>
         <Stack spacing={2} sx={{ mt: 1 }}>
           {/* Status */}
-          <FormControl fullWidth>
+          <FormControl fullWidth sx={StyleAdmin.FormSelect}>
             <InputLabel id='status-label'>Trạng thái</InputLabel>
             <Controller
               name='status'
               control={control}
-              rules={{ required: 'Vui lòng chọn trạng thái' }}
+              rules={{ required: 'Vui lòng chọn trạng thái đơn hàng' }}
               render={({ field }) => (
                 <Select
                   labelId='status-label'
-                  label='Trạng thái'
+                  label='Trạng thái đơn hàng'
                   {...field}
                   error={!!errors.status}
+                  MenuProps={{
+                    PaperProps: {
+                      sx: StyleAdmin.FormSelect.SelectMenu
+                    }
+                  }}
                 >
                   {statusOptions.map((status) => (
                     <MenuItem key={status} value={status}>
@@ -172,7 +178,7 @@ const EditOrderModal = ({ open, onClose, order, onUpdate, loading }) => {
           />
 
           {/* Payment Status */}
-          <FormControl fullWidth>
+          <FormControl fullWidth sx={StyleAdmin.FormSelect}>
             <InputLabel id='payment-status-label'>
               Trạng thái thanh toán
             </InputLabel>
@@ -186,6 +192,11 @@ const EditOrderModal = ({ open, onClose, order, onUpdate, loading }) => {
                   label='Trạng thái thanh toán'
                   {...field}
                   error={!!errors.paymentStatus}
+                  MenuProps={{
+                    PaperProps: {
+                      sx: StyleAdmin.FormSelect.SelectMenu
+                    }
+                  }}
                 >
                   {paymentStatusOptions.map((status) => (
                     <MenuItem key={status} value={status}>
@@ -198,7 +209,7 @@ const EditOrderModal = ({ open, onClose, order, onUpdate, loading }) => {
           </FormControl>
 
           {/* Payment Method */}
-          <FormControl fullWidth>
+          <FormControl fullWidth sx={StyleAdmin.FormSelect}>
             <InputLabel id='payment-method-label'>
               Phương thức thanh toán
             </InputLabel>
@@ -212,6 +223,11 @@ const EditOrderModal = ({ open, onClose, order, onUpdate, loading }) => {
                   label='Phương thức thanh toán'
                   {...field}
                   error={!!errors.paymentMethod}
+                  MenuProps={{
+                    PaperProps: {
+                      sx: StyleAdmin.FormSelect.SelectMenu
+                    }
+                  }}
                 >
                   {paymentMethodOptions.map((method) => (
                     <MenuItem key={method} value={method}>

@@ -424,7 +424,9 @@ function ShippingAdress({ showSnackbar }) {
                 addresses.map((addr) => (
                   <TableRow
                     key={addr._id}
-                    sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+                    sx={{
+                      '&:last-child td, &:last-child th': { border: 0 }
+                    }}
                   >
                     <TableCell>{addr.fullName}</TableCell>
                     <TableCell>{addr.phone}</TableCell>
@@ -459,6 +461,7 @@ function ShippingAdress({ showSnackbar }) {
 
       {/* Dialog thêm/sửa địa chỉ */}
       <Dialog
+        style={{ marginTop: '50px' }}
         open={openAddressDialog}
         onClose={() => {
           setOpenAddressDialog(false)
@@ -475,7 +478,7 @@ function ShippingAdress({ showSnackbar }) {
         fullWidth
         maxWidth='sm'
       >
-        <DialogTitle>
+        <DialogTitle style={{ marginTop: '50px' }}>
           {editAddressId ? 'Sửa địa chỉ' : 'Thêm địa chỉ mới'}
         </DialogTitle>
         <DialogContent>

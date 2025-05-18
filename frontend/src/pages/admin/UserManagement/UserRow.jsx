@@ -46,19 +46,19 @@ export default React.memo(function UserRow({ user, index, handleOpenModal }) {
             onClick={() => handleOpenModal('view', user)}
             size='small'
           >
-            <RemoveRedEyeIcon />
+            <RemoveRedEyeIcon color='primary' />
           </IconButton>
           <IconButton
             onClick={() => handleOpenModal('edit', user)}
             size='small'
           >
-            <BorderColorIcon />
+            <BorderColorIcon color='warning' />
           </IconButton>
           <IconButton
             onClick={() => handleOpenModal('delete', user)}
             size='small'
           >
-            <DeleteForeverIcon />
+            <DeleteForeverIcon color='error' />
           </IconButton>
         </Stack>
       </StyledTableCell>

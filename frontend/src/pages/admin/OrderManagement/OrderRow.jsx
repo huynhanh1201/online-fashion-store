@@ -9,46 +9,32 @@ import {
   StyledTableRow
 } from '~/pages/admin/CategorieManagement/CategoryTableStyles.jsx'
 
-const OrderRow = ({ order, onView, onEdit, onDelete }) => {
+const OrderRow = ({ order, index, onView, onEdit, onDelete }) => {
   const {
     _id,
-    total,
-    paymentMethod,
-    paymentStatus,
-    discountAmount,
+    customerName = order.userId.name,
     status,
-    isDelivered,
+    paymentStatus,
     createdAt
   } = order
 
   return (
     <StyledTableRow hover>
-      <StyledTableCell>{_id}</StyledTableCell>
-
-      <StyledTableCell>
-        {paymentMethod ? paymentMethod.toUpperCase() : '—'}
+      <StyledTableCell sx={{ textAlign: 'center' }}>
+        {index + 1}
       </StyledTableCell>
 
-      <StyledTableCell>
-        <Chip
-          label={
-            paymentStatus === 'Pending'
-              ? 'Đang chờ'
-              : paymentStatus === 'Completed'
-                ? 'Đã thanh toán'
-                : paymentStatus === 'Failed'
-                  ? 'Thất bại'
-                  : '—'
-          }
-          color={
-            paymentStatus === 'Completed'
-              ? 'success'
-              : paymentStatus === 'Failed'
-                ? 'error'
-                : 'warning'
-          }
-          size='small'
-        />
+      <StyledTableCell>{_id}</StyledTableCell>
+
+      <StyledTableCell
+        sx={{
+          maxWidth: '130px',
+          whiteSpace: 'nowrap',
+          overflow: 'hidden',
+          textOverflow: 'ellipsis'
+        }}
+      >
+        {customerName || '—'}
       </StyledTableCell>
 
       <StyledTableCell>
@@ -79,18 +65,24 @@ const OrderRow = ({ order, onView, onEdit, onDelete }) => {
 
       <StyledTableCell>
         <Chip
-          label={isDelivered ? 'Đã giao' : 'Chưa giao'}
-          color={isDelivered ? 'success' : 'default'}
+          label={
+            paymentStatus === 'Pending'
+              ? 'Đang chờ'
+              : paymentStatus === 'Completed'
+                ? 'Đã thanh toán'
+                : paymentStatus === 'Failed'
+                  ? 'Thất bại'
+                  : '—'
+          }
+          color={
+            paymentStatus === 'Completed'
+              ? 'success'
+              : paymentStatus === 'Failed'
+                ? 'error'
+                : 'warning'
+          }
           size='small'
         />
-      </StyledTableCell>
-
-      <StyledTableCell>
-        {discountAmount > 0 ? `- ${discountAmount.toLocaleString()}₫` : '—'}
-      </StyledTableCell>
-
-      <StyledTableCell>
-        {total ? `${total.toLocaleString()}₫` : '—'}
       </StyledTableCell>
 
       <StyledTableCell>
@@ -100,13 +92,13 @@ const OrderRow = ({ order, onView, onEdit, onDelete }) => {
       <StyledTableCell sx={{ maxWidth: 130, width: 130 }}>
         <Stack direction='row' spacing={1}>
           <IconButton onClick={() => onView(order)} size='small'>
-            <RemoveRedEyeIcon />
+            <RemoveRedEyeIcon color='primary' />
           </IconButton>
           <IconButton onClick={() => onEdit(order)} size='small'>
-            <BorderColorIcon />
+            <BorderColorIcon color='warning' />
           </IconButton>
           <IconButton onClick={() => onDelete(order)} size='small'>
-            <DeleteForeverIcon />
+            <DeleteForeverIcon color='error' />
           </IconButton>
         </Stack>
       </StyledTableCell>

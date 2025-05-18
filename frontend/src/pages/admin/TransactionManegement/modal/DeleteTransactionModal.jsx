@@ -5,34 +5,67 @@ import {
   DialogContent,
   DialogActions,
   Button,
-  Divider,
+  CircularProgress,
   Typography
 } from '@mui/material'
 
-const DeleteTransactionModal = ({ open, onClose, transaction, onDelete }) => {
-  const handleDelete = () => {
-    onDelete(transaction._id)
+const DeleteTransactionModal = ({
+  open,
+  onClose,
+  transaction,
+  onDelete,
+  loading
+}) => {
+  const handleDelete = async () => {
+    await onDelete(transaction._id)
+    onClose()
   }
-
   return (
-    <Dialog open={open} onClose={onClose} fullWidth maxWidth='xs'>
-      <DialogTitle>Xác nhận xoá</DialogTitle>
-      <Divider />
-      <DialogContent>
-        <Typography>Bạn có chắc chắn muốn xoá giao dịch này không?</Typography>
-        <Typography variant='body2' color='text.secondary' mt={1}>
-          ID: {transaction?._id}
+    <Dialog
+      open={open}
+      onClose={onClose}
+      fullWidth
+      maxWidth='sm'
+      BackdropProps={{
+        sx: {
+          backgroundColor: 'rgba(0, 0, 0, 0.3)'
+        }
+      }}
+      PaperProps={{
+        sx: {
+          borderRadius: '12px',
+          padding: 0
+        }
+      }}
+    >
+      <DialogTitle
+        sx={{
+          fontWeight: 600,
+          fontSize: 20,
+          padding: '16px 24px'
+        }}
+      >
+        Xác nhận xoá giao dịch
+      </DialogTitle>
+
+      <DialogContent dividers sx={{ padding: '16px 24px' }}>
+        <Typography>
+          Bạn có chắc chắn muốn xoá giao dịch có mã{' '}
+          <strong>{transaction?._id}</strong> không?
         </Typography>
       </DialogContent>
-      <Divider />
-      <DialogActions>
-        <Button onClick={onClose}>Huỷ</Button>
+
+      <DialogActions sx={{ padding: '16px 24px' }}>
+        <Button color='inherit' onClick={onClose} disabled={loading}>
+          Huỷ
+        </Button>
         <Button
-          onClick={() => handleDelete(transaction._id)}
           variant='contained'
           color='error'
+          onClick={handleDelete}
+          disabled={loading}
         >
-          Xoá
+          {loading ? 'Đang xoá' : 'Xoá'}
         </Button>
       </DialogActions>
     </Dialog>

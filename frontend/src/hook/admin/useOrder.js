@@ -1,12 +1,13 @@
 import { useState } from 'react'
 import {
   getOrders,
+  getOrderById,
   getOrderItems,
   getOrderHistories,
   updateOrder
 } from '~/services/orderService'
 
-const useOrders = () => {
+const useOrder = () => {
   const [orders, setOrders] = useState([])
   const [loading, setLoading] = useState(false)
   const [totalPages, setTotalPages] = useState(1)
@@ -23,6 +24,16 @@ const useOrders = () => {
       setTotalPages(1)
     } finally {
       setLoading(false)
+    }
+  }
+
+  const getOrderId = async (orderId) => {
+    try {
+      const order = await getOrderById(orderId)
+      return order
+    } catch (error) {
+      console.error('Lỗi khi lấy đơn hàng:', error)
+      return null
     }
   }
 
@@ -63,8 +74,9 @@ const useOrders = () => {
     fetchOrders,
     getOrderDetailsByOrderId,
     getOrderHistoriesByOrderId,
-    updateOrderById
+    updateOrderById,
+    getOrderId
   }
 }
 
-export default useOrders
+export default useOrder

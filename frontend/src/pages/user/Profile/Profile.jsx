@@ -182,13 +182,12 @@ const Profile = () => {
           indicatorColor='primary'
         >
           <Tab icon={<PersonIcon />} iconPosition='start' label='Tài khoản' />
-          <Tab icon={<LockIcon />} iconPosition='start' label='Bảo mật' />
         </Tabs>
 
         {tab === 0 && (
           <Box>
             {loading ? (
-              <Typography>Đang tải...</Typography>
+              <Typography>Đang cập nhật ...</Typography>
             ) : (
               <>
                 <Box sx={{ textAlign: 'center', mb: 3 }}>
@@ -272,14 +271,6 @@ const Profile = () => {
                 </Button>
               </>
             )}
-          </Box>
-        )}
-
-        {tab === 1 && (
-          <Box>
-            <Typography variant='h6' textAlign='center' mb={3}>
-              Cài đặt bảo mật (Sắp ra mắt)
-            </Typography>
           </Box>
         )}
       </Paper>

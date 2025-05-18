@@ -22,6 +22,12 @@ export default function AdminMenu({
     dispatch(logoutUserAPI())
     onClose()
   }
+  const styles = {
+    menuItem: {
+      width: '200px',
+      height: '40px'
+    }
+  }
   return (
     <Popper
       open={isOpen}
@@ -42,7 +48,7 @@ export default function AdminMenu({
                     onProfileClick()
                     // navigate('/admin/profile') // Chuyển hướng tới trang profile
                   }}
-                  sx={{ borderBottom: '1px solid #ccc' }}
+                  sx={{ borderBottom: '1px solid #ccc', ...styles.menuItem }}
                 >
                   Thông tin cá nhân
                 </MenuItem>
@@ -50,6 +56,7 @@ export default function AdminMenu({
                   onClick={() => {
                     handleLogout()
                   }}
+                  sx={styles.menuItem}
                 >
                   Đăng xuất
                 </MenuItem>
