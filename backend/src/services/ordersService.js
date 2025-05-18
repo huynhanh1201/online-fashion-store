@@ -13,6 +13,7 @@ import { PaymentTransactionModel } from '~/models/PaymentTransactionModel'
 import { generatePaymentUrl, verifyChecksum } from '~/utils/vnpay'
 import { env } from '~/config/environment'
 
+
 const createOrder = async (userId, reqBody, ipAddr) => {
   // eslint-disable-next-line no-useless-catch
   try {
@@ -78,6 +79,9 @@ const createOrder = async (userId, reqBody, ipAddr) => {
 
     const cartTotal = validateCoupon.newTotal || calculatedSubtotal
     const discountAmount = validateCoupon.discountAmount || 0
+
+    console.log('cartTotal', cartTotal)
+    console.log('total', total)
 
     // Kiểm tra tổng tiền từ FE
     if (cartTotal !== total) {

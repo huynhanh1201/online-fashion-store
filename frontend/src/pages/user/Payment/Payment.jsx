@@ -21,6 +21,7 @@ import { useAddress } from '~/hook/useAddress'
 import useCoupon from '~/hook/useCoupon'
 import { useCart } from '~/hook/useCarts'
 import { useOrder } from '~/hook/useOrder'
+import { useSelector } from 'react-redux'
 
 const SectionTitle = styled(Typography)(({ theme }) => ({
   fontWeight: 700,
@@ -28,7 +29,6 @@ const SectionTitle = styled(Typography)(({ theme }) => ({
   marginBottom: theme.spacing(2),
   textTransform: 'uppercase',
 }))
-
 const ProductItem = ({ name, price, quantity, image }) => {
   // Validate product data
   if (!name || typeof price !== 'number' || typeof quantity !== 'number') {
@@ -70,21 +70,38 @@ const Payment = () => {
   const [snackbar, setSnackbar] = useState({ open: false, severity: 'info', message: '' })
 
   const { addresses, fetchAddresses } = useAddress()
-  const { cart, loading: cartLoading } = useCart()
+  const { loading: cartLoading } = useCart()
   const { createOrder, loading: orderLoading } = useOrder()
   const { discount, discountMessage, loading: couponLoading, handleApplyVoucher, couponId } = useCoupon()
 
-  const cartItems = cart?.cartItems || []
-
+  const cartItems = useSelector(state => state.cart.cartItems)
+  const selectedItems = useSelector(state => state.cart.selectedItems)
+  const selectedIds = useSelector(state => state.cart.selectedItems || [])
   // Tính tổng tiền tạm tính (subtotal)
-  const subTotal = cartItems.reduce((acc, item) => {
-    const product = item.product || item.productId || {}
+
+  const selectedCartItems = []
+  let subTotal = 0
+
+  cartItems?.forEach(item => {
+    const rawId =
+      item.product?._id ||
+      (typeof item.productId === 'string' ? item.productId : item.productId?._id)
+
+    if (!rawId || !selectedIds.includes(rawId)) return
+
+    const product = item.product || item.productId || {};
     const price = typeof product.price === 'number' ? product.price : 0
     const quantity = typeof item.quantity === 'number' ? item.quantity : 1
-    return acc + price * quantity
-  }, 0)
 
-  const total = Math.max(subTotal - discount, 0) // Tránh âm
+    subTotal += price * quantity
+
+    selectedCartItems.push({
+      productId: String(rawId),
+      quantity
+    })
+  })
+  const total = Math.max(subTotal - discount, 0)
+  // Tránh âm
 
   // Lấy địa chỉ mặc định khi có danh sách địa chỉ
   useEffect(() => {
@@ -174,12 +191,12 @@ const Payment = () => {
       setSnackbar({ open: true, severity: 'error', message: error.message })
       return
     }
-
+    console.log(selectedCartItems)
     const orderData = {
+      cartItems: selectedCartItems,
       shippingAddressId: selectedAddress._id,
       total,
       paymentMethod,
-      cartItems: mappedItems,
       note: note.trim() || undefined,
       couponCode: voucherApplied ? voucherInput : undefined,
       couponId: voucherApplied ? couponId : undefined,
@@ -264,18 +281,21 @@ const Payment = () => {
                       </tr>
                     </thead>
                     <tbody>
-                      {cartItems.map((item, index) => {
-                        const product = item.product || item.productId || {}
-                        return (
-                          <ProductItem
-                            key={index}
-                            name={product.name || 'Sản phẩm không tên'}
-                            price={product.price || 0}
-                            quantity={item.quantity || 1}
-                            image={product.image}
-                          />
-                        )
-                      })}
+                      {cartItems
+                        .filter(item => selectedItems.includes(item.productId._id || item.productId)) // lọc đúng item đã chọn
+                        .map((item, index) => {
+                          const product = item.product || item.productId || {};
+                          return (
+                            <ProductItem
+                              key={index}
+                              name={product.name || 'Sản phẩm không tên'}
+                              price={product.price || 0}
+                              quantity={item.quantity || 1}
+                              image={product.image}
+                            />
+                          );
+                        })}
+
                     </tbody>
                   </table>
                 )}

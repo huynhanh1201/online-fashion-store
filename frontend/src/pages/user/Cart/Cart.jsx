@@ -6,6 +6,10 @@ import {
 import { Delete, Add, Remove } from '@mui/icons-material'
 import { useCart } from '~/hook/useCarts'
 import { useNavigate } from 'react-router-dom'
+import { useDispatch } from 'react-redux'
+import { setSelectedItems as setSelectedItemsAction } from '~/redux/cart/cartSlice'
+
+
 
 const Cart = () => {
   const { cart, loading, deleteItem, clearCart, updateItem } = useCart()
@@ -13,52 +17,47 @@ const Cart = () => {
   const [cartItems, setCartItems] = useState([])
   const [showMaxQuantityAlert, setShowMaxQuantityAlert] = useState(false)
   const navigate = useNavigate()
+  const dispatch = useDispatch()
+
+
+
+
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'auto' })
   }, [])
 
   useEffect(() => {
-    if (cart?.cartItems) {
-      const updated = cart.cartItems.map(item => ({
-        ...item,
-        selected: false
-      }))
-      setCartItems(updated)
-      setSelectedItems([])
-    }
+    if (cart?.cartItems) setCartItems(cart.cartItems)
   }, [cart])
 
+  // Kiểm tra đã chọn hết chưa
   const allSelected = cartItems.length > 0 && selectedItems.length === cartItems.length
+  // Kiểm tra chọn một phần
   const someSelected = selectedItems.length > 0 && selectedItems.length < cartItems.length
 
+  // Chọn / bỏ chọn tất cả
   const handleSelectAll = () => {
-    if (allSelected) {
-      setSelectedItems([])
-      setCartItems(items => items.map(item => ({ ...item, selected: false })))
-    } else {
-      const allIds = cartItems.map(item => item.productId?._id).filter(Boolean)
-      setSelectedItems(allIds)
-      setCartItems(items => items.map(item => ({ ...item, selected: true })))
+    let newSelected = []
+    if (!allSelected) {
+      newSelected = cartItems.map(item => item.productId._id)
     }
+    setSelectedItems(newSelected);
+    dispatch(setSelectedItemsAction(newSelected))
   }
+
 
   const handleSelect = (id) => {
-    setSelectedItems(prev => {
-      const isSelected = prev.includes(id)
-      const newSelected = isSelected ? prev.filter(i => i !== id) : [...prev, id]
+    const newSelected = selectedItems.includes(id)
+      ? selectedItems.filter(i => i !== id)
+      : [...selectedItems, id];
 
-      setCartItems(items =>
-        items.map(item =>
-          item.productId._id === id
-            ? { ...item, selected: !isSelected }
-            : item
-        )
-      )
+    setSelectedItems(newSelected) // cập nhật local state
+    dispatch(setSelectedItemsAction(newSelected)); // cập nhật redux luôn
+  };
 
-      return newSelected
-    })
-  }
+
+
 
   const formatPrice = (val) =>
     typeof val === 'number'
@@ -93,7 +92,7 @@ const Cart = () => {
       console.error('Lỗi cập nhật số lượng:', error)
     }
   }
-
+  console.log('selectedItems:', selectedItems)
   const handleRemove = async (id) => {
     try {
       const res = await deleteItem(id)
@@ -106,7 +105,9 @@ const Cart = () => {
     }
   }
 
-  const selectedCartItems = cartItems.filter(item => item.selected)
+  const selectedCartItems = cartItems.filter(item =>
+    selectedItems.includes(item.productId?._id)
+  )
 
   const totalPrice = selectedCartItems.reduce(
     (sum, item) => sum + (item.productId?.price || 0) * item.quantity,
@@ -157,7 +158,7 @@ const Cart = () => {
                 <TableRow key={item._id} hover>
                   <TableCell padding='checkbox'>
                     <Checkbox
-                      checked={item.selected}
+                      checked={selectedItems.includes(product._id)}
                       onChange={() => handleSelect(product._id)}
                       color='primary'
                     />
@@ -217,6 +218,7 @@ const Cart = () => {
                         size='small'
                         onClick={() => handleQuantityChange(product._id, item.quantity, 1)}
                         aria-label='Tăng số lượng'
+                        disabled={item.quantity >= product.quantity} // disable when max reached
                       >
                         <Add />
                       </IconButton>
@@ -254,12 +256,18 @@ const Cart = () => {
           <Button
             variant='contained'
             color='primary'
-            disabled={selectedCartItems.length === 0}
-            onClick={() => navigate('/payment', { state: { selectedCartItems } })}
+            disabled={selectedItems.length === 0}
+            onClick={() => {
+              // console.log('setSelectedItems:', setSelectedItems(selectedItems))
+              dispatch(setSelectedItemsAction(selectedItems))
+
+              navigate('/payment')
+            }}
             sx={{ minWidth: 120 }}
           >
             Thanh toán
           </Button>
+
           <Button
             variant='outlined'
             color='error'

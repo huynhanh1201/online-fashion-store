@@ -4,14 +4,8 @@ import { API_ROOT } from '~/utils/constants.js'
 const orderService = {
   createOrder: async ({ cartItems, shippingAddressId, total, couponId, couponCode, paymentMethod, note }) => {
     try {
-      // // Ép productId thành string để tránh lỗi validation
-      // const sanitizedCartItems = cartItems.map(item => ({
-      //   productId: String(item.productId),
-      //   quantity: item.quantity
-      // }));
-
       const payload = {
-        // cartItems: sanitizedCartItems,
+        cartItems, // giỏ hàng
         shippingAddressId,
         total,
         paymentMethod,

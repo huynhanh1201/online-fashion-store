@@ -91,6 +91,7 @@ export const useCart = () => {
 
   // Số lượng sản phẩm trong giỏ
   const cartCount = cart.cartItems.reduce((total, item) => total + (Number(item.quantity) || 0), 0)
+  const getProductId = (item) => typeof item.productId === 'object' ? item.productId._id : item.productId
 
   // Tạo payload order gửi về server
   const getOrderPayload = ({
@@ -103,7 +104,7 @@ export const useCart = () => {
   }) => {
     return {
       cartItems: selectedCartItems.map(item => ({
-        productId: typeof item.productId === 'object' ? item.productId._id : item.productId,
+        productId: getProductId(item),
         quantity: item.quantity
       })),
       shippingAddressId,
