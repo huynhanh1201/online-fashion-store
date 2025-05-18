@@ -67,6 +67,8 @@ const createOrder = async (userId, reqBody, ipAddr) => {
       calculatedSubtotal += product.price * item.quantity
     }
 
+    console.log(calculatedSubtotal)
+
     // Xác thực mã giảm giá
     const validateCoupon = await couponsService.validateCoupon(userId, {
       couponCode,
