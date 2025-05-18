@@ -42,7 +42,7 @@ const SidebarContainer = styled(Box)(({ theme }) => ({
     color: theme.palette.primary.dark,
     fontWeight: 600,
     marginBottom: theme.spacing(1)
-  },
+  }
 }))
 
 const FilterTitle = styled(Typography)(({ theme }) => ({
@@ -74,7 +74,6 @@ const Product = () => {
 
     fetchCategories(), fetchProducts()
   }, [])
-
 
   const [filteredProducts, setFilteredProducts] = useState([])
   const [category, setCategory] = useState('')
@@ -137,9 +136,7 @@ const Product = () => {
         cartItems: [{ productId: product._id, quantity: 1 }]
       })
 
-      dispatch(
-        setCartItems(res?.cartItems || updatedCart?.cartItems || [])
-      )
+      dispatch(setCartItems(res?.cartItems || updatedCart?.cartItems || []))
       setSnackbar({
         type: 'success',
         message: 'Thêm sản phẩm vào giỏ hàng thành công!'
@@ -159,11 +156,15 @@ const Product = () => {
   const handleOriginChange = (e) => setOrigin(e.target.value)
   const handleSizeChange = (e) => {
     const value = e.target.name
-    setSize((prev) => (prev.includes(value) ? prev.filter((v) => v !== value) : [...prev, value]))
+    setSize((prev) =>
+      prev.includes(value) ? prev.filter((v) => v !== value) : [...prev, value]
+    )
   }
   const handleColorChange = (e) => {
     const value = e.target.name
-    setColor((prev) => (prev.includes(value) ? prev.filter((v) => v !== value) : [...prev, value]))
+    setColor((prev) =>
+      prev.includes(value) ? prev.filter((v) => v !== value) : [...prev, value]
+    )
   }
   const handlePageChange = (_, value) => setPage(value)
   const handleSearch = () => setPage(1)
@@ -176,28 +177,40 @@ const Product = () => {
   }
 
   return (
-    <Box sx={{ p: 2, backgroundColor: '#f5f5f5', minHeight: '100vh', display: 'flex', gap: 2 }}>
+    <Box
+      sx={{
+        p: 2,
+        backgroundColor: '#f5f5f5',
+        minHeight: '100vh',
+        display: 'flex',
+        gap: 2
+      }}
+    >
       {/* Sidebar */}
       <SidebarContainer>
-        <Typography variant="h6" gutterBottom>
+        <Typography variant='h6' gutterBottom>
           Bộ lọc tìm kiếm
         </Typography>
         <Divider sx={{ mb: 1 }} />
 
-        <FilterTitle variant="subtitle1">Danh mục</FilterTitle>
+        <FilterTitle variant='subtitle1'>Danh mục</FilterTitle>
         {loadingCategories ? (
           <Box sx={{ display: 'flex', justifyContent: 'center', py: 2 }}>
             <CircularProgress size={24} />
           </Box>
         ) : errorCategories ? (
-          <Typography color="error" sx={{ mb: 2 }}>
+          <Typography color='error' sx={{ mb: 2 }}>
             Lỗi tải danh mục
           </Typography>
         ) : (
-          <FormControl fullWidth size="small" sx={{ mb: 2 }}>
+          <FormControl fullWidth size='small' sx={{ mb: 2 }}>
             <InputLabel>Danh mục</InputLabel>
-            <Select value={category} label="Danh mục" onChange={handleCategoryChange}>
-              <MenuItem value="">Tất cả</MenuItem>
+            <Select
+              value={category}
+              label='Danh mục'
+              onChange={handleCategoryChange}
+            >
+              <MenuItem value=''>Tất cả</MenuItem>
               {categories.map((cat) => (
                 <MenuItem key={cat._id} value={cat._id}>
                   {cat.name}
@@ -207,17 +220,17 @@ const Product = () => {
           </FormControl>
         )}
 
-        <FilterTitle variant="subtitle1">Xuất xứ</FilterTitle>
-        <FormControl fullWidth size="small" sx={{ mb: 2 }}>
+        <FilterTitle variant='subtitle1'>Xuất xứ</FilterTitle>
+        <FormControl fullWidth size='small' sx={{ mb: 2 }}>
           <InputLabel>Xuất xứ</InputLabel>
-          <Select value={origin} label="Xuất xứ" onChange={handleOriginChange}>
-            <MenuItem value="">Tất cả</MenuItem>
-            <MenuItem value="vietnam">Việt Nam</MenuItem>
-            <MenuItem value="china">Trung Quốc</MenuItem>
+          <Select value={origin} label='Xuất xứ' onChange={handleOriginChange}>
+            <MenuItem value=''>Tất cả</MenuItem>
+            <MenuItem value='vietnam'>Việt Nam</MenuItem>
+            <MenuItem value='china'>Trung Quốc</MenuItem>
           </Select>
         </FormControl>
 
-        <FilterTitle variant="subtitle1">Kích thước</FilterTitle>
+        <FilterTitle variant='subtitle1'>Kích thước</FilterTitle>
         <FormGroup>
           {['S', 'M', 'L', 'XL'].map((sizeOption) => (
             <FormControlLabel
@@ -227,7 +240,7 @@ const Product = () => {
                   checked={size.includes(sizeOption)}
                   onChange={handleSizeChange}
                   name={sizeOption}
-                  size="small"
+                  size='small'
                 />
               }
               label={sizeOption}
@@ -235,7 +248,7 @@ const Product = () => {
           ))}
         </FormGroup>
 
-        <FilterTitle variant="subtitle1" sx={{ mt: 2 }}>
+        <FilterTitle variant='subtitle1' sx={{ mt: 2 }}>
           Màu sắc
         </FilterTitle>
         <FormGroup>
@@ -247,7 +260,7 @@ const Product = () => {
                   checked={color.includes(colorOption)}
                   onChange={handleColorChange}
                   name={colorOption}
-                  size="small"
+                  size='small'
                 />
               }
               label={colorOption}
@@ -256,10 +269,20 @@ const Product = () => {
         </FormGroup>
 
         <Box sx={{ mt: 2, display: 'flex', gap: 1 }}>
-          <Button variant="contained" color="primary" onClick={handleSearch} fullWidth>
+          <Button
+            variant='contained'
+            color='primary'
+            onClick={handleSearch}
+            fullWidth
+          >
             Tìm
           </Button>
-          <Button variant="outlined" color="secondary" onClick={handleReset} fullWidth>
+          <Button
+            variant='outlined'
+            color='secondary'
+            onClick={handleReset}
+            fullWidth
+          >
             Reset
           </Button>
         </Box>
@@ -273,10 +296,12 @@ const Product = () => {
             <Typography>Đang tải sản phẩm...</Typography>
           </Box>
         ) : filteredProducts.length === 0 ? (
-          <Typography sx={{ textAlign: 'center', mt: 10 }}>Không có sản phẩm phù hợp.</Typography>
+          <Typography sx={{ textAlign: 'center', mt: 10 }}>
+            Không có sản phẩm phù hợp.
+          </Typography>
         ) : (
           <>
-            <Grid container spacing={3} justifyContent="center">
+            <Grid container spacing={3} justifyContent='start'>
               {paginatedProducts.map((product) => (
                 <Grid item xs={12} sm={6} md={4} lg={3} key={product._id}>
                   <ProductCard
@@ -293,7 +318,7 @@ const Product = () => {
                 count={totalPages}
                 page={page}
                 onChange={handlePageChange}
-                color="primary"
+                color='primary'
               />
             </Box>
           </>
@@ -308,7 +333,11 @@ const Product = () => {
           onClose={() => setSnackbar(null)}
           anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
         >
-          <Alert severity={snackbar.type} onClose={() => setSnackbar(null)} sx={{ width: '100%' }}>
+          <Alert
+            severity={snackbar.type}
+            onClose={() => setSnackbar(null)}
+            sx={{ width: '100%' }}
+          >
             {snackbar.message}
           </Alert>
         </Snackbar>
