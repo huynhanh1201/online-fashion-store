@@ -67,7 +67,6 @@ const createOrder = async (userId, reqBody, ipAddr) => {
       calculatedSubtotal += product.price * item.quantity
     }
 
-    console.log(calculatedSubtotal)
 
     // Xác thực mã giảm giá
     const validateCoupon = await couponsService.validateCoupon(userId, {
@@ -82,8 +81,6 @@ const createOrder = async (userId, reqBody, ipAddr) => {
     const cartTotal = validateCoupon.newTotal || calculatedSubtotal
     const discountAmount = validateCoupon.discountAmount || 0
 
-    console.log('cartTotal', cartTotal)
-    console.log('total', total)
 
     // Kiểm tra tổng tiền từ FE
     if (cartTotal !== total) {
