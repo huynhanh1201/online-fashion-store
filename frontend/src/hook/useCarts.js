@@ -12,24 +12,22 @@ import { setCartItems } from '~/redux/cart/cartSlice'
 export const useCart = () => {
   const [loading, setLoading] = useState(true)
   const dispatch = useDispatch()
-
   const cart = useSelector(state => state.cart)
 
-  const fetchCart = async () => {
-    setLoading(true)
+  // Fetch dữ liệu giỏ hàng từ server
+  const fetchCart = async (options = {}) => {
+    if (!options?.silent) setLoading(true)
     const data = await getCart()
     dispatch(setCartItems(data?.cartItems || []))
     setLoading(false)
   }
 
+  // Thêm sản phẩm vào giỏ hàng
   const handleAddToCart = async (payload) => {
     try {
-      console.log('Gửi payload lên addToCart:', payload)
       const newItem = await addToCart(payload)
-      console.log('API trả về:', newItem)
 
       if (newItem) {
-        // So sánh productId string: cẩn thận khi productId có thể là object hoặc string
         const newProductId = typeof newItem.productId === 'object' ? newItem.productId._id : newItem.productId
 
         const existingItem = cart.cartItems.find(item => {
@@ -61,6 +59,7 @@ export const useCart = () => {
     }
   }
 
+  // Cập nhật sản phẩm trong giỏ (số lượng, trạng thái selected)
   const handleUpdateItem = async (productId, data) => {
     const updated = await updateCartItem(productId, data)
     if (updated) {
@@ -68,11 +67,18 @@ export const useCart = () => {
     }
   }
 
-  const handleDeleteItem = async (productId) => {
-    await deleteCartItem(productId)
-    fetchCart()
+  // Cập nhật trạng thái selected
+  const handleToggleSelected = async (productId, selected) => {
+    await handleUpdateItem(productId, { selected })
   }
 
+  // Xoá một sản phẩm khỏi giỏ
+  const handleDeleteItem = async (productId) => {
+    await deleteCartItem(productId)
+    fetchCart({ silent: true })
+  }
+
+  // Xoá toàn bộ giỏ hàng
   const handleClearCart = async () => {
     const cleared = await clearCart()
     if (cleared) {
@@ -80,20 +86,50 @@ export const useCart = () => {
     }
   }
 
+  // Các sản phẩm được chọn để thanh toán
+  const selectedCartItems = cart.cartItems.filter(item => item.selected)
+
+  // Số lượng sản phẩm trong giỏ
+  const cartCount = cart.cartItems.reduce((total, item) => total + (Number(item.quantity) || 0), 0)
+
+  // Tạo payload order gửi về server
+  const getOrderPayload = ({
+    shippingAddressId,
+    total,
+    couponId,
+    couponCode,
+    paymentMethod,
+    note
+  }) => {
+    return {
+      cartItems: selectedCartItems.map(item => ({
+        productId: typeof item.productId === 'object' ? item.productId._id : item.productId,
+        quantity: item.quantity
+      })),
+      shippingAddressId,
+      total,
+      couponId,
+      couponCode,
+      paymentMethod,
+      note
+    }
+  }
+
   useEffect(() => {
     fetchCart()
   }, [])
 
-  const cartCount = cart?.cartItems?.reduce((total, item) => total + (Number(item.quantity) || 0), 0) || 0
-
   return {
     cart,
     cartCount,
+    selectedItems: selectedCartItems,
     loading,
     refresh: fetchCart,
     addToCart: handleAddToCart,
     updateItem: handleUpdateItem,
     deleteItem: handleDeleteItem,
-    clearCart: handleClearCart
+    clearCart: handleClearCart,
+    toggleSelected: handleToggleSelected,
+    getOrderPayload
   }
 }

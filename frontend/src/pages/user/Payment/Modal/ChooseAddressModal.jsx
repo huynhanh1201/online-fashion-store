@@ -1,10 +1,18 @@
 import React, { useState, useEffect } from 'react'
 import {
-  Dialog, DialogTitle, DialogContent, DialogActions,
-  Button, Typography, Box, Radio, RadioGroup, FormControlLabel,
-  IconButton, CircularProgress
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Button,
+  Typography,
+  Box,
+  Radio,
+  RadioGroup,
+  FormControlLabel,
+  CircularProgress
 } from '@mui/material'
-import ArrowBackIcon from '@mui/icons-material/ArrowBack'
+
 import { useAddress } from '~/hook/useAddress'
 import AddAddressModal from './AddAddressModal'
 
@@ -19,41 +27,45 @@ export const ChooseAddressModal = ({ open, onClose, onConfirm }) => {
   const [isFormOpen, setIsFormOpen] = useState(false)
   const [editingAddress, setEditingAddress] = useState(null)
 
-  // Fetch địa chỉ khi mở modal
+  // Khi modal mở thì load danh sách địa chỉ
   useEffect(() => {
     if (open) {
       fetchAddresses()
     }
-  }, [open])
+  }, [open, fetchAddresses])
 
-  // Reset khi addresses thay đổi
+  // Khi addresses thay đổi, cập nhật selectedId nếu cần
   useEffect(() => {
     if (addresses.length > 0) {
+      // Nếu selectedId không có trong danh sách mới, set mặc định là địa chỉ đầu tiên
       if (!addresses.find(a => a._id === selectedId)) {
         setSelectedId(addresses[0]._id)
       }
     } else {
       setSelectedId(null)
     }
-  }, [addresses])
+  }, [addresses, selectedId])
 
+  // Mở form thêm mới
   const handleAddNew = () => {
     setEditingAddress(null)
     setIsFormOpen(true)
   }
 
+  // Mở form chỉnh sửa
   const handleEdit = (addr) => {
     setEditingAddress(addr)
     setIsFormOpen(true)
   }
 
-  const handleFormClose = async (shouldReload = false) => {
-    setIsFormOpen(false)
-    setEditingAddress(null)
-    if (shouldReload) {
-      await fetchAddresses()
-    }
-  }
+  // Đóng form thêm/sửa
+  // const handleFormClose = async (shouldReload = false) => {
+  //   setIsFormOpen(false)
+  //   setEditingAddress(null)
+  //   if (shouldReload) {
+  //     await fetchAddresses()
+  //   }
+  // }
 
   return (
     <>
@@ -67,10 +79,20 @@ export const ChooseAddressModal = ({ open, onClose, onConfirm }) => {
             </Box>
           ) : (
             <>
-              <RadioGroup value={selectedId} onChange={(e) => setSelectedId(e.target.value)}>
+              <RadioGroup
+                value={selectedId}
+                onChange={(e) => setSelectedId(e.target.value)}
+              >
                 {addresses.map((addr) => (
-                  <Box key={addr._id} sx={{ borderBottom: '1px solid #eee', mb: 2 }}>
-                    <Box display="flex" alignItems="center" justifyContent="space-between">
+                  <Box
+                    key={addr._id}
+                    sx={{ borderBottom: '1px solid #eee', mb: 2, pb: 1 }}
+                  >
+                    <Box
+                      display="flex"
+                      alignItems="center"
+                      justifyContent="space-between"
+                    >
                       <FormControlLabel
                         value={addr._id}
                         control={<Radio />}
@@ -78,20 +100,31 @@ export const ChooseAddressModal = ({ open, onClose, onConfirm }) => {
                           <Box>
                             <Typography fontWeight={700}>
                               {addr.fullName}{' '}
-                              <Typography component="span" fontWeight={400}>({addr.phone})</Typography>
+                              <Typography component="span" fontWeight={400}>
+                                ({addr.phone})
+                              </Typography>
                             </Typography>
                             <Typography>{addr.address}</Typography>
-                            <Typography>{addr.ward}, {addr.district}, {addr.city}</Typography>
+                            <Typography>
+                              {addr.ward}, {addr.district}, {addr.city}
+                            </Typography>
                           </Box>
                         }
                       />
-                      <Button size="small" onClick={() => handleEdit(addr)}>Cập nhật</Button>
+                      <Button size="small" onClick={() => handleEdit(addr)}>
+                        Cập nhật
+                      </Button>
                     </Box>
                   </Box>
                 ))}
               </RadioGroup>
 
-              <Button variant="outlined" fullWidth onClick={handleAddNew} sx={{ mt: 2 }}>
+              <Button
+                variant="outlined"
+                fullWidth
+                onClick={handleAddNew}
+                sx={{ mt: 2 }}
+              >
                 + Thêm Địa Chỉ Mới
               </Button>
             </>
@@ -100,18 +133,34 @@ export const ChooseAddressModal = ({ open, onClose, onConfirm }) => {
 
         <DialogActions>
           <Button onClick={onClose}>Huỷ</Button>
-          <Button variant="contained" onClick={() => onConfirm(selectedId)} disabled={!selectedId}>
+          <Button
+            variant="contained"
+            onClick={() => onConfirm(selectedId)}
+            disabled={!selectedId}
+          >
             Xác nhận
           </Button>
         </DialogActions>
       </Dialog>
 
-      {/* Gọi modal form riêng */}
+      {/* Modal form thêm/sửa địa chỉ */}
       <AddAddressModal
         open={isFormOpen}
-        onClose={handleFormClose}
-        initialData={editingAddress}
+        onClose={() => setIsFormOpen(false)}
+        onSuccess={() => {
+          setIsFormOpen(false)
+          setEditingAddress(null)
+
+          // Nếu hook useAddress có thể cập nhật local:
+          // updateAddressInLocalList(newOrUpdatedAddress)
+
+          // Nếu không, gọi lại API như bạn đang làm
+          fetchAddresses()
+        }}
+        addressToEdit={editingAddress}
       />
+
+
     </>
   )
 }

@@ -16,7 +16,7 @@ const cartSlice = createSlice({
       if (existingItem) {
         existingItem.quantity += quantity
       } else {
-        state.cartItems.push({ productId, quantity })
+        state.cartItems.push({ productId, quantity, checked: true }) // thêm checked mặc định true
       }
     },
     removeFromCart: (state, action) => {
@@ -31,16 +31,25 @@ const cartSlice = createSlice({
     },
     clearCart: (state) => {
       state.cartItems = []
+    },
+    toggleChecked: (state, action) => {
+      const productId = action.payload
+      const item = state.cartItems.find(item => item.productId === productId)
+      if (item) {
+        item.checked = !item.checked
+      }
     }
+
   }
 })
 
 export const {
-  setCartItems, // ✅ EXPORT NÀY BỊ THIẾU TRƯỚC ĐÂY
+  setCartItems,
   addToCart,
   removeFromCart,
   updateCartItem,
-  clearCart
+  clearCart,
+  toggleChecked
 } = cartSlice.actions
 
 export default cartSlice.reducer

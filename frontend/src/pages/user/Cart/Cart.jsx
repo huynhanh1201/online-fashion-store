@@ -19,28 +19,45 @@ const Cart = () => {
   }, [])
 
   useEffect(() => {
-    if (cart?.cartItems) setCartItems(cart.cartItems)
+    if (cart?.cartItems) {
+      const updated = cart.cartItems.map(item => ({
+        ...item,
+        selected: false
+      }))
+      setCartItems(updated)
+      setSelectedItems([])
+    }
   }, [cart])
 
-  // Kiểm tra đã chọn hết chưa
   const allSelected = cartItems.length > 0 && selectedItems.length === cartItems.length
-  // Kiểm tra chọn một phần
   const someSelected = selectedItems.length > 0 && selectedItems.length < cartItems.length
 
-  // Chọn / bỏ chọn tất cả
   const handleSelectAll = () => {
     if (allSelected) {
       setSelectedItems([])
+      setCartItems(items => items.map(item => ({ ...item, selected: false })))
     } else {
       const allIds = cartItems.map(item => item.productId?._id).filter(Boolean)
       setSelectedItems(allIds)
+      setCartItems(items => items.map(item => ({ ...item, selected: true })))
     }
   }
 
   const handleSelect = (id) => {
-    setSelectedItems(prev =>
-      prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]
-    )
+    setSelectedItems(prev => {
+      const isSelected = prev.includes(id)
+      const newSelected = isSelected ? prev.filter(i => i !== id) : [...prev, id]
+
+      setCartItems(items =>
+        items.map(item =>
+          item.productId._id === id
+            ? { ...item, selected: !isSelected }
+            : item
+        )
+      )
+
+      return newSelected
+    })
   }
 
   const formatPrice = (val) =>
@@ -89,9 +106,7 @@ const Cart = () => {
     }
   }
 
-  const selectedCartItems = cartItems.filter(item =>
-    selectedItems.includes(item.productId?._id)
-  )
+  const selectedCartItems = cartItems.filter(item => item.selected)
 
   const totalPrice = selectedCartItems.reduce(
     (sum, item) => sum + (item.productId?.price || 0) * item.quantity,
@@ -142,7 +157,7 @@ const Cart = () => {
                 <TableRow key={item._id} hover>
                   <TableCell padding='checkbox'>
                     <Checkbox
-                      checked={selectedItems.includes(product._id)}
+                      checked={item.selected}
                       onChange={() => handleSelect(product._id)}
                       color='primary'
                     />
@@ -237,11 +252,10 @@ const Cart = () => {
         </Typography>
         <Box display='flex' gap={2}>
           <Button
-            href='/payment'
             variant='contained'
             color='primary'
-            disabled={selectedItems.length === 0}
-            onClick={() => console.log('Thanh toán:', selectedCartItems)}
+            disabled={selectedCartItems.length === 0}
+            onClick={() => navigate('/payment', { state: { selectedCartItems } })}
             sx={{ minWidth: 120 }}
           >
             Thanh toán

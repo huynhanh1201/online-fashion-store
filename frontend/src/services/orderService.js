@@ -2,16 +2,22 @@ import AuthorizedAxiosInstance from '~/utils/authorizedAxios.js'
 import { API_ROOT } from '~/utils/constants.js'
 
 const orderService = {
-  createOrder: async ({ shippingAddressId, total, couponId, couponCode, paymentMethod, note }) => {
+  createOrder: async ({ cartItems, shippingAddressId, total, couponId, couponCode, paymentMethod, note }) => {
     try {
-      // Tạo payload
+      // // Ép productId thành string để tránh lỗi validation
+      // const sanitizedCartItems = cartItems.map(item => ({
+      //   productId: String(item.productId),
+      //   quantity: item.quantity
+      // }));
+
       const payload = {
+        // cartItems: sanitizedCartItems,
         shippingAddressId,
         total,
         paymentMethod,
-        note,
+        note
       }
-      // Nếu couponCode có giá trị, thêm couponId và couponCode
+
       if (couponCode && couponCode.trim() !== '') {
         payload.couponId = couponId
         payload.couponCode = couponCode
@@ -20,14 +26,13 @@ const orderService = {
       const response = await AuthorizedAxiosInstance.post(`${API_ROOT}/v1/orders`, payload)
       return response.data
     } catch (error) {
-      // Ném lỗi lên để hook hoặc component xử lý
       throw error.response?.data || error.message || 'Đặt hàng thất bại'
     }
-  },
+  }
 }
 
+// ... phần còn lại giữ nguyên như bạn đã viết
 
-// Lấy danh sách đơn hàng (có phân trang)
 export const getOrders = async (page = 1, limit = 10) => {
   try {
     const response = await AuthorizedAxiosInstance.get(
@@ -36,7 +41,7 @@ export const getOrders = async (page = 1, limit = 10) => {
     const orders = response.data
     return {
       orders,
-      total: orders.length // sửa nếu backend có trả về tổng số đơn thật
+      total: orders.length
     }
   } catch (error) {
     console.error('Lỗi khi lấy danh sách đơn hàng:', error)
@@ -44,7 +49,6 @@ export const getOrders = async (page = 1, limit = 10) => {
   }
 }
 
-// Lấy chi tiết đơn hàng theo orderId (bao gồm info, items, địa chỉ, lịch sử)
 export const getOrderById = async (orderId) => {
   try {
     const response = await AuthorizedAxiosInstance.get(
@@ -57,13 +61,11 @@ export const getOrderById = async (orderId) => {
   }
 }
 
-// Lấy danh sách sản phẩm trong đơn hàng
 export const getOrderItems = async (orderId) => {
   try {
     const response = await AuthorizedAxiosInstance.get(
       `${API_ROOT}/v1/order-items/${orderId}`
     )
-
     return response.data
   } catch (error) {
     console.error(`Lỗi khi lấy chi tiết sản phẩm đơn hàng ${orderId}:`, error)
@@ -71,7 +73,6 @@ export const getOrderItems = async (orderId) => {
   }
 }
 
-// Lấy lịch sử trạng thái của đơn hàng
 export const getOrderHistories = async (orderId) => {
   try {
     const response = await AuthorizedAxiosInstance.get(
@@ -95,7 +96,7 @@ export const getProductById = async (productId) => {
     return null
   }
 }
-// Cập nhật một số trường của đơn hàng
+
 export const updateOrder = async (orderId, updateData) => {
   try {
     const response = await AuthorizedAxiosInstance.patch(
@@ -108,7 +109,7 @@ export const updateOrder = async (orderId, updateData) => {
     return null
   }
 }
-// Xoá đơn hàng theo orderId
+
 export const deleteOrderById = async (orderId) => {
   try {
     await AuthorizedAxiosInstance.delete(`${API_ROOT}/v1/orders/${orderId}`)
@@ -118,4 +119,5 @@ export const deleteOrderById = async (orderId) => {
     return false
   }
 }
+
 export default orderService

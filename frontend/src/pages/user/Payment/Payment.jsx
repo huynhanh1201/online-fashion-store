@@ -1,8 +1,18 @@
 import React, { useState, useEffect } from 'react'
 import {
-  Box, Container, Grid, Typography, TextField, Button,
-  Radio, RadioGroup, FormControlLabel, Divider, CircularProgress,
-  Snackbar, Alert
+  Box,
+  Container,
+  Grid,
+  Typography,
+  TextField,
+  Button,
+  Radio,
+  RadioGroup,
+  FormControlLabel,
+  Divider,
+  CircularProgress,
+  Snackbar,
+  Alert,
 } from '@mui/material'
 import { styled } from '@mui/system'
 import { ChooseAddressModal } from './Modal/ChooseAddressModal'
@@ -16,15 +26,15 @@ const SectionTitle = styled(Typography)(({ theme }) => ({
   fontWeight: 700,
   fontSize: '1.1rem',
   marginBottom: theme.spacing(2),
-  textTransform: 'uppercase'
+  textTransform: 'uppercase',
 }))
 
 const ProductItem = ({ name, price, quantity, image }) => {
-  const isValid = name && typeof price === 'number' && typeof quantity === 'number'
-  if (!isValid) {
+  // Validate product data
+  if (!name || typeof price !== 'number' || typeof quantity !== 'number') {
     return (
       <tr>
-        <td colSpan={4} style={{ color: 'red', padding: '8px' }}>
+        <td colSpan={4} style={{ color: 'red', padding: 8 }}>
           Lỗi: Dữ liệu sản phẩm không hợp lệ.
         </td>
       </tr>
@@ -35,7 +45,7 @@ const ProductItem = ({ name, price, quantity, image }) => {
 
   return (
     <tr>
-      <td style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '8px' }}>
+      <td style={{ display: 'flex', alignItems: 'center', gap: 12, padding: 8 }}>
         <img
           src={image || 'https://via.placeholder.com/64'}
           alt={name}
@@ -62,12 +72,11 @@ const Payment = () => {
   const { addresses, fetchAddresses } = useAddress()
   const { cart, loading: cartLoading } = useCart()
   const { createOrder, loading: orderLoading } = useOrder()
-  const {
-    discount, discountMessage,
-    loading: couponLoading, handleApplyVoucher, couponId
-  } = useCoupon()
+  const { discount, discountMessage, loading: couponLoading, handleApplyVoucher, couponId } = useCoupon()
 
   const cartItems = cart?.cartItems || []
+
+  // Tính tổng tiền tạm tính (subtotal)
   const subTotal = cartItems.reduce((acc, item) => {
     const product = item.product || item.productId || {}
     const price = typeof product.price === 'number' ? product.price : 0
@@ -75,33 +84,33 @@ const Payment = () => {
     return acc + price * quantity
   }, 0)
 
-  const total = subTotal - discount
+  const total = Math.max(subTotal - discount, 0) // Tránh âm
+
+  // Lấy địa chỉ mặc định khi có danh sách địa chỉ
+  useEffect(() => {
+    fetchAddresses()
+  }, [fetchAddresses])
 
   useEffect(() => {
     if (addresses.length > 0 && !selectedAddress) {
-      const defaultAddr = addresses.find(addr => addr.isDefault)
+      const defaultAddr = addresses.find((addr) => addr.isDefault)
       setSelectedAddress(defaultAddr || addresses[0])
     }
-  }, [addresses])
-
-
+  }, [addresses, selectedAddress])
 
   const handleOpenAddressModal = () => setOpenAddressModal(true)
   const handleCloseAddressModal = () => setOpenAddressModal(false)
 
   const handleAddressConfirm = (addressId) => {
-    const selected = addresses.find(addr => addr._id === addressId)
+    const selected = addresses.find((addr) => addr._id === addressId)
     setSelectedAddress(selected)
     handleCloseAddressModal()
   }
 
+  // Áp dụng voucher
   const handleApplyVoucherClick = async () => {
     if (!voucherInput.trim()) {
-      setSnackbar({
-        open: true,
-        severity: 'warning',
-        message: 'Vui lòng nhập mã giảm giá'
-      })
+      setSnackbar({ open: true, severity: 'warning', message: 'Vui lòng nhập mã giảm giá' })
       return
     }
 
@@ -110,31 +119,59 @@ const Payment = () => {
 
       if (response?.valid) {
         setVoucherApplied(true)
-        setSnackbar({
-          open: true,
-          severity: 'success',
-          message: response.message || 'Áp dụng mã giảm giá thành công'
-        })
+        setSnackbar({ open: true, severity: 'success', message: response.message || 'Áp dụng mã giảm giá thành công' })
       } else {
-        throw new Error(response?.message || 'Mã giảm giá không hợp lệ hoặc đã hết hạn')
+        setVoucherApplied(false)
+        setSnackbar({ open: true, severity: 'error', message: response?.message || 'Mã giảm giá không hợp lệ hoặc đã hết hạn' })
       }
     } catch (err) {
       setVoucherApplied(false)
-      const errorMessage = err?.message || 'Có lỗi xảy ra khi áp dụng mã giảm giá'
-      setSnackbar({
-        open: true,
-        severity: 'error',
-        message: errorMessage
-      })
+      setSnackbar({ open: true, severity: 'error', message: err.message || 'Có lỗi xảy ra khi áp dụng mã giảm giá' })
     }
   }
 
+  // Kiểm tra productId hợp lệ (24 ký tự hex)
+  const isValidObjectId = (id) => /^[a-f0-9]{24}$/.test(String(id))
 
-
-
+  // Xử lý đặt hàng
   const handlePlaceOrder = async () => {
     if (!selectedAddress) {
       setSnackbar({ open: true, severity: 'warning', message: 'Vui lòng chọn địa chỉ nhận hàng' })
+      return
+    }
+
+    if (cartItems.length === 0) {
+      setSnackbar({ open: true, severity: 'error', message: 'Giỏ hàng trống' })
+      return
+    }
+
+    // Chuẩn hóa cartItems
+    let mappedItems
+    try {
+      mappedItems = cartItems.map((item, index) => {
+        let rawId = null
+        if (item.product && item.product._id) {
+          rawId = item.product._id
+        } else if (typeof item.productId === 'string') {
+          rawId = item.productId
+        } else if (item.productId && typeof item.productId === 'object' && item.productId._id) {
+          // Trường hợp item.productId là object chứa _id
+          rawId = item.productId._id
+        } else {
+          rawId = null
+        }
+
+        if (!rawId) throw new Error(`Sản phẩm thứ ${index + 1} không có productId`)
+
+        const productId = String(rawId).toLowerCase()
+        if (!isValidObjectId(productId)) {
+          throw new Error(`productId của sản phẩm thứ ${index + 1} không hợp lệ: ${productId}`)
+        }
+
+        return { productId, quantity: item.quantity || 1 }
+      })
+    } catch (error) {
+      setSnackbar({ open: true, severity: 'error', message: error.message })
       return
     }
 
@@ -142,23 +179,26 @@ const Payment = () => {
       shippingAddressId: selectedAddress._id,
       total,
       paymentMethod,
-    }
-
-    if (note.trim()) orderData.note = note.trim()
-    if (voucherApplied) {
-      orderData.couponCode = voucherInput
-      orderData.couponId = couponId
+      cartItems: mappedItems,
+      note: note.trim() || undefined,
+      couponCode: voucherApplied ? voucherInput : undefined,
+      couponId: voucherApplied ? couponId : undefined,
     }
 
     try {
-      await createOrder(orderData)
+      const result = await createOrder(orderData)
       setSnackbar({ open: true, severity: 'success', message: 'Đặt hàng thành công' })
-      setTimeout(() => window.location.reload(), 1500)
+
+      if (typeof result === 'string' && result.startsWith('http')) {
+        window.location.href = result
+      } else {
+        setTimeout(() => window.location.reload(), 1500)
+      }
     } catch (error) {
       setSnackbar({
         open: true,
         severity: 'error',
-        message: `Đặt hàng thất bại: ${error.message || error}`
+        message: `Đặt hàng thất bại: ${error.message || error}`,
       })
     }
   }
@@ -167,13 +207,18 @@ const Payment = () => {
     <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
       <Container maxWidth="lg" sx={{ py: 4 }}>
         {cartLoading ? (
-          <Box sx={{ textAlign: 'center', mt: 4 }}><CircularProgress /></Box>
+          <Box sx={{ textAlign: 'center', mt: 4 }}>
+            <CircularProgress />
+          </Box>
         ) : (
-          <Grid container spacing={4} >
-            <Grid item md={12} lg={8} >
-              {/* Địa chỉ */}
+          <Grid container spacing={4}>
+            {/* Left side: Địa chỉ, danh sách sản phẩm, ghi chú, phương thức thanh toán */}
+            <Grid item md={12} lg={8}>
+              {/* Địa chỉ nhận hàng */}
               <Box sx={{ border: '1px solid #ccc', borderRadius: 2, p: 2, mb: 2 }}>
-                <Typography fontWeight={600} mb={1}>Địa Chỉ Nhận Hàng</Typography>
+                <Typography fontWeight={600} mb={1}>
+                  Địa Chỉ Nhận Hàng
+                </Typography>
                 {selectedAddress ? (
                   <>
                     <Typography fontWeight={700}>
@@ -204,20 +249,18 @@ const Payment = () => {
                 )}
               </Box>
 
-              {/* Sản phẩm */}
+              {/* Danh sách sản phẩm */}
               <Box sx={{ border: '1px solid #ccc', borderRadius: 2, p: 2, mb: 2 }}>
                 {cartItems.length === 0 ? (
-                  <Typography sx={{ textAlign: 'center', py: 4, color: 'text.secondary' }}>
-                    Giỏ hàng trống
-                  </Typography>
+                  <Typography sx={{ textAlign: 'center', py: 4, color: 'text.secondary' }}>Giỏ hàng trống</Typography>
                 ) : (
                   <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                     <thead>
                       <tr style={{ borderBottom: '2px solid #ccc' }}>
-                        <th style={{ textAlign: 'left', padding: '8px' }}>Sản phẩm</th>
-                        <th style={{ textAlign: 'center', padding: '8px' }}>Giá</th>
-                        <th style={{ textAlign: 'center', padding: '8px' }}>Số lượng</th>
-                        <th style={{ textAlign: 'right', padding: '8px' }}>Thành tiền</th>
+                        <th style={{ textAlign: 'left', padding: 8 }}>Sản phẩm</th>
+                        <th style={{ textAlign: 'center', padding: 8 }}>Giá</th>
+                        <th style={{ textAlign: 'center', padding: 8 }}>Số lượng</th>
+                        <th style={{ textAlign: 'right', padding: 8 }}>Thành tiền</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -238,7 +281,7 @@ const Payment = () => {
                 )}
               </Box>
 
-              {/* Ghi chú */}
+              {/* Ghi chú đơn hàng */}
               <TextField
                 fullWidth
                 label="Ghi chú đơn hàng (không bắt buộc)"
@@ -250,7 +293,7 @@ const Payment = () => {
                 sx={{ mb: 2 }}
               />
 
-              {/* Thanh toán */}
+              {/* Phương thức thanh toán */}
               <Box sx={{ border: '1px solid #ccc', borderRadius: 2, p: 2 }}>
                 <SectionTitle>Phương thức thanh toán</SectionTitle>
                 <RadioGroup value={paymentMethod} onChange={(e) => setPaymentMethod(e.target.value)}>
@@ -261,8 +304,8 @@ const Payment = () => {
                     label={
                       <Box sx={{ display: 'flex', alignItems: 'center' }}>
                         <img
-                          src='https://play-lh.googleusercontent.com/htxII9LeOz8fRkdW0pcvOb88aoc448v9eoxnbKEPK98NLG6iX5mSd4dbu3PX9j36dwy9=w480-h960-rw'
-                          alt='VNPAY'
+                          src="https://play-lh.googleusercontent.com/htxII9LeOz8fRkdW0pcvOb88aoc448v9eoxnbKEPK98NLG6iX5mSd4dbu3PX9j36dwy9=w480-h960-rw"
+                          alt="VNPAY"
                           style={{ width: 24, marginRight: 8 }}
                         />
                         Thanh toán qua VNPay
@@ -273,7 +316,7 @@ const Payment = () => {
               </Box>
             </Grid>
 
-            {/* Tổng cộng */}
+            {/* Right side: Ưu đãi và tổng thanh toán */}
             <Grid item md={12} lg={4}>
               <Box sx={{ border: '1px solid #ccc', borderRadius: 2, p: 2 }}>
                 <SectionTitle>Ưu đãi</SectionTitle>
@@ -288,6 +331,7 @@ const Payment = () => {
                   }}
                   size="small"
                   sx={{ mb: 1 }}
+                  disabled={couponLoading}
                 />
                 <Button
                   fullWidth
@@ -306,48 +350,50 @@ const Payment = () => {
 
                 <Divider sx={{ my: 2 }} />
 
-                <Box sx={{ fontSize: '0.95rem', lineHeight: 1.8 }}>
+                <Box>
                   <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <span>Phí vận chuyển</span><span>0đ</span>
+                    <span>Tạm tính</span>
+                    <span>{subTotal.toLocaleString()}đ</span>
                   </Box>
                   <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <span>Giảm giá</span><span>{discount.toLocaleString()}đ</span>
+                    <span>Giảm giá</span>
+                    <span>{discount.toLocaleString()}đ</span>
                   </Box>
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <span>Tạm tính</span><span>{subTotal.toLocaleString()}đ</span>
-                  </Box>
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between', fontWeight: 700, mt: 1 }}>
-                    <span>Tổng cộng</span><span style={{ color: '#1976d2' }}>{total.toLocaleString()}đ</span>
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', fontWeight: 700 }}>
+                    <span>Tổng cộng</span>
+                    <span>{total.toLocaleString()}đ</span>
                   </Box>
                 </Box>
 
-                <Typography variant="body2" color="success.main" mt={2}>
-                  Miễn phí vận chuyển
+                <Typography mt={2} variant="body2" color="text.secondary">
+                  Phí vận chuyển: miễn phí
                 </Typography>
 
                 <Button
                   fullWidth
                   variant="contained"
-                  color="primary"
-                  sx={{ mt: 2 }}
+                  color="secondary"
+                  sx={{ mt: 3 }}
                   onClick={handlePlaceOrder}
                   disabled={orderLoading}
                 >
-                  {orderLoading ? 'Đang đặt hàng...' : 'Đặt hàng'}
+                  {orderLoading ? 'Đang xử lý...' : 'Đặt hàng'}
                 </Button>
               </Box>
             </Grid>
           </Grid>
         )}
 
+        {/* Modal chọn địa chỉ */}
         <ChooseAddressModal
           open={openAddressModal}
           onClose={handleCloseAddressModal}
-          onConfirm={handleAddressConfirm}
           addresses={addresses}
+          onConfirm={handleAddressConfirm}
           selectedAddressId={selectedAddress?._id}
         />
 
+        {/* Snackbar thông báo */}
         <Snackbar
           open={snackbar.open}
           autoHideDuration={4000}
@@ -355,15 +401,13 @@ const Payment = () => {
           anchorOrigin={{ vertical: 'top', horizontal: 'right' }} // Góc phải trên
         >
           <Alert
-            onClose={() => setSnackbar(prev => ({ ...prev, open: false }))}
+            onClose={() => setSnackbar((prev) => ({ ...prev, open: false }))}
             severity={snackbar.severity}
             sx={{ width: '100%' }}
-            variant="filled"
           >
             {snackbar.message}
           </Alert>
         </Snackbar>
-
       </Container>
     </Box>
   )

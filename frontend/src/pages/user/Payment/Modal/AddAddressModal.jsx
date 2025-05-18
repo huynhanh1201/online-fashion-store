@@ -232,10 +232,10 @@ export default function AddAddressModal({
         field === 'fullName'
           ? !value.trim() || value.trim().length < 3
           : field === 'phone'
-          ? !value.trim() || !/^\d{10}$/.test(value.trim())
-          : field === 'address'
-          ? !value.trim() || value.trim().length < 5
-          : !value
+            ? !value.trim() || !/^\d{10}$/.test(value.trim())
+            : field === 'address'
+              ? !value.trim() || value.trim().length < 5
+              : !value
     }))
   }
 
@@ -294,8 +294,8 @@ export default function AddAddressModal({
         {viewOnly
           ? 'Xem địa chỉ'
           : isEditMode
-          ? 'Chỉnh sửa địa chỉ'
-          : 'Thêm địa chỉ mới'}
+            ? 'Chỉnh sửa địa chỉ'
+            : 'Thêm địa chỉ mới'}
         <IconButton
           aria-label="close"
           onClick={onClose}
