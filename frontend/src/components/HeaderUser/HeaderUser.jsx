@@ -84,27 +84,16 @@ const HeaderUser = () => {
               sx={{
                 display: { xs: 'none', md: 'flex' },
                 alignItems: 'center',
-                gap: 1,
+                gap: 2,
                 flexGrow: 1,
-                justifyContent: 'flex-start',
+                justifyContent: 'center',
                 maxWidth: 600,
                 minWidth: 600
               }}
             >
               <Menu />
-              <Box
-                sx={{
-                  width: 50,
-                  maxWidth: '100%',
-                  height: 36,
-                  display: 'flex',
-                  alignItems: 'center'
-                }}
-              >
-                <Search />
-              </Box>
             </Box>
-
+            <Search />
             {/* Auth + Action */}
             <Box
               sx={{

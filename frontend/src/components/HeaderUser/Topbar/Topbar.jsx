@@ -15,7 +15,7 @@ const TopBar = styled(Box)(({ theme }) => ({
   height: '40px',
   display: 'flex',
   alignItems: 'center',
-  zIndex: 1302,
+  zIndex: 1300,
   [theme.breakpoints.down('sm')]: {
     height: '40px',
     fontSize: '0.8rem'

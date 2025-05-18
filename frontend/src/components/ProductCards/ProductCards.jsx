@@ -11,10 +11,24 @@ import {
 import FavoriteIcon from '@mui/icons-material/Favorite'
 import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart'
 
-// Hàm cắt chuỗi
+// Hàm cắt chuỗi tên
 const truncate = (str, maxLength) => {
   if (!str) return ''
   return str.length > maxLength ? str.slice(0, maxLength) + '...' : str
+}
+
+// Hàm rút gọn giá nếu > 10 triệu
+const formatPrice = (price) => {
+  if (!price) return '---'
+  if (price >= 1_000_000_000) {
+    const ty = price / 1_000_000_000
+    return `${ty.toFixed(1)} Tỉ`
+  } else if (price >= 10_000_000) {
+    const tr = price / 1_000_000
+    return `${tr.toFixed(1)} Tr`
+  } else {
+    return `${price.toLocaleString()}₫`
+  }
 }
 
 const ProductCard = ({ product, handleAddToCart, isAdding }) => {
@@ -47,10 +61,21 @@ const ProductCard = ({ product, handleAddToCart, isAdding }) => {
       <CardContent sx={{ mb: -2 }}>
         <a
           href={`/productdetail/${product._id}`}
-          style={{ textDecoration: 'none', color: 'black', fontWeight: 'bold' }}
-          title={product.name} // Tooltip xem tên đầy đủ
+          style={{ textDecoration: 'none' }}
+          title={product.name}
         >
-          {truncate(product.name, 20)}
+          <Typography
+            variant='body1'
+            sx={{
+              fontWeight: 'bold',
+              color: 'black',
+              whiteSpace: 'nowrap',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis'
+            }}
+          >
+            {product.name}
+          </Typography>
         </a>
       </CardContent>
       <CardActions disableSpacing>
@@ -67,7 +92,7 @@ const ProductCard = ({ product, handleAddToCart, isAdding }) => {
         </IconButton>
         <Box sx={{ ml: 'auto', pr: 1 }}>
           <Typography variant='subtitle1' fontWeight='bold'>
-            {product.price ? `${product.price.toLocaleString()}₫` : '---'}
+            {formatPrice(product.price)}
           </Typography>
         </Box>
       </CardActions>

@@ -31,8 +31,8 @@ import ContentCopyIcon from '@mui/icons-material/ContentCopy' // Thêm import �
 
 // Utility format tiền gọn
 const formatCurrencyShort = (value) => {
-  if (value >= 1_000_000) return `${(value / 1_000_000).toFixed(1)}tr`
-  if (value >= 1_000) return `${(value / 1_000).toFixed(0)}k`
+  if (value >= 1_000_000) return `${(value / 1_000_000).toFixed(1)}Tr`
+  if (value >= 1_000) return `${(value / 1_000).toFixed(0)}K`
   return `${value.toLocaleString()}đ`
 }
 
@@ -190,7 +190,7 @@ const ProductDetail = () => {
       maxWidth='lg'
       sx={{ py: 4, mt: 20, justifyContent: 'center', alignItems: 'center' }}
     >
-      <Grid container spacing={10} justify='space-between'>
+      <Grid container spacing={10} justifyContent='center'>
         <Grid item xs={12} md={6}>
           <Box sx={{ width: 400, height: 450, mb: 5 }}>
             <Fade in={fadeIn} timeout={300} key={selectedImageIndex}>
@@ -227,9 +227,18 @@ const ProductDetail = () => {
 
         <Grid item xs={12} md={6}>
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-            <Typography variant='h5' fontWeight={700}>
+            <Typography
+              variant='h5'
+              fontWeight={700}
+              sx={{
+                maxWidth: '670px', // giới hạn theo container
+                wordBreak: 'break-word', // cho phép xuống dòng khi quá dài
+                whiteSpace: 'pre-wrap' // giữ nguyên khoảng trắng và xuống dòng
+              }}
+            >
               {product.name}
             </Typography>
+
             <PriceTypography variant='h5'>
               {typeof product.price === 'number'
                 ? product.price.toLocaleString('vi-VN') + 'đ'
