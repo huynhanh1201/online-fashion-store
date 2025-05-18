@@ -6,7 +6,6 @@ import { API_ROOT } from '~/utils/constants.js'
 // Lấy danh sách sản phẩm (phân trang)
 export const getProducts = async (page = 1, limit = 10) => {
   try {
-    console.log('Lấy danh sách sản phẩm')
     const response = await AuthorizedAxiosInstance.get(
       `${API_ROOT}/v1/products?page=${page}&limit=${limit}`
     )

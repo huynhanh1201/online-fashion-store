@@ -16,6 +16,6 @@ export const validateCoupon = async (cartTotal, couponCode) => {
       errorMessage = error.message
     }
     console.error('Lỗi khi kiểm tra mã giảm giá:', errorMessage)
-    throw new Error(errorMessage)  // Ném ra lỗi có message rõ ràng
+    throw new Error(errorMessage) // Ném ra lỗi có message rõ ràng
   }
 }
