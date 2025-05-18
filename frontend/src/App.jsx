@@ -57,6 +57,7 @@ function App() {
         <Route element={<ProtectedRoute user={currentUser} />}>
           {/*<Outlet/> của react-router-dom sẽ chạy vào các child route trong này*/}
           <Route path='payment' element={<Payment />} />
+          <Route path='payment-vnpay' element={ <h1>Thanh toán vnpay </h1>} />
           <Route path='cart' element={<Cart />} />
           <Route path='profile' element={<Profile />} />
           <Route path='order' element={<Order />} />

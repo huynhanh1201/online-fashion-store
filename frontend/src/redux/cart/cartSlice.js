@@ -3,6 +3,7 @@ import { createSlice } from '@reduxjs/toolkit'
 const cartSlice = createSlice({
   name: 'cart',
   initialState: {
+    selectedItems: [],
     cartItems: []
   },
   reducers: {
@@ -16,7 +17,7 @@ const cartSlice = createSlice({
       if (existingItem) {
         existingItem.quantity += quantity
       } else {
-        state.cartItems.push({ productId, quantity })
+        state.cartItems.push({ productId, quantity, checked: false }) // thêm checked mặc định false
       }
     },
     removeFromCart: (state, action) => {
@@ -31,16 +32,32 @@ const cartSlice = createSlice({
     },
     clearCart: (state) => {
       state.cartItems = []
+    },
+    toggleChecked: (state, action) => {
+      const { productId, checked } = action.payload
+      const item = state.cartItems.find(i => i.productId === productId)
+      if (item) {
+        item.checked = checked
+      }
+    },
+
+    // Add this:
+    setSelectedItems: (state, action) => {
+      console.log('Set selected items:', state)
+      state.selectedItems = action.payload
     }
   }
 })
 
 export const {
-  setCartItems, // ✅ EXPORT NÀY BỊ THIẾU TRƯỚC ĐÂY
+  setCartItems,
   addToCart,
   removeFromCart,
   updateCartItem,
-  clearCart
+  clearCart,
+  toggleChecked, // ✅ Sửa lại tên đúng với reducer bạn đã khai báo
+  setSelectedItems
 } = cartSlice.actions
+
 
 export default cartSlice.reducer
