@@ -208,7 +208,7 @@ const createOrder = async (userId, reqBody, ipAddr) => {
       const urlPayment =
         vnpUrl + '?' + querystring.stringify(vnp_Params, { encode: false })
 
-      console.log('urlPayment', urlPayment)
+      // console.log('urlPayment', urlPayment)
 
       return urlPayment
     }
