@@ -1,18 +1,19 @@
 import React from 'react'
-import {
-  Table,
-  TableBody,
-  TableHead,
-  Paper,
-  CircularProgress,
-  Typography
-} from '@mui/material'
+import Table from '@mui/material/Table'
+import TableBody from '@mui/material/TableBody'
+import TableHead from '@mui/material/TableHead'
+import Paper from '@mui/material/Paper'
+import CircularProgress from '@mui/material/CircularProgress'
+import Typography from '@mui/material/Typography'
+
 import OrderRow from './OrderRow'
-import {
+
+import StyleAdmin, {
   StyledTableCell,
   StyledTableRow,
   StyledTableContainer
-} from '~/pages/admin/CategorieManagement/CategoryTableStyles.jsx'
+} from '~/components/StyleAdmin'
+
 const OrderTable = ({
   orders = [],
   loading = false,
@@ -27,14 +28,22 @@ const OrderTable = ({
       <Table stickyHeader>
         <TableHead>
           <StyledTableRow>
-            <StyledTableCell sx={{ textAlign: 'center', width: '50px' }}>
+            <StyledTableCell sx={StyleAdmin.TableColumnSTT}>
               STT
             </StyledTableCell>
-            <StyledTableCell>Mã đơn hàng</StyledTableCell>
-            <StyledTableCell>Tên khách hàng</StyledTableCell>
-            <StyledTableCell>Trạng thái đơn hàng</StyledTableCell>
-            <StyledTableCell>Trạng thái thanh toán</StyledTableCell>
-            <StyledTableCell>Ngày đặt hàng</StyledTableCell>
+            <StyledTableCell sx={{ width: '30%' }}>Mã đơn hàng</StyledTableCell>
+            <StyledTableCell sx={{ width: '20%' }}>
+              Tên khách hàng
+            </StyledTableCell>
+            <StyledTableCell sx={{ width: '170px' }}>
+              Trạng thái đơn hàng
+            </StyledTableCell>
+            <StyledTableCell sx={{ width: '170px' }}>
+              Trạng thái thanh toán
+            </StyledTableCell>
+            <StyledTableCell sx={{ width: '170px' }}>
+              Ngày đặt hàng
+            </StyledTableCell>
             <StyledTableCell sx={{ maxWidth: '130px', width: '130px' }}>
               Hành động
             </StyledTableCell>

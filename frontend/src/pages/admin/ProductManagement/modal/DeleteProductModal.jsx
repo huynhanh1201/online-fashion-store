@@ -1,13 +1,13 @@
 import React, { useState } from 'react'
-import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Button,
-  Typography
-} from '@mui/material'
-import styleAdmin from '~/components/StyleAdmin.jsx'
+
+import Dialog from '@mui/material/Dialog'
+import DialogTitle from '@mui/material/DialogTitle'
+import DialogContent from '@mui/material/DialogContent'
+import DialogActions from '@mui/material/DialogActions'
+import Button from '@mui/material/Button'
+import Typography from '@mui/material/Typography'
+
+import styleAdmin from '~/components/StyleAdmin'
 
 const DeleteProductModal = ({ open, onClose, product, onDelete }) => {
   const [isDeleting, setIsDeleting] = useState(false)

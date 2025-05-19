@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { getDiscounts } from '~/services/discountService'
+import { getDiscounts } from '~/services/admin/discountService'
 
 const useDiscounts = (initialPage = 1, limit = 10) => {
   const [discounts, setDiscounts] = useState([])

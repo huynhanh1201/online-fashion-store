@@ -4,7 +4,7 @@ import {
   getTransactionById,
   updateTransactionById,
   deleteTransactionById
-} from '~/services/transactionService'
+} from '~/services/admin/transactionService'
 
 const useTransactions = () => {
   const [transactions, setTransactions] = useState([])

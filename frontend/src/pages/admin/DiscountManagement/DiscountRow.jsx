@@ -1,13 +1,14 @@
 import React from 'react'
+
 import IconButton from '@mui/material/IconButton'
-import { Stack, Chip } from '@mui/material'
+import Stack from '@mui/material/Stack'
+import Chip from '@mui/material/Chip'
+
 import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye'
 import BorderColorIcon from '@mui/icons-material/BorderColor'
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever'
-import {
-  StyledTableCell,
-  StyledTableRow
-} from '../UserManagement/UserTableStyles.js'
+
+import { StyledTableCell, StyledTableRow } from '~/components/StyleAdmin'
 
 const DiscountRow = ({ discount, index, onAction }) => {
   const remaining = discount.usageLimit - discount.usedCount
@@ -17,7 +18,7 @@ const DiscountRow = ({ discount, index, onAction }) => {
       <StyledTableCell sx={{ textAlign: 'center' }}>
         {index + 1}
       </StyledTableCell>
-      <StyledTableCell>{discount.code}</StyledTableCell>
+      <StyledTableCell>{discount.code.toUpperCase()}</StyledTableCell>
       <StyledTableCell>
         {discount.type === 'fixed' ? 'Cố định' : 'Phần trăm'}
       </StyledTableCell>

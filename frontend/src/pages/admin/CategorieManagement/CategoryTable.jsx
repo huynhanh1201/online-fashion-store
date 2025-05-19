@@ -1,11 +1,13 @@
 // components/CategoryTable.jsx
 import React from 'react'
-import { Table, TableBody, TableHead, TableRow, TableCell } from '@mui/material'
-import {
+import Table from '@mui/material/Table'
+import TableBody from '@mui/material/TableBody'
+import TableHead from '@mui/material/TableHead'
+import StyleAdmin, {
   StyledTableCell,
   StyledTableRow,
   StyledTableContainer
-} from './CategoryTableStyles'
+} from '~/components/StyleAdmin'
 import CategoryRow from './CategoryRow'
 
 const CategoryTable = ({ categories, loading, handleOpenModal }) => {
@@ -14,11 +16,9 @@ const CategoryTable = ({ categories, loading, handleOpenModal }) => {
     <Table>
       <TableHead>
         <StyledTableRow>
-          <StyledTableCell sx={{ textAlign: 'center', width: '50px' }}>
-            STT
-          </StyledTableCell>
+          <StyledTableCell sx={StyleAdmin.TableColumnSTT}>STT</StyledTableCell>
           <StyledTableCell sx={{ width: '20%' }}>Tên danh mục</StyledTableCell>
-          <StyledTableCell>Mô tả</StyledTableCell>
+          <StyledTableCell sx={{ width: '100%' }}>Mô tả</StyledTableCell>
           <StyledTableCell sx={{ width: '130px', maxWidth: '130px' }}>
             Hành động
           </StyledTableCell>

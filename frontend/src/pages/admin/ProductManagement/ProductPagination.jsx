@@ -1,5 +1,6 @@
 import React from 'react'
-import { Pagination, Stack } from '@mui/material'
+import Pagination from '@mui/material/Pagination'
+import Stack from '@mui/material/Stack'
 
 export default function ProductPagination({ page, totalPages, onPageChange }) {
   return (

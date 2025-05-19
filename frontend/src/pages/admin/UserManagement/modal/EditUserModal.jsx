@@ -1,23 +1,24 @@
 import React, { useEffect } from 'react'
-import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Button,
-  TextField,
-  MenuItem,
-  Select,
-  InputLabel,
-  FormControl,
-  CircularProgress,
-  Divider
-} from '@mui/material'
+
+import Dialog from '@mui/material/Dialog'
+import DialogTitle from '@mui/material/DialogTitle'
+import DialogContent from '@mui/material/DialogContent'
+import DialogActions from '@mui/material/DialogActions'
+import Button from '@mui/material/Button'
+import TextField from '@mui/material/TextField'
+import MenuItem from '@mui/material/MenuItem'
+import Select from '@mui/material/Select'
+import InputLabel from '@mui/material/InputLabel'
+import FormControl from '@mui/material/FormControl'
+import CircularProgress from '@mui/material/CircularProgress'
+import Divider from '@mui/material/Divider'
+
 import { useForm } from 'react-hook-form'
-import AuthorizedAxiosInstance from '~/utils/authorizedAxios.js'
-import { API_ROOT } from '~/utils/constants.js'
-import StyleAdmin from '~/components/StyleAdmin.jsx'
-import styleAdmin from '~/components/StyleAdmin.jsx'
+
+import AuthorizedAxiosInstance from '~/utils/authorizedAxios'
+import { API_ROOT } from '~/utils/constants'
+import StyleAdmin from '~/components/StyleAdmin'
+
 const EditUserModal = React.memo(({ open, onClose, user, onSave }) => {
   const {
     register,
@@ -65,7 +66,7 @@ const EditUserModal = React.memo(({ open, onClose, user, onSave }) => {
       fullWidth
       maxWidth='sm'
       BackdropProps={{
-        sx: styleAdmin.OverlayModal
+        sx: StyleAdmin.OverlayModal
       }}
     >
       <DialogTitle>Chỉnh sửa người dùng</DialogTitle>

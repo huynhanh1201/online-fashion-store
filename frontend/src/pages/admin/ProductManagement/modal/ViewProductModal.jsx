@@ -1,17 +1,17 @@
 import React, { useState } from 'react'
-import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Button,
-  Box,
-  Grid,
-  Typography,
-  Divider,
-  Chip
-} from '@mui/material'
-import StyleAdmin from '~/components/StyleAdmin.jsx'
+
+import Dialog from '@mui/material/Dialog'
+import DialogTitle from '@mui/material/DialogTitle'
+import DialogContent from '@mui/material/DialogContent'
+import DialogActions from '@mui/material/DialogActions'
+import Button from '@mui/material/Button'
+import Box from '@mui/material/Box'
+import Grid from '@mui/material/Grid'
+import Typography from '@mui/material/Typography'
+import Divider from '@mui/material/Divider'
+import Chip from '@mui/material/Chip'
+
+import StyleAdmin from '~/components/StyleAdmin'
 
 const ViewProductModal = ({ open, onClose, product }) => {
   const imageList = Array.isArray(product?.image) ? product.image : []
@@ -22,7 +22,21 @@ const ViewProductModal = ({ open, onClose, product }) => {
   }
 
   if (!product) return null
+  const colorMap = {
+    Đỏ: '#f44336',
+    'Xanh dương': '#2196f3',
+    Đen: '#212121',
+    Trắng: '#e0e0e0',
+    Vàng: '#ffeb3b'
+  }
 
+  const textColorMap = {
+    Đỏ: '#fff',
+    'Xanh dương': '#fff',
+    Đen: '#fff',
+    Trắng: '#000',
+    Vàng: '#000'
+  }
   return (
     <Dialog
       open={open}
@@ -161,11 +175,23 @@ const ViewProductModal = ({ open, onClose, product }) => {
               >
                 Kích thước
               </Typography>
-              <Typography variant='body1' gutterBottom>
-                {product.sizes && product.sizes.length > 0
-                  ? product.sizes.join(', ')
-                  : 'Chưa có'}
-              </Typography>
+              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+                {product.sizes && product.sizes.length > 0 ? (
+                  product.sizes.map((size) => (
+                    <Chip
+                      key={size}
+                      label={size}
+                      size='small'
+                      sx={{
+                        backgroundColor: '#e0e0e0',
+                        fontWeight: 500
+                      }}
+                    />
+                  ))
+                ) : (
+                  <Typography variant='body2'>Chưa có</Typography>
+                )}
+              </Box>
               <Divider sx={{ my: 1 }} />
 
               {/* Thêm trường Màu sắc */}
@@ -176,11 +202,24 @@ const ViewProductModal = ({ open, onClose, product }) => {
               >
                 Màu sắc
               </Typography>
-              <Typography variant='body1' gutterBottom>
-                {product.colors && product.colors.length > 0
-                  ? product.colors.join(', ')
-                  : 'Chưa có'}
-              </Typography>
+              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+                {product.colors && product.colors.length > 0 ? (
+                  product.colors.map((color) => (
+                    <Chip
+                      key={color}
+                      label={color}
+                      size='small'
+                      sx={{
+                        backgroundColor: colorMap[color] || 'default',
+                        color: textColorMap[color] || '#fff'
+                      }}
+                    />
+                  ))
+                ) : (
+                  <Typography variant='body2'>Chưa có</Typography>
+                )}
+              </Box>
+
               <Divider sx={{ my: 1 }} />
               <Typography
                 variant='subtitle2'

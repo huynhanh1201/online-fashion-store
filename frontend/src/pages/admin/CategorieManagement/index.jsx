@@ -1,24 +1,19 @@
-// components/CategoryManagement.jsx
 import React from 'react'
-import Typography from '@mui/material/Typography'
-import Button from '@mui/material/Button'
+import { Typography } from '@mui/material'
+import { Button } from '@mui/material'
 import CategoryTable from './CategoryTable'
 import CategoryPagination from './CategoryPagination'
-import useCategories from '~/hook/useCategories.js'
-import { updateCategory, deleteCategory } from '~/services/categoryService'
+import useCategories from '~/hook/admin/useCategories'
+import { updateCategory } from '~/services/admin/categoryService'
+import { deleteCategory } from '~/services/admin/categoryService'
 import AddIcon from '@mui/icons-material/Add'
+
 // Lazy load các modal
-const AddCategoryModal = React.lazy(
-  () => import('./modal/AddCategoryModal.jsx')
-)
-const ViewCategoryModal = React.lazy(
-  () => import('./modal/ViewCategoryModal.jsx')
-)
-const EditCategoryModal = React.lazy(
-  () => import('./modal/EditCategoryModal.jsx')
-)
+const AddCategoryModal = React.lazy(() => import('./modal/AddCategoryModal'))
+const ViewCategoryModal = React.lazy(() => import('./modal/ViewCategoryModal'))
+const EditCategoryModal = React.lazy(() => import('./modal/EditCategoryModal'))
 const DeleteCategoryModal = React.lazy(
-  () => import('./modal/DeleteCategoryModal.jsx')
+  () => import('./modal/DeleteCategoryModal')
 )
 
 const CategoryManagement = () => {
