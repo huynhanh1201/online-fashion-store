@@ -7,7 +7,7 @@ const StyledButton = styled(Button)(({ theme }) => ({
   color: '#000',
   fontWeight: 500,
   padding: '8px 16px',
-  borderRadius: '20px',
+  borderRadius: '10px',
   position: 'relative',
   '&::after': {
     content: '""',
@@ -16,7 +16,7 @@ const StyledButton = styled(Button)(({ theme }) => ({
     left: 0,
     width: 0,
     height: '2px',
-    backgroundColor: theme.palette.primary.main,
+    backgroundColor: '#1A3C7B',
     transition: 'width 0.3s ease'
   },
   '&:hover::after': {
@@ -29,22 +29,17 @@ const StyledButton = styled(Button)(({ theme }) => ({
 }))
 
 const CategoryButton = styled(Button)(({ theme }) => ({
-  width: '100%',
-  justifyContent: 'flex-start',
+  width: '200px',
+  justifyContent: 'center',
   padding: '10px 14px',
-  borderRadius: '10px',
-  border: '1px solid #e0e0e0',
   color: theme.palette.text.primary,
-  fontWeight: 400,
+  fontWeight: 450,
   textTransform: 'none',
   fontSize: '15px',
   transition: 'all 0.25s ease',
-  backgroundColor: '#fff',
   '&:hover': {
-    backgroundColor: theme.palette.grey[100],
-    borderColor: theme.palette.primary.main,
     transform: 'translateX(4px)',
-    color: theme.palette.primary.main
+    color: 'red'
   }
 }))
 
@@ -108,27 +103,36 @@ const Menu = () => {
 
   const renderPopoverContent = (menu) => {
     const renderRow = (title, items) => (
-      <Box sx={{ p: 2, minWidth: 200, maxWidth: 250 }}>
+      <Box
+        sx={{
+          p: 2,
+          minWidth: 500,
+          maxWidth: 1000,
+          alignItems: 'center'
+        }}
+      >
         <Typography
           variant='subtitle1'
-          fontWeight={600}
+          fontWeight={700}
           align='center'
           sx={{ mb: 2 }}
         >
           {title}
         </Typography>
-        <Box
-          sx={{
-            display: 'flex',
-            flexDirection: 'column',
-            gap: 1
-          }}
-        >
-          {items.map((item, index) => (
-            <CategoryButton key={index} size='small' href={item.href || '#'}>
-              {item.name}
-            </CategoryButton>
-          ))}
+
+        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+          <Box
+            sx={{
+              display: 'flex',
+              gap: 1
+            }}
+          >
+            {items.map((item, index) => (
+              <CategoryButton key={index} size='small' href={item.href || '#'}>
+                {item.name}
+              </CategoryButton>
+            ))}
+          </Box>
         </Box>
       </Box>
     )
