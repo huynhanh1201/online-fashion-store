@@ -1,15 +1,15 @@
 import React from 'react'
-import {
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
-  TextField,
-  Button,
-  Divider
-} from '@mui/material'
-import StyleAdmin from '~/components/StyleAdmin.jsx'
-import styleAdmin from '~/components/StyleAdmin.jsx'
+
+import Dialog from '@mui/material/Dialog'
+import DialogActions from '@mui/material/DialogActions'
+import DialogContent from '@mui/material/DialogContent'
+import DialogTitle from '@mui/material/DialogTitle'
+import TextField from '@mui/material/TextField'
+import Button from '@mui/material/Button'
+import Divider from '@mui/material/Divider'
+
+import StyleAdmin from '~/components/StyleAdmin'
+
 const ViewCategoryModal = ({ open, onClose, category }) => {
   return (
     <Dialog
@@ -18,7 +18,7 @@ const ViewCategoryModal = ({ open, onClose, category }) => {
       fullWidth
       maxWidth='sm'
       BackdropProps={{
-        sx: styleAdmin.OverlayModal
+        sx: StyleAdmin.OverlayModal
       }}
     >
       <DialogTitle>Xem thông tin danh mục</DialogTitle>

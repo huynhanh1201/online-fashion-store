@@ -1,13 +1,19 @@
 import React, { useEffect, useState } from 'react'
-import { TableCell, TableRow, IconButton, Tooltip, Chip } from '@mui/material'
+
+import IconButton from '@mui/material/IconButton'
+import Tooltip from '@mui/material/Tooltip'
+import Chip from '@mui/material/Chip'
+
 import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye'
 import BorderColorIcon from '@mui/icons-material/BorderColor'
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever'
-import useOrderAdmin from '~/hook/admin/useOrder.js'
-import {
+
+import useOrderAdmin from '~/hook/admin/useOrder'
+import StyleAdmin, {
   StyledTableCell,
   StyledTableRow
-} from '../UserManagement/UserTableStyles.js'
+} from '~/components/StyleAdmin'
+
 const TransactionRow = ({ transaction, onView, onEdit, onDelete, index }) => {
   const [orderTotal, setOrderTotal] = useState(null)
   const { getOrderId } = useOrderAdmin()
@@ -28,7 +34,7 @@ const TransactionRow = ({ transaction, onView, onEdit, onDelete, index }) => {
   }, [transaction.orderId])
   return (
     <StyledTableRow>
-      <StyledTableCell sx={{ textAlign: 'center' }}>
+      <StyledTableCell sx={StyleAdmin.TableColumnSTT}>
         {index + 1}
       </StyledTableCell>
       <StyledTableCell>{transaction._id}</StyledTableCell>

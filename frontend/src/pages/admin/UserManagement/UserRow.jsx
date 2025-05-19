@@ -1,11 +1,15 @@
 // UserRow.jsx
 import React from 'react'
+
 import IconButton from '@mui/material/IconButton'
-import { TableRow, Stack } from '@mui/material'
+import TableRow from '@mui/material/TableRow'
+import Stack from '@mui/material/Stack'
+
 import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye'
 import BorderColorIcon from '@mui/icons-material/BorderColor'
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever'
-import { StyledTableCell, StyledTableRow } from './UserTableStyles'
+
+import { StyledTableCell, StyledTableRow } from '~/components/StyleAdmin'
 
 const styles = {
   groupIcon: {

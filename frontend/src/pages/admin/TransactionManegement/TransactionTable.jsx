@@ -1,17 +1,20 @@
 import React from 'react'
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableRow,
-  CircularProgress
-} from '@mui/material'
+
+import Table from '@mui/material/Table'
+import TableBody from '@mui/material/TableBody'
+import TableCell from '@mui/material/TableCell'
+import TableHead from '@mui/material/TableHead'
+import TableRow from '@mui/material/TableRow'
+import CircularProgress from '@mui/material/CircularProgress'
+
 import TransactionRow from './TransactionRow'
-import {
+import StyleAdmin, {
   StyledTableCell,
-  StyledTableRow
-} from '../UserManagement/UserTableStyles.js'
+  StyledTableRow,
+  StyledTableContainer
+} from '~/components/StyleAdmin'
+import Paper from '@mui/material/Paper'
+
 const TransactionTable = ({
   transactions,
   loading,
@@ -20,20 +23,18 @@ const TransactionTable = ({
   onDelete
 }) => {
   return (
-    <Table>
+    <StyledTableContainer component={Paper}>
       <TableHead>
         <StyledTableRow>
-          <StyledTableCell sx={{ textAlign: 'center', width: '50px' }}>
-            STT
-          </StyledTableCell>
-          <StyledTableCell>Mã giao dịch</StyledTableCell>
-          <StyledTableCell>Đơn hàng</StyledTableCell>
+          <StyledTableCell sx={StyleAdmin.TableColumnSTT}>STT</StyledTableCell>
+          <StyledTableCell sx={{ width: '20%' }}>Mã giao dịch</StyledTableCell>
+          <StyledTableCell sx={{ width: '20%' }}>Đơn hàng</StyledTableCell>
           <StyledTableCell>Phương thức</StyledTableCell>
           <StyledTableCell>Trạng thái</StyledTableCell>
-          <StyledTableCell>Số tiền</StyledTableCell>
-          <StyledTableCell sx={{ width: '100px', maxWidth: '100px' }}>
-            Ghi chú
+          <StyledTableCell sx={{ width: '100px' }}>
+            Số tiền (VNĐ)
           </StyledTableCell>
+          <StyledTableCell sx={{ width: '25%' }}>Ghi chú</StyledTableCell>
           <StyledTableCell>Ngày tạo</StyledTableCell>
           <StyledTableCell sx={{ maxWidth: '130px', width: '130px' }}>
             Hành động
@@ -69,7 +70,7 @@ const TransactionTable = ({
           </StyledTableRow>
         )}
       </TableBody>
-    </Table>
+    </StyledTableContainer>
   )
 }
 

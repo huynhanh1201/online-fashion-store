@@ -1,45 +1,35 @@
 import React from 'react'
-import {
-  Table,
-  TableHead,
-  TableBody,
-  TableRow,
-  TableCell,
-  CircularProgress,
-  Button
-} from '@mui/material'
+import Table from '@mui/material/Table'
+import TableHead from '@mui/material/TableHead'
+import TableBody from '@mui/material/TableBody'
+import TableRow from '@mui/material/TableRow'
+import TableCell from '@mui/material/TableCell'
+import CircularProgress from '@mui/material/CircularProgress'
 import ProductRow from './ProductRow'
-import {
+import StyleAdmin, {
   StyledTableCell,
   StyledTableRow,
   StyledTableContainer
-} from '~/pages/admin/CategorieManagement/CategoryTableStyles.jsx'
+} from '~/components/StyleAdmin'
+
 import AddIcon from '@mui/icons-material/Add'
 const ProductTable = ({ products, loading, handleOpenModal }) => {
   if (loading) return <CircularProgress />
 
   return (
     <>
-      <Button
-        variant='contained'
-        sx={{ mb: 2, backgroundColor: '#001f5d' }}
-        startIcon={<AddIcon />}
-        onClick={() => handleOpenModal('add')}
-      >
-        Thêm sản phẩm
-      </Button>
-      <Table>
+      <StyledTableContainer>
         <TableHead>
           <StyledTableRow>
-            <StyledTableCell sx={{ textAlign: 'center', width: '50px' }}>
+            <StyledTableCell sx={StyleAdmin.TableColumnSTT}>
               STT
             </StyledTableCell>
             <StyledTableCell sx={{ width: '50px' }}>Ảnh</StyledTableCell>
-            <StyledTableCell>Tên</StyledTableCell>
-            <StyledTableCell sx={{ width: '100px' }}>Giá (VNĐ)</StyledTableCell>
+            <StyledTableCell sx={{ width: '20%' }}>Tên</StyledTableCell>
+            <StyledTableCell sx={{ width: '150px' }}>Giá (VNĐ)</StyledTableCell>
             <StyledTableCell sx={{ width: '70px' }}>Số lượng</StyledTableCell>
-            <StyledTableCell>Mô tả</StyledTableCell>
-            <StyledTableCell sx={{ width: '100px' }}>Xuất xứ</StyledTableCell>
+            <StyledTableCell sx={{ width: '100%' }}>Mô tả</StyledTableCell>
+            <StyledTableCell sx={{ width: '250px' }}>Xuất xứ</StyledTableCell>
             <StyledTableCell sx={{ width: '100px' }}>Danh mục</StyledTableCell>
             <StyledTableCell sx={{ width: '70px' }}>Trạng thái</StyledTableCell>
             <StyledTableCell sx={{ maxWidth: '130px', width: '130px' }}>
@@ -73,7 +63,7 @@ const ProductTable = ({ products, loading, handleOpenModal }) => {
               ))
           )}
         </TableBody>
-      </Table>
+      </StyledTableContainer>
     </>
   )
 }

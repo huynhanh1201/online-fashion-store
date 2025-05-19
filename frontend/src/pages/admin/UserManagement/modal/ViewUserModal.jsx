@@ -1,15 +1,15 @@
 import React, { useEffect } from 'react'
-import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Button,
-  TextField,
-  Divider
-} from '@mui/material'
-import StyleAdmin from '~/components/StyleAdmin.jsx'
-import styleAdmin from '~/components/StyleAdmin.jsx'
+
+import Dialog from '@mui/material/Dialog'
+import DialogTitle from '@mui/material/DialogTitle'
+import DialogContent from '@mui/material/DialogContent'
+import DialogActions from '@mui/material/DialogActions'
+import Button from '@mui/material/Button'
+import TextField from '@mui/material/TextField'
+import Divider from '@mui/material/Divider'
+
+import StyleAdmin from '~/components/StyleAdmin'
+
 const ViewUserModal = React.memo(({ open, onClose, user }) => {
   useEffect(() => {
     if (!open) {
@@ -24,7 +24,7 @@ const ViewUserModal = React.memo(({ open, onClose, user }) => {
       fullWidth
       maxWidth='sm'
       BackdropProps={{
-        sx: styleAdmin.OverlayModal
+        sx: StyleAdmin.OverlayModal
       }}
     >
       <DialogTitle>Chi tiết người dùng</DialogTitle>

@@ -1,14 +1,18 @@
 import React, { useState } from 'react'
 import CloseIcon from '@mui/icons-material/Close'
-import { TableCell, Stack, IconButton, Box, Chip } from '@mui/material'
-import {
+import TableCell from '@mui/material/TableCell'
+import Stack from '@mui/material/Stack'
+import IconButton from '@mui/material/IconButton'
+import Box from '@mui/material/Box'
+import Chip from '@mui/material/Chip'
+import StyleAdmin, {
   StyledTableCell,
   StyledTableRow
-} from '~/pages/admin/CategorieManagement/CategoryTableStyles.jsx'
+} from '~/components/StyleAdmin'
 import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye'
 import BorderColorIcon from '@mui/icons-material/BorderColor'
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever'
-import ProductImageModal from './modal/ProductImageModal.jsx'
+import ProductImageModal from './modal/ProductImageModal'
 
 const styles = {
   groupIcon: {
@@ -32,11 +36,12 @@ const ProductRow = ({ index, product, handleOpenModal }) => {
   const handleClose = () => {
     setOpenImage(false)
   }
-
   return (
     <>
       <StyledTableRow>
-        <StyledTableCell sx={{ textAlign: 'center' }}>{index}</StyledTableCell>
+        <StyledTableCell sx={StyleAdmin.TableColumnSTT}>
+          {index}
+        </StyledTableCell>
         <StyledTableCell>
           <img
             src={product.image?.[0]}
@@ -50,7 +55,16 @@ const ProductRow = ({ index, product, handleOpenModal }) => {
             onClick={handleImageClick}
           />
         </StyledTableCell>
-        <StyledTableCell>{product.name}</StyledTableCell>
+        <StyledTableCell
+          sx={{
+            maxWidth: '300px',
+            whiteSpace: 'nowrap',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis'
+          }}
+        >
+          {product.name}
+        </StyledTableCell>
         <StyledTableCell>{product.price.toLocaleString()}</StyledTableCell>
         <StyledTableCell>{product.quantity}</StyledTableCell>
         <StyledTableCell
@@ -63,8 +77,26 @@ const ProductRow = ({ index, product, handleOpenModal }) => {
         >
           {product.description}
         </StyledTableCell>
-        <StyledTableCell>{product.origin}</StyledTableCell>
-        <StyledTableCell>{product.categoryId.name}</StyledTableCell>
+        <StyledTableCell
+          sx={{
+            maxWidth: '250px',
+            whiteSpace: 'nowrap',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis'
+          }}
+        >
+          {product.origin}
+        </StyledTableCell>
+        <StyledTableCell
+          sx={{
+            maxWidth: '100px',
+            whiteSpace: 'nowrap',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis'
+          }}
+        >
+          {product.categoryId.name}
+        </StyledTableCell>
         <StyledTableCell>
           <Chip
             label={product.destroy ? 'Ngừng bán' : 'Đang bán'}

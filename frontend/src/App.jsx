@@ -25,7 +25,6 @@ import ProductManagement from '~/pages/admin/ProductManagement/index.jsx'
 import CategorieManagement from '~/pages/admin/CategorieManagement/index.jsx'
 import OrderManagement from '~/pages/admin/OrderManagement/index'
 import DiscountManagement from '~/pages/admin/DiscountManagement/index.jsx'
-import DemoCart from '~/pages/admin/DemoCart/index.jsx'
 import TransactionManegement from '~/pages/admin/TransactionManegement/index.jsx'
 // Trang 404
 import NotFound from '~/pages/404/NotFound'
@@ -94,7 +93,6 @@ function App() {
             path='transaction-management'
             element={<TransactionManegement />}
           />
-          <Route path='demo-cart' element={<DemoCart />} />
         </Route>
       </Route>
 

@@ -1,14 +1,12 @@
 import React from 'react'
-import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Button,
-  CircularProgress,
-  Typography
-} from '@mui/material'
-import styleAdmin from '~/components/StyleAdmin.jsx'
+import Dialog from '@mui/material/Dialog'
+import DialogTitle from '@mui/material/DialogTitle'
+import DialogContent from '@mui/material/DialogContent'
+import DialogActions from '@mui/material/DialogActions'
+import Button from '@mui/material/Button'
+import CircularProgress from '@mui/material/CircularProgress'
+import Typography from '@mui/material/Typography'
+import styleAdmin from '~/components/StyleAdmin'
 
 const DeleteOrderModal = ({ open, onClose, onConfirm, order }) => {
   const [isDeleting, setIsDeleting] = React.useState(false)

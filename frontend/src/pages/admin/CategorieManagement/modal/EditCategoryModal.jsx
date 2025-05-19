@@ -1,17 +1,17 @@
 import React, { useEffect } from 'react'
-import {
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
-  TextField,
-  Button,
-  CircularProgress,
-  Divider
-} from '@mui/material'
+
+import Dialog from '@mui/material/Dialog'
+import DialogActions from '@mui/material/DialogActions'
+import DialogContent from '@mui/material/DialogContent'
+import DialogTitle from '@mui/material/DialogTitle'
+import TextField from '@mui/material/TextField'
+import Button from '@mui/material/Button'
+import CircularProgress from '@mui/material/CircularProgress'
+import Divider from '@mui/material/Divider'
+
 import { useForm } from 'react-hook-form'
-import StyleAdmin from '~/components/StyleAdmin.jsx'
-import styleAdmin from '~/components/StyleAdmin.jsx'
+import StyleAdmin from '~/components/StyleAdmin'
+
 const EditCategoryModal = ({ open, onClose, category, onSave }) => {
   const {
     register,
@@ -46,7 +46,7 @@ const EditCategoryModal = ({ open, onClose, category, onSave }) => {
       fullWidth
       maxWidth='sm'
       BackdropProps={{
-        sx: styleAdmin.OverlayModal
+        sx: StyleAdmin.OverlayModal
       }}
     >
       <DialogTitle>Sửa danh mục</DialogTitle>

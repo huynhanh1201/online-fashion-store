@@ -1,29 +1,31 @@
 import React, { useState, useRef, useEffect } from 'react'
-import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  TextField,
-  Button,
-  Box,
-  Typography,
-  FormControl,
-  Select,
-  InputLabel,
-  MenuItem,
-  IconButton,
-  Divider
-} from '@mui/material'
+
+import Dialog from '@mui/material/Dialog'
+import DialogTitle from '@mui/material/DialogTitle'
+import DialogContent from '@mui/material/DialogContent'
+import DialogActions from '@mui/material/DialogActions'
+import TextField from '@mui/material/TextField'
+import Button from '@mui/material/Button'
+import Box from '@mui/material/Box'
+import Typography from '@mui/material/Typography'
+import FormControl from '@mui/material/FormControl'
+import Select from '@mui/material/Select'
+import InputLabel from '@mui/material/InputLabel'
+import MenuItem from '@mui/material/MenuItem'
+import IconButton from '@mui/material/IconButton'
+import Divider from '@mui/material/Divider'
+import Chip from '@mui/material/Chip'
+
 import EditIcon from '@mui/icons-material/Edit'
 import DeleteIcon from '@mui/icons-material/Delete'
+import CancelIcon from '@mui/icons-material/Cancel'
+
 import { useForm, Controller } from 'react-hook-form'
 
 import { addProduct } from '~/services/productService'
 import useCategories from '~/hook/useCategories'
-import AddCategoryModal from '~/pages/admin/CategorieManagement/modal/AddCategoryModal.jsx'
+import AddCategoryModal from '~/pages/admin/CategorieManagement/modal/AddCategoryModal'
 import StyleAdmin from '~/components/StyleAdmin'
-import styleAdmin from '~/components/StyleAdmin.jsx'
 
 const URI = 'https://api.cloudinary.com/v1_1/dkwsy9sph/image/upload'
 const CloudinaryProduct = 'product_upload'
@@ -41,6 +43,22 @@ const uploadToCloudinary = async (file) => {
 
   const data = await res.json()
   return data.secure_url
+}
+
+const textColorMap = {
+  S: '#fff',
+  M: '#fff',
+  L: '#fff',
+  XL: '#fff',
+  XXL: '#fff'
+}
+
+const colorMap = {
+  Đỏ: '#f44336',
+  'Xanh dương': '#2196f3',
+  Đen: '#212121',
+  Trắng: '#e0e0e0',
+  Vàng: '#ffeb3b'
 }
 
 const AddProductModal = ({ open, onClose, onSuccess }) => {
@@ -139,7 +157,7 @@ const AddProductModal = ({ open, onClose, onSuccess }) => {
         maxWidth='xl'
         PaperProps={{ sx: { mt: 8, maxHeight: '90vh', width: '90vw' } }}
         BackdropProps={{
-          sx: styleAdmin.OverlayModal
+          sx: StyleAdmin.OverlayModal
         }}
       >
         <DialogTitle>Thêm Sản Phẩm</DialogTitle>
@@ -221,27 +239,70 @@ const AddProductModal = ({ open, onClose, onSuccess }) => {
                     name='sizes'
                     control={control}
                     rules={{ required: 'Kích cỡ không được bỏ trống' }}
-                    render={({ field }) => (
-                      <Select
-                        {...field}
-                        label='Kích cỡ'
-                        multiple
-                        MenuProps={{
-                          PaperProps: { sx: StyleAdmin.FormSelect.SelectMenu }
-                        }}
-                      >
-                        {['S', 'M', 'L', 'XL', 'XXL'].map((size) => (
-                          <MenuItem key={size} value={size}>
-                            {size}
-                          </MenuItem>
-                        ))}
-                      </Select>
-                    )}
+                    render={({ field }) => {
+                      const handleDelete = (event, itemToDelete) => {
+                        event.stopPropagation()
+                        const newValue = (field.value || []).filter(
+                          (item) => item !== itemToDelete
+                        )
+                        field.onChange(newValue)
+                      }
+
+                      return (
+                        <Select
+                          {...field}
+                          label='Kích cỡ'
+                          multiple
+                          value={field.value || []}
+                          onChange={(event) =>
+                            field.onChange(event.target.value)
+                          }
+                          renderValue={(selected) => (
+                            <Box
+                              sx={{
+                                display: 'flex',
+                                flexWrap: 'wrap',
+                                gap: 0.5
+                              }}
+                            >
+                              {selected.map((value) => (
+                                <Chip
+                                  key={value}
+                                  label={value}
+                                  onDelete={(e) => handleDelete(e, value)}
+                                  deleteIcon={
+                                    <CancelIcon
+                                      onMouseDown={(e) => e.stopPropagation()}
+                                    />
+                                  }
+                                  sx={{
+                                    color: '#000',
+                                    '& .MuiChip-deleteIcon': {
+                                      color: '#000'
+                                    }
+                                  }}
+                                />
+                              ))}
+                            </Box>
+                          )}
+                          MenuProps={{
+                            PaperProps: { sx: StyleAdmin.FormSelect.SelectMenu }
+                          }}
+                        >
+                          {['S', 'M', 'L', 'XL', 'XXL'].map((size) => (
+                            <MenuItem key={size} value={size}>
+                              {size}
+                            </MenuItem>
+                          ))}
+                        </Select>
+                      )
+                    }}
                   />
                   <Typography variant='caption' color='error'>
                     {errors.sizes?.message}
                   </Typography>
                 </FormControl>
+
                 <FormControl
                   fullWidth
                   margin='normal'
@@ -253,24 +314,67 @@ const AddProductModal = ({ open, onClose, onSuccess }) => {
                     name='colors'
                     control={control}
                     rules={{ required: 'Màu sắc không được bỏ trống' }}
-                    render={({ field }) => (
-                      <Select
-                        {...field}
-                        label='Màu sắc'
-                        multiple
-                        MenuProps={{
-                          PaperProps: { sx: StyleAdmin.FormSelect.SelectMenu }
-                        }}
-                      >
-                        {['Đỏ', 'Xanh dương', 'Đen', 'Trắng', 'Vàng'].map(
-                          (color) => (
-                            <MenuItem key={color} value={color}>
-                              {color}
-                            </MenuItem>
-                          )
-                        )}
-                      </Select>
-                    )}
+                    render={({ field }) => {
+                      const handleDelete = (event, itemToDelete) => {
+                        event.stopPropagation()
+                        const newValue = (field.value || []).filter(
+                          (item) => item !== itemToDelete
+                        )
+                        field.onChange(newValue)
+                      }
+                      return (
+                        <Select
+                          {...field}
+                          label='Màu sắc'
+                          multiple
+                          value={field.value || []}
+                          onChange={(event) =>
+                            field.onChange(event.target.value)
+                          }
+                          renderValue={(selected) => (
+                            <Box
+                              sx={{
+                                display: 'flex',
+                                flexWrap: 'wrap',
+                                gap: 0.5
+                              }}
+                            >
+                              {selected.map((value) => (
+                                <Chip
+                                  key={value}
+                                  label={value}
+                                  onDelete={(e) => handleDelete(e, value)}
+                                  deleteIcon={
+                                    <CancelIcon
+                                      onMouseDown={(e) => e.stopPropagation()}
+                                    />
+                                  }
+                                  sx={{
+                                    backgroundColor:
+                                      colorMap[value] || 'default',
+                                    color: textColorMap[value] || '#ffffff',
+                                    '& .MuiChip-deleteIcon': {
+                                      color: textColorMap[value] || '#ffffff'
+                                    }
+                                  }}
+                                />
+                              ))}
+                            </Box>
+                          )}
+                          MenuProps={{
+                            PaperProps: { sx: StyleAdmin.FormSelect.SelectMenu }
+                          }}
+                        >
+                          {['Đỏ', 'Xanh dương', 'Đen', 'Trắng', 'Vàng'].map(
+                            (color) => (
+                              <MenuItem key={color} value={color}>
+                                {color}
+                              </MenuItem>
+                            )
+                          )}
+                        </Select>
+                      )
+                    }}
                   />
                   <Typography variant='caption' color='error'>
                     {errors.colors?.message}

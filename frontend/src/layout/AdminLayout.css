@@ -33,7 +33,7 @@ a {
     padding: 24px;
     margin-left: 0;
     transition: width 0.2s ease, margin 0.2s ease;
-    width: 100vw;
+    width: calc(100% - 240px);
     box-sizing: border-box;
 }
 
