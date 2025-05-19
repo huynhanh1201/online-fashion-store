@@ -36,6 +36,29 @@ export const logoutUserAPI = createAsyncThunk(
   }
 )
 
+export const updateUserAPI = createAsyncThunk(
+  'user/updateUserAPI',
+  async (updatedData, { rejectWithValue }) => {
+    try {
+      // Lấy các trường được phép gửi lên
+      const { name, avatarUrl } = updatedData
+      const payload = { name }
+      if (avatarUrl) payload.avatarUrl = avatarUrl
+
+      const response = await authorizedAxiosInstance.patch(
+        `${API_ROOT}/v1/users/profile`,
+        payload
+      )
+      return response.data
+    } catch (error) {
+      const message =
+        error.response?.data?.message || error.message || 'Lỗi không xác định'
+      toast.error(`Cập nhật thất bại: ${message}`)
+      return rejectWithValue(message)
+    }
+  }
+)
+
 // Khởi tạo một Slice trong kho lưu trữ - Redux Store
 export const userSlice = createSlice({
   name: 'user',
@@ -59,6 +82,9 @@ export const userSlice = createSlice({
        * */
 
       state.currentUser = null
+    })
+    builder.addCase(updateUserAPI.fulfilled, (state, action) => {
+      state.currentUser = action.payload
     })
   }
 })

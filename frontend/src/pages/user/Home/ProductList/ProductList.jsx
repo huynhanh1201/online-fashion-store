@@ -8,9 +8,8 @@ import ProductCard from '~/components/ProductCards/ProductCards'
 
 const ProductList = () => {
   const { products, fetchProducts } = useProducts()
-  const [snackbar, setSnackbar] = useState(null)
+  const [snackbar, setSnackbar] = useState(null) // { type: 'success' | 'error' | 'warning', message: string }
   const [isAdding, setIsAdding] = useState({})
-  // const [cartItems, setLocalCartItems] = useState([])
   const dispatch = useDispatch()
 
   useEffect(() => {
@@ -56,8 +55,9 @@ const ProductList = () => {
     }
   }
 
-  const first4Products = products.slice(0, 4)
-  const next4Products = products.slice(4, 8)
+  // Chia products thành 2 nhóm mỗi nhóm 4 sản phẩm
+  const first4Products = Array.isArray(products) ? products.slice(0, 4) : []
+  const next4Products = Array.isArray(products) ? products.slice(4, 8) : []
 
   return (
     <Box
