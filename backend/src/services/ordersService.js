@@ -350,10 +350,13 @@ const vnpayIPN = async (req) => {
     }
 
     if (rspCode === '00') {
-      updateData.status = 'Success'
+      updateData.status = 'Completed'
       await PaymentTransactionModel.updateOne({ orderId }, updateData)
 
-      await OrderModel.updateOne({ _id: orderId }, { paymentStatus: 'Success' })
+      await OrderModel.updateOne(
+        { _id: orderId },
+        { paymentStatus: 'Completed' }
+      )
 
       return { RspCode: '00', Message: 'Giao dịch thành công' }
     } else {
