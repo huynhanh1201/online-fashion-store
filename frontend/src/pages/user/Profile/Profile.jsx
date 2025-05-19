@@ -26,6 +26,8 @@ import PersonIcon from '@mui/icons-material/Person'
 import LockIcon from '@mui/icons-material/Lock'
 import ShippingAdress from './shippingAdress/shippingAdress'
 import { getProfileUser, updateProfile } from '~/services/userService'
+import { useDispatch } from 'react-redux'
+import { updateUserAPI } from '~/redux/user/userSlice'
 
 const CLOUDINARY_URI = 'https://api.cloudinary.com/v1_1/dkwsy9sph/image/upload'
 const UPLOAD_PRESET = 'demo_unsigned'
@@ -56,6 +58,7 @@ const Profile = () => {
   const [snackbarOpen, setSnackbarOpen] = useState(false)
   const [snackbarMessage, setSnackbarMessage] = useState('')
   const [snackbarSeverity, setSnackbarSeverity] = useState('success')
+  const dispatch = useDispatch()
 
   const handleTabChange = (_, newValue) => {
     setTab(newValue)
@@ -110,6 +113,7 @@ const Profile = () => {
       setName(result.name)
       setAvatarPreview(result.avatarUrl || '')
       setAvatarFile(null)
+      dispatch(updateUserAPI(result))
       showSnackbar('Cập nhật thành công!')
     } else {
       showSnackbar(

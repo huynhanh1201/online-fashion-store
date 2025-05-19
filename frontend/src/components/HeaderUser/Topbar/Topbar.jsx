@@ -4,7 +4,7 @@ import { Box } from '@mui/material'
 import { getDiscounts } from '~/services/discountService'
 
 const TopBar = styled(Box)(({ theme }) => ({
-  backgroundColor: '#03235e',
+  backgroundColor: '#1A3C7B',
   color: 'white',
   width: '100%',
   overflow: 'hidden',
@@ -15,7 +15,7 @@ const TopBar = styled(Box)(({ theme }) => ({
   height: '40px',
   display: 'flex',
   alignItems: 'center',
-  zIndex: 1302,
+  zIndex: 1300,
   [theme.breakpoints.down('sm')]: {
     height: '40px',
     fontSize: '0.8rem'

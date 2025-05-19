@@ -79,49 +79,41 @@ const HeaderUser = () => {
               </Typography>
             </Box>
 
-            {/* Menu + Search */}
+            {/* Menu giữa */}
             <Box
               sx={{
                 display: { xs: 'none', md: 'flex' },
                 alignItems: 'center',
-                gap: 1,
+                gap: 2,
                 flexGrow: 1,
-                justifyContent: 'flex-start',
+                justifyContent: 'center',
                 maxWidth: 600,
                 minWidth: 600
               }}
             >
               <Menu />
-              <Box
-                sx={{
-                  width: 50,
-                  maxWidth: '100%',
-                  height: 36,
-                  display: 'flex',
-                  alignItems: 'center'
-                }}
-              >
-                <Search />
-              </Box>
             </Box>
 
-            {/* Auth + Action */}
+            {/* Search + Auth + Action bên phải */}
             <Box
               sx={{
                 display: 'flex',
                 alignItems: 'center',
-                gap: { xs: 0.5, sm: 1, md: 2 },
+                gap: { xs: 1, sm: 1.5, md: 2 },
+                justifyContent: 'flex-end',
+                width: { xs: 'auto', md: '30%' },
                 flexShrink: 0
               }}
             >
+              <Search />
               <AuthButtons />
               <Box
                 sx={{
                   width: 36,
-                  maxWidth: '100%',
                   height: 36,
                   display: 'flex',
-                  alignItems: 'center'
+                  alignItems: 'center',
+                  justifyContent: 'center'
                 }}
               >
                 <HeaderAction />

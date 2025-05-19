@@ -28,7 +28,7 @@ const CouponList = () => {
   }, [])
 
   const formatCurrencyShort = (value) => {
-    if (value >= 1_000_000) return `${(value / 1_000_000).toFixed(1)}M`
+    if (value >= 1_000_000) return `${(value / 1_000_000).toFixed(1)}Tr`
     if (value >= 1_000) return `${(value / 1_000).toFixed(1)}K`
     return value.toString()
   }
@@ -49,7 +49,7 @@ const CouponList = () => {
 
   return (
     <Box sx={{ p: 3 }}>
-      <Grid container spacing={2} justifyContent='center'>
+      <Grid container spacing={2} justifyContent='start'>
         {coupons.map((coupon) => {
           const isPercent = coupon.type === 'percent'
           const valueText = isPercent

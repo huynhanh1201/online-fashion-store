@@ -7,11 +7,20 @@ const StyledButton = styled(Button)(({ theme }) => ({
   color: '#000',
   fontWeight: 500,
   padding: '8px 16px',
-  borderRadius: '20px',
-  transition: 'all 0.3s ease',
-  '&:hover': {
-    backgroundColor: '#e9ecef',
-    transform: 'translateY(-2px)'
+  borderRadius: '10px',
+  position: 'relative',
+  '&::after': {
+    content: '""',
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    width: 0,
+    height: '2px',
+    backgroundColor: '#1A3C7B',
+    transition: 'width 0.3s ease'
+  },
+  '&:hover::after': {
+    width: '100%'
   },
   [theme.breakpoints.down('md')]: {
     padding: '6px 12px',
@@ -19,26 +28,60 @@ const StyledButton = styled(Button)(({ theme }) => ({
   }
 }))
 
-const sectionStyle = {
-  minWidth: 150,
-  display: 'flex',
-  flexDirection: 'column',
-  alignItems: 'center',
-  gap: 1
-}
+const CategoryButton = styled(Button)(({ theme }) => ({
+  width: '200px',
+  justifyContent: 'center',
+  padding: '10px 14px',
+  color: theme.palette.text.primary,
+  fontWeight: 450,
+  textTransform: 'none',
+  fontSize: '15px',
+  transition: 'all 0.25s ease',
+  '&:hover': {
+    transform: 'translateX(4px)',
+    color: 'red'
+  }
+}))
+
+const AnimatedPopover = styled(Popover)(({ theme }) => ({
+  '& .MuiPaper-root': {
+    animation: 'slideDown 0.3s ease-out',
+    '@keyframes slideDown': {
+      from: {
+        opacity: 0,
+        transform: 'translateY(-10px)'
+      },
+      to: {
+        opacity: 1,
+        transform: 'translateY(0)'
+      }
+    },
+    '&.MuiPopover-paper-exit': {
+      animation: 'slideUp 0.3s ease-in',
+      '@keyframes slideUp': {
+        from: {
+          opacity: 1,
+          transform: 'translateY(0)'
+        },
+        to: {
+          opacity: 0,
+          transform: 'translateY(-10px)'
+        }
+      }
+    }
+  }
+}))
 
 const Menu = () => {
   const [hoveredMenu, setHoveredMenu] = useState({ name: null, el: null })
   const [categories, setCategories] = useState([])
   const hoverTimeout = useRef(null)
 
-  // Lấy danh mục từ API
   useEffect(() => {
     const fetchCategories = async () => {
       try {
         const response = await getCategories(1, 100)
         const categories = response.categories || response || []
-        console.log('Danh sách danh mục trong MainMenu:', categories)
         setCategories(categories)
       } catch (error) {
         console.error('Lỗi khi lấy danh mục:', error)
@@ -59,58 +102,66 @@ const Menu = () => {
   }
 
   const renderPopoverContent = (menu) => {
-    if (menu === 'Sản phẩm') {
-      return (
-        <Box sx={{ display: 'flex', flexDirection: 'column', p: 2 }}>
-          <Box sx={sectionStyle}>
-            <Typography variant='subtitle1' fontWeight={600} align='center'>
-              DANH MỤC SẢN PHẨM
-            </Typography>
-            {categories.length > 0 ? (
-              categories.map((category) => (
-                <Button
-                  key={category._id}
-                  size='small'
-                  href={`/product?category=${category._id}`}
-                >
-                  {category.name}
-                </Button>
-              ))
-            ) : (
-              <Typography variant='body2' color='text.secondary'>
-                Không có danh mục
-              </Typography>
-            )}
+    const renderRow = (title, items) => (
+      <Box
+        sx={{
+          p: 2,
+          minWidth: 500,
+          maxWidth: 1000,
+          alignItems: 'center'
+        }}
+      >
+        <Typography
+          variant='subtitle1'
+          fontWeight={700}
+          align='center'
+          sx={{ mb: 2 }}
+        >
+          {title}
+        </Typography>
+
+        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+          <Box
+            sx={{
+              display: 'flex',
+              gap: 1
+            }}
+          >
+            {items.map((item, index) => (
+              <CategoryButton key={index} size='small' href={item.href || '#'}>
+                {item.name}
+              </CategoryButton>
+            ))}
           </Box>
         </Box>
-      )
+      </Box>
+    )
+
+    if (menu === 'Sản phẩm') {
+      const categoryItems = categories.map((cat) => ({
+        name: cat.name,
+        href: `/product?category=${cat._id}`
+      }))
+      return renderRow('DANH MỤC SẢN PHẨM', categoryItems)
     }
 
     if (menu === 'Áo Nam') {
-      return (
-        <Box sx={sectionStyle}>
-          <Typography variant='subtitle1' fontWeight={600} align='center'>
-            ÁO NAM
-          </Typography>
-          <Button size='small'>Áo Thun</Button>
-          <Button size='small'>Áo Polo</Button>
-          <Button size='small'>Áo Sơmi</Button>
-        </Box>
-      )
+      const items = [
+        { name: 'Áo Thun' },
+        { name: 'Áo Polo' },
+        { name: 'Áo Sơmi' }
+      ]
+      return renderRow('ÁO NAM', items)
     }
 
     if (menu === 'Quần Nam') {
-      return (
-        <Box sx={sectionStyle}>
-          <Typography variant='subtitle1' fontWeight={600} align='center'>
-            QUẦN NAM
-          </Typography>
-          <Button size='small'>Quần Jean</Button>
-          <Button size='small'>Quần Kaki</Button>
-          <Button size='small'>Quần Short</Button>
-          <Button size='small'>Quần Què</Button>
-        </Box>
-      )
+      const items = [
+        { name: 'Quần Jean' },
+        { name: 'Quần Kaki' },
+        { name: 'Quần Short' },
+        { name: 'Quần Què' }
+      ]
+      return renderRow('QUẦN NAM', items)
     }
 
     return null
@@ -135,7 +186,7 @@ const Menu = () => {
           >
             {menu}
           </StyledButton>
-          <Popover
+          <AnimatedPopover
             open={hoveredMenu.name === menu}
             anchorEl={hoveredMenu.el}
             onClose={handleLeave}
@@ -144,11 +195,16 @@ const Menu = () => {
             PaperProps={{
               onMouseEnter: () => clearTimeout(hoverTimeout.current),
               onMouseLeave: handleLeave,
-              sx: { mt: 1, p: 2, borderRadius: 2 }
+              sx: {
+                mt: 1,
+                borderRadius: 2,
+                boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
+              }
             }}
+            disableRestoreFocus
           >
             {renderPopoverContent(menu)}
-          </Popover>
+          </AnimatedPopover>
         </Box>
       ))}
     </Box>
