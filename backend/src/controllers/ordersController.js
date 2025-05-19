@@ -1,6 +1,7 @@
 import { StatusCodes } from 'http-status-codes'
 
 import { ordersService } from '~/services/ordersService'
+import { env } from '~/config/environment'
 
 const createOrder = async (req, res, next) => {
   try {
@@ -77,6 +78,7 @@ const deleteOrder = async (req, res, next) => {
 const vnpayIPN = async (req, res, next) => {
   try {
     const result = await ordersService.vnpayIPN(req)
+
     res.status(200).json(result)
   } catch (err) {
     next(err)
@@ -85,8 +87,10 @@ const vnpayIPN = async (req, res, next) => {
 
 const vnpayReturn = async (req, res, next) => {
   try {
-    const resultCode = await ordersService.vnpayReturn(req)
-    res.render('success', { code: resultCode })
+    const result = await ordersService.vnpayReturn(req)
+
+    res.redirect(result)
+    // res.status(200).json({ code: resultCode })
   } catch (err) {
     next(err)
   }

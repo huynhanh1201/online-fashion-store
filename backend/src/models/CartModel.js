@@ -14,6 +14,11 @@ const cartItemSchema = new Schema(
       required: true,
       min: 1,
       default: 1
+    },
+    selected: {
+      type: Boolean,
+      required: true,
+      default: true
     }
   },
   { _id: false }

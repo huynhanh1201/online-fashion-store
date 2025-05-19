@@ -6,6 +6,10 @@ import {
 import { Delete, Add, Remove } from '@mui/icons-material'
 import { useCart } from '~/hook/useCarts'
 import { useNavigate } from 'react-router-dom'
+import { useDispatch } from 'react-redux'
+import { setSelectedItems as setSelectedItemsAction } from '~/redux/cart/cartSlice'
+
+
 
 const Cart = () => {
   const { cart, loading, deleteItem, clearCart, updateItem } = useCart()
@@ -13,6 +17,11 @@ const Cart = () => {
   const [cartItems, setCartItems] = useState([])
   const [showMaxQuantityAlert, setShowMaxQuantityAlert] = useState(false)
   const navigate = useNavigate()
+  const dispatch = useDispatch()
+
+
+
+
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'auto' })
@@ -29,19 +38,26 @@ const Cart = () => {
 
   // Chọn / bỏ chọn tất cả
   const handleSelectAll = () => {
-    if (allSelected) {
-      setSelectedItems([])
-    } else {
-      const allIds = cartItems.map(item => item.productId?._id).filter(Boolean)
-      setSelectedItems(allIds)
+    let newSelected = []
+    if (!allSelected) {
+      newSelected = cartItems.map(item => item.productId._id)
     }
+    setSelectedItems(newSelected);
+    dispatch(setSelectedItemsAction(newSelected))
   }
 
+
   const handleSelect = (id) => {
-    setSelectedItems(prev =>
-      prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]
-    )
-  }
+    const newSelected = selectedItems.includes(id)
+      ? selectedItems.filter(i => i !== id)
+      : [...selectedItems, id];
+
+    setSelectedItems(newSelected) // cập nhật local state
+    dispatch(setSelectedItemsAction(newSelected)); // cập nhật redux luôn
+  };
+
+
+
 
   const formatPrice = (val) =>
     typeof val === 'number'
@@ -76,7 +92,7 @@ const Cart = () => {
       console.error('Lỗi cập nhật số lượng:', error)
     }
   }
-
+  console.log('selectedItems:', selectedItems)
   const handleRemove = async (id) => {
     try {
       const res = await deleteItem(id)
@@ -202,6 +218,7 @@ const Cart = () => {
                         size='small'
                         onClick={() => handleQuantityChange(product._id, item.quantity, 1)}
                         aria-label='Tăng số lượng'
+                        disabled={item.quantity >= product.quantity} // disable when max reached
                       >
                         <Add />
                       </IconButton>
@@ -237,15 +254,20 @@ const Cart = () => {
         </Typography>
         <Box display='flex' gap={2}>
           <Button
-            href='/payment'
             variant='contained'
             color='primary'
             disabled={selectedItems.length === 0}
-            onClick={() => console.log('Thanh toán:', selectedCartItems)}
+            onClick={() => {
+              // console.log('setSelectedItems:', setSelectedItems(selectedItems))
+              dispatch(setSelectedItemsAction(selectedItems))
+
+              navigate('/payment')
+            }}
             sx={{ minWidth: 120 }}
           >
             Thanh toán
           </Button>
+
           <Button
             variant='outlined'
             color='error'

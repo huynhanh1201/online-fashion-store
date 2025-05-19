@@ -4,18 +4,21 @@ import * as addressService from '~/services/addressService'
 export const useAddress = () => {
   const [addresses, setAddresses] = useState([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
 
-  const fetchedRef = useRef(false) 
+  const fetchedRef = useRef(false)
 
-  const fetchAddresses = async () => {
-    if (fetchedRef.current) return // Nếu đã fetch, không gọi lại
+  const fetchAddresses = async (force = false) => {
+    if (fetchedRef.current && !force) return
     setLoading(true)
+    setError(null)
     try {
-      const res = await addressService.getAddresses()
-      setAddresses(res)
-      fetchedRef.current = true // Ghi nhớ là đã fetch
-    } catch (error) {
-      console.error('Lỗi khi lấy địa chỉ:', error)
+      const res = await addressService.getShippingAddresses()
+      setAddresses(res.addresses || [])
+      fetchedRef.current = true
+    } catch (err) {
+      console.error('Lỗi khi lấy địa chỉ:', err)
+      setError(err.message || 'Không thể lấy địa chỉ')
     } finally {
       setLoading(false)
     }
@@ -27,41 +30,45 @@ export const useAddress = () => {
 
   const addAddress = async (data) => {
     try {
-      const newAddr = await addressService.createAddress(data)
+      const newAddr = await addressService.addShippingAddress(data)
       setAddresses(prev => [...prev, newAddr])
       return newAddr
-    } catch (error) {
-      console.error('Lỗi thêm địa chỉ:', error)
+    } catch (err) {
+      console.error('Lỗi thêm địa chỉ:', err)
+      throw err
     }
   }
 
   const editAddress = async (id, data) => {
     try {
-      const updated = await addressService.updateAddress(id, data)
+      const updated = await addressService.updateShippingAddress(id, data)
       setAddresses(prev =>
         prev.map(addr => (addr._id === id ? updated : addr))
       )
       return updated
-    } catch (error) {
-      console.error('Lỗi cập nhật địa chỉ:', error)
+    } catch (err) {
+      console.error('Lỗi cập nhật địa chỉ:', err)
+      throw err
     }
   }
 
   const removeAddress = async (id) => {
     try {
-      await addressService.deleteAddress(id)
+      await addressService.deleteShippingAddress(id)
       setAddresses(prev => prev.filter(addr => addr._id !== id))
-    } catch (error) {
-      console.error('Lỗi xoá địa chỉ:', error)
+    } catch (err) {
+      console.error('Lỗi xoá địa chỉ:', err)
+      throw err
     }
   }
 
   return {
     addresses,
     loading,
+    error,
+    fetchAddresses,
     addAddress,
     editAddress,
-    removeAddress,
-    fetchAddresses
+    removeAddress
   }
 }
