@@ -89,7 +89,7 @@ const Search = () => {
 
   return (
     <>
-      <IconButton onClick={() => setOpenDrawer(true)}>
+      <IconButton onClick={() => setOpenDrawer(true)} sx={{ color: 'black' }}>
         <SearchIcon />
       </IconButton>
 

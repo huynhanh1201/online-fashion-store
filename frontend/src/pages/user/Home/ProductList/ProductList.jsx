@@ -55,7 +55,7 @@ const ProductList = () => {
     }
   }
 
-  const maxDisplayProducts = 15
+  const maxDisplayProducts = 10
   const displayedProducts = Array.isArray(products)
     ? products.slice(0, maxDisplayProducts)
     : []

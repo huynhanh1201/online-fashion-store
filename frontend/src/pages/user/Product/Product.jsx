@@ -6,18 +6,17 @@ import {
   Snackbar,
   Alert,
   Pagination,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
   FormGroup,
   FormControlLabel,
   Checkbox,
   Typography,
   CircularProgress,
   Divider,
-  styled
+  styled,
+  IconButton,
+  Drawer
 } from '@mui/material'
+import FilterListAltIcon from '@mui/icons-material/FilterListAlt'
 import { addToCart, getCart } from '~/services/cartService'
 import useProducts from '~/hook/useProducts'
 import { getCategories } from '~/services/categoryService'
@@ -42,6 +41,9 @@ const SidebarContainer = styled(Box)(({ theme }) => ({
     color: theme.palette.primary.dark,
     fontWeight: 600,
     marginBottom: theme.spacing(1)
+  },
+  [theme.breakpoints.down('sm')]: {
+    display: 'none'
   }
 }))
 
@@ -52,59 +54,203 @@ const FilterTitle = styled(Typography)(({ theme }) => ({
   marginBottom: theme.spacing(1)
 }))
 
+const MobileFilterIcon = styled(IconButton)(({ theme }) => ({
+  display: 'none',
+  '@media (max-width: 800px)': {
+    display: 'block !important',
+    position: 'fixed',
+    top: theme.spacing(2),
+    right: theme.spacing(2),
+    zIndex: 1300,
+    backgroundColor: theme.palette.primary.main,
+    color: '#fff',
+    '&:hover': {
+      backgroundColor: theme.palette.primary.dark
+    }
+  }
+}))
+
+const DrawerContainer = styled(Box)(({ theme }) => ({
+  width: 280,
+  marginTop: '20px',
+  padding: theme.spacing(2),
+  backgroundColor: '#fff'
+}))
+
 const Product = () => {
   const dispatch = useDispatch()
-  const { products: allProducts, fetchProducts } = useProducts()
+  const {
+    products: allProducts,
+    fetchProducts,
+    loading: loadingProducts,
+    error: errorProducts
+  } = useProducts()
   const [categories, setCategories] = useState([])
   const [loadingCategories, setLoadingCategories] = useState(true)
   const [errorCategories, setErrorCategories] = useState(null)
+  const [mobileFilterOpen, setMobileFilterOpen] = useState(false)
 
   useEffect(() => {
     const fetchCategories = async () => {
       try {
         setLoadingCategories(true)
-        const { categories: fetchedCategories } = await getCategories(1, 1000)
+        const { categories: fetchedCategories, total } = await getCategories(
+          1,
+          1000
+        )
+        if (!fetchedCategories || fetchedCategories.length === 0) {
+          throw new Error('Không có danh mục nào được tải')
+        }
+        console.log(
+          `Tải được ${fetchedCategories.length} danh mục`,
+          fetchedCategories
+        ) // Debug
         setCategories(fetchedCategories)
       } catch (err) {
-        setErrorCategories(err)
+        setErrorCategories('Không thể tải danh mục: ' + err.message)
+        console.error('Chi tiết lỗi danh mục:', err)
       } finally {
         setLoadingCategories(false)
       }
     }
 
-    fetchCategories(), fetchProducts()
+    fetchCategories()
+    fetchProducts()
   }, [])
 
   const [filteredProducts, setFilteredProducts] = useState([])
-  const [category, setCategory] = useState('')
-  const [origin, setOrigin] = useState('')
-  const [size, setSize] = useState([])
-  const [color, setColor] = useState([])
+  const [selectedCategories, setSelectedCategories] = useState([])
+  const [selectedOrigins, setSelectedOrigins] = useState([])
+  const [selectedSizes, setSelectedSizes] = useState([])
+  const [selectedColors, setSelectedColors] = useState([])
+  const [selectedPriceRanges, setSelectedPriceRanges] = useState([])
   const [page, setPage] = useState(1)
-  const [snackbar, setSnackbar] = useState(null) // { type, message }
+  const [snackbar, setSnackbar] = useState(null)
   const [isAdding, setIsAdding] = useState({})
 
-  // Filter
-  useEffect(() => {
-    let filtered = allProducts
+  const priceRanges = [
+    { label: 'Dưới 100k', min: 0, max: 100000 },
+    { label: '100k - 200k', min: 100000, max: 200000 },
+    { label: '200k - 500k', min: 200000, max: 500000 },
+    { label: 'Trên 500k', min: 500000, max: Infinity }
+  ]
 
-    if (category) {
-      filtered = filtered.filter((p) => p.category?._id === category)
+  // Filter logic
+  useEffect(() => {
+    if (!allProducts.length || !categories.length) {
+      console.log(
+        'Chưa tải đủ dữ liệu: allProducts=',
+        allProducts.length,
+        'categories=',
+        categories.length
+      ) // Debug
+      setFilteredProducts([])
+      return
     }
-    if (origin) {
-      filtered = filtered.filter((p) => p.origin === origin)
+
+    console.log(
+      'Sản phẩm:',
+      allProducts.map((p) => ({
+        _id: p._id,
+        name: p.name,
+        categoryId: p.categoryId,
+        price: p.price
+      }))
+    ) // Debug
+    console.log(
+      'Danh mục:',
+      categories.map((c) => ({ _id: c._id, name: c.name }))
+    ) // Debug
+    console.log('Danh mục đã chọn:', selectedCategories) // Debug
+    console.log('Khoảng giá đã chọn:', selectedPriceRanges) // Debug
+
+    let filtered = [...allProducts]
+
+    if (selectedCategories.length) {
+      filtered = filtered.filter((p) => {
+        if (!p.categoryId) {
+          console.warn(`Sản phẩm ${p._id} (${p.name}) thiếu categoryId`)
+          return false
+        }
+        const categoryId =
+          typeof p.categoryId === 'object' && p.categoryId?._id
+            ? p.categoryId._id
+            : p.categoryId
+        const match = selectedCategories.includes(categoryId)
+        console.log(
+          `Sản phẩm ${p._id} (${p.name}): categoryId=${JSON.stringify(p.categoryId)}, normalized=${categoryId}, selectedCategories=${selectedCategories.join(', ')}, khớp=${match}`
+        ) // Debug
+        return match
+      })
     }
-    if (size.length) {
-      filtered = filtered.filter((p) => size.includes(p.size))
+    if (selectedOrigins.length) {
+      filtered = filtered.filter((p) => selectedOrigins.includes(p.origin))
     }
-    if (color.length) {
-      filtered = filtered.filter((p) => color.includes(p.color))
+    if (selectedSizes.length) {
+      filtered = filtered.filter(
+        (p) => p.sizes && p.sizes.some((size) => selectedSizes.includes(size))
+      )
     }
+    if (selectedColors.length) {
+      filtered = filtered.filter(
+        (p) =>
+          p.colors && p.colors.some((color) => selectedColors.includes(color))
+      )
+    }
+    if (selectedPriceRanges.length) {
+      filtered = filtered.filter((p) => {
+        if (!p.price && p.price !== 0) {
+          console.warn(
+            `Sản phẩm ${p._id} (${p.name}) thiếu hoặc giá không hợp lệ: price=${p.price}`
+          )
+          return false
+        }
+        const price =
+          typeof p.price === 'string' ? parseFloat(p.price) : p.price
+        if (isNaN(price)) {
+          console.warn(
+            `Sản phẩm ${p._id} (${p.name}) giá không phải số: price=${p.price}`
+          )
+          return false
+        }
+        const match = selectedPriceRanges.some((range) => {
+          const rangeData = priceRanges.find((pr) => pr.label === range)
+          if (!rangeData) {
+            console.warn(`Không tìm thấy khoảng giá: ${range}`)
+            return false
+          }
+          const { min, max } = rangeData
+          return price >= min && price <= max
+        })
+        console.log(
+          `Sản phẩm ${p._id} (${p.name}): price=${price}, selectedPriceRanges=${selectedPriceRanges.join(', ')}, khớp=${match}`
+        ) // Debug
+        return match
+      })
+    }
+
+    console.log(
+      'Sản phẩm sau khi lọc:',
+      filtered.map((p) => ({
+        _id: p._id,
+        name: p.name,
+        categoryId: p.categoryId,
+        price: p.price
+      }))
+    ) // Debug
     setFilteredProducts(filtered)
     setPage(1)
-  }, [category, origin, size, color, allProducts])
+  }, [
+    selectedCategories,
+    selectedOrigins,
+    selectedSizes,
+    selectedColors,
+    selectedPriceRanges,
+    allProducts,
+    categories
+  ])
 
-  // Pagination slice
+  // Pagination
   const paginatedProducts = filteredProducts.slice(
     (page - 1) * PRODUCTS_PER_PAGE,
     page * PRODUCTS_PER_PAGE
@@ -152,29 +298,193 @@ const Product = () => {
   }
 
   // Filter handlers
-  const handleCategoryChange = (e) => setCategory(e.target.value)
-  const handleOriginChange = (e) => setOrigin(e.target.value)
+  const handleCategoryChange = (e) => {
+    const value = e.target.name
+    console.log('Chọn danh mục:', value) // Debug
+    setSelectedCategories((prev) =>
+      prev.includes(value) ? prev.filter((v) => v !== value) : [...prev, value]
+    )
+  }
+
+  const handleOriginChange = (e) => {
+    const value = e.target.name
+    setSelectedOrigins((prev) =>
+      prev.includes(value) ? prev.filter((v) => v !== value) : [...prev, value]
+    )
+  }
+
   const handleSizeChange = (e) => {
     const value = e.target.name
-    setSize((prev) =>
+    setSelectedSizes((prev) =>
       prev.includes(value) ? prev.filter((v) => v !== value) : [...prev, value]
     )
   }
+
   const handleColorChange = (e) => {
     const value = e.target.name
-    setColor((prev) =>
+    setSelectedColors((prev) =>
       prev.includes(value) ? prev.filter((v) => v !== value) : [...prev, value]
     )
   }
+
+  const handlePriceRangeChange = (e) => {
+    const value = e.target.name
+    console.log('Chọn khoảng giá:', value) // Debug
+    setSelectedPriceRanges((prev) =>
+      prev.includes(value) ? prev.filter((v) => v !== value) : [...prev, value]
+    )
+  }
+
   const handlePageChange = (_, value) => setPage(value)
-  const handleSearch = () => setPage(1)
+
+  const handleSearch = () => {
+    setPage(1)
+    setMobileFilterOpen(false)
+  }
+
   const handleReset = () => {
-    setCategory('')
-    setOrigin('')
-    setSize([])
-    setColor([])
+    setSelectedCategories([])
+    setSelectedOrigins([])
+    setSelectedSizes([])
+    setSelectedColors([])
+    setSelectedPriceRanges([])
     setPage(1)
   }
+
+  const toggleMobileFilter = () => {
+    setMobileFilterOpen((prev) => !prev)
+    console.log('Toggle filter:', !mobileFilterOpen) // Debug
+  }
+
+  const renderFilterContent = () => (
+    <>
+      <Typography variant='h6' gutterBottom>
+        Bộ lọc tìm kiếm
+      </Typography>
+      <Divider sx={{ mb: 1 }} />
+
+      <FilterTitle variant='subtitle1'>Danh mục</FilterTitle>
+      {loadingCategories ? (
+        <Box sx={{ display: 'flex', justifyContent: 'center', py: 2 }}>
+          <CircularProgress size={24} />
+        </Box>
+      ) : errorCategories ? (
+        <Typography color='error' sx={{ mb: 2 }}>
+          {errorCategories}
+        </Typography>
+      ) : categories.length === 0 ? (
+        <Typography sx={{ mb: 2 }}>Không có danh mục nào</Typography>
+      ) : (
+        <FormGroup>
+          {categories.map((cat) => (
+            <FormControlLabel
+              key={cat._id}
+              control={
+                <Checkbox
+                  checked={selectedCategories.includes(cat._id)}
+                  onChange={handleCategoryChange}
+                  name={cat._id}
+                  size='small'
+                />
+              }
+              label={cat.name}
+            />
+          ))}
+        </FormGroup>
+      )}
+
+      <FilterTitle variant='subtitle1'>Xuất xứ</FilterTitle>
+      <FormGroup>
+        {['Việt Nam', 'Trung Quốc'].map((originOption) => (
+          <FormControlLabel
+            key={originOption}
+            control={
+              <Checkbox
+                checked={selectedOrigins.includes(originOption)}
+                onChange={handleOriginChange}
+                name={originOption}
+                size='small'
+              />
+            }
+            label={originOption}
+          />
+        ))}
+      </FormGroup>
+
+      <FilterTitle variant='subtitle1'>Kích thước</FilterTitle>
+      <FormGroup>
+        {['S', 'M', 'L', 'XL'].map((sizeOption) => (
+          <FormControlLabel
+            key={sizeOption}
+            control={
+              <Checkbox
+                checked={selectedSizes.includes(sizeOption)}
+                onChange={handleSizeChange}
+                name={sizeOption}
+                size='small'
+              />
+            }
+            label={sizeOption}
+          />
+        ))}
+      </FormGroup>
+
+      <FilterTitle variant='subtitle1'>Màu sắc</FilterTitle>
+      <FormGroup>
+        {['Đỏ', 'Xanh', 'Đen', 'Trắng'].map((colorOption) => (
+          <FormControlLabel
+            key={colorOption}
+            control={
+              <Checkbox
+                checked={selectedColors.includes(colorOption)}
+                onChange={handleColorChange}
+                name={colorOption}
+                size='small'
+              />
+            }
+            label={colorOption}
+          />
+        ))}
+      </FormGroup>
+
+      <FilterTitle variant='subtitle1'>Khoảng giá</FilterTitle>
+      <FormGroup>
+        {priceRanges.map((range) => (
+          <FormControlLabel
+            key={range.label}
+            control={
+              <Checkbox
+                checked={selectedPriceRanges.includes(range.label)}
+                onChange={handlePriceRangeChange}
+                name={range.label}
+                size='small'
+              />
+            }
+            label={range.label}
+          />
+        ))}
+      </FormGroup>
+
+      <Box sx={{ mt: 2, display: 'flex', gap: 1 }}>
+        <Button
+          variant='contained'
+          color='primary'
+          onClick={handleSearch}
+          fullWidth
+        >
+          Tìm
+        </Button>
+        <Button
+          variant='outlined'
+          color='secondary'
+          onClick={handleReset}
+          fullWidth
+        >
+          Reset
+        </Button>
+      </Box>
+    </>
+  )
 
   return (
     <Box
@@ -186,115 +496,55 @@ const Product = () => {
         gap: 2
       }}
     >
-      {/* Sidebar */}
-      <SidebarContainer>
-        <Typography variant='h6' gutterBottom>
-          Bộ lọc tìm kiếm
+      <SidebarContainer>{renderFilterContent()}</SidebarContainer>
+
+      <Box
+        sx={{
+          position: 'fixed',
+          top: 100,
+          right: 16,
+          zIndex: 1200,
+          color: '#1A3C7B',
+          p: 1,
+          cursor: 'pointer',
+          display: { xs: 'flex', md: 'none' }, // Hiện trên mobile
+          alignItems: 'center',
+          gap: 0.5
+        }}
+        onClick={toggleMobileFilter}
+      >
+        <FilterListAltIcon sx={{ fontSize: 24 }} />
+        <Typography variant='body2' sx={{ fontSize: 14, fontWeight: 500 }}>
+          Filter
         </Typography>
-        <Divider sx={{ mb: 1 }} />
+      </Box>
 
-        <FilterTitle variant='subtitle1'>Danh mục</FilterTitle>
-        {loadingCategories ? (
-          <Box sx={{ display: 'flex', justifyContent: 'center', py: 2 }}>
-            <CircularProgress size={24} />
-          </Box>
-        ) : errorCategories ? (
-          <Typography color='error' sx={{ mb: 2 }}>
-            Lỗi tải danh mục
-          </Typography>
-        ) : (
-          <FormControl fullWidth size='small' sx={{ mb: 2 }}>
-            <InputLabel>Danh mục</InputLabel>
-            <Select
-              value={category}
-              label='Danh mục'
-              onChange={handleCategoryChange}
-            >
-              <MenuItem value=''>Tất cả</MenuItem>
-              {categories.map((cat) => (
-                <MenuItem key={cat._id} value={cat._id}>
-                  {cat.name}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-        )}
+      <Drawer
+        anchor='right'
+        open={mobileFilterOpen}
+        onClose={toggleMobileFilter}
+        sx={{
+          zIndex: 1100, // cao hơn header nhưng thấp hơn icon
+          mt: 10
+        }}
+      >
+        <DrawerContainer>{renderFilterContent()}</DrawerContainer>
+      </Drawer>
 
-        <FilterTitle variant='subtitle1'>Xuất xứ</FilterTitle>
-        <FormControl fullWidth size='small' sx={{ mb: 2 }}>
-          <InputLabel>Xuất xứ</InputLabel>
-          <Select value={origin} label='Xuất xứ' onChange={handleOriginChange}>
-            <MenuItem value=''>Tất cả</MenuItem>
-            <MenuItem value='vietnam'>Việt Nam</MenuItem>
-            <MenuItem value='china'>Trung Quốc</MenuItem>
-          </Select>
-        </FormControl>
-
-        <FilterTitle variant='subtitle1'>Kích thước</FilterTitle>
-        <FormGroup>
-          {['S', 'M', 'L', 'XL'].map((sizeOption) => (
-            <FormControlLabel
-              key={sizeOption}
-              control={
-                <Checkbox
-                  checked={size.includes(sizeOption)}
-                  onChange={handleSizeChange}
-                  name={sizeOption}
-                  size='small'
-                />
-              }
-              label={sizeOption}
-            />
-          ))}
-        </FormGroup>
-
-        <FilterTitle variant='subtitle1' sx={{ mt: 2 }}>
-          Màu sắc
-        </FilterTitle>
-        <FormGroup>
-          {['Đỏ', 'Xanh', 'Đen', 'Trắng'].map((colorOption) => (
-            <FormControlLabel
-              key={colorOption}
-              control={
-                <Checkbox
-                  checked={color.includes(colorOption)}
-                  onChange={handleColorChange}
-                  name={colorOption}
-                  size='small'
-                />
-              }
-              label={colorOption}
-            />
-          ))}
-        </FormGroup>
-
-        <Box sx={{ mt: 2, display: 'flex', gap: 1 }}>
-          <Button
-            variant='contained'
-            color='primary'
-            onClick={handleSearch}
-            fullWidth
-          >
-            Tìm
-          </Button>
-          <Button
-            variant='outlined'
-            color='secondary'
-            onClick={handleReset}
-            fullWidth
-          >
-            Reset
-          </Button>
-        </Box>
-      </SidebarContainer>
-
-      {/* Product grid */}
       <Box sx={{ flexGrow: 1 }}>
-        {allProducts.length === 0 ? (
+        {loadingProducts ? (
           <Box sx={{ textAlign: 'center', mt: 10 }}>
             <CircularProgress />
             <Typography>Đang tải sản phẩm...</Typography>
           </Box>
+        ) : errorProducts ? (
+          <Typography sx={{ textAlign: 'center', mt: 10 }} color='error'>
+            {errorProducts}
+          </Typography>
+        ) : allProducts.length === 0 ? (
+          <Typography sx={{ textAlign: 'center', mt: 10 }}>
+            Không có sản phẩm nào.
+          </Typography>
         ) : filteredProducts.length === 0 ? (
           <Typography sx={{ textAlign: 'center', mt: 10 }}>
             Không có sản phẩm phù hợp.
@@ -312,7 +562,6 @@ const Product = () => {
                 </Grid>
               ))}
             </Grid>
-
             <Box sx={{ mt: 4, display: 'flex', justifyContent: 'center' }}>
               <Pagination
                 count={totalPages}
@@ -324,8 +573,6 @@ const Product = () => {
           </>
         )}
       </Box>
-
-      {/* Snackbar */}
       {snackbar && (
         <Snackbar
           open
