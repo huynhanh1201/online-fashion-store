@@ -223,21 +223,21 @@ export default function AdminSidebar({ open }) {
             >
               <ListItem disablePadding>
                 <ListItemButton
-                  sx={{
-                    backgroundColor: isActive
-                      ? 'rgba(0, 31, 93, 0.3)'
-                      : 'transparent',
-                    '&:hover': {
-                      backgroundColor: isActive
-                        ? 'rgba(0, 31, 93, 0.3)'
-                        : 'rgba(0, 31, 93, 0.1)'
-                    }
-                  }}
+                // sx={{
+                //   backgroundColor: isActive
+                //     ? 'rgba(0, 31, 93, 0.3)'
+                //     : 'transparent',
+                //   '&:hover': {
+                //     backgroundColor: isActive
+                //       ? 'rgba(0, 31, 93, 0.3)'
+                //       : 'rgba(0, 31, 93, 0.1)'
+                //   }
+                // }}
                 >
                   <ListItemIcon
                     sx={{
                       minWidth: '36px',
-                      color: isActive ? '#001f5d' : 'inherit'
+                      color: isActive ? '#1A3C7B' : 'inherit'
                     }}
                   >
                     {item.icon}
@@ -246,7 +246,7 @@ export default function AdminSidebar({ open }) {
                     primary={item.name}
                     primaryTypographyProps={{
                       sx: {
-                        color: isActive ? '#001f5d' : 'inherit',
+                        color: isActive ? '#1A3C7B' : 'inherit',
                         fontWeight: isActive ? '900' : 'normal'
                       }
                     }}

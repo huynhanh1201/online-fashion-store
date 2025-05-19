@@ -129,7 +129,7 @@ const EditOrderModal = ({ open, onClose, order, onUpdate, loading }) => {
         <Stack spacing={2} sx={{ mt: 1 }}>
           {/* Status */}
           <FormControl fullWidth sx={StyleAdmin.FormSelect}>
-            <InputLabel id='status-label'>Trạng thái</InputLabel>
+            <InputLabel id='status-label'>Trạng thái đơn hàng</InputLabel>
             <Controller
               name='status'
               control={control}
