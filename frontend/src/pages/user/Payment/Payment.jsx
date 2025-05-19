@@ -110,28 +110,26 @@ const Payment = () => {
   }, [fetchAddresses])
 
   useEffect(() => {
-    fetchAddresses()
   }, [fetchAddresses])
 
   useEffect(() => {
-    if (addresses.length > 0) {
-      // Nếu selectedAddress không tồn tại hoặc không còn trong addresses mới, set lại
-      if (!selectedAddress || !addresses.find(addr => addr._id === selectedAddress._id)) {
-        const defaultAddr = addresses.find(addr => addr.isDefault)
-        setSelectedAddress(defaultAddr || addresses[0])
-      }
+    if (addresses.length > 0 && !selectedAddress) {
+      const defaultAddr = addresses.find(addr => addr.isDefault)
+      setSelectedAddress(defaultAddr || addresses[0])
     }
   }, [addresses])
+
+
   const handleOpenAddressModal = () => setOpenAddressModal(true)
   const handleCloseAddressModal = () => setOpenAddressModal(false)
 
   const handleAddressConfirm = (addressId) => {
-    const selected = addresses.find((addr) => addr._id === addressId)
+    const selected = addresses.find(addr => addr._id === addressId)
     setSelectedAddress(selected)
     handleCloseAddressModal()
   }
   const handleAddressListUpdated = async () => {
-    await fetchAddresses(true) // force fetch mới dữ liệu
+    await fetchAddresses(true)
   }
 
   // Áp dụng voucher
@@ -202,7 +200,7 @@ const Payment = () => {
 
   return (
     <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-      <Container maxWidth="lg" sx={{ py: 4 }}>
+      <Container maxWidth="lg" sx={{ py: 4 } }>
         {cartLoading ? (
           <Box sx={{ textAlign: 'center', mt: 4 }}>
             <CircularProgress />

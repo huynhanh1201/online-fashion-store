@@ -17,7 +17,6 @@ import { useAddress } from '~/hook/useAddress'
 import AddAddressModal from './AddAddressModal'
 
 export const ChooseAddressModal = ({ open, onClose, onConfirm, onUpdateAddresses }) => {
-
   const {
     addresses,
     loading,
@@ -28,12 +27,12 @@ export const ChooseAddressModal = ({ open, onClose, onConfirm, onUpdateAddresses
   const [isFormOpen, setIsFormOpen] = useState(false)
   const [editingAddress, setEditingAddress] = useState(null)
 
-  // Khi modal mở thì load danh sách địa chỉ
+  // Khi modal mở thì force fetch dữ liệu mới nhất
   useEffect(() => {
     if (open) {
-      fetchAddresses()
+      fetchAddresses(true)
     }
-  }, [open])
+  }, [open, fetchAddresses])
 
   // Khi addresses thay đổi, cập nhật selectedId nếu cần
   useEffect(() => {
@@ -44,7 +43,7 @@ export const ChooseAddressModal = ({ open, onClose, onConfirm, onUpdateAddresses
     } else {
       setSelectedId(null)
     }
-  }, [addresses])
+  }, [addresses, selectedId])
 
   // Mở form thêm mới
   const handleAddNew = () => {
@@ -60,17 +59,15 @@ export const ChooseAddressModal = ({ open, onClose, onConfirm, onUpdateAddresses
 
   // Đóng form và reload danh sách nếu cần
   const handleSuccess = async () => {
-    await fetchAddresses(true)  // gọi force fetch
+    await fetchAddresses(true)  // gọi force fetch mới
     if (onUpdateAddresses) await onUpdateAddresses()
     setIsFormOpen(false)
     setEditingAddress(null)
   }
 
-
-
   return (
     <>
-      <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
+      <Dialog open={open} onClose={onClose} fullWidth maxWidth="md">
         <DialogTitle>Chọn địa chỉ giao hàng</DialogTitle>
 
         <DialogContent dividers>
