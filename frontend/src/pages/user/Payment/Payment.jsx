@@ -101,16 +101,11 @@ const Payment = () => {
     })
   })
   const total = Math.max(subTotal - discount, 0)
-  // Tránh âm
   // const { addresses, fetchAddresses } = useAddress()
   // const [selectedAddress, setSelectedAddress] = useState(null)
   // Lấy địa chỉ mặc định khi có danh sách địa chỉ
-  useEffect(() => {
-    fetchAddresses()
-  }, [fetchAddresses])
-
-  useEffect(() => {
-  }, [fetchAddresses])
+  // useEffect(() => {
+  // }, [fetchAddresses])
 
   useEffect(() => {
     if (addresses.length > 0 && !selectedAddress) {

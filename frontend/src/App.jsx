@@ -62,7 +62,7 @@ function App() {
           {/*=====Huynh Anh=====*/}
           <Route
             path='/payment-result'
-            element={<h2>THANH TOÁN THÀNH CÔNG!</h2>}
+            element={<PaymentVnpay />}
           />
           <Route
             path='/payment-failed'

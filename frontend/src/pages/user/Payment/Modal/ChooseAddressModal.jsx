@@ -28,11 +28,11 @@ export const ChooseAddressModal = ({ open, onClose, onConfirm, onUpdateAddresses
   const [editingAddress, setEditingAddress] = useState(null)
 
   // Khi modal mở thì force fetch dữ liệu mới nhất
-  useEffect(() => {
-    if (open) {
-      fetchAddresses(true)
-    }
-  }, [open, fetchAddresses])
+  // useEffect(() => {
+  //   if (open) {
+  //     fetchAddresses(true)
+  //   }
+  // }, [open, fetchAddresses])
 
   // Khi addresses thay đổi, cập nhật selectedId nếu cần
   useEffect(() => {
