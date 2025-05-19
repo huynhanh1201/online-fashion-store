@@ -1,15 +1,18 @@
 import React from 'react'
+
 import Table from '@mui/material/Table'
 import TableHead from '@mui/material/TableHead'
 import TableRow from '@mui/material/TableRow'
 import TableCell from '@mui/material/TableCell'
 import TableBody from '@mui/material/TableBody'
 import CircularProgress from '@mui/material/CircularProgress'
+
 import DiscountRow from './DiscountRow'
-import {
+
+import StyleAdmin, {
   StyledTableCell,
   StyledTableRow
-} from '../UserManagement/UserTableStyles.js'
+} from '~/components/StyleAdmin'
 
 const DiscountTable = ({ discounts, loading, onAction }) => {
   if (loading) return <CircularProgress />
@@ -18,17 +21,21 @@ const DiscountTable = ({ discounts, loading, onAction }) => {
     <Table>
       <TableHead>
         <StyledTableRow>
-          <StyledTableCell sx={{ textAlign: 'center', width: '50px' }}>
-            STT
+          <StyledTableCell sx={StyleAdmin.TableColumnSTT}>STT</StyledTableCell>
+          <StyledTableCell sx={{ minWidth: '100%' }}>Mã giảm</StyledTableCell>
+          <StyledTableCell sx={{ width: '100px' }}>Loại</StyledTableCell>
+          <StyledTableCell sx={{ width: '120px' }}>
+            Giá trị giảm
           </StyledTableCell>
-          <StyledTableCell sx={{ minWidth: '170px' }}>Mã giảm</StyledTableCell>
-          <StyledTableCell>Loại</StyledTableCell>
-          <StyledTableCell>Giá trị giảm</StyledTableCell>
-          <StyledTableCell>Số lượt sử dụng tối đa</StyledTableCell>
-          <StyledTableCell>Số lượng còn lại</StyledTableCell>
-          <StyledTableCell>Trạng thái</StyledTableCell>
-          <StyledTableCell>Ngày bắt đầu</StyledTableCell>
-          <StyledTableCell>Ngày kết thúc</StyledTableCell>
+          <StyledTableCell sx={{ width: '100px' }}>SL tối đa</StyledTableCell>
+          <StyledTableCell sx={{ width: '100px' }}>SL còn lại</StyledTableCell>
+          <StyledTableCell sx={{ width: '100px' }}>Trạng thái</StyledTableCell>
+          <StyledTableCell sx={{ width: '170px' }}>
+            Ngày bắt đầu
+          </StyledTableCell>
+          <StyledTableCell sx={{ width: '170px' }}>
+            Ngày kết thúc
+          </StyledTableCell>
           <StyledTableCell sx={{ maxWidth: '130px', width: '130px' }}>
             Hành động
           </StyledTableCell>

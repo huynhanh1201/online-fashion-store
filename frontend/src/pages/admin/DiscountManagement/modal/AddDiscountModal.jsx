@@ -1,25 +1,24 @@
 import React from 'react'
 import { useForm } from 'react-hook-form'
-import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Button,
-  TextField,
-  MenuItem,
-  FormControlLabel,
-  Checkbox,
-  Divider,
-  Grid,
-  FormControl,
-  InputLabel,
-  Select
-} from '@mui/material'
-import { Box } from '@mui/material'
-import { addDiscount } from '~/services/discountService'
-import StyleAdmin from '~/components/StyleAdmin.jsx'
-import styleAdmin from '~/components/StyleAdmin.jsx'
+
+import Dialog from '@mui/material/Dialog'
+import DialogTitle from '@mui/material/DialogTitle'
+import DialogContent from '@mui/material/DialogContent'
+import DialogActions from '@mui/material/DialogActions'
+import Button from '@mui/material/Button'
+import TextField from '@mui/material/TextField'
+import MenuItem from '@mui/material/MenuItem'
+import FormControlLabel from '@mui/material/FormControlLabel'
+import Checkbox from '@mui/material/Checkbox'
+import Divider from '@mui/material/Divider'
+import FormControl from '@mui/material/FormControl'
+import InputLabel from '@mui/material/InputLabel'
+import Select from '@mui/material/Select'
+import Box from '@mui/material/Box'
+
+import { addDiscount } from '~/services/admin/discountService'
+import StyleAdmin from '~/components/StyleAdmin'
+
 const AddDiscountModal = ({ open, onClose, onAdded }) => {
   const {
     register,
@@ -66,7 +65,7 @@ const AddDiscountModal = ({ open, onClose, onAdded }) => {
       fullWidth
       maxWidth='lg'
       BackdropProps={{
-        sx: styleAdmin.OverlayModal
+        sx: StyleAdmin.OverlayModal
       }}
     >
       <DialogTitle>Thêm mã giảm giá</DialogTitle>

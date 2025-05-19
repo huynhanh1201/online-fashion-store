@@ -1,6 +1,6 @@
 // hooks/useCategories.js
 import { useState } from 'react'
-import { getCategories } from '~/services/categoryService'
+import { getCategories } from '~/services/admin/categoryService'
 
 const useCategories = (pageCategory = 1, limit = 10) => {
   const [categories, setCategories] = useState([])

@@ -1,16 +1,15 @@
 import React from 'react'
-import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Button,
-  Divider,
-  TextField,
-  Stack
-} from '@mui/material'
+
+import Dialog from '@mui/material/Dialog'
+import DialogTitle from '@mui/material/DialogTitle'
+import DialogContent from '@mui/material/DialogContent'
+import DialogActions from '@mui/material/DialogActions'
+import Button from '@mui/material/Button'
+import Divider from '@mui/material/Divider'
+import TextField from '@mui/material/TextField'
+import Stack from '@mui/material/Stack'
+
 import StyleAdmin from '~/components/StyleAdmin'
-import styleAdmin from '~/components/StyleAdmin.jsx'
 
 const ViewTransactionModal = ({ open, onClose, transaction }) => {
   const statusLabel = {
@@ -36,7 +35,7 @@ const ViewTransactionModal = ({ open, onClose, transaction }) => {
         }
       }}
       BackdropProps={{
-        sx: styleAdmin.OverlayModal
+        sx: StyleAdmin.OverlayModal
       }}
     >
       <DialogTitle>Chi tiết giao dịch</DialogTitle>

@@ -5,7 +5,7 @@ import {
   getOrderItems,
   getOrderHistories,
   updateOrder
-} from '~/services/orderService'
+} from '~/services/admin/orderService'
 
 const useOrder = () => {
   const [orders, setOrders] = useState([])

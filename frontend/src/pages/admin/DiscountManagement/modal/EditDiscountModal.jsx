@@ -1,23 +1,22 @@
 import React from 'react'
 import { useForm } from 'react-hook-form'
-import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Button,
-  TextField,
-  MenuItem,
-  FormControlLabel,
-  Checkbox,
-  Divider,
-  Box,
-  InputLabel,
-  Select,
-  FormControl
-} from '@mui/material'
-import StyleAdmin from '~/components/StyleAdmin.jsx'
-import styleAdmin from '~/components/StyleAdmin.jsx'
+
+import Dialog from '@mui/material/Dialog'
+import DialogTitle from '@mui/material/DialogTitle'
+import DialogContent from '@mui/material/DialogContent'
+import DialogActions from '@mui/material/DialogActions'
+import Button from '@mui/material/Button'
+import TextField from '@mui/material/TextField'
+import MenuItem from '@mui/material/MenuItem'
+import FormControlLabel from '@mui/material/FormControlLabel'
+import Checkbox from '@mui/material/Checkbox'
+import Divider from '@mui/material/Divider'
+import Box from '@mui/material/Box'
+import InputLabel from '@mui/material/InputLabel'
+import Select from '@mui/material/Select'
+import FormControl from '@mui/material/FormControl'
+
+import StyleAdmin from '~/components/StyleAdmin'
 
 // Hàm định dạng lại datetime cho input type="datetime-local"
 const formatDateTimeLocal = (isoString) => {
@@ -79,7 +78,7 @@ const EditDiscountModal = ({ open, onClose, discount, onSave }) => {
       fullWidth
       maxWidth='lg'
       BackdropProps={{
-        sx: styleAdmin.OverlayModal
+        sx: StyleAdmin.OverlayModal
       }}
     >
       <DialogTitle>Chỉnh sửa mã giảm giá</DialogTitle>

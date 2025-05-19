@@ -1,17 +1,18 @@
 import React from 'react'
-import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  TextField,
-  Button,
-  Divider
-} from '@mui/material'
+
+import Dialog from '@mui/material/Dialog'
+import DialogTitle from '@mui/material/DialogTitle'
+import DialogContent from '@mui/material/DialogContent'
+import DialogActions from '@mui/material/DialogActions'
+import TextField from '@mui/material/TextField'
+import Button from '@mui/material/Button'
+import Divider from '@mui/material/Divider'
+
 import { useForm } from 'react-hook-form'
-import { addCategory } from '~/services/categoryService'
-import StyleAdmin from '~/components/StyleAdmin.jsx'
-import styleAdmin from '~/components/StyleAdmin.jsx'
+
+import { addCategory } from '~/services/admin/categoryService'
+import StyleAdmin from '~/components/StyleAdmin'
+
 const AddCategoryModal = ({ open, onClose, onAdded }) => {
   const {
     register,
@@ -47,7 +48,7 @@ const AddCategoryModal = ({ open, onClose, onAdded }) => {
       fullWidth
       maxWidth='sm'
       BackdropProps={{
-        sx: styleAdmin.OverlayModal
+        sx: StyleAdmin.OverlayModal
       }}
     >
       <DialogTitle>Thêm danh mục mới</DialogTitle>

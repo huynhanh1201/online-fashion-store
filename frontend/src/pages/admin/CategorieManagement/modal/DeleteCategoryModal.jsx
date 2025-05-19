@@ -1,13 +1,13 @@
 import React, { useState } from 'react'
-import {
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
-  Button,
-  Divider
-} from '@mui/material'
-import styleAdmin from '~/components/StyleAdmin.jsx'
+
+import Dialog from '@mui/material/Dialog'
+import DialogActions from '@mui/material/DialogActions'
+import DialogContent from '@mui/material/DialogContent'
+import DialogTitle from '@mui/material/DialogTitle'
+import Button from '@mui/material/Button'
+import Divider from '@mui/material/Divider'
+
+import StyleAdmin from '~/components/StyleAdmin'
 
 const DeleteCategoryModal = ({ open, onClose, category, onDelete }) => {
   const [isDeleting, setIsDeleting] = useState(false)
@@ -31,7 +31,7 @@ const DeleteCategoryModal = ({ open, onClose, category, onDelete }) => {
       fullWidth
       maxWidth='sm'
       BackdropProps={{
-        sx: styleAdmin.OverlayModal
+        sx: StyleAdmin.OverlayModal
       }}
     >
       <DialogTitle>Xoá danh mục</DialogTitle>

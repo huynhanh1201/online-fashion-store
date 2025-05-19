@@ -1,14 +1,16 @@
 import React from 'react'
+
 import Table from '@mui/material/Table'
 import TableBody from '@mui/material/TableBody'
 import TableHead from '@mui/material/TableHead'
 import TableRow from '@mui/material/TableRow'
 import Paper from '@mui/material/Paper'
-import {
+
+import StyleAdmin, {
   StyledTableCell,
   StyledTableRow,
   StyledTableContainer
-} from './UserTableStyles'
+} from '~/components/StyleAdmin'
 import UserRow from './UserRow'
 
 const UserTable = React.memo(function UserTable({
@@ -24,7 +26,7 @@ const UserTable = React.memo(function UserTable({
       <Table>
         <TableHead>
           <TableRow>
-            <StyledTableCell sx={{ textAlign: 'center', width: '50px' }}>
+            <StyledTableCell sx={StyleAdmin.TableColumnSTT}>
               STT
             </StyledTableCell>
             <StyledTableCell>Tên</StyledTableCell>

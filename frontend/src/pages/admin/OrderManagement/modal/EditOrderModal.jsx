@@ -1,22 +1,19 @@
 import React, { useEffect } from 'react'
-import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Button,
-  TextField,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
-  FormControlLabel,
-  Checkbox,
-  Stack
-} from '@mui/material'
+import Dialog from '@mui/material/Dialog'
+import DialogTitle from '@mui/material/DialogTitle'
+import DialogContent from '@mui/material/DialogContent'
+import DialogActions from '@mui/material/DialogActions'
+import Button from '@mui/material/Button'
+import TextField from '@mui/material/TextField'
+import FormControl from '@mui/material/FormControl'
+import InputLabel from '@mui/material/InputLabel'
+import Select from '@mui/material/Select'
+import MenuItem from '@mui/material/MenuItem'
+import FormControlLabel from '@mui/material/FormControlLabel'
+import Checkbox from '@mui/material/Checkbox'
+import Stack from '@mui/material/Stack'
 import { useForm, Controller } from 'react-hook-form'
-import styleAdmin from '~/components/StyleAdmin.jsx'
-import StyleAdmin from '~/components/StyleAdmin.jsx'
+import StyleAdmin from '~/components/StyleAdmin'
 
 const statusOptions = [
   'Pending',
@@ -121,7 +118,7 @@ const EditOrderModal = ({ open, onClose, order, onUpdate, loading }) => {
       fullWidth
       maxWidth='sm'
       BackdropProps={{
-        sx: styleAdmin.OverlayModal
+        sx: StyleAdmin.OverlayModal
       }}
     >
       {/* Header */}
