@@ -16,7 +16,8 @@ import {
 import { useAddress } from '~/hook/useAddress'
 import AddAddressModal from './AddAddressModal'
 
-export const ChooseAddressModal = ({ open, onClose, onConfirm }) => {
+export const ChooseAddressModal = ({ open, onClose, onConfirm, onUpdateAddresses }) => {
+
   const {
     addresses,
     loading,
@@ -32,19 +33,18 @@ export const ChooseAddressModal = ({ open, onClose, onConfirm }) => {
     if (open) {
       fetchAddresses()
     }
-  }, [open, fetchAddresses])
+  }, [open])
 
   // Khi addresses thay đổi, cập nhật selectedId nếu cần
   useEffect(() => {
     if (addresses.length > 0) {
-      // Nếu selectedId không có trong danh sách mới, set mặc định là địa chỉ đầu tiên
       if (!addresses.find(a => a._id === selectedId)) {
         setSelectedId(addresses[0]._id)
       }
     } else {
       setSelectedId(null)
     }
-  }, [addresses, selectedId])
+  }, [addresses])
 
   // Mở form thêm mới
   const handleAddNew = () => {
@@ -58,14 +58,15 @@ export const ChooseAddressModal = ({ open, onClose, onConfirm }) => {
     setIsFormOpen(true)
   }
 
-  // Đóng form thêm/sửa
-  // const handleFormClose = async (shouldReload = false) => {
-  //   setIsFormOpen(false)
-  //   setEditingAddress(null)
-  //   if (shouldReload) {
-  //     await fetchAddresses()
-  //   }
-  // }
+  // Đóng form và reload danh sách nếu cần
+  const handleSuccess = async () => {
+    await fetchAddresses(true)  // gọi force fetch
+    if (onUpdateAddresses) await onUpdateAddresses()
+    setIsFormOpen(false)
+    setEditingAddress(null)
+  }
+
+
 
   return (
     <>
@@ -143,24 +144,13 @@ export const ChooseAddressModal = ({ open, onClose, onConfirm }) => {
         </DialogActions>
       </Dialog>
 
-      {/* Modal form thêm/sửa địa chỉ */}
+      {/* Modal thêm/sửa địa chỉ */}
       <AddAddressModal
         open={isFormOpen}
         onClose={() => setIsFormOpen(false)}
-        onSuccess={() => {
-          setIsFormOpen(false)
-          setEditingAddress(null)
-
-          // Nếu hook useAddress có thể cập nhật local:
-          // updateAddressInLocalList(newOrUpdatedAddress)
-
-          // Nếu không, gọi lại API như bạn đang làm
-          fetchAddresses()
-        }}
+        onSuccess={handleSuccess}
         addressToEdit={editingAddress}
       />
-
-
     </>
   )
 }

@@ -31,7 +31,7 @@ export const useAddress = () => {
   const addAddress = async (data) => {
     try {
       const newAddr = await addressService.addShippingAddress(data)
-      setAddresses(prev => [...prev, newAddr])
+      setAddresses(prev => [newAddr, ...prev])
       return newAddr
     } catch (err) {
       console.error('Lỗi thêm địa chỉ:', err)
