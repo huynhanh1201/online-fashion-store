@@ -38,6 +38,19 @@ export const updateCartItem = async (productId, updateData) => {
     return null
   }
 }
+// Cập nhật trạng thái selected của tất cả sản phẩm
+export const updateAllSelection = async (selected) => {
+  try {
+    const response = await AuthorizedAxiosInstance.patch(
+      `${API_ROOT}/v1/carts/items`,
+      { selected }
+    )
+    return response.data
+  } catch (error) {
+    console.error('Lỗi khi cập nhật trạng thái chọn của tất cả sản phẩm:', error)
+    return null
+  }
+}
 
 // Xoá một sản phẩm khỏi giỏ
 export const deleteCartItem = async (productId) => {

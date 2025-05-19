@@ -23,6 +23,7 @@ Router.route('/').get(
 Router.route('/items/:productId').patch(
   authMiddleware.isAuthorized,
   cartsValidation.verifyId,
+  cartsValidation.cartItem,
   cartsController.updateItemCart
 )
 

@@ -47,7 +47,33 @@ const cart = async (req, res, next) => {
   }
 }
 
+const cartItem = async (req, res, next) => {
+  // Xác thực dữ liệu đầu vào correctCondition: điều kiện đúng
+  const correctCondition = Joi.object({
+    // quantity là số lượng sản phẩm - bắt buộc, tối thiểu 1
+    quantity: Joi.number().integer().min(1).required(),
+
+    selected: Joi.boolean()
+  })
+
+  try {
+    await correctCondition.validateAsync(req.body, {
+      abortEarly: false // Không dừng lại khi gặp lỗi đầu tiên
+    })
+
+    next() // Nếu không có lỗi, tiếp tục xử lý request sang controller
+  } catch (err) {
+    const errorMessage = new Error(err).message
+    const customError = new ApiError(
+      StatusCodes.UNPROCESSABLE_ENTITY,
+      errorMessage
+    )
+    next(customError) // Gọi middleware xử lý lỗi tập trung
+  }
+}
+
 export const cartsValidation = {
   verifyId,
-  cart
+  cart,
+  cartItem
 }

@@ -76,7 +76,9 @@ const updateItemCart = async (userId, productId, reqBody) => {
         'cartItems.productId': productId
       },
       {
-        $set: { 'cartItems.$.quantity': reqBody.quantity }
+        $set: {
+          'cartItems.$.quantity': reqBody.quantity
+        }
       },
       {
         new: true
