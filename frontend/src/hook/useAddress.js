@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from 'react'
+import { useEffect, useState, useRef, useCallback } from 'react'
 import * as addressService from '~/services/addressService'
 
 export const useAddress = () => {
@@ -8,7 +8,8 @@ export const useAddress = () => {
 
   const fetchedRef = useRef(false)
 
-  const fetchAddresses = async (force = false) => {
+  // Sử dụng useCallback để tránh lỗi dependency
+  const fetchAddresses = useCallback(async (force = false) => {
     if (fetchedRef.current && !force) return
     setLoading(true)
     setError(null)
@@ -22,16 +23,16 @@ export const useAddress = () => {
     } finally {
       setLoading(false)
     }
-  }
+  }, [])
 
   useEffect(() => {
     fetchAddresses()
-  }, [])
+  }, [fetchAddresses])
 
   const addAddress = async (data) => {
     try {
       const newAddr = await addressService.addShippingAddress(data)
-      setAddresses(prev => [...prev, newAddr])
+      setAddresses(prev => [newAddr, ...prev])
       return newAddr
     } catch (err) {
       console.error('Lỗi thêm địa chỉ:', err)

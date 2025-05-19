@@ -89,7 +89,7 @@ const Payment = () => {
 
     if (!rawId || !selectedIds.includes(rawId)) return
 
-    const product = item.product || item.productId || {};
+    const product = item.product || item.productId || {}
     const price = typeof product.price === 'number' ? product.price : 0
     const quantity = typeof item.quantity === 'number' ? item.quantity : 1
 
@@ -101,27 +101,30 @@ const Payment = () => {
     })
   })
   const total = Math.max(subTotal - discount, 0)
-  // Tránh âm
-
+  // const { addresses, fetchAddresses } = useAddress()
+  // const [selectedAddress, setSelectedAddress] = useState(null)
   // Lấy địa chỉ mặc định khi có danh sách địa chỉ
-  useEffect(() => {
-    fetchAddresses()
-  }, [fetchAddresses])
+  // useEffect(() => {
+  // }, [fetchAddresses])
 
   useEffect(() => {
     if (addresses.length > 0 && !selectedAddress) {
-      const defaultAddr = addresses.find((addr) => addr.isDefault)
+      const defaultAddr = addresses.find(addr => addr.isDefault)
       setSelectedAddress(defaultAddr || addresses[0])
     }
-  }, [addresses, selectedAddress])
+  }, [addresses])
+
 
   const handleOpenAddressModal = () => setOpenAddressModal(true)
   const handleCloseAddressModal = () => setOpenAddressModal(false)
 
   const handleAddressConfirm = (addressId) => {
-    const selected = addresses.find((addr) => addr._id === addressId)
+    const selected = addresses.find(addr => addr._id === addressId)
     setSelectedAddress(selected)
     handleCloseAddressModal()
+  }
+  const handleAddressListUpdated = async () => {
+    await fetchAddresses(true)
   }
 
   // Áp dụng voucher
@@ -148,7 +151,6 @@ const Payment = () => {
   }
 
   // Kiểm tra productId hợp lệ (24 ký tự hex)
-  const isValidObjectId = (id) => /^[a-f0-9]{24}$/.test(String(id))
 
   // Xử lý đặt hàng
   const handlePlaceOrder = async () => {
@@ -163,35 +165,6 @@ const Payment = () => {
     }
 
     // Chuẩn hóa cartItems
-    let mappedItems
-    try {
-      mappedItems = cartItems.map((item, index) => {
-        let rawId = null
-        if (item.product && item.product._id) {
-          rawId = item.product._id
-        } else if (typeof item.productId === 'string') {
-          rawId = item.productId
-        } else if (item.productId && typeof item.productId === 'object' && item.productId._id) {
-          // Trường hợp item.productId là object chứa _id
-          rawId = item.productId._id
-        } else {
-          rawId = null
-        }
-
-        if (!rawId) throw new Error(`Sản phẩm thứ ${index + 1} không có productId`)
-
-        const productId = String(rawId).toLowerCase()
-        if (!isValidObjectId(productId)) {
-          throw new Error(`productId của sản phẩm thứ ${index + 1} không hợp lệ: ${productId}`)
-        }
-
-        return { productId, quantity: item.quantity || 1 }
-      })
-    } catch (error) {
-      setSnackbar({ open: true, severity: 'error', message: error.message })
-      return
-    }
-    console.log(selectedCartItems)
     const orderData = {
       cartItems: selectedCartItems,
       shippingAddressId: selectedAddress._id,
@@ -222,7 +195,7 @@ const Payment = () => {
 
   return (
     <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-      <Container maxWidth="lg" sx={{ py: 4 }}>
+      <Container maxWidth="lg" sx={{ py: 4 } }>
         {cartLoading ? (
           <Box sx={{ textAlign: 'center', mt: 4 }}>
             <CircularProgress />
@@ -408,10 +381,10 @@ const Payment = () => {
         <ChooseAddressModal
           open={openAddressModal}
           onClose={handleCloseAddressModal}
-          addresses={addresses}
           onConfirm={handleAddressConfirm}
-          selectedAddressId={selectedAddress?._id}
+          onUpdateAddresses={handleAddressListUpdated}
         />
+
 
         {/* Snackbar thông báo */}
         <Snackbar

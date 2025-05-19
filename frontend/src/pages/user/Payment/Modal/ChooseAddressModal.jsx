@@ -16,7 +16,7 @@ import {
 import { useAddress } from '~/hook/useAddress'
 import AddAddressModal from './AddAddressModal'
 
-export const ChooseAddressModal = ({ open, onClose, onConfirm }) => {
+export const ChooseAddressModal = ({ open, onClose, onConfirm, onUpdateAddresses }) => {
   const {
     addresses,
     loading,
@@ -27,17 +27,16 @@ export const ChooseAddressModal = ({ open, onClose, onConfirm }) => {
   const [isFormOpen, setIsFormOpen] = useState(false)
   const [editingAddress, setEditingAddress] = useState(null)
 
-  // Khi modal mở thì load danh sách địa chỉ
-  useEffect(() => {
-    if (open) {
-      fetchAddresses()
-    }
-  }, [open, fetchAddresses])
+  // Khi modal mở thì force fetch dữ liệu mới nhất
+  // useEffect(() => {
+  //   if (open) {
+  //     fetchAddresses(true)
+  //   }
+  // }, [open, fetchAddresses])
 
   // Khi addresses thay đổi, cập nhật selectedId nếu cần
   useEffect(() => {
     if (addresses.length > 0) {
-      // Nếu selectedId không có trong danh sách mới, set mặc định là địa chỉ đầu tiên
       if (!addresses.find(a => a._id === selectedId)) {
         setSelectedId(addresses[0]._id)
       }
@@ -58,18 +57,17 @@ export const ChooseAddressModal = ({ open, onClose, onConfirm }) => {
     setIsFormOpen(true)
   }
 
-  // Đóng form thêm/sửa
-  // const handleFormClose = async (shouldReload = false) => {
-  //   setIsFormOpen(false)
-  //   setEditingAddress(null)
-  //   if (shouldReload) {
-  //     await fetchAddresses()
-  //   }
-  // }
+  // Đóng form và reload danh sách nếu cần
+  const handleSuccess = async () => {
+    await fetchAddresses(true)  // gọi force fetch mới
+    if (onUpdateAddresses) await onUpdateAddresses()
+    setIsFormOpen(false)
+    setEditingAddress(null)
+  }
 
   return (
     <>
-      <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
+      <Dialog open={open} onClose={onClose} fullWidth maxWidth="md">
         <DialogTitle>Chọn địa chỉ giao hàng</DialogTitle>
 
         <DialogContent dividers>
@@ -143,24 +141,13 @@ export const ChooseAddressModal = ({ open, onClose, onConfirm }) => {
         </DialogActions>
       </Dialog>
 
-      {/* Modal form thêm/sửa địa chỉ */}
+      {/* Modal thêm/sửa địa chỉ */}
       <AddAddressModal
         open={isFormOpen}
         onClose={() => setIsFormOpen(false)}
-        onSuccess={() => {
-          setIsFormOpen(false)
-          setEditingAddress(null)
-
-          // Nếu hook useAddress có thể cập nhật local:
-          // updateAddressInLocalList(newOrUpdatedAddress)
-
-          // Nếu không, gọi lại API như bạn đang làm
-          fetchAddresses()
-        }}
+        onSuccess={handleSuccess}
         addressToEdit={editingAddress}
       />
-
-
     </>
   )
 }

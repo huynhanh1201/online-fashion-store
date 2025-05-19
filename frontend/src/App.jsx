@@ -16,6 +16,7 @@ import Payment from '~/pages/user/Payment/Payment'
 import Cart from '~/pages/user/Cart/Cart'
 import Profile from '~/pages/user/Profile/Profile'
 import Order from '~/pages/user/Order/Order'
+import PaymentVnpay from '~/pages/user/PaymentVnpay/PaymentVnpay'
 
 // Trang HeaderAdmin
 import AdminLayout from '~/layout/AdminLayout'
@@ -60,7 +61,7 @@ function App() {
           {/*=====Huynh Anh=====*/}
           <Route
             path='/payment-result'
-            element={<h2>THANH TOÁN THÀNH CÔNG!</h2>}
+            element={<PaymentVnpay />}
           />
           <Route
             path='/payment-failed'

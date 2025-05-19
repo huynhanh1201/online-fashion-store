@@ -264,7 +264,8 @@ export default function AddAddressModal({
         const updated = await updateShippingAddress(addressToEdit._id, addressData)
         if (updated && updated._id) {
           showSnackbar?.('Sửa địa chỉ thành công!')
-          onSuccess?.()
+          onSuccess?.(isEditMode ? { ...addressData, _id: addressToEdit._id } : updated)
+
           onClose()
         } else {
           showSnackbar?.('Không thể sửa địa chỉ!', 'error')
@@ -273,7 +274,8 @@ export default function AddAddressModal({
         const added = await addShippingAddress(addressData)
         if (added && added._id) {
           showSnackbar?.('Thêm địa chỉ thành công!')
-          onSuccess?.()
+          onSuccess?.(isEditMode ? { ...addressData, _id: addressToEdit._id } : added)
+
           onClose()
         } else {
           showSnackbar?.('Không thể thêm địa chỉ!', 'error')
