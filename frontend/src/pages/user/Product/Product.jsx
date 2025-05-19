@@ -119,7 +119,11 @@ const Product = () => {
   }, [])
 
   const [filteredProducts, setFilteredProducts] = useState([])
-  const [selectedCategories, setSelectedCategories] = useState([])
+  const [selectedCategories, setSelectedCategories] = useState(() => {
+    const params = new URLSearchParams(location.search)
+    const category = params.get('category')
+    return category ? [category] : []
+  })
   const [selectedOrigins, setSelectedOrigins] = useState([])
   const [selectedSizes, setSelectedSizes] = useState([])
   const [selectedColors, setSelectedColors] = useState([])
