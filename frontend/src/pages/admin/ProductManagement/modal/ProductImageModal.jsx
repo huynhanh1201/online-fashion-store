@@ -1,14 +1,12 @@
 import React from 'react'
-import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  IconButton,
-  Button
-} from '@mui/material'
-import CloseIcon from '@mui/icons-material/Close'
-import styleAdmin from '~/components/StyleAdmin.jsx'
+
+import Dialog from '@mui/material/Dialog'
+import DialogTitle from '@mui/material/DialogTitle'
+import DialogContent from '@mui/material/DialogContent'
+import DialogActions from '@mui/material/DialogActions'
+import Button from '@mui/material/Button'
+
+import styleAdmin from '~/components/StyleAdmin'
 
 const ProductImageModal = ({ open, onClose, imageSrc, productName }) => {
   return (

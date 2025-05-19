@@ -1,23 +1,18 @@
 import React from 'react'
-import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Button,
-  Typography,
-  Divider,
-  Box,
-  TextField,
-  MenuItem,
-  FormControlLabel,
-  Checkbox,
-  FormControl,
-  InputLabel,
-  Select
-} from '@mui/material'
-import StyleAdmin from '~/components/StyleAdmin.jsx'
-import styleAdmin from '~/components/StyleAdmin.jsx'
+
+import Dialog from '@mui/material/Dialog'
+import DialogTitle from '@mui/material/DialogTitle'
+import DialogContent from '@mui/material/DialogContent'
+import DialogActions from '@mui/material/DialogActions'
+import Button from '@mui/material/Button'
+import Divider from '@mui/material/Divider'
+import Box from '@mui/material/Box'
+import TextField from '@mui/material/TextField'
+import FormControlLabel from '@mui/material/FormControlLabel'
+import Checkbox from '@mui/material/Checkbox'
+
+import StyleAdmin from '~/components/StyleAdmin'
+
 const ViewDiscountModal = ({ open, onClose, discount }) => {
   if (!discount) return null
   return (
@@ -27,7 +22,7 @@ const ViewDiscountModal = ({ open, onClose, discount }) => {
       fullWidth
       maxWidth='lg'
       BackdropProps={{
-        sx: styleAdmin.OverlayModal
+        sx: StyleAdmin.OverlayModal
       }}
     >
       <DialogTitle>Chi tiết mã giảm giá</DialogTitle>

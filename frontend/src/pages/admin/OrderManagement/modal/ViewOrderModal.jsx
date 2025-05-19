@@ -1,26 +1,25 @@
 import React, { useEffect, useState } from 'react'
-import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Button,
-  Divider,
-  Tab,
-  Tabs,
-  Typography,
-  Box,
-  Stack,
-  Chip,
-  Table,
-  TableHead,
-  TableRow,
-  TableCell,
-  TableBody
-} from '@mui/material'
+import Dialog from '@mui/material/Dialog'
+import DialogTitle from '@mui/material/DialogTitle'
+import DialogContent from '@mui/material/DialogContent'
+import DialogActions from '@mui/material/DialogActions'
+import Button from '@mui/material/Button'
+import Divider from '@mui/material/Divider'
+import Tab from '@mui/material/Tab'
+import Tabs from '@mui/material/Tabs'
+import Typography from '@mui/material/Typography'
+import Box from '@mui/material/Box'
+import Stack from '@mui/material/Stack'
+import Chip from '@mui/material/Chip'
+import Table from '@mui/material/Table'
+import TableHead from '@mui/material/TableHead'
+import TableRow from '@mui/material/TableRow'
+import TableCell from '@mui/material/TableCell'
+import TableBody from '@mui/material/TableBody'
+
 import dayjs from 'dayjs'
-import useProducts from '~/hook/useProducts'
-import styleAdmin from '~/components/StyleAdmin.jsx'
+import useProducts from '~/hook/admin/useProducts'
+import styleAdmin from '~/components/StyleAdmin'
 
 function ViewOrderModal({
   open,

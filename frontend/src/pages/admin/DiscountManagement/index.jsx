@@ -1,10 +1,14 @@
 import React from 'react'
+
 import Typography from '@mui/material/Typography'
 import Button from '@mui/material/Button'
 import AddIcon from '@mui/icons-material/Add'
 
-import useDiscounts from '~/hook/useDiscount'
-import { updateDiscount, deleteDiscount } from '~/services/discountService'
+import useDiscounts from '~/hook/admin/useDiscount'
+import {
+  updateDiscount,
+  deleteDiscount
+} from '~/services/admin/discountService'
 
 // Lazy load modals
 const AddDiscountModal = React.lazy(() => import('./modal/AddDiscountModal'))

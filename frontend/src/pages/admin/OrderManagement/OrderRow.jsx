@@ -1,13 +1,15 @@
 import React from 'react'
-import { TableCell, IconButton, Stack, Chip } from '@mui/material'
+import IconButton from '@mui/material/IconButton'
+import Stack from '@mui/material/Stack'
+import Chip from '@mui/material/Chip'
 import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye'
 import BorderColorIcon from '@mui/icons-material/BorderColor'
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever'
 import dayjs from 'dayjs'
-import {
+import StyleAdmin, {
   StyledTableCell,
   StyledTableRow
-} from '~/pages/admin/CategorieManagement/CategoryTableStyles.jsx'
+} from '~/components/StyleAdmin'
 
 const OrderRow = ({ order, index, onView, onEdit, onDelete }) => {
   const {
@@ -20,7 +22,7 @@ const OrderRow = ({ order, index, onView, onEdit, onDelete }) => {
 
   return (
     <StyledTableRow hover>
-      <StyledTableCell sx={{ textAlign: 'center' }}>
+      <StyledTableCell sx={StyleAdmin.TableColumnSTT}>
         {index + 1}
       </StyledTableCell>
 
@@ -28,7 +30,7 @@ const OrderRow = ({ order, index, onView, onEdit, onDelete }) => {
 
       <StyledTableCell
         sx={{
-          maxWidth: '130px',
+          maxWidth: '200px',
           whiteSpace: 'nowrap',
           overflow: 'hidden',
           textOverflow: 'ellipsis'

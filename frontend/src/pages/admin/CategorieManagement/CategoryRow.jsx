@@ -1,6 +1,6 @@
-// components/CategoryRow.jsx
 import React from 'react'
 import { TableRow, Stack } from '@mui/material'
+import IconButton from '@mui/material/IconButton'
 import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye'
 import BorderColorIcon from '@mui/icons-material/BorderColor'
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever'
@@ -8,8 +8,8 @@ import {
   StyledTableCell,
   StyledTableRow,
   StyledTableContainer
-} from './CategoryTableStyles'
-import IconButton from '@mui/material/IconButton'
+} from '~/components/StyleAdmin'
+
 const styles = {
   groupIcon: {
     display: 'flex',
@@ -37,7 +37,7 @@ export default function CategoryRow({ category, idx, handleOpenModal }) {
       </StyledTableCell>
       <StyledTableCell
         sx={{
-          maxWidth: 300,
+          maxWidth: 950,
           overflow: 'hidden',
           textOverflow: 'ellipsis',
           whiteSpace: 'nowrap'

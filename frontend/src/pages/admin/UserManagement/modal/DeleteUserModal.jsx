@@ -1,15 +1,15 @@
 import React from 'react'
-import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Button,
-  CircularProgress,
-  Typography
-} from '@mui/material'
-import { dialogTitleStyle, cancelButtonStyle } from './StyleModal.js'
-import styleAdmin from '~/components/StyleAdmin.jsx'
+
+import Dialog from '@mui/material/Dialog'
+import DialogTitle from '@mui/material/DialogTitle'
+import DialogContent from '@mui/material/DialogContent'
+import DialogActions from '@mui/material/DialogActions'
+import Button from '@mui/material/Button'
+import CircularProgress from '@mui/material/CircularProgress'
+import Typography from '@mui/material/Typography'
+
+import { dialogTitleStyle, cancelButtonStyle } from './StyleModal'
+import StyleAdmin from '~/components/StyleAdmin'
 
 const DeleteUserModal = React.memo(({ open, onClose, user, onDelete }) => {
   const [isDeleting, setIsDeleting] = React.useState(false)
@@ -33,7 +33,7 @@ const DeleteUserModal = React.memo(({ open, onClose, user, onDelete }) => {
       onClose={onClose}
       fullWidth
       BackdropProps={{
-        sx: styleAdmin.OverlayModal
+        sx: StyleAdmin.OverlayModal
       }}
     >
       <DialogTitle sx={dialogTitleStyle}>Xác nhận xóa người dùng</DialogTitle>

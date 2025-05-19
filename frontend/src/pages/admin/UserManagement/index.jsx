@@ -2,11 +2,11 @@ import * as React from 'react'
 import Typography from '@mui/material/Typography'
 import UserTable from './UserTable'
 import UserPagination from './UserPagination'
-import useUsers from '~/hook/admin/useUsers.js'
+import useUsers from '~/hook/admin/useUsers'
 // Lazy load các modal
-const EditUserModal = React.lazy(() => import('./modal/EditUserModal.jsx'))
-const DeleteUserModal = React.lazy(() => import('./modal/DeleteUserModal.jsx'))
-const ViewUserModal = React.lazy(() => import('./modal/ViewUserModal.jsx'))
+const EditUserModal = React.lazy(() => import('./modal/EditUserModal'))
+const DeleteUserModal = React.lazy(() => import('./modal/DeleteUserModal'))
+const ViewUserModal = React.lazy(() => import('./modal/ViewUserModal'))
 
 const ROWS_PER_PAGE = 10
 
@@ -69,32 +69,30 @@ export default function UserManagement() {
         handleOpenModal={handleOpenModal}
       />
 
-      <React.Suspense fallback={<></>}>
-        {modalType === 'view' && selectedUser && (
-          <ViewUserModal open onClose={handleCloseModal} user={selectedUser} />
-        )}
-        {ModalComponent && selectedUser && (
-          <ModalComponent
-            open
-            onClose={handleCloseModal}
-            user={selectedUser}
-            onSave={modalType === 'edit' ? fetchUsers : undefined}
-            onDelete={
-              modalType === 'delete'
-                ? () => handleDeleteUser(selectedUser._id)
-                : undefined
-            }
-          />
-        )}
-        {modalType === 'delete' && selectedUser && (
-          <DeleteUserModal
-            open
-            onClose={handleCloseModal}
-            user={selectedUser}
-            onDelete={() => handleDeleteUser(selectedUser._id)}
-          />
-        )}
-      </React.Suspense>
+      {modalType === 'view' && selectedUser && (
+        <ViewUserModal open onClose={handleCloseModal} user={selectedUser} />
+      )}
+      {ModalComponent && selectedUser && (
+        <ModalComponent
+          open
+          onClose={handleCloseModal}
+          user={selectedUser}
+          onSave={modalType === 'edit' ? fetchUsers : undefined}
+          onDelete={
+            modalType === 'delete'
+              ? () => handleDeleteUser(selectedUser._id)
+              : undefined
+          }
+        />
+      )}
+      {modalType === 'delete' && selectedUser && (
+        <DeleteUserModal
+          open
+          onClose={handleCloseModal}
+          user={selectedUser}
+          onDelete={() => handleDeleteUser(selectedUser._id)}
+        />
+      )}
 
       <UserPagination
         page={page}

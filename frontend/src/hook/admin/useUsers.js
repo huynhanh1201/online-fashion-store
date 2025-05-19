@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { getUsers, deleteUser } from '~/services/userService'
+import { getUsers, deleteUser } from '~/services/admin/userService'
 
 export default function useUsers(limit = 10) {
   const [users, setUsers] = useState([])
