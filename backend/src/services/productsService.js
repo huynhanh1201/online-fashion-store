@@ -4,6 +4,7 @@ import { StatusCodes } from 'http-status-codes'
 import { ProductModel } from '~/models/ProductModel'
 import ApiError from '~/utils/ApiError'
 import { slugify } from '~/utils/formatters'
+import { ColorPaletteModel } from '~/models/ColorPaletteModel'
 
 const createProduct = async (reqBody) => {
   // eslint-disable-next-line no-useless-catch
@@ -23,9 +24,17 @@ const createProduct = async (reqBody) => {
       colors: reqBody.colors
     }
 
-    const Product = await ProductModel.create(newProduct)
+    const product = await ProductModel.create(newProduct)
 
-    return Product
+    const newColorPalette = {
+      productId: product._id,
+      colors: reqBody.colors
+    }
+
+    //  Tạo Màu sắc sản phẩm
+    await ColorPaletteModel.create(newColorPalette)
+
+    return product
   } catch (err) {
     throw err
   }

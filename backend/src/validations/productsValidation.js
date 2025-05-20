@@ -45,7 +45,20 @@ const product = async (req, res, next) => {
       .min(1) // ít nhất 1 ảnh
       .required(), // bắt buộc
 
-    categoryId: Joi.string().length(24).hex().required()
+    categoryId: Joi.string().length(24).hex().required(),
+
+    colors: Joi.array()
+      .items(
+        Joi.object({
+          name: Joi.string().trim().required().min(1).max(100),
+
+          image: Joi.string()
+            .trim()
+            .required()
+            .uri({ scheme: [/https?/] })
+        })
+      )
+      .min(1)
   })
 
   try {
