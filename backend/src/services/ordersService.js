@@ -110,9 +110,10 @@ const createOrder = async (userId, reqBody, ipAddr) => {
       const product = productMap.get(item.productId.toString())
       return {
         orderId: order._id,
-        productId: product._id,
+        name: product.name,
+        price: product.price,
         quantity: item.quantity,
-        priceAtOrder: product.price
+        subtotal: product.price * item.quantity
       }
     })
 
