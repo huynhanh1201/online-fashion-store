@@ -91,6 +91,7 @@ const createOrder = async (userId, reqBody, ipAddr) => {
     const newOrder = {
       userId,
       shippingAddressId,
+      shippingAddress: address,
       total: cartTotal,
       couponId,
       paymentMethod,
@@ -242,9 +243,7 @@ const createOrder = async (userId, reqBody, ipAddr) => {
 const getOrderList = async () => {
   // eslint-disable-next-line no-useless-catch
   try {
-    const result = await OrderModel.find({})
-      .populate('userId shippingAddressId couponId')
-      .lean()
+    const result = await OrderModel.find({}).populate('userId couponId').lean()
 
     return result
   } catch (err) {
@@ -257,7 +256,7 @@ const getOrder = async (orderId) => {
   try {
     const result = await OrderModel.findById(orderId)
       .populate({
-        path: 'userId couponId shippingAddressId',
+        path: 'userId couponId',
         select: '-password -role -destroy -isActive -verifyToken'
       })
       .lean()
