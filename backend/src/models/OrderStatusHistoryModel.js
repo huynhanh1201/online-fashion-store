@@ -19,9 +19,16 @@ const OrderStatusHistorySchema = new Schema(
       default: null
     },
     updatedBy: {
-      type: Schema.Types.ObjectId,
-      ref: 'User', // hoặc 'Admin' tuỳ structure của bạn
-      required: true
+      name: {
+        type: String,
+        required: true,
+        trim: true // Tên người cập nhật
+      },
+      role: {
+        type: String,
+        required: true,
+        enum: ['customer', 'admin'] // hoặc các role khác bạn có
+      }
     }
   },
   {

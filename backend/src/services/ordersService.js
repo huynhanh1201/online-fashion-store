@@ -12,6 +12,7 @@ import { PaymentTransactionModel } from '~/models/PaymentTransactionModel'
 
 import { verifyChecksum } from '~/utils/vnpay'
 import { env } from '~/config/environment'
+import { UserModel } from '~/models/UserModel'
 
 const createOrder = async (userId, reqBody, ipAddr) => {
   // eslint-disable-next-line no-useless-catch
@@ -286,12 +287,19 @@ const updateOrder = async (userId, orderId, reqBody) => {
     const newStatus = reqBody.status
 
     if (newStatus && newStatus !== existingOrder.status) {
+      const user = await UserModel.findById(userId)
+
+      if (!user)
+        throw new ApiError(StatusCodes.NOT_FOUND, 'Người dùng không tồn tại')
+
+      console.log('userId:', userId)
+      console.log('user:', user)
       // status đã đổi, tạo history
       await OrderStatusHistoryModel.create({
         orderId: orderId,
         status: newStatus,
         note: reqBody.note || null,
-        updatedBy: userId,
+        updatedBy: { name: user.name, role: user.role },
         updatedAt: new Date()
       })
     }
