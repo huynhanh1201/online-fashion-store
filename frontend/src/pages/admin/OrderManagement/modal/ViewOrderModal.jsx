@@ -194,9 +194,7 @@ function ViewOrderModal({
                   </Typography>
                   <Typography>
                     <strong>Quyền: </strong>{' '}
-                    {h.updatedBy.role === 'admin'
-                      ? 'QUẢN TRỊ'
-                      : 'KHÁCH HÀNG' || ''}
+                    {h.updatedBy.role === 'admin' ? 'QUẢN TRỊ' : 'KHÁCH HÀNG'}
                   </Typography>
                   <Typography>
                     <strong>Thời gian:</strong>{' '}

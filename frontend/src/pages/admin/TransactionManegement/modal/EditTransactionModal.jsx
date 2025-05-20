@@ -65,7 +65,7 @@ const EditTransactionModal = ({
           />
           <TextField
             label='Phương thức thanh toán'
-            value={transaction.method}
+            value={transaction.method.toUpperCase()}
             fullWidth
             InputProps={{ readOnly: true }}
             sx={{
