@@ -37,7 +37,9 @@ const TransactionRow = ({ transaction, onView, onEdit, onDelete, index }) => {
       <StyledTableCell sx={StyleAdmin.TableColumnSTT}>
         {index + 1}
       </StyledTableCell>
-      <StyledTableCell>{transaction._id}</StyledTableCell>
+      <StyledTableCell>
+        {transaction.transactionId || '(Thanh toán COD)'}
+      </StyledTableCell>
       <StyledTableCell>{transaction.orderId}</StyledTableCell>
       <StyledTableCell>{transaction.method}</StyledTableCell>
       <StyledTableCell>
@@ -74,7 +76,7 @@ const TransactionRow = ({ transaction, onView, onEdit, onDelete, index }) => {
           textOverflow: 'ellipsis'
         }}
       >
-        {transaction.note || '-'}
+        {transaction.note || ' '}
       </StyledTableCell>
       <StyledTableCell>
         {new Date(transaction.createdAt).toLocaleString()}

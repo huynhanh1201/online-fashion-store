@@ -44,7 +44,7 @@ const ViewTransactionModal = ({ open, onClose, transaction }) => {
         <Stack spacing={2} mt={1}>
           <TextField
             label='Mã giao dịch'
-            value={transaction._id}
+            value={transaction.transactionId || '(Thanh toán COD)'}
             fullWidth
             InputProps={{ readOnly: true }}
             sx={{
@@ -115,9 +115,10 @@ const ViewTransactionModal = ({ open, onClose, transaction }) => {
               ...StyleAdmin.InputCustom.CursorNone
             }}
           />
+
           <TextField
             label='Ghi chú'
-            value={transaction.note || '-'}
+            value={transaction.note || ' '}
             multiline
             rows={3}
             fullWidth
