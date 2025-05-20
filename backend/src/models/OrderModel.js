@@ -28,6 +28,38 @@ const OrderSchema = new Schema(
       ref: 'ShippingAddress',
       required: true
     },
+    shippingAddress: {
+      fullName: {
+        type: String,
+        required: true, // Họ tên người nhận
+        trim: true
+      },
+      phone: {
+        type: String,
+        required: true, // Số điện thoại liên hệ
+        trim: true
+      },
+      address: {
+        type: String,
+        required: true, // Số nhà, tên đường
+        trim: true
+      },
+      ward: {
+        type: String,
+        required: true, // Phường
+        trim: true
+      },
+      district: {
+        type: String,
+        required: true, // Quận/Huyện
+        trim: true
+      },
+      city: {
+        type: String,
+        required: true, // Thành phố/Tỉnh
+        trim: true
+      }
+    },
     total: {
       type: Number,
       required: true,
