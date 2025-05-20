@@ -190,7 +190,13 @@ function ViewOrderModal({
                     <strong>Ghi chú:</strong> {h.note || 'Không có'}
                   </Typography>
                   <Typography>
-                    <strong>Người cập nhật:</strong> {order.userId.name || '—'}
+                    <strong>Người cập nhật:</strong> {h.updatedBy.name || ''}
+                  </Typography>
+                  <Typography>
+                    <strong>Quyền: </strong>{' '}
+                    {h.updatedBy.role === 'admin'
+                      ? 'QUẢN TRỊ'
+                      : 'KHÁCH HÀNG' || ''}
                   </Typography>
                   <Typography>
                     <strong>Thời gian:</strong>{' '}
