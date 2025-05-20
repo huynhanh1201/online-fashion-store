@@ -10,6 +10,8 @@ import {
 } from '@mui/material'
 import FavoriteIcon from '@mui/icons-material/Favorite'
 import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart'
+import { useDispatch } from 'react-redux'
+import { setSelectedItems as setSelectedItemsAction } from '~/redux/cart/cartSlice'
 
 // Hàm cắt chuỗi tên
 const truncate = (str, maxLength) => {
@@ -32,6 +34,13 @@ const formatPrice = (price) => {
 }
 
 const ProductCard = ({ product, handleAddToCart, isAdding }) => {
+  const dispatch = useDispatch()
+
+  const handleSelectAndNavigate = () => {
+    dispatch(setSelectedItemsAction([product._id]))
+    window.location.href = `/productdetail/${product._id}`
+  }
+
   return (
     <Card
       sx={{
@@ -42,46 +51,43 @@ const ProductCard = ({ product, handleAddToCart, isAdding }) => {
       }}
     >
       <div
-        style={{ padding: '10px', backgroundColor: '#fff', height: '350px' }}
+        style={{ padding: '10px', backgroundColor: '#fff', height: '350px', cursor: 'pointer' }}
+        onClick={handleSelectAndNavigate}
       >
-        <a
-          href={`/productdetail/${product._id}`}
-          style={{ textDecoration: 'none' }}
-        >
-          <CardMedia
-            component='img'
-            height='100%'
-            width='100%'
-            image={product.image?.[0] || '/default.jpg'}
-            alt={product.name}
-            sx={{ objectFit: 'contain' }}
-          />
-        </a>
+        <CardMedia
+          component='img'
+          height='100%'
+          width='100%'
+          image={product.image?.[0] || '/default.jpg'}
+          alt={product.name}
+          sx={{ objectFit: 'contain' }}
+        />
       </div>
+
       <CardContent sx={{ mb: -2 }}>
-        <a
-          href={`/productdetail/${product._id}`}
-          style={{ textDecoration: 'none' }}
+        <Typography
+          variant='body1'
+          onClick={handleSelectAndNavigate}
+          sx={{
+            fontWeight: 'bold',
+            color: 'black',
+            whiteSpace: 'nowrap',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            textDecoration: 'none',
+            cursor: 'pointer'
+          }}
           title={product.name}
         >
-          <Typography
-            variant='body1'
-            sx={{
-              fontWeight: 'bold',
-              color: 'black',
-              whiteSpace: 'nowrap',
-              overflow: 'hidden',
-              textOverflow: 'ellipsis'
-            }}
-          >
-            {product.name}
-          </Typography>
-        </a>
+          {product.name}
+        </Typography>
       </CardContent>
+
       <CardActions disableSpacing>
         <IconButton aria-label='add to favorites'>
           <FavoriteIcon />
         </IconButton>
+
         <IconButton
           onClick={() => handleAddToCart(product)}
           disabled={isAdding}
@@ -90,6 +96,7 @@ const ProductCard = ({ product, handleAddToCart, isAdding }) => {
         >
           <AddShoppingCartIcon />
         </IconButton>
+
         <Box sx={{ ml: 'auto', pr: 1 }}>
           <Typography variant='subtitle1' fontWeight='bold'>
             {formatPrice(product.price)}
@@ -99,5 +106,6 @@ const ProductCard = ({ product, handleAddToCart, isAdding }) => {
     </Card>
   )
 }
+
 
 export default ProductCard

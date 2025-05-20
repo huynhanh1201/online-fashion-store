@@ -9,8 +9,6 @@ import { useNavigate } from 'react-router-dom'
 import { useDispatch } from 'react-redux'
 import { setSelectedItems as setSelectedItemsAction } from '~/redux/cart/cartSlice'
 
-
-
 const Cart = () => {
   const { cart, loading, deleteItem, clearCart, updateItem } = useCart()
   const [selectedItems, setSelectedItems] = useState([])
@@ -18,10 +16,6 @@ const Cart = () => {
   const [showMaxQuantityAlert, setShowMaxQuantityAlert] = useState(false)
   const navigate = useNavigate()
   const dispatch = useDispatch()
-
-
-
-
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'auto' })
@@ -50,13 +44,11 @@ const Cart = () => {
   const handleSelect = (id) => {
     const newSelected = selectedItems.includes(id)
       ? selectedItems.filter(i => i !== id)
-      : [...selectedItems, id];
+      : [...selectedItems, id]
 
     setSelectedItems(newSelected) // cập nhật local state
-    dispatch(setSelectedItemsAction(newSelected)); // cập nhật redux luôn
-  };
-
-
+    dispatch(setSelectedItemsAction(newSelected)) // cập nhật redux luôn
+  }
 
 
   const formatPrice = (val) =>
@@ -167,7 +159,10 @@ const Cart = () => {
                     <Box display='flex' alignItems='center' gap={2}>
                       <Box
                         sx={{ cursor: 'pointer' }}
-                        onClick={() => navigate(`/productdetail/${product._id}`)}
+                        onClick={() => {
+                          dispatch(setSelectedItemsAction([product._id]))
+                          navigate(`/productdetail/${product._id}`)
+                        }}
                       >
                         <Avatar
                           src={product.image?.[0] || '/default.jpg'}
@@ -258,9 +253,7 @@ const Cart = () => {
             color='primary'
             disabled={selectedItems.length === 0}
             onClick={() => {
-              // console.log('setSelectedItems:', setSelectedItems(selectedItems))
               dispatch(setSelectedItemsAction(selectedItems))
-
               navigate('/payment')
             }}
             sx={{ minWidth: 120 }}

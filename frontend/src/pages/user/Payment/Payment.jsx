@@ -22,12 +22,14 @@ import useCoupon from '~/hook/useCoupon'
 import { useCart } from '~/hook/useCarts'
 import { useOrder } from '~/hook/useOrder'
 import { useSelector } from 'react-redux'
+import { useDispatch } from 'react-redux'
+import { clearTempCart } from '~/redux/cart/cartSlice'
 
 const SectionTitle = styled(Typography)(({ theme }) => ({
   fontWeight: 700,
   fontSize: '1.1rem',
   marginBottom: theme.spacing(2),
-  textTransform: 'uppercase',
+  textTransform: 'uppercase'
 }))
 const ProductItem = ({ name, price, quantity, image }) => {
   // Validate product data
@@ -74,38 +76,52 @@ const Payment = () => {
   const { createOrder, loading: orderLoading } = useOrder()
   const { discount, discountMessage, loading: couponLoading, handleApplyVoucher, couponId } = useCoupon()
 
-  const cartItems = useSelector(state => state.cart.cartItems)
+
   const selectedItems = useSelector(state => state.cart.selectedItems)
   const selectedIds = useSelector(state => state.cart.selectedItems || [])
-  // Tính tổng tiền tạm tính (subtotal)
 
-  const selectedCartItems = []
+
+  const tempCart = useSelector((state) => state.cart.tempCart)
+  const cartCartItems = useSelector((state) => state.cart.cartItems)
+
+
+  const isBuyNow = tempCart?.cartItems?.length > 0
+  const cartItems = isBuyNow ? tempCart.cartItems : cartCartItems
+
+  // Tính selectedCartItems + subTotal
   let subTotal = 0
-
-  cartItems?.forEach(item => {
-    const rawId =
-      item.product?._id ||
-      (typeof item.productId === 'string' ? item.productId : item.productId?._id)
-
-    if (!rawId || !selectedIds.includes(rawId)) return
-
-    const product = item.product || item.productId || {}
-    const price = typeof product.price === 'number' ? product.price : 0
-    const quantity = typeof item.quantity === 'number' ? item.quantity : 1
-
-    subTotal += price * quantity
-
-    selectedCartItems.push({
-      productId: String(rawId),
-      quantity
+  const selectedCartItems = cartItems
+    .filter((item) => {
+      if (isBuyNow) return true // tính tất cả khi Buy Now
+      const productId = String(item.product?._id || item.productId?._id || item.productId)
+      return selectedIds.includes(productId)
     })
-  })
+    .map((item) => {
+      const product = item.product || item.productId || {}
+      const productId = String(product._id || item.productId?._id || item.productId)
+      const price = typeof product.price === 'number' ? product.price : 0
+      const quantity = typeof item.quantity === 'number' ? item.quantity : 1
+
+      subTotal += price * quantity
+
+      return { productId, quantity }
+    })
+
   const total = Math.max(subTotal - discount, 0)
+
+
   // const { addresses, fetchAddresses } = useAddress()
   // const [selectedAddress, setSelectedAddress] = useState(null)
   // Lấy địa chỉ mặc định khi có danh sách địa chỉ
   // useEffect(() => {
   // }, [fetchAddresses])
+  const dispatch = useDispatch()
+
+  useEffect(() => {
+    return () => {
+      dispatch(clearTempCart())
+    }
+  }, [])
 
   useEffect(() => {
     if (addresses.length > 0 && !selectedAddress) {
@@ -149,9 +165,6 @@ const Payment = () => {
       setSnackbar({ open: true, severity: 'error', message: err.message || 'Có lỗi xảy ra khi áp dụng mã giảm giá' })
     }
   }
-
-  // Kiểm tra productId hợp lệ (24 ký tự hex)
-
   // Xử lý đặt hàng
   const handlePlaceOrder = async () => {
     if (!selectedAddress) {
@@ -172,30 +185,31 @@ const Payment = () => {
       paymentMethod,
       note: note.trim() || undefined,
       couponCode: voucherApplied ? voucherInput : undefined,
-      couponId: voucherApplied ? couponId : undefined,
+      couponId: voucherApplied ? couponId : undefined
     }
 
     try {
       const result = await createOrder(orderData)
       setSnackbar({ open: true, severity: 'success', message: 'Đặt hàng thành công' })
+      dispatch(clearTempCart())
 
       if (typeof result === 'string' && result.startsWith('http')) {
         window.location.href = result
       } else {
-        setTimeout(() => window.location.reload(), 1500)
+        setTimeout(() => window.location.reload())
       }
     } catch (error) {
       setSnackbar({
         open: true,
         severity: 'error',
-        message: `Đặt hàng thất bại: ${error.message || error}`,
+        message: `Đặt hàng thất bại: ${error.message || error}`
       })
     }
   }
 
   return (
     <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-      <Container maxWidth="lg" sx={{ py: 4 } }>
+      <Container maxWidth="lg" sx={{ py: 4 }}>
         {cartLoading ? (
           <Box sx={{ textAlign: 'center', mt: 4 }}>
             <CircularProgress />

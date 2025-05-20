@@ -28,6 +28,11 @@ import { getProductById } from '~/services/productService'
 import AuthorizedAxiosInstance from '~/utils/authorizedAxios'
 import { getDiscounts } from '~/services/discountService'
 import ContentCopyIcon from '@mui/icons-material/ContentCopy' // Thêm import ở đầu file
+import { addToCart, getCart } from '~/services/cartService'
+import { useDispatch } from 'react-redux'
+import { setCartItems } from '~/redux/cart/cartSlice'
+import { useNavigate } from 'react-router-dom'
+import { setTempCart } from '~/redux/cart/cartSlice'
 
 // Utility format tiền gọn
 const formatCurrencyShort = (value) => {
@@ -76,35 +81,44 @@ const ProductDetail = () => {
   const [fadeIn, setFadeIn] = useState(true)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState(null)
-  const [openSnackbar, setOpenSnackbar] = useState(false)
   const [openVoucherDrawer, setOpenVoucherDrawer] = useState(false)
   const [coupons, setCoupons] = useState([])
+  const [copiedCode, setCopiedCode] = useState('')
+  const [snackbar, setSnackbar] = useState(null)
+  const [isAdding, setIsAdding] = useState(false)
+
+  const dispatch = useDispatch()
+  const navigate = useNavigate()
 
   const colors = ['Đen', 'Trắng', 'Xanh', 'Đỏ']
   const sizes = ['S', 'M', 'L', 'XL']
 
+  // Fetch product detail
   const fetchProduct = useCallback(async () => {
     setIsLoading(true)
+    setError(null)
+    if (!productId || !/^[0-9a-fA-F]{24}$/.test(productId)) {
+      setError('ID sản phẩm không hợp lệ.')
+      setIsLoading(false)
+      return
+    }
     try {
-      if (!productId || !/^[0-9a-fA-F]{24}$/.test(productId)) {
-        throw new Error('ID sản phẩm không hợp lệ.')
-      }
       const data = await getProductById(productId)
-      if (data && Object.keys(data).length > 0) {
+      if (data && Object.keys(data).length) {
         setProduct({
           ...data,
-          images: data.images || data.image || ['/default.jpg'],
-          name: data.name || 'Sản phẩm không tên'
+          images: data.images || data.image ? (Array.isArray(data.images) ? data.images : [data.image]) : ['/default.jpg'],
+          name: data.name || 'Sản phẩm không tên',
         })
       } else {
         setError('Sản phẩm không tồn tại.')
       }
-    } catch (error) {
-      const errorMessage =
-        error?.response?.data?.message ||
-        error.message ||
+    } catch (err) {
+      setError(
+        err?.response?.data?.message ||
+        err.message ||
         'Không thể tải thông tin sản phẩm.'
-      setError(errorMessage)
+      )
     } finally {
       setIsLoading(false)
     }
@@ -118,17 +132,17 @@ const ProductDetail = () => {
     const fetchCoupons = async () => {
       try {
         const { discounts } = await getDiscounts()
-        const latestCoupons = discounts.sort(
+        const sortedCoupons = discounts.sort(
           (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
         )
-        setCoupons(latestCoupons)
+        setCoupons(sortedCoupons)
       } catch (err) {
         console.error('Lỗi khi lấy coupon:', err)
       }
     }
     fetchCoupons()
   }, [])
-  const [copiedCode, setCopiedCode] = useState('')
+
 
   const handleCopy = (code) => {
     navigator.clipboard.writeText(code)
@@ -136,7 +150,9 @@ const ProductDetail = () => {
     setTimeout(() => setCopiedCode(''), 2000)
   }
 
+
   const handleImageClick = (index) => {
+    if (index === selectedImageIndex) return
     setFadeIn(false)
     setTimeout(() => {
       setSelectedImageIndex(index)
@@ -144,25 +160,74 @@ const ProductDetail = () => {
     }, 150)
   }
 
+  // Thêm sản phẩm vào giỏ hàng và check SL
   const handleAddToCart = async () => {
+    if (isAdding) return
+    if (!product) return
+
+    setIsAdding(true)
     try {
-      if (!product?._id || !/^[0-9a-fA-F]{24}$/.test(product._id)) {
-        throw new Error('ID sản phẩm không hợp lệ để thêm vào giỏ hàng.')
+      const updatedCart = await getCart()
+      const existingItem = updatedCart?.cartItems?.find(
+        (item) => item.productId._id === product._id
+      )
+      const currentQty = existingItem?.quantity || 0
+
+      if (currentQty + quantity > product.quantity) {
+        setSnackbar({
+          type: 'warning',
+          message: 'Không thể vượt quá số lượng tồn kho!',
+        })
+        return
       }
-      await AuthorizedAxiosInstance.post('/v1/cart', {
-        productId: product._id,
-        quantity,
-        color,
-        size
+
+      const res = await addToCart({
+        cartItems: [{ productId: product._id, quantity }],
       })
-      setOpenSnackbar(true)
+
+      dispatch(setCartItems(res?.cartItems || updatedCart?.cartItems || []))
+      setSnackbar({
+        type: 'success',
+        message: 'Thêm sản phẩm vào giỏ hàng thành công!',
+      })
+      setQuantity(1)
     } catch (error) {
-      const errorMessage =
-        error?.response?.data?.message ||
-        'Không thể thêm sản phẩm vào giỏ hàng.'
-      setError(errorMessage)
+      console.error('Lỗi khi thêm vào giỏ:', error)
+      setSnackbar({
+        type: 'error',
+        message: 'Không thể thêm sản phẩm vào giỏ hàng!',
+      })
+    } finally {
+      setIsAdding(false)
     }
   }
+
+  // Giảm SL
+  const handleIncrease = () => {
+    if (product && quantity < product.quantity) {
+      setQuantity((prev) => prev + 1)
+    }
+  }
+
+  // Buy now: set temp cart & navigate to payment
+  const handleBuyNow = () => {
+    if (!product) return
+
+    const itemToBuy = {
+      productId: product._id,
+      quantity,
+      product: {
+        _id: product._id,
+        name: product.name,
+        price: product.price,
+        image: product.image || (product.images && product.images[0]) || '',
+      },
+    }
+
+    dispatch(setTempCart({ cartItems: [itemToBuy] }))
+    navigate('/payment')
+  }
+
 
   if (isLoading) {
     return (
@@ -278,11 +343,10 @@ const ProductDetail = () => {
                   .map((coupon) => (
                     <VoucherChip
                       key={coupon.code}
-                      label={`VOUCHER ${
-                        coupon.type === 'percent'
-                          ? `${coupon.amount}%`
-                          : `${coupon.amount.toLocaleString()}đ`
-                      }`}
+                      label={`VOUCHER ${coupon.type === 'percent'
+                        ? `${coupon.amount}%`
+                        : `${coupon.amount.toLocaleString()}đ`
+                        }`}
                       onClick={() => setOpenVoucherDrawer(true)}
                     />
                   ))}
@@ -302,12 +366,12 @@ const ProductDetail = () => {
                     sx={
                       color === c
                         ? {
-                            backgroundColor: '#1A3C7B',
-                            color: '#fff',
-                            '&:hover': {
-                              backgroundColor: '#162f63'
-                            }
+                          backgroundColor: '#1A3C7B',
+                          color: '#fff',
+                          '&:hover': {
+                            backgroundColor: '#162f63'
                           }
+                        }
                         : {}
                     }
                   >
@@ -330,12 +394,12 @@ const ProductDetail = () => {
                     sx={
                       size === s
                         ? {
-                            backgroundColor: '#1A3C7B',
-                            color: '#fff',
-                            '&:hover': {
-                              backgroundColor: '#162f63'
-                            }
+                          backgroundColor: '#1A3C7B',
+                          color: '#fff',
+                          '&:hover': {
+                            backgroundColor: '#162f63'
                           }
+                        }
                         : undefined
                     }
                   >
@@ -354,7 +418,7 @@ const ProductDetail = () => {
               >
                 <RemoveIcon />
               </IconButton>
-              <TextField
+              {/* <TextField
                 size='small'
                 value={quantity === '' ? '' : quantity}
                 onChange={(e) => {
@@ -365,24 +429,37 @@ const ProductDetail = () => {
                 }}
                 inputProps={{ style: { textAlign: 'center' }, min: 1 }}
                 sx={{ width: 60 }}
+              /> */}
+              <TextField
+                value={quantity === '' ? '' : quantity}
+                size='small'
+                sx={{ width: 50, mx: 1 }}
+                inputProps={{ style: { textAlign: 'center' }, readOnly: true }}
               />
-              <IconButton onClick={() => setQuantity((q) => Number(q) + 1)}>
+              <IconButton
+                onClick={handleIncrease}
+                disabled={quantity >= product.quantity}
+              >
                 <AddIcon />
               </IconButton>
+              <Typography color="text.secondary" ml={2}>
+                Kho: {product.quantity}
+              </Typography>
             </Box>
 
             {/* Nút thao tác */}
             <Box sx={{ display: 'flex', gap: 2 }}>
               <Button
-                variant='contained'
+                variant="contained"
                 onClick={handleAddToCart}
+                disabled={!!isAdding[product._id]}
                 sx={{ backgroundColor: '#1A3C7B', color: 'white' }}
               >
-                Thêm vào giỏ
+                Thêm vào giỏ hàng
               </Button>
               <Button
                 variant='outlined'
-                onClick={() => alert('Chức năng Mua ngay chưa hỗ trợ')}
+                onClick={handleBuyNow}
                 sx={{ backgroundColor: '#1A3C7B', color: 'white' }}
               >
                 Mua ngay
@@ -391,7 +468,6 @@ const ProductDetail = () => {
           </Box>
         </Grid>
       </Grid>
-
       {/* Mô tả sản phẩm */}
       <Box sx={{ mt: 5 }}>
         <Typography variant='h6'>MÔ TẢ SẢN PHẨM</Typography>
@@ -402,12 +478,17 @@ const ProductDetail = () => {
 
       {/* Snackbar + Drawer */}
       <Snackbar
-        open={openSnackbar}
+        open={!!snackbar}
         autoHideDuration={3000}
-        onClose={() => setOpenSnackbar(false)}
+        onClose={() => setSnackbar(null)}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
       >
-        <Alert severity='success' onClose={() => setOpenSnackbar(false)}>
-          Thêm sản phẩm vào giỏ hàng thành công!
+        <Alert
+          onClose={() => setSnackbar(null)}
+          severity={snackbar?.type}
+          sx={{ width: '100%' }}
+        >
+          {snackbar?.message}
         </Alert>
       </Snackbar>
 
