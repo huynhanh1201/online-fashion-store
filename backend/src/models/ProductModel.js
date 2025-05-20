@@ -48,19 +48,6 @@ const productSchema = new Schema(
     destroy: {
       type: Boolean,
       default: false // Soft-delete mặc định là false
-    },
-    origin: {
-      type: String,
-      required: true, // Quốc gia hoặc nơi sản xuất chính của sản phẩm
-      default: 'Việt Nam'
-    },
-    sizes: {
-      type: [String],
-      required: true // Kích cỡ (ví dụ: ["S", "M", "L"])
-    },
-    colors: {
-      type: [String],
-      required: true // Màu sắc (ví dụ: ["Red", "Blue", "Black"])
     }
   },
   {

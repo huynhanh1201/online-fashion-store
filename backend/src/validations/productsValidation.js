@@ -45,21 +45,7 @@ const product = async (req, res, next) => {
       .min(1) // ít nhất 1 ảnh
       .required(), // bắt buộc
 
-    categoryId: Joi.string().length(24).hex().required(),
-
-    origin: Joi.string()
-      .default('Việt Nam') // Giá trị mặc định nếu không truyền
-      .required(), // Bắt buộc phải có trường này :contentReference[oaicite:3]{index=3}
-
-    sizes: Joi.array()
-      .items(Joi.string()) // Mỗi phần tử phải là chuỗi :contentReference[oaicite:4]{index=4}
-      .min(1) // Tối thiểu 1 phần tử, tuỳ chọn
-      .required(), // Bắt buộc phải có trường này :contentReference[oaicite:5]{index=5}
-
-    colors: Joi.array()
-      .items(Joi.string()) // Mỗi phần tử phải là chuỗi :contentReference[oaicite:6]{index=6}
-      .min(1) // Tối thiểu 1 phần tử, tuỳ chọn
-      .required() // Bắt buộc phải có trường này :contentReference[oaicite:7]{index=7}
+    categoryId: Joi.string().length(24).hex().required()
   })
 
   try {
