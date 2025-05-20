@@ -11,26 +11,26 @@ const colorPaletteSchema = new Schema(
       required: true,
       index: true // tạo index để truy vấn nhanh theo product
     },
-
-    // Tên màu hiển thị
-    name: {
-      type: String,
-      required: true,
-      trim: true // tự động loại bỏ khoảng trắng đầu/cuối
-    },
-
-    // Hình ảnh minh họa cho màu (có thể là URL hoặc đường dẫn)
-    image: {
-      type: String,
-      required: true,
-      trim: true // tự động loại bỏ khoảng trắng đầu/cuối
-    },
-
-    // Cờ bật/tắt màu trong UI
-    isActive: {
-      type: Boolean,
-      default: true
-    }
+    colors: [
+      {
+        name: {
+          type: String,
+          required: true,
+          trim: true,
+          minlength: 1,
+          maxlength: 100
+        },
+        image: {
+          type: String,
+          required: true,
+          trim: true
+        },
+        isActive: {
+          type: Boolean,
+          default: true
+        }
+      }
+    ]
   },
   {
     // Tự động thêm createdAt & updatedAt
