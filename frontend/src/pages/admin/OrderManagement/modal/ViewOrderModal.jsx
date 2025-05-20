@@ -41,7 +41,7 @@ function ViewOrderModal({
     }
     return map[status] || '—'
   }
-  console.log('orderDetails', orderDetails)
+  console.log('order', order)
   return (
     <Dialog
       open={open}
@@ -86,14 +86,14 @@ function ViewOrderModal({
               <strong>Mã đơn hàng:</strong> {order._id}
             </Typography>
             <Typography>
-              <strong>Người nhận:</strong> {order.shippingAddressId?.fullName}
+              <strong>Người nhận:</strong> {order.shippingAddress?.fullName}
             </Typography>
             <Typography>
-              <strong>SĐT:</strong> {order.shippingAddressId?.phone}
+              <strong>SĐT:</strong> {order.shippingAddress?.phone}
             </Typography>
             <Typography>
               <strong>Địa chỉ giao hàng:</strong>{' '}
-              {`${order.shippingAddressId?.address}, ${order.shippingAddressId?.ward}, ${order.shippingAddressId?.district}, ${order.shippingAddressId?.city}`}
+              {`${order.shippingAddress?.address}, ${order.shippingAddress?.ward}, ${order.shippingAddress?.district}, ${order.shippingAddress?.city}`}
             </Typography>
             <Typography>
               <strong>Phương thức thanh toán:</strong>{' '}
