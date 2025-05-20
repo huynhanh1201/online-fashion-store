@@ -115,9 +115,10 @@ const ViewTransactionModal = ({ open, onClose, transaction }) => {
               ...StyleAdmin.InputCustom.CursorNone
             }}
           />
+
           <TextField
             label='Ghi chú'
-            value={transaction.note || '-'}
+            value={transaction.note || ' '}
             multiline
             rows={3}
             fullWidth
