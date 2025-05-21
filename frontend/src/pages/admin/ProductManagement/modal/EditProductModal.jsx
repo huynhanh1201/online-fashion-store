@@ -1,5 +1,4 @@
 import React, { useEffect, useState, useRef } from 'react'
-
 import Dialog from '@mui/material/Dialog'
 import DialogTitle from '@mui/material/DialogTitle'
 import DialogContent from '@mui/material/DialogContent'
@@ -14,16 +13,36 @@ import InputLabel from '@mui/material/InputLabel'
 import MenuItem from '@mui/material/MenuItem'
 import Divider from '@mui/material/Divider'
 import IconButton from '@mui/material/IconButton'
-import Chip from '@mui/material/Chip'
-
-import DeleteIcon from '@mui/icons-material/Delete'
+import List from '@mui/material/List'
+import ListItem from '@mui/material/ListItem'
+import ListItemText from '@mui/material/ListItemText'
+import ListItemAvatar from '@mui/material/ListItemAvatar'
+import Avatar from '@mui/material/Avatar'
 import EditIcon from '@mui/icons-material/Edit'
-import CancelIcon from '@mui/icons-material/Cancel'
-
+import DeleteIcon from '@mui/icons-material/Delete'
 import { useForm, Controller } from 'react-hook-form'
-
 import useCategories from '~/hook/admin/useCategories'
+import useColorPalettes from '~/hook/admin/useColorPalettes'
 import StyleAdmin from '~/components/StyleAdmin'
+
+const URI = 'https://api.cloudinary.com/v1_1/dkwsy9sph/image/upload'
+const CloudinaryProduct = 'product_upload'
+const CloudinaryColor = 'color_upload'
+
+const uploadToCloudinary = async (file, folder = CloudinaryProduct) => {
+  const formData = new FormData()
+  formData.append('file', file)
+  formData.append('upload_preset', 'demo_unsigned')
+  formData.append('folder', folder)
+
+  const res = await fetch(URI, {
+    method: 'POST',
+    body: formData
+  })
+
+  const data = await res.json()
+  return data.secure_url
+}
 
 const EditProductModal = ({ open, onClose, product, onSave }) => {
   const {
@@ -32,32 +51,64 @@ const EditProductModal = ({ open, onClose, product, onSave }) => {
     handleSubmit,
     reset,
     formState: { errors, isSubmitting }
-  } = useForm()
+  } = useForm({
+    defaultValues: {
+      name: '',
+      description: '',
+      price: '',
+      quantity: '',
+      categoryId: '',
+      colors: []
+    }
+  })
 
   const [images, setImages] = useState([{ file: null, preview: '' }])
+  const [colorInput, setColorInput] = useState('')
+  const [colorImage, setColorImage] = useState(null)
+  const [colorImagePreview, setColorImagePreview] = useState('')
+  const [colorList, setColorList] = useState([])
+  const [editingColor, setEditingColor] = useState(null) // Trạng thái màu đang sửa
   const fileInputRefs = useRef([])
-  const { categories, loading, fetchCategories } = useCategories()
+  const colorFileInputRef = useRef(null)
+  const {
+    categories,
+    loading: categoryLoading,
+    fetchCategories
+  } = useCategories()
+  const {
+    colorPalettes,
+    loading: colorLoading,
+    addColorPalette
+  } = useColorPalettes()
 
   useEffect(() => {
-    if (product) {
+    if (product && open) {
       reset({
         name: product.name || '',
         description: product.description || '',
         price: product.price || '',
         quantity: product.quantity || '',
         categoryId: product.categoryId?._id || '',
-        origin: product.origin || '',
-        sizes: product.sizes || [],
-        colors: Array.isArray(product.colors)
-          ? product.colors.map((c) => (typeof c === 'string' ? c : c.color))
-          : []
+        colors: product.colors || []
       })
 
+      // Load hình ảnh sản phẩm
       const previews =
         product.image?.map((url) => ({ file: null, preview: url })) || []
       setImages([...previews, { file: null, preview: '' }])
+
+      // Load danh sách màu từ product.colors
+      setColorList(
+        Array.isArray(product.colors)
+          ? product.colors.map((c) =>
+              typeof c === 'string'
+                ? { name: c, image: '' }
+                : { name: c.name, image: c.image || '' }
+            )
+          : []
+      )
     }
-  }, [product, reset])
+  }, [product, reset, open])
 
   useEffect(() => {
     if (open) fetchCategories()
@@ -77,40 +128,125 @@ const EditProductModal = ({ open, onClose, product, onSave }) => {
   const handleImageDelete = (index) => {
     const updated = [...images]
     updated.splice(index, 1)
+    if (updated.length === 0 || updated[updated.length - 1].file) {
+      updated.push({ file: null, preview: '' })
+    }
     setImages(updated)
   }
 
-  const onSubmit = (data) => {
-    const imageUrls = images
-      .filter((img) => img.preview)
-      .map((img) => img.preview)
-
-    const updatedProduct = {
-      name: data.name,
-      description: data.description,
-      price: Number(data.price),
-      quantity: Number(data.quantity),
-      categoryId: data.categoryId,
-      origin: data.origin,
-      sizes: data.sizes || [],
-      colors: data.colors || [],
-      image: imageUrls
+  const handleColorImageChange = (e) => {
+    const file = e.target.files[0]
+    if (file) {
+      setColorImage(file)
+      setColorImagePreview(URL.createObjectURL(file))
     }
-
-    onSave(product._id, updatedProduct)
-    onClose()
-  }
-  const colorMap = {
-    Đỏ: '#f44336',
-    'Xanh dương': '#2196f3',
-    Đen: '#212121',
-    Trắng: '#e0e0e0',
-    Vàng: '#ffeb3b'
   }
 
-  const textColorMap = {
-    Trắng: '#000'
+  const handleAddOrEditColor = async (e) => {
+    e.preventDefault()
+    if (
+      colorInput.trim() &&
+      (colorImage || (editingColor && editingColor.image))
+    ) {
+      try {
+        let imageUrl = editingColor?.image || ''
+        if (colorImage) {
+          imageUrl = await uploadToCloudinary(colorImage, CloudinaryColor)
+        }
+
+        const colorData = { name: colorInput.trim(), image: imageUrl }
+
+        if (editingColor) {
+          // Cập nhật màu trong colorList
+          setColorList(
+            colorList.map((color) =>
+              color.name === editingColor.name ? colorData : color
+            )
+          )
+        } else {
+          // Thêm màu mới vào API và colorList
+          const newColor = await addColorPalette(colorData)
+          setColorList([
+            ...colorList,
+            { name: newColor.name, image: newColor.image }
+          ])
+        }
+
+        // Reset form
+        setColorInput('')
+        setColorImage(null)
+        setColorImagePreview('')
+        setEditingColor(null)
+        if (colorFileInputRef.current) {
+          colorFileInputRef.current.value = ''
+        }
+      } catch (error) {
+        console.error('Lỗi khi thêm/cập nhật màu:', error)
+        alert('Không thể thêm/cập nhật màu, vui lòng thử lại')
+      }
+    } else {
+      alert('Vui lòng nhập tên màu và chọn ảnh (nếu thêm mới)')
+    }
   }
+
+  const handleEditColor = (color) => {
+    setEditingColor(color)
+    setColorInput(color.name)
+    setColorImagePreview(color.image || '')
+    setColorImage(null)
+  }
+
+  const handleRemoveColor = (colorToRemove) => {
+    setColorList(colorList.filter((color) => color.name !== colorToRemove.name))
+    if (editingColor?.name === colorToRemove.name) {
+      // Reset form nếu màu đang sửa bị xóa
+      setEditingColor(null)
+      setColorInput('')
+      setColorImage(null)
+      setColorImagePreview('')
+      if (colorFileInputRef.current) {
+        colorFileInputRef.current.value = ''
+      }
+    }
+  }
+
+  const onSubmit = async (data) => {
+    try {
+      const imageUrls = []
+      for (const img of images) {
+        if (img.file && img.preview.startsWith('blob:')) {
+          const url = await uploadToCloudinary(img.file)
+          imageUrls.push(url)
+        } else if (img.preview) {
+          imageUrls.push(img.preview)
+        }
+      }
+
+      const updatedProduct = {
+        name: data.name,
+        description: data.description,
+        price: Number(data.price),
+        quantity: Number(data.quantity),
+        categoryId: data.categoryId,
+        colors: colorList, // Gửi mảng colorList với cấu trúc [{ name, image }]
+        image: imageUrls
+      }
+
+      await onSave(product._id, updatedProduct)
+      onClose()
+      reset()
+      setImages([{ file: null, preview: '' }])
+      setColorList([])
+      setColorInput('')
+      setColorImage(null)
+      setColorImagePreview('')
+      setEditingColor(null)
+    } catch (error) {
+      console.error('Lỗi khi chỉnh sửa sản phẩm:', error)
+      alert('Có lỗi xảy ra, vui lòng thử lại')
+    }
+  }
+
   return (
     <Dialog
       open={open}
@@ -126,7 +262,6 @@ const EditProductModal = ({ open, onClose, product, onSave }) => {
 
       <form onSubmit={handleSubmit(onSubmit)}>
         <DialogContent sx={{ display: 'flex', gap: 3, py: 3 }}>
-          {/* Bên trái: thông tin sản phẩm */}
           <Box sx={{ flex: 2 }}>
             <TextField
               label='Tên sản phẩm'
@@ -178,138 +313,134 @@ const EditProductModal = ({ open, onClose, product, onSave }) => {
                 sx={StyleAdmin.InputCustom}
               />
             </Box>
-            <TextField
-              label='Xuất xứ'
-              fullWidth
-              margin='normal'
-              {...register('origin')}
-              sx={StyleAdmin.InputCustom}
-            />
-            <Box sx={{ display: 'flex', gap: 2 }}>
-              <FormControl fullWidth margin='normal' sx={StyleAdmin.FormSelect}>
-                <InputLabel>Kích thước</InputLabel>
-                <Controller
-                  name='sizes'
-                  control={control}
-                  render={({ field }) => {
-                    const handleDelete = (event, itemToDelete) => {
-                      event.stopPropagation()
-                      const newValue = (field.value || []).filter(
-                        (item) => item !== itemToDelete
+            <Box sx={{ mt: 2 }}>
+              <Typography variant='subtitle1' sx={{ mb: 1 }}>
+                Màu sắc
+              </Typography>
+              <Box
+                sx={{ display: 'flex', gap: 1, mb: 2, alignItems: 'center' }}
+              >
+                <FormControl fullWidth sx={StyleAdmin.FormSelect}>
+                  <InputLabel>Chọn màu</InputLabel>
+                  <Select
+                    value=''
+                    onChange={(e) => {
+                      const selectedColor = colorPalettes.find(
+                        (c) => c._id === e.target.value
                       )
-                      field.onChange(newValue)
-                    }
-
-                    return (
-                      <Select
-                        {...field}
-                        label='Kích thước'
-                        multiple
-                        value={field.value || []}
-                        onChange={(event) => field.onChange(event.target.value)}
-                        renderValue={(selected) => (
-                          <Box
-                            sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}
-                          >
-                            {selected.map((value) => (
-                              <Chip
-                                key={value}
-                                label={value}
-                                onDelete={(e) => handleDelete(e, value)}
-                                deleteIcon={
-                                  <CancelIcon
-                                    onMouseDown={(e) => e.stopPropagation()}
-                                  />
-                                }
-                                sx={{
-                                  color: '#000',
-                                  '& .MuiChip-deleteIcon': {
-                                    color: '#000'
-                                  }
-                                }}
-                              />
-                            ))}
-                          </Box>
-                        )}
-                        MenuProps={{
-                          PaperProps: { sx: StyleAdmin.FormSelect.SelectMenu }
-                        }}
-                      >
-                        {['S', 'M', 'L', 'XL'].map((size) => (
-                          <MenuItem key={size} value={size}>
-                            {size}
-                          </MenuItem>
-                        ))}
-                      </Select>
-                    )
-                  }}
+                      if (
+                        selectedColor &&
+                        !colorList.some((c) => c.name === selectedColor.name)
+                      ) {
+                        setColorList([
+                          ...colorList,
+                          {
+                            name: selectedColor.name,
+                            image: selectedColor.image || ''
+                          }
+                        ])
+                      } else if (selectedColor) {
+                        alert('Màu này đã được chọn')
+                      }
+                    }}
+                    disabled={colorLoading}
+                  >
+                    {colorPalettes.map((color) => (
+                      <MenuItem key={color._id} value={color._id}>
+                        {color.name}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+                <Typography variant='subtitle2' sx={{ mx: 1 }}>
+                  hoặc
+                </Typography>
+                <TextField
+                  label={editingColor ? 'Sửa tên màu' : 'Tên màu mới'}
+                  value={colorInput}
+                  onChange={(e) => setColorInput(e.target.value)}
+                  sx={StyleAdmin.InputCustom}
+                  style={{ flex: 1 }}
                 />
-              </FormControl>
-
-              <FormControl fullWidth margin='normal' sx={StyleAdmin.FormSelect}>
-                <InputLabel>Màu sắc</InputLabel>
-                <Controller
-                  name='colors'
-                  control={control}
-                  render={({ field }) => {
-                    const handleDelete = (event, itemToDelete) => {
-                      event.stopPropagation()
-                      const newValue = (field.value || []).filter(
-                        (item) => item !== itemToDelete
-                      )
-                      field.onChange(newValue)
-                    }
-
-                    return (
-                      <Select
-                        {...field}
-                        label='Màu sắc'
-                        multiple
-                        value={field.value || []}
-                        onChange={(event) => field.onChange(event.target.value)}
-                        renderValue={(selected) => (
-                          <Box
-                            sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}
-                          >
-                            {selected.map((value) => (
-                              <Chip
-                                key={value}
-                                label={value}
-                                onDelete={(e) => handleDelete(e, value)}
-                                deleteIcon={
-                                  <CancelIcon
-                                    onMouseDown={(e) => e.stopPropagation()}
-                                  />
-                                }
-                                sx={{
-                                  backgroundColor: colorMap[value] || 'default',
-                                  color: textColorMap[value] || '#fff',
-                                  '& .MuiChip-deleteIcon': {
-                                    color: textColorMap[value] || '#fff'
-                                  }
-                                }}
-                              />
-                            ))}
-                          </Box>
-                        )}
-                        MenuProps={{
-                          PaperProps: { sx: StyleAdmin.FormSelect.SelectMenu }
-                        }}
-                      >
-                        {['Đỏ', 'Xanh dương', 'Đen', 'Trắng', 'Vàng'].map(
-                          (color) => (
-                            <MenuItem key={color} value={color}>
-                              {color}
-                            </MenuItem>
-                          )
-                        )}
-                      </Select>
-                    )
+                <Button
+                  variant='outlined'
+                  component='label'
+                  sx={{
+                    height: '56px',
+                    borderColor: '#000',
+                    color: '#000'
                   }}
-                />
-              </FormControl>
+                >
+                  Chọn ảnh
+                  <input
+                    type='file'
+                    accept='image/*'
+                    hidden
+                    ref={colorFileInputRef}
+                    onChange={handleColorImageChange}
+                  />
+                </Button>
+                <Button
+                  variant='contained'
+                  onClick={handleAddOrEditColor}
+                  disabled={
+                    !colorInput.trim() || (!colorImage && !editingColor?.image)
+                  }
+                  sx={{ backgroundColor: '#001f5d', height: '56px' }}
+                >
+                  {editingColor ? 'Cập nhật' : 'Thêm'}
+                </Button>
+              </Box>
+              {colorImagePreview && (
+                <Box sx={{ mb: 2 }}>
+                  <Typography variant='caption'>Xem trước ảnh:</Typography>
+                  <Box
+                    component='img'
+                    src={colorImagePreview}
+                    alt='color-preview'
+                    sx={{
+                      width: '100px',
+                      height: '100px',
+                      objectFit: 'cover',
+                      borderRadius: 1
+                    }}
+                  />
+                </Box>
+              )}
+              <List sx={{ maxHeight: '150px', overflowY: 'auto' }}>
+                {colorList.map((color, index) => (
+                  <ListItem
+                    key={index}
+                    secondaryAction={
+                      <Box>
+                        <IconButton
+                          edge='end'
+                          onClick={() => handleEditColor(color)}
+                          sx={{ mr: 1 }}
+                        >
+                          <EditIcon sx={{ color: '#2196f3' }} />
+                        </IconButton>
+                        <IconButton
+                          edge='end'
+                          onClick={() => handleRemoveColor(color)}
+                        >
+                          <DeleteIcon sx={{ color: '#f44336' }} />
+                        </IconButton>
+                      </Box>
+                    }
+                  >
+                    <ListItemAvatar>
+                      <Avatar
+                        src={color.image}
+                        alt={color.name}
+                        sx={{ width: 40, height: 40 }}
+                      />
+                    </ListItemAvatar>
+                    <ListItemText primary={color.name} />
+                  </ListItem>
+                ))}
+              </List>
             </Box>
-
             <FormControl
               fullWidth
               margin='normal'
@@ -330,7 +461,7 @@ const EditProductModal = ({ open, onClose, product, onSave }) => {
                         sx: StyleAdmin.FormSelect.SelectMenu
                       }
                     }}
-                    disabled={loading}
+                    disabled={categoryLoading}
                   >
                     {categories
                       ?.filter((cat) => !cat.destroy)
@@ -348,7 +479,6 @@ const EditProductModal = ({ open, onClose, product, onSave }) => {
             </FormControl>
           </Box>
 
-          {/* Bên phải: hình ảnh */}
           <Box sx={{ flex: 1 }}>
             <Typography variant='subtitle1' sx={{ mb: 1 }}>
               Hình ảnh sản phẩm (tối đa 9 ảnh)
@@ -428,8 +558,6 @@ const EditProductModal = ({ open, onClose, product, onSave }) => {
                             <EditIcon sx={{ fontSize: 18, color: '#2196f3' }} />
                           </IconButton>
                         </Box>
-
-                        {/* Icon xoá ở góc trên bên phải */}
                         <Box
                           sx={{
                             position: 'absolute',
