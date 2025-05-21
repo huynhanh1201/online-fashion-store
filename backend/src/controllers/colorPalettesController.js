@@ -17,6 +17,7 @@ const createColorPalette = async (req, res, next) => {
 const getColorPaletteList = async (req, res, next) => {
   try {
     const colorPaletteId = req.params.colorPaletteId
+    console.log('req.params', req.params)
     // Lấy danh sách Danh mục sản phẩm từ tầng Service chuyển qua
     const result =
       await colorPalettesService.getColorPaletteList(colorPaletteId)
