@@ -15,7 +15,7 @@ import {
 import EditProfileModal from './modal/EditProfileModal.jsx'
 import StyleAdmin, {
   readOnlyBottomBorderInputSx
-} from '~/components/StyleAdmin.jsx'
+} from '~/assets/StyleAdmin.jsx'
 export default function ProfileModal({ open, onClose, profile, fetchProfile }) {
   const [openEdit, setOpenEdit] = useState(false)
 

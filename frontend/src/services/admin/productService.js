@@ -1,32 +1,8 @@
 /* eslint-disable no-console */
 // services/productService.js
-import AuthorizedAxiosInstance from '~/utils/authorizedAxios.js'
-import { API_ROOT } from '~/utils/constants.js'
 
-export const buildQueryString = (params) => {
-  const query = Object.entries(params)
-    .filter(([, value]) => value !== undefined && value !== '')
-    .map(([key, value]) => `${key}=${encodeURIComponent(value)}`)
-    .join('&')
-  return query ? `?${query}` : ''
-}
+//
 
-export const getProducts = async (params = {}) => {
-  try {
-    const queryString = buildQueryString(params)
-    const response = await AuthorizedAxiosInstance.get(
-      `${API_ROOT}/v1/products${queryString}`
-    )
-    return {
-      products: response.data.data || [],
-      total: response.data.meta?.total || 0,
-      totalPages: response.data.meta?.totalPages || 1
-    }
-  } catch (error) {
-    console.error('Lỗi khi lấy danh sách sản phẩm:', error)
-    return { products: [], total: 0, totalPages: 1 }
-  }
-}
 // Lấy danh sách sản phẩm (phân trang)
 // export const getProducts = async (page, limit) => {
 //   try {
@@ -121,6 +97,35 @@ export const getProducts = async (params = {}) => {
 //   }
 // }
 
+//
+import AuthorizedAxiosInstance from '~/utils/authorizedAxios.js'
+import { API_ROOT } from '~/utils/constants.js'
+
+export const buildQueryString = (params) => {
+  const query = Object.entries(params)
+    .filter(([, value]) => value !== undefined && value !== '')
+    .map(([key, value]) => `${key}=${encodeURIComponent(value)}`)
+    .join('&')
+  return query ? `?${query}` : ''
+}
+
+export const getProducts = async (params = {}) => {
+  try {
+    const queryString = buildQueryString(params)
+    const response = await AuthorizedAxiosInstance.get(
+      `${API_ROOT}/v1/products${queryString}`
+    )
+    return {
+      products: response.data.data || [],
+      total: response.data.meta?.total || 0,
+      totalPages: response.data.meta?.totalPages || 1
+    }
+  } catch (error) {
+    console.error('Lỗi khi lấy danh sách sản phẩm:', error)
+    return { products: [], total: 0, totalPages: 1 }
+  }
+}
+
 export const getProductById = async (productId) => {
   try {
     if (typeof productId !== 'string' || !productId) {
@@ -179,3 +184,5 @@ export const addProduct = async (data) => {
     return error
   }
 }
+
+// color

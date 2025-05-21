@@ -9,7 +9,7 @@ import dayjs from 'dayjs'
 import StyleAdmin, {
   StyledTableCell,
   StyledTableRow
-} from '~/components/StyleAdmin'
+} from '~/assets/StyleAdmin.jsx'
 
 const OrderRow = ({ order, index, onView, onEdit, onDelete }) => {
   const {

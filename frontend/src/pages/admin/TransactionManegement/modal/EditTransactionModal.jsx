@@ -16,7 +16,7 @@ import Select from '@mui/material/Select'
 
 import { useForm } from 'react-hook-form'
 
-import StyleAdmin from '~/components/StyleAdmin'
+import StyleAdmin from '~/assets/StyleAdmin.jsx'
 
 const EditTransactionModal = ({
   open,
@@ -65,7 +65,7 @@ const EditTransactionModal = ({
           />
           <TextField
             label='Phương thức thanh toán'
-            value={transaction.method}
+            value={transaction.method.toUpperCase()}
             fullWidth
             InputProps={{ readOnly: true }}
             sx={{

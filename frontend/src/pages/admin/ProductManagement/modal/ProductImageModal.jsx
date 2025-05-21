@@ -6,7 +6,7 @@ import DialogContent from '@mui/material/DialogContent'
 import DialogActions from '@mui/material/DialogActions'
 import Button from '@mui/material/Button'
 
-import styleAdmin from '~/components/StyleAdmin'
+import styleAdmin from '~/assets/StyleAdmin.jsx'
 
 const ProductImageModal = ({ open, onClose, imageSrc, productName }) => {
   return (

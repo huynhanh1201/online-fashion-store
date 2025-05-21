@@ -18,7 +18,7 @@ import TableCell from '@mui/material/TableCell'
 import TableBody from '@mui/material/TableBody'
 
 import dayjs from 'dayjs'
-import styleAdmin from '~/components/StyleAdmin'
+import styleAdmin from '~/assets/StyleAdmin.jsx'
 
 function ViewOrderModal({
   open,
@@ -194,9 +194,7 @@ function ViewOrderModal({
                   </Typography>
                   <Typography>
                     <strong>Quyền: </strong>{' '}
-                    {h.updatedBy.role === 'admin'
-                      ? 'QUẢN TRỊ'
-                      : 'KHÁCH HÀNG' || ''}
+                    {h.updatedBy.role === 'admin' ? 'QUẢN TRỊ' : 'KHÁCH HÀNG'}
                   </Typography>
                   <Typography>
                     <strong>Thời gian:</strong>{' '}
