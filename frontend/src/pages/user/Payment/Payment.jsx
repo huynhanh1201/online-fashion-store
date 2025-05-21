@@ -12,7 +12,7 @@ import {
   Divider,
   CircularProgress,
   Snackbar,
-  Alert,
+  Alert
 } from '@mui/material'
 import { styled } from '@mui/system'
 import { ChooseAddressModal } from './Modal/ChooseAddressModal'
@@ -128,7 +128,7 @@ const Payment = () => {
       const defaultAddr = addresses.find(addr => addr.isDefault)
       setSelectedAddress(defaultAddr || addresses[0])
     }
-  }, [addresses])
+  }, [addresses, selectedAddress])
 
 
   const handleOpenAddressModal = () => setOpenAddressModal(true)
@@ -271,7 +271,7 @@ const Payment = () => {
                       {cartItems
                         .filter(item => selectedItems.includes(item.productId._id || item.productId)) // lọc đúng item đã chọn
                         .map((item, index) => {
-                          const product = item.product || item.productId || {};
+                          const product = item.product || item.productId || {}
                           return (
                             <ProductItem
                               key={index}
@@ -280,7 +280,7 @@ const Payment = () => {
                               quantity={item.quantity || 1}
                               image={product.image}
                             />
-                          );
+                          )
                         })}
 
                     </tbody>
