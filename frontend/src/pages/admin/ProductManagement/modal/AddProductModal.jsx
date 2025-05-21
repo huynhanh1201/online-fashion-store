@@ -61,6 +61,7 @@ const AddProductModal = ({ open, onClose, onSuccess }) => {
       categoryId: '',
       quantity: '',
       slug: '',
+      orgin: '',
       colors: []
     }
   })
@@ -148,6 +149,7 @@ const AddProductModal = ({ open, onClose, onSuccess }) => {
         image: imageUrls,
         categoryId: data.categoryId,
         quantity: Number(data.quantity),
+        origin: data.orgin || '',
         colors: colorList // Gửi mảng colorList với cấu trúc [{ name, image }]
       })
 
@@ -241,6 +243,14 @@ const AddProductModal = ({ open, onClose, onSuccess }) => {
                 />
               </Box>
               <Box sx={{ mt: 2 }}>
+                <TextField
+                  label='Xuất xứ'
+                  fullWidth
+                  multiline
+                  rows={3}
+                  margin='normal'
+                  sx={StyleAdmin.InputCustom}
+                />
                 <Typography variant='subtitle1' sx={{ mb: 1 }}>
                   Màu sắc
                 </Typography>
