@@ -17,7 +17,7 @@ import { useForm } from 'react-hook-form'
 
 import AuthorizedAxiosInstance from '~/utils/authorizedAxios'
 import { API_ROOT } from '~/utils/constants'
-import StyleAdmin from '~/components/StyleAdmin'
+import StyleAdmin from '~/assets/StyleAdmin.jsx'
 
 const EditUserModal = React.memo(({ open, onClose, user, onSave }) => {
   const {

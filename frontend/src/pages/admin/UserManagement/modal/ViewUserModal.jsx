@@ -8,7 +8,7 @@ import Button from '@mui/material/Button'
 import TextField from '@mui/material/TextField'
 import Divider from '@mui/material/Divider'
 
-import StyleAdmin from '~/components/StyleAdmin'
+import StyleAdmin from '~/assets/StyleAdmin.jsx'
 
 const ViewUserModal = React.memo(({ open, onClose, user }) => {
   useEffect(() => {

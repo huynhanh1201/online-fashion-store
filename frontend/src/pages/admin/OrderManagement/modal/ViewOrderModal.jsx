@@ -18,7 +18,7 @@ import TableCell from '@mui/material/TableCell'
 import TableBody from '@mui/material/TableBody'
 
 import dayjs from 'dayjs'
-import styleAdmin from '~/components/StyleAdmin'
+import styleAdmin from '~/assets/StyleAdmin.jsx'
 
 function ViewOrderModal({
   open,

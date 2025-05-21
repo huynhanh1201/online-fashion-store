@@ -8,7 +8,7 @@ import Chip from '@mui/material/Chip'
 import StyleAdmin, {
   StyledTableCell,
   StyledTableRow
-} from '~/components/StyleAdmin'
+} from '~/assets/StyleAdmin.jsx'
 import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye'
 import BorderColorIcon from '@mui/icons-material/BorderColor'
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever'

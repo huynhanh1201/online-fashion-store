@@ -24,7 +24,7 @@ import { useForm, Controller } from 'react-hook-form'
 import { addProduct } from '~/services/productService'
 import useCategories from '~/hook/useCategories'
 import AddCategoryModal from '~/pages/admin/CategorieManagement/modal/AddCategoryModal'
-import StyleAdmin from '~/components/StyleAdmin'
+import StyleAdmin from '~/assets/StyleAdmin.jsx'
 
 const URI = 'https://api.cloudinary.com/v1_1/dkwsy9sph/image/upload'
 const CloudinaryProduct = 'product_upload'

@@ -8,7 +8,7 @@ import {
   StyledTableCell,
   StyledTableRow,
   StyledTableContainer
-} from '~/components/StyleAdmin'
+} from '~/assets/StyleAdmin.jsx'
 
 const styles = {
   groupIcon: {

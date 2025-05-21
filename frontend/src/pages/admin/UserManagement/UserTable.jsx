@@ -10,7 +10,7 @@ import StyleAdmin, {
   StyledTableCell,
   StyledTableRow,
   StyledTableContainer
-} from '~/components/StyleAdmin'
+} from '~/assets/StyleAdmin.jsx'
 import UserRow from './UserRow'
 
 const UserTable = React.memo(function UserTable({

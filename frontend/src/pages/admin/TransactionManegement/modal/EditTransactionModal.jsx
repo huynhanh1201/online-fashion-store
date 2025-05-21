@@ -16,7 +16,7 @@ import Select from '@mui/material/Select'
 
 import { useForm } from 'react-hook-form'
 
-import StyleAdmin from '~/components/StyleAdmin'
+import StyleAdmin from '~/assets/StyleAdmin.jsx'
 
 const EditTransactionModal = ({
   open,

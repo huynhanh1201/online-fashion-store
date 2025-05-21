@@ -7,7 +7,7 @@ import StyleAdmin, {
   StyledTableCell,
   StyledTableRow,
   StyledTableContainer
-} from '~/components/StyleAdmin'
+} from '~/assets/StyleAdmin.jsx'
 import CategoryRow from './CategoryRow'
 
 const CategoryTable = ({ categories, loading, handleOpenModal }) => {

@@ -7,7 +7,7 @@ import DialogTitle from '@mui/material/DialogTitle'
 import Button from '@mui/material/Button'
 import Divider from '@mui/material/Divider'
 
-import StyleAdmin from '~/components/StyleAdmin'
+import StyleAdmin from '~/assets/StyleAdmin.jsx'
 
 const DeleteCategoryModal = ({ open, onClose, category, onDelete }) => {
   const [isDeleting, setIsDeleting] = useState(false)

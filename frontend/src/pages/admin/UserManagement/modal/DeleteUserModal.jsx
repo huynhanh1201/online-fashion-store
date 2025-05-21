@@ -9,7 +9,7 @@ import CircularProgress from '@mui/material/CircularProgress'
 import Typography from '@mui/material/Typography'
 
 import { dialogTitleStyle, cancelButtonStyle } from './StyleModal'
-import StyleAdmin from '~/components/StyleAdmin'
+import StyleAdmin from '~/assets/StyleAdmin.jsx'
 
 const DeleteUserModal = React.memo(({ open, onClose, user, onDelete }) => {
   const [isDeleting, setIsDeleting] = React.useState(false)

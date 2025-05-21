@@ -10,7 +10,7 @@ import StyleAdmin, {
   StyledTableCell,
   StyledTableRow,
   StyledTableContainer
-} from '~/components/StyleAdmin'
+} from '~/assets/StyleAdmin.jsx'
 
 import AddIcon from '@mui/icons-material/Add'
 const ProductTable = ({ products, loading, handleOpenModal }) => {

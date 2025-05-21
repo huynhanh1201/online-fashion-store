@@ -12,7 +12,7 @@ import StyleAdmin, {
   StyledTableCell,
   StyledTableRow,
   StyledTableContainer
-} from '~/components/StyleAdmin'
+} from '~/assets/StyleAdmin.jsx'
 import Paper from '@mui/material/Paper'
 
 const TransactionTable = ({

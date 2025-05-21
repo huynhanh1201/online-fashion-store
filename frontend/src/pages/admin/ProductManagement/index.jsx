@@ -153,7 +153,7 @@ const DeleteProductModal = React.lazy(
 )
 const ViewProductModal = React.lazy(() => import('./modal/ViewProductModal'))
 
-import StyleAdmin from '~/components/StyleAdmin'
+import StyleAdmin from '~/assets/StyleAdmin.jsx'
 
 const ProductManagement = () => {
   const [page, setPage] = React.useState(1)
