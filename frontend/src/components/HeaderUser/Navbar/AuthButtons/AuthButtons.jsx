@@ -80,8 +80,8 @@ const AuthButtons = () => {
 
   const truncateName = (name) => {
     if (!name) return 'Người dùng'
-    if (name.length <= 13) return name
-    return `${name.slice(0, 10)}...`
+    if (name.length <= 15) return name
+    return `${name.slice(0, 12)}...`
   }
 
   return (

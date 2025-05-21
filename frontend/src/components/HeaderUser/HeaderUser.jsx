@@ -41,7 +41,7 @@ const HeaderUser = () => {
     <>
       <Topbar />
       <StyledAppBar>
-        <Container maxWidth='lg'>
+        <Container maxWidth='xl'>
           <Toolbar
             sx={{
               display: 'flex',

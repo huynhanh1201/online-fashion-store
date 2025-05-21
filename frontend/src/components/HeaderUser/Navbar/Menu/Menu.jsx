@@ -101,14 +101,15 @@ const Menu = () => {
     }, 200)
   }
 
-  const renderPopoverContent = (menu) => {
-    const renderRow = (title, items) => (
+  const renderPopoverContent = (categoryName) => {
+    // Tạm thời gán cứng loại sản phẩm cho mọi danh mục
+    const types = [{ name: 'Loại 1' }, { name: 'Loại 2' }, { name: 'Loại 3' }]
+
+    return (
       <Box
         sx={{
           p: 2,
-          minWidth: 500,
-          maxWidth: 1000,
-          alignItems: 'center'
+          minWidth: 400
         }}
       >
         <Typography
@@ -117,54 +118,18 @@ const Menu = () => {
           align='center'
           sx={{ mb: 2 }}
         >
-          {title}
+          {categoryName.toUpperCase()}
         </Typography>
 
-        <Box sx={{ display: 'flex', alignItems: 'center' }}>
-          <Box
-            sx={{
-              display: 'flex',
-              gap: 1
-            }}
-          >
-            {items.map((item, index) => (
-              <CategoryButton key={index} size='small' href={item.href || '#'}>
-                {item.name}
-              </CategoryButton>
-            ))}
-          </Box>
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+          {types.map((type, index) => (
+            <CategoryButton key={index} size='small' href='#'>
+              {type.name}
+            </CategoryButton>
+          ))}
         </Box>
       </Box>
     )
-
-    if (menu === 'Sản phẩm') {
-      const categoryItems = categories.map((cat) => ({
-        name: cat.name,
-        href: `/product?category=${cat._id}`
-      }))
-      return renderRow('DANH MỤC SẢN PHẨM', categoryItems)
-    }
-
-    if (menu === 'Áo Nam') {
-      const items = [
-        { name: 'Áo Thun' },
-        { name: 'Áo Polo' },
-        { name: 'Áo Sơmi' }
-      ]
-      return renderRow('ÁO NAM', items)
-    }
-
-    if (menu === 'Quần Nam') {
-      const items = [
-        { name: 'Quần Jean' },
-        { name: 'Quần Kaki' },
-        { name: 'Quần Short' },
-        { name: 'Quần Què' }
-      ]
-      return renderRow('QUẦN NAM', items)
-    }
-
-    return null
   }
 
   return (
@@ -175,19 +140,22 @@ const Menu = () => {
         gap: 2
       }}
     >
-      {['Sản phẩm', 'Áo Nam', 'Quần Nam'].map((menu) => (
+      {/* Menu cố định "Sản phẩm" */}
+      <StyledButton href='/product'>Sản phẩm</StyledButton>
+
+      {/* Các danh mục sản phẩm từ API */}
+      {categories.map((cat) => (
         <Box
-          key={menu}
-          onMouseEnter={(e) => handleHover(menu, e.currentTarget)}
+          key={cat._id}
+          onMouseEnter={(e) => handleHover(cat.name, e.currentTarget)}
           onMouseLeave={handleLeave}
         >
-          <StyledButton
-            href={`/${menu === 'Sản phẩm' ? 'product' : menu.toLowerCase().replace(' ', '-')}`}
-          >
-            {menu}
+          <StyledButton href={`/product?category=${cat._id}`}>
+            {cat.name}
           </StyledButton>
+
           <AnimatedPopover
-            open={hoveredMenu.name === menu}
+            open={hoveredMenu.name === cat.name}
             anchorEl={hoveredMenu.el}
             onClose={handleLeave}
             anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
@@ -203,7 +171,7 @@ const Menu = () => {
             }}
             disableRestoreFocus
           >
-            {renderPopoverContent(menu)}
+            {renderPopoverContent(cat.name)}
           </AnimatedPopover>
         </Box>
       ))}
