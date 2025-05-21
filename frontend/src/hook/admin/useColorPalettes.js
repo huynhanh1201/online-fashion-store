@@ -68,7 +68,7 @@ const useColorPalettes = (productId) => {
     }
   }
 
-  const addColorPalette = async (data) => {
+  const addColorPalette = async (data, productId) => {
     try {
       const newColor = await createColorPalette({ ...data, productId })
       await fetchColorPalettes() // refetch lại vì màu nằm trong mảng colors

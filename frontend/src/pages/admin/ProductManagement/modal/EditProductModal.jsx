@@ -75,7 +75,7 @@ const EditProductModal = ({ open, onClose, product, onSave }) => {
   const {
     colorPalettes,
     fetchColorPalettes,
-    createColorPalette,
+    addColorPalette,
     editColorPalette
     // deleteColorPalette
   } = useColorPalettes(product?._id)
@@ -194,7 +194,7 @@ const EditProductModal = ({ open, onClose, product, onSave }) => {
 
       if (oldColor.isNew) {
         // Nếu là màu mới thì gọi API tạo màu
-        const created = await createColorPalette({
+        const created = await addColorPalette({
           name: updatedColor.name,
           image: updatedColor.image,
           isActive: true
@@ -228,6 +228,7 @@ const EditProductModal = ({ open, onClose, product, onSave }) => {
 
   // Thêm màu mới (upload ảnh rồi gọi API tạo màu mới)
   // Thêm màu mới (chỉ thêm vào mảng colorList local, không gọi API)
+  // Thêm màu mới (upload ảnh rồi gọi API tạo màu mới)
   const handleAddColor = async (e) => {
     e.preventDefault()
 
@@ -236,7 +237,6 @@ const EditProductModal = ({ open, onClose, product, onSave }) => {
       return
     }
 
-    // Nếu có ảnh mới thì upload lên Cloudinary trước
     let imageUrl = ''
     if (colorImage) {
       try {
@@ -247,21 +247,23 @@ const EditProductModal = ({ open, onClose, product, onSave }) => {
       }
     }
 
-    const newColor = {
-      // Tạo _id giả để key trong list không bị trùng (có thể dùng timestamp hoặc random)
-      _id: `temp-${Date.now()}`,
-      name: colorInput.trim(),
-      image: imageUrl,
-      isActive: true,
-      isNew: true // đánh dấu là màu mới chưa lưu lên DB
+    try {
+      // Gọi addColorPalette (gọi API bên trong)
+      const createdColor = await addColorPalette({
+        name: colorInput.trim(),
+        image: imageUrl,
+        isActive: true
+      })
+
+      setColorList((prev) => [...prev, createdColor])
+
+      setColorInput('')
+      setColorImage(null)
+      setColorImagePreview('')
+    } catch (error) {
+      console.error('Lỗi khi tạo màu:', error)
+      alert('Lỗi khi tạo màu, vui lòng thử lại')
     }
-
-    setColorList((prev) => [...prev, newColor])
-
-    // Reset input
-    setColorInput('')
-    setColorImage(null)
-    setColorImagePreview('')
   }
 
   // Xóa màu sắc (gọi API xóa và cập nhật local state)

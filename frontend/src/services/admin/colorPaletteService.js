@@ -84,10 +84,13 @@ export const getColorPalettes = async (productId) => {
   }
 }
 
-export const createColorPalette = async (data) => {
+export const createColorPalette = async (productId, data) => {
   try {
-    const response = await AuthorizedAxiosInstance.post(BASE_URL, data)
-    return response.data
+    const res = await AuthorizedAxiosInstance.post(
+      `${API_ROOT}/v1/color-palettes/${productId}`, // chỉ đường dẫn tương đối với API_ROOT đã định nghĩa
+      data
+    )
+    return res.data
   } catch (error) {
     console.error('Lỗi khi tạo màu mới:', error)
     throw error
