@@ -83,10 +83,8 @@ const EditOrderModal = ({ open, onClose, order, onUpdate, loading }) => {
   } = useForm({
     defaultValues: {
       status: '',
-      isPaid: false,
       paymentStatus: '',
       paymentMethod: '',
-      isDelivered: false,
       note: ''
     }
   })
@@ -96,10 +94,8 @@ const EditOrderModal = ({ open, onClose, order, onUpdate, loading }) => {
     if (order) {
       reset({
         status: order.status || '',
-        isPaid: order.isPaid || false,
         paymentStatus: order.paymentStatus || '',
         paymentMethod: order.paymentMethod || '',
-        isDelivered: order.isDelivered || false,
         note: order.note || ''
       })
     }
@@ -155,25 +151,6 @@ const EditOrderModal = ({ open, onClose, order, onUpdate, loading }) => {
               )}
             />
           </FormControl>
-
-          {/* isPaid */}
-          <FormControlLabel
-            control={
-              <Controller
-                name='isPaid'
-                control={control}
-                render={({ field }) => (
-                  <Checkbox
-                    {...field}
-                    checked={field.value}
-                    onChange={(e) => field.onChange(e.target.checked)}
-                  />
-                )}
-              />
-            }
-            label='Đã thanh toán'
-          />
-
           {/* Payment Status */}
           <FormControl fullWidth sx={StyleAdmin.FormSelect}>
             <InputLabel id='payment-status-label'>
@@ -235,24 +212,6 @@ const EditOrderModal = ({ open, onClose, order, onUpdate, loading }) => {
               )}
             />
           </FormControl>
-
-          {/* isDelivered */}
-          <FormControlLabel
-            control={
-              <Controller
-                name='isDelivered'
-                control={control}
-                render={({ field }) => (
-                  <Checkbox
-                    {...field}
-                    checked={field.value}
-                    onChange={(e) => field.onChange(e.target.checked)}
-                  />
-                )}
-              />
-            }
-            label='Đã giao hàng'
-          />
 
           {/* Note */}
           <Controller

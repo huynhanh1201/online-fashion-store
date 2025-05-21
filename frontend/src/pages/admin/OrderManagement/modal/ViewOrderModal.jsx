@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import Dialog from '@mui/material/Dialog'
 import DialogTitle from '@mui/material/DialogTitle'
 import DialogContent from '@mui/material/DialogContent'
@@ -18,7 +18,6 @@ import TableCell from '@mui/material/TableCell'
 import TableBody from '@mui/material/TableBody'
 
 import dayjs from 'dayjs'
-import useProducts from '~/hook/admin/useProducts'
 import styleAdmin from '~/components/StyleAdmin'
 
 function ViewOrderModal({
@@ -29,30 +28,6 @@ function ViewOrderModal({
   orderDetails = []
 }) {
   const [tab, setTab] = useState(0)
-  const { fetchProductById } = useProducts()
-  const [productMap, setProductMap] = useState({})
-
-  useEffect(() => {
-    const fetchAllProducts = async () => {
-      const map = {}
-      for (const item of orderDetails) {
-        if (item.productId) {
-          try {
-            const product = await fetchProductById(item.productId)
-            map[item._id] = product
-          } catch (err) {
-            console.error('Lỗi khi lấy thông tin sản phẩm:', err)
-          }
-        }
-      }
-      setProductMap(map)
-    }
-
-    if (orderDetails?.length > 0) {
-      fetchAllProducts()
-    }
-  }, [orderDetails])
-
   if (!order) return null
   const handleTabChange = (_, newValue) => setTab(newValue)
 
@@ -66,7 +41,7 @@ function ViewOrderModal({
     }
     return map[status] || '—'
   }
-
+  console.log('order', order)
   return (
     <Dialog
       open={open}
@@ -75,8 +50,8 @@ function ViewOrderModal({
       fullWidth
       PaperProps={{
         sx: {
-          height: '80vh',
-          maxHeight: '80vh',
+          height: '81vh',
+          maxHeight: '81vh',
           display: 'flex',
           flexDirection: 'column'
         }
@@ -111,14 +86,14 @@ function ViewOrderModal({
               <strong>Mã đơn hàng:</strong> {order._id}
             </Typography>
             <Typography>
-              <strong>Người nhận:</strong> {order.shippingAddressId?.fullName}
+              <strong>Người nhận:</strong> {order.shippingAddress?.fullName}
             </Typography>
             <Typography>
-              <strong>SĐT:</strong> {order.shippingAddressId?.phone}
+              <strong>SĐT:</strong> {order.shippingAddress?.phone}
             </Typography>
             <Typography>
               <strong>Địa chỉ giao hàng:</strong>{' '}
-              {`${order.shippingAddressId?.address}, ${order.shippingAddressId?.ward}, ${order.shippingAddressId?.district}, ${order.shippingAddressId?.city}`}
+              {`${order.shippingAddress?.address}, ${order.shippingAddress?.ward}, ${order.shippingAddress?.district}, ${order.shippingAddress?.city}`}
             </Typography>
             <Typography>
               <strong>Phương thức thanh toán:</strong>{' '}
@@ -215,7 +190,13 @@ function ViewOrderModal({
                     <strong>Ghi chú:</strong> {h.note || 'Không có'}
                   </Typography>
                   <Typography>
-                    <strong>Người cập nhật:</strong> {order.userId.name || '—'}
+                    <strong>Người cập nhật:</strong> {h.updatedBy.name || ''}
+                  </Typography>
+                  <Typography>
+                    <strong>Quyền: </strong>{' '}
+                    {h.updatedBy.role === 'admin'
+                      ? 'QUẢN TRỊ'
+                      : 'KHÁCH HÀNG' || ''}
                   </Typography>
                   <Typography>
                     <strong>Thời gian:</strong>{' '}
@@ -244,15 +225,13 @@ function ViewOrderModal({
                 <TableBody>
                   {orderDetails.map((item) => (
                     <TableRow key={item._id}>
-                      <TableCell>
-                        {productMap[item._id]?.name || 'Không có tên'}
-                      </TableCell>
+                      <TableCell>{item.name || 'Không có tên'}</TableCell>
                       <TableCell align='right'>{item.quantity}</TableCell>
                       <TableCell align='right'>
-                        {item.priceAtOrder.toLocaleString()}₫
+                        {item.subtotal.toLocaleString()}₫
                       </TableCell>
                       <TableCell align='right'>
-                        {(item.priceAtOrder * item.quantity).toLocaleString()}₫
+                        {(item.subtotal * item.quantity).toLocaleString()}₫
                       </TableCell>
                     </TableRow>
                   ))}

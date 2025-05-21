@@ -68,10 +68,19 @@ const updateShippingAddress = async (userId, shippingAddressId, reqBody) => {
 const deleteShippingAddress = async (userId, shippingAddressId) => {
   // eslint-disable-next-line no-useless-catch
   try {
-    const shippingAddressUpdated = await ShippingAddressModel.findOneAndDelete({
-      userId,
-      _id: shippingAddressId
-    })
+    const shippingAddressUpdated = await ShippingAddressModel.findOneAndUpdate(
+      {
+        userId,
+        _id: shippingAddressId
+      },
+      {
+        destroy: true
+      },
+      {
+        new: true,
+        runValidators: true
+      }
+    )
 
     return shippingAddressUpdated
   } catch (err) {

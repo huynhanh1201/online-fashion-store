@@ -13,7 +13,7 @@ const LogoButton = styled(Button)(({ theme }) => ({
 }))
 
 const Logo = () => {
-  return <LogoButton href='/'>ICONDEWIM™</LogoButton>
+  return <LogoButton href='/'>FASHIONSTORE™</LogoButton>
 }
 
 export default Logo

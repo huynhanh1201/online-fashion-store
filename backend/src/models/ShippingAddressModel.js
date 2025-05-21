@@ -40,6 +40,10 @@ const ShippingAddressSchema = new Schema(
       type: String,
       required: true, // Thành phố/Tỉnh
       trim: true
+    },
+    destroy: {
+      type: Boolean,
+      default: false // Soft-delete mặc định là false
     }
   },
   {

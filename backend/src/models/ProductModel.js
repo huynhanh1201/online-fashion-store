@@ -51,16 +51,8 @@ const productSchema = new Schema(
     },
     origin: {
       type: String,
-      required: true, // Quốc gia hoặc nơi sản xuất chính của sản phẩm
-      default: 'Việt Nam'
-    },
-    sizes: {
-      type: [String],
-      required: true // Kích cỡ (ví dụ: ["S", "M", "L"])
-    },
-    colors: {
-      type: [String],
-      required: true // Màu sắc (ví dụ: ["Red", "Blue", "Black"])
+      trim: true, // tự động loại bỏ khoảng trắng đầu/cuối
+      maxlength: 200 // tuỳ chọn: độ dài tối đa
     }
   },
   {

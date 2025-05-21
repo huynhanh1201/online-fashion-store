@@ -12,6 +12,7 @@ import { PaymentTransactionModel } from '~/models/PaymentTransactionModel'
 
 import { verifyChecksum } from '~/utils/vnpay'
 import { env } from '~/config/environment'
+import { UserModel } from '~/models/UserModel'
 
 const createOrder = async (userId, reqBody, ipAddr) => {
   // eslint-disable-next-line no-useless-catch
@@ -91,6 +92,7 @@ const createOrder = async (userId, reqBody, ipAddr) => {
     const newOrder = {
       userId,
       shippingAddressId,
+      shippingAddress: address,
       total: cartTotal,
       couponId,
       paymentMethod,
@@ -110,9 +112,10 @@ const createOrder = async (userId, reqBody, ipAddr) => {
       const product = productMap.get(item.productId.toString())
       return {
         orderId: order._id,
-        productId: product._id,
+        name: product.name,
+        price: product.price,
         quantity: item.quantity,
-        priceAtOrder: product.price
+        subtotal: product.price * item.quantity
       }
     })
 
@@ -241,9 +244,7 @@ const createOrder = async (userId, reqBody, ipAddr) => {
 const getOrderList = async () => {
   // eslint-disable-next-line no-useless-catch
   try {
-    const result = await OrderModel.find({})
-      .populate('userId shippingAddressId couponId')
-      .lean()
+    const result = await OrderModel.find({}).populate('userId couponId').lean()
 
     return result
   } catch (err) {
@@ -256,7 +257,7 @@ const getOrder = async (orderId) => {
   try {
     const result = await OrderModel.findById(orderId)
       .populate({
-        path: 'userId couponId shippingAddressId',
+        path: 'userId couponId',
         select: '-password -role -destroy -isActive -verifyToken'
       })
       .lean()
@@ -286,12 +287,19 @@ const updateOrder = async (userId, orderId, reqBody) => {
     const newStatus = reqBody.status
 
     if (newStatus && newStatus !== existingOrder.status) {
+      const user = await UserModel.findById(userId)
+
+      if (!user)
+        throw new ApiError(StatusCodes.NOT_FOUND, 'Người dùng không tồn tại')
+
+      console.log('userId:', userId)
+      console.log('user:', user)
       // status đã đổi, tạo history
       await OrderStatusHistoryModel.create({
         orderId: orderId,
         status: newStatus,
         note: reqBody.note || null,
-        updatedBy: userId,
+        updatedBy: { name: user.name, role: user.role },
         updatedAt: new Date()
       })
     }

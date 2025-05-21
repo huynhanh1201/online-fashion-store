@@ -3,8 +3,8 @@ import { Box, IconButton } from '@mui/material'
 import { ArrowForward, ArrowBack } from '@mui/icons-material'
 
 const images = [
-  'https://intphcm.com/data/upload/banner-thoi-trang-bi-an.jpg',
-  'https://intphcm.com/data/upload/banner-thoi-trang-nam.jpg'
+  'https://hellomida.vn/wp-content/uploads/2023/09/THU-DONG-2.jpg',
+  'https://hellomida.vn/wp-content/uploads/2023/09/banner-hlmd-1.jpg'
 ]
 
 const Slider = () => {
@@ -34,9 +34,8 @@ const Slider = () => {
       sx={{
         position: 'relative',
         width: '100%',
-        height: '500px',
-        overflow: 'hidden',
-        borderRadius: '8px'
+        height: '622px',
+        overflow: 'hidden'
       }}
     >
       <Box

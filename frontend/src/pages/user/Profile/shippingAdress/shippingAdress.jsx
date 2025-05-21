@@ -33,10 +33,12 @@ import {
   deleteShippingAddress
 } from '~/services/addressService'
 
-function ShippingAdress({ showSnackbar }) {
+function ShippingAddress({ showSnackbar }) {
   const [addresses, setAddresses] = useState([])
   const [openAddressDialog, setOpenAddressDialog] = useState(false)
   const [openViewDialog, setOpenViewDialog] = useState(false)
+  const [openConfirmDialog, setOpenConfirmDialog] = useState(false) // New state for confirmation dialog
+  const [addressToDelete, setAddressToDelete] = useState(null) // New state for address to delete
   const [editAddressId, setEditAddressId] = useState(null)
   const [viewAddress, setViewAddress] = useState(null)
   const [provinces, setProvinces] = useState([])
@@ -59,7 +61,7 @@ function ShippingAdress({ showSnackbar }) {
     ward: false
   })
 
-  // Lấy danh sách tỉnh/thành
+  // Fetch provinces
   useEffect(() => {
     const fetchProvinces = async () => {
       try {
@@ -73,7 +75,7 @@ function ShippingAdress({ showSnackbar }) {
     fetchProvinces()
   }, [])
 
-  // Lấy danh sách quận/huyện khi chọn tỉnh/thành
+  // Fetch districts when city changes
   useEffect(() => {
     if (formData.city) {
       const fetchDistricts = async () => {
@@ -98,7 +100,7 @@ function ShippingAdress({ showSnackbar }) {
     }
   }, [formData.city, editAddressId])
 
-  // Lấy danh sách phường/xã khi chọn quận/huyện
+  // Fetch wards when district changes
   useEffect(() => {
     if (formData.district) {
       const fetchWards = async () => {
@@ -121,17 +123,16 @@ function ShippingAdress({ showSnackbar }) {
     }
   }, [formData.district, editAddressId])
 
-  // Lấy danh sách địa chỉ từ API
+  // Fetch addresses
   useEffect(() => {
     const fetchAddresses = async () => {
       try {
         const { addresses } = await getShippingAddresses()
-        // Lọc bỏ các địa chỉ có _id không hợp lệ
         const validAddresses = (addresses || []).filter(
           (addr) =>
             addr._id && typeof addr._id === 'string' && addr._id.trim() !== ''
         )
-        console.log('Fetched addresses:', validAddresses) // Log để debug
+        console.log('Fetched addresses:', validAddresses)
         setAddresses(validAddresses)
       } catch (error) {
         showSnackbar?.(
@@ -174,7 +175,6 @@ function ShippingAdress({ showSnackbar }) {
     }
     const fullAddress = `${address}, ${wardName}, ${districtName}, ${cityName}`
 
-    // Kiểm tra trùng lặp địa chỉ
     const isDuplicate = addresses.some(
       (addr) =>
         addr.fullName === addressData.fullName &&
@@ -191,7 +191,6 @@ function ShippingAdress({ showSnackbar }) {
 
     try {
       if (editAddressId) {
-        // Sửa địa chỉ
         const updatedAddress = await updateShippingAddress(
           editAddressId,
           addressData
@@ -210,7 +209,6 @@ function ShippingAdress({ showSnackbar }) {
           return
         }
       } else {
-        // Thêm địa chỉ
         const newAddress = await addShippingAddress(addressData)
         if (newAddress && newAddress._id) {
           setAddresses([...addresses, { ...newAddress, fullAddress }])
@@ -248,17 +246,21 @@ function ShippingAdress({ showSnackbar }) {
     }
   }
 
-  const handleDeleteAddress = async (id) => {
+  const handleDeleteAddress = (id) => {
     if (!id || typeof id !== 'string' || id.trim() === '') {
       showSnackbar?.('ID địa chỉ không hợp lệ!', 'error')
       console.error('Invalid address ID:', id)
       return
     }
+    setAddressToDelete(id)
+    setOpenConfirmDialog(true)
+  }
 
+  const confirmDeleteAddress = async () => {
     try {
-      const response = await deleteShippingAddress(id)
+      const response = await deleteShippingAddress(addressToDelete)
       if (response) {
-        setAddresses(addresses.filter((addr) => addr._id !== id))
+        setAddresses(addresses.filter((addr) => addr._id !== addressToDelete))
         showSnackbar?.('Xóa địa chỉ thành công!')
       } else {
         showSnackbar?.('Không thể xóa địa chỉ!', 'error')
@@ -268,6 +270,9 @@ function ShippingAdress({ showSnackbar }) {
         error.response?.data?.message || error.message || 'Lỗi khi xóa địa chỉ!'
       showSnackbar?.(`Lỗi: ${errorMessage}`, 'error')
       console.error('Delete error:', errorMessage)
+    } finally {
+      setOpenConfirmDialog(false)
+      setAddressToDelete(null)
     }
   }
 
@@ -359,10 +364,10 @@ function ShippingAdress({ showSnackbar }) {
         elevation={3}
         sx={{
           flex: 1,
-          p: 3,
+          p: 5,
           borderRadius: 2,
           bgcolor: '#ffffff',
-          width: '100%' // Chiều rộng 100%
+          width: '100%'
         }}
       >
         <Box
@@ -461,7 +466,7 @@ function ShippingAdress({ showSnackbar }) {
 
       {/* Dialog thêm/sửa địa chỉ */}
       <Dialog
-        style={{ marginTop: '50px' }}
+        style={{ marginTop: '100px' }}
         open={openAddressDialog}
         onClose={() => {
           setOpenAddressDialog(false)
@@ -478,7 +483,7 @@ function ShippingAdress({ showSnackbar }) {
         fullWidth
         maxWidth='sm'
       >
-        <DialogTitle style={{ marginTop: '50px' }}>
+        <DialogTitle>
           {editAddressId ? 'Sửa địa chỉ' : 'Thêm địa chỉ mới'}
         </DialogTitle>
         <DialogContent>
@@ -693,8 +698,43 @@ function ShippingAdress({ showSnackbar }) {
           </Button>
         </DialogActions>
       </Dialog>
+
+      {/* Dialog xác nhận xóa */}
+      <Dialog
+        open={openConfirmDialog}
+        onClose={() => {
+          setOpenConfirmDialog(false)
+          setAddressToDelete(null)
+        }}
+        fullWidth
+        maxWidth='xs'
+      >
+        <DialogTitle>Xác nhận xóa</DialogTitle>
+        <DialogContent>
+          <Typography>Bạn có chắc chắn muốn xóa địa chỉ này?</Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            onClick={() => {
+              setOpenConfirmDialog(false)
+              setAddressToDelete(null)
+            }}
+            sx={{ textTransform: 'none' }}
+          >
+            Hủy
+          </Button>
+          <Button
+            onClick={confirmDeleteAddress}
+            variant='contained'
+            color='error'
+            sx={{ textTransform: 'none' }}
+          >
+            Xóa
+          </Button>
+        </DialogActions>
+      </Dialog>
     </div>
   )
 }
 
-export default ShippingAdress
+export default ShippingAddress

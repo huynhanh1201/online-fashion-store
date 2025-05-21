@@ -9,20 +9,24 @@ const OrderItemSchema = new Schema(
       ref: 'Order', // Tham chiếu đến đơn hàng
       required: true
     },
-    productId: {
-      type: Schema.Types.ObjectId,
-      ref: 'Product', // Tham chiếu đến sản phẩm
-      required: true
+    name: {
+      type: String,
+      required: true // tên sản phẩm lúc đặt không được bỏ trống
+    },
+    price: {
+      type: Number,
+      required: true, // giá từng món lúc đặt bắt buộc phải có
+      min: 0 // giá tối thiểu 0
     },
     quantity: {
-      type: Number, // Số lượng đặt
-      required: true,
-      min: 1
+      type: Number,
+      required: true, // số lượng không được bỏ trống
+      min: 1 // tối thiểu 1 sản phẩm
     },
-    priceAtOrder: {
-      type: Number, // Giá tại thời điểm đặt
-      required: true,
-      min: 0
+    subtotal: {
+      type: Number,
+      required: true, // subtotal = price * quantity
+      min: 0 // tối thiểu 0
     }
   },
   {

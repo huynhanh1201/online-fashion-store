@@ -80,8 +80,6 @@ const updateOrder = async (req, res, next) => {
       .valid('Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled')
       .required(),
 
-    isPaid: Joi.boolean().required(),
-
     paymentStatus: Joi.string()
       .valid('Pending', 'Completed', 'Failed')
       .required(),
@@ -89,9 +87,8 @@ const updateOrder = async (req, res, next) => {
     paymentMethod: Joi.string()
       .valid('COD', 'vnpay', 'momo', 'paypal', 'credit_card')
       .allow(null),
-    isDelivered: Joi.boolean().required(),
 
-    note: Joi.string().trim().min(1).max(500).allow(null)
+    note: Joi.string().trim().min(1).max(500).allow(null, '')
   })
 
   try {
