@@ -367,6 +367,13 @@ export default function AddAddressModal({
                 value={formData.city}
                 label="Tỉnh/Thành"
                 onChange={handleChange('city')}
+                MenuProps={{
+                  PaperProps: {
+                    style: {
+                      maxHeight: 200,
+                    },
+                  },
+                }}
               >
                 {provinces.map((p) => (
                   <MenuItem key={p.code} value={p.code}>
@@ -391,6 +398,13 @@ export default function AddAddressModal({
                 value={formData.district}
                 label="Quận/Huyện"
                 onChange={handleChange('district')}
+                MenuProps={{
+                  PaperProps: {
+                    style: {
+                      maxHeight: 200,
+                    },
+                  },
+                }}
               >
                 {districts.map((d) => (
                   <MenuItem key={d.code} value={d.code}>
@@ -415,6 +429,13 @@ export default function AddAddressModal({
                 value={formData.ward}
                 label="Phường/Xã"
                 onChange={handleChange('ward')}
+                MenuProps={{
+                  PaperProps: {
+                    style: {
+                      maxHeight: 200,
+                    },
+                  },
+                }}
               >
                 {wards.map((w) => (
                   <MenuItem key={w.code} value={w.code}>

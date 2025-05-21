@@ -2,7 +2,7 @@ import * as React from 'react'
 import Typography from '@mui/material/Typography'
 import UserTable from './UserTable'
 import UserPagination from './UserPagination'
-import useUsers from '~/hook/admin/useUsers'
+import useUsers from '~/hooks/admin/useUsers'
 // Lazy load các modal
 const EditUserModal = React.lazy(() => import('./modal/EditUserModal'))
 const DeleteUserModal = React.lazy(() => import('./modal/DeleteUserModal'))

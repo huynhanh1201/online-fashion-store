@@ -11,7 +11,7 @@ import {
   Divider,
   Typography
 } from '@mui/material'
-import useProfile from '~/hook/useUserProfile.js'
+import useProfile from '~/hooks/useUserProfile.js'
 
 const CLOUDINARY_URI = 'https://api.cloudinary.com/v1_1/dkwsy9sph/image/upload'
 const UPLOAD_PRESET = 'demo_unsigned'

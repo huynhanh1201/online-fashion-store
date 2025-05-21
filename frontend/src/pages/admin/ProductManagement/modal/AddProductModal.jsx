@@ -22,7 +22,7 @@ import EditIcon from '@mui/icons-material/Edit'
 import DeleteIcon from '@mui/icons-material/Delete'
 import { useForm, Controller } from 'react-hook-form'
 import { addProduct } from '~/services/productService'
-import useCategories from '~/hook/useCategories'
+import useCategories from '~/hooks/useCategories'
 import AddCategoryModal from '~/pages/admin/CategorieManagement/modal/AddCategoryModal'
 import StyleAdmin from '~/assets/StyleAdmin.jsx'
 

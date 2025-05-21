@@ -18,7 +18,7 @@ import {
 } from '@mui/material'
 import FilterListAltIcon from '@mui/icons-material/FilterListAlt'
 import { addToCart, getCart } from '~/services/cartService'
-import useProducts from '~/hook/useProducts'
+import useProducts from '~/hooks/useProducts'
 import { getCategories } from '~/services/categoryService'
 import { useDispatch } from 'react-redux'
 import { setCartItems } from '~/redux/cart/cartSlice'

@@ -5,7 +5,7 @@ import OrderPagination from './OrderPagination'
 import ViewOrderModal from './modal/ViewOrderModal'
 import EditOrderModal from './modal/EditOrderModal' // import modal sửa
 import DeleteOrderModal from './modal/DeleteOrderModal' // import modal xoá
-import useOrder from '~/hook/admin/useOrder'
+import useOrder from '~/hooks/admin/useOrder'
 import { deleteOrderById } from '~/services/admin/orderService'
 
 const OrderManagement = () => {

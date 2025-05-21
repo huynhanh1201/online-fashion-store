@@ -6,7 +6,7 @@ import AdminDrawer from '~/components/HeaderAdmin/Drawer'
 import AdminMenu from '~/components/HeaderAdmin/Menu'
 import '~/layout/AdminLayout.css'
 import ProfileModal from '~/components/ProfileAdmin/index.jsx'
-import useProfile from '~/hook/useUserProfile.js'
+import useProfile from '~/hooks/useUserProfile.js'
 
 export default function AdminLayout() {
   const [open, setOpen] = useState(true)

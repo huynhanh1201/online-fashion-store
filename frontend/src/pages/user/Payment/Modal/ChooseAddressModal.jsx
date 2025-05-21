@@ -13,7 +13,7 @@ import {
   CircularProgress
 } from '@mui/material'
 
-import { useAddress } from '~/hook/useAddress'
+import { useAddress } from '~/hooks/useAddress'
 import AddAddressModal from './AddAddressModal'
 
 export const ChooseAddressModal = ({ open, onClose, onConfirm, onUpdateAddresses }) => {
@@ -67,7 +67,12 @@ export const ChooseAddressModal = ({ open, onClose, onConfirm, onUpdateAddresses
 
   return (
     <>
-      <Dialog open={open} onClose={onClose} fullWidth maxWidth="md">
+      <Dialog open={open} onClose={onClose} fullWidth maxWidth="md"
+        PaperProps={{
+          sx: {
+            maxHeight: '70vh',
+          },
+        }}>
         <DialogTitle>Chọn địa chỉ giao hàng</DialogTitle>
 
         <DialogContent dividers>
