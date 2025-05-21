@@ -3,11 +3,7 @@ import { StatusCodes } from 'http-status-codes'
 import { ColorPaletteModel } from '~/models/ColorPaletteModel'
 import ApiError from '~/utils/ApiError'
 
-<<<<<<< HEAD
-const createColorPalette = async (colorPaletteId, reqBody) => {
-=======
 const createColorPalette = async (productId, reqBody) => {
->>>>>>> 36f7537907274793104600faaf6226b0528ddffa
   // eslint-disable-next-line no-useless-catch
   try {
     const newColorPalette = {
@@ -33,10 +29,6 @@ const createColorPalette = async (productId, reqBody) => {
 
 const getColorPaletteList = async (productId) => {
   const result = await ColorPaletteModel.findOne({ productId }).lean()
-<<<<<<< HEAD
-=======
-
->>>>>>> 36f7537907274793104600faaf6226b0528ddffa
   return result
 }
 

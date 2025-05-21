@@ -87,7 +87,7 @@ export const getColorPalettes = async (productId) => {
 export const createColorPalette = async (productId, data) => {
   try {
     const res = await AuthorizedAxiosInstance.post(
-      `${API_ROOT}/v1/color-palettes/${productId}`, // chỉ đường dẫn tương đối với API_ROOT đã định nghĩa
+      `${API_ROOT}/v1/color-palettes?productId=${productId}`, // chỉ đường dẫn tương đối với API_ROOT đã định nghĩa
       data
     )
     return res.data

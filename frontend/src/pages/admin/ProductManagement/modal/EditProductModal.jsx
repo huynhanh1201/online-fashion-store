@@ -58,6 +58,7 @@ const EditProductModal = ({ open, onClose, product, onSave }) => {
       price: '',
       quantity: '',
       categoryId: '',
+      origin: '',
       colors: []
     }
   })
@@ -76,8 +77,8 @@ const EditProductModal = ({ open, onClose, product, onSave }) => {
     colorPalettes,
     fetchColorPalettes,
     addColorPalette,
-    editColorPalette
-    // deleteColorPalette
+    editColorPalette,
+    removeColorPalette
   } = useColorPalettes(product?._id)
 
   // State quản lý chỉnh sửa màu sắc
@@ -196,8 +197,7 @@ const EditProductModal = ({ open, onClose, product, onSave }) => {
         // Nếu là màu mới thì gọi API tạo màu
         const created = await addColorPalette({
           name: updatedColor.name,
-          image: updatedColor.image,
-          isActive: true
+          image: updatedColor.image
         })
         // Thay thế color trong list bằng màu mới từ DB (có _id thật)
         const updatedColors = [...colorList]
@@ -248,11 +248,10 @@ const EditProductModal = ({ open, onClose, product, onSave }) => {
     }
 
     try {
-      // Gọi addColorPalette (gọi API bên trong)
+      // Gọi addColorPalette truyền đúng productId
       const createdColor = await addColorPalette({
         name: colorInput.trim(),
-        image: imageUrl,
-        isActive: true
+        image: imageUrl
       })
 
       setColorList((prev) => [...prev, createdColor])
@@ -267,8 +266,17 @@ const EditProductModal = ({ open, onClose, product, onSave }) => {
   }
 
   // Xóa màu sắc (gọi API xóa và cập nhật local state)
-  const handleRemoveColor = (colorToRemove) => {
+  const handleRemoveColor = async (colorToRemove) => {
     setColorList(colorList.filter((color) => color !== colorToRemove))
+    // Gọi API xóa màu
+    if (colorToRemove._id) {
+      try {
+        await removeColorPalette(colorToRemove._id)
+      } catch (error) {
+        console.error('Lỗi khi xóa màu:', error)
+        alert('Lỗi khi xóa màu, vui lòng thử lại')
+      }
+    }
   }
 
   // Submit form chỉnh sửa sản phẩm
@@ -294,6 +302,7 @@ const EditProductModal = ({ open, onClose, product, onSave }) => {
       const updatedProduct = {
         name: data.name.trim(),
         description: data.description.trim(),
+        origin: data.origin || '',
         price: Number(data.price),
         quantity: Number(data.quantity),
         categoryId: data.categoryId,
@@ -360,6 +369,13 @@ const EditProductModal = ({ open, onClose, product, onSave }) => {
               })}
               error={!!errors.description}
               helperText={errors.description?.message}
+              sx={StyleAdmin.InputCustom}
+            />
+            <TextField
+              label='Xuất xứ'
+              fullWidth
+              margin='normal'
+              {...register('origin')}
               sx={StyleAdmin.InputCustom}
             />
             <Box sx={{ display: 'flex', gap: 2 }}>

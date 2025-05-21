@@ -68,10 +68,10 @@ const useColorPalettes = (productId) => {
     }
   }
 
-  const addColorPalette = async (data, productId) => {
+  const addColorPalette = async (data) => {
     try {
-      const newColor = await createColorPalette({ ...data, productId })
-      await fetchColorPalettes() // refetch lại vì màu nằm trong mảng colors
+      const newColor = await createColorPalette(productId, data)
+      await fetchColorPalettes() // load lại màu mới
       return newColor
     } catch (error) {
       console.error('Lỗi khi thêm màu mới:', error)
