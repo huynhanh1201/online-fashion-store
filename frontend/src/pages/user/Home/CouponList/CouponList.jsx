@@ -28,8 +28,18 @@ const CouponList = () => {
   }, [])
 
   const formatCurrencyShort = (value) => {
-    if (value >= 1_000_000) return `${(value / 1_000_000).toFixed(1)}Tr`
-    if (value >= 1_000) return `${(value / 1_000).toFixed(1)}K`
+    const units = [
+      { threshold: 1_000_000, suffix: 'Tr' },
+      { threshold: 1_000, suffix: 'K' }
+    ]
+
+    for (const { threshold, suffix } of units) {
+      if (value >= threshold) {
+        const shortValue = Math.floor(value / threshold)
+        return `${shortValue}${suffix}`
+      }
+    }
+
     return value.toString()
   }
 

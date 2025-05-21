@@ -99,8 +99,18 @@ const ProductList = () => {
         ))}
       </Grid>
 
-      <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
-        <Button href='/product' sx={{ color: 'white' }}>
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'center',
+          mt: 4
+        }}
+      >
+        <Button
+          href='/product'
+          sx={{ color: 'white', backgroundColor: '#1A3C7B' }}
+          onClick={handleAddToCart}
+        >
           Xem tất cả
         </Button>
       </Box>

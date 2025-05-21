@@ -141,6 +141,8 @@ const Menu = () => {
       }}
     >
       {/* Menu cố định "Sản phẩm" */}
+      <StyledButton href='/'>Trang chủ</StyledButton>
+
       <StyledButton href='/product'>Sản phẩm</StyledButton>
 
       {/* Các danh mục sản phẩm từ API */}
