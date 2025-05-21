@@ -34,8 +34,18 @@ const MarqueeText = styled('div')({
 
 // Format tiền ngắn gọn: 1000000 → 1M, 100000 → 100K
 const formatCurrencyShort = (value) => {
-  if (value >= 1_000_000) return `${value / 1_000_000}M`
-  if (value >= 1_000) return `${value / 1_000}K`
+  const units = [
+    { threshold: 1_000_000, suffix: 'Tr' },
+    { threshold: 1_000, suffix: 'K' }
+  ]
+
+  for (const { threshold, suffix } of units) {
+    if (value >= threshold) {
+      const shortValue = Math.floor(value / threshold)
+      return `${shortValue}${suffix}`
+    }
+  }
+
   return value.toString()
 }
 

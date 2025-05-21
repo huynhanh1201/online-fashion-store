@@ -60,15 +60,7 @@ const ProductList = () => {
   const next4Products = Array.isArray(products) ? products.slice(4, 8) : []
 
   return (
-    <Box
-      sx={{
-        backgroundColor: '#03235e',
-        p: 2,
-        borderRadius: 3,
-        m: 2,
-        boxShadow: 3
-      }}
-    >
+    <Box>
       {/* 4 products */}
       <Grid
         container
@@ -107,8 +99,18 @@ const ProductList = () => {
         ))}
       </Grid>
 
-      <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
-        <Button href='/product' sx={{ color: 'white' }}>
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'center',
+          mt: 4
+        }}
+      >
+        <Button
+          href='/product'
+          sx={{ color: 'white', backgroundColor: '#1A3C7B' }}
+          onClick={handleAddToCart}
+        >
           Xem tất cả
         </Button>
       </Box>
