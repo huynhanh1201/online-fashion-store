@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import React, { useState, useEffect, useCallback } from 'react'
 import {
   Box,
@@ -17,7 +18,8 @@ import {
   ListItem,
   ListItemText,
   Card,
-  Tooltip
+  Tooltip,
+  CircularProgress
 } from '@mui/material'
 import { styled } from '@mui/system'
 import AddIcon from '@mui/icons-material/Add'
@@ -108,7 +110,7 @@ const ProductDetail = () => {
         setProduct({
           ...data,
           images: data.images || data.image ? (Array.isArray(data.images) ? data.images : [data.image]) : ['/default.jpg'],
-          name: data.name || 'Sản phẩm không tên',
+          name: data.name || 'Sản phẩm không tên'
         })
       } else {
         setError('Sản phẩm không tồn tại.')
@@ -159,13 +161,12 @@ const ProductDetail = () => {
       setFadeIn(true)
     }, 150)
   }
-
-  // Thêm sản phẩm vào giỏ hàng và check SL
   const handleAddToCart = async () => {
     if (isAdding) return
     if (!product) return
 
     setIsAdding(true)
+
     try {
       const updatedCart = await getCart()
       const existingItem = updatedCart?.cartItems?.find(
@@ -176,31 +177,34 @@ const ProductDetail = () => {
       if (currentQty + quantity > product.quantity) {
         setSnackbar({
           type: 'warning',
-          message: 'Không thể vượt quá số lượng tồn kho!',
+          message: 'Không thể vượt quá số lượng tồn kho!'
         })
+        // Bật lại nút ngay trước khi return
+        setTimeout(() => setIsAdding(false), 500)
         return
       }
 
       const res = await addToCart({
-        cartItems: [{ productId: product._id, quantity }],
+        cartItems: [{ productId: product._id, quantity }]
       })
 
       dispatch(setCartItems(res?.cartItems || updatedCart?.cartItems || []))
       setSnackbar({
         type: 'success',
-        message: 'Thêm sản phẩm vào giỏ hàng thành công!',
+        message: 'Thêm sản phẩm vào giỏ hàng thành công!'
       })
       setQuantity(1)
     } catch (error) {
       console.error('Lỗi khi thêm vào giỏ:', error)
       setSnackbar({
         type: 'error',
-        message: 'Không thể thêm sản phẩm vào giỏ hàng!',
+        message: 'Không thể thêm sản phẩm vào giỏ hàng!'
       })
     } finally {
-      setIsAdding(false)
+      setTimeout(() => setIsAdding(false), 1000)
     }
   }
+
 
   // Giảm SL
   const handleIncrease = () => {
@@ -220,8 +224,8 @@ const ProductDetail = () => {
         _id: product._id,
         name: product.name,
         price: product.price,
-        image: product.image || (product.images && product.images[0]) || '',
-      },
+        image: product.image || (product.images && product.images[0]) || ''
+      }
     }
 
     dispatch(setTempCart({ cartItems: [itemToBuy] }))
@@ -346,7 +350,7 @@ const ProductDetail = () => {
                       label={`VOUCHER ${coupon.type === 'percent'
                         ? `${coupon.amount}%`
                         : `${coupon.amount.toLocaleString()}đ`
-                        }`}
+                      }`}
                       onClick={() => setOpenVoucherDrawer(true)}
                     />
                   ))}
@@ -451,11 +455,15 @@ const ProductDetail = () => {
             <Box sx={{ display: 'flex', gap: 2 }}>
               <Button
                 variant="contained"
+                color="primary"
+                disabled={isAdding}
                 onClick={handleAddToCart}
-                disabled={!!isAdding[product._id]}
                 sx={{ backgroundColor: '#1A3C7B', color: 'white' }}
+                startIcon={
+                  isAdding ? <CircularProgress size={20} color="inherit" /> : null
+                }
               >
-                Thêm vào giỏ hàng
+                {isAdding ? 'Đang thêm...' : 'Thêm vào giỏ'}
               </Button>
               <Button
                 variant='outlined'

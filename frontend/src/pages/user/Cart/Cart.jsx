@@ -8,7 +8,6 @@ import { useCart } from '~/hook/useCarts'
 import { useNavigate } from 'react-router-dom'
 import { useDispatch } from 'react-redux'
 import { setSelectedItems as setSelectedItemsAction } from '~/redux/cart/cartSlice'
-
 const Cart = () => {
   const { cart, loading, deleteItem, clearCart, updateItem } = useCart()
   const [selectedItems, setSelectedItems] = useState([])

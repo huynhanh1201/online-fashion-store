@@ -67,7 +67,12 @@ export const ChooseAddressModal = ({ open, onClose, onConfirm, onUpdateAddresses
 
   return (
     <>
-      <Dialog open={open} onClose={onClose} fullWidth maxWidth="md">
+      <Dialog open={open} onClose={onClose} fullWidth maxWidth="md"
+        PaperProps={{
+          sx: {
+            maxHeight: '70vh',
+          },
+        }}>
         <DialogTitle>Chọn địa chỉ giao hàng</DialogTitle>
 
         <DialogContent dividers>
