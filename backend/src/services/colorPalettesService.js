@@ -2,27 +2,33 @@ import { StatusCodes } from 'http-status-codes'
 
 import { ColorPaletteModel } from '~/models/ColorPaletteModel'
 import ApiError from '~/utils/ApiError'
-import { ProductModel } from '~/models/ProductModel'
 
-const createColorPalette = async (reqBody) => {
+const createColorPalette = async (colorPaletteId, reqBody) => {
   // eslint-disable-next-line no-useless-catch
   try {
     const newColorPalette = {
-      productId: reqBody.productId,
       name: reqBody.name,
-      image: reqBody.image
+      image: reqBody.image,
+      isActive: true
     }
 
-    const colorPalette = await ColorPaletteModel.create(newColorPalette)
+    const updatedPalette = await ColorPaletteModel.findOneAndUpdate(
+      { _id: colorPaletteId },
+      { $push: { colors: newColorPalette } },
+      {
+        new: true,
+        upsert: true
+      }
+    )
 
-    return colorPalette
+    return updatedPalette
   } catch (err) {
     throw err
   }
 }
 
-const getColorPaletteList = async () => {
-  const result = await ColorPaletteModel.find({}).lean()
+const getColorPaletteList = async (productId) => {
+  const result = await ColorPaletteModel.findOne({ productId }).lean()
 
   return result
 }

@@ -7,7 +7,7 @@ import { authMiddleware } from '~/middlewares/authMiddleware'
 const Router = express.Router()
 
 // Tạo Danh mục sản phẩm mới
-Router.route('/').post(
+Router.route('/:colorPaletteId').post(
   colorPalettesValidation.colorPalette,
   colorPalettesController.createColorPalette
 )
