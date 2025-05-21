@@ -1,149 +1,74 @@
-import React, { useState } from 'react'
+import TextField from '@mui/material/TextField'
+import Button from '@mui/material/Button'
 import Dialog from '@mui/material/Dialog'
 import DialogTitle from '@mui/material/DialogTitle'
 import DialogContent from '@mui/material/DialogContent'
 import DialogActions from '@mui/material/DialogActions'
-import TextField from '@mui/material/TextField'
-import Button from '@mui/material/Button'
-import Box from '@mui/material/Box'
-import Typography from '@mui/material/Typography'
-
+import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
-import { createColorPalette } from '~/services/admin/colorPaletteService.js' // API thêm màu (có trường name, image)
 
-const URI = 'https://api.cloudinary.com/v1_1/dkwsy9sph/image/upload'
-const CloudinaryFolder = 'color_upload'
-
-const uploadToCloudinary = async (file) => {
-  const formData = new FormData()
-  formData.append('file', file)
-  formData.append('upload_preset', 'demo_unsigned')
-  formData.append('folder', CloudinaryFolder)
-
-  const res = await fetch(URI, {
-    method: 'POST',
-    body: formData
-  })
-  const data = await res.json()
-  return data.secure_url
-}
-
-const AddColorModal = ({ open, onClose, onSuccess }) => {
+export default function AddColorModal({ open, onClose, onAddColor }) {
   const {
     register,
     handleSubmit,
     reset,
-    formState: { errors, isSubmitting }
-  } = useForm({
-    defaultValues: { name: '' }
-  })
+    formState: { errors }
+  } = useForm()
 
-  const [imageFile, setImageFile] = useState(null)
-  const [preview, setPreview] = useState('')
-
-  const handleFileChange = (e) => {
-    const file = e.target.files[0]
-    if (file) {
-      setImageFile(file)
-      setPreview(URL.createObjectURL(file))
+  const onSubmit = (data) => {
+    const newColor = {
+      _id: crypto.randomUUID(),
+      name: data.name,
+      code: data.code
     }
-  }
-
-  const onSubmit = async (data) => {
-    try {
-      let imageUrl = ''
-      if (imageFile) {
-        imageUrl = await uploadToCloudinary(imageFile)
-      }
-
-      const payload = {
-        name: data.name,
-        image: imageUrl // URL hình ảnh màu
-      }
-
-      const result = await createColorPalette(payload)
-      if (result) {
-        onSuccess()
-        onClose()
-        reset()
-        setImageFile(null)
-        setPreview('')
-      } else {
-        alert('Thêm màu không thành công')
-      }
-    } catch (error) {
-      console.error('Lỗi khi thêm màu:', error)
-      alert('Có lỗi xảy ra, vui lòng thử lại')
+    if (typeof onAddColor === 'function') {
+      onAddColor(newColor)
     }
-  }
-
-  const handleClose = () => {
-    onClose()
     reset()
-    setImageFile(null)
-    setPreview('')
+    onClose()
   }
+
+  useEffect(() => {
+    if (!open) reset()
+  }, [open, reset])
 
   return (
-    <Dialog open={open} onClose={handleClose} maxWidth='sm' fullWidth>
-      <DialogTitle>Thêm Màu Sắc</DialogTitle>
+    <Dialog open={open} onClose={onClose}>
+      <DialogTitle>Thêm màu sắc</DialogTitle>
       <DialogContent>
-        <Box sx={{ mt: 2 }}>
-          <TextField
-            label='Tên màu'
-            fullWidth
-            {...register('name', { required: 'Tên màu không được bỏ trống' })}
-            error={!!errors.name}
-            helperText={errors.name?.message}
-          />
-        </Box>
-        <Box sx={{ mt: 2 }}>
-          <Typography>Ảnh màu (chọn 1 ảnh)</Typography>
-          <input
-            type='file'
-            accept='image/*'
-            onChange={handleFileChange}
-            style={{ marginTop: 8 }}
-          />
-          {preview && (
-            <Box sx={{ mt: 2 }}>
-              <img
-                src={preview}
-                alt='Preview'
-                style={{
-                  width: 100,
-                  height: 100,
-                  objectFit: 'cover',
-                  borderRadius: 8
-                }}
-              />
-              <Button
-                variant='text'
-                color='error'
-                size='small'
-                onClick={() => {
-                  setImageFile(null)
-                  setPreview('')
-                }}
-              >
-                Xóa ảnh
-              </Button>
-            </Box>
-          )}
-        </Box>
+        <form onSubmit={handleSubmit(onSubmit)} className='space-y-4 mt-4'>
+          <div>
+            <label className='block mb-1 font-medium'>Tên màu</label>
+            <TextField
+              {...register('name', { required: 'Vui lòng nhập tên màu' })}
+              placeholder='Ví dụ: Đỏ tươi'
+              fullWidth
+            />
+            {errors.name && (
+              <p className='text-red-500 text-sm mt-1'>{errors.name.message}</p>
+            )}
+          </div>
+
+          <div>
+            <label className='block mb-1 font-medium'>Mã màu (hex)</label>
+            <TextField
+              type='color'
+              {...register('code', { required: 'Vui lòng chọn mã màu' })}
+              className='h-10 w-16 p-0 border-none'
+            />
+            {errors.code && (
+              <p className='text-red-500 text-sm mt-1'>{errors.code.message}</p>
+            )}
+          </div>
+
+          <DialogActions className='pt-4'>
+            <Button type='button' variant='outlined' onClick={onClose}>
+              Hủy
+            </Button>
+            <Button type='submit'>Thêm</Button>
+          </DialogActions>
+        </form>
       </DialogContent>
-      <DialogActions>
-        <Button onClick={handleClose}>Hủy</Button>
-        <Button
-          onClick={handleSubmit(onSubmit)}
-          disabled={isSubmitting}
-          variant='contained'
-        >
-          Thêm
-        </Button>
-      </DialogActions>
     </Dialog>
   )
 }
-
-export default AddColorModal

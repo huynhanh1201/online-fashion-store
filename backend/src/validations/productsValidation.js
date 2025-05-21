@@ -47,6 +47,11 @@ const product = async (req, res, next) => {
 
     categoryId: Joi.string().length(24).hex().required(),
 
+    origin: Joi.string()
+      .trim() // loại bỏ khoảng trắng đầu/cuối
+      .min(1) // độ dài tối thiểu 1 ký tự
+      .max(200), // độ dài tối đa 200 ký tự,
+
     colors: Joi.array()
       .items(
         Joi.object({
