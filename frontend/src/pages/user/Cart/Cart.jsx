@@ -4,7 +4,7 @@ import {
   Typography, IconButton, TextField, Avatar, Button, Checkbox, Snackbar, Alert
 } from '@mui/material'
 import { Delete, Add, Remove } from '@mui/icons-material'
-import { useCart } from '~/hook/useCarts'
+import { useCart } from '~/hooks/useCarts'
 import { useNavigate } from 'react-router-dom'
 import { useDispatch } from 'react-redux'
 import { setSelectedItems as setSelectedItemsAction } from '~/redux/cart/cartSlice'

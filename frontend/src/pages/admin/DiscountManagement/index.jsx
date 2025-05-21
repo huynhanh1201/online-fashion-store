@@ -4,7 +4,7 @@ import Typography from '@mui/material/Typography'
 import Button from '@mui/material/Button'
 import AddIcon from '@mui/icons-material/Add'
 
-import useDiscounts from '~/hook/admin/useDiscount'
+import useDiscounts from '~/hooks/admin/useDiscount'
 import {
   updateDiscount,
   deleteDiscount

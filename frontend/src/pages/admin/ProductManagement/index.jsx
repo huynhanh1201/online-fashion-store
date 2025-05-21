@@ -141,8 +141,8 @@ import FilterListIcon from '@mui/icons-material/FilterList'
 import ProductTable from './ProductTable'
 import ProductPagination from './ProductPagination'
 
-import useProducts from '~/hook/admin/useProducts'
-import useCategories from '~/hook/admin/useCategories'
+import useProducts from '~/hooks/admin/useProducts'
+import useCategories from '~/hooks/admin/useCategories'
 
 import { updateProduct, deleteProduct } from '~/services/admin/productService'
 

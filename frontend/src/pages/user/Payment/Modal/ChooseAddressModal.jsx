@@ -13,7 +13,7 @@ import {
   CircularProgress
 } from '@mui/material'
 
-import { useAddress } from '~/hook/useAddress'
+import { useAddress } from '~/hooks/useAddress'
 import AddAddressModal from './AddAddressModal'
 
 export const ChooseAddressModal = ({ open, onClose, onConfirm, onUpdateAddresses }) => {

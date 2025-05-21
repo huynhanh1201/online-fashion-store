@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { Box, Grid, Button, Snackbar, Alert } from '@mui/material'
 import { addToCart, getCart } from '~/services/cartService'
-import useProducts from '~/hook/useProducts'
+import useProducts from '~/hooks/useProducts'
 import { useDispatch } from 'react-redux'
 import { setCartItems } from '~/redux/cart/cartSlice'
 import ProductCard from '~/components/ProductCards/ProductCards'
