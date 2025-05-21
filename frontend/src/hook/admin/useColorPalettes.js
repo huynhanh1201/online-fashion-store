@@ -1,21 +1,68 @@
-import { useState, useEffect } from 'react'
+// import { useState } from 'react'
+// import {
+//   getColorPalettes,
+//   createColorPalette
+// } from '~/services/admin/colorPaletteService'
+//
+// const useColorPalettes = () => {
+//   const [colorPalettes, setColorPalettes] = useState([])
+//   const [loading, setLoading] = useState(false)
+//
+//   const fetchColorPalettes = async (productId) => {
+//     setLoading(true)
+//     try {
+//       const data = await getColorPalettes(productId)
+//       // Đảm bảo data là mảng
+//       setColorPalettes(Array.isArray(data) ? data : [])
+//     } catch (error) {
+//       console.error('Lỗi khi fetch danh sách màu:', error)
+//       setColorPalettes([])
+//     } finally {
+//       setLoading(false)
+//     }
+//   }
+//
+//   const addColorPalette = async (data) => {
+//     try {
+//       const newColor = await createColorPalette(data)
+//       setColorPalettes((prev) => [...prev, newColor])
+//       return newColor
+//     } catch (error) {
+//       console.error('Lỗi khi thêm màu mới:', error)
+//       throw error
+//     }
+//   }
+//
+//   return { colorPalettes, loading, fetchColorPalettes, addColorPalette }
+// }
+//
+// export default useColorPalettes
+
+// hooks/useColorPalettes.js
+import { useEffect, useState } from 'react'
 import {
   getColorPalettes,
-  createColorPalette
+  createColorPalette,
+  updateColorPalette,
+  deleteColorPalette
 } from '~/services/admin/colorPaletteService'
 
-const useColorPalettes = () => {
+const useColorPalettes = (productId) => {
   const [colorPalettes, setColorPalettes] = useState([])
   const [loading, setLoading] = useState(false)
+  const [paletteId, setPaletteId] = useState(null)
 
   const fetchColorPalettes = async () => {
+    if (!productId) return
     setLoading(true)
     try {
-      const data = await getColorPalettes()
-      setColorPalettes(data || [])
+      const data = await getColorPalettes(productId)
+      setColorPalettes(data.colors)
+      setPaletteId(data.paletteId)
     } catch (error) {
       console.error('Lỗi khi fetch danh sách màu:', error)
       setColorPalettes([])
+      setPaletteId(null)
     } finally {
       setLoading(false)
     }
@@ -23,8 +70,8 @@ const useColorPalettes = () => {
 
   const addColorPalette = async (data) => {
     try {
-      const newColor = await createColorPalette(data)
-      setColorPalettes((prev) => [...prev, newColor])
+      const newColor = await createColorPalette({ ...data, productId })
+      await fetchColorPalettes() // refetch lại vì màu nằm trong mảng colors
       return newColor
     } catch (error) {
       console.error('Lỗi khi thêm màu mới:', error)
@@ -32,11 +79,40 @@ const useColorPalettes = () => {
     }
   }
 
+  const editColorPalette = async (colorId, updatedData) => {
+    try {
+      const updated = await updateColorPalette(colorId, updatedData)
+      await fetchColorPalettes()
+      return updated
+    } catch (error) {
+      console.error('Lỗi khi cập nhật màu:', error)
+      throw error
+    }
+  }
+
+  const removeColorPalette = async (colorId) => {
+    try {
+      await deleteColorPalette(colorId)
+      await fetchColorPalettes()
+    } catch (error) {
+      console.error('Lỗi khi xóa màu:', error)
+      throw error
+    }
+  }
+
   useEffect(() => {
     fetchColorPalettes()
-  }, [])
+  }, [productId])
 
-  return { colorPalettes, loading, fetchColorPalettes, addColorPalette }
+  return {
+    colorPalettes,
+    loading,
+    paletteId,
+    fetchColorPalettes,
+    addColorPalette,
+    editColorPalette,
+    removeColorPalette
+  }
 }
 
 export default useColorPalettes
