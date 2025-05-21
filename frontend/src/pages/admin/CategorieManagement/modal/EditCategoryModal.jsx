@@ -10,7 +10,7 @@ import CircularProgress from '@mui/material/CircularProgress'
 import Divider from '@mui/material/Divider'
 
 import { useForm } from 'react-hook-form'
-import StyleAdmin from '~/components/StyleAdmin'
+import StyleAdmin from '~/assets/StyleAdmin.jsx'
 
 const EditCategoryModal = ({ open, onClose, category, onSave }) => {
   const {

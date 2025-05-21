@@ -9,7 +9,7 @@ import Divider from '@mui/material/Divider'
 import Typography from '@mui/material/Typography'
 import CircularProgress from '@mui/material/CircularProgress'
 
-import StyleAdmin from '~/components/StyleAdmin'
+import StyleAdmin from '~/assets/StyleAdmin.jsx'
 
 const DeleteDiscountModal = ({ open, onClose, discount, onDelete }) => {
   const [loading, setLoading] = useState(false)

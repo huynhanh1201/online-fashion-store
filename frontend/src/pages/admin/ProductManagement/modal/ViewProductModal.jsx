@@ -11,7 +11,7 @@ import Typography from '@mui/material/Typography'
 import Divider from '@mui/material/Divider'
 import Chip from '@mui/material/Chip'
 
-import StyleAdmin from '~/components/StyleAdmin'
+import StyleAdmin from '~/assets/StyleAdmin.jsx'
 
 const ViewProductModal = ({ open, onClose, product }) => {
   const imageList = Array.isArray(product?.image) ? product.image : []

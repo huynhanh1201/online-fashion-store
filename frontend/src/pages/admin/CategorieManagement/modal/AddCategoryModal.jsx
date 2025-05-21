@@ -11,7 +11,7 @@ import Divider from '@mui/material/Divider'
 import { useForm } from 'react-hook-form'
 
 import { addCategory } from '~/services/admin/categoryService'
-import StyleAdmin from '~/components/StyleAdmin'
+import StyleAdmin from '~/assets/StyleAdmin.jsx'
 
 const AddCategoryModal = ({ open, onClose, onAdded }) => {
   const {

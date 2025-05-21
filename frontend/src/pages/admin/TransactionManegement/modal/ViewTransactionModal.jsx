@@ -9,7 +9,7 @@ import Divider from '@mui/material/Divider'
 import TextField from '@mui/material/TextField'
 import Stack from '@mui/material/Stack'
 
-import StyleAdmin from '~/components/StyleAdmin'
+import StyleAdmin from '~/assets/StyleAdmin.jsx'
 
 const ViewTransactionModal = ({ open, onClose, transaction }) => {
   const statusLabel = {

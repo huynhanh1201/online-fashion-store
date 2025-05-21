@@ -12,7 +12,7 @@ import useOrderAdmin from '~/hook/admin/useOrder'
 import StyleAdmin, {
   StyledTableCell,
   StyledTableRow
-} from '~/components/StyleAdmin'
+} from '~/assets/StyleAdmin.jsx'
 
 const TransactionRow = ({ transaction, onView, onEdit, onDelete, index }) => {
   const [orderTotal, setOrderTotal] = useState(null)

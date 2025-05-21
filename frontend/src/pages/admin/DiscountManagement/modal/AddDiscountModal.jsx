@@ -17,7 +17,7 @@ import Select from '@mui/material/Select'
 import Box from '@mui/material/Box'
 
 import { addDiscount } from '~/services/admin/discountService'
-import StyleAdmin from '~/components/StyleAdmin'
+import StyleAdmin from '~/assets/StyleAdmin.jsx'
 
 const AddDiscountModal = ({ open, onClose, onAdded }) => {
   const {

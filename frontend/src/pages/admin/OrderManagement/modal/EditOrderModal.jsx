@@ -13,7 +13,7 @@ import FormControlLabel from '@mui/material/FormControlLabel'
 import Checkbox from '@mui/material/Checkbox'
 import Stack from '@mui/material/Stack'
 import { useForm, Controller } from 'react-hook-form'
-import StyleAdmin from '~/components/StyleAdmin'
+import StyleAdmin from '~/assets/StyleAdmin.jsx'
 
 const statusOptions = [
   'Pending',

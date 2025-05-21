@@ -1,5 +1,4 @@
 import React, { useState, useRef, useEffect } from 'react'
-
 import Dialog from '@mui/material/Dialog'
 import DialogTitle from '@mui/material/DialogTitle'
 import DialogContent from '@mui/material/DialogContent'
@@ -14,27 +13,28 @@ import InputLabel from '@mui/material/InputLabel'
 import MenuItem from '@mui/material/MenuItem'
 import IconButton from '@mui/material/IconButton'
 import Divider from '@mui/material/Divider'
-import Chip from '@mui/material/Chip'
-
+import List from '@mui/material/List'
+import ListItem from '@mui/material/ListItem'
+import ListItemText from '@mui/material/ListItemText'
+import ListItemAvatar from '@mui/material/ListItemAvatar'
+import Avatar from '@mui/material/Avatar'
 import EditIcon from '@mui/icons-material/Edit'
 import DeleteIcon from '@mui/icons-material/Delete'
-import CancelIcon from '@mui/icons-material/Cancel'
-
 import { useForm, Controller } from 'react-hook-form'
-
 import { addProduct } from '~/services/productService'
 import useCategories from '~/hook/useCategories'
 import AddCategoryModal from '~/pages/admin/CategorieManagement/modal/AddCategoryModal'
-import StyleAdmin from '~/components/StyleAdmin'
+import StyleAdmin from '~/assets/StyleAdmin.jsx'
 
 const URI = 'https://api.cloudinary.com/v1_1/dkwsy9sph/image/upload'
 const CloudinaryProduct = 'product_upload'
+const CloudinaryColor = 'color_upload' // Thêm folder riêng cho ảnh màu
 
-const uploadToCloudinary = async (file) => {
+const uploadToCloudinary = async (file, folder = CloudinaryProduct) => {
   const formData = new FormData()
   formData.append('file', file)
   formData.append('upload_preset', 'demo_unsigned')
-  formData.append('folder', CloudinaryProduct)
+  formData.append('folder', folder)
 
   const res = await fetch(URI, {
     method: 'POST',
@@ -43,22 +43,6 @@ const uploadToCloudinary = async (file) => {
 
   const data = await res.json()
   return data.secure_url
-}
-
-const textColorMap = {
-  S: '#fff',
-  M: '#fff',
-  L: '#fff',
-  XL: '#fff',
-  XXL: '#fff'
-}
-
-const colorMap = {
-  Đỏ: '#f44336',
-  'Xanh dương': '#2196f3',
-  Đen: '#212121',
-  Trắng: '#e0e0e0',
-  Vàng: '#ffeb3b'
 }
 
 const AddProductModal = ({ open, onClose, onSuccess }) => {
@@ -76,17 +60,21 @@ const AddProductModal = ({ open, onClose, onSuccess }) => {
       image: [],
       categoryId: '',
       quantity: '',
-      origin: '',
       slug: '',
-      sizes: [], // phải là mảng
-      colors: [] // phải là mảng
+      orgin: '',
+      colors: []
     }
   })
 
   const [images, setImages] = useState([{ file: null, preview: '' }])
   const { categories, loading, fetchCategories } = useCategories()
   const [categoryOpen, setCategoryOpen] = useState(false)
+  const [colorInput, setColorInput] = useState('')
+  const [colorImage, setColorImage] = useState(null)
+  const [colorImagePreview, setColorImagePreview] = useState('')
+  const [colorList, setColorList] = useState([])
   const fileInputRefs = useRef([])
+  const colorFileInputRef = useRef(null)
 
   const handleImageChange = (index, file) => {
     const newImages = [...images]
@@ -108,6 +96,42 @@ const AddProductModal = ({ open, onClose, onSuccess }) => {
     setImages(newImages)
   }
 
+  const handleColorImageChange = (e) => {
+    const file = e.target.files[0]
+    if (file) {
+      setColorImage(file)
+      setColorImagePreview(URL.createObjectURL(file))
+    }
+  }
+
+  const handleAddColor = async (e) => {
+    e.preventDefault()
+    if (colorInput.trim() && colorImage) {
+      try {
+        const imageUrl = await uploadToCloudinary(colorImage, CloudinaryColor)
+        setColorList([
+          ...colorList,
+          { name: colorInput.trim(), image: imageUrl }
+        ])
+        setColorInput('')
+        setColorImage(null)
+        setColorImagePreview('')
+        if (colorFileInputRef.current) {
+          colorFileInputRef.current.value = '' // Reset input file
+        }
+      } catch (error) {
+        console.error('Lỗi khi upload ảnh màu:', error)
+        alert('Không thể upload ảnh màu, vui lòng thử lại')
+      }
+    } else {
+      alert('Vui lòng nhập tên màu và chọn ảnh')
+    }
+  }
+
+  const handleRemoveColor = (colorToRemove) => {
+    setColorList(colorList.filter((color) => color.name !== colorToRemove.name))
+  }
+
   const onSubmit = async (data) => {
     try {
       const imageUrls = []
@@ -125,9 +149,8 @@ const AddProductModal = ({ open, onClose, onSuccess }) => {
         image: imageUrls,
         categoryId: data.categoryId,
         quantity: Number(data.quantity),
-        origin: data.origin,
-        sizes: data.sizes || [],
-        colors: data.colors || []
+        origin: data.orgin || '',
+        colors: colorList // Gửi mảng colorList với cấu trúc [{ name, image }]
       })
 
       if (result) {
@@ -135,6 +158,10 @@ const AddProductModal = ({ open, onClose, onSuccess }) => {
         onClose()
         reset()
         setImages([{ file: null, preview: '' }])
+        setColorList([])
+        setColorInput('')
+        setColorImage(null)
+        setColorImagePreview('')
       } else {
         alert('Thêm sản phẩm không thành công')
       }
@@ -215,171 +242,95 @@ const AddProductModal = ({ open, onClose, onSuccess }) => {
                   sx={StyleAdmin.InputCustom}
                 />
               </Box>
-
-              <TextField
-                label='Xuất xứ'
-                fullWidth
-                margin='normal'
-                {...register('origin', {
-                  required: 'Xuất xứ không được bỏ trống'
-                })}
-                error={!!errors.origin}
-                helperText={errors.origin?.message}
-                sx={StyleAdmin.InputCustom}
-              />
-              <Box sx={{ display: 'flex', gap: 2 }}>
-                <FormControl
+              <Box sx={{ mt: 2 }}>
+                <TextField
+                  label='Xuất xứ'
                   fullWidth
+                  multiline
+                  rows={3}
                   margin='normal'
-                  error={!!errors.sizes}
-                  sx={StyleAdmin.FormSelect}
+                  sx={StyleAdmin.InputCustom}
+                />
+                <Typography variant='subtitle1' sx={{ mb: 1 }}>
+                  Màu sắc
+                </Typography>
+                <Box
+                  sx={{ display: 'flex', gap: 1, mb: 2, alignItems: 'center' }}
                 >
-                  <InputLabel>Kích cỡ</InputLabel>
-                  <Controller
-                    name='sizes'
-                    control={control}
-                    rules={{ required: 'Kích cỡ không được bỏ trống' }}
-                    render={({ field }) => {
-                      const handleDelete = (event, itemToDelete) => {
-                        event.stopPropagation()
-                        const newValue = (field.value || []).filter(
-                          (item) => item !== itemToDelete
-                        )
-                        field.onChange(newValue)
-                      }
-
-                      return (
-                        <Select
-                          {...field}
-                          label='Kích cỡ'
-                          multiple
-                          value={field.value || []}
-                          onChange={(event) =>
-                            field.onChange(event.target.value)
-                          }
-                          renderValue={(selected) => (
-                            <Box
-                              sx={{
-                                display: 'flex',
-                                flexWrap: 'wrap',
-                                gap: 0.5
-                              }}
-                            >
-                              {selected.map((value) => (
-                                <Chip
-                                  key={value}
-                                  label={value}
-                                  onDelete={(e) => handleDelete(e, value)}
-                                  deleteIcon={
-                                    <CancelIcon
-                                      onMouseDown={(e) => e.stopPropagation()}
-                                    />
-                                  }
-                                  sx={{
-                                    color: '#000',
-                                    '& .MuiChip-deleteIcon': {
-                                      color: '#000'
-                                    }
-                                  }}
-                                />
-                              ))}
-                            </Box>
-                          )}
-                          MenuProps={{
-                            PaperProps: { sx: StyleAdmin.FormSelect.SelectMenu }
-                          }}
-                        >
-                          {['S', 'M', 'L', 'XL', 'XXL'].map((size) => (
-                            <MenuItem key={size} value={size}>
-                              {size}
-                            </MenuItem>
-                          ))}
-                        </Select>
-                      )
-                    }}
+                  <TextField
+                    label='Tên màu sắc'
+                    value={colorInput}
+                    onChange={(e) => setColorInput(e.target.value)}
+                    sx={StyleAdmin.InputCustom}
+                    style={{ flex: 1 }}
                   />
-                  <Typography variant='caption' color='error'>
-                    {errors.sizes?.message}
-                  </Typography>
-                </FormControl>
-
-                <FormControl
-                  fullWidth
-                  margin='normal'
-                  error={!!errors.colors}
-                  sx={StyleAdmin.FormSelect}
-                >
-                  <InputLabel>Màu sắc</InputLabel>
-                  <Controller
-                    name='colors'
-                    control={control}
-                    rules={{ required: 'Màu sắc không được bỏ trống' }}
-                    render={({ field }) => {
-                      const handleDelete = (event, itemToDelete) => {
-                        event.stopPropagation()
-                        const newValue = (field.value || []).filter(
-                          (item) => item !== itemToDelete
-                        )
-                        field.onChange(newValue)
-                      }
-                      return (
-                        <Select
-                          {...field}
-                          label='Màu sắc'
-                          multiple
-                          value={field.value || []}
-                          onChange={(event) =>
-                            field.onChange(event.target.value)
-                          }
-                          renderValue={(selected) => (
-                            <Box
-                              sx={{
-                                display: 'flex',
-                                flexWrap: 'wrap',
-                                gap: 0.5
-                              }}
-                            >
-                              {selected.map((value) => (
-                                <Chip
-                                  key={value}
-                                  label={value}
-                                  onDelete={(e) => handleDelete(e, value)}
-                                  deleteIcon={
-                                    <CancelIcon
-                                      onMouseDown={(e) => e.stopPropagation()}
-                                    />
-                                  }
-                                  sx={{
-                                    backgroundColor:
-                                      colorMap[value] || 'default',
-                                    color: textColorMap[value] || '#ffffff',
-                                    '& .MuiChip-deleteIcon': {
-                                      color: textColorMap[value] || '#ffffff'
-                                    }
-                                  }}
-                                />
-                              ))}
-                            </Box>
-                          )}
-                          MenuProps={{
-                            PaperProps: { sx: StyleAdmin.FormSelect.SelectMenu }
-                          }}
-                        >
-                          {['Đỏ', 'Xanh dương', 'Đen', 'Trắng', 'Vàng'].map(
-                            (color) => (
-                              <MenuItem key={color} value={color}>
-                                {color}
-                              </MenuItem>
-                            )
-                          )}
-                        </Select>
-                      )
+                  <Button
+                    variant='outlined'
+                    component='label'
+                    sx={{
+                      height: '56px',
+                      borderColor: '#000',
+                      color: '#000'
                     }}
-                  />
-                  <Typography variant='caption' color='error'>
-                    {errors.colors?.message}
-                  </Typography>
-                </FormControl>
+                  >
+                    Chọn ảnh
+                    <input
+                      type='file'
+                      accept='image/*'
+                      hidden
+                      ref={colorFileInputRef}
+                      onChange={handleColorImageChange}
+                    />
+                  </Button>
+                  <Button
+                    variant='contained'
+                    onClick={handleAddColor}
+                    disabled={!colorInput.trim() || !colorImage}
+                    sx={{ backgroundColor: '#001f5d', height: '56px' }}
+                  >
+                    Thêm
+                  </Button>
+                </Box>
+                {colorImagePreview && (
+                  <Box sx={{ mb: 2 }}>
+                    <Typography variant='caption'>Xem trước ảnh:</Typography>
+                    <Box
+                      component='img'
+                      src={colorImagePreview}
+                      alt='color-preview'
+                      sx={{
+                        width: '100px',
+                        height: '100px',
+                        objectFit: 'cover',
+                        borderRadius: 1
+                      }}
+                    />
+                  </Box>
+                )}
+                <List sx={{ maxHeight: '150px', overflowY: 'auto' }}>
+                  {colorList.map((color, index) => (
+                    <ListItem
+                      key={index}
+                      secondaryAction={
+                        <IconButton
+                          edge='end'
+                          onClick={() => handleRemoveColor(color)}
+                        >
+                          <DeleteIcon sx={{ color: '#f44336' }} />
+                        </IconButton>
+                      }
+                    >
+                      <ListItemAvatar>
+                        <Avatar
+                          src={color.image}
+                          alt={color.name}
+                          sx={{ width: 40, height: 40 }}
+                        />
+                      </ListItemAvatar>
+                      <ListItemText primary={color.name} />
+                    </ListItem>
+                  ))}
+                </List>
               </Box>
               <FormControl
                 fullWidth
@@ -502,8 +453,6 @@ const AddProductModal = ({ open, onClose, onSuccess }) => {
                               />
                             </IconButton>
                           </Box>
-
-                          {/* Icon xoá ở góc trên bên phải */}
                           <Box
                             sx={{
                               position: 'absolute',
@@ -574,7 +523,6 @@ const AddProductModal = ({ open, onClose, onSuccess }) => {
         </form>
       </Dialog>
 
-      {/* Modal thêm danh mục */}
       <AddCategoryModal
         open={categoryOpen}
         onClose={() => setCategoryOpen(false)}

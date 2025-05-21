@@ -12,7 +12,7 @@ import DiscountRow from './DiscountRow'
 import StyleAdmin, {
   StyledTableCell,
   StyledTableRow
-} from '~/components/StyleAdmin'
+} from '~/assets/StyleAdmin.jsx'
 
 const DiscountTable = ({ discounts, loading, onAction }) => {
   if (loading) return <CircularProgress />

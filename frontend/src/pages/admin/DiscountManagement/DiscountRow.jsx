@@ -8,7 +8,7 @@ import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye'
 import BorderColorIcon from '@mui/icons-material/BorderColor'
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever'
 
-import { StyledTableCell, StyledTableRow } from '~/components/StyleAdmin'
+import { StyledTableCell, StyledTableRow } from '~/assets/StyleAdmin.jsx'
 
 const DiscountRow = ({ discount, index, onAction }) => {
   const remaining = discount.usageLimit - discount.usedCount

@@ -7,7 +7,7 @@ import DialogActions from '@mui/material/DialogActions'
 import Button from '@mui/material/Button'
 import Typography from '@mui/material/Typography'
 
-import styleAdmin from '~/components/StyleAdmin'
+import styleAdmin from '~/assets/StyleAdmin.jsx'
 
 const DeleteProductModal = ({ open, onClose, product, onDelete }) => {
   const [isDeleting, setIsDeleting] = useState(false)

@@ -16,7 +16,7 @@ import InputLabel from '@mui/material/InputLabel'
 import Select from '@mui/material/Select'
 import FormControl from '@mui/material/FormControl'
 
-import StyleAdmin from '~/components/StyleAdmin'
+import StyleAdmin from '~/assets/StyleAdmin.jsx'
 
 // Hàm định dạng lại datetime cho input type="datetime-local"
 const formatDateTimeLocal = (isoString) => {

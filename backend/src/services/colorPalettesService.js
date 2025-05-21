@@ -29,7 +29,6 @@ const createColorPalette = async (productId, reqBody) => {
 
 const getColorPaletteList = async (productId) => {
   const result = await ColorPaletteModel.findOne({ productId }).lean()
-
   return result
 }
 
