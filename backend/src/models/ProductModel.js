@@ -52,7 +52,6 @@ const productSchema = new Schema(
     origin: {
       type: String,
       trim: true, // tự động loại bỏ khoảng trắng đầu/cuối
-      minlength: 1, // tuỳ chọn: độ dài tối thiểu
       maxlength: 200 // tuỳ chọn: độ dài tối đa
     }
   },
