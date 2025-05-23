@@ -27,6 +27,8 @@ import CategorieManagement from '~/pages/admin/CategorieManagement/index.jsx'
 import OrderManagement from '~/pages/admin/OrderManagement/index'
 import DiscountManagement from '~/pages/admin/DiscountManagement/index.jsx'
 import TransactionManegement from '~/pages/admin/TransactionManegement/index.jsx'
+import ColorManagement from '~/pages/admin/ColorManagement/index.jsx'
+
 // Trang 404
 import NotFound from '~/pages/404/NotFound'
 
@@ -59,10 +61,7 @@ function App() {
           <Route path='payment' element={<Payment />} />
 
           {/*=====Huynh Anh=====*/}
-          <Route
-            path='/payment-result'
-            element={<PaymentVnpay />}
-          />
+          <Route path='/payment-result' element={<PaymentVnpay />} />
           <Route
             path='/payment-failed'
             element={<h2>THANH TOÁN THẤT BẠI!</h2>}
@@ -94,6 +93,7 @@ function App() {
             path='transaction-management'
             element={<TransactionManegement />}
           />
+          <Route path='color-management' element={<ColorManagement />} />
         </Route>
       </Route>
 
