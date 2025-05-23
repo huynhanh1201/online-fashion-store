@@ -16,6 +16,7 @@ import { shippingAddressesRoute } from '~/routes/v1/shippingAddressesRoute'
 import { orderStatusHistoriesRoute } from '~/routes/v1/orderStatusHistoriesRoute'
 import { paymentTransactionsRoute } from '~/routes/v1/paymentTransactionsRoute'
 import { colorPalettesRoute } from '~/routes/v1/colorPalettesRoute'
+import { colorsRoute } from '~/routes/v1/colorsRoute'
 
 const Router = express.Router()
 
@@ -48,5 +49,7 @@ Router.use('/order-status-histories', orderStatusHistoriesRoute)
 Router.use('/payment-transactions', paymentTransactionsRoute)
 
 Router.use('/color-palettes', colorPalettesRoute)
+
+Router.use('/colors', colorsRoute)
 
 export const APIs_V1 = Router
