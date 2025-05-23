@@ -6,6 +6,7 @@ const cartSlice = createSlice({
     cartItems: [],
     selectedItems: [],
     tempCart: null,
+    isBuyNow: false
   },
   reducers: {
     setCartItems(state, action) {
@@ -16,9 +17,11 @@ const cartSlice = createSlice({
     },
     setTempCart(state, action) {
       state.tempCart = action.payload
+      state.isBuyNow = true
     },
     clearTempCart(state) {
       state.tempCart = null
+      state.isBuyNow = false
     },
     clearSelectedItems: (state) => {
       state.selectedItems = []

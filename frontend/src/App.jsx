@@ -17,6 +17,7 @@ import Cart from '~/pages/user/Cart/Cart'
 import Profile from '~/pages/user/Profile/Profile'
 import Order from '~/pages/user/Order/Order'
 import PaymentVnpay from '~/pages/user/PaymentVnpay/PaymentVnpay'
+import OrderSuccess from './pages/OrderSuccess/OrderSuccess'
 
 // Trang HeaderAdmin
 import AdminLayout from '~/layout/AdminLayout'
@@ -30,6 +31,9 @@ import TransactionManegement from '~/pages/admin/TransactionManegement/index.jsx
 // Trang 404
 import NotFound from '~/pages/404/NotFound'
 
+// Hook
+import { useAutoClearTempCart } from './hooks/useAutoClearTempCart'
+
 // Giải pháp Clean Code trong việc xác định các route nào cần đăng nhập tài khoản xong thì mới được truy cập
 const ProtectedRoute = ({ user }) => {
   if (!user) {
@@ -41,7 +45,7 @@ const ProtectedRoute = ({ user }) => {
 
 function App() {
   const currentUser = useSelector(selectCurrentUser)
-
+  useAutoClearTempCart()
   return (
     <Routes>
       {/*Authentication*/}
@@ -57,6 +61,7 @@ function App() {
         <Route element={<ProtectedRoute user={currentUser} />}>
           {/*<Outlet/> của react-router-dom sẽ chạy vào các child route trong này*/}
           <Route path='payment' element={<Payment />} />
+          <Route path="/order-success" element={<OrderSuccess />} />
 
           {/*=====Huynh Anh=====*/}
           <Route
