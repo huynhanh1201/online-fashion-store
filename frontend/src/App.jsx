@@ -15,7 +15,7 @@ import ProductDetail from '~/pages/user/ProductDetail/ProductDetail'
 import Payment from '~/pages/user/Payment/Payment'
 import Cart from '~/pages/user/Cart/Cart'
 import Profile from '~/pages/user/Profile/Profile'
-import Order from '~/pages/user/Order/Order'
+import Order from '~/pages/user/Order/OrderListPage'
 import PaymentVnpay from '~/pages/user/PaymentVnpay/PaymentVnpay'
 import OrderSuccess from './pages/OrderSuccess/OrderSuccess'
 
