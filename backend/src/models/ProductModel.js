@@ -24,8 +24,8 @@ const productSchema = new Schema(
     quantity: {
       type: Number,
       required: true,
-      min: 0,
-      default: 0 // nếu không truyền sẽ là 0
+      default: 0, // Nếu không truyền, để mặc định là 0
+      min: 0 // Giá không thể âm :contentReference[oaicite:2]{index=2}
     },
     image: [
       {
@@ -49,10 +49,15 @@ const productSchema = new Schema(
       type: Boolean,
       default: false // Soft-delete mặc định là false
     },
-    origin: {
-      type: String,
-      trim: true, // tự động loại bỏ khoảng trắng đầu/cuối
-      maxlength: 200 // tuỳ chọn: độ dài tối đa
+    importPrice: {
+      type: Number,
+      required: true,
+      min: 0 // Giá không thể âm :contentReference[oaicite:2]{index=2}
+    },
+    exportPrice: {
+      type: Number,
+      required: true,
+      min: 0 // Giá không thể âm :contentReference[oaicite:2]{index=2}
     }
   },
   {

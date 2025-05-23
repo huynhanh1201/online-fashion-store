@@ -31,11 +31,6 @@ const product = async (req, res, next) => {
       .min(0) // không âm :contentReference[oaicite:2]{index=2}
       .required(),
 
-    quantity: Joi.number() // thêm validate cho quantity
-      .integer() // phải là số nguyên
-      .min(0) // không âm
-      .required(),
-
     image: Joi.array() // image là mảng
       .items(
         Joi.string()
@@ -47,11 +42,9 @@ const product = async (req, res, next) => {
 
     categoryId: Joi.string().length(24).hex().required(),
 
-    origin: Joi.string()
-      .trim() // loại bỏ khoảng trắng đầu/cuối
-      .max(200)
-      .allow(null, '')
-      .optional(), // độ dài tối đa 200 ký tự,
+    importPrice: Joi.number() // price bắt buộc, số
+      .min(0) // không âm :contentReference[oaicite:2]{index=2}
+      .required(),
 
     colors: Joi.array()
       .items(
@@ -62,6 +55,24 @@ const product = async (req, res, next) => {
             .trim()
             .required()
             .uri({ scheme: [/https?/] })
+        })
+      )
+      .min(1),
+
+    sizes: Joi.array()
+      .items(
+        Joi.object({
+          name: Joi.string().trim().required().min(1).max(100)
+        })
+      )
+      .min(1),
+
+    stockMatrix: Joi.array()
+      .items(
+        Joi.object({
+          color: Joi.string().trim().required().min(1).max(100),
+          size: Joi.string().trim().required().min(1).max(100),
+          quantity: Joi.number().integer().min(0).required()
         })
       )
       .min(1)
