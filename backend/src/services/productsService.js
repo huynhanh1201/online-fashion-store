@@ -5,6 +5,7 @@ import { ProductModel } from '~/models/ProductModel'
 import ApiError from '~/utils/ApiError'
 import { slugify } from '~/utils/formatters'
 import { ColorPaletteModel } from '~/models/ColorPaletteModel'
+import { SizePaletteModel } from '~/models/SizePaletteModel'
 
 const createProduct = async (reqBody) => {
   // eslint-disable-next-line no-useless-catch
@@ -15,24 +16,34 @@ const createProduct = async (reqBody) => {
       price: reqBody.price,
       image: reqBody.image,
       categoryId: reqBody.categoryId,
-      quantity: reqBody.quantity,
       slug: slugify(reqBody.name),
-      destroy: false,
 
-      origin: reqBody.origin,
+      importPrice: reqBody.importPrice,
       sizes: reqBody.sizes,
-      colors: reqBody.colors
+      colors: reqBody.colors,
+
+      exportPrice: reqBody.price,
+      quantity: 0,
+      destroy: false
     }
 
     const product = await ProductModel.create(newProduct)
 
+    //  Tạo Màu sắc sản phẩm
     const newColorPalette = {
       productId: product._id,
       colors: reqBody.colors
     }
 
-    //  Tạo Màu sắc sản phẩm
     await ColorPaletteModel.create(newColorPalette)
+
+    //  Tạo Kích cỡ sản phẩm
+    const newSizePalette = {
+      productId: product._id,
+      sizes: reqBody.sizes
+    }
+
+    await SizePaletteModel.create(newSizePalette)
 
     return product
   } catch (err) {

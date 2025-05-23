@@ -1,7 +1,7 @@
 import express from 'express'
 
 import { colorPalettesValidation } from '~/validations/colorPalettesValidation'
-import { colorPaletteController } from '~/controllers/colorPaletteController'
+import { colorPalettesController } from '~/controllers/colorPalettesController'
 import { authMiddleware } from '~/middlewares/authMiddleware'
 
 const Router = express.Router()
@@ -9,29 +9,29 @@ const Router = express.Router()
 // Tạo Màu sắc sản phẩm mới
 Router.route('/').post(
   colorPalettesValidation.colorPalette,
-  colorPaletteController.createColorPalette
+  colorPalettesController.createColorPalette
 )
 
 // Danh sách Màu sắc sản phẩm
-Router.route('/').get(colorPaletteController.getColorPaletteList)
+Router.route('/').get(colorPalettesController.getColorPaletteList)
 
 // Lấy thông tin một Màu sắc sản phẩm.
 Router.route('/:colorPaletteId').get(
   colorPalettesValidation.verifyId,
-  colorPaletteController.getColorPalette
+  colorPalettesController.getColorPalette
 )
 
 // Cập nhật thông tin Màu sắc sản phẩm
 Router.route('/:colorPaletteId').patch(
   colorPalettesValidation.verifyId,
   colorPalettesValidation.colorPaletteUpadate,
-  colorPaletteController.updateColorPalette
+  colorPalettesController.updateColorPalette
 )
 
 // Xoá Màu sắc sản phẩm (Xóa mềm)
 Router.route('/:colorPaletteId').delete(
   colorPalettesValidation.verifyId,
-  colorPaletteController.deleteColorPalette
+  colorPalettesController.deleteColorPalette
 )
 
 export const colorPalettesRoute = Router

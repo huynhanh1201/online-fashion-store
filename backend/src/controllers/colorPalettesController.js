@@ -73,7 +73,7 @@ const deleteColorPalette = async (req, res, next) => {
   }
 }
 
-export const colorPaletteController = {
+export const colorPalettesController = {
   createColorPalette,
   getColorPaletteList,
   getColorPalette,

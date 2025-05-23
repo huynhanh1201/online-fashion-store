@@ -9,6 +9,12 @@ const OrderItemSchema = new Schema(
       ref: 'Order', // Tham chiếu đến đơn hàng
       required: true
     },
+    image: [
+      {
+        type: String,
+        trim: true // Mỗi phần tử là URL chuỗi, trim khoảng trắng
+      }
+    ],
     name: {
       type: String,
       required: true // tên sản phẩm lúc đặt không được bỏ trống

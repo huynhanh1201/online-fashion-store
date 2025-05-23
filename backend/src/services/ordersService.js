@@ -112,6 +112,7 @@ const createOrder = async (userId, reqBody, ipAddr) => {
       const product = productMap.get(item.productId.toString())
       return {
         orderId: order._id,
+        image: product.image,
         name: product.name,
         price: product.price,
         quantity: item.quantity,
