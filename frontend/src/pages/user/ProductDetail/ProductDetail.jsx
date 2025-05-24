@@ -109,7 +109,12 @@ const ProductDetail = () => {
       if (data && Object.keys(data).length) {
         setProduct({
           ...data,
-          images: data.images || data.image ? (Array.isArray(data.images) ? data.images : [data.image]) : ['/default.jpg'],
+          images:
+            data.images || data.image
+              ? Array.isArray(data.images)
+                ? data.images
+                : [data.image]
+              : ['/default.jpg'],
           name: data.name || 'Sản phẩm không tên'
         })
       } else {
@@ -118,8 +123,8 @@ const ProductDetail = () => {
     } catch (err) {
       setError(
         err?.response?.data?.message ||
-        err.message ||
-        'Không thể tải thông tin sản phẩm.'
+          err.message ||
+          'Không thể tải thông tin sản phẩm.'
       )
     } finally {
       setIsLoading(false)
@@ -145,13 +150,11 @@ const ProductDetail = () => {
     fetchCoupons()
   }, [])
 
-
   const handleCopy = (code) => {
     navigator.clipboard.writeText(code)
     setCopiedCode(code)
     setTimeout(() => setCopiedCode(''), 2000)
   }
-
 
   const handleImageClick = (index) => {
     if (index === selectedImageIndex) return
@@ -205,7 +208,6 @@ const ProductDetail = () => {
     }
   }
 
-
   // Giảm SL
   const handleIncrease = () => {
     if (product && quantity < product.quantity) {
@@ -231,7 +233,6 @@ const ProductDetail = () => {
     dispatch(setTempCart({ cartItems: [itemToBuy] }))
     navigate('/payment')
   }
-
 
   if (isLoading) {
     return (
@@ -347,9 +348,10 @@ const ProductDetail = () => {
                   .map((coupon) => (
                     <VoucherChip
                       key={coupon.code}
-                      label={`VOUCHER ${coupon.type === 'percent'
-                        ? `${coupon.amount}%`
-                        : `${coupon.amount.toLocaleString()}đ`
+                      label={`VOUCHER ${
+                        coupon.type === 'percent'
+                          ? `${coupon.amount}%`
+                          : `${coupon.amount.toLocaleString()}đ`
                       }`}
                       onClick={() => setOpenVoucherDrawer(true)}
                     />
@@ -361,28 +363,23 @@ const ProductDetail = () => {
               <Typography variant='body2' fontWeight={700}>
                 Chọn màu
               </Typography>
-              <ButtonGroup>
-                {colors.map((c) => (
-                  <Button
-                    key={c}
-                    variant={color === c ? 'contained' : 'outlined'}
-                    onClick={() => setColor(c)}
-                    sx={
-                      color === c
-                        ? {
-                          backgroundColor: '#1A3C7B',
-                          color: '#fff',
-                          '&:hover': {
-                            backgroundColor: '#162f63'
-                          }
-                        }
-                        : {}
-                    }
-                  >
-                    {c}
-                  </Button>
-                ))}
-              </ButtonGroup>
+              <div>
+                <strong>Màu sắc:</strong>
+                <div style={{ display: 'flex', gap: '10px', marginTop: '5px' }}>
+                  {product.colors.map((color, index) => (
+                    <span
+                      key={index}
+                      style={{
+                        padding: '5px 10px',
+                        backgroundColor: '#f0f0f0',
+                        borderRadius: '5px'
+                      }}
+                    >
+                      {color}
+                    </span>
+                  ))}
+                </div>
+              </div>
             </Box>
 
             <Box>
@@ -398,12 +395,12 @@ const ProductDetail = () => {
                     sx={
                       size === s
                         ? {
-                          backgroundColor: '#1A3C7B',
-                          color: '#fff',
-                          '&:hover': {
-                            backgroundColor: '#162f63'
+                            backgroundColor: '#1A3C7B',
+                            color: '#fff',
+                            '&:hover': {
+                              backgroundColor: '#162f63'
+                            }
                           }
-                        }
                         : undefined
                     }
                   >
@@ -422,18 +419,6 @@ const ProductDetail = () => {
               >
                 <RemoveIcon />
               </IconButton>
-              {/* <TextField
-                size='small'
-                value={quantity === '' ? '' : quantity}
-                onChange={(e) => {
-                  const val = e.target.value
-                  if (/^\d*$/.test(val)) {
-                    setQuantity(val === '' ? '' : Math.max(1, parseInt(val)))
-                  }
-                }}
-                inputProps={{ style: { textAlign: 'center' }, min: 1 }}
-                sx={{ width: 60 }}
-              /> */}
               <TextField
                 value={quantity === '' ? '' : quantity}
                 size='small'
@@ -446,7 +431,7 @@ const ProductDetail = () => {
               >
                 <AddIcon />
               </IconButton>
-              <Typography color="text.secondary" ml={2}>
+              <Typography color='text.secondary' ml={2}>
                 Kho: {product.quantity}
               </Typography>
             </Box>
@@ -454,13 +439,15 @@ const ProductDetail = () => {
             {/* Nút thao tác */}
             <Box sx={{ display: 'flex', gap: 2 }}>
               <Button
-                variant="contained"
-                color="primary"
+                variant='contained'
+                color='primary'
                 disabled={isAdding}
                 onClick={handleAddToCart}
                 sx={{ backgroundColor: '#1A3C7B', color: 'white' }}
                 startIcon={
-                  isAdding ? <CircularProgress size={20} color="inherit" /> : null
+                  isAdding ? (
+                    <CircularProgress size={20} color='inherit' />
+                  ) : null
                 }
               >
                 {isAdding ? 'Đang thêm...' : 'Thêm vào giỏ'}
