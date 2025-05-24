@@ -1,6 +1,8 @@
 import React from 'react'
 import { Stack, IconButton } from '@mui/material'
 import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye'
+import BorderColorIcon from '@mui/icons-material/BorderColor'
+import DeleteForeverIcon from '@mui/icons-material/DeleteForever'
 import { StyledTableCell, StyledTableRow } from '~/assets/StyleAdmin.jsx'
 
 const styles = {
@@ -42,6 +44,18 @@ export default function InventoryRow({ inventory, idx, handleOpenModal }) {
             size='small'
           >
             <RemoveRedEyeIcon color='primary' />
+          </IconButton>
+          <IconButton
+            onClick={() => handleOpenModal('edit', inventory)}
+            size='small'
+          >
+            <BorderColorIcon color='warning' />
+          </IconButton>
+          <IconButton
+            onClick={() => handleOpenModal('delete', inventory)}
+            size='small'
+          >
+            <DeleteForeverIcon color='error' />
           </IconButton>
         </Stack>
       </StyledTableCell>

@@ -3,8 +3,16 @@ import { Typography } from '@mui/material'
 import InventoryTable from './InventoryTable'
 import InventoryPagination from './InventoryPagination'
 import useInventories from '~/hooks/admin/useInventories'
+
+// Lazy load các modal
 const ViewInventoryModal = React.lazy(
   () => import('./modal/ViewInventoryModal')
+)
+const EditInventoryModal = React.lazy(
+  () => import('./modal/EditInventoryModal')
+)
+const DeleteInventoryModal = React.lazy(
+  () => import('./modal/DeleteInventoryModal')
 )
 
 const InventoryManagement = () => {
@@ -18,6 +26,7 @@ const InventoryManagement = () => {
   React.useEffect(() => {
     fetchInventories(page)
   }, [page])
+
   const handleOpenModal = (type, inventory) => {
     if (!inventory || !inventory._id) return
     setSelectedInventory(inventory)
@@ -49,6 +58,22 @@ const InventoryManagement = () => {
             open
             onClose={handleCloseModal}
             inventory={selectedInventory}
+          />
+        )}
+        {modalType === 'edit' && selectedInventory && (
+          <EditInventoryModal
+            open
+            onClose={handleCloseModal}
+            inventory={selectedInventory}
+            onUpdated={() => fetchInventories(page)}
+          />
+        )}
+        {modalType === 'delete' && selectedInventory && (
+          <DeleteInventoryModal
+            open
+            onClose={handleCloseModal}
+            inventory={selectedInventory}
+            onDeleted={() => fetchInventories(page)}
           />
         )}
       </React.Suspense>
