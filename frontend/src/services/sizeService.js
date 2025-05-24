@@ -9,9 +9,10 @@ export const getSizePalettes = async (productId) => {
   try {
     const res = await fetch(`${BASE_URL}?productId=${productId}`)
     const data = await res.json()
+
     return {
-      sizes: data?.sizes || [],
-      paletteId: data?._id || null
+      sizes: (data?.sizes || []).map((s) => s.name),
+      paletteId: data?.paletteId || null
     }
   } catch (error) {
     console.error('Lỗi khi lấy danh sách size:', error)

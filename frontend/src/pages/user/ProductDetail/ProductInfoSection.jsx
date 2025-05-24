@@ -26,6 +26,24 @@ const VoucherChip = styled(Chip)({
   cursor: 'pointer'
 })
 
+const ColorBox = styled(Box)(({ selected }) => ({
+  display: 'flex',
+  alignItems: 'center',
+  padding: '5px 10px',
+  backgroundColor: selected ? '#e3f2fd' : '#f0f0f0',
+  border: selected ? '2px solid #1A3C7B' : 'none',
+  borderRadius: '5px',
+  cursor: 'pointer',
+  gap: 8
+}))
+
+const ColorImage = styled('img')({
+  width: 24,
+  height: 24,
+  objectFit: 'cover',
+  borderRadius: '4px'
+})
+
 const ProductInfoSection = ({
   product,
   quantity,
@@ -33,7 +51,7 @@ const ProductInfoSection = ({
   size,
   setSize,
   colors,
-  sizes,
+  sizes = [],
   coupons,
   isAdding,
   handleAddToCart,
@@ -44,6 +62,12 @@ const ProductInfoSection = ({
 
   const handleColorSelect = (color) => {
     setSelectedColor(color)
+  }
+
+  // Ánh xạ màu với ảnh
+  const getColorImage = (color, index) => {
+    if (color.image) return color.image
+    return product?.images?.[index] || '/default.jpg'
   }
 
   return (
@@ -127,28 +151,21 @@ const ProductInfoSection = ({
         <Typography variant='body2' fontWeight={700}>
           Chọn màu
         </Typography>
-        <Box sx={{ display: 'flex', gap: 1, mt: 0.5 }}>
+        <Box sx={{ display: 'flex', gap: 1, mt: 0.5, flexWrap: 'wrap' }}>
           {colors?.length > 0 ? (
             colors.map((color, index) => (
-              <Box
-                key={index}
-                sx={{
-                  padding: '5px 10px',
-                  backgroundColor:
-                    selectedColor === (color.name || color)
-                      ? '#e3f2fd'
-                      : '#f0f0f0',
-                  borderRadius: '5px',
-                  border:
-                    selectedColor === (color.name || color)
-                      ? '2px solid #1A3C7B'
-                      : 'none',
-                  cursor: 'pointer'
-                }}
+              <ColorBox
+                key={color._id || index}
+                selected={selectedColor === (color.name || color)}
                 onClick={() => handleColorSelect(color.name || color)}
               >
-                {color.name || color}
-              </Box>
+                <ColorImage
+                  src={getColorImage(color, index)}
+                  alt={color.name || color}
+                  onError={(e) => (e.target.src = '/default.jpg')}
+                />
+                <Typography variant='body2'>{color.name || color}</Typography>
+              </ColorBox>
             ))
           ) : (
             <Typography variant='body2' color='text.secondary'>
@@ -165,9 +182,9 @@ const ProductInfoSection = ({
         </Typography>
         <ButtonGroup sx={{ mt: 0.5 }}>
           {sizes?.length > 0 ? (
-            sizes.map((s) => (
+            sizes.map((s, index) => (
               <Button
-                key={s}
+                key={s || index}
                 variant={size === s ? 'contained' : 'outlined'}
                 onClick={() => setSize(s)}
                 sx={

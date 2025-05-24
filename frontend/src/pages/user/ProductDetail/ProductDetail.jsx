@@ -28,8 +28,9 @@ const ProductDetail = () => {
     setFadeIn,
     quantity,
     setQuantity,
-    size,
+    size = [],
     setSize,
+    sizes,
     colors,
     coupons,
     openVoucherDrawer,
@@ -95,6 +96,7 @@ const ProductDetail = () => {
             size={size}
             setSize={setSize}
             colors={colors}
+            sizes={sizes}
             coupons={coupons}
             isAdding={isAdding}
             handleAddToCart={handleAddToCart}

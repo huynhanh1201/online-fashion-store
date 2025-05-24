@@ -5,7 +5,7 @@ import { getProductById } from '~/services/productService'
 import { getDiscounts } from '~/services/discountService'
 import { addToCart, getCart } from '~/services/cartService'
 import { getColorPalettes } from '~/services/colorService'
-import { getSizePalettes } from '~/services/sizeService' // Import API mới
+import { getSizePalettes } from '~/services/sizeService'
 import { setCartItems, setTempCart } from '~/redux/cart/cartSlice'
 
 const useProductDetail = (productId) => {
@@ -22,7 +22,7 @@ const useProductDetail = (productId) => {
   const [snackbar, setSnackbar] = useState(null)
   const [isAdding, setIsAdding] = useState(false)
   const [colors, setColors] = useState([])
-  const [sizes, setSizes] = useState(['S', 'M', 'L', 'XL']) // Thêm state cho sizes
+  const [sizes, setSizes] = useState([])
 
   const dispatch = useDispatch()
   const navigate = useNavigate()
@@ -67,7 +67,9 @@ const useProductDetail = (productId) => {
           ...data,
           images,
           name: data.name || 'Sản phẩm không tên',
-          colors: []
+          price: data.price || 0,
+          discountPrice: data.discountPrice || null,
+          quantity: data.quantity || 0
         })
       } else {
         setError('Sản phẩm không tồn tại hoặc dữ liệu không hợp lệ.')
@@ -87,45 +89,57 @@ const useProductDetail = (productId) => {
   const fetchColors = useCallback(async () => {
     try {
       const { colors } = await getColorPalettes(productId)
-      console.log('Colors from getColorPalettes:', colors)
-      setColors(colors)
+      console.log(
+        'Colors from getColorPalettes (raw):',
+        JSON.stringify(colors, null, 2)
+      )
+      setColors(colors || [])
     } catch (err) {
-      console.error('Lỗi khi lấy màu:', err)
+      console.error('Lỗi khi lấy màu:', err.response || err)
       setColors([])
     }
   }, [productId])
 
   const fetchSizes = useCallback(async () => {
     try {
-      const { sizes } = await getSizePalettes(productId)
-      console.log('Sizes from getSizePalettes:', sizes)
-      setSizes(sizes.length > 0 ? sizes : ['S', 'M', 'L', 'XL'])
+      const response = await getSizePalettes(productId)
+      console.log(
+        'Raw response from getSizePalettes:',
+        JSON.stringify(response, null, 2)
+      )
+      const sizes = response?.sizes || []
+      // Ánh xạ sizes thành mảng chuỗi, chỉ lấy kích thước isActive
+      const activeSizes = sizes
+        .filter((size) => size.isActive)
+        .map((size) => size.name)
+      console.log('Processed sizes (active only):', activeSizes)
+      setSizes(activeSizes.length > 0 ? activeSizes : ['S', 'M', 'L', 'XL'])
     } catch (err) {
-      console.error('Lỗi khi lấy kích thước:', err)
+      console.error('Lỗi khi lấy kích thước:', err.response || err)
       setSizes(['S', 'M', 'L', 'XL'])
     }
   }, [productId])
+
+  const fetchCoupons = useCallback(async () => {
+    try {
+      const { discounts } = await getDiscounts()
+      console.log('Coupons from getDiscounts:', discounts)
+      const sortedCoupons = discounts.sort(
+        (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+      )
+      setCoupons(sortedCoupons)
+    } catch (err) {
+      console.error('Lỗi khi lấy coupon:', err)
+      setCoupons([])
+    }
+  }, [])
 
   useEffect(() => {
     fetchProduct()
     fetchColors()
     fetchSizes()
-  }, [fetchProduct, fetchColors, fetchSizes])
-
-  useEffect(() => {
-    const fetchCoupons = async () => {
-      try {
-        const { discounts } = await getDiscounts()
-        const sortedCoupons = discounts.sort(
-          (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
-        )
-        setCoupons(sortedCoupons)
-      } catch (err) {
-        console.error('Lỗi khi lấy coupon:', err)
-      }
-    }
     fetchCoupons()
-  }, [])
+  }, [fetchProduct, fetchColors, fetchSizes, fetchCoupons])
 
   const handleCopy = (code) => {
     navigator.clipboard.writeText(code)
@@ -180,18 +194,12 @@ const useProductDetail = (productId) => {
       product: {
         _id: product._id,
         name: product.name,
-        price: product.price,
+        price: product.discountPrice || product.price,
         image: product.images && product.images[0] ? product.images[0] : ''
       }
     }
     dispatch(setTempCart({ cartItems: [itemToBuy] }))
     navigate('/payment')
-  }
-
-  const handleIncrease = () => {
-    if (product && quantity < product.quantity) {
-      setQuantity((prev) => prev + 1)
-    }
   }
 
   return {
@@ -208,7 +216,7 @@ const useProductDetail = (productId) => {
     size,
     setSize,
     colors,
-    sizes, // Trả về sizes
+    sizes,
     coupons,
     openVoucherDrawer,
     setOpenVoucherDrawer,
@@ -219,7 +227,6 @@ const useProductDetail = (productId) => {
     handleBuyNow,
     handleCopy,
     copiedCode,
-    handleIncrease,
     formatCurrencyShort
   }
 }
