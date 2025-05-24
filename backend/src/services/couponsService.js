@@ -48,6 +48,7 @@ const validateCoupon = async (userId, reqBody) => {
       const message = `Áp dụng thành công mã ${coupon.code}`
 
       return {
+        couponId: coupon._id,
         valid: true, // Mã hợp lệ
         discountAmount,
         newTotal,

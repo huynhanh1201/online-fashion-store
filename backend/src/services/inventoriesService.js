@@ -1,10 +1,41 @@
+import { StatusCodes } from 'http-status-codes'
+
 import { InventoryModel } from '~/models/InventoryModel'
+import generateSKU from '~/utils/generateSKU'
+import { ProductModel } from '~/models/ProductModel'
+import ApiError from '~/utils/ApiError'
 
 const createInventory = async (reqBody) => {
   // eslint-disable-next-line no-useless-catch
   try {
+    const product = await ProductModel.findById(reqBody.productId)
+
+    if (!product) {
+      throw new ApiError(StatusCodes.NOT_FOUND, 'Không tìm thấy sản phẩm.')
+    }
+
     const newInventory = {
-      name: reqBody.name,
+      productId: reqBody.productId,
+      variant: {
+        color: {
+          name: reqBody.variant.color.name,
+          image: reqBody.variant.color.image
+        },
+        size: {
+          name: reqBody.variant.size.name
+        },
+        sku: generateSKU(
+          product.name,
+          reqBody.variant.color.name,
+          reqBody.variant.size.name
+        )
+      },
+      quantity: reqBody.quantity,
+      importPrice: reqBody.importPrice,
+      exportPrice: reqBody.exportPrice,
+      minQuantity: reqBody.minQuantity,
+      status: reqBody.status,
+
       destroy: false
     }
 
@@ -70,10 +101,57 @@ const deleteInventory = async (inventoryId) => {
   }
 }
 
+const importStockInventory = async (inventoryId, reqBody) => {
+  // eslint-disable-next-line no-useless-catch
+  try {
+    const importStockInventory = await InventoryModel.findOneAndUpdate(
+      { _id: inventoryId },
+      reqBody,
+      { new: true }
+    )
+
+    return importStockInventory
+  } catch (err) {
+    throw err
+  }
+}
+
+const exportStockInventory = async (inventoryId, reqBody) => {
+  // eslint-disable-next-line no-useless-catch
+  try {
+    const inventory = await InventoryModel.findById(inventoryId)
+
+    if (!inventory) {
+      throw new ApiError(StatusCodes.NOT_FOUND, 'Không tìm thấy sản phẩm.')
+    }
+
+    if (inventory.quantity < reqBody.quantity) {
+      throw new ApiError(
+        StatusCodes.BAD_REQUEST,
+        'Số lượng xuất kho lớn hơn số lượng tồn kho.'
+      )
+    }
+
+    const exportStockInventory = await InventoryModel.findOneAndUpdate(
+      { _id: inventoryId },
+      {
+        quantity: inventory.quantity - reqBody.quantity
+      },
+      { new: true }
+    )
+
+    return exportStockInventory
+  } catch (err) {
+    throw err
+  }
+}
+
 export const inventoriesService = {
   createInventory,
   getInventoryList,
   getInventory,
   updateInventory,
-  deleteInventory
+  deleteInventory,
+  importStockInventory,
+  exportStockInventory
 }
