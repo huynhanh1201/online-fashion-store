@@ -24,7 +24,7 @@ Router.route('/:inventoryId').get(
 // Cập nhật thông tin Màu sắc sản phẩm
 Router.route('/:inventoryId').patch(
   inventoriesValidation.verifyId,
-  inventoriesValidation.inventory,
+  inventoriesValidation.inventoryUpdate,
   inventoriesController.updateInventory
 )
 

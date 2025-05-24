@@ -27,7 +27,12 @@ const getInventoryList = async () => {
 const getInventory = async (inventoryId) => {
   // eslint-disable-next-line no-useless-catch
   try {
-    const result = await InventoryModel.findById(inventoryId).lean()
+    const result = await InventoryModel.findOne({
+      _id: inventoryId,
+      destroy: false
+    })
+      .populate('productId')
+      .lean()
 
     return result
   } catch (err) {
