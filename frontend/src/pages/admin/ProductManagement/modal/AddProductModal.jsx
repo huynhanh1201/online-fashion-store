@@ -557,9 +557,10 @@ import AddSizeModal from './modalColorAddProduct/AddSizeModal'
 import AddStockModal from './modalColorAddProduct/AddStockModal'
 import AddCategoryModal from '~/pages/admin/CategorieManagement/modal/AddCategoryModal.jsx'
 import StyleAdmin from '~/assets/StyleAdmin.jsx'
-
+import { addProduct } from '~/services/admin/productService.js'
 const URI = 'https://api.cloudinary.com/v1_1/dkwsy9sph/image/upload'
 const CloudinaryColor = 'color_upload' // folder riêng cho ảnh màu
+const CloudinaryProduct = 'product_upload' // folder riêng cho ảnh sản phẩm
 
 const uploadToCloudinary = async (file, folder = CloudinaryColor) => {
   const formData = new FormData()
@@ -578,7 +579,7 @@ const uploadToCloudinary = async (file, folder = CloudinaryColor) => {
   return data.secure_url
 }
 
-const AddProductModal = ({ open, onClose, onSave }) => {
+const AddProductModal = ({ open, onClose, onSuccess }) => {
   const {
     control,
     handleSubmit,
@@ -604,13 +605,20 @@ const AddProductModal = ({ open, onClose, onSave }) => {
   const [categoryOpen, setCategoryOpen] = useState(false)
   const [stockMatrix, setStockMatrix] = useState([])
 
-  // Thêm màu: dùng local state để quản lý tên + file ảnh
+  // State cho màu sắc
   const [colorName, setColorName] = useState('')
   const [colorFile, setColorFile] = useState(null)
   const [colorPreview, setColorPreview] = useState('')
   const [isAddingColor, setIsAddingColor] = useState(false)
 
-  const fileInputRef = useRef()
+  // State cho ảnh sản phẩm
+  const [productImages, setProductImages] = useState([]) // Danh sách ảnh sản phẩm
+  const [productImageFile, setProductImageFile] = useState(null)
+  const [productImagePreview, setProductImagePreview] = useState('')
+  const [isAddingProductImage, setIsAddingProductImage] = useState(false)
+
+  const fileInputRef = useRef() // Ref cho ảnh màu
+  const productImageInputRef = useRef() // Ref cho ảnh sản phẩm
 
   const { categories, loading, fetchCategories } = useCategories()
 
@@ -626,6 +634,9 @@ const AddProductModal = ({ open, onClose, onSave }) => {
       setColorName('')
       setColorFile(null)
       setColorPreview('')
+      setProductImages([]) // Reset ảnh sản phẩm
+      setProductImageFile(null)
+      setProductImagePreview('')
     }
   }, [open, reset])
 
@@ -635,6 +646,15 @@ const AddProductModal = ({ open, onClose, onSave }) => {
     if (file) {
       setColorFile(file)
       setColorPreview(URL.createObjectURL(file))
+    }
+  }
+
+  // Xử lý chọn file ảnh sản phẩm và preview
+  const handleProductImageFileChange = (e) => {
+    const file = e.target.files[0]
+    if (file) {
+      setProductImageFile(file)
+      setProductImagePreview(URL.createObjectURL(file))
     }
   }
 
@@ -663,14 +683,44 @@ const AddProductModal = ({ open, onClose, onSave }) => {
     }
   }
 
+  // Xử lý thêm ảnh sản phẩm (upload lên Cloudinary)
+  const handleAddProductImage = async () => {
+    if (!productImageFile) {
+      alert('Vui lòng chọn ảnh sản phẩm')
+      return
+    }
+    setIsAddingProductImage(true)
+    try {
+      const imageUrl = await uploadToCloudinary(
+        productImageFile,
+        CloudinaryProduct
+      )
+      setProductImages((prev) => [...prev, imageUrl])
+      setProductImageFile(null)
+      setProductImagePreview('')
+      if (productImageInputRef.current) productImageInputRef.current.value = ''
+    } catch (err) {
+      alert('Upload ảnh sản phẩm thất bại, vui lòng thử lại')
+      console.error(err)
+    } finally {
+      setIsAddingProductImage(false)
+    }
+  }
+
   // Xóa màu trong danh sách
   const handleRemoveColor = (index) => {
     setColorsList((prev) => prev.filter((_, i) => i !== index))
     if (selectedColor === colorsList[index]?.name) setSelectedColor('')
   }
 
+  // Xóa ảnh sản phẩm
+  const handleRemoveProductImage = (index) => {
+    setProductImages((prev) => prev.filter((_, i) => i !== index))
+  }
+
   // Thêm size
   const handleAddSize = (sizeName) => {
+    if (!sizeName || typeof sizeName !== 'string' || !sizeName.trim()) return
     setSizesList((prev) => [...prev, { name: sizeName }])
   }
 
@@ -697,15 +747,70 @@ const AddProductModal = ({ open, onClose, onSave }) => {
   }
 
   // Lưu sản phẩm
-  const onSubmit = (data) => {
-    const finalProduct = {
-      ...data,
-      colors: colorsList,
-      sizes: sizesList,
-      stockMatrix
+  const onSubmit = async (data) => {
+    try {
+      // Validation: Đảm bảo có ít nhất một ảnh sản phẩm
+      if (productImages.length === 0) {
+        alert('Vui lòng thêm ít nhất một ảnh sản phẩm')
+        return
+      }
+
+      // Validation: Đảm bảo có ít nhất một màu
+      if (colorsList.length === 0) {
+        alert('Vui lòng thêm ít nhất một màu sắc')
+        return
+      }
+
+      // Validation: Đảm bảo có ít nhất một kích thước
+      if (sizesList.length === 0) {
+        alert('Vui lòng thêm ít nhất một kích thước')
+        return
+      }
+
+      // Validation: Đảm bảo có ít nhất một mục trong stockMatrix
+      if (stockMatrix.length === 0) {
+        alert('Vui lòng thêm ít nhất một mục kho')
+        return
+      }
+
+      // Tạo đối tượng finalProduct
+      const finalProduct = {
+        name: data.name,
+        description: data.description,
+        price: Number(data.price), // Chuyển sang số
+        importPrice: data.importPrice ? Number(data.importPrice) : undefined, // Chuyển sang số hoặc undefined nếu không có
+        categoryId: data.categoryId,
+        image: productImages, // Danh sách URL ảnh sản phẩm
+        colors: colorsList, // [{ name, image }]
+        sizes: sizesList, // [{ name }]
+        stockMatrix // [{ color, size, quantity }]
+      }
+
+      console.log('Final Product:', finalProduct)
+
+      // Gửi yêu cầu API
+      const result = await addProduct(finalProduct)
+
+      if (result) {
+        onSuccess() // Gọi callback thành công
+        onClose() // Đóng modal
+        reset() // Reset form
+        setColorsList([])
+        setSizesList([])
+        setStockMatrix([])
+        setProductImages([])
+        setColorName('')
+        setColorFile(null)
+        setColorPreview('')
+        setProductImageFile(null)
+        setProductImagePreview('')
+      } else {
+        alert('Thêm sản phẩm không thành công')
+      }
+    } catch (error) {
+      console.error('Lỗi khi thêm sản phẩm:', error)
+      alert('Có lỗi xảy ra, vui lòng thử lại')
     }
-    console.log('Final Product:', finalProduct)
-    onSave(finalProduct)
   }
 
   return (
@@ -744,6 +849,79 @@ const AddProductModal = ({ open, onClose, onSave }) => {
                 />
               )}
             />
+          </Grid>
+
+          {/* Phần thêm ảnh sản phẩm */}
+          <Grid item xs={12}>
+            <Typography variant='h6'>Thêm ảnh sản phẩm</Typography>
+            <Grid container spacing={1} alignItems='center'>
+              <Grid item xs={6}>
+                <Button variant='outlined' component='label'>
+                  Chọn ảnh sản phẩm
+                  <input
+                    type='file'
+                    accept='image/*'
+                    hidden
+                    ref={productImageInputRef}
+                    onChange={handleProductImageFileChange}
+                  />
+                </Button>
+              </Grid>
+              <Grid item xs={3}>
+                <Button
+                  variant='contained'
+                  onClick={handleAddProductImage}
+                  disabled={isAddingProductImage || !productImageFile}
+                >
+                  {isAddingProductImage ? 'Đang thêm...' : 'Thêm ảnh'}
+                </Button>
+              </Grid>
+              <Grid item xs={3}>
+                {productImagePreview && (
+                  <Box
+                    component='img'
+                    src={productImagePreview}
+                    alt='preview-product-image'
+                    sx={{
+                      width: 50,
+                      height: 50,
+                      objectFit: 'cover',
+                      borderRadius: 1
+                    }}
+                  />
+                )}
+              </Grid>
+            </Grid>
+            {/* Danh sách ảnh sản phẩm */}
+            <Box sx={{ mt: 2 }}>
+              {productImages.length > 0 && (
+                <ul style={{ paddingLeft: 20 }}>
+                  {productImages.map((image, idx) => (
+                    <li key={idx} style={{ marginBottom: 4 }}>
+                      <img
+                        src={image}
+                        alt={`product-image-${idx}`}
+                        style={{
+                          width: 30,
+                          height: 30,
+                          objectFit: 'cover',
+                          marginRight: 8
+                        }}
+                      />
+                      Ảnh {idx + 1}
+                      <Button
+                        size='small'
+                        color='error'
+                        onClick={() => handleRemoveProductImage(idx)}
+                        sx={{ ml: 1 }}
+                      >
+                        Xóa
+                      </Button>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </Box>
           </Grid>
 
           <Grid item xs={12}>
@@ -879,7 +1057,6 @@ const AddProductModal = ({ open, onClose, onSave }) => {
                 )}
               </Grid>
             </Grid>
-            {/* Danh sách màu */}
             <Box sx={{ mt: 2 }}>
               {colorsList.length > 0 && (
                 <ul style={{ paddingLeft: 20 }}>
@@ -972,7 +1149,6 @@ const AddProductModal = ({ open, onClose, onSave }) => {
                 ))}
               </Select>
             </FormControl>
-
             <Box sx={{ mt: 1 }}>
               <Button
                 variant='contained'
@@ -982,7 +1158,6 @@ const AddProductModal = ({ open, onClose, onSave }) => {
                 Thêm kho
               </Button>
             </Box>
-            {/* Hiển thị danh sách kho */}
             <Box sx={{ mt: 2 }}>
               {stockMatrix.length > 0 && (
                 <ul style={{ paddingLeft: 20 }}>
@@ -1015,7 +1190,6 @@ const AddProductModal = ({ open, onClose, onSave }) => {
         </Button>
       </DialogActions>
 
-      {/* Modal thêm kích thước */}
       <AddSizeModal
         open={isSizeModalOpen}
         onClose={() => setSizeModalOpen(false)}
@@ -1025,7 +1199,6 @@ const AddProductModal = ({ open, onClose, onSave }) => {
           setSizeModalOpen(false)
         }}
       />
-      {/* Modal nhập số lượng kho */}
       <AddStockModal
         open={isStockModalOpen}
         onClose={() => setStockModalOpen(false)}
@@ -1034,8 +1207,6 @@ const AddProductModal = ({ open, onClose, onSave }) => {
           setStockModalOpen(false)
         }}
       />
-
-      {/* Modal thêm danh mục */}
       <AddCategoryModal
         open={categoryOpen}
         onClose={() => setCategoryOpen(false)}
