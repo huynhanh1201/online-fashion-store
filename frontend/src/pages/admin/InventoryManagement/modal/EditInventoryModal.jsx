@@ -11,11 +11,9 @@ import {
 } from '@mui/material'
 import StyleAdmin from '~/assets/StyleAdmin.jsx'
 import { useForm } from 'react-hook-form'
-import useInventories from '~/hooks/admin/useInventories.js'
 
 const EditInventoryModal = ({ open, onClose, inventory, onSave }) => {
   const { register, handleSubmit, reset } = useForm()
-  const { updateInventoryById } = useInventories()
   // Reset dữ liệu form mỗi khi inventory thay đổi
   React.useEffect(() => {
     if (inventory) {
@@ -48,12 +46,12 @@ const EditInventoryModal = ({ open, onClose, inventory, onSave }) => {
         minQuantity: Number(data.minQuantity),
         status: data.status
       }
-      console.log('Updated Inventory:', updatedInventory)
-      const result = await updateInventoryById(inventory._id, updatedInventory)
+
+      const result = await onSave(inventory._id, updatedInventory) // GỌI HÀM ĐÚNG
+
       if (result) {
-        onSave
-        onClose() // đóng modal
-        reset() // reset form
+        onClose() // Đóng modal
+        reset() // Reset form
       } else {
         alert('Cập nhật kho không thành công')
       }

@@ -9,22 +9,7 @@ import {
   Typography
 } from '@mui/material'
 import StyleAdmin from '~/assets/StyleAdmin.jsx'
-import useInventories from '~/hooks/admin/useInventories.js'
 const DeleteInventoryModal = ({ open, onClose, inventory, onDelete }) => {
-  const { deleteInventoryById } = useInventories()
-  const handleDelete = async (id) => {
-    try {
-      const result = await deleteInventoryById(id)
-      if (result) {
-        onDelete(id)
-        onClose()
-      } else {
-        alert('Xoá kho không thành công')
-      }
-    } catch (error) {
-      console.error('Xoá kho thất bại:', error)
-    }
-  }
   return (
     <Dialog
       open={open}
@@ -47,7 +32,7 @@ const DeleteInventoryModal = ({ open, onClose, inventory, onDelete }) => {
       <DialogActions>
         <Button onClick={onClose}>Huỷ</Button>
         <Button
-          onClick={() => handleDelete(inventory._id)}
+          onClick={() => onDelete(inventory._id)}
           color='error'
           variant='contained'
         >

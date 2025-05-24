@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { Typography } from '@mui/material'
 import InventoryTable from './InventoryTable'
 import InventoryPagination from './InventoryPagination'
@@ -20,10 +20,15 @@ const InventoryManagement = () => {
   const [selectedInventory, setSelectedInventory] = React.useState(null)
   const [modalType, setModalType] = React.useState(null)
 
-  const { inventories, totalPages, fetchInventories, loading } =
-    useInventories()
-
-  React.useEffect(() => {
+  const {
+    inventories,
+    totalPages,
+    fetchInventories,
+    loading,
+    updateInventoryById,
+    deleteInventoryById
+  } = useInventories(page)
+  useEffect(() => {
     fetchInventories(page)
   }, [page])
 
@@ -37,7 +42,17 @@ const InventoryManagement = () => {
     setSelectedInventory(null)
     setModalType(null)
   }
-
+  const updateInventory = async (id, data) => {
+    const result = await updateInventoryById(id, data)
+    if (result) await fetchInventories() // KHÔNG truyền lại page vì đã nhận sẵn từ pageInventory
+    return result
+  }
+  const deleteInventory = async (id) => {
+    const result = await deleteInventoryById(id)
+    handleCloseModal()
+    if (result) await fetchInventories() // KHÔNG truyền lại page vì đã nhận sẵn từ pageInventory
+    return result
+  }
   const handleChangePage = (event, value) => setPage(value)
 
   return (
@@ -65,7 +80,7 @@ const InventoryManagement = () => {
             open
             onClose={handleCloseModal}
             inventory={selectedInventory}
-            onUpdated={() => fetchInventories(page)}
+            onSave={updateInventory}
           />
         )}
         {modalType === 'delete' && selectedInventory && (
@@ -73,7 +88,7 @@ const InventoryManagement = () => {
             open
             onClose={handleCloseModal}
             inventory={selectedInventory}
-            onDeleted={() => fetchInventories(page)}
+            onDelete={deleteInventory}
           />
         )}
       </React.Suspense>
