@@ -15,7 +15,7 @@ import ProductDetail from '~/pages/user/ProductDetail/ProductDetail'
 import Payment from '~/pages/user/Payment/Payment'
 import Cart from '~/pages/user/Cart/Cart'
 import Profile from '~/pages/user/Profile/Profile'
-import Order from '~/pages/user/Order/OrderListPage'
+import Order from '~/pages/user/Orders/OrderListPage'
 import PaymentVnpay from '~/pages/user/PaymentVnpay/PaymentVnpay'
 import OrderSuccess from './pages/OrderSuccess/OrderSuccess'
 
@@ -33,6 +33,7 @@ import NotFound from '~/pages/404/NotFound'
 
 // Hook
 import { useAutoClearTempCart } from './hooks/useAutoClearTempCart'
+import OrderDetail from './pages/user/Orders/OrderDetail'
 
 // Giải pháp Clean Code trong việc xác định các route nào cần đăng nhập tài khoản xong thì mới được truy cập
 const ProtectedRoute = ({ user }) => {
@@ -77,7 +78,8 @@ function App() {
 
           <Route path='cart' element={<Cart />} />
           <Route path='profile' element={<Profile />} />
-          <Route path='order' element={<Order />} />
+          <Route path='orders' element={<Order />} />
+          <Route path='order-detail/:orderId' element={<OrderDetail />} />
         </Route>
         <Route index element={<UserHome />} />
       </Route>

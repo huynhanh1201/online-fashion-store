@@ -29,6 +29,7 @@ import { useSelector } from 'react-redux'
 import { useDispatch } from 'react-redux'
 import { clearTempCart } from '~/redux/cart/cartSlice'
 import { useLocation, useNavigate } from 'react-router-dom'
+import { set } from 'lodash'
 
 const SectionTitle = styled(Typography)(({ theme }) => ({
   fontWeight: 700,
@@ -80,6 +81,7 @@ const Payment = () => {
   const { loading: cartLoading } = useCart()
   const { createOrder, loading: orderLoading } = useOrder()
   const { discount, discountMessage, loading: couponLoading, handleApplyVoucher, couponId } = useCoupon()
+  
 
 
   const selectedItems = useSelector(state => state.cart.selectedItems)
@@ -189,8 +191,6 @@ const Payment = () => {
       setSnackbar({ open: true, severity: 'error', message: 'Giỏ hàng trống' })
       return
     }
-
-    // Chuẩn hóa cartItems
     const orderData = {
       cartItems: selectedCartItems,
       shippingAddressId: selectedAddress._id,

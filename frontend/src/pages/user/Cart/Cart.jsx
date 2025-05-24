@@ -1,18 +1,22 @@
 import React, { useState, useEffect } from 'react'
 import {
   Box, Container, Table, TableHead, TableRow, TableCell, TableBody,
-  Typography, IconButton, TextField, Avatar, Button, Checkbox, Snackbar, Alert
+  Typography, IconButton, TextField, Avatar, Button, Checkbox,
+  Snackbar, Alert, Dialog, DialogActions, DialogContent,
+  DialogContentText, DialogTitle
 } from '@mui/material'
-import { Delete, Add, Remove } from '@mui/icons-material'
+import { Delete, Add, Remove, DeleteForever } from '@mui/icons-material'
 import { useCart } from '~/hooks/useCarts'
 import { useNavigate } from 'react-router-dom'
 import { useDispatch } from 'react-redux'
 import { setSelectedItems as setSelectedItemsAction } from '~/redux/cart/cartSlice'
+
 const Cart = () => {
   const { cart, loading, deleteItem, clearCart, updateItem } = useCart()
   const [selectedItems, setSelectedItems] = useState([])
   const [cartItems, setCartItems] = useState([])
   const [showMaxQuantityAlert, setShowMaxQuantityAlert] = useState(false)
+  const [confirmClearOpen, setConfirmClearOpen] = useState(false)
   const navigate = useNavigate()
   const dispatch = useDispatch()
 
@@ -24,12 +28,9 @@ const Cart = () => {
     if (cart?.cartItems) setCartItems(cart.cartItems)
   }, [cart])
 
-  // Kiểm tra đã chọn hết chưa
   const allSelected = cartItems.length > 0 && selectedItems.length === cartItems.length
-  // Kiểm tra chọn một phần
   const someSelected = selectedItems.length > 0 && selectedItems.length < cartItems.length
 
-  // Chọn / bỏ chọn tất cả
   const handleSelectAll = () => {
     let newSelected = []
     if (!allSelected) {
@@ -39,16 +40,14 @@ const Cart = () => {
     dispatch(setSelectedItemsAction(newSelected))
   }
 
-
   const handleSelect = (id) => {
     const newSelected = selectedItems.includes(id)
       ? selectedItems.filter(i => i !== id)
       : [...selectedItems, id]
 
-    setSelectedItems(newSelected) // cập nhật local state
-    dispatch(setSelectedItemsAction(newSelected)) // cập nhật redux luôn
+    setSelectedItems(newSelected)
+    dispatch(setSelectedItemsAction(newSelected))
   }
-
 
   const formatPrice = (val) =>
     typeof val === 'number'
@@ -83,7 +82,7 @@ const Cart = () => {
       console.error('Lỗi cập nhật số lượng:', error)
     }
   }
-  console.log('selectedItems:', selectedItems)
+
   const handleRemove = async (id) => {
     try {
       const res = await deleteItem(id)
@@ -104,6 +103,13 @@ const Cart = () => {
     (sum, item) => sum + (item.productId?.price || 0) * item.quantity,
     0
   )
+
+  const handleClearCart = async () => {
+    await clearCart()
+    setCartItems([])
+    setSelectedItems([])
+    setConfirmClearOpen(false)
+  }
 
   if (loading) {
     return (
@@ -177,7 +183,6 @@ const Cart = () => {
                         >
                           {truncate(product.name, 20)}
                         </Typography>
-
                         <Typography
                           variant='body2'
                           color='text.secondary'
@@ -212,7 +217,7 @@ const Cart = () => {
                         size='small'
                         onClick={() => handleQuantityChange(product._id, item.quantity, 1)}
                         aria-label='Tăng số lượng'
-                        disabled={item.quantity >= product.quantity} // disable when max reached
+                        disabled={item.quantity >= product.quantity}
                       >
                         <Add />
                       </IconButton>
@@ -263,15 +268,18 @@ const Cart = () => {
           <Button
             variant='outlined'
             color='error'
-            onClick={async () => {
-              await clearCart()
-              setCartItems([])
-              setSelectedItems([])
+            endIcon={<DeleteForever />}
+            onClick={() => setConfirmClearOpen(true)}
+            disabled={cartItems.length === 0}
+            sx={{
+              minWidth: 140,
+              borderWidth: 2,
+              '&:hover': { borderWidth: 2 }
             }}
-            sx={{ minWidth: 120 }}
           >
             Xoá toàn bộ
           </Button>
+
         </Box>
       </Box>
 
@@ -285,6 +293,26 @@ const Cart = () => {
           Số lượng sản phẩm đã hết!
         </Alert>
       </Snackbar>
+
+      <Dialog
+        open={confirmClearOpen}
+        onClose={() => setConfirmClearOpen(false)}
+      >
+        <DialogTitle>Xác nhận xoá</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Bạn có chắc chắn muốn xoá toàn bộ giỏ hàng không?
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setConfirmClearOpen(false)} color='primary'>
+            Huỷ
+          </Button>
+          <Button onClick={handleClearCart} color='error' variant='contained'>
+            Xoá
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Container>
   )
 }

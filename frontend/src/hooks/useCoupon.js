@@ -39,7 +39,8 @@ const useCoupon = () => {
       if (result.valid) {
         setDiscount(result.discountAmount || 0)
         setDiscountMessage(result.message || 'Áp dụng mã giảm giá thành công!')
-        setCouponId(result.id || null)
+        setCouponId(result.coupon?._id || result.id || null)
+
         return result
       } else {
         setDiscount(0)
