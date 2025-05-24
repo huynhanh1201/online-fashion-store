@@ -1,69 +1,3 @@
-// import AuthorizedAxiosInstance from '~/utils/authorizedAxios'
-// import { API_ROOT } from '~/utils/constants'
-//
-// export const getColorPalettes = async (productId) => {
-//   try {
-//     const response = await AuthorizedAxiosInstance.get(
-//       `${API_ROOT}/v1/color-palettes`,
-//       { params: { productId } }
-//     )
-//     // Đảm bảo trả về mảng
-//     return Array.isArray(response.data) ? response.data : []
-//   } catch (error) {
-//     console.error('Lỗi khi lấy danh sách màu:', error)
-//     return []
-//   }
-// }
-//
-// // Các hàm khác giữ nguyên
-// export const createColorPalette = async (data) => {
-//   try {
-//     const response = await AuthorizedAxiosInstance.post(
-//       `${API_ROOT}/v1/color-palettes`,
-//       { name: data.name, description: data.description || '' }
-//     )
-//     return response.data
-//   } catch (error) {
-//     console.error('Lỗi khi tạo màu mới:', error)
-//     throw error
-//   }
-// }
-//
-// export const getColorPaletteById = async (id) => {
-//   try {
-//     const response = await AuthorizedAxiosInstance.get(
-//       `${API_ROOT}/v1/color-palettes/${id}`
-//     )
-//     return response.data
-//   } catch (error) {
-//     console.error('Lỗi khi lấy màu theo ID:', error)
-//     return null
-//   }
-// }
-//
-// export const updateColorPalette = async (id, data) => {
-//   try {
-//     const response = await AuthorizedAxiosInstance.patch(
-//       `${API_ROOT}/v1/color-palettes/${id}`,
-//       { name: data.name, description: data.description || '' }
-//     )
-//     return response.data
-//   } catch (error) {
-//     console.error('Lỗi khi cập nhật màu:', error)
-//     return null
-//   }
-// }
-//
-// export const deleteColorPalette = async (id) => {
-//   try {
-//     await AuthorizedAxiosInstance.delete(`${API_ROOT}/v1/color-palettes/${id}`)
-//     return true
-//   } catch (error) {
-//     console.error('Lỗi khi xóa màu:', error)
-//     throw error
-//   }
-// }
-
 import AuthorizedAxiosInstance from '~/utils/authorizedAxios'
 import { API_ROOT } from '~/utils/constants'
 
@@ -73,7 +7,6 @@ export const getColorPalettes = async (productId) => {
   try {
     const res = await fetch(`${BASE_URL}?productId=${productId}`)
     const data = await res.json()
-    // Trả thêm _id của bản ghi chính (dùng cho edit toàn bộ nếu cần)
     return {
       colors: data?.colors || [],
       paletteId: data?._id || null
@@ -87,7 +20,7 @@ export const getColorPalettes = async (productId) => {
 export const createColorPalette = async (productId, data) => {
   try {
     const res = await AuthorizedAxiosInstance.post(
-      `${API_ROOT}/v1/color-palettes?productId=${productId}`, // chỉ đường dẫn tương đối với API_ROOT đã định nghĩa
+      `${API_ROOT}/v1/color-palettes?productId=${productId}`,
       data
     )
     return res.data
