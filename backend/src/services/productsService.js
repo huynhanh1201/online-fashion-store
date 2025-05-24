@@ -12,6 +12,10 @@ import generateSKU from '~/utils/generateSKU'
 const createProduct = async (reqBody) => {
   // eslint-disable-next-line no-useless-catch
   try {
+    const totalQuantity = reqBody.stockMatrix.reduce((acc, item) => {
+      return acc + item.quantity
+    }, 0)
+
     const newProduct = {
       name: reqBody.name,
       description: reqBody.description,
@@ -25,7 +29,7 @@ const createProduct = async (reqBody) => {
       colors: reqBody.colors,
 
       exportPrice: reqBody.price,
-      quantity: 0,
+      quantity: totalQuantity,
       destroy: false
     }
 

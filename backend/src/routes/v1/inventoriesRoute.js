@@ -6,32 +6,46 @@ import { authMiddleware } from '~/middlewares/authMiddleware'
 
 const Router = express.Router()
 
-// Tạo Màu sắc sản phẩm mới
+// Tạo Kho (Biến thể) sản phẩm mới
 Router.route('/').post(
   inventoriesValidation.inventory,
   inventoriesController.createInventory
 )
 
-// Danh sách Màu sắc sản phẩm
+// Danh sách Kho (Biến thể) sản phẩm
 Router.route('/').get(inventoriesController.getInventoryList)
 
-// Lấy thông tin một Màu sắc sản phẩm.
+// Lấy thông tin một Kho (Biến thể) sản phẩm.
 Router.route('/:inventoryId').get(
   inventoriesValidation.verifyId,
   inventoriesController.getInventory
 )
 
-// Cập nhật thông tin Màu sắc sản phẩm
+// Cập nhật thông tin Kho (Biến thể) sản phẩm
 Router.route('/:inventoryId').patch(
   inventoriesValidation.verifyId,
-  inventoriesValidation.inventory,
+  inventoriesValidation.inventoryUpdate,
   inventoriesController.updateInventory
 )
 
-// Xoá Màu sắc sản phẩm (Xóa mềm)
+// Xoá Kho (Biến thể) sản phẩm (Xóa mềm)
 Router.route('/:inventoryId').delete(
   inventoriesValidation.verifyId,
   inventoriesController.deleteInventory
+)
+
+// Nhập Kho (Biến thể) sản phẩm
+Router.route('/:inventoryId/in').post(
+  inventoriesValidation.verifyId,
+  inventoriesValidation.inventoryInOutStock,
+  inventoriesController.importStockInventory
+)
+
+// Xuất Kho (Biến thể) sản phẩm
+Router.route('/:inventoryId/out').post(
+  inventoriesValidation.verifyId,
+  inventoriesValidation.inventoryInOutStock,
+  inventoriesController.exportStockInventory
 )
 
 export const inventoriesRoute = Router

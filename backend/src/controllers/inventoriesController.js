@@ -64,10 +64,42 @@ const deleteInventory = async (req, res, next) => {
   }
 }
 
+const importStockInventory = async (req, res, next) => {
+  try {
+    const inventoryId = req.params.inventoryId
+
+    const result = await inventoriesService.importStockInventory(
+      inventoryId,
+      req.body
+    )
+
+    res.status(StatusCodes.OK).json(result)
+  } catch (err) {
+    next(err)
+  }
+}
+
+const exportStockInventory = async (req, res, next) => {
+  try {
+    const inventoryId = req.params.inventoryId
+
+    const result = await inventoriesService.exportStockInventory(
+      inventoryId,
+      req.body
+    )
+
+    res.status(StatusCodes.OK).json(result)
+  } catch (err) {
+    next(err)
+  }
+}
+
 export const inventoriesController = {
   createInventory,
   getInventoryList,
   getInventory,
   updateInventory,
-  deleteInventory
+  deleteInventory,
+  importStockInventory,
+  exportStockInventory
 }
