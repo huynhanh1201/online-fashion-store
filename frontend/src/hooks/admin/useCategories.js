@@ -1,4 +1,3 @@
-// hooks/useCategories.js
 import { useState } from 'react'
 import { getCategories } from '~/services/admin/categoryService'
 
