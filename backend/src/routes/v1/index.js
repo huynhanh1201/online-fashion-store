@@ -19,6 +19,7 @@ import { colorPalettesRoute } from '~/routes/v1/colorPalettesRoute'
 import { sizePalettesRoute } from '~/routes/v1/sizePalettesRoute'
 import { colorsRoute } from '~/routes/v1/colorsRoute'
 import { sizesRoute } from '~/routes/v1/sizesRoute'
+import { inventoriesRoute } from '~/routes/v1/inventoriesRoute'
 
 const Router = express.Router()
 
@@ -57,5 +58,7 @@ Router.use('/size-palettes', sizePalettesRoute)
 Router.use('/colors', colorsRoute)
 
 Router.use('/sizes', sizesRoute)
+
+Router.use('/inventories', inventoriesRoute)
 
 export const APIs_V1 = Router
