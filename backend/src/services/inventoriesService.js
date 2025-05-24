@@ -1,8 +1,9 @@
+import { StatusCodes } from 'http-status-codes'
+
 import { InventoryModel } from '~/models/InventoryModel'
 import generateSKU from '~/utils/generateSKU'
 import { ProductModel } from '~/models/ProductModel'
 import ApiError from '~/utils/ApiError'
-import { StatusCodes } from 'http-status-codes'
 
 const createInventory = async (reqBody) => {
   // eslint-disable-next-line no-useless-catch
