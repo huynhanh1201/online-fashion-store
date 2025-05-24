@@ -17,7 +17,9 @@ const createInventory = async (reqBody) => {
 }
 
 const getInventoryList = async () => {
-  const result = await InventoryModel.find({}).lean()
+  const result = await InventoryModel.find({ destroy: false })
+    .populate('productId')
+    .lean()
 
   return result
 }
