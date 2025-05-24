@@ -6,29 +6,29 @@ import { authMiddleware } from '~/middlewares/authMiddleware'
 
 const Router = express.Router()
 
-// Tạo Danh mục sản phẩm mới
+// Tạo Màu sắc sản phẩm mới
 Router.route('/').post(
   colorPalettesValidation.colorPalette,
   colorPalettesController.createColorPalette
 )
 
-// Danh sách Danh mục sản phẩm
+// Danh sách Màu sắc sản phẩm
 Router.route('/').get(colorPalettesController.getColorPaletteList)
 
-// Lấy thông tin một Danh mục sản phẩm.
+// Lấy thông tin một Màu sắc sản phẩm.
 Router.route('/:colorPaletteId').get(
   colorPalettesValidation.verifyId,
   colorPalettesController.getColorPalette
 )
 
-// Cập nhật thông tin Danh mục sản phẩm
+// Cập nhật thông tin Màu sắc sản phẩm
 Router.route('/:colorPaletteId').patch(
   colorPalettesValidation.verifyId,
   colorPalettesValidation.colorPaletteUpadate,
   colorPalettesController.updateColorPalette
 )
 
-// Xoá Danh mục sản phẩm (Xóa mềm)
+// Xoá Màu sắc sản phẩm (Xóa mềm)
 Router.route('/:colorPaletteId').delete(
   colorPalettesValidation.verifyId,
   colorPalettesController.deleteColorPalette

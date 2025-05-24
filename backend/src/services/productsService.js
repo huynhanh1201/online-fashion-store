@@ -5,34 +5,80 @@ import { ProductModel } from '~/models/ProductModel'
 import ApiError from '~/utils/ApiError'
 import { slugify } from '~/utils/formatters'
 import { ColorPaletteModel } from '~/models/ColorPaletteModel'
+import { SizePaletteModel } from '~/models/SizePaletteModel'
+import { InventoryModel } from '~/models/InventoryModel'
+import generateSKU from '~/utils/generateSKU'
 
 const createProduct = async (reqBody) => {
   // eslint-disable-next-line no-useless-catch
   try {
+    const totalQuantity = reqBody.stockMatrix.reduce((acc, item) => {
+      return acc + item.quantity
+    }, 0)
+
     const newProduct = {
       name: reqBody.name,
       description: reqBody.description,
       price: reqBody.price,
       image: reqBody.image,
       categoryId: reqBody.categoryId,
-      quantity: reqBody.quantity,
       slug: slugify(reqBody.name),
-      destroy: false,
 
-      origin: reqBody.origin,
+      importPrice: reqBody.importPrice,
       sizes: reqBody.sizes,
-      colors: reqBody.colors
+      colors: reqBody.colors,
+
+      exportPrice: reqBody.price,
+      quantity: totalQuantity,
+      destroy: false
     }
 
     const product = await ProductModel.create(newProduct)
 
+    //  Tạo Màu sắc sản phẩm
     const newColorPalette = {
       productId: product._id,
       colors: reqBody.colors
     }
 
-    //  Tạo Màu sắc sản phẩm
     await ColorPaletteModel.create(newColorPalette)
+
+    //  Tạo Kích cỡ sản phẩm
+    const newSizePalette = {
+      productId: product._id,
+      sizes: reqBody.sizes
+    }
+
+    await SizePaletteModel.create(newSizePalette)
+
+    // Lưu vào Kho sản phẩm
+
+    const inventoris = reqBody.stockMatrix.map((item) => {
+      const colorName = item.color.toLowerCase()
+
+      const colorObj = reqBody.colors.find(
+        (color) => color.name.toLowerCase() === colorName
+      )
+
+      const inventory = {
+        productId: product._id, // ID sản phẩm gốc
+        variant: {
+          color: { name: item.color, image: colorObj.image },
+          size: { name: item.size.toUpperCase() },
+          sku: generateSKU(product.name, colorName, item.size)
+        },
+        quantity: item.quantity,
+        importPrice: product.importPrice,
+        exportPrice: product.price,
+        minQuantity: 5,
+        status: 'in-stock',
+        destroy: false
+      }
+
+      return inventory
+    })
+
+    await InventoryModel.insertMany(inventoris)
 
     return product
   } catch (err) {
