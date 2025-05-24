@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { getInventories } from '~/services/admin/inventoryService'
 
 const useInventories = (pageInventory = 1, limit = 10) => {
@@ -13,7 +13,10 @@ const useInventories = (pageInventory = 1, limit = 10) => {
     setTotalPages(Math.max(1, Math.ceil(total / limit)))
     setLoading(false)
   }
-
+  useEffect(() => {
+    fetchInventories(pageInventory)
+  }, [pageInventory])
+  console.log('inventories', inventories)
   return { inventories, totalPages, fetchInventories, loading }
 }
 

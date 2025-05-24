@@ -10,10 +10,6 @@ import StyleAdmin, {
 import InventoryRow from './InventoryRow'
 
 const InventoryTable = ({ inventories, loading, handleOpenModal }) => {
-  const filteredInventories = inventories.filter(
-    (item) => item.destroy !== true
-  )
-
   return (
     <Table>
       <TableHead>
@@ -38,14 +34,14 @@ const InventoryTable = ({ inventories, loading, handleOpenModal }) => {
               Đang tải dữ liệu kho...
             </StyledTableCell>
           </StyledTableRow>
-        ) : filteredInventories.length === 0 ? (
+        ) : inventories.length === 0 ? (
           <StyledTableRow>
             <StyledTableCell colSpan={9} align='center'>
               Không có dữ liệu kho.
             </StyledTableCell>
           </StyledTableRow>
         ) : (
-          filteredInventories.map((item, idx) => (
+          inventories.map((item, idx) => (
             <InventoryRow
               key={item._id}
               inventory={item}

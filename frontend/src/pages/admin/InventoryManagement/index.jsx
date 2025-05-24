@@ -18,7 +18,6 @@ const InventoryManagement = () => {
   React.useEffect(() => {
     fetchInventories(page)
   }, [page])
-
   const handleOpenModal = (type, inventory) => {
     if (!inventory || !inventory._id) return
     setSelectedInventory(inventory)

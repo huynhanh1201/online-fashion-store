@@ -8,7 +8,7 @@ export const getInventories = async (page = 1, limit = 10, filters = {}) => {
       `${API_ROOT}/v1/inventories?${params}`
     )
     return {
-      inventories: response.data.data,
+      inventories: response.data,
       total: response.data.totalPages
     }
   } catch (error) {

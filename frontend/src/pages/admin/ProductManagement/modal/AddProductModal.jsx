@@ -992,22 +992,6 @@ const AddProductModal = ({ open, onClose, onSuccess }) => {
               )}
             />
           </Grid>
-
-          <Grid item xs={4}>
-            <Controller
-              name='exportPrice'
-              control={control}
-              render={({ field }) => (
-                <TextField
-                  label='Giá xuất'
-                  fullWidth
-                  type='number'
-                  {...field}
-                />
-              )}
-            />
-          </Grid>
-
           {/* Phần thêm màu */}
           <Grid item xs={12}>
             <Typography variant='h6'>Thêm màu sắc</Typography>
