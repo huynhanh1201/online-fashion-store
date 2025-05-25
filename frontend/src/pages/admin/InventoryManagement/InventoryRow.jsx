@@ -72,13 +72,20 @@ import {
   BorderColor,
   DeleteForever
 } from '@mui/icons-material'
-import { StyledTableCell, StyledTableRow } from '~/assets/StyleAdmin.jsx'
+import StyleAdmin, {
+  StyledTableCell,
+  StyledTableRow
+} from '~/assets/StyleAdmin.jsx'
 import ExpandLessIcon from '@mui/icons-material/ExpandLess'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
+import AssignmentAddIcon from '@mui/icons-material/AssignmentAdd'
+import LoginIcon from '@mui/icons-material/Login'
+import LogoutIcon from '@mui/icons-material/Logout'
+
 const styles = {
   groupIcon: {
     display: 'flex',
-    justifyContent: 'center',
+    justifyContent: 'start',
     alignItems: 'center',
     width: '100%'
   },
@@ -91,29 +98,78 @@ const styles = {
 export default function InventoryRow({
   inventory,
   handleOpenModal,
-  childrenInventories
+  childrenInventories,
+  index
 }) {
   const [open, setOpen] = useState(false)
+  // Lấy danh sách màu không trùng, có thể thêm màu biến thể cha
+  const getUniqueColors = () => {
+    const colors = [
+      inventory.variant?.color?.name,
+      ...childrenInventories.map((item) => item.variant?.color?.name)
+    ].filter(Boolean)
+    return [...new Set(colors)]
+  }
 
+  // Lấy danh sách size không trùng, có thể thêm size biến thể cha
+  const getUniqueSizes = () => {
+    const sizes = [
+      inventory.variant?.size?.name,
+      ...childrenInventories.map((item) => item.variant?.size?.name)
+    ].filter(Boolean)
+    return [...new Set(sizes)]
+  }
+
+  const uniqueColors = getUniqueColors()
+  const uniqueSizes = getUniqueSizes()
   return (
     <>
       {/* Dòng chính */}
       <StyledTableRow>
         <StyledTableCell sx={{ textAlign: 'center' }}>
+          {index + 1}
+        </StyledTableCell>
+        <StyledTableCell>
           <IconButton onClick={() => setOpen(!open)}>
             {open ? <ExpandLessIcon /> : <ExpandMoreIcon />}
           </IconButton>
         </StyledTableCell>
-
-        <StyledTableCell>
+        <StyledTableCell
+          sx={{
+            maxWidth: '150px',
+            whiteSpace: 'nowrap',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis'
+          }}
+        >
           {inventory.productId?.name || 'Không xác định'}
         </StyledTableCell>
 
-        <StyledTableCell>{inventory.variant?.color?.name}</StyledTableCell>
+        {/* Hiển thị danh sách màu tổng hợp */}
+        <StyledTableCell
+          sx={{
+            maxWidth: '100px',
+            whiteSpace: 'nowrap',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis'
+          }}
+        >
+          {uniqueColors.length > 0 ? uniqueColors.join(', ') : '-'}
+        </StyledTableCell>
 
-        <StyledTableCell>{inventory.variant?.size?.name}</StyledTableCell>
+        {/* Hiển thị danh sách size tổng hợp */}
+        <StyledTableCell
+          sx={{
+            maxWidth: '100px',
+            whiteSpace: 'nowrap',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis'
+          }}
+        >
+          {uniqueSizes.length > 0 ? uniqueSizes.join(', ') : '-'}
+        </StyledTableCell>
 
-        <StyledTableCell>{inventory.quantity}</StyledTableCell>
+        <StyledTableCell>{inventory.productId.quantity}</StyledTableCell>
         <StyledTableCell>
           {inventory.importPrice?.toLocaleString()}đ
         </StyledTableCell>
@@ -139,10 +195,10 @@ export default function InventoryRow({
               <RemoveRedEye color='primary' />
             </IconButton>
             <IconButton
-              onClick={() => handleOpenModal('edit', inventory)}
+              onClick={() => handleOpenModal('add', inventory)}
               size='small'
             >
-              <BorderColor color='warning' />
+              <AssignmentAddIcon color='success' />
             </IconButton>
             <IconButton
               onClick={() => handleOpenModal('delete', inventory)}
@@ -156,12 +212,33 @@ export default function InventoryRow({
 
       {/* Dòng chi tiết xổ xuống có cùng số cột */}
       {open &&
-        childrenInventories.map((inv) => (
+        childrenInventories.map((inv, idx) => (
           <StyledTableRow key={inv._id}>
             <StyledTableCell></StyledTableCell>
+            <StyledTableCell sx={StyleAdmin.TableColumnSTT}>
+              {idx + 1}
+            </StyledTableCell>
             <StyledTableCell></StyledTableCell>
-            <StyledTableCell>{inv.variant.color.name}</StyledTableCell>
-            <StyledTableCell>{inv.variant.size.name}</StyledTableCell>
+            <StyledTableCell
+              sx={{
+                maxWidth: '100px',
+                whiteSpace: 'nowrap',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis'
+              }}
+            >
+              {inv.variant.color.name}
+            </StyledTableCell>
+            <StyledTableCell
+              sx={{
+                maxWidth: '100px',
+                whiteSpace: 'nowrap',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis'
+              }}
+            >
+              {inv.variant.size.name}
+            </StyledTableCell>
             <StyledTableCell>{inv.quantity}</StyledTableCell>
             <StyledTableCell>
               {inv.importPrice?.toLocaleString()}đ
@@ -189,6 +266,18 @@ export default function InventoryRow({
                   size='small'
                 >
                   <BorderColor color='warning' />
+                </IconButton>
+                <IconButton
+                  onClick={() => handleOpenModal('delete', inv)}
+                  size='small'
+                >
+                  <LoginIcon color='success' />
+                </IconButton>
+                <IconButton
+                  // onClick={() => handleOpenModal('delete', inv)}
+                  size='small'
+                >
+                  <LogoutIcon />
                 </IconButton>
                 <IconButton
                   onClick={() => handleOpenModal('delete', inv)}

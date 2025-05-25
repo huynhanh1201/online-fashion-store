@@ -42,3 +42,16 @@ export const deleteInventory = async (inventoryId) => {
     return null
   }
 }
+
+export const createInventory = async (data) => {
+  try {
+    const response = await AuthorizedAxiosInstance.post(
+      `${API_ROOT}/v1/inventories`,
+      data
+    )
+    return response.data
+  } catch (error) {
+    console.error('Lỗi khi tạo biến thể kho:', error)
+    return null
+  }
+}

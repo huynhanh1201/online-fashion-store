@@ -67,62 +67,6 @@ import StyleAdmin, {
 import InventoryRow from './InventoryRow'
 import { groupBy } from 'lodash'
 const InventoryTable = ({ inventories, loading, handleOpenModal }) => {
-  // ================
-  // const data = [
-  //   {
-  //     '6831811485a5d1d6a736bd75': [
-  //       {
-  //         _id: '68312205c9153f7bca8fcc8a',
-  //         productId: {
-  //           _id: '68312205c9153f7bca8fcc82',
-  //           name: 'asdasd',
-  //           description: 'asdasd',
-  //           price: 1232,
-  //           quantity: 0,
-  //           image: [
-  //             'https://res.cloudinary.com/dkwsy9sph/image/upload/v1748050434/product_upload/qqj8j0nnvlxmsmkplafz.webp'
-  //           ],
-  //           categoryId: '68307c968c717d3d673af4e5',
-  //           slug: 'asdasd',
-  //           destroy: false,
-  //           importPrice: 123213,
-  //           exportPrice: 1232,
-  //           createdAt: '2025-05-24T01:33:57.741Z',
-  //           updatedAt: '2025-05-24T01:33:57.741Z',
-  //           __v: 0
-  //         }
-  //       },
-  //       {
-  //         _id: '68312205c9153f7bca8fcc8a',
-  //         productId: {
-  //           _id: '68312205c9153f7bca8fcc82',
-  //           name: 'asdasd',
-  //           description: 'asdasd',
-  //           price: 1232,
-  //           quantity: 0,
-  //           image: [
-  //             'https://res.cloudinary.com/dkwsy9sph/image/upload/v1748050434/product_upload/qqj8j0nnvlxmsmkplafz.webp'
-  //           ],
-  //           categoryId: '68307c968c717d3d673af4e5',
-  //           slug: 'asdasd',
-  //           destroy: false,
-  //           importPrice: 123213,
-  //           exportPrice: 1232,
-  //           createdAt: '2025-05-24T01:33:57.741Z',
-  //           updatedAt: '2025-05-24T01:33:57.741Z',
-  //           __v: 0
-  //         }
-  //       }
-  //     ]
-  //   }
-  // ]
-  // //==================
-  // // const result = data.map((item) => {
-  // //   const productId = Object.keys(item)[0]
-  // // })
-  //
-  // console.log('inventories: ', data[0]['6831811485a5d1d6a736bd75'])
-  // console.log('inventories 2: ', inventories)
   const groupedData = Object.values(
     groupBy(inventories, (item) => item.productId._id)
   )
@@ -131,14 +75,17 @@ const InventoryTable = ({ inventories, loading, handleOpenModal }) => {
       <TableHead>
         <StyledTableRow>
           <StyledTableCell sx={StyleAdmin.TableColumnSTT}>STT</StyledTableCell>
-          <StyledTableCell>Tên sản phẩm</StyledTableCell>
-          <StyledTableCell>Màu sắc</StyledTableCell>
-          <StyledTableCell>Kich thước</StyledTableCell>
-          <StyledTableCell>Số lượng</StyledTableCell>
-          <StyledTableCell>Giá nhập</StyledTableCell>
-          <StyledTableCell>Giá bán</StyledTableCell>
-          <StyledTableCell>Trạng thái</StyledTableCell>
-          <StyledTableCell sx={{ width: '130px', maxWidth: '130px' }}>
+          <StyledTableCell sx={StyleAdmin.TableColumnSTT}>#</StyledTableCell>
+          <StyledTableCell sx={{ width: '150px' }}>
+            Tên sản phẩm
+          </StyledTableCell>
+          <StyledTableCell sx={{ width: '150px' }}>Màu sắc</StyledTableCell>
+          <StyledTableCell sx={{ width: '150px' }}>Kich thước</StyledTableCell>
+          <StyledTableCell sx={{ width: '100px' }}>Số lượng</StyledTableCell>
+          <StyledTableCell sx={{ width: '100px' }}>Giá nhập</StyledTableCell>
+          <StyledTableCell sx={{ width: '100px' }}>Giá bán</StyledTableCell>
+          <StyledTableCell sx={{ width: '100px' }}>Trạng thái</StyledTableCell>
+          <StyledTableCell sx={{ width: '220px', maxWidth: '220px' }}>
             Hành động
           </StyledTableCell>
         </StyledTableRow>
@@ -157,11 +104,12 @@ const InventoryTable = ({ inventories, loading, handleOpenModal }) => {
             </StyledTableCell>
           </StyledTableRow>
         ) : (
-          Object.values(groupedData).map((group) => (
+          Object.values(groupedData).map((group, index) => (
             <InventoryRow
+              index={index}
               key={group[0]._id}
               inventory={group[0]}
-              childrenInventories={group.slice(1)}
+              childrenInventories={group} // truyền toàn bộ group
               handleOpenModal={handleOpenModal}
             />
           ))

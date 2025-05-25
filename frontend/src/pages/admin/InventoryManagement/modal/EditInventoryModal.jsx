@@ -20,7 +20,6 @@ const EditInventoryModal = ({ open, onClose, inventory, onSave }) => {
       reset({
         importPrice: inventory.importPrice ?? 0,
         exportPrice: inventory.exportPrice ?? 0,
-        quantity: inventory.quantity ?? 0,
         minQuantity: inventory.minQuantity ?? 0,
         status: inventory.status ?? 'in-stock'
       })
@@ -32,7 +31,6 @@ const EditInventoryModal = ({ open, onClose, inventory, onSave }) => {
       if (
         data.importPrice < 0 ||
         data.exportPrice < 0 ||
-        data.quantity < 0 ||
         data.minQuantity < 0
       ) {
         alert('Giá và số lượng không được nhỏ hơn 0')
@@ -42,7 +40,6 @@ const EditInventoryModal = ({ open, onClose, inventory, onSave }) => {
       const updatedInventory = {
         importPrice: Number(data.importPrice),
         exportPrice: Number(data.exportPrice),
-        quantity: Number(data.quantity),
         minQuantity: Number(data.minQuantity),
         status: data.status
       }
@@ -86,13 +83,6 @@ const EditInventoryModal = ({ open, onClose, inventory, onSave }) => {
             fullWidth
             margin='normal'
             {...register('exportPrice')}
-          />
-          <TextField
-            label='Số lượng'
-            type='number'
-            fullWidth
-            margin='normal'
-            {...register('quantity')}
           />
           <TextField
             label='Ngưỡng cảnh báo'

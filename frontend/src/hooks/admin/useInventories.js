@@ -1,8 +1,9 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import {
   getInventories,
   updateInventory,
-  deleteInventory
+  deleteInventory,
+  createInventory
 } from '~/services/admin/inventoryService'
 
 const useInventories = (pageInventory = 1, limit = 10) => {
@@ -28,13 +29,21 @@ const useInventories = (pageInventory = 1, limit = 10) => {
     if (result) await fetchInventories(pageInventory)
     return result
   }
+
+  const createNewInventory = async (data) => {
+    const result = await createInventory(data)
+    if (result) await fetchInventories(pageInventory)
+    return result
+  }
+
   return {
     inventories,
     totalPages,
     fetchInventories,
     loading,
     updateInventoryById,
-    deleteInventoryById
+    deleteInventoryById,
+    createNewInventory
   }
 }
 
