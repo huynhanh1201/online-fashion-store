@@ -1,5 +1,5 @@
-import React, { useEffect } from 'react'
-import { Container, Box, Typography, Button } from '@mui/material'
+import React from 'react'
+import { Container, Box, Typography, Button, Stack } from '@mui/material'
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline'
 import { useNavigate } from 'react-router-dom'
 import { useCart } from '~/hooks/useCarts'
@@ -8,16 +8,20 @@ const OrderSuccess = () => {
   const navigate = useNavigate()
   const { refresh } = useCart()
 
-  useEffect(() => {
+  const handleGoHome = () => {
+    navigate('/')
+    // Gọi refresh sau khi đã chuyển trang
     setTimeout(() => {
       refresh()
     }, 0)
-  }, [])
-
-  const handleGoHome = () => {
-    navigate('/')
   }
 
+  const handleGoOrders = () => {
+    navigate('/orders')
+    setTimeout(() => {
+      refresh()
+    }, 0)
+  }
   return (
     <Box
       sx={{
@@ -54,9 +58,14 @@ const OrderSuccess = () => {
           Cảm ơn bạn đã mua sắm cùng chúng tôi. Đơn hàng của bạn đang được xử lý và sẽ sớm được giao.
         </Typography>
 
-        <Button variant="contained" color="primary" onClick={handleGoHome}>
-          Quay về trang chủ
-        </Button>
+        <Stack direction="row" spacing={2} justifyContent="center">
+          <Button variant="contained" color="primary" onClick={handleGoHome}>
+            Quay về trang chủ
+          </Button>
+          <Button variant="contained" color="primary" onClick={handleGoOrders}>
+            Đơn mua của bạn
+          </Button>
+        </Stack>
       </Container>
     </Box>
   )

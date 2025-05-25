@@ -120,7 +120,7 @@ const Cart = () => {
   }
 
   return (
-    <Container maxWidth='lg' sx={{ minHeight: '70vh', mt: 10, mb: 5, overflowX: 'auto' }}>
+    <Container maxWidth='xl' sx={{ minHeight: '70vh', mt: 10, mb: 5, overflowX: 'auto' }}>
       <Table size='medium' sx={{ minWidth: 650 }}>
         <TableHead>
           <TableRow>

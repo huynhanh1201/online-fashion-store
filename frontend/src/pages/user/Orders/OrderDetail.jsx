@@ -1,49 +1,47 @@
-import React, { useEffect, useState } from 'react'
+import React from 'react'
 import {
-  Box, Typography, Paper, Divider, Chip, CircularProgress, Avatar
+  Box, Typography, Paper, Divider, Chip, CircularProgress, Avatar, IconButton
 } from '@mui/material'
-import { useParams } from 'react-router-dom'
-import { getOrderById, getOrderItems } from '~/services/orderService'
+import { useParams, useNavigate } from 'react-router-dom'
+import ArrowBackIcon from '@mui/icons-material/ArrowBack'
+import { useOrderDetail } from '~/hooks/useOrderDetail'
+
+const statusLabels = {
+  Pending: ['Đang chờ', 'warning'],
+  Processing: ['Đang xử lý', 'info'],
+  Shipped: ['Đã gửi hàng', 'primary'],
+  Delivered: ['Đã giao', 'success'],
+  Cancelled: ['Đã hủy', 'error'],
+}
 
 const OrderDetail = () => {
   const { orderId } = useParams()
-  const [order, setOrder] = useState(null)
-  const [items, setItems] = useState([])
-  const [loading, setLoading] = useState(true)
+  const navigate = useNavigate()
 
-  useEffect(() => {
-    if (!/^[0-9a-fA-F]{24}$/.test(orderId)) return
+  const { order, items, loading, error } = useOrderDetail(orderId)
 
-    const fetchOrderData = async () => {
-      try {
-        const orderData = await getOrderById(orderId)
-        const itemData = await getOrderItems(orderId)
-        setOrder(orderData)
-        setItems(itemData)
-      } catch (error) {
-        console.error('Lỗi khi lấy chi tiết đơn hàng:', error)
-      } finally {
-        setLoading(false)
-      }
-    }
+  if (loading) return <CircularProgress />
+  if (error) return <Typography color="error">Lỗi: {error.message || 'Có lỗi xảy ra'}</Typography>
+  if (!order) return <Typography>Không tìm thấy đơn hàng</Typography>
 
-    fetchOrderData()
-  }, [orderId])
+  const [label, color] = statusLabels[order.status] || ['Không xác định', 'default']
 
+  const totalProductsPrice = items.reduce((sum, item) => sum + (item.price * item.quantity), 0)
+  const finalAmount = totalProductsPrice - (order.discountAmount || 0)
   const formatPrice = (val) =>
     typeof val === 'number'
       ? val.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })
       : '0₫'
 
-  if (loading) return <CircularProgress />
-  if (!order) return <Typography>Không tìm thấy đơn hàng</Typography>
-
   return (
-    <Box maxWidth="md" mx="auto" p={2}>
+    <Box maxWidth="lg" mx="auto" p={2} sx={{ minHeight: '70vh' }}>
       <Paper sx={{ p: 2 }}>
-        <Box display="flex" justifyContent="space-between" mb={2}>
-          <Typography variant="h6" fontWeight="bold">Đơn hàng: {order._id}</Typography>
-          <Chip label={order.status} color="error" />
+        <Box display="flex" alignItems="center" mb={2}>
+          <IconButton onClick={() => navigate(-1)} aria-label="Quay lại">
+            <ArrowBackIcon />
+          </IconButton>
+          <Typography variant="h6" fontWeight="bold" ml={1}>Đơn hàng: {order._id}</Typography>
+          <Chip label={label} color={color} sx={{ ml: 'auto' }} />
         </Box>
 
         <Typography fontWeight="bold">Thông tin người nhận:</Typography>
@@ -60,22 +58,15 @@ const OrderDetail = () => {
               variant="square"
               sx={{ width: 64, height: 64, borderRadius: 1, objectFit: 'cover' }}
             />
-
-            {/* Container chính giữa chứa cả tên + số lượng + giá */}
             <Box display="flex" justifyContent="space-between" alignItems="center" flex={1}>
-              {/* Thông tin sản phẩm bên trái */}
               <Box textAlign="left">
-                <Typography fontWeight={600}>{item.name}</Typography>
+                <Typography fontWeight={500}>{item.name}</Typography>
                 <Typography variant="body2" color="text.secondary">
                   Số lượng: x{item.quantity}
                 </Typography>
               </Box>
-
-              {/* Giá sản phẩm bên phải */}
               <Box textAlign="right">
-                <Typography variant="body1" fontWeight={600}>
-                  {item.price?.toLocaleString()} ₫
-                </Typography>
+                <Typography variant="body1">{item.price?.toLocaleString()} ₫</Typography>
                 {item.originalPrice && item.originalPrice > item.price && (
                   <Typography
                     variant="body2"
@@ -93,28 +84,34 @@ const OrderDetail = () => {
 
         <Box display="flex" justifyContent="space-between" mb={1}>
           <Typography fontWeight="bold">Tổng tiền hàng:</Typography>
-          <Typography>{formatPrice(order.total)}</Typography>
+          <Typography>{formatPrice(totalProductsPrice)}</Typography>
         </Box>
+
         <Box display="flex" justifyContent="space-between" mb={1}>
           <Typography fontWeight="bold">Phí vận chuyển:</Typography>
           <Typography>{formatPrice(0)}</Typography>
         </Box>
-        {order.coupon && (
+
+        {order.couponId ? (
           <Box display="flex" justifyContent="space-between" mb={1}>
             <Typography fontWeight="bold">Mã giảm giá:</Typography>
             <Typography color="green">
-              {order.coupon.code || 'Mã giảm giá'} - {formatPrice(order.coupon.discount || 0)}
+              {order.couponId.code || order.couponCode} - {formatPrice(order.discountAmount || 0)}
             </Typography>
           </Box>
+        ) : (
+          <Box display="flex" justifyContent="space-between" mb={1}>
+            <Typography fontWeight="bold">Mã giảm giá:</Typography>
+            <Typography>0₫</Typography>
+          </Box>
         )}
-
 
         <Divider sx={{ my: 2 }} />
 
         <Box display="flex" justifyContent="space-between" mb={1}>
           <Typography fontWeight="bold">Thành tiền:</Typography>
-          <Typography color="error" fontWeight="bold">
-            {formatPrice(order.finalAmount || order.total)}
+          <Typography fontWeight="bold">
+            {formatPrice(finalAmount > 0 ? finalAmount : 0)}
           </Typography>
         </Box>
 
@@ -125,7 +122,6 @@ const OrderDetail = () => {
               ? 'Thanh toán khi nhận hàng (COD)'
               : 'VNPay'}
           </Typography>
-
         </Box>
       </Paper>
     </Box>

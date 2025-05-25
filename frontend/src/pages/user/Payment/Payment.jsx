@@ -29,7 +29,6 @@ import { useSelector } from 'react-redux'
 import { useDispatch } from 'react-redux'
 import { clearTempCart } from '~/redux/cart/cartSlice'
 import { useLocation, useNavigate } from 'react-router-dom'
-import { set } from 'lodash'
 
 const SectionTitle = styled(Typography)(({ theme }) => ({
   fontWeight: 700,
