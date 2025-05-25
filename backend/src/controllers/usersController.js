@@ -73,11 +73,25 @@ const updateProfile = async (req, res, next) => {
   }
 }
 
+const updatePasswordProfile = async (req, res, next) => {
+  try {
+    const result = await usersService.updatePasswordProfile(
+      req.jwtDecoded._id,
+      req.body
+    )
+
+    res.status(StatusCodes.OK).json(result)
+  } catch (err) {
+    next(err)
+  }
+}
+
 export const usersController = {
   getUserList,
   getUser,
   updateUser,
   deleteUser,
   getProfile,
-  updateProfile
+  updateProfile,
+  updatePasswordProfile
 }

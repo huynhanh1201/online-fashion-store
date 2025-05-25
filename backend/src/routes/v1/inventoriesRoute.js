@@ -36,6 +36,7 @@ Router.route('/:inventoryId').delete(
 
 // Nhập Kho (Biến thể) sản phẩm
 Router.route('/:inventoryId/in').post(
+  authMiddleware.isAuthorized,
   inventoriesValidation.verifyId,
   inventoriesValidation.inventoryInOutStock,
   inventoriesController.importStockInventory
@@ -43,6 +44,7 @@ Router.route('/:inventoryId/in').post(
 
 // Xuất Kho (Biến thể) sản phẩm
 Router.route('/:inventoryId/out').post(
+  authMiddleware.isAuthorized,
   inventoriesValidation.verifyId,
   inventoriesValidation.inventoryInOutStock,
   inventoriesController.exportStockInventory
