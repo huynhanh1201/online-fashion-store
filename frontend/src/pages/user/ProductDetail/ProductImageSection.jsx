@@ -28,24 +28,12 @@ const ProductImageSection = ({
   colors,
   isViewingThumbnails
 }) => {
-  useEffect(() => {
-    console.log('ProductImageSection - selectedColor:', selectedColor)
-    console.log('ProductImageSection - colors:', colors)
-    console.log(
-      'ProductImageSection - isViewingThumbnails:',
-      isViewingThumbnails
-    )
-  }, [selectedColor, colors, isViewingThumbnails])
-
   const getSelectedImage = () => {
-    console.log('getSelectedImage - selectedColor:', selectedColor)
-    console.log('getSelectedImage - isViewingThumbnails:', isViewingThumbnails)
     if (!isViewingThumbnails && selectedColor && colors?.length > 0) {
       const selectedColorObj = colors.find(
         (color) =>
           (color.name || color).toLowerCase() === selectedColor.toLowerCase()
       )
-      console.log('getSelectedImage - selectedColorObj:', selectedColorObj)
       return (
         selectedColorObj?.image ||
         images?.[selectedImageIndex] ||
@@ -56,7 +44,6 @@ const ProductImageSection = ({
   }
 
   const currentImage = getSelectedImage()
-  console.log('ProductImageSection - currentImage:', currentImage)
 
   return (
     <Box sx={{ width: 400, height: 450, mb: 5 }}>
@@ -70,9 +57,8 @@ const ProductImageSection = ({
             src={currentImage}
             alt='Sản phẩm'
             onError={(e) => {
-              console.log('Image load error:', e)
-              e.target.src =
-                'https://res.cloudinary.com/dkwsy9sph/image/upload/v1748152973/color_upload/iszbo9bwqchybblbqxfu.jpg'
+              // console.log('Image load error:', e);
+              e.target.src = '/default.jpg'
             }}
           />
         </div>
@@ -94,8 +80,8 @@ const ProductImageSection = ({
             selected={index === selectedImageIndex}
             onClick={() => onImageClick(index)}
             onError={(e) => {
-              e.target.src =
-                'https://res.cloudinary.com/dkwsy9sph/image/upload/v1748152973/color_upload/iszbo9bwqchybblbqxfu.jpg'
+              // console.log('Thumbnail load error:', e);
+              e.target.src = '/default.jpg'
             }}
           />
         ))}

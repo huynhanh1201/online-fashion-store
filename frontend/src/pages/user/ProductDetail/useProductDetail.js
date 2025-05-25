@@ -44,8 +44,6 @@ const useProductDetail = (productId) => {
     }
     try {
       const data = await getProductById(productId)
-      console.log('API getProductById response:', data)
-      console.log('Raw images:', data.image)
       if (data && Object.keys(data).length && data._id) {
         let images = []
         if (typeof data.image === 'string') {
@@ -63,7 +61,6 @@ const useProductDetail = (productId) => {
         if (images.length === 0) {
           images = ['/default.jpg']
         }
-        console.log('Processed images:', images)
         setProduct({
           ...data,
           images,
@@ -90,10 +87,6 @@ const useProductDetail = (productId) => {
   const fetchColors = useCallback(async () => {
     try {
       const { colors } = await getColorPalettes(productId)
-      console.log(
-        'Colors from getColorPalettes (raw):',
-        JSON.stringify(colors, null, 2)
-      )
       setColors(colors || [])
     } catch (err) {
       console.error('Lỗi khi lấy màu:', err.response || err)
@@ -104,10 +97,6 @@ const useProductDetail = (productId) => {
   const fetchSizes = useCallback(async () => {
     try {
       const response = await getSizePalettes(productId)
-      console.log(
-        'Raw response from getSizePalettes:',
-        JSON.stringify(response, null, 2)
-      )
       const sizes = response?.sizes || []
       setSizes(sizes) // Không cần lọc nữa vì API đã trả đúng mảng chuỗi
     } catch (err) {
@@ -119,7 +108,6 @@ const useProductDetail = (productId) => {
   const fetchCoupons = useCallback(async () => {
     try {
       const { discounts } = await getDiscounts()
-      console.log('Coupons from getDiscounts:', discounts)
       const sortedCoupons = discounts.sort(
         (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
       )

@@ -60,11 +60,7 @@ const ProductInfoSection = ({
   selectedColor,
   setSelectedColor
 }) => {
-  console.log('ProductInfoSection - colors:', colors)
-  console.log('ProductInfoSection - selectedColor:', selectedColor)
-
   const handleColorSelect = (color) => {
-    console.log('Selected color:', color)
     setSelectedColor(color)
   }
 
