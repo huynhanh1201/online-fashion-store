@@ -136,7 +136,7 @@ const HeaderAction = () => {
         <MenuItem component={Link} to='/cart'>
           Giỏ hàng
         </MenuItem>
-        <MenuItem component={Link} to='/order'>
+        <MenuItem component={Link} to='/orders'>
           Thông tin đơn hàng
         </MenuItem>
       </Menu>
