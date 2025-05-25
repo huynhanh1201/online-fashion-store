@@ -55,3 +55,42 @@ export const createInventory = async (data) => {
     return null
   }
 }
+export const importInventory = async (inventoryId, quantity) => {
+  const response = await AuthorizedAxiosInstance.post(
+    `${API_ROOT}/v1/inventories/${inventoryId}/in`,
+    { quantity }
+  )
+  return response.data
+}
+export const exportInventory = async (inventoryId, quantity) => {
+  const response = await AuthorizedAxiosInstance.post(
+    `${API_ROOT}/v1/inventories/${inventoryId}/out`,
+    { quantity }
+  )
+  return response.data
+}
+
+export const getInventoryLogs = async ({ page, limit }) => {
+  try {
+    const response = await AuthorizedAxiosInstance.get(
+      `${API_ROOT}/v1/inventory-logs`,
+      {
+        params: {
+          page,
+          limit
+        }
+      }
+    )
+    console.log('Inventory logs response:', response.data)
+    return {
+      logs: response.data, // bọc lại
+      totalPages: 1 // nếu chưa có phân trang thật
+    }
+  } catch (error) {
+    console.error('Lỗi khi lấy lịch xử kho:', error)
+    return {
+      logs: [],
+      totalPages: 1
+    }
+  }
+}

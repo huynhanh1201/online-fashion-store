@@ -14,11 +14,17 @@ const DeleteInventoryModal = React.lazy(
   () => import('./modal/DeleteInventoryModal')
 )
 const AddInventoryModal = React.lazy(() => import('./modal/AddInventoryModal'))
-
+const AdjustInventoryModal = React.lazy(
+  () => import('./modal/AdjustInventoryModal')
+)
 const InventoryManagement = () => {
   const [page, setPage] = React.useState(1)
   const [selectedInventory, setSelectedInventory] = React.useState(null)
   const [modalType, setModalType] = React.useState(null)
+  const [openAdjustModal, setOpenAdjustModal] = React.useState(false)
+  const [adjustType, setAdjustType] = React.useState('in') // 'in' hoặc 'out'
+  const [selectedInventoryId, setSelectedInventoryId] = React.useState(null)
+
   const {
     inventories,
     totalPages,
@@ -26,7 +32,9 @@ const InventoryManagement = () => {
     loading,
     updateInventoryById,
     deleteInventoryById,
-    createNewInventory
+    createNewInventory,
+    handleExport,
+    handleImport
   } = useInventories(page)
 
   useEffect(() => {
@@ -34,10 +42,17 @@ const InventoryManagement = () => {
   }, [page])
 
   const handleOpenModal = (type, inventory) => {
-    if (inventory && inventory._id) {
-      setSelectedInventory(inventory) // Thiết lập selectedInventory cho các type khác
-      setModalType(type)
+    if (!inventory || !inventory._id) return
+
+    if (type === 'in' || type === 'out') {
+      setAdjustType(type)
+      setSelectedInventoryId(inventory._id)
+      setOpenAdjustModal(true)
+      return
     }
+
+    setSelectedInventory(inventory)
+    setModalType(type)
   }
 
   const handleCloseModal = () => {
@@ -66,6 +81,15 @@ const InventoryManagement = () => {
 
   const handleChangePage = (event, value) => setPage(value)
 
+  const handleAdjustSubmit = async (quantity) => {
+    if (adjustType === 'in') {
+      await handleImport(selectedInventoryId, quantity)
+    } else {
+      await handleExport(selectedInventoryId, quantity)
+    }
+
+    setOpenAdjustModal(false)
+  }
   return (
     <>
       <Typography variant='h5' sx={{ mb: 2 }}>
@@ -108,6 +132,14 @@ const InventoryManagement = () => {
             onClose={handleCloseModal}
             onAdd={handleAddInventory}
             inventory={selectedInventory}
+          />
+        )}
+        {openAdjustModal && (
+          <AdjustInventoryModal
+            open={openAdjustModal}
+            onClose={() => setOpenAdjustModal(false)}
+            onSubmit={handleAdjustSubmit}
+            type={adjustType}
           />
         )}
       </React.Suspense>

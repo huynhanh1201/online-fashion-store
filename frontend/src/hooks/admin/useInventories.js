@@ -3,7 +3,9 @@ import {
   getInventories,
   updateInventory,
   deleteInventory,
-  createInventory
+  createInventory,
+  importInventory,
+  exportInventory
 } from '~/services/admin/inventoryService'
 
 const useInventories = (pageInventory = 1, limit = 10) => {
@@ -36,6 +38,26 @@ const useInventories = (pageInventory = 1, limit = 10) => {
     return result
   }
 
+  const handleImport = async (inventoryId, quantity) => {
+    try {
+      const res = await importInventory(inventoryId, quantity)
+      return res.data
+    } catch (error) {
+      console.error('Import error', error)
+      return null
+    }
+  }
+
+  const handleExport = async (inventoryId, quantity) => {
+    try {
+      const res = await exportInventory(inventoryId, quantity)
+      return res.data
+    } catch (error) {
+      console.error('Export error', error)
+      return null
+    }
+  }
+
   return {
     inventories,
     totalPages,
@@ -43,7 +65,9 @@ const useInventories = (pageInventory = 1, limit = 10) => {
     loading,
     updateInventoryById,
     deleteInventoryById,
-    createNewInventory
+    createNewInventory,
+    handleImport,
+    handleExport
   }
 }
 
