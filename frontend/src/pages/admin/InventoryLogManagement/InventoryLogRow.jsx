@@ -1,22 +1,25 @@
 import React from 'react'
-import { TableRow, TableCell } from '@mui/material'
 import dayjs from 'dayjs'
-
+import StyleAdmin, {
+  StyledTableCell,
+  StyledTableRow
+} from '~/assets/StyleAdmin.jsx'
 const InventoryLogRow = ({ log }) => {
-  console.log('InventoryLogRow:', log)
   return (
-    <TableRow>
-      <TableCell>{dayjs(log.date).format('DD/MM/YYYY HH:mm')}</TableCell>
-      <TableCell>{log.variant?.sku}</TableCell>
-      <TableCell>{log.variant?.color}</TableCell>
-      <TableCell>{log.variant?.size}</TableCell>
-      <TableCell>{log.type}</TableCell>
-      <TableCell>{log.source || '-'}</TableCell>
-      <TableCell>{log.amount}</TableCell>
-      <TableCell>{log.importPrice || '-'}</TableCell>
-      <TableCell>{log.exportPrice || '-'}</TableCell>
-      <TableCell>{log.note || '-'}</TableCell>
-    </TableRow>
+    <StyledTableRow>
+      <StyledTableCell>
+        {dayjs(log.date).format('DD/MM/YYYY HH:mm')}
+      </StyledTableCell>
+      <StyledTableCell>{log.variant?.sku}</StyledTableCell>
+      <StyledTableCell>{log.variant?.color.name}</StyledTableCell>
+      <StyledTableCell>{log.variant?.size.name}</StyledTableCell>
+      <StyledTableCell>{log.type}</StyledTableCell>
+      <StyledTableCell>{log.source || '-'}</StyledTableCell>
+      <StyledTableCell>{log.amount}</StyledTableCell>
+      <StyledTableCell>{log.importPrice || '-'}</StyledTableCell>
+      <StyledTableCell>{log.exportPrice || '-'}</StyledTableCell>
+      <StyledTableCell>{log.note || '-'}</StyledTableCell>
+    </StyledTableRow>
   )
 }
 

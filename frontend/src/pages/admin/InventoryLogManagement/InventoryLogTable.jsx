@@ -1,37 +1,40 @@
 import React from 'react'
-import { Table, TableBody, TableHead, TableRow, TableCell } from '@mui/material'
+import { Table, TableBody, TableHead } from '@mui/material'
 import InventoryLogRow from './InventoryLogRow'
-
+import StyleAdmin, {
+  StyledTableCell,
+  StyledTableRow
+} from '~/assets/StyleAdmin.jsx'
 const InventoryLogTable = ({ logs, loading }) => {
   return (
     <Table>
       <TableHead>
-        <TableRow>
-          <TableCell>Ngày</TableCell>
-          <TableCell>SKU</TableCell>
-          <TableCell>Màu</TableCell>
-          <TableCell>Size</TableCell>
-          <TableCell>Loại</TableCell>
-          <TableCell>Nguồn</TableCell>
-          <TableCell>SL</TableCell>
-          <TableCell>Giá nhập</TableCell>
-          <TableCell>Giá bán</TableCell>
-          <TableCell>Ghi chú</TableCell>
-        </TableRow>
+        <StyledTableRow>
+          <StyledTableCell>Ngày</StyledTableCell>
+          <StyledTableCell>SKU</StyledTableCell>
+          <StyledTableCell>Màu</StyledTableCell>
+          <StyledTableCell>Size</StyledTableCell>
+          <StyledTableCell>Loại</StyledTableCell>
+          <StyledTableCell>Nguồn</StyledTableCell>
+          <StyledTableCell>SL</StyledTableCell>
+          <StyledTableCell>Giá nhập</StyledTableCell>
+          <StyledTableCell>Giá bán</StyledTableCell>
+          <StyledTableCell>Ghi chú</StyledTableCell>
+        </StyledTableRow>
       </TableHead>
       <TableBody>
         {loading ? (
-          <TableRow>
-            <TableCell colSpan={10} align='center'>
+          <StyledTableRow>
+            <StyledTableCell colSpan={10} align='center'>
               Đang tải dữ liệu...
-            </TableCell>
-          </TableRow>
+            </StyledTableCell>
+          </StyledTableRow>
         ) : logs.length === 0 ? (
-          <TableRow>
-            <TableCell colSpan={10} align='center'>
+          <StyledTableRow>
+            <StyledTableCell colSpan={10} align='center'>
               Không có dữ liệu
-            </TableCell>
-          </TableRow>
+            </StyledTableCell>
+          </StyledTableRow>
         ) : (
           logs.map((log) => <InventoryLogRow key={log._id} log={log} />)
         )}
