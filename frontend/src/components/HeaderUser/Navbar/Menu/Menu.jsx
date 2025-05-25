@@ -73,7 +73,7 @@ const AnimatedPopover = styled(Popover)(({ theme }) => ({
 }))
 
 const Menu = () => {
-  const [hoveredMenu, setHoveredMenu] = useState({ name: null, el: null })
+  const [hovered, setHovered] = useState({ open: false, anchorEl: null })
   const [categories, setCategories] = useState([])
   const hoverTimeout = useRef(null)
 
@@ -90,47 +90,41 @@ const Menu = () => {
     fetchCategories()
   }, [])
 
-  const handleHover = (menu, el) => {
+  const handleEnter = (el) => {
     clearTimeout(hoverTimeout.current)
-    setHoveredMenu({ name: menu, el })
+    setHovered({ open: true, anchorEl: el })
   }
 
   const handleLeave = () => {
     hoverTimeout.current = setTimeout(() => {
-      setHoveredMenu({ name: null, el: null })
+      setHovered({ open: false, anchorEl: null })
     }, 200)
   }
 
-  const renderPopoverContent = (categoryName) => {
-    // Tạm thời gán cứng loại sản phẩm cho mọi danh mục
-    const types = [{ name: 'Loại 1' }, { name: 'Loại 2' }, { name: 'Loại 3' }]
-
-    return (
-      <Box
-        sx={{
-          p: 2,
-          minWidth: 400
-        }}
+  const renderPopoverContent = () => (
+    <Box sx={{ p: 2, minWidth: 300 }}>
+      <Typography
+        variant='subtitle1'
+        fontWeight={700}
+        align='center'
+        sx={{ mb: 2 }}
       >
-        <Typography
-          variant='subtitle1'
-          fontWeight={700}
-          align='center'
-          sx={{ mb: 2 }}
-        >
-          {categoryName.toUpperCase()}
-        </Typography>
+        TẤT CẢ DANH MỤC
+      </Typography>
 
-        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-          {types.map((type, index) => (
-            <CategoryButton key={index} size='small' href='#'>
-              {type.name}
-            </CategoryButton>
-          ))}
-        </Box>
+      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+        {categories.map((cat) => (
+          <CategoryButton
+            key={cat._id}
+            href={`/product?category=${cat._id}`}
+            size='small'
+          >
+            {cat.name}
+          </CategoryButton>
+        ))}
       </Box>
-    )
-  }
+    </Box>
+  )
 
   return (
     <Box
@@ -140,43 +134,36 @@ const Menu = () => {
         gap: 2
       }}
     >
-      {/* Menu cố định "Sản phẩm" */}
       <StyledButton href='/'>Trang chủ</StyledButton>
 
       <StyledButton href='/product'>Sản phẩm</StyledButton>
 
-      {/* Các danh mục sản phẩm từ API */}
-      {categories.map((cat) => (
-        <Box
-          key={cat._id}
-          onMouseEnter={(e) => handleHover(cat.name, e.currentTarget)}
-          onMouseLeave={handleLeave}
-        >
-          <StyledButton href={`/product?category=${cat._id}`}>
-            {cat.name}
-          </StyledButton>
+      <Box
+        onMouseEnter={(e) => handleEnter(e.currentTarget)}
+        onMouseLeave={handleLeave}
+      >
+        <StyledButton>Danh mục</StyledButton>
 
-          <AnimatedPopover
-            open={hoveredMenu.name === cat.name}
-            anchorEl={hoveredMenu.el}
-            onClose={handleLeave}
-            anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-            transformOrigin={{ vertical: 'top', horizontal: 'center' }}
-            PaperProps={{
-              onMouseEnter: () => clearTimeout(hoverTimeout.current),
-              onMouseLeave: handleLeave,
-              sx: {
-                mt: 1,
-                borderRadius: 2,
-                boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
-              }
-            }}
-            disableRestoreFocus
-          >
-            {renderPopoverContent(cat.name)}
-          </AnimatedPopover>
-        </Box>
-      ))}
+        <AnimatedPopover
+          open={hovered.open}
+          anchorEl={hovered.anchorEl}
+          onClose={handleLeave}
+          anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+          transformOrigin={{ vertical: 'top', horizontal: 'center' }}
+          PaperProps={{
+            onMouseEnter: () => clearTimeout(hoverTimeout.current),
+            onMouseLeave: handleLeave,
+            sx: {
+              mt: 1,
+              borderRadius: 2,
+              boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
+            }
+          }}
+          disableRestoreFocus
+        >
+          {renderPopoverContent()}
+        </AnimatedPopover>
+      </Box>
     </Box>
   )
 }

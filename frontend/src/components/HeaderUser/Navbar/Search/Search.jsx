@@ -5,7 +5,6 @@ import {
   IconButton,
   List,
   ListItem,
-  ListItemText,
   Typography
 } from '@mui/material'
 import SearchIcon from '@mui/icons-material/Search'
@@ -17,40 +16,62 @@ import { getProducts } from '~/services/productService'
 const SearchWrapper = styled(Box)({
   position: 'relative',
   display: 'flex',
-  alignItems: 'center'
+  alignItems: 'center',
+  width: 'fit-content'
 })
 
 // Input xổ ra ngang hàng với icon
 const AnimatedInput = styled(InputBase)(({ visible }) => ({
   position: 'absolute',
-  right: '40px', // nằm bên trái icon
+  right: '40px',
   top: '50%',
   transform: visible
     ? 'translateY(-50%) scaleX(1)'
     : 'translateY(-50%) scaleX(0)',
-  transformOrigin: 'right center', // scale từ phải sang trái
+  transformOrigin: 'right center',
   transition: 'transform 0.3s ease, opacity 0.3s ease',
   opacity: visible ? 1 : 0,
-  width: 240,
-  backgroundColor: '#f1f3f5',
-  padding: '6px 12px',
-  borderRadius: 20,
+  width: 280,
+  backgroundColor: '#ffffff',
+  padding: '8px 16px',
+  borderRadius: 24,
+  border: '1px solid #e0e0e0',
+  boxShadow: '0 2px 4px rgba(0,0,0,0.05)',
   pointerEvents: visible ? 'auto' : 'none',
-  zIndex: 10
+  zIndex: 10,
+  '&:hover': {
+    borderColor: '#1976d2',
+    boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
+  }
 }))
 
 const SuggestionList = styled(List)({
   position: 'absolute',
-  top: '100%',
-  left: 0,
-  width: 300,
-  backgroundColor: '#fff',
-  boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
-  borderRadius: 8,
+  top: 'calc(100% + 8px)',
+  right: '40px',
+  width: 320,
+  backgroundColor: '#ffffff',
+  boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+  borderRadius: 12,
   zIndex: 9,
-  maxHeight: 200,
+  maxHeight: 300,
   overflowY: 'auto',
-  marginTop: 4
+  padding: '8px 0',
+  '&::-webkit-scrollbar': {
+    width: '6px'
+  },
+  '&::-webkit-scrollbar-thumb': {
+    backgroundColor: '#e0e0e0',
+    borderRadius: '6px'
+  }
+})
+
+const StyledListItem = styled(ListItem)({
+  padding: '12px 16px',
+  transition: 'background-color 0.2s ease',
+  '&:hover': {
+    backgroundColor: '#f5f5f5'
+  }
 })
 
 const Search = () => {
@@ -79,7 +100,7 @@ const Search = () => {
 
         if (filtered.length === 0) {
           setSuggestions([])
-          setErrorMessage('Không có sản phẩm này')
+          setErrorMessage('Không tìm thấy sản phẩm')
         } else {
           setSuggestions(filtered)
           setErrorMessage('')
@@ -87,7 +108,7 @@ const Search = () => {
       } catch (error) {
         console.error('Lỗi khi tìm kiếm sản phẩm:', error)
         setSuggestions([])
-        setErrorMessage('Không có sản phẩm này')
+        setErrorMessage('Không tìm thấy sản phẩm')
       }
     }
 
@@ -113,9 +134,9 @@ const Search = () => {
     }
   }
 
-  const handleSuggestionClick = (productName) => {
-    setSearchText(productName)
-    navigate(`/products?search=${encodeURIComponent(productName)}`)
+  const handleSuggestionClick = (productId) => {
+    setSearchText('')
+    navigate(`/productdetail/${productId}`)
     setShowInput(false)
     setSuggestions([])
   }
@@ -144,40 +165,66 @@ const Search = () => {
               variant='body2'
               color='error'
               textAlign='center'
-              sx={{ py: 1 }}
+              sx={{ py: 2, px: 2 }}
             >
               {errorMessage}
             </Typography>
           ) : (
-            suggestions.map((product) => (
-              <ListItem
-                button
+            suggestions.map((product, index) => (
+              <StyledListItem
                 key={product._id}
-                onClick={() => handleSuggestionClick(product.name)}
+                onClick={() => handleSuggestionClick(product._id)}
+                sx={{
+                  animation: `fadeIn 0.3s ease ${index * 0.05}s`,
+                  '@keyframes fadeIn': {
+                    from: { opacity: 0, transform: 'translateY(5px)' },
+                    to: { opacity: 1, transform: 'translateY(0)' }
+                  }
+                }}
               >
-                <Box
-                  sx={{ display: 'flex', alignItems: 'center', width: '100%' }}
-                >
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                   <img
-                    src={product.imageUrl}
+                    src={product.image?.[0] || '/fallback.jpg'}
                     alt={product.name}
+                    onError={(e) => {
+                      e.target.onerror = null
+                      e.target.src = '/fallback.jpg'
+                    }}
                     style={{
-                      width: 40,
-                      height: 40,
+                      width: 48,
+                      height: 48,
                       objectFit: 'cover',
-                      marginRight: 8
+                      borderRadius: 8,
+                      flexShrink: 0
                     }}
                   />
-                  <ListItemText primary={product.name} />
-                  <Typography
-                    variant='body2'
-                    color='textSecondary'
-                    sx={{ marginLeft: 'auto' }}
-                  >
-                    {product.price} VND
-                  </Typography>
+                  <Box sx={{ flex: 1, overflow: 'hidden' }}>
+                    <Typography
+                      variant='subtitle2'
+                      fontWeight={600}
+                      noWrap
+                      sx={{ maxWidth: '200px' }}
+                    >
+                      {product.name}
+                    </Typography>
+                    <Typography
+                      variant='body2'
+                      color='text.secondary'
+                      noWrap
+                      sx={{ maxWidth: '200px' }}
+                    >
+                      {product.description}
+                    </Typography>
+                    <Typography
+                      variant='body2'
+                      color='primary'
+                      fontWeight={500}
+                    >
+                      {product.price.toLocaleString()} VND
+                    </Typography>
+                  </Box>
                 </Box>
-              </ListItem>
+              </StyledListItem>
             ))
           )}
         </SuggestionList>
