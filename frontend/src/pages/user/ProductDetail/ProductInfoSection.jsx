@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React from 'react'
 import {
   Box,
   Typography,
@@ -56,18 +56,16 @@ const ProductInfoSection = ({
   isAdding,
   handleAddToCart,
   handleBuyNow,
-  setOpenVoucherDrawer
+  setOpenVoucherDrawer,
+  selectedColor,
+  setSelectedColor
 }) => {
-  const [selectedColor, setSelectedColor] = useState('')
+  console.log('ProductInfoSection - colors:', colors)
+  console.log('ProductInfoSection - selectedColor:', selectedColor)
 
   const handleColorSelect = (color) => {
+    console.log('Selected color:', color)
     setSelectedColor(color)
-  }
-
-  // Ánh xạ màu với ảnh
-  const getColorImage = (color, index) => {
-    if (color.image) return color.image
-    return product?.images?.[index] || '/default.jpg'
   }
 
   return (
@@ -77,10 +75,7 @@ const ProductInfoSection = ({
       <Typography
         variant='h5'
         fontWeight={700}
-        sx={{
-          wordBreak: 'break-word',
-          whiteSpace: 'pre-wrap'
-        }}
+        sx={{ wordBreak: 'break-word', whiteSpace: 'pre-wrap' }}
       >
         {product?.name || 'Sản phẩm không tên'}
       </Typography>
@@ -106,7 +101,6 @@ const ProductInfoSection = ({
         )}
       </Box>
 
-      {/* Promotions */}
       <Box sx={{ border: '1px dashed #d32f2f', p: 1.5, borderRadius: 1 }}>
         <Typography variant='body2' color='error' fontWeight={700}>
           <LocalOfferIcon sx={{ verticalAlign: 'middle', mr: 1 }} />
@@ -130,7 +124,6 @@ const ProductInfoSection = ({
         )}
       </Box>
 
-      {/* Coupon Chips */}
       {coupons?.length > 0 && (
         <Box>
           <Typography variant='body2' fontWeight={700} sx={{ mb: 0.5 }}>
@@ -146,27 +139,28 @@ const ProductInfoSection = ({
         </Box>
       )}
 
-      {/* Colors */}
       <Box>
         <Typography variant='body2' fontWeight={700}>
           Chọn màu
         </Typography>
         <Box sx={{ display: 'flex', gap: 1, mt: 0.5, flexWrap: 'wrap' }}>
           {colors?.length > 0 ? (
-            colors.map((color, index) => (
-              <ColorBox
-                key={color._id || index}
-                selected={selectedColor === (color.name || color)}
-                onClick={() => handleColorSelect(color.name || color)}
-              >
-                <ColorImage
-                  src={getColorImage(color, index)}
-                  alt={color.name || color}
-                  onError={(e) => (e.target.src = '/default.jpg')}
-                />
-                <Typography variant='body2'>{color.name || color}</Typography>
-              </ColorBox>
-            ))
+            colors
+              .filter((color) => color.isActive)
+              .map((color, index) => (
+                <ColorBox
+                  key={color._id || index}
+                  selected={selectedColor === color.name}
+                  onClick={() => handleColorSelect(color.name)}
+                >
+                  <ColorImage
+                    src={color.image || '/default.jpg'}
+                    alt={color.name}
+                    onError={(e) => (e.target.src = '/default.jpg')}
+                  />
+                  <Typography variant='body2'>{color.name}</Typography>
+                </ColorBox>
+              ))
           ) : (
             <Typography variant='body2' color='text.secondary'>
               Không có màu sắc nào.
@@ -175,7 +169,6 @@ const ProductInfoSection = ({
         </Box>
       </Box>
 
-      {/* Sizes */}
       <Box>
         <Typography variant='body2' fontWeight={700}>
           Chọn kích cỡ
@@ -208,7 +201,6 @@ const ProductInfoSection = ({
         </ButtonGroup>
       </Box>
 
-      {/* Quantity */}
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
         <Typography variant='body2' fontWeight={700}>
           Số lượng
@@ -238,7 +230,6 @@ const ProductInfoSection = ({
         </Typography>
       </Box>
 
-      {/* Action Buttons */}
       <Box sx={{ display: 'flex', gap: 2 }}>
         <Button
           variant='contained'

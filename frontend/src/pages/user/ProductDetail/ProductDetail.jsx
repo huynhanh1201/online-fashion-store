@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import {
   Container,
   Grid,
@@ -16,7 +16,8 @@ import SnackbarAlert from './SnackbarAlert'
 
 const ProductDetail = () => {
   const { productId } = useParams()
-  console.log('Product ID from useParams:', productId) // Thêm log
+  const [selectedColor, setSelectedColor] = useState(null)
+  const [isViewingThumbnails, setIsViewingThumbnails] = useState(false) // Thêm state mới
   const {
     product,
     isLoading,
@@ -44,6 +45,11 @@ const ProductDetail = () => {
     copiedCode,
     formatCurrencyShort
   } = useProductDetail(productId)
+
+  console.log('ProductDetail - productId:', productId)
+  console.log('ProductDetail - selectedColor:', selectedColor)
+  console.log('ProductDetail - colors:', colors)
+  console.log('ProductDetail - isViewingThumbnails:', isViewingThumbnails)
 
   if (isLoading) {
     return (
@@ -78,6 +84,7 @@ const ProductDetail = () => {
             selectedImageIndex={selectedImageIndex}
             fadeIn={fadeIn}
             onImageClick={(index) => {
+              setIsViewingThumbnails(true) // Kích hoạt chế độ xem thumbnail
               if (index !== selectedImageIndex) {
                 setFadeIn(false)
                 setTimeout(() => {
@@ -86,6 +93,10 @@ const ProductDetail = () => {
                 }, 150)
               }
             }}
+            selectedColor={selectedColor}
+            colors={colors}
+            isViewingThumbnails={isViewingThumbnails}
+            setIsViewingThumbnails={setIsViewingThumbnails}
           />
         </Grid>
         <Grid item xs={12} md={6}>
@@ -102,6 +113,11 @@ const ProductDetail = () => {
             handleAddToCart={handleAddToCart}
             handleBuyNow={handleBuyNow}
             setOpenVoucherDrawer={setOpenVoucherDrawer}
+            selectedColor={selectedColor}
+            setSelectedColor={(color) => {
+              setSelectedColor(color)
+              setIsViewingThumbnails(false) // Tắt chế độ xem thumbnail khi chọn màu
+            }}
           />
         </Grid>
       </Grid>

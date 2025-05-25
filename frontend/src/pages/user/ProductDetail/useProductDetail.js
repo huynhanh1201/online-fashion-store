@@ -23,6 +23,7 @@ const useProductDetail = (productId) => {
   const [isAdding, setIsAdding] = useState(false)
   const [colors, setColors] = useState([])
   const [sizes, setSizes] = useState([])
+  const [selectedColor, setSelectedColor] = useState(null)
 
   const dispatch = useDispatch()
   const navigate = useNavigate()
@@ -108,15 +109,10 @@ const useProductDetail = (productId) => {
         JSON.stringify(response, null, 2)
       )
       const sizes = response?.sizes || []
-      // Ánh xạ sizes thành mảng chuỗi, chỉ lấy kích thước isActive
-      const activeSizes = sizes
-        .filter((size) => size.isActive)
-        .map((size) => size.name)
-      console.log('Processed sizes (active only):', activeSizes)
-      setSizes(activeSizes.length > 0 ? activeSizes : ['S', 'M', 'L', 'XL'])
+      setSizes(sizes) // Không cần lọc nữa vì API đã trả đúng mảng chuỗi
     } catch (err) {
       console.error('Lỗi khi lấy kích thước:', err.response || err)
-      setSizes(['S', 'M', 'L', 'XL'])
+      setSizes([])
     }
   }, [productId])
 
@@ -145,6 +141,16 @@ const useProductDetail = (productId) => {
     navigator.clipboard.writeText(code)
     setCopiedCode(code)
     setTimeout(() => setCopiedCode(''), 2000)
+  }
+  const handleColorChange = (color) => {
+    setSelectedColor(color)
+    if (color.images && color.images.length > 0) {
+      setProduct((prev) => ({
+        ...prev,
+        images: color.images
+      }))
+      setSelectedImageIndex(0)
+    }
   }
 
   const handleAddToCart = async () => {
@@ -227,7 +233,10 @@ const useProductDetail = (productId) => {
     handleBuyNow,
     handleCopy,
     copiedCode,
-    formatCurrencyShort
+    formatCurrencyShort,
+    selectedColor,
+    setSelectedColor,
+    handleColorChange
   }
 }
 
