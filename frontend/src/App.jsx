@@ -29,6 +29,7 @@ import DiscountManagement from '~/pages/admin/DiscountManagement/index.jsx'
 import TransactionManegement from '~/pages/admin/TransactionManegement/index.jsx'
 import ColorManagement from '~/pages/admin/ColorManagement/index.jsx'
 import InventoryManagement from '~/pages/admin/InventoryManagement/index.jsx'
+import InventoryLogManagement from '~/pages/admin/InventoryLogManagement/index.jsx'
 // Trang 404
 import NotFound from '~/pages/404/NotFound'
 
@@ -97,6 +98,10 @@ function App() {
           <Route
             path='inventory-management'
             element={<InventoryManagement />}
+          />
+          <Route
+            path='inventory-log-management'
+            element={<InventoryLogManagement />}
           />
         </Route>
       </Route>

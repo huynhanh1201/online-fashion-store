@@ -13,7 +13,7 @@ import { useForm } from 'react-hook-form'
 import { addCategory } from '~/services/admin/categoryService'
 import StyleAdmin from '~/assets/StyleAdmin.jsx'
 
-const AddCategoryModal = ({ open, onClose, onAdded }) => {
+const AddCategoryModal = ({ open, onClose, onAdded, onSave }) => {
   const {
     register,
     handleSubmit,
@@ -28,6 +28,7 @@ const AddCategoryModal = ({ open, onClose, onAdded }) => {
     }
     const result = await addCategory(payload)
     if (result) {
+      onSave()
       onAdded() // callback để load lại danh sách
       onClose()
       reset()
