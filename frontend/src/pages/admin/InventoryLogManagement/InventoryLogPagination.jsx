@@ -8,7 +8,13 @@ const InventoryLogPagination = ({ page, totalPages, onPageChange }) => {
         count={totalPages}
         page={page}
         onChange={onPageChange}
-        color='primary'
+        sx={{
+          '& .Mui-selected': {
+            backgroundColor: '#001f5d !important',
+            color: '#fff',
+            fontWeight: 'bold'
+          }
+        }}
       />
     </Stack>
   )

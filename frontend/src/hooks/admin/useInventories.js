@@ -17,7 +17,7 @@ const useInventories = (pageInventory = 1, limit = 10) => {
     setLoading(true)
     const { inventories, total } = await getInventories(page, limit, filters)
     setInventories(inventories)
-    setTotalPages(Math.max(1, Math.ceil(total / limit)))
+    setTotalPages(total || 1)
     setLoading(false)
   }
   const updateInventoryById = async (id, data) => {

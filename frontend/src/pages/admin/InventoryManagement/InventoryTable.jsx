@@ -93,13 +93,13 @@ const InventoryTable = ({ inventories, loading, handleOpenModal }) => {
       <TableBody>
         {loading ? (
           <StyledTableRow>
-            <StyledTableCell colSpan={9} align='center'>
+            <StyledTableCell colSpan={10} align='center'>
               Đang tải dữ liệu kho...
             </StyledTableCell>
           </StyledTableRow>
         ) : inventories.length === 0 ? (
           <StyledTableRow>
-            <StyledTableCell colSpan={9} align='center'>
+            <StyledTableCell colSpan={10} align='center'>
               Không có dữ liệu kho.
             </StyledTableCell>
           </StyledTableRow>
