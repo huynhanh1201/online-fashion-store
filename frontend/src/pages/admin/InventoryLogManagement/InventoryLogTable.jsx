@@ -26,13 +26,13 @@ const InventoryLogTable = ({ logs, loading, onViewLog }) => {
       <TableBody>
         {loading ? (
           <StyledTableRow>
-            <StyledTableCell colSpan={10} align='center'>
+            <StyledTableCell colSpan={11} align='center'>
               Đang tải dữ liệu...
             </StyledTableCell>
           </StyledTableRow>
         ) : logs.length === 0 ? (
           <StyledTableRow>
-            <StyledTableCell colSpan={10} align='center'>
+            <StyledTableCell colSpan={11} align='center'>
               Không có dữ liệu
             </StyledTableCell>
           </StyledTableRow>
