@@ -19,6 +19,13 @@ Router.route('/profile').patch(
   usersController.updateProfile
 )
 
+// Cập nhật Mật khẩu Profile user
+Router.route('/password').patch(
+  authMiddleware.isAuthorized,
+  usersValidation.updatePasswordProfile,
+  usersController.updatePasswordProfile
+)
+
 // Tài khoản người dùng
 Router.route('/').get(authMiddleware.isAuthorized, usersController.getUserList)
 

@@ -4,6 +4,7 @@ import { UserModel } from '~/models/UserModel'
 import ApiError from '~/utils/ApiError'
 import { pickUser } from '~/utils/formatters'
 import { ROLE } from '~/utils/constants'
+import { password } from '~/utils/password'
 
 const getUserList = async () => {
   // eslint-disable-next-line no-useless-catch
@@ -110,11 +111,44 @@ const updateProfile = async (userId, reqBody) => {
   }
 }
 
+const updatePasswordProfile = async (userId, reqBody) => {
+  // eslint-disable-next-line no-useless-catch
+  try {
+    const user = await UserModel.findById(userId)
+    if (!user) {
+      throw new ApiError(StatusCodes.NOT_FOUND, 'Không có dữ liệu người dùng.')
+    }
+
+    const validateOldPassword = await password.compare(
+      reqBody.oldPassword,
+      user.password
+    )
+
+    if (!validateOldPassword) {
+      throw new ApiError(
+        StatusCodes.UNPROCESSABLE_ENTITY,
+        'Mật khẩu cũ không đúng.'
+      )
+    }
+
+    const newPasswordHash = await password.hash(reqBody.newPassword)
+
+    user.password = newPasswordHash
+
+    const result = await user.save()
+
+    return result
+  } catch (err) {
+    throw err
+  }
+}
+
 export const usersService = {
   getUserList,
   getUser,
   updateUser,
   deleteUser,
   getProfile,
-  updateProfile
+  updateProfile,
+  updatePasswordProfile
 }
