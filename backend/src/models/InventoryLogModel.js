@@ -21,14 +21,23 @@ const inventoryLogSchema = new Schema(
         trim: true
       },
       color: {
-        type: String,
-        required: true,
-        trim: true
+        name: {
+          type: String,
+          required: true,
+          trim: true
+        },
+        image: {
+          type: String,
+          required: false,
+          trim: true
+        }
       },
       size: {
-        type: String,
-        required: true,
-        trim: true
+        name: {
+          type: String,
+          required: true,
+          trim: true
+        }
       }
     },
     type: {

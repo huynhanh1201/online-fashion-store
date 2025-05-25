@@ -13,6 +13,7 @@ import { PaymentTransactionModel } from '~/models/PaymentTransactionModel'
 import { verifyChecksum } from '~/utils/vnpay'
 import { env } from '~/config/environment'
 import { UserModel } from '~/models/UserModel'
+import { CouponModel } from '~/models/CouponModel'
 
 const createOrder = async (userId, reqBody, ipAddr) => {
   // eslint-disable-next-line no-useless-catch
@@ -40,6 +41,7 @@ const createOrder = async (userId, reqBody, ipAddr) => {
       _id: shippingAddressId,
       userId
     })
+
     if (!address) {
       throw new ApiError(
         StatusCodes.NOT_FOUND,
@@ -75,6 +77,13 @@ const createOrder = async (userId, reqBody, ipAddr) => {
 
     if (!validateCoupon.valid && couponCode) {
       throw new ApiError(StatusCodes.BAD_REQUEST, validateCoupon.message)
+    }
+
+    if (validateCoupon.valid && couponCode) {
+      await CouponModel.updateOne(
+        { code: couponCode },
+        { $inc: { usedCount: 1 } }
+      )
     }
 
     const cartTotal = validateCoupon.newTotal || calculatedSubtotal
