@@ -47,6 +47,7 @@ const InventoryManagement = () => {
     if (type === 'in' || type === 'out') {
       setAdjustType(type)
       setSelectedInventoryId(inventory._id)
+      setSelectedInventory(inventory)
       setOpenAdjustModal(true)
       return
     }
@@ -58,6 +59,7 @@ const InventoryManagement = () => {
   const handleCloseModal = () => {
     setSelectedInventory(null)
     setModalType(null)
+    fetchInventories(page)
   }
 
   const handleAddInventory = async (data) => {
