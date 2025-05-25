@@ -102,7 +102,7 @@ const OrderDetail = () => {
         ) : (
           <Box display="flex" justifyContent="space-between" mb={1}>
             <Typography fontWeight="bold">Mã giảm giá:</Typography>
-            <Typography>0₫</Typography>
+            <Typography>0 ₫</Typography>
           </Box>
         )}
 
