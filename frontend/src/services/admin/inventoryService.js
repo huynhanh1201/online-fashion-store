@@ -70,27 +70,16 @@ export const exportInventory = async (inventoryId, quantity) => {
   return response.data
 }
 
-export const getInventoryLogs = async ({ page, limit }) => {
-  try {
-    const response = await AuthorizedAxiosInstance.get(
-      `${API_ROOT}/v1/inventory-logs`,
-      {
-        params: {
-          page,
-          limit
-        }
-      }
-    )
-    console.log('Inventory logs response:', response.data)
-    return {
-      logs: response.data, // bọc lại
-      totalPages: 1 // nếu chưa có phân trang thật
-    }
-  } catch (error) {
-    console.error('Lỗi khi lấy lịch xử kho:', error)
-    return {
-      logs: [],
-      totalPages: 1
-    }
-  }
+export const getInventoryLogs = async (params) => {
+  const response = await AuthorizedAxiosInstance.get(
+    `${API_ROOT}/v1/inventory-logs`,
+    { params }
+  )
+  return response.data
+}
+export const getInventoryLogDetail = async (logId) => {
+  const response = await AuthorizedAxiosInstance.get(
+    `${API_ROOT}/v1/inventory-logs/${logId}`
+  )
+  return response.data
 }

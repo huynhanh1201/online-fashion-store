@@ -4,7 +4,9 @@ import StyleAdmin, {
   StyledTableCell,
   StyledTableRow
 } from '~/assets/StyleAdmin.jsx'
-const InventoryLogRow = ({ log }) => {
+import { IconButton, Stack } from '@mui/material'
+import { RemoveRedEye } from '@mui/icons-material'
+const InventoryLogRow = ({ log, onView }) => {
   return (
     <StyledTableRow>
       <StyledTableCell>
@@ -19,6 +21,13 @@ const InventoryLogRow = ({ log }) => {
       <StyledTableCell>{log.importPrice || '-'}</StyledTableCell>
       <StyledTableCell>{log.exportPrice || '-'}</StyledTableCell>
       <StyledTableCell>{log.note || '-'}</StyledTableCell>
+      <StyledTableCell>
+        <Stack direction='row' spacing={1}>
+          <IconButton onClick={onView} size='small'>
+            <RemoveRedEye color='primary' />
+          </IconButton>
+        </Stack>
+      </StyledTableCell>
     </StyledTableRow>
   )
 }

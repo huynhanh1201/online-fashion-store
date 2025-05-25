@@ -10,7 +10,6 @@ import {
 
 const AdjustInventoryModal = ({ open, onClose, onSubmit, type }) => {
   const { register, handleSubmit, reset } = useForm()
-
   const handleFormSubmit = (data) => {
     onSubmit(Number(data.quantity))
     reset()

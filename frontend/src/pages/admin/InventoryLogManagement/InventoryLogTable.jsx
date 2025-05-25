@@ -5,7 +5,7 @@ import StyleAdmin, {
   StyledTableCell,
   StyledTableRow
 } from '~/assets/StyleAdmin.jsx'
-const InventoryLogTable = ({ logs, loading }) => {
+const InventoryLogTable = ({ logs, loading, onViewLog }) => {
   return (
     <Table>
       <TableHead>
@@ -20,6 +20,7 @@ const InventoryLogTable = ({ logs, loading }) => {
           <StyledTableCell>Giá nhập</StyledTableCell>
           <StyledTableCell>Giá bán</StyledTableCell>
           <StyledTableCell>Ghi chú</StyledTableCell>
+          <StyledTableCell>Hành động</StyledTableCell>
         </StyledTableRow>
       </TableHead>
       <TableBody>
@@ -36,7 +37,13 @@ const InventoryLogTable = ({ logs, loading }) => {
             </StyledTableCell>
           </StyledTableRow>
         ) : (
-          logs.map((log) => <InventoryLogRow key={log._id} log={log} />)
+          logs.map((log) => (
+            <InventoryLogRow
+              key={log._id}
+              log={log}
+              onView={() => onViewLog('view', log._id)}
+            />
+          ))
         )}
       </TableBody>
     </Table>

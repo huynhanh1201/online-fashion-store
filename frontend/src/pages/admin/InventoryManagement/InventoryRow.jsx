@@ -268,13 +268,13 @@ export default function InventoryRow({
                   <BorderColor color='warning' />
                 </IconButton>
                 <IconButton
-                  onClick={() => handleOpenModal('in', inventory)}
+                  onClick={() => handleOpenModal('in', inv)}
                   size='small'
                 >
                   <LoginIcon color='success' />
                 </IconButton>
                 <IconButton
-                  onClick={() => handleOpenModal('out', inventory)}
+                  onClick={() => handleOpenModal('out', inv)}
                   size='small'
                 >
                   <LogoutIcon />

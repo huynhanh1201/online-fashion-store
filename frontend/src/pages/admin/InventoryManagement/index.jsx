@@ -134,12 +134,13 @@ const InventoryManagement = () => {
             inventory={selectedInventory}
           />
         )}
-        {openAdjustModal && (
+        {openAdjustModal && selectedInventory && (
           <AdjustInventoryModal
             open={openAdjustModal}
             onClose={() => setOpenAdjustModal(false)}
             onSubmit={handleAdjustSubmit}
             type={adjustType}
+            inventory={selectedInventory}
           />
         )}
       </React.Suspense>
