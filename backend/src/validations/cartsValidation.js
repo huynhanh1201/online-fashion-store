@@ -16,44 +16,15 @@ const verifyId = (req, res, next) => {
 const cart = async (req, res, next) => {
   // Xác thực dữ liệu đầu vào correctCondition: điều kiện đúng
   const correctCondition = Joi.object({
-    // cartItems là mảng các item trong giỏ
-    cartItems: Joi.array()
-      .items(
-        Joi.object({
-          // productId là ObjectId của sản phẩm - bắt buộc
-          productId: Joi.string().hex().length(24).required(),
+    // productId là ObjectId của sản phẩm - bắt buộc
+    productId: Joi.string().hex().length(24).required(),
 
-          // quantity là số lượng sản phẩm - bắt buộc, tối thiểu 1
-          quantity: Joi.number().integer().min(1).required()
-        })
-      )
-      .min(1) // Yêu cầu phải có ít nhất 1 item trong giỏ
-      .required()
-  })
+    color: Joi.string().min(1).max(50).required(),
 
-  try {
-    await correctCondition.validateAsync(req.body, {
-      abortEarly: false // Không dừng lại khi gặp lỗi đầu tiên
-    })
+    size: Joi.string().min(1).max(10).required(),
 
-    next() // Nếu không có lỗi, tiếp tục xử lý request sang controller
-  } catch (err) {
-    const errorMessage = new Error(err).message
-    const customError = new ApiError(
-      StatusCodes.UNPROCESSABLE_ENTITY,
-      errorMessage
-    )
-    next(customError) // Gọi middleware xử lý lỗi tập trung
-  }
-}
-
-const cartItem = async (req, res, next) => {
-  // Xác thực dữ liệu đầu vào correctCondition: điều kiện đúng
-  const correctCondition = Joi.object({
     // quantity là số lượng sản phẩm - bắt buộc, tối thiểu 1
-    quantity: Joi.number().integer().min(1).required(),
-
-    selected: Joi.boolean()
+    quantity: Joi.number().integer().min(1).required()
   })
 
   try {
@@ -74,6 +45,5 @@ const cartItem = async (req, res, next) => {
 
 export const cartsValidation = {
   verifyId,
-  cart,
-  cartItem
+  cart
 }

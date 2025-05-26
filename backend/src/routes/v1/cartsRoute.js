@@ -20,10 +20,9 @@ Router.route('/').get(
 )
 
 // Cập nhật thông tin Item giỏ hàng
-Router.route('/items/:productId').patch(
+Router.route('/items').patch(
   authMiddleware.isAuthorized,
-  cartsValidation.verifyId,
-  cartsValidation.cartItem,
+  cartsValidation.cart,
   cartsController.updateItemCart
 )
 
