@@ -14,7 +14,7 @@ import { styled } from '@mui/system'
 import AddIcon from '@mui/icons-material/Add'
 import RemoveIcon from '@mui/icons-material/Remove'
 import LocalOfferIcon from '@mui/icons-material/LocalOffer'
-import SnackbarAlert from './SnackbarAlert';
+import SnackbarAlert from './SnackbarAlert'
 
 const PriceTypography = styled(Typography)({
   color: '#d32f2f',
@@ -62,8 +62,6 @@ const ProductInfoSection = ({
   selectedColor,
   setSelectedColor
 }) => {
-  console.log('ProductInfoSection - colors:', colors)
-  console.log('ProductInfoSection - selectedColor:', selectedColor)
   const [snackbar, setSnackbar] = useState({
     open: false,
     message: '',
@@ -160,7 +158,7 @@ const ProductInfoSection = ({
               .map((color, index) => (
                 <ColorBox
                   key={color._id || index}
-                  selected={selectedColor === color.name}
+                  selected={selectedColor?.toLowerCase() === color.name.toLowerCase()}
                   onClick={() => handleColorSelect(color.name)}
                 >
                   <ColorImage
@@ -244,7 +242,7 @@ const ProductInfoSection = ({
         <Button
           variant='contained'
           disabled={isAdding}
-          onClick={handleAddToCart}
+          onClick={() => handleAddToCart(product, selectedColor, size, quantity)}
           sx={{ backgroundColor: '#1A3C7B', color: 'white', flex: 1, py: 1.5 }}
           startIcon={
             isAdding ? <CircularProgress size={20} color='inherit' /> : null

@@ -48,7 +48,7 @@ const ProductDetail = () => {
 
   // console.log('ProductDetail - productId:', productId)
   // console.log('ProductDetail - selectedColor:', selectedColor)
-  console.log('ProductDetail - colors:', colors)
+  // console.log('ProductDetail - colors:', colors)
   // console.log('ProductDetail - isViewingThumbnails:', isViewingThumbnails)
 
   if (isLoading) {
@@ -80,7 +80,7 @@ const ProductDetail = () => {
       <Grid container spacing={10} justifyContent='center'>
         <Grid item xs={12} md={6}>
           <ProductImageSection
-            images={product.images}
+            images={selectedColor?.images || product.images}
             selectedImageIndex={selectedImageIndex}
             fadeIn={fadeIn}
             onImageClick={(index) => {
@@ -109,7 +109,7 @@ const ProductDetail = () => {
             colors={colors}
             sizes={sizes}
             coupons={coupons}
-            isAdding={isAdding}
+            isAdding={isAdding[product._id] || false}
             handleAddToCart={handleAddToCart}
             handleBuyNow={handleBuyNow}
             setOpenVoucherDrawer={setOpenVoucherDrawer}

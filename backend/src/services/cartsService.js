@@ -62,7 +62,9 @@ const createCart = async (reqJwtDecoded, reqBody) => {
 const getItemCartList = async (userId) => {
   // eslint-disable-next-line no-useless-catch
   try {
-    const result = await CartModel.findOne({ userId }).lean()
+    const result = await CartModel.findOne({ userId })
+      .populate('cartItems.productId') // đảm bảo ref đúng
+      .lean() // sau populate mới gọi lean
 
     return result
   } catch (err) {

@@ -61,6 +61,8 @@ const Cart = () => {
 
   const handleQuantityChange = async (id, currentQty, delta) => {
     const item = cartItems.find(i => i.productId?._id === id)
+    if (!item) return
+
     const maxQty = item?.productId?.quantity || 1
     const newQty = Math.max(1, currentQty + delta)
 
@@ -69,12 +71,23 @@ const Cart = () => {
       return
     }
 
+    const payload = {
+      productId: id,
+      quantity: newQty,
+      color: item.color || '',  // hoặc set giá trị mặc định nếu thiếu
+      size: item.size || ''
+    }
+
+    console.log('Payload updateItem:', payload)
+
     try {
-      const res = await updateItem(id, { quantity: newQty })
+      const res = await updateItem(id, payload)
       if (res) {
         setCartItems(prev =>
-          prev.map(item =>
-            item.productId._id === id ? { ...item, quantity: newQty } : item
+          prev.map(i =>
+            i.productId._id === id && i.color === item.color && i.size === item.size
+              ? { ...i, quantity: newQty }
+              : i
           )
         )
       }
@@ -82,6 +95,9 @@ const Cart = () => {
       console.error('Lỗi cập nhật số lượng:', error)
     }
   }
+
+
+
 
   const handleRemove = async (id) => {
     try {

@@ -1,6 +1,7 @@
 import AuthorizedAxiosInstance from '~/utils/authorizedAxios.js'
 import { API_ROOT } from '~/utils/constants.js'
 
+// Lấy giỏ hàng
 export const getCart = async () => {
   try {
     const response = await AuthorizedAxiosInstance.get(`${API_ROOT}/v1/carts`)
@@ -12,12 +13,14 @@ export const getCart = async () => {
 }
 
 // Thêm sản phẩm vào giỏ hàng
-export const addToCart = async (product) => {
+// Đảm bảo gửi đúng format { productId: string, color, size, quantity }
+export const addToCart = async ({ productId, color, size, quantity }) => {
   try {
-    console.log('Thêm sản phẩm vào giỏ:', product)
+    const payload = { productId, color, size, quantity }
+    console.log('Thêm sản phẩm vào giỏ:', payload)
     const response = await AuthorizedAxiosInstance.post(
       `${API_ROOT}/v1/carts`,
-      product
+      payload
     )
     return response.data
   } catch (error) {
@@ -26,11 +29,12 @@ export const addToCart = async (product) => {
   }
 }
 
-// Cập nhật sản phẩm trong giỏ
-export const updateCartItem = async (productId, updateData) => {
+// Cập nhật sản phẩm trong giỏ hàng
+// Giữ nguyên endpoint PATCH /v1/carts/items, payload gồm { productId, color, size, quantity }
+export const updateCartItem = async (itemId, updateData) => {
   try {
     const response = await AuthorizedAxiosInstance.patch(
-      `${API_ROOT}/v1/carts/items/${productId}`,
+      `${API_ROOT}/v1/carts/items/${itemId}`,
       updateData
     )
     return response.data
@@ -53,7 +57,7 @@ export const updateAllSelection = async (selected) => {
   }
 }
 
-// Xoá một sản phẩm khỏi giỏ
+// Xóa một sản phẩm khỏi giỏ hàng theo productId
 export const deleteCartItem = async (productId) => {
   try {
     const response = await AuthorizedAxiosInstance.delete(
@@ -66,7 +70,7 @@ export const deleteCartItem = async (productId) => {
   }
 }
 
-// Xoá toàn bộ giỏ hàng
+// Xóa toàn bộ giỏ hàng
 export const clearCart = async () => {
   try {
     const response = await AuthorizedAxiosInstance.delete(

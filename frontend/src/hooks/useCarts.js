@@ -52,24 +52,26 @@ export const useCart = () => {
         }
 
         dispatch(setCartItems(newCartItems))
+
+        return true // Thêm thành công
       }
+      return false // Không có item mới trả về
     } catch (error) {
       console.error('Error adding to cart:', error)
-      throw error
+      return false
     }
   }
 
   // Cập nhật sản phẩm trong giỏ (số lượng, trạng thái selected)
-  const handleUpdateItem = async (productId, data) => {
-    const updated = await updateCartItem(productId, data)
+  const handleUpdateItem = async (cartItemId, data) => {
+    const updated = await updateCartItem(cartItemId, data)
     if (updated) {
       dispatch(setCartItems(updated?.cartItems || []))
     }
   }
-
   // Cập nhật trạng thái selected
-  const handleToggleSelected = async (productId, selected) => {
-    await handleUpdateItem(productId, { selected })
+  const handleToggleSelected = async (cartItemId, selected) => {
+    await handleUpdateItem(cartItemId, { selected })
   }
 
   // Xoá một sản phẩm khỏi giỏ
