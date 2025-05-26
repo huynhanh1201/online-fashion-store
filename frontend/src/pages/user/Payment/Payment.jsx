@@ -36,7 +36,7 @@ const SectionTitle = styled(Typography)(({ theme }) => ({
   marginBottom: theme.spacing(2),
   textTransform: 'uppercase'
 }))
-const ProductItem = ({ name, price, quantity, image }) => {
+const ProductItem = ({ name, price, quantity, image, color, size }) => {
   // Validate product data
   if (!name || typeof price !== 'number' || typeof quantity !== 'number') {
     return (
@@ -58,11 +58,16 @@ const ProductItem = ({ name, price, quantity, image }) => {
           alt={name}
           style={{ width: 64, height: 64, borderRadius: 8, objectFit: 'cover' }}
         />
-        <span>{truncatedName}</span>
+        <div style={{ display: 'flex', flexDirection: 'column' }}>
+          <Typography fontWeight={600}>{truncatedName}</Typography>
+          <Typography variant="caption" color="text.secondary">
+            {color || 'Chưa chọn màu'}, {size || 'Chưa chọn kích cỡ'}
+          </Typography>
+        </div>
       </td>
-      <td style={{ textAlign: 'center' }}>{price.toLocaleString()}đ</td>
+      <td style={{ textAlign: 'center' }}>{price.toLocaleString('vi-VN')} đ</td>
       <td style={{ textAlign: 'center' }}>{quantity}</td>
-      <td style={{ textAlign: 'right' }}>{(price * quantity).toLocaleString()}đ</td>
+      <td style={{ textAlign: 'right' }}>{(price * quantity).toLocaleString('vi-VN')} đ</td>
     </tr>
   )
 }
@@ -282,6 +287,8 @@ const Payment = () => {
                         .filter(item => selectedItems.includes(item.productId._id || item.productId))
                         .map((item, index) => {
                           const product = item.product || item.productId || {}
+                          const color = item.color || 'Chưa chọn màu'
+                          const size = item.size || 'Chưa chọn kích cỡ'
                           return (
                             <ProductItem
                               key={index}
@@ -289,8 +296,9 @@ const Payment = () => {
                               price={product.price || 0}
                               quantity={item.quantity || 1}
                               image={product.image}
-                              color={product.color}
-                              size={product.size}
+                              color={item.color}
+                              size={item.size}
+                              variantText={`Phân loại hàng: ${color}, ${size}`}
                             />
                           )
                         })}
@@ -378,15 +386,15 @@ const Payment = () => {
                 <Box>
                   <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
                     <span>Tạm tính</span>
-                    <span>{subTotal.toLocaleString()}đ</span>
+                    <span>{subTotal.toLocaleString('vi-VN')} đ</span>
                   </Box>
                   <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
                     <span>Giảm giá</span>
-                    <span>{discount.toLocaleString()}đ</span>
+                    <span>{discount.toLocaleString('vi-VN')} đ</span>
                   </Box>
                   <Box sx={{ display: 'flex', justifyContent: 'space-between', fontWeight: 700 }}>
                     <span>Tổng cộng</span>
-                    <span>{total.toLocaleString()}đ</span>
+                    <span>{total.toLocaleString('vi-VN')} đ</span>
                   </Box>
                 </Box>
 

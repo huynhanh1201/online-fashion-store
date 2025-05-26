@@ -209,7 +209,7 @@ const useProductDetail = (productId) => {
         type: 'success',
         message: 'Thêm sản phẩm vào giỏ hàng thành công!'
       })
-
+      setQuantity(1)
     } catch (error) {
       console.error('Thêm vào giỏ hàng lỗi:', error)
       setSnackbar({ type: 'error', message: 'Thêm sản phẩm thất bại!' })
