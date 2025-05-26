@@ -7,48 +7,53 @@ const createCart = async (reqJwtDecoded, reqBody) => {
   // eslint-disable-next-line no-useless-catch
   try {
     const { _id: userId } = reqJwtDecoded
-    const { cartItems } = reqBody
 
     // Lấy document giỏ hàng (nếu có)
     const userCart = await CartModel.findOne({ userId })
 
-    // Lấy mảng các productId đã có
-    const existingIds = userCart
-      ? userCart.cartItems.map((ci) => ci.productId.toString())
-      : []
+    // Nếu không có giỏ hàng, tạo mới
+    if (!userCart) {
+      const newCart = await CartModel.create({
+        userId,
+        cartItems: [reqBody]
+      })
 
-    const updateOps = []
-    const insertOps = []
-
-    for (const item of cartItems) {
-      if (existingIds.includes(item.productId)) {
-        // 1. update quantity
-        updateOps.push({
-          updateOne: {
-            filter: { userId, 'cartItems.productId': item.productId },
-            update: { $inc: { 'cartItems.$.quantity': item.quantity } }
-          }
-        })
-      } else {
-        // 2. push item mới
-        insertOps.push({
-          updateOne: {
-            filter: { userId },
-            update: {
-              $push: { cartItems: item },
-              $setOnInsert: { userId }
-            },
-            upsert: true
-          }
-        })
-      }
+      return newCart
     }
 
-    await CartModel.bulkWrite([...updateOps, ...insertOps])
+    // Nếu có giỏ hàng, cập nhật các item trong giỏ hàng
+    // Biến thể đã tồn tại
 
-    // Lấy giỏ hàng sau cập nhật
-    const result = await CartModel.findOne({ userId })
-    return result
+    const updateItemExists = await CartModel.updateOne(
+      {
+        userId, // nếu bạn đã biết _id của cart
+        cartItems: {
+          $elemMatch: {
+            productId: reqBody.productId,
+            color: reqBody.color,
+            size: reqBody.size.toUpperCase()
+          }
+        }
+      },
+      {
+        $inc: { 'cartItems.$.quantity': reqBody.quantity }
+      }
+    )
+
+    if (updateItemExists.modifiedCount > 0) return updateItemExists
+
+    // Biến thể chưa tồn tại
+
+    const createItem = await CartModel.updateOne(
+      { userId },
+      {
+        $push: { cartItems: reqBody }
+      },
+      {
+        upsert: true
+      }
+    )
+    return createItem
   } catch (err) {
     throw err
   }

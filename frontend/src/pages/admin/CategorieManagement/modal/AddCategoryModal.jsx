@@ -28,7 +28,9 @@ const AddCategoryModal = ({ open, onClose, onAdded, onSave }) => {
     }
     const result = await addCategory(payload)
     if (result) {
-      onSave()
+      if (onSave) {
+        onSave()
+      }
       onAdded() // callback để load lại danh sách
       onClose()
       reset()
