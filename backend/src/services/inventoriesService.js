@@ -43,6 +43,10 @@ const createInventory = async (reqBody) => {
 
     const inventories = await InventoryModel.create(newInventory)
 
+    // Cập nhật số lượng tồn kho trong sản phẩm
+    product.qauntity += reqBody.quantity
+    await product.save()
+
     return inventories
   } catch (err) {
     throw err

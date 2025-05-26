@@ -351,15 +351,6 @@ export default function AddAddressModal({
               helperText={formErrors.phone ? 'Số điện thoại phải đúng 10 số' : ''}
               disabled={viewOnly}
             />
-            <TextField
-              label="Địa chỉ cụ thể"
-              fullWidth
-              value={formData.address}
-              onChange={handleChange('address')}
-              error={formErrors.address}
-              helperText={formErrors.address ? 'Địa chỉ phải ít nhất 5 ký tự' : ''}
-              disabled={viewOnly}
-            />
             <FormControl fullWidth error={formErrors.city} disabled={viewOnly}>
               <InputLabel id="select-city-label">Tỉnh/Thành</InputLabel>
               <Select
@@ -449,6 +440,15 @@ export default function AddAddressModal({
                 </Typography>
               )}
             </FormControl>
+            <TextField
+              label="Địa chỉ cụ thể"
+              fullWidth
+              value={formData.address}
+              onChange={handleChange('address')}
+              error={formErrors.address}
+              helperText={formErrors.address ? 'Địa chỉ phải ít nhất 5 ký tự' : ''}
+              disabled={viewOnly}
+            />
           </Box>
         )}
       </DialogContent>

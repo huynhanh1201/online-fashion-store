@@ -7,12 +7,3 @@ export async function CONNECT_DB() {
     autoIndex: process.env.BUILD_MODE !== 'prod'
   })
 }
-
-// export async function CONNECT_DB() {
-//   await mongoose.connect(env.MONGODB_URI, {
-//     maxPoolSize: 10,
-//     authSource: 'admin',
-//     user: 'admin',
-//     pass: 'admin123'
-//   })
-// }
