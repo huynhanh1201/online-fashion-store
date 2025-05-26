@@ -12,7 +12,11 @@ import {
   Divider,
   CircularProgress,
   Snackbar,
-  Alert
+  Alert,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
 } from '@mui/material'
 import { styled } from '@mui/system'
 import { ChooseAddressModal } from './Modal/ChooseAddressModal'
@@ -24,6 +28,7 @@ import { useOrder } from '~/hooks/useOrder'
 import { useSelector } from 'react-redux'
 import { useDispatch } from 'react-redux'
 import { clearTempCart } from '~/redux/cart/cartSlice'
+import { useLocation, useNavigate } from 'react-router-dom'
 
 const SectionTitle = styled(Typography)(({ theme }) => ({
   fontWeight: 700,
@@ -75,18 +80,22 @@ const Payment = () => {
   const { loading: cartLoading } = useCart()
   const { createOrder, loading: orderLoading } = useOrder()
   const { discount, discountMessage, loading: couponLoading, handleApplyVoucher, couponId } = useCoupon()
+  
 
 
   const selectedItems = useSelector(state => state.cart.selectedItems)
   const selectedIds = useSelector(state => state.cart.selectedItems || [])
 
 
-  const tempCart = useSelector((state) => state.cart.tempCart)
   const cartCartItems = useSelector((state) => state.cart.cartItems)
+  const tempCart = useSelector((state) => state.cart.tempCart)
 
+  const location = useLocation()
+  const isBuyNow = useSelector((state) => state.cart.isBuyNow)
 
-  const isBuyNow = tempCart?.cartItems?.length > 0
-  const cartItems = isBuyNow ? tempCart.cartItems : cartCartItems
+  const cartItems = isBuyNow && tempCart?.cartItems?.length > 0
+    ? tempCart.cartItems
+    : cartCartItems
 
   // Tính selectedCartItems + subTotal
   let subTotal = 0
@@ -118,10 +127,12 @@ const Payment = () => {
   const dispatch = useDispatch()
 
   useEffect(() => {
-    return () => {
+    const isOnPaymentPage = location.pathname.startsWith('/payment')
+    if (!isOnPaymentPage && isBuyNow) {
       dispatch(clearTempCart())
     }
-  }, [])
+  }, [location, isBuyNow])
+
 
   useEffect(() => {
     if (addresses.length > 0 && !selectedAddress) {
@@ -130,9 +141,12 @@ const Payment = () => {
     }
   }, [addresses, selectedAddress])
 
+  const navigate = useNavigate()
 
   const handleOpenAddressModal = () => setOpenAddressModal(true)
   const handleCloseAddressModal = () => setOpenAddressModal(false)
+
+  const [confirmOpen, setConfirmOpen] = useState(false)
 
   const handleAddressConfirm = (addressId) => {
     const selected = addresses.find(addr => addr._id === addressId)
@@ -176,8 +190,6 @@ const Payment = () => {
       setSnackbar({ open: true, severity: 'error', message: 'Giỏ hàng trống' })
       return
     }
-
-    // Chuẩn hóa cartItems
     const orderData = {
       cartItems: selectedCartItems,
       shippingAddressId: selectedAddress._id,
@@ -196,7 +208,7 @@ const Payment = () => {
       if (typeof result === 'string' && result.startsWith('http')) {
         window.location.href = result
       } else {
-        setTimeout(() => window.location.reload())
+        navigate('/order-success')
       }
     } catch (error) {
       setSnackbar({
@@ -381,7 +393,7 @@ const Payment = () => {
                   variant="contained"
                   color="secondary"
                   sx={{ mt: 3 }}
-                  onClick={handlePlaceOrder}
+                  onClick={() => setConfirmOpen(true)}
                   disabled={orderLoading}
                 >
                   {orderLoading ? 'Đang xử lý...' : 'Đặt hàng'}
@@ -416,6 +428,28 @@ const Payment = () => {
           </Alert>
         </Snackbar>
       </Container>
+      <Dialog open={confirmOpen} onClose={() => setConfirmOpen(false)}>
+        <DialogTitle>Xác nhận đặt hàng</DialogTitle>
+        <DialogContent>
+          <Typography>Bạn có chắc chắn muốn đặt hàng không?</Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setConfirmOpen(false)} color="inherit">
+            Hủy
+          </Button>
+          <Button
+            onClick={() => {
+              setConfirmOpen(false)
+              handlePlaceOrder()
+            }}
+            variant="contained"
+            color="secondary"
+          >
+            Xác nhận
+          </Button>
+        </DialogActions>
+      </Dialog>
+
     </Box>
   )
 }

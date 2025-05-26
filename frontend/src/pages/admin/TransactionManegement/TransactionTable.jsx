@@ -34,7 +34,7 @@ const TransactionTable = ({
           <StyledTableCell sx={{ width: '100px' }}>
             Số tiền (VNĐ)
           </StyledTableCell>
-          <StyledTableCell sx={{ width: '25%' }}>Ghi chú</StyledTableCell>
+          <StyledTableCell sx={{ width: '30%' }}>Ghi chú</StyledTableCell>
           <StyledTableCell>Ngày tạo</StyledTableCell>
           <StyledTableCell sx={{ maxWidth: '130px', width: '130px' }}>
             Hành động
@@ -45,7 +45,7 @@ const TransactionTable = ({
         {loading ? (
           <StyledTableRow>
             <StyledTableCell colSpan={9} align='center'>
-              <CircularProgress size={24} />
+              đang tải dữ liệu ....
             </StyledTableCell>
           </StyledTableRow>
         ) : transactions.filter((transaction) => !transaction.destroy).length >

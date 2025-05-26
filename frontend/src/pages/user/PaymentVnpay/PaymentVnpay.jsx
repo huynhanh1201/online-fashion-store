@@ -1,15 +1,22 @@
-import React from 'react'
+import React, { useEffect } from 'react'
+
 import { Container, Box, Typography, Button } from '@mui/material'
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline'
 import { useNavigate } from 'react-router-dom'
+import { useCart } from '~/hooks/useCarts'
 
 const PaymentVnpay = () => {
 
   const navigate = useNavigate()
-
+  const { refresh } = useCart()
   const handleGoHome = () => {
     navigate('/')
   }
+  useEffect(() => {
+    setTimeout(() => {
+      refresh()
+    }, 0) 
+  }, [])
 
   return (
     <Box
@@ -24,20 +31,33 @@ const PaymentVnpay = () => {
       <Container maxWidth="sm" sx={{ textAlign: 'center' }}>
         <Box
           sx={{
-            bgcolor: 'success.main',
-            color: 'white',
-            width: 80,
-            height: 80,
+            width: 150,
+            height: 150,
             mx: 'auto',
             borderRadius: '50%',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             mb: 3,
+            p: 2,
+            boxShadow: 3,
+            backgroundColor: '#ffffff',
+            border: '2px solid #e0e0e0',
           }}
         >
-          <CheckCircleOutlineIcon sx={{ fontSize: 50 }} />
+          <img
+            src="https://vinadesign.vn/uploads/thumbnails/800/2023/05/vnpay-logo-vinadesign-25-12-59-16.jpg"
+            alt="VNPay Logo"
+            style={{
+              maxWidth: '100%',
+              maxHeight: '100%',
+              objectFit: 'contain',
+              borderRadius: '50%',
+            }}
+          />
         </Box>
+
+
 
         <Typography variant="h4" gutterBottom>
           Thanh toán thành công!

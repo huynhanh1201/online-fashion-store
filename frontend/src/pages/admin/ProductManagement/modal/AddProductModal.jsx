@@ -1195,8 +1195,8 @@ const AddProductModal = ({ open, onClose, onSuccess }) => {
         open={categoryOpen}
         onClose={() => setCategoryOpen(false)}
         onSave={() => {
-          fetchCategories()
           setCategoryOpen(false)
+          fetchCategories()
         }}
       />
     </Dialog>

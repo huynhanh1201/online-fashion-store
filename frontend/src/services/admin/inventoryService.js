@@ -16,3 +16,70 @@ export const getInventories = async (page = 1, limit = 10, filters = {}) => {
     return { inventories: [], total: 0 }
   }
 }
+// Cập nhật một phần thông tin kho
+export const updateInventory = async (inventoryId, data) => {
+  try {
+    const response = await AuthorizedAxiosInstance.patch(
+      `${API_ROOT}/v1/inventories/${inventoryId}`,
+      data
+    )
+    return response.data
+  } catch (error) {
+    console.error('Lỗi khi cập nhật kho:', error)
+    return null
+  }
+}
+
+// Xoá mềm kho
+export const deleteInventory = async (inventoryId) => {
+  try {
+    const response = await AuthorizedAxiosInstance.delete(
+      `${API_ROOT}/v1/inventories/${inventoryId}`
+    )
+    return response.data
+  } catch (error) {
+    console.error('Lỗi khi xoá kho:', error)
+    return null
+  }
+}
+
+export const createInventory = async (data) => {
+  try {
+    const response = await AuthorizedAxiosInstance.post(
+      `${API_ROOT}/v1/inventories`,
+      data
+    )
+    return response.data
+  } catch (error) {
+    console.error('Lỗi khi tạo biến thể kho:', error)
+    return null
+  }
+}
+export const importInventory = async (inventoryId, quantity) => {
+  const response = await AuthorizedAxiosInstance.post(
+    `${API_ROOT}/v1/inventories/${inventoryId}/in`,
+    { quantity }
+  )
+  return response.data
+}
+export const exportInventory = async (inventoryId, quantity) => {
+  const response = await AuthorizedAxiosInstance.post(
+    `${API_ROOT}/v1/inventories/${inventoryId}/out`,
+    { quantity }
+  )
+  return response.data
+}
+
+export const getInventoryLogs = async (params) => {
+  const response = await AuthorizedAxiosInstance.get(
+    `${API_ROOT}/v1/inventory-logs`,
+    { params }
+  )
+  return response.data
+}
+export const getInventoryLogDetail = async (logId) => {
+  const response = await AuthorizedAxiosInstance.get(
+    `${API_ROOT}/v1/inventory-logs/${logId}`
+  )
+  return response.data
+}

@@ -1,4 +1,5 @@
 import { StatusCodes } from 'http-status-codes'
+import mongoose from 'mongoose'
 
 import ApiError from '~/utils/ApiError'
 import { OrderModel } from '~/models/OrderModel'
@@ -9,14 +10,20 @@ import { ProductModel } from '~/models/ProductModel'
 import { OrderItemModel } from '~/models/OrderItemModel'
 import { OrderStatusHistoryModel } from '~/models/OrderStatusHistoryModel'
 import { PaymentTransactionModel } from '~/models/PaymentTransactionModel'
-
 import { verifyChecksum } from '~/utils/vnpay'
 import { env } from '~/config/environment'
 import { UserModel } from '~/models/UserModel'
+import { CouponModel } from '~/models/CouponModel'
 
 const createOrder = async (userId, reqBody, ipAddr) => {
   // eslint-disable-next-line no-useless-catch
+
+  // 1. Bắt đầu phiên làm việc với Mongoose Transactions
+  const session = await mongoose.startSession()
+
   try {
+    session.startTransaction()
+
     const {
       cartItems,
       shippingAddressId,
@@ -39,7 +46,8 @@ const createOrder = async (userId, reqBody, ipAddr) => {
     const address = await ShippingAddressModel.findOne({
       _id: shippingAddressId,
       userId
-    })
+    }).session(session)
+
     if (!address) {
       throw new ApiError(
         StatusCodes.NOT_FOUND,
@@ -51,7 +59,9 @@ const createOrder = async (userId, reqBody, ipAddr) => {
     const productIds = cartItems.map((item) => item.productId)
     const products = await ProductModel.find({
       _id: { $in: productIds }
-    }).lean()
+    })
+      .session(session)
+      .lean()
     const productMap = new Map(products.map((p) => [p._id.toString(), p]))
 
     // Tính toán tổng tiền
@@ -75,6 +85,13 @@ const createOrder = async (userId, reqBody, ipAddr) => {
 
     if (!validateCoupon.valid && couponCode) {
       throw new ApiError(StatusCodes.BAD_REQUEST, validateCoupon.message)
+    }
+
+    if (validateCoupon.valid && couponCode) {
+      await CouponModel.updateOne(
+        { code: couponCode },
+        { $inc: { usedCount: 1 } }
+      ).session(session)
     }
 
     const cartTotal = validateCoupon.newTotal || calculatedSubtotal
@@ -105,7 +122,7 @@ const createOrder = async (userId, reqBody, ipAddr) => {
       isDelivered: false
     }
 
-    const order = await OrderModel.create(newOrder)
+    const [order] = await OrderModel.create([newOrder], { session })
 
     // Tạo OrderItems
     const orderItems = cartItems.map((item) => {
@@ -120,7 +137,7 @@ const createOrder = async (userId, reqBody, ipAddr) => {
       }
     })
 
-    await OrderItemModel.insertMany(orderItems)
+    await OrderItemModel.insertMany(orderItems, { session })
 
     // Tạo giao dịch thanh toán
     const paymentTransactionInfo = {
@@ -132,7 +149,7 @@ const createOrder = async (userId, reqBody, ipAddr) => {
       note: note || null
     }
 
-    await PaymentTransactionModel.create(paymentTransactionInfo)
+    await PaymentTransactionModel.create([paymentTransactionInfo], { session })
 
     // Xóa sản phẩm trong giỏ hàng
     await CartModel.updateOne(
@@ -144,7 +161,7 @@ const createOrder = async (userId, reqBody, ipAddr) => {
           }
         }
       }
-    )
+    ).session(session)
 
     //==============================
     const dayjs = require('dayjs')
@@ -236,9 +253,15 @@ const createOrder = async (userId, reqBody, ipAddr) => {
       return paymentUrl
     }
 
+    // 3. Commit transaction
+    await session.commitTransaction()
+
     return order
   } catch (err) {
+    await session.abortTransaction()
     throw err
+  } finally {
+    session.endSession()
   }
 }
 

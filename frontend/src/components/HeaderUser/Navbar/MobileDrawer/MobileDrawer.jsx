@@ -51,7 +51,7 @@ const MobileDrawer = ({ open, onClose }) => {
           <ListItem button component='a' href='/cart'>
             <ListItemText primary='Giỏ hàng' />
           </ListItem>
-          <ListItem button component='a' href='/order'>
+          <ListItem button component='a' href='/orders'>
             <ListItemText primary='Thông tin đơn hàng' />
           </ListItem>
         </List>

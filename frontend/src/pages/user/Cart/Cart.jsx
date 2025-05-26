@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import {
+<<<<<<< HEAD
   Box,
   Container,
   Table,
@@ -15,17 +16,25 @@ import {
   Checkbox,
   Snackbar,
   Alert
+=======
+  Box, Container, Table, TableHead, TableRow, TableCell, TableBody,
+  Typography, IconButton, TextField, Avatar, Button, Checkbox,
+  Snackbar, Alert, Dialog, DialogActions, DialogContent,
+  DialogContentText, DialogTitle
+>>>>>>> e7366683e59206e7438a0d3bd3bba78b8eb9fbf8
 } from '@mui/material'
-import { Delete, Add, Remove } from '@mui/icons-material'
+import { Delete, Add, Remove, DeleteForever } from '@mui/icons-material'
 import { useCart } from '~/hooks/useCarts'
 import { useNavigate } from 'react-router-dom'
 import { useDispatch } from 'react-redux'
 import { setSelectedItems as setSelectedItemsAction } from '~/redux/cart/cartSlice'
+
 const Cart = () => {
   const { cart, loading, deleteItem, clearCart, updateItem } = useCart()
   const [selectedItems, setSelectedItems] = useState([])
   const [cartItems, setCartItems] = useState([])
   const [showMaxQuantityAlert, setShowMaxQuantityAlert] = useState(false)
+  const [confirmClearOpen, setConfirmClearOpen] = useState(false)
   const navigate = useNavigate()
   const dispatch = useDispatch()
 
@@ -37,14 +46,18 @@ const Cart = () => {
     if (cart?.cartItems) setCartItems(cart.cartItems)
   }, [cart])
 
+<<<<<<< HEAD
   // Kiểm tra đã chọn hết chưa
   const allSelected =
     cartItems.length > 0 && selectedItems.length === cartItems.length
   // Kiểm tra chọn một phần
   const someSelected =
     selectedItems.length > 0 && selectedItems.length < cartItems.length
+=======
+  const allSelected = cartItems.length > 0 && selectedItems.length === cartItems.length
+  const someSelected = selectedItems.length > 0 && selectedItems.length < cartItems.length
+>>>>>>> e7366683e59206e7438a0d3bd3bba78b8eb9fbf8
 
-  // Chọn / bỏ chọn tất cả
   const handleSelectAll = () => {
     let newSelected = []
     if (!allSelected) {
@@ -59,8 +72,8 @@ const Cart = () => {
       ? selectedItems.filter((i) => i !== id)
       : [...selectedItems, id]
 
-    setSelectedItems(newSelected) // cập nhật local state
-    dispatch(setSelectedItemsAction(newSelected)) // cập nhật redux luôn
+    setSelectedItems(newSelected)
+    dispatch(setSelectedItemsAction(newSelected))
   }
 
   const formatPrice = (val) =>
@@ -96,7 +109,7 @@ const Cart = () => {
       console.error('Lỗi cập nhật số lượng:', error)
     }
   }
-  console.log('selectedItems:', selectedItems)
+
   const handleRemove = async (id) => {
     try {
       const res = await deleteItem(id)
@@ -120,6 +133,13 @@ const Cart = () => {
     0
   )
 
+  const handleClearCart = async () => {
+    await clearCart()
+    setCartItems([])
+    setSelectedItems([])
+    setConfirmClearOpen(false)
+  }
+
   if (loading) {
     return (
       <Typography sx={{ height: '70vh', mt: 10, textAlign: 'center' }}>
@@ -129,6 +149,7 @@ const Cart = () => {
   }
 
   return (
+<<<<<<< HEAD
     <Container>
       <Box
         maxWidth='lg'
@@ -136,6 +157,29 @@ const Cart = () => {
       >
         <Table size='medium' sx={{ minWidth: 650 }}>
           <TableHead>
+=======
+    <Container maxWidth='xl' sx={{ minHeight: '70vh', mt: 10, mb: 5, overflowX: 'auto' }}>
+      <Table size='medium' sx={{ minWidth: 650 }}>
+        <TableHead>
+          <TableRow>
+            <TableCell padding="checkbox" sx={{ width: 50 }}>
+              <Checkbox
+                indeterminate={someSelected}
+                checked={allSelected}
+                onChange={handleSelectAll}
+                color="primary"
+              />
+            </TableCell>
+            <TableCell align='left' sx={{ fontWeight: 'bold' }}>Sản phẩm</TableCell>
+            <TableCell align='center' sx={{ fontWeight: 'bold', width: 120 }}>Giá</TableCell>
+            <TableCell align='center' sx={{ fontWeight: 'bold', width: 130 }}>Số lượng</TableCell>
+            <TableCell align='center' sx={{ fontWeight: 'bold', width: 90 }}>Thao tác</TableCell>
+          </TableRow>
+        </TableHead>
+
+        <TableBody>
+          {cartItems.length === 0 ? (
+>>>>>>> e7366683e59206e7438a0d3bd3bba78b8eb9fbf8
             <TableRow>
               <TableCell padding='checkbox' sx={{ width: 50 }}>
                 <Checkbox
@@ -160,6 +204,7 @@ const Cart = () => {
             </TableRow>
           </TableHead>
 
+<<<<<<< HEAD
           <TableBody>
             {cartItems.length === 0 ? (
               <TableRow>
@@ -228,6 +273,85 @@ const Cart = () => {
                     <TableCell
                       align='center'
                       sx={{ fontWeight: '600', color: '#007B00' }}
+=======
+              return (
+                <TableRow key={item._id} hover>
+                  <TableCell padding='checkbox'>
+                    <Checkbox
+                      checked={selectedItems.includes(product._id)}
+                      onChange={() => handleSelect(product._id)}
+                      color='primary'
+                    />
+                  </TableCell>
+                  <TableCell>
+                    <Box display='flex' alignItems='center' gap={2}>
+                      <Box
+                        sx={{ cursor: 'pointer' }}
+                        onClick={() => {
+                          dispatch(setSelectedItemsAction([product._id]))
+                          navigate(`/productdetail/${product._id}`)
+                        }}
+                      >
+                        <Avatar
+                          src={product.image?.[0] || '/default.jpg'}
+                          variant='square'
+                          sx={{ width: 64, height: 64, borderRadius: 1, objectFit: 'cover' }}
+                        />
+                      </Box>
+                      <Box>
+                        <Typography
+                          fontWeight={600}
+                          sx={{ lineHeight: 1.2, maxWidth: 350 }}
+                          title={product.name}
+                        >
+                          {truncate(product.name, 20)}
+                        </Typography>
+                        <Typography
+                          variant='body2'
+                          color='text.secondary'
+                          sx={{ maxWidth: 350 }}
+                          title={product.description}
+                        >
+                          {truncate(product.description, 20)}
+                        </Typography>
+                      </Box>
+                    </Box>
+                  </TableCell>
+                  <TableCell align='center' sx={{ fontWeight: '600', color: '#007B00' }}>
+                    {formatPrice(product.price)}
+                  </TableCell>
+                  <TableCell align='center'>
+                    <Box display='flex' alignItems='center' justifyContent='center'>
+                      <IconButton
+                        size='small'
+                        onClick={() => handleQuantityChange(product._id, item.quantity, -1)}
+                        disabled={item.quantity <= 1}
+                        aria-label='Giảm số lượng'
+                      >
+                        <Remove />
+                      </IconButton>
+                      <TextField
+                        value={item.quantity}
+                        size='small'
+                        sx={{ width: 50, mx: 1 }}
+                        inputProps={{ style: { textAlign: 'center' }, readOnly: true }}
+                      />
+                      <IconButton
+                        size='small'
+                        onClick={() => handleQuantityChange(product._id, item.quantity, 1)}
+                        aria-label='Tăng số lượng'
+                        disabled={item.quantity >= product.quantity}
+                      >
+                        <Add />
+                      </IconButton>
+                    </Box>
+                  </TableCell>
+                  <TableCell align='center'>
+                    <IconButton
+                      color='error'
+                      onClick={() => handleRemove(product._id)}
+                      aria-label='Xoá sản phẩm'
+>>>>>>> e7366683e59206e7438a0d3bd3bba78b8eb9fbf8
                     >
                       {formatPrice(product.price)}
                     </TableCell>
@@ -310,6 +434,7 @@ const Cart = () => {
               Thanh toán
             </Button>
 
+<<<<<<< HEAD
             <Button
               variant='outlined'
               color='error'
@@ -323,8 +448,26 @@ const Cart = () => {
               Xoá toàn bộ
             </Button>
           </Box>
+=======
+          <Button
+            variant='outlined'
+            color='error'
+            endIcon={<DeleteForever />}
+            onClick={() => setConfirmClearOpen(true)}
+            disabled={cartItems.length === 0}
+            sx={{
+              minWidth: 140,
+              borderWidth: 2,
+              '&:hover': { borderWidth: 2 }
+            }}
+          >
+            Xoá toàn bộ
+          </Button>
+
+>>>>>>> e7366683e59206e7438a0d3bd3bba78b8eb9fbf8
         </Box>
 
+<<<<<<< HEAD
         <Snackbar
           open={showMaxQuantityAlert}
           autoHideDuration={3000}
@@ -340,6 +483,38 @@ const Cart = () => {
           </Alert>
         </Snackbar>
       </Box>
+=======
+      <Snackbar
+        open={showMaxQuantityAlert}
+        autoHideDuration={3000}
+        onClose={() => setShowMaxQuantityAlert(false)}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+      >
+        <Alert onClose={() => setShowMaxQuantityAlert(false)} severity='warning' sx={{ width: '100%' }}>
+          Số lượng sản phẩm đã hết!
+        </Alert>
+      </Snackbar>
+
+      <Dialog
+        open={confirmClearOpen}
+        onClose={() => setConfirmClearOpen(false)}
+      >
+        <DialogTitle>Xác nhận xoá</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Bạn có chắc chắn muốn xoá toàn bộ giỏ hàng không?
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setConfirmClearOpen(false)} color='primary'>
+            Huỷ
+          </Button>
+          <Button onClick={handleClearCart} color='error' variant='contained'>
+            Xoá
+          </Button>
+        </DialogActions>
+      </Dialog>
+>>>>>>> e7366683e59206e7438a0d3bd3bba78b8eb9fbf8
     </Container>
   )
 }

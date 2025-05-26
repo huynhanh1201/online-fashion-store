@@ -14,7 +14,6 @@ const ViewInventoryModal = ({ open, onClose, inventory }) => {
 
   const {
     productId,
-    variant,
     quantity,
     importPrice,
     exportPrice,

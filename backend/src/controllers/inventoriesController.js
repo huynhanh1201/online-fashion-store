@@ -66,11 +66,13 @@ const deleteInventory = async (req, res, next) => {
 
 const importStockInventory = async (req, res, next) => {
   try {
+    const userId = req.jwtDecoded._id
     const inventoryId = req.params.inventoryId
 
     const result = await inventoriesService.importStockInventory(
       inventoryId,
-      req.body
+      req.body,
+      userId
     )
 
     res.status(StatusCodes.OK).json(result)
@@ -81,11 +83,13 @@ const importStockInventory = async (req, res, next) => {
 
 const exportStockInventory = async (req, res, next) => {
   try {
+    const userId = req.jwtDecoded._id
     const inventoryId = req.params.inventoryId
 
     const result = await inventoriesService.exportStockInventory(
       inventoryId,
-      req.body
+      req.body,
+      userId
     )
 
     res.status(StatusCodes.OK).json(result)
