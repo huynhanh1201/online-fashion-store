@@ -80,7 +80,7 @@ const Payment = () => {
   const { loading: cartLoading } = useCart()
   const { createOrder, loading: orderLoading } = useOrder()
   const { discount, discountMessage, loading: couponLoading, handleApplyVoucher, couponId } = useCoupon()
-  
+
 
 
   const selectedItems = useSelector(state => state.cart.selectedItems)
@@ -274,14 +274,14 @@ const Payment = () => {
                     <thead>
                       <tr style={{ borderBottom: '2px solid #ccc' }}>
                         <th style={{ textAlign: 'left', padding: 8 }}>Sản phẩm</th>
-                        <th style={{ textAlign: 'center', padding: 8 }}>Giá</th>
+                        <th style={{ textAlign: 'center', padding: 8 }}>Đơn giá</th>
                         <th style={{ textAlign: 'center', padding: 8 }}>Số lượng</th>
                         <th style={{ textAlign: 'right', padding: 8 }}>Thành tiền</th>
                       </tr>
                     </thead>
                     <tbody>
                       {cartItems
-                        .filter(item => selectedItems.includes(item.productId._id || item.productId)) // lọc đúng item đã chọn
+                        .filter(item => selectedItems.includes(item.productId._id || item.productId))
                         .map((item, index) => {
                           const product = item.product || item.productId || {}
                           return (
@@ -291,10 +291,11 @@ const Payment = () => {
                               price={product.price || 0}
                               quantity={item.quantity || 1}
                               image={product.image}
+                              color={product.color}
+                              size={product.size}
                             />
                           )
                         })}
-
                     </tbody>
                   </table>
                 )}
@@ -355,12 +356,19 @@ const Payment = () => {
                 <Button
                   fullWidth
                   variant="contained"
-                  color="primary"
                   onClick={handleApplyVoucherClick}
                   disabled={couponLoading}
+                  sx={{
+                    backgroundColor: '#1A3C7B',
+                    color: '#fff',
+                    '&:hover': {
+                      backgroundColor: '#3f51b5'
+                    }
+                  }}
                 >
                   {couponLoading ? 'Đang áp dụng...' : 'Áp dụng Voucher'}
                 </Button>
+
                 {discountMessage && (
                   <Typography variant="body2" color={discount > 0 ? 'success.main' : 'error'} mt={1}>
                     {discountMessage}
@@ -443,7 +451,13 @@ const Payment = () => {
               handlePlaceOrder()
             }}
             variant="contained"
-            color="secondary"
+            sx={{
+              backgroundColor: '#1A3C7B',
+              color: '#fff',
+              '&:hover': {
+                backgroundColor: '#3f51b5'
+              }
+            }}
           >
             Xác nhận
           </Button>

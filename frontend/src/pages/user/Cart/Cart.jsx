@@ -54,10 +54,10 @@ const Cart = () => {
       ? val.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })
       : '0₫'
 
-  const truncate = (str, maxLength) => {
-    if (!str) return ''
-    return str.length > maxLength ? str.slice(0, maxLength) + '...' : str
-  }
+  // const truncate = (str, maxLength) => {
+  //   if (!str) return ''
+  //   return str.length > maxLength ? str.slice(0, maxLength) + '...' : str
+  // }
 
   const handleQuantityChange = async (id, currentQty, delta) => {
     const item = cartItems.find(i => i.productId?._id === id)
@@ -178,20 +178,28 @@ const Cart = () => {
                       <Box>
                         <Typography
                           fontWeight={600}
-                          sx={{ lineHeight: 1.2, maxWidth: 350 }}
+                          sx={{
+                            lineHeight: 1.2,
+                            maxWidth: 350,
+                            whiteSpace: 'nowrap',
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis'
+                          }}
                           title={product.name}
                         >
-                          {truncate(product.name, 20)}
+                          {product.name}
                         </Typography>
+
                         <Typography
-                          variant='body2'
-                          color='text.secondary'
+                          variant="body2"
+                          color="text.secondary"
                           sx={{ maxWidth: 350 }}
-                          title={product.description}
                         >
-                          {truncate(product.description, 20)}
+                          Phân loại hàng:
+                          {product.color}, {product.size}
                         </Typography>
                       </Box>
+
                     </Box>
                   </TableCell>
                   <TableCell align='center' sx={{ fontWeight: '600', color: '#007B00' }}>

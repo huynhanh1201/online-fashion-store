@@ -29,9 +29,10 @@ const formatPrice = (price) => {
     const tr = price / 1_000_000
     return `${tr.toFixed(1)} Tr`
   } else {
-    return `${price.toLocaleString()}₫`
+    return `${price.toLocaleString('vi-VN')} ₫`
   }
 }
+
 
 const ProductCard = ({ product, handleAddToCart, isAdding }) => {
   const dispatch = useDispatch()

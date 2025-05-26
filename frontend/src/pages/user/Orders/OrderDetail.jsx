@@ -60,19 +60,22 @@ const OrderDetail = () => {
             />
             <Box display="flex" justifyContent="space-between" alignItems="center" flex={1}>
               <Box textAlign="left">
-                <Typography fontWeight={500}>{item.name}</Typography>
+                <Typography variant='h6' >{item.name}</Typography>
                 <Typography variant="body2" color="text.secondary">
-                  Số lượng: x{item.quantity}
+                  Phân loại hàng: Xanh, XL
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  x{item.quantity}
                 </Typography>
               </Box>
               <Box textAlign="right">
-                <Typography variant="body1">{item.price?.toLocaleString()} ₫</Typography>
+                <Typography variant="body1">{item.price?.toLocaleString('vi-VN')} ₫</Typography>
                 {item.originalPrice && item.originalPrice > item.price && (
                   <Typography
                     variant="body2"
                     sx={{ textDecoration: 'line-through', color: 'text.secondary' }}
                   >
-                    {item.originalPrice?.toLocaleString()} ₫
+                    {item.originalPrice?.toLocaleString('vi-VN')} ₫
                   </Typography>
                 )}
               </Box>
@@ -95,8 +98,7 @@ const OrderDetail = () => {
         {order.couponId ? (
           <Box display="flex" justifyContent="space-between" mb={1}>
             <Typography fontWeight="bold">Mã giảm giá:</Typography>
-            <Typography color="green">
-              {order.couponId.code || order.couponCode} - {formatPrice(order.discountAmount || 0)}
+            <Typography color="error">{formatPrice(order.discountAmount || 0)}
             </Typography>
           </Box>
         ) : (
@@ -110,10 +112,11 @@ const OrderDetail = () => {
 
         <Box display="flex" justifyContent="space-between" mb={1}>
           <Typography fontWeight="bold">Thành tiền:</Typography>
-          <Typography fontWeight="bold">
+          <Typography fontWeight="bold" variant="h5">
             {formatPrice(finalAmount > 0 ? finalAmount : 0)}
           </Typography>
         </Box>
+
 
         <Box display="flex" justifyContent="space-between" mt={2}>
           <Typography fontWeight="bold">Phương thức thanh toán:</Typography>
