@@ -7,10 +7,10 @@ import TextField from '@mui/material/TextField'
 import Button from '@mui/material/Button'
 import Divider from '@mui/material/Divider'
 import { useForm } from 'react-hook-form'
-import { addColor } from '~/services/admin/colorService'
+import { addSize } from '~/services/admin/sizeService'
 import StyleAdmin from '~/assets/StyleAdmin.jsx'
 
-const AddColorModal = ({ open, onClose, onAdded }) => {
+const AddSizeModal = ({ open, onClose, onAdded }) => {
   const {
     register,
     handleSubmit,
@@ -23,17 +23,17 @@ const AddColorModal = ({ open, onClose, onAdded }) => {
       const payload = {
         name: data.name.trim()
       }
-      const result = await addColor(payload)
+      const result = await addSize(payload)
       if (onAdded) onAdded()
       if (result) {
         onClose()
         reset()
       } else {
-        alert('Thêm màu thất bại. Vui lòng thử lại!')
+        alert('Thêm kích thước thất bại. Vui lòng thử lại!')
       }
     } catch (error) {
-      console.error('Lỗi khi thêm màu:', error)
-      alert('Thêm màu thất bại. Vui lòng thử lại!')
+      console.error('Lỗi khi thêm kích thước:', error)
+      alert('Thêm kích thước thất bại. Vui lòng thử lại!')
     }
   }
 
@@ -52,7 +52,7 @@ const AddColorModal = ({ open, onClose, onAdded }) => {
         sx: StyleAdmin.OverlayModal
       }}
     >
-      <DialogTitle>Thêm màu mới</DialogTitle>
+      <DialogTitle>Thêm kích thước mới</DialogTitle>
       <Divider sx={{ my: 0 }} />
       <form
         onSubmit={(e) => {
@@ -62,14 +62,14 @@ const AddColorModal = ({ open, onClose, onAdded }) => {
       >
         <DialogContent>
           <TextField
-            label='Tên màu'
+            label='Tên kích thước'
             fullWidth
             margin='normal'
             {...register('name', {
-              required: 'Tên màu là bắt buộc',
+              required: 'Tên kích thước là bắt buộc',
               minLength: {
-                value: 2,
-                message: 'Tên màu phải có ít nhất 2 ký tự'
+                value: 1,
+                message: 'Tên kích thước phải có ít nhất 1 ký tự'
               }
             })}
             error={!!errors.name}
@@ -97,4 +97,4 @@ const AddColorModal = ({ open, onClose, onAdded }) => {
   )
 }
 
-export default AddColorModal
+export default AddSizeModal
