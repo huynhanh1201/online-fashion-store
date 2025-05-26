@@ -54,7 +54,7 @@ function DiscountManagement() {
     const deleted = await deleteDiscount(discountId)
     if (deleted) await fetchDiscounts(page)
   }
-  // console.log('discounts', discounts)
+
   return (
     <>
       <Typography variant='h5' sx={{ mb: 2 }}>

@@ -30,6 +30,7 @@ import TransactionManegement from '~/pages/admin/TransactionManegement/index.jsx
 import ColorManagement from '~/pages/admin/ColorManagement/index.jsx'
 import InventoryManagement from '~/pages/admin/InventoryManagement/index.jsx'
 import InventoryLogManagement from '~/pages/admin/InventoryLogManagement/index.jsx'
+import SizeManagement from '~/pages/admin/SizeManagement/index.jsx'
 // Trang 404
 import NotFound from '~/pages/404/NotFound'
 
@@ -103,6 +104,7 @@ function App() {
             path='inventory-log-management'
             element={<InventoryLogManagement />}
           />
+          <Route path='size-management' element={<SizeManagement />} />
         </Route>
       </Route>
 

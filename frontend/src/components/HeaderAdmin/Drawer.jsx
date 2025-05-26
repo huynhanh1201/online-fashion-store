@@ -147,6 +147,7 @@ import PaymentIcon from '@mui/icons-material/Payment'
 import PaletteIcon from '@mui/icons-material/Palette'
 import WarehouseIcon from '@mui/icons-material/Warehouse'
 import HistoryIcon from '@mui/icons-material/History'
+import StraightenIcon from '@mui/icons-material/Straighten'
 const tab = [
   { name: 'Thống kê', path: '/admin', icon: <PollIcon /> },
   {
@@ -193,6 +194,11 @@ const tab = [
     name: 'Nhật ký kho',
     path: '/admin/inventory-log-management',
     icon: <HistoryIcon />
+  },
+  {
+    name: 'Quản lý kích cỡ',
+    path: '/admin/size-management',
+    icon: <StraightenIcon />
   }
 ]
 

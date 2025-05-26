@@ -15,8 +15,6 @@ import StyleAdmin, {
 } from '~/assets/StyleAdmin.jsx'
 
 const DiscountTable = ({ discounts, loading, onAction }) => {
-  if (loading) return <CircularProgress />
-
   return (
     <Table>
       <TableHead>

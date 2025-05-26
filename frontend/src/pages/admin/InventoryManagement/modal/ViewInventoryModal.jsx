@@ -13,7 +13,6 @@ const ViewInventoryModal = ({ open, onClose, inventory }) => {
   if (!inventory) return null
 
   const {
-    productId,
     quantity,
     importPrice,
     exportPrice,
@@ -21,7 +20,6 @@ const ViewInventoryModal = ({ open, onClose, inventory }) => {
     status,
     variant: { color, size, sku }
   } = inventory
-
   return (
     <Dialog
       open={open}
@@ -40,7 +38,7 @@ const ViewInventoryModal = ({ open, onClose, inventory }) => {
             label='Tên sản phẩm (ID)'
             fullWidth
             margin='normal'
-            defaultValue={productId}
+            defaultValue={inventory.productId?.name || 'Không xác định'}
             InputProps={{ readOnly: true }}
             sx={{
               ...StyleAdmin.InputCustom,
