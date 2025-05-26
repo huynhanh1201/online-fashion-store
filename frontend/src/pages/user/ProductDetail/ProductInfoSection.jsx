@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import {
   Box,
   Typography,
@@ -7,12 +7,14 @@ import {
   IconButton,
   TextField,
   Chip,
-  CircularProgress
+  CircularProgress,
+
 } from '@mui/material'
 import { styled } from '@mui/system'
 import AddIcon from '@mui/icons-material/Add'
 import RemoveIcon from '@mui/icons-material/Remove'
 import LocalOfferIcon from '@mui/icons-material/LocalOffer'
+import SnackbarAlert from './SnackbarAlert';
 
 const PriceTypography = styled(Typography)({
   color: '#d32f2f',
@@ -62,11 +64,19 @@ const ProductInfoSection = ({
 }) => {
   console.log('ProductInfoSection - colors:', colors)
   console.log('ProductInfoSection - selectedColor:', selectedColor)
-
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: '',
+    severity: 'info'
+  })
+  const handleSnackbarClose = () => {
+    setSnackbar((prev) => ({ ...prev, open: false }))
+  }
   const handleColorSelect = (color) => {
     console.log('Selected color:', color)
     setSelectedColor(color)
   }
+
 
   return (
     <Box
@@ -179,14 +189,14 @@ const ProductInfoSection = ({
               <Button
                 key={s || index}
                 variant={size === s ? 'contained' : 'outlined'}
-                onClick={() => setSize(s)}
+                onClick={() => { setSize(s); console.log('Selected size:', s); }}
                 sx={
                   size === s
                     ? {
-                        backgroundColor: '#1A3C7B',
-                        color: '#fff',
-                        '&:hover': { backgroundColor: '#162f63' }
-                      }
+                      backgroundColor: '#1A3C7B',
+                      color: '#fff',
+                      '&:hover': { backgroundColor: '#162f63' }
+                    }
                     : undefined
                 }
               >
@@ -249,7 +259,14 @@ const ProductInfoSection = ({
         >
           Mua ngay
         </Button>
+
       </Box>
+      <SnackbarAlert
+        open={snackbar.open}
+        onClose={handleSnackbarClose}
+        severity={snackbar.severity}
+        message={snackbar.message}
+      />
     </Box>
   )
 }

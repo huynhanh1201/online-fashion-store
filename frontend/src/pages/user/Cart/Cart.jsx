@@ -190,14 +190,10 @@ const Cart = () => {
                           {product.name}
                         </Typography>
 
-                        <Typography
-                          variant="body2"
-                          color="text.secondary"
-                          sx={{ maxWidth: 350 }}
-                        >
-                          Phân loại hàng:
-                          {product.color}, {product.size}
+                        <Typography variant="body2" color="text.secondary" sx={{ maxWidth: 350 }}>
+                          Phân loại hàng: {item.color || 'Không rõ'}{item.color && item.size ? ', ' : ''}{item.size || ''}
                         </Typography>
+
                       </Box>
 
                     </Box>

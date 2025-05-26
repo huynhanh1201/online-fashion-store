@@ -7,7 +7,7 @@ import {
   CircularProgress
 } from '@mui/material'
 import { useParams } from 'react-router-dom'
-import useProductDetail from './useProductDetail'
+import useProductDetail from '~/hooks/useProductDetail'
 import ProductImageSection from './ProductImageSection'
 import ProductInfoSection from './ProductInfoSection'
 import ProductDescription from './ProductDescription'
@@ -46,10 +46,10 @@ const ProductDetail = () => {
     formatCurrencyShort
   } = useProductDetail(productId)
 
-  console.log('ProductDetail - productId:', productId)
-  console.log('ProductDetail - selectedColor:', selectedColor)
+  // console.log('ProductDetail - productId:', productId)
+  // console.log('ProductDetail - selectedColor:', selectedColor)
   console.log('ProductDetail - colors:', colors)
-  console.log('ProductDetail - isViewingThumbnails:', isViewingThumbnails)
+  // console.log('ProductDetail - isViewingThumbnails:', isViewingThumbnails)
 
   if (isLoading) {
     return (

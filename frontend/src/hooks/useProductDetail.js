@@ -11,7 +11,7 @@ import { setCartItems, setTempCart } from '~/redux/cart/cartSlice'
 const useProductDetail = (productId) => {
   const [product, setProduct] = useState(null)
   const [quantity, setQuantity] = useState(1)
-  const [size, setSize] = useState('S')
+  const [size, setSize] = useState('')
   const [selectedImageIndex, setSelectedImageIndex] = useState(0)
   const [fadeIn, setFadeIn] = useState(true)
   const [isLoading, setIsLoading] = useState(true)
@@ -79,8 +79,8 @@ const useProductDetail = (productId) => {
       console.error('Error fetching product:', err.response || err)
       setError(
         err?.response?.data?.message ||
-          err.message ||
-          'Không thể tải thông tin sản phẩm.'
+        err.message ||
+        'Không thể tải thông tin sản phẩm.'
       )
     } finally {
       setIsLoading(false)
@@ -144,6 +144,7 @@ const useProductDetail = (productId) => {
   }
   const handleColorChange = (color) => {
     setSelectedColor(color)
+    console.log('>>>Selected color:', color)
     if (color.images && color.images.length > 0) {
       setProduct((prev) => ({
         ...prev,
@@ -154,43 +155,51 @@ const useProductDetail = (productId) => {
   }
 
   const handleAddToCart = async () => {
-    if (isAdding || !product) return
+    console.log('CHECK BEFORE ADD:', { selectedColor, size });
+
+    // if (!selectedColor || !selectedColor.name || !size) {
+    //   setSnackbar({
+    //     open: true,
+    //     message: 'Vui lòng chọn màu và kích thước',
+    //     severity: 'warning',
+    //   });
+    //   return;
+    // }
+
     setIsAdding(true)
+
     try {
-      const updatedCart = await getCart()
-      const existingItem = updatedCart?.cartItems?.find(
-        (item) => item.productId._id === product._id
-      )
-      const currentQty = existingItem?.quantity || 0
-
-      if (currentQty + quantity > product.quantity) {
-        setSnackbar({
-          type: 'warning',
-          message: 'Không thể vượt quá số lượng tồn kho!'
-        })
-        setTimeout(() => setIsAdding(false), 500)
-        return
-      }
-
       const res = await addToCart({
-        cartItems: [{ productId: product._id, quantity }]
-      })
-      dispatch(setCartItems(res?.cartItems || updatedCart?.cartItems || []))
-      setSnackbar({
-        type: 'success',
-        message: 'Thêm sản phẩm vào giỏ hàng thành công!'
-      })
-      setQuantity(1)
+        productId: product._id,
+        quantity,
+        color: selectedColor,
+        size,
+      });
+
+      if (res) {
+        dispatch(setCartItems(res.cartItems));
+        setSnackbar({
+          open: true,
+          message: 'Thêm vào giỏ hàng thành công',
+          severity: 'success',
+        });
+        setQuantity(1);
+      } else {
+        throw new Error('Không nhận được dữ liệu phản hồi');
+      }
     } catch (error) {
-      console.error('Lỗi khi thêm vào giỏ:', error)
+      console.error(error);
       setSnackbar({
-        type: 'error',
-        message: 'Không thể thêm sản phẩm vào giỏ hàng!'
-      })
+        open: true,
+        message: 'Có lỗi xảy ra khi thêm vào giỏ hàng',
+        severity: 'error',
+      });
     } finally {
-      setTimeout(() => setIsAdding(false), 1000)
+      setIsAdding(false);
     }
-  }
+  };
+
+
 
   const handleBuyNow = () => {
     if (!product) return

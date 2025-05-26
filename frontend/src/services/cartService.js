@@ -14,6 +14,7 @@ export const getCart = async () => {
 // Thêm sản phẩm vào giỏ hàng
 export const addToCart = async (product) => {
   try {
+    console.log('Thêm sản phẩm vào giỏ:', product)
     const response = await AuthorizedAxiosInstance.post(
       `${API_ROOT}/v1/carts`,
       product
