@@ -62,9 +62,7 @@ const createCart = async (reqJwtDecoded, reqBody) => {
 const getItemCartList = async (userId) => {
   // eslint-disable-next-line no-useless-catch
   try {
-    const result = await CartModel.findOne({ userId })
-      .populate('cartItems.productId')
-      .lean()
+    const result = await CartModel.findOne({ userId }).lean()
 
     return result
   } catch (err) {
@@ -72,13 +70,15 @@ const getItemCartList = async (userId) => {
   }
 }
 
-const updateItemCart = async (userId, productId, reqBody) => {
+const updateItemCart = async (userId, reqBody) => {
   // eslint-disable-next-line no-useless-catch
   try {
     const itemCart = await CartModel.findOneAndUpdate(
       {
         userId,
-        'cartItems.productId': productId
+        'cartItems.productId': reqBody.productId,
+        'cartItems.color': reqBody.color,
+        'cartItems.size': reqBody.size
       },
       {
         $set: {
