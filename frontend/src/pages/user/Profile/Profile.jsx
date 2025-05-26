@@ -1,3 +1,5 @@
+// ✅ Component Profile.jsx với sửa lỗi ObjectId & Toggle hiển thị mật khẩu
+
 import React, { useState, useEffect } from 'react'
 import {
   Box,
@@ -10,22 +12,24 @@ import {
   Paper,
   Snackbar,
   Alert,
-  List,
-  ListItem,
-  ListItemText,
-  IconButton,
   Dialog,
   DialogTitle,
   DialogContent,
   DialogActions,
-  Divider
+  IconButton
 } from '@mui/material'
 import UploadIcon from '@mui/icons-material/CloudUpload'
 import EmailIcon from '@mui/icons-material/Email'
 import PersonIcon from '@mui/icons-material/Person'
 import LockIcon from '@mui/icons-material/Lock'
+import VisibilityIcon from '@mui/icons-material/Visibility'
+import VisibilityOffIcon from '@mui/icons-material/VisibilityOff'
 import ShippingAdress from './shippingAdress/shippingAdress'
-import { getProfileUser, updateProfile } from '~/services/userService'
+import {
+  getProfileUser,
+  updateProfile,
+  changePassword
+} from '~/services/userService'
 import { useDispatch } from 'react-redux'
 import { updateUserAPI } from '~/redux/user/userSlice'
 
@@ -38,12 +42,7 @@ const uploadToCloudinary = async (file) => {
   formData.append('file', file)
   formData.append('upload_preset', UPLOAD_PRESET)
   formData.append('folder', CLOUD_FOLDER)
-
-  const res = await fetch(CLOUDINARY_URI, {
-    method: 'POST',
-    body: formData
-  })
-
+  const res = await fetch(CLOUDINARY_URI, { method: 'POST', body: formData })
   const data = await res.json()
   return data.secure_url
 }
@@ -58,19 +57,29 @@ const Profile = () => {
   const [snackbarOpen, setSnackbarOpen] = useState(false)
   const [snackbarMessage, setSnackbarMessage] = useState('')
   const [snackbarSeverity, setSnackbarSeverity] = useState('success')
+  const [openPasswordDialog, setOpenPasswordDialog] = useState(false)
+  const [oldPassword, setOldPassword] = useState('')
+  const [newPassword, setNewPassword] = useState('')
+  const [confirmNewPassword, setConfirmNewPassword] = useState('')
+  const [showPassword, setShowPassword] = useState({
+    old: false,
+    new: false,
+    confirm: false
+  })
   const dispatch = useDispatch()
 
-  const handleTabChange = (_, newValue) => {
-    setTab(newValue)
-  }
+  const handleTabChange = (_, newValue) => setTab(newValue)
 
-  const handleImageChange = (event) => {
-    const file = event.target.files[0]
+  const handleImageChange = (e) => {
+    const file = e.target.files[0]
     if (file) {
       setAvatarFile(file)
-      const blobUrl = URL.createObjectURL(file)
-      setAvatarPreview(blobUrl)
+      setAvatarPreview(URL.createObjectURL(file))
     }
+  }
+
+  const toggleShowPassword = (field) => {
+    setShowPassword((prev) => ({ ...prev, [field]: !prev[field] }))
   }
 
   const showSnackbar = (message, severity = 'success') => {
@@ -79,17 +88,26 @@ const Profile = () => {
     setSnackbarOpen(true)
   }
 
-  const handleCloseSnackbar = () => {
-    setSnackbarOpen(false)
+  const handleCloseSnackbar = () => setSnackbarOpen(false)
+  const handleOpenPasswordDialog = () => setOpenPasswordDialog(true)
+  const handleClosePasswordDialog = () => {
+    setOpenPasswordDialog(false)
+    setOldPassword('')
+    setNewPassword('')
+    setConfirmNewPassword('')
+  }
+
+  const validatePassword = (password) => {
+    return (
+      password.length >= 6 &&
+      /[A-Z]/.test(password) &&
+      /[^a-zA-Z0-9]/.test(password)
+    )
   }
 
   const handleUpdate = async () => {
     const trimmedName = name.trim()
-    if (!trimmedName) {
-      showSnackbar('Tên không được để trống!', 'error')
-      return
-    }
-    if (trimmedName.length < 3) {
+    if (!trimmedName || trimmedName.length < 3) {
       showSnackbar('Tên phải có ít nhất 3 ký tự!', 'error')
       return
     }
@@ -120,20 +138,48 @@ const Profile = () => {
         `Cập nhật thất bại: ${result?.error?.message || 'Lỗi không xác định'}`,
         'error'
       )
-      if (result?.error?.message.includes('avatarUrl')) {
-        const retryResult = await updateProfile({ name: trimmedName })
-        if (retryResult && !retryResult.error) {
-          setName(retryResult.name)
-          setAvatarPreview(retryResult.avatarUrl || '')
-          setAvatarFile(null)
-          showSnackbar('Cập nhật thành công (không bao gồm avatar)!')
-        } else {
-          showSnackbar(
-            `Cập nhật thất bại: ${retryResult?.error?.message || 'Lỗi không xác định'}`,
-            'error'
-          )
-        }
+    }
+  }
+
+  const handleChangePassword = async () => {
+    if (loading) return
+    if (!oldPassword || !newPassword || !confirmNewPassword) {
+      showSnackbar('Vui lòng điền đầy đủ thông tin', 'error')
+      return
+    }
+    if (newPassword !== confirmNewPassword) {
+      showSnackbar('Mật khẩu xác nhận không khớp', 'error')
+      return
+    }
+    if (!validatePassword(newPassword)) {
+      showSnackbar(
+        'Mật khẩu mới phải ≥ 6 ký tự, có 1 chữ in hoa, 1 ký tự đặc biệt',
+        'error'
+      )
+      return
+    }
+
+    setLoading(true)
+    try {
+      const payload = {
+        oldPassword,
+        newPassword,
+        confirmNewPassword
       }
+      console.log('Payload gửi đi:', payload)
+
+      const result = await changePassword(payload)
+      setLoading(false)
+
+      if (result?.success) {
+        showSnackbar('Đổi mật khẩu thành công!')
+        handleClosePasswordDialog()
+      } else {
+        showSnackbar(result?.error?.message || 'Lỗi khi đổi mật khẩu', 'error')
+      }
+    } catch (error) {
+      setLoading(false)
+      showSnackbar('Lỗi hệ thống: ' + error.message, 'error')
     }
   }
 
@@ -147,12 +193,9 @@ const Profile = () => {
         setAvatarPreview(profileData.avatarUrl || '')
       } else {
         showSnackbar('Không thể tải thông tin hồ sơ!', 'error')
-        setName('Người dùng')
-        setAvatarPreview('')
       }
       setLoading(false)
     }
-
     fetchProfile()
   }, [])
 
@@ -166,26 +209,9 @@ const Profile = () => {
         gap: 4
       }}
     >
-      {/* Sidebar bên trái */}
-      <Paper
-        elevation={3}
-        sx={{
-          width: 350,
-          p: 3,
-          borderRadius: 2,
-          bgcolor: '#ffffff',
-          height: 'fit-content'
-        }}
-      >
-        <Tabs
-          value={tab}
-          onChange={handleTabChange}
-          orientation='vertical'
-          sx={{ mb: 2 }}
-          textColor='primary'
-          indicatorColor='primary'
-        >
-          <Tab icon={<PersonIcon />} iconPosition='start' label='Tài khoản' />
+      <Paper elevation={3} sx={{ width: 350, p: 3, borderRadius: 2 }}>
+        <Tabs value={tab} onChange={handleTabChange} orientation='vertical'>
+          <Tab icon={<PersonIcon />} label='Tài khoản' />
         </Tabs>
 
         {tab === 0 && (
@@ -196,21 +222,13 @@ const Profile = () => {
               <>
                 <Box sx={{ textAlign: 'center', mb: 3 }}>
                   <Avatar
-                    sx={{
-                      width: 100,
-                      height: 100,
-                      mx: 'auto',
-                      mb: 2,
-                      border: '2px solid #1976d2'
-                    }}
                     src={avatarPreview}
-                    alt='Avatar người dùng'
+                    sx={{ width: 100, height: 100, mx: 'auto', mb: 2 }}
                   />
                   <Button
                     startIcon={<UploadIcon />}
-                    variant='outlined'
                     component='label'
-                    sx={{ textTransform: 'none', borderRadius: 2 }}
+                    variant='outlined'
                   >
                     Chọn ảnh
                     <input
@@ -221,67 +239,119 @@ const Profile = () => {
                     />
                   </Button>
                 </Box>
-
                 <TextField
                   fullWidth
                   label='Email'
                   value={email}
-                  InputProps={{
-                    startAdornment: (
-                      <EmailIcon sx={{ mr: 1, color: '#1976d2' }} />
-                    )
-                  }}
-                  margin='normal'
-                  InputLabelProps={{ shrink: true }}
                   disabled
-                  sx={{ bgcolor: '#f9f9f9' }}
+                  sx={{ mb: 2 }}
                 />
-
                 <TextField
                   fullWidth
                   label='Tên'
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  InputProps={{
-                    startAdornment: (
-                      <PersonIcon sx={{ mr: 1, color: '#1976d2' }} />
-                    )
-                  }}
-                  margin='normal'
-                  InputLabelProps={{ shrink: true }}
                   error={!name.trim() || name.trim().length < 3}
                   helperText={
                     !name.trim()
-                      ? 'Tên không được để trống'
+                      ? 'Không được để trống'
                       : name.trim().length < 3
-                        ? 'Tên phải có ít nhất 3 ký tự'
+                        ? 'Ít nhất 3 ký tự'
                         : ''
                   }
                 />
-
                 <Button
-                  variant='contained'
                   fullWidth
-                  sx={{
-                    mt: 3,
-                    borderRadius: 2,
-                    bgcolor: '#1976d2',
-                    textTransform: 'none'
-                  }}
+                  variant='contained'
+                  sx={{ mt: 3 }}
                   onClick={handleUpdate}
-                  disabled={loading}
                 >
                   {loading ? 'Đang cập nhật...' : 'Cập nhật'}
+                </Button>
+                <Button
+                  fullWidth
+                  variant='outlined'
+                  startIcon={<LockIcon />}
+                  sx={{ mt: 2 }}
+                  onClick={handleOpenPasswordDialog}
+                >
+                  Đổi mật khẩu
                 </Button>
               </>
             )}
           </Box>
         )}
       </Paper>
+
       <Box>
-        <ShippingAdress></ShippingAdress>
+        <ShippingAdress />
       </Box>
-      {/* Snackbar thông báo */}
+
+      <Dialog open={openPasswordDialog} onClose={() => {}} disableEscapeKeyDown>
+        <DialogTitle>Đổi mật khẩu</DialogTitle>
+        <DialogContent>
+          {['old', 'new', 'confirm'].map((field, index) => (
+            <TextField
+              key={field}
+              label={
+                field === 'old'
+                  ? 'Mật khẩu hiện tại'
+                  : field === 'new'
+                    ? 'Mật khẩu mới'
+                    : 'Xác nhận mật khẩu mới'
+              }
+              type={showPassword[field] ? 'text' : 'password'}
+              fullWidth
+              margin='normal'
+              value={
+                field === 'old'
+                  ? oldPassword
+                  : field === 'new'
+                    ? newPassword
+                    : confirmNewPassword
+              }
+              onChange={(e) => {
+                if (field === 'old') setOldPassword(e.target.value)
+                else if (field === 'new') setNewPassword(e.target.value)
+                else setConfirmNewPassword(e.target.value)
+              }}
+              InputProps={{
+                endAdornment: (
+                  <IconButton
+                    onClick={() => toggleShowPassword(field)}
+                    edge='end'
+                  >
+                    {showPassword[field] ? (
+                      <VisibilityOffIcon />
+                    ) : (
+                      <VisibilityIcon />
+                    )}
+                  </IconButton>
+                )
+              }}
+              helperText={
+                field === 'new'
+                  ? '≥6 ký tự, 1 chữ in hoa, 1 ký tự đặc biệt'
+                  : ''
+              }
+            />
+          ))}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleClosePasswordDialog} color='secondary'>
+            Hủy
+          </Button>
+          <Button
+            onClick={handleChangePassword}
+            variant='contained'
+            color='primary'
+            disabled={loading}
+          >
+            {loading ? 'Đang xử lý...' : 'Cập nhật'}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
       <Snackbar
         open={snackbarOpen}
         autoHideDuration={3000}

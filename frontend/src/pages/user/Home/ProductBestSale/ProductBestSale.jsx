@@ -6,7 +6,7 @@ import { useDispatch } from 'react-redux'
 import { setCartItems } from '~/redux/cart/cartSlice'
 import ProductCard from '~/components/ProductCards/ProductCards'
 
-const ProductList = () => {
+const ProductBestSale = () => {
   const { products, fetchProducts } = useProducts()
   const [snackbar, setSnackbar] = useState(null)
   const [isAdding, setIsAdding] = useState({})
@@ -14,7 +14,7 @@ const ProductList = () => {
 
   useEffect(() => {
     fetchProducts()
-  }, []) // Loại bỏ dependency fetchProducts nếu đã dùng useCallback
+  }, []) // Dependency rỗng để tránh vòng lặp vô hạn
 
   const handleAddToCart = async (product) => {
     if (isAdding[product._id]) return
@@ -58,11 +58,11 @@ const ProductList = () => {
     }
   }
 
-  // Sắp xếp và lấy 5 sản phẩm mới nhất
-  const latestProducts = Array.isArray(products)
+  // Sắp xếp và lấy 5 sản phẩm bán chạy nhất
+  const bestSaleProducts = Array.isArray(products)
     ? [...products]
-        .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-        .slice(0, 5)
+        .sort((a, b) => (b.sold || 0) - (a.sold || 0)) // Sắp xếp theo sold giảm dần
+        .slice(0, 5) // Lấy 5 sản phẩm đầu tiên
     : []
 
   return (
@@ -74,7 +74,7 @@ const ProductList = () => {
         spacing={2}
         sx={{ mt: 5 }}
       >
-        {latestProducts.map((product) => (
+        {bestSaleProducts.map((product) => (
           <Grid item xs={12} sm={6} md={2.4} key={product._id}>
             <ProductCard
               product={product}
@@ -114,4 +114,4 @@ const ProductList = () => {
   )
 }
 
-export default ProductList
+export default ProductBestSale
