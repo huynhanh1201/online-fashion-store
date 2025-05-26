@@ -31,10 +31,10 @@ export const addToCart = async ({ productId, color, size, quantity }) => {
 
 // Cập nhật sản phẩm trong giỏ hàng
 // Giữ nguyên endpoint PATCH /v1/carts/items, payload gồm { productId, color, size, quantity }
-export const updateCartItem = async (itemId, updateData) => {
+export const updateCartItem = async (updateData) => {
   try {
     const response = await AuthorizedAxiosInstance.patch(
-      `${API_ROOT}/v1/carts/items/${itemId}`,
+      `${API_ROOT}/v1/carts/items`,
       updateData
     )
     return response.data

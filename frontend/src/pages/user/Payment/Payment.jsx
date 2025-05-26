@@ -81,8 +81,6 @@ const Payment = () => {
   const { createOrder, loading: orderLoading } = useOrder()
   const { discount, discountMessage, loading: couponLoading, handleApplyVoucher, couponId } = useCoupon()
 
-
-
   const selectedItems = useSelector(state => state.cart.selectedItems)
   const selectedIds = useSelector(state => state.cart.selectedItems || [])
 

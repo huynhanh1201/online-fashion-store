@@ -202,7 +202,9 @@ const useProductDetail = (productId) => {
         size: size
       })
 
-      dispatch(setCartItems(res?.cartItems || updatedCart?.cartItems || []))
+      const latestCart = res?.cartItems ? res : await getCart()
+
+      dispatch(setCartItems(latestCart?.cartItems || []))
       setSnackbar({
         type: 'success',
         message: 'Thêm sản phẩm vào giỏ hàng thành công!'
@@ -212,14 +214,11 @@ const useProductDetail = (productId) => {
       console.error('Thêm vào giỏ hàng lỗi:', error)
       setSnackbar({ type: 'error', message: 'Thêm sản phẩm thất bại!' })
     } finally {
-      // set về false ngay sau khi hoàn tất try/catch, không cần delay
-      setIsAdding((prev) => ({ ...prev, [product._id]: false }))
+      setTimeout(() => {
+        setIsAdding((prev) => ({ ...prev, [product._id]: false }))
+      }, 500)
     }
   }
-
-
-
-
 
 
   const handleBuyNow = () => {

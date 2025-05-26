@@ -59,8 +59,10 @@ const Cart = () => {
   //   return str.length > maxLength ? str.slice(0, maxLength) + '...' : str
   // }
 
-  const handleQuantityChange = async (id, currentQty, delta) => {
-    const item = cartItems.find(i => i.productId?._id === id)
+  const handleQuantityChange = async (productId, currentQty, delta, color, size) => {
+    const item = cartItems.find(
+      i => i.productId?._id === productId && i.color === color && i.size === size
+    )
     if (!item) return
 
     const maxQty = item?.productId?.quantity || 1
@@ -72,29 +74,25 @@ const Cart = () => {
     }
 
     const payload = {
-      productId: id,
-      quantity: newQty,
-      color: item.color || '',  // hoặc set giá trị mặc định nếu thiếu
-      size: item.size || ''
+      productId,
+      color,
+      size,
+      quantity: newQty
     }
 
-    console.log('Payload updateItem:', payload)
-
-    try {
-      const res = await updateItem(id, payload)
-      if (res) {
-        setCartItems(prev =>
-          prev.map(i =>
-            i.productId._id === id && i.color === item.color && i.size === item.size
-              ? { ...i, quantity: newQty }
-              : i
-          )
+    const res = await updateItem(payload)
+    if (res) {
+      setCartItems(prev =>
+        prev.map(i =>
+          i.productId._id === productId && i.color === color && i.size === size
+            ? { ...i, quantity: newQty }
+            : i
         )
-      }
-    } catch (error) {
-      console.error('Lỗi cập nhật số lượng:', error)
+      )
     }
   }
+
+
 
 
 
@@ -221,7 +219,7 @@ const Cart = () => {
                     <Box display='flex' alignItems='center' justifyContent='center'>
                       <IconButton
                         size='small'
-                        onClick={() => handleQuantityChange(product._id, item.quantity, -1)}
+                        onClick={() => handleQuantityChange(product._id, item.quantity, -1, item.color, item.size)}
                         disabled={item.quantity <= 1}
                         aria-label='Giảm số lượng'
                       >
@@ -235,7 +233,9 @@ const Cart = () => {
                       />
                       <IconButton
                         size='small'
-                        onClick={() => handleQuantityChange(product._id, item.quantity, 1)}
+                        onClick={() =>
+                          handleQuantityChange(product._id, item.quantity, 1, item.color, item.size)
+                        }
                         aria-label='Tăng số lượng'
                         disabled={item.quantity >= product.quantity}
                       >
