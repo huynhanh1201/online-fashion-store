@@ -9,16 +9,23 @@ const cartItemSchema = new Schema(
       ref: 'Product',
       required: true
     },
+    color: {
+      type: String,
+      required: true,
+      minlength: 1,
+      maxlength: 50
+    },
+    size: {
+      type: String,
+      required: true,
+      minlength: 1,
+      maxlength: 10
+    },
     quantity: {
       type: Number,
       required: true,
       min: 1,
       default: 1
-    },
-    selected: {
-      type: Boolean,
-      required: true,
-      default: true
     }
   },
   { _id: false }
