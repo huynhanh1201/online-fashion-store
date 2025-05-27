@@ -8,77 +8,51 @@ import { ColorPaletteModel } from '~/models/ColorPaletteModel'
 import { SizePaletteModel } from '~/models/SizePaletteModel'
 import { InventoryModel } from '~/models/InventoryModel'
 import generateSKU from '~/utils/generateSKU'
+import { generateCode } from '~/utils/generateCode'
+import { VariantModel } from '~/models/VariantModel'
 
 const createProduct = async (reqBody) => {
   // eslint-disable-next-line no-useless-catch
   try {
-    const totalQuantity = reqBody.stockMatrix.reduce((acc, item) => {
-      return acc + item.quantity
-    }, 0)
+    // Tạo lấy ký tự để tạo Prefix cho productCode
+    const prefix = generateCode.generateGetPrefix(reqBody.name)
+
+    // Query mã lớn nhất đã có với prefix đó
+    //    - regex /^AV\d{2,}$/ để match AV10, AV09, AV123...
+    const regex = new RegExp(`^${prefix}(\\d+)$`)
+    const latest = await ProductModel.findOne({
+      productCode: { $regex: regex }
+    })
+      .sort({ productCode: -1 }) // sort giảm dần, AV10 > AV09
+      .lean()
+
+    // Tính số thứ tự tiếp theo
+    let nextNumber = 1
+    if (latest) {
+      const match = latest.productCode.match(regex)
+      if (match && match[1]) {
+        nextNumber = parseInt(match[1], 10) + 1 // ví dụ AV10 → match[1] = "10" → +1 = 11
+      }
+    }
+
+    // Tạo productCode
+    const productCode = generateCode.generate(prefix, nextNumber)
 
     const newProduct = {
       name: reqBody.name,
       description: reqBody.description,
-      price: reqBody.price,
       image: reqBody.image,
       categoryId: reqBody.categoryId,
-      slug: slugify(reqBody.name),
-
       importPrice: reqBody.importPrice,
-      sizes: reqBody.sizes,
-      colors: reqBody.colors,
+      exportPrice: reqBody.exportPrice,
 
-      exportPrice: reqBody.price,
-      quantity: totalQuantity,
+      productCode: productCode,
+      slug: slugify(reqBody.name),
+      quantity: 0,
       destroy: false
     }
 
     const product = await ProductModel.create(newProduct)
-
-    //  Tạo Màu sắc sản phẩm
-    const newColorPalette = {
-      productId: product._id,
-      colors: reqBody.colors
-    }
-
-    await ColorPaletteModel.create(newColorPalette)
-
-    //  Tạo Kích cỡ sản phẩm
-    const newSizePalette = {
-      productId: product._id,
-      sizes: reqBody.sizes
-    }
-
-    await SizePaletteModel.create(newSizePalette)
-
-    // Lưu vào Kho sản phẩm
-
-    const inventoris = reqBody.stockMatrix.map((item) => {
-      const colorName = item.color.toLowerCase()
-
-      const colorObj = reqBody.colors.find(
-        (color) => color.name.toLowerCase() === colorName
-      )
-
-      const inventory = {
-        productId: product._id, // ID sản phẩm gốc
-        variant: {
-          color: { name: item.color, image: colorObj.image },
-          size: { name: item.size.toUpperCase() },
-          sku: generateSKU(product.name, colorName, item.size)
-        },
-        quantity: item.quantity,
-        importPrice: product.importPrice,
-        exportPrice: product.price,
-        minQuantity: 5,
-        status: 'in-stock',
-        destroy: false
-      }
-
-      return inventory
-    })
-
-    await InventoryModel.insertMany(inventoris)
 
     return product
   } catch (err) {
@@ -104,10 +78,10 @@ const getProductList = async (reqQuery) => {
     const priceMaxNumber = Number(priceMax)
 
     if (!isNaN(priceMinNumber))
-      filter.price = { ...(filter.price || {}), $gte: priceMinNumber }
+      filter.price = { ...(filter.exportPrice || {}), $gte: priceMinNumber }
 
     if (!isNaN(priceMaxNumber))
-      filter.price = { ...(filter.price || {}), $lte: priceMaxNumber }
+      filter.price = { ...(filter.exportPrice || {}), $lte: priceMaxNumber }
 
     if (search) filter.name = { $regex: search, $options: 'i' }
 
@@ -220,11 +194,26 @@ const getListProductOfCategory = async (categoryId) => {
   }
 }
 
+const getVariantOfProduct = async (productId) => {
+  // eslint-disable-next-line no-useless-catch
+  try {
+    const variants = await VariantModel.find({
+      productId: productId,
+      destroy: false
+    }).lean()
+
+    return variants
+  } catch (err) {
+    throw err
+  }
+}
+
 export const productsService = {
   createProduct,
   getProductList,
   getProduct,
   updateProduct,
   deleteProduct,
-  getListProductOfCategory
+  getListProductOfCategory,
+  getVariantOfProduct
 }

@@ -17,7 +17,7 @@ const category = async (req, res, next) => {
   // Xác thực dữ liệu đầu vào correctCondition: điều kiện đúng
   const correctCondition = Joi.object({
     name: Joi.string() // name bắt buộc, chuỗi
-      .min(3) // tối thiểu 3 ký tự
+      .min(1) // tối thiểu 3 ký tự
       .max(50) // tối đa 50 ký tự
       .trim() // loại bỏ khoảng trắng đầu/cuối
       .required(), // bắt buộc

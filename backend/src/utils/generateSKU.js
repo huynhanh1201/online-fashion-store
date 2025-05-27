@@ -1,13 +1,11 @@
 import { remove as removeDiacritics } from 'diacritics'
 
-export default function generateSKU(productName, colorName, size) {
-  const productCode = removeDiacritics(productName)
+export default function generateSKU(value1, value2, value3) {
+  const productCode = removeDiacritics(value1)
     .toUpperCase()
     .replace(/\s+/g, '-')
-  const colorCode = removeDiacritics(colorName)
-    .toUpperCase()
-    .replace(/\s+/g, '')
-  const sizeCode = size.toUpperCase()
+  const colorCode = removeDiacritics(value2).toUpperCase().replace(/\s+/g, '')
+  const value3Code = value3.toUpperCase()
 
-  return `${productCode}-${colorCode}-${sizeCode}`
+  return `${productCode}-${colorCode}-${value3Code}`
 }
