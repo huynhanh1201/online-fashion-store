@@ -24,7 +24,7 @@ const cart = async (req, res, next) => {
     size: Joi.string().min(1).max(10).required(),
 
     // quantity là số lượng sản phẩm - bắt buộc, tối thiểu 1
-    quantity: Joi.number().integer().min(1).required()
+    quantity: Joi.number().integer().required()
   })
 
   try {

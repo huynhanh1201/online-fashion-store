@@ -41,11 +41,9 @@ const updateItemCart = async (req, res, next) => {
 
 const deleteItemCart = async (req, res, next) => {
   try {
-    const productId = req.params.productId
-
     const result = await cartsService.deleteItemCart(
       req.jwtDecoded._id,
-      productId
+      req.body
     )
 
     res.status(StatusCodes.OK).json(result)

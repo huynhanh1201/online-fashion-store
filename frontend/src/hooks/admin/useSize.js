@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { getSizes } from '~/services/admin/SizeService'
+import { getSizes } from '~/services/admin/sizeService'
 
 const useSizes = (pageSize = 1, limit = 10) => {
   const [sizes, setSizes] = useState([])

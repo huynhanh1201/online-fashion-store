@@ -27,9 +27,9 @@ Router.route('/items').patch(
 )
 
 // Xoá Item giỏ hàng
-Router.route('/items/:productId').delete(
+Router.route('/items').delete(
   authMiddleware.isAuthorized,
-  cartsValidation.verifyId,
+  cartsValidation.cart,
   cartsController.deleteItemCart
 )
 
