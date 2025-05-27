@@ -56,7 +56,6 @@ const Cart = () => {
 
     let newSelected = []
     if (exists) {
-      // Bỏ chọn: lọc ra item trùng
       newSelected = selectedItems.filter(i =>
         !(i.productId === item.productId._id &&
           i.color === item.color &&
@@ -90,46 +89,36 @@ const Cart = () => {
   //   return str.length > maxLength ? str.slice(0, maxLength) + '...' : str
   // }
 
-  const handleQuantityChange = async (productId, delta, color, size) => {
-    const item = cartItems.find(
-      i =>
-        i.productId._id &&
-        i.color === color &&
-        i.size === size
-    )
-    if (!item) return
+  const handleQuantityChange = (productId, delta, color, size) => {
+    setCartItems(prevItems => {
+      return prevItems.map(i => {
+        const isMatch =
+          (i.productId._id || i.productId) === productId &&
+          i.color === color &&
+          i.size === size
 
-    const currentQty = item.quantity
-    const maxQty = item.productId?.quantity || 1
-    const newQty = Math.max(1, currentQty + delta)
+        if (!isMatch) return i
 
-    if (newQty > maxQty) {
-      setShowMaxQuantityAlert(true)
-      return
-    }
+        const currentQty = i.quantity
+        const maxQty = i.productId.quantity || 1
+        const newQty = Math.max(1, currentQty + delta)
 
-    const payload = {
-      productId,
-      color,
-      size,
-      quantity: newQty
-    }
-    console.log('Cập nhật giỏ hàng với:', payload)
-    const res = await updateItem(payload)
-    if (res) {
-      setCartItems(prev =>
-        prev.map(i =>
-          i.productId.toString() === productId.toString() &&
-            i.color === color &&
-            i.size === size
-            ? { ...i, quantity: newQty }
-            : i
-        )
-      )
+        if (newQty > maxQty) {
+          setShowMaxQuantityAlert(true)
+          return i
+        }
 
-    }
+        updateItem({
+          productId,
+          color,
+          size,
+          quantity: delta
+        });
+
+        return { ...i, quantity: newQty }
+      })
+    })
   }
-
 
   const handleRemove = async (itemToRemove) => {
     try {
