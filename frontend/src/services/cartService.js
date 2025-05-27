@@ -58,10 +58,13 @@ export const updateAllSelection = async (selected) => {
 }
 
 // Xóa một sản phẩm khỏi giỏ hàng theo productId
-export const deleteCartItem = async (productId) => {
+export const deleteCartItem = async ({ productId, color, size, quantity }) => {
   try {
     const response = await AuthorizedAxiosInstance.delete(
-      `${API_ROOT}/v1/carts/items/${productId}`
+      `${API_ROOT}/v1/carts/items`,
+      {
+        data: { productId, color, size, quantity }
+      }
     )
     return response.data
   } catch (error) {

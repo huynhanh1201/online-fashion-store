@@ -86,15 +86,13 @@ const Payment = () => {
   const { createOrder, loading: orderLoading } = useOrder()
   const { discount, discountMessage, loading: couponLoading, handleApplyVoucher, couponId } = useCoupon()
 
-  const selectedItems = useSelector(state => state.cart.selectedItems)
-  const selectedIds = useSelector(state => state.cart.selectedItems || [])
+  const selectedItems = useSelector(state => state.cart.selectedItems || [])
 
-
-  const cartCartItems = useSelector((state) => state.cart.cartItems)
-  const tempCart = useSelector((state) => state.cart.tempCart)
+  const cartCartItems = useSelector(state => state.cart.cartItems)
+  const tempCart = useSelector(state => state.cart.tempCart)
 
   const location = useLocation()
-  const isBuyNow = useSelector((state) => state.cart.isBuyNow)
+  const isBuyNow = useSelector(state => state.cart.isBuyNow)
 
   const cartItems = isBuyNow && tempCart?.cartItems?.length > 0
     ? tempCart.cartItems
@@ -102,24 +100,29 @@ const Payment = () => {
 
   // Tính selectedCartItems + subTotal
   let subTotal = 0
-  const selectedCartItems = cartItems
-    .filter((item) => {
-      if (isBuyNow) return true // tính tất cả khi Buy Now
-      const productId = String(item.product?._id || item.productId?._id || item.productId)
-      return selectedIds.includes(productId)
-    })
-    .map((item) => {
-      const product = item.product || item.productId || {}
-      const productId = String(product._id || item.productId?._id || item.productId)
-      const price = typeof product.price === 'number' ? product.price : 0
-      const quantity = typeof item.quantity === 'number' ? item.quantity : 1
 
-      subTotal += price * quantity
+  const selectedCartItems = cartItems.filter(item => {
+    if (isBuyNow) return true // tính tất cả khi Buy Now
 
-      return { productId, quantity }
-    })
+    // Tìm xem trong selectedItems có item tương ứng với productId, color, size hay không
+    return selectedItems.some(selected =>
+      selected.productId === (item.product?._id || item.productId?._id || item.productId) &&
+      selected.color === item.color &&
+      selected.size === item.size
+    )
+  }).map(item => {
+    const product = item.product || item.productId || {}
+    const productId = String(product._id || item.productId?._id || item.productId)
+    const price = typeof product.price === 'number' ? product.price : 0
+    const quantity = typeof item.quantity === 'number' ? item.quantity : 1
+
+    subTotal += price * quantity
+
+    return { productId, color: item.color, size: item.size, quantity }
+  })
 
   const total = Math.max(subTotal - discount, 0)
+
 
 
   // const { addresses, fetchAddresses } = useAddress()
@@ -193,8 +196,15 @@ const Payment = () => {
       setSnackbar({ open: true, severity: 'error', message: 'Giỏ hàng trống' })
       return
     }
+
+    // Chỉ gửi productId và quantity, bỏ color, size nếu backend không hỗ trợ
+    const sanitizedCartItems = selectedCartItems.map(item => ({
+      productId: item.productId,
+      quantity: item.quantity
+    }))
+
     const orderData = {
-      cartItems: selectedCartItems,
+      cartItems: sanitizedCartItems,
       shippingAddressId: selectedAddress._id,
       total,
       paymentMethod,
@@ -221,6 +231,7 @@ const Payment = () => {
       })
     }
   }
+
 
   return (
     <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
@@ -284,7 +295,13 @@ const Payment = () => {
                     </thead>
                     <tbody>
                       {cartItems
-                        .filter(item => selectedItems.includes(item.productId._id || item.productId))
+                        .filter(item =>
+                          selectedItems.some(selected =>
+                            selected.productId === (item.product?._id || item.productId?._id || item.productId) &&
+                            selected.color === item.color &&
+                            selected.size === item.size
+                          )
+                        )
                         .map((item, index) => {
                           const product = item.product || item.productId || {}
                           const color = item.color || 'Chưa chọn màu'

@@ -19,7 +19,6 @@ const Cart = () => {
   const [confirmClearOpen, setConfirmClearOpen] = useState(false)
   const navigate = useNavigate()
   const dispatch = useDispatch()
-
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'auto' })
   }, [])
@@ -34,20 +33,52 @@ const Cart = () => {
   const handleSelectAll = () => {
     let newSelected = []
     if (!allSelected) {
-      newSelected = cartItems.map(item => item.productId._id)
+      // map cartItems thành mảng object chi tiết
+      newSelected = cartItems.map(item => ({
+        productId: item.productId._id,
+        color: item.color,
+        size: item.size,
+        quantity: item.quantity
+      }))
     }
-    setSelectedItems(newSelected);
+    setSelectedItems(newSelected)
     dispatch(setSelectedItemsAction(newSelected))
   }
 
-  const handleSelect = (id) => {
-    const newSelected = selectedItems.includes(id)
-      ? selectedItems.filter(i => i !== id)
-      : [...selectedItems, id]
+
+  const handleSelect = (item) => {
+    // Kiểm tra xem item đã có trong selectedItems chưa dựa trên productId + color + size
+    const exists = selectedItems.some(i =>
+      i.productId === item.productId._id &&
+      i.color === item.color &&
+      i.size === item.size
+    )
+
+    let newSelected = []
+    if (exists) {
+      // Bỏ chọn: lọc ra item trùng
+      newSelected = selectedItems.filter(i =>
+        !(i.productId === item.productId._id &&
+          i.color === item.color &&
+          i.size === item.size)
+      )
+    } else {
+      // Thêm item mới (lấy chi tiết cần thiết)
+      newSelected = [
+        ...selectedItems,
+        {
+          productId: item.productId._id,
+          color: item.color,
+          size: item.size,
+          quantity: item.quantity
+        }
+      ]
+    }
 
     setSelectedItems(newSelected)
     dispatch(setSelectedItemsAction(newSelected))
   }
+
 
   const formatPrice = (val) =>
     typeof val === 'number'
@@ -59,13 +90,17 @@ const Cart = () => {
   //   return str.length > maxLength ? str.slice(0, maxLength) + '...' : str
   // }
 
-  const handleQuantityChange = async (productId, currentQty, delta, color, size) => {
+  const handleQuantityChange = async (productId, delta, color, size) => {
     const item = cartItems.find(
-      i => i.productId?._id === productId && i.color === color && i.size === size
+      i =>
+        i.productId._id === productId &&
+        i.color === color &&
+        i.size === size
     )
     if (!item) return
 
-    const maxQty = item?.productId?.quantity || 1
+    const currentQty = item.quantity
+    const maxQty = item.productId?.quantity || 1
     const newQty = Math.max(1, currentQty + delta)
 
     if (newQty > maxQty) {
@@ -79,7 +114,7 @@ const Cart = () => {
       size,
       quantity: newQty
     }
-
+    console.log('Cập nhật giỏ hàng với:', payload)
     const res = await updateItem(payload)
     if (res) {
       setCartItems(prev =>
@@ -91,11 +126,6 @@ const Cart = () => {
       )
     }
   }
-
-
-
-
-
 
   const handleRemove = async (id) => {
     try {
@@ -110,8 +140,13 @@ const Cart = () => {
   }
 
   const selectedCartItems = cartItems.filter(item =>
-    selectedItems.includes(item.productId?._id)
+    selectedItems.some(selected =>
+      selected.productId === item.productId._id &&
+      selected.color === item.color &&
+      selected.size === item.size
+    )
   )
+
 
   const totalPrice = selectedCartItems.reduce(
     (sum, item) => sum + (item.productId?.price || 0) * item.quantity,
@@ -169,8 +204,12 @@ const Cart = () => {
                 <TableRow key={item._id} hover>
                   <TableCell padding='checkbox'>
                     <Checkbox
-                      checked={selectedItems.includes(product._id)}
-                      onChange={() => handleSelect(product._id)}
+                      checked={selectedItems.some(i =>
+                        i.productId === item.productId._id &&
+                        i.color === item.color &&
+                        i.size === item.size
+                      )}
+                      onChange={() => handleSelect(item)}
                       color='primary'
                     />
                   </TableCell>
@@ -219,7 +258,8 @@ const Cart = () => {
                     <Box display='flex' alignItems='center' justifyContent='center'>
                       <IconButton
                         size='small'
-                        onClick={() => handleQuantityChange(product._id, item.quantity, -1, item.color, item.size)}
+                        onClick={() => handleQuantityChange(product._id, -1, item.color, item.size)}
+
                         disabled={item.quantity <= 1}
                         aria-label='Giảm số lượng'
                       >
@@ -233,9 +273,9 @@ const Cart = () => {
                       />
                       <IconButton
                         size='small'
-                        onClick={() =>
-                          handleQuantityChange(product._id, item.quantity, 1, item.color, item.size)
-                        }
+                        onClick={() => handleQuantityChange(product._id, 1, item.color, item.size)}
+
+
                         aria-label='Tăng số lượng'
                         disabled={item.quantity >= product.quantity}
                       >
@@ -246,7 +286,14 @@ const Cart = () => {
                   <TableCell align='center'>
                     <IconButton
                       color='error'
-                      onClick={() => handleRemove(product._id)}
+                      onClick={() =>
+                        handleRemove({
+                          productId: product._id,
+                          color: item.color,
+                          size: item.size,
+                          quantity: item.quantity
+                        })
+                      }
                       aria-label='Xoá sản phẩm'
                     >
                       <Delete />
@@ -278,7 +325,7 @@ const Cart = () => {
             disabled={selectedItems.length === 0}
             onClick={() => {
               dispatch(setSelectedItemsAction(selectedItems))
-              navigate('/payment')
+              navigate('/payment', { state: { selectedItems } })
             }}
             sx={{ minWidth: 120 }}
           >
