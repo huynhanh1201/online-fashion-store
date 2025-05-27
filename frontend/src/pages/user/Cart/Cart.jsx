@@ -93,7 +93,7 @@ const Cart = () => {
   const handleQuantityChange = async (productId, delta, color, size) => {
     const item = cartItems.find(
       i =>
-        i.productId._id === productId &&
+        i.productId._id &&
         i.color === color &&
         i.size === size
     )
@@ -119,25 +119,38 @@ const Cart = () => {
     if (res) {
       setCartItems(prev =>
         prev.map(i =>
-          i.productId._id === productId && i.color === color && i.size === size
+          i.productId.toString() === productId.toString() &&
+            i.color === color &&
+            i.size === size
             ? { ...i, quantity: newQty }
             : i
         )
       )
+
     }
   }
 
-  const handleRemove = async (id) => {
+
+  const handleRemove = async (itemToRemove) => {
     try {
-      const res = await deleteItem(id)
+      const res = await deleteItem(itemToRemove)
       if (res) {
-        setCartItems(prev => prev.filter(item => item.productId?._id !== id))
-        setSelectedItems(prev => prev.filter(i => i !== id))
+        setCartItems(prev => prev.filter(item =>
+          !(item.productId?._id === itemToRemove.productId &&
+            item.color === itemToRemove.color &&
+            item.size === itemToRemove.size)
+        ))
+        setSelectedItems(prev => prev.filter(i =>
+          !(i.productId === itemToRemove.productId &&
+            i.color === itemToRemove.color &&
+            i.size === itemToRemove.size)
+        ))
       }
     } catch (error) {
       console.error('Lỗi xoá sản phẩm:', error)
     }
   }
+
 
   const selectedCartItems = cartItems.filter(item =>
     selectedItems.some(selected =>
