@@ -14,10 +14,10 @@ import { useDispatch } from 'react-redux'
 import { setSelectedItems as setSelectedItemsAction } from '~/redux/cart/cartSlice'
 
 // Hàm cắt chuỗi tên
-const truncate = (str, maxLength) => {
-  if (!str) return ''
-  return str.length > maxLength ? str.slice(0, maxLength) + '...' : str
-}
+// const truncate = (str, maxLength) => {
+//   if (!str) return ''
+//   return str.length > maxLength ? str.slice(0, maxLength) + '...' : str
+// }
 
 // Hàm rút gọn giá nếu > 10 triệu
 const formatPrice = (price) => {
