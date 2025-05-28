@@ -22,8 +22,9 @@ import { sizesRoute } from '~/routes/v1/sizesRoute'
 
 import { warehousesRoute } from '~/routes/v1/warehousesRoute'
 import { variantsRoute } from '~/routes/v1/variantsRoute'
-
 import { inventoriesRoute } from '~/routes/v1/inventoriesRoute'
+import { batchesRoute } from '~/routes/v1/batchesRoute'
+
 import { warehouseSlipsRoute } from '~/routes/v1/warehouseSlipsRoute'
 import { inventoryLogsRoute } from '~/routes/v1/inventoryLogsRoute'
 
@@ -70,6 +71,8 @@ Router.use('/warehouses', warehousesRoute)
 Router.use('/variants', variantsRoute)
 
 Router.use('/inventories', inventoriesRoute)
+
+Router.use('/batches', batchesRoute)
 
 // ================Pending=================
 Router.use('/warehouse-slips', warehouseSlipsRoute)
