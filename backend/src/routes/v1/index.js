@@ -19,7 +19,12 @@ import { colorPalettesRoute } from '~/routes/v1/colorPalettesRoute'
 import { sizePalettesRoute } from '~/routes/v1/sizePalettesRoute'
 import { colorsRoute } from '~/routes/v1/colorsRoute'
 import { sizesRoute } from '~/routes/v1/sizesRoute'
+
+import { warehousesRoute } from '~/routes/v1/warehousesRoute'
+import { variantsRoute } from '~/routes/v1/variantsRoute'
+
 import { inventoriesRoute } from '~/routes/v1/inventoriesRoute'
+import { warehouseSlipsRoute } from '~/routes/v1/warehouseSlipsRoute'
 import { inventoryLogsRoute } from '~/routes/v1/inventoryLogsRoute'
 
 const Router = express.Router()
@@ -60,7 +65,14 @@ Router.use('/colors', colorsRoute)
 
 Router.use('/sizes', sizesRoute)
 
+Router.use('/warehouses', warehousesRoute)
+
+Router.use('/variants', variantsRoute)
+
+// ================Pending=================
 Router.use('/inventories', inventoriesRoute)
+
+Router.use('/warehouse-slips', warehouseSlipsRoute)
 
 Router.use('/inventory-logs', inventoryLogsRoute)
 

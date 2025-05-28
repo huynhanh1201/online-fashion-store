@@ -16,11 +16,6 @@ const productSchema = new Schema(
       trim: true,
       text: true // Tạo text index cho mô tả :contentReference[oaicite:1]{index=1}
     },
-    price: {
-      type: Number,
-      required: true,
-      min: 0 // Giá không thể âm :contentReference[oaicite:2]{index=2}
-    },
     quantity: {
       type: Number,
       required: true,
@@ -58,6 +53,14 @@ const productSchema = new Schema(
       type: Number,
       required: true,
       min: 0 // Giá không thể âm :contentReference[oaicite:2]{index=2}
+    },
+    productCode: {
+      type: String,
+      required: true,
+      unique: true,
+      uppercase: true,
+      trim: true
+      // Ví dụ: AT01 – Mã định danh duy nhất của sản phẩm
     }
   },
   {

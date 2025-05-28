@@ -15,6 +15,12 @@ Router.route('/').post(
 // Danh sách Sản phẩm
 Router.route('/').get(productsController.getProductList)
 
+// Lấy các biến thể của một sản phẩm
+Router.route('/:productId/variants').get(
+  productsValidation.verifyId,
+  productsController.getVariantOfProduct
+)
+
 // Lấy thông tin một Sản phẩm.
 Router.route('/:productId').get(
   productsValidation.verifyId,

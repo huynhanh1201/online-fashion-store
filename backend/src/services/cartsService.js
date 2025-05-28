@@ -78,12 +78,16 @@ const updateItemCart = async (userId, reqBody) => {
     const itemCart = await CartModel.findOneAndUpdate(
       {
         userId,
-        'cartItems.productId': reqBody.productId,
-        'cartItems.color': reqBody.color,
-        'cartItems.size': reqBody.size
+        cartItems: {
+          $elemMatch: {
+            productId: reqBody.productId,
+            color: reqBody.color,
+            size: reqBody.size
+          }
+        }
       },
       {
-        $set: {
+        $inc: {
           'cartItems.$.quantity': reqBody.quantity
         }
       },
@@ -102,16 +106,24 @@ const updateItemCart = async (userId, reqBody) => {
   }
 }
 
-const deleteItemCart = async (userId, productId) => {
+const deleteItemCart = async (userId, reqBody) => {
   // eslint-disable-next-line no-useless-catch
   try {
     const updatedCart = await CartModel.findOneAndUpdate(
       {
         userId,
-        'cartItems.productId': productId
+        'cartItems.productId': reqBody.productId,
+        'cartItems.color': reqBody.color,
+        'cartItems.size': reqBody.size
       },
       {
-        $pull: { cartItems: { productId } }
+        $pull: {
+          cartItems: {
+            productId: reqBody.productId,
+            color: reqBody.color,
+            size: reqBody.size
+          }
+        }
       },
       { new: true }
     )

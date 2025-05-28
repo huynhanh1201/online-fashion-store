@@ -17,7 +17,7 @@ const product = async (req, res, next) => {
   // Xác thực dữ liệu đầu vào correctCondition: điều kiện đúng
   const correctCondition = Joi.object({
     name: Joi.string() // name bắt buộc, chuỗi
-      .min(3) // tối thiểu 3 ký tự
+      .min(1) // tối thiểu 3 ký tự
       .max(100) // tối đa 100 ký tự
       .trim() // loại bỏ khoảng trắng đầu/cuối
       .required(), // bắt buộc :contentReference[oaicite:0]{index=0}
@@ -26,10 +26,6 @@ const product = async (req, res, next) => {
       .max(1000) // giới hạn độ dài nếu cần
       .trim()
       .allow('', null), // cho phép bỏ trống hoặc null :contentReference[oaicite:1]{index=1}
-
-    price: Joi.number() // price bắt buộc, số
-      .min(0) // không âm :contentReference[oaicite:2]{index=2}
-      .required(),
 
     image: Joi.array() // image là mảng
       .items(
@@ -46,36 +42,9 @@ const product = async (req, res, next) => {
       .min(0) // không âm :contentReference[oaicite:2]{index=2}
       .required(),
 
-    colors: Joi.array()
-      .items(
-        Joi.object({
-          name: Joi.string().trim().required().min(1).max(100),
-
-          image: Joi.string()
-            .trim()
-            .required()
-            .uri({ scheme: [/https?/] })
-        })
-      )
-      .min(1),
-
-    sizes: Joi.array()
-      .items(
-        Joi.object({
-          name: Joi.string().trim().required().min(1).max(100)
-        })
-      )
-      .min(1),
-
-    stockMatrix: Joi.array()
-      .items(
-        Joi.object({
-          color: Joi.string().trim().required().min(1).max(100),
-          size: Joi.string().trim().required().min(1).max(100),
-          quantity: Joi.number().integer().min(0).required()
-        })
-      )
-      .min(1)
+    exportPrice: Joi.number() // price bắt buộc, số
+      .min(0) // không âm :contentReference[oaicite:2]{index=2}
+      .required()
   })
 
   try {
