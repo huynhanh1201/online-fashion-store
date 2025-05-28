@@ -23,7 +23,7 @@ const TransactionTable = ({
   onDelete
 }) => {
   return (
-    <table component={Paper}>
+    <StyledTableContainer component={Paper}>
       <TableHead>
         <StyledTableRow>
           <StyledTableCell sx={StyleAdmin.TableColumnSTT}>STT</StyledTableCell>
@@ -70,7 +70,7 @@ const TransactionTable = ({
           </StyledTableRow>
         )}
       </TableBody>
-    </table>
+    </StyledTableContainer>
   )
 }
 

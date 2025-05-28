@@ -57,6 +57,7 @@ const AddProductModal = ({ open, onClose, onSuccess }) => {
     reset
   } = useForm({
     defaultValues: {
+      // StockId: '',
       name: '',
       description: '',
       categoryId: '',
@@ -241,6 +242,7 @@ const AddProductModal = ({ open, onClose, onSuccess }) => {
       }
 
       const finalProduct = {
+        // StockId: data.StockId,
         name: data.name,
         description: data.description,
         price: Number(data.price),
@@ -302,13 +304,32 @@ const AddProductModal = ({ open, onClose, onSuccess }) => {
             onClick={handleSubmit(onSubmit)}
             variant='contained'
             sx={{ color: '#fff', backgroundColor: '#001f5d' }}
+            disabled={loading}
           >
-            Thêm sản phẩm
+            {loading ? 'Đang thêm...' : 'Thêm sản phẩm'}
           </Button>
         </DialogActions>
       </Box>
       <DialogContent>
         <Grid container spacing={2}>
+          {/*Mã kho*/}
+          <Grid item size={12}>
+            <TextField label='Mã kho hàng' fullWidth />
+            {/*<Controller*/}
+            {/*  name='StockId'*/}
+            {/*  control={control}*/}
+            {/*  rules={{ required: 'Mã kho hàng không được bỏ trống' }}*/}
+            {/*  render={({ field }) => (*/}
+            {/*    <TextField*/}
+            {/*      label='Mã kho hàng'*/}
+            {/*      fullWidth*/}
+            {/*      error={!!errors.StockId}*/}
+            {/*      helperText={errors.StockId?.message}*/}
+            {/*      {...field}*/}
+            {/*    />*/}
+            {/*  )}*/}
+            {/*/>*/}
+          </Grid>
           {/*Tên*/}
           <Grid item size={12}>
             <Controller
@@ -596,9 +617,6 @@ const AddProductModal = ({ open, onClose, onSuccess }) => {
                         label='Màu'
                         onChange={(e) => setSelectedColor(e.target.value)}
                       >
-                        <MenuItem value=''>
-                          <em>Chọn màu</em>
-                        </MenuItem>
                         {colors.map((color, idx) => (
                           <MenuItem key={idx} value={color.name}>
                             {color.name}
@@ -606,7 +624,10 @@ const AddProductModal = ({ open, onClose, onSuccess }) => {
                         ))}
                         <MenuItem
                           value='add_new'
-                          onClick={() => setAddColorModalOpen(true)}
+                          onClick={() => {
+                            setSelectedColor('')
+                            setAddColorModalOpen(true)
+                          }}
                         >
                           Thêm màu mới
                         </MenuItem>
@@ -624,15 +645,17 @@ const AddProductModal = ({ open, onClose, onSuccess }) => {
                     onChange={(e) => setSelectedSize(e.target.value)}
                     renderValue={(selected) => selected || 'Chọn kích thước'}
                   >
-                    <MenuItem value=''>
-                      <em>Chọn kích thước</em>
-                    </MenuItem>
                     {sizes.map((size, idx) => (
                       <MenuItem key={idx} value={size.name}>
                         {size.name}
                       </MenuItem>
                     ))}
-                    <MenuItem onClick={() => setSizeModalOpen(true)}>
+                    <MenuItem
+                      onClick={() => {
+                        setSelectedSize('')
+                        setSizeModalOpen(true)
+                      }}
+                    >
                       Thêm kích thước mới
                     </MenuItem>
                   </Select>
@@ -747,6 +770,7 @@ const AddProductModal = ({ open, onClose, onSuccess }) => {
       <AddColorModal
         open={isAddColorModalOpen}
         onClose={() => {
+          setSelectedColor('')
           setAddColorModalOpen(false)
           fetchColors() // cập nhật danh sách
         }}

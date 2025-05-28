@@ -15,7 +15,7 @@ import {
   Box
 } from '@mui/material'
 import { useForm, Controller } from 'react-hook-form'
-import { createInventory } from '~/services/admin/inventoryService.js'
+import { createInventory } from '~/services/admin/Inventory/inventoryService.js'
 
 const URI = 'https://api.cloudinary.com/v1_1/dkwsy9sph/image/upload'
 const CloudinaryColor = 'color_upload'

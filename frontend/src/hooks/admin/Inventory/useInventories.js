@@ -6,7 +6,7 @@ import {
   createInventory,
   importInventory,
   exportInventory
-} from '~/services/admin/inventoryService'
+} from '~/services/admin/Inventory/inventoryService'
 
 const useInventories = (pageInventory = 1, limit = 10) => {
   const [inventories, setInventories] = useState([]) // Danh sách các biến thể kho

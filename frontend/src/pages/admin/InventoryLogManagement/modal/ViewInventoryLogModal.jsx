@@ -6,7 +6,7 @@ import {
   Typography,
   CircularProgress
 } from '@mui/material'
-import { getInventoryLogDetail } from '~/services/admin/inventoryService'
+import { getInventoryLogDetail } from '~/services/admin/Inventory/inventoryService'
 
 const ViewInventoryLogModal = ({ open, onClose, logId }) => {
   const [log, setLog] = useState(null)
