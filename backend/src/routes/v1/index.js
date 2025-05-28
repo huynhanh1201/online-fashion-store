@@ -69,9 +69,9 @@ Router.use('/warehouses', warehousesRoute)
 
 Router.use('/variants', variantsRoute)
 
-// ================Pending=================
 Router.use('/inventories', inventoriesRoute)
 
+// ================Pending=================
 Router.use('/warehouse-slips', warehouseSlipsRoute)
 
 Router.use('/inventory-logs', inventoryLogsRoute)
