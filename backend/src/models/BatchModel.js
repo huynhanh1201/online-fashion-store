@@ -23,10 +23,12 @@ const batchSchema = new Schema(
     },
     manufactureDate: {
       type: Date,
-      required: true
+      allow: null,
+      default: null
     },
     expiry: {
       type: Date,
+      allow: null,
       default: null
     },
     quantity: {
@@ -42,6 +44,11 @@ const batchSchema = new Schema(
     destroy: {
       type: Boolean,
       default: false
+    },
+    importedAt: {
+      type: Date,
+      required: true,
+      default: Date.now // Mặc định lấy ngày hiện tại khi tạo
     }
   },
   {

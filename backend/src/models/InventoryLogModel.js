@@ -5,40 +5,14 @@ const { Schema, model } = mongoose
 const inventoryLogSchema = new Schema(
   {
     inventoryId: {
-      type: mongoose.Schema.Types.ObjectId,
+      type: Schema.Types.ObjectId,
       ref: 'Inventory',
       required: true
     },
-    productId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'Product',
-      required: true
-    },
-    variant: {
-      sku: {
-        type: String,
-        required: true,
-        trim: true
-      },
-      color: {
-        name: {
-          type: String,
-          required: true,
-          trim: true
-        },
-        image: {
-          type: String,
-          required: false,
-          trim: true
-        }
-      },
-      size: {
-        name: {
-          type: String,
-          required: true,
-          trim: true
-        }
-      }
+    batchId: {
+      type: Schema.Types.ObjectId,
+      ref: 'Batch',
+      default: null // Nếu không có batch thì có thể để null
     },
     type: {
       type: String,
@@ -47,27 +21,46 @@ const inventoryLogSchema = new Schema(
     },
     source: {
       type: String,
-      default: 'manual',
-      trim: true
+      required: true // Đảm bảo log có nguồn gốc rõ ràng
     },
     amount: {
       type: Number,
       required: true
     },
     importPrice: {
-      type: Number
+      type: Number,
+      default: 0 // Có thể null nhưng mặc định là 0 để dễ tính toán
     },
     exportPrice: {
-      type: Number
+      type: Number,
+      default: 0
     },
     note: {
       type: String,
-      trim: true
+      default: ''
     },
-    userId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'User',
-      required: true
+    createdBy: {
+      _id: {
+        type: Schema.Types.ObjectId,
+        ref: 'User',
+        required: true
+      },
+      name: {
+        type: String,
+        required: true
+      },
+      role: {
+        type: String,
+        required: true
+      },
+      email: {
+        type: String,
+        required: true
+      }
+    },
+    createdAt: {
+      type: Date,
+      default: Date.now
     }
   },
   {

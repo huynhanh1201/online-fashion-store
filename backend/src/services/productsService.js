@@ -4,39 +4,45 @@ import { StatusCodes } from 'http-status-codes'
 import { ProductModel } from '~/models/ProductModel'
 import ApiError from '~/utils/ApiError'
 import { slugify } from '~/utils/formatters'
-import { ColorPaletteModel } from '~/models/ColorPaletteModel'
-import { SizePaletteModel } from '~/models/SizePaletteModel'
-import { InventoryModel } from '~/models/InventoryModel'
-import generateSKU from '~/utils/generateSKU'
-import { generateCode } from '~/utils/generateCode'
+import generateSequentialCode from '~/utils/generateSequentialCode'
 import { VariantModel } from '~/models/VariantModel'
 
 const createProduct = async (reqBody) => {
   // eslint-disable-next-line no-useless-catch
   try {
     // Tạo lấy ký tự để tạo Prefix cho productCode
-    const prefix = generateCode.generateGetPrefix(reqBody.name)
-
-    // Query mã lớn nhất đã có với prefix đó
-    //    - regex /^AV\d{2,}$/ để match AV10, AV09, AV123...
-    const regex = new RegExp(`^${prefix}(\\d+)$`)
-    const latest = await ProductModel.findOne({
-      productCode: { $regex: regex }
-    })
-      .sort({ productCode: -1 }) // sort giảm dần, AV10 > AV09
-      .lean()
-
-    // Tính số thứ tự tiếp theo
-    let nextNumber = 1
-    if (latest) {
-      const match = latest.productCode.match(regex)
-      if (match && match[1]) {
-        nextNumber = parseInt(match[1], 10) + 1 // ví dụ AV10 → match[1] = "10" → +1 = 11
-      }
-    }
+    const prefix =
+      slugify(reqBody.name, { lower: true }) // bỏ dấu, gạch ngang
+        .trim()
+        .split('-')
+        .map((item) => item.charAt(0).toUpperCase())
+        .join('') + '-'
 
     // Tạo productCode
-    const productCode = generateCode.generate(prefix, nextNumber)
+    const productCodeValue = await generateSequentialCode(
+      prefix,
+      4,
+      async (prefix) => {
+        // Query mã lớn nhất đã có với prefix đó
+        const regex = new RegExp(`^${prefix}(\\d+)$`)
+        const latest = await ProductModel.findOne({
+          productCode: { $regex: regex }
+        })
+          .sort({ productCode: -1 }) // sort giảm dần, AV10 > AV09
+          .lean()
+
+        // Tính số thứ tự tiếp theo
+        let nextNumber = 1
+        if (latest) {
+          const match = latest.productCode.match(regex)
+          if (match && match[1]) {
+            nextNumber = parseInt(match[1], 10) + 1 // ví dụ AV10 → match[1] = "10" → +1 = 11
+          }
+        }
+
+        return nextNumber
+      }
+    )
 
     const newProduct = {
       name: reqBody.name,
@@ -46,7 +52,7 @@ const createProduct = async (reqBody) => {
       importPrice: reqBody.importPrice,
       exportPrice: reqBody.exportPrice,
 
-      productCode: productCode,
+      productCode: productCodeValue,
       slug: slugify(reqBody.name),
       quantity: 0,
       destroy: false
@@ -112,7 +118,7 @@ const getProductList = async (reqQuery) => {
       }
     }
 
-    return result || []
+    return result
   } catch (err) {
     throw err
   }

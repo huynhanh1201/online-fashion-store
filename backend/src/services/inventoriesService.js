@@ -1,5 +1,9 @@
 import { InventoryModel } from '~/models/InventoryModel'
 
+const handleCreateInventory = async () => {
+  return 'Empty'
+}
+
 const getInventoryList = async () => {
   const result = await InventoryModel.find({ destroy: false }).lean()
 
@@ -56,5 +60,6 @@ export const inventoriesService = {
   getInventoryList,
   getInventory,
   updateInventory,
-  deleteInventory
+  deleteInventory,
+  handleCreateInventory
 }

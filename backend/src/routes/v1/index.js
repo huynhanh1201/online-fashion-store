@@ -74,9 +74,8 @@ Router.use('/inventories', inventoriesRoute)
 
 Router.use('/batches', batchesRoute)
 
-// ================Pending=================
 Router.use('/warehouse-slips', warehouseSlipsRoute)
-
+// ================Pending=================
 Router.use('/inventory-logs', inventoryLogsRoute)
 
 export const APIs_V1 = Router

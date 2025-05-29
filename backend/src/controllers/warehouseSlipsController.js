@@ -4,7 +4,12 @@ import { warehouseSlipsService } from '~/services/warehouseSlipsService'
 
 const createWarehouseSlip = async (req, res, next) => {
   try {
-    const result = await warehouseSlipsService.createWarehouseSlip(req.body)
+    const jwtDecoded = req.jwtDecoded
+
+    const result = await warehouseSlipsService.createWarehouseSlip(
+      req.body,
+      jwtDecoded
+    )
 
     // Có kết quả thì trả về Client
     res.status(StatusCodes.CREATED).json(result)
@@ -65,46 +70,10 @@ const deleteWarehouseSlip = async (req, res, next) => {
   }
 }
 
-const importStockWarehouseSlip = async (req, res, next) => {
-  try {
-    const userId = req.jwtDecoded._id
-    const warehouseSlipId = req.params.warehouseSlipId
-
-    const result = await warehouseSlipsService.importStockWarehouseSlip(
-      warehouseSlipId,
-      req.body,
-      userId
-    )
-
-    res.status(StatusCodes.OK).json(result)
-  } catch (err) {
-    next(err)
-  }
-}
-
-const exportStockWarehouseSlip = async (req, res, next) => {
-  try {
-    const userId = req.jwtDecoded._id
-    const warehouseSlipId = req.params.warehouseSlipId
-
-    const result = await warehouseSlipsService.exportStockWarehouseSlip(
-      warehouseSlipId,
-      req.body,
-      userId
-    )
-
-    res.status(StatusCodes.OK).json(result)
-  } catch (err) {
-    next(err)
-  }
-}
-
 export const warehouseSlipsController = {
   createWarehouseSlip,
   getWarehouseSlipList,
   getWarehouseSlip,
   updateWarehouseSlip,
-  deleteWarehouseSlip,
-  importStockWarehouseSlip,
-  exportStockWarehouseSlip
+  deleteWarehouseSlip
 }
