@@ -115,7 +115,7 @@ const AddProductModal = ({ open, onClose, onSuccess }) => {
   }, [colors, sizes])
 
   // Xử lý chọn file ảnh sản phẩm và preview
-  const handleProductImageFileChange = (e) => {
+  const handleProductImageFileChange = async (e) => {
     const files = Array.from(e.target.files || [])
     const remainingSlots = 9 - productImages.length
 
@@ -123,9 +123,20 @@ const AddProductModal = ({ open, onClose, onSuccess }) => {
       alert(`Bạn chỉ có thể thêm tối đa ${remainingSlots} ảnh nữa.`)
       return
     }
+    try {
+      const uploadedUrls = await Promise.all(
+        files.map((file) => uploadToCloudinary(file, CloudinaryProduct))
+      )
 
-    const imageURLs = files.map((file) => URL.createObjectURL(file))
-    setProductImages((prev) => [...prev, ...imageURLs])
+      // Cập nhật state với URL thật từ Cloudinary
+      setProductImages((prev) => [...prev, ...uploadedUrls])
+    } catch (error) {
+      alert('Có lỗi khi upload ảnh. Vui lòng thử lại.')
+      // eslint-disable-next-line no-console
+      console.error(error)
+    }
+    // const imageURLs = files.map((file) => URL.createObjectURL(file))
+    // setProductImages((prev) => [...prev, ...imageURLs])
 
     // Reset input
     if (productImageInputRef.current) {

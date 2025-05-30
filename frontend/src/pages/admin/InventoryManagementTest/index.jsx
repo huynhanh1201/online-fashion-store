@@ -14,7 +14,7 @@ import {
   FilterList as FilterListIcon,
   FileDownload as FileDownloadIcon
 } from '@mui/icons-material'
-import InventoryTable from './InventoryTable'
+import InventoryTable from './InventoryTableApi'
 import InventoryPagination from './InventoryPagination'
 import useInventories from '~/hooks/admin/Inventory/useInventories'
 import InventoryStatusCards from '~/components/dashboard/InventoryStatusCards.jsx'
@@ -35,7 +35,7 @@ const AdjustInventoryModal = React.lazy(
 )
 
 const InventoryDashboard = () => {
-  const [page, setPage] = useState(1)
+  const [page] = useState(1)
   const [searchTerm, setSearchTerm] = useState('')
   const [filterStatus, setFilterStatus] = useState('all')
   const [selectedInventory, setSelectedInventory] = useState(null)
@@ -113,25 +113,8 @@ const InventoryDashboard = () => {
     fetchInventories(page)
   }
 
-  const handleChangePage = (event, value) => {
-    setPage(value)
-  }
-
   const handleExportExcel = async () => {
     await handleExport()
-  }
-
-  // Tính tổng số lượng theo trạng thái
-  const inventoryData = {
-    inStock: inventories
-      ? inventories.filter((item) => item.status === 'in-stock').length
-      : 0,
-    lowStock: inventories
-      ? inventories.filter((item) => item.status === 'low-stock').length
-      : 0,
-    outOfStock: inventories
-      ? inventories.filter((item) => item.status === 'out-of-stock').length
-      : 0
   }
 
   // Lọc dữ liệu với kiểm tra undefined
@@ -166,7 +149,7 @@ const InventoryDashboard = () => {
       >
         <Box display='flex' alignItems='center' gap={1}>
           <Typography variant='h4' fontWeight='bold' color='primary'>
-            📦 Quản lý Kho hàng 1
+            📦 Quản lý Kho hàng 2
           </Typography>
         </Box>
         <Box display='flex' alignItems='center' gap={1}>
