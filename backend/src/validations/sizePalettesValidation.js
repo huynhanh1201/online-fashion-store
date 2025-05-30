@@ -16,9 +16,7 @@ const verifyId = (req, res, next) => {
 const sizePalette = async (req, res, next) => {
   // Xác thực dữ liệu đầu vào correctCondition: điều kiện đúng
   const correctCondition = Joi.object({
-    name: Joi.string().trim().required().min(1).max(100),
-
-    image: Joi.string().trim().required()
+    name: Joi.string().trim().required().min(1).max(100)
   })
 
   try {
