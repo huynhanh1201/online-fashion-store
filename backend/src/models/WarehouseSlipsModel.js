@@ -8,10 +8,11 @@ const warehouseSlipSchema = new Schema(
     type: { type: String, required: true, enum: ['import', 'export'] },
     date: { type: Date, required: true },
 
-    partner: {
-      code: { type: String, required: true, trim: true },
-      name: { type: String, required: true, trim: true },
-      contact: { type: String, required: true, trim: true }
+    partnerId: {
+      type: Types.ObjectId,
+      ref: 'Partner',
+      required: true,
+      index: true
     },
 
     warehouseId: {

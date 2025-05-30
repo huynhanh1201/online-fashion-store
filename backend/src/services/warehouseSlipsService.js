@@ -126,7 +126,7 @@ const importStockWarehouseSlip = async (reqBody, jwtDecoded, session) => {
     const warehouseSlipInfo = {
       type: reqBody.type,
       date: reqBody.date,
-      partner: reqBody.partner,
+      partnerId: reqBody.partnerId,
       warehouseId: reqBody.warehouseId,
       items: reqBody.items,
       note: reqBody.note,
@@ -362,7 +362,7 @@ const exportStockWarehouseSlip = async (reqBody, jwtDecoded, session) => {
     const warehouseSlipInfo = {
       type: reqBody.type,
       date: reqBody.date,
-      partner: reqBody.partner,
+      partnerId: reqBody.partnerId,
       warehouseId: reqBody.warehouseId,
       items: reqBody.items,
       note: reqBody.note,

@@ -20,11 +20,7 @@ const warehouseSlip = async (req, res, next) => {
 
     date: Joi.date().iso().required(),
 
-    partner: Joi.object({
-      code: Joi.string().trim().required(),
-      name: Joi.string().trim().required(),
-      contact: Joi.string().trim().required()
-    }).required(),
+    partnerId: Joi.string().length(24).hex().required(),
 
     warehouseId: Joi.string().length(24).hex().required(),
 
