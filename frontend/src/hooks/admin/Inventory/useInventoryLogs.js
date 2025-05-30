@@ -1,7 +1,8 @@
 import { useState } from 'react'
 import {
   getInventoryLogs,
-  getInventoryLogDetail
+  getInventoryLogDetail,
+  createInventory
 } from '~/services/admin/Inventory/inventoryService'
 
 const useInventoryLogs = (page = 1, limit = 10) => {
@@ -24,13 +25,20 @@ const useInventoryLogs = (page = 1, limit = 10) => {
     return detail
   }
 
+  const createNewLog = async (data) => {
+    const result = await createInventory(data)
+    if (result) await fetchLogs()
+    return result
+  }
+
   return {
     logs,
     totalPages,
     loading,
     fetchLogs,
     fetchLogDetail,
-    logDetail
+    logDetail,
+    createNewLog
   }
 }
 

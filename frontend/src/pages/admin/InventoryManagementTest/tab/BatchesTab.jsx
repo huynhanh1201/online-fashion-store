@@ -21,9 +21,11 @@ const BatchesTab = ({
   onPageChange,
   onRowsPerPageChange
 }) => {
-  const enrichedBatches = data.map((batch) => {
-    const slip = warehouseSlips.find((s) => s.id === batch.warehouseSlipId)
-    const variant = variants.find((v) => v.id === batch.variantId)
+  const enrichedBatches = (data || []).map((batch) => {
+    const slip = (warehouseSlips || []).find(
+      (s) => s.id === batch.warehouseSlipId
+    )
+    const variant = (variants || []).find((v) => v.id === batch.variantId)
     return {
       ...batch,
       slipCode: slip ? slip.code : 'N/A',

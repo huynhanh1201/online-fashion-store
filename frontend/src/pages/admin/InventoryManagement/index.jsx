@@ -16,7 +16,7 @@ import {
 } from '@mui/icons-material'
 import InventoryTable from './InventoryTable'
 import InventoryPagination from './InventoryPagination'
-import useInventories from '~/hooks/admin/Inventory/useInventories'
+import useInventorys from '~/hooks/admin/Inventory/useInventorys.js'
 import InventoryStatusCards from '~/components/dashboard/InventoryStatusCards.jsx'
 
 // Lazy load các modal
@@ -54,7 +54,7 @@ const InventoryDashboard = () => {
     createNewInventory,
     handleExport,
     handleImport
-  } = useInventories(page)
+  } = useInventorys(page)
 
   useEffect(() => {
     fetchInventories(page)

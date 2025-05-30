@@ -46,11 +46,6 @@ export default function AddWarehouseSlipModal({
   warehouseSlips,
   type = 'input' // Default to 'input' if not provided
 }) {
-  console.log(
-    'Current date and time:',
-    new Date().toLocaleString('en-US', { timeZone: 'Asia/Ho_Chi_Minh' })
-  ) // Wednesday, May 28, 2025, 06:56 PM +07
-
   const [isEditing, setIsEditing] = useState(false) // State to toggle edit mode
 
   // Safeguard against undefined newSlipData

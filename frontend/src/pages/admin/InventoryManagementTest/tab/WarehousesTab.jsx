@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import {
   Paper,
   Table,
@@ -8,16 +8,20 @@ import {
   TableRow,
   TableCell,
   TablePagination,
-  Typography
+  Typography,
+  Box,
+  Button
 } from '@mui/material'
 import VisibilityIcon from '@mui/icons-material/Visibility'
-
+import AddWarehouseModal from '../modal/Warehouse/AddWarehouseModal.jsx'
 const WarehousesTab = ({
   data,
   page,
   rowsPerPage,
   onPageChange,
-  onRowsPerPageChange
+  onRowsPerPageChange,
+  addWarehouse,
+  refreshWarehouses
 }) => {
   const warehouseColumns = [
     { id: 'code', label: 'Mã kho', minWidth: 100 },
@@ -28,7 +32,14 @@ const WarehousesTab = ({
     { id: 'city', label: 'Thành phố', minWidth: 100 },
     { id: 'action', label: 'Hành động', minWidth: 100, align: 'center' }
   ]
-
+  const [openAddModal, setOpenAddModal] = useState(false)
+  const handleAddWarehouse = () => {
+    setOpenAddModal(true)
+  }
+  const handleCloseAddModal = () => {
+    setOpenAddModal(false)
+    refreshWarehouses()
+  }
   return (
     <Paper sx={{ border: '1px solid #ccc', width: '100%', overflow: 'hidden' }}>
       <TableContainer sx={{ maxHeight: 440 }}>
@@ -36,9 +47,25 @@ const WarehousesTab = ({
           <TableHead>
             <TableRow>
               <TableCell colSpan={warehouseColumns.length}>
-                <Typography variant='h6' sx={{ fontWeight: '800' }}>
-                  Danh sách kho hàng
-                </Typography>
+                <Box
+                  sx={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center'
+                  }}
+                >
+                  <Typography variant='h6' sx={{ fontWeight: '800' }}>
+                    Danh sách kho hàng
+                  </Typography>
+                  <Button
+                    variant='contained'
+                    color='primary'
+                    sx={{ mr: 1 }}
+                    onClick={() => handleAddWarehouse()}
+                  >
+                    Thêm kho hàng
+                  </Button>
+                </Box>
               </TableCell>
             </TableRow>
             <TableRow>
@@ -88,6 +115,11 @@ const WarehousesTab = ({
         page={page}
         onPageChange={onPageChange}
         onRowsPerPageChange={onRowsPerPageChange}
+      />
+      <AddWarehouseModal
+        open={openAddModal}
+        onClose={handleCloseAddModal}
+        onSave={addWarehouse}
       />
     </Paper>
   )

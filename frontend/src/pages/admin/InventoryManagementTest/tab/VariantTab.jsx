@@ -20,8 +20,8 @@ const VariantsTab = ({
   onPageChange,
   onRowsPerPageChange
 }) => {
-  const enrichedVariants = data.map((variant) => {
-    const product = products.find((p) => p.id === variant.productId)
+  const enrichedVariants = (data || []).map((variant) => {
+    const product = (products || []).find((p) => p.id === variant.productId)
     return {
       ...variant,
       productName: product ? product.name : 'N/A'
