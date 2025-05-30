@@ -1,63 +1,49 @@
 import mongoose from 'mongoose'
-const { Schema, model } = mongoose
+const { Schema, model, Types } = mongoose
 
 // Tạo schema cho Danh mục sản phẩm
 const warehouseSlipSchema = new Schema(
   {
-    productId: {
-      type: mongoose.Types.ObjectId,
-      ref: 'Product',
-      required: true
-    },
-    variant: {
-      color: {
-        name: {
-          type: String,
-          required: true,
-          trim: true
-        },
-        image: String
-      },
-      size: {
-        name: {
-          type: String,
-          required: true,
-          trim: true
-        }
-      },
-      sku: {
-        type: String,
-        required: true,
-        unique: true,
-        trim: true
-      }
-    },
-    quantity: {
-      type: Number,
+    slipId: { type: String, required: true, unique: true, trim: true },
+    type: { type: String, required: true, enum: ['import', 'export'] },
+    date: { type: Date, required: true },
+
+    partnerId: {
+      type: Types.ObjectId,
+      ref: 'Partner',
       required: true,
-      default: 0
+      index: true
     },
-    importPrice: {
-      type: Number,
-      required: true
+
+    warehouseId: {
+      type: Types.ObjectId,
+      ref: 'Warehouse',
+      required: true,
+      index: true
     },
-    exportPrice: {
-      type: Number,
-      required: true
+
+    items: [
+      {
+        variantId: {
+          type: Types.ObjectId,
+          ref: 'Variant',
+          required: true,
+          index: true
+        },
+        batchCode: { type: String, trim: true, default: null },
+        quantity: { type: Number, required: true, min: 0 },
+        unit: { type: String, required: true, trim: true }
+      }
+    ],
+
+    createdBy: {
+      _id: { type: mongoose.Types.ObjectId, required: true },
+      name: { type: String, required: true },
+      role: { type: String, required: true },
+      email: { type: String, required: true }
     },
-    minQuantity: {
-      type: Number,
-      default: 0
-    },
-    status: {
-      type: String,
-      enum: ['in-stock', 'out-of-stock', 'discontinued'],
-      default: 'in-stock'
-    },
-    destroy: {
-      type: Boolean,
-      default: false
-    }
+    note: { type: String, trim: true, default: '' },
+    destroy: { type: Boolean, default: false }
   },
   {
     // Tự động thêm createdAt & updatedAt

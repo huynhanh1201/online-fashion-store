@@ -5,26 +5,25 @@ import ApiError from '~/utils/ApiError'
 import validObjectId from '~/utils/validObjectId'
 
 const verifyId = (req, res, next) => {
-  const inventoryId = req.params.inventoryId
+  const batchId = req.params.batchId
 
   // Kiểm tra format ObjectId
-  validObjectId(inventoryId, next)
+  validObjectId(batchId, next)
 
   next()
 }
 
-const inventory = async (req, res, next) => {
+const batch = async (req, res, next) => {
   // Xác thực dữ liệu đầu vào correctCondition: điều kiện đúng
   const correctCondition = Joi.object({
-    minQuantity: Joi.number().integer().min(0).required(),
+    manufactureDate: Joi.date().required(),
 
-    importPrice: Joi.number().min(0).required(),
+    expiry: Joi.date()
+      .min(Joi.ref('manufactureDate'))
+      .allow(null)
+      .default(null),
 
-    exportPrice: Joi.number().min(0).required(),
-
-    status: Joi.string()
-      .valid('in-stock', 'low-stock', 'out-of-stock')
-      .required()
+    importPrice: Joi.number().min(0).required()
   })
 
   try {
@@ -43,7 +42,7 @@ const inventory = async (req, res, next) => {
   }
 }
 
-export const inventoriesValidation = {
+export const batchesValidation = {
   verifyId,
-  inventory
+  batch
 }

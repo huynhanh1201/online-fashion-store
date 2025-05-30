@@ -134,7 +134,9 @@ const login = async (reqBody) => {
     //  Tạo thông tin để dính kèm trong JWT Token bao gồm _id và email của user
     const userInfo = {
       _id: existsUser._id,
-      email: existsUser.email
+      email: existsUser.email,
+      name: existsUser.name,
+      role: existsUser.role
     }
 
     //   Tạo ra 2 loại token: accessToken và refreshToken trả về cho phía FE
@@ -169,7 +171,9 @@ const refreshToken = async (clientRefreshToken) => {
     //   Đoạn này vì chúng ta chỉ lưu những thông tin unique và cố định của user trong token rồi, vì vậy có thể lấy luôn từ decoded ra, tiết kiệm query vào DB để lấy data mới.
     const userInfo = {
       _id: refreshTokenDecoded._id,
-      email: refreshTokenDecoded.email
+      email: refreshTokenDecoded.email,
+      name: refreshTokenDecoded.name,
+      role: refreshTokenDecoded.role
     }
 
     //   Tạo accessToken mới
