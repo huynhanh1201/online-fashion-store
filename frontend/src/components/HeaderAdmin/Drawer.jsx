@@ -145,6 +145,7 @@ import ReceiptLongIcon from '@mui/icons-material/ReceiptLong'
 import LocalOfferIcon from '@mui/icons-material/LocalOffer'
 import PaymentIcon from '@mui/icons-material/Payment'
 import PaletteIcon from '@mui/icons-material/Palette'
+import StraightenIcon from '@mui/icons-material/Straighten'
 import WarehouseIcon from '@mui/icons-material/Warehouse'
 import HistoryIcon from '@mui/icons-material/History'
 const tab = [
@@ -183,6 +184,11 @@ const tab = [
     name: 'Quản lý màu sản phẩm',
     path: '/admin/color-management',
     icon: <PaletteIcon />
+  },
+  {
+    name: 'Quản lý kích cỡ',
+    path: '/admin/size-management',
+    icon: <StraightenIcon />
   },
   {
     name: 'Quản lý kho',

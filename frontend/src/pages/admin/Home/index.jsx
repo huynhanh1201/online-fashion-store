@@ -2,7 +2,6 @@ import { Grid, Typography, Box } from '@mui/material'
 import CustomerCard from '~/components/dashboard/CustomerCard'
 import OrderCard from '~/components/dashboard/OrderCard'
 import ProductCard from '~/components/dashboard/ProductCard'
-
 export default function AdminHome() {
   // Dữ liệu giả lập
   const newCustomers = 5

@@ -1,10 +1,7 @@
 import React from 'react'
-import Table from '@mui/material/Table'
 import TableHead from '@mui/material/TableHead'
 import TableBody from '@mui/material/TableBody'
-import TableRow from '@mui/material/TableRow'
-import TableCell from '@mui/material/TableCell'
-import CircularProgress from '@mui/material/CircularProgress'
+import Table from '@mui/material/Table'
 import ProductRow from './ProductRow'
 import StyleAdmin, {
   StyledTableCell,
@@ -12,20 +9,17 @@ import StyleAdmin, {
   StyledTableContainer
 } from '~/assets/StyleAdmin.jsx'
 
-import AddIcon from '@mui/icons-material/Add'
 const ProductTable = ({ products, loading, handleOpenModal }) => {
-  if (loading) return <CircularProgress />
-
   return (
     <>
-      <StyledTableContainer>
+      <Table>
         <TableHead>
           <StyledTableRow>
             <StyledTableCell sx={StyleAdmin.TableColumnSTT}>
               STT
             </StyledTableCell>
             <StyledTableCell sx={{ width: '50px' }}>Ảnh</StyledTableCell>
-            <StyledTableCell sx={{ width: '20%' }}>Tên</StyledTableCell>
+            <StyledTableCell sx={{ width: '25%' }}>Tên</StyledTableCell>
             <StyledTableCell sx={{ width: '150px' }}>Giá (VNĐ)</StyledTableCell>
             <StyledTableCell sx={{ width: '70px' }}>Số lượng</StyledTableCell>
             <StyledTableCell sx={{ width: '100%' }}>Mô tả</StyledTableCell>
@@ -39,17 +33,17 @@ const ProductTable = ({ products, loading, handleOpenModal }) => {
         </TableHead>
         <TableBody>
           {loading ? (
-            <TableRow>
-              <TableCell colSpan={8} align='center'>
+            <StyledTableRow>
+              <StyledTableCell colSpan={10} align='center'>
                 Đang tải sản phẩm...
-              </TableCell>
-            </TableRow>
+              </StyledTableCell>
+            </StyledTableRow>
           ) : products.filter((product) => !product.destroy).length === 0 ? (
-            <TableRow>
-              <TableCell colSpan={8} align='center'>
+            <StyledTableRow>
+              <StyledTableCell colSpan={10} align='center'>
                 Không có sản phẩm nào.
-              </TableCell>
-            </TableRow>
+              </StyledTableCell>
+            </StyledTableRow>
           ) : (
             products
               .filter((product) => !product.destroy)
@@ -63,7 +57,7 @@ const ProductTable = ({ products, loading, handleOpenModal }) => {
               ))
           )}
         </TableBody>
-      </StyledTableContainer>
+      </Table>
     </>
   )
 }

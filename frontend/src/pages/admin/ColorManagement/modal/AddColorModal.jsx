@@ -7,7 +7,7 @@ import TextField from '@mui/material/TextField'
 import Button from '@mui/material/Button'
 import Divider from '@mui/material/Divider'
 import { useForm } from 'react-hook-form'
-import { addColor } from '~/services/admin/colorService'
+import { addColor } from '~/services/admin/ColorService'
 import StyleAdmin from '~/assets/StyleAdmin.jsx'
 
 const AddColorModal = ({ open, onClose, onAdded }) => {
@@ -24,8 +24,8 @@ const AddColorModal = ({ open, onClose, onAdded }) => {
         name: data.name.trim()
       }
       const result = await addColor(payload)
+      if (onAdded) onAdded()
       if (result) {
-        onAdded() // Callback để cập nhật danh sách màu
         onClose()
         reset()
       } else {

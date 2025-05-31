@@ -19,8 +19,13 @@ import { colorPalettesRoute } from '~/routes/v1/colorPalettesRoute'
 import { sizePalettesRoute } from '~/routes/v1/sizePalettesRoute'
 import { colorsRoute } from '~/routes/v1/colorsRoute'
 import { sizesRoute } from '~/routes/v1/sizesRoute'
+import { warehousesRoute } from '~/routes/v1/warehousesRoute'
+import { variantsRoute } from '~/routes/v1/variantsRoute'
 import { inventoriesRoute } from '~/routes/v1/inventoriesRoute'
+import { batchesRoute } from '~/routes/v1/batchesRoute'
+import { warehouseSlipsRoute } from '~/routes/v1/warehouseSlipsRoute'
 import { inventoryLogsRoute } from '~/routes/v1/inventoryLogsRoute'
+import { partnersRoute } from '~/routes/v1/partnersRoute'
 
 const Router = express.Router()
 
@@ -60,8 +65,18 @@ Router.use('/colors', colorsRoute)
 
 Router.use('/sizes', sizesRoute)
 
+Router.use('/warehouses', warehousesRoute)
+
+Router.use('/variants', variantsRoute)
+
 Router.use('/inventories', inventoriesRoute)
 
+Router.use('/batches', batchesRoute)
+
+Router.use('/warehouse-slips', warehouseSlipsRoute)
+
 Router.use('/inventory-logs', inventoryLogsRoute)
+
+Router.use('/partners', partnersRoute)
 
 export const APIs_V1 = Router

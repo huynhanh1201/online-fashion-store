@@ -20,17 +20,16 @@ Router.route('/').get(
 )
 
 // Cập nhật thông tin Item giỏ hàng
-Router.route('/items/:productId').patch(
+Router.route('/items').patch(
   authMiddleware.isAuthorized,
-  cartsValidation.verifyId,
-  cartsValidation.cartItem,
+  cartsValidation.cart,
   cartsController.updateItemCart
 )
 
 // Xoá Item giỏ hàng
-Router.route('/items/:productId').delete(
+Router.route('/items').delete(
   authMiddleware.isAuthorized,
-  cartsValidation.verifyId,
+  cartsValidation.cartDeleteItem,
   cartsController.deleteItemCart
 )
 

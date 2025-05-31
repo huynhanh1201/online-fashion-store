@@ -17,14 +17,10 @@ const cart = async (req, res, next) => {
   // Xác thực dữ liệu đầu vào correctCondition: điều kiện đúng
   const correctCondition = Joi.object({
     // productId là ObjectId của sản phẩm - bắt buộc
-    productId: Joi.string().hex().length(24).required(),
-
-    color: Joi.string().min(1).max(50).required(),
-
-    size: Joi.string().min(1).max(10).required(),
+    variantId: Joi.string().hex().length(24).required(),
 
     // quantity là số lượng sản phẩm - bắt buộc, tối thiểu 1
-    quantity: Joi.number().integer().min(1).required()
+    quantity: Joi.number().integer().required()
   })
 
   try {
@@ -43,17 +39,11 @@ const cart = async (req, res, next) => {
   }
 }
 
-const cartItem = async (req, res, next) => {
+const cartDeleteItem = async (req, res, next) => {
   // Xác thực dữ liệu đầu vào correctCondition: điều kiện đúng
   const correctCondition = Joi.object({
-    // quantity là số lượng sản phẩm - bắt buộc, tối thiểu 1
-    quantity: Joi.number().integer().min(1).required(),
-
-    color: Joi.string().min(1).max(50).required(),
-
-    size: Joi.string().min(1).max(10).required(),
-
-    selected: Joi.boolean()
+    // productId là ObjectId của sản phẩm - bắt buộc
+    variantId: Joi.string().hex().length(24).required()
   })
 
   try {
@@ -75,5 +65,5 @@ const cartItem = async (req, res, next) => {
 export const cartsValidation = {
   verifyId,
   cart,
-  cartItem
+  cartDeleteItem
 }

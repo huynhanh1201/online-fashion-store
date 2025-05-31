@@ -65,7 +65,9 @@ const ProductRow = ({ index, product, handleOpenModal }) => {
         >
           {product.name}
         </StyledTableCell>
-        <StyledTableCell>{product.price.toLocaleString()}</StyledTableCell>
+        <StyledTableCell>
+          {product.exportPrice.toLocaleString()}
+        </StyledTableCell>
         <StyledTableCell>{product.quantity}</StyledTableCell>
         <StyledTableCell
           sx={{

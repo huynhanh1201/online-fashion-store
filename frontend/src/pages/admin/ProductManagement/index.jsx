@@ -152,7 +152,6 @@ const DeleteProductModal = React.lazy(
   () => import('./modal/DeleteProductModal')
 )
 const ViewProductModal = React.lazy(() => import('./modal/ViewProductModal'))
-
 import StyleAdmin from '~/assets/StyleAdmin.jsx'
 
 const ProductManagement = () => {
@@ -215,17 +214,24 @@ const ProductManagement = () => {
   }
 
   const handleSaveProduct = async (id, updatedData) => {
-    const result = await updateProduct(id, updatedData)
-    if (result) {
-      await fetchProducts({
-        page,
-        limit,
-        categoryId: selectedCategory,
-        search: searchTerm,
-        priceMin: minPrice,
-        priceMax: maxPrice,
-        ...(createdAt && { createdAt: new Date(createdAt).toISOString() })
-      })
+    try {
+      const result = await updateProduct(id, updatedData)
+      console.log('Result from updateProduct:', result) // Debugging log
+      if (result) {
+        await fetchProducts({
+          page,
+          limit,
+          categoryId: selectedCategory,
+          search: searchTerm,
+          priceMin: minPrice,
+          priceMax: maxPrice,
+          ...(createdAt && { createdAt: new Date(createdAt).toISOString() })
+        })
+      }
+      return result // Explicitly return the result
+    } catch (error) {
+      console.error('Error in handleSaveProduct:', error)
+      return false // Return false on error
     }
   }
 

@@ -4,9 +4,9 @@ const { Schema, model } = mongoose
 // Tạo schema cho Giỏ hàng
 const cartItemSchema = new Schema(
   {
-    productId: {
+    variantId: {
       type: Schema.Types.ObjectId,
-      ref: 'Product',
+      ref: 'Variant',
       required: true
     },
     color: {
