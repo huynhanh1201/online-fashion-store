@@ -5,7 +5,18 @@ const handleCreateInventory = async () => {
 }
 
 const getInventoryList = async () => {
-  const result = await InventoryModel.find({ destroy: false }).lean()
+  const result = await InventoryModel.find({ destroy: false })
+    .populate([
+      {
+        path: 'variantId',
+        select: 'name'
+      },
+      {
+        path: 'warehouseId',
+        select: 'name'
+      }
+    ])
+    .lean()
 
   return result
 }
@@ -16,7 +27,18 @@ const getInventory = async (inventoryId) => {
     const result = await InventoryModel.findOne({
       _id: inventoryId,
       destroy: false
-    }).lean()
+    })
+      .populate([
+        {
+          path: 'variantId',
+          select: 'name'
+        },
+        {
+          path: 'warehouseId',
+          select: 'name'
+        }
+      ])
+      .lean()
 
     return result
   } catch (err) {
