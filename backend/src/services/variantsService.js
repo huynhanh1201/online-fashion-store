@@ -60,10 +60,18 @@ const createVariant = async (reqBody) => {
   }
 }
 
-const getVariantList = async () => {
-  const result = await VariantModel.find({ destroy: false }).lean()
+const getVariantList = async (productId) => {
+  const filter = {
+    destroy: false
+  }
 
-  return result || []
+  if (productId) {
+    filter['productId'] = productId
+  }
+
+  const result = await VariantModel.find(filter).lean()
+
+  return result
 }
 
 const getVariant = async (variantId) => {
