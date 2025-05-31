@@ -7,12 +7,13 @@ import { logoutUserAPI, selectCurrentUser } from '~/redux/user/userSlice'
 import { getProfileUser } from '~/services/userService'
 import { toast } from 'react-toastify'
 
-const StyledButton = styled(Button)(({ theme }) => ({
+const StyledButtonRegister = styled(Button)(({ theme }) => ({
   color: '#000',
   fontWeight: 500,
   borderRadius: '10px',
   minWidth: '120px',
   maxWidth: '120px',
+  border: '2px solid #1A3C7B',
   padding: '8px 16px',
   textTransform: 'none',
   transition: 'all 0.3s ease',
@@ -29,6 +30,28 @@ const StyledButton = styled(Button)(({ theme }) => ({
   }
 }))
 
+const StyledButtonLogin = styled(Button)(({ theme }) => ({
+  color: 'white',
+  fontWeight: 500,
+  borderRadius: '10px',
+  minWidth: '120px',
+  maxWidth: '120px',
+  padding: '8px 16px',
+  textTransform: 'none',
+  transition: 'all 0.3s ease',
+  backgroundColor: '#1A3C7B',
+  '&:hover': {
+    backgroundColor: '#e9ecef',
+    transform: 'translateY(-2px)',
+    color: 'black'
+  },
+  [theme.breakpoints.down('md')]: {
+    minWidth: '100px',
+    maxWidth: '100px',
+    fontSize: '0.875rem',
+    padding: '6px 12px'
+  }
+}))
 const StyledTypography = styled(Typography)(({ theme }) => ({
   color: '#000',
   fontWeight: 400,
@@ -88,12 +111,12 @@ const AuthButtons = () => {
     <div style={{ display: 'flex', gap: '8px' }}>
       {!currentUser ? (
         <>
-          <StyledButton component={Link} to='/register'>
+          <StyledButtonRegister component={Link} to='/register'>
             Đăng ký
-          </StyledButton>
-          <StyledButton component={Link} to='/login'>
+          </StyledButtonRegister>
+          <StyledButtonLogin component={Link} to='/login'>
             Đăng nhập
-          </StyledButton>
+          </StyledButtonLogin>
         </>
       ) : (
         <>

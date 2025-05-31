@@ -4,7 +4,8 @@ import {
   Grid,
   Typography,
   Button,
-  CircularProgress
+  CircularProgress,
+  Box
 } from '@mui/material'
 import { useParams } from 'react-router-dom'
 import useProductDetail from './useProductDetail'
@@ -13,7 +14,7 @@ import ProductInfoSection from './ProductInfoSection'
 import ProductDescription from './ProductDescription'
 import VoucherDrawer from './VoucherDrawer'
 import SnackbarAlert from './SnackbarAlert'
-
+import ProductReview from './ProductReview'
 const ProductDetail = () => {
   const { productId } = useParams()
   const [selectedColor, setSelectedColor] = useState(null)
@@ -117,6 +118,9 @@ const ProductDetail = () => {
         </Grid>
       </Grid>
       <ProductDescription description={product.description} />
+      <Box sx={{ mt: 5 }}>
+        <ProductReview />
+      </Box>
       <VoucherDrawer
         open={openVoucherDrawer}
         onClose={() => setOpenVoucherDrawer(false)}

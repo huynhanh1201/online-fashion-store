@@ -143,14 +143,17 @@ const Profile = () => {
 
   const handleChangePassword = async () => {
     if (loading) return
+
     if (!oldPassword || !newPassword || !confirmNewPassword) {
       showSnackbar('Vui lòng điền đầy đủ thông tin', 'error')
       return
     }
+
     if (newPassword !== confirmNewPassword) {
       showSnackbar('Mật khẩu xác nhận không khớp', 'error')
       return
     }
+
     if (!validatePassword(newPassword)) {
       showSnackbar(
         'Mật khẩu mới phải ≥ 6 ký tự, có 1 chữ in hoa, 1 ký tự đặc biệt',
@@ -166,20 +169,25 @@ const Profile = () => {
         newPassword,
         confirmNewPassword
       }
-      console.log('Payload gửi đi:', payload)
 
       const result = await changePassword(payload)
+      console.log('Phản hồi từ API:', result)
+
       setLoading(false)
 
-      if (result?.success) {
+      if (result?._id) {
         showSnackbar('Đổi mật khẩu thành công!')
         handleClosePasswordDialog()
       } else {
-        showSnackbar(result?.error?.message || 'Lỗi khi đổi mật khẩu', 'error')
+        showSnackbar('Lỗi khi đổi mật khẩu', 'error')
       }
     } catch (error) {
       setLoading(false)
-      showSnackbar('Lỗi hệ thống: ' + error.message, 'error')
+      console.error('Lỗi khi gọi API:', error)
+      showSnackbar(
+        'Lỗi hệ thống: ' + (error?.response?.data?.message || error.message),
+        'error'
+      )
     }
   }
 

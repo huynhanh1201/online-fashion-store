@@ -56,7 +56,7 @@ function Register() {
         alignItems: 'center',
         justifyContent: 'center',
         backgroundImage:
-          'url("https://inuv247.com/wp-content/uploads/2022/12/11702107_21201466-2-1536x614.jpg")',
+          'url("https://png.pngtree.com/background/20230426/original/pngtree-an-image-of-a-clothing-store-picture-image_2490513.jpg")',
         backgroundRepeat: 'no-repeat',
         backgroundSize: 'cover',
         backgroundPosition: 'center',
@@ -65,24 +65,24 @@ function Register() {
         position: 'relative'
       }}
     >
-      <Button
-        variant='contained'
-        color='secondary'
-        onClick={() => navigate('/')}
-        sx={{
-          position: 'absolute',
-          top: 16,
-          left: 16,
-          zIndex: 10,
-          borderRadius: 2,
-          textTransform: 'none',
-          fontWeight: 500,
-          px: 2
-        }}
-        startIcon={<ArrowBack />}
-      >
-        Trang chủ
-      </Button>
+      {/*<Button*/}
+      {/*  variant='contained'*/}
+      {/*  color='secondary'*/}
+      {/*  onClick={() => navigate('/')}*/}
+      {/*  sx={{*/}
+      {/*    position: 'absolute',*/}
+      {/*    top: 16,*/}
+      {/*    left: 16,*/}
+      {/*    zIndex: 10,*/}
+      {/*    borderRadius: 2,*/}
+      {/*    textTransform: 'none',*/}
+      {/*    fontWeight: 500,*/}
+      {/*    px: 2*/}
+      {/*  }}*/}
+      {/*  startIcon={<ArrowBack />}*/}
+      {/*>*/}
+      {/*  Trang chủ*/}
+      {/*</Button>*/}
 
       <form onSubmit={handleSubmit(submitRegister)}>
         <Zoom in={true} style={{ transitionDelay: '200ms' }}>
