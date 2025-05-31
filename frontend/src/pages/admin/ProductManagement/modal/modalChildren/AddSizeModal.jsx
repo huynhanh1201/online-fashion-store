@@ -8,6 +8,7 @@ import {
   Button
 } from '@mui/material'
 import useSizePalettes from '~/hooks/admin/useSizePalettes.js'
+
 const AddSizeModal = ({ open, onClose, product }) => {
   const [sizeName, setSizeName] = useState('')
   const [isSaving, setIsSaving] = useState(false)

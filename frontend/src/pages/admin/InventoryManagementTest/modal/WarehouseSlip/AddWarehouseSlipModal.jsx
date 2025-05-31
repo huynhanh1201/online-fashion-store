@@ -33,26 +33,27 @@ export default function AddWarehouseSlipModal({
   open,
   onClose,
   newSlipData,
-  batches,
   handleChange,
   handleDateChange,
-  handleAdd,
   warehouses,
   items,
   handleItemChange,
   handleDeleteRow,
   handleAddRow,
   variants,
-  warehouseSlips,
-  type = 'input' // Default to 'input' if not provided
+  type = 'input', // 'input' for import, 'output' for export
+  partners,
+  addWarehouseSlip,
+  handleAdd
 }) {
-  const [isEditing, setIsEditing] = useState(false) // State to toggle edit mode
+  const [isEditing, setIsEditing] = useState(false)
 
   // Safeguard against undefined newSlipData
   if (!newSlipData) {
     console.warn('newSlipData is undefined')
     return null
   }
+
   // Normalize Vietnamese for search
   const normalizeVietnamese = (str = '') => {
     return str
@@ -73,7 +74,7 @@ export default function AddWarehouseSlipModal({
     const searchNormalized = normalizeVietnamese(searchText)
     return variants
       .map((variant) => ({
-        _id: variant.id,
+        _id: variant._id,
         sku: variant.sku,
         name: `${variant.sku || ''} - ${variant.name || ''}`
       }))
@@ -82,26 +83,29 @@ export default function AddWarehouseSlipModal({
       )
   }
 
-  // Filter batches (lots) based on batchCode
-  const filterLotsByBatchCode = (searchText, itemIndex) => {
-    if (!batches || !Array.isArray(batches)) {
-      console.warn('batches is undefined or not an array', { batches })
-      return []
-    }
-
-    const searchNormalized = normalizeVietnamese(searchText)
-    return batches
-      .filter((batch) =>
-        normalizeVietnamese(batch.batchCode || '').includes(searchNormalized)
-      )
-      .map((batch) => ({ _id: batch.id, name: batch.batchCode }))
-  }
-
   // Helper to get SKU from variantId
   const getSkuFromVariantId = (variantId) => {
     if (!variantId || !variants || !Array.isArray(variants)) return ''
-    const variant = variants.find((v) => v.id === variantId)
+    const variant = variants.find((v) => v._id === variantId)
     return variant ? variant.sku : ''
+  }
+
+  // Modified handleAdd to match the desired JSON structure
+  const onSubmit = async () => {
+    const formattedData = {
+      type: type === 'input' ? 'import' : 'export',
+      date: newSlipData.date ? new Date(newSlipData.date).toISOString() : null,
+      partnerId: newSlipData.partnerId || '',
+      warehouseId: newSlipData.warehouseId || '',
+      items: items.map((item) => ({
+        variantId: item.variantId || '',
+        quantity: parseInt(item.quantity) || 0,
+        unit: item.unit || 'cái'
+      })),
+      note: newSlipData.note || ''
+    }
+    await handleAdd(formattedData)
+    onClose()
   }
 
   return (
@@ -135,7 +139,7 @@ export default function AddWarehouseSlipModal({
               </Button>
             )}
             <Button onClick={onClose}>Hủy</Button>
-            <Button variant='contained' color='success' onClick={handleAdd}>
+            <Button variant='contained' color='success' onClick={onSubmit}>
               Duyệt & Hoàn thành
             </Button>
           </DialogActions>
@@ -145,16 +149,9 @@ export default function AddWarehouseSlipModal({
           <Card variant='outlined' sx={{ mb: 2 }}>
             <CardContent>
               <Grid container spacing={2}>
-                <Grid item size={10} sm={4} md={3}>
-                  <TextField
-                    label='Mã phiếu'
-                    value={newSlipData.slipId || ''}
-                    onChange={handleChange('slipId')}
-                    fullWidth
-                  />
-                </Grid>
-                <Grid item size={2} sm={4} md={3}>
+                <Grid item size={12} sm={6} md={4}>
                   <DatePicker
+                    sx={{ width: '100%' }}
                     label='Ngày nhập'
                     value={newSlipData.date || null}
                     onChange={handleDateChange}
@@ -163,35 +160,7 @@ export default function AddWarehouseSlipModal({
                     )}
                   />
                 </Grid>
-                <Grid item size={12} sm={4} md={3} sx={{ display: 'none' }}>
-                  <FormControl fullWidth>
-                    <InputLabel>Lãi phiếu</InputLabel>
-                    <Select
-                      value={
-                        newSlipData.profitType ||
-                        (type === 'input' ? 'Import' : 'Export')
-                      }
-                      onChange={handleChange('profitType')}
-                    >
-                      {!isEditing ? (
-                        <MenuItem
-                          value={type === 'input' ? 'Import' : 'Export'}
-                        >
-                          {type === 'input' ? 'Import' : 'Export'}
-                        </MenuItem>
-                      ) : (
-                        <>
-                          <MenuItem value='Import'>Import</MenuItem>
-                          <MenuItem value='Export'>Export</MenuItem>
-                        </>
-                      )}
-                    </Select>
-                  </FormControl>
-                </Grid>
-              </Grid>
-
-              <Grid container spacing={2} mt={1}>
-                <Grid item size={4} sm={4} md={3}>
+                <Grid item size={12} sm={6} md={4}>
                   <FormControl fullWidth>
                     <InputLabel>Kho nhập hàng</InputLabel>
                     <Select
@@ -200,40 +169,39 @@ export default function AddWarehouseSlipModal({
                     >
                       <MenuItem value=''>Chọn kho</MenuItem>
                       {warehouses.map((warehouse) => (
-                        <MenuItem key={warehouse.id} value={warehouse.id}>
+                        <MenuItem key={warehouse._id} value={warehouse._id}>
                           {warehouse.name}
                         </MenuItem>
                       ))}
                     </Select>
                   </FormControl>
                 </Grid>
-                <Grid item size={4} sm={4} md={3}>
+                <Grid item size={12} sm={6} md={4}>
+                  <FormControl fullWidth>
+                    <InputLabel>Nhà cung cấp</InputLabel>
+                    <Select
+                      value={newSlipData.partnerId || ''}
+                      onChange={handleChange('partnerId')}
+                    >
+                      <MenuItem value=''>Chọn nhà cung cấp</MenuItem>
+                      {partners.map((partner) => (
+                        <MenuItem key={partner._id} value={partner._id}>
+                          {partner.name}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                </Grid>
+                <Grid item size={12}>
                   <TextField
-                    label='Mã đối tác'
-                    value={newSlipData.partnerCode || ''}
-                    onChange={handleChange('partnerCode')}
+                    label='Ghi chú'
+                    value={newSlipData.note || ''}
+                    onChange={handleChange('note')}
                     fullWidth
+                    multiline
+                    rows={3}
                   />
                 </Grid>
-                <Grid item size={4} sm={4} md={3}>
-                  <TextField
-                    label='Tên đối tác'
-                    value={newSlipData.partnerName || ''}
-                    onChange={handleChange('partnerName')}
-                    fullWidth
-                  />
-                </Grid>
-              </Grid>
-
-              <Grid item size={12} mt={2}>
-                <TextField
-                  label='Ghi chú'
-                  value={newSlipData.note || ''}
-                  onChange={handleChange('note')}
-                  fullWidth
-                  multiline
-                  rows={3}
-                />
               </Grid>
             </CardContent>
             {isEditing && (
@@ -252,24 +220,22 @@ export default function AddWarehouseSlipModal({
             )}
           </Card>
           <Paper variant='outlined' sx={{ mb: 3 }}>
-            <Box p={2} sx={{ minHeight: '372px' }}>
+            <Box p={2} sx={{ minHeight: '350px' }}>
               <Typography fontWeight={600} mb={1}>
                 Danh sách sản phẩm {type === 'input' ? 'nhập' : 'xuất'}
               </Typography>
               <TableContainer
-                sx={{ minHeight: '300px', overflow: 'auto', zIndex: 0 }}
+                sx={{ minHeight: '350px', overflow: 'auto', zIndex: 0 }}
               >
                 <Table stickyHeader size='small'>
                   <TableHead>
                     <TableRow>
                       <TableCell>STT</TableCell>
                       <TableCell>Variant</TableCell>
-                      <TableCell>Lô</TableCell>
                       <TableCell>
                         SL {type === 'input' ? 'nhập' : 'xuất'}
                       </TableCell>
                       <TableCell>Đơn vị</TableCell>
-                      <TableCell>Ghi chú</TableCell>
                       <TableCell>Thao tác</TableCell>
                     </TableRow>
                   </TableHead>
@@ -300,33 +266,7 @@ export default function AddWarehouseSlipModal({
                               })
                             }
                             placeholder='Tìm theo SKU hoặc tên...'
-                            index={index} // Pass the row index
-                          />
-                        </TableCell>
-                        <TableCell sx={{ position: 'relative', minWidth: 200 }}>
-                          <Search
-                            data={(searchText) =>
-                              filterLotsByBatchCode(searchText, index)
-                            }
-                            onSelect={(selectedLot) =>
-                              handleItemChange(
-                                index,
-                                'lot'
-                              )({
-                                target: { value: selectedLot }
-                              })
-                            }
-                            searchText={item.lot || ''}
-                            setSearchText={(value) =>
-                              handleItemChange(
-                                index,
-                                'lot'
-                              )({
-                                target: { value }
-                              })
-                            }
-                            placeholder='Tìm theo mã lô...'
-                            index={index} // Pass the row index
+                            index={index}
                           />
                         </TableCell>
                         <TableCell sx={{ minWidth: 100 }}>
@@ -340,16 +280,8 @@ export default function AddWarehouseSlipModal({
                         </TableCell>
                         <TableCell sx={{ minWidth: 100 }}>
                           <TextField
-                            value={item.unit || 'pcs'}
-                            disabled
-                            fullWidth
-                            size='small'
-                          />
-                        </TableCell>
-                        <TableCell sx={{ minWidth: 150 }}>
-                          <TextField
-                            value={item.note || ''}
-                            onChange={handleItemChange(index, 'note')}
+                            value={'cái'}
+                            onChange={handleItemChange(index, 'unit')}
                             fullWidth
                             size='small'
                           />
@@ -364,7 +296,6 @@ export default function AddWarehouseSlipModal({
                   </TableBody>
                 </Table>
               </TableContainer>
-
               <Box display='flex' justifyContent='space-between' mt={2}>
                 <Button variant='outlined' onClick={handleAddRow}>
                   + Thêm dòng

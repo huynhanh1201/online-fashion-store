@@ -13,10 +13,22 @@ const useVariants = (pageVariant = 1, limit = 10) => {
 
   const fetchVariants = async (page = pageVariant, filters = {}) => {
     setLoading(true)
-    const { variants, total } = await getVariants(page, limit, filters)
-    setVariants(variants)
-    setTotalPages(total || 1)
-    setLoading(false)
+    try {
+      const { variants = [], total = 0 } = await getVariants({
+        page,
+        limit,
+        ...filters
+      })
+
+      setVariants(variants)
+      setTotalPages(total || 1)
+    } catch (err) {
+      setVariants([])
+      setTotalPages(1)
+      console.error('Lỗi fetchVariants:', err)
+    } finally {
+      setLoading(false)
+    }
   }
 
   const createNewVariant = async (data) => {

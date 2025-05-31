@@ -14,7 +14,6 @@ import VisibilityIcon from '@mui/icons-material/Visibility'
 
 const BatchesTab = ({
   data,
-  warehouseSlips,
   variants,
   page,
   rowsPerPage,
@@ -22,20 +21,20 @@ const BatchesTab = ({
   onRowsPerPageChange
 }) => {
   const enrichedBatches = (data || []).map((batch) => {
-    const slip = (warehouseSlips || []).find(
-      (s) => s.id === batch.warehouseSlipId
-    )
-    const variant = (variants || []).find((v) => v.id === batch.variantId)
+    const variant = (variants || []).find((v) => v._id === batch.variantId)
+
     return {
       ...batch,
-      slipCode: slip ? slip.code : 'N/A',
       variantName: variant ? variant.name : 'N/A',
-      createdAtFormatted: new Date(batch.createdAt).toLocaleString()
+      importedAtFormatted: batch.importedAt
+        ? new Date(batch.importedAt).toLocaleString('vi-VN')
+        : 'Chưa nhập',
+      createdAtFormatted: new Date(batch.createdAt).toLocaleString('vi-VN')
     }
   })
 
   const batchColumns = [
-    { id: 'slipCode', label: 'Mã phiếu', minWidth: 100 },
+    { id: 'batchCode', label: 'Mã lô', minWidth: 120 },
     { id: 'variantName', label: 'Biến thể', minWidth: 150 },
     { id: 'quantity', label: 'Số lượng', minWidth: 100, align: 'right' },
     {
@@ -46,13 +45,17 @@ const BatchesTab = ({
       format: (value) => `${value.toLocaleString()}đ`
     },
     {
-      id: 'exportPrice',
-      label: 'Giá bán',
-      minWidth: 100,
-      align: 'right',
-      format: (value) => `${value.toLocaleString()}đ`
+      id: 'importedAtFormatted',
+      label: 'Ngày nhập',
+      minWidth: 160,
+      align: 'center'
     },
-    { id: 'createdAtFormatted', label: 'Ngày tạo', minWidth: 150 },
+    {
+      id: 'createdAtFormatted',
+      label: 'Ngày tạo',
+      minWidth: 160,
+      align: 'center'
+    },
     { id: 'action', label: 'Hành động', minWidth: 100, align: 'center' }
   ]
 

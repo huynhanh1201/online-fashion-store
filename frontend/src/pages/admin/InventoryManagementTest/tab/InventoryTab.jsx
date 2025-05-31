@@ -39,11 +39,11 @@ const InventoryTab = ({
     const warehouse = warehouses.find((w) => w.id === item.warehouseId)
     return {
       ...item,
-      sku: variant ? variant.sku : 'N/A',
-      name: variant ? variant.name : 'N/A',
-      warehouse: warehouse ? warehouse.name : 'N/A',
-      color: variant ? variant.color.name : 'N/A',
-      size: variant ? variant.size.name : 'N/A'
+      sku: variant?.sku || 'N/A',
+      name: variant?.name || 'N/A',
+      color: variant?.color?.name || 'N/A',
+      size: variant?.size?.name || 'N/A',
+      warehouse: warehouse?.name || 'N/A'
     }
   })
 
@@ -57,9 +57,6 @@ const InventoryTab = ({
   })
 
   const inventoryColumns = [
-    { id: 'sku', label: 'SKU', minWidth: 100 },
-    { id: 'name', label: 'Biến thể', minWidth: 150 },
-    { id: 'warehouse', label: 'Kho', minWidth: 100 },
     { id: 'quantity', label: 'Số lượng', minWidth: 100, align: 'right' },
     {
       id: 'minQuantity',
@@ -67,7 +64,6 @@ const InventoryTab = ({
       minWidth: 120,
       align: 'right'
     },
-    { id: 'status', label: 'Trạng thái', minWidth: 100, align: 'center' },
     {
       id: 'importPrice',
       label: 'Giá nhập',
@@ -82,6 +78,21 @@ const InventoryTab = ({
       align: 'right',
       format: (value) => `${value.toLocaleString()}đ`
     },
+    {
+      id: 'createdAt',
+      label: 'Ngày tạo',
+      minWidth: 150,
+      align: 'center',
+      format: (value) => new Date(value).toLocaleString('vi-VN')
+    },
+    {
+      id: 'updatedAt',
+      label: 'Ngày cập nhật',
+      minWidth: 150,
+      align: 'center',
+      format: (value) => new Date(value).toLocaleString('vi-VN')
+    },
+    { id: 'status', label: 'Trạng thái', minWidth: 100, align: 'center' },
     { id: 'action', label: 'Hành động', minWidth: 100, align: 'center' }
   ]
 

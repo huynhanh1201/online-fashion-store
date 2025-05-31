@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import {
   Paper,
   Table,
@@ -14,8 +14,6 @@ import {
 } from '@mui/material'
 import VisibilityIcon from '@mui/icons-material/Visibility'
 import AddVariantModal from '../modal/Variant/AddVariantModal.jsx'
-import useColorPalettes from '~/hooks/admin/useColorPalettes.js'
-import useSizesPalettes from '~/hooks/admin/useSizePalettes.js'
 const VariantsTab = ({
   data,
   products,
@@ -33,18 +31,9 @@ const VariantsTab = ({
       productName: product ? product.name : 'N/A'
     }
   })
-
-  const { colorPalettes, fetchColorPalettes } = useColorPalettes(products._id)
-  const { sizePalettes, fetchSizePalettes } = useSizesPalettes(products._id)
   const [openAddModal, setOpenAddModal] = useState(false)
-  useEffect(() => {
-    fetchColorPalettes()
-    fetchSizePalettes()
-  }, [])
   const handleAddVariant = () => {
     setOpenAddModal(true)
-    fetchColorPalettes()
-    fetchSizePalettes()
     refreshVariants()
   }
 
@@ -55,7 +44,6 @@ const VariantsTab = ({
   const variantColumns = [
     { id: 'sku', label: 'SKU', minWidth: 100 },
     { id: 'name', label: 'Tên biến thể', minWidth: 150 },
-    { id: 'productName', label: 'Sản phẩm', minWidth: 150 },
     { id: 'color.name', label: 'Màu sắc', minWidth: 100 },
     { id: 'size.name', label: 'Kích thước', minWidth: 100 },
     {
@@ -156,8 +144,6 @@ const VariantsTab = ({
         open={openAddModal}
         onClose={handleCloseAddModal}
         addVariant={addVariant}
-        colors={colorPalettes}
-        sizes={sizePalettes}
         products={products}
       />
     </Paper>

@@ -26,7 +26,7 @@ const ProductTable = ({ products, loading, handleOpenModal }) => {
             <StyledTableCell sx={{ width: '250px' }}>Xuất xứ</StyledTableCell>
             <StyledTableCell sx={{ width: '100px' }}>Danh mục</StyledTableCell>
             <StyledTableCell sx={{ width: '70px' }}>Trạng thái</StyledTableCell>
-            <StyledTableCell sx={{ maxWidth: '220px', width: '220px' }}>
+            <StyledTableCell sx={{ maxWidth: '130px', width: '130px' }}>
               Hành động
             </StyledTableCell>
           </StyledTableRow>
