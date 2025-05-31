@@ -27,9 +27,9 @@ const useColorPalettes = (productId) => {
     }
   }
 
-  const addColorPalette = async (data) => {
+  const addColorPalette = async (product, data) => {
     try {
-      const newColor = await createColorPalette(productId, data)
+      const newColor = await createColorPalette(product, data)
       await fetchColorPalettes() // load lại màu mới
       return newColor
     } catch (error) {

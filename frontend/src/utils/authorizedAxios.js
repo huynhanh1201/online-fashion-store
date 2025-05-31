@@ -41,8 +41,6 @@ authorizedAxiosInstance.interceptors.request.use(
       config.headers.Authorization = `Bearer ${accessToken}`
     }
 
-    console.log('config: ', config)
-
     return config
   },
   (error) => {

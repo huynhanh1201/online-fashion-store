@@ -16,6 +16,43 @@ export const getInventories = async (page = 1, limit = 10, filters = {}) => {
     return { inventories: [], total: 0 }
   }
 }
+
+export const getInventoryById = async (id) => {
+  try {
+    const response = await AuthorizedAxiosInstance.get(
+      `${API_ROOT}/v1/inventory/${id}`
+    )
+    return response.data
+  } catch (error) {
+    console.error('Lỗi khi lấy tồn kho theo ID:', error)
+    return null
+  }
+}
+
+export const getInventoryByWarehouse = async (warehouseId) => {
+  try {
+    const response = await AuthorizedAxiosInstance.get(
+      `${API_ROOT}/v1/warehouses/${warehouseId}/inventory`
+    )
+    return response.data
+  } catch (error) {
+    console.error('Lỗi khi lấy tồn kho theo kho:', error)
+    return []
+  }
+}
+
+export const getInventoryByVariant = async (variantId) => {
+  try {
+    const response = await AuthorizedAxiosInstance.get(
+      `${API_ROOT}/v1/variants/${variantId}/inventory`
+    )
+    return response.data
+  } catch (error) {
+    console.error('Lỗi khi lấy tồn kho theo biến thể:', error)
+    return []
+  }
+}
+
 // Cập nhật một phần thông tin kho
 export const updateInventory = async (inventoryId, data) => {
   try {

@@ -6,9 +6,9 @@ import {
   createInventory,
   importInventory,
   exportInventory
-} from '~/services/admin/inventoryService'
+} from '~/services/admin/Inventory/inventoryService'
 
-const useInventories = (pageInventory = 1, limit = 10) => {
+const useInventorys = (pageInventory = 1, limit = 10) => {
   const [inventories, setInventories] = useState([]) // Danh sách các biến thể kho
   const [totalPages, setTotalPages] = useState(1) // Tổng số trang phục vụ phân trang
   const [loading, setLoading] = useState(false) // Trạng thái đang tải
@@ -71,4 +71,4 @@ const useInventories = (pageInventory = 1, limit = 10) => {
   }
 }
 
-export default useInventories
+export default useInventorys
