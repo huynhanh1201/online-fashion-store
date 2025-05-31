@@ -21,11 +21,17 @@ const AddSizeModal = ({ open, onClose, product }) => {
 
     setIsSaving(true)
     try {
+      const result = {
+        name: trimmed
+      }
       console.log('Adding size palette:', trimmed)
       console.log('Product ID:', product._id)
-      await addSizePalette(product._id, { name: trimmed })
-      setSizeName('')
+      console.log('Saving size palette:', result)
+
+      await addSizePalette(product._id, result)
+
       onClose()
+      setSizeName('')
     } catch (error) {
       alert('Thêm kích thước thất bại. Vui lòng thử lại!')
       console.error(error)

@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import {
   Paper,
   Table,
@@ -8,17 +8,23 @@ import {
   TableRow,
   TableCell,
   TablePagination,
-  Typography
+  Typography,
+  Box,
+  Button
 } from '@mui/material'
 import VisibilityIcon from '@mui/icons-material/Visibility'
-
+import AddVariantModal from '../modal/Variant/AddVariantModal.jsx'
+import useColorPalettes from '~/hooks/admin/useColorPalettes.js'
+import useSizesPalettes from '~/hooks/admin/useSizePalettes.js'
 const VariantsTab = ({
   data,
   products,
   page,
   rowsPerPage,
   onPageChange,
-  onRowsPerPageChange
+  onRowsPerPageChange,
+  refreshVariants,
+  addVariant
 }) => {
   const enrichedVariants = (data || []).map((variant) => {
     const product = (products || []).find((p) => p.id === variant.productId)
@@ -28,6 +34,24 @@ const VariantsTab = ({
     }
   })
 
+  const { colorPalettes, fetchColorPalettes } = useColorPalettes(products._id)
+  const { sizePalettes, fetchSizePalettes } = useSizesPalettes(products._id)
+  const [openAddModal, setOpenAddModal] = useState(false)
+  useEffect(() => {
+    fetchColorPalettes()
+    fetchSizePalettes()
+  }, [])
+  const handleAddVariant = () => {
+    setOpenAddModal(true)
+    fetchColorPalettes()
+    fetchSizePalettes()
+    refreshVariants()
+  }
+
+  const handleCloseAddModal = () => {
+    setOpenAddModal(false)
+    refreshVariants()
+  }
   const variantColumns = [
     { id: 'sku', label: 'SKU', minWidth: 100 },
     { id: 'name', label: 'Tên biến thể', minWidth: 150 },
@@ -50,7 +74,6 @@ const VariantsTab = ({
     },
     { id: 'action', label: 'Hành động', minWidth: 100, align: 'center' }
   ]
-
   return (
     <Paper sx={{ border: '1px solid #ccc', width: '100%', overflow: 'hidden' }}>
       <TableContainer sx={{ maxHeight: 440 }}>
@@ -58,9 +81,25 @@ const VariantsTab = ({
           <TableHead>
             <TableRow>
               <TableCell colSpan={variantColumns.length}>
-                <Typography variant='h6' sx={{ fontWeight: '800' }}>
-                  Danh sách biến thể sản phẩm
-                </Typography>
+                <Box
+                  sx={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center'
+                  }}
+                >
+                  <Typography variant='h6' sx={{ fontWeight: '800' }}>
+                    Danh sách biến thể sản phẩm
+                  </Typography>
+                  <Button
+                    variant='contained'
+                    color='primary'
+                    sx={{ mr: 1 }}
+                    onClick={() => handleAddVariant()}
+                  >
+                    Thêm biến thể
+                  </Button>
+                </Box>
               </TableCell>
             </TableRow>
             <TableRow>
@@ -112,6 +151,14 @@ const VariantsTab = ({
         page={page}
         onPageChange={onPageChange}
         onRowsPerPageChange={onRowsPerPageChange}
+      />
+      <AddVariantModal
+        open={openAddModal}
+        onClose={handleCloseAddModal}
+        addVariant={addVariant}
+        colors={colorPalettes}
+        sizes={sizePalettes}
+        products={products}
       />
     </Paper>
   )

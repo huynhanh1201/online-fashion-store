@@ -33,7 +33,6 @@ const InventoryTable = () => {
     useWarehouseSlips(page + 1, rowsPerPage)
   const { batches, fetchBatches, createNewBatch } = useBatches()
   const { logs, fetchLogs, createNewLog } = useInventoryLog()
-
   useEffect(() => {
     fetchProducts()
     fetchColors()
@@ -45,7 +44,6 @@ const InventoryTable = () => {
     fetchBatches()
     fetchLogs()
   }, [page])
-
   const handleTabChange = (event, newValue) => {
     setActiveTab(newValue)
     setPage(0) // Reset page when switching tabs
@@ -139,6 +137,7 @@ const InventoryTable = () => {
             onPageChange={handleChangePage}
             onRowsPerPageChange={handleChangeRowsPerPage}
             addVariant={createNewVariant}
+            refreshVariants={fetchVariants}
           />
         )}
         {activeTab === 5 && (
