@@ -16,9 +16,7 @@ const getInventory = async (inventoryId) => {
     const result = await InventoryModel.findOne({
       _id: inventoryId,
       destroy: false
-    })
-      .populate('productId')
-      .lean()
+    }).lean()
 
     return result
   } catch (err) {
