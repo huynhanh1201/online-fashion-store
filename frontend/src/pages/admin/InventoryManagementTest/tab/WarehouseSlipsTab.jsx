@@ -1,4 +1,5 @@
-import React, { useState } from 'react'
+// WarehouseSlipsTab.js
+import React, { useState, useEffect } from 'react'
 import {
   Paper,
   Table,
@@ -10,10 +11,12 @@ import {
   TablePagination,
   Typography,
   Box,
-  Button
+  Button,
+  IconButton
 } from '@mui/material'
 import VisibilityIcon from '@mui/icons-material/Visibility'
 import AddWarehouseSlipModal from '../modal/WarehouseSlip/AddWarehouseSlipModal'
+import ViewWarehouseSlipModal from '../modal/WarehouseSlip/ViewWarehouseSlipModal' // Thêm modal mới
 
 const WarehouseSlipsTab = ({
   data: initialData,
@@ -30,11 +33,18 @@ const WarehouseSlipsTab = ({
 }) => {
   const [data, setData] = useState(initialData)
   const [openModal, setOpenModal] = useState(false)
-  const [modalType, setModalType] = useState('input') // Track the type ('input' or 'output')
+  const [openViewModal, setOpenViewModal] = useState(false) // State cho View modal
+  const [selectedSlip, setSelectedSlip] = useState(null) // State cho phiếu được chọn
+  const [modalType, setModalType] = useState('input')
+
+  useEffect(() => {
+    refreshWarehouseSlips()
+  }, [])
+
   const [newSlipData, setNewSlipData] = useState({
     slipId: `PNK-${new Date().toISOString().slice(0, 10).replace(/-/g, '')}-001`,
     date: new Date(),
-    profitType: 'Import', // Default, will be updated based on type
+    profitType: 'Import',
     warehouseId: '',
     partnerCode: '',
     partnerName: '',
@@ -49,15 +59,15 @@ const WarehouseSlipsTab = ({
     setNewSlipData({
       ...newSlipData,
       slipId: `${type === 'input' ? 'PNK' : 'PXK'}-${new Date().toISOString().slice(0, 10).replace(/-/g, '')}-001`,
-      profitType: type === 'input' ? 'Import' : 'Export' // Set profitType based on type
+      profitType: type === 'input' ? 'Import' : 'Export'
     })
     setOpenModal(true)
   }
 
   const handleCloseModal = () => {
     setOpenModal(false)
-    refreshWarehouseSlips() // Refresh the slips after closing the modal
-    setModalType('input') // Reset to default
+    refreshWarehouseSlips()
+    setModalType('input')
     setNewSlipData({
       slipId: `PNK-${new Date().toISOString().slice(0, 10).replace(/-/g, '')}-001`,
       date: new Date(),
@@ -72,7 +82,7 @@ const WarehouseSlipsTab = ({
 
   const handleAddSlip = async (newSlip) => {
     setData([...data, newSlip])
-    await addWarehouseSlip(newSlip) // Call the function to add the slip
+    await addWarehouseSlip(newSlip)
     handleCloseModal()
   }
 
@@ -118,6 +128,11 @@ const WarehouseSlipsTab = ({
     handleAddSlip(newSlip)
   }
 
+  const handleViewSlip = (slip) => {
+    setSelectedSlip(slip)
+    setOpenViewModal(true)
+  }
+
   const enrichedWarehouseSlips = data.map((slip) => {
     const warehouse = warehouses.find((w) => w.id === slip.warehouseId)
     return {
@@ -138,6 +153,7 @@ const WarehouseSlipsTab = ({
     { id: 'createdAtFormatted', label: 'Ngày tạo', minWidth: 150 },
     { id: 'action', label: 'Hành động', minWidth: 100, align: 'center' }
   ]
+
   return (
     <Paper sx={{ border: '1px solid #ccc', width: '100%', overflow: 'hidden' }}>
       <TableContainer sx={{ maxHeight: 440 }}>
@@ -197,7 +213,13 @@ const WarehouseSlipsTab = ({
                     if (column.id === 'action') {
                       return (
                         <TableCell key={column.id} align={column.align}>
-                          <VisibilityIcon />
+                          <IconButton
+                            onClick={() => handleViewSlip(row)}
+                            size='small'
+                            color='primary'
+                          >
+                            <VisibilityIcon />
+                          </IconButton>
                         </TableCell>
                       )
                     }
@@ -236,11 +258,19 @@ const WarehouseSlipsTab = ({
         handleDeleteRow={handleDeleteRow}
         handleAddRow={handleAddRow}
         variants={variants}
-        warehouseSlips={data} // Pass warehouseSlips
-        batches={batches} // Pass batches
-        type={modalType} // Pass the type ('input' or 'output')
-        partners={partners} // Pass partners
+        warehouseSlips={data}
+        batches={batches}
+        type={modalType}
+        partners={partners}
         addWarehouseSlip={addWarehouseSlip}
+      />
+      <ViewWarehouseSlipModal
+        open={openViewModal}
+        onClose={() => setOpenViewModal(false)}
+        slip={selectedSlip}
+        warehouses={warehouses}
+        variants={variants}
+        partners={partners}
       />
     </Paper>
   )

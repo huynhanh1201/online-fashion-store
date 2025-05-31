@@ -17,40 +17,57 @@ import useWarehouseSlips from '~/hooks/admin/Inventory/useWarehouseSlip.js'
 import useBatches from '~/hooks/admin/Inventory/useBatches.js'
 import useInventoryLog from '~/hooks/admin/Inventory/useInventoryLogs.js'
 import usePartner from '~/hooks/admin/Inventory/usePartner.js'
-import useProfile from '~/hooks/admin/useUserProfile.js'
 const InventoryTable = () => {
   const [activeTab, setActiveTab] = useState(0)
   const [page, setPage] = useState(0)
   const [rowsPerPage, setRowsPerPage] = useState(10)
 
   const { products, fetchProducts } = useProducts()
-  const { colors, fetchColors } = useColors()
-  const { sizes, fetchSizes } = useSizes()
-  const { inventories, fetchInventories, createNewInventory } = useInventory(
-    page + 1,
-    rowsPerPage
-  )
-  const { variants, fetchVariants, createNewVariant } = useVariants()
-  const { warehouses, fetchWarehouses, createNewWarehouse } = useWarehouses()
-  const { warehouseSlips, fetchWarehouseSlips, createNewWarehouseSlip } =
-    useWarehouseSlips(page + 1, rowsPerPage)
-  const { batches, fetchBatches, createNewBatch } = useBatches()
+  const { colors } = useColors()
+  const { sizes } = useSizes()
+  const {
+    inventories,
+    fetchInventories,
+    createNewInventory,
+    updateInventoryById,
+    deleteInventoryById
+  } = useInventory(page + 1, rowsPerPage)
+  const {
+    variants,
+    fetchVariants,
+    createNewVariant,
+    updateVariantById,
+    deleteVariantById
+  } = useVariants()
+  const {
+    warehouses,
+    fetchWarehouses,
+    createNewWarehouse,
+    updateWarehouseById,
+    deleteWarehouseById
+  } = useWarehouses()
+  const {
+    warehouseSlips,
+    fetchWarehouseSlips,
+    createNewWarehouseSlip,
+    update,
+    removeWarehouseSlip
+  } = useWarehouseSlips(page + 1, rowsPerPage)
+  const {
+    batches,
+    fetchBatches,
+    createNewBatch,
+    updateBatchById,
+    deleteBatchById
+  } = useBatches()
   const { logs, fetchLogs, createNewLog } = useInventoryLog()
-  const { partners, fetchPartners, createNewPartner } = usePartner()
-  const { profile, fetchProfile } = useProfile()
-  useEffect(() => {
-    fetchProducts()
-    fetchColors()
-    fetchSizes()
-    fetchInventories(page + 1, rowsPerPage)
-    fetchVariants()
-    fetchWarehouses()
-    fetchWarehouseSlips()
-    fetchBatches()
-    fetchLogs()
-    fetchPartners()
-    fetchProfile()
-  }, [page])
+  const {
+    partners,
+    fetchPartners,
+    createNewPartner,
+    updateExistingPartner,
+    removePartner
+  } = usePartner()
   const handleTabChange = (event, newValue) => {
     setActiveTab(newValue)
     setPage(0) // Reset page when switching tabs
@@ -98,6 +115,9 @@ const InventoryTable = () => {
             onPageChange={handleChangePage}
             onRowsPerPageChange={handleChangeRowsPerPage}
             addInventory={createNewInventory}
+            refreshInventories={fetchInventories}
+            updateInventory={updateInventoryById}
+            deleteInventory={deleteInventoryById}
           />
         )}
         {activeTab === 1 && (
@@ -112,8 +132,9 @@ const InventoryTable = () => {
             batches={batches}
             addWarehouseSlip={createNewWarehouseSlip}
             partners={partners}
-            user={profile}
             refreshWarehouseSlips={fetchWarehouseSlips}
+            updateWarehouseSlip={update}
+            deleteWarehouseSlip={removeWarehouseSlip}
           />
         )}
         {activeTab === 2 && (
@@ -126,6 +147,9 @@ const InventoryTable = () => {
             onPageChange={handleChangePage}
             onRowsPerPageChange={handleChangeRowsPerPage}
             addInventoryLog={createNewLog}
+            refreshInventoryLogs={fetchLogs}
+            updateInventoryLog={update}
+            deleteInventoryLog={removeWarehouseSlip}
           />
         )}
         {activeTab === 3 && (
@@ -137,6 +161,8 @@ const InventoryTable = () => {
             onRowsPerPageChange={handleChangeRowsPerPage}
             addWarehouse={createNewWarehouse}
             refreshWarehouses={fetchWarehouses}
+            updateWarehouse={updateWarehouseById}
+            deleteWarehouse={deleteWarehouseById}
           />
         )}
         {activeTab === 4 && (
@@ -149,6 +175,9 @@ const InventoryTable = () => {
             onRowsPerPageChange={handleChangeRowsPerPage}
             addVariant={createNewVariant}
             refreshVariants={fetchVariants}
+            updateVariant={updateVariantById}
+            deleteVariant={deleteVariantById}
+            refreshProducts={fetchProducts}
           />
         )}
         {activeTab === 5 && (
@@ -162,6 +191,8 @@ const InventoryTable = () => {
             onRowsPerPageChange={handleChangeRowsPerPage}
             addBatch={createNewBatch}
             refreshBatches={fetchBatches}
+            updateBatch={updateBatchById}
+            deleteBatch={deleteBatchById}
           />
         )}
         {activeTab === 6 && (
@@ -173,6 +204,8 @@ const InventoryTable = () => {
             onRowsPerPageChange={handleChangeRowsPerPage}
             refreshPartners={fetchPartners}
             addPartner={createNewPartner}
+            updatePartner={updateExistingPartner}
+            deletePartner={removePartner}
           />
         )}
       </Box>

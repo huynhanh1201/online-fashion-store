@@ -1,4 +1,5 @@
-import React, { useState } from 'react'
+// InventoryTab.js
+import React, { useState, useEffect } from 'react'
 import {
   Paper,
   Table,
@@ -14,9 +15,15 @@ import {
   FormControl,
   InputLabel,
   Typography,
-  Box
+  Box,
+  IconButton
 } from '@mui/material'
 import VisibilityIcon from '@mui/icons-material/Visibility'
+import EditIcon from '@mui/icons-material/Edit'
+import DeleteIcon from '@mui/icons-material/Delete'
+import ViewInventoryModal from '../modal/Inventory/ViewInventoryModal.jsx'
+import EditInventoryModal from '../modal/Inventory/EditInventoryModal.jsx'
+import DeleteInventoryModal from '../modal/Inventory/DeleteInventoryModal.jsx'
 
 const InventoryTab = ({
   data,
@@ -27,12 +34,23 @@ const InventoryTab = ({
   page,
   rowsPerPage,
   onPageChange,
-  onRowsPerPageChange
+  onRowsPerPageChange,
+  updateInventory,
+  deleteInventory,
+  refreshInventories
 }) => {
   const [filterWarehouse, setFilterWarehouse] = useState('all')
   const [filterColor, setFilterColor] = useState('all')
   const [filterSize, setFilterSize] = useState('all')
   const [filterStatus, setFilterStatus] = useState('all')
+  const [openViewModal, setOpenViewModal] = useState(false)
+  const [openEditModal, setOpenEditModal] = useState(false)
+  const [openDeleteModal, setOpenDeleteModal] = useState(false)
+  const [selectedInventory, setSelectedInventory] = useState(null)
+
+  useEffect(() => {
+    refreshInventories()
+  }, [])
 
   const enrichedInventories = data.map((item) => {
     const variant = variants.find((v) => v.id === item.variantId)
@@ -93,8 +111,31 @@ const InventoryTab = ({
       format: (value) => new Date(value).toLocaleString('vi-VN')
     },
     { id: 'status', label: 'Trạng thái', minWidth: 100, align: 'center' },
-    { id: 'action', label: 'Hành động', minWidth: 100, align: 'center' }
+    { id: 'action', label: 'Hành động', minWidth: 150, align: 'center' }
   ]
+
+  const handleViewInventory = (inventory) => {
+    setSelectedInventory(inventory)
+    setOpenViewModal(true)
+  }
+
+  const handleEditInventory = (inventory) => {
+    setSelectedInventory(inventory)
+    setOpenEditModal(true)
+  }
+
+  const handleDeleteInventory = (inventory) => {
+    setSelectedInventory(inventory)
+    setOpenDeleteModal(true)
+  }
+
+  const handleCloseEditModal = () => {
+    setOpenEditModal(false)
+  }
+
+  const handleCloseDeleteModal = () => {
+    setOpenDeleteModal(false)
+  }
 
   return (
     <Paper sx={{ border: '1px solid #ccc', width: '100%', overflow: 'hidden' }}>
@@ -248,7 +289,27 @@ const InventoryTab = ({
                     if (column.id === 'action') {
                       return (
                         <TableCell key={column.id} align={column.align}>
-                          <VisibilityIcon />
+                          <IconButton
+                            onClick={() => handleViewInventory(row)}
+                            size='small'
+                            color='primary'
+                          >
+                            <VisibilityIcon />
+                          </IconButton>
+                          <IconButton
+                            onClick={() => handleEditInventory(row)}
+                            size='small'
+                            color='info'
+                          >
+                            <EditIcon />
+                          </IconButton>
+                          <IconButton
+                            onClick={() => handleDeleteInventory(row)}
+                            size='small'
+                            color='error'
+                          >
+                            <DeleteIcon />
+                          </IconButton>
                         </TableCell>
                       )
                     }
@@ -273,6 +334,27 @@ const InventoryTab = ({
         page={page}
         onPageChange={onPageChange}
         onRowsPerPageChange={onRowsPerPageChange}
+      />
+      <ViewInventoryModal
+        open={openViewModal}
+        onClose={() => setOpenViewModal(false)}
+        inventory={selectedInventory}
+        variants={variants}
+        warehouses={warehouses}
+      />
+      <EditInventoryModal
+        open={openEditModal}
+        onClose={handleCloseEditModal}
+        inventory={selectedInventory}
+        onSave={updateInventory}
+        variants={variants}
+        warehouses={warehouses}
+      />
+      <DeleteInventoryModal
+        open={openDeleteModal}
+        onClose={handleCloseDeleteModal}
+        inventory={selectedInventory}
+        onSave={deleteInventory}
       />
     </Paper>
   )

@@ -1,4 +1,5 @@
-import React, { useState } from 'react'
+// InventoryLogTab.js
+import React, { useState, useEffect } from 'react'
 import {
   Paper,
   Table,
@@ -14,8 +15,11 @@ import {
   MenuItem,
   Select,
   Typography,
-  Box
+  Box,
+  IconButton
 } from '@mui/material'
+import VisibilityIcon from '@mui/icons-material/Visibility'
+import ViewInventoryLogModal from '../modal/InventoryLog/ViewInventoryLogModal' // Thêm modal mới
 
 const InventoryLogTab = ({
   data,
@@ -24,12 +28,24 @@ const InventoryLogTab = ({
   page,
   rowsPerPage,
   onPageChange,
-  onRowsPerPageChange
+  onRowsPerPageChange,
+  refreshInventoryLogs
 }) => {
   const [filterSku, setFilterSku] = useState('')
   const [filterLogWarehouse, setFilterLogWarehouse] = useState('all')
   const [filterLogType, setFilterLogType] = useState('all')
   const [filterLogDate, setFilterLogDate] = useState('all')
+  const [openViewModal, setOpenViewModal] = useState(false) // State cho modal xem
+  const [selectedLog, setSelectedLog] = useState(null) // State cho bản ghi được chọn
+
+  useEffect(() => {
+    refreshInventoryLogs()
+  }, [])
+
+  const handleViewLog = (log) => {
+    setSelectedLog(log)
+    setOpenViewModal(true)
+  }
 
   const enrichedInventoryLogs = data.map((log) => {
     const variant = variants.find((v) => v.id === log.variantId)
@@ -40,7 +56,7 @@ const InventoryLogTab = ({
       variantName: variant?.name || 'N/A',
       warehouse: warehouse?.name || 'N/A',
       typeLabel: log.type === 'in' ? 'Nhập' : 'Xuất',
-      createdAtFormatted: new Date(log.createdAt).toLocaleDateString(),
+      createdAtFormatted: new Date(log.createdAt).toLocaleDateString('vi-VN'),
       createdByName: log.createdBy?.name || 'N/A'
     }
   })
@@ -51,8 +67,7 @@ const InventoryLogTab = ({
       filterLogWarehouse === 'all' || log.warehouse === filterLogWarehouse
     const typeMatch = filterLogType === 'all' || log.typeLabel === filterLogType
     const dateMatch =
-      filterLogDate === 'all' ||
-      new Date(log.createdAtFormatted).toLocaleDateString() === filterLogDate
+      filterLogDate === 'all' || log.createdAtFormatted === filterLogDate
     return variant && warehouseMatch && typeMatch && dateMatch
   })
 
@@ -66,7 +81,8 @@ const InventoryLogTab = ({
     { id: 'exportPrice', label: 'Giá xuất', minWidth: 100, align: 'right' },
     { id: 'note', label: 'Ghi chú', minWidth: 150 },
     { id: 'createdByName', label: 'Người thực hiện', minWidth: 120 },
-    { id: 'createdAtFormatted', label: 'Ngày thực hiện', minWidth: 150 }
+    { id: 'createdAtFormatted', label: 'Ngày thực hiện', minWidth: 150 },
+    { id: 'action', label: 'Hành động', minWidth: 100, align: 'center' } // Thêm cột Hành động
   ]
 
   return (
@@ -186,6 +202,19 @@ const InventoryLogTab = ({
                 <TableRow hover role='checkbox' tabIndex={-1} key={index}>
                   {inventoryLogColumns.map((column) => {
                     const value = row[column.id]
+                    if (column.id === 'action') {
+                      return (
+                        <TableCell key={column.id} align={column.align}>
+                          <IconButton
+                            onClick={() => handleViewLog(row)}
+                            size='small'
+                            color='primary'
+                          >
+                            <VisibilityIcon />
+                          </IconButton>
+                        </TableCell>
+                      )
+                    }
                     return (
                       <TableCell key={column.id} align={column.align}>
                         {value !== undefined ? value : '—'}
@@ -205,6 +234,13 @@ const InventoryLogTab = ({
         page={page}
         onPageChange={onPageChange}
         onRowsPerPageChange={onRowsPerPageChange}
+      />
+      <ViewInventoryLogModal
+        open={openViewModal}
+        onClose={() => setOpenViewModal(false)}
+        log={selectedLog}
+        variants={variants}
+        warehouses={warehouses}
       />
     </Paper>
   )

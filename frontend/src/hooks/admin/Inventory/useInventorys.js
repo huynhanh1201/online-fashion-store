@@ -22,19 +22,16 @@ const useInventorys = (pageInventory = 1, limit = 10) => {
   }
   const updateInventoryById = async (id, data) => {
     const result = await updateInventory(id, data)
-    if (result) await fetchInventories(pageInventory)
     return result
   }
 
   const deleteInventoryById = async (id) => {
     const result = await deleteInventory(id)
-    if (result) await fetchInventories(pageInventory)
     return result
   }
 
   const createNewInventory = async (data) => {
     const result = await createInventory(data)
-    if (result) await fetchInventories(pageInventory)
     return result
   }
 
