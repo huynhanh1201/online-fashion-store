@@ -5,7 +5,6 @@ import { sizePalettesService } from '~/services/sizePalettesService'
 const createSizePalette = async (req, res, next) => {
   try {
     const productId = req.query.productId
-    console.log('productId', productId)
 
     // Lấy Danh mục sản phẩm mới tạo từ tầng Service chuyển qua
     const result = await sizePalettesService.createSizePalette(
