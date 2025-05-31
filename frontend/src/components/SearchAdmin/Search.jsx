@@ -428,6 +428,7 @@ export default function Search({
   }, [suggestions, index])
 
   const handleSelect = (value) => {
+    console.log('value selected:', value)
     const displayText = value.sku || value.name || value
     setSearchTextInternal(displayText)
     setSearchText(displayText)

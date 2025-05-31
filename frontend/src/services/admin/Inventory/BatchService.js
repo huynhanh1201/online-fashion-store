@@ -7,7 +7,7 @@ export const getBatches = async (filters = {}) => {
     const response = await AuthorizedAxiosInstance.get(
       `${API_ROOT}/v1/batches?${params}`
     )
-    return response.data
+    return { batches: response.data, total: response.data.length }
   } catch (error) {
     console.error('Lỗi khi lấy danh sách lô hàng:', error)
     return []

@@ -16,42 +16,23 @@ import {
 } from '@mui/icons-material'
 import InventoryTable from './InventoryTableApi'
 import useInventorys from '~/hooks/admin/Inventory/useInventorys.js'
-import InventoryStatusCards from '~/components/dashboard/InventoryStatusCards.jsx'
-// Lazy load các modal
-const ViewInventoryModal = React.lazy(
-  () => import('./modal/ViewInventoryModal')
-)
-const EditInventoryModal = React.lazy(
-  () => import('./modal/EditInventoryModal')
-)
-const DeleteInventoryModal = React.lazy(
-  () => import('./modal/DeleteInventoryModal')
-)
-const AddInventoryModal = React.lazy(() => import('./modal/AddInventoryModal'))
-const AdjustInventoryModal = React.lazy(
-  () => import('./modal/AdjustInventoryModal')
-)
 
 const InventoryDashboard = () => {
   const [page] = useState(1)
   const [searchTerm, setSearchTerm] = useState('')
   const [filterStatus, setFilterStatus] = useState('all')
-  const [selectedInventory, setSelectedInventory] = useState(null)
-  const [modalType, setModalType] = useState(null)
-  const [openAdjustModal, setOpenAdjustModal] = useState(false)
-  const [adjustType, setAdjustType] = useState('in')
-  const [selectedInventoryId, setSelectedInventoryId] = useState(null)
+  const [setSelectedInventory] = useState(null)
+  const [setModalType] = useState(null)
+  const [setOpenAdjustModal] = useState(false)
+  const [setAdjustType] = useState('in')
+  const [setSelectedInventoryId] = useState(null)
 
   const {
     inventories,
     // totalPages,
     fetchInventories,
     loading,
-    updateInventoryById,
-    deleteInventoryById,
-    createNewInventory,
-    handleExport,
-    handleImport
+    handleExport
   } = useInventorys(page)
 
   useEffect(() => {
@@ -71,44 +52,6 @@ const InventoryDashboard = () => {
 
     setSelectedInventory(inventory)
     setModalType(type)
-  }
-
-  const handleCloseModal = () => {
-    setSelectedInventory(null)
-    setModalType(null)
-    setOpenAdjustModal(false)
-    fetchInventories(page)
-  }
-
-  const handleAddInventory = async (data) => {
-    const result = await createNewInventory(data)
-    if (result) handleCloseModal()
-    return result
-  }
-
-  const updateInventory = async (id, data) => {
-    const result = await updateInventoryById(id, data)
-    if (result) await fetchInventories()
-    return result
-  }
-
-  const deleteInventory = async (id) => {
-    const result = await deleteInventoryById(id)
-    if (result) {
-      handleCloseModal()
-      await fetchInventories()
-    }
-    return result
-  }
-
-  const handleAdjustSubmit = async (quantity) => {
-    if (adjustType === 'in') {
-      await handleImport(selectedInventoryId, quantity)
-    } else {
-      await handleExport(selectedInventoryId, quantity)
-    }
-    setOpenAdjustModal(false)
-    fetchInventories(page)
   }
 
   const handleExportExcel = async () => {
@@ -217,56 +160,6 @@ const InventoryDashboard = () => {
           {/*/>*/}
         </>
       )}
-
-      {/* Modal */}
-      <React.Suspense
-        fallback={
-          <Box display='flex' justifyContent='center' my={4}>
-            <CircularProgress />
-          </Box>
-        }
-      >
-        {modalType === 'view' && selectedInventory && (
-          <ViewInventoryModal
-            open
-            onClose={handleCloseModal}
-            inventory={selectedInventory}
-          />
-        )}
-        {modalType === 'edit' && selectedInventory && (
-          <EditInventoryModal
-            open
-            onClose={handleCloseModal}
-            inventory={selectedInventory}
-            onSave={updateInventory}
-          />
-        )}
-        {modalType === 'delete' && selectedInventory && (
-          <DeleteInventoryModal
-            open
-            onClose={handleCloseModal}
-            inventory={selectedInventory}
-            onDelete={deleteInventory}
-          />
-        )}
-        {modalType === 'add' && (
-          <AddInventoryModal
-            open
-            onClose={handleCloseModal}
-            onAdd={handleAddInventory}
-          />
-        )}
-        {openAdjustModal && selectedInventory && (
-          <AdjustInventoryModal
-            open={openAdjustModal}
-            onClose={() => setOpenAdjustModal(false)}
-            onSubmit={handleAdjustSubmit}
-            type={adjustType}
-            inventory={selectedInventory}
-          />
-        )}
-      </React.Suspense>
-      {/*<InventoryStatusCards inventoryData={inventoryData} />*/}
     </Box>
   )
 }

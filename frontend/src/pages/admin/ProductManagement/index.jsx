@@ -152,14 +152,7 @@ const DeleteProductModal = React.lazy(
   () => import('./modal/DeleteProductModal')
 )
 const ViewProductModal = React.lazy(() => import('./modal/ViewProductModal'))
-const AddColorModal = React.lazy(
-  () => import('./modal/modalChildren/AddColorModal.jsx')
-)
-const AddSizeModal = React.lazy(
-  () => import('./modal/modalChildren/AddSizeModal.jsx')
-)
 import StyleAdmin from '~/assets/StyleAdmin.jsx'
-import AddColorbyProductModal from '~/pages/admin/ProductManagement/modal/modalChildren/AddColorModal.jsx'
 
 const ProductManagement = () => {
   const [page, setPage] = React.useState(1)
@@ -408,20 +401,6 @@ const ProductManagement = () => {
             onClose={handleCloseModal}
             product={selectedProduct}
             onDelete={handleDeleteProduct}
-          />
-        )}
-        {modalType === 'addColor' && selectedProduct && (
-          <AddColorbyProductModal
-            open
-            onClose={handleCloseModal}
-            product={selectedProduct}
-          />
-        )}
-        {modalType === 'addSize' && selectedProduct && (
-          <AddSizeModal
-            open
-            onClose={handleCloseModal}
-            product={selectedProduct}
           />
         )}
       </React.Suspense>
