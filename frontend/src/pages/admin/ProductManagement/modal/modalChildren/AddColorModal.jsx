@@ -117,8 +117,6 @@ const AddColorbyProductModal = ({ open, onClose, product }) => {
       setColorFile(null)
       setColorPreview('')
       if (fileInputRef.current) fileInputRef.current.value = ''
-
-      alert('Thêm màu thành công')
     } catch (err) {
       alert('Upload ảnh hoặc thêm màu thất bại, vui lòng thử lại')
       console.error(err)

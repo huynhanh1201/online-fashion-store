@@ -6,6 +6,7 @@ import InventoryLogTab from './tab/InventoryLogTab'
 import WarehousesTab from './tab/WarehousesTab'
 import VariantsTab from './tab/VariantTab'
 import BatchesTab from './tab/BatchesTab'
+import PartnersTab from './tab/PartnersTab'
 import useProducts from '~/hooks/admin/useProducts.js'
 import useColors from '~/hooks/admin/useColor.js'
 import useSizes from '~/hooks/admin/useSize.js'
@@ -15,6 +16,8 @@ import useWarehouses from '~/hooks/admin/Inventory/useWarehouses.js'
 import useWarehouseSlips from '~/hooks/admin/Inventory/useWarehouseSlip.js'
 import useBatches from '~/hooks/admin/Inventory/useBatches.js'
 import useInventoryLog from '~/hooks/admin/Inventory/useInventoryLogs.js'
+import usePartner from '~/hooks/admin/Inventory/usePartner.js'
+import useProfile from '~/hooks/admin/useUserProfile.js'
 const InventoryTable = () => {
   const [activeTab, setActiveTab] = useState(0)
   const [page, setPage] = useState(0)
@@ -33,6 +36,8 @@ const InventoryTable = () => {
     useWarehouseSlips(page + 1, rowsPerPage)
   const { batches, fetchBatches, createNewBatch } = useBatches()
   const { logs, fetchLogs, createNewLog } = useInventoryLog()
+  const { partners, fetchPartners, createNewPartner } = usePartner()
+  const { profile, fetchProfile } = useProfile()
   useEffect(() => {
     fetchProducts()
     fetchColors()
@@ -43,6 +48,8 @@ const InventoryTable = () => {
     fetchWarehouseSlips()
     fetchBatches()
     fetchLogs()
+    fetchPartners()
+    fetchProfile()
   }, [page])
   const handleTabChange = (event, newValue) => {
     setActiveTab(newValue)
@@ -64,7 +71,8 @@ const InventoryTable = () => {
     'Lịch sử',
     'Kho hàng',
     'Biến thể',
-    'Lô hàng'
+    'Lô hàng',
+    'Đối tác'
   ]
   return (
     <Box sx={{ width: '100%' }}>
@@ -103,6 +111,9 @@ const InventoryTable = () => {
             onRowsPerPageChange={handleChangeRowsPerPage}
             batches={batches}
             addWarehouseSlip={createNewWarehouseSlip}
+            partners={partners}
+            user={profile}
+            refreshWarehouseSlips={fetchWarehouseSlips}
           />
         )}
         {activeTab === 2 && (
@@ -150,6 +161,18 @@ const InventoryTable = () => {
             onPageChange={handleChangePage}
             onRowsPerPageChange={handleChangeRowsPerPage}
             addBatch={createNewBatch}
+            refreshBatches={fetchBatches}
+          />
+        )}
+        {activeTab === 6 && (
+          <PartnersTab
+            data={partners}
+            page={page}
+            rowsPerPage={rowsPerPage}
+            onPageChange={handleChangePage}
+            onRowsPerPageChange={handleChangeRowsPerPage}
+            refreshPartners={fetchPartners}
+            addPartner={createNewPartner}
           />
         )}
       </Box>

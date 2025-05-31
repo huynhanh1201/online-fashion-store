@@ -34,12 +34,14 @@ const InventoryLogTab = ({
   const enrichedInventoryLogs = data.map((log) => {
     const variant = variants.find((v) => v.id === log.variantId)
     const warehouse = warehouses.find((w) => w.id === log.warehouseId)
+
     return {
       ...log,
-      variantName: variant ? variant.name : 'N/A',
-      warehouse: warehouse ? warehouse.name : 'N/A',
+      variantName: variant?.name || 'N/A',
+      warehouse: warehouse?.name || 'N/A',
       typeLabel: log.type === 'in' ? 'Nhập' : 'Xuất',
-      createdAtFormatted: new Date(log.createdAt).toLocaleDateString()
+      createdAtFormatted: new Date(log.createdAt).toLocaleDateString(),
+      createdByName: log.createdBy?.name || 'N/A'
     }
   })
 
@@ -55,17 +57,15 @@ const InventoryLogTab = ({
   })
 
   const inventoryLogColumns = [
+    { id: 'source', label: 'Mã phiếu', minWidth: 130 },
     { id: 'variantName', label: 'Biến thể', minWidth: 150 },
     { id: 'warehouse', label: 'Kho', minWidth: 100 },
     { id: 'typeLabel', label: 'Loại', minWidth: 100 },
-    {
-      id: 'quantityChange',
-      label: 'Số lượng thay đổi',
-      minWidth: 120,
-      align: 'right'
-    },
+    { id: 'amount', label: 'Số lượng', minWidth: 100, align: 'right' },
+    { id: 'importPrice', label: 'Giá nhập', minWidth: 100, align: 'right' },
+    { id: 'exportPrice', label: 'Giá xuất', minWidth: 100, align: 'right' },
     { id: 'note', label: 'Ghi chú', minWidth: 150 },
-    { id: 'createdBy', label: 'Người thực hiện', minWidth: 120 },
+    { id: 'createdByName', label: 'Người thực hiện', minWidth: 120 },
     { id: 'createdAtFormatted', label: 'Ngày thực hiện', minWidth: 150 }
   ]
 
@@ -188,9 +188,7 @@ const InventoryLogTab = ({
                     const value = row[column.id]
                     return (
                       <TableCell key={column.id} align={column.align}>
-                        {column.format && typeof value === 'number'
-                          ? column.format(value)
-                          : value}
+                        {value !== undefined ? value : '—'}
                       </TableCell>
                     )
                   })}

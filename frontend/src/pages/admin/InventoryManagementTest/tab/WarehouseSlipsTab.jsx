@@ -23,7 +23,10 @@ const WarehouseSlipsTab = ({
   rowsPerPage,
   onPageChange,
   onRowsPerPageChange,
-  batches
+  batches,
+  partners,
+  addWarehouseSlip,
+  refreshWarehouseSlips
 }) => {
   const [data, setData] = useState(initialData)
   const [openModal, setOpenModal] = useState(false)
@@ -38,7 +41,7 @@ const WarehouseSlipsTab = ({
     note: ''
   })
   const [items, setItems] = useState([
-    { variantId: '', lot: '', quantity: '', unit: 'pcs', note: '' }
+    { variantId: '', lot: '', quantity: '', unit: '', note: '' }
   ])
 
   const handleOpenModal = (type) => {
@@ -53,6 +56,7 @@ const WarehouseSlipsTab = ({
 
   const handleCloseModal = () => {
     setOpenModal(false)
+    refreshWarehouseSlips() // Refresh the slips after closing the modal
     setModalType('input') // Reset to default
     setNewSlipData({
       slipId: `PNK-${new Date().toISOString().slice(0, 10).replace(/-/g, '')}-001`,
@@ -63,11 +67,12 @@ const WarehouseSlipsTab = ({
       partnerName: '',
       note: ''
     })
-    setItems([{ variantId: '', lot: '', quantity: '', unit: 'pcs', note: '' }])
+    setItems([{ variantId: '', lot: '', quantity: '', unit: '', note: '' }])
   }
 
-  const handleAddSlip = (newSlip) => {
+  const handleAddSlip = async (newSlip) => {
     setData([...data, newSlip])
+    await addWarehouseSlip(newSlip) // Call the function to add the slip
     handleCloseModal()
   }
 
@@ -88,7 +93,7 @@ const WarehouseSlipsTab = ({
   const handleAddRow = () => {
     setItems([
       ...items,
-      { variantId: '', lot: '', quantity: '', unit: 'pcs', note: '' }
+      { variantId: '', lot: '', quantity: '', unit: '', note: '' }
     ])
   }
 
@@ -99,20 +104,16 @@ const WarehouseSlipsTab = ({
 
   const handleAdd = () => {
     const newSlip = {
-      id: `slip-${Date.now()}`,
-      slipId: newSlipData.slipId,
-      warehouseId: newSlipData.warehouseId,
-      type: modalType, // Use the type from state
-      status: 'pending',
-      note: newSlipData.note,
-      createdAt: newSlipData.date.toISOString(),
+      type: modalType === 'input' ? 'import' : 'export',
+      date: newSlipData.date ? new Date(newSlipData.date).toISOString() : null,
+      partnerId: newSlipData.partnerId || '',
+      warehouseId: newSlipData.warehouseId || '',
       items: items.map((item) => ({
-        variantId: item.variantId,
-        lot: item.lot,
+        variantId: item.variantId || '',
         quantity: parseInt(item.quantity) || 0,
-        unit: item.unit,
-        note: item.note
-      }))
+        unit: item.unit || 'cái'
+      })),
+      note: newSlipData.note || ''
     }
     handleAddSlip(newSlip)
   }
@@ -122,7 +123,7 @@ const WarehouseSlipsTab = ({
     return {
       ...slip,
       warehouse: warehouse ? warehouse.name : 'N/A',
-      typeLabel: slip.type === 'input' ? 'Nhập' : 'Xuất',
+      type: slip.type === 'import' ? 'Nhập' : 'Xuất',
       statusLabel: slip.status === 'pending' ? 'Đang xử lý' : 'Hoàn thành',
       createdAtFormatted: new Date(slip.createdAt).toLocaleString()
     }
@@ -130,7 +131,7 @@ const WarehouseSlipsTab = ({
 
   const warehouseSlipColumns = [
     { id: 'slipId', label: 'Mã phiếu', minWidth: 100 },
-    { id: 'typeLabel', label: 'Loại', minWidth: 100 },
+    { id: 'type', label: 'Loại', minWidth: 100 },
     { id: 'warehouse', label: 'Kho', minWidth: 100 },
     { id: 'statusLabel', label: 'Trạng thái', minWidth: 100 },
     { id: 'note', label: 'Ghi chú', minWidth: 150 },
@@ -238,6 +239,8 @@ const WarehouseSlipsTab = ({
         warehouseSlips={data} // Pass warehouseSlips
         batches={batches} // Pass batches
         type={modalType} // Pass the type ('input' or 'output')
+        partners={partners} // Pass partners
+        addWarehouseSlip={addWarehouseSlip}
       />
     </Paper>
   )
