@@ -29,7 +29,7 @@ Router.route('/items').patch(
 // Xoá Item giỏ hàng
 Router.route('/items').delete(
   authMiddleware.isAuthorized,
-  cartsValidation.cart,
+  cartsValidation.cartDeleteItem,
   cartsController.deleteItemCart
 )
 
