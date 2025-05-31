@@ -19,7 +19,7 @@ const order = async (req, res, next) => {
     cartItems: Joi.array()
       .items(
         Joi.object({
-          productId: Joi.string().length(24).hex().required(),
+          variantId: Joi.string().length(24).hex().required(),
           quantity: Joi.number().integer().min(1).required()
         })
       )

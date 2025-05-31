@@ -14,6 +14,7 @@ import { verifyChecksum } from '~/utils/vnpay'
 import { env } from '~/config/environment'
 import { UserModel } from '~/models/UserModel'
 import { CouponModel } from '~/models/CouponModel'
+import { VariantModel } from '~/models/VariantModel'
 
 const createOrder = async (userId, reqBody, ipAddr) => {
   // eslint-disable-next-line no-useless-catch
@@ -33,6 +34,8 @@ const createOrder = async (userId, reqBody, ipAddr) => {
       paymentMethod,
       note
     } = reqBody
+
+    //
 
     // Kiểm tra cartItems
     if (!Array.isArray(cartItems) || cartItems.length === 0) {
@@ -56,25 +59,26 @@ const createOrder = async (userId, reqBody, ipAddr) => {
     }
 
     // Lấy thông tin sản phẩm
-    const productIds = cartItems.map((item) => item.productId)
-    const products = await ProductModel.find({
-      _id: { $in: productIds }
+    const variantIds = cartItems.map((item) => item.variantId)
+    const variants = await VariantModel.find({
+      _id: { $in: variantIds }
     })
       .session(session)
       .lean()
-    const productMap = new Map(products.map((p) => [p._id.toString(), p]))
+
+    const variantMap = new Map(variants.map((p) => [p._id.toString(), p]))
 
     // Tính toán tổng tiền
     let calculatedSubtotal = 0
     for (const item of cartItems) {
-      const product = productMap.get(item.productId.toString())
-      if (!product) {
+      const variant = variantMap.get(item.variantId.toString())
+      if (!variant) {
         throw new ApiError(
           StatusCodes.NOT_FOUND,
-          `Sản phẩm với ID ${item.productId} không tồn tại.`
+          `Sản phẩm với ID ${item.variantId} không tồn tại.`
         )
       }
-      calculatedSubtotal += product.price * item.quantity
+      calculatedSubtotal += variant.exportPrice * item.quantity
     }
 
     // Xác thực mã giảm giá
@@ -98,6 +102,7 @@ const createOrder = async (userId, reqBody, ipAddr) => {
     const discountAmount = validateCoupon.discountAmount || 0
 
     // Kiểm tra tổng tiền từ FE
+
     if (cartTotal !== total) {
       throw new ApiError(
         StatusCodes.UNPROCESSABLE_ENTITY,
@@ -126,14 +131,14 @@ const createOrder = async (userId, reqBody, ipAddr) => {
 
     // Tạo OrderItems
     const orderItems = cartItems.map((item) => {
-      const product = productMap.get(item.productId.toString())
+      const variant = variantMap.get(item.variantId.toString())
       return {
         orderId: order._id,
-        image: product.image,
-        name: product.name,
-        price: product.price,
+        image: variant.color.name,
+        name: variant.name,
+        price: variant.exportPrice,
         quantity: item.quantity,
-        subtotal: product.price * item.quantity
+        subtotal: variant.exportPrice * item.quantity
       }
     })
 
@@ -157,7 +162,7 @@ const createOrder = async (userId, reqBody, ipAddr) => {
       {
         $pull: {
           cartItems: {
-            productId: { $in: productIds }
+            variantId: { $in: variantIds }
           }
         }
       }
