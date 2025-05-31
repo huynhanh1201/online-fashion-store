@@ -4,22 +4,10 @@ const { Schema, model } = mongoose
 // Tạo schema cho Giỏ hàng
 const cartItemSchema = new Schema(
   {
-    productId: {
+    variantId: {
       type: Schema.Types.ObjectId,
-      ref: 'Product',
+      ref: 'Variant',
       required: true
-    },
-    color: {
-      type: String,
-      required: true,
-      minlength: 1,
-      maxlength: 50
-    },
-    size: {
-      type: String,
-      required: true,
-      minlength: 1,
-      maxlength: 10
     },
     quantity: {
       type: Number,

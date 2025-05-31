@@ -2,6 +2,8 @@ import { StatusCodes } from 'http-status-codes'
 
 import { CartModel } from '~/models/CartModel'
 import ApiError from '~/utils/ApiError'
+import { VariantModel } from '~/models/VariantModel'
+import apiError from '~/utils/ApiError'
 
 const createCart = async (reqJwtDecoded, reqBody) => {
   // eslint-disable-next-line no-useless-catch
@@ -10,6 +12,12 @@ const createCart = async (reqJwtDecoded, reqBody) => {
 
     // Lấy document giỏ hàng (nếu có)
     const userCart = await CartModel.findOne({ userId })
+
+    const variant = await VariantModel.findById(reqBody.variantId)
+
+    if (!variant) {
+      throw new apiError(StatusCodes.NOT_FOUND, 'Không tìm thấy biến thể.')
+    }
 
     // Nếu không có giỏ hàng, tạo mới
     if (!userCart) {
@@ -29,9 +37,7 @@ const createCart = async (reqJwtDecoded, reqBody) => {
         userId, // nếu bạn đã biết _id của cart
         cartItems: {
           $elemMatch: {
-            productId: reqBody.productId,
-            color: reqBody.color,
-            size: reqBody.size.toUpperCase()
+            variantId: reqBody.variantId
           }
         }
       },
@@ -63,7 +69,10 @@ const getItemCartList = async (userId) => {
   // eslint-disable-next-line no-useless-catch
   try {
     const result = await CartModel.findOne({ userId })
-      .populate('cartItems.productId') // đảm bảo ref đúng
+      .populate({
+        path: 'cartItems.variantId',
+        select: 'productId color size name importPrice exportPrice'
+      })
       .lean() // sau populate mới gọi lean
 
     return result
@@ -78,13 +87,7 @@ const updateItemCart = async (userId, reqBody) => {
     const itemCart = await CartModel.findOneAndUpdate(
       {
         userId,
-        cartItems: {
-          $elemMatch: {
-            productId: reqBody.productId,
-            color: reqBody.color,
-            size: reqBody.size
-          }
-        }
+        'cartItems.variantId': reqBody.variantId
       },
       {
         $inc: {
@@ -94,7 +97,12 @@ const updateItemCart = async (userId, reqBody) => {
       {
         new: true
       }
-    ).populate('cartItems.productId')
+    )
+      .populate({
+        path: 'cartItems.variantId',
+        select: 'productId color size name importPrice exportPrice'
+      })
+      .lean() // sau populate mới gọi lean
 
     if (!itemCart) {
       throw new ApiError(StatusCodes.NOT_FOUND, 'ID không tồn tại.')
@@ -112,17 +120,11 @@ const deleteItemCart = async (userId, reqBody) => {
     const updatedCart = await CartModel.findOneAndUpdate(
       {
         userId,
-        'cartItems.productId': reqBody.productId,
-        'cartItems.color': reqBody.color,
-        'cartItems.size': reqBody.size
+        'cartItems.variantId': reqBody.variantId
       },
       {
         $pull: {
-          cartItems: {
-            productId: reqBody.productId,
-            color: reqBody.color,
-            size: reqBody.size
-          }
+          cartItems: { variantId: reqBody.variantId }
         }
       },
       { new: true }
