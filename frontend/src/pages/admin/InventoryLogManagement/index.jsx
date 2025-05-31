@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { Typography } from '@mui/material'
 import InventoryLogTable from './InventoryLogTable'
 import InventoryLogPagination from './InventoryLogPagination'
-import useInventoryLogs from '~/hooks/admin/useInventoryLogs'
+import useInventoryLogs from '~/hooks/admin/Inventory/useInventoryLogs'
 import ViewInventoryLogModal from '~/pages/admin/InventoryLogManagement/modal/ViewInventoryLogModal.jsx'
 const InventoryLogPage = () => {
   const [page, setPage] = useState(1)

@@ -12,6 +12,8 @@ import StyleAdmin, {
 import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye'
 import BorderColorIcon from '@mui/icons-material/BorderColor'
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever'
+import PaletteIcon from '@mui/icons-material/Palette'
+import StraightenIcon from '@mui/icons-material/Straighten'
 import ProductImageModal from './modal/ProductImageModal'
 
 const styles = {
@@ -65,7 +67,9 @@ const ProductRow = ({ index, product, handleOpenModal }) => {
         >
           {product.name}
         </StyledTableCell>
-        <StyledTableCell>{product.price.toLocaleString()}</StyledTableCell>
+        <StyledTableCell>
+          {product.exportPrice.toLocaleString()}
+        </StyledTableCell>
         <StyledTableCell>{product.quantity}</StyledTableCell>
         <StyledTableCell
           sx={{
@@ -104,7 +108,7 @@ const ProductRow = ({ index, product, handleOpenModal }) => {
             size='small'
           />
         </StyledTableCell>
-        <StyledTableCell sx={{ maxWidth: '130px', width: '130px' }}>
+        <StyledTableCell sx={{ maxWidth: '220px', width: '220px' }}>
           <Stack direction='row' spacing={1} sx={styles.groupIcon}>
             <IconButton
               onClick={() => handleOpenModal('view', product)}
@@ -117,6 +121,18 @@ const ProductRow = ({ index, product, handleOpenModal }) => {
               size='small'
             >
               <BorderColorIcon color='warning' />
+            </IconButton>
+            <IconButton
+              onClick={() => handleOpenModal('addColor', product)}
+              size='small'
+            >
+              <PaletteIcon color='primary' />
+            </IconButton>
+            <IconButton
+              onClick={() => handleOpenModal('addSize', product)}
+              size='small'
+            >
+              <StraightenIcon color='primary' />
             </IconButton>
             <IconButton
               onClick={() => handleOpenModal('delete', product)}

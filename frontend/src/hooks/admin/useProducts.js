@@ -30,7 +30,11 @@
 // export default useProducts
 
 import { useState } from 'react'
-import { getProducts, getProductById } from '~/services/admin/productService'
+import {
+  getProducts,
+  getProductById,
+  addProduct
+} from '~/services/admin/productService'
 
 const useProducts = (initialPage = 1) => {
   const [products, setProducts] = useState([])
@@ -68,7 +72,27 @@ const useProducts = (initialPage = 1) => {
     }
   }
 
-  return { products, totalPages, fetchProducts, loading, fetchProductById }
+  const createNewProduct = async (data) => {
+    try {
+      const result = await addProduct(data)
+      if (result) {
+        await fetchProducts()
+      }
+      return result
+    } catch (error) {
+      console.error('Lỗi khi tạo sản phẩm mới:', error)
+      return null
+    }
+  }
+
+  return {
+    products,
+    totalPages,
+    fetchProducts,
+    loading,
+    fetchProductById,
+    createNewProduct
+  }
 }
 
 export default useProducts

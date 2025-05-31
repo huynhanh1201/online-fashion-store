@@ -16,30 +16,26 @@ const verifyId = (req, res, next) => {
 const warehouseSlip = async (req, res, next) => {
   // Xác thực dữ liệu đầu vào correctCondition: điều kiện đúng
   const correctCondition = Joi.object({
-    productId: Joi.string().length(24).hex().required(),
+    type: Joi.string().valid('import', 'export').required(),
 
-    variant: Joi.object({
-      color: Joi.object({
-        name: Joi.string().trim().required(),
-        image: Joi.string().uri().optional()
-      }).required(),
-      size: Joi.object({
-        name: Joi.string().trim().required()
-      }).required(),
-      sku: Joi.string().trim().required()
-    }).required(),
+    date: Joi.date().iso().required(),
 
-    quantity: Joi.number().integer().min(0).required(),
+    partnerId: Joi.string().length(24).hex().required(),
 
-    importPrice: Joi.number().min(0).required(),
+    warehouseId: Joi.string().length(24).hex().required(),
 
-    exportPrice: Joi.number().min(0).required(),
+    items: Joi.array()
+      .items(
+        Joi.object({
+          variantId: Joi.string().length(24).hex().required(),
+          quantity: Joi.number().min(0).required(),
+          unit: Joi.string().trim().required()
+        })
+      )
+      .min(1)
+      .required(),
 
-    minQuantity: Joi.number().integer().min(0).default(0),
-
-    status: Joi.string()
-      .valid('in-stock', 'out-of-stock', 'discontinued')
-      .default('in-stock')
+    note: Joi.string().trim().allow('').default('')
   })
 
   try {
@@ -88,31 +84,8 @@ const warehouseSlipUpdate = async (req, res, next) => {
   }
 }
 
-const warehouseSlipInOutStock = async (req, res, next) => {
-  // Xác thực dữ liệu đầu vào correctCondition: điều kiện đúng
-  const correctCondition = Joi.object({
-    quantity: Joi.number().integer().min(0).required()
-  })
-
-  try {
-    await correctCondition.validateAsync(req.body, {
-      abortEarly: false // Không dừng lại khi gặp lỗi đầu tiên
-    })
-
-    next() // Nếu không có lỗi, tiếp tục xử lý request sang controller
-  } catch (err) {
-    const errorMessage = new Error(err).message
-    const customError = new ApiError(
-      StatusCodes.UNPROCESSABLE_ENTITY,
-      errorMessage
-    )
-    next(customError) // Gọi middleware xử lý lỗi tập trung
-  }
-}
-
 export const warehouseSlipsValidation = {
   verifyId,
   warehouseSlip,
-  warehouseSlipUpdate,
-  warehouseSlipInOutStock
+  warehouseSlipUpdate
 }

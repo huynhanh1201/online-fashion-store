@@ -20,13 +20,13 @@ import Divider from '@mui/material/Divider'
 import { useForm, Controller } from 'react-hook-form'
 import useCategories from '~/hooks/admin/useCategories.js'
 import AddSizeModal from '~/pages/admin/SizeManagement/modal/AddSizeModal.jsx'
-import AddStockModal from './modalColorAddProduct/AddStockModal'
+import AddStockModal from '~/pages/admin/ProductManagement/modal/modalChildren/AddStockModal'
 import AddColorModal from '~/pages/admin/ColorManagement/modal/AddColorModal.jsx'
 import AddCategoryModal from '~/pages/admin/CategorieManagement/modal/AddCategoryModal.jsx'
 import StyleAdmin from '~/assets/StyleAdmin.jsx'
 import { addProduct } from '~/services/admin/productService.js'
-import useColors from '~/hooks/admin/useColor.js'
-import useSizes from '~/hooks/admin/useSize.js'
+// import useColors from '~/hooks/admin/useColor.js'
+// import useSizes from '~/hooks/admin/useSize.js'
 import AddIcon from '@mui/icons-material/Add'
 const URI = 'https://api.cloudinary.com/v1_1/dkwsy9sph/image/upload'
 const CloudinaryColor = 'color_upload' // folder riêng cho ảnh màu
@@ -57,6 +57,7 @@ const AddProductModal = ({ open, onClose, onSuccess }) => {
     reset
   } = useForm({
     defaultValues: {
+      // StockId: '',
       name: '',
       description: '',
       categoryId: '',
@@ -65,53 +66,53 @@ const AddProductModal = ({ open, onClose, onSuccess }) => {
       exportPrice: ''
     }
   })
-  const [allColors, setAllColors] = useState([])
-  const [allSizes, setAllSizes] = useState([])
-  const [colorImageFile, setColorImageFile] = useState(null)
-  const [loading, setLoading] = useState(false)
-  const [colorsList, setColorsList] = useState([])
-  const [sizesList, setSizesList] = useState([])
-  const [selectedColor, setSelectedColor] = useState('')
-  const [selectedSize, setSelectedSize] = useState('')
-  const [isSizeModalOpen, setSizeModalOpen] = useState(false)
+  // const [allColors, setAllColors] = useState([])
+  // const [allSizes, setAllSizes] = useState([])
+  // const [colorImageFile, setColorImageFile] = useState(null)
+  // const [loading, setLoading] = useState(false)
+  // const [colorsList, setColorsList] = useState([])
+  // const [sizesList, setSizesList] = useState([])
+  // const [selectedColor, setSelectedColor] = useState('')
+  // const [selectedSize, setSelectedSize] = useState('')
+  // const [isSizeModalOpen, setSizeModalOpen] = useState(false)
   const [categoryOpen, setCategoryOpen] = useState(false)
-  const [stockMatrix, setStockMatrix] = useState([])
-  const [quantity, setQuantity] = useState('')
+  // const [stockMatrix, setStockMatrix] = useState([])
+  // const [quantity, setQuantity] = useState('')
   // State cho màu sắc
-  const [isAddColorModalOpen, setAddColorModalOpen] = useState(false)
+  // const [isAddColorModalOpen, setAddColorModalOpen] = useState(false)
   // State cho ảnh sản phẩm
   const [productImages, setProductImages] = useState([]) // Danh sách ảnh sản phẩm
   const [productImagePreview, setProductImagePreview] = useState([]) // Mảng preview ảnh
 
   const productImageInputRef = useRef() // Ref cho ảnh sản phẩm
-  const colorImageInputRef = useRef()
+  // const colorImageInputRef = useRef()
 
-  const { categories, fetchCategories } = useCategories()
-  const { colors, fetchColors } = useColors()
-  const { sizes, fetchSizes } = useSizes()
+  const { categories, fetchCategories, loading } = useCategories()
+  // const { colors, fetchColors } = useColors()
+  // const { sizes, fetchSizes } = useSizes()
   useEffect(() => {
     if (open) {
       fetchCategories()
       reset()
-      setColorsList([])
-      setSizesList([])
-      setSelectedColor('')
-      setSelectedSize('')
-      setStockMatrix([])
+      // setColorsList([])
+      // setSizesList([])
+      // setSelectedColor('')
+      // setSelectedSize('')
+      // setStockMatrix([])
       setProductImages([]) // Reset ảnh sản phẩm
       setProductImagePreview('')
-      setColorImageFile(null) // Reset ảnh màu
+      // setColorImageFile(null) // Reset ảnh màu
     }
   }, [open, reset])
 
-  useEffect(() => {
-    fetchColors(), fetchSizes()
-  }, [])
+  // useEffect(() => {
+  //   fetchColors(), fetchSizes()
+  // }, [])
 
-  useEffect(() => {
-    if (colors) setAllColors(colors)
-    if (sizes) setAllSizes(sizes)
-  }, [colors, sizes])
+  // useEffect(() => {
+  //   if (colors) setAllColors(colors)
+  //   if (sizes) setAllSizes(sizes)
+  // }, [colors, sizes])
 
   // Xử lý chọn file ảnh sản phẩm và preview
   const handleProductImageFileChange = async (e) => {
@@ -124,7 +125,7 @@ const AddProductModal = ({ open, onClose, onSuccess }) => {
     }
     try {
       const uploadedUrls = await Promise.all(
-        files.map(file => uploadToCloudinary(file, CloudinaryProduct))
+        files.map((file) => uploadToCloudinary(file, CloudinaryProduct))
       )
 
       // Cập nhật state với URL thật từ Cloudinary
@@ -149,84 +150,84 @@ const AddProductModal = ({ open, onClose, onSuccess }) => {
   }
 
   // Thêm kho
-  const handleAddStock = async (quantity) => {
-    setLoading(true)
-
-    const selectedColorData = allColors.find((c) => c.name === selectedColor)
-    const selectedSizeData = allSizes.find((s) => s.name === selectedSize)
-
-    if (!selectedColorData) {
-      alert('Màu đã chọn không tồn tại trong danh sách')
-      setLoading(false)
-      return
-    }
-
-    if (!selectedSizeData) {
-      alert('Kích thước đã chọn không tồn tại trong danh sách')
-      setLoading(false)
-      return
-    }
-
-    // Upload ảnh màu nếu màu chưa tồn tại trong colorsList
-    const existingColor = colorsList.find(
-      (c) => c.name === selectedColorData.name
-    )
-    if (!existingColor) {
-      let imageUrl = ''
-      if (colorImageFile) {
-        try {
-          imageUrl = await uploadToCloudinary(colorImageFile, CloudinaryColor)
-        } catch (error) {
-          console.error('Lỗi khi upload ảnh màu:', error)
-          alert('Upload ảnh màu thất bại')
-          setLoading(false)
-          return
-        }
-      } else {
-        alert('Vui lòng chọn ảnh màu cho màu mới')
-        setLoading(false)
-        return
-      }
-
-      setColorsList((prevColors) => [
-        ...prevColors,
-        { name: selectedColorData.name, image: imageUrl }
-      ])
-
-      // ✅ Reset input file
-      if (colorImageInputRef.current) {
-        colorImageInputRef.current.value = ''
-      }
-    }
-
-    // Thêm size nếu chưa có
-    setSizesList((prevSizes) => {
-      const exists = prevSizes.some((s) => s.name === selectedSizeData.name)
-      if (!exists) {
-        return [...prevSizes, { name: selectedSizeData.name }]
-      }
-      return prevSizes
-    })
-
-    // Thêm vào stockMatrix
-    setStockMatrix((prev) => [
-      ...prev,
-      { color: selectedColorData.name, size: selectedSizeData.name, quantity }
-    ])
-
-    // Reset
-    setSelectedColor('')
-    setSelectedSize('')
-    setQuantity('')
-    setColorImageFile(null)
-
-    setLoading(false)
-  }
+  // const handleAddStock = async (quantity) => {
+  //   setLoading(true)
+  //
+  //   const selectedColorData = allColors.find((c) => c.name === selectedColor)
+  //   const selectedSizeData = allSizes.find((s) => s.name === selectedSize)
+  //
+  //   if (!selectedColorData) {
+  //     alert('Màu đã chọn không tồn tại trong danh sách')
+  //     setLoading(false)
+  //     return
+  //   }
+  //
+  //   if (!selectedSizeData) {
+  //     alert('Kích thước đã chọn không tồn tại trong danh sách')
+  //     setLoading(false)
+  //     return
+  //   }
+  //
+  //   // Upload ảnh màu nếu màu chưa tồn tại trong colorsList
+  //   const existingColor = colorsList.find(
+  //     (c) => c.name === selectedColorData.name
+  //   )
+  //   if (!existingColor) {
+  //     let imageUrl = ''
+  //     if (colorImageFile) {
+  //       try {
+  //         imageUrl = await uploadToCloudinary(colorImageFile, CloudinaryColor)
+  //       } catch (error) {
+  //         console.error('Lỗi khi upload ảnh màu:', error)
+  //         alert('Upload ảnh màu thất bại')
+  //         setLoading(false)
+  //         return
+  //       }
+  //     } else {
+  //       alert('Vui lòng chọn ảnh màu cho màu mới')
+  //       setLoading(false)
+  //       return
+  //     }
+  //
+  //     setColorsList((prevColors) => [
+  //       ...prevColors,
+  //       { name: selectedColorData.name, image: imageUrl }
+  //     ])
+  //
+  //     // ✅ Reset input file
+  //     if (colorImageInputRef.current) {
+  //       colorImageInputRef.current.value = ''
+  //     }
+  //   }
+  //
+  //   // Thêm size nếu chưa có
+  //   setSizesList((prevSizes) => {
+  //     const exists = prevSizes.some((s) => s.name === selectedSizeData.name)
+  //     if (!exists) {
+  //       return [...prevSizes, { name: selectedSizeData.name }]
+  //     }
+  //     return prevSizes
+  //   })
+  //
+  //   // Thêm vào stockMatrix
+  //   setStockMatrix((prev) => [
+  //     ...prev,
+  //     { color: selectedColorData.name, size: selectedSizeData.name, quantity }
+  //   ])
+  //
+  //   // Reset
+  //   setSelectedColor('')
+  //   setSelectedSize('')
+  //   setQuantity('')
+  //   setColorImageFile(null)
+  //
+  //   setLoading(false)
+  // }
 
   // Xóa kho
-  const handleRemoveStock = (index) => {
-    setStockMatrix((prev) => prev.filter((_, i) => i !== index))
-  }
+  // const handleRemoveStock = (index) => {
+  //   setStockMatrix((prev) => prev.filter((_, i) => i !== index))
+  // }
 
   // Lưu sản phẩm
   const onSubmit = async (data) => {
@@ -236,36 +237,37 @@ const AddProductModal = ({ open, onClose, onSuccess }) => {
         return
       }
 
-      if (colorsList.length === 0) {
-        console.log('Vui lòng thêm ít nhất một màu sắc')
-        return
-      }
+      // if (colorsList.length === 0) {
+      //   console.log('Vui lòng thêm ít nhất một màu sắc')
+      //   return
+      // }
+      //
+      // if (sizesList.length === 0) {
+      //   console.log('Vui lòng thêm ít nhất một kích thước')
+      //   return
+      // }
 
-      if (sizesList.length === 0) {
-        console.log('Vui lòng thêm ít nhất một kích thước')
-        return
-      }
-
-      if (stockMatrix.length === 0) {
-        console.log('Vui lòng thêm ít nhất một mục kho')
-        return
-      }
+      // if (stockMatrix.length === 0) {
+      //   console.log('Vui lòng thêm ít nhất một mục kho')
+      //   return
+      // }
 
       const finalProduct = {
+        // StockId: data.StockId,
         name: data.name,
         description: data.description,
-        price: Number(data.price),
+        exportPrice: Number(data.price),
         importPrice: data.importPrice ? Number(data.importPrice) : undefined,
         categoryId: data.categoryId,
-        image: productImages,
-        colors: colorsList.map((c) => ({
-          name: c.name,
-          image: c.image || ''
-        })),
-        sizes: sizesList.map((s) => ({
-          name: s.name
-        })),
-        stockMatrix
+        image: productImages
+        // colors: colorsList.map((c) => ({
+        //   name: c.name,
+        //   image: c.image || ''
+        // })),
+        // sizes: sizesList.map((s) => ({
+        //   name: s.name
+        // }))
+        // stockMatrix
       }
 
       console.log('Final Product:', finalProduct)
@@ -276,9 +278,9 @@ const AddProductModal = ({ open, onClose, onSuccess }) => {
         onSuccess()
         onClose()
         reset()
-        setColorsList([])
-        setSizesList([])
-        setStockMatrix([])
+        // setColorsList([])
+        // setSizesList([])
+        // setStockMatrix([])
         setProductImages([])
         setProductImagePreview('')
       } else {
@@ -320,6 +322,24 @@ const AddProductModal = ({ open, onClose, onSuccess }) => {
       </Box>
       <DialogContent>
         <Grid container spacing={2}>
+          {/*Mã kho*/}
+          <Grid item size={12}>
+            {/*<TextField label='Mã kho hàng' fullWidth />*/}
+            {/*<Controller*/}
+            {/*  name='StockId'*/}
+            {/*  control={control}*/}
+            {/*  rules={{ required: 'Mã kho hàng không được bỏ trống' }}*/}
+            {/*  render={({ field }) => (*/}
+            {/*    <TextField*/}
+            {/*      label='Mã kho hàng'*/}
+            {/*      fullWidth*/}
+            {/*      error={!!errors.StockId}*/}
+            {/*      helperText={errors.StockId?.message}*/}
+            {/*      {...field}*/}
+            {/*    />*/}
+            {/*  )}*/}
+            {/*/>*/}
+          </Grid>
           {/*Tên*/}
           <Grid item size={12}>
             <Controller
@@ -535,208 +555,210 @@ const AddProductModal = ({ open, onClose, onSuccess }) => {
             />
           </Grid>
           {/* Chọn màu và kích thước để thêm kho */}
-          <Grid item size={12}>
-            <Grid
-              container
-              spacing={2}
-              alignItems='center'
-              justifyContent='center'
-            >
-              <Grid item size={4} style={{ height: '56px' }}>
-                <Grid container spacing={1}>
-                  <Grid item size={2}>
-                    <label
-                      htmlFor='color-image'
-                      style={{
-                        width: '56px',
-                        height: '56px',
-                        border: '1px solid #ccc',
-                        borderRadius: '4px',
-                        cursor: 'pointer',
-                        overflow: 'hidden',
-                        display: 'inline-block',
-                        position: 'relative',
-                        backgroundColor: '#f9f9f9'
-                      }}
-                    >
-                      {/* Nếu có ảnh thì hiển thị */}
-                      {colorImageFile ? (
-                        <img
-                          src={URL.createObjectURL(colorImageFile)}
-                          alt='Preview'
-                          style={{
-                            width: '100%',
-                            height: '100%',
-                            objectFit: 'cover',
-                            display: 'block'
-                          }}
-                        />
-                      ) : (
-                        // Placeholder khi chưa chọn ảnh
-                        <div
-                          style={{
-                            width: '100%',
-                            height: '100%',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            fontSize: '12px',
-                            color: '#999'
-                          }}
-                        >
-                          <AddIcon />
-                        </div>
-                      )}
+          {/*<Grid item size={12}>*/}
+          {/*  <Grid*/}
+          {/*    container*/}
+          {/*    spacing={2}*/}
+          {/*    alignItems='center'*/}
+          {/*    justifyContent='center'*/}
+          {/*  >*/}
+          {/*    <Grid item size={4} style={{ height: '56px' }}>*/}
+          {/*      <Grid container spacing={1}>*/}
+          {/*        <Grid item size={2}>*/}
+          {/*          <label*/}
+          {/*            htmlFor='color-image'*/}
+          {/*            style={{*/}
+          {/*              width: '56px',*/}
+          {/*              height: '56px',*/}
+          {/*              border: '1px solid #ccc',*/}
+          {/*              borderRadius: '4px',*/}
+          {/*              cursor: 'pointer',*/}
+          {/*              overflow: 'hidden',*/}
+          {/*              display: 'inline-block',*/}
+          {/*              position: 'relative',*/}
+          {/*              backgroundColor: '#f9f9f9'*/}
+          {/*            }}*/}
+          {/*          >*/}
+          {/*            /!* Nếu có ảnh thì hiển thị *!/*/}
+          {/*            {colorImageFile ? (*/}
+          {/*              <img*/}
+          {/*                src={URL.createObjectURL(colorImageFile)}*/}
+          {/*                alt='Preview'*/}
+          {/*                style={{*/}
+          {/*                  width: '100%',*/}
+          {/*                  height: '100%',*/}
+          {/*                  objectFit: 'cover',*/}
+          {/*                  display: 'block'*/}
+          {/*                }}*/}
+          {/*              />*/}
+          {/*            ) : (*/}
+          {/*              // Placeholder khi chưa chọn ảnh*/}
+          {/*              <div*/}
+          {/*                style={{*/}
+          {/*                  width: '100%',*/}
+          {/*                  height: '100%',*/}
+          {/*                  display: 'flex',*/}
+          {/*                  alignItems: 'center',*/}
+          {/*                  justifyContent: 'center',*/}
+          {/*                  fontSize: '12px',*/}
+          {/*                  color: '#999'*/}
+          {/*                }}*/}
+          {/*              >*/}
+          {/*                <AddIcon />*/}
+          {/*              </div>*/}
+          {/*            )}*/}
 
-                      {/* Hidden input file */}
-                      <input
-                        id='color-image'
-                        type='file'
-                        accept='image/*'
-                        style={{ display: 'none' }}
-                        onChange={(e) => setColorImageFile(e.target.files[0])}
-                        ref={colorImageInputRef}
-                      />
-                    </label>
-                  </Grid>
-                  <Grid item size={10}>
-                    <FormControl fullWidth sx={{ mb: 2 }}>
-                      <InputLabel>Màu</InputLabel>
-                      <Select
-                        value={selectedColor}
-                        label='Màu'
-                        onChange={(e) => setSelectedColor(e.target.value)}
-                      >
-                        <MenuItem value=''>
-                          <em>Chọn màu</em>
-                        </MenuItem>
-                        {colors.map((color, idx) => (
-                          <MenuItem key={idx} value={color.name}>
-                            {color.name}
-                          </MenuItem>
-                        ))}
-                        <MenuItem
-                          value='add_new'
-                          onClick={() => setAddColorModalOpen(true)}
-                        >
-                          Thêm màu mới
-                        </MenuItem>
-                      </Select>
-                    </FormControl>
-                  </Grid>
-                </Grid>
-              </Grid>
-              <Grid item size={4} style={{ height: '56px' }}>
-                <FormControl fullWidth>
-                  <InputLabel>Kích thước</InputLabel>
-                  <Select
-                    value={selectedSize}
-                    label='Kích thước'
-                    onChange={(e) => setSelectedSize(e.target.value)}
-                    renderValue={(selected) => selected || 'Chọn kích thước'}
-                  >
-                    <MenuItem value=''>
-                      <em>Chọn kích thước</em>
-                    </MenuItem>
-                    {sizes.map((size, idx) => (
-                      <MenuItem key={idx} value={size.name}>
-                        {size.name}
-                      </MenuItem>
-                    ))}
-                    <MenuItem onClick={() => setSizeModalOpen(true)}>
-                      Thêm kích thước mới
-                    </MenuItem>
-                  </Select>
-                </FormControl>
-              </Grid>
-              <Grid item size={3} style={{ height: '56px' }}>
-                <TextField
-                  label='Số lượng'
-                  type='number'
-                  fullWidth
-                  value={quantity}
-                  onChange={(e) => setQuantity(e.target.value)}
-                  inputProps={{ min: 1 }}
-                />
-              </Grid>
-              <Grid item size={1}>
-                <Button
-                  disabled={loading}
-                  variant='contained'
-                  sx={{
-                    height: '56px',
-                    width: '100%',
-                    color: '#fff',
-                    backgroundColor: '#001f5d'
-                  }}
-                  onClick={() => {
-                    const qty = Number(quantity)
-                    if (!selectedColor || !selectedSize) {
-                      alert('Vui lòng chọn màu và kích thước')
-                      return
-                    }
-                    if (isNaN(qty) || qty <= 0) {
-                      alert('Vui lòng nhập số lượng hợp lệ (> 0)')
-                      return
-                    }
-                    handleAddStock(qty)
-                    setQuantity('')
-                  }}
-                >
-                  Thêm
-                </Button>
-              </Grid>
-            </Grid>
-          </Grid>
+          {/*            /!* Hidden input file *!/*/}
+          {/*            <input*/}
+          {/*              id='color-image'*/}
+          {/*              type='file'*/}
+          {/*              accept='image/*'*/}
+          {/*              style={{ display: 'none' }}*/}
+          {/*              onChange={(e) => setColorImageFile(e.target.files[0])}*/}
+          {/*              ref={colorImageInputRef}*/}
+          {/*            />*/}
+          {/*          </label>*/}
+          {/*        </Grid>*/}
+          {/*        <Grid item size={10}>*/}
+          {/*          <FormControl fullWidth sx={{ mb: 2 }}>*/}
+          {/*            <InputLabel>Màu</InputLabel>*/}
+          {/*            <Select*/}
+          {/*              value={selectedColor}*/}
+          {/*              label='Màu'*/}
+          {/*              onChange={(e) => setSelectedColor(e.target.value)}*/}
+          {/*            >*/}
+          {/*              {colors.map((color, idx) => (*/}
+          {/*                <MenuItem key={idx} value={color.name}>*/}
+          {/*                  {color.name}*/}
+          {/*                </MenuItem>*/}
+          {/*              ))}*/}
+          {/*              <MenuItem*/}
+          {/*                value='add_new'*/}
+          {/*                onClick={() => {*/}
+          {/*                  setSelectedColor('')*/}
+          {/*                  setAddColorModalOpen(true)*/}
+          {/*                }}*/}
+          {/*              >*/}
+          {/*                Thêm màu mới*/}
+          {/*              </MenuItem>*/}
+          {/*            </Select>*/}
+          {/*          </FormControl>*/}
+          {/*        </Grid>*/}
+          {/*      </Grid>*/}
+          {/*    </Grid>*/}
+          {/*    <Grid item size={4} style={{ height: '56px' }}>*/}
+          {/*      <FormControl fullWidth>*/}
+          {/*        <InputLabel>Kích thước</InputLabel>*/}
+          {/*        <Select*/}
+          {/*          value={selectedSize}*/}
+          {/*          label='Kích thước'*/}
+          {/*          onChange={(e) => setSelectedSize(e.target.value)}*/}
+          {/*          renderValue={(selected) => selected || 'Chọn kích thước'}*/}
+          {/*        >*/}
+          {/*          {sizes.map((size, idx) => (*/}
+          {/*            <MenuItem key={idx} value={size.name}>*/}
+          {/*              {size.name}*/}
+          {/*            </MenuItem>*/}
+          {/*          ))}*/}
+          {/*          <MenuItem*/}
+          {/*            onClick={() => {*/}
+          {/*              setSelectedSize('')*/}
+          {/*              setSizeModalOpen(true)*/}
+          {/*            }}*/}
+          {/*          >*/}
+          {/*            Thêm kích thước mới*/}
+          {/*          </MenuItem>*/}
+          {/*        </Select>*/}
+          {/*      </FormControl>*/}
+          {/*    </Grid>*/}
+          {/*    <Grid item size={3} style={{ height: '56px' }}>*/}
+          {/*      <TextField*/}
+          {/*        label='Số lượng'*/}
+          {/*        type='number'*/}
+          {/*        fullWidth*/}
+          {/*        value={quantity}*/}
+          {/*        onChange={(e) => setQuantity(e.target.value)}*/}
+          {/*        inputProps={{ min: 1 }}*/}
+          {/*      />*/}
+          {/*    </Grid>*/}
+          {/*    <Grid item size={1}>*/}
+          {/*      <Button*/}
+          {/*        disabled={loading}*/}
+          {/*        variant='contained'*/}
+          {/*        sx={{*/}
+          {/*          height: '56px',*/}
+          {/*          width: '100%',*/}
+          {/*          color: '#fff',*/}
+          {/*          backgroundColor: '#001f5d'*/}
+          {/*        }}*/}
+          {/*        onClick={() => {*/}
+          {/*          const qty = Number(quantity)*/}
+          {/*          if (!selectedColor || !selectedSize) {*/}
+          {/*            alert('Vui lòng chọn màu và kích thước')*/}
+          {/*            return*/}
+          {/*          }*/}
+          {/*          if (isNaN(qty) || qty <= 0) {*/}
+          {/*            alert('Vui lòng nhập số lượng hợp lệ (> 0)')*/}
+          {/*            return*/}
+          {/*          }*/}
+          {/*          handleAddStock()*/}
+          {/*          setQuantity('')*/}
+          {/*        }}*/}
+          {/*      >*/}
+          {/*        Thêm*/}
+          {/*      </Button>*/}
+          {/*    </Grid>*/}
+          {/*  </Grid>*/}
+          {/*</Grid>*/}
           {/* Hiển thị danh sách kho */}
-          <Grid item size={12}>
-            <FormControl fullWidth>
-              <Select
-                value={''}
-                displayEmpty
-                renderValue={() =>
-                  stockMatrix.length > 0
-                    ? 'Chọn để xem và xoá mục kho'
-                    : 'Không có sản phẩm trong kho'
-                }
-              >
-                {stockMatrix.length > 0 ? (
-                  stockMatrix.map((stock, idx) => (
-                    <MenuItem key={idx} value={idx}>
-                      <Box
-                        sx={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          width: '100%'
-                        }}
-                      >
-                        {/* Nếu có ảnh cho màu, bạn có thể thêm <img> ở đây */}
-                        <Typography variant='body2' sx={{ flexGrow: 1 }}>
-                          Màu: {stock.color} - Size: {stock.size} - SL:{' '}
-                          {stock.quantity}
-                        </Typography>
-                        <IconButton
-                          edge='end'
-                          color='error'
-                          size='small'
-                          onClick={(e) => {
-                            e.stopPropagation() // Ngăn chọn Select
-                            handleRemoveStock(idx)
-                          }}
-                        >
-                          <DeleteIcon />
-                        </IconButton>
-                      </Box>
-                    </MenuItem>
-                  ))
-                ) : (
-                  <MenuItem disabled value=''>
-                    Không có sản phẩm trong kho
-                  </MenuItem>
-                )}
-              </Select>
-            </FormControl>
-          </Grid>
+          {/*<Grid item size={12}>*/}
+          {/*  <FormControl fullWidth>*/}
+          {/*    <Select*/}
+          {/*      value={''}*/}
+          {/*      displayEmpty*/}
+          {/*      renderValue={() =>*/}
+          {/*        stockMatrix.length > 0*/}
+          {/*          ? 'Chọn để xem và xoá mục kho'*/}
+          {/*          : 'Không có sản phẩm trong kho'*/}
+          {/*      }*/}
+          {/*    >*/}
+          {/*      {stockMatrix.length > 0 ? (*/}
+          {/*        stockMatrix.map((stock, idx) => (*/}
+          {/*          <MenuItem key={idx} value={idx}>*/}
+          {/*            <Box*/}
+          {/*              sx={{*/}
+          {/*                display: 'flex',*/}
+          {/*                alignItems: 'center',*/}
+          {/*                width: '100%'*/}
+          {/*              }}*/}
+          {/*            >*/}
+          {/*              /!* Nếu có ảnh cho màu, bạn có thể thêm <img> ở đây *!/*/}
+          {/*              <Typography variant='body2' sx={{ flexGrow: 1 }}>*/}
+          {/*                Màu: {stock.color} - Size: {stock.size} - SL:{' '}*/}
+          {/*                {stock.quantity}*/}
+          {/*              </Typography>*/}
+          {/*              <IconButton*/}
+          {/*                edge='end'*/}
+          {/*                color='error'*/}
+          {/*                size='small'*/}
+          {/*                onClick={(e) => {*/}
+          {/*                  e.stopPropagation() // Ngăn chọn Select*/}
+          {/*                  handleRemoveStock(idx)*/}
+          {/*                }}*/}
+          {/*              >*/}
+          {/*                <DeleteIcon />*/}
+          {/*              </IconButton>*/}
+          {/*            </Box>*/}
+          {/*          </MenuItem>*/}
+          {/*        ))*/}
+          {/*      ) : (*/}
+          {/*        <MenuItem disabled value=''>*/}
+          {/*          Không có sản phẩm trong kho*/}
+          {/*        </MenuItem>*/}
+          {/*      )}*/}
+          {/*    </Select>*/}
+          {/*  </FormControl>*/}
+          {/*</Grid>*/}
           {/*Mô tả*/}
           <Grid item size={12}>
             <Controller
@@ -755,37 +777,38 @@ const AddProductModal = ({ open, onClose, onSuccess }) => {
           </Grid>
         </Grid>
       </DialogContent>
-      <AddColorModal
-        open={isAddColorModalOpen}
-        onClose={() => {
-          setAddColorModalOpen(false)
-          fetchColors() // cập nhật danh sách
-        }}
-        onSave={(newColorId) => {
-          fetchColors() // gọi lại API để cập nhật danh sách màu
-          const newColor = colors.find((color) => color._id === newColorId)
-          if (newColor) {
-            setSelectedColor(newColor.name)
-          }
-          setAddColorModalOpen(false)
-        }}
-      />
+      {/*<AddColorModal*/}
+      {/*  open={isAddColorModalOpen}*/}
+      {/*  onClose={() => {*/}
+      {/*    setSelectedColor('')*/}
+      {/*    setAddColorModalOpen(false)*/}
+      {/*    fetchColors() // cập nhật danh sách*/}
+      {/*  }}*/}
+      {/*  onSave={(newColorId) => {*/}
+      {/*    fetchColors() // gọi lại API để cập nhật danh sách màu*/}
+      {/*    const newColor = colors.find((color) => color._id === newColorId)*/}
+      {/*    if (newColor) {*/}
+      {/*      setSelectedColor(newColor.name)*/}
+      {/*    }*/}
+      {/*    setAddColorModalOpen(false)*/}
+      {/*  }}*/}
+      {/*/>*/}
 
-      <AddSizeModal
-        open={isSizeModalOpen}
-        onClose={() => {
-          setSizeModalOpen(false)
-          fetchSizes()
-        }}
-        onSave={(newSizeId) => {
-          fetchSizes()
-          const newSize = sizes.find((size) => size._id === newSizeId)
-          if (newSize) {
-            setSelectedSize(newSize.name)
-          }
-          setSizeModalOpen(false)
-        }}
-      />
+      {/*<AddSizeModal*/}
+      {/*  open={isSizeModalOpen}*/}
+      {/*  onClose={() => {*/}
+      {/*    setSizeModalOpen(false)*/}
+      {/*    fetchSizes()*/}
+      {/*  }}*/}
+      {/*  onSave={(newSizeId) => {*/}
+      {/*    fetchSizes()*/}
+      {/*    const newSize = sizes.find((size) => size._id === newSizeId)*/}
+      {/*    if (newSize) {*/}
+      {/*      setSelectedSize(newSize.name)*/}
+      {/*    }*/}
+      {/*    setSizeModalOpen(false)*/}
+      {/*  }}*/}
+      {/*/>*/}
       <AddCategoryModal
         open={categoryOpen}
         onClose={() => setCategoryOpen(false)}

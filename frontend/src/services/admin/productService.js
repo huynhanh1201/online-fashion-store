@@ -184,5 +184,3 @@ export const addProduct = async (data) => {
     return error
   }
 }
-
-// color

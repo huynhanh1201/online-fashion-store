@@ -8,13 +8,12 @@ const createSizePalette = async (productId, reqBody) => {
   try {
     const newSizePalette = {
       name: reqBody.name,
-      image: reqBody.image,
       isActive: true
     }
 
     const updatedPalette = await SizePaletteModel.findOneAndUpdate(
       { productId },
-      { $push: { colors: newSizePalette } },
+      { $push: { sizes: newSizePalette } },
       {
         new: true,
         upsert: true

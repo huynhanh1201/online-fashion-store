@@ -4,54 +4,44 @@ const { Schema, model } = mongoose
 // Tạo schema cho Danh mục sản phẩm
 const inventorySchema = new Schema(
   {
-    productId: {
-      type: mongoose.Types.ObjectId,
-      ref: 'Product',
+    variantId: {
+      type: Schema.Types.ObjectId,
+      ref: 'Variant',
       required: true
     },
-    variant: {
-      color: {
-        name: {
-          type: String,
-          required: true,
-          trim: true
-        },
-        image: String
-      },
-      size: {
-        name: {
-          type: String,
-          required: true,
-          trim: true
-        }
-      },
-      sku: {
-        type: String,
-        required: true,
-        unique: true,
-        trim: true
-      }
+    warehouseId: {
+      type: Schema.Types.ObjectId,
+      ref: 'Warehouse',
+      required: true
     },
     quantity: {
       type: Number,
       required: true,
-      default: 0
-    },
-    importPrice: {
-      type: Number,
-      required: true
-    },
-    exportPrice: {
-      type: Number,
-      required: true
+      default: 0,
+      min: 0
     },
     minQuantity: {
       type: Number,
-      default: 0
+      required: true,
+      default: 0,
+      min: 0
+    },
+    importPrice: {
+      type: Number,
+      required: true,
+      default: 0,
+      min: 0
+    },
+    exportPrice: {
+      type: Number,
+      required: true,
+      default: 0,
+      min: 0
     },
     status: {
       type: String,
-      enum: ['in-stock', 'out-of-stock', 'discontinued'],
+      required: true,
+      enum: ['in-stock', 'low-stock', 'out-of-stock'],
       default: 'in-stock'
     },
     destroy: {

@@ -8,6 +8,7 @@ const Router = express.Router()
 
 // Tạo Kho (Biến thể) sản phẩm mới
 Router.route('/').post(
+  authMiddleware.isAuthorized,
   warehouseSlipsValidation.warehouseSlip,
   warehouseSlipsController.createWarehouseSlip
 )
@@ -32,22 +33,6 @@ Router.route('/:warehouseSlipId').patch(
 Router.route('/:warehouseSlipId').delete(
   warehouseSlipsValidation.verifyId,
   warehouseSlipsController.deleteWarehouseSlip
-)
-
-// Nhập Kho (Biến thể) sản phẩm
-Router.route('/:warehouseSlipId/in').post(
-  authMiddleware.isAuthorized,
-  warehouseSlipsValidation.verifyId,
-  warehouseSlipsValidation.warehouseSlipInOutStock,
-  warehouseSlipsController.importStockWarehouseSlip
-)
-
-// Xuất Kho (Biến thể) sản phẩm
-Router.route('/:warehouseSlipId/out').post(
-  authMiddleware.isAuthorized,
-  warehouseSlipsValidation.verifyId,
-  warehouseSlipsValidation.warehouseSlipInOutStock,
-  warehouseSlipsController.exportStockWarehouseSlip
 )
 
 export const warehouseSlipsRoute = Router

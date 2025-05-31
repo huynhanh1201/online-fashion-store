@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { getColors } from '~/services/admin/ColorService'
+import { getColors, addColor } from '~/services/admin/ColorService'
 
 const useColors = (pageColor = 1, limit = 10) => {
   const [colors, setColors] = useState([])
@@ -18,7 +18,20 @@ const useColors = (pageColor = 1, limit = 10) => {
     setLoading(false)
   }
 
-  return { colors, totalPages, fetchColors, loading }
+  const createNewColor = async (data) => {
+    try {
+      const result = await addColor(data)
+      if (result) {
+        await fetchColors(pageColor)
+      }
+      return result
+    } catch (error) {
+      console.error('Lỗi khi tạo màu mới:', error)
+      return null
+    }
+  }
+
+  return { colors, totalPages, fetchColors, loading, createNewColor }
 }
 
 export default useColors

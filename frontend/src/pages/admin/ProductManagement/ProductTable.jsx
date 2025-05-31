@@ -26,7 +26,7 @@ const ProductTable = ({ products, loading, handleOpenModal }) => {
             <StyledTableCell sx={{ width: '250px' }}>Xuất xứ</StyledTableCell>
             <StyledTableCell sx={{ width: '100px' }}>Danh mục</StyledTableCell>
             <StyledTableCell sx={{ width: '70px' }}>Trạng thái</StyledTableCell>
-            <StyledTableCell sx={{ maxWidth: '130px', width: '130px' }}>
+            <StyledTableCell sx={{ maxWidth: '220px', width: '220px' }}>
               Hành động
             </StyledTableCell>
           </StyledTableRow>
@@ -34,13 +34,13 @@ const ProductTable = ({ products, loading, handleOpenModal }) => {
         <TableBody>
           {loading ? (
             <StyledTableRow>
-              <StyledTableCell colSpan={8} align='center'>
+              <StyledTableCell colSpan={10} align='center'>
                 Đang tải sản phẩm...
               </StyledTableCell>
             </StyledTableRow>
           ) : products.filter((product) => !product.destroy).length === 0 ? (
             <StyledTableRow>
-              <StyledTableCell colSpan={8} align='center'>
+              <StyledTableCell colSpan={10} align='center'>
                 Không có sản phẩm nào.
               </StyledTableCell>
             </StyledTableRow>

@@ -1,737 +1,36 @@
-// import React, { useEffect, useState, useRef } from 'react'
-// import Dialog from '@mui/material/Dialog'
-// import DialogTitle from '@mui/material/DialogTitle'
-// import DialogContent from '@mui/material/DialogContent'
-// import DialogActions from '@mui/material/DialogActions'
-// import TextField from '@mui/material/TextField'
-// import Button from '@mui/material/Button'
-// import Box from '@mui/material/Box'
-// import Typography from '@mui/material/Typography'
-// import FormControl from '@mui/material/FormControl'
-// import Select from '@mui/material/Select'
-// import InputLabel from '@mui/material/InputLabel'
-// import MenuItem from '@mui/material/MenuItem'
-// import Divider from '@mui/material/Divider'
-// import IconButton from '@mui/material/IconButton'
-// import List from '@mui/material/List'
-// import ListItem from '@mui/material/ListItem'
-// import ListItemText from '@mui/material/ListItemText'
-// import ListItemAvatar from '@mui/material/ListItemAvatar'
-// import Avatar from '@mui/material/Avatar'
-// import EditIcon from '@mui/icons-material/Edit'
-// import DeleteIcon from '@mui/icons-material/Delete'
-// import { useForm, Controller } from 'react-hook-form'
-// import useCategories from '~/hooks/admin/useCategories'
-// import useColorPalettes from '~/hooks/admin/useColorPalettes'
-// import StyleAdmin from '~/assets/StyleAdmin.jsx'
-//
-// const URI = 'https://api.cloudinary.com/v1_1/dkwsy9sph/image/upload'
-// const CloudinaryProduct = 'product_upload'
-// const CloudinaryColor = 'color_upload'
-//
-// const uploadToCloudinary = async (file, folder = CloudinaryProduct) => {
-//   const formData = new FormData()
-//   formData.append('file', file)
-//   formData.append('upload_preset', 'demo_unsigned')
-//   formData.append('folder', folder)
-//
-//   const res = await fetch(URI, {
-//     method: 'POST',
-//     body: formData
-//   })
-//
-//   const data = await res.json()
-//   return data.secure_url
-// }
-//
-// const EditProductModal = ({ open, onClose, product, onSave }) => {
-//   const {
-//     control,
-//     register,
-//     handleSubmit,
-//     reset,
-//     formState: { errors, isSubmitting }
-//   } = useForm({
-//     defaultValues: {
-//       name: '',
-//       description: '',
-//       price: '',
-//       quantity: '',
-//       categoryId: '',
-//       origin: '',
-//       colors: []
-//     }
-//   })
-//
-//   const [images, setImages] = useState([{ file: null, preview: '' }])
-//   const [colorInput, setColorInput] = useState('')
-//   const [colorImage, setColorImage] = useState(null)
-//   const [colorImagePreview, setColorImagePreview] = useState('')
-//   const [colorList, setColorList] = useState([])
-//   const fileInputRefs = useRef([])
-//   const colorFileInputRef = useRef(null)
-//   const { categories, loading, fetchCategories } = useCategories()
-//   const didFetchRef = useRef(false)
-//   // useColorPalettes: lấy, tạo, cập nhật, xoá màu theo productId
-//   const {
-//     colorPalettes,
-//     fetchColorPalettes,
-//     addColorPalette,
-//     editColorPalette,
-//     removeColorPalette
-//   } = useColorPalettes(product?._id)
-//
-//   // State quản lý chỉnh sửa màu sắc
-//   const [editingColorIndex, setEditingColorIndex] = useState(null)
-//   const [editColorName, setEditColorName] = useState('')
-//   const [editColorImage, setEditColorImage] = useState(null)
-//   const [editColorPreview, setEditColorPreview] = useState('')
-//
-//   useEffect(() => {
-//     if (product) {
-//       reset({
-//         name: product.name || '',
-//         description: product.description || '',
-//         price: product.price || '',
-//         quantity: product.quantity || '',
-//         categoryId: product.categoryId?._id || '',
-//         colors: product.colors || []
-//       })
-//
-//       const previews =
-//         product.image?.map((url) => ({ file: null, preview: url })) || []
-//       setImages([...previews, { file: null, preview: '' }])
-//
-//       // Lấy màu ban đầu từ product.colors hoặc colorPalettes
-//       if (product.colors && product.colors.length > 0) {
-//         setColorList(
-//           product.colors.map((c) =>
-//             typeof c === 'string' ? { name: c, image: '' } : c
-//           )
-//         )
-//       } else if (colorPalettes.length) {
-//         setColorList(colorPalettes)
-//       } else {
-//         setColorList([])
-//       }
-//     }
-//   }, [product, reset, colorPalettes])
-//
-//   useEffect(() => {
-//     if (open && product?._id && !didFetchRef.current) {
-//       fetchCategories()
-//       fetchColorPalettes(product._id)
-//       didFetchRef.current = true
-//     }
-//     if (!open) {
-//       didFetchRef.current = false
-//     }
-//   }, [open, product, fetchCategories, fetchColorPalettes])
-//
-//   // Xử lý thay đổi ảnh sản phẩm
-//   const handleImageChange = (index, file) => {
-//     const updated = [...images]
-//     updated[index] = { file, preview: URL.createObjectURL(file) }
-//
-//     if (index === images.length - 1 && file && images.length < 9) {
-//       updated.push({ file: null, preview: '' })
-//     }
-//
-//     setImages(updated)
-//   }
-//
-//   const handleImageDelete = (index) => {
-//     const updated = [...images]
-//     updated.splice(index, 1)
-//     if (updated.length === 0 || updated[updated.length - 1].file) {
-//       updated.push({ file: null, preview: '' })
-//     }
-//     setImages(updated)
-//   }
-//
-//   // Xử lý thay đổi ảnh màu mới
-//   const handleColorImageChange = (e) => {
-//     const file = e.target.files[0]
-//     if (file) {
-//       setColorImage(file)
-//       setColorImagePreview(URL.createObjectURL(file))
-//     }
-//   }
-//
-//   // Xử lý thay đổi ảnh màu đang chỉnh sửa
-//   const handleEditColorImageChange = (e) => {
-//     const file = e.target.files[0]
-//     if (file) {
-//       setEditColorImage(file)
-//       setEditColorPreview(URL.createObjectURL(file))
-//     }
-//   }
-//
-//   // Bắt đầu chỉnh sửa 1 màu trong list
-//   const handleEditColor = (index) => {
-//     setEditingColorIndex(index)
-//     setEditColorName(colorList[index].name)
-//     setEditColorPreview(colorList[index].image)
-//     setEditColorImage(null)
-//   }
-//
-//   // Lưu chỉnh sửa màu sắc (cập nhật lên API)
-//   const handleSaveEditColor = async () => {
-//     try {
-//       let newImageUrl = editColorPreview
-//
-//       if (editColorImage) {
-//         newImageUrl = await uploadToCloudinary(editColorImage, CloudinaryColor)
-//       }
-//
-//       const oldColor = colorList[editingColorIndex]
-//
-//       const updatedColor = {
-//         ...oldColor,
-//         name: editColorName.trim(),
-//         image: newImageUrl,
-//         isNew: false // đã lưu thành công
-//       }
-//
-//       if (oldColor.isNew) {
-//         // Nếu là màu mới thì gọi API tạo màu
-//         const created = await addColorPalette({
-//           name: updatedColor.name,
-//           image: updatedColor.image
-//         })
-//         // Thay thế color trong list bằng màu mới từ DB (có _id thật)
-//         const updatedColors = [...colorList]
-//         updatedColors[editingColorIndex] = created
-//         setColorList(updatedColors)
-//       } else {
-//         // Nếu là màu có sẵn thì gọi API cập nhật
-//         await editColorPalette(oldColor._id, {
-//           name: updatedColor.name,
-//           image: updatedColor.image,
-//           isActive: oldColor.isActive ?? true
-//         })
-//
-//         const updatedColors = [...colorList]
-//         updatedColors[editingColorIndex] = updatedColor
-//         setColorList(updatedColors)
-//       }
-//
-//       setEditingColorIndex(null)
-//       setEditColorName('')
-//       setEditColorImage(null)
-//       setEditColorPreview('')
-//     } catch (error) {
-//       console.error('Lỗi khi cập nhật màu:', error)
-//       alert('Lỗi khi cập nhật màu, vui lòng thử lại')
-//     }
-//   }
-//
-//   // Thêm màu mới (upload ảnh rồi gọi API tạo màu mới)
-//   // Thêm màu mới (chỉ thêm vào mảng colorList local, không gọi API)
-//   // Thêm màu mới (upload ảnh rồi gọi API tạo màu mới)
-//   const handleAddColor = async (e) => {
-//     e.preventDefault()
-//
-//     if (!colorInput.trim()) {
-//       alert('Tên màu không được để trống')
-//       return
-//     }
-//
-//     let imageUrl = ''
-//     if (colorImage) {
-//       try {
-//         imageUrl = await uploadToCloudinary(colorImage, CloudinaryColor)
-//       } catch {
-//         alert('Lỗi khi upload ảnh màu, vui lòng thử lại')
-//         return
-//       }
-//     }
-//
-//     try {
-//       // Gọi addColorPalette truyền đúng productId
-//       const createdColor = await addColorPalette({
-//         name: colorInput.trim(),
-//         image: imageUrl
-//       })
-//
-//       setColorList((prev) => [...prev, createdColor])
-//
-//       setColorInput('')
-//       setColorImage(null)
-//       setColorImagePreview('')
-//     } catch (error) {
-//       console.error('Lỗi khi tạo màu:', error)
-//       alert('Lỗi khi tạo màu, vui lòng thử lại')
-//     }
-//   }
-//
-//   // Xóa màu sắc (gọi API xóa và cập nhật local state)
-//   const handleRemoveColor = async (colorToRemove) => {
-//     setColorList(colorList.filter((color) => color !== colorToRemove))
-//     // Gọi API xóa màu
-//     if (colorToRemove._id) {
-//       try {
-//         await removeColorPalette(colorToRemove._id)
-//       } catch (error) {
-//         console.error('Lỗi khi xóa màu:', error)
-//         alert('Lỗi khi xóa màu, vui lòng thử lại')
-//       }
-//     }
-//   }
-//
-//   // Submit form chỉnh sửa sản phẩm
-//   const onSubmit = async (data) => {
-//     try {
-//       // 1. Upload ảnh sản phẩm mới (ảnh có file và preview là blob)
-//       const imageUrls = []
-//       for (const img of images) {
-//         if (img.file && img.preview.startsWith('blob:')) {
-//           const url = await uploadToCloudinary(img.file)
-//           imageUrls.push(url)
-//         } else if (img.preview) {
-//           // Ảnh cũ giữ nguyên url
-//           imageUrls.push(img.preview)
-//         }
-//       }
-//
-//       // 2. Đảm bảo màu sắc trong colorList đã được đồng bộ với API
-//       //    Mỗi màu đã được thêm/xóa/cập nhật khi thao tác tương ứng,
-//       //    nên chỉ cần lấy colorList hiện tại.
-//
-//       // 3. Chuẩn bị dữ liệu cập nhật sản phẩm
-//       const updatedProduct = {
-//         name: data.name.trim(),
-//         description: data.description.trim(),
-//         origin: data.origin || '',
-//         price: Number(data.price),
-//         quantity: Number(data.quantity),
-//         categoryId: data.categoryId,
-//         colors: colorList.map((color) => ({
-//           name: color.name.trim(),
-//           image: color.image
-//         })),
-//         image: imageUrls
-//       }
-//
-//       // 4. Gọi hàm onSave (do props truyền vào) để cập nhật backend
-//       await onSave(product._id, updatedProduct)
-//
-//       // 5. Reset form, đóng modal và xóa dữ liệu tạm
-//       onClose()
-//       reset()
-//       setImages([{ file: null, preview: '' }])
-//       setColorList([])
-//       setColorInput('')
-//       setColorImage(null)
-//       setColorImagePreview('')
-//     } catch (error) {
-//       console.error('Lỗi khi chỉnh sửa sản phẩm:', error)
-//       alert('Có lỗi xảy ra, vui lòng thử lại')
-//     }
-//   }
-//
-//   return (
-//     <Dialog
-//       open={open}
-//       onClose={onClose}
-//       fullWidth
-//       maxWidth='xl'
-//       PaperProps={{ sx: { mt: 8, maxHeight: '90vh', width: '90vw' } }}
-//     >
-//       <DialogTitle sx={{ fontWeight: 600, fontSize: 20 }}>
-//         Sửa Sản Phẩm
-//       </DialogTitle>
-//       <Divider />
-//
-//       <form onSubmit={handleSubmit(onSubmit)}>
-//         <DialogContent sx={{ display: 'flex', gap: 3, py: 3 }}>
-//           {/* Bên trái: thông tin sản phẩm */}
-//           <Box sx={{ flex: 2 }}>
-//             <TextField
-//               label='Tên sản phẩm'
-//               fullWidth
-//               margin='normal'
-//               {...register('name', {
-//                 required: 'Tên sản phẩm không được bỏ trống'
-//               })}
-//               error={!!errors.name}
-//               helperText={errors.name?.message}
-//               sx={StyleAdmin.InputCustom}
-//             />
-//             <TextField
-//               label='Mô tả'
-//               fullWidth
-//               multiline
-//               rows={3}
-//               margin='normal'
-//               {...register('description', {
-//                 required: 'Mô tả không được bỏ trống'
-//               })}
-//               error={!!errors.description}
-//               helperText={errors.description?.message}
-//               sx={StyleAdmin.InputCustom}
-//             />
-//             <TextField
-//               label='Xuất xứ'
-//               fullWidth
-//               margin='normal'
-//               {...register('origin')}
-//               sx={StyleAdmin.InputCustom}
-//             />
-//             <Box sx={{ display: 'flex', gap: 2 }}>
-//               <TextField
-//                 label='Giá (VNĐ)'
-//                 type='number'
-//                 fullWidth
-//                 margin='normal'
-//                 {...register('price', {
-//                   required: 'Giá không được bỏ trống'
-//                 })}
-//                 error={!!errors.price}
-//                 helperText={errors.price?.message}
-//                 sx={StyleAdmin.InputCustom}
-//               />
-//               <TextField
-//                 label='Số lượng'
-//                 type='number'
-//                 fullWidth
-//                 margin='normal'
-//                 {...register('quantity', {
-//                   required: 'Số lượng không được bỏ trống'
-//                 })}
-//                 error={!!errors.quantity}
-//                 helperText={errors.quantity?.message}
-//                 sx={StyleAdmin.InputCustom}
-//               />
-//             </Box>
-//             <FormControl fullWidth margin='normal' sx={StyleAdmin.InputCustom}>
-//               <InputLabel id='category-select-label'>Danh mục</InputLabel>
-//               <Controller
-//                 name='categoryId'
-//                 control={control}
-//                 rules={{ required: 'Chọn danh mục' }}
-//                 render={({ field }) => (
-//                   <Select
-//                     labelId='category-select-label'
-//                     label='Danh mục'
-//                     {...field}
-//                     disabled={loading}
-//                   >
-//                     {categories.map((cat) => (
-//                       <MenuItem key={cat._id} value={cat._id}>
-//                         {cat.name}
-//                       </MenuItem>
-//                     ))}
-//                   </Select>
-//                 )}
-//               />
-//               {errors.categoryId && (
-//                 <Typography color='error' variant='caption'>
-//                   {errors.categoryId.message}
-//                 </Typography>
-//               )}
-//             </FormControl>
-//             <Box sx={{ mt: 3 }}>
-//               <Typography variant='h6' gutterBottom>
-//                 Ảnh sản phẩm (tối đa 9 ảnh)
-//               </Typography>
-//               <Box
-//                 sx={{
-//                   display: 'flex',
-//                   flexWrap: 'wrap',
-//                   gap: 1,
-//                   maxHeight: 200,
-//                   overflowY: 'auto'
-//                 }}
-//               >
-//                 {images.map((img, i) => (
-//                   <Box
-//                     key={i}
-//                     sx={{
-//                       position: 'relative',
-//                       width: 100,
-//                       height: 100,
-//                       border: '1px solid #ccc',
-//                       borderRadius: 1,
-//                       overflow: 'hidden'
-//                     }}
-//                   >
-//                     {img.preview ? (
-//                       <>
-//                         <img
-//                           src={img.preview}
-//                           alt={`Ảnh ${i + 1}`}
-//                           style={{
-//                             width: '100%',
-//                             height: '100%',
-//                             objectFit: 'cover'
-//                           }}
-//                         />
-//                         <IconButton
-//                           size='small'
-//                           onClick={() => handleImageDelete(i)}
-//                           sx={{
-//                             position: 'absolute',
-//                             top: 0,
-//                             right: 0,
-//                             backgroundColor: 'rgba(255,255,255,0.7)'
-//                           }}
-//                         >
-//                           <DeleteIcon fontSize='small' />
-//                         </IconButton>
-//                       </>
-//                     ) : (
-//                       <Button
-//                         variant='outlined'
-//                         component='label'
-//                         sx={{ height: '100%', width: '100%' }}
-//                       >
-//                         Thêm
-//                         <input
-//                           type='file'
-//                           hidden
-//                           accept='image/*'
-//                           onChange={(e) =>
-//                             handleImageChange(i, e.target.files[0])
-//                           }
-//                           ref={(el) => (fileInputRefs.current[i] = el)}
-//                         />
-//                       </Button>
-//                     )}
-//                   </Box>
-//                 ))}
-//               </Box>
-//             </Box>
-//           </Box>
-//
-//           {/* Bên phải: màu sắc */}
-//           <Box sx={{ flex: 1 }}>
-//             <Typography variant='h6' mb={1}>
-//               Màu sắc sản phẩm
-//             </Typography>
-//
-//             {/* Danh sách màu */}
-//             <List
-//               dense
-//               sx={{
-//                 maxHeight: 300,
-//                 overflowY: 'auto',
-//                 bgcolor: 'background.paper',
-//                 border: '1px solid #ccc',
-//                 borderRadius: 1
-//               }}
-//             >
-//               {colorList.length === 0 && (
-//                 <Typography
-//                   variant='body2'
-//                   sx={{ textAlign: 'center', mt: 2, mb: 2 }}
-//                 >
-//                   Chưa có màu nào
-//                 </Typography>
-//               )}
-//
-//               {colorList.map((color, index) => (
-//                 <ListItem
-//                   key={color._id || index}
-//                   secondaryAction={
-//                     <>
-//                       <IconButton
-//                         edge='end'
-//                         aria-label='edit'
-//                         onClick={() => handleEditColor(index)}
-//                         size='small'
-//                       >
-//                         <EditIcon />
-//                       </IconButton>
-//                       <IconButton
-//                         edge='end'
-//                         aria-label='delete'
-//                         onClick={() => handleRemoveColor(color)}
-//                         size='small'
-//                       >
-//                         <DeleteIcon />
-//                       </IconButton>
-//                     </>
-//                   }
-//                 >
-//                   <ListItemAvatar>
-//                     <Avatar
-//                       src={color.image || ''}
-//                       sx={{ bgcolor: '#eee', color: '#000' }}
-//                       variant='rounded'
-//                     >
-//                       {color.name?.[0]?.toUpperCase() || '?'}
-//                     </Avatar>
-//                   </ListItemAvatar>
-//                   <ListItemText primary={color.name} />
-//                 </ListItem>
-//               ))}
-//             </List>
-//
-//             <Divider sx={{ my: 2 }} />
-//
-//             <Box component='form' onSubmit={handleAddColor}>
-//               <TextField
-//                 label='Tên màu mới'
-//                 value={colorInput}
-//                 onChange={(e) => setColorInput(e.target.value)}
-//                 size='small'
-//                 fullWidth
-//                 sx={{ mb: 1 }}
-//               />
-//               <Button
-//                 variant='outlined'
-//                 component='label'
-//                 fullWidth
-//                 sx={{ mb: 1 }}
-//               >
-//                 Chọn ảnh màu
-//                 <input
-//                   type='file'
-//                   hidden
-//                   accept='image/*'
-//                   onChange={handleColorImageChange}
-//                   ref={colorFileInputRef}
-//                 />
-//               </Button>
-//               {colorImagePreview && (
-//                 <Box
-//                   component='img'
-//                   src={colorImagePreview}
-//                   alt='Ảnh màu mới'
-//                   sx={{
-//                     width: '100%',
-//                     height: 80,
-//                     objectFit: 'cover',
-//                     borderRadius: 1,
-//                     mb: 1
-//                   }}
-//                 />
-//               )}
-//               <Button
-//                 type='button' // đổi từ submit thành button
-//                 variant='contained'
-//                 fullWidth
-//                 disabled={!colorInput.trim() || !colorImage}
-//                 onClick={handleAddColor} // gọi hàm thêm màu
-//               >
-//                 Thêm màu
-//               </Button>
-//             </Box>
-//
-//             {/* Chỉnh sửa màu */}
-//             {editingColorIndex !== null && (
-//               <Box sx={{ mt: 3 }}>
-//                 <Typography variant='subtitle1' mb={1}>
-//                   Chỉnh sửa màu
-//                 </Typography>
-//                 <TextField
-//                   label='Tên màu'
-//                   value={editColorName}
-//                   onChange={(e) => setEditColorName(e.target.value)}
-//                   size='small'
-//                   fullWidth
-//                   sx={{ mb: 1 }}
-//                 />
-//                 <Button
-//                   variant='outlined'
-//                   component='label'
-//                   fullWidth
-//                   sx={{ mb: 1 }}
-//                 >
-//                   Chọn ảnh mới
-//                   <input
-//                     type='file'
-//                     hidden
-//                     accept='image/*'
-//                     onChange={handleEditColorImageChange}
-//                   />
-//                 </Button>
-//                 {editColorPreview && (
-//                   <Box
-//                     component='img'
-//                     src={editColorPreview}
-//                     alt='Ảnh màu chỉnh sửa'
-//                     sx={{
-//                       width: '100%',
-//                       height: 80,
-//                       objectFit: 'cover',
-//                       borderRadius: 1,
-//                       mb: 1
-//                     }}
-//                   />
-//                 )}
-//                 <Box sx={{ display: 'flex', gap: 1 }}>
-//                   <Button
-//                     variant='contained'
-//                     onClick={handleSaveEditColor}
-//                     disabled={!editColorName.trim()}
-//                     fullWidth
-//                   >
-//                     Lưu
-//                   </Button>
-//                   <Button
-//                     variant='outlined'
-//                     onClick={() => setEditingColorIndex(null)}
-//                     fullWidth
-//                   >
-//                     Hủy
-//                   </Button>
-//                 </Box>
-//               </Box>
-//             )}
-//           </Box>
-//         </DialogContent>
-//
-//         <DialogActions>
-//           <Button onClick={onClose} disabled={isSubmitting}>
-//             Hủy
-//           </Button>
-//           <Button type='submit' variant='contained' disabled={isSubmitting}>
-//             Lưu thay đổi
-//           </Button>
-//         </DialogActions>
-//       </form>
-//     </Dialog>
-//   )
-// }
-//
-// export default EditProductModal
-
-import React, { useEffect, useState, useRef, useCallback } from 'react'
-import Dialog from '@mui/material/Dialog'
-import DialogTitle from '@mui/material/DialogTitle'
-import DialogContent from '@mui/material/DialogContent'
-import DialogActions from '@mui/material/DialogActions'
-import TextField from '@mui/material/TextField'
-import Button from '@mui/material/Button'
-import Box from '@mui/material/Box'
-import Typography from '@mui/material/Typography'
-import FormControl from '@mui/material/FormControl'
-import Select from '@mui/material/Select'
-import InputLabel from '@mui/material/InputLabel'
-import MenuItem from '@mui/material/MenuItem'
-import Divider from '@mui/material/Divider'
+import React, { useState, useEffect, useRef } from 'react'
+import {
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Button,
+  TextField,
+  Grid,
+  Select,
+  MenuItem,
+  InputLabel,
+  FormControl,
+  Typography,
+  Box
+} from '@mui/material'
 import IconButton from '@mui/material/IconButton'
-import List from '@mui/material/List'
-import ListItem from '@mui/material/ListItem'
-import ListItemText from '@mui/material/ListItemText'
-import ListItemAvatar from '@mui/material/ListItemAvatar'
-import Avatar from '@mui/material/Avatar'
-import EditIcon from '@mui/icons-material/Edit'
 import DeleteIcon from '@mui/icons-material/Delete'
+import AddIcon from '@mui/icons-material/Add'
 import { useForm, Controller } from 'react-hook-form'
-import useCategories from '~/hooks/admin/useCategories'
-import useColorPalettes from '~/hooks/admin/useColorPalettes'
-import useColors from '~/hooks/admin/useColor'
-import AddColorModal from '../../ColorManagement/modal/AddColorModal'
+import useCategories from '~/hooks/admin/useCategories.js'
+import AddSizeModal from '~/pages/admin/SizeManagement/modal/AddSizeModal.jsx'
+import AddColorModal from '~/pages/admin/ColorManagement/modal/AddColorModal.jsx'
+import AddCategoryModal from '~/pages/admin/CategorieManagement/modal/AddCategoryModal.jsx'
 import StyleAdmin from '~/assets/StyleAdmin.jsx'
+import useColors from '~/hooks/admin/useColor.js'
+import useSizes from '~/hooks/admin/useSize.js'
 
 const URI = 'https://api.cloudinary.com/v1_1/dkwsy9sph/image/upload'
-const CloudinaryProduct = 'product_upload'
 const CloudinaryColor = 'color_upload'
+const CloudinaryProduct = 'product_upload'
 
-const uploadToCloudinary = async (file, folder = CloudinaryProduct) => {
+const uploadToCloudinary = async (file, folder = CloudinaryColor) => {
   const formData = new FormData()
   formData.append('file', file)
   formData.append('upload_preset', 'demo_unsigned')
@@ -742,735 +41,710 @@ const uploadToCloudinary = async (file, folder = CloudinaryProduct) => {
     body: formData
   })
 
+  if (!res.ok) throw new Error('Upload thất bại')
+
   const data = await res.json()
   return data.secure_url
 }
 
-const EditProductModal = ({ open, onClose, product, onSave }) => {
+const EditProductModal = ({ open, onClose, onSave, product }) => {
   const {
     control,
-    register,
     handleSubmit,
-    reset,
-    formState: { errors, isSubmitting }
+    formState: { errors },
+    reset
   } = useForm({
     defaultValues: {
       name: '',
       description: '',
-      price: '',
-      quantity: '',
       categoryId: '',
-      origin: '',
-      colors: []
+      price: '',
+      importPrice: ''
     }
   })
 
-  const [images, setImages] = useState([{ file: null, preview: '' }])
-  const [colorInput, setColorInput] = useState('')
-  const [colorImage, setColorImage] = useState(null)
-  const [colorImagePreview, setColorImagePreview] = useState('')
-  const [colorList, setColorList] = useState([])
-  const [selectedColorId, setSelectedColorId] = useState('')
-  const [openAddColorModal, setOpenAddColorModal] = useState(false)
-  const fileInputRefs = useRef([])
-  const colorFileInputRef = useRef(null)
-  const lastFetchedProductId = useRef(null)
-  const {
-    categories,
-    loading: categoriesLoading,
-    fetchCategories
-  } = useCategories()
-  const { colors, fetchColors, addColor, loading: colorsLoading } = useColors()
-  const {
-    colorPalettes,
-    fetchColorPalettes,
-    addColorPalette,
-    editColorPalette,
-    removeColorPalette
-  } = useColorPalettes(product?._id)
-  const [editingColorIndex, setEditingColorIndex] = useState(null)
-  const [editColorName, setEditColorName] = useState('')
-  const [editColorImage, setEditColorImage] = useState(null)
-  const [editColorPreview, setEditColorPreview] = useState('')
+  const [allColors, setAllColors] = useState([])
+  const [allSizes, setAllSizes] = useState([])
+  const [colorImageFile, setColorImageFile] = useState(null)
+  const [loading, setLoading] = useState(false)
+  const [colorsList, setColorsList] = useState([])
+  const [sizesList, setSizesList] = useState([])
+  const [selectedColor, setSelectedColor] = useState('')
+  const [selectedSize, setSelectedSize] = useState('')
+  const [isSizeModalOpen, setSizeModalOpen] = useState(false)
+  const [categoryOpen, setCategoryOpen] = useState(false)
+  const [stockMatrix, setStockMatrix] = useState([])
+  const [quantity, setQuantity] = useState('')
+  const [isAddColorModalOpen, setAddColorModalOpen] = useState(false)
+  const [productImages, setProductImages] = useState([])
+  const [productImagePreview, setProductImagePreview] = useState([])
 
-  const memoizedFetchColorPalettes = useCallback(() => {
-    if (product?._id && lastFetchedProductId.current !== product._id) {
-      fetchColorPalettes(product._id)
-    }
-  }, [product?._id, fetchColorPalettes])
+  const productImageInputRef = useRef()
+  const colorImageInputRef = useRef()
 
+  const { categories, fetchCategories } = useCategories()
+  const { colors, fetchColors } = useColors()
+  const { sizes, fetchSizes } = useSizes()
+
+  // Pre-populate form with product data
   useEffect(() => {
-    if (!open) {
-      lastFetchedProductId.current = null
-      setColorList([])
-      setSelectedColorId('')
-      setColorInput('')
-      setColorImage(null)
-      setColorImagePreview('')
-      setEditingColorIndex(null)
-      setOpenAddColorModal(false)
-    }
-  }, [open])
-
-  useEffect(() => {
-    if (product?._id && open) {
+    if (open && product) {
       reset({
         name: product.name || '',
         description: product.description || '',
-        price: product.price || '',
-        quantity: product.quantity || '',
-        categoryId: product.categoryId?._id || '',
-        origin: product.origin || '',
-        colors: product.colors || []
+        categoryId: product.categoryId || '',
+        price: product.price?.toString() || '',
+        importPrice: product.importPrice?.toString() || ''
       })
-
-      const previews =
-        product.image?.map((url) => ({ file: null, preview: url })) || []
-      setImages([...previews, { file: null, preview: '' }])
-    }
-  }, [product?._id, open, reset])
-
-  useEffect(() => {
-    if (product?._id && open && lastFetchedProductId.current !== product._id) {
-      memoizedFetchColorPalettes()
-      fetchColors()
+      setProductImages(product.image || [])
+      setColorsList(product.colors || [])
+      setSizesList(product.sizes || [])
+      setStockMatrix(product.stockMatrix || [])
+      setProductImagePreview(product.image || [])
       fetchCategories()
-      lastFetchedProductId.current = product._id
+      fetchColors()
+      fetchSizes()
     }
-  }, [
-    product?._id,
-    open,
-    memoizedFetchColorPalettes,
-    fetchColors,
-    fetchCategories
-  ])
+  }, [open, product, reset])
 
   useEffect(() => {
-    if (open && Array.isArray(colorPalettes)) {
-      const newColorList =
-        colorPalettes.length > 0
-          ? colorPalettes.map((color) => ({
-              _id: color._id,
-              name: color.name,
-              image: color.image || ''
-            }))
-          : Array.isArray(product?.colors)
-            ? product.colors.map((c) =>
-                typeof c === 'string' ? { name: c, image: '' } : c
-              )
-            : []
-      setColorList((prev) =>
-        JSON.stringify(prev) !== JSON.stringify(newColorList)
-          ? (console.log('Updating colorList:', newColorList), newColorList)
-          : prev
-      )
-    }
-  }, [open, colorPalettes, product?.colors])
+    if (colors) setAllColors(colors)
+    if (sizes) setAllSizes(sizes)
+  }, [colors, sizes])
 
-  const handleImageChange = (index, file) => {
-    const updated = [...images]
-    updated[index] = { file, preview: URL.createObjectURL(file) }
+  // Handle product image file change
+  const handleProductImageFileChange = (e) => {
+    const files = Array.from(e.target.files || [])
+    const remainingSlots = 9 - productImages.length
 
-    if (index === images.length - 1 && file && images.length < 9) {
-      updated.push({ file: null, preview: '' })
+    if (files.length > remainingSlots) {
+      alert(`Bạn chỉ có thể thêm tối đa ${remainingSlots} ảnh nữa.`)
+      return
     }
 
-    setImages(updated)
-  }
+    const imageURLs = files.map((file) => URL.createObjectURL(file))
+    setProductImages((prev) => [...prev, ...imageURLs])
+    setProductImagePreview((prev) => [...prev, ...imageURLs])
 
-  const handleImageDelete = (index) => {
-    const updated = [...images]
-    updated.splice(index, 1)
-    if (updated.length === 0 || updated[updated.length - 1].file) {
-      updated.push({ file: null, preview: '' })
-    }
-    setImages(updated)
-  }
-
-  const handleColorImageChange = (e) => {
-    const file = e.target.files[0]
-    if (file) {
-      setColorImage(file)
-      setColorImagePreview(URL.createObjectURL(file))
+    if (productImageInputRef.current) {
+      productImageInputRef.current.value = ''
     }
   }
 
-  const handleEditColorImageChange = (e) => {
-    const file = e.target.files[0]
-    if (file) {
-      setEditColorImage(file)
-      setEditColorPreview(URL.createObjectURL(file))
+  // Remove product image
+  const handleRemoveProductImage = (index) => {
+    setProductImages((prev) => prev.filter((_, i) => i !== index))
+    setProductImagePreview((prev) => prev.filter((_, i) => i !== index))
+  }
+
+  // Add stock
+  const handleAddStock = async (quantity) => {
+    setLoading(true)
+
+    const selectedColorData = allColors.find((c) => c.name === selectedColor)
+    const selectedSizeData = allSizes.find((s) => s.name === selectedSize)
+
+    if (!selectedColorData) {
+      alert('Màu đã chọn không tồn tại trong danh sách')
+      setLoading(false)
+      return
     }
-  }
 
-  const handleEditColor = (index) => {
-    setEditingColorIndex(index)
-    setEditColorName(colorList[index].name)
-    setEditColorPreview(colorList[index].image)
-    setEditColorImage(null)
-  }
+    if (!selectedSizeData) {
+      alert('Kích thước đã chọn không tồn tại trong danh sách')
+      setLoading(false)
+      return
+    }
 
-  const handleSaveEditColor = async () => {
-    try {
-      let newImageUrl = editColorPreview
-
-      if (editColorImage) {
-        newImageUrl = await uploadToCloudinary(editColorImage, CloudinaryColor)
-      }
-
-      const oldColor = colorList[editingColorIndex]
-      const updatedColor = {
-        ...oldColor,
-        name: editColorName.trim(),
-        image: newImageUrl
-      }
-
-      if (oldColor.isNew) {
-        const created = await addColorPalette({
-          name: updatedColor.name,
-          image: updatedColor.image
-        })
-        const updatedColors = [...colorList]
-        updatedColors[editingColorIndex] = created
-        setColorList(updatedColors)
+    const existingColor = colorsList.find(
+      (c) => c.name === selectedColorData.name
+    )
+    if (!existingColor) {
+      let imageUrl = ''
+      if (colorImageFile) {
+        try {
+          imageUrl = await uploadToCloudinary(colorImageFile, CloudinaryColor)
+        } catch (error) {
+          console.error('Lỗi khi upload ảnh màu:', error)
+          alert('Upload ảnh màu thất bại')
+          setLoading(false)
+          return
+        }
       } else {
-        await editColorPalette(oldColor._id, {
-          name: updatedColor.name,
-          image: updatedColor.image,
-          isActive: oldColor.isActive ?? true
-        })
-        const updatedColors = [...colorList]
-        updatedColors[editingColorIndex] = updatedColor
-        setColorList(updatedColors)
-      }
-
-      setEditingColorIndex(null)
-      setEditColorName('')
-      setEditColorImage(null)
-      setEditColorPreview('')
-    } catch (error) {
-      console.error('Lỗi khi cập nhật màu:', error)
-      alert('Lỗi khi cập nhật màu, vui lòng thử lại')
-    }
-  }
-
-  const handleAddColor = async (e) => {
-    e.preventDefault()
-    try {
-      if (selectedColorId) {
-        const selectedColor = colors.find(
-          (color) => color._id === selectedColorId
-        )
-        if (!selectedColor) {
-          alert('Màu đã chọn không hợp lệ')
-          return
-        }
-        if (colorList.some((color) => color.name === selectedColor.name)) {
-          alert('Màu này đã được thêm')
-          return
-        }
-
-        const imageUrl = colorImage
-          ? await uploadToCloudinary(colorImage, CloudinaryColor)
-          : ''
-
-        const newColor = {
-          name: selectedColor.name,
-          image: imageUrl
-        }
-        const created = await addColorPalette(newColor)
-        setColorList([...colorList, created])
-      } else if (colorInput.trim()) {
-        if (colorList.some((color) => color.name === colorInput.trim())) {
-          alert('Màu này đã tồn tại')
-          return
-        }
-
-        const imageUrl = colorImage
-          ? await uploadToCloudinary(colorImage, CloudinaryColor)
-          : ''
-
-        const newColor = {
-          name: colorInput.trim(),
-          image: imageUrl
-        }
-
-        await addColor(newColor)
-        const created = await addColorPalette(newColor)
-        setColorList([...colorList, created])
-      } else {
-        alert('Vui lòng chọn màu hoặc nhập tên màu')
+        alert('Vui lòng chọn ảnh màu cho màu mới')
+        setLoading(false)
         return
       }
 
-      setColorInput('')
-      setSelectedColorId('')
-      setColorImage(null)
-      setColorImagePreview('')
-      if (colorFileInputRef.current) {
-        colorFileInputRef.current.value = ''
-      }
-    } catch (error) {
-      console.error('Lỗi khi thêm màu:', error)
-      alert('Không thể thêm màu, vui lòng thử lại')
-    }
-  }
+      setColorsList((prevColors) => [
+        ...prevColors,
+        { name: selectedColorData.name, image: imageUrl }
+      ])
 
-  const handleRemoveColor = async (colorToRemove) => {
-    setColorList(colorList.filter((color) => color !== colorToRemove))
-    if (colorToRemove._id) {
-      try {
-        await removeColorPalette(colorToRemove._id)
-      } catch (error) {
-        console.error('Lỗi khi xóa màu:', error)
-        alert('Lỗi khi xóa màu, vui lòng thử lại')
+      if (colorImageInputRef.current) {
+        colorImageInputRef.current.value = ''
       }
     }
-  }
 
-  const handleAddColorModalClose = () => {
-    setOpenAddColorModal(false)
-    setSelectedColorId('')
-  }
-
-  const handleColorAdded = async (newColorId) => {
-    try {
-      await fetchColors()
-      if (newColorId) {
-        setSelectedColorId(newColorId)
+    setSizesList((prevSizes) => {
+      const exists = prevSizes.some((s) => s.name === selectedSizeData.name)
+      if (!exists) {
+        return [...prevSizes, { name: selectedSizeData.name }]
       }
-    } catch (error) {
-      console.error('Lỗi khi cập nhật danh sách màu:', error)
-    }
+      return prevSizes
+    })
+
+    setStockMatrix((prev) => [
+      ...prev,
+      { color: selectedColorData.name, size: selectedSizeData.name, quantity }
+    ])
+
+    setSelectedColor('')
+    setSelectedSize('')
+    setQuantity('')
+    setColorImageFile(null)
+    setLoading(false)
   }
 
+  // Remove stock
+  const handleRemoveStock = (index) => {
+    setStockMatrix((prev) => prev.filter((_, i) => i !== index))
+  }
+
+  // Update product
   const onSubmit = async (data) => {
     try {
-      const imageUrls = []
-      for (const img of images) {
-        if (img.file && img.preview.startsWith('blob:')) {
-          const url = await uploadToCloudinary(img.file)
-          imageUrls.push(url)
-        } else if (img.preview) {
-          imageUrls.push(img.preview)
-        }
+      if (productImages.length === 0) {
+        alert('Vui lòng thêm ít nhất một ảnh sản phẩm')
+        return
       }
 
-      const updatedProduct = {
-        name: data.name.trim(),
-        description: data.description.trim(),
-        origin: data.origin || '',
+      if (colorsList.length === 0) {
+        alert('Vui lòng thêm ít nhất một màu sắc')
+        return
+      }
+
+      if (sizesList.length === 0) {
+        alert('Vui lòng thêm ít nhất một kích thước')
+        return
+      }
+
+      if (stockMatrix.length === 0) {
+        alert('Vui lòng thêm ít nhất một mục kho')
+        return
+      }
+
+      const finalProduct = {
+        name: data.name,
+        description: data.description,
         price: Number(data.price),
-        quantity: Number(data.quantity),
+        importPrice: data.importPrice ? Number(data.importPrice) : undefined,
         categoryId: data.categoryId,
-        colors: colorList.map((color) => ({
-          name: color.name.trim(),
-          image: color.image
+        image: productImages,
+        colors: colorsList.map((c) => ({
+          name: c.name,
+          image: c.image || ''
         })),
-        image: imageUrls
+        sizes: sizesList.map((s) => ({
+          name: s.name
+        })),
+        stockMatrix
       }
 
-      await onSave(product._id, updatedProduct)
-      onClose()
-      reset()
-      setImages([{ file: null, preview: '' }])
-      setColorList([])
-      setColorInput('')
-      setColorImage(null)
-      setColorImagePreview('')
+      const result = await onSave(product._id, finalProduct)
+
+      if (result) {
+        onClose()
+        reset()
+        setColorsList([])
+        setSizesList([])
+        setStockMatrix([])
+        setProductImages([])
+        setProductImagePreview([])
+      } else {
+        alert('Cập nhật sản phẩm không thành công')
+      }
     } catch (error) {
-      console.error('Lỗi khi chỉnh sửa sản phẩm:', error)
+      console.error('Lỗi khi cập nhật sản phẩm:', error)
       alert('Có lỗi xảy ra, vui lòng thử lại')
     }
   }
 
   return (
-    <Dialog
-      open={open}
-      onClose={onClose}
-      fullWidth
-      maxWidth='xl'
-      PaperProps={{ sx: { mt: 8, maxHeight: '90vh', width: '90vw' } }}
-    >
-      <DialogTitle sx={{ fontWeight: 600, fontSize: 20 }}>
-        Sửa Sản Phẩm
-      </DialogTitle>
-      <Divider />
-
-      <form onSubmit={handleSubmit(onSubmit)}>
-        <DialogContent sx={{ display: 'flex', gap: 3, py: 3 }}>
-          <Box sx={{ flex: 2 }}>
-            <TextField
-              label='Tên sản phẩm'
-              fullWidth
-              margin='normal'
-              {...register('name', {
-                required: 'Tên sản phẩm không được bỏ trống'
-              })}
-              error={!!errors.name}
-              helperText={errors.name?.message}
-              sx={StyleAdmin.InputCustom}
+    <Dialog open={open} onClose={onClose} maxWidth='xl' fullWidth>
+      <Box
+        sx={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'start',
+          justifyContent: 'start',
+          paddingBottom: '8px',
+          borderBottom: '1px solid #ccc'
+        }}
+      >
+        <DialogTitle sx={{ paddingTop: '8px', paddingBottom: '8px' }}>
+          Sửa sản phẩm
+        </DialogTitle>
+        <DialogActions sx={{ paddingLeft: '24px' }}>
+          <Button onClick={onClose} variant='outlined' color='error'>
+            Hủy
+          </Button>
+          <Button
+            onClick={handleSubmit(onSubmit)}
+            variant='contained'
+            sx={{ color: '#fff', backgroundColor: '#001f5d' }}
+            disabled={loading}
+          >
+            {loading ? 'Đang cập nhật...' : 'Cập nhật sản phẩm'}
+          </Button>
+        </DialogActions>
+      </Box>
+      <DialogContent>
+        <Grid container spacing={2}>
+          {/* Tên */}
+          <Grid item size={12}>
+            <Controller
+              name='name'
+              control={control}
+              rules={{ required: 'Tên sản phẩm không được bỏ trống' }}
+              render={({ field }) => (
+                <TextField
+                  label='Tên sản phẩm'
+                  fullWidth
+                  error={!!errors.name}
+                  helperText={errors.name?.message}
+                  {...field}
+                />
+              )}
             />
-            <TextField
-              label='Mô tả'
-              fullWidth
-              multiline
-              rows={3}
-              margin='normal'
-              {...register('description', {
-                required: 'Mô tả không được bỏ trống'
-              })}
-              error={!!errors.description}
-              helperText={errors.description?.message}
-              sx={StyleAdmin.InputCustom}
-            />
-            <TextField
-              label='Xuất xứ'
-              fullWidth
-              margin='normal'
-              {...register('origin')}
-              sx={StyleAdmin.InputCustom}
-            />
-            <Box sx={{ display: 'flex', gap: 2 }}>
-              <TextField
-                label='Giá (VNĐ)'
-                type='number'
-                fullWidth
-                margin='normal'
-                {...register('price', {
-                  required: 'Giá không được bỏ trống'
-                })}
-                error={!!errors.price}
-                helperText={errors.price?.message}
-                sx={StyleAdmin.InputCustom}
-              />
-              <TextField
-                label='Số lượng'
-                type='number'
-                fullWidth
-                margin='normal'
-                {...register('quantity', {
-                  required: 'Số lượng không được bỏ trống'
-                })}
-                error={!!errors.quantity}
-                helperText={errors.quantity?.message}
-                sx={StyleAdmin.InputCustom}
-              />
-            </Box>
-            <FormControl fullWidth margin='normal' sx={StyleAdmin.InputCustom}>
-              <InputLabel id='category-select-label'>Danh mục</InputLabel>
+          </Grid>
+          {/* Phần thêm ảnh sản phẩm */}
+          <Grid item size={12}>
+            <Typography variant='h6' style={{ marginBottom: '16px' }}>
+              Ảnh sản phẩm
+            </Typography>
+            <Grid container spacing={1} alignItems='center' sx={{ mb: 2 }}>
+              <Grid
+                item
+                xs={2}
+                style={{
+                  display: 'flex',
+                  alignItems: 'start',
+                  justifyContent: 'start',
+                  flexDirection: 'column',
+                  gap: '16px',
+                  height: '56px'
+                }}
+              >
+                <Grid item>
+                  <Button
+                    sx={{ height: '56px' }}
+                    variant='outlined'
+                    component='label'
+                    disabled={productImages.length >= 9}
+                  >
+                    Chọn ảnh sản phẩm
+                    <input
+                      type='file'
+                      accept='image/*'
+                      multiple
+                      hidden
+                      ref={productImageInputRef}
+                      onChange={handleProductImageFileChange}
+                    />
+                  </Button>
+                </Grid>
+                <Grid item>
+                  <Typography variant='body2' color='text.secondary'>
+                    {`Đã thêm ${productImages.length}/9 ảnh`}
+                  </Typography>
+                </Grid>
+              </Grid>
+              <Grid item size={10}>
+                <FormControl fullWidth>
+                  <Select
+                    value=''
+                    displayEmpty
+                    renderValue={() =>
+                      productImages.length > 0
+                        ? 'Chọn để xem và xoá ảnh'
+                        : 'Không có ảnh'
+                    }
+                  >
+                    {productImages.length > 0 ? (
+                      productImages.map((image, idx) => (
+                        <MenuItem key={idx} value={idx}>
+                          <Box
+                            sx={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              width: '100%'
+                            }}
+                          >
+                            <img
+                              src={image}
+                              alt={`product-image-${idx}`}
+                              style={{
+                                width: 40,
+                                height: 40,
+                                objectFit: 'cover',
+                                borderRadius: 4,
+                                marginRight: 12
+                              }}
+                            />
+                            <Typography variant='body2' sx={{ flexGrow: 1 }}>
+                              Ảnh {idx + 1}
+                            </Typography>
+                            <IconButton
+                              edge='end'
+                              color='error'
+                              size='small'
+                              onClick={(e) => {
+                                e.stopPropagation()
+                                handleRemoveProductImage(idx)
+                              }}
+                            >
+                              <DeleteIcon />
+                            </IconButton>
+                          </Box>
+                        </MenuItem>
+                      ))
+                    ) : (
+                      <MenuItem disabled value=''>
+                        Không có ảnh
+                      </MenuItem>
+                    )}
+                  </Select>
+                </FormControl>
+              </Grid>
+            </Grid>
+          </Grid>
+          {/* Danh mục */}
+          <Grid item size={4}>
+            <FormControl fullWidth margin='normal' error={!!errors.categoryId}>
+              <InputLabel>Danh mục</InputLabel>
               <Controller
                 name='categoryId'
                 control={control}
-                rules={{ required: 'Chọn danh mục' }}
+                rules={{ required: 'Danh mục không được bỏ trống' }}
                 render={({ field }) => (
                   <Select
-                    labelId='category-select-label'
-                    label='Danh mục'
                     {...field}
-                    disabled={categoriesLoading}
+                    label='Danh mục'
+                    value={field.value || ''}
+                    disabled={loading}
+                    MenuProps={{
+                      PaperProps: { sx: StyleAdmin.FormSelect.SelectMenu }
+                    }}
                   >
-                    {categories.map((cat) => (
-                      <MenuItem key={cat._id} value={cat._id}>
-                        {cat.name}
-                      </MenuItem>
-                    ))}
+                    {categories
+                      ?.filter((c) => !c.destroy)
+                      .map((cat) => (
+                        <MenuItem key={cat._id} value={cat._id}>
+                          {cat.name}
+                        </MenuItem>
+                      ))}
+                    <MenuItem onClick={() => setCategoryOpen(true)}>
+                      Thêm danh mục mới
+                    </MenuItem>
                   </Select>
                 )}
               />
-              {errors.categoryId && (
-                <Typography color='error' variant='caption'>
-                  {errors.categoryId.message}
-                </Typography>
-              )}
-            </FormControl>
-            <Box sx={{ mt: 3 }}>
-              <Typography variant='h6' gutterBottom>
-                Ảnh sản phẩm (tối đa 9 ảnh)
+              <Typography variant='caption' color='error'>
+                {errors.categoryId?.message}
               </Typography>
-              <Box
-                sx={{
-                  display: 'flex',
-                  flexWrap: 'wrap',
-                  gap: 1,
-                  maxHeight: 200,
-                  overflowY: 'auto'
-                }}
-              >
-                {images.map((img, i) => (
-                  <Box
-                    key={i}
-                    sx={{
-                      position: 'relative',
-                      width: 100,
-                      height: 100,
-                      border: '1px solid #ccc',
-                      borderRadius: 1,
-                      overflow: 'hidden'
-                    }}
-                  >
-                    {img.preview ? (
-                      <>
+            </FormControl>
+          </Grid>
+          {/* Giá nhập */}
+          <Grid item size={4} style={{ marginTop: '16px' }}>
+            <Controller
+              name='importPrice'
+              control={control}
+              render={({ field }) => (
+                <TextField
+                  label='Giá nhập'
+                  fullWidth
+                  type='number'
+                  {...field}
+                />
+              )}
+            />
+          </Grid>
+          {/* Giá bán */}
+          <Grid item size={4} style={{ marginTop: '16px' }}>
+            <Controller
+              name='price'
+              control={control}
+              rules={{ required: 'Giá bán không được bỏ trống' }}
+              render={({ field }) => (
+                <TextField
+                  label='Giá bán'
+                  fullWidth
+                  type='number'
+                  error={!!errors.price}
+                  helperText={errors.price?.message}
+                  {...field}
+                />
+              )}
+            />
+          </Grid>
+          {/* Chọn màu và kích thước để thêm kho */}
+          <Grid item size={12}>
+            <Grid
+              container
+              spacing={2}
+              alignItems='center'
+              justifyContent='center'
+            >
+              <Grid item size={4} style={{ height: '56px' }}>
+                <Grid container spacing={1}>
+                  <Grid item size={2}>
+                    <label
+                      htmlFor='color-image'
+                      style={{
+                        width: '56px',
+                        height: '56px',
+                        border: '1px solid #ccc',
+                        borderRadius: '4px',
+                        cursor: 'pointer',
+                        overflow: 'hidden',
+                        display: 'inline-block',
+                        position: 'relative',
+                        backgroundColor: '#f9f9f9'
+                      }}
+                    >
+                      {colorImageFile ? (
                         <img
-                          src={img.preview}
-                          alt={`Ảnh ${i + 1}`}
+                          src={URL.createObjectURL(colorImageFile)}
+                          alt='Preview'
                           style={{
                             width: '100%',
                             height: '100%',
-                            objectFit: 'cover'
+                            objectFit: 'cover',
+                            display: 'block'
                           }}
                         />
-                        <IconButton
-                          size='small'
-                          onClick={() => handleImageDelete(i)}
-                          sx={{
-                            position: 'absolute',
-                            top: 0,
-                            right: 0,
-                            backgroundColor: 'rgba(255,255,255,0.7)'
+                      ) : (
+                        <div
+                          style={{
+                            width: '100%',
+                            height: '100%',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            fontSize: '12px',
+                            color: '#999'
                           }}
                         >
-                          <DeleteIcon fontSize='small' />
-                        </IconButton>
-                      </>
-                    ) : (
-                      <Button
-                        variant='outlined'
-                        component='label'
-                        sx={{ height: '100%', width: '100%' }}
+                          <AddIcon />
+                        </div>
+                      )}
+                      <input
+                        id='color-image'
+                        type='file'
+                        accept='image/*'
+                        style={{ display: 'none' }}
+                        onChange={(e) => setColorImageFile(e.target.files[0])}
+                        ref={colorImageInputRef}
+                      />
+                    </label>
+                  </Grid>
+                  <Grid item size={10}>
+                    <FormControl fullWidth sx={{ mb: 2 }}>
+                      <InputLabel>Màu</InputLabel>
+                      <Select
+                        value={selectedColor}
+                        label='Màu'
+                        onChange={(e) => setSelectedColor(e.target.value)}
                       >
-                        Thêm
-                        <input
-                          type='file'
-                          hidden
-                          accept='image/*'
-                          onChange={(e) =>
-                            handleImageChange(i, e.target.files[0])
-                          }
-                          ref={(el) => (fileInputRefs.current[i] = el)}
-                        />
-                      </Button>
-                    )}
-                  </Box>
-                ))}
-              </Box>
-            </Box>
-          </Box>
-
-          <Box sx={{ flex: 1 }}>
-            <Typography variant='h6' mb={1}>
-              Màu sắc sản phẩm
-            </Typography>
-            <List
-              dense
-              sx={{
-                maxHeight: 300,
-                overflowY: 'auto',
-                bgcolor: 'background.paper',
-                border: '1px solid #ccc',
-                borderRadius: 1
-              }}
-            >
-              {colorList.length === 0 && (
-                <Typography
-                  variant='body2'
-                  sx={{ textAlign: 'center', mt: 2, mb: 2 }}
-                >
-                  Chưa có màu nào
-                </Typography>
-              )}
-              {colorList.map((color, index) => (
-                <ListItem
-                  key={color._id || index}
-                  secondaryAction={
-                    <>
-                      <IconButton
-                        edge='end'
-                        aria-label='edit'
-                        onClick={() => handleEditColor(index)}
-                        size='small'
-                      >
-                        <EditIcon />
-                      </IconButton>
-                      <IconButton
-                        edge='end'
-                        aria-label='delete'
-                        onClick={() => handleRemoveColor(color)}
-                        size='small'
-                      >
-                        <DeleteIcon />
-                      </IconButton>
-                    </>
-                  }
-                >
-                  <ListItemAvatar>
-                    <Avatar
-                      src={color.image || ''}
-                      sx={{ bgcolor: '#eee', color: '#000' }}
-                      variant='rounded'
+                        {colors.map((color, idx) => (
+                          <MenuItem key={idx} value={color.name}>
+                            {color.name}
+                          </MenuItem>
+                        ))}
+                        <MenuItem
+                          value='add_new'
+                          onClick={() => {
+                            setSelectedColor('')
+                            setAddColorModalOpen(true)
+                          }}
+                        >
+                          Thêm màu mới
+                        </MenuItem>
+                      </Select>
+                    </FormControl>
+                  </Grid>
+                </Grid>
+              </Grid>
+              <Grid item size={4} style={{ height: '56px' }}>
+                <FormControl fullWidth>
+                  <InputLabel>Kích thước</InputLabel>
+                  <Select
+                    value={selectedSize}
+                    label='Kích thước'
+                    onChange={(e) => setSelectedSize(e.target.value)}
+                    renderValue={(selected) => selected || 'Chọn kích thước'}
+                  >
+                    {sizes.map((size, idx) => (
+                      <MenuItem key={idx} value={size.name}>
+                        {size.name}
+                      </MenuItem>
+                    ))}
+                    <MenuItem
+                      onClick={() => {
+                        setSelectedSize('')
+                        setSizeModalOpen(true)
+                      }}
                     >
-                      {color.name?.[0]?.toUpperCase() || '?'}
-                    </Avatar>
-                  </ListItemAvatar>
-                  <ListItemText primary={color.name} />
-                </ListItem>
-              ))}
-            </List>
-            <Divider sx={{ my: 2 }} />
-            <Box component='form' onSubmit={handleAddColor}>
-              <FormControl fullWidth sx={{ mb: 1 }}>
-                <InputLabel id='color-select-label'>Chọn màu có sẵn</InputLabel>
-                <Select
-                  labelId='color-select-label'
-                  label='Chọn màu có sẵn'
-                  value={selectedColorId}
-                  onChange={(e) => {
-                    const value = e.target.value
-                    if (value === 'add-new') {
-                      setOpenAddColorModal(true)
-                      setSelectedColorId('')
-                      setColorInput('')
-                      setColorImage(null)
-                      setColorImagePreview('')
-                    } else {
-                      setSelectedColorId(value)
-                      setColorInput('')
-                      setColorImage(null)
-                      setColorImagePreview('')
-                      setOpenAddColorModal(false)
-                    }
-                  }}
-                  disabled={colorsLoading}
-                >
-                  {colors.map((color) => (
-                    <MenuItem key={color._id} value={color._id}>
-                      {color.name}
+                      Thêm kích thước mới
                     </MenuItem>
-                  ))}
-                  <MenuItem value='add-new'>
-                    <em>Thêm màu mới</em>
-                  </MenuItem>
-                </Select>
-              </FormControl>
-              <Button
-                variant='outlined'
-                component='label'
-                fullWidth
-                sx={{ mb: 1 }}
-              >
-                Chọn ảnh màu
-                <input
-                  type='file'
-                  hidden
-                  accept='image/*'
-                  onChange={handleColorImageChange}
-                  ref={colorFileInputRef}
+                  </Select>
+                </FormControl>
+              </Grid>
+              <Grid item size={3} style={{ height: '56px' }}>
+                <TextField
+                  label='Số lượng'
+                  type='number'
+                  fullWidth
+                  value={quantity}
+                  onChange={(e) => setQuantity(e.target.value)}
+                  inputProps={{ min: 1 }}
                 />
-              </Button>
-              {colorImagePreview && (
-                <Box
-                  component='img'
-                  src={colorImagePreview}
-                  alt='Ảnh màu mới'
+              </Grid>
+              <Grid item size={1}>
+                <Button
+                  disabled={loading}
+                  variant='contained'
                   sx={{
+                    height: '56px',
                     width: '100%',
-                    height: 80,
-                    objectFit: 'cover',
-                    borderRadius: 1,
-                    mb: 1
+                    color: '#fff',
+                    backgroundColor: '#001f5d'
                   }}
+                  onClick={() => {
+                    const qty = Number(quantity)
+                    if (!selectedColor || !selectedSize) {
+                      alert('Vui lòng chọn màu và kích thước')
+                      return
+                    }
+                    if (isNaN(qty) || qty <= 0) {
+                      alert('Vui lòng nhập số lượng hợp lệ (> 0)')
+                      return
+                    }
+                    handleAddStock(qty)
+                    setQuantity('')
+                  }}
+                >
+                  Thêm
+                </Button>
+              </Grid>
+            </Grid>
+          </Grid>
+          {/* Hiển thị danh sách kho */}
+          <Grid item size={12}>
+            <FormControl fullWidth>
+              <Select
+                value=''
+                displayEmpty
+                renderValue={() =>
+                  stockMatrix.length > 0
+                    ? 'Chọn để xem và xoá mục kho'
+                    : 'Không có sản phẩm trong kho'
+                }
+              >
+                {stockMatrix.length > 0 ? (
+                  stockMatrix.map((stock, idx) => (
+                    <MenuItem key={idx} value={idx}>
+                      <Box
+                        sx={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          width: '100%'
+                        }}
+                      >
+                        <Typography variant='body2' sx={{ flexGrow: 1 }}>
+                          Màu: {stock.color} - Size: {stock.size} - SL:{' '}
+                          {stock.quantity}
+                        </Typography>
+                        <IconButton
+                          edge='end'
+                          color='error'
+                          size='small'
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            handleRemoveStock(idx)
+                          }}
+                        >
+                          <DeleteIcon />
+                        </IconButton>
+                      </Box>
+                    </MenuItem>
+                  ))
+                ) : (
+                  <MenuItem disabled value=''>
+                    Không có sản phẩm trong kho
+                  </MenuItem>
+                )}
+              </Select>
+            </FormControl>
+          </Grid>
+          {/* Mô tả */}
+          <Grid item size={12}>
+            <Controller
+              name='description'
+              control={control}
+              render={({ field }) => (
+                <TextField
+                  label='Mô tả'
+                  fullWidth
+                  multiline
+                  rows={3}
+                  {...field}
                 />
               )}
-              <Button
-                type='button'
-                variant='contained'
-                fullWidth
-                disabled={
-                  (!selectedColorId && !colorInput.trim()) ||
-                  colorsLoading ||
-                  openAddColorModal
-                }
-                onClick={handleAddColor}
-              >
-                Thêm màu
-              </Button>
-            </Box>
-            {editingColorIndex !== null && (
-              <Box sx={{ mt: 3 }}>
-                <Typography variant='subtitle1' mb={1}>
-                  Chỉnh sửa màu
-                </Typography>
-                <TextField
-                  label='Tên màu'
-                  value={editColorName}
-                  onChange={(e) => setEditColorName(e.target.value)}
-                  size='small'
-                  fullWidth
-                  sx={{ mb: 1 }}
-                />
-                <Button
-                  variant='outlined'
-                  component='label'
-                  fullWidth
-                  sx={{ mb: 1 }}
-                >
-                  Chọn ảnh mới
-                  <input
-                    type='file'
-                    hidden
-                    accept='image/*'
-                    onChange={handleEditColorImageChange}
-                  />
-                </Button>
-                {editColorPreview && (
-                  <Box
-                    component='img'
-                    src={editColorPreview}
-                    alt='Ảnh màu chỉnh sửa'
-                    sx={{
-                      width: '100%',
-                      height: 80,
-                      objectFit: 'cover',
-                      borderRadius: 1,
-                      mb: 1
-                    }}
-                  />
-                )}
-                <Box sx={{ display: 'flex', gap: 1 }}>
-                  <Button
-                    variant='contained'
-                    onClick={handleSaveEditColor}
-                    disabled={!editColorName.trim()}
-                    fullWidth
-                  >
-                    Lưu
-                  </Button>
-                  <Button
-                    variant='outlined'
-                    onClick={() => setEditingColorIndex(null)}
-                    fullWidth
-                  >
-                    Hủy
-                  </Button>
-                </Box>
-              </Box>
-            )}
-            <AddColorModal
-              open={openAddColorModal}
-              onClose={handleAddColorModalClose}
-              onAdded={handleColorAdded}
             />
-          </Box>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={onClose} disabled={isSubmitting}>
-            Hủy
-          </Button>
-          <Button type='submit' variant='contained' disabled={isSubmitting}>
-            Lưu thay đổi
-          </Button>
-        </DialogActions>
-      </form>
+          </Grid>
+        </Grid>
+      </DialogContent>
+      <AddColorModal
+        open={isAddColorModalOpen}
+        onClose={() => {
+          setSelectedColor('')
+          setAddColorModalOpen(false)
+          fetchColors()
+        }}
+        onSave={(newColorId) => {
+          fetchColors()
+          const newColor = colors.find((color) => color._id === newColorId)
+          if (newColor) {
+            setSelectedColor(newColor.name)
+          }
+          setAddColorModalOpen(false)
+        }}
+      />
+      <AddSizeModal
+        open={isSizeModalOpen}
+        onClose={() => {
+          setSizeModalOpen(false)
+          fetchSizes()
+        }}
+        onSave={(newSizeId) => {
+          fetchSizes()
+          const newSize = sizes.find((size) => size._id === newSizeId)
+          if (newSize) {
+            setSelectedSize(newSize.name)
+          }
+          setSizeModalOpen(false)
+        }}
+      />
+      <AddCategoryModal
+        open={categoryOpen}
+        onClose={() => setCategoryOpen(false)}
+        onSave={() => {
+          setCategoryOpen(false)
+          fetchCategories()
+        }}
+      />
     </Dialog>
   )
 }
