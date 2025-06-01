@@ -18,16 +18,22 @@ const createInventoryLog = async (reqBody) => {
 
 const getInventoryLogList = async () => {
   const result = await InventoryLogModel.find({})
-    // .populate([
-    //   {
-    //     path: 'variantId',
-    //     select: 'name'
-    //   },
-    //   {
-    //     path: 'warehouseId',
-    //     select: 'name'
-    //   }
-    // ])
+    .populate({
+      path: 'inventoryId',
+      populate: [
+        {
+          path: 'variantId',
+          select: 'name sku price', // Chỉ lấy thông tin cần thiết của variant
+          model: 'Variant' // Đảm bảo Mongoose biết đúng model
+        },
+        {
+          path: 'warehouseId', // Bước 3: trong Inventory, populate warehouseId
+          select: 'name',
+          model: 'Warehouse'
+        }
+      ],
+      select: 'variantId warehouseId'
+    })
     .lean()
 
   return result
@@ -37,16 +43,22 @@ const getInventoryLog = async (inventoryLogId) => {
   // eslint-disable-next-line no-useless-catch
   try {
     const result = await InventoryLogModel.findById(inventoryLogId)
-      .populate([
-        {
-          path: 'variantId',
-          select: 'name'
-        },
-        {
-          path: 'warehouseId',
-          select: 'name'
-        }
-      ])
+      .populate({
+        path: 'inventoryId',
+        populate: [
+          {
+            path: 'variantId',
+            select: 'name sku price', // Chỉ lấy thông tin cần thiết của variant
+            model: 'Variant' // Đảm bảo Mongoose biết đúng model
+          },
+          {
+            path: 'warehouseId', // Bước 3: trong Inventory, populate warehouseId
+            select: 'name',
+            model: 'Warehouse'
+          }
+        ],
+        select: 'variantId warehouseId'
+      })
       .lean()
 
     return result
