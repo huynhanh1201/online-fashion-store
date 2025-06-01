@@ -17,7 +17,18 @@ const createInventoryLog = async (reqBody) => {
 }
 
 const getInventoryLogList = async () => {
-  const result = await InventoryLogModel.find({}).lean()
+  const result = await InventoryLogModel.find({})
+    // .populate([
+    //   {
+    //     path: 'variantId',
+    //     select: 'name'
+    //   },
+    //   {
+    //     path: 'warehouseId',
+    //     select: 'name'
+    //   }
+    // ])
+    .lean()
 
   return result
 }
@@ -25,7 +36,18 @@ const getInventoryLogList = async () => {
 const getInventoryLog = async (inventoryLogId) => {
   // eslint-disable-next-line no-useless-catch
   try {
-    const result = await InventoryLogModel.findById(inventoryLogId).lean()
+    const result = await InventoryLogModel.findById(inventoryLogId)
+      .populate([
+        {
+          path: 'variantId',
+          select: 'name'
+        },
+        {
+          path: 'warehouseId',
+          select: 'name'
+        }
+      ])
+      .lean()
 
     return result
   } catch (err) {
