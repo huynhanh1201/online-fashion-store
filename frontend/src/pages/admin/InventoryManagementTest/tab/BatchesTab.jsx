@@ -34,27 +34,36 @@ const BatchesTab = ({
   warehouses
 }) => {
   const enrichedBatches = data.map((batch) => {
-    const variant = Array.isArray(variants)
-      ? variants.find((v) => v.id === batch.variantId)
-      : null
+    const variantName =
+      typeof batch.variantId === 'object'
+        ? batch.variantId.name
+        : Array.isArray(variants)
+          ? variants.find((v) => v.id === batch.variantId)?.name
+          : 'N/A'
 
-    const warehouse = Array.isArray(warehouses)
-      ? warehouses.find((w) => w.id === batch.warehouseId)
-      : null
-
+    const warehouseName =
+      typeof batch.warehouseId === 'object'
+        ? batch.warehouseId.name
+        : Array.isArray(warehouses)
+          ? warehouses.find((w) => w.id === batch.warehouseId)?.name
+          : 'N/A'
     return {
       ...batch,
-      variantName: variant?.name || 'N/A',
-      warehouseName: warehouse?.name || 'N/A',
-      manufactureDate: batch.manufactureDate || 'Chờ cập nhật',
-      expiry: batch.expiry || 'Chờ cập nhật'
+      variantName: variantName || 'N/A',
+      warehouseName: warehouseName || 'N/A',
+      manufactureDate: batch.manufactureDate ?? null,
+      expiry: batch.expiry ?? null
     }
   })
 
   const batchColumns = [
     { id: 'batchCode', label: 'Mã lô', minWidth: 120 },
-    { id: 'variantId.name', label: 'Biến thể', minWidth: 200 },
-    { id: 'warehouseId.name', label: 'Kho hàng', minWidth: 150 },
+    { id: 'variantName', label: 'Biến thể', minWidth: 200 },
+    {
+      id: 'warehouseName',
+      label: 'Kho hàng',
+      minWidth: 150
+    },
     { id: 'quantity', label: 'Số lượng', minWidth: 100, align: 'right' },
     {
       id: 'importPrice',
@@ -74,14 +83,14 @@ const BatchesTab = ({
       label: 'NSX',
       minWidth: 130,
       format: (value) =>
-        value ? new Date(value).toLocaleDateString('vi-VN') : 'Chờ cập nhật'
+        value ? new Date(value).toLocaleString('vi-VN') : 'Chờ cập nhật'
     },
     {
       id: 'expiry',
       label: 'HSD',
       minWidth: 130,
       format: (value) =>
-        value ? new Date(value).toLocaleDateString('vi-VN') : 'Chờ cập nhật'
+        value ? new Date(value).toLocaleString('vi-VN') : 'Chờ cập nhật'
     },
     { id: 'action', label: 'Hành động', minWidth: 150, align: 'center' }
   ]
@@ -158,7 +167,7 @@ const BatchesTab = ({
             </TableRow>
           </TableHead>
           <TableBody>
-            {data
+            {enrichedBatches
               .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
               .map((row, index) => (
                 <TableRow hover role='checkbox' tabIndex={-1} key={index}>

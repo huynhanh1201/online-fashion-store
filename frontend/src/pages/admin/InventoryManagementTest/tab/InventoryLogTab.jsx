@@ -16,7 +16,8 @@ import {
   Select,
   Typography,
   Box,
-  IconButton
+  IconButton,
+  Chip
 } from '@mui/material'
 import VisibilityIcon from '@mui/icons-material/Visibility'
 import ViewInventoryLogModal from '../modal/InventoryLog/ViewInventoryLogModal' // Thêm modal mới
@@ -49,7 +50,6 @@ const InventoryLogTab = ({
   const enrichedInventoryLogs = (data || []).map((log) => {
     const variant = variants?.find((v) => v.id === log.variantId) || {}
     const warehouse = warehouses?.find((w) => w.id === log.warehouseId) || {}
-
     return {
       ...log,
       variantName: variant?.name || 'N/A',
@@ -206,6 +206,17 @@ const InventoryLogTab = ({
                 <TableRow hover role='checkbox' tabIndex={-1} key={index}>
                   {inventoryLogColumns.map((column) => {
                     const value = row[column.id]
+                    if (column.id === 'typeLabel') {
+                      return (
+                        <TableCell key={column.id} align={column.align}>
+                          <Chip
+                            label={value}
+                            size='small'
+                            color={value === 'Nhập' ? 'success' : 'error'}
+                          />
+                        </TableCell>
+                      )
+                    }
                     if (column.id === 'amount') {
                       return (
                         <TableCell key={column.id} align={column.align}>
@@ -220,7 +231,6 @@ const InventoryLogTab = ({
                         </TableCell>
                       )
                     }
-
                     return (
                       <TableCell key={column.id} align={column.align}>
                         {value !== undefined ? value : '—'}

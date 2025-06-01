@@ -1,4 +1,3 @@
-// modal/Inventory/ViewInventoryModal.jsx
 import React from 'react'
 import {
   Dialog,
@@ -7,82 +6,130 @@ import {
   DialogActions,
   Button,
   Typography,
-  Chip
+  Chip,
+  Grid,
+  Divider,
+  Box
 } from '@mui/material'
 
-const ViewInventoryModal = ({
-  open,
-  onClose,
-  inventory,
-  variants,
-  warehouses
-}) => {
+const ViewInventoryModal = ({ open, onClose, inventory }) => {
+  const statusColor =
+    inventory?.status === 'in-stock'
+      ? 'success'
+      : inventory?.status === 'low-stock'
+        ? 'warning'
+        : 'error'
+
+  const statusLabel =
+    inventory?.status === 'in-stock'
+      ? 'Còn hàng'
+      : inventory?.status === 'low-stock'
+        ? 'Cảnh báo'
+        : 'Hết hàng'
+  console.log('inventory', inventory)
   return (
-    <Dialog open={open} onClose={onClose}>
-      <DialogTitle>Chi tiết tồn kho</DialogTitle>
-      <DialogContent>
-        {inventory && (
-          <>
-            <Typography>
-              <strong>ID:</strong> {inventory.id}
-            </Typography>
-            <Typography>
-              <strong>Biến thể:</strong>{' '}
-              {variants.find((v) => v._id === inventory.variantId)?.name ||
-                'N/A'}
-            </Typography>
-            <Typography>
-              <strong>Kho:</strong>{' '}
-              {warehouses.find((w) => w._id === inventory.warehouseId)?.name ||
-                'N/A'}
-            </Typography>
-            <Typography>
-              <strong>Số lượng:</strong> {inventory.quantity}
-            </Typography>
-            <Typography>
-              <strong>Ngưỡng cảnh báo:</strong> {inventory.minQuantity}
-            </Typography>
-            <Typography>
-              <strong>Giá nhập:</strong>{' '}
-              {inventory.importPrice.toLocaleString()}đ
-            </Typography>
-            <Typography>
-              <strong>Giá bán:</strong> {inventory.exportPrice.toLocaleString()}
-              đ
-            </Typography>
-            <Typography>
-              <strong>Ngày tạo:</strong>{' '}
-              {new Date(inventory.createdAt).toLocaleString('vi-VN')}
-            </Typography>
-            <Typography>
-              <strong>Ngày cập nhật:</strong>{' '}
-              {new Date(inventory.updatedAt).toLocaleString('vi-VN')}
-            </Typography>
-            <Typography>
-              <strong>Trạng thái:</strong>
-              <Chip
-                label={
-                  inventory.status === 'in-stock'
-                    ? 'Còn hàng'
-                    : inventory.status === 'low-stock'
-                      ? 'Cảnh báo'
-                      : 'Hết hàng'
-                }
-                color={
-                  inventory.status === 'in-stock'
-                    ? 'success'
-                    : inventory.status === 'low-stock'
-                      ? 'warning'
-                      : 'error'
-                }
-                size='small'
-              />
-            </Typography>
-          </>
+    <Dialog open={open} onClose={onClose} maxWidth='sm' fullWidth>
+      <DialogTitle sx={{ fontWeight: 'bold' }}>Chi tiết tồn kho</DialogTitle>
+      <DialogContent dividers>
+        {inventory ? (
+          <Box sx={{ mt: 1 }}>
+            <Grid container spacing={2}>
+              <Grid item size={6}>
+                <Typography variant='body2' color='text.secondary'>
+                  Mã tồn kho
+                </Typography>
+                <Typography variant='subtitle1'>
+                  {inventory.variantId}
+                </Typography>
+              </Grid>
+              <Grid item size={6}>
+                <Typography variant='body2' color='text.secondary'>
+                  Biến thể
+                </Typography>
+                <Typography variant='subtitle1'>
+                  {inventory.variantName || 'N/A'}
+                </Typography>
+              </Grid>
+
+              <Grid item size={6}>
+                <Typography variant='body2' color='text.secondary'>
+                  Kho hàng
+                </Typography>
+                <Typography variant='subtitle1'>
+                  {inventory?.warehouseId.name || 'N/A'}
+                </Typography>
+              </Grid>
+              <Grid item size={6}>
+                <Typography variant='body2' color='text.secondary'>
+                  Trạng thái
+                </Typography>
+                <Chip label={statusLabel} color={statusColor} size='small' />
+              </Grid>
+
+              <Grid item size={6}>
+                <Typography variant='body2' color='text.secondary'>
+                  Số lượng
+                </Typography>
+                <Typography variant='subtitle1'>
+                  {inventory.quantity}
+                </Typography>
+              </Grid>
+              <Grid item size={6}>
+                <Typography variant='body2' color='text.secondary'>
+                  Ngưỡng cảnh báo
+                </Typography>
+                <Typography variant='subtitle1'>
+                  {inventory.minQuantity}
+                </Typography>
+              </Grid>
+
+              <Grid item size={6}>
+                <Typography variant='body2' color='text.secondary'>
+                  Giá nhập
+                </Typography>
+                <Typography variant='subtitle1'>
+                  {inventory.importPrice?.toLocaleString()}đ
+                </Typography>
+              </Grid>
+              <Grid item size={6}>
+                <Typography variant='body2' color='text.secondary'>
+                  Giá bán
+                </Typography>
+                <Typography variant='subtitle1'>
+                  {inventory.exportPrice?.toLocaleString()}đ
+                </Typography>
+              </Grid>
+
+              <Grid item size={6}>
+                <Typography variant='body2' color='text.secondary'>
+                  Ngày tạo
+                </Typography>
+                <Typography variant='subtitle2'>
+                  {inventory.createdAt
+                    ? new Date(inventory.createdAt).toLocaleString('vi-VN')
+                    : '—'}
+                </Typography>
+              </Grid>
+              <Grid item size={6}>
+                <Typography variant='body2' color='text.secondary'>
+                  Ngày cập nhật
+                </Typography>
+                <Typography variant='subtitle2'>
+                  {inventory.updatedAt
+                    ? new Date(inventory.updatedAt).toLocaleString('vi-VN')
+                    : '—'}
+                </Typography>
+              </Grid>
+            </Grid>
+          </Box>
+        ) : (
+          <Typography>Không có dữ liệu tồn kho</Typography>
         )}
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose}>Đóng</Button>
+        <Button onClick={onClose} variant='outlined' color='primary'>
+          Đóng
+        </Button>
       </DialogActions>
     </Dialog>
   )

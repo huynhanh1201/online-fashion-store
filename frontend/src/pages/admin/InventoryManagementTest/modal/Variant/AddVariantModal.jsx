@@ -73,6 +73,15 @@ const AddVariantModal = ({ open, onClose, addVariant, products }) => {
   const overridePrice = watch('overridePrice') // Theo dõi overridePrice
   const colorImage = watch('colorImage') // Theo dõi colorImage để hiển thị preview
   const productId = watch('productId') // Theo dõi productId để lấy giá sản phẩm
+  useEffect(() => {
+    if (productId) {
+      const selectedProduct = products.find((p) => p._id === productId)
+      if (selectedProduct) {
+        setValue('importPrice', selectedProduct.importPrice || 0)
+        setValue('exportPrice', selectedProduct.exportPrice || 0)
+      }
+    }
+  }, [productId, products, setValue])
 
   useEffect(() => {
     fetchColors()
@@ -124,7 +133,6 @@ const AddVariantModal = ({ open, onClose, addVariant, products }) => {
     const selectedProduct = products.find((p) => p._id === productId)
     const productImportPrice = selectedProduct?.importPrice || 0
     const productExportPrice = selectedProduct?.exportPrice || 0
-
     try {
       await addColorPalette(productId, { name: color, image: colorImage })
       await addSizePalette(productId, { name: size })
@@ -270,14 +278,13 @@ const AddVariantModal = ({ open, onClose, addVariant, products }) => {
                 onChange={(e) => setValue('overridePrice', e.target.checked)}
               />
             }
-            label='Ghi đè giá mặc định'
+            label='Đặt giá riêng cho biến thể'
           />
 
           {/* Giá nhập */}
           <TextField
-            label='Giá nhập'
             type='number'
-            disabled={!overridePrice} // Vô hiệu hóa nếu overridePrice là false
+            disabled={!overridePrice}
             {...register('importPrice', {
               required: overridePrice ? 'Vui lòng nhập giá nhập' : false,
               valueAsNumber: true,
@@ -286,15 +293,13 @@ const AddVariantModal = ({ open, onClose, addVariant, products }) => {
                 : undefined
             })}
             error={!!errors.importPrice}
-            helperText={errors.importPrice?.message}
             fullWidth
           />
 
           {/* Giá bán */}
           <TextField
-            label='Giá bán'
             type='number'
-            disabled={!overridePrice} // Vô hiệu hóa nếu overridePrice là false
+            disabled={!overridePrice}
             {...register('exportPrice', {
               required: overridePrice ? 'Vui lòng nhập giá bán' : false,
               valueAsNumber: true,
@@ -303,7 +308,6 @@ const AddVariantModal = ({ open, onClose, addVariant, products }) => {
                 : undefined
             })}
             error={!!errors.exportPrice}
-            helperText={errors.exportPrice?.message}
             fullWidth
           />
         </DialogContent>

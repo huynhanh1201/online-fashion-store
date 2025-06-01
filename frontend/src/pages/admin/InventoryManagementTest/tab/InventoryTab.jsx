@@ -469,13 +469,13 @@ const InventoryTab = ({
   })
 
   const inventoryColumns = [
+    { id: 'variantId', label: 'Mã biến thể', minWidth: 200 },
     { id: 'warehouse', label: 'Kho hàng', minWidth: 120 },
     { id: 'variantName', label: 'Sản phẩm', minWidth: 150 },
-    { id: 'variantId', label: 'Mã biến thể', minWidth: 200 },
     { id: 'quantity', label: 'Số lượng', minWidth: 100, align: 'right' },
     {
       id: 'minQuantity',
-      label: 'Tối thiểu',
+      label: 'Tối thiểu', // ngưỡng cảnh báo số lượng sản phẩm (SL) cảnh báo
       minWidth: 100,
       align: 'right'
     },
