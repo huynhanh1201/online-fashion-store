@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useState } from 'react'
 import { Box, Fade } from '@mui/material'
 import { styled } from '@mui/system'
 
@@ -24,63 +24,75 @@ const ProductImageSection = ({
   selectedImageIndex,
   fadeIn,
   onImageClick,
+  getCurrentImages,
   selectedColor,
-  colors,
-  isViewingThumbnails
+  selectedSize,
+  selectedVariant
 }) => {
-  const getSelectedImage = () => {
-    if (!isViewingThumbnails && selectedColor && colors?.length > 0) {
-      const selectedColorObj = colors.find(
-        (color) =>
-          (color.name || color).toLowerCase() === selectedColor.toLowerCase()
-      )
-      return (
-        selectedColorObj?.image ||
-        images?.[selectedImageIndex] ||
-        '/default.jpg'
-      )
-    }
-    return images?.[selectedImageIndex] || '/default.jpg'
-  }
+  const [isThumbnailClicked, setIsThumbnailClicked] = useState(false)
 
-  const currentImage = getSelectedImage()
+  // Reset isThumbnailClicked khi selectedVariant thay đổi
+  React.useEffect(() => {
+    setIsThumbnailClicked(false)
+    console.log(
+      'Reset isThumbnailClicked due to selectedVariant change:',
+      selectedVariant
+    ) // Debug
+  }, [selectedVariant])
+
+  // Lấy danh sách ảnh hiện tại
+  const currentImages = getCurrentImages
+    ? getCurrentImages()
+    : images?.length > 0
+      ? images
+      : ['/default.jpg']
+
+  // Thumbnail luôn hiển thị danh sách ảnh của sản phẩm
+  const displayImages = images?.length > 0 ? images : ['/default.jpg']
+
+  // Ảnh chính
+  const mainImage = isThumbnailClicked
+    ? displayImages[selectedImageIndex] || displayImages[0] || '/default.jpg'
+    : selectedVariant?.color?.image
+      ? selectedVariant.color.image
+      : displayImages[selectedImageIndex] || displayImages[0] || '/default.jpg'
+
+  console.log('mainImage:', mainImage) // Debug
+  console.log('isThumbnailClicked:', isThumbnailClicked) // Debug
 
   return (
     <Box sx={{ width: 400, height: 450, mb: 5 }}>
       <Fade
         in={fadeIn}
         timeout={300}
-        key={`${selectedColor || ''}-${selectedImageIndex}-${isViewingThumbnails}`}
+        key={`${selectedColor || ''}-${selectedSize || ''}-${selectedVariant?._id || ''}`}
       >
-        <div style={{ width: '100%', height: '100%', objectFit: 'cover' }}>
+        <div style={{ width: '100%', height: '100%' }}>
           <ProductImage
-            src={currentImage}
-            alt='Sản phẩm'
+            src={mainImage}
+            alt={selectedVariant?.name || 'Sản phẩm'}
             onError={(e) => {
-              // console.log('Image load error:', e);
+              e.target.onerror = null
               e.target.src = '/default.jpg'
             }}
           />
         </div>
       </Fade>
-      <Box
-        sx={{
-          display: 'flex',
-          justifyContent: 'center',
-          gap: 1,
-          mt: 2,
-          objectFit: 'contain'
-        }}
-      >
-        {images?.map((img, index) => (
+
+      <Box sx={{ display: 'flex', justifyContent: 'center', gap: 1, mt: 2 }}>
+        {displayImages.map((img, index) => (
           <Thumbnail
             key={`${img}-${index}`}
             src={img}
             alt={`thumb-${index}`}
             selected={index === selectedImageIndex}
-            onClick={() => onImageClick(index)}
+            onClick={() => {
+              setIsThumbnailClicked(true)
+              onImageClick(index)
+              console.log('Clicked thumbnail index:', index) // Debug
+            }}
             onError={(e) => {
-              // console.log('Thumbnail load error:', e);
+              e.target.onerror = null
               e.target.src = '/default.jpg'
             }}
           />

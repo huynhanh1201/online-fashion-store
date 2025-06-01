@@ -4,14 +4,12 @@ import { useNavigate } from 'react-router-dom'
 import { getProductById } from '~/services/productService'
 import { getDiscounts } from '~/services/discountService'
 import { addToCart, getCart } from '~/services/cartService'
-import { getColorPalettes } from '~/services/colorService'
-import { getSizePalettes } from '~/services/sizeService'
+import { getProductVariants } from '~/services/variantService'
 import { setCartItems, setTempCart } from '~/redux/cart/cartSlice'
 
 const useProductDetail = (productId) => {
   const [product, setProduct] = useState(null)
   const [quantity, setQuantity] = useState(1)
-  const [size, setSize] = useState('S')
   const [selectedImageIndex, setSelectedImageIndex] = useState(0)
   const [fadeIn, setFadeIn] = useState(true)
   const [isLoading, setIsLoading] = useState(true)
@@ -21,19 +19,26 @@ const useProductDetail = (productId) => {
   const [copiedCode, setCopiedCode] = useState('')
   const [snackbar, setSnackbar] = useState(null)
   const [isAdding, setIsAdding] = useState(false)
-  const [colors, setColors] = useState([])
-  const [sizes, setSizes] = useState([])
+
+  // Variants related states
+  const [variants, setVariants] = useState([])
+  const [selectedVariant, setSelectedVariant] = useState(null)
+  const [availableColors, setAvailableColors] = useState([])
+  const [availableSizes, setAvailableSizes] = useState([])
   const [selectedColor, setSelectedColor] = useState(null)
+  const [selectedSize, setSelectedSize] = useState(null)
 
   const dispatch = useDispatch()
   const navigate = useNavigate()
 
+  // Format currency
   const formatCurrencyShort = (value) => {
     if (value >= 1_000_000) return `${(value / 1_000_000).toFixed(1)}Tr`
     if (value >= 1_000) return `${(value / 1_000).toFixed(0)}K`
     return `${value.toLocaleString()}đ`
   }
 
+  // Fetch product details
   const fetchProduct = useCallback(async () => {
     setIsLoading(true)
     setError(null)
@@ -84,27 +89,46 @@ const useProductDetail = (productId) => {
     }
   }, [productId])
 
-  const fetchColors = useCallback(async () => {
+  // Fetch product variants
+  const fetchVariants = useCallback(async () => {
+    if (!productId) return
     try {
-      const { colors } = await getColorPalettes(productId)
-      setColors(colors || [])
+      const data = await getProductVariants(productId)
+      setVariants(data || [])
+
+      // Extract unique colors and sizes
+      const colors = []
+      const sizes = []
+      const colorMap = new Map()
+      const sizeMap = new Map()
+
+      data?.forEach((variant) => {
+        // Extract colors
+        if (variant.color && !colorMap.has(variant.color.name)) {
+          colorMap.set(variant.color.name, variant.color)
+          colors.push(variant.color)
+        }
+
+        // Extract sizes
+        if (variant.size && !sizeMap.has(variant.size.name)) {
+          sizeMap.set(variant.size.name, variant.size)
+          sizes.push(variant.size)
+        }
+      })
+
+      setAvailableColors(colors)
+      setAvailableSizes(sizes)
+
+      // Không tự động chọn màu và kích thước
     } catch (err) {
-      console.error('Lỗi khi lấy màu:', err.response || err)
-      setColors([])
+      console.error('Lỗi khi lấy variants:', err.response || err)
+      setVariants([])
+      setAvailableColors([])
+      setAvailableSizes([])
     }
   }, [productId])
 
-  const fetchSizes = useCallback(async () => {
-    try {
-      const response = await getSizePalettes(productId)
-      const sizes = response?.sizes || []
-      setSizes(sizes) // Không cần lọc nữa vì API đã trả đúng mảng chuỗi
-    } catch (err) {
-      console.error('Lỗi khi lấy kích thước:', err.response || err)
-      setSizes([])
-    }
-  }, [productId])
-
+  // Fetch coupons
   const fetchCoupons = useCallback(async () => {
     try {
       const { discounts } = await getDiscounts()
@@ -118,50 +142,125 @@ const useProductDetail = (productId) => {
     }
   }, [])
 
+  // Fetch data on mount
   useEffect(() => {
     fetchProduct()
-    fetchColors()
-    fetchSizes()
+    fetchVariants()
     fetchCoupons()
-  }, [fetchProduct, fetchColors, fetchSizes, fetchCoupons])
+  }, [fetchProduct, fetchVariants, fetchCoupons])
 
+  // Update selected variant when color and size are selected
+  useEffect(() => {
+    if (selectedColor && selectedSize && variants.length > 0) {
+      const variant = variants.find(
+        (v) => v.color.name === selectedColor && v.size.name === selectedSize
+      )
+      setSelectedVariant(variant || null)
+      console.log('Updated selectedVariant:', variant) // Debug
+    } else {
+      setSelectedVariant(null) // Reset if either color or size is missing
+    }
+  }, [selectedColor, selectedSize, variants])
+
+  // Reset selectedImageIndex when selectedVariant changes
+  useEffect(() => {
+    setSelectedImageIndex(0)
+  }, [selectedVariant])
+
+  // Handle copy coupon code
   const handleCopy = (code) => {
     navigator.clipboard.writeText(code)
     setCopiedCode(code)
+    setSnackbar({
+      type: 'success',
+      message: `Đã sao chép mã ${code}`
+    })
     setTimeout(() => setCopiedCode(''), 2000)
   }
+
+  // Handle color change
   const handleColorChange = (color) => {
     setSelectedColor(color)
-    if (color.images && color.images.length > 0) {
-      setProduct((prev) => ({
-        ...prev,
-        images: color.images
-      }))
-      setSelectedImageIndex(0)
+    if (selectedSize) {
+      const variant = variants.find(
+        (v) => v.color.name === color && v.size.name === selectedSize
+      )
+      setSelectedVariant(variant || null)
+      console.log('Selected variant (color change):', variant) // Debug
+    } else {
+      setSelectedVariant(null) // Reset if size is not selected
     }
   }
 
+  // Handle size change
+  const handleSizeChange = (size) => {
+    setSelectedSize(size)
+    if (selectedColor) {
+      const variant = variants.find(
+        (v) => v.color.name === selectedColor && v.size.name === size
+      )
+      setSelectedVariant(variant || null)
+      console.log('Selected variant (size change):', variant) // Debug
+    } else {
+      setSelectedVariant(null) // Reset if color is not selected
+    }
+  }
+
+  // Get current price
+  const getCurrentPrice = () => {
+    if (selectedVariant) {
+      return {
+        price: selectedVariant.exportPrice || 0,
+        discountPrice: selectedVariant.discountPrice || null
+      }
+    }
+    return {
+      price: product?.price || 0,
+      discountPrice: product?.discountPrice || null
+    }
+  }
+
+  // Get current images
+  const getCurrentImages = () => {
+    console.log('selectedVariant.color.image:', selectedVariant?.color?.image)
+    console.log('product.images:', product?.images)
+    if (selectedVariant && selectedVariant.color?.image) {
+      return [selectedVariant.color.image]
+    }
+    return product?.images?.length > 0 ? product.images : ['/default.jpg']
+  }
+
+  // Handle add to cart
   const handleAddToCart = async () => {
     if (isAdding || !product) return
+    if (variants.length > 0 && !selectedVariant) {
+      setSnackbar({
+        type: 'warning',
+        message: 'Vui lòng chọn màu sắc và kích thước!'
+      })
+      return
+    }
     setIsAdding(true)
     try {
       const updatedCart = await getCart()
+      const productIdToUse = selectedVariant?._id || product._id
       const existingItem = updatedCart?.cartItems?.find(
-        (item) => item.productId._id === product._id
+        (item) => item.productId._id === productIdToUse
       )
       const currentQty = existingItem?.quantity || 0
+      const availableQuantity = selectedVariant?.quantity || product.quantity
 
-      if (currentQty + quantity > product.quantity) {
+      if (currentQty + quantity > availableQuantity) {
         setSnackbar({
           type: 'warning',
           message: 'Không thể vượt quá số lượng tồn kho!'
         })
-        setTimeout(() => setIsAdding(false), 500)
+        setIsAdding(false)
         return
       }
 
       const res = await addToCart({
-        cartItems: [{ productId: product._id, quantity }]
+        cartItems: [{ productId: productIdToUse, quantity }]
       })
       dispatch(setCartItems(res?.cartItems || updatedCart?.cartItems || []))
       setSnackbar({
@@ -180,16 +279,27 @@ const useProductDetail = (productId) => {
     }
   }
 
+  // Handle buy now
   const handleBuyNow = () => {
     if (!product) return
+    if (variants.length > 0 && !selectedVariant) {
+      setSnackbar({
+        type: 'warning',
+        message: 'Vui lòng chọn màu sắc và kích thước!'
+      })
+      return
+    }
+    const currentPrice = getCurrentPrice()
+    const currentImages = getCurrentImages()
+
     const itemToBuy = {
-      productId: product._id,
+      productId: selectedVariant?._id || product._id,
       quantity,
       product: {
-        _id: product._id,
-        name: product.name,
-        price: product.discountPrice || product.price,
-        image: product.images && product.images[0] ? product.images[0] : ''
+        _id: selectedVariant?._id || product._id,
+        name: selectedVariant?.name || product.name,
+        price: currentPrice.discountPrice || currentPrice.price,
+        image: currentImages[0] || ''
       }
     }
     dispatch(setTempCart({ cartItems: [itemToBuy] }))
@@ -207,10 +317,16 @@ const useProductDetail = (productId) => {
     setFadeIn,
     quantity,
     setQuantity,
-    size,
-    setSize,
-    colors,
-    sizes,
+    variants,
+    selectedVariant,
+    availableColors,
+    availableSizes,
+    selectedColor,
+    selectedSize,
+    handleColorChange,
+    handleSizeChange,
+    getCurrentPrice,
+    getCurrentImages,
     coupons,
     openVoucherDrawer,
     setOpenVoucherDrawer,
@@ -221,10 +337,7 @@ const useProductDetail = (productId) => {
     handleBuyNow,
     handleCopy,
     copiedCode,
-    formatCurrencyShort,
-    selectedColor,
-    setSelectedColor,
-    handleColorChange
+    formatCurrencyShort
   }
 }
 

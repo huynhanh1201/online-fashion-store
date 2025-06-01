@@ -1,12 +1,5 @@
-import React, { useState } from 'react'
-import {
-  Container,
-  Grid,
-  Typography,
-  Button,
-  CircularProgress,
-  Box
-} from '@mui/material'
+import React, { useState, useEffect } from 'react'
+import { Container, Grid, Typography, Button, Box } from '@mui/material'
 import { useParams } from 'react-router-dom'
 import useProductDetail from './useProductDetail'
 import ProductImageSection from './ProductImageSection'
@@ -15,10 +8,11 @@ import ProductDescription from './ProductDescription'
 import VoucherDrawer from './VoucherDrawer'
 import SnackbarAlert from './SnackbarAlert'
 import ProductReview from './ProductReview'
+
 const ProductDetail = () => {
   const { productId } = useParams()
-  const [selectedColor, setSelectedColor] = useState(null)
   const [isViewingThumbnails, setIsViewingThumbnails] = useState(false)
+
   const {
     product,
     isLoading,
@@ -30,10 +24,16 @@ const ProductDetail = () => {
     setFadeIn,
     quantity,
     setQuantity,
-    size = [],
-    setSize,
-    sizes,
-    colors,
+    variants,
+    selectedVariant,
+    availableColors,
+    availableSizes,
+    selectedColor,
+    selectedSize,
+    handleColorChange,
+    handleSizeChange,
+    getCurrentPrice,
+    getCurrentImages,
     coupons,
     openVoucherDrawer,
     setOpenVoucherDrawer,
@@ -46,6 +46,11 @@ const ProductDetail = () => {
     copiedCode,
     formatCurrencyShort
   } = useProductDetail(productId)
+
+  // Reset ảnh chính về ảnh đầu tiên khi chọn biến thể mới
+  useEffect(() => {
+    setSelectedImageIndex(0)
+  }, [selectedVariant])
 
   if (isLoading) {
     return (
@@ -80,7 +85,6 @@ const ProductDetail = () => {
             selectedImageIndex={selectedImageIndex}
             fadeIn={fadeIn}
             onImageClick={(index) => {
-              setIsViewingThumbnails(true)
               if (index !== selectedImageIndex) {
                 setFadeIn(false)
                 setTimeout(() => {
@@ -89,10 +93,10 @@ const ProductDetail = () => {
                 }, 150)
               }
             }}
+            getCurrentImages={getCurrentImages}
+            selectedVariant={selectedVariant}
             selectedColor={selectedColor}
-            colors={colors}
-            isViewingThumbnails={isViewingThumbnails}
-            setIsViewingThumbnails={setIsViewingThumbnails}
+            selectedSize={selectedSize}
           />
         </Grid>
         <Grid item xs={12} md={6}>
@@ -100,20 +104,24 @@ const ProductDetail = () => {
             product={product}
             quantity={quantity}
             setQuantity={setQuantity}
-            size={size}
-            setSize={setSize}
-            colors={colors}
-            sizes={sizes}
             coupons={coupons}
             isAdding={isAdding}
             handleAddToCart={handleAddToCart}
             handleBuyNow={handleBuyNow}
             setOpenVoucherDrawer={setOpenVoucherDrawer}
+            variants={variants}
+            selectedVariant={selectedVariant}
+            availableColors={availableColors}
+            availableSizes={availableSizes}
             selectedColor={selectedColor}
-            setSelectedColor={(color) => {
-              setSelectedColor(color)
+            selectedSize={selectedSize}
+            handleColorChange={(color) => {
+              handleColorChange(color)
               setIsViewingThumbnails(false)
             }}
+            handleSizeChange={handleSizeChange}
+            getCurrentPrice={getCurrentPrice}
+            getCurrentImages={getCurrentImages}
           />
         </Grid>
       </Grid>

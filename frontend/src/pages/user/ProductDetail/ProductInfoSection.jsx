@@ -1,9 +1,9 @@
+// ProductInfoSection.jsx
 import React from 'react'
 import {
   Box,
   Typography,
   Button,
-  ButtonGroup,
   IconButton,
   TextField,
   Chip,
@@ -26,43 +26,52 @@ const VoucherChip = styled(Chip)({
   cursor: 'pointer'
 })
 
-const ColorBox = styled(Box)(({ selected }) => ({
+const VariantBox = styled(Box)(({ selected }) => ({
   display: 'flex',
   alignItems: 'center',
-  padding: '5px 10px',
-  backgroundColor: selected ? '#e3f2fd' : '#f0f0f0',
-  border: selected ? '2px solid #1A3C7B' : 'none',
-  borderRadius: '5px',
+  padding: '8px 12px',
+  backgroundColor: selected ? '#e3f2fd' : '#f9f9f9',
+  border: selected ? '2px solid #1A3C7B' : '1px solid #e0e0e0',
+  borderRadius: '8px',
   cursor: 'pointer',
-  gap: 8
+  gap: 10,
+  transition: 'all 0.2s ease',
+  '&:hover': {
+    backgroundColor: selected ? '#e3f2fd' : '#f0f0f0',
+    borderColor: selected ? '#1A3C7B' : '#bdbdbd'
+  }
 }))
 
-const ColorImage = styled('img')({
-  width: 24,
-  height: 24,
+const VariantImage = styled('img')({
+  width: 40,
+  height: 40,
   objectFit: 'cover',
-  borderRadius: '4px'
+  borderRadius: '6px'
 })
 
 const ProductInfoSection = ({
   product,
   quantity,
   setQuantity,
-  size,
-  setSize,
-  colors,
-  sizes = [],
   coupons,
   isAdding,
   handleAddToCart,
   handleBuyNow,
   setOpenVoucherDrawer,
+  // Variants props
+  variants,
+  selectedVariant,
+  availableColors,
+  availableSizes,
   selectedColor,
-  setSelectedColor
+  selectedSize,
+  handleColorChange,
+  handleSizeChange,
+  getCurrentPrice,
+  getCurrentImages
 }) => {
-  const handleColorSelect = (color) => {
-    setSelectedColor(color)
-  }
+  const currentPrice = getCurrentPrice()
+  const currentImages = getCurrentImages()
 
   return (
     <Box
@@ -73,25 +82,26 @@ const ProductInfoSection = ({
         fontWeight={700}
         sx={{ wordBreak: 'break-word', whiteSpace: 'pre-wrap' }}
       >
-        {product?.name || 'Sản phẩm không tên'}
+        {selectedVariant?.name || product?.name || 'Sản phẩm không tên'}
       </Typography>
+
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-        {product?.discountPrice ? (
+        {currentPrice?.discountPrice ? (
           <>
             <Typography
               variant='h5'
               sx={{ color: 'text.secondary', textDecoration: 'line-through' }}
             >
-              {product.price.toLocaleString('vi-VN')}đ
+              {currentPrice.price.toLocaleString('vi-VN')}đ
             </Typography>
             <PriceTypography variant='h5'>
-              {product.discountPrice.toLocaleString('vi-VN')}đ
+              {currentPrice.discountPrice.toLocaleString('vi-VN')}đ
             </PriceTypography>
           </>
         ) : (
           <PriceTypography variant='h5'>
-            {typeof product?.price === 'number'
-              ? product.price.toLocaleString('vi-VN') + 'đ'
+            {typeof currentPrice?.price === 'number'
+              ? currentPrice.price.toLocaleString('vi-VN') + 'đ'
               : 'Liên hệ'}
           </PriceTypography>
         )}
@@ -135,67 +145,93 @@ const ProductInfoSection = ({
         </Box>
       )}
 
-      <Box>
-        <Typography variant='body2' fontWeight={700}>
-          Chọn màu
-        </Typography>
-        <Box sx={{ display: 'flex', gap: 1, mt: 0.5, flexWrap: 'wrap' }}>
-          {colors?.length > 0 ? (
-            colors
-              .filter((color) => color.isActive)
-              .map((color, index) => (
-                <ColorBox
-                  key={color._id || index}
-                  selected={selectedColor === color.name}
-                  onClick={() => handleColorSelect(color.name)}
+      {variants?.length > 0 && (
+        <Box>
+          <Typography variant='body2' fontWeight={700} sx={{ mb: 1 }}>
+            Chọn phiên bản
+          </Typography>
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
+            {availableColors?.map((color) => (
+              <Box key={color.name}>
+                <Typography
+                  variant='body2'
+                  fontWeight={600}
+                  sx={{ mb: 1, color: '#666' }}
                 >
-                  <ColorImage
-                    src={color.image || '/default.jpg'}
-                    alt={color.name}
-                    onError={(e) => (e.target.src = '/default.jpg')}
-                  />
-                  <Typography variant='body2'>{color.name}</Typography>
-                </ColorBox>
-              ))
-          ) : (
-            <Typography variant='body2' color='text.secondary'>
-              Không có màu sắc nào.
-            </Typography>
+                  Màu: {color.name}
+                </Typography>
+                <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', mb: 2 }}>
+                  {availableSizes
+                    ?.filter((size) =>
+                      variants.some(
+                        (v) =>
+                          v.color.name === color.name &&
+                          v.size.name === size.name
+                      )
+                    )
+                    ?.map((size) => {
+                      const variant = variants.find(
+                        (v) =>
+                          v.color.name === color.name &&
+                          v.size.name === size.name
+                      )
+                      const isSelected =
+                        selectedColor === color.name &&
+                        selectedSize === size.name
+
+                      return (
+                        <VariantBox
+                          key={`${color.name}-${size.name}`}
+                          selected={isSelected}
+                          onClick={() => {
+                            handleColorChange(color.name)
+                            handleSizeChange(size.name)
+                          }}
+                        >
+                          <VariantImage
+                            src={color.image || '/default.jpg'}
+                            alt={color.name}
+                            onError={(e) => (e.target.src = '/default.jpg')}
+                          />
+                          <Box>
+                            <Typography variant='body2' fontWeight={600}>
+                              Size {size.name}
+                            </Typography>
+                            <Typography
+                              variant='caption'
+                              color='text.secondary'
+                            >
+                              {variant?.exportPrice?.toLocaleString('vi-VN')}đ
+                            </Typography>
+                          </Box>
+                        </VariantBox>
+                      )
+                    })}
+                </Box>
+              </Box>
+            ))}
+          </Box>
+
+          {selectedVariant && (
+            <Box
+              sx={{
+                mt: 2,
+                p: 2,
+                backgroundColor: '#f8f9fa',
+                borderRadius: 2,
+                border: '1px solid #e9ecef'
+              }}
+            >
+              <Typography variant='body2' fontWeight={600} color='primary'>
+                Đã chọn: {selectedVariant.name}
+              </Typography>
+              <Typography variant='caption' color='text.secondary'>
+                SKU: {selectedVariant.sku}
+              </Typography>
+            </Box>
           )}
         </Box>
-      </Box>
-
-      <Box>
-        <Typography variant='body2' fontWeight={700}>
-          Chọn kích cỡ
-        </Typography>
-        <ButtonGroup sx={{ mt: 0.5 }}>
-          {sizes?.length > 0 ? (
-            sizes.map((s, index) => (
-              <Button
-                key={s || index}
-                variant={size === s ? 'contained' : 'outlined'}
-                onClick={() => setSize(s)}
-                sx={
-                  size === s
-                    ? {
-                        backgroundColor: '#1A3C7B',
-                        color: '#fff',
-                        '&:hover': { backgroundColor: '#162f63' }
-                      }
-                    : undefined
-                }
-              >
-                {s}
-              </Button>
-            ))
-          ) : (
-            <Typography variant='body2' color='text.secondary'>
-              Không có kích thước nào.
-            </Typography>
-          )}
-        </ButtonGroup>
-      </Box>
+      )}
 
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
         <Typography variant='body2' fontWeight={700}>
@@ -214,15 +250,17 @@ const ProductInfoSection = ({
         />
         <IconButton
           onClick={() =>
-            setQuantity((q) =>
-              product && q < product.quantity ? Number(q) + 1 : q
-            )
+            setQuantity((q) => {
+              const maxQuantity =
+                selectedVariant?.quantity || product?.quantity || 0
+              return q < maxQuantity ? Number(q) + 1 : q
+            })
           }
         >
           <AddIcon />
         </IconButton>
         <Typography color='text.secondary'>
-          Kho: {product?.quantity || 0}
+          Kho: {selectedVariant?.quantity || product?.quantity || 0}
         </Typography>
       </Box>
 
