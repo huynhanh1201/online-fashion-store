@@ -1,7 +1,18 @@
 import { BatchModel } from '~/models/BatchModel'
 
 const getBatchList = async () => {
-  const result = await BatchModel.find({ destroy: false }).lean()
+  const result = await BatchModel.find({ destroy: false })
+    .populate([
+      {
+        path: 'variantId',
+        select: 'name'
+      },
+      {
+        path: 'warehouseId',
+        select: 'name'
+      }
+    ])
+    .lean()
 
   return result
 }
