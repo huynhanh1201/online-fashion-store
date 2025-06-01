@@ -449,9 +449,10 @@ const InventoryTab = ({
 
   const enrichedInventories = data.map((item) => {
     const variant = variants.find((v) => v.id === item.variantId)
-    const warehouse = warehouses.find((w) => w.id === item.warehouseId)
+    // const warehouse = warehouses.find((w) => w.id === item.warehouseId)
     return {
       ...item,
+      variantId: item.variantId.sku || {},
       warehouse: item.warehouseId?.name || 'N/A',
       variantName: item.variantId?.name || 'N/A',
       color: variant?.color?.name || 'N/A',
@@ -468,9 +469,9 @@ const InventoryTab = ({
   })
 
   const inventoryColumns = [
-    { id: '_id', label: 'ID', minWidth: 200 },
-    { id: 'variantName', label: 'Sản phẩm', minWidth: 150 },
     { id: 'warehouse', label: 'Kho hàng', minWidth: 120 },
+    { id: 'variantName', label: 'Sản phẩm', minWidth: 150 },
+    { id: 'variantId', label: 'Mã biến thể', minWidth: 200 },
     { id: 'quantity', label: 'Số lượng', minWidth: 100, align: 'right' },
     {
       id: 'minQuantity',
@@ -503,14 +504,30 @@ const InventoryTab = ({
       label: 'Ngày tạo',
       minWidth: 150,
       align: 'center',
-      format: (value) => new Date(value).toLocaleString('vi-VN')
+      format: (value) =>
+        new Date(value).toLocaleString('vi-VN', {
+          hour: '2-digit',
+          minute: '2-digit',
+          day: '2-digit',
+          month: '2-digit',
+          year: 'numeric',
+          hour12: false
+        })
     },
     {
       id: 'updatedAt',
       label: 'Ngày cập nhật',
       minWidth: 150,
       align: 'center',
-      format: (value) => new Date(value).toLocaleString('vi-VN')
+      format: (value) =>
+        new Date(value).toLocaleString('vi-VN', {
+          hour: '2-digit',
+          minute: '2-digit',
+          day: '2-digit',
+          month: '2-digit',
+          year: 'numeric',
+          hour12: false
+        })
     },
     {
       id: 'action',
@@ -620,7 +637,7 @@ const InventoryTab = ({
 
   return (
     <Paper sx={{ border: '1px solid #ccc', width: '100%', overflow: 'hidden' }}>
-      <TableContainer sx={{ maxHeight: 440 }}>
+      <TableContainer>
         <Table stickyHeader aria-label='inventory table'>
           <TableHead>
             <TableRow>
@@ -821,9 +838,7 @@ const InventoryTab = ({
                     }
                     return (
                       <TableCell key={column.id} align={column.align}>
-                        {column.format && typeof value === 'number'
-                          ? column.format(value)
-                          : value}
+                        {column.format ? column.format(value) : value}
                       </TableCell>
                     )
                   })}

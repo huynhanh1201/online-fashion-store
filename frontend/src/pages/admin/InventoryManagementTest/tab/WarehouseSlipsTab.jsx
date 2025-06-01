@@ -137,10 +137,21 @@ const WarehouseSlipsTab = ({
   }
 
   const enrichedWarehouseSlips = data.map((slip) => {
-    const warehouse = warehouses.find((w) => w.id === slip.warehouseId)
+    const warehouseId =
+      slip.warehouseId && typeof slip.warehouseId === 'object'
+        ? slip.warehouseId._id || slip.warehouseId.id
+        : slip.warehouseId
+
+    const warehouseName =
+      typeof slip.warehouseId === 'object'
+        ? slip.warehouseId.name
+        : warehouses.find(
+            (w) => w._id === slip.warehouseId || w.id === slip.warehouseId
+          )?.name
+
     return {
       ...slip,
-      warehouse: warehouse?.name || 'N/A',
+      warehouse: warehouseName || 'N/A',
       type: slip.type === 'import' ? 'Nhập' : 'Xuất',
       createdAtFormatted: new Date(slip.createdAt).toLocaleString('vi-VN'),
       itemCount: slip.items.length,
@@ -160,7 +171,7 @@ const WarehouseSlipsTab = ({
 
   return (
     <Paper sx={{ border: '1px solid #ccc', width: '100%', overflow: 'hidden' }}>
-      <TableContainer sx={{ maxHeight: 440 }}>
+      <TableContainer>
         <Table stickyHeader aria-label='warehouse slips table'>
           <TableHead>
             <TableRow>

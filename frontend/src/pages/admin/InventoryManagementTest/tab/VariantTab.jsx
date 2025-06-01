@@ -115,7 +115,7 @@ const VariantsTab = ({
 
   return (
     <Paper sx={{ border: '1px solid #ccc', width: '100%', overflow: 'hidden' }}>
-      <TableContainer sx={{ maxHeight: 440 }}>
+      <TableContainer>
         <Table stickyHeader aria-label='variants table'>
           <TableHead>
             <TableRow>

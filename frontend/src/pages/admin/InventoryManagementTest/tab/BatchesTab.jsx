@@ -46,15 +46,15 @@ const BatchesTab = ({
       ...batch,
       variantName: variant?.name || 'N/A',
       warehouseName: warehouse?.name || 'N/A',
-      manufactureDate: batch.manufactureDate,
-      expiry: batch.expiry
+      manufactureDate: batch.manufactureDate || 'Chờ cập nhật',
+      expiry: batch.expiry || 'Chờ cập nhật'
     }
   })
 
   const batchColumns = [
     { id: 'batchCode', label: 'Mã lô', minWidth: 120 },
-    { id: 'variantName', label: 'Biến thể', minWidth: 200 },
-    { id: 'warehouseName', label: 'Kho hàng', minWidth: 150 },
+    { id: 'variantId.name', label: 'Biến thể', minWidth: 200 },
+    { id: 'warehouseId.name', label: 'Kho hàng', minWidth: 150 },
     { id: 'quantity', label: 'Số lượng', minWidth: 100, align: 'right' },
     {
       id: 'importPrice',
@@ -74,14 +74,14 @@ const BatchesTab = ({
       label: 'NSX',
       minWidth: 130,
       format: (value) =>
-        value ? new Date(value).toLocaleDateString('vi-VN') : 'N/A'
+        value ? new Date(value).toLocaleDateString('vi-VN') : 'Chờ cập nhật'
     },
     {
       id: 'expiry',
       label: 'HSD',
       minWidth: 130,
       format: (value) =>
-        value ? new Date(value).toLocaleDateString('vi-VN') : 'N/A'
+        value ? new Date(value).toLocaleDateString('vi-VN') : 'Chờ cập nhật'
     },
     { id: 'action', label: 'Hành động', minWidth: 150, align: 'center' }
   ]
@@ -127,7 +127,7 @@ const BatchesTab = ({
 
   return (
     <Paper sx={{ border: '1px solid #ccc', width: '100%', overflow: 'hidden' }}>
-      <TableContainer sx={{ maxHeight: 440 }}>
+      <TableContainer>
         <Table stickyHeader aria-label='batches table'>
           <TableHead>
             <TableRow>
@@ -195,7 +195,7 @@ const BatchesTab = ({
                       <TableCell key={column.id} align={column.align}>
                         {column.format && value !== null && value !== undefined
                           ? column.format(value)
-                          : (value ?? 'N/A')}
+                          : (value ?? 'Không có dữ liệu')}
                       </TableCell>
                     )
                   })}

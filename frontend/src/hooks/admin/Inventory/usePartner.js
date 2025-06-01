@@ -11,11 +11,16 @@ const usePartner = () => {
   const [partners, setPartners] = React.useState([])
   const [total, setTotal] = React.useState(0)
 
-  const fetchPartners = async (filters = {}) => {
+  const fetchPartners = async (filters = {}, page = 1, limit = 10) => {
     try {
-      const { partners, total } = await getPartners(filters)
+      const { partners, total } = await getPartners({
+        ...filters,
+        page,
+        limit
+      })
       setPartners(partners)
-      setTotal(total)
+      setTotal(total || 0)
+      return { partners, total }
     } catch (error) {
       console.error('Error fetching partners:', error)
       return { partners: [], total: 0 }

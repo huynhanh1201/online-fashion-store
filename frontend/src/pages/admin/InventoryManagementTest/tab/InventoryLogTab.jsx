@@ -91,7 +91,7 @@ const InventoryLogTab = ({
 
   return (
     <Paper sx={{ border: '1px solid #ccc', width: '100%', overflow: 'hidden' }}>
-      <TableContainer sx={{ maxHeight: 440 }}>
+      <TableContainer>
         <Table stickyHeader aria-label='inventory log table'>
           <TableHead>
             <TableRow sx={{ paddingBottom: '0' }}>
