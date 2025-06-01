@@ -14,7 +14,7 @@ import {
   FilterList as FilterListIcon,
   FileDownload as FileDownloadIcon
 } from '@mui/icons-material'
-import InventoryTable from './InventoryTableApi'
+import InventoryTable from './InventoryTable.jsx'
 import useInventorys from '~/hooks/admin/Inventory/useInventorys.js'
 
 const InventoryDashboard = () => {

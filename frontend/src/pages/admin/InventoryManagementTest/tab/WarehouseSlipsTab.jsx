@@ -16,10 +16,12 @@ import {
 } from '@mui/material'
 import VisibilityIcon from '@mui/icons-material/Visibility'
 import AddWarehouseSlipModal from '../modal/WarehouseSlip/AddWarehouseSlipModal'
-import ViewWarehouseSlipModal from '../modal/WarehouseSlip/ViewWarehouseSlipModal' // Thêm modal mới
+import ViewWarehouseSlipModal from '../modal/WarehouseSlip/ViewWarehouseSlipModal'
+
+import { Chip } from '@mui/material'
 
 const WarehouseSlipsTab = ({
-  data: initialData,
+  data,
   warehouses,
   variants,
   page,
@@ -29,20 +31,19 @@ const WarehouseSlipsTab = ({
   batches,
   partners,
   addWarehouseSlip,
-  refreshWarehouseSlips
+  refreshWarehouseSlips,
+  fetchWarehouses,
+  fetchPartner
 }) => {
-  const [data, setData] = useState(initialData)
   const [openModal, setOpenModal] = useState(false)
   const [openViewModal, setOpenViewModal] = useState(false) // State cho View modal
   const [selectedSlip, setSelectedSlip] = useState(null) // State cho phiếu được chọn
   const [modalType, setModalType] = useState('input')
-
   useEffect(() => {
     refreshWarehouseSlips()
   }, [])
-
   const [newSlipData, setNewSlipData] = useState({
-    slipId: `PNK-${new Date().toISOString().slice(0, 10).replace(/-/g, '')}-001`,
+    slipId: '',
     date: new Date(),
     profitType: 'Import',
     warehouseId: '',
@@ -55,10 +56,12 @@ const WarehouseSlipsTab = ({
   ])
 
   const handleOpenModal = (type) => {
+    fetchPartner()
+    fetchWarehouses()
     setModalType(type)
     setNewSlipData({
       ...newSlipData,
-      slipId: `${type === 'input' ? 'PNK' : 'PXK'}-${new Date().toISOString().slice(0, 10).replace(/-/g, '')}-001`,
+      slipId: '',
       profitType: type === 'input' ? 'Import' : 'Export'
     })
     setOpenModal(true)
@@ -69,7 +72,7 @@ const WarehouseSlipsTab = ({
     refreshWarehouseSlips()
     setModalType('input')
     setNewSlipData({
-      slipId: `PNK-${new Date().toISOString().slice(0, 10).replace(/-/g, '')}-001`,
+      slipId: '',
       date: new Date(),
       profitType: 'Import',
       warehouseId: '',
@@ -81,7 +84,7 @@ const WarehouseSlipsTab = ({
   }
 
   const handleAddSlip = async (newSlip) => {
-    setData([...data, newSlip])
+    // setData([...data, newSlip])
     await addWarehouseSlip(newSlip)
     handleCloseModal()
   }
@@ -137,21 +140,22 @@ const WarehouseSlipsTab = ({
     const warehouse = warehouses.find((w) => w.id === slip.warehouseId)
     return {
       ...slip,
-      warehouse: warehouse ? warehouse.name : 'N/A',
+      warehouse: warehouse?.name || 'N/A',
       type: slip.type === 'import' ? 'Nhập' : 'Xuất',
-      statusLabel: slip.status === 'pending' ? 'Đang xử lý' : 'Hoàn thành',
-      createdAtFormatted: new Date(slip.createdAt).toLocaleString()
+      createdAtFormatted: new Date(slip.createdAt).toLocaleString('vi-VN'),
+      itemCount: slip.items.length,
+      createdByName: slip.createdBy?.name || 'N/A'
     }
   })
-
   const warehouseSlipColumns = [
-    { id: 'slipId', label: 'Mã phiếu', minWidth: 100 },
+    { id: 'slipId', label: 'Mã phiếu', minWidth: 120 },
     { id: 'type', label: 'Loại', minWidth: 100 },
-    { id: 'warehouse', label: 'Kho', minWidth: 100 },
-    { id: 'statusLabel', label: 'Trạng thái', minWidth: 100 },
-    { id: 'note', label: 'Ghi chú', minWidth: 150 },
-    { id: 'createdAtFormatted', label: 'Ngày tạo', minWidth: 150 },
-    { id: 'action', label: 'Hành động', minWidth: 100, align: 'center' }
+    { id: 'warehouse', label: 'Kho', minWidth: 120 },
+    { id: 'itemCount', label: 'Số mặt hàng', minWidth: 120, align: 'right' },
+    { id: 'createdByName', label: 'Người tạo', minWidth: 150 },
+    { id: 'note', label: 'Ghi chú', minWidth: 180 },
+    { id: 'createdAtFormatted', label: 'Ngày tạo', minWidth: 160 },
+    { id: 'action', label: 'Hành động', minWidth: 120, align: 'center' }
   ]
 
   return (
@@ -225,9 +229,17 @@ const WarehouseSlipsTab = ({
                     }
                     return (
                       <TableCell key={column.id} align={column.align}>
-                        {column.format && typeof value === 'number'
-                          ? column.format(value)
-                          : value}
+                        {column.id === 'type' ? (
+                          <Chip
+                            label={value}
+                            color={value === 'Nhập' ? 'success' : 'error'}
+                            size='small'
+                          />
+                        ) : column.format && typeof value === 'number' ? (
+                          column.format(value)
+                        ) : (
+                          value
+                        )}
                       </TableCell>
                     )
                   })}

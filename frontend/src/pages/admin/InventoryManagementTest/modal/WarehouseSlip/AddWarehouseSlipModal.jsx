@@ -43,7 +43,6 @@ export default function AddWarehouseSlipModal({
   variants,
   type = 'input', // 'input' for import, 'output' for export
   partners,
-  addWarehouseSlip,
   handleAdd
 }) {
   const [isEditing, setIsEditing] = useState(false)

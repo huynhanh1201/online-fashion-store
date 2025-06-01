@@ -30,13 +30,59 @@ const BatchesTab = ({
   onRowsPerPageChange,
   updateBatch,
   refreshBatches,
-  deleteBatch
+  deleteBatch,
+  warehouses
 }) => {
+  const enrichedBatches = data.map((batch) => {
+    const variant = Array.isArray(variants)
+      ? variants.find((v) => v.id === batch.variantId)
+      : null
+
+    const warehouse = Array.isArray(warehouses)
+      ? warehouses.find((w) => w.id === batch.warehouseId)
+      : null
+
+    return {
+      ...batch,
+      variantName: variant?.name || 'N/A',
+      warehouseName: warehouse?.name || 'N/A',
+      manufactureDate: batch.manufactureDate,
+      expiry: batch.expiry
+    }
+  })
+
   const batchColumns = [
-    { id: 'batchCode', label: 'Mã lô', minWidth: 100 },
-    { id: 'variantId', label: 'ID Biến thể', minWidth: 120 },
-    { id: 'quantity', label: 'Số lượng', minWidth: 100 },
-    { id: 'importPrice', label: 'Giá nhập', minWidth: 120 },
+    { id: 'batchCode', label: 'Mã lô', minWidth: 120 },
+    { id: 'variantName', label: 'Biến thể', minWidth: 200 },
+    { id: 'warehouseName', label: 'Kho hàng', minWidth: 150 },
+    { id: 'quantity', label: 'Số lượng', minWidth: 100, align: 'right' },
+    {
+      id: 'importPrice',
+      label: 'Giá nhập',
+      minWidth: 120,
+      align: 'right',
+      format: (value) => `${value.toLocaleString()}đ`
+    },
+    {
+      id: 'importedAt',
+      label: 'Ngày nhập',
+      minWidth: 150,
+      format: (value) => new Date(value).toLocaleString('vi-VN')
+    },
+    {
+      id: 'manufactureDate',
+      label: 'NSX',
+      minWidth: 130,
+      format: (value) =>
+        value ? new Date(value).toLocaleDateString('vi-VN') : 'N/A'
+    },
+    {
+      id: 'expiry',
+      label: 'HSD',
+      minWidth: 130,
+      format: (value) =>
+        value ? new Date(value).toLocaleDateString('vi-VN') : 'N/A'
+    },
     { id: 'action', label: 'Hành động', minWidth: 150, align: 'center' }
   ]
 
@@ -147,7 +193,9 @@ const BatchesTab = ({
                     }
                     return (
                       <TableCell key={column.id} align={column.align}>
-                        {value}
+                        {column.format && value !== null && value !== undefined
+                          ? column.format(value)
+                          : (value ?? 'N/A')}
                       </TableCell>
                     )
                   })}

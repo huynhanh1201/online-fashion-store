@@ -41,15 +41,14 @@ const InventoryLogTab = ({
   useEffect(() => {
     refreshInventoryLogs()
   }, [])
-
   const handleViewLog = (log) => {
     setSelectedLog(log)
     setOpenViewModal(true)
   }
 
-  const enrichedInventoryLogs = data.map((log) => {
-    const variant = variants.find((v) => v.id === log.variantId)
-    const warehouse = warehouses.find((w) => w.id === log.warehouseId)
+  const enrichedInventoryLogs = (data || []).map((log) => {
+    const variant = variants?.find((v) => v.id === log.variantId) || {}
+    const warehouse = warehouses?.find((w) => w.id === log.warehouseId) || {}
 
     return {
       ...log,
@@ -57,18 +56,23 @@ const InventoryLogTab = ({
       warehouse: warehouse?.name || 'N/A',
       typeLabel: log.type === 'in' ? 'Nhập' : 'Xuất',
       createdAtFormatted: new Date(log.createdAt).toLocaleDateString('vi-VN'),
-      createdByName: log.createdBy?.name || 'N/A'
+      createdByName: log.createdBy?.name || 'N/A',
+      action: 'view' // hoặc bất kỳ string nào để đảm bảo tồn tại key
     }
   })
 
   const filteredInventoryLogs = enrichedInventoryLogs.filter((log) => {
-    const variant = variants.find((v) => v.sku === filterSku || !filterSku)
+    const skuMatch =
+      !filterSku ||
+      variants.find((v) => v.id === log.variantId && v.sku === filterSku)
+
     const warehouseMatch =
       filterLogWarehouse === 'all' || log.warehouse === filterLogWarehouse
     const typeMatch = filterLogType === 'all' || log.typeLabel === filterLogType
     const dateMatch =
       filterLogDate === 'all' || log.createdAtFormatted === filterLogDate
-    return variant && warehouseMatch && typeMatch && dateMatch
+
+    return skuMatch && warehouseMatch && typeMatch && dateMatch
   })
 
   const inventoryLogColumns = [
@@ -202,19 +206,21 @@ const InventoryLogTab = ({
                 <TableRow hover role='checkbox' tabIndex={-1} key={index}>
                   {inventoryLogColumns.map((column) => {
                     const value = row[column.id]
-                    if (column.id === 'action') {
+                    if (column.id === 'amount') {
                       return (
                         <TableCell key={column.id} align={column.align}>
-                          <IconButton
-                            onClick={() => handleViewLog(row)}
-                            size='small'
-                            color='primary'
+                          <Typography
+                            sx={{
+                              fontWeight: 900,
+                              color: row.typeLabel === 'Nhập' ? 'green' : 'red'
+                            }}
                           >
-                            <VisibilityIcon />
-                          </IconButton>
+                            {value !== undefined ? value : '—'}
+                          </Typography>
                         </TableCell>
                       )
                     }
+
                     return (
                       <TableCell key={column.id} align={column.align}>
                         {value !== undefined ? value : '—'}
