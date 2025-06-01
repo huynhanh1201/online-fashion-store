@@ -11,18 +11,8 @@ import {
   Box
 } from '@mui/material'
 
-const ViewInventoryLogModal = ({
-  open,
-  onClose,
-  log,
-  variants,
-  warehouses
-}) => {
+const ViewInventoryLogModal = ({ open, onClose, log }) => {
   if (!log) return null
-
-  // Ánh xạ variantId và warehouseId sang tên
-  const variant = variants.find((v) => v.id === log.variantId)
-  const warehouse = warehouses.find((w) => w.id === log.warehouseId)
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth='sm' fullWidth>
@@ -34,10 +24,10 @@ const ViewInventoryLogModal = ({
           </Typography>
           <Typography variant='subtitle1'>
             <strong>Biến thể:</strong>{' '}
-            {log.variantName || variant?.name || 'N/A'}
+            {log.variantId.name ?? 'không có dữ liệu'}
           </Typography>
           <Typography variant='subtitle1'>
-            <strong>Kho:</strong> {log.warehouse || warehouse?.name || 'N/A'}
+            <strong>Lô hàng:</strong> {log.batchId.name ?? 'không có dữ liệu'}
           </Typography>
           <Typography variant='subtitle1'>
             <strong>Loại:</strong>{' '}

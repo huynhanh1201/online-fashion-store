@@ -20,7 +20,9 @@ import {
   Chip
 } from '@mui/material'
 import VisibilityIcon from '@mui/icons-material/Visibility'
-import ViewInventoryLogModal from '../modal/InventoryLog/ViewInventoryLogModal' // Thêm modal mới
+import ViewInventoryLogModal from '../modal/InventoryLog/ViewInventoryLogModal'
+import EditIcon from '@mui/icons-material/Edit'
+import DeleteIcon from '@mui/icons-material/Delete' // Thêm modal mới
 
 const InventoryLogTab = ({
   data,
@@ -48,16 +50,13 @@ const InventoryLogTab = ({
   }
 
   const enrichedInventoryLogs = (data || []).map((log) => {
-    const variant = variants?.find((v) => v.id === log.variantId) || {}
-    const warehouse = warehouses?.find((w) => w.id === log.warehouseId) || {}
     return {
       ...log,
-      variantName: variant?.name || 'N/A',
-      warehouse: warehouse?.name || 'N/A',
+      variantName: log.variantId?.name || 'N/A',
+      warehouse: log.warehouseId?.name || 'N/A',
       typeLabel: log.type === 'in' ? 'Nhập' : 'Xuất',
       createdAtFormatted: new Date(log.createdAt).toLocaleDateString('vi-VN'),
-      createdByName: log.createdBy?.name || 'N/A',
-      action: 'view' // hoặc bất kỳ string nào để đảm bảo tồn tại key
+      createdByName: log.createdBy?.name || 'N/A'
     }
   })
 
@@ -86,9 +85,8 @@ const InventoryLogTab = ({
     { id: 'note', label: 'Ghi chú', minWidth: 150 },
     { id: 'createdByName', label: 'Người thực hiện', minWidth: 120 },
     { id: 'createdAtFormatted', label: 'Ngày thực hiện', minWidth: 150 },
-    { id: 'action', label: 'Hành động', minWidth: 100, align: 'center' } // Thêm cột Hành động
+    { id: 'action', label: 'Hành động', minWidth: 100, align: 'center' }
   ]
-
   return (
     <Paper sx={{ border: '1px solid #ccc', width: '100%', overflow: 'hidden' }}>
       <TableContainer>
@@ -228,6 +226,19 @@ const InventoryLogTab = ({
                           >
                             {value !== undefined ? value : '—'}
                           </Typography>
+                        </TableCell>
+                      )
+                    }
+                    if (column.id === 'action') {
+                      return (
+                        <TableCell key={column.id} align={column.align}>
+                          <IconButton
+                            onClick={() => handleViewLog(row)}
+                            size='small'
+                            color='primary'
+                          >
+                            <VisibilityIcon />
+                          </IconButton>
                         </TableCell>
                       )
                     }

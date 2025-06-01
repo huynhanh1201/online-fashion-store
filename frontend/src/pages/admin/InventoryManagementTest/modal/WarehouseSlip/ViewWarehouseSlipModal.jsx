@@ -15,27 +15,8 @@ import {
   Chip
 } from '@mui/material'
 
-const ViewWarehouseSlipModal = ({
-  open,
-  onClose,
-  slip,
-  warehouses,
-  variants,
-  partners
-}) => {
+const ViewWarehouseSlipModal = ({ open, onClose, slip }) => {
   if (!slip) return null
-
-  // Lấy thông tin kho, đối tác, và ánh xạ items
-  const warehouse = warehouses.find((w) => w.id === slip.warehouseId)
-  const partner = partners.find((p) => p.id === slip.partnerId)
-  const enrichedItems =
-    slip.items?.map((item) => {
-      const variant = variants.find((v) => v.id === item.variantId)
-      return {
-        ...item,
-        variantName: variant ? variant.name : 'N/A'
-      }
-    }) || []
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth='md' fullWidth>
@@ -47,13 +28,18 @@ const ViewWarehouseSlipModal = ({
           <strong>Mã phiếu:</strong> {slip.slipId || 'N/A'}
         </Typography>
         <Typography variant='subtitle1' gutterBottom>
-          <strong>Loại:</strong> {slip.type === 'import' ? 'Nhập' : 'Xuất'}
+          <strong>Loại: </strong>
+          <Chip
+            label={slip.type}
+            color={slip.type === 'Nhập' ? 'success' : 'error'}
+            size='small'
+          />
         </Typography>
         <Typography variant='subtitle1' gutterBottom>
-          <strong>Kho:</strong> {warehouse ? warehouse.name : 'N/A'}
+          <strong>Kho:</strong> {slip.warehouseId.name}
         </Typography>
         <Typography variant='subtitle1' gutterBottom>
-          <strong>Đối tác:</strong> {partner ? partner.name : 'N/A'}
+          <strong>Đối tác:</strong> {slip.partnerId.name}
         </Typography>
         <Typography variant='subtitle1' gutterBottom>
           <strong>Trạng thái:</strong>{' '}
@@ -79,20 +65,20 @@ const ViewWarehouseSlipModal = ({
         <Table size='small'>
           <TableHead>
             <TableRow>
+              <TableCell>Mã biến thể</TableCell>
               <TableCell>Biến thể</TableCell>
               <TableCell align='right'>Số lượng</TableCell>
               <TableCell>Đơn vị</TableCell>
-              <TableCell>Ghi chú</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {enrichedItems.length > 0 ? (
-              enrichedItems.map((item, index) => (
+            {slip.items.length > 0 ? (
+              slip.items.map((item, index) => (
                 <TableRow key={index}>
-                  <TableCell>{item.variantName}</TableCell>
+                  <TableCell>{item.variantId.sku}</TableCell>
+                  <TableCell>{item.variantId.name}</TableCell>
                   <TableCell align='right'>{item.quantity || 0}</TableCell>
                   <TableCell>{item.unit || 'cái'}</TableCell>
-                  <TableCell>{item.note || 'Không có'}</TableCell>
                 </TableRow>
               ))
             ) : (
