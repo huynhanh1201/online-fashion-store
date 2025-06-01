@@ -2,7 +2,9 @@ import { useState } from 'react'
 import {
   getWarehouseSlips,
   createWarehouseSlip,
-  getWarehouseSlipById
+  getWarehouseSlipById,
+  deleteWarehouseSlip,
+  updateWarehouseSlip
 } from '~/services/admin/Inventory/WarehouseSlipSetvice.js'
 
 const useWarehouseSlips = (page = 1, limit = 10) => {
@@ -30,6 +32,16 @@ const useWarehouseSlips = (page = 1, limit = 10) => {
     if (result) fetchWarehouseSlips(page)
     return result
   }
+  const removeWarehouseSlip = async (id) => {
+    const result = await deleteWarehouseSlip(id)
+    if (result) fetchWarehouseSlips(page)
+    return result
+  }
+  const update = async (id, data) => {
+    const result = await updateWarehouseSlip(id, data)
+    if (result) fetchWarehouseSlips(page)
+    return result
+  }
 
   return {
     warehouseSlips,
@@ -37,7 +49,9 @@ const useWarehouseSlips = (page = 1, limit = 10) => {
     loading,
     fetchWarehouseSlips,
     createNewWarehouseSlip,
-    getWarehouseSlipId
+    getWarehouseSlipId,
+    removeWarehouseSlip,
+    update
   }
 }
 export default useWarehouseSlips

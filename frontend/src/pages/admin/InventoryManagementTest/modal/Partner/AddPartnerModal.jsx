@@ -44,7 +44,7 @@ const AddPartnerModal = ({ open, onClose, addPartner }) => {
       <form onSubmit={handleSubmit(onSubmit)}>
         <DialogContent dividers>
           <Grid container spacing={2}>
-            <Grid item xs={12}>
+            <Grid item size={12}>
               <TextField
                 label='Tên đối tác'
                 fullWidth
@@ -53,7 +53,7 @@ const AddPartnerModal = ({ open, onClose, addPartner }) => {
                 helperText={errors.name?.message}
               />
             </Grid>
-            <Grid item xs={12}>
+            <Grid item size={12}>
               <TextField
                 select
                 label='Loại đối tác'
@@ -70,14 +70,14 @@ const AddPartnerModal = ({ open, onClose, addPartner }) => {
                 <MenuItem value='both'>Khách hàng & NCC</MenuItem>
               </TextField>
             </Grid>
-            <Grid item xs={12} sm={6}>
+            <Grid item size={12} sm={6}>
               <TextField
                 label='Số điện thoại'
                 fullWidth
                 {...register('phone')}
               />
             </Grid>
-            <Grid item xs={12} sm={6}>
+            <Grid item size={12} sm={6}>
               <TextField
                 label='Email'
                 fullWidth
