@@ -52,8 +52,8 @@ const InventoryLogTab = ({
   const enrichedInventoryLogs = (data || []).map((log) => {
     return {
       ...log,
-      variantName: log.variantId?.name || 'N/A',
-      warehouse: log.warehouseId?.name || 'N/A',
+      variantName: log.inventoryId.variantId?.name || 'N/A',
+      warehouse: log.inventoryId.warehouseId?.name || 'N/A',
       typeLabel: log.type === 'in' ? 'Nhập' : 'Xuất',
       createdAtFormatted: new Date(log.createdAt).toLocaleDateString('vi-VN'),
       createdByName: log.createdBy?.name || 'N/A'

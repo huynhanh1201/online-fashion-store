@@ -26,7 +26,6 @@ const ViewInventoryModal = ({ open, onClose, inventory }) => {
       : inventory?.status === 'low-stock'
         ? 'Cảnh báo'
         : 'Hết hàng'
-  console.log('inventory', inventory)
   return (
     <Dialog open={open} onClose={onClose} maxWidth='sm' fullWidth>
       <DialogTitle sx={{ fontWeight: 'bold' }}>Chi tiết tồn kho</DialogTitle>

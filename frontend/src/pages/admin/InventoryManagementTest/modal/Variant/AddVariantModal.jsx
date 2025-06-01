@@ -15,7 +15,7 @@ import {
   FormControlLabel,
   Box
 } from '@mui/material'
-import { useForm } from 'react-hook-form'
+import { useForm, Controller } from 'react-hook-form'
 import { toast } from 'react-toastify'
 import useColors from '~/hooks/admin/useColor'
 import useSizes from '~/hooks/admin/useSize'
@@ -47,9 +47,11 @@ const uploadToCloudinary = async (file, folder = CloudinaryColor) => {
 const AddVariantModal = ({ open, onClose, addVariant, products }) => {
   const {
     register,
+    control,
     handleSubmit,
     setValue,
     watch,
+    reset,
     formState: { errors }
   } = useForm({
     defaultValues: {
@@ -128,7 +130,7 @@ const AddVariantModal = ({ open, onClose, addVariant, products }) => {
       exportPrice,
       overridePrice
     } = data
-
+    console.log('DATA:', data)
     // Tìm sản phẩm được chọn để lấy importPrice và exportPrice
     const selectedProduct = products.find((p) => p._id === productId)
     const productImportPrice = selectedProduct?.importPrice || 0
@@ -145,7 +147,6 @@ const AddVariantModal = ({ open, onClose, addVariant, products }) => {
         exportPrice: overridePrice ? Number(exportPrice) : productExportPrice,
         overridePrice
       }
-
       await addVariant(finalVariant)
       toast.success('Thêm biến thể thành công')
       handleClose()
@@ -156,13 +157,15 @@ const AddVariantModal = ({ open, onClose, addVariant, products }) => {
   }
 
   const handleClose = () => {
-    setValue('productId', '')
-    setValue('color', '')
-    setValue('colorImage', '')
-    setValue('size', '')
-    setValue('importPrice', '')
-    setValue('exportPrice', '')
-    setValue('overridePrice', false)
+    reset({
+      productId: '',
+      color: '',
+      colorImage: '',
+      size: '',
+      importPrice: '',
+      exportPrice: '',
+      overridePrice: false
+    })
     onClose()
   }
 
@@ -176,16 +179,20 @@ const AddVariantModal = ({ open, onClose, addVariant, products }) => {
           {/* Sản phẩm */}
           <FormControl fullWidth error={!!errors.productId}>
             <InputLabel>Sản phẩm</InputLabel>
-            <Select
-              {...register('productId', { required: 'Vui lòng chọn sản phẩm' })}
-              label='Sản phẩm'
-            >
-              {products.map((p) => (
-                <MenuItem key={p._id} value={p._id}>
-                  {p.name}
-                </MenuItem>
-              ))}
-            </Select>
+            <Controller
+              name='productId'
+              control={control}
+              rules={{ required: 'Vui lòng chọn sản phẩm' }}
+              render={({ field }) => (
+                <Select {...field} label='Sản phẩm'>
+                  {products.map((p) => (
+                    <MenuItem key={p._id} value={p._id}>
+                      {p.name}
+                    </MenuItem>
+                  ))}
+                </Select>
+              )}
+            />
             {errors.productId && (
               <p style={{ color: 'red', fontSize: '0.75rem' }}>
                 {errors.productId.message}
@@ -226,19 +233,24 @@ const AddVariantModal = ({ open, onClose, addVariant, products }) => {
           {/* Màu sắc */}
           <FormControl fullWidth error={!!errors.color}>
             <InputLabel>Màu sắc</InputLabel>
-            <Select
-              {...register('color', { required: 'Vui lòng chọn màu sắc' })}
-              label='Màu sắc'
-            >
-              {colors.map((c) => (
-                <MenuItem key={c.name} value={c.name}>
-                  {c.name}
-                </MenuItem>
-              ))}
-              <MenuItem onClick={handleOpenColorModal}>
-                <em>Thêm màu mới</em>
-              </MenuItem>
-            </Select>
+            <Controller
+              name='color'
+              control={control}
+              rules={{ required: 'Vui lòng chọn màu sắc' }}
+              render={({ field }) => (
+                <Select {...field} label='Màu sắc'>
+                  {colors.map((c) => (
+                    <MenuItem key={c.name} value={c.name}>
+                      {c.name}
+                    </MenuItem>
+                  ))}
+                  <MenuItem onClick={handleOpenColorModal}>
+                    <em>Thêm màu mới</em>
+                  </MenuItem>
+                </Select>
+              )}
+            />
+
             {errors.color && (
               <p style={{ color: 'red', fontSize: '0.75rem' }}>
                 {errors.color.message}

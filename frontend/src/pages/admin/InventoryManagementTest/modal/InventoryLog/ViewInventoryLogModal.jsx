@@ -24,10 +24,11 @@ const ViewInventoryLogModal = ({ open, onClose, log }) => {
           </Typography>
           <Typography variant='subtitle1'>
             <strong>Biến thể:</strong>{' '}
-            {log.variantId.name ?? 'không có dữ liệu'}
+            {log.inventoryId.variantId?.name ?? 'không có dữ liệu'}
           </Typography>
           <Typography variant='subtitle1'>
-            <strong>Lô hàng:</strong> {log.batchId.name ?? 'không có dữ liệu'}
+            <strong>Kho:</strong>{' '}
+            {log.inventoryId.warehouseId?.name ?? 'không có dữ liệu'}
           </Typography>
           <Typography variant='subtitle1'>
             <strong>Loại:</strong>{' '}
