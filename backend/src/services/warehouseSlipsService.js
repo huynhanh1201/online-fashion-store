@@ -38,7 +38,12 @@ const createWarehouseSlip = async (reqBody, jwtDecoded) => {
 }
 
 const getWarehouseSlipList = async () => {
-  const result = await WarehouseSlipModel.find({ destroy: false }).lean()
+  const result = await WarehouseSlipModel.find({ destroy: false })
+    .populate([
+      { path: 'partnerId', select: 'name' },
+      { path: 'warehouseId', select: 'name' }
+    ])
+    .lean()
 
   return result
 }
@@ -49,7 +54,12 @@ const getWarehouseSlip = async (warehouseSlipId) => {
     const result = await WarehouseSlipModel.findOne({
       _id: warehouseSlipId,
       destroy: false
-    }).lean()
+    })
+      .populate([
+        { path: 'partnerId', select: 'name' },
+        { path: 'warehouseId', select: 'name' }
+      ])
+      .lean()
 
     return result
   } catch (err) {
