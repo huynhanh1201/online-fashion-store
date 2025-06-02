@@ -4,8 +4,9 @@ import { inventoriesService } from '~/services/inventoriesService'
 
 const getInventoryList = async (req, res, next) => {
   try {
+    const variantId = req.query
     // Lấy danh sách Danh mục sản phẩm từ tầng Service chuyển qua
-    const result = await inventoriesService.getInventoryList()
+    const result = await inventoriesService.getInventoryList(req.query)
 
     // Có kết quả thì trả về Client
     res.status(StatusCodes.OK).json(result)
