@@ -165,6 +165,11 @@ const InventoryTable = () => {
             refreshInventoryLogs={fetchLogs}
             updateInventoryLog={update}
             deleteInventoryLog={removeWarehouseSlip}
+            inventories={inventories}
+            fetchInventories={fetchInventories}
+            fetchVariants={fetchVariants}
+            batches={batches}
+            fetchBatches={fetchBatches}
           />
         )}
         {activeTab === 3 && (

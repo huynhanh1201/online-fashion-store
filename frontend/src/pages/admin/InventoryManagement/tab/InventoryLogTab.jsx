@@ -32,17 +32,25 @@ const InventoryLogTab = ({
   rowsPerPage,
   onPageChange,
   onRowsPerPageChange,
-  refreshInventoryLogs
+  refreshInventoryLogs,
+  inventories,
+  fetchInventories,
+  fetchVariants,
+  batches,
+  fetchBatches
 }) => {
-  const [filterSku, setFilterSku] = useState('')
-  const [filterLogWarehouse, setFilterLogWarehouse] = useState('all')
-  const [filterLogType, setFilterLogType] = useState('all')
-  const [filterLogDate, setFilterLogDate] = useState('all')
+  const [filterInventory, setFilterInventory] = useState('all')
+  const [filterBatchId, setFilterBatchId] = useState('all')
+  const [filterType, setFilterType] = useState('all')
+  const [filterSource, setFilterSource] = useState('all')
   const [openViewModal, setOpenViewModal] = useState(false) // State cho modal xem
   const [selectedLog, setSelectedLog] = useState(null) // State cho bản ghi được chọn
 
   useEffect(() => {
     refreshInventoryLogs()
+    fetchInventories()
+    fetchVariants()
+    fetchBatches()
   }, [])
   const handleViewLog = (log) => {
     setSelectedLog(log)
@@ -61,19 +69,39 @@ const InventoryLogTab = ({
   })
 
   const filteredInventoryLogs = enrichedInventoryLogs.filter((log) => {
-    const skuMatch =
-      !filterSku ||
-      variants.find((v) => v.id === log.variantId && v.sku === filterSku)
+    const inventoryMatch =
+      filterInventory === 'all' || log.inventoryId === filterInventory
+    const typeMatch = filterType === 'all' || log.typeLabel === filterType
 
-    const warehouseMatch =
-      filterLogWarehouse === 'all' || log.warehouse === filterLogWarehouse
-    const typeMatch = filterLogType === 'all' || log.typeLabel === filterLogType
-    const dateMatch =
-      filterLogDate === 'all' || log.createdAtFormatted === filterLogDate
+    const batchMatch = filterBatchId === 'all' || log.batchId === filterBatchId
 
-    return skuMatch && warehouseMatch && typeMatch && dateMatch
+    const sourceMatch = filterSource === 'all' || log.source === filterSource
+
+    return typeMatch && batchMatch && sourceMatch && inventoryMatch
   })
+  const handleFilterChange = (type, value) => {
+    // cập nhật state
+    if (type === 'inventoryId') setFilterInventory(value)
+    if (type === 'type') setFilterType(value)
+    if (type === 'batchId') setFilterBatchId(value)
+    if (type === 'source') setFilterSource(value)
 
+    // tạo object filter đúng cách
+    const inventoryId = type === 'variantId' ? value : filterInventory
+    const typeLabel = type === 'type' ? value : filterType
+    const batchId = type === 'batchId' ? value : filterBatchId
+    const source = type === 'source' ? value : filterSource
+
+    const filters = {}
+    if (inventoryId !== 'all') filters.inventoryId = inventoryId
+    if (typeLabel !== 'all') filters.type = typeLabel
+    if (batchId !== 'all') filters.batchId = batchId
+    if (source !== 'all') filters.source = source
+    console.log('filters', filters)
+
+    // gọi lại API với filters mới
+    refreshInventoryLogs(page > 0 ? page : 1, 10, filters)
+  }
   const inventoryLogColumns = [
     { id: 'source', label: 'Mã phiếu', minWidth: 130 },
     { id: 'variantName', label: 'Biến thể', minWidth: 150 },
@@ -105,81 +133,94 @@ const InventoryLogTab = ({
             <TableRow>
               <TableCell colSpan={inventoryLogColumns.length}>
                 <Box display='flex' gap={2} alignItems='center'>
-                  <TextField
-                    label='SKU'
-                    value={filterSku}
-                    onChange={(e) => setFilterSku(e.target.value)}
+                  <FormControl
                     variant='outlined'
                     size='small'
-                    sx={{ minWidth: 150 }}
-                  />
-                  <FormControl
-                    sx={{
-                      minWidth: 200,
-                      height: '40px',
-                      '& .MuiInputBase-root': {
-                        height: '40px',
-                        padding: '0 14px 0 0'
-                      }
-                    }}
+                    sx={{ minWidth: 120 }}
                   >
+                    <InputLabel id='inventory-select-label'>
+                      Tồn theo kho
+                    </InputLabel>
                     <Select
-                      value={filterLogWarehouse}
-                      onChange={(e) => setFilterLogWarehouse(e.target.value)}
-                    >
-                      <MenuItem value='all'>Tất cả kho</MenuItem>
-                      {warehouses.map((warehouse) => (
-                        <MenuItem key={warehouse.id} value={warehouse.name}>
-                          {warehouse.name}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                  </FormControl>
-                  <FormControl
-                    sx={{
-                      minWidth: 200,
-                      height: '40px',
-                      '& .MuiInputBase-root': {
-                        height: '40px',
-                        padding: '0 14px 0 0'
+                      labelId='inventory-select-label'
+                      value={filterInventory}
+                      onChange={(e) =>
+                        handleFilterChange('inventoryId', e.target.value)
                       }
-                    }}
-                  >
-                    <Select
-                      value={filterLogType}
-                      onChange={(e) => setFilterLogType(e.target.value)}
+                      label='Tồn theo kho'
                     >
                       <MenuItem value='all'>Tất cả</MenuItem>
-                      <MenuItem value='Nhập'>Nhập</MenuItem>
-                      <MenuItem value='Xuất'>Xuất</MenuItem>
+                      {inventories.map((inventory) => (
+                        <MenuItem key={inventory._id} value={inventory._id}>
+                          {inventory.variantId.name} -{' '}
+                          {inventory.warehouseId.name}
+                        </MenuItem>
+                      ))}
                     </Select>
                   </FormControl>
                   <FormControl
-                    sx={{
-                      minWidth: 200,
-                      height: '40px',
-                      '& .MuiInputBase-root': {
-                        height: '40px',
-                        padding: '0 14px 0 0'
-                      }
-                    }}
+                    variant='outlined'
+                    size='small'
+                    sx={{ minWidth: 120 }}
                   >
+                    <InputLabel id='type-select-label'>Loại</InputLabel>
                     <Select
-                      value={filterLogDate}
-                      onChange={(e) => setFilterLogDate(e.target.value)}
+                      labelId='type-select-label'
+                      value={filterType}
+                      onChange={(e) =>
+                        handleFilterChange('type', e.target.value)
+                      }
+                      label='Loại'
                     >
-                      <MenuItem value='all'>Tất cả ngày</MenuItem>
-                      {[
-                        ...new Set(
-                          enrichedInventoryLogs.map(
-                            (log) => log.createdAtFormatted
-                          )
-                        )
-                      ].map((date) => (
-                        <MenuItem key={date} value={date}>
-                          {date}
+                      <MenuItem value='all'>Tất cả</MenuItem>
+                      <MenuItem value='in'>Nhập</MenuItem>
+                      <MenuItem value='out'>Xuất</MenuItem>
+                    </Select>
+                  </FormControl>
+                  <FormControl
+                    variant='outlined'
+                    size='small'
+                    sx={{ minWidth: 120 }}
+                  >
+                    <InputLabel id='batch-select-label'>Lô hàng</InputLabel>
+                    <Select
+                      labelId='batch-select-label'
+                      value={filterBatchId}
+                      onChange={(e) =>
+                        handleFilterChange('batchId', e.target.value)
+                      }
+                      label='Lô hàng'
+                    >
+                      <MenuItem value='all'>Tất cả</MenuItem>
+                      {batches.map((batch) => (
+                        <MenuItem key={batch._id} value={batch._id}>
+                          {batch.batchCode}
                         </MenuItem>
                       ))}
+                    </Select>
+                  </FormControl>
+                  <FormControl
+                    variant='outlined'
+                    size='small'
+                    sx={{ minWidth: 120 }}
+                  >
+                    <InputLabel id='source-select-label'>Mã phiếu</InputLabel>
+                    <Select
+                      labelId='source-select-label'
+                      value={filterSource}
+                      onChange={(e) =>
+                        handleFilterChange('source', e.target.value)
+                      }
+                      label='Mã phiếu'
+                    >
+                      <MenuItem value='all'>Tất cả</MenuItem>
+                      {[...new Set(data.map((log) => log.source))].map(
+                        (source) => (
+                          <MenuItem key={source} value={source}>
+                            {source}
+                          </MenuItem>
+                        )
+                      )}
                     </Select>
                   </FormControl>
                 </Box>

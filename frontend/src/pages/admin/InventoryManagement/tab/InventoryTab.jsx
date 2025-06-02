@@ -405,8 +405,6 @@ const InventoryTab = ({
   data,
   variants,
   warehouses,
-  colors,
-  sizes,
   page,
   rowsPerPage,
   onPageChange,
@@ -419,24 +417,11 @@ const InventoryTab = ({
   fetchWarehouses,
   fetchPartner,
   batches,
-  products,
-  refreshColors,
-  refreshProducts,
-  refreshSizes,
   refreshVariants
 }) => {
-  // Các state filter nâng cao
-  const [filterWarehouse, setFilterWarehouse] = useState('all') // warehouseId
-  const [filterVariant, setFilterVariant] = useState('all') // variantId
-  const [filterProduct, setFilterProduct] = useState('all') // productId
-  const [filterStatus, setFilterStatus] = useState('all') // in_stock | out_of_stock | low_stock
-  const [filterColor, setFilterColor] = useState('all') // color
-  const [filterSize, setFilterSize] = useState('all') // size
-  const [filterKeyword, setFilterKeyword] = useState('') // keyword (SKU hoặc tên sản phẩm)
-  const [filterMinQuantity, setFilterMinQuantity] = useState('') // minQuantity (số)
-  const [filterCreatedAtFrom, setFilterCreatedAtFrom] = useState('') // createdAtFrom (yyyy-mm-dd)
-  const [filterCreatedAtTo, setFilterCreatedAtTo] = useState('') // createdAtTo (yyyy-mm-dd)
-
+  const [filterWarehouse, setFilterWarehouse] = useState('all')
+  const [filterStatus, setFilterStatus] = useState('all')
+  const [filterVariantId, setFilterVariantId] = useState('all')
   const [openViewModal, setOpenViewModal] = useState(false)
   const [openEditModal, setOpenEditModal] = useState(false)
   const [openDeleteModal, setOpenDeleteModal] = useState(false)
@@ -457,85 +442,53 @@ const InventoryTab = ({
     { variantId: '', lot: '', quantity: '', unit: '', note: '' }
   ])
   useEffect(() => {
-    refreshInventories()
+    refreshInventories(page > 0 ? page : 1, rowsPerPage)
     refreshVariants()
-    refreshProducts()
-    refreshSizes()
-    refreshColors()
     fetchWarehouses()
   }, [])
 
   const enrichedInventories = data.map((item) => {
-    const variant = variants.find((v) => v.id === item.variantId)
-    const product = products.find((p) => p.id === (variant?.productId || ''))
-    const warehouse = warehouses.find((w) => w.id === item.warehouseId)
-
     return {
       ...item,
-      warehouseId: item.warehouseId || '',
-      warehouseName: warehouse?.name || 'N/A',
-      variantId: item.variantId || '',
-      variantSku: variant?.sku || '',
-      variantName: variant?.name || 'N/A',
-      productId: product?.id || '',
-      productName: product?.name || 'N/A',
-      color: variant?.color?.name || 'N/A',
-      size: variant?.size?.name || 'N/A'
+      variantId: item.variantId._id, // giữ nguyên ID
+      warehouseId: item.warehouseId._id, // giữ nguyên ID để filter
+      warehouse: item.warehouseId?.name || 'N/A',
+      variantName: item.variantId?.name || 'N/A',
+      color: item.variantId.color?.name || 'N/A',
+      size: item.variantId.size?.name || 'N/A',
+      sku: item.variantId?.sku || 'N/A' // bạn có thể thêm sku nếu cần
     }
   })
 
-  // Hàm kiểm tra trạng thái tồn kho (status)
-  const getInventoryStatus = (item) => {
-    if (item.quantity === 0) return 'out_of_stock'
-    if (item.quantity > 0 && item.quantity <= item.minQuantity)
-      return 'low_stock'
-    return 'in_stock'
-  }
-
   const filteredInventories = enrichedInventories.filter((item) => {
-    // warehouseId
-    if (filterWarehouse !== 'all' && item.warehouseId !== filterWarehouse)
-      return false
-    // variantId
-    if (filterVariant !== 'all' && item.variantId !== filterVariant)
-      return false
-    // productId
-    if (filterProduct !== 'all' && item.productId !== filterProduct)
-      return false
-    // status
-    if (filterStatus !== 'all' && getInventoryStatus(item) !== filterStatus)
-      return false
-    // color
-    if (filterColor !== 'all' && item.color !== filterColor) return false
-    // size
-    if (filterSize !== 'all' && item.size !== filterSize) return false
-    // minQuantity
-    if (filterMinQuantity !== '' && item.quantity < Number(filterMinQuantity))
-      return false
-    // keyword (tìm trên SKU biến thể hoặc tên sản phẩm)
-    if (
-      filterKeyword.trim() !== '' &&
-      !(
-        item.variantSku.toLowerCase().includes(filterKeyword.toLowerCase()) ||
-        item.productName.toLowerCase().includes(filterKeyword.toLowerCase())
-      )
+    return (
+      (filterWarehouse === 'all' || item.warehouseId === filterWarehouse) &&
+      (filterStatus === 'all' || item.status === filterStatus) &&
+      (filterVariantId === 'all' || item.variantId === filterVariantId)
     )
-      return false
-    // createdAtFrom
-    if (
-      filterCreatedAtFrom !== '' &&
-      new Date(item.createdAt) < new Date(filterCreatedAtFrom)
-    )
-      return false
-    // createdAtTo
-    if (
-      filterCreatedAtTo !== '' &&
-      new Date(item.createdAt) > new Date(filterCreatedAtTo + 'T23:59:59')
-    )
-      return false
-
-    return true
   })
+
+  const handleFilterChange = (type, value) => {
+    // cập nhật state
+    if (type === 'variantId') setFilterVariantId(value)
+    if (type === 'warehouseId') setFilterWarehouse(value)
+    if (type === 'status') setFilterStatus(value)
+
+    // tạo object filter đúng cách
+    const nextVariantId = type === 'variantId' ? value : filterVariantId
+    const nextWarehouseId = type === 'warehouseId' ? value : filterWarehouse
+    const nextStatus = type === 'status' ? value : filterStatus
+
+    const filters = {}
+    if (nextVariantId !== 'all') filters.variantId = nextVariantId
+    if (nextWarehouseId !== 'all') filters.warehouseId = nextWarehouseId
+    if (nextStatus !== 'all') filters.status = nextStatus
+
+    console.log('filters', filters)
+
+    // gọi lại API với filters mới
+    refreshInventories(page > 0 ? page : 1, 10, filters)
+  }
 
   const inventoryColumns = [
     { id: 'variantId', label: 'Mã biến thể', minWidth: 200 },
@@ -759,11 +712,13 @@ const InventoryTab = ({
                   >
                     <Select
                       value={filterWarehouse}
-                      onChange={(e) => setFilterWarehouse(e.target.value)}
+                      onChange={(e) =>
+                        handleFilterChange('warehouseId', e.target.value)
+                      }
                     >
                       <MenuItem value='all'>Tất cả kho</MenuItem>
                       {warehouses.map((warehouse) => (
-                        <MenuItem key={warehouse.id} value={warehouse.name}>
+                        <MenuItem key={warehouse._id} value={warehouse._id}>
                           {warehouse.name}
                         </MenuItem>
                       ))}
@@ -780,35 +735,15 @@ const InventoryTab = ({
                     }}
                   >
                     <Select
-                      value={filterColor}
-                      onChange={(e) => setFilterColor(e.target.value)}
-                    >
-                      <MenuItem value='all'>Tất cả màu</MenuItem>
-                      {colors.map((color) => (
-                        <MenuItem key={color.id} value={color.name}>
-                          {color.name}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                  </FormControl>
-                  <FormControl
-                    sx={{
-                      minWidth: 200,
-                      height: '40px',
-                      '& .MuiInputBase-root': {
-                        height: '40px',
-                        padding: '0 14px 0 0'
+                      value={filterVariantId}
+                      onChange={(e) =>
+                        handleFilterChange('variantId', e.target.value)
                       }
-                    }}
-                  >
-                    <Select
-                      value={filterSize}
-                      onChange={(e) => setFilterSize(e.target.value)}
                     >
-                      <MenuItem value='all'>Tất cả kích thước</MenuItem>
-                      {sizes.map((size) => (
-                        <MenuItem key={size.id} value={size.name}>
-                          {size.name}
+                      <MenuItem value='all'>Tất cả biến thể</MenuItem>
+                      {variants.map((variant) => (
+                        <MenuItem key={variant._id} value={variant._id}>
+                          {variant.sku} - {variant.name}
                         </MenuItem>
                       ))}
                     </Select>
@@ -825,7 +760,9 @@ const InventoryTab = ({
                   >
                     <Select
                       value={filterStatus}
-                      onChange={(e) => setFilterStatus(e.target.value)}
+                      onChange={(e) =>
+                        handleFilterChange('status', e.target.value)
+                      }
                     >
                       <MenuItem value='all'>Tất cả trạng thái</MenuItem>
                       <MenuItem value='in-stock'>Còn hàng</MenuItem>

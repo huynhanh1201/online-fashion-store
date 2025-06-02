@@ -8,12 +8,16 @@ import {
   exportInventory
 } from '~/services/admin/Inventory/inventoryService'
 
-const useInventorys = (pageInventory = 1, limit = 10) => {
+const useInventorys = (pageInventory = 1) => {
   const [inventories, setInventories] = useState([]) // Danh sách các biến thể kho
   const [totalPages, setTotalPages] = useState(1) // Tổng số trang phục vụ phân trang
   const [loading, setLoading] = useState(false) // Trạng thái đang tải
 
-  const fetchInventories = async (page = pageInventory, filters = {}) => {
+  const fetchInventories = async (
+    page = pageInventory,
+    limit = 10,
+    filters = {}
+  ) => {
     setLoading(true)
     const { inventories, total } = await getInventories(page, limit, filters)
     setInventories(inventories)

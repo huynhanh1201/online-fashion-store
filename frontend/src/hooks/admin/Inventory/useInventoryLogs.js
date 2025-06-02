@@ -11,7 +11,7 @@ const useInventoryLogs = (page = 1, limit = 10) => {
   const [loading, setLoading] = useState(false)
   const [logDetail, setLogDetail] = useState(null)
 
-  const fetchLogs = async (filters = {}) => {
+  const fetchLogs = async (page = 1, limit = 10, filters = {}) => {
     setLoading(true)
     const response = await getInventoryLogs({ page, limit, ...filters })
     setLogs(response)

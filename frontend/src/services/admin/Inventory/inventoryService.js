@@ -3,7 +3,11 @@ import { API_ROOT } from '~/utils/constants.js'
 
 export const getInventories = async (page = 1, limit = 10, filters = {}) => {
   try {
-    const params = new URLSearchParams({ page, limit, ...filters }).toString()
+    const params = new URLSearchParams({
+      page: String(page || 1),
+      limit: String(limit || 10),
+      ...filters
+    }).toString()
     const response = await AuthorizedAxiosInstance.get(
       `${API_ROOT}/v1/inventories?${params}`
     )
