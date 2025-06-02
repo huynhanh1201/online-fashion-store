@@ -142,9 +142,7 @@ const ViewProductModal = ({
           {/* Cột thông tin */}
           <Grid item size={12} md={7} width='calc(98% - 350px)'>
             <Box sx={{ width: '100%' }}>
-              <Typography variant='h6' gutterBottom>
-                Thông tin sản phẩm
-              </Typography>
+              <Typography variant='h6'>Thông tin sản phẩm</Typography>
               <Divider sx={{ mb: 2 }} />
               <Table size='small' sx={{ width: '100%' }}>
                 <TableBody>
@@ -253,6 +251,9 @@ const ViewProductModal = ({
         </Grid>
 
         {/* Cột mô tả nằm ở dưới cùng */}
+        <Typography variant='h6' gutterBottom sx={{ mt: 3 }}>
+          Mô tả sản phẩm
+        </Typography>
         <Box
           sx={{
             width: '100%',
