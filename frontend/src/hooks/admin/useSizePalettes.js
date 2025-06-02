@@ -4,7 +4,8 @@ import {
   getSizePalettes,
   createSizePalette,
   updateSizePalette,
-  deleteSizePalette
+  deleteSizePalette,
+  getSizePaletteById
 } from '~/services/admin/sizePaletteService'
 
 const useSizePalettes = (productId) => {
@@ -59,6 +60,15 @@ const useSizePalettes = (productId) => {
       throw error
     }
   }
+  const getSizePaletteId = async (id) => {
+    try {
+      const palette = await getSizePaletteById(id)
+      return palette
+    } catch (error) {
+      console.error('Error fetching size palette by ID:', error)
+      throw error
+    }
+  }
 
   useEffect(() => {
     fetchSizePalettes()
@@ -71,7 +81,8 @@ const useSizePalettes = (productId) => {
     fetchSizePalettes,
     addSizePalette,
     editSizePalette,
-    removeSizePalette
+    removeSizePalette,
+    getSizePaletteId
   }
 }
 export default useSizePalettes

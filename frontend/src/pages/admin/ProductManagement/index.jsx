@@ -152,7 +152,11 @@ const DeleteProductModal = React.lazy(
   () => import('./modal/DeleteProductModal')
 )
 const ViewProductModal = React.lazy(() => import('./modal/ViewProductModal'))
+const ViewDesc = React.lazy(() => import('./modal/ViewDescriptionModal.jsx'))
 import StyleAdmin from '~/assets/StyleAdmin.jsx'
+import ViewDescriptionModal from '~/pages/admin/ProductManagement/modal/ViewDescriptionModal.jsx'
+import useColorPalettes from '~/hooks/admin/useColorPalettes.js'
+import useSizePalettes from '~/hooks/admin/useSizePalettes.js'
 
 const ProductManagement = () => {
   const [page, setPage] = React.useState(1)
@@ -176,6 +180,11 @@ const ProductManagement = () => {
   const { categories, fetchCategories } = useCategories()
   const [showAdvancedFilter, setShowAdvancedFilter] = React.useState(false)
 
+  const [colorPalette, setColorPalette] = React.useState(null)
+  const [sizePalette, setSizePalette] = React.useState(null)
+  const { getColorPaletteId } = useColorPalettes()
+  const { getSizePaletteId } = useSizePalettes()
+
   React.useEffect(() => {
     fetchCategories()
   }, [])
@@ -194,11 +203,23 @@ const ProductManagement = () => {
 
   const handleChangePage = (event, value) => setPage(value)
 
-  const handleOpenModal = (type, product = null) => {
+  const handleOpenModal = async (type, product = null) => {
     setSelectedProduct(product)
     setModalType(type)
-  }
 
+    if (type === 'view' && product) {
+      try {
+        const colorPalette = await getColorPaletteId(product._id)
+        const sizePalette = await getSizePaletteId(product._id)
+
+        // Bạn có thể lưu dữ liệu này vào state nếu cần dùng ở modal
+        setColorPalette(colorPalette)
+        setSizePalette(sizePalette)
+      } catch (error) {
+        console.error('Lỗi khi lấy dữ liệu palette:', error)
+      }
+    }
+  }
   const handleCloseModal = () => {
     setSelectedProduct(null)
     setModalType(null)
@@ -385,6 +406,8 @@ const ProductManagement = () => {
             open
             onClose={handleCloseModal}
             product={selectedProduct}
+            colorPalette={colorPalette}
+            sizePalette={sizePalette}
           />
         )}
         {modalType === 'edit' && selectedProduct && (
@@ -401,6 +424,13 @@ const ProductManagement = () => {
             onClose={handleCloseModal}
             product={selectedProduct}
             onDelete={handleDeleteProduct}
+          />
+        )}
+        {modalType === 'viewDesc' && selectedProduct && (
+          <ViewDescriptionModal
+            open
+            onClose={handleCloseModal}
+            product={selectedProduct}
           />
         )}
       </React.Suspense>
