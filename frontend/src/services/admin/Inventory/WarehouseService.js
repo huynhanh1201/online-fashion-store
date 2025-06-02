@@ -44,7 +44,7 @@ export const createWarehouse = async (data) => {
 
 export const updateWarehouse = async (id, data) => {
   try {
-    const response = await AuthorizedAxiosInstance.put(
+    const response = await AuthorizedAxiosInstance.patch(
       `${API_ROOT}/v1/warehouses/${id}`,
       data
     )

@@ -45,7 +45,7 @@ export const createVariant = async (data) => {
 
 export const updateVariant = async (id, data) => {
   try {
-    const response = await AuthorizedAxiosInstance.put(
+    const response = await AuthorizedAxiosInstance.patch(
       `${API_ROOT}/v1/variants/${id}`,
       data
     )

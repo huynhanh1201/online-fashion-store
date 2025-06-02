@@ -13,7 +13,7 @@ const useBatches = (pageBatch = 1, limit = 10) => {
 
   const fetchBatches = async (page = pageBatch, filters = {}) => {
     setLoading(true)
-    const { batches, total } = await getBatches(page, limit, filters)
+    const { batches, total } = await getBatches({ page, limit, filters })
     setBatches(batches)
     setTotalPages(total || 1)
     setLoading(false)

@@ -39,7 +39,7 @@ export const createPartner = async (data) => {
 }
 export const updatePartner = async (id, data) => {
   try {
-    const response = await AuthorizedAxiosInstance.put(
+    const response = await AuthorizedAxiosInstance.patch(
       `${API_ROOT}/v1/partners/${id}`,
       data
     )

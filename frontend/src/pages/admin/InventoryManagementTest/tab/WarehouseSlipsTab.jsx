@@ -1,4 +1,5 @@
-import React, { useState } from 'react'
+// WarehouseSlipsTab.js
+import React, { useState, useEffect } from 'react'
 import {
   Paper,
   Table,
@@ -10,13 +11,17 @@ import {
   TablePagination,
   Typography,
   Box,
-  Button
+  Button,
+  IconButton
 } from '@mui/material'
 import VisibilityIcon from '@mui/icons-material/Visibility'
 import AddWarehouseSlipModal from '../modal/WarehouseSlip/AddWarehouseSlipModal'
+import ViewWarehouseSlipModal from '../modal/WarehouseSlip/ViewWarehouseSlipModal'
+
+import { Chip } from '@mui/material'
 
 const WarehouseSlipsTab = ({
-  data: initialData,
+  data,
   warehouses,
   variants,
   page,
@@ -26,15 +31,21 @@ const WarehouseSlipsTab = ({
   batches,
   partners,
   addWarehouseSlip,
-  refreshWarehouseSlips
+  refreshWarehouseSlips,
+  fetchWarehouses,
+  fetchPartner
 }) => {
-  const [data, setData] = useState(initialData)
   const [openModal, setOpenModal] = useState(false)
-  const [modalType, setModalType] = useState('input') // Track the type ('input' or 'output')
+  const [openViewModal, setOpenViewModal] = useState(false) // State cho View modal
+  const [selectedSlip, setSelectedSlip] = useState(null) // State cho phiếu được chọn
+  const [modalType, setModalType] = useState('input')
+  useEffect(() => {
+    refreshWarehouseSlips()
+  }, [])
   const [newSlipData, setNewSlipData] = useState({
-    slipId: `PNK-${new Date().toISOString().slice(0, 10).replace(/-/g, '')}-001`,
+    slipId: '',
     date: new Date(),
-    profitType: 'Import', // Default, will be updated based on type
+    profitType: 'Import',
     warehouseId: '',
     partnerCode: '',
     partnerName: '',
@@ -45,21 +56,23 @@ const WarehouseSlipsTab = ({
   ])
 
   const handleOpenModal = (type) => {
+    fetchPartner()
+    fetchWarehouses()
     setModalType(type)
     setNewSlipData({
       ...newSlipData,
-      slipId: `${type === 'input' ? 'PNK' : 'PXK'}-${new Date().toISOString().slice(0, 10).replace(/-/g, '')}-001`,
-      profitType: type === 'input' ? 'Import' : 'Export' // Set profitType based on type
+      slipId: '',
+      profitType: type === 'input' ? 'Import' : 'Export'
     })
     setOpenModal(true)
   }
 
   const handleCloseModal = () => {
     setOpenModal(false)
-    refreshWarehouseSlips() // Refresh the slips after closing the modal
-    setModalType('input') // Reset to default
+    refreshWarehouseSlips()
+    setModalType('input')
     setNewSlipData({
-      slipId: `PNK-${new Date().toISOString().slice(0, 10).replace(/-/g, '')}-001`,
+      slipId: '',
       date: new Date(),
       profitType: 'Import',
       warehouseId: '',
@@ -71,8 +84,8 @@ const WarehouseSlipsTab = ({
   }
 
   const handleAddSlip = async (newSlip) => {
-    setData([...data, newSlip])
-    await addWarehouseSlip(newSlip) // Call the function to add the slip
+    // setData([...data, newSlip])
+    await addWarehouseSlip(newSlip)
     handleCloseModal()
   }
 
@@ -118,29 +131,47 @@ const WarehouseSlipsTab = ({
     handleAddSlip(newSlip)
   }
 
+  const handleViewSlip = (slip) => {
+    setSelectedSlip(slip)
+    setOpenViewModal(true)
+  }
+
   const enrichedWarehouseSlips = data.map((slip) => {
-    const warehouse = warehouses.find((w) => w.id === slip.warehouseId)
+    const warehouseId =
+      slip.warehouseId && typeof slip.warehouseId === 'object'
+        ? slip.warehouseId._id || slip.warehouseId.id
+        : slip.warehouseId
+
+    const warehouseName =
+      typeof slip.warehouseId === 'object'
+        ? slip.warehouseId.name
+        : warehouses.find(
+            (w) => w._id === slip.warehouseId || w.id === slip.warehouseId
+          )?.name
+
     return {
       ...slip,
-      warehouse: warehouse ? warehouse.name : 'N/A',
+      warehouse: warehouseName || 'N/A',
       type: slip.type === 'import' ? 'Nhập' : 'Xuất',
-      statusLabel: slip.status === 'pending' ? 'Đang xử lý' : 'Hoàn thành',
-      createdAtFormatted: new Date(slip.createdAt).toLocaleString()
+      createdAtFormatted: new Date(slip.createdAt).toLocaleString('vi-VN'),
+      itemCount: slip.items.length,
+      createdByName: slip.createdBy?.name || 'N/A'
     }
   })
-
   const warehouseSlipColumns = [
-    { id: 'slipId', label: 'Mã phiếu', minWidth: 100 },
+    { id: 'slipId', label: 'Mã phiếu', minWidth: 120 },
     { id: 'type', label: 'Loại', minWidth: 100 },
-    { id: 'warehouse', label: 'Kho', minWidth: 100 },
-    { id: 'statusLabel', label: 'Trạng thái', minWidth: 100 },
-    { id: 'note', label: 'Ghi chú', minWidth: 150 },
-    { id: 'createdAtFormatted', label: 'Ngày tạo', minWidth: 150 },
-    { id: 'action', label: 'Hành động', minWidth: 100, align: 'center' }
+    { id: 'warehouse', label: 'Kho', minWidth: 120 },
+    { id: 'itemCount', label: 'Số mặt hàng', minWidth: 120, align: 'right' },
+    { id: 'createdByName', label: 'Người tạo', minWidth: 150 },
+    { id: 'note', label: 'Ghi chú', minWidth: 180 },
+    { id: 'createdAtFormatted', label: 'Ngày tạo', minWidth: 160 },
+    { id: 'action', label: 'Hành động', minWidth: 120, align: 'center' }
   ]
+
   return (
     <Paper sx={{ border: '1px solid #ccc', width: '100%', overflow: 'hidden' }}>
-      <TableContainer sx={{ maxHeight: 440 }}>
+      <TableContainer>
         <Table stickyHeader aria-label='warehouse slips table'>
           <TableHead>
             <TableRow>
@@ -197,15 +228,29 @@ const WarehouseSlipsTab = ({
                     if (column.id === 'action') {
                       return (
                         <TableCell key={column.id} align={column.align}>
-                          <VisibilityIcon />
+                          <IconButton
+                            onClick={() => handleViewSlip(row)}
+                            size='small'
+                            color='primary'
+                          >
+                            <VisibilityIcon />
+                          </IconButton>
                         </TableCell>
                       )
                     }
                     return (
                       <TableCell key={column.id} align={column.align}>
-                        {column.format && typeof value === 'number'
-                          ? column.format(value)
-                          : value}
+                        {column.id === 'type' ? (
+                          <Chip
+                            label={value}
+                            color={value === 'Nhập' ? 'success' : 'error'}
+                            size='small'
+                          />
+                        ) : column.format && typeof value === 'number' ? (
+                          column.format(value)
+                        ) : (
+                          value
+                        )}
                       </TableCell>
                     )
                   })}
@@ -236,11 +281,19 @@ const WarehouseSlipsTab = ({
         handleDeleteRow={handleDeleteRow}
         handleAddRow={handleAddRow}
         variants={variants}
-        warehouseSlips={data} // Pass warehouseSlips
-        batches={batches} // Pass batches
-        type={modalType} // Pass the type ('input' or 'output')
-        partners={partners} // Pass partners
+        warehouseSlips={data}
+        batches={batches}
+        type={modalType}
+        partners={partners}
         addWarehouseSlip={addWarehouseSlip}
+      />
+      <ViewWarehouseSlipModal
+        open={openViewModal}
+        onClose={() => setOpenViewModal(false)}
+        slip={selectedSlip}
+        warehouses={warehouses}
+        variants={variants}
+        partners={partners}
       />
     </Paper>
   )

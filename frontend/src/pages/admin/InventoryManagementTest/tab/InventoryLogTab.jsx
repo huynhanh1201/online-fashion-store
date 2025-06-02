@@ -1,4 +1,5 @@
-import React, { useState } from 'react'
+// InventoryLogTab.js
+import React, { useState, useEffect } from 'react'
 import {
   Paper,
   Table,
@@ -14,8 +15,14 @@ import {
   MenuItem,
   Select,
   Typography,
-  Box
+  Box,
+  IconButton,
+  Chip
 } from '@mui/material'
+import VisibilityIcon from '@mui/icons-material/Visibility'
+import ViewInventoryLogModal from '../modal/InventoryLog/ViewInventoryLogModal'
+import EditIcon from '@mui/icons-material/Edit'
+import DeleteIcon from '@mui/icons-material/Delete' // Thêm modal mới
 
 const InventoryLogTab = ({
   data,
@@ -24,36 +31,47 @@ const InventoryLogTab = ({
   page,
   rowsPerPage,
   onPageChange,
-  onRowsPerPageChange
+  onRowsPerPageChange,
+  refreshInventoryLogs
 }) => {
   const [filterSku, setFilterSku] = useState('')
   const [filterLogWarehouse, setFilterLogWarehouse] = useState('all')
   const [filterLogType, setFilterLogType] = useState('all')
   const [filterLogDate, setFilterLogDate] = useState('all')
+  const [openViewModal, setOpenViewModal] = useState(false) // State cho modal xem
+  const [selectedLog, setSelectedLog] = useState(null) // State cho bản ghi được chọn
 
-  const enrichedInventoryLogs = data.map((log) => {
-    const variant = variants.find((v) => v.id === log.variantId)
-    const warehouse = warehouses.find((w) => w.id === log.warehouseId)
+  useEffect(() => {
+    refreshInventoryLogs()
+  }, [])
+  const handleViewLog = (log) => {
+    setSelectedLog(log)
+    setOpenViewModal(true)
+  }
 
+  const enrichedInventoryLogs = (data || []).map((log) => {
     return {
       ...log,
-      variantName: variant?.name || 'N/A',
-      warehouse: warehouse?.name || 'N/A',
+      variantName: log.inventoryId.variantId?.name || 'N/A',
+      warehouse: log.inventoryId.warehouseId?.name || 'N/A',
       typeLabel: log.type === 'in' ? 'Nhập' : 'Xuất',
-      createdAtFormatted: new Date(log.createdAt).toLocaleDateString(),
+      createdAtFormatted: new Date(log.createdAt).toLocaleDateString('vi-VN'),
       createdByName: log.createdBy?.name || 'N/A'
     }
   })
 
   const filteredInventoryLogs = enrichedInventoryLogs.filter((log) => {
-    const variant = variants.find((v) => v.sku === filterSku || !filterSku)
+    const skuMatch =
+      !filterSku ||
+      variants.find((v) => v.id === log.variantId && v.sku === filterSku)
+
     const warehouseMatch =
       filterLogWarehouse === 'all' || log.warehouse === filterLogWarehouse
     const typeMatch = filterLogType === 'all' || log.typeLabel === filterLogType
     const dateMatch =
-      filterLogDate === 'all' ||
-      new Date(log.createdAtFormatted).toLocaleDateString() === filterLogDate
-    return variant && warehouseMatch && typeMatch && dateMatch
+      filterLogDate === 'all' || log.createdAtFormatted === filterLogDate
+
+    return skuMatch && warehouseMatch && typeMatch && dateMatch
   })
 
   const inventoryLogColumns = [
@@ -66,12 +84,12 @@ const InventoryLogTab = ({
     { id: 'exportPrice', label: 'Giá xuất', minWidth: 100, align: 'right' },
     { id: 'note', label: 'Ghi chú', minWidth: 150 },
     { id: 'createdByName', label: 'Người thực hiện', minWidth: 120 },
-    { id: 'createdAtFormatted', label: 'Ngày thực hiện', minWidth: 150 }
+    { id: 'createdAtFormatted', label: 'Ngày thực hiện', minWidth: 150 },
+    { id: 'action', label: 'Hành động', minWidth: 100, align: 'center' }
   ]
-
   return (
     <Paper sx={{ border: '1px solid #ccc', width: '100%', overflow: 'hidden' }}>
-      <TableContainer sx={{ maxHeight: 440 }}>
+      <TableContainer>
         <Table stickyHeader aria-label='inventory log table'>
           <TableHead>
             <TableRow sx={{ paddingBottom: '0' }}>
@@ -186,6 +204,44 @@ const InventoryLogTab = ({
                 <TableRow hover role='checkbox' tabIndex={-1} key={index}>
                   {inventoryLogColumns.map((column) => {
                     const value = row[column.id]
+                    if (column.id === 'typeLabel') {
+                      return (
+                        <TableCell key={column.id} align={column.align}>
+                          <Chip
+                            label={value}
+                            size='small'
+                            color={value === 'Nhập' ? 'success' : 'error'}
+                          />
+                        </TableCell>
+                      )
+                    }
+                    if (column.id === 'amount') {
+                      return (
+                        <TableCell key={column.id} align={column.align}>
+                          <Typography
+                            sx={{
+                              fontWeight: 900,
+                              color: row.typeLabel === 'Nhập' ? 'green' : 'red'
+                            }}
+                          >
+                            {value !== undefined ? value : '—'}
+                          </Typography>
+                        </TableCell>
+                      )
+                    }
+                    if (column.id === 'action') {
+                      return (
+                        <TableCell key={column.id} align={column.align}>
+                          <IconButton
+                            onClick={() => handleViewLog(row)}
+                            size='small'
+                            color='primary'
+                          >
+                            <VisibilityIcon />
+                          </IconButton>
+                        </TableCell>
+                      )
+                    }
                     return (
                       <TableCell key={column.id} align={column.align}>
                         {value !== undefined ? value : '—'}
@@ -205,6 +261,13 @@ const InventoryLogTab = ({
         page={page}
         onPageChange={onPageChange}
         onRowsPerPageChange={onRowsPerPageChange}
+      />
+      <ViewInventoryLogModal
+        open={openViewModal}
+        onClose={() => setOpenViewModal(false)}
+        log={selectedLog}
+        variants={variants}
+        warehouses={warehouses}
       />
     </Paper>
   )

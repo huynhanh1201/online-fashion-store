@@ -9,7 +9,7 @@ const getInventoryList = async () => {
     .populate([
       {
         path: 'variantId',
-        select: 'name'
+        select: 'name sku color size'
       },
       {
         path: 'warehouseId',
@@ -31,7 +31,7 @@ const getInventory = async (inventoryId) => {
       .populate([
         {
           path: 'variantId',
-          select: 'name'
+          select: 'name sku color size'
         },
         {
           path: 'warehouseId',

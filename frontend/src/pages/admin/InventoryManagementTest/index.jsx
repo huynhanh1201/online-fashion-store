@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import {
   Box,
   Typography,
@@ -14,7 +14,7 @@ import {
   FilterList as FilterListIcon,
   FileDownload as FileDownloadIcon
 } from '@mui/icons-material'
-import InventoryTable from './InventoryTableApi'
+import InventoryTable from './InventoryTable.jsx'
 import useInventorys from '~/hooks/admin/Inventory/useInventorys.js'
 
 const InventoryDashboard = () => {
@@ -27,17 +27,7 @@ const InventoryDashboard = () => {
   const [setAdjustType] = useState('in')
   const [setSelectedInventoryId] = useState(null)
 
-  const {
-    inventories,
-    // totalPages,
-    fetchInventories,
-    loading,
-    handleExport
-  } = useInventorys(page)
-
-  useEffect(() => {
-    fetchInventories(page)
-  }, [page])
+  const { inventories, loading, handleExport } = useInventorys(page)
 
   const handleOpenModal = (type, inventory) => {
     if (!inventory || !inventory._id) return
