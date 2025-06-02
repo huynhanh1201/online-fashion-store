@@ -44,7 +44,8 @@ const ProductDetail = () => {
     handleBuyNow,
     handleCopy,
     copiedCode,
-    formatCurrencyShort
+    formatCurrencyShort,
+    inventory,
   } = useProductDetail(productId)
 
   // console.log('ProductDetail - productId:', productId)
@@ -122,6 +123,7 @@ const ProductDetail = () => {
             handleSizeChange={handleSizeChange}
             getCurrentPrice={getCurrentPrice}
             getCurrentImages={getCurrentImages}
+            inventory={inventory}
           />
         </Grid>
       </Grid>

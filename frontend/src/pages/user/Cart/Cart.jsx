@@ -35,6 +35,7 @@ const Cart = () => {
   const [confirmClearOpen, setConfirmClearOpen] = useState(false)
   const navigate = useNavigate()
   const dispatch = useDispatch()
+
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'auto' })
   }, [])
@@ -49,76 +50,41 @@ const Cart = () => {
     selectedItems.length > 0 && selectedItems.length < cartItems.length
 
   const handleSelectAll = () => {
-    let newSelected = []
-    if (!allSelected) {
-      // map cartItems thành mảng object chi tiết
-      newSelected = cartItems.map(item => ({
-        productId: item.productId._id,
-        color: item.color,
-        size: item.size,
+    const newSelected = allSelected
+      ? []
+      : cartItems.map(item => ({
+        variantId: item.variant._id,
         quantity: item.quantity
       }))
-    }
+
     setSelectedItems(newSelected)
     dispatch(setSelectedItemsAction(newSelected))
   }
-
 
   const handleSelect = (item) => {
-    // Kiểm tra xem item đã có trong selectedItems chưa dựa trên productId + color + size
-    const exists = selectedItems.some(i =>
-      i.productId === item.productId._id &&
-      i.color === item.color &&
-      i.size === item.size
-    )
+    const variantId = item.variant._id
+    const exists = selectedItems.some(i => i.variantId === variantId)
 
-    let newSelected = []
-    if (exists) {
-      newSelected = selectedItems.filter(i =>
-        !(i.productId === item.productId._id &&
-          i.color === item.color &&
-          i.size === item.size)
-      )
-    } else {
-      // Thêm item mới (lấy chi tiết cần thiết)
-      newSelected = [
-        ...selectedItems,
-        {
-          productId: item.productId._id,
-          color: item.color,
-          size: item.size,
-          quantity: item.quantity
-        }
-      ]
-    }
+    const newSelected = exists
+      ? selectedItems.filter(i => i.variantId !== variantId)
+      : [...selectedItems, { variantId, quantity: item.quantity }]
 
     setSelectedItems(newSelected)
     dispatch(setSelectedItemsAction(newSelected))
   }
-
 
   const formatPrice = (val) =>
     typeof val === 'number'
       ? val.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })
       : '0₫'
 
-  // const truncate = (str, maxLength) => {
-  //   if (!str) return ''
-  //   return str.length > maxLength ? str.slice(0, maxLength) + '...' : str
-  // }
-
-  const handleQuantityChange = (productId, delta, color, size) => {
+  const handleQuantityChange = (variantId, delta) => {
     setCartItems(prevItems => {
       return prevItems.map(i => {
-        const isMatch =
-          (i.productId._id || i.productId) === productId &&
-          i.color === color &&
-          i.size === size
-
-        if (!isMatch) return i
+        if (i.variant._id !== variantId) return i
 
         const currentQty = i.quantity
-        const maxQty = i.productId.quantity || 1
+        const maxQty = i.variant.quantity || 1
         const newQty = Math.max(1, currentQty + delta)
 
         if (newQty > maxQty) {
@@ -127,49 +93,33 @@ const Cart = () => {
         }
 
         updateItem({
-          productId,
-          color,
-          size,
-          quantity: delta
-        });
+          variantId,
+          quantity: newQty
+        })
 
         return { ...i, quantity: newQty }
       })
     })
   }
 
-  const handleRemove = async (itemToRemove) => {
+  const handleRemove = async ({ variantId }) => {
     try {
-      const res = await deleteItem(itemToRemove)
+      const res = await deleteItem({ variantId })
       if (res) {
-        setCartItems(prev => prev.filter(item =>
-          !(item.productId?._id === itemToRemove.productId &&
-            item.color === itemToRemove.color &&
-            item.size === itemToRemove.size)
-        ))
-        setSelectedItems(prev => prev.filter(i =>
-          !(i.productId === itemToRemove.productId &&
-            i.color === itemToRemove.color &&
-            i.size === itemToRemove.size)
-        ))
+        setCartItems(prev => prev.filter(item => item.variant._id !== variantId))
+        setSelectedItems(prev => prev.filter(i => i.variantId !== variantId))
       }
     } catch (error) {
       console.error('Lỗi xoá sản phẩm:', error)
     }
   }
 
-
   const selectedCartItems = cartItems.filter(item =>
-    selectedItems.some(selected =>
-      selected.productId === item.productId._id &&
-      selected.color === item.color &&
-      selected.size === item.size
-    )
+    selectedItems.some(selected => selected.variantId === item.variant._id)
   )
 
-
   const totalPrice = selectedCartItems.reduce(
-    (sum, item) => sum + (item.productId?.price || 0) * item.quantity,
+    (sum, item) => sum + (item.variant.exportPrice || 0) * item.quantity,
     0
   )
 
@@ -231,18 +181,14 @@ const Cart = () => {
             </TableRow>
           ) : (
             cartItems.map((item) => {
-              const product = item.productId
-              if (!product) return null
+              const variant = item.variant
+              if (!variant) return null
 
               return (
                 <TableRow key={item._id} hover>
                   <TableCell padding='checkbox'>
                     <Checkbox
-                      checked={selectedItems.some(i =>
-                        i.productId === item.productId._id &&
-                        i.color === item.color &&
-                        i.size === item.size
-                      )}
+                      checked={selectedItems.some(i => i.variantId === variant._id)}
                       onChange={() => handleSelect(item)}
                       color='primary'
                     />
@@ -252,12 +198,12 @@ const Cart = () => {
                       <Box
                         sx={{ cursor: 'pointer' }}
                         onClick={() => {
-                          dispatch(setSelectedItemsAction([product._id]))
-                          navigate(`/productdetail/${product._id}`)
+                          dispatch(setSelectedItemsAction([{ variantId: variant._id, quantity: item.quantity }]))
+                          navigate(`/productdetail/${variant._id}`)
                         }}
                       >
                         <Avatar
-                          src={product.image?.[0] || '/default.jpg'}
+                          src={variant.image?.[0] || '/default.jpg'}
                           variant='square'
                           sx={{
                             width: 64,
@@ -277,24 +223,24 @@ const Cart = () => {
                             overflow: 'hidden',
                             textOverflow: 'ellipsis'
                           }}
-                          title={product.name}
+                          title={variant.name}
                         >
-                          {product.name}
+                          {variant.name}
                         </Typography>
 
                         <Typography variant="body2" color="text.secondary" sx={{ maxWidth: 350 }}>
-                          Phân loại hàng: {item.color || 'Không rõ'}{item.color && item.size ? ', ' : ''}{item.size || ''}
+                          Phân loại hàng: {item.color || 'Không rõ'}
+                          {item.color && item.size ? ', ' : ''}
+                          {item.size || ''}
                         </Typography>
-
                       </Box>
-
                     </Box>
                   </TableCell>
                   <TableCell
                     align='center'
                     sx={{ fontWeight: '600', color: '#007B00' }}
                   >
-                    {formatPrice(product.price)}
+                    {formatPrice(variant.exportPrice)}
                   </TableCell>
                   <TableCell align='center'>
                     <Box
@@ -304,8 +250,7 @@ const Cart = () => {
                     >
                       <IconButton
                         size='small'
-                        onClick={() => handleQuantityChange(product._id, -1, item.color, item.size)}
-
+                        onClick={() => handleQuantityChange(variant._id, -1)}
                         disabled={item.quantity <= 1}
                         aria-label='Giảm số lượng'
                       >
@@ -322,11 +267,9 @@ const Cart = () => {
                       />
                       <IconButton
                         size='small'
-                        onClick={() => handleQuantityChange(product._id, 1, item.color, item.size)}
-
-
+                        onClick={() => handleQuantityChange(variant._id, 1)}
                         aria-label='Tăng số lượng'
-                        disabled={item.quantity >= product.quantity}
+                        disabled={item.quantity >= variant.quantity}
                       >
                         <Add />
                       </IconButton>
@@ -335,14 +278,7 @@ const Cart = () => {
                   <TableCell align='center'>
                     <IconButton
                       color='error'
-                      onClick={() =>
-                        handleRemove({
-                          productId: product._id,
-                          color: item.color,
-                          size: item.size,
-                          quantity: item.quantity
-                        })
-                      }
+                      onClick={() => handleRemove({ variantId: variant._id })}
                       aria-label='Xoá sản phẩm'
                     >
                       <Delete />
@@ -369,68 +305,58 @@ const Cart = () => {
         </Typography>
         <Box display='flex' gap={2}>
           <Button
+            variant='outlined'
+            color='error'
+            startIcon={<DeleteForever />}
+            onClick={() => setConfirmClearOpen(true)}
+            disabled={cartItems.length === 0}
+          >
+            Xoá toàn bộ
+          </Button>
+          <Button
             variant='contained'
             color='primary'
             disabled={selectedItems.length === 0}
             onClick={() => {
-              dispatch(setSelectedItemsAction(selectedItems))
-              navigate('/payment', { state: { selectedItems } })
+              navigate('/checkout')
             }}
-            sx={{ minWidth: 120 }}
           >
             Thanh toán
-          </Button>
-          <Button
-            variant='outlined'
-            color='error'
-            endIcon={<DeleteForever />}
-            onClick={() => setConfirmClearOpen(true)}
-            disabled={cartItems.length === 0}
-            sx={{
-              minWidth: 140,
-              borderWidth: 2,
-              '&:hover': { borderWidth: 2 }
-            }}
-          >
-            Xoá toàn bộ
           </Button>
         </Box>
       </Box>
 
-      <Snackbar
-        open={showMaxQuantityAlert}
-        autoHideDuration={3000}
-        onClose={() => setShowMaxQuantityAlert(false)}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-      >
-        <Alert
-          onClose={() => setShowMaxQuantityAlert(false)}
-          severity='warning'
-          sx={{ width: '100%' }}
-        >
-          Số lượng sản phẩm đã hết!
-        </Alert>
-      </Snackbar>
-
+      {/* Xác nhận xoá toàn bộ */}
       <Dialog
         open={confirmClearOpen}
         onClose={() => setConfirmClearOpen(false)}
+        aria-labelledby='confirm-clear-title'
       >
-        <DialogTitle>Xác nhận xoá</DialogTitle>
+        <DialogTitle id='confirm-clear-title'>Xác nhận</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            Bạn có chắc chắn muốn xoá toàn bộ giỏ hàng không?
+            Bạn có chắc chắn muốn xoá toàn bộ sản phẩm trong giỏ hàng không?
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setConfirmClearOpen(false)} color='primary'>
-            Huỷ
-          </Button>
-          <Button onClick={handleClearCart} color='error' variant='contained'>
+          <Button onClick={() => setConfirmClearOpen(false)}>Hủy</Button>
+          <Button color='error' onClick={handleClearCart}>
             Xoá
           </Button>
         </DialogActions>
       </Dialog>
+
+      {/* Thông báo khi đạt số lượng tối đa */}
+      <Snackbar
+        open={showMaxQuantityAlert}
+        autoHideDuration={2000}
+        onClose={() => setShowMaxQuantityAlert(false)}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      >
+        <Alert severity='warning' sx={{ width: '100%' }}>
+          Đã đạt số lượng tối đa của sản phẩm!
+        </Alert>
+      </Snackbar>
     </Container>
   )
 }

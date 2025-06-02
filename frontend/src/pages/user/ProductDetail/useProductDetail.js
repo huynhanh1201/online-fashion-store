@@ -28,6 +28,8 @@ const useProductDetail = (productId) => {
   const [selectedColor, setSelectedColor] = useState(null)
   const [selectedSize, setSelectedSize] = useState(null)
 
+  const [inventory, setInventory] = useState(null)
+
   const dispatch = useDispatch()
   const navigate = useNavigate()
 
@@ -229,74 +231,78 @@ const useProductDetail = (productId) => {
     }
     return product?.images?.length > 0 ? product.images : ['/default.jpg']
   }
-
+  const fetchInventory = async (variantId) => {
+    try {
+      const response = await fetch(`http://localhost:8017/v1/inventories?variantId=${variantId}`)
+      if (!response.ok) throw new Error(`Lỗi HTTP ${response.status}`)
+      const data = await response.json()
+      const inventory = Array.isArray(data) ? data[0] : data // nếu trả về danh sách
+      setInventory(inventory)
+      console.log('Thông tin kho:', inventory)
+    } catch (error) {
+      console.error('Lỗi lấy kho:', error)
+    }
+  }
+  useEffect(() => {
+    if (selectedVariant && selectedVariant._id) {
+      fetchInventory(selectedVariant._id)
+    } else {
+      setInventory(null)
+    }
+  }, [selectedVariant])
   // Handle add to cart
   const handleAddToCart = async () => {
-    // if (isAdding || !product) return
-    // if (variants.length > 0 && !selectedVariant) {
-    //   setSnackbar({
-    //     type: 'warning',
-    //     message: 'Vui lòng chọn màu sắc và kích thước!'
-    //   })
-    //   return
-    // }
-    // setIsAdding(true)
-    // try {
-    //   if (!selectedColor) {
-    //     setSnackbar({
-    //       type: 'warning',
-    //       message: 'Vui lòng chọn màu sắc!'
-    //     })
-    //     setIsAdding((prev) => ({ ...prev, [product._id]: false }))
-    //     return
-    //   }
-    //   if (!size) {
-    //     setSnackbar({
-    //       type: 'warning',
-    //       message: 'Vui lòng chọn kích cỡ!'
-    //     })
-    //     setIsAdding((prev) => ({ ...prev, [product._id]: false }))
-    //     return
-    //   }
+    if (isAdding || !product) return
 
-    //   const updatedCart = await getCart()
-    //   const productIdToUse = selectedVariant?._id || product._id
-    //   const existingItem = updatedCart?.cartItems?.find(
-    //     (item) => item.productId._id === productIdToUse
-    //   )
-    //   const currentQty = existingItem?.quantity || 0
-    //   const availableQuantity = selectedVariant?.quantity || product.quantity
+    if (!selectedVariant) {
+      setSnackbar({
+        type: 'warning',
+        message: 'Vui lòng chọn màu sắc và kích thước!'
+      })
+      return
+    }
 
-    //   if (currentQty + quantity > availableQuantity) {
-    //     setSnackbar({
-    //       type: 'warning',
-    //       message: `Bạn chỉ có thể thêm tối đa ${maxQty - currentQty} sản phẩm cho biến thể này!`
-    //     })
-    //     setIsAdding(false)
-    //     return
-    //   }
+    const variantId = selectedVariant._id
+    const availableQuantity = inventory?.quantity ?? selectedVariant?.quantity ?? 0
 
-    //   const res = await addToCart({
-    //     cartItems: [{ productId: productIdToUse, quantity }]
-    //   })
+    try {
+      setIsAdding(true)
 
-    //   const latestCart = res?.cartItems ? res : await getCart()
+      const updatedCart = await getCart()
+      const existingItem = updatedCart?.cartItems?.find(
+        (item) => item.variantId?._id === variantId
+      )
+      const currentQty = existingItem?.quantity || 0
 
-    //   dispatch(setCartItems(latestCart?.cartItems || []))
-    //   setSnackbar({
-    //     type: 'success',
-    //     message: 'Thêm sản phẩm vào giỏ hàng thành công!'
-    //   })
-    //   setQuantity(1)
-    // } catch (error) {
-    //   console.error('Thêm vào giỏ hàng lỗi:', error)
-    //   setSnackbar({ type: 'error', message: 'Thêm sản phẩm thất bại!' })
-    // } finally {
-    //   setTimeout(() => {
-    //     setIsAdding((prev) => ({ ...prev, [product._id]: false }))
-    //   }, 500)
-    // }
+      if (currentQty + quantity > availableQuantity) {
+        setSnackbar({
+          type: 'warning',
+          message: `Bạn chỉ có thể thêm tối đa ${availableQuantity - currentQty} sản phẩm cho biến thể này!`
+        })
+        return
+      }
+
+      const res = await addToCart({
+        cartItems: [{ variantId, quantity }]
+      })
+
+      const latestCart = res?.cartItems ? res : await getCart()
+      dispatch(setCartItems(latestCart?.cartItems || []))
+
+      setSnackbar({
+        type: 'success',
+        message: 'Thêm sản phẩm vào giỏ hàng thành công!'
+      })
+      setQuantity(1)
+    } catch (error) {
+      console.error('Thêm vào giỏ hàng lỗi:', error)
+      setSnackbar({ type: 'error', message: 'Thêm sản phẩm thất bại!' })
+    } finally {
+      setIsAdding(false)
+    }
   }
+
+
 
   // Handle buy now
   const handleBuyNow = () => {
@@ -356,7 +362,8 @@ const useProductDetail = (productId) => {
     handleBuyNow,
     handleCopy,
     copiedCode,
-    formatCurrencyShort
+    formatCurrencyShort,
+    inventory
   }
 }
 

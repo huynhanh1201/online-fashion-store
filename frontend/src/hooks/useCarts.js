@@ -31,18 +31,18 @@ export const useCart = () => {
       const newItem = await addToCart(payload)
       if (!newItem) return false
 
-      const newProductId = typeof newItem.productId === 'object' ? newItem.productId._id : newItem.productId
+      const newVariantId = typeof newItem.variantId === 'object' ? newItem.variantId._id : newItem.variantId
 
       const existingItem = cart.cartItems.find(item => {
-        const itemProductId = typeof item.productId === 'object' ? item.productId._id : item.productId
-        return itemProductId === newProductId
+        const itemVariantId = typeof item.variantId === 'object' ? item.variantId._id : item.variantId
+        return itemVariantId === newVariantId
       })
 
       let updatedCartItems
       if (existingItem) {
         updatedCartItems = cart.cartItems.map(item => {
-          const itemProductId = typeof item.productId === 'object' ? item.productId._id : item.productId
-          if (itemProductId === newProductId) {
+          const itemVariantId = typeof item.variantId === 'object' ? item.variantId._id : item.variantId
+          if (itemVariantId === newVariantId) {
             return {
               ...item,
               quantity: (Number(item.quantity) || 0) + (Number(newItem.quantity) || 0)
@@ -100,7 +100,8 @@ export const useCart = () => {
   const selectedCartItems = cart.cartItems.filter(item => item.selected)
   const cartCount = cart.cartItems.reduce((total, item) => total + (Number(item.quantity) || 0), 0)
 
-  const getProductId = (item) => typeof item.productId === 'object' ? item.productId._id : item.productId
+  const getVariantId = (item) =>
+    typeof item.variantId === 'object' ? item.variantId._id : item.variantId
 
   const getOrderPayload = ({
     shippingAddressId,
@@ -111,7 +112,7 @@ export const useCart = () => {
     note
   }) => ({
     cartItems: selectedCartItems.map(item => ({
-      productId: getProductId(item),
+      variantId: getVariantId(item),
       quantity: item.quantity
     })),
     shippingAddressId,
