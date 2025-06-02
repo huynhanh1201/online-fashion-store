@@ -31,11 +31,10 @@ const VariantBox = styled(Box)(({ selected }) => ({
   alignItems: 'center',
   padding: '8px 12px',
   backgroundColor: selected ? '#e3f2fd' : '#f9f9f9',
-  border: selected ? '2px solid #1A3C7B' : '1px solid #e0e0e0',
+  border: selected ? '1px solid #1A3C7B' : '1px solid #e0e0e0',
   borderRadius: '8px',
   cursor: 'pointer',
   gap: 10,
-  transition: 'all 0.2s ease',
   '&:hover': {
     backgroundColor: selected ? '#e3f2fd' : '#f0f0f0',
     borderColor: selected ? '#1A3C7B' : '#bdbdbd'

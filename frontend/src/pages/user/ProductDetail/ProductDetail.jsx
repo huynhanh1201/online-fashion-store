@@ -7,7 +7,6 @@ import ProductInfoSection from './ProductInfoSection'
 import ProductDescription from './ProductDescription'
 import VoucherDrawer from './VoucherDrawer'
 import SnackbarAlert from './SnackbarAlert'
-import ProductReview from './ProductReview'
 
 const ProductDetail = () => {
   const { productId } = useParams()
@@ -127,9 +126,8 @@ const ProductDetail = () => {
           />
         </Grid>
       </Grid>
-      <ProductDescription description={product.description} />
-      <Box sx={{ mt: 5 }}>
-        <ProductReview />
+      <Box sx={{ mt: 10 }}>
+        <ProductDescription description={product.description} />
       </Box>
       <VoucherDrawer
         open={openVoucherDrawer}

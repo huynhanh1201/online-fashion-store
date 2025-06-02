@@ -202,7 +202,6 @@ const useProductDetail = (productId) => {
         (v) => v.color.name === selectedColor && v.size.name === size
       )
       setSelectedVariant(variant || null)
-      console.log('Selected variant (size change):', variant) // Debug
     } else {
       setSelectedVariant(null) // Reset if color is not selected
     }
@@ -224,8 +223,6 @@ const useProductDetail = (productId) => {
 
   // Get current images
   const getCurrentImages = () => {
-    console.log('selectedVariant.color.image:', selectedVariant?.color?.image)
-    console.log('product.images:', product?.images)
     if (selectedVariant && selectedVariant.color?.image) {
       return [selectedVariant.color.image]
     }
