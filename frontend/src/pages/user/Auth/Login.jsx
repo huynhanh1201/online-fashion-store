@@ -28,7 +28,8 @@ import { useNavigate, useSearchParams } from 'react-router-dom'
 import { loginUserAPI } from '~/redux/user/userSlice'
 import { getProfileUser } from '~/services/userService'
 import { logoutUserAPI } from '~/redux/user/userSlice'
-
+import CheckCircleOutline from '@mui/icons-material/CheckCircleOutline'
+import InfoOutlined from '@mui/icons-material/InfoOutlined'
 const SocialButton = styled(Button)({
   padding: '8px',
   borderRadius: '50%',
@@ -93,7 +94,7 @@ function Login() {
         alignItems: 'center',
         justifyContent: 'center',
         backgroundImage:
-          'url("https://inuv247.com/wp-content/uploads/2022/12/11702107_21201466-2-1536x614.jpg")',
+          'url("https://png.pngtree.com/background/20230426/original/pngtree-an-image-of-a-clothing-store-picture-image_2490513.jpg")',
         backgroundRepeat: 'no-repeat',
         backgroundSize: 'cover',
         backgroundPosition: 'center',
@@ -101,24 +102,24 @@ function Login() {
         p: 2
       }}
     >
-      <Button
-        variant='contained'
-        color='secondary'
-        onClick={() => navigate('/')}
-        sx={{
-          position: 'absolute',
-          top: 16,
-          left: 16,
-          zIndex: 10,
-          borderRadius: 2,
-          textTransform: 'none',
-          fontWeight: 500,
-          px: 2
-        }}
-        startIcon={<ArrowBack />}
-      >
-        Trang chủ
-      </Button>
+      {/*<Button*/}
+      {/*  variant='contained'*/}
+      {/*  color='secondary'*/}
+      {/*  onClick={() => navigate('/')}*/}
+      {/*  sx={{*/}
+      {/*    position: 'absolute',*/}
+      {/*    top: 16,*/}
+      {/*    left: 16,*/}
+      {/*    zIndex: 10,*/}
+      {/*    borderRadius: 2,*/}
+      {/*    textTransform: 'none',*/}
+      {/*    fontWeight: 500,*/}
+      {/*    px: 2*/}
+      {/*  }}*/}
+      {/*  startIcon={<ArrowBack />}*/}
+      {/*>*/}
+      {/*  Trang chủ*/}
+      {/*</Button>*/}
 
       <form onSubmit={handleSubmit(submitLogIn)}>
         <Zoom in={true} style={{ transitionDelay: '200ms' }}>
@@ -145,9 +146,22 @@ function Login() {
                 <Alert
                   variant='outlined'
                   severity='success'
-                  sx={{ textAlign: 'left' }}
+                  icon={<CheckCircleOutline sx={{ color: '#2e7d32' }} />}
+                  sx={{
+                    textAlign: 'left',
+                    borderRadius: '8px',
+                    borderColor: '#4caf50',
+                    backgroundColor: '#e8f5e9',
+                    color: '#1b5e20',
+                    fontWeight: 500,
+                    padding: '12px 16px',
+                    boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+                    '& .MuiAlert-icon': {
+                      alignItems: 'center'
+                    }
+                  }}
                 >
-                  Tài khoản đã được xác thực.
+                  Tài khoản đã được xác thực thành công!
                 </Alert>
               )}
 
@@ -155,10 +169,23 @@ function Login() {
                 <Alert
                   variant='outlined'
                   severity='info'
-                  sx={{ textAlign: 'left' }}
+                  icon={<InfoOutlined sx={{ color: '#0288d1' }} />}
+                  sx={{
+                    textAlign: 'left',
+                    borderRadius: '8px',
+                    borderColor: '#03a9f4',
+                    backgroundColor: '#e3f2fd',
+                    color: '#01579b',
+                    fontWeight: 500,
+                    padding: '12px 16px',
+                    boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+                    '& .MuiAlert-icon': {
+                      alignItems: 'center'
+                    }
+                  }}
                 >
-                  Vui lòng vào gmail <b>{registeredEmail}</b> để xác thực tài
-                  khoản trước khi sử dụng dịch vụ.
+                  Vui lòng kiểm tra email <b>{registeredEmail}</b> để xác thực
+                  tài khoản trước khi sử dụng dịch vụ.
                 </Alert>
               )}
             </Box>

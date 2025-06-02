@@ -1,9 +1,25 @@
 import React, { useState, useEffect } from 'react'
 import {
-  Box, Container, Table, TableHead, TableRow, TableCell, TableBody,
-  Typography, IconButton, TextField, Avatar, Button, Checkbox,
-  Snackbar, Alert, Dialog, DialogActions, DialogContent,
-  DialogContentText, DialogTitle
+  Box,
+  Container,
+  Table,
+  TableHead,
+  TableRow,
+  TableCell,
+  TableBody,
+  Typography,
+  IconButton,
+  TextField,
+  Avatar,
+  Button,
+  Checkbox,
+  Snackbar,
+  Alert,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle
 } from '@mui/material'
 import { Delete, Add, Remove, DeleteForever } from '@mui/icons-material'
 import { useCart } from '~/hooks/useCarts'
@@ -27,8 +43,10 @@ const Cart = () => {
     if (cart?.cartItems) setCartItems(cart.cartItems)
   }, [cart])
 
-  const allSelected = cartItems.length > 0 && selectedItems.length === cartItems.length
-  const someSelected = selectedItems.length > 0 && selectedItems.length < cartItems.length
+  const allSelected =
+    cartItems.length > 0 && selectedItems.length === cartItems.length
+  const someSelected =
+    selectedItems.length > 0 && selectedItems.length < cartItems.length
 
   const handleSelectAll = () => {
     let newSelected = []
@@ -171,34 +189,48 @@ const Cart = () => {
   }
 
   return (
-    <Container maxWidth='xl' sx={{ minHeight: '70vh', mt: 10, mb: 5, overflowX: 'auto' }}>
+    <Container
+      maxWidth='xl'
+      sx={{ minHeight: '70vh', mt: 10, mb: 5, overflowX: 'auto' }}
+    >
       <Table size='medium' sx={{ minWidth: 650 }}>
         <TableHead>
           <TableRow>
-            <TableCell padding="checkbox" sx={{ width: 50 }}>
+            <TableCell padding='checkbox' sx={{ width: 50 }}>
               <Checkbox
                 indeterminate={someSelected}
                 checked={allSelected}
                 onChange={handleSelectAll}
-                color="primary"
+                color='primary'
               />
             </TableCell>
-            <TableCell align='left' sx={{ fontWeight: 'bold' }}>Sản phẩm</TableCell>
-            <TableCell align='center' sx={{ fontWeight: 'bold', width: 120 }}>Giá</TableCell>
-            <TableCell align='center' sx={{ fontWeight: 'bold', width: 130 }}>Số lượng</TableCell>
-            <TableCell align='center' sx={{ fontWeight: 'bold', width: 90 }}>Thao tác</TableCell>
+            <TableCell align='left' sx={{ fontWeight: 'bold' }}>
+              Sản phẩm
+            </TableCell>
+            <TableCell align='center' sx={{ fontWeight: 'bold', width: 120 }}>
+              Giá
+            </TableCell>
+            <TableCell align='center' sx={{ fontWeight: 'bold', width: 130 }}>
+              Số lượng
+            </TableCell>
+            <TableCell align='center' sx={{ fontWeight: 'bold', width: 90 }}>
+              Thao tác
+            </TableCell>
           </TableRow>
         </TableHead>
-
         <TableBody>
           {cartItems.length === 0 ? (
             <TableRow>
-              <TableCell colSpan={5} align='center' sx={{ py: 8, fontSize: '1.2rem', color: 'text.secondary' }}>
+              <TableCell
+                colSpan={5}
+                align='center'
+                sx={{ py: 8, fontSize: '1.2rem', color: 'text.secondary' }}
+              >
                 Giỏ hàng của bạn đang trống
               </TableCell>
             </TableRow>
           ) : (
-            cartItems.map(item => {
+            cartItems.map((item) => {
               const product = item.productId
               if (!product) return null
 
@@ -227,7 +259,12 @@ const Cart = () => {
                         <Avatar
                           src={product.image?.[0] || '/default.jpg'}
                           variant='square'
-                          sx={{ width: 64, height: 64, borderRadius: 1, objectFit: 'cover' }}
+                          sx={{
+                            width: 64,
+                            height: 64,
+                            borderRadius: 1,
+                            objectFit: 'cover'
+                          }}
                         />
                       </Box>
                       <Box>
@@ -253,11 +290,18 @@ const Cart = () => {
 
                     </Box>
                   </TableCell>
-                  <TableCell align='center' sx={{ fontWeight: '600', color: '#007B00' }}>
+                  <TableCell
+                    align='center'
+                    sx={{ fontWeight: '600', color: '#007B00' }}
+                  >
                     {formatPrice(product.price)}
                   </TableCell>
                   <TableCell align='center'>
-                    <Box display='flex' alignItems='center' justifyContent='center'>
+                    <Box
+                      display='flex'
+                      alignItems='center'
+                      justifyContent='center'
+                    >
                       <IconButton
                         size='small'
                         onClick={() => handleQuantityChange(product._id, -1, item.color, item.size)}
@@ -271,7 +315,10 @@ const Cart = () => {
                         value={item.quantity}
                         size='small'
                         sx={{ width: 50, mx: 1 }}
-                        inputProps={{ style: { textAlign: 'center' }, readOnly: true }}
+                        inputProps={{
+                          style: { textAlign: 'center' },
+                          readOnly: true
+                        }}
                       />
                       <IconButton
                         size='small'
@@ -333,7 +380,6 @@ const Cart = () => {
           >
             Thanh toán
           </Button>
-
           <Button
             variant='outlined'
             color='error'
@@ -348,7 +394,6 @@ const Cart = () => {
           >
             Xoá toàn bộ
           </Button>
-
         </Box>
       </Box>
 
@@ -358,7 +403,11 @@ const Cart = () => {
         onClose={() => setShowMaxQuantityAlert(false)}
         anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
       >
-        <Alert onClose={() => setShowMaxQuantityAlert(false)} severity='warning' sx={{ width: '100%' }}>
+        <Alert
+          onClose={() => setShowMaxQuantityAlert(false)}
+          severity='warning'
+          sx={{ width: '100%' }}
+        >
           Số lượng sản phẩm đã hết!
         </Alert>
       </Snackbar>
