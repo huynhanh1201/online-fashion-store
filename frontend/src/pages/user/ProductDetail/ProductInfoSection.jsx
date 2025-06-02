@@ -82,7 +82,7 @@ const ProductInfoSection = ({
         fontWeight={700}
         sx={{ wordBreak: 'break-word', whiteSpace: 'pre-wrap' }}
       >
-        {selectedVariant?.name || product?.name || 'Sản phẩm không tên'}
+        {product?.name}
       </Typography>
 
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
