@@ -7,7 +7,7 @@ import {
   CircularProgress
 } from '@mui/material'
 import { useParams } from 'react-router-dom'
-import useProductDetail from '~/hooks/useProductDetail'
+import useProductDetail from '~/pages/user/ProductDetail/useProductDetail'
 import ProductImageSection from './ProductImageSection'
 import ProductInfoSection from './ProductInfoSection'
 import ProductDescription from './ProductDescription'
