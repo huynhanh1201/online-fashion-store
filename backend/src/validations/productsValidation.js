@@ -23,7 +23,6 @@ const product = async (req, res, next) => {
       .required(), // bắt buộc :contentReference[oaicite:0]{index=0}
 
     description: Joi.string() // description không bắt buộc
-      .max(1000) // giới hạn độ dài nếu cần
       .trim()
       .allow('', null), // cho phép bỏ trống hoặc null :contentReference[oaicite:1]{index=1}
 
