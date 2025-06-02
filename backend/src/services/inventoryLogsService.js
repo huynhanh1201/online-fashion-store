@@ -1,4 +1,6 @@
 import { InventoryLogModel } from '~/models/InventoryLogModel'
+import apiError from '~/utils/ApiError'
+import { StatusCodes } from 'http-status-codes'
 
 const createInventoryLog = async (reqBody) => {
   // eslint-disable-next-line no-useless-catch
@@ -16,8 +18,50 @@ const createInventoryLog = async (reqBody) => {
   }
 }
 
-const getInventoryLogList = async () => {
-  const result = await InventoryLogModel.find({})
+const getInventoryLogList = async (queryString) => {
+  let { page = 1, limit = 10, inventoryId, batchId, type, source } = queryString
+
+  // Kiểm tra dữ liệu đầu vào của limit và page
+  limit = Number(limit)
+  page = Number(page)
+
+  if (!limit || limit < 1) {
+    throw new apiError(
+      StatusCodes.UNPROCESSABLE_ENTITY,
+      'Query string "limit" phải là số và lớn hơn 0'
+    )
+  }
+
+  if (!page || page < 1) {
+    throw new apiError(
+      StatusCodes.UNPROCESSABLE_ENTITY,
+      'Query string "page" phải là số và lớn hơn 0'
+    )
+  }
+
+  const filter = {}
+
+  // Kiểm tra data query string
+
+  if (inventoryId) {
+    filter['inventoryId'] = inventoryId
+  }
+
+  if (batchId) {
+    filter['batchId'] = batchId
+  }
+
+  if (type) {
+    filter['type'] = type
+  }
+
+  if (source) {
+    filter['source'] = source
+  }
+
+  const result = await InventoryLogModel.find(filter)
+    .skip((page - 1) * limit)
+    .limit(limit)
     .populate({
       path: 'inventoryId',
       populate: [
