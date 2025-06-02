@@ -4,8 +4,16 @@ const handleCreateInventory = async () => {
   return 'Empty'
 }
 
-const getInventoryList = async () => {
-  const result = await InventoryModel.find({ destroy: false })
+const getInventoryList = async (variantId) => {
+  const filter = {
+    destroy: false
+  }
+
+  if (variantId) {
+    filter['variantId'] = variantId
+  }
+
+  const result = await InventoryModel.find(filter)
     .populate([
       {
         path: 'variantId',
