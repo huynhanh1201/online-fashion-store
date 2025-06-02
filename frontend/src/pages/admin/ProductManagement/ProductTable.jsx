@@ -19,10 +19,10 @@ const ProductTable = ({ products, loading, handleOpenModal }) => {
               STT
             </StyledTableCell>
             <StyledTableCell sx={{ width: '50px' }}>Ảnh</StyledTableCell>
-            <StyledTableCell sx={{ width: '25%' }}>Tên</StyledTableCell>
+            <StyledTableCell sx={{ width: '100%' }}>Tên</StyledTableCell>
             <StyledTableCell sx={{ width: '150px' }}>Giá (VNĐ)</StyledTableCell>
             <StyledTableCell sx={{ width: '70px' }}>Số lượng</StyledTableCell>
-            <StyledTableCell sx={{ width: '100%' }}>Mô tả</StyledTableCell>
+            <StyledTableCell sx={{ width: '100px' }}>Mô tả</StyledTableCell>
             <StyledTableCell sx={{ width: '250px' }}>Xuất xứ</StyledTableCell>
             <StyledTableCell sx={{ width: '100px' }}>Danh mục</StyledTableCell>
             <StyledTableCell sx={{ width: '70px' }}>Trạng thái</StyledTableCell>

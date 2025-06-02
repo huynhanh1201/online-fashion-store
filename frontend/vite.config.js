@@ -7,5 +7,8 @@ export default defineConfig({
   // base: './'
   resolve: {
     alias: [{ find: '~', replacement: '/src' }]
+  },
+  define: {
+    global: 'window'
   }
 })
