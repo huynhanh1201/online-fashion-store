@@ -125,7 +125,9 @@ const ProductDetail = () => {
           />
         </Grid>
       </Grid>
-      <ProductDescription description={product.description} />
+      <Box sx={{ mt: 10 }}>
+        <ProductDescription description={product.description} />
+      </Box>
       <Box sx={{ mt: 5 }}>
         <ProductReview />
       </Box>

@@ -3,6 +3,7 @@ import { Box } from '@mui/material'
 import Slider from './Slider/Slider'
 import ProductCategories from './ProductCategories/ProductCategories'
 import ProductList from './ProductList/ProductList'
+import ProductListTest from './ProductListTest/ProductListTest'
 import ProductBestSale from './ProductBestSale/ProductBestSale'
 import StoreIntroduction from './StoreIntroduction/StoreIntroduction'
 import CouponList from './CouponList/CouponList'
@@ -14,6 +15,7 @@ const UserHome = () => {
       <ProductBestSale />
       <CouponList />
       <ProductList />
+      <ProductListTest />
       <StoreIntroduction />
     </>
   )

@@ -220,7 +220,7 @@ const Search = () => {
                       color='primary'
                       fontWeight={500}
                     >
-                      {product.price.toLocaleString()} VND
+                      {(product.exportPrice ?? 0).toLocaleString()} VND
                     </Typography>
                   </Box>
                 </Box>
