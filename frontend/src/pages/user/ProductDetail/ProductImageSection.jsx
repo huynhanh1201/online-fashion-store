@@ -34,10 +34,6 @@ const ProductImageSection = ({
   // Reset isThumbnailClicked khi selectedVariant thay đổi
   React.useEffect(() => {
     setIsThumbnailClicked(false)
-    console.log(
-      'Reset isThumbnailClicked due to selectedVariant change:',
-      selectedVariant
-    ) // Debug
   }, [selectedVariant])
 
   // Lấy danh sách ảnh hiện tại
@@ -56,9 +52,6 @@ const ProductImageSection = ({
     : selectedVariant?.color?.image
       ? selectedVariant.color.image
       : displayImages[selectedImageIndex] || displayImages[0] || '/default.jpg'
-
-  console.log('mainImage:', mainImage) // Debug
-  console.log('isThumbnailClicked:', isThumbnailClicked) // Debug
 
   return (
     <Box sx={{ width: 400, height: 450, mb: 5 }}>

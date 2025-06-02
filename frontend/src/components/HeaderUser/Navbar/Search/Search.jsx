@@ -127,7 +127,7 @@ const Search = () => {
   const handleSubmit = (e) => {
     e.preventDefault()
     if (searchText.trim()) {
-      navigate(`/products?search=${encodeURIComponent(searchText.trim())}`)
+      navigate(`/searchresult?search=${encodeURIComponent(searchText.trim())}`)
       setShowInput(false)
       setSuggestions([])
       setErrorMessage('')
@@ -209,18 +209,10 @@ const Search = () => {
                     </Typography>
                     <Typography
                       variant='body2'
-                      color='text.secondary'
-                      noWrap
-                      sx={{ maxWidth: '200px' }}
-                    >
-                      {product.description}
-                    </Typography>
-                    <Typography
-                      variant='body2'
                       color='primary'
                       fontWeight={500}
                     >
-                      {product.price.toLocaleString()} VND
+                      {(product.exportPrice ?? 0).toLocaleString()} VND
                     </Typography>
                   </Box>
                 </Box>

@@ -18,7 +18,7 @@ import Profile from '~/pages/user/Profile/Profile'
 import Order from '~/pages/user/Orders/OrderListPage'
 import PaymentVnpay from '~/pages/user/PaymentVnpay/PaymentVnpay'
 import OrderSuccess from './pages/OrderSuccess/OrderSuccess'
-
+import SearchResult from '~/pages/user/SearchResult/SearchResult'
 // Trang HeaderAdmin
 import AdminLayout from '~/layout/AdminLayout'
 import AdminHome from '~/pages/admin/Home/index'
@@ -82,6 +82,7 @@ function App() {
           <Route path='profile' element={<Profile />} />
           <Route path='orders' element={<Order />} />
           <Route path='order-detail/:orderId' element={<OrderDetail />} />
+          <Route path='searchresult' element={<SearchResult />} />
         </Route>
         <Route index element={<UserHome />} />
       </Route>
