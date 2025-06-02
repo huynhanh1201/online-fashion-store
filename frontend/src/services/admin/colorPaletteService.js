@@ -33,7 +33,9 @@ export const createColorPalette = async (productId, data) => {
 
 export const getColorPaletteById = async (id) => {
   try {
-    const response = await AuthorizedAxiosInstance.get(`${BASE_URL}/${id}`)
+    const response = await AuthorizedAxiosInstance.get(
+      `${BASE_URL}?productId=${id}`
+    )
     return response.data
   } catch (error) {
     console.error('Lỗi khi lấy màu theo ID:', error)

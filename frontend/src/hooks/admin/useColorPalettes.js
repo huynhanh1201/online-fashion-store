@@ -3,7 +3,8 @@ import {
   getColorPalettes,
   createColorPalette,
   updateColorPalette,
-  deleteColorPalette
+  deleteColorPalette,
+  getColorPaletteById
 } from '~/services/admin/colorPaletteService'
 
 const useColorPalettes = (productId) => {
@@ -58,6 +59,15 @@ const useColorPalettes = (productId) => {
       throw error
     }
   }
+  const getColorPaletteId = async (colorId) => {
+    try {
+      const color = await getColorPaletteById(colorId)
+      return color
+    } catch (error) {
+      console.error('Lỗi khi lấy thông tin màu:', error)
+      throw error
+    }
+  }
 
   useEffect(() => {
     fetchColorPalettes()
@@ -70,7 +80,8 @@ const useColorPalettes = (productId) => {
     fetchColorPalettes,
     addColorPalette,
     editColorPalette,
-    removeColorPalette
+    removeColorPalette,
+    getColorPaletteId
   }
 }
 
