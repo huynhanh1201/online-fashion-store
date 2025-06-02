@@ -399,7 +399,7 @@ import DeleteIcon from '@mui/icons-material/Delete'
 import ViewInventoryModal from '../modal/Inventory/ViewInventoryModal.jsx'
 import EditInventoryModal from '../modal/Inventory/EditInventoryModal.jsx'
 import DeleteInventoryModal from '../modal/Inventory/DeleteInventoryModal.jsx'
-import AddWarehouseSlipModal from '~/pages/admin/InventoryManagementTest/modal/WarehouseSlip/AddWarehouseSlipModal.jsx'
+import AddWarehouseSlipModal from '~/pages/admin/InventoryManagement/modal/WarehouseSlip/AddWarehouseSlipModal.jsx'
 
 const InventoryTab = ({
   data,
@@ -418,12 +418,25 @@ const InventoryTab = ({
   addWarehouseSlip,
   fetchWarehouses,
   fetchPartner,
-  batches
+  batches,
+  products,
+  refreshColors,
+  refreshProducts,
+  refreshSizes,
+  refreshVariants
 }) => {
-  const [filterWarehouse, setFilterWarehouse] = useState('all')
-  const [filterColor, setFilterColor] = useState('all')
-  const [filterSize, setFilterSize] = useState('all')
-  const [filterStatus, setFilterStatus] = useState('all')
+  // Các state filter nâng cao
+  const [filterWarehouse, setFilterWarehouse] = useState('all') // warehouseId
+  const [filterVariant, setFilterVariant] = useState('all') // variantId
+  const [filterProduct, setFilterProduct] = useState('all') // productId
+  const [filterStatus, setFilterStatus] = useState('all') // in_stock | out_of_stock | low_stock
+  const [filterColor, setFilterColor] = useState('all') // color
+  const [filterSize, setFilterSize] = useState('all') // size
+  const [filterKeyword, setFilterKeyword] = useState('') // keyword (SKU hoặc tên sản phẩm)
+  const [filterMinQuantity, setFilterMinQuantity] = useState('') // minQuantity (số)
+  const [filterCreatedAtFrom, setFilterCreatedAtFrom] = useState('') // createdAtFrom (yyyy-mm-dd)
+  const [filterCreatedAtTo, setFilterCreatedAtTo] = useState('') // createdAtTo (yyyy-mm-dd)
+
   const [openViewModal, setOpenViewModal] = useState(false)
   const [openEditModal, setOpenEditModal] = useState(false)
   const [openDeleteModal, setOpenDeleteModal] = useState(false)
@@ -445,27 +458,83 @@ const InventoryTab = ({
   ])
   useEffect(() => {
     refreshInventories()
+    refreshVariants()
+    refreshProducts()
+    refreshSizes()
+    refreshColors()
+    fetchWarehouses()
   }, [])
 
   const enrichedInventories = data.map((item) => {
     const variant = variants.find((v) => v.id === item.variantId)
-    // const warehouse = warehouses.find((w) => w.id === item.warehouseId)
+    const product = products.find((p) => p.id === (variant?.productId || ''))
+    const warehouse = warehouses.find((w) => w.id === item.warehouseId)
+
     return {
       ...item,
-      variantId: item.variantId.sku || {},
-      warehouse: item.warehouseId?.name || 'N/A',
-      variantName: item.variantId?.name || 'N/A',
+      warehouseId: item.warehouseId || '',
+      warehouseName: warehouse?.name || 'N/A',
+      variantId: item.variantId || '',
+      variantSku: variant?.sku || '',
+      variantName: variant?.name || 'N/A',
+      productId: product?.id || '',
+      productName: product?.name || 'N/A',
       color: variant?.color?.name || 'N/A',
       size: variant?.size?.name || 'N/A'
     }
   })
+
+  // Hàm kiểm tra trạng thái tồn kho (status)
+  const getInventoryStatus = (item) => {
+    if (item.quantity === 0) return 'out_of_stock'
+    if (item.quantity > 0 && item.quantity <= item.minQuantity)
+      return 'low_stock'
+    return 'in_stock'
+  }
+
   const filteredInventories = enrichedInventories.filter((item) => {
-    return (
-      (filterWarehouse === 'all' || item.warehouse === filterWarehouse) &&
-      (filterColor === 'all' || item.color === filterColor) &&
-      (filterSize === 'all' || item.size === filterSize) &&
-      (filterStatus === 'all' || item.status === filterStatus)
+    // warehouseId
+    if (filterWarehouse !== 'all' && item.warehouseId !== filterWarehouse)
+      return false
+    // variantId
+    if (filterVariant !== 'all' && item.variantId !== filterVariant)
+      return false
+    // productId
+    if (filterProduct !== 'all' && item.productId !== filterProduct)
+      return false
+    // status
+    if (filterStatus !== 'all' && getInventoryStatus(item) !== filterStatus)
+      return false
+    // color
+    if (filterColor !== 'all' && item.color !== filterColor) return false
+    // size
+    if (filterSize !== 'all' && item.size !== filterSize) return false
+    // minQuantity
+    if (filterMinQuantity !== '' && item.quantity < Number(filterMinQuantity))
+      return false
+    // keyword (tìm trên SKU biến thể hoặc tên sản phẩm)
+    if (
+      filterKeyword.trim() !== '' &&
+      !(
+        item.variantSku.toLowerCase().includes(filterKeyword.toLowerCase()) ||
+        item.productName.toLowerCase().includes(filterKeyword.toLowerCase())
+      )
     )
+      return false
+    // createdAtFrom
+    if (
+      filterCreatedAtFrom !== '' &&
+      new Date(item.createdAt) < new Date(filterCreatedAtFrom)
+    )
+      return false
+    // createdAtTo
+    if (
+      filterCreatedAtTo !== '' &&
+      new Date(item.createdAt) > new Date(filterCreatedAtTo + 'T23:59:59')
+    )
+      return false
+
+    return true
   })
 
   const inventoryColumns = [
