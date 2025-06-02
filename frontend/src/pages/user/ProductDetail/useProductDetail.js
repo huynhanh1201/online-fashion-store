@@ -210,13 +210,13 @@ const useProductDetail = (productId) => {
   const getCurrentPrice = () => {
     if (selectedVariant) {
       return {
-        price: selectedVariant.exportPrice || 0,
-        discountPrice: selectedVariant.discountPrice || null
+        price: selectedVariant.exportPrice,
+        discountPrice: selectedVariant.discountPrice
       }
     }
     return {
-      price: product?.price || 0,
-      discountPrice: product?.discountPrice || null
+      price: product?.exportPrice,
+      discountPrice: product?.discountPrice
     }
   }
 

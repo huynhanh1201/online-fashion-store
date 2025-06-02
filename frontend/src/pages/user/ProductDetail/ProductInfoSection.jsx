@@ -184,8 +184,13 @@ const ProductInfoSection = ({
                           key={`${color.name}-${size.name}`}
                           selected={isSelected}
                           onClick={() => {
-                            handleColorChange(color.name)
-                            handleSizeChange(size.name)
+                            if (isSelected) {
+                              handleColorChange(null)
+                              handleSizeChange(null)
+                            } else {
+                              handleColorChange(color.name)
+                              handleSizeChange(size.name)
+                            }
                           }}
                         >
                           <VariantImage
@@ -211,25 +216,6 @@ const ProductInfoSection = ({
               </Box>
             ))}
           </Box>
-
-          {selectedVariant && (
-            <Box
-              sx={{
-                mt: 2,
-                p: 2,
-                backgroundColor: '#f8f9fa',
-                borderRadius: 2,
-                border: '1px solid #e9ecef'
-              }}
-            >
-              <Typography variant='body2' fontWeight={600} color='primary'>
-                Đã chọn: {selectedVariant.name}
-              </Typography>
-              <Typography variant='caption' color='text.secondary'>
-                SKU: {selectedVariant.sku}
-              </Typography>
-            </Box>
-          )}
         </Box>
       )}
 
