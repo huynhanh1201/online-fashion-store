@@ -60,3 +60,25 @@ export const updateProfile = async (data) => {
     return { error: errorData }
   }
 }
+export const changePassword = async ({
+  oldPassword,
+  newPassword,
+  confirmNewPassword
+}) => {
+  try {
+    const response = await AuthorizedAxiosInstance.patch(
+      `${API_ROOT}/v1/users/password`,
+      { oldPassword, newPassword, confirmNewPassword },
+      {
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      }
+    )
+    return response.data
+  } catch (error) {
+    const errorData = error?.response?.data || { message: 'Lỗi không xác định' }
+    console.error('Lỗi khi đổi mật khẩu:', errorData)
+    return { error: errorData }
+  }
+}

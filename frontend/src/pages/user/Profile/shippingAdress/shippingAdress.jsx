@@ -1,44 +1,23 @@
 import React, { useState, useEffect } from 'react'
-import {
-  Box,
-  Button,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
-  Divider,
-  IconButton,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Paper,
-  TextField,
-  Typography,
-  MenuItem,
-  Select,
-  InputLabel,
-  FormControl
-} from '@mui/material'
+import { Box, Button, Divider, Paper, Typography } from '@mui/material'
 import AddIcon from '@mui/icons-material/Add'
-import DeleteIcon from '@mui/icons-material/Delete'
-import EditIcon from '@mui/icons-material/Edit'
-import VisibilityIcon from '@mui/icons-material/Visibility'
 import {
   getShippingAddresses,
   addShippingAddress,
   updateShippingAddress,
   deleteShippingAddress
 } from '~/services/addressService'
+import AddressTable from './AddressTable'
+import AddressDialog from './AddressDialog'
+import ViewAddressDialog from './ViewAddressDialog'
+import ConfirmDeleteDialog from './ConfirmDeleteDialog'
 
 function ShippingAddress({ showSnackbar }) {
   const [addresses, setAddresses] = useState([])
   const [openAddressDialog, setOpenAddressDialog] = useState(false)
   const [openViewDialog, setOpenViewDialog] = useState(false)
-  const [openConfirmDialog, setOpenConfirmDialog] = useState(false) // New state for confirmation dialog
-  const [addressToDelete, setAddressToDelete] = useState(null) // New state for address to delete
+  const [openConfirmDialog, setOpenConfirmDialog] = useState(false)
+  const [addressToDelete, setAddressToDelete] = useState(null)
   const [editAddressId, setEditAddressId] = useState(null)
   const [viewAddress, setViewAddress] = useState(null)
   const [provinces, setProvinces] = useState([])
@@ -400,73 +379,15 @@ function ShippingAddress({ showSnackbar }) {
           </Button>
         </Box>
         <Divider sx={{ mb: 2 }} />
-        <TableContainer component={Paper} sx={{ width: '100%' }}>
-          <Table
-            sx={{ minWidth: { xs: '100%', sm: 450 }, width: '100%' }}
-            aria-label='address table'
-          >
-            <TableHead>
-              <TableRow>
-                <TableCell>Họ và tên</TableCell>
-                <TableCell>Số điện thoại</TableCell>
-                <TableCell>Địa chỉ</TableCell>
-                <TableCell>Phường/Xã</TableCell>
-                <TableCell>Quận/Huyện</TableCell>
-                <TableCell>Tỉnh/Thành</TableCell>
-                <TableCell align='right'>Hành động</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {addresses.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={7} align='center'>
-                    <Typography color='text.secondary'>
-                      Chưa có địa chỉ giao hàng
-                    </Typography>
-                  </TableCell>
-                </TableRow>
-              ) : (
-                addresses.map((addr) => (
-                  <TableRow
-                    key={addr._id}
-                    sx={{
-                      '&:last-child td, &:last-child th': { border: 0 }
-                    }}
-                  >
-                    <TableCell>{addr.fullName}</TableCell>
-                    <TableCell>{addr.phone}</TableCell>
-                    <TableCell>{addr.address}</TableCell>
-                    <TableCell>{addr.ward}</TableCell>
-                    <TableCell>{addr.district}</TableCell>
-                    <TableCell>{addr.city}</TableCell>
-                    <TableCell align='right'>
-                      <IconButton
-                        onClick={() => handleViewAddress(addr)}
-                        sx={{ mr: 1 }}
-                      >
-                        <VisibilityIcon color='info' />
-                      </IconButton>
-                      <IconButton
-                        onClick={() => handleEditAddress(addr)}
-                        sx={{ mr: 1 }}
-                      >
-                        <EditIcon color='primary' />
-                      </IconButton>
-                      <IconButton onClick={() => handleDeleteAddress(addr._id)}>
-                        <DeleteIcon color='error' />
-                      </IconButton>
-                    </TableCell>
-                  </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
-        </TableContainer>
+        <AddressTable
+          addresses={addresses}
+          onView={handleViewAddress}
+          onEdit={handleEditAddress}
+          onDelete={handleDeleteAddress}
+        />
       </Paper>
 
-      {/* Dialog thêm/sửa địa chỉ */}
-      <Dialog
-        style={{ marginTop: '100px' }}
+      <AddressDialog
         open={openAddressDialog}
         onClose={() => {
           setOpenAddressDialog(false)
@@ -480,259 +401,30 @@ function ShippingAddress({ showSnackbar }) {
             ward: ''
           })
         }}
-        fullWidth
-        maxWidth='sm'
-      >
-        <DialogTitle>
-          {editAddressId ? 'Sửa địa chỉ' : 'Thêm địa chỉ mới'}
-        </DialogTitle>
-        <DialogContent>
-          <TextField
-            margin='dense'
-            label='Họ và tên'
-            fullWidth
-            value={formData.fullName}
-            onChange={(e) => handleFormChange('fullName', e.target.value)}
-            error={formErrors.fullName}
-            helperText={
-              formErrors.fullName ? 'Tên phải có ít nhất 3 ký tự' : ''
-            }
-          />
-          <TextField
-            margin='dense'
-            label='Số điện thoại'
-            fullWidth
-            value={formData.phone}
-            onChange={(e) => handleFormChange('phone', e.target.value)}
-            error={formErrors.phone}
-            helperText={
-              formErrors.phone ? 'Số điện thoại phải là 10 chữ số' : ''
-            }
-          />
-          <FormControl fullWidth margin='dense' error={formErrors.city}>
-            <InputLabel>Tỉnh/Thành phố</InputLabel>
-            <Select
-              value={formData.city}
-              onChange={(e) => handleFormChange('city', e.target.value)}
-              label='Tỉnh/Thành phố'
-            >
-              <MenuItem value=''>
-                <em>Chọn tỉnh/thành</em>
-              </MenuItem>
-              {provinces.map((province) => (
-                <MenuItem key={province.code} value={province.code}>
-                  {province.name}
-                </MenuItem>
-              ))}
-            </Select>
-            {formErrors.city && (
-              <Typography color='error' variant='caption'>
-                Vui lòng chọn tỉnh/thành
-              </Typography>
-            )}
-          </FormControl>
+        editAddressId={editAddressId}
+        formData={formData}
+        formErrors={formErrors}
+        provinces={provinces}
+        districts={districts}
+        wards={wards}
+        onFormChange={handleFormChange}
+        onSave={handleAddOrUpdateAddress}
+      />
 
-          <FormControl fullWidth margin='dense' error={formErrors.district}>
-            <InputLabel>Quận/Huyện</InputLabel>
-            <Select
-              value={formData.district}
-              onChange={(e) => handleFormChange('district', e.target.value)}
-              label='Quận/Huyện'
-              disabled={!formData.city}
-            >
-              <MenuItem value=''>
-                <em>Chọn quận/huyện</em>
-              </MenuItem>
-              {districts.map((district) => (
-                <MenuItem key={district.code} value={district.code}>
-                  {district.name}
-                </MenuItem>
-              ))}
-            </Select>
-            {formErrors.district && (
-              <Typography color='error' variant='caption'>
-                Vui lòng chọn quận/huyện
-              </Typography>
-            )}
-          </FormControl>
-
-          <FormControl fullWidth margin='dense' error={formErrors.ward}>
-            <InputLabel>Phường/Xã</InputLabel>
-            <Select
-              value={formData.ward}
-              onChange={(e) => handleFormChange('ward', e.target.value)}
-              label='Phường/Xã'
-              disabled={!formData.district}
-            >
-              <MenuItem value=''>
-                <em>Chọn phường/xã</em>
-              </MenuItem>
-              {wards.map((ward) => (
-                <MenuItem key={ward.code} value={ward.code}>
-                  {ward.name}
-                </MenuItem>
-              ))}
-            </Select>
-            {formErrors.ward && (
-              <Typography color='error' variant='caption'>
-                Vui lòng chọn phường/xã
-              </Typography>
-            )}
-          </FormControl>
-
-          <TextField
-            margin='dense'
-            label='Số nhà, tên đường'
-            fullWidth
-            value={formData.address}
-            onChange={(e) => handleFormChange('address', e.target.value)}
-            error={formErrors.address}
-            helperText={
-              formErrors.address
-                ? 'Số nhà, tên đường phải có ít nhất 5 ký tự'
-                : ''
-            }
-          />
-        </DialogContent>
-        <DialogActions>
-          <Button
-            onClick={() => {
-              setOpenAddressDialog(false)
-              setEditAddressId(null)
-              setFormData({
-                fullName: '',
-                phone: '',
-                address: '',
-                city: '',
-                district: '',
-                ward: ''
-              })
-            }}
-            sx={{ textTransform: 'none' }}
-          >
-            Hủy
-          </Button>
-          <Button
-            onClick={handleAddOrUpdateAddress}
-            variant='contained'
-            sx={{ textTransform: 'none' }}
-            disabled={
-              !formData.fullName ||
-              !formData.phone ||
-              !formData.address ||
-              !formData.city ||
-              !formData.district ||
-              !formData.ward ||
-              formErrors.fullName ||
-              formErrors.phone ||
-              formErrors.address
-            }
-          >
-            {editAddressId ? 'Lưu' : 'Thêm'}
-          </Button>
-        </DialogActions>
-      </Dialog>
-
-      {/* Dialog xem địa chỉ */}
-      <Dialog
+      <ViewAddressDialog
         open={openViewDialog}
         onClose={() => setOpenViewDialog(false)}
-        fullWidth
-        maxWidth='sm'
-      >
-        <DialogTitle>Xem địa chỉ</DialogTitle>
-        <DialogContent>
-          {viewAddress && (
-            <>
-              <TextField
-                margin='dense'
-                label='Họ và tên'
-                fullWidth
-                value={viewAddress.fullName}
-                InputProps={{ readOnly: true }}
-              />
-              <TextField
-                margin='dense'
-                label='Số điện thoại'
-                fullWidth
-                value={viewAddress.phone}
-                InputProps={{ readOnly: true }}
-              />
-              <TextField
-                margin='dense'
-                label='Số nhà, tên đường'
-                fullWidth
-                value={viewAddress.address}
-                InputProps={{ readOnly: true }}
-              />
-              <TextField
-                margin='dense'
-                label='Phường/Xã'
-                fullWidth
-                value={viewAddress.ward}
-                InputProps={{ readOnly: true }}
-              />
-              <TextField
-                margin='dense'
-                label='Quận/Huyện'
-                fullWidth
-                value={viewAddress.district}
-                InputProps={{ readOnly: true }}
-              />
-              <TextField
-                margin='dense'
-                label='Tỉnh/Thành phố'
-                fullWidth
-                value={viewAddress.city}
-                InputProps={{ readOnly: true }}
-              />
-            </>
-          )}
-        </DialogContent>
-        <DialogActions>
-          <Button
-            onClick={() => setOpenViewDialog(false)}
-            sx={{ textTransform: 'none' }}
-          >
-            Đóng
-          </Button>
-        </DialogActions>
-      </Dialog>
+        address={viewAddress}
+      />
 
-      {/* Dialog xác nhận xóa */}
-      <Dialog
+      <ConfirmDeleteDialog
         open={openConfirmDialog}
         onClose={() => {
           setOpenConfirmDialog(false)
           setAddressToDelete(null)
         }}
-        fullWidth
-        maxWidth='xs'
-      >
-        <DialogTitle>Xác nhận xóa</DialogTitle>
-        <DialogContent>
-          <Typography>Bạn có chắc chắn muốn xóa địa chỉ này?</Typography>
-        </DialogContent>
-        <DialogActions>
-          <Button
-            onClick={() => {
-              setOpenConfirmDialog(false)
-              setAddressToDelete(null)
-            }}
-            sx={{ textTransform: 'none' }}
-          >
-            Hủy
-          </Button>
-          <Button
-            onClick={confirmDeleteAddress}
-            variant='contained'
-            color='error'
-            sx={{ textTransform: 'none' }}
-          >
-            Xóa
-          </Button>
-        </DialogActions>
-      </Dialog>
+        onConfirm={confirmDeleteAddress}
+      />
     </div>
   )
 }
