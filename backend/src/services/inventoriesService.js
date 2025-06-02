@@ -1,19 +1,52 @@
 import { InventoryModel } from '~/models/InventoryModel'
+import apiError from '~/utils/ApiError'
+import { StatusCodes } from 'http-status-codes'
 
 const handleCreateInventory = async () => {
   return 'Empty'
 }
 
-const getInventoryList = async (variantId) => {
+const getInventoryList = async (queryString) => {
+  let { limit = 10, page = 1, warehouseId, variantId, status } = queryString
+
   const filter = {
     destroy: false
+  }
+
+  // Kiểm tra dữ liệu đầu vào của limit và page
+  limit = Number(limit)
+  page = Number(page)
+
+  if (!limit || limit < 1) {
+    throw new apiError(
+      StatusCodes.UNPROCESSABLE_ENTITY,
+      'Query string "limit" phải là số và lớn hơn 0'
+    )
+  }
+
+  if (!page || page < 1) {
+    throw new apiError(
+      StatusCodes.UNPROCESSABLE_ENTITY,
+      'Query string "page" phải là số và lớn hơn 0'
+    )
+  }
+
+  // Kiểm tra dữ liệu của query string
+  if (warehouseId) {
+    filter['warehouseId'] = warehouseId
   }
 
   if (variantId) {
     filter['variantId'] = variantId
   }
 
+  if (status) {
+    filter['status'] = status
+  }
+
   const result = await InventoryModel.find(filter)
+    .skip((page - 1) * limit)
+    .limit(limit)
     .populate([
       {
         path: 'variantId',
