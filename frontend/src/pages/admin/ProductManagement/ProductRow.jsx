@@ -76,8 +76,10 @@ const ProductRow = ({ index, product, handleOpenModal }) => {
             overflow: 'hidden',
             textOverflow: 'ellipsis'
           }}
+          onClick={() => handleOpenModal('viewDesc', product)}
+          sx={{ cursor: 'pointer' }}
         >
-          {product.description}
+          <p>xem mô tả</p>
         </StyledTableCell>
         <StyledTableCell
           sx={{

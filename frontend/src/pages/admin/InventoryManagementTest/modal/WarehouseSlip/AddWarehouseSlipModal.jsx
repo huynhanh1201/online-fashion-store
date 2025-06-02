@@ -148,7 +148,7 @@ export default function AddWarehouseSlipModal({
           <Card variant='outlined' sx={{ mb: 2 }}>
             <CardContent>
               <Grid container spacing={2}>
-                <Grid item size={12} sm={6} md={4}>
+                <Grid item size={4} sm={6} md={4}>
                   <DatePicker
                     sx={{ width: '100%' }}
                     label='Ngày nhập'
@@ -159,7 +159,7 @@ export default function AddWarehouseSlipModal({
                     )}
                   />
                 </Grid>
-                <Grid item size={12} sm={6} md={4}>
+                <Grid item size={4} sm={6} md={4}>
                   <FormControl fullWidth>
                     <InputLabel>Kho nhập hàng</InputLabel>
                     <Select
@@ -175,7 +175,7 @@ export default function AddWarehouseSlipModal({
                     </Select>
                   </FormControl>
                 </Grid>
-                <Grid item size={12} sm={6} md={4}>
+                <Grid item size={4} sm={6} md={4}>
                   <FormControl fullWidth>
                     <InputLabel>Nhà cung cấp</InputLabel>
                     <Select
