@@ -1,80 +1,9 @@
-import React, { useState } from 'react'
-
-const sampleProducts = [
-  {
-    id: 1,
-    name: 'iPhone 15 Pro Maxbdjabdjbadjbadasbd',
-    price: 29990000,
-    originalPrice: 32990000,
-    rating: 4.8,
-    reviews: 1234,
-    image: 'https://intphcm.com/data/upload/mau-banner-dep.jpg',
-    category: 'Điện thoại',
-    brand: 'Appleasaaaa',
-    inStock: true,
-    discount: 9
-  },
-  {
-    id: 2,
-    name: 'Samsung Galaxy S24 Ultraaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
-    price: 26990000,
-    originalPrice: 28990000,
-    rating: 4.7,
-    reviews: 856,
-    image:
-      'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=300&h=300&fit=crop',
-    category: 'Điện thoại',
-    brand: 'Samsung',
-    inStock: true,
-    discount: 7
-  },
-  {
-    id: 3,
-    name: 'MacBook Pro M3 14 inch',
-    price: 45990000,
-    originalPrice: 49990000,
-    rating: 4.9,
-    reviews: 432,
-    image:
-      'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=300&h=300&fit=crop',
-    category: 'Laptop',
-    brand: 'Apple',
-    inStock: true,
-    discount: 8
-  },
-  {
-    id: 4,
-    name: 'Dell XPS 13 Plus',
-    price: 35990000,
-    originalPrice: 38990000,
-    rating: 4.6,
-    reviews: 298,
-    image:
-      'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=300&h=300&fit=crop',
-    category: 'Laptop',
-    brand: 'Dell',
-    inStock: false,
-    discount: 8
-  },
-  {
-    id: 5,
-    name: 'AirPods Pro 2',
-    price: 5990000,
-    originalPrice: 6990000,
-    rating: 4.5,
-    reviews: 1876,
-    image:
-      'https://images.unsplash.com/photo-1588423771073-b8903fbb85b5?w=300&h=300&fit=crop',
-    category: 'Tai nghe',
-    brand: 'Apple',
-    inStock: true,
-    discount: 14
-  }
-]
+import React, { useState, useEffect } from 'react'
+import { useLocation } from 'react-router-dom'
+import { getProducts } from '~/services/productService'
 
 const styles = {
   container: {
-    backgroundColor: '#f5f5f5',
     minHeight: '100vh',
     fontFamily:
       '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif'
@@ -328,19 +257,22 @@ const styles = {
 }
 
 export default function SearchResults() {
-  const [searchQuery, setSearchQuery] = useState('')
-  const [sortBy, setSortBy] = useState('popular')
+  const [products, setProducts] = useState([])
   const [currentPage, setCurrentPage] = useState(1)
+  const [errorMessage, setErrorMessage] = useState('')
   const [favorites, setFavorites] = useState(new Set())
-  const [products] = useState(sampleProducts)
+  const location = useLocation()
+
+  // Lấy truy vấn tìm kiếm từ URL
+  const query = new URLSearchParams(location.search).get('search') || ''
 
   const formatPrice = (price) => {
     return price.toLocaleString('vi-VN') + 'đ'
   }
 
   const renderStars = (rating) => {
-    const fullStars = Math.floor(rating)
-    const hasHalfStar = rating % 1 !== 0
+    const fullStars = Math.floor(rating || 0)
+    const hasHalfStar = (rating || 0) % 1 !== 0
     const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0)
 
     return (
@@ -351,101 +283,142 @@ export default function SearchResults() {
       </span>
     )
   }
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const { products } = await getProducts(1, 20) // Giả sử API hỗ trợ phân trang
+        const filtered = products
+          .filter((p) => p.name.toLowerCase().includes(query.toLowerCase()))
+          .map((p) => ({
+            id: p._id,
+            name: p.name,
+            price: p.exportPrice || 0,
+            originalPrice: p.originalPrice || p.exportPrice * 1.1, // Giả lập nếu không có originalPrice
+            rating: p.rating || 4.5, // Giá trị mặc định nếu không có
+            reviews: p.reviews || Math.floor(Math.random() * 1000) + 100, // Giả lập
+            image: p.image?.[0] || '/fallback.jpg',
+            category: p.category || 'Không xác định', // Giả lập
+            brand: p.brand || 'Không xác định', // Giả lập
+            inStock: p.inStock !== undefined ? p.inStock : true, // Giả lập
+            discount: p.discount || Math.floor(Math.random() * 10) + 5 // Giả lập
+          }))
+
+        if (filtered.length === 0) {
+          setProducts([])
+          setErrorMessage('Không tìm thấy sản phẩm phù hợp')
+        } else {
+          setProducts(filtered)
+          setErrorMessage('')
+        }
+      } catch (error) {
+        console.error('Lỗi khi tìm kiếm sản phẩm:', error)
+        setProducts([])
+        setErrorMessage('Có lỗi xảy ra khi tìm kiếm sản phẩm')
+      }
+    }
+
+    const debounce = setTimeout(fetchProducts, 300)
+    return () => clearTimeout(debounce)
+  }, [query, currentPage])
+
   return (
     <div style={styles.container}>
       <main style={styles.main}>
-        {/* Results Header */}
         <section style={styles.resultsHeader}>
-          <h2 style={styles.resultsTitle}>Kết quả tìm kiếm</h2>
+          <h2 style={styles.resultsTitle}>
+            Kết quả tìm kiếm cho: "{query || 'Tất cả'}"
+          </h2>
           <p style={styles.resultsCount}>
             Tìm thấy {products.length} sản phẩm phù hợp
           </p>
         </section>
 
-        {/* Products Grid */}
-        <section style={styles.productsGrid}>
-          {products.map((product) => (
-            <div
-              key={product.id}
-              style={styles.productCard}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.transform = 'translateY(-8px) scale(1.02)'
-                e.currentTarget.style.boxShadow =
-                  '0 20px 40px rgba(26, 60, 123, 0.15)'
-                const img = e.currentTarget.querySelector('img')
-                if (img) img.style.transform = 'scale(1.1)'
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.transform = 'translateY(0) scale(1)'
-                e.currentTarget.style.boxShadow = '0 6px 25px rgba(0,0,0,0.08)'
-                const img = e.currentTarget.querySelector('img')
-                if (img) img.style.transform = 'scale(1)'
-              }}
-            >
-              <div style={styles.productImageWrapper}>
-                <img
-                  src={product.image}
-                  alt={product.name}
-                  style={styles.productImage}
-                />
-                {product.discount > 0 && (
-                  <div style={styles.discountBadge}>-{product.discount}%</div>
-                )}
-                {!product.inStock && (
-                  <div style={styles.outOfStockOverlay}>Tạm hết hàng</div>
-                )}
-              </div>
-
-              <div style={styles.productContent}>
-                <h3 style={styles.productName}>{product.name}</h3>
-
-                <div style={styles.ratingSection}>
-                  {renderStars(product.rating)}
-                  <span style={styles.reviewCount}>
-                    ({product.reviews.toLocaleString()})
-                  </span>
-                </div>
-
-                <div style={styles.priceSection}>
-                  <span style={styles.currentPrice}>
-                    {formatPrice(product.price)}
-                  </span>
-                  {product.originalPrice > product.price && (
-                    <span style={styles.originalPrice}>
-                      {formatPrice(product.originalPrice)}
-                    </span>
+        {errorMessage ? (
+          <p style={styles.resultsCount}>{errorMessage}</p>
+        ) : (
+          <section style={styles.productsGrid}>
+            {products.map((product) => (
+              <div
+                key={product.id}
+                style={styles.productCard}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform =
+                    'translateY(-8px) scale(1.02)'
+                  e.currentTarget.style.boxShadow =
+                    '0 20px 40px rgba(26, 60, 123, 0.15)'
+                  const img = e.currentTarget.querySelector('img')
+                  if (img) img.style.transform = 'scale(1.1)'
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = 'translateY(0) scale(1)'
+                  e.currentTarget.style.boxShadow =
+                    '0 6px 25px rgba(0,0,0,0.08)'
+                  const img = e.currentTarget.querySelector('img')
+                  if (img) img.style.transform = 'scale(1)'
+                }}
+                onClick={() =>
+                  (window.location.href = `/productdetail/${product.id}`)
+                }
+              >
+                <div style={styles.productImageWrapper}>
+                  <img
+                    src={product.image}
+                    alt={product.name}
+                    style={styles.productImage}
+                    onError={(e) => {
+                      e.target.onerror = null
+                      e.target.src = '/fallback.jpg'
+                    }}
+                  />
+                  {!product.inStock && (
+                    <div style={styles.outOfStockOverlay}>Tạm hết hàng</div>
                   )}
                 </div>
 
-                <button
-                  style={{
-                    ...styles.addToCartButton,
-                    ...(product.inStock ? {} : styles.disabledButton)
-                  }}
-                  disabled={!product.inStock}
-                  onMouseEnter={(e) => {
-                    if (product.inStock) {
-                      e.target.style.transform = 'translateY(-2px)'
-                      e.target.style.boxShadow =
-                        '0 6px 20px rgba(26, 60, 123, 0.4)'
-                    }
-                  }}
-                  onMouseLeave={(e) => {
-                    if (product.inStock) {
-                      e.target.style.transform = 'translateY(0)'
-                      e.target.style.boxShadow =
-                        '0 4px 12px rgba(26, 60, 123, 0.3)'
-                    }
-                  }}
-                >
-                  🛒 {product.inStock ? 'Thêm vào giỏ hàng' : 'Tạm hết hàng'}
-                </button>
-              </div>
-            </div>
-          ))}
-        </section>
+                <div style={styles.productContent}>
+                  <h3 style={styles.productName}>{product.name}</h3>
 
-        {/* Pagination */}
+                  <div style={styles.priceSection}>
+                    <span style={styles.currentPrice}>
+                      {formatPrice(product.price)}
+                    </span>
+                    {product.originalPrice > product.price && (
+                      <span style={styles.originalPrice}>
+                        {formatPrice(product.originalPrice)}
+                      </span>
+                    )}
+                  </div>
+
+                  <button
+                    style={{
+                      ...styles.addToCartButton,
+                      ...(product.inStock ? {} : styles.disabledButton)
+                    }}
+                    disabled={!product.inStock}
+                    onMouseEnter={(e) => {
+                      if (product.inStock) {
+                        e.target.style.transform = 'translateY(-2px)'
+                        e.target.style.boxShadow =
+                          '0 6px 20px rgba(26, 60, 123, 0.4)'
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      if (product.inStock) {
+                        e.target.style.transform = 'translateY(0)'
+                        e.target.style.boxShadow =
+                          '0 4px 12px rgba(26, 60, 123, 0.3)'
+                      }
+                    }}
+                  >
+                    🛒 {product.inStock ? 'Thêm vào giỏ hàng' : 'Tạm hết hàng'}
+                  </button>
+                </div>
+              </div>
+            ))}
+          </section>
+        )}
+
         <div style={styles.pagination}>
           {[1, 2, 3, 4, 5].map((page) => (
             <button
