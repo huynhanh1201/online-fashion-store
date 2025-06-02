@@ -1,4 +1,5 @@
-import React, { useState } from 'react'
+// WarehousesTab.js
+import React, { useState, useEffect } from 'react'
 import {
   Paper,
   Table,
@@ -10,10 +11,17 @@ import {
   TablePagination,
   Typography,
   Box,
-  Button
+  Button,
+  IconButton
 } from '@mui/material'
 import VisibilityIcon from '@mui/icons-material/Visibility'
+import EditIcon from '@mui/icons-material/Edit'
+import DeleteIcon from '@mui/icons-material/Delete'
 import AddWarehouseModal from '../modal/Warehouse/AddWarehouseModal.jsx'
+import EditWarehouseModal from '../modal/Warehouse/EditWarehouseModal.jsx'
+import ViewWarehouseModal from '../modal/Warehouse/ViewWarehouseModal.jsx'
+import DeleteWarehouseModal from '../modal/Warehouse/DeleteWarehouseModal.jsx' // Thêm modal mới
+
 const WarehousesTab = ({
   data,
   page,
@@ -21,6 +29,8 @@ const WarehousesTab = ({
   onPageChange,
   onRowsPerPageChange,
   addWarehouse,
+  updateWarehouse,
+  deleteWarehouse,
   refreshWarehouses
 }) => {
   const warehouseColumns = [
@@ -30,19 +40,58 @@ const WarehousesTab = ({
     { id: 'ward', label: 'Phường', minWidth: 100 },
     { id: 'district', label: 'Quận', minWidth: 100 },
     { id: 'city', label: 'Thành phố', minWidth: 100 },
-    { id: 'action', label: 'Hành động', minWidth: 100, align: 'center' }
+    { id: 'action', label: 'Hành động', minWidth: 150, align: 'center' }
   ]
+
   const [openAddModal, setOpenAddModal] = useState(false)
+  const [openEditModal, setOpenEditModal] = useState(false)
+  const [openViewModal, setOpenViewModal] = useState(false) // Thêm state cho View modal
+  const [openDeleteModal, setOpenDeleteModal] = useState(false) // Thêm state cho Delete modal
+  const [selectedWarehouse, setSelectedWarehouse] = useState(null)
+
+  useEffect(() => {
+    refreshWarehouses()
+  }, [])
+
   const handleAddWarehouse = () => {
     setOpenAddModal(true)
   }
+
   const handleCloseAddModal = () => {
     setOpenAddModal(false)
     refreshWarehouses()
   }
+
+  const handleViewWarehouse = (warehouse) => {
+    setSelectedWarehouse(warehouse)
+    setOpenViewModal(true) // Mở View modal
+  }
+
+  const handleEditWarehouse = (warehouse) => {
+    setSelectedWarehouse(warehouse)
+    setOpenEditModal(true)
+  }
+
+  const handleCloseEditModal = () => {
+    setOpenEditModal(false)
+    setSelectedWarehouse(null)
+    refreshWarehouses()
+  }
+
+  const handleDeleteWarehouse = (warehouse) => {
+    setSelectedWarehouse(warehouse)
+    setOpenDeleteModal(true) // Mở Delete modal
+  }
+
+  const handleCloseDeleteModal = () => {
+    setOpenDeleteModal(false)
+    setSelectedWarehouse(null)
+    refreshWarehouses()
+  }
+
   return (
     <Paper sx={{ border: '1px solid #ccc', width: '100%', overflow: 'hidden' }}>
-      <TableContainer sx={{ maxHeight: 440 }}>
+      <TableContainer>
         <Table stickyHeader aria-label='warehouses table'>
           <TableHead>
             <TableRow>
@@ -61,7 +110,7 @@ const WarehousesTab = ({
                     variant='contained'
                     color='primary'
                     sx={{ mr: 1 }}
-                    onClick={() => handleAddWarehouse()}
+                    onClick={handleAddWarehouse}
                   >
                     Thêm kho hàng
                   </Button>
@@ -90,15 +139,33 @@ const WarehousesTab = ({
                     if (column.id === 'action') {
                       return (
                         <TableCell key={column.id} align={column.align}>
-                          <VisibilityIcon />
+                          <IconButton
+                            onClick={() => handleViewWarehouse(row)}
+                            size='small'
+                            color='primary'
+                          >
+                            <VisibilityIcon />
+                          </IconButton>
+                          <IconButton
+                            onClick={() => handleEditWarehouse(row)}
+                            size='small'
+                            color='info'
+                          >
+                            <EditIcon />
+                          </IconButton>
+                          <IconButton
+                            onClick={() => handleDeleteWarehouse(row)}
+                            size='small'
+                            color='error'
+                          >
+                            <DeleteIcon />
+                          </IconButton>
                         </TableCell>
                       )
                     }
                     return (
                       <TableCell key={column.id} align={column.align}>
-                        {column.format && typeof value === 'number'
-                          ? column.format(value)
-                          : value}
+                        {value}
                       </TableCell>
                     )
                   })}
@@ -107,6 +174,7 @@ const WarehousesTab = ({
           </TableBody>
         </Table>
       </TableContainer>
+
       <TablePagination
         rowsPerPageOptions={[10, 25, 100]}
         component='div'
@@ -116,10 +184,31 @@ const WarehousesTab = ({
         onPageChange={onPageChange}
         onRowsPerPageChange={onRowsPerPageChange}
       />
+
       <AddWarehouseModal
         open={openAddModal}
         onClose={handleCloseAddModal}
         onSave={addWarehouse}
+      />
+
+      <ViewWarehouseModal
+        open={openViewModal}
+        onClose={() => setOpenViewModal(false)}
+        warehouse={selectedWarehouse}
+      />
+
+      <EditWarehouseModal
+        open={openEditModal}
+        onClose={handleCloseEditModal}
+        warehouse={selectedWarehouse}
+        onSave={updateWarehouse}
+      />
+
+      <DeleteWarehouseModal
+        open={openDeleteModal}
+        onClose={handleCloseDeleteModal}
+        warehouse={selectedWarehouse}
+        onSave={deleteWarehouse}
       />
     </Paper>
   )

@@ -65,7 +65,7 @@ export const createBatch = async (data) => {
 
 export const updateBatch = async (id, data) => {
   try {
-    const response = await AuthorizedAxiosInstance.put(
+    const response = await AuthorizedAxiosInstance.patch(
       `${API_ROOT}/v1/batches/${id}`,
       data
     )

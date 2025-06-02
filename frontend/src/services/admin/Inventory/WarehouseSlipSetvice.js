@@ -40,3 +40,28 @@ export const createWarehouseSlip = async (data) => {
     return null
   }
 }
+
+export const updateWarehouseSlip = async (id, data) => {
+  try {
+    const response = await AuthorizedAxiosInstance.patch(
+      `${API_ROOT}/v1/warehouse-slips/${id}`,
+      data
+    )
+    return response.data
+  } catch (error) {
+    console.error('Error updating warehouse slip:', error)
+    return null
+  }
+}
+
+export const deleteWarehouseSlip = async (id) => {
+  try {
+    const response = await AuthorizedAxiosInstance.delete(
+      `${API_ROOT}/v1/warehouse-slips/${id}`
+    )
+    return response.data
+  } catch (error) {
+    console.error('Error deleting warehouse slip:', error)
+    return null
+  }
+}
