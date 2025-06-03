@@ -27,7 +27,7 @@ import { Editor } from 'react-draft-wysiwyg'
 import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css'
 import { EditorState, convertToRaw } from 'draft-js'
 import draftToHtml from 'draftjs-to-html'
-
+import EditIcon from '@mui/icons-material/Edit'
 const URI = 'https://api.cloudinary.com/v1_1/dkwsy9sph/image/upload'
 const CloudinaryColor = 'color_upload'
 const CloudinaryProduct = 'product_upload'
@@ -80,7 +80,9 @@ const AddProductModal = ({ open, onClose, onSuccess }) => {
   const [productImagePreview, setProductImagePreview] = useState([])
   const [editorState, setEditorState] = useState(EditorState.createEmpty())
 
-  const productImageInputRef = useRef()
+  const productImageInputRef = useRef(null) // input file cho thêm ảnh
+  const productImageEditInputRef = useRef(null) // input file cho sửa ảnh
+  const editImageIndexRef = useRef(null) // lưu index ảnh đang sửa
 
   const { categories, fetchCategories, loading } = useCategories()
 
@@ -106,7 +108,6 @@ const AddProductModal = ({ open, onClose, onSuccess }) => {
       const uploadedUrls = await Promise.all(
         files.map((file) => uploadToCloudinary(file, CloudinaryProduct))
       )
-
       setProductImages((prev) => [...prev, ...uploadedUrls])
       setProductImagePreview((prev) => [...prev, ...uploadedUrls])
     } catch (error) {
@@ -118,9 +119,50 @@ const AddProductModal = ({ open, onClose, onSuccess }) => {
     }
   }
 
+  // Xoá ảnh
   const handleRemoveProductImage = (index) => {
     setProductImages((prev) => prev.filter((_, i) => i !== index))
     setProductImagePreview((prev) => prev.filter((_, i) => i !== index))
+  }
+
+  // Mở hộp chọn file sửa ảnh
+  const handleEditProductImage = (index) => {
+    editImageIndexRef.current = index
+    if (productImageEditInputRef.current) {
+      productImageEditInputRef.current.click()
+    }
+  }
+
+  // Xử lý upload ảnh sửa
+  const handleProductImageEditFileChange = async (e) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    try {
+      const uploadedUrl = await uploadToCloudinary(file, CloudinaryProduct)
+      if (uploadedUrl) {
+        const index = editImageIndexRef.current
+        if (index !== null) {
+          setProductImages((prev) => {
+            const newImages = [...prev]
+            newImages[index] = uploadedUrl
+            return newImages
+          })
+          setProductImagePreview((prev) => {
+            const newPreviews = [...prev]
+            newPreviews[index] = uploadedUrl
+            return newPreviews
+          })
+        }
+      }
+    } catch (error) {
+      alert('Có lỗi khi upload ảnh. Vui lòng thử lại.')
+      console.error(error)
+    }
+
+    if (productImageEditInputRef.current) {
+      productImageEditInputRef.current.value = ''
+    }
   }
 
   const onSubmit = async (data) => {
@@ -221,126 +263,138 @@ const AddProductModal = ({ open, onClose, onSuccess }) => {
             />
           </Grid>
           <Grid item size={12}>
-            <Typography variant='h6' style={{ marginBottom: '16px' }}>
-              Thêm ảnh sản phẩm
-            </Typography>
-            <Grid container spacing={1} alignItems='center' sx={{ mb: 2 }}>
-              <Grid
-                item
-                size={2}
-                style={{
-                  display: 'flex',
-                  alignItems: 'start',
-                  justifyContent: 'start',
-                  flexDirection: 'column',
-                  gap: '16px',
-                  height: '56px'
-                }}
-              >
-                <Grid item>
-                  <Button
-                    sx={{ height: '56px' }}
-                    variant='outlined'
-                    component='label'
-                    disabled={productImages.length >= 9}
-                  >
-                    Chọn ảnh sản phẩm
-                    <input
-                      type='file'
-                      accept='image/*'
-                      multiple
-                      hidden
-                      ref={productImageInputRef}
-                      onChange={handleProductImageFileChange}
-                    />
-                  </Button>
-                </Grid>
-                <Grid item>
-                  <Typography variant='body2' color='text.secondary'>
-                    {`Đã thêm ${productImages.length}/9 ảnh`}
-                  </Typography>
-                </Grid>
-                {productImagePreview.length > 0 && (
-                  <Grid
-                    item
-                    xs={12}
-                    sx={{ display: 'flex', gap: 1, mt: 1 }}
-                    style={{ marginTop: '16px', display: 'none' }}
-                  >
-                    {productImagePreview.map((preview, idx) => (
-                      <Box
-                        key={idx}
-                        component='img'
-                        src={preview}
-                        alt={`preview-${idx}`}
-                        sx={{
-                          width: 50,
-                          height: 50,
-                          objectFit: 'cover',
-                          borderRadius: 1,
-                          border: '1px solid #ccc'
-                        }}
-                      />
-                    ))}
-                  </Grid>
-                )}
+            <Box
+              sx={{
+                display: 'flex',
+                justifyContent: 'start',
+                flexDirection: 'row',
+                alignItems: 'center',
+                gap: '16px',
+                marginBottom: '16px'
+              }}
+            >
+              <Typography variant='h6'>Thêm ảnh sản phẩm</Typography>
+              <Grid item>
+                <Button
+                  sx={{ height: '35px' }}
+                  variant='outlined'
+                  component='label'
+                  disabled={productImages.length >= 9}
+                >
+                  Chọn ảnh sản phẩm
+                  <input
+                    type='file'
+                    accept='image/*'
+                    multiple
+                    hidden
+                    ref={productImageInputRef}
+                    onChange={handleProductImageFileChange}
+                  />
+                </Button>
               </Grid>
-              <Grid item size={10}>
-                <FormControl fullWidth>
-                  <Select
-                    value=''
-                    displayEmpty
-                    renderValue={() =>
-                      productImages.length > 0
-                        ? 'Chọn để xem và xoá ảnh'
-                        : 'Không có ảnh'
-                    }
-                  >
+              <Grid item>
+                <Typography variant='body2' color='text.secondary'>
+                  {`Đã thêm ${productImages.length}/9 ảnh`}
+                </Typography>
+              </Grid>
+            </Box>
+
+            <Grid container spacing={1} alignItems='center' sx={{ mb: 2 }}>
+              <Grid item size={12}>
+                <Box>
+                  <Grid container spacing={2}>
                     {productImages.length > 0 ? (
                       productImages.map((image, idx) => (
-                        <MenuItem key={idx} value={idx}>
+                        <Grid
+                          item
+                          key={idx}
+                          xs={6}
+                          sm={4}
+                          md={3}
+                          sx={{
+                            border: '1px solid #ccc',
+                            borderRadius: 2,
+                            p: 1,
+                            position: 'relative'
+                          }}
+                        >
+                          <Box
+                            component='img'
+                            src={image}
+                            alt={`Ảnh sản phẩm ${idx + 1}`}
+                            sx={{
+                              width: '100%',
+                              height: 140,
+                              objectFit: 'cover',
+                              borderRadius: 1
+                            }}
+                          />
+                          <Typography
+                            variant='body2'
+                            sx={{ mt: 1, mb: 1, textAlign: 'center' }}
+                          >
+                            Ảnh {idx + 1}
+                          </Typography>
                           <Box
                             sx={{
                               display: 'flex',
-                              alignItems: 'center',
-                              width: '100%'
+                              justifyContent: 'space-around'
                             }}
                           >
-                            <img
-                              src={image}
-                              alt={`product-image-${idx}`}
-                              style={{
-                                width: 40,
-                                height: 40,
-                                objectFit: 'cover',
-                                borderRadius: 4,
-                                marginRight: 12
-                              }}
-                            />
-                            <Typography variant='body2' sx={{ flexGrow: 1 }}>
-                              Ảnh {idx + 1}
-                            </Typography>
-                            <IconButton
-                              edge='end'
-                              color='error'
+                            <Button
                               size='small'
-                              onClick={(e) => {
-                                e.stopPropagation()
-                                handleRemoveProductImage(idx)
-                              }}
+                              variant='outlined'
+                              startIcon={<EditIcon />}
+                              onClick={() => handleEditProductImage(idx)}
                             >
-                              <DeleteIcon />
-                            </IconButton>
+                              Sửa
+                            </Button>
+                            <Button
+                              size='small'
+                              color='error'
+                              variant='outlined'
+                              startIcon={<DeleteIcon />}
+                              onClick={() => handleRemoveProductImage(idx)}
+                            >
+                              Xoá
+                            </Button>
                           </Box>
-                        </MenuItem>
+                        </Grid>
                       ))
                     ) : (
-                      <MenuItem disabled value=''>
-                        Không có ảnh
-                      </MenuItem>
+                      <Typography>Không có ảnh nào</Typography>
                     )}
-                  </Select>
-                </FormControl>
+                  </Grid>
+
+                  {/* Input ẩn để thêm ảnh mới */}
+                  <input
+                    type='file'
+                    multiple
+                    accept='image/*'
+                    style={{ display: 'none' }}
+                    ref={productImageInputRef}
+                    onChange={handleProductImageFileChange}
+                  />
+                  {/* Input ẩn để sửa ảnh */}
+                  <input
+                    type='file'
+                    accept='image/*'
+                    style={{ display: 'none' }}
+                    ref={productImageEditInputRef}
+                    onChange={handleProductImageEditFileChange}
+                  />
+
+                  {/* Nút bấm mở hộp chọn file thêm ảnh */}
+                  <Button
+                    variant='contained'
+                    sx={{ mt: 2 }}
+                    style={{ display: 'none' }}
+                    onClick={() => productImageInputRef.current?.click()}
+                    disabled={productImages.length >= 9}
+                  >
+                    Thêm ảnh
+                  </Button>
+                </Box>
               </Grid>
             </Grid>
           </Grid>

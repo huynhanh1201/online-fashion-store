@@ -81,10 +81,18 @@ const AddVariantModal = ({ open, onClose, addVariant, products }) => {
       if (selectedProduct) {
         setValue('importPrice', selectedProduct.importPrice || 0)
         setValue('exportPrice', selectedProduct.exportPrice || 0)
+
+        // ✅ Chỉ lấy ảnh đầu tiên nếu image là mảng
+        const firstImage = Array.isArray(selectedProduct.image)
+          ? selectedProduct.image[0]
+          : selectedProduct.image
+
+        if (firstImage) {
+          setValue('colorImage', firstImage)
+        }
       }
     }
   }, [productId, products, setValue])
-
   useEffect(() => {
     fetchColors()
     fetchSizes()
@@ -130,7 +138,7 @@ const AddVariantModal = ({ open, onClose, addVariant, products }) => {
       exportPrice,
       overridePrice
     } = data
-    console.log('DATA:', data)
+
     // Tìm sản phẩm được chọn để lấy importPrice và exportPrice
     const selectedProduct = products.find((p) => p._id === productId)
     const productImportPrice = selectedProduct?.importPrice || 0
@@ -236,7 +244,7 @@ const AddVariantModal = ({ open, onClose, addVariant, products }) => {
             <Controller
               name='color'
               control={control}
-              rules={{ required: 'Vui lòng chọn màu sắc' }}
+              rules={{ required: 'Đã có biến thể vui lòng chọn màu sắc khác' }}
               render={({ field }) => (
                 <Select {...field} label='Màu sắc'>
                   {colors.map((c) => (
@@ -262,7 +270,9 @@ const AddVariantModal = ({ open, onClose, addVariant, products }) => {
           <FormControl fullWidth error={!!errors.size}>
             <InputLabel>Kích thước</InputLabel>
             <Select
-              {...register('size', { required: 'Vui lòng chọn kích thước' })}
+              {...register('size', {
+                required: 'Đã có biến thể vui lòng chọn kích thước khác'
+              })}
               label='Kích thước'
             >
               {sizes.map((s) => (

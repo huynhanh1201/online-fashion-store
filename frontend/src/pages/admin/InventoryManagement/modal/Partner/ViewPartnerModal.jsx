@@ -7,7 +7,11 @@ import {
   Button,
   Typography,
   Box,
-  Chip
+  Chip,
+  Table,
+  TableBody,
+  TableRow,
+  TableCell
 } from '@mui/material'
 
 const getPartnerTypeLabel = (type) => {
@@ -28,24 +32,35 @@ export default function ViewPartnerModal({ open, onClose, partner }) {
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth='sm'>
       <DialogTitle>Thông tin đối tác</DialogTitle>
-      <DialogContent dividers>
-        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-          <Typography variant='subtitle1'>
-            <strong>Tên:</strong> {partner.name || '---'}
-          </Typography>
-          <Typography
-            variant='subtitle1'
-            sx={{ display: 'flex', alignItems: 'center', gap: 1 }}
-          >
-            <strong>Loại:</strong> {getPartnerTypeLabel(partner.type)}
-          </Typography>
-          <Typography variant='subtitle1'>
-            <strong>Điện thoại:</strong> {partner.contact?.phone || '---'}
-          </Typography>
-          <Typography variant='subtitle1'>
-            <strong>Email:</strong> {partner.contact?.email || '---'}
-          </Typography>
-        </Box>
+      <DialogContent>
+        <Table>
+          <TableBody>
+            <TableRow>
+              <TableCell>
+                <strong>Tên</strong>
+              </TableCell>
+              <TableCell>{partner.name || '---'}</TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell>
+                <strong>Loại</strong>
+              </TableCell>
+              <TableCell>{getPartnerTypeLabel(partner.type)}</TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell>
+                <strong>Điện thoại</strong>
+              </TableCell>
+              <TableCell>{partner.contact?.phone || '---'}</TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell>
+                <strong>Email</strong>
+              </TableCell>
+              <TableCell>{partner.contact?.email || '---'}</TableCell>
+            </TableRow>
+          </TableBody>
+        </Table>
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose} variant='contained'>

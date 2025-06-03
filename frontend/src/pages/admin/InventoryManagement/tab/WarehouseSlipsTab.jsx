@@ -33,7 +33,9 @@ const WarehouseSlipsTab = ({
   addWarehouseSlip,
   refreshWarehouseSlips,
   fetchWarehouses,
-  fetchPartner
+  fetchPartner,
+  addPartner,
+  addWarehouse
 }) => {
   const [openModal, setOpenModal] = useState(false)
   const [openViewModal, setOpenViewModal] = useState(false) // State cho View modal
@@ -286,6 +288,8 @@ const WarehouseSlipsTab = ({
         type={modalType}
         partners={partners}
         addWarehouseSlip={addWarehouseSlip}
+        addPartner={addPartner}
+        addWarehouse={addWarehouse}
       />
       <ViewWarehouseSlipModal
         open={openViewModal}
