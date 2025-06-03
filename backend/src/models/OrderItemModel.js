@@ -1,5 +1,4 @@
 import mongoose from 'mongoose'
-import { type } from 'yarn/lib/cli'
 const { Schema, model } = mongoose
 
 // Định nghĩa schema cho đơn hàng
