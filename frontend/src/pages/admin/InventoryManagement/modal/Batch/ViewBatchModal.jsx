@@ -6,38 +6,60 @@ import {
   DialogActions,
   Button,
   Typography,
-  Grid
+  Grid,
+  Table,
+  TableBody,
+  TableRow,
+  TableCell
 } from '@mui/material'
 
 const ViewBatchModal = ({ open, onClose, batch }) => {
-  console.log('ViewBatchModal batch:', batch)
   if (!batch) return null
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth='sm' fullWidth>
       <DialogTitle>Chi Tiết Lô Hàng</DialogTitle>
-      <DialogContent dividers>
-        <Grid container spacing={2}>
-          <Grid item xs={6}>
-            <Typography variant='subtitle2'>Mã lô:</Typography>
-            <Typography>{batch.batchCode}</Typography>
-          </Grid>
-          <Grid item xs={6}>
-            <Typography variant='subtitle2'>ID Biến thể:</Typography>
-            <Typography>{batch.variantId.name}</Typography>
-          </Grid>
-          <Grid item xs={6}>
-            <Typography variant='subtitle2'>Số lượng:</Typography>
-            <Typography>{batch.quantity}</Typography>
-          </Grid>
-          <Grid item xs={6}>
-            <Typography variant='subtitle2'>Giá nhập:</Typography>
-            <Typography>{batch.importPrice}</Typography>
-          </Grid>
-        </Grid>
+      <DialogContent>
+        <Table>
+          <TableBody>
+            <TableRow>
+              <TableCell>
+                <strong>Mã lô</strong>
+              </TableCell>
+              <TableCell>{batch.batchCode || 'N/A'}</TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell>
+                <strong>Tên biến thể</strong>
+              </TableCell>
+              <TableCell>{batch.variantId?.name || 'N/A'}</TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell>
+                <strong>Số lượng</strong>
+              </TableCell>
+              <TableCell>{batch.quantity ?? 'N/A'}</TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell>
+                <strong>Giá nhập</strong>
+              </TableCell>
+              <TableCell>
+                {batch.importPrice
+                  ? batch.importPrice.toLocaleString('vi-VN', {
+                      style: 'currency',
+                      currency: 'VND'
+                    })
+                  : 'N/A'}
+              </TableCell>
+            </TableRow>
+          </TableBody>
+        </Table>
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose}>Đóng</Button>
+        <Button onClick={onClose} variant='outlined'>
+          Đóng
+        </Button>
       </DialogActions>
     </Dialog>
   )

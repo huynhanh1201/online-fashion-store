@@ -49,7 +49,7 @@ const EditBatchModal = ({ open, onClose, onSave, batch }) => {
       <form onSubmit={handleSubmit(onSubmit)}>
         <DialogContent dividers>
           <Grid container spacing={2}>
-            <Grid item xs={12}>
+            <Grid item size={12}>
               <TextField
                 label='Ngày sản xuất'
                 type='date'
@@ -60,7 +60,7 @@ const EditBatchModal = ({ open, onClose, onSave, batch }) => {
               />
             </Grid>
 
-            <Grid item xs={12}>
+            <Grid item size={12}>
               <TextField
                 label='Hạn sử dụng'
                 type='date'
@@ -71,7 +71,7 @@ const EditBatchModal = ({ open, onClose, onSave, batch }) => {
               />
             </Grid>
 
-            <Grid item xs={12}>
+            <Grid item size={12}>
               <TextField
                 label='Giá nhập'
                 type='number'

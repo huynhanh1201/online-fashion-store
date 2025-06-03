@@ -7,7 +7,11 @@ import {
   DialogActions,
   Button,
   Typography,
-  Box
+  Box,
+  Table,
+  TableBody,
+  TableRow,
+  TableCell
 } from '@mui/material'
 
 const ViewVariantModal = ({ open, onClose, variant, products }) => {
@@ -19,45 +23,73 @@ const ViewVariantModal = ({ open, onClose, variant, products }) => {
     <Dialog open={open} onClose={onClose} maxWidth='sm' fullWidth>
       <DialogTitle>Chi tiết biến thể</DialogTitle>
       <DialogContent>
-        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-          <Typography variant='subtitle1'>
-            <strong>SKU:</strong> {variant.sku || 'N/A'}
-          </Typography>
-          <Typography variant='subtitle1'>
-            <strong>Tên biến thể:</strong> {variant.name || 'N/A'}
-          </Typography>
-          <Typography variant='subtitle1'>
-            <strong>Màu sắc:</strong> {variant.color?.name || 'N/A'}
-          </Typography>
-          <Typography variant='subtitle1'>
-            <strong>Kích thước:</strong> {variant.size?.name || 'N/A'}
-          </Typography>
-          <Typography variant='subtitle1'>
-            <strong>Giá nhập:</strong>{' '}
-            {variant.importPrice
-              ? variant.importPrice.toLocaleString('vi-VN', {
-                  style: 'currency',
-                  currency: 'VND'
-                })
-              : 'N/A'}
-          </Typography>
-          <Typography variant='subtitle1'>
-            <strong>Giá bán:</strong>{' '}
-            {variant.exportPrice
-              ? variant.exportPrice.toLocaleString('vi-VN', {
-                  style: 'currency',
-                  currency: 'VND'
-                })
-              : 'N/A'}
-          </Typography>
-          <Typography variant='subtitle1'>
-            <strong>Sản phẩm:</strong>{' '}
-            {variant.productName || product?.name || 'N/A'}
-          </Typography>
-        </Box>
+        <Table>
+          <TableBody>
+            <TableRow>
+              <TableCell>
+                <strong>SKU</strong>
+              </TableCell>
+              <TableCell>{variant.sku || 'N/A'}</TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell>
+                <strong>Tên biến thể</strong>
+              </TableCell>
+              <TableCell>{variant.name || 'N/A'}</TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell>
+                <strong>Màu sắc</strong>
+              </TableCell>
+              <TableCell>{variant.color?.name || 'N/A'}</TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell>
+                <strong>Kích thước</strong>
+              </TableCell>
+              <TableCell>{variant.size?.name || 'N/A'}</TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell>
+                <strong>Giá nhập</strong>
+              </TableCell>
+              <TableCell>
+                {variant.importPrice
+                  ? variant.importPrice.toLocaleString('vi-VN', {
+                      style: 'currency',
+                      currency: 'VND'
+                    })
+                  : 'N/A'}
+              </TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell>
+                <strong>Giá bán</strong>
+              </TableCell>
+              <TableCell>
+                {variant.exportPrice
+                  ? variant.exportPrice.toLocaleString('vi-VN', {
+                      style: 'currency',
+                      currency: 'VND'
+                    })
+                  : 'N/A'}
+              </TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell>
+                <strong>Sản phẩm</strong>
+              </TableCell>
+              <TableCell>
+                {variant.productName || product?.name || 'N/A'}
+              </TableCell>
+            </TableRow>
+          </TableBody>
+        </Table>
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose}>Đóng</Button>
+        <Button onClick={onClose} variant='outlined'>
+          Đóng
+        </Button>
       </DialogActions>
     </Dialog>
   )

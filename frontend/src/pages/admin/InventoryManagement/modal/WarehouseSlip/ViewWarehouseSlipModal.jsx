@@ -24,40 +24,70 @@ const ViewWarehouseSlipModal = ({ open, onClose, slip }) => {
         Chi tiết phiếu {slip.type === 'import' ? 'nhập' : 'xuất'} kho
       </DialogTitle>
       <DialogContent>
-        <Typography variant='subtitle1' gutterBottom>
-          <strong>Mã phiếu:</strong> {slip.slipId || 'N/A'}
-        </Typography>
-        <Typography variant='subtitle1' gutterBottom>
-          <strong>Loại: </strong>
-          <Chip
-            label={slip.type}
-            color={slip.type === 'Nhập' ? 'success' : 'error'}
-            size='small'
-          />
-        </Typography>
-        <Typography variant='subtitle1' gutterBottom>
-          <strong>Kho:</strong> {slip.warehouseId.name}
-        </Typography>
-        <Typography variant='subtitle1' gutterBottom>
-          <strong>Đối tác:</strong> {slip.partnerId.name}
-        </Typography>
-        <Typography variant='subtitle1' gutterBottom>
-          <strong>Trạng thái:</strong>{' '}
-          <Chip
-            label={slip.status === 'pending' ? 'Đang xử lý' : 'Hoàn thành'}
-            color={slip.status === 'pending' ? 'warning' : 'success'}
-            size='small'
-          />
-        </Typography>
-        <Typography variant='subtitle1' gutterBottom>
-          <strong>Ngày tạo:</strong>{' '}
-          {slip.createdAt
-            ? new Date(slip.createdAt).toLocaleString('vi-VN')
-            : 'N/A'}
-        </Typography>
-        <Typography variant='subtitle1' gutterBottom>
-          <strong>Ghi chú:</strong> {slip.note || 'Không có'}
-        </Typography>
+        <Table>
+          <TableBody>
+            <TableRow>
+              <TableCell>
+                <strong>Mã phiếu</strong>
+              </TableCell>
+              <TableCell>{slip.slipId || 'N/A'}</TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell>
+                <strong>Loại</strong>
+              </TableCell>
+              <TableCell>
+                <Chip
+                  label={slip.type}
+                  color={slip.type === 'Nhập' ? 'success' : 'error'}
+                  size='small'
+                />
+              </TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell>
+                <strong>Kho</strong>
+              </TableCell>
+              <TableCell>{slip.warehouseId?.name || 'N/A'}</TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell>
+                <strong>Đối tác</strong>
+              </TableCell>
+              <TableCell>{slip.partnerId?.name || 'N/A'}</TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell>
+                <strong>Trạng thái</strong>
+              </TableCell>
+              <TableCell>
+                <Chip
+                  label={
+                    slip.status === 'pending' ? 'Đang xử lý' : 'Hoàn thành'
+                  }
+                  color={slip.status === 'pending' ? 'warning' : 'success'}
+                  size='small'
+                />
+              </TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell>
+                <strong>Ngày tạo</strong>
+              </TableCell>
+              <TableCell>
+                {slip.createdAt
+                  ? new Date(slip.createdAt).toLocaleString('vi-VN')
+                  : 'N/A'}
+              </TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell>
+                <strong>Ghi chú</strong>
+              </TableCell>
+              <TableCell>{slip.note || 'Không có'}</TableCell>
+            </TableRow>
+          </TableBody>
+        </Table>
 
         <Typography variant='h6' gutterBottom sx={{ mt: 2 }}>
           Danh sách mặt hàng

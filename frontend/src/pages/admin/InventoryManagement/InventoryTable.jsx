@@ -85,8 +85,8 @@ const InventoryTable = () => {
 
   const tabLabels = [
     'Tồn kho',
-    'Phiếu nhập/xuất',
-    'Lịch sử',
+    'Nhập/xuất kho',
+    'Lịch sử nhập/xuất kho',
     'Kho hàng',
     'Biến thể',
     'Lô hàng',
@@ -151,6 +151,8 @@ const InventoryTable = () => {
             deleteWarehouseSlip={removeWarehouseSlip}
             fetchWarehouses={fetchWarehouses}
             fetchPartner={fetchPartners}
+            addPartner={createNewPartner}
+            addWarehouse={createNewWarehouse}
           />
         )}
         {activeTab === 2 && (

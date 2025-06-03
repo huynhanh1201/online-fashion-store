@@ -393,6 +393,7 @@ import {
   IconButton,
   Button
 } from '@mui/material'
+import { filterDate } from '~/utils/constants.js'
 import VisibilityIcon from '@mui/icons-material/Visibility'
 import EditIcon from '@mui/icons-material/Edit'
 import DeleteIcon from '@mui/icons-material/Delete'
@@ -400,7 +401,7 @@ import ViewInventoryModal from '../modal/Inventory/ViewInventoryModal.jsx'
 import EditInventoryModal from '../modal/Inventory/EditInventoryModal.jsx'
 import DeleteInventoryModal from '../modal/Inventory/DeleteInventoryModal.jsx'
 import AddWarehouseSlipModal from '~/pages/admin/InventoryManagement/modal/WarehouseSlip/AddWarehouseSlipModal.jsx'
-
+import FilterByTime from '~/components/filterDateType/FilterByTime.jsx'
 const InventoryTab = ({
   data,
   variants,
@@ -423,6 +424,7 @@ const InventoryTab = ({
   const [filterWarehouse, setFilterWarehouse] = useState('all')
   const [filterStatus, setFilterStatus] = useState('all')
   const [filterVariantId, setFilterVariantId] = useState('all')
+  const [filterTypeDate, setFilterTypeDate] = useState('all')
   const [openViewModal, setOpenViewModal] = useState(false)
   const [openEditModal, setOpenEditModal] = useState(false)
   const [openDeleteModal, setOpenDeleteModal] = useState(false)
@@ -442,6 +444,9 @@ const InventoryTab = ({
   const [items, setItems] = useState([
     { variantId: '', lot: '', quantity: '', unit: '', note: '' }
   ])
+
+  const [selectedFilter, setSelectedFilter] = useState('all')
+
   useEffect(() => {
     refreshInventories(page > 0 ? page : 1, rowsPerPage)
     refreshVariants()
@@ -451,8 +456,8 @@ const InventoryTab = ({
   const enrichedInventories = data.map((item) => {
     return {
       ...item,
-      variantId: item.variantId.sku, // giữ nguyên ID
-      warehouseId: item.warehouseId._id, // giữ nguyên ID để filter
+      variantId: item.variantId._id || 'N/A', // ← Ghi đè variantId thành chuỗi _id
+      warehouseId: item.warehouseId._id || 'N/A', // ← Ghi đè warehouseId thành chuỗi _id
       warehouse: item.warehouseId?.name || 'N/A',
       variantName: item.variantId?.name || 'N/A',
       color: item.variantId.color?.name || 'N/A',
@@ -470,27 +475,29 @@ const InventoryTab = ({
   })
 
   const handleFilterChange = (type, value) => {
-    // cập nhật state
     if (type === 'variantId') setFilterVariantId(value)
     if (type === 'warehouseId') setFilterWarehouse(value)
     if (type === 'status') setFilterStatus(value)
+    if (type === 'filterTypeDate') setFilterTypeDate(value)
 
-    // tạo object filter đúng cách
     const nextVariantId = type === 'variantId' ? value : filterVariantId
     const nextWarehouseId = type === 'warehouseId' ? value : filterWarehouse
     const nextStatus = type === 'status' ? value : filterStatus
+    const nextFilterTypeDate =
+      type === 'filterTypeDate' ? value : filterTypeDate
 
     const filters = {}
     if (nextVariantId !== 'all') filters.variantId = nextVariantId
     if (nextWarehouseId !== 'all') filters.warehouseId = nextWarehouseId
     if (nextStatus !== 'all') filters.status = nextStatus
+    if (nextFilterTypeDate !== 'all')
+      filters.filterTypeDate = nextFilterTypeDate
 
-    // gọi lại API với filters mới
     refreshInventories(page > 0 ? page : 1, 10, filters)
   }
 
   const inventoryColumns = [
-    { id: 'variantId', label: 'Mã biến thể', minWidth: 200 },
+    { id: 'sku', label: 'Mã biến thể', minWidth: 200 },
     { id: 'warehouse', label: 'Kho hàng', minWidth: 120 },
     { id: 'variantName', label: 'Sản phẩm', minWidth: 150 },
     { id: 'quantity', label: 'Số lượng', minWidth: 100, align: 'right' },
@@ -776,6 +783,14 @@ const InventoryTab = ({
                       <MenuItem value='out-of-stock'>Hết hàng</MenuItem>
                     </Select>
                   </FormControl>
+                  <FilterByTime
+                    filterDate={filterDate}
+                    selectedFilter={selectedFilter}
+                    setSelectedFilter={setSelectedFilter}
+                    onApply={(value) =>
+                      handleFilterChange('filterTypeDate', value)
+                    }
+                  />
                 </Box>
               </TableCell>
             </TableRow>
