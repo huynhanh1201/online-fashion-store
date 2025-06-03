@@ -449,8 +449,6 @@ const InventoryTab = ({
 
   useEffect(() => {
     refreshInventories(page > 0 ? page : 1, rowsPerPage)
-    refreshVariants()
-    fetchWarehouses()
   }, [])
 
   const enrichedInventories = data.map((item) => {
