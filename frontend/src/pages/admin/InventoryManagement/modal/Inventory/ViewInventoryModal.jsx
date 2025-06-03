@@ -35,27 +35,27 @@ const ViewInventoryModal = ({ open, onClose, inventory }) => {
             <Grid container spacing={2}>
               <Grid item size={6}>
                 <Typography variant='body2' color='text.secondary'>
-                  Mã tồn kho
+                  Mã biến thể
                 </Typography>
                 <Typography variant='subtitle1'>
-                  {inventory.variantId}
+                  {inventory.variantId.sku}
                 </Typography>
               </Grid>
               <Grid item size={6}>
                 <Typography variant='body2' color='text.secondary'>
-                  Biến thể
+                  kho hàng
                 </Typography>
                 <Typography variant='subtitle1'>
-                  {inventory.variantName || 'N/A'}
+                  {inventory.warehouseId.name || 'N/A'}
                 </Typography>
               </Grid>
 
               <Grid item size={6}>
                 <Typography variant='body2' color='text.secondary'>
-                  Kho hàng
+                  sản phẩm
                 </Typography>
                 <Typography variant='subtitle1'>
-                  {inventory?.warehouseId.name || 'N/A'}
+                  {inventory?.variantId.name || 'N/A'}
                 </Typography>
               </Grid>
               <Grid item size={6}>

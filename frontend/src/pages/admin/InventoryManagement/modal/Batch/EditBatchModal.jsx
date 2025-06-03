@@ -30,8 +30,10 @@ const EditBatchModal = ({ open, onClose, onSave, batch }) => {
 
   const onSubmit = (data) => {
     const payload = {
-      manufactureDate: new Date(data.manufactureDate).toISOString(),
-      expiry: new Date(data.expiry).toISOString(),
+      manufactureDate: data.manufactureDate
+        ? new Date(data.manufactureDate).toISOString()
+        : null,
+      expiry: data.expiry ? new Date(data.expiry).toISOString() : null,
       importPrice: Number(data.importPrice)
     }
 
@@ -53,11 +55,8 @@ const EditBatchModal = ({ open, onClose, onSave, batch }) => {
                 type='date'
                 fullWidth
                 InputLabelProps={{ shrink: true }}
-                {...register('manufactureDate', {
-                  required: 'Vui lòng chọn ngày sản xuất'
-                })}
-                error={!!errors.manufactureDate}
-                helperText={errors.manufactureDate?.message}
+                {...register('manufactureDate')}
+                defaultValue=''
               />
             </Grid>
 
@@ -67,11 +66,8 @@ const EditBatchModal = ({ open, onClose, onSave, batch }) => {
                 type='date'
                 fullWidth
                 InputLabelProps={{ shrink: true }}
-                {...register('expiry', {
-                  required: 'Vui lòng chọn hạn sử dụng'
-                })}
-                error={!!errors.expiry}
-                helperText={errors.expiry?.message}
+                {...register('expiry')}
+                defaultValue=''
               />
             </Grid>
 

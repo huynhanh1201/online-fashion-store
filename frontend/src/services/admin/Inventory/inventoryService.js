@@ -24,7 +24,7 @@ export const getInventories = async (page = 1, limit = 10, filters = {}) => {
 export const getInventoryById = async (id) => {
   try {
     const response = await AuthorizedAxiosInstance.get(
-      `${API_ROOT}/v1/inventory/${id}`
+      `${API_ROOT}/v1/inventories/${id}`
     )
     return response.data
   } catch (error) {

@@ -56,10 +56,11 @@ const InventoryLogTab = ({
     setSelectedLog(log)
     setOpenViewModal(true)
   }
-
   const enrichedInventoryLogs = (data || []).map((log) => {
     return {
       ...log,
+      batchName:
+        batches.find((batch) => batch._id === log.batchId)?.batchCode || 'N/A',
       variantName: log.inventoryId.variantId?.name || 'N/A',
       warehouse: log.inventoryId.warehouseId?.name || 'N/A',
       typeLabel: log.type === 'in' ? 'Nhập' : 'Xuất',
@@ -70,8 +71,11 @@ const InventoryLogTab = ({
 
   const filteredInventoryLogs = enrichedInventoryLogs.filter((log) => {
     const inventoryMatch =
-      filterInventory === 'all' || log.inventoryId === filterInventory
-    const typeMatch = filterType === 'all' || log.typeLabel === filterType
+      filterInventory === 'all' ||
+      log.inventoryId === filterInventory ||
+      log.inventoryId?._id === filterInventory
+
+    const typeMatch = filterType === 'all' || log.type === filterType
 
     const batchMatch = filterBatchId === 'all' || log.batchId === filterBatchId
 
@@ -79,27 +83,24 @@ const InventoryLogTab = ({
 
     return typeMatch && batchMatch && sourceMatch && inventoryMatch
   })
+
   const handleFilterChange = (type, value) => {
-    // cập nhật state
+    const newInventoryId = type === 'inventoryId' ? value : filterInventory
+    const newType = type === 'type' ? value : filterType
+    const newBatchId = type === 'batchId' ? value : filterBatchId
+    const newSource = type === 'source' ? value : filterSource
+
     if (type === 'inventoryId') setFilterInventory(value)
     if (type === 'type') setFilterType(value)
     if (type === 'batchId') setFilterBatchId(value)
     if (type === 'source') setFilterSource(value)
 
-    // tạo object filter đúng cách
-    const inventoryId = type === 'variantId' ? value : filterInventory
-    const typeLabel = type === 'type' ? value : filterType
-    const batchId = type === 'batchId' ? value : filterBatchId
-    const source = type === 'source' ? value : filterSource
-
     const filters = {}
-    if (inventoryId !== 'all') filters.inventoryId = inventoryId
-    if (typeLabel !== 'all') filters.type = typeLabel
-    if (batchId !== 'all') filters.batchId = batchId
-    if (source !== 'all') filters.source = source
-    console.log('filters', filters)
+    if (newInventoryId !== 'all') filters.inventoryId = newInventoryId
+    if (newType !== 'all') filters.type = newType
+    if (newBatchId !== 'all') filters.batchId = newBatchId
+    if (newSource !== 'all') filters.source = newSource
 
-    // gọi lại API với filters mới
     refreshInventoryLogs(page > 0 ? page : 1, 10, filters)
   }
   const inventoryLogColumns = [
@@ -177,26 +178,30 @@ const InventoryLogTab = ({
                       <MenuItem value='out'>Xuất</MenuItem>
                     </Select>
                   </FormControl>
-                  <FormControl
-                    variant='outlined'
-                    size='small'
-                    sx={{ minWidth: 120 }}
-                  >
-                    <InputLabel id='batch-select-label'>Lô hàng</InputLabel>
+                  <FormControl sx={{ minWidth: 160 }}>
+                    <InputLabel>Batch</InputLabel>
                     <Select
-                      labelId='batch-select-label'
                       value={filterBatchId}
-                      onChange={(e) =>
-                        handleFilterChange('batchId', e.target.value)
-                      }
-                      label='Lô hàng'
+                      onChange={(e) => setFilterBatchId(e.target.value)}
+                      label='Batch'
+                      size='small'
                     >
                       <MenuItem value='all'>Tất cả</MenuItem>
-                      {batches.map((batch) => (
-                        <MenuItem key={batch._id} value={batch._id}>
-                          {batch.batchCode}
-                        </MenuItem>
-                      ))}
+                      {[
+                        ...new Set(
+                          enrichedInventoryLogs.map((log) => log.batchId)
+                        )
+                      ].map((id) => {
+                        const batchName =
+                          enrichedInventoryLogs.find(
+                            (log) => log.batchId === id
+                          )?.batchName || id
+                        return (
+                          <MenuItem key={id} value={id}>
+                            {batchName}
+                          </MenuItem>
+                        )
+                      })}
                     </Select>
                   </FormControl>
                   <FormControl

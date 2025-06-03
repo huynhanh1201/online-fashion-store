@@ -28,10 +28,10 @@ const InventoryTable = () => {
   const {
     inventories,
     fetchInventories,
-    createNewInventory,
     updateInventoryById,
-    deleteInventoryById
-  } = useInventory(page + 1, rowsPerPage)
+    deleteInventoryById,
+    getInventoryId
+  } = useInventory()
   const {
     variants,
     fetchVariants,
@@ -131,6 +131,7 @@ const InventoryTable = () => {
             refreshProducts={fetchProducts}
             refreshColors={fetchColors}
             refreshSizes={fetchSizes}
+            getInventoryId={getInventoryId} // Add this prop
           />
         )}
         {activeTab === 1 && (

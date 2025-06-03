@@ -5,7 +5,8 @@ import {
   deleteInventory,
   createInventory,
   importInventory,
-  exportInventory
+  exportInventory,
+  getInventoryById
 } from '~/services/admin/Inventory/inventoryService'
 
 const useInventorys = (pageInventory = 1) => {
@@ -59,6 +60,16 @@ const useInventorys = (pageInventory = 1) => {
     }
   }
 
+  const getInventoryId = async (id) => {
+    try {
+      const res = await getInventoryById(id)
+      return res
+    } catch (error) {
+      console.error('Get inventory by ID error', error)
+      return null
+    }
+  }
+
   return {
     inventories,
     totalPages,
@@ -68,7 +79,8 @@ const useInventorys = (pageInventory = 1) => {
     deleteInventoryById,
     createNewInventory,
     handleImport,
-    handleExport
+    handleExport,
+    getInventoryId
   }
 }
 

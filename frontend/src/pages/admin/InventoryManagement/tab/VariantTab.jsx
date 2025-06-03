@@ -227,7 +227,7 @@ const VariantsTab = ({
         open={openEditModal}
         onClose={handleCloseEditModal}
         variant={selectedVariant}
-        updateVariant={updateVariant}
+        onUpdateVariant={updateVariant}
         products={products}
       />
       <DeleteVariantModal

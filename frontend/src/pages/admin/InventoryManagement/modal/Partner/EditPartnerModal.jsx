@@ -20,7 +20,8 @@ export default function EditPartnerModal({
   open,
   onClose,
   partner,
-  updatePartner
+  updatePartner,
+  fetchPartners
 }) {
   const [form, setForm] = useState({
     name: '',
@@ -51,7 +52,6 @@ export default function EditPartnerModal({
       return
     }
     const updated = {
-      ...partner,
       name: form.name,
       type: form.type,
       contact: {
@@ -61,6 +61,7 @@ export default function EditPartnerModal({
     }
     updatePartner(partner._id, updated)
     onClose()
+    fetchPartners() // Refresh partners after update
   }
 
   const handleCancel = () => {

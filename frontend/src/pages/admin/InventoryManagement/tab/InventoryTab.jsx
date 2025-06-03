@@ -417,7 +417,8 @@ const InventoryTab = ({
   fetchWarehouses,
   fetchPartner,
   batches,
-  refreshVariants
+  refreshVariants,
+  getInventoryId
 }) => {
   const [filterWarehouse, setFilterWarehouse] = useState('all')
   const [filterStatus, setFilterStatus] = useState('all')
@@ -450,7 +451,7 @@ const InventoryTab = ({
   const enrichedInventories = data.map((item) => {
     return {
       ...item,
-      variantId: item.variantId._id, // giữ nguyên ID
+      variantId: item.variantId.sku, // giữ nguyên ID
       warehouseId: item.warehouseId._id, // giữ nguyên ID để filter
       warehouse: item.warehouseId?.name || 'N/A',
       variantName: item.variantId?.name || 'N/A',
@@ -483,8 +484,6 @@ const InventoryTab = ({
     if (nextVariantId !== 'all') filters.variantId = nextVariantId
     if (nextWarehouseId !== 'all') filters.warehouseId = nextWarehouseId
     if (nextStatus !== 'all') filters.status = nextStatus
-
-    console.log('filters', filters)
 
     // gọi lại API với filters mới
     refreshInventories(page > 0 ? page : 1, 10, filters)
@@ -559,27 +558,34 @@ const InventoryTab = ({
     }
   ]
 
-  const handleViewInventory = (inventory) => {
-    setSelectedInventory(inventory)
+  const handleViewInventory = async (inventory) => {
+    const inventoryDetails = await getInventoryId(inventory._id)
+    setSelectedInventory(inventoryDetails)
     setOpenViewModal(true)
   }
 
-  const handleEditInventory = (inventory) => {
-    setSelectedInventory(inventory)
+  const handleEditInventory = async (inventory) => {
+    const inventoryDetails = await getInventoryId(inventory._id)
+    setSelectedInventory(inventoryDetails)
     setOpenEditModal(true)
   }
 
-  const handleDeleteInventory = (inventory) => {
-    setSelectedInventory(inventory)
+  const handleDeleteInventory = async (inventory) => {
+    const inventoryDetails = await getInventoryId(inventory._id)
+    setSelectedInventory(inventoryDetails)
     setOpenDeleteModal(true)
   }
 
   const handleCloseEditModal = () => {
+    setSelectedInventory(null)
     setOpenEditModal(false)
+    refreshInventories()
   }
 
   const handleCloseDeleteModal = () => {
+    setSelectedInventory(null)
     setOpenDeleteModal(false)
+    refreshInventories()
   }
 
   const handleOpenModal = (type) => {
@@ -864,7 +870,11 @@ const InventoryTab = ({
       />
       <ViewInventoryModal
         open={openViewModal}
-        onClose={() => setOpenViewModal(false)}
+        onClose={() => {
+          setSelectedInventory(null)
+          setOpenViewModal(false)
+          refreshInventories()
+        }}
         inventory={selectedInventory}
         variants={variants}
         warehouses={warehouses}

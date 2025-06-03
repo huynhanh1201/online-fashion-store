@@ -5,7 +5,7 @@ import {
   createInventory
 } from '~/services/admin/Inventory/inventoryService'
 
-const useInventoryLogs = (page = 1, limit = 10) => {
+const useInventoryLogs = () => {
   const [logs, setLogs] = useState([])
   const [totalPages, setTotalPages] = useState(1)
   const [loading, setLoading] = useState(false)
