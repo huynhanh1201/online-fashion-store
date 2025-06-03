@@ -9,18 +9,6 @@ const cartItemSchema = new Schema(
       ref: 'Variant',
       required: true
     },
-    color: {
-      type: String,
-      required: true,
-      minlength: 1,
-      maxlength: 50
-    },
-    size: {
-      type: String,
-      required: true,
-      minlength: 1,
-      maxlength: 10
-    },
     quantity: {
       type: Number,
       required: true,
