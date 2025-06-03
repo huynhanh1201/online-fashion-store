@@ -154,7 +154,7 @@ const Content = () => {
     }
 
     .content-container {
-      max-width: 1200px;
+      max-width: 1450px;
       margin: 0 auto;
       padding: 24px 16px;
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
