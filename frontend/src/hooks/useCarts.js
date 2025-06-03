@@ -18,13 +18,18 @@ export const useCart = () => {
     if (!options?.silent) setLoading(true)
     try {
       const response = await getCart()
-      dispatch(setCartItems(response?.cartItems || []))
+      const normalizedItems = (response?.cartItems || []).map(item => ({
+        ...item,
+        variant: typeof item.variantId === 'object' ? item.variantId : { _id: item.variantId }
+      }))
+      dispatch(setCartItems(normalizedItems))
     } catch (error) {
       console.error('Failed to fetch cart:', error)
     } finally {
       setLoading(false)
     }
   }
+
 
   const handleAddToCart = async (payload) => {
     try {
@@ -62,16 +67,29 @@ export const useCart = () => {
     }
   }
 
-  const handleUpdateItem = async (cartItemId, data) => {
+  const handleUpdateItem = async (variantId, data) => {
+    if (!data || Object.keys(data).length === 0) return
+
     try {
-      const updated = await updateCartItem(cartItemId, data)
-      if (updated?.cartItems) {
-        dispatch(setCartItems(updated.cartItems))
+      const payload = { variantId, ...data }
+      const updated = await updateCartItem(payload)
+
+      if (Array.isArray(updated?.cartItems)) {
+        const normalizedItems = updated.cartItems.map(item => ({
+          ...item,
+          variant: typeof item.variantId === 'object'
+            ? item.variantId
+            : { _id: item.variantId }
+        }))
+        dispatch(setCartItems(normalizedItems))
       }
     } catch (error) {
-      console.error('Error updating cart item:', error)
+      console.error('Error updating cart item:', error?.response || error)
     }
   }
+
+
+
 
   const handleToggleSelected = async (cartItemId, selected) => {
     await handleUpdateItem(cartItemId, { selected })

@@ -13,10 +13,9 @@ export const getCart = async () => {
 }
 
 // Thêm sản phẩm vào giỏ hàng
-// Đảm bảo gửi đúng format { productId: string, color, size, quantity }
-export const addToCart = async ({ productId, color, size, quantity }) => {
+export const addToCart = async ({ variant, quantity }) => {
   try {
-    const payload = { productId, color, size, quantity }
+    const payload = { variantId: variant._id, quantity }  // gửi variantId thay vì object variant
     console.log('Thêm sản phẩm vào giỏ:', payload)
     const response = await AuthorizedAxiosInstance.post(
       `${API_ROOT}/v1/carts`,
@@ -30,7 +29,6 @@ export const addToCart = async ({ productId, color, size, quantity }) => {
 }
 
 // Cập nhật sản phẩm trong giỏ hàng
-// Giữ nguyên endpoint PATCH /v1/carts/items, payload gồm { productId, color, size, quantity }
 export const updateCartItem = async (updateData) => {
   try {
     const response = await AuthorizedAxiosInstance.patch(
@@ -43,6 +41,7 @@ export const updateCartItem = async (updateData) => {
     return null
   }
 }
+
 // Cập nhật trạng thái selected của tất cả sản phẩm
 export const updateAllSelection = async (selected) => {
   try {
@@ -57,13 +56,13 @@ export const updateAllSelection = async (selected) => {
   }
 }
 
-// Xóa một sản phẩm khỏi giỏ hàng theo productId
-export const deleteCartItem = async ({ productId, color, size, quantity }) => {
+// Xóa một sản phẩm khỏi giỏ hàng theo variantId và quantity
+export const deleteCartItem = async ({ variantId, quantity }) => {
   try {
     const response = await AuthorizedAxiosInstance.delete(
       `${API_ROOT}/v1/carts/items`,
       {
-        data: { productId, color, size, quantity }
+        data: { variantId, quantity }
       }
     )
     return response.data

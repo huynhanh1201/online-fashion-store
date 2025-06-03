@@ -217,7 +217,7 @@ const ProductInfoSection = ({
           onClick={() =>
             setQuantity(q => {
               const maxQuantity = inventory?.quantity ?? selectedVariant?.quantity ?? product?.quantity ?? 0
-              return q < maxQuantity ? Number(q) + 1 : q
+              return q < maxQuantity ? q + 1 : q
             })
           }
         >
@@ -231,7 +231,7 @@ const ProductInfoSection = ({
       <Box sx={{ display: 'flex', gap: 2 }}>
         <Button
           variant='contained'
-          disabled={isAdding}
+          disabled={isAdding || quantity > (inventory?.quantity ?? selectedVariant?.quantity ?? product?.quantity ?? 0)}
           onClick={() => {
             const max = inventory?.quantity ?? selectedVariant?.quantity ?? product?.quantity ?? 0
             if (quantity > max) {
@@ -242,13 +242,15 @@ const ProductInfoSection = ({
               })
               return
             }
-            handleAddToCart(product, selectedColor, selectedSize, quantity)
+            handleAddToCart({ variant: selectedVariant, quantity })
           }}
           sx={{ backgroundColor: '#1A3C7B', color: 'white', flex: 1, py: 1.5 }}
           startIcon={isAdding ? <CircularProgress size={20} color='inherit' /> : null}
         >
           {isAdding ? 'Đang thêm...' : 'Thêm vào giỏ'}
         </Button>
+
+
         <Button
           variant='outlined'
           onClick={handleBuyNow}

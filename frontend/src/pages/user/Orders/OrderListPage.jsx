@@ -84,6 +84,7 @@ const OrderRow = ({ order }) => {
               ) : (
                 <>
                   {items.map((item, i) => (
+
                     <Box
                       key={i}
                       display="flex"

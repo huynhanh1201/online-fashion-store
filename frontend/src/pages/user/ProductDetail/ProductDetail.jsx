@@ -10,6 +10,7 @@ import SnackbarAlert from './SnackbarAlert'
 
 const ProductDetail = () => {
   const { productId } = useParams()
+  // eslint-disable-next-line no-unused-vars
   const [isViewingThumbnails, setIsViewingThumbnails] = useState(false)
 
   const {
@@ -106,7 +107,7 @@ const ProductDetail = () => {
             setQuantity={setQuantity}
             coupons={coupons}
             isAdding={isAdding[product._id] || false}
-            handleAddToCart={handleAddToCart}
+            handleAddToCart={() => handleAddToCart(product._id)}
             handleBuyNow={handleBuyNow}
             setOpenVoucherDrawer={setOpenVoucherDrawer}
             variants={variants}

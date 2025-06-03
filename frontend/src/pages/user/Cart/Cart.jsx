@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import React, { useState, useEffect } from 'react'
 import {
   Box,
@@ -35,7 +36,7 @@ const Cart = () => {
   const [confirmClearOpen, setConfirmClearOpen] = useState(false)
   const navigate = useNavigate()
   const dispatch = useDispatch()
-
+  const [inventoryQuantities, setInventoryQuantities] = useState({})
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'auto' })
   }, [])
@@ -43,6 +44,25 @@ const Cart = () => {
   useEffect(() => {
     if (cart?.cartItems) setCartItems(cart.cartItems)
   }, [cart])
+  useEffect(() => {
+    const fetchInventories = async () => {
+      const newInventoryQuantities = {}
+      for (const item of cartItems) {
+        try {
+          const res = await fetch(`http://localhost:8017/v1/inventories?variantId=${item.variant._id}`)
+          const data = await res.json()
+          const inventory = Array.isArray(data) ? data[0] : data
+          newInventoryQuantities[item.variant._id] = inventory?.quantity ?? 0
+        } catch (error) {
+          console.error('Lỗi lấy tồn kho:', error)
+          newInventoryQuantities[item.variant._id] = 0
+        }
+      }
+      setInventoryQuantities(newInventoryQuantities)
+    }
+
+    if (cartItems.length > 0) fetchInventories()
+  }, [cartItems])
 
   const allSelected =
     cartItems.length > 0 && selectedItems.length === cartItems.length
@@ -78,28 +98,34 @@ const Cart = () => {
       ? val.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })
       : '0₫'
 
-  const handleQuantityChange = (variantId, delta) => {
-    setCartItems(prevItems => {
-      return prevItems.map(i => {
-        if (i.variant._id !== variantId) return i
+  const handleQuantityChange = async (variantId, delta) => {
+    const item = cartItems.find(i => i.variant._id === variantId)
+    if (!item) return
 
-        const currentQty = i.quantity
-        const maxQty = i.variant.quantity || 1
-        const newQty = Math.max(1, currentQty + delta)
+    const currentQty = item.quantity
+    const maxQty = inventoryQuantities[variantId] || 1
+    const newQty = currentQty + delta
 
-        if (newQty > maxQty) {
-          setShowMaxQuantityAlert(true)
-          return i
-        }
+    if (newQty < 1) return
+    if (newQty > maxQty) {
+      setShowMaxQuantityAlert(true)
+      return
+    }
 
-        updateItem({
-          variantId,
-          quantity: newQty
-        })
+    try {
 
-        return { ...i, quantity: newQty }
-      })
-    })
+      await updateItem(variantId, { quantity: delta })
+
+      setCartItems(prevItems =>
+        prevItems.map(i =>
+          i.variant._id === variantId
+            ? { ...i, quantity: newQty }
+            : i
+        )
+      )
+    } catch (error) {
+      console.error('Lỗi cập nhật số lượng:', error)
+    }
   }
 
   const handleRemove = async ({ variantId }) => {
@@ -199,11 +225,11 @@ const Cart = () => {
                         sx={{ cursor: 'pointer' }}
                         onClick={() => {
                           dispatch(setSelectedItemsAction([{ variantId: variant._id, quantity: item.quantity }]))
-                          navigate(`/productdetail/${variant._id}`)
+                          navigate(`/productdetail/${variant.productId}`)
                         }}
                       >
                         <Avatar
-                          src={variant.image?.[0] || '/default.jpg'}
+                          src={variant.color?.image || '/default.jpg'}
                           variant='square'
                           sx={{
                             width: 64,
@@ -228,26 +254,17 @@ const Cart = () => {
                           {variant.name}
                         </Typography>
 
-                        <Typography variant="body2" color="text.secondary" sx={{ maxWidth: 350 }}>
-                          Phân loại hàng: {item.color || 'Không rõ'}
-                          {item.color && item.size ? ', ' : ''}
-                          {item.size || ''}
+                        <Typography variant="body2" color="text.secondary">
+                          Phân loại hàng: {variant.color?.name || 'Không rõ'}, {variant.size?.name || 'Không rõ'}
                         </Typography>
                       </Box>
                     </Box>
                   </TableCell>
-                  <TableCell
-                    align='center'
-                    sx={{ fontWeight: '600', color: '#007B00' }}
-                  >
+                  <TableCell align='center' sx={{ fontWeight: '600', color: '#007B00' }}>
                     {formatPrice(variant.exportPrice)}
                   </TableCell>
                   <TableCell align='center'>
-                    <Box
-                      display='flex'
-                      alignItems='center'
-                      justifyContent='center'
-                    >
+                    <Box display='flex' alignItems='center' justifyContent='center'>
                       <IconButton
                         size='small'
                         onClick={() => handleQuantityChange(variant._id, -1)}
@@ -269,7 +286,8 @@ const Cart = () => {
                         size='small'
                         onClick={() => handleQuantityChange(variant._id, 1)}
                         aria-label='Tăng số lượng'
-                        disabled={item.quantity >= variant.quantity}
+                        disabled={item.quantity >= (inventoryQuantities[variant._id] || 99)}
+
                       >
                         <Add />
                       </IconButton>
@@ -287,6 +305,7 @@ const Cart = () => {
                 </TableRow>
               )
             })
+
           )}
         </TableBody>
       </Table>
@@ -305,6 +324,16 @@ const Cart = () => {
         </Typography>
         <Box display='flex' gap={2}>
           <Button
+            variant='contained'
+            color='primary'
+            disabled={selectedItems.length === 0}
+            onClick={() => {
+              navigate('/payment')
+            }}
+          >
+            Thanh toán
+          </Button>
+          <Button
             variant='outlined'
             color='error'
             startIcon={<DeleteForever />}
@@ -312,16 +341,6 @@ const Cart = () => {
             disabled={cartItems.length === 0}
           >
             Xoá toàn bộ
-          </Button>
-          <Button
-            variant='contained'
-            color='primary'
-            disabled={selectedItems.length === 0}
-            onClick={() => {
-              navigate('/checkout')
-            }}
-          >
-            Thanh toán
           </Button>
         </Box>
       </Box>

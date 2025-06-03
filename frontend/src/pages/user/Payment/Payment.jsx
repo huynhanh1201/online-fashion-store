@@ -111,21 +111,21 @@ const Payment = () => {
   const selectedCartItems = cartItems.filter(item => {
     if (isBuyNow) return true // tính tất cả khi Buy Now
 
-    // Tìm xem trong selectedItems có item tương ứng với productId, color, size hay không
+    // Tìm xem trong selectedItems có item tương ứng với variantId, color, size hay không
     return selectedItems.some(selected =>
-      selected.productId === (item.product?._id || item.productId?._id || item.productId) &&
+      selected.variantId === (item.variantId?._id || item.variantId) &&
       selected.color === item.color &&
       selected.size === item.size
     )
   }).map(item => {
-    const product = item.product || item.productId || {}
-    const productId = String(product._id || item.productId?._id || item.productId)
-    const price = typeof product.price === 'number' ? product.price : 0
+    const variant = item.variantId || {}
+    const variantId = String(variant._id || item.variantId)
+    const price = typeof variant.exportPrice === 'number' ? variant.exportPrice : 0
     const quantity = typeof item.quantity === 'number' ? item.quantity : 1
 
     subTotal += price * quantity
 
-    return { productId, color: item.color, size: item.size, quantity }
+    return { variantId, color: item.color, size: item.size, quantity }
   })
 
   const total = Math.max(subTotal - discount, 0)
@@ -224,9 +224,9 @@ const Payment = () => {
       return
     }
 
-    // Chỉ gửi productId và quantity, bỏ color, size nếu backend không hỗ trợ
+    // Chỉ gửi variantId và quantity, bỏ color, size nếu backend không hỗ trợ
     const sanitizedCartItems = selectedCartItems.map(item => ({
-      productId: item.productId,
+      variantId: item.variantId,
       quantity: item.quantity
     }))
 
@@ -336,31 +336,25 @@ const Payment = () => {
                       </tr>
                     </thead>
                     <tbody>
-                      {cartItems
-                        .filter(item =>
-                          selectedItems.some(selected =>
-                            selected.productId === (item.product?._id || item.productId?._id || item.productId) &&
-                            selected.color === item.color &&
-                            selected.size === item.size
-                          )
+                      {(isBuyNow ? cartItems : cartItems.filter(item =>
+                        selectedItems.some(selected =>
+                          selected.variantId === item.variantId?._id
                         )
-                        .map((item, index) => {
-                          const product = item.product || item.productId || {}
-                          const color = item.color || 'Chưa chọn màu'
-                          const size = item.size || 'Chưa chọn kích cỡ'
-                          return (
-                            <ProductItem
-                              key={index}
-                              name={product.name || 'Sản phẩm không tên'}
-                              price={product.price || 0}
-                              quantity={item.quantity || 1}
-                              image={product.image}
-                              color={item.color}
-                              size={item.size}
-                              variantText={`Phân loại hàng: ${color}, ${size}`}
-                            />
-                          )
-                        })}
+                      )).map((item, index) => {
+                        const variant = item.variantId || {}
+
+                        return (
+                          <ProductItem
+                            key={index}
+                            name={variant.name || 'Sản phẩm không tên'}
+                            price={variant.exportPrice || 0}
+                            quantity={item.quantity || 1}
+                            image={variant.color?.image}
+                            color={variant.color?.name}
+                            size={variant.size?.name}
+                          />
+                        )
+                      })}
                     </tbody>
                   </table>
                 )}
