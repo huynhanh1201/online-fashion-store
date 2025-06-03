@@ -179,11 +179,11 @@ const InventoryLogTab = ({
                     </Select>
                   </FormControl>
                   <FormControl sx={{ minWidth: 160 }}>
-                    <InputLabel>Batch</InputLabel>
+                    <InputLabel>Lô hàng</InputLabel>
                     <Select
                       value={filterBatchId}
                       onChange={(e) => setFilterBatchId(e.target.value)}
-                      label='Batch'
+                      label='Lô hàng'
                       size='small'
                     >
                       <MenuItem value='all'>Tất cả</MenuItem>

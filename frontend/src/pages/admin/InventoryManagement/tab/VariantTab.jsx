@@ -58,7 +58,6 @@ const VariantsTab = ({
 
   const handleCloseAddModal = () => {
     setOpenAddModal(false)
-    refreshVariants()
   }
 
   const handleViewVariant = (variant) => {

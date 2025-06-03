@@ -393,6 +393,7 @@ import {
   IconButton,
   Button
 } from '@mui/material'
+import { filterDate } from '~/utils/constants.js'
 import VisibilityIcon from '@mui/icons-material/Visibility'
 import EditIcon from '@mui/icons-material/Edit'
 import DeleteIcon from '@mui/icons-material/Delete'
@@ -400,7 +401,8 @@ import ViewInventoryModal from '../modal/Inventory/ViewInventoryModal.jsx'
 import EditInventoryModal from '../modal/Inventory/EditInventoryModal.jsx'
 import DeleteInventoryModal from '../modal/Inventory/DeleteInventoryModal.jsx'
 import AddWarehouseSlipModal from '~/pages/admin/InventoryManagement/modal/WarehouseSlip/AddWarehouseSlipModal.jsx'
-
+import FilterByTime from '~/components/filterDateType/FilterByTime.jsx'
+import dayjs from 'dayjs'
 const InventoryTab = ({
   data,
   variants,
@@ -412,47 +414,31 @@ const InventoryTab = ({
   updateInventory,
   deleteInventory,
   refreshInventories,
-  partners,
-  addWarehouseSlip,
-  fetchWarehouses,
-  fetchPartner,
-  batches,
-  refreshVariants,
   getInventoryId
 }) => {
   const [filterWarehouse, setFilterWarehouse] = useState('all')
   const [filterStatus, setFilterStatus] = useState('all')
   const [filterVariantId, setFilterVariantId] = useState('all')
+  const [filterTypeDate, setFilterTypeDate] = useState('all')
+
   const [openViewModal, setOpenViewModal] = useState(false)
   const [openEditModal, setOpenEditModal] = useState(false)
   const [openDeleteModal, setOpenDeleteModal] = useState(false)
   const [selectedInventory, setSelectedInventory] = useState(null)
 
-  const [openModal, setOpenModal] = useState(false)
-  const [modalType, setModalType] = useState('input')
-  const [newSlipData, setNewSlipData] = useState({
-    slipId: '',
-    date: new Date(),
-    profitType: 'Import',
-    warehouseId: '',
-    partnerCode: '',
-    partnerName: '',
-    note: ''
-  })
-  const [items, setItems] = useState([
-    { variantId: '', lot: '', quantity: '', unit: '', note: '' }
-  ])
+  // const [selectedFilter, setSelectedFilter] = useState('all')
+  const [startDate, setStartDate] = useState(dayjs().format('YYYY-MM-DD'))
+  const [endDate, setEndDate] = useState(dayjs().format('YYYY-MM-DD'))
+
   useEffect(() => {
     refreshInventories(page > 0 ? page : 1, rowsPerPage)
-    refreshVariants()
-    fetchWarehouses()
   }, [])
 
   const enrichedInventories = data.map((item) => {
     return {
       ...item,
-      variantId: item.variantId.sku, // giữ nguyên ID
-      warehouseId: item.warehouseId._id, // giữ nguyên ID để filter
+      variantId: item.variantId._id || 'N/A', // ← Ghi đè variantId thành chuỗi _id
+      warehouseId: item.warehouseId._id || 'N/A', // ← Ghi đè warehouseId thành chuỗi _id
       warehouse: item.warehouseId?.name || 'N/A',
       variantName: item.variantId?.name || 'N/A',
       color: item.variantId.color?.name || 'N/A',
@@ -470,27 +456,34 @@ const InventoryTab = ({
   })
 
   const handleFilterChange = (type, value) => {
-    // cập nhật state
     if (type === 'variantId') setFilterVariantId(value)
     if (type === 'warehouseId') setFilterWarehouse(value)
     if (type === 'status') setFilterStatus(value)
+    if (type === 'filterTypeDate') setFilterTypeDate(value)
 
-    // tạo object filter đúng cách
     const nextVariantId = type === 'variantId' ? value : filterVariantId
     const nextWarehouseId = type === 'warehouseId' ? value : filterWarehouse
     const nextStatus = type === 'status' ? value : filterStatus
+    const nextFilterTypeDate =
+      type === 'filterTypeDate' ? value : filterTypeDate
 
     const filters = {}
     if (nextVariantId !== 'all') filters.variantId = nextVariantId
     if (nextWarehouseId !== 'all') filters.warehouseId = nextWarehouseId
     if (nextStatus !== 'all') filters.status = nextStatus
+    if (nextFilterTypeDate !== 'all')
+      filters.filterTypeDate = nextFilterTypeDate
 
-    // gọi lại API với filters mới
+    if (nextFilterTypeDate === 'custom' && startDate && endDate) {
+      filters.startDate = startDate
+      filters.endDate = endDate
+    }
+
     refreshInventories(page > 0 ? page : 1, 10, filters)
   }
 
   const inventoryColumns = [
-    { id: 'variantId', label: 'Mã biến thể', minWidth: 200 },
+    { id: 'sku', label: 'Mã biến thể', minWidth: 200 },
     { id: 'warehouse', label: 'Kho hàng', minWidth: 120 },
     { id: 'variantName', label: 'Sản phẩm', minWidth: 150 },
     { id: 'quantity', label: 'Số lượng', minWidth: 100, align: 'right' },
@@ -588,81 +581,6 @@ const InventoryTab = ({
     refreshInventories()
   }
 
-  const handleOpenModal = (type) => {
-    fetchPartner()
-    fetchWarehouses()
-    setModalType(type)
-    setNewSlipData({
-      ...newSlipData,
-      slipId: '',
-      profitType: type === 'input' ? 'Import' : 'Export'
-    })
-    setOpenModal(true)
-  }
-
-  const handleCloseModal = () => {
-    setOpenModal(false)
-    setModalType('input')
-    setNewSlipData({
-      slipId: '',
-      date: new Date(),
-      profitType: 'Import',
-      warehouseId: '',
-      partnerCode: '',
-      partnerName: '',
-      note: ''
-    })
-    setItems([{ variantId: '', lot: '', quantity: '', unit: '', note: '' }])
-  }
-
-  const handleAddSlip = async (newSlip) => {
-    // setData([...data, newSlip])
-    await addWarehouseSlip(newSlip)
-    handleCloseModal()
-  }
-
-  const handleChange = (field) => (event) => {
-    setNewSlipData({ ...newSlipData, [field]: event.target.value })
-  }
-
-  const handleDateChange = (date) => {
-    setNewSlipData({ ...newSlipData, date })
-  }
-
-  const handleItemChange = (index, field) => (event) => {
-    const newItems = [...items]
-    newItems[index][field] = event.target.value
-    setItems(newItems)
-  }
-
-  const handleAddRow = () => {
-    setItems([
-      ...items,
-      { variantId: '', lot: '', quantity: '', unit: '', note: '' }
-    ])
-  }
-
-  const handleDeleteRow = (index) => {
-    const newItems = items.filter((_, i) => i !== index)
-    setItems(newItems)
-  }
-
-  const handleAdd = () => {
-    const newSlip = {
-      type: modalType === 'input' ? 'import' : 'export',
-      date: newSlipData.date ? new Date(newSlipData.date).toISOString() : null,
-      partnerId: newSlipData.partnerId || '',
-      warehouseId: newSlipData.warehouseId || '',
-      items: items.map((item) => ({
-        variantId: item.variantId || '',
-        quantity: parseInt(item.quantity) || 0,
-        unit: item.unit || 'cái'
-      })),
-      note: newSlipData.note || ''
-    }
-    handleAddSlip(newSlip)
-  }
-
   return (
     <Paper sx={{ border: '1px solid #ccc', width: '100%', overflow: 'hidden' }}>
       <TableContainer>
@@ -673,34 +591,9 @@ const InventoryTab = ({
                 colSpan={inventoryColumns.length}
                 sx={{ borderBottom: 'none', paddingBottom: '0' }}
               >
-                <Box
-                  sx={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center'
-                  }}
-                >
-                  <Typography variant='h6' sx={{ fontWeight: '800' }}>
-                    Tồn kho theo kho
-                  </Typography>
-                  <Box>
-                    <Button
-                      variant='contained'
-                      color='primary'
-                      onClick={() => handleOpenModal('input')}
-                      sx={{ mr: 1 }}
-                    >
-                      Nhập kho
-                    </Button>
-                    <Button
-                      variant='contained'
-                      color='secondary'
-                      onClick={() => handleOpenModal('output')}
-                    >
-                      Xuất kho
-                    </Button>
-                  </Box>
-                </Box>
+                <Typography variant='h6' sx={{ fontWeight: '800' }}>
+                  Tồn kho theo kho
+                </Typography>
               </TableCell>
             </TableRow>
             <TableRow>
@@ -776,6 +669,18 @@ const InventoryTab = ({
                       <MenuItem value='out-of-stock'>Hết hàng</MenuItem>
                     </Select>
                   </FormControl>
+                  <FilterByTime
+                    onApply={(value) =>
+                      handleFilterChange('filterTypeDate', value)
+                    }
+                    filterDate={filterDate}
+                    selectedFilter={filterTypeDate}
+                    setSelectedFilter={setFilterTypeDate}
+                    startDate={startDate}
+                    setStartDate={setStartDate}
+                    endDate={endDate}
+                    setEndDate={setEndDate}
+                  />
                 </Box>
               </TableCell>
             </TableRow>
@@ -892,25 +797,6 @@ const InventoryTab = ({
         onClose={handleCloseDeleteModal}
         inventory={selectedInventory}
         onSave={deleteInventory}
-      />
-      <AddWarehouseSlipModal
-        open={openModal}
-        onClose={handleCloseModal}
-        newSlipData={newSlipData}
-        handleChange={handleChange}
-        handleDateChange={handleDateChange}
-        handleAdd={handleAdd}
-        warehouses={warehouses}
-        items={items}
-        handleItemChange={handleItemChange}
-        handleDeleteRow={handleDeleteRow}
-        handleAddRow={handleAddRow}
-        variants={variants}
-        warehouseSlips={data}
-        batches={batches}
-        type={modalType}
-        partners={partners}
-        addWarehouseSlip={addWarehouseSlip}
       />
     </Paper>
   )

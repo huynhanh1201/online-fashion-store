@@ -28,7 +28,8 @@ import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers'
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns'
 import DeleteIcon from '@mui/icons-material/Delete'
 import Search from '~/components/SearchAdmin/Search.jsx' // Adjust the import path as needed
-
+import AddPartnerModal from '~/pages/admin/InventoryManagement/modal/Partner/AddPartnerModal.jsx'
+import AddWarehouseModal from '~/pages/admin/InventoryManagement/modal/Warehouse/AddWarehouseModal.jsx'
 export default function AddWarehouseSlipModal({
   open,
   onClose,
@@ -43,10 +44,21 @@ export default function AddWarehouseSlipModal({
   variants,
   type = 'input', // 'input' for import, 'output' for export
   partners,
-  handleAdd
+  handleAdd,
+  addPartner,
+  addWarehouse
 }) {
   const [isEditing, setIsEditing] = useState(false)
+  const [openAddDialog, setOpenAddDialog] = useState(false)
+  const [openAddWarehouse, setOpenAddWarehouse] = useState(false)
 
+  const handleOpenAddWarehouse = () => {
+    setOpenAddWarehouse(false)
+  }
+
+  const handleCloseAddDialog = () => {
+    setOpenAddDialog(false)
+  }
   // Safeguard against undefined newSlipData
   if (!newSlipData) {
     console.warn('newSlipData is undefined')
@@ -166,7 +178,9 @@ export default function AddWarehouseSlipModal({
                       value={newSlipData.warehouseId || ''}
                       onChange={handleChange('warehouseId')}
                     >
-                      <MenuItem value=''>Chọn kho</MenuItem>
+                      <MenuItem onClick={() => setOpenAddWarehouse(true)}>
+                        Thêm kho
+                      </MenuItem>
                       {warehouses.map((warehouse) => (
                         <MenuItem key={warehouse._id} value={warehouse._id}>
                           {warehouse.name}
@@ -182,7 +196,9 @@ export default function AddWarehouseSlipModal({
                       value={newSlipData.partnerId || ''}
                       onChange={handleChange('partnerId')}
                     >
-                      <MenuItem value=''>Chọn nhà cung cấp</MenuItem>
+                      <MenuItem onClick={() => setOpenAddDialog(true)}>
+                        Thêm hà cung cấp
+                      </MenuItem>
                       {partners.map((partner) => (
                         <MenuItem key={partner._id} value={partner._id}>
                           {partner.name}
@@ -315,6 +331,16 @@ export default function AddWarehouseSlipModal({
             </Box>
           </Paper>
         </DialogContent>
+        <AddPartnerModal
+          open={openAddDialog}
+          onClose={handleCloseAddDialog}
+          addPartner={addPartner}
+        />
+        <AddWarehouseModal
+          open={openAddWarehouse}
+          onClose={handleOpenAddWarehouse}
+          onSave={addWarehouse}
+        />
       </Dialog>
     </LocalizationProvider>
   )
