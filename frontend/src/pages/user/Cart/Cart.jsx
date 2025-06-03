@@ -370,7 +370,7 @@ const Cart = () => {
         open={showMaxQuantityAlert}
         autoHideDuration={2000}
         onClose={() => setShowMaxQuantityAlert(false)}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
       >
         <Alert severity='warning' sx={{ width: '100%' }}>
           Đã đạt số lượng tối đa của sản phẩm!
