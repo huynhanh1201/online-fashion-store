@@ -54,16 +54,18 @@ const OrderDetail = () => {
         {items.map(item => (
           <Box key={item._id} mb={2} display="flex" gap={2} alignItems="center">
             <Avatar
-              src={item.image || '/default.jpg'}
+              src={item.color?.image || '/default.jpg'}
               variant="square"
               sx={{ width: 64, height: 64, borderRadius: 1, objectFit: 'cover' }}
             />
+
             <Box display="flex" justifyContent="space-between" alignItems="center" flex={1}>
               <Box textAlign="left">
                 <Typography variant='h6' >{item.name}</Typography>
                 <Typography variant="body2" color="text.secondary">
-                  Phân loại hàng: Xanh, XL
+                  Phân loại hàng: {item.color?.name}, {item.size}
                 </Typography>
+
                 <Typography variant="body2" color="text.secondary">
                   x{item.quantity}
                 </Typography>

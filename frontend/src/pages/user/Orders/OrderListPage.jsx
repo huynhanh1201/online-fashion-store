@@ -95,7 +95,7 @@ const OrderRow = ({ order }) => {
                       <Box display="flex" alignItems="center" gap={2}>
                         <Box
                           component="img"
-                          src={item.image || '/images/default.jpg'}
+                          src={item.color?.image || '/images/default.jpg'}
                           alt={item.name}
                           sx={{ width: 72, height: 72, objectFit: 'cover', borderRadius: 1, border: '1px solid #ddd' }}
                         />
@@ -104,10 +104,14 @@ const OrderRow = ({ order }) => {
                             {item.name}
                           </Typography>
                           <Typography variant="body2" color="text.secondary">
+                            Màu: {item.color?.name} | Size: {item.size}
+                          </Typography>
+                          <Typography variant="body2" color="text.secondary">
                             Số lượng: x{item.quantity}
                           </Typography>
                         </Box>
                       </Box>
+
 
                       <Box textAlign="right" minWidth={120}>
                         <Typography variant="body1" fontWeight={600}>
