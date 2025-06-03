@@ -1,6 +1,5 @@
 import { PartnerModel } from '~/models/PartnerModel'
 import generateSequentialCode from '~/utils/generateSequentialCode'
-import { WarehouseSlipModel } from '~/models/WarehouseSlipsModel'
 
 const createPartner = async (reqBody) => {
   // eslint-disable-next-line no-useless-catch
