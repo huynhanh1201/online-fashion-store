@@ -9,5 +9,6 @@ export const filterDate = [
   { label: 'Quý này', value: 'this_quarter' },
   { label: 'Quý trước', value: 'last_quarter' },
   { label: 'Năm này', value: 'this_year' },
-  { label: 'Năm trước', value: 'last_year' }
+  { label: 'Năm trước', value: 'last_year' },
+  { label: 'Tùy chỉnh', value: 'custom' }
 ]
