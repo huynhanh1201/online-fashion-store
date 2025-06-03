@@ -329,6 +329,15 @@ const useProductDetail = (productId) => {
       return
     }
 
+    const maxQuantity = inventory?.quantity ?? selectedVariant?.quantity ?? product?.quantity ?? 0
+    if (maxQuantity === 0) {
+      setSnackbar({
+        type: 'warning',
+        message: 'Sản phẩm này đã hết hàng!'
+      })
+      return
+    }
+
     const itemToBuy = {
       variantId: selectedVariant,
       quantity
