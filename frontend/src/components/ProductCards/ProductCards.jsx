@@ -38,17 +38,6 @@ export default function ProductCard({ product }) {
               {product.exportPrice.toLocaleString()}₫
             </span>
           </div>
-
-          <button
-            className='add-to-cart-btn'
-            disabled={false}
-            onClick={(e) => {
-              e.preventDefault() // Ngăn click vào button bị chuyển trang
-              // Thực hiện hành động thêm vào giỏ ở đây
-            }}
-          >
-            🛒 Thêm vào giỏ hàng
-          </button>
         </div>
       </div>
     </Link>

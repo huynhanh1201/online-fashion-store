@@ -5,6 +5,7 @@ import ProductCategories from './ProductCategories/ProductCategories'
 import ProductList from './ProductList/ProductList'
 import CouponList from './CouponList/CouponList'
 import Content from './Contents/Content.jsx'
+import ProductContent from './ProductContent/ProductContent.jsx'
 const UserHome = () => {
   return (
     <>
@@ -13,6 +14,7 @@ const UserHome = () => {
       {/*<CouponList />*/}
       {/*<ProductList />*/}
       <Content />
+      <ProductContent />
     </>
   )
 }

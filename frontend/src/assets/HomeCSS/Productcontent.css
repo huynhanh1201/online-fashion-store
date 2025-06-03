@@ -1,0 +1,102 @@
+.product-content {
+    padding: 20px;
+    font-family: Arial, sans-serif;
+}
+
+.section-title {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+.banner {
+    margin-bottom: 20px;
+}
+
+.banner img {
+    width: 100%;
+    max-width: 300px;
+    height: auto;
+}
+
+.main-content {
+    display: flex;
+    gap: 20px;
+}
+
+.product-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 20px;
+    flex: 3;
+}
+
+.product-card {
+    text-align: center;
+}
+
+.product-image {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+}
+
+.product-name {
+    font-size: 14px;
+    margin: 10px 0 5px;
+}
+
+.product-price {
+    font-size: 16px;
+    color: #e91e63;
+    margin-bottom: 10px;
+}
+
+.color-options {
+    display: flex;
+    justify-content: center;
+    gap: 5px;
+}
+
+.color-dot {
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    border: 1px solid #ccc;
+}
+
+.sidebar {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.sidebar-title {
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.sidebar-product {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.sidebar-product-image {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+}
+
+.sidebar-product-info {
+    flex: 1;
+}
+
+.sidebar-product-info .product-name {
+    font-size: 12px;
+}
+
+.sidebar-product-info .product-price {
+    font-size: 14px;
+}
