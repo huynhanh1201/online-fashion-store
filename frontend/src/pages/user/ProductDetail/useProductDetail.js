@@ -28,6 +28,8 @@ const useProductDetail = (productId) => {
   const [selectedColor, setSelectedColor] = useState(null)
   const [selectedSize, setSelectedSize] = useState(null)
 
+  const [inventory, setInventory] = useState(null)
+
   const dispatch = useDispatch()
   const navigate = useNavigate()
 
@@ -81,8 +83,8 @@ const useProductDetail = (productId) => {
       console.error('Error fetching product:', err.response || err)
       setError(
         err?.response?.data?.message ||
-          err.message ||
-          'Không thể tải thông tin sản phẩm.'
+        err.message ||
+        'Không thể tải thông tin sản phẩm.'
       )
     } finally {
       setIsLoading(false)
@@ -227,58 +229,98 @@ const useProductDetail = (productId) => {
     return product?.images?.length > 0 ? product.images : ['/default.jpg']
   }
 
+  const fetchInventory = async (variantId) => {
+    try {
+      const response = await fetch(`http://localhost:8017/v1/inventories?variantId=${variantId}`)
+      if (!response.ok) throw new Error(`Lỗi HTTP ${response.status}`)
+      const data = await response.json()
+      const inventory = Array.isArray(data) ? data[0] : data // nếu trả về danh sách
+      setInventory(inventory)
+      console.log('Thông tin kho:', inventory)
+    } catch (error) {
+      console.error('Lỗi lấy kho:', error)
+    }
+  }
+  useEffect(() => {
+    if (selectedVariant && selectedVariant._id) {
+      fetchInventory(selectedVariant._id)
+    } else {
+      setInventory(null)
+    }
+  }, [selectedVariant])
   // Handle add to cart
-  const handleAddToCart = async () => {
-    if (isAdding || !product) return
-    if (variants.length > 0 && !selectedVariant) {
+  const handleAddToCart = async (productId) => {
+    if (isAdding[productId] || !product) return;
+
+    if (!selectedVariant) {
+      setSnackbar({ open: true, severity: 'warning', message: 'Vui lòng chọn màu sắc và kích thước!' })
+      return
+    }
+
+    const variantId = selectedVariant._id
+    const availableQuantity = inventory?.quantity ?? selectedVariant?.quantity ?? 0
+
+    if (availableQuantity === 0) {
+      setSnackbar({ open: true, severity: 'warning', message: 'Sản phẩm này hiện đang hết hàng!' })
+      return
+    }
+
+    const updatedCart = await getCart();
+    const existingItem = updatedCart?.cartItems?.find(
+      item => {
+        const itemVariantId = typeof item.variantId === 'object' ? item.variantId._id : item.variantId;
+        return itemVariantId === variantId
+      }
+    );
+
+    const currentQty = existingItem?.quantity || 0
+
+
+    if (currentQty + quantity > availableQuantity) {
+      const remainingQty = availableQuantity - currentQty
       setSnackbar({
-        type: 'warning',
-        message: 'Vui lòng chọn màu sắc và kích thước!'
+        open: true,
+        severity: 'warning',
+        message:
+          remainingQty > 0
+            ? `Bạn chỉ có thể thêm tối đa ${remainingQty} sản phẩm nữa cho biến thể này!`
+            : 'Bạn đã thêm số lượng tối đa cho mẫu này trong giỏ hàng!'
       })
       return
     }
-    setIsAdding(true)
+
     try {
-      const updatedCart = await getCart()
-      const productIdToUse = selectedVariant?._id || product._id
-      const existingItem = updatedCart?.cartItems?.find(
-        (item) => item.productId._id === productIdToUse
-      )
-      const currentQty = existingItem?.quantity || 0
-      const availableQuantity = selectedVariant?.quantity || product.quantity
+      setIsAdding(prev => ({ ...prev, [productId]: true }));
 
-      if (currentQty + quantity > availableQuantity) {
-        setSnackbar({
-          type: 'warning',
-          message: 'Không thể vượt quá số lượng tồn kho!'
-        })
-        setIsAdding(false)
-        return
-      }
+      const res = await addToCart({ variant: selectedVariant, quantity });
 
-      const res = await addToCart({
-        cartItems: [{ productId: productIdToUse, quantity }]
-      })
-      dispatch(setCartItems(res?.cartItems || updatedCart?.cartItems || []))
-      setSnackbar({
-        type: 'success',
-        message: 'Thêm sản phẩm vào giỏ hàng thành công!'
-      })
+      if (!res) throw new Error('Thêm giỏ hàng thất bại')
+
+      const latestCart = res.cartItems ? res : await getCart()
+      dispatch(setCartItems(latestCart.cartItems || []))
+
+      setSnackbar({ open: true, severity: 'success', message: 'Thêm sản phẩm vào giỏ hàng thành công!' })
       setQuantity(1)
     } catch (error) {
-      console.error('Lỗi khi thêm vào giỏ:', error)
-      setSnackbar({
-        type: 'error',
-        message: 'Không thể thêm sản phẩm vào giỏ hàng!'
-      })
+      console.error('Thêm vào giỏ hàng lỗi:', error)
+      const messageFromServer = error.response?.data?.message || ''
+      if (messageFromServer.includes('ValidationError')) {
+        setSnackbar({ open: true, severity: 'warning', message: 'Số lượng thêm vượt quá tồn kho!' })
+      } else {
+        setSnackbar({ open: true, severity: 'error', message: 'Thêm sản phẩm thất bại!' })
+      }
     } finally {
-      setTimeout(() => setIsAdding(false), 1000)
+      setTimeout(() => {
+        setIsAdding(prev => ({ ...prev, [productId]: false }))
+      }, 500)
     }
   }
+
 
   // Handle buy now
   const handleBuyNow = () => {
     if (!product) return
+
     if (variants.length > 0 && !selectedVariant) {
       setSnackbar({
         type: 'warning',
@@ -286,19 +328,21 @@ const useProductDetail = (productId) => {
       })
       return
     }
-    const currentPrice = getCurrentPrice()
-    const currentImages = getCurrentImages()
+
+    const maxQuantity = inventory?.quantity ?? selectedVariant?.quantity ?? product?.quantity ?? 0
+    if (maxQuantity === 0) {
+      setSnackbar({
+        type: 'warning',
+        message: 'Sản phẩm này đã hết hàng!'
+      })
+      return
+    }
 
     const itemToBuy = {
-      productId: selectedVariant?._id || product._id,
-      quantity,
-      product: {
-        _id: selectedVariant?._id || product._id,
-        name: selectedVariant?.name || product.name,
-        price: currentPrice.discountPrice || currentPrice.price,
-        image: currentImages[0] || ''
-      }
+      variantId: selectedVariant,
+      quantity
     }
+
     dispatch(setTempCart({ cartItems: [itemToBuy] }))
     navigate('/payment')
   }
@@ -334,7 +378,8 @@ const useProductDetail = (productId) => {
     handleBuyNow,
     handleCopy,
     copiedCode,
-    formatCurrencyShort
+    formatCurrencyShort,
+    inventory
   }
 }
 

@@ -13,7 +13,8 @@ import {
   Typography,
   Divider,
   Box,
-  IconButton
+  IconButton,
+  Autocomplete
 } from '@mui/material'
 import CloseIcon from '@mui/icons-material/Close'
 
@@ -351,95 +352,64 @@ export default function AddAddressModal({
               helperText={formErrors.phone ? 'Số điện thoại phải đúng 10 số' : ''}
               disabled={viewOnly}
             />
-            <FormControl fullWidth error={formErrors.city} disabled={viewOnly}>
-              <InputLabel id="select-city-label">Tỉnh/Thành</InputLabel>
-              <Select
-                labelId="select-city-label"
-                value={formData.city}
-                label="Tỉnh/Thành"
-                onChange={handleChange('city')}
-                MenuProps={{
-                  PaperProps: {
-                    style: {
-                      maxHeight: 200,
-                    },
-                  },
-                }}
-              >
-                {provinces.map((p) => (
-                  <MenuItem key={p.code} value={p.code}>
-                    {p.name}
-                  </MenuItem>
-                ))}
-              </Select>
-              {formErrors.city && (
-                <Typography color="error" variant="caption">
-                  Vui lòng chọn tỉnh/thành
-                </Typography>
+            {/* Tỉnh/ Thành */}
+            <Autocomplete
+              options={provinces}
+              getOptionLabel={(option) => option.name}
+              value={provinces.find((p) => p.code === formData.city) || null}
+              onChange={(event, newValue) => {
+                handleChange('city')({ target: { value: newValue?.code || '' } });
+              }}
+              noOptionsText="Không có kết quả"
+              disabled={viewOnly}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label="Tỉnh/Thành"
+                  error={!!formErrors.city}
+                  helperText={formErrors.city && 'Vui lòng chọn tỉnh/thành'}
+                />
               )}
-            </FormControl>
-            <FormControl
-              fullWidth
-              error={formErrors.district}
+            />
+            {/* Quận/ Huyện */}
+            <Autocomplete
+              options={districts}
+              getOptionLabel={(option) => option.name}
+              value={districts.find((d) => d.code === formData.district) || null}
+              onChange={(event, newValue) => {
+                handleChange('district')({ target: { value: newValue?.code || '' } });
+              }}
+              noOptionsText="Không có kết quả"
               disabled={viewOnly || districts.length === 0}
-            >
-              <InputLabel id="select-district-label">Quận/Huyện</InputLabel>
-              <Select
-                labelId="select-district-label"
-                value={formData.district}
-                label="Quận/Huyện"
-                onChange={handleChange('district')}
-                MenuProps={{
-                  PaperProps: {
-                    style: {
-                      maxHeight: 200,
-                    },
-                  },
-                }}
-              >
-                {districts.map((d) => (
-                  <MenuItem key={d.code} value={d.code}>
-                    {d.name}
-                  </MenuItem>
-                ))}
-              </Select>
-              {formErrors.district && (
-                <Typography color="error" variant="caption">
-                  Vui lòng chọn quận/huyện
-                </Typography>
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label="Quận/Huyện"
+                  error={!!formErrors.district}
+                  helperText={formErrors.district && 'Vui lòng chọn quận/huyện'}
+                />
               )}
-            </FormControl>
-            <FormControl
-              fullWidth
-              error={formErrors.ward}
+            />
+            {/* Phường/Xã */}
+            <Autocomplete
+              options={wards}
+              getOptionLabel={(option) => option.name}
+              value={wards.find((w) => w.code === formData.ward) || null}
+              onChange={(event, newValue) => {
+                handleChange('ward')({ target: { value: newValue?.code || '' } });
+              }}
+              noOptionsText="Không có kết quả"
               disabled={viewOnly || wards.length === 0}
-            >
-              <InputLabel id="select-ward-label">Phường/Xã</InputLabel>
-              <Select
-                labelId="select-ward-label"
-                value={formData.ward}
-                label="Phường/Xã"
-                onChange={handleChange('ward')}
-                MenuProps={{
-                  PaperProps: {
-                    style: {
-                      maxHeight: 200,
-                    },
-                  },
-                }}
-              >
-                {wards.map((w) => (
-                  <MenuItem key={w.code} value={w.code}>
-                    {w.name}
-                  </MenuItem>
-                ))}
-              </Select>
-              {formErrors.ward && (
-                <Typography color="error" variant="caption">
-                  Vui lòng chọn phường/xã
-                </Typography>
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label="Phường/Xã"
+                  error={!!formErrors.ward}
+                  helperText={formErrors.ward && 'Vui lòng chọn phường/xã'}
+                />
               )}
-            </FormControl>
+            />
+
             <TextField
               label="Địa chỉ cụ thể"
               fullWidth

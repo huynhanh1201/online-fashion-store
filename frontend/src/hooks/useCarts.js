@@ -14,86 +14,113 @@ export const useCart = () => {
   const dispatch = useDispatch()
   const cart = useSelector(state => state.cart)
 
-  // Fetch dữ liệu giỏ hàng từ server
   const fetchCart = async (options = {}) => {
     if (!options?.silent) setLoading(true)
-    const data = await getCart()
-    dispatch(setCartItems(data?.cartItems || []))
-    setLoading(false)
+    try {
+      const response = await getCart()
+      const normalizedItems = (response?.cartItems || []).map(item => ({
+        ...item,
+        variant: typeof item.variantId === 'object' ? item.variantId : { _id: item.variantId }
+      }))
+      dispatch(setCartItems(normalizedItems))
+    } catch (error) {
+      console.error('Failed to fetch cart:', error)
+    } finally {
+      setLoading(false)
+    }
   }
 
-  // Thêm sản phẩm vào giỏ hàng
+
   const handleAddToCart = async (payload) => {
     try {
       const newItem = await addToCart(payload)
+      if (!newItem) return false
 
-      if (newItem) {
-        const newProductId = typeof newItem.productId === 'object' ? newItem.productId._id : newItem.productId
+      const newVariantId = typeof newItem.variantId === 'object' ? newItem.variantId._id : newItem.variantId
 
-        const existingItem = cart.cartItems.find(item => {
-          const itemProductId = typeof item.productId === 'object' ? item.productId._id : item.productId
-          return itemProductId === newProductId
-        })
+      const existingItem = cart.cartItems.find(item => {
+        const itemVariantId = typeof item.variantId === 'object' ? item.variantId._id : item.variantId
+        return itemVariantId === newVariantId
+      })
 
-        let newCartItems
-        if (existingItem) {
-          newCartItems = cart.cartItems.map(item => {
-            const itemProductId = typeof item.productId === 'object' ? item.productId._id : item.productId
-            if (itemProductId === newProductId) {
-              return {
-                ...item,
-                quantity: (Number(item.quantity) || 0) + (Number(newItem.quantity) || 0)
-              }
+      let updatedCartItems
+      if (existingItem) {
+        updatedCartItems = cart.cartItems.map(item => {
+          const itemVariantId = typeof item.variantId === 'object' ? item.variantId._id : item.variantId
+          if (itemVariantId === newVariantId) {
+            return {
+              ...item,
+              quantity: (Number(item.quantity) || 0) + (Number(newItem.quantity) || 0)
             }
-            return item
-          })
-        } else {
-          newCartItems = [...cart.cartItems, newItem]
-        }
-
-        dispatch(setCartItems(newCartItems))
+          }
+          return item
+        })
+      } else {
+        updatedCartItems = [...cart.cartItems, newItem]
       }
+
+      dispatch(setCartItems(updatedCartItems))
+      return true
     } catch (error) {
       console.error('Error adding to cart:', error)
-      throw error
+      return false
     }
   }
 
-  // Cập nhật sản phẩm trong giỏ (số lượng, trạng thái selected)
-  const handleUpdateItem = async (productId, data) => {
-    const updated = await updateCartItem(productId, data)
-    if (updated) {
-      dispatch(setCartItems(updated?.cartItems || []))
+  const handleUpdateItem = async (variantId, data) => {
+    if (!data || Object.keys(data).length === 0) return
+
+    try {
+      const payload = { variantId, ...data }
+      const updated = await updateCartItem(payload)
+
+      if (Array.isArray(updated?.cartItems)) {
+        const normalizedItems = updated.cartItems.map(item => ({
+          ...item,
+          variant: typeof item.variantId === 'object'
+            ? item.variantId
+            : { _id: item.variantId }
+        }))
+        dispatch(setCartItems(normalizedItems))
+      }
+    } catch (error) {
+      console.error('Error updating cart item:', error?.response || error)
     }
   }
 
-  // Cập nhật trạng thái selected
-  const handleToggleSelected = async (productId, selected) => {
-    await handleUpdateItem(productId, { selected })
+
+
+
+  const handleToggleSelected = async (cartItemId, selected) => {
+    await handleUpdateItem(cartItemId, { selected })
   }
 
-  // Xoá một sản phẩm khỏi giỏ
-  const handleDeleteItem = async (productId) => {
-    await deleteCartItem(productId)
-    fetchCart({ silent: true })
+  const handleDeleteItem = async (cartItemId) => {
+    try {
+      await deleteCartItem(cartItemId)
+      await fetchCart({ silent: true })
+    } catch (error) {
+      console.error('Error deleting cart item:', error)
+    }
   }
 
-  // Xoá toàn bộ giỏ hàng
   const handleClearCart = async () => {
-    const cleared = await clearCart()
-    if (cleared) {
-      dispatch(setCartItems([]))
+    try {
+      const cleared = await clearCart()
+      if (cleared) {
+        dispatch(setCartItems([]))
+      }
+    } catch (error) {
+      console.error('Error clearing cart:', error)
     }
   }
 
-  // Các sản phẩm được chọn để thanh toán
   const selectedCartItems = cart.cartItems.filter(item => item.selected)
-
-  // Số lượng sản phẩm trong giỏ
   const cartCount = cart.cartItems.reduce((total, item) => total + (Number(item.quantity) || 0), 0)
-  const getProductId = (item) => typeof item.productId === 'object' ? item.productId._id : item.productId
 
-  // Tạo payload order gửi về server
+  const getVariantId = (item) =>
+    typeof item.variantId === 'object' ? item.variantId._id : item.variantId
+
   const getOrderPayload = ({
     shippingAddressId,
     total,
@@ -101,20 +128,18 @@ export const useCart = () => {
     couponCode,
     paymentMethod,
     note
-  }) => {
-    return {
-      cartItems: selectedCartItems.map(item => ({
-        productId: getProductId(item),
-        quantity: item.quantity
-      })),
-      shippingAddressId,
-      total,
-      couponId,
-      couponCode,
-      paymentMethod,
-      note
-    }
-  }
+  }) => ({
+    cartItems: selectedCartItems.map(item => ({
+      variantId: getVariantId(item),
+      quantity: item.quantity
+    })),
+    shippingAddressId,
+    total,
+    couponId,
+    couponCode,
+    paymentMethod,
+    note
+  })
 
   useEffect(() => {
     fetchCart()

@@ -36,7 +36,7 @@ const SectionTitle = styled(Typography)(({ theme }) => ({
   marginBottom: theme.spacing(2),
   textTransform: 'uppercase'
 }))
-const ProductItem = ({ name, price, quantity, image }) => {
+const ProductItem = ({ name, price, quantity, image, color, size }) => {
   // Validate product data
   if (!name || typeof price !== 'number' || typeof quantity !== 'number') {
     return (
@@ -60,13 +60,16 @@ const ProductItem = ({ name, price, quantity, image }) => {
           alt={name}
           style={{ width: 64, height: 64, borderRadius: 8, objectFit: 'cover' }}
         />
-        <span>{truncatedName}</span>
+        <div style={{ display: 'flex', flexDirection: 'column' }}>
+          <Typography fontWeight={600}>{truncatedName}</Typography>
+          <Typography variant="caption" color="text.secondary">
+            {color || 'Chưa chọn màu'}, {size || 'Chưa chọn kích cỡ'}
+          </Typography>
+        </div>
       </td>
-      <td style={{ textAlign: 'center' }}>{price.toLocaleString()}đ</td>
+      <td style={{ textAlign: 'center' }}>{price.toLocaleString('vi-VN')} đ</td>
       <td style={{ textAlign: 'center' }}>{quantity}</td>
-      <td style={{ textAlign: 'right' }}>
-        {(price * quantity).toLocaleString()}đ
-      </td>
+      <td style={{ textAlign: 'right' }}>{(price * quantity).toLocaleString('vi-VN')} đ</td>
     </tr>
   )
 }
@@ -87,22 +90,15 @@ const Payment = () => {
   const { addresses, fetchAddresses } = useAddress()
   const { loading: cartLoading } = useCart()
   const { createOrder, loading: orderLoading } = useOrder()
-  const {
-    discount,
-    discountMessage,
-    loading: couponLoading,
-    handleApplyVoucher,
-    couponId
-  } = useCoupon()
+  const { discount, discountMessage, loading: couponLoading, handleApplyVoucher, couponId } = useCoupon()
 
-  const selectedItems = useSelector((state) => state.cart.selectedItems)
-  const selectedIds = useSelector((state) => state.cart.selectedItems || [])
+  const selectedItems = useSelector(state => state.cart.selectedItems || [])
 
-  const cartCartItems = useSelector((state) => state.cart.cartItems)
-  const tempCart = useSelector((state) => state.cart.tempCart)
+  const cartCartItems = useSelector(state => state.cart.cartItems)
+  const tempCart = useSelector(state => state.cart.tempCart)
 
   const location = useLocation()
-  const isBuyNow = useSelector((state) => state.cart.isBuyNow)
+  const isBuyNow = useSelector(state => state.cart.isBuyNow)
 
   const cartItems =
     isBuyNow && tempCart?.cartItems?.length > 0
@@ -111,28 +107,30 @@ const Payment = () => {
 
   // Tính selectedCartItems + subTotal
   let subTotal = 0
-  const selectedCartItems = cartItems
-    .filter((item) => {
-      if (isBuyNow) return true // tính tất cả khi Buy Now
-      const productId = String(
-        item.product?._id || item.productId?._id || item.productId
-      )
-      return selectedIds.includes(productId)
-    })
-    .map((item) => {
-      const product = item.product || item.productId || {}
-      const productId = String(
-        product._id || item.productId?._id || item.productId
-      )
-      const price = typeof product.price === 'number' ? product.price : 0
-      const quantity = typeof item.quantity === 'number' ? item.quantity : 1
 
-      subTotal += price * quantity
+  const selectedCartItems = cartItems.filter(item => {
+    if (isBuyNow) return true // tính tất cả khi Buy Now
 
-      return { productId, quantity }
-    })
+    // Tìm xem trong selectedItems có item tương ứng với variantId, color, size hay không
+    return selectedItems.some(selected =>
+      selected.variantId === (item.variantId?._id || item.variantId) &&
+      selected.color === item.color &&
+      selected.size === item.size
+    )
+  }).map(item => {
+    const variant = item.variantId || {}
+    const variantId = String(variant._id || item.variantId)
+    const price = typeof variant.exportPrice === 'number' ? variant.exportPrice : 0
+    const quantity = typeof item.quantity === 'number' ? item.quantity : 1
+
+    subTotal += price * quantity
+
+    return { variantId, color: item.color, size: item.size, quantity }
+  })
 
   const total = Math.max(subTotal - discount, 0)
+
+
 
   // const { addresses, fetchAddresses } = useAddress()
   // const [selectedAddress, setSelectedAddress] = useState(null)
@@ -225,8 +223,15 @@ const Payment = () => {
       setSnackbar({ open: true, severity: 'error', message: 'Giỏ hàng trống' })
       return
     }
+
+    // Chỉ gửi variantId và quantity, bỏ color, size nếu backend không hỗ trợ
+    const sanitizedCartItems = selectedCartItems.map(item => ({
+      variantId: item.variantId,
+      quantity: item.quantity
+    }))
+
     const orderData = {
-      cartItems: selectedCartItems,
+      cartItems: sanitizedCartItems,
       shippingAddressId: selectedAddress._id,
       total,
       paymentMethod,
@@ -257,6 +262,7 @@ const Payment = () => {
       })
     }
   }
+
 
   return (
     <Box
@@ -323,37 +329,32 @@ const Payment = () => {
                   <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                     <thead>
                       <tr style={{ borderBottom: '2px solid #ccc' }}>
-                        <th style={{ textAlign: 'left', padding: 8 }}>
-                          Sản phẩm
-                        </th>
-                        <th style={{ textAlign: 'center', padding: 8 }}>Giá</th>
-                        <th style={{ textAlign: 'center', padding: 8 }}>
-                          Số lượng
-                        </th>
-                        <th style={{ textAlign: 'right', padding: 8 }}>
-                          Thành tiền
-                        </th>
+                        <th style={{ textAlign: 'left', padding: 8 }}>Sản phẩm</th>
+                        <th style={{ textAlign: 'center', padding: 8 }}>Đơn giá</th>
+                        <th style={{ textAlign: 'center', padding: 8 }}>Số lượng</th>
+                        <th style={{ textAlign: 'right', padding: 8 }}>Thành tiền</th>
                       </tr>
                     </thead>
                     <tbody>
-                      {cartItems
-                        .filter((item) =>
-                          selectedItems.includes(
-                            item.productId._id || item.productId
-                          )
-                        ) // lọc đúng item đã chọn
-                        .map((item, index) => {
-                          const product = item.product || item.productId || {}
-                          return (
-                            <ProductItem
-                              key={index}
-                              name={product.name || 'Sản phẩm không tên'}
-                              price={product.price || 0}
-                              quantity={item.quantity || 1}
-                              image={product.image}
-                            />
-                          )
-                        })}
+                      {(isBuyNow ? cartItems : cartItems.filter(item =>
+                        selectedItems.some(selected =>
+                          selected.variantId === item.variantId?._id
+                        )
+                      )).map((item, index) => {
+                        const variant = item.variantId || {}
+
+                        return (
+                          <ProductItem
+                            key={index}
+                            name={variant.name || 'Sản phẩm không tên'}
+                            price={variant.exportPrice || 0}
+                            quantity={item.quantity || 1}
+                            image={variant.color?.image}
+                            color={variant.color?.name}
+                            size={variant.size?.name}
+                          />
+                        )
+                      })}
                     </tbody>
                   </table>
                 )}
@@ -420,13 +421,20 @@ const Payment = () => {
                 />
                 <Button
                   fullWidth
-                  variant='contained'
-                  color='primary'
+                  variant="contained"
                   onClick={handleApplyVoucherClick}
                   disabled={couponLoading}
+                  sx={{
+                    backgroundColor: '#1A3C7B',
+                    color: '#fff',
+                    '&:hover': {
+                      backgroundColor: '#3f51b5'
+                    }
+                  }}
                 >
                   {couponLoading ? 'Đang áp dụng...' : 'Áp dụng Voucher'}
                 </Button>
+
                 {discountMessage && (
                   <Typography
                     variant='body2'
@@ -444,13 +452,13 @@ const Payment = () => {
                     sx={{ display: 'flex', justifyContent: 'space-between' }}
                   >
                     <span>Tạm tính</span>
-                    <span>{subTotal.toLocaleString()}đ</span>
+                    <span>{subTotal.toLocaleString('vi-VN')} đ</span>
                   </Box>
                   <Box
                     sx={{ display: 'flex', justifyContent: 'space-between' }}
                   >
                     <span>Giảm giá</span>
-                    <span>{discount.toLocaleString()}đ</span>
+                    <span>{discount.toLocaleString('vi-VN')} đ</span>
                   </Box>
                   <Box
                     sx={{
@@ -460,7 +468,7 @@ const Payment = () => {
                     }}
                   >
                     <span>Tổng cộng</span>
-                    <span>{total.toLocaleString()}đ</span>
+                    <span>{total.toLocaleString('vi-VN')} đ</span>
                   </Box>
                 </Box>
 
@@ -521,8 +529,14 @@ const Payment = () => {
               setConfirmOpen(false)
               handlePlaceOrder()
             }}
-            variant='contained'
-            color='secondary'
+            variant="contained"
+            sx={{
+              backgroundColor: '#1A3C7B',
+              color: '#fff',
+              '&:hover': {
+                backgroundColor: '#3f51b5'
+              }
+            }}
           >
             Xác nhận
           </Button>

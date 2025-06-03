@@ -1,5 +1,4 @@
-// ProductInfoSection.jsx
-import React from 'react'
+import React, { useState } from 'react'
 import {
   Box,
   Typography,
@@ -7,12 +6,13 @@ import {
   IconButton,
   TextField,
   Chip,
-  CircularProgress
+  CircularProgress,
 } from '@mui/material'
 import { styled } from '@mui/system'
 import AddIcon from '@mui/icons-material/Add'
 import RemoveIcon from '@mui/icons-material/Remove'
 import LocalOfferIcon from '@mui/icons-material/LocalOffer'
+import SnackbarAlert from './SnackbarAlert'
 
 const PriceTypography = styled(Typography)({
   color: '#d32f2f',
@@ -57,7 +57,6 @@ const ProductInfoSection = ({
   handleAddToCart,
   handleBuyNow,
   setOpenVoucherDrawer,
-  // Variants props
   variants,
   selectedVariant,
   availableColors,
@@ -67,30 +66,30 @@ const ProductInfoSection = ({
   handleColorChange,
   handleSizeChange,
   getCurrentPrice,
-  getCurrentImages
+  inventory,
 }) => {
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: '',
+    severity: 'info'
+  })
+
+  const handleSnackbarClose = () => {
+    setSnackbar(prev => ({ ...prev, open: false }))
+  }
+
   const currentPrice = getCurrentPrice()
-  const currentImages = getCurrentImages()
 
   return (
-    <Box
-      sx={{ display: 'flex', flexDirection: 'column', gap: 2, maxWidth: 670 }}
-    >
-      <Typography
-        variant='h5'
-        fontWeight={700}
-        sx={{ wordBreak: 'break-word', whiteSpace: 'pre-wrap' }}
-      >
+    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, maxWidth: 670 }}>
+      <Typography variant='h5' fontWeight={700} sx={{ wordBreak: 'break-word', whiteSpace: 'pre-wrap' }}>
         {product?.name}
       </Typography>
 
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
         {currentPrice?.discountPrice ? (
           <>
-            <Typography
-              variant='h5'
-              sx={{ color: 'text.secondary', textDecoration: 'line-through' }}
-            >
+            <Typography variant='h5' sx={{ color: 'text.secondary', textDecoration: 'line-through' }}>
               {currentPrice.price.toLocaleString('vi-VN')}đ
             </Typography>
             <PriceTypography variant='h5'>
@@ -107,13 +106,12 @@ const ProductInfoSection = ({
       </Box>
 
       <Box sx={{ border: '1px dashed #d32f2f', p: 1.5, borderRadius: 1 }}>
-        <Typography variant='body2' color='error' fontWeight={700}>
-          <LocalOfferIcon sx={{ verticalAlign: 'middle', mr: 1 }} />
-          KHUYẾN MÃI - ƯU ĐÃI
+        <Typography variant='body2' color='error' fontWeight={700} sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          <LocalOfferIcon /> KHUYẾN MÃI - ƯU ĐÃI
         </Typography>
         {coupons?.length > 0 ? (
           <Box sx={{ mt: 1 }}>
-            {coupons.slice(0, 3).map((coupon) => (
+            {coupons.slice(0, 3).map(coupon => (
               <Typography key={coupon.code} variant='body2'>
                 👉 Nhập mã <b>{coupon.code}</b> GIẢM{' '}
                 {coupon.type === 'percent'
@@ -134,7 +132,7 @@ const ProductInfoSection = ({
           <Typography variant='body2' fontWeight={700} sx={{ mb: 0.5 }}>
             Mã giảm giá
           </Typography>
-          {coupons.slice(0, 3).map((coupon) => (
+          {coupons.slice(0, 3).map(coupon => (
             <VoucherChip
               key={coupon.code}
               label={`VOUCHER ${coupon.type === 'percent' ? `${coupon.amount}%` : `${coupon.amount.toLocaleString()}đ`}`}
@@ -150,33 +148,19 @@ const ProductInfoSection = ({
             Chọn phiên bản
           </Typography>
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
-            {availableColors?.map((color) => (
+            {availableColors?.map(color => (
               <Box key={color.name}>
-                <Typography
-                  variant='body2'
-                  fontWeight={600}
-                  sx={{ mb: 1, color: '#666' }}
-                >
+                <Typography variant='body2' fontWeight={600} sx={{ mb: 1, color: '#666' }}>
                   Màu: {color.name}
                 </Typography>
                 <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', mb: 2 }}>
                   {availableSizes
-                    ?.filter((size) =>
-                      variants.some(
-                        (v) =>
-                          v.color.name === color.name &&
-                          v.size.name === size.name
-                      )
+                    ?.filter(size =>
+                      variants.some(v => v.color.name === color.name && v.size.name === size.name)
                     )
-                    ?.map((size) => {
-                      const variant = variants.find(
-                        (v) =>
-                          v.color.name === color.name &&
-                          v.size.name === size.name
-                      )
-                      const isSelected =
-                        selectedColor === color.name &&
-                        selectedSize === size.name
+                    ?.map(size => {
+                      const variant = variants.find(v => v.color.name === color.name && v.size.name === size.name)
+                      const isSelected = selectedColor === color.name && selectedSize === size.name
 
                       return (
                         <VariantBox
@@ -189,22 +173,20 @@ const ProductInfoSection = ({
                             } else {
                               handleColorChange(color.name)
                               handleSizeChange(size.name)
+                              // Thêm xử lý khi chọn variant nếu cần
                             }
                           }}
                         >
                           <VariantImage
                             src={color.image || '/default.jpg'}
                             alt={color.name}
-                            onError={(e) => (e.target.src = '/default.jpg')}
+                            onError={e => (e.target.src = '/default.jpg')}
                           />
                           <Box>
                             <Typography variant='body2' fontWeight={600}>
                               Size {size.name}
                             </Typography>
-                            <Typography
-                              variant='caption'
-                              color='text.secondary'
-                            >
+                            <Typography variant='caption' color='text.secondary'>
                               {variant?.exportPrice?.toLocaleString('vi-VN')}đ
                             </Typography>
                           </Box>
@@ -222,9 +204,7 @@ const ProductInfoSection = ({
         <Typography variant='body2' fontWeight={700}>
           Số lượng
         </Typography>
-        <IconButton
-          onClick={() => setQuantity((q) => Math.max(1, Number(q) - 1))}
-        >
+        <IconButton onClick={() => setQuantity(q => Math.max(1, Number(q) - 1))}>
           <RemoveIcon />
         </IconButton>
         <TextField
@@ -235,32 +215,42 @@ const ProductInfoSection = ({
         />
         <IconButton
           onClick={() =>
-            setQuantity((q) => {
-              const maxQuantity =
-                selectedVariant?.quantity || product?.quantity || 0
-              return q < maxQuantity ? Number(q) + 1 : q
+            setQuantity(q => {
+              const maxQuantity = inventory?.quantity ?? selectedVariant?.quantity ?? product?.quantity ?? 0
+              return q < maxQuantity ? q + 1 : q
             })
           }
         >
           <AddIcon />
         </IconButton>
         <Typography color='text.secondary'>
-          Kho: {selectedVariant?.quantity || product?.quantity || 0}
+          Kho: {inventory?.quantity ?? selectedVariant?.quantity ?? product?.quantity ?? 0}
         </Typography>
       </Box>
 
       <Box sx={{ display: 'flex', gap: 2 }}>
         <Button
           variant='contained'
-          disabled={isAdding}
-          onClick={handleAddToCart}
+          disabled={isAdding || quantity > (inventory?.quantity ?? selectedVariant?.quantity ?? product?.quantity ?? 0)}
+          onClick={() => {
+            const max = inventory?.quantity ?? selectedVariant?.quantity ?? product?.quantity ?? 0
+            if (quantity > max) {
+              setSnackbar({
+                open: true,
+                message: `Chỉ còn ${max} sản phẩm trong kho.`,
+                severity: 'warning'
+              })
+              return
+            }
+            handleAddToCart({ variant: selectedVariant, quantity })
+          }}
           sx={{ backgroundColor: '#1A3C7B', color: 'white', flex: 1, py: 1.5 }}
-          startIcon={
-            isAdding ? <CircularProgress size={20} color='inherit' /> : null
-          }
+          startIcon={isAdding ? <CircularProgress size={20} color='inherit' /> : null}
         >
           {isAdding ? 'Đang thêm...' : 'Thêm vào giỏ'}
         </Button>
+
+
         <Button
           variant='outlined'
           onClick={handleBuyNow}
@@ -269,6 +259,13 @@ const ProductInfoSection = ({
           Mua ngay
         </Button>
       </Box>
+
+      <SnackbarAlert
+        open={snackbar.open}
+        onClose={handleSnackbarClose}
+        severity={snackbar.severity}
+        message={snackbar.message}
+      />
     </Box>
   )
 }

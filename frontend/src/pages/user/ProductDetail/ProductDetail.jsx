@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import { Container, Grid, Typography, Button, Box } from '@mui/material'
 import { useParams } from 'react-router-dom'
-import useProductDetail from './useProductDetail'
+import useProductDetail from '~/pages/user/ProductDetail/useProductDetail'
 import ProductImageSection from './ProductImageSection'
 import ProductInfoSection from './ProductInfoSection'
 import ProductDescription from './ProductDescription'
@@ -10,6 +10,7 @@ import SnackbarAlert from './SnackbarAlert'
 
 const ProductDetail = () => {
   const { productId } = useParams()
+  // eslint-disable-next-line no-unused-vars
   const [isViewingThumbnails, setIsViewingThumbnails] = useState(false)
 
   const {
@@ -43,13 +44,14 @@ const ProductDetail = () => {
     handleBuyNow,
     handleCopy,
     copiedCode,
-    formatCurrencyShort
+    formatCurrencyShort,
+    inventory,
   } = useProductDetail(productId)
 
-  // Reset ảnh chính về ảnh đầu tiên khi chọn biến thể mới
-  useEffect(() => {
-    setSelectedImageIndex(0)
-  }, [selectedVariant])
+  // console.log('ProductDetail - productId:', productId)
+  // console.log('ProductDetail - selectedColor:', selectedColor)
+  // console.log('ProductDetail - colors:', colors)
+  // console.log('ProductDetail - isViewingThumbnails:', isViewingThumbnails)
 
   if (isLoading) {
     return (
@@ -80,7 +82,7 @@ const ProductDetail = () => {
       <Grid container spacing={10} justifyContent='center'>
         <Grid item xs={12} md={6}>
           <ProductImageSection
-            images={product.images}
+            images={selectedColor?.images || product.images}
             selectedImageIndex={selectedImageIndex}
             fadeIn={fadeIn}
             onImageClick={(index) => {
@@ -104,8 +106,8 @@ const ProductDetail = () => {
             quantity={quantity}
             setQuantity={setQuantity}
             coupons={coupons}
-            isAdding={isAdding}
-            handleAddToCart={handleAddToCart}
+            isAdding={isAdding[product._id] || false}
+            handleAddToCart={() => handleAddToCart(product._id)}
             handleBuyNow={handleBuyNow}
             setOpenVoucherDrawer={setOpenVoucherDrawer}
             variants={variants}
@@ -121,6 +123,7 @@ const ProductDetail = () => {
             handleSizeChange={handleSizeChange}
             getCurrentPrice={getCurrentPrice}
             getCurrentImages={getCurrentImages}
+            inventory={inventory}
           />
         </Grid>
       </Grid>
