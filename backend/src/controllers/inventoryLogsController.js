@@ -15,8 +15,9 @@ const createInventoryLog = async (req, res, next) => {
 
 const getInventoryLogList = async (req, res, next) => {
   try {
+    const queryString = req.query
     // Lấy danh sách Danh mục sản phẩm từ tầng Service chuyển qua
-    const result = await inventoryLogsService.getInventoryLogList()
+    const result = await inventoryLogsService.getInventoryLogList(queryString)
 
     // Có kết quả thì trả về Client
     res.status(StatusCodes.OK).json(result)

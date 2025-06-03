@@ -399,14 +399,12 @@ import DeleteIcon from '@mui/icons-material/Delete'
 import ViewInventoryModal from '../modal/Inventory/ViewInventoryModal.jsx'
 import EditInventoryModal from '../modal/Inventory/EditInventoryModal.jsx'
 import DeleteInventoryModal from '../modal/Inventory/DeleteInventoryModal.jsx'
-import AddWarehouseSlipModal from '~/pages/admin/InventoryManagementTest/modal/WarehouseSlip/AddWarehouseSlipModal.jsx'
+import AddWarehouseSlipModal from '~/pages/admin/InventoryManagement/modal/WarehouseSlip/AddWarehouseSlipModal.jsx'
 
 const InventoryTab = ({
   data,
   variants,
   warehouses,
-  colors,
-  sizes,
   page,
   rowsPerPage,
   onPageChange,
@@ -418,12 +416,13 @@ const InventoryTab = ({
   addWarehouseSlip,
   fetchWarehouses,
   fetchPartner,
-  batches
+  batches,
+  refreshVariants,
+  getInventoryId
 }) => {
   const [filterWarehouse, setFilterWarehouse] = useState('all')
-  const [filterColor, setFilterColor] = useState('all')
-  const [filterSize, setFilterSize] = useState('all')
   const [filterStatus, setFilterStatus] = useState('all')
+  const [filterVariantId, setFilterVariantId] = useState('all')
   const [openViewModal, setOpenViewModal] = useState(false)
   const [openEditModal, setOpenEditModal] = useState(false)
   const [openDeleteModal, setOpenDeleteModal] = useState(false)
@@ -444,29 +443,51 @@ const InventoryTab = ({
     { variantId: '', lot: '', quantity: '', unit: '', note: '' }
   ])
   useEffect(() => {
-    refreshInventories()
+    refreshInventories(page > 0 ? page : 1, rowsPerPage)
+    refreshVariants()
+    fetchWarehouses()
   }, [])
 
   const enrichedInventories = data.map((item) => {
-    const variant = variants.find((v) => v.id === item.variantId)
-    // const warehouse = warehouses.find((w) => w.id === item.warehouseId)
     return {
       ...item,
-      variantId: item.variantId.sku || {},
+      variantId: item.variantId.sku, // giữ nguyên ID
+      warehouseId: item.warehouseId._id, // giữ nguyên ID để filter
       warehouse: item.warehouseId?.name || 'N/A',
       variantName: item.variantId?.name || 'N/A',
-      color: variant?.color?.name || 'N/A',
-      size: variant?.size?.name || 'N/A'
+      color: item.variantId.color?.name || 'N/A',
+      size: item.variantId.size?.name || 'N/A',
+      sku: item.variantId?.sku || 'N/A' // bạn có thể thêm sku nếu cần
     }
   })
+
   const filteredInventories = enrichedInventories.filter((item) => {
     return (
-      (filterWarehouse === 'all' || item.warehouse === filterWarehouse) &&
-      (filterColor === 'all' || item.color === filterColor) &&
-      (filterSize === 'all' || item.size === filterSize) &&
-      (filterStatus === 'all' || item.status === filterStatus)
+      (filterWarehouse === 'all' || item.warehouseId === filterWarehouse) &&
+      (filterStatus === 'all' || item.status === filterStatus) &&
+      (filterVariantId === 'all' || item.variantId === filterVariantId)
     )
   })
+
+  const handleFilterChange = (type, value) => {
+    // cập nhật state
+    if (type === 'variantId') setFilterVariantId(value)
+    if (type === 'warehouseId') setFilterWarehouse(value)
+    if (type === 'status') setFilterStatus(value)
+
+    // tạo object filter đúng cách
+    const nextVariantId = type === 'variantId' ? value : filterVariantId
+    const nextWarehouseId = type === 'warehouseId' ? value : filterWarehouse
+    const nextStatus = type === 'status' ? value : filterStatus
+
+    const filters = {}
+    if (nextVariantId !== 'all') filters.variantId = nextVariantId
+    if (nextWarehouseId !== 'all') filters.warehouseId = nextWarehouseId
+    if (nextStatus !== 'all') filters.status = nextStatus
+
+    // gọi lại API với filters mới
+    refreshInventories(page > 0 ? page : 1, 10, filters)
+  }
 
   const inventoryColumns = [
     { id: 'variantId', label: 'Mã biến thể', minWidth: 200 },
@@ -537,27 +558,34 @@ const InventoryTab = ({
     }
   ]
 
-  const handleViewInventory = (inventory) => {
-    setSelectedInventory(inventory)
+  const handleViewInventory = async (inventory) => {
+    const inventoryDetails = await getInventoryId(inventory._id)
+    setSelectedInventory(inventoryDetails)
     setOpenViewModal(true)
   }
 
-  const handleEditInventory = (inventory) => {
-    setSelectedInventory(inventory)
+  const handleEditInventory = async (inventory) => {
+    const inventoryDetails = await getInventoryId(inventory._id)
+    setSelectedInventory(inventoryDetails)
     setOpenEditModal(true)
   }
 
-  const handleDeleteInventory = (inventory) => {
-    setSelectedInventory(inventory)
+  const handleDeleteInventory = async (inventory) => {
+    const inventoryDetails = await getInventoryId(inventory._id)
+    setSelectedInventory(inventoryDetails)
     setOpenDeleteModal(true)
   }
 
   const handleCloseEditModal = () => {
+    setSelectedInventory(null)
     setOpenEditModal(false)
+    refreshInventories()
   }
 
   const handleCloseDeleteModal = () => {
+    setSelectedInventory(null)
     setOpenDeleteModal(false)
+    refreshInventories()
   }
 
   const handleOpenModal = (type) => {
@@ -690,11 +718,13 @@ const InventoryTab = ({
                   >
                     <Select
                       value={filterWarehouse}
-                      onChange={(e) => setFilterWarehouse(e.target.value)}
+                      onChange={(e) =>
+                        handleFilterChange('warehouseId', e.target.value)
+                      }
                     >
                       <MenuItem value='all'>Tất cả kho</MenuItem>
                       {warehouses.map((warehouse) => (
-                        <MenuItem key={warehouse.id} value={warehouse.name}>
+                        <MenuItem key={warehouse._id} value={warehouse._id}>
                           {warehouse.name}
                         </MenuItem>
                       ))}
@@ -711,35 +741,15 @@ const InventoryTab = ({
                     }}
                   >
                     <Select
-                      value={filterColor}
-                      onChange={(e) => setFilterColor(e.target.value)}
-                    >
-                      <MenuItem value='all'>Tất cả màu</MenuItem>
-                      {colors.map((color) => (
-                        <MenuItem key={color.id} value={color.name}>
-                          {color.name}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                  </FormControl>
-                  <FormControl
-                    sx={{
-                      minWidth: 200,
-                      height: '40px',
-                      '& .MuiInputBase-root': {
-                        height: '40px',
-                        padding: '0 14px 0 0'
+                      value={filterVariantId}
+                      onChange={(e) =>
+                        handleFilterChange('variantId', e.target.value)
                       }
-                    }}
-                  >
-                    <Select
-                      value={filterSize}
-                      onChange={(e) => setFilterSize(e.target.value)}
                     >
-                      <MenuItem value='all'>Tất cả kích thước</MenuItem>
-                      {sizes.map((size) => (
-                        <MenuItem key={size.id} value={size.name}>
-                          {size.name}
+                      <MenuItem value='all'>Tất cả biến thể</MenuItem>
+                      {variants.map((variant) => (
+                        <MenuItem key={variant._id} value={variant._id}>
+                          {variant.sku} - {variant.name}
                         </MenuItem>
                       ))}
                     </Select>
@@ -756,7 +766,9 @@ const InventoryTab = ({
                   >
                     <Select
                       value={filterStatus}
-                      onChange={(e) => setFilterStatus(e.target.value)}
+                      onChange={(e) =>
+                        handleFilterChange('status', e.target.value)
+                      }
                     >
                       <MenuItem value='all'>Tất cả trạng thái</MenuItem>
                       <MenuItem value='in-stock'>Còn hàng</MenuItem>
@@ -858,7 +870,11 @@ const InventoryTab = ({
       />
       <ViewInventoryModal
         open={openViewModal}
-        onClose={() => setOpenViewModal(false)}
+        onClose={() => {
+          setSelectedInventory(null)
+          setOpenViewModal(false)
+          refreshInventories()
+        }}
         inventory={selectedInventory}
         variants={variants}
         warehouses={warehouses}

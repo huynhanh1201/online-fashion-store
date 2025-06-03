@@ -1,4 +1,5 @@
 import mongoose from 'mongoose'
+import { type } from 'yarn/lib/cli'
 const { Schema, model } = mongoose
 
 // Định nghĩa schema cho đơn hàng
@@ -9,12 +10,13 @@ const OrderItemSchema = new Schema(
       ref: 'Order', // Tham chiếu đến đơn hàng
       required: true
     },
-    image: [
-      {
-        type: String,
-        trim: true // Mỗi phần tử là URL chuỗi, trim khoảng trắng
-      }
-    ],
+    color: {
+      type: Object,
+      require: true
+    },
+    size: {
+      type: String
+    },
     name: {
       type: String,
       required: true // tên sản phẩm lúc đặt không được bỏ trống
