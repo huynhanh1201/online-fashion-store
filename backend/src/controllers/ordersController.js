@@ -1,7 +1,6 @@
 import { StatusCodes } from 'http-status-codes'
 
 import { ordersService } from '~/services/ordersService'
-import { env } from '~/config/environment'
 
 const createOrder = async (req, res, next) => {
   try {

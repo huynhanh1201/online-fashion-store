@@ -57,7 +57,7 @@ const getInventoryList = async (queryString) => {
 
   const dateRange = getDateRange(filterTypeDate, startDate, endDate)
 
-  if (dateRange) {
+  if (dateRange.startDate && dateRange.endDate) {
     filter['createdAt'] = {
       $gte: new Date(dateRange.startDate),
       $lte: new Date(dateRange.endDate)

@@ -6,7 +6,6 @@ import { OrderModel } from '~/models/OrderModel'
 import { ShippingAddressModel } from '~/models/ShippingAddressModel'
 import { CartModel } from '~/models/CartModel'
 import { couponsService } from '~/services/couponsService'
-import { ProductModel } from '~/models/ProductModel'
 import { OrderItemModel } from '~/models/OrderItemModel'
 import { OrderStatusHistoryModel } from '~/models/OrderStatusHistoryModel'
 import { PaymentTransactionModel } from '~/models/PaymentTransactionModel'
@@ -323,8 +322,6 @@ const updateOrder = async (userId, orderId, reqBody) => {
       if (!user)
         throw new ApiError(StatusCodes.NOT_FOUND, 'Người dùng không tồn tại')
 
-      console.log('userId:', userId)
-      console.log('user:', user)
       // status đã đổi, tạo history
       await OrderStatusHistoryModel.create({
         orderId: orderId,
