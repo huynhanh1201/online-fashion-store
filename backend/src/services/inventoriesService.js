@@ -1,13 +1,24 @@
+import { StatusCodes } from 'http-status-codes'
+
 import { InventoryModel } from '~/models/InventoryModel'
 import apiError from '~/utils/ApiError'
-import { StatusCodes } from 'http-status-codes'
+import getDateRange from '~/utils/getDateRange'
 
 const handleCreateInventory = async () => {
   return 'Empty'
 }
 
 const getInventoryList = async (queryString) => {
-  let { limit = 10, page = 1, warehouseId, variantId, status } = queryString
+  let {
+    limit = 10,
+    page = 1,
+    warehouseId,
+    variantId,
+    status,
+    filterTypeDate,
+    startDate,
+    endDate
+  } = queryString
 
   const filter = {
     destroy: false
@@ -42,6 +53,15 @@ const getInventoryList = async (queryString) => {
 
   if (status) {
     filter['status'] = status
+  }
+
+  const dateRange = getDateRange(filterTypeDate, startDate, endDate)
+
+  if (dateRange) {
+    filter['createdAt'] = {
+      $gte: new Date(dateRange.startDate),
+      $lte: new Date(dateRange.endDate)
+    }
   }
 
   const result = await InventoryModel.find(filter)
