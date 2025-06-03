@@ -228,6 +228,7 @@ const useProductDetail = (productId) => {
     }
     return product?.images?.length > 0 ? product.images : ['/default.jpg']
   }
+
   const fetchInventory = async (variantId) => {
     try {
       const response = await fetch(`http://localhost:8017/v1/inventories?variantId=${variantId}`)
