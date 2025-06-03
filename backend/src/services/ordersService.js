@@ -132,9 +132,11 @@ const createOrder = async (userId, reqBody, ipAddr) => {
     // Tạo OrderItems
     const orderItems = cartItems.map((item) => {
       const variant = variantMap.get(item.variantId.toString())
+      console.log('variant: ', variant)
       return {
         orderId: order._id,
-        image: variant.color.name,
+        color: variant.color,
+        size: variant.size.name,
         name: variant.name,
         price: variant.exportPrice,
         quantity: item.quantity,
