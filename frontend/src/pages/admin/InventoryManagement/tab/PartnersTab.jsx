@@ -204,6 +204,7 @@ const PartnersTab = ({
         onClose={handleCloseEditDialog}
         partner={selectedPartner}
         updatePartner={updatePartner}
+        fetchPartners={refreshPartners}
       />
       <ViewPartnerModal
         open={openViewDialog}

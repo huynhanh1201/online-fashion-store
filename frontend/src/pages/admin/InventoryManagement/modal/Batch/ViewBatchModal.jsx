@@ -10,6 +10,7 @@ import {
 } from '@mui/material'
 
 const ViewBatchModal = ({ open, onClose, batch }) => {
+  console.log('ViewBatchModal batch:', batch)
   if (!batch) return null
 
   return (
@@ -23,7 +24,7 @@ const ViewBatchModal = ({ open, onClose, batch }) => {
           </Grid>
           <Grid item xs={6}>
             <Typography variant='subtitle2'>ID Biến thể:</Typography>
-            <Typography>{batch.variantId}</Typography>
+            <Typography>{batch.variantId.name}</Typography>
           </Grid>
           <Grid item xs={6}>
             <Typography variant='subtitle2'>Số lượng:</Typography>

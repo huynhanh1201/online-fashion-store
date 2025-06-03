@@ -191,7 +191,6 @@ const EditWarehouseModal = ({ open, onClose, warehouse, onSave }) => {
 
   const onSubmit = async (data) => {
     const payload = {
-      code: data.code,
       name: data.name,
       address: data.address,
       ward: wardName,

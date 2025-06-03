@@ -13,7 +13,7 @@ import { toast } from 'react-toastify'
 const DeleteVariantModal = ({ open, onClose, variant, deleteVariant }) => {
   const handleDelete = async () => {
     try {
-      await deleteVariant(variant.id)
+      await deleteVariant(variant._id)
       toast.success('Xóa biến thể thành công')
       onClose()
     } catch (error) {
@@ -26,7 +26,8 @@ const DeleteVariantModal = ({ open, onClose, variant, deleteVariant }) => {
       <DialogTitle>Xóa biến thể</DialogTitle>
       <DialogContent>
         <Typography>
-          Bạn có chắc muốn xóa biến thể "{variant?.name || 'N/A'}"?
+          Bạn có chắc muốn xóa biến thể "
+          <strong>{variant?.name || 'N/A'}</strong>"?
         </Typography>
       </DialogContent>
       <DialogActions>

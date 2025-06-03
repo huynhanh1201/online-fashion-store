@@ -1,5 +1,5 @@
 // modal/Inventory/EditInventoryModal.jsx
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import {
   Dialog,
   DialogTitle,
@@ -15,22 +15,27 @@ import {
 import { toast } from 'react-toastify'
 
 const EditInventoryModal = ({ open, onClose, inventory, onSave }) => {
-  const [formData, setFormData] = useState(
-    inventory
-      ? {
-          minQuantity: Number(inventory.minQuantity), // Đảm bảo số
-          importPrice: Number(inventory.importPrice), // Đảm bảo số
-          exportPrice: Number(inventory.exportPrice), // Đảm bảo số
-          status: inventory.status
-        }
-      : {
-          minQuantity: 0,
-          importPrice: 0,
-          exportPrice: 0,
-          status: 'in-stock'
-        }
-  )
+  const [formData, setFormData] = useState({
+    minQuantity: 0,
+    importPrice: 0,
+    exportPrice: 0,
+    status: 'in-stock',
+    text: 'không'
+  })
 
+  useEffect(() => {
+    if (inventory) {
+      setFormData({
+        minQuantity: Number(inventory.minQuantity ?? 0),
+        importPrice: Number(inventory.importPrice ?? 0),
+        exportPrice: Number(inventory.exportPrice ?? 0),
+        status: inventory.status ?? 'in-stock',
+        text: 'có'
+      })
+    }
+  }, [inventory])
+
+  console.log('formData:', formData)
   const handleChange = (e) => {
     const { name, value } = e.target
     setFormData((prev) => ({
