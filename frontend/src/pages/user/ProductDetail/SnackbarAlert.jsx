@@ -1,15 +1,48 @@
 import React from 'react'
-import { Snackbar, Alert } from '@mui/material'
+import { Snackbar, Alert, Box, Typography, Button } from '@mui/material'
+import ShoppingCartIcon from '@mui/icons-material/ShoppingCart'
 
-const SnackbarAlert = ({ snackbar, onClose }) => (
+const SnackbarAlert = ({ open, onClose, severity, message, variantImage, productName }) => (
   <Snackbar
-    open={!!snackbar}
-    autoHideDuration={3000}
+    open={open}
+    autoHideDuration={6000}
     onClose={onClose}
-    anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+    anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
   >
-    <Alert onClose={onClose} severity={snackbar?.type} sx={{ width: '100%' }}>
-      {snackbar?.message}
+    <Alert
+      onClose={onClose}
+      severity={severity}
+      sx={{ width: '100%', alignItems: 'center' }}
+    >
+      {severity === 'success' ? (
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+          <img
+            src={variantImage}
+            alt="Product"
+            style={{ width: 50, height: 50, objectFit: 'cover', borderRadius: '6px' }}
+            onError={e => (e.target.src = '/default.jpg')}
+          />
+          <Box>
+            <Typography variant="body2" fontWeight={600}>
+              {productName}
+            </Typography>
+            <Typography variant="caption">
+              {message}
+            </Typography>
+          </Box>
+          <Button
+            variant="contained"
+            size="small"
+            startIcon={<ShoppingCartIcon />}
+            onClick={() => (window.location.href = '/cart')}
+            sx={{ ml: 2, backgroundColor: '#fff', color: '#1A3C7B' }}
+          >
+            Xem giỏ hàng
+          </Button>
+        </Box>
+      ) : (
+        <Typography variant="body2">{message}</Typography>
+      )}
     </Alert>
   </Snackbar>
 )
