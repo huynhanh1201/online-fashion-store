@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import ProductCard from '~/components/ProductCards/ProductCards'
 import { getProducts } from '~/services/productService'
-import '~/assets/ProductCard.css'
+import '~/assets/HomeCSS/Content.css'
 
 export default function ProductList() {
   const [products, setProducts] = useState([])
@@ -26,20 +26,18 @@ export default function ProductList() {
   }, [])
 
   return (
-    <div className='product-list-container'>
-      <main className='product-list-main'>
-        {loading ? (
-          <p>Đang tải sản phẩm...</p>
-        ) : error ? (
-          <p>{error}</p>
-        ) : (
-          <section className='products-grid'>
-            {products.map((product) => (
-              <ProductCard key={product._id || product.id} product={product} />
-            ))}
-          </section>
-        )}
-      </main>
-    </div>
+    <main className='content-container'>
+      {loading ? (
+        <p>Đang tải sản phẩm...</p>
+      ) : error ? (
+        <p>{error}</p>
+      ) : (
+        <section className='product-grid'>
+          {products.map((product) => (
+            <ProductCard key={product._id || product.id} product={product} />
+          ))}
+        </section>
+      )}
+    </main>
   )
 }
