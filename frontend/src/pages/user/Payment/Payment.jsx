@@ -265,16 +265,17 @@ const Payment = () => {
 
 
   return (
-    <Box
-      sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}
-    >
-      <Container maxWidth='lg' sx={{ py: 4 }}>
+    <Box>
+      <Container
+        maxWidth="xl"
+        sx={{ py: 4, margin: '0 auto', minHeight: '70vh' }}
+      >
         {cartLoading ? (
           <Box sx={{ textAlign: 'center', mt: 4 }}>
             <CircularProgress />
           </Box>
         ) : (
-          <Grid container spacing={4}>
+          <Grid container justifyContent="center" spacing={4}>
             {/* Left side: Địa chỉ, danh sách sản phẩm, ghi chú, phương thức thanh toán */}
             <Grid item md={12} lg={8}>
               {/* Địa chỉ nhận hàng */}
@@ -372,34 +373,6 @@ const Payment = () => {
                 sx={{ mb: 2 }}
               />
 
-              {/* Phương thức thanh toán */}
-              <Box sx={{ border: '1px solid #ccc', borderRadius: 2, p: 2 }}>
-                <SectionTitle>Phương thức thanh toán</SectionTitle>
-                <RadioGroup
-                  value={paymentMethod}
-                  onChange={(e) => setPaymentMethod(e.target.value)}
-                >
-                  <FormControlLabel
-                    value='COD'
-                    control={<Radio />}
-                    label='Thanh toán khi nhận hàng (COD)'
-                  />
-                  <FormControlLabel
-                    value='vnpay'
-                    control={<Radio />}
-                    label={
-                      <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                        <img
-                          src='https://play-lh.googleusercontent.com/htxII9LeOz8fRkdW0pcvOb88aoc448v9eoxnbKEPK98NLG6iX5mSd4dbu3PX9j36dwy9=w480-h960-rw'
-                          alt='VNPAY'
-                          style={{ width: 24, marginRight: 8 }}
-                        />
-                        Thanh toán qua VNPay
-                      </Box>
-                    }
-                  />
-                </RadioGroup>
-              </Box>
             </Grid>
 
             {/* Right side: Ưu đãi và tổng thanh toán */}
@@ -419,11 +392,12 @@ const Payment = () => {
                   sx={{ mb: 1 }}
                   disabled={couponLoading}
                 />
+
                 <Button
                   fullWidth
                   variant="contained"
                   onClick={handleApplyVoucherClick}
-                  disabled={couponLoading}
+                  disabled={couponLoading || voucherApplied}  // disable khi đang load hoặc đã áp dụng
                   sx={{
                     backgroundColor: '#1A3C7B',
                     color: '#fff',
@@ -432,7 +406,7 @@ const Payment = () => {
                     }
                   }}
                 >
-                  {couponLoading ? 'Đang áp dụng...' : 'Áp dụng Voucher'}
+                  {couponLoading ? 'Đang áp dụng...' : voucherApplied ? 'Đã áp dụng' : 'Áp dụng Voucher'}
                 </Button>
 
                 {discountMessage && (
@@ -467,7 +441,7 @@ const Payment = () => {
                       fontWeight: 700
                     }}
                   >
-                    <span>Tổng cộng</span>
+                    <span>Thành tiền</span>
                     <span>{total.toLocaleString('vi-VN')} đ</span>
                   </Box>
                 </Box>
@@ -475,7 +449,33 @@ const Payment = () => {
                 <Typography mt={2} variant='body2' color='text.secondary'>
                   Phí vận chuyển: miễn phí
                 </Typography>
+                <Divider sx={{ my: 2 }} />
+                {/* Phương thức thanh toán */}
 
+                <RadioGroup
+                  value={paymentMethod}
+                  onChange={(e) => setPaymentMethod(e.target.value)}
+                >
+                  <FormControlLabel
+                    value='COD'
+                    control={<Radio />}
+                    label='Thanh toán khi nhận hàng (COD)'
+                  />
+                  <FormControlLabel
+                    value='vnpay'
+                    control={<Radio />}
+                    label={
+                      <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                        <img
+                          src='https://play-lh.googleusercontent.com/htxII9LeOz8fRkdW0pcvOb88aoc448v9eoxnbKEPK98NLG6iX5mSd4dbu3PX9j36dwy9=w480-h960-rw'
+                          alt='VNPAY'
+                          style={{ width: 24, marginRight: 8 }}
+                        />
+                        Thanh toán qua VNPay
+                      </Box>
+                    }
+                  />
+                </RadioGroup>
                 <Button
                   fullWidth
                   variant='contained'

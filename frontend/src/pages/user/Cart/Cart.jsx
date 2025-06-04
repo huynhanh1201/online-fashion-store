@@ -34,9 +34,11 @@ const Cart = () => {
   const [cartItems, setCartItems] = useState([])
   const [showMaxQuantityAlert, setShowMaxQuantityAlert] = useState(false)
   const [confirmClearOpen, setConfirmClearOpen] = useState(false)
+  const [coupons, setCoupons] = useState([])
   const navigate = useNavigate()
   const dispatch = useDispatch()
   const [inventoryQuantities, setInventoryQuantities] = useState({})
+
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'auto' })
   }, [])
@@ -44,6 +46,7 @@ const Cart = () => {
   useEffect(() => {
     if (cart?.cartItems) setCartItems(cart.cartItems)
   }, [cart])
+
   useEffect(() => {
     const fetchInventories = async () => {
       const newInventoryQuantities = {}
@@ -64,10 +67,23 @@ const Cart = () => {
     if (cartItems.length > 0) fetchInventories()
   }, [cartItems])
 
-  const allSelected =
-    cartItems.length > 0 && selectedItems.length === cartItems.length
-  const someSelected =
-    selectedItems.length > 0 && selectedItems.length < cartItems.length
+  useEffect(() => {
+    const fetchCoupons = async () => {
+      try {
+        const res = await fetch('http://localhost:8017/v1/coupons')
+        const data = await res.json()
+        if (Array.isArray(data) && data.length > 0) {
+          setCoupons(data.sort((a, b) => a.minOrderValue - b.minOrderValue))
+        }
+      } catch (error) {
+        console.error('Lỗi lấy coupon:', error)
+      }
+    }
+    fetchCoupons()
+  }, [])
+
+  const allSelected = cartItems.length > 0 && selectedItems.length === cartItems.length
+  const someSelected = selectedItems.length > 0 && selectedItems.length < cartItems.length
 
   const handleSelectAll = () => {
     const newSelected = allSelected
@@ -113,9 +129,7 @@ const Cart = () => {
     }
 
     try {
-
       await updateItem(variantId, { quantity: delta })
-
       setCartItems(prevItems =>
         prevItems.map(i =>
           i.variant._id === variantId
@@ -156,6 +170,49 @@ const Cart = () => {
     setConfirmClearOpen(false)
   }
 
+  const calculateDiscount = (coupon, total) => {
+    if (!coupon || total < coupon.minOrderValue) return 0
+
+    return coupon.type === 'percent'
+      ? Math.floor((total * coupon.amount) / 100)
+      : coupon.amount
+  }
+
+
+  const getApplicableCoupon = () => {
+    const validCoupons = coupons.filter(c => totalPrice >= c.minOrderValue)
+    if (validCoupons.length === 0) return null
+
+    return validCoupons.reduce((best, current) => {
+      const bestDiscount = calculateDiscount(best, totalPrice)
+      const currentDiscount = calculateDiscount(current, totalPrice)
+      return currentDiscount > bestDiscount ? current : best
+    })
+  }
+
+
+  const getNextCoupon = () => {
+    if (!coupons.length) return null
+
+    const sorted = [...coupons].sort((a, b) => a.minOrderValue - b.minOrderValue)
+    const applicable = getApplicableCoupon()
+
+    if (!applicable) {
+      // Chưa đủ điều kiện cho bất kỳ mã nào
+      return sorted.find(c => totalPrice < c.minOrderValue) || null
+    }
+
+    // Đã có mã phù hợp, tìm mã tiếp theo cao hơn nếu có
+    const next = sorted.find(c => c.minOrderValue > applicable.minOrderValue)
+    return next || null
+  }
+
+
+
+  const applicableCoupon = getApplicableCoupon()
+  const nextCoupon = getNextCoupon()
+  const discountAmount = applicableCoupon ? calculateDiscount(applicableCoupon, totalPrice) : 0
+
   if (loading) {
     return (
       <Typography sx={{ height: '70vh', mt: 10, textAlign: 'center' }}>
@@ -167,8 +224,58 @@ const Cart = () => {
   return (
     <Container
       maxWidth='xl'
-      sx={{ minHeight: '70vh', mt: 10, mb: 5, overflowX: 'auto' }}
+      sx={{ minHeight: '70vh', mt: 16, mb: 5, overflowX: 'auto' }}
     >
+      <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
+        <Typography variant="h6" sx={{ fontWeight: 700 }}>
+          Giỏ hàng:
+        </Typography>
+        <Typography variant="h6" sx={{ fontWeight: 700 }}>
+          {cartItems.length} Sản phẩm
+        </Typography>
+      </Box>
+      {coupons.length > 0 && selectedItems.length > 0 && (
+        <Typography
+          variant="body1"
+          sx={{
+            color: '#1A3C7B',
+            backgroundColor: '#E3F2FD',
+            p: 1,
+            borderRadius: 1,
+            mb: 2
+          }}
+        >
+          {(() => {
+            if (applicableCoupon) {
+              if (nextCoupon && totalPrice < nextCoupon.minOrderValue) {
+                const nextDiscountText = nextCoupon.type === 'percent'
+                  ? `${nextCoupon.amount}%`
+                  : formatPrice(nextCoupon.amount)
+
+                return `Bạn đang được Giảm ${formatPrice(discountAmount)}, chỉ cần mua thêm ${formatPrice(nextCoupon.minOrderValue - totalPrice)} để nhận mã giảm ${nextDiscountText} 🎉!`
+              }
+
+              // TH đã có mã cao nhất và không còn mã cao hơn
+              return `Đơn hàng của bạn đã đạt mức giảm cao nhất: ${formatPrice(discountAmount)} 🎉`
+            }
+
+            // TH chưa đủ điều kiện mã nào
+            const first = coupons[0]
+            if (first) {
+              const discountText = first.type === 'percent'
+                ? `${first.amount}%`
+                : formatPrice(first.amount)
+
+              return `Chỉ cần mua thêm ${formatPrice(first.minOrderValue - totalPrice)} để nhận mã giảm ${discountText} 🎉!`
+            }
+
+            return null
+          })()}
+        </Typography>
+      )}
+
+
+
       <Table size='medium' sx={{ minWidth: 650 }}>
         <TableHead>
           <TableRow>
@@ -253,7 +360,6 @@ const Cart = () => {
                         >
                           {variant.name}
                         </Typography>
-
                         <Typography variant="body2" color="text.secondary">
                           Phân loại hàng: {variant.color?.name || 'Không rõ'}, {variant.size?.name || 'Không rõ'}
                         </Typography>
@@ -287,7 +393,6 @@ const Cart = () => {
                         onClick={() => handleQuantityChange(variant._id, 1)}
                         aria-label='Tăng số lượng'
                         disabled={item.quantity >= (inventoryQuantities[variant._id] || 99)}
-
                       >
                         <Add />
                       </IconButton>
@@ -295,7 +400,13 @@ const Cart = () => {
                   </TableCell>
                   <TableCell align='center'>
                     <IconButton
-                      color='error'
+                      sx={{
+                        color: '#3f51b5',
+                        '&:hover': {
+                          backgroundColor: 'rgba(63, 81, 181, 0.1)',
+                          color: '#2a3eb1'
+                        }
+                      }}
                       onClick={() => handleRemove({ variantId: variant._id })}
                       aria-label='Xoá sản phẩm'
                     >
@@ -305,7 +416,6 @@ const Cart = () => {
                 </TableRow>
               )
             })
-
           )}
         </TableBody>
       </Table>
@@ -319,9 +429,19 @@ const Cart = () => {
         flexWrap='wrap'
         gap={2}
       >
-        <Typography variant='h6' sx={{ flexGrow: 1, color: '#222' }}>
-          Tổng tiền: {formatPrice(totalPrice)}
-        </Typography>
+        <Box>
+          <Typography variant='h6' sx={{ flexGrow: 1, color: '#222', mb: 1 }}>
+            Tổng giá: {formatPrice(totalPrice)}
+          </Typography>
+          {/* {coupon && totalPrice >= coupon.minOrderValue && (
+            <Typography variant='body2' color="success.main">
+              Giảm giá: {formatPrice(discountAmount)} (Mã {coupon.code})
+            </Typography>
+          )} */}
+          {/* <Typography variant='h6' sx={{ flexGrow: 1, color: '#222', fontWeight: 700 }}>
+            Thành tiền: {formatPrice(finalPrice)}
+          </Typography> */}
+        </Box>
         <Box display='flex' gap={2}>
           <Button
             variant='contained'
@@ -345,7 +465,6 @@ const Cart = () => {
         </Box>
       </Box>
 
-      {/* Xác nhận xoá toàn bộ */}
       <Dialog
         open={confirmClearOpen}
         onClose={() => setConfirmClearOpen(false)}
@@ -359,13 +478,12 @@ const Cart = () => {
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setConfirmClearOpen(false)}>Hủy</Button>
-          <Button color='error' onClick={handleClearCart}>
+          <Button sx={{ color: 'black' }} onClick={handleClearCart}>
             Xoá
           </Button>
         </DialogActions>
       </Dialog>
 
-      {/* Thông báo khi đạt số lượng tối đa */}
       <Snackbar
         open={showMaxQuantityAlert}
         autoHideDuration={2000}
