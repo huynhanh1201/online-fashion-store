@@ -14,7 +14,14 @@ import {
 } from '@mui/material'
 import { toast } from 'react-toastify'
 
-const EditInventoryModal = ({ open, onClose, inventory, onSave }) => {
+const EditInventoryModal = ({
+  open,
+  onClose,
+  inventory,
+  onSave,
+  formatCurrency,
+  parseCurrency
+}) => {
   const [formData, setFormData] = useState({
     minQuantity: 0,
     importPrice: 0,
@@ -84,21 +91,36 @@ const EditInventoryModal = ({ open, onClose, inventory, onSave }) => {
           margin='dense'
           label='Giá nhập'
           name='importPrice'
-          type='number'
-          value={formData.importPrice}
-          onChange={handleChange}
+          type='text'
+          value={formatCurrency(formData.importPrice)}
+          onChange={(e) =>
+            handleChange({
+              target: {
+                name: 'importPrice',
+                value: parseCurrency(e.target.value)
+              }
+            })
+          }
           fullWidth
-          inputProps={{ min: 0 }} // Ngăn nhập số âm
+          inputProps={{ inputMode: 'numeric' }} // Gợi ý bàn phím số trên di động
         />
+
         <TextField
           margin='dense'
           label='Giá bán'
           name='exportPrice'
-          type='number'
-          value={formData.exportPrice}
-          onChange={handleChange}
+          type='text'
+          value={formatCurrency(formData.exportPrice)}
+          onChange={(e) =>
+            handleChange({
+              target: {
+                name: 'exportPrice',
+                value: parseCurrency(e.target.value)
+              }
+            })
+          }
           fullWidth
-          inputProps={{ min: 0 }} // Ngăn nhập số âm
+          inputProps={{ inputMode: 'numeric' }}
         />
         <FormControl fullWidth margin='dense'>
           <InputLabel>Trạng thái</InputLabel>

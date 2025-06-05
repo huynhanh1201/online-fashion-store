@@ -116,7 +116,10 @@ export const getInventoryLogs = async (params) => {
     `${API_ROOT}/v1/inventory-logs`,
     { params }
   )
-  return response.data
+  return {
+    logs: response.data,
+    totalPages: response.data.totalPages || 1
+  }
 }
 export const getInventoryLogDetail = async (logId) => {
   const response = await AuthorizedAxiosInstance.get(

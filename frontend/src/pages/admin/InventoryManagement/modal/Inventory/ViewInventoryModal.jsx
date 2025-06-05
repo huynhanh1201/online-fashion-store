@@ -61,20 +61,26 @@ const ViewInventoryModal = ({ open, onClose, inventory }) => {
                   <TableCell>
                     <strong>Số lượng</strong>
                   </TableCell>
-                  <TableCell>{inventory.quantity}</TableCell>
+                  <TableCell>
+                    {inventory.quantity
+                      ? `${Number(inventory.quantity).toLocaleString('vi-VN')}`
+                      : 'N/A'}
+                  </TableCell>
                 </TableRow>
                 <TableRow>
                   <TableCell>
                     <strong>Ngưỡng cảnh báo</strong>
                   </TableCell>
-                  <TableCell>{inventory.minQuantity}</TableCell>
+                  <TableCell>{inventory.minQuantity ?? 0}</TableCell>
                 </TableRow>
                 <TableRow>
                   <TableCell>
                     <strong>Giá nhập</strong>
                   </TableCell>
                   <TableCell>
-                    {inventory.importPrice?.toLocaleString()}đ
+                    {inventory.importPrice
+                      ? `${Number(inventory.importPrice).toLocaleString('vi-VN')}đ`
+                      : 'N/A'}
                   </TableCell>
                 </TableRow>
                 <TableRow>
@@ -82,7 +88,9 @@ const ViewInventoryModal = ({ open, onClose, inventory }) => {
                     <strong>Giá bán</strong>
                   </TableCell>
                   <TableCell>
-                    {inventory.exportPrice?.toLocaleString()}đ
+                    {inventory.exportPrice
+                      ? `${Number(inventory.exportPrice).toLocaleString('vi-VN')}đ`
+                      : 'N/A'}
                   </TableCell>
                 </TableRow>
                 <TableRow>

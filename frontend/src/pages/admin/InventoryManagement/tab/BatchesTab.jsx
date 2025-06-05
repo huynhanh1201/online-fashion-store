@@ -31,7 +31,9 @@ const BatchesTab = ({
   updateBatch,
   refreshBatches,
   deleteBatch,
-  warehouses
+  warehouses,
+  parseCurrency,
+  formatCurrency
 }) => {
   const enrichedBatches = data.map((batch) => {
     const variantName =
@@ -64,13 +66,19 @@ const BatchesTab = ({
       label: 'Kho hàng',
       minWidth: 150
     },
-    { id: 'quantity', label: 'Số lượng', minWidth: 100, align: 'right' },
+    {
+      id: 'quantity',
+      label: 'Số lượng',
+      minWidth: 100,
+      align: 'right',
+      format: (value) => `${value.toLocaleString('vi-VN')}`
+    },
     {
       id: 'importPrice',
       label: 'Giá nhập',
       minWidth: 120,
       align: 'right',
-      format: (value) => `${value.toLocaleString()}đ`
+      format: (value) => `${value.toLocaleString('vi-VN')}đ`
     },
     {
       id: 'importedAt',
@@ -167,53 +175,50 @@ const BatchesTab = ({
             </TableRow>
           </TableHead>
           <TableBody>
-            {enrichedBatches
-              .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-              .map((row, index) => (
-                <TableRow hover role='checkbox' tabIndex={-1} key={index}>
-                  {batchColumns.map((column) => {
-                    const value = row[column.id]
-                    if (column.id === 'action') {
-                      return (
-                        <TableCell key={column.id} align={column.align}>
-                          <IconButton
-                            onClick={() => handleViewBatch(row)}
-                            size='small'
-                            color='primary'
-                          >
-                            <VisibilityIcon />
-                          </IconButton>
-                          <IconButton
-                            onClick={() => handleEditBatch(row)}
-                            size='small'
-                            color='info'
-                          >
-                            <EditIcon />
-                          </IconButton>
-                          <IconButton
-                            onClick={() => handleDeleteBatch(row)}
-                            size='small'
-                            color='error'
-                          >
-                            <DeleteIcon />
-                          </IconButton>
-                        </TableCell>
-                      )
-                    }
+            {enrichedBatches.map((row, index) => (
+              <TableRow hover role='checkbox' tabIndex={-1} key={index}>
+                {batchColumns.map((column) => {
+                  const value = row[column.id]
+                  if (column.id === 'action') {
                     return (
                       <TableCell key={column.id} align={column.align}>
-                        {column.format && value !== null && value !== undefined
-                          ? column.format(value)
-                          : (value ?? 'Không có dữ liệu')}
+                        <IconButton
+                          onClick={() => handleViewBatch(row)}
+                          size='small'
+                          color='primary'
+                        >
+                          <VisibilityIcon />
+                        </IconButton>
+                        <IconButton
+                          onClick={() => handleEditBatch(row)}
+                          size='small'
+                          color='info'
+                        >
+                          <EditIcon />
+                        </IconButton>
+                        <IconButton
+                          onClick={() => handleDeleteBatch(row)}
+                          size='small'
+                          color='error'
+                        >
+                          <DeleteIcon />
+                        </IconButton>
                       </TableCell>
                     )
-                  })}
-                </TableRow>
-              ))}
+                  }
+                  return (
+                    <TableCell key={column.id} align={column.align}>
+                      {column.format && value !== null && value !== undefined
+                        ? column.format(value)
+                        : (value ?? 'Không có dữ liệu')}
+                    </TableCell>
+                  )
+                })}
+              </TableRow>
+            ))}
           </TableBody>
         </Table>
       </TableContainer>
-
       <TablePagination
         rowsPerPageOptions={[10, 25, 100]}
         component='div'
@@ -221,7 +226,13 @@ const BatchesTab = ({
         rowsPerPage={rowsPerPage}
         page={page}
         onPageChange={onPageChange}
-        onRowsPerPageChange={onRowsPerPageChange}
+        onRowsPerPageChange={(e) => onRowsPerPageChange(e, 'batch')}
+        labelRowsPerPage='Số dòng mỗi trang'
+        labelDisplayedRows={({ from, to, count }) => {
+          const actualTo = to > count ? count : to // nếu to vượt quá count thì lấy count
+          const actualFrom = from > count ? count : from // nếu from vượt quá count thì lấy count
+          return `${actualFrom}–${actualTo} trên ${count !== -1 ? count : `hơn ${actualTo}`}`
+        }}
       />
       <EditBatchModal
         open={openEditModal}
@@ -229,6 +240,8 @@ const BatchesTab = ({
         batch={selectedBatch}
         onSave={updateBatch}
         variants={variants}
+        parseCurrency={parseCurrency}
+        formatCurrency={formatCurrency}
       />
       <ViewBatchModal
         open={openViewModal}

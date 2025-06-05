@@ -62,7 +62,11 @@ const ViewInventoryLogModal = ({ open, onClose, log }) => {
               <TableCell>
                 <strong>Số lượng</strong>
               </TableCell>
-              <TableCell>{log.amount || 0}</TableCell>
+              <TableCell>
+                {log.amount
+                  ? `${Number(log.amount).toLocaleString('vi-VN')}`
+                  : 0}
+              </TableCell>
             </TableRow>
             <TableRow>
               <TableCell>
@@ -70,10 +74,7 @@ const ViewInventoryLogModal = ({ open, onClose, log }) => {
               </TableCell>
               <TableCell>
                 {log.importPrice
-                  ? log.importPrice.toLocaleString('vi-VN', {
-                      style: 'currency',
-                      currency: 'VND'
-                    })
+                  ? `${Number(log.importPrice).toLocaleString('vi-VN')}đ`
                   : 'N/A'}
               </TableCell>
             </TableRow>
@@ -83,10 +84,7 @@ const ViewInventoryLogModal = ({ open, onClose, log }) => {
               </TableCell>
               <TableCell>
                 {log.exportPrice
-                  ? log.exportPrice.toLocaleString('vi-VN', {
-                      style: 'currency',
-                      currency: 'VND'
-                    })
+                  ? `${Number(log.exportPrice).toLocaleString('vi-VN')}đ`
                   : 'N/A'}
               </TableCell>
             </TableRow>

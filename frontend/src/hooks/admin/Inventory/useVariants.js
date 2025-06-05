@@ -6,12 +6,12 @@ import {
   deleteVariant
 } from '~/services/admin/Inventory/VariantService'
 
-const useVariants = (pageVariant = 1, limit = 10) => {
+const useVariants = () => {
   const [variants, setVariants] = useState([])
   const [totalPages, setTotalPages] = useState(1)
   const [loading, setLoading] = useState(false)
 
-  const fetchVariants = async (page = pageVariant, filters = {}) => {
+  const fetchVariants = async (page = 1, limit = 10, filters = {}) => {
     setLoading(true)
     try {
       const { variants = [], total = 0 } = await getVariants({
