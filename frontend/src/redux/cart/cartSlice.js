@@ -31,11 +31,6 @@ const cartSlice = createSlice({
 
 export const {
   setCartItems,
-  addToCart,
-  removeFromCart,
-  updateCartItem,
-  clearCart,
-  toggleChecked,
   setSelectedItems,
   setTempCart,
   clearTempCart,

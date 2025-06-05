@@ -13,15 +13,12 @@ import {
 } from '@mui/material'
 
 const ReviewModal = ({ open, onClose, onSubmit, orderItems }) => {
-  // State cho form
   const [rating, setRating] = useState(0)
-  const [usage, setUsage] = useState('')
   const [advantages, setAdvantages] = useState('')
 
-  // Xử lý submit
   const handleSubmit = () => {
-    if (rating && (usage || advantages)) {
-      onSubmit({ rating, usage, advantages })
+    if (rating && advantages.trim()) {
+      onSubmit({ rating, advantages })
       onClose()
     }
   }
@@ -31,13 +28,12 @@ const ReviewModal = ({ open, onClose, onSubmit, orderItems }) => {
       <DialogTitle>Đánh Giá Sản Phẩm</DialogTitle>
       <DialogContent>
         <Box sx={{ p: 2 }}>
-          {/* Danh sách sản phẩm với thanh cuộn */}
-          {orderItems && orderItems.length > 0 ? (
+          {orderItems?.length > 0 ? (
             <Box
               sx={{
-                maxHeight: '200px', // Giới hạn chiều cao
-                overflowY: 'auto', // Thêm thanh cuộn dọc
-                mb: 2
+                maxHeight: '200px',
+                overflowY: 'auto',
+                mb: 2,
               }}
             >
               {orderItems.map((item) => (
@@ -56,7 +52,7 @@ const ReviewModal = ({ open, onClose, onSubmit, orderItems }) => {
                   <Avatar
                     src={item?.color?.image || '/default.jpg'}
                     variant="square"
-                    sx={{ width: 64, height: 64, borderRadius: 1, objectFit: 'cover' }}
+                    sx={{ width: 64, height: 64, borderRadius: 1 }}
                   />
                   <Box>
                     <Typography variant="subtitle1">{item?.name || 'Sản phẩm'}</Typography>
@@ -74,7 +70,6 @@ const ReviewModal = ({ open, onClose, onSubmit, orderItems }) => {
             <Typography>Không có sản phẩm để đánh giá</Typography>
           )}
 
-          {/* Đánh giá sao */}
           <Typography variant="subtitle1" gutterBottom>
             Chất lượng sản phẩm
           </Typography>
@@ -84,7 +79,6 @@ const ReviewModal = ({ open, onClose, onSubmit, orderItems }) => {
             size="large"
           />
 
-          {/* Điểm tốt */}
           <Typography variant="subtitle1" gutterBottom>
             Điểm tốt của sản phẩm:
           </Typography>
@@ -108,7 +102,7 @@ const ReviewModal = ({ open, onClose, onSubmit, orderItems }) => {
           onClick={handleSubmit}
           color="error"
           variant="contained"
-          disabled={!rating || (!usage && !advantages)}
+          disabled={!rating || !advantages.trim()}
         >
           Hoàn Thành
         </Button>
