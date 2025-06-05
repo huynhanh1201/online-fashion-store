@@ -21,7 +21,7 @@ import { useDispatch } from 'react-redux'
 import { setCartItems } from '~/redux/cart/cartSlice'
 import ProductCard from '~/components/ProductCards/ProductCards'
 
-const PRODUCTS_PER_PAGE = 12
+const PRODUCTS_PER_PAGE = 4
 const CustomSelect = styled(Select)(({ theme }) => ({
   '& .MuiSelect-select': {
     padding: '8px 32px 8px 12px', // Điều chỉnh padding

@@ -47,7 +47,7 @@ const OrderRow = ({ order }) => {
     }
   }
 
-  const totalAmount = items.reduce((sum, item) => sum + item.price * item.quantity, 0)
+  // const totalAmount = items.reduce((sum, item) => sum + item.price * item.quantity, 0)
   const [label, color] = statusLabels[order.status] || ['Không xác định', 'default']
 
   return (
@@ -126,11 +126,6 @@ const OrderRow = ({ order }) => {
                     </Box>
                   ))}
 
-                  <Box mt={2} textAlign="right">
-                    <Typography variant="subtitle1" fontWeight="bold">
-                      Tổng: {totalAmount.toLocaleString()} ₫
-                    </Typography>
-                  </Box>
                 </>
               )}
             </Box>

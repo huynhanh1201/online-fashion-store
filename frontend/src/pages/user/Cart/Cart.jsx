@@ -35,9 +35,12 @@ const Cart = () => {
   const [showMaxQuantityAlert, setShowMaxQuantityAlert] = useState(false)
   const [confirmClearOpen, setConfirmClearOpen] = useState(false)
   const [coupons, setCoupons] = useState([])
+  const [hasFetchedCoupons, setHasFetchedCoupons] = useState(false) // Track if coupons were fetched
   const navigate = useNavigate()
   const dispatch = useDispatch()
-  const [inventoryQuantities, setInventoryQuantities] = useState({})
+  const [inventoryQuantities, setInventoryQuantities] = useState({}) // Cached inventory quantities
+  const [fetchingVariants, setFetchingVariants] = useState(new Set()) // Track ongoing fetches
+  const [isFetchingInventories, setIsFetchingInventories] = useState(false) // Loading state for inventory fetching
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'auto' })
@@ -47,27 +50,57 @@ const Cart = () => {
     if (cart?.cartItems) setCartItems(cart.cartItems)
   }, [cart])
 
+  // Gọi API 1 lần từ kho
   useEffect(() => {
     const fetchInventories = async () => {
-      const newInventoryQuantities = {}
-      for (const item of cartItems) {
-        try {
-          const res = await fetch(`http://localhost:8017/v1/inventories?variantId=${item.variant._id}`)
-          const data = await res.json()
-          const inventory = Array.isArray(data) ? data[0] : data
-          newInventoryQuantities[item.variant._id] = inventory?.quantity ?? 0
-        } catch (error) {
-          console.error('Lỗi lấy tồn kho:', error)
-          newInventoryQuantities[item.variant._id] = 0
-        }
+      if (cartItems.length === 0) return
+
+      const newVariantsToFetch = cartItems
+        .filter(item => !inventoryQuantities[item.variant._id] && !fetchingVariants.has(item.variant._id))
+        .map(item => item.variant._id)
+
+      if (newVariantsToFetch.length === 0) return
+
+      setIsFetchingInventories(true)
+      setFetchingVariants(prev => new Set([...prev, ...newVariantsToFetch]))
+
+      try {
+        // Batch fetch inventory data
+        const fetchPromises = newVariantsToFetch.map(async variantId => {
+          try {
+            const res = await fetch(`http://localhost:8017/v1/inventories?variantId=${variantId}`)
+            const data = await res.json()
+            const inventory = Array.isArray(data) ? data[0] : data
+            return { variantId, quantity: inventory?.quantity ?? 0 }
+          } catch (error) {
+            console.error(`Lỗi lấy tồn kho cho variant ${variantId}:`, error)
+            return { variantId, quantity: 0 }
+          }
+        })
+
+        const results = await Promise.all(fetchPromises)
+        const newInventoryQuantities = { ...inventoryQuantities }
+        results.forEach(({ variantId, quantity }) => {
+          newInventoryQuantities[variantId] = quantity
+        })
+
+        setInventoryQuantities(newInventoryQuantities)
+      } finally {
+        setFetchingVariants(prev => {
+          const newSet = new Set(prev)
+          newVariantsToFetch.forEach(id => newSet.delete(id))
+          return newSet
+        })
+        setIsFetchingInventories(false)
       }
-      setInventoryQuantities(newInventoryQuantities)
     }
 
-    if (cartItems.length > 0) fetchInventories()
-  }, [cartItems])
+    fetchInventories()
+  }, [cartItems, inventoryQuantities, fetchingVariants])
 
   useEffect(() => {
+    if (hasFetchedCoupons) return
+
     const fetchCoupons = async () => {
       try {
         const res = await fetch('http://localhost:8017/v1/coupons')
@@ -75,12 +108,15 @@ const Cart = () => {
         if (Array.isArray(data) && data.length > 0) {
           setCoupons(data.sort((a, b) => a.minOrderValue - b.minOrderValue))
         }
+        setHasFetchedCoupons(true)
       } catch (error) {
         console.error('Lỗi lấy coupon:', error)
+        setHasFetchedCoupons(true)
       }
     }
+
     fetchCoupons()
-  }, [])
+  }, [hasFetchedCoupons])
 
   const allSelected = cartItems.length > 0 && selectedItems.length === cartItems.length
   const someSelected = selectedItems.length > 0 && selectedItems.length < cartItems.length
@@ -115,6 +151,8 @@ const Cart = () => {
       : '0₫'
 
   const handleQuantityChange = async (variantId, delta) => {
+    if (isFetchingInventories) return // Prevent quantity changes during fetching
+
     const item = cartItems.find(i => i.variant._id === variantId)
     if (!item) return
 
@@ -137,6 +175,12 @@ const Cart = () => {
             : i
         )
       )
+      // Sync quantity with selectedItems
+      setSelectedItems(prev =>
+        prev.map(i =>
+          i.variantId === variantId ? { ...i, quantity: newQty } : i
+        )
+      )
     } catch (error) {
       console.error('Lỗi cập nhật số lượng:', error)
     }
@@ -148,6 +192,10 @@ const Cart = () => {
       if (res) {
         setCartItems(prev => prev.filter(item => item.variant._id !== variantId))
         setSelectedItems(prev => prev.filter(i => i.variantId !== variantId))
+        setInventoryQuantities(prev => {
+          const { [variantId]: _, ...rest } = prev
+          return rest
+        })
       }
     } catch (error) {
       console.error('Lỗi xoá sản phẩm:', error)
@@ -167,6 +215,7 @@ const Cart = () => {
     await clearCart()
     setCartItems([])
     setSelectedItems([])
+    setInventoryQuantities({})
     setConfirmClearOpen(false)
   }
 
@@ -177,7 +226,6 @@ const Cart = () => {
       ? Math.floor((total * coupon.amount) / 100)
       : coupon.amount
   }
-
 
   const getApplicableCoupon = () => {
     const validCoupons = coupons.filter(c => totalPrice >= c.minOrderValue)
@@ -190,7 +238,6 @@ const Cart = () => {
     })
   }
 
-
   const getNextCoupon = () => {
     if (!coupons.length) return null
 
@@ -198,16 +245,12 @@ const Cart = () => {
     const applicable = getApplicableCoupon()
 
     if (!applicable) {
-      // Chưa đủ điều kiện cho bất kỳ mã nào
       return sorted.find(c => totalPrice < c.minOrderValue) || null
     }
 
-    // Đã có mã phù hợp, tìm mã tiếp theo cao hơn nếu có
     const next = sorted.find(c => c.minOrderValue > applicable.minOrderValue)
     return next || null
   }
-
-
 
   const applicableCoupon = getApplicableCoupon()
   const nextCoupon = getNextCoupon()
@@ -255,11 +298,9 @@ const Cart = () => {
                 return `Bạn đang được Giảm ${formatPrice(discountAmount)}, chỉ cần mua thêm ${formatPrice(nextCoupon.minOrderValue - totalPrice)} để nhận mã giảm ${nextDiscountText} 🎉!`
               }
 
-              // TH đã có mã cao nhất và không còn mã cao hơn
               return `Đơn hàng của bạn đã đạt mức giảm cao nhất: ${formatPrice(discountAmount)} 🎉`
             }
 
-            // TH chưa đủ điều kiện mã nào
             const first = coupons[0]
             if (first) {
               const discountText = first.type === 'percent'
@@ -273,8 +314,6 @@ const Cart = () => {
           })()}
         </Typography>
       )}
-
-
 
       <Table size='medium' sx={{ minWidth: 650 }}>
         <TableHead>
@@ -374,7 +413,7 @@ const Cart = () => {
                       <IconButton
                         size='small'
                         onClick={() => handleQuantityChange(variant._id, -1)}
-                        disabled={item.quantity <= 1}
+                        disabled={isFetchingInventories || item.quantity <= 1}
                         aria-label='Giảm số lượng'
                       >
                         <Remove />
@@ -391,8 +430,8 @@ const Cart = () => {
                       <IconButton
                         size='small'
                         onClick={() => handleQuantityChange(variant._id, 1)}
+                        disabled={isFetchingInventories || item.quantity >= (inventoryQuantities[variant._id] || 99)}
                         aria-label='Tăng số lượng'
-                        disabled={item.quantity >= (inventoryQuantities[variant._id] || 99)}
                       >
                         <Add />
                       </IconButton>
@@ -430,17 +469,9 @@ const Cart = () => {
         gap={2}
       >
         <Box>
-          <Typography variant='h6' sx={{ flexGrow: 1, color: '#222', mb: 1 }}>
-            Tổng giá: {formatPrice(totalPrice)}
+          <Typography variant='h6' sx={{ flexGrow: 1, color: '#222', fontWeight: 700 }}>
+            Thành tiền: {formatPrice(totalPrice - discountAmount)}
           </Typography>
-          {/* {coupon && totalPrice >= coupon.minOrderValue && (
-            <Typography variant='body2' color="success.main">
-              Giảm giá: {formatPrice(discountAmount)} (Mã {coupon.code})
-            </Typography>
-          )} */}
-          {/* <Typography variant='h6' sx={{ flexGrow: 1, color: '#222', fontWeight: 700 }}>
-            Thành tiền: {formatPrice(finalPrice)}
-          </Typography> */}
         </Box>
         <Box display='flex' gap={2}>
           <Button

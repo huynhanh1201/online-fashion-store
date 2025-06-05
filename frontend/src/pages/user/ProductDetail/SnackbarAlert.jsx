@@ -8,6 +8,7 @@ const SnackbarAlert = ({ open, onClose, severity, message, variantImage, product
     autoHideDuration={6000}
     onClose={onClose}
     anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+    sx={{ mt: 12 }} 
   >
     <Alert
       onClose={onClose}
