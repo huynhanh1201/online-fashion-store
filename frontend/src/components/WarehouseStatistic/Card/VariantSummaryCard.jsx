@@ -1,10 +1,10 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import { Card, CardContent, Typography, Grid, Box, Stack } from '@mui/material'
 import InventoryIcon from '@mui/icons-material/Inventory'
 import CategoryIcon from '@mui/icons-material/Category'
 import WarningIcon from '@mui/icons-material/Warning'
 import MonetizationOnIcon from '@mui/icons-material/MonetizationOn'
-
+import socket from '~/socket/index'
 // Dữ liệu mẫu
 const inventoryList = [
   {
@@ -25,6 +25,31 @@ const inventoryList = [
 ]
 
 export default function VariantSummaryCard() {
+  // =================================================
+  const [stats, setStats] = useState(null)
+
+  useEffect(() => {
+    socket.connect()
+
+    socket.emit('subscribeInventoryStats') // v1/inventory
+
+    socket.on('inventoryStatsUpdate', (data) => {
+      console.log('📦 Realtime update:', data)
+      setStats(data)
+    })
+
+    // Khi mất kết nối với server (đóng tab, F5, mạng yếu...), event này sẽ chạy.
+    socket.on('disconnect', (data) => {
+      console.log('Disconnect data: ', data)
+    })
+
+    // Gỡ bỏ listener khi component bị unmount (tránh memory leak).
+    return () => {
+      socket.off('inventoryStatsUpdate')
+    }
+  }, [])
+  // =================================================
+
   const totalVariants = inventoryList.length
   const totalProducts = new Set(
     inventoryList.map((item) => item.variantId?.productId)
