@@ -33,19 +33,19 @@ const useVariants = () => {
 
   const createNewVariant = async (data) => {
     const result = await createVariant(data)
-    if (result) await fetchVariants(pageVariant)
+    if (result) await fetchVariants()
     return result
   }
 
   const updateVariantById = async (id, data) => {
     const result = await updateVariant(id, data)
-    if (result) await fetchVariants(pageVariant)
+    if (result) await fetchVariants()
     return result
   }
 
   const deleteVariantById = async (id) => {
     const result = await deleteVariant(id)
-    if (result) await fetchVariants(pageVariant)
+    if (result) await fetchVariants()
     return result
   }
 
