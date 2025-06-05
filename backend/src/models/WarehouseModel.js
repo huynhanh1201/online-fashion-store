@@ -6,7 +6,7 @@ const warehouseSchema = new Schema(
   {
     code: {
       type: String,
-      default: 'WH-HCM01', // Mặc định là WH-HCM01
+      unique: true,
       trim: true, // Loại bỏ khoảng trắng đầu/cuối
       required: true
     },

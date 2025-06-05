@@ -4,15 +4,30 @@ import cors from 'cors'
 import mongoose from 'mongoose'
 import exitHook from 'async-exit-hook'
 import cookieParser from 'cookie-parser'
+import * as http from 'node:http'
+import { Server } from 'socket.io'
 
 import { CONNECT_DB } from '~/config/mongodb'
 import { env } from '~/config/environment'
 import { APIs_V1 } from '~/routes/v1'
 import { errorHandlingMiddleware } from '~/middlewares/errorHandlingMiddleware'
 import { corsOptions } from '~/config/cors'
+import setupSocket from '~/sockets/setupSocket'
 
 const START_SERVER = () => {
   const app = express()
+
+  // Config websocket
+  const server = http.createServer(app)
+
+  const io = new Server(server, {
+    cors: {
+      origin: env.FE_BASE_URL,
+      credentials: true
+    }
+  })
+
+  setupSocket(io)
 
   // Middleware cấu hình Cookie Parser
   app.use(cookieParser())
@@ -30,7 +45,7 @@ const START_SERVER = () => {
   app.use(errorHandlingMiddleware)
 
   // Ruuning server
-  app.listen(env.APP_PORT, env.APP_HOST, () => {
+  server.listen(env.APP_PORT, env.APP_HOST, () => {
     console.log(
       '\x1b[32m%s\x1b[0m',
       `Xin chào Dev!, Tôi đang chạy tại HOST: ${env.APP_HOST} - PORT: ${env.APP_PORT}`
