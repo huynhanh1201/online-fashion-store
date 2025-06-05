@@ -55,10 +55,7 @@ const ViewVariantModal = ({ open, onClose, variant, products }) => {
               </TableCell>
               <TableCell>
                 {variant.importPrice
-                  ? variant.importPrice.toLocaleString('vi-VN', {
-                      style: 'currency',
-                      currency: 'VND'
-                    })
+                  ? `${Number(variant.importPrice).toLocaleString('vi-VN')}đ`
                   : 'N/A'}
               </TableCell>
             </TableRow>
@@ -68,10 +65,7 @@ const ViewVariantModal = ({ open, onClose, variant, products }) => {
               </TableCell>
               <TableCell>
                 {variant.exportPrice
-                  ? variant.exportPrice.toLocaleString('vi-VN', {
-                      style: 'currency',
-                      currency: 'VND'
-                    })
+                  ? `${Number(variant.exportPrice).toLocaleString('vi-VN')}đ`
                   : 'N/A'}
               </TableCell>
             </TableRow>

@@ -11,12 +11,12 @@ const usePartner = () => {
   const [partners, setPartners] = React.useState([])
   const [total, setTotal] = React.useState(0)
 
-  const fetchPartners = async (filters = {}, page = 1, limit = 10) => {
+  const fetchPartners = async (page = 1, limit = 10, filters = {}) => {
     try {
       const { partners, total } = await getPartners({
-        ...filters,
         page,
-        limit
+        limit,
+        ...filters
       })
       setPartners(partners)
       setTotal(total || 0)

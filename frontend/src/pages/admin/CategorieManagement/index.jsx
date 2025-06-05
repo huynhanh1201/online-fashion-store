@@ -7,7 +7,6 @@ import useCategories from '~/hooks/admin/useCategories'
 import { updateCategory } from '~/services/admin/categoryService'
 import { deleteCategory } from '~/services/admin/categoryService'
 import AddIcon from '@mui/icons-material/Add'
-import Search from '~/components/SearchAdmin/Search.jsx'
 // Lazy load các modal
 const AddCategoryModal = React.lazy(() => import('./modal/AddCategoryModal'))
 const ViewCategoryModal = React.lazy(() => import('./modal/ViewCategoryModal'))
@@ -69,10 +68,6 @@ const CategoryManagement = () => {
     }
   }
 
-  const onSelectCategory = (name) => {
-    console.log('Chọn category:', name)
-  }
-
   const styles = {
     buttonAdd: {
       backgroundColor: '#001f5d',
@@ -86,11 +81,6 @@ const CategoryManagement = () => {
       <Typography variant='h5' sx={{ mb: 2 }}>
         Quản lý danh mục sản phẩm
       </Typography>
-      <Search
-        data={categories}
-        label={'tìm danh mục'}
-        onSelect={onSelectCategory}
-      />
       <Button
         variant='contained'
         sx={styles.buttonAdd}

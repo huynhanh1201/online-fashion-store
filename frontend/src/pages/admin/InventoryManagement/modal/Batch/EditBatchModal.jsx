@@ -8,13 +8,21 @@ import {
   Button,
   Grid
 } from '@mui/material'
-import { useForm } from 'react-hook-form'
+import { useForm, Controller } from 'react-hook-form'
 
-const EditBatchModal = ({ open, onClose, onSave, batch }) => {
+const EditBatchModal = ({
+  open,
+  onClose,
+  onSave,
+  batch,
+  formatCurrency,
+  parseCurrency
+}) => {
   const {
     register,
     handleSubmit,
     reset,
+    control,
     formState: { errors }
   } = useForm()
 
@@ -72,17 +80,31 @@ const EditBatchModal = ({ open, onClose, onSave, batch }) => {
             </Grid>
 
             <Grid item size={12}>
-              <TextField
-                label='Giá nhập'
-                type='number'
-                fullWidth
-                {...register('importPrice', {
+              <Controller
+                name='importPrice'
+                control={control}
+                rules={{
                   required: 'Vui lòng nhập giá nhập',
-                  valueAsNumber: true,
-                  min: { value: 0, message: 'Giá nhập không hợp lệ' }
-                })}
-                error={!!errors.importPrice}
-                helperText={errors.importPrice?.message}
+                  validate: (val) =>
+                    Number(val) < 0 ? 'Giá nhập không hợp lệ' : true
+                }}
+                render={({ field }) => (
+                  <TextField
+                    label='Giá nhập'
+                    type='text'
+                    fullWidth
+                    value={formatCurrency(field.value)}
+                    onChange={(e) =>
+                      field.onChange(parseCurrency(e.target.value))
+                    }
+                    error={!!errors.importPrice}
+                    helperText={errors.importPrice?.message}
+                    InputProps={{
+                      endAdornment: <span style={{ marginLeft: 4 }}>₫</span>,
+                      inputMode: 'numeric'
+                    }}
+                  />
+                )}
               />
             </Grid>
           </Grid>

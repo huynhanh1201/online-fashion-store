@@ -67,8 +67,7 @@ const InventoryDashboard = () => {
     <Box
       sx={{
         p: 3,
-        bgcolor: 'background.default',
-        minHeight: '100vh'
+        bgcolor: 'background.default'
       }}
     >
       {/* Header */}
@@ -80,7 +79,7 @@ const InventoryDashboard = () => {
       >
         <Box display='flex' alignItems='center' gap={1}>
           <Typography variant='h4' fontWeight='bold' color='primary'>
-            📦 Quản lý Kho hàng 2
+            Quản lý Kho hàng
           </Typography>
         </Box>
         <Box display='flex' alignItems='center' gap={1}>
@@ -91,35 +90,35 @@ const InventoryDashboard = () => {
             onChange={(e) => setSearchTerm(e.target.value)}
             sx={{ width: 200 }}
           />
-          <FormControl
-            sx={{
-              minWidth: 200,
-              height: '40px',
-              '& .MuiInputBase-root': {
-                height: '40px',
-                padding: '0 14px 0 0'
-              }
-            }}
-            size='small'
-          >
-            <Select
-              value={filterStatus}
-              onChange={(e) => setFilterStatus(e.target.value)}
-            >
-              <MenuItem value='all'>Tất cả trạng thái</MenuItem>
-              <MenuItem value='in-stock'>Còn hàng</MenuItem>
-              <MenuItem value='low-stock'>Cảnh báo</MenuItem>
-              <MenuItem value='out-of-stock'>Hết hàng</MenuItem>
-            </Select>
-          </FormControl>
-          <Button
-            variant='contained'
-            color='primary'
-            onClick={() => setModalType('add')}
-            sx={{ px: 3 }}
-          >
-            + Tạo mới
-          </Button>
+          {/*<FormControl*/}
+          {/*  sx={{*/}
+          {/*    minWidth: 200,*/}
+          {/*    height: '40px',*/}
+          {/*    '& .MuiInputBase-root': {*/}
+          {/*      height: '40px',*/}
+          {/*      padding: '0 14px 0 0'*/}
+          {/*    }*/}
+          {/*  }}*/}
+          {/*  size='small'*/}
+          {/*>*/}
+          {/*  <Select*/}
+          {/*    value={filterStatus}*/}
+          {/*    onChange={(e) => setFilterStatus(e.target.value)}*/}
+          {/*  >*/}
+          {/*    <MenuItem value='all'>Tất cả trạng thái</MenuItem>*/}
+          {/*    <MenuItem value='in-stock'>Còn hàng</MenuItem>*/}
+          {/*    <MenuItem value='low-stock'>Cảnh báo</MenuItem>*/}
+          {/*    <MenuItem value='out-of-stock'>Hết hàng</MenuItem>*/}
+          {/*  </Select>*/}
+          {/*</FormControl>*/}
+          {/*<Button*/}
+          {/*  variant='contained'*/}
+          {/*  color='primary'*/}
+          {/*  onClick={() => setModalType('add')}*/}
+          {/*  sx={{ px: 3 }}*/}
+          {/*>*/}
+          {/*  + Tạo mới*/}
+          {/*</Button>*/}
           <Button
             variant='outlined'
             color='secondary'
@@ -143,11 +142,6 @@ const InventoryDashboard = () => {
             loading={loading}
             handleOpenModal={handleOpenModal}
           />
-          {/*<InventoryPagination*/}
-          {/*  page={page}*/}
-          {/*  totalPages={totalPages}*/}
-          {/*  onPageChange={handleChangePage}*/}
-          {/*/>*/}
         </>
       )}
     </Box>

@@ -44,7 +44,14 @@ const uploadToCloudinary = async (file, folder = CloudinaryColor) => {
   return data.secure_url
 }
 
-const AddVariantModal = ({ open, onClose, addVariant, products }) => {
+const AddVariantModal = ({
+  open,
+  onClose,
+  addVariant,
+  products,
+  formatCurrency,
+  parseCurrency
+}) => {
   const {
     register,
     control,
@@ -304,33 +311,61 @@ const AddVariantModal = ({ open, onClose, addVariant, products }) => {
           />
 
           {/* Giá nhập */}
-          <TextField
-            type='number'
-            disabled={!overridePrice}
-            {...register('importPrice', {
+          <Controller
+            name='importPrice'
+            control={control}
+            rules={{
               required: overridePrice ? 'Vui lòng nhập giá nhập' : false,
-              valueAsNumber: true,
-              min: overridePrice
-                ? { value: 0, message: 'Giá nhập không được âm' }
-                : undefined
-            })}
-            error={!!errors.importPrice}
-            fullWidth
+              validate: (val) =>
+                overridePrice && Number(val) < 0
+                  ? 'Giá nhập không được âm'
+                  : true
+            }}
+            render={({ field }) => (
+              <TextField
+                label='Giá nhập'
+                disabled={!overridePrice}
+                type='text'
+                fullWidth
+                value={formatCurrency(field.value)}
+                onChange={(e) => field.onChange(parseCurrency(e.target.value))}
+                error={!!errors.importPrice}
+                helperText={errors.importPrice?.message}
+                InputProps={{
+                  endAdornment: <span style={{ marginLeft: 4 }}>₫</span>,
+                  inputMode: 'numeric'
+                }}
+              />
+            )}
           />
 
           {/* Giá bán */}
-          <TextField
-            type='number'
-            disabled={!overridePrice}
-            {...register('exportPrice', {
+          <Controller
+            name='exportPrice'
+            control={control}
+            rules={{
               required: overridePrice ? 'Vui lòng nhập giá bán' : false,
-              valueAsNumber: true,
-              min: overridePrice
-                ? { value: 0, message: 'Giá bán không được âm' }
-                : undefined
-            })}
-            error={!!errors.exportPrice}
-            fullWidth
+              validate: (val) =>
+                overridePrice && Number(val) < 0
+                  ? 'Giá bán không được âm'
+                  : true
+            }}
+            render={({ field }) => (
+              <TextField
+                label='Giá bán'
+                disabled={!overridePrice}
+                type='text'
+                fullWidth
+                value={formatCurrency(field.value)}
+                onChange={(e) => field.onChange(parseCurrency(e.target.value))}
+                error={!!errors.exportPrice}
+                helperText={errors.exportPrice?.message}
+                InputProps={{
+                  endAdornment: <span style={{ marginLeft: 4 }}>₫</span>,
+                  inputMode: 'numeric'
+                }}
+              />
+            )}
           />
         </DialogContent>
         <DialogActions>

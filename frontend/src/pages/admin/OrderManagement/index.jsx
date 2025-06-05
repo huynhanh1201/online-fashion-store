@@ -129,6 +129,7 @@ const OrderManagement = () => {
         order={selectedOrder}
         histories={histories}
         orderDetails={orderDetails}
+        onUpdate={handleUpdateOrder}
       />
 
       <EditOrderModal
