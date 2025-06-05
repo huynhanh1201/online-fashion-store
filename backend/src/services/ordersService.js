@@ -34,8 +34,6 @@ const createOrder = async (userId, reqBody, ipAddr) => {
       note
     } = reqBody
 
-    //
-
     // Kiểm tra cartItems
     if (!Array.isArray(cartItems) || cartItems.length === 0) {
       throw new ApiError(
@@ -131,7 +129,7 @@ const createOrder = async (userId, reqBody, ipAddr) => {
     // Tạo OrderItems
     const orderItems = cartItems.map((item) => {
       const variant = variantMap.get(item.variantId.toString())
-      console.log('variant: ', variant)
+
       return {
         orderId: order._id,
         color: variant.color,
@@ -168,6 +166,9 @@ const createOrder = async (userId, reqBody, ipAddr) => {
         }
       }
     ).session(session)
+
+    // 3. Commit transaction
+    await session.commitTransaction()
 
     //==============================
     const dayjs = require('dayjs')
@@ -258,9 +259,6 @@ const createOrder = async (userId, reqBody, ipAddr) => {
 
       return paymentUrl
     }
-
-    // 3. Commit transaction
-    await session.commitTransaction()
 
     return order
   } catch (err) {
