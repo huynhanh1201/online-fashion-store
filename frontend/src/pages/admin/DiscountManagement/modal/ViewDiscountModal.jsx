@@ -10,7 +10,11 @@ import Box from '@mui/material/Box'
 import TextField from '@mui/material/TextField'
 import FormControlLabel from '@mui/material/FormControlLabel'
 import Checkbox from '@mui/material/Checkbox'
-
+import Table from '@mui/material/Table'
+import TableBody from '@mui/material/TableBody'
+import TableCell from '@mui/material/TableCell'
+import TableRow from '@mui/material/TableRow'
+import Chip from '@mui/material/Chip'
 import StyleAdmin from '~/assets/StyleAdmin.jsx'
 
 const ViewDiscountModal = ({ open, onClose, discount }) => {
@@ -26,130 +30,101 @@ const ViewDiscountModal = ({ open, onClose, discount }) => {
       }}
     >
       <DialogTitle>Chi tiết mã giảm giá</DialogTitle>
-      <Divider sx={{ my: 0 }} />
       <DialogContent>
-        <Box display='flex' gap={4} flexDirection={{ xs: 'column', md: 'row' }}>
-          {/* Cột trái */}
-          <Box flex={1}>
-            <TextField
-              label='Mã giảm giá'
-              value={discount.code}
-              fullWidth
-              margin='normal'
-              InputProps={{ readOnly: true }}
-              sx={{
-                ...StyleAdmin.InputCustom,
-                ...StyleAdmin.InputCustom.CursorNone
-              }}
-            />
-            <TextField
-              label='Loại giảm giá'
-              value={
-                discount.type === 'fixed'
-                  ? 'Giảm theo số tiền'
-                  : 'Giảm theo phần trăm'
-              }
-              fullWidth
-              margin='normal'
-              InputProps={{ readOnly: true }}
-              sx={{
-                ...StyleAdmin.InputCustom,
-                ...StyleAdmin.InputCustom.CursorNone
-              }}
-            />
-            <TextField
-              label={
-                discount.type === 'fixed'
-                  ? 'Giá trị giảm (VNĐ)'
-                  : 'Giá trị giảm (%)'
-              }
-              value={discount.amount}
-              type='number'
-              fullWidth
-              margin='normal'
-              InputProps={{ readOnly: true }}
-              sx={{
-                ...StyleAdmin.InputCustom,
-                ...StyleAdmin.InputCustom.CursorNone
-              }}
-            />
-            <FormControlLabel
-              control={
-                <Checkbox
-                  checked={discount.isActive}
-                  InputProps={{ readOnly: true }}
-                />
-              }
-              label='Kích hoạt'
-            />
-          </Box>
+        <Table>
+          <TableBody>
+            <TableRow>
+              <TableCell>
+                <strong>Mã giảm giá</strong>
+              </TableCell>
+              <TableCell>{discount.code || '—'}</TableCell>
+            </TableRow>
 
-          {/* Cột phải */}
-          <Box flex={1}>
-            <TextField
-              label='Giá trị đơn hàng tối thiểu'
-              value={discount.minOrderValue}
-              type='number'
-              fullWidth
-              margin='normal'
-              InputProps={{ readOnly: true }}
-              sx={{
-                ...StyleAdmin.InputCustom,
-                ...StyleAdmin.InputCustom.CursorNone
-              }}
-            />
-            <TextField
-              label='Số lượt sử dụng tối đa'
-              value={discount.usageLimit}
-              type='number'
-              fullWidth
-              margin='normal'
-              InputProps={{ readOnly: true }}
-              sx={{
-                ...StyleAdmin.InputCustom,
-                ...StyleAdmin.InputCustom.CursorNone
-              }}
-            />
-            <TextField
-              label='Số lượt còn lại'
-              value={discount.usageLimit - discount.usedCount}
-              type='number'
-              fullWidth
-              margin='normal'
-              InputProps={{ readOnly: true }}
-              sx={{
-                ...StyleAdmin.InputCustom,
-                ...StyleAdmin.InputCustom.CursorNone
-              }}
-            />
-            <TextField
-              label='Hiệu lực từ'
-              value={new Date(discount.validFrom).toLocaleString()}
-              type='text'
-              fullWidth
-              margin='normal'
-              InputProps={{ readOnly: true }}
-              sx={{
-                ...StyleAdmin.InputCustom,
-                ...StyleAdmin.InputCustom.CursorNone
-              }}
-            />
-            <TextField
-              label='Hiệu lực đến'
-              value={new Date(discount.validUntil).toLocaleString()}
-              type='text'
-              fullWidth
-              margin='normal'
-              InputProps={{ readOnly: true }}
-              sx={{
-                ...StyleAdmin.InputCustom,
-                ...StyleAdmin.InputCustom.CursorNone
-              }}
-            />
-          </Box>
-        </Box>
+            <TableRow>
+              <TableCell>
+                <strong>Loại giảm giá</strong>
+              </TableCell>
+              <TableCell>
+                {discount.type === 'fixed'
+                  ? 'Giảm theo số tiền'
+                  : 'Giảm theo phần trăm'}
+              </TableCell>
+            </TableRow>
+
+            <TableRow>
+              <TableCell>
+                <strong>
+                  {discount.type === 'fixed'
+                    ? 'Giá trị giảm (VNĐ)'
+                    : 'Giá trị giảm (%)'}
+                </strong>
+              </TableCell>
+              <TableCell>{discount.amount ?? '—'}</TableCell>
+            </TableRow>
+
+            <TableRow>
+              <TableCell>
+                <strong>Kích hoạt</strong>
+              </TableCell>
+              <TableCell>
+                <Chip
+                  label={
+                    discount.isActive ? 'Đang hoạt động' : 'Không hoạt động'
+                  }
+                  color={discount.isActive ? 'success' : 'error'}
+                />
+              </TableCell>
+            </TableRow>
+
+            <TableRow>
+              <TableCell>
+                <strong>Giá trị đơn hàng tối thiểu</strong>
+              </TableCell>
+              <TableCell>{discount.minOrderValue ?? '—'}</TableCell>
+            </TableRow>
+
+            <TableRow>
+              <TableCell>
+                <strong>Số lượt sử dụng tối đa</strong>
+              </TableCell>
+              <TableCell>{discount.usageLimit ?? '—'}</TableCell>
+            </TableRow>
+
+            <TableRow>
+              <TableCell>
+                <strong>Số lượt còn lại</strong>
+              </TableCell>
+              <TableCell>
+                {discount.usageLimit != null && discount.usedCount != null
+                  ? discount.usageLimit - discount.usedCount
+                  : '—'}
+              </TableCell>
+            </TableRow>
+
+            <TableRow>
+              <TableCell>
+                <strong>Hiệu lực từ</strong>
+              </TableCell>
+              <TableCell>
+                {discount.validFrom
+                  ? new Date(discount.validFrom).toLocaleString('vi-VN')
+                  : '—'}
+              </TableCell>
+            </TableRow>
+
+            <TableRow>
+              <TableCell>
+                <strong>Hiệu lực đến</strong>
+              </TableCell>
+              <TableCell>
+                {discount.validUntil
+                  ? new Date(discount.validUntil).toLocaleString('vi-VN')
+                  : '—'}
+              </TableCell>
+            </TableRow>
+          </TableBody>
+        </Table>
       </DialogContent>
-      <Divider sx={{ my: 0 }} />
       <DialogActions sx={{ padding: '16px 24px' }}>
         <Button onClick={onClose} variant='contained' color='error'>
           Đóng

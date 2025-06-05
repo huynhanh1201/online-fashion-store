@@ -7,11 +7,11 @@ import {
   updateWarehouseSlip
 } from '~/services/admin/Inventory/WarehouseSlipSetvice.js'
 
-const useWarehouseSlips = (page = 1, limit = 10) => {
+const useWarehouseSlips = () => {
   const [warehouseSlips, setWarehouseSlips] = useState([])
   const [totalPages, setTotalPages] = useState(1)
   const [loading, setLoading] = useState(false)
-  const fetchWarehouseSlips = async (filters = {}) => {
+  const fetchWarehouseSlips = async (page = 1, limit = 10, filters = {}) => {
     setLoading(true)
     const { warehouseSlips, total } = await getWarehouseSlips(
       page,

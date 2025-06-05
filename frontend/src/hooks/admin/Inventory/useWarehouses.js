@@ -6,12 +6,12 @@ import {
   deleteWarehouse
 } from '~/services/admin/Inventory/WarehouseService'
 
-const useWarehouses = (pageWarehouse = 1, limit = 10) => {
+const useWarehouses = () => {
   const [warehouses, setWarehouses] = useState([])
   const [totalPages, setTotalPages] = useState(1)
   const [loading, setLoading] = useState(false)
 
-  const fetchWarehouses = async (page = pageWarehouse, filters = {}) => {
+  const fetchWarehouses = async (page = 1, limit = 10, filters = {}) => {
     setLoading(true)
     const { warehouses, total } = await getWarehouses(page, limit, filters)
     setWarehouses(warehouses)
@@ -21,19 +21,19 @@ const useWarehouses = (pageWarehouse = 1, limit = 10) => {
 
   const createNewWarehouse = async (data) => {
     const result = await createWarehouse(data)
-    if (result) await fetchWarehouses(pageWarehouse)
+    if (result) await fetchWarehouses()
     return result
   }
 
   const updateWarehouseById = async (id, data) => {
     const result = await updateWarehouse(id, data)
-    if (result) await fetchWarehouses(pageWarehouse)
+    if (result) await fetchWarehouses()
     return result
   }
 
   const deleteWarehouseById = async (id) => {
     const result = await deleteWarehouse(id)
-    if (result) await fetchWarehouses(pageWarehouse)
+    if (result) await fetchWarehouses()
     return result
   }
 

@@ -117,64 +117,62 @@ const PartnersTab = ({
           </TableRow>
         </TableHead>
         <TableBody>
-          {data
-            .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-            .map((partner, index) => {
-              const fullAddress = [
-                partner.address?.street,
-                partner.address?.ward,
-                partner.address?.district,
-                partner.address?.city
-              ]
-                .filter(Boolean)
-                .join(', ')
+          {data.map((partner, index) => {
+            const fullAddress = [
+              partner.address?.street,
+              partner.address?.ward,
+              partner.address?.district,
+              partner.address?.city
+            ]
+              .filter(Boolean)
+              .join(', ')
 
-              const bankInfo = partner.bankInfo?.accountNumber
-                ? `${partner.bankInfo.accountNumber} - ${partner.bankInfo.bankName || ''}`
-                : '---'
+            const bankInfo = partner.bankInfo?.accountNumber
+              ? `${partner.bankInfo.accountNumber} - ${partner.bankInfo.bankName || ''}`
+              : '---'
 
-              return (
-                <TableRow key={partner._id || index}>
-                  <TableCell>{page * rowsPerPage + index + 1}</TableCell>
-                  <TableCell>{partner.code || '---'}</TableCell>
-                  <TableCell>{partner.name || '---'}</TableCell>
-                  <TableCell>{getPartnerTypeLabel(partner.type)}</TableCell>
-                  <TableCell>{partner.contact?.phone || '---'}</TableCell>
-                  <TableCell>{partner.contact?.email || '---'}</TableCell>
-                  <TableCell>{partner.taxCode || '---'}</TableCell>
-                  <TableCell>{fullAddress || '---'}</TableCell>
-                  <TableCell>{bankInfo}</TableCell>
-                  <TableCell>
-                    {partner.createdAt
-                      ? new Date(partner.createdAt).toLocaleDateString()
-                      : '---'}
-                  </TableCell>
-                  <TableCell align='center'>
-                    <IconButton
-                      size='small'
-                      color='primary'
-                      onClick={() => handleViewPartner(partner)}
-                    >
-                      <VisibilityIcon />
-                    </IconButton>
-                    <IconButton
-                      size='small'
-                      color='info'
-                      onClick={() => handleEditPartner(partner)}
-                    >
-                      <EditIcon />
-                    </IconButton>
-                    <IconButton
-                      size='small'
-                      color='error'
-                      onClick={() => handleDeletePartner(partner)}
-                    >
-                      <DeleteIcon />
-                    </IconButton>
-                  </TableCell>
-                </TableRow>
-              )
-            })}
+            return (
+              <TableRow key={partner._id || index}>
+                <TableCell>{page * rowsPerPage + index + 1}</TableCell>
+                <TableCell>{partner.code || '---'}</TableCell>
+                <TableCell>{partner.name || '---'}</TableCell>
+                <TableCell>{getPartnerTypeLabel(partner.type)}</TableCell>
+                <TableCell>{partner.contact?.phone || '---'}</TableCell>
+                <TableCell>{partner.contact?.email || '---'}</TableCell>
+                <TableCell>{partner.taxCode || '---'}</TableCell>
+                <TableCell>{fullAddress || '---'}</TableCell>
+                <TableCell>{bankInfo}</TableCell>
+                <TableCell>
+                  {partner.createdAt
+                    ? new Date(partner.createdAt).toLocaleDateString()
+                    : '---'}
+                </TableCell>
+                <TableCell align='center'>
+                  <IconButton
+                    size='small'
+                    color='primary'
+                    onClick={() => handleViewPartner(partner)}
+                  >
+                    <VisibilityIcon />
+                  </IconButton>
+                  <IconButton
+                    size='small'
+                    color='info'
+                    onClick={() => handleEditPartner(partner)}
+                  >
+                    <EditIcon />
+                  </IconButton>
+                  <IconButton
+                    size='small'
+                    color='error'
+                    onClick={() => handleDeletePartner(partner)}
+                  >
+                    <DeleteIcon />
+                  </IconButton>
+                </TableCell>
+              </TableRow>
+            )
+          })}
           {data.length === 0 && (
             <TableRow>
               <TableCell colSpan={11} align='center'>
@@ -185,13 +183,19 @@ const PartnersTab = ({
         </TableBody>
       </Table>
       <TablePagination
+        rowsPerPageOptions={[10, 25, 100]}
         component='div'
         count={data.length}
         page={page}
         onPageChange={onPageChange}
         rowsPerPage={rowsPerPage}
-        onRowsPerPageChange={onRowsPerPageChange}
+        onRowsPerPageChange={(e) => onRowsPerPageChange(e, 'partner')}
         labelRowsPerPage='Số dòng mỗi trang'
+        labelDisplayedRows={({ from, to, count }) => {
+          const actualTo = to > count ? count : to // nếu to vượt quá count thì lấy count
+          const actualFrom = from > count ? count : from // nếu from vượt quá count thì lấy count
+          return `${actualFrom}–${actualTo} trên ${count !== -1 ? count : `hơn ${actualTo}`}`
+        }}
       />
 
       <AddPartnerModal

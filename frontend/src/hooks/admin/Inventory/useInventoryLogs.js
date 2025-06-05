@@ -13,9 +13,13 @@ const useInventoryLogs = () => {
 
   const fetchLogs = async (page = 1, limit = 10, filters = {}) => {
     setLoading(true)
-    const response = await getInventoryLogs({ page, limit, ...filters })
-    setLogs(response)
-    setTotalPages(response.totalPages || 1)
+    const { logs, totalPages } = await getInventoryLogs({
+      page,
+      limit,
+      ...filters
+    })
+    setLogs(logs)
+    setTotalPages(totalPages || 1)
     setLoading(false)
   }
 

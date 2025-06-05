@@ -71,7 +71,7 @@ const ProductRow = ({ index, product, handleOpenModal }) => {
         <StyledTableCell>{product.quantity}</StyledTableCell>
         <StyledTableCell
           sx={{
-            maxWidth: '130px',
+            maxWidth: '150px',
             whiteSpace: 'nowrap',
             overflow: 'hidden',
             textOverflow: 'ellipsis'
@@ -84,16 +84,6 @@ const ProductRow = ({ index, product, handleOpenModal }) => {
         <StyledTableCell
           sx={{
             maxWidth: '250px',
-            whiteSpace: 'nowrap',
-            overflow: 'hidden',
-            textOverflow: 'ellipsis'
-          }}
-        >
-          {product.origin}
-        </StyledTableCell>
-        <StyledTableCell
-          sx={{
-            maxWidth: '100px',
             whiteSpace: 'nowrap',
             overflow: 'hidden',
             textOverflow: 'ellipsis'

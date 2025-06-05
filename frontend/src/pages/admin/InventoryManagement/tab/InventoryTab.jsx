@@ -400,7 +400,6 @@ import DeleteIcon from '@mui/icons-material/Delete'
 import ViewInventoryModal from '../modal/Inventory/ViewInventoryModal.jsx'
 import EditInventoryModal from '../modal/Inventory/EditInventoryModal.jsx'
 import DeleteInventoryModal from '../modal/Inventory/DeleteInventoryModal.jsx'
-import AddWarehouseSlipModal from '~/pages/admin/InventoryManagement/modal/WarehouseSlip/AddWarehouseSlipModal.jsx'
 import FilterByTime from '~/components/filterDateType/FilterByTime.jsx'
 import dayjs from 'dayjs'
 const InventoryTab = ({
@@ -414,7 +413,11 @@ const InventoryTab = ({
   updateInventory,
   deleteInventory,
   refreshInventories,
-  getInventoryId
+  getInventoryId,
+  refreshVariants,
+  fetchWarehouses,
+  formatCurrency,
+  parseCurrency
 }) => {
   const [filterWarehouse, setFilterWarehouse] = useState('all')
   const [filterStatus, setFilterStatus] = useState('all')
@@ -432,6 +435,8 @@ const InventoryTab = ({
 
   useEffect(() => {
     refreshInventories(page > 0 ? page : 1, rowsPerPage)
+    refreshVariants()
+    fetchWarehouses()
   }, [])
 
   const enrichedInventories = data.map((item) => {
@@ -491,21 +496,22 @@ const InventoryTab = ({
       id: 'minQuantity',
       label: 'Tối thiểu', // ngưỡng cảnh báo số lượng sản phẩm (SL) cảnh báo
       minWidth: 100,
-      align: 'right'
+      align: 'right',
+      format: (value) => `${value.toLocaleString('vi-VN')}`
     },
     {
       id: 'importPrice',
       label: 'Giá nhập',
       minWidth: 100,
       align: 'right',
-      format: (value) => `${value.toLocaleString()}đ`
+      format: (value) => `${value.toLocaleString('vi-VN')}đ` // dùng 'vi-VN' cho đúng format Việt Nam
     },
     {
       id: 'exportPrice',
       label: 'Giá bán',
       minWidth: 100,
       align: 'right',
-      format: (value) => `${value.toLocaleString()}đ`
+      format: (value) => `${value.toLocaleString('vi-VN')}đ`
     },
     {
       id: 'status',
@@ -697,70 +703,68 @@ const InventoryTab = ({
             </TableRow>
           </TableHead>
           <TableBody>
-            {filteredInventories
-              .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-              .map((row, index) => (
-                <TableRow hover role='checkbox' tabIndex={-1} key={index}>
-                  {inventoryColumns.map((column) => {
-                    let value = row[column.id]
-                    if (column.id === 'status') {
-                      return (
-                        <TableCell key={column.id} align={column.align}>
-                          <Chip
-                            label={
-                              value === 'in-stock'
-                                ? 'Còn hàng'
-                                : value === 'low-stock'
-                                  ? 'Cảnh báo'
-                                  : 'Hết hàng'
-                            }
-                            color={
-                              value === 'in-stock'
-                                ? 'success'
-                                : value === 'low-stock'
-                                  ? 'warning'
-                                  : 'error'
-                            }
-                            size='small'
-                          />
-                        </TableCell>
-                      )
-                    }
-                    if (column.id === 'action') {
-                      return (
-                        <TableCell key={column.id} align={column.align}>
-                          <IconButton
-                            onClick={() => handleViewInventory(row)}
-                            size='small'
-                            color='primary'
-                          >
-                            <VisibilityIcon />
-                          </IconButton>
-                          <IconButton
-                            onClick={() => handleEditInventory(row)}
-                            size='small'
-                            color='info'
-                          >
-                            <EditIcon />
-                          </IconButton>
-                          <IconButton
-                            onClick={() => handleDeleteInventory(row)}
-                            size='small'
-                            color='error'
-                          >
-                            <DeleteIcon />
-                          </IconButton>
-                        </TableCell>
-                      )
-                    }
+            {filteredInventories.map((row, index) => (
+              <TableRow hover role='checkbox' tabIndex={-1} key={index}>
+                {inventoryColumns.map((column) => {
+                  let value = row[column.id]
+                  if (column.id === 'status') {
                     return (
                       <TableCell key={column.id} align={column.align}>
-                        {column.format ? column.format(value) : value}
+                        <Chip
+                          label={
+                            value === 'in-stock'
+                              ? 'Còn hàng'
+                              : value === 'low-stock'
+                                ? 'Cảnh báo'
+                                : 'Hết hàng'
+                          }
+                          color={
+                            value === 'in-stock'
+                              ? 'success'
+                              : value === 'low-stock'
+                                ? 'warning'
+                                : 'error'
+                          }
+                          size='small'
+                        />
                       </TableCell>
                     )
-                  })}
-                </TableRow>
-              ))}
+                  }
+                  if (column.id === 'action') {
+                    return (
+                      <TableCell key={column.id} align={column.align}>
+                        <IconButton
+                          onClick={() => handleViewInventory(row)}
+                          size='small'
+                          color='primary'
+                        >
+                          <VisibilityIcon />
+                        </IconButton>
+                        <IconButton
+                          onClick={() => handleEditInventory(row)}
+                          size='small'
+                          color='info'
+                        >
+                          <EditIcon />
+                        </IconButton>
+                        <IconButton
+                          onClick={() => handleDeleteInventory(row)}
+                          size='small'
+                          color='error'
+                        >
+                          <DeleteIcon />
+                        </IconButton>
+                      </TableCell>
+                    )
+                  }
+                  return (
+                    <TableCell key={column.id} align={column.align}>
+                      {column.format ? column.format(value) : value}
+                    </TableCell>
+                  )
+                })}
+              </TableRow>
+            ))}
           </TableBody>
         </Table>
       </TableContainer>
@@ -771,8 +775,15 @@ const InventoryTab = ({
         rowsPerPage={rowsPerPage}
         page={page}
         onPageChange={onPageChange}
-        onRowsPerPageChange={onRowsPerPageChange}
+        onRowsPerPageChange={(e) => onRowsPerPageChange(e, 'inventory')}
+        labelRowsPerPage='Số dòng mỗi trang'
+        labelDisplayedRows={({ from, to, count }) => {
+          const actualTo = to > count ? count : to // nếu to vượt quá count thì lấy count
+          const actualFrom = from > count ? count : from // nếu from vượt quá count thì lấy count
+          return `${actualFrom}–${actualTo} trên ${count !== -1 ? count : `hơn ${actualTo}`}`
+        }}
       />
+
       <ViewInventoryModal
         open={openViewModal}
         onClose={() => {
@@ -783,6 +794,8 @@ const InventoryTab = ({
         inventory={selectedInventory}
         variants={variants}
         warehouses={warehouses}
+        formatCurrency={formatCurrency}
+        parseCurrency={parseCurrency}
       />
       <EditInventoryModal
         open={openEditModal}
@@ -791,6 +804,8 @@ const InventoryTab = ({
         onSave={updateInventory}
         variants={variants}
         warehouses={warehouses}
+        formatCurrency={formatCurrency}
+        parseCurrency={parseCurrency}
       />
       <DeleteInventoryModal
         open={openDeleteModal}
