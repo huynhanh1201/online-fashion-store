@@ -24,22 +24,22 @@ const useWarehouseSlips = () => {
   }
   const createNewWarehouseSlip = async (data) => {
     const result = await createWarehouseSlip(data)
-    if (result) await fetchWarehouseSlips(page)
+    if (result) await fetchWarehouseSlips()
     return result
   }
   const getWarehouseSlipId = async (id) => {
     const result = await getWarehouseSlipById(id)
-    if (result) fetchWarehouseSlips(page)
+    if (result) fetchWarehouseSlips()
     return result
   }
   const removeWarehouseSlip = async (id) => {
     const result = await deleteWarehouseSlip(id)
-    if (result) fetchWarehouseSlips(page)
+    if (result) fetchWarehouseSlips()
     return result
   }
   const update = async (id, data) => {
     const result = await updateWarehouseSlip(id, data)
-    if (result) fetchWarehouseSlips(page)
+    if (result) fetchWarehouseSlips()
     return result
   }
 
