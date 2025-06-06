@@ -12,41 +12,62 @@ import {
 import { Paper, Typography, Grid } from '@mui/material'
 
 export default function ChartDashboard({ data }) {
-  // Gộp tổng in/out của toàn bộ kho
-  const summarizedData = useMemo(() => {
+  const year = new Date().getFullYear()
+  const monthlySummary = useMemo(() => {
     if (!Array.isArray(data)) return []
 
-    const totalIn = data.reduce((sum, w) => sum + (w.inAmount || 0), 0)
-    const totalOut = data.reduce(
-      (sum, w) => sum + Math.abs(w.outAmount || 0),
-      0
-    )
-
-    return [
-      {
-        name: 'Tất cả kho',
-        Nhập: totalIn,
-        Xuất: totalOut
+    const months = Array.from({ length: 12 }, (_, i) => {
+      const m = i + 1
+      const monthStr = m < 10 ? `0${m}` : `${m}`
+      return {
+        monthIndex: i, // ← giá trị duy nhất để XAxis nhận dạng
+        name: `T${m}/${year}`,
+        key: `${year}-${monthStr}`,
+        Nhập: 0,
+        Xuất: 0,
+        'Chênh lệch': 0
       }
-    ]
-  }, [data])
+    })
+
+    console.log('months', months)
+    data.forEach((warehouse) => {
+      warehouse.data?.forEach(({ month, inAmount, outAmount }) => {
+        const index = months.findIndex((m) => m.key === month)
+        if (index !== -1) {
+          months[index].Nhập += inAmount || 0
+          months[index].Xuất += Math.abs(outAmount || 0)
+        }
+      })
+    })
+
+    return months.map((m) => ({
+      ...m,
+      'Chênh lệch': m.Nhập - m.Xuất
+    }))
+  }, [data, year])
 
   return (
     <Grid container spacing={2}>
-      <Grid item size={12} md={6}>
-        <Paper sx={{ p: 2, height: '100%' }}>
+      <Grid item size={12}>
+        <Paper sx={{ p: 2 }}>
           <Typography variant='h6' gutterBottom>
-            Tổng Nhập / Xuất Tất Cả Kho
+            So Sánh Nhập Xuất Kho Theo Tháng (T1 - T12/2024)
           </Typography>
-          <ResponsiveContainer width='100%' height={300}>
-            <BarChart data={summarizedData}>
+          <ResponsiveContainer width='100%' height={400}>
+            <BarChart data={monthlySummary}>
               <CartesianGrid strokeDasharray='3 3' />
-              <XAxis dataKey='name' />
+              <XAxis
+                dataKey='monthIndex'
+                tickFormatter={(index) => monthlySummary[index]?.name}
+                interval={0}
+              />
+
               <YAxis />
               <Tooltip />
               <Legend />
-              <Bar dataKey='Nhập' fill='#3f51b5' barSize={40} />
-              <Bar dataKey='Xuất' fill='#fb8c00' barSize={40} />
+              <Bar dataKey='Xuất' fill='#4CAF50' barSize={25} />
+              <Bar dataKey='Nhập' fill='#F44336' barSize={25} />
+              <Bar dataKey='Chênh lệch' fill='#2196F3' barSize={20} />
             </BarChart>
           </ResponsiveContainer>
         </Paper>

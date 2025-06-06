@@ -82,7 +82,7 @@ export default function LowStockAlertCard({ data, loading }) {
         </Typography>
       ) : (
         filteredWarehouses.map((warehouse, wIndex) => (
-          <Box key={wIndex} sx={{ mb: 3 }}>
+          <Box key={wIndex} sx={{ mb: 2 }}>
             {/*<Typography variant='h6' sx={{ mb: 1, color: '#5e35b1' }}>*/}
             {/*  Kho: {warehouse.warehouseId}*/}
             {/*</Typography>*/}
@@ -94,7 +94,6 @@ export default function LowStockAlertCard({ data, loading }) {
                   backgroundColor: '#fce4ec',
                   borderRadius: 2,
                   p: 2,
-                  mb: 1.5,
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'space-between'

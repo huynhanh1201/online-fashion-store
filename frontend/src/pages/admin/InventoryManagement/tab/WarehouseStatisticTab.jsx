@@ -80,17 +80,7 @@ function WarehouseStatisticTab() {
       {/*  </Typography>*/}
       {/*  <TopSellingSlowSellingCard />*/}
       {/*</Box>*/}
-      <Box sx={styles.BoxCard}>
-        <Typography
-          variant='h5'
-          gutterBottom
-          fontWeight='700'
-          sx={styles.header}
-        >
-          Cảnh Báo Hết Hàng
-        </Typography>
-        <LowStockAlertCard data={statistics} loading={loading} />
-      </Box>
+
       <Box sx={styles.BoxCard}>
         <Typography
           variant='h5'
@@ -101,6 +91,17 @@ function WarehouseStatisticTab() {
           Biến Động Tồn Kho Theo Thời Gian
         </Typography>
         <ChartDashboard data={statistics} loading={loading} />
+      </Box>
+      <Box sx={styles.BoxCard}>
+        <Typography
+          variant='h5'
+          gutterBottom
+          fontWeight='700'
+          sx={styles.header}
+        >
+          Cảnh Báo Hết Hàng
+        </Typography>
+        <LowStockAlertCard data={statistics} loading={loading} />
       </Box>
       {/*<Box sx={styles.BoxCard}>*/}
       {/*  <Typography*/}

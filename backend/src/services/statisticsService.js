@@ -98,10 +98,11 @@ const getInventoryStatistics = async () => {
       {
         // Bước 2: Gom theo kho + tháng + loại (in/out)
         $group: {
-          _id: {},
-          warehouseId: '$warehouseId',
-          month: '$month',
-          type: '$type',
+          _id: {
+            warehouseId: '$warehouseId',
+            month: '$month',
+            type: '$type'
+          },
           totalAmount: { $sum: '$amount' }
         }
       },

@@ -183,15 +183,15 @@ function ViewOrderModal({
                       }
                       size='small'
                     />
-                    {/*{getNextStatus(order.status) && (*/}
-                    {/*  <Button*/}
-                    {/*    variant='outlined'*/}
-                    {/*    size='small'*/}
-                    {/*    onClick={handleNextStatus}*/}
-                    {/*  >*/}
-                    {/*    Chuyển tiếp*/}
-                    {/*  </Button>*/}
-                    {/*)}*/}
+                    {getNextStatus(order.status) && (
+                      <Button
+                        variant='outlined'
+                        size='small'
+                        onClick={handleNextStatus}
+                      >
+                        Chuyển tiếp
+                      </Button>
+                    )}
                   </Stack>
                 </TableCell>
               </TableRow>
