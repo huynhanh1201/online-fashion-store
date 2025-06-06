@@ -87,21 +87,29 @@ const getInventoryStatistics = async () => {
 
     // Dữ liệu biến động tồn kho theo thời gian (nhập/xuất từng ngày)
     const stockMovementsPromise = InventoryLogModel.aggregate([
-      // Bước 1: Gom theo type + warehouseId
       {
+        // Bước 1: Thêm trường tháng
+        $addFields: {
+          month: {
+            $dateToString: { format: '%Y-%m', date: '$createdAt' }
+          }
+        }
+      },
+      {
+        // Bước 2: Gom theo kho + tháng + loại (in/out)
         $group: {
-          _id: {
-            type: '$type',
-            warehouseId: '$warehouseId'
-          },
+          _id: {},
+          warehouseId: '$warehouseId',
+          month: '$month',
+          type: '$type',
           totalAmount: { $sum: '$amount' }
         }
       },
-
-      // Bước 2: Biến kết quả thành dạng: mỗi dòng là warehouseId + inAmount/outAmount riêng
       {
+        // Bước 3: Tách in/out
         $project: {
           warehouseId: '$_id.warehouseId',
+          month: '$_id.month',
           inAmount: {
             $cond: [{ $eq: ['$_id.type', 'in'] }, '$totalAmount', 0]
           },
@@ -110,13 +118,34 @@ const getInventoryStatistics = async () => {
           }
         }
       },
-
-      // Bước 3: Gom lại theo warehouseId, cộng tổng in/out
       {
+        // Bước 4: Gom lại theo warehouse + tháng
         $group: {
-          _id: '$warehouseId',
+          _id: {
+            warehouseId: '$warehouseId',
+            month: '$month'
+          },
           inAmount: { $sum: '$inAmount' },
           outAmount: { $sum: '$outAmount' }
+        }
+      },
+      {
+        // Bước 5: Đưa về dạng dễ nhét vào mảng
+        $project: {
+          _id: 0,
+          warehouseId: '$_id.warehouseId',
+          data: {
+            month: '$_id.month',
+            inAmount: '$inAmount',
+            outAmount: '$outAmount'
+          }
+        }
+      },
+      {
+        // Bước 6: Gom về theo warehouseId
+        $group: {
+          _id: '$warehouseId',
+          data: { $push: '$data' }
         }
       }
     ])
@@ -129,6 +158,8 @@ const getInventoryStatistics = async () => {
         stockWarningsPromise,
         stockMovementsPromise
       ])
+
+    console.log('stockMovements: ', stockMovements)
 
     // Xử lý cấu trúc dữ liệu về dạng Hash map
     const warehouseStatsMap = convertArrToMap(warehouseStats, '_id')
