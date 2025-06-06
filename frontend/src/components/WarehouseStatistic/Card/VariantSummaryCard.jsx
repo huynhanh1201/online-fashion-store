@@ -5,24 +5,6 @@ import CategoryIcon from '@mui/icons-material/Category'
 import WarningIcon from '@mui/icons-material/Warning'
 import MonetizationOnIcon from '@mui/icons-material/MonetizationOn'
 import socket from '~/socket/index'
-// Dữ liệu mẫu
-const inventoryList = [
-  {
-    quantity: 20,
-    minQuantity: 5,
-    variantId: { sku: 'SP001', productId: 'P1' }
-  },
-  {
-    quantity: 3,
-    minQuantity: 5,
-    variantId: { sku: 'SP002', productId: 'P2' }
-  },
-  {
-    quantity: 10,
-    minQuantity: 0,
-    variantId: { sku: 'SP003', productId: 'P1' }
-  }
-]
 
 export default function VariantSummaryCard() {
   // =======================TEST WEBSOCKET==========================
@@ -35,29 +17,30 @@ export default function VariantSummaryCard() {
 
     socket.on('products:update', (data) => {
       console.log('📦 Realtime update:', data)
+      if (!data) {
+        console.warn('⚠️ Không nhận được dữ liệu thống kê từ socket')
+      }
       setStats(data)
     })
 
-    // Khi mất kết nối với server (đóng tab, F5, mạng yếu...), event này sẽ chạy.
     socket.on('disconnect', (data) => {
       console.log('Disconnect data: ', data)
     })
 
-    // Gỡ bỏ listener khi component bị unmount (tránh memory leak).
     return () => {
       socket.off('products:update')
     }
   }, [])
-  // =================================================
+  // Xử lý dữ liệu nếu đã nhận được từ socket
+  const totalVariants =
+    stats?.inventorySummary?.reduce((acc, item) => acc + item.totalStock, 0) ||
+    0
 
-  const totalVariants = inventoryList.length
-  const totalProducts = new Set(
-    inventoryList.map((item) => item.variantId?.productId)
-  ).size
+  const totalProducts = stats?.inventorySummary?.length || 0
 
-  const lowStockVariants = inventoryList.filter(
-    (item) => item.quantity <= item.minQuantity
-  ).length
+  const lowStockVariants =
+    stats?.lowStockCount?.reduce((acc, item) => acc + item.lowStockCount, 0) ||
+    0
 
   const summaryItems = [
     {

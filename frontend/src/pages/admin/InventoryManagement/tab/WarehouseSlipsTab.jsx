@@ -35,7 +35,8 @@ const WarehouseSlipsTab = ({
   fetchWarehouses,
   fetchPartner,
   addPartner,
-  addWarehouse
+  addWarehouse,
+  fetchVariants
 }) => {
   const [openModal, setOpenModal] = useState(false)
   const [openViewModal, setOpenViewModal] = useState(false) // State cho View modal
@@ -60,6 +61,7 @@ const WarehouseSlipsTab = ({
   const handleOpenModal = (type) => {
     fetchPartner()
     fetchWarehouses()
+    fetchVariants()
     setModalType(type)
     setNewSlipData({
       ...newSlipData,

@@ -24,52 +24,58 @@ const TransactionTable = ({
 }) => {
   return (
     <StyledTableContainer component={Paper}>
-      <TableHead>
-        <StyledTableRow>
-          <StyledTableCell sx={StyleAdmin.TableColumnSTT}>STT</StyledTableCell>
-          <StyledTableCell sx={{ width: '20%' }}>Mã giao dịch</StyledTableCell>
-          <StyledTableCell sx={{ width: '20%' }}>Đơn hàng</StyledTableCell>
-          <StyledTableCell>Phương thức</StyledTableCell>
-          <StyledTableCell>Trạng thái</StyledTableCell>
-          <StyledTableCell sx={{ width: '100px' }}>
-            Số tiền (VNĐ)
-          </StyledTableCell>
-          <StyledTableCell sx={{ width: '30%' }}>Ghi chú</StyledTableCell>
-          <StyledTableCell>Ngày tạo</StyledTableCell>
-          <StyledTableCell sx={{ maxWidth: '130px', width: '130px' }}>
-            Hành động
-          </StyledTableCell>
-        </StyledTableRow>
-      </TableHead>
-      <TableBody>
-        {loading ? (
+      <table>
+        <TableHead>
           <StyledTableRow>
-            <StyledTableCell colSpan={9} align='center'>
-              đang tải dữ liệu ....
+            <StyledTableCell sx={StyleAdmin.TableColumnSTT}>
+              STT
+            </StyledTableCell>
+            <StyledTableCell sx={{ width: '20%' }}>
+              Mã giao dịch
+            </StyledTableCell>
+            <StyledTableCell sx={{ width: '20%' }}>Đơn hàng</StyledTableCell>
+            <StyledTableCell>Phương thức</StyledTableCell>
+            <StyledTableCell>Trạng thái</StyledTableCell>
+            <StyledTableCell sx={{ width: '120px' }}>
+              Số tiền (VNĐ)
+            </StyledTableCell>
+            <StyledTableCell sx={{ width: '30%' }}>Ghi chú</StyledTableCell>
+            <StyledTableCell>Ngày tạo</StyledTableCell>
+            <StyledTableCell sx={{ maxWidth: '130px', width: '130px' }}>
+              Hành động
             </StyledTableCell>
           </StyledTableRow>
-        ) : transactions.filter((transaction) => !transaction.destroy).length >
-          0 ? (
-          transactions
-            .filter((transaction) => !transaction.destroy)
-            .map((transaction, index) => (
-              <TransactionRow
-                key={transaction._id}
-                index={index}
-                transaction={transaction}
-                onView={onView}
-                onEdit={onEdit}
-                onDelete={onDelete}
-              />
-            ))
-        ) : (
-          <StyledTableRow>
-            <StyledTableCell colSpan={9} align='center'>
-              Không có giao dịch nào.
-            </StyledTableCell>
-          </StyledTableRow>
-        )}
-      </TableBody>
+        </TableHead>
+        <TableBody>
+          {loading ? (
+            <StyledTableRow>
+              <StyledTableCell colSpan={9} align='center'>
+                đang tải dữ liệu ....
+              </StyledTableCell>
+            </StyledTableRow>
+          ) : transactions.filter((transaction) => !transaction.destroy)
+              .length > 0 ? (
+            transactions
+              .filter((transaction) => !transaction.destroy)
+              .map((transaction, index) => (
+                <TransactionRow
+                  key={transaction._id}
+                  index={index}
+                  transaction={transaction}
+                  onView={onView}
+                  onEdit={onEdit}
+                  onDelete={onDelete}
+                />
+              ))
+          ) : (
+            <StyledTableRow>
+              <StyledTableCell colSpan={9} align='center'>
+                Không có giao dịch nào.
+              </StyledTableCell>
+            </StyledTableRow>
+          )}
+        </TableBody>
+      </table>
     </StyledTableContainer>
   )
 }

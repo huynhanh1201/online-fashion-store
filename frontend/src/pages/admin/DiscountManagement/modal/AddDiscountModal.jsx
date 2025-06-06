@@ -1,21 +1,23 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 
-import Dialog from '@mui/material/Dialog'
-import DialogTitle from '@mui/material/DialogTitle'
-import DialogContent from '@mui/material/DialogContent'
-import DialogActions from '@mui/material/DialogActions'
-import Button from '@mui/material/Button'
-import TextField from '@mui/material/TextField'
-import MenuItem from '@mui/material/MenuItem'
-import FormControlLabel from '@mui/material/FormControlLabel'
-import Checkbox from '@mui/material/Checkbox'
-import Divider from '@mui/material/Divider'
-import FormControl from '@mui/material/FormControl'
-import InputLabel from '@mui/material/InputLabel'
-import Select from '@mui/material/Select'
-import Box from '@mui/material/Box'
-
+import {
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Button,
+  TextField,
+  MenuItem,
+  FormControlLabel,
+  Checkbox,
+  Divider,
+  FormControl,
+  InputLabel,
+  Select,
+  Box
+} from '@mui/material'
+import { toast } from 'react-toastify'
 import { addDiscount } from '~/services/admin/discountService'
 import StyleAdmin from '~/assets/StyleAdmin.jsx'
 
@@ -25,6 +27,7 @@ const AddDiscountModal = ({ open, onClose, onAdded }) => {
     watch,
     handleSubmit,
     reset,
+    setValue,
     formState: { isSubmitting }
   } = useForm({
     defaultValues: {
@@ -32,24 +35,51 @@ const AddDiscountModal = ({ open, onClose, onAdded }) => {
       isActive: true
     }
   })
-  const type = watch('type', 'fixed')
-  const onSubmit = async (data) => {
-    const payload = {
-      ...data,
-      amount: Number(data.amount),
-      minOrderValue: Number(data.minOrderValue),
-      usageLimit: Number(data.usageLimit),
-      validFrom: new Date(data.validFrom).toISOString(),
-      validUntil: new Date(data.validUntil).toISOString()
-    }
 
-    const result = await addDiscount(payload)
-    if (result) {
-      onAdded()
-      reset()
-      onClose()
-    } else {
-      console.log('Thêm mã giảm giá thất bại. Vui lòng thử lại!')
+  const type = watch('type')
+
+  // Reset amount khi thay đổi loại giảm giá
+  useEffect(() => {
+    setValue('amount', '') // reset giá trị giảm
+  }, [type, setValue])
+
+  const onSubmit = async (data) => {
+    try {
+      if (data.type === 'percent' && (data.amount < 0 || data.amount > 100)) {
+        toast.error('Giá trị giảm (%) phải nằm trong khoảng từ 0 đến 100!')
+        return
+      }
+
+      const payload = {
+        ...data,
+        amount: Number(data.amount),
+        minOrderValue: Number(data.minOrderValue),
+        usageLimit: Number(data.usageLimit),
+        validFrom: new Date(data.validFrom).toISOString(),
+        validUntil: new Date(data.validUntil).toISOString()
+      }
+
+      const result = await addDiscount(payload)
+      if (!data.code) {
+        toast.error('Vui lòng nhập mã giảm giá!')
+        return
+      }
+
+      if (!data.amount) {
+        toast.error('Vui lòng nhập giá trị giảm!')
+        return
+      }
+      if (result) {
+        toast.success('Thêm mã giảm giá thành công!')
+        onAdded()
+        reset()
+        onClose()
+      } else {
+        toast.error('Thêm mã giảm giá thất bại. Vui lòng thử lại!')
+      }
+    } catch (error) {
+      toast.error('Đã có lỗi xảy ra. Vui lòng thử lại sau!')
+      console.error(error)
     }
   }
 
@@ -86,19 +116,14 @@ const AddDiscountModal = ({ open, onClose, onAdded }) => {
                 {...register('code', { required: true })}
                 sx={StyleAdmin.InputCustom}
               />
-              <FormControl
-                fullWidth
-                margin='normal'
-                sx={StyleAdmin.FormSelect} // style chuẩn bạn dùng cho select
-              >
+
+              <FormControl fullWidth margin='normal' sx={StyleAdmin.FormSelect}>
                 <InputLabel id='type-label'>Loại giảm giá</InputLabel>
                 <Select
                   labelId='type-label'
                   label='Loại giảm giá'
-                  defaultValue='fixed'
-                  {...register('type', {
-                    required: 'Vui lòng chọn loại giảm giá'
-                  })}
+                  value={type}
+                  {...register('type', { required: true })}
                   MenuProps={{
                     PaperProps: {
                       sx: StyleAdmin.FormSelect.SelectMenu
@@ -109,6 +134,7 @@ const AddDiscountModal = ({ open, onClose, onAdded }) => {
                   <MenuItem value='percent'>Giảm theo phần trăm</MenuItem>
                 </Select>
               </FormControl>
+
               <TextField
                 label={
                   type === 'fixed' ? 'Giá trị giảm (VNĐ)' : 'Giá trị giảm (%)'
@@ -116,9 +142,27 @@ const AddDiscountModal = ({ open, onClose, onAdded }) => {
                 type='number'
                 fullWidth
                 margin='normal'
-                {...register('amount', { required: true })}
+                inputProps={{
+                  min: 0,
+                  max: type === 'percent' ? 100 : undefined
+                }}
+                {...register('amount', {
+                  required: true,
+                  min: {
+                    value: 0,
+                    message: 'Giá trị giảm phải lớn hơn hoặc bằng 0'
+                  },
+                  max:
+                    type === 'percent'
+                      ? {
+                          value: 100,
+                          message: 'Phần trăm giảm tối đa là 100%'
+                        }
+                      : undefined
+                })}
                 sx={StyleAdmin.InputCustom}
               />
+
               <FormControlLabel
                 control={<Checkbox defaultChecked {...register('isActive')} />}
                 label='Kích hoạt'

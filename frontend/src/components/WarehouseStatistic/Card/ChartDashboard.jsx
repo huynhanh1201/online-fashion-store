@@ -1,88 +1,74 @@
-import React from 'react'
+import React, { useMemo } from 'react'
 import {
-  LineChart,
-  Line,
+  BarChart,
+  Bar,
   XAxis,
   YAxis,
-  Tooltip,
   CartesianGrid,
-  PieChart,
-  Pie,
-  Cell,
+  Tooltip,
   ResponsiveContainer,
   Legend
 } from 'recharts'
-import { Box, Grid, Typography, Paper } from '@mui/material'
+import { Paper, Typography, Grid } from '@mui/material'
 
-// Dữ liệu mẫu cho biểu đồ Line
-const inventoryTrendData = [
-  { date: '1/6', in: 420, out: 190 },
-  { date: '2/6', in: 300, out: 470 }
-]
+export default function ChartDashboard({ data }) {
+  const year = new Date().getFullYear()
+  const monthlySummary = useMemo(() => {
+    if (!Array.isArray(data)) return []
 
-// Dữ liệu mẫu cho biểu đồ Pie
-const variantStatusData = [
-  { name: 'Đang bán', value: 60, color: '#4caf50' },
-  { name: 'Tạm dừng', value: 25, color: '#fbc02d' },
-  { name: 'Ngừng bán', value: 15, color: '#e57373' }
-]
+    const months = Array.from({ length: 12 }, (_, i) => {
+      const m = i + 1
+      const monthStr = m < 10 ? `0${m}` : `${m}`
+      return {
+        monthIndex: i, // ← giá trị duy nhất để XAxis nhận dạng
+        name: `T${m}/${year}`,
+        key: `${year}-${monthStr}`,
+        Nhập: 0,
+        Xuất: 0,
+        'Chênh lệch': 0
+      }
+    })
 
-export default function ChartDashboard() {
+    console.log('months', months)
+    data.forEach((warehouse) => {
+      warehouse.data?.forEach(({ month, inAmount, outAmount }) => {
+        const index = months.findIndex((m) => m.key === month)
+        if (index !== -1) {
+          months[index].Nhập += inAmount || 0
+          months[index].Xuất += Math.abs(outAmount || 0)
+        }
+      })
+    })
+
+    return months.map((m) => ({
+      ...m,
+      'Chênh lệch': m.Nhập - m.Xuất
+    }))
+  }, [data, year])
+
   return (
     <Grid container spacing={2}>
-      {/* Biểu đồ biến động tồn kho */}
-      <Grid item size={6} xs={12} md={6}>
-        <Paper sx={{ p: 2, height: '100%' }}>
+      <Grid item size={12}>
+        <Paper sx={{ p: 2 }}>
           <Typography variant='h6' gutterBottom>
-            Biến động tồn kho
+            So Sánh Nhập Xuất Kho Theo Tháng (T1 - T12/2024)
           </Typography>
-          <ResponsiveContainer width='100%' height={250}>
-            <LineChart data={inventoryTrendData}>
+          <ResponsiveContainer width='100%' height={400}>
+            <BarChart data={monthlySummary}>
               <CartesianGrid strokeDasharray='3 3' />
-              <XAxis dataKey='date' />
+              <XAxis
+                dataKey='monthIndex'
+                tickFormatter={(index) => monthlySummary[index]?.name}
+                interval={0}
+              />
+
               <YAxis />
               <Tooltip />
               <Legend />
-              <Line
-                type='monotone'
-                dataKey='in'
-                stroke='#81c784'
-                name='in'
-                dot={{ r: 5 }}
-              />
-              <Line
-                type='monotone'
-                dataKey='out'
-                stroke='#ef5350'
-                name='out'
-                dot={{ r: 5 }}
-              />
-            </LineChart>
-          </ResponsiveContainer>
-        </Paper>
-      </Grid>
-
-      {/* Biểu đồ trạng thái biến thể */}
-      <Grid item size={6} xs={12} md={6}>
-        <Paper sx={{ p: 2, height: '100%' }}>
-          <Typography variant='h6' gutterBottom>
-            Trạng thái biến thể
-          </Typography>
-          <ResponsiveContainer width='100%' height={250}>
-            <PieChart>
-              <Pie
-                data={variantStatusData}
-                dataKey='value'
-                nameKey='name'
-                outerRadius={80}
-                label
-              >
-                {variantStatusData.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={entry.color} />
-                ))}
-              </Pie>
-              <Tooltip />
-            </PieChart>
+              <Bar dataKey='Xuất' fill='#4CAF50' barSize={25} />
+              <Bar dataKey='Nhập' fill='#F44336' barSize={25} />
+              <Bar dataKey='Chênh lệch' fill='#2196F3' barSize={20} />
+            </BarChart>
           </ResponsiveContainer>
         </Paper>
       </Grid>

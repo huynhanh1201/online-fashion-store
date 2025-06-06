@@ -190,6 +190,7 @@ const InventoryTable = () => {
             addWarehouseSlip={createNewWarehouseSlip}
             partners={partners}
             refreshWarehouseSlips={fetchWarehouseSlips}
+            fetchVariants={fetchVariants}
             updateWarehouseSlip={update}
             deleteWarehouseSlip={removeWarehouseSlip}
             fetchWarehouses={fetchWarehouses}
