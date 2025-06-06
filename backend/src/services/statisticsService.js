@@ -1,11 +1,12 @@
 import { InventoryModel } from '~/models/InventoryModel'
 import { InventoryLogModel } from '~/models/InventoryLogModel'
+import convertArrToMap from '~/utils/convertArrToMap'
 
 const getInventoryStatistics = async () => {
   // eslint-disable-next-line no-useless-catch
   try {
     // Thống kê kho
-    const warehouseStats = await InventoryModel.aggregate([
+    const warehouseStatsPromise = InventoryModel.aggregate([
       { $match: { destroy: false } },
       {
         $group: {
@@ -25,7 +26,7 @@ const getInventoryStatistics = async () => {
     ])
 
     // Lấy số lượng biến thể sắp hết (quantity <= minQuantity)
-    const lowStockCount = await InventoryModel.aggregate([
+    const lowStockCountPromise = InventoryModel.aggregate([
       {
         $match: {
           destroy: false,
@@ -41,7 +42,7 @@ const getInventoryStatistics = async () => {
     ])
 
     // Lấy danh sách cảnh báo sắp hết hàng
-    const stockWarnings = await InventoryModel.aggregate([
+    const stockWarningsPromise = InventoryModel.aggregate([
       {
         $match: {
           destroy: false,
@@ -85,32 +86,88 @@ const getInventoryStatistics = async () => {
     ])
 
     // Dữ liệu biến động tồn kho theo thời gian (nhập/xuất từng ngày)
-    const stockMovements = await InventoryLogModel.aggregate([
+    const stockMovementsPromise = InventoryLogModel.aggregate([
+      // Bước 1: Gom theo type + warehouseId
       {
         $group: {
-          _id: '$type',
-
+          _id: {
+            type: '$type',
+            warehouseId: '$warehouseId'
+          },
           totalAmount: { $sum: '$amount' }
+        }
+      },
+
+      // Bước 2: Biến kết quả thành dạng: mỗi dòng là warehouseId + inAmount/outAmount riêng
+      {
+        $project: {
+          warehouseId: '$_id.warehouseId',
+          inAmount: {
+            $cond: [{ $eq: ['$_id.type', 'in'] }, '$totalAmount', 0]
+          },
+          outAmount: {
+            $cond: [{ $eq: ['$_id.type', 'out'] }, '$totalAmount', 0]
+          }
+        }
+      },
+
+      // Bước 3: Gom lại theo warehouseId, cộng tổng in/out
+      {
+        $group: {
+          _id: '$warehouseId',
+          inAmount: { $sum: '$inAmount' },
+          outAmount: { $sum: '$outAmount' }
         }
       }
     ])
 
-    const inventoryStatisticsInfo = {
-      // Phần thống kê chính về tồn kho, liên quan trực tiếp đến kho hàng
-      inventorySummary: warehouseStats,
+    // Xử lý chạy song song bằng Promise.all
+    const [warehouseStats, lowStockCount, stockWarnings, stockMovements] =
+      await Promise.all([
+        warehouseStatsPromise,
+        lowStockCountPromise,
+        stockWarningsPromise,
+        stockMovementsPromise
+      ])
 
-      // Số lượng biến thể sắp hết hàng (ví dụ tồn kho nhỏ hơn ngưỡng cảnh báo minQuantity)
-      lowStockCount: lowStockCount,
+    // Xử lý cấu trúc dữ liệu về dạng Hash map
+    const warehouseStatsMap = convertArrToMap(warehouseStats, '_id')
 
-      // Danh sách cảnh báo hết hàng hoặc gần hết hàng, giúp quản lý kho biết biến thể nào cần nhập thêm
-      stockWarnings: stockWarnings,
+    const lowStockCountMap = convertArrToMap(lowStockCount, '_id')
 
-      // Dữ liệu biến động tồn kho theo thời gian (nhập/xuất từng ngày)
-      // Thường dùng để vẽ biểu đồ theo dõi hàng tồn di chuyển ra vào kho
-      stockMovements: stockMovements
-    }
+    const stockWarningsMap = convertArrToMap(stockWarnings, 'warehouseId')
 
-    return inventoryStatisticsInfo
+    const stockMovementsMap = convertArrToMap(stockMovements, '_id')
+
+    // Xử lý làm phảng dữ liệu trước khi trả về
+    const mergedWarehouses = []
+
+    const warehouseIds = new Set([
+      ...Object.keys(warehouseStatsMap),
+      ...Object.keys(lowStockCountMap),
+      ...Object.keys(stockWarningsMap),
+      ...Object.keys(stockMovementsMap)
+    ])
+
+    warehouseIds.forEach((warehouseId) => {
+      const stats = warehouseStatsMap[warehouseId] || {}
+      const lowStock = lowStockCountMap[warehouseId] || { lowStockCount: 0 }
+      const warnings = stockWarningsMap[warehouseId] || { lowStockVariants: [] }
+      const movements = stockMovementsMap[warehouseId] || {
+        inAmount: 0,
+        outAmount: 0
+      }
+
+      mergedWarehouses.push({
+        warehouseId,
+        ...stats,
+        ...lowStock,
+        ...warnings,
+        ...movements
+      })
+    })
+
+    return mergedWarehouses
   } catch (err) {
     throw err
   }

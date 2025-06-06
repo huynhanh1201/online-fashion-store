@@ -7,6 +7,7 @@ import MonetizationOnIcon from '@mui/icons-material/MonetizationOn'
 import socket from '~/socket/index'
 
 export default function VariantSummaryCard() {
+  // =======================TEST WEBSOCKET==========================
   const [stats, setStats] = useState(null)
 
   useEffect(() => {
