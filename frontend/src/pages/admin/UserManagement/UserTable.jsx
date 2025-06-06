@@ -29,9 +29,9 @@ const UserTable = React.memo(function UserTable({
             <StyledTableCell sx={StyleAdmin.TableColumnSTT}>
               STT
             </StyledTableCell>
-            <StyledTableCell>Tên</StyledTableCell>
+            <StyledTableCell sx={{ width: '300px' }}>Tên</StyledTableCell>
             <StyledTableCell>Email</StyledTableCell>
-            <StyledTableCell>Quyền</StyledTableCell>
+            <StyledTableCell sx={{ width: '200px' }}>Quyền</StyledTableCell>
             <StyledTableCell className='hide-on-mobile'>
               Ngày tạo
             </StyledTableCell>
