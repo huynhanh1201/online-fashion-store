@@ -30,7 +30,7 @@ const EditBatchModal = ({
     if (batch) {
       reset({
         manufactureDate: batch.manufactureDate?.slice(0, 10) || '',
-        expiry: batch.expiry?.slice(0, 10) || '',
+        // expiry: batch.expiry?.slice(0, 10) || '',
         importPrice: batch.importPrice || 0
       })
     }
@@ -41,7 +41,7 @@ const EditBatchModal = ({
       manufactureDate: data.manufactureDate
         ? new Date(data.manufactureDate).toISOString()
         : null,
-      expiry: data.expiry ? new Date(data.expiry).toISOString() : null,
+      // expiry: data.expiry ? new Date(data.expiry).toISOString() : null,
       importPrice: Number(data.importPrice)
     }
 
@@ -68,16 +68,16 @@ const EditBatchModal = ({
               />
             </Grid>
 
-            <Grid item size={12}>
-              <TextField
-                label='Hạn sử dụng'
-                type='date'
-                fullWidth
-                InputLabelProps={{ shrink: true }}
-                {...register('expiry')}
-                defaultValue=''
-              />
-            </Grid>
+            {/*<Grid item size={12}>*/}
+            {/*  <TextField*/}
+            {/*    label='Hạn sử dụng'*/}
+            {/*    type='date'*/}
+            {/*    fullWidth*/}
+            {/*    InputLabelProps={{ shrink: true }}*/}
+            {/*    {...register('expiry')}*/}
+            {/*    defaultValue=''*/}
+            {/*  />*/}
+            {/*</Grid>*/}
 
             <Grid item size={12}>
               <Controller
