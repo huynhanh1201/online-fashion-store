@@ -25,7 +25,7 @@ const inventoryList = [
 ]
 
 export default function VariantSummaryCard() {
-  // =================================================
+  // =======================TEST WEBSOCKET==========================
   const [stats, setStats] = useState(null)
 
   useEffect(() => {
@@ -82,7 +82,6 @@ export default function VariantSummaryCard() {
 
   return (
     <Grid container spacing={2}>
-      <h1>Product count: {stats?.data?.count}</h1>
       {summaryItems.map((item, index) => (
         <Grid
           item
