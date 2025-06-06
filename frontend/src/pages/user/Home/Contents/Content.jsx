@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import '~/assets/HomeCSS/Content.css'
 import ProductCard from '~/components/ProductCards/ProductCards'
 import { getProducts } from '~/services/productService.js'
+import FlashSaleSection from '~/pages/user/Home/FlashSaleSection/FlashSaleSection.jsx'
 import { Link } from 'react-router-dom'
 const Content = () => {
   const [products, setProducts] = useState([])
@@ -199,36 +200,7 @@ const Content = () => {
       </div>
 
       {/* Flash Sale Section */}
-      <div className='flash-sale'>
-        <div className='flash-sale-header'>
-          <div className='flash-sale-title'>
-            ⚡ FLASH SALE 24H
-            <div className='countdown'>
-              <div className='countdown-item'>16</div>
-              <div className='countdown-item'>23</div>
-              <div className='countdown-item'>59</div>
-            </div>
-          </div>
-        </div>
-
-        <div className='product-grid'>
-          {loading ? (
-            <p>Đang tải sản phẩm...</p>
-          ) : error ? (
-            <p>{error}</p>
-          ) : (
-            <section className='product-grid'>
-              {products.slice(0, 5).map((product) => (
-                <ProductCard
-                  key={product._id || product.id}
-                  product={product}
-                  isFlashSale={true}
-                />
-              ))}
-            </section>
-          )}
-        </div>
-      </div>
+      <FlashSaleSection products={products} loading={loading} error={error} />
     </div>
   )
 }

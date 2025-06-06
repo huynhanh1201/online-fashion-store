@@ -209,37 +209,6 @@
 .product-card.flash-sale .current-price {
     color: #ff4444;
 }
-/* Flash Sale Section */
-.flash-sale {
-    background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
-    border-radius: 24px;
-    padding: 32px;
-    color: white;
-    margin-bottom: 32px;
-}
-
-.flash-sale-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 24px;
-    flex-wrap: wrap;
-    gap: 16px;
-}
-
-.flash-sale-title {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    font-size: 24px;
-    font-weight: bold;
-}
-
-.countdown {
-    display: flex;
-    gap: 8px;
-}
-
 .countdown-item {
     background: #f44336;
     color: white;
