@@ -8,6 +8,10 @@ const Link = ({ to, children, ...props }) => (
 )
 
 const ResponsiveProductCard = ({ product, isFlashSale = false }) => {
+  if (!product) {
+    return null // hoặc render một placeholder
+  }
+
   const quantity = Number(product.quantity) || 0
   const inStock = quantity > 0
 
@@ -68,7 +72,7 @@ const ResponsiveProductCard = ({ product, isFlashSale = false }) => {
           <h3 style={styles.productName}>{product.name}</h3>
           <div style={styles.priceRow}>
             <span style={styles.currentPrice}>
-              {product.exportPrice.toLocaleString()}₫
+              {(product.exportPrice ?? 0).toLocaleString()}₫
             </span>
             {product.originalPrice && (
               <span style={styles.originalPrice}>
