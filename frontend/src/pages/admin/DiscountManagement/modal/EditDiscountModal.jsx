@@ -15,7 +15,7 @@ import Box from '@mui/material/Box'
 import InputLabel from '@mui/material/InputLabel'
 import Select from '@mui/material/Select'
 import FormControl from '@mui/material/FormControl'
-
+import { toast } from 'react-toastify'
 import StyleAdmin from '~/assets/StyleAdmin.jsx'
 
 // Hàm định dạng lại datetime cho input type="datetime-local"
@@ -32,9 +32,24 @@ const EditDiscountModal = ({ open, onClose, discount, onSave }) => {
     watch,
     handleSubmit,
     reset,
+    // setValue,
+    setError,
     formState: { isSubmitting }
-  } = useForm()
+  } = useForm({
+    defaultValues: {
+      code: '',
+      type: 'fixed',
+      amount: '',
+      minOrderValue: '',
+      usageLimit: '',
+      validFrom: '',
+      validUntil: '',
+      isActive: false
+    }
+  })
+
   const type = watch('type', 'fixed')
+  // const code = watch('code')
 
   React.useEffect(() => {
     if (discount) {
@@ -45,8 +60,24 @@ const EditDiscountModal = ({ open, onClose, discount, onSave }) => {
       })
     }
   }, [discount, reset])
-
+  // React.useEffect(() => {
+  //   setValue('amount', '') // reset về rỗng
+  // }, [code, setValue])
   const onSubmit = async (data) => {
+    if (!data.amount) {
+      toast.error('Vui lòng nhập giá trị giảm!')
+      return
+    }
+
+    if (data.type === 'percent' && (data.amount < 0 || data.amount > 100)) {
+      toast.error('Giá trị giảm (%) phải nằm trong khoảng 0 đến 100!')
+      setError('amount', {
+        type: 'manual',
+        message: 'Giá trị giảm (%) không hợp lệ'
+      })
+      return
+    }
+
     const payload = {
       code: data.code,
       type: data.type,
@@ -128,6 +159,9 @@ const EditDiscountModal = ({ open, onClose, discount, onSave }) => {
                 type='number'
                 fullWidth
                 margin='normal'
+                inputProps={
+                  type === 'percent' ? { min: 0, max: 100 } : { min: 0 }
+                }
                 {...register('amount', { required: true })}
                 sx={StyleAdmin.InputCustom}
               />

@@ -93,10 +93,7 @@ const EditOrderModal = ({ open, onClose, order, onUpdate, loading }) => {
   useEffect(() => {
     if (order) {
       reset({
-        status: order.status || '',
-        paymentStatus: order.paymentStatus || '',
-        paymentMethod: order.paymentMethod || '',
-        note: order.note || ''
+        status: order.status || ''
       })
     }
   }, [order, reset])
@@ -152,81 +149,81 @@ const EditOrderModal = ({ open, onClose, order, onUpdate, loading }) => {
             />
           </FormControl>
           {/* Payment Status */}
-          <FormControl fullWidth sx={StyleAdmin.FormSelect}>
-            <InputLabel id='payment-status-label'>
-              Trạng thái thanh toán
-            </InputLabel>
-            <Controller
-              name='paymentStatus'
-              control={control}
-              rules={{ required: 'Vui lòng chọn trạng thái thanh toán' }}
-              render={({ field }) => (
-                <Select
-                  labelId='payment-status-label'
-                  label='Trạng thái thanh toán'
-                  {...field}
-                  error={!!errors.paymentStatus}
-                  MenuProps={{
-                    PaperProps: {
-                      sx: StyleAdmin.FormSelect.SelectMenu
-                    }
-                  }}
-                >
-                  {paymentStatusOptions.map((status) => (
-                    <MenuItem key={status} value={status}>
-                      {translatePaymentStatus(status)}
-                    </MenuItem>
-                  ))}
-                </Select>
-              )}
-            />
-          </FormControl>
+          {/*<FormControl fullWidth sx={StyleAdmin.FormSelect}>*/}
+          {/*  <InputLabel id='payment-status-label'>*/}
+          {/*    Trạng thái thanh toán*/}
+          {/*  </InputLabel>*/}
+          {/*  <Controller*/}
+          {/*    name='paymentStatus'*/}
+          {/*    control={control}*/}
+          {/*    rules={{ required: 'Vui lòng chọn trạng thái thanh toán' }}*/}
+          {/*    render={({ field }) => (*/}
+          {/*      <Select*/}
+          {/*        labelId='payment-status-label'*/}
+          {/*        label='Trạng thái thanh toán'*/}
+          {/*        {...field}*/}
+          {/*        error={!!errors.paymentStatus}*/}
+          {/*        MenuProps={{*/}
+          {/*          PaperProps: {*/}
+          {/*            sx: StyleAdmin.FormSelect.SelectMenu*/}
+          {/*          }*/}
+          {/*        }}*/}
+          {/*      >*/}
+          {/*        {paymentStatusOptions.map((status) => (*/}
+          {/*          <MenuItem key={status} value={status}>*/}
+          {/*            {translatePaymentStatus(status)}*/}
+          {/*          </MenuItem>*/}
+          {/*        ))}*/}
+          {/*      </Select>*/}
+          {/*    )}*/}
+          {/*  />*/}
+          {/*</FormControl>*/}
 
-          {/* Payment Method */}
-          <FormControl fullWidth sx={StyleAdmin.FormSelect}>
-            <InputLabel id='payment-method-label'>
-              Phương thức thanh toán
-            </InputLabel>
-            <Controller
-              name='paymentMethod'
-              control={control}
-              rules={{ required: 'Vui lòng chọn phương thức thanh toán' }}
-              render={({ field }) => (
-                <Select
-                  labelId='payment-method-label'
-                  label='Phương thức thanh toán'
-                  {...field}
-                  error={!!errors.paymentMethod}
-                  MenuProps={{
-                    PaperProps: {
-                      sx: StyleAdmin.FormSelect.SelectMenu
-                    }
-                  }}
-                >
-                  {paymentMethodOptions.map((method) => (
-                    <MenuItem key={method} value={method}>
-                      {translatePaymentMethod(method)}
-                    </MenuItem>
-                  ))}
-                </Select>
-              )}
-            />
-          </FormControl>
+          {/*/!* Payment Method *!/*/}
+          {/*<FormControl fullWidth sx={StyleAdmin.FormSelect}>*/}
+          {/*  <InputLabel id='payment-method-label'>*/}
+          {/*    Phương thức thanh toán*/}
+          {/*  </InputLabel>*/}
+          {/*  <Controller*/}
+          {/*    name='paymentMethod'*/}
+          {/*    control={control}*/}
+          {/*    rules={{ required: 'Vui lòng chọn phương thức thanh toán' }}*/}
+          {/*    render={({ field }) => (*/}
+          {/*      <Select*/}
+          {/*        labelId='payment-method-label'*/}
+          {/*        label='Phương thức thanh toán'*/}
+          {/*        {...field}*/}
+          {/*        error={!!errors.paymentMethod}*/}
+          {/*        MenuProps={{*/}
+          {/*          PaperProps: {*/}
+          {/*            sx: StyleAdmin.FormSelect.SelectMenu*/}
+          {/*          }*/}
+          {/*        }}*/}
+          {/*      >*/}
+          {/*        {paymentMethodOptions.map((method) => (*/}
+          {/*          <MenuItem key={method} value={method}>*/}
+          {/*            {translatePaymentMethod(method)}*/}
+          {/*          </MenuItem>*/}
+          {/*        ))}*/}
+          {/*      </Select>*/}
+          {/*    )}*/}
+          {/*  />*/}
+          {/*</FormControl>*/}
 
-          {/* Note */}
-          <Controller
-            name='note'
-            control={control}
-            render={({ field }) => (
-              <TextField
-                label='Ghi chú'
-                multiline
-                rows={3}
-                fullWidth
-                {...field}
-              />
-            )}
-          />
+          {/*/!* Note *!/*/}
+          {/*<Controller*/}
+          {/*  name='note'*/}
+          {/*  control={control}*/}
+          {/*  render={({ field }) => (*/}
+          {/*    <TextField*/}
+          {/*      label='Ghi chú'*/}
+          {/*      multiline*/}
+          {/*      rows={3}*/}
+          {/*      fullWidth*/}
+          {/*      {...field}*/}
+          {/*    />*/}
+          {/*  )}*/}
+          {/*/>*/}
         </Stack>
       </DialogContent>
 
