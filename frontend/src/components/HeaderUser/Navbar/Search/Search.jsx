@@ -31,7 +31,7 @@ const AnimatedInput = styled(InputBase)(({ visible }) => ({
   transformOrigin: 'right center',
   transition: 'transform 0.3s ease, opacity 0.3s ease',
   opacity: visible ? 1 : 0,
-  width: 280,
+  width: 220,
   backgroundColor: '#ffffff',
   padding: '8px 16px',
   borderRadius: 24,

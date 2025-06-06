@@ -3,6 +3,7 @@ import '~/assets/HomeCSS/Content.css'
 import ProductCard from '~/components/ProductCards/ProductCards'
 import { getProducts } from '~/services/productService.js'
 import FlashSaleSection from '~/pages/user/Home/FlashSaleSection/FlashSaleSection.jsx'
+import CouponList from '~/pages/user/Home/CouponList/CouponList.jsx'
 import { Link } from 'react-router-dom'
 const Content = () => {
   const [products, setProducts] = useState([])
@@ -182,7 +183,7 @@ const Content = () => {
           </a>
         ))}
       </div>
-
+      <CouponList />
       {/* Stitch Collection Banner */}
       <div className='stitch-banner'></div>
 

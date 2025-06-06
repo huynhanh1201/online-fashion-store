@@ -28,25 +28,47 @@ const CouponList = () => {
   }, [])
 
   const formatCurrencyShort = (value) => {
-    const units = [
-      { threshold: 1_000_000, suffix: 'Tr' },
-      { threshold: 1_000, suffix: 'K' }
-    ]
-
-    for (const { threshold, suffix } of units) {
-      if (value >= threshold) {
-        const shortValue = Math.floor(value / threshold)
-        return `${shortValue}${suffix}`
-      }
-    }
-
-    return value.toString()
+    if (value >= 1_000_000) return `${(value / 1_000_000).toFixed(1)}Tr`
+    if (value >= 1_000) return `${(value / 1_000).toFixed(0)}K`
+    return `${value.toLocaleString()}đ`
   }
 
   const handleCopy = (code) => {
     navigator.clipboard.writeText(code)
     setCopiedCode(code)
     setTimeout(() => setCopiedCode(''), 1500)
+  }
+
+  // Định nghĩa màu sắc cho từng loại voucher
+  const getVoucherColors = (index, coupon) => {
+    const colors = [
+      {
+        bg: 'linear-gradient(135deg, #87CEEB 0%, #4FC3F7 100%)',
+        text: '#1565C0'
+      }, // Blue
+      {
+        bg: 'linear-gradient(135deg, #E8F5E8 0%, #C8E6C9 100%)',
+        text: '#2E7D32'
+      }, // Green
+      {
+        bg: 'linear-gradient(135deg, #FFF3E0 0%, #FFE0B2 100%)',
+        text: '#F57C00'
+      }, // Orange
+      {
+        bg: 'linear-gradient(135deg, #F3E5F5 0%, #E1BEE7 100%)',
+        text: '#7B1FA2'
+      } // Purple
+    ]
+
+    // Nếu là free ship thì dùng màu xanh dương đậm
+    if (coupon.type === 'freeship' || coupon.amount === 0) {
+      return {
+        bg: 'linear-gradient(135deg, #1976D2 0%, #1565C0 100%)',
+        text: '#FFFFFF'
+      }
+    }
+
+    return colors[index % colors.length]
   }
 
   if (loading) {
@@ -58,124 +80,230 @@ const CouponList = () => {
   }
 
   return (
-    <Box sx={{ p: 3, justifyItems: 'center' }}>
-      <Grid container spacing={2} justifyContent='start'>
-        {coupons.map((coupon) => {
+    <Box sx={{ p: 3 }}>
+      <Grid container spacing={2} justifyContent='center'>
+        {coupons.map((coupon, index) => {
           const isPercent = coupon.type === 'percent'
-          const valueText = isPercent
-            ? `${coupon.amount}%`
-            : `${coupon.amount.toLocaleString()} VND`
+          const isFreeShip = coupon.type === 'freeship' || coupon.amount === 0
+          const colors = getVoucherColors(index, coupon)
 
-          const minOrderText = coupon.minOrderValue
-            ? `Đơn tối thiểu ${formatCurrencyShort(coupon.minOrderValue)}`
-            : ''
+          let valueText = ''
+          let mainText = ''
+
+          if (isFreeShip) {
+            mainText = 'FREESHIP'
+            valueText = 'MỌI ĐƠN HÀNG'
+          } else if (isPercent) {
+            mainText = `${coupon.amount}%`
+            valueText = coupon.minOrderValue
+              ? `TỐI ĐA ${formatCurrencyShort(coupon.maxDiscountValue || coupon.amount * 1000)}`
+              : 'KHÔNG GIỚI HạN'
+          } else {
+            mainText = `${formatCurrencyShort(coupon.amount)}`
+            valueText = coupon.minOrderValue
+              ? `ĐƠN TỪ ${formatCurrencyShort(coupon.minOrderValue)}`
+              : 'MỌI ĐƠN HÀNG'
+          }
 
           return (
-            <Grid item xs={12} sm={10} md={6} key={coupon._id}>
+            <Grid item xs={12} sm={6} md={6} lg={4} key={coupon._id}>
               <Card
                 sx={{
-                  borderRadius: 4,
-                  boxShadow: 6,
-                  p: 1, // Giảm padding để phù hợp với kích thước nhỏ hơn
-                  backgroundColor: '#fff',
-                  border: '2px dashed #a6a6a6', // Giảm độ dày viền
-                  height: { xs: 100, sm: 110, md: 120 }, // Giảm chiều cao, responsive theo màn hình
-                  width: { xs: '100%', sm: 300, md: 320 }, // Responsive: 100% trên mobile, cố định trên desktop
-                  maxWidth: 350, // Giới hạn chiều rộng tối đa
-                  minWidth: 200, // Giới hạn chiều rộng tối thiểu
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between', // Thay justifyItems thành justifyContent
-                  overflow: 'hidden' // Đảm bảo nội dung không làm phình card
+                  borderRadius: '16px',
+                  overflow: 'hidden',
+                  background: colors.bg,
+                  boxShadow: '0 6px 20px rgba(0,0,0,0.12)',
+                  height: '125px',
+                  width: '100%',
+                  maxWidth: '380px',
+                  minWidth: '320px',
+                  position: 'relative',
+                  cursor: 'pointer',
+                  transition: 'all 0.3s ease',
+                  '&:hover': {
+                    transform: 'translateY(-4px)',
+                    boxShadow: '0 12px 32px rgba(0,0,0,0.2)'
+                  }
                 }}
+                onClick={() => handleCopy(coupon.code)}
               >
-                {/* Left section */}
+                {/* Voucher Label */}
                 <Box
                   sx={{
-                    flex: 1,
-                    pr: 1, // Thêm padding bên phải để tránh sát Button
-                    overflow: 'hidden' // Ngăn nội dung tràn ra
+                    position: 'absolute',
+                    top: '12px',
+                    left: '16px',
+                    background: 'rgba(255,255,255,0.95)',
+                    borderRadius: '6px',
+                    padding: '4px 10px',
+                    transform: 'rotate(-8deg)',
+                    boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
                   }}
                 >
                   <Typography
-                    variant='caption' // Giảm từ subtitle2 xuống caption
-                    color='text.secondary'
-                    sx={{ fontSize: { xs: '0.7rem', sm: '0.75rem' } }} // Responsive font size
+                    sx={{
+                      fontSize: '11px',
+                      fontWeight: 'bold',
+                      color: colors.text,
+                      letterSpacing: '0.8px'
+                    }}
                   >
                     VOUCHER
                   </Typography>
+                </Box>
+
+                {/* Copy Button */}
+                <Tooltip
+                  title={
+                    copiedCode === coupon.code
+                      ? 'Đã sao chép'
+                      : 'Click để sao chép'
+                  }
+                >
+                  <Button
+                    sx={{
+                      position: 'absolute',
+                      top: '12px',
+                      right: '12px',
+                      minWidth: '32px',
+                      width: '32px',
+                      height: '32px',
+                      borderRadius: '8px',
+                      background: 'rgba(255,255,255,0.95)',
+                      color: colors.text,
+                      fontSize: '16px',
+                      fontWeight: 'bold',
+                      boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+                      '&:hover': {
+                        background: 'rgba(255,255,255,1)'
+                      }
+                    }}
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      handleCopy(coupon.code)
+                    }}
+                  >
+                    📋
+                  </Button>
+                </Tooltip>
+
+                {/* Main Content */}
+                <Box
+                  sx={{
+                    height: '100%',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    textAlign: 'center',
+                    padding: '24px 20px',
+                    color: colors.text
+                  }}
+                >
+                  {/* Main Value */}
                   <Typography
-                    variant='subtitle1' // Giảm từ h6 xuống subtitle1
-                    fontWeight='bold'
-                    color='#1A3C7B'
-                    sx={{ fontSize: { xs: '0.9rem', sm: '1rem' } }}
+                    sx={{
+                      fontSize: isFreeShip ? '32px' : '42px',
+                      fontWeight: '900',
+                      lineHeight: 1,
+                      marginBottom: '6px',
+                      textShadow: '0 2px 4px rgba(0,0,0,0.1)'
+                    }}
+                  >
+                    {mainText}
+                  </Typography>
+
+                  {/* Sub Text */}
+                  <Typography
+                    sx={{
+                      fontSize: '12px',
+                      fontWeight: '600',
+                      opacity: 0.9,
+                      letterSpacing: '0.5px',
+                      marginBottom: '12px'
+                    }}
                   >
                     {valueText}
                   </Typography>
-                  <Tooltip title={coupon.code}>
+
+                  {/* Code */}
+                  <Box
+                    sx={{
+                      background: 'rgba(255,255,255,0.95)',
+                      borderRadius: '16px',
+                      padding: '8px 16px',
+                      border: '2px dashed rgba(0,0,0,0.2)',
+                      boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
+                    }}
+                  >
                     <Typography
-                      variant='body2' // Giảm từ body1 xuống body2
-                      color='#1A3C7B'
-                      mt={0.5}
                       sx={{
-                        fontSize: { xs: '0.75rem', sm: '0.8rem' }, // Responsive font size
-                        maxWidth: '100%', // Đảm bảo không tràn
-                        whiteSpace: 'nowrap',
-                        overflow: 'hidden',
-                        textOverflow: 'ellipsis'
+                        fontSize: '13px',
+                        fontWeight: 'bold',
+                        color: colors.text,
+                        letterSpacing: '1px'
                       }}
                     >
-                      Mã: <strong>{coupon.code}</strong>
+                      {coupon.code}
                     </Typography>
-                  </Tooltip>
+                  </Box>
                 </Box>
 
-                {/* Right section */}
+                {/* Decorative circles */}
                 <Box
                   sx={{
-                    minWidth: { xs: 100, sm: 110 }, // Responsive minWidth
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'flex-end',
-                    pl: 1 // Thêm padding bên trái
+                    position: 'absolute',
+                    left: '-12px',
+                    top: '50%',
+                    transform: 'translateY(-50%)',
+                    width: '24px',
+                    height: '24px',
+                    borderRadius: '50%',
+                    background: '#fff',
+                    boxShadow: 'inset 0 0 0 3px rgba(0,0,0,0.1)'
                   }}
-                >
-                  {minOrderText && (
-                    <Typography
-                      variant='caption' // Giảm từ caption xuống nhỏ hơn
-                      color='text.secondary'
-                      sx={{ fontSize: { xs: '0.65rem', sm: '0.7rem' } }}
-                    >
-                      {minOrderText}
-                    </Typography>
-                  )}
-                  <Tooltip
-                    title={
-                      copiedCode === coupon.code ? 'Đã sao chép' : 'Sao chép mã'
-                    }
-                  >
-                    <Button
-                      variant='contained'
-                      size='small' // Giảm từ medium xuống small
-                      sx={{
-                        backgroundColor: '#1A3C7B',
-                        color: '#fff',
-                        mt: 1, // Giảm margin-top
-                        fontSize: { xs: '0.7rem', sm: '0.8rem' }, // Responsive font size
-                        padding: { xs: '4px 8px', sm: '6px 12px' }, // Responsive padding
-                        minWidth: 80 // Đảm bảo nút không quá nhỏ
-                      }}
-                      onClick={() => handleCopy(coupon.code)}
-                    >
-                      Sao chép
-                    </Button>
-                  </Tooltip>
-                </Box>
+                />
+                <Box
+                  sx={{
+                    position: 'absolute',
+                    right: '-12px',
+                    top: '50%',
+                    transform: 'translateY(-50%)',
+                    width: '24px',
+                    height: '24px',
+                    borderRadius: '50%',
+                    background: '#fff',
+                    boxShadow: 'inset 0 0 0 3px rgba(0,0,0,0.1)'
+                  }}
+                />
               </Card>
             </Grid>
           )
         })}
       </Grid>
+
+      {/* Thông báo sao chép */}
+
+      <style jsx>{`
+        @keyframes fadeInOut {
+          0% {
+            opacity: 0;
+            transform: translateX(-50%) translateY(10px);
+          }
+          20% {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+          }
+          80% {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+          }
+          100% {
+            opacity: 0;
+            transform: translateX(-50%) translateY(-10px);
+          }
+        }
+      `}</style>
     </Box>
   )
 }
