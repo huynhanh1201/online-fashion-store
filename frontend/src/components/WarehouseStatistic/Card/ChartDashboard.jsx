@@ -1,88 +1,53 @@
-import React from 'react'
+import React, { useMemo } from 'react'
 import {
-  LineChart,
-  Line,
+  BarChart,
+  Bar,
   XAxis,
   YAxis,
-  Tooltip,
   CartesianGrid,
-  PieChart,
-  Pie,
-  Cell,
+  Tooltip,
   ResponsiveContainer,
   Legend
 } from 'recharts'
-import { Box, Grid, Typography, Paper } from '@mui/material'
+import { Paper, Typography, Grid } from '@mui/material'
 
-// Dữ liệu mẫu cho biểu đồ Line
-const inventoryTrendData = [
-  { date: '1/6', in: 420, out: 190 },
-  { date: '2/6', in: 300, out: 470 }
-]
+export default function ChartDashboard({ data }) {
+  // Gộp tổng in/out của toàn bộ kho
+  const summarizedData = useMemo(() => {
+    if (!Array.isArray(data)) return []
 
-// Dữ liệu mẫu cho biểu đồ Pie
-const variantStatusData = [
-  { name: 'Đang bán', value: 60, color: '#4caf50' },
-  { name: 'Tạm dừng', value: 25, color: '#fbc02d' },
-  { name: 'Ngừng bán', value: 15, color: '#e57373' }
-]
+    const totalIn = data.reduce((sum, w) => sum + (w.inAmount || 0), 0)
+    const totalOut = data.reduce(
+      (sum, w) => sum + Math.abs(w.outAmount || 0),
+      0
+    )
 
-export default function ChartDashboard() {
+    return [
+      {
+        name: 'Tất cả kho',
+        Nhập: totalIn,
+        Xuất: totalOut
+      }
+    ]
+  }, [data])
+
   return (
     <Grid container spacing={2}>
-      {/* Biểu đồ biến động tồn kho */}
-      <Grid item size={6} xs={12} md={6}>
+      <Grid item size={12} md={6}>
         <Paper sx={{ p: 2, height: '100%' }}>
           <Typography variant='h6' gutterBottom>
-            Biến động tồn kho
+            Tổng Nhập / Xuất Tất Cả Kho
           </Typography>
-          <ResponsiveContainer width='100%' height={250}>
-            <LineChart data={inventoryTrendData}>
+          <ResponsiveContainer width='100%' height={300}>
+            <BarChart data={summarizedData}>
               <CartesianGrid strokeDasharray='3 3' />
-              <XAxis dataKey='date' />
+              <XAxis dataKey='name' />
               <YAxis />
               <Tooltip />
               <Legend />
-              <Line
-                type='monotone'
-                dataKey='in'
-                stroke='#81c784'
-                name='in'
-                dot={{ r: 5 }}
-              />
-              <Line
-                type='monotone'
-                dataKey='out'
-                stroke='#ef5350'
-                name='out'
-                dot={{ r: 5 }}
-              />
-            </LineChart>
-          </ResponsiveContainer>
-        </Paper>
-      </Grid>
-
-      {/* Biểu đồ trạng thái biến thể */}
-      <Grid item size={6} xs={12} md={6}>
-        <Paper sx={{ p: 2, height: '100%' }}>
-          <Typography variant='h6' gutterBottom>
-            Trạng thái biến thể
-          </Typography>
-          <ResponsiveContainer width='100%' height={250}>
-            <PieChart>
-              <Pie
-                data={variantStatusData}
-                dataKey='value'
-                nameKey='name'
-                outerRadius={80}
-                label
-              >
-                {variantStatusData.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={entry.color} />
-                ))}
-              </Pie>
-              <Tooltip />
-            </PieChart>
+              <Bar dataKey='Nhập' fill='#3f51b5' barSize={40} />
+              <Bar dataKey='Xuất' fill='#fb8c00' barSize={40} />
+            </BarChart>
           </ResponsiveContainer>
         </Paper>
       </Grid>

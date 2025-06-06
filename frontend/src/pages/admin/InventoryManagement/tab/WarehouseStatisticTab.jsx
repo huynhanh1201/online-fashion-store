@@ -7,7 +7,7 @@ import ChartDashboard from '~/components/WarehouseStatistic/Card/ChartDashboard'
 import ProductColorDetail from '~/components/WarehouseStatistic/Card/ProductColorDetail'
 import { Typography, Box, Divider } from '@mui/material'
 import React from 'react'
-
+import useInventoryStatistics from '~/hooks/admin/Inventory/useStatistic.js'
 const styles = {
   header: {
     borderBottom: '1px solid #ccc',
@@ -25,22 +25,28 @@ const styles = {
 }
 
 function WarehouseStatisticTab() {
+  const { statistics, loading, fetchStatistics } = useInventoryStatistics()
+
+  React.useEffect(() => {
+    fetchStatistics()
+  }, [])
+
   return (
     <div
       className='tab-content'
       style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}
     >
-      <Box sx={styles.BoxCard}>
-        <Typography
-          variant='h5'
-          gutterBottom
-          fontWeight='700'
-          sx={styles.header}
-        >
-          Sản phẩm & Biến thể
-        </Typography>
-        <VariantSummaryCard />
-      </Box>
+      {/*<Box sx={styles.BoxCard}>*/}
+      {/*  <Typography*/}
+      {/*    variant='h5'*/}
+      {/*    gutterBottom*/}
+      {/*    fontWeight='700'*/}
+      {/*    sx={styles.header}*/}
+      {/*  >*/}
+      {/*    Sản phẩm & Biến thể*/}
+      {/*  </Typography>*/}
+      {/*  <VariantSummaryCard />*/}
+      {/*</Box>*/}
       <Box sx={styles.BoxCard}>
         <Typography
           variant='h5'
@@ -50,7 +56,7 @@ function WarehouseStatisticTab() {
         >
           Thống kê kho hàng
         </Typography>
-        <InventorySummaryCard />
+        <InventorySummaryCard data={statistics} loading={loading} />
       </Box>
       {/*<Box sx={styles.BoxCard}>*/}
       {/*  <Typography*/}
@@ -83,7 +89,7 @@ function WarehouseStatisticTab() {
         >
           Cảnh Báo Hết Hàng
         </Typography>
-        <LowStockAlertCard />
+        <LowStockAlertCard data={statistics} loading={loading} />
       </Box>
       <Box sx={styles.BoxCard}>
         <Typography
@@ -94,7 +100,7 @@ function WarehouseStatisticTab() {
         >
           Biến Động Tồn Kho Theo Thời Gian
         </Typography>
-        <ChartDashboard />
+        <ChartDashboard data={statistics} loading={loading} />
       </Box>
       {/*<Box sx={styles.BoxCard}>*/}
       {/*  <Typography*/}
