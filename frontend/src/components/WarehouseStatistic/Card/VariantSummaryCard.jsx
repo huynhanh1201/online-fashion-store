@@ -25,15 +25,15 @@ const inventoryList = [
 ]
 
 export default function VariantSummaryCard() {
-  // =================================================
+  // =======================TEST WEBSOCKET==========================
   const [stats, setStats] = useState(null)
 
   useEffect(() => {
     socket.connect()
 
-    socket.emit('subscribeInventoryStats') // v1/inventory
+    // socket.emit('subscribeInventoryStats')
 
-    socket.on('inventoryStatsUpdate', (data) => {
+    socket.on('products:update', (data) => {
       console.log('📦 Realtime update:', data)
       setStats(data)
     })
@@ -45,7 +45,7 @@ export default function VariantSummaryCard() {
 
     // Gỡ bỏ listener khi component bị unmount (tránh memory leak).
     return () => {
-      socket.off('inventoryStatsUpdate')
+      socket.off('products:update')
     }
   }, [])
   // =================================================
@@ -54,6 +54,7 @@ export default function VariantSummaryCard() {
   const totalProducts = new Set(
     inventoryList.map((item) => item.variantId?.productId)
   ).size
+
   const lowStockVariants = inventoryList.filter(
     (item) => item.quantity <= item.minQuantity
   ).length
