@@ -9,6 +9,12 @@ const inventoryLogSchema = new Schema(
       ref: 'Inventory',
       required: true
     },
+    warehouseId: {
+      type: mongoose.Types.ObjectId,
+      ref: 'Warehouse',
+      required: true,
+      index: true
+    },
     batchId: {
       type: Schema.Types.ObjectId,
       ref: 'Batch',

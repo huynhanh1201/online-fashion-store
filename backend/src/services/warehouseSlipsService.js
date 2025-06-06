@@ -310,6 +310,7 @@ const importStockWarehouseSlip = async (reqBody, jwtDecoded, session) => {
 
       inventoryLogs.push({
         inventoryId: inventory._id,
+        warehouseId: inventory.warehouseId,
         batchId: batch ? batch._id : null,
         type: 'in',
         source: warehouseSlip.slipId,
@@ -449,6 +450,7 @@ const exportStockWarehouseSlip = async (reqBody, jwtDecoded, session) => {
 
       batchesUsed.push({
         batchId: batch._id,
+        warehouseId: batch.warehouseId,
         quantity: used,
         inventoryId: batch.inventoryId,
         importPrice: batch.importPrice,
@@ -461,6 +463,7 @@ const exportStockWarehouseSlip = async (reqBody, jwtDecoded, session) => {
     // #4 Ghi log vào inventoryLogs
     const inventoryLogs = batchesUsed.map((batchesUsed) => ({
       inventoryId: batchesUsed.inventory._id,
+      warehouseId: batchesUsed.warehouseId,
       batchId: batchesUsed.batchId,
       type: 'out',
       source: warehouseSlip.slipId,

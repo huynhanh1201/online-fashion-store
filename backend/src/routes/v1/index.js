@@ -26,6 +26,7 @@ import { batchesRoute } from '~/routes/v1/batchesRoute'
 import { warehouseSlipsRoute } from '~/routes/v1/warehouseSlipsRoute'
 import { inventoryLogsRoute } from '~/routes/v1/inventoryLogsRoute'
 import { partnersRoute } from '~/routes/v1/partnersRoute'
+import { statisticsRoute } from '~/routes/v1/statisticsRoute'
 
 const Router = express.Router()
 
@@ -78,5 +79,7 @@ Router.use('/warehouse-slips', warehouseSlipsRoute)
 Router.use('/inventory-logs', inventoryLogsRoute)
 
 Router.use('/partners', partnersRoute)
+
+Router.use('/statistics', statisticsRoute)
 
 export const APIs_V1 = Router
