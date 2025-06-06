@@ -17,7 +17,7 @@ const SearchWrapper = styled(Box)({
   position: 'relative',
   display: 'flex',
   alignItems: 'center',
-  width: 'fit-content'
+  width: 'fit-Content'
 })
 
 // Input xổ ra ngang hàng với icon
