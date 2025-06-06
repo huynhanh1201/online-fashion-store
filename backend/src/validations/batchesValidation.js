@@ -16,14 +16,9 @@ const verifyId = (req, res, next) => {
 const batch = async (req, res, next) => {
   // Xác thực dữ liệu đầu vào correctCondition: điều kiện đúng
   const correctCondition = Joi.object({
-    manufactureDate: Joi.date().required(),
+    manufactureDate: Joi.date().allow(null),
 
-    expiry: Joi.date()
-      .min(Joi.ref('manufactureDate'))
-      .allow(null)
-      .default(null),
-
-    importPrice: Joi.number().min(0).required()
+    importPrice: Joi.number().min(0).allow(null)
   })
 
   try {
