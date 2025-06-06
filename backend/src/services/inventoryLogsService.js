@@ -1,6 +1,7 @@
 import { InventoryLogModel } from '~/models/InventoryLogModel'
 import apiError from '~/utils/ApiError'
 import { StatusCodes } from 'http-status-codes'
+import { InventoryModel } from '~/models/InventoryModel'
 
 const createInventoryLog = async (reqBody) => {
   // eslint-disable-next-line no-useless-catch
@@ -59,26 +60,39 @@ const getInventoryLogList = async (queryString) => {
     filter['source'] = source
   }
 
-  const result = await InventoryLogModel.find(filter)
-    .skip((page - 1) * limit)
-    .limit(limit)
-    .populate({
-      path: 'inventoryId',
-      populate: [
-        {
-          path: 'variantId',
-          select: 'name sku price', // Chỉ lấy thông tin cần thiết của variant
-          model: 'Variant' // Đảm bảo Mongoose biết đúng model
-        },
-        {
-          path: 'warehouseId', // Bước 3: trong Inventory, populate warehouseId
-          select: 'name',
-          model: 'Warehouse'
-        }
-      ],
-      select: 'variantId warehouseId'
-    })
-    .lean()
+  const [inventoryLogs, total] = await Promise.all([
+    InventoryLogModel.find(filter)
+      .populate({
+        path: 'inventoryId',
+        populate: [
+          {
+            path: 'variantId',
+            select: 'name sku price', // Chỉ lấy thông tin cần thiết của variant
+            model: 'Variant' // Đảm bảo Mongoose biết đúng model
+          },
+          {
+            path: 'warehouseId', // Bước 3: trong Inventory, populate warehouseId
+            select: 'name',
+            model: 'Warehouse'
+          }
+        ],
+        select: 'variantId warehouseId'
+      })
+      .skip((page - 1) * limit)
+      .limit(limit)
+      .lean(),
+    InventoryLogModel.countDocuments(filter)
+  ])
+
+  const result = {
+    data: inventoryLogs,
+    meta: {
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit)
+    }
+  }
 
   return result
 }
