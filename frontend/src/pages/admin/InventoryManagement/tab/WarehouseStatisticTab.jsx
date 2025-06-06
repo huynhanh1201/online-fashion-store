@@ -52,28 +52,28 @@ function WarehouseStatisticTab() {
         </Typography>
         <InventorySummaryCard />
       </Box>
-      <Box sx={styles.BoxCard}>
-        <Typography
-          variant='h5'
-          gutterBottom
-          fontWeight='700'
-          sx={styles.header}
-        >
-          Tình trạng theo kho
-        </Typography>
-        <StockStatus />
-      </Box>
-      <Box sx={styles.BoxCard}>
-        <Typography
-          variant='h5'
-          gutterBottom
-          fontWeight='700'
-          sx={styles.header}
-        >
-          Tình trạng theo kho
-        </Typography>
-        <TopSellingSlowSellingCard />
-      </Box>
+      {/*<Box sx={styles.BoxCard}>*/}
+      {/*  <Typography*/}
+      {/*    variant='h5'*/}
+      {/*    gutterBottom*/}
+      {/*    fontWeight='700'*/}
+      {/*    sx={styles.header}*/}
+      {/*  >*/}
+      {/*    Tình trạng theo kho*/}
+      {/*  </Typography>*/}
+      {/*  <StockStatus />*/}
+      {/*</Box>*/}
+      {/*<Box sx={styles.BoxCard}>*/}
+      {/*  <Typography*/}
+      {/*    variant='h5'*/}
+      {/*    gutterBottom*/}
+      {/*    fontWeight='700'*/}
+      {/*    sx={styles.header}*/}
+      {/*  >*/}
+      {/*    Tình trạng theo kho*/}
+      {/*  </Typography>*/}
+      {/*  <TopSellingSlowSellingCard />*/}
+      {/*</Box>*/}
       <Box sx={styles.BoxCard}>
         <Typography
           variant='h5'
@@ -96,17 +96,17 @@ function WarehouseStatisticTab() {
         </Typography>
         <ChartDashboard />
       </Box>
-      <Box sx={styles.BoxCard}>
-        <Typography
-          variant='h5'
-          gutterBottom
-          fontWeight='700'
-          sx={styles.header}
-        >
-          Chi Tiết Sản Phẩm Theo Màu Sắc
-        </Typography>
-        <ProductColorDetail />
-      </Box>
+      {/*<Box sx={styles.BoxCard}>*/}
+      {/*  <Typography*/}
+      {/*    variant='h5'*/}
+      {/*    gutterBottom*/}
+      {/*    fontWeight='700'*/}
+      {/*    sx={styles.header}*/}
+      {/*  >*/}
+      {/*    Chi Tiết Sản Phẩm Theo Màu Sắc*/}
+      {/*  </Typography>*/}
+      {/*  <ProductColorDetail />*/}
+      {/*</Box>*/}
     </div>
   )
 }

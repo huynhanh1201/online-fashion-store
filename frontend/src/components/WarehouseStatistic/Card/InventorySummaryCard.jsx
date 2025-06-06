@@ -3,21 +3,25 @@ import { Typography, Grid, Box, Stack } from '@mui/material'
 import InventoryIcon from '@mui/icons-material/Inventory'
 import MonetizationOnIcon from '@mui/icons-material/MonetizationOn'
 import AttachMoneyIcon from '@mui/icons-material/AttachMoney'
+import WarningIcon from '@mui/icons-material/Warning'
 
 // Dữ liệu mẫu
 const inventoryList = [
   {
     quantity: 20,
+    minQuantity: 5,
     importPrice: 100,
     exportPrice: 150
   },
   {
     quantity: 3,
+    minQuantity: 3,
     importPrice: 200,
     exportPrice: 250
   },
   {
     quantity: 10,
+    minQuantity: 1,
     importPrice: 150,
     exportPrice: 180
   }
@@ -37,6 +41,9 @@ export default function InventorySummaryCard() {
     0
   )
 
+  const lowStockVariants = inventoryList.filter(
+    (item) => item.quantity <= item.minQuantity
+  ).length
   const summaryItems = [
     {
       label: 'Tổng số lượng tồn',
@@ -55,6 +62,12 @@ export default function InventorySummaryCard() {
       value: `${Number(estimatedProfit).toLocaleString('vi-VN')}đ`,
       icon: <AttachMoneyIcon color='warning' />,
       color: '#FFB74D'
+    },
+    {
+      label: 'Biến thể sắp hết hàng',
+      value: `${Number(lowStockVariants).toLocaleString('vi-VN')}`,
+      icon: <WarningIcon color='error' />,
+      color: '#657C6A'
     }
   ]
 
@@ -62,7 +75,7 @@ export default function InventorySummaryCard() {
     <Grid container spacing={2}>
       {summaryItems.map((item, index) => (
         <Grid
-          size={4}
+          size={6}
           item
           xs={6}
           md={4}
