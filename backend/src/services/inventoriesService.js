@@ -3,6 +3,7 @@ import { StatusCodes } from 'http-status-codes'
 import { InventoryModel } from '~/models/InventoryModel'
 import apiError from '~/utils/ApiError'
 import getDateRange from '~/utils/getDateRange'
+import { ProductModel } from '~/models/ProductModel'
 
 const handleCreateInventory = async () => {
   return 'Empty'
@@ -64,20 +65,33 @@ const getInventoryList = async (queryString) => {
     }
   }
 
-  const result = await InventoryModel.find(filter)
-    .skip((page - 1) * limit)
-    .limit(limit)
-    .populate([
-      {
-        path: 'variantId',
-        select: 'name sku color size'
-      },
-      {
-        path: 'warehouseId',
-        select: 'name'
-      }
-    ])
-    .lean()
+  const [inventories, total] = await Promise.all([
+    InventoryModel.find(filter)
+      .populate([
+        {
+          path: 'variantId',
+          select: 'name sku color size'
+        },
+        {
+          path: 'warehouseId',
+          select: 'name'
+        }
+      ])
+      .skip((page - 1) * limit)
+      .limit(limit)
+      .lean(),
+    InventoryModel.countDocuments(filter)
+  ])
+
+  const result = {
+    data: inventories,
+    meta: {
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit)
+    }
+  }
 
   return result
 }
