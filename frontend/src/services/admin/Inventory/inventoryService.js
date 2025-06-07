@@ -12,7 +12,7 @@ export const getInventories = async (page = 1, limit = 10, filters = {}) => {
       `${API_ROOT}/v1/inventories?${params}`
     )
     return {
-      inventories: response.data,
+      inventories: response.data.data,
       total: response.data.totalPages
     }
   } catch (error) {
@@ -116,9 +116,12 @@ export const getInventoryLogs = async (params) => {
     `${API_ROOT}/v1/inventory-logs`,
     { params }
   )
+  console.log('getInventoryLogs', response)
+
   return {
-    logs: response.data,
-    totalPages: response.data.totalPages || 1
+    logs: response.data.data,
+    totalPages: response.data.meta?.totalPages,
+    total: response.data.meta?.total
   }
 }
 export const getInventoryLogDetail = async (logId) => {
