@@ -103,7 +103,7 @@ const styles = {
     overflow: 'hidden',
     boxShadow: '0 6px 25px rgba(0,0,0,0.08)',
     transition: 'all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
-    height: 'fit-content',
+    height: 'fit-Content',
     border: '1px solid rgba(26, 60, 123, 0.05)'
   },
   productImageWrapper: {
