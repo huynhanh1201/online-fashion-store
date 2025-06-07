@@ -21,7 +21,7 @@ export const getVariants = async ({ page, limit, ...filters }) => {
 export const getVariantById = async (id) => {
   try {
     const response = await AuthorizedAxiosInstance.get(
-      `${API_ROOT}/v1/variants/${id}`
+      `${API_ROOT}/v1/variants?productId=${id}`
     )
     return response.data
   } catch (error) {

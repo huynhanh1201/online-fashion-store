@@ -4,13 +4,13 @@ import {
   Bar,
   XAxis,
   YAxis,
+  Tooltip as RechartsTooltip,
   CartesianGrid,
-  Tooltip,
   ResponsiveContainer,
   Legend
 } from 'recharts'
 import { Paper, Typography, Grid } from '@mui/material'
-
+import Tooltip from '../Content/Tooltip/Tooltip'
 export default function ChartDashboard({ data }) {
   const year = new Date().getFullYear()
   const monthlySummary = useMemo(() => {
@@ -20,7 +20,7 @@ export default function ChartDashboard({ data }) {
       const m = i + 1
       const monthStr = m < 10 ? `0${m}` : `${m}`
       return {
-        monthIndex: i, // ← giá trị duy nhất để XAxis nhận dạng
+        monthIndex: i + 1, // ← giá trị duy nhất để XAxis nhận dạng
         name: `T${m}/${year}`,
         key: `${year}-${monthStr}`,
         Nhập: 0,
@@ -29,7 +29,6 @@ export default function ChartDashboard({ data }) {
       }
     })
 
-    console.log('months', months)
     data.forEach((warehouse) => {
       warehouse.data?.forEach(({ month, inAmount, outAmount }) => {
         const index = months.findIndex((m) => m.key === month)
@@ -63,7 +62,7 @@ export default function ChartDashboard({ data }) {
               />
 
               <YAxis />
-              <Tooltip />
+              <RechartsTooltip content={<Tooltip />} />
               <Legend />
               <Bar dataKey='Xuất' fill='#4CAF50' barSize={25} />
               <Bar dataKey='Nhập' fill='#F44336' barSize={25} />

@@ -6,6 +6,7 @@ import { pickUser } from '~/utils/formatters'
 import { ROLE } from '~/utils/constants'
 import { password } from '~/utils/password'
 import { OrderModel } from '~/models/OrderModel'
+import { CartModel } from '~/models/CartModel'
 
 const getUserList = async () => {
   // eslint-disable-next-line no-useless-catch
@@ -70,19 +71,34 @@ const updateUser = async (userId, reqBody) => {
 const deleteUser = async (userId) => {
   // eslint-disable-next-line no-useless-catch
   try {
-    // const orderPromise = OrderModel.
+    const orderPromise = OrderModel.exists({
+      userId,
+      status: { $in: ['Pending', 'Processing', 'Shipping'] }
+    })
 
-    const user = await UserModel.findById(userId)
+    const cartPromise = CartModel.deleteOne({ userId })
 
-    if (!user) {
-      throw new ApiError(StatusCodes.NOT_FOUND, 'Không có dữ liệu người dùng.')
+    const [orderExists] = await Promise.all([orderPromise, cartPromise])
+
+    if (orderExists) {
+      throw new ApiError(
+        StatusCodes.CONFLICT,
+        'Không thể xóa TÀI KHOẢN KHÁCH HÀNG khi vẫn còn ĐƠN HÀNG hoạt động.'
+      )
     }
 
-    // Cập nhật dữ liệu
-    user.destroy = true
-    const updatedUser = await user.save()
+    const user = await UserModel.updateOne(
+      { _id: userId },
+      {
+        destroy: true
+      }
+    )
 
-    return pickUser(updatedUser)
+    if (!user) {
+      throw new ApiError(StatusCodes.NOT_FOUND, 'Tài khoản không tồn tại.')
+    }
+
+    return user
   } catch (err) {
     throw err
   }

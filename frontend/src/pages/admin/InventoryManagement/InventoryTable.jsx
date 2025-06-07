@@ -89,7 +89,6 @@ const InventoryTable = () => {
 
   const handleChangeRowsPerPage = (event, source) => {
     const newRowsPerPage = +event.target.value
-    console.log('New rows per page:', newRowsPerPage, 'Source:', source)
     setRowsPerPage(newRowsPerPage)
     const page = 0
     setPage(page)

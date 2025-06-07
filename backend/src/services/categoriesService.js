@@ -4,6 +4,7 @@ import { CategoryModel } from '~/models/CategoryModel'
 import ApiError from '~/utils/ApiError'
 import { slugify } from '~/utils/formatters'
 import { ProductModel } from '~/models/ProductModel'
+import mongoose from 'mongoose'
 
 const createCategory = async (reqBody) => {
   try {

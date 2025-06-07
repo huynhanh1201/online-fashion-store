@@ -21,8 +21,9 @@ import useColors from '~/hooks/admin/useColor'
 import useSizes from '~/hooks/admin/useSize'
 import useColorPalettes from '~/hooks/admin/useColorPalettes'
 import useSizePalettes from '~/hooks/admin/useSizePalettes'
-import AddColorModal from '~/pages/admin/ColorManagement/modal/AddColorModal.jsx'
-import AddSizeModal from '~/pages/admin/SizeManagement/modal/AddSizeModal.jsx'
+import { getVariantById } from '~/services/admin/Inventory/VariantService.js'
+import AddColorModal from '~/pages/admin/ColorManagement/modal/AddColorModal'
+import AddSizeModal from '~/pages/admin/SizeManagement/modal/AddSizeModal'
 
 const URI = 'https://api.cloudinary.com/v1_1/dkwsy9sph/image/upload'
 const CloudinaryColor = 'color_upload'
@@ -79,6 +80,8 @@ const AddVariantModal = ({
   const [openColorModal, setOpenColorModal] = useState(false)
   const [openSizeModal, setOpenSizeModal] = useState(false)
 
+  const [existingVariants, setExistingVariants] = useState([])
+
   const overridePrice = watch('overridePrice') // Theo dõi overridePrice
   const colorImage = watch('colorImage') // Theo dõi colorImage để hiển thị preview
   const productId = watch('productId') // Theo dõi productId để lấy giá sản phẩm
@@ -99,12 +102,34 @@ const AddVariantModal = ({
         }
       }
     }
+
+    const fetchVariants = async () => {
+      try {
+        const variants = await getVariantById(productId)
+        setExistingVariants(variants)
+      } catch (err) {
+        console.error('Lỗi khi lấy biến thể:', err)
+        toast.error('Lỗi khi lấy biến thể')
+      }
+    }
+    fetchVariants()
   }, [productId, products, setValue])
   useEffect(() => {
     fetchColors()
     fetchSizes()
   }, [])
 
+  const isSizeDisabled = (color, size) => {
+    return existingVariants.some(
+      (variant) => variant.color.name === color && variant.size.name === size
+    )
+  }
+
+  const isColorDisabled = (size, color) => {
+    return existingVariants.some(
+      (variant) => variant.size.name === size && variant.color.name === color
+    )
+  }
   const handleOpenColorModal = () => {
     setOpenColorModal(true)
   }
@@ -214,7 +239,6 @@ const AddVariantModal = ({
               </p>
             )}
           </FormControl>
-
           {/* Ảnh màu */}
           <Box display='flex' alignItems='center' gap={2}>
             <Button variant='outlined' component='label'>
@@ -244,7 +268,6 @@ const AddVariantModal = ({
             error={!!errors.colorImage}
             helperText={errors.colorImage?.message}
           />
-
           {/* Màu sắc */}
           <FormControl fullWidth error={!!errors.color}>
             <InputLabel>Màu sắc</InputLabel>
@@ -254,25 +277,28 @@ const AddVariantModal = ({
               rules={{ required: 'Đã có biến thể vui lòng chọn màu sắc khác' }}
               render={({ field }) => (
                 <Select {...field} label='Màu sắc'>
-                  {colors.map((c) => (
-                    <MenuItem key={c.name} value={c.name}>
-                      {c.name}
-                    </MenuItem>
-                  ))}
+                  {colors.map((c) => {
+                    const selectedSize = watch('size')
+                    const disabled =
+                      selectedSize && isColorDisabled(selectedSize, c.name)
+                    return (
+                      <MenuItem key={c.name} value={c.name} disabled={disabled}>
+                        {c.name} {disabled ? ' (đã tồn tại)' : ''}
+                      </MenuItem>
+                    )
+                  })}
                   <MenuItem onClick={handleOpenColorModal}>
                     <em>Thêm màu mới</em>
                   </MenuItem>
                 </Select>
               )}
             />
-
             {errors.color && (
               <p style={{ color: 'red', fontSize: '0.75rem' }}>
                 {errors.color.message}
               </p>
             )}
           </FormControl>
-
           {/* Kích thước */}
           <FormControl fullWidth error={!!errors.size}>
             <InputLabel>Kích thước</InputLabel>
@@ -282,11 +308,16 @@ const AddVariantModal = ({
               })}
               label='Kích thước'
             >
-              {sizes.map((s) => (
-                <MenuItem key={s.name} value={s.name}>
-                  {s.name}
-                </MenuItem>
-              ))}
+              {sizes.map((s) => {
+                const selectedColor = watch('color')
+                const disabled =
+                  selectedColor && isSizeDisabled(selectedColor, s.name)
+                return (
+                  <MenuItem key={s.name} value={s.name} disabled={disabled}>
+                    {s.name} {disabled ? ' (đã tồn tại)' : ''}
+                  </MenuItem>
+                )
+              })}
               <MenuItem onClick={handleOpenSizeModal}>
                 <em>Thêm kích thước mới</em>
               </MenuItem>
@@ -297,7 +328,6 @@ const AddVariantModal = ({
               </p>
             )}
           </FormControl>
-
           {/* Ghi đè giá */}
           <FormControlLabel
             control={
@@ -309,7 +339,6 @@ const AddVariantModal = ({
             }
             label='Đặt giá riêng cho biến thể'
           />
-
           {/* Giá nhập */}
           <Controller
             name='importPrice'
@@ -338,7 +367,6 @@ const AddVariantModal = ({
               />
             )}
           />
-
           {/* Giá bán */}
           <Controller
             name='exportPrice'

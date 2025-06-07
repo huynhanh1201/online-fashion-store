@@ -125,7 +125,7 @@ const deleteVariant = async (variantId) => {
       'cartItems.variantId': variantId
     })
 
-    const [isInventoryExsits, isVariantOfCart] = Promise.all([
+    const [isInventoryExsits, isVariantOfCart] = await Promise.all([
       isInventoryExsitsPromise,
       isVariantOfCartPromise
     ])
