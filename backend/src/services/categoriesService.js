@@ -70,18 +70,28 @@ const deleteCategory = async (categoryId) => {
     })
 
     if (isProductExist) {
-      throw new ApiError(StatusCodes.CONFLICT, 'Danh mục có chứa sản phẩm.')
+      throw new ApiError(
+        StatusCodes.CONFLICT,
+        'Không thể xóa DANH MỤC SẢN PHẨM khi vẫn còn SẢN PHẨM hoạt động.'
+      )
     }
 
     const categoryUpdated = await CategoryModel.findOneAndUpdate(
       { _id: categoryId },
       {
-        $set: { destroy: true }
+        destroy: true
       },
       {
         new: true
       }
     )
+
+    if (!categoryUpdated) {
+      throw new ApiError(
+        StatusCodes.NOT_FOUND,
+        'Danh mục sản phẩm không tồn tại.'
+      )
+    }
 
     return categoryUpdated
   } catch (err) {

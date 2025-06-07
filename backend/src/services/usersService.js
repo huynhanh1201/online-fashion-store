@@ -5,6 +5,7 @@ import ApiError from '~/utils/ApiError'
 import { pickUser } from '~/utils/formatters'
 import { ROLE } from '~/utils/constants'
 import { password } from '~/utils/password'
+import { OrderModel } from '~/models/OrderModel'
 
 const getUserList = async () => {
   // eslint-disable-next-line no-useless-catch
@@ -69,6 +70,8 @@ const updateUser = async (userId, reqBody) => {
 const deleteUser = async (userId) => {
   // eslint-disable-next-line no-useless-catch
   try {
+    // const orderPromise = OrderModel.
+
     const user = await UserModel.findById(userId)
 
     if (!user) {
