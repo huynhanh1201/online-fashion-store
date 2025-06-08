@@ -32,9 +32,10 @@ import { getDiscounts } from '~/services/discountService';
 
 const SectionTitle = styled(Typography)(({ theme }) => ({
   fontWeight: 700,
-  fontSize: '1.1rem',
+  fontSize: '1.3rem',
   marginBottom: theme.spacing(2),
   textTransform: 'uppercase',
+  color: '#1A3C7B',
 }));
 
 const ProductItem = ({ name, price, quantity, image, color, size }) => {
@@ -86,8 +87,8 @@ const Payment = () => {
     message: '',
   });
   const [coupons, setCoupons] = useState([]);
-  const [setCouponLoading] = useState(true);
-  const [setCouponError] = useState(null);
+  const [couponLoading, setCouponLoading] = useState(true);
+  const [couponError, setCouponError] = useState(null);
   const [copiedCode, setCopiedCode] = useState('');
 
   const { addresses, fetchAddresses } = useAddress();
@@ -102,16 +103,23 @@ const Payment = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
+  // Xác định cartItems
+  const cartItems = isBuyNow && tempCart?.cartItems?.length > 0 ? tempCart.cartItems : cartCartItems;
+
   // Tính selectedCartItems + subTotal
   let subTotal = 0;
-  const selectedCartItems = cartCartItems
+  const selectedCartItems = cartItems
     .filter(item => {
       if (isBuyNow) return true;
-      return selectedItems.some(selected =>
-        selected.variantId === (item.variantId?._id || item.variantId) &&
-        selected.color === item.color &&
-        selected.size === item.size
-      );
+      return selectedItems.some(selected => {
+        const itemVariantId = String(item.variantId?._id || item.variantId);
+        const selectedVariantId = String(selected.variantId);
+        return (
+          selectedVariantId === itemVariantId &&
+          selected.color === item.color &&
+          selected.size === item.size
+        );
+      });
     })
     .map(item => {
       const variant = item.variantId || {};
@@ -122,17 +130,40 @@ const Payment = () => {
       return { variantId, color: item.color, size: item.size, quantity };
     });
 
+  // Debug Redux state
+  useEffect(() => {
+    console.log('Redux state:', { cartItems, selectedItems, selectedCartItems, subTotal });
+  }, [cartItems, selectedItems, selectedCartItems, subTotal]);
+
+  // Kiểm tra dữ liệu
+  useEffect(() => {
+    if (isBuyNow && (!tempCart?.cartItems?.length || subTotal === 0)) {
+      setSnackbar({
+        open: true,
+        severity: 'error',
+        message: 'Không tìm thấy sản phẩm trong chế độ Mua ngay. Vui lòng thử lại.',
+      });
+      setTimeout(() => navigate('/'), 3000);
+    } else if (!isBuyNow && (!selectedItems.length || !selectedCartItems.length)) {
+      setSnackbar({
+        open: true,
+        severity: 'error',
+        message: 'Vui lòng chọn ít nhất một sản phẩm trong giỏ hàng.',
+      });
+      setTimeout(() => navigate('/cart'), 3000); // Chuyển về trang giỏ hàng
+    }
+  }, [isBuyNow, tempCart, subTotal, selectedItems, selectedCartItems, navigate]);
+
   // Lấy danh sách coupon
   useEffect(() => {
     const fetchCoupons = async () => {
       try {
         const response = await getDiscounts();
-        console.log('Dữ liệu từ getDiscounts trong Payment:', response); // Debug API
+        console.log('Dữ liệu từ getDiscounts trong Payment:', response);
         const { discounts } = response;
         if (!Array.isArray(discounts)) {
           throw new Error('Dữ liệu coupon không hợp lệ');
         }
-        // Gắn isApplicable và sắp xếp
         const validCoupons = discounts
           .filter(coupon => coupon && coupon._id)
           .map(coupon => ({
@@ -140,11 +171,9 @@ const Payment = () => {
             isApplicable: !coupon.minOrderValue || subTotal >= coupon.minOrderValue,
           }))
           .sort((a, b) => {
-            // Ưu tiên isApplicable: true
             if (a.isApplicable !== b.isApplicable) {
-              return b.isApplicable - a.isApplicable; // true (-1) trước false (1)
+              return b.isApplicable - a.isApplicable;
             }
-            // Trong cùng isApplicable, sắp xếp theo createdAt giảm dần
             return new Date(b.createdAt || new Date()) - new Date(a.createdAt || new Date());
           })
           .slice(0, 4);
@@ -182,8 +211,6 @@ const Payment = () => {
     setVoucherApplied(false);
     setTimeout(() => setCopiedCode(''), 1500);
   };
-
-  const cartItems = isBuyNow && tempCart?.cartItems?.length > 0 ? tempCart.cartItems : cartCartItems;
 
   const total = Math.max(subTotal - discount, 0);
 
@@ -262,7 +289,7 @@ const Payment = () => {
       return;
     }
 
-    if (cartItems.length === 0) {
+    if (cartItems.length === 0 || selectedCartItems.length === 0) {
       setSnackbar({ open: true, severity: 'error', message: 'Giỏ hàng trống' });
       return;
     }
@@ -315,21 +342,17 @@ const Payment = () => {
           <Grid container justifyContent="center" spacing={4}>
             <Grid item xs={12} md={12} lg={8}>
               {/* Địa chỉ nhận hàng */}
+              <SectionTitle>Địa chỉ nhận hàng</SectionTitle>
               <Box
                 sx={{
                   border: '1px solid #ccc',
                   borderRadius: 1,
                   p: 2,
-                  mb: 2,
+                  mb: 4,
                   width: '100%',
-                  borderCollapse: 'collapse',
                   minWidth: { xs: '100%', sm: 600, md: 800 },
                 }}
               >
-                <Typography fontWeight={600} mb={1} sx={{ fontSize: '1.2rem' }}>
-                  Địa Chỉ Nhận Hàng
-                </Typography>
-                <Divider sx={{ my: 2 }} />
                 {selectedAddress ? (
                   <Box display="flex" alignItems="center" justifyContent="space-between">
                     <Box>
@@ -353,7 +376,7 @@ const Payment = () => {
                     Chưa có địa chỉ
                     <Typography
                       component="span"
-                      sx={{ color: 'primary.main', cursor: 'pointer', ml: 1, fontSize: '1rem' }}
+                      sx={{ color: '#3f51b5', cursor: 'pointer', ml: 1, fontSize: '1rem' }}
                       onClick={handleOpenAddressModal}
                     >
                       Chọn Địa Chỉ
@@ -363,6 +386,7 @@ const Payment = () => {
               </Box>
 
               {/* Ghi chú đơn hàng */}
+              <SectionTitle>Ghi chú đơn hàng</SectionTitle>
               <TextField
                 fullWidth
                 label="Ghi chú đơn hàng (không bắt buộc)"
@@ -371,11 +395,11 @@ const Payment = () => {
                 variant="outlined"
                 rows={3}
                 multiline
-                sx={{ mb: 3, fontSize: '1.1rem', backgroundColor: '#fff' }}
+                sx={{ mb: 4, backgroundColor: '#fff' }}
               />
-              <SectionTitle sx={{ fontSize: '1.3rem', fontWeight: 700, mb: 2 }}>
-                Hình thức thanh toán
-              </SectionTitle>
+
+              {/* Hình thức thanh toán */}
+              <SectionTitle>Hình thức thanh toán</SectionTitle>
               {/* COD */}
               <Box
                 sx={{
@@ -437,11 +461,12 @@ const Payment = () => {
               </Box>
             </Grid>
 
-            {/* Right side: Ưu đãi và tổng thanh toán */}
+            {/* Right side: Giỏ hàng, ưu đãi và tổng thanh toán */}
             <Grid item xs={12} md={12} lg={4}>
-              {/* Danh sách sản phẩm */}
               <Box sx={{ border: '1px solid #ccc', borderRadius: 1, p: 2, mb: 2 }}>
-                {cartItems.length === 0 ? (
+                {/* Giỏ hàng */}
+                <SectionTitle>Giỏ hàng</SectionTitle>
+                {selectedCartItems.length === 0 ? (
                   <Typography
                     sx={{ textAlign: 'center', py: 4, color: 'text.secondary', fontSize: '1rem' }}
                   >
@@ -464,12 +489,12 @@ const Payment = () => {
                       </tr>
                     </thead>
                     <tbody>
-                      {(isBuyNow ? cartItems : cartItems.filter(item =>
-                        selectedItems.some(selected =>
-                          selected.variantId === item.variantId?._id
-                        )
-                      )).map((item, index) => {
-                        const variant = item.variantId || {};
+                      {selectedCartItems.map((item, index) => {
+                        const variant = cartItems.find(cartItem =>
+                          String(cartItem.variantId?._id || cartItem.variantId) === item.variantId &&
+                          cartItem.color === item.color &&
+                          cartItem.size === item.size
+                        )?.variantId || {};
                         return (
                           <ProductItem
                             key={index}
@@ -485,8 +510,10 @@ const Payment = () => {
                     </tbody>
                   </Box>
                 )}
+
+                {/* Ưu đãi */}
                 <Divider sx={{ my: 2 }} />
-                <SectionTitle sx={{ fontSize: '1.2rem' }}>Ưu đãi</SectionTitle>
+                <SectionTitle>Ưu đãi</SectionTitle>
                 <TextField
                   fullWidth
                   label="Nhập mã giảm giá"
@@ -527,67 +554,95 @@ const Payment = () => {
                 )}
 
                 {/* Danh sách coupon */}
-                <Box
-                  sx={{
-                    maxWidth: 600,
-                    overflowX: 'auto',
-                    display: 'flex',
-                    gap: 2,
-                    pb: 1,
-                    mt: 4,
-                    '&::-webkit-scrollbar': { height: 8 },
-                    '&::-webkit-scrollbar-thumb': {
-                      backgroundColor: '#ccc',
-                      borderRadius: 4,
-                    },
-                  }}
-                >
-                  {coupons.map(coupon => (
-                    <Box
-                      key={coupon._id}
-                      sx={{ flex: '0 0 auto', minWidth: { xs: '280px', sm: '300px' } }}
-                    >
-                      <CouponItem
-                        coupon={coupon}
-                        onCopy={handleCouponSelect}
-                        copiedCode={copiedCode}
-                        formatCurrencyShort={formatCurrencyShort}
-                        disabled={!coupon.isApplicable}
-                      />
+                <Box sx={{ mt: 4 }}>
+                  <Divider sx={{ mb: 2 }} />
+                  <Typography
+                    variant="subtitle2"
+                    sx={{
+                      fontWeight: 600,
+                      fontSize: { xs: '1rem', sm: '1rem' },
+                      mb: 2,
+                      color: 'text.secondary',
+                    }}
+                  >
+                    Các mã giảm giá có sẵn
+                  </Typography>
+                  {couponLoading ? (
+                    <Box display="flex" justifyContent="center" mt={2}>
+                      <CircularProgress size={24} />
                     </Box>
-                  ))}
+                  ) : couponError ? (
+                    <Typography color="error" fontSize={{ xs: '0.9rem', sm: '1rem' }} textAlign="center">
+                      {couponError}
+                    </Typography>
+                  ) : coupons.length === 0 ? (
+                    <Typography
+                      color="text.secondary"
+                      fontSize={{ xs: '0.9rem', sm: '1rem' }}
+                      textAlign="center"
+                    >
+                      Không có coupon nào hiện tại
+                    </Typography>
+                  ) : (
+                    <Box
+                      sx={{
+                        maxWidth: 600,
+                        overflowX: 'auto',
+                        display: 'flex',
+                        gap: 2,
+                        pb: 1,
+                        '&::-webkit-scrollbar': { height: 8 },
+                        '&::-webkit-scrollbar-thumb': {
+                          backgroundColor: '#ccc',
+                          borderRadius: 4,
+                        },
+                      }}
+                    >
+                      {coupons.map(coupon => (
+                        <Box
+                          key={coupon._id}
+                          sx={{ flex: '0 0 auto', minWidth: { xs: '280px', sm: '300px' } }}
+                        >
+                          <CouponItem
+                            coupon={coupon}
+                            onCopy={handleCouponSelect}
+                            copiedCode={copiedCode}
+                            formatCurrencyShort={formatCurrencyShort}
+                            disabled={!coupon.isApplicable}
+                          />
+                        </Box>
+                      ))}
+                    </Box>
+                  )}
                 </Box>
 
-
-                <Box>
-                  <Divider sx={{ my: 2 }} />
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <span style={{ fontSize: '1.1rem' }}>Tạm tính:</span>
-                    <span style={{ fontSize: '1.1rem' }}>{subTotal.toLocaleString('vi-VN')}đ</span>
-                  </Box>
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <span style={{ fontSize: '1.1rem' }}>Tiết kiệm:</span>
-                    <span style={{ fontSize: '1.1rem' }}>{discount.toLocaleString('vi-VN')}đ</span>
-                  </Box>
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <span style={{ fontSize: '1.1rem' }}>Voucher giảm giá:</span>
-                    <span style={{ fontSize: '1.1rem' }}>{discount.toLocaleString('vi-VN')}đ</span>
-                  </Box>
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <span style={{ fontSize: '1.1rem' }}>Phí vận chuyển:</span>
-                    <span style={{ fontSize: '1.1rem' }}>Miễn phí</span>
-                  </Box>
-                  <Divider sx={{ my: 2 }} />
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between', fontWeight: 700 }}>
-                    <span style={{ fontSize: '1.2rem' }}>Tổng:</span>
-                    <span style={{ fontSize: '1.2rem' }}>{total.toLocaleString('vi-VN')}đ</span>
-                  </Box>
+                {/* Tổng thanh toán */}
+                <Divider sx={{ my: 2 }} />
+                <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                  <span style={{ fontSize: '1.1rem' }}>Tạm tính:</span>
+                  <span style={{ fontSize: '1.1rem' }}>{subTotal.toLocaleString('vi-VN')}đ</span>
+                </Box>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                  <span style={{ fontSize: '1.1rem' }}>Tiết kiệm:</span>
+                  <span style={{ fontSize: '1.1rem' }}>{discount.toLocaleString('vi-VN')}đ</span>
+                </Box>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                  <span style={{ fontSize: '1.1rem' }}>Voucher giảm giá:</span>
+                  <span style={{ fontSize: '1.1rem' }}>{discount.toLocaleString('vi-VN')}đ</span>
+                </Box>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                  <span style={{ fontSize: '1.1rem' }}>Phí vận chuyển:</span>
+                  <span style={{ fontSize: '1.1rem' }}>Miễn phí</span>
+                </Box>
+                <Divider sx={{ my: 2 }} />
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', fontWeight: 700 }}>
+                  <span style={{ fontSize: '1.2rem' }}>Tổng:</span>
+                  <span style={{ fontSize: '1.2rem' }}>{total.toLocaleString('vi-VN')}đ</span>
                 </Box>
 
                 <Button
                   fullWidth
                   variant="contained"
-                  color="secondary"
                   sx={{
                     mt: 3,
                     fontSize: '1rem',
@@ -596,7 +651,7 @@ const Payment = () => {
                     '&:hover': { backgroundColor: '#3f51b5' },
                   }}
                   onClick={() => setConfirmOpen(true)}
-                  disabled={orderLoading}
+                  disabled={orderLoading || selectedCartItems.length === 0}
                 >
                   {orderLoading ? 'Đang xử lý...' : 'Đặt hàng'}
                 </Button>
