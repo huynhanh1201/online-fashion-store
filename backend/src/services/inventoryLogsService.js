@@ -68,7 +68,7 @@ const getInventoryLogList = async (queryString) => {
           {
             path: 'variantId',
             select: 'name sku price', // Chỉ lấy thông tin cần thiết của variant
-            model: 'Variant' // Đảm bảo Mongoose biết đúng model
+            model: 'Variant' // Đảm bảo Mongoose biết đúng modal
           },
           {
             path: 'warehouseId', // Bước 3: trong Inventory, populate warehouseId
@@ -107,7 +107,7 @@ const getInventoryLog = async (inventoryLogId) => {
           {
             path: 'variantId',
             select: 'name sku price', // Chỉ lấy thông tin cần thiết của variant
-            model: 'Variant' // Đảm bảo Mongoose biết đúng model
+            model: 'Variant' // Đảm bảo Mongoose biết đúng modal
           },
           {
             path: 'warehouseId', // Bước 3: trong Inventory, populate warehouseId

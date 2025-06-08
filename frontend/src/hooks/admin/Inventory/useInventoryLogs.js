@@ -8,6 +8,7 @@ import {
 const useInventoryLogs = () => {
   const [logs, setLogs] = useState([])
   const [totalPagesLogs, setTotalPages] = useState(1)
+  const [totalLogs, setTotalLogs] = useState(0)
   const [loading, setLoading] = useState(false)
   const [logDetail, setLogDetail] = useState(null)
 
@@ -19,7 +20,8 @@ const useInventoryLogs = () => {
       ...filters
     })
     setLogs(logs?.logs || [])
-    setTotalPages(logs?.total || 0)
+    setTotalLogs(logs?.total || 0)
+    setTotalPages(logs?.totalPages || 1)
     setLoading(false)
   }
 
@@ -35,6 +37,7 @@ const useInventoryLogs = () => {
     return result
   }
   return {
+    totalLogs,
     logs,
     totalPagesLogs,
     loading,

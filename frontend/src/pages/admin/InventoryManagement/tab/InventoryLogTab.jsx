@@ -37,7 +37,8 @@ const InventoryLogTab = ({
   fetchInventories,
   fetchVariants,
   batches,
-  fetchBatches
+  fetchBatches,
+  total
 }) => {
   const [filterInventory, setFilterInventory] = useState('all')
   const [filterBatchId, setFilterBatchId] = useState('all')
@@ -45,15 +46,13 @@ const InventoryLogTab = ({
   const [filterSource, setFilterSource] = useState('all')
   const [openViewModal, setOpenViewModal] = useState(false) // State cho modal xem
   const [selectedLog, setSelectedLog] = useState(null) // State cho bản ghi được chọn
-  if (page < 0) {
-    page = 1
-  }
+  console.log(page)
   useEffect(() => {
-    refreshInventoryLogs()
+    refreshInventoryLogs(page, rowsPerPage)
     fetchInventories()
     fetchVariants()
     fetchBatches()
-  }, [])
+  }, [page, rowsPerPage])
   const handleViewLog = (log) => {
     setSelectedLog(log)
     setOpenViewModal(true)
@@ -320,17 +319,15 @@ const InventoryLogTab = ({
       <TablePagination
         rowsPerPageOptions={[10, 25, 100]}
         component='div'
-        count={data.length}
+        count={total || 0}
         rowsPerPage={rowsPerPage}
-        page={page}
-        onPageChange={onPageChange}
-        onRowsPerPageChange={(e) => onRowsPerPageChange(e, 'log')}
+        page={page - 1}
+        onPageChange={(event, newPage) => onPageChange(event, newPage)} // +1 để giữ page bắt đầu từ 1
+        onRowsPerPageChange={(event) => onRowsPerPageChange(event, 'log')} // giữ đúng chuẩn
         labelRowsPerPage='Số dòng mỗi trang'
-        labelDisplayedRows={({ from, to, count }) => {
-          const actualTo = to > count ? count : to // nếu to vượt quá count thì lấy count
-          const actualFrom = from > count ? count : from // nếu from vượt quá count thì lấy count
-          return `${actualFrom}–${actualTo} trên ${count !== -1 ? count : `hơn ${actualTo}`}`
-        }}
+        labelDisplayedRows={({ from, to, count }) =>
+          `${from}–${to} trên ${count !== -1 ? count : `hơn ${to}`}`
+        }
       />
 
       <ViewInventoryLogModal
