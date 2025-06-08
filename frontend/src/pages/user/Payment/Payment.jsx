@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react'
 import {
   Box,
   Container,
@@ -17,18 +17,18 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
-} from '@mui/material';
-import { styled } from '@mui/system';
-import { ChooseAddressModal } from './Modal/ChooseAddressModal';
-import { useAddress } from '~/hooks/useAddress';
-import useCoupon from '~/hooks/useCoupon';
-import { useCart } from '~/hooks/useCarts';
-import { useOrder } from '~/hooks/useOrder';
-import { useSelector, useDispatch } from 'react-redux';
-import { clearTempCart } from '~/redux/cart/cartSlice';
-import { useLocation, useNavigate } from 'react-router-dom';
-import CouponItem from '~/components/Coupon/CouponItem';
-import { getDiscounts } from '~/services/discountService';
+} from '@mui/material'
+import { styled } from '@mui/system'
+import { ChooseAddressModal } from './Modal/ChooseAddressModal'
+import { useAddress } from '~/hooks/useAddress'
+import useCoupon from '~/hooks/useCoupon'
+import { useCart } from '~/hooks/useCarts'
+import { useOrder } from '~/hooks/useOrder'
+import { useSelector, useDispatch } from 'react-redux'
+import { clearTempCart } from '~/redux/cart/cartSlice'
+import { useLocation, useNavigate } from 'react-router-dom'
+import CouponItem from '~/components/Coupon/CouponItem'
+import { getDiscounts } from '~/services/discountService'
 
 const SectionTitle = styled(Typography)(({ theme }) => ({
   fontWeight: 700,
@@ -36,7 +36,7 @@ const SectionTitle = styled(Typography)(({ theme }) => ({
   marginBottom: theme.spacing(2),
   textTransform: 'uppercase',
   color: '#1A3C7B',
-}));
+}))
 
 const ProductItem = ({ name, price, quantity, image, color, size }) => {
   if (!name || typeof price !== 'number' || typeof quantity !== 'number') {
@@ -46,10 +46,10 @@ const ProductItem = ({ name, price, quantity, image, color, size }) => {
           Lỗi: Dữ liệu sản phẩm không hợp lệ.
         </td>
       </tr>
-    );
+    )
   }
 
-  const truncatedName = name.length > 20 ? name.slice(0, 20) + '...' : name;
+  const truncatedName = name.length > 20 ? name.slice(0, 20) + '...' : name
 
   return (
     <tr>
@@ -71,69 +71,69 @@ const ProductItem = ({ name, price, quantity, image, color, size }) => {
         {(price * quantity).toLocaleString('vi-VN')} đ
       </td>
     </tr>
-  );
-};
+  )
+}
 
 const Payment = () => {
-  const [paymentMethod, setPaymentMethod] = useState('');
-  const [openAddressModal, setOpenAddressModal] = useState(false);
-  const [selectedAddress, setSelectedAddress] = useState(null);
-  const [note, setNote] = useState('');
-  const [voucherInput, setVoucherInput] = useState('');
-  const [voucherApplied, setVoucherApplied] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState('')
+  const [openAddressModal, setOpenAddressModal] = useState(false)
+  const [selectedAddress, setSelectedAddress] = useState(null)
+  const [note, setNote] = useState('')
+  const [voucherInput, setVoucherInput] = useState('')
+  const [voucherApplied, setVoucherApplied] = useState(false)
   const [snackbar, setSnackbar] = useState({
     open: false,
     severity: 'info',
     message: '',
-  });
-  const [coupons, setCoupons] = useState([]);
-  const [couponLoading, setCouponLoading] = useState(true);
-  const [couponError, setCouponError] = useState(null);
-  const [copiedCode, setCopiedCode] = useState('');
+  })
+  const [coupons, setCoupons] = useState([])
+  const [couponLoading, setCouponLoading] = useState(true)
+  const [couponError, setCouponError] = useState(null)
+  const [copiedCode, setCopiedCode] = useState('')
 
-  const { addresses, fetchAddresses } = useAddress();
-  const { loading: cartLoading } = useCart();
-  const { createOrder, loading: orderLoading } = useOrder();
-  const { discount, discountMessage, loading: voucherLoading, handleApplyVoucher, couponId } = useCoupon();
-  const selectedItems = useSelector(state => state.cart.selectedItems || []);
-  const cartCartItems = useSelector(state => state.cart.cartItems);
-  const tempCart = useSelector(state => state.cart.tempCart);
-  const isBuyNow = useSelector(state => state.cart.isBuyNow);
-  const dispatch = useDispatch();
-  const location = useLocation();
-  const navigate = useNavigate();
+  const { addresses, fetchAddresses } = useAddress()
+  const { loading: cartLoading } = useCart()
+  const { createOrder, loading: orderLoading } = useOrder()
+  const { discount, discountMessage, loading: voucherLoading, handleApplyVoucher, couponId } = useCoupon()
+  const selectedItems = useSelector(state => state.cart.selectedItems || [])
+  const cartCartItems = useSelector(state => state.cart.cartItems)
+  const tempCart = useSelector(state => state.cart.tempCart)
+  const isBuyNow = useSelector(state => state.cart.isBuyNow)
+  const dispatch = useDispatch()
+  const location = useLocation()
+  const navigate = useNavigate()
 
   // Xác định cartItems
-  const cartItems = isBuyNow && tempCart?.cartItems?.length > 0 ? tempCart.cartItems : cartCartItems;
+  const cartItems = isBuyNow && tempCart?.cartItems?.length > 0 ? tempCart.cartItems : cartCartItems
 
   // Tính selectedCartItems + subTotal
-  let subTotal = 0;
+  let subTotal = 0
   const selectedCartItems = cartItems
     .filter(item => {
-      if (isBuyNow) return true;
+      if (isBuyNow) return true
       return selectedItems.some(selected => {
-        const itemVariantId = String(item.variantId?._id || item.variantId);
-        const selectedVariantId = String(selected.variantId);
+        const itemVariantId = String(item.variantId?._id || item.variantId)
+        const selectedVariantId = String(selected.variantId)
         return (
           selectedVariantId === itemVariantId &&
           selected.color === item.color &&
           selected.size === item.size
-        );
-      });
+        )
+      })
     })
     .map(item => {
-      const variant = item.variantId || {};
-      const variantId = String(variant._id || item.variantId);
-      const price = typeof variant.exportPrice === 'number' ? variant.exportPrice : 0;
-      const quantity = typeof item.quantity === 'number' ? item.quantity : 1;
-      subTotal += price * quantity;
-      return { variantId, color: item.color, size: item.size, quantity };
-    });
+      const variant = item.variantId || {}
+      const variantId = String(variant._id || item.variantId)
+      const price = typeof variant.exportPrice === 'number' ? variant.exportPrice : 0
+      const quantity = typeof item.quantity === 'number' ? item.quantity : 1
+      subTotal += price * quantity
+      return { variantId, color: item.color, size: item.size, quantity }
+    })
 
   // Debug Redux state
   useEffect(() => {
-    console.log('Redux state:', { cartItems, selectedItems, selectedCartItems, subTotal });
-  }, [cartItems, selectedItems, selectedCartItems, subTotal]);
+    console.log('Redux state:', { cartItems, selectedItems, selectedCartItems, subTotal })
+  }, [cartItems, selectedItems, selectedCartItems, subTotal])
 
   // Kiểm tra dữ liệu
   useEffect(() => {
@@ -142,27 +142,27 @@ const Payment = () => {
         open: true,
         severity: 'error',
         message: 'Không tìm thấy sản phẩm trong chế độ Mua ngay. Vui lòng thử lại.',
-      });
-      setTimeout(() => navigate('/'), 3000);
+      })
+      setTimeout(() => navigate('/'), 3000)
     } else if (!isBuyNow && (!selectedItems.length || !selectedCartItems.length)) {
       setSnackbar({
         open: true,
         severity: 'error',
         message: 'Vui lòng chọn ít nhất một sản phẩm trong giỏ hàng.',
-      });
-      setTimeout(() => navigate('/cart'), 3000); // Chuyển về trang giỏ hàng
+      })
+      setTimeout(() => navigate('/cart'), 3000)   // Chuyển về trang giỏ hàng
     }
-  }, [isBuyNow, tempCart, subTotal, selectedItems, selectedCartItems, navigate]);
+  }, [isBuyNow, tempCart, subTotal, selectedItems, selectedCartItems, navigate])
 
   // Lấy danh sách coupon
   useEffect(() => {
     const fetchCoupons = async () => {
       try {
-        const response = await getDiscounts();
-        console.log('Dữ liệu từ getDiscounts trong Payment:', response);
-        const { discounts } = response;
+        const response = await getDiscounts()
+        console.log('Dữ liệu từ getDiscounts trong Payment:', response)
+        const { discounts } = response
         if (!Array.isArray(discounts)) {
-          throw new Error('Dữ liệu coupon không hợp lệ');
+          throw new Error('Dữ liệu coupon không hợp lệ')
         }
         const validCoupons = discounts
           .filter(coupon => coupon && coupon._id)
@@ -172,75 +172,75 @@ const Payment = () => {
           }))
           .sort((a, b) => {
             if (a.isApplicable !== b.isApplicable) {
-              return b.isApplicable - a.isApplicable;
+              return b.isApplicable - a.isApplicable
             }
-            return new Date(b.createdAt || new Date()) - new Date(a.createdAt || new Date());
+            return new Date(b.createdAt || new Date()) - new Date(a.createdAt || new Date())
           })
-          .slice(0, 4);
-        setCoupons(validCoupons);
-        setCouponLoading(false);
+          .slice(0, 4)
+        setCoupons(validCoupons)
+        setCouponLoading(false)
       } catch (error) {
-        console.error('Lỗi lấy coupon:', error);
-        setCouponError(error.message || 'Không thể tải coupon');
-        setCouponLoading(false);
+        console.error('Lỗi lấy coupon:', error)
+        setCouponError(error.message || 'Không thể tải coupon')
+        setCouponLoading(false)
       }
-    };
-    fetchCoupons();
-  }, [subTotal]);
+    }
+    fetchCoupons()
+  }, [subTotal])
 
   const formatCurrencyShort = (value) => {
-    if (typeof value !== 'number') return '0';
+    if (typeof value !== 'number') return '0'
     const units = [
       { threshold: 1_000_000, suffix: 'Tr' },
       { threshold: 1_000, suffix: 'K' },
-    ];
+    ]
     for (const { threshold, suffix } of units) {
       if (value >= threshold) {
-        const shortValue = Math.floor(value / threshold);
-        return `${shortValue}${suffix}`;
+        const shortValue = Math.floor(value / threshold)
+        return `${shortValue}${suffix}`
       }
     }
-    return value.toString();
-  };
+    return value.toString()
+  }
 
   const handleCouponSelect = (code) => {
-    if (!code || code === 'N/A') return;
-    navigator.clipboard.writeText(code);
-    setCopiedCode(code);
-    setVoucherInput(code);
-    setVoucherApplied(false);
-    setTimeout(() => setCopiedCode(''), 1500);
-  };
+    if (!code || code === 'N/A') return
+    navigator.clipboard.writeText(code)
+    setCopiedCode(code)
+    setVoucherInput(code)
+    setVoucherApplied(false)
+    setTimeout(() => setCopiedCode(''), 1500)
+  }
 
-  const total = Math.max(subTotal - discount, 0);
+  const total = Math.max(subTotal - discount, 0)
 
   useEffect(() => {
-    const isOnPaymentPage = location.pathname.startsWith('/payment');
+    const isOnPaymentPage = location.pathname.startsWith('/payment')
     if (!isOnPaymentPage && isBuyNow) {
-      dispatch(clearTempCart());
+      dispatch(clearTempCart())
     }
-  }, [location, isBuyNow, dispatch]);
+  }, [location, isBuyNow, dispatch])
 
   useEffect(() => {
     if (addresses.length > 0 && !selectedAddress) {
-      const defaultAddr = addresses.find(addr => addr.isDefault);
-      setSelectedAddress(defaultAddr || addresses[0]);
+      const defaultAddr = addresses.find(addr => addr.isDefault)
+      setSelectedAddress(defaultAddr || addresses[0])
     }
-  }, [addresses, selectedAddress]);
+  }, [addresses, selectedAddress])
 
-  const handleOpenAddressModal = () => setOpenAddressModal(true);
-  const handleCloseAddressModal = () => setOpenAddressModal(false);
-  const [confirmOpen, setConfirmOpen] = useState(false);
+  const handleOpenAddressModal = () => setOpenAddressModal(true)
+  const handleCloseAddressModal = () => setOpenAddressModal(false)
+  const [confirmOpen, setConfirmOpen] = useState(false)
 
   const handleAddressConfirm = (addressId) => {
-    const selected = addresses.find(addr => addr._id === addressId);
-    setSelectedAddress(selected);
-    handleCloseAddressModal();
-  };
+    const selected = addresses.find(addr => addr._id === addressId)
+    setSelectedAddress(selected)
+    handleCloseAddressModal()
+  }
 
   const handleAddressListUpdated = async () => {
-    await fetchAddresses(true);
-  };
+    await fetchAddresses(true)
+  }
 
   const handleApplyVoucherClick = async () => {
     if (!voucherInput.trim()) {
@@ -248,36 +248,36 @@ const Payment = () => {
         open: true,
         severity: 'warning',
         message: 'Vui lòng nhập mã giảm giá',
-      });
-      return;
+      })
+      return
     }
 
     try {
-      const response = await handleApplyVoucher(voucherInput.trim(), subTotal);
+      const response = await handleApplyVoucher(voucherInput.trim(), subTotal)
       if (response?.valid) {
-        setVoucherApplied(true);
+        setVoucherApplied(true)
         setSnackbar({
           open: true,
           severity: 'success',
           message: response.message || 'Áp dụng mã giảm giá thành công',
-        });
+        })
       } else {
-        setVoucherApplied(false);
+        setVoucherApplied(false)
         setSnackbar({
           open: true,
           severity: 'error',
           message: response?.message || 'Mã giảm giá không hợp lệ hoặc đã hết hạn',
-        });
+        })
       }
     } catch (err) {
-      setVoucherApplied(false);
+      setVoucherApplied(false)
       setSnackbar({
         open: true,
         severity: 'error',
         message: err.message || 'Có lỗi xảy ra khi áp dụng mã giảm giá',
-      });
+      })
     }
-  };
+  }
 
   const handlePlaceOrder = async () => {
     if (!selectedAddress) {
@@ -285,19 +285,19 @@ const Payment = () => {
         open: true,
         severity: 'warning',
         message: 'Vui lòng chọn địa chỉ nhận hàng',
-      });
-      return;
+      })
+      return
     }
 
     if (cartItems.length === 0 || selectedCartItems.length === 0) {
-      setSnackbar({ open: true, severity: 'error', message: 'Giỏ hàng trống' });
-      return;
+      setSnackbar({ open: true, severity: 'error', message: 'Giỏ hàng trống' })
+      return
     }
 
     const sanitizedCartItems = selectedCartItems.map(item => ({
       variantId: item.variantId,
       quantity: item.quantity,
-    }));
+    }))
 
     const orderData = {
       cartItems: sanitizedCartItems,
@@ -307,29 +307,29 @@ const Payment = () => {
       note: note.trim() || undefined,
       couponCode: voucherApplied ? voucherInput : undefined,
       couponId: voucherApplied ? couponId : undefined,
-    };
+    }
 
     try {
-      const result = await createOrder(orderData);
+      const result = await createOrder(orderData)
       setSnackbar({
         open: true,
         severity: 'success',
         message: 'Đặt hàng thành công',
-      });
-      dispatch(clearTempCart());
+      })
+      dispatch(clearTempCart())
       if (typeof result === 'string' && result.startsWith('http')) {
-        window.location.href = result;
+        window.location.href = result
       } else {
-        navigate('/order-success');
+        navigate('/order-success')
       }
     } catch (error) {
       setSnackbar({
         open: true,
         severity: 'error',
         message: `Đặt hàng thất bại: ${error.message || error}`,
-      });
+      })
     }
-  };
+  }
 
   return (
     <Box>
@@ -494,7 +494,7 @@ const Payment = () => {
                           String(cartItem.variantId?._id || cartItem.variantId) === item.variantId &&
                           cartItem.color === item.color &&
                           cartItem.size === item.size
-                        )?.variantId || {};
+                        )?.variantId || {}
                         return (
                           <ProductItem
                             key={index}
@@ -505,7 +505,7 @@ const Payment = () => {
                             color={variant.color?.name}
                             size={variant.size?.name}
                           />
-                        );
+                        )
                       })}
                     </tbody>
                   </Box>
@@ -519,9 +519,9 @@ const Payment = () => {
                   label="Nhập mã giảm giá"
                   value={voucherInput}
                   onChange={e => {
-                    const value = e.target.value.toUpperCase().slice(0, 10);
-                    setVoucherInput(value);
-                    setVoucherApplied(false);
+                    const value = e.target.value.toUpperCase().slice(0, 10)
+                    setVoucherInput(value)
+                    setVoucherApplied(false)
                   }}
                   size="small"
                   sx={{ mb: 1, '& .MuiInputBase-root': { fontSize: '1rem' } }}
@@ -695,8 +695,8 @@ const Payment = () => {
           </Button>
           <Button
             onClick={() => {
-              setConfirmOpen(false);
-              handlePlaceOrder();
+              setConfirmOpen(false)
+              handlePlaceOrder()
             }}
             variant="contained"
             sx={{
@@ -710,7 +710,7 @@ const Payment = () => {
         </DialogActions>
       </Dialog>
     </Box>
-  );
-};
+  )
+}
 
-export default Payment;
+export default Payment  
