@@ -463,9 +463,9 @@ const Payment = () => {
 
             {/* Right side: Giỏ hàng, ưu đãi và tổng thanh toán */}
             <Grid item xs={12} md={12} lg={4}>
+              <SectionTitle>Giỏ hàng</SectionTitle>
               <Box sx={{ border: '1px solid #ccc', borderRadius: 1, p: 2, mb: 2 }}>
                 {/* Giỏ hàng */}
-                <SectionTitle>Giỏ hàng</SectionTitle>
                 {selectedCartItems.length === 0 ? (
                   <Typography
                     sx={{ textAlign: 'center', py: 4, color: 'text.secondary', fontSize: '1rem' }}
@@ -621,10 +621,6 @@ const Payment = () => {
                 <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
                   <span style={{ fontSize: '1.1rem' }}>Tạm tính:</span>
                   <span style={{ fontSize: '1.1rem' }}>{subTotal.toLocaleString('vi-VN')}đ</span>
-                </Box>
-                <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                  <span style={{ fontSize: '1.1rem' }}>Tiết kiệm:</span>
-                  <span style={{ fontSize: '1.1rem' }}>{discount.toLocaleString('vi-VN')}đ</span>
                 </Box>
                 <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
                   <span style={{ fontSize: '1.1rem' }}>Voucher giảm giá:</span>
