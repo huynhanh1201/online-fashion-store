@@ -160,7 +160,7 @@ import useSizePalettes from '~/hooks/admin/useSizePalettes.js'
 
 const ProductManagement = () => {
   const [page, setPage] = React.useState(1)
-  const [limit] = React.useState(8)
+  const [limit, setLimit] = React.useState(10)
   const [modalType, setModalType] = React.useState(null)
   const [selectedProduct, setSelectedProduct] = React.useState(null)
 
@@ -176,7 +176,7 @@ const ProductManagement = () => {
   const [pendingMaxPrice, setPendingMaxPrice] = React.useState('')
   const [pendingCreatedAt, setPendingCreatedAt] = React.useState('')
 
-  const { products, totalPages, fetchProducts, loading } = useProducts()
+  const { products, fetchProducts, loading, total } = useProducts()
   const { categories, fetchCategories } = useCategories()
   const [showAdvancedFilter, setShowAdvancedFilter] = React.useState(false)
 
@@ -296,7 +296,6 @@ const ProductManagement = () => {
         >
           Thêm sản phẩm
         </Button>
-
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
           <Box sx={{ display: 'flex', gap: 1, justifyContent: 'end' }}>
             <TextField
@@ -379,6 +378,15 @@ const ProductManagement = () => {
         products={products}
         loading={loading}
         handleOpenModal={handleOpenModal}
+        addProduct={() => handleOpenModal('add')}
+        page={page - 1}
+        rowsPerPage={limit}
+        total={total}
+        onPageChange={handleChangePage}
+        onChangeRowsPerPage={(newLimit) => {
+          setPage(1)
+          setLimit(newLimit)
+        }}
       />
 
       <React.Suspense fallback={<></>}>
@@ -434,12 +442,6 @@ const ProductManagement = () => {
           />
         )}
       </React.Suspense>
-
-      <ProductPagination
-        page={page}
-        totalPages={totalPages}
-        onPageChange={handleChangePage}
-      />
     </>
   )
 }

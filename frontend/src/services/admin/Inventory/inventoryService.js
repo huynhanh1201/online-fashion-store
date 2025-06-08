@@ -13,7 +13,7 @@ export const getInventories = async (page = 1, limit = 10, filters = {}) => {
     )
     return {
       inventories: response.data.data,
-      total: response.data.totalPages
+      total: response.data.meta?.total || 0
     }
   } catch (error) {
     console.error('Lỗi khi lấy danh sách kho:', error)

@@ -67,32 +67,17 @@ const ColorManagement = () => {
     }
   }
 
-  const styles = {
-    buttonAdd: {
-      backgroundColor: '#001f5d',
-      color: '#fff',
-      marginBottom: '16px'
-    }
-  }
-
   return (
     <>
       <Typography variant='h5' sx={{ mb: 2 }}>
         Quản lý màu sắc sản phẩm
       </Typography>
-      <Button
-        variant='contained'
-        sx={styles.buttonAdd}
-        startIcon={<AddIcon />}
-        onClick={() => setModalType('add')}
-      >
-        Thêm màu
-      </Button>
 
       <ColorTable
         colors={colors}
         loading={Loading}
         handleOpenModal={handleOpenModal}
+        addColor={() => setModalType('add')}
       />
 
       <React.Suspense fallback={<></>}>
