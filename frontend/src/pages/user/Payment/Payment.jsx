@@ -396,8 +396,62 @@ const Payment = () => {
                 variant="outlined"
                 rows={3}
                 multiline
-                sx={{ mb: 4, backgroundColor: '#fff' }}
+                sx={{
+                  mb: 4,
+                  backgroundColor: '#fff',
+                  '& .MuiOutlinedInput-root': {
+                    '& fieldset': {
+                      borderColor: '#1A3C7B'
+                    },
+                    '&:hover fieldset': {
+                      borderColor: '#1A3C7B'
+                    },
+                    '&.Mui-focused fieldset': {
+                      borderColor: '#1A3C7B',
+                      borderWidth: '2px'
+                    }
+                  }
+                }}
               />
+
+              {/* Phương thức vận chuyển */}
+              <SectionTitle>Phương thức vận chuyển</SectionTitle>
+              <Box
+                sx={{
+                  border: '2px solid',
+                  borderColor: '#1A3C7B',
+                  borderRadius: 1,
+                  p: 2,
+                  mb: 2
+                }}
+              >
+                <RadioGroup defaultValue="Ship">
+                  <FormControlLabel
+                    value="Ship"
+                    control={
+                      <Radio
+                        sx={{
+                          color: '#ccc',
+                          '&.Mui-checked': { color: '#1A3C7B' }
+                        }}
+                      />
+                    }
+                    label={
+                      <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                        <img
+                          src="https://file.hstatic.net/1000360022/file/giaohangnhanh_abaa5d524e464a0c8547a91ad9b50968.png"
+                          alt="Ship"
+                          style={{ height: 32, marginRight: 8 }}
+                        />
+                        <Typography sx={{ fontSize: '1rem' }}>
+                          Phí ship đơn hàng miễn phí
+                        </Typography>
+                      </Box>
+                    }
+                  />
+                </RadioGroup>
+
+              </Box>
 
               {/* Hình thức thanh toán */}
               <SectionTitle>Hình thức thanh toán</SectionTitle>
