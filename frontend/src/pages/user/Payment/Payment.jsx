@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import React, { useState, useEffect } from 'react'
 import {
   Box,
@@ -16,7 +17,7 @@ import {
   Dialog,
   DialogTitle,
   DialogContent,
-  DialogActions,
+  DialogActions
 } from '@mui/material'
 import { styled } from '@mui/system'
 import { ChooseAddressModal } from './Modal/ChooseAddressModal'
@@ -35,7 +36,7 @@ const SectionTitle = styled(Typography)(({ theme }) => ({
   fontSize: '1.3rem',
   marginBottom: theme.spacing(2),
   textTransform: 'uppercase',
-  color: '#1A3C7B',
+  color: '#1A3C7B'
 }))
 
 const ProductItem = ({ name, price, quantity, image, color, size }) => {
@@ -84,7 +85,7 @@ const Payment = () => {
   const [snackbar, setSnackbar] = useState({
     open: false,
     severity: 'info',
-    message: '',
+    message: ''
   })
   const [coupons, setCoupons] = useState([])
   const [couponLoading, setCouponLoading] = useState(true)
@@ -141,16 +142,16 @@ const Payment = () => {
       setSnackbar({
         open: true,
         severity: 'error',
-        message: 'Không tìm thấy sản phẩm trong chế độ Mua ngay. Vui lòng thử lại.',
+        message: 'Không tìm thấy sản phẩm trong chế độ Mua ngay. Vui lòng thử lại.'
       })
       setTimeout(() => navigate('/'), 3000)
     } else if (!isBuyNow && (!selectedItems.length || !selectedCartItems.length)) {
       setSnackbar({
         open: true,
         severity: 'error',
-        message: 'Vui lòng chọn ít nhất một sản phẩm trong giỏ hàng.',
+        message: 'Vui lòng chọn ít nhất một sản phẩm trong giỏ hàng.'
       })
-      setTimeout(() => navigate('/cart'), 3000)   // Chuyển về trang giỏ hàng
+      setTimeout(() => navigate('/cart'), 3000) // Chuyển về trang giỏ hàng
     }
   }, [isBuyNow, tempCart, subTotal, selectedItems, selectedCartItems, navigate])
 
@@ -168,7 +169,7 @@ const Payment = () => {
           .filter(coupon => coupon && coupon._id)
           .map(coupon => ({
             ...coupon,
-            isApplicable: !coupon.minOrderValue || subTotal >= coupon.minOrderValue,
+            isApplicable: !coupon.minOrderValue || subTotal >= coupon.minOrderValue
           }))
           .sort((a, b) => {
             if (a.isApplicable !== b.isApplicable) {
@@ -192,7 +193,7 @@ const Payment = () => {
     if (typeof value !== 'number') return '0'
     const units = [
       { threshold: 1_000_000, suffix: 'Tr' },
-      { threshold: 1_000, suffix: 'K' },
+      { threshold: 1_000, suffix: 'K' }
     ]
     for (const { threshold, suffix } of units) {
       if (value >= threshold) {
@@ -247,7 +248,7 @@ const Payment = () => {
       setSnackbar({
         open: true,
         severity: 'warning',
-        message: 'Vui lòng nhập mã giảm giá',
+        message: 'Vui lòng nhập mã giảm giá'
       })
       return
     }
@@ -259,14 +260,14 @@ const Payment = () => {
         setSnackbar({
           open: true,
           severity: 'success',
-          message: response.message || 'Áp dụng mã giảm giá thành công',
+          message: response.message || 'Áp dụng mã giảm giá thành công'
         })
       } else {
         setVoucherApplied(false)
         setSnackbar({
           open: true,
           severity: 'error',
-          message: response?.message || 'Mã giảm giá không hợp lệ hoặc đã hết hạn',
+          message: response?.message || 'Mã giảm giá không hợp lệ hoặc đã hết hạn'
         })
       }
     } catch (err) {
@@ -274,7 +275,7 @@ const Payment = () => {
       setSnackbar({
         open: true,
         severity: 'error',
-        message: err.message || 'Có lỗi xảy ra khi áp dụng mã giảm giá',
+        message: err.message || 'Có lỗi xảy ra khi áp dụng mã giảm giá'
       })
     }
   }
@@ -284,7 +285,7 @@ const Payment = () => {
       setSnackbar({
         open: true,
         severity: 'warning',
-        message: 'Vui lòng chọn địa chỉ nhận hàng',
+        message: 'Vui lòng chọn địa chỉ nhận hàng'
       })
       return
     }
@@ -296,7 +297,7 @@ const Payment = () => {
 
     const sanitizedCartItems = selectedCartItems.map(item => ({
       variantId: item.variantId,
-      quantity: item.quantity,
+      quantity: item.quantity
     }))
 
     const orderData = {
@@ -306,7 +307,7 @@ const Payment = () => {
       paymentMethod,
       note: note.trim() || undefined,
       couponCode: voucherApplied ? voucherInput : undefined,
-      couponId: voucherApplied ? couponId : undefined,
+      couponId: voucherApplied ? couponId : undefined
     }
 
     try {
@@ -314,7 +315,7 @@ const Payment = () => {
       setSnackbar({
         open: true,
         severity: 'success',
-        message: 'Đặt hàng thành công',
+        message: 'Đặt hàng thành công'
       })
       dispatch(clearTempCart())
       if (typeof result === 'string' && result.startsWith('http')) {
@@ -326,7 +327,7 @@ const Payment = () => {
       setSnackbar({
         open: true,
         severity: 'error',
-        message: `Đặt hàng thất bại: ${error.message || error}`,
+        message: `Đặt hàng thất bại: ${error.message || error}`
       })
     }
   }
@@ -350,7 +351,7 @@ const Payment = () => {
                   p: 2,
                   mb: 4,
                   width: '100%',
-                  minWidth: { xs: '100%', sm: 600, md: 800 },
+                  minWidth: { xs: '100%', sm: 600, md: 800 }
                 }}
               >
                 {selectedAddress ? (
@@ -407,7 +408,7 @@ const Payment = () => {
                   borderColor: paymentMethod === 'COD' ? '#1A3C7B' : '#ccc',
                   borderRadius: 1,
                   p: 2,
-                  mb: 2,
+                  mb: 2
                 }}
               >
                 <RadioGroup value={paymentMethod} onChange={e => setPaymentMethod(e.target.value)}>
@@ -437,7 +438,7 @@ const Payment = () => {
                   borderColor: paymentMethod === 'vnpay' ? '#1A3C7B' : '#ccc',
                   borderRadius: 1,
                   p: 2,
-                  mb: 2,
+                  mb: 2
                 }}
               >
                 <RadioGroup value={paymentMethod} onChange={e => setPaymentMethod(e.target.value)}>
@@ -478,7 +479,7 @@ const Payment = () => {
                     sx={{
                       width: '100%',
                       borderCollapse: 'collapse',
-                      minWidth: { xs: '100%', md: 600 },
+                      minWidth: { xs: '100%', md: 600 }
                     }}
                   >
                     <thead>
@@ -536,7 +537,7 @@ const Payment = () => {
                     backgroundColor: '#1A3C7B',
                     color: '#fff',
                     '&:hover': { backgroundColor: '#3f51b5' },
-                    fontSize: '1rem',
+                    fontSize: '1rem'
                   }}
                 >
                   {voucherLoading ? 'Đang áp dụng...' : voucherApplied ? 'Đã áp dụng' : 'Áp dụng Voucher'}
@@ -562,7 +563,7 @@ const Payment = () => {
                       fontWeight: 600,
                       fontSize: { xs: '1rem', sm: '1rem' },
                       mb: 2,
-                      color: 'text.secondary',
+                      color: 'text.secondary'
                     }}
                   >
                     Các mã giảm giá có sẵn
@@ -594,8 +595,8 @@ const Payment = () => {
                         '&::-webkit-scrollbar': { height: 8 },
                         '&::-webkit-scrollbar-thumb': {
                           backgroundColor: '#ccc',
-                          borderRadius: 4,
-                        },
+                          borderRadius: 4
+                        }
                       }}
                     >
                       {coupons.map(coupon => (
@@ -644,7 +645,7 @@ const Payment = () => {
                     fontSize: '1rem',
                     backgroundColor: '#1A3C7B',
                     color: '#fff',
-                    '&:hover': { backgroundColor: '#3f51b5' },
+                    '&:hover': { backgroundColor: '#3f51b5' }
                   }}
                   onClick={() => setConfirmOpen(true)}
                   disabled={orderLoading || selectedCartItems.length === 0}
@@ -698,7 +699,7 @@ const Payment = () => {
             sx={{
               backgroundColor: '#1A3C7B',
               color: '#fff',
-              '&:hover': { backgroundColor: '#3f51b5' },
+              '&:hover': { backgroundColor: '#3f51b5' }
             }}
           >
             Xác nhận
@@ -709,4 +710,4 @@ const Payment = () => {
   )
 }
 
-export default Payment  
+export default Payment
