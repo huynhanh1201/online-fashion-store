@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState } from 'react'
 import {
   Box,
   Typography,
@@ -9,11 +9,11 @@ import {
   Avatar,
   IconButton,
   Button,
-} from '@mui/material';
-import { useParams, useNavigate } from 'react-router-dom';
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import { useOrderDetail } from '~/hooks/useOrderDetail';
-import ReviewModal from './modal/ReviewModal';
+} from '@mui/material'
+import { useParams, useNavigate } from 'react-router-dom'
+import ArrowBackIcon from '@mui/icons-material/ArrowBack'
+import { useOrderDetail } from '~/hooks/useOrderDetail'
+import ReviewModal from './modal/ReviewModal'
 
 // Định nghĩa các nhãn trạng thái đơn hàng
 const statusLabels = {
@@ -22,69 +22,73 @@ const statusLabels = {
   Shipped: ['Đã gửi hàng', 'primary'],
   Delivered: ['Đã giao', 'success'],
   Cancelled: ['Đã hủy', 'error'],
-};
+}
 
 const OrderDetail = () => {
-  const { orderId } = useParams();
-  const navigate = useNavigate();
-  const { order, items, loading, error } = useOrderDetail(orderId);
+  const { orderId } = useParams()
+  const navigate = useNavigate()
+  const { order, items, loading, error } = useOrderDetail(orderId)
 
-  // State cho modal - Đặt trước tất cả các return
-  const [openReviewModal, setOpenReviewModal] = useState(false);
+  // State cho modal
+  const [openReviewModal, setOpenReviewModal] = useState(false)
+  const [selectedItem, setSelectedItem] = useState(null)
 
   // Kiểm tra trạng thái loading, error hoặc không tìm thấy đơn hàng
-  if (loading) return <CircularProgress />;
-  if (error) return <Typography color="error">Lỗi: {error.message || 'Có lỗi xảy ra'}</Typography>;
-  if (!order) return <Typography>Không tìm thấy đơn hàng</Typography>;
+  if (loading) return <CircularProgress />
+  if (error) return <Typography color="error">Lỗi: {error.message || 'Có lỗi xảy ra'}</Typography>
+  if (!order) return <Typography>Không tìm thấy đơn hàng</Typography>
 
-  const [label, color] = statusLabels[order.status] || ['Không xác định', 'default'];
+  const [label, color] = statusLabels[order.status] || ['Không xác định', 'default']
 
   // Tính tổng tiền hàng và thành tiền
-  const totalProductsPrice = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-  const finalAmount = totalProductsPrice - (order.discountAmount || 0);
+  const totalProductsPrice = items.reduce((sum, item) => sum + (item.price * item.quantity), 0)
+  const finalAmount = totalProductsPrice - (order.discountAmount || 0)
   const formatPrice = (val) =>
     typeof val === 'number'
       ? val.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })
-      : '0₫';
+      : '0₫'
 
   // Logic hiển thị nút
-  const isPaid = order.paymentStatus === 'paid'; // Giả sử order.paymentStatus là 'paid' hoặc 'unpaid'
-  const isOrderCompleted = order.status === 'Delivered'; // Đơn hàng đã giao
-  const isOrderCancellable = ['Pending', 'Processing'].includes(order.status) && !isPaid; // Đơn hàng có thể hủy
+  const isPaid = order.paymentStatus === 'paid'
+  const isOrderCompleted = order.status === 'Delivered'
+  const isOrderCancellable = ['Pending', 'Processing'].includes(order.status) && !isPaid
 
   // Xử lý hủy đơn hàng
   const handleCancelOrder = async () => {
     try {
-      console.log('Hủy đơn hàng:', orderId);
-      navigate('/orders');
+      console.log('Hủy đơn hàng:', orderId)
+      navigate('/orders')
     } catch (err) {
-      console.error('Lỗi khi hủy đơn hàng:', err);
+      console.error('Lỗi khi hủy đơn hàng:', err)
     }
-  };
+  }
 
-  // Mở modal đánh giá
-  const handleReviewProduct = () => {
-    setOpenReviewModal(true);
-  };
+  // Mở modal đánh giá cho sản phẩm cụ thể
+  const handleReviewProduct = (item) => {
+    setSelectedItem(item)
+    setOpenReviewModal(true)
+  }
 
   // Đóng modal
   const handleCloseModal = () => {
-    setOpenReviewModal(false);
-  };
+    setOpenReviewModal(false)
+    setSelectedItem(null)
+  }
 
   // Xử lý submit đánh giá
   const handleSubmitReview = async (reviewData) => {
     try {
       const fullReviewData = {
         orderId,
+        productId: selectedItem?._id,
         ...reviewData,
-      };
-      console.log('Gửi đánh giá:', fullReviewData);
-      handleCloseModal();
+      }
+      console.log('Gửi đánh giá:', fullReviewData)
+      handleCloseModal()
     } catch (err) {
-      console.error('Lỗi khi gửi đánh giá:', err);
+      console.error('Lỗi khi gửi đánh giá:', err)
     }
-  };
+  }
 
   return (
     <Box maxWidth="lg" mx="auto" p={2} sx={{ minHeight: '70vh' }}>
@@ -121,15 +125,27 @@ const OrderDetail = () => {
                   x{item.quantity}
                 </Typography>
               </Box>
-              <Box textAlign="right">
-                <Typography variant="body1">{item.price?.toLocaleString('vi-VN')} ₫</Typography>
-                {item.originalPrice && item.originalPrice > item.price && (
-                  <Typography
-                    variant="body2"
-                    sx={{ textDecoration: 'line-through', color: 'text.secondary' }}
+              <Box textAlign="right" display="flex" alignItems="center" gap={2}>
+                <Box>
+                  <Typography variant="body1">{item.price?.toLocaleString('vi-VN')} ₫</Typography>
+                  {item.originalPrice && item.originalPrice > item.price && (
+                    <Typography
+                      variant="body2"
+                      sx={{ textDecoration: 'line-through', color: 'text.secondary' }}
+                    >
+                      {item.originalPrice?.toLocaleString('vi-VN')} ₫
+                    </Typography>
+                  )}
+                </Box>
+                {(isOrderCompleted || isPaid) && (
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    size="small"
+                    onClick={() => handleReviewProduct(item)}
                   >
-                    {item.originalPrice?.toLocaleString('vi-VN')} ₫
-                  </Typography>
+                    Đánh giá
+                  </Button>
                 )}
               </Box>
             </Box>
@@ -188,25 +204,16 @@ const OrderDetail = () => {
             Hủy đơn hàng
           </Button>
         )}
-        {(isOrderCompleted || isPaid) && (
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={handleReviewProduct}
-          >
-            Đánh giá sản phẩm
-          </Button>
-        )}
       </Box>
 
       <ReviewModal
         open={openReviewModal}
         onClose={handleCloseModal}
         onSubmit={handleSubmitReview}
-        orderItems={items}
+        orderItems={selectedItem ? [selectedItem] : []}
       />
     </Box>
-  );
-};
+  )
+}
 
-export default OrderDetail;
+export default OrderDetail 

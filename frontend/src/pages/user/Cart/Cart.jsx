@@ -42,6 +42,10 @@ const Cart = () => {
   const [fetchingVariants, setFetchingVariants] = useState(new Set()) // Track ongoing fetches
   const [isFetchingInventories, setIsFetchingInventories] = useState(false) // Loading state for inventory fetching
 
+
+  const [deleteMode, setDeleteMode] = useState('') // 'single' | 'all'
+  const [itemToDelete, setItemToDelete] = useState(null)
+
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'auto' })
   }, [])
@@ -150,8 +154,20 @@ const Cart = () => {
       ? val.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })
       : '0₫'
 
+  const [isWaiting, setIsWaiting] = React.useState(false);
+
+  const handleQuantityChangeWithDelay = async (variantId, delta) => {
+    if (isWaiting || isFetchingInventories) return;
+    setIsWaiting(true);
+
+    try {
+      await handleQuantityChange(variantId, delta);
+    } finally {
+      setTimeout(() => setIsWaiting(false), 500);
+    }
+  };
   const handleQuantityChange = async (variantId, delta) => {
-    if (isFetchingInventories) return // Prevent quantity changes during fetching
+    if (isFetchingInventories) return
 
     const item = cartItems.find(i => i.variant._id === variantId)
     if (!item) return
@@ -167,7 +183,13 @@ const Cart = () => {
     }
 
     try {
+      // Gọi API để cập nhật số lượng
       await updateItem(variantId, { quantity: delta })
+
+      // Tạo một Promise để delay chỉ cho sản phẩm cụ thể
+      await new Promise(resolve => setTimeout(resolve, 500))
+
+      // Cập nhật cartItems cho sản phẩm cụ thể
       setCartItems(prevItems =>
         prevItems.map(i =>
           i.variant._id === variantId
@@ -175,7 +197,8 @@ const Cart = () => {
             : i
         )
       )
-      // Sync quantity with selectedItems
+
+      // Cập nhật selectedItems cho sản phẩm cụ thể
       setSelectedItems(prev =>
         prev.map(i =>
           i.variantId === variantId ? { ...i, quantity: newQty } : i
@@ -185,7 +208,6 @@ const Cart = () => {
       console.error('Lỗi cập nhật số lượng:', error)
     }
   }
-
   const handleRemove = async ({ variantId }) => {
     try {
       const res = await deleteItem({ variantId })
@@ -412,8 +434,8 @@ const Cart = () => {
                     <Box display='flex' alignItems='center' justifyContent='center'>
                       <IconButton
                         size='small'
-                        onClick={() => handleQuantityChange(variant._id, -1)}
-                        disabled={isFetchingInventories || item.quantity <= 1}
+                        onClick={() => handleQuantityChangeWithDelay(variant._id, -1)}
+                        disabled={isFetchingInventories || item.quantity <= 1 || isWaiting}
                         aria-label='Giảm số lượng'
                       >
                         <Remove />
@@ -429,28 +451,28 @@ const Cart = () => {
                       />
                       <IconButton
                         size='small'
-                        onClick={() => handleQuantityChange(variant._id, 1)}
-                        disabled={isFetchingInventories || item.quantity >= (inventoryQuantities[variant._id] || 99)}
+                        onClick={() => handleQuantityChangeWithDelay(variant._id, 1)}
+                        disabled={isFetchingInventories || item.quantity >= (inventoryQuantities[variant._id] || 99) || isWaiting}
                         aria-label='Tăng số lượng'
                       >
                         <Add />
                       </IconButton>
                     </Box>
                   </TableCell>
+
+
                   <TableCell align='center'>
                     <IconButton
-                      sx={{
-                        color: '#3f51b5',
-                        '&:hover': {
-                          backgroundColor: 'rgba(63, 81, 181, 0.1)',
-                          color: '#2a3eb1'
-                        }
+                      color='error'
+                      onClick={() => {
+                        setDeleteMode('single')
+                        setItemToDelete(variant)
+                        setConfirmClearOpen(true)
                       }}
-                      onClick={() => handleRemove({ variantId: variant._id })}
-                      aria-label='Xoá sản phẩm'
                     >
                       <Delete />
                     </IconButton>
+
                   </TableCell>
                 </TableRow>
               )
@@ -470,13 +492,24 @@ const Cart = () => {
       >
         <Box>
           <Typography variant='h6' sx={{ flexGrow: 1, color: '#222', fontWeight: 700 }}>
-            Thành tiền: {formatPrice(totalPrice - discountAmount)}
+            Tổng tiền: {formatPrice(totalPrice)}
           </Typography>
         </Box>
         <Box display='flex' gap={2}>
           <Button
-            variant='contained'
             color='primary'
+            sx={{
+              backgroundColor: '#1A3C7B',
+              color: '#fff',
+              '&:hover': {
+                backgroundColor: '#3f51b5'
+              },
+              '&:disabled': {
+                backgroundColor: '#ccc',
+                color: '#666',
+                boxShadow: 'none'
+              }
+            }}
             disabled={selectedItems.length === 0}
             onClick={() => {
               navigate('/payment')
@@ -485,35 +518,48 @@ const Cart = () => {
             Thanh toán
           </Button>
           <Button
-            variant='outlined'
             color='error'
-            startIcon={<DeleteForever />}
-            onClick={() => setConfirmClearOpen(true)}
-            disabled={cartItems.length === 0}
+            onClick={() => {
+              setDeleteMode('all')
+              setConfirmClearOpen(true)
+            }}
           >
             Xoá toàn bộ
           </Button>
+
         </Box>
       </Box>
 
       <Dialog
         open={confirmClearOpen}
         onClose={() => setConfirmClearOpen(false)}
-        aria-labelledby='confirm-clear-title'
       >
-        <DialogTitle id='confirm-clear-title'>Xác nhận</DialogTitle>
+        <DialogTitle>Xác nhận</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            Bạn có chắc chắn muốn xoá toàn bộ sản phẩm trong giỏ hàng không?
+            {deleteMode === 'single'
+              ? 'Bạn có chắc chắn muốn xoá sản phẩm này không?'
+              : 'Bạn có chắc chắn muốn xoá toàn bộ sản phẩm trong giỏ hàng không?'}
           </DialogContentText>
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setConfirmClearOpen(false)}>Hủy</Button>
-          <Button sx={{ color: 'black' }} onClick={handleClearCart}>
+          <Button
+            sx={{ color: 'black' }}
+            onClick={() => {
+              if (deleteMode === 'single') {
+                handleRemove({ variantId: itemToDelete._id })
+              } else {
+                handleClearCart()
+              }
+              setConfirmClearOpen(false)
+            }}
+          >
             Xoá
           </Button>
         </DialogActions>
       </Dialog>
+
 
       <Snackbar
         open={showMaxQuantityAlert}
