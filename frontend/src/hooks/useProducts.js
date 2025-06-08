@@ -19,12 +19,33 @@ const useProducts = (initialPage = 1, limit = 1000) => {
     setLoading(false)
     return product
   }
+  const fetchProductsByCategory = async (categoryName) => {
+    try {
+      setLoading(true)
+      setError(null)
+
+      const response = await getProducts(1, limit, { category: categoryName }) // tuỳ vào API backend
+      setProducts(response.products)
+      setTotalPages(Math.max(1, Math.ceil(response.total / limit)))
+    } catch (err) {
+      setError('Không thể tải sản phẩm theo danh mục: ' + err.message)
+    } finally {
+      setLoading(false)
+    }
+  }
   // useEffect(() => {
   //   fetchProducts(initialPage) // gọi khi hook được render lần đầu
   //   console.log('số trang', initialPage)
   // }, [initialPage])
 
-  return { products, totalPages, fetchProducts, loading, fetchProductById }
+  return {
+    products,
+    totalPages,
+    fetchProducts,
+    loading,
+    fetchProductById,
+    fetchProductsByCategory
+  }
 }
 
 export default useProducts

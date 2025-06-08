@@ -1,58 +1,124 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import HeaderCategories from './HeaderCategories'
 import ProductSection from './ProductSection'
 import CollectionBanner from './CollectionBanner'
 import ComboSection from './ComboSection'
-
-const tabData = {
-  'Áo Thun': {
-    bannerImg: 'https://file.hstatic.net/1000360022/file/button5-01.jpg',
-    products: [
-      { name: 'Áo Thun Nam In Hình Disney...', exportprice: '290,000đ' },
-      { name: 'Áo Thun Nam In Hình Smokie...', exportprice: '290,000đ' },
-      { name: 'Áo Thun Nam In Rubber Fusion...', exportprice: '290,000đ' },
-      { name: 'Áo Thun Nam In The Pink Cat...', exportprice: '290,000đ' }
-    ]
-  },
-  'Áo Polo': {
-    bannerImg: 'https://file.hstatic.net/1000360022/file/background.jpg',
-    products: [
-      { name: 'Áo Thun Nam In Hình Disney...', exportprice: '290,000đ' },
-      { name: 'Áo Thun Nam In Hình Smokie...', exportprice: '290,000đ' },
-      { name: 'Áo Thun Nam In Rubber Fusion...', exportprice: '290,000đ' },
-      { name: 'Áo Thun Nam In The Pink Cat...', exportprice: '290,000đ' }
-    ]
-  },
-  'Áo Sơ Mi': {
-    bannerImg:
-      'https://file.hstatic.net/1000360022/file/2_copy__1__1024x1024.jpg',
-    products: [
-      { name: 'Áo Thun Nam In Hình Disney...', exportprice: '290,000đ' },
-      { name: 'Áo Thun Nam In Hình Smokie...', exportprice: '290,000đ' },
-      { name: 'Áo Thun Nam In Rubber Fusion...', exportprice: '290,000đ' },
-      { name: 'Áo Thun Nam In The Pink Cat...', exportprice: '290,000đ' }
-    ]
-  }
-}
+import { getCategories } from '~/services/categoryService'
+import { getProductsByCategory } from '~/services/productService'
 
 const ProductContent = () => {
-  const [activeTab, setActiveTab] = useState('Áo Thun')
-  const currentTabData = tabData[activeTab]
+  const [categories, setCategories] = useState([])
+  const [activeCategoryId, setActiveCategoryId] = useState(null)
+  const [products, setProducts] = useState([])
+
+  const [loadingCategories, setLoadingCategories] = useState(false)
+  const [loadingProducts, setLoadingProducts] = useState(false)
+  const [errorCategories, setErrorCategories] = useState(null)
+  const [errorProducts, setErrorProducts] = useState(null)
+
+  // Load danh mục khi component mount
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        setLoadingCategories(true)
+        setErrorCategories(null)
+
+        const { categories: fetchedCategories } = await getCategories(1, 1000)
+
+        if (!fetchedCategories || fetchedCategories.length === 0) {
+          throw new Error('Không có danh mục nào được tải')
+        }
+
+        setCategories(fetchedCategories)
+        // Set active category mặc định
+        setActiveCategoryId(fetchedCategories[0]._id)
+      } catch (err) {
+        setErrorCategories(err.message || 'Lỗi khi tải danh mục')
+      } finally {
+        setLoadingCategories(false)
+      }
+    }
+
+    fetchCategories()
+  }, [])
+
+  // Load sản phẩm khi activeCategoryId thay đổi
+  useEffect(() => {
+    if (!activeCategoryId) return
+
+    const fetchProducts = async () => {
+      try {
+        setLoadingProducts(true)
+        setErrorProducts(null)
+
+        console.log('Fetching products for category:', activeCategoryId)
+
+        const productsData = await getProductsByCategory(activeCategoryId)
+
+        console.log('Products data received:', productsData)
+
+        // Xử lý dữ liệu products
+        let productArray = []
+        if (productsData) {
+          if (Array.isArray(productsData)) {
+            productArray = productsData
+          } else if (
+            productsData.products &&
+            Array.isArray(productsData.products)
+          ) {
+            productArray = productsData.products
+          }
+        }
+
+        setProducts(productArray)
+
+        if (productArray.length === 0) {
+          console.warn('No products found for category:', activeCategoryId)
+        }
+      } catch (err) {
+        console.error('Error fetching products:', err)
+        setErrorProducts(err.message || 'Lỗi khi tải sản phẩm')
+        setProducts([])
+      } finally {
+        setLoadingProducts(false)
+      }
+    }
+
+    fetchProducts()
+  }, [activeCategoryId])
+
+  // Handler cho việc thay đổi category
+  const handleCategoryChange = (categoryId) => {
+    console.log('Category changed to:', categoryId)
+    setActiveCategoryId(categoryId)
+  }
+
+  if (loadingCategories) {
+    return <div>Đang tải danh mục...</div>
+  }
+
+  if (errorCategories) {
+    return <div style={{ color: 'red' }}>{errorCategories}</div>
+  }
+
+  const activeCategory =
+    categories.find((c) => c._id === activeCategoryId) || {}
 
   return (
     <div className='container' style={{ maxWidth: '1400px', margin: '0 auto' }}>
       <HeaderCategories
-        activeTab={activeTab}
-        setActiveTab={(tab) => {
-          setActiveTab(tab)
-        }}
+        categories={categories}
+        activeCategoryId={activeCategoryId}
+        onCategoryChange={handleCategoryChange}
       />
 
       <ProductSection
-        bannerImg={currentTabData.bannerImg}
-        bannerTitle={activeTab}
+        bannerImg={activeCategory.bannerImg || ''}
+        bannerTitle={activeCategory.name || ''}
         bannerDesc='Bộ sưu tập hot'
-        products={currentTabData.products}
+        products={products}
+        loading={loadingProducts}
+        error={errorProducts}
       />
 
       <CollectionBanner />

@@ -4,8 +4,9 @@ import { ArrowForward, ArrowBack } from '@mui/icons-material'
 
 const images = [
   'https://file.hstatic.net/1000360022/file/banner_trang_ch__pc__2048x813px__c3710b6015564c6d8cdac098c4a482d2.jpg',
-  'https://file.hstatic.net/1000360022/file/banner_web_desk__5_.jpg',
-  'https://file.hstatic.net/1000360022/file/banner_web_desk_copy_ea4e281a9290450d8b3e1eeb11e29a17.jpg'
+  'https://file.hstatic.net/1000360022/file/banner_web_desk_copy_ea4e281a9290450d8b3e1eeb11e29a17.jpg',
+  'https://file.hstatic.net/1000360022/file/banner_trang_ch__pc__2048x813px__11c095c817cf48bd99137aa5c555d2fa.jpg',
+  'https://file.hstatic.net/1000360022/file/banner_t3_pc1-2048x812.jpg'
 ]
 
 const Slider = () => {

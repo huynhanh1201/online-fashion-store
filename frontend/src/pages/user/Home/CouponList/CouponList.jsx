@@ -1,14 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import {
-  Box,
-  Card,
-  Typography,
-  Grid,
-  Button,
-  CircularProgress,
-  Tooltip
-} from '@mui/material'
-import { getDiscounts } from '~/services/discountService'
+import { getDiscounts } from '~/services/discountService.js'
 
 const CouponList = () => {
   const [coupons, setCoupons] = useState([])
@@ -17,19 +8,25 @@ const CouponList = () => {
 
   useEffect(() => {
     const fetchCoupons = async () => {
-      const { discounts } = await getDiscounts()
-      const latestCoupons = discounts
-        .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-        .slice(0, 4)
-      setCoupons(latestCoupons)
-      setLoading(false)
+      try {
+        const { discounts } = await getDiscounts()
+        const latestCoupons = discounts
+          .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+          .slice(0, 4)
+        setCoupons(latestCoupons)
+      } catch (error) {
+        console.error('Failed to fetch coupons:', error)
+      } finally {
+        setLoading(false)
+      }
     }
+
     fetchCoupons()
   }, [])
 
   const formatCurrencyShort = (value) => {
-    if (value >= 1_000_000) return `${(value / 1_000_000).toFixed(1)}Tr`
-    if (value >= 1_000) return `${(value / 1_000).toFixed(0)}K`
+    if (value >= 1_000_000) return `${Math.floor(value / 1_000_000)}Tr`
+    if (value >= 1_000) return `${Math.floor(value / 1_000)}K`
     return `${value.toLocaleString()}đ`
   }
 
@@ -39,272 +36,403 @@ const CouponList = () => {
     setTimeout(() => setCopiedCode(''), 1500)
   }
 
-  // Định nghĩa màu sắc cho từng loại voucher
-  const getVoucherColors = (index, coupon) => {
-    const colors = [
-      {
-        bg: 'linear-gradient(135deg, #87CEEB 0%, #4FC3F7 100%)',
-        text: '#1565C0'
-      }, // Blue
-      {
-        bg: 'linear-gradient(135deg, #E8F5E8 0%, #C8E6C9 100%)',
-        text: '#2E7D32'
-      }, // Green
-      {
-        bg: 'linear-gradient(135deg, #FFF3E0 0%, #FFE0B2 100%)',
-        text: '#F57C00'
-      }, // Orange
-      {
-        bg: 'linear-gradient(135deg, #F3E5F5 0%, #E1BEE7 100%)',
-        text: '#7B1FA2'
-      } // Purple
-    ]
-
-    // Nếu là free ship thì dùng màu xanh dương đậm
-    if (coupon.type === 'freeship' || coupon.amount === 0) {
-      return {
-        bg: 'linear-gradient(135deg, #1976D2 0%, #1565C0 100%)',
-        text: '#FFFFFF'
-      }
-    }
-
-    return colors[index % colors.length]
-  }
-
   if (loading) {
     return (
-      <Box display='flex' justifyContent='center' mt={5}>
-        <CircularProgress />
-      </Box>
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          padding: '80px 20px'
+        }}
+      >
+        <div className='spinner'></div>
+      </div>
     )
   }
 
   return (
-    <Box sx={{ p: 3 }}>
-      <Grid container spacing={2} justifyContent='center'>
-        {coupons.map((coupon, index) => {
-          const isPercent = coupon.type === 'percent'
-          const isFreeShip = coupon.type === 'freeship' || coupon.amount === 0
-          const colors = getVoucherColors(index, coupon)
+    <div className='coupon-container'>
+      <div className='coupon-wrapper'>
+        <div className='coupon-grid'>
+          {coupons.map((coupon) => {
+            const isPercent = coupon.type === 'percent'
+            const isFreeShip = coupon.type === 'freeship' || coupon.amount === 0
 
-          let valueText = ''
-          let mainText = ''
+            let mainText = ''
+            let conditionText = ''
 
-          if (isFreeShip) {
-            mainText = 'FREESHIP'
-            valueText = 'MỌI ĐƠN HÀNG'
-          } else if (isPercent) {
-            mainText = `${coupon.amount}%`
-            valueText = coupon.minOrderValue
-              ? `TỐI ĐA ${formatCurrencyShort(coupon.maxDiscountValue || coupon.amount * 1000)}`
-              : 'KHÔNG GIỚI HạN'
-          } else {
-            mainText = `${formatCurrencyShort(coupon.amount)}`
-            valueText = coupon.minOrderValue
-              ? `ĐƠN TỪ ${formatCurrencyShort(coupon.minOrderValue)}`
-              : 'MỌI ĐƠN HÀNG'
-          }
+            if (isFreeShip) {
+              mainText = 'FREESHIP'
+              conditionText = 'mọi đơn hàng'
+            } else if (isPercent) {
+              mainText = `${coupon.amount}%`
+              conditionText = `tối đa ${formatCurrencyShort(coupon.maxDiscountValue || coupon.amount * 10000)}`
+            } else {
+              mainText = formatCurrencyShort(coupon.amount)
+              conditionText = `đơn từ ${formatCurrencyShort(coupon.minOrderValue)}`
+            }
 
-          return (
-            <Grid item xs={12} sm={6} md={6} lg={4} key={coupon._id}>
-              <Card
-                sx={{
-                  borderRadius: '16px',
-                  overflow: 'hidden',
-                  background: colors.bg,
-                  boxShadow: '0 6px 20px rgba(0,0,0,0.12)',
-                  height: '125px',
-                  width: '100%',
-                  maxWidth: '380px',
-                  minWidth: '320px',
-                  position: 'relative',
-                  cursor: 'pointer',
-                  transition: 'all 0.3s ease',
-                  '&:hover': {
-                    transform: 'translateY(-4px)',
-                    boxShadow: '0 12px 32px rgba(0,0,0,0.2)'
-                  }
-                }}
-                onClick={() => handleCopy(coupon.code)}
-              >
-                {/* Voucher Label */}
-                <Box
-                  sx={{
-                    position: 'absolute',
-                    top: '12px',
-                    left: '16px',
-                    background: 'rgba(255,255,255,0.95)',
-                    borderRadius: '6px',
-                    padding: '4px 10px',
-                    transform: 'rotate(-8deg)',
-                    boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
-                  }}
-                >
-                  <Typography
-                    sx={{
-                      fontSize: '11px',
-                      fontWeight: 'bold',
-                      color: colors.text,
-                      letterSpacing: '0.8px'
-                    }}
-                  >
-                    VOUCHER
-                  </Typography>
-                </Box>
+            return (
+              <div key={coupon._id} className='coupon-card'>
+                <div className='coupon-header'>
+                  <div className='voucher-label'>VOUCHER</div>
+                  <div className='condition-text'>{conditionText}</div>
+                </div>
 
-                {/* Copy Button */}
-                <Tooltip
-                  title={
-                    copiedCode === coupon.code
-                      ? 'Đã sao chép'
-                      : 'Click để sao chép'
-                  }
-                >
-                  <Button
-                    sx={{
-                      position: 'absolute',
-                      top: '12px',
-                      right: '12px',
-                      minWidth: '32px',
-                      width: '32px',
-                      height: '32px',
-                      borderRadius: '8px',
-                      background: 'rgba(255,255,255,0.95)',
-                      color: colors.text,
-                      fontSize: '16px',
-                      fontWeight: 'bold',
-                      boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-                      '&:hover': {
-                        background: 'rgba(255,255,255,1)'
-                      }
-                    }}
+                <div className='main-value-section'>
+                  <div className='main-text'>{mainText}</div>
+                </div>
+
+                <div className='code-section'>
+                  <div className='code-info'>
+                    <div className='code-label'>
+                      Nhập mã: <span className='code-text'>{coupon.code}</span>
+                    </div>
+                  </div>
+                  <button
                     onClick={(e) => {
                       e.stopPropagation()
                       handleCopy(coupon.code)
                     }}
+                    className={`copy-button ${copiedCode === coupon.code ? 'copied' : ''}`}
                   >
-                    📋
-                  </Button>
-                </Tooltip>
+                    {copiedCode === coupon.code ? '✓ Đã copy' : 'Sao chép'}
+                  </button>
+                </div>
 
-                {/* Main Content */}
-                <Box
-                  sx={{
-                    height: '100%',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    textAlign: 'center',
-                    padding: '24px 20px',
-                    color: colors.text
-                  }}
-                >
-                  {/* Main Value */}
-                  <Typography
-                    sx={{
-                      fontSize: isFreeShip ? '32px' : '42px',
-                      fontWeight: '900',
-                      lineHeight: 1,
-                      marginBottom: '6px',
-                      textShadow: '0 2px 4px rgba(0,0,0,0.1)'
-                    }}
-                  >
-                    {mainText}
-                  </Typography>
+                {copiedCode === coupon.code && (
+                  <div className='success-notification'>Đã sao chép mã!</div>
+                )}
+              </div>
+            )
+          })}
+        </div>
+      </div>
 
-                  {/* Sub Text */}
-                  <Typography
-                    sx={{
-                      fontSize: '12px',
-                      fontWeight: '600',
-                      opacity: 0.9,
-                      letterSpacing: '0.5px',
-                      marginBottom: '12px'
-                    }}
-                  >
-                    {valueText}
-                  </Typography>
+      {/* Styles ở đây */}
+      <style>{`
+        .coupon-container {
+          padding: 20px 0;
+          background-color: #ffffff;
+          font-family:
+            -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
 
-                  {/* Code */}
-                  <Box
-                    sx={{
-                      background: 'rgba(255,255,255,0.95)',
-                      borderRadius: '16px',
-                      padding: '8px 16px',
-                      border: '2px dashed rgba(0,0,0,0.2)',
-                      boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
-                    }}
-                  >
-                    <Typography
-                      sx={{
-                        fontSize: '13px',
-                        fontWeight: 'bold',
-                        color: colors.text,
-                        letterSpacing: '1px'
-                      }}
-                    >
-                      {coupon.code}
-                    </Typography>
-                  </Box>
-                </Box>
+        .coupon-wrapper {
+          max-width: 1450px;
+          margin: 0 auto;
+          padding: 0 0px;
+        }
 
-                {/* Decorative circles */}
-                <Box
-                  sx={{
-                    position: 'absolute',
-                    left: '-12px',
-                    top: '50%',
-                    transform: 'translateY(-50%)',
-                    width: '24px',
-                    height: '24px',
-                    borderRadius: '50%',
-                    background: '#fff',
-                    boxShadow: 'inset 0 0 0 3px rgba(0,0,0,0.1)'
-                  }}
-                />
-                <Box
-                  sx={{
-                    position: 'absolute',
-                    right: '-12px',
-                    top: '50%',
-                    transform: 'translateY(-50%)',
-                    width: '24px',
-                    height: '24px',
-                    borderRadius: '50%',
-                    background: '#fff',
-                    boxShadow: 'inset 0 0 0 3px rgba(0,0,0,0.1)'
-                  }}
-                />
-              </Card>
-            </Grid>
-          )
-        })}
-      </Grid>
+        .coupon-grid {
+          display: grid;
+          grid-template-columns: repeat(4, 1fr);
+          gap: 16px;
+        }
 
-      {/* Thông báo sao chép */}
+        .coupon-card {
+          background-color: #ffffff;
+          border: 1px solid #e5e7eb;
+          border-radius: 6px;
+          overflow: hidden;
+          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+          transition: all 0.2s ease;
+          cursor: pointer;
+          position: relative;
+        }
 
-      <style jsx>{`
-        @keyframes fadeInOut {
-          0% {
+        .coupon-card:hover {
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+          transform: translateY(-2px);
+        }
+
+        .coupon-header {
+          padding: 12px 16px 8px 16px;
+          display: flex;
+          justify-content: space-between;
+          align-items: flex-start;
+          flex-wrap: wrap;
+          gap: 8px;
+        }
+
+        .voucher-label {
+          color: #475569;
+          border-radius: 4px;
+          font-size: 15px;
+          font-weight: 700;
+          letter-spacing: 0.5px;
+        }
+
+        .condition-text {
+          font-size: 12px;
+          color: #64748b;
+          font-weight: 800;
+          text-align: right;
+          flex-shrink: 0;
+        }
+
+        .main-value-section {
+          text-align: left;
+          padding: 0 7px 3px;
+        }
+
+        .main-text {
+          font-size: 27px;
+          font-weight: 700;
+          color: #1e40af;
+          line-height: 1.1;
+          margin-left: 12px;
+          word-break: break-word;
+        }
+
+        .currency-label {
+          font-size: 16px;
+          font-weight: 600;
+          margin-left: 2px;
+        }
+
+        .code-section {
+          padding: 12px 16px;
+          background-color: #f8fafc;
+          border-top: 1px solid #e5e7eb;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 8px;
+          flex-wrap: wrap;
+        }
+
+        .code-info {
+          flex: 1;
+          min-width: 0;
+        }
+
+        .code-label {
+          font-size: 12px;
+          color: #64748b;
+          margin-bottom: 4px;
+          font-weight: 500;
+          word-break: break-word;
+        }
+
+        .code-text {
+          color: #1e40af;
+          font-weight: 600;
+          font-family: monospace;
+        }
+
+        .copy-button {
+          background-color: #1a3c7b;
+          color: #ffffff;
+          border: #1a3c7b;
+          padding: 8px 16px;
+          border-radius: 6px;
+          font-size: 12px;
+          font-weight: 600;
+          cursor: pointer;
+          transition: all 0.2s ease;
+          min-width: 70px;
+          white-space: nowrap;
+          flex-shrink: 0;
+        }
+
+        .copy-button:hover {
+          background-color: white;
+          color: #1a3c7b;
+        }
+
+        .copy-button.copied {
+          background-color: #10b981;
+        }
+
+        .copy-button.copied:hover {
+          background-color: #10b981;
+        }
+
+        .success-notification {
+          position: absolute;
+          top: 1px;
+          left: 50%;
+          transform: translateX(-50%);
+          background-color: #10b981;
+          color: #ffffff;
+          padding: 6px 12px;
+          border-radius: 6px;
+          font-size: 11px;
+          font-weight: 600;
+          white-space: nowrap;
+          z-index: 10;
+          box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+          animation: slideUp 0.3s ease-out;
+        }
+
+        .spinner {
+          width: 48px;
+          height: 48px;
+          border: 3px solid #f3f4f6;
+          border-top: 3px solid #1d4ed8;
+          border-radius: 50%;
+          animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+          to {
+            transform: rotate(360deg);
+          }
+        }
+
+        @keyframes slideUp {
+          from {
             opacity: 0;
             transform: translateX(-50%) translateY(10px);
           }
-          20% {
+          to {
             opacity: 1;
             transform: translateX(-50%) translateY(0);
           }
-          80% {
-            opacity: 1;
-            transform: translateX(-50%) translateY(0);
+        }
+
+        /* Tablet landscape and smaller desktop */
+        @media (max-width: 1200px) {
+          .coupon-wrapper {
+            max-width: 100%;
+            padding: 0 20px;
           }
-          100% {
-            opacity: 0;
-            transform: translateX(-50%) translateY(-10px);
+        }
+
+        /* Tablet */
+        @media (max-width: 1024px) {
+          .coupon-grid {
+            grid-template-columns: repeat(3, 1fr);
+            gap: 14px;
+          }
+
+          .main-text {
+            font-size: 24px;
+          }
+
+          .voucher-label {
+            font-size: 14px;
+          }
+        }
+
+        /* Small tablet */
+        @media (max-width: 768px) {
+          .coupon-grid {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+          }
+
+          .coupon-wrapper {
+            padding: 0 16px;
+          }
+
+          .coupon-header {
+            padding: 10px 12px 6px 12px;
+          }
+
+          .main-text {
+            font-size: 22px;
+            margin-left: 10px;
+          }
+
+          .code-section {
+            padding: 10px 12px;
+          }
+
+          .copy-button {
+            padding: 6px 12px;
+            font-size: 11px;
+            min-width: 60px;
+          }
+        }
+
+        /* Mobile */
+        @media (max-width: 480px) {
+          .coupon-grid {
+            grid-template-columns: 1fr;
+            gap: 12px;
+          }
+
+          .coupon-container {
+            padding: 16px 0;
+          }
+
+          .coupon-wrapper {
+            padding: 0 12px;
+          }
+
+          .coupon-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 4px;
+            padding: 12px 14px 8px 14px;
+          }
+
+          .condition-text {
+            text-align: left;
+            align-self: flex-start;
+          }
+
+          .main-text {
+            font-size: 28px;
+            margin-left: 12px;
+          }
+
+          .code-section {
+            flex-direction: column;
+            align-items: stretch;
+            gap: 8px;
+            padding: 12px 14px;
+          }
+
+          .copy-button {
+            width: 100%;
+            justify-self: stretch;
+            padding: 10px;
+            font-size: 12px;
+            min-width: auto;
+          }
+
+          .code-label {
+            margin-bottom: 0;
+          }
+        }
+
+        /* Very small mobile */
+        @media (max-width: 360px) {
+          .coupon-wrapper {
+            padding: 0 8px;
+          }
+
+          .main-text {
+            font-size: 24px;
+          }
+
+          .voucher-label {
+            font-size: 13px;
+          }
+
+          .condition-text {
+            font-size: 11px;
+          }
+        }
+
+        /* Landscape mobile */
+        @media (max-width: 768px) and (orientation: landscape) {
+          .coupon-grid {
+            grid-template-columns: repeat(3, 1fr);
+          }
+        }
+
+        @media (max-width: 480px) and (orientation: landscape) {
+          .coupon-grid {
+            grid-template-columns: repeat(2, 1fr);
           }
         }
       `}</style>
-    </Box>
+    </div>
   )
 }
 

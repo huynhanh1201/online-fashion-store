@@ -151,23 +151,6 @@ const Product = () => {
       setFilteredProducts([])
       return
     }
-
-    console.log(
-      'Sản phẩm:',
-      allProducts.map((p) => ({
-        _id: p._id,
-        name: p.name,
-        categoryId: p.categoryId,
-        price: p.price
-      }))
-    ) // Debug
-    console.log(
-      'Danh mục:',
-      categories.map((c) => ({ _id: c._id, name: c.name }))
-    ) // Debug
-    console.log('Danh mục đã chọn:', selectedCategories) // Debug
-    console.log('Khoảng giá đã chọn:', selectedPriceRanges) // Debug
-
     let filtered = [...allProducts]
 
     if (selectedCategories.length) {

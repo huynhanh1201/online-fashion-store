@@ -37,32 +37,35 @@ const styles = {
   }
 }
 
-const HeaderCategories = ({ activeTab, setActiveTab }) => {
-  const tabs = ['Áo Thun', 'Áo Polo', 'Áo Sơ Mi']
-  const [prevTab, setPrevTab] = useState(null)
+const HeaderCategories = ({
+  categories,
+  activeCategoryId,
+  onCategoryChange
+}) => {
+  const [prevCategoryId, setPrevCategoryId] = useState(null)
 
-  const handleClick = (tab) => {
-    if (tab !== activeTab) {
-      setPrevTab(activeTab)
-      setActiveTab(tab)
+  const handleClick = (categoryId) => {
+    if (categoryId !== activeCategoryId) {
+      setPrevCategoryId(activeCategoryId)
+      onCategoryChange(categoryId) // Gọi callback để thông báo cho parent component
     }
   }
 
   return (
     <div style={styles.container}>
-      {tabs.map((tab) => {
-        const isActive = tab === activeTab
-        const isPrev = tab === prevTab
+      {categories.map((cat) => {
+        const isActive = cat._id === activeCategoryId
+        const isPrev = cat._id === prevCategoryId
         return (
           <span
-            key={tab}
-            onClick={() => handleClick(tab)}
+            key={cat._id}
+            onClick={() => handleClick(cat._id)}
             style={{
               ...styles.itemBase,
               color: isActive ? '#1A3C7B' : '#666'
             }}
           >
-            {tab}
+            {cat.name}
             <span
               style={{
                 ...styles.underline,
