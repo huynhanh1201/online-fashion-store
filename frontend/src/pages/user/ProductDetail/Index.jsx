@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { Container, Grid, Typography, Button, Box } from '@mui/material'
 import { useParams } from 'react-router-dom'
-import useProductDetail from '~/pages/user/ProductDetail/useProductDetail'
+import useProductDetail from '~/hooks/useProductDetail'
 import ProductImageSection from './ProductImageSection'
 import ProductInfoSection from './ProductInfoSection'
 import ProductDescription from './ProductDescription'
