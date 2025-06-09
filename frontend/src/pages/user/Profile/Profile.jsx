@@ -1,5 +1,3 @@
-// ✅ Component Profile.jsx với sửa lỗi ObjectId & Toggle hiển thị mật khẩu
-
 import React, { useState, useEffect } from 'react'
 import {
   Box,
@@ -16,10 +14,11 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
-  IconButton
+  IconButton,
+  useTheme,
+  useMediaQuery
 } from '@mui/material'
 import UploadIcon from '@mui/icons-material/CloudUpload'
-import EmailIcon from '@mui/icons-material/Email'
 import PersonIcon from '@mui/icons-material/Person'
 import LockIcon from '@mui/icons-material/Lock'
 import VisibilityIcon from '@mui/icons-material/Visibility'
@@ -48,6 +47,9 @@ const uploadToCloudinary = async (file) => {
 }
 
 const Profile = () => {
+  const theme = useTheme()
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'))
+
   const [tab, setTab] = useState(0)
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
@@ -171,7 +173,6 @@ const Profile = () => {
       }
 
       const result = await changePassword(payload)
-      console.log('Phản hồi từ API:', result)
 
       setLoading(false)
 
@@ -183,7 +184,6 @@ const Profile = () => {
       }
     } catch (error) {
       setLoading(false)
-      console.error('Lỗi khi gọi API:', error)
       showSnackbar(
         'Lỗi hệ thống: ' + (error?.response?.data?.message || error.message),
         'error'
@@ -212,93 +212,112 @@ const Profile = () => {
       sx={{
         minHeight: '100vh',
         bgcolor: '#f5f5f5',
-        p: 4,
+        p: isMobile ? 2 : 4,
         display: 'flex',
-        gap: 4
+        flexDirection: isMobile ? 'column' : 'row',
+        gap: 4,
+        alignItems: isMobile ? 'stretch' : 'flex-start'
       }}
     >
-      <Paper elevation={3} sx={{ width: 350, p: 3, borderRadius: 2 }}>
-        <Tabs value={tab} onChange={handleTabChange} orientation='vertical'>
-          <Tab icon={<PersonIcon />} label='Tài khoản' />
-        </Tabs>
-
-        {tab === 0 && (
-          <Box>
-            {loading ? (
-              <Typography>Đang cập nhật ...</Typography>
-            ) : (
-              <>
-                <Box sx={{ textAlign: 'center', mb: 3 }}>
-                  <Avatar
-                    src={avatarPreview}
-                    sx={{ width: 100, height: 100, mx: 'auto', mb: 2 }}
-                  />
-                  <Button
-                    startIcon={<UploadIcon />}
-                    component='label'
-                    variant='outlined'
-                  >
-                    Chọn ảnh
-                    <input
-                      hidden
-                      accept='image/*'
-                      type='file'
-                      onChange={handleImageChange}
-                    />
-                  </Button>
-                </Box>
-                <TextField
-                  fullWidth
-                  label='Email'
-                  value={email}
-                  disabled
-                  sx={{ mb: 2 }}
-                />
-                <TextField
-                  fullWidth
-                  label='Tên'
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  error={!name.trim() || name.trim().length < 3}
-                  helperText={
-                    !name.trim()
-                      ? 'Không được để trống'
-                      : name.trim().length < 3
-                        ? 'Ít nhất 3 ký tự'
-                        : ''
-                  }
+      <Paper
+        elevation={3}
+        sx={{
+          width: isMobile ? '100%' : 350,
+          p: 3,
+          borderRadius: 2,
+          display: 'flex',
+          flexDirection: isMobile ? 'row' : 'column'
+        }}
+      >
+        <Box
+          sx={{
+            flexGrow: 1,
+            mt: isMobile ? 0 : 2,
+            ml: isMobile ? 2 : 0,
+            width: '100%'
+          }}
+        >
+          {loading ? (
+            <Typography>Đang cập nhật ...</Typography>
+          ) : (
+            <>
+              <Box sx={{ textAlign: 'center', mb: 3 }}>
+                <Avatar
+                  src={avatarPreview}
+                  sx={{ width: 100, height: 100, mx: 'auto', mb: 2 }}
                 />
                 <Button
-                  fullWidth
-                  variant='contained'
-                  sx={{ mt: 3 }}
-                  onClick={handleUpdate}
-                >
-                  {loading ? 'Đang cập nhật...' : 'Cập nhật'}
-                </Button>
-                <Button
-                  fullWidth
+                  startIcon={<UploadIcon />}
+                  component='label'
                   variant='outlined'
-                  startIcon={<LockIcon />}
-                  sx={{ mt: 2 }}
-                  onClick={handleOpenPasswordDialog}
                 >
-                  Đổi mật khẩu
+                  Chọn ảnh
+                  <input
+                    hidden
+                    accept='image/*'
+                    type='file'
+                    onChange={handleImageChange}
+                  />
                 </Button>
-              </>
-            )}
-          </Box>
-        )}
+              </Box>
+              <TextField
+                fullWidth
+                label='Email'
+                value={email}
+                disabled
+                sx={{ mb: 2 }}
+              />
+              <TextField
+                fullWidth
+                label='Tên'
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                error={!name.trim() || name.trim().length < 3}
+                helperText={
+                  !name.trim()
+                    ? 'Không được để trống'
+                    : name.trim().length < 3
+                      ? 'Ít nhất 3 ký tự'
+                      : ''
+                }
+              />
+              <Button
+                fullWidth
+                variant='contained'
+                sx={{ mt: 3 }}
+                onClick={handleUpdate}
+                disabled={loading}
+              >
+                {loading ? 'Đang cập nhật...' : 'Cập nhật'}
+              </Button>
+              <Button
+                fullWidth
+                variant='outlined'
+                startIcon={<LockIcon />}
+                sx={{ mt: 2 }}
+                onClick={handleOpenPasswordDialog}
+              >
+                Đổi mật khẩu
+              </Button>
+            </>
+          )}
+        </Box>
       </Paper>
 
-      <Box>
+      <Box sx={{ flexGrow: 1 }}>
         <ShippingAdress />
       </Box>
 
-      <Dialog open={openPasswordDialog} onClose={() => {}} disableEscapeKeyDown>
+      <Dialog
+        open={openPasswordDialog}
+        onClose={() => {}}
+        disableEscapeKeyDown
+        fullWidth
+        maxWidth='xs'
+      >
         <DialogTitle>Đổi mật khẩu</DialogTitle>
         <DialogContent>
-          {['old', 'new', 'confirm'].map((field, index) => (
+          {['old', 'new', 'confirm'].map((field) => (
             <TextField
               key={field}
               label={
@@ -362,9 +381,9 @@ const Profile = () => {
 
       <Snackbar
         open={snackbarOpen}
-        autoHideDuration={3000}
+        autoHideDuration={4000}
         onClose={handleCloseSnackbar}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
       >
         <Alert
           onClose={handleCloseSnackbar}

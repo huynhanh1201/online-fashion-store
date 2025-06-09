@@ -21,7 +21,7 @@ import { useDispatch } from 'react-redux'
 import { setCartItems } from '~/redux/cart/cartSlice'
 import ProductCard from '~/components/ProductCards/ProductCards'
 
-const PRODUCTS_PER_PAGE = 4
+const PRODUCTS_PER_PAGE = 10
 const CustomSelect = styled(Select)(({ theme }) => ({
   '& .MuiSelect-select': {
     padding: '8px 32px 8px 12px', // Điều chỉnh padding
@@ -189,7 +189,7 @@ const Product = () => {
           </Typography>
         ) : (
           <>
-            <Grid container spacing={3} justifyContent='start'>
+            <div className='product-grid'>
               {paginatedProducts.map((product) => (
                 <Grid item xs={12} sm={6} md={4} lg={3} key={product._id}>
                   <ProductCard
@@ -199,7 +199,7 @@ const Product = () => {
                   />
                 </Grid>
               ))}
-            </Grid>
+            </div>
             <Box sx={{ mt: 4, display: 'flex', justifyContent: 'center' }}>
               <Pagination
                 count={totalPages}

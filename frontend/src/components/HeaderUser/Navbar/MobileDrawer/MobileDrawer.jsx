@@ -1,4 +1,3 @@
-// components/MobileDrawer.jsx
 import React from 'react'
 import {
   Box,
@@ -21,38 +20,27 @@ const MobileDrawer = ({ open, onClose }) => {
       }}
       sx={{
         display: { xs: 'block', md: 'none' },
-        '& .MuiDrawer-paper': { boxSizing: 'border-box', width: 250 }
+        '& .MuiDrawer-paper': { boxSizing: 'border-box', width: 280 }
       }}
     >
-      <Box sx={{ width: 250, p: 2 }}>
-        <Typography variant='h6' sx={{ p: 2, fontWeight: 700 }}>
+      <Box
+        sx={{
+          width: 280,
+          p: 2,
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 2
+        }}
+      >
+        <Typography variant='h6' sx={{ fontWeight: 700 }}>
           ICONDEWIM™
         </Typography>
+
         <Divider />
+
         <List>
           <ListItem button component='a' href='/product'>
             <ListItemText primary='Sản phẩm' />
-          </ListItem>
-          <ListItem button component='a' href='/ao-nam'>
-            <ListItemText primary='Áo Nam' />
-          </ListItem>
-          <ListItem button component='a' href='/quan-nam'>
-            <ListItemText primary='Quần Nam' />
-          </ListItem>
-          <ListItem button component='a' href='/login'>
-            <ListItemText primary='Đăng nhập' />
-          </ListItem>
-          <ListItem button component='a' href='/profile'>
-            <ListItemText primary='Hồ sơ' />
-          </ListItem>
-          <ListItem button component='a' href='/logout'>
-            <ListItemText primary='Đăng xuất' />
-          </ListItem>
-          <ListItem button component='a' href='/cart'>
-            <ListItemText primary='Giỏ hàng' />
-          </ListItem>
-          <ListItem button component='a' href='/orders'>
-            <ListItemText primary='Thông tin đơn hàng' />
           </ListItem>
         </List>
       </Box>

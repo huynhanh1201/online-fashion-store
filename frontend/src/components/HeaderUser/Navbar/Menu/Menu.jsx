@@ -29,16 +29,14 @@ const StyledButton = styled(Button)(({ theme }) => ({
 }))
 
 const CategoryButton = styled(Button)(({ theme }) => ({
-  width: '200px',
-  justifyContent: 'center',
-  padding: '10px 14px',
+  width: '100%',
+  justifyContent: 'start',
   color: theme.palette.text.primary,
-  fontWeight: 450,
+  fontWeight: 350,
   textTransform: 'none',
-  fontSize: '15px',
+  fontSize: '18px',
   transition: 'all 0.25s ease',
   '&:hover': {
-    transform: 'translateX(4px)',
     color: 'red'
   }
 }))
@@ -102,16 +100,7 @@ const Menu = () => {
   }
 
   const renderPopoverContent = () => (
-    <Box sx={{ p: 2, minWidth: 300 }}>
-      <Typography
-        variant='subtitle1'
-        fontWeight={700}
-        align='center'
-        sx={{ mb: 2 }}
-      >
-        TẤT CẢ DANH MỤC
-      </Typography>
-
+    <Box sx={{ p: 2 }}>
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
         {categories.map((cat) => (
           <CategoryButton
