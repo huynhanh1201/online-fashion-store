@@ -233,8 +233,9 @@ const useProductDetail = (productId) => {
     try {
       const response = await fetch(`http://localhost:8017/v1/inventories?variantId=${variantId}`)
       if (!response.ok) throw new Error(`Lỗi HTTP ${response.status}`)
-      const data = await response.json()
-      const inventory = Array.isArray(data) ? data[0] : data // nếu trả về danh sách
+      const result = await response.json()
+      const inventoryList = result.data
+      const inventory = Array.isArray(inventoryList) ? inventoryList[0] : inventoryList
       setInventory(inventory)
       console.log('Thông tin kho:', inventory)
     } catch (error) {
