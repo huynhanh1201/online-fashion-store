@@ -1,0 +1,15 @@
+import express from 'express'
+
+import { deliveriesValidation } from '~/validations/deliveriesValidation'
+import { deliveriesController } from '~/controllers/deliveriesController'
+import { authMiddleware } from '~/middlewares/authMiddleware'
+
+const Router = express.Router()
+
+// Tính phí giao hàng
+Router.route('/calculate-fee').post(
+  deliveriesValidation.deliveryGHN,
+  deliveriesController.getDelivery
+)
+
+export const deliveriesRoute = Router

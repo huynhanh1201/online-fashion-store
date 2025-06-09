@@ -28,5 +28,9 @@ export const env = {
   VNP_HASHSECRET: process.env.VNP_HASHSECRET,
   VNP_URL: process.env.VNP_URL,
   VNP_RETURN_URL: process.env.VNP_RETURN_URL,
-  VNP_IPN_URL: process.env.VNP_IPN_URL
+  VNP_IPN_URL: process.env.VNP_IPN_URL,
+
+  GHN_SHOP_ID: process.env.GHN_SHOP_ID,
+  GHN_TOKEN_API: process.env.GHN_TOKEN_API,
+  GHN_BASE_URL: process.env.GHN_BASE_URL
 }
