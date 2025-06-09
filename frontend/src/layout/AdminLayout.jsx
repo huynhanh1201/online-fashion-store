@@ -49,7 +49,12 @@ export default function AdminLayout() {
         onMenuClose={handleDrawerClose}
         profile={profile}
       />
-      <AdminDrawer open={open} onClose={handleDrawerClose} />
+      <AdminDrawer
+        open={open}
+        onClose={handleDrawerClose}
+        profile={profile}
+        onDrawerOpen={handleDrawerOpen}
+      />
       <AdminMenu
         anchorEl={anchorEl}
         isOpen={Boolean(anchorEl)}
@@ -58,6 +63,7 @@ export default function AdminLayout() {
           setOpenProfile(true)
           handleMenuClose()
         }}
+        profile={profile}
       />
       <ProfileModal
         fetchProfile={fetchProfile}

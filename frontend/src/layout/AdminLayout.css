@@ -15,15 +15,15 @@ a {
 .app-bar {
     position: fixed;
     z-index: 1201; /* Đảm bảo AppBar nằm trên Drawer */
-    transition: width 0.2s ease, margin 0.2s ease;
+    /*transition: width 0.2s ease, margin 0.2s ease;*/
     padding-right: 0 !important;
 }
 
 /* Khi Drawer mở */
 .app-bar.open {
     margin-left: 240px;
-    width: calc(100% - 260px);
-    transition: width 0.2s ease, margin 0.2s ease;
+    width: calc(100% - 260px) !important;
+    /*transition: width 0.2s ease, margin 0.2s ease;*/
 
 }
 
@@ -31,9 +31,9 @@ a {
 .main-content {
     flex-grow: 1;
     padding: 24px;
-    margin-left: 0;
-    transition: width 0.2s ease, margin 0.2s ease;
-    width: calc(100% - 260px);
+    margin-left: 80px;
+    /*transition: width 0.2s ease, margin 0.2s ease;*/
+    width: 100%;
     box-sizing: border-box;
 }
 
@@ -41,13 +41,12 @@ a {
 .main-content.open {
     width: calc(100% - 260px);
     /*margin-left: 240px;*/
-    transition: width 0.2s ease;
+    /*transition: width 0.2s ease;*/
 
 }
 
 /* Drawer */
 .drawer {
-    width: 0;
     flex-shrink: 0;
 }
 
@@ -56,14 +55,14 @@ a {
     width: 260px;
 }
 
+.admin-layout .app-bar {
+    margin-left: -80px;
+    width: calc(100% - 80px);
+    z-index: 9999;
+}
 .admin-layout.open .main-content {
     margin-left: 260px;
-    transition: margin 0.2s ease;
-}
-.admin-layout .app-bar {
-    margin-left: -260px;
-    width: 100%;
-    z-index: 9999;
+    /*transition: margin 0.2s ease;*/
 }
 /* Drawer paper */
 .drawer-paper {

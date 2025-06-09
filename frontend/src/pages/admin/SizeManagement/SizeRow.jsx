@@ -110,23 +110,33 @@ export default function SizeRow({ size, idx, handleOpenModal }) {
       </TableCell>
       <TableCell>{formatDateTime(size.createdAt)}</TableCell>
       <TableCell>{formatDateTime(size.updatedAt)}</TableCell>
-      <TableCell sx={{ width: '130px', maxWidth: '130px' }}>
-        <Stack direction='row' spacing={1} sx={styles.groupIcon}>
+      <TableCell
+        sx={{
+          width: '130px',
+          maxWidth: '130px',
+          padding: '0px',
+          textAlign: 'center'
+        }}
+      >
+        <Stack direction='row' sx={styles.groupIcon}>
           <IconButton
             onClick={() => handleOpenModal('view', size)}
             size='small'
+            color='primary'
           >
             <RemoveRedEyeIcon color='primary' />
           </IconButton>
           <IconButton
             onClick={() => handleOpenModal('edit', size)}
             size='small'
+            color='info'
           >
             <BorderColorIcon color='warning' />
           </IconButton>
           <IconButton
             onClick={() => handleOpenModal('delete', size)}
             size='small'
+            color='error'
           >
             <DeleteForeverIcon color='error' />
           </IconButton>

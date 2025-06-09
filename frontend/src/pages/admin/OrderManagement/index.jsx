@@ -117,11 +117,11 @@ const OrderManagement = () => {
         onDelete={handleOpenModalDelete} // truyền sự kiện mở modal xoá
       />
 
-      <OrderPagination
-        page={page}
-        totalPages={totalPages}
-        onPageChange={(e, val) => setPage(val)}
-      />
+      {/*<OrderPagination*/}
+      {/*  page={page}*/}
+      {/*  totalPages={totalPages}*/}
+      {/*  onPageChange={(e, val) => setPage(val)}*/}
+      {/*/>*/}
 
       <ViewOrderModal
         open={openViewModal}

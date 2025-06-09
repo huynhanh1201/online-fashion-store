@@ -104,21 +104,21 @@ export default React.memo(function UserRow({
                   size='small'
                   color='primary'
                 >
-                  <RemoveRedEyeIcon />
+                  <RemoveRedEyeIcon color='primary' />
                 </IconButton>
                 <IconButton
                   onClick={() => handleOpenModal('edit', user)}
                   size='small'
                   color='info'
                 >
-                  <BorderColorIcon />
+                  <BorderColorIcon color='warning' />
                 </IconButton>
                 <IconButton
                   onClick={() => handleOpenModal('delete', user)}
                   size='small'
                   color='error'
                 >
-                  <DeleteForeverIcon />
+                  <DeleteForeverIcon color='error' />
                 </IconButton>
               </Stack>
             </TableCell>

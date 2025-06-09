@@ -13,9 +13,9 @@ import {
   Chip,
   IconButton
 } from '@mui/material'
-import VisibilityIcon from '@mui/icons-material/Visibility'
-import EditIcon from '@mui/icons-material/Edit'
-import DeleteIcon from '@mui/icons-material/Delete'
+import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye'
+import BorderColorIcon from '@mui/icons-material/BorderColor'
+import DeleteForeverIcon from '@mui/icons-material/DeleteForever'
 import AddPartnerModal from '../modal/Partner/AddPartnerModal.jsx'
 import EditPartnerModal from '../modal/Partner/EditPartnerModal.jsx'
 import ViewPartnerModal from '../modal/Partner/ViewPartnerModal.jsx'
@@ -35,13 +35,40 @@ const PartnersTab = ({
   const getPartnerTypeLabel = (type) => {
     switch (type) {
       case 'supplier':
-        return <Chip label='Nhà cung cấp' color='primary' size='small' />
+        return (
+          <Chip
+            label='Nhà cung cấp'
+            color='primary'
+            size='large'
+            sx={{ width: '120px', fontWeight: '800' }}
+          />
+        )
       case 'customer':
-        return <Chip label='Khách hàng' color='success' size='small' />
+        return (
+          <Chip
+            label='Khách hàng'
+            color='success'
+            size='large'
+            sx={{ width: '120px', fontWeight: '800' }}
+          />
+        )
       case 'both':
-        return <Chip label='Khách hàng & NCC' color='warning' size='small' />
+        return (
+          <Chip
+            label='Khách hàng & NCC'
+            color='warning'
+            size='large'
+            sx={{ width: '137px', fontWeight: '800' }}
+          />
+        )
       default:
-        return <Chip label='Không xác định' size='small' />
+        return (
+          <Chip
+            label='Không xác định'
+            size='large'
+            sx={{ width: '120px', fontWeight: '800' }}
+          />
+        )
     }
   }
 
@@ -86,7 +113,14 @@ const PartnersTab = ({
   const handleCloseDeleteDialog = () => {
     setOpenDeleteDialog(false)
   }
-
+  const styles = {
+    groupIcon: {
+      display: 'flex',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      width: '100%'
+    }
+  }
   return (
     <Paper elevation={3} sx={{ p: 2 }}>
       <Box
@@ -106,14 +140,21 @@ const PartnersTab = ({
             <TableCell>STT</TableCell>
             <TableCell>Mã</TableCell>
             <TableCell>Tên</TableCell>
-            <TableCell>Loại</TableCell>
+            <TableCell sx={{ textAlign: 'center', width: '150px' }}>
+              Loại
+            </TableCell>
             <TableCell>SĐT</TableCell>
             <TableCell>Email</TableCell>
             <TableCell>Mã số thuế</TableCell>
             <TableCell>Địa chỉ</TableCell>
             <TableCell>Ngân hàng</TableCell>
             <TableCell>Ngày tạo</TableCell>
-            <TableCell align='center'>Hành động</TableCell>
+            <TableCell
+              align='center'
+              sx={{ minWidth: '130px', width: '130px', maxWidth: '130px' }}
+            >
+              Hành động
+            </TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -147,27 +188,27 @@ const PartnersTab = ({
                     ? new Date(partner.createdAt).toLocaleDateString()
                     : '---'}
                 </TableCell>
-                <TableCell align='center'>
+                <TableCell align='center' spacing={1} sx={styles.groupIcon}>
                   <IconButton
                     size='small'
                     color='primary'
                     onClick={() => handleViewPartner(partner)}
                   >
-                    <VisibilityIcon />
+                    <RemoveRedEyeIcon color='primary' />
                   </IconButton>
                   <IconButton
                     size='small'
                     color='info'
                     onClick={() => handleEditPartner(partner)}
                   >
-                    <EditIcon />
+                    <BorderColorIcon color='warning' />
                   </IconButton>
                   <IconButton
                     size='small'
                     color='error'
                     onClick={() => handleDeletePartner(partner)}
                   >
-                    <DeleteIcon />
+                    <DeleteForeverIcon color='error' />
                   </IconButton>
                 </TableCell>
               </TableRow>

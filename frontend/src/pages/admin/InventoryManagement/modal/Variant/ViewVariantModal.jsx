@@ -14,11 +14,8 @@ import {
   TableCell
 } from '@mui/material'
 
-const ViewVariantModal = ({ open, onClose, variant, products }) => {
+const ViewVariantModal = ({ open, onClose, variant }) => {
   if (!variant) return null
-
-  const product = products.find((p) => p.id === variant.productId)
-
   return (
     <Dialog open={open} onClose={onClose} maxWidth='sm' fullWidth>
       <DialogTitle>Chi tiết biến thể</DialogTitle>
@@ -29,33 +26,33 @@ const ViewVariantModal = ({ open, onClose, variant, products }) => {
               <TableCell>
                 <strong>SKU</strong>
               </TableCell>
-              <TableCell>{variant.sku || 'N/A'}</TableCell>
+              <TableCell>{variant?.sku || 'N/A'}</TableCell>
             </TableRow>
             <TableRow>
               <TableCell>
                 <strong>Tên biến thể</strong>
               </TableCell>
-              <TableCell>{variant.name || 'N/A'}</TableCell>
+              <TableCell>{variant?.name || 'N/A'}</TableCell>
             </TableRow>
             <TableRow>
               <TableCell>
                 <strong>Màu sắc</strong>
               </TableCell>
-              <TableCell>{variant.color?.name || 'N/A'}</TableCell>
+              <TableCell>{variant?.color?.name || 'N/A'}</TableCell>
             </TableRow>
             <TableRow>
               <TableCell>
                 <strong>Kích thước</strong>
               </TableCell>
-              <TableCell>{variant.size?.name || 'N/A'}</TableCell>
+              <TableCell>{variant?.size?.name || 'N/A'}</TableCell>
             </TableRow>
             <TableRow>
               <TableCell>
                 <strong>Giá nhập</strong>
               </TableCell>
               <TableCell>
-                {variant.importPrice
-                  ? `${Number(variant.importPrice).toLocaleString('vi-VN')}đ`
+                {variant?.importPrice
+                  ? `${Number(variant?.importPrice).toLocaleString('vi-VN')}đ`
                   : 'N/A'}
               </TableCell>
             </TableRow>
@@ -64,18 +61,16 @@ const ViewVariantModal = ({ open, onClose, variant, products }) => {
                 <strong>Giá bán</strong>
               </TableCell>
               <TableCell>
-                {variant.exportPrice
-                  ? `${Number(variant.exportPrice).toLocaleString('vi-VN')}đ`
+                {variant?.exportPrice
+                  ? `${Number(variant?.exportPrice).toLocaleString('vi-VN')}đ`
                   : 'N/A'}
               </TableCell>
             </TableRow>
             <TableRow>
               <TableCell>
-                <strong>Sản phẩm</strong>
+                <strong>Mã sản phẩm</strong>
               </TableCell>
-              <TableCell>
-                {variant.productName || product?.name || 'N/A'}
-              </TableCell>
+              <TableCell>{variant?.productCode || 'N/A'}</TableCell>
             </TableRow>
           </TableBody>
         </Table>

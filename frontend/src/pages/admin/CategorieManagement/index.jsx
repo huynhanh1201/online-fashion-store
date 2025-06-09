@@ -115,11 +115,11 @@ const CategoryManagement = () => {
         )}
       </React.Suspense>
 
-      <CategoryPagination
-        page={page}
-        totalPages={totalPages}
-        onPageChange={handleChangePage}
-      />
+      {/*<CategoryPagination*/}
+      {/*  page={page}*/}
+      {/*  totalPages={totalPages}*/}
+      {/*  onPageChange={handleChangePage}*/}
+      {/*/>*/}
     </>
   )
 }

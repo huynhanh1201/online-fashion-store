@@ -19,6 +19,7 @@ import TableBody from '@mui/material/TableBody'
 
 import dayjs from 'dayjs'
 import styleAdmin from '~/assets/StyleAdmin.jsx'
+import ArrowForwardIcon from '@mui/icons-material/ArrowForward'
 
 function ViewOrderModal({
   open,
@@ -161,7 +162,8 @@ function ViewOrderModal({
                           ? 'error'
                           : 'warning'
                     }
-                    size='small'
+                    size='large'
+                    sx={{ width: '120px', fontWeight: '800' }}
                   />
                 </TableCell>
               </TableRow>
@@ -181,16 +183,22 @@ function ViewOrderModal({
                             ? 'warning'
                             : 'success'
                       }
-                      size='small'
+                      size='large'
+                      sx={{ width: '120px', fontWeight: '800' }}
                     />
+
                     {getNextStatus(order.status) && (
-                      <Button
-                        variant='outlined'
-                        size='small'
-                        onClick={handleNextStatus}
-                      >
-                        Chuyển tiếp
-                      </Button>
+                      <>
+                        <Chip
+                          icon={<ArrowForwardIcon />}
+                          label={renderStatusLabel(getNextStatus(order.status))}
+                          variant='outlined'
+                          size='large'
+                          sx={{ width: '120px', fontWeight: '800' }}
+                          color='info'
+                          onClick={handleNextStatus}
+                        />
+                      </>
                     )}
                   </Stack>
                 </TableCell>
@@ -204,7 +212,8 @@ function ViewOrderModal({
                   <Chip
                     label={order.isDelivered ? 'Đã giao' : 'Chưa giao'}
                     color={order.isDelivered ? 'success' : 'default'}
-                    size='small'
+                    size='large'
+                    sx={{ width: '120px', fontWeight: '800' }}
                   />
                 </TableCell>
               </TableRow>
@@ -224,7 +233,7 @@ function ViewOrderModal({
                 <TableCell>
                   <strong>Tổng tiền</strong>
                 </TableCell>
-                <TableCell>{order.total.toLocaleString()}₫</TableCell>
+                <TableCell>{order.total.toLocaleString('vi-VN')}₫</TableCell>
               </TableRow>
 
               <TableRow>
@@ -303,12 +312,17 @@ function ViewOrderModal({
                   {orderDetails.map((item) => (
                     <TableRow key={item._id}>
                       <TableCell>{item.name || 'Không có tên'}</TableCell>
-                      <TableCell align='right'>{item.quantity}</TableCell>
                       <TableCell align='right'>
-                        {item.subtotal.toLocaleString()}₫
+                        {item.quantity.toLocaleString('vi-VN')}
                       </TableCell>
                       <TableCell align='right'>
-                        {(item.subtotal * item.quantity).toLocaleString()}₫
+                        {item.subtotal.toLocaleString('vi-VN')}₫
+                      </TableCell>
+                      <TableCell align='right'>
+                        {(item.subtotal * item.quantity).toLocaleString(
+                          'vi-VN'
+                        )}
+                        ₫
                       </TableCell>
                     </TableRow>
                   ))}

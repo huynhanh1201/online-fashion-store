@@ -17,7 +17,7 @@ const ViewInventoryModal = ({ open, onClose, inventory }) => {
   const statusColor =
     inventory?.quantity <= inventory?.minQuantity ? 'error' : 'success'
   const statusLabel =
-    inventory?.quantity <= inventory?.minQuantity ? 'Cảnh báo' : 'Ổn định'
+    inventory?.quantity <= inventory?.minQuantity ? 'Cảnh báo' : 'Còn hàng'
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth='sm' fullWidth>
@@ -53,7 +53,8 @@ const ViewInventoryModal = ({ open, onClose, inventory }) => {
                     <Chip
                       label={statusLabel}
                       color={statusColor}
-                      size='small'
+                      size='large'
+                      sx={{ width: '120px', fontWeight: '800' }}
                     />
                   </TableCell>
                 </TableRow>
