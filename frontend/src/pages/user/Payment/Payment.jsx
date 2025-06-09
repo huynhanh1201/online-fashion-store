@@ -54,7 +54,7 @@ const ProductItem = ({ name, price, quantity, image, color, size }) => {
 
   return (
     <tr>
-      <td style={{ display: 'flex', alignItems: 'center', gap: 12, padding: 8 }}>
+      <td style={{ display: 'flex', alignItems: 'flex-start', gap: 12, padding: 8 }}>
         <img
           src={image || 'https://via.placeholder.com/64'}
           alt={name}
@@ -177,7 +177,6 @@ const Payment = () => {
             }
             return new Date(b.createdAt || new Date()) - new Date(a.createdAt || new Date())
           })
-          .slice(0, 4)
         setCoupons(validCoupons)
         setCouponLoading(false)
       } catch (error) {
@@ -188,7 +187,6 @@ const Payment = () => {
     }
     fetchCoupons()
   }, [subTotal])
-
   const formatCurrencyShort = (value) => {
     if (typeof value !== 'number') return '0'
     const units = [
