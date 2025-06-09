@@ -73,8 +73,9 @@ const Cart = () => {
         const fetchPromises = newVariantsToFetch.map(async variantId => {
           try {
             const res = await fetch(`http://localhost:8017/v1/inventories?variantId=${variantId}`)
-            const data = await res.json()
-            const inventory = Array.isArray(data) ? data[0] : data
+            const result = await res.json()
+            const inventoryList = result.data
+            const inventory = Array.isArray(inventoryList) ? inventoryList[0] : inventoryList
             return { variantId, quantity: inventory?.quantity ?? 0 }
           } catch (error) {
             console.error(`Lỗi lấy tồn kho cho variant ${variantId}:`, error)
