@@ -1,56 +1,224 @@
 import React from 'react'
-import { Link } from 'react-router-dom' // Thêm dòng này
-import '~/assets/ProductCard.css'
 
-const renderStars = (rating) => {
-  const fullStars = Math.floor(rating)
-  const hasHalfStar = rating % 1 !== 0
-  const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0)
+// Mock Link component
+const Link = ({ to, children, ...props }) => (
+  <a href={to} {...props}>
+    {children}
+  </a>
+)
 
-  return (
-    <span className='stars'>
-      {'★'.repeat(fullStars)}
-      {hasHalfStar && '☆'}
-      {'☆'.repeat(emptyStars)}
-    </span>
-  )
-}
+const ResponsiveProductCard = ({ product, isFlashSale = false }) => {
+  if (!product) {
+    return null // hoặc render một placeholder
+  }
 
-export default function ProductCard({ product }) {
   const quantity = Number(product.quantity) || 0
-  const inStock = quantity < 0
-  const productImage = product.image?.[0] || ''
+  const inStock = quantity > 0
 
   return (
-    <Link to={`/productdetail/${product._id}`} className='product-card-link'>
-      <div className='product-card'>
-        <div className='product-image-wrapper'>
-          <img src={productImage} alt={product.name} />
+    <Link
+      to={`/productdetail/${product._id}`}
+      style={styles.productCardLink}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.transform = 'translateY(-2px)'
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.transform = 'translateY(0)'
+      }}
+    >
+      <div
+        style={{
+          ...styles.productCard,
+          ...(isFlashSale ? styles.flashSaleCard : {})
+        }}
+      >
+        <div
+          style={styles.productImage}
+          onMouseEnter={(e) => {
+            const overlay = e.currentTarget.querySelector('.overlay')
+            overlay.style.opacity = '1'
+          }}
+          onMouseLeave={(e) => {
+            const overlay = e.currentTarget.querySelector('.overlay')
+            overlay.style.opacity = '0'
+          }}
+        >
+          <img
+            src={product.image}
+            alt={product.name}
+            style={{
+              ...styles.productImg,
+              ...(inStock ? {} : styles.outOfStockImg)
+            }}
+          />
           {product.discount > 0 && (
-            <div className='discount-badge'>-{product.discount}%</div>
+            <div style={styles.discountBadge}>-{product.discount}%</div>
           )}
+          <div className='overlay' style={styles.overlay}>
+            <button
+              style={styles.cartButton}
+              onClick={(e) => {
+                e.preventDefault()
+                e.stopPropagation()
+                alert(`Thêm ${product.name} vào giỏ hàng`)
+              }}
+            >
+              🛒
+            </button>
+          </div>
         </div>
 
-        <div className='product-content'>
-          <h3 className='product-name'>{product.name}</h3>
-          <div className='price-section'>
-            <span className='current-price'>
-              {product.exportPrice.toLocaleString()}₫
+        <div style={styles.productInfo}>
+          <h3 style={styles.productName}>{product.name}</h3>
+          <div style={styles.priceRow}>
+            <span style={styles.currentPrice}>
+              {(product.exportPrice ?? 0).toLocaleString()}₫
             </span>
+            {product.originalPrice && (
+              <span style={styles.originalPrice}>
+                {product.originalPrice.toLocaleString()}₫
+              </span>
+            )}
           </div>
-
-          <button
-            className='add-to-cart-btn'
-            disabled={false}
-            onClick={(e) => {
-              e.preventDefault() // Ngăn click vào button bị chuyển trang
-              // Thực hiện hành động thêm vào giỏ ở đây
-            }}
-          >
-            🛒 Thêm vào giỏ hàng
-          </button>
+          <div style={styles.productMeta}>
+            <div style={styles.rating}>
+              <span style={styles.star}>★</span>
+              <span>{product.rating}</span>
+            </div>
+            <span style={styles.sold}>Đã bán {product.sold || '0'}</span>
+          </div>
         </div>
       </div>
     </Link>
   )
 }
+
+const styles = {
+  productCardLink: {
+    textDecoration: 'none',
+    color: 'inherit',
+    display: 'block',
+    transition: 'transform 0.2s ease-in-out'
+  },
+  productCard: {
+    background: '#fff',
+    borderRadius: '12px',
+    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
+    overflow: 'hidden',
+    transition: 'all 0.3s ease',
+    border: '1px solid #f0f0f0',
+    height: '100%',
+    display: 'flex',
+    flexDirection: 'column',
+    position: 'relative'
+  },
+  flashSaleCard: {
+    border: '1px solid #ff6b6b',
+    position: 'relative'
+  },
+  productImage: {
+    position: 'relative',
+    width: '100%',
+    height: '300px',
+    overflow: 'hidden',
+    border: '8px solid white'
+  },
+  productImg: {
+    width: '100%',
+    height: '100%',
+    objectFit: 'cover',
+    transition: 'transform 0.3s ease'
+  },
+  overlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    background: 'rgba(0,0,0,0.4)',
+    opacity: 0,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    transition: 'opacity 0.3s ease'
+  },
+  cartButton: {
+    background: 'white',
+    border: 'none',
+    borderRadius: '50%',
+    padding: '10px 14px',
+    cursor: 'pointer',
+    fontSize: '20px',
+    boxShadow: '0 2px 6px rgba(0,0,0,0.3)',
+    transition: 'transform 0.2s ease'
+  },
+  discountBadge: {
+    position: 'absolute',
+    top: '12px',
+    left: '12px',
+    backgroundColor: '#ff4d4f',
+    color: 'white',
+    padding: '4px 8px',
+    fontSize: '12px',
+    fontWeight: '600',
+    borderRadius: '4px'
+  },
+  productInfo: {
+    padding: '10px',
+    flexGrow: 1,
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '8px'
+  },
+  productName: {
+    fontSize: '16px',
+    fontWeight: '500',
+    color: '#333',
+    lineHeight: '1.4',
+    display: '-webkit-box',
+    WebkitLineClamp: 2,
+    WebkitBoxOrient: 'vertical',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis'
+  },
+  priceRow: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '8px'
+  },
+  currentPrice: {
+    fontSize: '18px',
+    fontWeight: '700',
+    color: '#ff6b6b'
+  },
+  originalPrice: {
+    fontSize: '14px',
+    color: '#888',
+    textDecoration: 'line-through',
+    fontWeight: '500'
+  },
+  productMeta: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginTop: 'auto',
+    paddingTop: '8px'
+  },
+  rating: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '4px',
+    fontSize: '14px'
+  },
+  star: {
+    color: '#ffd700',
+    fontSize: '16px'
+  },
+  sold: {
+    fontSize: '13px',
+    color: '#888',
+    fontWeight: '500'
+  }
+}
+
+export default ResponsiveProductCard

@@ -3,8 +3,10 @@ import { Box, IconButton } from '@mui/material'
 import { ArrowForward, ArrowBack } from '@mui/icons-material'
 
 const images = [
-  'https://hellomida.vn/wp-content/uploads/2023/09/THU-DONG-2.jpg',
-  'https://hellomida.vn/wp-content/uploads/2023/09/banner-hlmd-1.jpg'
+  'https://file.hstatic.net/1000360022/file/banner_trang_ch__pc__2048x813px__c3710b6015564c6d8cdac098c4a482d2.jpg',
+  'https://file.hstatic.net/1000360022/file/banner_web_desk_copy_ea4e281a9290450d8b3e1eeb11e29a17.jpg',
+  'https://file.hstatic.net/1000360022/file/banner_trang_ch__pc__2048x813px__11c095c817cf48bd99137aa5c555d2fa.jpg',
+  'https://file.hstatic.net/1000360022/file/banner_t3_pc1-2048x812.jpg'
 ]
 
 const Slider = () => {
@@ -34,7 +36,7 @@ const Slider = () => {
       sx={{
         position: 'relative',
         width: '100%',
-        height: '622px',
+        height: { xs: 200, sm: 400, md: 622 }, // chiều cao responsive
         overflow: 'hidden'
       }}
     >
@@ -48,11 +50,12 @@ const Slider = () => {
         }}
       >
         {images.map((image, index) => (
-          <img
+          <Box
             key={index}
+            component='img'
             src={image}
             alt={`slide-${index}`}
-            style={{
+            sx={{
               width: `${100 / images.length}%`,
               height: '100%',
               objectFit: 'cover'
@@ -68,7 +71,8 @@ const Slider = () => {
           top: '50%',
           left: '10px',
           transform: 'translateY(-50%)',
-          backgroundColor: 'rgba(255, 255, 255, 0.6)'
+          backgroundColor: 'rgba(255, 255, 255, 0.6)',
+          '&:hover': { backgroundColor: 'rgba(255, 255, 255, 0.8)' }
         }}
       >
         <ArrowBack />
@@ -81,7 +85,8 @@ const Slider = () => {
           top: '50%',
           right: '10px',
           transform: 'translateY(-50%)',
-          backgroundColor: 'rgba(255, 255, 255, 0.6)'
+          backgroundColor: 'rgba(255, 255, 255, 0.6)',
+          '&:hover': { backgroundColor: 'rgba(255, 255, 255, 0.8)' }
         }}
       >
         <ArrowForward />
