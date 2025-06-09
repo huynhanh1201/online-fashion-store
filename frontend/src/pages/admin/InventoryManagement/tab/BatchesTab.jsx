@@ -13,10 +13,9 @@ import {
   Button,
   IconButton
 } from '@mui/material'
-import VisibilityIcon from '@mui/icons-material/Visibility'
-import EditIcon from '@mui/icons-material/Edit'
-import DeleteIcon from '@mui/icons-material/Delete'
-
+import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye'
+import BorderColorIcon from '@mui/icons-material/BorderColor'
+import DeleteForeverIcon from '@mui/icons-material/DeleteForever'
 import EditBatchModal from '../modal/Batch/EditBatchModal.jsx'
 import ViewBatchModal from '../modal/Batch/ViewBatchModal.jsx'
 import DeleteBatchModal from '../modal/Batch/DeleteBatchModal.jsx'
@@ -89,13 +88,6 @@ const BatchesTab = ({
     {
       id: 'manufactureDate',
       label: 'NSX',
-      minWidth: 130,
-      format: (value) =>
-        value ? new Date(value).toLocaleString('vi-VN') : 'Chờ cập nhật'
-    },
-    {
-      id: 'expiry',
-      label: 'HSD',
       minWidth: 130,
       format: (value) =>
         value ? new Date(value).toLocaleString('vi-VN') : 'Chờ cập nhật'
@@ -187,21 +179,21 @@ const BatchesTab = ({
                           size='small'
                           color='primary'
                         >
-                          <VisibilityIcon />
+                          <RemoveRedEyeIcon color='primary' />
                         </IconButton>
                         <IconButton
                           onClick={() => handleEditBatch(row)}
                           size='small'
                           color='info'
                         >
-                          <EditIcon />
+                          <BorderColorIcon color='warning' />
                         </IconButton>
                         <IconButton
                           onClick={() => handleDeleteBatch(row)}
                           size='small'
                           color='error'
                         >
-                          <DeleteIcon />
+                          <DeleteForeverIcon color='error' />
                         </IconButton>
                       </TableCell>
                     )

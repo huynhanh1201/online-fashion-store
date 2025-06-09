@@ -72,11 +72,11 @@ const TransactionManagement = () => {
         onDelete={handleOpenDelete}
       />
 
-      <TransactionPagination
-        page={page}
-        totalPages={1}
-        onPageChange={setPage}
-      />
+      {/*<TransactionPagination*/}
+      {/*  page={page}*/}
+      {/*  totalPages={1}*/}
+      {/*  onPageChange={setPage}*/}
+      {/*/>*/}
 
       {selectedTransaction && (
         <ViewTransactionModal

@@ -110,21 +110,21 @@ export default function ColorRow({ color, index, columns, handleOpenModal }) {
                   size='small'
                   color='primary'
                 >
-                  <RemoveRedEyeIcon />
+                  <RemoveRedEyeIcon color='primary' />
                 </IconButton>
                 <IconButton
                   onClick={() => handleOpenModal('edit', color)}
                   size='small'
                   color='info'
                 >
-                  <BorderColorIcon />
+                  <BorderColorIcon color='warning' />
                 </IconButton>
                 <IconButton
                   onClick={() => handleOpenModal('delete', color)}
                   size='small'
                   color='error'
                 >
-                  <DeleteForeverIcon />
+                  <DeleteForeverIcon color='error' />
                 </IconButton>
               </Stack>
             </TableCell>

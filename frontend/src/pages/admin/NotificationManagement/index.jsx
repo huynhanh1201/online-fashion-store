@@ -1,59 +1,92 @@
-// NotificationsPage.jsx
-import React, { useState } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import {
   Box,
   Typography,
   Avatar,
   Stack,
-  Divider,
   Chip,
-  Pagination
+  RadioGroup,
+  FormControlLabel,
+  Radio,
+  FormControl,
+  FormLabel,
+  Select,
+  MenuItem
 } from '@mui/material'
 import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import 'dayjs/locale/vi'
 dayjs.extend(relativeTime)
-dayjs.locale('vi') // set ngôn ngữ là tiếng Việt
+dayjs.locale('vi')
+
 const allNotifications = [
-  // Lặp giả dữ liệu nhiều thông báo để phân trang
-  ...Array(23)
+  ...Array(100)
     .fill(0)
     .map((_, i) => ({
       id: i + 1,
       type: i % 2 === 0 ? 'system' : 'user',
       title: `Thông báo #${i + 1}`,
       content: 'Đây là nội dung của thông báo mẫu.',
-      time: '2 tháng trước',
+      createdAt: dayjs().subtract(i, 'day').toISOString(),
       read: i % 3 === 0
     }))
 ]
 
 export default function NotificationManagement() {
   const [filter, setFilter] = useState('all')
-  const [page, setPage] = useState(1)
-  const pageSize = 10
+  const [readStatus, setReadStatus] = useState('all')
+  const [sortOrder, setSortOrder] = useState('desc')
+  const [displayCount, setDisplayCount] = useState(10)
+  const observerRef = useRef(null)
 
-  // const filtered = allNotifications.filter((n) =>
-  //   filter === 'all' ? true : n.type === filter
-  // )
   const filtered = allNotifications
     .filter((n) => (filter === 'all' ? true : n.type === filter))
-    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-  const paged = filtered.slice((page - 1) * pageSize, page * pageSize)
+    .filter((n) =>
+      readStatus === 'all' ? true : readStatus === 'read' ? n.read : !n.read
+    )
+    .sort((a, b) =>
+      sortOrder === 'desc'
+        ? new Date(b.createdAt) - new Date(a.createdAt)
+        : new Date(a.createdAt) - new Date(b.createdAt)
+    )
+
+  const visibleItems = filtered.slice(0, displayCount)
+
+  // IntersectionObserver để tự động tải thêm
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const target = entries[0]
+        if (target.isIntersecting) {
+          setDisplayCount((prev) => Math.min(prev + 10, filtered.length))
+        }
+      },
+      {
+        root: null,
+        rootMargin: '0px',
+        threshold: 1.0
+      }
+    )
+    if (observerRef.current) observer.observe(observerRef.current)
+
+    return () => {
+      if (observerRef.current) observer.unobserve(observerRef.current)
+    }
+  }, [filtered.length])
 
   return (
-    <Box p={3} fullWidth mx='auto'>
+    <Box p={3} mx='auto'>
       <Typography variant='h5' mb={2}>
         Tất cả thông báo
       </Typography>
 
-      <Stack direction='row' spacing={1} mb={2}>
+      <Stack direction='row' spacing={1} mb={2} flexWrap='wrap'>
         <Chip
           label='Tất cả'
           onClick={() => {
             setFilter('all')
-            setPage(1)
+            setDisplayCount(10)
           }}
           color={filter === 'all' ? 'primary' : 'default'}
         />
@@ -61,7 +94,7 @@ export default function NotificationManagement() {
           label='Hệ thống'
           onClick={() => {
             setFilter('system')
-            setPage(1)
+            setDisplayCount(10)
           }}
           color={filter === 'system' ? 'primary' : 'default'}
         />
@@ -69,16 +102,51 @@ export default function NotificationManagement() {
           label='Người dùng'
           onClick={() => {
             setFilter('user')
-            setPage(1)
+            setDisplayCount(10)
           }}
           color={filter === 'user' ? 'primary' : 'default'}
         />
       </Stack>
 
-      {paged.map((item) => (
+      <Stack direction='row' spacing={4} mb={2} alignItems='center'>
+        <FormControl component='fieldset'>
+          <FormLabel component='legend'>Trạng thái đọc</FormLabel>
+          <RadioGroup
+            row
+            value={readStatus}
+            onChange={(e) => {
+              setReadStatus(e.target.value)
+              setDisplayCount(10)
+            }}
+          >
+            <FormControlLabel value='all' control={<Radio />} label='Tất cả' />
+            <FormControlLabel value='read' control={<Radio />} label='Đã đọc' />
+            <FormControlLabel
+              value='unread'
+              control={<Radio />}
+              label='Chưa đọc'
+            />
+          </RadioGroup>
+        </FormControl>
+
+        <FormControl size='small'>
+          <FormLabel>Sắp xếp</FormLabel>
+          <Select
+            value={sortOrder}
+            onChange={(e) => {
+              setSortOrder(e.target.value)
+              setDisplayCount(10)
+            }}
+          >
+            <MenuItem value='desc'>Mới nhất</MenuItem>
+            <MenuItem value='asc'>Cũ nhất</MenuItem>
+          </Select>
+        </FormControl>
+      </Stack>
+
+      {visibleItems.map((item) => (
         <Box
           key={item.id}
-          mb={2}
           sx={{
             backgroundColor: item.read ? '#fafafa' : '#fff5f5',
             borderRadius: 2,
@@ -87,11 +155,7 @@ export default function NotificationManagement() {
             position: 'relative'
           }}
         >
-          <Stack
-            direction='row'
-            spacing={2}
-            sx={{ display: 'flex', alignItems: 'center' }}
-          >
+          <Stack direction='row' spacing={2} alignItems='center'>
             <Avatar>{item.type === 'system' ? 'S' : 'U'}</Avatar>
             <Box flex={1}>
               <Typography fontWeight='bold'>{item.title}</Typography>
@@ -109,12 +173,8 @@ export default function NotificationManagement() {
         </Box>
       ))}
 
-      <Pagination
-        count={Math.ceil(filtered.length / pageSize)}
-        page={page}
-        onChange={(e, value) => setPage(value)}
-        color='primary'
-      />
+      {/* Thẻ theo dõi cuối trang */}
+      <div ref={observerRef} style={{ height: '1px' }} />
     </Box>
   )
 }

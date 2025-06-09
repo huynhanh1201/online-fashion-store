@@ -100,9 +100,10 @@ const DiscountTable = ({
     { id: 'code', label: 'Mã giảm', minWidth: 150 },
     { id: 'type', label: 'Loại', minWidth: 100 },
     { id: 'amount', label: 'Giá trị giảm', minWidth: 120 },
+    { id: 'minOrderValue', label: 'Giá tối thiểu', minWidth: 100 },
     { id: 'usageLimit', label: 'SL tối đa', minWidth: 100 },
     { id: 'remaining', label: 'SL còn lại', minWidth: 100 },
-    { id: 'status', label: 'Trạng thái', minWidth: 120 },
+    { id: 'status', label: 'Trạng thái', minWidth: 150 },
     { id: 'validFrom', label: 'Ngày bắt đầu', minWidth: 180 },
     { id: 'validUntil', label: 'Ngày kết thúc', minWidth: 180 },
     { id: 'action', label: 'Hành động', minWidth: 130, align: 'center' }

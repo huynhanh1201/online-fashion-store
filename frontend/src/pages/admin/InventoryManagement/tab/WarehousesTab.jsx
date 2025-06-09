@@ -14,9 +14,9 @@ import {
   Button,
   IconButton
 } from '@mui/material'
-import VisibilityIcon from '@mui/icons-material/Visibility'
-import EditIcon from '@mui/icons-material/Edit'
-import DeleteIcon from '@mui/icons-material/Delete'
+import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye'
+import BorderColorIcon from '@mui/icons-material/BorderColor'
+import DeleteForeverIcon from '@mui/icons-material/DeleteForever'
 import AddWarehouseModal from '../modal/Warehouse/AddWarehouseModal.jsx'
 import EditWarehouseModal from '../modal/Warehouse/EditWarehouseModal.jsx'
 import ViewWarehouseModal from '../modal/Warehouse/ViewWarehouseModal.jsx'
@@ -142,21 +142,21 @@ const WarehousesTab = ({
                           size='small'
                           color='primary'
                         >
-                          <VisibilityIcon />
+                          <RemoveRedEyeIcon color='primary' />
                         </IconButton>
                         <IconButton
                           onClick={() => handleEditWarehouse(row)}
                           size='small'
                           color='info'
                         >
-                          <EditIcon />
+                          <BorderColorIcon color='warning' />
                         </IconButton>
                         <IconButton
                           onClick={() => handleDeleteWarehouse(row)}
                           size='small'
                           color='error'
                         >
-                          <DeleteIcon />
+                          <DeleteForeverIcon color='error' />
                         </IconButton>
                       </TableCell>
                     )

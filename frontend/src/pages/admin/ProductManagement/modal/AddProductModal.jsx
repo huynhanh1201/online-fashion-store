@@ -128,7 +128,12 @@ const AddProductModal = ({ open, onClose, onSuccess }) => {
       alert('Có lỗi xảy ra, vui lòng thử lại')
     }
   }
+  const formatNumber = (value) => {
+    const number = value.replace(/\D/g, '') // Xóa ký tự không phải số
+    return number.replace(/\B(?=(\d{3})+(?!\d))/g, '.') // Thêm dấu chấm ngăn cách
+  }
 
+  const parseNumber = (formatted) => formatted.replace(/\./g, '')
   return (
     <Dialog
       open={open}
@@ -236,7 +241,7 @@ const AddProductModal = ({ open, onClose, onSuccess }) => {
               </Typography>
             </FormControl>
           </Grid>
-          {/*Giá nhập*/}
+          {/* Giá nhập */}
           <Grid item size={4} style={{ marginTop: '16px' }}>
             <Controller
               name='importPrice'
@@ -245,13 +250,18 @@ const AddProductModal = ({ open, onClose, onSuccess }) => {
                 <TextField
                   label='Giá nhập'
                   fullWidth
-                  type='number'
-                  {...field}
+                  type='text'
+                  value={formatNumber(field.value || '')}
+                  onChange={(e) => {
+                    const rawValue = parseNumber(e.target.value)
+                    field.onChange(rawValue)
+                  }}
                 />
               )}
             />
           </Grid>
-          {/*Giá bán*/}
+
+          {/* Giá bán */}
           <Grid item size={4} style={{ marginTop: '16px' }}>
             <Controller
               name='price'
@@ -261,10 +271,14 @@ const AddProductModal = ({ open, onClose, onSuccess }) => {
                 <TextField
                   label='Giá bán'
                   fullWidth
-                  type='number'
+                  type='text'
+                  value={formatNumber(field.value || '')}
+                  onChange={(e) => {
+                    const rawValue = parseNumber(e.target.value)
+                    field.onChange(rawValue)
+                  }}
                   error={!!errors.price}
                   helperText={errors.price?.message}
-                  {...field}
                 />
               )}
             />

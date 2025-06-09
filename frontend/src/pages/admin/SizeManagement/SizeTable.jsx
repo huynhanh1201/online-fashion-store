@@ -57,6 +57,7 @@
 // }
 //
 // export default SizeTable
+
 import React from 'react'
 import {
   Table,
@@ -71,15 +72,20 @@ import {
   Box,
   Button
 } from '@mui/material'
-
-import StyleAdmin from '~/assets/StyleAdmin.jsx'
-
 import SizeRow from './SizeRow'
 import AddIcon from '@mui/icons-material/Add'
 
+const styles = {
+  buttonAdd: {
+    backgroundColor: '#001f5d',
+    color: '#fff',
+    marginBottom: '16px'
+  }
+}
+
 const SizeTable = ({
-  sizes,
-  loading,
+  sizes = [],
+  loading = false,
   page = 0,
   rowsPerPage = 10,
   handleOpenModal,
@@ -87,25 +93,21 @@ const SizeTable = ({
 }) => {
   const filteredSizes = sizes.filter((s) => !s.destroy)
 
-  const paginatedSizes = filteredSizes.slice(
-    page * rowsPerPage,
-    page * rowsPerPage + rowsPerPage
-  )
-  const styles = {
-    buttonAdd: {
-      backgroundColor: '#001f5d',
-      color: '#fff',
-      marginBottom: '16px'
-    }
-  }
+  const columns = [
+    { id: 'index', label: 'STT', minWidth: 50, align: 'center' },
+    { id: 'name', label: 'Tên kích thước', minWidth: 200 },
+    { id: 'createdAt', label: 'Ngày tạo', minWidth: 150 },
+    { id: 'updatedAt', label: 'Ngày cập nhật', minWidth: 150 },
+    { id: 'action', label: 'Hành động', minWidth: 130, align: 'center' }
+  ]
 
   return (
     <Paper sx={{ border: '1px solid #ccc', width: '100%', overflow: 'hidden' }}>
       <TableContainer>
-        <Table stickyHeader>
+        <Table stickyHeader aria-label='sizes table'>
           <TableHead>
             <TableRow>
-              <TableCell colSpan={5}>
+              <TableCell colSpan={columns.length}>
                 <Box
                   sx={{
                     display: 'flex',
@@ -128,52 +130,66 @@ const SizeTable = ({
               </TableCell>
             </TableRow>
             <TableRow>
-              <TableCell sx={StyleAdmin.TableColumnSTT}>STT</TableCell>
-              <TableCell sx={{ width: '50%' }}>Tên kích thước</TableCell>
-              <TableCell sx={{ width: '20%' }}>Ngày tạo</TableCell>
-              <TableCell sx={{ width: '20%' }}>Ngày cập nhật</TableCell>
-              <TableCell sx={{ width: '130px', maxWidth: '130px' }}>
-                Hành động
-              </TableCell>
+              {columns.map((column) => (
+                <TableCell
+                  key={column.id}
+                  align={column.align}
+                  sx={{
+                    minWidth: column.minWidth,
+                    ...(column.id === 'index' && { width: '50px' }),
+                    ...(column.id === 'action' && {
+                      width: '130px',
+                      maxWidth: '130px'
+                    }),
+                    ...(column.id === 'name' && { width: '70%' })
+                  }}
+                >
+                  {column.label}
+                </TableCell>
+              ))}
             </TableRow>
           </TableHead>
           <TableBody>
             {loading ? (
               <TableRow>
-                <TableCell colSpan={5} align='center'>
+                <TableCell colSpan={columns.length} align='center'>
                   Đang tải kích thước...
                 </TableCell>
               </TableRow>
-            ) : paginatedSizes.length === 0 ? (
-              <TableRow>
-                <TableCell colSpan={5} align='center'>
-                  Không có kích thước nào.
-                </TableCell>
-              </TableRow>
-            ) : (
-              paginatedSizes.map((size, idx) => (
+            ) : filteredSizes.length > 0 ? (
+              filteredSizes.map((size, idx) => (
                 <SizeRow
                   key={size._id}
                   size={size}
-                  idx={page * rowsPerPage + idx}
+                  idx={idx + 1}
+                  columns={columns}
                   handleOpenModal={handleOpenModal}
                 />
               ))
+            ) : (
+              <TableRow>
+                <TableCell colSpan={columns.length} align='center'>
+                  Không có kích thước nào.
+                </TableCell>
+              </TableRow>
             )}
           </TableBody>
         </Table>
       </TableContainer>
-
       <TablePagination
-        rowsPerPageOptions={[5, 10, 25]}
+        rowsPerPageOptions={[10, 25, 100]}
         component='div'
         count={filteredSizes.length}
         rowsPerPage={rowsPerPage}
         page={page}
         labelRowsPerPage='Số dòng mỗi trang'
-        labelDisplayedRows={({ from, to, count }) =>
-          `${from}–${to} trên ${count !== -1 ? count : `hơn ${to}`}`
-        }
+        labelDisplayedRows={({ from, to, count }) => {
+          const actualTo = to > count ? count : to
+          const actualFrom = from > count ? count : from
+          return `${actualFrom}–${actualTo} trên ${
+            count !== -1 ? count : `hơn ${actualTo}`
+          }`
+        }}
       />
     </Paper>
   )

@@ -84,7 +84,12 @@ const CategoryTable = ({
     { id: 'index', label: 'STT', minWidth: 50, align: 'center' },
     { id: 'name', label: 'Tên danh mục', minWidth: 200 },
     { id: 'description', label: 'Mô tả', minWidth: 400 },
-    { id: 'action', label: 'Hành động', minWidth: 130, align: 'center' }
+    {
+      id: 'action',
+      label: 'Hành động',
+      minWidth: 130,
+      align: 'center'
+    }
   ]
   const styles = {
     buttonAdd: {
@@ -128,7 +133,11 @@ const CategoryTable = ({
                   align={column.align}
                   sx={{
                     minWidth: column.minWidth,
-                    ...(column.id === 'index' && { width: '50px' })
+                    ...(column.id === 'index' && { width: '50px' }),
+                    ...(column.id === 'action' && {
+                      width: '130px',
+                      maxWidth: '130px'
+                    })
                   }}
                 >
                   {column.label}

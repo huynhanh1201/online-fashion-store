@@ -19,10 +19,8 @@ import {
   IconButton,
   Chip
 } from '@mui/material'
-import VisibilityIcon from '@mui/icons-material/Visibility'
+import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye'
 import ViewInventoryLogModal from '../modal/InventoryLog/ViewInventoryLogModal'
-import EditIcon from '@mui/icons-material/Edit'
-import DeleteIcon from '@mui/icons-material/Delete' // Thêm modal mới
 
 const InventoryLogTab = ({
   data,
@@ -46,7 +44,7 @@ const InventoryLogTab = ({
   const [filterSource, setFilterSource] = useState('all')
   const [openViewModal, setOpenViewModal] = useState(false) // State cho modal xem
   const [selectedLog, setSelectedLog] = useState(null) // State cho bản ghi được chọn
-  console.log(page)
+
   useEffect(() => {
     refreshInventoryLogs(page, rowsPerPage)
     fetchInventories()
@@ -108,7 +106,7 @@ const InventoryLogTab = ({
     { id: 'source', label: 'Mã phiếu', minWidth: 130 },
     { id: 'variantName', label: 'Biến thể', minWidth: 150 },
     { id: 'warehouse', label: 'Kho', minWidth: 100 },
-    { id: 'typeLabel', label: 'Loại', minWidth: 100 },
+    { id: 'typeLabel', label: 'Loại', minWidth: 100, align: 'center' },
     {
       id: 'amount',
       label: 'Số lượng',
@@ -130,8 +128,12 @@ const InventoryLogTab = ({
       align: 'right',
       format: (value) => `${value.toLocaleString('vi-VN')}đ`
     },
-    { id: 'note', label: 'Ghi chú', minWidth: 150 },
-    { id: 'createdByName', label: 'Người thực hiện', minWidth: 120 },
+    {
+      id: 'createdByName',
+      label: 'Người thực hiện',
+      minWidth: 120,
+      align: 'center'
+    },
     { id: 'createdAtFormatted', label: 'Ngày thực hiện', minWidth: 150 },
     { id: 'action', label: 'Hành động', minWidth: 100, align: 'center' }
   ]
@@ -272,7 +274,8 @@ const InventoryLogTab = ({
                       <TableCell key={column.id} align={column.align}>
                         <Chip
                           label={value}
-                          size='small'
+                          size='large'
+                          sx={{ width: '120px', fontWeight: '800' }}
                           color={value === 'Nhập' ? 'success' : 'error'}
                         />
                       </TableCell>
@@ -287,7 +290,9 @@ const InventoryLogTab = ({
                             color: row.typeLabel === 'Nhập' ? 'green' : 'red'
                           }}
                         >
-                          {value !== undefined ? value : '—'}
+                          {value !== undefined
+                            ? `${row.typeLabel === 'Nhập' ? '+' : ''}${value}`
+                            : '—'}
                         </Typography>
                       </TableCell>
                     )
@@ -300,14 +305,14 @@ const InventoryLogTab = ({
                           size='small'
                           color='primary'
                         >
-                          <VisibilityIcon />
+                          <RemoveRedEyeIcon color='primary' />
                         </IconButton>
                       </TableCell>
                     )
                   }
                   return (
                     <TableCell key={column.id} align={column.align}>
-                      {value !== undefined ? value : '—'}
+                      {column.format ? column.format(value) : value}
                     </TableCell>
                   )
                 })}

@@ -40,7 +40,8 @@ const ViewWarehouseSlipModal = ({ open, onClose, slip }) => {
                 <Chip
                   label={slip.type}
                   color={slip.type === 'Nhập' ? 'success' : 'error'}
-                  size='small'
+                  size='large'
+                  sx={{ width: '120px', fontWeight: '800' }}
                 />
               </TableCell>
             </TableRow>
@@ -66,7 +67,8 @@ const ViewWarehouseSlipModal = ({ open, onClose, slip }) => {
                     slip.status === 'pending' ? 'Đang xử lý' : 'Hoàn thành'
                   }
                   color={slip.status === 'pending' ? 'warning' : 'success'}
-                  size='small'
+                  size='large'
+                  sx={{ width: '120px', fontWeight: '800' }}
                 />
               </TableCell>
             </TableRow>

@@ -116,7 +116,14 @@ import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye'
 import BorderColorIcon from '@mui/icons-material/BorderColor'
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever'
 import dayjs from 'dayjs'
-
+const styles = {
+  groupIcon: {
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: 1
+  }
+}
 const OrderRow = ({ order, index, columns, onView, onEdit, onDelete }) => {
   const formatDate = (date) =>
     date ? dayjs(date).format('DD/MM/YYYY HH:mm') : '—'
@@ -160,7 +167,8 @@ const OrderRow = ({ order, index, columns, onView, onEdit, onDelete }) => {
                       ? 'error'
                       : 'success'
                 }
-                size='small'
+                size='large'
+                sx={{ width: '120px', fontWeight: '800' }}
               />
             )
             break
@@ -183,7 +191,8 @@ const OrderRow = ({ order, index, columns, onView, onEdit, onDelete }) => {
                       ? 'error'
                       : 'warning'
                 }
-                size='small'
+                size='large'
+                sx={{ width: '120px', fontWeight: '800' }}
               />
             )
             break
@@ -192,7 +201,7 @@ const OrderRow = ({ order, index, columns, onView, onEdit, onDelete }) => {
             break
           case 'action':
             value = (
-              <Stack direction='row' spacing={1}>
+              <Stack direction='row' spacing={1} sx={styles.groupIcon}>
                 <IconButton onClick={() => onView(order)} size='small'>
                   <RemoveRedEyeIcon color='primary' />
                 </IconButton>

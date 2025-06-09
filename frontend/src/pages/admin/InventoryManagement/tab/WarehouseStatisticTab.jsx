@@ -24,7 +24,18 @@ const styles = {
   }
 }
 
-function WarehouseStatisticTab() {
+function WarehouseStatisticTab({
+  warehouses,
+  fetchWarehouses,
+  fetchVariants,
+  addWarehouse,
+  addWarehouseSlip,
+  addPartner,
+  fetchPartners,
+  variants,
+  partners,
+  batches
+}) {
   const { statistics, loading, fetchStatistics } = useInventoryStatistics()
 
   React.useEffect(() => {
@@ -101,7 +112,20 @@ function WarehouseStatisticTab() {
         >
           Cảnh Báo Hết Hàng
         </Typography>
-        <LowStockAlertCard data={statistics} loading={loading} />
+        <LowStockAlertCard
+          data={statistics}
+          loading={loading}
+          warehouses={warehouses}
+          variants={variants}
+          addWarehouseSlip={addWarehouseSlip}
+          addWarehouse={addWarehouse}
+          fetchVariants={fetchVariants}
+          batches={batches}
+          partners={partners}
+          addPartner={addPartner}
+          fetchWarehouses={fetchWarehouses}
+          fetchPartner={fetchPartners}
+        />
       </Box>
       {/*<Box sx={styles.BoxCard}>*/}
       {/*  <Typography*/}

@@ -141,7 +141,15 @@ import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye'
 import BorderColorIcon from '@mui/icons-material/BorderColor'
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever'
 import ProductImageModal from './modal/ProductImageModal'
-
+const styles = {
+  groupIcon: {
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: 1,
+    width: '100%'
+  }
+}
 const ProductRow = ({ product, index, columns, onAction }) => {
   const [openImage, setOpenImage] = useState(false)
 
@@ -177,10 +185,7 @@ const ProductRow = ({ product, index, columns, onAction }) => {
               value = product.name
               break
             case 'exportPrice':
-              value = product.exportPrice?.toLocaleString('vi-VN')
-              break
-            case 'quantity':
-              value = product.quantity
+              value = `${product.exportPrice.toLocaleString()}đ`
               break
             case 'description':
               value = (
@@ -200,13 +205,14 @@ const ProductRow = ({ product, index, columns, onAction }) => {
                 <Chip
                   label={product.destroy ? 'Ngừng bán' : 'Đang bán'}
                   color={product.destroy ? 'error' : 'success'}
-                  size='small'
+                  size='large'
+                  sx={{ width: '120px', fontWeight: '800' }}
                 />
               )
               break
             case 'action':
               value = (
-                <Stack direction='row' spacing={1}>
+                <Stack direction='row' spacing={1} sx={styles.groupIcon}>
                   <IconButton
                     onClick={() => onAction('view', product)}
                     size='small'
@@ -216,12 +222,14 @@ const ProductRow = ({ product, index, columns, onAction }) => {
                   <IconButton
                     onClick={() => onAction('edit', product)}
                     size='small'
+                    sx={{ ml: '0 !important' }}
                   >
                     <BorderColorIcon color='warning' />
                   </IconButton>
                   <IconButton
                     onClick={() => onAction('delete', product)}
                     size='small'
+                    sx={{ ml: '0 !important' }}
                   >
                     <DeleteForeverIcon color='error' />
                   </IconButton>
@@ -233,7 +241,15 @@ const ProductRow = ({ product, index, columns, onAction }) => {
           }
 
           return (
-            <TableCell key={id} align={align || 'left'}>
+            <TableCell
+              key={id}
+              align={align || 'left'}
+              sx={
+                id === 'action'
+                  ? { width: 130, maxWidth: 130, minWidth: 130 }
+                  : {}
+              }
+            >
               {value}
             </TableCell>
           )
