@@ -102,11 +102,11 @@ function DiscountManagement() {
         />
       )}
 
-      <DiscountPagination
-        page={page}
-        totalPages={totalPages}
-        onPageChange={handleChangePage}
-      />
+      {/*<DiscountPagination*/}
+      {/*  page={page}*/}
+      {/*  totalPages={totalPages}*/}
+      {/*  onPageChange={handleChangePage}*/}
+      {/*/>*/}
     </>
   )
 }

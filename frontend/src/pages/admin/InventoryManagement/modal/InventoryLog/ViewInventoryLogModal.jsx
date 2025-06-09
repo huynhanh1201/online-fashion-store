@@ -54,7 +54,8 @@ const ViewInventoryLogModal = ({ open, onClose, log }) => {
                 <Chip
                   label={log.typeLabel || (log.type === 'in' ? 'Nhập' : 'Xuất')}
                   color={log.type === 'in' ? 'success' : 'warning'}
-                  size='small'
+                  ssize='large'
+                  sx={{ width: '120px', fontWeight: '800' }}
                 />
               </TableCell>
             </TableRow>

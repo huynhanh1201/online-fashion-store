@@ -143,7 +143,20 @@ const InventoryTable = () => {
         ))}
       </Tabs>
       <Box sx={{ p: 2 }}>
-        {activeTab === 0 && <WarehouseStatisticTab />}
+        {activeTab === 0 && (
+          <WarehouseStatisticTab
+            warehouses={warehouses}
+            variants={variants}
+            batches={batches}
+            partners={partners}
+            addWarehouseSlip={createNewWarehouseSlip}
+            fetchVariants={fetchVariants}
+            fetchWarehouses={fetchWarehouses}
+            fetchPartners={fetchPartners}
+            addPartner={createNewPartner}
+            addWarehouse={createNewWarehouse}
+          />
+        )}
         {activeTab === 1 && (
           <InventoryTab
             data={inventories}

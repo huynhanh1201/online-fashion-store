@@ -127,12 +127,17 @@ const TransactionTable = ({
             <TableCell sx={StyleAdmin.TableColumnSTT}>STT</TableCell>
             <TableCell sx={{ width: '20%' }}>Mã giao dịch</TableCell>
             <TableCell sx={{ width: '20%' }}>Đơn hàng</TableCell>
-            <TableCell>Phương thức</TableCell>
-            <TableCell>Trạng thái</TableCell>
-            <TableCell sx={{ width: '120px' }}>Số tiền (VNĐ)</TableCell>
-            <TableCell sx={{ width: '30%' }}>Ghi chú</TableCell>
-            <TableCell>Ngày tạo</TableCell>
-            <TableCell sx={{ width: '13%', maxWidth: '130px' }}>
+            <TableCell sx={{ width: 100 }}>Phương thức</TableCell>
+            <TableCell sx={{ width: 100 }}>Trạng thái</TableCell>
+            <TableCell sx={{ width: '200px' }}>Số tiền (VNĐ)</TableCell>
+            <TableCell sx={{ width: 180 }}>Ngày tạo</TableCell>
+            <TableCell
+              sx={{
+                width: '130px',
+                maxWidth: '130px',
+                textAlign: 'center'
+              }}
+            >
               Hành động
             </TableCell>
           </TableRow>

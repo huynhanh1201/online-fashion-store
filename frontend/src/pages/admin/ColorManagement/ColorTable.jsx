@@ -92,8 +92,8 @@ const ColorTable = ({
   const columns = [
     { id: 'index', label: 'STT', minWidth: 50, align: 'center' },
     { id: 'name', label: 'Tên màu', minWidth: 200 },
-    { id: 'createdAt', label: 'Ngày tạo', minWidth: 180 },
-    { id: 'updatedAt', label: 'Ngày cập nhật', minWidth: 180 },
+    { id: 'createdAt', label: 'Ngày tạo', minWidth: 150 },
+    { id: 'updatedAt', label: 'Ngày cập nhật', minWidth: 150 },
     { id: 'action', label: 'Hành động', minWidth: 130, align: 'center' }
   ]
 
@@ -132,7 +132,12 @@ const ColorTable = ({
                   align={column.align}
                   sx={{
                     minWidth: column.minWidth,
-                    ...(column.id === 'index' && { width: '50px' })
+                    ...(column.id === 'index' && { width: '50px' }),
+                    ...(column.id === 'action' && {
+                      width: '130px',
+                      maxWidth: '130px'
+                    }),
+                    ...(column.id === 'name' && { width: '70%' })
                   }}
                 >
                   {column.label}

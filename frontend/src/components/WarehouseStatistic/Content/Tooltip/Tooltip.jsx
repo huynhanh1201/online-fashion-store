@@ -7,7 +7,7 @@ const Tooltip = ({ active, payload, label }) => {
       <div
         style={{ background: '#fff', border: '1px solid #ccc', padding: 10 }}
       >
-        <Typography fontWeight='bold'>{`Tháng ${label}`}</Typography>
+        <Typography fontWeight='bold'>{`Tháng ${label + 1}`}</Typography>
         {payload.map((entry, index) => (
           <Typography key={index} sx={{ color: entry.fill }}>
             {`${entry.name}: ${entry.value.toLocaleString('vi-VN')}`}

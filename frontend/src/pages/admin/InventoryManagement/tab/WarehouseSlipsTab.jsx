@@ -14,7 +14,7 @@ import {
   Button,
   IconButton
 } from '@mui/material'
-import VisibilityIcon from '@mui/icons-material/Visibility'
+import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye'
 import AddWarehouseSlipModal from '../modal/WarehouseSlip/AddWarehouseSlipModal'
 import ViewWarehouseSlipModal from '../modal/WarehouseSlip/ViewWarehouseSlipModal'
 
@@ -164,18 +164,22 @@ const WarehouseSlipsTab = ({
   })
   const warehouseSlipColumns = [
     { id: 'slipId', label: 'Mã phiếu', minWidth: 120 },
-    { id: 'type', label: 'Loại', minWidth: 100 },
+    { id: 'type', label: 'Loại', minWidth: 100, align: 'center' },
     { id: 'warehouse', label: 'Kho', minWidth: 120 },
     {
       id: 'itemCount',
       label: 'Số mặt hàng',
       minWidth: 120,
-      align: 'right',
+      align: 'center',
       format: (value) => `${value.toLocaleString('vi-VN')}`
     },
-    { id: 'createdByName', label: 'Người tạo', minWidth: 150 },
-    { id: 'note', label: 'Ghi chú', minWidth: 180 },
-    { id: 'createdAtFormatted', label: 'Ngày tạo', minWidth: 160 },
+    { id: 'createdByName', label: 'Người tạo', minWidth: 150, align: 'center' },
+    {
+      id: 'createdAtFormatted',
+      label: 'Ngày tạo',
+      minWidth: 160,
+      align: 'center'
+    },
     { id: 'action', label: 'Hành động', minWidth: 120, align: 'center' }
   ]
 
@@ -241,7 +245,7 @@ const WarehouseSlipsTab = ({
                           size='small'
                           color='primary'
                         >
-                          <VisibilityIcon />
+                          <RemoveRedEyeIcon color='primary' />
                         </IconButton>
                       </TableCell>
                     )
@@ -252,7 +256,8 @@ const WarehouseSlipsTab = ({
                         <Chip
                           label={value}
                           color={value === 'Nhập' ? 'success' : 'error'}
-                          size='small'
+                          size='large'
+                          sx={{ width: '120px', fontWeight: '800' }}
                         />
                       ) : column.format && typeof value === 'number' ? (
                         column.format(value)

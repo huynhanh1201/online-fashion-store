@@ -73,6 +73,14 @@ import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye'
 import BorderColorIcon from '@mui/icons-material/BorderColor'
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever'
 
+const styles = {
+  groupIcon: {
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: 1
+  }
+}
 const formatDate = (date) =>
   date ? new Date(date).toLocaleString('vi-VN') : '—'
 
@@ -101,6 +109,12 @@ export default function DiscountRow({ discount, index, columns, onAction }) {
                 ? `${discount.amount?.toLocaleString('vi-VN')} VNĐ`
                 : `${discount.amount}%`
             break
+          case 'minOrderValue':
+            value = discount.minOrderValue
+            if (discount.minOrderValue) {
+              value = `${discount.minOrderValue.toLocaleString('vi-VN')}`
+            }
+            break
           case 'usageLimit':
             value = discount.usageLimit
             break
@@ -110,11 +124,10 @@ export default function DiscountRow({ discount, index, columns, onAction }) {
           case 'status':
             value = (
               <Chip
-                label={
-                  discount.status === 'active' ? 'Hoạt động' : 'Ngừng hoạt động'
-                }
-                color={discount.status === 'active' ? 'success' : 'error'}
-                size='small'
+                label={discount.isActive ? 'Đang hoạt động' : 'Ngừng hoạt động'}
+                color={discount.isActive ? 'success' : 'error'}
+                size='large'
+                sx={{ width: '120px', fontWeight: '800' }}
               />
             )
             break
@@ -126,7 +139,7 @@ export default function DiscountRow({ discount, index, columns, onAction }) {
             break
           case 'action':
             value = (
-              <Stack direction='row' spacing={1}>
+              <Stack direction='row' spacing={1} sx={styles.groupIcon}>
                 <IconButton
                   onClick={() => onAction('view', discount)}
                   size='small'

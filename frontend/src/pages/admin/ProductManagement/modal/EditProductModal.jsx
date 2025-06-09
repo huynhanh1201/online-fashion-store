@@ -57,7 +57,13 @@ const uploadImageFunction = async (file) => {
     return Promise.reject(error)
   }
 }
+// Hàm định dạng số và bỏ định dạng
+const formatNumber = (value) => {
+  const number = value?.toString().replace(/\D/g, '') || ''
+  return number.replace(/\B(?=(\d{3})+(?!\d))/g, '.')
+}
 
+const parseNumber = (formatted) => formatted.replace(/\./g, '')
 const EditProductModal = ({ open, onClose, onSave, product }) => {
   const {
     control,
@@ -379,7 +385,7 @@ const EditProductModal = ({ open, onClose, onSave, product }) => {
               </Typography>
             </FormControl>
           </Grid>
-          {/*giá nhập*/}
+          {/* Giá nhập */}
           <Grid item size={4} style={{ marginTop: '16px' }}>
             <Controller
               name='importPrice'
@@ -388,13 +394,18 @@ const EditProductModal = ({ open, onClose, onSave, product }) => {
                 <TextField
                   label='Giá nhập'
                   fullWidth
-                  type='number'
-                  {...field}
+                  type='text'
+                  value={formatNumber(field.value)}
+                  onChange={(e) => {
+                    const rawValue = parseNumber(e.target.value)
+                    field.onChange(rawValue)
+                  }}
                 />
               )}
             />
           </Grid>
-          {/*giá bán*/}
+
+          {/* Giá bán */}
           <Grid item size={4} style={{ marginTop: '16px' }}>
             <Controller
               name='price'
@@ -404,14 +415,19 @@ const EditProductModal = ({ open, onClose, onSave, product }) => {
                 <TextField
                   label='Giá bán'
                   fullWidth
-                  type='number'
+                  type='text'
+                  value={formatNumber(field.value)}
+                  onChange={(e) => {
+                    const rawValue = parseNumber(e.target.value)
+                    field.onChange(rawValue)
+                  }}
                   error={!!errors.price}
                   helperText={errors.price?.message}
-                  {...field}
                 />
               )}
             />
           </Grid>
+
           {/*mô tả*/}
           <Grid item size={12}>
             <Controller

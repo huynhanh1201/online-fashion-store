@@ -17,13 +17,40 @@ import {
 const getPartnerTypeLabel = (type) => {
   switch (type) {
     case 'supplier':
-      return <Chip label='Nhà cung cấp' color='primary' size='small' />
+      return (
+        <Chip
+          label='Nhà cung cấp'
+          color='primary'
+          size='large'
+          sx={{ width: '120px', fontWeight: '800' }}
+        />
+      )
     case 'customer':
-      return <Chip label='Khách hàng' color='success' size='small' />
+      return (
+        <Chip
+          label='Khách hàng'
+          color='success'
+          size='large'
+          sx={{ width: '120px', fontWeight: '800' }}
+        />
+      )
     case 'both':
-      return <Chip label='Khách hàng & NCC' color='warning' size='small' />
+      return (
+        <Chip
+          label='Khách hàng & NCC'
+          color='warning'
+          size='large'
+          sx={{ width: '137px', fontWeight: '800' }}
+        />
+      )
     default:
-      return <Chip label='Không xác định' size='small' />
+      return (
+        <Chip
+          label='Không xác định'
+          size='large'
+          sx={{ width: '120px', fontWeight: '800' }}
+        />
+      )
   }
 }
 

@@ -14,9 +14,9 @@ import {
   Button,
   IconButton
 } from '@mui/material'
-import VisibilityIcon from '@mui/icons-material/Visibility'
-import EditIcon from '@mui/icons-material/Edit'
-import DeleteIcon from '@mui/icons-material/Delete'
+import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye'
+import BorderColorIcon from '@mui/icons-material/BorderColor'
+import DeleteForeverIcon from '@mui/icons-material/DeleteForever'
 import AddVariantModal from '../modal/Variant/AddVariantModal.jsx'
 import ViewVariantModal from '../modal/Variant/ViewVariantModal.jsx' // Thêm modal mới
 import EditVariantModal from '../modal/Variant/EditVariantModal.jsx' // Thêm modal mới
@@ -169,21 +169,21 @@ const VariantsTab = ({
                           size='small'
                           color='primary'
                         >
-                          <VisibilityIcon />
+                          <RemoveRedEyeIcon color='primary' />
                         </IconButton>
                         <IconButton
                           onClick={() => handleEditVariant(row)}
                           size='small'
                           color='info'
                         >
-                          <EditIcon />
+                          <BorderColorIcon color='warning' />
                         </IconButton>
                         <IconButton
                           onClick={() => handleDeleteVariant(row)}
                           size='small'
                           color='error'
                         >
-                          <DeleteIcon />
+                          <DeleteForeverIcon color='error' />
                         </IconButton>
                       </TableCell>
                     )

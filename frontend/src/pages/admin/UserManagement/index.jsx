@@ -1,7 +1,6 @@
 import * as React from 'react'
 import Typography from '@mui/material/Typography'
 import UserTable from './UserTable'
-import UserPagination from './UserPagination'
 import useUsers from '~/hooks/admin/useUsers'
 // Lazy load các modal
 const EditUserModal = React.lazy(() => import('./modal/EditUserModal'))
@@ -16,7 +15,7 @@ export default function UserManagement() {
   const [modalType, setModalType] = React.useState(null)
   const [ModalComponent, setModalComponent] = React.useState(null)
 
-  const { users, totalPages, fetchUsers, removeUser, Loading } = useUsers()
+  const { users, fetchUsers, removeUser, Loading } = useUsers()
 
   // Gọi API duy nhất một lần khi component mount
   React.useEffect(() => {
@@ -55,8 +54,6 @@ export default function UserManagement() {
     handleCloseModal()
   }
 
-  const handleChangePage = (event, value) => setPage(value)
-
   return (
     <>
       <Typography variant='h5' sx={{ mb: 2 }}>
@@ -93,12 +90,6 @@ export default function UserManagement() {
           onDelete={() => handleDeleteUser(selectedUser._id)}
         />
       )}
-
-      <UserPagination
-        page={page}
-        totalPages={totalPages}
-        onPageChange={handleChangePage}
-      />
     </>
   )
 }

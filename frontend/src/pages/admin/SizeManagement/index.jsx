@@ -112,11 +112,11 @@ const SizeManagement = () => {
         )}
       </React.Suspense>
 
-      <SizePagination
-        page={page}
-        totalPages={totalPages}
-        onPageChange={handleChangePage}
-      />
+      {/*<SizePagination*/}
+      {/*  page={page}*/}
+      {/*  totalPages={totalPages}*/}
+      {/*  onPageChange={handleChangePage}*/}
+      {/*/>*/}
     </>
   )
 }

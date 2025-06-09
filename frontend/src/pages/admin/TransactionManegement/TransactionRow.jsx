@@ -104,7 +104,14 @@
 //
 // export default TransactionRow
 import React, { useEffect, useState } from 'react'
-import { IconButton, Tooltip, Chip, TableRow, TableCell } from '@mui/material'
+import {
+  IconButton,
+  Tooltip,
+  Chip,
+  TableRow,
+  TableCell,
+  Stack
+} from '@mui/material'
 
 import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye'
 import BorderColorIcon from '@mui/icons-material/BorderColor'
@@ -143,6 +150,15 @@ const TransactionRow = ({ transaction, onView, onEdit, onDelete, index }) => {
     Completed: 'success',
     Failed: 'error'
   }
+  const styles = {
+    groupIcon: {
+      display: 'flex',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      width: '100%',
+      maxWidth: '130px'
+    }
+  }
 
   return (
     <TableRow>
@@ -154,43 +170,30 @@ const TransactionRow = ({ transaction, onView, onEdit, onDelete, index }) => {
         <Chip
           label={statusLabel[transaction.status] || '—'}
           color={statusColor[transaction.status] || 'default'}
-          size='small'
+          size='large'
+          sx={{ width: '120px', fontWeight: '800' }}
         />
       </TableCell>
       <TableCell>
         {orderTotal !== null
-          ? `${orderTotal.toLocaleString()} VNĐ`
+          ? `${orderTotal.toLocaleString('vi-VN')} VNĐ`
           : 'Đang tải...'}
-      </TableCell>
-      <TableCell
-        sx={{
-          maxWidth: '130px',
-          whiteSpace: 'nowrap',
-          overflow: 'hidden',
-          textOverflow: 'ellipsis'
-        }}
-      >
-        {transaction.note || ''}
       </TableCell>
       <TableCell>
         {new Date(transaction.createdAt).toLocaleString('vi-VN')}
       </TableCell>
-      <TableCell sx={{ minWidth: '130px' }}>
-        <Tooltip title='Xem'>
+      <TableCell>
+        <Stack direction='row' spacing={1} sx={styles.groupIcon}>
           <IconButton onClick={() => onView(transaction)} size='small'>
             <RemoveRedEyeIcon color='primary' />
           </IconButton>
-        </Tooltip>
-        <Tooltip title='Sửa'>
           <IconButton onClick={() => onEdit(transaction)} size='small'>
             <BorderColorIcon color='warning' />
           </IconButton>
-        </Tooltip>
-        <Tooltip title='Xoá'>
           <IconButton onClick={() => onDelete(transaction)} size='small'>
             <DeleteForeverIcon color='error' />
           </IconButton>
-        </Tooltip>
+        </Stack>
       </TableCell>
     </TableRow>
   )

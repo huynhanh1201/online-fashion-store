@@ -82,7 +82,8 @@ const styles = {
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
-    gap: 1
+    gap: 1,
+    width: '130px'
   }
 }
 
@@ -104,21 +105,21 @@ export default function CategoryRow({
                   size='small'
                   color='primary'
                 >
-                  <RemoveRedEyeIcon />
+                  <RemoveRedEyeIcon color='primary' />
                 </IconButton>
                 <IconButton
                   onClick={() => handleOpenModal('edit', category)}
                   size='small'
                   color='info'
                 >
-                  <BorderColorIcon />
+                  <BorderColorIcon color='warning' />
                 </IconButton>
                 <IconButton
                   onClick={() => handleOpenModal('delete', category)}
                   size='small'
                   color='error'
                 >
-                  <DeleteForeverIcon />
+                  <DeleteForeverIcon color='error' />
                 </IconButton>
               </Stack>
             </TableCell>

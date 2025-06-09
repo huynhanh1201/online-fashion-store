@@ -17,10 +17,10 @@ export default function ChartDashboard({ data }) {
     if (!Array.isArray(data)) return []
 
     const months = Array.from({ length: 12 }, (_, i) => {
-      const m = i + 1
+      const m = i + 1 // tháng từ 1 đến 12
       const monthStr = m < 10 ? `0${m}` : `${m}`
       return {
-        monthIndex: i + 1, // ← giá trị duy nhất để XAxis nhận dạng
+        monthIndex: i, // ← giá trị duy nhất để XAxis nhận dạng
         name: `T${m}/${year}`,
         key: `${year}-${monthStr}`,
         Nhập: 0,

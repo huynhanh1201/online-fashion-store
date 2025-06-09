@@ -82,6 +82,14 @@ const AddDiscountModal = ({ open, onClose, onAdded }) => {
       console.error(error)
     }
   }
+  const formatNumber = (value) => {
+    const number = value?.toString().replace(/\D/g, '') || ''
+    return number.replace(/\B(?=(\d{3})+(?!\d))/g, '.')
+  }
+
+  const parseNumber = (formatted) => formatted.replace(/\./g, '')
+  const minOrderValue = watch('minOrderValue')
+  const usageLimit = watch('usageLimit')
 
   const handleClose = () => {
     reset()
@@ -174,20 +182,30 @@ const AddDiscountModal = ({ open, onClose, onAdded }) => {
             <Box flex={1}>
               <TextField
                 label='Giá trị đơn hàng tối thiểu'
-                type='number'
+                type='text'
                 fullWidth
                 margin='normal'
-                {...register('minOrderValue')}
+                value={formatNumber(minOrderValue)}
+                onChange={(e) => {
+                  const rawValue = parseNumber(e.target.value)
+                  setValue('minOrderValue', rawValue)
+                }}
                 sx={StyleAdmin.InputCustom}
               />
+
               <TextField
                 label='Số lượt sử dụng tối đa'
-                type='number'
+                type='text'
                 fullWidth
                 margin='normal'
-                {...register('usageLimit')}
+                value={formatNumber(usageLimit)}
+                onChange={(e) => {
+                  const rawValue = parseNumber(e.target.value)
+                  setValue('usageLimit', rawValue)
+                }}
                 sx={StyleAdmin.InputCustom}
               />
+
               <TextField
                 label='Hiệu lực từ'
                 type='datetime-local'

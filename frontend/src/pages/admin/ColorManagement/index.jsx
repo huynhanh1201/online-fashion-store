@@ -116,11 +116,11 @@ const ColorManagement = () => {
         )}
       </React.Suspense>
 
-      <ColorPagination
-        page={page}
-        totalPages={totalPages}
-        onPageChange={handleChangePage}
-      />
+      {/*<ColorPagination*/}
+      {/*  page={page}*/}
+      {/*  totalPages={totalPages}*/}
+      {/*  onPageChange={handleChangePage}*/}
+      {/*/>*/}
     </>
   )
 }
