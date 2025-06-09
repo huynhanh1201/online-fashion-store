@@ -72,7 +72,25 @@ const ProductImageSection = ({
         </div>
       </Fade>
 
-      <Box sx={{ display: 'flex', justifyContent: 'center', gap: 1, mt: 2 }}>
+      <Box
+        sx={{
+          display: 'flex',
+          gap: 1,
+          mt: 2,
+          overflowX: 'auto',
+          maxWidth: 80 * 4 + 3 * 3, // 4 ảnh x 80px + 3 gap x 3px
+          paddingBottom: '8px',
+          '&::-webkit-scrollbar': {
+            height: '6px'
+          },
+          '&::-webkit-scrollbar-thumb': {
+            backgroundColor: 'black',
+            borderRadius: '3px'
+          },
+          scrollbarWidth: 'thin',
+          scrollbarColor: '#1976d2 transparent'
+        }}
+      >
         {displayImages.map((img, index) => (
           <Thumbnail
             key={`${img}-${index}`}
@@ -82,7 +100,6 @@ const ProductImageSection = ({
             onClick={() => {
               setIsThumbnailClicked(true)
               onImageClick(index)
-              console.log('Clicked thumbnail index:', index) // Debug
             }}
             onError={(e) => {
               e.target.onerror = null

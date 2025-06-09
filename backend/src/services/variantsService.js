@@ -4,6 +4,8 @@ import ApiError from '~/utils/ApiError'
 import { VariantModel } from '~/models/VariantModel'
 import { ProductModel } from '~/models/ProductModel'
 import generateSKU from '~/utils/generateSKU'
+import { InventoryModel } from '~/models/InventoryModel'
+import { CartModel } from '~/models/CartModel'
 
 const createVariant = async (reqBody) => {
   // eslint-disable-next-line no-useless-catch
@@ -114,11 +116,43 @@ const updateVariant = async (variantId, reqBody) => {
 const deleteVariant = async (variantId) => {
   // eslint-disable-next-line no-useless-catch
   try {
+    const isInventoryExsitsPromise = InventoryModel.exists({
+      variantId,
+      destroy: false
+    })
+
+    const isVariantOfCartPromise = CartModel.exists({
+      'cartItems.variantId': variantId
+    })
+
+    const [isInventoryExsits, isVariantOfCart] = await Promise.all([
+      isInventoryExsitsPromise,
+      isVariantOfCartPromise
+    ])
+
+    if (isInventoryExsits) {
+      throw new ApiError(
+        StatusCodes.CONFLICT,
+        'Không thể xóa BIẾN THỂ khi vẫn còn TỒN KHO CỦA BIẾN THỂ hoạt động.'
+      )
+    }
+
+    if (isVariantOfCart) {
+      throw new ApiError(
+        StatusCodes.CONFLICT,
+        'Không thể xóa BIẾN THỂ khi vẫn còn GIỎ HÀNG hoạt động.'
+      )
+    }
+
     const variantDeleted = await VariantModel.findOneAndUpdate(
       { _id: variantId },
       { destroy: true },
       { new: true }
     )
+
+    if (!variantDeleted) {
+      throw new ApiError(StatusCodes.NOT_FOUND, 'Biến thể không tồn tại.')
+    }
 
     return variantDeleted
   } catch (err) {

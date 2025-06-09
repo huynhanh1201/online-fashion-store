@@ -3,7 +3,6 @@ import { StatusCodes } from 'http-status-codes'
 import { InventoryModel } from '~/models/InventoryModel'
 import apiError from '~/utils/ApiError'
 import getDateRange from '~/utils/getDateRange'
-import { ProductModel } from '~/models/ProductModel'
 
 const handleCreateInventory = async () => {
   return 'Empty'

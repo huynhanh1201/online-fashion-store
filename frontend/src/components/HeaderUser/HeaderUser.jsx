@@ -25,6 +25,7 @@ const StyledAppBar = styled(AppBar)(({ theme }) => ({
   zIndex: 1301,
   boxShadow: '0 4px 12px rgba(0,0,0,0.08)',
   borderBottom: '1px solid rgba(0,0,0,0.05)',
+  transition: 'top 0.3s ease',
   [theme.breakpoints.down('md')]: {
     top: 30
   }
@@ -41,68 +42,74 @@ const HeaderUser = () => {
     <>
       <Topbar />
       <StyledAppBar>
-        <Container maxWidth='xl'>
+        <Container maxWidth='1450px'>
           <Toolbar
+            disableGutters
             sx={{
               display: 'flex',
               justifyContent: 'space-between',
               alignItems: 'center',
-              minHeight: { xs: 56, sm: 64 },
-              paddingY: 0
+              minHeight: { xs: 56, sm: 64, md: 72 },
+              px: { xs: 1, sm: 2, md: 3 }
             }}
           >
-            {/* Logo + menu icon mobile */}
+            {/* Left: Menu icon + Logo */}
             <Box
               sx={{
                 display: 'flex',
                 alignItems: 'center',
-                width: { xs: 80, sm: 100, md: '20%' },
-                flexShrink: 0
+                flexBasis: { xs: 'auto', md: '20%' },
+                flexShrink: 0,
+                gap: 1
               }}
             >
               <IconButton
                 color='inherit'
                 edge='start'
                 onClick={handleDrawerToggle}
-                sx={{ mr: 0.5, display: { md: 'none' } }}
+                sx={{ mr: 1, display: { md: 'none' } }}
+                aria-label='open drawer'
               >
                 <MenuIcon />
               </IconButton>
               <Typography
                 variant='h6'
+                noWrap
                 sx={{
-                  width: { xs: 60, sm: 80, md: '100%' },
-                  fontSize: { xs: '0.8rem', sm: '0.9rem', md: '1rem' }
+                  fontSize: { xs: '1rem', sm: '1.1rem', md: '1.25rem' },
+                  cursor: 'pointer',
+                  userSelect: 'none'
                 }}
               >
                 <Logo href='/'>ICONDEWIM™</Logo>
               </Typography>
             </Box>
 
-            {/* Menu giữa */}
+            {/* Center: Menu */}
             <Box
               sx={{
                 display: { xs: 'none', md: 'flex' },
-                alignItems: 'center',
-                gap: 2,
                 flexGrow: 1,
                 justifyContent: 'center',
                 maxWidth: 600,
-                minWidth: 600
+                minWidth: 400,
+                gap: 2,
+                userSelect: 'none'
               }}
             >
               <Menu />
             </Box>
 
-            {/* Search + Auth + Action bên phải */}
+            {/* Right: Search + Auth + HeaderAction */}
             <Box
               sx={{
                 display: 'flex',
                 alignItems: 'center',
                 gap: { xs: 1, sm: 1.5, md: 2 },
                 justifyContent: 'flex-end',
-                width: { xs: 'auto', md: '30%' },
-                flexShrink: 0
+                flexBasis: { xs: 'auto', md: '25%' },
+                flexShrink: 0,
+                minWidth: { xs: 'auto', md: 250 }
               }}
             >
               <Search />
