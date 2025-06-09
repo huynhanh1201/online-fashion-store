@@ -17,13 +17,15 @@ const CouponList = ({ onCouponSelect }) => {
         if (!Array.isArray(discounts)) {
           throw new Error('Dữ liệu coupon không hợp lệ')
         }
-        // Lọc và sắp xếp coupon, bỏ .slice(0, 4)
+        // Lọc coupon tối thiểu
         const validCoupons = discounts
           .filter(coupon => coupon && coupon._id)
           .sort((a, b) => new Date(b.createdAt || new Date()) - new Date(a.createdAt || new Date()))
+          .slice(0, 4)
         setCoupons(validCoupons)
         setLoading(false)
       } catch (error) {
+        // console.error('Lỗi lấy coupon:', error)
         setError(error.message || 'Không thể tải coupon')
         setLoading(false)
       }

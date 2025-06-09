@@ -10,7 +10,7 @@ export const getProducts = async (page = 1, limit = 10) => {
       `${API_ROOT}/v1/products?page=${page}&limit=${limit}`
     )
     return {
-      products: response.data.data || response.data || [],
+      products: response.data.data.data || response.data || [],
       total: response.data.total || 0
     }
   } catch (error) {
