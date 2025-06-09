@@ -49,7 +49,7 @@ const SuggestionList = styled(List)({
   position: 'absolute',
   top: 'calc(100% + 8px)',
   right: '40px',
-  width: 320,
+  width: 220,
   backgroundColor: '#ffffff',
   boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
   borderRadius: 12,
