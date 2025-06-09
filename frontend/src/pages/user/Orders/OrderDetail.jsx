@@ -127,13 +127,13 @@ const OrderDetail = () => {
               </Box>
               <Box textAlign="right" display="flex" alignItems="center" gap={2}>
                 <Box>
-                  <Typography variant="body1">{item.price?.toLocaleString('vi-VN')} ₫</Typography>
+                  <Typography variant="body1">{item.price?.toLocaleString('vi-VN')}₫</Typography>
                   {item.originalPrice && item.originalPrice > item.price && (
                     <Typography
                       variant="body2"
                       sx={{ textDecoration: 'line-through', color: 'text.secondary' }}
                     >
-                      {item.originalPrice?.toLocaleString('vi-VN')} ₫
+                      {item.originalPrice?.toLocaleString('vi-VN')}₫
                     </Typography>
                   )}
                 </Box>
@@ -216,4 +216,4 @@ const OrderDetail = () => {
   )
 }
 
-export default OrderDetail 
+export default OrderDetail

@@ -69,7 +69,7 @@ const ProductItem = ({ name, price, quantity, image, color, size }) => {
       </td>
       <td style={{ textAlign: 'center' }}>{quantity}</td>
       <td style={{ textAlign: 'right' }}>
-        {(price * quantity).toLocaleString('vi-VN')} đ
+        {(price * quantity).toLocaleString('vi-VN')}đ
       </td>
     </tr>
   )
@@ -349,7 +349,7 @@ const Payment = () => {
                   p: 2,
                   mb: 4,
                   width: '100%',
-                  minWidth: { xs: '100%', sm: 600, md: 800 }
+                  minWidth: { xs: '100%', sm: 500, md: 800 }
                 }}
               >
                 {selectedAddress ? (
@@ -505,7 +505,7 @@ const Payment = () => {
                           style={{ height: 32, marginRight: 8 }}
                         />
                         <Typography sx={{ fontSize: '1rem' }}>
-                          Thanh toán qua VNPay
+                         Ví điện tử VNPAY
                         </Typography>
                       </Box>
                     }
@@ -531,7 +531,7 @@ const Payment = () => {
                     sx={{
                       width: '100%',
                       borderCollapse: 'collapse',
-                      minWidth: { xs: '100%', md: 600 }
+                      minWidth: { xs: '100%', md: 500 }
                     }}
                   >
                     <thead>
@@ -566,7 +566,7 @@ const Payment = () => {
 
                 {/* Ưu đãi */}
                 <Divider sx={{ my: 2 }} />
-                <SectionTitle>Ưu đãi</SectionTitle>
+                <SectionTitle>Ưu đãi dành cho bạn</SectionTitle>
                 <TextField
                   fullWidth
                   label="Nhập mã giảm giá"
@@ -607,8 +607,8 @@ const Payment = () => {
                 )}
 
                 {/* Danh sách coupon */}
-                <Box sx={{ mt: 4 }}>
-                  <Divider sx={{ mb: 2 }} />
+                <Box sx={{ mt: 2 }}>
+                  {/* <Divider sx={{ mb: 2 }} /> */}
                   <Typography
                     variant="subtitle2"
                     sx={{
@@ -676,12 +676,12 @@ const Payment = () => {
                   <span style={{ fontSize: '1.1rem' }}>{subTotal.toLocaleString('vi-VN')}đ</span>
                 </Box>
                 <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                  <span style={{ fontSize: '1.1rem' }}>Voucher giảm giá:</span>
-                  <span style={{ fontSize: '1.1rem' }}>{discount.toLocaleString('vi-VN')}đ</span>
-                </Box>
-                <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
                   <span style={{ fontSize: '1.1rem' }}>Phí vận chuyển:</span>
                   <span style={{ fontSize: '1.1rem' }}>Miễn phí</span>
+                </Box>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                  <span style={{ fontSize: '1.1rem' }}>Voucher giảm giá:</span>
+                  <span style={{ fontSize: '1.1rem' }}>{discount.toLocaleString('vi-VN')}đ</span>
                 </Box>
                 <Divider sx={{ my: 2 }} />
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', fontWeight: 700 }}>

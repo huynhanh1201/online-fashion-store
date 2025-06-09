@@ -63,7 +63,7 @@ const OrderRow = ({ order }) => {
         <TableCell sx={{ minWidth: 200 }}>
           {order.shippingAddress?.address}, {order.shippingAddress?.district}
         </TableCell>
-        <TableCell sx={{ minWidth: 120 }}>{order.total?.toLocaleString('vi-VN')} ₫</TableCell>
+        <TableCell sx={{ minWidth: 120 }}>{order.total?.toLocaleString('vi-VN')}₫</TableCell>
         <TableCell sx={{ minWidth: 120 }}>
           <Chip label={label} color={color === 'default' ? undefined : color} size="small" />
         </TableCell>
