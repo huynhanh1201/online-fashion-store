@@ -67,32 +67,17 @@ const SizeManagement = () => {
     }
   }
 
-  const styles = {
-    buttonAdd: {
-      backgroundColor: '#001f5d',
-      color: '#fff',
-      marginBottom: '16px'
-    }
-  }
-
   return (
     <>
       <Typography variant='h5' sx={{ mb: 2 }}>
         Quản lý kích thước sản phẩm
       </Typography>
-      <Button
-        variant='contained'
-        sx={styles.buttonAdd}
-        startIcon={<AddIcon />}
-        onClick={() => setModalType('add')}
-      >
-        Thêm kích thước
-      </Button>
 
       <SizeTable
         sizes={sizes}
         loading={Loading}
         handleOpenModal={handleOpenModal}
+        addSize={() => setModalType('add')}
       />
 
       <React.Suspense fallback={<></>}>

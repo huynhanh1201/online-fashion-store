@@ -107,7 +107,11 @@ const ViewWarehouseSlipModal = ({ open, onClose, slip }) => {
                 <TableRow key={index}>
                   <TableCell>{item.variantId.sku}</TableCell>
                   <TableCell>{item.variantId.name}</TableCell>
-                  <TableCell align='right'>{item.quantity || 0}</TableCell>
+                  <TableCell align='right'>
+                    {item.quantity
+                      ? `${Number(item.quantity).toLocaleString('vi-VN')}`
+                      : 0}
+                  </TableCell>
                   <TableCell>{item.unit || 'cái'}</TableCell>
                 </TableRow>
               ))

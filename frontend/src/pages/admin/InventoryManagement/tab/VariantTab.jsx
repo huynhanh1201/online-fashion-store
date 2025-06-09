@@ -33,7 +33,9 @@ const VariantsTab = ({
   addVariant,
   updateVariant, // Giả định prop mới
   deleteVariant, // Giả định prop mới
-  refreshProducts
+  refreshProducts,
+  formatCurrency,
+  parseCurrency
 }) => {
   const enrichedVariants = (data || []).map((variant) => {
     const product = (products || []).find((p) => p.id === variant.productId)
@@ -153,68 +155,74 @@ const VariantsTab = ({
             </TableRow>
           </TableHead>
           <TableBody>
-            {enrichedVariants
-              .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-              .map((row, index) => (
-                <TableRow hover role='checkbox' tabIndex={-1} key={index}>
-                  {variantColumns.map((column) => {
-                    let value = column.id.includes('.')
-                      ? column.id.split('.').reduce((o, i) => o[i], row)
-                      : row[column.id]
-                    if (column.id === 'action') {
-                      return (
-                        <TableCell key={column.id} align={column.align}>
-                          <IconButton
-                            onClick={() => handleViewVariant(row)}
-                            size='small'
-                            color='primary'
-                          >
-                            <VisibilityIcon />
-                          </IconButton>
-                          <IconButton
-                            onClick={() => handleEditVariant(row)}
-                            size='small'
-                            color='info'
-                          >
-                            <EditIcon />
-                          </IconButton>
-                          <IconButton
-                            onClick={() => handleDeleteVariant(row)}
-                            size='small'
-                            color='error'
-                          >
-                            <DeleteIcon />
-                          </IconButton>
-                        </TableCell>
-                      )
-                    }
+            {enrichedVariants.map((row, index) => (
+              <TableRow hover role='checkbox' tabIndex={-1} key={index}>
+                {variantColumns.map((column) => {
+                  let value = column.id.includes('.')
+                    ? column.id.split('.').reduce((o, i) => o[i], row)
+                    : row[column.id]
+                  if (column.id === 'action') {
                     return (
                       <TableCell key={column.id} align={column.align}>
-                        {column.format && typeof value === 'number'
-                          ? column.format(value)
-                          : value || '—'}
+                        <IconButton
+                          onClick={() => handleViewVariant(row)}
+                          size='small'
+                          color='primary'
+                        >
+                          <VisibilityIcon />
+                        </IconButton>
+                        <IconButton
+                          onClick={() => handleEditVariant(row)}
+                          size='small'
+                          color='info'
+                        >
+                          <EditIcon />
+                        </IconButton>
+                        <IconButton
+                          onClick={() => handleDeleteVariant(row)}
+                          size='small'
+                          color='error'
+                        >
+                          <DeleteIcon />
+                        </IconButton>
                       </TableCell>
                     )
-                  })}
-                </TableRow>
-              ))}
+                  }
+                  return (
+                    <TableCell key={column.id} align={column.align}>
+                      {column.format && typeof value === 'number'
+                        ? column.format(value)
+                        : value || '—'}
+                    </TableCell>
+                  )
+                })}
+              </TableRow>
+            ))}
           </TableBody>
         </Table>
       </TableContainer>
       <TablePagination
         rowsPerPageOptions={[10, 25, 100]}
         component='div'
-        count={enrichedVariants.length}
+        count={data.length}
         rowsPerPage={rowsPerPage}
         page={page}
         onPageChange={onPageChange}
-        onRowsPerPageChange={onRowsPerPageChange}
+        onRowsPerPageChange={(e) => onRowsPerPageChange(e, 'variant')}
+        labelRowsPerPage='Số dòng mỗi trang'
+        labelDisplayedRows={({ from, to, count }) => {
+          const actualTo = to > count ? count : to // nếu to vượt quá count thì lấy count
+          const actualFrom = from > count ? count : from // nếu from vượt quá count thì lấy count
+          return `${actualFrom}–${actualTo} trên ${count !== -1 ? count : `hơn ${actualTo}`}`
+        }}
       />
       <AddVariantModal
         open={openAddModal}
         onClose={handleCloseAddModal}
         addVariant={addVariant}
         products={products}
+        parseCurrency={parseCurrency}
+        formatCurrency={formatCurrency}
       />
       <ViewVariantModal
         open={openViewModal}
@@ -228,6 +236,8 @@ const VariantsTab = ({
         variant={selectedVariant}
         onUpdateVariant={updateVariant}
         products={products}
+        parseCurrency={parseCurrency}
+        formatCurrency={formatCurrency}
       />
       <DeleteVariantModal
         open={openDeleteModal}

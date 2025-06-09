@@ -7,11 +7,11 @@ import {
   updateWarehouseSlip
 } from '~/services/admin/Inventory/WarehouseSlipSetvice.js'
 
-const useWarehouseSlips = (page = 1, limit = 10) => {
+const useWarehouseSlips = () => {
   const [warehouseSlips, setWarehouseSlips] = useState([])
   const [totalPages, setTotalPages] = useState(1)
   const [loading, setLoading] = useState(false)
-  const fetchWarehouseSlips = async (filters = {}) => {
+  const fetchWarehouseSlips = async (page = 1, limit = 10, filters = {}) => {
     setLoading(true)
     const { warehouseSlips, total } = await getWarehouseSlips(
       page,
@@ -24,22 +24,22 @@ const useWarehouseSlips = (page = 1, limit = 10) => {
   }
   const createNewWarehouseSlip = async (data) => {
     const result = await createWarehouseSlip(data)
-    if (result) await fetchWarehouseSlips(page)
+    if (result) await fetchWarehouseSlips()
     return result
   }
   const getWarehouseSlipId = async (id) => {
     const result = await getWarehouseSlipById(id)
-    if (result) fetchWarehouseSlips(page)
+    if (result) fetchWarehouseSlips()
     return result
   }
   const removeWarehouseSlip = async (id) => {
     const result = await deleteWarehouseSlip(id)
-    if (result) fetchWarehouseSlips(page)
+    if (result) fetchWarehouseSlips()
     return result
   }
   const update = async (id, data) => {
     const result = await updateWarehouseSlip(id, data)
-    if (result) fetchWarehouseSlips(page)
+    if (result) fetchWarehouseSlips()
     return result
   }
 

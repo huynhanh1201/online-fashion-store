@@ -37,7 +37,8 @@ const InventoryLogTab = ({
   fetchInventories,
   fetchVariants,
   batches,
-  fetchBatches
+  fetchBatches,
+  total
 }) => {
   const [filterInventory, setFilterInventory] = useState('all')
   const [filterBatchId, setFilterBatchId] = useState('all')
@@ -45,13 +46,13 @@ const InventoryLogTab = ({
   const [filterSource, setFilterSource] = useState('all')
   const [openViewModal, setOpenViewModal] = useState(false) // State cho modal xem
   const [selectedLog, setSelectedLog] = useState(null) // State cho bản ghi được chọn
-
+  console.log(page)
   useEffect(() => {
-    refreshInventoryLogs()
+    refreshInventoryLogs(page, rowsPerPage)
     fetchInventories()
     fetchVariants()
     fetchBatches()
-  }, [])
+  }, [page, rowsPerPage])
   const handleViewLog = (log) => {
     setSelectedLog(log)
     setOpenViewModal(true)
@@ -108,9 +109,27 @@ const InventoryLogTab = ({
     { id: 'variantName', label: 'Biến thể', minWidth: 150 },
     { id: 'warehouse', label: 'Kho', minWidth: 100 },
     { id: 'typeLabel', label: 'Loại', minWidth: 100 },
-    { id: 'amount', label: 'Số lượng', minWidth: 100, align: 'right' },
-    { id: 'importPrice', label: 'Giá nhập', minWidth: 100, align: 'right' },
-    { id: 'exportPrice', label: 'Giá xuất', minWidth: 100, align: 'right' },
+    {
+      id: 'amount',
+      label: 'Số lượng',
+      minWidth: 100,
+      align: 'right',
+      format: (value) => `${value.toLocaleString('vi-VN')}`
+    },
+    {
+      id: 'importPrice',
+      label: 'Giá nhập',
+      minWidth: 100,
+      align: 'right',
+      format: (value) => `${value.toLocaleString('vi-VN')}đ`
+    },
+    {
+      id: 'exportPrice',
+      label: 'Giá xuất',
+      minWidth: 100,
+      align: 'right',
+      format: (value) => `${value.toLocaleString('vi-VN')}đ`
+    },
     { id: 'note', label: 'Ghi chú', minWidth: 150 },
     { id: 'createdByName', label: 'Người thực hiện', minWidth: 120 },
     { id: 'createdAtFormatted', label: 'Ngày thực hiện', minWidth: 150 },
@@ -244,70 +263,73 @@ const InventoryLogTab = ({
             </TableRow>
           </TableHead>
           <TableBody>
-            {filteredInventoryLogs
-              .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-              .map((row, index) => (
-                <TableRow hover role='checkbox' tabIndex={-1} key={index}>
-                  {inventoryLogColumns.map((column) => {
-                    const value = row[column.id]
-                    if (column.id === 'typeLabel') {
-                      return (
-                        <TableCell key={column.id} align={column.align}>
-                          <Chip
-                            label={value}
-                            size='small'
-                            color={value === 'Nhập' ? 'success' : 'error'}
-                          />
-                        </TableCell>
-                      )
-                    }
-                    if (column.id === 'amount') {
-                      return (
-                        <TableCell key={column.id} align={column.align}>
-                          <Typography
-                            sx={{
-                              fontWeight: 900,
-                              color: row.typeLabel === 'Nhập' ? 'green' : 'red'
-                            }}
-                          >
-                            {value !== undefined ? value : '—'}
-                          </Typography>
-                        </TableCell>
-                      )
-                    }
-                    if (column.id === 'action') {
-                      return (
-                        <TableCell key={column.id} align={column.align}>
-                          <IconButton
-                            onClick={() => handleViewLog(row)}
-                            size='small'
-                            color='primary'
-                          >
-                            <VisibilityIcon />
-                          </IconButton>
-                        </TableCell>
-                      )
-                    }
+            {filteredInventoryLogs.map((row, index) => (
+              <TableRow hover role='checkbox' tabIndex={-1} key={index}>
+                {inventoryLogColumns.map((column) => {
+                  const value = row[column.id]
+                  if (column.id === 'typeLabel') {
                     return (
                       <TableCell key={column.id} align={column.align}>
-                        {value !== undefined ? value : '—'}
+                        <Chip
+                          label={value}
+                          size='small'
+                          color={value === 'Nhập' ? 'success' : 'error'}
+                        />
                       </TableCell>
                     )
-                  })}
-                </TableRow>
-              ))}
+                  }
+                  if (column.id === 'amount') {
+                    return (
+                      <TableCell key={column.id} align={column.align}>
+                        <Typography
+                          sx={{
+                            fontWeight: 900,
+                            color: row.typeLabel === 'Nhập' ? 'green' : 'red'
+                          }}
+                        >
+                          {value !== undefined ? value : '—'}
+                        </Typography>
+                      </TableCell>
+                    )
+                  }
+                  if (column.id === 'action') {
+                    return (
+                      <TableCell key={column.id} align={column.align}>
+                        <IconButton
+                          onClick={() => handleViewLog(row)}
+                          size='small'
+                          color='primary'
+                        >
+                          <VisibilityIcon />
+                        </IconButton>
+                      </TableCell>
+                    )
+                  }
+                  return (
+                    <TableCell key={column.id} align={column.align}>
+                      {value !== undefined ? value : '—'}
+                    </TableCell>
+                  )
+                })}
+              </TableRow>
+            ))}
           </TableBody>
         </Table>
       </TableContainer>
       <TablePagination
         rowsPerPageOptions={[10, 25, 100]}
         component='div'
-        count={filteredInventoryLogs.length}
+        count={total || 0}
         rowsPerPage={rowsPerPage}
-        page={page}
-        onPageChange={onPageChange}
-        onRowsPerPageChange={onRowsPerPageChange}
+        page={page - 1}
+        onPageChange={(event, newPage) => onPageChange(event, newPage)} // +1 để giữ page bắt đầu từ 1
+        onRowsPerPageChange={(event) => onRowsPerPageChange(event, 'log')} // giữ đúng chuẩn
+        labelRowsPerPage='Số dòng mỗi trang'
+        labelDisplayedRows={({ from, to, count }) =>
+          `${from}–${to} trên ${count !== -1 ? count : `hơn ${to}`}`
+        }
       />
+
       <ViewInventoryLogModal
         open={openViewModal}
         onClose={() => setOpenViewModal(false)}

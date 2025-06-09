@@ -35,7 +35,8 @@ const WarehouseSlipsTab = ({
   fetchWarehouses,
   fetchPartner,
   addPartner,
-  addWarehouse
+  addWarehouse,
+  fetchVariants
 }) => {
   const [openModal, setOpenModal] = useState(false)
   const [openViewModal, setOpenViewModal] = useState(false) // State cho View modal
@@ -60,6 +61,7 @@ const WarehouseSlipsTab = ({
   const handleOpenModal = (type) => {
     fetchPartner()
     fetchWarehouses()
+    fetchVariants()
     setModalType(type)
     setNewSlipData({
       ...newSlipData,
@@ -139,10 +141,10 @@ const WarehouseSlipsTab = ({
   }
 
   const enrichedWarehouseSlips = data.map((slip) => {
-    const warehouseId =
-      slip.warehouseId && typeof slip.warehouseId === 'object'
-        ? slip.warehouseId._id || slip.warehouseId.id
-        : slip.warehouseId
+    // const warehouseId =
+    //   slip.warehouseId && typeof slip.warehouseId === 'object'
+    //     ? slip.warehouseId._id || slip.warehouseId.id
+    //     : slip.warehouseId
 
     const warehouseName =
       typeof slip.warehouseId === 'object'
@@ -164,7 +166,13 @@ const WarehouseSlipsTab = ({
     { id: 'slipId', label: 'Mã phiếu', minWidth: 120 },
     { id: 'type', label: 'Loại', minWidth: 100 },
     { id: 'warehouse', label: 'Kho', minWidth: 120 },
-    { id: 'itemCount', label: 'Số mặt hàng', minWidth: 120, align: 'right' },
+    {
+      id: 'itemCount',
+      label: 'Số mặt hàng',
+      minWidth: 120,
+      align: 'right',
+      format: (value) => `${value.toLocaleString('vi-VN')}`
+    },
     { id: 'createdByName', label: 'Người tạo', minWidth: 150 },
     { id: 'note', label: 'Ghi chú', minWidth: 180 },
     { id: 'createdAtFormatted', label: 'Ngày tạo', minWidth: 160 },
@@ -221,54 +229,58 @@ const WarehouseSlipsTab = ({
             </TableRow>
           </TableHead>
           <TableBody>
-            {enrichedWarehouseSlips
-              .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-              .map((row, index) => (
-                <TableRow hover role='checkbox' tabIndex={-1} key={index}>
-                  {warehouseSlipColumns.map((column) => {
-                    const value = row[column.id]
-                    if (column.id === 'action') {
-                      return (
-                        <TableCell key={column.id} align={column.align}>
-                          <IconButton
-                            onClick={() => handleViewSlip(row)}
-                            size='small'
-                            color='primary'
-                          >
-                            <VisibilityIcon />
-                          </IconButton>
-                        </TableCell>
-                      )
-                    }
+            {enrichedWarehouseSlips.map((row, index) => (
+              <TableRow hover role='checkbox' tabIndex={-1} key={index}>
+                {warehouseSlipColumns.map((column) => {
+                  const value = row[column.id]
+                  if (column.id === 'action') {
                     return (
                       <TableCell key={column.id} align={column.align}>
-                        {column.id === 'type' ? (
-                          <Chip
-                            label={value}
-                            color={value === 'Nhập' ? 'success' : 'error'}
-                            size='small'
-                          />
-                        ) : column.format && typeof value === 'number' ? (
-                          column.format(value)
-                        ) : (
-                          value
-                        )}
+                        <IconButton
+                          onClick={() => handleViewSlip(row)}
+                          size='small'
+                          color='primary'
+                        >
+                          <VisibilityIcon />
+                        </IconButton>
                       </TableCell>
                     )
-                  })}
-                </TableRow>
-              ))}
+                  }
+                  return (
+                    <TableCell key={column.id} align={column.align}>
+                      {column.id === 'type' ? (
+                        <Chip
+                          label={value}
+                          color={value === 'Nhập' ? 'success' : 'error'}
+                          size='small'
+                        />
+                      ) : column.format && typeof value === 'number' ? (
+                        column.format(value)
+                      ) : (
+                        value
+                      )}
+                    </TableCell>
+                  )
+                })}
+              </TableRow>
+            ))}
           </TableBody>
         </Table>
       </TableContainer>
       <TablePagination
         rowsPerPageOptions={[10, 25, 100]}
         component='div'
-        count={enrichedWarehouseSlips.length}
+        count={data.length}
         rowsPerPage={rowsPerPage}
         page={page}
         onPageChange={onPageChange}
-        onRowsPerPageChange={onRowsPerPageChange}
+        onRowsPerPageChange={(e) => onRowsPerPageChange(e, 'warehouseSlip')}
+        labelRowsPerPage='Số dòng mỗi trang'
+        labelDisplayedRows={({ from, to, count }) => {
+          const actualTo = to > count ? count : to // nếu to vượt quá count thì lấy count
+          const actualFrom = from > count ? count : from // nếu from vượt quá count thì lấy count
+          return `${actualFrom}–${actualTo} trên ${count !== -1 ? count : `hơn ${actualTo}`}`
+        }}
       />
       <AddWarehouseSlipModal
         open={openModal}

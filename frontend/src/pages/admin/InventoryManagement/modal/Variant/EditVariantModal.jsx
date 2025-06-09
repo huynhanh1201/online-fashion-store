@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect } from 'react'
 import {
   Dialog,
   DialogTitle,
@@ -9,9 +9,8 @@ import {
   Box,
   Typography
 } from '@mui/material'
-import { useForm } from 'react-hook-form'
+import { useForm, Controller } from 'react-hook-form'
 import { toast } from 'react-toastify'
-
 const URI = 'https://api.cloudinary.com/v1_1/dkwsy9sph/image/upload'
 const CloudinaryColor = 'color_upload'
 
@@ -32,12 +31,20 @@ const uploadToCloudinary = async (file, folder = CloudinaryColor) => {
   return data.secure_url
 }
 
-const EditVariantModal = ({ open, onClose, variant, onUpdateVariant }) => {
+const EditVariantModal = ({
+  open,
+  onClose,
+  variant,
+  onUpdateVariant,
+  formatCurrency,
+  parseCurrency
+}) => {
   const {
     register,
     handleSubmit,
     setValue,
     reset,
+    control,
     watch,
     formState: { errors }
   } = useForm({
@@ -70,7 +77,7 @@ const EditVariantModal = ({ open, onClose, variant, onUpdateVariant }) => {
       const url = await uploadToCloudinary(file)
       setValue('colorImage', url)
       toast.success('Upload ảnh thành công')
-    } catch (error) {
+    } catch {
       toast.error('Lỗi khi upload ảnh')
     }
   }
@@ -156,36 +163,52 @@ const EditVariantModal = ({ open, onClose, variant, onUpdateVariant }) => {
             </label>
           </Box>
 
-          <TextField
-            label='Giá nhập'
-            type='number'
-            disabled={!overridePrice}
-            {...register('importPrice', {
+          <Controller
+            name='importPrice'
+            control={control}
+            rules={{
               required: overridePrice ? 'Vui lòng nhập giá nhập' : false,
-              valueAsNumber: true,
-              min: overridePrice
-                ? { value: 0, message: 'Giá nhập không được âm' }
-                : undefined
-            })}
-            error={!!errors.importPrice}
-            helperText={errors.importPrice?.message}
-            fullWidth
+              validate: (val) =>
+                overridePrice && Number(val) < 0
+                  ? 'Giá nhập không được âm'
+                  : true
+            }}
+            render={({ field }) => (
+              <TextField
+                label='Giá nhập'
+                disabled={!overridePrice}
+                type='text'
+                fullWidth
+                value={formatCurrency(field.value)}
+                onChange={(e) => field.onChange(parseCurrency(e.target.value))}
+                error={!!errors.importPrice}
+                helperText={errors.importPrice?.message}
+              />
+            )}
           />
 
-          <TextField
-            label='Giá bán'
-            type='number'
-            disabled={!overridePrice}
-            {...register('exportPrice', {
+          <Controller
+            name='exportPrice'
+            control={control}
+            rules={{
               required: overridePrice ? 'Vui lòng nhập giá bán' : false,
-              valueAsNumber: true,
-              min: overridePrice
-                ? { value: 0, message: 'Giá bán không được âm' }
-                : undefined
-            })}
-            error={!!errors.exportPrice}
-            helperText={errors.exportPrice?.message}
-            fullWidth
+              validate: (val) =>
+                overridePrice && Number(val) < 0
+                  ? 'Giá bán không được âm'
+                  : true
+            }}
+            render={({ field }) => (
+              <TextField
+                label='Giá bán'
+                disabled={!overridePrice}
+                type='text'
+                fullWidth
+                value={formatCurrency(field.value)}
+                onChange={(e) => field.onChange(parseCurrency(e.target.value))}
+                error={!!errors.exportPrice}
+                helperText={errors.exportPrice?.message}
+              />
+            )}
           />
         </DialogContent>
         <DialogActions>

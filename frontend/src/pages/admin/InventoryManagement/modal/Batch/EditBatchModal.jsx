@@ -8,13 +8,21 @@ import {
   Button,
   Grid
 } from '@mui/material'
-import { useForm } from 'react-hook-form'
+import { useForm, Controller } from 'react-hook-form'
 
-const EditBatchModal = ({ open, onClose, onSave, batch }) => {
+const EditBatchModal = ({
+  open,
+  onClose,
+  onSave,
+  batch,
+  formatCurrency,
+  parseCurrency
+}) => {
   const {
     register,
     handleSubmit,
     reset,
+    control,
     formState: { errors }
   } = useForm()
 
@@ -22,7 +30,7 @@ const EditBatchModal = ({ open, onClose, onSave, batch }) => {
     if (batch) {
       reset({
         manufactureDate: batch.manufactureDate?.slice(0, 10) || '',
-        expiry: batch.expiry?.slice(0, 10) || '',
+        // expiry: batch.expiry?.slice(0, 10) || '',
         importPrice: batch.importPrice || 0
       })
     }
@@ -33,7 +41,7 @@ const EditBatchModal = ({ open, onClose, onSave, batch }) => {
       manufactureDate: data.manufactureDate
         ? new Date(data.manufactureDate).toISOString()
         : null,
-      expiry: data.expiry ? new Date(data.expiry).toISOString() : null,
+      // expiry: data.expiry ? new Date(data.expiry).toISOString() : null,
       importPrice: Number(data.importPrice)
     }
 
@@ -60,29 +68,43 @@ const EditBatchModal = ({ open, onClose, onSave, batch }) => {
               />
             </Grid>
 
-            <Grid item size={12}>
-              <TextField
-                label='Hạn sử dụng'
-                type='date'
-                fullWidth
-                InputLabelProps={{ shrink: true }}
-                {...register('expiry')}
-                defaultValue=''
-              />
-            </Grid>
+            {/*<Grid item size={12}>*/}
+            {/*  <TextField*/}
+            {/*    label='Hạn sử dụng'*/}
+            {/*    type='date'*/}
+            {/*    fullWidth*/}
+            {/*    InputLabelProps={{ shrink: true }}*/}
+            {/*    {...register('expiry')}*/}
+            {/*    defaultValue=''*/}
+            {/*  />*/}
+            {/*</Grid>*/}
 
             <Grid item size={12}>
-              <TextField
-                label='Giá nhập'
-                type='number'
-                fullWidth
-                {...register('importPrice', {
+              <Controller
+                name='importPrice'
+                control={control}
+                rules={{
                   required: 'Vui lòng nhập giá nhập',
-                  valueAsNumber: true,
-                  min: { value: 0, message: 'Giá nhập không hợp lệ' }
-                })}
-                error={!!errors.importPrice}
-                helperText={errors.importPrice?.message}
+                  validate: (val) =>
+                    Number(val) < 0 ? 'Giá nhập không hợp lệ' : true
+                }}
+                render={({ field }) => (
+                  <TextField
+                    label='Giá nhập'
+                    type='text'
+                    fullWidth
+                    value={formatCurrency(field.value)}
+                    onChange={(e) =>
+                      field.onChange(parseCurrency(e.target.value))
+                    }
+                    error={!!errors.importPrice}
+                    helperText={errors.importPrice?.message}
+                    InputProps={{
+                      endAdornment: <span style={{ marginLeft: 4 }}>₫</span>,
+                      inputMode: 'numeric'
+                    }}
+                  />
+                )}
               />
             </Grid>
           </Grid>

@@ -5,9 +5,10 @@ import DialogTitle from '@mui/material/DialogTitle'
 import DialogContent from '@mui/material/DialogContent'
 import DialogActions from '@mui/material/DialogActions'
 import Button from '@mui/material/Button'
-import Divider from '@mui/material/Divider'
-import TextField from '@mui/material/TextField'
-import Stack from '@mui/material/Stack'
+import Table from '@mui/material/Table'
+import TableBody from '@mui/material/TableBody'
+import TableRow from '@mui/material/TableRow'
+import TableCell from '@mui/material/TableCell'
 
 import StyleAdmin from '~/assets/StyleAdmin.jsx'
 
@@ -39,98 +40,68 @@ const ViewTransactionModal = ({ open, onClose, transaction }) => {
       }}
     >
       <DialogTitle>Chi tiết giao dịch</DialogTitle>
-      <Divider />
-      <DialogContent>
-        <Stack spacing={2} mt={1}>
-          <TextField
-            label='Mã giao dịch'
-            value={transaction.transactionId || '(Thanh toán COD)'}
-            fullWidth
-            InputProps={{ readOnly: true }}
-            sx={{
-              ...StyleAdmin.InputCustom,
-              ...StyleAdmin.InputCustom.CursorNone
-            }}
-          />
+      <DialogContent sx={{ overflowY: 'auto' }}>
+        {transaction ? (
+          <Table>
+            <TableBody>
+              <TableRow>
+                <TableCell sx={{ fontWeight: 'bold', width: '35%' }}>
+                  Mã giao dịch
+                </TableCell>
+                <TableCell>
+                  {transaction.transactionId || '(Thanh toán COD)'}
+                </TableCell>
+              </TableRow>
 
-          <TextField
-            label='Mã đơn hàng'
-            value={
-              typeof transaction.orderId === 'object'
-                ? transaction.orderId._id
-                : transaction.orderId
-            }
-            fullWidth
-            InputProps={{ readOnly: true }}
-            sx={{
-              ...StyleAdmin.InputCustom,
-              ...StyleAdmin.InputCustom.CursorNone
-            }}
-          />
+              <TableRow>
+                <TableCell sx={{ fontWeight: 'bold' }}>Mã đơn hàng</TableCell>
+                <TableCell>
+                  {typeof transaction.orderId === 'object'
+                    ? transaction.orderId._id
+                    : transaction.orderId}
+                </TableCell>
+              </TableRow>
 
-          <TextField
-            label='Phương thức thanh toán'
-            value={transaction.method}
-            fullWidth
-            InputProps={{ readOnly: true }}
-            sx={{
-              ...StyleAdmin.InputCustom,
-              ...StyleAdmin.InputCustom.CursorNone
-            }}
-          />
+              <TableRow>
+                <TableCell sx={{ fontWeight: 'bold' }}>
+                  Phương thức thanh toán
+                </TableCell>
+                <TableCell>{transaction.method}</TableCell>
+              </TableRow>
 
-          <TextField
-            label='Trạng thái'
-            value={statusLabel[transaction.status] || 'Không xác định'}
-            fullWidth
-            InputProps={{ readOnly: true }}
-            sx={{
-              ...StyleAdmin.InputCustom,
-              ...StyleAdmin.InputCustom.CursorNone
-            }}
-          />
+              <TableRow>
+                <TableCell sx={{ fontWeight: 'bold' }}>Trạng thái</TableCell>
+                <TableCell>
+                  {statusLabel[transaction.status] || 'Không xác định'}
+                </TableCell>
+              </TableRow>
 
-          <TextField
-            label='Số tiền'
-            value={
-              transaction.orderId.total
-                ? `${transaction.orderId.total.toLocaleString()} VNĐ`
-                : 'Không có thông tin'
-            }
-            fullWidth
-            InputProps={{ readOnly: true }}
-            sx={{
-              ...StyleAdmin.InputCustom,
-              ...StyleAdmin.InputCustom.CursorNone
-            }}
-          />
+              <TableRow>
+                <TableCell sx={{ fontWeight: 'bold' }}>Số tiền</TableCell>
+                <TableCell>
+                  {transaction.orderId?.total
+                    ? `${transaction.orderId.total.toLocaleString()} VNĐ`
+                    : 'Không có thông tin'}
+                </TableCell>
+              </TableRow>
 
-          <TextField
-            label='Ngày tạo'
-            value={new Date(transaction.createdAt).toLocaleString()}
-            fullWidth
-            InputProps={{ readOnly: true }}
-            sx={{
-              ...StyleAdmin.InputCustom,
-              ...StyleAdmin.InputCustom.CursorNone
-            }}
-          />
+              <TableRow>
+                <TableCell sx={{ fontWeight: 'bold' }}>Ngày tạo</TableCell>
+                <TableCell>
+                  {new Date(transaction.createdAt).toLocaleString()}
+                </TableCell>
+              </TableRow>
 
-          <TextField
-            label='Ghi chú'
-            value={transaction.note || ' '}
-            multiline
-            rows={3}
-            fullWidth
-            InputProps={{ readOnly: true }}
-            sx={{
-              ...StyleAdmin.InputCustom,
-              ...StyleAdmin.InputCustom.CursorNone
-            }}
-          />
-        </Stack>
+              <TableRow>
+                <TableCell sx={{ fontWeight: 'bold' }}>Ghi chú</TableCell>
+                <TableCell>{transaction.note || ' '}</TableCell>
+              </TableRow>
+            </TableBody>
+          </Table>
+        ) : (
+          <Typography>Không có dữ liệu giao dịch</Typography>
+        )}
       </DialogContent>
-      <Divider />
       <DialogActions sx={{ padding: '16px 24px' }}>
         <Button onClick={onClose} variant='contained'>
           Đóng

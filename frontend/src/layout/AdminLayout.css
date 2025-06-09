@@ -22,7 +22,7 @@ a {
 /* Khi Drawer mở */
 .app-bar.open {
     margin-left: 240px;
-    width: calc(100% - 240px);
+    width: calc(100% - 260px);
     transition: width 0.2s ease, margin 0.2s ease;
 
 }
@@ -33,13 +33,13 @@ a {
     padding: 24px;
     margin-left: 0;
     transition: width 0.2s ease, margin 0.2s ease;
-    width: calc(100% - 240px);
+    width: calc(100% - 260px);
     box-sizing: border-box;
 }
 
 /* Khi Drawer mở */
 .main-content.open {
-    width: calc(100% - 240px);
+    width: calc(100% - 260px);
     /*margin-left: 240px;*/
     transition: width 0.2s ease;
 
@@ -53,21 +53,21 @@ a {
 
 /* Khi Drawer mở */
 .drawer.open {
-    width: 240px;
+    width: 260px;
 }
 
 .admin-layout.open .main-content {
-    margin-left: 240px;
+    margin-left: 260px;
     transition: margin 0.2s ease;
 }
 .admin-layout .app-bar {
-    margin-left: -240px;
+    margin-left: -260px;
     width: 100%;
     z-index: 9999;
 }
 /* Drawer paper */
 .drawer-paper {
-    width: 240px;
+    width: 260px;
     box-sizing: border-box;
 }
 /* Drawer HeaderAdmin */

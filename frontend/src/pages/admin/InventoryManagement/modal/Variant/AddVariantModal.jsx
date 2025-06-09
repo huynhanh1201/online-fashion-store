@@ -21,8 +21,9 @@ import useColors from '~/hooks/admin/useColor'
 import useSizes from '~/hooks/admin/useSize'
 import useColorPalettes from '~/hooks/admin/useColorPalettes'
 import useSizePalettes from '~/hooks/admin/useSizePalettes'
-import AddColorModal from '~/pages/admin/ColorManagement/modal/AddColorModal.jsx'
-import AddSizeModal from '~/pages/admin/SizeManagement/modal/AddSizeModal.jsx'
+import { getVariantById } from '~/services/admin/Inventory/VariantService.js'
+import AddColorModal from '~/pages/admin/ColorManagement/modal/AddColorModal'
+import AddSizeModal from '~/pages/admin/SizeManagement/modal/AddSizeModal'
 
 const URI = 'https://api.cloudinary.com/v1_1/dkwsy9sph/image/upload'
 const CloudinaryColor = 'color_upload'
@@ -44,7 +45,14 @@ const uploadToCloudinary = async (file, folder = CloudinaryColor) => {
   return data.secure_url
 }
 
-const AddVariantModal = ({ open, onClose, addVariant, products }) => {
+const AddVariantModal = ({
+  open,
+  onClose,
+  addVariant,
+  products,
+  formatCurrency,
+  parseCurrency
+}) => {
   const {
     register,
     control,
@@ -72,6 +80,8 @@ const AddVariantModal = ({ open, onClose, addVariant, products }) => {
   const [openColorModal, setOpenColorModal] = useState(false)
   const [openSizeModal, setOpenSizeModal] = useState(false)
 
+  const [existingVariants, setExistingVariants] = useState([])
+
   const overridePrice = watch('overridePrice') // Theo dõi overridePrice
   const colorImage = watch('colorImage') // Theo dõi colorImage để hiển thị preview
   const productId = watch('productId') // Theo dõi productId để lấy giá sản phẩm
@@ -92,12 +102,34 @@ const AddVariantModal = ({ open, onClose, addVariant, products }) => {
         }
       }
     }
+
+    const fetchVariants = async () => {
+      try {
+        const variants = await getVariantById(productId)
+        setExistingVariants(variants)
+      } catch (err) {
+        console.error('Lỗi khi lấy biến thể:', err)
+        toast.error('Lỗi khi lấy biến thể')
+      }
+    }
+    fetchVariants()
   }, [productId, products, setValue])
   useEffect(() => {
     fetchColors()
     fetchSizes()
   }, [])
 
+  const isSizeDisabled = (color, size) => {
+    return existingVariants.some(
+      (variant) => variant.color.name === color && variant.size.name === size
+    )
+  }
+
+  const isColorDisabled = (size, color) => {
+    return existingVariants.some(
+      (variant) => variant.size.name === size && variant.color.name === color
+    )
+  }
   const handleOpenColorModal = () => {
     setOpenColorModal(true)
   }
@@ -207,7 +239,6 @@ const AddVariantModal = ({ open, onClose, addVariant, products }) => {
               </p>
             )}
           </FormControl>
-
           {/* Ảnh màu */}
           <Box display='flex' alignItems='center' gap={2}>
             <Button variant='outlined' component='label'>
@@ -237,7 +268,6 @@ const AddVariantModal = ({ open, onClose, addVariant, products }) => {
             error={!!errors.colorImage}
             helperText={errors.colorImage?.message}
           />
-
           {/* Màu sắc */}
           <FormControl fullWidth error={!!errors.color}>
             <InputLabel>Màu sắc</InputLabel>
@@ -247,25 +277,28 @@ const AddVariantModal = ({ open, onClose, addVariant, products }) => {
               rules={{ required: 'Đã có biến thể vui lòng chọn màu sắc khác' }}
               render={({ field }) => (
                 <Select {...field} label='Màu sắc'>
-                  {colors.map((c) => (
-                    <MenuItem key={c.name} value={c.name}>
-                      {c.name}
-                    </MenuItem>
-                  ))}
+                  {colors.map((c) => {
+                    const selectedSize = watch('size')
+                    const disabled =
+                      selectedSize && isColorDisabled(selectedSize, c.name)
+                    return (
+                      <MenuItem key={c.name} value={c.name} disabled={disabled}>
+                        {c.name} {disabled ? ' (đã tồn tại)' : ''}
+                      </MenuItem>
+                    )
+                  })}
                   <MenuItem onClick={handleOpenColorModal}>
                     <em>Thêm màu mới</em>
                   </MenuItem>
                 </Select>
               )}
             />
-
             {errors.color && (
               <p style={{ color: 'red', fontSize: '0.75rem' }}>
                 {errors.color.message}
               </p>
             )}
           </FormControl>
-
           {/* Kích thước */}
           <FormControl fullWidth error={!!errors.size}>
             <InputLabel>Kích thước</InputLabel>
@@ -275,11 +308,16 @@ const AddVariantModal = ({ open, onClose, addVariant, products }) => {
               })}
               label='Kích thước'
             >
-              {sizes.map((s) => (
-                <MenuItem key={s.name} value={s.name}>
-                  {s.name}
-                </MenuItem>
-              ))}
+              {sizes.map((s) => {
+                const selectedColor = watch('color')
+                const disabled =
+                  selectedColor && isSizeDisabled(selectedColor, s.name)
+                return (
+                  <MenuItem key={s.name} value={s.name} disabled={disabled}>
+                    {s.name} {disabled ? ' (đã tồn tại)' : ''}
+                  </MenuItem>
+                )
+              })}
               <MenuItem onClick={handleOpenSizeModal}>
                 <em>Thêm kích thước mới</em>
               </MenuItem>
@@ -290,7 +328,6 @@ const AddVariantModal = ({ open, onClose, addVariant, products }) => {
               </p>
             )}
           </FormControl>
-
           {/* Ghi đè giá */}
           <FormControlLabel
             control={
@@ -302,35 +339,61 @@ const AddVariantModal = ({ open, onClose, addVariant, products }) => {
             }
             label='Đặt giá riêng cho biến thể'
           />
-
           {/* Giá nhập */}
-          <TextField
-            type='number'
-            disabled={!overridePrice}
-            {...register('importPrice', {
+          <Controller
+            name='importPrice'
+            control={control}
+            rules={{
               required: overridePrice ? 'Vui lòng nhập giá nhập' : false,
-              valueAsNumber: true,
-              min: overridePrice
-                ? { value: 0, message: 'Giá nhập không được âm' }
-                : undefined
-            })}
-            error={!!errors.importPrice}
-            fullWidth
+              validate: (val) =>
+                overridePrice && Number(val) < 0
+                  ? 'Giá nhập không được âm'
+                  : true
+            }}
+            render={({ field }) => (
+              <TextField
+                label='Giá nhập'
+                disabled={!overridePrice}
+                type='text'
+                fullWidth
+                value={formatCurrency(field.value)}
+                onChange={(e) => field.onChange(parseCurrency(e.target.value))}
+                error={!!errors.importPrice}
+                helperText={errors.importPrice?.message}
+                InputProps={{
+                  endAdornment: <span style={{ marginLeft: 4 }}>₫</span>,
+                  inputMode: 'numeric'
+                }}
+              />
+            )}
           />
-
           {/* Giá bán */}
-          <TextField
-            type='number'
-            disabled={!overridePrice}
-            {...register('exportPrice', {
+          <Controller
+            name='exportPrice'
+            control={control}
+            rules={{
               required: overridePrice ? 'Vui lòng nhập giá bán' : false,
-              valueAsNumber: true,
-              min: overridePrice
-                ? { value: 0, message: 'Giá bán không được âm' }
-                : undefined
-            })}
-            error={!!errors.exportPrice}
-            fullWidth
+              validate: (val) =>
+                overridePrice && Number(val) < 0
+                  ? 'Giá bán không được âm'
+                  : true
+            }}
+            render={({ field }) => (
+              <TextField
+                label='Giá bán'
+                disabled={!overridePrice}
+                type='text'
+                fullWidth
+                value={formatCurrency(field.value)}
+                onChange={(e) => field.onChange(parseCurrency(e.target.value))}
+                error={!!errors.exportPrice}
+                helperText={errors.exportPrice?.message}
+                InputProps={{
+                  endAdornment: <span style={{ marginLeft: 4 }}>₫</span>,
+                  inputMode: 'numeric'
+                }}
+              />
+            )}
           />
         </DialogContent>
         <DialogActions>

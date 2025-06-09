@@ -25,11 +25,27 @@ function ViewOrderModal({
   onClose,
   order,
   histories = [],
-  orderDetails = []
+  orderDetails = [],
+  onUpdate
 }) {
   const [tab, setTab] = useState(0)
   if (!order) return null
   const handleTabChange = (_, newValue) => setTab(newValue)
+  const getNextStatus = (currentStatus) => {
+    const flow = ['Pending', 'Processing', 'Shipped', 'Delivered']
+    const index = flow.indexOf(currentStatus)
+    return index >= 0 && index < flow.length - 1 ? flow[index + 1] : null
+  }
+
+  const handleNextStatus = async () => {
+    const nextStatus = getNextStatus(order.status)
+    if (!nextStatus) return
+    try {
+      await onUpdate(order._id, { status: nextStatus }) // bạn có thể gọi API tại đây
+    } catch (error) {
+      console.error('Lỗi chuyển trạng thái:', error)
+    }
+  }
 
   const renderStatusLabel = (status) => {
     const map = {
@@ -41,7 +57,6 @@ function ViewOrderModal({
     }
     return map[status] || '—'
   }
-  console.log('order', order)
   return (
     <Dialog
       open={open}
@@ -81,99 +96,163 @@ function ViewOrderModal({
         </Tabs>
 
         {tab === 0 && (
-          <Stack spacing={2}>
-            <Typography>
-              <strong>Mã đơn hàng:</strong> {order._id}
-            </Typography>
-            <Typography>
-              <strong>Người nhận:</strong> {order.shippingAddress?.fullName}
-            </Typography>
-            <Typography>
-              <strong>SĐT:</strong> {order.shippingAddress?.phone}
-            </Typography>
-            <Typography>
-              <strong>Địa chỉ giao hàng:</strong>{' '}
-              {`${order.shippingAddress?.address}, ${order.shippingAddress?.ward}, ${order.shippingAddress?.district}, ${order.shippingAddress?.city}`}
-            </Typography>
-            <Typography>
-              <strong>Phương thức thanh toán:</strong>{' '}
-              {order.paymentMethod?.toUpperCase()}
-            </Typography>
+          <Table>
+            <TableBody>
+              <TableRow>
+                <TableCell>
+                  <strong>Mã đơn hàng</strong>
+                </TableCell>
+                <TableCell>{order._id || '—'}</TableCell>
+              </TableRow>
 
-            <Box display='flex' alignItems='center' gap={1}>
-              <Typography component='span'>
-                <strong>Trạng thái thanh toán:</strong>
-              </Typography>
-              <Chip
-                label={
-                  order.paymentStatus === 'Pending'
-                    ? 'Đang chờ'
-                    : order.paymentStatus === 'Completed'
-                      ? 'Đã thanh toán'
-                      : order.paymentStatus === 'Failed'
-                        ? 'Thất bại'
-                        : '—'
-                }
-                color={
-                  order.paymentStatus === 'Completed'
-                    ? 'success'
-                    : order.paymentStatus === 'Failed'
-                      ? 'error'
-                      : 'warning'
-                }
-                size='small'
-              />
-            </Box>
+              <TableRow>
+                <TableCell>
+                  <strong>Người nhận</strong>
+                </TableCell>
+                <TableCell>{order.shippingAddress?.fullName || '—'}</TableCell>
+              </TableRow>
 
-            <Box display='flex' alignItems='center' gap={1}>
-              <Typography component='span'>
-                <strong>Trạng thái đơn hàng:</strong>
-              </Typography>
-              <Chip
-                label={renderStatusLabel(order.status)}
-                color={
-                  order.status === 'Cancelled'
-                    ? 'error'
-                    : order.status === 'Pending'
-                      ? 'warning'
-                      : 'success'
-                }
-                size='small'
-              />
-            </Box>
+              <TableRow>
+                <TableCell>
+                  <strong>SĐT</strong>
+                </TableCell>
+                <TableCell>{order.shippingAddress?.phone || '—'}</TableCell>
+              </TableRow>
 
-            <Box display='flex' alignItems='center' gap={1}>
-              <Typography component='span'>
-                <strong>Giao hàng:</strong>
-              </Typography>
-              <Chip
-                label={order.isDelivered ? 'Đã giao' : 'Chưa giao'}
-                color={order.isDelivered ? 'success' : 'default'}
-                size='small'
-              />
-            </Box>
+              <TableRow>
+                <TableCell>
+                  <strong>Địa chỉ giao hàng</strong>
+                </TableCell>
+                <TableCell>
+                  {order.shippingAddress
+                    ? `${order.shippingAddress.address}, ${order.shippingAddress.ward}, ${order.shippingAddress.district}, ${order.shippingAddress.city}`
+                    : '—'}
+                </TableCell>
+              </TableRow>
 
-            <Typography>
-              <strong>Giảm giá:</strong>{' '}
-              {order.discountAmount > 0
-                ? `- ${order.discountAmount.toLocaleString()}₫`
-                : 'Không có'}
-            </Typography>
-            <Typography>
-              <strong>Tổng tiền:</strong> {order.total.toLocaleString()}₫
-            </Typography>
-            <Typography>
-              <strong>Lời nhắn:</strong> {order.note || 'Không có'}
-            </Typography>
-            <Typography>
-              <strong>Ngày tạo:</strong>{' '}
-              {dayjs(order.createdAt).format('DD/MM/YYYY HH:mm')}
-            </Typography>
-            <Typography>
-              <strong>Ngày cập nhật:</strong>{' '}
-              {dayjs(order.updatedAt).format('DD/MM/YYYY HH:mm')}
-            </Typography>
-          </Stack>
+              <TableRow>
+                <TableCell>
+                  <strong>Phương thức thanh toán</strong>
+                </TableCell>
+                <TableCell>
+                  {order.paymentMethod?.toUpperCase() || '—'}
+                </TableCell>
+              </TableRow>
+
+              <TableRow>
+                <TableCell>
+                  <strong>Trạng thái thanh toán</strong>
+                </TableCell>
+                <TableCell>
+                  <Chip
+                    label={
+                      order.paymentStatus === 'Pending'
+                        ? 'Đang chờ'
+                        : order.paymentStatus === 'Completed'
+                          ? 'Đã thanh toán'
+                          : order.paymentStatus === 'Failed'
+                            ? 'Thất bại'
+                            : '—'
+                    }
+                    color={
+                      order.paymentStatus === 'Completed'
+                        ? 'success'
+                        : order.paymentStatus === 'Failed'
+                          ? 'error'
+                          : 'warning'
+                    }
+                    size='small'
+                  />
+                </TableCell>
+              </TableRow>
+
+              <TableRow>
+                <TableCell>
+                  <strong>Trạng thái đơn hàng</strong>
+                </TableCell>
+                <TableCell>
+                  <Stack direction='row' alignItems='center' spacing={1}>
+                    <Chip
+                      label={renderStatusLabel(order.status)}
+                      color={
+                        order.status === 'Cancelled'
+                          ? 'error'
+                          : order.status === 'Pending'
+                            ? 'warning'
+                            : 'success'
+                      }
+                      size='small'
+                    />
+                    {getNextStatus(order.status) && (
+                      <Button
+                        variant='outlined'
+                        size='small'
+                        onClick={handleNextStatus}
+                      >
+                        Chuyển tiếp
+                      </Button>
+                    )}
+                  </Stack>
+                </TableCell>
+              </TableRow>
+
+              <TableRow>
+                <TableCell>
+                  <strong>Giao hàng</strong>
+                </TableCell>
+                <TableCell>
+                  <Chip
+                    label={order.isDelivered ? 'Đã giao' : 'Chưa giao'}
+                    color={order.isDelivered ? 'success' : 'default'}
+                    size='small'
+                  />
+                </TableCell>
+              </TableRow>
+
+              <TableRow>
+                <TableCell>
+                  <strong>Giảm giá</strong>
+                </TableCell>
+                <TableCell>
+                  {order.discountAmount > 0
+                    ? `- ${order.discountAmount.toLocaleString()}₫`
+                    : 'Không có'}
+                </TableCell>
+              </TableRow>
+
+              <TableRow>
+                <TableCell>
+                  <strong>Tổng tiền</strong>
+                </TableCell>
+                <TableCell>{order.total.toLocaleString()}₫</TableCell>
+              </TableRow>
+
+              <TableRow>
+                <TableCell>
+                  <strong>Lời nhắn</strong>
+                </TableCell>
+                <TableCell>{order.note || 'Không có'}</TableCell>
+              </TableRow>
+
+              <TableRow>
+                <TableCell>
+                  <strong>Ngày tạo</strong>
+                </TableCell>
+                <TableCell>
+                  {dayjs(order.createdAt).format('DD/MM/YYYY HH:mm')}
+                </TableCell>
+              </TableRow>
+
+              <TableRow>
+                <TableCell>
+                  <strong>Ngày cập nhật</strong>
+                </TableCell>
+                <TableCell>
+                  {dayjs(order.updatedAt).format('DD/MM/YYYY HH:mm')}
+                </TableCell>
+              </TableRow>
+            </TableBody>
+          </Table>
         )}
 
         {tab === 1 && (
