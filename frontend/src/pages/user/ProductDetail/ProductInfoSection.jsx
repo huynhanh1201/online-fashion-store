@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React from 'react'
 import {
   Box,
   Typography,
@@ -12,7 +12,6 @@ import { styled } from '@mui/system'
 import AddIcon from '@mui/icons-material/Add'
 import RemoveIcon from '@mui/icons-material/Remove'
 import LocalOfferIcon from '@mui/icons-material/LocalOffer'
-import SnackbarAlert from './SnackbarAlert'
 
 const PriceTypography = styled(Typography)({
   color: '#d32f2f',
@@ -68,15 +67,7 @@ const ProductInfoSection = ({
   getCurrentPrice,
   inventory,
 }) => {
-  const [snackbar, setSnackbar] = useState({
-    open: false,
-    message: '',
-    severity: 'info'
-  })
 
-  const handleSnackbarClose = () => {
-    setSnackbar(prev => ({ ...prev, open: false }))
-  }
 
   const currentPrice = getCurrentPrice()
 
@@ -232,18 +223,7 @@ const ProductInfoSection = ({
         <Button
           variant='contained'
           disabled={isAdding || quantity > (inventory?.quantity ?? selectedVariant?.quantity ?? product?.quantity ?? 0)}
-          onClick={() => {
-            const max = inventory?.quantity ?? selectedVariant?.quantity ?? product?.quantity ?? 0
-            if (quantity > max) {
-              setSnackbar({
-                open: true,
-                message: `Chỉ còn ${max} sản phẩm trong kho.`,
-                severity: 'warning'
-              })
-              return
-            }
-            handleAddToCart({ variant: selectedVariant, quantity })
-          }}
+          onClick={() => handleAddToCart(product._id)}
           sx={{ backgroundColor: '#1A3C7B', color: 'white', flex: 1, py: 1.5 }}
           startIcon={isAdding ? <CircularProgress size={20} color='inherit' /> : null}
         >
@@ -260,12 +240,7 @@ const ProductInfoSection = ({
         </Button>
       </Box>
 
-      <SnackbarAlert
-        open={snackbar.open}
-        onClose={handleSnackbarClose}
-        severity={snackbar.severity}
-        message={snackbar.message}
-      />
+
     </Box>
   )
 }

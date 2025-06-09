@@ -15,7 +15,7 @@ const PaymentVnpay = () => {
   useEffect(() => {
     setTimeout(() => {
       refresh()
-    }, 0) 
+    }, 0)
   }, [])
 
   return (

@@ -17,9 +17,9 @@ import {
   selectCurrentUser,
   loginUserAPI
 } from '~/redux/user/userSlice'
-import { clearCart } from '~/redux/cart/cartSlice'
 import { getProfileUser } from '~/services/userService'
 import { toast } from 'react-toastify'
+import { useCart } from '~/hooks/useCarts'
 
 const HeaderAction = () => {
   const [anchorEl, setAnchorEl] = useState(null)
@@ -30,6 +30,7 @@ const HeaderAction = () => {
 
   // Lấy giỏ hàng từ Redux store
   const cartItems = useSelector((state) => state.cart.cartItems)
+  const { refresh } = useCart()
   const cartCount = cartItems.reduce((total, item) => total + item.quantity, 0)
   const [tokenUpdated, setTokenUpdated] = useState(
     localStorage.getItem('token')
@@ -46,7 +47,7 @@ const HeaderAction = () => {
             type: 'user/loginUserAPI/fulfilled',
             payload: profileData
           })
-          console.log('Thông tin người dùng từ API:', profileData)
+          await refresh()
         } else {
           throw new Error('Không tìm thấy thông tin người dùng')
         }
@@ -58,7 +59,6 @@ const HeaderAction = () => {
       }
     }
 
-    // Chỉ fetch profile nếu có token và chưa có currentUser
     if (token && !currentUser) {
       setTokenUpdated(token)
       fetchProfile()
@@ -73,9 +73,8 @@ const HeaderAction = () => {
     setAnchorEl(null)
   }
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
     dispatch(logoutUserAPI())
-    dispatch(clearCart()) // Xóa giỏ hàng khi đăng xuất
     localStorage.removeItem('token')
     setTokenUpdated(null)
     handleClose()

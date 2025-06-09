@@ -34,9 +34,18 @@ const Cart = () => {
   const [cartItems, setCartItems] = useState([])
   const [showMaxQuantityAlert, setShowMaxQuantityAlert] = useState(false)
   const [confirmClearOpen, setConfirmClearOpen] = useState(false)
+  const [coupons, setCoupons] = useState([])
+  const [hasFetchedCoupons, setHasFetchedCoupons] = useState(false) // Track if coupons were fetched
   const navigate = useNavigate()
   const dispatch = useDispatch()
-  const [inventoryQuantities, setInventoryQuantities] = useState({})
+  const [inventoryQuantities, setInventoryQuantities] = useState({}) // Cached inventory quantities
+  const [fetchingVariants, setFetchingVariants] = useState(new Set()) // Track ongoing fetches
+  const [isFetchingInventories, setIsFetchingInventories] = useState(false) // Loading state for inventory fetching
+
+
+  const [deleteMode, setDeleteMode] = useState('') // 'single' | 'all'
+  const [itemToDelete, setItemToDelete] = useState(null)
+
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'auto' })
   }, [])
@@ -44,30 +53,78 @@ const Cart = () => {
   useEffect(() => {
     if (cart?.cartItems) setCartItems(cart.cartItems)
   }, [cart])
+
+  // Gọi API 1 lần từ kho
   useEffect(() => {
     const fetchInventories = async () => {
-      const newInventoryQuantities = {}
-      for (const item of cartItems) {
-        try {
-          const res = await fetch(`http://localhost:8017/v1/inventories?variantId=${item.variant._id}`)
-          const data = await res.json()
-          const inventory = Array.isArray(data) ? data[0] : data
-          newInventoryQuantities[item.variant._id] = inventory?.quantity ?? 0
-        } catch (error) {
-          console.error('Lỗi lấy tồn kho:', error)
-          newInventoryQuantities[item.variant._id] = 0
-        }
+      if (cartItems.length === 0) return
+
+      const newVariantsToFetch = cartItems
+        .filter(item => !inventoryQuantities[item.variant._id] && !fetchingVariants.has(item.variant._id))
+        .map(item => item.variant._id)
+
+      if (newVariantsToFetch.length === 0) return
+
+      setIsFetchingInventories(true)
+      setFetchingVariants(prev => new Set([...prev, ...newVariantsToFetch]))
+
+      try {
+        // Batch fetch inventory data
+        const fetchPromises = newVariantsToFetch.map(async variantId => {
+          try {
+            const res = await fetch(`http://localhost:8017/v1/inventories?variantId=${variantId}`)
+            const result = await res.json()
+            const inventoryList = result.data
+            const inventory = Array.isArray(inventoryList) ? inventoryList[0] : inventoryList
+            return { variantId, quantity: inventory?.quantity ?? 0 }
+          } catch (error) {
+            console.error(`Lỗi lấy tồn kho cho variant ${variantId}:`, error)
+            return { variantId, quantity: 0 }
+          }
+        })
+
+        const results = await Promise.all(fetchPromises)
+        const newInventoryQuantities = { ...inventoryQuantities }
+        results.forEach(({ variantId, quantity }) => {
+          newInventoryQuantities[variantId] = quantity
+        })
+
+        setInventoryQuantities(newInventoryQuantities)
+      } finally {
+        setFetchingVariants(prev => {
+          const newSet = new Set(prev)
+          newVariantsToFetch.forEach(id => newSet.delete(id))
+          return newSet
+        })
+        setIsFetchingInventories(false)
       }
-      setInventoryQuantities(newInventoryQuantities)
     }
 
-    if (cartItems.length > 0) fetchInventories()
-  }, [cartItems])
+    fetchInventories()
+  }, [cartItems, inventoryQuantities, fetchingVariants])
 
-  const allSelected =
-    cartItems.length > 0 && selectedItems.length === cartItems.length
-  const someSelected =
-    selectedItems.length > 0 && selectedItems.length < cartItems.length
+  useEffect(() => {
+    if (hasFetchedCoupons) return
+
+    const fetchCoupons = async () => {
+      try {
+        const res = await fetch('http://localhost:8017/v1/coupons')
+        const data = await res.json()
+        if (Array.isArray(data) && data.length > 0) {
+          setCoupons(data.sort((a, b) => a.minOrderValue - b.minOrderValue))
+        }
+        setHasFetchedCoupons(true)
+      } catch (error) {
+        console.error('Lỗi lấy coupon:', error)
+        setHasFetchedCoupons(true)
+      }
+    }
+
+    fetchCoupons()
+  }, [hasFetchedCoupons])
+
+  const allSelected = cartItems.length > 0 && selectedItems.length === cartItems.length
+  const someSelected = selectedItems.length > 0 && selectedItems.length < cartItems.length
 
   const handleSelectAll = () => {
     const newSelected = allSelected
@@ -98,7 +155,21 @@ const Cart = () => {
       ? val.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })
       : '0₫'
 
+  const [isWaiting, setIsWaiting] = React.useState(false);
+
+  const handleQuantityChangeWithDelay = async (variantId, delta) => {
+    if (isWaiting || isFetchingInventories) return;
+    setIsWaiting(true);
+
+    try {
+      await handleQuantityChange(variantId, delta);
+    } finally {
+      setTimeout(() => setIsWaiting(false), 500);
+    }
+  };
   const handleQuantityChange = async (variantId, delta) => {
+    if (isFetchingInventories) return
+
     const item = cartItems.find(i => i.variant._id === variantId)
     if (!item) return
 
@@ -113,9 +184,13 @@ const Cart = () => {
     }
 
     try {
-
+      // Gọi API để cập nhật số lượng
       await updateItem(variantId, { quantity: delta })
 
+      // Tạo một Promise để delay chỉ cho sản phẩm cụ thể
+      await new Promise(resolve => setTimeout(resolve, 500))
+
+      // Cập nhật cartItems cho sản phẩm cụ thể
       setCartItems(prevItems =>
         prevItems.map(i =>
           i.variant._id === variantId
@@ -123,17 +198,27 @@ const Cart = () => {
             : i
         )
       )
+
+      // Cập nhật selectedItems cho sản phẩm cụ thể
+      setSelectedItems(prev =>
+        prev.map(i =>
+          i.variantId === variantId ? { ...i, quantity: newQty } : i
+        )
+      )
     } catch (error) {
       console.error('Lỗi cập nhật số lượng:', error)
     }
   }
-
   const handleRemove = async ({ variantId }) => {
     try {
       const res = await deleteItem({ variantId })
       if (res) {
         setCartItems(prev => prev.filter(item => item.variant._id !== variantId))
         setSelectedItems(prev => prev.filter(i => i.variantId !== variantId))
+        setInventoryQuantities(prev => {
+          const { [variantId]: _, ...rest } = prev
+          return rest
+        })
       }
     } catch (error) {
       console.error('Lỗi xoá sản phẩm:', error)
@@ -153,8 +238,46 @@ const Cart = () => {
     await clearCart()
     setCartItems([])
     setSelectedItems([])
+    setInventoryQuantities({})
     setConfirmClearOpen(false)
   }
+
+  const calculateDiscount = (coupon, total) => {
+    if (!coupon || total < coupon.minOrderValue) return 0
+
+    return coupon.type === 'percent'
+      ? Math.floor((total * coupon.amount) / 100)
+      : coupon.amount
+  }
+
+  const getApplicableCoupon = () => {
+    const validCoupons = coupons.filter(c => totalPrice >= c.minOrderValue)
+    if (validCoupons.length === 0) return null
+
+    return validCoupons.reduce((best, current) => {
+      const bestDiscount = calculateDiscount(best, totalPrice)
+      const currentDiscount = calculateDiscount(current, totalPrice)
+      return currentDiscount > bestDiscount ? current : best
+    })
+  }
+
+  const getNextCoupon = () => {
+    if (!coupons.length) return null
+
+    const sorted = [...coupons].sort((a, b) => a.minOrderValue - b.minOrderValue)
+    const applicable = getApplicableCoupon()
+
+    if (!applicable) {
+      return sorted.find(c => totalPrice < c.minOrderValue) || null
+    }
+
+    const next = sorted.find(c => c.minOrderValue > applicable.minOrderValue)
+    return next || null
+  }
+
+  const applicableCoupon = getApplicableCoupon()
+  const nextCoupon = getNextCoupon()
+  const discountAmount = applicableCoupon ? calculateDiscount(applicableCoupon, totalPrice) : 0
 
   if (loading) {
     return (
@@ -167,8 +290,54 @@ const Cart = () => {
   return (
     <Container
       maxWidth='xl'
-      sx={{ minHeight: '70vh', mt: 10, mb: 5, overflowX: 'auto' }}
+      sx={{ minHeight: '70vh', mt: 16, mb: 5, overflowX: 'auto' }}
     >
+      <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
+        <Typography variant="h6" sx={{ fontWeight: 700 }}>
+          Giỏ hàng:
+        </Typography>
+        <Typography variant="h6" sx={{ fontWeight: 700 }}>
+          {cartItems.length} Sản phẩm
+        </Typography>
+      </Box>
+      {coupons.length > 0 && selectedItems.length > 0 && (
+        <Typography
+          variant="body1"
+          sx={{
+            color: '#1A3C7B',
+            backgroundColor: '#E3F2FD',
+            p: 1,
+            borderRadius: 1,
+            mb: 2
+          }}
+        >
+          {(() => {
+            if (applicableCoupon) {
+              if (nextCoupon && totalPrice < nextCoupon.minOrderValue) {
+                const nextDiscountText = nextCoupon.type === 'percent'
+                  ? `${nextCoupon.amount}%`
+                  : formatPrice(nextCoupon.amount)
+
+                return `Bạn đang được Giảm ${formatPrice(discountAmount)}, chỉ cần mua thêm ${formatPrice(nextCoupon.minOrderValue - totalPrice)} để nhận mã giảm ${nextDiscountText} 🎉!`
+              }
+
+              return `Đơn hàng của bạn đã đạt mức giảm cao nhất: ${formatPrice(discountAmount)} 🎉`
+            }
+
+            const first = coupons[0]
+            if (first) {
+              const discountText = first.type === 'percent'
+                ? `${first.amount}%`
+                : formatPrice(first.amount)
+
+              return `Chỉ cần mua thêm ${formatPrice(first.minOrderValue - totalPrice)} để nhận mã giảm ${discountText} 🎉!`
+            }
+
+            return null
+          })()}
+        </Typography>
+      )}
+
       <Table size='medium' sx={{ minWidth: 650 }}>
         <TableHead>
           <TableRow>
@@ -253,7 +422,6 @@ const Cart = () => {
                         >
                           {variant.name}
                         </Typography>
-
                         <Typography variant="body2" color="text.secondary">
                           Phân loại hàng: {variant.color?.name || 'Không rõ'}, {variant.size?.name || 'Không rõ'}
                         </Typography>
@@ -267,8 +435,8 @@ const Cart = () => {
                     <Box display='flex' alignItems='center' justifyContent='center'>
                       <IconButton
                         size='small'
-                        onClick={() => handleQuantityChange(variant._id, -1)}
-                        disabled={item.quantity <= 1}
+                        onClick={() => handleQuantityChangeWithDelay(variant._id, -1)}
+                        disabled={isFetchingInventories || item.quantity <= 1 || isWaiting}
                         aria-label='Giảm số lượng'
                       >
                         <Remove />
@@ -284,28 +452,32 @@ const Cart = () => {
                       />
                       <IconButton
                         size='small'
-                        onClick={() => handleQuantityChange(variant._id, 1)}
+                        onClick={() => handleQuantityChangeWithDelay(variant._id, 1)}
+                        disabled={isFetchingInventories || item.quantity >= (inventoryQuantities[variant._id] || 99) || isWaiting}
                         aria-label='Tăng số lượng'
-                        disabled={item.quantity >= (inventoryQuantities[variant._id] || 99)}
-
                       >
                         <Add />
                       </IconButton>
                     </Box>
                   </TableCell>
+
+
                   <TableCell align='center'>
                     <IconButton
                       color='error'
-                      onClick={() => handleRemove({ variantId: variant._id })}
-                      aria-label='Xoá sản phẩm'
+                      onClick={() => {
+                        setDeleteMode('single')
+                        setItemToDelete(variant)
+                        setConfirmClearOpen(true)
+                      }}
                     >
                       <Delete />
                     </IconButton>
+
                   </TableCell>
                 </TableRow>
               )
             })
-
           )}
         </TableBody>
       </Table>
@@ -319,13 +491,26 @@ const Cart = () => {
         flexWrap='wrap'
         gap={2}
       >
-        <Typography variant='h6' sx={{ flexGrow: 1, color: '#222' }}>
-          Tổng tiền: {formatPrice(totalPrice)}
-        </Typography>
+        <Box>
+          <Typography variant='h6' sx={{ flexGrow: 1, color: '#222', fontWeight: 700 }}>
+            Tổng tiền: {formatPrice(totalPrice)}
+          </Typography>
+        </Box>
         <Box display='flex' gap={2}>
           <Button
-            variant='contained'
             color='primary'
+            sx={{
+              backgroundColor: '#1A3C7B',
+              color: '#fff',
+              '&:hover': {
+                backgroundColor: '#3f51b5'
+              },
+              '&:disabled': {
+                backgroundColor: '#ccc',
+                color: '#666',
+                boxShadow: 'none'
+              }
+            }}
             disabled={selectedItems.length === 0}
             onClick={() => {
               navigate('/payment')
@@ -334,38 +519,49 @@ const Cart = () => {
             Thanh toán
           </Button>
           <Button
-            variant='outlined'
             color='error'
-            startIcon={<DeleteForever />}
-            onClick={() => setConfirmClearOpen(true)}
-            disabled={cartItems.length === 0}
+            onClick={() => {
+              setDeleteMode('all')
+              setConfirmClearOpen(true)
+            }}
           >
             Xoá toàn bộ
           </Button>
+
         </Box>
       </Box>
 
-      {/* Xác nhận xoá toàn bộ */}
       <Dialog
         open={confirmClearOpen}
         onClose={() => setConfirmClearOpen(false)}
-        aria-labelledby='confirm-clear-title'
       >
-        <DialogTitle id='confirm-clear-title'>Xác nhận</DialogTitle>
+        <DialogTitle>Xác nhận</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            Bạn có chắc chắn muốn xoá toàn bộ sản phẩm trong giỏ hàng không?
+            {deleteMode === 'single'
+              ? 'Bạn có chắc chắn muốn xoá sản phẩm này không?'
+              : 'Bạn có chắc chắn muốn xoá toàn bộ sản phẩm trong giỏ hàng không?'}
           </DialogContentText>
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setConfirmClearOpen(false)}>Hủy</Button>
-          <Button color='error' onClick={handleClearCart}>
+          <Button
+            sx={{ color: 'black' }}
+            onClick={() => {
+              if (deleteMode === 'single') {
+                handleRemove({ variantId: itemToDelete._id })
+              } else {
+                handleClearCart()
+              }
+              setConfirmClearOpen(false)
+            }}
+          >
             Xoá
           </Button>
         </DialogActions>
       </Dialog>
 
-      {/* Thông báo khi đạt số lượng tối đa */}
+
       <Snackbar
         open={showMaxQuantityAlert}
         autoHideDuration={2000}

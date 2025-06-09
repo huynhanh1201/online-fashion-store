@@ -1,9 +1,10 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { getDiscounts } from '~/services/discountService.js'
 
-const CouponList = () => {
+const CouponList = ({ onCouponSelect }) => {
   const [coupons, setCoupons] = useState([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
   const [copiedCode, setCopiedCode] = useState('')
   const scrollRef = useRef(null)
 
@@ -29,8 +30,12 @@ const CouponList = () => {
   }
 
   const handleCopy = (code) => {
+    if (!code || code === 'N/A') return
     navigator.clipboard.writeText(code)
     setCopiedCode(code)
+    if (onCouponSelect) {
+      onCouponSelect(code)
+    }
     setTimeout(() => setCopiedCode(''), 1500)
   }
 

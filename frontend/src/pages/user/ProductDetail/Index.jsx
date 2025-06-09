@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { Container, Grid, Typography, Button, Box } from '@mui/material'
 import { useParams } from 'react-router-dom'
-import useProductDetail from '~/pages/user/ProductDetail/useProductDetail'
+import useProductDetail from '~/hooks/useProductDetail'
 import ProductImageSection from './ProductImageSection'
 import ProductInfoSection from './ProductInfoSection'
 import ProductDescription from './ProductDescription'
@@ -124,6 +124,8 @@ const ProductDetail = () => {
             getCurrentPrice={getCurrentPrice}
             getCurrentImages={getCurrentImages}
             inventory={inventory}
+            setSnackbar={setSnackbar}
+            
           />
         </Grid>
       </Grid>
@@ -138,7 +140,15 @@ const ProductDetail = () => {
         handleCopy={handleCopy}
         formatCurrencyShort={formatCurrencyShort}
       />
-      <SnackbarAlert snackbar={snackbar} onClose={() => setSnackbar(null)} />
+      <SnackbarAlert
+        open={snackbar?.open || false}
+        message={snackbar?.message || ''}
+        severity={snackbar?.severity || 'info'}
+        variantImage={snackbar?.variantImage || '/default.jpg'}
+        productName={snackbar?.productName || ''}
+        onClose={() => setSnackbar(prev => ({ ...prev, open: false }))}
+      />
+
     </Container>
   )
 }

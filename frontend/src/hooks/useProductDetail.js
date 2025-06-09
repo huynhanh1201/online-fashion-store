@@ -233,8 +233,9 @@ const useProductDetail = (productId) => {
     try {
       const response = await fetch(`http://localhost:8017/v1/inventories?variantId=${variantId}`)
       if (!response.ok) throw new Error(`Lỗi HTTP ${response.status}`)
-      const data = await response.json()
-      const inventory = Array.isArray(data) ? data[0] : data // nếu trả về danh sách
+      const result = await response.json()
+      const inventoryList = result.data
+      const inventory = Array.isArray(inventoryList) ? inventoryList[0] : inventoryList
       setInventory(inventory)
       console.log('Thông tin kho:', inventory)
     } catch (error) {
@@ -299,7 +300,14 @@ const useProductDetail = (productId) => {
       const latestCart = res.cartItems ? res : await getCart()
       dispatch(setCartItems(latestCart.cartItems || []))
 
-      setSnackbar({ open: true, severity: 'success', message: 'Thêm sản phẩm vào giỏ hàng thành công!' })
+      setSnackbar({
+        open: true,
+        severity: 'success',
+        message: 'Thêm sản phẩm vào giỏ hàng thành công!',
+        variantImage: selectedVariant?.color?.image || product?.images?.[0],
+        productName: product?.name
+      })
+
       setQuantity(1)
     } catch (error) {
       console.error('Thêm vào giỏ hàng lỗi:', error)
@@ -323,7 +331,8 @@ const useProductDetail = (productId) => {
 
     if (variants.length > 0 && !selectedVariant) {
       setSnackbar({
-        type: 'warning',
+        open: true,
+        severity: 'warning',
         message: 'Vui lòng chọn màu sắc và kích thước!'
       })
       return
@@ -332,8 +341,9 @@ const useProductDetail = (productId) => {
     const maxQuantity = inventory?.quantity ?? selectedVariant?.quantity ?? product?.quantity ?? 0
     if (maxQuantity === 0) {
       setSnackbar({
-        type: 'warning',
-        message: 'Sản phẩm này đã hết hàng!'
+        open: true,
+        severity: 'warning',
+        message: 'Vui lòng chọn màu sắc và kích thước!'
       })
       return
     }

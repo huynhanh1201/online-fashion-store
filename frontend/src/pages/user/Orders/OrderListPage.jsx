@@ -47,7 +47,7 @@ const OrderRow = ({ order }) => {
     }
   }
 
-  const totalAmount = items.reduce((sum, item) => sum + item.price * item.quantity, 0)
+  // const totalAmount = items.reduce((sum, item) => sum + item.price * item.quantity, 0)
   const [label, color] = statusLabels[order.status] || ['Không xác định', 'default']
 
   return (
@@ -63,7 +63,7 @@ const OrderRow = ({ order }) => {
         <TableCell sx={{ minWidth: 200 }}>
           {order.shippingAddress?.address}, {order.shippingAddress?.district}
         </TableCell>
-        <TableCell sx={{ minWidth: 120 }}>{order.total?.toLocaleString('vi-VN')} ₫</TableCell>
+        <TableCell sx={{ minWidth: 120 }}>{order.total?.toLocaleString('vi-VN')}₫</TableCell>
         <TableCell sx={{ minWidth: 120 }}>
           <Chip label={label} color={color === 'default' ? undefined : color} size="small" />
         </TableCell>
@@ -126,11 +126,6 @@ const OrderRow = ({ order }) => {
                     </Box>
                   ))}
 
-                  <Box mt={2} textAlign="right">
-                    <Typography variant="subtitle1" fontWeight="bold">
-                      Tổng: {totalAmount.toLocaleString()} ₫
-                    </Typography>
-                  </Box>
                 </>
               )}
             </Box>

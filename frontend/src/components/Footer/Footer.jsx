@@ -14,7 +14,7 @@ function Footer() {
   return (
     <>
       {/* Footer */}
-      <Box sx={{ bgcolor: '#1A3C7B', color: 'white', mt: 4, pt: 4, pb: 2 }}>
+      <Box sx={{ bgcolor: '#1A3C7B', color: 'white', pt: 4, pb: 2 }}>
         <Container maxWidth='lg'>
           <Box
             sx={{
