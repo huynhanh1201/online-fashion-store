@@ -39,6 +39,7 @@ import {
 const useProducts = (initialPage = 1) => {
   const [products, setProducts] = useState([])
   const [totalPages, setTotalPages] = useState(1)
+  const [total, setTotal] = useState(0)
   const [loading, setLoading] = useState(false)
 
   const fetchProducts = async (params = {}) => {
@@ -51,6 +52,7 @@ const useProducts = (initialPage = 1) => {
       })
       setProducts(result?.products || [])
       setTotalPages(result?.totalPages || 1)
+      setTotal(result?.total || 0)
     } catch (error) {
       console.error('Lỗi khi fetch sản phẩm:', error)
       setProducts([])
@@ -86,6 +88,7 @@ const useProducts = (initialPage = 1) => {
   }
 
   return {
+    total,
     products,
     totalPages,
     fetchProducts,

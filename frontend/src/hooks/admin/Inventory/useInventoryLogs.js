@@ -7,19 +7,21 @@ import {
 
 const useInventoryLogs = () => {
   const [logs, setLogs] = useState([])
-  const [totalPages, setTotalPages] = useState(1)
+  const [totalPagesLogs, setTotalPages] = useState(1)
+  const [totalLogs, setTotalLogs] = useState(0)
   const [loading, setLoading] = useState(false)
   const [logDetail, setLogDetail] = useState(null)
 
   const fetchLogs = async (page = 1, limit = 10, filters = {}) => {
     setLoading(true)
-    const { logs, totalPages } = await getInventoryLogs({
+    const logs = await getInventoryLogs({
       page,
       limit,
       ...filters
     })
-    setLogs(logs)
-    setTotalPages(totalPages || 1)
+    setLogs(logs?.logs || [])
+    setTotalLogs(logs?.total || 0)
+    setTotalPages(logs?.totalPages || 1)
     setLoading(false)
   }
 
@@ -35,8 +37,9 @@ const useInventoryLogs = () => {
     return result
   }
   return {
+    totalLogs,
     logs,
-    totalPages,
+    totalPagesLogs,
     loading,
     fetchLogs,
     fetchLogDetail,

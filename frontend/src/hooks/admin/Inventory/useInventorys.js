@@ -11,7 +11,7 @@ import {
 
 const useInventorys = (pageInventory = 1) => {
   const [inventories, setInventories] = useState([]) // Danh sách các biến thể kho
-  const [totalPages, setTotalPages] = useState(1) // Tổng số trang phục vụ phân trang
+  const [totalPageInventory, setTotalPages] = useState(1) // Tổng số trang phục vụ phân trang
   const [loading, setLoading] = useState(false) // Trạng thái đang tải
 
   const fetchInventories = async (
@@ -20,9 +20,9 @@ const useInventorys = (pageInventory = 1) => {
     filters = {}
   ) => {
     setLoading(true)
-    const { inventories, total } = await getInventories(page, limit, filters)
-    setInventories(inventories)
-    setTotalPages(total || 1)
+    const inventory = await getInventories(page, limit, filters)
+    setInventories(inventory.inventories || [])
+    setTotalPages(inventory.total || 1)
     setLoading(false)
   }
   const updateInventoryById = async (id, data) => {
@@ -72,7 +72,7 @@ const useInventorys = (pageInventory = 1) => {
 
   return {
     inventories,
-    totalPages,
+    totalPageInventory,
     fetchInventories,
     loading,
     updateInventoryById,

@@ -160,8 +160,6 @@ const getInventoryStatistics = async () => {
         stockMovementsPromise
       ])
 
-    console.log('stockMovements: ', stockMovements)
-
     // Xử lý cấu trúc dữ liệu về dạng Hash map
     const warehouseStatsMap = convertArrToMap(warehouseStats, '_id')
 

@@ -68,31 +68,16 @@ const CategoryManagement = () => {
     }
   }
 
-  const styles = {
-    buttonAdd: {
-      backgroundColor: '#001f5d',
-      color: '#fff',
-      marginBottom: '16px'
-    }
-  }
-
   return (
     <>
       <Typography variant='h5' sx={{ mb: 2 }}>
         Quản lý danh mục sản phẩm
       </Typography>
-      <Button
-        variant='contained'
-        sx={styles.buttonAdd}
-        startIcon={<AddIcon />}
-        onClick={() => setModalType('add')}
-      >
-        Thêm danh mục
-      </Button>
       <CategoryTable
         categories={categories}
         loading={Loading}
         handleOpenModal={handleOpenModal}
+        addCategory={() => setModalType('add')}
       />
 
       <React.Suspense fallback={<></>}>

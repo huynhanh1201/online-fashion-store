@@ -31,7 +31,8 @@ const InventoryTable = () => {
     fetchInventories,
     updateInventoryById,
     deleteInventoryById,
-    getInventoryId
+    getInventoryId,
+    totalPageInventory
   } = useInventory()
   const {
     variants,
@@ -61,7 +62,7 @@ const InventoryTable = () => {
     updateBatchById,
     deleteBatchById
   } = useBatches()
-  const { logs, fetchLogs, createNewLog } = useInventoryLog()
+  const { logs, fetchLogs, createNewLog, totalLogs } = useInventoryLog()
   const {
     partners,
     fetchPartners,
@@ -80,18 +81,17 @@ const InventoryTable = () => {
 
   const handleTabChange = (event, newValue) => {
     setActiveTab(newValue)
-    setPage(0) // Reset page when switching tabs
+    setPage(1) // Reset page when switching tabs
   }
 
   const handleChangePage = (event, newPage) => {
-    setPage(newPage)
+    setPage(newPage + 1)
   }
 
   const handleChangeRowsPerPage = (event, source) => {
     const newRowsPerPage = +event.target.value
-    console.log('New rows per page:', newRowsPerPage, 'Source:', source)
     setRowsPerPage(newRowsPerPage)
-    const page = 0
+    const page = 1
     setPage(page)
 
     switch (source) {
@@ -156,6 +156,7 @@ const InventoryTable = () => {
             products={products}
             //properties
             page={page}
+            total={totalPageInventory}
             rowsPerPage={rowsPerPage}
             onPageChange={handleChangePage}
             onRowsPerPageChange={handleChangeRowsPerPage}
@@ -182,7 +183,7 @@ const InventoryTable = () => {
             data={warehouseSlips}
             warehouses={warehouses}
             variants={variants} // Add this prop
-            page={page}
+            page={page - 1}
             rowsPerPage={rowsPerPage}
             onPageChange={handleChangePage}
             onRowsPerPageChange={handleChangeRowsPerPage}
@@ -208,6 +209,7 @@ const InventoryTable = () => {
             variants={variants}
             warehouses={warehouses}
             page={page}
+            total={totalLogs}
             rowsPerPage={rowsPerPage}
             onPageChange={handleChangePage}
             onRowsPerPageChange={handleChangeRowsPerPage}

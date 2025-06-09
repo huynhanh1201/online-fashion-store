@@ -60,19 +60,12 @@ function DiscountManagement() {
       <Typography variant='h5' sx={{ mb: 2 }}>
         Quản lý mã giảm giá
       </Typography>
-      <Button
-        variant='contained'
-        startIcon={<AddIcon />}
-        onClick={() => setModalType('add')}
-        sx={{ mb: 2, backgroundColor: '#001f5d' }}
-      >
-        Thêm mã giảm
-      </Button>
 
       <DiscountTable
         discounts={discounts}
         loading={loading}
         onAction={handleOpenModal}
+        addDiscount={() => setModalType('add')}
       />
 
       {modalType === 'add' && (

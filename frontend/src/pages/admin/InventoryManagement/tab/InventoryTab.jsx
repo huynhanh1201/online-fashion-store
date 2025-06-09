@@ -417,7 +417,8 @@ const InventoryTab = ({
   refreshVariants,
   fetchWarehouses,
   formatCurrency,
-  parseCurrency
+  parseCurrency,
+  total
 }) => {
   const [filterWarehouse, setFilterWarehouse] = useState('all')
   const [filterStatus, setFilterStatus] = useState('all')
@@ -434,10 +435,10 @@ const InventoryTab = ({
   const [endDate, setEndDate] = useState(dayjs().format('YYYY-MM-DD'))
 
   useEffect(() => {
-    refreshInventories(page > 0 ? page : 1, rowsPerPage)
+    refreshInventories(page, rowsPerPage)
     refreshVariants()
     fetchWarehouses()
-  }, [])
+  }, [page, rowsPerPage])
 
   const enrichedInventories = data.map((item) => {
     return {
@@ -771,17 +772,15 @@ const InventoryTab = ({
       <TablePagination
         rowsPerPageOptions={[10, 25, 100]}
         component='div'
-        count={filteredInventories.length}
+        count={total || 0}
         rowsPerPage={rowsPerPage}
-        page={page}
-        onPageChange={onPageChange}
-        onRowsPerPageChange={(e) => onRowsPerPageChange(e, 'inventory')}
+        page={page - 1}
+        onPageChange={(event, newPage) => onPageChange(event, newPage)} // +1 để giữ page bắt đầu từ 1
+        onRowsPerPageChange={(event) => onRowsPerPageChange(event, 'log')} // giữ đúng chuẩn
         labelRowsPerPage='Số dòng mỗi trang'
-        labelDisplayedRows={({ from, to, count }) => {
-          const actualTo = to > count ? count : to // nếu to vượt quá count thì lấy count
-          const actualFrom = from > count ? count : from // nếu from vượt quá count thì lấy count
-          return `${actualFrom}–${actualTo} trên ${count !== -1 ? count : `hơn ${actualTo}`}`
-        }}
+        labelDisplayedRows={({ from, to, count }) =>
+          `${from}–${to} trên ${count !== -1 ? count : `hơn ${to}`}`
+        }
       />
 
       <ViewInventoryModal

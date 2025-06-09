@@ -30,6 +30,7 @@ import DiscountManagement from '~/pages/admin/DiscountManagement/index.jsx'
 import TransactionManegement from '~/pages/admin/TransactionManegement/index.jsx'
 import ColorManagement from '~/pages/admin/ColorManagement/index.jsx'
 import InventoryManagement from '~/pages/admin/InventoryManagement/index.jsx'
+import NotificationManagement from '~/pages/admin/NotificationManagement/index.jsx'
 // import InventoryLogManagement from '~/pages/admin/InventoryLogManagement/index.jsx'
 import SizeManagement from '~/pages/admin/SizeManagement/index.jsx'
 import InventoryLogManagement from '~/pages/admin/InventoryLogManagement/index.jsx'
@@ -114,6 +115,10 @@ function App() {
             element={<InventoryLogManagement />}
           />
           <Route path='size-management' element={<SizeManagement />} />
+          <Route
+            path='notification-management'
+            element={<NotificationManagement />}
+          />
         </Route>
       </Route>
 

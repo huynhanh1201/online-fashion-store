@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import {
   AppBar,
   Toolbar,
@@ -9,7 +9,9 @@ import {
 } from '@mui/material'
 import MenuIcon from '@mui/icons-material/Menu'
 import MoreIcon from '@mui/icons-material/MoreVert'
-
+import NotificationsIcon from '@mui/icons-material/Notifications'
+import Badge from '@mui/material/Badge'
+import ViewsAppBarModal from '~/pages/admin/NotificationManagement/modal/ViewsAppBarModal.jsx'
 export default function AdminAppBar({
   open,
   anchorEl,
@@ -21,7 +23,9 @@ export default function AdminAppBar({
 }) {
   const menuId = 'primary-search-account-menu'
   const mobileMenuId = 'primary-search-account-menu-mobile'
-
+  const [modalOpen, setModalOpen] = useState(false)
+  const handleModalOpen = () => setModalOpen(true)
+  const handleModalClose = () => setModalOpen(false)
   return (
     <AppBar position='fixed' className={`app-bar ${open ? 'open' : ''}`}>
       <Toolbar className='app-bar--header'>
@@ -51,6 +55,31 @@ export default function AdminAppBar({
               .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
               .join(' ') || ''}
           </Typography>
+          <Box
+            sx={{
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              width: 40,
+              height: 40
+            }}
+          >
+            <IconButton
+              size='large'
+              aria-label='show notifications'
+              color='inherit'
+              onClick={handleModalOpen}
+            >
+              <Badge
+                // badgeContent={notifications.filter((n) => !n.read).length}
+                badgeContent={10}
+                color='error'
+              >
+                <NotificationsIcon />
+              </Badge>
+            </IconButton>
+          </Box>
           <IconButton
             size='large'
             edge='end'
@@ -81,6 +110,7 @@ export default function AdminAppBar({
             <MoreIcon />
           </IconButton>
         </Box>
+        <ViewsAppBarModal open={modalOpen} handleClose={handleModalClose} />
       </Toolbar>
     </AppBar>
   )

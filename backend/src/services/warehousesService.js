@@ -1,6 +1,9 @@
 import { WarehouseModel } from '~/models/WarehouseModel'
 import generateSequentialCode from '~/utils/generateSequentialCode'
+import { InventoryModel } from '~/models/InventoryModel'
 import { WarehouseSlipModel } from '~/models/WarehouseSlipsModel'
+import ApiError from '~/utils/ApiError'
+import { StatusCodes } from 'http-status-codes'
 
 const createWarehouse = async (reqBody) => {
   // eslint-disable-next-line no-useless-catch
@@ -86,11 +89,44 @@ const updateWarehouse = async (warehouseId, reqBody) => {
 const deleteWarehouse = async (warehouseId) => {
   // eslint-disable-next-line no-useless-catch
   try {
+    const inventoryPromise = InventoryModel.exists({
+      warehouseId,
+      destroy: false
+    })
+
+    const warehouseSlipPromise = WarehouseSlipModel.exists({
+      warehouseId,
+      destroy: false
+    })
+
+    const [inventoryExsits, warehouseSlipExsits] = await Promise.all([
+      inventoryPromise,
+      warehouseSlipPromise
+    ])
+
+    if (inventoryExsits) {
+      throw new ApiError(
+        StatusCodes.CONFLICT,
+        'Không thể xóa KHO HÀNG khi vẫn còn TỒN KHO hoạt động.'
+      )
+    }
+
+    if (warehouseSlipExsits) {
+      throw new ApiError(
+        StatusCodes.CONFLICT,
+        'Không thể xóa KHO HÀNG khi vẫn còn PHIẾU NHÂP/XUẤT hoạt động.'
+      )
+    }
+
     const warehouseDeleted = await WarehouseModel.findOneAndUpdate(
       { _id: warehouseId },
       { destroy: true },
       { new: true }
     )
+
+    if (!warehouseDeleted) {
+      throw new ApiError(StatusCodes.NOT_FOUND, 'Kho hàng không tồn tại.')
+    }
 
     return warehouseDeleted
   } catch (err) {
