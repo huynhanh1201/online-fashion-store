@@ -107,6 +107,61 @@ const Payment = () => {
   // Xác định cartItems
   const cartItems = isBuyNow && tempCart?.cartItems?.length > 0 ? tempCart.cartItems : cartCartItems
 
+  const [shippingFee, setShippingFee] = useState(0);
+  const [shippingFeeLoading, setShippingFeeLoading] = useState(false);
+
+  useEffect(() => {
+    if (selectedAddress && selectedCartItems.length > 0) {
+      fetchShippingFee(selectedAddress, selectedCartItems);
+    } else {
+      setShippingFee(0);
+    }
+  }, [selectedAddress]);
+  const fetchShippingFee = async (address, items) => {
+    if (!address || !items.length) {
+      setShippingFee(0);
+      return;
+    }
+
+    try {
+      setShippingFeeLoading(true);
+      const totalItems = items.reduce((sum, item) => sum + (item.quantity || 1), 0);
+
+      const payload = {
+        numberItemOrder: totalItems,
+        service_type_id: 2,
+        to_district_id: parseInt(address.districtId, 10), // Chuyển districtId thành số nguyên
+        to_ward_code: address.wardId, // Sử dụng wardId trực tiếp
+        insurance_value: 0,
+        coupon: null,
+      };
+
+      const response = await fetch('http://localhost:8017/v1/deliveries/calculate-fee', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) {
+        throw new Error('Không thể tính phí vận chuyển');
+      }
+
+      const data = await response.json();
+      setShippingFee(data.totalFeeShipping || 0); // Sử dụng totalFeeShipping thay vì fee
+    } catch (error) {
+      console.error('Lỗi tính phí vận chuyển:', error);
+      setShippingFee(0);
+      setSnackbar({
+        open: true,
+        severity: 'error',
+        message: 'Không thể tính phí vận chuyển',
+      });
+    } finally {
+      setShippingFeeLoading(false);
+    }
+  };
   // Tính selectedCartItems + subTotal
   let subTotal = 0
   const selectedCartItems = cartItems
@@ -211,7 +266,7 @@ const Payment = () => {
     setTimeout(() => setCopiedCode(''), 1500)
   }
 
-  const total = Math.max(subTotal - discount, 0)
+  const total = Math.max(subTotal - discount + shippingFee, 0);
 
   useEffect(() => {
     const isOnPaymentPage = location.pathname.startsWith('/payment')
@@ -441,9 +496,16 @@ const Payment = () => {
                           alt="Ship"
                           style={{ height: 32, marginRight: 8 }}
                         />
-                        <Typography sx={{ fontSize: '1rem' }}>
-                          Phí ship đơn hàng miễn phí
-                        </Typography>
+                        <span style={{ fontSize: '1rem' }}>Phí vận chuyển: </span>
+                        <span style={{ fontSize: '1rem' }}>
+                          {shippingFeeLoading ? (
+                            <CircularProgress size={16} />
+                          ) : shippingFee === 0 ? (
+                            'Miễn phí'
+                          ) : (
+                            shippingFee.toLocaleString('vi-VN') + 'đ'
+                          )}
+                        </span>
                       </Box>
                     }
                   />
@@ -505,7 +567,7 @@ const Payment = () => {
                           style={{ height: 32, marginRight: 8 }}
                         />
                         <Typography sx={{ fontSize: '1rem' }}>
-                         Ví điện tử VNPAY
+                          Ví điện tử VNPAY
                         </Typography>
                       </Box>
                     }
@@ -671,23 +733,30 @@ const Payment = () => {
 
                 {/* Tổng thanh toán */}
                 <Divider sx={{ my: 2 }} />
-                <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                  <span style={{ fontSize: '1.1rem' }}>Tạm tính:</span>
-                  <span style={{ fontSize: '1.1rem' }}>{subTotal.toLocaleString('vi-VN')}đ</span>
-                </Box>
-                <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                  <span style={{ fontSize: '1.1rem' }}>Phí vận chuyển:</span>
-                  <span style={{ fontSize: '1.1rem' }}>Miễn phí</span>
-                </Box>
-                <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                  <span style={{ fontSize: '1.1rem' }}>Voucher giảm giá:</span>
-                  <span style={{ fontSize: '1.1rem' }}>{discount.toLocaleString('vi-VN')}đ</span>
-                </Box>
+                <Typography sx={{ display: 'flex', justifyContent: 'space-between', fontSize: '1.1rem' }}>
+                  <span>Tạm tính:</span>
+                  <span>{subTotal.toLocaleString('vi-VN')}đ</span>
+                </Typography>
+                <Typography sx={{ display: 'flex', justifyContent: 'space-between', fontSize: '1.1rem' }}>
+                  <span>Phí vận chuyển:</span>
+                  {shippingFeeLoading ? (
+                    <CircularProgress size={24} />
+                  ) : shippingFee === 0 ? (
+                    'Miễn phí'
+                  ) : (
+                    shippingFee.toLocaleString('vi-VN') + 'đ'
+                  )}
+                </Typography>
+
+                <Typography sx={{ display: 'flex', justifyContent: 'space-between', fontSize: '1.1rem' }}>
+                  <span>Voucher giảm giá:</span>
+                  <span>{discount.toLocaleString('vi-VN')}đ</span>
+                </Typography>
                 <Divider sx={{ my: 2 }} />
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', fontWeight: 700 }}>
-                  <span style={{ fontSize: '1.2rem' }}>Tổng:</span>
-                  <span style={{ fontSize: '1.2rem' }}>{total.toLocaleString('vi-VN')}đ</span>
-                </Box>
+                <Typography sx={{ display: 'flex', justifyContent: 'space-between', fontSize: '1.2rem', fontWeight: 'bold' }}>
+                  <span>Tổng:</span>
+                  <span>{total.toLocaleString('vi-VN')}đ</span>
+                </Typography>
 
                 <Button
                   fullWidth
