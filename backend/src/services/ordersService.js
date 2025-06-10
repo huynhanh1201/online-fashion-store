@@ -14,6 +14,9 @@ import { env } from '~/config/environment'
 import { UserModel } from '~/models/UserModel'
 import { CouponModel } from '~/models/CouponModel'
 import { VariantModel } from '~/models/VariantModel'
+import { InventoryModel } from '~/models/InventoryModel'
+import apiError from '~/utils/ApiError'
+import { deliveriesService } from '~/services/deliveriesService'
 
 const createOrder = async (userId, reqBody, ipAddr) => {
   // eslint-disable-next-line no-useless-catch
@@ -55,8 +58,40 @@ const createOrder = async (userId, reqBody, ipAddr) => {
       )
     }
 
-    // Lấy thông tin sản phẩm
-    const variantIds = cartItems.map((item) => item.variantId)
+    // Lấy thông tin sản phẩm và kiểm tra kho
+    let variantIds = []
+
+    let numberItemOrder = 0
+
+    const variantItemsGHN = []
+
+    for (const item of cartItems) {
+      const { variantId, quantity } = item
+
+      const inventory = await InventoryModel.findOneAndUpdate(
+        {
+          variantId,
+          quantity: { $gte: quantity }
+        },
+        {
+          $inc: { quantity: -quantity }
+        }
+      )
+
+      if (!inventory) {
+        throw new apiError(
+          StatusCodes.UNPROCESSABLE_ENTITY,
+          `Số lượng tồn kho (${inventory?.quantity || 0}) không đủ so với yêu cầu (${quantity})`
+        )
+      }
+
+      numberItemOrder += quantity
+
+      // Lấy mảng variantId
+      if (variantIds.includes(variantId)) continue
+      variantIds.push(variantId)
+    }
+
     const variants = await VariantModel.find({
       _id: { $in: variantIds }
     })
@@ -125,6 +160,45 @@ const createOrder = async (userId, reqBody, ipAddr) => {
     }
 
     const [order] = await OrderModel.create([newOrder], { session })
+
+    // // Tạo đơn hàng cho đơn vị vận chuyển (GHN)
+    //
+    // const length = 30
+    // const width = 20
+    // const height = 2 * numberItemOrder
+    // const weight = 300 * numberItemOrder
+    //
+    // const bodyReqCreateOrderGnh = {
+    //   // Thông tin người nhận
+    //   to_name: address.fullName,
+    //   to_phone: address.phone,
+    //   to_address: address.address,
+    //   to_ward_code: address.ward,
+    //   to_district_name: address.district,
+    //   to_province_name: address.city,
+    //
+    //   // Kích thước & cân nặng
+    //   length,
+    //   width,
+    //   height,
+    //   weight,
+    //
+    //   // Dịch vụ giao hàng
+    //   service_type_id: 1,
+    //   payment_type_id: 1,
+    //   required_note: 'KHONGCHOXEMHANG',
+    //
+    //   // Quản lý đơn hàng
+    //   client_order_code: order._id.toString()
+    // }
+    //
+    // console.log('bodyReqCreateOrderGnh: ', bodyReqCreateOrderGnh)
+    //
+    // const orderGHNCreated = await deliveriesService.createOrderDelivery(
+    //   bodyReqCreateOrderGnh
+    // )
+    //
+    // console.log('orderGHNCreated: ', orderGHNCreated)
 
     // Tạo OrderItems
     const orderItems = cartItems.map((item) => {
