@@ -15,7 +15,7 @@ import {
 import CloseIcon from '@mui/icons-material/Close'
 import { addShippingAddress, updateShippingAddress } from '~/services/addressService'
 import { GHN_TOKEN_API } from '~/utils/constants'
-
+import { getProvinces, getDistricts, getWards } from '~/services/addressGHNService'
 export default function AddAddressModal({
   open,
   onClose,
@@ -112,97 +112,6 @@ export default function AddAddressModal({
     fetchProvinces()
   }, [open, showSnackbar])
 
-  // Gọi API quận/huyện khi tỉnh/thành thay đổi
-  useEffect(() => {
-    if (!formData.city) {
-      setDistricts([])
-      setWards([])
-      setFormData((prev) => ({ ...prev, district: '', ward: '' }))
-      return
-    }
-
-    const fetchDistricts = async () => {
-      try {
-        const districtRes = await fetch(
-          'https://online-gateway.ghn.vn/shiip/public-api/master-data/district',
-          {
-            method: 'POST',
-            headers: {
-              'Token': GHN_TOKEN_API,
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ province_id: parseInt(formData.city) })
-          }
-        )
-        if (!districtRes.ok) {
-          throw new Error(`Lỗi tải quận/huyện: ${districtRes.status} ${districtRes.statusText}`)
-        }
-        const districtData = await districtRes.json()
-        if (districtData.code !== 200 || !districtData.data) {
-          throw new Error('Không có dữ liệu quận/huyện')
-        }
-        // Chuẩn hóa dữ liệu: DistrictID -> code, DistrictName -> name
-        const districts = districtData.data.map((d) => ({
-          code: String(d.DistrictID),
-          name: d.DistrictName
-        }))
-        setDistricts(districts)
-        if (!isEditMode) {
-          setFormData((prev) => ({ ...prev, district: '', ward: '' }))
-        }
-      } catch (error) {
-        console.error('Lỗi khi tải quận/huyện:', error)
-        showSnackbar?.(`Không thể tải dữ liệu quận/huyện: ${error.message}`, 'error')
-      }
-    }
-
-    fetchDistricts()
-  }, [formData.city, isEditMode, showSnackbar])
-
-  // Gọi API phường/xã khi quận/huyện thay đổi
-  useEffect(() => {
-    if (!formData.district) {
-      setWards([])
-      setFormData((prev) => ({ ...prev, ward: '' }))
-      return
-    }
-
-    const fetchWards = async () => {
-      try {
-        const wardRes = await fetch(
-          `https://online-gateway.ghn.vn/shiip/public-api/master-data/ward?district_id=${formData.district}`,
-          {
-            method: 'GET',
-            headers: {
-              'Token': GHN_TOKEN_API,
-              'Content-Type': 'application/json'
-            }
-          }
-        )
-        if (!wardRes.ok) {
-          throw new Error(`Lỗi tải phường/xã: ${wardRes.status} ${wardRes.statusText}`)
-        }
-        const wardData = await wardRes.json()
-        if (wardData.code !== 200 || !wardData.data) {
-          throw new Error('Không có dữ liệu phường/xã')
-        }
-        // Chuẩn hóa dữ liệu: WardCode -> code, WardName -> name
-        const wards = wardData.data.map((w) => ({
-          code: String(w.WardCode),
-          name: w.WardName
-        }))
-        setWards(wards)
-        if (!isEditMode) {
-          setFormData((prev) => ({ ...prev, ward: '' }))
-        }
-      } catch (error) {
-        console.error('Lỗi khi tải phường/xã:', error)
-        showSnackbar?.(`Không thể tải dữ liệu phường/xã: ${error.message}`, 'error')
-      }
-    }
-
-    fetchWards()
-  }, [formData.district, isEditMode, showSnackbar])
 
   // Load dữ liệu khi chỉnh sửa
   useEffect(() => {
