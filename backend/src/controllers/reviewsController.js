@@ -15,24 +15,12 @@ const createReview = async (req, res, next) => {
 
 const getReviewList = async (req, res, next) => {
   try {
-    const productId = req.query.productId
+    const queryString = req.query
 
     // Lấy danh sách Danh mục sản phẩm từ tầng Service chuyển qua
-    const result = await reviewsService.getReviewList(productId)
+    const result = await reviewsService.getReviewList(queryString)
 
     // Có kết quả thì trả về Client
-    res.status(StatusCodes.OK).json(result)
-  } catch (err) {
-    next(err)
-  }
-}
-
-const getReview = async (req, res, next) => {
-  try {
-    const reviewId = req.params.reviewId
-
-    const result = await reviewsService.getReview(reviewId)
-
     res.status(StatusCodes.OK).json(result)
   } catch (err) {
     next(err)
@@ -66,7 +54,6 @@ const deleteReview = async (req, res, next) => {
 export const reviewsController = {
   createReview,
   getReviewList,
-  getReview,
   updateReview,
   deleteReview
 }
