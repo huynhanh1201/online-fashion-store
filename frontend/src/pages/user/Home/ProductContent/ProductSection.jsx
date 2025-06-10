@@ -159,16 +159,6 @@ const ProductSection = ({ bannerImg, bannerTitle, bannerDesc, products }) => {
           </div>
         )}
       </div>
-
-      <div style={styles.seeMore}>
-        <button
-          style={styles.button}
-          onMouseOver={(e) => (e.target.style.backgroundColor = '#d0d0d0')}
-          onMouseOut={(e) => (e.target.style.backgroundColor = '#e0e0e0')}
-        >
-          Xem thêm
-        </button>
-      </div>
     </div>
   )
 }
