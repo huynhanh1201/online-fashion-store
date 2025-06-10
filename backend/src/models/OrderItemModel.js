@@ -9,6 +9,11 @@ const OrderItemSchema = new Schema(
       ref: 'Order', // Tham chiếu đến đơn hàng
       required: true
     },
+    productId: {
+      type: Schema.Types.ObjectId,
+      ref: 'Product', // Tham chiếu đến sản phẩm
+      required: true
+    },
     color: {
       type: Object,
       require: true

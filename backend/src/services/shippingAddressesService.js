@@ -10,7 +10,10 @@ const createShippingAddress = async (userId, reqBody) => {
       address: reqBody.address,
       ward: reqBody.ward,
       district: reqBody.district,
-      city: reqBody.city
+      city: reqBody.city,
+      wardId: reqBody.wardId,
+      districtId: reqBody.districtId,
+      cityId: reqBody.cityId
     }
 
     const ShippingAddress =

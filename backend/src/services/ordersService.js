@@ -206,6 +206,7 @@ const createOrder = async (userId, reqBody, ipAddr) => {
 
       return {
         orderId: order._id,
+        productId: variant.productId,
         color: variant.color,
         size: variant.size.name,
         name: variant.name,
