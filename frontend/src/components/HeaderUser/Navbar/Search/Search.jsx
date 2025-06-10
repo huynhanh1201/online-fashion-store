@@ -18,7 +18,7 @@ const SearchWrapper = styled(Box)({
   display: 'flex',
   alignItems: 'center',
   width: 'fit-content',
-  '@media (max-width: 740px)': {
+  '@media (max-width: 760px)': {
     display: 'none'
   }
 })

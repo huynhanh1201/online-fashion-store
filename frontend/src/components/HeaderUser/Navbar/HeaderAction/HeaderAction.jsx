@@ -157,23 +157,28 @@ const HeaderAction = () => {
           <div>
             {currentUser ? (
               <>
-                <MenuItem disabled sx={{ fontWeight: 'bold', opacity: 1 }}>
-                  👤 {currentUser.name}
+                <MenuItem
+                  onClick={handleClose}
+                  component={Link}
+                  to='/profile'
+                  sx={{ fontWeight: 'bold', opacity: 1 }}
+                >
+                  {currentUser.name}
                 </MenuItem>
-                <MenuItem component={Link} to='/profile'>
+                <MenuItem onClick={handleClose} component={Link} to='/profile'>
                   Hồ sơ
                 </MenuItem>
                 <MenuItem onClick={handleLogout}>Đăng xuất</MenuItem>
               </>
             ) : (
-              <MenuItem component={Link} to='/login'>
+              <MenuItem onClick={handleClose} component={Link} to='/login'>
                 Đăng nhập
               </MenuItem>
             )}
-            <MenuItem component={Link} to='/cart'>
+            <MenuItem onClick={handleClose} component={Link} to='/cart'>
               Giỏ hàng
             </MenuItem>
-            <MenuItem component={Link} to='/orders'>
+            <MenuItem onClick={handleClose} component={Link} to='/orders'>
               Thông tin đơn hàng
             </MenuItem>
           </div>
