@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react';
 import {
   Dialog,
   DialogTitle,
@@ -11,11 +11,11 @@ import {
   Box,
   IconButton,
   Autocomplete
-} from '@mui/material'
-import CloseIcon from '@mui/icons-material/Close'
-import { addShippingAddress, updateShippingAddress } from '~/services/addressService'
-import { GHN_TOKEN_API } from '~/utils/constants'
-import { getProvinces, getDistricts, getWards } from '~/services/addressGHNService'
+} from '@mui/material';
+import CloseIcon from '@mui/icons-material/Close';
+import { addShippingAddress, updateShippingAddress } from '~/services/addressService';
+import { GHN_TOKEN_API } from '~/utils/constants';
+
 export default function AddAddressModal({
   open,
   onClose,
@@ -24,9 +24,9 @@ export default function AddAddressModal({
   viewOnly = false,
   showSnackbar
 }) {
-  const [provinces, setProvinces] = useState([])
-  const [districts, setDistricts] = useState([])
-  const [wards, setWards] = useState([])
+  const [provinces, setProvinces] = useState([]);
+  const [districts, setDistricts] = useState([]);
+  const [wards, setWards] = useState([]);
   const [formData, setFormData] = useState({
     fullName: addressToEdit?.fullName || '',
     phone: addressToEdit?.phone || '',
@@ -34,7 +34,7 @@ export default function AddAddressModal({
     city: addressToEdit?.city || '', // Lưu ProvinceID
     district: addressToEdit?.district || '', // Lưu DistrictID
     ward: addressToEdit?.ward || '' // Lưu WardCode
-  })
+  });
   const [formErrors, setFormErrors] = useState({
     fullName: false,
     phone: false,
@@ -42,25 +42,25 @@ export default function AddAddressModal({
     city: false,
     district: false,
     ward: false
-  })
+  });
 
-  const isEditMode = !!addressToEdit
+  const isEditMode = !!addressToEdit;
 
   // Hàm xử lý thay đổi input
   const handleChange = (field) => (event) => {
-    const value = event.target.value
-    setFormData((prev) => ({ ...prev, [field]: value }))
+    const value = event.target.value;
+    setFormData((prev) => ({ ...prev, [field]: value }));
 
     // Reset quận/huyện và phường/xã khi tỉnh/thành thay đổi
     if (field === 'city') {
-      setFormData((prev) => ({ ...prev, district: '', ward: '' }))
-      setDistricts([])
-      setWards([])
+      setFormData((prev) => ({ ...prev, district: '', ward: '' }));
+      setDistricts([]);
+      setWards([]);
     }
     // Reset phường/xã khi quận/huyện thay đổi
     if (field === 'district') {
-      setFormData((prev) => ({ ...prev, ward: '' }))
-      setWards([])
+      setFormData((prev) => ({ ...prev, ward: '' }));
+      setWards([]);
     }
 
     // Xác thực
@@ -71,12 +71,34 @@ export default function AddAddressModal({
           field === 'phone' ? !value.trim() || !/^\d{10}$/.test(value.trim()) :
             field === 'address' ? !value.trim() || value.trim().length < 5 :
               !value
-    }))
-  }
+    }));
+  };
+
+  // Reset form khi mở modal
+  useEffect(() => {
+    if (open) {
+      setFormData({
+        fullName: addressToEdit?.fullName || '',
+        phone: addressToEdit?.phone || '',
+        address: addressToEdit?.address || '',
+        city: addressToEdit?.city || '',
+        district: addressToEdit?.district || '',
+        ward: addressToEdit?.ward || ''
+      });
+      setFormErrors({
+        fullName: false,
+        phone: false,
+        address: false,
+        city: false,
+        district: false,
+        ward: false
+      });
+    }
+  }, [open, addressToEdit]);
 
   // Gọi API tỉnh/thành khi modal mở
   useEffect(() => {
-    if (!open) return
+    if (!open) return;
 
     const fetchProvinces = async () => {
       try {
@@ -89,43 +111,129 @@ export default function AddAddressModal({
               'Token': GHN_TOKEN_API
             }
           }
-        )
+        );
         if (!provinceRes.ok) {
-          throw new Error(`Lỗi tải tỉnh/thành: ${provinceRes.status} ${provinceRes.statusText}`)
+          throw new Error(`Lỗi tải tỉnh/thành: ${provinceRes.status} ${provinceRes.statusText}`);
         }
-        const provinceData = await provinceRes.json()
+        const provinceData = await provinceRes.json();
         if (provinceData.code !== 200 || !provinceData.data) {
-          throw new Error('Không có dữ liệu tỉnh/thành')
+          throw new Error('Không có dữ liệu tỉnh/thành');
         }
-        // Chuẩn hóa dữ liệu: ProvinceID -> code, ProvinceName -> name
         const provinces = provinceData.data.map((p) => ({
           code: String(p.ProvinceID),
           name: p.ProvinceName
-        }))
-        setProvinces(provinces)
+        }));
+        setProvinces(provinces);
       } catch (error) {
-        console.error('Lỗi khi tải tỉnh/thành:', error)
-        showSnackbar?.(`Không thể tải dữ liệu tỉnh/thành: ${error.message}`, 'error')
+        console.error('Lỗi khi tải tỉnh/thành:', error);
+        showSnackbar?.(`Không thể tải dữ liệu tỉnh/thành: ${error.message}`, 'error');
       }
+    };
+
+    fetchProvinces();
+  }, [open, showSnackbar]);
+
+  // Gọi API quận/huyện khi tỉnh/thành thay đổi
+  useEffect(() => {
+    if (!formData.city) {
+      setDistricts([]);
+      setWards([]);
+      setFormData((prev) => ({ ...prev, district: '', ward: '' }));
+      return;
     }
 
-    fetchProvinces()
-  }, [open, showSnackbar])
+    const fetchDistricts = async () => {
+      try {
+        const districtRes = await fetch(
+          'https://online-gateway.ghn.vn/shiip/public-api/master-data/district',
+          {
+            method: 'POST',
+            headers: {
+              'Token': GHN_TOKEN_API,
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ province_id: parseInt(formData.city) })
+          }
+        );
+        if (!districtRes.ok) {
+          throw new Error(`Lỗi tải quận/huyện: ${districtRes.status} ${districtRes.statusText}`);
+        }
+        const districtData = await districtRes.json();
+        if (districtData.code !== 200 || !districtData.data) {
+          throw new Error('Không có dữ liệu quận/huyện');
+        }
+        const districts = districtData.data.map((d) => ({
+          code: String(d.DistrictID),
+          name: d.DistrictName
+        }));
+        setDistricts(districts);
+        if (!isEditMode) {
+          setFormData((prev) => ({ ...prev, district: '', ward: '' }));
+        }
+      } catch (error) {
+        console.error('Lỗi khi tải quận/huyện:', error);
+        showSnackbar?.(`Không thể tải dữ liệu quận/huyện: ${error.message}`, 'error');
+      }
+    };
 
+    fetchDistricts();
+  }, [formData.city, isEditMode, showSnackbar]);
+
+  // Gọi API phường/xã khi quận/huyện thay đổi
+  useEffect(() => {
+    if (!formData.district) {
+      setWards([]);
+      setFormData((prev) => ({ ...prev, ward: '' }));
+      return;
+    }
+
+    const fetchWards = async () => {
+      try {
+        const wardRes = await fetch(
+          `https://online-gateway.ghn.vn/shiip/public-api/master-data/ward?district_id=${formData.district}`,
+          {
+            method: 'GET',
+            headers: {
+              'Token': GHN_TOKEN_API,
+              'Content-Type': 'application/json'
+            }
+          }
+        );
+        if (!wardRes.ok) {
+          throw new Error(`Lỗi tải phường/xã: ${wardRes.status} ${wardRes.statusText}`);
+        }
+        const wardData = await wardRes.json();
+        if (wardData.code !== 200 || !wardData.data) {
+          throw new Error('Không có dữ liệu phường/xã');
+        }
+        const wards = wardData.data.map((w) => ({
+          code: String(w.WardCode),
+          name: w.WardName
+        }));
+        setWards(wards);
+        if (!isEditMode) {
+          setFormData((prev) => ({ ...prev, ward: '' }));
+        }
+      } catch (error) {
+        console.error('Lỗi khi tải phường/xã:', error);
+        showSnackbar?.(`Không thể tải dữ liệu phường/xã: ${error.message}`, 'error');
+      }
+    };
+
+    fetchWards();
+  }, [formData.district, isEditMode, showSnackbar]);
 
   // Load dữ liệu khi chỉnh sửa
   useEffect(() => {
-    if (!open || !isEditMode || !addressToEdit || provinces.length === 0) return
+    if (!open || !isEditMode || !addressToEdit || provinces.length === 0) return;
 
     const loadLocationCodes = async () => {
       try {
         // Tìm ProvinceID từ city name
-        const city = provinces.find((p) => p.name === addressToEdit.city || String(p.code) === String(addressToEdit.city))
-        const cityCode = city?.code || ''
-        if (!cityCode) throw new Error('Không tìm thấy tỉnh/thành')
-
-        // Cập nhật city vào formData
-        setFormData((prev) => ({ ...prev, city: cityCode }))
+        const city = provinces.find((p) => p.name === addressToEdit.city || String(p.code) === String(addressToEdit.city));
+        const cityCode = city?.code || '';
+        if (!cityCode) throw new Error('Không tìm thấy tỉnh/thành');
+        setFormData((prev) => ({ ...prev, city: cityCode }));
 
         // Gọi API quận/huyện
         const districtRes = await fetch(
@@ -138,23 +246,21 @@ export default function AddAddressModal({
             },
             body: JSON.stringify({ province_id: parseInt(cityCode) })
           }
-        )
-        if (!districtRes.ok) throw new Error('Lỗi tải quận/huyện')
-        const districtData = await districtRes.json()
-        if (districtData.code !== 200 || !districtData.data) throw new Error('Không có dữ liệu quận/huyện')
+        );
+        if (!districtRes.ok) throw new Error('Lỗi tải quận/huyện');
+        const districtData = await districtRes.json();
+        if (districtData.code !== 200 || !districtData.data) throw new Error('Không có dữ liệu quận/huyện');
         const districts = districtData.data.map((d) => ({
           code: String(d.DistrictID),
           name: d.DistrictName
-        }))
-        setDistricts(districts)
+        }));
+        setDistricts(districts);
 
         // Tìm DistrictID từ district name
-        const district = districts.find((d) => d.name === addressToEdit.district || String(d.code) === String(addressToEdit.district))
-        const districtCode = district?.code || ''
-        if (!districtCode) throw new Error('Không tìm thấy quận/huyện')
-
-        // Cập nhật district vào formData
-        setFormData((prev) => ({ ...prev, district: districtCode }))
+        const district = districts.find((d) => d.name === addressToEdit.district || String(d.code) === String(addressToEdit.district));
+        const districtCode = district?.code || '';
+        if (!districtCode) throw new Error('Không tìm thấy quận/huyện');
+        setFormData((prev) => ({ ...prev, district: districtCode }));
 
         // Gọi API phường/xã
         const wardRes = await fetch(
@@ -166,19 +272,19 @@ export default function AddAddressModal({
               'Content-Type': 'application/json'
             }
           }
-        )
-        if (!wardRes.ok) throw new Error('Lỗi tải phường/xã')
-        const wardData = await wardRes.json()
-        if (wardData.code !== 200 || !wardData.data) throw new Error('Không có dữ liệu phường/xã')
+        );
+        if (!wardRes.ok) throw new Error('Lỗi tải phường/xã');
+        const wardData = await wardRes.json();
+        if (wardData.code !== 200 || !wardData.data) throw new Error('Không có dữ liệu phường/xã');
         const wards = wardData.data.map((w) => ({
           code: String(w.WardCode),
           name: w.WardName
-        }))
-        setWards(wards)
+        }));
+        setWards(wards);
 
         // Tìm WardCode từ ward name
-        const ward = wards.find((w) => w.name === addressToEdit.ward || String(w.code) === String(addressToEdit.ward))
-        const wardCode = ward?.code || ''
+        const ward = wards.find((w) => w.name === addressToEdit.ward || String(w.code) === String(addressToEdit.ward));
+        const wardCode = ward?.code || '';
 
         // Cập nhật formData
         setFormData({
@@ -188,7 +294,7 @@ export default function AddAddressModal({
           city: cityCode,
           district: districtCode,
           ward: wardCode
-        })
+        });
         setFormErrors({
           fullName: false,
           phone: false,
@@ -196,15 +302,15 @@ export default function AddAddressModal({
           city: false,
           district: false,
           ward: false
-        })
+        });
       } catch (error) {
-        console.error('Lỗi khi tải thông tin địa chỉ:', error)
-        showSnackbar?.(`Không thể tải thông tin địa chỉ: ${error.message}`, 'error')
+        console.error('Lỗi khi tải thông tin địa chỉ:', error);
+        showSnackbar?.(`Không thể tải thông tin địa chỉ: ${error.message}`, 'error');
       }
-    }
+    };
 
-    loadLocationCodes()
-  }, [open, isEditMode, addressToEdit, provinces, showSnackbar])
+    loadLocationCodes();
+  }, [open, isEditMode, addressToEdit, provinces, showSnackbar]);
 
   // Xử lý submit
   const handleSubmit = async () => {
@@ -215,54 +321,58 @@ export default function AddAddressModal({
       city: !formData.city,
       district: !formData.district,
       ward: !formData.ward
-    }
-    setFormErrors(errors)
+    };
+    setFormErrors(errors);
     if (Object.values(errors).some(Boolean)) {
-      showSnackbar?.('Vui lòng điền đầy đủ và đúng thông tin địa chỉ!', 'error')
-      return
+      showSnackbar?.('Vui lòng điền đầy đủ và đúng thông tin địa chỉ!', 'error');
+      return;
     }
 
-    const cityName = provinces.find((p) => p.code === formData.city)?.name || ''
-    const districtName = districts.find((d) => d.code === formData.district)?.name || ''
-    const wardName = wards.find((w) => w.code === formData.ward)?.name || ''
+    // Lấy tên và mã định danh từ các danh sách
+    const cityName = provinces.find((p) => p.code === formData.city)?.name || '';
+    const districtName = districts.find((d) => d.code === formData.district)?.name || '';
+    const wardName = wards.find((w) => w.code === formData.ward)?.name || '';
 
     const addressData = {
       fullName: formData.fullName.trim(),
       phone: formData.phone.trim(),
       address: formData.address.trim(),
-      city: cityName,
-      district: districtName,
-      ward: wardName
-    }
+      city: cityName, // Tên thành phố/tỉnh
+      cityId: formData.city, // Mã định danh thành phố/tỉnh
+      district: districtName, // Tên quận/huyện
+      districtId: formData.district, // Mã định danh quận/huyện
+      ward: wardName, // Tên phường/xã
+      wardId: formData.ward // Mã định danh phường/xã
+    };
 
     try {
       if (isEditMode) {
-        const updated = await updateShippingAddress(addressToEdit._id, addressData)
+        const updated = await updateShippingAddress(addressToEdit._id, addressData);
         if (updated && updated._id) {
-          showSnackbar?.('Sửa địa chỉ thành công!')
-          onSuccess?.({ ...addressData, _id: addressToEdit._id })
-          onClose()
+          showSnackbar?.('Sửa địa chỉ thành công!');
+          onSuccess?.({ ...addressData, _id: addressToEdit._id });
+          onClose();
         } else {
-          showSnackbar?.('Không thể sửa địa chỉ!', 'error')
+          showSnackbar?.('Không thể sửa địa chỉ!', 'error');
         }
       } else {
-        const added = await addShippingAddress(addressData)
+        const added = await addShippingAddress(addressData);
         if (added && added._id) {
-          showSnackbar?.('Thêm địa chỉ thành công!')
-          onSuccess?.(added)
-          onClose()
+          showSnackbar?.('Thêm địa chỉ thành công!');
+          onSuccess?.(added);
+          onClose();
         } else {
-          showSnackbar?.('Không thể thêm địa chỉ!', 'error')
+          showSnackbar?.('Không thể thêm địa chỉ!', 'error');
         }
       }
     } catch (error) {
       const errorMessage =
         error.response?.data?.message ||
         error.message ||
-        'Không thể xử lý địa chỉ!'
-      showSnackbar?.(`Lỗi: ${errorMessage}`, 'error')
+        'Không thể xử lý địa chỉ!';
+      showSnackbar?.(`Lỗi: ${errorMessage}`, 'error');
     }
-  }
+  };
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
@@ -325,13 +435,12 @@ export default function AddAddressModal({
               helperText={formErrors.phone ? 'Số điện thoại phải đúng 10 số' : ''}
               disabled={viewOnly}
             />
-            {/* Tỉnh/Thành */}
             <Autocomplete
               options={provinces}
               getOptionLabel={(option) => option.name}
               value={provinces.find((p) => p.code === formData.city) || null}
               onChange={(event, newValue) => {
-                handleChange('city')({ target: { value: newValue?.code || '' } })
+                handleChange('city')({ target: { value: newValue?.code || '' } });
               }}
               noOptionsText="Không có kết quả"
               disabled={viewOnly}
@@ -344,16 +453,15 @@ export default function AddAddressModal({
                 />
               )}
             />
-            {/* Quận/Huyện */}
             <Autocomplete
               options={districts}
               getOptionLabel={(option) => option.name}
               value={districts.find((d) => d.code === formData.district) || null}
               onChange={(event, newValue) => {
-                handleChange('district')({ target: { value: newValue?.code || '' } })
+                handleChange('district')({ target: { value: newValue?.code || '' } });
               }}
               noOptionsText="Không có kết quả"
-              disabled={viewOnly || districts.length === 0}
+              disabled={viewOnly || !formData.city || districts.length === 0}
               renderInput={(params) => (
                 <TextField
                   {...params}
@@ -363,16 +471,15 @@ export default function AddAddressModal({
                 />
               )}
             />
-            {/* Phường/Xã */}
             <Autocomplete
               options={wards}
               getOptionLabel={(option) => option.name}
               value={wards.find((w) => w.code === formData.ward) || null}
               onChange={(event, newValue) => {
-                handleChange('ward')({ target: { value: newValue?.code || '' } })
+                handleChange('ward')({ target: { value: newValue?.code || '' } });
               }}
               noOptionsText="Không có kết quả"
-              disabled={viewOnly || wards.length === 0}
+              disabled={viewOnly || !formData.district || wards.length === 0}
               renderInput={(params) => (
                 <TextField
                   {...params}
@@ -405,5 +512,5 @@ export default function AddAddressModal({
         </DialogActions>
       )}
     </Dialog>
-  )
+  );
 }
