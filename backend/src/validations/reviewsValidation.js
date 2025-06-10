@@ -16,11 +16,33 @@ const verifyId = (req, res, next) => {
 const review = async (req, res, next) => {
   // Xác thực dữ liệu đầu vào correctCondition: điều kiện đúng
   const correctCondition = Joi.object({
-    name: Joi.string()
-      .trim() // Loại bỏ khoảng trắng đầu/cuối
-      .min(1) // ít nhất 1 ký tự sau khi trim
-      .max(50) // tối đa 50 ký tự (tuỳ bạn điều chỉnh)
-      .required() // bắt buộc phải có
+    productId: Joi.string().length(24).hex().required(),
+    userId: Joi.string().length(24).hex().required(),
+    rating: Joi.number().integer().min(1).max(5).required(),
+    comment: Joi.string().trim().required()
+  })
+
+  try {
+    await correctCondition.validateAsync(req.body, {
+      abortEarly: false // Không dừng lại khi gặp lỗi đầu tiên
+    })
+
+    next() // Nếu không có lỗi, tiếp tục xử lý request sang controller
+  } catch (err) {
+    const errorMessage = new Error(err).message
+    const customError = new ApiError(
+      StatusCodes.UNPROCESSABLE_ENTITY,
+      errorMessage
+    )
+    next(customError) // Gọi middleware xử lý lỗi tập trung
+  }
+}
+
+const reviewUpdate = async (req, res, next) => {
+  // Xác thực dữ liệu đầu vào correctCondition: điều kiện đúng
+  const correctCondition = Joi.object({
+    rating: Joi.number().integer().min(1).max(5).required(),
+    comment: Joi.string().trim().required()
   })
 
   try {
@@ -41,5 +63,6 @@ const review = async (req, res, next) => {
 
 export const reviewsValidation = {
   verifyId,
-  review
+  review,
+  reviewUpdate
 }

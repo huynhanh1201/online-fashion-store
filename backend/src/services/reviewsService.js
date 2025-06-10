@@ -4,8 +4,12 @@ const createReview = async (reqBody) => {
   // eslint-disable-next-line no-useless-catch
   try {
     const newReview = {
-      name: reqBody.name,
-      destroy: false
+      productId: reqBody.productId,
+      userId: reqBody.userId,
+      rating: reqBody.rating,
+      comment: reqBody.comment,
+
+      isVerified: true
     }
 
     const reviews = await ReviewModel.create(newReview)
@@ -16,21 +20,20 @@ const createReview = async (reqBody) => {
   }
 }
 
-const getReviewList = async () => {
-  const result = await ReviewModel.find({}).lean()
+const getReviewList = async (queryString) => {
+  const { productId, userId } = queryString
+
+  const filter = {
+    destroy: false
+  }
+
+  if (productId) filter.productId = productId
+
+  if (userId) filter.userId = userId
+
+  const result = await ReviewModel.find(filter).lean()
 
   return result
-}
-
-const getReview = async (reviewId) => {
-  // eslint-disable-next-line no-useless-catch
-  try {
-    const result = await ReviewModel.findById(reviewId).lean()
-
-    return result
-  } catch (err) {
-    throw err
-  }
 }
 
 const updateReview = async (reviewId, reqBody) => {
@@ -66,7 +69,6 @@ const deleteReview = async (reviewId) => {
 export const reviewsService = {
   createReview,
   getReviewList,
-  getReview,
   updateReview,
   deleteReview
 }

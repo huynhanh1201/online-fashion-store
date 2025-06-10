@@ -12,6 +12,8 @@ const getDelivery = async (reqBody) => {
 
     const { data: dataResultGhn } = await ghnAxios.post('/shipping-order/fee', {
       ...reqBody,
+      from_district_id: 1442,
+      from_ward_code: '21211',
       length,
       width,
       height,

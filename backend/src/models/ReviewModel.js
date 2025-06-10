@@ -4,11 +4,30 @@ const { Schema, model } = mongoose
 // Tạo schema cho Danh mục sản phẩm
 const reviewSchema = new Schema(
   {
-    name: {
+    productId: {
+      type: Schema.Types.ObjectId,
+      ref: 'Product',
+      required: true
+    },
+    userId: {
+      type: Schema.Types.ObjectId,
+      ref: 'User',
+      required: true
+    },
+    rating: {
+      type: Number,
+      min: 1,
+      max: 5,
+      required: true
+    },
+    comment: {
       type: String,
       required: true,
-      trim: true, // Loại bỏ khoảng trắng đầu/cuối
-      unique: true // Đảm bảo tên màu không trùng lặp
+      trim: true
+    },
+    isVerified: {
+      type: Boolean,
+      default: false
     },
     destroy: {
       type: Boolean,
@@ -16,7 +35,6 @@ const reviewSchema = new Schema(
     }
   },
   {
-    // Tự động thêm createdAt & updatedAt
     timestamps: true
   }
 )
