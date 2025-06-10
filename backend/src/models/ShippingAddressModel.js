@@ -44,6 +44,21 @@ const ShippingAddressSchema = new Schema(
     destroy: {
       type: Boolean,
       default: false // Soft-delete mặc định là false
+    },
+    districtId: {
+      type: String,
+      required: true,
+      trim: true
+    },
+    wardId: {
+      type: String,
+      required: true, // Phường
+      trim: true
+    },
+    cityId: {
+      type: String,
+      required: true, // Thành phố/Tỉnh
+      trim: true
     }
   },
   {
