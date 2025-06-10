@@ -107,25 +107,25 @@ const Payment = () => {
   // Xác định cartItems
   const cartItems = isBuyNow && tempCart?.cartItems?.length > 0 ? tempCart.cartItems : cartCartItems
 
-  const [shippingFee, setShippingFee] = useState(0);
-  const [shippingFeeLoading, setShippingFeeLoading] = useState(false);
+  const [shippingPrice, setShippingPrice] = useState(0)
+  const [shippingPriceLoading, setShippingPriceLoading] = useState(false)
 
   useEffect(() => {
     if (selectedAddress && selectedCartItems.length > 0) {
-      fetchShippingFee(selectedAddress, selectedCartItems);
+      fetchShippingPrice(selectedAddress, selectedCartItems)
     } else {
-      setShippingFee(0);
+      setShippingPrice(0)
     }
-  }, [selectedAddress]);
-  const fetchShippingFee = async (address, items) => {
+  }, [selectedAddress])
+  const fetchShippingPrice = async (address, items) => {
     if (!address || !items.length) {
-      setShippingFee(0);
-      return;
+      setShippingPrice(0)
+      return
     }
 
     try {
-      setShippingFeeLoading(true);
-      const totalItems = items.reduce((sum, item) => sum + (item.quantity || 1), 0);
+      setShippingPriceLoading(true)
+      const totalItems = items.reduce((sum, item) => sum + (item.quantity || 1), 0)
 
       const payload = {
         numberItemOrder: totalItems,
@@ -134,7 +134,7 @@ const Payment = () => {
         to_ward_code: address.wardId, // Sử dụng wardId trực tiếp
         insurance_value: 0,
         coupon: null,
-      };
+      }
 
       const response = await fetch('http://localhost:8017/v1/deliveries/calculate-fee', {
         method: 'POST',
@@ -142,26 +142,26 @@ const Payment = () => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(payload),
-      });
+      })
 
       if (!response.ok) {
-        throw new Error('Không thể tính phí vận chuyển');
+        throw new Error('Không thể tính phí vận chuyển')
       }
 
-      const data = await response.json();
-      setShippingFee(data.totalFeeShipping || 0); // Sử dụng totalFeeShipping thay vì fee
+      const data = await response.json()
+      setShippingPrice(data.totalFeeShipping || 0)  // Sử dụng totalFeeShipping thay vì fee
     } catch (error) {
-      console.error('Lỗi tính phí vận chuyển:', error);
-      setShippingFee(0);
+      console.error('Lỗi tính phí vận chuyển:', error)
+      setShippingPrice(0)
       setSnackbar({
         open: true,
         severity: 'error',
         message: 'Không thể tính phí vận chuyển',
-      });
+      })
     } finally {
-      setShippingFeeLoading(false);
+      setShippingPriceLoading(false)
     }
-  };
+  }
   // Tính selectedCartItems + subTotal
   let subTotal = 0
   const selectedCartItems = cartItems
@@ -266,7 +266,7 @@ const Payment = () => {
     setTimeout(() => setCopiedCode(''), 1500)
   }
 
-  const total = Math.max(subTotal - discount + shippingFee, 0);
+  const total = Math.max(subTotal - discount + shippingPrice, 0)
 
   useEffect(() => {
     const isOnPaymentPage = location.pathname.startsWith('/payment')
@@ -498,12 +498,12 @@ const Payment = () => {
                         />
                         <span style={{ fontSize: '1rem' }}>Phí vận chuyển: </span>
                         <span style={{ fontSize: '1rem' }}>
-                          {shippingFeeLoading ? (
+                          {shippingPriceLoading ? (
                             <CircularProgress size={16} />
-                          ) : shippingFee === 0 ? (
+                          ) : shippingPrice === 0 ? (
                             'Miễn phí'
                           ) : (
-                            shippingFee.toLocaleString('vi-VN') + 'đ'
+                            shippingPrice.toLocaleString('vi-VN') + 'đ'
                           )}
                         </span>
                       </Box>
@@ -739,12 +739,12 @@ const Payment = () => {
                 </Typography>
                 <Typography sx={{ display: 'flex', justifyContent: 'space-between', fontSize: '1.1rem' }}>
                   <span>Phí vận chuyển:</span>
-                  {shippingFeeLoading ? (
+                  {shippingPriceLoading ? (
                     <CircularProgress size={24} />
-                  ) : shippingFee === 0 ? (
+                  ) : shippingPrice === 0 ? (
                     'Miễn phí'
                   ) : (
-                    shippingFee.toLocaleString('vi-VN') + 'đ'
+                    shippingPrice.toLocaleString('vi-VN') + 'đ'
                   )}
                 </Typography>
 
