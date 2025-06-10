@@ -389,7 +389,7 @@ const Cart = () => {
                     />
                   </TableCell>
                   <TableCell>
-                    <Box display='flex' alignItems='center' gap={2}>
+                    <Box display='flex' alignItems='start' gap={2}>
                       <Box
                         sx={{ cursor: 'pointer' }}
                         onClick={() => {

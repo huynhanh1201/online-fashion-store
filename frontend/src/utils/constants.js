@@ -12,3 +12,4 @@ export const filterDate = [
   { label: 'Năm trước', value: 'last_year' },
   { label: 'Tùy chỉnh', value: 'custom' }
 ]
+export const GHN_TOKEN_API = '8062c850-4543-11f0-a61c-b20cbde7a816'
