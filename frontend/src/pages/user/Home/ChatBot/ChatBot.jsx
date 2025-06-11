@@ -3,9 +3,11 @@ import { Box, TextField, Paper, Typography, IconButton } from '@mui/material'
 import { Chat, Send, Close } from '@mui/icons-material'
 import axios from 'axios'
 
-// Lấy API key từ biến môi trường (Create React App hoặc Vite)
-const XAI_API_KEY =
-  process.env.REACT_APP_XAI_API_KEY || import.meta.env.VITE_XAI_API_KEY
+// Lấy API key từ biến môi trường
+const OPENAI_API_KEY =
+  typeof process !== 'undefined' && process.env.REACT_APP_OPENAI_API_KEY
+    ? process.env.REACT_APP_OPENAI_API_KEY
+    : import.meta.env.VITE_OPENAI_API_KEY
 
 const ChatBot = () => {
   const [open, setOpen] = useState(false)
@@ -51,18 +53,23 @@ const ChatBot = () => {
       return
     }
 
-    // Gửi yêu cầu đến API xAI
+    // Gửi yêu cầu đến API OpenAI
     try {
-      if (!XAI_API_KEY) {
+      if (!OPENAI_API_KEY) {
         throw new Error(
-          'API key không được cấu hình. Vui lòng kiểm tra file .env.'
+          'API key OpenAI không được cấu hình. Vui lòng kiểm tra file .env trong thư mục frontend.'
         )
       }
 
+      console.log(
+        'Sending request to OpenAI with API key:',
+        OPENAI_API_KEY.slice(0, 5) + '...'
+      ) // Debug
+
       const response = await axios.post(
-        'https://api.x.ai/v1/chat/completions',
+        'https://api.openai.com/v1/chat/completions',
         {
-          model: 'grok-3-latest',
+          model: 'gpt-4o-mini', // Hoặc 'gpt-3.5-turbo' nếu tiết kiệm chi phí
           messages: [
             {
               role: 'system',
@@ -77,7 +84,7 @@ const ChatBot = () => {
         },
         {
           headers: {
-            Authorization: `Bearer ${XAI_API_KEY}`,
+            Authorization: `Bearer ${OPENAI_API_KEY}`,
             'Content-Type': 'application/json'
           },
           timeout: 5000
@@ -90,14 +97,25 @@ const ChatBot = () => {
       setMessages((prev) => [...prev, { sender: 'bot', text: botReply }])
     } catch (error) {
       console.error(
-        'Error calling xAI API:',
+        'Error calling OpenAI API:',
         error.response?.data || error.message
       )
+      let errorMessage = error.message
+      if (error.response?.status === 401) {
+        errorMessage =
+          'API key OpenAI không hợp lệ. Vui lòng kiểm tra key trong .env.'
+      } else if (error.response?.status === 429) {
+        errorMessage =
+          'Vượt quá giới hạn yêu cầu. Vui lòng thử lại sau hoặc kiểm tra quota OpenAI.'
+      } else if (error.response?.status === 403) {
+        errorMessage =
+          'Yêu cầu bị từ chối (403). Vui lòng kiểm tra quyền API key OpenAI.'
+      }
       setMessages((prev) => [
         ...prev,
         {
           sender: 'bot',
-          text: `Có lỗi xảy ra: ${error.message}. Bạn thử lại nhé!`
+          text: `Có lỗi xảy ra: ${errorMessage}. Vui lòng thử lại sau.`
         }
       ])
     }

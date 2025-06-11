@@ -72,23 +72,23 @@ const ProductInfoSection = ({
   const currentPrice = getCurrentPrice()
 
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, maxWidth: 670 }}>
-      <Typography variant='h5' fontWeight={700} sx={{ wordBreak: 'break-word', whiteSpace: 'pre-wrap' }}>
+    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, maxWidth: 670 }}>
+      <Typography variant='h5' fontWeight={700} sx={{ wordBreak: 'break-word', whiteSpace: 'pre-wrap', mb: 1 }}>
         {product?.name}
       </Typography>
 
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
         {currentPrice?.discountPrice ? (
           <>
-            <Typography variant='h5' sx={{ color: 'text.secondary', textDecoration: 'line-through' }}>
+            <Typography variant='h5' sx={{ color: 'text.secondary', textDecoration: 'line-through', fontSize: 20 }}>
               {currentPrice.price.toLocaleString('vi-VN')}đ
             </Typography>
-            <PriceTypography variant='h5'>
+            <PriceTypography variant='h5' sx={{ fontSize: 22 }}>
               {currentPrice.discountPrice.toLocaleString('vi-VN')}đ
             </PriceTypography>
           </>
         ) : (
-          <PriceTypography variant='h5'>
+          <PriceTypography variant='h5' sx={{ fontSize: 22 }}>
             {typeof currentPrice?.price === 'number'
               ? currentPrice.price.toLocaleString('vi-VN') + 'đ'
               : 'Liên hệ'}
@@ -96,14 +96,14 @@ const ProductInfoSection = ({
         )}
       </Box>
 
-      <Box sx={{ border: '1px dashed #d32f2f', p: 1.5, borderRadius: 1 }}>
-        <Typography variant='body2' color='error' fontWeight={700} sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+      <Box sx={{ border: '1px dashed #d32f2f', p: 1, borderRadius: 1, mb: 1 }}>
+        <Typography variant='body2' color='error' fontWeight={700} sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>
           <LocalOfferIcon /> KHUYẾN MÃI - ƯU ĐÃI
         </Typography>
         {coupons?.length > 0 ? (
-          <Box sx={{ mt: 1 }}>
+          <Box>
             {coupons.slice(0, 3).map(coupon => (
-              <Typography key={coupon.code} variant='body2'>
+              <Typography key={coupon.code} variant='body2' sx={{ mb: 0.25 }}>
                 👉 Nhập mã <b>{coupon.code}</b> GIẢM{' '}
                 {coupon.type === 'percent'
                   ? `${coupon.amount}%${coupon.maxDiscount ? ` tối đa ${coupon.maxDiscount.toLocaleString()}đ` : ''}`
@@ -112,15 +112,15 @@ const ProductInfoSection = ({
             ))}
           </Box>
         ) : (
-          <Typography variant='body2' sx={{ mt: 1 }}>
+          <Typography variant='body2'>
             👉 Đang cập nhật khuyến mãi mới!
           </Typography>
         )}
       </Box>
 
       {coupons?.length > 0 && (
-        <Box>
-          <Typography variant='body2' fontWeight={700} sx={{ mb: 0.5 }}>
+        <Box sx={{ mb: 1 }}>
+          <Typography variant='body2' fontWeight={700} sx={{ mb: 0.25 }}>
             Mã giảm giá
           </Typography>
           {coupons.slice(0, 3).map(coupon => (
@@ -128,23 +128,24 @@ const ProductInfoSection = ({
               key={coupon.code}
               label={`VOUCHER ${coupon.type === 'percent' ? `${coupon.amount}%` : `${coupon.amount.toLocaleString()}đ`}`}
               onClick={() => setOpenVoucherDrawer(true)}
+              sx={{ mr: 0.5, mb: 0.5 }}
             />
           ))}
         </Box>
       )}
 
       {variants?.length > 0 && (
-        <Box>
-          <Typography variant='body2' fontWeight={700} sx={{ mb: 1 }}>
+        <Box sx={{ mb: 1 }}>
+          <Typography variant='body2' fontWeight={700} sx={{ mb: 0.5 }}>
             Chọn phiên bản
           </Typography>
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
             {availableColors?.map(color => (
-              <Box key={color.name}>
-                <Typography variant='body2' fontWeight={600} sx={{ mb: 1, color: '#666' }}>
+              <Box key={color.name} sx={{ mb: 0.5 }}>
+                <Typography variant='body2' fontWeight={600} sx={{ mb: 0.5, color: '#666' }}>
                   Màu: {color.name}
                 </Typography>
-                <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', mb: 2 }}>
+                <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap', mb: 1 }}>
                   {availableSizes
                     ?.filter(size =>
                       variants.some(v => v.color.name === color.name && v.size.name === size.name)
@@ -164,9 +165,9 @@ const ProductInfoSection = ({
                             } else {
                               handleColorChange(color.name)
                               handleSizeChange(size.name)
-                              // Thêm xử lý khi chọn variant nếu cần
                             }
                           }}
+                          sx={{ p: '4px 8px', minHeight: 40 }}
                         >
                           <VariantImage
                             src={color.image || '/default.jpg'}
@@ -174,7 +175,7 @@ const ProductInfoSection = ({
                             onError={e => (e.target.src = '/default.jpg')}
                           />
                           <Box>
-                            <Typography variant='body2' fontWeight={600}>
+                            <Typography variant='body2' fontWeight={600} sx={{ fontSize: 14 }}>
                               Size {size.name}
                             </Typography>
                             <Typography variant='caption' color='text.secondary'>
@@ -191,18 +192,18 @@ const ProductInfoSection = ({
         </Box>
       )}
 
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
         <Typography variant='body2' fontWeight={700}>
           Số lượng
         </Typography>
-        <IconButton onClick={() => setQuantity(q => Math.max(1, Number(q) - 1))}>
-          <RemoveIcon />
+        <IconButton onClick={() => setQuantity(q => Math.max(1, Number(q) - 1))} size="small">
+          <RemoveIcon fontSize="small" />
         </IconButton>
         <TextField
           value={quantity === '' ? '' : quantity}
           size='small'
-          sx={{ width: 50 }}
-          inputProps={{ style: { textAlign: 'center' }, readOnly: true }}
+          sx={{ width: 40 }}
+          inputProps={{ style: { textAlign: 'center', padding: 4 }, readOnly: true }}
         />
         <IconButton
           onClick={() =>
@@ -211,36 +212,34 @@ const ProductInfoSection = ({
               return q < maxQuantity ? q + 1 : q
             })
           }
+          size="small"
         >
-          <AddIcon />
+          <AddIcon fontSize="small" />
         </IconButton>
-        <Typography color='text.secondary'>
+        <Typography color='text.secondary' sx={{ fontSize: 13 }}>
           Kho: {inventory?.quantity ?? selectedVariant?.quantity ?? product?.quantity ?? 0}
         </Typography>
       </Box>
 
-      <Box sx={{ display: 'flex', gap: 2 }}>
+      <Box sx={{ display: 'flex', gap: 1, mb: 0.5 }}>
         <Button
           variant='contained'
           disabled={isAdding || quantity > (inventory?.quantity ?? selectedVariant?.quantity ?? product?.quantity ?? 0)}
           onClick={() => handleAddToCart(product._id)}
-          sx={{ backgroundColor: '#1A3C7B', color: 'white', flex: 1, py: 1.5 }}
-          startIcon={isAdding ? <CircularProgress size={20} color='inherit' /> : null}
+          sx={{ backgroundColor: '#1A3C7B', color: 'white', flex: 1, py: 1 }}
+          startIcon={isAdding ? <CircularProgress size={18} color='inherit' /> : null}
         >
           {isAdding ? 'Đang thêm...' : 'Thêm vào giỏ'}
         </Button>
 
-
         <Button
           variant='outlined'
           onClick={handleBuyNow}
-          sx={{ borderColor: '#1A3C7B', color: '#1A3C7B', flex: 1, py: 1.5 }}
+          sx={{ borderColor: '#1A3C7B', color: '#1A3C7B', flex: 1, py: 1 }}
         >
           Mua ngay
         </Button>
       </Box>
-
-
     </Box>
   )
 }

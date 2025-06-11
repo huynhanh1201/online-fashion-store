@@ -114,9 +114,7 @@ const HeaderUser = () => {
             >
               <Search />
               <AuthButtons />
-              <Box>
-                <HeaderAction />
-              </Box>
+              <HeaderAction />
             </Box>
           </Toolbar>
         </Container>
