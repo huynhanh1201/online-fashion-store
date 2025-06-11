@@ -99,6 +99,19 @@ const OrderSchema = new Schema(
       type: String,
       default: null,
       trim: true
+    },
+
+    shippingFee: {
+      type: Number,
+      default: 0,
+      min: 0
+    },
+
+    code: {
+      type: String,
+      unique: true,
+      trim: true,
+      required: true
     }
   },
   {

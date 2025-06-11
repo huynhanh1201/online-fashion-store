@@ -1,5 +1,6 @@
 import { StatusCodes } from 'http-status-codes'
 import mongoose from 'mongoose'
+import dayjs from 'dayjs'
 
 import ApiError from '~/utils/ApiError'
 import { OrderModel } from '~/models/OrderModel'
@@ -17,6 +18,7 @@ import { VariantModel } from '~/models/VariantModel'
 import { InventoryModel } from '~/models/InventoryModel'
 import apiError from '~/utils/ApiError'
 import { deliveriesService } from '~/services/deliveriesService'
+import generateSequentialCode from '~/utils/generateSequentialCode'
 
 const createOrder = async (userId, reqBody, ipAddr) => {
   // eslint-disable-next-line no-useless-catch
@@ -63,8 +65,6 @@ const createOrder = async (userId, reqBody, ipAddr) => {
 
     let numberItemOrder = 0
 
-    const variantItemsGHN = []
-
     for (const item of cartItems) {
       const { variantId, quantity } = item
 
@@ -101,6 +101,7 @@ const createOrder = async (userId, reqBody, ipAddr) => {
     const variantMap = new Map(variants.map((p) => [p._id.toString(), p]))
 
     // Tính toán tổng tiền
+    const variantItemsGHN = []
     let calculatedSubtotal = 0
     for (const item of cartItems) {
       const variant = variantMap.get(item.variantId.toString())
@@ -111,6 +112,18 @@ const createOrder = async (userId, reqBody, ipAddr) => {
         )
       }
       calculatedSubtotal += variant.exportPrice * item.quantity
+
+      // Danh sach items GHN
+      variantItemsGHN.push({
+        name: variant.name,
+        code: variant.sku,
+        quantity: item.quantity,
+        price: variant.exportPrice,
+        length: 30,
+        width: 20,
+        height: 2,
+        weight: 300
+      })
     }
 
     // Xác thực mã giảm giá
@@ -143,11 +156,41 @@ const createOrder = async (userId, reqBody, ipAddr) => {
     }
 
     // Tạo đơn hàng
+    const date = dayjs().format('YYYYMMDD')
+    const prefixSlipId = `DH-${date}-`
+
+    const code = await generateSequentialCode(
+      prefixSlipId,
+      4,
+      async (prefixSlipId) => {
+        // Query mã lớn nhất đã có với prefixSlipId đó
+        const regex = new RegExp(`^${prefixSlipId}(\\d{4})$`)
+        const latest = await OrderModel.findOne({
+          code: { $regex: regex }
+        })
+          .sort({ code: -1 }) // sort giảm dần, AV10 > AV09
+          .lean()
+
+        // Tính số thứ tự tiếp theo
+        let nextNumber = 1
+        if (latest) {
+          const match = latest.code.match(regex)
+          if (match && match[1]) {
+            nextNumber = parseInt(match[1], 10) + 1 // ví dụ AV10 → match[1] = "10" → +1 = 11
+          }
+        }
+
+        return nextNumber
+      }
+    )
+
+    console.log('code: ', code)
+
     const newOrder = {
       userId,
       shippingAddressId,
       shippingAddress: address,
-      total: cartTotal,
+      total: cartTotal + reqBody?.shippingFee || 0,
       couponId,
       paymentMethod,
       couponCode,
@@ -156,49 +199,51 @@ const createOrder = async (userId, reqBody, ipAddr) => {
       status: 'Pending',
       isPaid: false,
       paymentStatus: 'Pending',
-      isDelivered: false
+      isDelivered: false,
+
+      shippingFee: reqBody.shippingFee,
+      code: code
     }
 
     const [order] = await OrderModel.create([newOrder], { session })
 
-    // // Tạo đơn hàng cho đơn vị vận chuyển (GHN)
-    //
-    // const length = 30
-    // const width = 20
-    // const height = 2 * numberItemOrder
-    // const weight = 300 * numberItemOrder
-    //
-    // const bodyReqCreateOrderGnh = {
-    //   // Thông tin người nhận
-    //   to_name: address.fullName,
-    //   to_phone: address.phone,
-    //   to_address: address.address,
-    //   to_ward_code: address.ward,
-    //   to_district_name: address.district,
-    //   to_province_name: address.city,
-    //
-    //   // Kích thước & cân nặng
-    //   length,
-    //   width,
-    //   height,
-    //   weight,
-    //
-    //   // Dịch vụ giao hàng
-    //   service_type_id: 1,
-    //   payment_type_id: 1,
-    //   required_note: 'KHONGCHOXEMHANG',
-    //
-    //   // Quản lý đơn hàng
-    //   client_order_code: order._id.toString()
-    // }
-    //
-    // console.log('bodyReqCreateOrderGnh: ', bodyReqCreateOrderGnh)
-    //
-    // const orderGHNCreated = await deliveriesService.createOrderDelivery(
-    //   bodyReqCreateOrderGnh
-    // )
-    //
-    // console.log('orderGHNCreated: ', orderGHNCreated)
+    // Tạo đơn hàng cho đơn vị vận chuyển (GHN)
+
+    const length = 30
+    const width = 20
+    const height = 2 * numberItemOrder
+    const weight = 300 * numberItemOrder
+
+    const bodyReqCreateOrderGnh = {
+      // Thông tin người nhận
+      to_name: address.fullName,
+      to_phone: address.phone,
+      to_address: address.address,
+      to_ward_name: address.ward,
+      to_district_name: address.district,
+      to_province_name: address.city,
+
+      // Kích thước & cân nặng
+      length,
+      width,
+      height,
+      weight,
+
+      // Dịch vụ giao hàng
+      service_type_id: 2,
+      payment_type_id: 1,
+      cod_amount: reqBody.paymentMethod === 'COD' ? order.total : 0,
+      required_note: 'KHONGCHOXEMHANG',
+
+      // Quản lý đơn hàng
+      client_order_code: order.code,
+
+      items: variantItemsGHN
+    }
+
+    const orderGHNCreated = deliveriesService.createOrderDelivery(
+      bodyReqCreateOrderGnh
+    )
 
     // Tạo OrderItems
     const orderItems = cartItems.map((item) => {
@@ -246,7 +291,7 @@ const createOrder = async (userId, reqBody, ipAddr) => {
     await session.commitTransaction()
 
     //==============================
-    const dayjs = require('dayjs')
+    // const dayjs = require('dayjs')
     const crypto = require('crypto')
     const querystring = require('qs')
 
