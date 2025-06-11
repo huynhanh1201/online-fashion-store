@@ -57,7 +57,8 @@ const OrderDetail = () => {
     fetchUserReviews()
   }, [currentUser])
 
-  const isReviewed = (productId) => reviewedMap.hasOwnProperty(productId?.toString())
+  const isReviewed = (productId) =>
+    Object.prototype.hasOwnProperty.call(reviewedMap, productId?.toString());
   const allReviewed = items.every(item => isReviewed(item.productId || item.product?._id))
 
   if (loading) return <CircularProgress />
