@@ -31,7 +31,9 @@ const getReviewList = async (queryString) => {
 
   if (userId) filter.userId = userId
 
-  const result = await ReviewModel.find(filter).lean()
+  const result = await ReviewModel.find(filter)
+    .lean()
+    .populate({ path: 'userId', select: '_id name avatarUrl' })
 
   return result
 }

@@ -5,6 +5,7 @@ import ApiError from '~/utils/ApiError'
 import { slugify } from '~/utils/formatters'
 import { ProductModel } from '~/models/ProductModel'
 import mongoose from 'mongoose'
+import apiError from '~/utils/ApiError'
 
 const createCategory = async (reqBody) => {
   try {
@@ -23,8 +24,55 @@ const createCategory = async (reqBody) => {
   }
 }
 
-const getCategoryList = async () => {
-  const result = await CategoryModel.find({}).lean()
+const getCategoryList = async (queryString) => {
+  let { page = 1, limit = 10, status, sort } = queryString
+
+  // Kiểm tra dữ liệu đầu vào của limit và page
+  limit = Number(limit)
+  page = Number(page)
+
+  if (!limit || limit < 1) {
+    throw new apiError(
+      StatusCodes.UNPROCESSABLE_ENTITY,
+      'Query string "limit" phải là số và lớn hơn 0'
+    )
+  }
+
+  if (!page || page < 1) {
+    throw new apiError(
+      StatusCodes.UNPROCESSABLE_ENTITY,
+      'Query string "page" phải là số và lớn hơn 0'
+    )
+  }
+
+  // Xử lý thông tin Filter
+  const filter = {}
+
+  if (status === 'true' || status === 'false') {
+    status = JSON.parse(status)
+
+    filter.destroy = status
+  }
+
+  const sortMap = {
+    name_asc: { name: 1 },
+    name_desc: { name: -1 },
+    newest: { createdAt: -1 },
+    oldest: { createdAt: 1 }
+  }
+
+  let sortFiled = null
+
+  if (sort) {
+    sortFiled = sortMap[sort]
+  }
+
+  const result = await CategoryModel.find(filter)
+    .collation({ locale: 'vi', strength: 1 })
+    .sort(sortFiled || {})
+    .skip((page - 1) * limit)
+    .limit(limit)
+    .lean()
 
   return result
 }

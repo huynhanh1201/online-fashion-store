@@ -98,7 +98,16 @@ const modalStyle = {
   overflowY: 'auto'
 }
 
+import socket from '~/socket'
+import { useEffect } from 'react'
+
 export default function ViewsAppBarModal({ open, handleClose }) {
+  // =========TEST WEBSOCKET==============
+  useEffect(() => {
+    socket.connect()
+  }, [])
+  // =========TEST WEBSOCKET==============
+
   const [filter, setFilter] = useState('all')
   // const timeAgo = dayjs(notifications.createdAt).fromNow()
   const filtered = notifications
