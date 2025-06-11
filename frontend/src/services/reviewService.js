@@ -20,5 +20,15 @@ export const getReviews = async (productId) => {
     throw error.response?.data || error.message || 'Không lấy được đánh giá'
   }
 }
+export const getUserReviews = async (userId) => {
+  try {
+    const response = await AuthorizedAxiosInstance.get(
+      `${API_ROOT}/v1/reviews?userId=${userId}`
+    )
+    return response.data
+  } catch (error) {
+    throw error.response?.data || error.message || 'Không lấy được đánh giá người dùng'
+  }
+}
 
 

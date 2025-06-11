@@ -130,7 +130,7 @@ const ProductDetail = () => {
         </Grid>
       </Grid>
       <Box sx={{ mt: 10 }}>
-        <ProductDescription description={product.description} productId={product._id} />
+        <ProductDescription description={product.description} productId={product._id} product={product} />
       </Box>
       <VoucherDrawer
         open={openVoucherDrawer}

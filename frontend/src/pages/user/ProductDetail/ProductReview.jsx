@@ -12,12 +12,10 @@ import {
   ListItemText,
   Divider
 } from '@mui/material'
-import { getReviews, createReview } from '~/services/reviewService'
+import { getReviews } from '~/services/reviewService'
 
 
 const ProductReview = ({ productId }) => {
-  const [rating, setRating] = useState(0)
-  const [comment, setComment] = useState('')
   const [reviews, setReviews] = useState([])
 
   useEffect(() => {
@@ -32,22 +30,6 @@ const ProductReview = ({ productId }) => {
     if (productId) fetchReviews()
   }, [productId])
 
-  const handleSubmit = async () => {
-    if (rating === 0 || comment.trim() === '') return
-    try {
-      const newReview = {
-        productId,
-        rating,
-        comment
-      }
-      const saved = await createReview(newReview)
-      setReviews([saved, ...reviews])
-      setRating(0)
-      setComment('')
-    } catch (err) {
-      console.error('Lỗi gửi đánh giá:', err)
-    }
-  }
 
   const averageRating = reviews.length
     ? (reviews.reduce((acc, r) => acc + r.rating, 0) / reviews.length).toFixed(1)
@@ -56,33 +38,33 @@ const ProductReview = ({ productId }) => {
   return (
     <Box sx={{ maxWidth: '100%', mt: 1 }}>
       <Typography variant='h5' gutterBottom sx={{ color: '#1A3C7B', fontWeight: 600 }}>
-        Đánh giá & nhận xét {productId.name}
+        Đánh giá & nhận xét
       </Typography>
 
       <Box display='flex' alignItems='center' gap={1} mb={2}>
+        <Typography variant='subtitle1' sx={{ color: '#1A3C7B', fontWeight: 600, fontSize: '3.4rem' }}>
+          {averageRating}
+        </Typography>
         <Rating value={Number(averageRating)} precision={0.1} readOnly />
         <Typography variant='subtitle1' sx={{ color: '#1A3C7B' }}>
-          ({averageRating}/5 từ {reviews.length} đánh giá)
+          ({reviews.length} đánh giá)
         </Typography>
       </Box>
 
 
-      <Divider sx={{ mb: 3 }} />
-      <Typography variant='h5' gutterBottom sx={{ color: '#1A3C7B', fontWeight: 500 }}>
-        Danh sách đánh giá
-      </Typography>
+      <Divider />
       <List>
         {reviews.map((review) => (
           <React.Fragment key={review._id}>
-            <ListItem alignItems='flex-start'>
+            <ListItem disablePadding alignItems='flex-start'>
               <ListItemAvatar>
-                <Avatar src={review.user?.avatarUrl || '/default.jpg'} />
+                <Avatar src={review.userId?.avatarUrl || '/default.jpg'} />
               </ListItemAvatar>
               <ListItemText
                 primary={
                   <Box display='flex' alignItems='center' gap={1}>
                     <Typography variant='subtitle1' fontWeight='bold' sx={{ color: '#1A3C7B' }}>
-                      {review.user?.name || 'Ẩn danh'}
+                      {review.userId?.name || 'Ẩn danh'}
                     </Typography>
                     <Rating value={review.rating} readOnly size='small' sx={{ color: '#faaf00' }} />
                   </Box>
@@ -99,7 +81,7 @@ const ProductReview = ({ productId }) => {
                 }
               />
             </ListItem>
-            <Divider variant='inset' component='li' />
+            {/* <Divider variant='inset' component='li' /> */}
           </React.Fragment>
         ))}
 

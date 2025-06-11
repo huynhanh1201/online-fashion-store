@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import {
   Box,
   Typography,
@@ -9,12 +9,14 @@ import {
   Avatar,
   IconButton,
   Button,
+  Snackbar,
+  Alert
 } from '@mui/material'
 import { useParams, useNavigate } from 'react-router-dom'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack'
 import { useOrderDetail } from '~/hooks/useOrderDetail'
 import ReviewModal from './modal/ReviewModal'
-import { createReview } from '~/services/reviewService'
+import { createReview, getUserReviews } from '~/services/reviewService'
 import { useSelector } from 'react-redux'
 import { selectCurrentUser } from '~/redux/user/userSlice'
 
@@ -27,40 +29,59 @@ const statusLabels = {
   Cancelled: ['Đã hủy', 'error'],
 }
 
+// ... [imports giữ nguyên như cũ]
+
 const OrderDetail = () => {
   const { orderId } = useParams()
   const navigate = useNavigate()
   const { order, items, loading, error } = useOrderDetail(orderId)
   const currentUser = useSelector(selectCurrentUser)
 
-
-  // State cho modal
+  const [snackbarOpen, setSnackbarOpen] = useState(false)
   const [openReviewModal, setOpenReviewModal] = useState(false)
   const [selectedItem, setSelectedItem] = useState(null)
+  const [reviewedProductIds, setReviewedProductIds] = useState([])
+  const [reviewedMap, setReviewedMap] = useState({})
 
-  // Kiểm tra trạng thái loading, error hoặc không tìm thấy đơn hàng
+  useEffect(() => {
+    const fetchUserReviews = async () => {
+      if (!currentUser?._id) return
+      try {
+        const reviews = await getUserReviews(currentUser._id)
+        const ids = reviews.map(r => r.productId)
+        setReviewedProductIds(ids)
+        const map = {}
+        ids.forEach(id => map[id] = true)
+        setReviewedMap(map)
+      } catch (err) {
+        console.error('Lỗi khi lấy đánh giá người dùng:', err)
+      }
+    }
+    fetchUserReviews()
+  }, [currentUser])
+
+  const isReviewed = (productId) => reviewedProductIds.includes(productId?.toString())
+  const allReviewed = items.every(item => isReviewed(item.productId || item.product?._id))
+
   if (loading) return <CircularProgress />
   if (error) return <Typography color="error">Lỗi: {error.message || 'Có lỗi xảy ra'}</Typography>
   if (!order) return <Typography>Không tìm thấy đơn hàng</Typography>
 
-  console.log('Order:', order, 'Items:', items, 'Current User:', currentUser) // Debug
-
   const [label, color] = statusLabels[order.status] || ['Không xác định', 'default']
+  const totalProductsPrice = items.reduce((sum, item) => sum + item.price * item.quantity, 0)
+  // Lấy danh sách productId duy nhất trong đơn
+  const uniqueProductIds = [...new Set(items.map(i => i.productId || i.product?._id))]
 
-  // Tính tổng tiền hàng
-  const totalProductsPrice = items.reduce((sum, item) => sum + (item.price * item.quantity), 0)
+  // Nếu chỉ có 1 sản phẩm thật sự (dù có nhiều biến thể)
+  const isSingleProduct = uniqueProductIds.length === 1
+  const formatPrice = (val) => typeof val === 'number'
+    ? val.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })
+    : '0₫'
 
-  const formatPrice = (val) =>
-    typeof val === 'number'
-      ? val.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })
-      : '0₫'
-
-  // Logic hiển thị nút
   const isPaid = order.paymentStatus === 'paid'
   const isOrderCompleted = order.status === 'Delivered'
   const isOrderCancellable = ['Pending', 'Processing'].includes(order.status) && !isPaid
 
-  // Xử lý hủy đơn hàng
   const handleCancelOrder = async () => {
     try {
       console.log('Hủy đơn hàng:', orderId)
@@ -70,34 +91,32 @@ const OrderDetail = () => {
     }
   }
 
-  // Đóng modal
   const handleCloseModal = () => {
     setOpenReviewModal(false)
     setSelectedItem(null)
   }
 
-  // Xử lý submit đánh giá
   const handleSubmitReview = async ({ rating, comment }) => {
     try {
-      const productsToReview = selectedItem ? [selectedItem] : items
-      console.log('Products to Review:', productsToReview) // Debug
+      const productsToReview = selectedItem
+        ? [selectedItem]
+        : items.length === 1
+          ? [items[0]]
+          : items
 
       for (const item of productsToReview) {
-        const reviewData = {
-          productId: item.productId || item.product?._id,
-          userId: currentUser?._id,
-          rating,
-          comment,
-        }
-        console.log('Review Data:', reviewData) // Debug
-        if (!reviewData.productId || !reviewData.userId) {
-          throw new Error('Thiếu productId hoặc userId')
-        }
-        await createReview(reviewData)
+        const productId = item.productId || item.product?._id
+        const userId = currentUser?._id
+        if (!productId || !userId) continue
+        if (reviewedMap[productId]) continue
+
+        await createReview({ productId, userId, rating, comment, orderId })
+        setReviewedProductIds(prev => [...new Set([...prev, productId])])
+        setReviewedMap(prev => ({ ...prev, [productId]: true }))
       }
 
-      console.log('Đã gửi đánh giá!')
       handleCloseModal()
+      setSnackbarOpen(true)
     } catch (error) {
       console.error('Lỗi gửi đánh giá:', error)
     }
@@ -121,39 +140,46 @@ const OrderDetail = () => {
         <Divider sx={{ my: 2 }} />
 
         <Typography fontWeight="bold" mb={1}>Sản phẩm đã mua:</Typography>
-        {items.map((item) => (
-          <Box key={item._id} mb={2} display="flex" gap={2} alignItems="center">
-            <Avatar
-              src={item.color?.image || '/default.jpg'}
-              variant="square"
-              sx={{ width: 64, height: 64, borderRadius: 1, objectFit: 'cover' }}
-            />
-            <Box display="flex" justifyContent="space-between" alignItems="center" flex={1}>
-              <Box textAlign="left">
+        {items.map((item) => {
+          const productId = item.productId || item.product?._id
+          return (
+            <Box key={item._id} mb={2} display="flex" gap={2} alignItems="center">
+              <Avatar
+                src={item.color?.image || '/default.jpg'}
+                variant="square"
+                sx={{ width: 64, height: 64, borderRadius: 1 }}
+              />
+              <Box flex={1}>
                 <Typography variant="h6">{item.name}</Typography>
                 <Typography variant="body2" color="text.secondary">
-                  Phân loại hàng: {item.color?.name}, {item.size}
+                  Phân loại: {item.color?.name}, {item.size} - x{item.quantity}
                 </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  x{item.quantity}
-                </Typography>
+                <Typography variant="body1">{formatPrice(item.price)}</Typography>
+                {item.originalPrice > item.price && (
+                  <Typography variant="body2" sx={{ textDecoration: 'line-through' }}>
+                    {formatPrice(item.originalPrice)}
+                  </Typography>
+                )}
               </Box>
-              <Box textAlign="right" display="flex" alignItems="center" gap={2}>
-                <Box>
-                  <Typography variant="body1">{formatPrice(item.price)}</Typography>
-                  {item.originalPrice && item.originalPrice > item.price && (
-                    <Typography
-                      variant="body2"
-                      sx={{ textDecoration: 'line-through', color: 'text.secondary' }}
-                    >
-                      {formatPrice(item.originalPrice)}
-                    </Typography>
-                  )}
-                </Box>
-              </Box>
+              {isOrderCompleted && !isReviewed(productId) && (
+                <Button variant="outlined" size="small" onClick={() => {
+                  setSelectedItem(item)
+                  setOpenReviewModal(true)
+                }}>Đánh giá</Button>
+              )}
+              {isReviewed(productId) && (
+                <Button
+                  variant="outlined"
+                  size="small"
+                  color="primary"
+                  onClick={() => navigate(`/productdetail/${productId}`)}
+                >
+                  Mua ngay
+                </Button>
+              )}
             </Box>
-          </Box>
-        ))}
+          )
+        })}
 
         <Divider sx={{ my: 2 }} />
 
@@ -161,23 +187,16 @@ const OrderDetail = () => {
           <Typography fontWeight="bold">Tổng tiền hàng:</Typography>
           <Typography>{formatPrice(totalProductsPrice)}</Typography>
         </Box>
-
         <Box display="flex" justifyContent="space-between" mb={1}>
           <Typography fontWeight="bold">Phí vận chuyển:</Typography>
           <Typography>{formatPrice(order.shippingFee || 0)}</Typography>
         </Box>
-
-        {order.couponId ? (
-          <Box display="flex" justifyContent="space-between" mb={1}>
-            <Typography fontWeight="bold">Mã giảm giá:</Typography>
-            <Typography color="error">{formatPrice(order.discountAmount || 0)}</Typography>
-          </Box>
-        ) : (
-          <Box display="flex" justifyContent="space-between" mb={1}>
-            <Typography fontWeight="bold">Mã giảm giá:</Typography>
-            <Typography>0 ₫</Typography>
-          </Box>
-        )}
+        <Box display="flex" justifyContent="space-between" mb={1}>
+          <Typography fontWeight="bold">Mã giảm giá:</Typography>
+          <Typography color={order.couponId ? 'error' : 'inherit'}>
+            {formatPrice(order.discountAmount || 0)}
+          </Typography>
+        </Box>
 
         <Divider sx={{ my: 2 }} />
 
@@ -198,39 +217,45 @@ const OrderDetail = () => {
         </Box>
       </Paper>
 
-      {(isOrderCompleted || isPaid) && currentUser && (
+      {isOrderCompleted && currentUser && isSingleProduct && !allReviewed && (
         <Box display="flex" justifyContent="flex-end" mt={2}>
           <Button
             variant="contained"
-            color="primary"
             onClick={() => {
-              console.log('Opening Review Modal') // Debug
-              setSelectedItem(null)
+              setSelectedItem(null) // Gửi tất cả biến thể trong review modal
               setOpenReviewModal(true)
             }}
           >
-            Đánh giá đơn hàng
+            Đánh giá sản phẩm
           </Button>
         </Box>
       )}
 
-      <Box display="flex" justifyContent="flex-end" mt={2} gap={2}>
-        {isOrderCancellable && (
-          <Button
-            variant="contained"
-            color="warning"
-            onClick={handleCancelOrder}
-          >
+
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={3000}
+        onClose={() => setSnackbarOpen(false)}
+        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+      >
+        <Alert onClose={() => setSnackbarOpen(false)} severity="success" sx={{ width: '100%' }}>
+          Cảm ơn bạn đã đánh giá!
+        </Alert>
+      </Snackbar>
+
+      {isOrderCancellable && (
+        <Box display="flex" justifyContent="flex-end" mt={2}>
+          <Button variant="contained" color="warning" onClick={handleCancelOrder}>
             Hủy đơn hàng
           </Button>
-        )}
-      </Box>
+        </Box>
+      )}
 
       <ReviewModal
         open={openReviewModal}
         onClose={handleCloseModal}
         onSubmit={handleSubmitReview}
-        orderItems={items} // Sử dụng items thay vì order.items
+        orderItems={selectedItem ? [selectedItem] : items}
       />
     </Box>
   )
