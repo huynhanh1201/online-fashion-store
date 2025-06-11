@@ -8,7 +8,10 @@ export const getCategories = async (filter) => {
     const response = await AuthorizedAxiosInstance.get(
       `${API_ROOT}/v1/categories?${queryString}`
     )
-    return { categories: response.data, total: response.data.length }
+    return {
+      categories: response.data.data,
+      total: response.data.meta.totalPages
+    }
   } catch (error) {
     console.error('Lỗi khi lấy danh sách danh mục:', error)
     return { categories: [], total: 0 }

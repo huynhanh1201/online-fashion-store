@@ -62,14 +62,15 @@ export default function FilterProduct({
     toDate = endDate
   } = {}) => {
     const filters = {
-      keyword: keywordInput || undefined,
+      search: keywordInput || undefined,
       categoryId: categoryId || undefined,
       priceMin: min ? parseInt(min) : undefined,
       priceMax: max ? parseInt(max) : undefined,
-      destroy: statusInput !== '' ? statusInput : undefined
+      status: statusInput !== '' ? statusInput : undefined
     }
 
     if (selectedTime === 'custom') {
+      filters.filterDate = 'custom'
       filters.startDate = fromDate
       filters.endDate = toDate
     } else if (selectedTime) {
@@ -153,7 +154,7 @@ export default function FilterProduct({
       <Button
         variant='outlined'
         size='small'
-        color='secondary'
+        color='error'
         onClick={handleReset}
       >
         Làm mới

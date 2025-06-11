@@ -56,13 +56,14 @@ export default function FilterCategory({
 
   const applyFilters = (selectedTime, fromDate, toDate) => {
     const filters = {
-      keyword: keyword || undefined,
-      destroy: status !== '' ? status : undefined,
+      search: keyword || undefined,
+      status: status !== '' ? status : undefined,
       sort: sort || undefined
     }
 
     // Xử lý thời gian tùy theo selectedTime
     if (selectedTime === 'custom') {
+      filters.filterTypeDate = 'custom'
       filters.startDate = fromDate
       filters.endDate = toDate
     } else if (selectedTime) {
