@@ -90,7 +90,7 @@ import {
 import ProductRow from './ProductRow'
 import AddIcon from '@mui/icons-material/Add'
 import Button from '@mui/material/Button'
-
+import FilterProduct from '~/components/FilterAdmin/FilterPoduct.jsx'
 const ProductTable = ({
   products,
   loading,
@@ -100,7 +100,10 @@ const ProductTable = ({
   addProduct,
   total,
   onPageChange,
-  onChangeRowsPerPage
+  onChangeRowsPerPage,
+  categories,
+  fetchCategories,
+  onFilter
 }) => {
   const columns = [
     { id: 'index', label: 'STT', minWidth: 50, align: 'center' },
@@ -129,17 +132,41 @@ const ProductTable = ({
                     alignItems: 'center'
                   }}
                 >
-                  <Typography variant='h6' sx={{ fontWeight: '800' }}>
-                    Danh sách sản phẩm
-                  </Typography>
-                  {/*<Button*/}
-                  {/*  variant='contained'*/}
-                  {/*  sx={{ backgroundColor: '#001f5d', padding: '13px 20px' }}*/}
-                  {/*  startIcon={<AddIcon />}*/}
-                  {/*  onClick={addProduct}*/}
-                  {/*>*/}
-                  {/*  Thêm sản phẩm*/}
-                  {/*</Button>*/}
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: 1,
+                      flex: '1'
+                    }}
+                  >
+                    <Typography variant='h6' sx={{ fontWeight: '800' }}>
+                      Danh Sách Sản Phẩm
+                    </Typography>
+                    <Button
+                      variant='contained'
+                      sx={{
+                        textTransform: 'none',
+                        width: 100,
+                        display: 'flex',
+                        alignItems: 'center'
+                      }}
+                      startIcon={<AddIcon />}
+                      onClick={addProduct}
+                    >
+                      Thêm
+                    </Button>
+                  </Box>
+                  <Box
+                    sx={{ display: 'flex', alignItems: 'center', flex: '2' }}
+                  >
+                    <FilterProduct
+                      categories={categories}
+                      fetchCategories={fetchCategories}
+                      onFilter={onFilter}
+                      products={products}
+                    />
+                  </Box>
                 </Box>
               </TableCell>
             </TableRow>
@@ -167,7 +194,7 @@ const ProductTable = ({
                 <ProductRow
                   key={product._id || idx}
                   product={product}
-                  index={idx + 1}
+                  index={page * rowsPerPage + idx + 1}
                   columns={columns}
                   onAction={handleOpenModal}
                 />

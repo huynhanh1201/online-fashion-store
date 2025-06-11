@@ -17,8 +17,9 @@ const DeleteColorModal = React.lazy(() => import('./modal/DeleteColorModal'))
 const ColorManagement = () => {
   const [page, setPage] = React.useState(1)
   const [selectedColor, setSelectedColor] = React.useState(null)
+  const [limit] = React.useState(10) // Giới hạn số lượng màu hiển thị mỗi trang
   const [modalType, setModalType] = React.useState(null)
-
+  const [filters, setFilters] = React.useState({})
   const { colors, totalPages, fetchColors, Loading } = useColors()
 
   React.useEffect(() => {
@@ -69,15 +70,16 @@ const ColorManagement = () => {
 
   return (
     <>
-      <Typography variant='h5' sx={{ mb: 2 }}>
-        Quản lý màu sắc sản phẩm
-      </Typography>
-
       <ColorTable
         colors={colors}
         loading={Loading}
         handleOpenModal={handleOpenModal}
         addColor={() => setModalType('add')}
+        onFilters={(filters) => {
+          setFilters(filters)
+          fetchColors(page, limit, filters)
+        }}
+        fetchColors={fetchColors}
       />
 
       <React.Suspense fallback={<></>}>

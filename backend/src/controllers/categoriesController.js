@@ -16,8 +16,9 @@ const createCategory = async (req, res, next) => {
 
 const getCategoryList = async (req, res, next) => {
   try {
+    const queryString = req.query
     // Lấy danh sách Danh mục sản phẩm từ tầng Service chuyển qua
-    const result = await categoriesService.getCategoryList()
+    const result = await categoriesService.getCategoryList(queryString)
 
     // Có kết quả thì trả về Client
     res.status(StatusCodes.OK).json(result)

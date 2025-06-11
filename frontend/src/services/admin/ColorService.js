@@ -1,10 +1,11 @@
 import AuthorizedAxiosInstance from '~/utils/authorizedAxios.js'
 import { API_ROOT } from '~/utils/constants.js'
 
-export const getColors = async (page = 1, limit = 10) => {
+export const getColors = async (filter) => {
+  const queryString = new URLSearchParams(filter).toString()
   try {
     const response = await AuthorizedAxiosInstance.get(
-      `${API_ROOT}/v1/colors?page=${page}&limit=${limit}`
+      `${API_ROOT}/v1/colors?${queryString}`
     )
     return {
       colors: response.data || response.data,

@@ -54,7 +54,9 @@ const order = async (req, res, next) => {
 
     isDelivered: Joi.boolean().default(false),
 
-    note: Joi.string().trim().min(1).max(500).allow(null)
+    note: Joi.string().trim().min(1).max(500).allow(null),
+
+    shippingFee: Joi.number().min(0).default(0)
   })
 
   try {

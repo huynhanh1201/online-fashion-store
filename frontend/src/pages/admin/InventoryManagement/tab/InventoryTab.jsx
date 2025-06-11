@@ -401,7 +401,7 @@ import DeleteForeverIcon from '@mui/icons-material/DeleteForever'
 import ViewInventoryModal from '../modal/Inventory/ViewInventoryModal.jsx'
 import EditInventoryModal from '../modal/Inventory/EditInventoryModal.jsx'
 import DeleteInventoryModal from '../modal/Inventory/DeleteInventoryModal.jsx'
-import FilterByTime from '~/components/filterDateType/FilterByTime.jsx'
+import FilterByTime from '~/components/FilterAdmin/common/FilterByTime.jsx'
 import dayjs from 'dayjs'
 const InventoryTab = ({
   data,
@@ -528,12 +528,9 @@ const InventoryTab = ({
       align: 'center',
       format: (value) =>
         new Date(value).toLocaleString('vi-VN', {
-          hour: '2-digit',
-          minute: '2-digit',
           day: '2-digit',
           month: '2-digit',
-          year: 'numeric',
-          hour12: false
+          year: 'numeric'
         })
     },
     {
@@ -543,12 +540,9 @@ const InventoryTab = ({
       align: 'center',
       format: (value) =>
         new Date(value).toLocaleString('vi-VN', {
-          hour: '2-digit',
-          minute: '2-digit',
           day: '2-digit',
           month: '2-digit',
-          year: 'numeric',
-          hour12: false
+          year: 'numeric'
         })
     },
     {

@@ -4,7 +4,8 @@ import { CategoryModel } from '~/models/CategoryModel'
 import ApiError from '~/utils/ApiError'
 import { slugify } from '~/utils/formatters'
 import { ProductModel } from '~/models/ProductModel'
-import mongoose from 'mongoose'
+import getDateRange from '~/utils/getDateRange'
+import validatePagination from '~/utils/validatePagination'
 
 const createCategory = async (reqBody) => {
   try {
@@ -23,8 +24,76 @@ const createCategory = async (reqBody) => {
   }
 }
 
-const getCategoryList = async () => {
-  const result = await CategoryModel.find({}).lean()
+const getCategoryList = async (queryString) => {
+  let {
+    page = 1,
+    limit = 10,
+    status,
+    search,
+    sort,
+    filterTypeDate,
+    startDate,
+    endDate
+  } = queryString
+
+  // Kiểm tra dữ liệu đầu vào của limit và page
+  validatePagination(page, limit)
+
+  // Xử lý thông tin Filter
+  const filter = {}
+
+  if (status === 'true' || status === 'false') {
+    status = JSON.parse(status)
+
+    filter.destroy = status
+  }
+
+  if (search) {
+    filter.name = { $regex: search, $options: 'i' }
+  }
+
+  const dateRange = getDateRange(filterTypeDate, startDate, endDate)
+
+  if (dateRange.startDate && dateRange.endDate) {
+    filter['createdAt'] = {
+      $gte: new Date(dateRange.startDate),
+      $lte: new Date(dateRange.endDate)
+    }
+  }
+
+  const sortMap = {
+    name_asc: { name: 1 },
+    name_desc: { name: -1 },
+    newest: { createdAt: -1 },
+    oldest: { createdAt: 1 }
+  }
+
+  let sortField = {}
+
+  if (sort) {
+    sortField = sortMap[sort]
+  }
+
+  const [categories, total] = await Promise.all([
+    CategoryModel.find(filter)
+      .collation({ locale: 'vi', strength: 1 })
+      .sort(sortField)
+      .skip((page - 1) * limit)
+      .limit(limit)
+      .lean(),
+
+    CategoryModel.countDocuments(filter)
+  ])
+
+  const result = {
+    data: categories,
+    meta: {
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit)
+    }
+  }
 
   return result
 }

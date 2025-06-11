@@ -8,8 +8,6 @@ const deliveryGHN = async (req, res, next) => {
   const correctCondition = Joi.object({
     numberItemOrder: Joi.number().min(1).required(),
     service_type_id: Joi.number().valid(2).required(), // chỉ cho phép 2, nếu sau này có nhiều hơn thì thêm vào
-    from_district_id: Joi.number().required(),
-    from_ward_code: Joi.string().required(),
     to_district_id: Joi.number().required(),
     to_ward_code: Joi.string().required(),
     insurance_value: Joi.number().min(0).required(), // có thể là 0
