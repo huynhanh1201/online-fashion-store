@@ -1,12 +1,9 @@
-/* eslint-disable no-console */
 import React, { useEffect, useState } from 'react'
 import {
   Box,
   Grid,
-  Button,
   Snackbar,
   Alert,
-  Pagination,
   MenuItem,
   Select,
   FormControl,
@@ -21,28 +18,29 @@ import { useDispatch } from 'react-redux'
 import { setCartItems } from '~/redux/cart/cartSlice'
 import ProductCard from '~/components/ProductCards/ProductCards'
 
-const PRODUCTS_PER_PAGE = 10
+const LOAD_COUNT = 5
 const CustomSelect = styled(Select)(({ theme }) => ({
   '& .MuiSelect-select': {
-    padding: '8px 32px 8px 12px', // Điều chỉnh padding
+    padding: '8px 32px 8px 12px',
     fontSize: '14px',
     display: 'flex',
-    alignItems: 'center',
+    alignItems: 'center'
   },
   '& .MuiSelect-icon': {
-    color: theme.palette.text.primary,
+    color: theme.palette.text.primary
   },
   '& .MuiOutlinedInput-notchedOutline': {
-    borderColor: theme.palette.grey[400],
+    borderColor: theme.palette.grey[400]
   },
   '&:hover .MuiOutlinedInput-notchedOutline': {
-    borderColor: theme.palette.grey[600],
+    borderColor: theme.palette.grey[600]
   },
   '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
     borderColor: theme.palette.primary.main,
-    borderWidth: '1px',
-  },
+    borderWidth: '1px'
+  }
 }))
+
 const Product = () => {
   const dispatch = useDispatch()
   const {
@@ -51,49 +49,74 @@ const Product = () => {
     loading: loadingProducts,
     error: errorProducts
   } = useProducts()
+
   const [filteredProducts, setFilteredProducts] = useState([])
-  const [sortOption, setSortOption] = useState('') // State cho tùy chọn sắp xếp
-  const [page, setPage] = useState(1)
+  const [visibleProducts, setVisibleProducts] = useState([])
+  const [sortOption, setSortOption] = useState('')
   const [snackbar, setSnackbar] = useState(null)
   const [isAdding, setIsAdding] = useState({})
+  const [loadingMore, setLoadingMore] = useState(false)
 
   useEffect(() => {
     fetchProducts()
   }, [])
 
-  // Logic sắp xếp sản phẩm
+  // Sắp xếp
   useEffect(() => {
     let sortedProducts = [...allProducts]
-
     switch (sortOption) {
-    case 'priceAsc':
-      sortedProducts.sort((a, b) => (a.exportPrice || 0) - (b.exportPrice || 0))
-      break
-    case 'priceDesc':
-      sortedProducts.sort((a, b) => (b.exportPrice || 0) - (a.exportPrice || 0))
-      break
-    case 'nameAsc':
-      sortedProducts.sort((a, b) => (a.name || '').localeCompare(b.name || ''))
-      break
-    case 'nameDesc':
-      sortedProducts.sort((a, b) => (b.name || '').localeCompare(a.name || ''))
-      break
-    default:
-      break
+      case 'priceAsc':
+        sortedProducts.sort(
+          (a, b) => (a.exportPrice || 0) - (b.exportPrice || 0)
+        )
+        break
+      case 'priceDesc':
+        sortedProducts.sort(
+          (a, b) => (b.exportPrice || 0) - (a.exportPrice || 0)
+        )
+        break
+      case 'nameAsc':
+        sortedProducts.sort((a, b) =>
+          (a.name || '').localeCompare(b.name || '')
+        )
+        break
+      case 'nameDesc':
+        sortedProducts.sort((a, b) =>
+          (b.name || '').localeCompare(a.name || '')
+        )
+        break
+      default:
+        break
     }
 
     setFilteredProducts(sortedProducts)
-    setPage(1)
+    setVisibleProducts(sortedProducts.slice(0, LOAD_COUNT))
   }, [allProducts, sortOption])
 
-  // Pagination
-  const paginatedProducts = filteredProducts.slice(
-    (page - 1) * PRODUCTS_PER_PAGE,
-    page * PRODUCTS_PER_PAGE
-  )
-  const totalPages = Math.ceil(filteredProducts.length / PRODUCTS_PER_PAGE)
+  // Infinite Scroll
+  useEffect(() => {
+    const handleScroll = () => {
+      if (
+        window.innerHeight + window.scrollY >=
+          document.body.offsetHeight - 300 &&
+        !loadingMore &&
+        visibleProducts.length < filteredProducts.length
+      ) {
+        setLoadingMore(true)
+        setTimeout(() => {
+          setVisibleProducts((prev) => [
+            ...prev,
+            ...filteredProducts.slice(prev.length, prev.length + LOAD_COUNT)
+          ])
+          setLoadingMore(false)
+        }, 500) // Giả lập delay loading
+      }
+    }
 
-  // Add to cart handler
+    window.addEventListener('scroll', handleScroll)
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [filteredProducts, visibleProducts, loadingMore])
+
   const handleAddToCart = async (product) => {
     if (isAdding[product._id]) return
     setIsAdding((prev) => ({ ...prev, [product._id]: true }))
@@ -133,8 +156,6 @@ const Product = () => {
     }
   }
 
-  const handlePageChange = (_, value) => setPage(value)
-
   return (
     <Box
       sx={{
@@ -154,18 +175,18 @@ const Product = () => {
           zIndex: 1200
         }}
       >
-        <InputLabel id="sort-select-label">Sắp xếp theo</InputLabel>
+        <InputLabel id='sort-select-label'>Sắp xếp theo</InputLabel>
         <Select
-          labelId="sort-select-label"
+          labelId='sort-select-label'
           value={sortOption}
-          label="Sắp xếp theo"
+          label='Sắp xếp theo'
           onChange={(e) => setSortOption(e.target.value)}
         >
-          <MenuItem value="">Mặc định</MenuItem>
-          <MenuItem value="priceAsc">Giá tăng dần</MenuItem>
-          <MenuItem value="priceDesc">Giá giảm dần</MenuItem>
-          <MenuItem value="nameAsc">Sản phẩm từ A-Z</MenuItem>
-          <MenuItem value="nameDesc">Sản phẩm từ Z-A</MenuItem>
+          <MenuItem value=''>Mặc định</MenuItem>
+          <MenuItem value='priceAsc'>Giá tăng dần</MenuItem>
+          <MenuItem value='priceDesc'>Giá giảm dần</MenuItem>
+          <MenuItem value='nameAsc'>Sản phẩm từ A-Z</MenuItem>
+          <MenuItem value='nameDesc'>Sản phẩm từ Z-A</MenuItem>
         </Select>
       </FormControl>
 
@@ -183,14 +204,14 @@ const Product = () => {
           <Typography sx={{ textAlign: 'center', mt: 10 }}>
             Không có sản phẩm nào.
           </Typography>
-        ) : filteredProducts.length === 0 ? (
+        ) : visibleProducts.length === 0 ? (
           <Typography sx={{ textAlign: 'center', mt: 10 }}>
             Không có sản phẩm phù hợp.
           </Typography>
         ) : (
           <>
             <div className='product-grid'>
-              {paginatedProducts.map((product) => (
+              {visibleProducts.map((product) => (
                 <Grid item xs={12} sm={6} md={4} lg={3} key={product._id}>
                   <ProductCard
                     product={product}
@@ -200,17 +221,19 @@ const Product = () => {
                 </Grid>
               ))}
             </div>
-            <Box sx={{ mt: 4, display: 'flex', justifyContent: 'center' }}>
-              <Pagination
-                count={totalPages}
-                page={page}
-                onChange={handlePageChange}
-                color='primary'
-              />
-            </Box>
+
+            {loadingMore && (
+              <Box sx={{ textAlign: 'center', mt: 2 }}>
+                <CircularProgress size={24} />
+                <Typography variant='body2'>
+                  Đang tải thêm sản phẩm...
+                </Typography>
+              </Box>
+            )}
           </>
         )}
       </Box>
+
       {snackbar && (
         <Snackbar
           open

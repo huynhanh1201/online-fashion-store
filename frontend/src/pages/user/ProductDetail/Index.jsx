@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { Container, Grid, Typography, Button, Box } from '@mui/material'
-import { useParams } from 'react-router-dom'
+import { useParams, Link as RouterLink } from 'react-router-dom'
 import useProductDetail from '~/hooks/useProductDetail'
 import ProductImageSection from './ProductImageSection'
 import ProductInfoSection from './ProductInfoSection'
@@ -76,11 +76,43 @@ const ProductDetail = () => {
 
   return (
     <Container
-      maxWidth='lg'
-      sx={{ py: 4, mt: 20, justifyContent: 'center', alignItems: 'center' }}
+      maxWidth={false}
+      sx={{
+        py: 0,
+        mt: 0,
+        px: 0,
+        justifyContent: 'center',
+        alignItems: 'center',
+        maxWidth: '1450px',
+        width: '100%',
+        mx: 'auto',
+      }}
     >
+      <Box sx={{ mb: 2, mt: 0, p: 1 }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', fontSize: 15, py: 1, px: 0, bgcolor: '#fafafa', borderRadius: 1 }}>
+          <Typography
+            component={RouterLink}
+            to="/"
+            sx={{ color: '#1976d2', textDecoration: 'none', fontSize: 15, '&:hover': { textDecoration: 'underline' }, mr: 0.5 }}
+          >
+            Trang chủ
+          </Typography>
+          <Typography sx={{ mx: 0.5, color: '#888' }}>/</Typography>
+          <Typography
+            component={RouterLink}
+            to="/product"
+            sx={{ color: '#1976d2', textDecoration: 'none', fontSize: 15, '&:hover': { textDecoration: 'underline' }, mr: 0.5 }}
+          >
+            Sản phẩm
+          </Typography>
+          <Typography sx={{ mx: 0.5, color: '#888' }}>/</Typography>
+          <Typography sx={{ fontWeight: 500, fontSize: 15, color: 'text.primary' }}>
+            {product?.name || 'Chi tiết sản phẩm'}
+          </Typography>
+        </Box>
+      </Box>
       <Grid container spacing={10} justifyContent='center'>
-        <Grid item xs={12} md={6}>
+        <Grid item xs={12} md={6} sx={{ px: { xs: 0, sm: 1, md: 2, lg: 2 }, maxWidth: '50%' }}>
           <ProductImageSection
             images={selectedColor?.images || product.images}
             selectedImageIndex={selectedImageIndex}
@@ -100,7 +132,7 @@ const ProductDetail = () => {
             selectedSize={selectedSize}
           />
         </Grid>
-        <Grid item xs={12} md={6}>
+        <Grid item xs={12} md={6} sx={{ px: { xs: 0, sm: 1, md: 2, lg: 2 }, maxWidth: '50%' }}>
           <ProductInfoSection
             product={product}
             quantity={quantity}

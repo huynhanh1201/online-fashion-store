@@ -5,8 +5,8 @@ import { getCategories } from '~/services/categoryService'
 
 const StyledButton = styled(Button)(({ theme }) => ({
   color: '#000',
-  fontWeight: 500,
-  padding: '8px 16px',
+  fontWeight: 450,
+  padding: '8px',
   borderRadius: '10px',
   position: 'relative',
   '&::after': {
@@ -79,10 +79,7 @@ const Menu = () => {
     const fetchCategories = async () => {
       try {
         const response = await getCategories(1, 100)
-        const categories = Array.isArray(response?.categories)
-          ? response.categories
-          : []
-
+        const categories = response.categories.data || response || []
         setCategories(categories)
       } catch (error) {
         console.error('Lỗi khi lấy danh mục:', error)
@@ -158,6 +155,7 @@ const Menu = () => {
           {renderPopoverContent()}
         </AnimatedPopover>
       </Box>
+      <StyledButton href='/blog'>Blog</StyledButton>
     </Box>
   )
 }

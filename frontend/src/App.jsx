@@ -19,6 +19,7 @@ import Order from '~/pages/user/Orders/OrderListPage'
 import PaymentVnpay from '~/pages/user/PaymentVnpay/PaymentVnpay'
 import OrderSuccess from './pages/OrderSuccess/OrderSuccess'
 import SearchResult from '~/pages/user/SearchResult/SearchResult'
+import Blog from '~/pages/user/Blog/Blog'
 // Trang HeaderAdmin
 import AdminLayout from '~/layout/AdminLayout'
 import AdminHome from '~/pages/admin/Home/index'
@@ -64,6 +65,7 @@ function App() {
       <Route path='/' element={<UserLayout />}>
         <Route path='product' element={<Product />} />
         <Route path='/productdetail/:productId' element={<ProductDetail />} />
+        <Route path='blog' element={<Blog />} />
         {/*Protected Routes (Hiểu đơn giản trong dự án của chúng ta là những route chỉ cho phép truy cập sau khi đã login)*/}
         <Route element={<ProtectedRoute user={currentUser} />}>
           {/*<Outlet/> của react-router-dom sẽ chạy vào các child route trong này*/}
