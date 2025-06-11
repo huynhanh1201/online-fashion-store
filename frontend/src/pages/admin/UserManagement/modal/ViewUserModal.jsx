@@ -65,7 +65,11 @@ const ViewUserModal = React.memo(({ open, onClose, user }) => {
                   </TableCell>
                   <TableCell>
                     {user.createdAt
-                      ? new Date(user.createdAt).toLocaleString('vi-VN')
+                      ? new Date(user.createdAt).toLocaleDateString('vi-VN', {
+                          day: '2-digit',
+                          month: '2-digit',
+                          year: 'numeric'
+                        })
                       : '—'}
                   </TableCell>
                 </TableRow>
@@ -75,7 +79,11 @@ const ViewUserModal = React.memo(({ open, onClose, user }) => {
                   </TableCell>
                   <TableCell>
                     {user.updatedAt
-                      ? new Date(user.updatedAt).toLocaleString('vi-VN')
+                      ? new Date(user.updatedAt).toLocaleDateString('vi-VN', {
+                          day: '2-digit',
+                          month: '2-digit',
+                          year: 'numeric'
+                        })
                       : '—'}
                   </TableCell>
                 </TableRow>

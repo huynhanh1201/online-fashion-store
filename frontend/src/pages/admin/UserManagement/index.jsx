@@ -11,6 +11,7 @@ const ROWS_PER_PAGE = 10
 
 export default function UserManagement() {
   const [page, setPage] = React.useState(1)
+  const [filters, setFilters] = React.useState()
   const [selectedUser, setSelectedUser] = React.useState(null)
   const [modalType, setModalType] = React.useState(null)
   const [ModalComponent, setModalComponent] = React.useState(null)
@@ -20,7 +21,7 @@ export default function UserManagement() {
   // Gọi API duy nhất một lần khi component mount
   React.useEffect(() => {
     const loadData = async () => {
-      await fetchUsers(page)
+      await fetchUsers(page, ROWS_PER_PAGE)
     }
     loadData()
   }, [page])
@@ -53,7 +54,6 @@ export default function UserManagement() {
     await removeUser(id, page) // ← truyền đúng page hiện tại
     handleCloseModal()
   }
-
   return (
     <>
       <Typography variant='h5' sx={{ mb: 2 }}>
@@ -64,6 +64,10 @@ export default function UserManagement() {
         page={page}
         loading={Loading}
         handleOpenModal={handleOpenModal}
+        onFilter={(filters) => {
+          setFilters(filters)
+          fetchUsers(1, ROWS_PER_PAGE, filters)
+        }}
       />
 
       {modalType === 'view' && selectedUser && (

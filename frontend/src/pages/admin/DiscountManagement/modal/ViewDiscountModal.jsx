@@ -107,7 +107,11 @@ const ViewDiscountModal = ({ open, onClose, discount }) => {
               </TableCell>
               <TableCell>
                 {discount.validFrom
-                  ? new Date(discount.validFrom).toLocaleString('vi-VN')
+                  ? new Date(discount.validFrom).toLocaleDateString('vi-VN', {
+                      day: '2-digit',
+                      month: '2-digit',
+                      year: 'numeric'
+                    })
                   : '—'}
               </TableCell>
             </TableRow>
@@ -118,7 +122,11 @@ const ViewDiscountModal = ({ open, onClose, discount }) => {
               </TableCell>
               <TableCell>
                 {discount.validUntil
-                  ? new Date(discount.validUntil).toLocaleString('vi-VN')
+                  ? new Date(discount.validUntil).toLocaleDateString('vi-VN', {
+                      day: '2-digit',
+                      month: '2-digit',
+                      year: 'numeric'
+                    })
                   : '—'}
               </TableCell>
             </TableRow>

@@ -157,7 +157,7 @@ const WarehouseSlipsTab = ({
       ...slip,
       warehouse: warehouseName || 'N/A',
       type: slip.type === 'import' ? 'Nhập' : 'Xuất',
-      createdAtFormatted: new Date(slip.createdAt).toLocaleString('vi-VN'),
+      createdAtFormatted: new Date(slip.createdAt).toLocaleDateString('vi-VN'),
       itemCount: slip.items.length,
       createdByName: slip.createdBy?.name || 'N/A'
     }
@@ -178,7 +178,8 @@ const WarehouseSlipsTab = ({
       id: 'createdAtFormatted',
       label: 'Ngày tạo',
       minWidth: 160,
-      align: 'center'
+      align: 'center',
+      format: (value) => new Date(value).toLocaleDateString('vi-VN')
     },
     { id: 'action', label: 'Hành động', minWidth: 120, align: 'center' }
   ]

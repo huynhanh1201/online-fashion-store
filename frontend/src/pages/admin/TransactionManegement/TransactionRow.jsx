@@ -180,7 +180,7 @@ const TransactionRow = ({ transaction, onView, onEdit, onDelete, index }) => {
           : 'Đang tải...'}
       </TableCell>
       <TableCell>
-        {new Date(transaction.createdAt).toLocaleString('vi-VN')}
+        {new Date(transaction.createdAt).toLocaleDateString()}
       </TableCell>
       <TableCell>
         <Stack direction='row' spacing={1} sx={styles.groupIcon}>

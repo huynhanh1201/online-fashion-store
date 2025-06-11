@@ -111,9 +111,9 @@ export const buildQueryString = (params) => {
 
 export const getProducts = async (params = {}) => {
   try {
-    const queryString = buildQueryString(params)
+    const queryString = new URLSearchParams(params).toString()
     const response = await AuthorizedAxiosInstance.get(
-      `${API_ROOT}/v1/products${queryString}`
+      `${API_ROOT}/v1/products?${queryString}`
     )
     return {
       products: response.data.data || [],

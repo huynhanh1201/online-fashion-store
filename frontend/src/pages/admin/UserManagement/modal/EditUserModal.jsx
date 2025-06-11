@@ -132,7 +132,13 @@ const EditUserModal = React.memo(({ open, onClose, user, onSave }) => {
             fullWidth
             margin='normal'
             value={
-              user?.createdAt ? new Date(user.createdAt).toLocaleString() : ''
+              user.createdAt
+                ? new Date(user.createdAt).toLocaleDateString('vi-VN', {
+                    day: '2-digit',
+                    month: '2-digit',
+                    year: 'numeric'
+                  })
+                : '—'
             }
             InputProps={{ readOnly: true }}
             sx={{
@@ -146,7 +152,13 @@ const EditUserModal = React.memo(({ open, onClose, user, onSave }) => {
             fullWidth
             margin='normal'
             value={
-              user?.updatedAt ? new Date(user.updatedAt).toLocaleString() : ''
+              user.updatedAt
+                ? new Date(user.updatedAt).toLocaleDateString('vi-VN', {
+                    day: '2-digit',
+                    month: '2-digit',
+                    year: 'numeric'
+                  })
+                : '—'
             }
             InputProps={{ readOnly: true }}
             sx={{

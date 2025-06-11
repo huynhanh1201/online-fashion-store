@@ -275,7 +275,7 @@ const InventoryLogTab = ({
                         <Chip
                           label={value}
                           size='large'
-                          sx={{ width: '120px', fontWeight: '800' }}
+                          sx={{ width: '90px', fontWeight: '800' }}
                           color={value === 'Nhập' ? 'success' : 'error'}
                         />
                       </TableCell>

@@ -17,14 +17,16 @@ const DeleteCategoryModal = React.lazy(
 
 const CategoryManagement = () => {
   const [page, setPage] = React.useState(1)
+  const [limit, setLimit] = React.useState(10)
+  const [filters, setFilters] = React.useState({})
   const [selectedCategory, setSelectedCategory] = React.useState(null)
   const [modalType, setModalType] = React.useState(null)
 
-  const { categories, totalPages, fetchCategories, Loading } = useCategories()
+  const { categories, fetchCategories, Loading } = useCategories()
 
   React.useEffect(() => {
     const loadData = async () => {
-      await fetchCategories(page)
+      await fetchCategories()
     }
     loadData()
   }, [page])
@@ -40,13 +42,11 @@ const CategoryManagement = () => {
     setModalType(null)
   }
 
-  const handleChangePage = (event, value) => setPage(value)
-
   const handleSaveCategory = async (categoryId, updatedData) => {
     try {
       const response = await updateCategory(categoryId, updatedData)
       if (response) {
-        await fetchCategories(page)
+        await fetchCategories()
       } else {
         console.log('Cập nhật không thành công')
       }
@@ -59,7 +59,7 @@ const CategoryManagement = () => {
     try {
       const result = await deleteCategory(categoryId)
       if (result) {
-        await fetchCategories(page)
+        await fetchCategories()
       } else {
         console.log('Xoá không thành công')
       }
@@ -70,14 +70,16 @@ const CategoryManagement = () => {
 
   return (
     <>
-      <Typography variant='h5' sx={{ mb: 2 }}>
-        Quản lý danh mục sản phẩm
-      </Typography>
       <CategoryTable
         categories={categories}
         loading={Loading}
+        fetchCategories={fetchCategories}
         handleOpenModal={handleOpenModal}
         addCategory={() => setModalType('add')}
+        onFilter={(filters) => {
+          setFilters(filters)
+          fetchCategories(page, limit, filters)
+        }}
       />
 
       <React.Suspense fallback={<></>}>

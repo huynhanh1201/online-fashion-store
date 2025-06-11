@@ -77,6 +77,7 @@
 //   )
 // })
 // export default UserTable
+
 import React from 'react'
 import {
   Table,
@@ -91,13 +92,14 @@ import {
   TablePagination
 } from '@mui/material'
 import UserRow from './UserRow'
-
+import FilterUser from '~/components/FilterAdmin/FilterUser.jsx'
 const UserTable = React.memo(function UserTable({
   users,
   page,
   rowsPerPage,
   handleOpenModal,
-  loading
+  loading,
+  onFilter
 }) {
   const validUsers = users.filter((user) => !user.destroy)
   const columns = [
@@ -139,6 +141,7 @@ const UserTable = React.memo(function UserTable({
                   <Typography variant='h6' sx={{ fontWeight: '800' }}>
                     Danh sách người dùng
                   </Typography>
+                  <FilterUser onFilter={onFilter} />
                 </Box>
               </TableCell>
             </TableRow>

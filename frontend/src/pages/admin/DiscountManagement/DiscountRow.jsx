@@ -81,9 +81,14 @@ const styles = {
     gap: 1
   }
 }
-const formatDate = (date) =>
-  date ? new Date(date).toLocaleString('vi-VN') : '—'
-
+const formatDate = (isoString) => {
+  const date = new Date(isoString)
+  return date.toLocaleString('vi-VN', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric'
+  })
+}
 export default function DiscountRow({ discount, index, columns, onAction }) {
   const remaining = discount.usageLimit - discount.usedCount
 

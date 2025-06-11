@@ -2,10 +2,11 @@
 import AuthorizedAxiosInstance from '~/utils/authorizedAxios.js'
 import { API_ROOT } from '~/utils/constants.js'
 
-export const getCategories = async (page = 1, limit = 10) => {
+export const getCategories = async (filter) => {
+  const queryString = new URLSearchParams(filter).toString()
   try {
     const response = await AuthorizedAxiosInstance.get(
-      `${API_ROOT}/v1/categories?page=${page}&limit=${limit}`
+      `${API_ROOT}/v1/categories?${queryString}`
     )
     return { categories: response.data, total: response.data.length }
   } catch (error) {
