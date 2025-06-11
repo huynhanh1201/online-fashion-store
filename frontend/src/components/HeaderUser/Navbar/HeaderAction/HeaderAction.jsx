@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import {
   IconButton,
   Menu,
   MenuItem,
   Badge,
   Grow,
+  Fade,
   Paper,
   Avatar
 } from '@mui/material'
@@ -27,6 +28,7 @@ const HeaderAction = () => {
   const dispatch = useDispatch()
   const navigate = useNavigate()
   const currentUser = useSelector(selectCurrentUser)
+  const menuRef = useRef(null) // Reference to the menu element
 
   // Lấy giỏ hàng từ Redux store
   const cartItems = useSelector((state) => state.cart.cartItems)
@@ -82,11 +84,28 @@ const HeaderAction = () => {
   }
 
   useEffect(() => {
+    const handleOutsideClick = (event) => {
+      if (
+        anchorEl &&
+        menuRef.current &&
+        !menuRef.current.contains(event.target) &&
+        !anchorEl.contains(event.target)
+      ) {
+        handleClose()
+      }
+    }
+
     const handleScroll = () => {
       if (anchorEl) handleClose()
     }
+
+    document.addEventListener('mousedown', handleOutsideClick)
     window.addEventListener('scroll', handleScroll)
-    return () => window.removeEventListener('scroll', handleScroll)
+
+    return () => {
+      document.removeEventListener('mousedown', handleOutsideClick)
+      window.removeEventListener('scroll', handleScroll)
+    }
   }, [anchorEl])
 
   return (
@@ -110,34 +129,60 @@ const HeaderAction = () => {
         anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
         transformOrigin={{ vertical: 'top', horizontal: 'right' }}
         TransitionComponent={Grow}
+        TransitionProps={{
+          timeout: { enter: 400, exit: 200 },
+          easing: {
+            enter: 'cubic-bezier(0.4, 0, 0.2, 1)',
+            exit: 'cubic-bezier(0.4, 0, 0.2, 1)'
+          }
+        }}
         PaperProps={{
           component: Paper,
           elevation: 4,
           sx: {
             mt: 1,
-            minWidth: 100,
-            zIndex: (theme) => theme.zIndex.tooltip + 10
+            minWidth: 160,
+            zIndex: (theme) => theme.zIndex.tooltip + 10,
+            '& .MuiMenuItem-root': {
+              transition: 'background-color 0.2s ease-in-out',
+              '&:hover': {
+                backgroundColor: 'rgba(0, 0, 0, 0.04)'
+              }
+            }
           }
         }}
+        MenuListProps={{ ref: menuRef }}
       >
-        {currentUser ? (
-          <>
-            <MenuItem component={Link} to='/profile'>
-              Hồ sơ
+        <Fade in={open} timeout={{ enter: 300, exit: 150 }}>
+          <div>
+            {currentUser ? (
+              <>
+                <MenuItem
+                  onClick={handleClose}
+                  component={Link}
+                  to='/profile'
+                  sx={{ fontWeight: 'bold', opacity: 1 }}
+                >
+                  {currentUser.name}
+                </MenuItem>
+                <MenuItem onClick={handleClose} component={Link} to='/profile'>
+                  Hồ sơ
+                </MenuItem>
+                <MenuItem onClick={handleLogout}>Đăng xuất</MenuItem>
+              </>
+            ) : (
+              <MenuItem onClick={handleClose} component={Link} to='/login'>
+                Đăng nhập
+              </MenuItem>
+            )}
+            <MenuItem onClick={handleClose} component={Link} to='/cart'>
+              Giỏ hàng
             </MenuItem>
-            <MenuItem onClick={handleLogout}>Đăng xuất</MenuItem>
-          </>
-        ) : (
-          <MenuItem component={Link} to='/login'>
-            Đăng nhập
-          </MenuItem>
-        )}
-        <MenuItem component={Link} to='/cart'>
-          Giỏ hàng
-        </MenuItem>
-        <MenuItem component={Link} to='/orders'>
-          Thông tin đơn hàng
-        </MenuItem>
+            <MenuItem onClick={handleClose} component={Link} to='/orders'>
+              Thông tin đơn hàng
+            </MenuItem>
+          </div>
+        </Fade>
       </Menu>
 
       <IconButton color='inherit' component={Link} to='/cart'>

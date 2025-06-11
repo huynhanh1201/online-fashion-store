@@ -6,6 +6,8 @@ import ApiError from '~/utils/ApiError'
 import { slugify } from '~/utils/formatters'
 import generateSequentialCode from '~/utils/generateSequentialCode'
 import { VariantModel } from '~/models/VariantModel'
+import validatePagination from '~/utils/validatePagination'
+import getDateRange from '~/utils/getDateRange'
 
 const createProduct = async (reqBody) => {
   // eslint-disable-next-line no-useless-catch
@@ -69,35 +71,81 @@ const createProduct = async (reqBody) => {
 const getProductList = async (reqQuery) => {
   // eslint-disable-next-line no-useless-catch
   try {
-    let { page, limit, search, categoryId, origin, priceMin, priceMax } =
-      reqQuery
+    let {
+      page,
+      limit,
+      search,
+      categoryId,
+      priceMin,
+      priceMax,
+      sort,
+      status,
+      filterTypeDate,
+      startDate,
+      endDate
+    } = reqQuery
 
-    page = parseInt(page, 10)
-    limit = parseInt(limit, 10)
+    validatePagination(page, limit)
 
-    if (isNaN(page) || page < 1) page = 1
-    if (isNaN(limit) || limit < 1) limit = 10
+    // Xử lý filter
+    const filter = {}
 
-    const filter = { destroy: false }
+    if (status === 'true' || status === 'false') {
+      status = JSON.parse(status)
+
+      filter.destroy = status
+    }
+
+    if (search) {
+      filter.name = { $regex: search, $options: 'i' }
+    }
 
     const priceMinNumber = Number(priceMin)
     const priceMaxNumber = Number(priceMax)
 
     if (!isNaN(priceMinNumber))
-      filter.price = { ...(filter.exportPrice || {}), $gte: priceMinNumber }
+      filter.exportPrice = {
+        ...(filter.exportPrice || {}),
+        $gte: priceMinNumber
+      }
 
     if (!isNaN(priceMaxNumber))
-      filter.price = { ...(filter.exportPrice || {}), $lte: priceMaxNumber }
+      filter.exportPrice = {
+        ...(filter.exportPrice || {}),
+        $lte: priceMaxNumber
+      }
 
     if (search) filter.name = { $regex: search, $options: 'i' }
 
     if (categoryId && mongoose.Types.ObjectId.isValid(categoryId))
       filter.categoryId = categoryId
 
-    if (origin) filter.origin = origin
+    const dateRange = getDateRange(filterTypeDate, startDate, endDate)
+
+    if (dateRange.startDate && dateRange.endDate) {
+      filter['createdAt'] = {
+        $gte: new Date(dateRange.startDate),
+        $lte: new Date(dateRange.endDate)
+      }
+    }
+
+    const sortMap = {
+      name_asc: { name: 1 },
+      name_desc: { name: -1 },
+      newest: { createdAt: -1 },
+      oldest: { createdAt: 1 }
+    }
+
+    let sortField = {}
+
+    if (sort) {
+      sortField = sortMap[sort]
+    }
 
     const [products, total] = await Promise.all([
       ProductModel.find(filter)
+        .collation({ locale: 'vi', strength: 1 })
+        .sort(sortField)
         .populate({
           path: 'categoryId',
           select: 'name description slug _id'

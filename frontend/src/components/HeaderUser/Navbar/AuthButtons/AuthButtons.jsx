@@ -118,11 +118,7 @@ const AuthButtons = () => {
             Đăng nhập
           </StyledButtonLogin>
         </>
-      ) : (
-        <>
-          <StyledTypography>{truncateName(currentUser.name)}</StyledTypography>
-        </>
-      )}
+      ) : null}
     </div>
   )
 }

@@ -69,14 +69,6 @@ const styles = {
 }
 
 const ProductSection = ({ bannerImg, bannerTitle, bannerDesc, products }) => {
-  // Debug: Log dữ liệu để kiểm tra
-  console.log('ProductSection props:', {
-    bannerImg,
-    bannerTitle,
-    bannerDesc,
-    products
-  })
-
   // Kiểm tra và xử lý dữ liệu products - FIX: products có cấu trúc { products: [...], total: number }
   let productArray = []
 
@@ -93,9 +85,6 @@ const ProductSection = ({ bannerImg, bannerTitle, bannerDesc, products }) => {
   const validProducts = productArray.filter(
     (product) => product && (product._id || product.id)
   )
-
-  console.log('Product array extracted:', productArray)
-  console.log('Valid products:', validProducts)
 
   return (
     <div style={styles.section}>
@@ -158,16 +147,6 @@ const ProductSection = ({ bannerImg, bannerTitle, bannerDesc, products }) => {
             <small>Kiểm tra console để xem dữ liệu products</small>
           </div>
         )}
-      </div>
-
-      <div style={styles.seeMore}>
-        <button
-          style={styles.button}
-          onMouseOver={(e) => (e.target.style.backgroundColor = '#d0d0d0')}
-          onMouseOut={(e) => (e.target.style.backgroundColor = '#e0e0e0')}
-        >
-          Xem thêm
-        </button>
       </div>
     </div>
   )

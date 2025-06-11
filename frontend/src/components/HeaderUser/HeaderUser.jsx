@@ -114,17 +114,7 @@ const HeaderUser = () => {
             >
               <Search />
               <AuthButtons />
-              <Box
-                sx={{
-                  width: 36,
-                  height: 36,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center'
-                }}
-              >
-                <HeaderAction />
-              </Box>
+              <HeaderAction />
             </Box>
           </Toolbar>
         </Container>
