@@ -6,7 +6,6 @@ import { slugify } from '~/utils/formatters'
 import { ProductModel } from '~/models/ProductModel'
 import getDateRange from '~/utils/getDateRange'
 import validatePagination from '~/utils/validatePagination'
-import { InventoryModel } from '~/models/InventoryModel'
 
 const createCategory = async (reqBody) => {
   try {
@@ -30,6 +29,7 @@ const getCategoryList = async (queryString) => {
     page = 1,
     limit = 10,
     status,
+    search,
     sort,
     filterTypeDate,
     startDate,
@@ -46,6 +46,10 @@ const getCategoryList = async (queryString) => {
     status = JSON.parse(status)
 
     filter.destroy = status
+  }
+
+  if (search) {
+    filter.name = { $regex: search, $options: 'i' }
   }
 
   const dateRange = getDateRange(filterTypeDate, startDate, endDate)
