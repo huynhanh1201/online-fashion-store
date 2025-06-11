@@ -70,16 +70,17 @@ import {
 } from '@mui/material'
 import CategoryRow from './CategoryRow'
 import AddIcon from '@mui/icons-material/Add'
-
+import FilterCategory from '~/components/FilterAdmin/FilterCategory.jsx'
 const CategoryTable = ({
   categories,
   page,
   rowsPerPage,
   loading,
   handleOpenModal,
-  addCategory
+  addCategory,
+  onFilter,
+  fetchCategories
 }) => {
-  const filteredCategories = categories.filter((c) => !c.destroy)
   const columns = [
     { id: 'index', label: 'STT', minWidth: 50, align: 'center' },
     { id: 'name', label: 'Tên danh mục', minWidth: 200 },
@@ -91,13 +92,6 @@ const CategoryTable = ({
       align: 'center'
     }
   ]
-  const styles = {
-    buttonAdd: {
-      backgroundColor: '#001f5d',
-      color: '#fff',
-      marginBottom: '16px'
-    }
-  }
   return (
     <Paper sx={{ border: '1px solid #ccc', width: '100%', overflow: 'hidden' }}>
       <TableContainer>
@@ -109,20 +103,36 @@ const CategoryTable = ({
                   sx={{
                     display: 'flex',
                     justifyContent: 'space-between',
-                    alignItems: 'center'
+                    alignItems: 'start'
                   }}
                 >
-                  <Typography variant='h6' sx={{ fontWeight: '800' }}>
-                    Danh sách danh mục
-                  </Typography>
-                  <Button
-                    variant='contained'
-                    sx={styles.buttonAdd}
-                    startIcon={<AddIcon />}
-                    onClick={addCategory}
+                  <Box
+                    sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}
                   >
-                    Thêm danh mục
-                  </Button>
+                    <Typography variant='h6' sx={{ fontWeight: '800' }}>
+                      Danh Sách Danh Mục
+                    </Typography>
+                    <Button
+                      variant='contained'
+                      color='primary'
+                      onClick={addCategory}
+                      startIcon={<AddIcon />}
+                      sx={{
+                        textTransform: 'none',
+                        width: 100,
+                        display: 'flex',
+                        alignItems: 'center'
+                      }}
+                    >
+                      Thêm
+                    </Button>
+                  </Box>
+                  <FilterCategory
+                    onFilter={onFilter}
+                    categories={categories}
+                    fetchCategories={fetchCategories}
+                    loading={loading}
+                  />
                 </Box>
               </TableCell>
             </TableRow>
@@ -152,8 +162,8 @@ const CategoryTable = ({
                   <TableCell key={column.id} align={column.align}></TableCell>
                 ))}
               </TableRow>
-            ) : filteredCategories.length > 0 ? (
-              filteredCategories.map((category, idx) => (
+            ) : categories.length > 0 ? (
+              categories.map((category, idx) => (
                 <CategoryRow
                   key={category._id}
                   category={category}

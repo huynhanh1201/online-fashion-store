@@ -125,8 +125,7 @@ const styles = {
   }
 }
 const OrderRow = ({ order, index, columns, onView, onEdit, onDelete }) => {
-  const formatDate = (date) =>
-    date ? dayjs(date).format('DD/MM/YYYY HH:mm') : '—'
+  const formatDate = (date) => (date ? dayjs(date).format('DD/MM/YYYY') : '—')
 
   return (
     <TableRow hover>

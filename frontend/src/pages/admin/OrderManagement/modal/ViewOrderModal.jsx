@@ -48,6 +48,26 @@ function ViewOrderModal({
     }
   }
 
+  const renderStatusChip = (status) => {
+    const map = {
+      Pending: { label: 'Đang chờ', color: 'warning' },
+      Processing: { label: 'Đang xử lý', color: 'info' },
+      Shipped: { label: 'Đã gửi hàng', color: 'primary' },
+      Delivered: { label: 'Đã giao', color: 'success' },
+      Cancelled: { label: 'Đã hủy', color: 'error' }
+    }
+
+    const config = map[status] || { label: '—', color: 'default' }
+
+    return (
+      <Chip
+        label={config.label}
+        color={config.color}
+        size='small'
+        sx={{ width: '120px', fontWeight: 'bold' }}
+      />
+    )
+  }
   const renderStatusLabel = (status) => {
     const map = {
       Pending: 'Đang chờ',
@@ -56,8 +76,15 @@ function ViewOrderModal({
       Delivered: 'Đã giao',
       Cancelled: 'Đã hủy'
     }
-    return map[status] || '—'
+    return map[status] || status
   }
+
+  const previousStatuses = Array.from(
+    new Set(
+      histories.map((h) => h.status).filter((s) => s && s !== order.status)
+    )
+  )
+
   return (
     <Dialog
       open={open}
@@ -174,6 +201,31 @@ function ViewOrderModal({
                 </TableCell>
                 <TableCell>
                   <Stack direction='row' alignItems='center' spacing={1}>
+                    {/* Hiển thị các trạng thái trước đó */}
+                    {previousStatuses.map((status, index) => (
+                      <Chip
+                        key={index}
+                        label={renderStatusLabel(status)}
+                        color={
+                          status === 'Cancelled'
+                            ? 'error'
+                            : status === 'Pending'
+                              ? 'warning'
+                              : status === 'Processing'
+                                ? 'info'
+                                : status === 'Shipped'
+                                  ? 'primary'
+                                  : status === 'Delivered'
+                                    ? 'success'
+                                    : 'default'
+                        }
+                        size='large'
+                        sx={{ width: '120px', fontWeight: '800' }}
+                        variant='outlined'
+                      />
+                    ))}
+
+                    {/* Trạng thái hiện tại */}
                     <Chip
                       label={renderStatusLabel(order.status)}
                       color={
@@ -181,24 +233,29 @@ function ViewOrderModal({
                           ? 'error'
                           : order.status === 'Pending'
                             ? 'warning'
-                            : 'success'
+                            : order.status === 'Processing'
+                              ? 'info'
+                              : order.status === 'Shipped'
+                                ? 'primary'
+                                : order.status === 'Delivered'
+                                  ? 'success'
+                                  : 'default'
                       }
                       size='large'
                       sx={{ width: '120px', fontWeight: '800' }}
                     />
 
+                    {/* Trạng thái tiếp theo (nếu có) */}
                     {getNextStatus(order.status) && (
-                      <>
-                        <Chip
-                          icon={<ArrowForwardIcon />}
-                          label={renderStatusLabel(getNextStatus(order.status))}
-                          variant='outlined'
-                          size='large'
-                          sx={{ width: '120px', fontWeight: '800' }}
-                          color='info'
-                          onClick={handleNextStatus}
-                        />
-                      </>
+                      <Chip
+                        icon={<ArrowForwardIcon />}
+                        label={renderStatusLabel(getNextStatus(order.status))}
+                        variant='outlined'
+                        size='large'
+                        sx={{ width: '120px', fontWeight: '800' }}
+                        color='info'
+                        onClick={handleNextStatus}
+                      />
                     )}
                   </Stack>
                 </TableCell>
@@ -248,7 +305,7 @@ function ViewOrderModal({
                   <strong>Ngày tạo</strong>
                 </TableCell>
                 <TableCell>
-                  {dayjs(order.createdAt).format('DD/MM/YYYY HH:mm')}
+                  {dayjs(order.createdAt).format('HH:mm DD/MM/YYYY')}
                 </TableCell>
               </TableRow>
 
@@ -257,7 +314,7 @@ function ViewOrderModal({
                   <strong>Ngày cập nhật</strong>
                 </TableCell>
                 <TableCell>
-                  {dayjs(order.updatedAt).format('DD/MM/YYYY HH:mm')}
+                  {dayjs(order.updatedAt).format('HH:mm DD/MM/YYYY')}
                 </TableCell>
               </TableRow>
             </TableBody>
@@ -272,7 +329,10 @@ function ViewOrderModal({
               histories.map((h) => (
                 <Box key={h._id} mb={2} p={1} border={1} borderRadius={2}>
                   <Typography>
-                    <strong>Trạng thái:</strong> {renderStatusLabel(h.status)}
+                    <Box display='flex' alignItems='center' gap={1}>
+                      <strong>Trạng thái:</strong>
+                      {renderStatusChip(h.status)}
+                    </Box>
                   </Typography>
                   <Typography>
                     <strong>Ghi chú:</strong> {h.note || 'Không có'}

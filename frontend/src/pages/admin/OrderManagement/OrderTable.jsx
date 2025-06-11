@@ -113,7 +113,11 @@ const OrderTable = ({
     { id: 'customerName', label: 'Tên khách hàng', minWidth: 200 },
     { id: 'status', label: 'Trạng thái đơn hàng', minWidth: 170 },
     { id: 'paymentStatus', label: 'Trạng thái thanh toán', minWidth: 170 },
-    { id: 'createdAt', label: 'Ngày đặt hàng', minWidth: 180 },
+    {
+      id: 'createdAt',
+      label: 'Ngày đặt hàng',
+      minWidth: 180
+    },
     { id: 'action', label: 'Hành động', minWidth: 130, align: 'center' }
   ]
 

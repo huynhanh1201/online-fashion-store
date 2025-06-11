@@ -2,15 +2,17 @@ import React, { useState } from 'react'
 import { Box, Button, Chip, Menu, MenuItem, Typography } from '@mui/material'
 import { TextField } from '@mui/material'
 import { toast } from 'react-toastify'
+import { filterDate } from '~/utils/constants.js'
+import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown'
 const FilterByTime = ({
   onApply,
-  filterDate,
   selectedFilter,
   setSelectedFilter,
   startDate,
   setStartDate,
   endDate,
-  setEndDate
+  setEndDate,
+  label
 }) => {
   const [anchorEl, setAnchorEl] = useState(null)
   const handleOpenMenu = (event) => {
@@ -36,8 +38,23 @@ const FilterByTime = ({
 
   return (
     <>
-      <Button variant='outlined' onClick={handleOpenMenu}>
-        Lọc thời gian
+      <Button
+        variant='outlined'
+        onClick={handleOpenMenu}
+        endIcon={<ArrowDropDownIcon />} // mũi tên giống select
+        sx={{
+          textTransform: 'none',
+          justifyContent: 'space-between',
+          minWidth: 200,
+          color: 'text.primary',
+          borderColor: 'rgba(0, 0, 0, 0.23)', // giống border Select mặc định
+          padding: '6.5px 14px', // giống TextField size="small"
+          '&:hover': {
+            borderColor: 'black'
+          }
+        }}
+      >
+        {label || 'Lọc theo thời gian'}
       </Button>
       <Menu
         anchorEl={anchorEl}

@@ -83,14 +83,23 @@ const BatchesTab = ({
       id: 'importedAt',
       label: 'Ngày nhập',
       minWidth: 150,
-      format: (value) => new Date(value).toLocaleString('vi-VN')
+      format: (value) =>
+        new Date(value).toLocaleDateString('vi-VN', {
+          day: '2-digit',
+          month: '2-digit',
+          year: 'numeric'
+        })
     },
     {
       id: 'manufactureDate',
       label: 'NSX',
       minWidth: 130,
       format: (value) =>
-        value ? new Date(value).toLocaleString('vi-VN') : 'Chờ cập nhật'
+        new Date(value).toLocaleDateString('vi-VN', {
+          day: '2-digit',
+          month: '2-digit',
+          year: 'numeric'
+        })
     },
     { id: 'action', label: 'Hành động', minWidth: 150, align: 'center' }
   ]
