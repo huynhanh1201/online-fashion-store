@@ -32,6 +32,11 @@ const reviewSchema = new Schema(
     destroy: {
       type: Boolean,
       default: false // Mặc định không xóa mềm
+    },
+    orderId: {
+      type: Schema.Types.ObjectId,
+      ref: 'Order',
+      required: true
     }
   },
   {
