@@ -9,7 +9,9 @@ const createReview = async (reqBody) => {
       rating: reqBody.rating,
       comment: reqBody.comment,
 
-      isVerified: true
+      isVerified: true,
+
+      orderId: reqBody.orderId
     }
 
     const reviews = await ReviewModel.create(newReview)

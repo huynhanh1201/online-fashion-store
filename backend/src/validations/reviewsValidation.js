@@ -19,7 +19,8 @@ const review = async (req, res, next) => {
     productId: Joi.string().length(24).hex().required(),
     userId: Joi.string().length(24).hex().required(),
     rating: Joi.number().integer().min(1).max(5).required(),
-    comment: Joi.string().trim().required()
+    comment: Joi.string().trim().required(),
+    orderId: Joi.string().length(24).hex().required()
   })
 
   try {
