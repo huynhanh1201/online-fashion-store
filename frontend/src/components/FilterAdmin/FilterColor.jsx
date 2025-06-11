@@ -1,22 +1,17 @@
 import React, { useState, useEffect } from 'react'
 import {
   Box,
-  FormControlLabel,
-  Checkbox,
   Button,
-  TextField,
-  CircularProgress,
   FormControl,
   InputLabel,
   MenuItem,
   Select
 } from '@mui/material'
+import dayjs from 'dayjs'
 import FilterByTime from '~/components/FilterAdmin/common/FilterByTime.jsx'
 import SearchWithSuggestions from '~/components/FilterAdmin/common/SearchWithSuggestions.jsx'
 import FilterStatusSelect from '~/components/FilterAdmin/common/FilterStatusSelect'
 import SortSelect from '~/components/FilterAdmin/common/SortSelect.jsx'
-import dayjs from 'dayjs'
-
 const sortOptions = [
   { label: 'Tên A-Z', value: 'name_asc' },
   { label: 'Tên Z-A', value: 'name_desc' },
@@ -24,10 +19,10 @@ const sortOptions = [
   { label: 'Cũ nhất', value: 'oldest' }
 ]
 
-export default function FilterCategory({
+export default function FilterColor({
   onFilter,
-  categories,
-  fetchCategories,
+  colors,
+  fetchColors,
   loading
 }) {
   const [keyword, setKeyword] = useState('')
@@ -37,6 +32,7 @@ export default function FilterCategory({
   const [endDate, setEndDate] = useState(dayjs().format('YYYY-MM-DD'))
   const [status, setStatus] = useState('')
   const [sort, setSort] = useState('')
+
   useEffect(() => {
     applyFilters(selectedFilter, startDate, endDate)
   }, [keyword, status, sort])
@@ -45,28 +41,29 @@ export default function FilterCategory({
     setSelectedFilter(selected)
     applyFilters(selected, startDate, endDate)
   }
+
   const handleSearch = () => {
     setKeyword(inputValue)
-    fetchCategories(1, 10, { keyword: inputValue }) // nếu bạn cần gọi API theo từ khoá tìm
+    fetchColors(1, 10, { keyword: inputValue })
+    applyFilters(selectedFilter, startDate, endDate)
   }
 
   const applyFilters = (selectedTime, fromDate, toDate) => {
     const filters = {
       search: keyword || undefined,
-      status: status !== '' ? status : undefined,
+      destroy: status !== '' ? status : undefined,
       sort: sort || undefined
     }
 
-    // Xử lý thời gian tùy theo selectedTime
     if (selectedTime === 'custom') {
-      filters.filterTypeDate = 'custom'
-      filters.startDate = fromDate
-      filters.endDate = toDate
+      filters.createdAt = {
+        from: fromDate,
+        to: toDate
+      }
     } else if (selectedTime) {
       filters.filterTypeDate = selectedTime
     }
 
-    // Xoá các field rỗng/null/undefined
     Object.keys(filters).forEach((key) => {
       if (
         filters[key] === undefined ||
@@ -113,9 +110,10 @@ export default function FilterCategory({
         setEndDate={setEndDate}
         onApply={handleApplyTimeFilter}
       />
+
       <SearchWithSuggestions
-        label='Tìm kiếm tên'
-        options={categories.map((cat) => cat.name)}
+        label='Tìm màu sắc'
+        options={colors.map((color) => color.name)}
         loading={loading}
         keyword={keyword}
         inputValue={inputValue}
@@ -123,6 +121,7 @@ export default function FilterCategory({
         setInputValue={setInputValue}
         onSearch={handleSearch}
       />
+
       <Button
         variant='outlined'
         size='small'

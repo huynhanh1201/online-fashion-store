@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react'
 import { Box, Button } from '@mui/material'
-import FilterByTime from './common/FilterByTime.jsx'
-import FilterByPrice from './common/FilterByPrice'
-import SearchWithSuggestions from './common/SearchWithSuggestions'
-import FilterCategorySelect from './common/FilterCategorySelect.jsx'
-import FilterStatusSelect from './common/FilterStatusSelect'
+import FilterByTime from '~/components/FilterAdmin/common/FilterByTime.jsx'
+import FilterByPrice from '~/components/FilterAdmin/common/FilterByPrice'
+import SearchWithSuggestions from '~/components/FilterAdmin/common/SearchWithSuggestions'
+import FilterCategorySelect from '~/components/FilterAdmin/common/FilterCategorySelect.jsx'
+import FilterStatusSelect from '~/components/FilterAdmin/common/FilterStatusSelect'
+import SortSelect from '~/components/FilterAdmin/common/SortSelect.jsx'
 import dayjs from 'dayjs'
 
 export default function FilterProduct({
@@ -20,6 +21,7 @@ export default function FilterProduct({
   const [priceMin, setPriceMin] = useState('')
   const [priceMax, setPriceMax] = useState('')
   const [status, setStatus] = useState('')
+  const [sort, setSort] = useState('')
   const [selectedFilter, setSelectedFilter] = useState('')
   const [startDate, setStartDate] = useState(dayjs().format('YYYY-MM-DD'))
   const [endDate, setEndDate] = useState(dayjs().format('YYYY-MM-DD'))
@@ -30,7 +32,7 @@ export default function FilterProduct({
 
   useEffect(() => {
     applyFilters()
-  }, [keyword, status, category, priceMin, priceMax])
+  }, [keyword, status, category, priceMin, priceMax, sort])
 
   const handleSearch = () => {
     setKeyword(inputValue)
@@ -40,6 +42,7 @@ export default function FilterProduct({
       priceMin,
       priceMax,
       status,
+      sort,
       selectedTime: selectedFilter,
       fromDate: startDate,
       toDate: endDate
@@ -57,6 +60,7 @@ export default function FilterProduct({
     priceMin: min = priceMin,
     priceMax: max = priceMax,
     status: statusInput = status,
+    sort: sortInput = sort,
     selectedTime = selectedFilter,
     fromDate = startDate,
     toDate = endDate
@@ -66,15 +70,16 @@ export default function FilterProduct({
       categoryId: categoryId || undefined,
       priceMin: min ? parseInt(min) : undefined,
       priceMax: max ? parseInt(max) : undefined,
-      status: statusInput !== '' ? statusInput : undefined
+      status: statusInput !== '' ? statusInput : undefined,
+      sort: sortInput || undefined
     }
 
     if (selectedTime === 'custom') {
-      filters.filterDate = 'custom'
+      filters.filterTypeDate = 'custom'
       filters.startDate = fromDate
       filters.endDate = toDate
     } else if (selectedTime) {
-      filters.filterDate = selectedTime
+      filters.filterTypeDate = selectedTime
     }
 
     // Xoá các field rỗng/null/undefined
@@ -98,6 +103,7 @@ export default function FilterProduct({
     setPriceMin('')
     setPriceMax('')
     setStatus('')
+    setSort('')
     setSelectedFilter('')
     setStartDate(dayjs().format('YYYY-MM-DD'))
     setEndDate(dayjs().format('YYYY-MM-DD'))
@@ -139,6 +145,8 @@ export default function FilterProduct({
           setStatus(value)
         }}
       />
+
+      <SortSelect value={sort} onChange={setSort} />
 
       <FilterByTime
         label='Lọc theo ngày tạo'
