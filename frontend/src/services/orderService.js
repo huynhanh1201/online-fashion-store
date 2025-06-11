@@ -2,14 +2,15 @@ import AuthorizedAxiosInstance from '~/utils/authorizedAxios.js'
 import { API_ROOT } from '~/utils/constants.js'
 
 const orderService = {
-  createOrder: async ({ cartItems, shippingAddressId, total, couponId, couponCode, paymentMethod, note }) => {
+  createOrder: async ({ cartItems, shippingAddressId, total, couponId, couponCode, paymentMethod, note, shippingFee }) => {
     try {
       const payload = {
         cartItems, // giỏ hàng
         shippingAddressId,
         total,
         paymentMethod,
-        note
+        note,
+        shippingFee
       }
 
       if (couponCode && couponCode.trim() !== '') {

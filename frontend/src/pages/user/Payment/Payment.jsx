@@ -110,58 +110,7 @@ const Payment = () => {
   const [shippingPrice, setShippingPrice] = useState(0)
   const [shippingPriceLoading, setShippingPriceLoading] = useState(false)
 
-  useEffect(() => {
-    if (selectedAddress && selectedCartItems.length > 0) {
-      fetchShippingPrice(selectedAddress, selectedCartItems)
-    } else {
-      setShippingPrice(0)
-    }
-  }, [selectedAddress])
-  const fetchShippingPrice = async (address, items) => {
-    if (!address || !items.length) {
-      setShippingPrice(0)
-      return
-    }
 
-    try {
-      setShippingPriceLoading(true)
-      const totalItems = items.reduce((sum, item) => sum + (item.quantity || 1), 0)
-
-      const payload = {
-        numberItemOrder: totalItems,
-        service_type_id: 2,
-        to_district_id: parseInt(address.districtId, 10), // Chuyển districtId thành số nguyên
-        to_ward_code: address.wardId, // Sử dụng wardId trực tiếp
-        insurance_value: 0,
-        coupon: null,
-      }
-
-      const response = await fetch('http://localhost:8017/v1/deliveries/calculate-fee', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(payload),
-      })
-
-      if (!response.ok) {
-        throw new Error('Không thể tính phí vận chuyển')
-      }
-
-      const data = await response.json()
-      setShippingPrice(data.totalFeeShipping || 0)  // Sử dụng totalFeeShipping thay vì fee
-    } catch (error) {
-      console.error('Lỗi tính phí vận chuyển:', error)
-      setShippingPrice(0)
-      setSnackbar({
-        open: true,
-        severity: 'error',
-        message: 'Không thể tính phí vận chuyển',
-      })
-    } finally {
-      setShippingPriceLoading(false)
-    }
-  }
   // Tính selectedCartItems + subTotal
   let subTotal = 0
   const selectedCartItems = cartItems
@@ -185,30 +134,90 @@ const Payment = () => {
       subTotal += price * quantity
       return { variantId, color: item.color, size: item.size, quantity }
     })
+  useEffect(() => {
+    if (selectedAddress && selectedCartItems.length > 0) {
+      fetchShippingPrice(selectedAddress, selectedCartItems)
+    } else {
+      setShippingPrice(0)
+    }
+  }, [selectedAddress])
+  const fetchShippingPrice = async (address, items) => {
+    if (!address || !items?.length) {
+      console.warn('fetchShippingPrice: Thiếu address hoặc items', { address, items });
+      setShippingPrice(0);
+      return;
+    }
 
+    try {
+      setShippingPriceLoading(true);
+      const totalItems = items.reduce((sum, item) => sum + (item.quantity || 1), 0);
+
+      const payload = {
+        numberItemOrder: totalItems,
+        service_type_id: 2,
+        to_district_id: parseInt(address.districtId, 10),
+        to_ward_code: address.wardId,
+        insurance_value: 0,
+        coupon: null,
+      };
+
+      console.log('fetchShippingPrice payload:', payload);
+
+      const response = await fetch('http://localhost:8017/v1/deliveries/calculate-fee', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Lỗi từ API: ${response.status} - ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      console.log('fetchShippingPrice response:', data);
+
+      const fee = data?.totalFeeShipping;
+      if (typeof fee !== 'number' || fee <= 0) {
+        throw new Error('Phí vận chuyển không hợp lệ hoặc bằng 0');
+      }
+
+      setShippingPrice(fee);
+    } catch (error) {
+      console.error('Lỗi tính phí vận chuyển:', error.message);
+      setShippingPrice(0);
+      setSnackbar({
+        open: true,
+        severity: 'error',
+        message: `Không thể tính phí vận chuyển: ${error.message}`,
+      });
+    } finally {
+      setShippingPriceLoading(false);
+    }
+  };
   // Debug Redux state
   useEffect(() => {
-    console.log('Redux state:', { cartItems, selectedItems, selectedCartItems, subTotal })
   }, [cartItems, selectedItems, selectedCartItems, subTotal])
 
   // Kiểm tra dữ liệu
-  useEffect(() => {
-    if (isBuyNow && (!tempCart?.cartItems?.length || subTotal === 0)) {
-      setSnackbar({
-        open: true,
-        severity: 'error',
-        message: 'Không tìm thấy sản phẩm trong chế độ Mua ngay. Vui lòng thử lại.'
-      })
-      setTimeout(() => navigate('/'), 3000)
-    } else if (!isBuyNow && (!selectedItems.length || !selectedCartItems.length)) {
-      setSnackbar({
-        open: true,
-        severity: 'error',
-        message: 'Vui lòng chọn ít nhất một sản phẩm trong giỏ hàng.'
-      })
-      setTimeout(() => navigate('/cart'), 3000) // Chuyển về trang giỏ hàng
-    }
-  }, [isBuyNow, tempCart, subTotal, selectedItems, selectedCartItems, navigate])
+  // useEffect(() => {
+  //   if (isBuyNow && (!tempCart?.cartItems?.length || subTotal === 0)) {
+  //     setSnackbar({
+  //       open: true,
+  //       severity: 'error',
+  //       message: 'Không tìm thấy sản phẩm trong chế độ Mua ngay. Vui lòng thử lại.'
+  //     })
+  //     setTimeout(() => navigate('/'), 3000)
+  //   } else if (!isBuyNow && (!selectedItems.length || !selectedCartItems.length)) {
+  //     setSnackbar({
+  //       open: true,
+  //       severity: 'error',
+  //       message: 'Vui lòng chọn ít nhất một sản phẩm trong giỏ hàng.'
+  //     })
+  //     setTimeout(() => navigate('/cart'), 3000) // Chuyển về trang giỏ hàng
+  //   }
+  // }, [isBuyNow, tempCart, subTotal, selectedItems, selectedCartItems, navigate])
 
   // Lấy danh sách coupon
   useEffect(() => {
@@ -268,6 +277,9 @@ const Payment = () => {
 
   const totalOrder = Math.max(subTotal - discount)
   const totalFeeShipping = totalOrder + shippingPrice
+
+  console.log('shippingPrice:', shippingPrice)
+  console.log('totalOrder:', totalOrder)
 
   useEffect(() => {
     const isOnPaymentPage = location.pathname.startsWith('/payment')
@@ -339,53 +351,80 @@ const Payment = () => {
       setSnackbar({
         open: true,
         severity: 'warning',
-        message: 'Vui lòng chọn địa chỉ nhận hàng'
-      })
-      return
+        message: 'Vui lòng chọn địa chỉ nhận hàng',
+      });
+      return;
     }
-
+    if (!paymentMethod) {
+      setSnackbar({
+        open: true,
+        severity: 'warning',
+        message: 'Vui lòng chọn phương thức thanh toán', // Sửa thông báo
+      });
+      return;
+    }
     if (cartItems.length === 0 || selectedCartItems.length === 0) {
-      setSnackbar({ open: true, severity: 'error', message: 'Giỏ hàng trống' })
-      return
+      setSnackbar({ open: true, severity: 'error', message: 'Giỏ hàng trống' });
+      return;
+    }
+    if (shippingPrice === 0 && !shippingPriceLoading) {
+      setSnackbar({
+        open: true,
+        severity: 'warning',
+        message: 'Phí vận chuyển không hợp lệ, vui lòng kiểm tra lại',
+      });
+      return;
+    }
+    if (totalOrder <= 0) {
+      setSnackbar({
+        open: true,
+        severity: 'warning',
+        message: 'Tổng đơn hàng không hợp lệ, vui lòng kiểm tra lại',
+      });
+      return;
     }
 
     const sanitizedCartItems = selectedCartItems.map(item => ({
       variantId: item.variantId,
-      quantity: item.quantity
-    }))
+      quantity: item.quantity,
+    }));
 
     const orderData = {
       cartItems: sanitizedCartItems,
       shippingAddressId: selectedAddress._id,
       total: totalOrder,
       paymentMethod,
-      note: note.trim() || undefined,
-      couponCode: voucherApplied ? voucherInput : undefined,
-      couponId: voucherApplied ? couponId : undefined,
-      shippingFee: shippingPrice,
-    }
+      note: note.trim() || null, // Thay undefined bằng null để đảm bảo gửi lên
+      couponCode: voucherApplied ? voucherInput : null, // Thay undefined bằng null
+      couponId: voucherApplied ? couponId : null, // Thay undefined bằng null
+      shippingFee: shippingPrice || 0, // Đảm bảo shippingFee luôn được gửi
+    };
+
+    console.log('orderData trước khi gửi:', orderData); // Debug orderData
 
     try {
-      const result = await createOrder(orderData)
+      const result = await createOrder(orderData);
+      console.log('createOrder response:', result); // Debug server response
       setSnackbar({
         open: true,
         severity: 'success',
-        message: 'Đặt hàng thành công'
-      })
-      dispatch(clearTempCart())
+        message: 'Đặt hàng thành công',
+      });
+      dispatch(clearTempCart());
       if (typeof result === 'string' && result.startsWith('http')) {
-        window.location.href = result
+        window.location.href = result;
       } else {
-        navigate('/order-success')
+        navigate('/order-success');
       }
     } catch (error) {
+      console.error('Lỗi đặt hàng:', error);
       setSnackbar({
         open: true,
         severity: 'error',
-        message: `Đặt hàng thất bại: ${error.message || error}`
-      })
+        message: `Đặt hàng thất bại: ${error.message || error}`,
+      });
     }
-  }
+  };
 
   return (
     <Box>
