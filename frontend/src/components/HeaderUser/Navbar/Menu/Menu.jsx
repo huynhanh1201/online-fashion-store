@@ -79,14 +79,19 @@ const Menu = () => {
     const fetchCategories = async () => {
       try {
         const response = await getCategories(1, 100)
-        const categories = response.categories || response || []
+        const categories = Array.isArray(response?.categories)
+          ? response.categories
+          : []
+
         setCategories(categories)
       } catch (error) {
         console.error('Lỗi khi lấy danh mục:', error)
+        setCategories([]) // fallback an toàn
       }
     }
     fetchCategories()
   }, [])
+
 
   const handleEnter = (el) => {
     clearTimeout(hoverTimeout.current)

@@ -32,3 +32,12 @@ export const getUserReviews = async (userId) => {
 }
 
 
+export const updateReview = async (reviewId, updatedData) => {
+  try {
+    const response = await AuthorizedAxiosInstance.patch(`${API_ROOT}/v1/reviews/${reviewId}`, updatedData)
+    return response.data
+  } catch (error) {
+    console.error('Lỗi cập nhật đánh giá:', error)
+    throw error
+  }
+}

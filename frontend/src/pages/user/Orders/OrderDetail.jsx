@@ -16,11 +16,10 @@ import { useParams, useNavigate } from 'react-router-dom'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack'
 import { useOrderDetail } from '~/hooks/useOrderDetail'
 import ReviewModal from './modal/ReviewModal'
-import { createReview, getUserReviews } from '~/services/reviewService'
+import { createReview, getUserReviews, updateReview } from '~/services/reviewService'
 import { useSelector } from 'react-redux'
 import { selectCurrentUser } from '~/redux/user/userSlice'
 
-// Định nghĩa các nhãn trạng thái đơn hàng
 const statusLabels = {
   Pending: ['Đang chờ', 'warning'],
   Processing: ['Đang xử lý', 'info'],
@@ -28,8 +27,6 @@ const statusLabels = {
   Delivered: ['Đã giao', 'success'],
   Cancelled: ['Đã hủy', 'error'],
 }
-
-// ... [imports giữ nguyên như cũ]
 
 const OrderDetail = () => {
   const { orderId } = useParams()
@@ -40,7 +37,6 @@ const OrderDetail = () => {
   const [snackbarOpen, setSnackbarOpen] = useState(false)
   const [openReviewModal, setOpenReviewModal] = useState(false)
   const [selectedItem, setSelectedItem] = useState(null)
-  const [reviewedProductIds, setReviewedProductIds] = useState([])
   const [reviewedMap, setReviewedMap] = useState({})
 
   useEffect(() => {
@@ -48,10 +44,11 @@ const OrderDetail = () => {
       if (!currentUser?._id) return
       try {
         const reviews = await getUserReviews(currentUser._id)
-        const ids = reviews.map(r => r.productId)
-        setReviewedProductIds(ids)
         const map = {}
-        ids.forEach(id => map[id] = true)
+        reviews.forEach(r => {
+          const productId = r.productId
+          map[productId] = r._id // lưu review mới nhất
+        })
         setReviewedMap(map)
       } catch (err) {
         console.error('Lỗi khi lấy đánh giá người dùng:', err)
@@ -60,7 +57,7 @@ const OrderDetail = () => {
     fetchUserReviews()
   }, [currentUser])
 
-  const isReviewed = (productId) => reviewedProductIds.includes(productId?.toString())
+  const isReviewed = (productId) => reviewedMap.hasOwnProperty(productId?.toString())
   const allReviewed = items.every(item => isReviewed(item.productId || item.product?._id))
 
   if (loading) return <CircularProgress />
@@ -69,14 +66,9 @@ const OrderDetail = () => {
 
   const [label, color] = statusLabels[order.status] || ['Không xác định', 'default']
   const totalProductsPrice = items.reduce((sum, item) => sum + item.price * item.quantity, 0)
-  // Lấy danh sách productId duy nhất trong đơn
   const uniqueProductIds = [...new Set(items.map(i => i.productId || i.product?._id))]
-
-  // Nếu chỉ có 1 sản phẩm thật sự (dù có nhiều biến thể)
   const isSingleProduct = uniqueProductIds.length === 1
-  const formatPrice = (val) => typeof val === 'number'
-    ? val.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })
-    : '0₫'
+  const formatPrice = (val) => typeof val === 'number' ? val.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' }) : '0₫'
 
   const isPaid = order.paymentStatus === 'paid'
   const isOrderCompleted = order.status === 'Delivered'
@@ -98,21 +90,20 @@ const OrderDetail = () => {
 
   const handleSubmitReview = async ({ rating, comment }) => {
     try {
-      const productsToReview = selectedItem
-        ? [selectedItem]
-        : items.length === 1
-          ? [items[0]]
-          : items
+      const productsToReview = selectedItem ? [selectedItem] : items
 
       for (const item of productsToReview) {
         const productId = item.productId || item.product?._id
         const userId = currentUser?._id
         if (!productId || !userId) continue
-        if (reviewedMap[productId]) continue
 
-        await createReview({ productId, userId, rating, comment, orderId })
-        setReviewedProductIds(prev => [...new Set([...prev, productId])])
-        setReviewedMap(prev => ({ ...prev, [productId]: true }))
+        const reviewId = reviewedMap[productId]
+        if (reviewId) {
+          await updateReview(reviewId, { rating, comment })
+        } else {
+          const review = await createReview({ productId, userId, rating, comment, orderId })
+          setReviewedMap(prev => ({ ...prev, [productId]: review._id }))
+        }
       }
 
       handleCloseModal()
@@ -161,11 +152,26 @@ const OrderDetail = () => {
                   </Typography>
                 )}
               </Box>
-              {isOrderCompleted && !isReviewed(productId) && (
-                <Button variant="outlined" size="small" onClick={() => {
-                  setSelectedItem(item)
-                  setOpenReviewModal(true)
-                }}>Đánh giá</Button>
+              {isOrderCompleted && (
+                isReviewed(productId) ? (
+                  <Button
+                    variant="outlined"
+                    size="small"
+                    onClick={() => {
+                      setSelectedItem(item)
+                      setOpenReviewModal(true)
+                    }}
+                  >
+                    Đánh giá lại
+                  </Button>
+                ) : (
+                  !isSingleProduct && (
+                    <Button variant="outlined" size="small" onClick={() => {
+                      setSelectedItem(item)
+                      setOpenReviewModal(true)
+                    }}>Đánh giá</Button>
+                  )
+                )
               )}
               {isReviewed(productId) && (
                 <Button
@@ -222,7 +228,7 @@ const OrderDetail = () => {
           <Button
             variant="contained"
             onClick={() => {
-              setSelectedItem(null) // Gửi tất cả biến thể trong review modal
+              setSelectedItem(null)
               setOpenReviewModal(true)
             }}
           >
@@ -230,7 +236,6 @@ const OrderDetail = () => {
           </Button>
         </Box>
       )}
-
 
       <Snackbar
         open={snackbarOpen}
