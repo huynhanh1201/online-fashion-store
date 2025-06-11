@@ -152,17 +152,6 @@ const styles = {
     boxShadow: '0 2px 6px rgba(0,0,0,0.3)',
     transition: 'transform 0.2s ease'
   },
-  discountBadge: {
-    position: 'absolute',
-    top: '12px',
-    left: '12px',
-    backgroundColor: '#ff4d4f',
-    color: 'white',
-    padding: '4px 8px',
-    fontSize: '12px',
-    fontWeight: '600',
-    borderRadius: '4px'
-  },
   productInfo: {
     padding: '10px',
     flexGrow: 1,

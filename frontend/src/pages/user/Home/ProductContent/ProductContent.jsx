@@ -23,14 +23,17 @@ const ProductContent = () => {
         setLoadingCategories(true)
         setErrorCategories(null)
 
-        const { categories: fetchedCategories } = await getCategories(1, 1000)
+        const response = await getCategories(1, 1000)
+        const fetchedCategories = response.categories?.data || []
 
-        if (!fetchedCategories || fetchedCategories.length === 0) {
+        if (
+          !Array.isArray(fetchedCategories) ||
+          fetchedCategories.length === 0
+        ) {
           throw new Error('Không có danh mục nào được tải')
         }
 
         setCategories(fetchedCategories)
-        // Set active category mặc định
         setActiveCategoryId(fetchedCategories[0]._id)
       } catch (err) {
         setErrorCategories(err.message || 'Lỗi khi tải danh mục')
@@ -50,12 +53,7 @@ const ProductContent = () => {
       try {
         setLoadingProducts(true)
         setErrorProducts(null)
-
-        console.log('Fetching products for category:', activeCategoryId)
-
         const productsData = await getProductsByCategory(activeCategoryId)
-
-        console.log('Products data received:', productsData)
 
         // Xử lý dữ liệu products
         let productArray = []
