@@ -4,7 +4,6 @@ import { getDiscounts } from '~/services/discountService.js'
 const CouponList = ({ onCouponSelect }) => {
   const [coupons, setCoupons] = useState([])
   const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(null)
   const [copiedCode, setCopiedCode] = useState('')
   const scrollRef = useRef(null)
 
