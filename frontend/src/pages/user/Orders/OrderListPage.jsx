@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react'
 import {
   Box,
   Typography,
@@ -15,10 +15,10 @@ import {
   Chip,
   Tabs,
   Tab,
-} from '@mui/material';
-import { KeyboardArrowDown, KeyboardArrowUp } from '@mui/icons-material';
-import { getOrders, getOrderItems } from '~/services/orderService';
-import { useNavigate } from 'react-router-dom';
+} from '@mui/material'
+import { KeyboardArrowDown, KeyboardArrowUp } from '@mui/icons-material'
+import { getOrders, getOrderItems } from '~/services/orderService'
+import { useNavigate } from 'react-router-dom'
 
 // Define status labels and corresponding tab values
 const statusLabels = {
@@ -28,31 +28,31 @@ const statusLabels = {
   Shipped: ['Đã gửi hàng', 'primary'],
   Delivered: ['Đã giao', 'success'],
   Cancelled: ['Đã hủy', 'error'],
-};
+}
 
 // OrderRow component (unchanged)
 const OrderRow = ({ order }) => {
-  const [open, setOpen] = useState(false);
-  const [items, setItems] = useState([]);
-  const [loadingItems, setLoadingItems] = useState(false);
-  const navigate = useNavigate();
+  const [open, setOpen] = useState(false)
+  const [items, setItems] = useState([])
+  const [loadingItems, setLoadingItems] = useState(false)
+  const navigate = useNavigate()
 
   const toggleOpen = async () => {
-    setOpen((prev) => !prev);
+    setOpen((prev) => !prev)
     if (!open && items.length === 0) {
-      setLoadingItems(true);
+      setLoadingItems(true)
       try {
-        const res = await getOrderItems(order._id);
-        setItems(res);
+        const res = await getOrderItems(order._id)
+        setItems(res)
       } catch (err) {
-        console.error('Lỗi khi lấy sản phẩm:', err);
+        console.error('Lỗi khi lấy sản phẩm:', err)
       } finally {
-        setLoadingItems(false);
+        setLoadingItems(false)
       }
     }
-  };
+  }
 
-  const [label, color] = statusLabels[order.status] || ['Không xác định', 'default'];
+  const [label, color] = statusLabels[order.status] || ['Không xác định', 'default']
 
   return (
     <>
@@ -63,7 +63,7 @@ const OrderRow = ({ order }) => {
           </IconButton>
         </TableCell>
         <TableCell sx={{ minWidth: 150, cursor: 'pointer' }} onClick={() => navigate(`/order-detail/${order._id}`)}>
-          {order._id}
+          {order.code}
         </TableCell>
         <TableCell sx={{ minWidth: 140 }}>{order.shippingAddress?.fullName}</TableCell>
         <TableCell sx={{ minWidth: 200 }}>
@@ -93,7 +93,7 @@ const OrderRow = ({ order }) => {
                       display="flex"
                       alignItems="center"
                       justifyContent="space-between"
-                      sx={{ borderBottom: '2px solid #ccc', py: 1.5 }}
+                      sx={{ borderBottom: '1px solid #ddd', py: 1.5 }}
                     >
                       <Box display="flex" alignItems="center" gap={2}>
                         <Box
@@ -133,39 +133,39 @@ const OrderRow = ({ order }) => {
         </TableCell>
       </TableRow>
     </>
-  );
-};
+  )
+}
 
 // Main OrderListPage component with tabs
 const OrderListPage = () => {
-  const [orders, setOrders] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [selectedTab, setSelectedTab] = useState('All'); // Default to "All" tab
+  const [orders, setOrders] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [selectedTab, setSelectedTab] = useState('All')  // Default to "All" tab
 
   useEffect(() => {
     const fetchOrders = async () => {
       try {
-        const { orders } = await getOrders();
-        setOrders(orders);
+        const { orders } = await getOrders()
+        setOrders(orders)
       } catch (error) {
-        console.error('Lỗi khi lấy đơn hàng:', error);
+        console.error('Lỗi khi lấy đơn hàng:', error)
       } finally {
-        setLoading(false);
+        setLoading(false)
       }
-    };
-    fetchOrders();
-  }, []);
+    }
+    fetchOrders()
+  }, [])
 
   // Handle tab change
   const handleTabChange = (event, newValue) => {
-    setSelectedTab(newValue);
-  };
+    setSelectedTab(newValue)
+  }
 
   // Filter orders based on selected tab
-  const filteredOrders = selectedTab === 'All' ? orders : orders.filter((order) => order.status === selectedTab);
+  const filteredOrders = selectedTab === 'All' ? orders : orders.filter((order) => order.status === selectedTab)
 
   if (loading) {
-    return <CircularProgress sx={{ mt: 4, mx: 'auto', display: 'block' }} />;
+    return <CircularProgress sx={{ mt: 4, mx: 'auto', display: 'block' }} />
   }
 
   return (
@@ -215,7 +215,7 @@ const OrderListPage = () => {
         </Table>
       </Paper>
     </Box>
-  );
-};
+  )
+}
 
-export default OrderListPage;
+export default OrderListPage 

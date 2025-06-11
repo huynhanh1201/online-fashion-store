@@ -42,7 +42,7 @@ const OrderDetail = () => {
 
   // Tính tổng tiền hàng và thành tiền
   const totalProductsPrice = items.reduce((sum, item) => sum + (item.price * item.quantity), 0)
-  const finalAmount = totalProductsPrice - (order.discountAmount || 0)
+
   const formatPrice = (val) =>
     typeof val === 'number'
       ? val.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })
@@ -97,7 +97,7 @@ const OrderDetail = () => {
           <IconButton onClick={() => navigate(-1)} aria-label="Quay lại">
             <ArrowBackIcon />
           </IconButton>
-          <Typography variant="h6" fontWeight="bold" ml={1}>Đơn hàng: {order._id}</Typography>
+          <Typography variant="h6" fontWeight="bold" ml={1}>Đơn hàng: {order.code}</Typography>
           <Chip label={label} color={color} sx={{ ml: 'auto' }} />
         </Box>
 
@@ -161,7 +161,7 @@ const OrderDetail = () => {
 
         <Box display="flex" justifyContent="space-between" mb={1}>
           <Typography fontWeight="bold">Phí vận chuyển:</Typography>
-          <Typography>{formatPrice(0)}</Typography>
+          <Typography>{formatPrice(order.shippingFee || 0)}</Typography>
         </Box>
 
         {order.couponId ? (
@@ -181,7 +181,7 @@ const OrderDetail = () => {
         <Box display="flex" justifyContent="space-between" mb={1}>
           <Typography fontWeight="bold">Thành tiền:</Typography>
           <Typography fontWeight="bold" variant="h5">
-            {formatPrice(finalAmount > 0 ? finalAmount : 0)}
+            {formatPrice(order.total)}
           </Typography>
         </Box>
 
