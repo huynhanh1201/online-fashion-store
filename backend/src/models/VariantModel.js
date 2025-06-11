@@ -70,6 +70,31 @@ const variantSchema = new Schema(
     destroy: {
       type: Boolean,
       default: false
+    },
+
+    length: {
+      type: Number,
+      required: true,
+      min: 1, // GHN yêu cầu phải > 0
+      default: 30
+    },
+    width: {
+      type: Number,
+      required: true,
+      min: 1,
+      default: 20
+    },
+    height: {
+      type: Number,
+      required: true,
+      min: 1,
+      default: 2
+    },
+    weight: {
+      type: Number,
+      required: true,
+      min: 1, // GHN lỗi nếu = 0
+      default: 300 // gram, bạn có thể tuỳ chỉnh
     }
   },
   {

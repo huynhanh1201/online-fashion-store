@@ -12,6 +12,8 @@ const getDelivery = async (reqBody) => {
 
     const { data: dataResultGhn } = await ghnAxios.post('/shipping-order/fee', {
       ...reqBody,
+      from_district_id: 1442,
+      from_ward_code: '21211',
       length,
       width,
       height,
@@ -26,6 +28,21 @@ const getDelivery = async (reqBody) => {
   }
 }
 
+const createOrderDelivery = async (data) => {
+  try {
+    const result = await ghnAxios.post('/shipping-order/create', data)
+
+    return result
+  } catch (err) {
+    console.error('GHN Error code:', err.response?.status)
+    console.error(
+      'GHN Error body:',
+      JSON.stringify(err.response?.data, null, 2)
+    )
+  }
+}
+
 export const deliveriesService = {
-  getDelivery
+  getDelivery,
+  createOrderDelivery
 }

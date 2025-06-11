@@ -43,6 +43,21 @@ const shippingAddress = async (req, res, next) => {
     city: Joi.string() // chuỗi ký tự
       .min(2)
       .max(100)
+      .required(),
+
+    wardId: Joi.string() // chuỗi ký tự
+      .min(2)
+      .max(100)
+      .required(),
+
+    districtId: Joi.string() // chuỗi ký tự
+      .min(2)
+      .max(100)
+      .required(),
+
+    cityId: Joi.string() // chuỗi ký tự
+      .min(2)
+      .max(100)
       .required()
   })
 
