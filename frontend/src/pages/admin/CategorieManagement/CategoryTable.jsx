@@ -79,7 +79,10 @@ const CategoryTable = ({
   handleOpenModal,
   addCategory,
   onFilter,
-  fetchCategories
+  fetchCategories,
+  total,
+  onPageChange,
+  onChangeRowsPerPage
 }) => {
   const columns = [
     { id: 'index', label: 'STT', minWidth: 50, align: 'center' },
@@ -107,7 +110,12 @@ const CategoryTable = ({
                   }}
                 >
                   <Box
-                    sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}
+                    sx={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: 1,
+                      minWidth: 250
+                    }}
                   >
                     <Typography variant='h6' sx={{ fontWeight: '800' }}>
                       Danh Sách Danh Mục
@@ -167,7 +175,7 @@ const CategoryTable = ({
                 <CategoryRow
                   key={category._id}
                   category={category}
-                  index={idx + 1}
+                  index={page * rowsPerPage + idx + 1}
                   columns={columns}
                   handleOpenModal={handleOpenModal}
                 />
@@ -185,15 +193,20 @@ const CategoryTable = ({
       <TablePagination
         rowsPerPageOptions={[10, 25, 100]}
         component='div'
-        count={categories.length || 1}
-        rowsPerPage={rowsPerPage || 10}
-        page={page || 0}
-        labelRowsPerPage='Số dòng mỗi trang'
-        labelDisplayedRows={({ from, to, count }) => {
-          const actualTo = to > count ? count : to
-          const actualFrom = from > count ? count : from
-          return `${actualFrom}–${actualTo} trên ${count !== -1 ? count : `hơn ${actualTo}`}`
+        count={total || 0}
+        rowsPerPage={rowsPerPage}
+        page={page}
+        onPageChange={(event, newPage) => onPageChange(event, newPage + 1)} // +1 để đúng logic bên cha
+        onRowsPerPageChange={(event) => {
+          const newLimit = parseInt(event.target.value, 10)
+          if (onChangeRowsPerPage) {
+            onChangeRowsPerPage(newLimit)
+          }
         }}
+        labelRowsPerPage='Số dòng mỗi trang'
+        labelDisplayedRows={({ from, to, count }) =>
+          `${from}–${to} trên ${count !== -1 ? count : `hơn ${to}`}`
+        }
       />
     </Paper>
   )

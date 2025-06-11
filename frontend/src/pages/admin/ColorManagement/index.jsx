@@ -22,12 +22,12 @@ const ColorManagement = () => {
   const [filters, setFilters] = React.useState({})
   const { colors, totalPages, fetchColors, Loading } = useColors()
 
-  React.useEffect(() => {
-    const loadData = async () => {
-      await fetchColors(page)
-    }
-    loadData()
-  }, [page])
+  // React.useEffect(() => {
+  //   const loadData = async () => {
+  //     await fetchColors(page)
+  //   }
+  //   loadData()
+  // }, [page])
 
   const handleOpenModal = (type, color) => {
     if (!color || !color._id) return

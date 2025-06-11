@@ -137,7 +137,8 @@ const ProductTable = ({
                       display: 'flex',
                       flexDirection: 'column',
                       gap: 1,
-                      flex: '1'
+                      flex: '1',
+                      minWidth: 250
                     }}
                   >
                     <Typography variant='h6' sx={{ fontWeight: '800' }}>
@@ -158,7 +159,10 @@ const ProductTable = ({
                     </Button>
                   </Box>
                   <Box
-                    sx={{ display: 'flex', alignItems: 'center', flex: '2' }}
+                    sx={{
+                      display: 'flex',
+                      alignItems: 'center'
+                    }}
                   >
                     <FilterProduct
                       categories={categories}

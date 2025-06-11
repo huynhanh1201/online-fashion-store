@@ -109,7 +109,12 @@ const ColorTable = ({
                   }}
                 >
                   <Box
-                    sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}
+                    sx={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: 1,
+                      minWidth: 250
+                    }}
                   >
                     <Typography variant='h6' sx={{ fontWeight: '800' }}>
                       Danh sách màu sắc

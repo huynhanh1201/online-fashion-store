@@ -87,9 +87,6 @@ const useProducts = () => {
   const createNewProduct = async (data) => {
     try {
       const result = await addProduct(data)
-      if (result) {
-        await fetchProducts()
-      }
       return result
     } catch (error) {
       console.error('Lỗi khi tạo sản phẩm mới:', error)

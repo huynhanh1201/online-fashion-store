@@ -174,8 +174,8 @@ const ProductManagement = () => {
   const { getSizePaletteId } = useSizePalettes()
 
   React.useEffect(() => {
-    fetchProducts()
-  }, [page, limit])
+    fetchProducts(page)
+  }, [page])
 
   const handleChangePage = (event, value) => setPage(value)
 
@@ -221,6 +221,12 @@ const ProductManagement = () => {
       await fetchProducts()
     }
   }
+  const handleFilter = (newFilters) => {
+    setFilters(newFilters)
+    if (Object.keys(newFilters).length > 0) {
+      fetchProducts(1, limit, newFilters)
+    }
+  }
 
   return (
     <>
@@ -246,10 +252,7 @@ const ProductManagement = () => {
           setPage(1)
           setLimit(newLimit)
         }}
-        onFilter={(filters) => {
-          setFilters(filters)
-          fetchProducts(page, limit, filters)
-        }}
+        onFilter={handleFilter}
         categories={categories}
         fetchCategories={fetchCategories}
       />

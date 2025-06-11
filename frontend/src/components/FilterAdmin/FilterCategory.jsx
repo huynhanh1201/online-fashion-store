@@ -92,7 +92,7 @@ export default function FilterCategory({
   }
 
   return (
-    <Box display='flex' flexWrap='wrap' gap={2} mb={2}>
+    <Box display='flex' flexWrap='wrap' gap={2} mb={2} justifyContent='end'>
       <FilterStatusSelect
         value={status}
         onChange={(value) => {
@@ -113,24 +113,26 @@ export default function FilterCategory({
         setEndDate={setEndDate}
         onApply={handleApplyTimeFilter}
       />
-      <SearchWithSuggestions
-        label='Tìm kiếm tên'
-        options={categories.map((cat) => cat.name)}
-        loading={loading}
-        keyword={keyword}
-        inputValue={inputValue}
-        setKeyword={setKeyword}
-        setInputValue={setInputValue}
-        onSearch={handleSearch}
-      />
-      <Button
-        variant='outlined'
-        size='small'
-        color='error'
-        onClick={handleReset}
-      >
-        Làm mới
-      </Button>
+      <Box sx={{ display: 'flex', gap: 2 }}>
+        <SearchWithSuggestions
+          label='Tìm kiếm tên'
+          options={categories.map((cat) => cat.name)}
+          loading={loading}
+          keyword={keyword}
+          inputValue={inputValue}
+          setKeyword={setKeyword}
+          setInputValue={setInputValue}
+          onSearch={handleSearch}
+        />
+        <Button
+          variant='outlined'
+          size='small'
+          color='error'
+          onClick={handleReset}
+        >
+          Làm mới
+        </Button>
+      </Box>
     </Box>
   )
 }
