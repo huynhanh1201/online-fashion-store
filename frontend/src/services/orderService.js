@@ -27,22 +27,11 @@ const orderService = {
 }
 
 // ... phần còn lại giữ nguyên như bạn đã viết
-
-export const getOrders = async (page = 1, limit = 10) => {
-  try {
-    const response = await AuthorizedAxiosInstance.get(
-      `${API_ROOT}/v1/orders?page=${page}&limit=${limit}`
-    )
-    const orders = response.data
-    return {
-      orders,
-      total: orders.length
-    }
-  } catch (error) {
-    console.error('Lỗi khi lấy danh sách đơn hàng:', error)
-    return { orders: [], total: 0 }
-  }
+export const getOrders = async (userId) => {
+  const response = await AuthorizedAxiosInstance.get(`/v1/orders?userId=${userId}`)
+  return response.data
 }
+
 
 export const getOrderById = async (orderId) => {
   try {

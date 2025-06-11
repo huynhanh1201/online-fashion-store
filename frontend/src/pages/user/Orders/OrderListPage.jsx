@@ -19,7 +19,8 @@ import {
 import { KeyboardArrowDown, KeyboardArrowUp } from '@mui/icons-material'
 import { getOrders, getOrderItems } from '~/services/orderService'
 import { useNavigate } from 'react-router-dom'
-
+import { useSelector } from 'react-redux'
+import { selectCurrentUser } from '~/redux/user/userSlice'
 // Define status labels and corresponding tab values
 const statusLabels = {
   All: ['Tất cả', 'default'],
@@ -140,12 +141,15 @@ const OrderRow = ({ order }) => {
 const OrderListPage = () => {
   const [orders, setOrders] = useState([])
   const [loading, setLoading] = useState(true)
-  const [selectedTab, setSelectedTab] = useState('All')  // Default to "All" tab
+  const [selectedTab, setSelectedTab] = useState('All')
+  const currentUser = useSelector(selectCurrentUser)
+  const userId = currentUser?._id
 
   useEffect(() => {
     const fetchOrders = async () => {
+      if (!userId) return
       try {
-        const { orders } = await getOrders()
+        const { orders } = await getOrders(userId)
         setOrders(orders)
       } catch (error) {
         console.error('Lỗi khi lấy đơn hàng:', error)
@@ -154,8 +158,7 @@ const OrderListPage = () => {
       }
     }
     fetchOrders()
-  }, [])
-
+  }, [userId])
   // Handle tab change
   const handleTabChange = (event, newValue) => {
     setSelectedTab(newValue)
@@ -210,6 +213,7 @@ const OrderListPage = () => {
               </TableRow>
             ) : (
               filteredOrders.map((order) => <OrderRow key={order._id} order={order} />)
+
             )}
           </TableBody>
         </Table>
