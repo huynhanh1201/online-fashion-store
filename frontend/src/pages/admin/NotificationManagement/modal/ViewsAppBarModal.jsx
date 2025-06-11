@@ -16,6 +16,7 @@ import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import 'dayjs/locale/vi'
+import StyleAdmin from '~/assets/StyleAdmin.jsx'
 dayjs.extend(relativeTime)
 dayjs.locale('vi') // set ngôn ngữ là tiếng Việt
 const notifications = [
@@ -87,7 +88,7 @@ const notifications = [
 
 const modalStyle = {
   position: 'absolute',
-  top: '10%',
+  top: '67px',
   right: '2%',
   width: 360,
   bgcolor: 'background.paper',
@@ -116,7 +117,14 @@ export default function ViewsAppBarModal({ open, handleClose }) {
     .slice(0, 4)
 
   return (
-    <Modal open={open} onClose={handleClose} disableScrollLock>
+    <Modal
+      open={open}
+      onClose={handleClose}
+      disableScrollLock
+      BackdropProps={{
+        sx: StyleAdmin.OverlayModal
+      }}
+    >
       <Box sx={modalStyle}>
         <Box display='flex' justifyContent='space-between' mb={2}>
           <Typography variant='h6'>Thông báo</Typography>

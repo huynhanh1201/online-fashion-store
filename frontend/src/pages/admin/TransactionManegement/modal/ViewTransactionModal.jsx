@@ -88,7 +88,12 @@ const ViewTransactionModal = ({ open, onClose, transaction }) => {
               <TableRow>
                 <TableCell sx={{ fontWeight: 'bold' }}>Ngày tạo</TableCell>
                 <TableCell>
-                  {new Date(transaction.createdAt).toLocaleString()}
+                  {/*{new Date(transaction.createdAt).toLocaleString()}*/}
+                  {new Date(transaction.createdAt).toLocaleDateString('vi-VN', {
+                    day: '2-digit',
+                    month: '2-digit',
+                    year: 'numeric'
+                  })}
                 </TableCell>
               </TableRow>
 

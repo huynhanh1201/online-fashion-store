@@ -72,20 +72,17 @@ import {
 } from '@mui/material'
 import ColorRow from './ColorRow'
 import AddIcon from '@mui/icons-material/Add'
-const styles = {
-  buttonAdd: {
-    backgroundColor: '#001f5d',
-    color: '#fff',
-    marginBottom: '16px'
-  }
-}
+import FilterColor from '~/components/FilterAdmin/FilterColor.jsx'
+
 const ColorTable = ({
   colors,
   loading,
   page,
   rowsPerPage,
   handleOpenModal,
-  addColor
+  addColor,
+  onFilters,
+  fetchColors
 }) => {
   const filteredColors = colors.filter((c) => !c.destroy)
 
@@ -111,17 +108,33 @@ const ColorTable = ({
                     alignItems: 'center'
                   }}
                 >
-                  <Typography variant='h6' sx={{ fontWeight: '800' }}>
-                    Danh sách màu sắc
-                  </Typography>
-                  <Button
-                    variant='contained'
-                    sx={styles.buttonAdd}
-                    startIcon={<AddIcon />}
-                    onClick={addColor}
+                  <Box
+                    sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}
                   >
-                    Thêm màu
-                  </Button>
+                    <Typography variant='h6' sx={{ fontWeight: '800' }}>
+                      Danh sách màu sắc
+                    </Typography>
+                    <Button
+                      variant='contained'
+                      color='primary'
+                      onClick={addColor}
+                      startIcon={<AddIcon />}
+                      sx={{
+                        textTransform: 'none',
+                        width: 100,
+                        display: 'flex',
+                        alignItems: 'center'
+                      }}
+                    >
+                      Thêm
+                    </Button>
+                  </Box>
+                  <FilterColor
+                    onFilter={onFilters}
+                    colors={colors}
+                    loading={loading}
+                    fetchColors={fetchColors}
+                  />
                 </Box>
               </TableCell>
             </TableRow>

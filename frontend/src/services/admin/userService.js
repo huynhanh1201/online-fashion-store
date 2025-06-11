@@ -2,10 +2,11 @@
 import AuthorizedAxiosInstance from '~/utils/authorizedAxios.js'
 import { API_ROOT } from '~/utils/constants.js'
 
-export const getUsers = async (page = 1, limit = 10) => {
+export const getUsers = async (filter) => {
+  const queryString = new URLSearchParams(filter).toString()
   try {
     const response = await AuthorizedAxiosInstance.get(
-      `${API_ROOT}/v1/users?page=${page}&limit=${limit}`
+      `${API_ROOT}/v1/users?${queryString}`
     )
     return { users: response.data, total: response.data.length }
   } catch (error) {

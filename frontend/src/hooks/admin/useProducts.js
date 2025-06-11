@@ -36,23 +36,33 @@ import {
   addProduct
 } from '~/services/admin/productService'
 
-const useProducts = (initialPage = 1) => {
+const useProducts = () => {
   const [products, setProducts] = useState([])
   const [totalPages, setTotalPages] = useState(1)
   const [total, setTotal] = useState(0)
   const [loading, setLoading] = useState(false)
 
-  const fetchProducts = async (params = {}) => {
+  const fetchProducts = async (page = 1, limit = 10, params = {}) => {
     setLoading(true)
-    try {
-      const result = await getProducts({
-        page: initialPage,
-        limit: 10,
-        ...params
+    const buildQuery = (input) => {
+      const query = { page, limit, ...input }
+      Object.keys(query).forEach((key) => {
+        if (
+          query[key] === '' ||
+          query[key] === undefined ||
+          query[key] === null
+        ) {
+          delete query[key]
+        }
       })
-      setProducts(result?.products || [])
-      setTotalPages(result?.totalPages || 1)
-      setTotal(result?.total || 0)
+      return query
+    }
+    try {
+      const query = buildQuery(params)
+      const { products, totalPages, total } = await getProducts(query)
+      setProducts(products || [])
+      setTotalPages(totalPages || 1)
+      setTotal(total || 0)
     } catch (error) {
       console.error('Lỗi khi fetch sản phẩm:', error)
       setProducts([])
