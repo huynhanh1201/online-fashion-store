@@ -4,8 +4,9 @@ import { CategoryModel } from '~/models/CategoryModel'
 import ApiError from '~/utils/ApiError'
 import { slugify } from '~/utils/formatters'
 import { ProductModel } from '~/models/ProductModel'
-import mongoose from 'mongoose'
-import apiError from '~/utils/ApiError'
+import getDateRange from '~/utils/getDateRange'
+import validatePagination from '~/utils/validatePagination'
+import { InventoryModel } from '~/models/InventoryModel'
 
 const createCategory = async (reqBody) => {
   try {
@@ -25,25 +26,18 @@ const createCategory = async (reqBody) => {
 }
 
 const getCategoryList = async (queryString) => {
-  let { page = 1, limit = 10, status, sort } = queryString
+  let {
+    page = 1,
+    limit = 10,
+    status,
+    sort,
+    filterTypeDate,
+    startDate,
+    endDate
+  } = queryString
 
   // Kiểm tra dữ liệu đầu vào của limit và page
-  limit = Number(limit)
-  page = Number(page)
-
-  if (!limit || limit < 1) {
-    throw new apiError(
-      StatusCodes.UNPROCESSABLE_ENTITY,
-      'Query string "limit" phải là số và lớn hơn 0'
-    )
-  }
-
-  if (!page || page < 1) {
-    throw new apiError(
-      StatusCodes.UNPROCESSABLE_ENTITY,
-      'Query string "page" phải là số và lớn hơn 0'
-    )
-  }
+  validatePagination(page, limit)
 
   // Xử lý thông tin Filter
   const filter = {}
@@ -54,6 +48,15 @@ const getCategoryList = async (queryString) => {
     filter.destroy = status
   }
 
+  const dateRange = getDateRange(filterTypeDate, startDate, endDate)
+
+  if (dateRange.startDate && dateRange.endDate) {
+    filter['createdAt'] = {
+      $gte: new Date(dateRange.startDate),
+      $lte: new Date(dateRange.endDate)
+    }
+  }
+
   const sortMap = {
     name_asc: { name: 1 },
     name_desc: { name: -1 },
@@ -61,18 +64,32 @@ const getCategoryList = async (queryString) => {
     oldest: { createdAt: 1 }
   }
 
-  let sortFiled = null
+  let sortField = {}
 
   if (sort) {
-    sortFiled = sortMap[sort]
+    sortField = sortMap[sort]
   }
 
-  const result = await CategoryModel.find(filter)
-    .collation({ locale: 'vi', strength: 1 })
-    .sort(sortFiled || {})
-    .skip((page - 1) * limit)
-    .limit(limit)
-    .lean()
+  const [categories, total] = await Promise.all([
+    CategoryModel.find(filter)
+      .collation({ locale: 'vi', strength: 1 })
+      .sort(sortField)
+      .skip((page - 1) * limit)
+      .limit(limit)
+      .lean(),
+
+    CategoryModel.countDocuments(filter)
+  ])
+
+  const result = {
+    data: categories,
+    meta: {
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit)
+    }
+  }
 
   return result
 }

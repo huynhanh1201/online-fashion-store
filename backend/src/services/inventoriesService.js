@@ -1,8 +1,6 @@
-import { StatusCodes } from 'http-status-codes'
-
 import { InventoryModel } from '~/models/InventoryModel'
-import apiError from '~/utils/ApiError'
 import getDateRange from '~/utils/getDateRange'
+import validatePagination from '~/utils/validatePagination'
 
 const handleCreateInventory = async () => {
   return 'Empty'
@@ -25,22 +23,7 @@ const getInventoryList = async (queryString) => {
   }
 
   // Kiểm tra dữ liệu đầu vào của limit và page
-  limit = Number(limit)
-  page = Number(page)
-
-  if (!limit || limit < 1) {
-    throw new apiError(
-      StatusCodes.UNPROCESSABLE_ENTITY,
-      'Query string "limit" phải là số và lớn hơn 0'
-    )
-  }
-
-  if (!page || page < 1) {
-    throw new apiError(
-      StatusCodes.UNPROCESSABLE_ENTITY,
-      'Query string "page" phải là số và lớn hơn 0'
-    )
-  }
+  validatePagination(page, limit)
 
   // Kiểm tra dữ liệu của query string
   if (warehouseId) {
