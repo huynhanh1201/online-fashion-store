@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import {
   Box,
   Typography,
@@ -12,143 +12,61 @@ import {
   ListItemText,
   Divider
 } from '@mui/material'
+import { getReviews } from '~/services/reviewService'
 
-const ProductReview = () => {
-  const [rating, setRating] = useState(0)
-  const [comment, setComment] = useState('')
-  const [reviews, setReviews] = useState([
-    {
-      id: 1,
-      name: 'Nguyễn Văn A',
-      avatar: 'https://i.pravatar.cc/150?img=1',
-      rating: 5,
-      comment: 'Sản phẩm rất tốt!',
-      date: '2025-05-31'
-    },
-    {
-      id: 2,
-      name: 'Trần Thị B',
-      avatar: 'https://i.pravatar.cc/150?img=2',
-      rating: 4,
-      comment: 'Đúng mô tả, sẽ ủng hộ tiếp!',
-      date: '2025-05-30'
+
+const ProductReview = ({ productId }) => {
+  const [reviews, setReviews] = useState([])
+
+  useEffect(() => {
+    const fetchReviews = async () => {
+      try {
+        const data = await getReviews(productId)
+        setReviews(data)
+      } catch (err) {
+        console.error('Lỗi khi lấy đánh giá:', err)
+      }
     }
-  ])
+    if (productId) fetchReviews()
+  }, [productId])
 
-  const handleSubmit = () => {
-    if (rating === 0 || comment.trim() === '') return
 
-    const newReview = {
-      id: Date.now(),
-      name: 'Bạn',
-      avatar: 'https://i.pravatar.cc/150?u=new',
-      rating,
-      comment,
-      date: new Date().toISOString().split('T')[0]
-    }
-
-    setReviews([newReview, ...reviews])
-    setRating(0)
-    setComment('')
-  }
-
-  const averageRating = (
-    reviews.reduce((acc, r) => acc + r.rating, 0) / reviews.length
-  ).toFixed(1)
+  const averageRating = reviews.length
+    ? (reviews.reduce((acc, r) => acc + r.rating, 0) / reviews.length).toFixed(1)
+    : 0
 
   return (
-    <Box
-      sx={{
-        maxWidth: '100%',
-        mx: 'auto',
-        p: 4,
-        backgroundColor: '#f9f9f9',
-        borderRadius: 2,
-        boxShadow: 3,
-        border: '1px solid #ddd'
-      }}
-    >
-      <Typography
-        variant='h4'
-        gutterBottom
-        sx={{ color: '#1A3C7B', fontWeight: 600 }}
-      >
-        Đánh giá sản phẩm
+    <Box sx={{ maxWidth: '100%', mt: 1 }}>
+      <Typography variant='h5' gutterBottom sx={{ color: '#1A3C7B', fontWeight: 600 }}>
+        Đánh giá & nhận xét
       </Typography>
 
       <Box display='flex' alignItems='center' gap={1} mb={2}>
+        <Typography variant='subtitle1' sx={{ color: '#1A3C7B', fontWeight: 600, fontSize: '3.4rem' }}>
+          {averageRating}
+        </Typography>
         <Rating value={Number(averageRating)} precision={0.1} readOnly />
         <Typography variant='subtitle1' sx={{ color: '#1A3C7B' }}>
-          ({averageRating}/5 từ {reviews.length} đánh giá)
+          ({reviews.length} đánh giá)
         </Typography>
       </Box>
 
-      <Box sx={{ mb: 4 }}>
-        <Typography
-          variant='subtitle1'
-          gutterBottom
-          sx={{ color: '#1A3C7B', fontWeight: 500 }}
-        >
-          Đánh giá của bạn
-        </Typography>
-        <Rating
-          value={rating}
-          onChange={(e, newValue) => setRating(newValue)}
-          sx={{ color: '#faaf00' }}
-        />
-        <TextField
-          fullWidth
-          multiline
-          rows={3}
-          label='Nhập bình luận'
-          value={comment}
-          onChange={(e) => setComment(e.target.value)}
-          sx={{ mt: 2 }}
-        />
-        <Button
-          variant='contained'
-          onClick={handleSubmit}
-          sx={{
-            mt: 2,
-            backgroundColor: '#1A3C7B',
-            '&:hover': { backgroundColor: '#152f61' }
-          }}
-        >
-          Gửi đánh giá
-        </Button>
-      </Box>
 
-      <Divider sx={{ mb: 3 }} />
-      <Typography
-        variant='h5'
-        gutterBottom
-        sx={{ color: '#1A3C7B', fontWeight: 500 }}
-      >
-        Danh sách đánh giá
-      </Typography>
+      <Divider />
       <List>
         {reviews.map((review) => (
-          <React.Fragment key={review.id}>
-            <ListItem alignItems='flex-start'>
+          <React.Fragment key={review._id}>
+            <ListItem disablePadding alignItems='flex-start'>
               <ListItemAvatar>
-                <Avatar src={review.avatar} />
+                <Avatar src={review.userId?.avatarUrl || '/default.jpg'} />
               </ListItemAvatar>
               <ListItemText
                 primary={
                   <Box display='flex' alignItems='center' gap={1}>
-                    <Typography
-                      variant='subtitle1'
-                      fontWeight='bold'
-                      sx={{ color: '#1A3C7B' }}
-                    >
-                      {review.name}
+                    <Typography variant='subtitle1' fontWeight='bold' sx={{ color: '#1A3C7B' }}>
+                      {review.userId?.name || 'Ẩn danh'}
                     </Typography>
-                    <Rating
-                      value={review.rating}
-                      readOnly
-                      size='small'
-                      sx={{ color: '#faaf00' }}
-                    />
+                    <Rating value={review.rating} readOnly size='small' sx={{ color: '#faaf00' }} />
                   </Box>
                 }
                 secondary={
@@ -157,16 +75,18 @@ const ProductReview = () => {
                       {review.comment}
                     </Typography>
                     <Typography variant='caption' color='text.secondary'>
-                      {review.date}
+                      {new Date(review.createdAt).toLocaleDateString('vi-VN')}
                     </Typography>
                   </>
                 }
               />
             </ListItem>
-            <Divider variant='inset' component='li' />
+            {/* <Divider variant='inset' component='li' /> */}
           </React.Fragment>
         ))}
+
       </List>
+
     </Box>
   )
 }
