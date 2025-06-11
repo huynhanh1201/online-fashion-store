@@ -125,12 +125,12 @@ const ProductDetail = () => {
             getCurrentImages={getCurrentImages}
             inventory={inventory}
             setSnackbar={setSnackbar}
-            
+
           />
         </Grid>
       </Grid>
       <Box sx={{ mt: 10 }}>
-        <ProductDescription description={product.description} />
+        <ProductDescription description={product.description} productId={product._id} />
       </Box>
       <VoucherDrawer
         open={openVoucherDrawer}

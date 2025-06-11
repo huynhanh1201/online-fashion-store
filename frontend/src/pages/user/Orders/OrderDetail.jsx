@@ -14,6 +14,9 @@ import { useParams, useNavigate } from 'react-router-dom'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack'
 import { useOrderDetail } from '~/hooks/useOrderDetail'
 import ReviewModal from './modal/ReviewModal'
+import { createReview } from '~/services/reviewService'
+import { useSelector } from 'react-redux'
+import { selectCurrentUser } from '~/redux/user/userSlice'
 
 // Định nghĩa các nhãn trạng thái đơn hàng
 const statusLabels = {
@@ -28,6 +31,8 @@ const OrderDetail = () => {
   const { orderId } = useParams()
   const navigate = useNavigate()
   const { order, items, loading, error } = useOrderDetail(orderId)
+  const currentUser = useSelector(selectCurrentUser)
+
 
   // State cho modal
   const [openReviewModal, setOpenReviewModal] = useState(false)
@@ -38,9 +43,11 @@ const OrderDetail = () => {
   if (error) return <Typography color="error">Lỗi: {error.message || 'Có lỗi xảy ra'}</Typography>
   if (!order) return <Typography>Không tìm thấy đơn hàng</Typography>
 
+  console.log('Order:', order, 'Items:', items, 'Current User:', currentUser) // Debug
+
   const [label, color] = statusLabels[order.status] || ['Không xác định', 'default']
 
-  // Tính tổng tiền hàng và thành tiền
+  // Tính tổng tiền hàng
   const totalProductsPrice = items.reduce((sum, item) => sum + (item.price * item.quantity), 0)
 
   const formatPrice = (val) =>
@@ -63,12 +70,6 @@ const OrderDetail = () => {
     }
   }
 
-  // Mở modal đánh giá cho sản phẩm cụ thể
-  const handleReviewProduct = (item) => {
-    setSelectedItem(item)
-    setOpenReviewModal(true)
-  }
-
   // Đóng modal
   const handleCloseModal = () => {
     setOpenReviewModal(false)
@@ -76,17 +77,29 @@ const OrderDetail = () => {
   }
 
   // Xử lý submit đánh giá
-  const handleSubmitReview = async (reviewData) => {
+  const handleSubmitReview = async ({ rating, comment }) => {
     try {
-      const fullReviewData = {
-        orderId,
-        productId: selectedItem?._id,
-        ...reviewData,
+      const productsToReview = selectedItem ? [selectedItem] : items
+      console.log('Products to Review:', productsToReview) // Debug
+
+      for (const item of productsToReview) {
+        const reviewData = {
+          productId: item.productId || item.product?._id,
+          userId: currentUser?._id,
+          rating,
+          comment,
+        }
+        console.log('Review Data:', reviewData) // Debug
+        if (!reviewData.productId || !reviewData.userId) {
+          throw new Error('Thiếu productId hoặc userId')
+        }
+        await createReview(reviewData)
       }
-      console.log('Gửi đánh giá:', fullReviewData)
+
+      console.log('Đã gửi đánh giá!')
       handleCloseModal()
-    } catch (err) {
-      console.error('Lỗi khi gửi đánh giá:', err)
+    } catch (error) {
+      console.error('Lỗi gửi đánh giá:', error)
     }
   }
 
@@ -127,26 +140,16 @@ const OrderDetail = () => {
               </Box>
               <Box textAlign="right" display="flex" alignItems="center" gap={2}>
                 <Box>
-                  <Typography variant="body1">{item.price?.toLocaleString('vi-VN')}₫</Typography>
+                  <Typography variant="body1">{formatPrice(item.price)}</Typography>
                   {item.originalPrice && item.originalPrice > item.price && (
                     <Typography
                       variant="body2"
                       sx={{ textDecoration: 'line-through', color: 'text.secondary' }}
                     >
-                      {item.originalPrice?.toLocaleString('vi-VN')}₫
+                      {formatPrice(item.originalPrice)}
                     </Typography>
                   )}
                 </Box>
-                {(isOrderCompleted || isPaid) && (
-                  <Button
-                    variant="contained"
-                    color="primary"
-                    size="small"
-                    onClick={() => handleReviewProduct(item)}
-                  >
-                    Đánh giá
-                  </Button>
-                )}
               </Box>
             </Box>
           </Box>
@@ -194,6 +197,23 @@ const OrderDetail = () => {
           </Typography>
         </Box>
       </Paper>
+
+      {(isOrderCompleted || isPaid) && currentUser && (
+        <Box display="flex" justifyContent="flex-end" mt={2}>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={() => {
+              console.log('Opening Review Modal') // Debug
+              setSelectedItem(null)
+              setOpenReviewModal(true)
+            }}
+          >
+            Đánh giá đơn hàng
+          </Button>
+        </Box>
+      )}
+
       <Box display="flex" justifyContent="flex-end" mt={2} gap={2}>
         {isOrderCancellable && (
           <Button
@@ -210,7 +230,7 @@ const OrderDetail = () => {
         open={openReviewModal}
         onClose={handleCloseModal}
         onSubmit={handleSubmitReview}
-        orderItems={selectedItem ? [selectedItem] : []}
+        orderItems={items} // Sử dụng items thay vì order.items
       />
     </Box>
   )
