@@ -266,7 +266,8 @@ const Payment = () => {
     setTimeout(() => setCopiedCode(''), 1500)
   }
 
-  const total = Math.max(subTotal - discount + shippingPrice, 0)
+  const totalOrder = Math.max(subTotal - discount)
+  const totalFeeShipping = totalOrder + shippingPrice
 
   useEffect(() => {
     const isOnPaymentPage = location.pathname.startsWith('/payment')
@@ -356,11 +357,12 @@ const Payment = () => {
     const orderData = {
       cartItems: sanitizedCartItems,
       shippingAddressId: selectedAddress._id,
-      total,
+      total: totalOrder,
       paymentMethod,
       note: note.trim() || undefined,
       couponCode: voucherApplied ? voucherInput : undefined,
-      couponId: voucherApplied ? couponId : undefined
+      couponId: voucherApplied ? couponId : undefined,
+      shippingFee: shippingPrice,
     }
 
     try {
@@ -755,7 +757,7 @@ const Payment = () => {
                 <Divider sx={{ my: 2 }} />
                 <Typography sx={{ display: 'flex', justifyContent: 'space-between', fontSize: '1.2rem', fontWeight: 'bold' }}>
                   <span>Tổng:</span>
-                  <span>{total.toLocaleString('vi-VN')}đ</span>
+                  <span>{totalFeeShipping.toLocaleString('vi-VN')}đ</span>
                 </Typography>
 
                 <Button
