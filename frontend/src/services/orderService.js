@@ -28,7 +28,7 @@ const orderService = {
 
 // ... phần còn lại giữ nguyên như bạn đã viết
 export const getOrders = async (userId) => {
-  const response = await AuthorizedAxiosInstance.get(`/v1/orders?userId=${userId}`)
+  const response = await AuthorizedAxiosInstance.get(`${API_ROOT}/v1/orders?userId=${userId}`)
   return response.data
 }
 

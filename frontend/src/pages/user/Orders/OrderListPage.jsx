@@ -149,7 +149,8 @@ const OrderListPage = () => {
     const fetchOrders = async () => {
       if (!userId) return
       try {
-        const { orders } = await getOrders(userId)
+        const orders = await getOrders(userId)
+        console.log('Fetched orders:', orders) // 👈 Kiểm tra ở console
         setOrders(orders)
       } catch (error) {
         console.error('Lỗi khi lấy đơn hàng:', error)
@@ -159,13 +160,18 @@ const OrderListPage = () => {
     }
     fetchOrders()
   }, [userId])
+
   // Handle tab change
   const handleTabChange = (event, newValue) => {
     setSelectedTab(newValue)
   }
 
   // Filter orders based on selected tab
-  const filteredOrders = selectedTab === 'All' ? orders : orders.filter((order) => order.status === selectedTab)
+  const filteredOrders = Array.isArray(orders)
+    ? selectedTab === 'All'
+      ? orders
+      : orders.filter((order) => order.status === selectedTab)
+    : []
 
   if (loading) {
     return <CircularProgress sx={{ mt: 4, mx: 'auto', display: 'block' }} />
@@ -212,10 +218,12 @@ const OrderListPage = () => {
                 </TableCell>
               </TableRow>
             ) : (
-              filteredOrders.map((order) => <OrderRow key={order._id} order={order} />)
-
+              filteredOrders.map((order) => (
+                <OrderRow key={order._id} order={order} />
+              ))
             )}
           </TableBody>
+
         </Table>
       </Paper>
     </Box>
