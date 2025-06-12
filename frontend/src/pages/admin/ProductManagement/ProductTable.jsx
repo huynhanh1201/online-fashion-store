@@ -103,7 +103,8 @@ const ProductTable = ({
   onChangeRowsPerPage,
   categories,
   fetchCategories,
-  onFilter
+  onFilter,
+  fetchProducts
 }) => {
   const columns = [
     { id: 'index', label: 'STT', minWidth: 50, align: 'center' },
@@ -113,9 +114,8 @@ const ProductTable = ({
     { id: 'description', label: 'Mô tả', minWidth: 120 },
     { id: 'category', label: 'Danh mục', minWidth: 120 },
     { id: 'status', label: 'Trạng thái', minWidth: 100 },
-    { id: 'action', label: 'Hành động', minWidth: 130, align: 'center' }
+    { id: 'action', label: 'Hành động', minWidth: 130, align: 'start' }
   ]
-
   const filtered = products.filter((p) => !p.destroy)
 
   return (
@@ -129,7 +129,7 @@ const ProductTable = ({
                   sx={{
                     display: 'flex',
                     justifyContent: 'space-between',
-                    alignItems: 'center'
+                    alignItems: 'start'
                   }}
                 >
                   <Box
@@ -169,6 +169,7 @@ const ProductTable = ({
                       fetchCategories={fetchCategories}
                       onFilter={onFilter}
                       products={products}
+                      fetchProducts={fetchProducts}
                     />
                   </Box>
                 </Box>

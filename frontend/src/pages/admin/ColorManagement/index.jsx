@@ -17,17 +17,14 @@ const DeleteColorModal = React.lazy(() => import('./modal/DeleteColorModal'))
 const ColorManagement = () => {
   const [page, setPage] = React.useState(1)
   const [selectedColor, setSelectedColor] = React.useState(null)
-  const [limit] = React.useState(10) // Giới hạn số lượng màu hiển thị mỗi trang
+  const [limit, setLimit] = React.useState(10) // Giới hạn số lượng màu hiển thị mỗi trang
   const [modalType, setModalType] = React.useState(null)
   const [filters, setFilters] = React.useState({})
   const { colors, totalPages, fetchColors, Loading } = useColors()
 
-  // React.useEffect(() => {
-  //   const loadData = async () => {
-  //     await fetchColors(page)
-  //   }
-  //   loadData()
-  // }, [page])
+  React.useEffect(() => {
+    fetchColors(page, limit, filters)
+  }, [page, limit])
 
   const handleOpenModal = (type, color) => {
     if (!color || !color._id) return
@@ -67,7 +64,12 @@ const ColorManagement = () => {
       console.error('Lỗi:', error)
     }
   }
-
+  const handleFilter = (newFilters) => {
+    setFilters(newFilters)
+    if (Object.keys(newFilters).length > 0) {
+      fetchColors(1, limit, newFilters)
+    }
+  }
   return (
     <>
       <ColorTable
@@ -75,11 +77,16 @@ const ColorManagement = () => {
         loading={Loading}
         handleOpenModal={handleOpenModal}
         addColor={() => setModalType('add')}
-        onFilters={(filters) => {
-          setFilters(filters)
-          fetchColors(page, limit, filters)
-        }}
+        onFilters={handleFilter}
         fetchColors={fetchColors}
+        page={page - 1}
+        rowsPerPage={limit}
+        total={totalPages}
+        onPageChange={handleChangePage}
+        onChangeRowsPerPage={(newLimit) => {
+          setPage(1)
+          setLimit(newLimit)
+        }}
       />
 
       <React.Suspense fallback={<></>}>

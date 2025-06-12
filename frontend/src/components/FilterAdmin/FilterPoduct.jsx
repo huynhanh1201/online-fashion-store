@@ -3,9 +3,7 @@ import { Box, Button } from '@mui/material'
 import FilterByTime from '~/components/FilterAdmin/common/FilterByTime.jsx'
 import FilterByPrice from '~/components/FilterAdmin/common/FilterByPrice'
 import SearchWithSuggestions from '~/components/FilterAdmin/common/SearchWithSuggestions'
-import FilterCategorySelect from '~/components/FilterAdmin/common/FilterCategorySelect.jsx'
-import FilterStatusSelect from '~/components/FilterAdmin/common/FilterStatusSelect'
-import SortSelect from '~/components/FilterAdmin/common/SortSelect.jsx'
+import FilterSelect from '~/components/FilterAdmin/common/FilterSelect.jsx'
 import dayjs from 'dayjs'
 
 export default function FilterProduct({
@@ -13,7 +11,8 @@ export default function FilterProduct({
   categories,
   fetchCategories,
   loading,
-  products
+  products,
+  fetchProducts
 }) {
   const [keyword, setKeyword] = useState('')
   const [inputValue, setInputValue] = useState('')
@@ -108,16 +107,24 @@ export default function FilterProduct({
     setStartDate(dayjs().format('YYYY-MM-DD'))
     setEndDate(dayjs().format('YYYY-MM-DD'))
     onFilter({})
+    fetchProducts(1, 10) // Reset products to initial state
   }
 
   return (
     <Box display='flex' flexWrap='wrap' gap={2} mb={2} justifyContent='end'>
-      <FilterCategorySelect
+      <FilterSelect
+        label='Danh mục'
         value={category}
         onChange={(value) => {
           setCategory(value)
         }}
-        categories={categories}
+        options={[
+          { label: 'Tất cả', value: '' },
+          ...categories.map((c) => ({
+            label: c.name,
+            value: c._id
+          }))
+        ]}
       />
 
       <FilterByPrice
@@ -128,14 +135,21 @@ export default function FilterProduct({
         onApply={() => applyFilters()}
       />
 
-      <FilterStatusSelect
+      <FilterSelect
+        label='Trạng thái'
         value={status}
         onChange={(value) => {
           setStatus(value)
+          applyFilters(selectedFilter, startDate, endDate)
         }}
+        options={[
+          { label: 'Tất cả', value: '' },
+          { label: 'Đang bán', value: false },
+          { label: 'Ngừng bán', value: true }
+        ]}
       />
 
-      <SortSelect value={sort} onChange={setSort} />
+      <FilterSelect value={sort} onChange={setSort} />
       <FilterByTime
         label='Lọc theo ngày tạo'
         selectedFilter={selectedFilter}

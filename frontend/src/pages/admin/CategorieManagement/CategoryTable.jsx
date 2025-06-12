@@ -92,7 +92,7 @@ const CategoryTable = ({
       id: 'action',
       label: 'Hành động',
       minWidth: 130,
-      align: 'center'
+      align: 'start'
     }
   ]
   return (
@@ -154,7 +154,8 @@ const CategoryTable = ({
                     ...(column.id === 'index' && { width: '50px' }),
                     ...(column.id === 'action' && {
                       width: '130px',
-                      maxWidth: '130px'
+                      maxWidth: '130px',
+                      paddingLeft: '26px'
                     })
                   }}
                 >

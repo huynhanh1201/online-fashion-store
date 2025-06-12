@@ -91,12 +91,13 @@ import {
   TableCell,
   TableRow,
   Typography,
-  Paper
+  Paper,
+  Box
 } from '@mui/material'
 
 import TransactionRow from './TransactionRow'
 import StyleAdmin from '~/assets/StyleAdmin.jsx'
-
+import FilterTransaction from '~/components/FilterAdmin/FilterTransaction.jsx'
 const TransactionTable = ({
   transactions = [],
   loading,
@@ -104,7 +105,12 @@ const TransactionTable = ({
   onEdit,
   onDelete,
   page = 0,
-  rowsPerPage = 10
+  rowsPerPage = 10,
+  onFilter,
+  onPageChange,
+  onChangeRowsPerPage,
+  total,
+  fetchTransactions
 }) => {
   const filteredTransactions = transactions.filter((t) => !t.destroy)
   const paginated = filteredTransactions.slice(
@@ -119,7 +125,32 @@ const TransactionTable = ({
           <TableRow>
             <TableCell colSpan={9}>
               <Typography variant='h6' fontWeight={800}>
-                Danh sách giao dịch
+                <Box
+                  sx={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'start'
+                  }}
+                >
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: 1,
+                      minWidth: 250
+                    }}
+                  >
+                    <Typography variant='h6' sx={{ fontWeight: '800' }}>
+                      Danh Sách Giao Dịch`
+                    </Typography>
+                  </Box>
+                  <FilterTransaction
+                    onFilter={onFilter}
+                    transactions={transactions}
+                    loading={loading}
+                    fetchTransactions={fetchTransactions}
+                  />
+                </Box>
               </Typography>
             </TableCell>
           </TableRow>
@@ -171,14 +202,21 @@ const TransactionTable = ({
       </Table>
 
       <TablePagination
+        rowsPerPageOptions={[10, 25, 100]}
         component='div'
-        rowsPerPageOptions={[5, 10, 25]}
-        count={filteredTransactions.length}
+        count={total || 0}
         rowsPerPage={rowsPerPage}
         page={page}
+        onPageChange={(event, newPage) => onPageChange(event, newPage + 1)} // +1 để đúng logic bên cha
+        onRowsPerPageChange={(event) => {
+          const newLimit = parseInt(event.target.value, 10)
+          if (onChangeRowsPerPage) {
+            onChangeRowsPerPage(newLimit)
+          }
+        }}
         labelRowsPerPage='Số dòng mỗi trang'
         labelDisplayedRows={({ from, to, count }) =>
-          `${from}–${to} trên ${count}`
+          `${from}–${to} trên ${count !== -1 ? count : `hơn ${to}`}`
         }
       />
     </Paper>

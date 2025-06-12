@@ -16,17 +16,16 @@ const DeleteSizeModal = React.lazy(() => import('./modal/DeleteSizeModal'))
 
 const SizeManagement = () => {
   const [page, setPage] = React.useState(1)
+  const [limit, setLimit] = React.useState(10) // Giới hạn số lượng kích thước trên mỗi trang
+  const [filters, setFilters] = React.useState('') // Bộ lọc tìm kiếm
   const [selectedSize, setSelectedSize] = React.useState(null)
   const [modalType, setModalType] = React.useState(null)
 
   const { sizes, totalPages, fetchSizes, Loading } = useSizes()
 
   React.useEffect(() => {
-    const loadData = async () => {
-      await fetchSizes(page)
-    }
-    loadData()
-  }, [page])
+    fetchSizes(page, limit, filters)
+  }, [page, limit])
 
   const handleOpenModal = (type, size) => {
     if (!size || !size._id) return
@@ -66,7 +65,12 @@ const SizeManagement = () => {
       console.error('Lỗi:', error)
     }
   }
-
+  const handleFilter = (newFilters) => {
+    setFilters(newFilters)
+    if (Object.keys(newFilters).length > 0) {
+      fetchSizes(1, limit, newFilters)
+    }
+  }
   return (
     <>
       <Typography variant='h5' sx={{ mb: 2 }}>
@@ -78,6 +82,16 @@ const SizeManagement = () => {
         loading={Loading}
         handleOpenModal={handleOpenModal}
         addSize={() => setModalType('add')}
+        onFilters={handleFilter}
+        page={page - 1}
+        rowsPerPage={limit}
+        total={totalPages}
+        onPageChange={handleChangePage}
+        onChangeRowsPerPage={(newLimit) => {
+          setPage(1)
+          setLimit(newLimit)
+        }}
+        fetchSizes={fetchSizes}
       />
 
       <React.Suspense fallback={<></>}>

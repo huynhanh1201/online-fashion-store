@@ -8,7 +8,7 @@ const defaultOptions = [
   { label: 'Cũ nhất', value: 'oldest' }
 ]
 
-export default function SortSelect({
+export default function FilterSelect({
   label = 'Sắp xếp',
   value,
   onChange,

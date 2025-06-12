@@ -174,8 +174,8 @@ const ProductManagement = () => {
   const { getSizePaletteId } = useSizePalettes()
 
   React.useEffect(() => {
-    fetchProducts(page)
-  }, [page])
+    fetchProducts(page, limit, filters)
+  }, [page, limit])
 
   const handleChangePage = (event, value) => setPage(value)
 
@@ -255,6 +255,7 @@ const ProductManagement = () => {
         onFilter={handleFilter}
         categories={categories}
         fetchCategories={fetchCategories}
+        fetchProducts={fetchProducts}
       />
 
       <React.Suspense fallback={<></>}>

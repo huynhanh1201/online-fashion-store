@@ -1,21 +1,14 @@
 import React, { useState, useEffect } from 'react'
-import {
-  Box,
-  Button,
-  FormControl,
-  InputLabel,
-  MenuItem,
-  Select
-} from '@mui/material'
+import { Box, Button } from '@mui/material'
 import dayjs from 'dayjs'
 import FilterByTime from '~/components/FilterAdmin/common/FilterByTime.jsx'
 import SearchWithSuggestions from '~/components/FilterAdmin/common/SearchWithSuggestions.jsx'
 import FilterSelect from '~/components/FilterAdmin/common/FilterSelect.jsx'
 
-export default function FilterColor({
+export default function FilterSize({
   onFilter,
-  colors,
-  fetchColors,
+  sizes = [],
+  fetchSizes,
   loading
 }) {
   const [keyword, setKeyword] = useState('')
@@ -24,11 +17,10 @@ export default function FilterColor({
   const [startDate, setStartDate] = useState(dayjs().format('YYYY-MM-DD'))
   const [endDate, setEndDate] = useState(dayjs().format('YYYY-MM-DD'))
   const [status, setStatus] = useState('')
-  const [sort, setSort] = useState('')
 
   useEffect(() => {
     applyFilters(selectedFilter, startDate, endDate)
-  }, [keyword, status, sort])
+  }, [keyword, status])
 
   const handleApplyTimeFilter = (selected) => {
     setSelectedFilter(selected)
@@ -37,15 +29,14 @@ export default function FilterColor({
 
   const handleSearch = () => {
     setKeyword(inputValue)
-    fetchColors(1, 10, { keyword: inputValue })
+    fetchSizes(1, 10, { keyword: inputValue }) // Fetch lại nếu cần
     applyFilters(selectedFilter, startDate, endDate)
   }
 
   const applyFilters = (selectedTime, fromDate, toDate) => {
     const filters = {
       search: keyword || undefined,
-      destroy: status !== '' ? status : undefined,
-      sort: sort || undefined
+      destroy: status !== '' ? status : undefined
     }
 
     if (selectedTime === 'custom') {
@@ -57,6 +48,7 @@ export default function FilterColor({
       filters.filterTypeDate = selectedTime
     }
 
+    // Xoá các key không có giá trị
     Object.keys(filters).forEach((key) => {
       if (
         filters[key] === undefined ||
@@ -77,9 +69,8 @@ export default function FilterColor({
     setStartDate(dayjs().format('YYYY-MM-DD'))
     setEndDate(dayjs().format('YYYY-MM-DD'))
     setStatus('')
-    setSort('')
     onFilter({})
-    fetchColors(1, 10, {}) // Reset filters when clearing
+    fetchSizes(1, 10, {}) // Reset lại dữ liệu
   }
 
   return (
@@ -98,8 +89,6 @@ export default function FilterColor({
         ]}
       />
 
-      <FilterSelect value={sort} onChange={setSort} />
-
       <FilterByTime
         label='Lọc thời gian tạo'
         selectedFilter={selectedFilter}
@@ -113,8 +102,8 @@ export default function FilterColor({
 
       <Box sx={{ display: 'flex', gap: 2 }}>
         <SearchWithSuggestions
-          label='Tìm màu sắc'
-          options={colors.map((color) => color.name)}
+          label='Tìm kích cỡ'
+          options={sizes.map((size) => size.name)}
           loading={loading}
           keyword={keyword}
           inputValue={inputValue}

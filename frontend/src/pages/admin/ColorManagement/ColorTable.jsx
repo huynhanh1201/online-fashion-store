@@ -82,7 +82,10 @@ const ColorTable = ({
   handleOpenModal,
   addColor,
   onFilters,
-  fetchColors
+  fetchColors,
+  onPageChange,
+  onChangeRowsPerPage,
+  total
 }) => {
   const filteredColors = colors.filter((c) => !c.destroy)
 
@@ -91,7 +94,7 @@ const ColorTable = ({
     { id: 'name', label: 'Tên màu', minWidth: 200 },
     { id: 'createdAt', label: 'Ngày tạo', minWidth: 150 },
     { id: 'updatedAt', label: 'Ngày cập nhật', minWidth: 150 },
-    { id: 'action', label: 'Hành động', minWidth: 130, align: 'center' }
+    { id: 'action', label: 'Hành động', minWidth: 130, align: 'start' }
   ]
 
   return (
@@ -105,7 +108,7 @@ const ColorTable = ({
                   sx={{
                     display: 'flex',
                     justifyContent: 'space-between',
-                    alignItems: 'center'
+                    alignItems: 'start'
                   }}
                 >
                   <Box
@@ -153,7 +156,8 @@ const ColorTable = ({
                     ...(column.id === 'index' && { width: '50px' }),
                     ...(column.id === 'action' && {
                       width: '130px',
-                      maxWidth: '130px'
+                      maxWidth: '130px',
+                      paddingLeft: '26px'
                     }),
                     ...(column.id === 'name' && { width: '70%' })
                   }}
@@ -175,7 +179,7 @@ const ColorTable = ({
                 <ColorRow
                   key={color._id}
                   color={color}
-                  index={idx + 1}
+                  index={page * rowsPerPage + idx + 1}
                   columns={columns}
                   handleOpenModal={handleOpenModal}
                 />
@@ -193,15 +197,20 @@ const ColorTable = ({
       <TablePagination
         rowsPerPageOptions={[10, 25, 100]}
         component='div'
-        count={colors.length || 1}
-        rowsPerPage={rowsPerPage || 10}
-        page={page || 0}
-        labelRowsPerPage='Số dòng mỗi trang'
-        labelDisplayedRows={({ from, to, count }) => {
-          const actualTo = to > count ? count : to
-          const actualFrom = from > count ? count : from
-          return `${actualFrom}–${actualTo} trên ${count !== -1 ? count : `hơn ${actualTo}`}`
+        count={total || 0}
+        rowsPerPage={rowsPerPage}
+        page={page}
+        onPageChange={(event, newPage) => onPageChange(event, newPage + 1)} // +1 để đúng logic bên cha
+        onRowsPerPageChange={(event) => {
+          const newLimit = parseInt(event.target.value, 10)
+          if (onChangeRowsPerPage) {
+            onChangeRowsPerPage(newLimit)
+          }
         }}
+        labelRowsPerPage='Số dòng mỗi trang'
+        labelDisplayedRows={({ from, to, count }) =>
+          `${from}–${to} trên ${count !== -1 ? count : `hơn ${to}`}`
+        }
       />
     </Paper>
   )

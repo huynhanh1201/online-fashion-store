@@ -8,8 +8,8 @@ export const getColors = async (filter) => {
       `${API_ROOT}/v1/colors?${queryString}`
     )
     return {
-      colors: response.data || response.data,
-      total: response.data.total || response.data.length
+      colors: response.data || response.data.data || [],
+      total: response.data.length || response.data.meta.total || 0
     }
   } catch (error) {
     console.error('Lỗi khi lấy danh sách màu:', error)

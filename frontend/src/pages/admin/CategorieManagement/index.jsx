@@ -25,8 +25,8 @@ const CategoryManagement = () => {
   const { categories, fetchCategories, Loading, totalPages } = useCategories()
 
   React.useEffect(() => {
-    fetchCategories(page)
-  }, [page])
+    fetchCategories(page, limit, filters)
+  }, [page, limit])
 
   const handleChangePage = (event, value) => setPage(value)
 

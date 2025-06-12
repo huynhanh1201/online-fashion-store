@@ -13,16 +13,8 @@ import {
 } from '@mui/material'
 import FilterByTime from '~/components/FilterAdmin/common/FilterByTime.jsx'
 import SearchWithSuggestions from '~/components/FilterAdmin/common/SearchWithSuggestions.jsx'
-import FilterStatusSelect from '~/components/FilterAdmin/common/FilterStatusSelect'
-import SortSelect from '~/components/FilterAdmin/common/SortSelect.jsx'
+import FilterSelect from '~/components/FilterAdmin/common/FilterSelect.jsx'
 import dayjs from 'dayjs'
-
-const sortOptions = [
-  { label: 'Tên A-Z', value: 'name_asc' },
-  { label: 'Tên Z-A', value: 'name_desc' },
-  { label: 'Mới nhất', value: 'newest' },
-  { label: 'Cũ nhất', value: 'oldest' }
-]
 
 export default function FilterCategory({
   onFilter,
@@ -89,19 +81,26 @@ export default function FilterCategory({
     setStatus('')
     setSort('')
     onFilter({})
+    fetchCategories(1, 10, {}) // Reset lại danh sách categories
   }
 
   return (
     <Box display='flex' flexWrap='wrap' gap={2} mb={2} justifyContent='end'>
-      <FilterStatusSelect
+      <FilterSelect
+        label='Trạng thái'
         value={status}
         onChange={(value) => {
           setStatus(value)
           applyFilters(selectedFilter, startDate, endDate)
         }}
+        options={[
+          { label: 'Tất cả', value: '' },
+          { label: 'Hoạt động', value: false },
+          { label: 'Không hoạt động', value: true }
+        ]}
       />
 
-      <SortSelect value={sort} onChange={setSort} />
+      <FilterSelect value={sort} onChange={setSort} />
 
       <FilterByTime
         label='Lọc thời gian tạo'

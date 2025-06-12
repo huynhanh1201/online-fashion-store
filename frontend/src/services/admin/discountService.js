@@ -3,11 +3,16 @@ import AuthorizedAxiosInstance from '~/utils/authorizedAxios.js'
 import { API_ROOT } from '~/utils/constants.js'
 
 // Lấy danh sách mã giảm giá
-export const getDiscounts = async () => {
+export const getDiscounts = async (filter) => {
+  const queryParams = new URLSearchParams(filter).toString()
   try {
-    const response = await AuthorizedAxiosInstance.get(`${API_ROOT}/v1/coupons`)
-    const coupons = response.data
-    return { discounts: coupons, total: coupons.length } // vì API trả về mảng
+    const response = await AuthorizedAxiosInstance.get(
+      `${API_ROOT}/v1/coupons?${queryParams}`
+    )
+    return {
+      discounts: response.data || response.data.data || [],
+      total: response.data.length || response.data.meta.total || 0
+    } // vì API trả về mảng
   } catch (error) {
     console.error('Lỗi khi lấy danh sách mã giảm:', error)
     return { discounts: [], total: 0 }

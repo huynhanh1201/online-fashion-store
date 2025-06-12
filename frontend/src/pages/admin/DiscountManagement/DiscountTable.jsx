@@ -86,14 +86,19 @@ import {
 import DiscountRow from './DiscountRow'
 import AddIcon from '@mui/icons-material/Add'
 import Button from '@mui/material/Button'
-
+import FilterDiscount from '~/components/FilterAdmin/FilterDiscount.jsx'
 const DiscountTable = ({
   discounts,
   loading,
   page,
   rowsPerPage,
   onAction,
-  addDiscount
+  addDiscount,
+  fetchDiscounts,
+  total,
+  onFilter,
+  onPageChange,
+  onChangeRowsPerPage
 }) => {
   const columns = [
     { id: 'index', label: 'STT', minWidth: 50, align: 'center' },
@@ -120,20 +125,41 @@ const DiscountTable = ({
                   sx={{
                     display: 'flex',
                     justifyContent: 'space-between',
-                    alignItems: 'center'
+                    alignItems: 'start'
                   }}
                 >
-                  <Typography variant='h6' sx={{ fontWeight: '800' }}>
-                    Danh sách mã giảm giá
-                  </Typography>
-                  <Button
-                    variant='contained'
-                    startIcon={<AddIcon />}
-                    onClick={addDiscount}
-                    sx={{ mb: 2, backgroundColor: '#001f5d' }}
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: 1,
+                      minWidth: 250
+                    }}
                   >
-                    Thêm mã giảm
-                  </Button>
+                    <Typography variant='h6' sx={{ fontWeight: '800' }}>
+                      Danh Sách Mã Giảm Giá
+                    </Typography>
+                    <Button
+                      variant='contained'
+                      color='primary'
+                      onClick={addDiscount}
+                      startIcon={<AddIcon />}
+                      sx={{
+                        textTransform: 'none',
+                        width: 100,
+                        display: 'flex',
+                        alignItems: 'center'
+                      }}
+                    >
+                      Thêm
+                    </Button>
+                  </Box>
+                  <FilterDiscount
+                    fetchDiscounts={fetchDiscounts}
+                    onFilter={onFilter}
+                    discounts={discounts}
+                    loading={loading}
+                  />
                 </Box>
               </TableCell>
             </TableRow>
@@ -161,7 +187,7 @@ const DiscountTable = ({
                 <DiscountRow
                   key={discount._id}
                   discount={discount}
-                  index={idx + 1}
+                  index={page * rowsPerPage + idx + 1}
                   columns={columns}
                   onAction={onAction}
                 />
@@ -178,11 +204,18 @@ const DiscountTable = ({
       </TableContainer>
 
       <TablePagination
-        rowsPerPageOptions={[10, 25, 50]}
+        rowsPerPageOptions={[10, 25, 100]}
         component='div'
-        count={discounts.length || 1}
-        rowsPerPage={rowsPerPage || 10}
-        page={page || 0}
+        count={total || 0}
+        rowsPerPage={rowsPerPage}
+        page={page}
+        onPageChange={(event, newPage) => onPageChange(event, newPage + 1)} // +1 để đúng logic bên cha
+        onRowsPerPageChange={(event) => {
+          const newLimit = parseInt(event.target.value, 10)
+          if (onChangeRowsPerPage) {
+            onChangeRowsPerPage(newLimit)
+          }
+        }}
         labelRowsPerPage='Số dòng mỗi trang'
         labelDisplayedRows={({ from, to, count }) =>
           `${from}–${to} trên ${count !== -1 ? count : `hơn ${to}`}`
