@@ -13,7 +13,8 @@ import {
   Select,
   Checkbox,
   FormControlLabel,
-  Box
+  Box,
+  Autocomplete
 } from '@mui/material'
 import { useForm, Controller } from 'react-hook-form'
 import { toast } from 'react-toastify'
@@ -25,8 +26,7 @@ import { getVariantById } from '~/services/admin/Inventory/VariantService.js'
 import AddColorModal from '~/pages/admin/ColorManagement/modal/AddColorModal'
 import AddSizeModal from '~/pages/admin/SizeManagement/modal/AddSizeModal'
 
-const URI = 'https://api.cloudinary.com/v1_1/dkwsy9sph/image/upload'
-const CloudinaryColor = 'color_upload'
+import { URI, CloudinaryColor } from '~/utils/constants'
 
 const uploadToCloudinary = async (file, folder = CloudinaryColor) => {
   const formData = new FormData()
@@ -277,16 +277,18 @@ const AddVariantModal = ({
               rules={{ required: 'Đã có biến thể vui lòng chọn màu sắc khác' }}
               render={({ field }) => (
                 <Select {...field} label='Màu sắc'>
-                  {colors.map((c) => {
-                    const selectedSize = watch('size')
-                    const disabled =
-                      selectedSize && isColorDisabled(selectedSize, c.name)
-                    return (
-                      <MenuItem key={c.name} value={c.name} disabled={disabled}>
-                        {c.name} {disabled ? ' (đã tồn tại)' : ''}
-                      </MenuItem>
-                    )
-                  })}
+                  {colors
+                    .filter((s) => !s.destroy) 
+                    .map((s) => {
+                      const selectedColor = watch('color')
+                      const disabled =
+                        selectedColor && isColorDisabled(selectedColor, s.name)
+                      return (
+                        <MenuItem key={s.name} value={s.name} disabled={disabled}>
+                          {s.name} {disabled ? ' (đã tồn tại)' : ''}
+                        </MenuItem>
+                      )
+                    })}
                   <MenuItem onClick={handleOpenColorModal}>
                     <em>Thêm màu mới</em>
                   </MenuItem>
@@ -308,16 +310,18 @@ const AddVariantModal = ({
               })}
               label='Kích thước'
             >
-              {sizes.map((s) => {
-                const selectedColor = watch('color')
-                const disabled =
-                  selectedColor && isSizeDisabled(selectedColor, s.name)
-                return (
-                  <MenuItem key={s.name} value={s.name} disabled={disabled}>
-                    {s.name} {disabled ? ' (đã tồn tại)' : ''}
-                  </MenuItem>
-                )
-              })}
+              {sizes
+                .filter((s) => !s.destroy) // Chỉ hiển thị size có destroy !== true
+                .map((s) => {
+                  const selectedColor = watch('color')
+                  const disabled =
+                    selectedColor && isSizeDisabled(selectedColor, s.name)
+                  return (
+                    <MenuItem key={s.name} value={s.name} disabled={disabled}>
+                      {s.name} {disabled ? ' (đã tồn tại)' : ''}
+                    </MenuItem>
+                  )
+                })}
               <MenuItem onClick={handleOpenSizeModal}>
                 <em>Thêm kích thước mới</em>
               </MenuItem>

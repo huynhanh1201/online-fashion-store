@@ -22,14 +22,17 @@ import {
   CardContent,
   InputLabel,
   Select,
-  MenuItem
+  MenuItem,
+  Snackbar,
+  Alert,
 } from '@mui/material'
 import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers'
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns'
 import DeleteIcon from '@mui/icons-material/Delete'
-import Search from '~/components/SearchAdmin/Search.jsx' // Adjust the import path as needed
+import Search from '~/components/SearchAdmin/Search.jsx'
 import AddPartnerModal from '~/pages/admin/InventoryManagement/modal/Partner/AddPartnerModal.jsx'
 import AddWarehouseModal from '~/pages/admin/InventoryManagement/modal/Warehouse/AddWarehouseModal.jsx'
+
 export default function AddWarehouseSlipModal({
   open,
   onClose,
@@ -46,26 +49,28 @@ export default function AddWarehouseSlipModal({
   partners,
   handleAdd,
   addPartner,
-  addWarehouse
+  addWarehouse,
 }) {
   const [isEditing, setIsEditing] = useState(false)
   const [openAddDialog, setOpenAddDialog] = useState(false)
   const [openAddWarehouse, setOpenAddWarehouse] = useState(false)
+  const [snackbarOpen, setSnackbarOpen] = useState(false)
+  const [errorMessage, setErrorMessage] = useState('')
 
+  // Sửa lỗi: Đặt openAddWarehouse thành true để mở modal
   const handleOpenAddWarehouse = () => {
-    setOpenAddWarehouse(false)
+    setOpenAddWarehouse(true)
   }
 
   const handleCloseAddDialog = () => {
     setOpenAddDialog(false)
   }
-  // Safeguard against undefined newSlipData
+
   if (!newSlipData) {
     console.warn('newSlipData is undefined')
     return null
   }
 
-  // Normalize Vietnamese for search
   const normalizeVietnamese = (str = '') => {
     return str
       .normalize('NFD')
@@ -75,48 +80,100 @@ export default function AddWarehouseSlipModal({
       .toLowerCase()
   }
 
-  // Filter variants based on sku and name
   const filterVariantsBySkuAndName = (searchText) => {
     if (!variants || !Array.isArray(variants)) {
       console.warn('variants is undefined or not an array', { variants })
       return []
     }
-
     const searchNormalized = normalizeVietnamese(searchText)
     return variants
+      .filter((variant) => !variant.destroy) // Lọc bỏ variant có destroy: true
       .map((variant) => ({
         _id: variant._id,
         sku: variant.sku,
-        name: `${variant.sku || ''} - ${variant.name || ''}`
+        name: `${variant.sku || ''} - ${variant.name || ''}`,
       }))
-      .filter((item) =>
-        normalizeVietnamese(item.name).includes(searchNormalized)
-      )
+      .filter((item) => normalizeVietnamese(item.name).includes(searchNormalized))
   }
 
-  // Helper to get SKU from variantId
   const getSkuFromVariantId = (variantId) => {
     if (!variantId || !variants || !Array.isArray(variants)) return ''
     const variant = variants.find((v) => v._id === variantId)
     return variant ? variant.sku : ''
   }
 
-  // Modified handleAdd to match the desired JSON structure
   const onSubmit = async () => {
-    const formattedData = {
-      type: type === 'input' ? 'import' : 'export',
-      date: newSlipData.date ? new Date(newSlipData.date).toISOString() : null,
-      partnerId: newSlipData.partnerId || '',
-      warehouseId: newSlipData.warehouseId || '',
-      items: items.map((item) => ({
-        variantId: item.variantId || '',
-        quantity: parseInt(item.quantity) || 0,
-        unit: item.unit || 'cái'
-      })),
-      note: newSlipData.note || ''
+    // Hàm kiểm tra dữ liệu đầu vào
+    const validateForm = () => {
+      if (!newSlipData) {
+        setErrorMessage('Dữ liệu phiếu nhập kho không hợp lệ!')
+        return false
+      }
+      if (!newSlipData.date) {
+        setErrorMessage('Vui lòng chọn ngày nhập kho!')
+        return false
+      }
+      if (!newSlipData.warehouseId) {
+        setErrorMessage('Vui lòng chọn kho nhập hàng!')
+        return false
+      }
+      if (!newSlipData.partnerId) {
+        setErrorMessage('Vui lòng chọn nhà cung cấp!')
+        return false
+      }
+      if (!items || items.length === 0) {
+        setErrorMessage('Vui lòng thêm ít nhất một sản phẩm!')
+        return false
+      }
+      if (
+        items.some((item) => !item.variantId || !item.quantity || item.quantity <= 0)
+      ) {
+        setErrorMessage('Vui lòng điền đầy đủ thông tin sản phẩm (biến thể và số lượng)!')
+        return false
+      }
+      // Kiểm tra biến thể có destroy: true
+      if (
+        variants &&
+        items.some((item) => {
+          const
+
+            variant = variants.find((v) => v._id === item.variantId)
+          return variant && variant.destroy === true
+        })
+      ) {
+        setErrorMessage('Một hoặc nhiều biến thể đã bị xóa (destroy: true)!')
+        return false
+      }
+      return true
     }
-    await handleAdd(formattedData)
-    onClose()
+
+    // Kiểm tra dữ liệu trước khi gửi
+    if (!validateForm()) {
+      setSnackbarOpen(true)
+      return
+    }
+
+    try {
+      const formattedData = {
+        type: type === 'input' ? 'import' : 'export',
+        date: new Date(newSlipData.date).toISOString(),
+        partnerId: newSlipData.partnerId,
+        warehouseId: newSlipData.warehouseId,
+        items: items.map((item) => ({
+          variantId: item.variantId,
+          quantity: parseInt(item.quantity),
+          unit: item.unit || 'cái',
+        })),
+        note: newSlipData.note || '',
+      }
+      await handleAdd(formattedData)
+      setErrorMessage(`Tạo phiếu ${type === 'input' ? 'nhập' : 'xuất'} kho thành công!`)
+      setSnackbarOpen(true)
+      onClose()
+    } catch (error) {
+      setErrorMessage(`Lỗi khi tạo phiếu ${type === 'input' ? 'nhập' : 'xuất'} kho: ${error.message}`)
+      setSnackbarOpen(true)
+    }
   }
 
   return (
@@ -124,7 +181,7 @@ export default function AddWarehouseSlipModal({
       <Dialog
         open={open}
         onClose={onClose}
-        maxWidth='xl'
+        maxWidth="xl"
         fullWidth
         sx={{ maxHeight: '95vh', marginTop: '60px' }}
       >
@@ -132,25 +189,20 @@ export default function AddWarehouseSlipModal({
           sx={{
             display: 'flex',
             justifyContent: 'space-between',
-            alignItems: 'center'
+            alignItems: 'center',
           }}
         >
-          <DialogTitle
-            sx={{ fontWeight: 600, fontSize: 20, padding: '20px 0 0 24px' }}
-          >
+          <DialogTitle sx={{ fontWeight: 600, fontSize: 20, padding: '20px 0 0 24px' }}>
             {type === 'input' ? 'Nhập kho' : 'Xuất kho'} – Tạo phiếu mới
           </DialogTitle>
           <DialogActions sx={{ padding: '20px 24px 0 0' }}>
             {!isEditing && (
-              <Button
-                onClick={() => setIsEditing(true)}
-                sx={{ display: 'none' }}
-              >
+              <Button onClick={() => setIsEditing(true)} sx={{ display: 'none' }}>
                 Sửa
               </Button>
             )}
             <Button onClick={onClose}>Hủy</Button>
-            <Button variant='contained' color='success' onClick={onSubmit}>
+            <Button variant="contained" color="success" onClick={onSubmit}>
               Duyệt & Hoàn thành
             </Button>
           </DialogActions>
@@ -163,12 +215,10 @@ export default function AddWarehouseSlipModal({
                 <Grid item size={4} sm={6} md={4}>
                   <DatePicker
                     sx={{ width: '100%' }}
-                    label='Ngày nhập'
+                    label="Ngày nhập"
                     value={newSlipData.date || null}
                     onChange={handleDateChange}
-                    renderInput={(params) => (
-                      <TextField fullWidth {...params} />
-                    )}
+                    slotProps={{ textField: { fullWidth: true } }} // Cập nhật để tương thích với MUI v6
                   />
                 </Grid>
                 <Grid item size={4} sm={6} md={4}>
@@ -178,9 +228,7 @@ export default function AddWarehouseSlipModal({
                       value={newSlipData.warehouseId || ''}
                       onChange={handleChange('warehouseId')}
                     >
-                      <MenuItem onClick={() => setOpenAddWarehouse(true)}>
-                        Thêm kho
-                      </MenuItem>
+                      <MenuItem onClick={handleOpenAddWarehouse}>Thêm kho</MenuItem>
                       {warehouses.map((warehouse) => (
                         <MenuItem key={warehouse._id} value={warehouse._id}>
                           {warehouse.name}
@@ -197,7 +245,7 @@ export default function AddWarehouseSlipModal({
                       onChange={handleChange('partnerId')}
                     >
                       <MenuItem onClick={() => setOpenAddDialog(true)}>
-                        Thêm hà cung cấp
+                        Thêm nhà cung cấp
                       </MenuItem>
                       {partners.map((partner) => (
                         <MenuItem key={partner._id} value={partner._id}>
@@ -209,7 +257,7 @@ export default function AddWarehouseSlipModal({
                 </Grid>
                 <Grid item size={12}>
                   <TextField
-                    label='Ghi chú'
+                    label="Ghi chú"
                     value={newSlipData.note || ''}
                     onChange={handleChange('note')}
                     fullWidth
@@ -220,10 +268,10 @@ export default function AddWarehouseSlipModal({
               </Grid>
             </CardContent>
             {isEditing && (
-              <Box mt={2} display='flex' justifyContent='flex-end'>
+              <Box mt={2} display="flex" justifyContent="flex-end">
                 <Button
-                  variant='contained'
-                  color='primary'
+                  variant="contained"
+                  color="primary"
                   onClick={() => setIsEditing(false)}
                 >
                   Lưu
@@ -234,22 +282,18 @@ export default function AddWarehouseSlipModal({
               </Box>
             )}
           </Card>
-          <Paper variant='outlined' sx={{ mb: 3 }}>
+          <Paper variant="outlined" sx={{ mb: 3 }}>
             <Box p={2} sx={{ minHeight: '350px' }}>
               <Typography fontWeight={600} mb={1}>
                 Danh sách sản phẩm {type === 'input' ? 'nhập' : 'xuất'}
               </Typography>
-              <TableContainer
-                sx={{ minHeight: '350px', overflow: 'auto', zIndex: 0 }}
-              >
-                <Table stickyHeader size='small'>
+              <TableContainer sx={{ minHeight: '350px', overflow: 'auto', zIndex: 0 }}>
+                <Table stickyHeader size="small">
                   <TableHead>
                     <TableRow>
                       <TableCell>STT</TableCell>
                       <TableCell>Variant</TableCell>
-                      <TableCell>
-                        SL {type === 'input' ? 'nhập' : 'xuất'}
-                      </TableCell>
+                      <TableCell>SL {type === 'input' ? 'nhập' : 'xuất'}</TableCell>
                       <TableCell>Đơn vị</TableCell>
                       <TableCell>Thao tác</TableCell>
                     </TableRow>
@@ -262,48 +306,40 @@ export default function AddWarehouseSlipModal({
                           <Search
                             data={filterVariantsBySkuAndName}
                             onSelect={(selectedVariantId) =>
-                              handleItemChange(
-                                index,
-                                'variantId'
-                              )({
-                                target: { value: selectedVariantId }
+                              handleItemChange(index, 'variantId')({
+                                target: { value: selectedVariantId },
                               })
                             }
-                            searchText={
-                              getSkuFromVariantId(item.variantId) || ''
-                            }
+                            searchText={getSkuFromVariantId(item.variantId) || ''}
                             setSearchText={(value) =>
-                              handleItemChange(
-                                index,
-                                'variantId'
-                              )({
-                                target: { value }
+                              handleItemChange(index, 'variantId')({
+                                target: { value },
                               })
                             }
-                            placeholder='Tìm theo SKU hoặc tên...'
+                            placeholder="Tìm theo SKU hoặc tên..."
                             index={index}
                           />
                         </TableCell>
                         <TableCell sx={{ minWidth: 100 }}>
                           <TextField
-                            type='number'
+                            type="number"
                             value={item.quantity || ''}
                             onChange={handleItemChange(index, 'quantity')}
                             fullWidth
-                            size='small'
+                            size="small"
                           />
                         </TableCell>
                         <TableCell sx={{ minWidth: 100 }}>
                           <TextField
-                            value={'cái'}
+                            value={item.unit || 'cái'}
                             onChange={handleItemChange(index, 'unit')}
                             fullWidth
-                            size='small'
+                            size="small"
                           />
                         </TableCell>
                         <TableCell sx={{ minWidth: 100 }}>
                           <IconButton onClick={() => handleDeleteRow(index)}>
-                            <DeleteIcon color='error' />
+                            <DeleteIcon color="error" />
                           </IconButton>
                         </TableCell>
                       </TableRow>
@@ -311,20 +347,15 @@ export default function AddWarehouseSlipModal({
                   </TableBody>
                 </Table>
               </TableContainer>
-              <Box display='flex' justifyContent='space-between' mt={2}>
-                <Button variant='outlined' onClick={handleAddRow}>
+              <Box display="flex" justifyContent="space-between" mt={2}>
+                <Button variant="outlined" onClick={handleAddRow}>
                   + Thêm dòng
                 </Button>
-                <Box display='flex' gap={3}>
-                  <Typography variant='body2'>
-                    Tổng dòng: {items.length}
-                  </Typography>
-                  <Typography variant='body2'>
+                <Box display="flex" gap={3}>
+                  <Typography variant="body2">Tổng dòng: {items.length}</Typography>
+                  <Typography variant="body2">
                     Tổng SL:{' '}
-                    {items.reduce(
-                      (sum, item) => sum + (parseInt(item.quantity) || 0),
-                      0
-                    )}
+                    {items.reduce((sum, item) => sum + (parseInt(item.quantity) || 0), 0)}
                   </Typography>
                 </Box>
               </Box>
@@ -338,9 +369,31 @@ export default function AddWarehouseSlipModal({
         />
         <AddWarehouseModal
           open={openAddWarehouse}
-          onClose={handleOpenAddWarehouse}
+          onClose={() => setOpenAddWarehouse(false)}
           onSave={addWarehouse}
         />
+        <Snackbar
+          open={snackbarOpen}
+          autoHideDuration={4000}
+          onClose={() => {
+            setSnackbarOpen(false)
+            setErrorMessage('')
+          }}
+          anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+        >
+          <Alert
+            onClose={() => {
+              setSnackbarOpen(false)
+              setErrorMessage('')
+            }}
+            severity={errorMessage.includes('thành công') ? 'success' : 'error'}
+            sx={{ width: '100%', fontSize: '0.9rem' }}
+            elevation={6}
+            variant="filled"
+          >
+            {errorMessage || 'Đã xảy ra lỗi, vui lòng thử lại!'}
+          </Alert>
+        </Snackbar>
       </Dialog>
     </LocalizationProvider>
   )
