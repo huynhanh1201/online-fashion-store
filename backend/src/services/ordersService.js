@@ -415,7 +415,7 @@ const getOrderList = async (queryString) => {
 
     if (status) filter.status = status
 
-    if (paymentMethod) filter.paymentMethod = paymentMethod.toUpperCase()
+    if (paymentMethod) filter.paymentMethod = paymentMethod
 
     if (paymentStatus) filter.paymentStatus = paymentStatus
 
