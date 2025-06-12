@@ -132,20 +132,20 @@ export default function FilterInventoryLog({
         ]}
       />
 
-      <FilterSelect
-        label='Lô hàng'
-        value={batchId}
-        onChange={(val) => {
-          setBatchId(val)
-        }}
-        options={[
-          { label: 'Tất cả', value: '' },
-          ...batches.map((b) => ({
-            label: b.batchCode,
-            value: b._id
-          }))
-        ]}
-      />
+      {/*<FilterSelect*/}
+      {/*  label='Lô hàng'*/}
+      {/*  value={batchId}*/}
+      {/*  onChange={(val) => {*/}
+      {/*    setBatchId(val)*/}
+      {/*  }}*/}
+      {/*  options={[*/}
+      {/*    { label: 'Tất cả', value: '' },*/}
+      {/*    ...batches.map((b) => ({*/}
+      {/*      label: b.batchCode,*/}
+      {/*      value: b._id*/}
+      {/*    }))*/}
+      {/*  ]}*/}
+      {/*/>*/}
 
       <FilterSelect
         label='Loại'
@@ -160,32 +160,32 @@ export default function FilterInventoryLog({
         ]}
       />
 
-      <FilterByPrice
-        label='Số lượng thay đổi'
-        priceMin={amountMin}
-        priceMax={amountMax}
-        setPriceMin={setAmountMin}
-        setPriceMax={setAmountMax}
-        onApply={handleApplyFilters}
-      />
+      {/*<FilterByPrice*/}
+      {/*  label='Số lượng thay đổi'*/}
+      {/*  priceMin={amountMin}*/}
+      {/*  priceMax={amountMax}*/}
+      {/*  setPriceMin={setAmountMin}*/}
+      {/*  setPriceMax={setAmountMax}*/}
+      {/*  onApply={handleApplyFilters}*/}
+      {/*/>*/}
 
-      <FilterByPrice
-        label='Giá nhập (VNĐ)'
-        priceMin={importPriceMin}
-        priceMax={importPriceMax}
-        setPriceMin={setImportPriceMin}
-        setPriceMax={setImportPriceMax}
-        onApply={handleApplyFilters}
-      />
+      {/*<FilterByPrice*/}
+      {/*  label='Giá nhập (VNĐ)'*/}
+      {/*  priceMin={importPriceMin}*/}
+      {/*  priceMax={importPriceMax}*/}
+      {/*  setPriceMin={setImportPriceMin}*/}
+      {/*  setPriceMax={setImportPriceMax}*/}
+      {/*  onApply={handleApplyFilters}*/}
+      {/*/>*/}
 
-      <FilterByPrice
-        label='Giá bán (VNĐ)'
-        priceMin={exportPriceMin}
-        priceMax={exportPriceMax}
-        setPriceMin={setExportPriceMin}
-        setPriceMax={setExportPriceMax}
-        onApply={handleApplyFilters}
-      />
+      {/*<FilterByPrice*/}
+      {/*  label='Giá bán (VNĐ)'*/}
+      {/*  priceMin={exportPriceMin}*/}
+      {/*  priceMax={exportPriceMax}*/}
+      {/*  setPriceMin={setExportPriceMin}*/}
+      {/*  setPriceMax={setExportPriceMax}*/}
+      {/*  onApply={handleApplyFilters}*/}
+      {/*/>*/}
 
       <FilterSelect
         label='Người người thực hiện'
@@ -203,7 +203,7 @@ export default function FilterInventoryLog({
       />
       <FilterSelect value={sort} onChange={setSort} />
       <FilterByTime
-        label='Ngày tạo'
+        label='Ngày tạo tạo phiếu'
         selectedFilter={createdFilter}
         setSelectedFilter={setCreatedFilter}
         startDate={createdStart}

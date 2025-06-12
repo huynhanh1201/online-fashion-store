@@ -33,7 +33,7 @@ export default function FilterInventory({
 
   useEffect(() => {
     handleApplyFilters()
-  }, [warehouseId, keyword, sort, status])
+  }, [warehouseId, keyword, sort, destroy, status])
   const handleSearch = () => {
     setKeyword(inputValue)
     handleApplyFilters(selectedFilter, startDate, endDate)
@@ -160,11 +160,11 @@ export default function FilterInventory({
         value={status}
         onChange={(val) => {
           setStatus(val)
-          handleApplyFilters()
         }}
         options={[
           { label: 'Tất cả', value: '' },
           { label: 'Còn hàng', value: 'in-stock' },
+          { label: 'Sắp hết hàng', value: 'low-stock' },
           { label: 'Hết hàng', value: 'out-of-stock' }
         ]}
       />
@@ -174,7 +174,6 @@ export default function FilterInventory({
         value={destroy}
         onChange={(val) => {
           setDestroy(val)
-          handleApplyFilters()
         }}
         options={[
           { label: 'Tất cả', value: '' },

@@ -166,10 +166,12 @@ export default function FilterOrder({
         onChange={setStatus}
         options={[
           { label: 'Tất cả', value: '' },
-          { label: 'Chờ xác nhận', value: 'pending' },
-          { label: 'Đã xác nhận', value: 'confirmed' },
-          { label: 'Đã huỷ', value: 'cancelled' },
-          { label: 'Hoàn thành', value: 'completed' }
+          { label: 'Chờ xác nhận', value: 'Pending' },
+          { label: 'Đang xử lý', value: 'Processing' },
+          { label: 'Đã vận chuyển', value: 'Shipped' },
+          { label: 'Đang vận chuyển', value: 'Shipping' },
+          { label: 'Đã giao hàng', value: 'Delivered' },
+          { label: 'Đã hủy', value: 'Cancelled' }
         ]}
       />
 
@@ -179,8 +181,8 @@ export default function FilterOrder({
         onChange={setPaymentMethod}
         options={[
           { label: 'Tất cả', value: '' },
-          { label: 'COD', value: 'cod' },
-          { label: 'Trực tuyến', value: 'vn_pay' }
+          { label: 'COD', value: 'COD' },
+          { label: 'Trực tuyến', value: 'vnpay' }
         ]}
       />
 
@@ -190,9 +192,9 @@ export default function FilterOrder({
         onChange={setPaymentStatus}
         options={[
           { label: 'Tất cả', value: '' },
-          { label: 'Chờ thanh toán', value: 'pending' },
-          { label: 'Đã thanh toán', value: 'completed' },
-          { label: 'Thất bại', value: 'failed' }
+          { label: 'Chờ thanh toán', value: 'Pending' },
+          { label: 'Đã thanh toán', value: 'Completed' },
+          { label: 'Thất bại', value: 'Failed' }
         ]}
       />
       <FilterSelect

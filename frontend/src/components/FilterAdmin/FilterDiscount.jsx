@@ -156,7 +156,7 @@ export default function FilterDiscount({
         options={[
           { label: 'Tất cả', value: '' },
           { label: 'Giảm theo %', value: 'percent' },
-          { label: 'Giảm theo giá', value: 'amount' }
+          { label: 'Giảm theo giá', value: 'fixed' }
         ]}
       />
       {/*<FilterByPrice*/}
