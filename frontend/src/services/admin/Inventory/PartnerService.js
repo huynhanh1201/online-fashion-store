@@ -7,7 +7,10 @@ export const getPartners = async (filters = {}) => {
     const response = await AuthorizedAxiosInstance.get(
       `${API_ROOT}/v1/partners?${params}`
     )
-    return { partners: response.data, total: response.data.length }
+    return {
+      partners: response.data || response.data.data || [],
+      total: response.data.length || response.data.meta.total || 0
+    }
   } catch (error) {
     console.error('Error fetching partners:', error)
     return []

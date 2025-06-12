@@ -22,14 +22,13 @@ const CategoryManagement = () => {
   const [selectedCategory, setSelectedCategory] = React.useState(null)
   const [modalType, setModalType] = React.useState(null)
 
-  const { categories, fetchCategories, Loading } = useCategories()
+  const { categories, fetchCategories, Loading, totalPages } = useCategories()
 
   React.useEffect(() => {
-    const loadData = async () => {
-      await fetchCategories()
-    }
-    loadData()
-  }, [page])
+    fetchCategories(page, limit, filters)
+  }, [page, limit])
+
+  const handleChangePage = (event, value) => setPage(value)
 
   const handleOpenModal = (type, category) => {
     if (!category || !category._id) return
@@ -46,7 +45,7 @@ const CategoryManagement = () => {
     try {
       const response = await updateCategory(categoryId, updatedData)
       if (response) {
-        await fetchCategories()
+        await fetchCategories(page, limit)
       } else {
         console.log('Cập nhật không thành công')
       }
@@ -59,7 +58,7 @@ const CategoryManagement = () => {
     try {
       const result = await deleteCategory(categoryId)
       if (result) {
-        await fetchCategories()
+        await fetchCategories(page, limit)
       } else {
         console.log('Xoá không thành công')
       }
@@ -67,7 +66,12 @@ const CategoryManagement = () => {
       console.error('Lỗi:', error)
     }
   }
-
+  const handleFilter = (newFilters) => {
+    setFilters(newFilters)
+    if (Object.keys(newFilters).length > 0) {
+      fetchCategories(1, limit, newFilters)
+    }
+  }
   return (
     <>
       <CategoryTable
@@ -76,9 +80,14 @@ const CategoryManagement = () => {
         fetchCategories={fetchCategories}
         handleOpenModal={handleOpenModal}
         addCategory={() => setModalType('add')}
-        onFilter={(filters) => {
-          setFilters(filters)
-          fetchCategories(page, limit, filters)
+        onFilter={handleFilter}
+        page={page - 1}
+        rowsPerPage={limit}
+        total={totalPages}
+        onPageChange={handleChangePage}
+        onChangeRowsPerPage={(newLimit) => {
+          setPage(1)
+          setLimit(newLimit)
         }}
       />
 

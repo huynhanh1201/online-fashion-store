@@ -18,6 +18,7 @@ import useWarehouseSlips from '~/hooks/admin/Inventory/useWarehouseSlip.js'
 import useBatches from '~/hooks/admin/Inventory/useBatches.js'
 import useInventoryLog from '~/hooks/admin/Inventory/useInventoryLogs.js'
 import usePartner from '~/hooks/admin/Inventory/usePartner.js'
+import useUsers from '~/hooks/admin/useUsers.js'
 const InventoryTable = () => {
   const [activeTab, setActiveTab] = useState(0)
   const [page, setPage] = useState(1)
@@ -32,21 +33,26 @@ const InventoryTable = () => {
     updateInventoryById,
     deleteInventoryById,
     getInventoryId,
-    totalPageInventory
+    totalPageInventory,
+    loadingInventories
   } = useInventory()
   const {
     variants,
     fetchVariants,
     createNewVariant,
     updateVariantById,
-    deleteVariantById
+    deleteVariantById,
+    loadingVariant,
+    totalVariant
   } = useVariants()
   const {
     warehouses,
     fetchWarehouses,
     createNewWarehouse,
     updateWarehouseById,
-    deleteWarehouseById
+    deleteWarehouseById,
+    loadingWarehouse,
+    totalWarehouse
   } = useWarehouses()
   const {
     warehouseSlips,
@@ -60,16 +66,22 @@ const InventoryTable = () => {
     fetchBatches,
     createNewBatch,
     updateBatchById,
-    deleteBatchById
+    deleteBatchById,
+    loadingBatch,
+    totalPageBatch
   } = useBatches()
-  const { logs, fetchLogs, createNewLog, totalLogs } = useInventoryLog()
+  const { logs, fetchLogs, createNewLog, totalLogs, loadingLog } =
+    useInventoryLog()
   const {
     partners,
     fetchPartners,
     createNewPartner,
     updateExistingPartner,
-    removePartner
+    removePartner,
+    loadingPartner,
+    totalPartner
   } = usePartner()
+  const { users, fetchUsers } = useUsers()
   const formatCurrency = (value) => {
     if (!value) return ''
     return Number(value).toLocaleString('vi-VN') // Thêm dấu chấm theo chuẩn VNĐ
@@ -84,43 +96,12 @@ const InventoryTable = () => {
     setPage(1) // Reset page when switching tabs
   }
 
-  const handleChangePage = (event, newPage) => {
-    setPage(newPage + 1)
+  const handleChangePage = (event, value) => setPage(value)
+
+  const handleChangeRowsPerPage = (event) => {
+    const newLimit = parseInt(event.target.value, 10)
+    setRowsPerPage(newLimit)
   }
-
-  const handleChangeRowsPerPage = (event, source) => {
-    const newRowsPerPage = +event.target.value
-    setRowsPerPage(newRowsPerPage)
-    const page = 1
-    setPage(page)
-
-    switch (source) {
-      case 'inventory':
-        fetchInventories(page + 1, newRowsPerPage)
-        break
-      case 'batch':
-        fetchBatches(page + 1, newRowsPerPage)
-        break
-      case 'warehouseSlip':
-        fetchWarehouseSlips(page + 1, newRowsPerPage) // nếu API dùng page bắt đầu từ 1
-        break
-      case 'log':
-        fetchLogs(page + 1, newRowsPerPage)
-        break
-      case 'partner':
-        fetchPartners(page + 1, newRowsPerPage)
-        break
-      case 'warehouse':
-        fetchWarehouses(page + 1, newRowsPerPage)
-        break
-      case 'variant':
-        fetchVariants(page + 1, newRowsPerPage)
-        break
-      default:
-        console.warn(`Unknown source: ${source}`)
-    }
-  }
-
   const tabLabels = [
     'Thống kê kho',
     'Tồn kho',
@@ -172,7 +153,11 @@ const InventoryTable = () => {
             total={totalPageInventory}
             rowsPerPage={rowsPerPage}
             onPageChange={handleChangePage}
-            onRowsPerPageChange={handleChangeRowsPerPage}
+            onChangeRowsPerPage={(newLimit) => {
+              setPage(1)
+              setRowsPerPage(newLimit)
+            }}
+            loading={loadingInventories}
             //handle
             updateInventory={updateInventoryById}
             deleteInventory={deleteInventoryById}
@@ -219,13 +204,18 @@ const InventoryTable = () => {
         {activeTab === 3 && (
           <InventoryLogTab
             data={logs}
+            users={users}
             variants={variants}
             warehouses={warehouses}
             page={page}
             total={totalLogs}
             rowsPerPage={rowsPerPage}
             onPageChange={handleChangePage}
-            onRowsPerPageChange={handleChangeRowsPerPage}
+            onChangeRowsPerPage={(newLimit) => {
+              setPage(1)
+              setRowsPerPage(newLimit)
+            }}
+            loading={loadingLog}
             addInventoryLog={createNewLog}
             refreshInventoryLogs={fetchLogs}
             updateInventoryLog={update}
@@ -233,6 +223,8 @@ const InventoryTable = () => {
             inventories={inventories}
             fetchInventories={fetchInventories}
             fetchVariants={fetchVariants}
+            fetchUsers={fetchUsers}
+            fetchWarehouses={fetchWarehouses}
             batches={batches}
             fetchBatches={fetchBatches}
             // format giá
@@ -244,9 +236,14 @@ const InventoryTable = () => {
           <WarehousesTab
             data={warehouses}
             page={page}
+            total={totalWarehouse}
             rowsPerPage={rowsPerPage}
             onPageChange={handleChangePage}
-            onRowsPerPageChange={handleChangeRowsPerPage}
+            onChangeRowsPerPage={(newLimit) => {
+              setPage(1)
+              setRowsPerPage(newLimit)
+            }}
+            loading={loadingWarehouse}
             addWarehouse={createNewWarehouse}
             refreshWarehouses={fetchWarehouses}
             updateWarehouse={updateWarehouseById}
@@ -257,15 +254,24 @@ const InventoryTable = () => {
           <VariantsTab
             data={variants}
             products={products}
+            colors={colors}
+            sizes={sizes}
             page={page}
+            total={totalVariant}
             rowsPerPage={rowsPerPage}
             onPageChange={handleChangePage}
-            onRowsPerPageChange={handleChangeRowsPerPage}
+            onChangeRowsPerPage={(newLimit) => {
+              setPage(1)
+              setRowsPerPage(newLimit)
+            }}
+            loading={loadingVariant}
             addVariant={createNewVariant}
             refreshVariants={fetchVariants}
             updateVariant={updateVariantById}
             deleteVariant={deleteVariantById}
             refreshProducts={fetchProducts}
+            fetchColors={fetchColors}
+            fetchSizes={fetchSizes}
             // format giá
             formatCurrency={formatCurrency}
             parseCurrency={parseCurrency}
@@ -277,11 +283,18 @@ const InventoryTable = () => {
             warehouse={warehouses}
             variants={variants}
             page={page}
+            total={totalPageBatch}
             rowsPerPage={rowsPerPage}
             onPageChange={handleChangePage}
-            onRowsPerPageChange={handleChangeRowsPerPage}
+            onChangeRowsPerPage={(newLimit) => {
+              setPage(1)
+              setRowsPerPage(newLimit)
+            }}
+            loading={loadingBatch}
             addBatch={createNewBatch}
             refreshBatches={fetchBatches}
+            fetchVariants={fetchVariants}
+            fetchWarehouses={fetchWarehouses}
             updateBatch={updateBatchById}
             deleteBatch={deleteBatchById}
             // format giá
@@ -293,9 +306,14 @@ const InventoryTable = () => {
           <PartnersTab
             data={partners}
             page={page}
+            total={totalPartner}
             rowsPerPage={rowsPerPage}
             onPageChange={handleChangePage}
-            onRowsPerPageChange={handleChangeRowsPerPage}
+            onChangeRowsPerPage={(newLimit) => {
+              setPage(1)
+              setRowsPerPage(newLimit)
+            }}
+            loading={loadingPartner}
             refreshPartners={fetchPartners}
             addPartner={createNewPartner}
             updatePartner={updateExistingPartner}

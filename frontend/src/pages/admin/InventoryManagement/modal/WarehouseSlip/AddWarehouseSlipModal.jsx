@@ -24,7 +24,7 @@ import {
   Select,
   MenuItem,
   Snackbar,
-  Alert,
+  Alert
 } from '@mui/material'
 import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers'
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns'
@@ -47,7 +47,7 @@ export default function AddWarehouseSlipModal({
   variants,
   type = 'input', // 'input' for import, 'output' for export
   partners,
-  handleAdd,
+  addWarehouseSlip,
   addPartner,
   addWarehouse,
 }) {
@@ -126,18 +126,20 @@ export default function AddWarehouseSlipModal({
         return false
       }
       if (
-        items.some((item) => !item.variantId || !item.quantity || item.quantity <= 0)
+        items.some(
+          (item) => !item.variantId || !item.quantity || item.quantity <= 0
+        )
       ) {
-        setErrorMessage('Vui lòng điền đầy đủ thông tin sản phẩm (biến thể và số lượng)!')
+        setErrorMessage(
+          'Vui lòng điền đầy đủ thông tin sản phẩm (biến thể và số lượng)!'
+        )
         return false
       }
       // Kiểm tra biến thể có destroy: true
       if (
         variants &&
         items.some((item) => {
-          const
-
-            variant = variants.find((v) => v._id === item.variantId)
+          const variant = variants.find((v) => v._id === item.variantId)
           return variant && variant.destroy === true
         })
       ) {
@@ -162,16 +164,20 @@ export default function AddWarehouseSlipModal({
         items: items.map((item) => ({
           variantId: item.variantId,
           quantity: parseInt(item.quantity),
-          unit: item.unit || 'cái',
+          unit: item.unit || 'cái'
         })),
-        note: newSlipData.note || '',
+        note: newSlipData.note || ''
       }
-      await handleAdd(formattedData)
-      setErrorMessage(`Tạo phiếu ${type === 'input' ? 'nhập' : 'xuất'} kho thành công!`)
+      await addWarehouseSlip(formattedData)
+      setErrorMessage(
+        `Tạo phiếu ${type === 'input' ? 'nhập' : 'xuất'} kho thành công!`
+      )
       setSnackbarOpen(true)
       onClose()
     } catch (error) {
-      setErrorMessage(`Lỗi khi tạo phiếu ${type === 'input' ? 'nhập' : 'xuất'} kho: ${error.message}`)
+      setErrorMessage(
+        `Lỗi khi tạo phiếu ${type === 'input' ? 'nhập' : 'xuất'} kho: ${error.message}`
+      )
       setSnackbarOpen(true)
     }
   }
@@ -228,7 +234,9 @@ export default function AddWarehouseSlipModal({
                       value={newSlipData.warehouseId || ''}
                       onChange={handleChange('warehouseId')}
                     >
-                      <MenuItem onClick={handleOpenAddWarehouse}>Thêm kho</MenuItem>
+                      <MenuItem onClick={handleOpenAddWarehouse}>
+                        Thêm kho
+                      </MenuItem>
                       {warehouses.map((warehouse) => (
                         <MenuItem key={warehouse._id} value={warehouse._id}>
                           {warehouse.name}
@@ -389,7 +397,7 @@ export default function AddWarehouseSlipModal({
             severity={errorMessage.includes('thành công') ? 'success' : 'error'}
             sx={{ width: '100%', fontSize: '0.9rem' }}
             elevation={6}
-            variant="filled"
+            variant='filled'
           >
             {errorMessage || 'Đã xảy ra lỗi, vui lòng thử lại!'}
           </Alert>

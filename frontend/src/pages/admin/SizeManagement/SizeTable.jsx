@@ -74,14 +74,7 @@ import {
 } from '@mui/material'
 import SizeRow from './SizeRow'
 import AddIcon from '@mui/icons-material/Add'
-
-const styles = {
-  buttonAdd: {
-    backgroundColor: '#001f5d',
-    color: '#fff',
-    marginBottom: '16px'
-  }
-}
+import FilterSize from '~/components/FilterAdmin/FilterSize.jsx'
 
 const SizeTable = ({
   sizes = [],
@@ -89,7 +82,12 @@ const SizeTable = ({
   page = 0,
   rowsPerPage = 10,
   handleOpenModal,
-  addSize
+  addSize,
+  onChangeRowsPerPage,
+  total,
+  onPageChange,
+  onFilters,
+  fetchSizes
 }) => {
   const filteredSizes = sizes.filter((s) => !s.destroy)
 
@@ -98,7 +96,7 @@ const SizeTable = ({
     { id: 'name', label: 'Tên kích thước', minWidth: 200 },
     { id: 'createdAt', label: 'Ngày tạo', minWidth: 150 },
     { id: 'updatedAt', label: 'Ngày cập nhật', minWidth: 150 },
-    { id: 'action', label: 'Hành động', minWidth: 130, align: 'center' }
+    { id: 'action', label: 'Hành động', minWidth: 130, align: 'start' }
   ]
 
   return (
@@ -112,20 +110,41 @@ const SizeTable = ({
                   sx={{
                     display: 'flex',
                     justifyContent: 'space-between',
-                    alignItems: 'center'
+                    alignItems: 'start'
                   }}
                 >
-                  <Typography variant='h6' sx={{ fontWeight: '800' }}>
-                    Danh sách kích thước
-                  </Typography>
-                  <Button
-                    variant='contained'
-                    sx={styles.buttonAdd}
-                    startIcon={<AddIcon />}
-                    onClick={addSize}
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: 1,
+                      minWidth: 250
+                    }}
                   >
-                    Thêm kích thước
-                  </Button>
+                    <Typography variant='h6' sx={{ fontWeight: '800' }}>
+                      Danh Sách Kích Thước
+                    </Typography>
+                    <Button
+                      variant='contained'
+                      color='primary'
+                      onClick={addSize}
+                      startIcon={<AddIcon />}
+                      sx={{
+                        textTransform: 'none',
+                        width: 100,
+                        display: 'flex',
+                        alignItems: 'center'
+                      }}
+                    >
+                      Thêm
+                    </Button>
+                  </Box>
+                  <FilterSize
+                    onFilter={onFilters}
+                    sizes={sizes}
+                    loading={loading}
+                    fetchSizes={fetchSizes}
+                  />
                 </Box>
               </TableCell>
             </TableRow>
@@ -139,7 +158,8 @@ const SizeTable = ({
                     ...(column.id === 'index' && { width: '50px' }),
                     ...(column.id === 'action' && {
                       width: '130px',
-                      maxWidth: '130px'
+                      maxWidth: '130px',
+                      paddingLeft: '6px'
                     }),
                     ...(column.id === 'name' && { width: '70%' })
                   }}
@@ -161,7 +181,7 @@ const SizeTable = ({
                 <SizeRow
                   key={size._id}
                   size={size}
-                  idx={idx + 1}
+                  idx={page * rowsPerPage + idx + 1}
                   columns={columns}
                   handleOpenModal={handleOpenModal}
                 />
@@ -179,17 +199,20 @@ const SizeTable = ({
       <TablePagination
         rowsPerPageOptions={[10, 25, 100]}
         component='div'
-        count={filteredSizes.length}
+        count={total || 0}
         rowsPerPage={rowsPerPage}
         page={page}
-        labelRowsPerPage='Số dòng mỗi trang'
-        labelDisplayedRows={({ from, to, count }) => {
-          const actualTo = to > count ? count : to
-          const actualFrom = from > count ? count : from
-          return `${actualFrom}–${actualTo} trên ${
-            count !== -1 ? count : `hơn ${actualTo}`
-          }`
+        onPageChange={(event, newPage) => onPageChange(event, newPage + 1)} // +1 để đúng logic bên cha
+        onRowsPerPageChange={(event) => {
+          const newLimit = parseInt(event.target.value, 10)
+          if (onChangeRowsPerPage) {
+            onChangeRowsPerPage(newLimit)
+          }
         }}
+        labelRowsPerPage='Số dòng mỗi trang'
+        labelDisplayedRows={({ from, to, count }) =>
+          `${from}–${to} trên ${count !== -1 ? count : `hơn ${to}`}`
+        }
       />
     </Paper>
   )

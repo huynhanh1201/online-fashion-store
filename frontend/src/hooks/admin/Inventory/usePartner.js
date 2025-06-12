@@ -9,17 +9,30 @@ import {
 
 const usePartner = () => {
   const [partners, setPartners] = React.useState([])
-  const [total, setTotal] = React.useState(0)
-
+  const [totalPartner, setTotal] = React.useState(0)
+  const [loadingPartner, setLoading] = React.useState(false)
   const fetchPartners = async (page = 1, limit = 10, filters = {}) => {
-    try {
-      const { partners, total } = await getPartners({
-        page,
-        limit,
-        ...filters
+    setLoading(true)
+    const buildQuery = (input) => {
+      const query = { page, limit, ...input }
+      Object.keys(query).forEach((key) => {
+        if (
+          query[key] === '' ||
+          query[key] === undefined ||
+          query[key] === null
+        ) {
+          delete query[key]
+        }
       })
+      return query
+    }
+    try {
+      const query = buildQuery(filters)
+      const { partners, total } = await getPartners(query)
       setPartners(partners)
       setTotal(total || 0)
+      setLoading(false)
+
       return { partners, total }
     } catch (error) {
       console.error('Error fetching partners:', error)
@@ -74,7 +87,8 @@ const usePartner = () => {
 
   return {
     partners,
-    total,
+    totalPartner,
+    loadingPartner,
     fetchPartners,
     fetchPartnerById,
     createNewPartner,

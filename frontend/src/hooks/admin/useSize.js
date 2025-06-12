@@ -1,17 +1,31 @@
 import { useState } from 'react'
 import { getSizes, addSize } from '~/services/admin/sizeService'
 
-const useSizes = (pageSize = 1, limit = 10) => {
+const useSizes = () => {
   const [sizes, setSizes] = useState([])
   const [totalPages, setTotalPages] = useState(1)
   const [loading, setLoading] = useState(false)
 
-  const fetchSizes = async (page = pageSize) => {
+  const fetchSizes = async (page = 1, limit = 10, filters) => {
     setLoading(true)
+    const buildQuery = (input) => {
+      const query = { page, limit, ...input }
+      Object.keys(query).forEach((key) => {
+        if (
+          query[key] === '' ||
+          query[key] === undefined ||
+          query[key] === null
+        ) {
+          delete query[key]
+        }
+      })
+      return query
+    }
     try {
-      const { sizes, total } = await getSizes(page, limit)
+      const query = buildQuery(filters)
+      const { sizes, total } = await getSizes(query)
       setSizes(sizes)
-      setTotalPages(Math.max(1, Math.ceil(total / limit)))
+      setTotalPages(total)
     } catch (error) {
       console.error('Lỗi khi lấy danh sách kích thước:', error)
     }

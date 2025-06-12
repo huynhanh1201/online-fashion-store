@@ -8,7 +8,7 @@ const defaultOptions = [
   { label: 'Cũ nhất', value: 'oldest' }
 ]
 
-export default function SortSelect({
+export default function FilterSelect({
   label = 'Sắp xếp',
   value,
   onChange,
@@ -16,7 +16,7 @@ export default function SortSelect({
   sx
 }) {
   return (
-    <FormControl size='small' sx={{ minWidth: 160, ...sx }}>
+    <FormControl size='small' sx={{ minWidth: 220, maxWidth: 300, ...sx }}>
       <InputLabel>{label}</InputLabel>
       <Select
         value={value}

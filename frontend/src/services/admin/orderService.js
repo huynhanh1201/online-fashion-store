@@ -2,15 +2,15 @@ import AuthorizedAxiosInstance from '~/utils/authorizedAxios.js'
 import { API_ROOT } from '~/utils/constants.js'
 
 // Lấy danh sách đơn hàng (có phân trang)
-export const getOrders = async (page = 1, limit = 10) => {
+export const getOrders = async (filter) => {
+  const query = new URLSearchParams(filter).toString()
   try {
     const response = await AuthorizedAxiosInstance.get(
-      `${API_ROOT}/v1/orders?page=${page}&limit=${limit}`
+      `${API_ROOT}/v1/orders?${query}`
     )
-    const orders = response.data
     return {
-      orders,
-      total: orders.length // sửa nếu backend có trả về tổng số đơn thật
+      orders: response.data.data || [],
+      total: response.data.meta.total || 0
     }
   } catch (error) {
     console.error('Lỗi khi lấy danh sách đơn hàng:', error)
