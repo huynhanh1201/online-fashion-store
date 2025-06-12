@@ -189,7 +189,7 @@ const Content = () => {
 
       {/* Stitch Products */}
       <div className='product-grid'>
-        {[...products.slice(-5)].reverse().map((product) => (
+        {[...products.slice(-(window.innerWidth < 1460 ? 5 : 6))].reverse().map((product) => (
           <ProductCard key={product._id || product.id} product={product} />
         ))}
       </div>

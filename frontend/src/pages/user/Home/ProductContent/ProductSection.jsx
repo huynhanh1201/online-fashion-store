@@ -1,5 +1,6 @@
 import ProductCard from '~/components/ProductCards/ProductCards.jsx'
 import React from 'react'
+import { CircularProgress, Typography } from '@mui/material'
 
 const styles = {
   section: {
@@ -9,15 +10,15 @@ const styles = {
     display: 'grid',
     gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
     gap: '20px',
-    alignItems: 'start' // Thêm để căn chỉnh items
+    alignItems: 'start'
   },
   banner: {
     position: 'relative',
     height: '420px',
     borderRadius: '10px',
     overflow: 'hidden',
-    gridColumn: '1', // Đảm bảo banner luôn ở vị trí đầu
-    gridRow: '1' // Đặt banner ở hàng đầu tiên
+    gridColumn: '1',
+    gridRow: '1'
   },
   bannerImg: {
     width: '100%',
@@ -30,7 +31,7 @@ const styles = {
     top: '20px',
     left: '20px',
     color: 'white',
-    textShadow: '0 2px 4px rgba(0,0,0,0.5)' // Thêm shadow để text dễ đọc hơn
+    textShadow: '0 2px 4px rgba(0,0,0,0.5)'
   },
   bannerTitle: {
     margin: '0 0 8px 0',
@@ -45,22 +46,24 @@ const styles = {
   productItem: {
     width: '100%'
   },
-  seeMore: {
-    display: 'block',
-    marginTop: '20px',
-    textAlign: 'center'
+  loadingContainer: {
+    gridColumn: '1 / -1',
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: '40px',
+    gap: '16px'
   },
-  button: {
-    padding: '10px 20px',
-    backgroundColor: '#e0e0e0',
-    border: 'none',
-    borderRadius: '5px',
-    fontSize: '14px',
-    cursor: 'pointer',
-    transition: 'background-color 0.2s ease'
+  errorContainer: {
+    gridColumn: '1 / -1',
+    textAlign: 'center',
+    padding: '20px',
+    color: '#d32f2f',
+    fontSize: '16px'
   },
   noProducts: {
-    gridColumn: '1 / -1', // Span toàn bộ grid
+    gridColumn: '1 / -1',
     textAlign: 'center',
     padding: '20px',
     color: '#666',
@@ -68,24 +71,7 @@ const styles = {
   }
 }
 
-const ProductSection = ({ bannerImg, bannerTitle, bannerDesc, products }) => {
-  // Kiểm tra và xử lý dữ liệu products - FIX: products có cấu trúc { products: [...], total: number }
-  let productArray = []
-
-  if (products) {
-    if (Array.isArray(products)) {
-      // Trường hợp products là array trực tiếp
-      productArray = products
-    } else if (products.products && Array.isArray(products.products)) {
-      // Trường hợp products có cấu trúc { products: [...], total: number }
-      productArray = products.products
-    }
-  }
-
-  const validProducts = productArray.filter(
-    (product) => product && (product._id || product.id)
-  )
-
+const ProductSection = ({ bannerImg, bannerTitle, bannerDesc, products, loading, error }) => {
   return (
     <div style={styles.section}>
       <div style={styles.grid}>
@@ -112,12 +98,26 @@ const ProductSection = ({ bannerImg, bannerTitle, bannerDesc, products }) => {
           </div>
         </div>
 
+        {/* Loading State */}
+        {loading && (
+          <div style={styles.loadingContainer}>
+            <CircularProgress />
+            <Typography>Đang tải sản phẩm...</Typography>
+          </div>
+        )}
+
+        {/* Error State */}
+        {error && (
+          <div style={styles.errorContainer}>
+            <Typography color="error">{error}</Typography>
+          </div>
+        )}
+
         {/* Products */}
-        {validProducts.length > 0 ? (
-          validProducts.map((product, index) => {
+        {!loading && !error && products && products.length > 0 ? (
+          products.map((product) => {
             // Xử lý ảnh sản phẩm
-            let productImage =
-              'https://via.placeholder.com/220x220?text=No+Image'
+            let productImage = 'https://via.placeholder.com/220x220?text=No+Image'
 
             if (product.image) {
               if (Array.isArray(product.image) && product.image.length > 0) {
@@ -127,26 +127,20 @@ const ProductSection = ({ bannerImg, bannerTitle, bannerDesc, products }) => {
               }
             }
 
-            const productWithSingleImage = {
-              ...product,
-              image: productImage
-            }
-
             return (
               <div
-                key={product._id || product.id || `product-${index}`}
+                key={product._id || product.id}
                 style={styles.productItem}
               >
-                <ProductCard product={productWithSingleImage} />
+                <ProductCard product={product} />
               </div>
             )
           })
-        ) : (
+        ) : !loading && !error ? (
           <div style={styles.noProducts}>
-            <p>Không có sản phẩm để hiển thị</p>
-            <small>Kiểm tra console để xem dữ liệu products</small>
+            <Typography>Không có sản phẩm để hiển thị</Typography>
           </div>
-        )}
+        ) : null}
       </div>
     </div>
   )

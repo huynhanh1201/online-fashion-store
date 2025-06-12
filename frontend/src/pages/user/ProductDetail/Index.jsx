@@ -89,7 +89,7 @@ const ProductDetail = () => {
       }}
     >
       <Box sx={{ mb: 2, mt: 0, p: 1 }}>
-        <Box sx={{ display: 'flex', alignItems: 'center', fontSize: 15, py: 1, px: 0, bgcolor: '#fafafa', borderRadius: 1 }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', fontSize: 15, py: 1, px: 0,borderRadius: 1 }}>
           <Typography
             component={RouterLink}
             to="/"

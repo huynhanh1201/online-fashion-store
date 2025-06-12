@@ -5,17 +5,19 @@
 }
 
 .content-container {
-    max-width: 1450px;
+    max-width: 1800px;
     margin: 0 auto;
     padding: 24px 16px;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    width: 100%;
 }
 
 /* Category Grid */
 .category-grid {
     display: grid;
     gap: 16px;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    margin-bottom: 32px;
 }
 
 .category-card {
@@ -96,7 +98,7 @@
 
 /* Stitch Banner */
 .stitch-banner {
-    background-image: url('https://file.hstatic.net/1000360022/file/banner_danh_m_c_sp_trang_ch__destop__2471x641px___2_.jpg'); /* hoặc link ảnh Stitch bạn muốn */
+    background-image: url('https://file.hstatic.net/1000360022/file/banner_danh_m_c_sp_trang_ch__destop__2471x641px___2_.jpg');
     background-size: cover;
     background-position: center;
     border-radius: 20px;
@@ -107,14 +109,15 @@
     position: relative;
     overflow: hidden;
     margin-bottom: 32px;
-    min-height: 350px;
+    min-height: 250px;
     object-fit: contain;
 }
+
 /* Product Grid */
 .product-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, min(200px, 1fr));
-    gap: 16px;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 20px;
     margin-bottom: 32px;
 }
 
@@ -145,7 +148,6 @@
     flex-direction: column;
     justify-content: start;
 }
-
 
 .product-name {
     font-size: 14px;
@@ -261,15 +263,19 @@
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     gap: 16px;
-    margin-top: 32px;
     margin-bottom: 32px;
+    padding: 16px 0;
 }
 
 .feature-card {
-    border-radius: 12px;
-    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     text-align: center;
-    transition: box-shadow 0.2s ease;
+    padding: 16px;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
 .feature-icon {
@@ -288,102 +294,86 @@
     color: #6b7280;
 }
 
-/* Responsive Design */
-@media (min-width: 1400px) {
-    .product-grid {
-        grid-template-columns: repeat(5, minmax(200px, 1fr));
+/* Responsive Media Queries */
+@media (max-width: 1200px) {
+    .content-container {
+        padding: 20px 12px;
     }
-}
-
-@media (min-width: 768px) and (max-width: 1399px) {
+    
     .product-grid {
-        grid-template-columns: repeat(4, minmax(200px, 1fr));
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
     }
 }
 
 @media (max-width: 768px) {
     .content-container {
-        padding: 16px 12px;
+        padding: 16px 8px;
     }
-
+    
     .category-grid {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 12px;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
     }
-
-    .voucher-grid {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 12px;
-    }
-
-    .product-grid {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 12px;
-    }
-
-    .banner-title {
-        font-size: 24px;
-    }
-
-    .banner-subtitle {
-        font-size: 16px;
-    }
-
-    .stitch-banner {
-        padding: 32px 20px;
-    }
-
-    .banner-icon {
-        font-size: 32px;
-        right: 20px;
-    }
-
-    .flash-sale {
-        padding: 20px;
-    }
-
-    .flash-sale-header {
-        flex-direction: column;
-        align-items: flex-start;
-    }
-
-    .flash-sale-title {
-        font-size: 20px;
-    }
-
+    
     .features-grid {
         grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .product-grid {
+        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+        gap: 12px;
+    }
+    
+    .stitch-banner {
+        min-height: 200px;
+        padding: 24px 16px;
+    }
+    
+    .product-image {
+        height: 280px;
     }
 }
 
 @media (max-width: 480px) {
+    .content-container {
+        padding: 12px 8px;
+    }
+    
     .category-grid {
         grid-template-columns: 1fr;
     }
-
+    
+    .features-grid {
+        grid-template-columns: 1fr;
+    }
+    
     .product-grid {
-        grid-template-columns: repeat(2, 1fr);
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
         gap: 8px;
     }
-
-    .product-name {
-        font-size: 10px;
-        height: 28px;
+    
+    .stitch-banner {
+        min-height: 150px;
+        padding: 16px 12px;
     }
-
-    .current-price {
+    
+    .product-image {
+        height: 200px;
+    }
+    
+    .product-name {
         font-size: 12px;
     }
-
+    
+    .current-price {
+        font-size: 14px;
+    }
+    
     .original-price {
         font-size: 10px;
     }
-
-    .voucher-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .features-grid {
-        grid-template-columns: 1fr;
+    
+    .cta-button {
+        padding: 8px 24px;
+        font-size: 14px;
     }
 }

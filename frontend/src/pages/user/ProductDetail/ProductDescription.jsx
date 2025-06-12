@@ -10,8 +10,7 @@ const ProductDescription = ({ description, productId }) => {
   }
 
   return (
-    <Box sx={{ mt: 5 }}>
-      <DialogTitle>Thông tin sản phẩm</DialogTitle>
+    <Box>
 
       <Tabs value={tabIndex} onChange={handleChange}>
         <Tab label='Mô tả sản phẩm' />
