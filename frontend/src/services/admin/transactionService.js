@@ -2,12 +2,16 @@ import AuthorizedAxiosInstance from '~/utils/authorizedAxios'
 import { API_ROOT } from '~/utils/constants'
 
 // ✅ Lấy tất cả giao dịch (không truyền orderId)
-export const getAllTransactions = async () => {
+export const getAllTransactions = async (filter) => {
+  const queryParams = new URLSearchParams(filter).toString()
   try {
     const response = await AuthorizedAxiosInstance.get(
-      `${API_ROOT}/v1/payment-transactions/`
+      `${API_ROOT}/v1/payment-transactions?${queryParams}`
     )
-    return response.data
+    return {
+      transactions: response.data || response.data.data || [],
+      total: response.data.length || response.data.meta.total || 0
+    }
   } catch (error) {
     console.error('Lỗi khi lấy danh sách giao dịch:', error)
     return []

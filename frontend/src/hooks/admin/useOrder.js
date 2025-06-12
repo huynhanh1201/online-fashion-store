@@ -12,12 +12,26 @@ const useOrder = () => {
   const [loading, setLoading] = useState(false)
   const [totalPages, setTotalPages] = useState(1)
 
-  const fetchOrders = async (page = 1, limit = 10) => {
+  const fetchOrders = async (page = 1, limit = 10, filters) => {
     setLoading(true)
+    const buildQuery = (input) => {
+      const query = { page, limit, ...input }
+      Object.keys(query).forEach((key) => {
+        if (
+          query[key] === '' ||
+          query[key] === undefined ||
+          query[key] === null
+        ) {
+          delete query[key]
+        }
+      })
+      return query
+    }
     try {
-      const { orders, total } = await getOrders(page, limit)
+      const query = buildQuery(filters)
+      const { orders, total } = await getOrders(query)
       setOrders(orders)
-      setTotalPages(Math.max(1, Math.ceil(total / limit)))
+      setTotalPages(total)
     } catch (error) {
       console.error('Lỗi khi fetch đơn hàng:', error)
       setOrders([])

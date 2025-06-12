@@ -1,16 +1,34 @@
 import { useState } from 'react'
 import { getDiscounts } from '~/services/admin/discountService'
 
-const useDiscounts = (initialPage = 1, limit = 10) => {
+const useDiscounts = () => {
   const [discounts, setDiscounts] = useState([])
   const [totalPages, setTotalPages] = useState(1)
   const [loading, setLoading] = useState(false)
 
-  const fetchDiscounts = async (page = initialPage) => {
+  const fetchDiscounts = async (page = 1, limit = 10, filters) => {
     setLoading(true)
-    const { discounts, total } = await getDiscounts(page, limit)
-    setDiscounts(discounts)
-    setTotalPages(Math.max(1, Math.ceil(total / limit)))
+    const buildQuery = (input) => {
+      const query = { page, limit, ...input }
+      Object.keys(query).forEach((key) => {
+        if (
+          query[key] === '' ||
+          query[key] === undefined ||
+          query[key] === null
+        ) {
+          delete query[key]
+        }
+      })
+      return query
+    }
+    try {
+      const query = buildQuery(filters)
+      const { discounts, total } = await getDiscounts(query)
+      setDiscounts(discounts)
+      setTotalPages(total)
+    } catch (error) {
+      console.error('Error fetching discounts:', error)
+    }
     setLoading(false)
   }
 

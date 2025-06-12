@@ -73,7 +73,6 @@ const WarehouseSlipsTab = ({
 
   const handleCloseModal = () => {
     setOpenModal(false)
-    refreshWarehouseSlips()
     setModalType('input')
     setNewSlipData({
       slipId: '',
@@ -85,12 +84,6 @@ const WarehouseSlipsTab = ({
       note: ''
     })
     setItems([{ variantId: '', lot: '', quantity: '', unit: '', note: '' }])
-  }
-
-  const handleAddSlip = async (newSlip) => {
-    // setData([...data, newSlip])
-    await addWarehouseSlip(newSlip)
-    handleCloseModal()
   }
 
   const handleChange = (field) => (event) => {
@@ -117,22 +110,6 @@ const WarehouseSlipsTab = ({
   const handleDeleteRow = (index) => {
     const newItems = items.filter((_, i) => i !== index)
     setItems(newItems)
-  }
-
-  const handleAdd = () => {
-    const newSlip = {
-      type: modalType === 'input' ? 'import' : 'export',
-      date: newSlipData.date ? new Date(newSlipData.date).toISOString() : null,
-      partnerId: newSlipData.partnerId || '',
-      warehouseId: newSlipData.warehouseId || '',
-      items: items.map((item) => ({
-        variantId: item.variantId || '',
-        quantity: parseInt(item.quantity) || 0,
-        unit: item.unit || 'cái'
-      })),
-      note: newSlipData.note || ''
-    }
-    handleAddSlip(newSlip)
   }
 
   const handleViewSlip = (slip) => {
@@ -294,7 +271,6 @@ const WarehouseSlipsTab = ({
         newSlipData={newSlipData}
         handleChange={handleChange}
         handleDateChange={handleDateChange}
-        handleAdd={handleAdd}
         warehouses={warehouses}
         items={items}
         handleItemChange={handleItemChange}

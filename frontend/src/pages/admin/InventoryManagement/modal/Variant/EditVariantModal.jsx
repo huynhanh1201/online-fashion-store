@@ -68,7 +68,7 @@ const EditVariantModal = ({
         colorImage: variant.color?.image || ''
       })
     }
-  }, [variant, reset])
+  }, [reset])
 
   const handleUploadImage = async (e) => {
     const file = e.target.files[0]

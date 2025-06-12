@@ -17,8 +17,6 @@ import {
 } from '@mui/material'
 import { useForm, Controller } from 'react-hook-form'
 import { toast } from 'react-toastify'
-import useColors from '~/hooks/admin/useColor'
-import useSizes from '~/hooks/admin/useSize'
 import useColorPalettes from '~/hooks/admin/useColorPalettes'
 import useSizePalettes from '~/hooks/admin/useSizePalettes'
 import { getVariantById } from '~/services/admin/Inventory/VariantService.js'
@@ -51,7 +49,9 @@ const AddVariantModal = ({
   addVariant,
   products,
   formatCurrency,
-  parseCurrency
+  parseCurrency,
+  colors,
+  sizes
 }) => {
   const {
     register,
@@ -73,8 +73,6 @@ const AddVariantModal = ({
     }
   })
 
-  const { colors, fetchColors } = useColors()
-  const { sizes, fetchSizes } = useSizes()
   const { addColorPalette } = useColorPalettes(watch('productId'))
   const { addSizePalette } = useSizePalettes(watch('productId'))
   const [openColorModal, setOpenColorModal] = useState(false)
@@ -86,6 +84,7 @@ const AddVariantModal = ({
   const colorImage = watch('colorImage') // Theo dõi colorImage để hiển thị preview
   const productId = watch('productId') // Theo dõi productId để lấy giá sản phẩm
   useEffect(() => {
+    if (!productId) return
     if (productId) {
       const selectedProduct = products.find((p) => p._id === productId)
       if (selectedProduct) {
@@ -113,10 +112,6 @@ const AddVariantModal = ({
       }
     }
     fetchVariants()
-  }, [productId, products, setValue])
-  useEffect(() => {
-    fetchColors()
-    fetchSizes()
   }, [])
 
   const isSizeDisabled = (color, size) => {
@@ -136,7 +131,6 @@ const AddVariantModal = ({
 
   const handleCloseColorModal = () => {
     setOpenColorModal(false)
-    fetchColors()
   }
 
   const handleOpenSizeModal = () => {
@@ -145,7 +139,6 @@ const AddVariantModal = ({
 
   const handleCloseSizeModal = () => {
     setOpenSizeModal(false)
-    fetchSizes()
   }
 
   const handleUploadImage = async (e) => {

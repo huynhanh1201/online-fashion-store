@@ -23,14 +23,16 @@ const DiscountPagination = React.lazy(() => import('./DiscountPagination'))
 
 function DiscountManagement() {
   const [page, setPage] = React.useState(1)
+  const [limit, setLimit] = React.useState(10)
+  const [filters, setFilters] = React.useState({})
   const [selectedDiscount, setSelectedDiscount] = React.useState(null)
   const [modalType, setModalType] = React.useState(null)
 
   const { discounts, totalPages, loading, fetchDiscounts } = useDiscounts()
 
   React.useEffect(() => {
-    fetchDiscounts(page)
-  }, [page])
+    fetchDiscounts(page, limit, filters)
+  }, [page, limit])
 
   const handleOpenModal = (type, discount) => {
     if (!discount || !discount._id) return
@@ -47,25 +49,37 @@ function DiscountManagement() {
 
   const handleSaveDiscount = async (discountId, updatedData) => {
     const updated = await updateDiscount(discountId, updatedData)
-    if (updated) await fetchDiscounts(page)
+    if (updated) await fetchDiscounts(page, limit)
   }
 
   const handleDeleteDiscount = async (discountId) => {
     const deleted = await deleteDiscount(discountId)
-    if (deleted) await fetchDiscounts(page)
+    if (deleted) await fetchDiscounts(page, limit)
+  }
+  const handleFilter = (newFilters) => {
+    setFilters(newFilters)
+    if (Object.keys(newFilters).length > 0) {
+      fetchDiscounts(1, limit, newFilters)
+    }
   }
 
   return (
     <>
-      <Typography variant='h5' sx={{ mb: 2 }}>
-        Quản lý mã giảm giá
-      </Typography>
-
       <DiscountTable
         discounts={discounts}
         loading={loading}
         onAction={handleOpenModal}
         addDiscount={() => setModalType('add')}
+        onFilter={handleFilter}
+        fetchDiscounts={fetchDiscounts}
+        page={page - 1}
+        rowsPerPage={limit}
+        total={totalPages}
+        onPageChange={handleChangePage}
+        onChangeRowsPerPage={(newLimit) => {
+          setPage(1)
+          setLimit(newLimit)
+        }}
       />
 
       {modalType === 'add' && (

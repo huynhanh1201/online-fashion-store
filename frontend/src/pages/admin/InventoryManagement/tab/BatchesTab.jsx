@@ -19,21 +19,28 @@ import DeleteForeverIcon from '@mui/icons-material/DeleteForever'
 import EditBatchModal from '../modal/Batch/EditBatchModal.jsx'
 import ViewBatchModal from '../modal/Batch/ViewBatchModal.jsx'
 import DeleteBatchModal from '../modal/Batch/DeleteBatchModal.jsx'
+import FilterBatches from '~/components/FilterAdmin/FilterBatches.jsx'
 
 const BatchesTab = ({
   data,
   variants,
+  warehouse,
   page,
   rowsPerPage,
   onPageChange,
-  onRowsPerPageChange,
+  onChangeRowsPerPage,
+  loading,
+  total,
   updateBatch,
   refreshBatches,
   deleteBatch,
   warehouses,
   parseCurrency,
-  formatCurrency
+  formatCurrency,
+  fetchVariants,
+  fetchWarehouses
 }) => {
+  const [filter, setFilter] = useState({})
   const enrichedBatches = data.map((batch) => {
     const variantName =
       typeof batch.variantId === 'object'
@@ -103,10 +110,14 @@ const BatchesTab = ({
     },
     { id: 'action', label: 'Hành động', minWidth: 150, align: 'center' }
   ]
+  useEffect(() => {
+    fetchVariants()
+    fetchWarehouses()
+  }, [])
 
   useEffect(() => {
-    refreshBatches()
-  }, [])
+    refreshBatches(page, rowsPerPage, filter)
+  }, [page, rowsPerPage])
 
   const [openEditModal, setOpenEditModal] = useState(false)
   const [selectedBatch, setSelectedBatch] = useState(null)
@@ -143,6 +154,12 @@ const BatchesTab = ({
     refreshBatches()
   }
 
+  const handleFilter = (newFilters) => {
+    setFilter(newFilters)
+    if (Object.keys(newFilters).length > 0) {
+      refreshBatches(1, rowsPerPage, newFilters)
+    }
+  }
   return (
     <Paper sx={{ border: '1px solid #ccc', width: '100%', overflow: 'hidden' }}>
       <TableContainer>
@@ -154,12 +171,29 @@ const BatchesTab = ({
                   sx={{
                     display: 'flex',
                     justifyContent: 'space-between',
-                    alignItems: 'center'
+                    alignItems: 'start'
                   }}
                 >
-                  <Typography variant='h6' sx={{ fontWeight: '800' }}>
-                    Danh sách lô hàng
-                  </Typography>
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: 1,
+                      minWidth: 250
+                    }}
+                  >
+                    <Typography variant='h6' sx={{ fontWeight: '800' }}>
+                      Danh Sách Lô Hàng
+                    </Typography>
+                  </Box>
+                  <FilterBatches
+                    variants={variants}
+                    warehouses={warehouse}
+                    onFilter={handleFilter}
+                    loading={loading}
+                    batches={data}
+                    fetchData={refreshBatches}
+                  />
                 </Box>
               </TableCell>
             </TableRow>
@@ -223,17 +257,20 @@ const BatchesTab = ({
       <TablePagination
         rowsPerPageOptions={[10, 25, 100]}
         component='div'
-        count={data.length}
+        count={total || 0}
         rowsPerPage={rowsPerPage}
-        page={page}
-        onPageChange={onPageChange}
-        onRowsPerPageChange={(e) => onRowsPerPageChange(e, 'batch')}
-        labelRowsPerPage='Số dòng mỗi trang'
-        labelDisplayedRows={({ from, to, count }) => {
-          const actualTo = to > count ? count : to // nếu to vượt quá count thì lấy count
-          const actualFrom = from > count ? count : from // nếu from vượt quá count thì lấy count
-          return `${actualFrom}–${actualTo} trên ${count !== -1 ? count : `hơn ${actualTo}`}`
+        page={page - 1}
+        onPageChange={(event, newPage) => onPageChange(event, newPage + 1)} // +1 để đúng logic bên cha
+        onRowsPerPageChange={(event) => {
+          const newLimit = parseInt(event.target.value, 10)
+          if (onChangeRowsPerPage) {
+            onChangeRowsPerPage(newLimit)
+          }
         }}
+        labelRowsPerPage='Số dòng mỗi trang'
+        labelDisplayedRows={({ from, to, count }) =>
+          `${from}–${to} trên ${count !== -1 ? count : `hơn ${to}`}`
+        }
       />
       <EditBatchModal
         open={openEditModal}
