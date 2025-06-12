@@ -21,7 +21,6 @@ import { deliveriesService } from '~/services/deliveriesService'
 import generateSequentialCode from '~/utils/generateSequentialCode'
 import validatePagination from '~/utils/validatePagination'
 import getDateRange from '~/utils/getDateRange'
-import { SizeModel } from '~/models/SizeModel'
 
 const createOrder = async (userId, reqBody, ipAddr) => {
   // eslint-disable-next-line no-useless-catch
@@ -400,7 +399,10 @@ const getOrderList = async (queryString) => {
       sort,
       filterTypeDate,
       startDate,
-      endDate
+      endDate,
+      status,
+      paymentMethod,
+      paymentStatus
     } = queryString
 
     // Kiểm tra dữ liệu đầu vào của limit và page
@@ -410,6 +412,12 @@ const getOrderList = async (queryString) => {
     const filter = {}
 
     if (userId) filter.userId = userId
+
+    if (status) filter.status = status
+
+    if (paymentMethod) filter.paymentMethod = paymentMethod.toUpperCase()
+
+    if (paymentStatus) filter.paymentStatus = paymentStatus
 
     const dateRange = getDateRange(filterTypeDate, startDate, endDate)
 
