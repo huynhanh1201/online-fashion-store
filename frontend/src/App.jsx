@@ -17,7 +17,8 @@ import Cart from '~/pages/user/Cart/Cart'
 import Profile from '~/pages/user/Profile/Profile'
 import Order from '~/pages/user/Orders/OrderListPage'
 import PaymentVnpay from '~/pages/user/PaymentVnpay/PaymentVnpay'
-import OrderSuccess from './pages/OrderSuccess/OrderSuccess'
+import OrderSuccess from './pages/user/OrderSuccess/OrderSuccess'
+import OrderFailed from './pages/user/OrderFailed/OrderFailed'
 import SearchResult from '~/pages/user/SearchResult/SearchResult'
 import Blog from '~/pages/user/Blog/Blog'
 // Trang HeaderAdmin
@@ -76,7 +77,7 @@ function App() {
           <Route path='/payment-result' element={<PaymentVnpay />} />
           <Route
             path='/payment-failed'
-            element={<h2>THANH TOÁN THẤT BẠI!</h2>}
+            element={<OrderFailed />}
           />
 
           {/*=======End=========*/}
