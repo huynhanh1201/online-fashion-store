@@ -8,8 +8,8 @@ export const getSizes = async (filter) => {
       `${API_ROOT}/v1/sizes?${queryString}`
     )
     return {
-      sizes: response.data || response.data.data || [],
-      total: response.data.length || response.data.meta.total || 0
+      sizes: response.data.data || [],
+      total: response.data.meta.total || 0
     }
   } catch (error) {
     console.error('Lỗi khi lấy danh sách kích thước:', error)

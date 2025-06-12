@@ -16,7 +16,6 @@ import FilterSelect from '~/components/FilterAdmin/common/FilterSelect.jsx'
 export default function FilterOrder({
   onFilter,
   users = [],
-  coupons = [],
   loading,
   fetchOrders
 }) {
@@ -24,7 +23,6 @@ export default function FilterOrder({
   const [inputValue, setInputValue] = useState('')
 
   const [userId, setUserId] = useState('')
-  const [couponId, setCouponId] = useState('')
   const [minTotal, setMinTotal] = useState('')
   const [maxTotal, setMaxTotal] = useState('')
   const [status, setStatus] = useState('')
@@ -37,7 +35,7 @@ export default function FilterOrder({
   const [sort, setSort] = useState('')
   useEffect(() => {
     applyFilters()
-  }, [keyword, userId, couponId, status, sort, paymentMethod, paymentStatus])
+  }, [keyword, userId, status, sort, paymentMethod, paymentStatus])
 
   const handleSearch = () => {
     setKeyword(inputValue)
@@ -49,7 +47,6 @@ export default function FilterOrder({
     applyFilters({
       keyword,
       userId,
-      couponId,
       minTotal,
       maxTotal,
       status,
@@ -65,10 +62,9 @@ export default function FilterOrder({
   const applyFilters = ({
     search: k = keyword,
     userId: uid = userId,
-    couponId: cid = couponId,
     minTotal: min = minTotal,
     maxTotal: max = maxTotal,
-    status: st = status,
+    statusOrder: st = status,
     sort: s = sort,
     paymentMethod: pm = paymentMethod,
     paymentStatus: ps = paymentStatus,
@@ -79,8 +75,7 @@ export default function FilterOrder({
     const filters = {
       search: k || undefined,
       userId: uid || undefined,
-      couponId: cid === 'none' ? null : cid || undefined,
-      status: st || undefined,
+      statusOrder: st || undefined,
       sort: s || undefined,
       priceMin: min ? parseInt(min) : undefined,
       priceMax: max ? parseInt(max) : undefined,
@@ -114,7 +109,6 @@ export default function FilterOrder({
     setKeyword('')
     setInputValue('')
     setUserId('')
-    setCouponId('')
     setMinTotal('')
     setMaxTotal('')
     setStatus('')
@@ -144,19 +138,19 @@ export default function FilterOrder({
       {/*  ]}*/}
       {/*/>*/}
 
-      <FilterSelect
-        label='Mã giảm giá'
-        value={couponId}
-        onChange={setCouponId}
-        options={[
-          { label: 'Tất cả', value: '' },
-          { label: 'Không dùng', value: 'none' },
-          ...coupons.map((c) => ({
-            label: c.code,
-            value: c._id
-          }))
-        ]}
-      />
+      {/*<FilterSelect*/}
+      {/*  label='Mã giảm giá'*/}
+      {/*  value={couponId}*/}
+      {/*  onChange={setCouponId}*/}
+      {/*  options={[*/}
+      {/*    { label: 'Tất cả', value: '' },*/}
+      {/*    { label: 'Không dùng', value: 'none' },*/}
+      {/*    ...coupons.map((c) => ({*/}
+      {/*      label: c.code,*/}
+      {/*      value: c._id*/}
+      {/*    }))*/}
+      {/*  ]}*/}
+      {/*/>*/}
 
       <FilterByPrice
         label='Giá trị đơn hàng'
@@ -173,10 +167,10 @@ export default function FilterOrder({
         onChange={setStatus}
         options={[
           { label: 'Tất cả', value: '' },
-          { label: 'Chờ xác nhận', value: 'PENDING' },
-          { label: 'Đã xác nhận', value: 'CONFIRMED' },
-          { label: 'Đã huỷ', value: 'CANCELLED' },
-          { label: 'Hoàn thành', value: 'COMPLETED' }
+          { label: 'Chờ xác nhận', value: 'pending' },
+          { label: 'Đã xác nhận', value: 'confirmed' },
+          { label: 'Đã huỷ', value: 'cancelled' },
+          { label: 'Hoàn thành', value: 'completed' }
         ]}
       />
 
@@ -186,8 +180,8 @@ export default function FilterOrder({
         onChange={setPaymentMethod}
         options={[
           { label: 'Tất cả', value: '' },
-          { label: 'COD', value: 'COD' },
-          { label: 'Chuyển khoản', value: 'BANKING' }
+          { label: 'COD', value: 'cod' },
+          { label: 'Chuyển khoản', value: 'vn_pay' }
         ]}
       />
 
@@ -197,9 +191,9 @@ export default function FilterOrder({
         onChange={setPaymentStatus}
         options={[
           { label: 'Tất cả', value: '' },
-          { label: 'Chờ thanh toán', value: 'Pending' },
-          { label: 'Đã thanh toán', value: 'Completed' },
-          { label: 'Thất bại', value: 'Failed' }
+          { label: 'Chờ thanh toán', value: 'pending' },
+          { label: 'Đã thanh toán', value: 'completed' },
+          { label: 'Thất bại', value: 'failed' }
         ]}
       />
       <FilterSelect value={sort} onChange={setSort} />

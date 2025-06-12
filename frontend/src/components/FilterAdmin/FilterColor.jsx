@@ -87,7 +87,6 @@ export default function FilterColor({
         value={status}
         onChange={(value) => {
           setStatus(value)
-          applyFilters(selectedFilter, startDate, endDate)
         }}
         options={[
           { label: 'Tất cả', value: '' },
