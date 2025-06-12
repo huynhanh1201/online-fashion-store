@@ -1,7 +1,6 @@
 import { ColorModel } from '~/models/ColorModel'
 import validatePagination from '~/utils/validatePagination'
 import getDateRange from '~/utils/getDateRange'
-import { CategoryModel } from '~/models/CategoryModel'
 
 const createColor = async (reqBody) => {
   // eslint-disable-next-line no-useless-catch
