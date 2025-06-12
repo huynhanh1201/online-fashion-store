@@ -9,8 +9,8 @@ export const getOrders = async (filter) => {
       `${API_ROOT}/v1/orders?${query}`
     )
     return {
-      orders: response.data || response.data.data || [],
-      total: response.data.length || 0
+      orders: response.data.data || [],
+      total: response.data.meta.total || 0
     }
   } catch (error) {
     console.error('Lỗi khi lấy danh sách đơn hàng:', error)
