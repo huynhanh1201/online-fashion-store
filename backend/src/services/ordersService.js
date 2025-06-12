@@ -394,7 +394,11 @@ const getOrderList = async (queryString) => {
   try {
     const { userId } = queryString
 
-    const result = await OrderModel.find({ userId })
+    const filter = {}
+
+    if (userId) filter.userId = userId
+
+    const result = await OrderModel.find(filter)
       .populate('userId couponId')
       .lean()
 
