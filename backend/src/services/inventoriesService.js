@@ -12,10 +12,12 @@ const getInventoryList = async (queryString) => {
     page = 1,
     warehouseId,
     variantId,
-    status,
+    statusInventory,
     filterTypeDate,
     startDate,
-    endDate
+    endDate,
+    status,
+    sort
   } = queryString
 
   const filter = {
@@ -26,6 +28,13 @@ const getInventoryList = async (queryString) => {
   validatePagination(page, limit)
 
   // Kiểm tra dữ liệu của query string
+
+  if (status === 'true' || status === 'false') {
+    status = JSON.parse(status)
+
+    filter.destroy = status
+  }
+
   if (warehouseId) {
     filter['warehouseId'] = warehouseId
   }
@@ -34,8 +43,8 @@ const getInventoryList = async (queryString) => {
     filter['variantId'] = variantId
   }
 
-  if (status) {
-    filter['status'] = status
+  if (statusInventory) {
+    filter['status'] = statusInventory
   }
 
   const dateRange = getDateRange(filterTypeDate, startDate, endDate)
@@ -47,8 +56,24 @@ const getInventoryList = async (queryString) => {
     }
   }
 
+  let sortField = {}
+
+  const sortMap = {
+    name_asc: { name: 1 },
+    name_desc: { name: -1 },
+    newest: { createdAt: -1 },
+    oldest: { createdAt: 1 }
+  }
+
+  if (sort) {
+    sortField = sortMap[sort]
+  }
+
   const [inventories, total] = await Promise.all([
     InventoryModel.find(filter)
+      .sort(sortField)
+      .skip((page - 1) * limit)
+      .limit(limit)
       .populate([
         {
           path: 'variantId',
@@ -59,8 +84,6 @@ const getInventoryList = async (queryString) => {
           select: 'name'
         }
       ])
-      .skip((page - 1) * limit)
-      .limit(limit)
       .lean(),
     InventoryModel.countDocuments(filter)
   ])
