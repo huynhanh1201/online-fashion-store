@@ -55,14 +55,14 @@ const getSizeList = async (queryString) => {
     }
   }
 
+  let sortField = {}
+
   const sortMap = {
     name_asc: { name: 1 },
     name_desc: { name: -1 },
     newest: { createdAt: -1 },
     oldest: { createdAt: 1 }
   }
-
-  let sortField = {}
 
   if (sort) {
     sortField = sortMap[sort]
