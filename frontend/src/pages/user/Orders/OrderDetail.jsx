@@ -70,16 +70,19 @@ const OrderDetail = () => {
 
   // Group items by product ID to handle variants
   const productGroups = items.reduce((groups, item) => {
-    const productId = item.productId || item.product?._id
+    const productId = item.productId?._id
+    if (!productId) return groups
+
     if (!groups[productId]) {
       groups[productId] = {
         productId,
-        productName: item.product?.name || 'Không xác định',
+        productName: item.productId?.name || 'Không xác định',
         variants: [],
         totalQuantity: 0,
         totalPrice: 0
       }
     }
+
     groups[productId].variants.push(item)
     groups[productId].totalQuantity += item.quantity
     groups[productId].totalPrice += item.price * item.quantity
@@ -164,7 +167,7 @@ const OrderDetail = () => {
 
         <Typography fontWeight="bold" mb={1}>Sản phẩm đã mua:</Typography>
         {uniqueProducts.map((product) => {
-          const firstVariant = product.variants[0]
+          // const firstVariant = product.variants[0]
           const hasMultipleVariants = product.variants.length > 1
           const productReviewed = isReviewed(product.productId)
 
@@ -174,10 +177,11 @@ const OrderDetail = () => {
               <Box display="flex" gap={2} alignItems="flex-start">
                 {/* Ảnh sản phẩm */}
                 <Avatar
-                  src={firstVariant.color?.image || '/default.jpg'}
+                  src={product.variants[0]?.productId?.image?.[0] || '/default.jpg'}
                   variant="square"
                   sx={{ width: 64, height: 64, borderRadius: 1 }}
                 />
+
 
                 {/* Thông tin sản phẩm và biến thể */}
                 <Box flex={1}>
