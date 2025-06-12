@@ -55,12 +55,11 @@ export default function FilterTransaction({
 
     // Thời gian thanh toán
     if (paidFilter === 'custom') {
-      filters.paidAt = {
-        from: paidFrom,
-        to: paidTo
-      }
+      filters.paidAtType = paidFilter
+      filters.paidAtFrom = paidFrom
+      filters.paidAtTo = paidTo
     } else if (paidFilter) {
-      filters.paidAt = { type: paidFilter }
+      filters.paidAtType = paidFilter
     }
     Object.keys(filters).forEach((key) => {
       if (
@@ -104,7 +103,7 @@ export default function FilterTransaction({
     setPaidFrom(dayjs().format('YYYY-MM-DD'))
     setPaidTo(dayjs().format('YYYY-MM-DD'))
     onFilter({})
-    fetchTransactions(1, 10, {})
+    fetchTransactions(1, 10)
   }
 
   return (

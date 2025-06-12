@@ -31,7 +31,7 @@ export default function FilterProduct({
 
   useEffect(() => {
     applyFilters()
-  }, [keyword, status, category, priceMin, priceMax, sort])
+  }, [keyword, status, category, sort])
 
   const handleSearch = () => {
     setKeyword(inputValue)
@@ -128,6 +128,7 @@ export default function FilterProduct({
       />
 
       <FilterByPrice
+        label='Giá sản phẩm'
         priceMin={priceMin}
         priceMax={priceMax}
         setPriceMin={setPriceMin}

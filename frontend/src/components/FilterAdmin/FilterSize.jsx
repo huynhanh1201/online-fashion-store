@@ -17,10 +17,11 @@ export default function FilterSize({
   const [startDate, setStartDate] = useState(dayjs().format('YYYY-MM-DD'))
   const [endDate, setEndDate] = useState(dayjs().format('YYYY-MM-DD'))
   const [status, setStatus] = useState('')
+  const [sort, setSort] = useState('')
 
   useEffect(() => {
     applyFilters(selectedFilter, startDate, endDate)
-  }, [keyword, status])
+  }, [keyword, status, sort])
 
   const handleApplyTimeFilter = (selected) => {
     setSelectedFilter(selected)
@@ -29,21 +30,20 @@ export default function FilterSize({
 
   const handleSearch = () => {
     setKeyword(inputValue)
-    fetchSizes(1, 10, { keyword: inputValue }) // Fetch lại nếu cần
     applyFilters(selectedFilter, startDate, endDate)
   }
 
   const applyFilters = (selectedTime, fromDate, toDate) => {
     const filters = {
       search: keyword || undefined,
-      destroy: status !== '' ? status : undefined
+      status: status !== '' ? status : undefined,
+      sort: sort || undefined
     }
 
     if (selectedTime === 'custom') {
-      filters.createdAt = {
-        from: fromDate,
-        to: toDate
-      }
+      filters.filterTypeDate = 'custom'
+      filters.startDate = fromDate
+      filters.endDate = toDate
     } else if (selectedTime) {
       filters.filterTypeDate = selectedTime
     }
@@ -70,7 +70,7 @@ export default function FilterSize({
     setEndDate(dayjs().format('YYYY-MM-DD'))
     setStatus('')
     onFilter({})
-    fetchSizes(1, 10, {}) // Reset lại dữ liệu
+    fetchSizes(1, 10) // Reset lại dữ liệu
   }
 
   return (
@@ -88,6 +88,7 @@ export default function FilterSize({
           { label: 'Không hoạt động', value: true }
         ]}
       />
+      <FilterSelect value={sort} onChange={setSort} />
 
       <FilterByTime
         label='Lọc thời gian tạo'

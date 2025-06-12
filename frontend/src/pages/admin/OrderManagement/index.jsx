@@ -93,7 +93,7 @@ const OrderManagement = () => {
     try {
       // Giả sử bạn có hàm updateOrderById trong service
       await updateOrderById(orderId, data)
-      fetchOrders(page)
+      fetchOrders(page, limit)
       handleCloseModalEdit()
     } catch (error) {
       console.error('Lỗi cập nhật đơn hàng:', error)
@@ -105,7 +105,7 @@ const OrderManagement = () => {
     if (!selectedOrder) return
     const success = await deleteOrderById(selectedOrder._id)
     if (success) {
-      fetchOrders(page)
+      fetchOrders(page, limit)
       handleCloseModalDelete()
     } else {
       alert('Xoá đơn hàng thất bại, vui lòng thử lại.')

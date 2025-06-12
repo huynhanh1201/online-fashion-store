@@ -17,17 +17,21 @@ import {
 import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye'
 import BorderColorIcon from '@mui/icons-material/BorderColor'
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever'
+import AddIcon from '@mui/icons-material/Add'
 import AddWarehouseModal from '../modal/Warehouse/AddWarehouseModal.jsx'
 import EditWarehouseModal from '../modal/Warehouse/EditWarehouseModal.jsx'
 import ViewWarehouseModal from '../modal/Warehouse/ViewWarehouseModal.jsx'
 import DeleteWarehouseModal from '../modal/Warehouse/DeleteWarehouseModal.jsx' // Thêm modal mới
+import FilterWarehouse from '~/components/FilterAdmin/FilterWarehouse.jsx'
 
 const WarehousesTab = ({
   data,
   page,
   rowsPerPage,
   onPageChange,
-  onRowsPerPageChange,
+  loading,
+  onChangeRowsPerPage,
+  total,
   addWarehouse,
   updateWarehouse,
   deleteWarehouse,
@@ -49,9 +53,11 @@ const WarehousesTab = ({
   const [openDeleteModal, setOpenDeleteModal] = useState(false) // Thêm state cho Delete modal
   const [selectedWarehouse, setSelectedWarehouse] = useState(null)
 
+  const [filter, setFilter] = useState({})
+
   useEffect(() => {
-    refreshWarehouses()
-  }, [])
+    refreshWarehouses(page, rowsPerPage, filter)
+  }, [page, rowsPerPage])
 
   const handleAddWarehouse = () => {
     setOpenAddModal(true)
@@ -59,7 +65,6 @@ const WarehousesTab = ({
 
   const handleCloseAddModal = () => {
     setOpenAddModal(false)
-    refreshWarehouses()
   }
 
   const handleViewWarehouse = (warehouse) => {
@@ -70,23 +75,29 @@ const WarehousesTab = ({
   const handleEditWarehouse = (warehouse) => {
     setSelectedWarehouse(warehouse)
     setOpenEditModal(true)
+    // refreshWarehouses(page, rowsPerPage)
   }
 
   const handleCloseEditModal = () => {
     setOpenEditModal(false)
     setSelectedWarehouse(null)
-    refreshWarehouses()
   }
 
   const handleDeleteWarehouse = (warehouse) => {
     setSelectedWarehouse(warehouse)
     setOpenDeleteModal(true) // Mở Delete modal
+    // refreshWarehouses(page, rowsPerPage)
   }
 
   const handleCloseDeleteModal = () => {
     setOpenDeleteModal(false)
     setSelectedWarehouse(null)
-    refreshWarehouses()
+  }
+  const handleFilter = (newFilters) => {
+    setFilter(newFilters)
+    if (Object.keys(newFilters).length > 0) {
+      refreshWarehouses(1, rowsPerPage, newFilters)
+    }
   }
 
   return (
@@ -100,20 +111,41 @@ const WarehousesTab = ({
                   sx={{
                     display: 'flex',
                     justifyContent: 'space-between',
-                    alignItems: 'center'
+                    alignItems: 'start'
                   }}
                 >
-                  <Typography variant='h6' sx={{ fontWeight: '800' }}>
-                    Danh sách kho hàng
-                  </Typography>
-                  <Button
-                    variant='contained'
-                    color='primary'
-                    sx={{ mr: 1 }}
-                    onClick={handleAddWarehouse}
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: 1,
+                      minWidth: 250
+                    }}
                   >
-                    Thêm kho hàng
-                  </Button>
+                    <Typography variant='h6' sx={{ fontWeight: '800' }}>
+                      Danh Sách Kho Hàng
+                    </Typography>
+                    <Button
+                      variant='contained'
+                      color='primary'
+                      onClick={handleAddWarehouse}
+                      startIcon={<AddIcon />}
+                      sx={{
+                        textTransform: 'none',
+                        width: 100,
+                        display: 'flex',
+                        alignItems: 'center'
+                      }}
+                    >
+                      Thêm
+                    </Button>
+                  </Box>
+                  <FilterWarehouse
+                    loading={loading}
+                    onFilter={handleFilter}
+                    warehouses={data}
+                    fetchWarehouses={refreshWarehouses}
+                  />
                 </Box>
               </TableCell>
             </TableRow>
@@ -176,17 +208,20 @@ const WarehousesTab = ({
       <TablePagination
         rowsPerPageOptions={[10, 25, 100]}
         component='div'
-        count={data.length}
+        count={total || 0}
         rowsPerPage={rowsPerPage}
-        page={page}
-        onPageChange={onPageChange}
-        onRowsPerPageChange={(e) => onRowsPerPageChange(e, 'warehouse')}
-        labelRowsPerPage='Số dòng mỗi trang'
-        labelDisplayedRows={({ from, to, count }) => {
-          const actualTo = to > count ? count : to // nếu to vượt quá count thì lấy count
-          const actualFrom = from > count ? count : from // nếu from vượt quá count thì lấy count
-          return `${actualFrom}–${actualTo} trên ${count !== -1 ? count : `hơn ${actualTo}`}`
+        page={page - 1}
+        onPageChange={(event, newPage) => onPageChange(event, newPage + 1)} // +1 để đúng logic bên cha
+        onRowsPerPageChange={(event) => {
+          const newLimit = parseInt(event.target.value, 10)
+          if (onChangeRowsPerPage) {
+            onChangeRowsPerPage(newLimit)
+          }
         }}
+        labelRowsPerPage='Số dòng mỗi trang'
+        labelDisplayedRows={({ from, to, count }) =>
+          `${from}–${to} trên ${count !== -1 ? count : `hơn ${to}`}`
+        }
       />
 
       <AddWarehouseModal

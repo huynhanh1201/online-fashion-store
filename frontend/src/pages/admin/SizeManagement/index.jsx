@@ -44,7 +44,7 @@ const SizeManagement = () => {
     try {
       const response = await updateSize(sizeId, updatedData)
       if (response) {
-        await fetchSizes(page)
+        await fetchSizes(page, limit)
       } else {
         console.log('Cập nhật không thành công')
       }
@@ -57,7 +57,7 @@ const SizeManagement = () => {
     try {
       const result = await deleteSize(sizeId)
       if (result) {
-        await fetchSizes(page)
+        await fetchSizes(page, limit)
       } else {
         console.log('Xoá không thành công')
       }

@@ -39,7 +39,6 @@ export default function FilterCategory({
   }
   const handleSearch = () => {
     setKeyword(inputValue)
-    fetchCategories(1, 10, { keyword: inputValue }) // nếu bạn cần gọi API theo từ khoá tìm
   }
 
   const applyFilters = (selectedTime, fromDate, toDate) => {

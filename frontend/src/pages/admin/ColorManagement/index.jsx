@@ -43,7 +43,7 @@ const ColorManagement = () => {
     try {
       const response = await updateColor(colorId, updatedData)
       if (response) {
-        await fetchColors(page)
+        await fetchColors(page, limit)
       } else {
         console.log('Cập nhật không thành công')
       }
@@ -56,7 +56,7 @@ const ColorManagement = () => {
     try {
       const result = await deleteColor(colorId)
       if (result) {
-        await fetchColors(page)
+        await fetchColors(page, limit)
       } else {
         console.log('Xoá không thành công')
       }

@@ -45,7 +45,7 @@ const CategoryManagement = () => {
     try {
       const response = await updateCategory(categoryId, updatedData)
       if (response) {
-        await fetchCategories()
+        await fetchCategories(page, limit)
       } else {
         console.log('Cập nhật không thành công')
       }
@@ -58,7 +58,7 @@ const CategoryManagement = () => {
     try {
       const result = await deleteCategory(categoryId)
       if (result) {
-        await fetchCategories()
+        await fetchCategories(page, limit)
       } else {
         console.log('Xoá không thành công')
       }

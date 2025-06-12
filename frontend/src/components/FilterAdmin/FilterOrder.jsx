@@ -33,35 +33,15 @@ export default function FilterOrder({
   const [selectedFilter, setSelectedFilter] = useState('')
   const [startDate, setStartDate] = useState(dayjs().format('YYYY-MM-DD'))
   const [endDate, setEndDate] = useState(dayjs().format('YYYY-MM-DD'))
-
+  const [userInput, setUserInput] = useState('')
+  const [sort, setSort] = useState('')
   useEffect(() => {
     applyFilters()
-  }, [
-    keyword,
-    userId,
-    couponId,
-    status,
-    paymentMethod,
-    paymentStatus,
-    minTotal,
-    maxTotal
-  ])
+  }, [keyword, userId, couponId, status, sort, paymentMethod, paymentStatus])
 
   const handleSearch = () => {
     setKeyword(inputValue)
-    applyFilters({
-      keyword: inputValue,
-      userId,
-      couponId,
-      minTotal,
-      maxTotal,
-      status,
-      paymentMethod,
-      paymentStatus,
-      selectedTime: selectedFilter,
-      fromDate: startDate,
-      toDate: endDate
-    })
+    applyFilters()
   }
 
   const handleApplyTimeFilter = (selected) => {
@@ -73,6 +53,7 @@ export default function FilterOrder({
       minTotal,
       maxTotal,
       status,
+      sort,
       paymentMethod,
       paymentStatus,
       selectedTime: selected,
@@ -82,12 +63,13 @@ export default function FilterOrder({
   }
 
   const applyFilters = ({
-    keyword: k = keyword,
+    search: k = keyword,
     userId: uid = userId,
     couponId: cid = couponId,
     minTotal: min = minTotal,
     maxTotal: max = maxTotal,
     status: st = status,
+    sort: s = sort,
     paymentMethod: pm = paymentMethod,
     paymentStatus: ps = paymentStatus,
     selectedTime = selectedFilter,
@@ -95,26 +77,21 @@ export default function FilterOrder({
     toDate = endDate
   } = {}) => {
     const filters = {
-      keyword: k || undefined,
+      search: k || undefined,
       userId: uid || undefined,
       couponId: cid === 'none' ? null : cid || undefined,
       status: st || undefined,
+      sort: s || undefined,
+      priceMin: min ? parseInt(min) : undefined,
+      priceMax: max ? parseInt(max) : undefined,
       paymentMethod: pm || undefined,
       paymentStatus: ps || undefined
     }
 
-    if (min || max) {
-      filters.totalRange = {
-        ...(min && { min: parseInt(min) }),
-        ...(max && { max: parseInt(max) })
-      }
-    }
-
     if (selectedTime === 'custom') {
-      filters.createdAt = {
-        from: fromDate,
-        to: toDate
-      }
+      filters.filterTypeDate = 'custom'
+      filters.startDate = fromDate
+      filters.endDate = toDate
     } else if (selectedTime) {
       filters.filterTypeDate = selectedTime
     }
@@ -144,6 +121,8 @@ export default function FilterOrder({
     setPaymentMethod('')
     setPaymentStatus('')
     setSelectedFilter('')
+    setUserInput('')
+    setSort('')
     setStartDate(dayjs().format('YYYY-MM-DD'))
     setEndDate(dayjs().format('YYYY-MM-DD'))
     onFilter({})
@@ -152,29 +131,18 @@ export default function FilterOrder({
 
   return (
     <Box display='flex' flexWrap='wrap' gap={2} mb={2} justifyContent='end'>
-      <SearchWithSuggestions
-        label='Tìm theo tên/địa chỉ'
-        options={[]} // có thể truyền users.map(u => u.name) nếu muốn
-        keyword={keyword}
-        inputValue={inputValue}
-        setKeyword={setKeyword}
-        setInputValue={setInputValue}
-        onSearch={handleSearch}
-        loading={loading}
-      />
-
-      <FilterSelect
-        label='Người dùng'
-        value={userId}
-        onChange={setUserId}
-        options={[
-          { label: 'Tất cả', value: '' },
-          ...users.map((user) => ({
-            label: user.name,
-            value: user._id
-          }))
-        ]}
-      />
+      {/*<FilterSelect*/}
+      {/*  label='Người dặt'*/}
+      {/*  value={userId}*/}
+      {/*  onChange={setUserId}*/}
+      {/*  options={[*/}
+      {/*    { label: 'Tất cả', value: '' },*/}
+      {/*    ...users.map((user) => ({*/}
+      {/*      label: user.name,*/}
+      {/*      value: user._id*/}
+      {/*    }))*/}
+      {/*  ]}*/}
+      {/*/>*/}
 
       <FilterSelect
         label='Mã giảm giá'
@@ -191,6 +159,7 @@ export default function FilterOrder({
       />
 
       <FilterByPrice
+        label='Giá trị đơn hàng'
         priceMin={minTotal}
         priceMax={maxTotal}
         setPriceMin={setMinTotal}
@@ -212,7 +181,7 @@ export default function FilterOrder({
       />
 
       <FilterSelect
-        label='Phương thức thanh toán'
+        label='Hình thức thanh toán'
         value={paymentMethod}
         onChange={setPaymentMethod}
         options={[
@@ -233,18 +202,28 @@ export default function FilterOrder({
           { label: 'Thất bại', value: 'Failed' }
         ]}
       />
+      <FilterSelect value={sort} onChange={setSort} />
+      <FilterByTime
+        label='Thời gian đặt hàng'
+        selectedFilter={selectedFilter}
+        setSelectedFilter={setSelectedFilter}
+        startDate={startDate}
+        setStartDate={setStartDate}
+        endDate={endDate}
+        setEndDate={setEndDate}
+        onApply={handleApplyTimeFilter}
+      />
       <Box sx={{ display: 'flex', gap: 2 }}>
-        <FilterByTime
-          label='Thời gian đặt hàng'
-          selectedFilter={selectedFilter}
-          setSelectedFilter={setSelectedFilter}
-          startDate={startDate}
-          setStartDate={setStartDate}
-          endDate={endDate}
-          setEndDate={setEndDate}
-          onApply={handleApplyTimeFilter}
+        <SearchWithSuggestions
+          label='Tìm theo tên người đặt'
+          options={users.map((u) => u.name)} // có thể truyền users.map(u => u.name) nếu muốn
+          keyword={keyword}
+          inputValue={inputValue}
+          setKeyword={setKeyword}
+          setInputValue={setInputValue}
+          onSearch={handleSearch}
+          loading={loading}
         />
-
         <Button
           variant='outlined'
           size='small'

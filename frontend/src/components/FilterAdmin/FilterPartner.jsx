@@ -1,34 +1,27 @@
 import React, { useState, useEffect } from 'react'
-import {
-  Box,
-  Button,
-  FormControl,
-  InputLabel,
-  MenuItem,
-  Select
-} from '@mui/material'
+import { Box, Button } from '@mui/material'
 import dayjs from 'dayjs'
-import FilterByTime from '~/components/FilterAdmin/common/FilterByTime.jsx'
-import SearchWithSuggestions from '~/components/FilterAdmin/common/SearchWithSuggestions.jsx'
-import FilterSelect from '~/components/FilterAdmin/common/FilterSelect.jsx'
+import FilterSelect from '~/components/FilterAdmin/common/FilterSelect'
+import FilterByTime from '~/components/FilterAdmin/common/FilterByTime'
+import SearchWithSuggestions from '~/components/FilterAdmin/common/SearchWithSuggestions'
 
-export default function FilterColor({
+export default function FilterPartner({
   onFilter,
-  colors,
-  fetchColors,
+  partners = [],
+  fetchPartners,
   loading
 }) {
   const [keyword, setKeyword] = useState('')
   const [inputValue, setInputValue] = useState('')
+  const [type, setType] = useState('')
+  const [destroy, setDestroy] = useState('')
   const [selectedFilter, setSelectedFilter] = useState('')
   const [startDate, setStartDate] = useState(dayjs().format('YYYY-MM-DD'))
   const [endDate, setEndDate] = useState(dayjs().format('YYYY-MM-DD'))
-  const [status, setStatus] = useState('')
-  const [sort, setSort] = useState('')
 
   useEffect(() => {
     applyFilters(selectedFilter, startDate, endDate)
-  }, [keyword, status, sort])
+  }, [keyword, type, destroy])
 
   const handleApplyTimeFilter = (selected) => {
     setSelectedFilter(selected)
@@ -37,14 +30,14 @@ export default function FilterColor({
 
   const handleSearch = () => {
     setKeyword(inputValue)
-    applyFilters(selectedFilter, startDate, endDate)
+    fetchPartners?.(1, 10, { keyword: inputValue })
   }
 
   const applyFilters = (selectedTime, fromDate, toDate) => {
     const filters = {
-      search: keyword || undefined,
-      status: status !== '' ? status : undefined,
-      sort: sort || undefined
+      keyword: keyword || undefined,
+      type: type || undefined,
+      destroy: destroy !== '' ? destroy === 'true' : undefined
     }
 
     if (selectedTime === 'custom') {
@@ -56,11 +49,7 @@ export default function FilterColor({
     }
 
     Object.keys(filters).forEach((key) => {
-      if (
-        filters[key] === undefined ||
-        filters[key] === null ||
-        filters[key] === ''
-      ) {
+      if (!filters[key] && filters[key] !== false) {
         delete filters[key]
       }
     })
@@ -71,32 +60,38 @@ export default function FilterColor({
   const handleReset = () => {
     setKeyword('')
     setInputValue('')
+    setType('')
+    setDestroy('')
     setSelectedFilter('')
     setStartDate(dayjs().format('YYYY-MM-DD'))
     setEndDate(dayjs().format('YYYY-MM-DD'))
-    setStatus('')
-    setSort('')
     onFilter({})
-    fetchColors(1, 10, {}) // Reset filters when clearing
+    fetchPartners?.(1, 10, {})
   }
 
   return (
     <Box display='flex' flexWrap='wrap' gap={2} mb={2} justifyContent='end'>
       <FilterSelect
-        label='Trạng thái'
-        value={status}
-        onChange={(value) => {
-          setStatus(value)
-          applyFilters(selectedFilter, startDate, endDate)
-        }}
+        label='Kiểu đối tác'
+        value={type}
+        onChange={setType}
         options={[
           { label: 'Tất cả', value: '' },
-          { label: 'Hoạt động', value: false },
-          { label: 'Không hoạt động', value: true }
+          { label: 'Nhà cung cấp', value: 'supplier' },
+          { label: 'Khách hàng', value: 'customer' }
         ]}
       />
 
-      <FilterSelect value={sort} onChange={setSort} />
+      <FilterSelect
+        label='Trạng thái'
+        value={destroy}
+        onChange={setDestroy}
+        options={[
+          { label: 'Tất cả', value: '' },
+          { label: 'Chưa xoá', value: 'false' },
+          { label: 'Đã xoá', value: 'true' }
+        ]}
+      />
 
       <FilterByTime
         label='Lọc thời gian tạo'
@@ -109,27 +104,25 @@ export default function FilterColor({
         onApply={handleApplyTimeFilter}
       />
 
-      <Box sx={{ display: 'flex', gap: 2 }}>
-        <SearchWithSuggestions
-          label='Tìm màu sắc'
-          options={colors.map((color) => color.name)}
-          loading={loading}
-          keyword={keyword}
-          inputValue={inputValue}
-          setKeyword={setKeyword}
-          setInputValue={setInputValue}
-          onSearch={handleSearch}
-        />
+      <SearchWithSuggestions
+        label='Tìm kiếm đối tác'
+        options={partners.map((p) => p.name)}
+        loading={loading}
+        keyword={keyword}
+        inputValue={inputValue}
+        setKeyword={setKeyword}
+        setInputValue={setInputValue}
+        onSearch={handleSearch}
+      />
 
-        <Button
-          variant='outlined'
-          size='small'
-          color='error'
-          onClick={handleReset}
-        >
-          Làm mới
-        </Button>
-      </Box>
+      <Button
+        variant='outlined'
+        size='small'
+        color='error'
+        onClick={handleReset}
+      >
+        Làm mới
+      </Button>
     </Box>
   )
 }

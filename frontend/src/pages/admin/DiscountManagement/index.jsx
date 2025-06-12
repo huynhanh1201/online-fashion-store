@@ -49,12 +49,12 @@ function DiscountManagement() {
 
   const handleSaveDiscount = async (discountId, updatedData) => {
     const updated = await updateDiscount(discountId, updatedData)
-    if (updated) await fetchDiscounts(page)
+    if (updated) await fetchDiscounts(page, limit)
   }
 
   const handleDeleteDiscount = async (discountId) => {
     const deleted = await deleteDiscount(discountId)
-    if (deleted) await fetchDiscounts(page)
+    if (deleted) await fetchDiscounts(page, limit)
   }
   const handleFilter = (newFilters) => {
     setFilters(newFilters)

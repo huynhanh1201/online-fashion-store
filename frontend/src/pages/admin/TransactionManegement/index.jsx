@@ -51,13 +51,13 @@ const TransactionManagement = () => {
 
   const handleUpdateTransaction = async (transactionId, data) => {
     await updateTransaction(transactionId, data)
-    fetchTransactions()
+    fetchTransactions(page, limit)
     setOpenEdit(false)
   }
 
   const handleDeleteTransaction = async (transactionId) => {
     await deleteTransaction(transactionId)
-    fetchTransactions()
+    fetchTransactions(page, limit)
     setOpenDelete(false)
   }
 

@@ -83,6 +83,7 @@ export default function FilterDiscount({
 
     // Thêm bộ lọc thời gian nếu là custom
     if (validFromFilter === 'custom') {
+      filters.validFromQuick = validFromFilter
       filters.validFromFrom = validFromStart || undefined
       filters.validFromTo = validFromEnd || undefined
     } else if (validFromFilter) {
@@ -90,6 +91,7 @@ export default function FilterDiscount({
     }
 
     if (validUntilFilter === 'custom') {
+      filters.validUntilQuick = validUntilFilter
       filters.validUntilFrom = validUntilStart || undefined
       filters.validUntilTo = validUntilEnd || undefined
     } else if (validUntilFilter) {
@@ -97,6 +99,7 @@ export default function FilterDiscount({
     }
 
     if (createdFilter === 'custom') {
+      filters.filterTypeDate = createdFilter
       filters.startDate = createdStart || undefined
       filters.endDate = createdEnd || undefined
     } else if (createdFilter) {
@@ -131,12 +134,12 @@ export default function FilterDiscount({
     setUsedCountMax('')
     setIsActive('')
     setSort('')
-    setValidFromStart(null)
-    setValidFromEnd(null)
-    setValidUntilStart(null)
-    setValidUntilEnd(null)
-    setCreatedStart(null)
-    setCreatedEnd(null)
+    setValidFromStart(dayjs().format('YYYY-MM-DD'))
+    setValidFromEnd(dayjs().format('YYYY-MM-DD'))
+    setValidUntilStart(dayjs().format('YYYY-MM-DD'))
+    setValidUntilEnd(dayjs().format('YYYY-MM-DD'))
+    setCreatedStart(dayjs().format('YYYY-MM-DD'))
+    setCreatedEnd(dayjs().format('YYYY-MM-DD'))
     setValidFromFilter('')
     setValidUntilFilter('')
     setCreatedFilter('')
@@ -157,6 +160,7 @@ export default function FilterDiscount({
         ]}
       />
       <FilterByPrice
+        label='Giá trị giảm'
         priceMin={amountMin}
         priceMax={amountMax}
         setPriceMin={setAmountMin}
@@ -164,6 +168,7 @@ export default function FilterDiscount({
         onApply={() => applyFilters()}
       />
       <FilterByPrice
+        label='Giá tối thiểu đơn hàng'
         priceMin={minOrderMin}
         priceMax={minOrderMax}
         setPriceMin={setMinOrderMin}
@@ -171,6 +176,7 @@ export default function FilterDiscount({
         onApply={() => applyFilters()}
       />
       <FilterByPrice
+        label='Giới hạn sử dụng'
         priceMin={usageMin}
         priceMax={usageMax}
         setPriceMin={setUsageMin}
@@ -178,6 +184,7 @@ export default function FilterDiscount({
         onApply={() => applyFilters()}
       />
       <FilterByPrice
+        label='Số lượng đã sử dụng'
         priceMin={usedCountMin}
         priceMax={usedCountMax}
         setPriceMin={setUsedCountMin}

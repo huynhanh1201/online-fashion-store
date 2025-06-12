@@ -21,6 +21,7 @@ import {
 } from '@mui/material'
 import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye'
 import ViewInventoryLogModal from '../modal/InventoryLog/ViewInventoryLogModal'
+import FilterInventoryLog from '~/components/FilterAdmin/FilterInventoryLog.jsx'
 
 const InventoryLogTab = ({
   data,
@@ -29,27 +30,31 @@ const InventoryLogTab = ({
   page,
   rowsPerPage,
   onPageChange,
-  onRowsPerPageChange,
+  onChangeRowsPerPage,
   refreshInventoryLogs,
   inventories,
   fetchInventories,
   fetchVariants,
   batches,
   fetchBatches,
-  total
+  total,
+  loading,
+  fetchUsers,
+  users,
+  fetchWarehouses
 }) => {
-  const [filterInventory, setFilterInventory] = useState('all')
-  const [filterBatchId, setFilterBatchId] = useState('all')
-  const [filterType, setFilterType] = useState('all')
-  const [filterSource, setFilterSource] = useState('all')
+  const [filters, setFilters] = useState({}) // State cho kho
   const [openViewModal, setOpenViewModal] = useState(false) // State cho modal xem
   const [selectedLog, setSelectedLog] = useState(null) // State cho bản ghi được chọn
-
   useEffect(() => {
-    refreshInventoryLogs(page, rowsPerPage)
     fetchInventories()
     fetchVariants()
     fetchBatches()
+    fetchUsers()
+    fetchWarehouses()
+  }, [])
+  useEffect(() => {
+    refreshInventoryLogs(page, rowsPerPage, filters)
   }, [page, rowsPerPage])
   const handleViewLog = (log) => {
     setSelectedLog(log)
@@ -68,40 +73,6 @@ const InventoryLogTab = ({
     }
   })
 
-  const filteredInventoryLogs = enrichedInventoryLogs.filter((log) => {
-    const inventoryMatch =
-      filterInventory === 'all' ||
-      log.inventoryId === filterInventory ||
-      log.inventoryId?._id === filterInventory
-
-    const typeMatch = filterType === 'all' || log.type === filterType
-
-    const batchMatch = filterBatchId === 'all' || log.batchId === filterBatchId
-
-    const sourceMatch = filterSource === 'all' || log.source === filterSource
-
-    return typeMatch && batchMatch && sourceMatch && inventoryMatch
-  })
-
-  const handleFilterChange = (type, value) => {
-    const newInventoryId = type === 'inventoryId' ? value : filterInventory
-    const newType = type === 'type' ? value : filterType
-    const newBatchId = type === 'batchId' ? value : filterBatchId
-    const newSource = type === 'source' ? value : filterSource
-
-    if (type === 'inventoryId') setFilterInventory(value)
-    if (type === 'type') setFilterType(value)
-    if (type === 'batchId') setFilterBatchId(value)
-    if (type === 'source') setFilterSource(value)
-
-    const filters = {}
-    if (newInventoryId !== 'all') filters.inventoryId = newInventoryId
-    if (newType !== 'all') filters.type = newType
-    if (newBatchId !== 'all') filters.batchId = newBatchId
-    if (newSource !== 'all') filters.source = newSource
-
-    refreshInventoryLogs(page > 0 ? page : 1, 10, filters)
-  }
   const inventoryLogColumns = [
     { id: 'source', label: 'Mã phiếu', minWidth: 130 },
     { id: 'variantName', label: 'Biến thể', minWidth: 150 },
@@ -137,6 +108,13 @@ const InventoryLogTab = ({
     { id: 'createdAtFormatted', label: 'Ngày thực hiện', minWidth: 150 },
     { id: 'action', label: 'Hành động', minWidth: 100, align: 'center' }
   ]
+
+  const handleFilter = (newFilters) => {
+    setFilters(newFilters)
+    if (Object.keys(newFilters).length > 0) {
+      refreshInventoryLogs(1, rowsPerPage, newFilters)
+    }
+  }
   return (
     <Paper sx={{ border: '1px solid #ccc', width: '100%', overflow: 'hidden' }}>
       <TableContainer>
@@ -147,108 +125,34 @@ const InventoryLogTab = ({
                 colSpan={inventoryLogColumns.length}
                 sx={{ borderBottom: 'none', paddingBottom: '0' }}
               >
-                <Typography variant='h6' sx={{ fontWeight: '800' }}>
-                  Lịch sử biến động kho
-                </Typography>
-              </TableCell>
-            </TableRow>
-            <TableRow>
-              <TableCell colSpan={inventoryLogColumns.length}>
-                <Box display='flex' gap={2} alignItems='center'>
-                  <FormControl
-                    variant='outlined'
-                    size='small'
-                    sx={{ minWidth: 120 }}
+                <Box
+                  sx={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'start'
+                  }}
+                >
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: 1,
+                      minWidth: 250
+                    }}
                   >
-                    <InputLabel id='inventory-select-label'>
-                      Tồn theo kho
-                    </InputLabel>
-                    <Select
-                      labelId='inventory-select-label'
-                      value={filterInventory}
-                      onChange={(e) =>
-                        handleFilterChange('inventoryId', e.target.value)
-                      }
-                      label='Tồn theo kho'
-                    >
-                      <MenuItem value='all'>Tất cả</MenuItem>
-                      {inventories.map((inventory) => (
-                        <MenuItem key={inventory._id} value={inventory._id}>
-                          {inventory.variantId.name} -{' '}
-                          {inventory.warehouseId.name}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                  </FormControl>
-                  <FormControl
-                    variant='outlined'
-                    size='small'
-                    sx={{ minWidth: 120 }}
-                  >
-                    <InputLabel id='type-select-label'>Loại</InputLabel>
-                    <Select
-                      labelId='type-select-label'
-                      value={filterType}
-                      onChange={(e) =>
-                        handleFilterChange('type', e.target.value)
-                      }
-                      label='Loại'
-                    >
-                      <MenuItem value='all'>Tất cả</MenuItem>
-                      <MenuItem value='in'>Nhập</MenuItem>
-                      <MenuItem value='out'>Xuất</MenuItem>
-                    </Select>
-                  </FormControl>
-                  <FormControl sx={{ minWidth: 160 }}>
-                    <InputLabel>Lô hàng</InputLabel>
-                    <Select
-                      value={filterBatchId}
-                      onChange={(e) => setFilterBatchId(e.target.value)}
-                      label='Lô hàng'
-                      size='small'
-                    >
-                      <MenuItem value='all'>Tất cả</MenuItem>
-                      {[
-                        ...new Set(
-                          enrichedInventoryLogs.map((log) => log.batchId)
-                        )
-                      ].map((id) => {
-                        const batchName =
-                          enrichedInventoryLogs.find(
-                            (log) => log.batchId === id
-                          )?.batchName || id
-                        return (
-                          <MenuItem key={id} value={id}>
-                            {batchName}
-                          </MenuItem>
-                        )
-                      })}
-                    </Select>
-                  </FormControl>
-                  <FormControl
-                    variant='outlined'
-                    size='small'
-                    sx={{ minWidth: 120 }}
-                  >
-                    <InputLabel id='source-select-label'>Mã phiếu</InputLabel>
-                    <Select
-                      labelId='source-select-label'
-                      value={filterSource}
-                      onChange={(e) =>
-                        handleFilterChange('source', e.target.value)
-                      }
-                      label='Mã phiếu'
-                    >
-                      <MenuItem value='all'>Tất cả</MenuItem>
-                      {[...new Set(data.map((log) => log.source))].map(
-                        (source) => (
-                          <MenuItem key={source} value={source}>
-                            {source}
-                          </MenuItem>
-                        )
-                      )}
-                    </Select>
-                  </FormControl>
+                    <Typography variant='h6' sx={{ fontWeight: '800' }}>
+                      Lịch sử nhập xuất kho
+                    </Typography>
+                  </Box>
+                  <FilterInventoryLog
+                    warehouses={warehouses}
+                    onFilter={handleFilter}
+                    loading={loading}
+                    batches={batches}
+                    inventories={inventories}
+                    users={users}
+                    inventoryLog={data || []}
+                  />
                 </Box>
               </TableCell>
             </TableRow>
@@ -265,7 +169,7 @@ const InventoryLogTab = ({
             </TableRow>
           </TableHead>
           <TableBody>
-            {filteredInventoryLogs.map((row, index) => (
+            {enrichedInventoryLogs.map((row, index) => (
               <TableRow hover role='checkbox' tabIndex={-1} key={index}>
                 {inventoryLogColumns.map((column) => {
                   const value = row[column.id]
@@ -327,8 +231,13 @@ const InventoryLogTab = ({
         count={total || 0}
         rowsPerPage={rowsPerPage}
         page={page - 1}
-        onPageChange={(event, newPage) => onPageChange(event, newPage)} // +1 để giữ page bắt đầu từ 1
-        onRowsPerPageChange={(event) => onRowsPerPageChange(event, 'log')} // giữ đúng chuẩn
+        onPageChange={(event, newPage) => onPageChange(event, newPage + 1)} // +1 để đúng logic bên cha
+        onRowsPerPageChange={(event) => {
+          const newLimit = parseInt(event.target.value, 10)
+          if (onChangeRowsPerPage) {
+            onChangeRowsPerPage(newLimit)
+          }
+        }}
         labelRowsPerPage='Số dòng mỗi trang'
         labelDisplayedRows={({ from, to, count }) =>
           `${from}–${to} trên ${count !== -1 ? count : `hơn ${to}`}`

@@ -141,7 +141,7 @@ const TransactionTable = ({
                     }}
                   >
                     <Typography variant='h6' sx={{ fontWeight: '800' }}>
-                      Danh Sách Giao Dịch`
+                      Danh Sách Giao Dịch
                     </Typography>
                   </Box>
                   <FilterTransaction

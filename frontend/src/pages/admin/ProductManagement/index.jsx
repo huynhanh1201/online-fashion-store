@@ -206,7 +206,7 @@ const ProductManagement = () => {
       const result = await updateProduct(id, updatedData)
       console.log('Result from updateProduct:', result) // Debugging log
       if (result) {
-        await fetchProducts()
+        await fetchProducts(page, limit)
       }
       return result // Explicitly return the result
     } catch (error) {
@@ -218,7 +218,7 @@ const ProductManagement = () => {
   const handleDeleteProduct = async (id) => {
     const result = await deleteProduct(id)
     if (result) {
-      await fetchProducts()
+      await fetchProducts(page, limit)
     }
   }
   const handleFilter = (newFilters) => {

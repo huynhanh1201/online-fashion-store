@@ -1,13 +1,9 @@
 import AuthorizedAxiosInstance from '~/utils/authorizedAxios.js'
 import { API_ROOT } from '~/utils/constants.js'
 
-export const getInventories = async (page = 1, limit = 10, filters = {}) => {
+export const getInventories = async (filters) => {
   try {
-    const params = new URLSearchParams({
-      page: String(page || 1),
-      limit: String(limit || 10),
-      ...filters
-    }).toString()
+    const params = new URLSearchParams(filters).toString()
     const response = await AuthorizedAxiosInstance.get(
       `${API_ROOT}/v1/inventories?${params}`
     )
@@ -111,13 +107,11 @@ export const exportInventory = async (inventoryId, quantity) => {
   return response.data
 }
 
-export const getInventoryLogs = async (params) => {
+export const getInventoryLogs = async (filters) => {
+  const params = new URLSearchParams(filters).toString()
   const response = await AuthorizedAxiosInstance.get(
-    `${API_ROOT}/v1/inventory-logs`,
-    { params }
+    `${API_ROOT}/v1/inventory-logs?${params}`
   )
-  console.log('getInventoryLogs', response)
-
   return {
     logs: response.data.data,
     totalPages: response.data.meta?.totalPages,
