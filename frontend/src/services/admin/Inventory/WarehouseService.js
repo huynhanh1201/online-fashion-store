@@ -1,15 +1,15 @@
 import AuthorizedAxiosInstance from '~/utils/authorizedAxios'
 import { API_ROOT } from '~/utils/constants'
 
-export const getWarehouses = async (page = 1, limit = 10, filters = {}) => {
+export const getWarehouses = async (filters) => {
   try {
-    const params = new URLSearchParams({ page, limit, ...filters }).toString()
+    const params = new URLSearchParams(filters).toString()
     const response = await AuthorizedAxiosInstance.get(
       `${API_ROOT}/v1/warehouses?${params}`
     )
     return {
-      warehouses: response.data,
-      total: response.data.totalPages
+      warehouses: response.data || response.data.data || [],
+      total: response.data.length || response.data.meta.total || 0
     }
   } catch (error) {
     console.error('Lỗi khi lấy danh sách kho:', error)

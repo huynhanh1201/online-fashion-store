@@ -25,7 +25,7 @@ const useCategories = () => {
       console.log('Fetching categories with query:', query)
       const { categories, total } = await getCategories(query)
       setCategories(categories)
-      setTotalPages(Math.max(1, Math.ceil(total / limit)))
+      setTotalPages(total)
     } catch (err) {
       console.error('Error fetching categories:', err)
       setloading(false)

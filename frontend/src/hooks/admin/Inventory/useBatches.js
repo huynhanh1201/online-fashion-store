@@ -8,15 +8,36 @@ import {
 
 const useBatches = () => {
   const [batches, setBatches] = useState([])
-  const [totalPages, setTotalPages] = useState(1)
-  const [loading, setLoading] = useState(false)
+  const [totalPageBatch, setTotalPages] = useState(1)
+  const [loadingBatch, setLoading] = useState(false)
 
   const fetchBatches = async (page = 1, limit = 10, filters = {}) => {
     setLoading(true)
-    const { batches, total } = await getBatches({ page, limit, ...filters })
-    setBatches(batches)
-    setTotalPages(total || 1)
-    setLoading(false)
+    const buildQuery = (input) => {
+      const query = { page, limit, ...input }
+      Object.keys(query).forEach((key) => {
+        if (
+          query[key] === '' ||
+          query[key] === undefined ||
+          query[key] === null
+        ) {
+          delete query[key]
+        }
+      })
+      return query
+    }
+    try {
+      const query = buildQuery(filters)
+      const response = await getBatches(query)
+      setBatches(response.batches || [])
+      setTotalPages(response.total || 1)
+      setLoading(false)
+    } catch (error) {
+      console.error('Error fetching batches:', error)
+      setBatches([])
+      setTotalPages(0)
+      setLoading(false)
+    }
   }
 
   const createNewBatch = async (data) => {
@@ -39,8 +60,8 @@ const useBatches = () => {
 
   return {
     batches,
-    totalPages,
-    loading,
+    totalPageBatch,
+    loadingBatch,
     fetchBatches,
     createNewBatch,
     updateBatchById,

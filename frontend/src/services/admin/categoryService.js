@@ -10,7 +10,7 @@ export const getCategories = async (filter) => {
     )
     return {
       categories: response.data.data,
-      total: response.data.meta.totalPages
+      total: response.data.meta.total
     }
   } catch (error) {
     console.error('Lỗi khi lấy danh sách danh mục:', error)

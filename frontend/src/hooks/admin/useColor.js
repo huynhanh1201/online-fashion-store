@@ -25,7 +25,7 @@ const useColors = () => {
       const query = buildQuery(filters)
       const { colors, total } = await getColors(query)
       setColors(colors)
-      setTotalPages(Math.max(1, Math.ceil(total / limit)))
+      setTotalPages(total)
     } catch (error) {
       console.error('Lỗi khi lấy danh sách màu:', error)
     }
@@ -35,9 +35,6 @@ const useColors = () => {
   const createNewColor = async (data) => {
     try {
       const result = await addColor(data)
-      if (result) {
-        await fetchColors(pageColor)
-      }
       return result
     } catch (error) {
       console.error('Lỗi khi tạo màu mới:', error)

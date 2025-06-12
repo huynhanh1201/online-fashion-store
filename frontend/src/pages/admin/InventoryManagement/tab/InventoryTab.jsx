@@ -394,23 +394,18 @@ import {
   IconButton,
   Button
 } from '@mui/material'
-import { filterDate } from '~/utils/constants.js'
 import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye'
 import BorderColorIcon from '@mui/icons-material/BorderColor'
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever'
 import ViewInventoryModal from '../modal/Inventory/ViewInventoryModal.jsx'
 import EditInventoryModal from '../modal/Inventory/EditInventoryModal.jsx'
 import DeleteInventoryModal from '../modal/Inventory/DeleteInventoryModal.jsx'
-import FilterByTime from '~/components/FilterAdmin/common/FilterByTime.jsx'
-import dayjs from 'dayjs'
+import FilterInventory from '~/components/FilterAdmin/FilterInventory.jsx'
 const InventoryTab = ({
   data,
+  products,
   variants,
   warehouses,
-  page,
-  rowsPerPage,
-  onPageChange,
-  onRowsPerPageChange,
   updateInventory,
   deleteInventory,
   refreshInventories,
@@ -419,24 +414,21 @@ const InventoryTab = ({
   fetchWarehouses,
   formatCurrency,
   parseCurrency,
-  total
+  total,
+  onPageChange,
+  rowsPerPage,
+  page,
+  onChangeRowsPerPage,
+  loading
 }) => {
-  const [filterWarehouse, setFilterWarehouse] = useState('all')
-  const [filterStatus, setFilterStatus] = useState('all')
-  const [filterVariantId, setFilterVariantId] = useState('all')
-  const [filterTypeDate, setFilterTypeDate] = useState('all')
-
+  const [filterWarehouse, setFilterWarehouse] = useState({})
   const [openViewModal, setOpenViewModal] = useState(false)
   const [openEditModal, setOpenEditModal] = useState(false)
   const [openDeleteModal, setOpenDeleteModal] = useState(false)
   const [selectedInventory, setSelectedInventory] = useState(null)
 
-  // const [selectedFilter, setSelectedFilter] = useState('all')
-  const [startDate, setStartDate] = useState(dayjs().format('YYYY-MM-DD'))
-  const [endDate, setEndDate] = useState(dayjs().format('YYYY-MM-DD'))
-
   useEffect(() => {
-    refreshInventories(page, rowsPerPage)
+    refreshInventories(page, rowsPerPage, filterWarehouse)
     refreshVariants()
     fetchWarehouses()
   }, [page, rowsPerPage])
@@ -453,41 +445,6 @@ const InventoryTab = ({
       sku: item.variantId?.sku || 'N/A' // bạn có thể thêm sku nếu cần
     }
   })
-
-  const filteredInventories = enrichedInventories.filter((item) => {
-    return (
-      (filterWarehouse === 'all' || item.warehouseId === filterWarehouse) &&
-      (filterStatus === 'all' || item.status === filterStatus) &&
-      (filterVariantId === 'all' || item.variantId === filterVariantId)
-    )
-  })
-
-  const handleFilterChange = (type, value) => {
-    if (type === 'variantId') setFilterVariantId(value)
-    if (type === 'warehouseId') setFilterWarehouse(value)
-    if (type === 'status') setFilterStatus(value)
-    if (type === 'filterTypeDate') setFilterTypeDate(value)
-
-    const nextVariantId = type === 'variantId' ? value : filterVariantId
-    const nextWarehouseId = type === 'warehouseId' ? value : filterWarehouse
-    const nextStatus = type === 'status' ? value : filterStatus
-    const nextFilterTypeDate =
-      type === 'filterTypeDate' ? value : filterTypeDate
-
-    const filters = {}
-    if (nextVariantId !== 'all') filters.variantId = nextVariantId
-    if (nextWarehouseId !== 'all') filters.warehouseId = nextWarehouseId
-    if (nextStatus !== 'all') filters.status = nextStatus
-    if (nextFilterTypeDate !== 'all')
-      filters.filterTypeDate = nextFilterTypeDate
-
-    if (nextFilterTypeDate === 'custom' && startDate && endDate) {
-      filters.startDate = startDate
-      filters.endDate = endDate
-    }
-
-    refreshInventories(page > 0 ? page : 1, 10, filters)
-  }
 
   const inventoryColumns = [
     { id: 'sku', label: 'Mã biến thể', minWidth: 200 },
@@ -563,24 +520,31 @@ const InventoryTab = ({
     const inventoryDetails = await getInventoryId(inventory._id)
     setSelectedInventory(inventoryDetails)
     setOpenEditModal(true)
+    refreshInventories(page, rowsPerPage)
   }
 
   const handleDeleteInventory = async (inventory) => {
     const inventoryDetails = await getInventoryId(inventory._id)
     setSelectedInventory(inventoryDetails)
     setOpenDeleteModal(true)
+    refreshInventories(page, rowsPerPage)
   }
 
   const handleCloseEditModal = () => {
     setSelectedInventory(null)
     setOpenEditModal(false)
-    refreshInventories()
   }
 
   const handleCloseDeleteModal = () => {
     setSelectedInventory(null)
     setOpenDeleteModal(false)
-    refreshInventories()
+  }
+
+  const handleFilter = (newFilters) => {
+    setFilterWarehouse(newFilters)
+    if (Object.keys(newFilters).length > 0) {
+      refreshInventories(1, rowsPerPage, newFilters)
+    }
   }
 
   return (
@@ -593,95 +557,31 @@ const InventoryTab = ({
                 colSpan={inventoryColumns.length}
                 sx={{ borderBottom: 'none', paddingBottom: '0' }}
               >
-                <Typography variant='h6' sx={{ fontWeight: '800' }}>
-                  Tồn kho theo kho
-                </Typography>
-              </TableCell>
-            </TableRow>
-            <TableRow>
-              <TableCell colSpan={inventoryColumns.length}>
-                <Box display='flex' gap={2}>
-                  <FormControl
+                <Box
+                  sx={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'start'
+                  }}
+                >
+                  <Box
                     sx={{
-                      minWidth: 200,
-                      height: '40px',
-                      '& .MuiInputBase-root': {
-                        height: '40px',
-                        padding: '0 14px 0 0'
-                      }
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: 1,
+                      minWidth: 250
                     }}
                   >
-                    <Select
-                      value={filterWarehouse}
-                      onChange={(e) =>
-                        handleFilterChange('warehouseId', e.target.value)
-                      }
-                    >
-                      <MenuItem value='all'>Tất cả kho</MenuItem>
-                      {warehouses.map((warehouse) => (
-                        <MenuItem key={warehouse._id} value={warehouse._id}>
-                          {warehouse.name}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                  </FormControl>
-                  <FormControl
-                    sx={{
-                      minWidth: 200,
-                      height: '40px',
-                      '& .MuiInputBase-root': {
-                        height: '40px',
-                        padding: '0 14px 0 0'
-                      }
-                    }}
-                  >
-                    <Select
-                      value={filterVariantId}
-                      onChange={(e) =>
-                        handleFilterChange('variantId', e.target.value)
-                      }
-                    >
-                      <MenuItem value='all'>Tất cả biến thể</MenuItem>
-                      {variants.map((variant) => (
-                        <MenuItem key={variant._id} value={variant._id}>
-                          {variant.sku} - {variant.name}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                  </FormControl>
-                  <FormControl
-                    sx={{
-                      minWidth: 200,
-                      height: '40px',
-                      '& .MuiInputBase-root': {
-                        height: '40px',
-                        padding: '0 14px 0 0'
-                      }
-                    }}
-                  >
-                    <Select
-                      value={filterStatus}
-                      onChange={(e) =>
-                        handleFilterChange('status', e.target.value)
-                      }
-                    >
-                      <MenuItem value='all'>Tất cả trạng thái</MenuItem>
-                      <MenuItem value='in-stock'>Còn hàng</MenuItem>
-                      <MenuItem value='low-stock'>Cảnh báo</MenuItem>
-                      <MenuItem value='out-of-stock'>Hết hàng</MenuItem>
-                    </Select>
-                  </FormControl>
-                  <FilterByTime
-                    onApply={(value) =>
-                      handleFilterChange('filterTypeDate', value)
-                    }
-                    filterDate={filterDate}
-                    selectedFilter={filterTypeDate}
-                    setSelectedFilter={setFilterTypeDate}
-                    startDate={startDate}
-                    setStartDate={setStartDate}
-                    endDate={endDate}
-                    setEndDate={setEndDate}
+                    <Typography variant='h6' sx={{ fontWeight: '800' }}>
+                      Danh Sách Tồn Kho
+                    </Typography>
+                  </Box>
+                  <FilterInventory
+                    loading={loading}
+                    onFilter={handleFilter}
+                    warehouses={data}
+                    fetchInventories={refreshInventories}
+                    variants={variants}
                   />
                 </Box>
               </TableCell>
@@ -699,26 +599,8 @@ const InventoryTab = ({
               ))}
             </TableRow>
           </TableHead>
-          {/*<svg*/}
-          {/*  width='64'*/}
-          {/*  height='41'*/}
-          {/*  viewBox='0 0 64 41'*/}
-          {/*  xmlns='http://www.w3.org/2000/svg'*/}
-          {/*>*/}
-          {/*  <title>No data</title>*/}
-          {/*  <g transform='translate(0 1)' fill='none' fill-rule='evenodd'>*/}
-          {/*    <ellipse fill='#f5f5f5' cx='32' cy='33' rx='32' ry='7'></ellipse>*/}
-          {/*    <g fill-rule='nonzero' stroke='#d9d9d9'>*/}
-          {/*      <path d='M55 12.76L44.854 1.258C44.367.474 43.656 0 42.907 0H21.093c-.749 0-1.46.474-1.947 1.257L9 12.761V22h46v-9.24z'></path>*/}
-          {/*      <path*/}
-          {/*        d='M41.613 15.931c0-1.605.994-2.93 2.227-2.931H55v18.137C55 33.26 53.68 35 52.05 35h-40.1C10.32 35 9 33.259 9 31.137V13h11.16c1.233 0 2.227 1.323 2.227 2.928v.022c0 1.605 1.005 2.901 2.237 2.901h14.752c1.232 0 2.237-1.308 2.237-2.913v-.007z'*/}
-          {/*        fill='#fafafa'*/}
-          {/*      ></path>*/}
-          {/*    </g>*/}
-          {/*  </g>*/}
-          {/*</svg>*/}
           <TableBody>
-            {filteredInventories.map((row, index) => (
+            {enrichedInventories.map((row, index) => (
               <TableRow hover role='checkbox' tabIndex={-1} key={index}>
                 {inventoryColumns.map((column) => {
                   let value = row[column.id]
@@ -790,8 +672,13 @@ const InventoryTab = ({
         count={total || 0}
         rowsPerPage={rowsPerPage}
         page={page - 1}
-        onPageChange={(event, newPage) => onPageChange(event, newPage)} // +1 để giữ page bắt đầu từ 1
-        onRowsPerPageChange={(event) => onRowsPerPageChange(event, 'log')} // giữ đúng chuẩn
+        onPageChange={(event, newPage) => onPageChange(event, newPage + 1)} // +1 để đúng logic bên cha
+        onRowsPerPageChange={(event) => {
+          const newLimit = parseInt(event.target.value, 10)
+          if (onChangeRowsPerPage) {
+            onChangeRowsPerPage(newLimit)
+          }
+        }}
         labelRowsPerPage='Số dòng mỗi trang'
         labelDisplayedRows={({ from, to, count }) =>
           `${from}–${to} trên ${count !== -1 ? count : `hơn ${to}`}`

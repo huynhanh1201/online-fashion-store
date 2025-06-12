@@ -9,20 +9,38 @@ const useInventoryLogs = () => {
   const [logs, setLogs] = useState([])
   const [totalPagesLogs, setTotalPages] = useState(1)
   const [totalLogs, setTotalLogs] = useState(0)
-  const [loading, setLoading] = useState(false)
+  const [loadingLog, setLoading] = useState(false)
   const [logDetail, setLogDetail] = useState(null)
 
   const fetchLogs = async (page = 1, limit = 10, filters = {}) => {
     setLoading(true)
-    const logs = await getInventoryLogs({
-      page,
-      limit,
-      ...filters
-    })
-    setLogs(logs?.logs || [])
-    setTotalLogs(logs?.total || 0)
-    setTotalPages(logs?.totalPages || 1)
-    setLoading(false)
+    const buildQuery = (input) => {
+      const query = { page, limit, ...input }
+      Object.keys(query).forEach((key) => {
+        if (
+          query[key] === '' ||
+          query[key] === undefined ||
+          query[key] === null
+        ) {
+          delete query[key]
+        }
+      })
+      return query
+    }
+    try {
+      const query = buildQuery(filters)
+      const response = await getInventoryLogs(query)
+      setLogs(response.logs || [])
+      setTotalPages(response.totalPages || 1)
+      setTotalLogs(response.total || 0)
+      setLoading(false)
+    } catch (error) {
+      console.error('Error fetching inventory logs:', error)
+      setLogs([])
+      setTotalPages(0)
+      setTotalLogs(0)
+      setLoading(false)
+    }
   }
 
   const fetchLogDetail = async (logId) => {
@@ -40,7 +58,7 @@ const useInventoryLogs = () => {
     totalLogs,
     logs,
     totalPagesLogs,
-    loading,
+    loadingLog,
     fetchLogs,
     fetchLogDetail,
     logDetail,

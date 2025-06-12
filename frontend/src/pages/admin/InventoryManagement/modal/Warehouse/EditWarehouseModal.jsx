@@ -210,7 +210,7 @@ const EditWarehouseModal = ({ open, onClose, warehouse, onSave }) => {
       setDistrictName('')
       setWardName('')
     } catch (error) {
-      toast.error('Cập nhật kho hàng thất bại')
+      toast.error('Cập nhật kho hàng thất bại', error)
     }
   }
 

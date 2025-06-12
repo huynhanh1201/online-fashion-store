@@ -1,25 +1,14 @@
 import React, { useState, useEffect } from 'react'
-import {
-  Box,
-  FormControlLabel,
-  Checkbox,
-  Button,
-  TextField,
-  CircularProgress,
-  FormControl,
-  InputLabel,
-  MenuItem,
-  Select
-} from '@mui/material'
+import { Box, Button } from '@mui/material'
+import dayjs from 'dayjs'
 import FilterByTime from '~/components/FilterAdmin/common/FilterByTime.jsx'
 import SearchWithSuggestions from '~/components/FilterAdmin/common/SearchWithSuggestions.jsx'
 import FilterSelect from '~/components/FilterAdmin/common/FilterSelect.jsx'
-import dayjs from 'dayjs'
 
-export default function FilterCategory({
+export default function FilterSize({
   onFilter,
-  categories,
-  fetchCategories,
+  sizes = [],
+  fetchSizes,
   loading
 }) {
   const [keyword, setKeyword] = useState('')
@@ -29,6 +18,7 @@ export default function FilterCategory({
   const [endDate, setEndDate] = useState(dayjs().format('YYYY-MM-DD'))
   const [status, setStatus] = useState('')
   const [sort, setSort] = useState('')
+
   useEffect(() => {
     applyFilters(selectedFilter, startDate, endDate)
   }, [keyword, status, sort])
@@ -37,8 +27,10 @@ export default function FilterCategory({
     setSelectedFilter(selected)
     applyFilters(selected, startDate, endDate)
   }
+
   const handleSearch = () => {
     setKeyword(inputValue)
+    applyFilters(selectedFilter, startDate, endDate)
   }
 
   const applyFilters = (selectedTime, fromDate, toDate) => {
@@ -48,7 +40,6 @@ export default function FilterCategory({
       sort: sort || undefined
     }
 
-    // Xử lý thời gian tùy theo selectedTime
     if (selectedTime === 'custom') {
       filters.filterTypeDate = 'custom'
       filters.startDate = fromDate
@@ -57,7 +48,7 @@ export default function FilterCategory({
       filters.filterTypeDate = selectedTime
     }
 
-    // Xoá các field rỗng/null/undefined
+    // Xoá các key không có giá trị
     Object.keys(filters).forEach((key) => {
       if (
         filters[key] === undefined ||
@@ -78,9 +69,8 @@ export default function FilterCategory({
     setStartDate(dayjs().format('YYYY-MM-DD'))
     setEndDate(dayjs().format('YYYY-MM-DD'))
     setStatus('')
-    setSort('')
     onFilter({})
-    fetchCategories(1, 10, {}) // Reset lại danh sách categories
+    fetchSizes(1, 10) // Reset lại dữ liệu
   }
 
   return (
@@ -90,7 +80,6 @@ export default function FilterCategory({
         value={status}
         onChange={(value) => {
           setStatus(value)
-          applyFilters(selectedFilter, startDate, endDate)
         }}
         options={[
           { label: 'Tất cả', value: '' },
@@ -98,7 +87,6 @@ export default function FilterCategory({
           { label: 'Không hoạt động', value: true }
         ]}
       />
-
       <FilterSelect value={sort} onChange={setSort} />
 
       <FilterByTime
@@ -111,10 +99,11 @@ export default function FilterCategory({
         setEndDate={setEndDate}
         onApply={handleApplyTimeFilter}
       />
+
       <Box sx={{ display: 'flex', gap: 2 }}>
         <SearchWithSuggestions
-          label='Tìm kiếm tên'
-          options={categories.map((cat) => cat.name)}
+          label='Tìm kích cỡ'
+          options={sizes.map((size) => size.name)}
           loading={loading}
           keyword={keyword}
           inputValue={inputValue}
@@ -122,6 +111,7 @@ export default function FilterCategory({
           setInputValue={setInputValue}
           onSearch={handleSearch}
         />
+
         <Button
           variant='outlined'
           size='small'

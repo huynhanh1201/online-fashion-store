@@ -1,14 +1,15 @@
 import AuthorizedAxiosInstance from '~/utils/authorizedAxios'
 import { API_ROOT } from '~/utils/constants'
 
-export const getSizes = async (page = 1, limit = 10) => {
+export const getSizes = async (filter) => {
+  const queryString = new URLSearchParams(filter).toString()
   try {
     const response = await AuthorizedAxiosInstance.get(
-      `${API_ROOT}/v1/sizes?page=${page}&limit=${limit}`
+      `${API_ROOT}/v1/sizes?${queryString}`
     )
     return {
-      sizes: response.data || [],
-      total: response.data.total || response.data.length
+      sizes: response.data.data || [],
+      total: response.data.meta.total || 0
     }
   } catch (error) {
     console.error('Lỗi khi lấy danh sách kích thước:', error)
