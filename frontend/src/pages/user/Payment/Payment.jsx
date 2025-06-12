@@ -259,9 +259,6 @@ const Payment = () => {
   const totalOrder = Math.max(subTotal - discount)
   const totalFeeShipping = totalOrder + shippingPrice
 
-  console.log('shippingPrice:', shippingPrice)
-  console.log('totalOrder:', totalOrder)
-
   useEffect(() => {
     const isOnPaymentPage = location.pathname.startsWith('/payment')
     if (!isOnPaymentPage && isBuyNow) {
