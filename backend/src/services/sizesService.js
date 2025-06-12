@@ -1,7 +1,6 @@
 import { SizeModel } from '~/models/SizeModel'
 import validatePagination from '~/utils/validatePagination'
 import getDateRange from '~/utils/getDateRange'
-import { ColorModel } from '~/models/ColorModel'
 
 const createSize = async (reqBody) => {
   // eslint-disable-next-line no-useless-catch
