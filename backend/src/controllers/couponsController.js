@@ -27,7 +27,9 @@ const validateCoupon = async (req, res, next) => {
 
 const getCouponList = async (req, res, next) => {
   try {
-    const result = await couponsService.getCouponList()
+    const queryString = req.query
+
+    const result = await couponsService.getCouponList(queryString)
 
     res.status(StatusCodes.OK).json(result)
   } catch (err) {
