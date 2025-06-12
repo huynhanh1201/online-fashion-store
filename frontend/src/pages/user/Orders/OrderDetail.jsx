@@ -10,7 +10,8 @@ import {
   IconButton,
   Button,
   Snackbar,
-  Alert
+  Alert,
+  Stack
 } from '@mui/material'
 import { useParams, useNavigate } from 'react-router-dom'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack'
@@ -37,6 +38,9 @@ const OrderDetail = () => {
   const [snackbarOpen, setSnackbarOpen] = useState(false)
   const [openReviewModal, setOpenReviewModal] = useState(false)
   const [reviewedMap, setReviewedMap] = useState({})
+
+  const [selectedProduct, setSelectedProduct] = useState(null)
+
 
   useEffect(() => {
     const fetchUserReviews = async () => {
@@ -70,7 +74,7 @@ const OrderDetail = () => {
     if (!groups[productId]) {
       groups[productId] = {
         productId,
-        productName: item.product?.name || item.productName || item.name,
+        productName: item.product?.name || 'Không xác định',
         variants: [],
         totalQuantity: 0,
         totalPrice: 0
@@ -84,8 +88,8 @@ const OrderDetail = () => {
 
   const uniqueProducts = Object.values(productGroups)
   const isReviewed = (productId) => Object.prototype.hasOwnProperty.call(reviewedMap, productId?.toString())
-  const allProductsReviewed = uniqueProducts.every(product => isReviewed(product.productId))
-  
+  // const allProductsReviewed = uniqueProducts.every(product => isReviewed(product.productId))
+
   const isPaid = order.paymentStatus === 'paid'
   const isOrderCompleted = order.status === 'Delivered'
   const isOrderCancellable = ['Pending', 'Processing'].includes(order.status) && !isPaid
@@ -101,36 +105,43 @@ const OrderDetail = () => {
 
   const handleCloseModal = () => {
     setOpenReviewModal(false)
+    setSelectedProduct(null)
   }
+
 
   const handleSubmitReview = async ({ rating, comment }) => {
     try {
-      // Review all unreviewed products in the order
-      for (const product of uniqueProducts) {
-        const productId = product.productId
+      if (selectedProduct) {
+        // Review specific product
+        const productId = selectedProduct.productId
         const userId = currentUser?._id
-        if (!productId || !userId || isReviewed(productId)) continue
+        if (!productId || !userId) return
 
-        const review = await createReview({ productId, userId, rating, comment, orderId })
-        setReviewedMap(prev => ({ ...prev, [productId]: review._id }))
+        const reviewId = reviewedMap[productId]
+        if (reviewId) {
+          // Update existing review
+          await updateReview(reviewId, { rating, comment })
+        } else {
+          // Create new review
+          const review = await createReview({ productId, userId, rating, comment, orderId })
+          setReviewedMap(prev => ({ ...prev, [productId]: review._id }))
+        }
+      } else {
+        // Review all unreviewed products in the order
+        for (const product of uniqueProducts) {
+          const productId = product.productId
+          const userId = currentUser?._id
+          if (!productId || !userId || isReviewed(productId)) continue
+
+          const review = await createReview({ productId, userId, rating, comment, orderId })
+          setReviewedMap(prev => ({ ...prev, [productId]: review._id }))
+        }
       }
 
       handleCloseModal()
       setSnackbarOpen(true)
     } catch (error) {
       console.error('Lỗi gửi đánh giá:', error)
-    }
-  }
-
-  const handleUpdateReview = async (productId, { rating, comment }) => {
-    try {
-      const reviewId = reviewedMap[productId]
-      if (reviewId) {
-        await updateReview(reviewId, { rating, comment })
-        setSnackbarOpen(true)
-      }
-    } catch (error) {
-      console.error('Lỗi cập nhật đánh giá:', error)
     }
   }
 
@@ -156,83 +167,82 @@ const OrderDetail = () => {
           const firstVariant = product.variants[0]
           const hasMultipleVariants = product.variants.length > 1
           const productReviewed = isReviewed(product.productId)
-          
+
           return (
-            <Box key={product.productId} mb={2}>
-              {/* Product header */}
-              <Box display="flex" gap={2} alignItems="flex-start" mb={1}>
+            <Box key={product.productId} mb={3}>
+              {/* Header */}
+              <Box display="flex" gap={2} alignItems="flex-start">
+                {/* Ảnh sản phẩm */}
                 <Avatar
                   src={firstVariant.color?.image || '/default.jpg'}
                   variant="square"
                   sx={{ width: 64, height: 64, borderRadius: 1 }}
                 />
+
+                {/* Thông tin sản phẩm và biến thể */}
                 <Box flex={1}>
-                  <Typography variant="h6" mb={1}>{product.productName}</Typography>
-                  
-                  {/* Show variants */}
+                  <Typography variant="h6" fontWeight={600} mb={1}>
+                    {product.productName}
+                  </Typography>
+
+                  {/* Các biến thể */}
                   {product.variants.map((variant, index) => (
                     <Box key={variant._id} mb={0.5}>
-                      <Typography variant="body2" color="text.secondary">
-                        {hasMultipleVariants && `Loại ${index + 1}: `}
-                        {variant.color?.name}, {variant.size} - x{variant.quantity} = {formatPrice(variant.price * variant.quantity)}
-                      </Typography>
-                      {variant.originalPrice > variant.price && (
-                        <Typography variant="body2" sx={{ textDecoration: 'line-through', ml: hasMultipleVariants ? 2 : 0 }}>
-                          {formatPrice(variant.originalPrice * variant.quantity)}
+                      <Stack direction="row" justifyContent="space-between" alignItems="center">
+                        <Typography variant="body2" color="text.secondary">
+                          {hasMultipleVariants && `Loại ${index + 1}: `}
+                          {variant.color?.name}, {variant.size} - x{variant.quantity}
                         </Typography>
+                        <Typography variant="body2" fontWeight={600}>
+                          {formatPrice(variant.price * variant.quantity)}
+                        </Typography>
+                      </Stack>
+
+                      {variant.originalPrice > variant.price && (
+                        <Stack direction="row" justifyContent="flex-end">
+                          <Typography
+                            variant="body2"
+                            color="text.disabled"
+                            sx={{ textDecoration: 'line-through', fontSize: '0.85rem' }}
+                          >
+                            {formatPrice(variant.originalPrice * variant.quantity)}
+                          </Typography>
+                        </Stack>
                       )}
                     </Box>
                   ))}
-                  
-                  {hasMultipleVariants && (
-                    <Typography variant="body1" fontWeight="bold" mt={1}>
-                      Tổng: {formatPrice(product.totalPrice)} ({product.totalQuantity} sản phẩm)
-                    </Typography>
-                  )}
+
+
                 </Box>
 
-                {/* Action buttons */}
-                <Box display="flex" flexDirection="column" gap={1} alignItems="flex-end">
-                  {isOrderCompleted && currentUser && (
-                    <>
-                      {productReviewed ? (
-                        <Button
-                          variant="outlined"
-                          size="small"
-                          onClick={() => {
-                            // Handle individual product review update
-                            setOpenReviewModal(true)
-                          }}
-                        >
-                          Sửa đánh giá
-                        </Button>
-                      ) : (
-                        <Button
-                          variant="outlined"
-                          size="small"
-                          onClick={() => {
-                            // Handle individual product review
-                            setOpenReviewModal(true)
-                          }}
-                        >
-                          Đánh giá
-                        </Button>
-                      )}
-                    </>
-                  )}
-                  
+                {/* Nút hành động */}
+              </Box>
+              <Box display="flex" justifyContent="flex-end" gap={1} alignItems="flex-end" mt={1}>
+                {isOrderCompleted && currentUser && (
                   <Button
                     variant="outlined"
                     size="small"
-                    color="primary"
-                    onClick={() => navigate(`/productdetail/${product.productId}`)}
+                    onClick={() => {
+                      setSelectedProduct(product)
+                      setOpenReviewModal(true)
+                    }}
                   >
-                    Mua lại
+                    {productReviewed ? 'Sửa đánh giá' : 'Đánh giá'}
                   </Button>
-                </Box>
+
+                )}
+
+                <Button
+                  variant="outlined"
+                  size="small"
+                  color="primary"
+                  onClick={() => navigate(`/productdetail/${product.productId}`)}
+                >
+                  Mua lại
+                </Button>
               </Box>
-              
-              {/* Divider between products */}
+
+              {/* Divider giữa các sản phẩm */}
               {uniqueProducts.indexOf(product) < uniqueProducts.length - 1 && (
                 <Divider sx={{ mt: 2 }} />
               )}
@@ -276,17 +286,6 @@ const OrderDetail = () => {
         </Box>
       </Paper>
 
-      {/* Global review button - only show if order is completed and there are unreviewed products */}
-      {isOrderCompleted && currentUser && !allProductsReviewed && (
-        <Box display="flex" justifyContent="flex-end" mt={2}>
-          <Button
-            variant="contained"
-            onClick={() => setOpenReviewModal(true)}
-          >
-            Đánh giá tất cả sản phẩm
-          </Button>
-        </Box>
-      )}
 
       {/* Cancel order button */}
       {isOrderCancellable && (
@@ -312,9 +311,10 @@ const OrderDetail = () => {
         open={openReviewModal}
         onClose={handleCloseModal}
         onSubmit={handleSubmitReview}
-        orderItems={items}
-        products={uniqueProducts}
+        orderItems={selectedProduct ? selectedProduct.variants : items} // chỉ truyền variants của sản phẩm đang chọn
+        products={selectedProduct ? [selectedProduct] : uniqueProducts}
       />
+
     </Box>
   )
 }
