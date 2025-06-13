@@ -117,28 +117,9 @@ import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye'
 import BorderColorIcon from '@mui/icons-material/BorderColor'
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever'
 
-import useOrderAdmin from '~/hooks/admin/useOrder'
 import StyleAdmin from '~/assets/StyleAdmin.jsx'
 
 const TransactionRow = ({ transaction, onView, onEdit, onDelete, index }) => {
-  const [orderTotal, setOrderTotal] = useState(null)
-  const { getOrderId } = useOrderAdmin()
-
-  useEffect(() => {
-    const fetchOrder = async () => {
-      try {
-        const order = await getOrderId(transaction.orderId)
-        setOrderTotal(order?.total)
-      } catch (error) {
-        console.error('Lỗi khi lấy đơn hàng:', error)
-      }
-    }
-
-    if (transaction.orderId) {
-      fetchOrder()
-    }
-  }, [transaction.orderId])
-
   const statusLabel = {
     Pending: 'Đang xử lý',
     Completed: 'Thành công',
@@ -164,7 +145,7 @@ const TransactionRow = ({ transaction, onView, onEdit, onDelete, index }) => {
     <TableRow>
       <TableCell sx={StyleAdmin.TableColumnSTT}>{index + 1}</TableCell>
       <TableCell>{transaction.transactionId || '(Thanh toán COD)'}</TableCell>
-      <TableCell>{transaction.orderId}</TableCell>
+      <TableCell>{transaction?.orderId?.code}</TableCell>
       <TableCell>{transaction.method}</TableCell>
       <TableCell>
         <Chip
@@ -175,8 +156,8 @@ const TransactionRow = ({ transaction, onView, onEdit, onDelete, index }) => {
         />
       </TableCell>
       <TableCell>
-        {orderTotal !== null
-          ? `${orderTotal.toLocaleString('vi-VN')} VNĐ`
+        {transaction?.total !== null
+          ? `${transaction?.total.toLocaleString('vi-VN')} VNĐ`
           : 'Đang tải...'}
       </TableCell>
       <TableCell>

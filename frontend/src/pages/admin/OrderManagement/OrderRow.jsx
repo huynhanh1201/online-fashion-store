@@ -138,7 +138,7 @@ const OrderRow = ({ order, index, columns, onView, onEdit, onDelete }) => {
             value = index
             break
           case '_id':
-            value = order._id
+            value = order.code
             break
           case 'customerName':
             value = order.customerName || order.userId?.name || '—'
