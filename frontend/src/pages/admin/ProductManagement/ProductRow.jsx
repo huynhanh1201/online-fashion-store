@@ -147,7 +147,7 @@ const styles = {
     justifyContent: 'center',
     alignItems: 'center',
     gap: 1,
-    width: '100%'
+    width: '130px'
   }
 }
 const ProductRow = ({ product, index, columns, onAction }) => {
@@ -181,6 +181,9 @@ const ProductRow = ({ product, index, columns, onAction }) => {
                 />
               )
               break
+            case 'productCode':
+              value = product.productCode || '—'
+              break
             case 'name':
               value = product.name
               break
@@ -212,7 +215,7 @@ const ProductRow = ({ product, index, columns, onAction }) => {
               break
             case 'action':
               value = (
-                <Stack direction='row' spacing={1} sx={styles.groupIcon}>
+                <Stack direction='row' sx={styles.groupIcon}>
                   <IconButton
                     onClick={() => onAction('view', product)}
                     size='small'
@@ -222,14 +225,12 @@ const ProductRow = ({ product, index, columns, onAction }) => {
                   <IconButton
                     onClick={() => onAction('edit', product)}
                     size='small'
-                    sx={{ ml: '0 !important' }}
                   >
                     <BorderColorIcon color='warning' />
                   </IconButton>
                   <IconButton
                     onClick={() => onAction('delete', product)}
                     size='small'
-                    sx={{ ml: '0 !important' }}
                   >
                     <DeleteForeverIcon color='error' />
                   </IconButton>
@@ -241,15 +242,7 @@ const ProductRow = ({ product, index, columns, onAction }) => {
           }
 
           return (
-            <TableCell
-              key={id}
-              align={align || 'left'}
-              sx={
-                id === 'action'
-                  ? { width: 130, maxWidth: 130, minWidth: 130 }
-                  : {}
-              }
-            >
+            <TableCell key={id} align={align || 'left'}>
               {value}
             </TableCell>
           )

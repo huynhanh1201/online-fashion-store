@@ -144,8 +144,8 @@ const TransactionRow = ({ transaction, onView, onEdit, onDelete, index }) => {
   return (
     <TableRow>
       <TableCell sx={StyleAdmin.TableColumnSTT}>{index + 1}</TableCell>
-      <TableCell>{transaction.transactionId || '(Thanh toán COD)'}</TableCell>
       <TableCell>{transaction?.orderId?.code}</TableCell>
+      <TableCell>{transaction.transactionId || '(Thanh toán COD)'}</TableCell>
       <TableCell>{transaction.method}</TableCell>
       <TableCell>
         <Chip
@@ -157,7 +157,7 @@ const TransactionRow = ({ transaction, onView, onEdit, onDelete, index }) => {
       </TableCell>
       <TableCell>
         {transaction?.orderId?.total !== null
-          ? `${transaction?.orderId?.total.toLocaleString('vi-VN')} VNĐ`
+          ? `${transaction?.orderId?.total.toLocaleString('vi-VN')}đ`
           : 'Đang tải...'}
       </TableCell>
       <TableCell>

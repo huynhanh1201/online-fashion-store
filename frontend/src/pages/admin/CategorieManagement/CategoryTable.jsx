@@ -88,12 +88,7 @@ const CategoryTable = ({
     { id: 'index', label: 'STT', minWidth: 50, align: 'center' },
     { id: 'name', label: 'Tên danh mục', minWidth: 200 },
     { id: 'description', label: 'Mô tả', minWidth: 400 },
-    {
-      id: 'action',
-      label: 'Hành động',
-      minWidth: 130,
-      align: 'start'
-    }
+    { id: 'action', label: 'Hành động', minWidth: 150, align: 'start' }
   ]
   return (
     <Paper sx={{ border: '1px solid #ccc', width: '100%', overflow: 'hidden' }}>
