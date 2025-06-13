@@ -1,8 +1,6 @@
 import { CouponModel } from '~/models/CouponModel'
 import validatePagination from '~/utils/validatePagination'
 import getDateRange from '~/utils/getDateRange'
-import { SizeModel } from '~/models/SizeModel'
-import { type } from 'yarn/lib/cli'
 
 const createCoupon = async (reqBody) => {
   // eslint-disable-next-line no-useless-catch
