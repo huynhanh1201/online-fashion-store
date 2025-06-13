@@ -13,7 +13,8 @@ const createCategory = async (reqBody) => {
       name: reqBody.name,
       description: reqBody.description,
       slug: slugify(reqBody.name),
-      destroy: false
+      destroy: false,
+      image: reqBody.image || null
     }
 
     const category = await CategoryModel.create(newCategory)

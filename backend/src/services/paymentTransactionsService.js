@@ -60,7 +60,6 @@ const getPaymentTransactionList = async (queryString) => {
 
     const [paymentTransactions, total] = await Promise.all([
       PaymentTransactionModel.find(filter)
-        .collation({ locale: 'vi', strength: 1 })
         .sort(sortField)
         .skip((page - 1) * limit)
         .limit(limit)
