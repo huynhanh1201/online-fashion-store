@@ -8,6 +8,11 @@ import ProductColorDetail from '~/components/WarehouseStatistic/Card/ProductColo
 import { Typography, Box, Divider } from '@mui/material'
 import React from 'react'
 import useInventoryStatistics from '~/hooks/admin/Inventory/useStatistic.js'
+import useBatches from '~/hooks/admin/Inventory/useBatches.js'
+import usePartner from '~/hooks/admin/Inventory/usePartner.js'
+import useVariants from '~/hooks/admin/Inventory/useVariants.js'
+import useWarehouses from '~/hooks/admin/Inventory/useWarehouses.js'
+import useWarehouseSlips from '~/hooks/admin/Inventory/useWarehouseSlip.js'
 const styles = {
   header: {
     borderBottom: '1px solid #ccc',
@@ -24,18 +29,13 @@ const styles = {
   }
 }
 
-function WarehouseStatisticTab({
-  warehouses,
-  fetchWarehouses,
-  fetchVariants,
-  addWarehouse,
-  addWarehouseSlip,
-  addPartner,
-  fetchPartners,
-  variants,
-  partners,
-  batches
-}) {
+function WarehouseStatisticTab() {
+  const { warehouses, fetchWarehouses, createNewWarehouse } = useWarehouses()
+  const { variants, fetchVariants } = useVariants()
+  const { batches } = useBatches()
+  const { partners, fetchPartners, createNewPartner } = usePartner()
+  const { createNewWarehouseSlip } = useWarehouseSlips()
+
   const { statistics, loading, fetchStatistics } = useInventoryStatistics()
 
   React.useEffect(() => {
@@ -117,12 +117,12 @@ function WarehouseStatisticTab({
           loading={loading}
           warehouses={warehouses}
           variants={variants}
-          addWarehouseSlip={addWarehouseSlip}
-          addWarehouse={addWarehouse}
+          addWarehouseSlip={createNewWarehouseSlip}
+          addWarehouse={createNewWarehouse}
           fetchVariants={fetchVariants}
           batches={batches}
           partners={partners}
-          addPartner={addPartner}
+          addPartner={createNewPartner}
           fetchWarehouses={fetchWarehouses}
           fetchPartner={fetchPartners}
         />

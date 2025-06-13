@@ -357,7 +357,7 @@ export default function Search({
   searchText: initialSearchText = '',
   setSearchText = () => {},
   placeholder = 'Tìm kiếm...',
-  index = 0 // New prop to track the row index
+  index = 0 // New prop to track the row index.jsx
 }) {
   const [searchText, setSearchTextInternal] = useState(initialSearchText)
   const [suggestions, setSuggestions] = useState([])
@@ -407,7 +407,7 @@ export default function Search({
       const spaceBelow = windowHeight - rect.bottom
       const spaceAbove = rect.top
 
-      // Force dropdown to appear above for rows 4 and beyond (index >= 3)
+      // Force dropdown to appear above for rows 4 and beyond (index.jsx >= 3)
       if (index >= 3) {
         setDropdownPosition({ top: true, bottom: false })
       } else {

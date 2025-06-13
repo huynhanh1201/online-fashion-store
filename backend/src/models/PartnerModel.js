@@ -13,7 +13,7 @@ const partnerSchema = new Schema(
     name: {
       type: String,
       required: true,
-      index: true, // index để tìm kiếm nhanh theo tên
+      index: true, // index.jsx để tìm kiếm nhanh theo tên
       trim: true
     },
     type: {
@@ -59,4 +59,4 @@ const partnerSchema = new Schema(
 )
 
 // Tạo Model
-export const PartnerModel = model('Partner', partnerSchema)
+export const PartnerModel = model('PartnerManagement', partnerSchema)

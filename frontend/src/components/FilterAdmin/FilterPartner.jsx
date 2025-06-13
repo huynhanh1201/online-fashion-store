@@ -4,12 +4,11 @@ import dayjs from 'dayjs'
 import FilterSelect from '~/components/FilterAdmin/common/FilterSelect'
 import FilterByTime from '~/components/FilterAdmin/common/FilterByTime'
 import SearchWithSuggestions from '~/components/FilterAdmin/common/SearchWithSuggestions'
-
 export default function FilterPartner({
   onFilter,
   partners = [],
-  fetchPartners,
-  loading
+  loading,
+  fetchPartners
 }) {
   const [keyword, setKeyword] = useState('')
   const [inputValue, setInputValue] = useState('')
@@ -68,7 +67,7 @@ export default function FilterPartner({
     setStartDate(dayjs().format('YYYY-MM-DD'))
     setEndDate(dayjs().format('YYYY-MM-DD'))
     onFilter({})
-    fetchPartners?.(1, 10, {})
+    fetchPartners(1, 10)
   }
 
   return (

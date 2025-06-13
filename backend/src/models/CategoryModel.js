@@ -8,7 +8,7 @@ const categorySchema = new Schema(
       type: String,
       required: true,
       trim: true, // Loại bỏ khoảng trắng đầu/cuối,
-      unique: true // ⚡ bật unique index
+      unique: true // ⚡ bật unique index.jsx
     },
     slug: {
       type: String,

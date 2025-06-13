@@ -22,27 +22,22 @@ import {
 import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye'
 import ViewInventoryLogModal from '../modal/InventoryLog/ViewInventoryLogModal'
 import FilterInventoryLog from '~/components/FilterAdmin/FilterInventoryLog.jsx'
+import useUsers from '~/hooks/admin/useUsers.js'
+import useBatches from '~/hooks/admin/Inventory/useBatches.js'
+import useInventoryLog from '~/hooks/admin/Inventory/useInventoryLogs.js'
+import useVariants from '~/hooks/admin/Inventory/useVariants.js'
+import useInventory from '~/hooks/admin/Inventory/useInventorys.js'
+import useWarehouses from '~/hooks/admin/Inventory/useWarehouses.js'
+const InventoryLogTab = () => {
+  const { logs, fetchLogs, loadingLog, totalLogs } = useInventoryLog()
+  const { variants, fetchVariants } = useVariants()
+  const { warehouses, fetchWarehouses } = useWarehouses()
+  const { batches, fetchBatches } = useBatches()
+  const { users, fetchUsers } = useUsers()
+  const { inventories, fetchInventories } = useInventory()
 
-const InventoryLogTab = ({
-  data,
-  variants,
-  warehouses,
-  page,
-  rowsPerPage,
-  onPageChange,
-  onChangeRowsPerPage,
-  refreshInventoryLogs,
-  inventories,
-  fetchInventories,
-  fetchVariants,
-  batches,
-  fetchBatches,
-  total,
-  loading,
-  fetchUsers,
-  users,
-  fetchWarehouses
-}) => {
+  const [page, setPage] = useState(1) // State cho trang hiện tại
+  const [rowsPerPage, setRowsPerPage] = useState(10) // State cho số dòng mỗi trang
   const [filters, setFilters] = useState({}) // State cho kho
   const [openViewModal, setOpenViewModal] = useState(false) // State cho modal xem
   const [selectedLog, setSelectedLog] = useState(null) // State cho bản ghi được chọn
@@ -54,13 +49,13 @@ const InventoryLogTab = ({
     fetchWarehouses()
   }, [])
   useEffect(() => {
-    refreshInventoryLogs(page, rowsPerPage, filters)
+    fetchLogs(page, rowsPerPage, filters)
   }, [page, rowsPerPage])
   const handleViewLog = (log) => {
     setSelectedLog(log)
     setOpenViewModal(true)
   }
-  const enrichedInventoryLogs = (data || []).map((log) => {
+  const enrichedInventoryLogs = (logs || []).map((log) => {
     return {
       ...log,
       batchName:
@@ -82,39 +77,46 @@ const InventoryLogTab = ({
       id: 'amount',
       label: 'Số lượng',
       minWidth: 100,
-      align: 'right',
+      align: 'start',
       format: (value) => `${value.toLocaleString('vi-VN')}`
     },
     {
       id: 'importPrice',
       label: 'Giá nhập',
       minWidth: 100,
-      align: 'right',
+      align: 'start',
       format: (value) => `${value.toLocaleString('vi-VN')}đ`
     },
     {
       id: 'exportPrice',
       label: 'Giá xuất',
       minWidth: 100,
-      align: 'right',
+      align: 'start',
       format: (value) => `${value.toLocaleString('vi-VN')}đ`
     },
     {
       id: 'createdByName',
       label: 'Người thực hiện',
       minWidth: 120,
-      align: 'center'
+      align: 'start'
     },
     { id: 'createdAtFormatted', label: 'Ngày thực hiện', minWidth: 150 },
-    { id: 'action', label: 'Hành động', minWidth: 100, align: 'center' }
+    { id: 'action', label: 'Hành động', minWidth: 130, align: 'start' }
   ]
 
   const handleFilter = (newFilters) => {
     setFilters(newFilters)
     if (Object.keys(newFilters).length > 0) {
-      refreshInventoryLogs(1, rowsPerPage, newFilters)
+      fetchLogs(1, rowsPerPage, newFilters)
     }
   }
+  const handleChangePage = (event, value) => setPage(value)
+
+  const onChangeRowsPerPage = (newLimit) => {
+    setPage(1)
+    setRowsPerPage(newLimit)
+  }
+
   return (
     <Paper sx={{ border: '1px solid #ccc', width: '100%', overflow: 'hidden' }}>
       <TableContainer>
@@ -147,11 +149,11 @@ const InventoryLogTab = ({
                   <FilterInventoryLog
                     warehouses={warehouses}
                     onFilter={handleFilter}
-                    loading={loading}
+                    loading={loadingLog}
                     batches={batches}
                     inventories={inventories}
                     users={users}
-                    inventoryLog={data || []}
+                    inventoryLog={logs || []}
                   />
                 </Box>
               </TableCell>
@@ -162,6 +164,13 @@ const InventoryLogTab = ({
                   key={column.id}
                   align={column.align}
                   style={{ minWidth: column.minWidth }}
+                  sx={{
+                    ...(column.id === 'action' && {
+                      width: '130px',
+                      maxWidth: '130px',
+                      paddingLeft: '20px'
+                    })
+                  }}
                 >
                   {column.label}
                 </TableCell>
@@ -228,10 +237,10 @@ const InventoryLogTab = ({
       <TablePagination
         rowsPerPageOptions={[10, 25, 100]}
         component='div'
-        count={total || 0}
+        count={totalLogs || 0}
         rowsPerPage={rowsPerPage}
         page={page - 1}
-        onPageChange={(event, newPage) => onPageChange(event, newPage + 1)} // +1 để đúng logic bên cha
+        onPageChange={(event, newPage) => handleChangePage(event, newPage + 1)} // +1 để đúng logic bên cha
         onRowsPerPageChange={(event) => {
           const newLimit = parseInt(event.target.value, 10)
           if (onChangeRowsPerPage) {

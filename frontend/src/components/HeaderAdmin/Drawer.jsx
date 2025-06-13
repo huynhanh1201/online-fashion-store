@@ -28,14 +28,14 @@ import {
 } from '@mui/icons-material'
 import { Link, useLocation } from 'react-router-dom'
 
-export default function AdminSidebar({ open, profile, onDrawerOpen }) {
+export default function AdminDrawer({ open, profile, onDrawerOpen, onClose }) {
   const location = useLocation()
   const [openProduct, setOpenProduct] = React.useState(false)
   const [openOrder, setOpenOrder] = React.useState(false)
-
+  const [openInventory, setOpenInventory] = React.useState(false)
   const toggleProduct = () => setOpenProduct(!openProduct)
   const toggleOrder = () => setOpenOrder(!openOrder)
-
+  const toggleInventory = () => setOpenInventory(!openInventory)
   const currentPath = location.pathname
 
   const isActive = (path) => {
@@ -48,6 +48,7 @@ export default function AdminSidebar({ open, profile, onDrawerOpen }) {
 
   const activeButtonStyle = {
     '&.Mui-selected': {
+      backgroundColor: 'transparent',
       '& .MuiListItemIcon-root': {
         color: '#001f5d'
       },
@@ -159,7 +160,10 @@ export default function AdminSidebar({ open, profile, onDrawerOpen }) {
         flexDirection: 'column'
       }}
     >
-      <Box sx={{ display: 'flex', alignItems: 'center', p: 2 }}>
+      <Box
+        onClick={onClose}
+        sx={{ display: 'flex', alignItems: 'center', p: 2 }}
+      >
         <Avatar
           src={profile?.avatarUrl}
           alt={profile?.name}
@@ -181,149 +185,198 @@ export default function AdminSidebar({ open, profile, onDrawerOpen }) {
       </Box>
 
       <Divider sx={{ my: 0 }} />
+      <Box
+        sx={{
+          flexGrow: 1,
+          overflowY: 'auto',
+          overflowX: 'hidden'
+        }}
+      >
+        <List sx={{ flexGrow: 1, pt: 0 }}>
+          <Link
+            to='/admin'
+            style={{ textDecoration: 'none', color: 'inherit' }}
+          >
+            <ListItem disablePadding>
+              <ListItemButton
+                selected={isActive('/admin')}
+                sx={activeButtonStyle}
+              >
+                <ListItemIcon>
+                  <PollIcon />
+                </ListItemIcon>
+                <ListItemText primary='Thống kê' />
+              </ListItemButton>
+            </ListItem>
+          </Link>
 
-      <List sx={{ flexGrow: 1, pt: 0 }}>
-        <Link to='/admin' style={{ textDecoration: 'none', color: 'inherit' }}>
+          <Link
+            to='/admin/user-management'
+            style={{ textDecoration: 'none', color: 'inherit' }}
+          >
+            <ListItem disablePadding>
+              <ListItemButton
+                selected={isActive('/admin/user-management')}
+                sx={activeButtonStyle}
+              >
+                <ListItemIcon>
+                  <PersonIcon />
+                </ListItemIcon>
+                <ListItemText primary='Quản lý người dùng' />
+              </ListItemButton>
+            </ListItem>
+          </Link>
+
           <ListItem disablePadding>
-            <ListItemButton
-              selected={isActive('/admin')}
-              sx={activeButtonStyle}
-            >
+            <ListItemButton onClick={toggleProduct} sx={activeButtonStyle}>
               <ListItemIcon>
-                <PollIcon />
+                <InventoryIcon />
               </ListItemIcon>
-              <ListItemText primary='Thống kê' />
+              <ListItemText primary='Quản lý sản phẩm' />
+              {openProduct ? <ExpandLess /> : <ExpandMore />}
             </ListItemButton>
           </ListItem>
-        </Link>
+          <Collapse in={openProduct} timeout='auto' unmountOnExit>
+            <List component='div' disablePadding>
+              {[
+                {
+                  label: 'Quản lý danh mục',
+                  path: '/admin/categorie-management',
+                  icon: <CategoryIcon />
+                },
+                {
+                  label: 'Quản lý sản phẩm',
+                  path: '/admin/product-management',
+                  icon: <InventoryIcon />
+                },
+                {
+                  label: 'Quản lý biến thể',
+                  path: '/admin/variant-management'
+                },
+                {
+                  label: 'Quản lý màu sắc',
+                  path: '/admin/color-management',
+                  icon: <PaletteIcon />
+                },
+                {
+                  label: 'Quản lý kích thước',
+                  path: '/admin/size-management',
+                  icon: <StraightenIcon />
+                }
+              ].map((item) => (
+                <Link
+                  key={item.path}
+                  to={item.path}
+                  style={{ textDecoration: 'none', color: 'inherit' }}
+                >
+                  <ListItemButton
+                    selected={isActive(item.path)}
+                    sx={{ pl: 2, ...activeButtonStyle }}
+                  >
+                    <ListItemText primary={item.label} sx={{ ml: 7 }} />
+                  </ListItemButton>
+                </Link>
+              ))}
+            </List>
+          </Collapse>
 
-        <Link
-          to='/admin/user-management'
-          style={{ textDecoration: 'none', color: 'inherit' }}
-        >
           <ListItem disablePadding>
-            <ListItemButton
-              selected={isActive('/admin/user-management')}
-              sx={activeButtonStyle}
-            >
+            <ListItemButton onClick={toggleOrder} sx={activeButtonStyle}>
               <ListItemIcon>
-                <PersonIcon />
+                <ReceiptLongIcon />
               </ListItemIcon>
-              <ListItemText primary='Quản lý người dùng' />
+              <ListItemText primary='Quản lý đơn hàng' />
+              {openOrder ? <ExpandLess /> : <ExpandMore />}
             </ListItemButton>
           </ListItem>
-        </Link>
-
-        <ListItem disablePadding>
-          <ListItemButton onClick={toggleProduct} sx={activeButtonStyle}>
-            <ListItemIcon>
-              <InventoryIcon />
-            </ListItemIcon>
-            <ListItemText primary='Quản lý sản phẩm' />
-            {openProduct ? <ExpandLess /> : <ExpandMore />}
-          </ListItemButton>
-        </ListItem>
-        <Collapse in={openProduct} timeout='auto' unmountOnExit>
-          <List component='div' disablePadding>
-            {[
-              {
-                label: 'Quản lý danh mục',
-                path: '/admin/categorie-management',
-                icon: <CategoryIcon />
-              },
-              {
-                label: 'Quản lý sản phẩm',
-                path: '/admin/product-management',
-                icon: <InventoryIcon />
-              },
-              {
-                label: 'Quản lý màu sắc',
-                path: '/admin/color-management',
-                icon: <PaletteIcon />
-              },
-              {
-                label: 'Quản lý kích thước',
-                path: '/admin/size-management',
-                icon: <StraightenIcon />
-              }
-            ].map((item) => (
-              <Link
-                key={item.path}
-                to={item.path}
-                style={{ textDecoration: 'none', color: 'inherit' }}
-              >
-                <ListItemButton
-                  selected={isActive(item.path)}
-                  sx={{ pl: 2, ...activeButtonStyle }}
+          <Collapse in={openOrder} timeout='auto' unmountOnExit>
+            <List component='div' disablePadding>
+              {[
+                {
+                  label: 'Quản lý đơn hàng',
+                  path: '/admin/order-management',
+                  icon: <ReceiptLongIcon />
+                },
+                {
+                  label: 'Quản lý mã giảm giá',
+                  path: '/admin/discount-management',
+                  icon: <LocalOfferIcon />
+                },
+                {
+                  label: 'Quản lý giao dịch',
+                  path: '/admin/transaction-management',
+                  icon: <PaymentIcon />
+                }
+              ].map((item) => (
+                <Link
+                  key={item.path}
+                  to={item.path}
+                  style={{ textDecoration: 'none', color: 'inherit' }}
                 >
-                  <ListItemText primary={item.label} sx={{ ml: 7 }} />
-                </ListItemButton>
-              </Link>
-            ))}
-          </List>
-        </Collapse>
+                  <ListItemButton
+                    selected={isActive(item.path)}
+                    sx={{ pl: 2, ...activeButtonStyle }}
+                  >
+                    <ListItemText primary={item.label} sx={{ ml: 7 }} />
+                  </ListItemButton>
+                </Link>
+              ))}
+            </List>
+          </Collapse>
 
-        <ListItem disablePadding>
-          <ListItemButton onClick={toggleOrder} sx={activeButtonStyle}>
-            <ListItemIcon>
-              <ReceiptLongIcon />
-            </ListItemIcon>
-            <ListItemText primary='Quản lý đơn hàng' />
-            {openOrder ? <ExpandLess /> : <ExpandMore />}
-          </ListItemButton>
-        </ListItem>
-        <Collapse in={openOrder} timeout='auto' unmountOnExit>
-          <List component='div' disablePadding>
-            {[
-              {
-                label: 'Quản lý đơn hàng',
-                path: '/admin/order-management',
-                icon: <ReceiptLongIcon />
-              },
-              {
-                label: 'Quản lý mã giảm giá',
-                path: '/admin/discount-management',
-                icon: <LocalOfferIcon />
-              },
-              {
-                label: 'Quản lý giao dịch',
-                path: '/admin/transaction-management',
-                icon: <PaymentIcon />
-              }
-            ].map((item) => (
-              <Link
-                key={item.path}
-                to={item.path}
-                style={{ textDecoration: 'none', color: 'inherit' }}
-              >
-                <ListItemButton
-                  selected={isActive(item.path)}
-                  sx={{ pl: 2, ...activeButtonStyle }}
-                >
-                  <ListItemText primary={item.label} sx={{ ml: 7 }} />
-                </ListItemButton>
-              </Link>
-            ))}
-          </List>
-        </Collapse>
-
-        <Link
-          to='/admin/inventory-management'
-          style={{ textDecoration: 'none', color: 'inherit' }}
-        >
           <ListItem disablePadding>
-            <ListItemButton
-              selected={isActive('/admin/inventory-management')}
-              sx={activeButtonStyle}
-            >
+            <ListItemButton onClick={toggleInventory} sx={activeButtonStyle}>
               <ListItemIcon>
                 <WarehouseIcon />
               </ListItemIcon>
               <ListItemText primary='Quản lý kho' />
+              {openOrder ? <ExpandLess /> : <ExpandMore />}
             </ListItemButton>
           </ListItem>
-        </Link>
-      </List>
+          <Collapse in={openInventory} timeout='auto' unmountOnExit>
+            <List component='div' disablePadding>
+              {[
+                {
+                  label: 'Thống kê kho',
+                  path: '/admin/warehouse-statistic-management',
+                  icon: <ReceiptLongIcon />
+                },
+                { label: 'Quản lý kho', path: '/admin/inventory-management' },
+                {
+                  label: 'Quản lý phiếu kho',
+                  path: '/admin/warehouse-slips-management'
+                },
+                {
+                  label: 'Quản lý nhật ký kho',
+                  path: '/admin/inventory-log-management'
+                },
+                {
+                  label: 'Quản lý kho hàng',
+                  path: '/admin/warehouses-management'
+                },
+                { label: 'Quản lý lô hàng', path: '/admin/batches-management' },
+                {
+                  label: 'Quản lý đối tác',
+                  path: '/admin/partner-management'
+                }
+              ].map((item) => (
+                <Link
+                  key={item.path}
+                  to={item.path}
+                  style={{ textDecoration: 'none', color: 'inherit' }}
+                >
+                  <ListItemButton
+                    selected={isActive(item.path)}
+                    sx={{ pl: 2, ...activeButtonStyle }}
+                  >
+                    <ListItemText primary={item.label} sx={{ ml: 7 }} />
+                  </ListItemButton>
+                </Link>
+              ))}
+            </List>
+          </Collapse>
+        </List>
+      </Box>
     </Box>
   )
 }

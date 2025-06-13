@@ -23,10 +23,10 @@
 //   }
 // }
 //
-// export default React.memo(function UserRow({ user, index, handleOpenModal }) {
+// export default React.memo(function UserRow({ user, index.jsx, handleOpenModal }) {
 //   return (
 //     <StyledTableRow>
-//       <StyledTableCell sx={{ textAlign: 'center' }}>{index}</StyledTableCell>
+//       <StyledTableCell sx={{ textAlign: 'center' }}>{index.jsx}</StyledTableCell>
 //       <StyledTableCell title={user.name}>
 //         {user.name
 //           ?.toLowerCase()
@@ -91,7 +91,7 @@ export default React.memo(function UserRow({
   handleOpenModal,
   columns
 }) {
-  // console.log('UserRow render', index)
+  // console.log('UserRow render', index.jsx)
   return (
     <TableRow hover role='checkbox' tabIndex={-1}>
       {columns.map((column) => {

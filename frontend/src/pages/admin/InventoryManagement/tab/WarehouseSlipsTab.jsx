@@ -19,41 +19,41 @@ import AddWarehouseSlipModal from '../modal/WarehouseSlip/AddWarehouseSlipModal'
 import ViewWarehouseSlipModal from '../modal/WarehouseSlip/ViewWarehouseSlipModal'
 import FilterWarehouseSlip from '~/components/FilterAdmin/FilterWarehouseSlip.jsx'
 import { Chip } from '@mui/material'
+import useVariants from '~/hooks/admin/Inventory/useVariants.js'
+import useWarehouses from '~/hooks/admin/Inventory/useWarehouses.js'
+import useWarehouseSlips from '~/hooks/admin/Inventory/useWarehouseSlip.js'
+import useBatches from '~/hooks/admin/Inventory/useBatches.js'
+import usePartner from '~/hooks/admin/Inventory/usePartner.js'
+const WarehouseSlipsTab = () => {
+  const {
+    warehouseSlips,
+    fetchWarehouseSlips,
+    createNewWarehouseSlip,
+    loadingSlip,
+    totalPageSlip
+  } = useWarehouseSlips()
 
-const WarehouseSlipsTab = ({
-  data,
-  warehouses,
-  variants,
-  page,
-  rowsPerPage,
-  onPageChange,
-  loading,
-  total,
-  onChangeRowsPerPage,
-  batches,
-  partners,
-  addWarehouseSlip,
-  refreshWarehouseSlips,
-  fetchWarehouses,
-  fetchPartner,
-  addPartner,
-  addWarehouse,
-  fetchVariants
-}) => {
+  const { variants, fetchVariants } = useVariants()
+  const { warehouses, fetchWarehouses, createNewWarehouse } = useWarehouses()
+  const { batches, fetchBatches } = useBatches()
+  const { partners, fetchPartners, createNewPartner } = usePartner()
+
   const [openModal, setOpenModal] = useState(false)
   const [openViewModal, setOpenViewModal] = useState(false) // State cho View modal
   const [selectedSlip, setSelectedSlip] = useState(null) // State cho phiếu được chọn
   const [modalType, setModalType] = useState('input')
+  const [page, setPage] = useState(1)
+  const [rowsPerPage, setRowsPerPage] = useState(10)
   const [filter, setFilter] = useState('')
 
   useEffect(() => {
-    refreshWarehouseSlips(page, rowsPerPage, filter)
+    fetchWarehouseSlips(page, rowsPerPage, filter)
   }, [page, rowsPerPage])
 
   const handleFilter = (newFilters) => {
     setFilter(newFilters)
     if (Object.keys(newFilters).length > 0) {
-      refreshWarehouseSlips(1, rowsPerPage, newFilters)
+      fetchWarehouseSlips(1, rowsPerPage, newFilters)
     }
   }
 
@@ -71,9 +71,10 @@ const WarehouseSlipsTab = ({
   ])
 
   const handleOpenModal = (type) => {
-    fetchPartner()
+    fetchPartners()
     fetchWarehouses()
     fetchVariants()
+    fetchBatches()
     setModalType(type)
     setNewSlipData({
       ...newSlipData,
@@ -129,7 +130,7 @@ const WarehouseSlipsTab = ({
     setOpenViewModal(true)
   }
 
-  const enrichedWarehouseSlips = data.map((slip) => {
+  const enrichedWarehouseSlips = warehouseSlips.map((slip) => {
     // const warehouseId =
     //   slip.warehouseId && typeof slip.warehouseId === 'object'
     //     ? slip.warehouseId._id || slip.warehouseId.id
@@ -153,25 +154,31 @@ const WarehouseSlipsTab = ({
   })
   const warehouseSlipColumns = [
     { id: 'slipId', label: 'Mã phiếu', minWidth: 120 },
-    { id: 'type', label: 'Loại', minWidth: 100, align: 'center' },
+    { id: 'type', label: 'Loại', minWidth: 100, align: 'start' },
     { id: 'warehouse', label: 'Kho', minWidth: 120 },
     {
       id: 'itemCount',
       label: 'Số mặt hàng',
-      minWidth: 120,
-      align: 'center',
+      minWidth: 90,
       format: (value) => `${value.toLocaleString('vi-VN')}`
     },
-    { id: 'createdByName', label: 'Người tạo', minWidth: 150, align: 'center' },
+    { id: 'createdByName', label: 'Người tạo', minWidth: 150, align: 'start' },
     {
       id: 'createdAtFormatted',
       label: 'Ngày tạo',
       minWidth: 160,
-      align: 'center',
+      align: 'start',
       format: (value) => new Date(value).toLocaleDateString('vi-VN')
     },
-    { id: 'action', label: 'Hành động', minWidth: 120, align: 'center' }
+    { id: 'action', label: 'Hành động', minWidth: 130, align: 'start' }
   ]
+
+  const handleChangePage = (event, value) => setPage(value)
+
+  const onChangeRowsPerPage = (newLimit) => {
+    setPage(1)
+    setRowsPerPage(newLimit)
+  }
 
   return (
     <Paper sx={{ border: '1px solid #ccc', width: '100%', overflow: 'hidden' }}>
@@ -245,10 +252,10 @@ const WarehouseSlipsTab = ({
                   </Box>
                   <FilterWarehouseSlip
                     warehouses={warehouses}
-                    slips={data}
-                    fetchData={refreshWarehouseSlips}
+                    slips={warehouseSlips}
+                    fetchData={fetchWarehouseSlips}
                     onFilter={handleFilter}
-                    loading={loading}
+                    loading={loadingSlip}
                   />
                 </Box>
               </TableCell>
@@ -258,7 +265,18 @@ const WarehouseSlipsTab = ({
                 <TableCell
                   key={column.id}
                   align={column.align}
-                  style={{ minWidth: column.minWidth }}
+                  style={{
+                    minWidth: column.minWidth,
+                    ...(column.id === 'action' && {
+                      width: '130px',
+                      maxWidth: '130px',
+                      paddingLeft: '26px'
+                    }),
+                    ...(column.id === 'itemCount' && {
+                      width: '115px',
+                      maxWidth: '130px'
+                    })
+                  }}
                 >
                   {column.label}
                 </TableCell>
@@ -280,6 +298,15 @@ const WarehouseSlipsTab = ({
                         >
                           <RemoveRedEyeIcon color='primary' />
                         </IconButton>
+                      </TableCell>
+                    )
+                  }
+                  if (column.id === 'itemCount') {
+                    return (
+                      <TableCell key={column.id} align={column.align}>
+                        <Typography align='right' variant='body2'>
+                          {value}
+                        </Typography>
                       </TableCell>
                     )
                   }
@@ -308,10 +335,10 @@ const WarehouseSlipsTab = ({
       <TablePagination
         rowsPerPageOptions={[10, 25, 100]}
         component='div'
-        count={total || 0}
+        count={totalPageSlip || 0}
         rowsPerPage={rowsPerPage}
         page={page - 1}
-        onPageChange={(event, newPage) => onPageChange(event, newPage + 1)} // +1 để đúng logic bên cha
+        onPageChange={(event, newPage) => handleChangePage(event, newPage + 1)} // +1 để đúng logic bên cha
         onRowsPerPageChange={(event) => {
           const newLimit = parseInt(event.target.value, 10)
           if (onChangeRowsPerPage) {
@@ -335,13 +362,13 @@ const WarehouseSlipsTab = ({
         handleDeleteRow={handleDeleteRow}
         handleAddRow={handleAddRow}
         variants={variants}
-        warehouseSlips={data}
+        warehouseSlips={warehouseSlips}
         batches={batches}
         type={modalType}
         partners={partners}
-        addWarehouseSlip={addWarehouseSlip}
-        addPartner={addPartner}
-        addWarehouse={addWarehouse}
+        addWarehouseSlip={createNewWarehouseSlip}
+        addPartner={createNewPartner}
+        addWarehouse={createNewWarehouse}
       />
       <ViewWarehouseSlipModal
         open={openViewModal}
