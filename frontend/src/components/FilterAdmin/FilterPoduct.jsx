@@ -127,14 +127,14 @@ export default function FilterProduct({
         ]}
       />
 
-      <FilterByPrice
-        label='Giá sản phẩm'
-        priceMin={priceMin}
-        priceMax={priceMax}
-        setPriceMin={setPriceMin}
-        setPriceMax={setPriceMax}
-        onApply={() => applyFilters()}
-      />
+      {/*<FilterByPrice*/}
+      {/*  label='Giá sản phẩm'*/}
+      {/*  priceMin={priceMin}*/}
+      {/*  priceMax={priceMax}*/}
+      {/*  setPriceMin={setPriceMin}*/}
+      {/*  setPriceMax={setPriceMax}*/}
+      {/*  onApply={() => applyFilters()}*/}
+      {/*/>*/}
 
       <FilterSelect
         label='Trạng thái'

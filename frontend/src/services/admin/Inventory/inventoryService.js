@@ -112,6 +112,7 @@ export const getInventoryLogs = async (filters) => {
   const response = await AuthorizedAxiosInstance.get(
     `${API_ROOT}/v1/inventory-logs?${params}`
   )
+  console.log('Response data:', response.data.data)
   return {
     logs: response.data.data,
     totalPages: response.data.meta?.totalPages,

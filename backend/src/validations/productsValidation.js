@@ -20,16 +20,16 @@ const product = async (req, res, next) => {
       .min(1) // tối thiểu 3 ký tự
       .max(100) // tối đa 100 ký tự
       .trim() // loại bỏ khoảng trắng đầu/cuối
-      .required(), // bắt buộc :contentReference[oaicite:0]{index=0}
+      .required(), // bắt buộc :contentReference[oaicite:0]{index.jsx=0}
 
     description: Joi.string() // description không bắt buộc
       .trim()
-      .allow('', null), // cho phép bỏ trống hoặc null :contentReference[oaicite:1]{index=1}
+      .allow('', null), // cho phép bỏ trống hoặc null :contentReference[oaicite:1]{index.jsx=1}
 
     image: Joi.array() // image là mảng
       .items(
         Joi.string()
-          .uri() // mỗi phần tử phải là URI hợp lệ :contentReference[oaicite:3]{index=3}
+          .uri() // mỗi phần tử phải là URI hợp lệ :contentReference[oaicite:3]{index.jsx=3}
           .trim()
       )
       .min(1) // ít nhất 1 ảnh
@@ -38,11 +38,11 @@ const product = async (req, res, next) => {
     categoryId: Joi.string().length(24).hex().required(),
 
     importPrice: Joi.number() // price bắt buộc, số
-      .min(0) // không âm :contentReference[oaicite:2]{index=2}
+      .min(0) // không âm :contentReference[oaicite:2]{index.jsx=2}
       .required(),
 
     exportPrice: Joi.number() // price bắt buộc, số
-      .min(0) // không âm :contentReference[oaicite:2]{index=2}
+      .min(0) // không âm :contentReference[oaicite:2]{index.jsx=2}
       .required()
   })
 

@@ -4,7 +4,6 @@ import dayjs from 'dayjs'
 
 import FilterSelect from '~/components/FilterAdmin/common/FilterSelect'
 import FilterByTime from '~/components/FilterAdmin/common/FilterByTime'
-import FilterByPrice from '~/components/FilterAdmin/common/FilterByPrice'
 import SearchWithSuggestions from '~/components/FilterAdmin/common/SearchWithSuggestions'
 
 export default function FilterVariant({

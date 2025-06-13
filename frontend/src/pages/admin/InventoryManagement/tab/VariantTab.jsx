@@ -23,29 +23,25 @@ import EditVariantModal from '../modal/Variant/EditVariantModal.jsx' // Thêm mo
 import DeleteVariantModal from '../modal/Variant/DeleteVariantModal.jsx'
 import AddIcon from '@mui/icons-material/Add'
 import FilterVariant from '~/components/FilterAdmin/FilterVariant.jsx'
+import useVariants from '~/hooks/admin/Inventory/useVariants.js'
+import useProducts from '~/hooks/admin/useProducts.js'
+import useColors from '~/hooks/admin/useColor.js'
+import useSizes from '~/hooks/admin/useSize.js'
+const VariantsTab = () => {
+  const {
+    variants,
+    fetchVariants,
+    createNewVariant,
+    updateVariantById,
+    deleteVariantById,
+    loadingVariant,
+    totalVariant
+  } = useVariants()
+  const { products, fetchProducts } = useProducts()
+  const { colors, fetchColors } = useColors()
+  const { sizes, fetchSizes } = useSizes()
 
-const VariantsTab = ({
-  data,
-  products,
-  page,
-  rowsPerPage,
-  loading,
-  total,
-  onPageChange,
-  onChangeRowsPerPage,
-  refreshVariants,
-  addVariant,
-  updateVariant, // Giả định prop mới
-  deleteVariant, // Giả định prop mới
-  refreshProducts,
-  formatCurrency,
-  parseCurrency,
-  colors,
-  fetchColors,
-  fetchSizes,
-  sizes
-}) => {
-  const enrichedVariants = (data || []).map((variant) => {
+  const enrichedVariants = (variants || []).map((variant) => {
     const product = (products || []).find((p) => p.id === variant.productId)
     return {
       ...variant,
@@ -58,16 +54,17 @@ const VariantsTab = ({
   const [openEditModal, setOpenEditModal] = useState(false)
   const [openDeleteModal, setOpenDeleteModal] = useState(false)
   const [selectedVariant, setSelectedVariant] = useState(null)
-
+  const [page, setPage] = useState(1)
+  const [rowsPerPage, setRowsPerPage] = useState(10)
   const [filter, setFilter] = useState({})
 
   useEffect(() => {
-    refreshProducts()
+    fetchProducts()
     fetchColors()
     fetchSizes()
   }, [])
   useEffect(() => {
-    refreshVariants(page, rowsPerPage, filter)
+    fetchVariants(page, rowsPerPage, filter)
   }, [page, rowsPerPage])
   const handleAddVariant = () => {
     setOpenAddModal(true)
@@ -75,6 +72,7 @@ const VariantsTab = ({
 
   const handleCloseAddModal = () => {
     setOpenAddModal(false)
+    fetchVariants(1, rowsPerPage)
   }
 
   const handleViewVariant = (variant) => {
@@ -95,11 +93,13 @@ const VariantsTab = ({
   const handleCloseViewModal = () => {
     setOpenViewModal(false)
     setSelectedVariant(null)
+    fetchVariants(1, rowsPerPage)
   }
 
   const handleCloseEditModal = () => {
     setOpenEditModal(false)
     setSelectedVariant(null)
+    fetchVariants(1, rowsPerPage)
   }
 
   const handleCloseDeleteModal = () => {
@@ -115,29 +115,54 @@ const VariantsTab = ({
     {
       id: 'importPrice',
       label: 'Giá nhập',
-      minWidth: 100,
-      align: 'right',
+      minWidth: 150,
+      align: 'start',
       format: (value) => `${value.toLocaleString('vi-VN')}đ`
     },
     {
       id: 'exportPrice',
       label: 'Giá bán',
-      minWidth: 100,
-      align: 'right',
+      minWidth: 150,
+      align: 'start',
       format: (value) => `${value.toLocaleString('vi-VN')}đ`
     },
-    { id: 'action', label: 'Hành động', minWidth: 150, align: 'center' }
+    {
+      id: 'createdAt',
+      label: 'Ngày tạo',
+      minWidth: 150,
+      align: 'start',
+      format: (value) => new Date(value).toLocaleDateString('vi-VN')
+    },
+    {
+      id: 'updatedAt',
+      label: 'Ngày cập nhật',
+      minWidth: 150,
+      align: 'start',
+      format: (value) => new Date(value).toLocaleDateString('vi-VN')
+    },
+    { id: 'action', label: 'Hành động', minWidth: 150, align: 'start' }
   ]
 
   const handleFilter = (newFilters) => {
     setFilter(newFilters)
     if (Object.keys(newFilters).length > 0) {
-      refreshVariants(1, rowsPerPage, newFilters)
+      fetchVariants(1, rowsPerPage, newFilters)
     }
   }
+  const formatCurrency = (value) => {
+    if (!value) return ''
+    return Number(value).toLocaleString('vi-VN') // Thêm dấu chấm theo chuẩn VNĐ
+  }
 
-  const filterColor = colors.filter((c) => !c.destroy)
-  const filterSize = sizes.filter((s) => !s.destroy)
+  const parseCurrency = (value) => {
+    return value.replaceAll('.', '').replace(/[^\d]/g, '') // Loại bỏ dấu . và ký tự khác ngoài số
+  }
+  const handleChangePage = (event, value) => setPage(value)
+
+  const onChangeRowsPerPage = (newLimit) => {
+    setPage(1)
+    setRowsPerPage(newLimit)
+  }
   return (
     <Paper sx={{ border: '1px solid #ccc', width: '100%', overflow: 'hidden' }}>
       <TableContainer>
@@ -181,11 +206,11 @@ const VariantsTab = ({
                   <FilterVariant
                     onFilter={handleFilter}
                     products={products}
-                    variants={data}
-                    loading={loading}
-                    fetchVariants={refreshVariants}
-                    colors={filterColor}
-                    sizes={filterSize}
+                    variants={variants}
+                    loading={loadingVariant}
+                    fetchVariants={fetchVariants}
+                    colors={colors}
+                    sizes={sizes}
                   />
                 </Box>
               </TableCell>
@@ -196,6 +221,13 @@ const VariantsTab = ({
                   key={column.id}
                   align={column.align}
                   style={{ minWidth: column.minWidth }}
+                  sx={{
+                    ...(column.id === 'action' && {
+                      width: '130px',
+                      maxWidth: '130px',
+                      paddingLeft: '20px'
+                    })
+                  }}
                 >
                   {column.label}
                 </TableCell>
@@ -238,9 +270,7 @@ const VariantsTab = ({
                   }
                   return (
                     <TableCell key={column.id} align={column.align}>
-                      {column.format && typeof value === 'number'
-                        ? column.format(value)
-                        : value || '—'}
+                      {column.format ? column.format(value) : value || '—'}
                     </TableCell>
                   )
                 })}
@@ -252,10 +282,10 @@ const VariantsTab = ({
       <TablePagination
         rowsPerPageOptions={[10, 25, 100]}
         component='div'
-        count={total || 0}
+        count={totalVariant || 0}
         rowsPerPage={rowsPerPage}
         page={page - 1}
-        onPageChange={(event, newPage) => onPageChange(event, newPage + 1)} // +1 để đúng logic bên cha
+        onPageChange={(event, newPage) => handleChangePage(event, newPage + 1)} // +1 để đúng logic bên cha
         onRowsPerPageChange={(event) => {
           const newLimit = parseInt(event.target.value, 10)
           if (onChangeRowsPerPage) {
@@ -270,12 +300,12 @@ const VariantsTab = ({
       <AddVariantModal
         open={openAddModal}
         onClose={handleCloseAddModal}
-        addVariant={addVariant}
+        addVariant={createNewVariant}
         products={products}
         parseCurrency={parseCurrency}
         formatCurrency={formatCurrency}
-        colors={filterColor}
-        sizes={filterSize}
+        colors={colors}
+        sizes={sizes}
       />
       <ViewVariantModal
         open={openViewModal}
@@ -287,7 +317,7 @@ const VariantsTab = ({
         open={openEditModal}
         onClose={handleCloseEditModal}
         variant={selectedVariant}
-        onUpdateVariant={updateVariant}
+        onUpdateVariant={updateVariantById}
         products={products}
         parseCurrency={parseCurrency}
         formatCurrency={formatCurrency}
@@ -296,7 +326,7 @@ const VariantsTab = ({
         open={openDeleteModal}
         onClose={handleCloseDeleteModal}
         variant={selectedVariant}
-        deleteVariant={deleteVariant}
+        deleteVariant={deleteVariantById}
       />
     </Paper>
   )

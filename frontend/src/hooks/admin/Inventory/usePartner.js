@@ -87,8 +87,8 @@ const usePartner = () => {
 
   return {
     partners,
-    totalPartner,
     loadingPartner,
+    totalPartner,
     fetchPartners,
     fetchPartnerById,
     createNewPartner,

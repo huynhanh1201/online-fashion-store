@@ -20,9 +20,9 @@
 // //           </Typography>
 // //
 // //           {warehouse.lowStockVariants?.length > 0 ? (
-// //             warehouse.lowStockVariants.map((item, index) => (
+// //             warehouse.lowStockVariants.map((item, index.jsx) => (
 // //               <Box
-// //                 key={index}
+// //                 key={index.jsx}
 // //                 sx={{
 // //                   backgroundColor: '#fce4ec',
 // //                   borderRadius: 2,
@@ -87,9 +87,9 @@
 //             {/*  Kho: {warehouse.warehouseId}*/}
 //             {/*</Typography>*/}
 //
-//             {warehouse.lowStockVariants.map((item, index) => (
+//             {warehouse.lowStockVariants.map((item, index.jsx) => (
 //               <Box
-//                 key={index}
+//                 key={index.jsx}
 //                 sx={{
 //                   backgroundColor: '#fce4ec',
 //                   borderRadius: 2,
