@@ -46,7 +46,8 @@ const FilterByTime = ({
           textTransform: 'none',
           justifyContent: 'space-between',
           minWidth: 150,
-          color: 'text.primary',
+          height: 40,
+          color: '#00000099',
           borderColor: 'rgba(0, 0, 0, 0.23)', // giống border Select mặc định
           padding: '6.5px 14px', // giống TextField size="small"
           '&:hover': {

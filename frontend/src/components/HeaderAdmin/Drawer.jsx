@@ -48,6 +48,7 @@ export default function AdminSidebar({ open, profile, onDrawerOpen }) {
 
   const activeButtonStyle = {
     '&.Mui-selected': {
+      backgroundColor: 'transparent',
       '& .MuiListItemIcon-root': {
         color: '#001f5d'
       },

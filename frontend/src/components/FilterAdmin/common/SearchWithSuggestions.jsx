@@ -26,7 +26,8 @@ export default function SearchWithSuggestions({
     <Autocomplete
       sx={{
         '& .MuiOutlinedInput-root': {
-          paddingRight: '6px !important'
+          paddingRight: '6px !important',
+          height: 40
         }
       }}
       freeSolo

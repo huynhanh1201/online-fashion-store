@@ -37,7 +37,6 @@ export default function FilterColor({
 
   const handleSearch = () => {
     setKeyword(inputValue)
-    applyFilters(selectedFilter, startDate, endDate)
   }
 
   const applyFilters = (selectedTime, fromDate, toDate) => {

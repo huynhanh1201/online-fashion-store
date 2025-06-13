@@ -592,7 +592,6 @@ const InventoryTab = ({
                   key={column.id}
                   align={column.align}
                   style={{ minWidth: column.minWidth }}
-                  sx={{ backgroundColor: '#001f5d', color: '#fff' }}
                 >
                   {column.label}
                 </TableCell>

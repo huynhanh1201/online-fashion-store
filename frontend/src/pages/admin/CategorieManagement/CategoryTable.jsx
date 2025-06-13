@@ -1,59 +1,3 @@
-// // components/CategoryTable.jsx
-// import React from 'react'
-// import Table from '@mui/material/Table'
-// import TableBody from '@mui/material/TableBody'
-// import TableHead from '@mui/material/TableHead'
-// import StyleAdmin, {
-//   StyledTableCell,
-//   StyledTableRow,
-//   StyledTableContainer
-// } from '~/assets/StyleAdmin.jsx'
-// import CategoryRow from './CategoryRow'
-//
-// const CategoryTable = ({ categories, loading, handleOpenModal }) => {
-//   const FilteredCategories = categories.filter((c) => c.destroy !== true)
-//   return (
-//     <Table>
-//       <TableHead>
-//         <StyledTableRow>
-//           <StyledTableCell sx={StyleAdmin.TableColumnSTT}>STT</StyledTableCell>
-//           <StyledTableCell sx={{ width: '20%' }}>Tên danh mục</StyledTableCell>
-//           <StyledTableCell sx={{ width: '100%' }}>Mô tả</StyledTableCell>
-//           <StyledTableCell sx={{ width: '130px', maxWidth: '130px' }}>
-//             Hành động
-//           </StyledTableCell>
-//         </StyledTableRow>
-//       </TableHead>
-//       <TableBody>
-//         {loading ? (
-//           <StyledTableRow>
-//             <StyledTableCell colSpan={4} align='center'>
-//               Đang tải danh mục...
-//             </StyledTableCell>
-//           </StyledTableRow>
-//         ) : FilteredCategories.length === 0 ? (
-//           <StyledTableRow>
-//             <StyledTableCell colSpan={4} align='center'>
-//               Không có danh mục nào.
-//             </StyledTableCell>
-//           </StyledTableRow>
-//         ) : (
-//           FilteredCategories.map((category, idx) => (
-//             <CategoryRow
-//               key={category._id}
-//               category={category}
-//               idx={idx}
-//               handleOpenModal={handleOpenModal}
-//             />
-//           ))
-//         )}
-//       </TableBody>
-//     </Table>
-//   )
-// }
-//
-// export default CategoryTable
-
 import React from 'react'
 import {
   Table,
@@ -88,6 +32,8 @@ const CategoryTable = ({
     { id: 'index', label: 'STT', minWidth: 50, align: 'center' },
     { id: 'name', label: 'Tên danh mục', minWidth: 200 },
     { id: 'description', label: 'Mô tả', minWidth: 400 },
+    { id: 'createdAt', label: 'Ngày tạo', minWidth: 150 },
+    { id: 'updatedAt', label: 'Ngày cập nhật', minWidth: 150 },
     { id: 'action', label: 'Hành động', minWidth: 150, align: 'start' }
   ]
   return (
