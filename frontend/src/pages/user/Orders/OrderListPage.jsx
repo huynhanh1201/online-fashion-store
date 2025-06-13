@@ -15,6 +15,8 @@ import { getOrders, getOrderItems } from '~/services/orderService'
 import { useNavigate } from 'react-router-dom'
 import { useSelector } from 'react-redux'
 import { selectCurrentUser } from '~/redux/user/userSlice'
+import { useCart } from '~/hooks/useCarts'
+
 // Define status labels and corresponding tab values
 const statusLabels = {
   All: ['Tất cả', 'default'],
@@ -32,11 +34,13 @@ const OrderRow = ({ order }) => {
   const navigate = useNavigate()
 
   const [label, color] = statusLabels[order.status] || ['Không xác định', 'default']
+  const { addToCart } = useCart()
 
   useEffect(() => {
     const fetchItems = async () => {
       try {
         const res = await getOrderItems(order._id)
+        console.log('order items:', res)
         setItems(res)
       } catch (err) {
         console.error('Lỗi khi lấy sản phẩm:', err)
@@ -117,21 +121,29 @@ const OrderRow = ({ order }) => {
           <Box display="flex" justifyContent="flex-end" gap={1}>
             {order.status === 'Delivered' ? (
               <>
-                <Button
-                  variant="contained"
-                  size="medium"
-                  sx={{ backgroundColor: '#1A3C7B', color: '#fff' }}
-                  onClick={() => { /* Đánh giá logic */ }}
-                >
-                  Đánh giá
-                </Button>
+
                 <Button
                   variant="outlined"
                   size="medium"
-                  onClick={() => navigate(`/productdetail/${items[0]?.productId}`)}
+                  onClick={async () => {
+                    try {
+                      // Lặp qua từng sản phẩm trong đơn hàng, chỉ thêm 1 sản phẩm mỗi loại vào giỏ
+                      for (const item of items) {
+                        const variantId = typeof item.variantId === 'object' ? item.variantId._id : item.variantId
+                        if (!variantId) continue
+                        await addToCart({ variantId, quantity: 1 })
+                      }
+
+                      navigate('/cart')
+                    } catch (err) {
+                      console.error('Lỗi khi mua lại:', err)
+                    }
+                  }}
                 >
                   Mua lại
                 </Button>
+
+
               </>
             ) : (
               <Button
