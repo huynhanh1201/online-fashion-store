@@ -44,7 +44,6 @@ export default function FilterWarehouse({
 
   const handleSearch = () => {
     setKeyword(inputValue)
-    applyFilters()
   }
 
   const applyFilters = (overrides = {}) => {
@@ -209,16 +208,18 @@ export default function FilterWarehouse({
       <FilterSelect
         label='Trạng thái'
         value={destroy}
-        onChange={setDestroy}
+        onChange={(val) => {
+          setDestroy(val)
+        }}
         options={[
           { label: 'Tất cả', value: '' },
-          { label: 'Đang hoạt động', value: 'true' },
-          { label: 'Ngừng hoạt động', value: 'false' }
+          { label: 'Đang hoạt động', value: 'false' },
+          { label: 'Ngừng hoạt động', value: 'true' }
         ]}
       />
       <FilterSelect value={sort} onChange={setSort} />
       <FilterByTime
-        label='Ngày tạo'
+        label='Ngày tạo kho'
         selectedFilter={selectedFilter}
         setSelectedFilter={setSelectedFilter}
         startDate={startDate}
@@ -234,7 +235,7 @@ export default function FilterWarehouse({
           inputValue={inputValue}
           setKeyword={setKeyword}
           setInputValue={setInputValue}
-          options={warehouses.map((w) => `${w.code} - ${w.name}`)}
+          options={warehouses.map((w) => w.name)}
           loading={loading}
           onSearch={handleSearch}
         />

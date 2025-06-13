@@ -194,11 +194,13 @@ export default function FilterDiscount({
       <FilterSelect
         label='Trạng thái'
         value={isActive}
-        onChange={setIsActive}
+        onChange={(val) => {
+          setIsActive(val)
+        }}
         options={[
           { label: 'Tất cả', value: '' },
-          { label: 'Đang hoạt động', value: false },
-          { label: 'Ngừng hoạt động', value: true }
+          { label: 'Đang hoạt động', value: 'false' },
+          { label: 'Ngừng hoạt động', value: 'true' }
         ]}
       />
       <FilterSelect value={sort} onChange={setSort} />

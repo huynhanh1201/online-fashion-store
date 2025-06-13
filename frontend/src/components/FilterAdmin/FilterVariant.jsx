@@ -73,8 +73,8 @@ export default function FilterVariant({
   const applyFilters = ({
     search: kw = keyword,
     productId: pid = productId,
-    colorName: c = colorName,
-    sizeName: s = sizeName,
+    colorId: c = colorName,
+    sizeId: s = sizeName,
     overridePrice: op = overridePrice,
     status: d = destroy,
     sort: so = sort,
@@ -87,7 +87,7 @@ export default function FilterVariant({
     toDate = endDate
   } = {}) => {
     const filters = {
-      keyword: kw || undefined,
+      search: kw || undefined,
       productId: pid || undefined,
       colorName: c || undefined,
       sizeName: s || undefined,
@@ -182,16 +182,16 @@ export default function FilterVariant({
         ]}
       />
 
-      <FilterSelect
-        label='Giá riêng'
-        value={overridePrice}
-        onChange={setOverridePrice}
-        options={[
-          { label: 'Tất cả', value: '' },
-          { label: 'Có', value: 'true' },
-          { label: 'Không', value: 'false' }
-        ]}
-      />
+      {/*<FilterSelect*/}
+      {/*  label='Giá riêng'*/}
+      {/*  value={overridePrice}*/}
+      {/*  onChange={setOverridePrice}*/}
+      {/*  options={[*/}
+      {/*    { label: 'Tất cả', value: '' },*/}
+      {/*    { label: 'Có', value: 'true' },*/}
+      {/*    { label: 'Không', value: 'false' }*/}
+      {/*  ]}*/}
+      {/*/>*/}
 
       <FilterSelect
         label='Trạng thái'
@@ -199,28 +199,28 @@ export default function FilterVariant({
         onChange={setDestroy}
         options={[
           { label: 'Tất cả', value: '' },
-          { label: 'Đang hoạt động', value: 'false' },
-          { label: 'Đã xóa mềm', value: 'true' }
+          { label: 'Đang còn biến thể', value: 'false' },
+          { label: 'Đã xóa', value: 'true' }
         ]}
       />
 
-      <FilterByPrice
-        label='Giá vốn'
-        priceMin={importPriceMin}
-        priceMax={importPriceMax}
-        setPriceMin={setImportPriceMin}
-        setPriceMax={setImportPriceMax}
-        onApply={() => applyFilters()}
-      />
+      {/*<FilterByPrice*/}
+      {/*  label='Giá vốn'*/}
+      {/*  priceMin={importPriceMin}*/}
+      {/*  priceMax={importPriceMax}*/}
+      {/*  setPriceMin={setImportPriceMin}*/}
+      {/*  setPriceMax={setImportPriceMax}*/}
+      {/*  onApply={() => applyFilters()}*/}
+      {/*/>*/}
 
-      <FilterByPrice
-        label='Giá bán'
-        priceMin={exportPriceMin}
-        priceMax={exportPriceMax}
-        setPriceMin={setExportPriceMin}
-        setPriceMax={setExportPriceMax}
-        onApply={() => applyFilters()}
-      />
+      {/*<FilterByPrice*/}
+      {/*  label='Giá bán'*/}
+      {/*  priceMin={exportPriceMin}*/}
+      {/*  priceMax={exportPriceMax}*/}
+      {/*  setPriceMin={setExportPriceMin}*/}
+      {/*  setPriceMax={setExportPriceMax}*/}
+      {/*  onApply={() => applyFilters()}*/}
+      {/*/>*/}
 
       <FilterSelect value={sort} onChange={setSort} />
 

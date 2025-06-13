@@ -181,28 +181,36 @@ export default function FilterInventory({
           { label: 'Dừng hoạt động', value: true }
         ]}
       />
-      <FilterSelect value={sort} onChange={setSort} />
-      <FilterByTime
-        label='Ngày tạo'
-        selectedFilter={selectedFilter}
-        setSelectedFilter={setSelectedFilter}
-        startDate={startDate}
-        setStartDate={setStartDate}
-        endDate={endDate}
-        setEndDate={setEndDate}
-        onApply={handleApplyFilters}
+      <FilterSelect
+        value={sort}
+        onChange={setSort}
+        options={[
+          { label: 'Mới nhất', value: 'newest' },
+          { label: 'Cũ nhất', value: 'oldest' }
+        ]}
       />
+
       <Box sx={{ display: 'flex', gap: 2 }}>
-        <SearchWithSuggestions
-          label='Biến thể sản phẩm'
-          keyword={keyword}
-          inputValue={inputValue}
-          setKeyword={setKeyword}
-          setInputValue={setInputValue}
-          options={variantOptions.map((v) => v.label)} // Gợi ý theo tên biến thể
-          loading={loading}
-          onSearch={handleSearch}
+        <FilterByTime
+          label='Ngày tạo'
+          selectedFilter={selectedFilter}
+          setSelectedFilter={setSelectedFilter}
+          startDate={startDate}
+          setStartDate={setStartDate}
+          endDate={endDate}
+          setEndDate={setEndDate}
+          onApply={handleApplyFilters}
         />
+        {/*<SearchWithSuggestions*/}
+        {/*  label='Biến thể sản phẩm'*/}
+        {/*  keyword={keyword}*/}
+        {/*  inputValue={inputValue}*/}
+        {/*  setKeyword={setKeyword}*/}
+        {/*  setInputValue={setInputValue}*/}
+        {/*  options={variantOptions.map((v) => v.label)} // Gợi ý theo tên biến thể*/}
+        {/*  loading={loading}*/}
+        {/*  onSearch={handleSearch}*/}
+        {/*/>*/}
         <Button
           variant='outlined'
           size='small'

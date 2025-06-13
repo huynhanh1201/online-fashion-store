@@ -18,12 +18,11 @@ export default function FilterBatches({
   const [inputValue, setInputValue] = useState('')
   const [variantId, setVariantId] = useState('')
   const [warehouseId, setWarehouseId] = useState('')
-  const [batchId, setBatchId] = useState('')
   const [destroy, setDestroy] = useState('')
   const [selectedFilter, setSelectedFilter] = useState('')
   const [startDate, setStartDate] = useState(dayjs().format('YYYY-MM-DD'))
   const [endDate, setEndDate] = useState(dayjs().format('YYYY-MM-DD'))
-
+  const [sort, setSort] = useState('')
   const [quantityMin, setQuantityMin] = useState('')
   const [quantityMax, setQuantityMax] = useState('')
   const [importPriceMin, setImportPriceMin] = useState('')
@@ -31,7 +30,7 @@ export default function FilterBatches({
 
   useEffect(() => {
     applyFilters()
-  }, [keyword, variantId, warehouseId, batchId, destroy])
+  }, [keyword, variantId, warehouseId, destroy, sort])
 
   const handleSearch = () => {
     setKeyword(inputValue)
@@ -39,8 +38,8 @@ export default function FilterBatches({
       keyword: inputValue,
       variantId,
       warehouseId,
-      batchId,
       destroy,
+      sort,
       selectedTime: selectedFilter,
       fromDate: startDate,
       toDate: endDate
@@ -53,8 +52,8 @@ export default function FilterBatches({
       keyword,
       variantId,
       warehouseId,
-      batchId,
       destroy,
+      sort,
       selectedTime: selected,
       fromDate: startDate,
       toDate: endDate
@@ -65,12 +64,12 @@ export default function FilterBatches({
     search: k = keyword,
     variantId: vid = variantId,
     warehouseId: wid = warehouseId,
-    batchId: bid = batchId,
     quantityMin: qMin = quantityMin,
     quantityMax: qMax = quantityMax,
     importPriceMin: pMin = importPriceMin,
     importPriceMax: pMax = importPriceMax,
-    destroy: d = destroy,
+    status: d = destroy,
+    sort: s = sort,
     selectedTime = selectedFilter,
     fromDate = startDate,
     toDate = endDate
@@ -79,12 +78,12 @@ export default function FilterBatches({
       search: k || undefined,
       variantId: vid || undefined,
       warehouseId: wid || undefined,
-      batchId: bid || undefined,
       quantityMin: qMin ? parseInt(qMin) : undefined,
       quantityMax: qMax ? parseInt(qMax) : undefined,
       importPriceMin: pMin ? parseInt(pMin) : undefined,
       importPriceMax: pMax ? parseInt(pMax) : undefined,
-      destroy: d || undefined
+      status: d || undefined,
+      sort: s || undefined
     }
 
     if (selectedTime === 'custom') {
@@ -114,12 +113,12 @@ export default function FilterBatches({
     setInputValue('')
     setVariantId('')
     setWarehouseId('')
-    setBatchId('')
     setQuantityMin('')
     setQuantityMax('')
     setImportPriceMin('')
     setImportPriceMax('')
     setDestroy('')
+    setSort('')
     setSelectedFilter('')
     setStartDate(dayjs().format('YYYY-MM-DD'))
     setEndDate(dayjs().format('YYYY-MM-DD'))
@@ -147,40 +146,39 @@ export default function FilterBatches({
           ...warehouses.map((w) => ({ label: w.name, value: w._id }))
         ]}
       />
-      <FilterSelect
-        label='Chọn tên lô'
-        value={batchId}
-        onChange={setBatchId}
-        options={[
-          { label: 'Tất cả', value: '' },
-          ...batches.map((b) => ({ label: b.batchCode, value: b._id }))
-        ]}
-      />
-      <FilterByPrice
-        label='Số lượng'
-        priceMin={quantityMin}
-        priceMax={quantityMax}
-        setPriceMin={setQuantityMin}
-        setPriceMax={setQuantityMax}
-        onApply={() => applyFilters()}
-      />
+      {/*<FilterByPrice*/}
+      {/*  label='Số lượng'*/}
+      {/*  priceMin={quantityMin}*/}
+      {/*  priceMax={quantityMax}*/}
+      {/*  setPriceMin={setQuantityMin}*/}
+      {/*  setPriceMax={setQuantityMax}*/}
+      {/*  onApply={() => applyFilters()}*/}
+      {/*/>*/}
 
-      <FilterByPrice
-        label='Giá nhập'
-        priceMin={importPriceMin}
-        priceMax={importPriceMax}
-        setPriceMin={setImportPriceMin}
-        setPriceMax={setImportPriceMax}
-        onApply={() => applyFilters()}
-      />
+      {/*<FilterByPrice*/}
+      {/*  label='Giá nhập'*/}
+      {/*  priceMin={importPriceMin}*/}
+      {/*  priceMax={importPriceMax}*/}
+      {/*  setPriceMin={setImportPriceMin}*/}
+      {/*  setPriceMax={setImportPriceMax}*/}
+      {/*  onApply={() => applyFilters()}*/}
+      {/*/>*/}
       <FilterSelect
-        label='Hủy lô'
+        label='Trạng thái'
         value={destroy}
         onChange={setDestroy}
         options={[
           { label: 'Tất cả', value: '' },
           { label: 'Đã huỷ', value: 'true' },
           { label: 'Chưa huỷ', value: 'false' }
+        ]}
+      />
+      <FilterSelect
+        value={sort}
+        onChange={setSort}
+        options={[
+          { label: 'Mới nhất', value: 'newest' },
+          { label: 'Cũ nhất', value: 'oldest' }
         ]}
       />
       <FilterByTime

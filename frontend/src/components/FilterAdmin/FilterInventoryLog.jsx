@@ -102,35 +102,35 @@ export default function FilterInventoryLog({
 
   return (
     <Box display='flex' flexWrap='wrap' gap={2} mb={2} justifyContent='end'>
-      <FilterSelect
-        label='Kho hàng'
-        value={warehouseId}
-        onChange={(val) => {
-          setWarehouseId(val)
-        }}
-        options={[
-          { label: 'Tất cả', value: '' },
-          ...warehouses.map((w) => ({
-            label: w.name,
-            value: w._id
-          }))
-        ]}
-      />
+      {/*<FilterSelect*/}
+      {/*  label='Kho hàng'*/}
+      {/*  value={warehouseId}*/}
+      {/*  onChange={(val) => {*/}
+      {/*    setWarehouseId(val)*/}
+      {/*  }}*/}
+      {/*  options={[*/}
+      {/*    { label: 'Tất cả', value: '' },*/}
+      {/*    ...warehouses.map((w) => ({*/}
+      {/*      label: w.name,*/}
+      {/*      value: w._id*/}
+      {/*    }))*/}
+      {/*  ]}*/}
+      {/*/>*/}
 
-      <FilterSelect
-        label='Bản ghi tồn kho'
-        value={inventoryId}
-        onChange={(val) => {
-          setInventoryId(val)
-        }}
-        options={[
-          { label: 'Tất cả', value: '' },
-          ...inventories.map((inv) => ({
-            label: inv.variantId.sku,
-            value: inv._id
-          }))
-        ]}
-      />
+      {/*<FilterSelect*/}
+      {/*  label='Bản ghi tồn kho'*/}
+      {/*  value={inventoryId}*/}
+      {/*  onChange={(val) => {*/}
+      {/*    setInventoryId(val)*/}
+      {/*  }}*/}
+      {/*  options={[*/}
+      {/*    { label: 'Tất cả', value: '' },*/}
+      {/*    ...inventories.map((inv) => ({*/}
+      {/*      label: inv.variantId.sku,*/}
+      {/*      value: inv._id*/}
+      {/*    }))*/}
+      {/*  ]}*/}
+      {/*/>*/}
 
       {/*<FilterSelect*/}
       {/*  label='Lô hàng'*/}
@@ -187,21 +187,28 @@ export default function FilterInventoryLog({
       {/*  onApply={handleApplyFilters}*/}
       {/*/>*/}
 
+      {/*<FilterSelect*/}
+      {/*  label='Người người thực hiện'*/}
+      {/*  value={createdById}*/}
+      {/*  onChange={(val) => {*/}
+      {/*    setCreatedById(val)*/}
+      {/*  }}*/}
+      {/*  options={[*/}
+      {/*    { label: 'Tất cả', value: '' },*/}
+      {/*    ...users.map((u) => ({*/}
+      {/*      label: `${u.name} (${u.role === 'admin' ? 'Quản trị viên' : 'Nhân viên'})`,*/}
+      {/*      value: u._id*/}
+      {/*    }))*/}
+      {/*  ]}*/}
+      {/*/>*/}
       <FilterSelect
-        label='Người người thực hiện'
-        value={createdById}
-        onChange={(val) => {
-          setCreatedById(val)
-        }}
+        value={sort}
+        onChange={setSort}
         options={[
-          { label: 'Tất cả', value: '' },
-          ...users.map((u) => ({
-            label: `${u.name} (${u.role === 'admin' ? 'Quản trị viên' : 'Nhân viên'})`,
-            value: u._id
-          }))
+          { label: 'Mới nhất', value: 'newest' },
+          { label: 'Cũ nhất', value: 'oldest' }
         ]}
       />
-      <FilterSelect value={sort} onChange={setSort} />
       <FilterByTime
         label='Ngày tạo tạo phiếu'
         selectedFilter={createdFilter}
