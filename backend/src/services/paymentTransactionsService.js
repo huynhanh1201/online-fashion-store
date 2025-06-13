@@ -14,7 +14,12 @@ const getPaymentTransactionList = async (orderId) => {
       ? { orderId } // Có orderId → chỉ tìm transaction của order đó
       : {}
 
-    const result = await PaymentTransactionModel.find(filter).lean()
+    const result = await PaymentTransactionModel.find(filter)
+      .populate({
+        path: 'orderId',
+        select: 'code total'
+      })
+      .lean()
 
     return result
   } catch (err) {
