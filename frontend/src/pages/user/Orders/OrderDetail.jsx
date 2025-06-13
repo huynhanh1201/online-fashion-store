@@ -159,100 +159,142 @@ const OrderDetail = () => {
           <Chip label={label} color={color} sx={{ ml: 'auto' }} />
         </Box>
 
-        <Typography fontWeight="bold">Thông tin người nhận:</Typography>
-        <Typography>{order.shippingAddress?.fullName} - {order.shippingAddress?.phone}</Typography>
-        <Typography>{order.shippingAddress?.address}, {order.shippingAddress?.ward}, {order.shippingAddress?.district}, {order.shippingAddress?.city}</Typography>
+        <Typography variant="h6" fontWeight="bold" gutterBottom>
+          Địa Chỉ Nhận Hàng
+        </Typography>
+
+        <Typography fontWeight="bold" mb={1}>{order.shippingAddress?.fullName}</Typography>
+
+        <Typography>
+          (+84) {order.shippingAddress?.phone}
+        </Typography>
+
+        <Typography>
+          {order.shippingAddress?.address}, {order.shippingAddress?.ward}, {order.shippingAddress?.district}, {order.shippingAddress?.city}
+        </Typography>
+
+        {order.note && (
+          <Typography color="text.secondary">
+            Ghi chú: {order.note}
+          </Typography>
+        )}
 
         <Divider sx={{ my: 2 }} />
 
-        <Typography fontWeight="bold" mb={1}>Sản phẩm đã mua:</Typography>
+
+        {/* <Typography fontWeight="bold" mb={1}>Sản phẩm đã mua:</Typography> */}
+
         {uniqueProducts.map((product) => {
-          // const firstVariant = product.variants[0]
-          const hasMultipleVariants = product.variants.length > 1
           const productReviewed = isReviewed(product.productId)
 
           return (
             <Box key={product.productId} mb={3}>
-              {/* Header */}
-              <Box display="flex" gap={2} alignItems="flex-start">
-                {/* Ảnh sản phẩm */}
-                <Avatar
-                  src={product.variants[0]?.productId?.image?.[0] || '/default.jpg'}
-                  variant="square"
-                  sx={{ width: 64, height: 64, borderRadius: 1 }}
-                />
+              {/* Tên sản phẩm */}
+              {/* <Typography fontWeight={600} fontSize="1.1rem" mb={1}>
+                Sản phẩm: {product.productName}
+              </Typography> */}
 
+              {/* Danh sách biến thể */}
+              {product.variants.map((variant, index) => (
+                <Box key={variant._id}>
+                  <Box
+                    display="flex"
+                    alignItems="center"
+                    justifyContent="space-between"
+                    px={1}
+                    py={1.5}
+                    gap={2}
+                  >
+                    {/* Ảnh sản phẩm */}
+                    <Avatar
+                      src={variant?.color?.image || '/default.jpg'}
+                      variant="square"
+                      sx={{ width: 84, height: 84, borderRadius: 1 }}
+                    />
 
-                {/* Thông tin sản phẩm và biến thể */}
-                <Box flex={1}>
-                  <Typography variant="h6" fontWeight={600} mb={1}>
-                    {product.productName}
-                  </Typography>
+                    {/* Thông tin sản phẩm và biến thể */}
+                    <Box flex={1}>
+                      <Typography fontWeight={500} >
+                        {product.productName}
+                      </Typography>
+                      <Typography variant='body2' color="text.primary">
+                        {variant.color?.name}, Size {variant.size}
+                      </Typography>
+                      <Typography variant='body2' fontWeight={500}>
+                        x{variant.quantity}
+                      </Typography>
+                    </Box>
 
-                  {/* Các biến thể */}
-                  {product.variants.map((variant, index) => (
-                    <Box key={variant._id} mb={0.5}>
-                      <Stack direction="row" justifyContent="space-between" alignItems="center">
-                        <Typography variant="body2" color="text.secondary">
-                          {hasMultipleVariants && `Loại ${index + 1}: `}
-                          {variant.color?.name}, {variant.size} - x{variant.quantity}
-                        </Typography>
-                        <Typography variant="body2" fontWeight={600}>
-                          {formatPrice(variant.price * variant.quantity)}
-                        </Typography>
-                      </Stack>
-
+                    {/* Giá tiền */}
+                    <Box textAlign="right" minWidth={100}>
+                      <Typography variant="body2" fontWeight={600}>
+                        {formatPrice(variant.price * variant.quantity)}
+                      </Typography>
                       {variant.originalPrice > variant.price && (
-                        <Stack direction="row" justifyContent="flex-end">
-                          <Typography
-                            variant="body2"
-                            color="text.disabled"
-                            sx={{ textDecoration: 'line-through', fontSize: '0.85rem' }}
-                          >
-                            {formatPrice(variant.originalPrice * variant.quantity)}
-                          </Typography>
-                        </Stack>
+                        <Typography
+                          variant="body2"
+                          color="text.disabled"
+                          sx={{ textDecoration: 'line-through', fontSize: '0.85rem' }}
+                        >
+                          {formatPrice(variant.originalPrice * variant.quantity)}
+                        </Typography>
                       )}
                     </Box>
-                  ))}
+                  </Box>
 
-
+                  {/* Divider sau mỗi biến thể, trừ cái cuối */}
+                  {index < product.variants.length - 1 && <Divider />}
                 </Box>
+              ))}
 
-                {/* Nút hành động */}
-              </Box>
-              <Box display="flex" justifyContent="flex-end" gap={1} alignItems="flex-end" mt={1}>
+              {/* Nút hành động */}
+              <Box display="flex" justifyContent="flex-end" gap={1} mt={2}>
                 {isOrderCompleted && currentUser && (
                   <Button
-                    variant="outlined"
-                    size="small"
+                    variant="contained"
+                    size="medium"
+                    sx={{
+                      backgroundColor: '#1A3C7B',
+                      color: '#fff',
+                      '&:hover': {
+                        backgroundColor: '#162f63',
+                      },
+                    }}
                     onClick={() => {
-                      setSelectedProduct(product)
-                      setOpenReviewModal(true)
+                      setSelectedProduct(product);
+                      setOpenReviewModal(true);
                     }}
                   >
                     {productReviewed ? 'Sửa đánh giá' : 'Đánh giá'}
                   </Button>
-
                 )}
 
                 <Button
                   variant="outlined"
-                  size="small"
-                  color="primary"
+                  size="medium"
+                  sx={{
+                    color: '#1A3C7B',
+                    borderColor: '#1A3C7B',
+                    '&:hover': {
+                      borderColor: '#1A3C7B',
+                      backgroundColor: 'rgba(26, 60, 123, 0.04)', // nhẹ khi hover
+                    },
+                  }}
                   onClick={() => navigate(`/productdetail/${product.productId}`)}
                 >
                   Mua lại
                 </Button>
               </Box>
 
+
               {/* Divider giữa các sản phẩm */}
               {uniqueProducts.indexOf(product) < uniqueProducts.length - 1 && (
-                <Divider sx={{ mt: 2 }} />
+                <Divider sx={{ mt: 3 }} />
               )}
             </Box>
           )
         })}
+
 
         <Divider sx={{ my: 2 }} />
 
