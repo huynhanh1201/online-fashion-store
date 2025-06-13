@@ -180,7 +180,12 @@ const ProductTable = ({
                 <TableCell
                   key={column.id}
                   align={column.align || 'left'}
-                  sx={{ minWidth: column.minWidth }}
+                  sx={{
+                    minWidth: column.minWidth,
+                    ...(column.id === 'action' && {
+                      paddingLeft: '10px'
+                    })
+                  }}
                 >
                   {column.label}
                 </TableCell>

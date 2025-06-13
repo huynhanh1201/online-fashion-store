@@ -8,8 +8,8 @@ export const getWarehouseSlips = async (filters) => {
       `${API_ROOT}/v1/warehouse-slips?${params}`
     )
     return {
-      warehouseSlips: response.data,
-      total: response.data.totalPages
+      warehouseSlips: response.data.data,
+      total: response.data.meta.total
     }
   } catch (error) {
     console.error('Error fetching warehouse slips:', error)
