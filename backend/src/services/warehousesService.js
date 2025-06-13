@@ -6,7 +6,6 @@ import ApiError from '~/utils/ApiError'
 import { StatusCodes } from 'http-status-codes'
 import validatePagination from '~/utils/validatePagination'
 import getDateRange from '~/utils/getDateRange'
-import { SizeModel } from '~/models/SizeModel'
 
 const createWarehouse = async (reqBody) => {
   // eslint-disable-next-line no-useless-catch

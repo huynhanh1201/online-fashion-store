@@ -6,6 +6,8 @@ import { ProductModel } from '~/models/ProductModel'
 import generateSKU from '~/utils/generateSKU'
 import { InventoryModel } from '~/models/InventoryModel'
 import { CartModel } from '~/models/CartModel'
+import validatePagination from '~/utils/validatePagination'
+import getDateRange from '~/utils/getDateRange'
 
 const createVariant = async (reqBody) => {
   // eslint-disable-next-line no-useless-catch
@@ -62,16 +64,87 @@ const createVariant = async (reqBody) => {
   }
 }
 
-const getVariantList = async (productId) => {
-  const filter = {
-    destroy: false
+const getVariantList = async (queryString) => {
+  let {
+    page = 1,
+    limit = 10,
+    search,
+    status,
+    sort,
+    filterTypeDate,
+    startDate,
+    endDate,
+    productId,
+    colorName,
+    sizeName
+  } = queryString
+
+  // Kiểm tra dữ liệu đầu vào của limit và page
+  validatePagination(page, limit)
+
+  // Xử lý thông tin Filter
+  const filter = {}
+
+  if (productId) filter.productId = productId
+
+  if (colorName) filter['color.name'] = colorName.toLowerCase()
+
+  if (sizeName) filter['size.name'] = sizeName.toLowerCase()
+
+  if (status === 'true' || status === 'false') {
+    status = JSON.parse(status)
+
+    filter.destroy = status
   }
 
-  if (productId) {
-    filter['productId'] = productId
+  if (search) {
+    filter.name = { $regex: search, $options: 'i' }
   }
 
-  const result = await VariantModel.find(filter).lean()
+  const dateRange = getDateRange(filterTypeDate, startDate, endDate)
+
+  if (dateRange.startDate && dateRange.endDate) {
+    filter['createdAt'] = {
+      $gte: new Date(dateRange.startDate),
+      $lte: new Date(dateRange.endDate)
+    }
+  }
+
+  let sortField = {}
+
+  const sortMap = {
+    name_asc: { name: 1 },
+    name_desc: { name: -1 },
+    newest: { createdAt: -1 },
+    oldest: { createdAt: 1 }
+  }
+
+  if (sort) {
+    sortField = sortMap[sort]
+  }
+
+  console.log('Filter:', filter)
+
+  const [variants, total] = await Promise.all([
+    VariantModel.find(filter)
+      .collation({ locale: 'vi', strength: 1 })
+      .sort(sortField)
+      .skip((page - 1) * limit)
+      .limit(limit)
+      .lean(),
+
+    VariantModel.countDocuments(filter)
+  ])
+
+  const result = {
+    data: variants,
+    meta: {
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit)
+    }
+  }
 
   return result
 }
