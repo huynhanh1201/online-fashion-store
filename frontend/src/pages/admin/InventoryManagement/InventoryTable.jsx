@@ -59,7 +59,9 @@ const InventoryTable = () => {
     fetchWarehouseSlips,
     createNewWarehouseSlip,
     update,
-    removeWarehouseSlip
+    removeWarehouseSlip,
+    loadingSlip,
+    totalPageSlip
   } = useWarehouseSlips()
   const {
     batches,
@@ -98,10 +100,6 @@ const InventoryTable = () => {
 
   const handleChangePage = (event, value) => setPage(value)
 
-  const handleChangeRowsPerPage = (event) => {
-    const newLimit = parseInt(event.target.value, 10)
-    setRowsPerPage(newLimit)
-  }
   const tabLabels = [
     'Thống kê kho',
     'Tồn kho',
@@ -181,10 +179,15 @@ const InventoryTable = () => {
             data={warehouseSlips}
             warehouses={warehouses}
             variants={variants} // Add this prop
-            page={page - 1}
+            page={page}
+            total={totalPageSlip}
             rowsPerPage={rowsPerPage}
             onPageChange={handleChangePage}
-            onRowsPerPageChange={handleChangeRowsPerPage}
+            onChangeRowsPerPage={(newLimit) => {
+              setPage(1)
+              setRowsPerPage(newLimit)
+            }}
+            loading={loadingSlip}
             batches={batches}
             addWarehouseSlip={createNewWarehouseSlip}
             partners={partners}

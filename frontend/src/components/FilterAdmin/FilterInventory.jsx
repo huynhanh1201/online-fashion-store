@@ -33,7 +33,7 @@ export default function FilterInventory({
 
   useEffect(() => {
     handleApplyFilters()
-  }, [warehouseId, keyword, sort])
+  }, [warehouseId, keyword, sort, destroy, status])
   const handleSearch = () => {
     setKeyword(inputValue)
     handleApplyFilters(selectedFilter, startDate, endDate)
@@ -119,91 +119,98 @@ export default function FilterInventory({
         ]}
       />
 
-      <FilterByPrice
-        label='Số lượng tồn kho'
-        priceMin={quantityMin}
-        priceMax={quantityMax}
-        setPriceMin={setQuantityMin}
-        setPriceMax={setQuantityMax}
-        onApply={handleApplyFilters}
-      />
+      {/*<FilterByPrice*/}
+      {/*  label='Số lượng tồn kho'*/}
+      {/*  priceMin={quantityMin}*/}
+      {/*  priceMax={quantityMax}*/}
+      {/*  setPriceMin={setQuantityMin}*/}
+      {/*  setPriceMax={setQuantityMax}*/}
+      {/*  onApply={handleApplyFilters}*/}
+      {/*/>*/}
 
-      <FilterByPrice
-        label='Ngưỡng cảnh báo'
-        priceMin={minQtyMin}
-        priceMax={minQtyMax}
-        setPriceMin={setMinQtyMin}
-        setPriceMax={setMinQtyMax}
-        onApply={handleApplyFilters}
-      />
+      {/*<FilterByPrice*/}
+      {/*  label='Ngưỡng cảnh báo'*/}
+      {/*  priceMin={minQtyMin}*/}
+      {/*  priceMax={minQtyMax}*/}
+      {/*  setPriceMin={setMinQtyMin}*/}
+      {/*  setPriceMax={setMinQtyMax}*/}
+      {/*  onApply={handleApplyFilters}*/}
+      {/*/>*/}
 
-      <FilterByPrice
-        label='Giá nhập (VNĐ)'
-        priceMin={importPriceMin}
-        priceMax={importPriceMax}
-        setPriceMin={setImportPriceMin}
-        setPriceMax={setImportPriceMax}
-        onApply={handleApplyFilters}
-      />
+      {/*<FilterByPrice*/}
+      {/*  label='Giá nhập (VNĐ)'*/}
+      {/*  priceMin={importPriceMin}*/}
+      {/*  priceMax={importPriceMax}*/}
+      {/*  setPriceMin={setImportPriceMin}*/}
+      {/*  setPriceMax={setImportPriceMax}*/}
+      {/*  onApply={handleApplyFilters}*/}
+      {/*/>*/}
 
-      <FilterByPrice
-        label='Giá bán (VNĐ)'
-        priceMin={exportPriceMin}
-        priceMax={exportPriceMax}
-        setPriceMin={setExportPriceMin}
-        setPriceMax={setExportPriceMax}
-        onApply={handleApplyFilters}
-      />
+      {/*<FilterByPrice*/}
+      {/*  label='Giá bán (VNĐ)'*/}
+      {/*  priceMin={exportPriceMin}*/}
+      {/*  priceMax={exportPriceMax}*/}
+      {/*  setPriceMin={setExportPriceMin}*/}
+      {/*  setPriceMax={setExportPriceMax}*/}
+      {/*  onApply={handleApplyFilters}*/}
+      {/*/>*/}
 
       <FilterSelect
         label='Trạng thái kho'
         value={status}
         onChange={(val) => {
           setStatus(val)
-          handleApplyFilters()
         }}
         options={[
           { label: 'Tất cả', value: '' },
           { label: 'Còn hàng', value: 'in-stock' },
+          { label: 'Sắp hết hàng', value: 'low-stock' },
           { label: 'Hết hàng', value: 'out-of-stock' }
         ]}
       />
 
       <FilterSelect
-        label='Trạng thái xoá'
+        label='Trạng thái'
         value={destroy}
         onChange={(val) => {
           setDestroy(val)
-          handleApplyFilters()
         }}
         options={[
           { label: 'Tất cả', value: '' },
-          { label: 'Chưa xoá', value: false },
-          { label: 'Đã xoá', value: true }
+          { label: 'Đang hoạt động', value: false },
+          { label: 'Dừng hoạt động', value: true }
         ]}
       />
-      <FilterSelect value={sort} onChange={setSort} />
-      <FilterByTime
-        label='Ngày tạo'
-        selectedFilter={selectedFilter}
-        setSelectedFilter={setSelectedFilter}
-        startDate={startDate}
-        setStartDate={setStartDate}
-        endDate={endDate}
-        setEndDate={setEndDate}
-        onApply={handleApplyFilters}
+      <FilterSelect
+        value={sort}
+        onChange={setSort}
+        options={[
+          { label: 'Mới nhất', value: 'newest' },
+          { label: 'Cũ nhất', value: 'oldest' }
+        ]}
       />
+
       <Box sx={{ display: 'flex', gap: 2 }}>
-        <SearchWithSuggestions
-          label='Biến thể sản phẩm'
-          keyword={keyword}
-          inputValue={inputValue}
-          setKeyword={setKeyword}
-          setInputValue={setInputValue}
-          options={variantOptions.map((v) => v.label)} // Gợi ý theo tên biến thể
-          loading={loading}
-          onSearch={handleSearch}
+        <FilterByTime
+          label='Ngày tạo'
+          selectedFilter={selectedFilter}
+          setSelectedFilter={setSelectedFilter}
+          startDate={startDate}
+          setStartDate={setStartDate}
+          endDate={endDate}
+          setEndDate={setEndDate}
+          onApply={handleApplyFilters}
         />
+        {/*<SearchWithSuggestions*/}
+        {/*  label='Biến thể sản phẩm'*/}
+        {/*  keyword={keyword}*/}
+        {/*  inputValue={inputValue}*/}
+        {/*  setKeyword={setKeyword}*/}
+        {/*  setInputValue={setInputValue}*/}
+        {/*  options={variantOptions.map((v) => v.label)} // Gợi ý theo tên biến thể*/}
+        {/*  loading={loading}*/}
+        {/*  onSearch={handleSearch}*/}
+        {/*/>*/}
         <Button
           variant='outlined'
           size='small'

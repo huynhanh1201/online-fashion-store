@@ -39,9 +39,9 @@ export default function FilterTransaction({
       search: keyword || undefined,
       orderId: orderId || undefined,
       method: method || undefined,
-      status: status || undefined,
+      statusPayment: status || undefined,
       sort: sort || undefined,
-      destroy: destroy !== '' ? destroy : undefined
+      status: destroy !== '' ? destroy : undefined
     }
 
     // Thời gian tạo
@@ -85,7 +85,6 @@ export default function FilterTransaction({
 
   const handleSearch = () => {
     setKeyword(inputValue)
-    fetchTransactions(1, 10, { keyword: inputValue })
   }
 
   const handleReset = () => {
@@ -109,40 +108,37 @@ export default function FilterTransaction({
   return (
     <Box display='flex' flexWrap='wrap' gap={2} mb={2} justifyContent='end'>
       <FilterSelect
+        sx={{ minWidth: 220 }}
         label='Phương thức thanh toán'
         value={method}
         onChange={(val) => {
           setMethod(val)
-          applyFilters()
         }}
         options={[
           { label: 'Tất cả', value: '' },
-          { label: 'Momo', value: 'momo' },
-          { label: 'ZaloPay', value: 'zalopay' },
-          { label: 'Chuyển khoản', value: 'bank_transfer' },
-          { label: 'Tiền mặt', value: 'cash' }
+          { label: 'Tiền mặt', value: 'COD' },
+          { label: 'VNPay', value: 'vnpay' }
         ]}
       />
       <FilterSelect
-        label='Trạng thái'
+        sx={{ minWidth: 190 }}
+        label='Trạng thái giao dịch'
         value={status}
         onChange={(val) => {
           setStatus(val)
-          applyFilters()
         }}
         options={[
           { label: 'Tất cả', value: '' },
-          { label: 'Thành công', value: 'Completed' },
           { label: 'Đang xử lý', value: 'Pending' },
+          { label: 'Thành công', value: 'Completed' },
           { label: 'Thất bại', value: 'Failed' }
         ]}
       />
       <FilterSelect
-        label='Đã xoá mềm'
+        label='Trạng thái xoá'
         value={destroy}
         onChange={(val) => {
           setDestroy(val)
-          applyFilters()
         }}
         options={[
           { label: 'Tất cả', value: '' },
@@ -150,8 +146,14 @@ export default function FilterTransaction({
           { label: 'Đã xoá', value: true }
         ]}
       />
-      <FilterSelect value={sort} onChange={setSort} />
-
+      <FilterSelect
+        value={sort}
+        onChange={setSort}
+        options={[
+          { label: 'Mới nhất', value: 'newest' },
+          { label: 'Cũ nhất', value: 'oldest' }
+        ]}
+      />
       <FilterByTime
         label='Thời gian tạo'
         selectedFilter={selectedFilter}
@@ -162,37 +164,48 @@ export default function FilterTransaction({
         setEndDate={setEndDate}
         onApply={handleApplyCreatedTime}
       />
+      <Box sx={{ display: 'flex', gap: 2 }}>
+        <SearchWithSuggestions
+          label='Tìm sản phẩm'
+          options={transactions.map((t) => t.orderId.code)}
+          loading={loading}
+          keyword={keyword}
+          inputValue={inputValue}
+          setKeyword={setKeyword}
+          setInputValue={setInputValue}
+          onSearch={handleSearch}
+        />
+        {/*<FilterByTime*/}
+        {/*  label='Thời gian thanh toán'*/}
+        {/*  selectedFilter={paidFilter}*/}
+        {/*  setSelectedFilter={setPaidFilter}*/}
+        {/*  startDate={paidFrom}*/}
+        {/*  setStartDate={setPaidFrom}*/}
+        {/*  endDate={paidTo}*/}
+        {/*  setEndDate={setPaidTo}*/}
+        {/*  onApply={handleApplyPaidTime}*/}
+        {/*/>*/}
 
-      <FilterByTime
-        label='Thời gian thanh toán'
-        selectedFilter={paidFilter}
-        setSelectedFilter={setPaidFilter}
-        startDate={paidFrom}
-        setStartDate={setPaidFrom}
-        endDate={paidTo}
-        setEndDate={setPaidTo}
-        onApply={handleApplyPaidTime}
-      />
+        {/*<SearchWithSuggestions*/}
+        {/*  label='Tìm mã giao dịch'*/}
+        {/*  options={transactions.map((t) => t.transactionId)}*/}
+        {/*  loading={loading}*/}
+        {/*  keyword={keyword}*/}
+        {/*  inputValue={inputValue}*/}
+        {/*  setKeyword={setKeyword}*/}
+        {/*  setInputValue={setInputValue}*/}
+        {/*  onSearch={handleSearch}*/}
+        {/*/>*/}
 
-      {/*<SearchWithSuggestions*/}
-      {/*  label='Tìm mã giao dịch'*/}
-      {/*  options={transactions.map((t) => t.transactionId)}*/}
-      {/*  loading={loading}*/}
-      {/*  keyword={keyword}*/}
-      {/*  inputValue={inputValue}*/}
-      {/*  setKeyword={setKeyword}*/}
-      {/*  setInputValue={setInputValue}*/}
-      {/*  onSearch={handleSearch}*/}
-      {/*/>*/}
-
-      <Button
-        variant='outlined'
-        size='small'
-        color='error'
-        onClick={handleReset}
-      >
-        Làm mới
-      </Button>
+        <Button
+          variant='outlined'
+          size='small'
+          color='error'
+          onClick={handleReset}
+        >
+          Làm mới
+        </Button>
+      </Box>
     </Box>
   )
 }

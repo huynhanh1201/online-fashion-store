@@ -39,7 +39,6 @@ export default function FilterOrder({
 
   const handleSearch = () => {
     setKeyword(inputValue)
-    applyFilters()
   }
 
   const handleApplyTimeFilter = (selected) => {
@@ -75,7 +74,7 @@ export default function FilterOrder({
     const filters = {
       search: k || undefined,
       userId: uid || undefined,
-      statusOrder: st || undefined,
+      status: st || undefined,
       sort: s || undefined,
       priceMin: min ? parseInt(min) : undefined,
       priceMax: max ? parseInt(max) : undefined,
@@ -152,14 +151,14 @@ export default function FilterOrder({
       {/*  ]}*/}
       {/*/>*/}
 
-      <FilterByPrice
-        label='Giá trị đơn hàng'
-        priceMin={minTotal}
-        priceMax={maxTotal}
-        setPriceMin={setMinTotal}
-        setPriceMax={setMaxTotal}
-        onApply={applyFilters}
-      />
+      {/*<FilterByPrice*/}
+      {/*  label='Giá trị đơn hàng'*/}
+      {/*  priceMin={minTotal}*/}
+      {/*  priceMax={maxTotal}*/}
+      {/*  setPriceMin={setMinTotal}*/}
+      {/*  setPriceMax={setMaxTotal}*/}
+      {/*  onApply={applyFilters}*/}
+      {/*/>*/}
 
       <FilterSelect
         label='Trạng thái đơn hàng'
@@ -167,10 +166,12 @@ export default function FilterOrder({
         onChange={setStatus}
         options={[
           { label: 'Tất cả', value: '' },
-          { label: 'Chờ xác nhận', value: 'pending' },
-          { label: 'Đã xác nhận', value: 'confirmed' },
-          { label: 'Đã huỷ', value: 'cancelled' },
-          { label: 'Hoàn thành', value: 'completed' }
+          { label: 'Chờ xác nhận', value: 'Pending' },
+          { label: 'Đang xử lý', value: 'Processing' },
+          { label: 'Đã vận chuyển', value: 'Shipped' },
+          { label: 'Đang vận chuyển', value: 'Shipping' },
+          { label: 'Đã giao hàng', value: 'Delivered' },
+          { label: 'Đã hủy', value: 'Cancelled' }
         ]}
       />
 
@@ -180,8 +181,8 @@ export default function FilterOrder({
         onChange={setPaymentMethod}
         options={[
           { label: 'Tất cả', value: '' },
-          { label: 'COD', value: 'cod' },
-          { label: 'Chuyển khoản', value: 'vn_pay' }
+          { label: 'COD', value: 'COD' },
+          { label: 'Trực tuyến', value: 'vnpay' }
         ]}
       />
 
@@ -191,22 +192,29 @@ export default function FilterOrder({
         onChange={setPaymentStatus}
         options={[
           { label: 'Tất cả', value: '' },
-          { label: 'Chờ thanh toán', value: 'pending' },
-          { label: 'Đã thanh toán', value: 'completed' },
-          { label: 'Thất bại', value: 'failed' }
+          { label: 'Chờ thanh toán', value: 'Pending' },
+          { label: 'Đã thanh toán', value: 'Completed' },
+          { label: 'Thất bại', value: 'Failed' }
         ]}
       />
-      <FilterSelect value={sort} onChange={setSort} />
-      <FilterByTime
-        label='Thời gian đặt hàng'
-        selectedFilter={selectedFilter}
-        setSelectedFilter={setSelectedFilter}
-        startDate={startDate}
-        setStartDate={setStartDate}
-        endDate={endDate}
-        setEndDate={setEndDate}
-        onApply={handleApplyTimeFilter}
+      <FilterSelect
+        value={sort}
+        onChange={setSort}
+        options={[
+          { label: 'Mới nhất', value: 'newest' },
+          { label: 'Cũ nhất', value: 'oldest' }
+        ]}
       />
+      {/*<FilterByTime*/}
+      {/*  label='Thời gian đặt hàng'*/}
+      {/*  selectedFilter={selectedFilter}*/}
+      {/*  setSelectedFilter={setSelectedFilter}*/}
+      {/*  startDate={startDate}*/}
+      {/*  setStartDate={setStartDate}*/}
+      {/*  endDate={endDate}*/}
+      {/*  setEndDate={setEndDate}*/}
+      {/*  onApply={handleApplyTimeFilter}*/}
+      {/*/>*/}
       <Box sx={{ display: 'flex', gap: 2 }}>
         <SearchWithSuggestions
           label='Tìm theo tên người đặt'

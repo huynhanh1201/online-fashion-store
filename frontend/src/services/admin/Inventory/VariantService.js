@@ -9,8 +9,8 @@ export const getVariants = async (filters) => {
     )
     // Đảm bảo return dạng { variants, total }
     return {
-      variants: response.data || response.data.data || [],
-      total: response.data.length || response.data.meta.total || 0
+      variants: response.data.data || [],
+      total: response.data.meta.total || 0
     }
   } catch (error) {
     console.error('Lỗi khi lấy danh sách biến thể:', error)

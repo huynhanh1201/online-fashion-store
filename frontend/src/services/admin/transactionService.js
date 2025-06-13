@@ -9,8 +9,8 @@ export const getAllTransactions = async (filter) => {
       `${API_ROOT}/v1/payment-transactions?${queryParams}`
     )
     return {
-      transactions: response.data || response.data.data || [],
-      total: response.data.length || response.data.meta.total || 0
+      transactions: response.data.data || [],
+      total: response.data.meta.total || 0
     }
   } catch (error) {
     console.error('Lỗi khi lấy danh sách giao dịch:', error)

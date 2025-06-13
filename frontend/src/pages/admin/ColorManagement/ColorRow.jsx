@@ -91,7 +91,8 @@ const styles = {
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
-    gap: 1
+    gap: 1,
+    width: '130px'
   }
 }
 
