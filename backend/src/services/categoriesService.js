@@ -41,7 +41,7 @@ const getCategoryList = async (queryString) => {
   validatePagination(page, limit)
 
   // Xử lý thông tin Filter
-  const filter = {}
+  const filter = { destroy: false }
 
   if (status === 'true' || status === 'false') {
     status = JSON.parse(status)

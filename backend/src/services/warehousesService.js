@@ -75,7 +75,7 @@ const getWarehouseList = async (queryString) => {
   validatePagination(page, limit)
 
   // Xử lý thông tin Filter
-  const filter = {}
+  const filter = { destroy: false }
 
   if (city) filter.city = city
 

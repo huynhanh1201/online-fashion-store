@@ -410,7 +410,7 @@ const getOrderList = async (queryString) => {
     validatePagination(page, limit)
 
     // Xử lý thông tin Filter
-    const filter = {}
+    const filter = { destroy: false }
 
     if (userId) filter.userId = userId
 
