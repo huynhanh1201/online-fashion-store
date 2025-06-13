@@ -10,8 +10,8 @@ export const getDiscounts = async (filter) => {
       `${API_ROOT}/v1/coupons?${queryParams}`
     )
     return {
-      discounts: response.data || response.data.data || [],
-      total: response.data.length || response.data.meta.total || 0
+      discounts: response.data.data || [],
+      total: response.data.meta.total || 0
     } // vì API trả về mảng
   } catch (error) {
     console.error('Lỗi khi lấy danh sách mã giảm:', error)

@@ -17,7 +17,7 @@ import {
 import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye'
 import AddWarehouseSlipModal from '../modal/WarehouseSlip/AddWarehouseSlipModal'
 import ViewWarehouseSlipModal from '../modal/WarehouseSlip/ViewWarehouseSlipModal'
-
+import FilterWarehouseSlip from '~/components/FilterAdmin/FilterWarehouseSlip.jsx'
 import { Chip } from '@mui/material'
 
 const WarehouseSlipsTab = ({
@@ -27,7 +27,9 @@ const WarehouseSlipsTab = ({
   page,
   rowsPerPage,
   onPageChange,
-  onRowsPerPageChange,
+  loading,
+  total,
+  onChangeRowsPerPage,
   batches,
   partners,
   addWarehouseSlip,
@@ -42,9 +44,19 @@ const WarehouseSlipsTab = ({
   const [openViewModal, setOpenViewModal] = useState(false) // State cho View modal
   const [selectedSlip, setSelectedSlip] = useState(null) // State cho phiếu được chọn
   const [modalType, setModalType] = useState('input')
+  const [filter, setFilter] = useState('')
+
   useEffect(() => {
-    refreshWarehouseSlips()
-  }, [])
+    refreshWarehouseSlips(page, rowsPerPage, filter)
+  }, [page, rowsPerPage])
+
+  const handleFilter = (newFilters) => {
+    setFilter(newFilters)
+    if (Object.keys(newFilters).length > 0) {
+      refreshWarehouseSlips(1, rowsPerPage, newFilters)
+    }
+  }
+
   const [newSlipData, setNewSlipData] = useState({
     slipId: '',
     date: new Date(),
@@ -169,32 +181,75 @@ const WarehouseSlipsTab = ({
             <TableRow>
               <TableCell colSpan={warehouseSlipColumns.length}>
                 <Box
-                  sx={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center'
-                  }}
+                  display='flex'
+                  justifyContent='space-between'
+                  alignItems='center'
+                  mb={2}
                 >
-                  <Typography variant='h6' sx={{ fontWeight: '800' }}>
-                    Danh sách phiếu nhập/xuất kho
-                  </Typography>
-                  <Box>
-                    <Button
-                      variant='contained'
-                      color='primary'
-                      onClick={() => handleOpenModal('input')}
-                      sx={{ mr: 1 }}
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'start',
+                      flex: 1
+                    }}
+                  >
+                    <Box
+                      sx={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: 1,
+                        minWidth: 250
+                      }}
                     >
-                      Nhập kho
-                    </Button>
-                    <Button
-                      variant='contained'
-                      color='secondary'
-                      onClick={() => handleOpenModal('output')}
-                    >
-                      Xuất kho
-                    </Button>
+                      <Typography variant='h6' sx={{ fontWeight: '800' }}>
+                        Danh Sách Phiếu Kho
+                      </Typography>
+                      <Box
+                        sx={{
+                          display: 'flex',
+                          justifyContent: 'space-between',
+                          alignItems: 'start',
+                          minWidth: 250,
+                          gap: 1
+                        }}
+                      >
+                        <Button
+                          variant='contained'
+                          color='primary'
+                          onClick={() => handleOpenModal('input')}
+                          sx={{
+                            textTransform: 'none',
+                            flex: 1,
+                            display: 'flex',
+                            alignItems: 'center'
+                          }}
+                        >
+                          Nhập kho
+                        </Button>
+                        <Button
+                          variant='contained'
+                          color='secondary'
+                          onClick={() => handleOpenModal('output')}
+                          sx={{
+                            textTransform: 'none',
+                            flex: 1,
+                            display: 'flex',
+                            alignItems: 'center'
+                          }}
+                        >
+                          Xuất kho
+                        </Button>
+                      </Box>
+                    </Box>
                   </Box>
+                  <FilterWarehouseSlip
+                    warehouses={warehouses}
+                    slips={data}
+                    fetchData={refreshWarehouseSlips}
+                    onFilter={handleFilter}
+                    loading={loading}
+                  />
                 </Box>
               </TableCell>
             </TableRow>
@@ -253,17 +308,20 @@ const WarehouseSlipsTab = ({
       <TablePagination
         rowsPerPageOptions={[10, 25, 100]}
         component='div'
-        count={data.length}
+        count={total || 0}
         rowsPerPage={rowsPerPage}
-        page={page}
-        onPageChange={onPageChange}
-        onRowsPerPageChange={(e) => onRowsPerPageChange(e, 'warehouseSlip')}
-        labelRowsPerPage='Số dòng mỗi trang'
-        labelDisplayedRows={({ from, to, count }) => {
-          const actualTo = to > count ? count : to // nếu to vượt quá count thì lấy count
-          const actualFrom = from > count ? count : from // nếu from vượt quá count thì lấy count
-          return `${actualFrom}–${actualTo} trên ${count !== -1 ? count : `hơn ${actualTo}`}`
+        page={page - 1}
+        onPageChange={(event, newPage) => onPageChange(event, newPage + 1)} // +1 để đúng logic bên cha
+        onRowsPerPageChange={(event) => {
+          const newLimit = parseInt(event.target.value, 10)
+          if (onChangeRowsPerPage) {
+            onChangeRowsPerPage(newLimit)
+          }
         }}
+        labelRowsPerPage='Số dòng mỗi trang'
+        labelDisplayedRows={({ from, to, count }) =>
+          `${from}–${to} trên ${count !== -1 ? count : `hơn ${to}`}`
+        }
       />
       <AddWarehouseSlipModal
         open={openModal}

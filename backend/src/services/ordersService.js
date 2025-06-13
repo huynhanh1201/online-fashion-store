@@ -270,7 +270,8 @@ const createOrder = async (userId, reqBody, ipAddr) => {
       transactionId: null,
       status: 'Pending',
       paidAt: null,
-      note: note || null
+      note: note || null,
+      orderCode: order.code
     }
 
     await PaymentTransactionModel.create([paymentTransactionInfo], { session })
@@ -409,7 +410,7 @@ const getOrderList = async (queryString) => {
     validatePagination(page, limit)
 
     // Xử lý thông tin Filter
-    const filter = {}
+    const filter = { destroy: false }
 
     if (userId) filter.userId = userId
 

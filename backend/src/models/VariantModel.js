@@ -13,6 +13,7 @@ const variantSchema = new Schema(
     color: {
       name: {
         type: String,
+        lowercase: true,
         required: true,
         trim: true
       },
@@ -25,6 +26,7 @@ const variantSchema = new Schema(
     size: {
       name: {
         type: String,
+        lowercase: true,
         required: true,
         trim: true
       }
@@ -47,6 +49,7 @@ const variantSchema = new Schema(
     name: {
       type: String,
       required: true,
+      lowercase: true,
       trim: true
     },
 

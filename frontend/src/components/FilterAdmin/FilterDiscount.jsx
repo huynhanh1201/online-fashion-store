@@ -156,74 +156,76 @@ export default function FilterDiscount({
         options={[
           { label: 'Tất cả', value: '' },
           { label: 'Giảm theo %', value: 'percent' },
-          { label: 'Giảm theo giá', value: 'amount' }
+          { label: 'Giảm theo giá', value: 'fixed' }
         ]}
       />
-      <FilterByPrice
-        label='Giá trị giảm'
-        priceMin={amountMin}
-        priceMax={amountMax}
-        setPriceMin={setAmountMin}
-        setPriceMax={setAmountMax}
-        onApply={() => applyFilters()}
-      />
-      <FilterByPrice
-        label='Giá tối thiểu đơn hàng'
-        priceMin={minOrderMin}
-        priceMax={minOrderMax}
-        setPriceMin={setMinOrderMin}
-        setPriceMax={setMinOrderMax}
-        onApply={() => applyFilters()}
-      />
-      <FilterByPrice
-        label='Giới hạn sử dụng'
-        priceMin={usageMin}
-        priceMax={usageMax}
-        setPriceMin={setUsageMin}
-        setPriceMax={setUsageMax}
-        onApply={() => applyFilters()}
-      />
-      <FilterByPrice
-        label='Số lượng đã sử dụng'
-        priceMin={usedCountMin}
-        priceMax={usedCountMax}
-        setPriceMin={setUsedCountMin}
-        setPriceMax={setUsedCountMax}
-        onApply={() => applyFilters()}
-      />
+      {/*<FilterByPrice*/}
+      {/*  label='Giá trị giảm'*/}
+      {/*  priceMin={amountMin}*/}
+      {/*  priceMax={amountMax}*/}
+      {/*  setPriceMin={setAmountMin}*/}
+      {/*  setPriceMax={setAmountMax}*/}
+      {/*  onApply={() => applyFilters()}*/}
+      {/*/>*/}
+      {/*<FilterByPrice*/}
+      {/*  label='Giá tối thiểu đơn hàng'*/}
+      {/*  priceMin={minOrderMin}*/}
+      {/*  priceMax={minOrderMax}*/}
+      {/*  setPriceMin={setMinOrderMin}*/}
+      {/*  setPriceMax={setMinOrderMax}*/}
+      {/*  onApply={() => applyFilters()}*/}
+      {/*/>*/}
+      {/*<FilterByPrice*/}
+      {/*  label='Giới hạn sử dụng'*/}
+      {/*  priceMin={usageMin}*/}
+      {/*  priceMax={usageMax}*/}
+      {/*  setPriceMin={setUsageMin}*/}
+      {/*  setPriceMax={setUsageMax}*/}
+      {/*  onApply={() => applyFilters()}*/}
+      {/*/>*/}
+      {/*<FilterByPrice*/}
+      {/*  label='Số lượng đã sử dụng'*/}
+      {/*  priceMin={usedCountMin}*/}
+      {/*  priceMax={usedCountMax}*/}
+      {/*  setPriceMin={setUsedCountMin}*/}
+      {/*  setPriceMax={setUsedCountMax}*/}
+      {/*  onApply={() => applyFilters()}*/}
+      {/*/>*/}
       <FilterSelect
         label='Trạng thái'
         value={isActive}
-        onChange={setIsActive}
+        onChange={(val) => {
+          setIsActive(val)
+        }}
         options={[
           { label: 'Tất cả', value: '' },
-          { label: 'Đang hoạt động', value: 'true' },
-          { label: 'Ngừng hoạt động', value: 'false' }
+          { label: 'Đang hoạt động', value: 'false' },
+          { label: 'Ngừng hoạt động', value: 'true' }
         ]}
       />
       <FilterSelect value={sort} onChange={setSort} />
+      {/*<FilterByTime*/}
+      {/*  label='Ngày bắt đầu hiệu lực'*/}
+      {/*  selectedFilter={validFromFilter}*/}
+      {/*  setSelectedFilter={setValidFromFilter}*/}
+      {/*  startDate={validFromStart}*/}
+      {/*  setStartDate={setValidFromStart}*/}
+      {/*  endDate={validFromEnd}*/}
+      {/*  setEndDate={setValidFromEnd}*/}
+      {/*  onApply={() => applyFilters()}*/}
+      {/*/>*/}
+      {/*<FilterByTime*/}
+      {/*  label='Ngày hết hiệu lực'*/}
+      {/*  selectedFilter={validUntilFilter}*/}
+      {/*  setSelectedFilter={setValidUntilFilter}*/}
+      {/*  startDate={validUntilStart}*/}
+      {/*  setStartDate={setValidUntilStart}*/}
+      {/*  endDate={validUntilEnd}*/}
+      {/*  setEndDate={setValidUntilEnd}*/}
+      {/*  onApply={() => applyFilters()}*/}
+      {/*/>*/}
       <FilterByTime
-        label='Ngày bắt đầu hiệu lực'
-        selectedFilter={validFromFilter}
-        setSelectedFilter={setValidFromFilter}
-        startDate={validFromStart}
-        setStartDate={setValidFromStart}
-        endDate={validFromEnd}
-        setEndDate={setValidFromEnd}
-        onApply={() => applyFilters()}
-      />
-      <FilterByTime
-        label='Ngày hết hiệu lực'
-        selectedFilter={validUntilFilter}
-        setSelectedFilter={setValidUntilFilter}
-        startDate={validUntilStart}
-        setStartDate={setValidUntilStart}
-        endDate={validUntilEnd}
-        setEndDate={setValidUntilEnd}
-        onApply={() => applyFilters()}
-      />
-      <FilterByTime
-        label='Ngày tạo'
+        label='Ngày tạo mã'
         selectedFilter={createdFilter}
         setSelectedFilter={setCreatedFilter}
         startDate={createdStart}

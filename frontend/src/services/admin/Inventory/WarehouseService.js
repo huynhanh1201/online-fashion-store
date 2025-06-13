@@ -8,8 +8,8 @@ export const getWarehouses = async (filters) => {
       `${API_ROOT}/v1/warehouses?${params}`
     )
     return {
-      warehouses: response.data || response.data.data || [],
-      total: response.data.length || response.data.meta.total || 0
+      warehouses: response.data.data || [],
+      total: response.data.meta.total || 0
     }
   } catch (error) {
     console.error('Lỗi khi lấy danh sách kho:', error)

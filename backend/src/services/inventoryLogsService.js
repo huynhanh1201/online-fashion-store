@@ -2,6 +2,8 @@ import { InventoryLogModel } from '~/models/InventoryLogModel'
 import apiError from '~/utils/ApiError'
 import { StatusCodes } from 'http-status-codes'
 import { InventoryModel } from '~/models/InventoryModel'
+import validatePagination from '~/utils/validatePagination'
+import getDateRange from '~/utils/getDateRange'
 
 const createInventoryLog = async (reqBody) => {
   // eslint-disable-next-line no-useless-catch
@@ -20,48 +22,58 @@ const createInventoryLog = async (reqBody) => {
 }
 
 const getInventoryLogList = async (queryString) => {
-  let { page = 1, limit = 10, inventoryId, batchId, type, source } = queryString
+  let {
+    page = 1,
+    limit = 10,
+    type,
+    search,
+    sort,
+    filterTypeDate,
+    startDate,
+    endDate
+  } = queryString
 
   // Kiểm tra dữ liệu đầu vào của limit và page
-  limit = Number(limit)
-  page = Number(page)
 
-  if (!limit || limit < 1) {
-    throw new apiError(
-      StatusCodes.UNPROCESSABLE_ENTITY,
-      'Query string "limit" phải là số và lớn hơn 0'
-    )
-  }
+  validatePagination(page, limit)
 
-  if (!page || page < 1) {
-    throw new apiError(
-      StatusCodes.UNPROCESSABLE_ENTITY,
-      'Query string "page" phải là số và lớn hơn 0'
-    )
-  }
-
-  const filter = {}
+  const filter = { destroy: false }
 
   // Kiểm tra data query string
-
-  if (inventoryId) {
-    filter['inventoryId'] = inventoryId
-  }
-
-  if (batchId) {
-    filter['batchId'] = batchId
-  }
 
   if (type) {
     filter['type'] = type
   }
 
-  if (source) {
-    filter['source'] = source
+  if (search) {
+    filter.source = { $regex: search, $options: 'i' }
+  }
+
+  const dateRange = getDateRange(filterTypeDate, startDate, endDate)
+
+  if (dateRange.startDate && dateRange.endDate) {
+    filter['createdAt'] = {
+      $gte: new Date(dateRange.startDate),
+      $lte: new Date(dateRange.endDate)
+    }
+  }
+
+  let sortField = {}
+
+  const sortMap = {
+    newest: { createdAt: -1 },
+    oldest: { createdAt: 1 }
+  }
+
+  if (sort) {
+    sortField = sortMap[sort]
   }
 
   const [inventoryLogs, total] = await Promise.all([
     InventoryLogModel.find(filter)
+      .sort(sortField)
+      .skip((page - 1) * limit)
+      .limit(limit)
       .populate({
         path: 'inventoryId',
         populate: [
@@ -78,8 +90,6 @@ const getInventoryLogList = async (queryString) => {
         ],
         select: 'variantId warehouseId'
       })
-      .skip((page - 1) * limit)
-      .limit(limit)
       .lean(),
     InventoryLogModel.countDocuments(filter)
   ])

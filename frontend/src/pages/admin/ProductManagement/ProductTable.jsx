@@ -109,12 +109,13 @@ const ProductTable = ({
   const columns = [
     { id: 'index', label: 'STT', minWidth: 50, align: 'center' },
     { id: 'image', label: 'Ảnh', minWidth: 70 },
-    { id: 'name', label: 'Tên sản phẩm', minWidth: 150 },
-    { id: 'exportPrice', label: 'Giá bán', minWidth: 120 },
-    { id: 'description', label: 'Mô tả', minWidth: 120 },
-    { id: 'category', label: 'Danh mục', minWidth: 120 },
+    { id: 'productCode', label: 'Mã sản phẩm', minWidth: 150 },
+    { id: 'name', label: 'Tên sản phẩm', minWidth: 350 },
+    { id: 'exportPrice', label: 'Giá bán', minWidth: 150 },
+    { id: 'description', label: 'Mô tả', minWidth: 150 },
+    { id: 'category', label: 'Danh mục', minWidth: 150 },
     { id: 'status', label: 'Trạng thái', minWidth: 100 },
-    { id: 'action', label: 'Hành động', minWidth: 130, align: 'start' }
+    { id: 'action', label: 'Hành động', minWidth: 150, align: 'start' }
   ]
   const filtered = products.filter((p) => !p.destroy)
 
@@ -180,7 +181,10 @@ const ProductTable = ({
                 <TableCell
                   key={column.id}
                   align={column.align || 'left'}
-                  sx={{ minWidth: column.minWidth }}
+                  sx={{
+                    minWidth: column.minWidth,
+                    ...(column.id === 'action' ? { maxWidth: '150px' } : {})
+                  }}
                 >
                   {column.label}
                 </TableCell>

@@ -156,11 +156,11 @@ const TransactionTable = ({
           </TableRow>
           <TableRow>
             <TableCell sx={StyleAdmin.TableColumnSTT}>STT</TableCell>
+            <TableCell sx={{ width: '20%' }}>Mã đơn hàng</TableCell>
             <TableCell sx={{ width: '20%' }}>Mã giao dịch</TableCell>
-            <TableCell sx={{ width: '20%' }}>Đơn hàng</TableCell>
             <TableCell sx={{ width: 100 }}>Phương thức</TableCell>
             <TableCell sx={{ width: 100 }}>Trạng thái</TableCell>
-            <TableCell sx={{ width: '200px' }}>Số tiền (VNĐ)</TableCell>
+            <TableCell sx={{ width: '200px' }}>Số tiền</TableCell>
             <TableCell sx={{ width: 180 }}>Ngày tạo</TableCell>
             <TableCell
               sx={{

@@ -15,10 +15,10 @@ const createWarehouse = async (req, res, next) => {
 
 const getWarehouseList = async (req, res, next) => {
   try {
-    const productId = req.query.productId
+    const queryString = req.query
 
     // Lấy danh sách Danh mục sản phẩm từ tầng Service chuyển qua
-    const result = await warehousesService.getWarehouseList(productId)
+    const result = await warehousesService.getWarehouseList(queryString)
 
     // Có kết quả thì trả về Client
     res.status(StatusCodes.OK).json(result)

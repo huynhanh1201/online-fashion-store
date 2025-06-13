@@ -73,8 +73,8 @@ export default function FilterVariant({
   const applyFilters = ({
     search: kw = keyword,
     productId: pid = productId,
-    colorName: c = colorName,
-    sizeName: s = sizeName,
+    colorId: c = colorName,
+    sizeId: s = sizeName,
     overridePrice: op = overridePrice,
     status: d = destroy,
     sort: so = sort,
@@ -87,7 +87,7 @@ export default function FilterVariant({
     toDate = endDate
   } = {}) => {
     const filters = {
-      keyword: kw || undefined,
+      search: kw || undefined,
       productId: pid || undefined,
       colorName: c || undefined,
       sizeName: s || undefined,
@@ -164,7 +164,7 @@ export default function FilterVariant({
           { label: 'Tất cả', value: '' },
           ...colors.map((p) => ({
             label: p.name,
-            value: p._id
+            value: p.name
           }))
         ]}
       />
@@ -177,21 +177,21 @@ export default function FilterVariant({
           { label: 'Tất cả', value: '' },
           ...sizes.map((p) => ({
             label: p.name,
-            value: p._id
+            value: p.name
           }))
         ]}
       />
 
-      <FilterSelect
-        label='Giá riêng'
-        value={overridePrice}
-        onChange={setOverridePrice}
-        options={[
-          { label: 'Tất cả', value: '' },
-          { label: 'Có', value: 'true' },
-          { label: 'Không', value: 'false' }
-        ]}
-      />
+      {/*<FilterSelect*/}
+      {/*  label='Giá riêng'*/}
+      {/*  value={overridePrice}*/}
+      {/*  onChange={setOverridePrice}*/}
+      {/*  options={[*/}
+      {/*    { label: 'Tất cả', value: '' },*/}
+      {/*    { label: 'Có', value: 'true' },*/}
+      {/*    { label: 'Không', value: 'false' }*/}
+      {/*  ]}*/}
+      {/*/>*/}
 
       <FilterSelect
         label='Trạng thái'
@@ -200,32 +200,32 @@ export default function FilterVariant({
         options={[
           { label: 'Tất cả', value: '' },
           { label: 'Đang hoạt động', value: 'false' },
-          { label: 'Đã xóa mềm', value: 'true' }
+          { label: 'Dừng hoạt động', value: 'true' }
         ]}
       />
 
-      <FilterByPrice
-        label='Giá vốn'
-        priceMin={importPriceMin}
-        priceMax={importPriceMax}
-        setPriceMin={setImportPriceMin}
-        setPriceMax={setImportPriceMax}
-        onApply={() => applyFilters()}
-      />
+      {/*<FilterByPrice*/}
+      {/*  label='Giá vốn'*/}
+      {/*  priceMin={importPriceMin}*/}
+      {/*  priceMax={importPriceMax}*/}
+      {/*  setPriceMin={setImportPriceMin}*/}
+      {/*  setPriceMax={setImportPriceMax}*/}
+      {/*  onApply={() => applyFilters()}*/}
+      {/*/>*/}
 
-      <FilterByPrice
-        label='Giá bán'
-        priceMin={exportPriceMin}
-        priceMax={exportPriceMax}
-        setPriceMin={setExportPriceMin}
-        setPriceMax={setExportPriceMax}
-        onApply={() => applyFilters()}
-      />
+      {/*<FilterByPrice*/}
+      {/*  label='Giá bán'*/}
+      {/*  priceMin={exportPriceMin}*/}
+      {/*  priceMax={exportPriceMax}*/}
+      {/*  setPriceMin={setExportPriceMin}*/}
+      {/*  setPriceMax={setExportPriceMax}*/}
+      {/*  onApply={() => applyFilters()}*/}
+      {/*/>*/}
 
       <FilterSelect value={sort} onChange={setSort} />
 
       <FilterByTime
-        label='Ngày tạo'
+        label='Ngày tạo biến thể'
         selectedFilter={selectedFilter}
         setSelectedFilter={setSelectedFilter}
         startDate={startDate}

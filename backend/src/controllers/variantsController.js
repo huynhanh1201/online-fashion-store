@@ -15,10 +15,10 @@ const createVariant = async (req, res, next) => {
 
 const getVariantList = async (req, res, next) => {
   try {
-    const productId = req.query.productId
+    const queryString = req.query
 
     // Lấy danh sách Danh mục sản phẩm từ tầng Service chuyển qua
-    const result = await variantsService.getVariantList(productId)
+    const result = await variantsService.getVariantList(queryString)
 
     // Có kết quả thì trả về Client
     res.status(StatusCodes.OK).json(result)

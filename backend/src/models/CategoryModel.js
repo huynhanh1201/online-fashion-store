@@ -25,6 +25,10 @@ const categorySchema = new Schema(
     destroy: {
       type: Boolean,
       default: false // Soft-delete mặc định là false
+    },
+    image: {
+      type: String,
+      default: null // Chuỗi rỗng nếu không có ảnh
     }
   },
   {

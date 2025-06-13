@@ -42,7 +42,7 @@ const userSchema = new Schema(
     // Vai trò người dùng: 'user' hoặc 'HeaderAdmin'
     role: {
       type: String,
-      enum: ['customer', 'admin'],
+      enum: ['owner', 'technical_admin', 'staff', 'customer'],
       default: 'customer'
     },
 

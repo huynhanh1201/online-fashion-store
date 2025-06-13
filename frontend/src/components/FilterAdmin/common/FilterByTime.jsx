@@ -45,7 +45,7 @@ const FilterByTime = ({
         sx={{
           textTransform: 'none',
           justifyContent: 'space-between',
-          minWidth: 200,
+          minWidth: 150,
           color: 'text.primary',
           borderColor: 'rgba(0, 0, 0, 0.23)', // giống border Select mặc định
           padding: '6.5px 14px', // giống TextField size="small"

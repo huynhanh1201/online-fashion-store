@@ -1,15 +1,15 @@
 import AuthorizedAxiosInstance from '~/utils/authorizedAxios'
 import { API_ROOT } from '~/utils/constants'
 
-export const getWarehouseSlips = async (page = 1, limit = 10, filters = {}) => {
+export const getWarehouseSlips = async (filters) => {
   try {
-    const params = new URLSearchParams({ page, limit, ...filters }).toString()
+    const params = new URLSearchParams(filters).toString()
     const response = await AuthorizedAxiosInstance.get(
       `${API_ROOT}/v1/warehouse-slips?${params}`
     )
     return {
-      warehouseSlips: response.data,
-      total: response.data.totalPages
+      warehouseSlips: response.data.data,
+      total: response.data.meta.total
     }
   } catch (error) {
     console.error('Error fetching warehouse slips:', error)

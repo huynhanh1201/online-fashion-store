@@ -3,56 +3,43 @@ import { Box, Button } from '@mui/material'
 import dayjs from 'dayjs'
 import FilterSelect from '~/components/FilterAdmin/common/FilterSelect'
 import FilterByTime from '~/components/FilterAdmin/common/FilterByTime'
-import FilterByPrice from '~/components/FilterAdmin/common/FilterByPrice'
 import SearchWithSuggestions from '~/components/FilterAdmin/common/SearchWithSuggestions'
 
-export default function FilterBatches({
+export default function FilterWarehouseSlip({
   onFilter,
-  batches = [],
-  variants = [],
+  slips = [],
   warehouses = [],
+  users = [],
   loading,
   fetchData
 }) {
-  const [keyword, setKeyword] = useState('')
+  const [code, setCode] = useState('')
   const [inputValue, setInputValue] = useState('')
-  const [variantId, setVariantId] = useState('')
   const [warehouseId, setWarehouseId] = useState('')
-  const [destroy, setDestroy] = useState('')
+  const [type, setType] = useState('')
+  const [createdBy, setCreatedBy] = useState('')
+  const [status, setStatus] = useState('')
+  const [sort, setSort] = useState('')
   const [selectedFilter, setSelectedFilter] = useState('')
   const [startDate, setStartDate] = useState(dayjs().format('YYYY-MM-DD'))
   const [endDate, setEndDate] = useState(dayjs().format('YYYY-MM-DD'))
-  const [sort, setSort] = useState('')
-  const [quantityMin, setQuantityMin] = useState('')
-  const [quantityMax, setQuantityMax] = useState('')
-  const [importPriceMin, setImportPriceMin] = useState('')
-  const [importPriceMax, setImportPriceMax] = useState('')
 
   useEffect(() => {
     applyFilters()
-  }, [keyword, variantId, warehouseId, destroy, sort])
+  }, [code, warehouseId, type, createdBy, status, sort])
 
   const handleSearch = () => {
-    setKeyword(inputValue)
-    applyFilters({
-      keyword: inputValue,
-      variantId,
-      warehouseId,
-      destroy,
-      sort,
-      selectedTime: selectedFilter,
-      fromDate: startDate,
-      toDate: endDate
-    })
+    setCode(inputValue)
   }
 
   const handleApplyTimeFilter = (selected) => {
     setSelectedFilter(selected)
     applyFilters({
-      keyword,
-      variantId,
+      code,
       warehouseId,
-      destroy,
+      type,
+      createdBy,
+      status,
       sort,
       selectedTime: selected,
       fromDate: startDate,
@@ -61,28 +48,22 @@ export default function FilterBatches({
   }
 
   const applyFilters = ({
-    search: k = keyword,
-    variantId: vid = variantId,
-    warehouseId: wid = warehouseId,
-    quantityMin: qMin = quantityMin,
-    quantityMax: qMax = quantityMax,
-    importPriceMin: pMin = importPriceMin,
-    importPriceMax: pMax = importPriceMax,
-    status: d = destroy,
+    search: c = code,
+    warehouseId: wId = warehouseId,
+    type: t = type,
+    createdBy: uId = createdBy,
+    status: st = status,
     sort: s = sort,
     selectedTime = selectedFilter,
     fromDate = startDate,
     toDate = endDate
   } = {}) => {
     const filters = {
-      search: k || undefined,
-      variantId: vid || undefined,
-      warehouseId: wid || undefined,
-      quantityMin: qMin ? parseInt(qMin) : undefined,
-      quantityMax: qMax ? parseInt(qMax) : undefined,
-      importPriceMin: pMin ? parseInt(pMin) : undefined,
-      importPriceMax: pMax ? parseInt(pMax) : undefined,
-      status: d || undefined,
+      search: c || undefined,
+      warehouseId: wId || undefined,
+      type: t || undefined,
+      createdBy: uId || undefined,
+      status: st || undefined,
       sort: s || undefined
     }
 
@@ -94,7 +75,6 @@ export default function FilterBatches({
       filters.filterTypeDate = selectedTime
     }
 
-    // Xoá các field không có giá trị
     Object.keys(filters).forEach((key) => {
       if (
         filters[key] === undefined ||
@@ -109,15 +89,12 @@ export default function FilterBatches({
   }
 
   const handleReset = () => {
-    setKeyword('')
+    setCode('')
     setInputValue('')
-    setVariantId('')
     setWarehouseId('')
-    setQuantityMin('')
-    setQuantityMax('')
-    setImportPriceMin('')
-    setImportPriceMax('')
-    setDestroy('')
+    setType('')
+    setCreatedBy('')
+    setStatus('')
     setSort('')
     setSelectedFilter('')
     setStartDate(dayjs().format('YYYY-MM-DD'))
@@ -129,15 +106,6 @@ export default function FilterBatches({
   return (
     <Box display='flex' flexWrap='wrap' gap={2} mb={2} justifyContent='end'>
       <FilterSelect
-        label='Biến thể'
-        value={variantId}
-        onChange={setVariantId}
-        options={[
-          { label: 'Tất cả', value: '' },
-          ...variants.map((v) => ({ label: v.name, value: v._id }))
-        ]}
-      />
-      <FilterSelect
         label='Kho'
         value={warehouseId}
         onChange={setWarehouseId}
@@ -146,33 +114,38 @@ export default function FilterBatches({
           ...warehouses.map((w) => ({ label: w.name, value: w._id }))
         ]}
       />
-      {/*<FilterByPrice*/}
-      {/*  label='Số lượng'*/}
-      {/*  priceMin={quantityMin}*/}
-      {/*  priceMax={quantityMax}*/}
-      {/*  setPriceMin={setQuantityMin}*/}
-      {/*  setPriceMax={setQuantityMax}*/}
-      {/*  onApply={() => applyFilters()}*/}
-      {/*/>*/}
-
-      {/*<FilterByPrice*/}
-      {/*  label='Giá nhập'*/}
-      {/*  priceMin={importPriceMin}*/}
-      {/*  priceMax={importPriceMax}*/}
-      {/*  setPriceMin={setImportPriceMin}*/}
-      {/*  setPriceMax={setImportPriceMax}*/}
-      {/*  onApply={() => applyFilters()}*/}
-      {/*/>*/}
       <FilterSelect
-        label='Trạng thái'
-        value={destroy}
-        onChange={setDestroy}
+        label='Loại phiếu'
+        value={type}
+        onChange={setType}
         options={[
           { label: 'Tất cả', value: '' },
-          { label: 'Đang hoạt động', value: 'false' },
-          { label: 'Dừng hoạt động', value: 'true' }
+          { label: 'Phiếu nhập', value: 'import' },
+          { label: 'Phiếu xuất', value: 'export' }
         ]}
       />
+      {/*<SearchWithSuggestions*/}
+      {/*  label='Người nhập'*/}
+      {/*  options={users.map((u) => u.name)}*/}
+      {/*  keyword={createdBy}*/}
+      {/*  inputValue={createdBy}*/}
+      {/*  setKeyword={setCreatedBy}*/}
+      {/*  setInputValue={setCreatedBy}*/}
+      {/*  onSearch={() => applyFilters({ createdBy })}*/}
+      {/*  loading={loading}*/}
+      {/*/>*/}
+
+      {/*<FilterSelect*/}
+      {/*  label='Trạng thái'*/}
+      {/*  value={status}*/}
+      {/*  onChange={setStatus}*/}
+      {/*  options={[*/}
+      {/*    { label: 'Tất cả', value: '' },*/}
+      {/*    { label: 'Đã xác nhận', value: 'confirmed' },*/}
+      {/*    { label: 'Đang xử lý', value: 'processing' },*/}
+      {/*    { label: 'Đã huỷ', value: 'cancelled' }*/}
+      {/*  ]}*/}
+      {/*/>*/}
       <FilterSelect
         value={sort}
         onChange={setSort}
@@ -182,7 +155,7 @@ export default function FilterBatches({
         ]}
       />
       <FilterByTime
-        label='Ngày tạo lô hàng'
+        label='Ngày tạo phiếu'
         selectedFilter={selectedFilter}
         setSelectedFilter={setSelectedFilter}
         startDate={startDate}
@@ -193,11 +166,11 @@ export default function FilterBatches({
       />
       <Box sx={{ display: 'flex', gap: 2 }}>
         <SearchWithSuggestions
-          label='Lô hàng'
-          options={batches.map((b) => b.batchCode)}
-          keyword={keyword}
+          label='Mã phiếu'
+          options={slips.map((s) => s.slipId)}
+          keyword={code}
           inputValue={inputValue}
-          setKeyword={setKeyword}
+          setKeyword={setCode}
           setInputValue={setInputValue}
           onSearch={handleSearch}
           loading={loading}
