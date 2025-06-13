@@ -1,26 +1,6 @@
 import mongoose from 'mongoose'
 const { Schema, model } = mongoose
 
-const permissionSchema = new Schema(
-  {
-    key: {
-      type: String,
-      required: true
-    },
-    label: {
-      type: String,
-      required: true
-    },
-    group: {
-      type: String,
-      required: true
-    }
-  },
-  {
-    _id: false
-  }
-)
-
 const roleSchema = new Schema(
   {
     name: {
@@ -35,7 +15,7 @@ const roleSchema = new Schema(
       trim: true
     },
     permissions: {
-      type: [permissionSchema], // Mảng permission objects
+      type: [String], // Mảng permission objects
       default: []
     }
   },

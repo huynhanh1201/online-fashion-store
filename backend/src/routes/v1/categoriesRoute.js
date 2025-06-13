@@ -4,10 +4,14 @@ import { categoriesValidation } from '~/validations/categoriesValidation'
 import { categoriesController } from '~/controllers/categoriesController'
 import { authMiddleware } from '~/middlewares/authMiddleware'
 
+import { rbacMiddleware } from '~/middlewares/rbacMiddleware'
+
 const Router = express.Router()
 
 // Tạo Danh mục sản phẩm mới
 Router.route('/').post(
+  authMiddleware.isAuthorized,
+  rbacMiddleware.isValidPermission(['category:create']),
   categoriesValidation.category,
   categoriesController.createCategory
 )
