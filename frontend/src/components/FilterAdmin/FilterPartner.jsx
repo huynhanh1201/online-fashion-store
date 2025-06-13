@@ -92,12 +92,12 @@ export default function FilterPartner({
         options={[
           { label: 'Tất cả', value: '' },
           { label: 'Đang hoạt động', value: 'false' },
-          { label: 'Dừng', value: 'true' }
+          { label: 'Dừng hoạt động', value: 'true' }
         ]}
       />
       <FilterSelect value={sort} onChange={setSort} />
       <FilterByTime
-        label='Lọc thời gian tạo'
+        label='Ngày tạo đối tác '
         selectedFilter={selectedFilter}
         setSelectedFilter={setSelectedFilter}
         startDate={startDate}

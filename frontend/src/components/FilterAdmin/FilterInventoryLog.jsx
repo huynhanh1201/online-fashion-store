@@ -210,7 +210,7 @@ export default function FilterInventoryLog({
         ]}
       />
       <FilterByTime
-        label='Ngày tạo tạo phiếu'
+        label='Ngày tạo phiếu'
         selectedFilter={createdFilter}
         setSelectedFilter={setCreatedFilter}
         startDate={createdStart}

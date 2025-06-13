@@ -9,18 +9,36 @@ import {
 
 const useWarehouseSlips = () => {
   const [warehouseSlips, setWarehouseSlips] = useState([])
-  const [totalPages, setTotalPages] = useState(1)
-  const [loading, setLoading] = useState(false)
+  const [totalPageSlip, setTotalPages] = useState(1)
+  const [loadingSlip, setLoading] = useState(false)
   const fetchWarehouseSlips = async (page = 1, limit = 10, filters = {}) => {
     setLoading(true)
-    const { warehouseSlips, total } = await getWarehouseSlips(
-      page,
-      limit,
-      filters
-    )
-    setWarehouseSlips(warehouseSlips)
-    setTotalPages(total || 1)
-    setLoading(false)
+    const buildQuery = (input) => {
+      const query = { page, limit, ...input }
+      Object.keys(query).forEach((key) => {
+        if (
+          query[key] === '' ||
+          query[key] === undefined ||
+          query[key] === null
+        ) {
+          delete query[key]
+        }
+      })
+      return query
+    }
+    try {
+      const query = buildQuery(filters)
+      const response = await getWarehouseSlips(query)
+      setWarehouseSlips(response.warehouseSlips || [])
+      setTotalPages(response.total || 1)
+      setLoading(false)
+    } catch (error) {
+      console.error('Error fetching warehouse slips:', error)
+      setWarehouseSlips([])
+      setTotalPages(0)
+      setLoading(false)
+      return { warehouseSlips: [], total: 0 }
+    }
   }
   const createNewWarehouseSlip = async (data) => {
     const result = await createWarehouseSlip(data)
@@ -45,8 +63,8 @@ const useWarehouseSlips = () => {
 
   return {
     warehouseSlips,
-    totalPages,
-    loading,
+    totalPageSlip,
+    loadingSlip,
     fetchWarehouseSlips,
     createNewWarehouseSlip,
     getWarehouseSlipId,

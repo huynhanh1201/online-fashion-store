@@ -16,7 +16,7 @@ export default function FilterSelect({
   sx
 }) {
   return (
-    <FormControl size='small' sx={{ minWidth: 220, maxWidth: 300, ...sx }}>
+    <FormControl size='small' sx={{ minWidth: 150, maxWidth: 200, ...sx }}>
       <InputLabel>{label}</InputLabel>
       <Select
         value={value}

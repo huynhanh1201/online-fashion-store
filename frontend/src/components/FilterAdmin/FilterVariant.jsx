@@ -164,7 +164,7 @@ export default function FilterVariant({
           { label: 'Tất cả', value: '' },
           ...colors.map((p) => ({
             label: p.name,
-            value: p._id
+            value: p.name
           }))
         ]}
       />
@@ -177,7 +177,7 @@ export default function FilterVariant({
           { label: 'Tất cả', value: '' },
           ...sizes.map((p) => ({
             label: p.name,
-            value: p._id
+            value: p.name
           }))
         ]}
       />
@@ -199,8 +199,8 @@ export default function FilterVariant({
         onChange={setDestroy}
         options={[
           { label: 'Tất cả', value: '' },
-          { label: 'Đang còn biến thể', value: 'false' },
-          { label: 'Đã xóa', value: 'true' }
+          { label: 'Đang hoạt động', value: 'false' },
+          { label: 'Dừng hoạt động', value: 'true' }
         ]}
       />
 
@@ -225,7 +225,7 @@ export default function FilterVariant({
       <FilterSelect value={sort} onChange={setSort} />
 
       <FilterByTime
-        label='Ngày tạo'
+        label='Ngày tạo biến thể'
         selectedFilter={selectedFilter}
         setSelectedFilter={setSelectedFilter}
         startDate={startDate}

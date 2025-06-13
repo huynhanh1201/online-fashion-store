@@ -170,7 +170,7 @@ export default function FilterInventory({
       />
 
       <FilterSelect
-        label='Trạng thái hoạt động'
+        label='Trạng thái'
         value={destroy}
         onChange={(val) => {
           setDestroy(val)
