@@ -20,8 +20,10 @@ const createWarehouseSlip = async (req, res, next) => {
 
 const getWarehouseSlipList = async (req, res, next) => {
   try {
+    const queryString = req.query
+
     // Lấy danh sách Danh mục sản phẩm từ tầng Service chuyển qua
-    const result = await warehouseSlipsService.getWarehouseSlipList()
+    const result = await warehouseSlipsService.getWarehouseSlipList(queryString)
 
     // Có kết quả thì trả về Client
     res.status(StatusCodes.OK).json(result)
