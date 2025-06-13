@@ -8,7 +8,7 @@ export const getWarehouseSlips = async (page = 1, limit = 10, filters = {}) => {
       `${API_ROOT}/v1/warehouse-slips?${params}`
     )
     return {
-      warehouseSlips: response.data,
+      warehouseSlips: response.data.data,
       total: response.data.totalPages
     }
   } catch (error) {

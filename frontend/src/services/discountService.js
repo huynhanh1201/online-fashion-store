@@ -7,7 +7,7 @@ export const getDiscounts = async () => {
   try {
     const response = await AuthorizedAxiosInstance.get(`${API_ROOT}/v1/coupons`)
     const coupons = response.data
-    return { discounts: coupons, total: coupons.length } // vì API trả về mảng
+    return { discounts: coupons.data, total: coupons.length } // vì API trả về mảng
   } catch (error) {
     console.error('Lỗi khi lấy danh sách mã giảm:', error)
     return { discounts: [], total: 0 }

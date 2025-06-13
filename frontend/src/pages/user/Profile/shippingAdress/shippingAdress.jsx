@@ -141,18 +141,21 @@ function ShippingAddress({ showSnackbar }) {
       return
     }
 
-    const cityName = provinces.find((p) => p.code === city)?.name || ''
-    const districtName = districts.find((d) => d.code === district)?.name || ''
-    const wardName = wards.find((w) => w.code === ward)?.name || ''
+    const cityObj = provinces.find((p) => p.code === city) || {}
+    const districtObj = districts.find((d) => d.code === district) || {}
+    const wardObj = wards.find((w) => w.code === ward) || {}
     const addressData = {
       fullName: fullName.trim(),
       phone: phone.trim(),
       address: address.trim(),
-      ward: wardName,
-      district: districtName,
-      city: cityName
+      ward: wardObj.name,
+      district: districtObj.name,
+      city: cityObj.name,
+      wardId: wardObj.code,
+      districtId: districtObj.code,
+      cityId: cityObj.code
     }
-    const fullAddress = `${address}, ${wardName}, ${districtName}, ${cityName}`
+    const fullAddress = `${address}, ${wardObj.name}, ${districtObj.name}, ${cityObj.name}`
 
     const isDuplicate = addresses.some(
       (addr) =>

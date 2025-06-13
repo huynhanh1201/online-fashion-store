@@ -8,7 +8,7 @@ export const getPartners = async (filters = {}) => {
       `${API_ROOT}/v1/partners?${params}`
     )
     return {
-      partners: response.data || response.data.data || [],
+      partners: response.data.data || response.data.data || [],
       total: response.data.length || response.data.meta.total || 0
     }
   } catch (error) {

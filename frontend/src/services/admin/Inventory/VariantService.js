@@ -9,7 +9,7 @@ export const getVariants = async (filters) => {
     )
     // Đảm bảo return dạng { variants, total }
     return {
-      variants: response.data || response.data.data || [],
+      variants: response.data.data || response.data.data || [],
       total: response.data.length || response.data.meta.total || 0
     }
   } catch (error) {

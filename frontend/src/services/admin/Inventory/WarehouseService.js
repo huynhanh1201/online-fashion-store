@@ -8,7 +8,7 @@ export const getWarehouses = async (filters) => {
       `${API_ROOT}/v1/warehouses?${params}`
     )
     return {
-      warehouses: response.data || response.data.data || [],
+      warehouses: response.data.data || response.data.data || [],
       total: response.data.length || response.data.meta.total || 0
     }
   } catch (error) {
