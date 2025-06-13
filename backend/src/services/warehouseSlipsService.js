@@ -9,6 +9,8 @@ import { BatchModel } from '~/models/BatchModel'
 import { InventoryLogModel } from '~/models/InventoryLogModel'
 import { StatusCodes } from 'http-status-codes'
 import apiError from '~/utils/ApiError'
+import validatePagination from '~/utils/validatePagination'
+import getDateRange from '~/utils/getDateRange'
 
 const createWarehouseSlip = async (reqBody, jwtDecoded) => {
   // eslint-disable-next-line no-useless-catch
@@ -37,14 +39,89 @@ const createWarehouseSlip = async (reqBody, jwtDecoded) => {
   }
 }
 
-const getWarehouseSlipList = async () => {
-  const result = await WarehouseSlipModel.find({ destroy: false })
-    .populate([
-      { path: 'items.variantId', select: 'name sku' },
-      { path: 'partnerId', select: 'name' },
-      { path: 'warehouseId', select: 'name' }
-    ])
-    .lean()
+const getWarehouseSlipList = async (queryString) => {
+  let {
+    page = 1,
+    limit = 10,
+    search,
+    status,
+    sort,
+    filterTypeDate,
+    startDate,
+    endDate,
+    type,
+    warehouseId
+  } = queryString
+
+  // Kiểm tra dữ liệu đầu vào của limit và page
+  validatePagination(page, limit)
+
+  // Xử lý thông tin Filter
+  const filter = {}
+
+  if (type) {
+    filter.type = type
+  }
+
+  if (warehouseId) {
+    filter.warehouseId = warehouseId
+  }
+
+  if (status === 'true' || status === 'false') {
+    status = JSON.parse(status)
+
+    filter.destroy = status
+  }
+
+  if (search) {
+    filter.slipId = { $regex: search, $options: 'i' }
+  }
+
+  const dateRange = getDateRange(filterTypeDate, startDate, endDate)
+
+  if (dateRange.startDate && dateRange.endDate) {
+    filter['createdAt'] = {
+      $gte: new Date(dateRange.startDate),
+      $lte: new Date(dateRange.endDate)
+    }
+  }
+
+  let sortField = {}
+
+  const sortMap = {
+    newest: { createdAt: -1 },
+    oldest: { createdAt: 1 }
+  }
+
+  if (sort) {
+    sortField = sortMap[sort]
+  }
+
+  const [warehouseSlips, total] = await Promise.all([
+    WarehouseSlipModel.find(filter)
+      .collation({ locale: 'vi', strength: 1 })
+      .sort(sortField)
+      .skip((page - 1) * limit)
+      .limit(limit)
+      .populate([
+        { path: 'items.variantId', select: 'name sku' },
+        { path: 'partnerId', select: 'name' },
+        { path: 'warehouseId', select: 'name' }
+      ])
+      .lean(),
+
+    WarehouseSlipModel.countDocuments(filter)
+  ])
+
+  const result = {
+    data: warehouseSlips,
+    meta: {
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit)
+    }
+  }
 
   return result
 }

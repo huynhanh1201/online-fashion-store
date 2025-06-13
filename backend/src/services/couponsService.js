@@ -1,4 +1,6 @@
 import { CouponModel } from '~/models/CouponModel'
+import validatePagination from '~/utils/validatePagination'
+import getDateRange from '~/utils/getDateRange'
 
 const createCoupon = async (reqBody) => {
   // eslint-disable-next-line no-useless-catch
@@ -65,10 +67,81 @@ const validateCoupon = async (userId, reqBody) => {
   }
 }
 
-const getCouponList = async () => {
+const getCouponList = async (queryString) => {
   // eslint-disable-next-line no-useless-catch
   try {
-    const result = await CouponModel.find({}).lean()
+    let {
+      page = 1,
+      limit = 10,
+      search,
+      status,
+      sort,
+      filterTypeDate,
+      startDate,
+      endDate,
+      type
+    } = queryString
+
+    // Kiểm tra dữ liệu đầu vào của limit và page
+    validatePagination(page, limit)
+
+    // Xử lý thông tin Filter
+    const filter = {}
+
+    if (type) filter.type = type.toLowerCase()
+
+    if (status === 'true' || status === 'false') {
+      status = JSON.parse(status)
+
+      filter.destroy = status
+    }
+
+    if (search) {
+      filter.code = { $regex: search, $options: 'i' }
+    }
+
+    const dateRange = getDateRange(filterTypeDate, startDate, endDate)
+
+    if (dateRange.startDate && dateRange.endDate) {
+      filter['createdAt'] = {
+        $gte: new Date(dateRange.startDate),
+        $lte: new Date(dateRange.endDate)
+      }
+    }
+
+    const sortMap = {
+      name_asc: { code: 1 },
+      name_desc: { code: -1 },
+      newest: { createdAt: -1 },
+      oldest: { createdAt: 1 }
+    }
+
+    let sortField = {}
+
+    if (sort) {
+      sortField = sortMap[sort]
+    }
+
+    const [coupons, total] = await Promise.all([
+      CouponModel.find(filter)
+        .collation({ locale: 'vi', strength: 1 })
+        .sort(sortField)
+        .skip((page - 1) * limit)
+        .limit(limit)
+        .lean(),
+
+      CouponModel.countDocuments(filter)
+    ])
+
+    const result = {
+      data: coupons,
+      meta: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit)
+      }
+    }
 
     return result
   } catch (err) {

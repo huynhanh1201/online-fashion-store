@@ -20,13 +20,17 @@ import AddPartnerModal from '../modal/Partner/AddPartnerModal.jsx'
 import EditPartnerModal from '../modal/Partner/EditPartnerModal.jsx'
 import ViewPartnerModal from '../modal/Partner/ViewPartnerModal.jsx'
 import DeletePartnerModal from '../modal/Partner/DeletePartnerModal.jsx'
+import AddIcon from '@mui/icons-material/Add'
+import FilterPartner from '~/components/FilterAdmin/FilterPartner.jsx'
 
 const PartnersTab = ({
   data = [],
   page,
   rowsPerPage,
   onPageChange,
-  onRowsPerPageChange,
+  loading,
+  onChangeRowsPerPage,
+  total,
   refreshPartners,
   addPartner,
   updatePartner,
@@ -77,11 +81,18 @@ const PartnersTab = ({
   const [openViewDialog, setOpenViewDialog] = useState(false)
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false)
   const [selectedPartner, setSelectedPartner] = useState(null)
+  const [filter, setFilter] = useState({})
 
   useEffect(() => {
-    refreshPartners()
-  }, [])
+    refreshPartners(page, rowsPerPage, filter)
+  }, [page, rowsPerPage])
 
+  const handleFilter = (newFilters) => {
+    setFilter(newFilters)
+    if (Object.keys(newFilters).length > 0) {
+      refreshPartners(1, rowsPerPage, newFilters)
+    }
+  }
   const handleAddPartner = () => {
     setOpenAddDialog(true)
   }
@@ -129,10 +140,47 @@ const PartnersTab = ({
         alignItems='center'
         mb={2}
       >
-        <Typography variant='h6'>Danh sách đối tác</Typography>
-        <Button variant='contained' onClick={handleAddPartner}>
-          Thêm đối tác
-        </Button>
+        <Box
+          sx={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'start',
+            flex: 1
+          }}
+        >
+          <Box
+            sx={{
+              display: 'flex',
+              flexDirection: 'column',
+              gap: 1,
+              minWidth: 250
+            }}
+          >
+            <Typography variant='h6' sx={{ fontWeight: '800' }}>
+              Danh Sách Đối tác
+            </Typography>
+            <Button
+              variant='contained'
+              color='primary'
+              onClick={handleAddPartner}
+              startIcon={<AddIcon />}
+              sx={{
+                textTransform: 'none',
+                width: 100,
+                display: 'flex',
+                alignItems: 'center'
+              }}
+            >
+              Thêm
+            </Button>
+          </Box>
+          <FilterPartner
+            partners={data}
+            loading={loading}
+            onFilter={handleFilter}
+            fetchPartners={refreshPartners}
+          />
+        </Box>
       </Box>
       <Table size='small'>
         <TableHead>
@@ -226,17 +274,20 @@ const PartnersTab = ({
       <TablePagination
         rowsPerPageOptions={[10, 25, 100]}
         component='div'
-        count={data.length}
-        page={page}
-        onPageChange={onPageChange}
+        count={total || 0}
         rowsPerPage={rowsPerPage}
-        onRowsPerPageChange={(e) => onRowsPerPageChange(e, 'partner')}
-        labelRowsPerPage='Số dòng mỗi trang'
-        labelDisplayedRows={({ from, to, count }) => {
-          const actualTo = to > count ? count : to // nếu to vượt quá count thì lấy count
-          const actualFrom = from > count ? count : from // nếu from vượt quá count thì lấy count
-          return `${actualFrom}–${actualTo} trên ${count !== -1 ? count : `hơn ${actualTo}`}`
+        page={page - 1}
+        onPageChange={(event, newPage) => onPageChange(event, newPage + 1)} // +1 để đúng logic bên cha
+        onRowsPerPageChange={(event) => {
+          const newLimit = parseInt(event.target.value, 10)
+          if (onChangeRowsPerPage) {
+            onChangeRowsPerPage(newLimit)
+          }
         }}
+        labelRowsPerPage='Số dòng mỗi trang'
+        labelDisplayedRows={({ from, to, count }) =>
+          `${from}–${to} trên ${count !== -1 ? count : `hơn ${to}`}`
+        }
       />
 
       <AddPartnerModal

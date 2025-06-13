@@ -72,8 +72,8 @@ const getProductList = async (reqQuery) => {
   // eslint-disable-next-line no-useless-catch
   try {
     let {
-      page,
-      limit,
+      page = 1,
+      limit = 10,
       search,
       categoryId,
       priceMin,

@@ -22,14 +22,17 @@ import {
   CardContent,
   InputLabel,
   Select,
-  MenuItem
+  MenuItem,
+  Snackbar,
+  Alert
 } from '@mui/material'
 import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers'
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns'
 import DeleteIcon from '@mui/icons-material/Delete'
-import Search from '~/components/SearchAdmin/Search.jsx' // Adjust the import path as needed
+import Search from '~/components/SearchAdmin/Search.jsx'
 import AddPartnerModal from '~/pages/admin/InventoryManagement/modal/Partner/AddPartnerModal.jsx'
 import AddWarehouseModal from '~/pages/admin/InventoryManagement/modal/Warehouse/AddWarehouseModal.jsx'
+
 export default function AddWarehouseSlipModal({
   open,
   onClose,
@@ -44,28 +47,30 @@ export default function AddWarehouseSlipModal({
   variants,
   type = 'input', // 'input' for import, 'output' for export
   partners,
-  handleAdd,
+  addWarehouseSlip,
   addPartner,
   addWarehouse
 }) {
   const [isEditing, setIsEditing] = useState(false)
   const [openAddDialog, setOpenAddDialog] = useState(false)
   const [openAddWarehouse, setOpenAddWarehouse] = useState(false)
+  const [snackbarOpen, setSnackbarOpen] = useState(false)
+  const [errorMessage, setErrorMessage] = useState('')
 
+  // Sửa lỗi: Đặt openAddWarehouse thành true để mở modal
   const handleOpenAddWarehouse = () => {
-    setOpenAddWarehouse(false)
+    setOpenAddWarehouse(true)
   }
 
   const handleCloseAddDialog = () => {
     setOpenAddDialog(false)
   }
-  // Safeguard against undefined newSlipData
+
   if (!newSlipData) {
     console.warn('newSlipData is undefined')
     return null
   }
 
-  // Normalize Vietnamese for search
   const normalizeVietnamese = (str = '') => {
     return str
       .normalize('NFD')
@@ -75,15 +80,14 @@ export default function AddWarehouseSlipModal({
       .toLowerCase()
   }
 
-  // Filter variants based on sku and name
   const filterVariantsBySkuAndName = (searchText) => {
     if (!variants || !Array.isArray(variants)) {
       console.warn('variants is undefined or not an array', { variants })
       return []
     }
-
     const searchNormalized = normalizeVietnamese(searchText)
     return variants
+      .filter((variant) => !variant.destroy) // Lọc bỏ variant có destroy: true
       .map((variant) => ({
         _id: variant._id,
         sku: variant.sku,
@@ -94,29 +98,90 @@ export default function AddWarehouseSlipModal({
       )
   }
 
-  // Helper to get SKU from variantId
   const getSkuFromVariantId = (variantId) => {
     if (!variantId || !variants || !Array.isArray(variants)) return ''
     const variant = variants.find((v) => v._id === variantId)
     return variant ? variant.sku : ''
   }
 
-  // Modified handleAdd to match the desired JSON structure
   const onSubmit = async () => {
-    const formattedData = {
-      type: type === 'input' ? 'import' : 'export',
-      date: newSlipData.date ? new Date(newSlipData.date).toISOString() : null,
-      partnerId: newSlipData.partnerId || '',
-      warehouseId: newSlipData.warehouseId || '',
-      items: items.map((item) => ({
-        variantId: item.variantId || '',
-        quantity: parseInt(item.quantity) || 0,
-        unit: item.unit || 'cái'
-      })),
-      note: newSlipData.note || ''
+    // Hàm kiểm tra dữ liệu đầu vào
+    const validateForm = () => {
+      if (!newSlipData) {
+        setErrorMessage('Dữ liệu phiếu nhập kho không hợp lệ!')
+        return false
+      }
+      if (!newSlipData.date) {
+        setErrorMessage('Vui lòng chọn ngày nhập kho!')
+        return false
+      }
+      if (!newSlipData.warehouseId) {
+        setErrorMessage('Vui lòng chọn kho nhập hàng!')
+        return false
+      }
+      if (!newSlipData.partnerId) {
+        setErrorMessage('Vui lòng chọn nhà cung cấp!')
+        return false
+      }
+      if (!items || items.length === 0) {
+        setErrorMessage('Vui lòng thêm ít nhất một sản phẩm!')
+        return false
+      }
+      if (
+        items.some(
+          (item) => !item.variantId || !item.quantity || item.quantity <= 0
+        )
+      ) {
+        setErrorMessage(
+          'Vui lòng điền đầy đủ thông tin sản phẩm (biến thể và số lượng)!'
+        )
+        return false
+      }
+      // Kiểm tra biến thể có destroy: true
+      if (
+        variants &&
+        items.some((item) => {
+          const variant = variants.find((v) => v._id === item.variantId)
+          return variant && variant.destroy === true
+        })
+      ) {
+        setErrorMessage('Một hoặc nhiều biến thể đã bị xóa (destroy: true)!')
+        return false
+      }
+      return true
     }
-    await handleAdd(formattedData)
-    onClose()
+
+    // Kiểm tra dữ liệu trước khi gửi
+    if (!validateForm()) {
+      setSnackbarOpen(true)
+      return
+    }
+
+    try {
+      const formattedData = {
+        type: type === 'input' ? 'import' : 'export',
+        date: new Date(newSlipData.date).toISOString(),
+        partnerId: newSlipData.partnerId,
+        warehouseId: newSlipData.warehouseId,
+        items: items.map((item) => ({
+          variantId: item.variantId,
+          quantity: parseInt(item.quantity),
+          unit: item.unit || 'cái'
+        })),
+        note: newSlipData.note || ''
+      }
+      await addWarehouseSlip(formattedData)
+      setErrorMessage(
+        `Tạo phiếu ${type === 'input' ? 'nhập' : 'xuất'} kho thành công!`
+      )
+      setSnackbarOpen(true)
+      onClose()
+    } catch (error) {
+      setErrorMessage(
+        `Lỗi khi tạo phiếu ${type === 'input' ? 'nhập' : 'xuất'} kho: ${error.message}`
+      )
+      setSnackbarOpen(true)
+    }
   }
 
   return (
@@ -166,9 +231,7 @@ export default function AddWarehouseSlipModal({
                     label='Ngày nhập'
                     value={newSlipData.date || null}
                     onChange={handleDateChange}
-                    renderInput={(params) => (
-                      <TextField fullWidth {...params} />
-                    )}
+                    slotProps={{ textField: { fullWidth: true } }} // Cập nhật để tương thích với MUI v6
                   />
                 </Grid>
                 <Grid item size={4} sm={6} md={4}>
@@ -178,7 +241,7 @@ export default function AddWarehouseSlipModal({
                       value={newSlipData.warehouseId || ''}
                       onChange={handleChange('warehouseId')}
                     >
-                      <MenuItem onClick={() => setOpenAddWarehouse(true)}>
+                      <MenuItem onClick={handleOpenAddWarehouse}>
                         Thêm kho
                       </MenuItem>
                       {warehouses.map((warehouse) => (
@@ -197,7 +260,7 @@ export default function AddWarehouseSlipModal({
                       onChange={handleChange('partnerId')}
                     >
                       <MenuItem onClick={() => setOpenAddDialog(true)}>
-                        Thêm hà cung cấp
+                        Thêm nhà cung cấp
                       </MenuItem>
                       {partners.map((partner) => (
                         <MenuItem key={partner._id} value={partner._id}>
@@ -295,7 +358,7 @@ export default function AddWarehouseSlipModal({
                         </TableCell>
                         <TableCell sx={{ minWidth: 100 }}>
                           <TextField
-                            value={'cái'}
+                            value={item.unit || 'cái'}
                             onChange={handleItemChange(index, 'unit')}
                             fullWidth
                             size='small'
@@ -338,9 +401,31 @@ export default function AddWarehouseSlipModal({
         />
         <AddWarehouseModal
           open={openAddWarehouse}
-          onClose={handleOpenAddWarehouse}
+          onClose={() => setOpenAddWarehouse(false)}
           onSave={addWarehouse}
         />
+        <Snackbar
+          open={snackbarOpen}
+          autoHideDuration={4000}
+          onClose={() => {
+            setSnackbarOpen(false)
+            setErrorMessage('')
+          }}
+          anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+        >
+          <Alert
+            onClose={() => {
+              setSnackbarOpen(false)
+              setErrorMessage('')
+            }}
+            severity={errorMessage.includes('thành công') ? 'success' : 'error'}
+            sx={{ width: '100%', fontSize: '0.9rem' }}
+            elevation={6}
+            variant='filled'
+          >
+            {errorMessage || 'Đã xảy ra lỗi, vui lòng thử lại!'}
+          </Alert>
+        </Snackbar>
       </Dialog>
     </LocalizationProvider>
   )

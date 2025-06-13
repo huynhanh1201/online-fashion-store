@@ -1,16 +1,16 @@
 import AuthorizedAxiosInstance from '~/utils/authorizedAxios'
 import { API_ROOT } from '~/utils/constants'
 
-export const getVariants = async ({ page, limit, ...filters }) => {
+export const getVariants = async (filters) => {
   try {
-    const params = new URLSearchParams({ page, limit, ...filters }).toString()
+    const params = new URLSearchParams(filters).toString()
     const response = await AuthorizedAxiosInstance.get(
       `${API_ROOT}/v1/variants?${params}`
     )
     // Đảm bảo return dạng { variants, total }
     return {
-      variants: response.data,
-      total: response.data.length
+      variants: response.data || response.data.data || [],
+      total: response.data.length || response.data.meta.total || 0
     }
   } catch (error) {
     console.error('Lỗi khi lấy danh sách biến thể:', error)

@@ -8,18 +8,27 @@ import {
 
 const useVariants = () => {
   const [variants, setVariants] = useState([])
-  const [totalPages, setTotalPages] = useState(1)
-  const [loading, setLoading] = useState(false)
+  const [totalVariant, setTotalPages] = useState(1)
+  const [loadingVariant, setLoading] = useState(false)
 
   const fetchVariants = async (page = 1, limit = 10, filters = {}) => {
     setLoading(true)
-    try {
-      const { variants = [], total = 0 } = await getVariants({
-        page,
-        limit,
-        ...filters
+    const buildQuery = (input) => {
+      const query = { page, limit, ...input }
+      Object.keys(query).forEach((key) => {
+        if (
+          query[key] === '' ||
+          query[key] === undefined ||
+          query[key] === null
+        ) {
+          delete query[key]
+        }
       })
-
+      return query
+    }
+    try {
+      const query = buildQuery(filters)
+      const { variants = [], total = 0 } = await getVariants(query)
       setVariants(variants)
       setTotalPages(total || 1)
     } catch (err) {
@@ -33,26 +42,23 @@ const useVariants = () => {
 
   const createNewVariant = async (data) => {
     const result = await createVariant(data)
-    if (result) await fetchVariants()
     return result
   }
 
   const updateVariantById = async (id, data) => {
     const result = await updateVariant(id, data)
-    if (result) await fetchVariants()
     return result
   }
 
   const deleteVariantById = async (id) => {
     const result = await deleteVariant(id)
-    if (result) await fetchVariants()
     return result
   }
 
   return {
     variants,
-    totalPages,
-    loading,
+    totalVariant,
+    loadingVariant,
     fetchVariants,
     createNewVariant,
     updateVariantById,

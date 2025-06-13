@@ -174,7 +174,7 @@ const ProductManagement = () => {
   const { getSizePaletteId } = useSizePalettes()
 
   React.useEffect(() => {
-    fetchProducts()
+    fetchProducts(page, limit, filters)
   }, [page, limit])
 
   const handleChangePage = (event, value) => setPage(value)
@@ -206,7 +206,7 @@ const ProductManagement = () => {
       const result = await updateProduct(id, updatedData)
       console.log('Result from updateProduct:', result) // Debugging log
       if (result) {
-        await fetchProducts()
+        await fetchProducts(page, limit)
       }
       return result // Explicitly return the result
     } catch (error) {
@@ -218,7 +218,13 @@ const ProductManagement = () => {
   const handleDeleteProduct = async (id) => {
     const result = await deleteProduct(id)
     if (result) {
-      await fetchProducts()
+      await fetchProducts(page, limit)
+    }
+  }
+  const handleFilter = (newFilters) => {
+    setFilters(newFilters)
+    if (Object.keys(newFilters).length > 0) {
+      fetchProducts(1, limit, newFilters)
     }
   }
 
@@ -246,12 +252,10 @@ const ProductManagement = () => {
           setPage(1)
           setLimit(newLimit)
         }}
-        onFilter={(filters) => {
-          setFilters(filters)
-          fetchProducts(page, limit, filters)
-        }}
+        onFilter={handleFilter}
         categories={categories}
         fetchCategories={fetchCategories}
+        fetchProducts={fetchProducts}
       />
 
       <React.Suspense fallback={<></>}>

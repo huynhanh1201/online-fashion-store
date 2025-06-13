@@ -20,22 +20,30 @@ import DeleteForeverIcon from '@mui/icons-material/DeleteForever'
 import AddVariantModal from '../modal/Variant/AddVariantModal.jsx'
 import ViewVariantModal from '../modal/Variant/ViewVariantModal.jsx' // Thêm modal mới
 import EditVariantModal from '../modal/Variant/EditVariantModal.jsx' // Thêm modal mới
-import DeleteVariantModal from '../modal/Variant/DeleteVariantModal.jsx' // Thêm modal mới
+import DeleteVariantModal from '../modal/Variant/DeleteVariantModal.jsx'
+import AddIcon from '@mui/icons-material/Add'
+import FilterVariant from '~/components/FilterAdmin/FilterVariant.jsx'
 
 const VariantsTab = ({
   data,
   products,
   page,
   rowsPerPage,
+  loading,
+  total,
   onPageChange,
-  onRowsPerPageChange,
+  onChangeRowsPerPage,
   refreshVariants,
   addVariant,
   updateVariant, // Giả định prop mới
   deleteVariant, // Giả định prop mới
   refreshProducts,
   formatCurrency,
-  parseCurrency
+  parseCurrency,
+  colors,
+  fetchColors,
+  fetchSizes,
+  sizes
 }) => {
   const enrichedVariants = (data || []).map((variant) => {
     const product = (products || []).find((p) => p.id === variant.productId)
@@ -50,10 +58,17 @@ const VariantsTab = ({
   const [openEditModal, setOpenEditModal] = useState(false)
   const [openDeleteModal, setOpenDeleteModal] = useState(false)
   const [selectedVariant, setSelectedVariant] = useState(null)
+
+  const [filter, setFilter] = useState({})
+
   useEffect(() => {
-    refreshVariants()
     refreshProducts()
+    fetchColors()
+    fetchSizes()
   }, [])
+  useEffect(() => {
+    refreshVariants(page, rowsPerPage, filter)
+  }, [page, rowsPerPage])
   const handleAddVariant = () => {
     setOpenAddModal(true)
   }
@@ -114,6 +129,15 @@ const VariantsTab = ({
     { id: 'action', label: 'Hành động', minWidth: 150, align: 'center' }
   ]
 
+  const handleFilter = (newFilters) => {
+    setFilter(newFilters)
+    if (Object.keys(newFilters).length > 0) {
+      refreshVariants(1, rowsPerPage, newFilters)
+    }
+  }
+
+  const filterColor = colors.filter((c) => !c.destroy)
+  const filterSize = sizes.filter((s) => !s.destroy)
   return (
     <Paper sx={{ border: '1px solid #ccc', width: '100%', overflow: 'hidden' }}>
       <TableContainer>
@@ -125,20 +149,44 @@ const VariantsTab = ({
                   sx={{
                     display: 'flex',
                     justifyContent: 'space-between',
-                    alignItems: 'center'
+                    alignItems: 'start'
                   }}
                 >
-                  <Typography variant='h6' sx={{ fontWeight: '800' }}>
-                    Danh sách biến thể sản phẩm
-                  </Typography>
-                  <Button
-                    variant='contained'
-                    color='primary'
-                    sx={{ mr: 1 }}
-                    onClick={handleAddVariant}
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: 1,
+                      minWidth: 250
+                    }}
                   >
-                    Thêm biến thể
-                  </Button>
+                    <Typography variant='h6' sx={{ fontWeight: '800' }}>
+                      Danh Sách Biến Thể
+                    </Typography>
+                    <Button
+                      variant='contained'
+                      color='primary'
+                      onClick={handleAddVariant}
+                      startIcon={<AddIcon />}
+                      sx={{
+                        textTransform: 'none',
+                        width: 100,
+                        display: 'flex',
+                        alignItems: 'center'
+                      }}
+                    >
+                      Thêm
+                    </Button>
+                  </Box>
+                  <FilterVariant
+                    onFilter={handleFilter}
+                    products={products}
+                    variants={data}
+                    loading={loading}
+                    fetchVariants={refreshVariants}
+                    colors={filterColor}
+                    sizes={filterSize}
+                  />
                 </Box>
               </TableCell>
             </TableRow>
@@ -204,17 +252,20 @@ const VariantsTab = ({
       <TablePagination
         rowsPerPageOptions={[10, 25, 100]}
         component='div'
-        count={data.length}
+        count={total || 0}
         rowsPerPage={rowsPerPage}
-        page={page}
-        onPageChange={onPageChange}
-        onRowsPerPageChange={(e) => onRowsPerPageChange(e, 'variant')}
-        labelRowsPerPage='Số dòng mỗi trang'
-        labelDisplayedRows={({ from, to, count }) => {
-          const actualTo = to > count ? count : to // nếu to vượt quá count thì lấy count
-          const actualFrom = from > count ? count : from // nếu from vượt quá count thì lấy count
-          return `${actualFrom}–${actualTo} trên ${count !== -1 ? count : `hơn ${actualTo}`}`
+        page={page - 1}
+        onPageChange={(event, newPage) => onPageChange(event, newPage + 1)} // +1 để đúng logic bên cha
+        onRowsPerPageChange={(event) => {
+          const newLimit = parseInt(event.target.value, 10)
+          if (onChangeRowsPerPage) {
+            onChangeRowsPerPage(newLimit)
+          }
         }}
+        labelRowsPerPage='Số dòng mỗi trang'
+        labelDisplayedRows={({ from, to, count }) =>
+          `${from}–${to} trên ${count !== -1 ? count : `hơn ${to}`}`
+        }
       />
       <AddVariantModal
         open={openAddModal}
@@ -223,6 +274,8 @@ const VariantsTab = ({
         products={products}
         parseCurrency={parseCurrency}
         formatCurrency={formatCurrency}
+        colors={filterColor}
+        sizes={filterSize}
       />
       <ViewVariantModal
         open={openViewModal}

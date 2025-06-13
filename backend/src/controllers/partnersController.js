@@ -15,10 +15,10 @@ const createPartner = async (req, res, next) => {
 
 const getPartnerList = async (req, res, next) => {
   try {
-    const productId = req.query.productId
+    const queryString = req.query
 
     // Lấy danh sách Danh mục sản phẩm từ tầng Service chuyển qua
-    const result = await partnersService.getPartnerList(productId)
+    const result = await partnersService.getPartnerList(queryString)
 
     // Có kết quả thì trả về Client
     res.status(StatusCodes.OK).json(result)

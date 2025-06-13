@@ -15,10 +15,10 @@ const createSize = async (req, res, next) => {
 
 const getSizeList = async (req, res, next) => {
   try {
-    const productId = req.query.productId
+    const queryString = req.query
 
     // Lấy danh sách Danh mục sản phẩm từ tầng Service chuyển qua
-    const result = await sizesService.getSizeList(productId)
+    const result = await sizesService.getSizeList(queryString)
 
     // Có kết quả thì trả về Client
     res.status(StatusCodes.OK).json(result)

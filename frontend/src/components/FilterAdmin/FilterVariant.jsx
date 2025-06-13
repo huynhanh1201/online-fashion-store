@@ -1,0 +1,260 @@
+import React, { useEffect, useState } from 'react'
+import { Box, Button } from '@mui/material'
+import dayjs from 'dayjs'
+
+import FilterSelect from '~/components/FilterAdmin/common/FilterSelect'
+import FilterByTime from '~/components/FilterAdmin/common/FilterByTime'
+import FilterByPrice from '~/components/FilterAdmin/common/FilterByPrice'
+import SearchWithSuggestions from '~/components/FilterAdmin/common/SearchWithSuggestions'
+
+export default function FilterVariant({
+  onFilter,
+  products = [],
+  fetchProducts,
+  variants = [],
+  fetchVariants,
+  loading,
+  colors,
+  sizes
+}) {
+  const [keyword, setKeyword] = useState('')
+  const [inputValue, setInputValue] = useState('')
+
+  const [productId, setProductId] = useState('')
+  const [colorName, setColorName] = useState('')
+  const [sizeName, setSizeName] = useState('')
+  const [overridePrice, setOverridePrice] = useState('')
+  const [destroy, setDestroy] = useState('')
+  const [sort, setSort] = useState('')
+  const [importPriceMin, setImportPriceMin] = useState('')
+  const [importPriceMax, setImportPriceMax] = useState('')
+  const [exportPriceMin, setExportPriceMin] = useState('')
+  const [exportPriceMax, setExportPriceMax] = useState('')
+
+  const [selectedFilter, setSelectedFilter] = useState('')
+  const [startDate, setStartDate] = useState(dayjs().format('YYYY-MM-DD'))
+  const [endDate, setEndDate] = useState(dayjs().format('YYYY-MM-DD'))
+
+  useEffect(() => {
+    fetchProducts?.()
+  }, [])
+
+  useEffect(() => {
+    applyFilters()
+  }, [keyword, destroy, colorName, sizeName, productId, overridePrice, sort])
+
+  const handleSearch = () => {
+    setKeyword(inputValue)
+    applyFilters({
+      keyword: inputValue,
+      productId,
+      colorName,
+      sizeName,
+      overridePrice,
+      destroy,
+      sort,
+      importPriceRange: { min: importPriceMin, max: importPriceMax },
+      exportPriceRange: { min: exportPriceMin, max: exportPriceMax },
+      selectedTime: selectedFilter,
+      fromDate: startDate,
+      toDate: endDate
+    })
+  }
+
+  const handleApplyTimeFilter = (selected) => {
+    setSelectedFilter(selected)
+    applyFilters({
+      selectedTime: selected,
+      fromDate: startDate,
+      toDate: endDate
+    })
+  }
+
+  const applyFilters = ({
+    search: kw = keyword,
+    productId: pid = productId,
+    colorName: c = colorName,
+    sizeName: s = sizeName,
+    overridePrice: op = overridePrice,
+    status: d = destroy,
+    sort: so = sort,
+    importPriceMin: ipMin = importPriceMin,
+    importPriceMax: ipMax = importPriceMax,
+    exportPriceMin: epMin = exportPriceMin,
+    exportPriceMax: epMax = exportPriceMax,
+    selectedTime = selectedFilter,
+    fromDate = startDate,
+    toDate = endDate
+  } = {}) => {
+    const filters = {
+      keyword: kw || undefined,
+      productId: pid || undefined,
+      colorName: c || undefined,
+      sizeName: s || undefined,
+      overridePrice: op !== '' ? op === 'true' : undefined,
+      status: d !== '' ? d === 'true' : undefined,
+      sort: so || undefined,
+      importPriceMin: ipMin || undefined,
+      importPriceMax: ipMax || undefined,
+      exportPriceMin: epMin || undefined,
+      exportPriceMax: epMax || undefined
+    }
+
+    if (selectedTime === 'custom') {
+      filters.filterTypeDate = 'custom'
+      filters.startDate = fromDate
+      filters.endDate = toDate
+    } else if (selectedTime) {
+      filters.filterTypeDate = selectedTime
+    }
+
+    Object.keys(filters).forEach((key) => {
+      if (
+        filters[key] === undefined ||
+        filters[key] === null ||
+        filters[key] === ''
+      ) {
+        delete filters[key]
+      }
+    })
+
+    onFilter(filters)
+  }
+
+  const handleReset = () => {
+    setKeyword('')
+    setInputValue('')
+    setProductId('')
+    setColorName('')
+    setSizeName('')
+    setOverridePrice('')
+    setDestroy('')
+    setSort('')
+    setImportPriceMin('')
+    setImportPriceMax('')
+    setExportPriceMin('')
+    setExportPriceMax('')
+    setSelectedFilter('')
+    setStartDate(dayjs().format('YYYY-MM-DD'))
+    setEndDate(dayjs().format('YYYY-MM-DD'))
+    onFilter({})
+    fetchVariants?.(1, 10)
+  }
+
+  return (
+    <Box display='flex' flexWrap='wrap' gap={2} mb={2} justifyContent='end'>
+      <FilterSelect
+        label='Sản phẩm'
+        value={productId}
+        onChange={setProductId}
+        options={[
+          { label: 'Tất cả', value: '' },
+          ...products.map((p) => ({
+            label: p.name,
+            value: p._id
+          }))
+        ]}
+      />
+
+      <FilterSelect
+        label='Màu sắc'
+        value={colorName}
+        onChange={setColorName}
+        options={[
+          { label: 'Tất cả', value: '' },
+          ...colors.map((p) => ({
+            label: p.name,
+            value: p._id
+          }))
+        ]}
+      />
+
+      <FilterSelect
+        label='Kích cỡ'
+        value={sizeName}
+        onChange={setSizeName}
+        options={[
+          { label: 'Tất cả', value: '' },
+          ...sizes.map((p) => ({
+            label: p.name,
+            value: p._id
+          }))
+        ]}
+      />
+
+      <FilterSelect
+        label='Giá riêng'
+        value={overridePrice}
+        onChange={setOverridePrice}
+        options={[
+          { label: 'Tất cả', value: '' },
+          { label: 'Có', value: 'true' },
+          { label: 'Không', value: 'false' }
+        ]}
+      />
+
+      <FilterSelect
+        label='Trạng thái'
+        value={destroy}
+        onChange={setDestroy}
+        options={[
+          { label: 'Tất cả', value: '' },
+          { label: 'Đang hoạt động', value: 'false' },
+          { label: 'Đã xóa mềm', value: 'true' }
+        ]}
+      />
+
+      <FilterByPrice
+        label='Giá vốn'
+        priceMin={importPriceMin}
+        priceMax={importPriceMax}
+        setPriceMin={setImportPriceMin}
+        setPriceMax={setImportPriceMax}
+        onApply={() => applyFilters()}
+      />
+
+      <FilterByPrice
+        label='Giá bán'
+        priceMin={exportPriceMin}
+        priceMax={exportPriceMax}
+        setPriceMin={setExportPriceMin}
+        setPriceMax={setExportPriceMax}
+        onApply={() => applyFilters()}
+      />
+
+      <FilterSelect value={sort} onChange={setSort} />
+
+      <FilterByTime
+        label='Ngày tạo'
+        selectedFilter={selectedFilter}
+        setSelectedFilter={setSelectedFilter}
+        startDate={startDate}
+        setStartDate={setStartDate}
+        endDate={endDate}
+        setEndDate={setEndDate}
+        onApply={handleApplyTimeFilter}
+      />
+
+      <Box sx={{ display: 'flex', gap: 2 }}>
+        <SearchWithSuggestions
+          label='Tìm biến thể'
+          options={variants.map((v) => v.name)}
+          loading={loading}
+          keyword={keyword}
+          inputValue={inputValue}
+          setKeyword={setKeyword}
+          setInputValue={setInputValue}
+          onSearch={handleSearch}
+        />
+        <Button
+          variant='outlined'
+          size='small'
+          color='error'
+          onClick={handleReset}
+        >
+          Làm mới
+        </Button>
+      </Box>
+    </Box>
+  )
+}

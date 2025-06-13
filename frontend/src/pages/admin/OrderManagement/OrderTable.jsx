@@ -93,10 +93,13 @@ import {
   TablePagination,
   Typography,
   Paper,
-  Box
+  Box,
+  Button
 } from '@mui/material'
 
 import OrderRow from './OrderRow'
+import AddIcon from '@mui/icons-material/Add'
+import FilterOrder from '~/components/FilterAdmin/FilterOrder.jsx'
 
 const OrderTable = ({
   orders = [],
@@ -105,20 +108,32 @@ const OrderTable = ({
   rowsPerPage = 10,
   onView,
   onEdit,
-  onDelete
+  onDelete,
+  fetchOrders,
+  total,
+  onPageChange,
+  onChangeRowsPerPage,
+  onFilter,
+  coupons,
+  users
 }) => {
   const columns = [
     { id: 'index', label: 'STT', minWidth: 50, align: 'center' },
     { id: '_id', label: 'Mã đơn hàng', minWidth: 150 },
     { id: 'customerName', label: 'Tên khách hàng', minWidth: 200 },
     { id: 'status', label: 'Trạng thái đơn hàng', minWidth: 170 },
-    { id: 'paymentStatus', label: 'Trạng thái thanh toán', minWidth: 170 },
+    {
+      id: 'paymentStatus',
+      label: 'Trạng thái thanh toán',
+      minWidth: 170,
+      paddingLeft: 6
+    },
     {
       id: 'createdAt',
       label: 'Ngày đặt hàng',
       minWidth: 180
     },
-    { id: 'action', label: 'Hành động', minWidth: 130, align: 'center' }
+    { id: 'action', label: 'Hành động', minWidth: 130, align: 'start' }
   ]
 
   return (
@@ -132,12 +147,28 @@ const OrderTable = ({
                   sx={{
                     display: 'flex',
                     justifyContent: 'space-between',
-                    alignItems: 'center'
+                    alignItems: 'start'
                   }}
                 >
-                  <Typography variant='h6' sx={{ fontWeight: '800' }}>
-                    Danh sách đơn hàng
-                  </Typography>
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: 1,
+                      minWidth: 250
+                    }}
+                  >
+                    <Typography variant='h6' sx={{ fontWeight: '800' }}>
+                      Danh Sách Đơn Hàng
+                    </Typography>
+                  </Box>
+                  <FilterOrder
+                    onFilter={onFilter}
+                    fetchOrders={fetchOrders}
+                    loading={loading}
+                    coupons={coupons}
+                    users={users}
+                  />
                 </Box>
               </TableCell>
             </TableRow>
@@ -146,7 +177,10 @@ const OrderTable = ({
                 <TableCell
                   key={column.id}
                   align={column.align || 'left'}
-                  sx={{ minWidth: column.minWidth }}
+                  sx={{
+                    minWidth: column.minWidth,
+                    ...(column.id === 'action' && { paddingLeft: '20px' })
+                  }}
                 >
                   {column.label}
                 </TableCell>
@@ -165,7 +199,7 @@ const OrderTable = ({
                 <OrderRow
                   key={order._id}
                   order={order}
-                  index={index + 1}
+                  index={page * rowsPerPage + index + 1}
                   columns={columns}
                   onView={onView}
                   onEdit={onEdit}
@@ -184,11 +218,18 @@ const OrderTable = ({
       </TableContainer>
 
       <TablePagination
-        rowsPerPageOptions={[10, 25, 50]}
+        rowsPerPageOptions={[10, 25, 100]}
         component='div'
-        count={orders.length || 1}
+        count={total || 0}
         rowsPerPage={rowsPerPage}
         page={page}
+        onPageChange={(event, newPage) => onPageChange(event, newPage + 1)} // +1 để đúng logic bên cha
+        onRowsPerPageChange={(event) => {
+          const newLimit = parseInt(event.target.value, 10)
+          if (onChangeRowsPerPage) {
+            onChangeRowsPerPage(newLimit)
+          }
+        }}
         labelRowsPerPage='Số dòng mỗi trang'
         labelDisplayedRows={({ from, to, count }) =>
           `${from}–${to} trên ${count !== -1 ? count : `hơn ${to}`}`

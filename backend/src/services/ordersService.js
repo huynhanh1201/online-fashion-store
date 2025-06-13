@@ -19,6 +19,8 @@ import { InventoryModel } from '~/models/InventoryModel'
 import apiError from '~/utils/ApiError'
 import { deliveriesService } from '~/services/deliveriesService'
 import generateSequentialCode from '~/utils/generateSequentialCode'
+import validatePagination from '~/utils/validatePagination'
+import getDateRange from '~/utils/getDateRange'
 
 const createOrder = async (userId, reqBody, ipAddr) => {
   // eslint-disable-next-line no-useless-catch
@@ -184,8 +186,6 @@ const createOrder = async (userId, reqBody, ipAddr) => {
       }
     )
 
-    console.log('code: ', code)
-
     const newOrder = {
       userId,
       shippingAddressId,
@@ -300,7 +300,7 @@ const createOrder = async (userId, reqBody, ipAddr) => {
       const createDate = dayjs().format('YYYYMMDDHHmmss')
       const expireDate = dayjs().add(15, 'minute').format('YYYYMMDDHHmmss')
       const orderId = order._id.toString()
-      const amount = total // tổng tiền chưa nhân 100
+      const amount = order.total // tổng tiền chưa nhân 100
       const bankCode = reqBody.bankCode || ''
       const orderInfo = `Thanh toan don hang ${cartItems.length} san pham, tong: ${amount} VND, coupon: ${couponCode || 'Khong'}, ghi chu: ${note || 'Khong co'}`
       const orderType = 'other'
@@ -389,10 +389,76 @@ const createOrder = async (userId, reqBody, ipAddr) => {
   }
 }
 
-const getOrderList = async () => {
+const getOrderList = async (queryString) => {
   // eslint-disable-next-line no-useless-catch
   try {
-    const result = await OrderModel.find({}).populate('userId couponId').lean()
+    let {
+      page = 1,
+      limit = 10,
+      userId,
+      sort,
+      filterTypeDate,
+      startDate,
+      endDate,
+      status,
+      paymentMethod,
+      paymentStatus
+    } = queryString
+
+    // Kiểm tra dữ liệu đầu vào của limit và page
+    validatePagination(page, limit)
+
+    // Xử lý thông tin Filter
+    const filter = {}
+
+    if (userId) filter.userId = userId
+
+    if (status) filter.status = status
+
+    if (paymentMethod) filter.paymentMethod = paymentMethod
+
+    if (paymentStatus) filter.paymentStatus = paymentStatus
+
+    const dateRange = getDateRange(filterTypeDate, startDate, endDate)
+
+    if (dateRange.startDate && dateRange.endDate) {
+      filter['createdAt'] = {
+        $gte: new Date(dateRange.startDate),
+        $lte: new Date(dateRange.endDate)
+      }
+    }
+
+    const sortMap = {
+      newest: { createdAt: -1 },
+      oldest: { createdAt: 1 }
+    }
+
+    let sortField = {}
+
+    if (sort) {
+      sortField = sortMap[sort]
+    }
+
+    const [orders, total] = await Promise.all([
+      OrderModel.find(filter)
+        .sort(sortField)
+        .skip((page - 1) * limit)
+        .limit(limit)
+        .populate('userId couponId')
+        .lean(),
+
+      OrderModel.countDocuments(filter)
+    ])
+
+    const result = {
+      data: orders,
+      meta: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit)
+      }
+    }
 
     return result
   } catch (err) {

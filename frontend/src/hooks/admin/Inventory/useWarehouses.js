@@ -8,15 +8,38 @@ import {
 
 const useWarehouses = () => {
   const [warehouses, setWarehouses] = useState([])
-  const [totalPages, setTotalPages] = useState(1)
-  const [loading, setLoading] = useState(false)
+  const [totalWarehouse, setTotalPages] = useState(1)
+  const [loadingWarehouse, setLoading] = useState(false)
 
-  const fetchWarehouses = async (page = 1, limit = 10, filters = {}) => {
+  const fetchWarehouses = async (page = 1, limit = 10, filters) => {
     setLoading(true)
-    const { warehouses, total } = await getWarehouses(page, limit, filters)
-    setWarehouses(warehouses)
-    setTotalPages(total || 1)
-    setLoading(false)
+    const buildQuery = (input) => {
+      const query = { page, limit, ...input }
+      Object.keys(query).forEach((key) => {
+        if (
+          query[key] === '' ||
+          query[key] === undefined ||
+          query[key] === null
+        ) {
+          delete query[key]
+        }
+      })
+      return query
+    }
+
+    try {
+      const query = buildQuery(filters)
+      const response = await getWarehouses(query)
+      setWarehouses(response.warehouses || [])
+      setTotalPages(response.total || 1)
+      setLoading(false)
+    } catch (error) {
+      console.error('Error fetching warehouses:', error)
+      setWarehouses([])
+      setTotalPages(0)
+      setLoading(false)
+      return { warehouses: [], total: 0 }
+    }
   }
 
   const createNewWarehouse = async (data) => {
@@ -39,8 +62,8 @@ const useWarehouses = () => {
 
   return {
     warehouses,
-    totalPages,
-    loading,
+    totalWarehouse,
+    loadingWarehouse,
     fetchWarehouses,
     createNewWarehouse,
     updateWarehouseById,
