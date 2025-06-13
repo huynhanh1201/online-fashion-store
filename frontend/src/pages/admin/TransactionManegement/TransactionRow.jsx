@@ -103,7 +103,7 @@
 // }
 //
 // export default TransactionRow
-import React, { useEffect, useState } from 'react'
+import React from 'react'
 import {
   IconButton,
   Tooltip,
@@ -156,8 +156,8 @@ const TransactionRow = ({ transaction, onView, onEdit, onDelete, index }) => {
         />
       </TableCell>
       <TableCell>
-        {transaction?.total !== null
-          ? `${transaction?.total.toLocaleString('vi-VN')} VNĐ`
+        {transaction?.orderId?.total !== null
+          ? `${transaction?.orderId?.total.toLocaleString('vi-VN')} VNĐ`
           : 'Đang tải...'}
       </TableCell>
       <TableCell>
