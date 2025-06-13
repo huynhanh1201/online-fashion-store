@@ -17,7 +17,7 @@ const getPaymentTransactionList = async (orderId) => {
     const result = await PaymentTransactionModel.find(filter)
       .populate({
         path: 'orderId',
-        select: 'code'
+        select: 'code total'
       })
       .lean()
 
