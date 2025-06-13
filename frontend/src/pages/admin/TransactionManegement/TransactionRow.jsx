@@ -14,7 +14,7 @@
 //
 // import StyleAdmin from '~/assets/StyleAdmin.jsx'
 //
-// const TransactionRow = ({ transaction, onView, onEdit, onDelete, index }) => {
+// const TransactionRow = ({ transaction, onView, onEdit, onDelete, index.jsx }) => {
 //   const statusLabel = {
 //     Pending: 'Đang xử lý',
 //     Completed: 'Thành công',
@@ -38,7 +38,7 @@
 //
 //   return (
 //     <TableRow>
-//       <TableCell sx={StyleAdmin.TableColumnSTT}>{index + 1}</TableCell>
+//       <TableCell sx={StyleAdmin.TableColumnSTT}>{index.jsx + 1}</TableCell>
 //       <TableCell>{transaction?.orderId?.code}</TableCell>
 //       <TableCell>{transaction.transactionId || '(Thanh toán COD)'}</TableCell>
 //       <TableCell>{transaction.method}</TableCell>

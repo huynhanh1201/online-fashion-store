@@ -25,7 +25,7 @@
 //   }
 // }
 //
-// export default function ColorRow({ color, index, columns, handleOpenModal }) {
+// export default function ColorRow({ color, index.jsx, columns, handleOpenModal }) {
 //   return (
 //     <TableRow hover>
 //       {columns.map((column) => {
@@ -60,7 +60,7 @@
 //         }
 //
 //         let value = ''
-//         if (column.id === 'index') value = index
+//         if (column.id === 'index.jsx') value = index.jsx
 //         else if (['createdAt', 'updatedAt'].includes(column.id))
 //           value = formatDateTime(color[column.id])
 //         else value = color[column.id]

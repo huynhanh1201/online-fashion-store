@@ -98,10 +98,10 @@
 //               </TableCell>
 //             </TableRow>
 //           ) : (
-//             transactions.map((transaction, index) => (
+//             transactions.map((transaction, index.jsx) => (
 //               <TransactionRow
 //                 key={transaction._id}
-//                 index={page * rowsPerPage + index + 1} // +1 để hiển thị đúng STT
+//                 index.jsx={page * rowsPerPage + index.jsx + 1} // +1 để hiển thị đúng STT
 //                 transaction={transaction}
 //                 onView={onView}
 //                 onEdit={onEdit}

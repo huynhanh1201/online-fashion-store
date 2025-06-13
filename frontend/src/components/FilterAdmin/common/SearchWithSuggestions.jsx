@@ -11,7 +11,7 @@ import Autocomplete from '@mui/material/Autocomplete'
 
 export default function SearchWithSuggestions({
   label = 'Tìm kiếm',
-  placeholder = '',
+  placeholder = 'nhập từ khoá',
   options = [],
   loading = false,
   keyword,
@@ -25,9 +25,12 @@ export default function SearchWithSuggestions({
   return (
     <Autocomplete
       sx={{
+        minWidth: 220,
         '& .MuiOutlinedInput-root': {
-          paddingRight: '6px !important',
-          height: 40
+          height: 34,
+          borderRadius: '4px',
+          fontSize: '0.8rem',
+          paddingRight: '6px !important'
         }
       }}
       freeSolo
@@ -41,33 +44,14 @@ export default function SearchWithSuggestions({
       renderInput={(params) => (
         <TextField
           {...params}
-          label={label}
+          label={placeholder ? undefined : label}
           placeholder={placeholder}
           size='small'
-          sx={{ minWidth: 220 }}
+          sx={{ pl: 0 }}
           InputProps={{
             ...params.InputProps,
-            endAdornment: (
-              <InputAdornment position='end'>
-                {loading && (
-                  <CircularProgress
-                    size={16}
-                    sx={{ color: '#1976d2', mr: 1 }}
-                  />
-                )}
-
-                {hasValue && (
-                  <IconButton
-                    onClick={() => {
-                      setInputValue('')
-                      setKeyword('')
-                    }}
-                    size='small'
-                  >
-                    <ClearIcon fontSize='small' />
-                  </IconButton>
-                )}
-
+            startAdornment: (
+              <InputAdornment position='start' sx={{ mr: 0 }}>
                 <IconButton
                   onClick={onSearch}
                   size='small'
@@ -77,11 +61,34 @@ export default function SearchWithSuggestions({
                 </IconButton>
               </InputAdornment>
             ),
-            sx: {
-              '& .MuiAutocomplete-inputRoot': {
-                paddingRight: '6px !important'
-              }
-            }
+            endAdornment: (
+              <InputAdornment position='end' sx={{ gap: 0.5, ml: 0 }}>
+                {loading && (
+                  <CircularProgress size={16} sx={{ color: '#1976d2' }} />
+                )}
+                {hasValue && (
+                  <IconButton
+                    onClick={() => {
+                      setInputValue('')
+                      setKeyword('')
+                    }}
+                    size='small'
+                    sx={{
+                      width: 16,
+                      height: 16,
+                      backgroundColor: '#e0e0e0',
+                      '&:hover': {
+                        backgroundColor: '#d5d5d5'
+                      },
+                      padding: 0,
+                      marginRight: '6px'
+                    }}
+                  >
+                    <ClearIcon sx={{ fontSize: 14 }} />
+                  </IconButton>
+                )}
+              </InputAdornment>
+            )
           }}
         />
       )}

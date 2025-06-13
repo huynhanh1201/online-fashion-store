@@ -23,10 +23,10 @@ const updateProfile = async (req, res, next) => {
       .strict() // Không cho phép ký tự không hợp lệ
       .required(), // Bắt buộc phải có trường này
 
-    avatarUrl: Joi.string() // phải là chuỗi :contentReference[oaicite:0]{index=0}
-      .trim() // loại bỏ khoảng trắng đầu/cuối :contentReference[oaicite:1]{index=1}
+    avatarUrl: Joi.string() // phải là chuỗi :contentReference[oaicite:0]{index.jsx=0}
+      .trim() // loại bỏ khoảng trắng đầu/cuối :contentReference[oaicite:1]{index.jsx=1}
       .default('images/default-avatar.png') // giá trị mặc định nếu không có
-      .pattern(/\.(jpeg|jpg|png|gif)$/, 'image file extension') // chỉ cho phép đuôi ảnh phổ biến :contentReference[oaicite:2]{index=2}
+      .pattern(/\.(jpeg|jpg|png|gif)$/, 'image file extension') // chỉ cho phép đuôi ảnh phổ biến :contentReference[oaicite:2]{index.jsx=2}
   })
 
   try {

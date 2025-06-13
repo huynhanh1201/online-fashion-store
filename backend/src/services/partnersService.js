@@ -7,7 +7,7 @@ import { SizeModel } from '~/models/SizeModel'
 const createPartner = async (reqBody) => {
   // eslint-disable-next-line no-useless-catch
   try {
-    // Tạo Code Partner
+    // Tạo Code PartnerManagement
     const prefixPartnerId = 'NCC-'
 
     const partnerCode = await generateSequentialCode(

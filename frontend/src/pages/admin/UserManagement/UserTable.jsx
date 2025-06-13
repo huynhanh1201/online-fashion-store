@@ -60,7 +60,7 @@
 //               <UserRow
 //                 key={user._id}
 //                 user={user}
-//                 index={(page - 1) * 10 + idx + 1}
+//                 index.jsx={(page - 1) * 10 + idx + 1}
 //                 handleOpenModal={handleOpenModal}
 //               />
 //             ))

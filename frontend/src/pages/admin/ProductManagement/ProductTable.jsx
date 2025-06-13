@@ -32,7 +32,7 @@
 //   fetchProducts
 // }) => {
 //   const columns = [
-//     { id: 'index', label: 'STT', minWidth: 50, align: 'center' },
+//     { id: 'index.jsx', label: 'STT', minWidth: 50, align: 'center' },
 //     { id: 'image', label: 'Ảnh', minWidth: 70 },
 //     { id: 'productCode', label: 'Mã sản phẩm', minWidth: 150 },
 //     { id: 'name', label: 'Tên sản phẩm', minWidth: 350 },
@@ -128,7 +128,7 @@
 //                 <ProductRow
 //                   key={product._id || idx}
 //                   product={product}
-//                   index={page * rowsPerPage + idx + 1}
+//                   index.jsx={page * rowsPerPage + idx + 1}
 //                   columns={columns}
 //                   onAction={handleOpenModal}
 //                 />

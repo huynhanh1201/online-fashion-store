@@ -270,8 +270,8 @@
 //           <TableBody>
 //             {filteredInventories
 //               .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-//               .map((row, index) => (
-//                 <TableRow hover role='checkbox' tabIndex={-1} key={index}>
+//               .map((row, index.jsx) => (
+//                 <TableRow hover role='checkbox' tabIndex={-1} key={index.jsx}>
 //                   {inventoryColumns.map((column) => {
 //                     let value = row[column.id]
 //                     if (column.id === 'status') {
@@ -401,39 +401,39 @@ import ViewInventoryModal from '../modal/Inventory/ViewInventoryModal.jsx'
 import EditInventoryModal from '../modal/Inventory/EditInventoryModal.jsx'
 import DeleteInventoryModal from '../modal/Inventory/DeleteInventoryModal.jsx'
 import FilterInventory from '~/components/FilterAdmin/FilterInventory.jsx'
-const InventoryTab = ({
-  data,
-  products,
-  variants,
-  warehouses,
-  updateInventory,
-  deleteInventory,
-  refreshInventories,
-  getInventoryId,
-  refreshVariants,
-  fetchWarehouses,
-  formatCurrency,
-  parseCurrency,
-  total,
-  onPageChange,
-  rowsPerPage,
-  page,
-  onChangeRowsPerPage,
-  loading
-}) => {
-  const [filterWarehouse, setFilterWarehouse] = useState({})
+import useVariants from '~/hooks/admin/Inventory/useVariants.js'
+import useInventory from '~/hooks/admin/Inventory/useInventorys.js'
+import useWarehouses from '~/hooks/admin/Inventory/useWarehouses.js'
+const InventoryTab = () => {
+  const { variants, fetchVariants } = useVariants()
+  const {
+    inventories,
+    fetchInventories,
+    loadingInventories,
+    totalPageInventory,
+    getInventoryId,
+    deleteInventoryById,
+    updateInventoryById
+  } = useInventory()
+  const { warehouses, fetchWarehouses } = useWarehouses()
+  const [page, setPage] = useState(1)
+  const [rowsPerPage, setRowsPerPage] = useState(10)
+  const [filter, setFilter] = useState({})
   const [openViewModal, setOpenViewModal] = useState(false)
   const [openEditModal, setOpenEditModal] = useState(false)
   const [openDeleteModal, setOpenDeleteModal] = useState(false)
   const [selectedInventory, setSelectedInventory] = useState(null)
 
   useEffect(() => {
-    refreshInventories(page, rowsPerPage, filterWarehouse)
-    refreshVariants()
     fetchWarehouses()
+    fetchVariants()
+  }, [])
+
+  useEffect(() => {
+    fetchInventories(page, rowsPerPage, filter)
   }, [page, rowsPerPage])
 
-  const enrichedInventories = data.map((item) => {
+  const enrichedInventories = inventories.map((item) => {
     return {
       ...item,
       variantId: item.variantId._id || 'N/A', // ← Ghi đè variantId thành chuỗi _id
@@ -462,27 +462,27 @@ const InventoryTab = ({
       id: 'importPrice',
       label: 'Giá nhập',
       minWidth: 100,
-      align: 'right',
+      align: 'start',
       format: (value) => `${value.toLocaleString('vi-VN')}đ` // dùng 'vi-VN' cho đúng format Việt Nam
     },
     {
       id: 'exportPrice',
       label: 'Giá bán',
       minWidth: 100,
-      align: 'right',
+      align: 'start',
       format: (value) => `${value.toLocaleString('vi-VN')}đ`
     },
     {
       id: 'status',
       label: 'Trạng thái',
       minWidth: 100,
-      align: 'center'
+      align: 'start'
     },
     {
       id: 'createdAt',
       label: 'Ngày tạo',
       minWidth: 150,
-      align: 'center',
+      align: 'start',
       format: (value) =>
         new Date(value).toLocaleString('vi-VN', {
           day: '2-digit',
@@ -494,7 +494,7 @@ const InventoryTab = ({
       id: 'updatedAt',
       label: 'Ngày cập nhật',
       minWidth: 150,
-      align: 'center',
+      align: 'start',
       format: (value) =>
         new Date(value).toLocaleString('vi-VN', {
           day: '2-digit',
@@ -506,7 +506,7 @@ const InventoryTab = ({
       id: 'action',
       label: 'Hành động',
       minWidth: 150,
-      align: 'center'
+      align: 'start'
     }
   ]
 
@@ -520,33 +520,46 @@ const InventoryTab = ({
     const inventoryDetails = await getInventoryId(inventory._id)
     setSelectedInventory(inventoryDetails)
     setOpenEditModal(true)
-    refreshInventories(page, rowsPerPage)
   }
 
   const handleDeleteInventory = async (inventory) => {
     const inventoryDetails = await getInventoryId(inventory._id)
     setSelectedInventory(inventoryDetails)
     setOpenDeleteModal(true)
-    refreshInventories(page, rowsPerPage)
   }
 
   const handleCloseEditModal = () => {
     setSelectedInventory(null)
     setOpenEditModal(false)
+    fetchInventories(page, rowsPerPage)
   }
 
   const handleCloseDeleteModal = () => {
     setSelectedInventory(null)
     setOpenDeleteModal(false)
+    fetchInventories(page, rowsPerPage)
   }
 
   const handleFilter = (newFilters) => {
-    setFilterWarehouse(newFilters)
+    setFilter(newFilters)
     if (Object.keys(newFilters).length > 0) {
-      refreshInventories(1, rowsPerPage, newFilters)
+      fetchInventories(1, rowsPerPage, newFilters)
     }
   }
+  const formatCurrency = (value) => {
+    if (!value) return ''
+    return Number(value).toLocaleString('vi-VN') // Thêm dấu chấm theo chuẩn VNĐ
+  }
 
+  const parseCurrency = (value) => {
+    return value.replaceAll('.', '').replace(/[^\d]/g, '') // Loại bỏ dấu . và ký tự khác ngoài số
+  }
+  const handleChangePage = (event, value) => setPage(value)
+
+  const onChangeRowsPerPage = (newLimit) => {
+    setPage(1)
+    setRowsPerPage(newLimit)
+  }
   return (
     <Paper sx={{ border: '1px solid #ccc', width: '100%', overflow: 'hidden' }}>
       <TableContainer>
@@ -577,10 +590,10 @@ const InventoryTab = ({
                     </Typography>
                   </Box>
                   <FilterInventory
-                    loading={loading}
+                    loading={loadingInventories}
                     onFilter={handleFilter}
-                    warehouses={data}
-                    fetchInventories={refreshInventories}
+                    warehouses={inventories}
+                    fetchInventories={fetchInventories}
                     variants={variants}
                   />
                 </Box>
@@ -591,7 +604,14 @@ const InventoryTab = ({
                 <TableCell
                   key={column.id}
                   align={column.align}
-                  style={{ minWidth: column.minWidth }}
+                  style={{
+                    minWidth: column.minWidth,
+                    ...(column.id === 'action' && {
+                      width: '130px',
+                      maxWidth: '130px',
+                      paddingLeft: '20px'
+                    })
+                  }}
                 >
                   {column.label}
                 </TableCell>
@@ -668,10 +688,10 @@ const InventoryTab = ({
       <TablePagination
         rowsPerPageOptions={[10, 25, 100]}
         component='div'
-        count={total || 0}
+        count={totalPageInventory || 0}
         rowsPerPage={rowsPerPage}
         page={page - 1}
-        onPageChange={(event, newPage) => onPageChange(event, newPage + 1)} // +1 để đúng logic bên cha
+        onPageChange={(event, newPage) => handleChangePage(event, newPage + 1)} // +1 để đúng logic bên cha
         onRowsPerPageChange={(event) => {
           const newLimit = parseInt(event.target.value, 10)
           if (onChangeRowsPerPage) {
@@ -689,7 +709,6 @@ const InventoryTab = ({
         onClose={() => {
           setSelectedInventory(null)
           setOpenViewModal(false)
-          refreshInventories()
         }}
         inventory={selectedInventory}
         variants={variants}
@@ -701,7 +720,7 @@ const InventoryTab = ({
         open={openEditModal}
         onClose={handleCloseEditModal}
         inventory={selectedInventory}
-        onSave={updateInventory}
+        onSave={updateInventoryById}
         variants={variants}
         warehouses={warehouses}
         formatCurrency={formatCurrency}
@@ -711,7 +730,7 @@ const InventoryTab = ({
         open={openDeleteModal}
         onClose={handleCloseDeleteModal}
         inventory={selectedInventory}
-        onSave={deleteInventory}
+        onSave={deleteInventoryById}
       />
     </Paper>
   )

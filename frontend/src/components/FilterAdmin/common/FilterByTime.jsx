@@ -4,6 +4,7 @@ import { TextField } from '@mui/material'
 import { toast } from 'react-toastify'
 import { filterDate } from '~/utils/constants.js'
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown'
+import dayjs from 'dayjs'
 const FilterByTime = ({
   onApply,
   selectedFilter,
@@ -41,21 +42,27 @@ const FilterByTime = ({
       <Button
         variant='outlined'
         onClick={handleOpenMenu}
-        endIcon={<ArrowDropDownIcon />} // mũi tên giống select
+        endIcon={<ArrowDropDownIcon />}
         sx={{
           textTransform: 'none',
           justifyContent: 'space-between',
           minWidth: 150,
-          height: 40,
+          height: 34, // Chiều cao tương đồng
+          fontSize: '0.8rem', // Cỡ chữ nhỏ
           color: '#00000099',
-          borderColor: 'rgba(0, 0, 0, 0.23)', // giống border Select mặc định
-          padding: '6.5px 14px', // giống TextField size="small"
+          borderRadius: '4px', // Bo tròn giống Select
+          borderColor: 'rgba(0, 0, 0, 0.23)',
+          padding: '4px 12px', // Gọn nhẹ hơn
           '&:hover': {
             borderColor: 'black'
           }
         }}
       >
-        {label || 'Lọc theo thời gian'}
+        {selectedFilter === 'custom' && startDate && endDate
+          ? `${dayjs(startDate).format('DD/MM')} - ${dayjs(endDate).format('DD/MM')}`
+          : filterDate.find((item) => item.value === selectedFilter)?.label ||
+            label ||
+            'Lọc theo thời gian'}
       </Button>
       <Menu
         anchorEl={anchorEl}

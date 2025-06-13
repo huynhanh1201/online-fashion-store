@@ -23,20 +23,17 @@ import EditWarehouseModal from '../modal/Warehouse/EditWarehouseModal.jsx'
 import ViewWarehouseModal from '../modal/Warehouse/ViewWarehouseModal.jsx'
 import DeleteWarehouseModal from '../modal/Warehouse/DeleteWarehouseModal.jsx' // Thêm modal mới
 import FilterWarehouse from '~/components/FilterAdmin/FilterWarehouse.jsx'
-
-const WarehousesTab = ({
-  data,
-  page,
-  rowsPerPage,
-  onPageChange,
-  loading,
-  onChangeRowsPerPage,
-  total,
-  addWarehouse,
-  updateWarehouse,
-  deleteWarehouse,
-  refreshWarehouses
-}) => {
+import useWarehouses from '~/hooks/admin/Inventory/useWarehouses.js'
+const WarehousesTab = () => {
+  const {
+    warehouses,
+    fetchWarehouses,
+    createNewWarehouse,
+    updateWarehouseById,
+    deleteWarehouseById,
+    loadingWarehouse,
+    totalWarehouse
+  } = useWarehouses()
   const warehouseColumns = [
     { id: 'code', label: 'Mã kho', minWidth: 100 },
     { id: 'name', label: 'Tên kho', minWidth: 120 },
@@ -44,7 +41,7 @@ const WarehousesTab = ({
     { id: 'ward', label: 'Phường', minWidth: 100 },
     { id: 'district', label: 'Quận', minWidth: 100 },
     { id: 'city', label: 'Thành phố', minWidth: 100 },
-    { id: 'action', label: 'Hành động', minWidth: 150, align: 'center' }
+    { id: 'action', label: 'Hành động', minWidth: 150, align: 'start' }
   ]
 
   const [openAddModal, setOpenAddModal] = useState(false)
@@ -52,11 +49,12 @@ const WarehousesTab = ({
   const [openViewModal, setOpenViewModal] = useState(false) // Thêm state cho View modal
   const [openDeleteModal, setOpenDeleteModal] = useState(false) // Thêm state cho Delete modal
   const [selectedWarehouse, setSelectedWarehouse] = useState(null)
-
+  const [page, setPage] = useState(1) // State cho trang hiện tại
+  const [rowsPerPage, setRowsPerPage] = useState(10) // State cho số dòng mỗi trang
   const [filter, setFilter] = useState({})
 
   useEffect(() => {
-    refreshWarehouses(page, rowsPerPage, filter)
+    fetchWarehouses(page, rowsPerPage, filter)
   }, [page, rowsPerPage])
 
   const handleAddWarehouse = () => {
@@ -75,31 +73,36 @@ const WarehousesTab = ({
   const handleEditWarehouse = (warehouse) => {
     setSelectedWarehouse(warehouse)
     setOpenEditModal(true)
-    // refreshWarehouses(page, rowsPerPage)
   }
 
   const handleCloseEditModal = () => {
     setOpenEditModal(false)
     setSelectedWarehouse(null)
+    fetchWarehouses(page, rowsPerPage)
   }
 
   const handleDeleteWarehouse = (warehouse) => {
     setSelectedWarehouse(warehouse)
     setOpenDeleteModal(true) // Mở Delete modal
-    // refreshWarehouses(page, rowsPerPage)
   }
 
   const handleCloseDeleteModal = () => {
     setOpenDeleteModal(false)
     setSelectedWarehouse(null)
+    fetchWarehouses(page, rowsPerPage)
   }
   const handleFilter = (newFilters) => {
     setFilter(newFilters)
     if (Object.keys(newFilters).length > 0) {
-      refreshWarehouses(1, rowsPerPage, newFilters)
+      fetchWarehouses(1, rowsPerPage, newFilters)
     }
   }
+  const handleChangePage = (event, value) => setPage(value)
 
+  const onChangeRowsPerPage = (newLimit) => {
+    setPage(1)
+    setRowsPerPage(newLimit)
+  }
   return (
     <Paper sx={{ border: '1px solid #ccc', width: '100%', overflow: 'hidden' }}>
       <TableContainer>
@@ -141,10 +144,10 @@ const WarehousesTab = ({
                     </Button>
                   </Box>
                   <FilterWarehouse
-                    loading={loading}
+                    loading={loadingWarehouse}
                     onFilter={handleFilter}
-                    warehouses={data}
-                    fetchWarehouses={refreshWarehouses}
+                    warehouses={warehouses}
+                    fetchWarehouses={fetchWarehouses}
                   />
                 </Box>
               </TableCell>
@@ -155,6 +158,13 @@ const WarehousesTab = ({
                   key={column.id}
                   align={column.align}
                   style={{ minWidth: column.minWidth }}
+                  sx={{
+                    ...(column.id === 'action' && {
+                      width: '130px',
+                      maxWidth: '130px',
+                      paddingLeft: '20px'
+                    })
+                  }}
                 >
                   {column.label}
                 </TableCell>
@@ -162,7 +172,7 @@ const WarehousesTab = ({
             </TableRow>
           </TableHead>
           <TableBody>
-            {data.map((row, index) => (
+            {warehouses.map((row, index) => (
               <TableRow hover role='checkbox' tabIndex={-1} key={index}>
                 {warehouseColumns.map((column) => {
                   const value = row[column.id]
@@ -208,10 +218,10 @@ const WarehousesTab = ({
       <TablePagination
         rowsPerPageOptions={[10, 25, 100]}
         component='div'
-        count={total || 0}
+        count={totalWarehouse || 0}
         rowsPerPage={rowsPerPage}
         page={page - 1}
-        onPageChange={(event, newPage) => onPageChange(event, newPage + 1)} // +1 để đúng logic bên cha
+        onPageChange={(event, newPage) => handleChangePage(event, newPage + 1)} // +1 để đúng logic bên cha
         onRowsPerPageChange={(event) => {
           const newLimit = parseInt(event.target.value, 10)
           if (onChangeRowsPerPage) {
@@ -227,7 +237,7 @@ const WarehousesTab = ({
       <AddWarehouseModal
         open={openAddModal}
         onClose={handleCloseAddModal}
-        onSave={addWarehouse}
+        onSave={createNewWarehouse}
       />
 
       <ViewWarehouseModal
@@ -240,14 +250,14 @@ const WarehousesTab = ({
         open={openEditModal}
         onClose={handleCloseEditModal}
         warehouse={selectedWarehouse}
-        onSave={updateWarehouse}
+        onSave={updateWarehouseById}
       />
 
       <DeleteWarehouseModal
         open={openDeleteModal}
         onClose={handleCloseDeleteModal}
         warehouse={selectedWarehouse}
-        onSave={deleteWarehouse}
+        onSave={deleteWarehouseById}
       />
     </Paper>
   )

@@ -32,7 +32,7 @@
 //   const filteredColors = colors.filter((c) => !c.destroy)
 //
 //   const columns = [
-//     { id: 'index', label: 'STT', minWidth: 50, align: 'center' },
+//     { id: 'index.jsx', label: 'STT', minWidth: 50, align: 'center' },
 //     { id: 'name', label: 'Tên màu', minWidth: 200 },
 //     { id: 'createdAt', label: 'Ngày tạo', minWidth: 250 },
 //     { id: 'updatedAt', label: 'Ngày cập nhật', minWidth: 250 },
@@ -95,7 +95,7 @@
 //                   align={column.align}
 //                   sx={{
 //                     minWidth: column.minWidth,
-//                     ...(column.id === 'index' && { width: '50px' }),
+//                     ...(column.id === 'index.jsx' && { width: '50px' }),
 //                     ...(column.id === 'name' && { width: '70%' })
 //                   }}
 //                 >
@@ -116,7 +116,7 @@
 //                 <ColorRow
 //                   key={color._id}
 //                   color={color}
-//                   index={page * rowsPerPage + idx + 1}
+//                   index.jsx={page * rowsPerPage + idx + 1}
 //                   columns={columns}
 //                   handleOpenModal={handleOpenModal}
 //                 />

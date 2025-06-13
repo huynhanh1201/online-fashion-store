@@ -10,7 +10,7 @@ const warehouseSlipSchema = new Schema(
 
     partnerId: {
       type: Types.ObjectId,
-      ref: 'Partner',
+      ref: 'PartnerManagement',
       required: true,
       index: true
     },

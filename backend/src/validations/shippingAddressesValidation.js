@@ -23,7 +23,7 @@ const shippingAddress = async (req, res, next) => {
 
     phone: Joi.string() // chỉ chứa chữ số, độ dài 9–11
       .pattern(/^[0-9]{9,11}$/)
-      .required(), // :contentReference[oaicite:1]{index=1}
+      .required(), // :contentReference[oaicite:1]{index.jsx=1}
 
     address: Joi.string() // chuỗi ký tự
       .min(5)

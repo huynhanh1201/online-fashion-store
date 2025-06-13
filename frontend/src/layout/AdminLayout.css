@@ -117,3 +117,23 @@ a {
     background: var(--bg-color);
     color: white;
 }
+
+
+::-webkit-scrollbar,
+::-webkit-scrollbar {
+    border-radius: 0;
+    width: 5px;
+    height: 3px;
+}
+
+::-webkit-scrollbar-thumb,
+::-webkit-scrollbar-thumb {
+    border-radius: 4px;
+    background-color: #16182333;
+}
+
+::-webkit-scrollbar-track,
+::-webkit-scrollbar-track {
+    border-radius: 0;
+    /*background-color: #eee;*/
+}

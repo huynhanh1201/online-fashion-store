@@ -21,7 +21,7 @@
 //     year: 'numeric'
 //   })
 // }
-// export default function DiscountRow({ discount, index, columns, onAction }) {
+// export default function DiscountRow({ discount, index.jsx, columns, onAction }) {
 //   const remaining = discount.usageLimit - discount.usedCount
 //
 //   return (
@@ -31,8 +31,8 @@
 //         let value
 //
 //         switch (id) {
-//           case 'index':
-//             value = index
+//           case 'index.jsx':
+//             value = index.jsx
 //             break
 //           case 'code':
 //             value = discount.code?.toUpperCase()

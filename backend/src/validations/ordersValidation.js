@@ -28,10 +28,10 @@ const order = async (req, res, next) => {
     couponId: Joi.string().hex().length(24).allow(null),
 
     couponCode: Joi.string()
-      .alphanum() // Chỉ cho phép chữ và số:contentReference[oaicite:0]{index=0}
-      .uppercase() // Ép về chữ in hoa (nếu muốn tự động convert):contentReference[oaicite:1]{index=1}
-      .min(5) // Độ dài tối thiểu 5 ký tự (ví dụ):contentReference[oaicite:2]{index=2}
-      .max(20), // Độ dài tối đa 20 ký tự (ví dụ):contentReference[oaicite:3]{index=3}
+      .alphanum() // Chỉ cho phép chữ và số:contentReference[oaicite:0]{index.jsx=0}
+      .uppercase() // Ép về chữ in hoa (nếu muốn tự động convert):contentReference[oaicite:1]{index.jsx=1}
+      .min(5) // Độ dài tối thiểu 5 ký tự (ví dụ):contentReference[oaicite:2]{index.jsx=2}
+      .max(20), // Độ dài tối đa 20 ký tự (ví dụ):contentReference[oaicite:3]{index.jsx=3}
     discountAmount: Joi.number().min(0).default(0),
 
     shippingAddressId: Joi.string().hex().length(24).required(),

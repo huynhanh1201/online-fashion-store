@@ -9,7 +9,7 @@ const sizePaletteSchema = new Schema(
       type: Schema.Types.ObjectId,
       ref: 'Product',
       required: true,
-      index: true // tạo index để truy vấn nhanh theo product
+      index: true // tạo index.jsx để truy vấn nhanh theo product
     },
     sizes: [
       {

@@ -173,6 +173,7 @@ export default function FilterOrder({
           { label: 'Đã giao hàng', value: 'Delivered' },
           { label: 'Đã hủy', value: 'Cancelled' }
         ]}
+        sx={{ width: 200 }}
       />
 
       <FilterSelect
@@ -184,6 +185,7 @@ export default function FilterOrder({
           { label: 'COD', value: 'COD' },
           { label: 'Trực tuyến', value: 'vnpay' }
         ]}
+        sx={{ width: 200 }}
       />
 
       <FilterSelect
@@ -196,6 +198,7 @@ export default function FilterOrder({
           { label: 'Đã thanh toán', value: 'Completed' },
           { label: 'Thất bại', value: 'Failed' }
         ]}
+        sx={{ width: 200 }}
       />
       <FilterSelect
         value={sort}

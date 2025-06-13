@@ -115,7 +115,7 @@ const OrderSchema = new Schema(
     }
   },
   {
-    timestamps: true // Tự động thêm và cập nhật createdAt & updatedAt :contentReference[oaicite:0]{index=0}:contentReference[oaicite:1]{index=1}
+    timestamps: true // Tự động thêm và cập nhật createdAt & updatedAt :contentReference[oaicite:0]{index.jsx=0}:contentReference[oaicite:1]{index.jsx=1}
   }
 )
 

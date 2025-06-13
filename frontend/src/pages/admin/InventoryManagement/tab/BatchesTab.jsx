@@ -20,45 +20,30 @@ import EditBatchModal from '../modal/Batch/EditBatchModal.jsx'
 import ViewBatchModal from '../modal/Batch/ViewBatchModal.jsx'
 import DeleteBatchModal from '../modal/Batch/DeleteBatchModal.jsx'
 import FilterBatches from '~/components/FilterAdmin/FilterBatches.jsx'
+import useBatches from '~/hooks/admin/Inventory/useBatches.js'
+import useVariants from '~/hooks/admin/Inventory/useVariants.js'
+import useWarehouses from '~/hooks/admin/Inventory/useWarehouses.js'
+const BatchesTab = () => {
+  const {
+    batches,
+    fetchBatches,
+    createNewBatch,
+    updateBatchById,
+    deleteBatchById,
+    loadingBatch,
+    totalPageBatch
+  } = useBatches()
+  const { variants, fetchVariants } = useVariants()
+  const { warehouses, fetchWarehouses } = useWarehouses()
 
-const BatchesTab = ({
-  data,
-  variants,
-  warehouse,
-  page,
-  rowsPerPage,
-  onPageChange,
-  onChangeRowsPerPage,
-  loading,
-  total,
-  updateBatch,
-  refreshBatches,
-  deleteBatch,
-  warehouses,
-  parseCurrency,
-  formatCurrency,
-  fetchVariants,
-  fetchWarehouses
-}) => {
+  const [page, setPage] = useState(1)
+  const [rowsPerPage, setRowsPerPage] = useState(10)
   const [filter, setFilter] = useState({})
-  const enrichedBatches = data.map((batch) => {
-    const variantName =
-      typeof batch.variantId === 'object'
-        ? batch.variantId.name
-        : Array.isArray(variants)
-          ? variants.find((v) => v.id === batch.variantId)?.name
-          : 'N/A'
-
-    const warehouseName =
-      typeof batch.warehouseId === 'object'
-        ? batch.warehouseId.name
-        : Array.isArray(warehouses)
-          ? warehouses.find((w) => w.id === batch.warehouseId)?.name
-          : 'N/A'
+  const enrichedBatches = batches.map((batch) => {
     return {
       ...batch,
-      variantName: variantName || 'N/A',
-      warehouseName: warehouseName || 'N/A',
+      variantName: batch.variantId.name || 'N/A',
+      warehouseName: batch.warehouseId.name || 'N/A',
       manufactureDate: batch.manufactureDate ?? null,
       expiry: batch.expiry ?? null
     }
@@ -108,7 +93,7 @@ const BatchesTab = ({
           year: 'numeric'
         })
     },
-    { id: 'action', label: 'Hành động', minWidth: 150, align: 'center' }
+    { id: 'action', label: 'Hành động', minWidth: 150, align: 'start' }
   ]
   useEffect(() => {
     fetchVariants()
@@ -116,7 +101,7 @@ const BatchesTab = ({
   }, [])
 
   useEffect(() => {
-    refreshBatches(page, rowsPerPage, filter)
+    fetchBatches(page, rowsPerPage, filter)
   }, [page, rowsPerPage])
 
   const [openEditModal, setOpenEditModal] = useState(false)
@@ -139,7 +124,7 @@ const BatchesTab = ({
   // Đóng modal sửa, refresh danh sách
   const handleCloseEditModal = () => {
     setOpenEditModal(false)
-    refreshBatches()
+    fetchBatches(page, rowsPerPage)
   }
 
   // Mở modal xoá
@@ -151,14 +136,28 @@ const BatchesTab = ({
   // Đóng modal xoá, refresh danh sách
   const handleCloseDeleteModal = () => {
     setOpenDeleteModal(false)
-    refreshBatches()
+    fetchBatches(page, rowsPerPage)
   }
 
   const handleFilter = (newFilters) => {
     setFilter(newFilters)
     if (Object.keys(newFilters).length > 0) {
-      refreshBatches(1, rowsPerPage, newFilters)
+      fetchBatches(1, rowsPerPage, newFilters)
     }
+  }
+  const formatCurrency = (value) => {
+    if (!value) return ''
+    return Number(value).toLocaleString('vi-VN') // Thêm dấu chấm theo chuẩn VNĐ
+  }
+
+  const parseCurrency = (value) => {
+    return value.replaceAll('.', '').replace(/[^\d]/g, '') // Loại bỏ dấu . và ký tự khác ngoài số
+  }
+  const handleChangePage = (event, value) => setPage(value)
+
+  const onChangeRowsPerPage = (newLimit) => {
+    setPage(1)
+    setRowsPerPage(newLimit)
   }
   return (
     <Paper sx={{ border: '1px solid #ccc', width: '100%', overflow: 'hidden' }}>
@@ -188,11 +187,11 @@ const BatchesTab = ({
                   </Box>
                   <FilterBatches
                     variants={variants}
-                    warehouses={warehouse}
+                    warehouses={warehouses}
                     onFilter={handleFilter}
-                    loading={loading}
-                    batches={data}
-                    fetchData={refreshBatches}
+                    loading={loadingBatch}
+                    batches={batches}
+                    fetchData={fetchBatches}
                   />
                 </Box>
               </TableCell>
@@ -203,6 +202,13 @@ const BatchesTab = ({
                   key={column.id}
                   align={column.align}
                   style={{ minWidth: column.minWidth }}
+                  sx={{
+                    ...(column.id === 'action' && {
+                      width: '130px',
+                      maxWidth: '130px',
+                      paddingLeft: '20px'
+                    })
+                  }}
                 >
                   {column.label}
                 </TableCell>
@@ -257,10 +263,10 @@ const BatchesTab = ({
       <TablePagination
         rowsPerPageOptions={[10, 25, 100]}
         component='div'
-        count={total || 0}
+        count={totalPageBatch || 0}
         rowsPerPage={rowsPerPage}
         page={page - 1}
-        onPageChange={(event, newPage) => onPageChange(event, newPage + 1)} // +1 để đúng logic bên cha
+        onPageChange={(event, newPage) => handleChangePage(event, newPage + 1)} // +1 để đúng logic bên cha
         onRowsPerPageChange={(event) => {
           const newLimit = parseInt(event.target.value, 10)
           if (onChangeRowsPerPage) {
@@ -276,7 +282,7 @@ const BatchesTab = ({
         open={openEditModal}
         onClose={handleCloseEditModal}
         batch={selectedBatch}
-        onSave={updateBatch}
+        onSave={updateBatchById}
         variants={variants}
         parseCurrency={parseCurrency}
         formatCurrency={formatCurrency}
@@ -290,7 +296,7 @@ const BatchesTab = ({
         open={openDeleteModal}
         onClose={handleCloseDeleteModal}
         batch={selectedBatch}
-        onSave={deleteBatch}
+        onSave={deleteBatchById}
       />
     </Paper>
   )

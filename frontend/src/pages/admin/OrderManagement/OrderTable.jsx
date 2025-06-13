@@ -34,7 +34,7 @@
 //   users
 // }) => {
 //   const columns = [
-//     { id: 'index', label: 'STT', minWidth: 50, align: 'center' },
+//     { id: 'index.jsx', label: 'STT', minWidth: 50, align: 'center' },
 //     { id: '_id', label: 'Mã đơn hàng', minWidth: 150 },
 //     { id: 'customerName', label: 'Tên khách hàng', minWidth: 200 },
 //     { id: 'status', label: 'Trạng thái đơn hàng', minWidth: 170 },
@@ -111,11 +111,11 @@
 //                 </TableCell>
 //               </TableRow>
 //             ) : orders.length > 0 ? (
-//               orders.map((order, index) => (
+//               orders.map((order, index.jsx) => (
 //                 <OrderRow
 //                   key={order._id}
 //                   order={order}
-//                   index={page * rowsPerPage + index + 1}
+//                   index.jsx={page * rowsPerPage + index.jsx + 1}
 //                   columns={columns}
 //                   onView={onView}
 //                   onEdit={onEdit}

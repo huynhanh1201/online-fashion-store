@@ -30,7 +30,7 @@
 //   onChangeRowsPerPage
 // }) => {
 //   const columns = [
-//     { id: 'index', label: 'STT', minWidth: 50, align: 'center' },
+//     { id: 'index.jsx', label: 'STT', minWidth: 50, align: 'center' },
 //     { id: 'code', label: 'Mã giảm', minWidth: 150 },
 //     { id: 'type', label: 'Loại', minWidth: 100 },
 //     { id: 'amount', label: 'Giá trị giảm', minWidth: 120 },
@@ -116,7 +116,7 @@
 //                 <DiscountRow
 //                   key={discount._id}
 //                   discount={discount}
-//                   index={page * rowsPerPage + idx + 1}
+//                   index.jsx={page * rowsPerPage + idx + 1}
 //                   columns={columns}
 //                   onAction={onAction}
 //                 />
