@@ -270,7 +270,8 @@ const createOrder = async (userId, reqBody, ipAddr) => {
       transactionId: null,
       status: 'Pending',
       paidAt: null,
-      note: note || null
+      note: note || null,
+      orderCode: order.code
     }
 
     await PaymentTransactionModel.create([paymentTransactionInfo], { session })

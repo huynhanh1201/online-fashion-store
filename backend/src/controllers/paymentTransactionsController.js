@@ -4,11 +4,11 @@ import { paymentTransactionsService } from '~/services/paymentTransactionsServic
 
 const getPaymentTransactionList = async (req, res, next) => {
   try {
-    const { orderId } = req.query
+    const queryString = req.query
 
     // Lấy danh sách Danh mục sản phẩm từ tầng Service chuyển qua
     const result =
-      await paymentTransactionsService.getPaymentTransactionList(orderId)
+      await paymentTransactionsService.getPaymentTransactionList(queryString)
 
     // Có kết quả thì trả về Client
     res.status(StatusCodes.OK).json(result)
