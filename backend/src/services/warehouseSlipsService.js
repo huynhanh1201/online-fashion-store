@@ -57,7 +57,7 @@ const getWarehouseSlipList = async (queryString) => {
   validatePagination(page, limit)
 
   // Xử lý thông tin Filter
-  const filter = {}
+  const filter = { destroy: false }
 
   if (type) {
     filter.type = type

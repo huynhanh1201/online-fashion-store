@@ -13,7 +13,8 @@ const createCategory = async (reqBody) => {
       name: reqBody.name,
       description: reqBody.description,
       slug: slugify(reqBody.name),
-      destroy: false
+      destroy: false,
+      image: reqBody.image || null
     }
 
     const category = await CategoryModel.create(newCategory)
@@ -40,7 +41,7 @@ const getCategoryList = async (queryString) => {
   validatePagination(page, limit)
 
   // Xử lý thông tin Filter
-  const filter = {}
+  const filter = { destroy: false }
 
   if (status === 'true' || status === 'false') {
     status = JSON.parse(status)

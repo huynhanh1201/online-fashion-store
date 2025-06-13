@@ -22,7 +22,7 @@ const getPaymentTransactionList = async (queryString) => {
     validatePagination(page, limit)
 
     // Xử lý thông tin Filter
-    const filter = {}
+    const filter = { destroy: false }
 
     if (statusPayment) filter.status = statusPayment
 
@@ -60,7 +60,6 @@ const getPaymentTransactionList = async (queryString) => {
 
     const [paymentTransactions, total] = await Promise.all([
       PaymentTransactionModel.find(filter)
-        .collation({ locale: 'vi', strength: 1 })
         .sort(sortField)
         .skip((page - 1) * limit)
         .limit(limit)

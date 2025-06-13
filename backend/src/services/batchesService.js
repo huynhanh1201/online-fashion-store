@@ -20,7 +20,7 @@ const getBatchList = async (queryString) => {
   validatePagination(page, limit)
 
   // Xử lý thông tin Filter
-  const filter = {}
+  const filter = { destroy: false }
 
   if (variantId) filter.variantId = variantId
 

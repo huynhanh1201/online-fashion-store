@@ -37,7 +37,7 @@ const getInventoryLogList = async (queryString) => {
 
   validatePagination(page, limit)
 
-  const filter = {}
+  const filter = { destroy: false }
 
   // Kiểm tra data query string
 

@@ -83,7 +83,7 @@ const getVariantList = async (queryString) => {
   validatePagination(page, limit)
 
   // Xử lý thông tin Filter
-  const filter = {}
+  const filter = { destroy: false }
 
   if (productId) filter.productId = productId
 
