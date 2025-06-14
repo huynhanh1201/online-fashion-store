@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { getProducts, getProductById } from '~/services/productService'
 
-const useProducts = (initialPage = 1, limit = 1000) => {
+const useProducts = (initialPage = 1, limit = 10) => {
   const [products, setProducts] = useState([])
   const [totalPages, setTotalPages] = useState(1)
   const [loading, setLoading] = useState(false)

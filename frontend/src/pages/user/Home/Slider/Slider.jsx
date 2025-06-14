@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { Box, IconButton } from '@mui/material'
+import { Box, IconButton, useTheme, useMediaQuery } from '@mui/material'
 import { ArrowForward, ArrowBack } from '@mui/icons-material'
 
 const images = [
@@ -11,6 +11,9 @@ const images = [
 
 const Slider = () => {
   const [currentIndex, setCurrentIndex] = useState(0)
+  const theme = useTheme()
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
+  const isTablet = useMediaQuery(theme.breakpoints.down('md'))
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -36,7 +39,13 @@ const Slider = () => {
       sx={{
         position: 'relative',
         width: '100%',
-        height: { xs: 200, sm: 400, md: 622 }, // chiều cao responsive
+        height: {
+          xs: '200px',    // Mobile
+          sm: '300px',    // Tablet
+          md: '400px',    // Small desktop
+          lg: '500px',    // Large desktop
+          xl: '622px'     // Extra large desktop
+        },
         overflow: 'hidden'
       }}
     >
@@ -69,13 +78,15 @@ const Slider = () => {
         sx={{
           position: 'absolute',
           top: '50%',
-          left: '10px',
+          left: { xs: '5px', sm: '10px' },
           transform: 'translateY(-50%)',
           backgroundColor: 'rgba(255, 255, 255, 0.6)',
-          '&:hover': { backgroundColor: 'rgba(255, 255, 255, 0.8)' }
+          '&:hover': { backgroundColor: 'rgba(255, 255, 255, 0.8)' },
+          display: { xs: 'none', sm: 'flex' },
+          padding: { xs: '4px', sm: '8px' }
         }}
       >
-        <ArrowBack />
+        <ArrowBack sx={{ fontSize: { xs: '20px', sm: '24px' } }} />
       </IconButton>
 
       <IconButton
@@ -83,13 +94,15 @@ const Slider = () => {
         sx={{
           position: 'absolute',
           top: '50%',
-          right: '10px',
+          right: { xs: '5px', sm: '10px' },
           transform: 'translateY(-50%)',
           backgroundColor: 'rgba(255, 255, 255, 0.6)',
-          '&:hover': { backgroundColor: 'rgba(255, 255, 255, 0.8)' }
+          '&:hover': { backgroundColor: 'rgba(255, 255, 255, 0.8)' },
+          display: { xs: 'none', sm: 'flex' },
+          padding: { xs: '4px', sm: '8px' }
         }}
       >
-        <ArrowForward />
+        <ArrowForward sx={{ fontSize: { xs: '20px', sm: '24px' } }} />
       </IconButton>
     </Box>
   )

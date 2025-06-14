@@ -22,6 +22,12 @@ const ProductCard = ({ product, isFlashSale = false }) => {
   const quantity = Number(product.quantity) || 0
   const inStock = quantity > 0
 
+  // Hàm xử lý tên sản phẩm
+  const truncateProductName = (name) => {
+    if (!name) return ''
+    return name.length > 17 ? name.substring(0, 20) + '...' : name
+  }
+
   return (
     <Link
       to={`/productdetail/${product._id}`}
@@ -77,7 +83,9 @@ const ProductCard = ({ product, isFlashSale = false }) => {
         </div>
 
         <div style={styles.productInfo}>
-          <h3 style={styles.productName}>{product.name}</h3>
+          <h3 style={styles.productName} title={product.name}>
+            {truncateProductName(product.name)}
+          </h3>
           <div style={styles.priceRow}>
             <span style={styles.currentPrice}>
               {(product.exportPrice ?? 0).toLocaleString()}₫
@@ -110,16 +118,17 @@ const styles = {
     transition: 'transform 0.2s ease-in-out'
   },
   productCard: {
-    background: '#fff',
-    borderRadius: '12px',
-    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
+    background: 'white',
+    borderRadius: '6px',
     overflow: 'hidden',
     transition: 'all 0.3s ease',
-    border: '1px solid #f0f0f0',
+    border: '2px solid #f0f0f0',
     height: '100%',
     display: 'flex',
     flexDirection: 'column',
-    position: 'relative'
+    position: 'relative',
+    padding: '5px 5px',
+    boxShadow: '0px 0px 4px 2px #dbdbdb80'
   },
   flashSaleCard: {
     border: '1px solid #ff6b6b',
@@ -128,7 +137,7 @@ const styles = {
   productImage: {
     position: 'relative',
     width: '100%',
-    height: '300px',
+    height: '400px',
     overflow: 'hidden',
     border: '8px solid white'
   },
@@ -173,11 +182,13 @@ const styles = {
     fontWeight: '500',
     color: '#333',
     lineHeight: '1.4',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
     display: '-webkit-box',
     WebkitLineClamp: 2,
     WebkitBoxOrient: 'vertical',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis'
+    margin: 0,
+    padding: 0
   },
   priceRow: {
     display: 'flex',
@@ -200,7 +211,6 @@ const styles = {
     justifyContent: 'space-between',
     alignItems: 'center',
     marginTop: 'auto',
-    paddingTop: '8px'
   },
   rating: {
     display: 'flex',

@@ -107,7 +107,7 @@ const Menu = () => {
         {categories.map((cat) => (
           <CategoryButton
             key={cat._id}
-            href={`/product?category=${cat._id}`}
+            href={`/productbycategory/${cat._id}`}
             size='small'
           >
             {cat.name}

@@ -4,18 +4,36 @@ import AuthorizedAxiosInstance from '~/utils/authorizedAxios.js'
 import { API_ROOT } from '~/utils/constants.js'
 
 // Lấy danh sách sản phẩm (phân trang)
-export const getProducts = async (page = 1, limit = 10) => {
+export const getProducts = async (params = {}) => {
   try {
-    const response = await AuthorizedAxiosInstance.get(
-      `${API_ROOT}/v1/products?page=${page}&limit=${limit}`
-    )
+    const { page = 1, limit = 10, sort = '' } = params
+    const url = `${API_ROOT}/v1/products?page=${page}&limit=${limit}${sort ? `&sort=${sort}` : ''}`
+    console.log('Calling API with URL:', url)
+    
+    const response = await AuthorizedAxiosInstance.get(url)
+    console.log('API Response:', response.data)
+
+    // Xử lý response là mảng trực tiếp hoặc object
+    const products = Array.isArray(response.data)
+      ? response.data
+      : response.data.data || response.data.products || response.data || []
+    
+    const total = Array.isArray(response.data)
+      ? response.data.length
+      : response.data.meta?.total || response.data.total || 0
+    
+    const totalPages = Array.isArray(response.data)
+      ? Math.ceil(response.data.length / limit)
+      : response.data.meta?.totalPages || Math.ceil(total / limit) || 1
+
     return {
-      products: response.data.data || response.data || [],
-      total: response.data.total || 0
+      products,
+      total,
+      totalPages
     }
   } catch (error) {
     console.error('Lỗi khi lấy danh sách sản phẩm:', error)
-    return { products: [], total: 0 }
+    return { products: [], total: 0, totalPages: 1 }
   }
 }
 

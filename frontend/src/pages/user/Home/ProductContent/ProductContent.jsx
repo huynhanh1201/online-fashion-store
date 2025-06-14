@@ -10,7 +10,6 @@ const ProductContent = () => {
   const [categories, setCategories] = useState([])
   const [activeCategoryId, setActiveCategoryId] = useState(null)
   const [products, setProducts] = useState([])
-
   const [loadingCategories, setLoadingCategories] = useState(false)
   const [loadingProducts, setLoadingProducts] = useState(false)
   const [errorCategories, setErrorCategories] = useState(null)
@@ -26,16 +25,17 @@ const ProductContent = () => {
         const response = await getCategories(1, 1000)
         const fetchedCategories = response.categories?.data || []
 
-        if (
-          !Array.isArray(fetchedCategories) ||
-          fetchedCategories.length === 0
-        ) {
+        if (!Array.isArray(fetchedCategories) || fetchedCategories.length === 0) {
           throw new Error('Không có danh mục nào được tải')
         }
 
         setCategories(fetchedCategories)
-        setActiveCategoryId(fetchedCategories[0]._id)
+        // Set active category to first category if none is selected
+        if (!activeCategoryId) {
+          setActiveCategoryId(fetchedCategories[0]._id)
+        }
       } catch (err) {
+        console.error('Error fetching categories:', err)
         setErrorCategories(err.message || 'Lỗi khi tải danh mục')
       } finally {
         setLoadingCategories(false)
@@ -53,24 +53,14 @@ const ProductContent = () => {
       try {
         setLoadingProducts(true)
         setErrorProducts(null)
-        const productsData = await getProductsByCategory(activeCategoryId)
+        
+        const response = await getProductsByCategory(activeCategoryId, 1, 20)
+        console.log('Products response:', response)
 
-        // Xử lý dữ liệu products
-        let productArray = []
-        if (productsData) {
-          if (Array.isArray(productsData)) {
-            productArray = productsData
-          } else if (
-            productsData.products &&
-            Array.isArray(productsData.products)
-          ) {
-            productArray = productsData.products
-          }
-        }
-
-        setProducts(productArray)
-
-        if (productArray.length === 0) {
+        if (response && response.products) {
+          setProducts(response.products)
+        } else {
+          setProducts([])
           console.warn('No products found for category:', activeCategoryId)
         }
       } catch (err) {
@@ -99,11 +89,10 @@ const ProductContent = () => {
     return <div style={{ color: 'red' }}>{errorCategories}</div>
   }
 
-  const activeCategory =
-    categories.find((c) => c._id === activeCategoryId) || {}
+  const activeCategory = categories.find((c) => c._id === activeCategoryId) || {}
 
   return (
-    <div className='container' style={{ maxWidth: '1400px', margin: '0 auto' }}>
+    <div className='container' style={{ maxWidth: '1780px', margin: '0 auto' }}>
       <HeaderCategories
         categories={categories}
         activeCategoryId={activeCategoryId}
@@ -111,9 +100,9 @@ const ProductContent = () => {
       />
 
       <ProductSection
-        bannerImg={activeCategory.bannerImg || ''}
+        bannerImg={activeCategory.bannerImg || activeCategory.image || ''}
         bannerTitle={activeCategory.name || ''}
-        bannerDesc='Bộ sưu tập hot'
+        bannerDesc={activeCategory.description || 'Bộ sưu tập hot'}
         products={products}
         loading={loadingProducts}
         error={errorProducts}
