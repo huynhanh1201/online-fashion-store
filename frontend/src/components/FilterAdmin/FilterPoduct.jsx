@@ -30,7 +30,7 @@ export default function FilterProduct({
   }, [])
 
   useEffect(() => {
-    applyFilters()
+    applyFilters(selectedFilter, startDate, endDate)
   }, [keyword, status, category, sort])
 
   const handleSearch = () => {
@@ -164,7 +164,7 @@ export default function FilterProduct({
       <Box sx={{ display: 'flex', gap: 2 }}>
         {' '}
         <SearchWithSuggestions
-          label='Tìm sản phẩm'
+          label='Tên sản phẩm'
           options={products.map((p) => p.name)}
           loading={loading}
           keyword={keyword}
@@ -178,6 +178,7 @@ export default function FilterProduct({
           size='small'
           color='error'
           onClick={handleReset}
+          sx={{ textTransform: 'none' }}
         >
           Làm mới
         </Button>

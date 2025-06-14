@@ -16,6 +16,7 @@ import TableRow from '@mui/material/TableRow'
 import TableCell from '@mui/material/TableCell'
 
 import StyleAdmin from '~/assets/StyleAdmin.jsx'
+import { optimizeCloudinaryUrl } from '~/utils/cloudinary.js'
 const ViewProductModal = ({
   open,
   onClose,
@@ -57,21 +58,6 @@ const ViewProductModal = ({
   const filteredSizes = sizePalette?.sizes ? uniqueSizes(sizePalette.sizes) : []
 
   if (!product) return null
-  const colorMap = {
-    Đỏ: '#f44336',
-    'Xanh dương': '#2196f3',
-    Đen: '#212121',
-    Trắng: '#e0e0e0',
-    Vàng: '#ffeb3b'
-  }
-
-  const textColorMap = {
-    Đỏ: '#fff',
-    'Xanh dương': '#fff',
-    Đen: '#fff',
-    Trắng: '#000',
-    Vàng: '#000'
-  }
   return (
     <Dialog
       open={open}
@@ -97,11 +83,11 @@ const ViewProductModal = ({
             {selectedImage && (
               <Box
                 component='img'
-                src={selectedImage}
+                src={optimizeCloudinaryUrl(selectedImage)}
                 alt='Ảnh sản phẩm'
                 sx={{
-                  width: '350px',
-                  height: '300px',
+                  width: '300px',
+                  height: '257px',
                   objectFit: 'contain',
                   backgroundColor: '#f5f5f5',
                   borderRadius: 2,
@@ -114,28 +100,31 @@ const ViewProductModal = ({
               />
             )}
 
-            {/* Thumbnail ảnh nhỏ */}
-            <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
-              {imageList.map((img, index) => (
-                <Box
-                  key={index}
-                  component='img'
-                  src={img}
-                  alt={`Ảnh ${index + 1}`}
-                  onClick={() => handleImageClick(img)}
-                  sx={{
-                    width: 45,
-                    height: 45,
-                    objectFit: 'cover',
-                    borderRadius: 1,
-                    border:
-                      img === selectedImage
-                        ? '2px solid #001f5d'
-                        : '1px solid #ccc',
-                    cursor: 'pointer'
-                  }}
-                />
-              ))}
+            {/* Thumbnail ảnh nhỏ với thanh cuộn ngang */}
+            <Box sx={{ maxWidth: '300px', overflowX: 'auto' }}>
+              <Box sx={{ display: 'flex', gap: 1, flexWrap: 'nowrap' }}>
+                {imageList.map((img, index) => (
+                  <Box
+                    key={index}
+                    component='img'
+                    src={optimizeCloudinaryUrl(img)}
+                    alt={`Ảnh ${index + 1}`}
+                    onClick={() => handleImageClick(img)}
+                    sx={{
+                      minWidth: 45,
+                      width: 45,
+                      height: 45,
+                      objectFit: 'cover',
+                      borderRadius: 1,
+                      border:
+                        img === selectedImage
+                          ? '2px solid #001f5d'
+                          : '1px solid #ccc',
+                      cursor: 'pointer'
+                    }}
+                  />
+                ))}
+              </Box>
             </Box>
           </Grid>
 
@@ -143,7 +132,7 @@ const ViewProductModal = ({
           <Grid item size={12} md={7} width='calc(98% - 350px)'>
             <Box sx={{ width: '100%' }}>
               <Typography variant='h6'>Thông tin sản phẩm</Typography>
-              <Divider sx={{ mb: 2 }} />
+              <Divider />
               <Table size='small' sx={{ width: '100%' }}>
                 <TableBody>
                   <TableRow>
@@ -160,7 +149,7 @@ const ViewProductModal = ({
                       Giá
                     </TableCell>
                     <TableCell>
-                      {product.exportPrice?.toLocaleString()} VNĐ
+                      {product.exportPrice?.toLocaleString('vi-VN')}đ
                     </TableCell>
                   </TableRow>
                   <TableRow>
@@ -168,12 +157,6 @@ const ViewProductModal = ({
                       Danh mục
                     </TableCell>
                     <TableCell>{product.categoryId?.name}</TableCell>
-                  </TableRow>
-                  <TableRow>
-                    <TableCell variant='head' sx={{ fontWeight: 500 }}>
-                      Số lượng
-                    </TableCell>
-                    <TableCell>{product.quantity}</TableCell>
                   </TableRow>
                   <TableRow>
                     <TableCell variant='head' sx={{ fontWeight: 500 }}>
@@ -192,13 +175,11 @@ const ViewProductModal = ({
                             <Chip
                               key={color._id}
                               label={color.name}
-                              size='small'
+                              size='large'
                               sx={{
-                                backgroundColor:
-                                  colorMap[color.name.toLowerCase()] || '#ccc',
-                                color:
-                                  textColorMap[color.name.toLowerCase()] ||
-                                  '#fff'
+                                backgroundColor: '#e0e0e0',
+                                fontWeight: 500,
+                                width: 120
                               }}
                             />
                           ))}
@@ -217,12 +198,14 @@ const ViewProductModal = ({
                         <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
                           {filteredSizes.map((size) => (
                             <Chip
+                              color='#000'
                               key={size._id}
                               label={size.name}
-                              size='small'
+                              size='large'
                               sx={{
                                 backgroundColor: '#e0e0e0',
-                                fontWeight: 500
+                                fontWeight: 500,
+                                width: 120
                               }}
                             />
                           ))}
@@ -240,7 +223,8 @@ const ViewProductModal = ({
                       <Chip
                         label={product.destroy ? 'Ngừng bán' : 'Đang bán'}
                         color={product.destroy ? 'error' : 'success'}
-                        size='small'
+                        size='large'
+                        sx={{ width: '120px', fontWeight: '800' }}
                       />
                     </TableCell>
                   </TableRow>

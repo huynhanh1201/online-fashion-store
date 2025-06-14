@@ -10,8 +10,7 @@ import SearchIcon from '@mui/icons-material/Search'
 import Autocomplete from '@mui/material/Autocomplete'
 
 export default function SearchWithSuggestions({
-  label = 'Tìm kiếm',
-  placeholder = 'nhập từ khoá',
+  label = 'Tìm kiếm tên',
   options = [],
   loading = false,
   keyword,
@@ -44,8 +43,7 @@ export default function SearchWithSuggestions({
       renderInput={(params) => (
         <TextField
           {...params}
-          label={placeholder ? undefined : label}
-          placeholder={placeholder}
+          placeholder={label}
           size='small'
           sx={{ pl: 0 }}
           InputProps={{

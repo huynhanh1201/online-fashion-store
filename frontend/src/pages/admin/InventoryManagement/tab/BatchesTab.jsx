@@ -23,6 +23,8 @@ import FilterBatches from '~/components/FilterAdmin/FilterBatches.jsx'
 import useBatches from '~/hooks/admin/Inventory/useBatches.js'
 import useVariants from '~/hooks/admin/Inventory/useVariants.js'
 import useWarehouses from '~/hooks/admin/Inventory/useWarehouses.js'
+import TablePaginationActions from '~/components/PaginationAdmin/TablePaginationActions.jsx'
+import Chip from '@mui/material/Chip'
 const BatchesTab = () => {
   const {
     batches,
@@ -71,6 +73,7 @@ const BatchesTab = () => {
       align: 'right',
       format: (value) => `${value.toLocaleString('vi-VN')}đ`
     },
+    { id: 'destroy', label: 'Trạng thái', minWidth: 150 },
     {
       id: 'importedAt',
       label: 'Ngày nhập',
@@ -220,6 +223,18 @@ const BatchesTab = () => {
               <TableRow hover role='checkbox' tabIndex={-1} key={index}>
                 {batchColumns.map((column) => {
                   const value = row[column.id]
+                  if (column.id === 'destroy') {
+                    return (
+                      <TableCell key={column.id} align={column.align}>
+                        <Chip
+                          label={value ? 'Không hoạt động' : 'Hoạt động'}
+                          color={value ? 'error' : 'success'}
+                          size='large'
+                          sx={{ width: '127px', fontWeight: '800' }}
+                        />
+                      </TableCell>
+                    )
+                  }
                   if (column.id === 'action') {
                     return (
                       <TableCell key={column.id} align={column.align}>
@@ -266,7 +281,7 @@ const BatchesTab = () => {
         count={totalPageBatch || 0}
         rowsPerPage={rowsPerPage}
         page={page - 1}
-        onPageChange={(event, newPage) => handleChangePage(event, newPage + 1)} // +1 để đúng logic bên cha
+        onPageChange={(event, newPage) => handleChangePage(event, newPage + 1)} // truyền lại đúng logic cho parent
         onRowsPerPageChange={(event) => {
           const newLimit = parseInt(event.target.value, 10)
           if (onChangeRowsPerPage) {
@@ -274,9 +289,11 @@ const BatchesTab = () => {
           }
         }}
         labelRowsPerPage='Số dòng mỗi trang'
-        labelDisplayedRows={({ from, to, count }) =>
-          `${from}–${to} trên ${count !== -1 ? count : `hơn ${to}`}`
-        }
+        labelDisplayedRows={({ from, to, count }) => {
+          const totalPages = Math.ceil(count / rowsPerPage)
+          return `${from}–${to} trên ${count} | Trang ${page} / ${totalPages}`
+        }}
+        ActionsComponent={TablePaginationActions}
       />
       <EditBatchModal
         open={openEditModal}

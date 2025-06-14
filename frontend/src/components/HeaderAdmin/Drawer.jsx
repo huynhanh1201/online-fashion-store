@@ -27,8 +27,20 @@ import {
   CheckCircle as CheckCircleIcon
 } from '@mui/icons-material'
 import { Link, useLocation } from 'react-router-dom'
+import ExitToAppIcon from '@mui/icons-material/ExitToApp'
+import AccountCircleIcon from '@mui/icons-material/AccountCircle'
+import { optimizeCloudinaryUrl } from '~/utils/cloudinary.js'
 
-export default function AdminDrawer({ open, profile, onDrawerOpen, onClose }) {
+import { useDispatch } from 'react-redux'
+import { logoutUserAPI } from '~/redux/user/userSlice'
+
+export default function AdminDrawer({
+  open,
+  profile,
+  onDrawerOpen,
+  onClose,
+  onProfileOpen
+}) {
   const location = useLocation()
   const [openProduct, setOpenProduct] = React.useState(false)
   const [openOrder, setOpenOrder] = React.useState(false)
@@ -65,6 +77,13 @@ export default function AdminDrawer({ open, profile, onDrawerOpen, onClose }) {
     }
   }
 
+  const dispatch = useDispatch()
+  // const navigate = useNavigate()
+  const handleLogout = () => {
+    dispatch(logoutUserAPI())
+    onClose()
+  }
+
   if (!open) {
     return (
       <Box
@@ -82,9 +101,19 @@ export default function AdminDrawer({ open, profile, onDrawerOpen, onClose }) {
         }}
         onClick={onDrawerOpen}
       >
+        <Box
+          onClick={onClose}
+          sx={{ display: 'flex', alignItems: 'center', p: 2 }}
+        >
+          <Typography fontWeight='bold' fontSize={18}>
+            LOGO
+          </Typography>
+        </Box>
+
+        <Divider sx={{ my: 0 }} />
         <Box sx={{ display: 'flex', alignItems: 'center', p: 2 }}>
           <Avatar
-            src={profile?.avatarUrl}
+            src={optimizeCloudinaryUrl(profile?.avatarUrl)}
             alt={profile?.name}
             sx={{ width: 48, height: 48 }}
           />
@@ -141,6 +170,20 @@ export default function AdminDrawer({ open, profile, onDrawerOpen, onClose }) {
             </ListItemButton>
           </ListItem>
         </List>
+        <Divider sx={{ my: 0 }} />
+        <Box sx={{ p: 0, textAlign: 'center' }}>
+          <List sx={{ flexGrow: 1, p: 0 }}>
+            <ListItem disablePadding sx={{ height: 48 }}>
+              <ListItemButton
+                sx={{ padding: '12px 24px', ...activeButtonStyle }}
+              >
+                <ListItemIcon>
+                  <ExitToAppIcon />
+                </ListItemIcon>
+              </ListItemButton>
+            </ListItem>
+          </List>
+        </Box>
       </Box>
     )
   }
@@ -164,8 +207,18 @@ export default function AdminDrawer({ open, profile, onDrawerOpen, onClose }) {
         onClick={onClose}
         sx={{ display: 'flex', alignItems: 'center', p: 2 }}
       >
+        <Typography fontWeight='bold' fontSize={18}>
+          LOGO
+        </Typography>
+      </Box>
+
+      <Divider sx={{ my: 0 }} />
+      <Box
+        onClick={onProfileOpen}
+        sx={{ display: 'flex', alignItems: 'center', p: 2, cursor: 'pointer' }}
+      >
         <Avatar
-          src={profile?.avatarUrl}
+          src={optimizeCloudinaryUrl(profile?.avatarUrl)}
           alt={profile?.name}
           sx={{ width: 48, height: 48, mr: 2 }}
         />
@@ -330,7 +383,7 @@ export default function AdminDrawer({ open, profile, onDrawerOpen, onClose }) {
                 <WarehouseIcon />
               </ListItemIcon>
               <ListItemText primary='Quản lý kho' />
-              {openOrder ? <ExpandLess /> : <ExpandMore />}
+              {openInventory ? <ExpandLess /> : <ExpandMore />}
             </ListItemButton>
           </ListItem>
           <Collapse in={openInventory} timeout='auto' unmountOnExit>
@@ -343,7 +396,7 @@ export default function AdminDrawer({ open, profile, onDrawerOpen, onClose }) {
                 },
                 { label: 'Quản lý kho', path: '/admin/inventory-management' },
                 {
-                  label: 'Quản lý phiếu kho',
+                  label: 'Quản lý xuất/nhập kho',
                   path: '/admin/warehouse-slips-management'
                 },
                 {
@@ -375,6 +428,19 @@ export default function AdminDrawer({ open, profile, onDrawerOpen, onClose }) {
               ))}
             </List>
           </Collapse>
+        </List>
+      </Box>
+      <Divider sx={{ my: 0 }} />
+      <Box sx={{ p: 0, textAlign: 'center' }}>
+        <List sx={{ flexGrow: 1, p: 0 }}>
+          <ListItem disablePadding onClick={handleLogout}>
+            <ListItemButton sx={{ ...activeButtonStyle }}>
+              <ListItemIcon>
+                <ExitToAppIcon />
+              </ListItemIcon>
+              <ListItemText primary='Đăng xuất' />
+            </ListItemButton>
+          </ListItem>
         </List>
       </Box>
     </Box>

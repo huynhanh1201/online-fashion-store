@@ -23,6 +23,7 @@ import DeletePartnerModal from '../modal/Partner/DeletePartnerModal.jsx'
 import AddIcon from '@mui/icons-material/Add'
 import FilterPartner from '~/components/FilterAdmin/FilterPartner.jsx'
 import usePartner from '~/hooks/admin/Inventory/usePartner.js'
+import TablePaginationActions from '~/components/PaginationAdmin/TablePaginationActions.jsx'
 const PartnersTab = () => {
   const {
     partners,
@@ -203,6 +204,7 @@ const PartnersTab = () => {
             <TableCell>Mã số thuế</TableCell>
             <TableCell>Địa chỉ</TableCell>
             <TableCell>Ngân hàng</TableCell>
+            <TableCell>Trạng thái</TableCell>
             <TableCell>Ngày tạo</TableCell>
             <TableCell
               align='start'
@@ -248,6 +250,14 @@ const PartnersTab = () => {
                     ? new Date(partner.createdAt).toLocaleDateString()
                     : '---'}
                 </TableCell>
+                <TableCell>
+                  <Chip
+                    label={partner.destroy ? 'Không hoạt động' : 'Hoạt động'}
+                    color={partner.destroy ? 'error' : 'success'}
+                    size='large'
+                    sx={{ width: '127px', fontWeight: '800' }}
+                  />
+                </TableCell>
                 <TableCell align='center' spacing={1} sx={styles.groupIcon}>
                   <IconButton
                     size='small'
@@ -289,7 +299,7 @@ const PartnersTab = () => {
         count={totalPartner || 0}
         rowsPerPage={rowsPerPage}
         page={page - 1}
-        onPageChange={(event, newPage) => handleChangePage(event, newPage + 1)} // +1 để đúng logic bên cha
+        onPageChange={(event, newPage) => handleChangePage(event, newPage + 1)} // truyền lại đúng logic cho parent
         onRowsPerPageChange={(event) => {
           const newLimit = parseInt(event.target.value, 10)
           if (onChangeRowsPerPage) {
@@ -297,9 +307,11 @@ const PartnersTab = () => {
           }
         }}
         labelRowsPerPage='Số dòng mỗi trang'
-        labelDisplayedRows={({ from, to, count }) =>
-          `${from}–${to} trên ${count !== -1 ? count : `hơn ${to}`}`
-        }
+        labelDisplayedRows={({ from, to, count }) => {
+          const totalPages = Math.ceil(count / rowsPerPage)
+          return `${from}–${to} trên ${count} | Trang ${page} / ${totalPages}`
+        }}
+        ActionsComponent={TablePaginationActions}
       />
 
       <AddPartnerModal

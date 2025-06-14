@@ -45,7 +45,7 @@ export default function FilterDiscount({
   const [createdFilter, setCreatedFilter] = useState('')
 
   useEffect(() => {
-    applyFilters()
+    applyFilters(createdFilter, createdStart, createdEnd)
   }, [keyword, type, isActive, sort])
 
   const applyFilters = ({
@@ -236,7 +236,7 @@ export default function FilterDiscount({
       />
       <Box display='flex' gap={2}>
         <SearchWithSuggestions
-          label='Tìm mã giảm giá'
+          label='Mã giảm giá'
           keyword={keyword}
           inputValue={inputValue}
           setKeyword={setKeyword}
@@ -248,7 +248,13 @@ export default function FilterDiscount({
           options={discounts.map((d) => d.code)}
           loading={loading}
         />
-        <Button variant='outlined' color='error' onClick={handleReset}>
+        <Button
+          variant='outlined'
+          color='error'
+          onClick={handleReset}
+          size='small'
+          sx={{ textTransform: 'none' }}
+        >
           Làm mới
         </Button>
       </Box>

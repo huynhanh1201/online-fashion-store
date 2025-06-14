@@ -28,6 +28,7 @@ export default function AdminMenu({
       height: '40px'
     }
   }
+
   return (
     <Popper
       open={isOpen}

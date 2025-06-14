@@ -24,6 +24,8 @@ import ViewWarehouseModal from '../modal/Warehouse/ViewWarehouseModal.jsx'
 import DeleteWarehouseModal from '../modal/Warehouse/DeleteWarehouseModal.jsx' // Thêm modal mới
 import FilterWarehouse from '~/components/FilterAdmin/FilterWarehouse.jsx'
 import useWarehouses from '~/hooks/admin/Inventory/useWarehouses.js'
+import TablePaginationActions from '~/components/PaginationAdmin/TablePaginationActions.jsx'
+import Chip from '@mui/material/Chip'
 const WarehousesTab = () => {
   const {
     warehouses,
@@ -41,6 +43,7 @@ const WarehousesTab = () => {
     { id: 'ward', label: 'Phường', minWidth: 100 },
     { id: 'district', label: 'Quận', minWidth: 100 },
     { id: 'city', label: 'Thành phố', minWidth: 100 },
+    { id: 'destroy', label: 'Trạng thái', minWidth: 150 },
     { id: 'action', label: 'Hành động', minWidth: 150, align: 'start' }
   ]
 
@@ -176,6 +179,18 @@ const WarehousesTab = () => {
               <TableRow hover role='checkbox' tabIndex={-1} key={index}>
                 {warehouseColumns.map((column) => {
                   const value = row[column.id]
+                  if (column.id === 'destroy') {
+                    return (
+                      <TableCell key={column.id} align={column.align}>
+                        <Chip
+                          label={value ? 'Không hoạt động' : 'Hoạt động'}
+                          color={value ? 'error' : 'success'}
+                          size='large'
+                          sx={{ width: '127px', fontWeight: '800' }}
+                        />
+                      </TableCell>
+                    )
+                  }
                   if (column.id === 'action') {
                     return (
                       <TableCell key={column.id} align={column.align}>
@@ -221,7 +236,7 @@ const WarehousesTab = () => {
         count={totalWarehouse || 0}
         rowsPerPage={rowsPerPage}
         page={page - 1}
-        onPageChange={(event, newPage) => handleChangePage(event, newPage + 1)} // +1 để đúng logic bên cha
+        onPageChange={(event, newPage) => handleChangePage(event, newPage + 1)} // truyền lại đúng logic cho parent
         onRowsPerPageChange={(event) => {
           const newLimit = parseInt(event.target.value, 10)
           if (onChangeRowsPerPage) {
@@ -229,11 +244,12 @@ const WarehousesTab = () => {
           }
         }}
         labelRowsPerPage='Số dòng mỗi trang'
-        labelDisplayedRows={({ from, to, count }) =>
-          `${from}–${to} trên ${count !== -1 ? count : `hơn ${to}`}`
-        }
+        labelDisplayedRows={({ from, to, count }) => {
+          const totalPages = Math.ceil(count / rowsPerPage)
+          return `${from}–${to} trên ${count} | Trang ${page} / ${totalPages}`
+        }}
+        ActionsComponent={TablePaginationActions}
       />
-
       <AddWarehouseModal
         open={openAddModal}
         onClose={handleCloseAddModal}

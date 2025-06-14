@@ -54,6 +54,11 @@ export default function AdminLayout() {
         onClose={handleDrawerClose}
         profile={profile}
         onDrawerOpen={handleDrawerOpen}
+        //
+        onProfileOpen={() => {
+          setOpenProfile(true)
+        }}
+        onProfileMenuClose={handleMenuClose}
       />
       <AdminMenu
         anchorEl={anchorEl}

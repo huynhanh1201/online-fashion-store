@@ -197,12 +197,14 @@ const DiscountRow = ({ discount, index, columns, onAction }) => {
                   <RemoveRedEyeIcon color='primary' />
                 </IconButton>
                 <IconButton
+                  sx={{ ml: '0 !important' }}
                   onClick={() => onAction('edit', discount)}
                   size='small'
                 >
                   <BorderColorIcon color='warning' />
                 </IconButton>
                 <IconButton
+                  sx={{ ml: '0 !important' }}
                   onClick={() => onAction('delete', discount)}
                   size='small'
                 >
@@ -214,7 +216,15 @@ const DiscountRow = ({ discount, index, columns, onAction }) => {
         }
 
         return (
-          <TableCell key={id} align={align || 'left'}>
+          <TableCell
+            key={id}
+            align={align || 'left'}
+            sx={{
+              ...(id === 'action' && {
+                px: 0
+              })
+            }}
+          >
             {value}
           </TableCell>
         )

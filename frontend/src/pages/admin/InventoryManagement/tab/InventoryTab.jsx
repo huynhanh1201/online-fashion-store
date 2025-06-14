@@ -404,6 +404,7 @@ import FilterInventory from '~/components/FilterAdmin/FilterInventory.jsx'
 import useVariants from '~/hooks/admin/Inventory/useVariants.js'
 import useInventory from '~/hooks/admin/Inventory/useInventorys.js'
 import useWarehouses from '~/hooks/admin/Inventory/useWarehouses.js'
+import TablePaginationActions from '~/components/PaginationAdmin/TablePaginationActions.jsx'
 const InventoryTab = () => {
   const { variants, fetchVariants } = useVariants()
   const {
@@ -691,7 +692,7 @@ const InventoryTab = () => {
         count={totalPageInventory || 0}
         rowsPerPage={rowsPerPage}
         page={page - 1}
-        onPageChange={(event, newPage) => handleChangePage(event, newPage + 1)} // +1 để đúng logic bên cha
+        onPageChange={(event, newPage) => handleChangePage(event, newPage + 1)} // truyền lại đúng logic cho parent
         onRowsPerPageChange={(event) => {
           const newLimit = parseInt(event.target.value, 10)
           if (onChangeRowsPerPage) {
@@ -699,9 +700,11 @@ const InventoryTab = () => {
           }
         }}
         labelRowsPerPage='Số dòng mỗi trang'
-        labelDisplayedRows={({ from, to, count }) =>
-          `${from}–${to} trên ${count !== -1 ? count : `hơn ${to}`}`
-        }
+        labelDisplayedRows={({ from, to, count }) => {
+          const totalPages = Math.ceil(count / rowsPerPage)
+          return `${from}–${to} trên ${count} | Trang ${page} / ${totalPages}`
+        }}
+        ActionsComponent={TablePaginationActions}
       />
 
       <ViewInventoryModal

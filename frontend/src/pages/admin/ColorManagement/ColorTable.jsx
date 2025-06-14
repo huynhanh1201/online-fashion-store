@@ -172,7 +172,7 @@ import {
 import ColorRow from './ColorRow'
 import AddIcon from '@mui/icons-material/Add'
 import FilterColor from '~/components/FilterAdmin/FilterColor.jsx'
-
+import TablePaginationActions from '~/components/PaginationAdmin/TablePaginationActions.jsx'
 const ColorTable = ({
   colors,
   loading,
@@ -189,6 +189,7 @@ const ColorTable = ({
   const columns = [
     { id: 'index', label: 'STT', minWidth: 50, align: 'center' },
     { id: 'name', label: 'Tên màu', minWidth: 200 },
+    { id: 'destroy', label: 'Trạng thái', minWidth: 150, align: 'start' },
     { id: 'createdAt', label: 'Ngày tạo', minWidth: 250 },
     { id: 'updatedAt', label: 'Ngày cập nhật', minWidth: 250 },
     { id: 'action', label: 'Hành động', minWidth: 150, align: 'start' }
@@ -296,7 +297,7 @@ const ColorTable = ({
         count={total || 0}
         rowsPerPage={rowsPerPage}
         page={page}
-        onPageChange={(event, newPage) => onPageChange(event, newPage + 1)}
+        onPageChange={(event, newPage) => onPageChange(event, newPage + 1)} // truyền lại đúng logic cho parent
         onRowsPerPageChange={(event) => {
           const newLimit = parseInt(event.target.value, 10)
           if (onChangeRowsPerPage) {
@@ -304,9 +305,11 @@ const ColorTable = ({
           }
         }}
         labelRowsPerPage='Số dòng mỗi trang'
-        labelDisplayedRows={({ from, to, count }) =>
-          `${from}–${to} trên ${count !== -1 ? count : `hơn ${to}`}`
-        }
+        labelDisplayedRows={({ from, to, count }) => {
+          const totalPages = Math.ceil(count / rowsPerPage)
+          return `${from}–${to} trên ${count} | Trang ${page + 1} / ${totalPages}`
+        }}
+        ActionsComponent={TablePaginationActions}
       />
     </Paper>
   )

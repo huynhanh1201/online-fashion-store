@@ -1,4 +1,3 @@
-// modal/Variant/ViewVariantModal.jsx
 import React from 'react'
 import {
   Dialog,
@@ -11,69 +10,114 @@ import {
   Table,
   TableBody,
   TableRow,
-  TableCell
+  TableCell,
+  Grid
 } from '@mui/material'
-
+import Chip from '@mui/material/Chip'
+import { optimizeCloudinaryUrl } from '~/utils/cloudinary.js'
 const ViewVariantModal = ({ open, onClose, variant }) => {
   if (!variant) return null
+
+  const formatCurrency = (value) =>
+    value ? `${Number(value).toLocaleString('vi-VN')}đ` : 'N/A'
+
   return (
-    <Dialog open={open} onClose={onClose} maxWidth='sm' fullWidth>
+    <Dialog open={open} onClose={onClose} maxWidth='md' fullWidth>
       <DialogTitle>Chi tiết biến thể</DialogTitle>
       <DialogContent>
-        <Table>
-          <TableBody>
-            <TableRow>
-              <TableCell>
-                <strong>SKU</strong>
-              </TableCell>
-              <TableCell>{variant?.sku || 'N/A'}</TableCell>
-            </TableRow>
-            <TableRow>
-              <TableCell>
-                <strong>Tên biến thể</strong>
-              </TableCell>
-              <TableCell>{variant?.name || 'N/A'}</TableCell>
-            </TableRow>
-            <TableRow>
-              <TableCell>
-                <strong>Màu sắc</strong>
-              </TableCell>
-              <TableCell>{variant?.color?.name || 'N/A'}</TableCell>
-            </TableRow>
-            <TableRow>
-              <TableCell>
-                <strong>Kích thước</strong>
-              </TableCell>
-              <TableCell>{variant?.size?.name || 'N/A'}</TableCell>
-            </TableRow>
-            <TableRow>
-              <TableCell>
-                <strong>Giá nhập</strong>
-              </TableCell>
-              <TableCell>
-                {variant?.importPrice
-                  ? `${Number(variant?.importPrice).toLocaleString('vi-VN')}đ`
-                  : 'N/A'}
-              </TableCell>
-            </TableRow>
-            <TableRow>
-              <TableCell>
-                <strong>Giá bán</strong>
-              </TableCell>
-              <TableCell>
-                {variant?.exportPrice
-                  ? `${Number(variant?.exportPrice).toLocaleString('vi-VN')}đ`
-                  : 'N/A'}
-              </TableCell>
-            </TableRow>
-            <TableRow>
-              <TableCell>
-                <strong>Mã sản phẩm</strong>
-              </TableCell>
-              <TableCell>{variant?.productCode || 'N/A'}</TableCell>
-            </TableRow>
-          </TableBody>
-        </Table>
+        <Grid container spacing={2}>
+          {/* Ảnh bên trái */}
+          <Grid item size={5}>
+            <Box
+              display='flex'
+              flexDirection='column'
+              alignItems='center'
+              gap={1}
+            >
+              {variant?.color?.image ? (
+                <Box
+                  component='img'
+                  src={optimizeCloudinaryUrl(variant.color.image)}
+                  alt='color'
+                  sx={{
+                    marginRight: '21px',
+                    width: 350,
+                    height: 437,
+                    objectFit: 'contain',
+                    backgroundColor: '#f5f5f5',
+                    borderRadius: 2,
+                    border: '1px solid #ccc'
+                  }}
+                />
+              ) : (
+                <Typography variant='body2'>Không có ảnh</Typography>
+              )}
+            </Box>
+          </Grid>
+          {/*<Grid item size={1}></Grid>*/}
+          {/* Thông tin chi tiết bên phải */}
+          <Grid item size={7}>
+            <Table>
+              <TableBody>
+                <TableRow>
+                  <TableCell>
+                    <strong>SKU</strong>
+                  </TableCell>
+                  <TableCell>{variant?.sku || 'N/A'}</TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell>
+                    <strong>Mã sản phẩm</strong>
+                  </TableCell>
+                  <TableCell>{variant?.productCode || 'N/A'}</TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell>
+                    <strong>Tên biến thể</strong>
+                  </TableCell>
+                  <TableCell>{variant?.name || 'N/A'}</TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell>
+                    <strong>Màu sắc</strong>
+                  </TableCell>
+                  <TableCell>{variant?.color?.name || 'N/A'}</TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell>
+                    <strong>Kích thước</strong>
+                  </TableCell>
+                  <TableCell>{variant?.size?.name || 'N/A'}</TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell>
+                    <strong>Giá nhập</strong>
+                  </TableCell>
+                  <TableCell>{formatCurrency(variant?.importPrice)}</TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell>
+                    <strong>Giá bán</strong>
+                  </TableCell>
+                  <TableCell>{formatCurrency(variant?.exportPrice)}</TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell>
+                    <strong>Trạng thái</strong>
+                  </TableCell>
+                  <TableCell>
+                    <Chip
+                      label={variant.destroy ? 'Đã huỷ' : 'Còn hàng'}
+                      color={variant.destroy ? 'error' : 'success'}
+                      size='large'
+                      sx={{ width: '127px', fontWeight: '800' }}
+                    />
+                  </TableCell>
+                </TableRow>
+              </TableBody>
+            </Table>
+          </Grid>
+        </Grid>
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose} variant='outlined'>

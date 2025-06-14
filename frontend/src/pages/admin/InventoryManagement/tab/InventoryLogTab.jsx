@@ -28,6 +28,7 @@ import useInventoryLog from '~/hooks/admin/Inventory/useInventoryLogs.js'
 import useVariants from '~/hooks/admin/Inventory/useVariants.js'
 import useInventory from '~/hooks/admin/Inventory/useInventorys.js'
 import useWarehouses from '~/hooks/admin/Inventory/useWarehouses.js'
+import TablePaginationActions from '~/components/PaginationAdmin/TablePaginationActions.jsx'
 const InventoryLogTab = () => {
   const { logs, fetchLogs, loadingLog, totalLogs } = useInventoryLog()
   const { variants, fetchVariants } = useVariants()
@@ -72,7 +73,7 @@ const InventoryLogTab = () => {
     { id: 'source', label: 'Mã phiếu', minWidth: 130 },
     { id: 'variantName', label: 'Biến thể', minWidth: 150 },
     { id: 'warehouse', label: 'Kho', minWidth: 100 },
-    { id: 'typeLabel', label: 'Loại', minWidth: 100, align: 'center' },
+    { id: 'typeLabel', label: 'Loại', minWidth: 100, align: 'start' },
     {
       id: 'amount',
       label: 'Số lượng',
@@ -240,7 +241,7 @@ const InventoryLogTab = () => {
         count={totalLogs || 0}
         rowsPerPage={rowsPerPage}
         page={page - 1}
-        onPageChange={(event, newPage) => handleChangePage(event, newPage + 1)} // +1 để đúng logic bên cha
+        onPageChange={(event, newPage) => handleChangePage(event, newPage + 1)} // truyền lại đúng logic cho parent
         onRowsPerPageChange={(event) => {
           const newLimit = parseInt(event.target.value, 10)
           if (onChangeRowsPerPage) {
@@ -248,9 +249,11 @@ const InventoryLogTab = () => {
           }
         }}
         labelRowsPerPage='Số dòng mỗi trang'
-        labelDisplayedRows={({ from, to, count }) =>
-          `${from}–${to} trên ${count !== -1 ? count : `hơn ${to}`}`
-        }
+        labelDisplayedRows={({ from, to, count }) => {
+          const totalPages = Math.ceil(count / rowsPerPage)
+          return `${from}–${to} trên ${count} | Trang ${page} / ${totalPages}`
+        }}
+        ActionsComponent={TablePaginationActions}
       />
 
       <ViewInventoryLogModal

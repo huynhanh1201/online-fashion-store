@@ -34,7 +34,7 @@ export default function FilterOrder({
   const [userInput, setUserInput] = useState('')
   const [sort, setSort] = useState('')
   useEffect(() => {
-    applyFilters()
+    applyFilters(selectedFilter, startDate, endDate)
   }, [keyword, userId, status, sort, paymentMethod, paymentStatus])
 
   const handleSearch = () => {
@@ -166,9 +166,8 @@ export default function FilterOrder({
         onChange={setStatus}
         options={[
           { label: 'Tất cả', value: '' },
-          { label: 'Chờ xác nhận', value: 'Pending' },
           { label: 'Đang xử lý', value: 'Processing' },
-          { label: 'Đã vận chuyển', value: 'Shipped' },
+          { label: 'Đã xuất kho', value: 'Shipped' },
           { label: 'Đang vận chuyển', value: 'Shipping' },
           { label: 'Đã giao hàng', value: 'Delivered' },
           { label: 'Đã hủy', value: 'Cancelled' }
@@ -220,7 +219,7 @@ export default function FilterOrder({
       {/*/>*/}
       <Box sx={{ display: 'flex', gap: 2 }}>
         <SearchWithSuggestions
-          label='Tìm theo tên người đặt'
+          label='Tên người đặt'
           options={users.map((u) => u.name)} // có thể truyền users.map(u => u.name) nếu muốn
           keyword={keyword}
           inputValue={inputValue}
@@ -234,6 +233,7 @@ export default function FilterOrder({
           size='small'
           color='error'
           onClick={handleReset}
+          sx={{ textTransform: 'none' }}
         >
           Làm mới
         </Button>

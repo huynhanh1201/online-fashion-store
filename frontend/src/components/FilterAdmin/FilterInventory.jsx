@@ -32,7 +32,7 @@ export default function FilterInventory({
   const [endDate, setEndDate] = useState(dayjs().format('YYYY-MM-DD'))
 
   useEffect(() => {
-    handleApplyFilters()
+    handleApplyFilters(selectedFilter, startDate, endDate)
   }, [warehouseId, keyword, sort, destroy, status])
   const handleSearch = () => {
     setKeyword(inputValue)
@@ -158,9 +158,7 @@ export default function FilterInventory({
       <FilterSelect
         label='Trạng thái kho'
         value={status}
-        onChange={(val) => {
-          setStatus(val)
-        }}
+        onChange={setStatus}
         options={[
           { label: 'Tất cả', value: '' },
           { label: 'Còn hàng', value: 'in-stock' },
@@ -172,9 +170,7 @@ export default function FilterInventory({
       <FilterSelect
         label='Trạng thái'
         value={destroy}
-        onChange={(val) => {
-          setDestroy(val)
-        }}
+        onChange={setDestroy}
         options={[
           { label: 'Tất cả', value: '' },
           { label: 'Đang hoạt động', value: false },
@@ -216,6 +212,7 @@ export default function FilterInventory({
           size='small'
           color='error'
           onClick={handleReset}
+          sx={{ textTransform: 'none' }}
         >
           Làm mới
         </Button>

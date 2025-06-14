@@ -9,7 +9,7 @@ import Table from '@mui/material/Table'
 import TableBody from '@mui/material/TableBody'
 import TableRow from '@mui/material/TableRow'
 import TableCell from '@mui/material/TableCell'
-
+import Chip from '@mui/material/Chip'
 import StyleAdmin from '~/assets/StyleAdmin.jsx'
 
 const ViewTransactionModal = ({ open, onClose, transaction }) => {
@@ -17,6 +17,11 @@ const ViewTransactionModal = ({ open, onClose, transaction }) => {
     Pending: 'Chờ xử lý',
     Completed: 'Thành công',
     Failed: 'Thất bại'
+  }
+  const statusColor = {
+    Pending: 'warning',
+    Completed: 'success',
+    Failed: 'error'
   }
 
   if (!transaction) return null
@@ -72,7 +77,12 @@ const ViewTransactionModal = ({ open, onClose, transaction }) => {
               <TableRow>
                 <TableCell sx={{ fontWeight: 'bold' }}>Trạng thái</TableCell>
                 <TableCell>
-                  {statusLabel[transaction.status] || 'Không xác định'}
+                  <Chip
+                    label={statusLabel[transaction.status] || '—'}
+                    color={statusColor[transaction.status] || 'default'}
+                    size='large'
+                    sx={{ width: '120px', fontWeight: '800' }}
+                  />
                 </TableCell>
               </TableRow>
 
@@ -80,7 +90,7 @@ const ViewTransactionModal = ({ open, onClose, transaction }) => {
                 <TableCell sx={{ fontWeight: 'bold' }}>Số tiền</TableCell>
                 <TableCell>
                   {transaction.orderId?.total
-                    ? `${transaction.orderId.total.toLocaleString()} VNĐ`
+                    ? `${transaction.orderId.total.toLocaleString('vi-VN')}đ`
                     : 'Không có thông tin'}
                 </TableCell>
               </TableRow>

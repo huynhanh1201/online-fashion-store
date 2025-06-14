@@ -6,7 +6,7 @@ const getOrderItemList = async (orderId) => {
     const result = await OrderItemModel.find({ orderId })
       .populate({
         path: 'productId',
-        select: 'name image'
+        select: 'name'
       })
       .lean()
 

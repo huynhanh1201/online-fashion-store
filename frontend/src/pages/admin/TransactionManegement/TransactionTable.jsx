@@ -152,7 +152,7 @@ import {
 import TransactionRow from './TransactionRow'
 import FilterTransaction from '~/components/FilterAdmin/FilterTransaction'
 import StyleAdmin from '~/assets/StyleAdmin.jsx'
-
+import TablePaginationActions from '~/components/PaginationAdmin/TablePaginationActions.jsx'
 const TransactionTable = ({
   transactions = [],
   loading,
@@ -230,19 +230,24 @@ const TransactionTable = ({
       </Table>
 
       <TablePagination
+        rowsPerPageOptions={[10, 25, 100]}
         component='div'
-        count={total}
-        page={page}
+        count={total || 0}
         rowsPerPage={rowsPerPage}
-        onPageChange={(e, newPage) => onPageChange(e, newPage + 1)}
-        onRowsPerPageChange={(e) =>
-          onChangeRowsPerPage(parseInt(e.target.value, 10))
-        }
-        rowsPerPageOptions={[10, 25, 50]}
+        page={page}
+        onPageChange={(event, newPage) => onPageChange(event, newPage + 1)} // truyền lại đúng logic cho parent
+        onRowsPerPageChange={(event) => {
+          const newLimit = parseInt(event.target.value, 10)
+          if (onChangeRowsPerPage) {
+            onChangeRowsPerPage(newLimit)
+          }
+        }}
         labelRowsPerPage='Số dòng mỗi trang'
-        labelDisplayedRows={({ from, to, count }) =>
-          `${from}–${to} trên ${count !== -1 ? count : `hơn ${to}`}`
-        }
+        labelDisplayedRows={({ from, to, count }) => {
+          const totalPages = Math.ceil(count / rowsPerPage)
+          return `${from}–${to} trên ${count} | Trang ${page + 1} / ${totalPages}`
+        }}
+        ActionsComponent={TablePaginationActions}
       />
     </Paper>
   )

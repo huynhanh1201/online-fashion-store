@@ -41,57 +41,6 @@ export default function AdminAppBar({
         </Typography>
 
         <Box sx={{ flexGrow: 1 }} />
-
-        {/* Desktop avatar */}
-        {/*<Box sx={{ display: { xs: 'none', md: 'flex' }, alignItems: 'center' }}>*/}
-        {/*  <Typography variant='h6' noWrap component='div'>*/}
-        {/*    {profile?.name*/}
-        {/*      ?.toLowerCase()*/}
-        {/*      .split(' ')*/}
-        {/*      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))*/}
-        {/*      .join(' ') || ''}*/}
-        {/*  </Typography>*/}
-        {/*  <Box*/}
-        {/*    sx={{*/}
-        {/*      cursor: 'pointer',*/}
-        {/*      display: 'flex',*/}
-        {/*      alignItems: 'center',*/}
-        {/*      justifyContent: 'center',*/}
-        {/*      width: 40,*/}
-        {/*      height: 40*/}
-        {/*    }}*/}
-        {/*  >*/}
-        {/*    <IconButton*/}
-        {/*      size='large'*/}
-        {/*      aria-label='show notifications'*/}
-        {/*      color='inherit'*/}
-        {/*      onClick={handleModalOpen}*/}
-        {/*    >*/}
-        {/*      <Badge*/}
-        {/*        // badgeContent={notifications.filter((n) => !n.read).length}*/}
-        {/*        badgeContent={10}*/}
-        {/*        color='error'*/}
-        {/*      >*/}
-        {/*        <NotificationsIcon />*/}
-        {/*      </Badge>*/}
-        {/*    </IconButton>*/}
-        {/*  </Box>*/}
-        {/*  <IconButton*/}
-        {/*    size='large'*/}
-        {/*    edge='end'*/}
-        {/*    aria-label='account of current user'*/}
-        {/*    aria-controls={menuId}*/}
-        {/*    aria-haspopup='true'*/}
-        {/*    onClick={anchorEl ? onProfileMenuClose : onProfileMenuOpen}*/}
-        {/*    color='inherit'*/}
-        {/*  >*/}
-        {/*    <Avatar*/}
-        {/*      src={profile?.avatarUrl}*/}
-        {/*      alt={profile?.name}*/}
-        {/*      sx={{ width: 32, height: 32 }}*/}
-        {/*    />*/}
-        {/*  </IconButton>*/}
-        {/*</Box>*/}
         <Box
           sx={{
             cursor: 'pointer',

@@ -1,17 +1,42 @@
-import React from 'react'
-
-import Dialog from '@mui/material/Dialog'
-import DialogTitle from '@mui/material/DialogTitle'
-import DialogContent from '@mui/material/DialogContent'
-import DialogActions from '@mui/material/DialogActions'
-import TextField from '@mui/material/TextField'
-import Button from '@mui/material/Button'
-import Divider from '@mui/material/Divider'
+import React, { useState } from 'react'
+import {
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  TextField,
+  Button,
+  Divider,
+  Box,
+  Typography,
+  IconButton
+} from '@mui/material'
+import EditIcon from '@mui/icons-material/Edit'
+import DeleteIcon from '@mui/icons-material/Delete'
+import AddPhotoAlternateIcon from '@mui/icons-material/AddPhotoAlternate'
 
 import { useForm } from 'react-hook-form'
-
 import { addCategory } from '~/services/admin/categoryService'
 import StyleAdmin from '~/assets/StyleAdmin.jsx'
+
+const URI = 'https://api.cloudinary.com/v1_1/dkwsy9sph/image/upload'
+const CloudinaryCategory = 'category_upload'
+
+const uploadToCloudinary = async (file, folder = CloudinaryCategory) => {
+  const formData = new FormData()
+  formData.append('file', file)
+  formData.append('upload_preset', 'demo_unsigned')
+  formData.append('folder', folder)
+
+  const res = await fetch(URI, {
+    method: 'POST',
+    body: formData
+  })
+
+  if (!res.ok) throw new Error('Upload thất bại')
+  const data = await res.json()
+  return data.secure_url
+}
 
 const AddCategoryModal = ({ open, onClose, onAdded, onSave }) => {
   const {
@@ -21,62 +46,178 @@ const AddCategoryModal = ({ open, onClose, onAdded, onSave }) => {
     reset
   } = useForm()
 
+  const [imageFile, setImageFile] = useState(null)
+  const [previewUrl, setPreviewUrl] = useState('')
+
   const onSubmit = async (data) => {
-    const payload = {
-      name: data.name,
-      description: data.description || ''
-    }
-    const result = await addCategory(payload)
-    if (result) {
-      if (onSave) {
-        onSave()
+    try {
+      let imageUrl = ''
+      if (imageFile) {
+        imageUrl = await uploadToCloudinary(imageFile)
       }
-      onAdded() // callback để load lại danh sách
-      onClose()
-      reset()
-    } else {
-      alert('Thêm danh mục thất bại. Vui lòng thử lại!')
+
+      const payload = {
+        name: data.name,
+        description: data.description || '',
+        image: imageUrl
+      }
+
+      const result = await addCategory(payload)
+      if (result) {
+        if (onSave) onSave()
+        onAdded()
+        onClose()
+        reset()
+        setImageFile(null)
+        setPreviewUrl('')
+      } else {
+        console.log('Thêm danh mục thất bại. Vui lòng thử lại!')
+      }
+    } catch {
+      console.log('Lỗi khi tải ảnh hoặc thêm danh mục!')
     }
   }
 
   const handleClose = () => {
     reset()
+    setImageFile(null)
+    setPreviewUrl('')
     onClose()
   }
+
+  const handleImageChange = (e) => {
+    const file = e.target.files[0]
+    if (file) {
+      setImageFile(file)
+      setPreviewUrl(URL.createObjectURL(file))
+    }
+  }
+
+  const handleImageRemove = () => {
+    setImageFile(null)
+    setPreviewUrl('')
+  }
+
+  const fileInputRef = React.useRef()
 
   return (
     <Dialog
       open={open}
       onClose={handleClose}
       fullWidth
-      maxWidth='sm'
-      BackdropProps={{
-        sx: StyleAdmin.OverlayModal
-      }}
+      maxWidth='md'
+      BackdropProps={{ sx: StyleAdmin.OverlayModal }}
     >
       <DialogTitle>Thêm danh mục mới</DialogTitle>
       <Divider sx={{ my: 0 }} />
       <form onSubmit={handleSubmit(onSubmit)}>
         <DialogContent>
-          <TextField
-            label='Tên danh mục'
-            fullWidth
-            margin='normal'
-            {...register('name', { required: 'Tên danh mục là bắt buộc' })}
-            error={!!errors.name}
-            helperText={errors.name?.message}
-            sx={StyleAdmin.InputCustom}
-          />
-          <TextField
-            label='Mô tả'
-            fullWidth
-            margin='normal'
-            multiline
-            rows={3}
-            {...register('description', { required: 'Mô tả là bắt buộc' })}
-            sx={StyleAdmin.InputCustom}
-          />
+          <Box
+            display='flex'
+            gap={3}
+            flexDirection={{ xs: 'column', sm: 'row' }}
+          >
+            {/* Vùng ảnh bên trái */}
+            <Box
+              display='flex'
+              flexDirection='column'
+              alignItems='center'
+              justifyContent='center'
+              border='2px dashed #ccc'
+              borderRadius={2}
+              p={2}
+              position='relative'
+              minHeight={200}
+              sx={{
+                backgroundColor: '#fafafa',
+                cursor: 'pointer',
+                width: 350,
+                height: 206
+              }}
+              onClick={() => !previewUrl && fileInputRef.current.click()}
+            >
+              {previewUrl ? (
+                <>
+                  <img
+                    src={previewUrl}
+                    alt='Ảnh danh mục'
+                    style={{
+                      width: '100%',
+                      maxHeight: 200,
+                      objectFit: 'contain',
+                      borderRadius: 8
+                    }}
+                  />
+                  <Box
+                    position='absolute'
+                    top={8}
+                    right={8}
+                    display='flex'
+                    gap={1}
+                  >
+                    <IconButton
+                      size='small'
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        fileInputRef.current.click()
+                      }}
+                    >
+                      <EditIcon fontSize='small' />
+                    </IconButton>
+                    <IconButton
+                      size='small'
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        handleImageRemove()
+                      }}
+                    >
+                      <DeleteIcon fontSize='small' />
+                    </IconButton>
+                  </Box>
+                </>
+              ) : (
+                <Box textAlign='center' color='#999'>
+                  <AddPhotoAlternateIcon fontSize='large' />
+                  <Typography fontSize={14} mt={1}>
+                    Thêm ảnh màu
+                  </Typography>
+                </Box>
+              )}
+              <input
+                type='file'
+                accept='image/*'
+                ref={fileInputRef}
+                style={{ display: 'none' }}
+                onChange={handleImageChange}
+              />
+            </Box>
+
+            {/* Thông tin bên phải */}
+            <Box flex={1}>
+              <TextField
+                label='Tên danh mục'
+                fullWidth
+                margin='normal'
+                {...register('name', { required: 'Tên danh mục là bắt buộc' })}
+                error={!!errors.name}
+                helperText={errors.name?.message}
+                sx={StyleAdmin.InputCustom}
+              />
+              <TextField
+                label='Mô tả'
+                fullWidth
+                margin='normal'
+                multiline
+                rows={3}
+                {...register('description', { required: 'Mô tả là bắt buộc' })}
+                error={!!errors.description}
+                helperText={errors.description?.message}
+                sx={StyleAdmin.InputCustom}
+              />
+            </Box>
+          </Box>
         </DialogContent>
+
         <Divider sx={{ my: 0 }} />
         <DialogActions sx={{ padding: '16px 24px' }}>
           <Button color='inherit' onClick={handleClose}>

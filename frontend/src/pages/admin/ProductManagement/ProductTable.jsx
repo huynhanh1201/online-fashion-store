@@ -184,7 +184,7 @@ import {
 import ProductRow from './ProductRow'
 import AddIcon from '@mui/icons-material/Add'
 import FilterProduct from '~/components/FilterAdmin/FilterPoduct.jsx'
-
+import TablePaginationActions from '~/components/PaginationAdmin/TablePaginationActions.jsx'
 const ProductTable = ({
   products,
   loading,
@@ -313,7 +313,7 @@ const ProductTable = ({
         count={total || 0}
         rowsPerPage={rowsPerPage}
         page={page}
-        onPageChange={(event, newPage) => onPageChange(event, newPage + 1)}
+        onPageChange={(event, newPage) => onPageChange(event, newPage + 1)} // truyền lại đúng logic cho parent
         onRowsPerPageChange={(event) => {
           const newLimit = parseInt(event.target.value, 10)
           if (onChangeRowsPerPage) {
@@ -321,9 +321,11 @@ const ProductTable = ({
           }
         }}
         labelRowsPerPage='Số dòng mỗi trang'
-        labelDisplayedRows={({ from, to, count }) =>
-          `${from}–${to} trên ${count !== -1 ? count : `hơn ${to}`}`
-        }
+        labelDisplayedRows={({ from, to, count }) => {
+          const totalPages = Math.ceil(count / rowsPerPage)
+          return `${from}–${to} trên ${count} | Trang ${page + 1} / ${totalPages}`
+        }}
+        ActionsComponent={TablePaginationActions}
       />
     </Paper>
   )

@@ -84,9 +84,7 @@ export default function FilterColor({
       <FilterSelect
         label='Trạng thái'
         value={status}
-        onChange={(value) => {
-          setStatus(value)
-        }}
+        onChange={setStatus}
         options={[
           { label: 'Tất cả', value: '' },
           { label: 'Hoạt động', value: false },
@@ -109,7 +107,7 @@ export default function FilterColor({
 
       <Box sx={{ display: 'flex', gap: 2 }}>
         <SearchWithSuggestions
-          label='Tìm màu sắc'
+          label='Tên màu sắc'
           options={colors.map((color) => color.name)}
           loading={loading}
           keyword={keyword}
@@ -124,6 +122,7 @@ export default function FilterColor({
           size='small'
           color='error'
           onClick={handleReset}
+          sx={{ textTransform: 'none' }}
         >
           Làm mới
         </Button>
