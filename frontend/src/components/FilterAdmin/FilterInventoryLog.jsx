@@ -221,7 +221,7 @@ export default function FilterInventoryLog({
       />
       <Box sx={{ display: 'flex', gap: 2 }}>
         <SearchWithSuggestions
-          label='Tìm kiếm phiếu'
+          label='Mã phiếu'
           keyword={keyword}
           inputValue={inputValue}
           setKeyword={setKeyword}

@@ -59,7 +59,7 @@ const FilterByTime = ({
         }}
       >
         {selectedFilter === 'custom' && startDate && endDate
-          ? `${dayjs(startDate).format('DD/MM')} - ${dayjs(endDate).format('DD/MM')}`
+          ? `${dayjs(startDate).format('DD/MM/YY')} - ${dayjs(endDate).format('DD/MM/YY')}`
           : filterDate.find((item) => item.value === selectedFilter)?.label ||
             label ||
             'Lọc theo thời gian'}

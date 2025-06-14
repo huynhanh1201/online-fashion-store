@@ -102,7 +102,7 @@ export default function FilterSize({
 
       <Box sx={{ display: 'flex', gap: 2 }}>
         <SearchWithSuggestions
-          label='Tìm kích cỡ'
+          label='Tên kích cỡ'
           options={sizes.map((size) => size.name)}
           loading={loading}
           keyword={keyword}

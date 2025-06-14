@@ -107,7 +107,7 @@ export default function FilterPartner({
       />
 
       <SearchWithSuggestions
-        label='Tìm kiếm đối tác'
+        label='Tên đối tác'
         options={partners.map((p) => p.name)}
         loading={loading}
         keyword={keyword}

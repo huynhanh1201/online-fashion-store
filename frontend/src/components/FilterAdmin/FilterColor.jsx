@@ -109,7 +109,7 @@ export default function FilterColor({
 
       <Box sx={{ display: 'flex', gap: 2 }}>
         <SearchWithSuggestions
-          label='Tìm màu sắc'
+          label='Tên màu sắc'
           options={colors.map((color) => color.name)}
           loading={loading}
           keyword={keyword}

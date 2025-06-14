@@ -220,7 +220,7 @@ export default function FilterOrder({
       {/*/>*/}
       <Box sx={{ display: 'flex', gap: 2 }}>
         <SearchWithSuggestions
-          label='Tìm theo tên người đặt'
+          label='Tên người đặt'
           options={users.map((u) => u.name)} // có thể truyền users.map(u => u.name) nếu muốn
           keyword={keyword}
           inputValue={inputValue}

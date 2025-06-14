@@ -330,7 +330,7 @@ export default function AdminDrawer({ open, profile, onDrawerOpen, onClose }) {
                 <WarehouseIcon />
               </ListItemIcon>
               <ListItemText primary='Quản lý kho' />
-              {openOrder ? <ExpandLess /> : <ExpandMore />}
+              {openInventory ? <ExpandLess /> : <ExpandMore />}
             </ListItemButton>
           </ListItem>
           <Collapse in={openInventory} timeout='auto' unmountOnExit>

@@ -236,7 +236,7 @@ export default function FilterDiscount({
       />
       <Box display='flex' gap={2}>
         <SearchWithSuggestions
-          label='Tìm mã giảm giá'
+          label='Mã giảm giá'
           keyword={keyword}
           inputValue={inputValue}
           setKeyword={setKeyword}

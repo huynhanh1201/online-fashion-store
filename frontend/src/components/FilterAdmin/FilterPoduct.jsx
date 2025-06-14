@@ -164,7 +164,7 @@ export default function FilterProduct({
       <Box sx={{ display: 'flex', gap: 2 }}>
         {' '}
         <SearchWithSuggestions
-          label='Tìm sản phẩm'
+          label='Tên sản phẩm'
           options={products.map((p) => p.name)}
           loading={loading}
           keyword={keyword}

@@ -137,7 +137,7 @@ const CategoryTable = ({
         component='div'
         count={total || 0}
         rowsPerPage={rowsPerPage}
-        page={page} // page - 1 vì MUI bắt đầu từ 0
+        page={page}
         onPageChange={(event, newPage) => onPageChange(event, newPage + 1)} // truyền lại đúng logic cho parent
         onRowsPerPageChange={(event) => {
           const newLimit = parseInt(event.target.value, 10)

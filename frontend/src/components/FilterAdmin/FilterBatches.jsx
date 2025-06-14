@@ -193,7 +193,7 @@ export default function FilterBatches({
       />
       <Box sx={{ display: 'flex', gap: 2 }}>
         <SearchWithSuggestions
-          label='Lô hàng'
+          label='Mã lô hàng'
           options={batches.map((b) => b.batchCode)}
           keyword={keyword}
           inputValue={inputValue}

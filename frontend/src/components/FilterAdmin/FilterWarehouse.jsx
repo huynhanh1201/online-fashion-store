@@ -230,7 +230,7 @@ export default function FilterWarehouse({
       />
       <Box sx={{ display: 'flex', gap: 2 }}>
         <SearchWithSuggestions
-          label='Tìm kiếm kho'
+          label='Tên kho'
           keyword={keyword}
           inputValue={inputValue}
           setKeyword={setKeyword}

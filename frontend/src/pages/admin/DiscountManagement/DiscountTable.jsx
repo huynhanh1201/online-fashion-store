@@ -181,7 +181,9 @@ const DiscountTable = ({
   onAction,
   fetchDiscounts,
   total,
-  onFilter
+  onFilter,
+  onPageChange,
+  onChangeRowsPerPage
 }) => {
   const columns = [
     { id: 'index', label: 'STT', minWidth: 50, align: 'center' },
@@ -276,14 +278,18 @@ const DiscountTable = ({
         count={total || 0}
         rowsPerPage={rowsPerPage}
         page={page}
-        onPageChange={(event, newPage) => onFilter({ page: newPage + 1 })}
-        onRowsPerPageChange={(event) =>
-          onFilter({ limit: parseInt(event.target.value, 10) })
-        }
+        onPageChange={(event, newPage) => onPageChange(event, newPage + 1)} // truyền lại đúng logic cho parent
+        onRowsPerPageChange={(event) => {
+          const newLimit = parseInt(event.target.value, 10)
+          if (onChangeRowsPerPage) {
+            onChangeRowsPerPage(newLimit)
+          }
+        }}
         labelRowsPerPage='Số dòng mỗi trang'
-        labelDisplayedRows={({ from, to, count }) =>
-          `${from}–${to} trên ${count !== -1 ? count : `hơn ${to}`}`
-        }
+        labelDisplayedRows={({ from, to, count }) => {
+          const totalPages = Math.ceil(count / rowsPerPage)
+          return `${from}–${to} trên ${count} | Trang ${page + 1} / ${totalPages}`
+        }}
       />
     </Paper>
   )

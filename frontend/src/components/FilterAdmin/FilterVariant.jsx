@@ -236,7 +236,7 @@ export default function FilterVariant({
 
       <Box sx={{ display: 'flex', gap: 2 }}>
         <SearchWithSuggestions
-          label='Tìm biến thể'
+          label='Tên biến thể'
           options={variants.map((v) => v.name)}
           loading={loading}
           keyword={keyword}
