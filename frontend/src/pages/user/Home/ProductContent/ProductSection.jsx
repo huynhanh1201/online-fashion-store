@@ -14,7 +14,7 @@ const styles = {
   },
   banner: {
     position: 'relative',
-    height: '440px',
+    height: '550px',
     borderRadius: '10px',
     overflow: 'hidden',
     gridColumn: '1',
@@ -115,7 +115,7 @@ const ProductSection = ({ bannerImg, bannerTitle, bannerDesc, products, loading,
 
         {/* Products */}
         {!loading && !error && products && products.length > 0 ? (
-          products.map((product) => {
+          products.slice(0, 4).map((product) => {
             // Xử lý ảnh sản phẩm
             let productImage = 'https://via.placeholder.com/220x220?text=No+Image'
 

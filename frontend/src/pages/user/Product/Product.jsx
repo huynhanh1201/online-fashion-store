@@ -334,15 +334,20 @@ const Product = () => {
             </Typography>
           ) : (
             <>
-              <div className="product-grid">
+              <div className="product-grid" style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(5, 1fr)',
+                gap: '20px',
+                padding: '0 10px'
+              }}>
                 {products.map((product) => (
-                  <Grid item xs={12} sm={6} md={4} lg={3} key={product._id}>
+                  <div key={product._id}>
                     <ProductCard
                       product={product}
                       handleAddToCart={handleAddToCart}
                       isAdding={!!isAdding[product._id]}
                     />
-                  </Grid>
+                  </div>
                 ))}
               </div>
 

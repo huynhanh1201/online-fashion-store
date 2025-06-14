@@ -6,7 +6,7 @@ const FlashSaleSection = ({ products, loading, error }) => {
   if (error) return <div>Failed to load flash sale products.</div>
   if (!products || products.length === 0) return null
 
-  const flashSaleProducts = products.slice(0, 6)
+  const flashSaleProducts = products.slice(0, 5)
 
   // ======= STYLES =======
   const styles = {

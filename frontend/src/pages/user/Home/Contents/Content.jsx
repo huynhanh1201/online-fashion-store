@@ -62,56 +62,6 @@ const Content = () => {
       link: '/categories/ao-so-mi'
     }
   ]
-
-  const vouchers = [
-    { amount: '150k', condition: 'Đơn từ 0Đ' },
-    { amount: '30.000Đ', condition: 'Đơn từ 0Đ' },
-    { amount: '99.000Đ', condition: 'Đơn từ 0Đ' },
-    { amount: '100.000Đ', condition: 'Đơn từ 0Đ' }
-  ]
-
-  const stitchProducts = [
-    {
-      name: 'Áo Thun Stitch Chính Hãng Disney Unisex',
-      price: '249.000đ',
-      originalPrice: '350.000đ',
-      discount: '29%',
-      rating: 4.5,
-      sold: '2.3k'
-    },
-    {
-      name: 'Áo Thun Stitch Chính Hãng Disney Unisex',
-      price: '249.000đ',
-      originalPrice: '350.000đ',
-      discount: '29%',
-      rating: 4.5,
-      sold: '2.3k'
-    },
-    {
-      name: 'Áo Stitch Gaming',
-      price: '156.000đ',
-      originalPrice: '200.000đ',
-      discount: '22%',
-      rating: 4.7,
-      sold: '1.8k'
-    },
-    {
-      name: 'Áo Thun Stitch Gaming Stitch Đen Hàng Có Sẵn',
-      price: '69.000đ',
-      originalPrice: '120.000đ',
-      discount: '43%',
-      rating: 4.3,
-      sold: '5.2k'
-    },
-    {
-      name: 'Áo Thun Stitch Gaming Stitch Xanh Hàng Có Sẵn',
-      price: '69.000đ',
-      originalPrice: '120.000đ',
-      discount: '43%',
-      rating: 4.6,
-      sold: '3.1k'
-    }
-  ]
   return (
     <div className='content-container'>
       {/* Features Section */}
@@ -188,8 +138,16 @@ const Content = () => {
       <div className='stitch-banner'></div>
 
       {/* Stitch Products */}
-      <div className='product-grid'>
-        {[...products.slice(-(window.innerWidth < 1460 ? 5 : 6))].reverse().map((product) => (
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
+        gap: '20px',
+        padding: '0 10px',
+        width: '100%',
+        maxWidth: '1800px',
+        margin: '0 auto'
+      }}>
+        {[...products.slice(-5)].reverse().map((product) => (
           <ProductCard key={product._id || product.id} product={product} />
         ))}
       </div>
