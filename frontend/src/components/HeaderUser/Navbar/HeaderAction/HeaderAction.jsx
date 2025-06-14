@@ -7,10 +7,12 @@ import {
   Grow,
   Fade,
   Paper,
-  Avatar
+  Avatar,
+  Typography
 } from '@mui/material'
 import PersonIcon from '@mui/icons-material/Person'
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart'
+import CheckCircleIcon from '@mui/icons-material/CheckCircle'
 import { Link, useNavigate } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import {
@@ -161,9 +163,53 @@ const HeaderAction = () => {
                   onClick={handleClose}
                   component={Link}
                   to='/profile'
-                  sx={{ fontWeight: 'bold', opacity: 1 }}
+                  sx={{ 
+                    fontWeight: 'bold', 
+                    opacity: 1,
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 1,
+                    padding: '12px 16px',
+                    backgroundColor: 'rgba(0, 0, 0, 0.04)',
+                    '&:hover': {
+                      backgroundColor: 'rgba(0, 0, 0, 0.08)',
+                    }
+                  }}
                 >
-                  {currentUser.name}
+                  <Avatar
+                    src={currentUser.avatarUrl}
+                    alt={currentUser.name || 'User'}
+                    sx={{ 
+                      width: 32, 
+                      height: 32,
+                      border: '2px solid #1976d2',
+                      boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+                      transition: 'transform 0.2s ease-in-out',
+                      '&:hover': {
+                        transform: 'scale(1.05)'
+                      }
+                    }}
+                  />
+                  <Typography
+                    sx={{
+                      color: '#1976d2',
+                      fontSize: '1rem',
+                      fontWeight: 600,
+                      letterSpacing: '0.5px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 0.5
+                    }}
+                  >
+                    {currentUser.name}
+                    <CheckCircleIcon 
+                      sx={{ 
+                        fontSize: '1.1rem',
+                        color: '#4caf50',
+                        ml: 0.5
+                      }} 
+                    />
+                  </Typography>
                 </MenuItem>
                 <MenuItem onClick={handleClose} component={Link} to='/profile'>
                   Hồ sơ

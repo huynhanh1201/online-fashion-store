@@ -1,5 +1,5 @@
-import React, { useState } from 'react'
-import { Box, Fade } from '@mui/material'
+import React, { useState, useEffect } from 'react'
+import { Box, Fade, Modal } from '@mui/material'
 import { styled } from '@mui/system'
 
 const ProductImage = styled('img')(() => ({
@@ -8,10 +8,45 @@ const ProductImage = styled('img')(() => ({
   objectFit: 'cover',
   boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
   transition: 'transform 0.3s ease, box-shadow 0.3s ease',
+  cursor: 'zoom-in',
   '&:hover': {
     transform: 'scale(1.02)',
     boxShadow: '0 12px 40px rgba(0, 0, 0, 0.15)'
   }
+}))
+
+const EnlargedImage = styled('img')(() => ({
+  width: 'min(90vw, 700px)',
+  height: 'min(90vh, 600px)',
+  objectFit: 'cover',
+  borderRadius: '8px',
+  boxShadow: '0 8px 32px rgba(0, 0, 0, 0.2)',
+}))
+
+const ModalContent = styled(Box)(() => ({
+  position: 'absolute',
+  top: '50%',
+  left: '50%',
+  transform: 'translate(-50%, -50%)',
+  backgroundColor: 'transparent',
+  padding: 0,
+  outline: 'none',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center'
+}))
+
+const ModalOverlay = styled(Box)(() => ({
+  position: 'fixed',
+  top: 0,
+  left: 0,
+  right: 0,
+  bottom: 0,
+  backgroundColor: 'rgba(0, 0, 0, 0.8)',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  zIndex: 1300
 }))
 
 const Thumbnail = styled('img')(({ selected }) => ({
@@ -89,130 +124,138 @@ const ProductImageSection = ({
   selectedVariant
 }) => {
   const [isThumbnailClicked, setIsThumbnailClicked] = useState(false)
+  const [isModalOpen, setIsModalOpen] = useState(false)
 
-  // Reset isThumbnailClicked khi selectedVariant thay đổi
-  React.useEffect(() => {
+  useEffect(() => {
     setIsThumbnailClicked(false)
   }, [selectedVariant])
 
-  // Lấy danh sách ảnh hiện tại
   const currentImages = getCurrentImages
     ? getCurrentImages()
     : images?.length > 0
       ? images
       : ['/default.jpg']
 
-  // Thumbnail luôn hiển thị danh sách ảnh của sản phẩm
   const displayImages = images?.length > 0 ? images : ['/default.jpg']
 
-  // Ảnh chính
   const mainImage = isThumbnailClicked
     ? displayImages[selectedImageIndex] || displayImages[0] || '/default.jpg'
     : selectedVariant?.color?.image
       ? selectedVariant.color.image
       : displayImages[selectedImageIndex] || displayImages[0] || '/default.jpg'
 
+  const handleOpenModal = () => {
+    setIsModalOpen(true)
+  }
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false)
+  }
+
   return (
-    <Box
-      sx={{
-        width: { xs: '100%', md: 550 },
-        height: { xs: 'auto', md: 600 },
-        mb: 6,
-        p: { xs: 1, sm: 2, md: 2 },
-        display: 'flex',
-        flexDirection: { xs: 'column', md: 'row' },
-        alignItems: { xs: 'center', md: 'flex-start' },
-        justifyContent: 'center',
-      }}
-    >
-      {/* Thumbnail bên trái ở md trở lên */}
-      {/** Ẩn thumbnail ở màn nhỏ */}
-      <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
-        <ThumbnailContainer
-          sx={{
-            maxHeight: { xs: 80, sm: 120, md: 520 },
-            minWidth: { xs: 0, md: 100 },
-            flexDirection: 'column',
-            gap: 2,
-            marginRight: 2,
-            marginBottom: 0,
-          }}
-        >
-          {displayImages.map((img, index) => (
-            <Thumbnail
-              key={`${img}-${index}`}
-              src={img}
-              alt={`thumb-${index}`}
-              selected={index === selectedImageIndex}
-              onClick={() => {
-                setIsThumbnailClicked(true)
-                onImageClick(index)
-              }}
-              onError={(e) => {
-                e.target.onerror = null
-                e.target.src = '/default.jpg'
-              }}
-              style={{ width: 100, height: 100 }}
-            />
-          ))}
-        </ThumbnailContainer>
-      </Box>
-      <Fade
-        in={fadeIn}
-        timeout={300}
-        key={`${selectedColor || ''}-${selectedSize || ''}-${selectedVariant?._id || ''}`}
+    <>
+      <Box
+        sx={{
+          width: { xs: '100%', md: 550 },
+          height: { xs: 'auto', md: 600 },
+          mb: 6,
+          p: { xs: 1, sm: 2, md: 2 },
+          display: 'flex',
+          flexDirection: { xs: 'column', md: 'row' },
+          alignItems: { xs: 'center', md: 'flex-start' },
+          justifyContent: 'center',
+        }}
       >
-        <MainImageContainer
-          sx={{
-            width: { xs: 220, sm: 320, md: 520 },
-            height: { xs: 220, sm: 320, md: 520 },
-            mb: 2
-          }}
+        {/* Thumbnail bên trái ở md trở lên */}
+        <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
+          <ThumbnailContainer>
+            {displayImages.map((img, index) => (
+              <Thumbnail
+                key={`${img}-${index}`}
+                src={img}
+                alt={`thumb-${index}`}
+                selected={index === selectedImageIndex}
+                onClick={() => {
+                  setIsThumbnailClicked(true)
+                  onImageClick(index)
+                }}
+                onError={(e) => {
+                  e.target.onerror = null
+                  e.target.src = '/default.jpg'
+                }}
+              />
+            ))}
+          </ThumbnailContainer>
+        </Box>
+
+        <Fade
+          in={fadeIn}
+          timeout={300}
+          key={`${selectedColor || ''}-${selectedSize || ''}-${selectedVariant?._id || ''}`}
         >
-          <ProductImage
-            src={mainImage}
-            alt={selectedVariant?.name || 'Sản phẩm'}
-            onError={(e) => {
-              e.target.onerror = null
-              e.target.src = '/default.jpg'
+          <MainImageContainer
+            sx={{
+              width: { xs: 220, sm: 320, md: 520 },
+              height: { xs: 220, sm: 320, md: 520 },
+              mb: 2
             }}
-          />
-        </MainImageContainer>
-      </Fade>
-      {/* Thumbnail dưới ảnh ở màn nhỏ */}
-      <Box sx={{ display: { xs: 'flex', md: 'none' }, width: '100%', justifyContent: 'center', mt: 2 }}>
-        <ThumbnailContainer
-          sx={{
-            maxHeight: 80,
-            minWidth: 0,
-            flexDirection: 'row',
-            gap: 1,
-            marginRight: 0,
-            marginBottom: 0,
-            width: 'auto',
-            justifyContent: 'center',
-          }}
-        >
-          {displayImages.map((img, index) => (
-            <Thumbnail
-              key={`${img}-${index}`}
-              src={img}
-              alt={`thumb-${index}`}
-              selected={index === selectedImageIndex}
-              onClick={() => {
-                setIsThumbnailClicked(true)
-                onImageClick(index)
-              }}
+          >
+            <ProductImage
+              src={mainImage}
+              alt={selectedVariant?.name || 'Sản phẩm'}
+              onClick={handleOpenModal}
               onError={(e) => {
                 e.target.onerror = null
                 e.target.src = '/default.jpg'
               }}
-              style={{ width: 60, height: 60 }}
             />
-          ))}
-        </ThumbnailContainer>
+          </MainImageContainer>
+        </Fade>
+
+        {/* Thumbnail dưới ảnh ở màn nhỏ */}
+        <Box sx={{ display: { xs: 'flex', md: 'none' }, width: '100%', justifyContent: 'center', mt: 2 }}>
+          <ThumbnailContainer sx={{ flexDirection: 'row', maxHeight: 80 }}>
+            {displayImages.map((img, index) => (
+              <Thumbnail
+                key={`${img}-${index}`}
+                src={img}
+                alt={`thumb-${index}`}
+                selected={index === selectedImageIndex}
+                onClick={() => {
+                  setIsThumbnailClicked(true)
+                  onImageClick(index)
+                }}
+                onError={(e) => {
+                  e.target.onerror = null
+                  e.target.src = '/default.jpg'
+                }}
+                style={{ width: 60, height: 60 }}
+              />
+            ))}
+          </ThumbnailContainer>
+        </Box>
       </Box>
-    </Box>
+
+      {/* Modal zoom ảnh */}
+      <Modal
+        open={isModalOpen}
+        onClose={handleCloseModal}
+        aria-labelledby="zoom-image-modal"
+      >
+        <ModalOverlay onClick={handleCloseModal}>
+          <ModalContent onClick={(e) => e.stopPropagation()}>
+            <EnlargedImage
+              src={mainImage}
+              alt={selectedVariant?.name || 'Sản phẩm'}
+              onError={(e) => {
+                e.target.onerror = null
+                e.target.src = '/default.jpg'
+              }}
+            />
+          </ModalContent>
+        </ModalOverlay>
+      </Modal>
+    </>
   )
 }
 

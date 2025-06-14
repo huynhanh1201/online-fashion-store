@@ -7,43 +7,74 @@ import {
   Grid,
   Snackbar,
   Alert,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
   Typography,
   CircularProgress,
-  styled
+  styled,
+  Pagination
 } from '@mui/material'
 import { useDispatch } from 'react-redux'
 import { setCartItems } from '~/redux/cart/cartSlice'
+import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward'
+import SortByAlphaIcon from '@mui/icons-material/SortByAlpha'
 
-const LOAD_COUNT = 5
-const CustomSelect = styled(Select)(({ theme }) => ({
-  '& .MuiSelect-select': {
-    padding: '8px 32px 8px 12px',
-    fontSize: '14px',
-    display: 'flex',
-    alignItems: 'center'
-  },
-  '& .MuiSelect-icon': {
-    color: theme.palette.text.primary
-  },
-  '& .MuiOutlinedInput-notchedOutline': {
-    borderColor: theme.palette.grey[400]
-  },
-  '&:hover .MuiOutlinedInput-notchedOutline': {
-    borderColor: theme.palette.grey[600]
-  },
-  '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-    borderColor: theme.palette.primary.main,
-    borderWidth: '1px'
+const ITEMS_PER_PAGE = 6
+
+// Custom styled button to mimic the dropdown in the image
+const SortDropdownButton = styled('button')(({ theme }) => ({
+  border: '1px solid #222',
+  background: '#fff',
+  borderRadius: 0,
+  padding: '4px ',
+  fontSize: 15,
+  display: 'flex',
+  alignItems: 'center',
+  gap: 8,
+  cursor: 'pointer',
+  position: 'relative',
+  minWidth: 180,
+  fontFamily: 'inherit',
+  transition: 'border 0.2s',
+  outline: 'none',
+  '&:hover, &:focus': {
+    border: '1.5px solid #111'
   }
 }))
 
+const SortMenu = styled('div')(({ theme }) => ({
+  position: 'absolute',
+  top: '110%',
+  right: 0,
+  background: '#fff',
+  border: '1px solid #222',
+  borderRadius: 0,
+  minWidth: 180,
+  zIndex: 10,
+  boxShadow: '0 2px 8px rgba(0,0,0,0.08)'
+}))
+
+const SortMenuItem = styled('div')(({ theme }) => ({
+  padding: '10px 18px',
+  fontSize: 14,
+  cursor: 'pointer',
+  color: '#222',
+  background: '#fff',
+  '&:hover': {
+    background: '#f5f5f5'
+  }
+}))
+
+const sortOptions = [
+  { value: '', label: 'Mặc định' },
+  { value: 'priceAsc', label: 'Giá tăng dần' },
+  { value: 'priceDesc', label: 'Giá giảm dần' },
+  { value: 'nameAsc', label: 'Sản phẩm từ A-Z' },
+  { value: 'nameDesc', label: 'Sản phẩm từ Z-A' }
+]
+
 const styles = {
   container: {
-    maxWidth: '1450px',
+    margin: '0 auto',
+    maxWidth: '1800px',
     minHeight: '100vh',
     fontFamily:
       '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif'
@@ -51,7 +82,9 @@ const styles = {
   header: {
     display: 'flex',
     justifyContent: 'space-between',
-    padding: '16px'
+    alignItems: 'center',
+    padding: '16px',
+    marginBottom: '2rem'
   },
   headerContent: {
     maxWidth: '1200px',
@@ -62,8 +95,7 @@ const styles = {
     alignItems: 'center'
   },
   resultsHeader: {
-    marginBottom: '2.5rem',
-    padding: '0 1.5rem'
+    flex: 1
   },
   resultsTitle: {
     color: '#1A3C7B',
@@ -80,6 +112,11 @@ const styles = {
     fontSize: '1.1rem',
     margin: 0,
     fontWeight: '500'
+  },
+  sortContainer: {
+    display: 'flex',
+    alignItems: 'center',
+    marginLeft: '2rem'
   }
 }
 
@@ -87,12 +124,13 @@ export default function SearchResults() {
   const dispatch = useDispatch()
   const [products, setProducts] = useState([])
   const [filteredProducts, setFilteredProducts] = useState([])
-  const [visibleProducts, setVisibleProducts] = useState([])
   const [sortOption, setSortOption] = useState('')
   const [snackbar, setSnackbar] = useState(null)
   const [isAdding, setIsAdding] = useState({})
   const [loading, setLoading] = useState(true)
   const [errorMessage, setErrorMessage] = useState('')
+  const [sortMenuOpen, setSortMenuOpen] = useState(false)
+  const [page, setPage] = useState(1)
   const location = useLocation()
 
   // Lấy truy vấn tìm kiếm từ URL
@@ -102,7 +140,7 @@ export default function SearchResults() {
     const fetchProducts = async () => {
       setLoading(true)
       try {
-        const { products: allProducts } = await getProducts(1, 20) // Giả sử API hỗ trợ phân trang
+        const { products: allProducts } = await getProducts(1, 20)
         const filtered = allProducts
           .filter((p) => p.name.toLowerCase().includes(query.toLowerCase()))
           .map((p) => ({
@@ -121,7 +159,6 @@ export default function SearchResults() {
         } else {
           setProducts(filtered)
           setFilteredProducts(filtered)
-          setVisibleProducts(filtered.slice(0, LOAD_COUNT))
           setErrorMessage('')
         }
       } catch (error) {
@@ -166,32 +203,18 @@ export default function SearchResults() {
     }
 
     setFilteredProducts(sortedProducts)
-    setVisibleProducts(sortedProducts.slice(0, LOAD_COUNT))
+    setPage(1) // Reset to first page when sorting changes
   }, [products, sortOption])
 
-  // Infinite Scroll
-  useEffect(() => {
-    const handleScroll = () => {
-      if (
-        window.innerHeight + window.scrollY >=
-          document.body.offsetHeight - 300 &&
-        !loading &&
-        visibleProducts.length < filteredProducts.length
-      ) {
-        setLoading(true)
-        setTimeout(() => {
-          setVisibleProducts((prev) => [
-            ...prev,
-            ...filteredProducts.slice(prev.length, prev.length + LOAD_COUNT)
-          ])
-          setLoading(false)
-        }, 500)
-      }
-    }
+  const handlePageChange = (event, value) => {
+    setPage(value)
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
 
-    window.addEventListener('scroll', handleScroll)
-    return () => window.removeEventListener('scroll', handleScroll)
-  }, [filteredProducts, visibleProducts, loading])
+  const paginatedProducts = filteredProducts.slice(
+    (page - 1) * ITEMS_PER_PAGE,
+    page * ITEMS_PER_PAGE
+  )
 
   const handleAddToCart = async (product) => {
     if (isAdding[product._id]) return
@@ -203,7 +226,7 @@ export default function SearchResults() {
         (item) => item.productId._id === product._id
       )
       const currentQty = existingItem?.quantity || 0
-      const maxQty = product.quantity || 10 // Giả định maxQty nếu không có
+      const maxQty = product.quantity || 10
 
       if (currentQty >= maxQty) {
         setSnackbar({
@@ -232,36 +255,69 @@ export default function SearchResults() {
     }
   }
 
+  // For closing menu on outside click
+  React.useEffect(() => {
+    if (!sortMenuOpen) return
+    const handleClick = (e) => {
+      if (!e.target.closest('.sort-dropdown-root')) setSortMenuOpen(false)
+    }
+    window.addEventListener('mousedown', handleClick)
+    return () => window.removeEventListener('mousedown', handleClick)
+  }, [sortMenuOpen])
+
+  // Get label for current sort option
+  const currentSort = sortOptions.find(opt => opt.value === sortOption) || sortOptions[0]
+
   return (
     <div style={styles.container}>
       <main style={{ padding: '0 1.5rem' }}>
         <div style={styles.header}>
-          <div>
-            <section style={styles.resultsHeader}>
-              <h2 style={styles.resultsTitle}>
-                Kết quả tìm kiếm cho: "{query || 'Tất cả'}"
-              </h2>
-              <p style={styles.resultsCount}>
-                Tìm thấy {products.length} sản phẩm phù hợp
-              </p>
-            </section>
+          <div style={styles.resultsHeader}>
+            <h2 style={styles.resultsTitle}>
+              Kết quả tìm kiếm cho: "{query || 'Tất cả'}"
+            </h2>
+            <p style={styles.resultsCount}>
+              Tìm thấy {products.length} sản phẩm phù hợp
+            </p>
           </div>
-          <div>
-            <FormControl sx={{ minWidth: 200 }}>
-              <InputLabel id='sort-select-label'>Sắp xếp theo</InputLabel>
-              <CustomSelect
-                labelId='sort-select-label'
-                value={sortOption}
-                label='Sắp xếp theo'
-                onChange={(e) => setSortOption(e.target.value)}
+          <div style={styles.sortContainer}>
+            {/* Custom Dropdown Sort Button */}
+            <Box className="sort-dropdown-root" sx={{ position: 'relative' }}>
+              <SortDropdownButton
+                onClick={() => setSortMenuOpen((open) => !open)}
+                tabIndex={0}
+                aria-haspopup="listbox"
+                aria-expanded={sortMenuOpen}
               >
-                <MenuItem value=''>Mặc định</MenuItem>
-                <MenuItem value='priceAsc'>Giá tăng dần</MenuItem>
-                <MenuItem value='priceDesc'>Giá giảm dần</MenuItem>
-                <MenuItem value='nameAsc'>Sản phẩm từ A-Z</MenuItem>
-                <MenuItem value='nameDesc'>Sản phẩm từ Z-A</MenuItem>
-              </CustomSelect>
-            </FormControl>
+                <span style={{ fontWeight: 400 }}>{currentSort.label}</span>
+                <Box sx={{ display: 'flex', alignItems: 'center', ml: 'auto' }}>
+                  <span style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                    <span style={{ lineHeight: 1, fontSize: 15, fontWeight: 700, marginBottom: -2 }}>A</span>
+                    <span style={{ lineHeight: 1, fontSize: 15, fontWeight: 700 }}>Z</span>
+                  </span>
+                  <ArrowDownwardIcon sx={{ fontSize: 20, marginBottom: '-2px' }} />
+                </Box>
+              </SortDropdownButton>
+              {sortMenuOpen && (
+                <SortMenu>
+                  {sortOptions.map((opt) => (
+                    <SortMenuItem
+                      key={opt.value}
+                      onClick={() => {
+                        setSortOption(opt.value)
+                        setSortMenuOpen(false)
+                      }}
+                      style={{
+                        fontWeight: sortOption === opt.value ? 600 : 400,
+                        background: sortOption === opt.value ? '#f5f5f5' : '#fff'
+                      }}
+                    >
+                      {opt.label}
+                    </SortMenuItem>
+                  ))}
+                </SortMenu>
+              )}
+            </Box>
           </div>
         </div>
 
@@ -279,25 +335,31 @@ export default function SearchResults() {
             Không có sản phẩm nào.
           </Typography>
         ) : (
-          <div className='product-grid'>
-            {visibleProducts.map((product) => (
-              <Grid key={product._id}>
-                <ProductCard
-                  product={product}
-                  handleAddToCart={handleAddToCart}
-                  isAdding={!!isAdding[product._id]}
-                />
-              </Grid>
-            ))}
-            {loading && (
-              <Box sx={{ textAlign: 'center', mt: 2, width: '100%' }}>
-                <CircularProgress size={24} />
-                <Typography variant='body2'>
-                  Đang tải thêm sản phẩm...
-                </Typography>
-              </Box>
-            )}
-          </div>
+          <>
+            <div className='product-grid'>
+              {paginatedProducts.map((product) => (
+                <Grid key={product._id}>
+                  <ProductCard
+                    product={product}
+                    handleAddToCart={handleAddToCart}
+                    isAdding={!!isAdding[product._id]}
+                  />
+                </Grid>
+              ))}
+            </div>
+
+            <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4, mb: 2 }}>
+              <Pagination
+                count={Math.ceil(filteredProducts.length / ITEMS_PER_PAGE)}
+                page={page}
+                onChange={handlePageChange}
+                color="primary"
+                size="large"
+                showFirstButton
+                showLastButton
+              />
+            </Box>
+          </>
         )}
       </main>
 
