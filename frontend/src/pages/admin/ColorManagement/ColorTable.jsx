@@ -172,7 +172,7 @@ import {
 import ColorRow from './ColorRow'
 import AddIcon from '@mui/icons-material/Add'
 import FilterColor from '~/components/FilterAdmin/FilterColor.jsx'
-
+import TablePaginationActions from '~/components/PaginationAdmin/TablePaginationActions.jsx'
 const ColorTable = ({
   colors,
   loading,
@@ -189,6 +189,7 @@ const ColorTable = ({
   const columns = [
     { id: 'index', label: 'STT', minWidth: 50, align: 'center' },
     { id: 'name', label: 'Tên màu', minWidth: 200 },
+    { id: 'destroy', label: 'Trạng thái', minWidth: 150, align: 'start' },
     { id: 'createdAt', label: 'Ngày tạo', minWidth: 250 },
     { id: 'updatedAt', label: 'Ngày cập nhật', minWidth: 250 },
     { id: 'action', label: 'Hành động', minWidth: 150, align: 'start' }
@@ -308,6 +309,7 @@ const ColorTable = ({
           const totalPages = Math.ceil(count / rowsPerPage)
           return `${from}–${to} trên ${count} | Trang ${page + 1} / ${totalPages}`
         }}
+        ActionsComponent={TablePaginationActions}
       />
     </Paper>
   )

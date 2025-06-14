@@ -30,7 +30,7 @@ export default function FilterProduct({
   }, [])
 
   useEffect(() => {
-    applyFilters()
+    applyFilters(selectedFilter, startDate, endDate)
   }, [keyword, status, category, sort])
 
   const handleSearch = () => {
@@ -178,6 +178,7 @@ export default function FilterProduct({
           size='small'
           color='error'
           onClick={handleReset}
+          sx={{ textTransform: 'none' }}
         >
           Làm mới
         </Button>

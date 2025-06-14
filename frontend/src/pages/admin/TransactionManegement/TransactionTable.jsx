@@ -152,7 +152,7 @@ import {
 import TransactionRow from './TransactionRow'
 import FilterTransaction from '~/components/FilterAdmin/FilterTransaction'
 import StyleAdmin from '~/assets/StyleAdmin.jsx'
-
+import TablePaginationActions from '~/components/PaginationAdmin/TablePaginationActions.jsx'
 const TransactionTable = ({
   transactions = [],
   loading,
@@ -247,6 +247,7 @@ const TransactionTable = ({
           const totalPages = Math.ceil(count / rowsPerPage)
           return `${from}–${to} trên ${count} | Trang ${page + 1} / ${totalPages}`
         }}
+        ActionsComponent={TablePaginationActions}
       />
     </Paper>
   )

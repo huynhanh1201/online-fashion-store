@@ -167,12 +167,14 @@ import {
   TablePagination,
   Typography,
   Paper,
-  Box
+  Box,
+  Button
 } from '@mui/material'
 
 import DiscountRow from './DiscountRow'
 import FilterDiscount from '~/components/FilterAdmin/FilterDiscount'
-
+import AddIcon from '@mui/icons-material/Add'
+import TablePaginationActions from '~/components/PaginationAdmin/TablePaginationActions.jsx'
 const DiscountTable = ({
   discounts = [],
   loading = false,
@@ -183,7 +185,8 @@ const DiscountTable = ({
   total,
   onFilter,
   onPageChange,
-  onChangeRowsPerPage
+  onChangeRowsPerPage,
+  addDiscount
 }) => {
   const columns = [
     { id: 'index', label: 'STT', minWidth: 50, align: 'center' },
@@ -193,10 +196,10 @@ const DiscountTable = ({
     { id: 'minOrderValue', label: 'Giá tối thiểu', minWidth: 100 },
     { id: 'usageLimit', label: 'SL tối đa', minWidth: 100 },
     { id: 'remaining', label: 'SL còn lại', minWidth: 100 },
-    { id: 'status', label: 'Trạng thái', minWidth: 150 },
-    { id: 'validFrom', label: 'Ngày bắt đầu', minWidth: 180 },
-    { id: 'validUntil', label: 'Ngày kết thúc', minWidth: 180 },
-    { id: 'action', label: 'Hành động', minWidth: 150, align: 'start' }
+    { id: 'status', label: 'Trạng thái', minWidth: 130 },
+    { id: 'validFrom', label: 'Ngày bắt đầu', maxWidth: 180 },
+    { id: 'validUntil', label: 'Ngày kết thúc', maxWidth: 180 },
+    { id: 'action', label: 'Hành động', minWidth: 130, align: 'start' }
   ]
 
   return (
@@ -213,9 +216,32 @@ const DiscountTable = ({
                     alignItems: 'start'
                   }}
                 >
-                  <Typography variant='h6' sx={{ fontWeight: '800' }}>
-                    Danh Sách Mã Giảm Giá
-                  </Typography>
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: 1,
+                      minWidth: 250
+                    }}
+                  >
+                    <Typography variant='h6' sx={{ fontWeight: '800' }}>
+                      Danh Sách Mã Giảm Giá
+                    </Typography>
+                    <Button
+                      variant='contained'
+                      color='primary'
+                      onClick={addDiscount}
+                      startIcon={<AddIcon />}
+                      sx={{
+                        textTransform: 'none',
+                        width: 100,
+                        display: 'flex',
+                        alignItems: 'center'
+                      }}
+                    >
+                      Thêm
+                    </Button>
+                  </Box>
                   <FilterDiscount
                     fetchDiscounts={fetchDiscounts}
                     onFilter={onFilter}
@@ -235,7 +261,7 @@ const DiscountTable = ({
                     ...(column.id === 'action' && {
                       width: '130px',
                       maxWidth: '130px',
-                      paddingLeft: '20px'
+                      paddingLeft: '10px'
                     })
                   }}
                 >
@@ -290,6 +316,7 @@ const DiscountTable = ({
           const totalPages = Math.ceil(count / rowsPerPage)
           return `${from}–${to} trên ${count} | Trang ${page + 1} / ${totalPages}`
         }}
+        ActionsComponent={TablePaginationActions}
       />
     </Paper>
   )

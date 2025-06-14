@@ -34,7 +34,7 @@ export default function FilterInventoryLog({
   const [createdEnd, setCreatedEnd] = useState(dayjs().format('YYYY-MM-DD'))
 
   useEffect(() => {
-    handleApplyFilters()
+    handleApplyFilters(createdFilter, createdStart, createdEnd)
   }, [keyword, inventoryId, warehouseId, batchId, type, createdById, sort])
 
   const handleApplyFilters = () => {
@@ -242,6 +242,7 @@ export default function FilterInventoryLog({
           size='small'
           color='error'
           onClick={handleReset}
+          sx={{ textTransform: 'none' }}
         >
           Làm mới
         </Button>

@@ -202,6 +202,7 @@ export default function FilterTransaction({
           size='small'
           color='error'
           onClick={handleReset}
+          sx={{ textTransform: 'none' }}
         >
           Làm mới
         </Button>

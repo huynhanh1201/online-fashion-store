@@ -177,7 +177,7 @@ import {
 import SizeRow from './SizeRow'
 import AddIcon from '@mui/icons-material/Add'
 import FilterSize from '~/components/FilterAdmin/FilterSize.jsx'
-
+import TablePaginationActions from '~/components/PaginationAdmin/TablePaginationActions.jsx'
 const SizeTable = ({
   sizes = [],
   loading = false,
@@ -194,6 +194,7 @@ const SizeTable = ({
   const columns = [
     { id: 'index', label: 'STT', minWidth: 50, align: 'center' },
     { id: 'name', label: 'Tên kích thước', minWidth: 200 },
+    { id: 'destroy', label: 'Trạng thái', minWidth: 150, align: 'start' },
     { id: 'createdAt', label: 'Ngày tạo', minWidth: 150 },
     { id: 'updatedAt', label: 'Ngày cập nhật', minWidth: 150 },
     { id: 'action', label: 'Hành động', minWidth: 130, align: 'start' }
@@ -302,6 +303,7 @@ const SizeTable = ({
           const totalPages = Math.ceil(count / rowsPerPage)
           return `${from}–${to} trên ${count} | Trang ${page + 1} / ${totalPages}`
         }}
+        ActionsComponent={TablePaginationActions}
       />
     </Paper>
   )

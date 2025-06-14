@@ -404,6 +404,7 @@ import FilterInventory from '~/components/FilterAdmin/FilterInventory.jsx'
 import useVariants from '~/hooks/admin/Inventory/useVariants.js'
 import useInventory from '~/hooks/admin/Inventory/useInventorys.js'
 import useWarehouses from '~/hooks/admin/Inventory/useWarehouses.js'
+import TablePaginationActions from '~/components/PaginationAdmin/TablePaginationActions.jsx'
 const InventoryTab = () => {
   const { variants, fetchVariants } = useVariants()
   const {
@@ -703,6 +704,7 @@ const InventoryTab = () => {
           const totalPages = Math.ceil(count / rowsPerPage)
           return `${from}–${to} trên ${count} | Trang ${page} / ${totalPages}`
         }}
+        ActionsComponent={TablePaginationActions}
       />
 
       <ViewInventoryModal

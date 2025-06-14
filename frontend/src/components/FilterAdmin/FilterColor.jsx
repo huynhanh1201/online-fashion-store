@@ -84,9 +84,7 @@ export default function FilterColor({
       <FilterSelect
         label='Trạng thái'
         value={status}
-        onChange={(value) => {
-          setStatus(value)
-        }}
+        onChange={setStatus}
         options={[
           { label: 'Tất cả', value: '' },
           { label: 'Hoạt động', value: false },
@@ -124,6 +122,7 @@ export default function FilterColor({
           size='small'
           color='error'
           onClick={handleReset}
+          sx={{ textTransform: 'none' }}
         >
           Làm mới
         </Button>

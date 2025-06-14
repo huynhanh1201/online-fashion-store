@@ -31,6 +31,9 @@ const OrderRow = ({ order, index, columns, onView, onEdit, onDelete }) => {
           case 'customerName':
             value = order.customerName || order.userId?.name || '—'
             break
+          case 'paymentMethod':
+            value = order.paymentMethod || '—'
+            break
           case 'status':
             value = (
               <Chip

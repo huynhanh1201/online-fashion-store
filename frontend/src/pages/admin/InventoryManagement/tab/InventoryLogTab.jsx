@@ -28,6 +28,7 @@ import useInventoryLog from '~/hooks/admin/Inventory/useInventoryLogs.js'
 import useVariants from '~/hooks/admin/Inventory/useVariants.js'
 import useInventory from '~/hooks/admin/Inventory/useInventorys.js'
 import useWarehouses from '~/hooks/admin/Inventory/useWarehouses.js'
+import TablePaginationActions from '~/components/PaginationAdmin/TablePaginationActions.jsx'
 const InventoryLogTab = () => {
   const { logs, fetchLogs, loadingLog, totalLogs } = useInventoryLog()
   const { variants, fetchVariants } = useVariants()
@@ -72,7 +73,7 @@ const InventoryLogTab = () => {
     { id: 'source', label: 'Mã phiếu', minWidth: 130 },
     { id: 'variantName', label: 'Biến thể', minWidth: 150 },
     { id: 'warehouse', label: 'Kho', minWidth: 100 },
-    { id: 'typeLabel', label: 'Loại', minWidth: 100, align: 'center' },
+    { id: 'typeLabel', label: 'Loại', minWidth: 100, align: 'start' },
     {
       id: 'amount',
       label: 'Số lượng',
@@ -252,6 +253,7 @@ const InventoryLogTab = () => {
           const totalPages = Math.ceil(count / rowsPerPage)
           return `${from}–${to} trên ${count} | Trang ${page} / ${totalPages}`
         }}
+        ActionsComponent={TablePaginationActions}
       />
 
       <ViewInventoryLogModal

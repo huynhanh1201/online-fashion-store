@@ -29,7 +29,7 @@ export default function FilterBatches({
   const [importPriceMax, setImportPriceMax] = useState('')
 
   useEffect(() => {
-    applyFilters()
+    applyFilters(selectedFilter, startDate, endDate)
   }, [keyword, variantId, warehouseId, destroy, sort])
 
   const handleSearch = () => {
@@ -207,6 +207,7 @@ export default function FilterBatches({
           size='small'
           color='error'
           onClick={handleReset}
+          sx={{ textTransform: 'none' }}
         >
           Làm mới
         </Button>

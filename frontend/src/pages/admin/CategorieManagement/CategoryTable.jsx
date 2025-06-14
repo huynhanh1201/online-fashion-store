@@ -15,6 +15,7 @@ import {
 import CategoryRow from './CategoryRow'
 import AddIcon from '@mui/icons-material/Add'
 import FilterCategory from '~/components/FilterAdmin/FilterCategory.jsx'
+import TablePaginationActions from '~/components/PaginationAdmin/TablePaginationActions.jsx'
 const CategoryTable = ({
   categories,
   page,
@@ -30,8 +31,10 @@ const CategoryTable = ({
 }) => {
   const columns = [
     { id: 'index', label: 'STT', minWidth: 50, align: 'center' },
+    { id: 'image', label: 'Hình ảnh', minWidth: 100, align: 'center' },
     { id: 'name', label: 'Tên danh mục', minWidth: 200 },
     { id: 'description', label: 'Mô tả', minWidth: 400 },
+    { id: 'destroy', label: 'Trạng thái', minWidth: 150, align: 'start' },
     { id: 'createdAt', label: 'Ngày tạo', minWidth: 150 },
     { id: 'updatedAt', label: 'Ngày cập nhật', minWidth: 150 },
     { id: 'action', label: 'Hành động', minWidth: 150, align: 'start' }
@@ -150,6 +153,7 @@ const CategoryTable = ({
           const totalPages = Math.ceil(count / rowsPerPage)
           return `${from}–${to} trên ${count} | Trang ${page + 1} / ${totalPages}`
         }}
+        ActionsComponent={TablePaginationActions}
       />
     </Paper>
   )

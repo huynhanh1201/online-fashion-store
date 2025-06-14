@@ -184,7 +184,7 @@ import {
 import ProductRow from './ProductRow'
 import AddIcon from '@mui/icons-material/Add'
 import FilterProduct from '~/components/FilterAdmin/FilterPoduct.jsx'
-
+import TablePaginationActions from '~/components/PaginationAdmin/TablePaginationActions.jsx'
 const ProductTable = ({
   products,
   loading,
@@ -325,6 +325,7 @@ const ProductTable = ({
           const totalPages = Math.ceil(count / rowsPerPage)
           return `${from}–${to} trên ${count} | Trang ${page + 1} / ${totalPages}`
         }}
+        ActionsComponent={TablePaginationActions}
       />
     </Paper>
   )

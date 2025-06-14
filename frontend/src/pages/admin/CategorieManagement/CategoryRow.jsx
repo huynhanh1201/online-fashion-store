@@ -3,7 +3,10 @@ import { TableCell, TableRow, IconButton, Stack } from '@mui/material'
 import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye'
 import BorderColorIcon from '@mui/icons-material/BorderColor'
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever'
-
+import Chip from '@mui/material/Chip'
+import Typography from '@mui/material/Typography'
+import Box from '@mui/material/Box'
+import ImageNotSupportedIcon from '@mui/icons-material/ImageNotSupported'
 const styles = {
   groupIcon: {
     display: 'flex',
@@ -23,6 +26,65 @@ export default function CategoryRow({
   return (
     <TableRow hover role='checkbox' tabIndex={-1}>
       {columns.map((column) => {
+        if (column.id === 'image') {
+          return (
+            <TableCell
+              key={column.id}
+              align='center'
+              sx={{ cursor: 'pointer' }}
+              onClick={() => handleOpenModal('view', category)}
+            >
+              {category.image ? (
+                <img
+                  src={category.image}
+                  alt='Ảnh danh mục'
+                  style={{
+                    width: 60,
+                    height: 60,
+                    objectFit: 'cover',
+                    borderRadius: 8,
+                    border: '1px solid #ccc'
+                  }}
+                />
+              ) : (
+                <IconButton>
+                  <ImageNotSupportedIcon sx={{ width: 40, height: 40 }} />
+                </IconButton>
+              )}
+            </TableCell>
+          )
+        }
+
+        if (column.id === 'description') {
+          return (
+            <TableCell
+              key={column.id}
+              align={column.align}
+              title={category[column.id]}
+              sx={{
+                maxWidth: '200px',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis'
+              }}
+            >
+              {category[column.id] || 'Không có mô tả'}
+            </TableCell>
+          )
+        }
+
+        if (column.id === 'destroy') {
+          return (
+            <TableCell key={column.id} align={column.align}>
+              <Chip
+                label={category[column.id] ? 'Không hoạt động' : 'Hoạt động'}
+                color={category[column.id] ? 'error' : 'success'}
+                size='large'
+                sx={{ width: '127px', fontWeight: '800' }}
+              />
+            </TableCell>
+          )
+        }
+
         if (column.id === 'createdAt' || column.id === 'updatedAt') {
           const date = new Date(category[column.id])
           const formattedDate = date.toLocaleDateString('vi-VN', {

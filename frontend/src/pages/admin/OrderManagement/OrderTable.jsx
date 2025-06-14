@@ -173,7 +173,7 @@ import {
 
 import OrderRow from './OrderRow'
 import FilterOrder from '~/components/FilterAdmin/FilterOrder.jsx'
-
+import TablePaginationActions from '~/components/PaginationAdmin/TablePaginationActions.jsx'
 const OrderTable = ({
   orders = [],
   loading = false,
@@ -194,6 +194,7 @@ const OrderTable = ({
     { id: 'index', label: 'STT', minWidth: 50, align: 'center' },
     { id: '_id', label: 'Mã đơn hàng', minWidth: 150 },
     { id: 'customerName', label: 'Tên khách hàng', minWidth: 200 },
+    { id: 'paymentMethod', label: 'Phương thức thanh toán', minWidth: 150 },
     { id: 'status', label: 'Trạng thái đơn hàng', minWidth: 170 },
     { id: 'paymentStatus', label: 'Thanh toán', minWidth: 150 },
     { id: 'createdAt', label: 'Ngày đặt hàng', minWidth: 180 },
@@ -295,6 +296,7 @@ const OrderTable = ({
           const totalPages = Math.ceil(count / rowsPerPage)
           return `${from}–${to} trên ${count} | Trang ${page + 1} / ${totalPages}`
         }}
+        ActionsComponent={TablePaginationActions}
       />
     </Paper>
   )

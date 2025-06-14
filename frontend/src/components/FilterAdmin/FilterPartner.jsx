@@ -122,6 +122,7 @@ export default function FilterPartner({
         size='small'
         color='error'
         onClick={handleReset}
+        sx={{ textTransform: 'none' }}
       >
         Làm mới
       </Button>

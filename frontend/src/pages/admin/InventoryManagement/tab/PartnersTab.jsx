@@ -23,6 +23,7 @@ import DeletePartnerModal from '../modal/Partner/DeletePartnerModal.jsx'
 import AddIcon from '@mui/icons-material/Add'
 import FilterPartner from '~/components/FilterAdmin/FilterPartner.jsx'
 import usePartner from '~/hooks/admin/Inventory/usePartner.js'
+import TablePaginationActions from '~/components/PaginationAdmin/TablePaginationActions.jsx'
 const PartnersTab = () => {
   const {
     partners,
@@ -203,6 +204,7 @@ const PartnersTab = () => {
             <TableCell>Mã số thuế</TableCell>
             <TableCell>Địa chỉ</TableCell>
             <TableCell>Ngân hàng</TableCell>
+            <TableCell>Trạng thái</TableCell>
             <TableCell>Ngày tạo</TableCell>
             <TableCell
               align='start'
@@ -247,6 +249,14 @@ const PartnersTab = () => {
                   {partner.createdAt
                     ? new Date(partner.createdAt).toLocaleDateString()
                     : '---'}
+                </TableCell>
+                <TableCell>
+                  <Chip
+                    label={partner.destroy ? 'Không hoạt động' : 'Hoạt động'}
+                    color={partner.destroy ? 'error' : 'success'}
+                    size='large'
+                    sx={{ width: '127px', fontWeight: '800' }}
+                  />
                 </TableCell>
                 <TableCell align='center' spacing={1} sx={styles.groupIcon}>
                   <IconButton
@@ -301,6 +311,7 @@ const PartnersTab = () => {
           const totalPages = Math.ceil(count / rowsPerPage)
           return `${from}–${to} trên ${count} | Trang ${page} / ${totalPages}`
         }}
+        ActionsComponent={TablePaginationActions}
       />
 
       <AddPartnerModal

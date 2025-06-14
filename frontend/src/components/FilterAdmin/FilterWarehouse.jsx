@@ -245,6 +245,7 @@ export default function FilterWarehouse({
           color='error'
           onClick={handleReset}
           size='small'
+          sx={{ textTransform: 'none' }}
         >
           Làm mới
         </Button>

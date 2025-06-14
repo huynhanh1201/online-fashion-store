@@ -84,7 +84,7 @@ import { TableCell, TableRow, IconButton, Stack } from '@mui/material'
 import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye'
 import BorderColorIcon from '@mui/icons-material/BorderColor'
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever'
-
+import Chip from '@mui/material/Chip'
 const formatDateTime = (isoString) => {
   if (!isoString) return 'Không xác định'
   const date = new Date(isoString)
@@ -105,6 +105,18 @@ export default function ColorRow({ color, index, columns, handleOpenModal }) {
   return (
     <TableRow hover role='checkbox' tabIndex={-1}>
       {columns.map((column) => {
+        if (column.id === 'destroy') {
+          return (
+            <TableCell key={column.id} align={column.align}>
+              <Chip
+                label={color.destroy ? 'Không hoạt động' : 'Hoạt động'}
+                color={color.destroy ? 'error' : 'success'}
+                size='large'
+                sx={{ width: '127px', fontWeight: '800' }}
+              />
+            </TableCell>
+          )
+        }
         if (column.id === 'action') {
           return (
             <TableCell key={column.id} align={column.align}>

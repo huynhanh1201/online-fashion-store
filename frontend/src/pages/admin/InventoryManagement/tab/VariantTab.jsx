@@ -27,6 +27,8 @@ import useVariants from '~/hooks/admin/Inventory/useVariants.js'
 import useProducts from '~/hooks/admin/useProducts.js'
 import useColors from '~/hooks/admin/useColor.js'
 import useSizes from '~/hooks/admin/useSize.js'
+import TablePaginationActions from '~/components/PaginationAdmin/TablePaginationActions.jsx'
+import Chip from '@mui/material/Chip'
 const VariantsTab = () => {
   const {
     variants,
@@ -126,6 +128,7 @@ const VariantsTab = () => {
       align: 'start',
       format: (value) => `${value.toLocaleString('vi-VN')}đ`
     },
+    { id: 'destroy', label: 'Trạng thái', minWidth: 150, align: 'start' },
     {
       id: 'createdAt',
       label: 'Ngày tạo',
@@ -241,6 +244,18 @@ const VariantsTab = () => {
                   let value = column.id.includes('.')
                     ? column.id.split('.').reduce((o, i) => o[i], row)
                     : row[column.id]
+                  if (column.id === 'destroy') {
+                    return (
+                      <TableCell key={column.id} align={column.align}>
+                        <Chip
+                          label={value ? 'Đã huỷ' : 'Còn hàng'}
+                          color={value ? 'error' : 'success'}
+                          size='large'
+                          sx={{ width: '127px', fontWeight: '800' }}
+                        />
+                      </TableCell>
+                    )
+                  }
                   if (column.id === 'action') {
                     return (
                       <TableCell key={column.id} align={column.align}>
@@ -297,6 +312,7 @@ const VariantsTab = () => {
           const totalPages = Math.ceil(count / rowsPerPage)
           return `${from}–${to} trên ${count} | Trang ${page} / ${totalPages}`
         }}
+        ActionsComponent={TablePaginationActions}
       />
       <AddVariantModal
         open={openAddModal}
@@ -307,6 +323,8 @@ const VariantsTab = () => {
         formatCurrency={formatCurrency}
         colors={colors}
         sizes={sizes}
+        fetchColors={fetchColors}
+        fetchSizes={fetchSizes}
       />
       <ViewVariantModal
         open={openViewModal}

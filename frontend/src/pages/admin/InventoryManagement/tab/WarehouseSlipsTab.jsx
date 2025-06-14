@@ -24,6 +24,7 @@ import useWarehouses from '~/hooks/admin/Inventory/useWarehouses.js'
 import useWarehouseSlips from '~/hooks/admin/Inventory/useWarehouseSlip.js'
 import useBatches from '~/hooks/admin/Inventory/useBatches.js'
 import usePartner from '~/hooks/admin/Inventory/usePartner.js'
+import TablePaginationActions from '~/components/PaginationAdmin/TablePaginationActions.jsx'
 const WarehouseSlipsTab = () => {
   const {
     warehouseSlips,
@@ -350,6 +351,7 @@ const WarehouseSlipsTab = () => {
           const totalPages = Math.ceil(count / rowsPerPage)
           return `${from}–${to} trên ${count} | Trang ${page} / ${totalPages}`
         }}
+        ActionsComponent={TablePaginationActions}
       />
       <AddWarehouseSlipModal
         open={openModal}

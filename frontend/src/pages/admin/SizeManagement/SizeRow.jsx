@@ -79,6 +79,7 @@ import { Stack, IconButton, TableCell, TableRow } from '@mui/material'
 import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye'
 import BorderColorIcon from '@mui/icons-material/BorderColor'
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever'
+import Chip from '@mui/material/Chip'
 
 const formatDateTime = (isoString) => {
   if (!isoString) return '—'
@@ -104,13 +105,22 @@ export default function SizeRow({ size, index, columns, handleOpenModal }) {
     <TableRow hover>
       {columns.map(({ id, align }) => {
         let value
-
         switch (id) {
           case 'index':
             value = index
             break
           case 'name':
             value = size.name || '—'
+            break
+          case 'destroy':
+            value = (
+              <Chip
+                label={size.destroy ? 'Không hoạt động' : 'Hoạt động'}
+                color={size.destroy ? 'error' : 'success'}
+                size='large'
+                sx={{ width: '127px', fontWeight: '800' }}
+              />
+            )
             break
           case 'createdAt':
             value = formatDateTime(size.createdAt)
