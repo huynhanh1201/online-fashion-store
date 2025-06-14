@@ -1,3 +1,4 @@
+// modal/Variant/AddVariantModal.jsx
 import React, { useState, useEffect, useRef } from 'react'
 import {
   Dialog,
@@ -14,7 +15,8 @@ import {
   FormControlLabel,
   Box,
   IconButton,
-  Typography
+  Typography,
+  Autocomplete
 } from '@mui/material'
 import { useForm, Controller } from 'react-hook-form'
 import { toast } from 'react-toastify'
@@ -23,11 +25,11 @@ import useSizePalettes from '~/hooks/admin/useSizePalettes'
 import { getVariantById } from '~/services/admin/Inventory/VariantService.js'
 import AddColorModal from '~/pages/admin/ColorManagement/modal/AddColorModal'
 import AddSizeModal from '~/pages/admin/SizeManagement/modal/AddSizeModal'
+
+import { URI, CloudinaryColor } from '~/utils/constants'
 import AddPhotoAlternateIcon from '@mui/icons-material/AddPhotoAlternate'
 import EditIcon from '@mui/icons-material/Edit'
 import DeleteIcon from '@mui/icons-material/Delete'
-const URI = 'https://api.cloudinary.com/v1_1/dkwsy9sph/image/upload'
-const CloudinaryColor = 'color_upload'
 
 const uploadToCloudinary = async (file, folder = CloudinaryColor) => {
   const formData = new FormData()
@@ -86,7 +88,7 @@ const AddVariantModal = ({
   const [existingVariants, setExistingVariants] = useState([])
   const fileInputRef = useRef(null)
   const [colorImage, setColorImage] = useState(null)
-  const overridePrice = watch('overridePrice') // Theo dõi overridePrice
+  const overridePrice = watch('overridePrice')
   const productId = watch('productId') // Theo dõi productId để lấy giá sản phẩm
 
   useEffect(() => {
