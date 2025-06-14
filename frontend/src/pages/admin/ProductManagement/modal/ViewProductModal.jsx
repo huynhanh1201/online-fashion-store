@@ -16,6 +16,7 @@ import TableRow from '@mui/material/TableRow'
 import TableCell from '@mui/material/TableCell'
 
 import StyleAdmin from '~/assets/StyleAdmin.jsx'
+import { optimizeCloudinaryUrl } from '~/utils/cloudinary.js'
 const ViewProductModal = ({
   open,
   onClose,
@@ -82,7 +83,7 @@ const ViewProductModal = ({
             {selectedImage && (
               <Box
                 component='img'
-                src={selectedImage}
+                src={optimizeCloudinaryUrl(selectedImage)}
                 alt='Ảnh sản phẩm'
                 sx={{
                   width: '300px',
@@ -106,7 +107,7 @@ const ViewProductModal = ({
                   <Box
                     key={index}
                     component='img'
-                    src={img}
+                    src={optimizeCloudinaryUrl(img)}
                     alt={`Ảnh ${index + 1}`}
                     onClick={() => handleImageClick(img)}
                     sx={{

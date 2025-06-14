@@ -29,6 +29,7 @@ import useColors from '~/hooks/admin/useColor.js'
 import useSizes from '~/hooks/admin/useSize.js'
 import TablePaginationActions from '~/components/PaginationAdmin/TablePaginationActions.jsx'
 import Chip from '@mui/material/Chip'
+
 const VariantsTab = () => {
   const {
     variants,

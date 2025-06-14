@@ -14,7 +14,7 @@ import {
   Grid
 } from '@mui/material'
 import Chip from '@mui/material/Chip'
-
+import { optimizeCloudinaryUrl } from '~/utils/cloudinary.js'
 const ViewVariantModal = ({ open, onClose, variant }) => {
   if (!variant) return null
 
@@ -37,7 +37,7 @@ const ViewVariantModal = ({ open, onClose, variant }) => {
               {variant?.color?.image ? (
                 <Box
                   component='img'
-                  src={variant.color.image}
+                  src={optimizeCloudinaryUrl(variant.color.image)}
                   alt='color'
                   sx={{
                     marginRight: '21px',

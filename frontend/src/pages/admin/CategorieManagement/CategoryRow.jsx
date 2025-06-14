@@ -4,9 +4,9 @@ import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye'
 import BorderColorIcon from '@mui/icons-material/BorderColor'
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever'
 import Chip from '@mui/material/Chip'
-import Typography from '@mui/material/Typography'
-import Box from '@mui/material/Box'
 import ImageNotSupportedIcon from '@mui/icons-material/ImageNotSupported'
+import { optimizeCloudinaryUrl } from '~/utils/cloudinary.js'
+
 const styles = {
   groupIcon: {
     display: 'flex',
@@ -36,7 +36,7 @@ export default function CategoryRow({
             >
               {category.image ? (
                 <img
-                  src={category.image}
+                  src={optimizeCloudinaryUrl(category.image)}
                   alt='Ảnh danh mục'
                   style={{
                     width: 60,

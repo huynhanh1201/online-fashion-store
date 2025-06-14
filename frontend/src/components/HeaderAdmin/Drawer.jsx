@@ -29,6 +29,7 @@ import {
 import { Link, useLocation } from 'react-router-dom'
 import ExitToAppIcon from '@mui/icons-material/ExitToApp'
 import AccountCircleIcon from '@mui/icons-material/AccountCircle'
+import { optimizeCloudinaryUrl } from '~/utils/cloudinary.js'
 
 import { useDispatch } from 'react-redux'
 import { logoutUserAPI } from '~/redux/user/userSlice'
@@ -112,7 +113,7 @@ export default function AdminDrawer({
         <Divider sx={{ my: 0 }} />
         <Box sx={{ display: 'flex', alignItems: 'center', p: 2 }}>
           <Avatar
-            src={profile?.avatarUrl}
+            src={optimizeCloudinaryUrl(profile?.avatarUrl)}
             alt={profile?.name}
             sx={{ width: 48, height: 48 }}
           />
@@ -217,7 +218,7 @@ export default function AdminDrawer({
         sx={{ display: 'flex', alignItems: 'center', p: 2, cursor: 'pointer' }}
       >
         <Avatar
-          src={profile?.avatarUrl}
+          src={optimizeCloudinaryUrl(profile?.avatarUrl)}
           alt={profile?.name}
           sx={{ width: 48, height: 48, mr: 2 }}
         />

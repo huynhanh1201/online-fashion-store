@@ -12,6 +12,7 @@ import {
 import AddPhotoAlternateIcon from '@mui/icons-material/AddPhotoAlternate'
 import StyleAdmin from '~/assets/StyleAdmin.jsx'
 import ImageNotSupportedIcon from '@mui/icons-material/ImageNotSupported'
+import { optimizeCloudinaryUrl } from '~/utils/cloudinary.js'
 const ViewCategoryModal = ({ open, onClose, category }) => {
   return (
     <Dialog
@@ -48,7 +49,7 @@ const ViewCategoryModal = ({ open, onClose, category }) => {
             >
               {category.image ? (
                 <img
-                  src={category.image}
+                  src={optimizeCloudinaryUrl(category.image)}
                   alt='Ảnh danh mục'
                   style={{
                     width: '100%',

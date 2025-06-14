@@ -16,6 +16,7 @@ import EditProfileModal from './modal/EditProfileModal.jsx'
 import StyleAdmin, {
   readOnlyBottomBorderInputSx
 } from '~/assets/StyleAdmin.jsx'
+import { optimizeCloudinaryUrl } from '~/utils/cloudinary.js'
 export default function ProfileModal({ open, onClose, profile, fetchProfile }) {
   const [openEdit, setOpenEdit] = useState(false)
 
@@ -46,7 +47,7 @@ export default function ProfileModal({ open, onClose, profile, fetchProfile }) {
         <Box display='flex' flexDirection='column' alignItems='center'>
           {/* Avatar */}
           <Avatar
-            src={profile.avatarUrl}
+            src={optimizeCloudinaryUrl(profile.avatarUrl)}
             alt={profile.name}
             sx={{
               width: 120,
