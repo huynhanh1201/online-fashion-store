@@ -29,6 +29,7 @@ import { partnersRoute } from '~/routes/v1/partnersRoute'
 import { statisticsRoute } from '~/routes/v1/statisticsRoute'
 import { deliveriesRoute } from '~/routes/v1/deliveriesRoute'
 import { reviewsRoute } from '~/routes/v1/reviewsRoute'
+import { transactionsRoute } from '~/routes/v1/transactionsRoute'
 
 const Router = express.Router()
 
@@ -55,6 +56,8 @@ Router.use('/order-items', orderItemsRoute)
 Router.use('/shipping-addresses', shippingAddressesRoute)
 
 Router.use('/orders', ordersRoute)
+
+Router.use('/transactions', transactionsRoute)
 
 Router.use('/order-status-histories', orderStatusHistoriesRoute)
 

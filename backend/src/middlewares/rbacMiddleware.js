@@ -7,8 +7,6 @@ const isValidPermission = (requiredPermissions) => async (req, res, next) => {
     // Lấy role  người dùng từ JWT
     const userRole = req.jwtDecoded.role
 
-    console.log('userRole: ', userRole)
-
     // Kiểm tra role
     if (!userRole) {
       throw new apiError(
@@ -19,8 +17,6 @@ const isValidPermission = (requiredPermissions) => async (req, res, next) => {
 
     // Dựa theo role của user để lấy permissions
     const fullUserRole = await RoleModel.findOne({ name: userRole })
-
-    console.log('fullUserRole: ', fullUserRole)
 
     if (!fullUserRole) {
       throw new apiError(

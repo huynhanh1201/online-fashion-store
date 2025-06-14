@@ -86,14 +86,14 @@ const getCouponList = async (queryString) => {
     validatePagination(page, limit)
 
     // Xử lý thông tin Filter
-    const filter = { destroy: false }
+    const filter = { isActive: true }
 
     if (type) filter.type = type.toLowerCase()
 
     if (status === 'true' || status === 'false') {
       status = JSON.parse(status)
 
-      filter.destroy = status
+      filter.isActive = status
     }
 
     if (search) {
