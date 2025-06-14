@@ -9,11 +9,7 @@ export const getWarehouseSlips = async (filters) => {
     )
     return {
       warehouseSlips: response.data.data,
-<<<<<<< HEAD
-      total: response.data.totalPages
-=======
       total: response.data.meta.total
->>>>>>> 558e39daa0c4449a00fc224edd8a7e9cf50964ad
     }
   } catch (error) {
     console.error('Error fetching warehouse slips:', error)

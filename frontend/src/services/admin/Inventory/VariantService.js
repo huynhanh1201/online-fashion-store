@@ -9,13 +9,8 @@ export const getVariants = async (filters) => {
     )
     // Đảm bảo return dạng { variants, total }
     return {
-<<<<<<< HEAD
-      variants: response.data.data || response.data.data || [],
-      total: response.data.length || response.data.meta.total || 0
-=======
       variants: response.data.data || [],
       total: response.data.meta.total || 0
->>>>>>> 558e39daa0c4449a00fc224edd8a7e9cf50964ad
     }
   } catch (error) {
     console.error('Lỗi khi lấy danh sách biến thể:', error)

@@ -8,13 +8,8 @@ export const getPartners = async (filters = {}) => {
       `${API_ROOT}/v1/partners?${params}`
     )
     return {
-<<<<<<< HEAD
-      partners: response.data.data || response.data.data || [],
-      total: response.data.length || response.data.meta.total || 0
-=======
       partners: response.data.data || [],
       total: response.data.meta.total || 0
->>>>>>> 558e39daa0c4449a00fc224edd8a7e9cf50964ad
     }
   } catch (error) {
     console.error('Error fetching partners:', error)
