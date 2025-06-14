@@ -52,7 +52,7 @@ const createVariant = async (reqBody) => {
 
       productCode: product.productCode,
       sku: newSku,
-      name: `${product.name} ${reqBody.color.name} size ${reqBody.size.name}`,
+      name: `${product.name}`,
       destroy: false
     }
 
