@@ -44,11 +44,26 @@ const ResponsiveProductCard = ({ product, isFlashSale = false }) => {
           }}
         >
           <img
-            src={product.image}
+            src={
+              (() => {
+                if (product.image) {
+                  if (Array.isArray(product.image) && product.image.length > 0) {
+                    return product.image[0]
+                  } else if (typeof product.image === 'string') {
+                    return product.image
+                  }
+                }
+                return 'https://via.placeholder.com/220x220?text=No+Image'
+              })()
+            }
             alt={product.name}
             style={{
               ...styles.productImg,
               ...(inStock ? {} : styles.outOfStockImg)
+            }}
+            onError={(e) => {
+              console.error('Product image failed to load:', e.target.src)
+              e.target.src = 'https://via.placeholder.com/220x220?text=Image+Error'
             }}
           />
           {product.discount > 0 && (

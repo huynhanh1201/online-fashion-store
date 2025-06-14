@@ -4,23 +4,23 @@ import {
   Grid,
   Snackbar,
   Alert,
-  MenuItem,
-  Select,
-  FormControl,
   Typography,
   CircularProgress,
   styled,
-  Pagination
+  Pagination,
+  Breadcrumbs,
+  Link
 } from '@mui/material'
 import { addToCart, getCart } from '~/services/cartService'
-import useProducts from '~/hooks/useProducts'
 import { useDispatch } from 'react-redux'
 import { setCartItems } from '~/redux/cart/cartSlice'
 import ProductCard from '~/components/ProductCards/ProductCards'
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward'
-import SortByAlphaIcon from '@mui/icons-material/SortByAlpha'
+import NavigateNextIcon from '@mui/icons-material/NavigateNext'
+import HomeIcon from '@mui/icons-material/Home'
+import { getProducts } from '~/services/productService'
 
-const ITEMS_PER_PAGE = 6
+const ITEMS_PER_PAGE = 12
 
 // Custom styled button to mimic the dropdown in the image
 const SortDropdownButton = styled('button')(({ theme }) => ({
@@ -76,54 +76,77 @@ const sortOptions = [
 
 const Product = () => {
   const dispatch = useDispatch()
-  const {
-    products: allProducts,
-    fetchProducts,
-    loading: loadingProducts,
-    error: errorProducts
-  } = useProducts()
-
-  const [filteredProducts, setFilteredProducts] = useState([])
+  const [products, setProducts] = useState([])
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState(null)
+  const [page, setPage] = useState(1)
+  const [totalPages, setTotalPages] = useState(1)
   const [sortOption, setSortOption] = useState('')
   const [snackbar, setSnackbar] = useState(null)
   const [isAdding, setIsAdding] = useState({})
-  const [page, setPage] = useState(1)
   const [sortMenuOpen, setSortMenuOpen] = useState(false)
 
-  useEffect(() => {
-    fetchProducts()
-  }, [])
+  // Fetch products with pagination and sorting
+  const fetchProducts = async () => {
+    try {
+      setLoading(true)
+      setError(null)
+      
+      // Map sort option to API sort parameter
+      const sortMap = {
+        'priceAsc': 'price_asc',
+        'priceDesc': 'price_desc',
+        'nameAsc': 'name_asc',
+        'nameDesc': 'name_desc'
+      }
+      
+      const params = {
+        page,
+        limit: ITEMS_PER_PAGE,
+        sort: sortMap[sortOption] || ''
+      }
 
-  useEffect(() => {
-    let sortedProducts = [...allProducts]
-    switch (sortOption) {
-      case 'priceAsc':
-        sortedProducts.sort(
-          (a, b) => (a.exportPrice || 0) - (b.exportPrice || 0)
-        )
-        break
-      case 'priceDesc':
-        sortedProducts.sort(
-          (a, b) => (b.exportPrice || 0) - (a.exportPrice || 0)
-        )
-        break
-      case 'nameAsc':
-        sortedProducts.sort((a, b) =>
-          (a.name || '').localeCompare(b.name || '')
-        )
-        break
-      case 'nameDesc':
-        sortedProducts.sort((a, b) =>
-          (b.name || '').localeCompare(a.name || '')
-        )
-        break
-      default:
-        break
+      console.log('Fetching products with params:', params)
+
+      const response = await getProducts(params)
+      console.log('API Response:', response)
+
+      if (!response) {
+        throw new Error('Không nhận được phản hồi từ server')
+      }
+
+      if (!Array.isArray(response.products)) {
+        console.error('Products không phải là array:', response.products)
+        throw new Error('Dữ liệu sản phẩm không hợp lệ')
+      }
+
+      setProducts(response.products)
+      setTotalPages(response.totalPages)
+    } catch (error) {
+      console.error('Chi tiết lỗi:', error)
+      setError(error.message || 'Không thể tải danh sách sản phẩm. Vui lòng thử lại sau.')
+      setProducts([])
+      setTotalPages(1)
+    } finally {
+      setLoading(false)
     }
+  }
 
-    setFilteredProducts(sortedProducts)
-    setPage(1)
-  }, [allProducts, sortOption])
+  // Fetch products when page or sort changes
+  useEffect(() => {
+    console.log('Effect triggered - page:', page, 'sortOption:', sortOption)
+    fetchProducts()
+  }, [page, sortOption])
+
+  const handlePageChange = (event, value) => {
+    setPage(value)
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+
+  const handleSortChange = (option) => {
+    setSortOption(option)
+    setPage(1) // Reset to first page when sort changes
+  }
 
   const handleAddToCart = async (product) => {
     if (isAdding[product._id]) return
@@ -164,16 +187,6 @@ const Product = () => {
     }
   }
 
-  const handlePageChange = (event, value) => {
-    setPage(value)
-    window.scrollTo({ top: 0, behavior: 'smooth' })
-  }
-
-  const paginatedProducts = filteredProducts.slice(
-    (page - 1) * ITEMS_PER_PAGE,
-    page * ITEMS_PER_PAGE
-  )
-
   // For closing menu on outside click
   React.useEffect(() => {
     if (!sortMenuOpen) return
@@ -191,14 +204,57 @@ const Product = () => {
     <Box sx={{ minHeight: '100vh' }}>
       <Box
         sx={{
-          width: '1760px',
+          bottom: { xs: '20px', sm: '30px', md: '40px' },
+          left: { xs: '20px', sm: '30px', md: '40px' },
+          right: { xs: '20px', sm: '30px', md: '40px' },
+          padding: '12px',
+          maxWidth: '1800px',
+          margin: '0 auto',
+        }}
+      >
+        <Breadcrumbs 
+          separator={<NavigateNextIcon fontSize="small" />}
+          aria-label="breadcrumb"
+        >
+          <Link
+            underline="hover"
+            sx={{ 
+              display: 'flex', 
+              alignItems: 'center',
+              color: '#007bff',
+              textDecoration: 'none',
+              '&:hover': {
+                color: 'primary.main'
+              }
+            }}
+            href="/"
+          >
+            Trang chủ
+          </Link>
+          <Typography
+            sx={{ 
+              display: 'flex', 
+              alignItems: 'center',
+              color: 'text.primary',
+              fontWeight: 500
+            }}
+          >
+            Tất cả sản phẩm
+          </Typography>
+        </Breadcrumbs>
+      </Box>
+      <Box
+        sx={{
+          width: '100%',
+          maxWidth: '1800px',
           height: { xs: '200px', sm: '300px', md: '400px' },
           backgroundImage: 'url(https://file.hstatic.net/1000360022/collection/tat_ca_san_pham_3682cf864f2d4433a1f0bdfb4ffe24de.jpg)',
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           position: 'relative',
           mb: 4,
-          margin: '0 auto'
+          margin: '0 auto',
+          px: { xs: 2, sm: 3, md: 4 }
         }}
       >
       </Box>
@@ -236,7 +292,7 @@ const Product = () => {
                   <SortMenuItem
                     key={opt.value}
                     onClick={() => {
-                      setSortOption(opt.value)
+                      handleSortChange(opt.value)
                       setSortMenuOpen(false)
                     }}
                     style={{
@@ -253,27 +309,32 @@ const Product = () => {
         </Box>
 
         <Box sx={{ flexGrow: 1 }}>
-          {loadingProducts ? (
+          {loading ? (
             <Box sx={{ textAlign: 'center', mt: 10 }}>
               <CircularProgress />
               <Typography>Đang tải sản phẩm...</Typography>
             </Box>
-          ) : errorProducts ? (
-            <Typography sx={{ textAlign: 'center', mt: 10 }} color='error'>
-              {errorProducts}
-            </Typography>
-          ) : allProducts.length === 0 ? (
+          ) : error ? (
+            <Box sx={{ textAlign: 'center', mt: 10 }}>
+              <Typography color='error' gutterBottom>
+                {error}
+              </Typography>
+              <Typography 
+                color='primary' 
+                sx={{ cursor: 'pointer', textDecoration: 'underline' }}
+                onClick={() => fetchProducts()}
+              >
+                Thử lại
+              </Typography>
+            </Box>
+          ) : products.length === 0 ? (
             <Typography sx={{ textAlign: 'center', mt: 10 }}>
               Không có sản phẩm nào.
-            </Typography>
-          ) : paginatedProducts.length === 0 ? (
-            <Typography sx={{ textAlign: 'center', mt: 10 }}>
-              Không có sản phẩm phù hợp.
             </Typography>
           ) : (
             <>
               <div className="product-grid">
-                {paginatedProducts.map((product) => (
+                {products.map((product) => (
                   <Grid item xs={12} sm={6} md={4} lg={3} key={product._id}>
                     <ProductCard
                       product={product}
@@ -286,7 +347,7 @@ const Product = () => {
 
               <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4, mb: 2 }}>
                 <Pagination
-                  count={Math.ceil(filteredProducts.length / ITEMS_PER_PAGE)}
+                  count={totalPages}
                   page={page}
                   onChange={handlePageChange}
                   color="primary"
