@@ -1,4 +1,6 @@
 import { ShippingAddressModel } from '~/models/ShippingAddressModel'
+import ApiError from '~/utils/ApiError'
+import { StatusCodes } from 'http-status-codes'
 
 const createShippingAddress = async (userId, reqBody) => {
   // eslint-disable-next-line no-useless-catch
@@ -82,10 +84,27 @@ const deleteShippingAddress = async (userId, shippingAddressId) => {
   }
 }
 
+const validateShippingAddress = async (userId, shippingAddressId, session) => {
+  const address = await ShippingAddressModel.findOne({
+    _id: shippingAddressId,
+    userId
+  }).session(session)
+
+  if (!address) {
+    throw new ApiError(
+      StatusCodes.NOT_FOUND,
+      'Địa chỉ giao hàng không tồn tại.'
+    )
+  }
+
+  return address
+}
+
 export const shippingAddressesService = {
   createShippingAddress,
   getShippingAddressList,
   getShippingAddress,
   updateShippingAddress,
-  deleteShippingAddress
+  deleteShippingAddress,
+  validateShippingAddress
 }
