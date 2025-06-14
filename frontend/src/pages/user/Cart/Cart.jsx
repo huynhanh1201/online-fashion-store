@@ -27,7 +27,8 @@ import { useCart } from '~/hooks/useCarts'
 import { useNavigate } from 'react-router-dom'
 import { useDispatch } from 'react-redux'
 import { setSelectedItems as setSelectedItemsAction } from '~/redux/cart/cartSlice'
-import { optimizeCloudinaryUrl } from '~/utils/cloudinary'
+// import { optimizeCloudinaryUrl } from '~/utils/cloudinary'
+import { getDiscounts } from '~/services/discountService'
 
 const Cart = () => {
   const { cart, loading, deleteItem, clearCart, updateItem } = useCart()
@@ -51,7 +52,7 @@ const Cart = () => {
 
   useEffect(() => {
     if (cart?.cartItems) setCartItems(cart.cartItems)
-  }, [])
+  }, [cart])
 
   useEffect(() => {
     const fetchInventories = async () => {
@@ -105,20 +106,21 @@ const Cart = () => {
 
     const fetchCoupons = async () => {
       try {
-        const res = await fetch('http://localhost:8017/v1/coupons')
-        const data = await res.json()
-        if (Array.isArray(data) && data.length > 0) {
-          setCoupons(data.sort((a, b) => a.minOrderValue - b.minOrderValue))
+        const res = await getDiscounts()
+        console.log('Dữ liệu mã giảm giá:', res) // Debug
+        if (Array.isArray(res.discounts) && res.discounts.length > 0) {
+          setCoupons(res.discounts.sort((a, b) => a.minOrderValue - b.minOrderValue))
         }
-        setHasFetchedCoupons(true)
       } catch (error) {
-        console.error('Lỗi lấy coupon:', error)
+        console.error('Lỗi lấy danh sách mã giảm giá:', error)
+      } finally {
         setHasFetchedCoupons(true)
       }
     }
 
     fetchCoupons()
   }, [hasFetchedCoupons])
+
 
   const allSelected = cartItems.length > 0 && selectedItems.length === cartItems.length
   const someSelected = selectedItems.length > 0 && selectedItems.length < cartItems.length
@@ -261,7 +263,6 @@ const Cart = () => {
 
 
 
-
   if (loading) {
     return (
       <Typography sx={{ height: '70vh', mt: 10, textAlign: 'center' }}>
@@ -357,13 +358,6 @@ const Cart = () => {
               const variant = item.variant
               if (!variant) return null
 
-              // Lấy ảnh từ variant.color.image (Cloudinary) hoặc ảnh mặc định
-              const imageUrl = Array.isArray(variant.color?.image)
-                ? variant.color.image[0]
-                : variant.color?.image || '/default.jpg'
-
-              const optimizedImage = optimizeCloudinaryUrl(imageUrl)
-
               return (
                 <TableRow key={item._id} hover>
                   <TableCell padding='checkbox'>
@@ -383,7 +377,7 @@ const Cart = () => {
                         }}
                       >
                         <Avatar
-                          src={optimizedImage}
+                          src={variant.color?.image || '/default.jpg'}
                           variant='square'
                           sx={{
                             width: 64,
