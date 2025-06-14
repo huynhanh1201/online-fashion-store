@@ -22,7 +22,7 @@ const getPaymentTransactionList = async (queryString) => {
     validatePagination(page, limit)
 
     // Xử lý thông tin Filter
-    const filter = { destroy: false }
+    const filter = {}
 
     if (statusPayment) filter.status = statusPayment
 

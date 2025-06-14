@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { Box, Fade, Modal } from '@mui/material'
 import { styled } from '@mui/system'
+import { optimizeCloudinaryUrl } from '~/utils/cloudinary'
 
 const ProductImage = styled('img')(() => ({
   width: '100%',
@@ -201,7 +202,7 @@ const ProductImageSection = ({
             }}
           >
             <ProductImage
-              src={mainImage}
+               src={optimizeCloudinaryUrl(mainImage)}
               alt={selectedVariant?.name || 'Sản phẩm'}
               onClick={handleOpenModal}
               onError={(e) => {
@@ -245,7 +246,7 @@ const ProductImageSection = ({
         <ModalOverlay onClick={handleCloseModal}>
           <ModalContent onClick={(e) => e.stopPropagation()}>
             <EnlargedImage
-              src={mainImage}
+               src={optimizeCloudinaryUrl(mainImage)}
               alt={selectedVariant?.name || 'Sản phẩm'}
               onError={(e) => {
                 e.target.onerror = null

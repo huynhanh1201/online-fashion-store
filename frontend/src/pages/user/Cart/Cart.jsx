@@ -27,7 +27,7 @@ import { useCart } from '~/hooks/useCarts'
 import { useNavigate } from 'react-router-dom'
 import { useDispatch } from 'react-redux'
 import { setSelectedItems as setSelectedItemsAction } from '~/redux/cart/cartSlice'
-// import { optimizeCloudinaryUrl } from '~/utils/cloudinary'
+import { optimizeCloudinaryUrl } from '~/utils/cloudinary'
 import { getDiscounts } from '~/services/discountService'
 
 const Cart = () => {
@@ -377,7 +377,7 @@ const Cart = () => {
                         }}
                       >
                         <Avatar
-                          src={variant.color?.image || '/default.jpg'}
+                          src={optimizeCloudinaryUrl(variant.color?.image) || '/default.jpg'}
                           variant='square'
                           sx={{
                             width: 64,

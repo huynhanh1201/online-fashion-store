@@ -1,6 +1,7 @@
 import React from 'react'
 import { Snackbar, Alert, Box, Typography, Button } from '@mui/material'
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart'
+import { optimizeCloudinaryUrl } from '~/utils/cloudinary'
 
 const SnackbarAlert = ({ open, onClose, severity, message, variantImage, productName }) => (
   <Snackbar
@@ -18,7 +19,7 @@ const SnackbarAlert = ({ open, onClose, severity, message, variantImage, product
       {severity === 'success' ? (
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
           <img
-            src={variantImage}
+            src={optimizeCloudinaryUrl(variantImage)}
             alt="Product"
             style={{ width: 50, height: 50, objectFit: 'cover', borderRadius: '6px' }}
             onError={e => (e.target.src = '/default.jpg')}
