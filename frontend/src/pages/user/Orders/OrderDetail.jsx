@@ -297,18 +297,18 @@ const OrderDetail = () => {
 
 
         <Divider sx={{ my: 2 }} />
-
+        
         <Box display="flex" justifyContent="space-between" mb={1}>
           <Typography fontWeight="bold">Tổng tiền hàng:</Typography>
-          <Typography>{formatPrice(totalProductsPrice)}</Typography>
+          <Typography fontWeight={600}>{formatPrice(totalProductsPrice)}</Typography>
         </Box>
         <Box display="flex" justifyContent="space-between" mb={1}>
           <Typography fontWeight="bold">Phí vận chuyển:</Typography>
-          <Typography>{formatPrice(order.shippingFee || 0)}</Typography>
+          <Typography fontWeight={600}>{formatPrice(order.shippingFee || 0)}</Typography>
         </Box>
         <Box display="flex" justifyContent="space-between" mb={1}>
           <Typography fontWeight="bold">Mã giảm giá:</Typography>
-          <Typography color={order.couponId ? 'error' : 'inherit'}>
+          <Typography fontWeight={600} color={order.couponId ? 'error' : 'inherit'}>
             {formatPrice(order.discountAmount || 0)}
           </Typography>
         </Box>

@@ -27,6 +27,7 @@ import { useCart } from '~/hooks/useCarts'
 import { useNavigate } from 'react-router-dom'
 import { useDispatch } from 'react-redux'
 import { setSelectedItems as setSelectedItemsAction } from '~/redux/cart/cartSlice'
+import { optimizeCloudinaryUrl } from '~/utils/cloudinary'
 
 const Cart = () => {
   const { cart, loading, deleteItem, clearCart, updateItem } = useCart()
@@ -35,15 +36,13 @@ const Cart = () => {
   const [showMaxQuantityAlert, setShowMaxQuantityAlert] = useState(false)
   const [confirmClearOpen, setConfirmClearOpen] = useState(false)
   const [coupons, setCoupons] = useState([])
-  const [hasFetchedCoupons, setHasFetchedCoupons] = useState(false) // Track if coupons were fetched
+  const [hasFetchedCoupons, setHasFetchedCoupons] = useState(false)
   const navigate = useNavigate()
   const dispatch = useDispatch()
-  const [inventoryQuantities, setInventoryQuantities] = useState({}) // Cached inventory quantities
-  const [fetchingVariants, setFetchingVariants] = useState(new Set()) // Track ongoing fetches
-  const [isFetchingInventories, setIsFetchingInventories] = useState(false) // Loading state for inventory fetching
-
-
-  const [deleteMode, setDeleteMode] = useState('') // 'single' | 'all'
+  const [inventoryQuantities, setInventoryQuantities] = useState({})
+  const [fetchingVariants, setFetchingVariants] = useState(new Set())
+  const [isFetchingInventories, setIsFetchingInventories] = useState(false)
+  const [deleteMode, setDeleteMode] = useState('')
   const [itemToDelete, setItemToDelete] = useState(null)
 
   useEffect(() => {
@@ -52,9 +51,8 @@ const Cart = () => {
 
   useEffect(() => {
     if (cart?.cartItems) setCartItems(cart.cartItems)
-  }, [cart])
+  }, [])
 
-  // Gọi API 1 lần từ kho
   useEffect(() => {
     const fetchInventories = async () => {
       if (cartItems.length === 0) return
@@ -69,7 +67,6 @@ const Cart = () => {
       setFetchingVariants(prev => new Set([...prev, ...newVariantsToFetch]))
 
       try {
-        // Batch fetch inventory data
         const fetchPromises = newVariantsToFetch.map(async variantId => {
           try {
             const res = await fetch(`http://localhost:8017/v1/inventories?variantId=${variantId}`)
@@ -155,18 +152,6 @@ const Cart = () => {
       ? val.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })
       : '0₫'
 
-  const [isWaiting, setIsWaiting] = React.useState(false);
-
-  const handleQuantityChangeWithDelay = async (variantId, delta) => {
-    if (isWaiting || isFetchingInventories) return;
-    setIsWaiting(true);
-
-    try {
-      await handleQuantityChange(variantId, delta);
-    } finally {
-      setTimeout(() => setIsWaiting(false), 500);
-    }
-  };
   const handleQuantityChange = async (variantId, delta) => {
     if (isFetchingInventories) return
 
@@ -184,13 +169,8 @@ const Cart = () => {
     }
 
     try {
-      // Gọi API để cập nhật số lượng
       await updateItem(variantId, { quantity: delta })
 
-      // Tạo một Promise để delay chỉ cho sản phẩm cụ thể
-      await new Promise(resolve => setTimeout(resolve, 500))
-
-      // Cập nhật cartItems cho sản phẩm cụ thể
       setCartItems(prevItems =>
         prevItems.map(i =>
           i.variant._id === variantId
@@ -199,7 +179,6 @@ const Cart = () => {
         )
       )
 
-      // Cập nhật selectedItems cho sản phẩm cụ thể
       setSelectedItems(prev =>
         prev.map(i =>
           i.variantId === variantId ? { ...i, quantity: newQty } : i
@@ -209,6 +188,7 @@ const Cart = () => {
       console.error('Lỗi cập nhật số lượng:', error)
     }
   }
+
   const handleRemove = async ({ variantId }) => {
     try {
       const res = await deleteItem({ variantId })
@@ -279,6 +259,9 @@ const Cart = () => {
   const nextCoupon = getNextCoupon()
   const discountAmount = applicableCoupon ? calculateDiscount(applicableCoupon, totalPrice) : 0
 
+
+
+
   if (loading) {
     return (
       <Typography sx={{ height: '70vh', mt: 10, textAlign: 'center' }}>
@@ -317,22 +300,17 @@ const Cart = () => {
                 const nextDiscountText = nextCoupon.type === 'percent'
                   ? `${nextCoupon.amount}%`
                   : formatPrice(nextCoupon.amount)
-
                 return `Bạn đang được Giảm ${formatPrice(discountAmount)}, chỉ cần mua thêm ${formatPrice(nextCoupon.minOrderValue - totalPrice)} để nhận mã giảm ${nextDiscountText} 🎉!`
               }
-
               return `Đơn hàng của bạn đã đạt mức giảm cao nhất: ${formatPrice(discountAmount)} 🎉`
             }
-
             const first = coupons[0]
             if (first) {
               const discountText = first.type === 'percent'
                 ? `${first.amount}%`
                 : formatPrice(first.amount)
-
               return `Chỉ cần mua thêm ${formatPrice(first.minOrderValue - totalPrice)} để nhận mã giảm ${discountText} 🎉!`
             }
-
             return null
           })()}
         </Typography>
@@ -379,6 +357,13 @@ const Cart = () => {
               const variant = item.variant
               if (!variant) return null
 
+              // Lấy ảnh từ variant.color.image (Cloudinary) hoặc ảnh mặc định
+              const imageUrl = Array.isArray(variant.color?.image)
+                ? variant.color.image[0]
+                : variant.color?.image || '/default.jpg'
+
+              const optimizedImage = optimizeCloudinaryUrl(imageUrl)
+
               return (
                 <TableRow key={item._id} hover>
                   <TableCell padding='checkbox'>
@@ -398,7 +383,7 @@ const Cart = () => {
                         }}
                       >
                         <Avatar
-                          src={variant.color?.image || '/default.jpg'}
+                          src={optimizedImage}
                           variant='square'
                           sx={{
                             width: 64,
@@ -435,8 +420,8 @@ const Cart = () => {
                     <Box display='flex' alignItems='center' justifyContent='center'>
                       <IconButton
                         size='small'
-                        onClick={() => handleQuantityChangeWithDelay(variant._id, -1)}
-                        disabled={isFetchingInventories || item.quantity <= 1 || isWaiting}
+                        onClick={() => handleQuantityChange(variant._id, -1)}
+                        disabled={isFetchingInventories || item.quantity <= 1}
                         aria-label='Giảm số lượng'
                       >
                         <Remove />
@@ -452,16 +437,14 @@ const Cart = () => {
                       />
                       <IconButton
                         size='small'
-                        onClick={() => handleQuantityChangeWithDelay(variant._id, 1)}
-                        disabled={isFetchingInventories || item.quantity >= (inventoryQuantities[variant._id] || 99) || isWaiting}
+                        onClick={() => handleQuantityChange(variant._id, 1)}
+                        disabled={isFetchingInventories || item.quantity >= (inventoryQuantities[variant._id] || 99)}
                         aria-label='Tăng số lượng'
                       >
                         <Add />
                       </IconButton>
                     </Box>
                   </TableCell>
-
-
                   <TableCell align='center'>
                     <IconButton
                       color='error'
@@ -473,7 +456,6 @@ const Cart = () => {
                     >
                       <Delete />
                     </IconButton>
-
                   </TableCell>
                 </TableRow>
               )
@@ -527,7 +509,6 @@ const Cart = () => {
           >
             Xoá toàn bộ
           </Button>
-
         </Box>
       </Box>
 
@@ -560,7 +541,6 @@ const Cart = () => {
           </Button>
         </DialogActions>
       </Dialog>
-
 
       <Snackbar
         open={showMaxQuantityAlert}
