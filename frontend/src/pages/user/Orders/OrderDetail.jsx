@@ -20,6 +20,7 @@ import ReviewModal from './modal/ReviewModal'
 import { createReview, getUserReviews, updateReview } from '~/services/reviewService'
 import { useSelector } from 'react-redux'
 import { selectCurrentUser } from '~/redux/user/userSlice'
+import { optimizeCloudinaryUrl } from '~/utils/cloudinary'
 
 const statusLabels = {
   Pending: ['Đang chờ', 'warning'],
@@ -207,7 +208,7 @@ const OrderDetail = () => {
                   >
                     {/* Ảnh sản phẩm */}
                     <Avatar
-                      src={variant?.color?.image || '/default.jpg'}
+                      src={optimizeCloudinaryUrl(variant?.color?.image) || '/default.jpg'}
                       variant="square"
                       sx={{ width: 84, height: 84, borderRadius: 1 }}
                     />

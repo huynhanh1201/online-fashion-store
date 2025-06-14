@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { Box, Fade } from '@mui/material'
 import { styled } from '@mui/system'
+import { optimizeCloudinaryUrl } from '~/utils/cloudinary'
 
 const ProductImage = styled('img')(() => ({
   width: '100%',
@@ -141,7 +142,7 @@ const ProductImageSection = ({
           {displayImages.map((img, index) => (
             <Thumbnail
               key={`${img}-${index}`}
-              src={img}
+              src={optimizeCloudinaryUrl(img)}
               alt={`thumb-${index}`}
               selected={index === selectedImageIndex}
               onClick={() => {
@@ -154,6 +155,7 @@ const ProductImageSection = ({
               }}
               style={{ width: 100, height: 100 }}
             />
+
           ))}
         </ThumbnailContainer>
       </Box>
@@ -170,13 +172,14 @@ const ProductImageSection = ({
           }}
         >
           <ProductImage
-            src={mainImage}
+            src={optimizeCloudinaryUrl(mainImage)}
             alt={selectedVariant?.name || 'Sản phẩm'}
             onError={(e) => {
               e.target.onerror = null
               e.target.src = '/default.jpg'
             }}
           />
+
         </MainImageContainer>
       </Fade>
       {/* Thumbnail dưới ảnh ở màn nhỏ */}
@@ -196,7 +199,7 @@ const ProductImageSection = ({
           {displayImages.map((img, index) => (
             <Thumbnail
               key={`${img}-${index}`}
-              src={img}
+              src={optimizeCloudinaryUrl(img)}
               alt={`thumb-${index}`}
               selected={index === selectedImageIndex}
               onClick={() => {
@@ -207,8 +210,9 @@ const ProductImageSection = ({
                 e.target.onerror = null
                 e.target.src = '/default.jpg'
               }}
-              style={{ width: 60, height: 60 }}
+              style={{ width: 100, height: 100 }}
             />
+
           ))}
         </ThumbnailContainer>
       </Box>

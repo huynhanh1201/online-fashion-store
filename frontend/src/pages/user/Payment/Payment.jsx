@@ -30,6 +30,8 @@ import { clearTempCart } from '~/redux/cart/cartSlice'
 import { useLocation, useNavigate } from 'react-router-dom'
 import CouponItem from '~/components/Coupon/CouponItem'
 import { getDiscounts } from '~/services/discountService'
+import { optimizeCloudinaryUrl } from '~/utils/cloudinary'
+
 
 const SectionTitle = styled(Typography)(({ theme }) => ({
   fontWeight: 700,
@@ -56,7 +58,7 @@ const ProductItem = ({ name, price, quantity, image, color, size }) => {
     <tr>
       <td style={{ display: 'flex', alignItems: 'flex-start', gap: 12, padding: 8 }}>
         <img
-          src={image || 'https://via.placeholder.com/64'}
+          src={optimizeCloudinaryUrl(image) || 'https://via.placeholder.com/64'}
           alt={name}
           style={{ width: 84, height: 84, borderRadius: 8, objectFit: 'cover' }}
         />
