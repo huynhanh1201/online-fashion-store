@@ -1,7 +1,7 @@
 import { verifyChecksum } from '~/utils/vnpay'
 import { PaymentTransactionModel } from '~/models/PaymentTransactionModel'
 import { OrderModel } from '~/models/OrderModel'
-import { env } from '../../.eslintrc'
+import { env } from '~/config/environment'
 
 // Thanh toán VNPAY
 const vnpayIPN = async (req) => {
