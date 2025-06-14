@@ -16,6 +16,7 @@ import { useNavigate } from 'react-router-dom'
 import { useSelector } from 'react-redux'
 import { selectCurrentUser } from '~/redux/user/userSlice'
 import { useCart } from '~/hooks/useCarts'
+import { optimizeCloudinaryUrl } from '~/utils/cloudinary'
 
 // Define status labels and corresponding tab values
 const statusLabels = {
@@ -76,7 +77,7 @@ const OrderRow = ({ order }) => {
             <Box display="flex" alignItems="center" gap={2}>
               <Box
                 component="img"
-                src={item.color?.image || '/images/default.jpg'}
+                src={optimizeCloudinaryUrl(item.color?.image) || '/images/default.jpg'}
                 alt={item.name}
                 sx={{
                   width: 72,

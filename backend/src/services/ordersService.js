@@ -129,6 +129,8 @@ const createOrder = async (userId, reqBody, ipAddr) => {
     let { variantItemsGHN, calculatedSubtotal, cartTotal, discountAmount } =
       checkOrderValue(total, cartItems, variantMap, validateCoupon)
 
+    console.log(checkOrderValue(total, cartItems, variantMap, validateCoupon))
+
     // Tạo đơn hàng
     const date = dayjs().format('YYYYMMDD')
     const prefixSlipId = `DH-${date}-`
@@ -487,16 +489,13 @@ const deleteOrder = async (orderId) => {
   }
 }
 
-const checkOrderValue = async (
-  total,
-  cartItems,
-  variantMap,
-  validateCoupon
-) => {
+const checkOrderValue = (total, cartItems, variantMap, validateCoupon) => {
   const variantItemsGHN = []
   let calculatedSubtotal = 0
+
   for (const item of cartItems) {
     const variant = variantMap.get(item.variantId.toString())
+
     if (!variant) {
       throw new ApiError(
         StatusCodes.NOT_FOUND,

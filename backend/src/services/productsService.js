@@ -88,7 +88,7 @@ const getProductList = async (reqQuery) => {
     validatePagination(page, limit)
 
     // Xử lý filter
-    const filter = { destroy: false }
+    const filter = {}
 
     if (status === 'true' || status === 'false') {
       status = JSON.parse(status)
