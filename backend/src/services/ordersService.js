@@ -20,6 +20,8 @@ import { deliveriesService } from '~/services/deliveriesService'
 import generateSequentialCode from '~/utils/generateSequentialCode'
 import validatePagination from '~/utils/validatePagination'
 import getDateRange from '~/utils/getDateRange'
+import { shippingAddressesService } from '~/services/shippingAddressesService'
+import { inventoriesService } from '~/services/inventoriesService'
 
 const createOrder = async (userId, reqBody, ipAddr) => {
   // eslint-disable-next-line no-useless-catch
@@ -40,92 +42,33 @@ const createOrder = async (userId, reqBody, ipAddr) => {
       note
     } = reqBody
 
-    // Kiểm tra cartItems
-    if (!Array.isArray(cartItems) || cartItems.length === 0) {
-      throw new ApiError(
-        StatusCodes.BAD_REQUEST,
-        'Giỏ hàng trống hoặc không hợp lệ.'
-      )
-    }
+    // Kiểm tra tồn kho và lấy thông tin sản phẩm
+    let { updatedInventories, numberItemOrder, variantIds } =
+      await inventoriesService.validateInventory(cartItems, session)
 
-    // Kiểm tra địa chỉ giao hàng
-    const address = await ShippingAddressModel.findOne({
-      _id: shippingAddressId,
-      userId
-    }).session(session)
-
-    if (!address) {
-      throw new ApiError(
-        StatusCodes.NOT_FOUND,
-        'Địa chỉ giao hàng không tồn tại.'
-      )
-    }
-
-    // Lấy thông tin sản phẩm và kiểm tra kho
-    let variantIds = []
-
-    let numberItemOrder = 0
-
-    for (const item of cartItems) {
-      const { variantId, quantity } = item
-
-      const inventory = await InventoryModel.findOneAndUpdate(
-        {
-          variantId,
-          quantity: { $gte: quantity }
-        },
-        {
-          $inc: { quantity: -quantity }
-        }
-      )
-
-      if (!inventory) {
-        throw new apiError(
-          StatusCodes.UNPROCESSABLE_ENTITY,
-          `Số lượng tồn kho (${inventory?.quantity || 0}) không đủ so với yêu cầu (${quantity})`
-        )
-      }
-
-      numberItemOrder += quantity
-
-      // Lấy mảng variantId
-      if (variantIds.includes(variantId)) continue
-      variantIds.push(variantId)
-    }
-
-    const variants = await VariantModel.find({
+    // Lấy các variants từ cartItems
+    const variantsPromise = await VariantModel.find({
       _id: { $in: variantIds }
     })
       .session(session)
       .lean()
 
+    // Kiểm tra địa ch giao hàng
+    const shippingAddressPromise =
+      shippingAddressesService.validateShippingAddress(
+        userId,
+        shippingAddressId,
+        session
+      )
+
+    // Xử lý các Promise đồng thời
+    const [variants, address] = await Promise.all([
+      variantsPromise,
+      shippingAddressPromise
+    ])
+
+    // Tạo dữ liệu variantMap
     const variantMap = new Map(variants.map((p) => [p._id.toString(), p]))
-
-    // Tính toán tổng tiền
-    const variantItemsGHN = []
-    let calculatedSubtotal = 0
-    for (const item of cartItems) {
-      const variant = variantMap.get(item.variantId.toString())
-      if (!variant) {
-        throw new ApiError(
-          StatusCodes.NOT_FOUND,
-          `Sản phẩm với ID ${item.variantId} không tồn tại.`
-        )
-      }
-      calculatedSubtotal += variant.exportPrice * item.quantity
-
-      // Danh sach items GHN
-      variantItemsGHN.push({
-        name: variant.name,
-        code: variant.sku,
-        quantity: item.quantity,
-        price: variant.exportPrice,
-        length: 30,
-        width: 20,
-        height: 2,
-        weight: 300
-      })
-    }
 
     // Xác thực mã giảm giá
     const validateCoupon = await couponsService.validateCoupon(userId, {
@@ -144,17 +87,47 @@ const createOrder = async (userId, reqBody, ipAddr) => {
       ).session(session)
     }
 
-    const cartTotal = validateCoupon.newTotal || calculatedSubtotal
-    const discountAmount = validateCoupon.discountAmount || 0
+    // Tính toán tổng tiền
+    // const variantItemsGHN = []
+    // let calculatedSubtotal = 0
+    // for (const item of cartItems) {
+    //   const variant = variantMap.get(item.variantId.toString())
+    //   if (!variant) {
+    //     throw new ApiError(
+    //       StatusCodes.NOT_FOUND,
+    //       `Sản phẩm với ID ${item.variantId} không tồn tại.`
+    //     )
+    //   }
+    //   calculatedSubtotal += variant.exportPrice * item.quantity
+    //
+    //   // Danh sach items GHN
+    //   variantItemsGHN.push({
+    //     name: variant.name,
+    //     code: variant.sku,
+    //     quantity: item.quantity,
+    //     price: variant.exportPrice,
+    //     length: 30,
+    //     width: 20,
+    //     height: 2,
+    //     weight: 300
+    //   })
+    // }
+    //
+    // const cartTotal = validateCoupon.newTotal || calculatedSubtotal
+    // const discountAmount = validateCoupon.discountAmount || 0
+    //
+    // // Kiểm tra tổng tiền từ FE
+    //
+    // if (cartTotal !== total) {
+    //   throw new ApiError(
+    //     StatusCodes.UNPROCESSABLE_ENTITY,
+    //     'Tổng tiền không chính xác.'
+    //   )
+    // }
 
-    // Kiểm tra tổng tiền từ FE
-
-    if (cartTotal !== total) {
-      throw new ApiError(
-        StatusCodes.UNPROCESSABLE_ENTITY,
-        'Tổng tiền không chính xác.'
-      )
-    }
+    // Kiiểm tra tổng giá tri của đơn hàng
+    let { variantItemsGHN, calculatedSubtotal, cartTotal, discountAmount } =
+      checkOrderValue(total, cartItems, variantMap, validateCoupon)
 
     // Tạo đơn hàng
     const date = dayjs().format('YYYYMMDD')
@@ -206,42 +179,13 @@ const createOrder = async (userId, reqBody, ipAddr) => {
 
     const [order] = await OrderModel.create([newOrder], { session })
 
-    // Tạo đơn hàng cho đơn vị vận chuyển (GHN)
-
-    const length = 30
-    const width = 20
-    const height = 2 * numberItemOrder
-    const weight = 300 * numberItemOrder
-
-    const bodyReqCreateOrderGnh = {
-      // Thông tin người nhận
-      to_name: address.fullName,
-      to_phone: address.phone,
-      to_address: address.address,
-      to_ward_name: address.ward,
-      to_district_name: address.district,
-      to_province_name: address.city,
-
-      // Kích thước & cân nặng
-      length,
-      width,
-      height,
-      weight,
-
-      // Dịch vụ giao hàng
-      service_type_id: 2,
-      payment_type_id: 1,
-      cod_amount: reqBody.paymentMethod === 'COD' ? order.total : 0,
-      required_note: 'KHONGCHOXEMHANG',
-
-      // Quản lý đơn hàng
-      client_order_code: order.code,
-
-      items: variantItemsGHN
-    }
-
+    // Tạo đơn hàng vận chuyển (GHN)
     const orderGHNCreated = deliveriesService.createOrderDelivery(
-      bodyReqCreateOrderGnh
+      reqBody,
+      order,
+      address,
+      variantItemsGHN,
+      numberItemOrder
     )
 
     // Tạo OrderItems
@@ -543,10 +487,57 @@ const deleteOrder = async (orderId) => {
   }
 }
 
+const checkOrderValue = async (
+  total,
+  cartItems,
+  variantMap,
+  validateCoupon
+) => {
+  const variantItemsGHN = []
+  let calculatedSubtotal = 0
+  for (const item of cartItems) {
+    const variant = variantMap.get(item.variantId.toString())
+    if (!variant) {
+      throw new ApiError(
+        StatusCodes.NOT_FOUND,
+        `Sản phẩm với ID ${item.variantId} không tồn tại.`
+      )
+    }
+    calculatedSubtotal += variant.exportPrice * item.quantity
+
+    // Danh sach items GHN
+    variantItemsGHN.push({
+      name: variant.name,
+      code: variant.sku,
+      quantity: item.quantity,
+      price: variant.exportPrice,
+      length: 30,
+      width: 20,
+      height: 2,
+      weight: 300
+    })
+  }
+
+  const cartTotal = validateCoupon.newTotal || calculatedSubtotal
+  const discountAmount = validateCoupon.discountAmount || 0
+
+  // Kiểm tra tổng tiền từ FE
+
+  if (cartTotal !== total) {
+    throw new ApiError(
+      StatusCodes.UNPROCESSABLE_ENTITY,
+      'Tổng tiền không chính xác.'
+    )
+  }
+
+  return { variantItemsGHN, calculatedSubtotal, cartTotal, discountAmount }
+}
+
 export const ordersService = {
   createOrder,
   getOrderList,
   getOrder,
   updateOrder,
-  deleteOrder
+  deleteOrder,
+  checkOrderValue
 }

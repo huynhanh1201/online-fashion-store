@@ -1,6 +1,8 @@
 import { InventoryModel } from '~/models/InventoryModel'
 import getDateRange from '~/utils/getDateRange'
 import validatePagination from '~/utils/validatePagination'
+import apiError from '~/utils/ApiError'
+import { StatusCodes } from 'http-status-codes'
 
 const handleCreateInventory = async () => {
   return 'Empty'
@@ -156,10 +158,52 @@ const deleteInventory = async (inventoryId) => {
   }
 }
 
+const validateInventory = async (cartItems, session) => {
+  const updatedInventories = []
+  let variantIds = []
+  let numberItemOrder = 0
+
+  for (const item of cartItems) {
+    const { variantId, quantity } = item
+
+    const inventory = await InventoryModel.findOneAndUpdate(
+      {
+        variantId,
+        quantity: { $gte: quantity }
+      },
+      {
+        $inc: { quantity: -quantity }
+      },
+      {
+        new: true,
+        session
+      }
+    )
+
+    if (!inventory) {
+      throw new apiError(
+        StatusCodes.UNPROCESSABLE_ENTITY,
+        `Biến thể của sản phẩm không đủ tồn kho để đặt hàng (yêu cầu: ${quantity})`
+      )
+    }
+
+    updatedInventories.push(inventory)
+
+    numberItemOrder += quantity
+
+    // Lấy mảng variantId
+    if (variantIds.includes(variantId)) continue
+    variantIds.push(variantId)
+  }
+
+  return { updatedInventories, numberItemOrder, variantIds }
+}
+
 export const inventoriesService = {
   getInventoryList,
   getInventory,
   updateInventory,
   deleteInventory,
-  handleCreateInventory
+  handleCreateInventory,
+  validateInventory
 }
