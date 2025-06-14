@@ -27,7 +27,7 @@ const styles = {
   },
   item: {
     position: 'relative',
-    height: '300px',
+    height: '310px',
     borderRadius: '8px',
     overflow: 'hidden',
     transition: 'all 0.3s ease'

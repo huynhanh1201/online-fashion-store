@@ -193,17 +193,39 @@ const Profile = () => {
 
   useEffect(() => {
     const fetchProfile = async () => {
-      setLoading(true)
-      const profileData = await getProfileUser()
-      if (profileData) {
-        setName(profileData.name || 'Người dùng')
+      try {
+        setLoading(true)
+        const profileData = await getProfileUser()
+        
+        if (!profileData) {
+          throw new Error('Không nhận được dữ liệu từ server')
+        }
+
+        // Kiểm tra và set các giá trị với fallback
+        setName(profileData.name || '')
         setEmail(profileData.email || '')
         setAvatarPreview(profileData.avatarUrl || '')
-      } else {
-        showSnackbar('Không thể tải thông tin hồ sơ!', 'error')
+
+        // Kiểm tra nếu không có dữ liệu cơ bản
+        if (!profileData.name && !profileData.email) {
+          throw new Error('Thông tin hồ sơ không đầy đủ')
+        }
+
+      } catch (error) {
+        console.error('Lỗi khi tải thông tin hồ sơ:', error)
+        showSnackbar(
+          error.message || 'Không thể tải thông tin hồ sơ. Vui lòng thử lại sau.',
+          'error'
+        )
+        // Reset các giá trị về mặc định
+        setName('')
+        setEmail('')
+        setAvatarPreview('')
+      } finally {
+        setLoading(false)
       }
-      setLoading(false)
     }
+
     fetchProfile()
   }, [])
 
