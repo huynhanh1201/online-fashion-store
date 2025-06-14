@@ -7,7 +7,7 @@ import DialogActions from '@mui/material/DialogActions'
 import Button from '@mui/material/Button'
 
 import styleAdmin from '~/assets/StyleAdmin.jsx'
-
+import { optimizeCloudinaryUrl } from '~/utils/cloudinary.js'
 const ProductImageModal = ({ open, onClose, imageSrc, productName }) => {
   return (
     <Dialog
@@ -46,7 +46,7 @@ const ProductImageModal = ({ open, onClose, imageSrc, productName }) => {
       {/* ===== Content ===== */}
       <DialogContent>
         <img
-          src={imageSrc}
+          src={optimizeCloudinaryUrl(imageSrc)}
           alt={productName}
           style={{
             width: '100%',

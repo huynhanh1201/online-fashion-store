@@ -4,6 +4,7 @@ import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye'
 import BorderColorIcon from '@mui/icons-material/BorderColor'
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever'
 import ProductImageModal from './modal/ProductImageModal'
+import { optimizeCloudinaryUrl } from '~/utils/cloudinary.js'
 const styles = {
   groupIcon: {
     display: 'flex',
@@ -32,7 +33,7 @@ const ProductRow = ({ product, index, columns, onAction }) => {
             case 'image':
               value = (
                 <img
-                  src={product.image?.[0]}
+                  src={optimizeCloudinaryUrl(product.image?.[0])}
                   alt={product.name}
                   style={{
                     width: 50,

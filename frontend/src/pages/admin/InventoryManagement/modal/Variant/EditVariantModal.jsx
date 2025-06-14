@@ -1,16 +1,21 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useRef } from 'react'
 import {
   Dialog,
   DialogTitle,
   DialogContent,
   DialogActions,
   Button,
-  TextField,
   Box,
-  Typography
+  Typography,
+  IconButton,
+  TextField
 } from '@mui/material'
 import { useForm, Controller } from 'react-hook-form'
 import { toast } from 'react-toastify'
+import EditIcon from '@mui/icons-material/Edit'
+import DeleteIcon from '@mui/icons-material/Delete'
+import AddPhotoAlternateIcon from '@mui/icons-material/AddPhotoAlternate'
+
 const URI = 'https://api.cloudinary.com/v1_1/dkwsy9sph/image/upload'
 const CloudinaryColor = 'color_upload'
 
@@ -56,6 +61,7 @@ const EditVariantModal = ({
     }
   })
 
+  const fileInputRef = useRef(null)
   const overridePrice = watch('overridePrice')
   const colorImage = watch('colorImage')
 
@@ -68,7 +74,7 @@ const EditVariantModal = ({
         colorImage: variant.color?.image || ''
       })
     }
-  }, [reset])
+  }, [variant, reset])
 
   const handleUploadImage = async (e) => {
     const file = e.target.files[0]
@@ -92,7 +98,6 @@ const EditVariantModal = ({
           image: data.colorImage
         }
       }
-      console.log('Updated Variant:', updatedVariant)
       await onUpdateVariant(variant._id, updatedVariant)
       toast.success('Cập nhật biến thể thành công')
       onClose()
@@ -103,113 +108,168 @@ const EditVariantModal = ({
   }
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth='sm' fullWidth>
+    <Dialog open={open} onClose={onClose} maxWidth='md' fullWidth>
       <DialogTitle>Cập nhật biến thể</DialogTitle>
       <form onSubmit={handleSubmit(onSubmit)}>
         <DialogContent
-          sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 1 }}
+          sx={{ display: 'flex', flexDirection: 'row', gap: 3, mt: 1 }}
         >
-          {/* Màu sắc và kích thước */}
-          <Box display='flex' gap={3} alignItems='center'>
-            <Typography variant='subtitle1'>
-              <strong>Màu:</strong> {variant?.color?.name || '---'}
-            </Typography>
-            <Typography variant='subtitle1'>
-              <strong>Kích thước:</strong> {variant?.size?.name || '---'}
-            </Typography>
-          </Box>
-
-          {/* Upload ảnh màu */}
-          <Box display='flex' alignItems='center' gap={2}>
-            <Button variant='outlined' component='label'>
-              Thay ảnh màu
-              <input
-                hidden
-                accept='image/*'
-                type='file'
-                onChange={handleUploadImage}
-              />
-            </Button>
-            {colorImage && (
-              <img src={colorImage} alt='color' width={50} height={50} />
-            )}
-          </Box>
-
-          <TextField
-            sx={{ display: 'none' }}
-            label='URL hình ảnh màu'
-            fullWidth
-            {...register('colorImage', {
-              required: 'Vui lòng nhập URL hình ảnh',
-              pattern: {
-                value: /^(https?:\/\/[^\s$.?#].[^\s]*)$/,
-                message: 'Vui lòng nhập URL hợp lệ'
-              }
-            })}
-            error={!!errors.colorImage}
-            helperText={errors.colorImage?.message}
-          />
-
-          {/* Ghi đè giá */}
-          <Box>
-            <label>
-              <input
-                type='checkbox'
-                {...register('overridePrice')}
-                checked={overridePrice}
-                onChange={(e) => setValue('overridePrice', e.target.checked)}
-              />{' '}
-              Ghi đè giá sản phẩm
-            </label>
-          </Box>
-
-          <Controller
-            name='importPrice'
-            control={control}
-            rules={{
-              required: overridePrice ? 'Vui lòng nhập giá nhập' : false,
-              validate: (val) =>
-                overridePrice && Number(val) < 0
-                  ? 'Giá nhập không được âm'
-                  : true
+          {/* Ảnh màu */}
+          <Box
+            sx={{
+              position: 'relative',
+              width: 403,
+              height: 403,
+              border: '1px dashed #ccc',
+              backgroundColor: '#f9f9f9',
+              borderRadius: 2,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: 'pointer',
+              overflow: 'hidden'
             }}
-            render={({ field }) => (
-              <TextField
-                label='Giá nhập'
-                disabled={!overridePrice}
-                type='text'
-                fullWidth
-                value={formatCurrency(field.value)}
-                onChange={(e) => field.onChange(parseCurrency(e.target.value))}
-                error={!!errors.importPrice}
-                helperText={errors.importPrice?.message}
-              />
-            )}
-          />
+            onClick={() => !colorImage && fileInputRef.current?.click()}
+          >
+            <input
+              type='file'
+              accept='image/*'
+              hidden
+              ref={fileInputRef}
+              onChange={handleUploadImage}
+            />
 
-          <Controller
-            name='exportPrice'
-            control={control}
-            rules={{
-              required: overridePrice ? 'Vui lòng nhập giá bán' : false,
-              validate: (val) =>
-                overridePrice && Number(val) < 0
-                  ? 'Giá bán không được âm'
-                  : true
-            }}
-            render={({ field }) => (
-              <TextField
-                label='Giá bán'
-                disabled={!overridePrice}
-                type='text'
-                fullWidth
-                value={formatCurrency(field.value)}
-                onChange={(e) => field.onChange(parseCurrency(e.target.value))}
-                error={!!errors.exportPrice}
-                helperText={errors.exportPrice?.message}
-              />
+            {colorImage ? (
+              <>
+                <Box
+                  component='img'
+                  src={colorImage}
+                  alt='Ảnh màu'
+                  sx={{ width: '100%', height: '100%', objectFit: 'contain' }}
+                />
+                <Box
+                  sx={{
+                    position: 'absolute',
+                    top: 4,
+                    right: 4,
+                    display: 'flex',
+                    gap: 1
+                  }}
+                >
+                  <IconButton
+                    size='small'
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      fileInputRef.current?.click()
+                    }}
+                    sx={{ backgroundColor: '#fff', boxShadow: 1 }}
+                  >
+                    <EditIcon fontSize='small' />
+                  </IconButton>
+                  <IconButton
+                    size='small'
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      setValue('colorImage', '')
+                    }}
+                    sx={{ backgroundColor: '#fff', boxShadow: 1 }}
+                  >
+                    <DeleteIcon fontSize='small' />
+                  </IconButton>
+                </Box>
+              </>
+            ) : (
+              <Box sx={{ textAlign: 'center', color: '#888' }}>
+                <AddPhotoAlternateIcon sx={{ fontSize: 48 }} />
+                <Typography variant='caption'>Thêm ảnh màu</Typography>
+              </Box>
             )}
-          />
+          </Box>
+
+          {/* Thông tin bên phải */}
+          <Box
+            sx={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 2 }}
+          >
+            <TextField
+              label='Màu sắc'
+              value={variant?.color?.name || '---'}
+              fullWidth
+              InputProps={{ readOnly: true }}
+              disabled
+            />
+
+            <TextField
+              label='Kích thước'
+              value={variant?.size?.name || '---'}
+              fullWidth
+              InputProps={{ readOnly: true }}
+              disabled
+            />
+
+            <Box>
+              <label>
+                <input
+                  type='checkbox'
+                  {...register('overridePrice')}
+                  checked={overridePrice}
+                  onChange={(e) => setValue('overridePrice', e.target.checked)}
+                />{' '}
+                Ghi đè giá sản phẩm
+              </label>
+            </Box>
+
+            <Controller
+              name='importPrice'
+              control={control}
+              rules={{
+                required: overridePrice ? 'Vui lòng nhập giá nhập' : false,
+                validate: (val) =>
+                  overridePrice && Number(val) < 0
+                    ? 'Giá nhập không được âm'
+                    : true
+              }}
+              render={({ field }) => (
+                <TextField
+                  label='Giá nhập'
+                  disabled={!overridePrice}
+                  type='text'
+                  fullWidth
+                  value={formatCurrency(field.value)}
+                  onChange={(e) =>
+                    field.onChange(parseCurrency(e.target.value))
+                  }
+                  error={!!errors.importPrice}
+                  helperText={errors.importPrice?.message}
+                />
+              )}
+            />
+
+            <Controller
+              name='exportPrice'
+              control={control}
+              rules={{
+                required: overridePrice ? 'Vui lòng nhập giá bán' : false,
+                validate: (val) =>
+                  overridePrice && Number(val) < 0
+                    ? 'Giá bán không được âm'
+                    : true
+              }}
+              render={({ field }) => (
+                <TextField
+                  label='Giá bán'
+                  disabled={!overridePrice}
+                  type='text'
+                  fullWidth
+                  value={formatCurrency(field.value)}
+                  onChange={(e) =>
+                    field.onChange(parseCurrency(e.target.value))
+                  }
+                  error={!!errors.exportPrice}
+                  helperText={errors.exportPrice?.message}
+                />
+              )}
+            />
+          </Box>
         </DialogContent>
         <DialogActions>
           <Button onClick={onClose}>Hủy</Button>

@@ -113,7 +113,7 @@ export default function FilterCategory({
       />
       <Box sx={{ display: 'flex', gap: 2 }}>
         <SearchWithSuggestions
-          label='Tìm kiếm tên'
+          label='Tên danh mục'
           options={categories.map((cat) => cat.name)}
           loading={loading}
           keyword={keyword}
@@ -127,6 +127,7 @@ export default function FilterCategory({
           size='small'
           color='error'
           onClick={handleReset}
+          sx={{ textTransform: 'none' }}
         >
           Làm mới
         </Button>

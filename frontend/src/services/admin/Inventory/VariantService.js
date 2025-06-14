@@ -23,7 +23,7 @@ export const getVariantById = async (id) => {
     const response = await AuthorizedAxiosInstance.get(
       `${API_ROOT}/v1/variants?productId=${id}`
     )
-    return response.data
+    return response.data.data
   } catch (error) {
     console.error('Lỗi khi lấy chi tiết biến thể:', error)
     return null

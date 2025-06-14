@@ -29,7 +29,7 @@ export default function FilterBatches({
   const [importPriceMax, setImportPriceMax] = useState('')
 
   useEffect(() => {
-    applyFilters()
+    applyFilters(selectedFilter, startDate, endDate)
   }, [keyword, variantId, warehouseId, destroy, sort])
 
   const handleSearch = () => {
@@ -193,7 +193,7 @@ export default function FilterBatches({
       />
       <Box sx={{ display: 'flex', gap: 2 }}>
         <SearchWithSuggestions
-          label='Lô hàng'
+          label='Mã lô hàng'
           options={batches.map((b) => b.batchCode)}
           keyword={keyword}
           inputValue={inputValue}
@@ -207,6 +207,7 @@ export default function FilterBatches({
           size='small'
           color='error'
           onClick={handleReset}
+          sx={{ textTransform: 'none' }}
         >
           Làm mới
         </Button>

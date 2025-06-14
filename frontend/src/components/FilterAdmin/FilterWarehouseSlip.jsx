@@ -180,6 +180,7 @@ export default function FilterWarehouseSlip({
           size='small'
           color='error'
           onClick={handleReset}
+          sx={{ textTransform: 'none' }}
         >
           Làm mới
         </Button>

@@ -103,20 +103,21 @@ const TransactionRow = ({ transaction, index, onView, onEdit, onDelete }) => {
       justifyContent: 'center',
       alignItems: 'center',
       gap: 1,
-      width: '130px'
+      width: '100%'
     }
   }
   return (
     <TableRow>
       <TableCell sx={StyleAdmin.TableColumnSTT}>{index + 1}</TableCell>
       <TableCell>{transaction?.orderId?.code || '—'}</TableCell>
-      <TableCell>{transaction.transactionId || '(COD)'}</TableCell>
+      <TableCell>{transaction.transactionId || '(Thanh toán COD)'}</TableCell>
       <TableCell>{transaction.method || '—'}</TableCell>
       <TableCell>
         <Chip
           label={statusLabel[transaction.status] || '—'}
           color={statusColor[transaction.status] || 'default'}
-          size='small'
+          size='large'
+          sx={{ width: '120px', fontWeight: '800' }}
         />
       </TableCell>
       <TableCell>
@@ -127,8 +128,13 @@ const TransactionRow = ({ transaction, index, onView, onEdit, onDelete }) => {
       <TableCell>
         {new Date(transaction.createdAt).toLocaleDateString('vi-VN')}
       </TableCell>
-      <TableCell align='center' sx={styles.groupIcon}>
-        <Stack direction='row' spacing={1} justifyContent='center'>
+      <TableCell align='center'>
+        <Stack
+          direction='row'
+          spacing={1}
+          justifyContent='center'
+          sx={styles.groupIcon}
+        >
           <IconButton onClick={() => onView(transaction)} size='small'>
             <RemoveRedEyeIcon color='primary' />
           </IconButton>

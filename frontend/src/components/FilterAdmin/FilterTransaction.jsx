@@ -166,7 +166,7 @@ export default function FilterTransaction({
       />
       <Box sx={{ display: 'flex', gap: 2 }}>
         <SearchWithSuggestions
-          label='Tìm sản phẩm'
+          label='Mã đơn hàng'
           options={transactions.map((t) => t.orderId.code)}
           loading={loading}
           keyword={keyword}
@@ -202,6 +202,7 @@ export default function FilterTransaction({
           size='small'
           color='error'
           onClick={handleReset}
+          sx={{ textTransform: 'none' }}
         >
           Làm mới
         </Button>
