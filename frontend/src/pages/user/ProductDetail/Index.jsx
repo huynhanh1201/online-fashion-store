@@ -111,57 +111,126 @@ const ProductDetail = () => {
           </Typography>
         </Box>
       </Box>
-      <Grid container spacing={10} justifyContent='center'>
-        <Grid item xs={12} md={6} sx={{ px: { xs: 0, sm: 1, md: 2, lg: 2 }, maxWidth: '50%' }}>
-          <ProductImageSection
-            images={selectedColor?.images || product.images}
-            selectedImageIndex={selectedImageIndex}
-            fadeIn={fadeIn}
-            onImageClick={(index) => {
-              if (index !== selectedImageIndex) {
-                setFadeIn(false)
-                setTimeout(() => {
-                  setSelectedImageIndex(index)
-                  setFadeIn(true)
-                }, 150)
+      <Grid 
+        container 
+        spacing={4} 
+        justifyContent='center'
+        sx={{
+          alignItems: 'flex-start',
+          flexWrap: 'nowrap',
+          '@media (max-width: 1100px)': {
+            flexWrap: 'wrap',
+            spacing: 2
+          }
+        }}
+      >
+        <Grid 
+          item 
+          xs={12} 
+          md={6} 
+          sx={{ 
+            px: { xs: 1, sm: 2 }, 
+            width: '100%',
+            maxWidth: { xs: '100%', md: '70%' },
+            display: 'flex',
+            flexDirection: 'column',
+            minHeight: 0
+          }}
+        >
+          <Box sx={{ 
+            width: '100%', 
+            display: 'flex', 
+            flexDirection: 'column',
+            height: 'fit-content'
+          }}>
+            <ProductImageSection
+              images={selectedColor?.images || product.images}
+              selectedImageIndex={selectedImageIndex}
+              fadeIn={fadeIn}
+              onImageClick={(index) => {
+                if (index !== selectedImageIndex) {
+                  setFadeIn(false)
+                  setTimeout(() => {
+                    setSelectedImageIndex(index)
+                    setFadeIn(true)
+                  }, 150)
+                }
+              }}
+              getCurrentImages={getCurrentImages}
+              selectedVariant={selectedVariant}
+              selectedColor={selectedColor}
+              selectedSize={selectedSize}
+            />
+          </Box>
+        </Grid>
+        <Grid 
+          item 
+          xs={12} 
+          md={6} 
+          sx={{ 
+            px: { xs: 1, sm: 2 }, 
+            width: '100%',
+            maxWidth: { xs: '100%', md: '50%' },
+            display: 'flex',
+            flexDirection: 'column',
+            minHeight: 0
+          }}
+        >
+          <Box 
+            sx={{ 
+              width: '100%',
+              display: 'flex', 
+              flexDirection: 'column',
+              height: 'fit-content',
+              '& .MuiButton-root': {
+                width: '100%',
+                minWidth: 'unset'
+              },
+              '& .product-info-buttons': {
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 1,
+                '& > *': {
+                  width: '100%'
+                }
+              },
+              '& .quantity-selector': {
+                width: '100%'
+              },
+              '& .variant-selector': {
+                width: '100%'
               }
             }}
-            getCurrentImages={getCurrentImages}
-            selectedVariant={selectedVariant}
-            selectedColor={selectedColor}
-            selectedSize={selectedSize}
-          />
-        </Grid>
-        <Grid item xs={12} md={6} sx={{ px: { xs: 0, sm: 1, md: 2, lg: 2 }, maxWidth: '50%' }}>
-          <ProductInfoSection
-            product={product}
-            quantity={quantity}
-            setQuantity={setQuantity}
-            coupons={coupons}
-            isAdding={isAdding[product._id] || false}
-            handleAddToCart={() => handleAddToCart(product._id)}
-            handleBuyNow={handleBuyNow}
-            setOpenVoucherDrawer={setOpenVoucherDrawer}
-            variants={variants}
-            selectedVariant={selectedVariant}
-            availableColors={availableColors}
-            availableSizes={availableSizes}
-            selectedColor={selectedColor}
-            selectedSize={selectedSize}
-            handleColorChange={(color) => {
-              handleColorChange(color)
-              setIsViewingThumbnails(false)
-            }}
-            handleSizeChange={handleSizeChange}
-            getCurrentPrice={getCurrentPrice}
-            getCurrentImages={getCurrentImages}
-            inventory={inventory}
-            setSnackbar={setSnackbar}
-
-          />
+          >
+            <ProductInfoSection
+              product={product}
+              quantity={quantity}
+              setQuantity={setQuantity}
+              coupons={coupons}
+              isAdding={isAdding[product._id] || false}
+              handleAddToCart={() => handleAddToCart(product._id)}
+              handleBuyNow={handleBuyNow}
+              setOpenVoucherDrawer={setOpenVoucherDrawer}
+              variants={variants}
+              selectedVariant={selectedVariant}
+              availableColors={availableColors}
+              availableSizes={availableSizes}
+              selectedColor={selectedColor}
+              selectedSize={selectedSize}
+              handleColorChange={(color) => {
+                handleColorChange(color)
+                setIsViewingThumbnails(false)
+              }}
+              handleSizeChange={handleSizeChange}
+              getCurrentPrice={getCurrentPrice}
+              getCurrentImages={getCurrentImages}
+              inventory={inventory}
+              setSnackbar={setSnackbar}
+            />
+          </Box>
         </Grid>
       </Grid>
-      <Box sx={{ mt: 10 }}>
+      <Box sx={{ mt: 3 }}>
         <ProductDescription description={product.description} productId={product._id} product={product} />
       </Box>
       <VoucherDrawer
@@ -180,7 +249,6 @@ const ProductDetail = () => {
         productName={snackbar?.productName || ''}
         onClose={() => setSnackbar(prev => ({ ...prev, open: false }))}
       />
-
     </Container>
   )
 }
