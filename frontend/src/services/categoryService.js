@@ -7,7 +7,7 @@ export const getCategories = async (page = 1, limit = 1000) => {
     const response = await AuthorizedAxiosInstance.get(
       `${API_ROOT}/v1/categories?page=${page}&limit=${limit}`
     )
-    return { categories: response.data, total: response.data.length }
+    return { categories: response.data, total: response.data.data.length }
   } catch (error) {
     console.error('Lỗi khi lấy danh sách danh mục:', error)
     return { categories: [], total: 0 }
