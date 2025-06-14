@@ -73,35 +73,10 @@ const deleteOrder = async (req, res, next) => {
   }
 }
 
-// Thanh toán VNPAY
-
-const vnpayIPN = async (req, res, next) => {
-  try {
-    const result = await ordersService.vnpayIPN(req)
-
-    res.status(200).json(result)
-  } catch (err) {
-    next(err)
-  }
-}
-
-const vnpayReturn = async (req, res, next) => {
-  try {
-    const result = await ordersService.vnpayReturn(req)
-
-    res.redirect(result)
-    // res.status(200).json({ code: resultCode })
-  } catch (err) {
-    next(err)
-  }
-}
-
 export const ordersController = {
   createOrder,
   getOrderList,
   getOrder,
   updateOrder,
-  deleteOrder,
-  vnpayIPN,
-  vnpayReturn
+  deleteOrder
 }
