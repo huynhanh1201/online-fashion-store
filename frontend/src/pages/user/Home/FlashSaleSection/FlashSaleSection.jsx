@@ -6,7 +6,7 @@ const FlashSaleSection = ({ products, loading, error }) => {
   if (error) return <div>Failed to load flash sale products.</div>
   if (!products || products.length === 0) return null
 
-  const flashSaleProducts = products.slice(0, 5)
+  const flashSaleProducts = products.slice(0, 6)
 
   // ======= STYLES =======
   const styles = {
@@ -53,10 +53,6 @@ const FlashSaleSection = ({ products, loading, error }) => {
       marginBottom: '32px'
     },
     flashSaleCard: {
-      border: '1px solid #e0e0e0',
-      padding: '10px',
-      textAlign: 'center',
-      backgroundColor: '#fff',
       borderRadius: '5px',
       width: '100%'
     },

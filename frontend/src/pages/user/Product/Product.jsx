@@ -19,6 +19,7 @@ import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward'
 import NavigateNextIcon from '@mui/icons-material/NavigateNext'
 import HomeIcon from '@mui/icons-material/Home'
 import { getProducts } from '~/services/productService'
+import ProductCategories from './ProductCategories/ProductCategories'
 
 const ITEMS_PER_PAGE = 12
 
@@ -258,7 +259,7 @@ const Product = () => {
         }}
       >
       </Box>
-
+      <ProductCategories />
       <Box sx={{ p: 2, maxWidth: '1800px', mx: 'auto' }}>
         <Box
           sx={{

@@ -15,6 +15,12 @@ const ResponsiveProductCard = ({ product, isFlashSale = false }) => {
   const quantity = Number(product.quantity) || 0
   const inStock = quantity > 0
 
+  // Hàm xử lý tên sản phẩm
+  const truncateProductName = (name) => {
+    if (!name) return ''
+    return name.length > 17 ? name.substring(0, 25) + '...' : name
+  }
+
   return (
     <Link
       to={`/productdetail/${product._id}`}
@@ -84,7 +90,9 @@ const ResponsiveProductCard = ({ product, isFlashSale = false }) => {
         </div>
 
         <div style={styles.productInfo}>
-          <h3 style={styles.productName}>{product.name}</h3>
+          <h3 style={styles.productName} title={product.name}>
+            {truncateProductName(product.name)}
+          </h3>
           <div style={styles.priceRow}>
             <span style={styles.currentPrice}>
               {(product.exportPrice ?? 0).toLocaleString()}₫
@@ -179,11 +187,14 @@ const styles = {
     fontWeight: '500',
     color: '#333',
     lineHeight: '1.4',
+    height: '44px', // Chiều cao cố định cho 2 dòng
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
     display: '-webkit-box',
     WebkitLineClamp: 2,
     WebkitBoxOrient: 'vertical',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis'
+    margin: 0,
+    padding: 0
   },
   priceRow: {
     display: 'flex',

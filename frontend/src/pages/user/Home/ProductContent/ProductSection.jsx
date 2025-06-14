@@ -14,7 +14,7 @@ const styles = {
   },
   banner: {
     position: 'relative',
-    height: '420px',
+    height: '440px',
     borderRadius: '10px',
     overflow: 'hidden',
     gridColumn: '1',
