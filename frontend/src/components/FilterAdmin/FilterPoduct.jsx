@@ -30,7 +30,7 @@ export default function FilterProduct({
   }, [])
 
   useEffect(() => {
-    applyFilters(selectedFilter, startDate, endDate)
+    applyFilters()
   }, [keyword, status, category, sort])
 
   const handleSearch = () => {

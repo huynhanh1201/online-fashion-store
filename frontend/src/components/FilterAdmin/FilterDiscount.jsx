@@ -45,7 +45,7 @@ export default function FilterDiscount({
   const [createdFilter, setCreatedFilter] = useState('')
 
   useEffect(() => {
-    applyFilters(createdFilter, createdStart, createdEnd)
+    applyFilters()
   }, [keyword, type, isActive, sort])
 
   const applyFilters = ({

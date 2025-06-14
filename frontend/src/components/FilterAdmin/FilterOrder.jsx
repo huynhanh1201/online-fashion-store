@@ -34,7 +34,7 @@ export default function FilterOrder({
   const [userInput, setUserInput] = useState('')
   const [sort, setSort] = useState('')
   useEffect(() => {
-    applyFilters(selectedFilter, startDate, endDate)
+    applyFilters()
   }, [keyword, userId, status, sort, paymentMethod, paymentStatus])
 
   const handleSearch = () => {
