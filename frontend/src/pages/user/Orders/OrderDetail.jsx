@@ -10,7 +10,8 @@ import {
   IconButton,
   Button,
   Snackbar,
-  Alert
+  Alert,
+  Stack
 } from '@mui/material'
 import { useParams, useNavigate } from 'react-router-dom'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack'
@@ -36,8 +37,10 @@ const OrderDetail = () => {
 
   const [snackbarOpen, setSnackbarOpen] = useState(false)
   const [openReviewModal, setOpenReviewModal] = useState(false)
-  const [selectedItem, setSelectedItem] = useState(null)
   const [reviewedMap, setReviewedMap] = useState({})
+
+  const [selectedProduct, setSelectedProduct] = useState(null)
+
 
   useEffect(() => {
     const fetchUserReviews = async () => {
@@ -47,7 +50,7 @@ const OrderDetail = () => {
         const map = {}
         reviews.forEach(r => {
           const productId = r.productId
-          map[productId] = r._id // lưu review mới nhất
+          map[productId] = r._id
         })
         setReviewedMap(map)
       } catch (err) {
@@ -57,19 +60,38 @@ const OrderDetail = () => {
     fetchUserReviews()
   }, [currentUser])
 
-  const isReviewed = (productId) =>
-    Object.prototype.hasOwnProperty.call(reviewedMap, productId?.toString());
-  const allReviewed = items.every(item => isReviewed(item.productId || item.product?._id))
-
   if (loading) return <CircularProgress />
   if (error) return <Typography color="error">Lỗi: {error.message || 'Có lỗi xảy ra'}</Typography>
   if (!order) return <Typography>Không tìm thấy đơn hàng</Typography>
 
   const [label, color] = statusLabels[order.status] || ['Không xác định', 'default']
   const totalProductsPrice = items.reduce((sum, item) => sum + item.price * item.quantity, 0)
-  const uniqueProductIds = [...new Set(items.map(i => i.productId || i.product?._id))]
-  const isSingleProduct = uniqueProductIds.length === 1
   const formatPrice = (val) => typeof val === 'number' ? val.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' }) : '0₫'
+
+  // Group items by product ID to handle variants
+  const productGroups = items.reduce((groups, item) => {
+    const productId = item.productId?._id
+    if (!productId) return groups
+
+    if (!groups[productId]) {
+      groups[productId] = {
+        productId,
+        productName: item.productId?.name || 'Không xác định',
+        variants: [],
+        totalQuantity: 0,
+        totalPrice: 0
+      }
+    }
+
+    groups[productId].variants.push(item)
+    groups[productId].totalQuantity += item.quantity
+    groups[productId].totalPrice += item.price * item.quantity
+    return groups
+  }, {})
+
+  const uniqueProducts = Object.values(productGroups)
+  const isReviewed = (productId) => Object.prototype.hasOwnProperty.call(reviewedMap, productId?.toString())
+  // const allProductsReviewed = uniqueProducts.every(product => isReviewed(product.productId))
 
   const isPaid = order.paymentStatus === 'paid'
   const isOrderCompleted = order.status === 'Delivered'
@@ -86,22 +108,34 @@ const OrderDetail = () => {
 
   const handleCloseModal = () => {
     setOpenReviewModal(false)
-    setSelectedItem(null)
+    setSelectedProduct(null)
   }
+
 
   const handleSubmitReview = async ({ rating, comment }) => {
     try {
-      const productsToReview = selectedItem ? [selectedItem] : items
-
-      for (const item of productsToReview) {
-        const productId = item.productId || item.product?._id
+      if (selectedProduct) {
+        // Review specific product
+        const productId = selectedProduct.productId
         const userId = currentUser?._id
-        if (!productId || !userId) continue
+        if (!productId || !userId) return
 
         const reviewId = reviewedMap[productId]
         if (reviewId) {
+          // Update existing review
           await updateReview(reviewId, { rating, comment })
         } else {
+          // Create new review
+          const review = await createReview({ productId, userId, rating, comment, orderId })
+          setReviewedMap(prev => ({ ...prev, [productId]: review._id }))
+        }
+      } else {
+        // Review all unreviewed products in the order
+        for (const product of uniqueProducts) {
+          const productId = product.productId
+          const userId = currentUser?._id
+          if (!productId || !userId || isReviewed(productId)) continue
+
           const review = await createReview({ productId, userId, rating, comment, orderId })
           setReviewedMap(prev => ({ ...prev, [productId]: review._id }))
         }
@@ -125,82 +159,156 @@ const OrderDetail = () => {
           <Chip label={label} color={color} sx={{ ml: 'auto' }} />
         </Box>
 
-        <Typography fontWeight="bold">Thông tin người nhận:</Typography>
-        <Typography>{order.shippingAddress?.fullName} - {order.shippingAddress?.phone}</Typography>
-        <Typography>{order.shippingAddress?.address}, {order.shippingAddress?.ward}, {order.shippingAddress?.district}, {order.shippingAddress?.city}</Typography>
+        <Typography variant="h6" fontWeight="bold" gutterBottom>
+          Địa Chỉ Nhận Hàng
+        </Typography>
+
+        <Typography fontWeight="bold" mb={1}>{order.shippingAddress?.fullName}</Typography>
+
+        <Typography>
+          (+84) {order.shippingAddress?.phone}
+        </Typography>
+
+        <Typography>
+          {order.shippingAddress?.address}, {order.shippingAddress?.ward}, {order.shippingAddress?.district}, {order.shippingAddress?.city}
+        </Typography>
+
+        {order.note && (
+          <Typography color="text.secondary">
+            Ghi chú: {order.note}
+          </Typography>
+        )}
 
         <Divider sx={{ my: 2 }} />
 
-        <Typography fontWeight="bold" mb={1}>Sản phẩm đã mua:</Typography>
-        {items.map((item) => {
-          const productId = item.productId || item.product?._id
+
+        {/* <Typography fontWeight="bold" mb={1}>Sản phẩm đã mua:</Typography> */}
+
+        {uniqueProducts.map((product) => {
+          const productReviewed = isReviewed(product.productId)
+
           return (
-            <Box key={item._id} mb={2} display="flex" gap={2} alignItems="center">
-              <Avatar
-                src={item.color?.image || '/default.jpg'}
-                variant="square"
-                sx={{ width: 64, height: 64, borderRadius: 1 }}
-              />
-              <Box flex={1}>
-                <Typography variant="h6">{item.name}</Typography>
-                <Typography variant="body2" color="text.secondary">
-                  Phân loại: {item.color?.name}, {item.size} - x{item.quantity}
-                </Typography>
-                <Typography variant="body1">{formatPrice(item.price)}</Typography>
-                {item.originalPrice > item.price && (
-                  <Typography variant="body2" sx={{ textDecoration: 'line-through' }}>
-                    {formatPrice(item.originalPrice)}
-                  </Typography>
-                )}
-              </Box>
-              {isOrderCompleted && (
-                isReviewed(productId) ? (
+            <Box key={product.productId} mb={3}>
+              {/* Tên sản phẩm */}
+              {/* <Typography fontWeight={600} fontSize="1.1rem" mb={1}>
+                Sản phẩm: {product.productName}
+              </Typography> */}
+
+              {/* Danh sách biến thể */}
+              {product.variants.map((variant, index) => (
+                <Box key={variant._id}>
+                  <Box
+                    display="flex"
+                    alignItems="center"
+                    justifyContent="space-between"
+                    px={1}
+                    py={1.5}
+                    gap={2}
+                  >
+                    {/* Ảnh sản phẩm */}
+                    <Avatar
+                      src={variant?.color?.image || '/default.jpg'}
+                      variant="square"
+                      sx={{ width: 84, height: 84, borderRadius: 1 }}
+                    />
+
+                    {/* Thông tin sản phẩm và biến thể */}
+                    <Box flex={1}>
+                      <Typography fontWeight={500} >
+                        {product.productName}
+                      </Typography>
+                      <Typography variant='body2' color="text.primary">
+                        {variant.color?.name}, Size {variant.size}
+                      </Typography>
+                      <Typography variant='body2' fontWeight={500}>
+                        x{variant.quantity}
+                      </Typography>
+                    </Box>
+
+                    {/* Giá tiền */}
+                    <Box textAlign="right" minWidth={100}>
+                      <Typography variant="body2" fontWeight={600}>
+                        {formatPrice(variant.price * variant.quantity)}
+                      </Typography>
+                      {variant.originalPrice > variant.price && (
+                        <Typography
+                          variant="body2"
+                          color="text.disabled"
+                          sx={{ textDecoration: 'line-through', fontSize: '0.85rem' }}
+                        >
+                          {formatPrice(variant.originalPrice * variant.quantity)}
+                        </Typography>
+                      )}
+                    </Box>
+                  </Box>
+
+                  {/* Divider sau mỗi biến thể, trừ cái cuối */}
+                  {index < product.variants.length - 1 && <Divider />}
+                </Box>
+              ))}
+
+              {/* Nút hành động */}
+              <Box display="flex" justifyContent="flex-end" gap={1} mt={2}>
+                {isOrderCompleted && currentUser && (
                   <Button
-                    variant="outlined"
-                    size="small"
+                    variant="contained"
+                    size="medium"
+                    sx={{
+                      backgroundColor: '#1A3C7B',
+                      color: '#fff',
+                      '&:hover': {
+                        backgroundColor: '#162f63',
+                      },
+                    }}
                     onClick={() => {
-                      setSelectedItem(item)
-                      setOpenReviewModal(true)
+                      setSelectedProduct(product);
+                      setOpenReviewModal(true);
                     }}
                   >
-                    Đánh giá lại
+                    {productReviewed ? 'Sửa đánh giá' : 'Đánh giá'}
                   </Button>
-                ) : (
-                  !isSingleProduct && (
-                    <Button variant="outlined" size="small" onClick={() => {
-                      setSelectedItem(item)
-                      setOpenReviewModal(true)
-                    }}>Đánh giá</Button>
-                  )
-                )
-              )}
-              {isReviewed(productId) && (
+                )}
+
                 <Button
                   variant="outlined"
-                  size="small"
-                  color="primary"
-                  onClick={() => navigate(`/productdetail/${productId}`)}
+                  size="medium"
+                  sx={{
+                    color: '#1A3C7B',
+                    borderColor: '#1A3C7B',
+                    '&:hover': {
+                      borderColor: '#1A3C7B',
+                      backgroundColor: 'rgba(26, 60, 123, 0.04)', // nhẹ khi hover
+                    },
+                  }}
+                  onClick={() => navigate(`/productdetail/${product.productId}`)}
                 >
-                  Mua ngay
+                  Mua lại
                 </Button>
+              </Box>
+
+
+              {/* Divider giữa các sản phẩm */}
+              {uniqueProducts.indexOf(product) < uniqueProducts.length - 1 && (
+                <Divider sx={{ mt: 3 }} />
               )}
             </Box>
           )
         })}
 
-        <Divider sx={{ my: 2 }} />
 
+        <Divider sx={{ my: 2 }} />
+        
         <Box display="flex" justifyContent="space-between" mb={1}>
           <Typography fontWeight="bold">Tổng tiền hàng:</Typography>
-          <Typography>{formatPrice(totalProductsPrice)}</Typography>
+          <Typography fontWeight={600}>{formatPrice(totalProductsPrice)}</Typography>
         </Box>
         <Box display="flex" justifyContent="space-between" mb={1}>
           <Typography fontWeight="bold">Phí vận chuyển:</Typography>
-          <Typography>{formatPrice(order.shippingFee || 0)}</Typography>
+          <Typography fontWeight={600}>{formatPrice(order.shippingFee || 0)}</Typography>
         </Box>
         <Box display="flex" justifyContent="space-between" mb={1}>
           <Typography fontWeight="bold">Mã giảm giá:</Typography>
-          <Typography color={order.couponId ? 'error' : 'inherit'}>
+          <Typography fontWeight={600} color={order.couponId ? 'error' : 'inherit'}>
             {formatPrice(order.discountAmount || 0)}
           </Typography>
         </Box>
@@ -224,16 +332,12 @@ const OrderDetail = () => {
         </Box>
       </Paper>
 
-      {isOrderCompleted && currentUser && isSingleProduct && !allReviewed && (
+
+      {/* Cancel order button */}
+      {isOrderCancellable && (
         <Box display="flex" justifyContent="flex-end" mt={2}>
-          <Button
-            variant="contained"
-            onClick={() => {
-              setSelectedItem(null)
-              setOpenReviewModal(true)
-            }}
-          >
-            Đánh giá sản phẩm
+          <Button variant="contained" color="warning" onClick={handleCancelOrder}>
+            Hủy đơn hàng
           </Button>
         </Box>
       )}
@@ -249,20 +353,14 @@ const OrderDetail = () => {
         </Alert>
       </Snackbar>
 
-      {isOrderCancellable && (
-        <Box display="flex" justifyContent="flex-end" mt={2}>
-          <Button variant="contained" color="warning" onClick={handleCancelOrder}>
-            Hủy đơn hàng
-          </Button>
-        </Box>
-      )}
-
       <ReviewModal
         open={openReviewModal}
         onClose={handleCloseModal}
         onSubmit={handleSubmitReview}
-        orderItems={selectedItem ? [selectedItem] : items}
+        orderItems={selectedProduct ? selectedProduct.variants : items} // chỉ truyền variants của sản phẩm đang chọn
+        products={selectedProduct ? [selectedProduct] : uniqueProducts}
       />
+
     </Box>
   )
 }

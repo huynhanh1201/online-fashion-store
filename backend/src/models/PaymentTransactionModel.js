@@ -37,6 +37,10 @@ const paymentTransactionSchema = new Schema(
     destroy: {
       type: Boolean,
       default: false // Soft-delete mặc định là false
+    },
+    orderCode: {
+      type: String,
+      required: true
     }
   },
   {

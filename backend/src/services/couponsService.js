@@ -25,48 +25,6 @@ const createCoupon = async (reqBody) => {
   }
 }
 
-const validateCoupon = async (userId, reqBody) => {
-  // eslint-disable-next-line no-useless-catch
-  try {
-    const now = new Date()
-
-    const coupon = await CouponModel.findOne({
-      code: reqBody.couponCode,
-      isActive: true,
-      validFrom: { $lte: now },
-      validUntil: { $gte: now },
-      $expr: { $lte: ['$usedCount', '$usageLimit'] }
-    })
-
-    if (coupon && reqBody.cartTotal >= coupon.minOrderValue) {
-      let discountAmount
-      if (coupon.type === 'fixed') {
-        discountAmount = coupon.amount
-      } else if (coupon.type === 'percent') {
-        discountAmount = reqBody.cartTotal * (coupon.amount / 100)
-      }
-
-      const newTotal = reqBody.cartTotal - discountAmount
-      const message = `Áp dụng thành công mã ${coupon.code}`
-
-      return {
-        couponId: coupon._id,
-        valid: true, // Mã hợp lệ
-        discountAmount,
-        newTotal,
-        message
-      }
-    } else {
-      return {
-        valid: false, // Mã sai hoặc hết hạn
-        message: 'Mã không hợp lệ hoặc đã hết hạn'
-      }
-    }
-  } catch (err) {
-    throw err
-  }
-}
-
 const getCouponList = async (queryString) => {
   // eslint-disable-next-line no-useless-catch
   try {
@@ -86,14 +44,14 @@ const getCouponList = async (queryString) => {
     validatePagination(page, limit)
 
     // Xử lý thông tin Filter
-    const filter = {}
+    const filter = { isActive: true }
 
     if (type) filter.type = type.toLowerCase()
 
     if (status === 'true' || status === 'false') {
       status = JSON.parse(status)
 
-      filter.destroy = status
+      filter.isActive = status
     }
 
     if (search) {
@@ -184,6 +142,48 @@ const deleteCoupon = async (couponId) => {
     const couponUpdated = await CouponModel.findOneAndDelete({ _id: couponId })
 
     return couponUpdated
+  } catch (err) {
+    throw err
+  }
+}
+
+const validateCoupon = async (userId, reqBody) => {
+  // eslint-disable-next-line no-useless-catch
+  try {
+    const now = new Date()
+
+    const coupon = await CouponModel.findOne({
+      code: reqBody.couponCode,
+      isActive: true,
+      validFrom: { $lte: now },
+      validUntil: { $gte: now },
+      $expr: { $lte: ['$usedCount', '$usageLimit'] }
+    })
+
+    if (coupon && reqBody.cartTotal >= coupon.minOrderValue) {
+      let discountAmount
+      if (coupon.type === 'fixed') {
+        discountAmount = coupon.amount
+      } else if (coupon.type === 'percent') {
+        discountAmount = reqBody.cartTotal * (coupon.amount / 100)
+      }
+
+      const newTotal = reqBody.cartTotal - discountAmount
+      const message = `Áp dụng thành công mã ${coupon.code}`
+
+      return {
+        couponId: coupon._id,
+        valid: true, // Mã hợp lệ
+        discountAmount,
+        newTotal,
+        message
+      }
+    } else {
+      return {
+        valid: false, // Mã sai hoặc hết hạn
+        message: 'Mã không hợp lệ hoặc đã hết hạn'
+      }
+    }
   } catch (err) {
     throw err
   }

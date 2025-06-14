@@ -57,7 +57,7 @@ const getWarehouseSlipList = async (queryString) => {
   validatePagination(page, limit)
 
   // Xử lý thông tin Filter
-  const filter = {}
+  const filter = { destroy: false }
 
   if (type) {
     filter.type = type
@@ -366,7 +366,7 @@ const importStockWarehouseSlip = async (reqBody, jwtDecoded, session) => {
 
         const [batchCreated] = await BatchModel.create([batchInfo], { session })
         batchDocs.push(batchCreated)
-        // Lưu vào batchMap với key dạng "variantId-index"
+        // Lưu vào batchMap với key dạng "variantId-index.jsx"
         batchMap[`${variant._id}-${i}`] = batchCreated // vì create() trả mảng
       }
     }

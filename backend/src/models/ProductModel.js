@@ -8,19 +8,19 @@ const productSchema = new Schema(
       type: String,
       required: true,
       trim: true, // Loại bỏ khoảng trắng đầu/cuối
-      text: true // Tạo text index để tìm kiếm nhanh :contentReference[oaicite:0]{index=0}
+      text: true // Tạo text index.jsx để tìm kiếm nhanh :contentReference[oaicite:0]{index.jsx=0}
     },
     description: {
       type: String,
       default: '', // Nếu không truyền, để chuỗi rỗng
       trim: true,
-      text: true // Tạo text index cho mô tả :contentReference[oaicite:1]{index=1}
+      text: true // Tạo text index.jsx cho mô tả :contentReference[oaicite:1]{index.jsx=1}
     },
     quantity: {
       type: Number,
       required: true,
       default: 0, // Nếu không truyền, để mặc định là 0
-      min: 0 // Giá không thể âm :contentReference[oaicite:2]{index=2}
+      min: 0 // Giá không thể âm :contentReference[oaicite:2]{index.jsx=2}
     },
     image: [
       {
@@ -38,7 +38,7 @@ const productSchema = new Schema(
       // required: true,
       lowercase: true, // Chuyển về chữ thường
       trim: true
-      // unique: true // Bắt buộc duy nhất để làm URL-friendly :contentReference[oaicite:3]{index=3}
+      // unique: true // Bắt buộc duy nhất để làm URL-friendly :contentReference[oaicite:3]{index.jsx=3}
     },
     destroy: {
       type: Boolean,
@@ -47,12 +47,12 @@ const productSchema = new Schema(
     importPrice: {
       type: Number,
       required: true,
-      min: 0 // Giá không thể âm :contentReference[oaicite:2]{index=2}
+      min: 0 // Giá không thể âm :contentReference[oaicite:2]{index.jsx=2}
     },
     exportPrice: {
       type: Number,
       required: true,
-      min: 0 // Giá không thể âm :contentReference[oaicite:2]{index=2}
+      min: 0 // Giá không thể âm :contentReference[oaicite:2]{index.jsx=2}
     },
     productCode: {
       type: String,

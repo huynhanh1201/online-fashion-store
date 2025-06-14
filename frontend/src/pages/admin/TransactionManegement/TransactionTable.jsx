@@ -1,103 +1,158 @@
 // import React from 'react'
-//
-// import Table from '@mui/material/Table'
-// import TableBody from '@mui/material/TableBody'
-// import TableCell from '@mui/material/TableCell'
-// import TableHead from '@mui/material/TableHead'
-// import TableRow from '@mui/material/TableRow'
-// import CircularProgress from '@mui/material/CircularProgress'
+// import {
+//   Table,
+//   TableBody,
+//   TableContainer,
+//   TableHead,
+//   TablePagination,
+//   TableCell,
+//   TableRow,
+//   Typography,
+//   Paper,
+//   Box
+// } from '@mui/material'
 //
 // import TransactionRow from './TransactionRow'
-// import StyleAdmin, {
-//   StyledTableCell,
-//   StyledTableRow,
-//   StyledTableContainer
-// } from '~/assets/StyleAdmin.jsx'
-// import Paper from '@mui/material/Paper'
-//
+// import StyleAdmin from '~/assets/StyleAdmin.jsx'
+// import FilterTransaction from '~/components/FilterAdmin/FilterTransaction.jsx'
 // const TransactionTable = ({
-//   transactions,
+//   transactions = [],
 //   loading,
 //   onView,
 //   onEdit,
-//   onDelete
+//   onDelete,
+//   page = 0,
+//   rowsPerPage = 10,
+//   onFilter,
+//   onPageChange,
+//   onChangeRowsPerPage,
+//   total,
+//   fetchTransactions
 // }) => {
 //   return (
-//     <StyledTableContainer component={Paper}>
-//       <table>
+//     <Paper sx={{ border: '1px solid #ccc', width: '100%', overflow: 'hidden' }}>
+//       <Table stickyHeader>
 //         <TableHead>
-//           <StyledTableRow>
-//             <StyledTableCell sx={StyleAdmin.TableColumnSTT}>
-//               STT
-//             </StyledTableCell>
-//             <StyledTableCell sx={{ width: '20%' }}>
-//               Mã giao dịch
-//             </StyledTableCell>
-//             <StyledTableCell sx={{ width: '20%' }}>Đơn hàng</StyledTableCell>
-//             <StyledTableCell>Phương thức</StyledTableCell>
-//             <StyledTableCell>Trạng thái</StyledTableCell>
-//             <StyledTableCell sx={{ width: '120px' }}>
-//               Số tiền (VNĐ)
-//             </StyledTableCell>
-//             <StyledTableCell sx={{ width: '30%' }}>Ghi chú</StyledTableCell>
-//             <StyledTableCell>Ngày tạo</StyledTableCell>
-//             <StyledTableCell sx={{ maxWidth: '130px', width: '130px' }}>
+//           <TableRow>
+//             <TableCell colSpan={9}>
+//               <Typography variant='h6' fontWeight={800}>
+//                 <Box
+//                   sx={{
+//                     display: 'flex',
+//                     justifyContent: 'space-between',
+//                     alignItems: 'start'
+//                   }}
+//                 >
+//                   <Box
+//                     sx={{
+//                       display: 'flex',
+//                       flexDirection: 'column',
+//                       gap: 1,
+//                       minWidth: 250
+//                     }}
+//                   >
+//                     <Typography variant='h6' sx={{ fontWeight: '800' }}>
+//                       Danh Sách Giao Dịch
+//                     </Typography>
+//                   </Box>
+//                   <FilterTransaction
+//                     onFilter={onFilter}
+//                     transactions={transactions}
+//                     loading={loading}
+//                     fetchTransactions={fetchTransactions}
+//                   />
+//                 </Box>
+//               </Typography>
+//             </TableCell>
+//           </TableRow>
+//           <TableRow>
+//             <TableCell sx={StyleAdmin.TableColumnSTT}>STT</TableCell>
+//             <TableCell sx={{ width: '20%' }}>Mã đơn hàng</TableCell>
+//             <TableCell sx={{ width: '20%' }}>Mã giao dịch</TableCell>
+//             <TableCell sx={{ width: 100 }}>Phương thức</TableCell>
+//             <TableCell sx={{ width: 100 }}>Trạng thái</TableCell>
+//             <TableCell sx={{ width: '200px' }}>Số tiền</TableCell>
+//             <TableCell sx={{ width: 180 }}>Ngày tạo</TableCell>
+//             <TableCell
+//               sx={{
+//                 width: '130px',
+//                 maxWidth: '130px',
+//                 textAlign: 'center'
+//               }}
+//             >
 //               Hành động
-//             </StyledTableCell>
-//           </StyledTableRow>
+//             </TableCell>
+//           </TableRow>
 //         </TableHead>
 //         <TableBody>
 //           {loading ? (
-//             <StyledTableRow>
-//               <StyledTableCell colSpan={9} align='center'>
-//                 đang tải dữ liệu ....
-//               </StyledTableCell>
-//             </StyledTableRow>
-//           ) : transactions.filter((transaction) => !transaction.destroy)
-//               .length > 0 ? (
-//             transactions
-//               .filter((transaction) => !transaction.destroy)
-//               .map((transaction, index) => (
-//                 <TransactionRow
-//                   key={transaction._id}
-//                   index={index}
-//                   transaction={transaction}
-//                   onView={onView}
-//                   onEdit={onEdit}
-//                   onDelete={onDelete}
-//                 />
-//               ))
-//           ) : (
-//             <StyledTableRow>
-//               <StyledTableCell colSpan={9} align='center'>
+//             <TableRow>
+//               <TableCell colSpan={9} align='center'>
+//                 Đang tải dữ liệu...
+//               </TableCell>
+//             </TableRow>
+//           ) : transactions.length === 0 ? (
+//             <TableRow>
+//               <TableCell colSpan={9} align='center'>
 //                 Không có giao dịch nào.
-//               </StyledTableCell>
-//             </StyledTableRow>
+//               </TableCell>
+//             </TableRow>
+//           ) : (
+//             transactions.map((transaction, index.jsx) => (
+//               <TransactionRow
+//                 key={transaction._id}
+//                 index.jsx={page * rowsPerPage + index.jsx + 1} // +1 để hiển thị đúng STT
+//                 transaction={transaction}
+//                 onView={onView}
+//                 onEdit={onEdit}
+//                 onDelete={onDelete}
+//               />
+//             ))
 //           )}
 //         </TableBody>
-//       </table>
-//     </StyledTableContainer>
+//       </Table>
+//
+//       <TablePagination
+//         rowsPerPageOptions={[10, 25, 100]}
+//         component='div'
+//         count={total || 0}
+//         rowsPerPage={rowsPerPage}
+//         page={page}
+//         onPageChange={(event, newPage) => onPageChange(event, newPage + 1)} // +1 để đúng logic bên cha
+//         onRowsPerPageChange={(event) => {
+//           const newLimit = parseInt(event.target.value, 10)
+//           if (onChangeRowsPerPage) {
+//             onChangeRowsPerPage(newLimit)
+//           }
+//         }}
+//         labelRowsPerPage='Số dòng mỗi trang'
+//         labelDisplayedRows={({ from, to, count }) =>
+//           `${from}–${to} trên ${count !== -1 ? count : `hơn ${to}`}`
+//         }
+//       />
+//     </Paper>
 //   )
 // }
 //
 // export default TransactionTable
+
 import React from 'react'
 import {
+  Paper,
+  Typography,
+  Box,
   Table,
   TableBody,
-  TableContainer,
   TableHead,
-  TablePagination,
-  TableCell,
   TableRow,
-  Typography,
-  Paper,
-  Box
+  TableCell,
+  TablePagination
 } from '@mui/material'
 
 import TransactionRow from './TransactionRow'
+import FilterTransaction from '~/components/FilterAdmin/FilterTransaction'
 import StyleAdmin from '~/assets/StyleAdmin.jsx'
-import FilterTransaction from '~/components/FilterAdmin/FilterTransaction.jsx'
+
 const TransactionTable = ({
   transactions = [],
   loading,
@@ -106,69 +161,42 @@ const TransactionTable = ({
   onDelete,
   page = 0,
   rowsPerPage = 10,
-  onFilter,
+  total = 0,
   onPageChange,
   onChangeRowsPerPage,
-  total,
+  onFilter,
   fetchTransactions
 }) => {
-  const filteredTransactions = transactions.filter((t) => !t.destroy)
-  const paginated = filteredTransactions.slice(
-    page * rowsPerPage,
-    page * rowsPerPage + rowsPerPage
-  )
-
   return (
-    <Paper sx={{ border: '1px solid #ccc', width: '100%', overflow: 'hidden' }}>
-      <Table stickyHeader>
+    <Paper sx={{ border: '1px solid #ccc' }}>
+      <Box
+        p={2}
+        display='flex'
+        justifyContent='space-between'
+        alignItems='center'
+      >
+        <Typography variant='h6' fontWeight={800}>
+          Danh sách giao dịch
+        </Typography>
+        <FilterTransaction
+          onFilter={onFilter}
+          transactions={transactions}
+          loading={loading}
+          fetchTransactions={fetchTransactions}
+        />
+      </Box>
+
+      <Table>
         <TableHead>
           <TableRow>
-            <TableCell colSpan={9}>
-              <Typography variant='h6' fontWeight={800}>
-                <Box
-                  sx={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'start'
-                  }}
-                >
-                  <Box
-                    sx={{
-                      display: 'flex',
-                      flexDirection: 'column',
-                      gap: 1,
-                      minWidth: 250
-                    }}
-                  >
-                    <Typography variant='h6' sx={{ fontWeight: '800' }}>
-                      Danh Sách Giao Dịch
-                    </Typography>
-                  </Box>
-                  <FilterTransaction
-                    onFilter={onFilter}
-                    transactions={transactions}
-                    loading={loading}
-                    fetchTransactions={fetchTransactions}
-                  />
-                </Box>
-              </Typography>
-            </TableCell>
-          </TableRow>
-          <TableRow>
             <TableCell sx={StyleAdmin.TableColumnSTT}>STT</TableCell>
-            <TableCell sx={{ width: '20%' }}>Mã giao dịch</TableCell>
-            <TableCell sx={{ width: '20%' }}>Đơn hàng</TableCell>
-            <TableCell sx={{ width: 100 }}>Phương thức</TableCell>
-            <TableCell sx={{ width: 100 }}>Trạng thái</TableCell>
-            <TableCell sx={{ width: '200px' }}>Số tiền (VNĐ)</TableCell>
-            <TableCell sx={{ width: 180 }}>Ngày tạo</TableCell>
-            <TableCell
-              sx={{
-                width: '130px',
-                maxWidth: '130px',
-                textAlign: 'center'
-              }}
-            >
+            <TableCell>Mã đơn hàng</TableCell>
+            <TableCell>Mã giao dịch</TableCell>
+            <TableCell>Phương thức</TableCell>
+            <TableCell>Trạng thái</TableCell>
+            <TableCell>Số tiền</TableCell>
+            <TableCell>Ngày tạo</TableCell>
+            <TableCell align='start' sx={{ width: 150 }}>
               Hành động
             </TableCell>
           </TableRow>
@@ -176,18 +204,18 @@ const TransactionTable = ({
         <TableBody>
           {loading ? (
             <TableRow>
-              <TableCell colSpan={9} align='center'>
+              <TableCell colSpan={8} align='center'>
                 Đang tải dữ liệu...
               </TableCell>
             </TableRow>
-          ) : filteredTransactions.length === 0 ? (
+          ) : transactions.length === 0 ? (
             <TableRow>
-              <TableCell colSpan={9} align='center'>
+              <TableCell colSpan={8} align='center'>
                 Không có giao dịch nào.
               </TableCell>
             </TableRow>
           ) : (
-            paginated.map((transaction, index) => (
+            transactions.map((transaction, index) => (
               <TransactionRow
                 key={transaction._id}
                 index={page * rowsPerPage + index}
@@ -202,18 +230,15 @@ const TransactionTable = ({
       </Table>
 
       <TablePagination
-        rowsPerPageOptions={[10, 25, 100]}
         component='div'
-        count={total || 0}
-        rowsPerPage={rowsPerPage}
+        count={total}
         page={page}
-        onPageChange={(event, newPage) => onPageChange(event, newPage + 1)} // +1 để đúng logic bên cha
-        onRowsPerPageChange={(event) => {
-          const newLimit = parseInt(event.target.value, 10)
-          if (onChangeRowsPerPage) {
-            onChangeRowsPerPage(newLimit)
-          }
-        }}
+        rowsPerPage={rowsPerPage}
+        onPageChange={(e, newPage) => onPageChange(e, newPage + 1)}
+        onRowsPerPageChange={(e) =>
+          onChangeRowsPerPage(parseInt(e.target.value, 10))
+        }
+        rowsPerPageOptions={[10, 25, 50]}
         labelRowsPerPage='Số dòng mỗi trang'
         labelDisplayedRows={({ from, to, count }) =>
           `${from}–${to} trên ${count !== -1 ? count : `hơn ${to}`}`

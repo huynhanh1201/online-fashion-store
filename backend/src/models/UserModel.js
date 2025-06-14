@@ -17,7 +17,7 @@ const userSchema = new Schema(
     email: {
       type: String,
       required: true,
-      unique: true, // tạo unique index trên email :contentReference[oaicite:3]{index=3}
+      unique: true, // tạo unique index.jsx trên email :contentReference[oaicite:3]{index.jsx=3}
       lowercase: true,
       trim: true,
       maxlength: 100
@@ -42,7 +42,7 @@ const userSchema = new Schema(
     // Vai trò người dùng: 'user' hoặc 'HeaderAdmin'
     role: {
       type: String,
-      enum: ['customer', 'admin'],
+      enum: ['owner', 'technical_admin', 'staff', 'customer'],
       default: 'customer'
     },
 
@@ -70,7 +70,7 @@ const userSchema = new Schema(
     }
   },
   {
-    // Tự động thêm createdAt & updatedAt :contentReference[oaicite:4]{index=4}
+    // Tự động thêm createdAt & updatedAt :contentReference[oaicite:4]{index.jsx=4}
     timestamps: true
   }
 )

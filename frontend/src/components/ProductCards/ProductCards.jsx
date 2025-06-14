@@ -1,16 +1,23 @@
 import React from 'react'
+import { optimizeCloudinaryUrl } from '~/utils/cloudinary'
 
-// Mock Link component
 const Link = ({ to, children, ...props }) => (
   <a href={to} {...props}>
     {children}
   </a>
 )
 
-const ResponsiveProductCard = ({ product, isFlashSale = false }) => {
-  if (!product) {
-    return null // hoặc render một placeholder
+const ProductCard = ({ product, isFlashSale = false }) => {
+  if (!product || !product.image) {
+    return <div style={styles.productCard}>No image available</div>
   }
+
+  const imageUrl = Array.isArray(product.image) ? product.image[0] : product.image
+  const optimizedImage = optimizeCloudinaryUrl(imageUrl)
+
+
+  // console.log('Original image URL:', imageUrl)
+  // console.log('Optimized image URL:', optimizedImage)
 
   const quantity = Number(product.quantity) || 0
   const inStock = quantity > 0
@@ -50,27 +57,13 @@ const ResponsiveProductCard = ({ product, isFlashSale = false }) => {
           }}
         >
           <img
-            src={
-              (() => {
-                if (product.image) {
-                  if (Array.isArray(product.image) && product.image.length > 0) {
-                    return product.image[0]
-                  } else if (typeof product.image === 'string') {
-                    return product.image
-                  }
-                }
-                return 'https://via.placeholder.com/220x220?text=No+Image'
-              })()
-            }
+            src={optimizedImage}
             alt={product.name}
             style={{
               ...styles.productImg,
               ...(inStock ? {} : styles.outOfStockImg)
             }}
-            onError={(e) => {
-              console.error('Product image failed to load:', e.target.src)
-              e.target.src = 'https://via.placeholder.com/220x220?text=Image+Error'
-            }}
+            loading="lazy"
           />
           {product.discount > 0 && (
             <div style={styles.discountBadge}>-{product.discount}%</div>
@@ -115,6 +108,7 @@ const ResponsiveProductCard = ({ product, isFlashSale = false }) => {
     </Link>
   )
 }
+
 
 const styles = {
   productCardLink: {
@@ -235,4 +229,4 @@ const styles = {
   }
 }
 
-export default ResponsiveProductCard
+export default ProductCard

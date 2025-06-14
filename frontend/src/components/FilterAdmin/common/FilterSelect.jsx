@@ -16,7 +16,22 @@ export default function FilterSelect({
   sx
 }) {
   return (
-    <FormControl size='small' sx={{ minWidth: 220, maxWidth: 300, ...sx }}>
+    <FormControl
+      size='small'
+      sx={{
+        minWidth: 150,
+        '& .MuiOutlinedInput-root': {
+          borderRadius: '4px', // Bo tròn
+          height: 34, // Chiều cao cố định
+          fontSize: '0.8rem', // Cỡ chữ nhỏ lại
+          paddingX: 1 // Padding ngang nhẹ
+        },
+        '& .MuiInputLabel-root': {
+          fontSize: '0.75rem' // Nhỏ label luôn
+        },
+        ...sx
+      }}
+    >
       <InputLabel>{label}</InputLabel>
       <Select
         value={value}

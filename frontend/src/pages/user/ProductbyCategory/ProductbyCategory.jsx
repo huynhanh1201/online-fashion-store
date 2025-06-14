@@ -18,7 +18,7 @@ import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import { useParams } from 'react-router-dom';
 import { getCategoryById } from '~/services/categoryService';
 
-const ITEMS_PER_PAGE = 6;
+const ITEMS_PER_PAGE = 12;
 
 // Custom styled components
 const SortDropdownButton = styled('button')(({ theme }) => ({
@@ -80,7 +80,8 @@ const ProductbyCategory = () => {
     fetchProducts,
     loading: loadingProducts,
     error: errorProducts
-  } = useProducts();
+  } = useProducts(1, 1000);
+  
 
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [sortOption, setSortOption] = useState('featured');
@@ -313,8 +314,7 @@ const ProductbyCategory = () => {
           ) : (
             <>
               <div className="product-grid">
-
-                  {paginatedProducts.map((product) => (
+                  {filteredProducts.map((product) => (
                     <Grid item xs={12} sm={6} md={4} lg={3} key={product._id}>
                       <ProductCard
                         product={product}

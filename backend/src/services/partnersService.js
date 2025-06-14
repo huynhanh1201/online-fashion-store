@@ -7,7 +7,7 @@ import { SizeModel } from '~/models/SizeModel'
 const createPartner = async (reqBody) => {
   // eslint-disable-next-line no-useless-catch
   try {
-    // Tạo Code Partner
+    // Tạo Code PartnerManagement
     const prefixPartnerId = 'NCC-'
 
     const partnerCode = await generateSequentialCode(
@@ -86,7 +86,7 @@ const getPartnerList = async (queryString) => {
   validatePagination(page, limit)
 
   // Xử lý thông tin Filter
-  const filter = {}
+  const filter = { destroy: false }
 
   if (type) {
     filter.type = type

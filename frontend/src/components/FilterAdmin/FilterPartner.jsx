@@ -4,24 +4,24 @@ import dayjs from 'dayjs'
 import FilterSelect from '~/components/FilterAdmin/common/FilterSelect'
 import FilterByTime from '~/components/FilterAdmin/common/FilterByTime'
 import SearchWithSuggestions from '~/components/FilterAdmin/common/SearchWithSuggestions'
-
 export default function FilterPartner({
   onFilter,
   partners = [],
-  fetchPartners,
-  loading
+  loading,
+  fetchPartners
 }) {
   const [keyword, setKeyword] = useState('')
   const [inputValue, setInputValue] = useState('')
   const [type, setType] = useState('')
   const [destroy, setDestroy] = useState('')
+  const [sort, setSort] = useState('')
   const [selectedFilter, setSelectedFilter] = useState('')
   const [startDate, setStartDate] = useState(dayjs().format('YYYY-MM-DD'))
   const [endDate, setEndDate] = useState(dayjs().format('YYYY-MM-DD'))
 
   useEffect(() => {
     applyFilters(selectedFilter, startDate, endDate)
-  }, [keyword, type, destroy])
+  }, [keyword, type, destroy, sort])
 
   const handleApplyTimeFilter = (selected) => {
     setSelectedFilter(selected)
@@ -30,14 +30,14 @@ export default function FilterPartner({
 
   const handleSearch = () => {
     setKeyword(inputValue)
-    fetchPartners?.(1, 10, { keyword: inputValue })
   }
 
   const applyFilters = (selectedTime, fromDate, toDate) => {
     const filters = {
-      keyword: keyword || undefined,
+      search: keyword || undefined,
       type: type || undefined,
-      destroy: destroy !== '' ? destroy === 'true' : undefined
+      status: destroy !== '' ? destroy === 'true' : undefined,
+      sort: sort || undefined
     }
 
     if (selectedTime === 'custom') {
@@ -62,11 +62,12 @@ export default function FilterPartner({
     setInputValue('')
     setType('')
     setDestroy('')
+    setSort('')
     setSelectedFilter('')
     setStartDate(dayjs().format('YYYY-MM-DD'))
     setEndDate(dayjs().format('YYYY-MM-DD'))
     onFilter({})
-    fetchPartners?.(1, 10, {})
+    fetchPartners(1, 10)
   }
 
   return (
@@ -78,7 +79,8 @@ export default function FilterPartner({
         options={[
           { label: 'Tất cả', value: '' },
           { label: 'Nhà cung cấp', value: 'supplier' },
-          { label: 'Khách hàng', value: 'customer' }
+          { label: 'Khách hàng', value: 'customer' },
+          { label: 'Ncc & Khách hàng', value: 'both' }
         ]}
       />
 
@@ -88,13 +90,13 @@ export default function FilterPartner({
         onChange={setDestroy}
         options={[
           { label: 'Tất cả', value: '' },
-          { label: 'Chưa xoá', value: 'false' },
-          { label: 'Đã xoá', value: 'true' }
+          { label: 'Đang hoạt động', value: 'false' },
+          { label: 'Dừng hoạt động', value: 'true' }
         ]}
       />
-
+      <FilterSelect value={sort} onChange={setSort} />
       <FilterByTime
-        label='Lọc thời gian tạo'
+        label='Ngày tạo đối tác '
         selectedFilter={selectedFilter}
         setSelectedFilter={setSelectedFilter}
         startDate={startDate}

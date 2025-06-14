@@ -25,7 +25,12 @@ const category = async (req, res, next) => {
     description: Joi.string() // description không bắt buộc
       .max(500) // bạn có thể giới hạn độ dài nếu muốn
       .trim()
-      .allow('', null) // cho phép bỏ trống hoặc null
+      .allow('', null), // cho phép bỏ trống hoặc null
+
+    image: Joi.string() // name bắt buộc, chuỗi
+      .max(150) // tối đa 50 ký tự
+      .trim() // loại bỏ khoảng trắng đầu/cuối
+      .allow('', null)
   })
 
   try {

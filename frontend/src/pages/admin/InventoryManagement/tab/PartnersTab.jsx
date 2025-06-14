@@ -22,20 +22,17 @@ import ViewPartnerModal from '../modal/Partner/ViewPartnerModal.jsx'
 import DeletePartnerModal from '../modal/Partner/DeletePartnerModal.jsx'
 import AddIcon from '@mui/icons-material/Add'
 import FilterPartner from '~/components/FilterAdmin/FilterPartner.jsx'
-
-const PartnersTab = ({
-  data = [],
-  page,
-  rowsPerPage,
-  onPageChange,
-  loading,
-  onChangeRowsPerPage,
-  total,
-  refreshPartners,
-  addPartner,
-  updatePartner,
-  deletePartner
-}) => {
+import usePartner from '~/hooks/admin/Inventory/usePartner.js'
+const PartnersTab = () => {
+  const {
+    partners,
+    fetchPartners,
+    createNewPartner,
+    updateExistingPartner,
+    removePartner,
+    loadingPartner,
+    totalPartner
+  } = usePartner()
   const getPartnerTypeLabel = (type) => {
     switch (type) {
       case 'supplier':
@@ -81,16 +78,18 @@ const PartnersTab = ({
   const [openViewDialog, setOpenViewDialog] = useState(false)
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false)
   const [selectedPartner, setSelectedPartner] = useState(null)
+  const [page, setPage] = useState(1)
+  const [rowsPerPage, setRowsPerPage] = useState(10)
   const [filter, setFilter] = useState({})
 
   useEffect(() => {
-    refreshPartners(page, rowsPerPage, filter)
+    fetchPartners(page, rowsPerPage, filter)
   }, [page, rowsPerPage])
 
   const handleFilter = (newFilters) => {
     setFilter(newFilters)
     if (Object.keys(newFilters).length > 0) {
-      refreshPartners(1, rowsPerPage, newFilters)
+      fetchPartners(1, rowsPerPage, newFilters)
     }
   }
   const handleAddPartner = () => {
@@ -106,7 +105,7 @@ const PartnersTab = ({
   }
   const handleCloseEditDialog = () => {
     setOpenEditDialog(false)
-    refreshPartners()
+    fetchPartners(page, rowsPerPage)
   }
 
   const handleViewPartner = (partner) => {
@@ -123,6 +122,7 @@ const PartnersTab = ({
   }
   const handleCloseDeleteDialog = () => {
     setOpenDeleteDialog(false)
+    fetchPartners(page, rowsPerPage)
   }
   const styles = {
     groupIcon: {
@@ -131,6 +131,13 @@ const PartnersTab = ({
       alignItems: 'center',
       width: '100%'
     }
+  }
+
+  const handleChangePage = (event, value) => setPage(value)
+
+  const onChangeRowsPerPage = (newLimit) => {
+    setPage(1)
+    setRowsPerPage(newLimit)
   }
   return (
     <Paper elevation={3} sx={{ p: 2 }}>
@@ -175,10 +182,10 @@ const PartnersTab = ({
             </Button>
           </Box>
           <FilterPartner
-            partners={data}
-            loading={loading}
+            partners={partners}
+            loading={loadingPartner}
             onFilter={handleFilter}
-            fetchPartners={refreshPartners}
+            fetchPartners={fetchPartners}
           />
         </Box>
       </Box>
@@ -188,7 +195,7 @@ const PartnersTab = ({
             <TableCell>STT</TableCell>
             <TableCell>Mã</TableCell>
             <TableCell>Tên</TableCell>
-            <TableCell sx={{ textAlign: 'center', width: '150px' }}>
+            <TableCell sx={{ textAlign: 'start', width: '150px' }}>
               Loại
             </TableCell>
             <TableCell>SĐT</TableCell>
@@ -198,15 +205,20 @@ const PartnersTab = ({
             <TableCell>Ngân hàng</TableCell>
             <TableCell>Ngày tạo</TableCell>
             <TableCell
-              align='center'
-              sx={{ minWidth: '130px', width: '130px', maxWidth: '130px' }}
+              align='start'
+              sx={{
+                minWidth: '130px',
+                width: '130px',
+                maxWidth: '130px',
+                paddingLeft: '20px'
+              }}
             >
               Hành động
             </TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
-          {data.map((partner, index) => {
+          {partners.map((partner, index) => {
             const fullAddress = [
               partner.address?.street,
               partner.address?.ward,
@@ -262,7 +274,7 @@ const PartnersTab = ({
               </TableRow>
             )
           })}
-          {data.length === 0 && (
+          {partners.length === 0 && (
             <TableRow>
               <TableCell colSpan={11} align='center'>
                 Không có dữ liệu đối tác
@@ -274,10 +286,10 @@ const PartnersTab = ({
       <TablePagination
         rowsPerPageOptions={[10, 25, 100]}
         component='div'
-        count={total || 0}
+        count={totalPartner || 0}
         rowsPerPage={rowsPerPage}
         page={page - 1}
-        onPageChange={(event, newPage) => onPageChange(event, newPage + 1)} // +1 để đúng logic bên cha
+        onPageChange={(event, newPage) => handleChangePage(event, newPage + 1)} // +1 để đúng logic bên cha
         onRowsPerPageChange={(event) => {
           const newLimit = parseInt(event.target.value, 10)
           if (onChangeRowsPerPage) {
@@ -293,14 +305,14 @@ const PartnersTab = ({
       <AddPartnerModal
         open={openAddDialog}
         onClose={handleCloseAddDialog}
-        addPartner={addPartner}
+        addPartner={createNewPartner}
       />
       <EditPartnerModal
         open={openEditDialog}
         onClose={handleCloseEditDialog}
         partner={selectedPartner}
-        updatePartner={updatePartner}
-        fetchPartners={refreshPartners}
+        updatePartner={updateExistingPartner}
+        fetchPartners={fetchPartners}
       />
       <ViewPartnerModal
         open={openViewDialog}
@@ -311,7 +323,7 @@ const PartnersTab = ({
         open={openDeleteDialog}
         onClose={handleCloseDeleteDialog}
         partner={selectedPartner}
-        deletePartner={deletePartner}
+        deletePartner={removePartner}
       />
     </Paper>
   )

@@ -12,6 +12,7 @@ import { styled } from '@mui/system'
 import AddIcon from '@mui/icons-material/Add'
 import RemoveIcon from '@mui/icons-material/Remove'
 import LocalOfferIcon from '@mui/icons-material/LocalOffer'
+import { optimizeCloudinaryUrl } from '~/utils/cloudinary'
 
 const PriceTypography = styled(Typography)({
   color: '#d32f2f',
@@ -170,10 +171,11 @@ const ProductInfoSection = ({
                           sx={{ p: '4px 8px', minHeight: 40 }}
                         >
                           <VariantImage
-                            src={color.image || '/default.jpg'}
+                            src={optimizeCloudinaryUrl(color.image) || '/default.jpg'}
                             alt={color.name}
                             onError={e => (e.target.src = '/default.jpg')}
                           />
+
                           <Box>
                             <Typography variant='body2' fontWeight={600} sx={{ fontSize: 14 }}>
                               Size {size.name}
