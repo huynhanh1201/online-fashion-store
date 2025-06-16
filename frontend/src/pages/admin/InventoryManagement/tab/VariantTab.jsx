@@ -98,7 +98,6 @@ const VariantsTab = () => {
   const handleCloseViewModal = () => {
     setOpenViewModal(false)
     setSelectedVariant(null)
-    fetchVariants(page, rowsPerPage, filter)
   }
 
   const handleCloseEditModal = () => {
@@ -110,6 +109,7 @@ const VariantsTab = () => {
   const handleCloseDeleteModal = () => {
     setOpenDeleteModal(false)
     setSelectedVariant(null)
+    fetchVariants(page, rowsPerPage, filter)
   }
 
   const variantColumns = [

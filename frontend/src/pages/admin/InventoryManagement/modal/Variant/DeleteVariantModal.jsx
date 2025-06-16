@@ -15,6 +15,7 @@ const DeleteVariantModal = ({ open, onClose, variant, deleteVariant }) => {
   const handleDelete = async () => {
     try {
       await deleteVariant(variant._id)
+      onClose()
       toast.success('Xóa biến thể thành công')
       onClose()
     } catch (error) {
