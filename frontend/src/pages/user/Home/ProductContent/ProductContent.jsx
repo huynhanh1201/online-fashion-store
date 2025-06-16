@@ -25,7 +25,10 @@ const ProductContent = () => {
         const response = await getCategories(1, 1000)
         const fetchedCategories = response.categories?.data || []
 
-        if (!Array.isArray(fetchedCategories) || fetchedCategories.length === 0) {
+        if (
+          !Array.isArray(fetchedCategories) ||
+          fetchedCategories.length === 0
+        ) {
           throw new Error('Không có danh mục nào được tải')
         }
 
@@ -53,18 +56,15 @@ const ProductContent = () => {
       try {
         setLoadingProducts(true)
         setErrorProducts(null)
-        
+
         const response = await getProductsByCategory(activeCategoryId, 1, 20)
-        console.log('Products response:', response)
 
         if (response && response.products) {
           setProducts(response.products)
         } else {
           setProducts([])
-          console.warn('No products found for category:', activeCategoryId)
         }
       } catch (err) {
-        console.error('Error fetching products:', err)
         setErrorProducts(err.message || 'Lỗi khi tải sản phẩm')
         setProducts([])
       } finally {
@@ -89,7 +89,8 @@ const ProductContent = () => {
     return <div style={{ color: 'red' }}>{errorCategories}</div>
   }
 
-  const activeCategory = categories.find((c) => c._id === activeCategoryId) || {}
+  const activeCategory =
+    categories.find((c) => c._id === activeCategoryId) || {}
 
   return (
     <div className='container' style={{ maxWidth: '1780px', margin: '0 auto' }}>

@@ -17,7 +17,7 @@ import { setCartItems } from '~/redux/cart/cartSlice'
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward'
 import SortByAlphaIcon from '@mui/icons-material/SortByAlpha'
 
-const ITEMS_PER_PAGE = 6
+const ITEMS_PER_PAGE = 15
 
 // Custom styled button to mimic the dropdown in the image
 const SortDropdownButton = styled('button')(({ theme }) => ({
@@ -266,7 +266,8 @@ export default function SearchResults() {
   }, [sortMenuOpen])
 
   // Get label for current sort option
-  const currentSort = sortOptions.find(opt => opt.value === sortOption) || sortOptions[0]
+  const currentSort =
+    sortOptions.find((opt) => opt.value === sortOption) || sortOptions[0]
 
   return (
     <div style={styles.container}>
@@ -282,20 +283,41 @@ export default function SearchResults() {
           </div>
           <div style={styles.sortContainer}>
             {/* Custom Dropdown Sort Button */}
-            <Box className="sort-dropdown-root" sx={{ position: 'relative' }}>
+            <Box className='sort-dropdown-root' sx={{ position: 'relative' }}>
               <SortDropdownButton
                 onClick={() => setSortMenuOpen((open) => !open)}
                 tabIndex={0}
-                aria-haspopup="listbox"
+                aria-haspopup='listbox'
                 aria-expanded={sortMenuOpen}
               >
                 <span style={{ fontWeight: 400 }}>{currentSort.label}</span>
                 <Box sx={{ display: 'flex', alignItems: 'center', ml: 'auto' }}>
-                  <span style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                    <span style={{ lineHeight: 1, fontSize: 15, fontWeight: 700, marginBottom: -2 }}>A</span>
-                    <span style={{ lineHeight: 1, fontSize: 15, fontWeight: 700 }}>Z</span>
+                  <span
+                    style={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center'
+                    }}
+                  >
+                    <span
+                      style={{
+                        lineHeight: 1,
+                        fontSize: 15,
+                        fontWeight: 700,
+                        marginBottom: -2
+                      }}
+                    >
+                      A
+                    </span>
+                    <span
+                      style={{ lineHeight: 1, fontSize: 15, fontWeight: 700 }}
+                    >
+                      Z
+                    </span>
                   </span>
-                  <ArrowDownwardIcon sx={{ fontSize: 20, marginBottom: '-2px' }} />
+                  <ArrowDownwardIcon
+                    sx={{ fontSize: 20, marginBottom: '-2px' }}
+                  />
                 </Box>
               </SortDropdownButton>
               {sortMenuOpen && (
@@ -309,7 +331,8 @@ export default function SearchResults() {
                       }}
                       style={{
                         fontWeight: sortOption === opt.value ? 600 : 400,
-                        background: sortOption === opt.value ? '#f5f5f5' : '#fff'
+                        background:
+                          sortOption === opt.value ? '#f5f5f5' : '#fff'
                       }}
                     >
                       {opt.label}
@@ -348,13 +371,15 @@ export default function SearchResults() {
               ))}
             </div>
 
-            <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4, mb: 2 }}>
+            <Box
+              sx={{ display: 'flex', justifyContent: 'center', mt: 4, mb: 2 }}
+            >
               <Pagination
                 count={Math.ceil(filteredProducts.length / ITEMS_PER_PAGE)}
                 page={page}
                 onChange={handlePageChange}
-                color="primary"
-                size="large"
+                color='primary'
+                size='large'
                 showFirstButton
                 showLastButton
               />
