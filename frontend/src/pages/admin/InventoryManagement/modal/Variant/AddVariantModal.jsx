@@ -166,7 +166,6 @@ const AddVariantModal = ({
 
     if (newColor?.name) {
       setValue('color', newColor.name)
-      setValue('colorImage', newColor.image || '')
     }
   }
 
