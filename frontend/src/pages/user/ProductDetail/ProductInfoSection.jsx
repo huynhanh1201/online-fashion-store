@@ -154,85 +154,81 @@ const ProductInfoSection = ({
 
       {variants?.length > 0 && (
         <Box sx={{ mb: 1 }}>
-          <Typography variant='body2' fontWeight={700} sx={{ mb: 0.5 }}>
-            Chọn phiên bản
+          <Typography variant='body2' fontWeight={700} sx={{ mb: 1 }}>
+            Chọn màu sắc
           </Typography>
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-            {availableColors?.map((color) => (
-              <Box key={color.name} sx={{ mb: 0.5 }}>
-                <Typography
-                  variant='body2'
-                  fontWeight={600}
-                  sx={{ mb: 0.5, color: '#666' }}
-                >
-                  Màu: {color.name}
-                </Typography>
-                <Box
-                  sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap', mb: 1 }}
-                >
-                  {availableSizes
-                    ?.filter((size) =>
-                      variants.some(
-                        (v) =>
-                          v.color.name === color.name &&
-                          v.size.name === size.name
-                      )
-                    )
-                    ?.map((size) => {
-                      const variant = variants.find(
-                        (v) =>
-                          v.color.name === color.name &&
-                          v.size.name === size.name
-                      )
-                      const isSelected =
-                        selectedColor === color.name &&
-                        selectedSize === size.name
+          {/* Hàng màu */}
+          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mb: 2 }}>
+            {availableColors?.map((color) => {
+              const isSelected = selectedColor === color.name
 
-                      return (
-                        <VariantBox
-                          key={`${color.name}-${size.name}`}
-                          selected={isSelected}
-                          onClick={() => {
-                            if (isSelected) {
-                              handleColorChange(null)
-                              handleSizeChange(null)
-                            } else {
-                              handleColorChange(color.name)
-                              handleSizeChange(size.name)
-                            }
-                          }}
-                          sx={{ p: '4px 8px', minHeight: 40 }}
-                        >
-                          <VariantImage
-                            src={
-                              optimizeCloudinaryUrl(color.image) ||
-                              '/default.jpg'
-                            }
-                            alt={color.name}
-                            onError={(e) => (e.target.src = '/default.jpg')}
-                          />
+              return (
+                <VariantBox
+                  key={color.name}
+                  selected={isSelected}
+                  onClick={() => {
+                    if (isSelected) {
+                      handleColorChange(null)
+                      handleSizeChange(null)
+                    } else {
+                      handleColorChange(color.name)
+                      handleSizeChange(null) // reset size khi đổi màu
+                    }
+                  }}
+                  sx={{
+                    flexDirection: 'column',
+                    width: 50,
+                    height: 50,
+                    justifyContent: 'center',
+                    borderRadius: '50%'
+                  }}
+                >
+                  <VariantImage
+                    src={optimizeCloudinaryUrl(color.image) || '/default.jpg'}
+                    alt={color.name}
+                    onError={(e) => (e.target.src = '/default.jpg')}
+                  />
+                </VariantBox>
+              )
+            })}
+          </Box>
 
-                          <Box>
-                            <Typography
-                              variant='body2'
-                              fontWeight={600}
-                              sx={{ fontSize: 14 }}
-                            >
-                              Size {size.name}
-                            </Typography>
-                            <Typography
-                              variant='caption'
-                              color='text.secondary'
-                            >
-                              {variant?.exportPrice?.toLocaleString('vi-VN')}đ
-                            </Typography>
-                          </Box>
-                        </VariantBox>
-                      )
-                    })}
-                </Box>
-              </Box>
-            ))}
+          {/* Hàng size */}
+          <Typography variant='body2' fontWeight={700} sx={{ mb: 1 }}>
+            Chọn kích thước
+          </Typography>
+          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+            {availableSizes?.map((size) => {
+              const isAvailable = variants.some(
+                (v) =>
+                  v.color.name === selectedColor && v.size.name === size.name
+              )
+              const isSelected = selectedSize === size.name
+
+              return (
+                <VariantBox
+                  key={size.name}
+                  selected={isSelected}
+                  onClick={() => {
+                    if (!isAvailable) return
+                    if (isSelected) {
+                      handleSizeChange(null)
+                    } else {
+                      handleSizeChange(size.name)
+                    }
+                  }}
+                  sx={{
+                    opacity: isAvailable ? 1 : 0.4,
+                    pointerEvents: isAvailable ? 'auto' : 'none',
+                    minWidth: 60,
+                    justifyContent: 'center',
+                    height: 40
+                  }}
+                >
+                  <Typography variant='body2'>Size {size.name}</Typography>
+                </VariantBox>
+              )
+            })}
           </Box>
         </Box>
       )}

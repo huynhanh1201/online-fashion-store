@@ -133,7 +133,7 @@ const SizeGuide = () => {
         sx={{
           display: 'flex',
           alignItems: 'center',
-          justifyContent: 'flex-end',
+          justifyContent: 'center',
           cursor: 'pointer',
           gap: 0.5,
           width: 'fit-content',
@@ -165,7 +165,8 @@ const SizeGuide = () => {
         PaperProps={{
           sx: {
             borderRadius: 2,
-            maxHeight: '90vh',
+            mt: 7,
+            maxHeight: '70vh',
             bgcolor: 'white'
           }
         }}
@@ -176,8 +177,7 @@ const SizeGuide = () => {
             alignItems: 'center',
             justifyContent: 'space-between',
             pb: 0,
-            px: 2,
-            pt: 2
+            px: 2
           }}
         >
           <Box />

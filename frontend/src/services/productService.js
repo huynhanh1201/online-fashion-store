@@ -14,17 +14,15 @@ export const getProducts = async (params = {}) => {
     console.log('API Response:', response.data)
 
     // Xử lý response là mảng trực tiếp hoặc object
-    const products = Array.isArray(response.data)
+    const rawProducts = Array.isArray(response.data)
       ? response.data
       : response.data.data || response.data.products || response.data || []
 
-    const total = Array.isArray(response.data)
-      ? response.data.length
-      : response.data.meta?.total || response.data.total || 0
+    // Lọc bỏ sản phẩm bị destroy = true
+    const products = rawProducts.filter((product) => product.destroy !== true)
 
-    const totalPages = Array.isArray(response.data)
-      ? Math.ceil(response.data.length / limit)
-      : response.data.meta?.totalPages || Math.ceil(total / limit) || 1
+    const total = products.length
+    const totalPages = Math.ceil(total / limit) || 1
 
     return {
       products,
