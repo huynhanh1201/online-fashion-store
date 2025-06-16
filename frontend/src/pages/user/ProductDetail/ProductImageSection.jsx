@@ -173,7 +173,7 @@ const ProductImageSection = ({
             {displayImages.map((img, index) => (
               <Thumbnail
                 key={`${img}-${index}`}
-                src={img}
+                src={optimizeCloudinaryUrl(img)}
                 alt={`thumb-${index}`}
                 selected={index === selectedImageIndex}
                 onClick={() => {
@@ -202,7 +202,7 @@ const ProductImageSection = ({
             }}
           >
             <ProductImage
-               src={optimizeCloudinaryUrl(mainImage)}
+              src={optimizeCloudinaryUrl(mainImage)}
               alt={selectedVariant?.name || 'Sản phẩm'}
               onClick={handleOpenModal}
               onError={(e) => {
@@ -219,7 +219,7 @@ const ProductImageSection = ({
             {displayImages.map((img, index) => (
               <Thumbnail
                 key={`${img}-${index}`}
-                src={img}
+                src={optimizeCloudinaryUrl(img)}
                 alt={`thumb-${index}`}
                 selected={index === selectedImageIndex}
                 onClick={() => {
@@ -246,7 +246,7 @@ const ProductImageSection = ({
         <ModalOverlay onClick={handleCloseModal}>
           <ModalContent onClick={(e) => e.stopPropagation()}>
             <EnlargedImage
-               src={optimizeCloudinaryUrl(mainImage)}
+              src={optimizeCloudinaryUrl(mainImage)}
               alt={selectedVariant?.name || 'Sản phẩm'}
               onError={(e) => {
                 e.target.onerror = null

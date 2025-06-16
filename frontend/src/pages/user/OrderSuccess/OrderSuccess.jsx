@@ -75,7 +75,8 @@ const OrderSuccess = () => {
               '&:hover': {
                 backgroundColor: '#162f61',
               }
-            }} onClick={handleGoOrders}>
+            }}
+            onClick={handleGoOrders}>
             Đơn mua của bạn
           </Button>
         </Stack>

@@ -23,6 +23,7 @@ import {
 import { getProfileUser } from '~/services/userService'
 import { toast } from 'react-toastify'
 import { useCart } from '~/hooks/useCarts'
+import { optimizeCloudinaryUrl } from '~/utils/cloudinary'
 
 const HeaderAction = () => {
   const [anchorEl, setAnchorEl] = useState(null)
@@ -35,7 +36,13 @@ const HeaderAction = () => {
   // Lấy giỏ hàng từ Redux store
   const cartItems = useSelector((state) => state.cart.cartItems)
   const { refresh } = useCart()
-  const cartCount = cartItems.reduce((total, item) => total + item.quantity, 0)
+  const tempQuantities = useSelector((state) => state.cart.tempQuantities || {})
+  const cartCount = cartItems.reduce((sum, item) => {
+    const variantId = item.variant?._id || item.variantId
+    const tempQty = tempQuantities[variantId]
+    return sum + (tempQty !== undefined ? tempQty : item.quantity)
+  }, 0)
+
   const [tokenUpdated, setTokenUpdated] = useState(
     localStorage.getItem('token')
   ) // Theo dõi token
@@ -115,7 +122,7 @@ const HeaderAction = () => {
       <IconButton color='inherit' onClick={handleClick}>
         {currentUser && currentUser.avatarUrl ? (
           <Avatar
-            src={currentUser.avatarUrl}
+            src={optimizeCloudinaryUrl(currentUser.avatarUrl)}
             alt={currentUser.name || 'User'}
             sx={{ width: 30, height: 30 }}
           />
@@ -163,8 +170,8 @@ const HeaderAction = () => {
                   onClick={handleClose}
                   component={Link}
                   to='/profile'
-                  sx={{ 
-                    fontWeight: 'bold', 
+                  sx={{
+                    fontWeight: 'bold',
                     opacity: 1,
                     display: 'flex',
                     alignItems: 'center',
@@ -177,10 +184,10 @@ const HeaderAction = () => {
                   }}
                 >
                   <Avatar
-                    src={currentUser.avatarUrl}
+                    src={optimizeCloudinaryUrl(currentUser.avatarUrl)}
                     alt={currentUser.name || 'User'}
-                    sx={{ 
-                      width: 32, 
+                    sx={{
+                      width: 32,
                       height: 32,
                       border: '2px solid #1976d2',
                       boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
@@ -202,12 +209,12 @@ const HeaderAction = () => {
                     }}
                   >
                     {currentUser.name}
-                    <CheckCircleIcon 
-                      sx={{ 
+                    <CheckCircleIcon
+                      sx={{
                         fontSize: '1.1rem',
                         color: '#4caf50',
                         ml: 0.5
-                      }} 
+                      }}
                     />
                   </Typography>
                 </MenuItem>

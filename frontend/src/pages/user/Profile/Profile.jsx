@@ -31,17 +31,16 @@ import {
 } from '~/services/userService'
 import { useDispatch } from 'react-redux'
 import { updateUserAPI } from '~/redux/user/userSlice'
+import { optimizeCloudinaryUrl } from '~/utils/cloudinary'
+import { URI, CLOUD_FOLDER } from '~/utils/constants'
 
-const CLOUDINARY_URI = 'https://api.cloudinary.com/v1_1/dkwsy9sph/image/upload'
-const UPLOAD_PRESET = 'demo_unsigned'
-const CLOUD_FOLDER = 'user_avatar'
 
 const uploadToCloudinary = async (file) => {
   const formData = new FormData()
   formData.append('file', file)
-  formData.append('upload_preset', UPLOAD_PRESET)
+  formData.append('upload_preset', 'demo_unsigned')
   formData.append('folder', CLOUD_FOLDER)
-  const res = await fetch(CLOUDINARY_URI, { method: 'POST', body: formData })
+  const res = await fetch(URI, { method: 'POST', body: formData })
   const data = await res.json()
   return data.secure_url
 }
@@ -196,7 +195,7 @@ const Profile = () => {
       try {
         setLoading(true)
         const profileData = await getProfileUser()
-        
+
         if (!profileData) {
           throw new Error('Không nhận được dữ liệu từ server')
         }
@@ -265,7 +264,7 @@ const Profile = () => {
             <>
               <Box sx={{ textAlign: 'center', mb: 3 }}>
                 <Avatar
-                  src={avatarPreview}
+                  src={optimizeCloudinaryUrl(avatarPreview)}
                   sx={{ width: 100, height: 100, mx: 'auto', mb: 2 }}
                 />
                 <Button
@@ -332,7 +331,7 @@ const Profile = () => {
 
       <Dialog
         open={openPasswordDialog}
-        onClose={() => {}}
+        onClose={() => { }}
         disableEscapeKeyDown
         fullWidth
         maxWidth='xs'
