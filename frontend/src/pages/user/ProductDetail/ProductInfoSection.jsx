@@ -6,13 +6,14 @@ import {
   IconButton,
   TextField,
   Chip,
-  CircularProgress,
+  CircularProgress
 } from '@mui/material'
 import { styled } from '@mui/system'
 import AddIcon from '@mui/icons-material/Add'
 import RemoveIcon from '@mui/icons-material/Remove'
 import LocalOfferIcon from '@mui/icons-material/LocalOffer'
 import { optimizeCloudinaryUrl } from '~/utils/cloudinary'
+import SizeGuide from './SizeGuide/SizeGuide.jsx'
 
 const PriceTypography = styled(Typography)({
   color: '#d32f2f',
@@ -66,22 +67,33 @@ const ProductInfoSection = ({
   handleColorChange,
   handleSizeChange,
   getCurrentPrice,
-  inventory,
+  inventory
 }) => {
-
-
   const currentPrice = getCurrentPrice()
 
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, maxWidth: 670 }}>
-      <Typography variant='h5' fontWeight={700} sx={{ wordBreak: 'break-word', whiteSpace: 'pre-wrap', mb: 1 }}>
+    <Box
+      sx={{ display: 'flex', flexDirection: 'column', gap: 1, maxWidth: 670 }}
+    >
+      <Typography
+        variant='h5'
+        fontWeight={700}
+        sx={{ wordBreak: 'break-word', whiteSpace: 'pre-wrap', mb: 1 }}
+      >
         {product?.name}
       </Typography>
 
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
         {currentPrice?.discountPrice ? (
           <>
-            <Typography variant='h5' sx={{ color: 'text.secondary', textDecoration: 'line-through', fontSize: 20 }}>
+            <Typography
+              variant='h5'
+              sx={{
+                color: 'text.secondary',
+                textDecoration: 'line-through',
+                fontSize: 20
+              }}
+            >
               {currentPrice.price.toLocaleString('vi-VN')}đ
             </Typography>
             <PriceTypography variant='h5' sx={{ fontSize: 22 }}>
@@ -98,12 +110,17 @@ const ProductInfoSection = ({
       </Box>
 
       <Box sx={{ border: '1px dashed #d32f2f', p: 1, borderRadius: 1, mb: 1 }}>
-        <Typography variant='body2' color='error' fontWeight={700} sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>
+        <Typography
+          variant='body2'
+          color='error'
+          fontWeight={700}
+          sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}
+        >
           <LocalOfferIcon /> KHUYẾN MÃI - ƯU ĐÃI
         </Typography>
         {coupons?.length > 0 ? (
           <Box>
-            {coupons.slice(0, 3).map(coupon => (
+            {coupons.slice(0, 3).map((coupon) => (
               <Typography key={coupon.code} variant='body2' sx={{ mb: 0.25 }}>
                 👉 Nhập mã <b>{coupon.code}</b> GIẢM{' '}
                 {coupon.type === 'percent'
@@ -124,7 +141,7 @@ const ProductInfoSection = ({
           <Typography variant='body2' fontWeight={700} sx={{ mb: 0.25 }}>
             Mã giảm giá
           </Typography>
-          {coupons.slice(0, 3).map(coupon => (
+          {coupons.slice(0, 3).map((coupon) => (
             <VoucherChip
               key={coupon.code}
               label={`VOUCHER ${coupon.type === 'percent' ? `${coupon.amount}%` : `${coupon.amount.toLocaleString()}đ`}`}
@@ -137,99 +154,169 @@ const ProductInfoSection = ({
 
       {variants?.length > 0 && (
         <Box sx={{ mb: 1 }}>
-          <Typography variant='body2' fontWeight={700} sx={{ mb: 0.5 }}>
-            Chọn phiên bản
+          <Typography variant='body2' fontWeight={700} sx={{ mb: 1 }}>
+            Màu sắc
+            {selectedColor
+              ? `: ${selectedColor.charAt(0).toUpperCase()}${selectedColor.slice(1)}`
+              : ''}
           </Typography>
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-            {availableColors?.map(color => (
-              <Box key={color.name} sx={{ mb: 0.5 }}>
-                <Typography variant='body2' fontWeight={600} sx={{ mb: 0.5, color: '#666' }}>
-                  Màu: {color.name}
-                </Typography>
-                <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap', mb: 1 }}>
-                  {availableSizes
-                    ?.filter(size =>
-                      variants.some(v => v.color.name === color.name && v.size.name === size.name)
-                    )
-                    ?.map(size => {
-                      const variant = variants.find(v => v.color.name === color.name && v.size.name === size.name)
-                      const isSelected = selectedColor === color.name && selectedSize === size.name
 
-                      return (
-                        <VariantBox
-                          key={`${color.name}-${size.name}`}
-                          selected={isSelected}
-                          onClick={() => {
-                            if (isSelected) {
-                              handleColorChange(null)
-                              handleSizeChange(null)
-                            } else {
-                              handleColorChange(color.name)
-                              handleSizeChange(size.name)
-                            }
-                          }}
-                          sx={{ p: '4px 8px', minHeight: 40 }}
-                        >
-                          <VariantImage
-                            src={optimizeCloudinaryUrl(color.image) || '/default.jpg'}
-                            alt={color.name}
-                            onError={e => (e.target.src = '/default.jpg')}
-                          />
+          {/* Hàng màu */}
+          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mb: 2 }}>
+            {availableColors?.map((color) => {
+              const isSelected = selectedColor === color.name
 
-                          <Box>
-                            <Typography variant='body2' fontWeight={600} sx={{ fontSize: 14 }}>
-                              Size {size.name}
-                            </Typography>
-                            <Typography variant='caption' color='text.secondary'>
-                              {variant?.exportPrice?.toLocaleString('vi-VN')}đ
-                            </Typography>
-                          </Box>
-                        </VariantBox>
-                      )
-                    })}
-                </Box>
-              </Box>
-            ))}
+              return (
+                <VariantBox
+                  key={color.name}
+                  selected={isSelected}
+                  onClick={() => {
+                    if (isSelected) {
+                      handleColorChange(null)
+                      handleSizeChange(null)
+                    } else {
+                      handleColorChange(color.name)
+                      handleSizeChange(null) // reset size khi đổi màu
+                    }
+                  }}
+                  sx={{
+                    width: 50,
+                    height: 50,
+                    justifyContent: 'center',
+                    borderRadius: '50%'
+                  }}
+                >
+                  <VariantImage
+                    src={optimizeCloudinaryUrl(color.image) || '/default.jpg'}
+                    alt={color.name}
+                    onError={(e) => (e.target.src = '/default.jpg')}
+                    style={{
+                      width: '47px',
+                      height: '47px',
+                      borderRadius: '50%',
+                      objectFit: 'cover'
+                    }}
+                  />
+                </VariantBox>
+              )
+            })}
+          </Box>
+
+          {/* Hàng size */}
+          <Typography variant='body2' fontWeight={700} sx={{ mb: 1 }}>
+            Kích thước{selectedSize ? `: ${selectedSize.toUpperCase()}` : ''}
+          </Typography>
+
+          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+            {availableSizes?.map((size) => {
+              const isAvailable = variants.some(
+                (v) =>
+                  v.color.name === selectedColor && v.size.name === size.name
+              )
+              const isSelected = selectedSize === size.name
+
+              return (
+                <VariantBox
+                  key={size.name}
+                  selected={isSelected}
+                  onClick={() => {
+                    if (!isAvailable) return
+                    if (isSelected) {
+                      handleSizeChange(null)
+                    } else {
+                      handleSizeChange(size.name)
+                    }
+                  }}
+                  sx={{
+                    opacity: isAvailable ? 1 : 0.4,
+                    pointerEvents: isAvailable ? 'auto' : 'none',
+                    minWidth: 60,
+                    justifyContent: 'center',
+                    height: 40
+                  }}
+                >
+                  <Typography variant='body2'>
+                    {size.name.toUpperCase()}
+                  </Typography>
+                </VariantBox>
+              )
+            })}
           </Box>
         </Box>
       )}
 
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
-        <Typography variant='body2' fontWeight={700}>
-          Số lượng
-        </Typography>
-        <IconButton onClick={() => setQuantity(q => Math.max(1, Number(q) - 1))} size="small">
-          <RemoveIcon fontSize="small" />
-        </IconButton>
-        <TextField
-          value={quantity === '' ? '' : quantity}
-          size='small'
-          sx={{ width: 40 }}
-          inputProps={{ style: { textAlign: 'center', padding: 4 }, readOnly: true }}
-        />
-        <IconButton
-          onClick={() =>
-            setQuantity(q => {
-              const maxQuantity = inventory?.quantity ?? selectedVariant?.quantity ?? product?.quantity ?? 0
-              return q < maxQuantity ? q + 1 : q
-            })
-          }
-          size="small"
-        >
-          <AddIcon fontSize="small" />
-        </IconButton>
-        <Typography color='text.secondary' sx={{ fontSize: 13 }}>
-          Kho: {inventory?.quantity ?? selectedVariant?.quantity ?? product?.quantity ?? 0}
-        </Typography>
+      <Box
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          mb: 1
+        }}
+      >
+        {/* Bên trái: Số lượng + Kho */}
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          <Typography variant='body2' fontWeight={700}>
+            Số lượng
+          </Typography>
+          <IconButton
+            onClick={() => setQuantity((q) => Math.max(1, Number(q) - 1))}
+            size='small'
+          >
+            <RemoveIcon fontSize='small' />
+          </IconButton>
+          <TextField
+            value={quantity === '' ? '' : quantity}
+            size='small'
+            sx={{ width: 40 }}
+            inputProps={{
+              style: { textAlign: 'center', padding: 4 },
+              readOnly: true
+            }}
+          />
+          <IconButton
+            onClick={() =>
+              setQuantity((q) => {
+                const maxQuantity =
+                  inventory?.quantity ??
+                  selectedVariant?.quantity ??
+                  product?.quantity ??
+                  0
+                return q < maxQuantity ? q + 1 : q
+              })
+            }
+            size='small'
+          >
+            <AddIcon fontSize='small' />
+          </IconButton>
+          <Typography color='text.secondary' sx={{ fontSize: 13 }}>
+            Kho:{' '}
+            {inventory?.quantity ??
+              selectedVariant?.quantity ??
+              product?.quantity ??
+              0}
+          </Typography>
+        </Box>
+
+        {/* Bên phải: Hướng dẫn chọn size */}
+        <SizeGuide />
       </Box>
 
       <Box sx={{ display: 'flex', gap: 1, mb: 0.5 }}>
         <Button
           variant='contained'
-          disabled={isAdding || quantity > (inventory?.quantity ?? selectedVariant?.quantity ?? product?.quantity ?? 0)}
+          disabled={
+            isAdding ||
+            quantity >
+              (inventory?.quantity ??
+                selectedVariant?.quantity ??
+                product?.quantity ??
+                0)
+          }
           onClick={() => handleAddToCart(product._id)}
           sx={{ backgroundColor: '#1A3C7B', color: 'white', flex: 1, py: 1 }}
-          startIcon={isAdding ? <CircularProgress size={18} color='inherit' /> : null}
+          startIcon={
+            isAdding ? <CircularProgress size={18} color='inherit' /> : null
+          }
         >
           {isAdding ? 'Đang thêm...' : 'Thêm vào giỏ'}
         </Button>

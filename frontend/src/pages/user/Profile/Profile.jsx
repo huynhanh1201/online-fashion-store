@@ -23,6 +23,7 @@ import PersonIcon from '@mui/icons-material/Person'
 import LockIcon from '@mui/icons-material/Lock'
 import VisibilityIcon from '@mui/icons-material/Visibility'
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff'
+import { optimizeCloudinaryUrl } from '~/utils/cloudinary.js'
 import ShippingAdress from './shippingAdress/shippingAdress'
 import {
   getProfileUser,
@@ -196,7 +197,7 @@ const Profile = () => {
       try {
         setLoading(true)
         const profileData = await getProfileUser()
-        
+
         if (!profileData) {
           throw new Error('Không nhận được dữ liệu từ server')
         }
@@ -210,11 +211,11 @@ const Profile = () => {
         if (!profileData.name && !profileData.email) {
           throw new Error('Thông tin hồ sơ không đầy đủ')
         }
-
       } catch (error) {
         console.error('Lỗi khi tải thông tin hồ sơ:', error)
         showSnackbar(
-          error.message || 'Không thể tải thông tin hồ sơ. Vui lòng thử lại sau.',
+          error.message ||
+            'Không thể tải thông tin hồ sơ. Vui lòng thử lại sau.',
           'error'
         )
         // Reset các giá trị về mặc định

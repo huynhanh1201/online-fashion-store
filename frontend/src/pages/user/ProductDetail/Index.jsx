@@ -45,8 +45,11 @@ const ProductDetail = () => {
     handleCopy,
     copiedCode,
     formatCurrencyShort,
-    inventory,
+    inventory
   } = useProductDetail(productId)
+  const selectedColorObj = availableColors?.find(
+    (color) => color.name === selectedColor
+  )
 
   // console.log('ProductDetail - productId:', productId)
   // console.log('ProductDetail - selectedColor:', selectedColor)
@@ -85,35 +88,58 @@ const ProductDetail = () => {
         alignItems: 'center',
         maxWidth: '1450px',
         width: '100%',
-        mx: 'auto',
+        mx: 'auto'
       }}
     >
       <Box sx={{ mb: 2, mt: 0, p: 1 }}>
-        <Box sx={{ display: 'flex', alignItems: 'center', fontSize: 15, py: 1, px: 0,borderRadius: 1 }}>
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            fontSize: 15,
+            py: 1,
+            px: 0,
+            borderRadius: 1
+          }}
+        >
           <Typography
             component={RouterLink}
-            to="/"
-            sx={{ color: '#1976d2', textDecoration: 'none', fontSize: 15, '&:hover': { textDecoration: 'underline' }, mr: 0.5 }}
+            to='/'
+            sx={{
+              color: '#1976d2',
+              textDecoration: 'none',
+              fontSize: 15,
+              '&:hover': { textDecoration: 'underline' },
+              mr: 0.5
+            }}
           >
             Trang chủ
           </Typography>
           <Typography sx={{ mx: 0.5, color: '#888' }}>/</Typography>
           <Typography
             component={RouterLink}
-            to="/product"
-            sx={{ color: '#1976d2', textDecoration: 'none', fontSize: 15, '&:hover': { textDecoration: 'underline' }, mr: 0.5 }}
+            to='/product'
+            sx={{
+              color: '#1976d2',
+              textDecoration: 'none',
+              fontSize: 15,
+              '&:hover': { textDecoration: 'underline' },
+              mr: 0.5
+            }}
           >
             Sản phẩm
           </Typography>
           <Typography sx={{ mx: 0.5, color: '#888' }}>/</Typography>
-          <Typography sx={{ fontWeight: 500, fontSize: 15, color: 'text.primary' }}>
+          <Typography
+            sx={{ fontWeight: 500, fontSize: 15, color: 'text.primary' }}
+          >
             {product?.name || 'Chi tiết sản phẩm'}
           </Typography>
         </Box>
       </Box>
-      <Grid 
-        container 
-        spacing={4} 
+      <Grid
+        container
+        spacing={4}
         justifyContent='center'
         sx={{
           alignItems: 'flex-start',
@@ -124,12 +150,12 @@ const ProductDetail = () => {
           }
         }}
       >
-        <Grid 
-          item 
-          xs={12} 
-          md={6} 
-          sx={{ 
-            px: { xs: 1, sm: 2 }, 
+        <Grid
+          item
+          xs={12}
+          md={6}
+          sx={{
+            px: { xs: 1, sm: 2 },
             width: '100%',
             maxWidth: { xs: '100%', md: '70%' },
             display: 'flex',
@@ -137,14 +163,16 @@ const ProductDetail = () => {
             minHeight: 0
           }}
         >
-          <Box sx={{ 
-            width: '100%', 
-            display: 'flex', 
-            flexDirection: 'column',
-            height: 'fit-content'
-          }}>
+          <Box
+            sx={{
+              width: '100%',
+              display: 'flex',
+              flexDirection: 'column',
+              height: 'fit-content'
+            }}
+          >
             <ProductImageSection
-              images={selectedColor?.images || product.images}
+              images={selectedColorObj?.images || product.images}
               selectedImageIndex={selectedImageIndex}
               fadeIn={fadeIn}
               onImageClick={(index) => {
@@ -158,17 +186,17 @@ const ProductDetail = () => {
               }}
               getCurrentImages={getCurrentImages}
               selectedVariant={selectedVariant}
-              selectedColor={selectedColor}
+              selectedColor={selectedColorObj} // <- truyền object thay vì name
               selectedSize={selectedSize}
             />
           </Box>
         </Grid>
-        <Grid 
-          item 
-          xs={12} 
-          md={6} 
-          sx={{ 
-            px: { xs: 1, sm: 2 }, 
+        <Grid
+          item
+          xs={12}
+          md={6}
+          sx={{
+            px: { xs: 1, sm: 2 },
             width: '100%',
             maxWidth: { xs: '100%', md: '50%' },
             display: 'flex',
@@ -176,10 +204,10 @@ const ProductDetail = () => {
             minHeight: 0
           }}
         >
-          <Box 
-            sx={{ 
+          <Box
+            sx={{
               width: '100%',
-              display: 'flex', 
+              display: 'flex',
               flexDirection: 'column',
               height: 'fit-content',
               '& .MuiButton-root': {
@@ -231,7 +259,11 @@ const ProductDetail = () => {
         </Grid>
       </Grid>
       <Box sx={{ mt: 3 }}>
-        <ProductDescription description={product.description} productId={product._id} product={product} />
+        <ProductDescription
+          description={product.description}
+          productId={product._id}
+          product={product}
+        />
       </Box>
       <VoucherDrawer
         open={openVoucherDrawer}
@@ -247,7 +279,7 @@ const ProductDetail = () => {
         severity={snackbar?.severity || 'info'}
         variantImage={snackbar?.variantImage || '/default.jpg'}
         productName={snackbar?.productName || ''}
-        onClose={() => setSnackbar(prev => ({ ...prev, open: false }))}
+        onClose={() => setSnackbar((prev) => ({ ...prev, open: false }))}
       />
     </Container>
   )

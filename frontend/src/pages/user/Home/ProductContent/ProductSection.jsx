@@ -14,7 +14,7 @@ const styles = {
   },
   banner: {
     position: 'relative',
-    height: '550px',
+    height: '523px',
     borderRadius: '10px',
     overflow: 'hidden',
     gridColumn: '1',
@@ -71,10 +71,17 @@ const styles = {
   }
 }
 
-const ProductSection = ({ bannerImg, bannerTitle, bannerDesc, products, loading, error }) => {
+const ProductSection = ({
+  bannerImg,
+  bannerTitle,
+  bannerDesc,
+  products,
+  loading,
+  error
+}) => {
   return (
     <div style={styles.section}>
-      <div style={styles.grid}>
+      <div className='product-grid'>
         {/* Banner */}
         <div style={styles.banner}>
           <img
@@ -109,7 +116,7 @@ const ProductSection = ({ bannerImg, bannerTitle, bannerDesc, products, loading,
         {/* Error State */}
         {error && (
           <div style={styles.errorContainer}>
-            <Typography color="error">{error}</Typography>
+            <Typography color='error'>{error}</Typography>
           </div>
         )}
 
@@ -117,7 +124,8 @@ const ProductSection = ({ bannerImg, bannerTitle, bannerDesc, products, loading,
         {!loading && !error && products && products.length > 0 ? (
           products.slice(0, 4).map((product) => {
             // Xử lý ảnh sản phẩm
-            let productImage = 'https://via.placeholder.com/220x220?text=No+Image'
+            let productImage =
+              'https://via.placeholder.com/220x220?text=No+Image'
 
             if (product.image) {
               if (Array.isArray(product.image) && product.image.length > 0) {
@@ -128,10 +136,7 @@ const ProductSection = ({ bannerImg, bannerTitle, bannerDesc, products, loading,
             }
 
             return (
-              <div
-                key={product._id || product.id}
-                style={styles.productItem}
-              >
+              <div key={product._id || product.id} style={styles.productItem}>
                 <ProductCard product={product} />
               </div>
             )

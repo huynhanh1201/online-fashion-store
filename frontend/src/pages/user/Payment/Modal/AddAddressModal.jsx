@@ -13,7 +13,10 @@ import {
   Autocomplete
 } from '@mui/material'
 import CloseIcon from '@mui/icons-material/Close'
-import { addShippingAddress, updateShippingAddress } from '~/services/addressService'
+import {
+  addShippingAddress,
+  updateShippingAddress
+} from '~/services/addressService'
 import { GHN_TOKEN_API } from '~/utils/constants'
 
 export default function AddAddressModal({
@@ -67,10 +70,13 @@ export default function AddAddressModal({
     setFormErrors((prev) => ({
       ...prev,
       [field]:
-        field === 'fullName' ? !value.trim() || value.trim().length < 3 :
-          field === 'phone' ? !value.trim() || !/^\d{10}$/.test(value.trim()) :
-            field === 'address' ? !value.trim() || value.trim().length < 5 :
-              !value
+        field === 'fullName'
+          ? !value.trim() || value.trim().length < 3
+          : field === 'phone'
+            ? !value.trim() || !/^\d{10}$/.test(value.trim())
+            : field === 'address'
+              ? !value.trim() || value.trim().length < 5
+              : !value
     }))
   }
 
@@ -108,12 +114,14 @@ export default function AddAddressModal({
             method: 'GET',
             headers: {
               'Content-Type': 'application/json',
-              'Token': GHN_TOKEN_API
+              Token: GHN_TOKEN_API
             }
           }
         )
         if (!provinceRes.ok) {
-          throw new Error(`Lỗi tải tỉnh/thành: ${provinceRes.status} ${provinceRes.statusText}`)
+          throw new Error(
+            `Lỗi tải tỉnh/thành: ${provinceRes.status} ${provinceRes.statusText}`
+          )
         }
         const provinceData = await provinceRes.json()
         if (provinceData.code !== 200 || !provinceData.data) {
@@ -126,7 +134,10 @@ export default function AddAddressModal({
         setProvinces(provinces)
       } catch (error) {
         console.error('Lỗi khi tải tỉnh/thành:', error)
-        showSnackbar?.(`Không thể tải dữ liệu tỉnh/thành: ${error.message}`, 'error')
+        showSnackbar?.(
+          `Không thể tải dữ liệu tỉnh/thành: ${error.message}`,
+          'error'
+        )
       }
     }
 
@@ -149,14 +160,16 @@ export default function AddAddressModal({
           {
             method: 'POST',
             headers: {
-              'Token': GHN_TOKEN_API,
+              Token: GHN_TOKEN_API,
               'Content-Type': 'application/json'
             },
             body: JSON.stringify({ province_id: parseInt(formData.city) })
           }
         )
         if (!districtRes.ok) {
-          throw new Error(`Lỗi tải quận/huyện: ${districtRes.status} ${districtRes.statusText}`)
+          throw new Error(
+            `Lỗi tải quận/huyện: ${districtRes.status} ${districtRes.statusText}`
+          )
         }
         const districtData = await districtRes.json()
         if (districtData.code !== 200 || !districtData.data) {
@@ -172,7 +185,10 @@ export default function AddAddressModal({
         }
       } catch (error) {
         console.error('Lỗi khi tải quận/huyện:', error)
-        showSnackbar?.(`Không thể tải dữ liệu quận/huyện: ${error.message}`, 'error')
+        showSnackbar?.(
+          `Không thể tải dữ liệu quận/huyện: ${error.message}`,
+          'error'
+        )
       }
     }
 
@@ -194,13 +210,15 @@ export default function AddAddressModal({
           {
             method: 'GET',
             headers: {
-              'Token': GHN_TOKEN_API,
+              Token: GHN_TOKEN_API,
               'Content-Type': 'application/json'
             }
           }
         )
         if (!wardRes.ok) {
-          throw new Error(`Lỗi tải phường/xã: ${wardRes.status} ${wardRes.statusText}`)
+          throw new Error(
+            `Lỗi tải phường/xã: ${wardRes.status} ${wardRes.statusText}`
+          )
         }
         const wardData = await wardRes.json()
         if (wardData.code !== 200 || !wardData.data) {
@@ -216,7 +234,10 @@ export default function AddAddressModal({
         }
       } catch (error) {
         console.error('Lỗi khi tải phường/xã:', error)
-        showSnackbar?.(`Không thể tải dữ liệu phường/xã: ${error.message}`, 'error')
+        showSnackbar?.(
+          `Không thể tải dữ liệu phường/xã: ${error.message}`,
+          'error'
+        )
       }
     }
 
@@ -230,7 +251,11 @@ export default function AddAddressModal({
     const loadLocationCodes = async () => {
       try {
         // Tìm ProvinceID từ city name
-        const city = provinces.find((p) => p.name === addressToEdit.city || String(p.code) === String(addressToEdit.city))
+        const city = provinces.find(
+          (p) =>
+            p.name === addressToEdit.city ||
+            String(p.code) === String(addressToEdit.city)
+        )
         const cityCode = city?.code || ''
         if (!cityCode) throw new Error('Không tìm thấy tỉnh/thành')
         setFormData((prev) => ({ ...prev, city: cityCode }))
@@ -241,7 +266,7 @@ export default function AddAddressModal({
           {
             method: 'POST',
             headers: {
-              'Token': GHN_TOKEN_API,
+              Token: GHN_TOKEN_API,
               'Content-Type': 'application/json'
             },
             body: JSON.stringify({ province_id: parseInt(cityCode) })
@@ -249,7 +274,8 @@ export default function AddAddressModal({
         )
         if (!districtRes.ok) throw new Error('Lỗi tải quận/huyện')
         const districtData = await districtRes.json()
-        if (districtData.code !== 200 || !districtData.data) throw new Error('Không có dữ liệu quận/huyện')
+        if (districtData.code !== 200 || !districtData.data)
+          throw new Error('Không có dữ liệu quận/huyện')
         const districts = districtData.data.map((d) => ({
           code: String(d.DistrictID),
           name: d.DistrictName
@@ -257,7 +283,11 @@ export default function AddAddressModal({
         setDistricts(districts)
 
         // Tìm DistrictID từ district name
-        const district = districts.find((d) => d.name === addressToEdit.district || String(d.code) === String(addressToEdit.district))
+        const district = districts.find(
+          (d) =>
+            d.name === addressToEdit.district ||
+            String(d.code) === String(addressToEdit.district)
+        )
         const districtCode = district?.code || ''
         if (!districtCode) throw new Error('Không tìm thấy quận/huyện')
         setFormData((prev) => ({ ...prev, district: districtCode }))
@@ -268,14 +298,15 @@ export default function AddAddressModal({
           {
             method: 'GET',
             headers: {
-              'Token': GHN_TOKEN_API,
+              Token: GHN_TOKEN_API,
               'Content-Type': 'application/json'
             }
           }
         )
         if (!wardRes.ok) throw new Error('Lỗi tải phường/xã')
         const wardData = await wardRes.json()
-        if (wardData.code !== 200 || !wardData.data) throw new Error('Không có dữ liệu phường/xã')
+        if (wardData.code !== 200 || !wardData.data)
+          throw new Error('Không có dữ liệu phường/xã')
         const wards = wardData.data.map((w) => ({
           code: String(w.WardCode),
           name: w.WardName
@@ -283,7 +314,11 @@ export default function AddAddressModal({
         setWards(wards)
 
         // Tìm WardCode từ ward name
-        const ward = wards.find((w) => w.name === addressToEdit.ward || String(w.code) === String(addressToEdit.ward))
+        const ward = wards.find(
+          (w) =>
+            w.name === addressToEdit.ward ||
+            String(w.code) === String(addressToEdit.ward)
+        )
         const wardCode = ward?.code || ''
 
         // Cập nhật formData
@@ -305,7 +340,10 @@ export default function AddAddressModal({
         })
       } catch (error) {
         console.error('Lỗi khi tải thông tin địa chỉ:', error)
-        showSnackbar?.(`Không thể tải thông tin địa chỉ: ${error.message}`, 'error')
+        showSnackbar?.(
+          `Không thể tải thông tin địa chỉ: ${error.message}`,
+          'error'
+        )
       }
     }
 
@@ -315,7 +353,8 @@ export default function AddAddressModal({
   // Xử lý submit
   const handleSubmit = async () => {
     const errors = {
-      fullName: !formData.fullName.trim() || formData.fullName.trim().length < 3,
+      fullName:
+        !formData.fullName.trim() || formData.fullName.trim().length < 3,
       phone: !formData.phone.trim() || !/^\d{10}$/.test(formData.phone.trim()),
       address: !formData.address.trim() || formData.address.trim().length < 5,
       city: !formData.city,
@@ -330,7 +369,8 @@ export default function AddAddressModal({
 
     // Lấy tên và mã định danh từ các danh sách
     const cityName = provinces.find((p) => p.code === formData.city)?.name || ''
-    const districtName = districts.find((d) => d.code === formData.district)?.name || ''
+    const districtName =
+      districts.find((d) => d.code === formData.district)?.name || ''
     const wardName = wards.find((w) => w.code === formData.ward)?.name || ''
 
     const addressData = {
@@ -347,7 +387,10 @@ export default function AddAddressModal({
 
     try {
       if (isEditMode) {
-        const updated = await updateShippingAddress(addressToEdit._id, addressData)
+        const updated = await updateShippingAddress(
+          addressToEdit._id,
+          addressData
+        )
         if (updated && updated._id) {
           showSnackbar?.('Sửa địa chỉ thành công!')
           onSuccess?.({ ...addressData, _id: addressToEdit._id })
@@ -375,7 +418,7 @@ export default function AddAddressModal({
   }
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
+    <Dialog open={open} onClose={onClose} maxWidth='sm' fullWidth>
       <DialogTitle sx={{ m: 0, p: 2 }}>
         {viewOnly
           ? 'Xem địa chỉ'
@@ -383,7 +426,7 @@ export default function AddAddressModal({
             ? 'Chỉnh sửa địa chỉ'
             : 'Thêm địa chỉ mới'}
         <IconButton
-          aria-label="close"
+          aria-label='close'
           onClick={onClose}
           sx={{
             position: 'absolute',
@@ -399,40 +442,44 @@ export default function AddAddressModal({
       <DialogContent dividers>
         {viewOnly ? (
           <Box>
-            <Typography variant="subtitle1">
+            <Typography variant='subtitle1'>
               <b>Họ và tên:</b> {addressToEdit?.fullName}
             </Typography>
-            <Typography variant="subtitle1">
+            <Typography variant='subtitle1'>
               <b>Số điện thoại:</b> {addressToEdit?.phone}
             </Typography>
-            <Typography variant="subtitle1">
+            <Typography variant='subtitle1'>
               <b>Địa chỉ:</b>{' '}
               {`${addressToEdit?.address}, ${addressToEdit?.ward}, ${addressToEdit?.district}, ${addressToEdit?.city}`}
             </Typography>
           </Box>
         ) : (
           <Box
-            component="form"
+            component='form'
             noValidate
-            autoComplete="off"
+            autoComplete='off'
             sx={{ display: 'grid', gap: 2 }}
           >
             <TextField
-              label="Họ và tên"
+              label='Họ và tên'
               fullWidth
               value={formData.fullName}
               onChange={handleChange('fullName')}
               error={formErrors.fullName}
-              helperText={formErrors.fullName ? 'Họ và tên phải ít nhất 3 ký tự' : ''}
+              helperText={
+                formErrors.fullName ? 'Họ và tên phải ít nhất 3 ký tự' : ''
+              }
               disabled={viewOnly}
             />
             <TextField
-              label="Số điện thoại"
+              label='Số điện thoại'
               fullWidth
               value={formData.phone}
               onChange={handleChange('phone')}
               error={formErrors.phone}
-              helperText={formErrors.phone ? 'Số điện thoại phải đúng 10 số' : ''}
+              helperText={
+                formErrors.phone ? 'Số điện thoại phải đúng 10 số' : ''
+              }
               disabled={viewOnly}
             />
             <Autocomplete
@@ -440,14 +487,16 @@ export default function AddAddressModal({
               getOptionLabel={(option) => option.name}
               value={provinces.find((p) => p.code === formData.city) || null}
               onChange={(event, newValue) => {
-                handleChange('city')({ target: { value: newValue?.code || '' } })
+                handleChange('city')({
+                  target: { value: newValue?.code || '' }
+                })
               }}
-              noOptionsText="Không có kết quả"
+              noOptionsText='Không có kết quả'
               disabled={viewOnly}
               renderInput={(params) => (
                 <TextField
                   {...params}
-                  label="Tỉnh/Thành"
+                  label='Tỉnh/Thành'
                   error={!!formErrors.city}
                   helperText={formErrors.city && 'Vui lòng chọn tỉnh/thành'}
                 />
@@ -456,16 +505,20 @@ export default function AddAddressModal({
             <Autocomplete
               options={districts}
               getOptionLabel={(option) => option.name}
-              value={districts.find((d) => d.code === formData.district) || null}
+              value={
+                districts.find((d) => d.code === formData.district) || null
+              }
               onChange={(event, newValue) => {
-                handleChange('district')({ target: { value: newValue?.code || '' } })
+                handleChange('district')({
+                  target: { value: newValue?.code || '' }
+                })
               }}
-              noOptionsText="Không có kết quả"
+              noOptionsText='Không có kết quả'
               disabled={viewOnly || !formData.city || districts.length === 0}
               renderInput={(params) => (
                 <TextField
                   {...params}
-                  label="Quận/Huyện"
+                  label='Quận/Huyện'
                   error={!!formErrors.district}
                   helperText={formErrors.district && 'Vui lòng chọn quận/huyện'}
                 />
@@ -476,26 +529,30 @@ export default function AddAddressModal({
               getOptionLabel={(option) => option.name}
               value={wards.find((w) => w.code === formData.ward) || null}
               onChange={(event, newValue) => {
-                handleChange('ward')({ target: { value: newValue?.code || '' } })
+                handleChange('ward')({
+                  target: { value: newValue?.code || '' }
+                })
               }}
-              noOptionsText="Không có kết quả"
+              noOptionsText='Không có kết quả'
               disabled={viewOnly || !formData.district || wards.length === 0}
               renderInput={(params) => (
                 <TextField
                   {...params}
-                  label="Phường/Xã"
+                  label='Phường/Xã'
                   error={!!formErrors.ward}
                   helperText={formErrors.ward && 'Vui lòng chọn phường/xã'}
                 />
               )}
             />
             <TextField
-              label="Địa chỉ cụ thể"
+              label='Địa chỉ cụ thể'
               fullWidth
               value={formData.address}
               onChange={handleChange('address')}
               error={formErrors.address}
-              helperText={formErrors.address ? 'Địa chỉ phải ít nhất 5 ký tự' : ''}
+              helperText={
+                formErrors.address ? 'Địa chỉ phải ít nhất 5 ký tự' : ''
+              }
               disabled={viewOnly}
             />
           </Box>
@@ -503,10 +560,10 @@ export default function AddAddressModal({
       </DialogContent>
       {!viewOnly && (
         <DialogActions>
-          <Button onClick={onClose} color="inherit">
+          <Button onClick={onClose} color='inherit'>
             Hủy
           </Button>
-          <Button onClick={handleSubmit} variant="contained">
+          <Button onClick={handleSubmit} variant='contained'>
             {isEditMode ? 'Lưu' : 'Thêm'}
           </Button>
         </DialogActions>

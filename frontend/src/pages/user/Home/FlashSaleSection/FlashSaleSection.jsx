@@ -81,7 +81,7 @@ const FlashSaleSection = ({ products, loading, error }) => {
         </div>
       </div>
 
-      <div style={styles.productGrid}>
+      <div className='product-grid'>
         {flashSaleProducts.map((product) => (
           <div key={product._id} style={styles.flashSaleCard}>
             <ProductCard product={product} />

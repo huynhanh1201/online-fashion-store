@@ -21,7 +21,7 @@ import HomeIcon from '@mui/icons-material/Home'
 import { getProducts } from '~/services/productService'
 import ProductCategories from './ProductCategories/ProductCategories'
 
-const ITEMS_PER_PAGE = 12
+const ITEMS_PER_PAGE = 15
 
 // Custom styled button to mimic the dropdown in the image
 const SortDropdownButton = styled('button')(({ theme }) => ({
@@ -92,15 +92,15 @@ const Product = () => {
     try {
       setLoading(true)
       setError(null)
-      
+
       // Map sort option to API sort parameter
       const sortMap = {
-        'priceAsc': 'price_asc',
-        'priceDesc': 'price_desc',
-        'nameAsc': 'name_asc',
-        'nameDesc': 'name_desc'
+        priceAsc: 'price_asc',
+        priceDesc: 'price_desc',
+        nameAsc: 'name_asc',
+        nameDesc: 'name_desc'
       }
-      
+
       const params = {
         page,
         limit: ITEMS_PER_PAGE,
@@ -125,7 +125,10 @@ const Product = () => {
       setTotalPages(response.totalPages)
     } catch (error) {
       console.error('Chi tiết lỗi:', error)
-      setError(error.message || 'Không thể tải danh sách sản phẩm. Vui lòng thử lại sau.')
+      setError(
+        error.message ||
+          'Không thể tải danh sách sản phẩm. Vui lòng thử lại sau.'
+      )
       setProducts([])
       setTotalPages(1)
     } finally {
@@ -199,7 +202,8 @@ const Product = () => {
   }, [sortMenuOpen])
 
   // Get label for current sort option
-  const currentSort = sortOptions.find(opt => opt.value === sortOption) || sortOptions[0]
+  const currentSort =
+    sortOptions.find((opt) => opt.value === sortOption) || sortOptions[0]
 
   return (
     <Box sx={{ minHeight: '100vh' }}>
@@ -210,17 +214,17 @@ const Product = () => {
           right: { xs: '20px', sm: '30px', md: '40px' },
           padding: '12px',
           maxWidth: '1800px',
-          margin: '0 auto',
+          margin: '0 auto'
         }}
       >
-        <Breadcrumbs 
-          separator={<NavigateNextIcon fontSize="small" />}
-          aria-label="breadcrumb"
+        <Breadcrumbs
+          separator={<NavigateNextIcon fontSize='small' />}
+          aria-label='breadcrumb'
         >
           <Link
-            underline="hover"
-            sx={{ 
-              display: 'flex', 
+            underline='hover'
+            sx={{
+              display: 'flex',
               alignItems: 'center',
               color: '#007bff',
               textDecoration: 'none',
@@ -228,13 +232,13 @@ const Product = () => {
                 color: 'primary.main'
               }
             }}
-            href="/"
+            href='/'
           >
             Trang chủ
           </Link>
           <Typography
-            sx={{ 
-              display: 'flex', 
+            sx={{
+              display: 'flex',
               alignItems: 'center',
               color: 'text.primary',
               fontWeight: 500
@@ -249,7 +253,8 @@ const Product = () => {
           width: '100%',
           maxWidth: '1800px',
           height: { xs: '200px', sm: '300px', md: '400px' },
-          backgroundImage: 'url(https://file.hstatic.net/1000360022/collection/tat_ca_san_pham_3682cf864f2d4433a1f0bdfb4ffe24de.jpg)',
+          backgroundImage:
+            'url(https://file.hstatic.net/1000360022/collection/tat_ca_san_pham_3682cf864f2d4433a1f0bdfb4ffe24de.jpg)',
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           position: 'relative',
@@ -257,8 +262,7 @@ const Product = () => {
           margin: '0 auto',
           px: { xs: 2, sm: 3, md: 4 }
         }}
-      >
-      </Box>
+      ></Box>
       <ProductCategories />
       <Box sx={{ p: 2, maxWidth: '1800px', mx: 'auto' }}>
         <Box
@@ -267,24 +271,45 @@ const Product = () => {
             justifyContent: 'flex-end',
             alignItems: 'center',
             gap: 2,
-            mb: 3,
+            mb: 3
           }}
         >
           {/* Custom Dropdown Sort Button */}
-          <Box className="sort-dropdown-root" sx={{ position: 'relative' }}>
+          <Box className='sort-dropdown-root' sx={{ position: 'relative' }}>
             <SortDropdownButton
               onClick={() => setSortMenuOpen((open) => !open)}
               tabIndex={0}
-              aria-haspopup="listbox"
+              aria-haspopup='listbox'
               aria-expanded={sortMenuOpen}
             >
               <span style={{ fontWeight: 400 }}>{currentSort.label}</span>
               <Box sx={{ display: 'flex', alignItems: 'center', ml: 'auto' }}>
-                <span style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                  <span style={{ lineHeight: 1, fontSize: 15, fontWeight: 700, marginBottom: -2 }}>A</span>
-                  <span style={{ lineHeight: 1, fontSize: 15, fontWeight: 700 }}>Z</span>
+                <span
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center'
+                  }}
+                >
+                  <span
+                    style={{
+                      lineHeight: 1,
+                      fontSize: 15,
+                      fontWeight: 700,
+                      marginBottom: -2
+                    }}
+                  >
+                    A
+                  </span>
+                  <span
+                    style={{ lineHeight: 1, fontSize: 15, fontWeight: 700 }}
+                  >
+                    Z
+                  </span>
                 </span>
-                <ArrowDownwardIcon sx={{ fontSize: 20, marginBottom: '-2px' }} />
+                <ArrowDownwardIcon
+                  sx={{ fontSize: 20, marginBottom: '-2px' }}
+                />
               </Box>
             </SortDropdownButton>
             {sortMenuOpen && (
@@ -320,8 +345,8 @@ const Product = () => {
               <Typography color='error' gutterBottom>
                 {error}
               </Typography>
-              <Typography 
-                color='primary' 
+              <Typography
+                color='primary'
                 sx={{ cursor: 'pointer', textDecoration: 'underline' }}
                 onClick={() => fetchProducts()}
               >
@@ -334,12 +359,7 @@ const Product = () => {
             </Typography>
           ) : (
             <>
-              <div className="product-grid" style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(5, 1fr)',
-                gap: '20px',
-                padding: '0 10px'
-              }}>
+              <div className='product-grid'>
                 {products.map((product) => (
                   <div key={product._id}>
                     <ProductCard
@@ -351,13 +371,15 @@ const Product = () => {
                 ))}
               </div>
 
-              <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4, mb: 2 }}>
+              <Box
+                sx={{ display: 'flex', justifyContent: 'center', mt: 4, mb: 2 }}
+              >
                 <Pagination
                   count={totalPages}
                   page={page}
                   onChange={handlePageChange}
-                  color="primary"
-                  size="large"
+                  color='primary'
+                  size='large'
                   showFirstButton
                   showLastButton
                 />
