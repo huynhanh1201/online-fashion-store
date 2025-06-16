@@ -6,7 +6,8 @@ const cartSlice = createSlice({
     cartItems: [],
     selectedItems: [],
     tempCart: null,
-    isBuyNow: false
+    isBuyNow: false,
+    tempQuantities: {}
   },
   reducers: {
     setCartItems(state, action) {
@@ -26,6 +27,20 @@ const cartSlice = createSlice({
     clearSelectedItems: (state) => {
       state.selectedItems = []
     },
+    setTempQuantity: (state, action) => {
+      const { variantId, quantity } = action.payload
+      if (!state.tempQuantities) {
+        state.tempQuantities = {}
+      }
+      state.tempQuantities[variantId] = quantity
+    },
+    removeTempQuantity: (state, action) => {
+      const variantId = action.payload
+      delete state.tempQuantities[variantId]
+    },
+    clearAllTempQuantities: (state) => {
+      state.tempQuantities = {}
+    }
   }
 })
 
@@ -34,8 +49,10 @@ export const {
   setSelectedItems,
   setTempCart,
   clearTempCart,
-  clearSelectedItems
+  clearSelectedItems,
+  setTempQuantity,
+  removeTempQuantity,
+  clearAllTempQuantities
 } = cartSlice.actions
-
 
 export default cartSlice.reducer
