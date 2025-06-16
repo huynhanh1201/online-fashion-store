@@ -39,7 +39,7 @@ const OrderManagement = () => {
   }, [])
   React.useEffect(() => {
     fetchOrders(page, limit, filters)
-  }, [page, limit])
+  }, [page, limit, filters])
   // Mở modal xem
   const handleOpenModalView = async (order) => {
     setSelectedOrder(order)
@@ -93,7 +93,7 @@ const OrderManagement = () => {
     try {
       // Giả sử bạn có hàm updateOrderById trong service
       await updateOrderById(orderId, data)
-      fetchOrders(page, limit)
+      fetchOrders(page, limit, filters) // Cập nhật lại danh sách đơn hàng
       handleCloseModalEdit()
     } catch (error) {
       console.error('Lỗi cập nhật đơn hàng:', error)
@@ -105,7 +105,7 @@ const OrderManagement = () => {
     if (!selectedOrder) return
     const success = await deleteOrderById(selectedOrder._id)
     if (success) {
-      fetchOrders(page, limit)
+      fetchOrders(page, limit, filters) // Cập nhật lại danh sách đơn hàng
       handleCloseModalDelete()
     } else {
       alert('Xoá đơn hàng thất bại, vui lòng thử lại.')
@@ -114,13 +114,14 @@ const OrderManagement = () => {
   const handleChangePage = (event, value) => {
     setPage(value)
   }
+  const isEqual = (obj1, obj2) => JSON.stringify(obj1) === JSON.stringify(obj2)
+
   const handleFilter = (newFilters) => {
-    setFilters(newFilters)
-    if (Object.keys(newFilters).length > 0) {
-      fetchOrders(1, limit, newFilters)
+    if (!isEqual(filters, newFilters)) {
+      setPage(1)
+      setFilters(newFilters)
     }
   }
-
   return (
     <>
       <OrderTable

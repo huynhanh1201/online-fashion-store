@@ -71,8 +71,13 @@ export default function ViewDescriptionModal({ open, onClose, product }) {
           dangerouslySetInnerHTML={{ __html: product?.description || '' }}
         />
       </DialogContent>
-      <DialogActions>
-        <Button onClick={onClose} variant='outlined'>
+      <DialogActions sx={{ padding: '16px 24px' }}>
+        <Button
+          onClick={onClose}
+          variant='outlined'
+          color='error'
+          sx={{ textTransform: 'none' }}
+        >
           Đóng
         </Button>
       </DialogActions>

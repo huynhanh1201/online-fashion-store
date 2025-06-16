@@ -14,6 +14,9 @@ import {
   MenuItem
 } from '@mui/material'
 import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord'
+import { useNavigate } from 'react-router-dom'
+import ArrowBackIcon from '@mui/icons-material/ArrowBack'
+import { Button } from '@mui/material'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import 'dayjs/locale/vi'
@@ -39,6 +42,7 @@ export default function NotificationManagement() {
   const [sortOrder, setSortOrder] = useState('desc')
   const [displayCount, setDisplayCount] = useState(10)
   const observerRef = useRef(null)
+  const navigate = useNavigate()
 
   const filtered = allNotifications
     .filter((n) => (filter === 'all' ? true : n.type === filter))
@@ -76,7 +80,17 @@ export default function NotificationManagement() {
   }, [filtered.length])
 
   return (
-    <Box p={3} mx='auto'>
+    <Box p={3} mx='auto' pt={0}>
+      <Button
+        variant='outlined'
+        color='error'
+        size='small'
+        startIcon={<ArrowBackIcon />}
+        onClick={() => navigate(-1)}
+        sx={{ textTransform: 'none', mr: 2, mb: 2 }}
+      >
+        Quay lại
+      </Button>
       <Typography variant='h5' mb={2}>
         Tất cả thông báo
       </Typography>

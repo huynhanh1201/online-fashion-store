@@ -31,6 +31,7 @@ const EditDiscountModal = ({ open, onClose, discount, onSave }) => {
     register,
     watch,
     handleSubmit,
+    setValue,
     reset,
     // setValue,
     setError,
@@ -101,7 +102,14 @@ const EditDiscountModal = ({ open, onClose, discount, onSave }) => {
     reset()
     onClose()
   }
+  const formatNumber = (value) => {
+    const number = value?.toString().replace(/\D/g, '') || ''
+    return number.replace(/\B(?=(\d{3})+(?!\d))/g, '.')
+  }
 
+  const parseNumber = (formatted) => formatted.replace(/\./g, '')
+  const minOrderValue = watch('minOrderValue')
+  const usageLimit = watch('usageLimit')
   return (
     <Dialog
       open={open}
@@ -112,7 +120,7 @@ const EditDiscountModal = ({ open, onClose, discount, onSave }) => {
         sx: StyleAdmin.OverlayModal
       }}
     >
-      <DialogTitle>Chỉnh sửa mã giảm giá</DialogTitle>
+      <DialogTitle>Sửa thông tin mã giảm giá</DialogTitle>
       <Divider sx={{ my: 0 }} />
       <form onSubmit={handleSubmit(onSubmit)}>
         <DialogContent>
@@ -182,20 +190,30 @@ const EditDiscountModal = ({ open, onClose, discount, onSave }) => {
             <Box flex={1}>
               <TextField
                 label='Giá trị đơn hàng tối thiểu'
-                type='number'
                 fullWidth
                 margin='normal'
-                {...register('minOrderValue')}
+                value={formatNumber(minOrderValue)}
+                onChange={(e) => {
+                  const raw = parseNumber(e.target.value)
+                  setValue('minOrderValue', raw)
+                }}
+                InputProps={{ inputMode: 'numeric' }}
                 sx={StyleAdmin.InputCustom}
               />
+
               <TextField
                 label='Số lượt sử dụng tối đa'
-                type='number'
                 fullWidth
                 margin='normal'
-                {...register('usageLimit')}
+                value={formatNumber(usageLimit)}
+                onChange={(e) => {
+                  const raw = parseNumber(e.target.value)
+                  setValue('usageLimit', raw)
+                }}
+                InputProps={{ inputMode: 'numeric' }}
                 sx={StyleAdmin.InputCustom}
               />
+
               <TextField
                 label='Hiệu lực từ'
                 type='datetime-local'
@@ -219,13 +237,22 @@ const EditDiscountModal = ({ open, onClose, discount, onSave }) => {
         </DialogContent>
         <Divider sx={{ my: 0 }} />
         <DialogActions sx={{ padding: '16px 24px' }}>
-          <Button onClick={handleClose} color='inherit'>
+          <Button
+            onClick={handleClose}
+            color='error'
+            variant='outlined'
+            sx={{ textTransform: 'none' }}
+          >
             Hủy
           </Button>
           <Button
             type='submit'
             variant='contained'
-            sx={{ backgroundColor: '#001f5d', color: '#fff' }}
+            sx={{
+              backgroundColor: '#001f5d',
+              color: '#fff',
+              textTransform: 'none'
+            }}
             disabled={isSubmitting}
           >
             {isSubmitting ? 'Đang lưu...' : 'Lưu'}

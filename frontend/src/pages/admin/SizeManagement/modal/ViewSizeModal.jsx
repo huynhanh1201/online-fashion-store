@@ -4,13 +4,32 @@ import Dialog from '@mui/material/Dialog'
 import DialogActions from '@mui/material/DialogActions'
 import DialogContent from '@mui/material/DialogContent'
 import DialogTitle from '@mui/material/DialogTitle'
-import TextField from '@mui/material/TextField'
-import Button from '@mui/material/Button'
 import Divider from '@mui/material/Divider'
+import Button from '@mui/material/Button'
+import Table from '@mui/material/Table'
+import TableBody from '@mui/material/TableBody'
+import TableRow from '@mui/material/TableRow'
+import TableCell from '@mui/material/TableCell'
+import Chip from '@mui/material/Chip'
 
 import StyleAdmin from '~/assets/StyleAdmin.jsx'
 
 const ViewSizeModal = ({ open, onClose, size }) => {
+  if (!size) return null
+
+  const formatDate = (dateString) => {
+    if (!dateString) return 'Không có thông tin'
+    const date = new Date(dateString)
+    return date.toLocaleString('vi-VN', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit'
+    })
+  }
+
   return (
     <Dialog
       open={open}
@@ -23,27 +42,60 @@ const ViewSizeModal = ({ open, onClose, size }) => {
     >
       <DialogTitle>Xem thông tin kích thước</DialogTitle>
       <Divider sx={{ my: 0 }} />
-      <DialogContent>
-        <form id='view-size-form'>
-          {/* Tên kích thước - chỉ đọc */}
-          <TextField
-            label='Tên kích thước'
-            fullWidth
-            margin='normal'
-            defaultValue={size?.name || ''}
-            InputProps={{
-              readOnly: true
-            }}
-            sx={{
-              ...StyleAdmin.InputCustom,
-              ...StyleAdmin.InputCustom.CursorNone
-            }}
-          />
-        </form>
+      <DialogContent sx={{ overflowY: 'auto', py: 0 }}>
+        <Table>
+          <TableBody>
+            <TableRow>
+              <TableCell sx={{ fontWeight: 'bold', width: '35%' }}>
+                Tên kích thước
+              </TableCell>
+              <TableCell>
+                {size.name
+                  .split(' ')
+                  .map(
+                    (word) =>
+                      word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+                  )
+                  .join(' ') || 'Không có tên'}
+              </TableCell>
+            </TableRow>
+
+            <TableRow>
+              <TableCell sx={{ fontWeight: 'bold' }}>Trạng thái</TableCell>
+              <TableCell>
+                <Chip
+                  label={size.destroy ? 'Ngừng hiển thị' : 'Đang hoạt động'}
+                  color={size.destroy ? 'error' : 'success'}
+                  size='medium'
+                  sx={{ width: 140, fontWeight: 700 }}
+                />
+              </TableCell>
+            </TableRow>
+
+            <TableRow>
+              <TableCell sx={{ fontWeight: 'bold' }}>Ngày tạo</TableCell>
+              <TableCell>{formatDate(size.createdAt)}</TableCell>
+            </TableRow>
+
+            <TableRow>
+              <TableCell sx={{ fontWeight: 'bold', borderBottom: 0 }}>
+                Ngày cập nhật
+              </TableCell>
+              <TableCell sx={{ borderBottom: 0 }}>
+                {formatDate(size.updatedAt)}
+              </TableCell>
+            </TableRow>
+          </TableBody>
+        </Table>
       </DialogContent>
       <Divider sx={{ my: 0 }} />
       <DialogActions sx={{ padding: '16px 24px' }}>
-        <Button onClick={onClose} color='error' variant='contained'>
+        <Button
+          onClick={onClose}
+          color='error'
+          variant='outlined'
+          sx={{ textTransform: 'none' }}
+        >
           Đóng
         </Button>
       </DialogActions>

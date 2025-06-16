@@ -56,7 +56,18 @@ const ViewProductModal = ({
     ? uniqueColors(colorPalette.colors)
     : []
   const filteredSizes = sizePalette?.sizes ? uniqueSizes(sizePalette.sizes) : []
-
+  const formatDate = (dateString) => {
+    if (!dateString) return 'Không có thông tin'
+    const date = new Date(dateString)
+    return date.toLocaleString('vi-VN', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit'
+    })
+  }
   if (!product) return null
   return (
     <Dialog
@@ -72,7 +83,7 @@ const ViewProductModal = ({
         ...StyleAdmin.InputCustom
       }}
     >
-      <DialogTitle>Chi tiết sản phẩm</DialogTitle>
+      <DialogTitle>Thông tin sản phẩm</DialogTitle>
       <DialogContent
         dividers
         sx={{ maxHeight: 'calc(85vh - 64px)', overflowY: 'auto' }}
@@ -131,10 +142,17 @@ const ViewProductModal = ({
           {/* Cột thông tin */}
           <Grid item size={12} md={7} width='calc(98% - 350px)'>
             <Box sx={{ width: '100%' }}>
-              <Typography variant='h6'>Thông tin sản phẩm</Typography>
-              <Divider />
               <Table size='small' sx={{ width: '100%' }}>
                 <TableBody>
+                  <TableRow>
+                    <TableCell
+                      variant='head'
+                      sx={{ fontWeight: 500, width: 100 }}
+                    >
+                      Mã sản phẩm
+                    </TableCell>
+                    <TableCell>{product.productCode}</TableCell>
+                  </TableRow>
                   <TableRow>
                     <TableCell
                       variant='head'
@@ -156,13 +174,16 @@ const ViewProductModal = ({
                     <TableCell variant='head' sx={{ fontWeight: 500 }}>
                       Danh mục
                     </TableCell>
-                    <TableCell>{product.categoryId?.name}</TableCell>
-                  </TableRow>
-                  <TableRow>
-                    <TableCell variant='head' sx={{ fontWeight: 500 }}>
-                      Xuất xứ
+                    <TableCell>
+                      {product.categoryId?.name
+                        .split(' ')
+                        .map(
+                          (word) =>
+                            word.charAt(0).toUpperCase() +
+                            word.slice(1).toLowerCase()
+                        )
+                        .join(' ')}
                     </TableCell>
-                    <TableCell>{product.origin || 'Chưa có'}</TableCell>
                   </TableRow>
                   <TableRow>
                     <TableCell variant='head' sx={{ fontWeight: 500 }}>
@@ -174,12 +195,26 @@ const ViewProductModal = ({
                           {filteredColors.map((color) => (
                             <Chip
                               key={color._id}
-                              label={color.name}
+                              label={
+                                <Box
+                                  sx={{
+                                    overflow: 'hidden',
+                                    textOverflow: 'ellipsis',
+                                    whiteSpace: 'nowrap',
+                                    width: '100%'
+                                  }}
+                                  title={color.name} // Hiển thị toàn bộ tên khi hover
+                                >
+                                  {color.name}
+                                </Box>
+                              }
                               size='large'
                               sx={{
-                                backgroundColor: '#e0e0e0',
+                                backgroundColor: '#001f5d',
+                                color: '#fff',
                                 fontWeight: 500,
-                                width: 120
+                                width: 120,
+                                paddingX: 1 // Có thể thêm nếu muốn canh nội dung đẹp hơn
                               }}
                             />
                           ))}
@@ -200,12 +235,26 @@ const ViewProductModal = ({
                             <Chip
                               color='#000'
                               key={size._id}
-                              label={size.name}
+                              label={
+                                <Box
+                                  sx={{
+                                    overflow: 'hidden',
+                                    textOverflow: 'ellipsis',
+                                    whiteSpace: 'nowrap',
+                                    width: '100%' // cần để hiệu lực max width từ chip
+                                  }}
+                                  title={size.name} // hiện full khi hover
+                                >
+                                  {size.name}
+                                </Box>
+                              }
                               size='large'
                               sx={{
-                                backgroundColor: '#e0e0e0',
+                                backgroundColor: '#001f5d',
+                                color: '#fff',
                                 fontWeight: 500,
-                                width: 120
+                                width: 120,
+                                paddingX: 1 // thêm padding nếu muốn đẹp hơn
                               }}
                             />
                           ))}
@@ -228,6 +277,19 @@ const ViewProductModal = ({
                       />
                     </TableCell>
                   </TableRow>
+                  <TableRow>
+                    <TableCell variant='head' sx={{ fontWeight: 500 }}>
+                      Ngày tạo
+                    </TableCell>
+                    <TableCell>{formatDate(product.createdAt)}</TableCell>
+                  </TableRow>
+
+                  <TableRow>
+                    <TableCell variant='head' sx={{ fontWeight: 500 }}>
+                      Ngày cập nhật
+                    </TableCell>
+                    <TableCell>{formatDate(product.updatedAt)}</TableCell>
+                  </TableRow>
                 </TableBody>
               </Table>
             </Box>
@@ -238,53 +300,64 @@ const ViewProductModal = ({
         <Typography variant='h6' gutterBottom sx={{ mt: 3 }}>
           Mô tả sản phẩm
         </Typography>
-        <Box
-          sx={{
-            width: '100%',
-            mt: 2,
-            '& img': {
-              width: '873px !important',
-              height: '873px !important',
-              display: 'block',
-              margin: '8px auto',
-              borderRadius: '6px',
-              objectFit: 'contain'
-            },
-            '& p': {
-              margin: '8px 0',
-              lineHeight: 1.6,
-              wordBreak: 'break-word'
-            },
-            '& ul, & ol': {
-              paddingLeft: '20px',
-              margin: '8px 0'
-            },
-            '& li': {
-              marginBottom: '4px'
-            },
-            '& strong': {
-              fontWeight: 600
-            },
-            '& em': {
-              fontStyle: 'italic'
-            },
-            '& a': {
-              color: '#1976d2',
-              textDecoration: 'underline',
-              wordBreak: 'break-all'
-            },
-            '& span': {
-              wordBreak: 'break-word'
-            },
-            '& *': {
-              boxSizing: 'border-box'
-            }
-          }}
-          dangerouslySetInnerHTML={{ __html: product.description }}
-        />
+        {!product.description ? (
+          <Typography variant='body2' color='textSecondary'>
+            Chưa có mô tả cho sản phẩm này.
+          </Typography>
+        ) : (
+          <Box
+            sx={{
+              width: '100%',
+              mt: 2,
+              '& img': {
+                width: '873px !important',
+                height: '873px !important',
+                display: 'block',
+                margin: '8px auto',
+                borderRadius: '6px',
+                objectFit: 'contain'
+              },
+              '& p': {
+                margin: '8px 0',
+                lineHeight: 1.6,
+                wordBreak: 'break-word'
+              },
+              '& ul, & ol': {
+                paddingLeft: '20px',
+                margin: '8px 0'
+              },
+              '& li': {
+                marginBottom: '4px'
+              },
+              '& strong': {
+                fontWeight: 600
+              },
+              '& em': {
+                fontStyle: 'italic'
+              },
+              '& a': {
+                color: '#1976d2',
+                textDecoration: 'underline',
+                wordBreak: 'break-all'
+              },
+              '& span': {
+                wordBreak: 'break-word'
+              },
+              '& *': {
+                boxSizing: 'border-box'
+              }
+            }}
+            dangerouslySetInnerHTML={{ __html: product.description }}
+          />
+        )}
       </DialogContent>
       <DialogActions sx={{ padding: '16px 24px' }}>
-        <Button color='error' variant='contained' onClick={onClose}>
+        <Button
+          color='error'
+          variant='outlined'
+          onClick={onClose}
+          sx={{ textTransform: 'none' }}
+        >
           Đóng
         </Button>
       </DialogActions>

@@ -286,11 +286,10 @@ const EditProductModal = ({ open, onClose, onSave, product }) => {
       fullWidth
       PaperProps={{
         sx: {
-          marginTop: '50px',
-          height: '85vh',
-          maxHeight: '85vh',
           display: 'flex',
-          flexDirection: 'column'
+          flexDirection: 'column',
+          marginTop: '50px',
+          maxHeight: '85vh' // đảm bảo không vượt quá
         }
       }}
     >
@@ -305,16 +304,25 @@ const EditProductModal = ({ open, onClose, onSave, product }) => {
         }}
       >
         <DialogTitle sx={{ paddingTop: '8px', paddingBottom: '8px' }}>
-          Sửa sản phẩm
+          Sửa thông tin sản phẩm
         </DialogTitle>
         <DialogActions sx={{ paddingLeft: '24px' }}>
-          <Button onClick={onClose} variant='outlined' color='error'>
+          <Button
+            onClick={onClose}
+            variant='outlined'
+            color='error'
+            sx={{ textTransform: 'none' }}
+          >
             Hủy
           </Button>
           <Button
             onClick={handleSubmit(onSubmit)}
             variant='contained'
-            sx={{ color: '#fff', backgroundColor: '#001f5d' }}
+            sx={{
+              color: '#fff',
+              backgroundColor: '#001f5d',
+              textTransform: 'none'
+            }}
           >
             Lưu thay đổi
           </Button>
@@ -349,7 +357,7 @@ const EditProductModal = ({ open, onClose, onSave, product }) => {
               onUpload={(file) => uploadToCloudinary(file, CloudinaryProduct)}
             />
           </Grid>
-          {/*danh mục*/}
+          {/*Danh mục*/}
           <Grid item size={4}>
             <FormControl fullWidth margin='normal' error={!!errors.categoryId}>
               <InputLabel>Danh mục</InputLabel>
@@ -395,7 +403,7 @@ const EditProductModal = ({ open, onClose, onSave, product }) => {
                   label='Giá nhập'
                   fullWidth
                   type='text'
-                  value={formatNumber(field.value)}
+                  value={formatNumber(field.value || '')}
                   onChange={(e) => {
                     const rawValue = parseNumber(e.target.value)
                     field.onChange(rawValue)
@@ -404,7 +412,6 @@ const EditProductModal = ({ open, onClose, onSave, product }) => {
               )}
             />
           </Grid>
-
           {/* Giá bán */}
           <Grid item size={4} style={{ marginTop: '16px' }}>
             <Controller
@@ -416,7 +423,7 @@ const EditProductModal = ({ open, onClose, onSave, product }) => {
                   label='Giá bán'
                   fullWidth
                   type='text'
-                  value={formatNumber(field.value)}
+                  value={formatNumber(field.value || '')}
                   onChange={(e) => {
                     const rawValue = parseNumber(e.target.value)
                     field.onChange(rawValue)
@@ -427,7 +434,6 @@ const EditProductModal = ({ open, onClose, onSave, product }) => {
               )}
             />
           </Grid>
-
           {/*mô tả*/}
           <Grid item size={12}>
             <Controller
@@ -502,7 +508,7 @@ const EditProductModal = ({ open, onClose, onSave, product }) => {
                       }
                     }}
                     editorStyle={{
-                      minHeight: '200px',
+                      minHeight: '150px',
                       border: '1px solid #ccc',
                       padding: '10px',
                       borderRadius: '4px',

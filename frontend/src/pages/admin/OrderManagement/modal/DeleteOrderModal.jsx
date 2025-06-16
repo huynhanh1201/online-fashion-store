@@ -34,11 +34,11 @@ const DeleteOrderModal = ({ open, onClose, onConfirm, order }) => {
         sx: styleAdmin.OverlayModal
       }}
     >
-      <DialogTitle>Xác nhận xoá đơn hàng</DialogTitle>
+      <DialogTitle>Xác nhận ẩn đơn hàng</DialogTitle>
       <DialogContent dividers>
         <Typography>
-          Bạn có chắc chắn muốn xoá đơn hàng <strong>{order?._id || ''}</strong>{' '}
-          không? Hành động này không thể hoàn tác.
+          Bạn có chắc chắn muốn ẩn đơn hàng <strong>{order?._id || ''}</strong>{' '}
+          không?
         </Typography>
       </DialogContent>
       <DialogActions sx={{ padding: '16px 24px' }}>

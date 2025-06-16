@@ -116,18 +116,10 @@ import React from 'react'
 import { TableRow, TableCell, IconButton, Stack, Chip } from '@mui/material'
 import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye'
 import BorderColorIcon from '@mui/icons-material/BorderColor'
-import DeleteForeverIcon from '@mui/icons-material/DeleteForever'
-
-const styles = {
-  groupIcon: {
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    gap: 1,
-    width: '130px'
-  }
-}
-
+import VisibilityIcon from '@mui/icons-material/Visibility'
+import StyleAdmin from '~/assets/StyleAdmin.jsx'
+import Tooltip from '@mui/material/Tooltip'
+import VisibilityOffIcon from '@mui/icons-material/VisibilityOff'
 const formatDate = (iso) =>
   iso
     ? new Date(iso).toLocaleDateString('vi-VN', {
@@ -137,82 +129,109 @@ const formatDate = (iso) =>
       })
     : '—'
 
-const DiscountRow = ({ discount, index, columns, onAction }) => {
+const styles = {
+  cell: {
+    height: 55,
+    minHeight: 55,
+    maxHeight: 55,
+    lineHeight: '49px',
+    py: 0,
+    px: 1,
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    verticalAlign: 'middle'
+  },
+  groupIcon: {
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: 1,
+    width: '130px'
+  }
+}
+
+export default function DiscountRow({ discount, index, columns, onAction }) {
   const remaining = discount.usageLimit - discount.usedCount
 
   return (
     <TableRow hover>
-      {columns.map((col) => {
-        const { id, align } = col
-        let value = '—'
+      {columns.map(({ id, align }) => {
+        let content = null
 
         switch (id) {
           case 'index':
-            value = index
+            content = index
             break
           case 'code':
-            value = discount.code?.toUpperCase()
+            content = discount.code?.toUpperCase() || '—'
             break
           case 'type':
-            value = discount.type === 'fixed' ? 'Cố định' : 'Phần trăm'
+            content = discount.type === 'fixed' ? 'Cố định' : 'Phần trăm'
             break
           case 'amount':
-            value =
+            content =
               discount.type === 'fixed'
                 ? `${discount.amount?.toLocaleString('vi-VN')}đ`
                 : `${discount.amount}%`
             break
           case 'minOrderValue':
-            value = discount.minOrderValue?.toLocaleString('vi-VN')
+            content = `${discount.minOrderValue?.toLocaleString('vi-VN')}đ`
             break
           case 'usageLimit':
-            value = discount.usageLimit
+            content = discount.usageLimit
             break
           case 'remaining':
-            value = remaining >= 0 ? remaining : 0
+            content = remaining >= 0 ? remaining : 0
             break
           case 'status':
-            value = (
+            content = (
               <Chip
                 label={discount.isActive ? 'Đang hoạt động' : 'Ngừng hoạt động'}
                 color={discount.isActive ? 'success' : 'error'}
                 size='large'
-                sx={{ width: '120px', fontWeight: '800' }}
+                sx={{ width: '127px', fontWeight: '800' }}
               />
             )
             break
           case 'validFrom':
-            value = formatDate(discount.validFrom)
+            content = formatDate(discount.validFrom)
             break
           case 'validUntil':
-            value = formatDate(discount.validUntil)
+            content = formatDate(discount.validUntil)
             break
           case 'action':
-            value = (
-              <Stack direction='row' spacing={1} sx={styles.groupIcon}>
-                <IconButton
-                  onClick={() => onAction('view', discount)}
-                  size='small'
-                >
-                  <RemoveRedEyeIcon color='primary' />
-                </IconButton>
-                <IconButton
-                  sx={{ ml: '0 !important' }}
-                  onClick={() => onAction('edit', discount)}
-                  size='small'
-                >
-                  <BorderColorIcon color='warning' />
-                </IconButton>
-                <IconButton
-                  sx={{ ml: '0 !important' }}
-                  onClick={() => onAction('delete', discount)}
-                  size='small'
-                >
-                  <DeleteForeverIcon color='error' />
-                </IconButton>
+            content = (
+              <Stack direction='row' sx={styles.groupIcon}>
+                <Tooltip title='Xem'>
+                  <IconButton
+                    onClick={() => onAction('view', discount)}
+                    size='small'
+                  >
+                    <RemoveRedEyeIcon color='primary' />
+                  </IconButton>
+                </Tooltip>
+                <Tooltip title='Sửa'>
+                  <IconButton
+                    onClick={() => onAction('edit', discount)}
+                    size='small'
+                  >
+                    <BorderColorIcon color='warning' />
+                  </IconButton>
+                </Tooltip>
+                <Tooltip title='Ẩn'>
+                  <IconButton
+                    onClick={() => onAction('delete', discount)}
+                    size='small'
+                  >
+                    <VisibilityOffIcon color='error' />
+                  </IconButton>
+                </Tooltip>
               </Stack>
             )
             break
+          default:
+            content = discount[id] ?? '—'
         }
 
         return (
@@ -220,17 +239,15 @@ const DiscountRow = ({ discount, index, columns, onAction }) => {
             key={id}
             align={align || 'left'}
             sx={{
-              ...(id === 'action' && {
-                px: 0
-              })
+              ...styles.cell,
+              ...(id === 'index' && StyleAdmin.TableColumnSTT)
             }}
+            title={typeof content === 'string' ? content : undefined}
           >
-            {value}
+            {content}
           </TableCell>
         )
       })}
     </TableRow>
   )
 }
-
-export default DiscountRow

@@ -10,7 +10,8 @@ import {
   MenuItem,
   Select,
   FormControl,
-  InputLabel
+  InputLabel,
+  Divider
 } from '@mui/material'
 import { toast } from 'react-toastify'
 
@@ -75,7 +76,8 @@ const EditInventoryModal = ({
 
   return (
     <Dialog open={open} onClose={onClose}>
-      <DialogTitle>Cập nhật tồn kho</DialogTitle>
+      <DialogTitle>Sửa thông tin tồn kho</DialogTitle>
+      <Divider />
       <DialogContent>
         <TextField
           margin='dense'
@@ -136,9 +138,26 @@ const EditInventoryModal = ({
           </Select>
         </FormControl>
       </DialogContent>
-      <DialogActions>
-        <Button onClick={onClose}>Hủy</Button>
-        <Button onClick={handleSubmit}>Lưu</Button>
+      <Divider />
+      <DialogActions sx={{ padding: '16px 24px' }}>
+        <Button
+          onClick={onClose}
+          color='error'
+          variant='outlined'
+          sx={{ textTransform: 'none' }}
+        >
+          Hủy
+        </Button>
+        <Button
+          onClick={handleSubmit}
+          sx={{
+            backgroundColor: '#001f5d',
+            color: '#fff',
+            textTransform: 'none'
+          }}
+        >
+          Lưu
+        </Button>
       </DialogActions>
     </Dialog>
   )

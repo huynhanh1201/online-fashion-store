@@ -34,7 +34,7 @@ export default function SearchWithSuggestions({
       }}
       freeSolo
       clearOnEscape
-      options={options}
+      options={[]}
       loading={loading}
       value={keyword}
       inputValue={inputValue}
@@ -45,7 +45,13 @@ export default function SearchWithSuggestions({
           {...params}
           placeholder={label}
           size='small'
-          sx={{ pl: 0 }}
+          sx={{
+            pl: 0,
+            '& .MuiInputBase-input::placeholder': {
+              color: '#000',
+              fontWeight: 400
+            }
+          }}
           InputProps={{
             ...params.InputProps,
             startAdornment: (

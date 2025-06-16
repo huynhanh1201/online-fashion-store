@@ -40,7 +40,7 @@ const AddPartnerModal = ({ open, onClose, addPartner }) => {
 
   return (
     <Dialog open={open} onClose={handleCancel} fullWidth maxWidth='sm'>
-      <DialogTitle>Thêm đối tác</DialogTitle>
+      <DialogTitle>Thêm đối tác mới</DialogTitle>
       <form onSubmit={handleSubmit(onSubmit)}>
         <DialogContent dividers>
           <Grid container spacing={2}>
@@ -56,7 +56,7 @@ const AddPartnerModal = ({ open, onClose, addPartner }) => {
             <Grid item size={12}>
               <TextField
                 select
-                label='Loại đối tác'
+                label='Kiểu đối tác'
                 fullWidth
                 defaultValue='supplier'
                 {...register('type', {
@@ -87,9 +87,23 @@ const AddPartnerModal = ({ open, onClose, addPartner }) => {
             </Grid>
           </Grid>
         </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCancel}>Huỷ</Button>
-          <Button type='submit' variant='contained'>
+        <DialogActions sx={{ padding: '16px 24px' }}>
+          <Button
+            onClick={handleCancel}
+            sx={{ textTransform: 'none' }}
+            color='error'
+            variant='outlined'
+          >
+            Huỷ
+          </Button>
+          <Button
+            type='submit'
+            sx={{
+              backgroundColor: '#001f5d',
+              color: '#fff',
+              textTransform: 'none'
+            }}
+          >
             Thêm
           </Button>
         </DialogActions>

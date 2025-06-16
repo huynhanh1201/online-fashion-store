@@ -29,6 +29,8 @@ import useVariants from '~/hooks/admin/Inventory/useVariants.js'
 import useInventory from '~/hooks/admin/Inventory/useInventorys.js'
 import useWarehouses from '~/hooks/admin/Inventory/useWarehouses.js'
 import TablePaginationActions from '~/components/PaginationAdmin/TablePaginationActions.jsx'
+import TableNoneData from '~/components/TableAdmin/NoneData.jsx'
+import Tooltip from '@mui/material/Tooltip'
 const InventoryLogTab = () => {
   const { logs, fetchLogs, loadingLog, totalLogs } = useInventoryLog()
   const { variants, fetchVariants } = useVariants()
@@ -51,64 +53,66 @@ const InventoryLogTab = () => {
   }, [])
   useEffect(() => {
     fetchLogs(page, rowsPerPage, filters)
-  }, [page, rowsPerPage])
+  }, [page, rowsPerPage, filters])
   const handleViewLog = (log) => {
     setSelectedLog(log)
     setOpenViewModal(true)
   }
-  const enrichedInventoryLogs = (logs || []).map((log) => {
-    return {
-      ...log,
-      batchName:
-        batches.find((batch) => batch._id === log.batchId)?.batchCode || 'N/A',
-      variantName: log.inventoryId.variantId?.name || 'N/A',
-      warehouse: log.inventoryId.warehouseId?.name || 'N/A',
-      typeLabel: log.type === 'in' ? 'Nhập' : 'Xuất',
-      createdAtFormatted: new Date(log.createdAt).toLocaleDateString('vi-VN'),
-      createdByName: log.createdBy?.name || 'N/A'
-    }
-  })
 
   const inventoryLogColumns = [
-    { id: 'source', label: 'Mã phiếu', minWidth: 130 },
-    { id: 'variantName', label: 'Biến thể', minWidth: 150 },
-    { id: 'warehouse', label: 'Kho', minWidth: 100 },
-    { id: 'typeLabel', label: 'Loại', minWidth: 100, align: 'start' },
+    {
+      id: 'index',
+      label: 'STT',
+      minWidth: 50,
+      maxWidth: 50,
+      width: 50,
+      align: 'center'
+    },
+    { id: 'variantName', label: 'Tên sản phẩm', minWidth: 150, maxWidth: 200 },
+    // {
+    //   id: 'createdByName',
+    //   label: 'Người thực hiện',
+    //   minWidth: 120
+    // },
+    { id: 'warehouse', label: 'Kho hàng', minWidth: 100, maxWidth: 150 },
+    {
+      id: 'typeLabel',
+      label: 'Loại phiếu',
+      minWidth: 150,
+      align: 'start',
+      maxWidth: 150
+    },
     {
       id: 'amount',
       label: 'Số lượng',
-      minWidth: 100,
+      minWidth: 150,
       align: 'start',
       format: (value) => `${value.toLocaleString('vi-VN')}`
     },
     {
       id: 'importPrice',
       label: 'Giá nhập',
-      minWidth: 100,
+      minWidth: 150,
       align: 'start',
       format: (value) => `${value.toLocaleString('vi-VN')}đ`
     },
     {
       id: 'exportPrice',
       label: 'Giá xuất',
-      minWidth: 100,
+      minWidth: 150,
       align: 'start',
       format: (value) => `${value.toLocaleString('vi-VN')}đ`
     },
-    {
-      id: 'createdByName',
-      label: 'Người thực hiện',
-      minWidth: 120,
-      align: 'start'
-    },
-    { id: 'createdAtFormatted', label: 'Ngày thực hiện', minWidth: 150 },
+    { id: 'createdAtFormatted', label: 'Ngày thực hiện', minWidth: 100 },
     { id: 'action', label: 'Hành động', minWidth: 130, align: 'start' }
   ]
 
+  const isEqual = (obj1, obj2) => JSON.stringify(obj1) === JSON.stringify(obj2)
+
   const handleFilter = (newFilters) => {
-    setFilters(newFilters)
-    if (Object.keys(newFilters).length > 0) {
-      fetchLogs(1, rowsPerPage, newFilters)
+    if (!isEqual(filters, newFilters)) {
+      setPage(1)
+      setFilters(newFilters)
     }
   }
   const handleChangePage = (event, value) => setPage(value)
@@ -124,10 +128,7 @@ const InventoryLogTab = () => {
         <Table stickyHeader aria-label='inventory log table'>
           <TableHead>
             <TableRow sx={{ paddingBottom: '0' }}>
-              <TableCell
-                colSpan={inventoryLogColumns.length}
-                sx={{ borderBottom: 'none', paddingBottom: '0' }}
-              >
+              <TableCell colSpan={inventoryLogColumns.length}>
                 <Box
                   sx={{
                     display: 'flex',
@@ -140,11 +141,12 @@ const InventoryLogTab = () => {
                       display: 'flex',
                       flexDirection: 'column',
                       gap: 1,
-                      minWidth: 250
+                      minWidth: 250,
+                      minHeight: 76.5
                     }}
                   >
                     <Typography variant='h6' sx={{ fontWeight: '800' }}>
-                      Lịch sử nhập xuất kho
+                      Danh Sách Lịch Sử Xuất Nhập Kho
                     </Typography>
                   </Box>
                   <FilterInventoryLog
@@ -163,13 +165,20 @@ const InventoryLogTab = () => {
               {inventoryLogColumns.map((column) => (
                 <TableCell
                   key={column.id}
-                  align={column.align}
-                  style={{ minWidth: column.minWidth }}
+                  align={column.align || 'left'}
                   sx={{
+                    minWidth: column.minWidth,
+                    width: column.width,
+                    px: 1,
+                    ...(column.maxWidth && { maxWidth: column.maxWidth }),
                     ...(column.id === 'action' && {
-                      width: '130px',
-                      maxWidth: '130px',
-                      paddingLeft: '20px'
+                      width: 130,
+                      maxWidth: 130,
+                      paddingLeft: 2
+                    }),
+                    ...(column.id === 'typeLabel' && {
+                      width: 150,
+                      maxWidth: 150
                     })
                   }}
                 >
@@ -179,59 +188,143 @@ const InventoryLogTab = () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {enrichedInventoryLogs.map((row, index) => (
-              <TableRow hover role='checkbox' tabIndex={-1} key={index}>
-                {inventoryLogColumns.map((column) => {
-                  const value = row[column.id]
-                  if (column.id === 'typeLabel') {
-                    return (
-                      <TableCell key={column.id} align={column.align}>
+            {loadingLog ? (
+              <TableRow>
+                <TableCell colSpan={inventoryLogColumns.length} align='center'>
+                  Đang tải nhật ký tồn kho...
+                </TableCell>
+              </TableRow>
+            ) : logs.length === 0 ? (
+              <TableNoneData
+                col={inventoryLogColumns.length}
+                message='Không có dữ liệu lịch sử xuất nhập kho.'
+              />
+            ) : (
+              logs.map((row, index) => (
+                <TableRow hover key={index}>
+                  {inventoryLogColumns.map((col) => {
+                    let rawValue
+                    const capitalizeWords = (text) =>
+                      (text || '')
+                        .toLowerCase()
+                        .split(' ')
+                        .filter(Boolean)
+                        .map(
+                          (word) => word.charAt(0).toUpperCase() + word.slice(1)
+                        )
+                        .join(' ')
+                    // Xử lý các field đặc biệt
+                    switch (col.id) {
+                      case 'index':
+                        rawValue = (page - 1) * rowsPerPage + index + 1
+                        break
+                      case 'variantName':
+                        rawValue = capitalizeWords(
+                          row.inventoryId?.variantId?.name
+                        )
+                        break
+
+                      case 'warehouse':
+                        rawValue = capitalizeWords(
+                          row.inventoryId?.warehouseId?.name
+                        )
+                        break
+
+                      case 'batchName': {
+                        const batch = batches.find((b) => b._id === row.batchId)
+                        rawValue = capitalizeWords(batch?.batchCode)
+                        break
+                      }
+
+                      case 'typeLabel':
+                        rawValue = row.type === 'in' ? 'Nhập' : 'Xuất'
+                        break
+                      case 'createdAtFormatted':
+                        rawValue = new Date(row.createdAt).toLocaleDateString(
+                          'vi-VN'
+                        )
+                        break
+                      case 'createdByName':
+                        rawValue = row.createdBy?.name
+                        break
+                      default:
+                        rawValue = row[col.id]
+                    }
+
+                    // Định dạng nếu có format
+                    let content = rawValue ?? '—'
+                    if (col.format && rawValue !== undefined) {
+                      content = col.format(rawValue)
+                    }
+
+                    // Chip loại nhập/xuất
+                    if (col.id === 'typeLabel') {
+                      content = (
                         <Chip
-                          label={value}
+                          label={rawValue}
                           size='large'
-                          sx={{ width: '90px', fontWeight: '800' }}
-                          color={value === 'Nhập' ? 'success' : 'error'}
+                          sx={{ width: 120, fontWeight: 800 }}
+                          color={row.type === 'in' ? 'success' : 'error'}
                         />
-                      </TableCell>
-                    )
-                  }
-                  if (column.id === 'amount') {
-                    return (
-                      <TableCell key={column.id} align={column.align}>
+                      )
+                    }
+
+                    // Số lượng + dấu
+                    if (col.id === 'amount') {
+                      content = (
                         <Typography
                           sx={{
                             fontWeight: 900,
-                            color: row.typeLabel === 'Nhập' ? 'green' : 'red'
+                            color: row.type === 'in' ? 'green' : 'red',
+                            textAlign: 'left'
                           }}
                         >
-                          {value !== undefined
-                            ? `${row.typeLabel === 'Nhập' ? '+' : ''}${value}`
+                          {rawValue !== undefined
+                            ? `${row.type === 'in' ? '+' : ''}${rawValue}`
                             : '—'}
                         </Typography>
-                      </TableCell>
-                    )
-                  }
-                  if (column.id === 'action') {
+                      )
+                    }
+
+                    // Nút hành động
+                    if (col.id === 'action') {
+                      content = (
+                        <Tooltip title='Xem'>
+                          <IconButton
+                            onClick={() => handleViewLog(row)}
+                            size='small'
+                            color='primary'
+                          >
+                            <RemoveRedEyeIcon color='primary' />
+                          </IconButton>
+                        </Tooltip>
+                      )
+                    }
+
                     return (
-                      <TableCell key={column.id} align={column.align}>
-                        <IconButton
-                          onClick={() => handleViewLog(row)}
-                          size='small'
-                          color='primary'
-                        >
-                          <RemoveRedEyeIcon color='primary' />
-                        </IconButton>
+                      <TableCell
+                        key={col.id}
+                        align={col.align || 'left'}
+                        sx={{
+                          py: 0,
+                          px: 1,
+                          height: 55,
+                          whiteSpace: 'nowrap',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                          ...(col.maxWidth && { maxWidth: col.maxWidth })
+                        }}
+                        title={
+                          typeof content === 'string' ? content : undefined
+                        }
+                      >
+                        {content}
                       </TableCell>
                     )
-                  }
-                  return (
-                    <TableCell key={column.id} align={column.align}>
-                      {column.format ? column.format(value) : value}
-                    </TableCell>
-                  )
-                })}
-              </TableRow>
-            ))}
+                  })}
+                </TableRow>
+              ))
+            )}
           </TableBody>
         </Table>
       </TableContainer>

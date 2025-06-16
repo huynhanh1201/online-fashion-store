@@ -34,7 +34,7 @@ export default function FilterOrder({
   const [userInput, setUserInput] = useState('')
   const [sort, setSort] = useState('')
   useEffect(() => {
-    applyFilters(selectedFilter, startDate, endDate)
+    applyFilters()
   }, [keyword, userId, status, sort, paymentMethod, paymentStatus])
 
   const handleSearch = () => {
@@ -136,7 +136,6 @@ export default function FilterOrder({
       {/*    }))*/}
       {/*  ]}*/}
       {/*/>*/}
-
       {/*<FilterSelect*/}
       {/*  label='Mã giảm giá'*/}
       {/*  value={couponId}*/}
@@ -150,7 +149,6 @@ export default function FilterOrder({
       {/*    }))*/}
       {/*  ]}*/}
       {/*/>*/}
-
       {/*<FilterByPrice*/}
       {/*  label='Giá trị đơn hàng'*/}
       {/*  priceMin={minTotal}*/}
@@ -159,7 +157,6 @@ export default function FilterOrder({
       {/*  setPriceMax={setMaxTotal}*/}
       {/*  onApply={applyFilters}*/}
       {/*/>*/}
-
       <FilterSelect
         label='Trạng thái đơn hàng'
         value={status}
@@ -174,19 +171,17 @@ export default function FilterOrder({
         ]}
         sx={{ width: 200 }}
       />
-
       <FilterSelect
         label='Hình thức thanh toán'
         value={paymentMethod}
         onChange={setPaymentMethod}
         options={[
           { label: 'Tất cả', value: '' },
-          { label: 'COD', value: 'COD' },
+          { label: 'Khi nhận hàng', value: 'COD' },
           { label: 'Trực tuyến', value: 'vnpay' }
         ]}
         sx={{ width: 200 }}
       />
-
       <FilterSelect
         label='Trạng thái thanh toán'
         value={paymentStatus}
@@ -207,16 +202,16 @@ export default function FilterOrder({
           { label: 'Cũ nhất', value: 'oldest' }
         ]}
       />
-      {/*<FilterByTime*/}
-      {/*  label='Thời gian đặt hàng'*/}
-      {/*  selectedFilter={selectedFilter}*/}
-      {/*  setSelectedFilter={setSelectedFilter}*/}
-      {/*  startDate={startDate}*/}
-      {/*  setStartDate={setStartDate}*/}
-      {/*  endDate={endDate}*/}
-      {/*  setEndDate={setEndDate}*/}
-      {/*  onApply={handleApplyTimeFilter}*/}
-      {/*/>*/}
+      <FilterByTime
+        label='Thời gian đặt hàng'
+        selectedFilter={selectedFilter}
+        setSelectedFilter={setSelectedFilter}
+        startDate={startDate}
+        setStartDate={setStartDate}
+        endDate={endDate}
+        setEndDate={setEndDate}
+        onApply={handleApplyTimeFilter}
+      />
       <Box sx={{ display: 'flex', gap: 2 }}>
         <SearchWithSuggestions
           label='Tên người đặt'

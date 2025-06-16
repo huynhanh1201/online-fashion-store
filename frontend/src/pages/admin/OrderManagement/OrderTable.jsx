@@ -174,6 +174,7 @@ import {
 import OrderRow from './OrderRow'
 import FilterOrder from '~/components/FilterAdmin/FilterOrder.jsx'
 import TablePaginationActions from '~/components/PaginationAdmin/TablePaginationActions.jsx'
+import TableNoneData from '~/components/TableAdmin/NoneData.jsx'
 const OrderTable = ({
   orders = [],
   loading = false,
@@ -194,11 +195,12 @@ const OrderTable = ({
     { id: 'index', label: 'STT', minWidth: 50, align: 'center' },
     { id: '_id', label: 'Mã đơn hàng', minWidth: 150 },
     { id: 'customerName', label: 'Tên khách hàng', minWidth: 200 },
-    { id: 'paymentMethod', label: 'Phương thức thanh toán', minWidth: 150 },
+    { id: 'paymentMethod', label: 'Phương thức thanh toán', minWidth: 160 },
+    { id: 'paymentStatus', label: 'Thanh toán', minWidth: 130 },
     { id: 'status', label: 'Trạng thái đơn hàng', minWidth: 170 },
-    { id: 'paymentStatus', label: 'Thanh toán', minWidth: 150 },
-    { id: 'createdAt', label: 'Ngày đặt hàng', minWidth: 180 },
-    { id: 'action', label: 'Hành động', minWidth: 150, align: 'start' }
+
+    { id: 'createdAt', label: 'Ngày đặt hàng', minWidth: 160 },
+    { id: 'action', label: 'Hành động', minWidth: 130, align: 'start' }
   ]
 
   return (
@@ -212,11 +214,18 @@ const OrderTable = ({
                   sx={{
                     display: 'flex',
                     justifyContent: 'space-between',
-                    alignItems: 'start'
+                    alignItems: 'start',
+                    minHeight: 76.5
                   }}
                 >
                   <Box>
-                    <Typography variant='h6' sx={{ fontWeight: '800' }}>
+                    <Typography
+                      variant='h6'
+                      sx={{
+                        fontWeight: '800',
+                        minWidth: 250
+                      }}
+                    >
                       Danh Sách Đơn Hàng
                     </Typography>
                   </Box>
@@ -237,10 +246,15 @@ const OrderTable = ({
                   align={column.align || 'left'}
                   sx={{
                     minWidth: column.minWidth,
+                    px: 1,
+                    ...(column.id === 'index' && {
+                      width: '50px',
+                      maxWidth: '50px'
+                    }),
                     ...(column.id === 'action' && {
                       width: '130px',
                       maxWidth: '130px',
-                      paddingLeft: '26px'
+                      paddingLeft: '20px'
                     })
                   }}
                 >
@@ -269,11 +283,10 @@ const OrderTable = ({
                 />
               ))
             ) : (
-              <TableRow>
-                <TableCell colSpan={columns.length} align='center'>
-                  Không có đơn hàng nào.
-                </TableCell>
-              </TableRow>
+              <TableNoneData
+                col={columns.length}
+                message='Không có dữ liệu đơn hàng.'
+              />
             )}
           </TableBody>
         </Table>

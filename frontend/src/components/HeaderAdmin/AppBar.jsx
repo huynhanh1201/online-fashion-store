@@ -55,7 +55,7 @@ export default function AdminAppBar({
             size='large'
             aria-label='show notifications'
             color='inherit'
-            onClick={handleModalOpen}
+            onClick={modalOpen ? handleModalClose : handleModalOpen}
           >
             <Badge
               // badgeContent={notifications.filter((n) => !n.read).length}

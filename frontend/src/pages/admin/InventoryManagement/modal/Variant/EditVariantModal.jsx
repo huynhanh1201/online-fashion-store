@@ -8,7 +8,9 @@ import {
   Box,
   Typography,
   IconButton,
-  TextField
+  TextField,
+  Divider,
+  Tooltip
 } from '@mui/material'
 import { useForm, Controller } from 'react-hook-form'
 import { toast } from 'react-toastify'
@@ -108,8 +110,15 @@ const EditVariantModal = ({
   }
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth='md' fullWidth>
-      <DialogTitle>Cập nhật biến thể</DialogTitle>
+    <Dialog
+      open={open}
+      onClose={onClose}
+      maxWidth='md'
+      fullWidth
+      sx={{ padding: '16px 24px' }}
+    >
+      <DialogTitle>Sửa thông tin biến thể</DialogTitle>
+      <Divider />
       <form onSubmit={handleSubmit(onSubmit)}>
         <DialogContent
           sx={{ display: 'flex', flexDirection: 'row', gap: 3, mt: 1 }}
@@ -148,34 +157,54 @@ const EditVariantModal = ({
                   sx={{ width: '100%', height: '100%', objectFit: 'contain' }}
                 />
                 <Box
-                  sx={{
-                    position: 'absolute',
-                    top: 4,
-                    right: 4,
-                    display: 'flex',
-                    gap: 1
-                  }}
+                  position='absolute'
+                  top={4}
+                  right={8}
+                  display='flex'
+                  gap={1}
                 >
-                  <IconButton
-                    size='small'
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      fileInputRef.current?.click()
+                  <Box
+                    sx={{
+                      position: 'absolute',
+                      top: 4,
+                      right: 40,
+                      backgroundColor: 'rgba(255,255,255,0.8)',
+                      borderRadius: 1
                     }}
-                    sx={{ backgroundColor: '#fff', boxShadow: 1 }}
                   >
-                    <EditIcon fontSize='small' />
-                  </IconButton>
-                  <IconButton
-                    size='small'
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      setValue('colorImage', '')
+                    <Tooltip title='Sửa'>
+                      <IconButton
+                        size='small'
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          fileInputRef.current.click()
+                        }}
+                      >
+                        <EditIcon fontSize='small' color='warning' />
+                      </IconButton>
+                    </Tooltip>
+                  </Box>
+                  <Box
+                    sx={{
+                      position: 'absolute',
+                      top: 4,
+                      right: 4,
+                      backgroundColor: 'rgba(255,255,255,0.8)',
+                      borderRadius: 1
                     }}
-                    sx={{ backgroundColor: '#fff', boxShadow: 1 }}
                   >
-                    <DeleteIcon fontSize='small' />
-                  </IconButton>
+                    <Tooltip title='Xoá'>
+                      <IconButton
+                        size='small'
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          setValue('colorImage', '')
+                        }}
+                      >
+                        <DeleteIcon fontSize='small' color='error' />
+                      </IconButton>
+                    </Tooltip>
+                  </Box>
                 </Box>
               </>
             ) : (
@@ -190,6 +219,13 @@ const EditVariantModal = ({
           <Box
             sx={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 2 }}
           >
+            <TextField
+              label='Tên sản phẩm'
+              value={variant?.name || '---'}
+              fullWidth
+              InputProps={{ readOnly: true }}
+              disabled
+            />
             <TextField
               label='Màu sắc'
               value={variant?.color?.name || '---'}
@@ -271,9 +307,25 @@ const EditVariantModal = ({
             />
           </Box>
         </DialogContent>
-        <DialogActions>
-          <Button onClick={onClose}>Hủy</Button>
-          <Button type='submit' variant='contained'>
+        <Divider />
+        <DialogActions sx={{ padding: '16px 24px' }}>
+          <Button
+            onClick={onClose}
+            variant='outlined'
+            color='error'
+            sx={{ textTransform: 'none' }}
+          >
+            Hủy
+          </Button>
+          <Button
+            type='submit'
+            variant='contained'
+            sx={{
+              backgroundColor: '#001f5d',
+              color: '#fff',
+              textTransform: 'none'
+            }}
+          >
             Cập nhật
           </Button>
         </DialogActions>

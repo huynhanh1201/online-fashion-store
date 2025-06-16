@@ -173,6 +173,7 @@ import ColorRow from './ColorRow'
 import AddIcon from '@mui/icons-material/Add'
 import FilterColor from '~/components/FilterAdmin/FilterColor.jsx'
 import TablePaginationActions from '~/components/PaginationAdmin/TablePaginationActions.jsx'
+import TableNoneData from '~/components/TableAdmin/NoneData.jsx'
 const ColorTable = ({
   colors,
   loading,
@@ -187,12 +188,24 @@ const ColorTable = ({
   total
 }) => {
   const columns = [
-    { id: 'index', label: 'STT', minWidth: 50, align: 'center' },
-    { id: 'name', label: 'Tên màu', minWidth: 200 },
-    { id: 'destroy', label: 'Trạng thái', minWidth: 150, align: 'start' },
-    { id: 'createdAt', label: 'Ngày tạo', minWidth: 250 },
-    { id: 'updatedAt', label: 'Ngày cập nhật', minWidth: 250 },
-    { id: 'action', label: 'Hành động', minWidth: 150, align: 'start' }
+    { id: 'index', label: 'STT', align: 'center', width: 50 },
+    { id: 'name', label: 'Tên màu', align: 'left', minWidth: 200 },
+    { id: 'createdAt', label: 'Ngày tạo', align: 'left', minWidth: 200 },
+    { id: 'updatedAt', label: 'Ngày cập nhật', align: 'left', minWidth: 200 },
+    {
+      id: 'destroy',
+      label: 'Trạng thái màu sắc',
+      align: 'left',
+      minWidth: 150
+    },
+    {
+      id: 'action',
+      label: 'Hành động',
+      align: 'left',
+      width: 130,
+      maxWidth: 130,
+      pl: '20px'
+    }
   ]
 
   return (
@@ -229,7 +242,9 @@ const ColorTable = ({
                         textTransform: 'none',
                         width: 100,
                         display: 'flex',
-                        alignItems: 'center'
+                        alignItems: 'center',
+                        backgroundColor: '#001f5d',
+                        color: '#fff'
                       }}
                     >
                       Thêm
@@ -248,15 +263,16 @@ const ColorTable = ({
               {columns.map((column) => (
                 <TableCell
                   key={column.id}
-                  align={column.align}
+                  align={column.align || 'left'}
                   sx={{
-                    minWidth: column.minWidth,
-                    ...(column.id === 'index' && { width: '50px' }),
-                    ...(column.id === 'action' && {
-                      width: '130px',
-                      maxWidth: '130px',
-                      paddingLeft: '26px'
-                    })
+                    px: 1,
+                    ...(column.minWidth && { minWidth: column.minWidth }),
+                    ...(column.width && { width: column.width }),
+                    ...(column.maxWidth && { maxWidth: column.maxWidth }),
+                    ...(column.pl && {
+                      paddingLeft: (theme) => theme.spacing(column.pl)
+                    }),
+                    whiteSpace: 'nowrap'
                   }}
                 >
                   {column.label}
@@ -282,11 +298,10 @@ const ColorTable = ({
                 />
               ))
             ) : (
-              <TableRow>
-                <TableCell colSpan={columns.length} align='center'>
-                  Không có màu sắc nào.
-                </TableCell>
-              </TableRow>
+              <TableNoneData
+                col={columns.length}
+                message='Không có dữ liệu màu sắc.'
+              />
             )}
           </TableBody>
         </Table>

@@ -6,7 +6,8 @@ import {
   DialogContent,
   DialogActions,
   Button,
-  Typography
+  Typography,
+  Divider
 } from '@mui/material'
 import { toast } from 'react-toastify'
 
@@ -24,17 +25,30 @@ const DeleteVariantModal = ({ open, onClose, variant, deleteVariant }) => {
   }
 
   return (
-    <Dialog open={open} onClose={onClose}>
+    <Dialog open={open} onClose={onClose} sx={{ padding: '16px 24px' }}>
       <DialogTitle>Xóa biến thể</DialogTitle>
+      <Divider />
       <DialogContent>
         <Typography>
-          Bạn có chắc muốn xóa biến thể "
-          <strong>{variant?.name || 'N/A'}</strong>"?
+          Bạn có chắc muốn xóa biến thể
+          <strong> {variant?.name || 'N/A'}</strong> không?
         </Typography>
       </DialogContent>
-      <DialogActions>
-        <Button onClick={onClose}>Hủy</Button>
-        <Button onClick={handleDelete} color='error'>
+      <Divider />
+      <DialogActions sx={{ padding: '16px 24px' }}>
+        <Button
+          onClick={onClose}
+          color='inherit'
+          sx={{ textTransform: 'none' }}
+        >
+          Hủy
+        </Button>
+        <Button
+          onClick={handleDelete}
+          color='error'
+          variant='contained'
+          sx={{ textTransform: 'none' }}
+        >
           Xóa
         </Button>
       </DialogActions>

@@ -34,14 +34,20 @@ const DeleteCategoryModal = ({ open, onClose, category, onDelete }) => {
         sx: StyleAdmin.OverlayModal
       }}
     >
-      <DialogTitle>Xoá danh mục</DialogTitle>
+      <DialogTitle>Xoá danh mục sản phẩm</DialogTitle>
       <Divider sx={{ my: 0 }} />
       <DialogContent>
-        Bạn có chắc chắn muốn xoá danh mục <strong>{category.name}</strong>?
+        Bạn có chắc chắn muốn xoá danh mục <strong>{category.name}</strong> này
+        không?
       </DialogContent>
       <Divider sx={{ my: 0 }} />
       <DialogActions sx={{ padding: '16px 24px' }}>
-        <Button onClick={onClose} color='inherit' disabled={isDeleting}>
+        <Button
+          onClick={onClose}
+          color='inherit'
+          disabled={isDeleting}
+          sx={{ textTransform: 'none' }}
+        >
           Hủy
         </Button>
         <Button
@@ -49,6 +55,7 @@ const DeleteCategoryModal = ({ open, onClose, category, onDelete }) => {
           color='error'
           variant='contained'
           disabled={isDeleting}
+          sx={{ textTransform: 'none' }}
         >
           {isDeleting ? 'Đang xoá...' : 'Xoá'}
         </Button>

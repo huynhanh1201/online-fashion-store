@@ -178,6 +178,7 @@ import SizeRow from './SizeRow'
 import AddIcon from '@mui/icons-material/Add'
 import FilterSize from '~/components/FilterAdmin/FilterSize.jsx'
 import TablePaginationActions from '~/components/PaginationAdmin/TablePaginationActions.jsx'
+import TableNoneData from '~/components/TableAdmin/NoneData.jsx'
 const SizeTable = ({
   sizes = [],
   loading = false,
@@ -193,13 +194,18 @@ const SizeTable = ({
 }) => {
   const columns = [
     { id: 'index', label: 'STT', minWidth: 50, align: 'center' },
-    { id: 'name', label: 'Tên kích thước', minWidth: 200 },
-    { id: 'destroy', label: 'Trạng thái', minWidth: 150, align: 'start' },
-    { id: 'createdAt', label: 'Ngày tạo', minWidth: 150 },
-    { id: 'updatedAt', label: 'Ngày cập nhật', minWidth: 150 },
-    { id: 'action', label: 'Hành động', minWidth: 130, align: 'start' }
-  ]
+    { id: 'name', label: 'Tên kích thước', minWidth: 200, align: 'left' },
 
+    { id: 'createdAt', label: 'Ngày tạo', minWidth: 200, align: 'left' },
+    { id: 'updatedAt', label: 'Ngày cập nhật', minWidth: 200, align: 'left' },
+    {
+      id: 'destroy',
+      label: 'Trạng thái kích thước',
+      minWidth: 150,
+      align: 'left'
+    },
+    { id: 'action', label: 'Hành động', minWidth: 150, align: 'left' }
+  ]
   return (
     <Paper sx={{ border: '1px solid #ccc', width: '100%', overflow: 'hidden' }}>
       <TableContainer>
@@ -225,7 +231,12 @@ const SizeTable = ({
                       color='primary'
                       onClick={addSize}
                       startIcon={<AddIcon />}
-                      sx={{ textTransform: 'none', width: 100 }}
+                      sx={{
+                        textTransform: 'none',
+                        width: 100,
+                        backgroundColor: '#001f5d',
+                        color: '#fff'
+                      }}
                     >
                       Thêm
                     </Button>
@@ -246,10 +257,12 @@ const SizeTable = ({
                   align={column.align || 'left'}
                   sx={{
                     minWidth: column.minWidth,
+                    px: 1,
+                    ...(column.id === 'index' && { width: '50px' }),
                     ...(column.id === 'action' && {
                       width: '130px',
                       maxWidth: '130px',
-                      paddingLeft: '26px'
+                      paddingLeft: '20px'
                     })
                   }}
                 >
@@ -276,11 +289,10 @@ const SizeTable = ({
                 />
               ))
             ) : (
-              <TableRow>
-                <TableCell colSpan={columns.length} align='center'>
-                  Không có kích thước nào.
-                </TableCell>
-              </TableRow>
+              <TableNoneData
+                col={columns.length}
+                message='Không có dữ liệu kích thước.'
+              />
             )}
           </TableBody>
         </Table>

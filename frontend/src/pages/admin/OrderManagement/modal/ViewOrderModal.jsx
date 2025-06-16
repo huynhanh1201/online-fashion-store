@@ -84,7 +84,11 @@ function ViewOrderModal({
       histories.map((h) => h.status).filter((s) => s && s !== order.status)
     )
   )
-
+  const style = {
+    nonePadding: {
+      py: 1.5
+    }
+  }
   return (
     <Dialog
       open={open}
@@ -93,17 +97,31 @@ function ViewOrderModal({
       fullWidth
       PaperProps={{
         sx: {
-          height: '81vh',
-          maxHeight: '81vh',
+          height: '88vh',
+          maxHeight: '88vh',
           display: 'flex',
-          flexDirection: 'column'
+          flexDirection: 'column',
+          mt: '87px'
         }
       }}
       BackdropProps={{ sx: styleAdmin.OverlayModal }}
     >
-      <DialogTitle>Xem chi tiết đơn hàng</DialogTitle>
+      <Box>
+        <DialogTitle sx={{ py: 1, pl: 3 }}>Thông tin đơn hàng</DialogTitle>
+
+        <DialogActions sx={{ p: 0, justifyContent: 'start', pb: 1, pl: 3 }}>
+          <Button
+            variant='outlined'
+            color='error'
+            onClick={onClose}
+            sx={{ textTransform: 'none' }}
+          >
+            Đóng
+          </Button>
+        </DialogActions>
+      </Box>
       <Divider />
-      <DialogContent dividers sx={{ flex: 1, overflowY: 'auto' }}>
+      <DialogContent dividers sx={{ flex: 1, overflowY: 'auto', pt: 0 }}>
         <Tabs
           value={tab}
           onChange={handleTabChange}
@@ -124,54 +142,67 @@ function ViewOrderModal({
         </Tabs>
 
         {tab === 0 && (
-          <Table>
+          <Table sx={style.nonePadding}>
             <TableBody>
-              <TableRow>
-                <TableCell>
+              <TableRow sx={style.nonePadding}>
+                <TableCell sx={style.nonePadding}>
                   <strong>Mã đơn hàng</strong>
                 </TableCell>
-                <TableCell>{order._id || '—'}</TableCell>
+                <TableCell sx={style.nonePadding}>
+                  {order.code || '—'}
+                </TableCell>
               </TableRow>
 
-              <TableRow>
-                <TableCell>
+              <TableRow sx={style.nonePadding}>
+                <TableCell sx={style.nonePadding}>
                   <strong>Người nhận</strong>
                 </TableCell>
-                <TableCell>{order.shippingAddress?.fullName || '—'}</TableCell>
+                <TableCell sx={style.nonePadding}>
+                  {order.shippingAddress?.fullName
+                    .split(' ')
+                    .map(
+                      (word) =>
+                        word.charAt(0).toUpperCase() +
+                        word.slice(1).toLowerCase()
+                    )
+                    .join(' ') || '—'}
+                </TableCell>
               </TableRow>
 
-              <TableRow>
-                <TableCell>
+              <TableRow sx={style.nonePadding}>
+                <TableCell sx={style.nonePadding}>
                   <strong>SĐT</strong>
                 </TableCell>
-                <TableCell>{order.shippingAddress?.phone || '—'}</TableCell>
+                <TableCell sx={style.nonePadding}>
+                  {order.shippingAddress?.phone || '—'}
+                </TableCell>
               </TableRow>
 
-              <TableRow>
-                <TableCell>
+              <TableRow sx={style.nonePadding}>
+                <TableCell sx={style.nonePadding}>
                   <strong>Địa chỉ giao hàng</strong>
                 </TableCell>
-                <TableCell>
+                <TableCell sx={style.nonePadding}>
                   {order.shippingAddress
                     ? `${order.shippingAddress.address}, ${order.shippingAddress.ward}, ${order.shippingAddress.district}, ${order.shippingAddress.city}`
                     : '—'}
                 </TableCell>
               </TableRow>
 
-              <TableRow>
-                <TableCell>
+              <TableRow sx={style.nonePadding}>
+                <TableCell sx={style.nonePadding}>
                   <strong>Phương thức thanh toán</strong>
                 </TableCell>
-                <TableCell>
+                <TableCell sx={style.nonePadding}>
                   {order.paymentMethod?.toUpperCase() || '—'}
                 </TableCell>
               </TableRow>
 
-              <TableRow>
-                <TableCell>
+              <TableRow sx={style.nonePadding}>
+                <TableCell sx={style.nonePadding}>
                   <strong>Trạng thái thanh toán</strong>
                 </TableCell>
-                <TableCell>
+                <TableCell sx={style.nonePadding}>
                   <Chip
                     label={
                       order.paymentStatus === 'Pending'
@@ -195,13 +226,12 @@ function ViewOrderModal({
                 </TableCell>
               </TableRow>
 
-              <TableRow>
-                <TableCell>
+              <TableRow sx={style.nonePadding}>
+                <TableCell sx={style.nonePadding}>
                   <strong>Trạng thái đơn hàng</strong>
                 </TableCell>
-                <TableCell>
+                <TableCell sx={style.nonePadding}>
                   <Stack direction='row' alignItems='center' spacing={1}>
-                    {/* Hiển thị các trạng thái trước đó */}
                     {previousStatuses.map((status, index) => (
                       <Chip
                         key={index}
@@ -224,8 +254,6 @@ function ViewOrderModal({
                         variant='outlined'
                       />
                     ))}
-
-                    {/* Trạng thái hiện tại */}
                     <Chip
                       label={renderStatusLabel(order.status)}
                       color={
@@ -244,8 +272,6 @@ function ViewOrderModal({
                       size='large'
                       sx={{ width: '120px', fontWeight: '800' }}
                     />
-
-                    {/* Trạng thái tiếp theo (nếu có) */}
                     {getNextStatus(order.status) && (
                       <Chip
                         icon={<ArrowForwardIcon />}
@@ -261,11 +287,11 @@ function ViewOrderModal({
                 </TableCell>
               </TableRow>
 
-              <TableRow>
-                <TableCell>
+              <TableRow sx={style.nonePadding}>
+                <TableCell sx={style.nonePadding}>
                   <strong>Giao hàng</strong>
                 </TableCell>
-                <TableCell>
+                <TableCell sx={style.nonePadding}>
                   <Chip
                     label={order.isDelivered ? 'Đã giao' : 'Chưa giao'}
                     color={order.isDelivered ? 'success' : 'default'}
@@ -275,46 +301,50 @@ function ViewOrderModal({
                 </TableCell>
               </TableRow>
 
-              <TableRow>
-                <TableCell>
+              <TableRow sx={style.nonePadding}>
+                <TableCell sx={style.nonePadding}>
                   <strong>Giảm giá</strong>
                 </TableCell>
-                <TableCell>
+                <TableCell sx={style.nonePadding}>
                   {order.discountAmount > 0
-                    ? `- ${order.discountAmount.toLocaleString()}₫`
+                    ? `- ${order.discountAmount.toLocaleString()}đ`
                     : 'Không có'}
                 </TableCell>
               </TableRow>
 
-              <TableRow>
-                <TableCell>
+              <TableRow sx={style.nonePadding}>
+                <TableCell sx={style.nonePadding}>
                   <strong>Tổng tiền</strong>
                 </TableCell>
-                <TableCell>{order.total.toLocaleString('vi-VN')}₫</TableCell>
-              </TableRow>
-
-              <TableRow>
-                <TableCell>
-                  <strong>Lời nhắn</strong>
+                <TableCell sx={style.nonePadding}>
+                  {order.total.toLocaleString('vi-VN')}đ
                 </TableCell>
-                <TableCell>{order.note || 'Không có'}</TableCell>
               </TableRow>
 
-              <TableRow>
-                <TableCell>
+              <TableRow sx={style.nonePadding}>
+                <TableCell sx={style.nonePadding}>
                   <strong>Ngày tạo</strong>
                 </TableCell>
-                <TableCell>
+                <TableCell sx={style.nonePadding}>
                   {dayjs(order.createdAt).format('HH:mm DD/MM/YYYY')}
                 </TableCell>
               </TableRow>
 
-              <TableRow>
-                <TableCell>
+              <TableRow sx={style.nonePadding}>
+                <TableCell sx={style.nonePadding}>
                   <strong>Ngày cập nhật</strong>
                 </TableCell>
-                <TableCell>
+                <TableCell sx={style.nonePadding}>
                   {dayjs(order.updatedAt).format('HH:mm DD/MM/YYYY')}
+                </TableCell>
+              </TableRow>
+
+              <TableRow sx={style.nonePadding}>
+                <TableCell sx={style.nonePadding}>
+                  <strong>Lời nhắn</strong>
+                </TableCell>
+                <TableCell sx={style.nonePadding}>
+                  {order.note || 'Không có'}
                 </TableCell>
               </TableRow>
             </TableBody>
@@ -338,7 +368,15 @@ function ViewOrderModal({
                     <strong>Ghi chú:</strong> {h.note || 'Không có'}
                   </Typography>
                   <Typography>
-                    <strong>Người cập nhật:</strong> {h.updatedBy.name || ''}
+                    <strong>Người cập nhật:</strong>{' '}
+                    {h.updatedBy.name
+                      .split(' ')
+                      .map(
+                        (word) =>
+                          word.charAt(0).toUpperCase() +
+                          word.slice(1).toLowerCase()
+                      )
+                      .join(' ') || ''}
                   </Typography>
                   <Typography>
                     <strong>Quyền: </strong>{' '}
@@ -346,7 +384,7 @@ function ViewOrderModal({
                   </Typography>
                   <Typography>
                     <strong>Thời gian:</strong>{' '}
-                    {dayjs(h.updatedAt).format('DD/MM/YYYY HH:mm')}
+                    {dayjs(h.updatedAt).format(' HH:mm DD/MM/YYYY')}
                   </Typography>
                 </Box>
               ))
@@ -371,18 +409,27 @@ function ViewOrderModal({
                 <TableBody>
                   {orderDetails.map((item) => (
                     <TableRow key={item._id}>
-                      <TableCell>{item.name || 'Không có tên'}</TableCell>
+                      <TableCell>
+                        {item.name
+                          .split(' ')
+                          .map(
+                            (word) =>
+                              word.charAt(0).toUpperCase() +
+                              word.slice(1).toLowerCase()
+                          )
+                          .join(' ') || 'Không có tên'}
+                      </TableCell>
                       <TableCell align='right'>
                         {item.quantity.toLocaleString('vi-VN')}
                       </TableCell>
                       <TableCell align='right'>
-                        {item.subtotal.toLocaleString('vi-VN')}₫
+                        {item.subtotal.toLocaleString('vi-VN')}đ
                       </TableCell>
                       <TableCell align='right'>
                         {(item.subtotal * item.quantity).toLocaleString(
                           'vi-VN'
                         )}
-                        ₫
+                        đ
                       </TableCell>
                     </TableRow>
                   ))}
@@ -392,12 +439,6 @@ function ViewOrderModal({
           </Box>
         )}
       </DialogContent>
-      <Divider />
-      <DialogActions sx={{ px: 3, py: 2 }}>
-        <Button variant='contained' color='error' onClick={onClose}>
-          Đóng
-        </Button>
-      </DialogActions>
     </Dialog>
   )
 }

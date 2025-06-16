@@ -22,7 +22,7 @@ a {
 /* Khi Drawer mở */
 .app-bar.open {
     margin-left: 240px;
-    width: calc(100% - 260px) !important;
+    width: calc(100% - 270px) !important;
     /*transition: width 0.2s ease, margin 0.2s ease;*/
 
 }
@@ -32,6 +32,7 @@ a {
     flex-grow: 1;
     padding: 24px;
     margin-left: 80px;
+    margin-top: 78px;
     /*transition: width 0.2s ease, margin 0.2s ease;*/
     width: 100%;
     box-sizing: border-box;
@@ -39,7 +40,7 @@ a {
 
 /* Khi Drawer mở */
 .main-content.open {
-    width: calc(100% - 260px);
+    width: calc(100% - 270px);
     /*margin-left: 240px;*/
     /*transition: width 0.2s ease;*/
 
@@ -52,7 +53,7 @@ a {
 
 /* Khi Drawer mở */
 .drawer.open {
-    width: 260px;
+    width: 270px;
 }
 
 .admin-layout .app-bar {

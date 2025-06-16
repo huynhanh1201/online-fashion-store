@@ -396,7 +396,7 @@ import {
 } from '@mui/material'
 import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye'
 import BorderColorIcon from '@mui/icons-material/BorderColor'
-import DeleteForeverIcon from '@mui/icons-material/DeleteForever'
+import VisibilityOffIcon from '@mui/icons-material/VisibilityOff'
 import ViewInventoryModal from '../modal/Inventory/ViewInventoryModal.jsx'
 import EditInventoryModal from '../modal/Inventory/EditInventoryModal.jsx'
 import DeleteInventoryModal from '../modal/Inventory/DeleteInventoryModal.jsx'
@@ -405,6 +405,9 @@ import useVariants from '~/hooks/admin/Inventory/useVariants.js'
 import useInventory from '~/hooks/admin/Inventory/useInventorys.js'
 import useWarehouses from '~/hooks/admin/Inventory/useWarehouses.js'
 import TablePaginationActions from '~/components/PaginationAdmin/TablePaginationActions.jsx'
+import TableNoneData from '~/components/TableAdmin/NoneData.jsx'
+import { Stack } from '@mui/system'
+import Tooltip from '@mui/material/Tooltip'
 const InventoryTab = () => {
   const { variants, fetchVariants } = useVariants()
   const {
@@ -432,77 +435,53 @@ const InventoryTab = () => {
 
   useEffect(() => {
     fetchInventories(page, rowsPerPage, filter)
-  }, [page, rowsPerPage])
-
-  const enrichedInventories = inventories.map((item) => {
-    return {
-      ...item,
-      variantId: item.variantId._id || 'N/A', // ← Ghi đè variantId thành chuỗi _id
-      warehouseId: item.warehouseId._id || 'N/A', // ← Ghi đè warehouseId thành chuỗi _id
-      warehouse: item.warehouseId?.name || 'N/A',
-      variantName: item.variantId?.name || 'N/A',
-      color: item.variantId.color?.name || 'N/A',
-      size: item.variantId.size?.name || 'N/A',
-      sku: item.variantId?.sku || 'N/A' // bạn có thể thêm sku nếu cần
-    }
-  })
+  }, [page, rowsPerPage, filter])
 
   const inventoryColumns = [
-    { id: 'sku', label: 'Mã biến thể', minWidth: 200 },
-    { id: 'warehouse', label: 'Kho hàng', minWidth: 120 },
-    { id: 'variantName', label: 'Sản phẩm', minWidth: 150 },
-    { id: 'quantity', label: 'Số lượng', minWidth: 100, align: 'right' },
+    {
+      id: 'index',
+      label: 'STT',
+      minWidth: 50,
+      maxWidth: 50,
+      width: 50,
+      align: 'center'
+    },
+    { id: 'warehouse', label: 'Kho hàng', minWidth: 150, maxWidth: 150 },
+
+    { id: 'variantName', label: 'Tên sản phẩm', minWidth: 200, maxWidth: 200 },
+    { id: 'sku', label: 'Mã biến thể', minWidth: 200, maxWidth: 200 },
+    {
+      id: 'quantity',
+      label: 'Số lượng tồn',
+      minWidth: 150,
+      align: 'start'
+    },
     {
       id: 'minQuantity',
-      label: 'Tối thiểu', // ngưỡng cảnh báo số lượng sản phẩm (SL) cảnh báo
-      minWidth: 100,
-      align: 'right',
-      format: (value) => `${value.toLocaleString('vi-VN')}`
+      label: 'Ngưỡng cảnh báo',
+      minWidth: 150,
+      align: 'start'
     },
     {
       id: 'importPrice',
       label: 'Giá nhập',
-      minWidth: 100,
+      minWidth: 150,
       align: 'start',
-      format: (value) => `${value.toLocaleString('vi-VN')}đ` // dùng 'vi-VN' cho đúng format Việt Nam
+      format: (val) => `${val?.toLocaleString('vi-VN')}đ`
     },
     {
       id: 'exportPrice',
       label: 'Giá bán',
-      minWidth: 100,
+      minWidth: 150,
       align: 'start',
-      format: (value) => `${value.toLocaleString('vi-VN')}đ`
+      format: (val) => `${val?.toLocaleString('vi-VN')}đ`
     },
     {
       id: 'status',
-      label: 'Trạng thái',
-      minWidth: 100,
-      align: 'start'
+      label: 'Trạng thái tồn kho',
+      minWidth: 150
     },
-    {
-      id: 'createdAt',
-      label: 'Ngày tạo',
-      minWidth: 150,
-      align: 'start',
-      format: (value) =>
-        new Date(value).toLocaleString('vi-VN', {
-          day: '2-digit',
-          month: '2-digit',
-          year: 'numeric'
-        })
-    },
-    {
-      id: 'updatedAt',
-      label: 'Ngày cập nhật',
-      minWidth: 150,
-      align: 'start',
-      format: (value) =>
-        new Date(value).toLocaleString('vi-VN', {
-          day: '2-digit',
-          month: '2-digit',
-          year: 'numeric'
-        })
-    },
+
     {
       id: 'action',
       label: 'Hành động',
@@ -510,7 +489,6 @@ const InventoryTab = () => {
       align: 'start'
     }
   ]
-
   const handleViewInventory = async (inventory) => {
     const inventoryDetails = await getInventoryId(inventory._id)
     setSelectedInventory(inventoryDetails)
@@ -532,21 +510,24 @@ const InventoryTab = () => {
   const handleCloseEditModal = () => {
     setSelectedInventory(null)
     setOpenEditModal(false)
-    fetchInventories(page, rowsPerPage)
+    fetchInventories(page, rowsPerPage, filter)
   }
 
   const handleCloseDeleteModal = () => {
     setSelectedInventory(null)
     setOpenDeleteModal(false)
-    fetchInventories(page, rowsPerPage)
+    fetchInventories(page, rowsPerPage, filter)
   }
 
+  const isEqual = (obj1, obj2) => JSON.stringify(obj1) === JSON.stringify(obj2)
+
   const handleFilter = (newFilters) => {
-    setFilter(newFilters)
-    if (Object.keys(newFilters).length > 0) {
-      fetchInventories(1, rowsPerPage, newFilters)
+    if (!isEqual(filter, newFilters)) {
+      setPage(1)
+      setFilter(newFilters)
     }
   }
+
   const formatCurrency = (value) => {
     if (!value) return ''
     return Number(value).toLocaleString('vi-VN') // Thêm dấu chấm theo chuẩn VNĐ
@@ -561,6 +542,7 @@ const InventoryTab = () => {
     setPage(1)
     setRowsPerPage(newLimit)
   }
+
   return (
     <Paper sx={{ border: '1px solid #ccc', width: '100%', overflow: 'hidden' }}>
       <TableContainer>
@@ -569,13 +551,14 @@ const InventoryTab = () => {
             <TableRow>
               <TableCell
                 colSpan={inventoryColumns.length}
-                sx={{ borderBottom: 'none', paddingBottom: '0' }}
+                sx={{ borderBottom: 'none' }}
               >
                 <Box
                   sx={{
                     display: 'flex',
                     justifyContent: 'space-between',
-                    alignItems: 'start'
+                    alignItems: 'start',
+                    minHeight: 77.5
                   }}
                 >
                   <Box
@@ -601,88 +584,168 @@ const InventoryTab = () => {
               </TableCell>
             </TableRow>
             <TableRow>
-              {inventoryColumns.map((column) => (
+              {inventoryColumns.map((col) => (
                 <TableCell
-                  key={column.id}
-                  align={column.align}
-                  style={{
-                    minWidth: column.minWidth,
-                    ...(column.id === 'action' && {
+                  key={col.id}
+                  align={col.align || 'left'}
+                  sx={{
+                    minWidth: col.minWidth,
+                    width: col.width,
+                    ...(col.maxWidth && { maxWidth: col.maxWidth }),
+                    ...(col.id === 'action' && {
                       width: '130px',
                       maxWidth: '130px',
                       paddingLeft: '20px'
-                    })
+                    }),
+                    px: 1
                   }}
                 >
-                  {column.label}
+                  {col.label}
                 </TableCell>
               ))}
             </TableRow>
           </TableHead>
           <TableBody>
-            {enrichedInventories.map((row, index) => (
-              <TableRow hover role='checkbox' tabIndex={-1} key={index}>
-                {inventoryColumns.map((column) => {
-                  let value = row[column.id]
-                  if (column.id === 'status') {
-                    return (
-                      <TableCell key={column.id} align={column.align}>
+            {loadingInventories ? (
+              <TableRow>
+                <TableCell colSpan={inventoryColumns.length} align='center'>
+                  Đang tải tồn kho...
+                </TableCell>
+              </TableRow>
+            ) : inventories.length === 0 ? (
+              <TableNoneData
+                col={inventoryColumns.length}
+                message='Không có dữ liệu tồn kho.'
+              />
+            ) : (
+              inventories.map((row, index) => (
+                <TableRow hover key={index}>
+                  {inventoryColumns.map((col) => {
+                    let rawValue
+                    // Xử lý thủ công các cột đặc biệt có lồng object
+                    switch (col.id) {
+                      case 'index':
+                        rawValue = (page - 1) * rowsPerPage + index + 1
+                        break
+                      case 'sku':
+                        rawValue = row.variantId?.sku
+                        break
+                      case 'variantName': {
+                        const name =
+                          row.variantId?.name || 'Không có tên biến thể'
+                        rawValue = name
+                          .toLowerCase()
+                          .split(' ')
+                          .map(
+                            (word) =>
+                              word.charAt(0).toUpperCase() + word.slice(1)
+                          )
+                          .join(' ')
+                        break
+                      }
+
+                      case 'warehouse': {
+                        const name = row.warehouseId?.name || 'Không có tên kho'
+                        rawValue = name
+                          .toLowerCase()
+                          .split(' ')
+                          .map(
+                            (word) =>
+                              word.charAt(0).toUpperCase() + word.slice(1)
+                          )
+                          .join(' ')
+                        break
+                      }
+
+                      default:
+                        rawValue = row[col.id]
+                    }
+
+                    let content = rawValue ?? '—'
+
+                    if (col.format) content = col.format(rawValue)
+
+                    if (col.id === 'status') {
+                      content = (
                         <Chip
                           label={
-                            value === 'in-stock'
+                            rawValue === 'in-stock'
                               ? 'Còn hàng'
-                              : value === 'low-stock'
+                              : rawValue === 'low-stock'
                                 ? 'Cảnh báo'
                                 : 'Hết hàng'
                           }
                           color={
-                            value === 'in-stock'
+                            rawValue === 'in-stock'
                               ? 'success'
-                              : value === 'low-stock'
+                              : rawValue === 'low-stock'
                                 ? 'warning'
                                 : 'error'
                           }
                           size='large'
-                          sx={{ width: '120px', fontWeight: '800' }}
+                          sx={{ width: 127, fontWeight: 800 }}
                         />
-                      </TableCell>
-                    )
-                  }
-                  if (column.id === 'action') {
+                      )
+                    }
+                    if (col.id === 'action') {
+                      content = (
+                        <Stack
+                          direction='row'
+                          spacing={1}
+                          justifyContent='start'
+                        >
+                          <Tooltip title='Xem'>
+                            <IconButton
+                              onClick={() => handleViewInventory(row)}
+                              size='small'
+                            >
+                              <RemoveRedEyeIcon color='primary' />
+                            </IconButton>
+                          </Tooltip>
+                          <Tooltip title='Sửa'>
+                            <IconButton
+                              onClick={() => handleEditInventory(row)}
+                              size='small'
+                            >
+                              <BorderColorIcon color='warning' />
+                            </IconButton>
+                          </Tooltip>
+                          <Tooltip title='Ẩn'>
+                            <IconButton
+                              onClick={() => handleDeleteInventory(row)}
+                              size='small'
+                            >
+                              <VisibilityOffIcon color='error' />
+                            </IconButton>
+                          </Tooltip>
+                        </Stack>
+                      )
+                    }
+
                     return (
-                      <TableCell key={column.id} align={column.align}>
-                        <IconButton
-                          onClick={() => handleViewInventory(row)}
-                          size='small'
-                          color='primary'
-                        >
-                          <RemoveRedEyeIcon color='primary' />
-                        </IconButton>
-                        <IconButton
-                          onClick={() => handleEditInventory(row)}
-                          size='small'
-                          color='info'
-                        >
-                          <BorderColorIcon color='warning' />
-                        </IconButton>
-                        <IconButton
-                          onClick={() => handleDeleteInventory(row)}
-                          size='small'
-                          color='error'
-                        >
-                          <DeleteForeverIcon color='error' />
-                        </IconButton>
+                      <TableCell
+                        key={col.id}
+                        align={col.align || 'left'}
+                        sx={{
+                          py: 0,
+                          px: 1,
+                          height: 55,
+                          whiteSpace: 'nowrap',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                          ...(col.maxWidth && { maxWidth: col.maxWidth })
+                        }}
+                        title={
+                          typeof content === 'string' ? content : undefined
+                        }
+                      >
+                        {content}
                       </TableCell>
                     )
-                  }
-                  return (
-                    <TableCell key={column.id} align={column.align}>
-                      {column.format ? column.format(value) : value}
-                    </TableCell>
-                  )
-                })}
-              </TableRow>
-            ))}
+                  })}
+                </TableRow>
+              ))
+            )}
           </TableBody>
         </Table>
       </TableContainer>

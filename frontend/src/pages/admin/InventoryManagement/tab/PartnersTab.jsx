@@ -24,6 +24,9 @@ import AddIcon from '@mui/icons-material/Add'
 import FilterPartner from '~/components/FilterAdmin/FilterPartner.jsx'
 import usePartner from '~/hooks/admin/Inventory/usePartner.js'
 import TablePaginationActions from '~/components/PaginationAdmin/TablePaginationActions.jsx'
+import TableNoneData from '~/components/TableAdmin/NoneData.jsx'
+import { Stack } from '@mui/system'
+import Tooltip from '@mui/material/Tooltip'
 const PartnersTab = () => {
   const {
     partners,
@@ -85,12 +88,14 @@ const PartnersTab = () => {
 
   useEffect(() => {
     fetchPartners(page, rowsPerPage, filter)
-  }, [page, rowsPerPage])
+  }, [page, rowsPerPage, filter])
+
+  const isEqual = (obj1, obj2) => JSON.stringify(obj1) === JSON.stringify(obj2)
 
   const handleFilter = (newFilters) => {
-    setFilter(newFilters)
-    if (Object.keys(newFilters).length > 0) {
-      fetchPartners(1, rowsPerPage, newFilters)
+    if (!isEqual(filter, newFilters)) {
+      setPage(1)
+      setFilter(newFilters)
     }
   }
   const handleAddPartner = () => {
@@ -106,7 +111,7 @@ const PartnersTab = () => {
   }
   const handleCloseEditDialog = () => {
     setOpenEditDialog(false)
-    fetchPartners(page, rowsPerPage)
+    fetchPartners(page, rowsPerPage, filter)
   }
 
   const handleViewPartner = (partner) => {
@@ -123,15 +128,7 @@ const PartnersTab = () => {
   }
   const handleCloseDeleteDialog = () => {
     setOpenDeleteDialog(false)
-    fetchPartners(page, rowsPerPage)
-  }
-  const styles = {
-    groupIcon: {
-      display: 'flex',
-      justifyContent: 'space-between',
-      alignItems: 'center',
-      width: '100%'
-    }
+    fetchPartners(page, rowsPerPage, filter)
   }
 
   const handleChangePage = (event, value) => setPage(value)
@@ -140,156 +137,252 @@ const PartnersTab = () => {
     setPage(1)
     setRowsPerPage(newLimit)
   }
+  const partnerColumns = [
+    {
+      id: 'index',
+      label: 'STT',
+      minWidth: 50,
+      maxWidth: 50,
+      width: 50,
+      align: 'center'
+    },
+
+    { id: 'code', label: 'Mã đối tác', minWidth: 100, maxWidth: 100 },
+    { id: 'name', label: 'Tên đối tác', minWidth: 150 },
+    {
+      id: 'type',
+      label: 'Kiểu đối tác',
+      minWidth: 160,
+      format: (val) => getPartnerTypeLabel(val)
+    },
+    { id: 'phone', label: 'SĐT', minWidth: 120 },
+    { id: 'email', label: 'Email', minWidth: 180 },
+    {
+      id: 'createdAt',
+      label: 'Ngày tạo',
+      minWidth: 130,
+      format: (val) => (val ? new Date(val).toLocaleDateString('vi-VN') : '—')
+    },
+    {
+      id: 'destroy',
+      label: 'Trạng thái hoạt động',
+      minWidth: 150,
+      format: (val) => (
+        <Chip
+          label={val ? 'Không hoạt động' : 'Hoạt động'}
+          color={val ? 'error' : 'success'}
+          size='large'
+          sx={{ width: 127, fontWeight: 800 }}
+        />
+      )
+    },
+    {
+      id: 'action',
+      label: 'Hành động',
+      minWidth: 150,
+      align: 'start'
+    }
+  ]
+
   return (
-    <Paper elevation={3} sx={{ p: 2 }}>
-      <Box
-        display='flex'
-        justifyContent='space-between'
-        alignItems='center'
-        mb={2}
-      >
-        <Box
-          sx={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'start',
-            flex: 1
-          }}
-        >
-          <Box
-            sx={{
-              display: 'flex',
-              flexDirection: 'column',
-              gap: 1,
-              minWidth: 250
-            }}
-          >
-            <Typography variant='h6' sx={{ fontWeight: '800' }}>
-              Danh Sách Đối tác
-            </Typography>
-            <Button
-              variant='contained'
-              color='primary'
-              onClick={handleAddPartner}
-              startIcon={<AddIcon />}
-              sx={{
-                textTransform: 'none',
-                width: 100,
-                display: 'flex',
-                alignItems: 'center'
-              }}
-            >
-              Thêm
-            </Button>
-          </Box>
-          <FilterPartner
-            partners={partners}
-            loading={loadingPartner}
-            onFilter={handleFilter}
-            fetchPartners={fetchPartners}
-          />
-        </Box>
-      </Box>
+    <Paper
+      elevation={3}
+      sx={{ border: '1px solid #ccc', width: '100%', overflow: 'hidden' }}
+    >
       <Table size='small'>
         <TableHead>
           <TableRow>
-            <TableCell>STT</TableCell>
-            <TableCell>Mã</TableCell>
-            <TableCell>Tên</TableCell>
-            <TableCell sx={{ textAlign: 'start', width: '150px' }}>
-              Loại
+            <TableCell colSpan={partnerColumns.length} sx={{ py: 2 }}>
+              <Box
+                display='flex'
+                justifyContent='space-between'
+                alignItems='center'
+              >
+                <Box
+                  sx={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'start',
+                    flex: 1
+                  }}
+                >
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: 1,
+                      minWidth: 250
+                    }}
+                  >
+                    <Typography variant='h6' sx={{ fontWeight: '800' }}>
+                      Danh Sách Đối tác
+                    </Typography>
+                    <Button
+                      variant='contained'
+                      color='primary'
+                      onClick={handleAddPartner}
+                      startIcon={<AddIcon />}
+                      sx={{
+                        textTransform: 'none',
+                        width: 100,
+                        display: 'flex',
+                        alignItems: 'center',
+                        backgroundColor: '#001f5d',
+                        color: '#fff'
+                      }}
+                    >
+                      Thêm
+                    </Button>
+                  </Box>
+                  <FilterPartner
+                    partners={partners}
+                    loading={loadingPartner}
+                    onFilter={handleFilter}
+                    fetchPartners={fetchPartners}
+                  />
+                </Box>
+              </Box>
             </TableCell>
-            <TableCell>SĐT</TableCell>
-            <TableCell>Email</TableCell>
-            <TableCell>Mã số thuế</TableCell>
-            <TableCell>Địa chỉ</TableCell>
-            <TableCell>Ngân hàng</TableCell>
-            <TableCell>Trạng thái</TableCell>
-            <TableCell>Ngày tạo</TableCell>
-            <TableCell
-              align='start'
-              sx={{
-                minWidth: '130px',
-                width: '130px',
-                maxWidth: '130px',
-                paddingLeft: '20px'
-              }}
-            >
-              Hành động
-            </TableCell>
+          </TableRow>
+          <TableRow>
+            {partnerColumns.map((col) => (
+              <TableCell
+                key={col.id}
+                align={col.align || 'left'}
+                sx={{
+                  minWidth: col.minWidth,
+                  height: 57,
+                  width: col.width,
+                  ...(col.maxWidth && { maxWidth: col.maxWidth }),
+                  ...(col.id === 'action' && {
+                    width: '130px',
+                    maxWidth: '130px',
+                    paddingLeft: '20px'
+                  }),
+                  px: 1
+                }}
+              >
+                {col.label}
+              </TableCell>
+            ))}
           </TableRow>
         </TableHead>
         <TableBody>
-          {partners.map((partner, index) => {
-            const fullAddress = [
-              partner.address?.street,
-              partner.address?.ward,
-              partner.address?.district,
-              partner.address?.city
-            ]
-              .filter(Boolean)
-              .join(', ')
-
-            const bankInfo = partner.bankInfo?.accountNumber
-              ? `${partner.bankInfo.accountNumber} - ${partner.bankInfo.bankName || ''}`
-              : '---'
-
-            return (
-              <TableRow key={partner._id || index}>
-                <TableCell>{page * rowsPerPage + index + 1}</TableCell>
-                <TableCell>{partner.code || '---'}</TableCell>
-                <TableCell>{partner.name || '---'}</TableCell>
-                <TableCell>{getPartnerTypeLabel(partner.type)}</TableCell>
-                <TableCell>{partner.contact?.phone || '---'}</TableCell>
-                <TableCell>{partner.contact?.email || '---'}</TableCell>
-                <TableCell>{partner.taxCode || '---'}</TableCell>
-                <TableCell>{fullAddress || '---'}</TableCell>
-                <TableCell>{bankInfo}</TableCell>
-                <TableCell>
-                  {partner.createdAt
-                    ? new Date(partner.createdAt).toLocaleDateString()
-                    : '---'}
-                </TableCell>
-                <TableCell>
-                  <Chip
-                    label={partner.destroy ? 'Không hoạt động' : 'Hoạt động'}
-                    color={partner.destroy ? 'error' : 'success'}
-                    size='large'
-                    sx={{ width: '127px', fontWeight: '800' }}
-                  />
-                </TableCell>
-                <TableCell align='center' spacing={1} sx={styles.groupIcon}>
-                  <IconButton
-                    size='small'
-                    color='primary'
-                    onClick={() => handleViewPartner(partner)}
-                  >
-                    <RemoveRedEyeIcon color='primary' />
-                  </IconButton>
-                  <IconButton
-                    size='small'
-                    color='info'
-                    onClick={() => handleEditPartner(partner)}
-                  >
-                    <BorderColorIcon color='warning' />
-                  </IconButton>
-                  <IconButton
-                    size='small'
-                    color='error'
-                    onClick={() => handleDeletePartner(partner)}
-                  >
-                    <DeleteForeverIcon color='error' />
-                  </IconButton>
-                </TableCell>
-              </TableRow>
-            )
-          })}
-          {partners.length === 0 && (
+          {loadingPartner ? (
             <TableRow>
-              <TableCell colSpan={11} align='center'>
-                Không có dữ liệu đối tác
+              <TableCell colSpan={partnerColumns.length} align='center'>
+                Đang tải đối tác...
               </TableCell>
             </TableRow>
+          ) : partners.length === 0 ? (
+            <TableNoneData
+              col={partnerColumns.length}
+              message='Không có dữ liệu đối tác.'
+            />
+          ) : (
+            partners.map((row, index) => (
+              <TableRow hover key={row._id || index}>
+                {partnerColumns.map((col) => {
+                  let rawValue
+                  const capitalizeWords = (text) =>
+                    (text || '')
+                      .toLowerCase()
+                      .split(' ')
+                      .filter(Boolean)
+                      .map(
+                        (word) => word.charAt(0).toUpperCase() + word.slice(1)
+                      )
+                      .join(' ')
+
+                  switch (col.id) {
+                    case 'index':
+                      rawValue = (page - 1) * rowsPerPage + index + 1
+                      break
+                    case 'name':
+                      rawValue = row.name ? capitalizeWords(row.name) : '—'
+                      break
+                    case 'phone':
+                      rawValue = row.contact?.phone || '—'
+                      break
+                    case 'email':
+                      rawValue = row.contact?.email || '—'
+                      break
+                    case 'address':
+                      rawValue =
+                        [
+                          row.address?.street,
+                          row.address?.ward,
+                          row.address?.district,
+                          row.address?.city
+                        ]
+                          .filter(Boolean)
+                          .join(', ') || '—'
+                      break
+                    case 'bank':
+                      rawValue = row.bankInfo?.accountNumber
+                        ? `${row.bankInfo.accountNumber} - ${row.bankInfo.bankName || ''}`
+                        : '—'
+                      break
+                    default:
+                      rawValue = row[col.id] ?? '—'
+                  }
+
+                  let content = rawValue
+
+                  if (col.format) content = col.format(rawValue)
+
+                  if (col.id === 'action') {
+                    content = (
+                      <Stack direction='row' spacing={1} justifyContent='start'>
+                        <Tooltip title='Xem'>
+                          <IconButton
+                            onClick={() => handleViewPartner(row)}
+                            size='small'
+                          >
+                            <RemoveRedEyeIcon color='primary' />
+                          </IconButton>
+                        </Tooltip>
+                        <Tooltip title='Sửa'>
+                          <IconButton
+                            onClick={() => handleEditPartner(row)}
+                            size='small'
+                          >
+                            <BorderColorIcon color='warning' />
+                          </IconButton>
+                        </Tooltip>
+                        <Tooltip title='Xoá'>
+                          <IconButton
+                            onClick={() => handleDeletePartner(row)}
+                            size='small'
+                          >
+                            <DeleteForeverIcon color='error' />
+                          </IconButton>
+                        </Tooltip>
+                      </Stack>
+                    )
+                  }
+
+                  return (
+                    <TableCell
+                      key={col.id}
+                      align={col.align || 'left'}
+                      sx={{
+                        py: 0,
+                        px: 1,
+                        height: 55,
+                        whiteSpace: 'nowrap',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        ...(col.maxWidth && { maxWidth: col.maxWidth })
+                      }}
+                      title={typeof content === 'string' ? content : undefined}
+                    >
+                      {content}
+                    </TableCell>
+                  )
+                })}
+              </TableRow>
+            ))
           )}
         </TableBody>
       </Table>
