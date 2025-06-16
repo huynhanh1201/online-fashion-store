@@ -14,7 +14,7 @@ const Content = () => {
     const fetchProducts = async () => {
       setLoading(true)
       try {
-        const { products } = await getProducts(1, 20)
+        const { products } = await getProducts(1, 1000)
         setProducts(products)
       } catch (err) {
         setError('Không thể tải danh sách sản phẩm.')
@@ -138,25 +138,19 @@ const Content = () => {
       <div className='stitch-banner'></div>
 
       {/* Stitch Products */}
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
-        gap: '20px',
-        padding: '0 10px',
-        width: '100%',
-        maxWidth: '1800px',
-        margin: '0 auto'
-      }}>
+      <div className='product-grid'>
         {[...products.slice(-5)].reverse().map((product) => (
           <ProductCard key={product._id || product.id} product={product} />
         ))}
       </div>
 
-      <div style={{ textAlign: 'center', marginBottom: '32px' }}>
-        <Link to='/product'>
-          <button className='cta-button'>Xem tất cả</button>
-        </Link>
-      </div>
+      {products.length > 0 && (
+        <div style={{ textAlign: 'center', marginBottom: '32px' }}>
+          <Link to='/product'>
+            <button className='cta-button'>Xem tất cả</button>
+          </Link>
+        </div>
+      )}
 
       {/* Flash Sale Section */}
       <FlashSaleSection products={products} loading={loading} error={error} />
