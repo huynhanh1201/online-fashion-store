@@ -238,9 +238,9 @@ const handleCreateOrder = async (
     couponCode,
     note,
     discountAmount,
-    status: 'Processing',
+    status: paymentMethod === 'COD' ? 'Processing' : 'Failed',
     isPaid: false,
-    paymentStatus: 'Pending',
+    paymentStatus: paymentMethod === 'COD' ? 'Pending' : 'Failed',
     isDelivered: false,
 
     shippingFee: reqBody.shippingFee,
@@ -278,7 +278,12 @@ const handleCreateOrderItems = async (
   return result
 }
 
-const handleCreateTransaction = async (reqBody, order, session) => {
+const handleCreateTransaction = async (
+  reqBody,
+  order,
+  transactionInfo = {},
+  session
+) => {
   const { paymentMethod, note } = reqBody
 
   const paymentTransactionInfo = {
@@ -288,7 +293,9 @@ const handleCreateTransaction = async (reqBody, order, session) => {
     status: 'Pending',
     paidAt: null,
     note: note || null,
-    orderCode: order.code
+    orderCode: order.code,
+
+    ...transactionInfo
   }
 
   const result = await PaymentTransactionModel.create(

@@ -8,6 +8,7 @@ import { UserModel } from '~/models/UserModel'
 import validatePagination from '~/utils/validatePagination'
 import getDateRange from '~/utils/getDateRange'
 import { orderHelpers } from '~/helpers/orderHelpers'
+import { PaymentSessionDraftModel } from '~/models/PaymentSessionDraftModel'
 
 const createOrder = async (userId, reqBody, ipAddr, jwtDecoded) => {
   // eslint-disable-next-line no-useless-catch
@@ -18,7 +19,8 @@ const createOrder = async (userId, reqBody, ipAddr, jwtDecoded) => {
   try {
     session.startTransaction()
 
-    const { cartItems, shippingAddressId, total, couponCode } = reqBody
+    const { cartItems, shippingAddressId, total, couponCode, paymentMethod } =
+      reqBody
 
     // Kiểm tra tồn kho có đủ không
     await orderHelpers.checkInventorySufficient(cartItems, session)
@@ -79,19 +81,36 @@ const createOrder = async (userId, reqBody, ipAddr, jwtDecoded) => {
       session
     )
 
-    // Tạo OrderItems
-    await orderHelpers.handleCreateOrderItems(
-      cartItems,
-      variantMap,
-      order,
-      session
-    )
+    if (paymentMethod === 'COD') {
+      // Tạo OrderItems
+      await orderHelpers.handleCreateOrderItems(
+        cartItems,
+        variantMap,
+        order,
+        session
+      )
 
-    // Tạo giao dịch thanh toán
-    await orderHelpers.handleCreateTransaction(reqBody, order, session)
+      // Tạo giao dịch thanh toán
+      await orderHelpers.handleCreateTransaction(reqBody, order, session)
 
-    // Xóa sản phẩm trong giỏ hàng
-    await orderHelpers.handleDeleteCartItems(userId, variantIds, session)
+      // Xóa sản phẩm trong giỏ hàng
+      await orderHelpers.handleDeleteCartItems(userId, variantIds, session)
+    } else {
+      await PaymentSessionDraftModel.create(
+        [
+          {
+            orderId: order._id.toString(),
+            cartItems,
+            variantMap,
+            order,
+            reqBody,
+            userId,
+            variantIds
+          }
+        ],
+        { session }
+      )
+    }
 
     // Xử lý thanh toán VNPAY
     const paymentUrl = orderHelpers.handlePaymentByVnpay(reqBody, order, ipAddr)
