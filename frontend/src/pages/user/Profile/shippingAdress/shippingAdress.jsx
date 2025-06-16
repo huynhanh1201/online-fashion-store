@@ -11,6 +11,7 @@ import AddressTable from './AddressTable'
 import AddressDialog from './AddressDialog'
 import ViewAddressDialog from './ViewAddressDialog'
 import ConfirmDeleteDialog from './ConfirmDeleteDialog'
+import { GHN_TOKEN_API } from '~/utils/constants'
 
 function ShippingAddress({ showSnackbar }) {
   const [addresses, setAddresses] = useState([])
@@ -44,32 +45,79 @@ function ShippingAddress({ showSnackbar }) {
   useEffect(() => {
     const fetchProvinces = async () => {
       try {
-        const response = await fetch('https://provinces.open-api.vn/api/p/')
-        const data = await response.json()
-        setProvinces(data)
+        const provinceRes = await fetch(
+          'https://online-gateway.ghn.vn/shiip/public-api/master-data/province',
+          {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json',
+              Token: GHN_TOKEN_API
+            }
+          }
+        )
+        if (!provinceRes.ok) {
+          throw new Error(
+            `Lỗi tải tỉnh/thành: ${provinceRes.status} ${provinceRes.statusText}`
+          )
+        }
+        const provinceData = await provinceRes.json()
+        if (provinceData.code !== 200 || !provinceData.data) {
+          throw new Error('Không có dữ liệu tỉnh/thành')
+        }
+        const provinces = provinceData.data.map((p) => ({
+          code: String(p.ProvinceID),
+          name: p.ProvinceName
+        }))
+        setProvinces(provinces)
       } catch (error) {
-        showSnackbar?.('Không thể tải danh sách tỉnh/thành!', 'error')
+        showSnackbar?.(
+          `Không thể tải danh sách tỉnh/thành: ${error.message}`,
+          'error'
+        )
       }
     }
     fetchProvinces()
-  }, [])
+  }, [showSnackbar])
 
   // Fetch districts when city changes
   useEffect(() => {
     if (formData.city) {
       const fetchDistricts = async () => {
         try {
-          const response = await fetch(
-            `https://provinces.open-api.vn/api/p/${formData.city}?depth=2`
+          const districtRes = await fetch(
+            'https://online-gateway.ghn.vn/shiip/public-api/master-data/district',
+            {
+              method: 'POST',
+              headers: {
+                Token: GHN_TOKEN_API,
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({ province_id: parseInt(formData.city) })
+            }
           )
-          const data = await response.json()
-          setDistricts(data.districts || [])
+          if (!districtRes.ok) {
+            throw new Error(
+              `Lỗi tải quận/huyện: ${districtRes.status} ${districtRes.statusText}`
+            )
+          }
+          const districtData = await districtRes.json()
+          if (districtData.code !== 200 || !districtData.data) {
+            throw new Error('Không có dữ liệu quận/huyện')
+          }
+          const districts = districtData.data.map((d) => ({
+            code: String(d.DistrictID),
+            name: d.DistrictName
+          }))
+          setDistricts(districts)
           if (!editAddressId) {
             setFormData((prev) => ({ ...prev, district: '', ward: '' }))
           }
           setWards([])
         } catch (error) {
-          showSnackbar?.('Không thể tải danh sách quận/huyện!', 'error')
+          showSnackbar?.(
+            `Không thể tải danh sách quận/huyện: ${error.message}`,
+            'error'
+          )
         }
       }
       fetchDistricts()
@@ -77,30 +125,52 @@ function ShippingAddress({ showSnackbar }) {
       setDistricts([])
       setWards([])
     }
-  }, [formData.city, editAddressId])
+  }, [formData.city, editAddressId, showSnackbar])
 
   // Fetch wards when district changes
   useEffect(() => {
     if (formData.district) {
       const fetchWards = async () => {
         try {
-          const response = await fetch(
-            `https://provinces.open-api.vn/api/d/${formData.district}?depth=2`
+          const wardRes = await fetch(
+            `https://online-gateway.ghn.vn/shiip/public-api/master-data/ward?district_id=${formData.district}`,
+            {
+              method: 'GET',
+              headers: {
+                Token: GHN_TOKEN_API,
+                'Content-Type': 'application/json'
+              }
+            }
           )
-          const data = await response.json()
-          setWards(data.wards || [])
+          if (!wardRes.ok) {
+            throw new Error(
+              `Lỗi tải phường/xã: ${wardRes.status} ${wardRes.statusText}`
+            )
+          }
+          const wardData = await wardRes.json()
+          if (wardData.code !== 200 || !wardData.data) {
+            throw new Error('Không có dữ liệu phường/xã')
+          }
+          const wards = wardData.data.map((w) => ({
+            code: String(w.WardCode),
+            name: w.WardName
+          }))
+          setWards(wards)
           if (!editAddressId) {
             setFormData((prev) => ({ ...prev, ward: '' }))
           }
         } catch (error) {
-          showSnackbar?.('Không thể tải danh sách phường/xã!', 'error')
+          showSnackbar?.(
+            `Không thể tải danh sách phường/xã: ${error.message}`,
+            'error'
+          )
         }
       }
       fetchWards()
     } else {
       setWards([])
     }
-  }, [formData.district, editAddressId])
+  }, [formData.district, editAddressId, showSnackbar])
 
   // Fetch addresses
   useEffect(() => {
@@ -111,18 +181,16 @@ function ShippingAddress({ showSnackbar }) {
           (addr) =>
             addr._id && typeof addr._id === 'string' && addr._id.trim() !== ''
         )
-        console.log('Fetched addresses:', validAddresses)
         setAddresses(validAddresses)
       } catch (error) {
         showSnackbar?.(
           `Lỗi khi tải danh sách địa chỉ: ${error.message}`,
           'error'
         )
-        console.error('Fetch addresses error:', error)
       }
     }
     fetchAddresses()
-  }, [])
+  }, [showSnackbar])
 
   const handleAddOrUpdateAddress = async () => {
     const { fullName, phone, address, city, district, ward } = formData
@@ -141,21 +209,22 @@ function ShippingAddress({ showSnackbar }) {
       return
     }
 
-    const cityObj = provinces.find((p) => p.code === city) || {}
-    const districtObj = districts.find((d) => d.code === district) || {}
-    const wardObj = wards.find((w) => w.code === ward) || {}
+    const cityName = provinces.find((p) => p.code === formData.city)?.name || ''
+    const districtName =
+      districts.find((d) => d.code === formData.district)?.name || ''
+    const wardName = wards.find((w) => w.code === formData.ward)?.name || ''
     const addressData = {
       fullName: fullName.trim(),
       phone: phone.trim(),
       address: address.trim(),
-      ward: wardObj.name,
-      district: districtObj.name,
-      city: cityObj.name,
-      wardId: wardObj.code,
-      districtId: districtObj.code,
-      cityId: cityObj.code
+      city: cityName,
+      cityId: city,
+      district: districtName,
+      districtId: district,
+      ward: wardName,
+      wardId: ward
     }
-    const fullAddress = `${address}, ${wardObj.name}, ${districtObj.name}, ${cityObj.name}`
+    const fullAddress = `${address}, ${wardName}, ${districtName}, ${cityName}`
 
     const isDuplicate = addresses.some(
       (addr) =>
@@ -164,9 +233,10 @@ function ShippingAddress({ showSnackbar }) {
         addr.address === addressData.address &&
         addr.ward === addressData.ward &&
         addr.district === addressData.district &&
-        addr.city === addressData.city
+        addr.city === addressData.city &&
+        addr._id !== editAddressId
     )
-    if (isDuplicate && !editAddressId) {
+    if (isDuplicate) {
       showSnackbar?.('Địa chỉ này đã tồn tại!', 'error')
       return
     }
@@ -224,14 +294,12 @@ function ShippingAddress({ showSnackbar }) {
         error.message ||
         'Không thể xử lý địa chỉ!'
       showSnackbar?.(`Lỗi: ${errorMessage}`, 'error')
-      console.error('Add/Update error:', errorMessage)
     }
   }
 
   const handleDeleteAddress = (id) => {
     if (!id || typeof id !== 'string' || id.trim() === '') {
       showSnackbar?.('ID địa chỉ không hợp lệ!', 'error')
-      console.error('Invalid address ID:', id)
       return
     }
     setAddressToDelete(id)
@@ -251,7 +319,6 @@ function ShippingAddress({ showSnackbar }) {
       const errorMessage =
         error.response?.data?.message || error.message || 'Lỗi khi xóa địa chỉ!'
       showSnackbar?.(`Lỗi: ${errorMessage}`, 'error')
-      console.error('Delete error:', errorMessage)
     } finally {
       setOpenConfirmDialog(false)
       setAddressToDelete(null)
@@ -265,50 +332,108 @@ function ShippingAddress({ showSnackbar }) {
       address._id.trim() === ''
     ) {
       showSnackbar?.('ID địa chỉ không hợp lệ!', 'error')
-      console.error('Invalid address _id:', address._id)
       return
     }
 
     setEditAddressId(address._id)
-    const cityCode = provinces.find((p) => p.name === address.city)?.code || ''
+    let cityCode = ''
     let districtCode = ''
     let wardCode = ''
 
-    if (cityCode) {
-      try {
-        const districtResponse = await fetch(
-          `https://provinces.open-api.vn/api/p/${cityCode}?depth=2`
-        )
-        const districtData = await districtResponse.json()
-        setDistricts(districtData.districts || [])
-        districtCode =
-          districtData.districts.find((d) => d.name === address.district)
-            ?.code || ''
-
-        if (districtCode) {
-          const wardResponse = await fetch(
-            `https://provinces.open-api.vn/api/d/${districtCode}?depth=2`
-          )
-          const wardData = await wardResponse.json()
-          setWards(wardData.wards || [])
-          wardCode =
-            wardData.wards.find((w) => w.name === address.ward)?.code || ''
-        }
-      } catch (error) {
-        showSnackbar?.('Không thể tải thông tin địa chỉ!', 'error')
-        console.error('Fetch districts/wards error:', error)
+    try {
+      // Find ProvinceID from city name or ID
+      const city = provinces.find(
+        (p) =>
+          p.name === address.city || String(p.code) === String(address.cityId)
+      )
+      cityCode = city?.code || ''
+      if (!cityCode) {
+        showSnackbar?.('Không tìm thấy tỉnh/thành!', 'error')
+        return
       }
-    }
 
-    setFormData({
-      fullName: address.fullName || '',
-      phone: address.phone || '',
-      address: address.address || '',
-      city: cityCode,
-      district: districtCode,
-      ward: wardCode
-    })
-    setOpenAddressDialog(true)
+      // Fetch districts
+      const districtRes = await fetch(
+        'https://online-gateway.ghn.vn/shiip/public-api/master-data/district',
+        {
+          method: 'POST',
+          headers: {
+            Token: GHN_TOKEN_API,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ province_id: parseInt(cityCode) })
+        }
+      )
+      if (!districtRes.ok) {
+        throw new Error('Lỗi tải quận/huyện')
+      }
+      const districtData = await districtRes.json()
+      if (districtData.code !== 200 || !districtData.data) {
+        throw new Error('Không có dữ liệu quận/huyện')
+      }
+      const districts = districtData.data.map((d) => ({
+        code: String(d.DistrictID),
+        name: d.DistrictName
+      }))
+      setDistricts(districts)
+
+      // Find DistrictID from district name or ID
+      const district = districts.find(
+        (d) =>
+          d.name === address.district ||
+          String(d.code) === String(address.districtId)
+      )
+      districtCode = district?.code || ''
+      if (!districtCode) {
+        throw new Error('Không tìm thấy quận/huyện')
+      }
+
+      // Fetch wards
+      const wardRes = await fetch(
+        `https://online-gateway.ghn.vn/shiip/public-api/master-data/ward?district_id=${districtCode}`,
+        {
+          method: 'GET',
+          headers: {
+            Token: GHN_TOKEN_API,
+            'Content-Type': 'application/json'
+          }
+        }
+      )
+      if (!wardRes.ok) {
+        throw new Error('Lỗi tải phường/xã')
+      }
+      const wardData = await wardRes.json()
+      if (wardData.code !== 200 || !wardData.data) {
+        throw new Error('Không có dữ liệu phường/xã')
+      }
+      const wards = wardData.data.map((w) => ({
+        code: String(w.WardCode),
+        name: w.WardName
+      }))
+      setWards(wards)
+
+      // Find WardCode from ward name or ID
+      const ward = wards.find(
+        (w) =>
+          w.name === address.ward || String(w.code) === String(address.wardId)
+      )
+      wardCode = ward?.code || ''
+
+      setFormData({
+        fullName: address.fullName || '',
+        phone: address.phone || '',
+        address: address.address || '',
+        city: cityCode,
+        district: districtCode,
+        ward: wardCode
+      })
+      setOpenAddressDialog(true)
+    } catch (error) {
+      showSnackbar?.(
+        `Không thể tải thông tin địa chỉ: ${error.message}`,
+        'error'
+      )
+    }
   }
 
   const handleViewAddress = (address) => {
@@ -318,7 +443,6 @@ function ShippingAddress({ showSnackbar }) {
       address._id.trim() === ''
     ) {
       showSnackbar?.('ID địa chỉ không hợp lệ!', 'error')
-      console.error('Invalid address _id:', address._id)
       return
     }
     setViewAddress(address)
@@ -412,6 +536,7 @@ function ShippingAddress({ showSnackbar }) {
         wards={wards}
         onFormChange={handleFormChange}
         onSave={handleAddOrUpdateAddress}
+        showSnackbar={showSnackbar}
       />
 
       <ViewAddressDialog

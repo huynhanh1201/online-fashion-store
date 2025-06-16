@@ -162,7 +162,7 @@ const HeaderAction = () => {
         }}
         MenuListProps={{ ref: menuRef }}
       >
-        <Fade in={open} timeout={{ enter: 300, exit: 150 }}>
+        <Fade in={open} timeout={{ enter: 500, exit: 200 }}>
           <div>
             {currentUser ? (
               <>
@@ -179,7 +179,7 @@ const HeaderAction = () => {
                     padding: '12px 16px',
                     backgroundColor: 'rgba(0, 0, 0, 0.04)',
                     '&:hover': {
-                      backgroundColor: 'rgba(0, 0, 0, 0.08)',
+                      backgroundColor: 'rgba(0, 0, 0, 0.08)'
                     }
                   }}
                 >

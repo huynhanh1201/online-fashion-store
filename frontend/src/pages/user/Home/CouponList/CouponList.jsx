@@ -61,6 +61,10 @@ const CouponList = ({ onCouponSelect }) => {
     )
   }
 
+  if (!coupons.length) {
+    return null
+  }
+
   return (
     <div className='coupon-container'>
       <div className='coupon-wrapper'>

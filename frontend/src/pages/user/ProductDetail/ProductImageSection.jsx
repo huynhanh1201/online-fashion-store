@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react' // Thêm useState và useEffect vào import
 import { Box, Fade, Modal } from '@mui/material'
 import { styled } from '@mui/system'
 import { optimizeCloudinaryUrl } from '~/utils/cloudinary'
@@ -21,7 +21,7 @@ const EnlargedImage = styled('img')(() => ({
   height: 'min(90vh, 600px)',
   objectFit: 'cover',
   borderRadius: '8px',
-  boxShadow: '0 8px 32px rgba(0, 0, 0, 0.2)',
+  boxShadow: '0 8px 32px rgba(0, 0, 0, 0.2)'
 }))
 
 const ModalContent = styled(Box)(() => ({
@@ -102,7 +102,7 @@ const ThumbnailContainer = styled(Box)(() => ({
     width: 8
   },
   '&::-webkit-scrollbar-track': {
-    background: 'rgba(0,0,0,0.05)',
+    background: 'rgba(0,0,0,0.05)'
   },
   '&::-webkit-scrollbar-thumb': {
     background: 'linear-gradient(45deg, #1976d2, #42a5f5)',
@@ -141,9 +141,15 @@ const ProductImageSection = ({
 
   const mainImage = isThumbnailClicked
     ? displayImages[selectedImageIndex] || displayImages[0] || '/default.jpg'
-    : selectedVariant?.color?.image
-      ? selectedVariant.color.image
-      : displayImages[selectedImageIndex] || displayImages[0] || '/default.jpg'
+    : selectedColor?.image
+      ? optimizeCloudinaryUrl(selectedColor.image)
+      : selectedColor?.images?.length
+        ? optimizeCloudinaryUrl(selectedColor.images[0])
+        : selectedVariant?.image
+          ? optimizeCloudinaryUrl(selectedVariant.image)
+          : displayImages[selectedImageIndex] ||
+            displayImages[0] ||
+            '/default.jpg'
 
   const handleOpenModal = () => {
     setIsModalOpen(true)
@@ -164,10 +170,9 @@ const ProductImageSection = ({
           display: 'flex',
           flexDirection: { xs: 'column', md: 'row' },
           alignItems: { xs: 'center', md: 'flex-start' },
-          justifyContent: 'center',
+          justifyContent: 'center'
         }}
       >
-        {/* Thumbnail bên trái ở md trở lên */}
         <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
           <ThumbnailContainer>
             {displayImages.map((img, index) => (
@@ -203,7 +208,7 @@ const ProductImageSection = ({
           >
             <ProductImage
               src={optimizeCloudinaryUrl(mainImage)}
-              alt={selectedVariant?.name || 'Sản phẩm'}
+              alt={selectedColor?.name || 'Sản phẩm'}
               onClick={handleOpenModal}
               onError={(e) => {
                 e.target.onerror = null
@@ -213,8 +218,14 @@ const ProductImageSection = ({
           </MainImageContainer>
         </Fade>
 
-        {/* Thumbnail dưới ảnh ở màn nhỏ */}
-        <Box sx={{ display: { xs: 'flex', md: 'none' }, width: '100%', justifyContent: 'center', mt: 2 }}>
+        <Box
+          sx={{
+            display: { xs: 'flex', md: 'none' },
+            width: '100%',
+            justifyContent: 'center',
+            mt: 2
+          }}
+        >
           <ThumbnailContainer sx={{ flexDirection: 'row', maxHeight: 80 }}>
             {displayImages.map((img, index) => (
               <Thumbnail
@@ -237,14 +248,13 @@ const ProductImageSection = ({
         </Box>
       </Box>
 
-      {/* Modal zoom ảnh */}
       <Modal
         open={isModalOpen}
         onClose={handleCloseModal}
-        aria-labelledby="zoom-image-modal"
+        aria-labelledby='zoom-image-modal'
       >
         <ModalOverlay onClick={handleCloseModal}>
-          <ModalContent onClick={(e) => e.stopPropagation()}>
+          <ModalContent onClick={(e) => e.stopPropagation()} sx={{ mt: 7 }}>
             <EnlargedImage
               src={optimizeCloudinaryUrl(mainImage)}
               alt={selectedVariant?.name || 'Sản phẩm'}
