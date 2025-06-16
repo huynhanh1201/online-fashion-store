@@ -48,6 +48,24 @@ export default function FilterDiscount({
     applyFilters()
   }, [keyword, type, isActive, sort])
 
+  const handleSelectFilter = (filter) => {
+    if (filter === createdFilter) {
+      setCreatedFilter('')
+      setCreatedStart(dayjs().format('YYYY-MM-DD'))
+      setCreatedEnd(dayjs().format('YYYY-MM-DD'))
+      applyFilters('', '', '')
+    } else {
+      setCreatedFilter(filter)
+      if (filter !== 'custom') {
+        applyFilters(filter, createdStart, createdEnd)
+      }
+    }
+  }
+
+  const handleApplyTime = (filterType) => {
+    applyFilters(filterType, createdStart, createdEnd)
+  }
+
   const applyFilters = ({
     search: k = keyword,
     type: t = type,
@@ -199,8 +217,8 @@ export default function FilterDiscount({
         }}
         options={[
           { label: 'Tất cả', value: '' },
-          { label: 'Đang hoạt động', value: 'false' },
-          { label: 'Ngừng hoạt động', value: 'true' }
+          { label: 'Đang hoạt động', value: 'true' },
+          { label: 'Ngừng hoạt động', value: 'false' }
         ]}
       />
       <FilterSelect value={sort} onChange={setSort} />
@@ -224,16 +242,19 @@ export default function FilterDiscount({
       {/*  setEndDate={setValidUntilEnd}*/}
       {/*  onApply={() => applyFilters()}*/}
       {/*/>*/}
+
       <FilterByTime
-        label='Ngày tạo mã'
+        label='Lọc thời gian tạo'
         selectedFilter={createdFilter}
         setSelectedFilter={setCreatedFilter}
+        onSelectFilter={handleSelectFilter}
+        onApply={handleApplyTime}
         startDate={createdStart}
         setStartDate={setCreatedStart}
         endDate={createdEnd}
         setEndDate={setCreatedEnd}
-        onApply={() => applyFilters()}
       />
+
       <Box display='flex' gap={2}>
         <SearchWithSuggestions
           label='Mã giảm giá'

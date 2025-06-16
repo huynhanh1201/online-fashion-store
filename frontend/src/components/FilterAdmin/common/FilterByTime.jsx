@@ -1,10 +1,10 @@
 import React, { useState } from 'react'
-import { Box, Button, Chip, Menu, MenuItem, Typography } from '@mui/material'
-import { TextField } from '@mui/material'
+import { Box, Button, Chip, Menu, Typography, TextField } from '@mui/material'
 import { toast } from 'react-toastify'
 import { filterDate } from '~/utils/constants.js'
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown'
 import dayjs from 'dayjs'
+
 const FilterByTime = ({
   onApply,
   selectedFilter,
@@ -16,6 +16,7 @@ const FilterByTime = ({
   label
 }) => {
   const [anchorEl, setAnchorEl] = useState(null)
+
   const handleOpenMenu = (event) => {
     setAnchorEl(event.currentTarget)
   }
@@ -25,7 +26,19 @@ const FilterByTime = ({
   }
 
   const handleChipClick = (value) => {
-    setSelectedFilter(value)
+    if (selectedFilter === value) {
+      // Nếu đã chọn rồi thì huỷ lọc
+      setSelectedFilter('')
+      setStartDate(dayjs().format('YYYY-MM-DD'))
+      setEndDate(dayjs().format('YYYY-MM-DD'))
+      onApply('') // gọi xoá filter
+    } else {
+      setSelectedFilter(value)
+      if (value !== 'custom') {
+        onApply(value) // tự động áp dụng ngay khi chọn preset
+        handleCloseMenu()
+      }
+    }
   }
 
   const handleApply = () => {
@@ -33,7 +46,7 @@ const FilterByTime = ({
       toast.error('Vui lòng chọn cả ngày bắt đầu và ngày kết thúc')
       return
     }
-    onApply(selectedFilter)
+    onApply(selectedFilter || '')
     handleCloseMenu()
   }
 
@@ -47,15 +60,14 @@ const FilterByTime = ({
           textTransform: 'none',
           justifyContent: 'space-between',
           minWidth: 150,
-          height: 34, // Chiều cao tương đồng
-          fontSize: '0.8rem', // Cỡ chữ nhỏ
+          height: 34,
+          fontSize: '0.8rem',
           color: '#00000099',
-          borderRadius: '4px', // Bo tròn giống Select
+          fontWeight: 400,
+          borderRadius: '4px',
           borderColor: 'rgba(0, 0, 0, 0.23)',
-          padding: '4px 12px', // Gọn nhẹ hơn
-          '&:hover': {
-            borderColor: 'black'
-          }
+          padding: '4px 12px',
+          '&:hover': { borderColor: 'black' }
         }}
       >
         {selectedFilter === 'custom' && startDate && endDate
@@ -64,15 +76,13 @@ const FilterByTime = ({
             label ||
             'Lọc theo thời gian'}
       </Button>
+
       <Menu
         anchorEl={anchorEl}
         open={Boolean(anchorEl)}
         onClose={handleCloseMenu}
         MenuListProps={{ sx: { padding: 2 } }}
-        anchorOrigin={{
-          vertical: 'bottom',
-          horizontal: 'left'
-        }}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
       >
         <Typography variant='subtitle2' sx={{ mb: 1 }}>
           Chọn thời gian
@@ -99,7 +109,7 @@ const FilterByTime = ({
               type='date'
               label='Từ ngày'
               InputLabelProps={{ shrink: true }}
-              value={startDate || ''}
+              value={startDate}
               onChange={(e) => setStartDate(e.target.value)}
               size='small'
             />
@@ -111,14 +121,13 @@ const FilterByTime = ({
               onChange={(e) => setEndDate(e.target.value)}
               size='small'
             />
+            <Box display='flex' justifyContent='flex-end'>
+              <Button variant='contained' size='small' onClick={handleApply}>
+                Áp dụng
+              </Button>
+            </Box>
           </Box>
         )}
-
-        <Box mt={2} display='flex' justifyContent='flex-end'>
-          <Button variant='contained' size='small' onClick={handleApply}>
-            Áp dụng
-          </Button>
-        </Box>
       </Menu>
     </>
   )

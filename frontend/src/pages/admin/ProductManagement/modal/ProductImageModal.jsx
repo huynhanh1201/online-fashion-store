@@ -5,6 +5,7 @@ import DialogTitle from '@mui/material/DialogTitle'
 import DialogContent from '@mui/material/DialogContent'
 import DialogActions from '@mui/material/DialogActions'
 import Button from '@mui/material/Button'
+import { Divider } from '@mui/material'
 
 import styleAdmin from '~/assets/StyleAdmin.jsx'
 import { optimizeCloudinaryUrl } from '~/utils/cloudinary.js'
@@ -42,7 +43,7 @@ const ProductImageModal = ({ open, onClose, imageSrc, productName }) => {
         {/*  <CloseIcon />*/}
         {/*</IconButton>*/}
       </DialogTitle>
-
+      <Divider />
       {/* ===== Content ===== */}
       <DialogContent>
         <img
@@ -50,15 +51,20 @@ const ProductImageModal = ({ open, onClose, imageSrc, productName }) => {
           alt={productName}
           style={{
             width: '100%',
-            maxHeight: '80vh',
+            height: '500px',
             objectFit: 'contain'
           }}
         />
       </DialogContent>
-
+      <Divider />
       {/* ===== Footer ===== */}
       <DialogActions sx={{ padding: '16px 24px' }}>
-        <Button onClick={onClose} color='error' variant='contained'>
+        <Button
+          onClick={onClose}
+          color='error'
+          variant='outlined'
+          sx={{ textTransform: 'none' }}
+        >
           Đóng
         </Button>
       </DialogActions>

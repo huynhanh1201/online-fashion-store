@@ -15,7 +15,7 @@ import {
 } from '@mui/material'
 import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye'
 import BorderColorIcon from '@mui/icons-material/BorderColor'
-import DeleteForeverIcon from '@mui/icons-material/DeleteForever'
+import VisibilityOffIcon from '@mui/icons-material/VisibilityOff'
 import EditBatchModal from '../modal/Batch/EditBatchModal.jsx'
 import ViewBatchModal from '../modal/Batch/ViewBatchModal.jsx'
 import DeleteBatchModal from '../modal/Batch/DeleteBatchModal.jsx'
@@ -25,11 +25,14 @@ import useVariants from '~/hooks/admin/Inventory/useVariants.js'
 import useWarehouses from '~/hooks/admin/Inventory/useWarehouses.js'
 import TablePaginationActions from '~/components/PaginationAdmin/TablePaginationActions.jsx'
 import Chip from '@mui/material/Chip'
+import TableNoneData from '~/components/TableAdmin/NoneData.jsx'
+import Stack from '@mui/material/Stack'
+import Tooltip from '@mui/material/Tooltip'
+
 const BatchesTab = () => {
   const {
     batches,
     fetchBatches,
-    createNewBatch,
     updateBatchById,
     deleteBatchById,
     loadingBatch,
@@ -52,32 +55,43 @@ const BatchesTab = () => {
   })
 
   const batchColumns = [
-    { id: 'batchCode', label: 'Mã lô', minWidth: 120 },
-    { id: 'variantName', label: 'Biến thể', minWidth: 200 },
     {
-      id: 'warehouseName',
-      label: 'Kho hàng',
-      minWidth: 150
+      id: 'index',
+      label: 'STT',
+      minWidth: 50,
+      maxWidth: 50,
+      width: 50,
+      align: 'center'
     },
+    { id: 'batchCode', label: 'Mã lô hàng ', minWidth: 120, maxWidth: 120 },
+    { id: 'variantName', label: 'Tên sản phẩm', minWidth: 200, maxWidth: 200 },
+    { id: 'warehouseName', label: 'Kho hàng', minWidth: 100, maxWidth: 150 },
     {
       id: 'quantity',
-      label: 'Số lượng',
-      minWidth: 100,
-      align: 'right',
+      label: 'Số lượng sản phẩm',
+      minWidth: 80,
+      maxWidth: 120,
+      align: 'start',
       format: (value) => `${value.toLocaleString('vi-VN')}`
     },
     {
       id: 'importPrice',
       label: 'Giá nhập',
-      minWidth: 120,
-      align: 'right',
+      minWidth: 80,
+      maxWidth: 150,
+      align: 'start',
       format: (value) => `${value.toLocaleString('vi-VN')}đ`
     },
-    { id: 'destroy', label: 'Trạng thái', minWidth: 150 },
+    {
+      id: 'destroy',
+      label: 'Trạng thái lô hàng',
+      align: 'start',
+      minWidth: 130
+    },
     {
       id: 'importedAt',
       label: 'Ngày nhập',
-      minWidth: 150,
+      minWidth: 100,
       format: (value) =>
         new Date(value).toLocaleDateString('vi-VN', {
           day: '2-digit',
@@ -85,19 +99,10 @@ const BatchesTab = () => {
           year: 'numeric'
         })
     },
-    {
-      id: 'manufactureDate',
-      label: 'NSX',
-      minWidth: 130,
-      format: (value) =>
-        new Date(value).toLocaleDateString('vi-VN', {
-          day: '2-digit',
-          month: '2-digit',
-          year: 'numeric'
-        })
-    },
+
     { id: 'action', label: 'Hành động', minWidth: 150, align: 'start' }
   ]
+
   useEffect(() => {
     fetchVariants()
     fetchWarehouses()
@@ -105,7 +110,7 @@ const BatchesTab = () => {
 
   useEffect(() => {
     fetchBatches(page, rowsPerPage, filter)
-  }, [page, rowsPerPage])
+  }, [page, rowsPerPage, filter])
 
   const [openEditModal, setOpenEditModal] = useState(false)
   const [selectedBatch, setSelectedBatch] = useState(null)
@@ -127,7 +132,7 @@ const BatchesTab = () => {
   // Đóng modal sửa, refresh danh sách
   const handleCloseEditModal = () => {
     setOpenEditModal(false)
-    fetchBatches(page, rowsPerPage)
+    fetchBatches(page, rowsPerPage, filter)
   }
 
   // Mở modal xoá
@@ -139,13 +144,15 @@ const BatchesTab = () => {
   // Đóng modal xoá, refresh danh sách
   const handleCloseDeleteModal = () => {
     setOpenDeleteModal(false)
-    fetchBatches(page, rowsPerPage)
+    fetchBatches(page, rowsPerPage, filter)
   }
 
+  const isEqual = (obj1, obj2) => JSON.stringify(obj1) === JSON.stringify(obj2)
+
   const handleFilter = (newFilters) => {
-    setFilter(newFilters)
-    if (Object.keys(newFilters).length > 0) {
-      fetchBatches(1, rowsPerPage, newFilters)
+    if (!isEqual(filter, newFilters)) {
+      setPage(1)
+      setFilter(newFilters)
     }
   }
   const formatCurrency = (value) => {
@@ -181,7 +188,8 @@ const BatchesTab = () => {
                       display: 'flex',
                       flexDirection: 'column',
                       gap: 1,
-                      minWidth: 250
+                      minWidth: 250,
+                      minHeight: 76.5
                     }}
                   >
                     <Typography variant='h6' sx={{ fontWeight: '800' }}>
@@ -200,78 +208,143 @@ const BatchesTab = () => {
               </TableCell>
             </TableRow>
             <TableRow>
-              {batchColumns.map((column) => (
+              {batchColumns.map((col) => (
                 <TableCell
-                  key={column.id}
-                  align={column.align}
-                  style={{ minWidth: column.minWidth }}
+                  key={col.id}
+                  align={col.align || 'left'}
                   sx={{
-                    ...(column.id === 'action' && {
+                    minWidth: col.minWidth,
+                    width: col.width,
+                    ...(col.maxWidth && { maxWidth: col.maxWidth }),
+
+                    ...(col.id === 'action' && {
                       width: '130px',
                       maxWidth: '130px',
-                      paddingLeft: '20px'
-                    })
+                      paddingLeft: '26px'
+                    }),
+                    px: 1
                   }}
                 >
-                  {column.label}
+                  {col.label}
                 </TableCell>
               ))}
             </TableRow>
           </TableHead>
           <TableBody>
-            {enrichedBatches.map((row, index) => (
-              <TableRow hover role='checkbox' tabIndex={-1} key={index}>
-                {batchColumns.map((column) => {
-                  const value = row[column.id]
-                  if (column.id === 'destroy') {
-                    return (
-                      <TableCell key={column.id} align={column.align}>
-                        <Chip
-                          label={value ? 'Không hoạt động' : 'Hoạt động'}
-                          color={value ? 'error' : 'success'}
-                          size='large'
-                          sx={{ width: '127px', fontWeight: '800' }}
-                        />
-                      </TableCell>
-                    )
-                  }
-                  if (column.id === 'action') {
-                    return (
-                      <TableCell key={column.id} align={column.align}>
-                        <IconButton
-                          onClick={() => handleViewBatch(row)}
-                          size='small'
-                          color='primary'
-                        >
-                          <RemoveRedEyeIcon color='primary' />
-                        </IconButton>
-                        <IconButton
-                          onClick={() => handleEditBatch(row)}
-                          size='small'
-                          color='info'
-                        >
-                          <BorderColorIcon color='warning' />
-                        </IconButton>
-                        <IconButton
-                          onClick={() => handleDeleteBatch(row)}
-                          size='small'
-                          color='error'
-                        >
-                          <DeleteForeverIcon color='error' />
-                        </IconButton>
-                      </TableCell>
-                    )
-                  }
-                  return (
-                    <TableCell key={column.id} align={column.align}>
-                      {column.format && value !== null && value !== undefined
-                        ? column.format(value)
-                        : (value ?? 'Không có dữ liệu')}
-                    </TableCell>
-                  )
-                })}
+            {loadingBatch ? (
+              <TableRow>
+                <TableCell colSpan={batchColumns.length} align='center'>
+                  Đang tải dữ liệu lô hàng...
+                </TableCell>
               </TableRow>
-            ))}
+            ) : enrichedBatches.length === 0 ? (
+              <TableNoneData
+                col={batchColumns.length}
+                message='Không có dữ liệu lô hàng.'
+              />
+            ) : (
+              enrichedBatches.map((row, index) => (
+                <TableRow hover key={index}>
+                  {batchColumns.map((col) => {
+                    const rawValue = row[col.id]
+                    let content = rawValue ?? '—'
+                    const capitalizeWords = (text) =>
+                      (text || '')
+                        .toLowerCase()
+                        .split(' ')
+                        .filter(Boolean)
+                        .map(
+                          (word) => word.charAt(0).toUpperCase() + word.slice(1)
+                        )
+                        .join(' ')
+
+                    if (
+                      col.format &&
+                      rawValue !== null &&
+                      rawValue !== undefined
+                    ) {
+                      content = col.format(rawValue)
+                    }
+                    if (col.id === 'index') {
+                      content = page - 1 + index + 1
+                    }
+                    if (
+                      col.id === 'variantName' ||
+                      col.id === 'warehouseName'
+                    ) {
+                      content = capitalizeWords(rawValue)
+                    }
+                    if (col.id === 'destroy') {
+                      content = (
+                        <Chip
+                          label={rawValue ? 'Không hoạt động' : 'Hoạt động'}
+                          color={rawValue ? 'error' : 'success'}
+                          size='large'
+                          sx={{ width: 127, fontWeight: 800 }}
+                        />
+                      )
+                    }
+
+                    if (col.id === 'action') {
+                      content = (
+                        <Stack
+                          direction='row'
+                          spacing={1}
+                          justifyContent='start'
+                          alignItems='start'
+                        >
+                          <Tooltip title='Xem'>
+                            <IconButton
+                              onClick={() => handleViewBatch(row)}
+                              size='small'
+                            >
+                              <RemoveRedEyeIcon color='primary' />
+                            </IconButton>
+                          </Tooltip>
+                          <Tooltip title='Sửa'>
+                            <IconButton
+                              onClick={() => handleEditBatch(row)}
+                              size='small'
+                            >
+                              <BorderColorIcon color='warning' />
+                            </IconButton>
+                          </Tooltip>
+                          <Tooltip title='Xoá'>
+                            <IconButton
+                              onClick={() => handleDeleteBatch(row)}
+                              size='small'
+                            >
+                              <VisibilityOffIcon color='error' />
+                            </IconButton>
+                          </Tooltip>
+                        </Stack>
+                      )
+                    }
+
+                    return (
+                      <TableCell
+                        key={col.id}
+                        align={col.align || 'left'}
+                        sx={{
+                          py: 0,
+                          px: 1,
+                          height: 55,
+                          whiteSpace: 'nowrap',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                          ...(col.maxWidth && { maxWidth: col.maxWidth })
+                        }}
+                        title={
+                          typeof content === 'string' ? content : undefined
+                        }
+                      >
+                        {content}
+                      </TableCell>
+                    )
+                  })}
+                </TableRow>
+              ))
+            )}
           </TableBody>
         </Table>
       </TableContainer>

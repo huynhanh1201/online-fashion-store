@@ -71,7 +71,7 @@ export default function EditPartnerModal({
   return (
     <Dialog open={open} onClose={handleCancel} fullWidth maxWidth='sm'>
       <DialogTitle>Sửa thông tin đối tác</DialogTitle>
-      <DialogContent>
+      <DialogContent dividers>
         <Box
           component='form'
           noValidate
@@ -88,7 +88,7 @@ export default function EditPartnerModal({
           />
           <TextField
             select
-            label='Loại đối tác'
+            label='Kiểu đối tác'
             name='type'
             value={form.type}
             onChange={handleChange}
@@ -118,11 +118,23 @@ export default function EditPartnerModal({
           />
         </Box>
       </DialogContent>
-      <DialogActions>
-        <Button onClick={handleCancel} color='inherit'>
+      <DialogActions sx={{ padding: '16px 24px' }}>
+        <Button
+          onClick={handleCancel}
+          sx={{ textTransform: 'none' }}
+          color='error'
+          variant='outlined'
+        >
           Hủy
         </Button>
-        <Button onClick={handleSave} variant='contained'>
+        <Button
+          onClick={handleSave}
+          sx={{
+            backgroundColor: '#001f5d',
+            color: '#fff',
+            textTransform: 'none'
+          }}
+        >
           Lưu
         </Button>
       </DialogActions>

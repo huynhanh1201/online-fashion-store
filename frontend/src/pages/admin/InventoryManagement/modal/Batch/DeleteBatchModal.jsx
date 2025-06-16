@@ -17,17 +17,29 @@ const DeleteBatchModal = ({ open, onClose, onSave, batch }) => {
   }
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth='xs' fullWidth>
-      <DialogTitle>Xoá Lô Hàng</DialogTitle>
+    <Dialog open={open} onClose={onClose} maxWidth='sm' fullWidth>
+      <DialogTitle>Ẩn Lô Hàng</DialogTitle>
       <DialogContent dividers>
         <Typography>
-          Bạn có chắc chắn muốn xoá lô <strong>{batch.batchCode}</strong> không?
+          Bạn có chắc chắn muốn ẩn lô hàng <strong>{batch.batchCode}</strong>{' '}
+          không?
         </Typography>
       </DialogContent>
-      <DialogActions>
-        <Button onClick={onClose}>Huỷ</Button>
-        <Button onClick={handleDelete} color='error' variant='contained'>
-          Xoá
+      <DialogActions sx={{ padding: '16px 24px' }}>
+        <Button
+          onClick={onClose}
+          color='inherit'
+          sx={{ textTransform: 'none' }}
+        >
+          Huỷ
+        </Button>
+        <Button
+          onClick={handleDelete}
+          color='error'
+          variant='contained'
+          sx={{ textTransform: 'none' }}
+        >
+          Ẩn
         </Button>
       </DialogActions>
     </Dialog>

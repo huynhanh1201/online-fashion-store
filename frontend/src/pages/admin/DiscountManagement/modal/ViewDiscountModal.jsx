@@ -6,10 +6,6 @@ import DialogContent from '@mui/material/DialogContent'
 import DialogActions from '@mui/material/DialogActions'
 import Button from '@mui/material/Button'
 import Divider from '@mui/material/Divider'
-import Box from '@mui/material/Box'
-import TextField from '@mui/material/TextField'
-import FormControlLabel from '@mui/material/FormControlLabel'
-import Checkbox from '@mui/material/Checkbox'
 import Table from '@mui/material/Table'
 import TableBody from '@mui/material/TableBody'
 import TableCell from '@mui/material/TableCell'
@@ -18,6 +14,18 @@ import Chip from '@mui/material/Chip'
 import StyleAdmin from '~/assets/StyleAdmin.jsx'
 
 const ViewDiscountModal = ({ open, onClose, discount }) => {
+  const formatDate = (dateString) => {
+    if (!dateString) return 'Không có thông tin'
+    const date = new Date(dateString)
+    return date.toLocaleString('vi-VN', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit'
+    })
+  }
   if (!discount) return null
   return (
     <Dialog
@@ -29,8 +37,9 @@ const ViewDiscountModal = ({ open, onClose, discount }) => {
         sx: StyleAdmin.OverlayModal
       }}
     >
-      <DialogTitle>Chi tiết mã giảm giá</DialogTitle>
-      <DialogContent>
+      <DialogTitle>Thông tin mã giảm giá</DialogTitle>
+      <Divider />
+      <DialogContent sx={{ py: 0 }}>
         <Table>
           <TableBody>
             <TableRow>
@@ -59,12 +68,16 @@ const ViewDiscountModal = ({ open, onClose, discount }) => {
                     : 'Giá trị giảm (%)'}
                 </strong>
               </TableCell>
-              <TableCell>{discount.amount ?? '—'}</TableCell>
+              <TableCell>
+                {discount.type === 'fixed'
+                  ? `${discount.amount?.toLocaleString('vi-VN') ?? '—'}đ`
+                  : `${discount.amount ?? '—'}%`}
+              </TableCell>
             </TableRow>
 
             <TableRow>
               <TableCell>
-                <strong>Kích hoạt</strong>
+                <strong>Trạng thái hoạt động</strong>
               </TableCell>
               <TableCell>
                 <Chip
@@ -72,6 +85,8 @@ const ViewDiscountModal = ({ open, onClose, discount }) => {
                     discount.isActive ? 'Đang hoạt động' : 'Không hoạt động'
                   }
                   color={discount.isActive ? 'success' : 'error'}
+                  size='large'
+                  sx={{ width: '127px', fontWeight: '800' }}
                 />
               </TableCell>
             </TableRow>
@@ -80,14 +95,18 @@ const ViewDiscountModal = ({ open, onClose, discount }) => {
               <TableCell>
                 <strong>Giá trị đơn hàng tối thiểu</strong>
               </TableCell>
-              <TableCell>{discount.minOrderValue ?? '—'}</TableCell>
+              <TableCell>
+                {discount.minOrderValue.toLocaleString('vi-VN')}đ
+              </TableCell>
             </TableRow>
 
             <TableRow>
               <TableCell>
                 <strong>Số lượt sử dụng tối đa</strong>
               </TableCell>
-              <TableCell>{discount.usageLimit ?? '—'}</TableCell>
+              <TableCell>
+                {discount.usageLimit.toLocaleString('vi-VN') ?? '—'}
+              </TableCell>
             </TableRow>
 
             <TableRow>
@@ -105,36 +124,26 @@ const ViewDiscountModal = ({ open, onClose, discount }) => {
               <TableCell>
                 <strong>Hiệu lực từ</strong>
               </TableCell>
-              <TableCell>
-                {discount.validFrom
-                  ? new Date(discount.validFrom).toLocaleDateString('vi-VN', {
-                      day: '2-digit',
-                      month: '2-digit',
-                      year: 'numeric'
-                    })
-                  : '—'}
-              </TableCell>
+              <TableCell>{formatDate(discount.createdAt)}</TableCell>
             </TableRow>
 
             <TableRow>
               <TableCell>
                 <strong>Hiệu lực đến</strong>
               </TableCell>
-              <TableCell>
-                {discount.validUntil
-                  ? new Date(discount.validUntil).toLocaleDateString('vi-VN', {
-                      day: '2-digit',
-                      month: '2-digit',
-                      year: 'numeric'
-                    })
-                  : '—'}
-              </TableCell>
+              <TableCell>{formatDate(discount.updatedAt)}</TableCell>
             </TableRow>
           </TableBody>
         </Table>
       </DialogContent>
+      <Divider />
       <DialogActions sx={{ padding: '16px 24px' }}>
-        <Button onClick={onClose} variant='contained' color='error'>
+        <Button
+          onClick={onClose}
+          variant='outlined'
+          color='error'
+          sx={{ textTransform: 'none' }}
+        >
           Đóng
         </Button>
       </DialogActions>

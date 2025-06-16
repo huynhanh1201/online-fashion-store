@@ -77,7 +77,6 @@ export default function AdminLayout() {
         onClose={() => setOpenProfile(false)}
       />
       <main className='main-content'>
-        <div className='drawer-header' />
         <Outlet />
       </main>
     </Box>

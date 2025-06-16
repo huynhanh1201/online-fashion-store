@@ -9,7 +9,8 @@ import {
   Divider,
   Box,
   Typography,
-  IconButton
+  IconButton,
+  Tooltip
 } from '@mui/material'
 import EditIcon from '@mui/icons-material/Edit'
 import DeleteIcon from '@mui/icons-material/Delete'
@@ -52,17 +53,20 @@ const AddCategoryModal = ({ open, onClose, onAdded, onSave }) => {
   const onSubmit = async (data) => {
     try {
       let imageUrl = ''
+
+      // Nếu có file mới upload ảnh
       if (imageFile) {
         imageUrl = await uploadToCloudinary(imageFile)
       }
 
       const payload = {
-        name: data.name,
-        description: data.description || '',
-        image: imageUrl
+        name: data.name.trim(),
+        description: data.description?.trim() || '',
+        image: imageUrl || ''
       }
 
       const result = await addCategory(payload)
+
       if (result) {
         if (onSave) onSave()
         onAdded()
@@ -73,8 +77,8 @@ const AddCategoryModal = ({ open, onClose, onAdded, onSave }) => {
       } else {
         console.log('Thêm danh mục thất bại. Vui lòng thử lại!')
       }
-    } catch {
-      console.log('Lỗi khi tải ảnh hoặc thêm danh mục!')
+    } catch (error) {
+      console.log('Lỗi khi tải ảnh hoặc thêm danh mục!', error)
     }
   }
 
@@ -105,13 +109,13 @@ const AddCategoryModal = ({ open, onClose, onAdded, onSave }) => {
       open={open}
       onClose={handleClose}
       fullWidth
-      maxWidth='md'
+      maxWidth='lg'
       BackdropProps={{ sx: StyleAdmin.OverlayModal }}
     >
       <DialogTitle>Thêm danh mục mới</DialogTitle>
       <Divider sx={{ my: 0 }} />
       <form onSubmit={handleSubmit(onSubmit)}>
-        <DialogContent>
+        <DialogContent sx={{ minHeight: 300 }}>
           <Box
             display='flex'
             gap={3}
@@ -132,7 +136,8 @@ const AddCategoryModal = ({ open, onClose, onAdded, onSave }) => {
                 backgroundColor: '#fafafa',
                 cursor: 'pointer',
                 width: 350,
-                height: 206
+                height: 345,
+                mt: '14px'
               }}
               onClick={() => !previewUrl && fileInputRef.current.click()}
             >
@@ -150,29 +155,53 @@ const AddCategoryModal = ({ open, onClose, onAdded, onSave }) => {
                   />
                   <Box
                     position='absolute'
-                    top={8}
+                    top={4}
                     right={8}
                     display='flex'
                     gap={1}
                   >
-                    <IconButton
-                      size='small'
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        fileInputRef.current.click()
+                    <Box
+                      sx={{
+                        position: 'absolute',
+                        top: 4,
+                        right: 40,
+                        backgroundColor: 'rgba(255,255,255,0.8)',
+                        borderRadius: 1
                       }}
                     >
-                      <EditIcon fontSize='small' />
-                    </IconButton>
-                    <IconButton
-                      size='small'
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        handleImageRemove()
+                      <Tooltip title='Sửa'>
+                        <IconButton
+                          size='small'
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            fileInputRef.current.click()
+                          }}
+                        >
+                          <EditIcon fontSize='small' color='warning' />
+                        </IconButton>
+                      </Tooltip>
+                    </Box>
+                    <Box
+                      sx={{
+                        position: 'absolute',
+                        top: 4,
+                        right: 4,
+                        backgroundColor: 'rgba(255,255,255,0.8)',
+                        borderRadius: 1
                       }}
                     >
-                      <DeleteIcon fontSize='small' />
-                    </IconButton>
+                      <Tooltip title='Xoá'>
+                        <IconButton
+                          size='small'
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            handleImageRemove()
+                          }}
+                        >
+                          <DeleteIcon fontSize='small' color='error' />
+                        </IconButton>
+                      </Tooltip>
+                    </Box>
                   </Box>
                 </>
               ) : (
@@ -204,14 +233,12 @@ const AddCategoryModal = ({ open, onClose, onAdded, onSave }) => {
                 sx={StyleAdmin.InputCustom}
               />
               <TextField
-                label='Mô tả'
+                label='Mô tả (không bắt buộc)'
                 fullWidth
                 margin='normal'
                 multiline
-                rows={3}
-                {...register('description', { required: 'Mô tả là bắt buộc' })}
-                error={!!errors.description}
-                helperText={errors.description?.message}
+                rows={10}
+                {...register('description')}
                 sx={StyleAdmin.InputCustom}
               />
             </Box>
@@ -220,13 +247,22 @@ const AddCategoryModal = ({ open, onClose, onAdded, onSave }) => {
 
         <Divider sx={{ my: 0 }} />
         <DialogActions sx={{ padding: '16px 24px' }}>
-          <Button color='inherit' onClick={handleClose}>
+          <Button
+            color='error'
+            variant='outlined'
+            sx={{ textTransform: 'none' }}
+            onClick={handleClose}
+          >
             Hủy
           </Button>
           <Button
             type='submit'
             variant='contained'
-            sx={{ backgroundColor: '#001f5d', color: '#fff' }}
+            sx={{
+              backgroundColor: '#001f5d',
+              color: '#fff',
+              textTransform: 'none'
+            }}
             disabled={isSubmitting}
           >
             {isSubmitting ? 'Đang thêm...' : 'Thêm'}

@@ -5,7 +5,8 @@ import {
   DialogContent,
   DialogActions,
   Button,
-  Typography
+  Typography,
+  Divider
 } from '@mui/material'
 
 export default function DeleteWarehouseModal({
@@ -17,15 +18,22 @@ export default function DeleteWarehouseModal({
   if (!warehouse) return null
 
   return (
-    <Dialog open={open} onClose={onClose}>
-      <DialogTitle>Xoá kho hàng</DialogTitle>
+    <Dialog open={open} onClose={onClose} maxWidth='sm' fullWidth>
+      <DialogTitle>Ẩn kho hàng</DialogTitle>
+      <Divider />
       <DialogContent>
         <Typography>
-          Bạn có chắc chắn muốn xoá kho <strong>{warehouse.code}</strong> không?
+          Bạn có chắc chắn muốn ẩn kho <strong>{warehouse.code}</strong> này
+          không?
         </Typography>
       </DialogContent>
+      <Divider />
       <DialogActions>
-        <Button onClick={onClose} variant='outlined'>
+        <Button
+          onClick={onClose}
+          color='inherit'
+          sx={{ textTransform: 'none' }}
+        >
           Hủy
         </Button>
         <Button
@@ -35,8 +43,9 @@ export default function DeleteWarehouseModal({
           }}
           color='error'
           variant='contained'
+          sx={{ textTransform: 'none' }}
         >
-          Xoá
+          Ẩn
         </Button>
       </DialogActions>
     </Dialog>

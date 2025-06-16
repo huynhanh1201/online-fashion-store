@@ -36,7 +36,7 @@ const modalStyle = {
   width: 360,
   bgcolor: 'background.paper',
   boxShadow: 24,
-  borderRadius: 2,
+  borderRadius: '8px',
   display: 'flex',
   flexDirection: 'column',
   maxHeight: '82vh',
@@ -95,7 +95,7 @@ export default function ViewsAppBarModal({ open, handleClose }) {
       open={open}
       onClose={handleClose}
       disableScrollLock
-      BackdropProps={{ sx: StyleAdmin.OverlayModal }}
+      BackdropProps={{ sx: StyleAdmin.NoneOverlayModal }}
     >
       <Box sx={modalStyle}>
         {/* Header cố định */}
@@ -108,7 +108,8 @@ export default function ViewsAppBarModal({ open, handleClose }) {
             position: 'sticky',
             top: 0,
             zIndex: 1,
-            bgcolor: 'background.paper'
+            bgcolor: 'background.paper',
+            borderRadius: '8px'
           }}
         >
           <Box
@@ -117,7 +118,7 @@ export default function ViewsAppBarModal({ open, handleClose }) {
             alignItems='center'
           >
             <Typography variant='h6'>Thông báo</Typography>
-            <Button variant='text' size='small'>
+            <Button variant='text' size='small' sx={{ textTransform: 'none' }}>
               <Link to='/admin/notification-management' onClick={handleClose}>
                 Xem tất cả
               </Link>
@@ -182,7 +183,13 @@ export default function ViewsAppBarModal({ open, handleClose }) {
         <Button
           variant='text'
           size='small'
-          sx={{ height: 60, borderTop: '1px solid #ccc' }}
+          sx={{
+            minHeight: 50,
+            maxHeight: 50,
+            height: 50,
+            borderTop: '1px solid #ccc',
+            textTransform: 'none'
+          }}
         >
           <Link to='/admin/notification-management' onClick={handleClose}>
             Xem tất cả thông báo

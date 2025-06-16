@@ -1,16 +1,45 @@
 import React from 'react'
 
 import Dialog from '@mui/material/Dialog'
-import DialogActions from '@mui/material/DialogActions'
-import DialogContent from '@mui/material/DialogContent'
 import DialogTitle from '@mui/material/DialogTitle'
-import TextField from '@mui/material/TextField'
-import Button from '@mui/material/Button'
+import DialogContent from '@mui/material/DialogContent'
+import DialogActions from '@mui/material/DialogActions'
 import Divider from '@mui/material/Divider'
+import Button from '@mui/material/Button'
+import Table from '@mui/material/Table'
+import TableBody from '@mui/material/TableBody'
+import TableRow from '@mui/material/TableRow'
+import TableCell from '@mui/material/TableCell'
+import Chip from '@mui/material/Chip'
 
 import StyleAdmin from '~/assets/StyleAdmin.jsx'
 
 const ViewColorModal = ({ open, onClose, color }) => {
+  if (!color) return null
+
+  const statusLabel = {
+    active: 'Hiển thị',
+    inactive: 'Ẩn'
+  }
+
+  const statusColor = {
+    active: 'success',
+    inactive: 'default'
+  }
+
+  const formatDate = (dateString) => {
+    if (!dateString) return 'Không có thông tin'
+    const date = new Date(dateString)
+    return date.toLocaleString('vi-VN', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit'
+    })
+  }
+
   return (
     <Dialog
       open={open}
@@ -21,29 +50,54 @@ const ViewColorModal = ({ open, onClose, color }) => {
         sx: StyleAdmin.OverlayModal
       }}
     >
-      <DialogTitle>Xem thông tin màu</DialogTitle>
+      <DialogTitle>Xem thông tin màu sắc</DialogTitle>
       <Divider sx={{ my: 0 }} />
-      <DialogContent>
-        <form id='view-color-form'>
-          {/* Tên màu - chỉ đọc */}
-          <TextField
-            label='Tên màu'
-            fullWidth
-            margin='normal'
-            defaultValue={color?.name || ''}
-            InputProps={{
-              readOnly: true
-            }}
-            sx={{
-              ...StyleAdmin.InputCustom,
-              ...StyleAdmin.InputCustom.CursorNone
-            }}
-          />
-        </form>
+      <DialogContent sx={{ overflowY: 'auto', py: 0 }}>
+        <Table>
+          <TableBody>
+            <TableRow>
+              <TableCell sx={{ fontWeight: 'bold', width: '35%' }}>
+                Tên màu
+              </TableCell>
+              <TableCell>{color.name || 'Không có tên'}</TableCell>
+            </TableRow>
+
+            <TableRow>
+              <TableCell sx={{ fontWeight: 'bold' }}>Trạng thái</TableCell>
+              <TableCell>
+                <Chip
+                  label={color.destroy ? 'Ngừng hiển thị' : 'Đang hoạt động'}
+                  color={color.destroy ? 'error' : 'success'}
+                  size='lagre'
+                  sx={{ width: 120, fontWeight: 800 }}
+                />
+              </TableCell>
+            </TableRow>
+
+            <TableRow>
+              <TableCell sx={{ fontWeight: 'bold' }}>Ngày tạo</TableCell>
+              <TableCell>{formatDate(color.createdAt)}</TableCell>
+            </TableRow>
+
+            <TableRow>
+              <TableCell sx={{ fontWeight: 'bold', borderBottom: 0 }}>
+                Ngày cập nhật
+              </TableCell>
+              <TableCell sx={{ borderBottom: 0 }}>
+                {formatDate(color.updatedAt)}
+              </TableCell>
+            </TableRow>
+          </TableBody>
+        </Table>
       </DialogContent>
       <Divider sx={{ my: 0 }} />
       <DialogActions sx={{ padding: '16px 24px' }}>
-        <Button onClick={onClose} color='error' variant='contained'>
+        <Button
+          onClick={onClose}
+          color='error'
+          variant='outlined'
+          sx={{ textTransform: 'none' }}
+        >
           Đóng
         </Button>
       </DialogActions>

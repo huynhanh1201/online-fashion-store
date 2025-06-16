@@ -9,7 +9,8 @@ import {
   Divider,
   Box,
   Typography,
-  IconButton
+  IconButton,
+  Tooltip
 } from '@mui/material'
 import EditIcon from '@mui/icons-material/Edit'
 import DeleteIcon from '@mui/icons-material/Delete'
@@ -106,10 +107,10 @@ const EditCategoryModal = ({ open, onClose, category, onSave }) => {
       open={open}
       onClose={handleClose}
       fullWidth
-      maxWidth='md'
+      maxWidth='lg'
       BackdropProps={{ sx: StyleAdmin.OverlayModal }}
     >
-      <DialogTitle>Sửa danh mục</DialogTitle>
+      <DialogTitle>Sửa thông tin danh mục</DialogTitle>
       <Divider sx={{ my: 0 }} />
       <form onSubmit={handleSubmit(onSubmit)}>
         <DialogContent>
@@ -133,7 +134,8 @@ const EditCategoryModal = ({ open, onClose, category, onSave }) => {
                 backgroundColor: '#fafafa',
                 cursor: 'pointer',
                 width: 350,
-                height: 206
+                height: 345,
+                mt: '14px'
               }}
               onClick={() => !previewUrl && fileInputRef.current.click()}
             >
@@ -151,29 +153,53 @@ const EditCategoryModal = ({ open, onClose, category, onSave }) => {
                   />
                   <Box
                     position='absolute'
-                    top={8}
+                    top={4}
                     right={8}
                     display='flex'
                     gap={1}
                   >
-                    <IconButton
-                      size='small'
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        fileInputRef.current.click()
+                    <Box
+                      sx={{
+                        position: 'absolute',
+                        top: 4,
+                        right: 40,
+                        backgroundColor: 'rgba(255,255,255,0.8)',
+                        borderRadius: 1
                       }}
                     >
-                      <EditIcon fontSize='small' />
-                    </IconButton>
-                    <IconButton
-                      size='small'
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        handleImageRemove()
+                      <Tooltip title='Sửa'>
+                        <IconButton
+                          size='small'
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            fileInputRef.current.click()
+                          }}
+                        >
+                          <EditIcon fontSize='small' color='warning' />
+                        </IconButton>
+                      </Tooltip>
+                    </Box>
+                    <Box
+                      sx={{
+                        position: 'absolute',
+                        top: 4,
+                        right: 4,
+                        backgroundColor: 'rgba(255,255,255,0.8)',
+                        borderRadius: 1
                       }}
                     >
-                      <DeleteIcon fontSize='small' />
-                    </IconButton>
+                      <Tooltip title='Xoá'>
+                        <IconButton
+                          size='small'
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            handleImageRemove()
+                          }}
+                        >
+                          <DeleteIcon fontSize='small' color='error' />
+                        </IconButton>
+                      </Tooltip>
+                    </Box>
                   </Box>
                 </>
               ) : (
@@ -209,7 +235,7 @@ const EditCategoryModal = ({ open, onClose, category, onSave }) => {
                 fullWidth
                 margin='normal'
                 multiline
-                rows={3}
+                rows={10}
                 {...register('description', { required: 'Mô tả là bắt buộc' })}
                 error={!!errors.description}
                 helperText={errors.description?.message}
@@ -220,13 +246,22 @@ const EditCategoryModal = ({ open, onClose, category, onSave }) => {
         </DialogContent>
         <Divider sx={{ my: 0 }} />
         <DialogActions sx={{ padding: '16px 24px' }}>
-          <Button color='inherit' onClick={handleClose}>
+          <Button
+            color='error'
+            variant='outlined'
+            onClick={handleClose}
+            sx={{ textTransform: 'none' }}
+          >
             Hủy
           </Button>
           <Button
             type='submit'
             variant='contained'
-            sx={{ backgroundColor: '#001f5d', color: '#fff' }}
+            sx={{
+              backgroundColor: '#001f5d',
+              color: '#fff',
+              textTransform: 'none'
+            }}
             disabled={isSubmitting}
           >
             {isSubmitting ? 'Đang lưu...' : 'Lưu'}

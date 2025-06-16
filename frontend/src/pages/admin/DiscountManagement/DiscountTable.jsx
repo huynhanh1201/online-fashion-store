@@ -175,6 +175,7 @@ import DiscountRow from './DiscountRow'
 import FilterDiscount from '~/components/FilterAdmin/FilterDiscount'
 import AddIcon from '@mui/icons-material/Add'
 import TablePaginationActions from '~/components/PaginationAdmin/TablePaginationActions.jsx'
+import TableNoneData from '~/components/TableAdmin/NoneData.jsx'
 const DiscountTable = ({
   discounts = [],
   loading = false,
@@ -189,17 +190,20 @@ const DiscountTable = ({
   addDiscount
 }) => {
   const columns = [
-    { id: 'index', label: 'STT', minWidth: 50, align: 'center' },
-    { id: 'code', label: 'Mã giảm', minWidth: 150 },
-    { id: 'type', label: 'Loại', minWidth: 100 },
-    { id: 'amount', label: 'Giá trị giảm', minWidth: 120 },
-    { id: 'minOrderValue', label: 'Giá tối thiểu', minWidth: 100 },
-    { id: 'usageLimit', label: 'SL tối đa', minWidth: 100 },
-    { id: 'remaining', label: 'SL còn lại', minWidth: 100 },
-    { id: 'status', label: 'Trạng thái', minWidth: 130 },
-    { id: 'validFrom', label: 'Ngày bắt đầu', maxWidth: 180 },
-    { id: 'validUntil', label: 'Ngày kết thúc', maxWidth: 180 },
-    { id: 'action', label: 'Hành động', minWidth: 130, align: 'start' }
+    { id: 'index', label: 'STT', align: 'center', width: 50 },
+    { id: 'code', label: 'Mã giảm giá', minWidth: 150 },
+    { id: 'type', label: 'Loại mã giảm giá', minWidth: 130 },
+    { id: 'amount', label: 'Giá trị giảm', minWidth: 120, align: 'start' },
+    {
+      id: 'minOrderValue',
+      label: 'Giá tối thiểu áp dụng',
+      minWidth: 150,
+      align: 'start'
+    },
+    { id: 'usageLimit', label: 'SL tối đa', minWidth: 100, align: 'start' },
+    { id: 'remaining', label: 'SL còn lại', minWidth: 100, align: 'start' },
+    { id: 'status', label: 'Trạng thái hoạt động', minWidth: 150 },
+    { id: 'action', label: 'Hành động', minWidth: 150, align: 'start' }
   ]
 
   return (
@@ -236,7 +240,9 @@ const DiscountTable = ({
                         textTransform: 'none',
                         width: 100,
                         display: 'flex',
-                        alignItems: 'center'
+                        alignItems: 'center',
+                        backgroundColor: '#001f5d',
+                        color: '#fff'
                       }}
                     >
                       Thêm
@@ -258,10 +264,12 @@ const DiscountTable = ({
                   align={column.align || 'left'}
                   sx={{
                     minWidth: column.minWidth,
+                    px: 1,
+                    ...(column.maxWidth && { maxWidth: column.maxWidth }),
                     ...(column.id === 'action' && {
                       width: '130px',
                       maxWidth: '130px',
-                      paddingLeft: '10px'
+                      paddingLeft: '20px'
                     })
                   }}
                 >
@@ -288,11 +296,10 @@ const DiscountTable = ({
                 />
               ))
             ) : (
-              <TableRow>
-                <TableCell colSpan={columns.length} align='center'>
-                  Không có mã giảm giá nào
-                </TableCell>
-              </TableRow>
+              <TableNoneData
+                col={columns.length}
+                message='Không có dữ liệu mã giảm giá.'
+              />
             )}
           </TableBody>
         </Table>

@@ -185,6 +185,7 @@ import ProductRow from './ProductRow'
 import AddIcon from '@mui/icons-material/Add'
 import FilterProduct from '~/components/FilterAdmin/FilterPoduct.jsx'
 import TablePaginationActions from '~/components/PaginationAdmin/TablePaginationActions.jsx'
+import TableNoneData from '~/components/TableAdmin/NoneData.jsx'
 const ProductTable = ({
   products,
   loading,
@@ -202,14 +203,15 @@ const ProductTable = ({
 }) => {
   const columns = [
     { id: 'index', label: 'STT', minWidth: 50, align: 'center' },
-    { id: 'image', label: 'Ảnh', minWidth: 70 },
-    { id: 'productCode', label: 'Mã sản phẩm', minWidth: 150 },
-    { id: 'name', label: 'Tên sản phẩm', minWidth: 350 },
-    { id: 'exportPrice', label: 'Giá bán', minWidth: 150 },
-    { id: 'description', label: 'Mô tả', minWidth: 150 },
-    { id: 'category', label: 'Danh mục', minWidth: 150 },
-    { id: 'status', label: 'Trạng thái', minWidth: 100 },
-    { id: 'action', label: 'Hành động', minWidth: 150, align: 'start' }
+    { id: 'image', label: 'Ảnh', minWidth: 100, align: 'start' },
+    { id: 'productCode', label: 'Mã sản phẩm', minWidth: 100, align: 'start' },
+    { id: 'name', label: 'Tên sản phẩm', minWidth: 250, align: 'start' },
+    { id: 'category', label: 'Danh mục', minWidth: 200, align: 'start' },
+    { id: 'exportPrice', label: 'Giá bán', minWidth: 100, align: 'start' },
+    { id: 'importPrice', label: 'Giá nhập', minWidth: 100, align: 'start' },
+    { id: 'description', label: 'Mô tả', minWidth: 150, align: 'start' },
+    { id: 'status', label: 'Trạng thái', minWidth: 130, align: 'start' },
+    { id: 'action', label: 'Hành động', minWidth: 130, align: 'start' }
   ]
 
   return (
@@ -243,7 +245,9 @@ const ProductTable = ({
                         textTransform: 'none',
                         width: 100,
                         display: 'flex',
-                        alignItems: 'center'
+                        alignItems: 'center',
+                        backgroundColor: '#001f5d',
+                        color: '#fff'
                       }}
                       startIcon={<AddIcon />}
                       onClick={addProduct}
@@ -268,11 +272,14 @@ const ProductTable = ({
                   align={column.align || 'left'}
                   sx={{
                     minWidth: column.minWidth,
+                    whiteSpace: 'nowrap',
+                    fontWeight: 'bold',
+                    px: 1,
                     ...(column.id === 'action' && {
-                      maxWidth: '130px',
-                      paddingLeft: '26px'
+                      maxWidth: 130,
+                      paddingLeft: '16px'
                     }),
-                    ...(column.id === 'index' && { width: '50px' })
+                    ...(column.id === 'index' && { width: 50 })
                   }}
                 >
                   {column.label}
@@ -298,11 +305,10 @@ const ProductTable = ({
                 />
               ))
             ) : (
-              <TableRow>
-                <TableCell colSpan={columns.length} align='center'>
-                  Không có sản phẩm nào.
-                </TableCell>
-              </TableRow>
+              <TableNoneData
+                col={columns.length}
+                message='Không có dữ liệu sản phẩm.'
+              />
             )}
           </TableBody>
         </Table>

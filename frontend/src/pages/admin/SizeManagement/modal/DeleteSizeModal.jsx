@@ -37,11 +37,17 @@ const DeleteSizeModal = ({ open, onClose, size, onDelete }) => {
       <DialogTitle>Xoá kích thước</DialogTitle>
       <Divider sx={{ my: 0 }} />
       <DialogContent>
-        Bạn có chắc chắn muốn xoá kích thước <strong>{size?.name}</strong>?
+        Bạn có chắc chắn muốn xoá kích thước <strong>{size?.name}</strong> này
+        không?
       </DialogContent>
       <Divider sx={{ my: 0 }} />
       <DialogActions sx={{ padding: '16px 24px' }}>
-        <Button onClick={onClose} color='inherit' disabled={isDeleting}>
+        <Button
+          onClick={onClose}
+          color='inherit'
+          disabled={isDeleting}
+          sx={{ textTransform: 'none' }}
+        >
           Hủy
         </Button>
         <Button
@@ -49,6 +55,7 @@ const DeleteSizeModal = ({ open, onClose, size, onDelete }) => {
           color='error'
           variant='contained'
           disabled={isDeleting}
+          sx={{ textTransform: 'none' }}
         >
           {isDeleting ? 'Đang xoá...' : 'Xoá'}
         </Button>

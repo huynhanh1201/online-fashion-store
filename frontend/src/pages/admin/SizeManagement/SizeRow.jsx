@@ -80,11 +80,11 @@ import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye'
 import BorderColorIcon from '@mui/icons-material/BorderColor'
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever'
 import Chip from '@mui/material/Chip'
-
+import Tooltip from '@mui/material/Tooltip'
 const formatDateTime = (isoString) => {
   if (!isoString) return '—'
   const date = new Date(isoString)
-  return date.toLocaleString('vi-VN', {
+  return date.toLocaleDateString('vi-VN', {
     day: '2-digit',
     month: '2-digit',
     year: 'numeric'
@@ -92,6 +92,18 @@ const formatDateTime = (isoString) => {
 }
 
 const styles = {
+  cell: {
+    height: 55,
+    minHeight: 55,
+    maxHeight: 55,
+    lineHeight: '49px',
+    py: 0,
+    px: 1,
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    verticalAlign: 'middle'
+  },
   groupIcon: {
     display: 'flex',
     justifyContent: 'center',
@@ -100,65 +112,75 @@ const styles = {
     width: '130px'
   }
 }
+
 export default function SizeRow({ size, index, columns, handleOpenModal }) {
   return (
     <TableRow hover>
       {columns.map(({ id, align }) => {
-        let value
-        switch (id) {
-          case 'index':
-            value = index
-            break
-          case 'name':
-            value = size.name || '—'
-            break
-          case 'destroy':
-            value = (
-              <Chip
-                label={size.destroy ? 'Không hoạt động' : 'Hoạt động'}
-                color={size.destroy ? 'error' : 'success'}
-                size='large'
-                sx={{ width: '127px', fontWeight: '800' }}
-              />
+        let content = null
+
+        if (id === 'index') content = index
+        else if (id === 'name') {
+          const name = size.name || 'Không có tên'
+          content = name
+            .split(' ')
+            .map(
+              (word) =>
+                word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
             )
-            break
-          case 'createdAt':
-            value = formatDateTime(size.createdAt)
-            break
-          case 'updatedAt':
-            value = formatDateTime(size.updatedAt)
-            break
-          case 'action':
-            value = (
-              <Stack direction='row' sx={styles.groupIcon}>
+            .join(' ')
+        } else if (id === 'destroy') {
+          content = (
+            <Chip
+              label={size.destroy ? 'Không hoạt động' : 'Hoạt động'}
+              color={size.destroy ? 'error' : 'success'}
+              size='large'
+              sx={{ width: '127px', fontWeight: '800' }}
+            />
+          )
+        } else if (id === 'createdAt' || id === 'updatedAt') {
+          content = formatDateTime(size[id])
+        } else if (id === 'action') {
+          content = (
+            <Stack direction='row' sx={styles.groupIcon}>
+              <Tooltip title='Xem'>
                 <IconButton
                   onClick={() => handleOpenModal('view', size)}
                   size='small'
                 >
                   <RemoveRedEyeIcon color='primary' />
                 </IconButton>
+              </Tooltip>
+              <Tooltip title='Sửa'>
                 <IconButton
                   onClick={() => handleOpenModal('edit', size)}
                   size='small'
                 >
                   <BorderColorIcon color='warning' />
                 </IconButton>
+              </Tooltip>
+              <Tooltip title='Xoá'>
                 <IconButton
                   onClick={() => handleOpenModal('delete', size)}
                   size='small'
                 >
                   <DeleteForeverIcon color='error' />
                 </IconButton>
-              </Stack>
-            )
-            break
-          default:
-            value = '—'
+              </Tooltip>
+            </Stack>
+          )
+        } else {
+          content = size[id] ?? '—'
         }
 
         return (
-          <TableCell key={id} align={align || 'left'}>
-            {value}
+          <TableCell
+            key={id}
+            align={align || 'left'}
+            title={typeof content === 'string' ? content : undefined}
+            sx={styles.cell}
+          >
+            {content}
           </TableCell>
         )
       })}

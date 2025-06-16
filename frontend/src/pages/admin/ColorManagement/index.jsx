@@ -24,7 +24,7 @@ const ColorManagement = () => {
 
   React.useEffect(() => {
     fetchColors(page, limit, filters)
-  }, [page, limit])
+  }, [page, limit, filters])
 
   const handleOpenModal = (type, color) => {
     if (!color || !color._id) return
@@ -43,7 +43,7 @@ const ColorManagement = () => {
     try {
       const response = await updateColor(colorId, updatedData)
       if (response) {
-        await fetchColors(page, limit)
+        await fetchColors(page, limit, filters)
       } else {
         console.log('Cập nhật không thành công')
       }
@@ -56,7 +56,7 @@ const ColorManagement = () => {
     try {
       const result = await deleteColor(colorId)
       if (result) {
-        await fetchColors(page, limit)
+        await fetchColors(page, limit, filters)
       } else {
         console.log('Xoá không thành công')
       }
@@ -64,10 +64,12 @@ const ColorManagement = () => {
       console.error('Lỗi:', error)
     }
   }
+  const isEqual = (obj1, obj2) => JSON.stringify(obj1) === JSON.stringify(obj2)
+
   const handleFilter = (newFilters) => {
-    setFilters(newFilters)
-    if (Object.keys(newFilters).length > 0) {
-      fetchColors(1, limit, newFilters)
+    if (!isEqual(filters, newFilters)) {
+      setPage(1)
+      setFilters(newFilters)
     }
   }
   return (

@@ -106,7 +106,7 @@ const AddDiscountModal = ({ open, onClose, onAdded }) => {
         sx: StyleAdmin.OverlayModal
       }}
     >
-      <DialogTitle>Thêm mã giảm giá</DialogTitle>
+      <DialogTitle>Thêm mã giảm giá mới</DialogTitle>
       <Divider sx={{ my: 0 }} />
       <form onSubmit={handleSubmit(onSubmit)}>
         <DialogContent>
@@ -229,13 +229,22 @@ const AddDiscountModal = ({ open, onClose, onAdded }) => {
         </DialogContent>
         <Divider sx={{ my: 0 }} />
         <DialogActions sx={{ padding: '16px 24px' }}>
-          <Button onClick={handleClose} color='inherit'>
+          <Button
+            onClick={handleClose}
+            color='error'
+            variant='outlined'
+            sx={{ textTransform: 'none' }}
+          >
             Hủy
           </Button>
           <Button
             type='submit'
             variant='contained'
-            sx={{ backgroundColor: '#001f5d', color: '#fff' }}
+            sx={{
+              backgroundColor: '#001f5d',
+              color: '#fff',
+              textTransform: 'none'
+            }}
             disabled={isSubmitting}
           >
             {isSubmitting ? 'Đang thêm...' : 'Thêm'}

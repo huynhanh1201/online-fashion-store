@@ -9,58 +9,95 @@ import {
   TableBody,
   TableRow,
   TableCell,
-  Chip
+  Chip,
+  Divider
 } from '@mui/material'
 import { Box } from '@mui/system'
+import React from 'react'
 
 const ViewInventoryModal = ({ open, onClose, inventory }) => {
-  const statusColor =
-    inventory?.quantity <= inventory?.minQuantity ? 'error' : 'success'
-  const statusLabel =
-    inventory?.quantity <= inventory?.minQuantity ? 'Cảnh báo' : 'Còn hàng'
-
   return (
-    <Dialog open={open} onClose={onClose} maxWidth='sm' fullWidth>
-      <DialogTitle sx={{ fontWeight: 'bold' }}>Chi tiết tồn kho</DialogTitle>
-      <DialogContent>
+    <Dialog
+      open={open}
+      onClose={onClose}
+      maxWidth='sm'
+      fullWidth
+      sx={{ padding: '16px 24px' }}
+    >
+      <DialogTitle sx={{ fontWeight: 'bold', pl: 5 }}>
+        Thông tin tồn kho
+      </DialogTitle>
+      <Divider />
+      <DialogContent sx={{ py: 0 }}>
         {inventory ? (
           <Box sx={{ mt: 1 }}>
             <Table>
               <TableBody>
                 <TableRow>
                   <TableCell>
+                    <strong>Kho hàng</strong>
+                  </TableCell>
+                  <TableCell>
+                    {inventory.warehouseId?.name
+                      .split(' ')
+                      .map(
+                        (word) =>
+                          word.charAt(0).toUpperCase() +
+                          word.slice(1).toLowerCase()
+                      )
+                      .join(' ') || '—'}
+                  </TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell>
+                    <strong>Tên sản phẩm</strong>
+                  </TableCell>
+                  <TableCell>
+                    {inventory.variantId?.name
+                      .split(' ')
+                      .map(
+                        (word) =>
+                          word.charAt(0).toUpperCase() +
+                          word.slice(1).toLowerCase()
+                      )
+                      .join(' ') || '—'}
+                  </TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell>
                     <strong>Mã biến thể</strong>
                   </TableCell>
                   <TableCell>{inventory.variantId?.sku || '—'}</TableCell>
                 </TableRow>
+
                 <TableRow>
                   <TableCell>
-                    <strong>Kho hàng</strong>
-                  </TableCell>
-                  <TableCell>{inventory.warehouseId?.name || '—'}</TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell>
-                    <strong>Sản phẩm</strong>
-                  </TableCell>
-                  <TableCell>{inventory.variantId?.name || '—'}</TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell>
-                    <strong>Trạng thái</strong>
+                    <strong>Trạng thái tồn kho</strong>
                   </TableCell>
                   <TableCell>
                     <Chip
-                      label={statusLabel}
-                      color={statusColor}
+                      label={
+                        inventory.status === 'in-stock'
+                          ? 'Còn hàng'
+                          : inventory.status === 'low-stock'
+                            ? 'Cảnh báo'
+                            : 'Hết hàng'
+                      }
+                      color={
+                        inventory.status === 'in-stock'
+                          ? 'success'
+                          : inventory.status === 'low-stock'
+                            ? 'warning'
+                            : 'error'
+                      }
                       size='large'
-                      sx={{ width: '120px', fontWeight: '800' }}
+                      sx={{ width: 127, fontWeight: 800 }}
                     />
                   </TableCell>
                 </TableRow>
                 <TableRow>
                   <TableCell>
-                    <strong>Số lượng</strong>
+                    <strong>Số lượng sản phẩm</strong>
                   </TableCell>
                   <TableCell>
                     {inventory.quantity
@@ -105,10 +142,10 @@ const ViewInventoryModal = ({ open, onClose, inventory }) => {
                   </TableCell>
                 </TableRow>
                 <TableRow>
-                  <TableCell>
+                  <TableCell sx={{ borderBottom: 0 }}>
                     <strong>Ngày cập nhật</strong>
                   </TableCell>
-                  <TableCell>
+                  <TableCell sx={{ borderBottom: 0 }}>
                     {inventory.updatedAt
                       ? new Date(inventory.updatedAt).toLocaleString('vi-VN')
                       : '—'}
@@ -121,8 +158,14 @@ const ViewInventoryModal = ({ open, onClose, inventory }) => {
           <Typography>Không có dữ liệu tồn kho</Typography>
         )}
       </DialogContent>
-      <DialogActions>
-        <Button onClick={onClose} variant='outlined' color='primary'>
+      <Divider />
+      <DialogActions sx={{ padding: '16px 24px' }}>
+        <Button
+          onClick={onClose}
+          variant='outlined'
+          color='error'
+          sx={{ textTransform: 'none' }}
+        >
           Đóng
         </Button>
       </DialogActions>

@@ -47,7 +47,7 @@ const EditSizeModal = ({ open, onClose, size, onSave }) => {
         sx: StyleAdmin.OverlayModal
       }}
     >
-      <DialogTitle>Sửa kích thước</DialogTitle>
+      <DialogTitle>Sửa thông tin kích thước</DialogTitle>
       <Divider sx={{ my: 0 }} />
       <DialogContent>
         <form id='edit-size-form' onSubmit={handleSubmit(onSubmit)}>
@@ -64,7 +64,13 @@ const EditSizeModal = ({ open, onClose, size, onSave }) => {
       </DialogContent>
       <Divider sx={{ my: 0 }} />
       <DialogActions sx={{ padding: '16px 24px' }}>
-        <Button onClick={onClose} disabled={isSubmitting} color='inherit'>
+        <Button
+          onClick={onClose}
+          disabled={isSubmitting}
+          color='error'
+          variant='outlined'
+          sx={{ textTransform: 'none' }}
+        >
           Hủy
         </Button>
         <Button
@@ -73,7 +79,11 @@ const EditSizeModal = ({ open, onClose, size, onSave }) => {
           variant='contained'
           disabled={isSubmitting}
           startIcon={isSubmitting ? <CircularProgress size={20} /> : null}
-          sx={{ backgroundColor: '#001f5d', color: '#fff' }}
+          sx={{
+            backgroundColor: '#001f5d',
+            color: '#fff',
+            textTransform: 'none'
+          }}
         >
           {isSubmitting ? 'Đang lưu' : 'Lưu'}
         </Button>

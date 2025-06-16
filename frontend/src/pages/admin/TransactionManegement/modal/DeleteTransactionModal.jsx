@@ -31,30 +31,28 @@ const DeleteTransactionModal = ({
       }}
       PaperProps={{
         sx: {
-          borderRadius: '12px',
           padding: 0
         }
       }}
     >
-      <DialogTitle
-        sx={{
-          fontWeight: 600,
-          fontSize: 20,
-          padding: '16px 24px'
-        }}
-      >
-        Xác nhận xoá giao dịch
-      </DialogTitle>
+      <DialogTitle>Ẩn giao dịch</DialogTitle>
 
       <DialogContent dividers sx={{ padding: '16px 24px' }}>
         <Typography>
-          Bạn có chắc chắn muốn xoá giao dịch có mã{' '}
-          <strong>{transaction?._id}</strong> không?
+          Bạn có chắc chắn muốn ẩn giao dịch
+          <strong> {transaction?._id}</strong> không?
         </Typography>
       </DialogContent>
 
       <DialogActions sx={{ padding: '16px 24px' }}>
-        <Button color='inherit' onClick={onClose} disabled={loading}>
+        <Button
+          color='inherit'
+          onClick={onClose}
+          disabled={loading}
+          sx={{
+            textTransform: 'none'
+          }}
+        >
           Huỷ
         </Button>
         <Button
@@ -62,8 +60,11 @@ const DeleteTransactionModal = ({
           color='error'
           onClick={handleDelete}
           disabled={loading}
+          sx={{
+            textTransform: 'none'
+          }}
         >
-          {loading ? 'Đang xoá' : 'Xoá'}
+          {loading ? 'Đang ẩn' : 'Ẩn'}
         </Button>
       </DialogActions>
     </Dialog>

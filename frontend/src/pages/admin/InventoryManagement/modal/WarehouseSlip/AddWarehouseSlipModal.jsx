@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import {
   Dialog,
   DialogTitle,
@@ -24,7 +24,8 @@ import {
   Select,
   MenuItem,
   Snackbar,
-  Alert
+  Alert,
+  Divider
 } from '@mui/material'
 import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers'
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns'
@@ -32,7 +33,7 @@ import DeleteIcon from '@mui/icons-material/Delete'
 import Search from '~/components/SearchAdmin/Search.jsx'
 import AddPartnerModal from '~/pages/admin/InventoryManagement/modal/Partner/AddPartnerModal.jsx'
 import AddWarehouseModal from '~/pages/admin/InventoryManagement/modal/Warehouse/AddWarehouseModal.jsx'
-
+import Tooltip from '@mui/material/Tooltip'
 export default function AddWarehouseSlipModal({
   open,
   onClose,
@@ -49,13 +50,24 @@ export default function AddWarehouseSlipModal({
   partners,
   addWarehouseSlip,
   addPartner,
-  addWarehouse,
+  addWarehouse
 }) {
   const [isEditing, setIsEditing] = useState(false)
   const [openAddDialog, setOpenAddDialog] = useState(false)
   const [openAddWarehouse, setOpenAddWarehouse] = useState(false)
   const [snackbarOpen, setSnackbarOpen] = useState(false)
   const [errorMessage, setErrorMessage] = useState('')
+
+  useEffect(() => {
+    if (
+      warehouses.length > 0 &&
+      (!newSlipData.warehouseId || newSlipData.warehouseId === '')
+    ) {
+      handleChange('warehouseId')({
+        target: { value: warehouses[0]._id }
+      })
+    }
+  }, [warehouses, newSlipData.warehouseId])
 
   // Sửa lỗi: Đặt openAddWarehouse thành true để mở modal
   const handleOpenAddWarehouse = () => {
@@ -91,9 +103,11 @@ export default function AddWarehouseSlipModal({
       .map((variant) => ({
         _id: variant._id,
         sku: variant.sku,
-        name: `${variant.sku || ''} - ${variant.name || ''}`,
+        name: `${variant.sku || ''} - ${variant.name || ''}`
       }))
-      .filter((item) => normalizeVietnamese(item.name).includes(searchNormalized))
+      .filter((item) =>
+        normalizeVietnamese(item.name).includes(searchNormalized)
+      )
   }
 
   const getSkuFromVariantId = (variantId) => {
@@ -187,33 +201,66 @@ export default function AddWarehouseSlipModal({
       <Dialog
         open={open}
         onClose={onClose}
-        maxWidth="xl"
+        maxWidth='xl'
         fullWidth
-        sx={{ maxHeight: '95vh', marginTop: '60px' }}
+        sx={{
+          mt: '64px',
+          '& .MuiDialog-container': { alignItems: 'end' },
+          '& .MuiDialog-paper': {
+            maxHeight: '96%',
+            height: '96%',
+            mt: 0,
+            mb: 2.4
+          }
+        }}
       >
         <Box
           sx={{
             display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
+            justifyContent: 'start',
+            alignItems: 'start',
+            flexDirection: 'column',
+            mb: '20px'
           }}
         >
-          <DialogTitle sx={{ fontWeight: 600, fontSize: 20, padding: '20px 0 0 24px' }}>
-            {type === 'input' ? 'Nhập kho' : 'Xuất kho'} – Tạo phiếu mới
+          <DialogTitle
+            sx={{ fontWeight: 600, fontSize: 20, padding: '20px 0 0 24px' }}
+          >
+            {type === 'input' ? 'Tạo phiếu nhập kho' : 'Tạo phiếu xuất kho'}
           </DialogTitle>
-          <DialogActions sx={{ padding: '20px 24px 0 0' }}>
-            {!isEditing && (
-              <Button onClick={() => setIsEditing(true)} sx={{ display: 'none' }}>
-                Sửa
-              </Button>
-            )}
-            <Button onClick={onClose}>Hủy</Button>
-            <Button variant="contained" color="success" onClick={onSubmit}>
+
+          <DialogActions sx={{ padding: '8px 0 0 20px' }}>
+            {/*{!isEditing && (*/}
+            {/*  <Button*/}
+            {/*    onClick={() => setIsEditing(true)}*/}
+            {/*    sx={{ display: 'none', textTransform: 'none' }}*/}
+            {/*  >*/}
+            {/*    Sửa*/}
+            {/*  </Button>*/}
+            {/*)}*/}
+            <Button
+              onClick={onClose}
+              sx={{ textTransform: 'none' }}
+              variant='outlined'
+              color='error'
+            >
+              Hủy
+            </Button>
+            <Button
+              variant='contained'
+              color='success'
+              onClick={onSubmit}
+              sx={{
+                backgroundColor: '#001f5d',
+                color: '#fff',
+                textTransform: 'none'
+              }}
+            >
               Duyệt & Hoàn thành
             </Button>
           </DialogActions>
         </Box>
-
+        <Divider />
         <DialogContent>
           <Card variant='outlined' sx={{ mb: 2 }}>
             <CardContent>
@@ -221,7 +268,7 @@ export default function AddWarehouseSlipModal({
                 <Grid item size={4} sm={6} md={4}>
                   <DatePicker
                     sx={{ width: '100%' }}
-                    label="Ngày nhập"
+                    label='Ngày nhập'
                     value={newSlipData.date || null}
                     onChange={handleDateChange}
                     slotProps={{ textField: { fullWidth: true } }} // Cập nhật để tương thích với MUI v6
@@ -230,42 +277,53 @@ export default function AddWarehouseSlipModal({
                 <Grid item size={4} sm={6} md={4}>
                   <FormControl fullWidth>
                     <InputLabel>Kho nhập hàng</InputLabel>
-                    <Select
-                      value={newSlipData.warehouseId || ''}
-                      onChange={handleChange('warehouseId')}
-                    >
-                      <MenuItem onClick={handleOpenAddWarehouse}>
-                        Thêm kho
-                      </MenuItem>
-                      {warehouses.map((warehouse) => (
-                        <MenuItem key={warehouse._id} value={warehouse._id}>
-                          {warehouse.name}
+                    {warehouses.length > 0 ? (
+                      <Select
+                        label='Kho nhập hàng'
+                        value={newSlipData.warehouseId || ''}
+                        onChange={handleChange('warehouseId')}
+                      >
+                        {warehouses.map((warehouse) => (
+                          <MenuItem key={warehouse._id} value={warehouse._id}>
+                            {warehouse.name}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    ) : (
+                      <Select
+                        label='Kho nhập hàng'
+                        value=''
+                        onChange={handleChange('warehouseId')}
+                      >
+                        <MenuItem onClick={handleOpenAddWarehouse}>
+                          Thêm kho
                         </MenuItem>
-                      ))}
-                    </Select>
+                      </Select>
+                    )}
                   </FormControl>
                 </Grid>
                 <Grid item size={4} sm={6} md={4}>
                   <FormControl fullWidth>
                     <InputLabel>Nhà cung cấp</InputLabel>
                     <Select
+                      label={'Nhà cung cấp'}
                       value={newSlipData.partnerId || ''}
                       onChange={handleChange('partnerId')}
                     >
-                      <MenuItem onClick={() => setOpenAddDialog(true)}>
-                        Thêm nhà cung cấp
-                      </MenuItem>
                       {partners.map((partner) => (
                         <MenuItem key={partner._id} value={partner._id}>
                           {partner.name}
                         </MenuItem>
                       ))}
+                      <MenuItem onClick={() => setOpenAddDialog(true)}>
+                        Thêm nhà cung cấp
+                      </MenuItem>
                     </Select>
                   </FormControl>
                 </Grid>
                 <Grid item size={12}>
                   <TextField
-                    label="Ghi chú"
+                    label='Ghi chú'
                     value={newSlipData.note || ''}
                     onChange={handleChange('note')}
                     fullWidth
@@ -276,10 +334,10 @@ export default function AddWarehouseSlipModal({
               </Grid>
             </CardContent>
             {isEditing && (
-              <Box mt={2} display="flex" justifyContent="flex-end">
+              <Box mt={2} display='flex' justifyContent='flex-end'>
                 <Button
-                  variant="contained"
-                  color="primary"
+                  variant='contained'
+                  color='primary'
                   onClick={() => setIsEditing(false)}
                 >
                   Lưu
@@ -290,18 +348,24 @@ export default function AddWarehouseSlipModal({
               </Box>
             )}
           </Card>
-          <Paper variant="outlined" sx={{ mb: 3 }}>
-            <Box p={2} sx={{ minHeight: '350px' }}>
+          <Paper variant='outlined'>
+            <Box p={2} sx={{ minHeight: '295px' }}>
               <Typography fontWeight={600} mb={1}>
                 Danh sách sản phẩm {type === 'input' ? 'nhập' : 'xuất'}
               </Typography>
-              <TableContainer sx={{ minHeight: '350px', overflow: 'auto', zIndex: 0 }}>
-                <Table stickyHeader size="small">
+              <TableContainer
+                sx={{ minHeight: '288px', overflow: 'auto', zIndex: 0 }}
+              >
+                <Table stickyHeader size='small'>
                   <TableHead>
                     <TableRow>
-                      <TableCell>STT</TableCell>
+                      <TableCell sx={{ width: 60, textAlign: 'center' }}>
+                        STT
+                      </TableCell>
                       <TableCell>Variant</TableCell>
-                      <TableCell>SL {type === 'input' ? 'nhập' : 'xuất'}</TableCell>
+                      <TableCell>
+                        SL {type === 'input' ? 'nhập' : 'xuất'}
+                      </TableCell>
                       <TableCell>Đơn vị</TableCell>
                       <TableCell>Thao tác</TableCell>
                     </TableRow>
@@ -309,32 +373,42 @@ export default function AddWarehouseSlipModal({
                   <TableBody>
                     {items.map((item, index) => (
                       <TableRow key={index}>
-                        <TableCell>{index + 1}</TableCell>
+                        <TableCell sx={{ width: 60, textAlign: 'center' }}>
+                          {index + 1}
+                        </TableCell>
                         <TableCell sx={{ position: 'relative', minWidth: 200 }}>
                           <Search
                             data={filterVariantsBySkuAndName}
                             onSelect={(selectedVariantId) =>
-                              handleItemChange(index, 'variantId')({
-                                target: { value: selectedVariantId },
+                              handleItemChange(
+                                index,
+                                'variantId'
+                              )({
+                                target: { value: selectedVariantId }
                               })
                             }
-                            searchText={getSkuFromVariantId(item.variantId) || ''}
+                            searchText={
+                              getSkuFromVariantId(item.variantId) || ''
+                            }
                             setSearchText={(value) =>
-                              handleItemChange(index, 'variantId')({
-                                target: { value },
+                              handleItemChange(
+                                index,
+                                'variantId'
+                              )({
+                                target: { value }
                               })
                             }
-                            placeholder="Tìm theo SKU hoặc tên..."
+                            placeholder='Tìm theo SKU hoặc tên...'
                             index={index}
                           />
                         </TableCell>
                         <TableCell sx={{ minWidth: 100 }}>
                           <TextField
-                            type="number"
+                            type='number'
                             value={item.quantity || ''}
                             onChange={handleItemChange(index, 'quantity')}
                             fullWidth
-                            size="small"
+                            size='small'
                           />
                         </TableCell>
                         <TableCell sx={{ minWidth: 100 }}>
@@ -342,34 +416,54 @@ export default function AddWarehouseSlipModal({
                             value={item.unit || 'cái'}
                             onChange={handleItemChange(index, 'unit')}
                             fullWidth
-                            size="small"
+                            size='small'
                           />
                         </TableCell>
-                        <TableCell sx={{ minWidth: 100 }}>
-                          <IconButton onClick={() => handleDeleteRow(index)}>
-                            <DeleteIcon color="error" />
-                          </IconButton>
+                        <TableCell sx={{ minWidth: 100, width: 100 }}>
+                          <Tooltip title='Xoá'>
+                            <IconButton
+                              sx={{ ml: -1.6 }}
+                              onClick={() => handleDeleteRow(index)}
+                            >
+                              <DeleteIcon color='error' />
+                            </IconButton>
+                          </Tooltip>
                         </TableCell>
                       </TableRow>
                     ))}
                   </TableBody>
                 </Table>
               </TableContainer>
-              <Box display="flex" justifyContent="space-between" mt={2}>
-                <Button variant="outlined" onClick={handleAddRow}>
-                  + Thêm dòng
-                </Button>
-                <Box display="flex" gap={3}>
-                  <Typography variant="body2">Tổng dòng: {items.length}</Typography>
-                  <Typography variant="body2">
-                    Tổng SL:{' '}
-                    {items.reduce((sum, item) => sum + (parseInt(item.quantity) || 0), 0)}
-                  </Typography>
-                </Box>
-              </Box>
             </Box>
           </Paper>
         </DialogContent>
+        <Box
+          display='flex'
+          justifyContent='space-between'
+          sx={{ px: 3, py: 2, borderTop: '1px solid #e0e0e0' }}
+        >
+          <Button
+            variant='contained'
+            onClick={handleAddRow}
+            sx={{
+              backgroundColor: '#001f5d',
+              color: '#fff',
+              textTransform: 'none'
+            }}
+          >
+            + Thêm dòng
+          </Button>
+          <Box display='flex' gap={3} alignItems='center'>
+            <Typography variant='body2'>Tổng dòng: {items.length}</Typography>
+            <Typography variant='body2'>
+              Tổng SL:{' '}
+              {items.reduce(
+                (sum, item) => sum + (parseInt(item.quantity) || 0),
+                0
+              )}
+            </Typography>
+          </Box>
+        </Box>
         <AddPartnerModal
           open={openAddDialog}
           onClose={handleCloseAddDialog}

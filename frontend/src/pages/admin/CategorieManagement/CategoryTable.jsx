@@ -16,6 +16,8 @@ import CategoryRow from './CategoryRow'
 import AddIcon from '@mui/icons-material/Add'
 import FilterCategory from '~/components/FilterAdmin/FilterCategory.jsx'
 import TablePaginationActions from '~/components/PaginationAdmin/TablePaginationActions.jsx'
+import TableNoneData from '~/components/TableAdmin/NoneData.jsx'
+
 const CategoryTable = ({
   categories,
   page,
@@ -30,15 +32,33 @@ const CategoryTable = ({
   onChangeRowsPerPage
 }) => {
   const columns = [
-    { id: 'index', label: 'STT', minWidth: 50, align: 'center' },
-    { id: 'image', label: 'Hình ảnh', minWidth: 100, align: 'center' },
-    { id: 'name', label: 'Tên danh mục', minWidth: 200 },
-    { id: 'description', label: 'Mô tả', minWidth: 400 },
-    { id: 'destroy', label: 'Trạng thái', minWidth: 150, align: 'start' },
-    { id: 'createdAt', label: 'Ngày tạo', minWidth: 150 },
-    { id: 'updatedAt', label: 'Ngày cập nhật', minWidth: 150 },
-    { id: 'action', label: 'Hành động', minWidth: 150, align: 'start' }
+    { id: 'index', label: 'STT', align: 'center', width: 50 },
+    { id: 'image', label: 'Hình ảnh', align: 'start', minWidth: 100 },
+    { id: 'name', label: 'Tên danh mục', align: 'left', minWidth: 200 },
+    {
+      id: 'description',
+      label: 'Mô tả danh mục',
+      align: 'left',
+      minWidth: 280
+    },
+
+    { id: 'createdAt', label: 'Ngày tạo', align: 'start', minWidth: 150 },
+    { id: 'updatedAt', label: 'Ngày cập nhật', align: 'start', minWidth: 150 },
+    {
+      id: 'destroy',
+      label: 'Trạng thái danh mục',
+      align: 'center',
+      minWidth: 170
+    },
+    {
+      id: 'action',
+      label: 'Hành động',
+      align: 'start',
+      width: 150,
+      maxWidth: 150
+    }
   ]
+
   return (
     <Paper sx={{ border: '1px solid #ccc', width: '100%', overflow: 'hidden' }}>
       <TableContainer>
@@ -65,15 +85,15 @@ const CategoryTable = ({
                       Danh Sách Danh Mục
                     </Typography>
                     <Button
-                      variant='contained'
-                      color='primary'
                       onClick={addCategory}
                       startIcon={<AddIcon />}
                       sx={{
                         textTransform: 'none',
                         width: 100,
                         display: 'flex',
-                        alignItems: 'center'
+                        alignItems: 'center',
+                        backgroundColor: '#001f5d',
+                        color: '#fff'
                       }}
                     >
                       Thêm
@@ -95,11 +115,12 @@ const CategoryTable = ({
                   align={column.align}
                   sx={{
                     minWidth: column.minWidth,
+                    px: 1,
                     ...(column.id === 'index' && { width: '50px' }),
                     ...(column.id === 'action' && {
                       width: '130px',
                       maxWidth: '130px',
-                      paddingLeft: '26px'
+                      px: 2
                     })
                   }}
                 >
@@ -126,11 +147,10 @@ const CategoryTable = ({
                 />
               ))
             ) : (
-              <TableRow>
-                <TableCell colSpan={columns.length} align='center'>
-                  Không có danh mục nào.
-                </TableCell>
-              </TableRow>
+              <TableNoneData
+                col={columns.length}
+                message='Không có dữ liệu danh mục sản phẩm.'
+              />
             )}
           </TableBody>
         </Table>

@@ -6,7 +6,8 @@ import {
   DialogActions,
   TextField,
   Button,
-  Grid
+  Grid,
+  Divider
 } from '@mui/material'
 import { useForm, Controller } from 'react-hook-form'
 
@@ -53,7 +54,8 @@ const EditBatchModal = ({
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth='sm' fullWidth>
-      <DialogTitle>Sửa Lô Hàng</DialogTitle>
+      <DialogTitle>Sửa thông tin Lô Hàng</DialogTitle>
+      <Divider />
       <form onSubmit={handleSubmit(onSubmit)}>
         <DialogContent dividers>
           <Grid container spacing={2}>
@@ -109,10 +111,24 @@ const EditBatchModal = ({
             </Grid>
           </Grid>
         </DialogContent>
-
-        <DialogActions>
-          <Button onClick={onClose}>Huỷ</Button>
-          <Button type='submit' variant='contained' color='primary'>
+        <Divider />
+        <DialogActions sx={{ padding: '16px 24px' }}>
+          <Button
+            onClick={onClose}
+            sx={{ textTransform: 'none' }}
+            color='error'
+            variant='outlined'
+          >
+            Huỷ
+          </Button>
+          <Button
+            type='submit'
+            sx={{
+              backgroundColor: '#001f5d',
+              color: '#fff',
+              textTransform: 'none'
+            }}
+          >
             Lưu
           </Button>
         </DialogActions>

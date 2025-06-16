@@ -29,7 +29,7 @@ const TransactionManagement = () => {
 
   useEffect(() => {
     fetchTransactions(page, limit, filters)
-  }, [page, limit])
+  }, [page, limit, filters])
 
   const handleOpenView = async (transaction) => {
     const detail = await getTransactionDetail(transaction._id)
@@ -63,10 +63,12 @@ const TransactionManagement = () => {
 
   const handleChangePage = (event, value) => setPage(value)
 
+  const isEqual = (obj1, obj2) => JSON.stringify(obj1) === JSON.stringify(obj2)
+
   const handleFilter = (newFilters) => {
-    setFilters(newFilters)
-    if (Object.keys(newFilters).length > 0) {
-      fetchTransactions(1, limit, newFilters)
+    if (!isEqual(filters, newFilters)) {
+      setPage(1)
+      setFilters(newFilters)
     }
   }
   return (

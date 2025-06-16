@@ -53,8 +53,19 @@ const EditTransactionModal = ({
       <DialogContent>
         <Stack spacing={2} mt={1}>
           <TextField
+            label='Mã giao dịch (transactionId)'
+            value={transaction.transactionId || 'Thanh toán COD'}
+            fullWidth
+            InputProps={{ readOnly: true }}
+            sx={{
+              ...StyleAdmin.InputCustom,
+              ...StyleAdmin.InputCustom.CursorNone,
+              ...StyleAdmin.InputCustom.InputViews
+            }}
+          />
+          <TextField
             label='Mã đơn hàng'
-            value={transaction.orderId._id}
+            value={transaction.orderCode}
             fullWidth
             InputProps={{ readOnly: true }}
             sx={{
@@ -74,17 +85,7 @@ const EditTransactionModal = ({
               ...StyleAdmin.InputCustom.InputViews
             }}
           />
-          <TextField
-            label='Mã giao dịch (transactionId)'
-            value={transaction._id || ''}
-            fullWidth
-            InputProps={{ readOnly: true }}
-            sx={{
-              ...StyleAdmin.InputCustom,
-              ...StyleAdmin.InputCustom.CursorNone,
-              ...StyleAdmin.InputCustom.InputViews
-            }}
-          />
+
           <FormControl
             fullWidth
             margin='normal'
@@ -119,11 +120,20 @@ const EditTransactionModal = ({
       </DialogContent>
       <Divider />
       <DialogActions sx={{ padding: '16px 24px' }}>
-        <Button onClick={onClose} color='inherit'>
+        <Button
+          onClick={onClose}
+          color='error'
+          variant='outlined'
+          sx={{ textTransform: 'none' }}
+        >
           Huỷ
         </Button>
         <Button
-          sx={{ backgroundColor: '#001f5d', color: '#fff' }}
+          sx={{
+            backgroundColor: '#001f5d',
+            color: '#fff',
+            textTransform: 'none'
+          }}
           onClick={handleSubmit(handleFormSubmit)}
           disabled={loading}
         >

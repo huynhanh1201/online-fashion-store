@@ -19,6 +19,7 @@ const statusOptions = [
   'Pending',
   'Processing',
   'Shipped',
+  'Shipping',
   'Delivered',
   'Cancelled'
 ]
@@ -31,6 +32,8 @@ const translateStatus = (status) => {
       return 'Đang xử lý'
     case 'Shipped':
       return 'Đã gửi hàng'
+    case 'Shipping':
+      return 'Đang giao hàng'
     case 'Delivered':
       return 'Đã giao hàng'
     case 'Cancelled':
@@ -39,41 +42,6 @@ const translateStatus = (status) => {
       return status
   }
 }
-
-const translatePaymentStatus = (status) => {
-  switch (status) {
-    case 'Pending':
-      return 'Đang chờ'
-    case 'Completed':
-      return 'Hoàn tất'
-    case 'Failed':
-      return 'Thất bại'
-    default:
-      return status
-  }
-}
-
-const translatePaymentMethod = (method) => {
-  switch (method) {
-    case 'COD':
-      return 'Thanh toán khi nhận hàng'
-    case 'vnpay':
-      return 'VNPay'
-    case 'momo':
-      return 'Momo'
-    case 'paypal':
-      return 'PayPal'
-    case 'credit_card':
-      return 'Thẻ tín dụng'
-    default:
-      return method
-  }
-}
-
-const paymentStatusOptions = ['Pending', 'Completed', 'Failed']
-
-const paymentMethodOptions = ['COD', 'vnpay', 'momo', 'paypal', 'credit_card']
-
 const EditOrderModal = ({ open, onClose, order, onUpdate, loading }) => {
   const {
     control,
@@ -229,7 +197,7 @@ const EditOrderModal = ({ open, onClose, order, onUpdate, loading }) => {
 
       {/* Footer */}
       <DialogActions sx={{ padding: '16px 24px' }}>
-        <Button onClick={onClose} color='inherit'>
+        <Button onClick={onClose} color='error' variant='outlined'>
           Hủy
         </Button>
         <Button

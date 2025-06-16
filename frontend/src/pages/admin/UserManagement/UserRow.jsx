@@ -97,7 +97,11 @@ export default React.memo(function UserRow({
       {columns.map((column) => {
         if (column.id === 'action') {
           return (
-            <TableCell key={column.id} align={column.align}>
+            <TableCell
+              key={column.id}
+              align={column.align}
+              sx={{ minHeight: 90, height: 90 }}
+            >
               <Stack direction='row' sx={styles.groupIcon}>
                 <IconButton
                   onClick={() => handleOpenModal('view', user)}
@@ -136,6 +140,7 @@ export default React.memo(function UserRow({
                 ? 'hide-on-mobile'
                 : ''
             }
+            sx={{ minHeight: 90, height: 90 }}
           >
             {column.id === 'name' && value
               ? value

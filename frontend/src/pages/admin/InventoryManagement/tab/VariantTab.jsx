@@ -29,7 +29,9 @@ import useColors from '~/hooks/admin/useColor.js'
 import useSizes from '~/hooks/admin/useSize.js'
 import TablePaginationActions from '~/components/PaginationAdmin/TablePaginationActions.jsx'
 import Chip from '@mui/material/Chip'
-
+import Stack from '@mui/material/Stack'
+import TableNoneData from '~/components/TableAdmin/NoneData.jsx'
+import Tooltip from '@mui/material/Tooltip'
 const VariantsTab = () => {
   const {
     variants,
@@ -68,14 +70,14 @@ const VariantsTab = () => {
   }, [])
   useEffect(() => {
     fetchVariants(page, rowsPerPage, filter)
-  }, [page, rowsPerPage])
+  }, [page, rowsPerPage, filter])
   const handleAddVariant = () => {
     setOpenAddModal(true)
   }
 
   const handleCloseAddModal = () => {
     setOpenAddModal(false)
-    fetchVariants(1, rowsPerPage)
+    fetchVariants(page, rowsPerPage, filter)
   }
 
   const handleViewVariant = (variant) => {
@@ -96,13 +98,13 @@ const VariantsTab = () => {
   const handleCloseViewModal = () => {
     setOpenViewModal(false)
     setSelectedVariant(null)
-    fetchVariants(1, rowsPerPage)
+    fetchVariants(page, rowsPerPage, filter)
   }
 
   const handleCloseEditModal = () => {
     setOpenEditModal(false)
     setSelectedVariant(null)
-    fetchVariants(1, rowsPerPage)
+    fetchVariants(page, rowsPerPage, filter)
   }
 
   const handleCloseDeleteModal = () => {
@@ -111,14 +113,23 @@ const VariantsTab = () => {
   }
 
   const variantColumns = [
-    { id: 'sku', label: 'SKU', minWidth: 100 },
-    { id: 'name', label: 'Tên biến thể', minWidth: 150 },
-    { id: 'color.name', label: 'Màu sắc', minWidth: 100 },
-    { id: 'size.name', label: 'Kích thước', minWidth: 100 },
+    {
+      id: 'index',
+      label: 'STT',
+      minWidth: 50,
+      maxWidth: 50,
+      width: 50,
+      align: 'center'
+    },
+    { id: 'sku', label: 'Mã biến thể', minWidth: 100 },
+    { id: 'name', label: 'Tên sản phẩm', minWidth: 250 },
+    { id: 'color.name', label: 'Màu sắc', minWidth: 150 },
+    { id: 'size.name', label: 'Kích thước', minWidth: 150 },
     {
       id: 'importPrice',
       label: 'Giá nhập',
       minWidth: 150,
+      maxWidth: 150,
       align: 'start',
       format: (value) => `${value.toLocaleString('vi-VN')}đ`
     },
@@ -126,10 +137,16 @@ const VariantsTab = () => {
       id: 'exportPrice',
       label: 'Giá bán',
       minWidth: 150,
+      maxWidth: 150,
       align: 'start',
       format: (value) => `${value.toLocaleString('vi-VN')}đ`
     },
-    { id: 'destroy', label: 'Trạng thái', minWidth: 150, align: 'start' },
+    {
+      id: 'destroy',
+      label: 'Trạng thái biến thể',
+      minWidth: 150,
+      align: 'start'
+    },
     {
       id: 'createdAt',
       label: 'Ngày tạo',
@@ -137,20 +154,15 @@ const VariantsTab = () => {
       align: 'start',
       format: (value) => new Date(value).toLocaleDateString('vi-VN')
     },
-    {
-      id: 'updatedAt',
-      label: 'Ngày cập nhật',
-      minWidth: 150,
-      align: 'start',
-      format: (value) => new Date(value).toLocaleDateString('vi-VN')
-    },
     { id: 'action', label: 'Hành động', minWidth: 150, align: 'start' }
   ]
 
+  const isEqual = (obj1, obj2) => JSON.stringify(obj1) === JSON.stringify(obj2)
+
   const handleFilter = (newFilters) => {
-    setFilter(newFilters)
-    if (Object.keys(newFilters).length > 0) {
-      fetchVariants(1, rowsPerPage, newFilters)
+    if (!isEqual(filter, newFilters)) {
+      setPage(1)
+      setFilter(newFilters)
     }
   }
   const formatCurrency = (value) => {
@@ -201,7 +213,9 @@ const VariantsTab = () => {
                         textTransform: 'none',
                         width: 100,
                         display: 'flex',
-                        alignItems: 'center'
+                        alignItems: 'center',
+                        backgroundColor: '#001f5d',
+                        color: '#fff'
                       }}
                     >
                       Thêm
@@ -223,9 +237,12 @@ const VariantsTab = () => {
               {variantColumns.map((column) => (
                 <TableCell
                   key={column.id}
-                  align={column.align}
-                  style={{ minWidth: column.minWidth }}
+                  align={column.align || 'left'}
                   sx={{
+                    minWidth: column.minWidth,
+                    width: column.width,
+                    px: 1,
+                    ...(column.maxWidth && { maxWidth: column.maxWidth }),
                     ...(column.id === 'action' && {
                       width: '130px',
                       maxWidth: '130px',
@@ -239,59 +256,142 @@ const VariantsTab = () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {enrichedVariants.map((row, index) => (
-              <TableRow hover role='checkbox' tabIndex={-1} key={index}>
-                {variantColumns.map((column) => {
-                  let value = column.id.includes('.')
-                    ? column.id.split('.').reduce((o, i) => o[i], row)
-                    : row[column.id]
-                  if (column.id === 'destroy') {
-                    return (
-                      <TableCell key={column.id} align={column.align}>
-                        <Chip
-                          label={value ? 'Đã huỷ' : 'Còn hàng'}
-                          color={value ? 'error' : 'success'}
-                          size='large'
-                          sx={{ width: '127px', fontWeight: '800' }}
-                        />
-                      </TableCell>
-                    )
-                  }
-                  if (column.id === 'action') {
-                    return (
-                      <TableCell key={column.id} align={column.align}>
-                        <IconButton
-                          onClick={() => handleViewVariant(row)}
-                          size='small'
-                          color='primary'
-                        >
-                          <RemoveRedEyeIcon color='primary' />
-                        </IconButton>
-                        <IconButton
-                          onClick={() => handleEditVariant(row)}
-                          size='small'
-                          color='info'
-                        >
-                          <BorderColorIcon color='warning' />
-                        </IconButton>
-                        <IconButton
-                          onClick={() => handleDeleteVariant(row)}
-                          size='small'
-                          color='error'
-                        >
-                          <DeleteForeverIcon color='error' />
-                        </IconButton>
-                      </TableCell>
-                    )
-                  }
-                  return (
-                    <TableCell key={column.id} align={column.align}>
-                      {column.format ? column.format(value) : value || '—'}
-                    </TableCell>
-                  )
-                })}
+            {loadingVariant ? (
+              <TableRow>
+                <TableCell colSpan={variantColumns.length} align='center'>
+                  Đang tải dữ liệu...
+                </TableCell>
               </TableRow>
-            ))}
+            ) : enrichedVariants.length === 0 ? (
+              <TableNoneData
+                col={variantColumns.length}
+                message='Không có dữ liệu biến thể.'
+              />
+            ) : (
+              enrichedVariants.map((row, index) => (
+                <TableRow hover role='checkbox' tabIndex={-1} key={index}>
+                  {variantColumns.map((column) => {
+                    const getValueByPath = (obj, path) =>
+                      path
+                        .split('.')
+                        .reduce((acc, key) => (acc ? acc[key] : undefined), obj)
+
+                    const { id, align, format } = column
+                    const rawValue = id.includes('.')
+                      ? getValueByPath(row, id)
+                      : row[id]
+                    let content = rawValue ?? '—'
+                    if (column.id === 'index') {
+                      content = (page - 1) * rowsPerPage + index + 1
+                    }
+                    if (id === 'name') {
+                      const name = row.name || 'Không có tên sản phẩm'
+                      content = name
+                        .toLowerCase()
+                        .split(' ')
+                        .map(
+                          (word) => word.charAt(0).toUpperCase() + word.slice(1)
+                        )
+                        .join(' ')
+                    }
+                    if (format) content = format(rawValue)
+                    if (id === 'color.name') {
+                      content =
+                        row.color?.name
+                          .split(' ')
+                          .map(
+                            (word) =>
+                              word.charAt(0).toUpperCase() +
+                              word.slice(1).toLowerCase()
+                          )
+                          .join(' ') || 'Không có màu sắc'
+                    }
+                    if (id === 'size.name') {
+                      content =
+                        row.size?.name
+                          .split(' ')
+                          .map(
+                            (word) =>
+                              word.charAt(0).toUpperCase() +
+                              word.slice(1).toLowerCase()
+                          )
+                          .join(' ') || 'Không có màu sắc'
+                    }
+                    if (id === 'destroy') {
+                      content = (
+                        <Chip
+                          label={rawValue ? 'Đã huỷ' : 'Còn hàng'}
+                          color={rawValue ? 'error' : 'success'}
+                          size='large'
+                          sx={{ width: 127, fontWeight: 800 }}
+                        />
+                      )
+                    }
+
+                    if (id === 'action') {
+                      content = (
+                        <Stack
+                          direction='row'
+                          spacing={1}
+                          justifyContent='center'
+                        >
+                          <Tooltip title='Xem'>
+                            <IconButton
+                              onClick={() => handleViewVariant(row)}
+                              size='small'
+                            >
+                              <RemoveRedEyeIcon color='primary' />
+                            </IconButton>
+                          </Tooltip>
+                          <Tooltip title='Sửa'>
+                            <IconButton
+                              onClick={() => handleEditVariant(row)}
+                              size='small'
+                            >
+                              <BorderColorIcon color='warning' />
+                            </IconButton>
+                          </Tooltip>
+                          <Tooltip title='Xoá'>
+                            <IconButton
+                              onClick={() => handleDeleteVariant(row)}
+                              size='small'
+                            >
+                              <DeleteForeverIcon color='error' />
+                            </IconButton>
+                          </Tooltip>
+                        </Stack>
+                      )
+                    }
+
+                    return (
+                      <TableCell
+                        key={id}
+                        align={align || 'left'}
+                        title={
+                          typeof content === 'string' ? content : undefined
+                        }
+                        sx={{
+                          height: 55,
+                          minHeight: 55,
+                          maxHeight: 55,
+                          py: 0,
+                          px: 1,
+                          whiteSpace: 'nowrap',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                          verticalAlign: 'middle',
+                          ...(id === 'sku' || id === 'name'
+                            ? { maxWidth: 150 } // Ẩn tràn nếu mã hoặc tên dài
+                            : {})
+                        }}
+                      >
+                        {content}
+                      </TableCell>
+                    )
+                  })}
+                </TableRow>
+              ))
+            )}
           </TableBody>
         </Table>
       </TableContainer>

@@ -12,7 +12,8 @@ import {
   Table,
   TableBody,
   TableRow,
-  TableCell
+  TableCell,
+  Divider
 } from '@mui/material'
 
 const ViewInventoryLogModal = ({ open, onClose, log }) => {
@@ -20,35 +21,52 @@ const ViewInventoryLogModal = ({ open, onClose, log }) => {
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth='sm' fullWidth>
-      <DialogTitle>Chi tiết lịch sử biến động kho</DialogTitle>
-      <DialogContent>
+      <DialogTitle>
+        Thông tin lịch sử phiếu {log.type === 'in' ? 'nhập' : 'xuất'} kho
+      </DialogTitle>
+      <Divider />
+      <DialogContent sx={{ py: 0 }}>
         <Table>
           <TableBody>
             <TableRow>
               <TableCell>
-                <strong>Mã phiếu</strong>
+                <strong>
+                  Mã phiếu {log.type === 'in' ? 'nhập' : 'xuất'} kho
+                </strong>
               </TableCell>
               <TableCell>{log.source || 'N/A'}</TableCell>
             </TableRow>
             <TableRow>
               <TableCell>
-                <strong>Biến thể</strong>
+                <strong>Tên sản phẩm</strong>
               </TableCell>
               <TableCell>
-                {log.inventoryId?.variantId?.name || 'Không có dữ liệu'}
-              </TableCell>
-            </TableRow>
-            <TableRow>
-              <TableCell>
-                <strong>Kho</strong>
-              </TableCell>
-              <TableCell>
-                {log.inventoryId?.warehouseId?.name || 'Không có dữ liệu'}
+                {log.inventoryId?.variantId?.name
+                  .split(' ')
+                  .map(
+                    (word) =>
+                      word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+                  )
+                  .join(' ') || 'Không có dữ liệu'}
               </TableCell>
             </TableRow>
             <TableRow>
               <TableCell>
-                <strong>Loại</strong>
+                <strong>Kho hàng</strong>
+              </TableCell>
+              <TableCell>
+                {log.inventoryId?.warehouseId?.name
+                  .split(' ')
+                  .map(
+                    (word) =>
+                      word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+                  )
+                  .join(' ') || 'Không có dữ liệu'}
+              </TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell>
+                <strong>Loại phiếu</strong>
               </TableCell>
               <TableCell>
                 <Chip
@@ -100,14 +118,20 @@ const ViewInventoryLogModal = ({ open, onClose, log }) => {
                 <strong>Người thực hiện</strong>
               </TableCell>
               <TableCell>
-                {log.createdByName || log.createdBy?.name || 'N/A'}
+                {log?.createdBy?.name
+                  .split(' ')
+                  .map(
+                    (word) =>
+                      word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+                  )
+                  .join(' ') || 'N/A'}
               </TableCell>
             </TableRow>
             <TableRow>
-              <TableCell>
-                <strong>Ngày thực hiện</strong>
+              <TableCell sx={{ borderBottom: 0 }}>
+                <strong>Ngày tạo phiếu</strong>
               </TableCell>
-              <TableCell>
+              <TableCell sx={{ borderBottom: 0 }}>
                 {log.createdAtFormatted ||
                   (log.createdAt
                     ? new Date(log.createdAt).toLocaleString('vi-VN')
@@ -117,8 +141,16 @@ const ViewInventoryLogModal = ({ open, onClose, log }) => {
           </TableBody>
         </Table>
       </DialogContent>
-      <DialogActions>
-        <Button onClick={onClose} variant='outlined' color='primary'>
+      <Divider />
+      <DialogActions sx={{ padding: '16px 24px' }}>
+        <Button
+          onClick={onClose}
+          variant='outlined'
+          color='error'
+          sx={{
+            textTransform: 'none'
+          }}
+        >
           Đóng
         </Button>
       </DialogActions>
