@@ -175,7 +175,7 @@ const ProductManagement = () => {
 
   React.useEffect(() => {
     fetchProducts(page, limit, filters)
-  }, [page, limit])
+  }, [page, limit, filters])
 
   const handleChangePage = (event, value) => setPage(value)
 
@@ -206,7 +206,7 @@ const ProductManagement = () => {
       const result = await updateProduct(id, updatedData)
       console.log('Result from updateProduct:', result) // Debugging log
       if (result) {
-        await fetchProducts(page, limit)
+        await fetchProducts(page, limit, filters)
       }
       return result // Explicitly return the result
     } catch (error) {
@@ -218,13 +218,15 @@ const ProductManagement = () => {
   const handleDeleteProduct = async (id) => {
     const result = await deleteProduct(id)
     if (result) {
-      await fetchProducts(page, limit)
+      await fetchProducts(page, limit, filters)
     }
   }
+  const isEqual = (obj1, obj2) => JSON.stringify(obj1) === JSON.stringify(obj2)
+
   const handleFilter = (newFilters) => {
-    setFilters(newFilters)
-    if (Object.keys(newFilters).length > 0) {
-      fetchProducts(1, limit, newFilters)
+    if (!isEqual(filters, newFilters)) {
+      setPage(1)
+      setFilters(newFilters)
     }
   }
 
@@ -234,8 +236,7 @@ const ProductManagement = () => {
         sx={{
           display: 'flex',
           justifyContent: 'space-between',
-          alignItems: 'flex-start',
-          mb: 2
+          alignItems: 'flex-start'
         }}
       ></Box>
 

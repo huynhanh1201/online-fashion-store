@@ -26,7 +26,7 @@ const CategoryManagement = () => {
 
   React.useEffect(() => {
     fetchCategories(page, limit, filters)
-  }, [page, limit])
+  }, [page, limit, filters])
 
   const handleChangePage = (event, value) => setPage(value)
 
@@ -45,7 +45,7 @@ const CategoryManagement = () => {
     try {
       const response = await updateCategory(categoryId, updatedData)
       if (response) {
-        await fetchCategories(page, limit)
+        await fetchCategories(page, limit, filters)
       } else {
         console.log('Cập nhật không thành công')
       }
@@ -58,7 +58,7 @@ const CategoryManagement = () => {
     try {
       const result = await deleteCategory(categoryId)
       if (result) {
-        await fetchCategories(page, limit)
+        await fetchCategories(page, limit, filters)
       } else {
         console.log('Xoá không thành công')
       }
@@ -66,10 +66,13 @@ const CategoryManagement = () => {
       console.error('Lỗi:', error)
     }
   }
+
+  const isEqual = (obj1, obj2) => JSON.stringify(obj1) === JSON.stringify(obj2)
+
   const handleFilter = (newFilters) => {
-    setFilters(newFilters)
-    if (Object.keys(newFilters).length > 0) {
-      fetchCategories(1, limit, newFilters)
+    if (!isEqual(filters, newFilters)) {
+      setPage(1)
+      setFilters(newFilters)
     }
   }
   return (
@@ -96,7 +99,7 @@ const CategoryManagement = () => {
           <AddCategoryModal
             open
             onClose={handleCloseModal}
-            onAdded={() => fetchCategories(page)}
+            onAdded={() => fetchCategories(page, limit, filters)}
           />
         )}
         {modalType === 'view' && selectedCategory && (

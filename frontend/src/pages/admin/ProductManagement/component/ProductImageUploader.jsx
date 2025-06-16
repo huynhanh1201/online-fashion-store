@@ -4,7 +4,7 @@ import { Box, Grid, IconButton, Typography, Tooltip } from '@mui/material'
 import AddPhotoAlternateIcon from '@mui/icons-material/AddPhotoAlternate'
 import EditIcon from '@mui/icons-material/Edit'
 import DeleteIcon from '@mui/icons-material/Delete'
-
+import { optimizeCloudinaryUrl } from '~/utils/cloudinary.js'
 const ProductImages = ({
   productImages,
   setProductImages,
@@ -80,14 +80,16 @@ const ProductImages = ({
           border: '1px solid #ddd',
           borderRadius: 2,
           overflow: 'hidden',
-          height: 180,
-          width: 180,
+          height: 150,
+          width: 150,
           background: '#dcdcdc'
         }}
       >
         <Box
           component='img'
-          src={image}
+          loading='lazy'
+          loading='lazy'
+          src={optimizeCloudinaryUrl(image || '')}
           alt={`Ảnh sản phẩm ${idx + 1}`}
           sx={{
             width: '100%',
@@ -99,14 +101,14 @@ const ProductImages = ({
           sx={{
             position: 'absolute',
             top: 4,
-            left: 4,
+            right: 40,
             backgroundColor: 'rgba(255,255,255,0.8)',
             borderRadius: 1
           }}
         >
           <Tooltip title='Sửa'>
             <IconButton size='small' onClick={() => handleEditImage(idx)}>
-              <EditIcon fontSize='small' />
+              <EditIcon fontSize='small' color='warning' />
             </IconButton>
           </Tooltip>
         </Box>
@@ -137,8 +139,8 @@ const ProductImages = ({
           cursor: 'pointer',
           border: '2px dashed #aaa',
           borderRadius: 2,
-          height: 180,
-          width: 180,
+          height: 150,
+          width: 150,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
@@ -162,10 +164,12 @@ const ProductImages = ({
       <Typography variant='h6' mb={2}>
         Ảnh sản phẩm
       </Typography>
-      <Grid container spacing={2}>
-        {productImages.map((img, idx) => renderImageItem(img, idx))}
-        {productImages.length < maxImages && renderAddBox()}
-      </Grid>
+      <Box sx={{ maxHeight: 320, overflowY: 'auto', pr: 1 }}>
+        <Grid container spacing={2}>
+          {productImages.map((img, idx) => renderImageItem(img, idx))}
+          {productImages.length < maxImages && renderAddBox()}
+        </Grid>
+      </Box>
 
       {/* Hidden input để upload ảnh mới */}
       <input

@@ -47,7 +47,7 @@ const EditColorModal = ({ open, onClose, color, onSave }) => {
         sx: StyleAdmin.OverlayModal
       }}
     >
-      <DialogTitle>Sửa màu</DialogTitle>
+      <DialogTitle>Sửa thông tin màu sắc</DialogTitle>
       <Divider sx={{ my: 0 }} />
       <DialogContent>
         <form id='edit-color-form' onSubmit={handleSubmit(onSubmit)}>
@@ -64,7 +64,13 @@ const EditColorModal = ({ open, onClose, color, onSave }) => {
       </DialogContent>
       <Divider sx={{ my: 0 }} />
       <DialogActions sx={{ padding: '16px 24px' }}>
-        <Button onClick={onClose} disabled={isSubmitting} color='inherit'>
+        <Button
+          onClick={onClose}
+          disabled={isSubmitting}
+          color='error'
+          variant='outlined'
+          sx={{ textTransform: 'none' }}
+        >
           Hủy
         </Button>
         <Button
@@ -73,7 +79,11 @@ const EditColorModal = ({ open, onClose, color, onSave }) => {
           variant='contained'
           disabled={isSubmitting}
           startIcon={isSubmitting ? <CircularProgress size={20} /> : null}
-          sx={{ backgroundColor: '#001f5d', color: '#fff' }}
+          sx={{
+            backgroundColor: '#001f5d',
+            color: '#fff',
+            textTransform: 'none'
+          }}
         >
           {isSubmitting ? 'Đang lưu' : 'Lưu'}
         </Button>

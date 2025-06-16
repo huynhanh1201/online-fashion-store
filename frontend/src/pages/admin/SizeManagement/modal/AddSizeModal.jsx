@@ -26,7 +26,7 @@ const AddSizeModal = ({ open, onClose, onAdded }) => {
       const result = await addSize(payload)
       if (onAdded) onAdded()
       if (result) {
-        onClose()
+        onClose(result)
         reset()
       } else {
         alert('Thêm kích thước thất bại. Vui lòng thử lại!')
@@ -79,14 +79,23 @@ const AddSizeModal = ({ open, onClose, onAdded }) => {
         </DialogContent>
         <Divider sx={{ my: 0 }} />
         <DialogActions sx={{ padding: '16px 24px' }}>
-          <Button color='inherit' onClick={handleClose} disabled={isSubmitting}>
+          <Button
+            color='error'
+            variant='outlined'
+            onClick={handleClose}
+            disabled={isSubmitting}
+            sx={{ textTransform: 'none' }}
+          >
             Hủy
           </Button>
           <Button
             type='button'
             onClick={handleSubmit(onSubmit)}
-            variant='contained'
-            sx={{ backgroundColor: '#001f5d', color: '#fff' }}
+            sx={{
+              backgroundColor: '#001f5d',
+              color: '#fff',
+              textTransform: 'none'
+            }}
             disabled={isSubmitting}
           >
             {isSubmitting ? 'Đang thêm...' : 'Thêm'}

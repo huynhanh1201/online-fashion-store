@@ -111,14 +111,6 @@ export default function AdminDrawer({
         </Box>
 
         <Divider sx={{ my: 0 }} />
-        <Box sx={{ display: 'flex', alignItems: 'center', p: 2 }}>
-          <Avatar
-            src={optimizeCloudinaryUrl(profile?.avatarUrl)}
-            alt={profile?.name}
-            sx={{ width: 48, height: 48 }}
-          />
-        </Box>
-        <Divider sx={{ my: 0 }} />
         <List sx={{ flexGrow: 1, pt: 0 }}>
           <ListItem disablePadding sx={{ height: 48 }}>
             <ListItemButton
@@ -191,7 +183,7 @@ export default function AdminDrawer({
   return (
     <Box
       sx={{
-        width: 260,
+        width: 270,
         height: '100vh',
         backgroundColor: 'white',
         boxShadow: 3,
@@ -231,7 +223,7 @@ export default function AdminDrawer({
                 .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
                 .join(' ') || ''}
             </Typography>
-            <CheckCircleIcon sx={{ color: '#b8f0f9' }} fontSize='small' />
+            <CheckCircleIcon sx={{ color: '#61b865' }} fontSize='small' />
           </Box>
           <Typography variant='caption'>Quản trị viên</Typography>
         </Box>
@@ -436,9 +428,9 @@ export default function AdminDrawer({
           <ListItem disablePadding onClick={handleLogout}>
             <ListItemButton sx={{ ...activeButtonStyle }}>
               <ListItemIcon>
-                <ExitToAppIcon />
+                <ExitToAppIcon color='error' />
               </ListItemIcon>
-              <ListItemText primary='Đăng xuất' />
+              <ListItemText sx={{ color: '#f00' }} primary='Đăng xuất' />
             </ListItemButton>
           </ListItem>
         </List>

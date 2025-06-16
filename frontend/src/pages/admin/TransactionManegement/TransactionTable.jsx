@@ -146,13 +146,15 @@ import {
   TableHead,
   TableRow,
   TableCell,
-  TablePagination
+  TablePagination,
+  Button
 } from '@mui/material'
 
 import TransactionRow from './TransactionRow'
 import FilterTransaction from '~/components/FilterAdmin/FilterTransaction'
 import StyleAdmin from '~/assets/StyleAdmin.jsx'
 import TablePaginationActions from '~/components/PaginationAdmin/TablePaginationActions.jsx'
+import TableNoneData from '~/components/TableAdmin/NoneData.jsx'
 const TransactionTable = ({
   transactions = [],
   loading,
@@ -169,34 +171,49 @@ const TransactionTable = ({
 }) => {
   return (
     <Paper sx={{ border: '1px solid #ccc' }}>
-      <Box
-        p={2}
-        display='flex'
-        justifyContent='space-between'
-        alignItems='center'
-      >
-        <Typography variant='h6' fontWeight={800}>
-          Danh sách giao dịch
-        </Typography>
-        <FilterTransaction
-          onFilter={onFilter}
-          transactions={transactions}
-          loading={loading}
-          fetchTransactions={fetchTransactions}
-        />
-      </Box>
-
-      <Table>
+      <Table stickyHeader aria-label='transaction table'>
         <TableHead>
           <TableRow>
-            <TableCell sx={StyleAdmin.TableColumnSTT}>STT</TableCell>
-            <TableCell>Mã đơn hàng</TableCell>
-            <TableCell>Mã giao dịch</TableCell>
-            <TableCell>Phương thức</TableCell>
-            <TableCell>Trạng thái</TableCell>
-            <TableCell>Số tiền</TableCell>
-            <TableCell>Ngày tạo</TableCell>
-            <TableCell align='start' sx={{ width: 150 }}>
+            <TableCell colSpan={8}>
+              <Box
+                display='flex'
+                justifyContent='space-between'
+                alignItems='start'
+                sx={{ minHeight: 76.5 }}
+              >
+                <Typography variant='h6' fontWeight={800} minWidth={250}>
+                  Danh sách giao dịch
+                </Typography>
+                <FilterTransaction
+                  onFilter={onFilter}
+                  transactions={transactions}
+                  loading={loading}
+                  fetchTransactions={fetchTransactions}
+                />
+              </Box>
+            </TableCell>
+          </TableRow>
+          <TableRow sx={{ height: 57 }}>
+            <TableCell align='center' sx={{ minWidth: 50, width: 50, px: 1 }}>
+              STT
+            </TableCell>
+            <TableCell sx={{ minWidth: 150, px: 1 }}>Mã đơn hàng</TableCell>
+            <TableCell sx={{ minWidth: 150, px: 1 }}>Mã giao dịch</TableCell>
+            <TableCell sx={{ minWidth: 180, px: 1 }}>
+              Phương thức thanh toán
+            </TableCell>
+
+            <TableCell sx={{ minWidth: 150, maxWidth: 150, px: 1 }}>
+              Số tiền
+            </TableCell>
+            <TableCell sx={{ minWidth: 150, px: 1 }}>Ngày tạo</TableCell>
+            <TableCell sx={{ minWidth: 130, px: 1 }}>
+              Trạng thái giao dịch
+            </TableCell>
+            <TableCell
+              align='start'
+              sx={{ minWidth: 130, maxWidth: 130, px: 2, paddingLeft: '20px' }}
+            >
               Hành động
             </TableCell>
           </TableRow>
@@ -209,11 +226,7 @@ const TransactionTable = ({
               </TableCell>
             </TableRow>
           ) : transactions.length === 0 ? (
-            <TableRow>
-              <TableCell colSpan={8} align='center'>
-                Không có giao dịch nào.
-              </TableCell>
-            </TableRow>
+            <TableNoneData col={8} message='Không có dữ liệu giao dịch.' />
           ) : (
             transactions.map((transaction, index) => (
               <TransactionRow

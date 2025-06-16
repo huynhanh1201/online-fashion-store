@@ -25,7 +25,7 @@ const StyleAdmin = {
       }
     },
     '& label': {
-      color: '#000' // màu label
+      // color: '#000' // màu label
     },
     '& label.Mui-focused': {
       color: '#000' // màu label khi focus

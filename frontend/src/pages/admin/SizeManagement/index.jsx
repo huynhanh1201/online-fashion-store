@@ -25,7 +25,7 @@ const SizeManagement = () => {
 
   React.useEffect(() => {
     fetchSizes(page, limit, filters)
-  }, [page, limit])
+  }, [page, limit, filters])
 
   const handleOpenModal = (type, size) => {
     if (!size || !size._id) return
@@ -44,7 +44,7 @@ const SizeManagement = () => {
     try {
       const response = await updateSize(sizeId, updatedData)
       if (response) {
-        await fetchSizes(page, limit)
+        await fetchSizes(page, limit, filters)
       } else {
         console.log('Cập nhật không thành công')
       }
@@ -57,7 +57,7 @@ const SizeManagement = () => {
     try {
       const result = await deleteSize(sizeId)
       if (result) {
-        await fetchSizes(page, limit)
+        await fetchSizes(page, limit, filters)
       } else {
         console.log('Xoá không thành công')
       }
@@ -65,18 +65,16 @@ const SizeManagement = () => {
       console.error('Lỗi:', error)
     }
   }
+  const isEqual = (obj1, obj2) => JSON.stringify(obj1) === JSON.stringify(obj2)
+
   const handleFilter = (newFilters) => {
-    setFilters(newFilters)
-    if (Object.keys(newFilters).length > 0) {
-      fetchSizes(1, limit, newFilters)
+    if (!isEqual(filters, newFilters)) {
+      setPage(1)
+      setFilters(newFilters)
     }
   }
   return (
     <>
-      <Typography variant='h5' sx={{ mb: 2 }}>
-        Quản lý kích thước sản phẩm
-      </Typography>
-
       <SizeTable
         sizes={sizes}
         loading={Loading}
@@ -99,7 +97,7 @@ const SizeManagement = () => {
           <AddSizeModal
             open
             onClose={handleCloseModal}
-            onAdded={() => fetchSizes(page)}
+            onAdded={() => fetchSizes(page, limit, filters)}
           />
         )}
 

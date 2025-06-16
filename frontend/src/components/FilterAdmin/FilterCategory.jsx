@@ -33,12 +33,25 @@ export default function FilterCategory({
     applyFilters(selectedFilter, startDate, endDate)
   }, [keyword, status, sort])
 
-  const handleApplyTimeFilter = (selected) => {
-    setSelectedFilter(selected)
-    applyFilters(selected, startDate, endDate)
-  }
   const handleSearch = () => {
     setKeyword(inputValue)
+  }
+  const handleSelectFilter = (filter) => {
+    if (filter === selectedFilter) {
+      setSelectedFilter('')
+      setStartDate(dayjs().format('YYYY-MM-DD'))
+      setEndDate(dayjs().format('YYYY-MM-DD'))
+      applyFilters('', '', '')
+    } else {
+      setSelectedFilter(filter)
+      if (filter !== 'custom') {
+        applyFilters(filter, startDate, endDate)
+      }
+    }
+  }
+
+  const handleApplyTime = (filterType) => {
+    applyFilters(filterType, startDate, endDate)
   }
 
   const applyFilters = (selectedTime, fromDate, toDate) => {
@@ -86,7 +99,7 @@ export default function FilterCategory({
   return (
     <Box display='flex' flexWrap='wrap' gap={2} mb={2} justifyContent='end'>
       <FilterSelect
-        label='Trạng thái'
+        label='Trạng thái danh mục'
         value={status}
         onChange={(value) => {
           setStatus(value)
@@ -105,11 +118,12 @@ export default function FilterCategory({
         label='Lọc thời gian tạo'
         selectedFilter={selectedFilter}
         setSelectedFilter={setSelectedFilter}
+        onSelectFilter={handleSelectFilter}
+        onApply={handleApplyTime}
         startDate={startDate}
         setStartDate={setStartDate}
         endDate={endDate}
         setEndDate={setEndDate}
-        onApply={handleApplyTimeFilter}
       />
       <Box sx={{ display: 'flex', gap: 2 }}>
         <SearchWithSuggestions

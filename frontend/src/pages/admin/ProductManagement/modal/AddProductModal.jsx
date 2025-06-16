@@ -137,11 +137,10 @@ const AddProductModal = ({ open, onClose, onSuccess }) => {
       fullWidth
       PaperProps={{
         sx: {
-          marginTop: '50px',
-          height: '85vh', // hoặc '600px' tùy ý
-          maxHeight: '85vh', // đảm bảo không vượt quá
           display: 'flex',
-          flexDirection: 'column'
+          flexDirection: 'column',
+          marginTop: '50px',
+          maxHeight: '85vh' // đảm bảo không vượt quá
         }
       }}
     >
@@ -156,22 +155,37 @@ const AddProductModal = ({ open, onClose, onSuccess }) => {
         }}
       >
         <DialogTitle sx={{ paddingTop: '8px', paddingBottom: '8px' }}>
-          Thêm sản phẩm
+          Thêm sản phẩm mới
         </DialogTitle>
         <DialogActions sx={{ paddingLeft: '24px' }}>
-          <Button onClick={onClose} variant='outlined' color='error'>
+          <Button
+            onClick={onClose}
+            color='error'
+            variant='outlined'
+            sx={{ textTransform: 'none' }}
+          >
             Hủy
           </Button>
           <Button
             onClick={handleSubmit(onSubmit)}
             variant='contained'
-            sx={{ color: '#fff', backgroundColor: '#001f5d' }}
+            sx={{
+              color: '#fff',
+              backgroundColor: '#001f5d',
+              textTransform: 'none'
+            }}
           >
             Thêm sản phẩm
           </Button>
         </DialogActions>
       </Box>
-      <DialogContent>
+      <DialogContent
+        sx={{
+          overflowY: 'auto',
+          padding: 3,
+          flex: 1
+        }}
+      >
         <Grid container spacing={2}>
           {/*tên sản phẩm*/}
           <Grid item size={12}>
@@ -351,7 +365,7 @@ const AddProductModal = ({ open, onClose, onSuccess }) => {
                       }
                     }}
                     editorStyle={{
-                      minHeight: '200px',
+                      minHeight: '150px',
                       border: '1px solid #ccc',
                       padding: '10px',
                       borderRadius: '4px',

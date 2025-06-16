@@ -25,7 +25,7 @@ export default function TablePaginationActions(props) {
       <IconButton
         onClick={handleBackButtonClick}
         disabled={page === 0}
-        sx={{ pr: 0 }}
+        sx={{ color: page === 0 ? '#ccc' : '#001f5d' }}
       >
         <KeyboardArrowLeft />
       </IconButton>
@@ -48,7 +48,7 @@ export default function TablePaginationActions(props) {
       <IconButton
         onClick={handleNextButtonClick}
         disabled={page >= totalPages - 1}
-        sx={{ pl: 0 }}
+        sx={{ color: page >= totalPages - 1 ? '#ccc' : '#001f5d' }}
       >
         <KeyboardArrowRight />
       </IconButton>

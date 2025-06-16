@@ -32,7 +32,7 @@ function DiscountManagement() {
 
   React.useEffect(() => {
     fetchDiscounts(page, limit, filters)
-  }, [page, limit])
+  }, [page, limit, filters])
 
   const handleOpenModal = (type, discount) => {
     if (!discount || !discount._id) return
@@ -56,10 +56,12 @@ function DiscountManagement() {
     const deleted = await deleteDiscount(discountId)
     if (deleted) await fetchDiscounts(page, limit)
   }
+  const isEqual = (obj1, obj2) => JSON.stringify(obj1) === JSON.stringify(obj2)
+
   const handleFilter = (newFilters) => {
-    setFilters(newFilters)
-    if (Object.keys(newFilters).length > 0) {
-      fetchDiscounts(1, limit, newFilters)
+    if (!isEqual(filters, newFilters)) {
+      setPage(1)
+      setFilters(newFilters)
     }
   }
 

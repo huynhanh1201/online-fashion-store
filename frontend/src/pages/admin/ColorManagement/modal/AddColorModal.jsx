@@ -26,7 +26,7 @@ const AddColorModal = ({ open, onClose, onAdded }) => {
       const result = await addColor(payload)
       if (onAdded) onAdded()
       if (result) {
-        onClose()
+        onClose(result)
         reset()
       } else {
         alert('Thêm màu thất bại. Vui lòng thử lại!')
@@ -52,7 +52,7 @@ const AddColorModal = ({ open, onClose, onAdded }) => {
         sx: StyleAdmin.OverlayModal
       }}
     >
-      <DialogTitle>Thêm màu mới</DialogTitle>
+      <DialogTitle>Thêm màu sắc mới</DialogTitle>
       <Divider sx={{ my: 0 }} />
       <form
         onSubmit={(e) => {
@@ -79,14 +79,24 @@ const AddColorModal = ({ open, onClose, onAdded }) => {
         </DialogContent>
         <Divider sx={{ my: 0 }} />
         <DialogActions sx={{ padding: '16px 24px' }}>
-          <Button color='inherit' onClick={handleClose} disabled={isSubmitting}>
+          <Button
+            color='error'
+            variant='outlined'
+            onClick={handleClose}
+            disabled={isSubmitting}
+            sx={{ textTransform: 'none' }}
+          >
             Hủy
           </Button>
           <Button
             type='button'
             onClick={handleSubmit(onSubmit)}
             variant='contained'
-            sx={{ backgroundColor: '#001f5d', color: '#fff' }}
+            sx={{
+              backgroundColor: '#001f5d',
+              color: '#fff',
+              textTransform: 'none'
+            }}
             disabled={isSubmitting}
           >
             {isSubmitting ? 'Đang thêm...' : 'Thêm'}

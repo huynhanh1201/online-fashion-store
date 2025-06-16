@@ -29,7 +29,7 @@ export default function FilterBatches({
   const [importPriceMax, setImportPriceMax] = useState('')
 
   useEffect(() => {
-    applyFilters(selectedFilter, startDate, endDate)
+    applyFilters()
   }, [keyword, variantId, warehouseId, destroy, sort])
 
   const handleSearch = () => {

@@ -12,19 +12,21 @@ import {
   Typography,
   Box,
   Button,
-  IconButton
+  IconButton,
+  Chip
 } from '@mui/material'
 import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye'
 import AddWarehouseSlipModal from '../modal/WarehouseSlip/AddWarehouseSlipModal'
 import ViewWarehouseSlipModal from '../modal/WarehouseSlip/ViewWarehouseSlipModal'
 import FilterWarehouseSlip from '~/components/FilterAdmin/FilterWarehouseSlip.jsx'
-import { Chip } from '@mui/material'
 import useVariants from '~/hooks/admin/Inventory/useVariants.js'
 import useWarehouses from '~/hooks/admin/Inventory/useWarehouses.js'
 import useWarehouseSlips from '~/hooks/admin/Inventory/useWarehouseSlip.js'
 import useBatches from '~/hooks/admin/Inventory/useBatches.js'
 import usePartner from '~/hooks/admin/Inventory/usePartner.js'
 import TablePaginationActions from '~/components/PaginationAdmin/TablePaginationActions.jsx'
+import TableNoneData from '~/components/TableAdmin/NoneData.jsx'
+import Tooltip from '@mui/material/Tooltip'
 const WarehouseSlipsTab = () => {
   const {
     warehouseSlips,
@@ -45,16 +47,20 @@ const WarehouseSlipsTab = () => {
   const [modalType, setModalType] = useState('input')
   const [page, setPage] = useState(1)
   const [rowsPerPage, setRowsPerPage] = useState(10)
-  const [filter, setFilter] = useState('')
-
+  const [filter, setFilter] = useState({})
+  useEffect(() => {
+    fetchWarehouses(1, 10, { status: false })
+  }, [])
   useEffect(() => {
     fetchWarehouseSlips(page, rowsPerPage, filter)
-  }, [page, rowsPerPage])
+  }, [page, rowsPerPage, filter])
+
+  const isEqual = (obj1, obj2) => JSON.stringify(obj1) === JSON.stringify(obj2)
 
   const handleFilter = (newFilters) => {
-    setFilter(newFilters)
-    if (Object.keys(newFilters).length > 0) {
-      fetchWarehouseSlips(1, rowsPerPage, newFilters)
+    if (!isEqual(filter, newFilters)) {
+      setPage(1)
+      setFilter(newFilters)
     }
   }
 
@@ -73,7 +79,7 @@ const WarehouseSlipsTab = () => {
 
   const handleOpenModal = (type) => {
     fetchPartners()
-    fetchWarehouses()
+    fetchWarehouses(1, 10, { status: false })
     fetchVariants()
     fetchBatches()
     setModalType(type)
@@ -154,23 +160,26 @@ const WarehouseSlipsTab = () => {
     }
   })
   const warehouseSlipColumns = [
-    { id: 'slipId', label: 'Mã phiếu', minWidth: 120 },
-    { id: 'type', label: 'Loại', minWidth: 100, align: 'start' },
-    { id: 'warehouse', label: 'Kho', minWidth: 120 },
+    {
+      id: 'index',
+      label: 'STT',
+      minWidth: 50,
+      maxWidth: 50,
+      width: 50,
+      align: 'center'
+    },
+    { id: 'slipId', label: 'Mã phiếu kho', minWidth: 120, maxWidth: 160 },
+    { id: 'type', label: 'Loại phiếu', minWidth: 100, align: 'start' },
+    { id: 'warehouse', label: 'Kho hàng', minWidth: 120, maxWidth: 180 },
     {
       id: 'itemCount',
-      label: 'Số mặt hàng',
+      label: 'Số lượng sản phẩm',
       minWidth: 90,
+      align: 'left',
       format: (value) => `${value.toLocaleString('vi-VN')}`
     },
     { id: 'createdByName', label: 'Người tạo', minWidth: 150, align: 'start' },
-    {
-      id: 'createdAtFormatted',
-      label: 'Ngày tạo',
-      minWidth: 160,
-      align: 'start',
-      format: (value) => new Date(value).toLocaleDateString('vi-VN')
-    },
+    { id: 'createdAtFormatted', label: 'Ngày thực hiện', minWidth: 150 },
     { id: 'action', label: 'Hành động', minWidth: 130, align: 'start' }
   ]
 
@@ -192,7 +201,6 @@ const WarehouseSlipsTab = () => {
                   display='flex'
                   justifyContent='space-between'
                   alignItems='center'
-                  mb={2}
                 >
                   <Box
                     sx={{
@@ -230,7 +238,9 @@ const WarehouseSlipsTab = () => {
                             textTransform: 'none',
                             flex: 1,
                             display: 'flex',
-                            alignItems: 'center'
+                            alignItems: 'center',
+                            backgroundColor: '#001f5d',
+                            color: '#fff'
                           }}
                         >
                           Nhập kho
@@ -265,17 +275,16 @@ const WarehouseSlipsTab = () => {
               {warehouseSlipColumns.map((column) => (
                 <TableCell
                   key={column.id}
-                  align={column.align}
-                  style={{
+                  align={column.align || 'left'}
+                  sx={{
                     minWidth: column.minWidth,
+                    width: column.width,
+                    px: 1,
+                    ...(column.maxWidth && { maxWidth: column.maxWidth }),
                     ...(column.id === 'action' && {
-                      width: '130px',
-                      maxWidth: '130px',
-                      paddingLeft: '26px'
-                    }),
-                    ...(column.id === 'itemCount' && {
-                      width: '115px',
-                      maxWidth: '130px'
+                      width: 130,
+                      maxWidth: 130,
+                      paddingLeft: 2
                     })
                   }}
                 >
@@ -285,51 +294,125 @@ const WarehouseSlipsTab = () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {enrichedWarehouseSlips.map((row, index) => (
-              <TableRow hover role='checkbox' tabIndex={-1} key={index}>
-                {warehouseSlipColumns.map((column) => {
-                  const value = row[column.id]
-                  if (column.id === 'action') {
-                    return (
-                      <TableCell key={column.id} align={column.align}>
-                        <IconButton
-                          onClick={() => handleViewSlip(row)}
-                          size='small'
-                          color='primary'
-                        >
-                          <RemoveRedEyeIcon color='primary' />
-                        </IconButton>
-                      </TableCell>
-                    )
-                  }
-                  if (column.id === 'itemCount') {
-                    return (
-                      <TableCell key={column.id} align={column.align}>
-                        <Typography align='right' variant='body2'>
-                          {value}
-                        </Typography>
-                      </TableCell>
-                    )
-                  }
-                  return (
-                    <TableCell key={column.id} align={column.align}>
-                      {column.id === 'type' ? (
-                        <Chip
-                          label={value}
-                          color={value === 'Nhập' ? 'success' : 'error'}
-                          size='large'
-                          sx={{ width: '120px', fontWeight: '800' }}
-                        />
-                      ) : column.format && typeof value === 'number' ? (
-                        column.format(value)
-                      ) : (
-                        value
-                      )}
-                    </TableCell>
-                  )
-                })}
+            {loadingSlip ? (
+              <TableRow>
+                <TableCell colSpan={warehouseSlipColumns.length} align='center'>
+                  Đang tải phiếu kho...
+                </TableCell>
               </TableRow>
-            ))}
+            ) : enrichedWarehouseSlips.length === 0 ? (
+              <TableNoneData
+                col={warehouseSlipColumns.length}
+                message='Không có dữ liệu phiếu kho.'
+              />
+            ) : (
+              enrichedWarehouseSlips.map((row, index) => (
+                <TableRow hover key={index}>
+                  {warehouseSlipColumns.map((col) => {
+                    let rawValue
+
+                    // Xử lý các field đặc biệt
+                    switch (col.id) {
+                      case 'index':
+                        rawValue = index + 1 + (page - 1) * rowsPerPage
+                        break
+                      case 'createdAtFormatted': {
+                        const date = new Date(row.createdAt)
+                        rawValue = isNaN(date.getTime())
+                          ? '—'
+                          : date.toLocaleDateString('vi-VN')
+                        break
+                      }
+                      case 'warehouse': {
+                        const name = row.warehouseId?.name || 'Không có tên kho'
+                        rawValue = name
+                          .toLowerCase()
+                          .split(' ')
+                          .filter(Boolean)
+                          .map(
+                            (word) =>
+                              word.charAt(0).toUpperCase() + word.slice(1)
+                          )
+                          .join(' ')
+                        break
+                      }
+                      case 'createdByName': {
+                        const name =
+                          row.createdBy?.name || 'Không có tên người tạo'
+                        rawValue = name
+                          .toLowerCase()
+                          .split(' ')
+                          .map(
+                            (word) =>
+                              word.charAt(0).toUpperCase() + word.slice(1)
+                          )
+                          .join(' ')
+                        break
+                      }
+
+                      default:
+                        rawValue = row[col.id]
+                    }
+
+                    // Định dạng nếu có format
+                    let content = rawValue ?? '—'
+                    if (col.format && rawValue !== undefined) {
+                      content = col.format(rawValue)
+                    }
+
+                    // Chip loại phiếu
+                    if (col.id === 'type') {
+                      console.log('Row type:', row.type),
+                        (content = (
+                          <Chip
+                            label={row.type === 'Nhập' ? 'Nhập' : 'Xuất'}
+                            size='large'
+                            sx={{ width: 120, fontWeight: 800 }}
+                            color={row.type === 'Nhập' ? 'success' : 'error'}
+                          />
+                        ))
+                    }
+
+                    // Nút hành động
+                    if (col.id === 'action') {
+                      content = (
+                        <Tooltip title='Xem'>
+                          <IconButton
+                            onClick={() => handleViewSlip(row)}
+                            size='small'
+                            color='primary'
+                          >
+                            <RemoveRedEyeIcon color='primary' />
+                          </IconButton>
+                        </Tooltip>
+                      )
+                    }
+
+                    return (
+                      <TableCell
+                        key={col.id}
+                        align={col.align || 'left'}
+                        sx={{
+                          py: 0,
+                          px: 1,
+                          height: 55,
+                          whiteSpace: 'nowrap',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                          ...(col.maxWidth && { maxWidth: col.maxWidth }),
+                          ...(col.id === 'itemCount' && { textAlign: 'left' })
+                        }}
+                        title={
+                          typeof content === 'string' ? content : undefined
+                        }
+                      >
+                        {content}
+                      </TableCell>
+                    )
+                  })}
+                </TableRow>
+              ))
+            )}
           </TableBody>
         </Table>
       </TableContainer>

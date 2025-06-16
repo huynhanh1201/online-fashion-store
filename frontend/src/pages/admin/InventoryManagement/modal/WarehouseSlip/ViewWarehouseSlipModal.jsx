@@ -12,7 +12,8 @@ import {
   TableBody,
   TableRow,
   TableCell,
-  Chip
+  Chip,
+  Divider
 } from '@mui/material'
 
 const ViewWarehouseSlipModal = ({ open, onClose, slip }) => {
@@ -20,21 +21,24 @@ const ViewWarehouseSlipModal = ({ open, onClose, slip }) => {
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth='md' fullWidth>
-      <DialogTitle>
-        Chi tiết phiếu {slip.type === 'import' ? 'nhập' : 'xuất'} kho
+      <DialogTitle sx={{ pl: 5 }}>
+        Thông tin phiếu {slip.type === 'Nhập' ? 'nhập' : 'xuất'} kho
       </DialogTitle>
-      <DialogContent>
+      <Divider />
+      <DialogContent sx={{ py: 0 }}>
         <Table>
           <TableBody>
             <TableRow>
               <TableCell>
-                <strong>Mã phiếu</strong>
+                <strong>
+                  Mã phiếu {slip.type === 'Nhập' ? 'nhập' : 'xuất'} kho
+                </strong>
               </TableCell>
               <TableCell>{slip.slipId || 'N/A'}</TableCell>
             </TableRow>
             <TableRow>
               <TableCell>
-                <strong>Loại</strong>
+                <strong>Loại phiếu</strong>
               </TableCell>
               <TableCell>
                 <Chip
@@ -47,19 +51,35 @@ const ViewWarehouseSlipModal = ({ open, onClose, slip }) => {
             </TableRow>
             <TableRow>
               <TableCell>
-                <strong>Kho</strong>
+                <strong>Kho hàng</strong>
               </TableCell>
-              <TableCell>{slip.warehouseId?.name || 'N/A'}</TableCell>
+              <TableCell>
+                {slip.warehouseId?.name
+                  .split(' ')
+                  .map(
+                    (word) =>
+                      word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+                  )
+                  .join(' ') || 'N/A'}
+              </TableCell>
             </TableRow>
             <TableRow>
               <TableCell>
-                <strong>Đối tác</strong>
+                <strong>Tên đối tác</strong>
               </TableCell>
-              <TableCell>{slip.partnerId?.name || 'N/A'}</TableCell>
+              <TableCell>
+                {slip.partnerId?.name
+                  .split(' ')
+                  .map(
+                    (word) =>
+                      word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+                  )
+                  .join(' ') || 'N/A'}
+              </TableCell>
             </TableRow>
             <TableRow>
               <TableCell>
-                <strong>Trạng thái</strong>
+                <strong>Trạng thái phiếu kho</strong>
               </TableCell>
               <TableCell>
                 <Chip
@@ -84,6 +104,16 @@ const ViewWarehouseSlipModal = ({ open, onClose, slip }) => {
             </TableRow>
             <TableRow>
               <TableCell>
+                <strong>Ngày cập nhật</strong>
+              </TableCell>
+              <TableCell>
+                {slip.updatedAt
+                  ? new Date(slip.updatedAt).toLocaleString('vi-VN')
+                  : 'N/A'}
+              </TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell>
                 <strong>Ghi chú</strong>
               </TableCell>
               <TableCell>{slip.note || 'Không có'}</TableCell>
@@ -98,7 +128,7 @@ const ViewWarehouseSlipModal = ({ open, onClose, slip }) => {
           <TableHead>
             <TableRow>
               <TableCell>Mã biến thể</TableCell>
-              <TableCell>Biến thể</TableCell>
+              <TableCell>Tên sản phẩm</TableCell>
               <TableCell align='right'>Số lượng</TableCell>
               <TableCell>Đơn vị</TableCell>
             </TableRow>
@@ -108,7 +138,16 @@ const ViewWarehouseSlipModal = ({ open, onClose, slip }) => {
               slip.items.map((item, index) => (
                 <TableRow key={index}>
                   <TableCell>{item.variantId.sku}</TableCell>
-                  <TableCell>{item.variantId.name}</TableCell>
+                  <TableCell>
+                    {item.variantId.name
+                      .split(' ')
+                      .map(
+                        (word) =>
+                          word.charAt(0).toUpperCase() +
+                          word.slice(1).toLowerCase()
+                      )
+                      .join(' ')}
+                  </TableCell>
                   <TableCell align='right'>
                     {item.quantity
                       ? `${Number(item.quantity).toLocaleString('vi-VN')}`
@@ -127,8 +166,16 @@ const ViewWarehouseSlipModal = ({ open, onClose, slip }) => {
           </TableBody>
         </Table>
       </DialogContent>
-      <DialogActions>
-        <Button onClick={onClose}>Đóng</Button>
+      <Divider />
+      <DialogActions sx={{ padding: '16px 24px' }}>
+        <Button
+          onClick={onClose}
+          sx={{ textTransform: 'none' }}
+          variant='outlined'
+          color='error'
+        >
+          Đóng
+        </Button>
       </DialogActions>
     </Dialog>
   )

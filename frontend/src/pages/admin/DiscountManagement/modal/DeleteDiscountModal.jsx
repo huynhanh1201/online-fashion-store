@@ -33,33 +33,40 @@ const DeleteDiscountModal = ({ open, onClose, discount, onDelete }) => {
         sx: StyleAdmin.OverlayModal
       }}
     >
-      <DialogTitle>Xóa mã giảm giá</DialogTitle>
+      <DialogTitle>Ẩn mã giảm giá</DialogTitle>
       <Divider sx={{ my: 0 }} />
       <DialogContent>
         <Typography>
-          Bạn có chắc muốn xóa mã giảm giá <strong>{discount.code}</strong>?
+          Bạn có chắc muốn ẩn mã giảm giá <strong>{discount.code}</strong> này
+          không?
         </Typography>
         {loading && (
           <div style={{ textAlign: 'center', marginTop: '20px' }}>
             <CircularProgress />
             <Typography variant='body2' sx={{ mt: 2 }}>
-              Đang xóa...
+              Đang ẩn...
             </Typography>
           </div>
         )}
       </DialogContent>
       <Divider sx={{ my: 0 }} />
       <DialogActions sx={{ padding: '16px 24px' }}>
-        <Button onClick={onClose} color='inherit' disabled={loading}>
+        <Button
+          onClick={onClose}
+          color='inherit'
+          disabled={loading}
+          sx={{ textTransform: 'none' }}
+        >
           Hủy
         </Button>
         <Button
           onClick={handleDelete}
           variant='contained'
           color='error'
-          disabled={loading} // Disable nút xóa khi đang xử lý
+          disabled={loading}
+          sx={{ textTransform: 'none' }}
         >
-          {loading ? 'Đang xóa...' : 'Xóa'}
+          {loading ? 'Đang ẩn...' : 'Ẩn'}
         </Button>
       </DialogActions>
     </Dialog>

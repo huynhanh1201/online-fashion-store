@@ -1,4 +1,3 @@
-// modal/Variant/AddVariantModal.jsx
 import React, { useState, useEffect, useRef } from 'react'
 import {
   Dialog,
@@ -16,7 +15,9 @@ import {
   Box,
   IconButton,
   Typography,
-  Autocomplete
+  Autocomplete,
+  Divider,
+  Tooltip
 } from '@mui/material'
 import { useForm, Controller } from 'react-hook-form'
 import { toast } from 'react-toastify'
@@ -159,18 +160,25 @@ const AddVariantModal = ({
     setOpenColorModal(true)
   }
 
-  const handleCloseColorModal = () => {
+  const handleCloseColorModal = async (newColor) => {
     setOpenColorModal(false)
-    fetchColors()
+    await fetchColors() // hoặc load lại danh sách màu
+
+    if (newColor?.name) {
+      setValue('color', newColor.name)
+    }
   }
 
   const handleOpenSizeModal = () => {
     setOpenSizeModal(true)
   }
 
-  const handleCloseSizeModal = () => {
+  const handleCloseSizeModal = async (newSize) => {
     setOpenSizeModal(false)
-    fetchSizes()
+    await fetchSizes()
+    if (newSize?.name) {
+      setValue('size', newSize.name)
+    }
   }
 
   const handleUploadImage = async (e) => {
@@ -235,8 +243,15 @@ const AddVariantModal = ({
   }
 
   return (
-    <Dialog open={open} onClose={handleClose} maxWidth='md' fullWidth>
-      <DialogTitle>Thêm biến thể sản phẩm</DialogTitle>
+    <Dialog
+      open={open}
+      onClose={handleClose}
+      maxWidth='xl'
+      fullWidth
+      sx={{ padding: '16px 24px' }}
+    >
+      <DialogTitle>Thêm biến thể mới</DialogTitle>
+      <Divider />
       <form onSubmit={handleSubmit(onSubmit)}>
         <DialogContent
           sx={{
@@ -252,6 +267,8 @@ const AddVariantModal = ({
               position: 'relative',
               width: 403,
               height: 403,
+              minWidth: 403,
+              minHeight: 403,
               border: '1px dashed #ccc',
               backgroundColor: '#f9f9f9',
               borderRadius: 2,
@@ -282,34 +299,54 @@ const AddVariantModal = ({
                   sx={{ width: '100%', height: '100%', objectFit: 'contain' }}
                 />
                 <Box
-                  sx={{
-                    position: 'absolute',
-                    top: 4,
-                    right: 4,
-                    display: 'flex',
-                    gap: 1
-                  }}
+                  position='absolute'
+                  top={4}
+                  right={8}
+                  display='flex'
+                  gap={1}
                 >
-                  <IconButton
-                    size='small'
-                    onClick={(e) => {
-                      e.stopPropagation() // chỉ ngăn tại icon, không ngăn toàn bộ Box
-                      fileInputRef.current?.click()
+                  <Box
+                    sx={{
+                      position: 'absolute',
+                      top: 4,
+                      right: 40,
+                      backgroundColor: 'rgba(255,255,255,0.8)',
+                      borderRadius: 1
                     }}
-                    sx={{ backgroundColor: '#fff', boxShadow: 1 }}
                   >
-                    <EditIcon fontSize='small' />
-                  </IconButton>
-                  <IconButton
-                    size='small'
-                    onClick={() => {
-                      setColorImage(null)
-                      setValue('colorImage', '')
+                    <Tooltip title='Sửa'>
+                      <IconButton
+                        size='small'
+                        onClick={(e) => {
+                          e.stopPropagation() // chỉ ngăn tại icon, không ngăn toàn bộ Box
+                          fileInputRef.current?.click()
+                        }}
+                      >
+                        <EditIcon fontSize='small' color='warning' />
+                      </IconButton>
+                    </Tooltip>
+                  </Box>
+                  <Box
+                    sx={{
+                      position: 'absolute',
+                      top: 4,
+                      right: 4,
+                      backgroundColor: 'rgba(255,255,255,0.8)',
+                      borderRadius: 1
                     }}
-                    sx={{ backgroundColor: '#fff', boxShadow: 1 }}
                   >
-                    <DeleteIcon fontSize='small' />
-                  </IconButton>
+                    <Tooltip title='Xoá'>
+                      <IconButton
+                        size='small'
+                        onClick={() => {
+                          setColorImage(null)
+                          setValue('colorImage', '')
+                        }}
+                      >
+                        <DeleteIcon fontSize='small' color='error' />
+                      </IconButton>
+                    </Tooltip>
+                  </Box>
                 </Box>
               </>
             ) : (
@@ -332,7 +369,18 @@ const AddVariantModal = ({
                 render={({ field }) => (
                   <Select {...field} label='Sản phẩm'>
                     {products.map((p) => (
-                      <MenuItem key={p._id} value={p._id}>
+                      <MenuItem
+                        key={p._id}
+                        value={p._id}
+                        sx={{
+                          whiteSpace: 'normal',
+                          wordBreak: 'break-word',
+                          display: '-webkit-box',
+                          WebkitLineClamp: 3,
+                          WebkitBoxOrient: 'vertical',
+                          overflow: 'hidden'
+                        }}
+                      >
                         {p.name}
                       </MenuItem>
                     ))}
@@ -376,11 +424,20 @@ const AddVariantModal = ({
                           key={c.name}
                           value={c.name}
                           disabled={disabled}
+                          sx={{
+                            whiteSpace: 'normal',
+                            wordBreak: 'break-word',
+                            display: '-webkit-box',
+                            WebkitLineClamp: 3,
+                            WebkitBoxOrient: 'vertical',
+                            overflow: 'hidden'
+                          }}
                         >
                           {c.name} {disabled ? ' (đã tồn tại)' : ''}
                         </MenuItem>
                       )
                     })}
+
                     <MenuItem onClick={handleOpenColorModal}>
                       <em>Thêm màu mới</em>
                     </MenuItem>
@@ -425,11 +482,20 @@ const AddVariantModal = ({
                           key={s.name}
                           value={s.name}
                           disabled={disabled}
+                          sx={{
+                            whiteSpace: 'normal',
+                            wordBreak: 'break-word',
+                            display: '-webkit-box',
+                            WebkitLineClamp: 3,
+                            WebkitBoxOrient: 'vertical',
+                            overflow: 'hidden'
+                          }}
                         >
                           {s.name} {disabled ? ' (đã tồn tại)' : ''}
                         </MenuItem>
                       )
                     })}
+
                     <MenuItem onClick={handleOpenSizeModal}>
                       <em>Thêm kích thước mới</em>
                     </MenuItem>
@@ -478,7 +544,7 @@ const AddVariantModal = ({
                   error={!!errors.importPrice}
                   helperText={errors.importPrice?.message}
                   InputProps={{
-                    endAdornment: <span style={{ marginLeft: 4 }}>₫</span>,
+                    endAdornment: <span style={{ marginLeft: 4 }}>đ</span>,
                     inputMode: 'numeric'
                   }}
                 />
@@ -508,7 +574,7 @@ const AddVariantModal = ({
                   error={!!errors.exportPrice}
                   helperText={errors.exportPrice?.message}
                   InputProps={{
-                    endAdornment: <span style={{ marginLeft: 4 }}>₫</span>,
+                    endAdornment: <span style={{ marginLeft: 4 }}>đ</span>,
                     inputMode: 'numeric'
                   }}
                 />
@@ -516,15 +582,36 @@ const AddVariantModal = ({
             />
           </Box>
         </DialogContent>
-        <DialogActions>
-          <Button onClick={handleClose}>Hủy</Button>
-          <Button type='submit' variant='contained'>
+        <Divider />
+        <DialogActions sx={{ padding: '16px 24px' }}>
+          <Button
+            onClick={handleClose}
+            color='error'
+            variant='outlined'
+            sx={{ textTransform: 'none' }}
+          >
+            Hủy
+          </Button>
+          <Button
+            type='submit'
+            sx={{
+              backgroundColor: '#001f5d',
+              color: '#fff',
+              textTransform: 'none'
+            }}
+          >
             Thêm
           </Button>
         </DialogActions>
       </form>
-      <AddColorModal open={openColorModal} onClose={handleCloseColorModal} />
-      <AddSizeModal open={openSizeModal} onClose={handleCloseSizeModal} />
+      <AddColorModal
+        open={openColorModal}
+        onClose={(newColor) => handleCloseColorModal(newColor)}
+      />
+      <AddSizeModal
+        open={openSizeModal}
+        onClose={(newSize) => handleCloseSizeModal(newSize)}
+      />
     </Dialog>
   )
 }

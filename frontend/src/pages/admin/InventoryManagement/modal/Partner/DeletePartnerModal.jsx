@@ -22,19 +22,28 @@ export default function DeletePartnerModal({
   }
 
   return (
-    <Dialog open={open} onClose={onClose} fullWidth maxWidth='xs'>
+    <Dialog open={open} onClose={onClose} fullWidth maxWidth='sm'>
       <DialogTitle>Xóa đối tác</DialogTitle>
       <DialogContent dividers>
         <Typography>
-          Bạn có chắc chắn muốn xóa đối tác <strong>{partner.name}</strong>{' '}
+          Bạn có chắc chắn muốn xóa đối tác <strong>{partner.name}</strong> này
           không?
         </Typography>
       </DialogContent>
-      <DialogActions>
-        <Button onClick={onClose} color='inherit'>
+      <DialogActions sx={{ padding: '16px 24px' }}>
+        <Button
+          onClick={onClose}
+          color='inherit'
+          sx={{ textTransform: 'none' }}
+        >
           Hủy
         </Button>
-        <Button onClick={handleDelete} color='error' variant='contained'>
+        <Button
+          onClick={handleDelete}
+          color='error'
+          variant='contained'
+          sx={{ textTransform: 'none' }}
+        >
           Xóa
         </Button>
       </DialogActions>

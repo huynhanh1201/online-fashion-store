@@ -9,6 +9,8 @@ import Table from '@mui/material/Table'
 import TableBody from '@mui/material/TableBody'
 import TableRow from '@mui/material/TableRow'
 import TableCell from '@mui/material/TableCell'
+import Typography from '@mui/material/Typography'
+import Divider from '@mui/material/Divider'
 import Chip from '@mui/material/Chip'
 import StyleAdmin from '~/assets/StyleAdmin.jsx'
 
@@ -23,7 +25,18 @@ const ViewTransactionModal = ({ open, onClose, transaction }) => {
     Completed: 'success',
     Failed: 'error'
   }
-
+  const formatDate = (dateString) => {
+    if (!dateString) return 'Không có thông tin'
+    const date = new Date(dateString)
+    return date.toLocaleString('vi-VN', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit'
+    })
+  }
   if (!transaction) return null
 
   return (
@@ -34,8 +47,8 @@ const ViewTransactionModal = ({ open, onClose, transaction }) => {
       maxWidth='md'
       PaperProps={{
         sx: {
-          height: '80vh',
-          maxHeight: '80vh',
+          height: '63vh',
+          maxHeight: '63vh',
           display: 'flex',
           flexDirection: 'column'
         }
@@ -44,8 +57,9 @@ const ViewTransactionModal = ({ open, onClose, transaction }) => {
         sx: StyleAdmin.OverlayModal
       }}
     >
-      <DialogTitle>Chi tiết giao dịch</DialogTitle>
-      <DialogContent sx={{ overflowY: 'auto' }}>
+      <DialogTitle>Xem thông tin giao dịch</DialogTitle>
+      <Divider />
+      <DialogContent sx={{ overflowY: 'auto', py: 0, maxHeight: 435 }}>
         {transaction ? (
           <Table>
             <TableBody>
@@ -62,8 +76,8 @@ const ViewTransactionModal = ({ open, onClose, transaction }) => {
                 <TableCell sx={{ fontWeight: 'bold' }}>Mã đơn hàng</TableCell>
                 <TableCell>
                   {typeof transaction.orderId === 'object'
-                    ? transaction.orderId._id
-                    : transaction.orderId}
+                    ? transaction.orderCode
+                    : 'Không có thông tin'}
                 </TableCell>
               </TableRow>
 
@@ -97,19 +111,20 @@ const ViewTransactionModal = ({ open, onClose, transaction }) => {
 
               <TableRow>
                 <TableCell sx={{ fontWeight: 'bold' }}>Ngày tạo</TableCell>
-                <TableCell>
-                  {/*{new Date(transaction.createdAt).toLocaleString()}*/}
-                  {new Date(transaction.createdAt).toLocaleDateString('vi-VN', {
-                    day: '2-digit',
-                    month: '2-digit',
-                    year: 'numeric'
-                  })}
-                </TableCell>
+                <TableCell>{formatDate(transaction.createdAt)}</TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell sx={{ fontWeight: 'bold' }}>Ngày cập nhật</TableCell>
+                <TableCell>{formatDate(transaction.updatedAt)}</TableCell>
               </TableRow>
 
               <TableRow>
-                <TableCell sx={{ fontWeight: 'bold' }}>Ghi chú</TableCell>
-                <TableCell>{transaction.note || ' '}</TableCell>
+                <TableCell sx={{ fontWeight: 'bold', borderBottom: 0 }}>
+                  Ghi chú
+                </TableCell>
+                <TableCell sx={{ borderBottom: 0 }}>
+                  {transaction.note || 'không có ghi chú'}
+                </TableCell>
               </TableRow>
             </TableBody>
           </Table>
@@ -117,8 +132,14 @@ const ViewTransactionModal = ({ open, onClose, transaction }) => {
           <Typography>Không có dữ liệu giao dịch</Typography>
         )}
       </DialogContent>
+      <Divider />
       <DialogActions sx={{ padding: '16px 24px' }}>
-        <Button onClick={onClose} variant='contained'>
+        <Button
+          color='error'
+          onClick={onClose}
+          variant='outlined'
+          sx={{ textTransform: 'none' }}
+        >
           Đóng
         </Button>
       </DialogActions>

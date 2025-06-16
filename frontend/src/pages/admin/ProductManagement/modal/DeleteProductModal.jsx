@@ -39,7 +39,7 @@ const DeleteProductModal = ({ open, onClose, product, onDelete }) => {
       <DialogTitle>Xoá sản phẩm</DialogTitle>
       <DialogContent dividers>
         <Typography>
-          Bạn có chắc muốn xoá sản phẩm <b>{product.name}</b> không?
+          Bạn có chắc muốn xoá sản phẩm <b>{product.name}</b> này không?
         </Typography>
       </DialogContent>
       <DialogActions sx={{ padding: '16px 24px' }}>
@@ -51,6 +51,7 @@ const DeleteProductModal = ({ open, onClose, product, onDelete }) => {
           color='error'
           variant='contained'
           disabled={isDeleting} // Vô hiệu hóa nút nếu đang xoá
+          sx={{ textTransform: 'none' }}
         >
           {isDeleting ? 'Đang xoá...' : 'Xoá'}
         </Button>

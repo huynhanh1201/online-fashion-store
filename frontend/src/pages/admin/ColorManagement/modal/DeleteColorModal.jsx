@@ -34,14 +34,19 @@ const DeleteColorModal = ({ open, onClose, color, onDelete }) => {
         sx: StyleAdmin.OverlayModal
       }}
     >
-      <DialogTitle>Xoá màu</DialogTitle>
+      <DialogTitle>Xoá màu sắc</DialogTitle>
       <Divider sx={{ my: 0 }} />
       <DialogContent>
-        Bạn có chắc chắn muốn xoá màu <strong>{color?.name}</strong>?
+        Bạn có chắc chắn muốn xoá màu <strong>{color?.name}</strong> này không?
       </DialogContent>
       <Divider sx={{ my: 0 }} />
       <DialogActions sx={{ padding: '16px 24px' }}>
-        <Button onClick={onClose} color='inherit' disabled={isDeleting}>
+        <Button
+          onClick={onClose}
+          color='inherit'
+          disabled={isDeleting}
+          sx={{ textTransform: 'none' }}
+        >
           Hủy
         </Button>
         <Button
@@ -49,6 +54,7 @@ const DeleteColorModal = ({ open, onClose, color, onDelete }) => {
           color='error'
           variant='contained'
           disabled={isDeleting}
+          sx={{ textTransform: 'none' }}
         >
           {isDeleting ? 'Đang xoá...' : 'Xoá'}
         </Button>
