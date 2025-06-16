@@ -73,7 +73,8 @@ const OrderSchema = new Schema(
         'Shipping',
         'Shipped',
         'Delivered',
-        'Cancelled'
+        'Cancelled',
+        'Failed'
       ],
       default: 'Pending'
     },
