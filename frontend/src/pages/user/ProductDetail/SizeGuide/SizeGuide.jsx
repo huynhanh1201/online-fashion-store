@@ -294,8 +294,7 @@ const SizeGuide = () => {
                   sx={{
                     borderRadius: 2,
                     boxShadow: 1,
-                    background:
-                      'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                    background: '#1A3C7B',
                     color: 'white'
                   }}
                 >

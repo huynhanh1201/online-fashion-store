@@ -155,7 +155,7 @@ const HeaderAction = () => {
         }}
         MenuListProps={{ ref: menuRef }}
       >
-        <Fade in={open} timeout={{ enter: 300, exit: 150 }}>
+        <Fade in={open} timeout={{ enter: 500, exit: 200 }}>
           <div>
             {currentUser ? (
               <>
@@ -163,8 +163,8 @@ const HeaderAction = () => {
                   onClick={handleClose}
                   component={Link}
                   to='/profile'
-                  sx={{ 
-                    fontWeight: 'bold', 
+                  sx={{
+                    fontWeight: 'bold',
                     opacity: 1,
                     display: 'flex',
                     alignItems: 'center',
@@ -172,15 +172,15 @@ const HeaderAction = () => {
                     padding: '12px 16px',
                     backgroundColor: 'rgba(0, 0, 0, 0.04)',
                     '&:hover': {
-                      backgroundColor: 'rgba(0, 0, 0, 0.08)',
+                      backgroundColor: 'rgba(0, 0, 0, 0.08)'
                     }
                   }}
                 >
                   <Avatar
                     src={currentUser.avatarUrl}
                     alt={currentUser.name || 'User'}
-                    sx={{ 
-                      width: 32, 
+                    sx={{
+                      width: 32,
                       height: 32,
                       border: '2px solid #1976d2',
                       boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
@@ -202,12 +202,12 @@ const HeaderAction = () => {
                     }}
                   >
                     {currentUser.name}
-                    <CheckCircleIcon 
-                      sx={{ 
+                    <CheckCircleIcon
+                      sx={{
                         fontSize: '1.1rem',
                         color: '#4caf50',
                         ml: 0.5
-                      }} 
+                      }}
                     />
                   </Typography>
                 </MenuItem>

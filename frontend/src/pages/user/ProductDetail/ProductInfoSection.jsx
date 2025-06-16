@@ -155,8 +155,12 @@ const ProductInfoSection = ({
       {variants?.length > 0 && (
         <Box sx={{ mb: 1 }}>
           <Typography variant='body2' fontWeight={700} sx={{ mb: 1 }}>
-            Chọn màu sắc
+            Màu sắc
+            {selectedColor
+              ? `: ${selectedColor.charAt(0).toUpperCase()}${selectedColor.slice(1)}`
+              : ''}
           </Typography>
+
           {/* Hàng màu */}
           <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mb: 2 }}>
             {availableColors?.map((color) => {
@@ -176,7 +180,6 @@ const ProductInfoSection = ({
                     }
                   }}
                   sx={{
-                    flexDirection: 'column',
                     width: 50,
                     height: 50,
                     justifyContent: 'center',
@@ -187,6 +190,12 @@ const ProductInfoSection = ({
                     src={optimizeCloudinaryUrl(color.image) || '/default.jpg'}
                     alt={color.name}
                     onError={(e) => (e.target.src = '/default.jpg')}
+                    style={{
+                      width: '47px',
+                      height: '47px',
+                      borderRadius: '50%',
+                      objectFit: 'cover'
+                    }}
                   />
                 </VariantBox>
               )
@@ -195,8 +204,9 @@ const ProductInfoSection = ({
 
           {/* Hàng size */}
           <Typography variant='body2' fontWeight={700} sx={{ mb: 1 }}>
-            Chọn kích thước
+            Kích thước{selectedSize ? `: ${selectedSize.toUpperCase()}` : ''}
           </Typography>
+
           <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
             {availableSizes?.map((size) => {
               const isAvailable = variants.some(
@@ -225,7 +235,9 @@ const ProductInfoSection = ({
                     height: 40
                   }}
                 >
-                  <Typography variant='body2'>Size {size.name}</Typography>
+                  <Typography variant='body2'>
+                    {size.name.toUpperCase()}
+                  </Typography>
                 </VariantBox>
               )
             })}
