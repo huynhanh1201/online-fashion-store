@@ -123,8 +123,6 @@ const getVariantList = async (queryString) => {
     sortField = sortMap[sort]
   }
 
-  console.log('Filter:', filter)
-
   const [variants, total] = await Promise.all([
     VariantModel.find(filter)
       .collation({ locale: 'vi', strength: 1 })

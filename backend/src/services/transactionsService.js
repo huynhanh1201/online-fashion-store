@@ -2,10 +2,18 @@ import { verifyChecksum } from '~/utils/vnpay'
 import { PaymentTransactionModel } from '~/models/PaymentTransactionModel'
 import { OrderModel } from '~/models/OrderModel'
 import { env } from '~/config/environment'
+import { PaymentSessionDraftModel } from '~/models/PaymentSessionDraftModel'
+import { orderHelpers } from '~/helpers/orderHelpers'
+import mongoose from 'mongoose'
 
 // Thanh toán VNPAY
 const vnpayIPN = async (req) => {
+  // Bắt đầu phiên làm việc với Mongoose Transactions
+  const session = await mongoose.startSession()
+
   try {
+    session.startTransaction()
+
     const vnp_Params = { ...req.query }
     const isValid = verifyChecksum(vnp_Params)
 
@@ -18,34 +26,65 @@ const vnpayIPN = async (req) => {
     const transactionNo = vnp_Params['vnp_TransactionNo']
     const bankCode = vnp_Params['vnp_BankCode']
 
-    const transaction = await PaymentTransactionModel.findOne({ orderId })
-    if (!transaction) {
-      return { RspCode: '01', Message: 'Không tìm thấy đơn hàng' }
-    }
-
-    const updateData = {
+    const transactionInfo = {
       transactionId: transactionNo,
       paidAt: new Date(),
       note: `Bank: ${bankCode}`
     }
 
     if (rspCode === '00') {
-      updateData.status = 'Completed'
-      await PaymentTransactionModel.updateOne({ orderId }, updateData)
+      transactionInfo.status = 'Completed'
 
-      await OrderModel.updateOne(
+      // Lấy dữ liệu từ lưu trữ tạm thời
+      const paymentSessionDraft = await PaymentSessionDraftModel.findOne({
+        orderId
+      })
+        .session(session)
+        .lean()
+
+      const { cartItems, variantMap, order, reqBody, userId, variantIds } =
+        paymentSessionDraft
+
+      // Cập nhật trạng thái đơn hàng
+      const orderPromise = await OrderModel.updateOne(
         { _id: orderId },
-        { paymentStatus: 'Completed' }
+        { status: 'Processing', paymentStatus: 'Completed' }
+      ).session(session)
+
+      // Tạo giao dịch thanh toán
+      await orderHelpers.handleCreateTransaction(
+        reqBody,
+        order,
+        transactionInfo,
+        session
       )
+
+      // Tạo OrderItems
+      await orderHelpers.handleCreateOrderItems(
+        cartItems,
+        variantMap,
+        order,
+        session
+      )
+
+      // Xóa sản phẩm trong giỏ hàng
+      await orderHelpers.handleDeleteCartItems(userId, variantIds)
+
+      // Commit transaction
+      await session.commitTransaction()
 
       return { RspCode: '00', Message: 'Giao dịch thành công' }
     } else {
-      updateData.status = 'Failed'
-      await PaymentTransactionModel.updateOne({ orderId }, updateData)
+      // Commit transaction
+      await session.commitTransaction()
+
       return { RspCode: '01', Message: 'Giao dịch thất bại' }
     }
   } catch (err) {
+    await session.abortTransaction()
     return { RspCode: '99', Message: 'Lỗi hệ thống' }
+  } finally {
+    session.endSession()
   }
 }
 
