@@ -158,52 +158,10 @@ const deleteInventory = async (inventoryId) => {
   }
 }
 
-const validateInventory = async (cartItems, session) => {
-  const updatedInventories = []
-  let variantIds = []
-  let numberItemOrder = 0
-
-  for (const item of cartItems) {
-    const { variantId, quantity } = item
-
-    const inventory = await InventoryModel.findOneAndUpdate(
-      {
-        variantId,
-        quantity: { $gte: quantity }
-      },
-      {
-        $inc: { quantity: -quantity }
-      },
-      {
-        new: true,
-        session
-      }
-    )
-
-    if (!inventory) {
-      throw new apiError(
-        StatusCodes.UNPROCESSABLE_ENTITY,
-        `Biến thể của sản phẩm không đủ tồn kho để đặt hàng (yêu cầu: ${quantity})`
-      )
-    }
-
-    updatedInventories.push(inventory)
-
-    numberItemOrder += quantity
-
-    // Lấy mảng variantId
-    if (variantIds.includes(variantId)) continue
-    variantIds.push(variantId)
-  }
-
-  return { updatedInventories, numberItemOrder, variantIds }
-}
-
 export const inventoriesService = {
   getInventoryList,
   getInventory,
   updateInventory,
   deleteInventory,
-  handleCreateInventory,
-  validateInventory
+  handleCreateInventory
 }

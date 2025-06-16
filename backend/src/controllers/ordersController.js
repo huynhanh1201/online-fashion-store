@@ -10,7 +10,8 @@ const createOrder = async (req, res, next) => {
     const result = await ordersService.createOrder(
       req.jwtDecoded._id,
       req.body,
-      ipAddr
+      ipAddr,
+      req.jwtDecoded
     )
 
     // Có kết quả thì trả về Client

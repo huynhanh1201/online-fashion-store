@@ -1,332 +1,114 @@
 import { StatusCodes } from 'http-status-codes'
 import mongoose from 'mongoose'
-import dayjs from 'dayjs'
 
 import ApiError from '~/utils/ApiError'
 import { OrderModel } from '~/models/OrderModel'
-import { ShippingAddressModel } from '~/models/ShippingAddressModel'
-import { CartModel } from '~/models/CartModel'
-import { couponsService } from '~/services/couponsService'
-import { OrderItemModel } from '~/models/OrderItemModel'
 import { OrderStatusHistoryModel } from '~/models/OrderStatusHistoryModel'
-import { PaymentTransactionModel } from '~/models/PaymentTransactionModel'
-import { env } from '~/config/environment'
 import { UserModel } from '~/models/UserModel'
-import { CouponModel } from '~/models/CouponModel'
-import { VariantModel } from '~/models/VariantModel'
-import { InventoryModel } from '~/models/InventoryModel'
-import apiError from '~/utils/ApiError'
-import { deliveriesService } from '~/services/deliveriesService'
-import generateSequentialCode from '~/utils/generateSequentialCode'
 import validatePagination from '~/utils/validatePagination'
 import getDateRange from '~/utils/getDateRange'
-import { shippingAddressesService } from '~/services/shippingAddressesService'
-import { inventoriesService } from '~/services/inventoriesService'
+import { orderHelpers } from '~/helpers/orderHelpers'
 
-const createOrder = async (userId, reqBody, ipAddr) => {
+const createOrder = async (userId, reqBody, ipAddr, jwtDecoded) => {
   // eslint-disable-next-line no-useless-catch
 
-  // 1. Bắt đầu phiên làm việc với Mongoose Transactions
+  // Bắt đầu phiên làm việc với Mongoose Transactions
   const session = await mongoose.startSession()
 
   try {
     session.startTransaction()
 
-    const {
-      cartItems,
-      shippingAddressId,
-      total,
-      couponId,
-      couponCode,
-      paymentMethod,
-      note
-    } = reqBody
+    const { cartItems, shippingAddressId, total, couponCode } = reqBody
 
-    // Kiểm tra tồn kho và lấy thông tin sản phẩm
-    let { updatedInventories, numberItemOrder, variantIds } =
-      await inventoriesService.validateInventory(cartItems, session)
+    // Kiểm tra tồn kho có đủ không
+    await orderHelpers.checkInventorySufficient(cartItems, session)
+
+    // Tạo phiếu xuất kho
+    await orderHelpers.createWarehouseSlipFromOrder(
+      jwtDecoded,
+      cartItems,
+      session,
+      'export'
+    )
+
+    // Lấy các variantIds từ cartItems
+    const variantIds = orderHelpers.getVariantIdsFromCartItems(cartItems)
 
     // Lấy các variants từ cartItems
-    const variantsPromise = await VariantModel.find({
-      _id: { $in: variantIds }
-    })
-      .session(session)
-      .lean()
+    const variants = await orderHelpers.getVariantsFromCartItems(
+      cartItems,
+      variantIds
+    )
 
     // Kiểm tra địa ch giao hàng
-    const shippingAddressPromise =
-      shippingAddressesService.validateShippingAddress(
-        userId,
-        shippingAddressId,
-        session
-      )
-
-    // Xử lý các Promise đồng thời
-    const [variants, address] = await Promise.all([
-      variantsPromise,
-      shippingAddressPromise
-    ])
+    const address = await orderHelpers.checkShippingAddress(
+      userId,
+      shippingAddressId,
+      session
+    )
 
     // Tạo dữ liệu variantMap
     const variantMap = new Map(variants.map((p) => [p._id.toString(), p]))
 
-    // Xác thực mã giảm giá
-    const validateCoupon = await couponsService.validateCoupon(userId, {
-      couponCode,
-      cartTotal: calculatedSubtotal
-    })
-
-    if (!validateCoupon.valid && couponCode) {
-      throw new ApiError(StatusCodes.BAD_REQUEST, validateCoupon.message)
-    }
-
-    if (validateCoupon.valid && couponCode) {
-      await CouponModel.updateOne(
-        { code: couponCode },
-        { $inc: { usedCount: 1 } }
-      ).session(session)
-    }
-
-    // Tính toán tổng tiền
-    // const variantItemsGHN = []
-    // let calculatedSubtotal = 0
-    // for (const item of cartItems) {
-    //   const variant = variantMap.get(item.variantId.toString())
-    //   if (!variant) {
-    //     throw new ApiError(
-    //       StatusCodes.NOT_FOUND,
-    //       `Sản phẩm với ID ${item.variantId} không tồn tại.`
-    //     )
-    //   }
-    //   calculatedSubtotal += variant.exportPrice * item.quantity
-    //
-    //   // Danh sach items GHN
-    //   variantItemsGHN.push({
-    //     name: variant.name,
-    //     code: variant.sku,
-    //     quantity: item.quantity,
-    //     price: variant.exportPrice,
-    //     length: 30,
-    //     width: 20,
-    //     height: 2,
-    //     weight: 300
-    //   })
-    // }
-    //
-    // const cartTotal = validateCoupon.newTotal || calculatedSubtotal
-    // const discountAmount = validateCoupon.discountAmount || 0
-    //
-    // // Kiểm tra tổng tiền từ FE
-    //
-    // if (cartTotal !== total) {
-    //   throw new ApiError(
-    //     StatusCodes.UNPROCESSABLE_ENTITY,
-    //     'Tổng tiền không chính xác.'
-    //   )
-    // }
-
-    // Kiiểm tra tổng giá tri của đơn hàng
-    let { variantItemsGHN, calculatedSubtotal, cartTotal, discountAmount } =
-      checkOrderValue(total, cartItems, variantMap, validateCoupon)
-
-    console.log(checkOrderValue(total, cartItems, variantMap, validateCoupon))
-
-    // Tạo đơn hàng
-    const date = dayjs().format('YYYYMMDD')
-    const prefixSlipId = `DH-${date}-`
-
-    const code = await generateSequentialCode(
-      prefixSlipId,
-      4,
-      async (prefixSlipId) => {
-        // Query mã lớn nhất đã có với prefixSlipId đó
-        const regex = new RegExp(`^${prefixSlipId}(\\d{4})$`)
-        const latest = await OrderModel.findOne({
-          code: { $regex: regex }
-        })
-          .sort({ code: -1 }) // sort giảm dần, AV10 > AV09
-          .lean()
-
-        // Tính số thứ tự tiếp theo
-        let nextNumber = 1
-        if (latest) {
-          const match = latest.code.match(regex)
-          if (match && match[1]) {
-            nextNumber = parseInt(match[1], 10) + 1 // ví dụ AV10 → match[1] = "10" → +1 = 11
-          }
-        }
-
-        return nextNumber
-      }
+    // Tính tổng tiền từ giỏ hàng
+    const calculatedSubtotal = orderHelpers.calculatedSubtotal(
+      cartItems,
+      variantMap
     )
 
-    const newOrder = {
+    // Kiểm tra tổng giá tri của đơn hàng FE gửi lên có đúng không
+    await orderHelpers.validateOrderTotal(calculatedSubtotal, total)
+
+    // Xác thực mã giảm giá
+    const validatedCoupon = await orderHelpers.applyCouponToCart(
       userId,
-      shippingAddressId,
-      shippingAddress: address,
-      total: cartTotal + reqBody?.shippingFee || 0,
-      couponId,
-      paymentMethod,
       couponCode,
-      note,
-      discountAmount,
-      status: 'Pending',
-      isPaid: false,
-      paymentStatus: 'Pending',
-      isDelivered: false,
+      calculatedSubtotal,
+      session
+    )
 
-      shippingFee: reqBody.shippingFee,
-      code: code
-    }
+    const discountAmount = validatedCoupon?.discountAmount || 0
 
-    const [order] = await OrderModel.create([newOrder], { session })
-
-    // Tạo đơn hàng vận chuyển (GHN)
-    const orderGHNCreated = deliveriesService.createOrderDelivery(
+    // Tạo order trong hệ thống
+    const order = await orderHelpers.handleCreateOrder(
+      userId,
       reqBody,
-      order,
       address,
-      variantItemsGHN,
-      numberItemOrder
+      discountAmount,
+      calculatedSubtotal,
+      session
     )
 
     // Tạo OrderItems
-    const orderItems = cartItems.map((item) => {
-      const variant = variantMap.get(item.variantId.toString())
-
-      return {
-        orderId: order._id,
-        productId: variant.productId,
-        color: variant.color,
-        size: variant.size.name,
-        name: variant.name,
-        price: variant.exportPrice,
-        quantity: item.quantity,
-        subtotal: variant.exportPrice * item.quantity
-      }
-    })
-
-    await OrderItemModel.insertMany(orderItems, { session })
+    await orderHelpers.handleCreateOrderItems(
+      cartItems,
+      variantMap,
+      order,
+      session
+    )
 
     // Tạo giao dịch thanh toán
-    const paymentTransactionInfo = {
-      orderId: order._id,
-      method: paymentMethod,
-      transactionId: null,
-      status: 'Pending',
-      paidAt: null,
-      note: note || null,
-      orderCode: order.code
-    }
-
-    await PaymentTransactionModel.create([paymentTransactionInfo], { session })
+    await orderHelpers.handleCreateTransaction(reqBody, order, session)
 
     // Xóa sản phẩm trong giỏ hàng
-    await CartModel.updateOne(
-      { userId },
-      {
-        $pull: {
-          cartItems: {
-            variantId: { $in: variantIds }
-          }
-        }
-      }
-    ).session(session)
-
-    // 3. Commit transaction
-    await session.commitTransaction()
-
-    //==============================
-    // const dayjs = require('dayjs')
-    const crypto = require('crypto')
-    const querystring = require('qs')
+    await orderHelpers.handleDeleteCartItems(userId, variantIds, session)
 
     // Xử lý thanh toán VNPAY
-    if (paymentMethod === 'vnpay') {
-      const createDate = dayjs().format('YYYYMMDDHHmmss')
-      const expireDate = dayjs().add(15, 'minute').format('YYYYMMDDHHmmss')
-      const orderId = order._id.toString()
-      const amount = order.total // tổng tiền chưa nhân 100
-      const bankCode = reqBody.bankCode || ''
-      const orderInfo = `Thanh toan don hang ${cartItems.length} san pham, tong: ${amount} VND, coupon: ${couponCode || 'Khong'}, ghi chu: ${note || 'Khong co'}`
-      const orderType = 'other'
-      const locale = reqBody.language || 'vn'
+    const paymentUrl = orderHelpers.handlePaymentByVnpay(reqBody, order, ipAddr)
 
-      const tmnCode = env.VNP_TMNCODE.trim()
-      const secretKey = env.VNP_HASHSECRET.trim()
-      const vnpUrl = env.VNP_URL.trim()
-      const returnUrl = env.VNP_RETURN_URL.trim()
+    // Commit transaction
+    await session.commitTransaction()
 
-      let vnp_Params = {
-        vnp_Version: '2.1.0',
-        vnp_Command: 'pay',
-        vnp_TmnCode: tmnCode,
-        vnp_Locale: locale,
-        vnp_CurrCode: 'VND',
-        vnp_TxnRef: orderId,
-        vnp_OrderInfo: orderInfo,
-        vnp_OrderType: orderType,
-        vnp_Amount: amount * 100, // Bắt buộc nhân 100
-        vnp_ReturnUrl: returnUrl,
-        vnp_IpAddr: ipAddr,
-        vnp_CreateDate: createDate,
-        vnp_ExpireDate: expireDate
-      }
+    // Tạo đơn hàng vận chuyển (GHN)
+    const orderGHNCreated = await orderHelpers.handleCreateOrderForGHN(
+      reqBody,
+      cartItems,
+      order,
+      address,
+      variantMap
+    )
 
-      if (bankCode) {
-        vnp_Params.vnp_BankCode = bankCode
-      }
-
-      // Loại bỏ tham số rỗng
-      vnp_Params = Object.fromEntries(
-        Object.entries(vnp_Params).filter(
-          ([_, v]) => v !== null && v !== undefined && v !== ''
-        )
-      )
-
-      // Hàm encode key, value rồi sort theo key
-      // eslint-disable-next-line no-inner-declarations
-      function sortObject(obj) {
-        const sorted = {}
-        const keys = Object.keys(obj)
-          .map((k) => encodeURIComponent(k))
-          .sort()
-        for (const key of keys) {
-          const originalKey = Object.keys(obj).find(
-            (k) => encodeURIComponent(k) === key
-          )
-          const value = encodeURIComponent(obj[originalKey]).replace(
-            /%20/g,
-            '+'
-          )
-          sorted[key] = value
-        }
-        return sorted
-      }
-
-      // Sắp xếp và encode param theo chuẩn VNPAY
-      const sortedParams = sortObject(vnp_Params)
-
-      // Tạo chuỗi ký (signData) từ params đã encode, không encode thêm nữa
-      const signData = querystring.stringify(sortedParams, { encode: false })
-
-      // Tạo chữ ký HMAC SHA512 với secretKey
-      const signature = crypto
-        .createHmac('sha512', secretKey)
-        .update(signData, 'utf-8')
-        .digest('hex')
-
-      // Thêm chữ ký vào params
-      sortedParams['vnp_SecureHash'] = signature
-
-      // Tạo URL thanh toán, sử dụng encode: false vì params đã được mã hóa
-      const paymentUrl =
-        vnpUrl + '?' + querystring.stringify(sortedParams, { encode: false })
-
-      return paymentUrl
-    }
-
-    return order
+    return paymentUrl || order
   } catch (err) {
     await session.abortTransaction()
     throw err
@@ -489,54 +271,10 @@ const deleteOrder = async (orderId) => {
   }
 }
 
-const checkOrderValue = (total, cartItems, variantMap, validateCoupon) => {
-  const variantItemsGHN = []
-  let calculatedSubtotal = 0
-
-  for (const item of cartItems) {
-    const variant = variantMap.get(item.variantId.toString())
-
-    if (!variant) {
-      throw new ApiError(
-        StatusCodes.NOT_FOUND,
-        `Sản phẩm với ID ${item.variantId} không tồn tại.`
-      )
-    }
-    calculatedSubtotal += variant.exportPrice * item.quantity
-
-    // Danh sach items GHN
-    variantItemsGHN.push({
-      name: variant.name,
-      code: variant.sku,
-      quantity: item.quantity,
-      price: variant.exportPrice,
-      length: 30,
-      width: 20,
-      height: 2,
-      weight: 300
-    })
-  }
-
-  const cartTotal = validateCoupon.newTotal || calculatedSubtotal
-  const discountAmount = validateCoupon.discountAmount || 0
-
-  // Kiểm tra tổng tiền từ FE
-
-  if (cartTotal !== total) {
-    throw new ApiError(
-      StatusCodes.UNPROCESSABLE_ENTITY,
-      'Tổng tiền không chính xác.'
-    )
-  }
-
-  return { variantItemsGHN, calculatedSubtotal, cartTotal, discountAmount }
-}
-
 export const ordersService = {
   createOrder,
   getOrderList,
   getOrder,
   updateOrder,
-  deleteOrder,
-  checkOrderValue
+  deleteOrder
 }

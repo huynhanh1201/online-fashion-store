@@ -38,6 +38,8 @@ const vnpayIPN = async (req) => {
         { paymentStatus: 'Completed' }
       )
 
+      console.log('VNPay IPN - Giao dịch thành công')
+
       return { RspCode: '00', Message: 'Giao dịch thành công' }
     } else {
       updateData.status = 'Failed'
