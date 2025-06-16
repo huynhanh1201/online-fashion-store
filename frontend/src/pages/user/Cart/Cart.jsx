@@ -25,8 +25,11 @@ import {
 import { Delete, Add, Remove, DeleteForever } from '@mui/icons-material'
 import { useCart } from '~/hooks/useCarts'
 import { useNavigate } from 'react-router-dom'
-import { useDispatch } from 'react-redux'
-import { setSelectedItems as setSelectedItemsAction } from '~/redux/cart/cartSlice'
+import { useDispatch, useSelector } from 'react-redux'
+import {
+  setSelectedItems as setSelectedItemsAction,
+  setTempQuantity, removeTempQuantity
+} from '~/redux/cart/cartSlice'
 import { optimizeCloudinaryUrl } from '~/utils/cloudinary'
 import { getDiscounts } from '~/services/discountService'
 
@@ -42,7 +45,7 @@ const Cart = () => {
   const dispatch = useDispatch()
   const [inventoryQuantities, setInventoryQuantities] = useState({})
   const [fetchingVariants, setFetchingVariants] = useState(new Set())
-  const [isFetchingInventories, setIsFetchingInventories] = useState(false)
+
   const [deleteMode, setDeleteMode] = useState('')
   const [itemToDelete, setItemToDelete] = useState(null)
 
@@ -64,7 +67,6 @@ const Cart = () => {
 
       if (newVariantsToFetch.length === 0) return
 
-      setIsFetchingInventories(true)
       setFetchingVariants(prev => new Set([...prev, ...newVariantsToFetch]))
 
       try {
@@ -94,7 +96,6 @@ const Cart = () => {
           newVariantsToFetch.forEach(id => newSet.delete(id))
           return newSet
         })
-        setIsFetchingInventories(false)
       }
     }
 
@@ -107,7 +108,6 @@ const Cart = () => {
     const fetchCoupons = async () => {
       try {
         const res = await getDiscounts()
-        console.log('Dữ liệu mã giảm giá:', res) // Debug
         if (Array.isArray(res.discounts) && res.discounts.length > 0) {
           setCoupons(res.discounts.sort((a, b) => a.minOrderValue - b.minOrderValue))
         }
@@ -154,42 +154,67 @@ const Cart = () => {
       ? val.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })
       : '0₫'
 
-  const handleQuantityChange = async (variantId, delta) => {
-    if (isFetchingInventories) return
-
+  const tempQuantities = useSelector(state => state.cart.tempQuantities || {})
+  const [processingVariantId, setProcessingVariantId] = useState(null)
+  const handleMouseDown = (variantId, delta) => {
     const item = cartItems.find(i => i.variant._id === variantId)
     if (!item) return
 
-    const currentQty = item.quantity
-    const maxQty = inventoryQuantities[variantId] || 1
-    const newQty = currentQty + delta
+    const current = tempQuantities[variantId] ?? item.quantity
+    const max = inventoryQuantities[variantId] || 99
 
-    if (newQty < 1) return
-    if (newQty > maxQty) {
+    // 🚫 Nếu đang tăng mà đã chạm max → không cho tăng nữa
+    if (delta > 0 && current >= max) {
       setShowMaxQuantityAlert(true)
       return
     }
 
+
+    const newQty = Math.min(Math.max(current + delta, 1), max)
+
+    dispatch(setTempQuantity({ variantId, quantity: newQty }))
+
+    setSelectedItems(prev =>
+      prev.map(i =>
+        i.variantId === variantId ? { ...i, quantity: newQty } : i
+      )
+    )
+  }
+
+
+
+  // khi rời chuột mới gọi api
+  const handleMouseLeave = async (variantId) => {
+    const item = cartItems.find(i => i.variant._id === variantId)
+    const tempQty = tempQuantities[variantId]
+
+    if (!item || tempQty === undefined || tempQty === item.quantity) return
+
     try {
+      setProcessingVariantId(variantId)
+      const delta = tempQty - item.quantity
       await updateItem(variantId, { quantity: delta })
 
-      setCartItems(prevItems =>
-        prevItems.map(i =>
-          i.variant._id === variantId
-            ? { ...i, quantity: newQty }
-            : i
+      setCartItems(prev =>
+        prev.map(i =>
+          i.variant._id === variantId ? { ...i, quantity: tempQty } : i
         )
       )
 
       setSelectedItems(prev =>
         prev.map(i =>
-          i.variantId === variantId ? { ...i, quantity: newQty } : i
+          i.variantId === variantId ? { ...i, quantity: tempQty } : i
         )
       )
-    } catch (error) {
-      console.error('Lỗi cập nhật số lượng:', error)
+
+      dispatch(removeTempQuantity(variantId))
+    } catch (err) {
+      console.error('Lỗi cập nhật số lượng:', err)
+    } finally {
+      setProcessingVariantId(null)
     }
   }
+
 
   const handleRemove = async ({ variantId }) => {
     try {
@@ -210,11 +235,16 @@ const Cart = () => {
   const selectedCartItems = cartItems.filter(item =>
     selectedItems.some(selected => selected.variantId === item.variant._id)
   )
+  useEffect(() => {
+    dispatch(setSelectedItemsAction(selectedItems))
+  }, [selectedItems])
 
-  const totalPrice = selectedCartItems.reduce(
-    (sum, item) => sum + (item.variant.exportPrice || 0) * item.quantity,
-    0
-  )
+  const totalPrice = selectedCartItems.reduce((sum, item) => {
+    const selected = selectedItems.find(i => i.variantId === item.variant._id)
+    const qty = selected?.quantity || item.quantity
+    return sum + (item.variant.exportPrice || 0) * qty
+  }, 0)
+
 
   const handleClearCart = async () => {
     await clearCart()
@@ -260,7 +290,6 @@ const Cart = () => {
   const applicableCoupon = getApplicableCoupon()
   const nextCoupon = getNextCoupon()
   const discountAmount = applicableCoupon ? calculateDiscount(applicableCoupon, totalPrice) : 0
-
 
 
   if (loading) {
@@ -410,35 +439,51 @@ const Cart = () => {
                   <TableCell align='center' sx={{ fontWeight: '600', color: '#007B00' }}>
                     {formatPrice(variant.exportPrice)}
                   </TableCell>
-                  <TableCell align='center'>
-                    <Box display='flex' alignItems='center' justifyContent='center'>
+                  <TableCell align="center">
+                    <Box
+                      display="flex"
+                      alignItems="center"
+                      justifyContent="center"
+                      onMouseLeave={() => handleMouseLeave(variant._id)}
+                    >
                       <IconButton
-                        size='small'
-                        onClick={() => handleQuantityChange(variant._id, -1)}
-                        disabled={isFetchingInventories || item.quantity <= 1}
-                        aria-label='Giảm số lượng'
+                        size="small"
+                        onMouseDown={() => handleMouseDown(variant._id, -1)}
+                        disabled={
+                          processingVariantId === variant._id ||
+                          (tempQuantities[variant._id] ?? item.quantity) <= 1
+                        }
                       >
                         <Remove />
                       </IconButton>
+
                       <TextField
-                        value={item.quantity}
-                        size='small'
+                        value={tempQuantities[variant._id] ?? item.quantity}
+                        size="small"
                         sx={{ width: 50, mx: 1 }}
-                        inputProps={{
-                          style: { textAlign: 'center' },
-                          readOnly: true
-                        }}
+                        inputProps={{ style: { textAlign: 'center' }, readOnly: true }}
                       />
+
                       <IconButton
-                        size='small'
-                        onClick={() => handleQuantityChange(variant._id, 1)}
-                        disabled={isFetchingInventories || item.quantity >= (inventoryQuantities[variant._id] || 99)}
-                        aria-label='Tăng số lượng'
+                        size="small"
+                        onMouseDown={() => handleMouseDown(variant._id, 1)}
+                        disabled={
+                          processingVariantId === variant._id ||
+                          !inventoryQuantities[variant._id] ||
+                          (tempQuantities[variant._id] ?? item.quantity) >= inventoryQuantities[variant._id]
+                        }
+
                       >
                         <Add />
                       </IconButton>
+
+
+
                     </Box>
                   </TableCell>
+
+
+
                   <TableCell align='center'>
                     <IconButton
                       color='error'

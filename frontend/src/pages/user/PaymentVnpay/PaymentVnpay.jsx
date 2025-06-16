@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react'
 
-import { Container, Box, Typography, Button } from '@mui/material'
+import { Container, Box, Typography, Button, Stack } from '@mui/material'
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline'
 import { useNavigate } from 'react-router-dom'
 import { useCart } from '~/hooks/useCarts'
@@ -11,6 +11,12 @@ const PaymentVnpay = () => {
   const { refresh } = useCart()
   const handleGoHome = () => {
     navigate('/')
+  }
+  const handleGoOrders = () => {
+    navigate('/orders')
+    setTimeout(() => {
+      refresh()
+    }, 0)
   }
   useEffect(() => {
     setTimeout(() => {
@@ -66,10 +72,31 @@ const PaymentVnpay = () => {
         <Typography variant="body1" sx={{ mb: 4 }}>
           Cảm ơn bạn đã thanh toán qua VNPay. Đơn hàng của bạn đã được xử lý.
         </Typography>
+        <Stack direction="row" spacing={2} justifyContent="center">
+          <Button
+            variant="contained"
+            onClick={handleGoHome}
+            sx={{
+              backgroundColor: '#1A3C7B',
+              '&:hover': {
+                backgroundColor: '#162f61',
+              }
+            }}
+          >
+            Quay về trang chủ
+          </Button>
 
-        <Button variant="contained" color="primary" onClick={handleGoHome}>
-          Quay về trang chủ
-        </Button>
+          <Button variant="contained"
+            sx={{
+              backgroundColor: '#1A3C7B',
+              '&:hover': {
+                backgroundColor: '#162f61',
+              }
+            }} onClick={handleGoOrders}>
+            Đơn mua của bạn
+          </Button>
+        </Stack>
+
       </Container>
     </Box>
   )

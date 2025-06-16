@@ -59,10 +59,24 @@ const OrderFailed = () => {
         </Typography>
 
         <Stack direction="row" spacing={2} justifyContent="center">
-          <Button variant="contained" color="primary" onClick={handleGoHome}>
+          <Button variant="contained"
+            onClick={handleGoHome}
+            sx={{
+              backgroundColor: '#1A3C7B',
+              '&:hover': {
+                backgroundColor: '#162f61',
+              }
+            }}
+          >
             Quay về trang chủ
           </Button>
-          <Button variant="contained" color="primary" onClick={handleGoCart}>
+          <Button variant="contained" sx={{
+            backgroundColor: '#1A3C7B',
+            '&:hover': {
+              backgroundColor: '#162f61',
+            }
+          }}
+            onClick={handleGoCart}>
             Quay về giỏ hàng
           </Button>
         </Stack>
