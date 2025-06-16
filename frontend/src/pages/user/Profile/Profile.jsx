@@ -32,7 +32,6 @@ import {
 } from '~/services/userService'
 import { useDispatch } from 'react-redux'
 import { updateUserAPI } from '~/redux/user/userSlice'
-import { optimizeCloudinaryUrl } from '~/utils/cloudinary'
 import { URI, CLOUD_FOLDER } from '~/utils/constants'
 
 
@@ -214,7 +213,7 @@ const Profile = () => {
         console.error('Lỗi khi tải thông tin hồ sơ:', error)
         showSnackbar(
           error.message ||
-            'Không thể tải thông tin hồ sơ. Vui lòng thử lại sau.',
+          'Không thể tải thông tin hồ sơ. Vui lòng thử lại sau.',
           'error'
         )
         // Reset các giá trị về mặc định
