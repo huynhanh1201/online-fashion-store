@@ -84,27 +84,10 @@ const deleteShippingAddress = async (userId, shippingAddressId) => {
   }
 }
 
-const validateShippingAddress = async (userId, shippingAddressId, session) => {
-  const address = await ShippingAddressModel.findOne({
-    _id: shippingAddressId,
-    userId
-  }).session(session)
-
-  if (!address) {
-    throw new ApiError(
-      StatusCodes.NOT_FOUND,
-      'Địa chỉ giao hàng không tồn tại.'
-    )
-  }
-
-  return address
-}
-
 export const shippingAddressesService = {
   createShippingAddress,
   getShippingAddressList,
   getShippingAddress,
   updateShippingAddress,
-  deleteShippingAddress,
-  validateShippingAddress
+  deleteShippingAddress
 }
