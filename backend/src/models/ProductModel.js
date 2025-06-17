@@ -61,6 +61,29 @@ const productSchema = new Schema(
       uppercase: true,
       trim: true
       // Ví dụ: AT01 – Mã định danh duy nhất của sản phẩm
+    },
+
+    packageSize: {
+      length: {
+        type: Number,
+        required: true,
+        min: 0
+      },
+      width: {
+        type: Number,
+        required: true,
+        min: 0
+      },
+      height: {
+        type: Number,
+        required: true,
+        min: 0
+      },
+      weight: {
+        type: Number,
+        required: true,
+        min: 0
+      }
     }
   },
   {
