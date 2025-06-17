@@ -3,11 +3,6 @@ import React, { useState, useEffect } from 'react'
 import {
   Box,
   Container,
-  Table,
-  TableHead,
-  TableRow,
-  TableCell,
-  TableBody,
   Typography,
   IconButton,
   TextField,
@@ -20,15 +15,32 @@ import {
   DialogActions,
   DialogContent,
   DialogContentText,
-  DialogTitle
+  DialogTitle,
+  Paper,
+  Divider,
+  Chip,
+  Card,
+  CardContent,
+  Grid,
+  Tooltip,
 } from '@mui/material'
-import { Delete, Add, Remove, DeleteForever } from '@mui/icons-material'
+import {
+  Delete,
+  Add,
+  Remove,
+  DeleteForever,
+  ShoppingCart,
+  LocalOffer,
+  Payment,
+  ArrowForward,
+} from '@mui/icons-material'
 import { useCart } from '~/hooks/useCarts'
 import { useNavigate } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import {
   setSelectedItems as setSelectedItemsAction,
-  setTempQuantity, removeTempQuantity
+  setTempQuantity,
+  removeTempQuantity,
 } from '~/redux/cart/cartSlice'
 import { optimizeCloudinaryUrl } from '~/utils/cloudinary'
 import { getDiscounts } from '~/services/discountService'
@@ -45,9 +57,10 @@ const Cart = () => {
   const dispatch = useDispatch()
   const [inventoryQuantities, setInventoryQuantities] = useState({})
   const [fetchingVariants, setFetchingVariants] = useState(new Set())
-
   const [deleteMode, setDeleteMode] = useState('')
   const [itemToDelete, setItemToDelete] = useState(null)
+  const tempQuantities = useSelector((state) => state.cart.tempQuantities || {})
+  const [processingVariantId, setProcessingVariantId] = useState(null)
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'auto' })
@@ -62,20 +75,28 @@ const Cart = () => {
       if (cartItems.length === 0) return
 
       const newVariantsToFetch = cartItems
-        .filter(item => !inventoryQuantities[item.variant._id] && !fetchingVariants.has(item.variant._id))
-        .map(item => item.variant._id)
+        .filter(
+          (item) =>
+            !inventoryQuantities[item.variant._id] &&
+            !fetchingVariants.has(item.variant._id),
+        )
+        .map((item) => item.variant._id)
 
       if (newVariantsToFetch.length === 0) return
 
-      setFetchingVariants(prev => new Set([...prev, ...newVariantsToFetch]))
+      setFetchingVariants((prev) => new Set([...prev, ...newVariantsToFetch]))
 
       try {
-        const fetchPromises = newVariantsToFetch.map(async variantId => {
+        const fetchPromises = newVariantsToFetch.map(async (variantId) => {
           try {
-            const res = await fetch(`http://localhost:8017/v1/inventories?variantId=${variantId}`)
+            const res = await fetch(
+              `http://localhost:8017/v1/inventories?variantId=${variantId}`,
+            )
             const result = await res.json()
             const inventoryList = result.data
-            const inventory = Array.isArray(inventoryList) ? inventoryList[0] : inventoryList
+            const inventory = Array.isArray(inventoryList)
+              ? inventoryList[0]
+              : inventoryList
             return { variantId, quantity: inventory?.quantity ?? 0 }
           } catch (error) {
             console.error(`Lỗi lấy tồn kho cho variant ${variantId}:`, error)
@@ -91,9 +112,9 @@ const Cart = () => {
 
         setInventoryQuantities(newInventoryQuantities)
       } finally {
-        setFetchingVariants(prev => {
+        setFetchingVariants((prev) => {
           const newSet = new Set(prev)
-          newVariantsToFetch.forEach(id => newSet.delete(id))
+          newVariantsToFetch.forEach((id) => newSet.delete(id))
           return newSet
         })
       }
@@ -109,7 +130,9 @@ const Cart = () => {
       try {
         const res = await getDiscounts()
         if (Array.isArray(res.discounts) && res.discounts.length > 0) {
-          setCoupons(res.discounts.sort((a, b) => a.minOrderValue - b.minOrderValue))
+          setCoupons(
+            res.discounts.sort((a, b) => a.minOrderValue - b.minOrderValue),
+          )
         }
       } catch (error) {
         console.error('Lỗi lấy danh sách mã giảm giá:', error)
@@ -121,16 +144,17 @@ const Cart = () => {
     fetchCoupons()
   }, [hasFetchedCoupons])
 
-
-  const allSelected = cartItems.length > 0 && selectedItems.length === cartItems.length
-  const someSelected = selectedItems.length > 0 && selectedItems.length < cartItems.length
+  const allSelected =
+    cartItems.length > 0 && selectedItems.length === cartItems.length
+  const someSelected =
+    selectedItems.length > 0 && selectedItems.length < cartItems.length
 
   const handleSelectAll = () => {
     const newSelected = allSelected
       ? []
-      : cartItems.map(item => ({
+      : cartItems.map((item) => ({
         variantId: item.variant._id,
-        quantity: item.quantity
+        quantity: item.quantity,
       }))
 
     setSelectedItems(newSelected)
@@ -139,10 +163,10 @@ const Cart = () => {
 
   const handleSelect = (item) => {
     const variantId = item.variant._id
-    const exists = selectedItems.some(i => i.variantId === variantId)
+    const exists = selectedItems.some((i) => i.variantId === variantId)
 
     const newSelected = exists
-      ? selectedItems.filter(i => i.variantId !== variantId)
+      ? selectedItems.filter((i) => i.variantId !== variantId)
       : [...selectedItems, { variantId, quantity: item.quantity }]
 
     setSelectedItems(newSelected)
@@ -154,38 +178,31 @@ const Cart = () => {
       ? val.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })
       : '0₫'
 
-  const tempQuantities = useSelector(state => state.cart.tempQuantities || {})
-  const [processingVariantId, setProcessingVariantId] = useState(null)
   const handleMouseDown = (variantId, delta) => {
-    const item = cartItems.find(i => i.variant._id === variantId)
+    const item = cartItems.find((i) => i.variant._id === variantId)
     if (!item) return
 
     const current = tempQuantities[variantId] ?? item.quantity
     const max = inventoryQuantities[variantId] || 99
 
-    // 🚫 Nếu đang tăng mà đã chạm max → không cho tăng nữa
     if (delta > 0 && current >= max) {
       setShowMaxQuantityAlert(true)
       return
     }
 
-
     const newQty = Math.min(Math.max(current + delta, 1), max)
 
     dispatch(setTempQuantity({ variantId, quantity: newQty }))
 
-    setSelectedItems(prev =>
-      prev.map(i =>
-        i.variantId === variantId ? { ...i, quantity: newQty } : i
-      )
+    setSelectedItems((prev) =>
+      prev.map((i) =>
+        i.variantId === variantId ? { ...i, quantity: newQty } : i,
+      ),
     )
   }
 
-
-
-  // khi rời chuột mới gọi api
   const handleMouseLeave = async (variantId) => {
-    const item = cartItems.find(i => i.variant._id === variantId)
+    const item = cartItems.find((i) => i.variant._id === variantId)
     const tempQty = tempQuantities[variantId]
 
     if (!item || tempQty === undefined || tempQty === item.quantity) return
@@ -195,16 +212,16 @@ const Cart = () => {
       const delta = tempQty - item.quantity
       await updateItem(variantId, { quantity: delta })
 
-      setCartItems(prev =>
-        prev.map(i =>
-          i.variant._id === variantId ? { ...i, quantity: tempQty } : i
-        )
+      setCartItems((prev) =>
+        prev.map((i) =>
+          i.variant._id === variantId ? { ...i, quantity: tempQty } : i,
+        ),
       )
 
-      setSelectedItems(prev =>
-        prev.map(i =>
-          i.variantId === variantId ? { ...i, quantity: tempQty } : i
-        )
+      setSelectedItems((prev) =>
+        prev.map((i) =>
+          i.variantId === variantId ? { ...i, quantity: tempQty } : i,
+        ),
       )
 
       dispatch(removeTempQuantity(variantId))
@@ -215,14 +232,17 @@ const Cart = () => {
     }
   }
 
-
   const handleRemove = async ({ variantId }) => {
     try {
       const res = await deleteItem({ variantId })
       if (res) {
-        setCartItems(prev => prev.filter(item => item.variant._id !== variantId))
-        setSelectedItems(prev => prev.filter(i => i.variantId !== variantId))
-        setInventoryQuantities(prev => {
+        setCartItems((prev) =>
+          prev.filter((item) => item.variant._id !== variantId),
+        )
+        setSelectedItems((prev) =>
+          prev.filter((i) => i.variantId !== variantId),
+        )
+        setInventoryQuantities((prev) => {
           const { [variantId]: _, ...rest } = prev
           return rest
         })
@@ -232,19 +252,19 @@ const Cart = () => {
     }
   }
 
-  const selectedCartItems = cartItems.filter(item =>
-    selectedItems.some(selected => selected.variantId === item.variant._id)
+  const selectedCartItems = cartItems.filter((item) =>
+    selectedItems.some((selected) => selected.variantId === item.variant._id),
   )
+
   useEffect(() => {
     dispatch(setSelectedItemsAction(selectedItems))
   }, [selectedItems])
 
   const totalPrice = selectedCartItems.reduce((sum, item) => {
-    const selected = selectedItems.find(i => i.variantId === item.variant._id)
+    const selected = selectedItems.find((i) => i.variantId === item.variant._id)
     const qty = selected?.quantity || item.quantity
     return sum + (item.variant.exportPrice || 0) * qty
   }, 0)
-
 
   const handleClearCart = async () => {
     await clearCart()
@@ -263,7 +283,7 @@ const Cart = () => {
   }
 
   const getApplicableCoupon = () => {
-    const validCoupons = coupons.filter(c => totalPrice >= c.minOrderValue)
+    const validCoupons = coupons.filter((c) => totalPrice >= c.minOrderValue)
     if (validCoupons.length === 0) return null
 
     return validCoupons.reduce((best, current) => {
@@ -280,293 +300,592 @@ const Cart = () => {
     const applicable = getApplicableCoupon()
 
     if (!applicable) {
-      return sorted.find(c => totalPrice < c.minOrderValue) || null
+      return sorted.find((c) => totalPrice < c.minOrderValue) || null
     }
 
-    const next = sorted.find(c => c.minOrderValue > applicable.minOrderValue)
+    const next = sorted.find((c) => c.minOrderValue > applicable.minOrderValue)
     return next || null
   }
 
   const applicableCoupon = getApplicableCoupon()
   const nextCoupon = getNextCoupon()
-  const discountAmount = applicableCoupon ? calculateDiscount(applicableCoupon, totalPrice) : 0
-
+  const discountAmount = applicableCoupon
+    ? calculateDiscount(applicableCoupon, totalPrice)
+    : 0
 
   if (loading) {
     return (
-      <Typography sx={{ height: '70vh', mt: 10, textAlign: 'center' }}>
-        Đang tải giỏ hàng...
-      </Typography>
+      <Container
+        maxWidth="xl"
+        sx={{
+          height: '70vh',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          mt: 10,
+        }}
+      >
+        <Paper
+          elevation={3}
+          sx={{
+            p: 4,
+            textAlign: 'center',
+            borderRadius: 2,
+            width: '100%',
+            maxWidth: 500,
+          }}
+        >
+          <ShoppingCart sx={{ fontSize: 60, color: '#1A3C7B', mb: 2, opacity: 0.7 }} />
+          <Typography variant="h5" sx={{ fontWeight: 600, color: '#1A3C7B' }}>
+            Đang tải giỏ hàng...
+          </Typography>
+        </Paper>
+      </Container>
     )
   }
 
   return (
     <Container
-      maxWidth='xl'
-      sx={{ minHeight: '70vh', mt: 16, mb: 5, overflowX: 'auto' }}
+      maxWidth="xl"
+      sx={{
+        minHeight: '70vh',
+        mt: { xs: 10, md: 16 },
+        mb: { xs: 3, md: 5 },
+        px: { xs: 2, sm: 3, md: 4 },
+      }}
     >
-      <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
-        <Typography variant="h6" sx={{ fontWeight: 700 }}>
-          Giỏ hàng:
-        </Typography>
-        <Typography variant="h6" sx={{ fontWeight: 700 }}>
-          {cartItems.length} Sản phẩm
-        </Typography>
-      </Box>
+      {/* Header */}
+      <Paper
+        elevation={0}
+        sx={{
+          p: 3,
+          mb: 3,
+          borderRadius: 2,
+          background: 'linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%)',
+          boxShadow: '0 4px 20px rgba(0,0,0,0.05)',
+        }}
+      >
+        <Box
+          display="flex"
+          justifyContent="space-between"
+          alignItems="center"
+          flexWrap="wrap"
+          gap={2}
+        >
+          <Box display="flex" alignItems="center" gap={1.5}>
+            <ShoppingCart sx={{ fontSize: 28, color: '#1A3C7B' }} />
+            <Typography
+              variant="h5"
+              sx={{ fontWeight: 700, color: '#1A3C7B', letterSpacing: 0.5 }}
+            >
+              Giỏ hàng của bạn
+            </Typography>
+          </Box>
+          <Chip
+            label={`${cartItems.length} Sản phẩm`}
+            color="primary"
+            variant="outlined"
+            sx={{ fontWeight: 600, borderRadius: 6, px: 1.5 }}
+          />
+        </Box>
+      </Paper>
+
+      {/* Coupon notification */}
       {coupons.length > 0 && selectedItems.length > 0 && (
-        <Typography
-          variant="body1"
+        <Paper
+          elevation={0}
           sx={{
-            color: '#1A3C7B',
+            p: { xs: 2, sm: 3 },
+            mb: 3,
+            borderRadius: 2,
+            border: '1px dashed #1A3C7B',
             backgroundColor: '#E3F2FD',
-            p: 1,
-            borderRadius: 1,
-            mb: 2
           }}
         >
-          {(() => {
-            if (applicableCoupon) {
-              if (nextCoupon && totalPrice < nextCoupon.minOrderValue) {
-                const nextDiscountText = nextCoupon.type === 'percent'
-                  ? `${nextCoupon.amount}%`
-                  : formatPrice(nextCoupon.amount)
-                return `Bạn đang được Giảm ${formatPrice(discountAmount)}, chỉ cần mua thêm ${formatPrice(nextCoupon.minOrderValue - totalPrice)} để nhận mã giảm ${nextDiscountText} 🎉!`
-              }
-              return `Đơn hàng của bạn đã đạt mức giảm cao nhất: ${formatPrice(discountAmount)} 🎉`
-            }
-            const first = coupons[0]
-            if (first) {
-              const discountText = first.type === 'percent'
-                ? `${first.amount}%`
-                : formatPrice(first.amount)
-              return `Chỉ cần mua thêm ${formatPrice(first.minOrderValue - totalPrice)} để nhận mã giảm ${discountText} 🎉!`
-            }
-            return null
-          })()}
-        </Typography>
+          <Box display="flex" alignItems="center" gap={1.5} flexWrap="wrap">
+            <LocalOffer sx={{ color: '#1A3C7B', fontSize: 24 }} />
+            <Typography
+              variant="body1"
+              sx={{ color: '#1A3C7B', fontWeight: 500, flex: 1 }}
+            >
+              {(() => {
+                if (applicableCoupon) {
+                  if (nextCoupon && totalPrice < nextCoupon.minOrderValue) {
+                    const nextDiscountText =
+                      nextCoupon.type === 'percent'
+                        ? `${nextCoupon.amount}%`
+                        : formatPrice(nextCoupon.amount)
+                    return (
+                      <>
+                        Bạn đang được giảm
+                        <Box component="span" sx={{ fontWeight: 600, mx: 0.5 }}>
+                          {formatPrice(discountAmount)}
+                        </Box>
+                        , chỉ cần mua thêm
+                        <Box component="span" sx={{ fontWeight: 600, mx: 0.5 }}>
+                          {formatPrice(nextCoupon.minOrderValue - totalPrice)}
+                        </Box>
+                        để nhận mã giảm
+                        <Box component="span" sx={{ fontWeight: 600, mx: 0.5 }}>
+                          {nextDiscountText}
+                        </Box>{' '}
+                        🎉!
+                      </>
+                    )
+                  }
+                  return (
+                    <>
+                      Đơn hàng của bạn đã đạt mức giảm cao nhất:{' '}
+                      <Box component="span" sx={{ fontWeight: 600, mx: 0.5 }}>
+                        {formatPrice(discountAmount)}
+                      </Box>{' '}
+                      🎉
+                    </>
+                  )
+                }
+                const first = coupons[0]
+                if (first) {
+                  const discountText =
+                    first.type === 'percent'
+                      ? `${first.amount}%`
+                      : formatPrice(first.amount)
+                  return (
+                    <>
+                      Chỉ cần mua thêm{' '}
+                      <Box component="span" sx={{ fontWeight: 600, mx: 0.5 }}>
+                        {formatPrice(first.minOrderValue - totalPrice)}
+                      </Box>
+                      để nhận mã giảm{' '}
+                      <Box component="span" sx={{ fontWeight: 600, mx: 0.5 }}>
+                        {discountText}
+                      </Box>{' '}
+                      🎉!
+                    </>
+                  )
+                }
+                return null
+              })()}
+            </Typography>
+
+          </Box>
+        </Paper>
       )}
 
-      <Table size='medium' sx={{ minWidth: 650 }}>
-        <TableHead>
-          <TableRow>
-            <TableCell padding='checkbox' sx={{ width: 50 }}>
-              <Checkbox
-                indeterminate={someSelected}
-                checked={allSelected}
-                onChange={handleSelectAll}
-                color='primary'
-              />
-            </TableCell>
-            <TableCell align='left' sx={{ fontWeight: 'bold' }}>
-              Sản phẩm
-            </TableCell>
-            <TableCell align='center' sx={{ fontWeight: 'bold', width: 120 }}>
-              Giá
-            </TableCell>
-            <TableCell align='center' sx={{ fontWeight: 'bold', width: 130 }}>
-              Số lượng
-            </TableCell>
-            <TableCell align='center' sx={{ fontWeight: 'bold', width: 90 }}>
-              Thao tác
-            </TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {cartItems.length === 0 ? (
-            <TableRow>
-              <TableCell
-                colSpan={5}
-                align='center'
-                sx={{ py: 8, fontSize: '1.2rem', color: 'text.secondary' }}
+      {/* Cart items */}
+      <Box
+        display="flex"
+        flexDirection={{ xs: 'column', md: 'row' }}
+        alignItems="flex-start"
+        gap={3}
+      >
+        <Box
+          flex={{ xs: '1 1 100%', md: 2 }}
+          width={{ xs: '100%', md: 'auto' }}
+        >
+          <Paper
+            elevation={2}
+            sx={{
+              borderRadius: 2,
+              overflow: 'hidden',
+              boxShadow: '0 4px 20px rgba(0,0,0,0.05)',
+            }}
+          >
+            {cartItems.length === 0 ? (
+              <Box
+                sx={{
+                  p: { xs: 4, sm: 6, md: 8 },
+                  textAlign: 'center',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  gap: 2,
+                }}
               >
-                Giỏ hàng của bạn đang trống
-              </TableCell>
-            </TableRow>
-          ) : (
-            cartItems.map((item) => {
-              const variant = item.variant
-              if (!variant) return null
-
-              return (
-                <TableRow key={item._id} hover>
-                  <TableCell padding='checkbox'>
-                    <Checkbox
-                      checked={selectedItems.some(i => i.variantId === variant._id)}
-                      onChange={() => handleSelect(item)}
-                      color='primary'
-                    />
-                  </TableCell>
-                  <TableCell>
-                    <Box display='flex' alignItems='start' gap={2}>
-                      <Box
-                        sx={{ cursor: 'pointer' }}
-                        onClick={() => {
-                          dispatch(setSelectedItemsAction([{ variantId: variant._id, quantity: item.quantity }]))
-                          navigate(`/productdetail/${variant.productId}`)
-                        }}
-                      >
-                        <Avatar
-                          src={optimizeCloudinaryUrl(variant.color?.image) || '/default.jpg'}
-                          variant='square'
-                          sx={{
-                            width: 64,
-                            height: 64,
-                            borderRadius: 1,
-                            objectFit: 'cover'
-                          }}
-                        />
-                      </Box>
-                      <Box>
-                        <Typography
-                          fontWeight={600}
-                          sx={{
-                            lineHeight: 1.2,
-                            maxWidth: 350,
-                            whiteSpace: 'nowrap',
-                            overflow: 'hidden',
-                            textOverflow: 'ellipsis'
-                          }}
-                          title={variant.name}
-                        >
-                          {variant.name}
-                        </Typography>
-                        <Typography variant="body2" color="text.secondary">
-                          Phân loại hàng: {variant.color?.name || 'Không rõ'}, {variant.size?.name || 'Không rõ'}
-                        </Typography>
-                      </Box>
-                    </Box>
-                  </TableCell>
-                  <TableCell align='center' sx={{ fontWeight: '600', color: '#007B00' }}>
-                    {formatPrice(variant.exportPrice)}
-                  </TableCell>
-                  <TableCell align="center">
-                    <Box
-                      display="flex"
-                      alignItems="center"
-                      justifyContent="center"
-                      onMouseLeave={() => handleMouseLeave(variant._id)}
-                    >
-                      <IconButton
-                        size="small"
-                        onMouseDown={() => handleMouseDown(variant._id, -1)}
-                        disabled={
-                          processingVariantId === variant._id ||
-                          (tempQuantities[variant._id] ?? item.quantity) <= 1
-                        }
-                      >
-                        <Remove />
-                      </IconButton>
-
-                      <TextField
-                        value={tempQuantities[variant._id] ?? item.quantity}
-                        size="small"
-                        sx={{ width: 50, mx: 1 }}
-                        inputProps={{ style: { textAlign: 'center' }, readOnly: true }}
-                      />
-
-                      <IconButton
-                        size="small"
-                        onMouseDown={() => handleMouseDown(variant._id, 1)}
-                        disabled={
-                          processingVariantId === variant._id ||
-                          !inventoryQuantities[variant._id] ||
-                          (tempQuantities[variant._id] ?? item.quantity) >= inventoryQuantities[variant._id]
-                        }
-
-                      >
-                        <Add />
-                      </IconButton>
-
-
-
-                    </Box>
-                  </TableCell>
-
-
-
-                  <TableCell align='center'>
+                <ShoppingCart sx={{ fontSize: 80, color: '#ccc' }} />
+                <Typography
+                  variant="h5"
+                  sx={{ color: 'text.secondary', fontWeight: 500 }}
+                >
+                  Giỏ hàng của bạn đang trống
+                </Typography>
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={() => navigate('/')}
+                  startIcon={<ArrowForward />}
+                  sx={{ mt: 2, borderRadius: 6, px: 4 }}
+                >
+                  Tiếp tục mua sắm
+                </Button>
+              </Box>
+            ) : (
+              <>
+                <Box
+                  sx={{
+                    p: { xs: 2, sm: 3 },
+                    backgroundColor: '#f5f7fa',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 2,
+                  }}
+                >
+                  <Checkbox
+                    indeterminate={someSelected}
+                    checked={allSelected}
+                    onChange={handleSelectAll}
+                    color="primary"
+                    sx={{ p: 1 }}
+                  />
+                  <Typography
+                    sx={{
+                      ml: 1,
+                      fontWeight: 600,
+                      fontSize: { xs: '0.9rem', sm: '1rem' },
+                    }}
+                  >
+                    Chọn tất cả
+                  </Typography>
+                  <Box sx={{ flexGrow: 1 }} />
+                  <Tooltip title="Xóa tất cả">
                     <IconButton
-                      color='error'
+                      color="error"
                       onClick={() => {
-                        setDeleteMode('single')
-                        setItemToDelete(variant)
+                        setDeleteMode('all')
                         setConfirmClearOpen(true)
                       }}
+                      size="small"
                     >
-                      <Delete />
+                      <DeleteForever />
                     </IconButton>
-                  </TableCell>
-                </TableRow>
-              )
-            })
-          )}
-        </TableBody>
-      </Table>
+                  </Tooltip>
+                </Box>
+                <Divider />
 
-      <Box
-        display='flex'
-        justifyContent='space-between'
-        alignItems='center'
-        mt={4}
-        px={1}
-        flexWrap='wrap'
-        gap={2}
-      >
-        <Box>
-          <Typography variant='h6' sx={{ flexGrow: 1, color: '#222', fontWeight: 700 }}>
-            Tổng tiền: {formatPrice(totalPrice)}
-          </Typography>
+                {cartItems.map((item) => {
+                  const variant = item.variant
+                  if (!variant) return null
+
+                  return (
+                    <React.Fragment key={item._id}>
+                      <Box
+                        sx={{
+                          p: { xs: 2, sm: 3 },
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: { xs: 1.5, sm: 2 },
+                          flexWrap: { xs: 'wrap', sm: 'nowrap' },
+                        }}
+                      >
+                        {/* Checkbox */}
+                        <Checkbox
+                          checked={selectedItems.some((i) => i.variantId === variant._id)}
+                          onChange={() => handleSelect(item)}
+                          color="primary"
+                          sx={{ alignSelf: 'center' }} // thay vì 'flex-start' hoặc bỏ hẳn nếu dùng Box bọc
+                        />
+
+
+                        {/* Product Image */}
+                        <Box
+                          sx={{ cursor: 'pointer' }}
+                          onClick={() => {
+                            dispatch(
+                              setSelectedItemsAction([
+                                {
+                                  variantId: variant._id,
+                                  quantity: item.quantity,
+                                },
+                              ]),
+                            )
+                            navigate(`/productdetail/${variant.productId}`)
+                          }}
+                        >
+                          <Avatar
+                            src={
+                              optimizeCloudinaryUrl(variant.color?.image) ||
+                              '/default.jpg'
+                            }
+                            variant="square"
+                            sx={{
+                              width: { xs: 60, sm: 80, md: 100 },
+                              height: { xs: 60, sm: 80, md: 100 },
+                              borderRadius: 2,
+                              objectFit: 'cover',
+                              boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+                            }}
+                          />
+                        </Box>
+
+                        {/* Product Info */}
+                        <Box
+                          sx={{
+                            flex: 1,
+                            minWidth: 0,
+                            display: 'flex',
+                            flexDirection: 'column',
+                            gap: 1,
+                          }}
+                        >
+                          <Typography
+                            fontWeight={600}
+                            sx={{
+                              fontSize: {
+                                xs: '0.9rem',
+                                sm: '1rem',
+                                md: '1.1rem',
+                              },
+                              maxWidth: '100%',
+                              whiteSpace: 'nowrap',
+                              overflow: 'hidden',
+                              textOverflow: 'ellipsis',
+                            }}
+                            title={variant.name}
+                          >
+                            {variant.name}
+                          </Typography>
+                          <Box display="flex" gap={1} flexWrap="wrap">
+                            <Chip
+                              size="small"
+                              label={variant.color?.name || 'Không rõ'}
+                              sx={{ fontSize: '0.75rem' }}
+                            />
+                            <Chip
+                              size="small"
+                              label={variant.size?.name || 'Không rõ'}
+                              sx={{ fontSize: '0.75rem' }}
+                            />
+                          </Box>
+                          <Typography
+                            sx={{
+                              fontWeight: 700,
+                              color: '#d32f2f',
+                              fontSize: { xs: '0.9rem', sm: '1rem' },
+                            }}
+                          >
+                            {formatPrice(variant.exportPrice)}
+                          </Typography>
+                        </Box>
+
+                        {/* Quantity and Delete */}
+                        <Box
+                          sx={{
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'flex-end',
+                            gap: 1.5
+                          }}
+                        >
+                          <Box
+                            display="flex"
+                            alignItems="center"
+                            onMouseLeave={() => handleMouseLeave(variant._id)}
+                            sx={{
+                              border: '1px solid #e0e0e0',
+                              borderRadius: 1,
+                              overflow: 'hidden',
+                            }}
+                          >
+                            <IconButton
+                              size="small"
+                              onMouseDown={() =>
+                                handleMouseDown(variant._id, -1)
+                              }
+                              disabled={
+                                processingVariantId === variant._id ||
+                                (tempQuantities[variant._id] ?? item.quantity) <=
+                                1
+                              }
+                              sx={{ borderRadius: 0, p: 0.5 }}
+                            >
+                              <Remove fontSize="small" />
+                            </IconButton>
+                            <TextField
+                              value={
+                                tempQuantities[variant._id] ?? item.quantity
+                              }
+                              size="small"
+                              sx={{
+                                width: 40,
+                                '& .MuiOutlinedInput-root': {
+                                  '& fieldset': { border: 'none' },
+                                },
+                              }}
+                              inputProps={{
+                                style: {
+                                  textAlign: 'center',
+                                  padding: '4px',
+                                  fontWeight: 600,
+                                  fontSize: '0.9rem',
+                                },
+                                readOnly: true,
+                              }}
+                            />
+                            <IconButton
+                              size="small"
+                              onMouseDown={() =>
+                                handleMouseDown(variant._id, 1)
+                              }
+                              disabled={
+                                processingVariantId === variant._id ||
+                                !inventoryQuantities[variant._id] ||
+                                (tempQuantities[variant._id] ?? item.quantity) >=
+                                inventoryQuantities[variant._id]
+                              }
+                              sx={{ borderRadius: 0, p: 0.5 }}
+                            >
+                              <Add fontSize="small" />
+                            </IconButton>
+                          </Box>
+                          <IconButton
+                            color="error"
+                            onClick={() => {
+                              setDeleteMode('single')
+                              setItemToDelete(variant)
+                              setConfirmClearOpen(true)
+                            }}
+                            size="small"
+                          >
+                            <Delete fontSize="small" />
+                          </IconButton>
+                        </Box>
+                      </Box>
+                      <Divider />
+                    </React.Fragment>
+                  )
+                })}
+              </>
+            )}
+          </Paper>
         </Box>
-        <Box display='flex' gap={2}>
-          <Button
-            color='primary'
+
+        {/* Order summary */}
+        <Box
+          flex={{ xs: '1 1 100%', md: 1 }}
+          width={{ xs: '100%', md: 'auto' }}
+        >
+          <Card
+            elevation={2}
             sx={{
-              backgroundColor: '#1A3C7B',
-              color: '#fff',
-              '&:hover': {
-                backgroundColor: '#3f51b5'
-              },
-              '&:disabled': {
-                backgroundColor: '#ccc',
-                color: '#666',
-                boxShadow: 'none'
-              }
-            }}
-            disabled={selectedItems.length === 0}
-            onClick={() => {
-              navigate('/payment')
+              borderRadius: 2,
+              position: { xs: 'static', md: 'sticky' },
+              top: { md: 100 },
+              boxShadow: '0 4px 20px rgba(0,0,0,0.05)',
+              height: 'fit-content',
+              maxHeight: { md: 'calc(100vh - 120px)' },
+              overflowY: { md: 'auto' },
             }}
           >
-            Thanh toán
-          </Button>
-          <Button
-            color='error'
-            onClick={() => {
-              setDeleteMode('all')
-              setConfirmClearOpen(true)
-            }}
-          >
-            Xoá toàn bộ
-          </Button>
+            <CardContent sx={{ p: { xs: 3, sm: 4 } }}>
+              <Typography
+                variant="h6"
+                sx={{ fontWeight: 700, mb: 3, color: '#1A3C7B' }}
+              >
+                Tóm tắt đơn hàng
+              </Typography>
+              <Box sx={{ mb: 2 }}>
+                <Box display="flex" justifyContent="space-between" mb={1}>
+                  <Typography color="text.secondary">
+                    Tạm tính ({selectedItems.length} sản phẩm):
+                  </Typography>
+                  <Typography fontWeight={500}>
+                    {formatPrice(totalPrice)}
+                  </Typography>
+                </Box>
+                {applicableCoupon && (
+                  <Box display="flex" justifyContent="space-between" mb={1}>
+                    <Typography color="text.secondary">Giảm giá:</Typography>
+                    <Typography fontWeight={500} color="error">
+                      -{formatPrice(discountAmount)}
+                    </Typography>
+                  </Box>
+                )}
+                <Divider sx={{ my: 2 }} />
+                <Box display="flex" justifyContent="space-between">
+                  <Typography fontWeight={700}>Tổng cộng:</Typography>
+                  <Typography
+                    fontWeight={700}
+                    sx={{ color: '#1A3C7B' }}
+                    fontSize="1.2rem"
+                  >
+                    {formatPrice(totalPrice - discountAmount)}
+                  </Typography>
+                </Box>
+              </Box>
+              <Button
+                fullWidth
+                variant="contained"
+                size="large"
+                startIcon={<Payment />}
+                sx={{
+                  mt: 2,
+                  py: 1.5,
+                  borderRadius: 2,
+                  fontWeight: 600,
+                  backgroundColor: '#1A3C7B',
+                  '&:hover': {
+                    backgroundColor: '#0F2A5C',
+                  },
+                  '&:disabled': {
+                    backgroundColor: '#ccc',
+                    color: '#666',
+                  },
+                }}
+                disabled={selectedItems.length === 0}
+                onClick={() => {
+                  navigate('/payment')
+                }}
+              >
+                Thanh toán ngay
+              </Button>
+              <Button
+                fullWidth
+                variant="outlined"
+                size="large"
+                sx={{
+                  mt: 2,
+                  py: 1.5,
+                  borderRadius: 2,
+                  fontWeight: 600,
+                }}
+                onClick={() => navigate('/')}
+              >
+                Tiếp tục mua sắm
+              </Button>
+            </CardContent>
+          </Card>
         </Box>
       </Box>
 
+      {/* Dialogs and Alerts */}
       <Dialog
         open={confirmClearOpen}
         onClose={() => setConfirmClearOpen(false)}
+        PaperProps={{
+          sx: { borderRadius: 2 },
+        }}
       >
-        <DialogTitle>Xác nhận</DialogTitle>
+        <DialogTitle sx={{ fontWeight: 600 }}>
+          {deleteMode === 'single' ? 'Xóa sản phẩm' : 'Xóa giỏ hàng'}
+        </DialogTitle>
         <DialogContent>
           <DialogContentText>
             {deleteMode === 'single'
-              ? 'Bạn có chắc chắn muốn xoá sản phẩm này không?'
-              : 'Bạn có chắc chắn muốn xoá toàn bộ sản phẩm trong giỏ hàng không?'}
+              ? 'Bạn có chắc chắn muốn xoá sản phẩm này khỏi giỏ hàng?'
+              : 'Bạn có chắc chắn muốn xoá toàn bộ sản phẩm trong giỏ hàng?'}
           </DialogContentText>
         </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setConfirmClearOpen(false)}>Hủy</Button>
+        <DialogActions sx={{ p: 2 }}>
           <Button
-            sx={{ color: 'black' }}
+            variant="outlined"
+            onClick={() => setConfirmClearOpen(false)}
+            sx={{ borderRadius: 6 }}
+          >
+            Hủy
+          </Button>
+          <Button
+            variant="contained"
+            color="error"
+            sx={{ borderRadius: 6 }}
             onClick={() => {
               if (deleteMode === 'single') {
                 handleRemove({ variantId: itemToDelete._id })
@@ -587,7 +906,11 @@ const Cart = () => {
         onClose={() => setShowMaxQuantityAlert(false)}
         anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
       >
-        <Alert severity='warning' sx={{ width: '100%' }}>
+        <Alert
+          severity="warning"
+          variant="filled"
+          sx={{ width: '100%', boxShadow: 3 }}
+        >
           Đã đạt số lượng tối đa của sản phẩm!
         </Alert>
       </Snackbar>
@@ -595,4 +918,4 @@ const Cart = () => {
   )
 }
 
-export default Cart
+export default Cart   

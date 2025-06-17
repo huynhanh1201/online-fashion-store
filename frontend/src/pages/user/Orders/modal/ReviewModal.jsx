@@ -11,12 +11,44 @@ import {
   Box,
   Avatar,
   Divider,
+  IconButton,
+  Chip,
+  Grid,
+  Card,
+  CardMedia,
+  Alert,
+  LinearProgress,
+  Stack,
+  Tooltip,
 } from '@mui/material'
+import {
+  PhotoCamera,
+  Videocam,
+  Delete,
+  Warning,
+  CheckCircle,
+  Info,
+} from '@mui/icons-material'
+import { contentFilter } from '~/utils/contentFilter'
 
 const ReviewModal = ({ open, onClose, onSubmit, orderItems }) => {
   const [rating, setRating] = useState(0)
   const [comment, setComment] = useState('')
+  const [images, setImages] = useState([])
+  const [videos, setVideos] = useState([])
+  const [uploading, setUploading] = useState(false)
+  const [contentValidation, setContentValidation] = useState({ isValid: true, violations: [], warnings: [] })
   const inputRef = useRef(null)
+  const imageInputRef = useRef(null)
+  const videoInputRef = useRef(null)
+
+  // Constants for file limits
+  const MAX_IMAGES = 2
+  const MAX_VIDEOS = 2
+  const MAX_IMAGE_SIZE = 5 * 1024 * 1024 // 5MB
+  const MAX_VIDEO_SIZE = 50 * 1024 * 1024 // 50MB
+  const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp']
+  const ALLOWED_VIDEO_TYPES = ['video/mp4', 'video/webm', 'video/ogg']
 
   useEffect(() => {
     if (open) {
@@ -24,30 +56,170 @@ const ReviewModal = ({ open, onClose, onSubmit, orderItems }) => {
     } else {
       setRating(0)
       setComment('')
+      setImages([])
+      setVideos([])
+      setContentValidation({ isValid: true, violations: [], warnings: [] })
+      setUploading(false)
     }
   }, [open])
 
-  const handleSubmit = () => {
-    if (rating && comment.trim()) {
-      onSubmit({ rating, comment })
+  // Content filter for comment
+  const handleCommentChange = (e) => {
+    const text = e.target.value
+    setComment(text)
+
+    if (text.trim()) {
+      const validation = contentFilter.filterContent(text)
+      setContentValidation(validation)
+    } else {
+      setContentValidation({ isValid: true, violations: [], warnings: [] })
     }
   }
 
+  // Handle image upload
+  const handleImageUpload = (event) => {
+    const files = Array.from(event.target.files)
+
+    if (images.length + files.length > MAX_IMAGES) {
+      alert(`Chỉ được upload tối đa ${MAX_IMAGES} ảnh`)
+      return
+    }
+
+    const validFiles = files.filter(file => {
+      if (!ALLOWED_IMAGE_TYPES.includes(file.type)) {
+        alert(`File ${file.name} không đúng định dạng. Chỉ chấp nhận: JPG, PNG, WebP`)
+        return false
+      }
+      if (file.size > MAX_IMAGE_SIZE) {
+        alert(`File ${file.name} quá lớn. Kích thước tối đa: 5MB`)
+        return false
+      }
+      return true
+    })
+
+    setUploading(true)
+
+    validFiles.forEach(file => {
+      const reader = new FileReader()
+      reader.onload = (e) => {
+        setImages(prev => [...prev, {
+          id: Date.now() + Math.random(),
+          file,
+          preview: e.target.result,
+          name: file.name,
+          size: file.size
+        }])
+        setUploading(false)
+      }
+      reader.readAsDataURL(file)
+    })
+
+    // Reset input
+    event.target.value = ''
+  }
+
+  // Handle video upload
+  const handleVideoUpload = (event) => {
+    const files = Array.from(event.target.files)
+
+    if (videos.length + files.length > MAX_VIDEOS) {
+      alert(`Chỉ được upload tối đa ${MAX_VIDEOS} video`)
+      return
+    }
+
+    const validFiles = files.filter(file => {
+      if (!ALLOWED_VIDEO_TYPES.includes(file.type)) {
+        alert(`File ${file.name} không đúng định dạng. Chỉ chấp nhận: MP4, WebM, OGG`)
+        return false
+      }
+      if (file.size > MAX_VIDEO_SIZE) {
+        alert(`File ${file.name} quá lớn. Kích thước tối đa: 50MB`)
+        return false
+      }
+      return true
+    })
+
+    setUploading(true)
+
+    validFiles.forEach(file => {
+      const reader = new FileReader()
+      reader.onload = (e) => {
+        setVideos(prev => [...prev, {
+          id: Date.now() + Math.random(),
+          file,
+          preview: e.target.result,
+          name: file.name,
+          size: file.size
+        }])
+        setUploading(false)
+      }
+      reader.readAsDataURL(file)
+    })
+
+    // Reset input
+    event.target.value = ''
+  }
+
+  // Remove image
+  const removeImage = (id) => {
+    setImages(prev => prev.filter(img => img.id !== id))
+  }
+
+  // Remove video
+  const removeVideo = (id) => {
+    setVideos(prev => prev.filter(vid => vid.id !== id))
+  }
+
+  // Format file size
+  const formatFileSize = (bytes) => {
+    if (bytes === 0) return '0 Bytes'
+    const k = 1024
+    const sizes = ['Bytes', 'KB', 'MB', 'GB']
+    const i = Math.floor(Math.log(bytes) / Math.log(k))
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i]
+  }
+
+  const handleSubmit = () => {
+    if (rating && comment.trim() && contentValidation.isValid) {
+      onSubmit({
+        rating,
+        comment: contentValidation.filteredText || comment,
+        images: images.map(img => img.file),
+        videos: videos.map(vid => vid.file)
+      })
+    }
+  }
+
+  const isSubmitDisabled = !rating || !comment.trim() || !contentValidation.isValid || uploading
+
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
-      <DialogTitle sx={{ fontWeight: 'bold', fontSize: '1.4rem' }}>Đánh Giá Sản Phẩm</DialogTitle>
+    <Dialog
+      open={open}
+      onClose={onClose}
+      maxWidth="lg"
+      fullWidth
+      PaperProps={{
+        sx: {
+          maxHeight: '70vh', // hoặc 60vh, tuỳ bạn muốn thấp bao nhiêu
+        },
+      }}
+    >
+
+      <DialogTitle sx={{ fontWeight: 'bold', fontSize: '1.4rem', pb: 1 }}>
+        Đánh Giá Sản Phẩm
+      </DialogTitle>
+
       <DialogContent sx={{ p: 3 }}>
+        {/* Product Display */}
         {orderItems?.length > 0 && (
           <Box
             sx={{
-              maxHeight: 220,
-              minHeight: 160,
+              maxHeight: 200,
               overflowY: 'auto',
               mb: 3,
-              pr: 1  // thêm padding phải để tránh che nội dung khi có thanh cuộn
+              pr: 1
             }}
           >
-
             {orderItems.map((item) => (
               <Box
                 key={item._id}
@@ -55,24 +227,32 @@ const ReviewModal = ({ open, onClose, onSubmit, orderItems }) => {
                   display: 'flex',
                   alignItems: 'center',
                   gap: 2,
-                  backgroundColor: '#f7f7f7',
+                  backgroundColor: 'grey.50',
                   borderRadius: 2,
                   p: 2,
                   mb: 1,
-                  boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
+                  border: '1px solid',
+                  borderColor: 'grey.200'
                 }}
               >
                 <Avatar
                   src={item?.color?.image || '/default.jpg'}
                   variant="rounded"
-                  sx={{ width: 72, height: 72 }}
+                  sx={{ width: 64, height: 64 }}
                 />
                 <Box>
-                  <Typography fontWeight={600}>{item?.name || 'Sản phẩm'}</Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    Phân loại: {item?.color?.name}, {item?.size}
+                  <Typography fontWeight={600} fontSize="1rem">
+                    {item?.name || 'Sản phẩm'}
                   </Typography>
-                  <Typography variant="body2" color="text.secondary">Số lượng: x{item.quantity}</Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    {item?.color?.name} • {item?.size}
+                  </Typography>
+                  <Chip
+                    label={`x${item.quantity}`}
+                    size="small"
+                    variant="outlined"
+                    sx={{ mt: 0.5, fontSize: '0.7rem', height: 20 }}
+                  />
                 </Box>
               </Box>
             ))}
@@ -81,41 +261,250 @@ const ReviewModal = ({ open, onClose, onSubmit, orderItems }) => {
 
         <Divider sx={{ mb: 3 }} />
 
-        <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
-          Chất lượng sản phẩm
-        </Typography>
-        <Rating
-          value={rating}
-          onChange={(e, newValue) => setRating(newValue)}
-          size="large"
-          sx={{ mb: 3 }}
-        />
+        {/* Rating Section */}
+        <Box mb={3}>
+          <Typography variant="h6" fontWeight="600" color="#1a3c7b" gutterBottom>
+            Chất lượng sản phẩm
+          </Typography>
+          <Rating
+            value={rating}
+            onChange={(e, newValue) => setRating(newValue)}
+            size="large"
+            sx={{ mb: 1 }}
+          />
+          <Typography variant="body2" color="text.secondary">
+            Vui lòng đánh giá từ 1-5 sao
+          </Typography>
+        </Box>
 
-        <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
-          Nhận xét của bạn
-        </Typography>
-        <TextField
-          inputRef={inputRef}
-          fullWidth
-          multiline
-          rows={4}
-          value={comment}
-          onChange={(e) => setComment(e.target.value)}
-          placeholder="Hãy chia sẻ trải nghiệm của bạn với sản phẩm này..."
-          variant="outlined"
-        />
+        {/* Comment Section with Content Filter */}
+        <Box mb={3}>
+          <Typography variant="h6" fontWeight="600" color="#1a3c7b" gutterBottom>
+            Nhận xét của bạn
+          </Typography>
+
+          <TextField
+            inputRef={inputRef}
+            fullWidth
+            multiline
+            rows={4}
+            value={comment}
+            onChange={handleCommentChange}
+            placeholder="Hãy chia sẻ trải nghiệm của bạn với sản phẩm này... (Tránh chia sẻ thông tin cá nhân)"
+            variant="outlined"
+            error={!contentValidation.isValid}
+            helperText={
+              !contentValidation.isValid
+                ? contentValidation.violations.join(', ')
+                : `${comment.length}/500 ký tự`
+            }
+            inputProps={{ maxLength: 500 }}
+          />
+
+          {/* Content Validation Alerts */}
+          {contentValidation.violations.length > 0 && (
+            <Alert severity="error" sx={{ mt: 1 }} icon={<Warning />}>
+              <Typography variant="body2">
+                Nội dung chứa từ ngữ không phù hợp:
+              </Typography>
+              <ul style={{ margin: '4px 0', paddingLeft: '20px' }}>
+                {contentValidation.violations.map((violation, index) => (
+                  <li key={index}>
+                    <Typography variant="caption">{violation}</Typography>
+                  </li>
+                ))}
+              </ul>
+            </Alert>
+          )}
+
+          {contentValidation.warnings.length > 0 && (
+            <Alert severity="warning" sx={{ mt: 1 }} icon={<Info />}>
+              <Typography variant="body2">
+                Gợi ý: Hãy thử diễn đạt tích cực hơn
+              </Typography>
+            </Alert>
+          )}
+
+          {contentValidation.isValid && comment.length > 0 && (
+            <Alert severity="success" sx={{ mt: 1 }} icon={<CheckCircle />}>
+              <Typography variant="body2">
+                Nội dung phù hợp!
+              </Typography>
+            </Alert>
+          )}
+        </Box>
+
+        {/* Media Upload Section */}
+        <Box>
+          <Typography variant="h6" fontWeight="600" color="#1a3c7b" gutterBottom>
+            Thêm ảnh và video (không bắt buộc)
+          </Typography>
+
+          {/* Upload Progress */}
+          {uploading && (
+            <Box mb={2}>
+              <LinearProgress />
+              <Typography variant="caption" color="text.secondary">
+                Đang tải lên...
+              </Typography>
+            </Box>
+          )}
+
+          {/* Upload Buttons */}
+          <Stack direction="row" spacing={2} mb={2}>
+            <input
+              ref={imageInputRef}
+              type="file"
+              accept="image/jpeg,image/png,image/webp"
+              multiple
+              hidden
+              onChange={handleImageUpload}
+            />
+            <input
+              ref={videoInputRef}
+              type="file"
+              accept="video/mp4,video/webm,video/ogg"
+              multiple
+              hidden
+              onChange={handleVideoUpload}
+            />
+
+            <Tooltip title={`Tối đa ${MAX_IMAGES} ảnh, mỗi ảnh < 5MB`}>
+              <Button
+                variant="outlined"
+                startIcon={<PhotoCamera />}
+                onClick={() => imageInputRef.current?.click()}
+                disabled={images.length >= MAX_IMAGES || uploading}
+                sx={{ textTransform: 'none' }}
+              >
+                Thêm ảnh ({images.length}/{MAX_IMAGES})
+              </Button>
+            </Tooltip>
+
+            <Tooltip title={`Tối đa ${MAX_VIDEOS} video, mỗi video < 50MB`}>
+              <Button
+                variant="outlined"
+                startIcon={<Videocam />}
+                onClick={() => videoInputRef.current?.click()}
+                disabled={videos.length >= MAX_VIDEOS || uploading}
+                sx={{ textTransform: 'none' }}
+              >
+                Thêm video ({videos.length}/{MAX_VIDEOS})
+              </Button>
+            </Tooltip>
+          </Stack>
+
+          {/* Media Preview */}
+          <Grid container spacing={2}>
+            {/* Images */}
+            {images.map((image) => (
+              <Grid item xs={6} sm={4} md={3} key={image.id}>
+                <Card sx={{ position: 'relative' }}>
+                  <CardMedia
+                    component="img"
+                    height="120"
+                    image={image.preview}
+                    alt={image.name}
+                    sx={{ objectFit: 'cover' }}
+                  />
+                  <IconButton
+                    size="small"
+                    onClick={() => removeImage(image.id)}
+                    sx={{
+                      position: 'absolute',
+                      top: 4,
+                      right: 4,
+                      backgroundColor: 'rgba(255,255,255,0.8)',
+                      '&:hover': { backgroundColor: 'rgba(255,255,255,0.9)' }
+                    }}
+                  >
+                    <Delete fontSize="small" />
+                  </IconButton>
+                  <Box p={1}>
+                    <Typography variant="caption" noWrap>
+                      {image.name}
+                    </Typography>
+                    <Typography variant="caption" display="block" color="text.secondary">
+                      {formatFileSize(image.size)}
+                    </Typography>
+                  </Box>
+                </Card>
+              </Grid>
+            ))}
+
+            {/* Videos */}
+            {videos.map((video) => (
+              <Grid item xs={6} sm={4} md={3} key={video.id}>
+                <Card sx={{ position: 'relative' }}>
+                  <Box
+                    sx={{
+                      height: 120,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      backgroundColor: 'grey.100'
+                    }}
+                  >
+                    <Videocam sx={{ fontSize: 40, color: 'grey.500' }} />
+                  </Box>
+                  <IconButton
+                    size="small"
+                    onClick={() => removeVideo(video.id)}
+                    sx={{
+                      position: 'absolute',
+                      top: 4,
+                      right: 4,
+                      backgroundColor: 'rgba(255,255,255,0.8)',
+                      '&:hover': { backgroundColor: 'rgba(255,255,255,0.9)' }
+                    }}
+                  >
+                    <Delete fontSize="small" />
+                  </IconButton>
+                  <Box p={1}>
+                    <Typography variant="caption" noWrap>
+                      {video.name}
+                    </Typography>
+                    <Typography variant="caption" display="block" color="text.secondary">
+                      {formatFileSize(video.size)}
+                    </Typography>
+                  </Box>
+                </Card>
+              </Grid>
+            ))}
+          </Grid>
+
+          {/* Upload Guidelines */}
+          <Alert severity="info" sx={{ mt: 2 }}>
+            <Typography variant="body2">
+              <strong>Hướng dẫn:</strong>
+            </Typography>
+            <ul style={{ margin: '4px 0', paddingLeft: '20px', fontSize: '0.875rem' }}>
+              <li>Ảnh: JPG, PNG, WebP - Tối đa 5MB/ảnh</li>
+              <li>Video: MP4, WebM, OGG - Tối đa 50MB/video</li>
+              <li>Chỉ upload ảnh/video liên quan đến sản phẩm</li>
+              <li>Không upload nội dung nhạy cảm hoặc vi phạm</li>
+            </ul>
+          </Alert>
+        </Box>
       </DialogContent>
-      <DialogActions sx={{ px: 3, pb: 2 }}>
-        <Button onClick={onClose} color="inherit" variant="outlined">
-          Trở Lại
+
+      <DialogActions sx={{ px: 3, pb: 2, pt: 1 }}>
+        <Button
+          onClick={onClose}
+          color="inherit"
+          variant="outlined"
+          sx={{ textTransform: 'none' }}
+        >
+          Hủy bỏ
         </Button>
         <Button
           onClick={handleSubmit}
           color="primary"
           variant="contained"
-          disabled={!rating || !comment.trim()}
+          disabled={isSubmitDisabled}
+          sx={{ textTransform: 'none', fontWeight: 600 }}
         >
-          Hoàn Thành
+          {uploading ? 'Đang tải...' : 'Gửi đánh giá'}
         </Button>
       </DialogActions>
     </Dialog>
