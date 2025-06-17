@@ -92,23 +92,22 @@ const vnpayIPN = async (req) => {
         session
       )
 
+      // Xử lý tất cả promise song song
+      await Promise.all([
+        warehouseSlipPromise,
+        orderPromise,
+        transactionPromise,
+        orderItemsPromise
+      ])
+
       // Tạo đơn hàng vận chuyển (GHN)
-      const createOrderGHNPromise = orderHelpers.handleCreateOrderForGHN(
+      await orderHelpers.handleCreateOrderForGHN(
         reqBody,
         cartItems,
         order,
         address,
         variantMap
       )
-
-      // Xử lý tất cả promise song song
-      await Promise.all([
-        warehouseSlipPromise,
-        orderPromise,
-        transactionPromise,
-        orderItemsPromise,
-        createOrderGHNPromise
-      ])
 
       // Xóa sản phẩm trong giỏ hàng
       await orderHelpers.handleDeleteCartItems(userId, variantIds, session)
