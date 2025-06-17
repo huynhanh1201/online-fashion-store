@@ -1,5 +1,4 @@
 import { verifyChecksum } from '~/utils/vnpay'
-import { PaymentTransactionModel } from '~/models/PaymentTransactionModel'
 import { OrderModel } from '~/models/OrderModel'
 import { env } from '~/config/environment'
 import { PaymentSessionDraftModel } from '~/models/PaymentSessionDraftModel'
