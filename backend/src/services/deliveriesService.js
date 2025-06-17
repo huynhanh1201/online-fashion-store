@@ -1,6 +1,4 @@
 import { ghnAxios } from '~/utils/axiosClient'
-import apiError from '~/utils/ApiError'
-import { StatusCodes } from 'http-status-codes'
 
 const getDelivery = async (reqBody) => {
   // eslint-disable-next-line no-useless-catch
@@ -37,6 +35,7 @@ const createOrderDelivery = async (
   variantItemsGHN,
   numberItemOrder
 ) => {
+  // eslint-disable-next-line no-useless-catch
   try {
     // Tạo đơn hàng cho đơn vị vận chuyển (GHN)
 
@@ -79,10 +78,7 @@ const createOrderDelivery = async (
 
     return result
   } catch (err) {
-    throw new apiError(
-      StatusCodes.UNPROCESSABLE_ENTITY,
-      'Không thể tạo đơn hàng giao hàng.'
-    )
+    throw err
   }
 }
 

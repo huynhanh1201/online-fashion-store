@@ -25,14 +25,6 @@ const createOrder = async (userId, reqBody, ipAddr, jwtDecoded) => {
     // Kiểm tra tồn kho có đủ không
     await orderHelpers.checkInventorySufficient(cartItems, session)
 
-    // Tạo phiếu xuất kho
-    await orderHelpers.createWarehouseSlipFromOrder(
-      jwtDecoded,
-      cartItems,
-      session,
-      'export'
-    )
-
     // Lấy các variantIds từ cartItems
     const variantIds = orderHelpers.getVariantIdsFromCartItems(cartItems)
 
@@ -82,8 +74,16 @@ const createOrder = async (userId, reqBody, ipAddr, jwtDecoded) => {
     )
 
     if (paymentMethod === 'COD') {
+      // Tạo phiếu xuất kho
+      const warehouseSlipPromise = orderHelpers.createWarehouseSlipFromOrder(
+        jwtDecoded,
+        cartItems,
+        session,
+        'export'
+      )
+
       // Tạo OrderItems
-      await orderHelpers.handleCreateOrderItems(
+      const orderItemsPromise = orderHelpers.handleCreateOrderItems(
         cartItems,
         variantMap,
         order,
@@ -91,10 +91,36 @@ const createOrder = async (userId, reqBody, ipAddr, jwtDecoded) => {
       )
 
       // Tạo giao dịch thanh toán
-      await orderHelpers.handleCreateTransaction(reqBody, order, session)
+      const transactionPromise = orderHelpers.handleCreateTransaction(
+        reqBody,
+        order,
+        session
+      )
 
       // Xóa sản phẩm trong giỏ hàng
-      await orderHelpers.handleDeleteCartItems(userId, variantIds, session)
+      const cartItemPromise = orderHelpers.handleDeleteCartItems(
+        userId,
+        variantIds,
+        session
+      )
+
+      // Tạo đơn hàng vận chuyển (GHN)
+      const createOrderGHNPromise = orderHelpers.handleCreateOrderForGHN(
+        reqBody,
+        cartItems,
+        order,
+        address,
+        variantMap
+      )
+
+      // Xử lý tất cả promise song song
+      await Promise.all([
+        warehouseSlipPromise,
+        orderItemsPromise,
+        transactionPromise,
+        cartItemPromise,
+        createOrderGHNPromise
+      ])
     } else {
       await PaymentSessionDraftModel.create(
         [
@@ -105,27 +131,20 @@ const createOrder = async (userId, reqBody, ipAddr, jwtDecoded) => {
             order,
             reqBody,
             userId,
-            variantIds
+            variantIds,
+            address,
+            jwtDecoded
           }
         ],
         { session }
       )
     }
 
-    // Xử lý thanh toán VNPAY
-    const paymentUrl = orderHelpers.handlePaymentByVnpay(reqBody, order, ipAddr)
-
     // Commit transaction
     await session.commitTransaction()
 
-    // Tạo đơn hàng vận chuyển (GHN)
-    const orderGHNCreated = await orderHelpers.handleCreateOrderForGHN(
-      reqBody,
-      cartItems,
-      order,
-      address,
-      variantMap
-    )
+    // Xử lý thanh toán VNPAY
+    const paymentUrl = orderHelpers.handlePaymentByVnpay(reqBody, order, ipAddr)
 
     return paymentUrl || order
   } catch (err) {
