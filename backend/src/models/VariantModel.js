@@ -75,6 +75,11 @@ const variantSchema = new Schema(
       default: false
     },
 
+    overridePackageSize: {
+      type: Boolean,
+      default: false
+    },
+
     packageSize: {
       length: {
         type: Number,
