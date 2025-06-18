@@ -294,6 +294,7 @@ export default function AdminDrawer({
                   path: '/admin/product-management',
                   icon: <InventoryIcon />
                 },
+                { label: 'Quản lý đánh giá', path: '/admin/review-management' },
                 {
                   label: 'Quản lý biến thể',
                   path: '/admin/variant-management'

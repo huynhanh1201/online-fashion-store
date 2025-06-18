@@ -226,7 +226,7 @@ const TransactionRow = ({ transaction, index, onView, onEdit, onDelete }) => {
         {transaction.method ? transaction.method.toLocaleUpperCase() : '—'}
       </TableCell>
 
-      <TableCell sx={styles.cell}>
+      <TableCell sx={{ ...styles.cell, pr: 10 }} align='right'>
         {transaction?.orderId?.total != null
           ? `${transaction.orderId.total.toLocaleString('vi-VN')}đ`
           : '—'}

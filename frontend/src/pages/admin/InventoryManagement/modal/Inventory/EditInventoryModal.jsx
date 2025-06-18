@@ -97,7 +97,7 @@ const EditInventoryModal = ({
         />
         <TextField
           margin='dense'
-          label='Giá nhập'
+          label='Giá nhập (đ)'
           name='importPrice'
           type='text'
           value={formatCurrency(formData.importPrice)}
@@ -115,7 +115,7 @@ const EditInventoryModal = ({
 
         <TextField
           margin='dense'
-          label='Giá bán'
+          label='Giá bán (đ)'
           name='exportPrice'
           type='text'
           value={formatCurrency(formData.exportPrice)}

@@ -73,7 +73,7 @@ const BatchesTab = () => {
       label: 'Số lượng sản phẩm',
       minWidth: 80,
       maxWidth: 120,
-      align: 'start',
+      align: 'right',
       format: (value) => `${value.toLocaleString('vi-VN')}`
     },
     {
@@ -81,7 +81,8 @@ const BatchesTab = () => {
       label: 'Giá nhập',
       minWidth: 80,
       maxWidth: 150,
-      align: 'start',
+      align: 'right',
+      pr: 6,
       format: (value) => `${value.toLocaleString('vi-VN')}đ`
     },
     {
@@ -146,7 +147,6 @@ const BatchesTab = () => {
   const handleCloseDeleteModal = () => {
     setOpenDeleteModal(false)
   }
-  console.log(batches)
   const handleSave = async (batch, type, batchId) => {
     if (type === 'edit') {
       const updatedBatch = await updateBatchById(batchId, batch)
@@ -238,7 +238,8 @@ const BatchesTab = () => {
                       maxWidth: '130px',
                       paddingLeft: '26px'
                     }),
-                    px: 1
+                    px: 1,
+                    pr: col.pr
                   }}
                 >
                   {col.label}
@@ -344,6 +345,7 @@ const BatchesTab = () => {
                         sx={{
                           py: 0,
                           px: 1,
+                          pr: col.pr,
                           height: 55,
                           whiteSpace: 'nowrap',
                           overflow: 'hidden',

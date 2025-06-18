@@ -4,7 +4,7 @@ import {
   createVariant,
   updateVariant,
   deleteVariant,
-  getVariantById
+  getVariantId
 } from '~/services/admin/Inventory/VariantService'
 
 const useVariants = () => {
@@ -55,16 +55,20 @@ const useVariants = () => {
     const result = await deleteVariant(id)
     return result
   }
-
-  const fetchVariantById = async (id) => {
-    const result = await getVariantById(id)
+  const fetchVariantId = async (id) => {
+    const result = await getVariantId(id)
     return result
   }
 
   const Save = (data) => {
-    setVariants((prev) =>
-      prev.map((d) => (d.productId === data.productId ? data : d))
-    )
+    console.log('Cập nhật biến thể ID:', data._id)
+    setVariants((prev) => {
+      const updated = prev.map((d) => {
+        console.log('So sánh:', d._id, data._id)
+        return String(d._id) === String(data._id) ? data : d
+      })
+      return updated
+    })
   }
 
   return {
@@ -75,8 +79,8 @@ const useVariants = () => {
     createNewVariant,
     updateVariantById,
     deleteVariantById,
-    fetchVariantById,
-    Save
+    Save,
+    fetchVariantId
   }
 }
 
