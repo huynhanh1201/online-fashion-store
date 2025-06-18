@@ -6,7 +6,8 @@ import {
   DialogActions,
   Button,
   TextField,
-  Autocomplete
+  Autocomplete,
+  Typography
 } from '@mui/material'
 
 function AddressDialog({
@@ -19,7 +20,8 @@ function AddressDialog({
   districts,
   wards,
   onFormChange,
-  onSave
+  onSave,
+  duplicateError
 }) {
   return (
     <Dialog
@@ -33,6 +35,12 @@ function AddressDialog({
         {editAddressId ? 'Sửa địa chỉ' : 'Thêm địa chỉ mới'}
       </DialogTitle>
       <DialogContent>
+        {/* Hiển thị lỗi trùng địa chỉ nếu có */}
+        {duplicateError && (
+          <Typography color="error" sx={{ mb: 2, fontWeight: 500 }}>
+            {duplicateError}
+          </Typography>
+        )}
         <TextField
           margin='dense'
           label='Họ và tên'
@@ -49,7 +57,9 @@ function AddressDialog({
           value={formData.phone}
           onChange={(e) => onFormChange('phone', e.target.value)}
           error={formErrors.phone}
-          helperText={formErrors.phone ? 'Số điện thoại phải là 10 chữ số' : ''}
+          // Cho phép nhập nhiều loại số điện thoại, helperText chỉ báo lỗi nếu có
+          helperText={formErrors.phone ? 'Vui lòng nhập số điện thoại hợp lệ' : ''}
+          placeholder="VD: 0912345678, (028) 38234567"
         />
         <Autocomplete
           options={provinces}

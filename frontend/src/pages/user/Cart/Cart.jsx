@@ -44,6 +44,7 @@ import {
 } from '~/redux/cart/cartSlice'
 import { optimizeCloudinaryUrl } from '~/utils/cloudinary'
 import { getDiscounts } from '~/services/discountService'
+import SuggestionProducts from './SuggestionProducts'
 
 const Cart = () => {
   const { cart, loading, deleteItem, clearCart, updateItem } = useCart()
@@ -857,6 +858,9 @@ const Cart = () => {
       </Box>
 
       {/* Dialogs and Alerts */}
+        <Box sx={{mt: 4}}>
+          <SuggestionProducts />
+        </Box>
       <Dialog
         open={confirmClearOpen}
         onClose={() => setConfirmClearOpen(false)}

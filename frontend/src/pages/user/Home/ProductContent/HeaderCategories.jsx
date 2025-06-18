@@ -6,7 +6,7 @@ const styles = {
     justifyContent: 'flex-end',
     gap: '20px',
     marginBottom: '20px',
-    fontSize: '16px',
+    fontSize: '20px',
     color: '#666',
     userSelect: 'none'
   },

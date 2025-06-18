@@ -67,6 +67,7 @@ const Profile = () => {
     new: false,
     confirm: false
   })
+  const [openForgotDialog, setOpenForgotDialog] = useState(false)
   const dispatch = useDispatch()
 
   const handleTabChange = (_, newValue) => setTab(newValue)
@@ -97,6 +98,8 @@ const Profile = () => {
     setNewPassword('')
     setConfirmNewPassword('')
   }
+  const handleOpenForgotDialog = () => setOpenForgotDialog(true)
+  const handleCloseForgotDialog = () => setOpenForgotDialog(false)
 
   const validatePassword = (password) => {
     return (
@@ -320,6 +323,14 @@ const Profile = () => {
               >
                 Đổi mật khẩu
               </Button>
+              <Button
+                fullWidth
+                variant='text'
+                sx={{ mt: 1, color: '#1976d2', textTransform: 'none' }}
+                onClick={handleOpenForgotDialog}
+              >
+                Quên mật khẩu?
+              </Button>
             </>
           )}
         </Box>
@@ -397,6 +408,34 @@ const Profile = () => {
           >
             {loading ? 'Đang xử lý...' : 'Cập nhật'}
           </Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog
+        open={openForgotDialog}
+        onClose={handleCloseForgotDialog}
+        fullWidth
+        maxWidth='xs'
+      >
+        <DialogTitle>Quên mật khẩu</DialogTitle>
+        <DialogContent>
+          <Typography gutterBottom>
+            Nếu bạn quên mật khẩu, vui lòng sử dụng chức năng "Quên mật khẩu" tại trang đăng nhập hoặc liên hệ bộ phận hỗ trợ để được cấp lại mật khẩu mới.
+          </Typography>
+          <Button
+            variant='contained'
+            color='primary'
+            fullWidth
+            sx={{ mt: 2 }}
+            onClick={() => {
+              window.location.href = '/forgot-password'
+            }}
+          >
+            Đến trang Quên mật khẩu
+          </Button>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseForgotDialog} color='secondary'>Đóng</Button>
         </DialogActions>
       </Dialog>
 
