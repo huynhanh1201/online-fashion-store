@@ -9,7 +9,7 @@ const Router = express.Router()
 // Tính phí giao hàng
 Router.route('/calculate-fee').post(
   deliveriesValidation.deliveryGHN,
-  deliveriesController.getDelivery
+  deliveriesController.getDeliveryFee
 )
 
 export const deliveriesRoute = Router
