@@ -43,7 +43,17 @@ const product = async (req, res, next) => {
 
     exportPrice: Joi.number() // price bắt buộc, số
       .min(0) // không âm :contentReference[oaicite:2]{index.jsx=2}
-      .required()
+      .required(),
+
+    packageSize: Joi.object({
+      length: Joi.number().positive().required(),
+
+      width: Joi.number().positive().required(),
+
+      height: Joi.number().positive().required(),
+
+      weight: Joi.number().positive().required()
+    })
   })
 
   try {

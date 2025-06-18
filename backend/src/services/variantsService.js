@@ -53,7 +53,11 @@ const createVariant = async (reqBody) => {
       productCode: product.productCode,
       sku: newSku,
       name: `${product.name}`,
-      destroy: false
+      destroy: false,
+
+      packageSize: product.overridePackageSize
+        ? product.packageSize
+        : reqBody.packageSize
     }
 
     const variants = await VariantModel.create(newVariant)
