@@ -4,9 +4,10 @@ import { Button } from '@mui/material'
 import CategoryTable from './CategoryTable'
 import CategoryPagination from './CategoryPagination'
 import useCategories from '~/hooks/admin/useCategories'
-import { updateCategory } from '~/services/admin/categoryService'
-import { deleteCategory } from '~/services/admin/categoryService'
-import AddIcon from '@mui/icons-material/Add'
+import {
+  updateCategory,
+  deleteCategory
+} from '~/services/admin/categoryService'
 // Lazy load các modal
 const AddCategoryModal = React.lazy(() => import('./modal/AddCategoryModal'))
 const ViewCategoryModal = React.lazy(() => import('./modal/ViewCategoryModal'))
@@ -22,7 +23,8 @@ const CategoryManagement = () => {
   const [selectedCategory, setSelectedCategory] = React.useState(null)
   const [modalType, setModalType] = React.useState(null)
 
-  const { categories, fetchCategories, Loading, totalPages } = useCategories()
+  const { categories, fetchCategories, Loading, totalPages, Save, fetchById } =
+    useCategories()
 
   React.useEffect(() => {
     fetchCategories(page, limit, filters)
@@ -44,8 +46,13 @@ const CategoryManagement = () => {
   const handleSaveCategory = async (categoryId, updatedData) => {
     try {
       const response = await updateCategory(categoryId, updatedData)
+
       if (response) {
-        await fetchCategories(page, limit, filters)
+        const updatedCategory = await fetchById(categoryId)
+
+        if (updatedCategory) {
+          Save(updatedCategory)
+        }
       } else {
         console.log('Cập nhật không thành công')
       }
@@ -58,7 +65,10 @@ const CategoryManagement = () => {
     try {
       const result = await deleteCategory(categoryId)
       if (result) {
-        await fetchCategories(page, limit, filters)
+        const deleteCategory = await fetchById(categoryId)
+        if (deleteCategory) {
+          Save(deleteCategory)
+        }
       } else {
         console.log('Xoá không thành công')
       }
@@ -99,7 +109,9 @@ const CategoryManagement = () => {
           <AddCategoryModal
             open
             onClose={handleCloseModal}
-            onAdded={() => fetchCategories(page, limit, filters)}
+            onAdded={() => {
+              fetchCategories(page, limit, filters)
+            }}
           />
         )}
         {modalType === 'view' && selectedCategory && (

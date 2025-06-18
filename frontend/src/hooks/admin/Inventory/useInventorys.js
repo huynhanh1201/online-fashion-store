@@ -84,7 +84,15 @@ const useInventorys = () => {
       return res
     } catch (error) {
       console.error('Get inventory by ID error', error)
-      return null
+      return []
+    }
+  }
+
+  const Save = (data) => {
+    try {
+      setInventories((prev) => prev.map((d) => (d._id === data._id ? data : d)))
+    } catch (error) {
+      console.error('Error saving inventory:', error)
     }
   }
 
@@ -98,7 +106,8 @@ const useInventorys = () => {
     createNewInventory,
     handleImport,
     handleExport,
-    getInventoryId
+    getInventoryId,
+    Save
   }
 }
 

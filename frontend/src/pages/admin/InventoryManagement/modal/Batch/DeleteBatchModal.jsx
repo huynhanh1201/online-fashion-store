@@ -7,17 +7,26 @@ import {
   Button,
   Typography
 } from '@mui/material'
+import StyleAdmin from '~/assets/StyleAdmin.jsx'
 
 const DeleteBatchModal = ({ open, onClose, onSave, batch }) => {
   if (!batch) return null
 
   const handleDelete = () => {
-    onSave(batch._id)
+    onSave(batch._id, 'delete')
     onClose()
   }
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth='sm' fullWidth>
+    <Dialog
+      open={open}
+      onClose={onClose}
+      maxWidth='sm'
+      fullWidth
+      BackdropProps={{
+        sx: StyleAdmin.OverlayModal
+      }}
+    >
       <DialogTitle>Ẩn Lô Hàng</DialogTitle>
       <DialogContent dividers>
         <Typography>

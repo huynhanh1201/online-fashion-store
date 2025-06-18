@@ -31,6 +31,7 @@ import { URI, CloudinaryColor } from '~/utils/constants'
 import AddPhotoAlternateIcon from '@mui/icons-material/AddPhotoAlternate'
 import EditIcon from '@mui/icons-material/Edit'
 import DeleteIcon from '@mui/icons-material/Delete'
+import StyleAdmin from '~/assets/StyleAdmin.jsx'
 
 const uploadToCloudinary = async (file, folder = CloudinaryColor) => {
   const formData = new FormData()
@@ -220,7 +221,7 @@ const AddVariantModal = ({
         exportPrice: overridePrice ? Number(exportPrice) : productExportPrice,
         overridePrice
       }
-      await addVariant(finalVariant)
+      await addVariant(finalVariant, 'add')
       toast.success('Thêm biến thể thành công')
       handleClose()
     } catch (err) {
@@ -249,6 +250,9 @@ const AddVariantModal = ({
       maxWidth='xl'
       fullWidth
       sx={{ padding: '16px 24px' }}
+      BackdropProps={{
+        sx: StyleAdmin.OverlayModal
+      }}
     >
       <DialogTitle>Thêm biến thể mới</DialogTitle>
       <Divider />

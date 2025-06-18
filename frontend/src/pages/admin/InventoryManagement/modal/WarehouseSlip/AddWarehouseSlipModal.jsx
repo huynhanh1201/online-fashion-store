@@ -34,6 +34,7 @@ import Search from '~/components/SearchAdmin/Search.jsx'
 import AddPartnerModal from '~/pages/admin/InventoryManagement/modal/Partner/AddPartnerModal.jsx'
 import AddWarehouseModal from '~/pages/admin/InventoryManagement/modal/Warehouse/AddWarehouseModal.jsx'
 import Tooltip from '@mui/material/Tooltip'
+import StyleAdmin from '~/assets/StyleAdmin.jsx'
 export default function AddWarehouseSlipModal({
   open,
   onClose,
@@ -212,6 +213,9 @@ export default function AddWarehouseSlipModal({
             mt: 0,
             mb: 2.4
           }
+        }}
+        BackdropProps={{
+          sx: StyleAdmin.OverlayModal
         }}
       >
         <Box

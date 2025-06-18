@@ -24,6 +24,9 @@ import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css'
 import { EditorState, convertToRaw } from 'draft-js'
 import draftToHtml from 'draftjs-to-html'
 import ProductImages from '../component/ProductImageUploader'
+import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css'
+import 'draft-js/dist/Draft.css'
+import InputAdornment from '@mui/material/InputAdornment'
 const URI = 'https://api.cloudinary.com/v1_1/dkwsy9sph/image/upload'
 const CloudinaryColor = 'color_upload'
 const CloudinaryProduct = 'product_upload'
@@ -133,7 +136,7 @@ const AddProductModal = ({ open, onClose, onSuccess }) => {
     <Dialog
       open={open}
       onClose={onClose}
-      maxWidth='xxl'
+      maxWidth='xl'
       fullWidth
       PaperProps={{
         sx: {
@@ -215,7 +218,7 @@ const AddProductModal = ({ open, onClose, onSuccess }) => {
             />
           </Grid>
           {/*Danh mục*/}
-          <Grid item size={4}>
+          <Grid item size={8}>
             <FormControl fullWidth margin='normal' error={!!errors.categoryId}>
               <InputLabel>Danh mục</InputLabel>
               <Controller
@@ -251,7 +254,7 @@ const AddProductModal = ({ open, onClose, onSuccess }) => {
             </FormControl>
           </Grid>
           {/* Giá nhập */}
-          <Grid item size={4} style={{ marginTop: '16px' }}>
+          <Grid item size={2} style={{ marginTop: '16px' }}>
             <Controller
               name='importPrice'
               control={control}
@@ -265,13 +268,17 @@ const AddProductModal = ({ open, onClose, onSuccess }) => {
                     const rawValue = parseNumber(e.target.value)
                     field.onChange(rawValue)
                   }}
+                  InputProps={{
+                    endAdornment: (
+                      <InputAdornment position='end'>đ</InputAdornment>
+                    )
+                  }}
                 />
               )}
             />
           </Grid>
-
           {/* Giá bán */}
-          <Grid item size={4} style={{ marginTop: '16px' }}>
+          <Grid item size={2} style={{ marginTop: '16px' }}>
             <Controller
               name='price'
               control={control}
@@ -288,6 +295,11 @@ const AddProductModal = ({ open, onClose, onSuccess }) => {
                   }}
                   error={!!errors.price}
                   helperText={errors.price?.message}
+                  InputProps={{
+                    endAdornment: (
+                      <InputAdornment position='end'>đ</InputAdornment>
+                    )
+                  }}
                 />
               )}
             />

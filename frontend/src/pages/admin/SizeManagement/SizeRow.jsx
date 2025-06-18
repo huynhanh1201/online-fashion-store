@@ -122,13 +122,7 @@ export default function SizeRow({ size, index, columns, handleOpenModal }) {
         if (id === 'index') content = index
         else if (id === 'name') {
           const name = size.name || 'Không có tên'
-          content = name
-            .split(' ')
-            .map(
-              (word) =>
-                word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
-            )
-            .join(' ')
+          content = name.toUpperCase()
         } else if (id === 'destroy') {
           content = (
             <Chip

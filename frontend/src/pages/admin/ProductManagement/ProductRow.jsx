@@ -151,7 +151,11 @@ const ProductRow = ({ product, index, columns, onAction }) => {
           }
           if (id === 'importPrice') {
             return (
-              <TableCell key={id} align='end' sx={styles.cellPadding}>
+              <TableCell
+                key={id}
+                align={align}
+                sx={{ ...styles.cellPadding, pr: 7 }}
+              >
                 {product.importPrice?.toLocaleString('vi-VN') + 'đ'}
               </TableCell>
             )

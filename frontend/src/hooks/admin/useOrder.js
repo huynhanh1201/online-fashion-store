@@ -81,6 +81,10 @@ const useOrder = () => {
     }
   }
 
+  const Save = (data) => {
+    setOrders((prev) => prev.map((d) => (d._id === data._id ? data : d)))
+  }
+
   return {
     orders,
     loading,
@@ -89,7 +93,8 @@ const useOrder = () => {
     getOrderDetailsByOrderId,
     getOrderHistoriesByOrderId,
     updateOrderById,
-    getOrderId
+    getOrderId,
+    Save
   }
 }
 

@@ -1,5 +1,8 @@
 import { useState } from 'react'
-import { getCategories } from '~/services/admin/categoryService'
+import {
+  getCategories,
+  getCategoryById
+} from '~/services/admin/categoryService'
 
 const useCategories = () => {
   const [categories, setCategories] = useState([])
@@ -34,7 +37,28 @@ const useCategories = () => {
     setloading(false)
   }
 
-  return { categories, totalPages, fetchCategories, loading }
+  const fetchById = async (id) => {
+    try {
+      const category = await getCategoryById(id)
+      return category
+    } catch (err) {
+      console.error('Error fetching category by ID:', err)
+      return null
+    }
+  }
+
+  const Save = (data) => {
+    setCategories((prev) => prev.map((d) => (d._id === data._id ? data : d)))
+  }
+
+  return {
+    categories,
+    totalPages,
+    fetchCategories,
+    loading,
+    fetchById,
+    Save
+  }
 }
 
 export default useCategories

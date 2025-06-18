@@ -16,6 +16,7 @@ import {
 } from '@mui/material'
 import Chip from '@mui/material/Chip'
 import { optimizeCloudinaryUrl } from '~/utils/cloudinary.js'
+import StyleAdmin from '~/assets/StyleAdmin.jsx'
 const ViewVariantModal = ({ open, onClose, variant }) => {
   if (!variant) return null
 
@@ -40,6 +41,9 @@ const ViewVariantModal = ({ open, onClose, variant }) => {
       maxWidth='md'
       fullWidth
       sx={{ padding: '16px 24px' }}
+      BackdropProps={{
+        sx: StyleAdmin.OverlayModal
+      }}
     >
       <DialogTitle>Thông tin biến thể</DialogTitle>
       <Divider />
@@ -125,14 +129,7 @@ const ViewVariantModal = ({ open, onClose, variant }) => {
                     <strong>Kích thước</strong>
                   </TableCell>
                   <TableCell>
-                    {variant?.size?.name
-                      .split(' ')
-                      .map(
-                        (word) =>
-                          word.charAt(0).toUpperCase() +
-                          word.slice(1).toLowerCase()
-                      )
-                      .join(' ') || 'N/A'}
+                    {variant?.size?.name.toUpperCase() || 'N/A'}
                   </TableCell>
                 </TableRow>
                 <TableRow>

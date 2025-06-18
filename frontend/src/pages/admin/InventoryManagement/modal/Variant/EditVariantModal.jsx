@@ -17,6 +17,7 @@ import { toast } from 'react-toastify'
 import EditIcon from '@mui/icons-material/Edit'
 import DeleteIcon from '@mui/icons-material/Delete'
 import AddPhotoAlternateIcon from '@mui/icons-material/AddPhotoAlternate'
+import StyleAdmin from '~/assets/StyleAdmin.jsx'
 
 const URI = 'https://api.cloudinary.com/v1_1/dkwsy9sph/image/upload'
 const CloudinaryColor = 'color_upload'
@@ -100,7 +101,7 @@ const EditVariantModal = ({
           image: data.colorImage
         }
       }
-      await onUpdateVariant(variant._id, updatedVariant)
+      await onUpdateVariant(updatedVariant, 'edit', variant._id)
       toast.success('Cập nhật biến thể thành công')
       onClose()
     } catch (error) {
@@ -116,6 +117,9 @@ const EditVariantModal = ({
       maxWidth='md'
       fullWidth
       sx={{ padding: '16px 24px' }}
+      BackdropProps={{
+        sx: StyleAdmin.OverlayModal
+      }}
     >
       <DialogTitle>Sửa thông tin biến thể</DialogTitle>
       <Divider />

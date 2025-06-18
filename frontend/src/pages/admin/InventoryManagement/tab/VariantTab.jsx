@@ -40,7 +40,9 @@ const VariantsTab = () => {
     updateVariantById,
     deleteVariantById,
     loadingVariant,
-    totalVariant
+    totalVariant,
+    Save,
+    fetchVariantById
   } = useVariants()
   const { products, fetchProducts } = useProducts()
   const { colors, fetchColors } = useColors()
@@ -77,7 +79,7 @@ const VariantsTab = () => {
 
   const handleCloseAddModal = () => {
     setOpenAddModal(false)
-    fetchVariants(page, rowsPerPage, filter)
+    // fetchVariants(page, rowsPerPage, filter)
   }
 
   const handleViewVariant = (variant) => {
@@ -103,12 +105,23 @@ const VariantsTab = () => {
   const handleCloseEditModal = () => {
     setOpenEditModal(false)
     setSelectedVariant(null)
-    fetchVariants(page, rowsPerPage, filter)
+    // fetchVariants(page, rowsPerPage, filter)
   }
 
   const handleCloseDeleteModal = () => {
     setOpenDeleteModal(false)
     setSelectedVariant(null)
+    // fetchVariants(page, rowsPerPage, filter)
+  }
+
+  const handleSave = async (variant, type, variantId) => {
+    if (type === 'add') {
+      await createNewVariant(variant)
+    } else if (type === 'edit') {
+      await updateVariantById(variantId, variant)
+    } else if (type === 'delete') {
+      await deleteVariantById(variant)
+    }
     fetchVariants(page, rowsPerPage, filter)
   }
 
@@ -308,14 +321,7 @@ const VariantsTab = () => {
                     }
                     if (id === 'size.name') {
                       content =
-                        row.size?.name
-                          .split(' ')
-                          .map(
-                            (word) =>
-                              word.charAt(0).toUpperCase() +
-                              word.slice(1).toLowerCase()
-                          )
-                          .join(' ') || 'Không có màu sắc'
+                        row.size?.name.toUpperCase() || 'Không có màu sắc'
                     }
                     if (id === 'destroy') {
                       content = (
@@ -418,7 +424,7 @@ const VariantsTab = () => {
       <AddVariantModal
         open={openAddModal}
         onClose={handleCloseAddModal}
-        addVariant={createNewVariant}
+        addVariant={handleSave}
         products={products}
         parseCurrency={parseCurrency}
         formatCurrency={formatCurrency}
@@ -437,7 +443,7 @@ const VariantsTab = () => {
         open={openEditModal}
         onClose={handleCloseEditModal}
         variant={selectedVariant}
-        onUpdateVariant={updateVariantById}
+        onUpdateVariant={handleSave}
         products={products}
         parseCurrency={parseCurrency}
         formatCurrency={formatCurrency}
@@ -446,7 +452,7 @@ const VariantsTab = () => {
         open={openDeleteModal}
         onClose={handleCloseDeleteModal}
         variant={selectedVariant}
-        deleteVariant={deleteVariantById}
+        deleteVariant={handleSave}
       />
     </Paper>
   )

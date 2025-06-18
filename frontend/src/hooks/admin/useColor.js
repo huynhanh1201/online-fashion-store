@@ -1,5 +1,9 @@
 import { useState } from 'react'
-import { getColors, addColor } from '~/services/admin/ColorService'
+import {
+  getColors,
+  addColor,
+  getColorById
+} from '~/services/admin/ColorService'
 
 const useColors = () => {
   const [colors, setColors] = useState([])
@@ -41,8 +45,28 @@ const useColors = () => {
       return null
     }
   }
+  const getColorId = async (id) => {
+    try {
+      const color = await getColorById(id)
+      return color
+    } catch (error) {
+      console.error('Lỗi khi lấy màu:', error)
+      return null
+    }
+  }
 
-  return { colors, totalPages, fetchColors, loading, createNewColor }
+  const saveColor = (data) => {
+    setColors((prev) => prev.map((d) => (d._id === data._id ? data : d)))
+  }
+  return {
+    colors,
+    totalPages,
+    fetchColors,
+    loading,
+    createNewColor,
+    getColorId,
+    saveColor
+  }
 }
 
 export default useColors
