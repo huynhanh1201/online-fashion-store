@@ -152,9 +152,9 @@ const HeaderAction = () => {
         }}
         PaperProps={{
           component: Paper,
-          elevation: 4,
+          elevation: 6,
           sx: {
-            mt: 1,
+            mt: 1.6,
             minWidth: 160,
             zIndex: (theme) => theme.zIndex.tooltip + 10,
             '& .MuiMenuItem-root': {
