@@ -15,7 +15,6 @@ import { OrderItemModel } from '~/models/OrderItemModel'
 import { PaymentTransactionModel } from '~/models/PaymentTransactionModel'
 import { CartModel } from '~/models/CartModel'
 import { env } from '~/config/environment'
-import { deliveriesService } from '~/services/deliveriesService'
 
 const checkInventorySufficient = async (cartItems, session) => {
   const warehouses = await WarehouseModel.find({ destroy: false }).session(
