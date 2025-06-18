@@ -26,10 +26,7 @@ import draftToHtml from 'draftjs-to-html'
 import ProductImages from '../component/ProductImageUploader'
 import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css'
 import 'draft-js/dist/Draft.css'
-import InputAdornment from '@mui/material/InputAdornment'
-const URI = 'https://api.cloudinary.com/v1_1/dkwsy9sph/image/upload'
-const CloudinaryColor = 'color_upload'
-const CloudinaryProduct = 'product_upload'
+import { CloudinaryColor, CloudinaryProduct, URI } from '~/utils/constants'
 
 const uploadToCloudinary = async (file, folder = CloudinaryColor) => {
   const formData = new FormData()
@@ -272,18 +269,13 @@ const AddProductModal = ({ open, onClose, onSuccess }) => {
               control={control}
               render={({ field }) => (
                 <TextField
-                  label='Giá nhập'
+                  label='Giá nhập (đ)'
                   fullWidth
                   type='text'
                   value={formatNumber(field.value || '')}
                   onChange={(e) => {
                     const rawValue = parseNumber(e.target.value)
                     field.onChange(rawValue)
-                  }}
-                  InputProps={{
-                    endAdornment: (
-                      <InputAdornment position='end'>đ</InputAdornment>
-                    )
                   }}
                 />
               )}
@@ -297,7 +289,7 @@ const AddProductModal = ({ open, onClose, onSuccess }) => {
               rules={{ required: 'Giá bán không được bỏ trống' }}
               render={({ field }) => (
                 <TextField
-                  label='Giá bán'
+                  label='Giá bán (đ)'
                   fullWidth
                   type='text'
                   value={formatNumber(field.value || '')}
@@ -307,16 +299,12 @@ const AddProductModal = ({ open, onClose, onSuccess }) => {
                   }}
                   error={!!errors.price}
                   helperText={errors.price?.message}
-                  InputProps={{
-                    endAdornment: (
-                      <InputAdornment position='end'>đ</InputAdornment>
-                    )
-                  }}
                 />
               )}
             />
           </Grid>
           {/*kích thước đóng gói*/}
+          <Typography variant='h6'>Kích thước đóng gói</Typography>
           <Grid item size={12}>
             <Grid container spacing={2} sx={{ mt: 1 }}>
               {/* Chiều dài */}
@@ -335,7 +323,6 @@ const AddProductModal = ({ open, onClose, onSuccess }) => {
                   )}
                 />
               </Grid>
-
               {/* Chiều rộng */}
               <Grid item size={3} xs={6} sm={3}>
                 <Controller
@@ -352,7 +339,6 @@ const AddProductModal = ({ open, onClose, onSuccess }) => {
                   )}
                 />
               </Grid>
-
               {/* Chiều cao */}
               <Grid item size={3} xs={6} sm={3}>
                 <Controller
@@ -369,7 +355,6 @@ const AddProductModal = ({ open, onClose, onSuccess }) => {
                   )}
                 />
               </Grid>
-
               {/* Khối lượng */}
               <Grid item size={3} xs={6} sm={3}>
                 <Controller

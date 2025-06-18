@@ -138,27 +138,35 @@ const EditDiscountModal = ({ open, onClose, discount, onSave }) => {
                 {...register('code', { required: true })}
                 sx={StyleAdmin.InputCustom}
               />
-              <FormControl
-                fullWidth
-                margin='normal'
-                sx={StyleAdmin.FormSelect} // style chuẩn bạn dùng cho select
-              >
-                <InputLabel id='type-label'>Loại giảm giá</InputLabel>
-                <Select
-                  label='Loại giảm giá'
-                  {...register('type', {
-                    required: 'Vui lòng chọn loại giảm giá'
-                  })}
-                  MenuProps={{
-                    PaperProps: {
-                      sx: StyleAdmin.FormSelect.SelectMenu
-                    }
-                  }}
-                >
-                  <MenuItem value='fixed'>Giảm theo số tiền</MenuItem>
-                  <MenuItem value='percent'>Giảm theo phần trăm</MenuItem>
-                </Select>
-              </FormControl>
+              <Controller
+                name='type'
+                control={control}
+                rules={{ required: 'Vui lòng chọn loại giảm giá' }}
+                render={({ field, fieldState: { error } }) => (
+                  <FormControl
+                    fullWidth
+                    margin='normal'
+                    error={!!error}
+                    sx={StyleAdmin.FormSelect}
+                  >
+                    <InputLabel id='type-label'>Loại giảm giá</InputLabel>
+                    <Select
+                      labelId='type-label'
+                      label='Loại giảm giá'
+                      {...field}
+                      MenuProps={{
+                        PaperProps: {
+                          sx: StyleAdmin.FormSelect.SelectMenu
+                        }
+                      }}
+                    >
+                      <MenuItem value='fixed'>Giảm theo số tiền</MenuItem>
+                      <MenuItem value='percent'>Giảm theo phần trăm</MenuItem>
+                    </Select>
+                  </FormControl>
+                )}
+              />
+
               <Controller
                 name='amount'
                 control={control}
@@ -179,9 +187,7 @@ const EditDiscountModal = ({ open, onClose, discount, onSave }) => {
                 }) => (
                   <TextField
                     label={
-                      type === 'fixed'
-                        ? 'Giá trị giảm (VNĐ)'
-                        : 'Giá trị giảm (%)'
+                      type === 'fixed' ? 'Giá trị giảm (đ)' : 'Giá trị giảm (%)'
                     }
                     fullWidth
                     margin='normal'
@@ -224,7 +230,7 @@ const EditDiscountModal = ({ open, onClose, discount, onSave }) => {
                   fieldState: { error }
                 }) => (
                   <TextField
-                    label='Giá trị đơn hàng tối thiểu'
+                    label='Giá trị đơn hàng tối thiểu (đ)'
                     fullWidth
                     margin='normal'
                     value={formatNumber(value)}

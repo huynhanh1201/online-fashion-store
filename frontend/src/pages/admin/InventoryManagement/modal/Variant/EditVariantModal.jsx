@@ -22,8 +22,7 @@ import DeleteIcon from '@mui/icons-material/Delete'
 import AddPhotoAlternateIcon from '@mui/icons-material/AddPhotoAlternate'
 import StyleAdmin from '~/assets/StyleAdmin.jsx'
 
-const URI = 'https://api.cloudinary.com/v1_1/dkwsy9sph/image/upload'
-const CloudinaryColor = 'color_upload'
+import { URI, CloudinaryColor } from '~/utils/constants'
 
 const uploadToCloudinary = async (file, folder = CloudinaryColor) => {
   const formData = new FormData()
@@ -312,7 +311,7 @@ const EditVariantModal = ({
                   render={({ field }) => (
                     <TextField
                       sx={{ mb: 2 }}
-                      label='Giá nhập'
+                      label='Giá nhập (đ)'
                       disabled={!overridePrice}
                       type='text'
                       fullWidth
@@ -322,10 +321,6 @@ const EditVariantModal = ({
                       }
                       error={!!errors.importPrice}
                       helperText={errors.importPrice?.message}
-                      InputProps={{
-                        endAdornment: <span style={{ marginLeft: 4 }}>đ</span>,
-                        inputMode: 'numeric'
-                      }}
                     />
                   )}
                 />
@@ -343,7 +338,7 @@ const EditVariantModal = ({
                   }}
                   render={({ field }) => (
                     <TextField
-                      label='Giá bán'
+                      label='Giá bán (đ)'
                       disabled={!overridePrice}
                       type='text'
                       fullWidth
@@ -353,10 +348,6 @@ const EditVariantModal = ({
                       }
                       error={!!errors.exportPrice}
                       helperText={errors.exportPrice?.message}
-                      InputProps={{
-                        endAdornment: <span style={{ marginLeft: 4 }}>đ</span>,
-                        inputMode: 'numeric'
-                      }}
                     />
                   )}
                 />

@@ -203,7 +203,10 @@ const TransactionTable = ({
               Phương thức thanh toán
             </TableCell>
 
-            <TableCell sx={{ minWidth: 150, maxWidth: 150, px: 1 }}>
+            <TableCell
+              align='right'
+              sx={{ minWidth: 150, maxWidth: 150, px: 1, pr: 10 }}
+            >
               Số tiền
             </TableCell>
             <TableCell sx={{ minWidth: 150, px: 1 }}>Ngày tạo</TableCell>

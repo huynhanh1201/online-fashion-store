@@ -366,7 +366,7 @@ export default function AddWarehouseSlipModal({
                       <TableCell sx={{ width: 60, textAlign: 'center' }}>
                         STT
                       </TableCell>
-                      <TableCell>Variant</TableCell>
+                      <TableCell>Tên sản phẩm</TableCell>
                       <TableCell>
                         SL {type === 'input' ? 'nhập' : 'xuất'}
                       </TableCell>

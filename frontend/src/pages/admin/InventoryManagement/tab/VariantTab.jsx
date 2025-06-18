@@ -1,5 +1,5 @@
 // VariantsTab.js
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useMemo } from 'react'
 import {
   Paper,
   Table,
@@ -42,19 +42,21 @@ const VariantsTab = () => {
     loadingVariant,
     totalVariant,
     Save,
-    fetchVariantById
+    fetchVariantId
   } = useVariants()
   const { products, fetchProducts } = useProducts()
   const { colors, fetchColors } = useColors()
   const { sizes, fetchSizes } = useSizes()
 
-  const enrichedVariants = (variants || []).map((variant) => {
-    const product = (products || []).find((p) => p.id === variant.productId)
-    return {
-      ...variant,
-      productName: product ? product.name : 'N/A'
-    }
-  })
+  const enrichedVariants = useMemo(() => {
+    return (variants || []).map((variant) => {
+      const product = (products || []).find((p) => p.id === variant.productId)
+      return {
+        ...variant,
+        productName: product ? product.name : 'N/A'
+      }
+    })
+  }, [variants, products])
 
   const [openAddModal, setOpenAddModal] = useState(false)
   const [openViewModal, setOpenViewModal] = useState(false)
@@ -118,11 +120,19 @@ const VariantsTab = () => {
     if (type === 'add') {
       await createNewVariant(variant)
     } else if (type === 'edit') {
-      await updateVariantById(variantId, variant)
+      // await updateVariantById(variantId, variant)
+      const edit = await updateVariantById(variantId, variant)
+      console.log(edit)
+      if (edit) {
+        const updatedVariant = await fetchVariantId(variantId)
+        console.log('Cập nhật biến thể:', updatedVariant)
+        if (updatedVariant) {
+          Save(updatedVariant)
+        }
+      }
     } else if (type === 'delete') {
       await deleteVariantById(variant)
     }
-    fetchVariants(page, rowsPerPage, filter)
   }
 
   const variantColumns = [
@@ -143,15 +153,16 @@ const VariantsTab = () => {
       label: 'Giá nhập',
       minWidth: 150,
       maxWidth: 150,
-      align: 'start',
+      align: 'right',
       format: (value) => `${value.toLocaleString('vi-VN')}đ`
     },
     {
       id: 'exportPrice',
       label: 'Giá bán',
-      minWidth: 150,
-      maxWidth: 150,
-      align: 'start',
+      minWidth: 190,
+      maxWidth: 214,
+      align: 'right',
+      pr: 8,
       format: (value) => `${value.toLocaleString('vi-VN')}đ`
     },
     {
@@ -255,6 +266,7 @@ const VariantsTab = () => {
                     minWidth: column.minWidth,
                     width: column.width,
                     px: 1,
+                    pr: column.pr,
                     ...(column.maxWidth && { maxWidth: column.maxWidth }),
                     ...(column.id === 'action' && {
                       width: '130px',
@@ -388,7 +400,8 @@ const VariantsTab = () => {
                           verticalAlign: 'middle',
                           ...(id === 'sku' || id === 'name'
                             ? { maxWidth: 150 } // Ẩn tràn nếu mã hoặc tên dài
-                            : {})
+                            : {}),
+                          ...(id === 'exportPrice' && { pr: column.pr })
                         }}
                       >
                         {content}

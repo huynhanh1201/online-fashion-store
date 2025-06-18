@@ -9,7 +9,7 @@ import {
   MenuItem,
   Grid
 } from '@mui/material'
-import { useForm } from 'react-hook-form'
+import { useForm, Controller } from 'react-hook-form'
 import { toast } from 'react-toastify'
 
 const partnerTypes = [
@@ -27,6 +27,7 @@ export default function EditPartnerModal({
   const {
     register,
     handleSubmit,
+    control,
     reset,
     setValue,
     formState: { errors }
@@ -79,7 +80,7 @@ export default function EditPartnerModal({
       <form onSubmit={handleSubmit(onSubmit)}>
         <DialogContent dividers>
           <Grid container spacing={2}>
-            <Grid item xs={12}>
+            <Grid item size={12} xs={12}>
               <TextField
                 label='Tên đối tác'
                 fullWidth
@@ -94,25 +95,30 @@ export default function EditPartnerModal({
                 helperText={errors.name?.message}
               />
             </Grid>
-            <Grid item xs={12}>
-              <TextField
-                select
-                label='Kiểu đối tác'
-                fullWidth
-                {...register('type', {
-                  required: 'Vui lòng chọn loại đối tác'
-                })}
-                error={!!errors.type}
-                helperText={errors.type?.message}
-              >
-                {partnerTypes.map((option) => (
-                  <MenuItem key={option.value} value={option.value}>
-                    {option.label}
-                  </MenuItem>
-                ))}
-              </TextField>
+            <Grid item size={12} xs={12}>
+              <Controller
+                name='type'
+                control={control}
+                rules={{ required: 'Vui lòng chọn loại đối tác' }}
+                render={({ field }) => (
+                  <TextField
+                    select
+                    label='Kiểu đối tác'
+                    fullWidth
+                    {...field}
+                    error={!!errors.type}
+                    helperText={errors.type?.message}
+                  >
+                    {partnerTypes.map((option) => (
+                      <MenuItem key={option.value} value={option.value}>
+                        {option.label}
+                      </MenuItem>
+                    ))}
+                  </TextField>
+                )}
+              />
             </Grid>
-            <Grid item xs={12} sm={6}>
+            <Grid item size={12} xs={12} sm={6}>
               <TextField
                 label='Số điện thoại'
                 fullWidth
@@ -127,7 +133,7 @@ export default function EditPartnerModal({
                 helperText={errors.phone?.message}
               />
             </Grid>
-            <Grid item xs={12} sm={6}>
+            <Grid item size={12} xs={12} sm={6}>
               <TextField
                 label='Email'
                 type='email'
