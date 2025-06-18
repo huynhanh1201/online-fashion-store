@@ -227,7 +227,7 @@ const handleCreateOrder = async (
     }
   )
 
-  if (couponCode) cartTotal -= discountAmount
+  if (couponCode) cartTotal -= discountAmount || 0
 
   // Tao đơn hàng trong hệ thống
   const newOrder = {
