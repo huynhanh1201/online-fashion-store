@@ -29,6 +29,12 @@ const categorySchema = new Schema(
     image: {
       type: String,
       default: null // Chuỗi rỗng nếu không có ảnh
+    },
+
+    parent: {
+      type: Schema.Types.ObjectId,
+      ref: 'Category',
+      default: null
     }
   },
   {
