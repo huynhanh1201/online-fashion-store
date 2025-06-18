@@ -1,6 +1,4 @@
 import { ShippingAddressModel } from '~/models/ShippingAddressModel'
-import ApiError from '~/utils/ApiError'
-import { StatusCodes } from 'http-status-codes'
 
 const createShippingAddress = async (userId, reqBody) => {
   // eslint-disable-next-line no-useless-catch
