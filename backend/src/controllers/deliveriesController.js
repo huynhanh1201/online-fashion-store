@@ -2,9 +2,9 @@ import { StatusCodes } from 'http-status-codes'
 
 import { deliveriesService } from '~/services/deliveriesService'
 
-const getDelivery = async (req, res, next) => {
+const getDeliveryFee = async (req, res, next) => {
   try {
-    const result = await deliveriesService.getDelivery(req.body)
+    const result = await deliveriesService.getDeliveryFee(req.body)
 
     res.status(StatusCodes.OK).json(result)
   } catch (err) {
@@ -13,5 +13,5 @@ const getDelivery = async (req, res, next) => {
 }
 
 export const deliveriesController = {
-  getDelivery
+  getDeliveryFee
 }

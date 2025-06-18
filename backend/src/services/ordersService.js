@@ -9,6 +9,7 @@ import validatePagination from '~/utils/validatePagination'
 import getDateRange from '~/utils/getDateRange'
 import { orderHelpers } from '~/helpers/orderHelpers'
 import { PaymentSessionDraftModel } from '~/models/PaymentSessionDraftModel'
+import { deliveriesService } from '~/services/deliveriesService'
 
 const createOrder = async (userId, reqBody, ipAddr, jwtDecoded) => {
   // eslint-disable-next-line no-useless-catch
@@ -105,7 +106,7 @@ const createOrder = async (userId, reqBody, ipAddr, jwtDecoded) => {
       )
 
       // Tạo đơn hàng vận chuyển (GHN)
-      const createOrderGHNPromise = orderHelpers.handleCreateOrderForGHN(
+      const createDeliveryOrderPromise = deliveriesService.createDeliveryOrder(
         reqBody,
         cartItems,
         order,
@@ -119,7 +120,7 @@ const createOrder = async (userId, reqBody, ipAddr, jwtDecoded) => {
         orderItemsPromise,
         transactionPromise,
         cartItemPromise,
-        createOrderGHNPromise
+        createDeliveryOrderPromise
       ])
     } else {
       await PaymentSessionDraftModel.create(

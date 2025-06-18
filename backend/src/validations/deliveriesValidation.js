@@ -6,12 +6,19 @@ import ApiError from '~/utils/ApiError'
 const deliveryGHN = async (req, res, next) => {
   // Xác thực dữ liệu đầu vào correctCondition: điều kiện đúng
   const correctCondition = Joi.object({
-    numberItemOrder: Joi.number().min(1).required(),
-    service_type_id: Joi.number().valid(2).required(), // chỉ cho phép 2, nếu sau này có nhiều hơn thì thêm vào
+    cartItems: Joi.array()
+      .items(
+        Joi.object({
+          variantId: Joi.string().length(24).hex().required(),
+          quantity: Joi.number().integer().min(1).required()
+        })
+      )
+      .min(1)
+      .required(),
+
     to_district_id: Joi.number().required(),
-    to_ward_code: Joi.string().required(),
-    insurance_value: Joi.number().min(0).required(), // có thể là 0
-    coupon: Joi.string().allow(null, '') // cho phép null hoặc chuỗi rỗng
+
+    to_ward_code: Joi.string().required()
   })
 
   try {
