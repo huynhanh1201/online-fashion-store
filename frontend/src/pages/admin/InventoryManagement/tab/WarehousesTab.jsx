@@ -158,6 +158,7 @@ const WarehousesTab = () => {
                       color='primary'
                       onClick={handleAddWarehouse}
                       startIcon={<AddIcon />}
+                      disabled={isAddDisabled}
                       sx={{
                         textTransform: 'none',
                         width: 100,
