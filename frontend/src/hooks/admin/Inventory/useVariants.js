@@ -3,7 +3,8 @@ import {
   getVariants,
   createVariant,
   updateVariant,
-  deleteVariant
+  deleteVariant,
+  getVariantById
 } from '~/services/admin/Inventory/VariantService'
 
 const useVariants = () => {
@@ -55,6 +56,17 @@ const useVariants = () => {
     return result
   }
 
+  const fetchVariantById = async (id) => {
+    const result = await getVariantById(id)
+    return result
+  }
+
+  const Save = (data) => {
+    setVariants((prev) =>
+      prev.map((d) => (d.productId === data.productId ? data : d))
+    )
+  }
+
   return {
     variants,
     totalVariant,
@@ -62,7 +74,9 @@ const useVariants = () => {
     fetchVariants,
     createNewVariant,
     updateVariantById,
-    deleteVariantById
+    deleteVariantById,
+    fetchVariantById,
+    Save
   }
 }
 

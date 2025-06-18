@@ -20,7 +20,8 @@ const ColorManagement = () => {
   const [limit, setLimit] = React.useState(10) // Giới hạn số lượng màu hiển thị mỗi trang
   const [modalType, setModalType] = React.useState(null)
   const [filters, setFilters] = React.useState({})
-  const { colors, totalPages, fetchColors, Loading } = useColors()
+  const { colors, totalPages, fetchColors, Loading, getColorId, saveColor } =
+    useColors()
 
   React.useEffect(() => {
     fetchColors(page, limit, filters)
@@ -43,7 +44,10 @@ const ColorManagement = () => {
     try {
       const response = await updateColor(colorId, updatedData)
       if (response) {
-        await fetchColors(page, limit, filters)
+        const updatedColor = await getColorId(colorId)
+        if (updatedColor) {
+          saveColor(updatedColor)
+        }
       } else {
         console.log('Cập nhật không thành công')
       }
@@ -56,7 +60,10 @@ const ColorManagement = () => {
     try {
       const result = await deleteColor(colorId)
       if (result) {
-        await fetchColors(page, limit, filters)
+        const deletedColor = await getColorId(colorId)
+        if (deletedColor) {
+          saveColor(deletedColor)
+        }
       } else {
         console.log('Xoá không thành công')
       }
@@ -96,7 +103,7 @@ const ColorManagement = () => {
           <AddColorModal
             open
             onClose={handleCloseModal}
-            onAdded={() => fetchColors(page)}
+            onAdded={() => fetchColors(page, limit, filters)}
           />
         )}
 

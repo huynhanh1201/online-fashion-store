@@ -15,12 +15,21 @@ import {
   Chip,
   Divider
 } from '@mui/material'
+import StyleAdmin from '~/assets/StyleAdmin.jsx'
 
 const ViewWarehouseSlipModal = ({ open, onClose, slip }) => {
   if (!slip) return null
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth='md' fullWidth>
+    <Dialog
+      open={open}
+      onClose={onClose}
+      maxWidth='md'
+      fullWidth
+      BackdropProps={{
+        sx: StyleAdmin.OverlayModal
+      }}
+    >
       <DialogTitle sx={{ pl: 5 }}>
         Thông tin phiếu {slip.type === 'Nhập' ? 'nhập' : 'xuất'} kho
       </DialogTitle>

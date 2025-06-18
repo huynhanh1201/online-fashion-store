@@ -44,19 +44,17 @@ const useWarehouses = () => {
 
   const createNewWarehouse = async (data) => {
     const result = await createWarehouse(data)
-    if (result) await fetchWarehouses()
+    await fetchWarehouses()
     return result
   }
 
   const updateWarehouseById = async (id, data) => {
     const result = await updateWarehouse(id, data)
-    if (result) await fetchWarehouses()
     return result
   }
 
   const deleteWarehouseById = async (id) => {
     const result = await deleteWarehouse(id)
-    if (result) await fetchWarehouses()
     return result
   }
 

@@ -240,7 +240,8 @@ export default function DiscountRow({ discount, index, columns, onAction }) {
             align={align || 'left'}
             sx={{
               ...styles.cell,
-              ...(id === 'index' && StyleAdmin.TableColumnSTT)
+              ...(id === 'index' && StyleAdmin.TableColumnSTT),
+              ...(id === 'remaining' && { paddingRight: '72px' })
             }}
             title={typeof content === 'string' ? content : undefined}
           >

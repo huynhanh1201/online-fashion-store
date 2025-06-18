@@ -21,7 +21,8 @@ const SizeManagement = () => {
   const [selectedSize, setSelectedSize] = React.useState(null)
   const [modalType, setModalType] = React.useState(null)
 
-  const { sizes, totalPages, fetchSizes, Loading } = useSizes()
+  const { sizes, totalPages, fetchSizes, Loading, fetchSizeById, Save } =
+    useSizes()
 
   React.useEffect(() => {
     fetchSizes(page, limit, filters)
@@ -44,7 +45,10 @@ const SizeManagement = () => {
     try {
       const response = await updateSize(sizeId, updatedData)
       if (response) {
-        await fetchSizes(page, limit, filters)
+        const updatedSize = await fetchSizeById(sizeId)
+        if (updatedSize) {
+          Save(updatedSize)
+        }
       } else {
         console.log('Cập nhật không thành công')
       }
@@ -57,7 +61,10 @@ const SizeManagement = () => {
     try {
       const result = await deleteSize(sizeId)
       if (result) {
-        await fetchSizes(page, limit, filters)
+        const removeSize = await fetchSizeById(sizeId)
+        if (removeSize) {
+          Save(removeSize)
+        }
       } else {
         console.log('Xoá không thành công')
       }
