@@ -28,15 +28,15 @@ const styles = {
   },
   bannerText: {
     position: 'absolute',
-    top: '20px',
-    left: '20px',
+    top: '150px',
+    left: '70px',
     color: 'white',
     textShadow: '0 2px 4px rgba(0,0,0,0.5)'
   },
   bannerTitle: {
     margin: '0 0 8px 0',
-    fontSize: '24px',
-    fontWeight: 'bold'
+    fontSize: '50px',
+    fontWeight: '1000'
   },
   bannerDesc: {
     margin: '0',
@@ -86,15 +86,16 @@ const ProductSection = ({
         <div style={styles.banner}>
           <img
             src={
-              bannerImg ||
-              'https://file.hstatic.net/1000360022/file/5-_banner_web_-__nh_nh_m_s_n_ph_m_trang_ch__qu_n_short__848x544_.jpg'
+              bannerImg
+                ? bannerImg
+                : 'https://placehold.co/500x440?text=No+Category+Image'
             }
             alt={bannerTitle || 'Banner'}
             style={styles.bannerImg}
             onError={(e) => {
               console.error('Banner image failed to load:', e.target.src)
               e.target.src =
-                'https://via.placeholder.com/500x440?text=Image+Error'
+                'https://placehold.co/500x440?text=Image+Error'
             }}
           />
           <div style={styles.bannerText}>
@@ -125,7 +126,7 @@ const ProductSection = ({
           products.slice(0, 4).map((product) => {
             // Xử lý ảnh sản phẩm
             let productImage =
-              'https://via.placeholder.com/220x220?text=No+Image'
+              'https://placehold.co/500x440?text=No+Category+Image'
 
             if (product.image) {
               if (Array.isArray(product.image) && product.image.length > 0) {

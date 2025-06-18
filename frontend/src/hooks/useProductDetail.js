@@ -74,7 +74,8 @@ const useProductDetail = (productId) => {
           name: data.name || 'Sản phẩm không tên',
           price: data.price || 0,
           discountPrice: data.discountPrice || null,
-          quantity: data.quantity || 0
+          quantity: data.quantity || 0,
+          category: data.categoryId,
         })
       } else {
         setError('Sản phẩm không tồn tại hoặc dữ liệu không hợp lệ.')
