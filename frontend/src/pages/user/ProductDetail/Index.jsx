@@ -72,26 +72,25 @@ const ProductDetail = () => {
         }
       }
     }
-  
+
     fetchCategory()
   }, [product])
-  
 
   if (isLoading) {
     return (
-      <Container maxWidth="lg" sx={{ py: 4, mt: 20, textAlign: 'center' }}>
-        <Typography variant="h6">Đang tải...</Typography>
+      <Container maxWidth='lg' sx={{ py: 4, mt: 20, textAlign: 'center' }}>
+        <Typography variant='h6'>Đang tải...</Typography>
       </Container>
     )
   }
 
   if (error || !product) {
     return (
-      <Container maxWidth="lg" sx={{ py: 4, mt: 20, textAlign: 'center' }}>
-        <Typography variant="h6" color="error">
+      <Container maxWidth='lg' sx={{ py: 4, mt: 20, textAlign: 'center' }}>
+        <Typography variant='h6' color='error'>
           {error || 'Không tìm thấy sản phẩm.'}
         </Typography>
-        <Button variant="contained" sx={{ mt: 2 }} onClick={fetchProduct}>
+        <Button variant='contained' sx={{ mt: 2 }} onClick={fetchProduct}>
           Thử lại
         </Button>
       </Container>
@@ -125,7 +124,7 @@ const ProductDetail = () => {
         >
           <Typography
             component={RouterLink}
-            to="/"
+            to='/'
             sx={{
               color: '#1976d2',
               textDecoration: 'none',
@@ -139,7 +138,7 @@ const ProductDetail = () => {
           <Typography sx={{ mx: 0.5, color: '#888' }}>/</Typography>
           <Typography
             component={RouterLink}
-            to="/product"
+            to='/product'
             sx={{
               color: '#1976d2',
               textDecoration: 'none',
@@ -153,7 +152,7 @@ const ProductDetail = () => {
           <Typography sx={{ mx: 0.5, color: '#888' }}>/</Typography>
           <Typography
             component={RouterLink}
-            to="/product"
+            to={`/productbycategory/${category?._id}`}
             sx={{
               color: '#1976d2',
               textDecoration: 'none',
@@ -176,7 +175,7 @@ const ProductDetail = () => {
       <Grid
         container
         spacing={4}
-        justifyContent="center"
+        justifyContent='center'
         sx={{
           alignItems: 'flex-start',
           flexWrap: 'nowrap',

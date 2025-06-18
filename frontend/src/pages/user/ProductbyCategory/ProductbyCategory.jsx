@@ -117,7 +117,6 @@ const ProductbyCategory = () => {
     if (!allProducts.length && !loadingProducts) return
 
     let sortedProducts = [...allProducts]
-    console.log('Tổng số sản phẩm ban đầu:', allProducts.length)
 
     if (categoryId) {
       // Lọc sản phẩm theo categoryId
@@ -156,7 +155,6 @@ const ProductbyCategory = () => {
           break
       }
 
-      console.log('Số sản phẩm sau khi lọc:', sortedProducts.length)
       console.log(
         'Chi tiết sản phẩm sau khi lọc:',
         sortedProducts.map((p) => ({
@@ -241,7 +239,6 @@ const ProductbyCategory = () => {
           width: '100%',
           height: { xs: '200px', sm: '300px', md: '400px' },
           backgroundImage:
-            category?.image ||
             'url(https://file.hstatic.net/1000360022/collection/ao-thun_cd23d8082c514c839615e1646371ba71.jpg)',
           backgroundSize: 'cover',
           backgroundPosition: 'center',

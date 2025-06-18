@@ -28,15 +28,15 @@ const styles = {
   },
   bannerText: {
     position: 'absolute',
-    top: '20px',
-    left: '20px',
+    top: '150px',
+    left: '70px',
     color: 'white',
     textShadow: '0 2px 4px rgba(0,0,0,0.5)'
   },
   bannerTitle: {
     margin: '0 0 8px 0',
-    fontSize: '24px',
-    fontWeight: 'bold'
+    fontSize: '50px',
+    fontWeight: '1000'
   },
   bannerDesc: {
     margin: '0',
@@ -85,7 +85,11 @@ const ProductSection = ({
         {/* Banner */}
         <div style={styles.banner}>
           <img
-            src={bannerImg ? bannerImg : 'https://via.placeholder.com/500x440?text=No+Category+Image'}
+            src={
+              bannerImg
+                ? bannerImg
+                : 'https://via.placeholder.com/500x440?text=No+Category+Image'
+            }
             alt={bannerTitle || 'Banner'}
             style={styles.bannerImg}
             onError={(e) => {

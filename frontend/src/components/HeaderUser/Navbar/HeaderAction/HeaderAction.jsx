@@ -119,6 +119,11 @@ const HeaderAction = () => {
 
   return (
     <>
+       <IconButton color='inherit' component={Link} to='/cart' sx={{ mt: 0.6 }}>
+        <Badge badgeContent={cartCount} color='error'>
+          <ShoppingCartIcon sx={{ fontSize: 26}} />
+        </Badge>
+      </IconButton>
       <IconButton color='inherit' onClick={handleClick}>
         {currentUser && currentUser.avatarUrl ? (
           <Avatar
@@ -186,14 +191,11 @@ const HeaderAction = () => {
                     src={optimizeCloudinaryUrl(currentUser.avatarUrl)}
                     alt={currentUser.name || 'User'}
                     sx={{
-                      width: 40,
-                      height: 40,
+                      width: 46,
+                      height: 46,
                       border: '2px solid #1976d2',
                       boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
                       transition: 'transform 0.2s ease-in-out',
-                      '&:hover': {
-                        transform: 'scale(1.05)'
-                      }
                     }}
                   />
                   <Typography
@@ -263,12 +265,6 @@ const HeaderAction = () => {
           </div>
         </Fade>
       </Menu>
-
-      <IconButton color='inherit' component={Link} to='/cart'>
-        <Badge badgeContent={cartCount} color='error'>
-          <ShoppingCartIcon />
-        </Badge>
-      </IconButton>
     </>
   )
 }
