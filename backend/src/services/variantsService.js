@@ -169,7 +169,9 @@ const updateVariant = async (variantId, reqBody) => {
       importPrice: reqBody.importPrice,
       exportPrice: reqBody.exportPrice,
       overridePrice: reqBody.overridePrice,
-      destroy: reqBody.destroy
+      destroy: reqBody.destroy,
+      overridePackageSize: reqBody.overridePackageSize,
+      packageSize: reqBody.packageSize
     }
 
     // Nếu có ảnh color mới
