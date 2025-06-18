@@ -85,10 +85,7 @@ const ProductSection = ({
         {/* Banner */}
         <div style={styles.banner}>
           <img
-            src={
-              bannerImg ||
-              'https://file.hstatic.net/1000360022/file/5-_banner_web_-__nh_nh_m_s_n_ph_m_trang_ch__qu_n_short__848x544_.jpg'
-            }
+            src={bannerImg ? bannerImg : 'https://via.placeholder.com/500x440?text=No+Category+Image'}
             alt={bannerTitle || 'Banner'}
             style={styles.bannerImg}
             onError={(e) => {

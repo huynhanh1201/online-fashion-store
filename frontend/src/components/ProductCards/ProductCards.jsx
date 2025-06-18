@@ -12,12 +12,11 @@ const ProductCard = ({ product, isFlashSale = false }) => {
     return <div style={styles.productCard}>No image available</div>
   }
 
-  const imageUrl = Array.isArray(product.image) ? product.image[0] : product.image
-  const optimizedImage = optimizeCloudinaryUrl(imageUrl)
+  const images = Array.isArray(product.image) ? product.image : [product.image]
+  const imageUrl1 = optimizeCloudinaryUrl(images[0])
+  const imageUrl2 = optimizeCloudinaryUrl(images[1] || images[0])
 
-
-  // console.log('Original image URL:', imageUrl)
-  // console.log('Optimized image URL:', optimizedImage)
+  const [hovered, setHovered] = React.useState(false)
 
   const quantity = Number(product.quantity) || 0
   const inStock = quantity > 0
@@ -32,12 +31,8 @@ const ProductCard = ({ product, isFlashSale = false }) => {
     <Link
       to={`/productdetail/${product._id}`}
       style={styles.productCardLink}
-      onMouseEnter={(e) => {
-        e.currentTarget.style.transform = 'translateY(-2px)'
-      }}
-      onMouseLeave={(e) => {
-        e.currentTarget.style.transform = 'translateY(0)'
-      }}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
     >
       <div
         style={{
@@ -45,43 +40,37 @@ const ProductCard = ({ product, isFlashSale = false }) => {
           ...(isFlashSale ? styles.flashSaleCard : {})
         }}
       >
-        <div
-          style={styles.productImage}
-          onMouseEnter={(e) => {
-            const overlay = e.currentTarget.querySelector('.overlay')
-            overlay.style.opacity = '1'
-          }}
-          onMouseLeave={(e) => {
-            const overlay = e.currentTarget.querySelector('.overlay')
-            overlay.style.opacity = '0'
-          }}
-        >
+        <div style={styles.productImage}>
+          {/* Ảnh chính */}
           <img
-            src={optimizedImage}
+            src={imageUrl1}
             alt={product.name}
             style={{
               ...styles.productImg,
-              ...(inStock ? {} : styles.outOfStockImg)
+              opacity: hovered ? 0 : 1,
+              zIndex: hovered ? 1 : 2,
+              position: 'absolute',
+              transition: 'opacity 0.4s ease'
+            }}
+            loading="lazy"
+          />
+          {/* Ảnh hover (ảnh thứ 2 hoặc ảnh 1 nếu không có) */}
+          <img
+            src={imageUrl2}
+            alt={product.name + ' hover'}
+            style={{
+              ...styles.productImg,
+              opacity: hovered ? 1 : 0,
+              zIndex: hovered ? 2 : 1,
+              position: 'absolute',
+              transition: 'opacity 0.7s ease'
             }}
             loading="lazy"
           />
           {product.discount > 0 && (
             <div style={styles.discountBadge}>-{product.discount}%</div>
           )}
-          <div className='overlay' style={styles.overlay}>
-            <button
-              style={styles.cartButton}
-              onClick={(e) => {
-                e.preventDefault()
-                e.stopPropagation()
-                alert(`Thêm ${product.name} vào giỏ hàng`)
-              }}
-            >
-              🛒
-            </button>
-          </div>
         </div>
-
         <div style={styles.productInfo}>
           <h3 style={styles.productName} title={product.name}>
             {truncateProductName(product.name)}

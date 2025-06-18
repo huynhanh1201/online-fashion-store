@@ -49,7 +49,9 @@ function AddressDialog({
           value={formData.phone}
           onChange={(e) => onFormChange('phone', e.target.value)}
           error={formErrors.phone}
-          helperText={formErrors.phone ? 'Số điện thoại phải là 10 chữ số' : ''}
+          // Cho phép nhập nhiều loại số điện thoại, helperText chỉ báo lỗi nếu có
+          helperText={formErrors.phone ? 'Vui lòng nhập số điện thoại hợp lệ' : ''}
+          placeholder="VD: 0912345678, (028) 38234567"
         />
         <Autocomplete
           options={provinces}
