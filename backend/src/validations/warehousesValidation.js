@@ -34,7 +34,22 @@ const warehouse = async (req, res, next) => {
 
     city: Joi.string() // Thành phố hoặc tỉnh
       .trim() // Loại bỏ khoảng trắng đầu/cuối
-      .required() // Bắt buộc
+      .required(), // Bắt buộc
+
+    wardId: Joi.string() // chuỗi ký tự
+      .min(2)
+      .max(100)
+      .required(),
+
+    districtId: Joi.string() // chuỗi ký tự
+      .min(2)
+      .max(100)
+      .required(),
+
+    cityId: Joi.string() // chuỗi ký tự
+      .min(2)
+      .max(100)
+      .required()
   })
 
   try {

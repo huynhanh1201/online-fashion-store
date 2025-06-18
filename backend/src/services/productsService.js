@@ -57,7 +57,9 @@ const createProduct = async (reqBody) => {
       productCode: productCodeValue,
       slug: slugify(reqBody.name),
       quantity: 0,
-      destroy: false
+      destroy: false,
+
+      packageSize: reqBody.packageSize
     }
 
     const product = await ProductModel.create(newProduct)
