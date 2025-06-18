@@ -151,15 +151,15 @@ const Payment = () => {
 
     try {
       setShippingPriceLoading(true)
-      const totalItems = items.reduce((sum, item) => sum + (item.quantity || 1), 0)
 
+      // Tạo payload theo format mới
       const payload = {
-        numberItemOrder: totalItems,
-        service_type_id: 2,
+        cartItems: items.map(item => ({
+          variantId: item.variantId,
+          quantity: item.quantity
+        })),
         to_district_id: parseInt(address.districtId, 10),
-        to_ward_code: address.wardId,
-        insurance_value: 0,
-        coupon: null,
+        to_ward_code: address.wardId
       }
 
       console.log('fetchShippingPrice payload:', payload)

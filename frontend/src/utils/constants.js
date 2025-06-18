@@ -15,7 +15,7 @@ export const filterDate = [
 export const GHN_TOKEN_API = '8062c850-4543-11f0-a61c-b20cbde7a816'
 
 export const URI = 'https://api.cloudinary.com/v1_1/dkwsy9sph/image/upload'
-const CLOUD_NAME = 'dkwsy9sph'
+export const CLOUD_NAME = 'dkwsy9sph'
 
 export const CloudinaryColor = 'color_upload'
 export const CLOUD_FOLDER = 'user_avatar'
