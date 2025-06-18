@@ -15,8 +15,6 @@ import {
   Box
 } from '@mui/material'
 import IconButton from '@mui/material/IconButton'
-import DeleteIcon from '@mui/icons-material/Delete'
-import Divider from '@mui/material/Divider'
 import { useForm, Controller } from 'react-hook-form'
 import useCategories from '~/hooks/admin/useCategories.js'
 import AddCategoryModal from '~/pages/admin/CategorieManagement/modal/AddCategoryModal.jsx'
@@ -26,6 +24,7 @@ import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css'
 import { EditorState, convertToRaw, ContentState } from 'draft-js'
 import draftToHtml from 'draftjs-to-html'
 import htmlToDraft from 'html-to-draftjs'
+import { InputAdornment } from '@mui/material'
 import ProductImages from '../component/ProductImageUploader.jsx'
 const URI = 'https://api.cloudinary.com/v1_1/dkwsy9sph/image/upload'
 const CloudinaryColor = 'color_upload'
@@ -78,7 +77,13 @@ const EditProductModal = ({ open, onClose, onSave, product }) => {
       categoryId: '',
       price: '',
       importPrice: '',
-      exportPrice: ''
+      exportPrice: '',
+      packageSize: {
+        length: '',
+        width: '',
+        height: '',
+        weight: ''
+      }
     }
   })
   const [categoryOpen, setCategoryOpen] = useState(false)
@@ -218,7 +223,13 @@ const EditProductModal = ({ open, onClose, onSave, product }) => {
         description: product.description || '',
         categoryId: product.categoryId?._id || product.categoryId || '',
         price: product.exportPrice || '',
-        importPrice: product.importPrice || ''
+        importPrice: product.importPrice || '',
+        packageSize: {
+          length: product.packageSize?.length || '',
+          width: product.packageSize?.width || '',
+          height: product.packageSize?.height || '',
+          weight: product.packageSize?.weight || ''
+        }
       })
 
       setProductImages(product.image || [])
@@ -258,7 +269,13 @@ const EditProductModal = ({ open, onClose, onSave, product }) => {
         exportPrice: Number(data.price),
         importPrice: data.importPrice ? Number(data.importPrice) : undefined,
         categoryId: data.categoryId,
-        image: productImages
+        image: productImages,
+        packageSize: {
+          length: Number(data.packageSize?.length || 0),
+          width: Number(data.packageSize?.width || 0),
+          height: Number(data.packageSize?.height || 0),
+          weight: Number(data.packageSize?.weight || 0)
+        }
       }
 
       const result = await onSave(product._id, finalProduct)
@@ -282,7 +299,7 @@ const EditProductModal = ({ open, onClose, onSave, product }) => {
     <Dialog
       open={open}
       onClose={onClose}
-      maxWidth='xxl'
+      maxWidth='xl'
       fullWidth
       PaperProps={{
         sx: {
@@ -358,7 +375,7 @@ const EditProductModal = ({ open, onClose, onSave, product }) => {
             />
           </Grid>
           {/*Danh mục*/}
-          <Grid item size={4}>
+          <Grid item size={6}>
             <FormControl fullWidth margin='normal' error={!!errors.categoryId}>
               <InputLabel>Danh mục</InputLabel>
               <Controller
@@ -394,7 +411,7 @@ const EditProductModal = ({ open, onClose, onSave, product }) => {
             </FormControl>
           </Grid>
           {/* Giá nhập */}
-          <Grid item size={4} style={{ marginTop: '16px' }}>
+          <Grid item size={3} style={{ marginTop: '16px' }}>
             <Controller
               name='importPrice'
               control={control}
@@ -408,12 +425,17 @@ const EditProductModal = ({ open, onClose, onSave, product }) => {
                     const rawValue = parseNumber(e.target.value)
                     field.onChange(rawValue)
                   }}
+                  InputProps={{
+                    endAdornment: (
+                      <InputAdornment position='end'>đ</InputAdornment>
+                    )
+                  }}
                 />
               )}
             />
           </Grid>
           {/* Giá bán */}
-          <Grid item size={4} style={{ marginTop: '16px' }}>
+          <Grid item size={3} style={{ marginTop: '16px' }}>
             <Controller
               name='price'
               control={control}
@@ -430,9 +452,86 @@ const EditProductModal = ({ open, onClose, onSave, product }) => {
                   }}
                   error={!!errors.price}
                   helperText={errors.price?.message}
+                  InputProps={{
+                    endAdornment: (
+                      <InputAdornment position='end'>đ</InputAdornment>
+                    )
+                  }}
                 />
               )}
             />
+          </Grid>
+          {/* Kích thước gói hàng */}
+          <Grid item size={12}>
+            <Grid container spacing={2} sx={{ mt: 1 }}>
+              {/* Chiều dài */}
+              <Grid item size={3} xs={6} sm={3}>
+                <Controller
+                  name='packageSize.length'
+                  control={control}
+                  render={({ field }) => (
+                    <TextField
+                      label='Dài (cm)'
+                      type='number'
+                      fullWidth
+                      inputProps={{ min: 0 }}
+                      {...field}
+                    />
+                  )}
+                />
+              </Grid>
+
+              {/* Chiều rộng */}
+              <Grid item size={3} xs={6} sm={3}>
+                <Controller
+                  name='packageSize.width'
+                  control={control}
+                  render={({ field }) => (
+                    <TextField
+                      label='Rộng (cm)'
+                      type='number'
+                      fullWidth
+                      inputProps={{ min: 0 }}
+                      {...field}
+                    />
+                  )}
+                />
+              </Grid>
+
+              {/* Chiều cao */}
+              <Grid item size={3} xs={6} sm={3}>
+                <Controller
+                  name='packageSize.height'
+                  control={control}
+                  render={({ field }) => (
+                    <TextField
+                      label='Cao (cm)'
+                      type='number'
+                      fullWidth
+                      inputProps={{ min: 0 }}
+                      {...field}
+                    />
+                  )}
+                />
+              </Grid>
+
+              {/* Khối lượng */}
+              <Grid item size={3} xs={6} sm={3}>
+                <Controller
+                  name='packageSize.weight'
+                  control={control}
+                  render={({ field }) => (
+                    <TextField
+                      label='Khối lượng (kg)'
+                      type='number'
+                      fullWidth
+                      inputProps={{ min: 0, step: '0.01' }}
+                      {...field}
+                    />
+                  )}
+                />
+              </Grid>
+            </Grid>
           </Grid>
           {/*mô tả*/}
           <Grid item size={12}>

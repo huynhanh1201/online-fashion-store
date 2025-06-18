@@ -24,7 +24,8 @@ const TransactionManagement = () => {
     fetchTransactions,
     getTransactionDetail,
     updateTransaction,
-    deleteTransaction
+    deleteTransaction,
+    Save
   } = useTransactions()
 
   useEffect(() => {
@@ -50,15 +51,37 @@ const TransactionManagement = () => {
   }
 
   const handleUpdateTransaction = async (transactionId, data) => {
-    await updateTransaction(transactionId, data)
-    fetchTransactions(page, limit)
-    setOpenEdit(false)
+    try {
+      const response = await updateTransaction(transactionId, data)
+      if (response) {
+        const update = await getTransactionDetail(transactionId)
+        if (update) {
+          Save(update)
+          setOpenEdit(false)
+        }
+      } else {
+        console.log('Câp nhật giao dịch thất bại')
+      }
+    } catch (error) {
+      console.error('Cập nhật giao dịch thất bại:', error)
+    }
   }
 
   const handleDeleteTransaction = async (transactionId) => {
-    await deleteTransaction(transactionId)
-    fetchTransactions(page, limit)
-    setOpenDelete(false)
+    try {
+      const response = await deleteTransaction(transactionId)
+      if (response) {
+        const remove = await getTransactionDetail(transactionId)
+        if (remove) {
+          Save(remove)
+          setOpenDelete(false)
+        }
+      } else {
+        console.log('Xoá giao dịch thất bại')
+      }
+    } catch (error) {
+      console.error('Xoá giao dịch thất bại:', error)
+    }
   }
 
   const handleChangePage = (event, value) => setPage(value)

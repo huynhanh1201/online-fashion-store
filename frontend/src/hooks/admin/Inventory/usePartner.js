@@ -64,9 +64,6 @@ const usePartner = () => {
   const updateExistingPartner = async (id, data) => {
     try {
       const updatedPartner = await updatePartner(id, data)
-      setPartners((prev) =>
-        prev.map((partner) => (partner.id === id ? updatedPartner : partner))
-      )
       return updatedPartner
     } catch (error) {
       console.error('Error updating partner:', error)
@@ -85,6 +82,10 @@ const usePartner = () => {
     }
   }
 
+  const Save = (data) => {
+    setPartners((prev) => prev.map((d) => (d._id === data._id ? data : d)))
+  }
+
   return {
     partners,
     loadingPartner,
@@ -93,7 +94,8 @@ const usePartner = () => {
     fetchPartnerById,
     createNewPartner,
     updateExistingPartner,
-    removePartner
+    removePartner,
+    Save
   }
 }
 

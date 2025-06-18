@@ -24,6 +24,9 @@ import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css'
 import { EditorState, convertToRaw } from 'draft-js'
 import draftToHtml from 'draftjs-to-html'
 import ProductImages from '../component/ProductImageUploader'
+import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css'
+import 'draft-js/dist/Draft.css'
+import InputAdornment from '@mui/material/InputAdornment'
 const URI = 'https://api.cloudinary.com/v1_1/dkwsy9sph/image/upload'
 const CloudinaryColor = 'color_upload'
 const CloudinaryProduct = 'product_upload'
@@ -68,7 +71,13 @@ const AddProductModal = ({ open, onClose, onSuccess }) => {
       categoryId: '',
       price: '',
       importPrice: '',
-      exportPrice: ''
+      exportPrice: '',
+      packageSize: {
+        length: '',
+        width: '',
+        height: '',
+        weight: ''
+      }
     }
   })
   const [categoryOpen, setCategoryOpen] = useState(false)
@@ -101,10 +110,16 @@ const AddProductModal = ({ open, onClose, onSuccess }) => {
         exportPrice: Number(data.price),
         importPrice: data.importPrice ? Number(data.importPrice) : undefined,
         categoryId: data.categoryId,
-        image: productImages
+        image: productImages,
+        packageSize: {
+          length: Number(data.packageSize?.length || 0),
+          width: Number(data.packageSize?.width || 0),
+          height: Number(data.packageSize?.height || 0),
+          weight: Number(data.packageSize?.weight || 0)
+        }
       }
 
-      console.log('Final Product:', finalProduct)
+      console.log('Final Product:', typeof finalProduct.packageSize.weight)
 
       const result = await addProduct(finalProduct)
 
@@ -133,7 +148,7 @@ const AddProductModal = ({ open, onClose, onSuccess }) => {
     <Dialog
       open={open}
       onClose={onClose}
-      maxWidth='xxl'
+      maxWidth='xl'
       fullWidth
       PaperProps={{
         sx: {
@@ -215,7 +230,7 @@ const AddProductModal = ({ open, onClose, onSuccess }) => {
             />
           </Grid>
           {/*Danh mục*/}
-          <Grid item size={4}>
+          <Grid item size={6}>
             <FormControl fullWidth margin='normal' error={!!errors.categoryId}>
               <InputLabel>Danh mục</InputLabel>
               <Controller
@@ -251,7 +266,7 @@ const AddProductModal = ({ open, onClose, onSuccess }) => {
             </FormControl>
           </Grid>
           {/* Giá nhập */}
-          <Grid item size={4} style={{ marginTop: '16px' }}>
+          <Grid item size={3} style={{ marginTop: '16px' }}>
             <Controller
               name='importPrice'
               control={control}
@@ -265,13 +280,17 @@ const AddProductModal = ({ open, onClose, onSuccess }) => {
                     const rawValue = parseNumber(e.target.value)
                     field.onChange(rawValue)
                   }}
+                  InputProps={{
+                    endAdornment: (
+                      <InputAdornment position='end'>đ</InputAdornment>
+                    )
+                  }}
                 />
               )}
             />
           </Grid>
-
           {/* Giá bán */}
-          <Grid item size={4} style={{ marginTop: '16px' }}>
+          <Grid item size={3} style={{ marginTop: '16px' }}>
             <Controller
               name='price'
               control={control}
@@ -288,9 +307,86 @@ const AddProductModal = ({ open, onClose, onSuccess }) => {
                   }}
                   error={!!errors.price}
                   helperText={errors.price?.message}
+                  InputProps={{
+                    endAdornment: (
+                      <InputAdornment position='end'>đ</InputAdornment>
+                    )
+                  }}
                 />
               )}
             />
+          </Grid>
+          {/*kích thước đóng gói*/}
+          <Grid item size={12}>
+            <Grid container spacing={2} sx={{ mt: 1 }}>
+              {/* Chiều dài */}
+              <Grid item size={3} xs={6} sm={3}>
+                <Controller
+                  name='packageSize.length'
+                  control={control}
+                  render={({ field }) => (
+                    <TextField
+                      label='Dài (cm)'
+                      type='number'
+                      fullWidth
+                      inputProps={{ min: 0 }}
+                      {...field}
+                    />
+                  )}
+                />
+              </Grid>
+
+              {/* Chiều rộng */}
+              <Grid item size={3} xs={6} sm={3}>
+                <Controller
+                  name='packageSize.width'
+                  control={control}
+                  render={({ field }) => (
+                    <TextField
+                      label='Rộng (cm)'
+                      type='number'
+                      fullWidth
+                      inputProps={{ min: 0 }}
+                      {...field}
+                    />
+                  )}
+                />
+              </Grid>
+
+              {/* Chiều cao */}
+              <Grid item size={3} xs={6} sm={3}>
+                <Controller
+                  name='packageSize.height'
+                  control={control}
+                  render={({ field }) => (
+                    <TextField
+                      label='Cao (cm)'
+                      type='number'
+                      fullWidth
+                      inputProps={{ min: 0 }}
+                      {...field}
+                    />
+                  )}
+                />
+              </Grid>
+
+              {/* Khối lượng */}
+              <Grid item size={3} xs={6} sm={3}>
+                <Controller
+                  name='packageSize.weight'
+                  control={control}
+                  render={({ field }) => (
+                    <TextField
+                      label='Khối lượng (kg)'
+                      type='number'
+                      fullWidth
+                      inputProps={{ min: 0, step: '0.01' }}
+                      {...field}
+                    />
+                  )}
+                />
+              </Grid>
+            </Grid>
           </Grid>
           {/*Mô tả*/}
           <Grid item size={12}>

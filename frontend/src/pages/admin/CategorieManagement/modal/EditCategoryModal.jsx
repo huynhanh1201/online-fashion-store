@@ -53,8 +53,7 @@ const EditCategoryModal = ({ open, onClose, category, onSave }) => {
   useEffect(() => {
     if (open && category) {
       reset({
-        name: category.name || '',
-        description: category.description || ''
+        name: category.name || ''
       })
       setPreviewUrl(category.image || '')
       setImageFile(null)
@@ -231,14 +230,12 @@ const EditCategoryModal = ({ open, onClose, category, onSave }) => {
                 sx={StyleAdmin.InputCustom}
               />
               <TextField
-                label='Mô tả'
+                label='Mô tả (không bắt buộc)'
                 fullWidth
                 margin='normal'
                 multiline
                 rows={10}
-                {...register('description', { required: 'Mô tả là bắt buộc' })}
-                error={!!errors.description}
-                helperText={errors.description?.message}
+                {...register('description')}
                 sx={StyleAdmin.InputCustom}
               />
             </Box>

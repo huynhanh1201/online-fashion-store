@@ -16,6 +16,7 @@ import {
 
 const ViewBatchModal = ({ open, onClose, batch }) => {
   if (!batch) return null
+  const variantName = batch?.variantId?.name
 
   const formatDate = (dateString) => {
     if (!dateString) return 'Không có thông tin'
@@ -48,13 +49,13 @@ const ViewBatchModal = ({ open, onClose, batch }) => {
                 <strong>Tên sản phẩm</strong>
               </TableCell>
               <TableCell>
-                {batch.variantId?.name
+                {(batch?.variantId?.name ?? 'N/A')
                   .split(' ')
                   .map(
                     (word) =>
                       word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
                   )
-                  .join(' ') || 'N/A'}
+                  .join(' ')}
               </TableCell>
             </TableRow>
             <TableRow>

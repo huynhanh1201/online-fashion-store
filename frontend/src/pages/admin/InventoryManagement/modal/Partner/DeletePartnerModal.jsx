@@ -17,7 +17,7 @@ export default function DeletePartnerModal({
   if (!partner) return null
   console.log('DeletePartnerModal rendered with partner:', partner)
   const handleDelete = () => {
-    deletePartner(partner._id)
+    deletePartner(partner._id, 'delete')
     onClose()
   }
 

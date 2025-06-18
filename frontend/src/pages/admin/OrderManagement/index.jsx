@@ -28,7 +28,9 @@ const OrderManagement = () => {
     fetchOrders,
     getOrderHistoriesByOrderId,
     getOrderDetailsByOrderId,
-    updateOrderById
+    updateOrderById,
+    getOrderId,
+    Save
   } = useOrder()
 
   const { discounts, fetchDiscounts } = useDiscounts() // lấy danh sách mã giảm giá nếu cần
@@ -89,12 +91,29 @@ const OrderManagement = () => {
 
   // Xử lý update đơn hàng
   const handleUpdateOrder = async (orderId, data) => {
-    // Gọi API cập nhật (bạn cần tạo hàm updateOrder trong service tương tự)
     try {
-      // Giả sử bạn có hàm updateOrderById trong service
-      await updateOrderById(orderId, data)
-      fetchOrders(page, limit, filters) // Cập nhật lại danh sách đơn hàng
-      handleCloseModalEdit()
+      const response = await updateOrderById(orderId, data)
+      if (response) {
+        const update = await getOrderId(orderId)
+        if (update) {
+          Save(update) // Lưu đơn hàng đã cập nhật
+          handleCloseModalEdit() // Đóng modal sửa
+        }
+      }
+    } catch (error) {
+      console.error('Lỗi cập nhật đơn hàng:', error)
+    }
+  }
+  const handleChangStatusOrder = async (orderId, data) => {
+    try {
+      const response = await updateOrderById(orderId, data)
+      if (response) {
+        const update = await getOrderId(orderId)
+        if (update) {
+          Save(update) // Lưu đơn hàng đã cập nhật
+          handleCloseModalEdit() // Đóng modal sửa
+        }
+      }
     } catch (error) {
       console.error('Lỗi cập nhật đơn hàng:', error)
     }
@@ -102,13 +121,20 @@ const OrderManagement = () => {
 
   // Xử lý xoá đơn hàng
   const handleDeleteOrder = async () => {
-    if (!selectedOrder) return
-    const success = await deleteOrderById(selectedOrder._id)
-    if (success) {
-      fetchOrders(page, limit, filters) // Cập nhật lại danh sách đơn hàng
-      handleCloseModalDelete()
-    } else {
-      alert('Xoá đơn hàng thất bại, vui lòng thử lại.')
+    try {
+      if (!selectedOrder) return
+      const success = await deleteOrderById(selectedOrder._id)
+      if (success) {
+        const deleteOrder = await getOrderId(selectedOrder._id)
+        if (deleteOrder) {
+          Save(deleteOrder) // Lưu đơn hàng đã xoá
+          handleCloseModalDelete() // Đóng modal xoá
+        }
+      } else {
+        alert('Xoá đơn hàng thất bại, vui lòng thử lại.')
+      }
+    } catch (error) {
+      console.error('Lỗi xoá đơn hàng:', error)
     }
   }
   const handleChangePage = (event, value) => {
@@ -156,7 +182,7 @@ const OrderManagement = () => {
         order={selectedOrder}
         histories={histories}
         orderDetails={orderDetails}
-        onUpdate={handleUpdateOrder}
+        onUpdate={handleChangStatusOrder}
       />
 
       <EditOrderModal
