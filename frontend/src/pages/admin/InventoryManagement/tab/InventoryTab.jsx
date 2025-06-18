@@ -454,27 +454,29 @@ const InventoryTab = () => {
     {
       id: 'quantity',
       label: 'Số lượng tồn',
-      minWidth: 150,
-      align: 'start'
+      minWidth: 190,
+      align: 'right',
+      pr: 5
     },
     {
       id: 'minQuantity',
       label: 'Ngưỡng cảnh báo',
       minWidth: 150,
-      align: 'start'
+      align: 'right'
     },
     {
       id: 'importPrice',
       label: 'Giá nhập',
       minWidth: 150,
-      align: 'start',
+      align: 'right',
       format: (val) => `${val?.toLocaleString('vi-VN')}đ`
     },
     {
       id: 'exportPrice',
       label: 'Giá bán',
-      minWidth: 150,
-      align: 'start',
+      minWidth: 206,
+      align: 'right',
+      pr: 7,
       format: (val) => `${val?.toLocaleString('vi-VN')}đ`
     },
     {
@@ -620,7 +622,8 @@ const InventoryTab = () => {
                       maxWidth: '130px',
                       paddingLeft: '20px'
                     }),
-                    px: 1
+                    px: 1,
+                    pr: col.pr
                   }}
                 >
                   {col.label}
@@ -756,7 +759,8 @@ const InventoryTab = () => {
                           whiteSpace: 'nowrap',
                           overflow: 'hidden',
                           textOverflow: 'ellipsis',
-                          ...(col.maxWidth && { maxWidth: col.maxWidth })
+                          ...(col.maxWidth && { maxWidth: col.maxWidth }),
+                          pr: col.pr
                         }}
                         title={
                           typeof content === 'string' ? content : undefined

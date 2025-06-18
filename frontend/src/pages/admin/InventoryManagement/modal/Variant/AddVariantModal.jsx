@@ -587,7 +587,7 @@ const AddVariantModal = ({
                   render={({ field }) => (
                     <TextField
                       sx={{ mb: 2 }}
-                      label='Giá nhập'
+                      label='Giá nhập (đ)'
                       disabled={!overridePrice}
                       type='text'
                       fullWidth
@@ -597,10 +597,6 @@ const AddVariantModal = ({
                       }
                       error={!!errors.importPrice}
                       helperText={errors.importPrice?.message}
-                      InputProps={{
-                        endAdornment: <span style={{ marginLeft: 4 }}>đ</span>,
-                        inputMode: 'numeric'
-                      }}
                     />
                   )}
                 />
@@ -617,7 +613,7 @@ const AddVariantModal = ({
                   }}
                   render={({ field }) => (
                     <TextField
-                      label='Giá bán'
+                      label='Giá bán (đ)'
                       disabled={!overridePrice}
                       type='text'
                       fullWidth
@@ -627,10 +623,6 @@ const AddVariantModal = ({
                       }
                       error={!!errors.exportPrice}
                       helperText={errors.exportPrice?.message}
-                      InputProps={{
-                        endAdornment: <span style={{ marginLeft: 4 }}>đ</span>,
-                        inputMode: 'numeric'
-                      }}
                     />
                   )}
                 />

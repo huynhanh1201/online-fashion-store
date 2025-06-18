@@ -45,7 +45,7 @@ const AddPartnerModal = ({ open, onClose, addPartner }) => {
       }
     }
 
-    addPartner(formattedData)
+    addPartner(formattedData, 'add')
     reset()
     onClose()
   }
