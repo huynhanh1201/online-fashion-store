@@ -100,7 +100,7 @@ const EditBatchModal = ({
                 }}
                 render={({ field }) => (
                   <TextField
-                    label='Giá nhập'
+                    label='Giá nhập (đ)'
                     type='text'
                     fullWidth
                     value={formatCurrency(field.value)}

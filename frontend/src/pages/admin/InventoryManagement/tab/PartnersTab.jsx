@@ -130,9 +130,7 @@ const PartnersTab = () => {
   }
   const handleCloseDeleteDialog = () => {
     setOpenDeleteDialog(false)
-    // fetchPartners(page, rowsPerPage, filter)
   }
-
   const handleChangePage = (event, value) => setPage(value)
 
   const onChangeRowsPerPage = (newLimit) => {
@@ -141,7 +139,10 @@ const PartnersTab = () => {
   }
 
   const handleSave = async (partner, type, partnerId) => {
-    if (type === 'edit') {
+    if (type === 'add') {
+      await createNewPartner(partner)
+      fetchPartners(page, rowsPerPage, filter)
+    } else if (type === 'edit') {
       const updatedBatch = await updateExistingPartner(partnerId, partner)
       if (updatedBatch) {
         const data = await fetchPartnerById(partnerId)
@@ -429,7 +430,7 @@ const PartnersTab = () => {
       <AddPartnerModal
         open={openAddDialog}
         onClose={handleCloseAddDialog}
-        addPartner={createNewPartner}
+        addPartner={handleSave}
       />
       <EditPartnerModal
         open={openEditDialog}

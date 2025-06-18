@@ -53,7 +53,6 @@ const usePartner = () => {
   const createNewPartner = async (data) => {
     try {
       const newPartner = await createPartner(data)
-      setPartners((prev) => [...prev, newPartner])
       return newPartner
     } catch (error) {
       console.error('Error creating partner:', error)
@@ -74,7 +73,6 @@ const usePartner = () => {
   const removePartner = async (id) => {
     try {
       await deletePartner(id)
-      setPartners((prev) => prev.filter((partner) => partner.id !== id))
       return true
     } catch (error) {
       console.error('Error deleting partner:', error)

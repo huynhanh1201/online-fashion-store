@@ -175,7 +175,8 @@ const WarehouseSlipsTab = () => {
       id: 'itemCount',
       label: 'Số lượng sản phẩm',
       minWidth: 90,
-      align: 'left',
+      align: 'right',
+      pr: 14,
       format: (value) => `${value.toLocaleString('vi-VN')}`
     },
     { id: 'createdByName', label: 'Người tạo', minWidth: 150, align: 'start' },
@@ -280,6 +281,7 @@ const WarehouseSlipsTab = () => {
                     minWidth: column.minWidth,
                     width: column.width,
                     px: 1,
+                    pr: column.pr,
                     ...(column.maxWidth && { maxWidth: column.maxWidth }),
                     ...(column.id === 'action' && {
                       width: 130,
@@ -399,7 +401,7 @@ const WarehouseSlipsTab = () => {
                           overflow: 'hidden',
                           textOverflow: 'ellipsis',
                           ...(col.maxWidth && { maxWidth: col.maxWidth }),
-                          ...(col.id === 'itemCount' && { textAlign: 'left' })
+                          ...(col.id === 'itemCount' && { pr: col.pr })
                         }}
                         title={
                           typeof content === 'string' ? content : undefined

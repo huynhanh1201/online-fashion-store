@@ -33,6 +33,7 @@ import DiscountManagement from '~/pages/admin/DiscountManagement/index.jsx'
 import TransactionManegement from '~/pages/admin/TransactionManegement/index.jsx'
 import ColorManagement from '~/pages/admin/ColorManagement/index.jsx'
 import NotificationManagement from '~/pages/admin/NotificationManagement/index.jsx'
+import ReviewManagement from '~/pages/admin/ReviewManagement/index.jsx'
 // kho
 import WarehouseStatisticTab from '~/pages/admin/InventoryManagement/tab/WarehouseStatisticTab.jsx'
 import PartnerTab from '~/pages/admin/InventoryManagement/tab/PartnersTab.jsx'
@@ -74,7 +75,10 @@ function App() {
         <Route path='product' element={<Product />} />
         <Route path='/productdetail/:productId' element={<ProductDetail />} />
         <Route path='blog' element={<Blog />} />
-        <Route path='productbycategory/:categoryId' element={<ProductbyCategory />} />
+        <Route
+          path='productbycategory/:categoryId'
+          element={<ProductbyCategory />}
+        />
         {/*Protected Routes (Hiểu đơn giản trong dự án của chúng ta là những route chỉ cho phép truy cập sau khi đã login)*/}
         <Route element={<ProtectedRoute user={currentUser} />}>
           {/*<Outlet/> của react-router-dom sẽ chạy vào các child route trong này*/}
@@ -83,10 +87,7 @@ function App() {
 
           {/*=====Huynh Anh=====*/}
           <Route path='/payment-result' element={<PaymentVnpay />} />
-          <Route
-            path='/payment-failed'
-            element={<OrderFailed />}
-          />
+          <Route path='/payment-failed' element={<OrderFailed />} />
 
           {/*=======End=========*/}
 
@@ -117,6 +118,7 @@ function App() {
             element={<TransactionManegement />}
           />
           <Route path='color-management' element={<ColorManagement />} />
+          <Route path='review-management' element={<ReviewManagement />} />
           <Route
             path='warehouse-statistic-management'
             element={<WarehouseStatisticTab />}

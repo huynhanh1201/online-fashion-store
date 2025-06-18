@@ -30,6 +30,19 @@ export const getVariantById = async (id) => {
   }
 }
 
+export const getVariantId = async (id) => {
+  try {
+    const response = await AuthorizedAxiosInstance.get(
+      `${API_ROOT}/v1/variants/${id}`
+    )
+    console.log('Lấy biến thể theo ID:', response.data)
+    return response.data
+  } catch (error) {
+    console.error('Lỗi khi lấy biến thể theo productId:', error)
+    return null
+  }
+}
+
 export const createVariant = async (data) => {
   try {
     const response = await AuthorizedAxiosInstance.post(

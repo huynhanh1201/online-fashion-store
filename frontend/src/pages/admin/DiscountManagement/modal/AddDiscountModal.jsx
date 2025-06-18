@@ -165,9 +165,7 @@ const AddDiscountModal = ({ open, onClose, onAdded }) => {
                 }) => (
                   <TextField
                     label={
-                      type === 'fixed'
-                        ? 'Giá trị giảm (VNĐ)'
-                        : 'Giá trị giảm (%)'
+                      type === 'fixed' ? 'Giá trị giảm (đ)' : 'Giá trị giảm (%)'
                     }
                     type='text'
                     fullWidth
@@ -208,7 +206,7 @@ const AddDiscountModal = ({ open, onClose, onAdded }) => {
                   fieldState: { error }
                 }) => (
                   <TextField
-                    label='Giá trị đơn hàng tối thiểu'
+                    label='Giá trị đơn hàng tối thiểu (đ)'
                     type='text'
                     fullWidth
                     margin='normal'
