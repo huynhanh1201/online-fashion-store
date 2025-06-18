@@ -10,7 +10,9 @@ const paymentSessionDraftSchema = new Schema(
     order: { type: Schema.Types.Mixed },
     reqBody: { type: Schema.Types.Mixed },
     userId: { type: Schema.Types.Mixed },
-    variantIds: { type: Schema.Types.Mixed }
+    variantIds: { type: Schema.Types.Mixed },
+    address: { type: Schema.Types.Mixed },
+    jwtDecoded: { type: Schema.Types.Mixed }
   },
   {
     timestamps: true

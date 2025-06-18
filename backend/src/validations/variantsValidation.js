@@ -31,7 +31,19 @@ const variant = async (req, res, next) => {
 
     exportPrice: Joi.number().min(0).default(0),
 
-    overridePrice: Joi.boolean().default(false)
+    overridePrice: Joi.boolean().default(false),
+
+    overridePackageSize: Joi.boolean().default(false),
+
+    packageSize: Joi.object({
+      length: Joi.number().positive(),
+
+      width: Joi.number().positive(),
+
+      height: Joi.number().positive(),
+
+      weight: Joi.number().positive()
+    })
   })
 
   try {
@@ -61,7 +73,19 @@ const variantUpdate = async (req, res, next) => {
 
     exportPrice: Joi.number().min(0).default(0),
 
-    overridePrice: Joi.boolean().default(false)
+    overridePrice: Joi.boolean().default(false),
+
+    overridePackageSize: Joi.boolean().default(false),
+
+    packageSize: Joi.object({
+      length: Joi.number().positive(),
+
+      width: Joi.number().positive(),
+
+      height: Joi.number().positive(),
+
+      weight: Joi.number().positive()
+    })
   })
 
   try {
