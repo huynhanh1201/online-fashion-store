@@ -13,6 +13,9 @@ import ViewAddressDialog from './ViewAddressDialog'
 import ConfirmDeleteDialog from './ConfirmDeleteDialog'
 import { GHN_TOKEN_API } from '~/utils/constants'
 
+// Regex kiểm tra số điện thoại Việt Nam (di động và bàn)
+const VN_PHONE_REGEX = /^(0(3[2-9]|5[2-9]|7[0-9]|8[1-9]|9[0-9])[0-9]{7}|0(2[0-9]{8,9}))$/;
+
 function ShippingAddress({ showSnackbar }) {
   const [addresses, setAddresses] = useState([])
   const [openAddressDialog, setOpenAddressDialog] = useState(false)
@@ -40,6 +43,7 @@ function ShippingAddress({ showSnackbar }) {
     district: false,
     ward: false
   })
+  const [duplicateError, setDuplicateError] = useState('');
 
   // Fetch provinces
   useEffect(() => {
@@ -196,7 +200,7 @@ function ShippingAddress({ showSnackbar }) {
     const { fullName, phone, address, city, district, ward } = formData
     const errors = {
       fullName: !fullName.trim() || fullName.trim().length < 3,
-      phone: !phone.trim() || !/^\d{10}$/.test(phone.trim()),
+      phone: !phone.trim() || !VN_PHONE_REGEX.test(phone.trim()),
       address: !address.trim() || address.trim().length < 5,
       city: !city,
       district: !district,
@@ -226,19 +230,15 @@ function ShippingAddress({ showSnackbar }) {
     }
     const fullAddress = `${address}, ${wardName}, ${districtName}, ${cityName}`
 
-    const isDuplicate = addresses.some(
-      (addr) =>
-        addr.fullName === addressData.fullName &&
-        addr.phone === addressData.phone &&
-        addr.address === addressData.address &&
-        addr.ward === addressData.ward &&
-        addr.district === addressData.district &&
-        addr.city === addressData.city &&
-        addr._id !== editAddressId
-    )
+    const isDuplicate = addresses.some(addr => {
+      if (addr._id === editAddressId) return false;
+      return Object.keys(addressData).every(key => addr[key] === addressData[key]);
+    });
     if (isDuplicate) {
-      showSnackbar?.('Địa chỉ này đã tồn tại!', 'error')
-      return
+      setDuplicateError('Địa chỉ này đã tồn tại!');
+      return;
+    } else {
+      setDuplicateError('');
     }
 
     try {
@@ -457,7 +457,7 @@ function ShippingAddress({ showSnackbar }) {
         field === 'fullName'
           ? !value.trim() || value.trim().length < 3
           : field === 'phone'
-            ? !value.trim() || !/^\d{10}$/.test(value.trim())
+            ? !value.trim() || !VN_PHONE_REGEX.test(value.trim())
             : field === 'address'
               ? !value.trim() || value.trim().length < 5
               : !value
@@ -527,6 +527,7 @@ function ShippingAddress({ showSnackbar }) {
             district: '',
             ward: ''
           })
+          setDuplicateError('');
         }}
         editAddressId={editAddressId}
         formData={formData}
@@ -537,6 +538,7 @@ function ShippingAddress({ showSnackbar }) {
         onFormChange={handleFormChange}
         onSave={handleAddOrUpdateAddress}
         showSnackbar={showSnackbar}
+        duplicateError={duplicateError}
       />
 
       <ViewAddressDialog

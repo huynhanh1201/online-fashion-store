@@ -96,7 +96,18 @@ const getBatch = async (batchId) => {
     const result = await BatchModel.findOne({
       _id: batchId,
       destroy: false
-    }).lean()
+    })
+      .populate([
+        {
+          path: 'variantId',
+          select: 'name'
+        },
+        {
+          path: 'warehouseId',
+          select: 'name'
+        }
+      ])
+      .lean()
 
     return result
   } catch (err) {
