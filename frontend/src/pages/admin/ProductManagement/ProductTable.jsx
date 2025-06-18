@@ -206,9 +206,21 @@ const ProductTable = ({
     { id: 'image', label: 'Ảnh', minWidth: 100, align: 'start' },
     { id: 'productCode', label: 'Mã sản phẩm', minWidth: 100, align: 'start' },
     { id: 'name', label: 'Tên sản phẩm', minWidth: 250, align: 'start' },
-    { id: 'category', label: 'Danh mục', minWidth: 200, align: 'start' },
-    { id: 'exportPrice', label: 'Giá bán', minWidth: 100, align: 'start' },
-    { id: 'importPrice', label: 'Giá nhập', minWidth: 100, align: 'start' },
+    {
+      id: 'category',
+      label: 'Danh mục',
+      minWidth: 200,
+      width: 200,
+      align: 'start'
+    },
+    { id: 'exportPrice', label: 'Giá bán', minWidth: 100, align: 'right' },
+    {
+      id: 'importPrice',
+      label: 'Giá nhập',
+      minWidth: 150,
+      align: 'right',
+      pr: 7
+    },
     { id: 'description', label: 'Mô tả', minWidth: 150, align: 'start' },
     { id: 'status', label: 'Trạng thái', minWidth: 130, align: 'start' },
     { id: 'action', label: 'Hành động', minWidth: 130, align: 'start' }
@@ -274,7 +286,9 @@ const ProductTable = ({
                     minWidth: column.minWidth,
                     whiteSpace: 'nowrap',
                     fontWeight: 'bold',
+                    width: column.width,
                     px: 1,
+                    pr: column.pr,
                     ...(column.id === 'action' && {
                       maxWidth: 130,
                       paddingLeft: '16px'

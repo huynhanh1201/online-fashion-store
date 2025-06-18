@@ -417,7 +417,8 @@ const InventoryTab = () => {
     totalPageInventory,
     getInventoryId,
     deleteInventoryById,
-    updateInventoryById
+    updateInventoryById,
+    Save
   } = useInventory()
   const { warehouses, fetchWarehouses } = useWarehouses()
   const [page, setPage] = useState(1)
@@ -510,13 +511,35 @@ const InventoryTab = () => {
   const handleCloseEditModal = () => {
     setSelectedInventory(null)
     setOpenEditModal(false)
-    fetchInventories(page, rowsPerPage, filter)
+    // fetchInventories(page, rowsPerPage, filter)
   }
 
   const handleCloseDeleteModal = () => {
     setSelectedInventory(null)
     setOpenDeleteModal(false)
-    fetchInventories(page, rowsPerPage, filter)
+    // fetchInventories(page, rowsPerPage, filter)
+  }
+
+  const handleSave = async (inventory, type, inventoryId) => {
+    if (type === 'edit') {
+      const edit = await updateInventoryById(inventoryId, inventory)
+      if (edit) {
+        const data = await getInventoryId(inventoryId)
+        if (data) {
+          Save(data)
+        }
+      }
+    } else if (type === 'delete') {
+      await deleteInventoryById(inventory)
+      fetchInventories(page, rowsPerPage, filter)
+      // const deleteInventory = await deleteInventoryById(inventory)
+      // if (deleteInventory) {
+      //   const data = await getInventoryId(inventory)
+      //   if (data) {
+      //     Save(data)
+      //   }
+      // }
+    }
   }
 
   const isEqual = (obj1, obj2) => JSON.stringify(obj1) === JSON.stringify(obj2)
@@ -786,7 +809,7 @@ const InventoryTab = () => {
         open={openEditModal}
         onClose={handleCloseEditModal}
         inventory={selectedInventory}
-        onSave={updateInventoryById}
+        onSave={handleSave}
         variants={variants}
         warehouses={warehouses}
         formatCurrency={formatCurrency}
@@ -796,7 +819,7 @@ const InventoryTab = () => {
         open={openDeleteModal}
         onClose={handleCloseDeleteModal}
         inventory={selectedInventory}
-        onSave={deleteInventoryById}
+        onSave={handleSave}
       />
     </Paper>
   )

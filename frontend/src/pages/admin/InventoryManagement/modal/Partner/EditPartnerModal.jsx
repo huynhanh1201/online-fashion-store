@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useEffect } from 'react'
 import {
   Dialog,
   DialogTitle,
@@ -7,8 +7,10 @@ import {
   TextField,
   Button,
   MenuItem,
-  Box
+  Grid
 } from '@mui/material'
+import { useForm } from 'react-hook-form'
+import { toast } from 'react-toastify'
 
 const partnerTypes = [
   { value: 'supplier', label: 'Nhà cung cấp' },
@@ -20,124 +22,149 @@ export default function EditPartnerModal({
   open,
   onClose,
   partner,
-  updatePartner,
-  fetchPartners
+  updatePartner
 }) {
-  const [form, setForm] = useState({
-    name: '',
-    type: '',
-    phone: '',
-    email: ''
-  })
+  const {
+    register,
+    handleSubmit,
+    reset,
+    setValue,
+    formState: { errors }
+  } = useForm()
 
   useEffect(() => {
     if (partner) {
-      setForm({
-        name: partner.name || '',
-        type: partner.type || '',
-        phone: partner.contact?.phone || '',
-        email: partner.contact?.email || ''
-      })
+      setValue('name', partner.name || '')
+      setValue('type', partner.type || '')
+      setValue('phone', partner.contact?.phone || '')
+      setValue('email', partner.contact?.email || '')
     }
-  }, [partner])
+  }, [partner, setValue])
 
-  const handleChange = (e) => {
-    const { name, value } = e.target
-    setForm((prev) => ({ ...prev, [name]: value }))
-  }
+  const onSubmit = (data) => {
+    const { type, phone, email } = data
 
-  const handleSave = () => {
-    if (!form.name || !form.type) {
-      alert('Vui lòng nhập tên và loại đối tác')
+    if (type === 'customer' && !phone) {
+      toast.error('Khách hàng cần có số điện thoại!')
       return
     }
-    const updated = {
-      name: form.name,
-      type: form.type,
+
+    if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      toast.error('Email không đúng định dạng!')
+      return
+    }
+
+    const formattedData = {
+      name: data.name.trim(),
+      type,
       contact: {
-        phone: form.phone,
-        email: form.email
+        phone: phone || null,
+        email: email || null
       }
     }
-    updatePartner(partner._id, updated)
+
+    updatePartner(formattedData, 'edit', partner._id)
+    reset()
     onClose()
-    fetchPartners() // Refresh partners after update
   }
 
   const handleCancel = () => {
+    reset()
     onClose()
   }
 
   return (
     <Dialog open={open} onClose={handleCancel} fullWidth maxWidth='sm'>
       <DialogTitle>Sửa thông tin đối tác</DialogTitle>
-      <DialogContent dividers>
-        <Box
-          component='form'
-          noValidate
-          autoComplete='off'
-          sx={{ mt: 1, display: 'flex', flexDirection: 'column', gap: 2 }}
-        >
-          <TextField
-            label='Tên đối tác'
-            name='name'
-            value={form.name}
-            onChange={handleChange}
-            fullWidth
-            required
-          />
-          <TextField
-            select
-            label='Kiểu đối tác'
-            name='type'
-            value={form.type}
-            onChange={handleChange}
-            fullWidth
-            required
+      <form onSubmit={handleSubmit(onSubmit)}>
+        <DialogContent dividers>
+          <Grid container spacing={2}>
+            <Grid item xs={12}>
+              <TextField
+                label='Tên đối tác'
+                fullWidth
+                {...register('name', {
+                  required: 'Tên không được bỏ trống',
+                  maxLength: {
+                    value: 100,
+                    message: 'Tên không được vượt quá 100 ký tự'
+                  }
+                })}
+                error={!!errors.name}
+                helperText={errors.name?.message}
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                select
+                label='Kiểu đối tác'
+                fullWidth
+                {...register('type', {
+                  required: 'Vui lòng chọn loại đối tác'
+                })}
+                error={!!errors.type}
+                helperText={errors.type?.message}
+              >
+                {partnerTypes.map((option) => (
+                  <MenuItem key={option.value} value={option.value}>
+                    {option.label}
+                  </MenuItem>
+                ))}
+              </TextField>
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <TextField
+                label='Số điện thoại'
+                fullWidth
+                {...register('phone', {
+                  pattern: {
+                    value:
+                      /^(?:\+84|0)(?:3[2-9]|5[2689]|7[06-9]|8[1-689]|9[0-9])\d{7}$/,
+                    message: 'Số điện thoại không hợp lệ'
+                  }
+                })}
+                error={!!errors.phone}
+                helperText={errors.phone?.message}
+              />
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <TextField
+                label='Email'
+                type='email'
+                fullWidth
+                {...register('email', {
+                  pattern: {
+                    value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                    message: 'Email không đúng định dạng'
+                  }
+                })}
+                error={!!errors.email}
+                helperText={errors.email?.message}
+              />
+            </Grid>
+          </Grid>
+        </DialogContent>
+        <DialogActions sx={{ padding: '16px 24px' }}>
+          <Button
+            onClick={handleCancel}
+            sx={{ textTransform: 'none' }}
+            color='error'
+            variant='outlined'
           >
-            {partnerTypes.map((option) => (
-              <MenuItem key={option.value} value={option.value}>
-                {option.label}
-              </MenuItem>
-            ))}
-          </TextField>
-          <TextField
-            label='Điện thoại'
-            name='phone'
-            value={form.phone}
-            onChange={handleChange}
-            fullWidth
-          />
-          <TextField
-            label='Email'
-            name='email'
-            type='email'
-            value={form.email}
-            onChange={handleChange}
-            fullWidth
-          />
-        </Box>
-      </DialogContent>
-      <DialogActions sx={{ padding: '16px 24px' }}>
-        <Button
-          onClick={handleCancel}
-          sx={{ textTransform: 'none' }}
-          color='error'
-          variant='outlined'
-        >
-          Hủy
-        </Button>
-        <Button
-          onClick={handleSave}
-          sx={{
-            backgroundColor: '#001f5d',
-            color: '#fff',
-            textTransform: 'none'
-          }}
-        >
-          Lưu
-        </Button>
-      </DialogActions>
+            Hủy
+          </Button>
+          <Button
+            type='submit'
+            sx={{
+              backgroundColor: '#001f5d',
+              color: '#fff',
+              textTransform: 'none'
+            }}
+          >
+            Lưu
+          </Button>
+        </DialogActions>
+      </form>
     </Dialog>
   )
 }

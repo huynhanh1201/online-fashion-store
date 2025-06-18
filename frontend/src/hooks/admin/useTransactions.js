@@ -51,6 +51,10 @@ const useTransactions = () => {
     return await deleteTransactionById(transactionId)
   }
 
+  const Save = (data) => {
+    setTransactions((prev) => prev.map((d) => (d._id === data._id ? data : d)))
+  }
+
   return {
     transactions,
     totalPages,
@@ -58,7 +62,8 @@ const useTransactions = () => {
     fetchTransactions,
     getTransactionDetail,
     updateTransaction,
-    deleteTransaction
+    deleteTransaction,
+    Save
   }
 }
 

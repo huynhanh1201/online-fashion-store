@@ -35,7 +35,9 @@ const PartnersTab = () => {
     updateExistingPartner,
     removePartner,
     loadingPartner,
-    totalPartner
+    totalPartner,
+    Save,
+    fetchPartnerById
   } = usePartner()
   const getPartnerTypeLabel = (type) => {
     switch (type) {
@@ -111,7 +113,7 @@ const PartnersTab = () => {
   }
   const handleCloseEditDialog = () => {
     setOpenEditDialog(false)
-    fetchPartners(page, rowsPerPage, filter)
+    // fetchPartners(page, rowsPerPage, filter)
   }
 
   const handleViewPartner = (partner) => {
@@ -128,7 +130,7 @@ const PartnersTab = () => {
   }
   const handleCloseDeleteDialog = () => {
     setOpenDeleteDialog(false)
-    fetchPartners(page, rowsPerPage, filter)
+    // fetchPartners(page, rowsPerPage, filter)
   }
 
   const handleChangePage = (event, value) => setPage(value)
@@ -137,6 +139,23 @@ const PartnersTab = () => {
     setPage(1)
     setRowsPerPage(newLimit)
   }
+
+  const handleSave = async (partner, type, partnerId) => {
+    if (type === 'edit') {
+      const updatedBatch = await updateExistingPartner(partnerId, partner)
+      if (updatedBatch) {
+        const data = await fetchPartnerById(partnerId)
+        console.log('Updated batch data:', data)
+        if (data) {
+          Save(data)
+        }
+      }
+    } else if (type === 'delete') {
+      await removePartner(partner)
+      fetchPartners(page, rowsPerPage, filter) // Refresh danh sách sau khi lưu
+    }
+  }
+
   const partnerColumns = [
     {
       id: 'index',
@@ -416,7 +435,7 @@ const PartnersTab = () => {
         open={openEditDialog}
         onClose={handleCloseEditDialog}
         partner={selectedPartner}
-        updatePartner={updateExistingPartner}
+        updatePartner={handleSave}
         fetchPartners={fetchPartners}
       />
       <ViewPartnerModal
@@ -428,7 +447,7 @@ const PartnersTab = () => {
         open={openDeleteDialog}
         onClose={handleCloseDeleteDialog}
         partner={selectedPartner}
-        deletePartner={removePartner}
+        deletePartner={handleSave}
       />
     </Paper>
   )

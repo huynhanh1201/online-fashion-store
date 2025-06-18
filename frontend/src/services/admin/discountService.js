@@ -28,7 +28,7 @@ export const getDiscountById = async (idOrCode) => {
     return response.data
   } catch (error) {
     console.error('Lỗi khi lấy thông tin mã giảm:', error)
-    return null
+    return []
   }
 }
 

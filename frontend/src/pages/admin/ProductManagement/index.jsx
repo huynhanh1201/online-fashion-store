@@ -164,7 +164,8 @@ const ProductManagement = () => {
   const [modalType, setModalType] = React.useState(null)
   const [selectedProduct, setSelectedProduct] = React.useState(null)
   const [filters, setFilters] = React.useState({})
-  const { products, fetchProducts, loading, total } = useProducts()
+  const { products, fetchProducts, loading, total, Save, fetchProductById } =
+    useProducts()
   const { categories, fetchCategories } = useCategories()
   // const [showAdvancedFilter, setShowAdvancedFilter] = React.useState(false)
 
@@ -204,9 +205,11 @@ const ProductManagement = () => {
   const handleSaveProduct = async (id, updatedData) => {
     try {
       const result = await updateProduct(id, updatedData)
-      console.log('Result from updateProduct:', result) // Debugging log
       if (result) {
-        await fetchProducts(page, limit, filters)
+        const update = await fetchProductById(id)
+        if (update) {
+          Save(update)
+        }
       }
       return result // Explicitly return the result
     } catch (error) {
@@ -216,9 +219,18 @@ const ProductManagement = () => {
   }
 
   const handleDeleteProduct = async (id) => {
-    const result = await deleteProduct(id)
-    if (result) {
-      await fetchProducts(page, limit, filters)
+    try {
+      const result = await deleteProduct(id)
+      if (result) {
+        const remove = await fetchProductById(id)
+        if (remove) {
+          Save(remove)
+        }
+      }
+      return result // Explicitly return the result
+    } catch (error) {
+      console.error('Error in handleSaveProduct:', error)
+      return false // Return false on error
     }
   }
   const isEqual = (obj1, obj2) => JSON.stringify(obj1) === JSON.stringify(obj2)

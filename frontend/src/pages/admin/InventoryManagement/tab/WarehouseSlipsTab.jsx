@@ -362,15 +362,14 @@ const WarehouseSlipsTab = () => {
 
                     // Chip loại phiếu
                     if (col.id === 'type') {
-                      console.log('Row type:', row.type),
-                        (content = (
-                          <Chip
-                            label={row.type === 'Nhập' ? 'Nhập' : 'Xuất'}
-                            size='large'
-                            sx={{ width: 120, fontWeight: 800 }}
-                            color={row.type === 'Nhập' ? 'success' : 'error'}
-                          />
-                        ))
+                      content = (
+                        <Chip
+                          label={row.type === 'Nhập' ? 'Nhập' : 'Xuất'}
+                          size='large'
+                          sx={{ width: 120, fontWeight: 800 }}
+                          color={row.type === 'Nhập' ? 'success' : 'error'}
+                        />
+                      )
                     }
 
                     // Nút hành động

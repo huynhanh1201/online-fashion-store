@@ -10,11 +10,13 @@ import {
   Divider
 } from '@mui/material'
 import { toast } from 'react-toastify'
+import StyleAdmin from '~/assets/StyleAdmin.jsx'
 
 const DeleteVariantModal = ({ open, onClose, variant, deleteVariant }) => {
   const handleDelete = async () => {
     try {
-      await deleteVariant(variant._id)
+      await deleteVariant(variant._id, 'delete')
+      onClose()
       toast.success('Xóa biến thể thành công')
       onClose()
     } catch (error) {
@@ -25,7 +27,14 @@ const DeleteVariantModal = ({ open, onClose, variant, deleteVariant }) => {
   }
 
   return (
-    <Dialog open={open} onClose={onClose} sx={{ padding: '16px 24px' }}>
+    <Dialog
+      open={open}
+      onClose={onClose}
+      sx={{ padding: '16px 24px' }}
+      BackdropProps={{
+        sx: StyleAdmin.OverlayModal
+      }}
+    >
       <DialogTitle>Xóa biến thể</DialogTitle>
       <Divider />
       <DialogContent>

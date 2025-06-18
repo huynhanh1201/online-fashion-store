@@ -193,15 +193,21 @@ const DiscountTable = ({
     { id: 'index', label: 'STT', align: 'center', width: 50 },
     { id: 'code', label: 'Mã giảm giá', minWidth: 150 },
     { id: 'type', label: 'Loại mã giảm giá', minWidth: 130 },
-    { id: 'amount', label: 'Giá trị giảm', minWidth: 120, align: 'start' },
+    { id: 'amount', label: 'Giá trị giảm', minWidth: 120, align: 'right' },
     {
       id: 'minOrderValue',
       label: 'Giá tối thiểu áp dụng',
       minWidth: 150,
-      align: 'start'
+      align: 'right'
     },
-    { id: 'usageLimit', label: 'SL tối đa', minWidth: 100, align: 'start' },
-    { id: 'remaining', label: 'SL còn lại', minWidth: 100, align: 'start' },
+    { id: 'usageLimit', label: 'SL tối đa', minWidth: 100, align: 'right' },
+    {
+      id: 'remaining',
+      label: 'SL còn lại',
+      minWidth: 172,
+      align: 'right',
+      pr: 9
+    },
     { id: 'status', label: 'Trạng thái hoạt động', minWidth: 150 },
     { id: 'action', label: 'Hành động', minWidth: 150, align: 'start' }
   ]
@@ -265,6 +271,7 @@ const DiscountTable = ({
                   sx={{
                     minWidth: column.minWidth,
                     px: 1,
+                    pr: column.pr,
                     ...(column.maxWidth && { maxWidth: column.maxWidth }),
                     ...(column.id === 'action' && {
                       width: '130px',

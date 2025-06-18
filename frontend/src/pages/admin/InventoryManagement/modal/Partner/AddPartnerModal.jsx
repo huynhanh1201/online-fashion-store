@@ -10,7 +10,7 @@ import {
   Grid
 } from '@mui/material'
 import { useForm } from 'react-hook-form'
-
+import { toast } from 'react-toastify'
 const AddPartnerModal = ({ open, onClose, addPartner }) => {
   const {
     register,
@@ -20,14 +20,31 @@ const AddPartnerModal = ({ open, onClose, addPartner }) => {
   } = useForm()
 
   const onSubmit = (data) => {
+    // Thực hiện xử lý với data ở đây
+    const { type, phone, email } = data
+
+    if (type === 'customer' && !phone) {
+      toast.error('Khách hàng cần có số điện thoại!')
+      return
+    }
+
+    if (
+      email &&
+      /^(?:\+84|0)(?:3[2-9]|5[2689]|7[06-9]|8[1-689]|9[0-9])\d{7}$/.test(email)
+    ) {
+      toast.error('Email không đúng định dạng!')
+      return
+    }
+
     const formattedData = {
-      name: data.name,
-      type: data.type,
+      name: data.name.trim(),
+      type,
       contact: {
-        phone: data.phone,
-        email: data.email
+        phone: phone || null,
+        email: email || null
       }
     }
+
     addPartner(formattedData)
     reset()
     onClose()
@@ -44,16 +61,22 @@ const AddPartnerModal = ({ open, onClose, addPartner }) => {
       <form onSubmit={handleSubmit(onSubmit)}>
         <DialogContent dividers>
           <Grid container spacing={2}>
-            <Grid item size={12}>
+            <Grid size={12} item xs={12}>
               <TextField
                 label='Tên đối tác'
                 fullWidth
-                {...register('name', { required: 'Tên không được bỏ trống' })}
+                {...register('name', {
+                  required: 'Tên không được bỏ trống',
+                  maxLength: {
+                    value: 100,
+                    message: 'Tên không được vượt quá 100 ký tự'
+                  }
+                })}
                 error={!!errors.name}
                 helperText={errors.name?.message}
               />
             </Grid>
-            <Grid item size={12}>
+            <Grid size={12} item xs={12}>
               <TextField
                 select
                 label='Kiểu đối tác'
@@ -70,19 +93,34 @@ const AddPartnerModal = ({ open, onClose, addPartner }) => {
                 <MenuItem value='both'>Khách hàng & NCC</MenuItem>
               </TextField>
             </Grid>
-            <Grid item size={12} sm={6}>
+            <Grid item size={12} xs={12} sm={6}>
               <TextField
                 label='Số điện thoại'
                 fullWidth
-                {...register('phone')}
+                {...register('phone', {
+                  pattern: {
+                    value:
+                      /^(?:\+84|0)(?:3[2-9]|5[2689]|7[06-9]|8[1-689]|9[0-9])\d{7}$/,
+                    message: 'Số điện thoại không hợp lệ'
+                  }
+                })}
+                error={!!errors.phone}
+                helperText={errors.phone?.message}
               />
             </Grid>
-            <Grid item size={12} sm={6}>
+            <Grid item size={12} xs={12} sm={6}>
               <TextField
                 label='Email'
-                fullWidth
                 type='email'
-                {...register('email')}
+                fullWidth
+                {...register('email', {
+                  pattern: {
+                    value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                    message: 'Email không đúng định dạng'
+                  }
+                })}
+                error={!!errors.email}
+                helperText={errors.email?.message}
               />
             </Grid>
           </Grid>

@@ -3,7 +3,8 @@ import {
   getBatches,
   createBatch,
   updateBatch,
-  deleteBatch
+  deleteBatch,
+  getBatchById
 } from '~/services/admin/Inventory/BatchService'
 
 const useBatches = () => {
@@ -42,20 +43,29 @@ const useBatches = () => {
 
   const createNewBatch = async (data) => {
     const result = await createBatch(data)
-    if (result) await fetchBatches()
     return result
   }
 
   const updateBatchById = async (id, data) => {
     const result = await updateBatch(id, data)
-    if (result) await fetchBatches()
     return result
   }
 
   const deleteBatchById = async (id) => {
     const result = await deleteBatch(id)
-    if (result) await fetchBatches()
     return result
+  }
+  const fetchBatchId = async (id) => {
+    const result = await getBatchById(id)
+    return result
+  }
+
+  const Save = (data) => {
+    try {
+      setBatches((prev) => prev.map((d) => (d._id === data._id ? data : d)))
+    } catch (error) {
+      console.error('Error saving inventory:', error)
+    }
   }
 
   return {
@@ -65,7 +75,9 @@ const useBatches = () => {
     fetchBatches,
     createNewBatch,
     updateBatchById,
-    deleteBatchById
+    deleteBatchById,
+    fetchBatchId,
+    Save
   }
 }
 

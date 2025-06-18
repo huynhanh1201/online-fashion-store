@@ -49,15 +49,7 @@ const ViewSizeModal = ({ open, onClose, size }) => {
               <TableCell sx={{ fontWeight: 'bold', width: '35%' }}>
                 Tên kích thước
               </TableCell>
-              <TableCell>
-                {size.name
-                  .split(' ')
-                  .map(
-                    (word) =>
-                      word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
-                  )
-                  .join(' ') || 'Không có tên'}
-              </TableCell>
+              <TableCell>{size.name.toUpperCase() || 'Không có tên'}</TableCell>
             </TableRow>
 
             <TableRow>
