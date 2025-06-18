@@ -30,8 +30,10 @@ import {
   CheckCircle,
   Replay,
   Visibility,
-  Warning
+  Warning,
+  Sync
 } from '@mui/icons-material'
+import ScheduleIcon from '@mui/icons-material/Schedule';
 import { getOrders, getOrderItems } from '~/services/orderService'
 import { useOrder } from '~/hooks/useOrder'
 import { useNavigate } from 'react-router-dom'
@@ -43,8 +45,8 @@ import { optimizeCloudinaryUrl } from '~/utils/cloudinary'
 // Define status labels with icons and colors
 const statusLabels = {
   All: ['Tất cả', 'default', <ShoppingBag key="all" />],
-  Pending: ['Đang chờ', 'warning', <KeyboardArrowUp key="pending" />],
-  Processing: ['Đang xử lý', 'info',],
+  Pending: ['Đang chờ', 'warning', <ScheduleIcon key="pending" />],
+  Processing: ['Đang xử lý', 'info', <Sync key="processing" />],
   Shipped: ['Đã gửi hàng', 'primary', <LocalShipping key="shipped" />],
   Delivered: ['Đã giao', 'success', <CheckCircle key="delivered" />],
   Cancelled: ['Đã hủy', 'error', <Cancel key="cancelled" />],
