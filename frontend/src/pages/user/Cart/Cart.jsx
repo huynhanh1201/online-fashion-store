@@ -396,8 +396,8 @@ const Cart = () => {
         <Paper
           elevation={0}
           sx={{
-            p: { xs: 2, sm: 3 },
-            mb: 3,
+            p: 1,
+            mb: 1,
             borderRadius: 2,
             border: '1px dashed #1A3C7B',
             backgroundColor: '#E3F2FD',
@@ -858,9 +858,9 @@ const Cart = () => {
       </Box>
 
       {/* Dialogs and Alerts */}
-        <Box sx={{mt: 4}}>
-          <SuggestionProducts />
-        </Box>
+      <Box sx={{ mt: 4 }}>
+        <SuggestionProducts />
+      </Box>
       <Dialog
         open={confirmClearOpen}
         onClose={() => setConfirmClearOpen(false)}

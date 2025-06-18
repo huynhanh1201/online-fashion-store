@@ -17,7 +17,11 @@ import {
   Dialog,
   DialogTitle,
   DialogContent,
-  DialogActions
+  DialogActions,
+  Card,
+  CardContent,
+  Paper,
+  Chip
 } from '@mui/material'
 import { styled } from '@mui/system'
 import { ChooseAddressModal } from './Modal/ChooseAddressModal'
@@ -32,20 +36,224 @@ import CouponItem from '~/components/Coupon/CouponItem'
 import { getDiscounts } from '~/services/discountService'
 import { optimizeCloudinaryUrl } from '~/utils/cloudinary'
 
+// Styled Components
+const StyledContainer = styled(Container)(({ theme }) => ({
+  minHeight: '100vh',
+  paddingTop: theme.spacing(4),
+  paddingBottom: theme.spacing(4),
+}))
+
 const SectionTitle = styled(Typography)(({ theme }) => ({
   fontWeight: 700,
-  fontSize: '1.3rem',
+  fontSize: '1.4rem',
+  marginBottom: theme.spacing(3),
+  color: '#1A3C7B',
+  position: 'relative',
+  paddingLeft: theme.spacing(2),
+  '&::before': {
+    content: '""',
+    position: 'absolute',
+    left: 0,
+    top: '50%',
+    transform: 'translateY(-50%)',
+    width: '4px',
+    height: '24px',
+    backgroundColor: '#1A3C7B',
+    borderRadius: '2px',
+  }
+}))
+
+const StyledCard = styled(Card)(({ theme }) => ({
+  borderRadius: '16px',
+  boxShadow: '0 8px 32px rgba(26, 60, 123, 0.1)',
+  border: '1px solid rgba(26, 60, 123, 0.1)',
+  marginBottom: theme.spacing(3),
+  transition: 'all 0.3s ease',
+  '&:hover': {
+    boxShadow: '0 12px 40px rgba(26, 60, 123, 0.15)',
+    transform: 'translateY(-2px)',
+  }
+}))
+
+const AddressCard = styled(Paper)(({ theme }) => ({
+  padding: theme.spacing(3),
+  borderRadius: '12px',
+  border: '2px solid #e3f2fd',
+  background: 'linear-gradient(135deg, #ffffff 0%, #f8f9ff 100%)',
+  marginBottom: theme.spacing(3),
+  transition: 'all 0.3s ease',
+  '&:hover': {
+    borderColor: '#1A3C7B',
+    boxShadow: '0 4px 20px rgba(26, 60, 123, 0.1)',
+  }
+}))
+
+const PaymentMethodCard = styled(Paper)(({ selected, theme }) => ({
+  padding: theme.spacing(2.5),
+  borderRadius: '12px',
+  border: `2px solid ${selected ? '#1A3C7B' : '#e0e0e0'}`,
   marginBottom: theme.spacing(2),
-  textTransform: 'uppercase',
-  color: '#1A3C7B'
+  transition: 'all 0.3s ease',
+  background: selected
+    ? 'linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%)'
+    : '#ffffff',
+  cursor: 'pointer',
+  '&:hover': {
+    borderColor: '#1A3C7B',
+    boxShadow: '0 4px 16px rgba(26, 60, 123, 0.1)',
+    transform: 'translateY(-1px)',
+  }
+}))
+
+const ShippingCard = styled(Paper)(({ theme }) => ({
+  padding: theme.spacing(2.5),
+  borderRadius: '12px',
+  border: '2px solid #1A3C7B',
+  marginBottom: theme.spacing(2),
+  background: 'linear-gradient(135deg, #e8f5e8 0%, #f0f8ff 100%)',
+  boxShadow: '0 4px 16px rgba(26, 60, 123, 0.1)',
+}))
+
+const StyledTextField = styled(TextField)(({ theme }) => ({
+  marginBottom: theme.spacing(3),
+  '& .MuiOutlinedInput-root': {
+    borderRadius: '12px',
+    backgroundColor: '#ffffff',
+    transition: 'all 0.3s ease',
+    '& fieldset': {
+      borderColor: '#e0e0e0',
+      borderWidth: '2px',
+    },
+    '&:hover fieldset': {
+      borderColor: '#1A3C7B',
+    },
+    '&.Mui-focused fieldset': {
+      borderColor: '#1A3C7B',
+      borderWidth: '2px',
+      boxShadow: '0 0 0 4px rgba(26, 60, 123, 0.1)',
+    }
+  },
+  '& .MuiInputLabel-root': {
+    color: '#666',
+    '&.Mui-focused': {
+      color: '#1A3C7B',
+    }
+  }
+}))
+
+const StyledButton = styled(Button)(({ theme }) => ({
+  borderRadius: '12px',
+  padding: theme.spacing(1.5, 3),
+  fontSize: '1rem',
+  fontWeight: 600,
+  textTransform: 'none',
+  boxShadow: '0 4px 16px rgba(26, 60, 123, 0.2)',
+  transition: 'all 0.3s ease',
+  '&:hover': {
+    boxShadow: '0 6px 24px rgba(26, 60, 123, 0.3)',
+    transform: 'translateY(-2px)',
+  }
+}))
+
+const PrimaryButton = styled(StyledButton)(() => ({
+  backgroundColor: '#1A3C7B',
+  color: '#ffffff',
+  '&:hover': {
+    backgroundColor: '#2c5aa0',
+  },
+  '&:disabled': {
+    backgroundColor: '#cccccc',
+    color: '#666666',
+  }
+}))
+
+const ChangeAddressButton = styled(Typography)(({ theme }) => ({
+  color: '#1A3C7B',
+  cursor: 'pointer',
+  fontWeight: 600,
+  fontSize: '0.95rem',
+  padding: theme.spacing(1, 2),
+  borderRadius: '8px',
+  border: '1px solid #1A3C7B',
+  transition: 'all 0.3s ease',
+  '&:hover': {
+    backgroundColor: '#1A3C7B',
+    color: '#ffffff',
+    transform: 'scale(1.05)',
+  }
+}))
+
+const ProductTable = styled('table')(({ theme }) => ({
+  width: '100%',
+  borderCollapse: 'separate',
+  borderSpacing: '0 8px',
+  '& thead tr': {
+    '& th': {
+      backgroundColor: '#f8f9fa',
+      padding: theme.spacing(2),
+      fontSize: '1rem',
+      fontWeight: 600,
+      color: '#1A3C7B',
+      border: 'none',
+      '&:first-of-type': {
+        borderTopLeftRadius: '8px',
+        borderBottomLeftRadius: '8px',
+      },
+      '&:last-of-type': {
+        borderTopRightRadius: '8px',
+        borderBottomRightRadius: '8px',
+      }
+    }
+  },
+  '& tbody tr': {
+    backgroundColor: '#ffffff',
+    boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
+    transition: 'all 0.3s ease',
+    '&:hover': {
+      boxShadow: '0 4px 16px rgba(0,0,0,0.1)',
+      transform: 'translateY(-1px)',
+    },
+    '& td': {
+      padding: theme.spacing(2),
+      border: 'none',
+      '&:first-of-type': {
+        borderTopLeftRadius: '8px',
+        borderBottomLeftRadius: '8px',
+      },
+      '&:last-of-type': {
+        borderTopRightRadius: '8px',
+        borderBottomRightRadius: '8px',
+      }
+    }
+  }
+}))
+
+const SummaryCard = styled(Card)(({ theme }) => ({
+  borderRadius: '16px',
+  background: 'linear-gradient(135deg, #ffffff 0%, #f8f9ff 100%)',
+  boxShadow: '0 8px 32px rgba(26, 60, 123, 0.15)',
+  border: '1px solid rgba(26, 60, 123, 0.1)',
+  position: 'sticky',
+  top: theme.spacing(2),
+}))
+
+const PriceRow = styled(Box)(({ theme, isTotal }) => ({
+  display: 'flex',
+  justifyContent: 'space-between',
+  alignItems: 'center',
+  padding: theme.spacing(1.5, 0),
+  fontSize: isTotal ? '1.2rem' : '1rem',
+  fontWeight: isTotal ? 700 : 400,
+  color: isTotal ? '#1A3C7B' : '#333',
+  borderBottom: isTotal ? 'none' : '1px solid #f0f0f0',
 }))
 
 const ProductItem = ({ name, price, quantity, image, color, size }) => {
   if (!name || typeof price !== 'number' || typeof quantity !== 'number') {
     return (
       <tr>
-        <td colSpan={3} style={{ color: 'red', padding: 8 }}>
-          Lỗi: Dữ liệu sản phẩm không hợp lệ.
+        <td colSpan={3} style={{ color: 'red', padding: 16, textAlign: 'center' }}>
+          <Typography color="error">Lỗi: Dữ liệu sản phẩm không hợp lệ.</Typography>
         </td>
       </tr>
     )
@@ -55,22 +263,56 @@ const ProductItem = ({ name, price, quantity, image, color, size }) => {
 
   return (
     <tr>
-      <td style={{ display: 'flex', alignItems: 'flex-start', gap: 12, padding: 8 }}>
-        <img
-          src={optimizeCloudinaryUrl(image) || 'https://via.placeholder.com/64'}
-          alt={name}
-          style={{ width: 84, height: 84, borderRadius: 8, objectFit: 'cover' }}
-        />
-        <div style={{ display: 'flex', flexDirection: 'column' }}>
-          <Typography fontWeight={600}>{truncatedName}</Typography>
-          <Typography variant="caption" color="text.secondary">
-            {color || 'Chưa chọn màu'}, {size || 'Chưa chọn kích cỡ'}
-          </Typography>
-        </div>
+      <td>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+          <Box
+            component="img"
+            src={optimizeCloudinaryUrl(image) || 'https://via.placeholder.com/64'}
+            alt={name}
+            sx={{
+              width: 64,
+              height: 64,
+              borderRadius: 2,
+              objectFit: 'cover',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+            }}
+          />
+          <Box>
+            <Typography fontWeight={600} sx={{ mb: 0.5 }}>
+              {truncatedName}
+            </Typography>
+            <Box sx={{ display: 'flex', gap: 1 }}>
+              <Chip
+                label={color || 'Chưa chọn màu'}
+                size="small"
+                variant="outlined"
+                sx={{ fontSize: '0.75rem' }}
+              />
+              <Chip
+                label={size || 'Chưa chọn kích cỡ'}
+                size="small"
+                variant="outlined"
+                sx={{ fontSize: '0.75rem' }}
+              />
+            </Box>
+          </Box>
+        </Box>
       </td>
-      <td style={{ textAlign: 'center' }}>{quantity}</td>
+      <td style={{ textAlign: 'center' }}>
+        <Chip
+          label={quantity}
+          color="primary"
+          sx={{
+            backgroundColor: '#1A3C7B',
+            color: 'white',
+            fontWeight: 600
+          }}
+        />
+      </td>
       <td style={{ textAlign: 'right' }}>
-        {(price * quantity).toLocaleString('vi-VN')}đ
+        <Typography fontWeight={600} color="#1A3C7B">
+          {(price * quantity).toLocaleString('vi-VN')}đ
+        </Typography>
       </td>
     </tr>
   )
@@ -431,324 +673,337 @@ const Payment = () => {
   }
 
   return (
-    <Box>
-      <Container maxWidth="xl" sx={{ py: 4, px: 3, minHeight: '70vh' }}>
-        {cartLoading ? (
-          <Box sx={{ textAlign: 'center', mt: 4 }}>
-            <CircularProgress />
-          </Box>
-        ) : (
-          <Grid container justifyContent="center" spacing={4}>
-            <Grid item xs={12} md={12} lg={8}>
-              {/* Địa chỉ nhận hàng */}
-              <SectionTitle>Địa chỉ nhận hàng</SectionTitle>
-              <Box
-                sx={{
-                  border: '1px solid #ccc',
-                  borderRadius: 1,
-                  p: 2,
-                  mb: 4,
-                  width: '100%',
-                  minWidth: { xs: '100%', sm: 500, md: 800 }
-                }}
-              >
-                {selectedAddress ? (
-                  <Box display="flex" alignItems="center" justifyContent="space-between">
-                    <Box>
-                      <Typography fontWeight={700} sx={{ fontSize: '1.1rem' }}>
-                        {selectedAddress.fullName} (+84) {selectedAddress.phone}
-                      </Typography>
-                      <Typography sx={{ fontSize: '1rem' }}>
-                        {selectedAddress.address}, {selectedAddress.ward}, {selectedAddress.district}, {selectedAddress.city}
-                      </Typography>
+    <StyledContainer maxWidth="xl">
+      {cartLoading ? (
+        <Box sx={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          minHeight: '60vh'
+        }}>
+          <CircularProgress size={60} sx={{ color: '#1A3C7B' }} />
+        </Box>
+      ) : (
+        <Box
+          display="flex"
+          flexDirection={{ xs: 'column', md: 'row' }}
+          alignItems="flex-start"
+          gap={3}
+        >
+          <Box
+            flex={{ xs: '1 1 100%', md: 2 }}
+            width={{ xs: '100%', md: 'auto' }}
+          >
+            {/* Địa chỉ nhận hàng */}
+            <StyledCard>
+              <CardContent>
+                <SectionTitle>Địa chỉ nhận hàng</SectionTitle>
+                <AddressCard elevation={0}>
+                  {selectedAddress ? (
+                    <Box display="flex" alignItems="center" justifyContent="space-between">
+                      <Box>
+                        <Typography
+                          variant="h6"
+                          sx={{
+                            fontWeight: 700,
+                            color: '#1A3C7B',
+                            mb: 1
+                          }}
+                        >
+                          {selectedAddress.fullName} • (+84) {selectedAddress.phone}
+                        </Typography>
+                        <Typography sx={{ color: '#666', lineHeight: 1.6 }}>
+                          {selectedAddress.address}, {selectedAddress.ward}, {selectedAddress.district}, {selectedAddress.city}
+                        </Typography>
+                      </Box>
+                      <ChangeAddressButton onClick={handleOpenAddressModal}>
+                        Thay Đổi
+                      </ChangeAddressButton>
                     </Box>
-                    <Typography
-                      component="span"
-                      sx={{ color: '#3f51b5', cursor: 'pointer', whiteSpace: 'nowrap', fontSize: '1rem' }}
-                      onClick={handleOpenAddressModal}
-                    >
-                      Thay Đổi
-                    </Typography>
-                  </Box>
-                ) : (
-                  <Typography sx={{ fontSize: '1rem' }}>
-                    Chưa có địa chỉ
-                    <Typography
-                      component="span"
-                      sx={{ color: '#3f51b5', cursor: 'pointer', ml: 1, fontSize: '1rem' }}
-                      onClick={handleOpenAddressModal}
-                    >
-                      Chọn Địa Chỉ
-                    </Typography>
-                  </Typography>
-                )}
-              </Box>
+                  ) : (
+                    <Box sx={{ textAlign: 'center', py: 2 }}>
+                      <Typography sx={{ mb: 2, color: '#666' }}>
+                        Chưa có địa chỉ giao hàng
+                      </Typography>
+                      <PrimaryButton onClick={handleOpenAddressModal}>
+                        Chọn Địa Chỉ
+                      </PrimaryButton>
+                    </Box>
+                  )}
+                </AddressCard>
+              </CardContent>
+            </StyledCard>
 
-              {/* Ghi chú đơn hàng */}
-              <SectionTitle>Ghi chú đơn hàng</SectionTitle>
-              <TextField
-                fullWidth
-                label="Ghi chú đơn hàng (không bắt buộc)"
-                value={note}
-                onChange={e => setNote(e.target.value)}
-                variant="outlined"
-                rows={2}
-                multiline
-                sx={{
-                  mb: 4,
-                  backgroundColor: '#fff',
-                  '& .MuiOutlinedInput-root': {
-                    '& fieldset': {
-                      borderColor: '#1A3c7B'
-                    },
-                    '&:hover fieldset': {
-                      borderColor: '#1A3C7B'
-                    },
-                    '&.Mui-focused fieldset': {
-                      borderColor: '#1A3c7B',
-                      borderWidth: '2px'
-                    }
-                  }
-                }}
-              />
+            {/* Ghi chú đơn hàng */}
+            <StyledCard>
+              <CardContent>
+                <SectionTitle>Ghi chú đơn hàng</SectionTitle>
+                <StyledTextField
+                  fullWidth
+                  label="Ghi chú đơn hàng (không bắt buộc)"
+                  value={note}
+                  onChange={e => setNote(e.target.value)}
+                  variant="outlined"
+                  rows={3}
+                  multiline
+                  placeholder="Nhập ghi chú cho đơn hàng của bạn..."
+                />
+              </CardContent>
+            </StyledCard>
 
-              {/* Phương thức vận chuyển */}
-              <SectionTitle>Phương thức vận chuyển</SectionTitle>
-              <Box
-                sx={{
-                  border: '2px solid',
-                  borderColor: '#1A3C7B',
-                  borderRadius: 1,
-                  p: 2,
-                  mb: 2
-                }}
-              >
-                <RadioGroup defaultValue="Ship">
-                  <FormControlLabel
-                    value="Ship"
-                    control={
-                      <Radio
-                        sx={{ color: '#ccc', '&.Mui-checked': { color: '#1A3C7B' } }}
-                      />
-                    }
-                    label={
-                      <Box
-                        sx={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'space-between',
-                          width: '100%',
-                        }}
-                      >
-                        {/* Bên trái: Text phí vận chuyển */}
-                        <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                          <img
+            {/* Phương thức vận chuyển */}
+            <StyledCard>
+              <CardContent>
+                <SectionTitle>Phương thức vận chuyển</SectionTitle>
+                <ShippingCard elevation={0}>
+                  <RadioGroup defaultValue="Ship">
+                    <FormControlLabel
+                      value="Ship"
+                      control={
+                        <Radio
+                          sx={{
+                            color: '#1A3C7B',
+                            '&.Mui-checked': { color: '#1A3C7B' }
+                          }}
+                        />
+                      }
+                      label={
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                          <Box
+                            component="img"
                             src="https://cdn.haitrieu.com/wp-content/uploads/2022/05/Logo-GHN-Slogan-VN.png"
-                            alt="Ship"
-                            style={{ height: 32, marginRight: 8 }}
+                            alt="GHN"
+                            sx={{ height: 40, borderRadius: 1 }}
                           />
-                          <span style={{ fontSize: '1rem' }}>
-                            Phí vận chuyển:{' '}
-                            {shippingPriceLoading ? (
-                              <CircularProgress size={16} />
-                            ) : shippingPrice === 0 ? (
-                              'Miễn phí'
-                            ) : (
-                              shippingPrice.toLocaleString('vi-VN') + 'đ'
-                            )}
-                          </span>
+                          <Box>
+                            <Typography fontWeight={600} sx={{ mb: 0.5 }}>
+                              Giao hàng nhanh (GHN)
+                            </Typography>
+                            <Typography
+                              variant="body2"
+                              color="text.secondary"
+                              component="span" // hoặc "span"
+                            >
+                              Phí vận chuyển:{' '}
+                              {shippingPriceLoading ? (
+                                <CircularProgress size={16} />
+                              ) : shippingPrice === 0 ? (
+                                <Chip label="Miễn phí" color="success" size="small" />
+                              ) : (
+                                <Chip
+                                  label={`${shippingPrice.toLocaleString('vi-VN')}đ`}
+                                  color="primary"
+                                  size="small"
+                                  sx={{ backgroundColor: '#1A3C7B' }}
+                                />
+                              )}
+                            </Typography>
+
+                          </Box>
                         </Box>
-                      </Box>
+                      }
+                    />
+                  </RadioGroup>
+                </ShippingCard>
+              </CardContent>
+            </StyledCard>
 
-                    }
-                  />
-                </RadioGroup>
+            {/* Hình thức thanh toán */}
+            <StyledCard>
+              <CardContent>
+                <SectionTitle>Hình thức thanh toán</SectionTitle>
 
-              </Box>
+                {/* COD */}
+                <PaymentMethodCard
+                  selected={paymentMethod === 'COD'}
+                  onClick={() => setPaymentMethod('COD')}
+                >
+                  <RadioGroup value={paymentMethod} onChange={e => setPaymentMethod(e.target.value)}>
+                    <FormControlLabel
+                      value="COD"
+                      control={
+                        <Radio sx={{
+                          color: '#1A3C7B',
+                          '&.Mui-checked': { color: '#1A3C7B' }
+                        }} />
+                      }
+                      label={
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                          <Box
+                            component="img"
+                            src="https://file.hstatic.net/1000360022/file/img_payment_method_5_23d8b98ee8c7456bab146250bedbc1a4.png"
+                            alt="COD"
+                            sx={{ height: 40, borderRadius: 1 }}
+                          />
+                          <Box>
+                            <Typography fontWeight={600}>
+                              Thanh toán khi nhận hàng (COD)
+                            </Typography>
+                            <Typography variant="body2" color="text.secondary">
+                              Thanh toán bằng tiền mặt khi nhận hàng
+                            </Typography>
+                          </Box>
+                        </Box>
+                      }
+                    />
+                  </RadioGroup>
+                </PaymentMethodCard>
 
-              {/* Hình thức thanh toán */}
-              <SectionTitle>Hình thức thanh toán</SectionTitle>
-              {/* COD */}
-              <Box
-                sx={{
-                  border: '2px solid',
-                  borderColor: paymentMethod === 'COD' ? '#1A3C7B' : '#ccc',
-                  borderRadius: 1,
-                  p: 2,
-                  mb: 2
-                }}
-              >
-                <RadioGroup value={paymentMethod} onChange={e => setPaymentMethod(e.target.value)}>
-                  <FormControlLabel
-                    value="COD"
-                    control={<Radio sx={{ color: '#ccc', '&.Mui-checked': { color: '#1A3C7B' } }} />}
-                    label={
-                      <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                        <img
-                          src="https://file.hstatic.net/1000360022/file/img_payment_method_5_23d8b98ee8c7456bab146250bedbc1a4.png"
-                          alt="COD"
-                          style={{ height: 32, marginRight: 8 }}
-                        />
-                        <Typography sx={{ fontSize: '1rem' }}>
-                          Thanh toán khi nhận hàng (COD)
-                        </Typography>
-                      </Box>
-                    }
-                  />
-                </RadioGroup>
-              </Box>
+                {/* VNPay */}
+                <PaymentMethodCard
+                  selected={paymentMethod === 'vnpay'}
+                  onClick={() => setPaymentMethod('vnpay')}
+                >
+                  <RadioGroup value={paymentMethod} onChange={e => setPaymentMethod(e.target.value)}>
+                    <FormControlLabel
+                      value="vnpay"
+                      control={
+                        <Radio sx={{
+                          color: '#1A3C7B',
+                          '&.Mui-checked': { color: '#1A3C7B' }
+                        }} />
+                      }
+                      label={
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                          <Box
+                            component="img"
+                            src="https://file.hstatic.net/1000360022/file/img_payment_method_4_7fdbf4cdf59647e684a29799683114f7.png"
+                            alt="VNPAY"
+                            sx={{ height: 40, borderRadius: 1 }}
+                          />
+                          <Box>
+                            <Typography fontWeight={600}>
+                              Ví điện tử VNPAY
+                            </Typography>
+                            <Typography variant="body2" color="text.secondary">
+                              Thanh toán trực tuyến qua VNPAY
+                            </Typography>
+                          </Box>
+                        </Box>
+                      }
+                    />
+                  </RadioGroup>
+                </PaymentMethodCard>
+              </CardContent>
+            </StyledCard>
+          </Box>
 
-              {/* VNPay */}
-              <Box
-                sx={{
-                  border: '2px solid',
-                  borderColor: paymentMethod === 'vnpay' ? '#1A3C7B' : '#ccc',
-                  borderRadius: 1,
-                  p: 2,
-                  mb: 2
-                }}
-              >
-                <RadioGroup value={paymentMethod} onChange={e => setPaymentMethod(e.target.value)}>
-                  <FormControlLabel
-                    value="vnpay"
-                    control={<Radio sx={{ color: '#ccc', '&.Mui-checked': { color: '#1A3C7B' } }} />}
-                    label={
-                      <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                        <img
-                          src="https://file.hstatic.net/1000360022/file/img_payment_method_4_7fdbf4cdf59647e684a29799683114f7.png"
-                          alt="VNPAY"
-                          style={{ height: 32, marginRight: 8 }}
-                        />
-                        <Typography sx={{ fontSize: '1rem' }}>
-                          Ví điện tử VNPAY
-                        </Typography>
-                      </Box>
-                    }
-                  />
-                </RadioGroup>
-              </Box>
-            </Grid>
+          {/* Right side: Giỏ hàng, ưu đãi và tổng thanh toán */}
+          <Box
+            flex={{ xs: '1 1 100%', md: 1 }}
+            width={{ xs: '100%', md: 'auto' }}
+          >
+            <SummaryCard>
+              <CardContent>
+                <SectionTitle>Đơn hàng của bạn</SectionTitle>
 
-            {/* Right side: Giỏ hàng, ưu đãi và tổng thanh toán */}
-            <Grid item xs={12} md={12} lg={4}>
-              <SectionTitle>Giỏ hàng</SectionTitle>
-              <Box sx={{ border: '1px solid #ccc', borderRadius: 1, p: 2, mb: 2 }}>
                 {/* Giỏ hàng */}
                 {selectedCartItems.length === 0 ? (
-                  <Typography
-                    sx={{ textAlign: 'center', py: 4, color: 'text.secondary', fontSize: '1rem' }}
-                  >
-                    Giỏ hàng trống
-                  </Typography>
+                  <Box sx={{
+                    textAlign: 'center',
+                    py: 6,
+                    background: 'linear-gradient(135deg, #f5f5f5 0%, #e8e8e8 100%)',
+                    borderRadius: 2,
+                    mb: 3
+                  }}>
+                    <Typography color="text.secondary" sx={{ fontSize: '1.1rem' }}>
+                      Giỏ hàng trống
+                    </Typography>
+                  </Box>
                 ) : (
-                  <Box
-                    component="table"
-                    sx={{
-                      width: '100%',
-                      borderCollapse: 'collapse',
-                      minWidth: { xs: '100%', md: 500 }
-                    }}
-                  >
-                    <thead>
-                      <tr style={{ borderBottom: '2px solid #ccc' }}>
-                        <th style={{ textAlign: 'left', padding: 8, fontSize: '1.1rem' }}>Sản phẩm</th>
-                        <th style={{ textAlign: 'center', padding: 8, fontSize: '1.1rem' }}>Số lượng</th>
-                        <th style={{ textAlign: 'right', padding: 8, fontSize: '1.1rem' }}>Thành tiền</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {selectedCartItems.map((item, index) => {
-                        const variant = cartItems.find(cartItem =>
-                          String(cartItem.variantId?._id || cartItem.variantId) === item.variantId &&
-                          cartItem.color === item.color &&
-                          cartItem.size === item.size
-                        )?.variantId || {}
-                        return (
-                          <ProductItem
-                            key={index}
-                            name={variant.name || 'Sản phẩm không tên'}
-                            price={variant.exportPrice || 0}
-                            quantity={item.quantity || 1}
-                            image={variant.color?.image}
-                            color={variant.color?.name}
-                            size={variant.size?.name}
-                          />
-                        )
-                      })}
-                    </tbody>
+                  <Box sx={{ mb: 3 }}>
+                    <ProductTable>
+                      <thead>
+                        <tr>
+                          <th style={{ textAlign: 'left' }}>Sản phẩm</th>
+                          <th style={{ textAlign: 'center' }}>SL</th>
+                          <th style={{ textAlign: 'right' }}>Thành tiền</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {selectedCartItems.map((item, index) => {
+                          const variant = cartItems.find(cartItem =>
+                            String(cartItem.variantId?._id || cartItem.variantId) === item.variantId &&
+                            cartItem.color === item.color &&
+                            cartItem.size === item.size
+                          )?.variantId || {}
+                          return (
+                            <ProductItem
+                              key={index}
+                              name={variant.name || 'Sản phẩm không tên'}
+                              price={variant.exportPrice || 0}
+                              quantity={item.quantity || 1}
+                              image={variant.color?.image}
+                              color={variant.color?.name}
+                              size={variant.size?.name}
+                            />
+                          )
+                        })}
+                      </tbody>
+                    </ProductTable>
                   </Box>
                 )}
 
-                {/* Ưu đãi */}
-                <Divider sx={{ my: 2 }} />
-                <SectionTitle>Ưu đãi dành cho bạn</SectionTitle>
-                <TextField
-                  fullWidth
-                  label="Nhập mã giảm giá"
-                  value={voucherInput}
-                  onChange={e => {
-                    const value = e.target.value.toUpperCase().slice(0, 10)
-                    setVoucherInput(value)
-                    setVoucherApplied(false)
-                  }}
-                  size="small"
-                  sx={{ mb: 1, '& .MuiInputBase-root': { fontSize: '1rem' } }}
-                  disabled={voucherLoading}
-                />
-                <Button
-                  fullWidth
-                  variant="contained"
-                  onClick={handleApplyVoucherClick}
-                  disabled={voucherLoading || voucherApplied}
-                  sx={{
-                    backgroundColor: '#1A3C7B',
-                    color: '#fff',
-                    '&:hover': { backgroundColor: '#3f51b5' },
-                    fontSize: '1rem'
-                  }}
-                >
-                  {voucherLoading ? 'Đang áp dụng...' : voucherApplied ? 'Đã áp dụng' : 'Áp dụng Mã giảm giá'}
-                </Button>
+                <Divider sx={{ my: 3 }} />
 
-                {discountMessage && (
-                  <Typography
-                    variant="body2"
-                    color={discount > 0 ? 'success.main' : 'error'}
-                    mt={1}
-                    sx={{ fontSize: '0.95rem' }}
+                {/* Ưu đãi */}
+                <SectionTitle>Mã giảm giá</SectionTitle>
+                <Box sx={{ mb: 3 }}>
+                  <StyledTextField
+                    fullWidth
+                    label="Nhập mã giảm giá"
+                    value={voucherInput}
+                    onChange={e => {
+                      const value = e.target.value.toUpperCase().slice(0, 10)
+                      setVoucherInput(value)
+                      setVoucherApplied(false)
+                    }}
+                    size="small"
+                    disabled={voucherLoading}
+                    sx={{ mb: 2 }}
+                  />
+                  <PrimaryButton
+                    fullWidth
+                    onClick={handleApplyVoucherClick}
+                    disabled={voucherLoading || voucherApplied}
                   >
-                    {discountMessage}
-                  </Typography>
-                )}
+                    {voucherLoading ? 'Đang áp dụng...' : voucherApplied ? 'Đã áp dụng' : 'Áp dụng mã'}
+                  </PrimaryButton>
+
+                  {discountMessage && (
+                    <Typography
+                      variant="body2"
+                      color={discount > 0 ? 'success.main' : 'error'}
+                      sx={{ mt: 1, textAlign: 'flex-start' }}
+                    >
+                      {discountMessage}
+                    </Typography>
+                  )}
+                </Box>
 
                 {/* Danh sách coupon */}
-                <Box sx={{ mt: 2 }}>
+                <Box sx={{ mb: 3 }}>
                   <Typography
                     variant="subtitle2"
                     sx={{
                       fontWeight: 600,
-                      fontSize: { xs: '1rem', sm: '1rem' },
                       mb: 2,
-                      color: 'text.secondary'
+                      color: '#666'
                     }}
                   >
-                    Các mã giảm giá có sẵn
+                    Mã giảm giá có sẵn
                   </Typography>
                   {couponLoading ? (
-                    <Box display="flex" justifyContent="center" mt={2}>
+                    <Box display="flex" justifyContent="center" py={2}>
                       <CircularProgress size={24} />
                     </Box>
                   ) : couponError ? (
-                    <Typography color="error" fontSize={{ xs: '0.9rem', sm: '1rem' }} textAlign="center">
+                    <Typography color="error" textAlign="center">
                       {couponError}
                     </Typography>
                   ) : coupons.length === 0 ? (
-                    <Typography
-                      color="text.secondary"
-                      fontSize={{ xs: '0.9rem', sm: '1rem' }}
-                      textAlign="center"
-                    >
-                      Không có coupon nào hiện tại
+                    <Typography color="text.secondary" textAlign="center">
+                      Không có mã giảm giá nào
                     </Typography>
                   ) : (
                     <Box
@@ -761,15 +1016,12 @@ const Payment = () => {
                         '&::-webkit-scrollbar': { height: 8 },
                         '&::-webkit-scrollbar-thumb': {
                           backgroundColor: '#ccc',
-                          borderRadius: 4
+                          borderRadius: 3
                         }
                       }}
                     >
                       {coupons.map(coupon => (
-                        <Box
-                          key={coupon._id}
-                          sx={{ flex: '0 0 auto', minWidth: { xs: '280px', sm: '300px' } }}
-                        >
+                        <Box key={coupon._id}>
                           <CouponItem
                             coupon={coupon}
                             onCopy={handleCouponSelect}
@@ -782,103 +1034,157 @@ const Payment = () => {
                   )}
                 </Box>
 
-                {/* Tổng thanh toán */}
-                <Divider sx={{ my: 2 }} />
-                <Typography sx={{ display: 'flex', justifyContent: 'space-between', fontSize: '1.1rem' }}>
-                  <span>Tạm tính:</span>
-                  <span>{subTotal.toLocaleString('vi-VN')}đ</span>
-                </Typography>
-                <Typography sx={{ display: 'flex', justifyContent: 'space-between', fontSize: '1.1rem' }}>
-                  <span>Phí vận chuyển: </span>
-                  <span> {shippingPriceLoading ? (
-                    <CircularProgress size={24} />
-                  ) : shippingPrice === 0 ? (
-                    'Miễn phí'
-                  ) : (
-                    shippingPrice.toLocaleString('vi-VN') + 'đ'
-                  )} </span>
-                </Typography>
-                <Typography sx={{ display: 'flex', justifyContent: 'space-between', fontSize: '1.1rem' }}>
-                  <span>Mã giảm giá:</span>
-                  <span>{discount.toLocaleString('vi-VN')}đ</span>
-                </Typography>
-                <Divider sx={{ my: 2 }} />
-                <Typography sx={{ display: 'flex', justifyContent: 'space-between', fontSize: '1.2rem', fontWeight: 'bold' }}>
-                  <span>Tổng:</span>
-                  <span>{totalFeeShipping.toLocaleString('vi-VN')}đ</span>
-                </Typography>
+                <Divider sx={{ my: 3 }} />
 
-                <Button
+                {/* Tổng thanh toán */}
+                <Box>
+                  <PriceRow>
+                    <Typography>Tạm tính:</Typography>
+                    <Typography fontWeight={600}>
+                      {subTotal.toLocaleString('vi-VN')}đ
+                    </Typography>
+                  </PriceRow>
+
+                  <PriceRow>
+                    <Typography>Phí vận chuyển:</Typography>
+                    <Typography fontWeight={600}>
+                      {shippingPriceLoading ? (
+                        <CircularProgress size={16} />
+                      ) : shippingPrice === 0 ? (
+                        'Miễn phí'
+                      ) : (
+                        `${shippingPrice.toLocaleString('vi-VN')}đ`
+                      )}
+                    </Typography>
+                  </PriceRow>
+
+                  <PriceRow>
+                    <Typography>Giảm giá:</Typography>
+                    <Typography fontWeight={600} color="success.main">
+                      {discount.toLocaleString('vi-VN')}đ
+                    </Typography>
+                  </PriceRow>
+
+                  <PriceRow isTotal>
+                    <Typography fontWeight={700}>Tổng cộng:</Typography>
+                    <Typography fontSize={'1.2rem'} fontWeight={700}>
+                      {totalFeeShipping.toLocaleString('vi-VN')}đ
+                    </Typography>
+                  </PriceRow>
+                </Box>
+
+                <PrimaryButton
                   fullWidth
-                  variant="contained"
-                  sx={{
-                    mt: 3,
-                    fontSize: '1rem',
-                    backgroundColor: '#1A3C7B',
-                    color: '#fff',
-                    '&:hover': { backgroundColor: '#3f51b5' }
-                  }}
+                  size="large"
                   onClick={() => setConfirmOpen(true)}
                   disabled={orderLoading || selectedCartItems.length === 0}
+                  sx={{
+                    mt: 3,
+                    py: 2,
+                    fontSize: '1.1rem',
+                    fontWeight: 700
+                  }}
                 >
-                  {orderLoading ? 'Đang xử lý...' : 'Đặt hàng'}
-                </Button>
-              </Box>
-            </Grid>
-          </Grid>
-        )}
+                  {orderLoading ? (
+                    <>
+                      <CircularProgress size={20} sx={{ mr: 1 }} />
+                      Đang xử lý...
+                    </>
+                  ) : (
+                    'Đặt hàng ngay'
+                  )}
+                </PrimaryButton>
+              </CardContent>
+            </SummaryCard>
+          </Box>
+        </Box>
+      )}
 
-        {/* Modal chọn địa chỉ */}
-        <ChooseAddressModal
-          open={openAddressModal}
-          onClose={handleCloseAddressModal}
-          onConfirm={handleAddressConfirm}
-          onUpdateAddresses={handleAddressListUpdated}
-        />
+      {/* Modal chọn địa chỉ */}
+      <ChooseAddressModal
+        open={openAddressModal}
+        onClose={handleCloseAddressModal}
+        onConfirm={handleAddressConfirm}
+        onUpdateAddresses={handleAddressListUpdated}
+      />
 
-        {/* Snackbar thông báo */}
-        <Snackbar
-          open={snackbar.open}
-          autoHideDuration={4000}
+      {/* Snackbar thông báo */}
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={4000}
+        onClose={() => setSnackbar(prev => ({ ...prev, open: false }))}
+        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+      >
+        <Alert
           onClose={() => setSnackbar(prev => ({ ...prev, open: false }))}
-          anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+          severity={snackbar.severity}
+          sx={{
+            width: '100%',
+            borderRadius: 2,
+            boxShadow: '0 4px 16px rgba(0,0,0,0.1)'
+          }}
         >
-          <Alert
-            onClose={() => setSnackbar(prev => ({ ...prev, open: false }))}
-            severity={snackbar.severity}
-            sx={{ width: '100%', fontSize: '1rem' }}
-          >
-            {snackbar.message}
-          </Alert>
-        </Snackbar>
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
 
-        <Dialog open={confirmOpen} onClose={() => setConfirmOpen(false)}>
-          <DialogTitle>Xác nhận đặt hàng</DialogTitle>
-          <DialogContent>
-            <Typography>Bạn có chắc chắn muốn đặt hàng không?</Typography>
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={() => setConfirmOpen(false)} color="inherit">
-              Hủy
-            </Button>
-            <Button
-              onClick={() => {
-                setConfirmOpen(false)
-                handlePlaceOrder()
-              }}
-              variant="contained"
-              sx={{
-                backgroundColor: '#1A3C7B',
-                color: '#fff',
-                '&:hover': { backgroundColor: '#3f51b5' }
-              }}
-            >
-              Xác nhận
-            </Button>
-          </DialogActions>
-        </Dialog>
-      </Container>
-    </Box>
+      {/* Dialog xác nhận */}
+      <Dialog
+        open={confirmOpen}
+        onClose={() => setConfirmOpen(false)}
+        PaperProps={{
+          sx: {
+            borderRadius: 3,
+            minWidth: 400
+          }
+        }}
+      >
+        <DialogTitle sx={{
+          textAlign: 'center',
+          color: '#1A3C7B',
+          fontWeight: 700,
+          fontSize: '1.3rem'
+        }}>
+          Xác nhận đặt hàng
+        </DialogTitle>
+        <DialogContent sx={{ textAlign: 'flex-start', py: 3 }}>
+          <Typography sx={{ fontSize: '1.1rem', mb: 2 }}>
+            Bạn có chắc chắn muốn đặt hàng không?
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            Tổng thanh toán: <strong>{totalFeeShipping.toLocaleString('vi-VN')}đ</strong>
+          </Typography>
+        </DialogContent>
+        <DialogActions sx={{ justifyContent: 'flex-end', gap: 1, pb: 3 }}>
+          <Button
+            onClick={() => setConfirmOpen(false)}
+            variant="outlined"
+            sx={{
+              borderRadius: 2,
+              px: 3,
+              borderColor: '#ccc',
+              color: '#666'
+            }}
+          >
+            Hủy
+          </Button>
+          <Button
+            onClick={() => {
+              setConfirmOpen(false)
+              handlePlaceOrder()
+            }}
+            sx={{
+              borderRadius: 2,
+              px: 3,
+              backgroundColor: '#1A3C7B',
+              color: 'white'
+            }}
+          >
+            Xác nhận đặt hàng
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </StyledContainer>
   )
 }
 

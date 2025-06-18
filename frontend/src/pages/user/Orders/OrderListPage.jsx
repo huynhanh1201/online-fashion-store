@@ -572,4 +572,4 @@ const OrderListPage = () => {
   )
 }
 
-export default OrderListPage  
+export default OrderListPage
