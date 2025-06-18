@@ -788,14 +788,14 @@ const Payment = () => {
                   <span>{subTotal.toLocaleString('vi-VN')}đ</span>
                 </Typography>
                 <Typography sx={{ display: 'flex', justifyContent: 'space-between', fontSize: '1.1rem' }}>
-                  <span>Phí vận chuyển: {shippingPriceLoading ? (
+                  <span>Phí vận chuyển: </span>
+                  <span> {shippingPriceLoading ? (
                     <CircularProgress size={24} />
                   ) : shippingPrice === 0 ? (
                     'Miễn phí'
                   ) : (
                     shippingPrice.toLocaleString('vi-VN') + 'đ'
                   )} </span>
-
                 </Typography>
                 <Typography sx={{ display: 'flex', justifyContent: 'space-between', fontSize: '1.1rem' }}>
                   <span>Mã giảm giá:</span>
