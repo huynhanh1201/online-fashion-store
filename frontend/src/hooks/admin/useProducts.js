@@ -94,6 +94,10 @@ const useProducts = () => {
     }
   }
 
+  const Save = (data) => {
+    setProducts((prev) => prev.map((d) => (d._id === data._id ? data : d)))
+  }
+
   return {
     total,
     products,
@@ -101,7 +105,8 @@ const useProducts = () => {
     fetchProducts,
     loading,
     fetchProductById,
-    createNewProduct
+    createNewProduct,
+    Save
   }
 }
 

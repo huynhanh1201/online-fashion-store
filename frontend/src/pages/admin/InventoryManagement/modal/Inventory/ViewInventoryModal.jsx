@@ -14,7 +14,7 @@ import {
 } from '@mui/material'
 import { Box } from '@mui/system'
 import React from 'react'
-
+import StyleAdmin from '~/assets/StyleAdmin.jsx'
 const ViewInventoryModal = ({ open, onClose, inventory }) => {
   return (
     <Dialog
@@ -23,6 +23,9 @@ const ViewInventoryModal = ({ open, onClose, inventory }) => {
       maxWidth='sm'
       fullWidth
       sx={{ padding: '16px 24px' }}
+      BackdropProps={{
+        sx: StyleAdmin.OverlayModal
+      }}
     >
       <DialogTitle sx={{ fontWeight: 'bold', pl: 5 }}>
         Thông tin tồn kho

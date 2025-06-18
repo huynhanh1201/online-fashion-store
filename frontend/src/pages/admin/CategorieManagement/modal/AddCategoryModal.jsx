@@ -17,11 +17,9 @@ import DeleteIcon from '@mui/icons-material/Delete'
 import AddPhotoAlternateIcon from '@mui/icons-material/AddPhotoAlternate'
 
 import { useForm } from 'react-hook-form'
-import { addCategory } from '~/services/admin/categoryService'
 import StyleAdmin from '~/assets/StyleAdmin.jsx'
-
-const URI = 'https://api.cloudinary.com/v1_1/dkwsy9sph/image/upload'
-const CloudinaryCategory = 'category_upload'
+import { addCategory } from '~/services/admin/categoryService.js'
+import { CloudinaryCategory, URI } from '~/utils/constants'
 
 const uploadToCloudinary = async (file, folder = CloudinaryCategory) => {
   const formData = new FormData()

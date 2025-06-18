@@ -1,5 +1,5 @@
 // VariantsTab.js
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useMemo } from 'react'
 import {
   Paper,
   Table,
@@ -40,19 +40,23 @@ const VariantsTab = () => {
     updateVariantById,
     deleteVariantById,
     loadingVariant,
-    totalVariant
+    totalVariant,
+    Save,
+    fetchVariantId
   } = useVariants()
   const { products, fetchProducts } = useProducts()
   const { colors, fetchColors } = useColors()
   const { sizes, fetchSizes } = useSizes()
 
-  const enrichedVariants = (variants || []).map((variant) => {
-    const product = (products || []).find((p) => p.id === variant.productId)
-    return {
-      ...variant,
-      productName: product ? product.name : 'N/A'
-    }
-  })
+  const enrichedVariants = useMemo(() => {
+    return (variants || []).map((variant) => {
+      const product = (products || []).find((p) => p.id === variant.productId)
+      return {
+        ...variant,
+        productName: product ? product.name : 'N/A'
+      }
+    })
+  }, [variants, products])
 
   const [openAddModal, setOpenAddModal] = useState(false)
   const [openViewModal, setOpenViewModal] = useState(false)
@@ -77,7 +81,7 @@ const VariantsTab = () => {
 
   const handleCloseAddModal = () => {
     setOpenAddModal(false)
-    fetchVariants(page, rowsPerPage, filter)
+    // fetchVariants(page, rowsPerPage, filter)
   }
 
   const handleViewVariant = (variant) => {
@@ -98,18 +102,37 @@ const VariantsTab = () => {
   const handleCloseViewModal = () => {
     setOpenViewModal(false)
     setSelectedVariant(null)
-    fetchVariants(page, rowsPerPage, filter)
   }
 
   const handleCloseEditModal = () => {
     setOpenEditModal(false)
     setSelectedVariant(null)
-    fetchVariants(page, rowsPerPage, filter)
+    // fetchVariants(page, rowsPerPage, filter)
   }
 
   const handleCloseDeleteModal = () => {
     setOpenDeleteModal(false)
     setSelectedVariant(null)
+    // fetchVariants(page, rowsPerPage, filter)
+  }
+
+  const handleSave = async (variant, type, variantId) => {
+    if (type === 'add') {
+      await createNewVariant(variant)
+    } else if (type === 'edit') {
+      // await updateVariantById(variantId, variant)
+      const edit = await updateVariantById(variantId, variant)
+      console.log(edit)
+      if (edit) {
+        const updatedVariant = await fetchVariantId(variantId)
+        console.log('Cập nhật biến thể:', updatedVariant)
+        if (updatedVariant) {
+          Save(updatedVariant)
+        }
+      }
+    } else if (type === 'delete') {
+      await deleteVariantById(variant)
+    }
   }
 
   const variantColumns = [
@@ -130,15 +153,16 @@ const VariantsTab = () => {
       label: 'Giá nhập',
       minWidth: 150,
       maxWidth: 150,
-      align: 'start',
+      align: 'right',
       format: (value) => `${value.toLocaleString('vi-VN')}đ`
     },
     {
       id: 'exportPrice',
       label: 'Giá bán',
-      minWidth: 150,
-      maxWidth: 150,
-      align: 'start',
+      minWidth: 190,
+      maxWidth: 214,
+      align: 'right',
+      pr: 8,
       format: (value) => `${value.toLocaleString('vi-VN')}đ`
     },
     {
@@ -242,6 +266,7 @@ const VariantsTab = () => {
                     minWidth: column.minWidth,
                     width: column.width,
                     px: 1,
+                    pr: column.pr,
                     ...(column.maxWidth && { maxWidth: column.maxWidth }),
                     ...(column.id === 'action' && {
                       width: '130px',
@@ -308,14 +333,7 @@ const VariantsTab = () => {
                     }
                     if (id === 'size.name') {
                       content =
-                        row.size?.name
-                          .split(' ')
-                          .map(
-                            (word) =>
-                              word.charAt(0).toUpperCase() +
-                              word.slice(1).toLowerCase()
-                          )
-                          .join(' ') || 'Không có màu sắc'
+                        row.size?.name.toUpperCase() || 'Không có màu sắc'
                     }
                     if (id === 'destroy') {
                       content = (
@@ -382,7 +400,8 @@ const VariantsTab = () => {
                           verticalAlign: 'middle',
                           ...(id === 'sku' || id === 'name'
                             ? { maxWidth: 150 } // Ẩn tràn nếu mã hoặc tên dài
-                            : {})
+                            : {}),
+                          ...(id === 'exportPrice' && { pr: column.pr })
                         }}
                       >
                         {content}
@@ -418,7 +437,7 @@ const VariantsTab = () => {
       <AddVariantModal
         open={openAddModal}
         onClose={handleCloseAddModal}
-        addVariant={createNewVariant}
+        addVariant={handleSave}
         products={products}
         parseCurrency={parseCurrency}
         formatCurrency={formatCurrency}
@@ -437,7 +456,7 @@ const VariantsTab = () => {
         open={openEditModal}
         onClose={handleCloseEditModal}
         variant={selectedVariant}
-        onUpdateVariant={updateVariantById}
+        onUpdateVariant={handleSave}
         products={products}
         parseCurrency={parseCurrency}
         formatCurrency={formatCurrency}
@@ -446,7 +465,7 @@ const VariantsTab = () => {
         open={openDeleteModal}
         onClose={handleCloseDeleteModal}
         variant={selectedVariant}
-        deleteVariant={deleteVariantById}
+        deleteVariant={handleSave}
       />
     </Paper>
   )

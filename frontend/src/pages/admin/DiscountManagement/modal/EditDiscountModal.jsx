@@ -1,5 +1,5 @@
 import React from 'react'
-import { useForm } from 'react-hook-form'
+import { useForm, Controller } from 'react-hook-form'
 
 import Dialog from '@mui/material/Dialog'
 import DialogTitle from '@mui/material/DialogTitle'
@@ -31,7 +31,7 @@ const EditDiscountModal = ({ open, onClose, discount, onSave }) => {
     register,
     watch,
     handleSubmit,
-    setValue,
+    control,
     reset,
     // setValue,
     setError,
@@ -138,41 +138,69 @@ const EditDiscountModal = ({ open, onClose, discount, onSave }) => {
                 {...register('code', { required: true })}
                 sx={StyleAdmin.InputCustom}
               />
-              <FormControl
-                fullWidth
-                margin='normal'
-                sx={StyleAdmin.FormSelect} // style chuẩn bạn dùng cho select
-              >
-                <InputLabel id='type-label'>Loại giảm giá</InputLabel>
-                <Select
-                  label='Loại giảm giá'
-                  defaultValue={discount?.type}
-                  {...register('type', {
-                    required: 'Vui lòng chọn loại giảm giá'
-                  })}
-                  MenuProps={{
-                    PaperProps: {
-                      sx: StyleAdmin.FormSelect.SelectMenu
-                    }
-                  }}
-                >
-                  <MenuItem value='fixed'>Giảm theo số tiền</MenuItem>
-                  <MenuItem value='percent'>Giảm theo phần trăm</MenuItem>
-                </Select>
-              </FormControl>
-              <TextField
-                label={
-                  type === 'fixed' ? 'Giá trị giảm (VNĐ)' : 'Giá trị giảm (%)'
-                }
-                type='number'
-                fullWidth
-                margin='normal'
-                inputProps={
-                  type === 'percent' ? { min: 0, max: 100 } : { min: 0 }
-                }
-                {...register('amount', { required: true })}
-                sx={StyleAdmin.InputCustom}
+              <Controller
+                name='type'
+                control={control}
+                rules={{ required: 'Vui lòng chọn loại giảm giá' }}
+                render={({ field, fieldState: { error } }) => (
+                  <FormControl
+                    fullWidth
+                    margin='normal'
+                    error={!!error}
+                    sx={StyleAdmin.FormSelect}
+                  >
+                    <InputLabel id='type-label'>Loại giảm giá</InputLabel>
+                    <Select
+                      labelId='type-label'
+                      label='Loại giảm giá'
+                      {...field}
+                      MenuProps={{
+                        PaperProps: {
+                          sx: StyleAdmin.FormSelect.SelectMenu
+                        }
+                      }}
+                    >
+                      <MenuItem value='fixed'>Giảm theo số tiền</MenuItem>
+                      <MenuItem value='percent'>Giảm theo phần trăm</MenuItem>
+                    </Select>
+                  </FormControl>
+                )}
               />
+
+              <Controller
+                name='amount'
+                control={control}
+                rules={{
+                  required: 'Vui lòng nhập giá trị giảm',
+                  validate: (value) => {
+                    const number = parseInt(value)
+                    if (isNaN(number)) return 'Giá trị không hợp lệ'
+                    if (number < 0) return 'Giá trị không được âm'
+                    if (type === 'percent' && number > 100)
+                      return 'Phần trăm giảm tối đa là 100%'
+                    return true
+                  }
+                }}
+                render={({
+                  field: { onChange, value },
+                  fieldState: { error }
+                }) => (
+                  <TextField
+                    label={
+                      type === 'fixed' ? 'Giá trị giảm (đ)' : 'Giá trị giảm (%)'
+                    }
+                    fullWidth
+                    margin='normal'
+                    value={formatNumber(value)}
+                    onChange={(e) => onChange(parseNumber(e.target.value))}
+                    error={!!error}
+                    helperText={error?.message}
+                    InputProps={{ inputMode: 'numeric' }}
+                    sx={StyleAdmin.InputCustom}
+                  />
+                )}
+              />
+
               <FormControlLabel
                 control={
                   <Checkbox
@@ -188,30 +216,58 @@ const EditDiscountModal = ({ open, onClose, discount, onSave }) => {
 
             {/* Cột phải */}
             <Box flex={1}>
-              <TextField
-                label='Giá trị đơn hàng tối thiểu'
-                fullWidth
-                margin='normal'
-                value={formatNumber(minOrderValue)}
-                onChange={(e) => {
-                  const raw = parseNumber(e.target.value)
-                  setValue('minOrderValue', raw)
+              <Controller
+                name='minOrderValue'
+                control={control}
+                rules={{
+                  required: 'Vui lòng nhập giá trị đơn hàng tối thiểu',
+                  validate: (value) =>
+                    parseInt(value) >= 1 ||
+                    'Giá trị tối thiểu phải lớn hơn hoặc bằng 1'
                 }}
-                InputProps={{ inputMode: 'numeric' }}
-                sx={StyleAdmin.InputCustom}
+                render={({
+                  field: { onChange, value },
+                  fieldState: { error }
+                }) => (
+                  <TextField
+                    label='Giá trị đơn hàng tối thiểu (đ)'
+                    fullWidth
+                    margin='normal'
+                    value={formatNumber(value)}
+                    onChange={(e) => onChange(parseNumber(e.target.value))}
+                    error={!!error}
+                    helperText={error?.message}
+                    InputProps={{ inputMode: 'numeric' }}
+                    sx={StyleAdmin.InputCustom}
+                  />
+                )}
               />
 
-              <TextField
-                label='Số lượt sử dụng tối đa'
-                fullWidth
-                margin='normal'
-                value={formatNumber(usageLimit)}
-                onChange={(e) => {
-                  const raw = parseNumber(e.target.value)
-                  setValue('usageLimit', raw)
+              <Controller
+                name='usageLimit'
+                control={control}
+                rules={{
+                  required: 'Vui lòng nhập số lượt sử dụng',
+                  validate: (value) =>
+                    parseInt(value) >= 1 ||
+                    'Số lượt sử dụng phải lớn hơn hoặc bằng 1'
                 }}
-                InputProps={{ inputMode: 'numeric' }}
-                sx={StyleAdmin.InputCustom}
+                render={({
+                  field: { onChange, value },
+                  fieldState: { error }
+                }) => (
+                  <TextField
+                    label='Số lượt sử dụng tối đa'
+                    fullWidth
+                    margin='normal'
+                    value={formatNumber(value)}
+                    onChange={(e) => onChange(parseNumber(e.target.value))}
+                    error={!!error}
+                    helperText={error?.message}
+                    InputProps={{ inputMode: 'numeric' }}
+                    sx={StyleAdmin.InputCustom}
+                  />
+                )}
               />
 
               <TextField

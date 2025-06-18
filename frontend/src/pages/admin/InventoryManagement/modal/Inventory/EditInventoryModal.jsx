@@ -14,7 +14,7 @@ import {
   Divider
 } from '@mui/material'
 import { toast } from 'react-toastify'
-
+import StyleAdmin from '~/assets/StyleAdmin.jsx'
 const EditInventoryModal = ({
   open,
   onClose,
@@ -66,7 +66,7 @@ const EditInventoryModal = ({
     }
 
     try {
-      await onSave(inventory._id, payload)
+      await onSave(payload, 'edit', inventory._id)
       toast.success('Cập nhật tồn kho thành công')
       onClose()
     } catch {
@@ -75,7 +75,13 @@ const EditInventoryModal = ({
   }
 
   return (
-    <Dialog open={open} onClose={onClose}>
+    <Dialog
+      open={open}
+      onClose={onClose}
+      BackdropProps={{
+        sx: StyleAdmin.OverlayModal
+      }}
+    >
       <DialogTitle>Sửa thông tin tồn kho</DialogTitle>
       <Divider />
       <DialogContent>
@@ -91,7 +97,7 @@ const EditInventoryModal = ({
         />
         <TextField
           margin='dense'
-          label='Giá nhập'
+          label='Giá nhập (đ)'
           name='importPrice'
           type='text'
           value={formatCurrency(formData.importPrice)}
@@ -109,7 +115,7 @@ const EditInventoryModal = ({
 
         <TextField
           margin='dense'
-          label='Giá bán'
+          label='Giá bán (đ)'
           name='exportPrice'
           type='text'
           value={formatCurrency(formData.exportPrice)}

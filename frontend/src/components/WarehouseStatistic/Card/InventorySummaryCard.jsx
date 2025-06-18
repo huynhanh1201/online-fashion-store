@@ -27,25 +27,25 @@ export default function InventorySummaryCard({ data, loading }) {
     {
       label: 'Tổng số lượng tồn',
       value: `${Number(totalStock).toLocaleString('vi-VN')}`,
-      icon: <InventoryIcon color='primary' />,
+      icon: <InventoryIcon color='primary' fontSize='lagre' />,
       color: '#4FC3F7'
     },
     {
       label: 'Tổng giá trị tồn kho',
       value: `${Number(totalValue).toLocaleString('vi-VN')}đ`,
-      icon: <MonetizationOnIcon color='success' />,
+      icon: <MonetizationOnIcon color='success' fontSize='lagre' />,
       color: '#81C784'
     },
     {
       label: 'Tổng lợi nhuận ước tính',
       value: `${Number(estimatedProfit).toLocaleString('vi-VN')}đ`,
-      icon: <AttachMoneyIcon color='warning' />,
+      icon: <AttachMoneyIcon color='warning' fontSize='lagre' />,
       color: '#FFB74D'
     },
     {
       label: 'Biến thể sắp hết hàng',
       value: `${Number(lowStockCount).toLocaleString('vi-VN')}`,
-      icon: <WarningIcon color='error' />,
+      icon: <WarningIcon color='error' fontSize='lagre' />,
       color: '#E57373'
     }
   ]
@@ -86,18 +86,18 @@ export default function InventorySummaryCard({ data, loading }) {
               alignItems: 'center',
               gap: 2,
               p: 2,
-              height: '100px',
-              borderLeft: `5px solid ${item.color}`,
+              height: '150px',
+              borderLeft: `10px solid ${item.color}`,
               backgroundColor: '#f5f5f5',
               borderRadius: 2
             }}
           >
             <Stack>
-              <Typography variant='body2' color='text.secondary' sx={{ mb: 1 }}>
+              <Typography variant='h5' color='text.secondary' sx={{ mb: 1 }}>
                 {item.label}
               </Typography>
               <Typography
-                variant='subtitle1'
+                variant='h5'
                 fontWeight='bold'
                 sx={{ display: 'flex', alignItems: 'center', gap: 1 }}
               >

@@ -227,6 +227,8 @@ const handleCreateOrder = async (
     }
   )
 
+  if (couponCode) cartTotal -= discountAmount
+
   // Tao đơn hàng trong hệ thống
   const newOrder = {
     userId,
@@ -408,52 +410,6 @@ const handlePaymentByVnpay = (reqBody, order, ipAddr) => {
   }
 }
 
-const handleCreateOrderForGHN = async (
-  reqBody,
-  cartItems,
-  order,
-  address,
-  variantMap
-) => {
-  const variantItemsGHN = []
-  let numberItemOrder = 0
-
-  for (const item of cartItems) {
-    const variant = variantMap.get(item.variantId.toString())
-
-    if (!variant) {
-      throw new ApiError(
-        StatusCodes.NOT_FOUND,
-        `Sản phẩm với ID ${item.variantId} không tồn tại.`
-      )
-    }
-
-    // Danh sach items GHN
-    variantItemsGHN.push({
-      name: variant.name,
-      code: variant.sku,
-      quantity: item.quantity,
-      price: variant.exportPrice,
-      length: 30,
-      width: 20,
-      height: 2,
-      weight: 300
-    })
-
-    numberItemOrder += item.quantity
-  }
-
-  const orderGHNCreated = await deliveriesService.createOrderDelivery(
-    reqBody,
-    order,
-    address,
-    variantItemsGHN,
-    numberItemOrder
-  )
-
-  return orderGHNCreated
-}
-
 export const orderHelpers = {
   checkInventorySufficient,
   createWarehouseSlipFromOrder,
@@ -467,6 +423,5 @@ export const orderHelpers = {
   handleCreateOrderItems,
   handleCreateTransaction,
   handleDeleteCartItems,
-  handlePaymentByVnpay,
-  handleCreateOrderForGHN
+  handlePaymentByVnpay
 }

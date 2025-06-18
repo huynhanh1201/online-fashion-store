@@ -86,21 +86,22 @@ const InventoryLogTab = () => {
       id: 'amount',
       label: 'Số lượng',
       minWidth: 150,
-      align: 'start',
+      align: 'right',
       format: (value) => `${value.toLocaleString('vi-VN')}`
     },
     {
       id: 'importPrice',
       label: 'Giá nhập',
       minWidth: 150,
-      align: 'start',
+      align: 'right',
       format: (value) => `${value.toLocaleString('vi-VN')}đ`
     },
     {
       id: 'exportPrice',
       label: 'Giá xuất',
-      minWidth: 150,
-      align: 'start',
+      minWidth: 230,
+      align: 'right',
+      pr: 10,
       format: (value) => `${value.toLocaleString('vi-VN')}đ`
     },
     { id: 'createdAtFormatted', label: 'Ngày thực hiện', minWidth: 100 },
@@ -170,6 +171,7 @@ const InventoryLogTab = () => {
                     minWidth: column.minWidth,
                     width: column.width,
                     px: 1,
+                    pr: column.pr,
                     ...(column.maxWidth && { maxWidth: column.maxWidth }),
                     ...(column.id === 'action' && {
                       width: 130,
@@ -275,8 +277,7 @@ const InventoryLogTab = () => {
                         <Typography
                           sx={{
                             fontWeight: 900,
-                            color: row.type === 'in' ? 'green' : 'red',
-                            textAlign: 'left'
+                            color: row.type === 'in' ? 'green' : 'red'
                           }}
                         >
                           {rawValue !== undefined
@@ -308,6 +309,7 @@ const InventoryLogTab = () => {
                         sx={{
                           py: 0,
                           px: 1,
+                          pr: col.pr,
                           height: 55,
                           whiteSpace: 'nowrap',
                           overflow: 'hidden',

@@ -18,9 +18,7 @@ import AddPhotoAlternateIcon from '@mui/icons-material/AddPhotoAlternate'
 
 import { useForm } from 'react-hook-form'
 import StyleAdmin from '~/assets/StyleAdmin.jsx'
-
-const URI = 'https://api.cloudinary.com/v1_1/dkwsy9sph/image/upload'
-const CloudinaryCategory = 'category_upload'
+import { CloudinaryCategory, URI } from '~/utils/constants'
 
 const uploadToCloudinary = async (file, folder = CloudinaryCategory) => {
   const formData = new FormData()
@@ -53,8 +51,7 @@ const EditCategoryModal = ({ open, onClose, category, onSave }) => {
   useEffect(() => {
     if (open && category) {
       reset({
-        name: category.name || '',
-        description: category.description || ''
+        name: category.name || ''
       })
       setPreviewUrl(category.image || '')
       setImageFile(null)
@@ -231,14 +228,12 @@ const EditCategoryModal = ({ open, onClose, category, onSave }) => {
                 sx={StyleAdmin.InputCustom}
               />
               <TextField
-                label='Mô tả'
+                label='Mô tả (không bắt buộc)'
                 fullWidth
                 margin='normal'
                 multiline
                 rows={10}
-                {...register('description', { required: 'Mô tả là bắt buộc' })}
-                error={!!errors.description}
-                helperText={errors.description?.message}
+                {...register('description')}
                 sx={StyleAdmin.InputCustom}
               />
             </Box>

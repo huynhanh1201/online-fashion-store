@@ -36,7 +36,9 @@ const BatchesTab = () => {
     updateBatchById,
     deleteBatchById,
     loadingBatch,
-    totalPageBatch
+    totalPageBatch,
+    Save,
+    fetchBatchId
   } = useBatches()
   const { variants, fetchVariants } = useVariants()
   const { warehouses, fetchWarehouses } = useWarehouses()
@@ -71,7 +73,7 @@ const BatchesTab = () => {
       label: 'Số lượng sản phẩm',
       minWidth: 80,
       maxWidth: 120,
-      align: 'start',
+      align: 'right',
       format: (value) => `${value.toLocaleString('vi-VN')}`
     },
     {
@@ -79,7 +81,8 @@ const BatchesTab = () => {
       label: 'Giá nhập',
       minWidth: 80,
       maxWidth: 150,
-      align: 'start',
+      align: 'right',
+      pr: 6,
       format: (value) => `${value.toLocaleString('vi-VN')}đ`
     },
     {
@@ -132,7 +135,6 @@ const BatchesTab = () => {
   // Đóng modal sửa, refresh danh sách
   const handleCloseEditModal = () => {
     setOpenEditModal(false)
-    fetchBatches(page, rowsPerPage, filter)
   }
 
   // Mở modal xoá
@@ -144,7 +146,21 @@ const BatchesTab = () => {
   // Đóng modal xoá, refresh danh sách
   const handleCloseDeleteModal = () => {
     setOpenDeleteModal(false)
-    fetchBatches(page, rowsPerPage, filter)
+  }
+  const handleSave = async (batch, type, batchId) => {
+    if (type === 'edit') {
+      const updatedBatch = await updateBatchById(batchId, batch)
+      if (updatedBatch) {
+        const data = await fetchBatchId(batchId)
+        console.log('Updated batch data:', data)
+        if (data) {
+          Save(data)
+        }
+      }
+    } else if (type === 'delete') {
+      await deleteBatchById(batch)
+      fetchBatches(page, rowsPerPage, filter) // Refresh danh sách sau khi lưu
+    }
   }
 
   const isEqual = (obj1, obj2) => JSON.stringify(obj1) === JSON.stringify(obj2)
@@ -222,7 +238,8 @@ const BatchesTab = () => {
                       maxWidth: '130px',
                       paddingLeft: '26px'
                     }),
-                    px: 1
+                    px: 1,
+                    pr: col.pr
                   }}
                 >
                   {col.label}
@@ -328,6 +345,7 @@ const BatchesTab = () => {
                         sx={{
                           py: 0,
                           px: 1,
+                          pr: col.pr,
                           height: 55,
                           whiteSpace: 'nowrap',
                           overflow: 'hidden',
@@ -372,7 +390,7 @@ const BatchesTab = () => {
         open={openEditModal}
         onClose={handleCloseEditModal}
         batch={selectedBatch}
-        onSave={updateBatchById}
+        onSave={handleSave}
         variants={variants}
         parseCurrency={parseCurrency}
         formatCurrency={formatCurrency}
@@ -386,7 +404,7 @@ const BatchesTab = () => {
         open={openDeleteModal}
         onClose={handleCloseDeleteModal}
         batch={selectedBatch}
-        onSave={deleteBatchById}
+        onSave={handleSave}
       />
     </Paper>
   )

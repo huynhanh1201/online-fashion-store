@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { getSizes, addSize } from '~/services/admin/sizeService'
+import { getSizes, addSize, getSizeById } from '~/services/admin/sizeService'
 
 const useSizes = () => {
   const [sizes, setSizes] = useState([])
@@ -35,16 +35,34 @@ const useSizes = () => {
   const createNewSize = async (data) => {
     try {
       const result = await addSize(data)
-      if (result) {
-        await fetchSizes(pageSize)
-      }
       return result
     } catch (error) {
       console.error('Lỗi khi tạo kích thước mới:', error)
       return null
     }
   }
-  return { sizes, totalPages, fetchSizes, loading, createNewSize }
+  const fetchSizeById = async (id) => {
+    try {
+      const size = await getSizeById(id)
+      return size
+    } catch (error) {
+      console.error('Lỗi khi lấy kích thước theo ID:', error)
+      return null
+    }
+  }
+
+  const Save = (data) => {
+    setSizes((prev) => prev.map((d) => (d._id === data._id ? data : d)))
+  }
+  return {
+    sizes,
+    totalPages,
+    fetchSizes,
+    loading,
+    createNewSize,
+    fetchSizeById,
+    Save
+  }
 }
 
 export default useSizes

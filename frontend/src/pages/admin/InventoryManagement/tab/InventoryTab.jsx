@@ -417,7 +417,8 @@ const InventoryTab = () => {
     totalPageInventory,
     getInventoryId,
     deleteInventoryById,
-    updateInventoryById
+    updateInventoryById,
+    Save
   } = useInventory()
   const { warehouses, fetchWarehouses } = useWarehouses()
   const [page, setPage] = useState(1)
@@ -453,27 +454,29 @@ const InventoryTab = () => {
     {
       id: 'quantity',
       label: 'Số lượng tồn',
-      minWidth: 150,
-      align: 'start'
+      minWidth: 190,
+      align: 'right',
+      pr: 5
     },
     {
       id: 'minQuantity',
       label: 'Ngưỡng cảnh báo',
       minWidth: 150,
-      align: 'start'
+      align: 'right'
     },
     {
       id: 'importPrice',
       label: 'Giá nhập',
       minWidth: 150,
-      align: 'start',
+      align: 'right',
       format: (val) => `${val?.toLocaleString('vi-VN')}đ`
     },
     {
       id: 'exportPrice',
       label: 'Giá bán',
-      minWidth: 150,
-      align: 'start',
+      minWidth: 206,
+      align: 'right',
+      pr: 7,
       format: (val) => `${val?.toLocaleString('vi-VN')}đ`
     },
     {
@@ -510,13 +513,35 @@ const InventoryTab = () => {
   const handleCloseEditModal = () => {
     setSelectedInventory(null)
     setOpenEditModal(false)
-    fetchInventories(page, rowsPerPage, filter)
+    // fetchInventories(page, rowsPerPage, filter)
   }
 
   const handleCloseDeleteModal = () => {
     setSelectedInventory(null)
     setOpenDeleteModal(false)
-    fetchInventories(page, rowsPerPage, filter)
+    // fetchInventories(page, rowsPerPage, filter)
+  }
+
+  const handleSave = async (inventory, type, inventoryId) => {
+    if (type === 'edit') {
+      const edit = await updateInventoryById(inventoryId, inventory)
+      if (edit) {
+        const data = await getInventoryId(inventoryId)
+        if (data) {
+          Save(data)
+        }
+      }
+    } else if (type === 'delete') {
+      await deleteInventoryById(inventory)
+      fetchInventories(page, rowsPerPage, filter)
+      // const deleteInventory = await deleteInventoryById(inventory)
+      // if (deleteInventory) {
+      //   const data = await getInventoryId(inventory)
+      //   if (data) {
+      //     Save(data)
+      //   }
+      // }
+    }
   }
 
   const isEqual = (obj1, obj2) => JSON.stringify(obj1) === JSON.stringify(obj2)
@@ -597,7 +622,8 @@ const InventoryTab = () => {
                       maxWidth: '130px',
                       paddingLeft: '20px'
                     }),
-                    px: 1
+                    px: 1,
+                    pr: col.pr
                   }}
                 >
                   {col.label}
@@ -733,7 +759,8 @@ const InventoryTab = () => {
                           whiteSpace: 'nowrap',
                           overflow: 'hidden',
                           textOverflow: 'ellipsis',
-                          ...(col.maxWidth && { maxWidth: col.maxWidth })
+                          ...(col.maxWidth && { maxWidth: col.maxWidth }),
+                          pr: col.pr
                         }}
                         title={
                           typeof content === 'string' ? content : undefined
@@ -786,7 +813,7 @@ const InventoryTab = () => {
         open={openEditModal}
         onClose={handleCloseEditModal}
         inventory={selectedInventory}
-        onSave={updateInventoryById}
+        onSave={handleSave}
         variants={variants}
         warehouses={warehouses}
         formatCurrency={formatCurrency}
@@ -796,7 +823,7 @@ const InventoryTab = () => {
         open={openDeleteModal}
         onClose={handleCloseDeleteModal}
         inventory={selectedInventory}
-        onSave={deleteInventoryById}
+        onSave={handleSave}
       />
     </Paper>
   )

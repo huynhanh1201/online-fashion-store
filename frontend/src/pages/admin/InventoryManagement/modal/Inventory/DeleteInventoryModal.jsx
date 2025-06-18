@@ -10,20 +10,27 @@ import {
   Divider
 } from '@mui/material'
 import { toast } from 'react-toastify'
-
+import StyleAdmin from '~/assets/StyleAdmin.jsx'
 const DeleteInventoryModal = ({ open, onClose, inventory, onSave }) => {
   const handleDelete = async () => {
     try {
-      await onSave(inventory._id)
+      await onSave(inventory._id, 'delete')
       toast.success('Xóa tồn kho thành công')
       onClose()
     } catch {
       toast.error('Xóa tồn kho thất bại')
     }
   }
-  console.log('inventory', inventory)
   return (
-    <Dialog open={open} onClose={onClose} fullWidth maxWidth='md'>
+    <Dialog
+      open={open}
+      onClose={onClose}
+      fullWidth
+      maxWidth='md'
+      BackdropProps={{
+        sx: StyleAdmin.OverlayModal
+      }}
+    >
       <DialogTitle>Ẩn tồn kho</DialogTitle>
       <Divider />
       <DialogContent>

@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react'
-import { useForm } from 'react-hook-form'
+import { useForm, Controller } from 'react-hook-form'
 
 import {
   Dialog,
@@ -28,6 +28,7 @@ const AddDiscountModal = ({ open, onClose, onAdded }) => {
     handleSubmit,
     reset,
     setValue,
+    control,
     formState: { isSubmitting }
   } = useForm({
     defaultValues: {
@@ -143,32 +144,42 @@ const AddDiscountModal = ({ open, onClose, onAdded }) => {
                 </Select>
               </FormControl>
 
-              <TextField
-                label={
-                  type === 'fixed' ? 'Giá trị giảm (VNĐ)' : 'Giá trị giảm (%)'
-                }
-                type='number'
-                fullWidth
-                margin='normal'
-                inputProps={{
-                  min: 0,
-                  max: type === 'percent' ? 100 : undefined
+              <Controller
+                name='amount'
+                control={control}
+                rules={{
+                  required: 'Vui lòng nhập giá trị giảm',
+                  validate: (value) => {
+                    const number = parseInt(value)
+                    if (isNaN(number)) return 'Giá trị không hợp lệ'
+                    if (number < 1)
+                      return 'Giá trị giảm phải lớn hơn hoặc bằng 1'
+                    if (type === 'percent' && number > 100)
+                      return 'Phần trăm giảm tối đa là 100%'
+                    return true
+                  }
                 }}
-                {...register('amount', {
-                  required: true,
-                  min: {
-                    value: 0,
-                    message: 'Giá trị giảm phải lớn hơn hoặc bằng 0'
-                  },
-                  max:
-                    type === 'percent'
-                      ? {
-                          value: 100,
-                          message: 'Phần trăm giảm tối đa là 100%'
-                        }
-                      : undefined
-                })}
-                sx={StyleAdmin.InputCustom}
+                render={({
+                  field: { onChange, value },
+                  fieldState: { error }
+                }) => (
+                  <TextField
+                    label={
+                      type === 'fixed' ? 'Giá trị giảm (đ)' : 'Giá trị giảm (%)'
+                    }
+                    type='text'
+                    fullWidth
+                    margin='normal'
+                    value={formatNumber(value)}
+                    onChange={(e) => {
+                      const rawValue = parseNumber(e.target.value)
+                      onChange(rawValue)
+                    }}
+                    error={!!error}
+                    helperText={error?.message}
+                    sx={StyleAdmin.InputCustom}
+                  />
+                )}
               />
 
               <FormControlLabel
@@ -180,30 +191,66 @@ const AddDiscountModal = ({ open, onClose, onAdded }) => {
 
             {/* Cột phải */}
             <Box flex={1}>
-              <TextField
-                label='Giá trị đơn hàng tối thiểu'
-                type='text'
-                fullWidth
-                margin='normal'
-                value={formatNumber(minOrderValue)}
-                onChange={(e) => {
-                  const rawValue = parseNumber(e.target.value)
-                  setValue('minOrderValue', rawValue)
+              {/* Giá trị đơn hàng tối thiểu */}
+              <Controller
+                name='minOrderValue'
+                control={control}
+                rules={{
+                  required: 'Vui lòng nhập giá trị đơn hàng tối thiểu',
+                  validate: (value) =>
+                    parseInt(value) >= 1 ||
+                    'Giá trị tối thiểu phải lớn hơn hoặc bằng 1'
                 }}
-                sx={StyleAdmin.InputCustom}
+                render={({
+                  field: { onChange, value },
+                  fieldState: { error }
+                }) => (
+                  <TextField
+                    label='Giá trị đơn hàng tối thiểu (đ)'
+                    type='text'
+                    fullWidth
+                    margin='normal'
+                    value={formatNumber(value)}
+                    onChange={(e) => {
+                      const rawValue = parseNumber(e.target.value)
+                      onChange(rawValue)
+                    }}
+                    error={!!error}
+                    helperText={error?.message}
+                    sx={StyleAdmin.InputCustom}
+                  />
+                )}
               />
 
-              <TextField
-                label='Số lượt sử dụng tối đa'
-                type='text'
-                fullWidth
-                margin='normal'
-                value={formatNumber(usageLimit)}
-                onChange={(e) => {
-                  const rawValue = parseNumber(e.target.value)
-                  setValue('usageLimit', rawValue)
+              {/* Số lượt sử dụng tối đa */}
+              <Controller
+                name='usageLimit'
+                control={control}
+                rules={{
+                  required: 'Vui lòng nhập số lượt sử dụng',
+                  validate: (value) =>
+                    parseInt(value) >= 1 ||
+                    'Số lượt sử dụng phải lớn hơn hoặc bằng 1'
                 }}
-                sx={StyleAdmin.InputCustom}
+                render={({
+                  field: { onChange, value },
+                  fieldState: { error }
+                }) => (
+                  <TextField
+                    label='Số lượt sử dụng tối đa'
+                    type='text'
+                    fullWidth
+                    margin='normal'
+                    value={formatNumber(value)}
+                    onChange={(e) => {
+                      const rawValue = parseNumber(e.target.value)
+                      onChange(rawValue)
+                    }}
+                    error={!!error}
+                    helperText={error?.message}
+                    sx={StyleAdmin.InputCustom}
+                  />
+                )}
               />
 
               <TextField

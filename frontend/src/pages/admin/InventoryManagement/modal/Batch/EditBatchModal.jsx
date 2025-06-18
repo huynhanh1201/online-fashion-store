@@ -10,7 +10,7 @@ import {
   Divider
 } from '@mui/material'
 import { useForm, Controller } from 'react-hook-form'
-
+import StyleAdmin from '~/assets/StyleAdmin.jsx'
 const EditBatchModal = ({
   open,
   onClose,
@@ -46,14 +46,22 @@ const EditBatchModal = ({
       importPrice: Number(data.importPrice)
     }
 
-    onSave(batch._id, payload)
+    onSave(payload, 'edit', batch._id)
     onClose()
   }
 
   if (!batch) return null
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth='sm' fullWidth>
+    <Dialog
+      open={open}
+      onClose={onClose}
+      maxWidth='sm'
+      fullWidth
+      BackdropProps={{
+        sx: StyleAdmin.OverlayModal
+      }}
+    >
       <DialogTitle>Sửa thông tin Lô Hàng</DialogTitle>
       <Divider />
       <form onSubmit={handleSubmit(onSubmit)}>
@@ -92,7 +100,7 @@ const EditBatchModal = ({
                 }}
                 render={({ field }) => (
                   <TextField
-                    label='Giá nhập'
+                    label='Giá nhập (đ)'
                     type='text'
                     fullWidth
                     value={formatCurrency(field.value)}

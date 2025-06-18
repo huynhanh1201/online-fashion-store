@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { getDiscounts } from '~/services/admin/discountService'
+import { getDiscounts, getDiscountById } from '~/services/admin/discountService'
 
 const useDiscounts = () => {
   const [discounts, setDiscounts] = useState([])
@@ -31,11 +31,27 @@ const useDiscounts = () => {
     }
     setLoading(false)
   }
+  const fetchDiscountById = async (id) => {
+    try {
+      const discount = await getDiscountById(id)
+      return discount
+    } catch (error) {
+      console.error('Error fetching discount by ID:', error)
+      return []
+    }
+  }
 
-  // useEffect(() => {
-  //   fetchDiscounts(initialPage)
-  // }, [initialPage])
-  return { discounts, totalPages, loading, fetchDiscounts }
+  const saveDiscount = (data) => {
+    setDiscounts((prev) => prev.map((d) => (d._id === data._id ? data : d)))
+  }
+  return {
+    discounts,
+    totalPages,
+    loading,
+    fetchDiscounts,
+    fetchDiscountById,
+    saveDiscount
+  }
 }
 
 export default useDiscounts
