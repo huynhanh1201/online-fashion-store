@@ -4,6 +4,7 @@ import { env } from '~/config/environment'
 import { PaymentSessionDraftModel } from '~/models/PaymentSessionDraftModel'
 import { orderHelpers } from '~/helpers/orderHelpers'
 import mongoose from 'mongoose'
+import { deliveriesService } from '~/services/deliveriesService'
 
 // Thanh toán VNPAY
 const vnpayIPN = async (req) => {
@@ -101,7 +102,7 @@ const vnpayIPN = async (req) => {
       ])
 
       // Tạo đơn hàng vận chuyển (GHN)
-      await orderHelpers.handleCreateOrderForGHN(
+      await deliveriesService.createDeliveryOrder(
         reqBody,
         cartItems,
         order,

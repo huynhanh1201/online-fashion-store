@@ -1,23 +1,29 @@
 import { ghnAxios } from '~/utils/axiosClient'
+import { diliveriesHelpers } from '~/helpers/deliveriesHelpers'
 
-const getDelivery = async (reqBody) => {
+const getDeliveryFee = async (reqBody) => {
   // eslint-disable-next-line no-useless-catch
   try {
-    const { numberItemOrder } = reqBody
+    const { to_district_id, to_ward_code, cartItems } = reqBody
 
-    const length = 30
-    const width = 20
-    const height = 2 * numberItemOrder
-    const weight = 300 * numberItemOrder
+    const variantIds = diliveriesHelpers.getVariantIds(cartItems)
+
+    const variants = await diliveriesHelpers.getVariants(variantIds)
+
+    const variantItemsGHN =
+      await diliveriesHelpers.handleVariantItemsGHN(cartItems)
+
+    const totalWeightOrder = diliveriesHelpers.calculateTotalWeight(
+      cartItems,
+      variants
+    )
 
     const { data: dataResultGhn } = await ghnAxios.post('/shipping-order/fee', {
-      ...reqBody,
-      from_district_id: 1442,
-      from_ward_code: '21211',
-      length,
-      width,
-      height,
-      weight
+      service_type_id: 2,
+      to_district_id,
+      to_ward_code,
+      weight: totalWeightOrder,
+      items: variantItemsGHN
     })
 
     const result = { totalFeeShipping: dataResultGhn.data.total }
@@ -28,24 +34,28 @@ const getDelivery = async (reqBody) => {
   }
 }
 
-const createOrderDelivery = async (
+const createDeliveryOrder = async (
   reqBody,
+  cartItems,
   order,
   address,
-  variantItemsGHN,
-  numberItemOrder
+  variantMap
 ) => {
   // eslint-disable-next-line no-useless-catch
   try {
-    // Tạo đơn hàng cho đơn vị vận chuyển (GHN)
+    const variantIds = diliveriesHelpers.getVariantIds(cartItems)
 
-    const length = 30
-    const width = 20
-    const height = 2 * numberItemOrder
-    const weight = 300 * numberItemOrder
+    const variants = await diliveriesHelpers.getVariants(variantIds)
 
-    const bodyReqCreateOrderGnh = {
-      // Thông tin người nhận
+    const totalWeightOrder = diliveriesHelpers.calculateTotalWeight(
+      cartItems,
+      variants
+    )
+
+    const variantItemsGHN =
+      await diliveriesHelpers.handleVariantItemsGHN(cartItems)
+
+    const dataCreateDilivery = {
       to_name: address.fullName,
       to_phone: address.phone,
       to_address: address.address,
@@ -53,28 +63,27 @@ const createOrderDelivery = async (
       to_district_name: address.district,
       to_province_name: address.city,
 
-      // Kích thước & cân nặng
-      length,
-      width,
-      height,
-      weight,
-
-      // Dịch vụ giao hàng
       service_type_id: 2,
-      payment_type_id: 1,
-      cod_amount: reqBody.paymentMethod === 'COD' ? order.total : 0,
+      payment_type_id: reqBody.paymentMethod === 'COD' ? 2 : 1,
       required_note: 'KHONGCHOXEMHANG',
 
-      // Quản lý đơn hàng
-      client_order_code: order.code,
+      items: variantItemsGHN,
 
-      items: variantItemsGHN
+      weight: totalWeightOrder,
+
+      cod_amount: order.total
     }
 
     const result = await ghnAxios.post(
       '/shipping-order/create',
-      bodyReqCreateOrderGnh
+      dataCreateDilivery
     )
+
+    const clientFee = reqBody.shippingFee
+
+    const serverFee = result.data.data.total_fee
+
+    diliveriesHelpers.isShippingFeeValid(clientFee, serverFee)
 
     return result
   } catch (err) {
@@ -83,6 +92,6 @@ const createOrderDelivery = async (
 }
 
 export const deliveriesService = {
-  getDelivery,
-  createOrderDelivery
+  getDeliveryFee,
+  createDeliveryOrder
 }
