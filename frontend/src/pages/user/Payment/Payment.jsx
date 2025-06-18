@@ -283,6 +283,7 @@ const Payment = () => {
 
   const totalOrder = Math.max(subTotal - discount, 0)
   const totalFeeShipping = totalOrder + shippingPrice
+  const totalCart = subTotal
 
   useEffect(() => {
     const isOnPaymentPage = location.pathname.startsWith('/payment')
@@ -395,7 +396,7 @@ const Payment = () => {
     const orderData = {
       cartItems: sanitizedCartItems,
       shippingAddressId: selectedAddress._id,
-      total: totalOrder,
+      total: totalCart,
       paymentMethod,
       note: note.trim() || null,
       couponCode: voucherApplied ? voucherInput : null,

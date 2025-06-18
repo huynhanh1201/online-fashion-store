@@ -451,11 +451,11 @@ const Cart = () => {
                       : formatPrice(first.amount)
                   return (
                     <>
-                      Chỉ cần mua thêm{' '}
+                      Chỉ cần mua thêm
                       <Box component="span" sx={{ fontWeight: 600, mx: 0.5 }}>
                         {formatPrice(first.minOrderValue - totalPrice)}
                       </Box>
-                      để nhận mã giảm{' '}
+                      để nhận mã giảm
                       <Box component="span" sx={{ fontWeight: 600, mx: 0.5 }}>
                         {discountText}
                       </Box>{' '}

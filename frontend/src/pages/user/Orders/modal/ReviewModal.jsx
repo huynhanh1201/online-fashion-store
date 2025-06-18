@@ -20,6 +20,7 @@ import {
   LinearProgress,
   Stack,
   Tooltip,
+  Snackbar,
 } from '@mui/material'
 import {
   PhotoCamera,
@@ -30,6 +31,58 @@ import {
   Info,
 } from '@mui/icons-material'
 import { contentFilter } from '~/utils/contentFilter'
+import { URI, CloudinaryVideoFolder, CloudinaryImageFolder } from '~/utils/constants'
+import { optimizeCloudinaryUrl } from '~/utils/cloudinary'
+
+const uploadToCloudinary = async (file, folder = CloudinaryImageFolder) => {
+  const formData = new FormData()
+  formData.append('file', file)
+  formData.append('upload_preset', 'demo_unsigned')
+  formData.append('folder', folder)
+
+  // Determine resource type based on file type
+  const isVideo = file.type.startsWith('video/')
+  if (isVideo) {
+    formData.append('resource_type', 'video')
+  }
+
+  console.log('Uploading to Cloudinary:', {
+    fileName: file.name,
+    fileType: file.type,
+    fileSize: file.size,
+    folder: folder,
+    resourceType: isVideo ? 'video' : 'image',
+    uploadURL: URI
+  })
+
+  const res = await fetch(URI, {
+    method: 'POST',
+    body: formData
+  })
+
+  if (!res.ok) {
+    console.error('Upload failed with status:', res.status)
+    const errorData = await res.json().catch(() => ({}))
+    console.error('Error details:', errorData)
+    throw new Error('Upload thất bại')
+  }
+
+  const data = await res.json()
+  console.log('Cloudinary response:', data)
+  console.log('Final URL:', data.secure_url)
+
+  return data.secure_url
+}
+
+// Function to generate video thumbnail from Cloudinary URL
+const getVideoThumbnail = (videoUrl) => {
+  if (!videoUrl) return null
+  // Convert video URL to thumbnail URL
+  // Example: https://res.cloudinary.com/demo/video/upload/v1234/folder/video.mp4
+  // To: https://res.cloudinary.com/demo/video/upload/so_0,w_200,h_120,c_fill,f_jpg/v1234/folder/video.jpg
+  return videoUrl.replace('/video/upload/', '/video/upload/so_0,w_200,h_120,c_fill,f_jpg/')
+    .replace(/\.(mp4|webm|ogg)$/, '.jpg')
+}
 
 const ReviewModal = ({ open, onClose, onSubmit, orderItems }) => {
   const [rating, setRating] = useState(0)
@@ -38,6 +91,7 @@ const ReviewModal = ({ open, onClose, onSubmit, orderItems }) => {
   const [videos, setVideos] = useState([])
   const [uploading, setUploading] = useState(false)
   const [contentValidation, setContentValidation] = useState({ isValid: true, violations: [], warnings: [] })
+  const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'info' })
   const inputRef = useRef(null)
   const imageInputRef = useRef(null)
   const videoInputRef = useRef(null)
@@ -46,9 +100,18 @@ const ReviewModal = ({ open, onClose, onSubmit, orderItems }) => {
   const MAX_IMAGES = 2
   const MAX_VIDEOS = 2
   const MAX_IMAGE_SIZE = 5 * 1024 * 1024 // 5MB
-  const MAX_VIDEO_SIZE = 50 * 1024 * 1024 // 50MB
+  const MAX_VIDEO_SIZE = 10 * 1024 * 1024 // 50MB
   const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp']
   const ALLOWED_VIDEO_TYPES = ['video/mp4', 'video/webm', 'video/ogg']
+
+  // Snackbar helper function
+  const showSnackbar = (message, severity = 'info') => {
+    setSnackbar({ open: true, message, severity })
+  }
+
+  const handleCloseSnackbar = () => {
+    setSnackbar(prev => ({ ...prev, open: false }))
+  }
 
   useEffect(() => {
     if (open) {
@@ -60,6 +123,7 @@ const ReviewModal = ({ open, onClose, onSubmit, orderItems }) => {
       setVideos([])
       setContentValidation({ isValid: true, violations: [], warnings: [] })
       setUploading(false)
+      setSnackbar({ open: false, message: '', severity: 'info' })
     }
   }, [open])
 
@@ -77,84 +141,144 @@ const ReviewModal = ({ open, onClose, onSubmit, orderItems }) => {
   }
 
   // Handle image upload
-  const handleImageUpload = (event) => {
+  const handleImageUpload = async (event) => {
     const files = Array.from(event.target.files)
 
     if (images.length + files.length > MAX_IMAGES) {
-      alert(`Chỉ được upload tối đa ${MAX_IMAGES} ảnh`)
+      showSnackbar(`Chỉ được upload tối đa ${MAX_IMAGES} ảnh`, 'warning')
       return
     }
 
     const validFiles = files.filter(file => {
       if (!ALLOWED_IMAGE_TYPES.includes(file.type)) {
-        alert(`File ${file.name} không đúng định dạng. Chỉ chấp nhận: JPG, PNG, WebP`)
+        showSnackbar(`File ${file.name} không đúng định dạng. Chỉ chấp nhận: JPG, PNG, WebP`, 'error')
         return false
       }
       if (file.size > MAX_IMAGE_SIZE) {
-        alert(`File ${file.name} quá lớn. Kích thước tối đa: 5MB`)
+        showSnackbar(`File ${file.name} quá lớn. Kích thước tối đa: 5MB`, 'error')
         return false
       }
       return true
     })
 
+    if (validFiles.length === 0) return
+
     setUploading(true)
 
-    validFiles.forEach(file => {
-      const reader = new FileReader()
-      reader.onload = (e) => {
-        setImages(prev => [...prev, {
-          id: Date.now() + Math.random(),
-          file,
-          preview: e.target.result,
-          name: file.name,
-          size: file.size
-        }])
-        setUploading(false)
+    try {
+      // Upload từng file lên Cloudinary
+      const uploadPromises = validFiles.map(async (file) => {
+        try {
+          // Tạo preview trước
+          const preview = await new Promise((resolve) => {
+            const reader = new FileReader()
+            reader.onload = (e) => resolve(e.target.result)
+            reader.readAsDataURL(file)
+          })
+
+          // Upload lên Cloudinary
+          const cloudinaryUrl = await uploadToCloudinary(file, CloudinaryImageFolder)
+
+          // Thêm vào danh sách với URL từ Cloudinary
+          const newImage = {
+            id: Date.now() + Math.random(),
+            url: cloudinaryUrl,
+            preview: preview, // Giữ preview để hiển thị ngay
+            name: file.name,
+            size: file.size
+          }
+
+          console.log('New image object:', newImage)
+          setImages(prev => [...prev, newImage])
+          return newImage
+        } catch (error) {
+          console.error('Lỗi upload ảnh:', error)
+          showSnackbar(`Không thể upload ảnh ${file.name}. Vui lòng thử lại.`, 'error')
+          throw error
+        }
+      })
+
+      const results = await Promise.allSettled(uploadPromises)
+      const successCount = results.filter(result => result.status === 'fulfilled').length
+      const failureCount = results.filter(result => result.status === 'rejected').length
+
+      if (successCount > 0) {
+        showSnackbar(`Upload thành công ${successCount} ảnh${failureCount > 0 ? `, ${failureCount} ảnh thất bại` : ''}!`, 'success')
       }
-      reader.readAsDataURL(file)
-    })
+    } catch (error) {
+      console.error('Lỗi xử lý upload:', error)
+      showSnackbar('Có lỗi xảy ra khi upload ảnh. Vui lòng thử lại.', 'error')
+    } finally {
+      setUploading(false)
+    }
 
     // Reset input
     event.target.value = ''
   }
 
   // Handle video upload
-  const handleVideoUpload = (event) => {
+  const handleVideoUpload = async (event) => {
     const files = Array.from(event.target.files)
 
     if (videos.length + files.length > MAX_VIDEOS) {
-      alert(`Chỉ được upload tối đa ${MAX_VIDEOS} video`)
+      showSnackbar(`Chỉ được upload tối đa ${MAX_VIDEOS} video`, 'warning')
       return
     }
 
     const validFiles = files.filter(file => {
       if (!ALLOWED_VIDEO_TYPES.includes(file.type)) {
-        alert(`File ${file.name} không đúng định dạng. Chỉ chấp nhận: MP4, WebM, OGG`)
+        showSnackbar(`File ${file.name} không đúng định dạng. Chỉ chấp nhận: MP4, WebM, OGG`, 'error')
         return false
       }
       if (file.size > MAX_VIDEO_SIZE) {
-        alert(`File ${file.name} quá lớn. Kích thước tối đa: 50MB`)
+        showSnackbar(`File ${file.name} quá lớn. Kích thước tối đa: 10MB`, 'error')
         return false
       }
       return true
     })
 
+    if (validFiles.length === 0) return
+
     setUploading(true)
 
-    validFiles.forEach(file => {
-      const reader = new FileReader()
-      reader.onload = (e) => {
-        setVideos(prev => [...prev, {
-          id: Date.now() + Math.random(),
-          file,
-          preview: e.target.result,
-          name: file.name,
-          size: file.size
-        }])
-        setUploading(false)
+    try {
+      // Upload từng file lên Cloudinary
+      const uploadPromises = validFiles.map(async (file) => {
+        try {
+          // Upload lên Cloudinary
+          const cloudinaryUrl = await uploadToCloudinary(file, CloudinaryVideoFolder)
+
+          // Thêm vào danh sách với URL từ Cloudinary
+          const newVideo = {
+            id: Date.now() + Math.random(),
+            url: cloudinaryUrl,
+            name: file.name,
+            size: file.size
+          }
+
+          console.log('New video object:', newVideo)
+          setVideos(prev => [...prev, newVideo])
+          return newVideo
+        } catch (error) {
+          console.error('Lỗi upload video:', error)
+          showSnackbar(`Không thể upload video ${file.name}. Vui lòng thử lại.`, 'error')
+          throw error
+        }
+      })
+
+      const results = await Promise.allSettled(uploadPromises)
+      const successCount = results.filter(result => result.status === 'fulfilled').length
+      const failureCount = results.filter(result => result.status === 'rejected').length
+
+      if (successCount > 0) {
+        showSnackbar(`Upload thành công ${successCount} video${failureCount > 0 ? `, ${failureCount} video thất bại` : ''}!`, 'success')
       }
-      reader.readAsDataURL(file)
-    })
+    } catch (error) {
+      console.error('Lỗi xử lý upload:', error)
+      showSnackbar('Có lỗi xảy ra khi upload video. Vui lòng thử lại.', 'error')
+    } finally {
+      setUploading(false)
+    }
 
     // Reset input
     event.target.value = ''
@@ -184,8 +308,8 @@ const ReviewModal = ({ open, onClose, onSubmit, orderItems }) => {
       onSubmit({
         rating,
         comment: contentValidation.filteredText || comment,
-        images: images.map(img => img.file),
-        videos: videos.map(vid => vid.file)
+        images: images.map(img => img.url),
+        videos: videos.map(vid => vid.url)
       })
     }
   }
@@ -236,7 +360,7 @@ const ReviewModal = ({ open, onClose, onSubmit, orderItems }) => {
                 }}
               >
                 <Avatar
-                  src={item?.color?.image || '/default.jpg'}
+                  src={item?.color?.image ? optimizeCloudinaryUrl(item.color.image, { width: 64, height: 64 }) : '/default.jpg'}
                   variant="rounded"
                   sx={{ width: 64, height: 64 }}
                 />
@@ -381,7 +505,7 @@ const ReviewModal = ({ open, onClose, onSubmit, orderItems }) => {
               </Button>
             </Tooltip>
 
-            <Tooltip title={`Tối đa ${MAX_VIDEOS} video, mỗi video < 50MB`}>
+            <Tooltip title={`Tối đa ${MAX_VIDEOS} video, mỗi video < 10MB`}>
               <Button
                 variant="outlined"
                 startIcon={<Videocam />}
@@ -403,7 +527,7 @@ const ReviewModal = ({ open, onClose, onSubmit, orderItems }) => {
                   <CardMedia
                     component="img"
                     height="120"
-                    image={image.preview}
+                    image={image.url ? optimizeCloudinaryUrl(image.url, { width: 200, height: 120 }) : image.preview}
                     alt={image.name}
                     sx={{ objectFit: 'cover' }}
                   />
@@ -436,17 +560,50 @@ const ReviewModal = ({ open, onClose, onSubmit, orderItems }) => {
             {videos.map((video) => (
               <Grid item xs={6} sm={4} md={3} key={video.id}>
                 <Card sx={{ position: 'relative' }}>
-                  <Box
-                    sx={{
-                      height: 120,
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      backgroundColor: 'grey.100'
-                    }}
-                  >
-                    <Videocam sx={{ fontSize: 40, color: 'grey.500' }} />
-                  </Box>
+                  {video.url ? (
+                    <CardMedia
+                      component="img"
+                      height="120"
+                      image={getVideoThumbnail(video.url)}
+                      alt={video.name}
+                      sx={{
+                        objectFit: 'cover',
+                        position: 'relative'
+                      }}
+                    />
+                  ) : (
+                    <Box
+                      sx={{
+                        height: 120,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        backgroundColor: 'grey.100'
+                      }}
+                    >
+                      <Videocam sx={{ fontSize: 40, color: 'grey.500' }} />
+                    </Box>
+                  )}
+                  {/* Video play overlay */}
+                  {video.url && (
+                    <Box
+                      sx={{
+                        position: 'absolute',
+                        top: '50%',
+                        left: '50%',
+                        transform: 'translate(-50%, -50%)',
+                        backgroundColor: 'rgba(0,0,0,0.6)',
+                        borderRadius: '50%',
+                        width: 40,
+                        height: 40,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center'
+                      }}
+                    >
+                      <Videocam sx={{ fontSize: 24, color: 'white' }} />
+                    </Box>
+                  )}
                   <IconButton
                     size="small"
                     onClick={() => removeVideo(video.id)}
@@ -480,7 +637,7 @@ const ReviewModal = ({ open, onClose, onSubmit, orderItems }) => {
             </Typography>
             <ul style={{ margin: '4px 0', paddingLeft: '20px', fontSize: '0.875rem' }}>
               <li>Ảnh: JPG, PNG, WebP - Tối đa 5MB/ảnh</li>
-              <li>Video: MP4, WebM, OGG - Tối đa 50MB/video</li>
+              <li>Video: MP4, WebM, OGG - Tối đa 10MB/video</li>
               <li>Chỉ upload ảnh/video liên quan đến sản phẩm</li>
               <li>Không upload nội dung nhạy cảm hoặc vi phạm</li>
             </ul>
@@ -507,6 +664,23 @@ const ReviewModal = ({ open, onClose, onSubmit, orderItems }) => {
           {uploading ? 'Đang tải...' : 'Gửi đánh giá'}
         </Button>
       </DialogActions>
+
+      {/* Snackbar for notifications */}
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={4000}
+        onClose={handleCloseSnackbar}
+        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+      >
+        <Alert
+          onClose={handleCloseSnackbar}
+          severity={snackbar.severity}
+          variant="filled"
+          sx={{ width: '100%' }}
+        >
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </Dialog>
   )
 }
