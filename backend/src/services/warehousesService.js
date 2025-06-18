@@ -45,7 +45,11 @@ const createWarehouse = async (reqBody) => {
       district: reqBody.district,
       city: reqBody.city,
 
-      destroy: false
+      destroy: false,
+
+      wardId: reqBody.wardId,
+      districtId: reqBody.districtId,
+      cityId: reqBody.cityId
     }
 
     const warehouses = await WarehouseModel.create(newWarehouse)

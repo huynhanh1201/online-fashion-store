@@ -38,6 +38,22 @@ const warehouseSchema = new Schema(
     destroy: {
       type: Boolean,
       default: false // false = chưa xóa
+    },
+
+    districtId: {
+      type: String,
+      required: true,
+      trim: true
+    },
+    wardId: {
+      type: String,
+      required: true, // Phường
+      trim: true
+    },
+    cityId: {
+      type: String,
+      required: true, // Thành phố/Tỉnh
+      trim: true
     }
   },
   {
