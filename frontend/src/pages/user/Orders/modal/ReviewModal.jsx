@@ -31,7 +31,7 @@ import {
   Info,
 } from '@mui/icons-material'
 import { contentFilter } from '~/utils/contentFilter'
-import { URI, CloudinaryVideoFolder, CloudinaryImageFolder } from '~/utils/constants'
+import { CLOUD_NAME, CloudinaryVideoFolder, CloudinaryImageFolder } from '~/utils/constants'
 import { optimizeCloudinaryUrl } from '~/utils/cloudinary'
 
 const uploadToCloudinary = async (file, folder = CloudinaryImageFolder) => {
@@ -40,22 +40,22 @@ const uploadToCloudinary = async (file, folder = CloudinaryImageFolder) => {
   formData.append('upload_preset', 'demo_unsigned')
   formData.append('folder', folder)
 
-  // Determine resource type based on file type
   const isVideo = file.type.startsWith('video/')
-  if (isVideo) {
-    formData.append('resource_type', 'video')
-  }
+  const resourceType = isVideo ? 'video' : 'image'
+
+  // Tạo URL động theo loại file
+  const uploadURL = `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/${resourceType}/upload`
 
   console.log('Uploading to Cloudinary:', {
     fileName: file.name,
     fileType: file.type,
     fileSize: file.size,
     folder: folder,
-    resourceType: isVideo ? 'video' : 'image',
-    uploadURL: URI
+    resourceType: resourceType,
+    uploadURL: uploadURL
   })
 
-  const res = await fetch(URI, {
+  const res = await fetch(uploadURL, {
     method: 'POST',
     body: formData
   })
@@ -69,10 +69,10 @@ const uploadToCloudinary = async (file, folder = CloudinaryImageFolder) => {
 
   const data = await res.json()
   console.log('Cloudinary response:', data)
-  console.log('Final URL:', data.secure_url)
-
   return data.secure_url
 }
+
+
 
 // Function to generate video thumbnail from Cloudinary URL
 const getVideoThumbnail = (videoUrl) => {
