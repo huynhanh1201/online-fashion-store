@@ -62,6 +62,24 @@ export function useOrder() {
       setOrderDetailLoading(false)
     }
   }, [])
+  // Hủy đơn hàng
+  const cancelOrder = useCallback(async (orderId) => {
+    setLoading(true)
+    setError(null)
+    try {
+      const data = await orderService.updateOrder(orderId, {
+        status: 'Cancelled', // hoặc 'user_cancelled' tùy theo API
+    
+      })
+      setSuccess(data)
+      return data
+    } catch (err) {
+      setError(err)
+      throw err
+    } finally {
+      setLoading(false)
+    }
+  }, [])
 
   return {
     // trạng thái tạo đơn
@@ -81,5 +99,8 @@ export function useOrder() {
     orderDetailLoading,
     orderDetailError,
     orderDetail,
+
+    // hủy đơn
+    cancelOrder,
   }
 }

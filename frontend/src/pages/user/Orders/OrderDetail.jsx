@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import { useState, useEffect } from 'react'
 import {
   Box,
@@ -11,13 +12,15 @@ import {
   Button,
   Snackbar,
   Alert,
-  Stack
+  Card,
+  CardContent,
+  Stack,
 } from '@mui/material'
 import { useParams, useNavigate } from 'react-router-dom'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack'
 import { useOrderDetail } from '~/hooks/useOrderDetail'
 import ReviewModal from './modal/ReviewModal'
-import { createReview, getUserReviews, updateReview } from '~/services/reviewService'
+import { createReview, getUserReviews } from '~/services/reviewService'
 import { useSelector } from 'react-redux'
 import { selectCurrentUser } from '~/redux/user/userSlice'
 import { optimizeCloudinaryUrl } from '~/utils/cloudinary'
@@ -38,28 +41,23 @@ const OrderDetail = () => {
 
   const [snackbarOpen, setSnackbarOpen] = useState(false)
   const [openReviewModal, setOpenReviewModal] = useState(false)
-  const [reviewedMap, setReviewedMap] = useState({})
-
+  const [hasReviewed, setHasReviewed] = useState(false)     // Track if order is reviewed
   const [selectedProduct, setSelectedProduct] = useState(null)
-
 
   useEffect(() => {
     const fetchUserReviews = async () => {
-      if (!currentUser?._id) return
+      if (!currentUser?._id || !orderId) return
       try {
         const reviews = await getUserReviews(currentUser._id)
-        const map = {}
-        reviews.forEach(r => {
-          const productId = r.productId
-          map[productId] = r._id
-        })
-        setReviewedMap(map)
+        // Check if any review exists for this orderId
+        const orderReviewed = reviews.some((review) => review.orderId === orderId)
+        setHasReviewed(orderReviewed)
       } catch (err) {
         console.error('Lỗi khi lấy đánh giá người dùng:', err)
       }
     }
     fetchUserReviews()
-  }, [currentUser])
+  }, [currentUser, orderId])
 
   if (loading) return <CircularProgress />
   if (error) return <Typography color="error">Lỗi: {error.message || 'Có lỗi xảy ra'}</Typography>
@@ -67,7 +65,7 @@ const OrderDetail = () => {
 
   const [label, color] = statusLabels[order.status] || ['Không xác định', 'default']
   const totalProductsPrice = items.reduce((sum, item) => sum + item.price * item.quantity, 0)
-  const formatPrice = (val) => typeof val === 'number' ? val.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' }) : '0₫'
+  const formatPrice = (val) => (typeof val === 'number' ? val.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' }) : '0₫')
 
   // Group items by product ID to handle variants
   const productGroups = items.reduce((groups, item) => {
@@ -80,7 +78,7 @@ const OrderDetail = () => {
         productName: item.productId?.name || 'Không xác định',
         variants: [],
         totalQuantity: 0,
-        totalPrice: 0
+        totalPrice: 0,
       }
     }
 
@@ -91,12 +89,8 @@ const OrderDetail = () => {
   }, {})
 
   const uniqueProducts = Object.values(productGroups)
-  const isReviewed = (productId) => Object.prototype.hasOwnProperty.call(reviewedMap, productId?.toString())
-  // const allProductsReviewed = uniqueProducts.every(product => isReviewed(product.productId))
-
-  const isPaid = order.paymentStatus === 'paid'
   const isOrderCompleted = order.status === 'Delivered'
-  const isOrderCancellable = ['Pending', 'Processing'].includes(order.status) && !isPaid
+  const isOrderCancellable = ['Pending', 'Processing'].includes(order.status) && order.paymentStatus !== 'paid'
 
   const handleCancelOrder = async () => {
     try {
@@ -112,36 +106,44 @@ const OrderDetail = () => {
     setSelectedProduct(null)
   }
 
-
-  const handleSubmitReview = async ({ rating, comment }) => {
+  const handleSubmitReview = async ({ rating, comment, images = [], videos = [] }) => {
     try {
-      if (selectedProduct) {
-        // Review specific product
-        const productId = selectedProduct.productId
-        const userId = currentUser?._id
-        if (!productId || !userId) return
-
-        const reviewId = reviewedMap[productId]
-        if (reviewId) {
-          // Update existing review
-          await updateReview(reviewId, { rating, comment })
-        } else {
-          // Create new review
-          const review = await createReview({ productId, userId, rating, comment, orderId })
-          setReviewedMap(prev => ({ ...prev, [productId]: review._id }))
-        }
-      } else {
-        // Review all unreviewed products in the order
-        for (const product of uniqueProducts) {
-          const productId = product.productId
-          const userId = currentUser?._id
-          if (!productId || !userId || isReviewed(productId)) continue
-
-          const review = await createReview({ productId, userId, rating, comment, orderId })
-          setReviewedMap(prev => ({ ...prev, [productId]: review._id }))
-        }
+      if (hasReviewed) {
+        console.error('Đơn hàng này đã được đánh giá.')
+        return
       }
 
+      // Review all products in the order
+      for (const product of uniqueProducts) {
+        const productId = product.productId
+        const userId = currentUser?._id
+        if (!productId || !userId) continue
+
+        // Create FormData to handle file uploads
+        const formData = new FormData()
+        formData.append('productId', productId)
+        formData.append('userId', userId)
+        formData.append('rating', rating)
+        formData.append('comment', comment)
+        formData.append('orderId', orderId)
+
+        // Add images
+        images.forEach((image, index) => {
+          formData.append('images', image)
+        })
+
+        // Add videos  
+        videos.forEach((video, index) => {
+          formData.append('videos', video)
+        })
+
+        // Use createReview with FormData (assume service supports it)
+        await createReview(formData, { 
+          headers: { 'Content-Type': 'multipart/form-data' } 
+        })
+      }
+
+      setHasReviewed(true)     // Mark order as reviewed
       handleCloseModal()
       setSnackbarOpen(true)
     } catch (error) {
@@ -150,207 +152,322 @@ const OrderDetail = () => {
   }
 
   return (
-    <Box maxWidth="lg" mx="auto" p={2} sx={{ minHeight: '70vh' }}>
-      <Paper sx={{ p: 2 }}>
-        <Box display="flex" alignItems="center" mb={2}>
-          <IconButton onClick={() => navigate(-1)} aria-label="Quay lại">
-            <ArrowBackIcon />
-          </IconButton>
-          <Typography variant="h6" fontWeight="bold" ml={1}>Đơn hàng: {order.code}</Typography>
-          <Chip label={label} color={color} sx={{ ml: 'auto' }} />
-        </Box>
+    <Box maxWidth="lg" mx="auto" p={3} sx={{ minHeight: '70vh' }}>
+      <Card
+        sx={{
+          borderRadius: 3,
+          boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
+          border: '1px solid rgba(0,0,0,0.05)',
+        }}
+      >
+        <CardContent sx={{ p: 3 }}>
+          {/* Header - similar to OrderListPage */}
+          <Box display="flex" alignItems="center" mb={3}>
+            <IconButton
+              onClick={() => navigate(-1)}
+              aria-label="Quay lại"
+              sx={{
+                mr: 2,
+                backgroundColor: 'grey.100',
+                '&:hover': { backgroundColor: 'grey.200' }
+              }}
+            >
+              <ArrowBackIcon />
+            </IconButton>
+            <Typography
+              variant="h6"
+              fontWeight="600"
+              sx={{ color: '#1a3c7b' }}
+            >
+              #{order.code}
+            </Typography>
+            <Typography variant="body2" color="text.secondary" ml={2}>
+              {new Date(order.createdAt).toLocaleDateString('vi-VN')}
+            </Typography>
+            <Chip
+              label={label}
+              color={color === 'default' ? undefined : color}
+              sx={{
+                ml: 'auto',
+                fontWeight: 600,
+                fontSize: '0.75rem',
+                height: 32
+              }}
+            />
+          </Box>
 
-        <Typography variant="h6" fontWeight="bold" gutterBottom>
-          Địa Chỉ Nhận Hàng
-        </Typography>
+          {/* Shipping Address Section */}
+          <Box
+            sx={{
+              p: 2,
+              borderRadius: 2,
+              backgroundColor: 'grey.50',
+              border: '1px solid',
+              borderColor: 'grey.200',
+              mb: 3
+            }}
+          >
+            <Typography variant="h6" fontWeight="600" color="#1a3c7b" gutterBottom>
+              Địa Chỉ Nhận Hàng
+            </Typography>
+            <Stack spacing={1}>
+              <Typography fontWeight="600" fontSize="1.1rem">
+                {order.shippingAddress?.fullName}
+              </Typography>
+              <Typography color="text.secondary">
+                (+84) {order.shippingAddress?.phone}
+              </Typography>
+              <Typography color="text.secondary">
+                {order.shippingAddress?.address}, {order.shippingAddress?.ward}, {order.shippingAddress?.district}, {order.shippingAddress?.city}
+              </Typography>
+              {order.note && (
+                <Typography color="text.secondary" fontStyle="italic">
+                  Ghi chú: {order.note}
+                </Typography>
+              )}
+            </Stack>
+          </Box>
 
-        <Typography fontWeight="bold" mb={1}>{order.shippingAddress?.fullName}</Typography>
+          {/* Products Section - similar to OrderListPage */}
+          <Stack spacing={2}>
+            {uniqueProducts.map((product, index) => (
+              <Box key={product.productId}>
+                {product.variants.map((variant, variantIndex) => (
+                  <Box key={variant._id}>
+                    <Box
+                      sx={{
+                        p: 2,
+                        borderRadius: 2,
+                        backgroundColor: variantIndex % 2 === 0 ? 'transparent' : 'grey.50',
+                        border: '1px solid',
+                        borderColor: 'grey.200',
+                        transition: 'all 0.2s ease',
+                        '&:hover': {
+                          backgroundColor: 'grey.100',
+                          borderColor: '#1a3c7b',
+                          transform: 'translateX(4px)'
+                        }
+                      }}
+                    >
+                      <Box display="flex" justifyContent="space-between" alignItems="center">
+                        <Box display="flex" alignItems="center" gap={2}>
+                          <Avatar
+                            src={optimizeCloudinaryUrl(variant?.color?.image) || '/images/default.jpg'}
+                            alt={variant.name}
+                            sx={{
+                              width: 80,
+                              height: 80,
+                              borderRadius: 2,
+                              border: '2px solid white',
+                              boxShadow: '0 4px 8px rgba(0,0,0,0.1)'
+                            }}
+                            variant="rounded"
+                          />
+                          <Box>
+                            <Typography
+                              fontWeight={600}
+                              fontSize="1.1rem"
+                              sx={{ mb: 0.5 }}
+                            >
+                              {product.productName}
+                            </Typography>
+                            <Typography
+                              variant="body2"
+                              color="text.secondary"
+                              sx={{ mb: 0.5 }}
+                            >
+                              {variant.color?.name} • {variant.size}
+                            </Typography>
+                            <Chip
+                              label={`Số lượng: ${variant.quantity}`}
+                              size="small"
+                              variant="outlined"
+                              sx={{ fontSize: '0.7rem', height: 20 }}
+                            />
+                          </Box>
+                        </Box>
 
-        <Typography>
-          (+84) {order.shippingAddress?.phone}
-        </Typography>
-
-        <Typography>
-          {order.shippingAddress?.address}, {order.shippingAddress?.ward}, {order.shippingAddress?.district}, {order.shippingAddress?.city}
-        </Typography>
-
-        {order.note && (
-          <Typography color="text.secondary">
-            Ghi chú: {order.note}
-          </Typography>
-        )}
-
-        <Divider sx={{ my: 2 }} />
-
-
-        {/* <Typography fontWeight="bold" mb={1}>Sản phẩm đã mua:</Typography> */}
-
-        {uniqueProducts.map((product) => {
-          const productReviewed = isReviewed(product.productId)
-
-          return (
-            <Box key={product.productId} mb={3}>
-              {/* Tên sản phẩm */}
-              {/* <Typography fontWeight={600} fontSize="1.1rem" mb={1}>
-                Sản phẩm: {product.productName}
-              </Typography> */}
-
-              {/* Danh sách biến thể */}
-              {product.variants.map((variant, index) => (
-                <Box key={variant._id}>
-                  <Box
-                    display="flex"
-                    alignItems="center"
-                    justifyContent="space-between"
-                    px={1}
-                    py={1.5}
-                    gap={2}
-                  >
-                    {/* Ảnh sản phẩm */}
-                    <Avatar
-                      src={optimizeCloudinaryUrl(variant?.color?.image) || '/default.jpg'}
-                      variant="square"
-                      sx={{ width: 84, height: 84, borderRadius: 1 }}
-                    />
-
-                    {/* Thông tin sản phẩm và biến thể */}
-                    <Box flex={1}>
-                      <Typography fontWeight={500} >
-                        {product.productName}
-                      </Typography>
-                      <Typography variant='body2' color="text.primary">
-                        {variant.color?.name}, Size {variant.size}
-                      </Typography>
-                      <Typography variant='body2' fontWeight={500}>
-                        x{variant.quantity}
-                      </Typography>
+                        <Box textAlign="right">
+                          <Typography
+                            fontWeight={700}
+                            fontSize="1.2rem"
+                            color="#1a3c7b"
+                          >
+                            {formatPrice(variant.price * variant.quantity)}
+                          </Typography>
+                          {variant.originalPrice > variant.price && (
+                            <Typography
+                              variant="body2"
+                              color="text.disabled"
+                              sx={{ textDecoration: 'line-through', fontSize: '0.85rem' }}
+                            >
+                              {formatPrice(variant.originalPrice * variant.quantity)}
+                            </Typography>
+                          )}
+                        </Box>
+                      </Box>
                     </Box>
-
-                    {/* Giá tiền */}
-                    <Box textAlign="right" minWidth={100}>
-                      <Typography variant="body2" fontWeight={600}>
-                        {formatPrice(variant.price * variant.quantity)}
-                      </Typography>
-                      {variant.originalPrice > variant.price && (
-                        <Typography
-                          variant="body2"
-                          color="text.disabled"
-                          sx={{ textDecoration: 'line-through', fontSize: '0.85rem' }}
-                        >
-                          {formatPrice(variant.originalPrice * variant.quantity)}
-                        </Typography>
-                      )}
-                    </Box>
+                    {variantIndex < product.variants.length - 1 && (
+                      <Divider sx={{ my: 1 }} />
+                    )}
                   </Box>
+                ))}
 
-                  {/* Divider sau mỗi biến thể, trừ cái cuối */}
-                  {index < product.variants.length - 1 && <Divider />}
-                </Box>
-              ))}
-
-              {/* Nút hành động */}
-              <Box display="flex" justifyContent="flex-end" gap={1} mt={2}>
-                {isOrderCompleted && currentUser && (
+                {/* Action Buttons */}
+                <Box display="flex" justifyContent="flex-end" gap={2} mt={2}>
+                  {isOrderCompleted && currentUser && !hasReviewed && (
+                    <Button
+                      variant="contained"
+                      size="medium"
+                      sx={{
+                        backgroundColor: '#1A3C7B',
+                        color: '#fff',
+                        borderRadius: 2,
+                        textTransform: 'none',
+                        fontWeight: 600,
+                        '&:hover': {
+                          backgroundColor: '#162f63',
+                          boxShadow: '0 4px 12px rgba(26, 60, 123, 0.3)'
+                        },
+                      }}
+                      onClick={() => {
+                        setSelectedProduct(product)
+                        setOpenReviewModal(true)
+                      }}
+                    >
+                      Đánh giá
+                    </Button>
+                  )}
                   <Button
-                    variant="contained"
+                    variant="outlined"
                     size="medium"
                     sx={{
-                      backgroundColor: '#1A3C7B',
-                      color: '#fff',
+                      color: '#1a3c7b',
+                      borderColor: '#1a3c7b',
+                      borderRadius: 2,
+                      textTransform: 'none',
+                      fontWeight: 600,
                       '&:hover': {
-                        backgroundColor: '#162f63',
+                        borderColor: '#1a3c7b',
+                        backgroundColor: 'rgba(26, 60, 123, 0.04)',
                       },
                     }}
-                    onClick={() => {
-                      setSelectedProduct(product);
-                      setOpenReviewModal(true);
-                    }}
+                    onClick={() => navigate(`/productdetail/${product.productId}`)}
                   >
-                    {productReviewed ? 'Sửa đánh giá' : 'Đánh giá'}
+                    Mua lại
                   </Button>
-                )}
+                </Box>
 
-                <Button
-                  variant="outlined"
-                  size="medium"
-                  sx={{
-                    color: '#1A3C7B',
-                    borderColor: '#1A3C7B',
-                    '&:hover': {
-                      borderColor: '#1A3C7B',
-                      backgroundColor: 'rgba(26, 60, 123, 0.04)', // nhẹ khi hover
-                    },
-                  }}
-                  onClick={() => navigate(`/productdetail/${product.productId}`)}
-                >
-                  Mua lại
-                </Button>
+                {index < uniqueProducts.length - 1 && <Divider sx={{ my: 3 }} />}
               </Box>
+            ))}
+          </Stack>
 
+          {/* Order Summary - similar to OrderListPage style */}
+          <Divider sx={{ my: 3 }} />
 
-              {/* Divider giữa các sản phẩm */}
-              {uniqueProducts.indexOf(product) < uniqueProducts.length - 1 && (
-                <Divider sx={{ mt: 3 }} />
-              )}
-            </Box>
-          )
-        })}
+          <Box
+            sx={{
+              p: 2,
+              borderRadius: 2,
+              backgroundColor: 'primary.50',
+            }}
+          >
+            <Typography variant="h6" fontWeight="600" mb={2}>
+              Tóm tắt đơn hàng
+            </Typography>
 
+            <Stack spacing={1.5}>
+              <Box display="flex" justifyContent="space-between">
+                <Typography>Tổng tiền hàng:</Typography>
+                <Typography fontWeight={600}>{formatPrice(totalProductsPrice)}</Typography>
+              </Box>
+              <Box display="flex" justifyContent="space-between">
+                <Typography>Phí vận chuyển:</Typography>
+                <Typography fontWeight={600}>{formatPrice(order.shippingFee || 0)}</Typography>
+              </Box>
+              <Box display="flex" justifyContent="space-between">
+                <Typography>Giảm giá:</Typography>
+                <Typography fontWeight={600} color={order.couponId ? 'error' : 'inherit'}>
+                  -{formatPrice(order.discountAmount || 0)}
+                </Typography>
+              </Box>
+              <Divider />
+              <Box display="flex" justifyContent="space-between" alignItems="center">
+                <Typography variant="h6" fontWeight="600">
+                  Tổng cộng:
+                </Typography>
+                <Typography
+                  variant="h5"
+                  fontWeight="700"
+                  sx={{ color: '#1a3c7b' }}
+                >
+                  {formatPrice(order.total)}
+                </Typography>
+              </Box>
+              <Box display="flex" justifyContent="space-between" mt={1}>
+                <Typography fontWeight="600">Thanh toán:</Typography>
+                <Typography fontWeight={600}>
+                  {order.paymentMethod?.toLowerCase() === 'cod' ? 'Thanh toán khi nhận hàng (COD)' : 'VNPay'}
+                </Typography>
+              </Box>
+            </Stack>
+          </Box>
+        </CardContent>
+      </Card>
 
-        <Divider sx={{ my: 2 }} />
-        
-        <Box display="flex" justifyContent="space-between" mb={1}>
-          <Typography fontWeight="bold">Tổng tiền hàng:</Typography>
-          <Typography fontWeight={600}>{formatPrice(totalProductsPrice)}</Typography>
-        </Box>
-        <Box display="flex" justifyContent="space-between" mb={1}>
-          <Typography fontWeight="bold">Phí vận chuyển:</Typography>
-          <Typography fontWeight={600}>{formatPrice(order.shippingFee || 0)}</Typography>
-        </Box>
-        <Box display="flex" justifyContent="space-between" mb={1}>
-          <Typography fontWeight="bold">Mã giảm giá:</Typography>
-          <Typography fontWeight={600} color={order.couponId ? 'error' : 'inherit'}>
-            {formatPrice(order.discountAmount || 0)}
-          </Typography>
-        </Box>
-
-        <Divider sx={{ my: 2 }} />
-
-        <Box display="flex" justifyContent="space-between" mb={1}>
-          <Typography fontWeight="bold">Thành tiền:</Typography>
-          <Typography fontWeight="bold" variant="h5">
-            {formatPrice(order.total)}
-          </Typography>
-        </Box>
-
-        <Box display="flex" justifyContent="space-between" mt={2}>
-          <Typography fontWeight="bold">Phương thức thanh toán:</Typography>
-          <Typography>
-            {order.paymentMethod?.toLowerCase() === 'cod'
-              ? 'Thanh toán khi nhận hàng (COD)'
-              : 'VNPay'}
-          </Typography>
-        </Box>
-      </Paper>
-
-
-      {/* Cancel order button */}
+      {/* Cancel Order Button */}
       {isOrderCancellable && (
-        <Box display="flex" justifyContent="flex-end" mt={2}>
-          <Button variant="contained" color="warning" onClick={handleCancelOrder}>
-            Hủy đơn hàng
-          </Button>
-        </Box>
+        <Card sx={{
+          mt: 2,
+          borderRadius: 3,
+          boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
+          border: '1px solid rgba(255, 152, 0, 0.2)'
+        }}>
+          <CardContent>
+            <Box display="flex" justifyContent="space-between" alignItems="center">
+              <Box>
+                <Typography variant="h6" fontWeight="600" color="#1a3c7b">
+                  Hủy đơn hàng
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  Bạn có thể hủy đơn hàng này vì chưa thanh toán
+                </Typography>
+              </Box>
+              <Button
+                variant="outlined"
+                color="error"
+                sx={{
+                  borderRadius: 2,
+                  textTransform: 'none',
+                  fontWeight: 600
+                }}
+                onClick={handleCancelOrder}
+              >
+                Hủy đơn
+              </Button>
+            </Box>
+          </CardContent>
+        </Card>
       )}
 
+      {/* Enhanced Snackbar */}
       <Snackbar
         open={snackbarOpen}
-        autoHideDuration={3000}
+        autoHideDuration={4000}
         onClose={() => setSnackbarOpen(false)}
-        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
       >
-        <Alert onClose={() => setSnackbarOpen(false)} severity="success" sx={{ width: '100%' }}>
-          Cảm ơn bạn đã đánh giá!
+        <Alert
+          onClose={() => setSnackbarOpen(false)}
+          severity="success"
+          sx={{
+            width: '100%',
+            borderRadius: 2,
+            fontWeight: 600
+          }}
+        >
+          ⭐ Cảm ơn bạn đã đánh giá!
         </Alert>
       </Snackbar>
 
@@ -358,12 +475,11 @@ const OrderDetail = () => {
         open={openReviewModal}
         onClose={handleCloseModal}
         onSubmit={handleSubmitReview}
-        orderItems={selectedProduct ? selectedProduct.variants : items} // chỉ truyền variants của sản phẩm đang chọn
+        orderItems={selectedProduct ? selectedProduct.variants : items}
         products={selectedProduct ? [selectedProduct] : uniqueProducts}
       />
-
     </Box>
   )
 }
 
-export default OrderDetail
+export default OrderDetail    

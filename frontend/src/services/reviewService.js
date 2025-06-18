@@ -1,9 +1,9 @@
 import AuthorizedAxiosInstance from '~/utils/authorizedAxios'
 import { API_ROOT } from '~/utils/constants'
 
-export const createReview = async (data) => {
+export const createReview = async (data, config = {}) => {
   try {
-    const response = await AuthorizedAxiosInstance.post(`${API_ROOT}/v1/reviews`, data)
+    const response = await AuthorizedAxiosInstance.post(`${API_ROOT}/v1/reviews`, data, config)
     return response.data
   } catch (error) {
     throw error.response?.data || error.message || 'Gửi đánh giá thất bại'

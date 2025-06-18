@@ -17,7 +17,7 @@ import {
   addShippingAddress,
   updateShippingAddress
 } from '~/services/addressService'
-import { GHN_TOKEN_API } from '~/utils/constants'
+import addressGHNService from '~/services/addressGHNService'
 
 export default function AddAddressModal({
   open,
@@ -108,36 +108,11 @@ export default function AddAddressModal({
 
     const fetchProvinces = async () => {
       try {
-        const provinceRes = await fetch(
-          'https://online-gateway.ghn.vn/shiip/public-api/master-data/province',
-          {
-            method: 'GET',
-            headers: {
-              'Content-Type': 'application/json',
-              Token: GHN_TOKEN_API
-            }
-          }
-        )
-        if (!provinceRes.ok) {
-          throw new Error(
-            `Lỗi tải tỉnh/thành: ${provinceRes.status} ${provinceRes.statusText}`
-          )
-        }
-        const provinceData = await provinceRes.json()
-        if (provinceData.code !== 200 || !provinceData.data) {
-          throw new Error('Không có dữ liệu tỉnh/thành')
-        }
-        const provinces = provinceData.data.map((p) => ({
-          code: String(p.ProvinceID),
-          name: p.ProvinceName
-        }))
+        const provinces = await addressGHNService.getProvinces()
         setProvinces(provinces)
       } catch (error) {
         console.error('Lỗi khi tải tỉnh/thành:', error)
-        showSnackbar?.(
-          `Không thể tải dữ liệu tỉnh/thành: ${error.message}`,
-          'error'
-        )
+        showSnackbar?.(error.message, 'error')
       }
     }
 
@@ -155,40 +130,14 @@ export default function AddAddressModal({
 
     const fetchDistricts = async () => {
       try {
-        const districtRes = await fetch(
-          'https://online-gateway.ghn.vn/shiip/public-api/master-data/district',
-          {
-            method: 'POST',
-            headers: {
-              Token: GHN_TOKEN_API,
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ province_id: parseInt(formData.city) })
-          }
-        )
-        if (!districtRes.ok) {
-          throw new Error(
-            `Lỗi tải quận/huyện: ${districtRes.status} ${districtRes.statusText}`
-          )
-        }
-        const districtData = await districtRes.json()
-        if (districtData.code !== 200 || !districtData.data) {
-          throw new Error('Không có dữ liệu quận/huyện')
-        }
-        const districts = districtData.data.map((d) => ({
-          code: String(d.DistrictID),
-          name: d.DistrictName
-        }))
+        const districts = await addressGHNService.getDistricts(formData.city)
         setDistricts(districts)
         if (!isEditMode) {
           setFormData((prev) => ({ ...prev, district: '', ward: '' }))
         }
       } catch (error) {
         console.error('Lỗi khi tải quận/huyện:', error)
-        showSnackbar?.(
-          `Không thể tải dữ liệu quận/huyện: ${error.message}`,
-          'error'
-        )
+        showSnackbar?.(error.message, 'error')
       }
     }
 
@@ -205,39 +154,14 @@ export default function AddAddressModal({
 
     const fetchWards = async () => {
       try {
-        const wardRes = await fetch(
-          `https://online-gateway.ghn.vn/shiip/public-api/master-data/ward?district_id=${formData.district}`,
-          {
-            method: 'GET',
-            headers: {
-              Token: GHN_TOKEN_API,
-              'Content-Type': 'application/json'
-            }
-          }
-        )
-        if (!wardRes.ok) {
-          throw new Error(
-            `Lỗi tải phường/xã: ${wardRes.status} ${wardRes.statusText}`
-          )
-        }
-        const wardData = await wardRes.json()
-        if (wardData.code !== 200 || !wardData.data) {
-          throw new Error('Không có dữ liệu phường/xã')
-        }
-        const wards = wardData.data.map((w) => ({
-          code: String(w.WardCode),
-          name: w.WardName
-        }))
+        const wards = await addressGHNService.getWards(formData.district)
         setWards(wards)
         if (!isEditMode) {
           setFormData((prev) => ({ ...prev, ward: '' }))
         }
       } catch (error) {
         console.error('Lỗi khi tải phường/xã:', error)
-        showSnackbar?.(
-          `Không thể tải dữ liệu phường/xã: ${error.message}`,
-          'error'
-        )
+        showSnackbar?.(error.message, 'error')
       }
     }
 
@@ -261,25 +185,7 @@ export default function AddAddressModal({
         setFormData((prev) => ({ ...prev, city: cityCode }))
 
         // Gọi API quận/huyện
-        const districtRes = await fetch(
-          'https://online-gateway.ghn.vn/shiip/public-api/master-data/district',
-          {
-            method: 'POST',
-            headers: {
-              Token: GHN_TOKEN_API,
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ province_id: parseInt(cityCode) })
-          }
-        )
-        if (!districtRes.ok) throw new Error('Lỗi tải quận/huyện')
-        const districtData = await districtRes.json()
-        if (districtData.code !== 200 || !districtData.data)
-          throw new Error('Không có dữ liệu quận/huyện')
-        const districts = districtData.data.map((d) => ({
-          code: String(d.DistrictID),
-          name: d.DistrictName
-        }))
+        const districts = await addressGHNService.getDistricts(cityCode)
         setDistricts(districts)
 
         // Tìm DistrictID từ district name
@@ -293,24 +199,7 @@ export default function AddAddressModal({
         setFormData((prev) => ({ ...prev, district: districtCode }))
 
         // Gọi API phường/xã
-        const wardRes = await fetch(
-          `https://online-gateway.ghn.vn/shiip/public-api/master-data/ward?district_id=${districtCode}`,
-          {
-            method: 'GET',
-            headers: {
-              Token: GHN_TOKEN_API,
-              'Content-Type': 'application/json'
-            }
-          }
-        )
-        if (!wardRes.ok) throw new Error('Lỗi tải phường/xã')
-        const wardData = await wardRes.json()
-        if (wardData.code !== 200 || !wardData.data)
-          throw new Error('Không có dữ liệu phường/xã')
-        const wards = wardData.data.map((w) => ({
-          code: String(w.WardCode),
-          name: w.WardName
-        }))
+        const wards = await addressGHNService.getWards(districtCode)
         setWards(wards)
 
         // Tìm WardCode từ ward name
@@ -340,10 +229,7 @@ export default function AddAddressModal({
         })
       } catch (error) {
         console.error('Lỗi khi tải thông tin địa chỉ:', error)
-        showSnackbar?.(
-          `Không thể tải thông tin địa chỉ: ${error.message}`,
-          'error'
-        )
+        showSnackbar?.(error.message, 'error')
       }
     }
 
@@ -545,7 +431,7 @@ export default function AddAddressModal({
               )}
             />
             <TextField
-              label='Địa chỉ cụ thể'
+              label='Địa chỉ chi tiết'
               fullWidth
               value={formData.address}
               onChange={handleChange('address')}
