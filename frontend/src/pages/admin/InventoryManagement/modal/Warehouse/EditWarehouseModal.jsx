@@ -20,6 +20,7 @@ import axios from 'axios'
 import { toast } from 'react-toastify'
 import ClearIcon from '@mui/icons-material/Clear'
 import IconButton from '@mui/material/IconButton'
+import { GHN_TOKEN_API } from '~/utils/constants'
 const EditWarehouseModal = ({ open, onClose, warehouse, onSave }) => {
   const {
     register,
@@ -32,26 +33,20 @@ const EditWarehouseModal = ({ open, onClose, warehouse, onSave }) => {
   const [provinces, setProvinces] = useState([])
   const [districts, setDistricts] = useState([])
   const [wards, setWards] = useState([])
-  const [loadingProvinces, setLoadingProvinces] = useState(true) // Thêm state loading
+  const [loadingProvinces, setLoadingProvinces] = useState(true)
+  const [loadingDistricts, setLoadingDistricts] = useState(false)
+  const [loadingWards, setLoadingWards] = useState(false)
 
-  const [selectedProvince, setSelectedProvince] = useState('')
-  const [selectedDistrict, setSelectedDistrict] = useState('')
-  const [selectedWard, setSelectedWard] = useState('')
-
-  const [provinceName, setProvinceName] = useState('')
-  const [districtName, setDistrictName] = useState('')
-  const [wardName, setWardName] = useState('')
-
-  const [provinceInput, setProvinceInput] = useState('')
-  const [districtInput, setDistrictInput] = useState('')
-  const [wardInput, setWardInput] = useState('')
+  const [selectedProvince, setSelectedProvince] = useState(null)
+  const [selectedDistrict, setSelectedDistrict] = useState(null)
+  const [selectedWard, setSelectedWard] = useState(null)
 
   // Hàm chuẩn hóa tên tỉnh/thành để so sánh
   const normalizeName = (name) => {
     if (!name) return ''
     return name
       .toLowerCase()
-      .replace(/^(thành phố|tỉnh)\s+/, '') // Loại bỏ "Thành phố" hoặc "Tỉnh"
+      .replace(/^(thành phố|tỉnh)\s+/, '')
       .replace(/\s+/g, ' ')
       .trim()
   }
@@ -60,174 +55,182 @@ const EditWarehouseModal = ({ open, onClose, warehouse, onSave }) => {
   useEffect(() => {
     setLoadingProvinces(true)
     axios
-      .get('https://provinces.open-api.vn/api/?depth=1')
+      .get(
+        'https://online-gateway.ghn.vn/shiip/public-api/master-data/province',
+        {
+          headers: { Token: GHN_TOKEN_API }
+        }
+      )
       .then((res) => {
-        setProvinces(res.data || [])
-        setLoadingProvinces(false)
+        const data = res.data?.data || []
+        setProvinces(data)
       })
       .catch((err) => {
-        console.error('Lỗi load tỉnh/thành: ', err)
+        console.error('Lỗi load tỉnh GHN:', err)
         toast.error('Không thể tải danh sách tỉnh/thành')
+      })
+      .finally(() => {
         setLoadingProvinces(false)
       })
   }, [])
 
   // Initialize form with warehouse data
+  // Load dữ liệu từ warehouse vào form
   useEffect(() => {
-    if (warehouse && provinces.length > 0 && !loadingProvinces) {
-      setValue('code', warehouse.code || '')
+    if (warehouse && provinces.length > 0) {
       setValue('name', warehouse.name || '')
       setValue('address', warehouse.address || '')
-      setValue('ward', warehouse.ward || '')
-      setValue('district', warehouse.district || '')
-      setValue('city', warehouse.city || '')
 
-      // Find province
-      const normalizedWarehouseCity = normalizeName(warehouse.city)
+      const normalizedCity = normalizeName(warehouse.city)
       const province = provinces.find(
-        (p) => normalizeName(p.name) === normalizedWarehouseCity
+        (p) => normalizeName(p.ProvinceName) === normalizedCity
       )
       if (province) {
-        setSelectedProvince(province.code)
-        setProvinceName(province.name)
-
-        // Load districts
+        setSelectedProvince(province)
         axios
-          .get(`https://provinces.open-api.vn/api/p/${province.code}?depth=2`)
+          .post(
+            'https://online-gateway.ghn.vn/shiip/public-api/master-data/district',
+            { province_id: province.ProvinceID },
+            { headers: { Token: GHN_TOKEN_API } }
+          )
           .then((res) => {
-            const districtList = res.data.districts || []
+            const districtList = res.data?.data || []
             setDistricts(districtList)
 
-            // Find district
-            const normalizedWarehouseDistrict = normalizeName(
-              warehouse.district
-            )
+            const normalizedDistrict = normalizeName(warehouse.district)
             const district = districtList.find(
-              (d) => normalizeName(d.name) === normalizedWarehouseDistrict
+              (d) => normalizeName(d.DistrictName) === normalizedDistrict
             )
             if (district) {
-              setSelectedDistrict(district.code)
-              setDistrictName(district.name)
+              setSelectedDistrict(district)
 
-              // Load wards
               axios
-                .get(
-                  `https://provinces.open-api.vn/api/d/${district.code}?depth=2`
+                .post(
+                  'https://online-gateway.ghn.vn/shiip/public-api/master-data/ward',
+                  { district_id: district.DistrictID },
+                  { headers: { Token: GHN_TOKEN_API } }
                 )
                 .then((res) => {
-                  const wardList = res.data.wards || []
+                  const wardList = res.data?.data || []
                   setWards(wardList)
 
-                  // Find ward
-                  const normalizedWarehouseWard = normalizeName(warehouse.ward)
+                  const normalizedWard = normalizeName(warehouse.ward)
                   const ward = wardList.find(
-                    (w) => normalizeName(w.name) === normalizedWarehouseWard
+                    (w) => normalizeName(w.WardName) === normalizedWard
                   )
                   if (ward) {
-                    setSelectedWard(ward.code)
-                    setWardName(ward.name)
+                    setSelectedWard(ward)
                   }
                 })
                 .catch((err) => {
-                  console.error('Lỗi load phường/xã:', err)
+                  console.error('Lỗi load phường GHN:', err)
                   toast.error('Không thể tải danh sách phường/xã')
                 })
             }
           })
           .catch((err) => {
-            console.error('Lỗi load quận/huyện:', err)
+            console.error('Lỗi load quận GHN:', err)
             toast.error('Không thể tải danh sách quận/huyện')
           })
       }
     }
-  }, [warehouse, provinces, loadingProvinces, setValue])
+  }, [warehouse, provinces, setValue])
 
-  const handleProvinceChange = async (event) => {
-    const code = event.target.value
-    const province = provinces.find((p) => p.code === code)
-    setSelectedProvince(code)
-    setProvinceName(province?.name || '')
-    setValue('city', province?.name || '')
+  const handleProvinceChange = async (_event, newValue) => {
+    if (!newValue) return
 
-    setSelectedDistrict('')
-    setSelectedWard('')
-    setDistrictName('')
-    setWardName('')
+    setSelectedProvince(newValue)
+    setSelectedDistrict(null)
+    setSelectedWard(null)
     setDistricts([])
     setWards([])
+    setLoadingDistricts(true)
+
     try {
-      const res = await axios.get(
-        `https://provinces.open-api.vn/api/p/${code}?depth=2`
+      const res = await axios.post(
+        'https://online-gateway.ghn.vn/shiip/public-api/master-data/district',
+        { province_id: newValue.ProvinceID },
+        { headers: { Token: GHN_TOKEN_API } }
       )
-      setDistricts(res.data.districts || [])
+      setDistricts(res.data?.data || [])
     } catch (err) {
-      console.error('Lỗi load quận/huyện:', err)
+      console.error('Lỗi load quận GHN:', err)
       toast.error('Không thể tải danh sách quận/huyện')
+    } finally {
+      setLoadingDistricts(false)
     }
   }
 
-  const handleDistrictChange = async (event) => {
-    const code = event.target.value
-    const district = districts.find((d) => d.code === code)
-    setSelectedDistrict(code)
-    setDistrictName(district?.name || '')
-    setValue('district', district?.name || '')
+  const handleDistrictChange = async (_event, newValue) => {
+    if (!newValue) return
 
-    setSelectedWard('')
-    setWardName('')
+    setSelectedDistrict(newValue)
+    setSelectedWard(null)
     setWards([])
+    setLoadingWards(true)
+
     try {
-      const res = await axios.get(
-        `https://provinces.open-api.vn/api/d/${code}?depth=2`
+      const res = await axios.post(
+        'https://online-gateway.ghn.vn/shiip/public-api/master-data/ward',
+        { district_id: newValue.DistrictID },
+        { headers: { Token: GHN_TOKEN_API } }
       )
-      setWards(res.data.wards || [])
+      setWards(res.data?.data || [])
     } catch (err) {
-      console.error('Lỗi load phường/xã:', err)
+      console.error('Lỗi load phường GHN:', err)
       toast.error('Không thể tải danh sách phường/xã')
+    } finally {
+      setLoadingWards(false)
     }
   }
 
-  const handleWardChange = (event) => {
-    const code = event.target.value
-    const ward = wards.find((w) => w.code === code)
-    setSelectedWard(code)
-    setWardName(ward?.name || '')
-    setValue('ward', ward?.name || '')
+  const handleWardChange = (_event, newValue) => {
+    if (!newValue) return
+    setSelectedWard(newValue)
   }
 
   const onSubmit = async (data) => {
+    if (!selectedProvince || !selectedDistrict || !selectedWard) {
+      toast.error('Vui lòng chọn đầy đủ Tỉnh, Quận, Phường')
+      return
+    }
+
     const payload = {
       name: data.name,
       address: data.address,
-      ward: wardName,
-      district: districtName,
-      city: provinceName
+      city: selectedProvince.ProvinceName,
+      district: selectedDistrict.DistrictName,
+      ward: selectedWard.WardName,
+      cityId: selectedProvince.ProvinceID,
+      districtId: selectedDistrict.DistrictID,
+      wardId: Number(selectedWard.WardCode)
     }
 
     try {
-      await onSave(warehouse._id, payload)
-      toast.success('Cập nhật kho hàng thành công')
-      onClose()
+      const res = await onSave(warehouse._id, payload)
+      if (res) {
+        toast.success('Cập nhật kho hàng thành công')
+      }
       reset()
-      setSelectedProvince('')
-      setSelectedDistrict('')
-      setSelectedWard('')
-      setProvinceName('')
-      setDistrictName('')
-      setWardName('')
-    } catch (error) {
-      toast.error('Cập nhật kho hàng thất bại', error)
+      setSelectedProvince(null)
+      setSelectedDistrict(null)
+      setSelectedWard(null)
+      setDistricts([])
+      setWards([])
+      onClose()
+    } catch (err) {
+      console.error('Lỗi cập nhật:', err)
+      toast.error('Cập nhật kho hàng thất bại')
     }
   }
 
   const handleCancel = () => {
     reset()
-    setSelectedProvince('')
-    setSelectedDistrict('')
-    setSelectedWard('')
-    setProvinceName('')
-    setDistrictName('')
-    setWardName('')
+    setSelectedProvince(null)
+    setSelectedDistrict(null)
+    setSelectedWard(null)
+    setDistricts([])
+    setWards([])
     onClose()
   }
 
@@ -272,25 +275,16 @@ const EditWarehouseModal = ({ open, onClose, warehouse, onSave }) => {
                   helperText={errors.address?.message}
                 />
               </Grid>
-              <Grid item size={12} sm={4}>
+              <Grid item size={12} xs={12} sm={4}>
                 <Autocomplete
                   disableClearable
                   options={provinces}
-                  getOptionLabel={(option) => option.name}
-                  value={
-                    provinces.find((p) => p.code === selectedProvince) || null
-                  }
-                  inputValue={provinceInput}
-                  onInputChange={(event, newInputValue) => {
-                    setProvinceInput(newInputValue)
-                  }}
-                  onChange={(event, newValue) => {
-                    if (newValue) {
-                      handleProvinceChange({ target: { value: newValue.code } })
-                    }
-                  }}
                   disabled={loadingProvinces}
-                  noOptionsText='Không có kết quả phù hợp'
+                  getOptionLabel={(option) => option.ProvinceName}
+                  value={selectedProvince}
+                  onChange={(_, newValue) => {
+                    handleProvinceChange(null, newValue)
+                  }}
                   renderInput={(params) => (
                     <TextField
                       {...params}
@@ -299,11 +293,12 @@ const EditWarehouseModal = ({ open, onClose, warehouse, onSave }) => {
                         ...params.InputProps,
                         endAdornment: (
                           <>
-                            {provinceInput && (
+                            {selectedProvince && (
                               <IconButton
                                 onClick={() => {
-                                  setProvinceInput('')
-                                  setSelectedProvince('')
+                                  setSelectedProvince(null)
+                                  setSelectedDistrict(null)
+                                  setSelectedWard(null)
                                   setDistricts([])
                                   setWards([])
                                 }}
@@ -328,26 +323,17 @@ const EditWarehouseModal = ({ open, onClose, warehouse, onSave }) => {
                   )}
                 />
               </Grid>
-              <Grid item size={12} sm={4}>
+
+              <Grid item size={12} xs={12} sm={4}>
                 <Autocomplete
                   disableClearable
-                  disablePortal
                   options={districts}
-                  getOptionLabel={(option) => option.name}
-                  value={
-                    districts.find((d) => d.code === selectedDistrict) || null
-                  }
-                  inputValue={districtInput}
-                  onInputChange={(event, newInputValue) => {
-                    setDistrictInput(newInputValue)
+                  getOptionLabel={(option) => option.DistrictName}
+                  value={selectedDistrict}
+                  onChange={(_, newValue) => {
+                    handleDistrictChange(null, newValue)
                   }}
-                  onChange={(event, newValue) => {
-                    if (newValue) {
-                      handleDistrictChange({ target: { value: newValue.code } })
-                    }
-                  }}
-                  disabled={!selectedProvince || districts.length === 0}
-                  noOptionsText='Không có kết quả phù hợp'
+                  disabled={!selectedProvince || loadingDistricts}
                   renderInput={(params) => (
                     <TextField
                       {...params}
@@ -356,11 +342,11 @@ const EditWarehouseModal = ({ open, onClose, warehouse, onSave }) => {
                         ...params.InputProps,
                         endAdornment: (
                           <>
-                            {districtInput && (
+                            {selectedDistrict && (
                               <IconButton
                                 onClick={() => {
-                                  setDistrictInput('')
-                                  setSelectedDistrict('')
+                                  setSelectedDistrict(null)
+                                  setSelectedWard(null)
                                   setWards([])
                                 }}
                                 size='small'
@@ -384,23 +370,17 @@ const EditWarehouseModal = ({ open, onClose, warehouse, onSave }) => {
                   )}
                 />
               </Grid>
-              <Grid item size={12} sm={4}>
+
+              <Grid item size={12} xs={12} sm={4}>
                 <Autocomplete
                   disableClearable
                   options={wards}
-                  getOptionLabel={(option) => option.name}
-                  value={wards.find((w) => w.code === selectedWard) || null}
-                  inputValue={wardInput || ''}
-                  onInputChange={(event, newInputValue) => {
-                    setWardInput(newInputValue)
+                  getOptionLabel={(option) => option.WardName}
+                  value={selectedWard}
+                  onChange={(_, newValue) => {
+                    handleWardChange(null, newValue)
                   }}
-                  onChange={(event, newValue) => {
-                    if (newValue) {
-                      handleWardChange({ target: { value: newValue.code } })
-                    }
-                  }}
-                  disabled={!selectedDistrict}
-                  noOptionsText='Không có kết quả phù hợp'
+                  disabled={!selectedDistrict || loadingWards}
                   renderInput={(params) => (
                     <TextField
                       {...params}
@@ -409,20 +389,17 @@ const EditWarehouseModal = ({ open, onClose, warehouse, onSave }) => {
                         ...params.InputProps,
                         endAdornment: (
                           <>
-                            {wardInput && (
+                            {selectedWard && (
                               <IconButton
                                 onClick={() => {
-                                  setWardInput('')
-                                  setSelectedWard('')
+                                  setSelectedWard(null)
                                 }}
                                 size='small'
                                 sx={{
                                   width: 16,
                                   height: 16,
                                   backgroundColor: '#e0e0e0',
-                                  '&:hover': {
-                                    backgroundColor: '#d5d5d5'
-                                  },
+                                  '&:hover': { backgroundColor: '#d5d5d5' },
                                   padding: 0,
                                   marginRight: '6px'
                                 }}

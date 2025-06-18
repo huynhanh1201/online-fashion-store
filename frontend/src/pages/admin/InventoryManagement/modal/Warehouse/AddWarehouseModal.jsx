@@ -7,16 +7,14 @@ import {
   TextField,
   Grid,
   Button,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem
+  Autocomplete,
+  IconButton
 } from '@mui/material'
 import { useForm } from 'react-hook-form'
-import axios from 'axios'
-import Autocomplete from '@mui/material/Autocomplete'
 import ClearIcon from '@mui/icons-material/Clear'
-import IconButton from '@mui/material/IconButton'
+import axios from 'axios'
+
+import { GHN_TOKEN_API } from '~/utils/constants'
 
 const AddWarehouseModal = ({ open, onClose, onSave }) => {
   const {
@@ -31,135 +29,131 @@ const AddWarehouseModal = ({ open, onClose, onSave }) => {
   const [districts, setDistricts] = useState([])
   const [wards, setWards] = useState([])
 
-  const [selectedProvince, setSelectedProvince] = useState('')
-  const [selectedDistrict, setSelectedDistrict] = useState('')
-  const [selectedWard, setSelectedWard] = useState('')
+  const [selectedProvince, setSelectedProvince] = useState(null)
+  const [selectedDistrict, setSelectedDistrict] = useState(null)
+  const [selectedWard, setSelectedWard] = useState(null)
 
-  const [provinceName, setProvinceName] = useState('')
-  const [districtName, setDistrictName] = useState('')
-  const [wardName, setWardName] = useState('')
-
-  const [provinceInput, setProvinceInput] = useState('')
-  const [districtInput, setDistrictInput] = useState('')
-  const [wardInput, setWardInput] = useState('')
-
+  // Fetch Provinces
   useEffect(() => {
     axios
-      .get('https://provinces.open-api.vn/api/?depth=1')
-      .then((res) => setProvinces(res.data))
-      .catch((err) => console.error('Lỗi load tỉnh/thành: ', err))
+      .get(
+        'https://online-gateway.ghn.vn/shiip/public-api/master-data/province',
+        {
+          headers: {
+            Token: GHN_TOKEN_API
+          }
+        }
+      )
+      .then((res) => {
+        const data = res.data?.data
+        setProvinces(Array.isArray(data) ? data : [])
+      })
+      .catch((err) => console.error('Lỗi load tỉnh GHN:', err))
   }, [])
 
-  const handleProvinceChange = async (event) => {
-    const code = event.target.value
-    const province = provinces.find((p) => p.code === code)
-    setSelectedProvince(code)
-    setProvinceName(province?.name || '')
-    setValue('city', province?.name || '')
-
-    setSelectedDistrict('')
-    setSelectedWard('')
-    setDistrictName('')
-    setWardName('')
+  // Fetch Districts theo Province
+  const handleProvinceChange = (event, newValue) => {
+    if (!newValue) return
+    setSelectedProvince(newValue)
+    setSelectedDistrict(null)
+    setSelectedWard(null)
+    setDistricts([])
     setWards([])
-    try {
-      const res = await axios.get(
-        `https://provinces.open-api.vn/api/p/${code}?depth=2`
+    axios
+      .post(
+        'https://online-gateway.ghn.vn/shiip/public-api/master-data/district',
+        { province_id: newValue.ProvinceID },
+        { headers: { Token: GHN_TOKEN_API } }
       )
-      setDistricts(res.data.districts || [])
-    } catch (err) {
-      console.error('Lỗi load quận/huyện:', err)
-    }
+      .then((res) => {
+        const data = res.data?.data
+        setDistricts(Array.isArray(data) ? data : [])
+      })
+      .catch((err) => console.error('Lỗi load quận GHN:', err))
   }
 
-  const handleDistrictChange = async (event) => {
-    const code = event.target.value
-    const district = districts.find((d) => d.code === code)
-    setSelectedDistrict(code)
-    setDistrictName(district?.name || '')
-    setValue('district', district?.name || '')
-
-    setSelectedWard('')
-    setWardName('')
-    try {
-      const res = await axios.get(
-        `https://provinces.open-api.vn/api/d/${code}?depth=2`
+  // Fetch Wards theo District
+  const handleDistrictChange = (event, newValue) => {
+    if (!newValue) return
+    setSelectedDistrict(newValue)
+    setSelectedWard(null)
+    setWards([])
+    axios
+      .post(
+        'https://online-gateway.ghn.vn/shiip/public-api/master-data/ward',
+        { district_id: newValue.DistrictID },
+        { headers: { Token: GHN_TOKEN_API } }
       )
-      setWards(res.data.wards || [])
-    } catch (err) {
-      console.error('Lỗi load phường/xã:', err)
-    }
+      .then((res) => {
+        const data = res.data?.data
+        setWards(Array.isArray(data) ? data : [])
+      })
+      .catch((err) => console.error('Lỗi load phường GHN:', err))
   }
 
-  const handleWardChange = (event) => {
-    const code = event.target.value
-    const ward = wards.find((w) => w.code === code)
-    setSelectedWard(code)
-    setWardName(ward?.name || '')
-    setValue('ward', ward?.name || '')
+  const handleWardChange = (event, newValue) => {
+    if (!newValue) return
+    setSelectedWard(newValue)
   }
 
   const onSubmit = (data) => {
-    const payload = {
-      name: data.name,
-      address: data.address,
-      ward: wardName,
-      district: districtName,
-      city: provinceName
+    if (!selectedProvince || !selectedDistrict || !selectedWard) {
+      alert('Vui lòng chọn đầy đủ Tỉnh/TP, Quận/Huyện, Phường/Xã')
+      return
     }
+    const payload = {
+      name: data.name, // nếu backend yêu cầu là fullName
+      phone: data.phone, // nếu có trường phone
+      address: data.address,
+      ward: selectedWard.WardName,
+      district: selectedDistrict.DistrictName,
+      city: selectedProvince.ProvinceName,
+      cityId: selectedProvince.ProvinceID,
+      districtId: selectedDistrict.DistrictID,
+      wardId: Number(selectedWard.WardCode)
+    }
+    console.log('Payload to save:', typeof payload.wardId)
+
     const result = onSave(payload)
     if (result) {
-      onClose()
       reset()
-      setSelectedProvince('')
-      setSelectedDistrict('')
-      setSelectedWard('')
-      setProvinceName('')
-      setDistrictName('')
-      setWardName('')
+      setSelectedProvince(null)
+      setSelectedDistrict(null)
+      setSelectedWard(null)
+      setDistricts([])
+      setWards([])
+      onClose()
     } else {
-      alert('Thêm kho hàng thất bại. Vui lòng thử lại!')
+      alert('Thêm kho hàng thất bại!')
     }
   }
 
   const handleCancel = () => {
     reset()
-    setSelectedProvince('')
-    setSelectedDistrict('')
-    setSelectedWard('')
-    setProvinceName('')
-    setDistrictName('')
-    setWardName('')
+    setSelectedProvince(null)
+    setSelectedDistrict(null)
+    setSelectedWard(null)
+    setDistricts([])
+    setWards([])
     onClose()
   }
 
   return (
-    <Dialog
-      open={open}
-      onClose={handleCancel}
-      maxWidth='sm'
-      fullWidth
-      PaperProps={{
-        sx: {
-          overflowY: 'visible'
-        }
-      }}
-    >
-      <DialogTitle>Thêm kho hàng mới</DialogTitle>
+    <Dialog open={open} onClose={handleCancel} maxWidth='sm' fullWidth>
+      <DialogTitle>Thêm kho hàng</DialogTitle>
       <form onSubmit={handleSubmit(onSubmit)}>
         <DialogContent dividers>
           <Grid container spacing={2}>
-            <Grid item size={12} sm={6}>
+            <Grid item size={12} xs={12}>
               <TextField
-                label='Tên kho hàng '
+                label='Tên kho hàng'
                 fullWidth
                 {...register('name', { required: 'Vui lòng nhập tên kho' })}
                 error={!!errors.name}
                 helperText={errors.name?.message}
               />
             </Grid>
-
-            <Grid item size={12}>
+            <Grid item size={12} xs={12}>
               <TextField
                 label='Địa chỉ (số nhà, tên đường)'
                 fullWidth
@@ -169,196 +163,50 @@ const AddWarehouseModal = ({ open, onClose, onSave }) => {
               />
             </Grid>
 
-            <Grid item size={12} sm={4}>
+            <Grid item size={12} xs={12} sm={4}>
               <Autocomplete
-                disableClearable
-                disablePortal
-                options={provinces}
-                getOptionLabel={(option) => option.name}
-                value={
-                  provinces.find((p) => p.code === selectedProvince) || null
-                }
-                inputValue={provinceInput || ''} // <- bạn cần thêm useState để kiểm soát input
-                onInputChange={(event, newInputValue) => {
-                  setProvinceInput(newInputValue)
-                }}
-                onChange={(event, newValue) => {
-                  if (newValue)
-                    handleProvinceChange({ target: { value: newValue.code } })
-                }}
-                noOptionsText='Không có kết quả phù hợp'
+                options={Array.isArray(provinces) ? provinces : []}
+                getOptionLabel={(option) => option.ProvinceName}
+                value={selectedProvince}
+                onChange={handleProvinceChange}
                 renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    label='Tỉnh / Thành phố'
-                    InputProps={{
-                      ...params.InputProps,
-                      endAdornment: (
-                        <>
-                          {provinceInput && (
-                            <IconButton
-                              onClick={() => {
-                                setProvinceInput('')
-                                setSelectedProvince('')
-                                setDistricts([])
-                                setWards([])
-                              }}
-                              size='small'
-                              sx={{
-                                width: 16,
-                                height: 16,
-                                backgroundColor: '#e0e0e0',
-                                '&:hover': {
-                                  backgroundColor: '#d5d5d5'
-                                },
-                                padding: 0,
-                                marginRight: '6px'
-                              }}
-                            >
-                              <ClearIcon sx={{ fontSize: 14 }} />
-                            </IconButton>
-                          )}
-                          {params.InputProps.endAdornment}
-                        </>
-                      )
-                    }}
-                  />
+                  <TextField {...params} label='Tỉnh / Thành phố' />
                 )}
               />
             </Grid>
 
-            <Grid item size={12} sm={4}>
+            <Grid item size={12} xs={12} sm={4}>
               <Autocomplete
-                disableClearable
-                disablePortal
-                options={districts}
-                getOptionLabel={(option) => option.name}
-                value={
-                  districts.find((d) => d.code === selectedDistrict) || null
-                }
-                inputValue={districtInput || ''}
-                onInputChange={(event, newInputValue) => {
-                  setDistrictInput(newInputValue)
-                }}
-                onChange={(event, newValue) => {
-                  if (newValue) {
-                    handleDistrictChange({ target: { value: newValue.code } })
-                  }
-                }}
+                options={Array.isArray(districts) ? districts : []}
+                getOptionLabel={(option) => option.DistrictName}
+                value={selectedDistrict}
+                onChange={handleDistrictChange}
                 disabled={!selectedProvince}
-                noOptionsText='Không có kết quả phù hợp'
                 renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    label='Quận / Huyện'
-                    InputProps={{
-                      ...params.InputProps,
-                      endAdornment: (
-                        <>
-                          {districtInput && (
-                            <IconButton
-                              onClick={() => {
-                                setDistrictInput('')
-                                setSelectedDistrict('')
-                                setWards([])
-                              }}
-                              size='small'
-                              sx={{
-                                width: 16,
-                                height: 16,
-                                backgroundColor: '#e0e0e0',
-                                '&:hover': {
-                                  backgroundColor: '#d5d5d5'
-                                },
-                                padding: 0,
-                                marginRight: '6px'
-                              }}
-                            >
-                              <ClearIcon sx={{ fontSize: 14 }} />
-                            </IconButton>
-                          )}
-                          {params.InputProps.endAdornment}
-                        </>
-                      )
-                    }}
-                  />
+                  <TextField {...params} label='Quận / Huyện' />
                 )}
               />
             </Grid>
 
-            <Grid item size={12} sm={4}>
+            <Grid item size={12} xs={12} sm={4}>
               <Autocomplete
-                disableClearable
-                options={wards}
-                getOptionLabel={(option) => option.name}
-                value={wards.find((w) => w.code === selectedWard) || null}
-                inputValue={wardInput || ''}
-                onInputChange={(event, newInputValue) => {
-                  setWardInput(newInputValue)
-                }}
-                onChange={(event, newValue) => {
-                  if (newValue) {
-                    handleWardChange({ target: { value: newValue.code } })
-                  }
-                }}
+                options={Array.isArray(wards) ? wards : []}
+                getOptionLabel={(option) => option.WardName}
+                value={selectedWard}
+                onChange={handleWardChange}
                 disabled={!selectedDistrict}
-                noOptionsText='Không có kết quả phù hợp'
                 renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    label='Phường / Xã'
-                    InputProps={{
-                      ...params.InputProps,
-                      endAdornment: (
-                        <>
-                          {wardInput && (
-                            <IconButton
-                              onClick={() => {
-                                setWardInput('')
-                                setSelectedWard('')
-                              }}
-                              size='small'
-                              sx={{
-                                width: 16,
-                                height: 16,
-                                backgroundColor: '#e0e0e0',
-                                '&:hover': {
-                                  backgroundColor: '#d5d5d5'
-                                },
-                                padding: 0,
-                                marginRight: '6px'
-                              }}
-                            >
-                              <ClearIcon sx={{ fontSize: 14 }} />
-                            </IconButton>
-                          )}
-                          {params.InputProps.endAdornment}
-                        </>
-                      )
-                    }}
-                  />
+                  <TextField {...params} label='Phường / Xã' />
                 )}
               />
             </Grid>
           </Grid>
         </DialogContent>
-        <DialogActions sx={{ padding: '16px 24px' }}>
-          <Button
-            onClick={handleCancel}
-            sx={{ textTransform: 'none' }}
-            color='error'
-            variant='outlined'
-          >
+        <DialogActions>
+          <Button onClick={handleCancel} color='error' variant='outlined'>
             Huỷ
           </Button>
-          <Button
-            type='submit'
-            sx={{
-              backgroundColor: '#001f5d',
-              color: '#fff',
-              textTransform: 'none'
-            }}
-          >
+          <Button type='submit' variant='contained'>
             Lưu
           </Button>
         </DialogActions>
