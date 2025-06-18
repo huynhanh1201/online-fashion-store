@@ -32,7 +32,6 @@ import CouponItem from '~/components/Coupon/CouponItem'
 import { getDiscounts } from '~/services/discountService'
 import { optimizeCloudinaryUrl } from '~/utils/cloudinary'
 
-
 const SectionTitle = styled(Typography)(({ theme }) => ({
   fontWeight: 700,
   fontSize: '1.3rem',
@@ -92,7 +91,6 @@ const Payment = () => {
   const [coupons, setCoupons] = useState([])
   const [couponLoading, setCouponLoading] = useState(true)
   const [couponError, setCouponError] = useState(null)
-  const [copiedCode, setCopiedCode] = useState('')
 
   const { addresses, fetchAddresses } = useAddress()
   const { loading: cartLoading } = useCart()
@@ -111,7 +109,6 @@ const Payment = () => {
 
   const [shippingPrice, setShippingPrice] = useState(0)
   const [shippingPriceLoading, setShippingPriceLoading] = useState(false)
-
 
   // Tính selectedCartItems + subTotal
   let subTotal = 0
@@ -136,6 +133,7 @@ const Payment = () => {
       subTotal += price * quantity
       return { variantId, color: item.color, size: item.size, quantity }
     })
+
   useEffect(() => {
     if (selectedAddress && selectedCartItems.length > 0) {
       fetchShippingPrice(selectedAddress, selectedCartItems)
@@ -143,6 +141,7 @@ const Payment = () => {
       setShippingPrice(0)
     }
   }, [selectedAddress])
+
   const fetchShippingPrice = async (address, items) => {
     if (!address || !items?.length) {
       console.warn('fetchShippingPrice: Thiếu address hoặc items', { address, items })
@@ -152,15 +151,15 @@ const Payment = () => {
 
     try {
       setShippingPriceLoading(true)
-      const totalItems = items.reduce((sum, item) => sum + (item.quantity || 1), 0)
 
+      // Tạo payload theo format mới
       const payload = {
-        numberItemOrder: totalItems,
-        service_type_id: 2,
+        cartItems: items.map(item => ({
+          variantId: item.variantId,
+          quantity: item.quantity
+        })),
         to_district_id: parseInt(address.districtId, 10),
-        to_ward_code: address.wardId,
-        insurance_value: 0,
-        coupon: null,
+        to_ward_code: address.wardId
       }
 
       console.log('fetchShippingPrice payload:', payload)
@@ -198,6 +197,7 @@ const Payment = () => {
       setShippingPriceLoading(false)
     }
   }
+
   // Debug Redux state
   useEffect(() => {
   }, [cartItems, selectedItems, selectedCartItems, subTotal])
@@ -234,6 +234,7 @@ const Payment = () => {
     }
     fetchCoupons()
   }, [subTotal])
+
   const formatCurrencyShort = (value) => {
     if (typeof value !== 'number') return '0'
     const units = [
@@ -249,17 +250,40 @@ const Payment = () => {
     return value.toString()
   }
 
-  const handleCouponSelect = (code) => {
+  const handleCouponSelect = async (code) => {
     if (!code || code === 'N/A') return
-    navigator.clipboard.writeText(code)
-    setCopiedCode(code)
     setVoucherInput(code)
     setVoucherApplied(false)
-    setTimeout(() => setCopiedCode(''), 1500)
+    try {
+      const response = await handleApplyVoucher(code.trim(), subTotal)
+      if (response?.valid) {
+        setVoucherApplied(true)
+        setSnackbar({
+          open: true,
+          severity: 'success',
+          message: response.message || 'Áp dụng mã giảm giá thành công'
+        })
+      } else {
+        setVoucherApplied(false)
+        setSnackbar({
+          open: true,
+          severity: 'error',
+          message: response?.message || 'Mã giảm giá không hợp lệ hoặc đã hết hạn'
+        })
+      }
+    } catch (err) {
+      setVoucherApplied(false)
+      setSnackbar({
+        open: true,
+        severity: 'error',
+        message: err.message || 'Có lỗi xảy ra khi áp dụng mã giảm giá'
+      })
+    }
   }
 
-  const totalOrder = Math.max(subTotal - discount)
+  const totalOrder = Math.max(subTotal - discount, 0)
   const totalFeeShipping = totalOrder + shippingPrice
+  const totalCart = subTotal
 
   useEffect(() => {
     const isOnPaymentPage = location.pathname.startsWith('/payment')
@@ -339,7 +363,7 @@ const Payment = () => {
       setSnackbar({
         open: true,
         severity: 'warning',
-        message: 'Vui lòng chọn phương thức thanh toán', // Sửa thông báo
+        message: 'Vui lòng chọn phương thức thanh toán',
       })
       return
     }
@@ -372,19 +396,19 @@ const Payment = () => {
     const orderData = {
       cartItems: sanitizedCartItems,
       shippingAddressId: selectedAddress._id,
-      total: totalOrder,
+      total: totalCart,
       paymentMethod,
-      note: note.trim() || null, // Thay undefined bằng null để đảm bảo gửi lên
-      couponCode: voucherApplied ? voucherInput : null, // Thay undefined bằng null
-      couponId: voucherApplied ? couponId : null, // Thay undefined bằng null
-      shippingFee: shippingPrice || 0, // Đảm bảo shippingFee luôn được gửi
+      note: note.trim() || null,
+      couponCode: voucherApplied ? voucherInput : null,
+      couponId: voucherApplied ? couponId : null,
+      shippingFee: shippingPrice || 0,
     }
 
-    console.log('orderData trước khi gửi:', orderData)   // Debug orderData
+    console.log('orderData trước khi gửi:', orderData)
 
     try {
       const result = await createOrder(orderData)
-      console.log('createOrder response:', result)   // Debug server response
+      console.log('createOrder response:', result)
       setSnackbar({
         open: true,
         severity: 'success',
@@ -408,7 +432,7 @@ const Payment = () => {
 
   return (
     <Box>
-      <Container maxWidth={false} sx={{ py: 4, px: 3, minHeight: '70vh' }}>
+      <Container maxWidth="xl" sx={{ py: 4, px: 3, minHeight: '70vh' }}>
         {cartLoading ? (
           <Box sx={{ textAlign: 'center', mt: 4 }}>
             <CircularProgress />
@@ -468,20 +492,20 @@ const Payment = () => {
                 value={note}
                 onChange={e => setNote(e.target.value)}
                 variant="outlined"
-                rows={3}
+                rows={2}
                 multiline
                 sx={{
                   mb: 4,
                   backgroundColor: '#fff',
                   '& .MuiOutlinedInput-root': {
                     '& fieldset': {
-                      borderColor: '#1A3C7B'
+                      borderColor: '#1A3c7B'
                     },
                     '&:hover fieldset': {
                       borderColor: '#1A3C7B'
                     },
                     '&.Mui-focused fieldset': {
-                      borderColor: '#1A3C7B',
+                      borderColor: '#1A3c7B',
                       borderWidth: '2px'
                     }
                   }
@@ -504,30 +528,38 @@ const Payment = () => {
                     value="Ship"
                     control={
                       <Radio
-                        sx={{
-                          color: '#ccc',
-                          '&.Mui-checked': { color: '#1A3C7B' }
-                        }}
+                        sx={{ color: '#ccc', '&.Mui-checked': { color: '#1A3C7B' } }}
                       />
                     }
                     label={
-                      <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                        <img
-                          src="https://file.hstatic.net/1000360022/file/giaohangnhanh_abaa5d524e464a0c8547a91ad9b50968.png"
-                          alt="Ship"
-                          style={{ height: 32, marginRight: 8 }}
-                        />
-                        <span style={{ fontSize: '1rem' }}>Phí vận chuyển: </span>
-                        <span style={{ fontSize: '1rem' }}>
-                          {shippingPriceLoading ? (
-                            <CircularProgress size={16} />
-                          ) : shippingPrice === 0 ? (
-                            'Miễn phí'
-                          ) : (
-                            shippingPrice.toLocaleString('vi-VN') + 'đ'
-                          )}
-                        </span>
+                      <Box
+                        sx={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
+                          width: '100%',
+                        }}
+                      >
+                        {/* Bên trái: Text phí vận chuyển */}
+                        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                          <img
+                            src="https://cdn.haitrieu.com/wp-content/uploads/2022/05/Logo-GHN-Slogan-VN.png"
+                            alt="Ship"
+                            style={{ height: 32, marginRight: 8 }}
+                          />
+                          <span style={{ fontSize: '1rem' }}>
+                            Phí vận chuyển:{' '}
+                            {shippingPriceLoading ? (
+                              <CircularProgress size={16} />
+                            ) : shippingPrice === 0 ? (
+                              'Miễn phí'
+                            ) : (
+                              shippingPrice.toLocaleString('vi-VN') + 'đ'
+                            )}
+                          </span>
+                        </Box>
                       </Box>
+
                     }
                   />
                 </RadioGroup>
@@ -675,7 +707,7 @@ const Payment = () => {
                     fontSize: '1rem'
                   }}
                 >
-                  {voucherLoading ? 'Đang áp dụng...' : voucherApplied ? 'Đã áp dụng' : 'Áp dụng Voucher'}
+                  {voucherLoading ? 'Đang áp dụng...' : voucherApplied ? 'Đã áp dụng' : 'Áp dụng Mã giảm giá'}
                 </Button>
 
                 {discountMessage && (
@@ -691,7 +723,6 @@ const Payment = () => {
 
                 {/* Danh sách coupon */}
                 <Box sx={{ mt: 2 }}>
-                  {/* <Divider sx={{ mb: 2 }} /> */}
                   <Typography
                     variant="subtitle2"
                     sx={{
@@ -742,7 +773,6 @@ const Payment = () => {
                           <CouponItem
                             coupon={coupon}
                             onCopy={handleCouponSelect}
-                            copiedCode={copiedCode}
                             formatCurrencyShort={formatCurrencyShort}
                             disabled={!coupon.isApplicable}
                           />
@@ -759,18 +789,17 @@ const Payment = () => {
                   <span>{subTotal.toLocaleString('vi-VN')}đ</span>
                 </Typography>
                 <Typography sx={{ display: 'flex', justifyContent: 'space-between', fontSize: '1.1rem' }}>
-                  <span>Phí vận chuyển:</span>
-                  {shippingPriceLoading ? (
+                  <span>Phí vận chuyển: </span>
+                  <span> {shippingPriceLoading ? (
                     <CircularProgress size={24} />
                   ) : shippingPrice === 0 ? (
                     'Miễn phí'
                   ) : (
                     shippingPrice.toLocaleString('vi-VN') + 'đ'
-                  )}
+                  )} </span>
                 </Typography>
-
                 <Typography sx={{ display: 'flex', justifyContent: 'space-between', fontSize: '1.1rem' }}>
-                  <span>Voucher giảm giá:</span>
+                  <span>Mã giảm giá:</span>
                   <span>{discount.toLocaleString('vi-VN')}đ</span>
                 </Typography>
                 <Divider sx={{ my: 2 }} />
@@ -822,32 +851,33 @@ const Payment = () => {
             {snackbar.message}
           </Alert>
         </Snackbar>
+
+        <Dialog open={confirmOpen} onClose={() => setConfirmOpen(false)}>
+          <DialogTitle>Xác nhận đặt hàng</DialogTitle>
+          <DialogContent>
+            <Typography>Bạn có chắc chắn muốn đặt hàng không?</Typography>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={() => setConfirmOpen(false)} color="inherit">
+              Hủy
+            </Button>
+            <Button
+              onClick={() => {
+                setConfirmOpen(false)
+                handlePlaceOrder()
+              }}
+              variant="contained"
+              sx={{
+                backgroundColor: '#1A3C7B',
+                color: '#fff',
+                '&:hover': { backgroundColor: '#3f51b5' }
+              }}
+            >
+              Xác nhận
+            </Button>
+          </DialogActions>
+        </Dialog>
       </Container>
-      <Dialog open={confirmOpen} onClose={() => setConfirmOpen(false)}>
-        <DialogTitle>Xác nhận đặt hàng</DialogTitle>
-        <DialogContent>
-          <Typography>Bạn có chắc chắn muốn đặt hàng không?</Typography>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setConfirmOpen(false)} color="inherit">
-            Hủy
-          </Button>
-          <Button
-            onClick={() => {
-              setConfirmOpen(false)
-              handlePlaceOrder()
-            }}
-            variant="contained"
-            sx={{
-              backgroundColor: '#1A3C7B',
-              color: '#fff',
-              '&:hover': { backgroundColor: '#3f51b5' }
-            }}
-          >
-            Xác nhận
-          </Button>
-        </DialogActions>
-      </Dialog>
     </Box>
   )
 }

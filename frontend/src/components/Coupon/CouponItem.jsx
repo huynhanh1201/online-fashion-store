@@ -76,7 +76,7 @@ const CouponItem = ({ coupon, onCopy, copiedCode, formatCurrencyShort, disabled 
           color="text.secondary"
           sx={{ fontSize: { xs: '0.7rem', sm: '0.75rem' } }}
         >
-          VOUCHER
+          Mã giảm giá
         </Typography>
         <Typography
           variant="subtitle1"
@@ -122,7 +122,7 @@ const CouponItem = ({ coupon, onCopy, copiedCode, formatCurrencyShort, disabled 
           </Typography>
         )}
         <Tooltip
-          title={copiedCode === code ? 'Đã sao chép' : 'Sao chép mã'}
+          title={copiedCode === code ? 'Đã áp dụng' : 'Áp dụng'}
         >
           <Button
             variant="outlined"
@@ -150,7 +150,7 @@ const CouponItem = ({ coupon, onCopy, copiedCode, formatCurrencyShort, disabled 
             onClick={() => onCopy(coupon.code)}
             disabled={disabled}
           >
-            {disabled ? 'Không áp dụng' : copiedCode === coupon.code ? 'Đã sao chép' : 'Sao chép'}
+            {disabled ? 'Không áp dụng' : copiedCode === coupon.code ? 'Đã áp dụng' : 'Áp dụng'}
           </Button>
 
 
@@ -160,4 +160,4 @@ const CouponItem = ({ coupon, onCopy, copiedCode, formatCurrencyShort, disabled 
   )
 }
 
-export default CouponItem  
+export default CouponItem

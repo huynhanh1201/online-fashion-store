@@ -23,6 +23,10 @@ const orderService = {
     } catch (error) {
       throw error.response?.data || error.message || 'Đặt hàng thất bại'
     }
+  },
+  updateOrder: async (orderId, updateData) => {
+    const response = await AuthorizedAxiosInstance.patch(`${API_ROOT}/v1/orders/${orderId}`, updateData)
+    return response.data
   }
 }
 
@@ -81,17 +85,10 @@ export const getProductById = async (productId) => {
   }
 }
 
+
 export const updateOrder = async (orderId, updateData) => {
-  try {
-    const response = await AuthorizedAxiosInstance.patch(
-      `${API_ROOT}/v1/orders/${orderId}`,
-      updateData
-    )
-    return response.data
-  } catch (error) {
-    console.error(`Lỗi khi cập nhật đơn hàng ${orderId}:`, error)
-    return null
-  }
+  const response = await AuthorizedAxiosInstance.patch(`${API_ROOT}/v1/orders/${orderId}`, updateData)
+  return response.data
 }
 
 export const deleteOrderById = async (orderId) => {
