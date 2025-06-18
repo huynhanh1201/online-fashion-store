@@ -108,9 +108,9 @@ const AddWarehouseModal = ({ open, onClose, onSave }) => {
       ward: selectedWard.WardName,
       district: selectedDistrict.DistrictName,
       city: selectedProvince.ProvinceName,
-      cityId: selectedProvince.ProvinceID,
-      districtId: selectedDistrict.DistrictID,
-      wardId: Number(selectedWard.WardCode)
+      cityId: String(selectedProvince.ProvinceID),
+      districtId: String(selectedDistrict.DistrictID),
+      wardId: String(selectedWard.WardCode)
     }
     console.log('Payload to save:', typeof payload.wardId)
 

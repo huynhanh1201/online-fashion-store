@@ -201,9 +201,9 @@ const EditWarehouseModal = ({ open, onClose, warehouse, onSave }) => {
       city: selectedProvince.ProvinceName,
       district: selectedDistrict.DistrictName,
       ward: selectedWard.WardName,
-      cityId: selectedProvince.ProvinceID,
-      districtId: selectedDistrict.DistrictID,
-      wardId: Number(selectedWard.WardCode)
+      cityId: String(selectedProvince.ProvinceID),
+      districtId: String(selectedDistrict.DistrictID),
+      wardId: String(selectedWard.WardCode)
     }
 
     try {
