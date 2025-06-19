@@ -12,6 +12,17 @@ const getDeliveryFee = async (req, res, next) => {
   }
 }
 
+const ghnWebhook = async (req, res, next) => {
+  try {
+    const result = await deliveriesService.getDeliveryFee(req.body)
+
+    res.status(StatusCodes.OK).json(result)
+  } catch (err) {
+    next(err)
+  }
+}
+
 export const deliveriesController = {
-  getDeliveryFee
+  getDeliveryFee,
+  ghnWebhook
 }
