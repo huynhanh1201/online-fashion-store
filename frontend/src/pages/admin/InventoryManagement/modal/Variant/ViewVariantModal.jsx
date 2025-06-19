@@ -41,7 +41,7 @@ const ViewVariantModal = ({ open, onClose, variant }) => {
     <Dialog
       open={open}
       onClose={onClose}
-      maxWidth='md'
+      maxWidth='lg'
       fullWidth
       sx={{ padding: '16px 24px' }}
       BackdropProps={{
@@ -66,9 +66,8 @@ const ViewVariantModal = ({ open, onClose, variant }) => {
                   src={optimizeCloudinaryUrl(variant.color.image)}
                   alt='color'
                   sx={{
-                    marginRight: '21px',
-                    width: 350,
-                    height: 437,
+                    width: 470,
+                    height: 595,
                     objectFit: 'contain',
                     backgroundColor: '#f5f5f5',
                     borderRadius: 2,
@@ -157,6 +156,17 @@ const ViewVariantModal = ({ open, onClose, variant }) => {
                       size='large'
                       sx={{ width: '127px', fontWeight: '800' }}
                     />
+                  </TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell>
+                    <strong>Kích thước đóng gói(DxRxC, Trọng lượng)</strong>
+                  </TableCell>
+                  <TableCell>
+                    {variant?.packageSize?.width} x{' '}
+                    {variant?.packageSize?.height} x{' '}
+                    {variant?.packageSize?.length} cm,{' '}
+                    {variant?.packageSize?.weight} gram
                   </TableCell>
                 </TableRow>
                 <TableRow>

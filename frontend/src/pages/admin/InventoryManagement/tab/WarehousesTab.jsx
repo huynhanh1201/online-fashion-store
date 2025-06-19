@@ -156,29 +156,31 @@ const WarehousesTab = () => {
                       display: 'flex',
                       flexDirection: 'column',
                       gap: 1,
-                      minWidth: 250
+                      minWidth: 250,
+                      minHeight: 76.5
                     }}
                   >
                     <Typography variant='h6' sx={{ fontWeight: '800' }}>
                       Danh Sách Kho Hàng
                     </Typography>
-                    <Button
-                      variant='contained'
-                      color='primary'
-                      onClick={handleAddWarehouse}
-                      startIcon={<AddIcon />}
-                      // disabled={isAddDisabled}
-                      sx={{
-                        textTransform: 'none',
-                        width: 100,
-                        display: 'flex',
-                        alignItems: 'center',
-                        backgroundColor: '#001f5d',
-                        color: '#fff'
-                      }}
-                    >
-                      Thêm
-                    </Button>
+                    {!isAddDisabled && (
+                      <Button
+                        variant='contained'
+                        color='primary'
+                        onClick={handleAddWarehouse}
+                        startIcon={<AddIcon />}
+                        sx={{
+                          textTransform: 'none',
+                          width: 100,
+                          display: 'flex',
+                          alignItems: 'center',
+                          backgroundColor: '#001f5d',
+                          color: '#fff'
+                        }}
+                      >
+                        Thêm
+                      </Button>
+                    )}
                   </Box>
                   <FilterWarehouse
                     loading={loadingWarehouse}

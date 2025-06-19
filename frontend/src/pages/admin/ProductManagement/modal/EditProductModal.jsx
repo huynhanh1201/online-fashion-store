@@ -469,7 +469,7 @@ const EditProductModal = ({ open, onClose, onSave, product }) => {
                   control={control}
                   render={({ field }) => (
                     <TextField
-                      label='Dài (cm)'
+                      label='Chiều dài gói hàng (cm)'
                       type='number'
                       fullWidth
                       inputProps={{ min: 0 }}
@@ -485,7 +485,7 @@ const EditProductModal = ({ open, onClose, onSave, product }) => {
                   control={control}
                   render={({ field }) => (
                     <TextField
-                      label='Rộng (cm)'
+                      label='Chiều rộng gói hàng (cm)'
                       type='number'
                       fullWidth
                       inputProps={{ min: 0 }}
@@ -501,7 +501,7 @@ const EditProductModal = ({ open, onClose, onSave, product }) => {
                   control={control}
                   render={({ field }) => (
                     <TextField
-                      label='Cao (cm)'
+                      label='Chiều cao gói hàng (cm)'
                       type='number'
                       fullWidth
                       inputProps={{ min: 0 }}
@@ -517,7 +517,7 @@ const EditProductModal = ({ open, onClose, onSave, product }) => {
                   control={control}
                   render={({ field }) => (
                     <TextField
-                      label='Khối lượng (kg)'
+                      label='Trọng lượng gói hàng (gram)'
                       type='number'
                       fullWidth
                       inputProps={{ min: 0, step: '0.01' }}

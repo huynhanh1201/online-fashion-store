@@ -14,9 +14,41 @@ import Table from '@mui/material/Table'
 import TableBody from '@mui/material/TableBody'
 import TableRow from '@mui/material/TableRow'
 import TableCell from '@mui/material/TableCell'
-
+import Tabs from '@mui/material/Tabs'
+import Tab from '@mui/material/Tab'
+import TabPanel from '@mui/lab/TabPanel'
+import TabContext from '@mui/lab/TabContext'
 import StyleAdmin from '~/assets/StyleAdmin.jsx'
 import { optimizeCloudinaryUrl } from '~/utils/cloudinary.js'
+import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye'
+import BorderColorIcon from '@mui/icons-material/BorderColor'
+import DeleteForeverIcon from '@mui/icons-material/DeleteForever'
+import IconButton from '@mui/material/IconButton'
+import Tooltip from '@mui/material/Tooltip'
+import Stack from '@mui/material/Stack'
+import TableNoneData from '~/components/TableAdmin/NoneData.jsx'
+
+const styles = {
+  groupIcon: {
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: 1,
+    width: '130px'
+  },
+  cellPadding: {
+    height: 54,
+    minHeight: 54,
+    maxHeight: 54,
+    lineHeight: '49px',
+    py: 0,
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    verticalAlign: 'middle'
+  }
+}
+
 const ViewProductModal = ({
   open,
   onClose,
@@ -26,36 +58,57 @@ const ViewProductModal = ({
 }) => {
   const imageList = Array.isArray(product?.image) ? product.image : []
   const [selectedImage, setSelectedImage] = useState(imageList[0] || '')
+  const [tabIndex, setTabIndex] = useState('1')
 
+  const handleTabChange = (event, newValue) => {
+    setTabIndex(newValue)
+  }
   const handleImageClick = (img) => {
     setSelectedImage(img)
   }
-  const uniqueColors = (colors) => {
-    const map = new Map()
-    colors.forEach((color) => {
-      const nameLower = color.name.toLowerCase().trim()
-      if (!map.has(nameLower)) {
-        map.set(nameLower, color)
-      }
-    })
-    return Array.from(map.values())
-  }
+  // const uniqueColors = (colors) => {
+  //   const map = new Map()
+  //   colors.forEach((color) => {
+  //     const nameLower = color.name.toLowerCase().trim()
+  //     if (!map.has(nameLower)) {
+  //       map.set(nameLower, color)
+  //     }
+  //   })
+  //   return Array.from(map.values())
+  // }
+  //
+  // const uniqueSizes = (sizes) => {
+  //   const map = new Map()
+  //   sizes.forEach((size) => {
+  //     const nameLower = size.name.toLowerCase().trim()
+  //     if (!map.has(nameLower)) {
+  //       map.set(nameLower, size)
+  //     }
+  //   })
+  //   return Array.from(map.values())
+  // }
+  //
+  // const filteredColors = colorPalette?.colors
+  //   ? uniqueColors(colorPalette.colors)
+  //   : []
+  // const filteredSizes = sizePalette?.sizes ? uniqueSizes(sizePalette.sizes) : []
 
-  const uniqueSizes = (sizes) => {
-    const map = new Map()
-    sizes.forEach((size) => {
-      const nameLower = size.name.toLowerCase().trim()
-      if (!map.has(nameLower)) {
-        map.set(nameLower, size)
-      }
-    })
-    return Array.from(map.values())
-  }
-
-  const filteredColors = colorPalette?.colors
-    ? uniqueColors(colorPalette.colors)
+  // Tách ra mảng màu và kích thước
+  const filteredColors = Array.isArray(colorPalette?.colors)
+    ? colorPalette.colors
     : []
-  const filteredSizes = sizePalette?.sizes ? uniqueSizes(sizePalette.sizes) : []
+
+  const filteredSizes = Array.isArray(sizePalette?.sizes)
+    ? sizePalette.sizes
+    : []
+
+  // Lưu thêm metadata
+  const colorCreatedAt = colorPalette?.createdAt
+  const colorUpdatedAt = colorPalette?.updatedAt
+
+  const sizeCreatedAt = sizePalette?.createdAt
+  const sizeUpdatedAt = sizePalette?.updatedAt
+
   const formatDate = (dateString) => {
     if (!dateString) return 'Không có thông tin'
     const date = new Date(dateString)
@@ -69,6 +122,7 @@ const ViewProductModal = ({
     })
   }
   if (!product) return null
+  const categoryName = product.categoryId?.name || 'Chưa có danh mục'
   return (
     <Dialog
       open={open}
@@ -78,7 +132,8 @@ const ViewProductModal = ({
       PaperProps={{
         sx: {
           mt: 8,
-          maxHeight: '85vh'
+          maxHeight: '85vh',
+          minHeight: '85vh'
         },
         ...StyleAdmin.InputCustom
       }}
@@ -88,269 +143,389 @@ const ViewProductModal = ({
         dividers
         sx={{ maxHeight: 'calc(85vh - 64px)', overflowY: 'auto' }}
       >
-        <Grid container spacing={2}>
-          {/* Cột ảnh */}
-          <Grid item xs={12} md={5}>
-            {selectedImage && (
-              <Box
-                component='img'
-                src={optimizeCloudinaryUrl(selectedImage)}
-                alt='Ảnh sản phẩm'
-                sx={{
-                  width: '300px',
-                  height: '257px',
-                  objectFit: 'contain',
-                  backgroundColor: '#f5f5f5',
-                  borderRadius: 2,
-                  border: '1px solid #ccc',
-                  mb: 1,
-                  display: 'flex',
-                  justifyContent: 'center',
-                  alignItems: 'center'
-                }}
-              />
-            )}
+        <TabContext value={tabIndex}>
+          <Tabs
+            value={tabIndex}
+            onChange={handleTabChange}
+            indicatorColor='primary'
+            textColor='primary'
+            variant='scrollable'
+            scrollButtons='auto'
+            sx={{ mb: 2 }}
+          >
+            <Tab label='Thông tin sản phẩm' value='1' />
+            <Tab label='Màu sắc sản phẩm' value='2' />
+            <Tab label='Kích thước sản phẩm' value='3' />
+          </Tabs>
 
-            {/* Thumbnail ảnh nhỏ với thanh cuộn ngang */}
-            <Box sx={{ maxWidth: '300px', overflowX: 'auto' }}>
-              <Box sx={{ display: 'flex', gap: 1, flexWrap: 'nowrap' }}>
-                {imageList.map((img, index) => (
+          <TabPanel value='1'>
+            <Grid container spacing={2}>
+              {/* Cột ảnh */}
+              <Grid item xs={12} md={5}>
+                {selectedImage && (
                   <Box
-                    key={index}
                     component='img'
-                    src={optimizeCloudinaryUrl(img)}
-                    alt={`Ảnh ${index + 1}`}
-                    onClick={() => handleImageClick(img)}
+                    src={optimizeCloudinaryUrl(selectedImage)}
+                    alt='Ảnh sản phẩm'
                     sx={{
-                      minWidth: 45,
-                      width: 45,
-                      height: 45,
-                      objectFit: 'cover',
-                      borderRadius: 1,
-                      border:
-                        img === selectedImage
-                          ? '2px solid #001f5d'
-                          : '1px solid #ccc',
-                      cursor: 'pointer'
+                      width: '300px',
+                      height: '257px',
+                      objectFit: 'contain',
+                      backgroundColor: '#f5f5f5',
+                      borderRadius: 2,
+                      border: '1px solid #ccc',
+                      mb: 1,
+                      display: 'flex',
+                      justifyContent: 'center',
+                      alignItems: 'center'
                     }}
                   />
-                ))}
-              </Box>
-            </Box>
-          </Grid>
+                )}
 
-          {/* Cột thông tin */}
-          <Grid item size={12} md={7} width='calc(98% - 350px)'>
-            <Box sx={{ width: '100%' }}>
-              <Table size='small' sx={{ width: '100%' }}>
-                <TableBody>
-                  <TableRow>
-                    <TableCell
-                      variant='head'
-                      sx={{ fontWeight: 500, width: 100 }}
-                    >
-                      Mã sản phẩm
-                    </TableCell>
-                    <TableCell>{product.productCode}</TableCell>
-                  </TableRow>
-                  <TableRow>
-                    <TableCell
-                      variant='head'
-                      sx={{ fontWeight: 500, width: '25%' }}
-                    >
-                      Tên sản phẩm
-                    </TableCell>
-                    <TableCell>{product.name}</TableCell>
-                  </TableRow>
-                  <TableRow>
-                    <TableCell variant='head' sx={{ fontWeight: 500 }}>
-                      Giá
-                    </TableCell>
-                    <TableCell>
-                      {product.exportPrice?.toLocaleString('vi-VN')}đ
-                    </TableCell>
-                  </TableRow>
-                  <TableRow>
-                    <TableCell variant='head' sx={{ fontWeight: 500 }}>
-                      Danh mục
-                    </TableCell>
-                    <TableCell>
-                      {product.categoryId?.name
-                        .split(' ')
-                        .map(
-                          (word) =>
-                            word.charAt(0).toUpperCase() +
-                            word.slice(1).toLowerCase()
-                        )
-                        .join(' ')}
-                    </TableCell>
-                  </TableRow>
-                  <TableRow>
-                    <TableCell variant='head' sx={{ fontWeight: 500 }}>
-                      Màu sắc
-                    </TableCell>
-                    <TableCell>
-                      {filteredColors.length > 0 ? (
-                        <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
-                          {filteredColors.map((color) => (
-                            <Chip
-                              key={color._id}
-                              label={
-                                <Box
-                                  sx={{
-                                    overflow: 'hidden',
-                                    textOverflow: 'ellipsis',
-                                    whiteSpace: 'nowrap',
-                                    width: '100%'
-                                  }}
-                                  title={color.name} // Hiển thị toàn bộ tên khi hover
-                                >
-                                  {color.name}
-                                </Box>
-                              }
-                              size='large'
-                              sx={{
-                                backgroundColor: '#001f5d',
-                                color: '#fff',
-                                fontWeight: 500,
-                                width: 120,
-                                paddingX: 1 // Có thể thêm nếu muốn canh nội dung đẹp hơn
-                              }}
-                            />
-                          ))}
-                        </Box>
-                      ) : (
-                        'Chưa có'
-                      )}
-                    </TableCell>
-                  </TableRow>
-                  <TableRow>
-                    <TableCell variant='head' sx={{ fontWeight: 500 }}>
-                      Kích thước
-                    </TableCell>
-                    <TableCell>
-                      {filteredSizes.length > 0 ? (
-                        <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
-                          {filteredSizes.map((size) => (
-                            <Chip
-                              color='#000'
-                              key={size._id}
-                              label={
-                                <Box
-                                  sx={{
-                                    overflow: 'hidden',
-                                    textOverflow: 'ellipsis',
-                                    whiteSpace: 'nowrap',
-                                    width: '100%' // cần để hiệu lực max width từ chip
-                                  }}
-                                  title={size.name} // hiện full khi hover
-                                >
-                                  {size.name}
-                                </Box>
-                              }
-                              size='large'
-                              sx={{
-                                backgroundColor: '#001f5d',
-                                color: '#fff',
-                                fontWeight: 500,
-                                width: 120,
-                                paddingX: 1 // thêm padding nếu muốn đẹp hơn
-                              }}
-                            />
-                          ))}
-                        </Box>
-                      ) : (
-                        'Chưa có'
-                      )}
-                    </TableCell>
-                  </TableRow>
-                  <TableRow>
-                    <TableCell variant='head' sx={{ fontWeight: 500 }}>
-                      Trạng thái
-                    </TableCell>
-                    <TableCell>
-                      <Chip
-                        label={product.destroy ? 'Ngừng bán' : 'Đang bán'}
-                        color={product.destroy ? 'error' : 'success'}
-                        size='large'
-                        sx={{ width: '120px', fontWeight: '800' }}
+                {/* Thumbnail ảnh nhỏ với thanh cuộn ngang */}
+                <Box sx={{ maxWidth: '300px', overflowX: 'auto' }}>
+                  <Box sx={{ display: 'flex', gap: 1, flexWrap: 'nowrap' }}>
+                    {imageList.map((img, index) => (
+                      <Box
+                        key={index}
+                        component='img'
+                        src={optimizeCloudinaryUrl(img)}
+                        alt={`Ảnh ${index + 1}`}
+                        onClick={() => handleImageClick(img)}
+                        sx={{
+                          minWidth: 45,
+                          width: 45,
+                          height: 45,
+                          objectFit: 'cover',
+                          borderRadius: 1,
+                          border:
+                            img === selectedImage
+                              ? '2px solid #001f5d'
+                              : '1px solid #ccc',
+                          cursor: 'pointer'
+                        }}
                       />
-                    </TableCell>
-                  </TableRow>
-                  <TableRow>
-                    <TableCell variant='head' sx={{ fontWeight: 500 }}>
-                      Ngày tạo
-                    </TableCell>
-                    <TableCell>{formatDate(product.createdAt)}</TableCell>
-                  </TableRow>
+                    ))}
+                  </Box>
+                </Box>
+              </Grid>
 
-                  <TableRow>
-                    <TableCell variant='head' sx={{ fontWeight: 500 }}>
-                      Ngày cập nhật
-                    </TableCell>
-                    <TableCell>{formatDate(product.updatedAt)}</TableCell>
-                  </TableRow>
-                </TableBody>
-              </Table>
-            </Box>
-          </Grid>
-        </Grid>
+              {/* Cột thông tin */}
+              <Grid item size={12} md={7} width='calc(98% - 350px)'>
+                <Box sx={{ width: '100%' }}>
+                  <Table size='small' sx={{ width: '100%' }}>
+                    <TableBody>
+                      <TableRow>
+                        <TableCell
+                          variant='head'
+                          sx={{ fontWeight: 500, width: 100 }}
+                        >
+                          Mã sản phẩm
+                        </TableCell>
+                        <TableCell>{product.productCode}</TableCell>
+                      </TableRow>
+                      <TableRow>
+                        <TableCell
+                          variant='head'
+                          sx={{ fontWeight: 500, width: '25%' }}
+                        >
+                          Tên sản phẩm
+                        </TableCell>
+                        <TableCell>{product.name}</TableCell>
+                      </TableRow>
+                      <TableRow>
+                        <TableCell variant='head' sx={{ fontWeight: 500 }}>
+                          Giá
+                        </TableCell>
+                        <TableCell>
+                          {product.exportPrice?.toLocaleString('vi-VN')}đ
+                        </TableCell>
+                      </TableRow>
+                      <TableRow>
+                        <TableCell variant='head' sx={{ fontWeight: 500 }}>
+                          Danh mục
+                        </TableCell>
+                        <TableCell>
+                          {categoryName
+                            .split(' ')
+                            .map(
+                              (word) =>
+                                word.charAt(0).toUpperCase() +
+                                word.slice(1).toLowerCase()
+                            )
+                            .join(' ')}
+                        </TableCell>
+                      </TableRow>
+                      <TableRow>
+                        <TableCell
+                          variant='head'
+                          sx={{ fontWeight: 500, minWidth: 300 }}
+                        >
+                          Kích thước đóng gói(DxRxC, Trọng lượng)
+                        </TableCell>
+                        <TableCell>
+                          {product?.packageSize?.width} x{' '}
+                          {product?.packageSize?.height} x{' '}
+                          {product?.packageSize?.length} cm,{' '}
+                          {product?.packageSize?.weight} gram
+                        </TableCell>
+                      </TableRow>
+                      <TableRow>
+                        <TableCell variant='head' sx={{ fontWeight: 500 }}>
+                          Trạng thái
+                        </TableCell>
+                        <TableCell>
+                          <Chip
+                            label={product.destroy ? 'Ngừng bán' : 'Đang bán'}
+                            color={product.destroy ? 'error' : 'success'}
+                            size='large'
+                            sx={{ width: '120px', fontWeight: '800' }}
+                          />
+                        </TableCell>
+                      </TableRow>
+                      <TableRow>
+                        <TableCell variant='head' sx={{ fontWeight: 500 }}>
+                          Ngày tạo
+                        </TableCell>
+                        <TableCell>{formatDate(product.createdAt)}</TableCell>
+                      </TableRow>
 
-        {/* Cột mô tả nằm ở dưới cùng */}
-        <Typography variant='h6' gutterBottom sx={{ mt: 3 }}>
-          Mô tả sản phẩm
-        </Typography>
-        {!product.description ? (
-          <Typography variant='body2' color='textSecondary'>
-            Chưa có mô tả cho sản phẩm này.
-          </Typography>
-        ) : (
-          <Box
-            sx={{
-              width: '100%',
-              mt: 2,
-              '& img': {
-                width: '873px !important',
-                height: '873px !important',
-                display: 'block',
-                margin: '8px auto',
-                borderRadius: '6px',
-                objectFit: 'contain'
-              },
-              '& p': {
-                margin: '8px 0',
-                lineHeight: 1.6,
-                wordBreak: 'break-word'
-              },
-              '& ul, & ol': {
-                paddingLeft: '20px',
-                margin: '8px 0'
-              },
-              '& li': {
-                marginBottom: '4px'
-              },
-              '& strong': {
-                fontWeight: 600
-              },
-              '& em': {
-                fontStyle: 'italic'
-              },
-              '& a': {
-                color: '#1976d2',
-                textDecoration: 'underline',
-                wordBreak: 'break-all'
-              },
-              '& span': {
-                wordBreak: 'break-word'
-              },
-              '& *': {
-                boxSizing: 'border-box'
-              }
-            }}
-            dangerouslySetInnerHTML={{ __html: product.description }}
-          />
-        )}
+                      <TableRow>
+                        <TableCell variant='head' sx={{ fontWeight: 500 }}>
+                          Ngày cập nhật
+                        </TableCell>
+                        <TableCell>{formatDate(product.updatedAt)}</TableCell>
+                      </TableRow>
+                    </TableBody>
+                  </Table>
+                </Box>
+              </Grid>
+            </Grid>
+
+            {/* Cột mô tả nằm ở dưới cùng */}
+            <Typography variant='h6' gutterBottom sx={{ mt: 3 }}>
+              Mô tả sản phẩm
+            </Typography>
+            {!product.description ? (
+              <Typography variant='body2' color='textSecondary'>
+                Chưa có mô tả cho sản phẩm này.
+              </Typography>
+            ) : (
+              <Box
+                sx={{
+                  width: '100%',
+                  mt: 2,
+                  '& img': {
+                    width: '873px !important',
+                    height: '873px !important',
+                    display: 'block',
+                    margin: '8px auto',
+                    borderRadius: '6px',
+                    objectFit: 'contain'
+                  },
+                  '& p': {
+                    margin: '8px 0',
+                    lineHeight: 1.6,
+                    wordBreak: 'break-word'
+                  },
+                  '& ul, & ol': {
+                    paddingLeft: '20px',
+                    margin: '8px 0'
+                  },
+                  '& li': {
+                    marginBottom: '4px'
+                  },
+                  '& strong': {
+                    fontWeight: 600
+                  },
+                  '& em': {
+                    fontStyle: 'italic'
+                  },
+                  '& a': {
+                    color: '#1976d2',
+                    textDecoration: 'underline',
+                    wordBreak: 'break-all'
+                  },
+                  '& span': {
+                    wordBreak: 'break-word'
+                  },
+                  '& *': {
+                    boxSizing: 'border-box'
+                  }
+                }}
+                dangerouslySetInnerHTML={{ __html: product.description }}
+              />
+            )}
+          </TabPanel>
+
+          <TabPanel value='2'>
+            <Typography variant='h6' gutterBottom>
+              Danh sách màu sắc
+            </Typography>
+            <Table size='small'>
+              <TableBody>
+                <TableRow sx={{ fontWeight: 600 }}>
+                  <TableCell sx={StyleAdmin.TableColumnSTT}>STT</TableCell>
+                  <TableCell align='left'>Ảnh</TableCell>
+                  <TableCell align='left' sx={{ width: '30%' }}>
+                    Tên màu
+                  </TableCell>
+                  <TableCell align='left' sx={{ width: 200 }}>
+                    Ngày tạo
+                  </TableCell>
+                  <TableCell align='left' sx={{ width: 200 }}>
+                    Ngày cập nhật
+                  </TableCell>
+                  <TableCell align='left' sx={{ width: 150, maxWidth: 150 }}>
+                    Thao tác
+                  </TableCell>
+                </TableRow>
+                {filteredColors.length === 0 ? (
+                  <TableNoneData
+                    col={6}
+                    message='Không có dữ liệu màu sắc cảu sản phẩm.'
+                  />
+                ) : (
+                  filteredColors.map((color, index) => (
+                    <TableRow key={color._id}>
+                      <TableCell sx={StyleAdmin.TableColumnSTT}>
+                        {index + 1}
+                      </TableCell>
+                      <TableCell
+                        sx={{
+                          ...styles.cellPadding,
+                          display: 'flex',
+                          justifyContent: 'start',
+                          alignItems: 'center',
+                          height: 50,
+                          minHeight: 55,
+                          maxHeight: 55
+                        }}
+                      >
+                        <Box
+                          component='img'
+                          src={optimizeCloudinaryUrl(color.image)}
+                          alt={color.name}
+                          sx={{
+                            width: 40,
+                            height: 40,
+                            objectFit: 'cover',
+                            borderRadius: '4px',
+                            border: '1px solid #ccc'
+                          }}
+                        />
+                      </TableCell>
+                      <TableCell
+                        sx={{ textAlign: 'left', ...styles.cellPadding }}
+                      >
+                        {color?.name}
+                      </TableCell>
+                      <TableCell sx={styles.cellPadding}>
+                        {formatDate(colorCreatedAt)}
+                      </TableCell>
+                      <TableCell sx={styles.cellPadding}>
+                        {formatDate(colorUpdatedAt)}
+                      </TableCell>
+                      <TableCell
+                        align='center'
+                        sx={{ maxWidth: 150, ...styles.cellPadding }}
+                      >
+                        <Stack
+                          direction='row'
+                          spacing={1}
+                          sx={styles.groupIcon}
+                        >
+                          <Tooltip title='Xem'>
+                            <IconButton size='small'>
+                              <RemoveRedEyeIcon color='primary' />
+                            </IconButton>
+                          </Tooltip>
+                          <Tooltip title='Sửa'>
+                            <IconButton size='small'>
+                              <BorderColorIcon color='warning' />
+                            </IconButton>
+                          </Tooltip>
+                          <Tooltip title='Xoá'>
+                            <IconButton size='small'>
+                              <DeleteForeverIcon color='error' />
+                            </IconButton>
+                          </Tooltip>
+                        </Stack>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
+              </TableBody>
+            </Table>
+          </TabPanel>
+
+          <TabPanel value='3'>
+            <Typography variant='h6' gutterBottom>
+              Danh sách kích thước
+            </Typography>
+            <Table size='small'>
+              <TableBody>
+                <TableRow sx={{ fontWeight: 600 }}>
+                  <TableCell sx={StyleAdmin.TableColumnSTT}>STT</TableCell>
+                  <TableCell align='left' sx={{ width: '30%' }}>
+                    Tên kích thước
+                  </TableCell>
+                  <TableCell align='left'>Ngày tạo</TableCell>
+                  <TableCell align='left'>Ngày cập nhật</TableCell>
+                  <TableCell align='left' sx={{ width: 150, maxWidth: 150 }}>
+                    Thao tác
+                  </TableCell>
+                </TableRow>
+                {filteredSizes.length === 0 ? (
+                  <TableNoneData
+                    col={5}
+                    message='Không có dữ liệu kích thước cảu sản phẩm.'
+                  />
+                ) : (
+                  filteredSizes.map((size, index) => (
+                    <TableRow key={size._id}>
+                      <TableCell sx={StyleAdmin.TableColumnSTT}>
+                        {index + 1}
+                      </TableCell>
+                      <TableCell sx={styles.cellPadding}>{size.name}</TableCell>
+                      <TableCell sx={styles.cellPadding}>
+                        {formatDate(sizeCreatedAt)}
+                      </TableCell>
+                      <TableCell sx={styles.cellPadding}>
+                        {formatDate(sizeUpdatedAt)}
+                      </TableCell>
+                      <TableCell align='center'>
+                        <Stack
+                          direction='row'
+                          spacing={1}
+                          sx={styles.groupIcon}
+                        >
+                          <Tooltip title='Xem'>
+                            <IconButton size='small'>
+                              <RemoveRedEyeIcon color='primary' />
+                            </IconButton>
+                          </Tooltip>
+                          <Tooltip title='Sửa'>
+                            <IconButton size='small'>
+                              <BorderColorIcon color='warning' />
+                            </IconButton>
+                          </Tooltip>
+                          <Tooltip title='Xoá'>
+                            <IconButton size='small'>
+                              <DeleteForeverIcon color='error' />
+                            </IconButton>
+                          </Tooltip>
+                        </Stack>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
+              </TableBody>
+            </Table>
+          </TabPanel>
+        </TabContext>
       </DialogContent>
+
       <DialogActions sx={{ padding: '16px 24px' }}>
         <Button
           color='error'

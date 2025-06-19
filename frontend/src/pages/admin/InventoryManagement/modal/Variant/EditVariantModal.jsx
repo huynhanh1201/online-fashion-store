@@ -141,7 +141,7 @@ const EditVariantModal = ({
     <Dialog
       open={open}
       onClose={onClose}
-      maxWidth='lg'
+      maxWidth='xl'
       fullWidth
       sx={{ padding: '16px 24px' }}
       BackdropProps={{
@@ -373,8 +373,8 @@ const EditVariantModal = ({
                   sx={{ mb: 1 }}
                 />
 
-                <Box sx={{ gap: 2, display: 'flex' }}>
-                  <Box sx={{ display: 'flex', gap: 2 }}>
+                <Box sx={{ gap: 2, display: 'flex', width: '100%' }}>
+                  <Box sx={{ display: 'flex', gap: 2, width: '100% ' }}>
                     {/* Dài */}
                     <Controller
                       name='packageSize.length'
@@ -390,7 +390,7 @@ const EditVariantModal = ({
                       }}
                       render={({ field }) => (
                         <TextField
-                          label='Dài (cm)'
+                          label='Chiều dài gói hàng (cm)'
                           type='number'
                           fullWidth
                           disabled={!overridePackageSize}
@@ -418,7 +418,7 @@ const EditVariantModal = ({
                       }}
                       render={({ field }) => (
                         <TextField
-                          label='Rộng (cm)'
+                          label='Chiều rộng gói hàng (cm)'
                           type='number'
                           fullWidth
                           disabled={!overridePackageSize}
@@ -431,7 +431,7 @@ const EditVariantModal = ({
                       )}
                     />
                   </Box>
-                  <Box sx={{ display: 'flex', gap: 2 }}>
+                  <Box sx={{ display: 'flex', gap: 2, width: '100% ' }}>
                     {/* Cao */}
                     <Controller
                       name='packageSize.height'
@@ -447,7 +447,7 @@ const EditVariantModal = ({
                       }}
                       render={({ field }) => (
                         <TextField
-                          label='Cao (cm)'
+                          label='Chiều cao gói hàng (cm)'
                           type='number'
                           fullWidth
                           disabled={!overridePackageSize}
@@ -466,16 +466,16 @@ const EditVariantModal = ({
                       control={control}
                       rules={{
                         required: overridePackageSize
-                          ? 'Khối lượng là bắt buộc'
+                          ? 'Trọng lượng là bắt buộc'
                           : false,
                         validate: (val) =>
                           overridePackageSize && Number(val) <= 0
-                            ? 'Khối lượng phải lớn hơn 0'
+                            ? 'Trọng lượng phải lớn hơn 0'
                             : true
                       }}
                       render={({ field }) => (
                         <TextField
-                          label='Khối lượng (gram)'
+                          label='Trọng lượng gói hàng (gram)'
                           type='number'
                           fullWidth
                           disabled={!overridePackageSize}

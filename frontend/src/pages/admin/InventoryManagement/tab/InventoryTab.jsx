@@ -722,14 +722,14 @@ const InventoryTab = () => {
                               <BorderColorIcon color='warning' />
                             </IconButton>
                           </Tooltip>
-                          <Tooltip title='Ẩn'>
-                            <IconButton
-                              onClick={() => handleDeleteInventory(row)}
-                              size='small'
-                            >
-                              <VisibilityOffIcon color='error' />
-                            </IconButton>
-                          </Tooltip>
+                          {/*<Tooltip title='Ẩn'>*/}
+                          {/*  <IconButton*/}
+                          {/*    onClick={() => handleDeleteInventory(row)}*/}
+                          {/*    size='small'*/}
+                          {/*  >*/}
+                          {/*    <VisibilityOffIcon color='error' />*/}
+                          {/*  </IconButton>*/}
+                          {/*</Tooltip>*/}
                         </Stack>
                       )
                     }

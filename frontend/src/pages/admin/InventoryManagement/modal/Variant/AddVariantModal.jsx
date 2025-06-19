@@ -305,7 +305,7 @@ const AddVariantModal = ({
     <Dialog
       open={open}
       onClose={handleClose}
-      maxWidth='lg'
+      maxWidth='xl'
       fullWidth
       sx={{ padding: '16px 24px' }}
       BackdropProps={{
@@ -676,7 +676,7 @@ const AddVariantModal = ({
                   />
                 </Box>
               </Box>
-              <Box sx={{ flex: 1 }}>
+              <Box sx={{ width: '100%' }}>
                 {/* Ghi đè kích thước đóng gói */}
                 <FormControlLabel
                   control={
@@ -691,8 +691,8 @@ const AddVariantModal = ({
                   sx={{ mb: 1 }}
                   label='Đặt kích thước đóng gói riêng cho biến thể'
                 />
-                <Box sx={{ display: 'flex', gap: 2 }}>
-                  <Box sx={{ display: 'flex', gap: 2, mb: 2 }}>
+                <Box sx={{ display: 'flex', gap: 2, width: '100%' }}>
+                  <Box sx={{ display: 'flex', gap: 2, mb: 2, width: '100%' }}>
                     {/* Dài */}
                     <Controller
                       name='packageSize.length'
@@ -708,7 +708,7 @@ const AddVariantModal = ({
                       }}
                       render={({ field }) => (
                         <TextField
-                          label='Dài (cm)'
+                          label='Chiều dài gói hàng (cm)'
                           type='number'
                           fullWidth
                           disabled={!overridePackageSize}
@@ -736,7 +736,7 @@ const AddVariantModal = ({
                       }}
                       render={({ field }) => (
                         <TextField
-                          label='Rộng (cm)'
+                          label='Chiều rộng gói hàng (cm)'
                           type='number'
                           fullWidth
                           disabled={!overridePackageSize}
@@ -749,7 +749,7 @@ const AddVariantModal = ({
                       )}
                     />
                   </Box>
-                  <Box sx={{ display: 'flex', gap: 2 }}>
+                  <Box sx={{ display: 'flex', gap: 2, width: '100%' }}>
                     {/* Cao */}
                     <Controller
                       name='packageSize.height'
@@ -766,7 +766,7 @@ const AddVariantModal = ({
                       render={({ field }) => (
                         <TextField
                           sx={{ mb: 2 }}
-                          label='Cao (cm)'
+                          label='Chiều cao gói hàng (cm)'
                           type='number'
                           fullWidth
                           disabled={!overridePackageSize}
@@ -785,16 +785,16 @@ const AddVariantModal = ({
                       control={control}
                       rules={{
                         required: overridePackageSize
-                          ? 'Khối lượng là bắt buộc'
+                          ? 'Trọng lượng là bắt buộc'
                           : false,
                         validate: (val) =>
                           overridePackageSize && Number(val) <= 0
-                            ? 'Khối lượng phải lớn hơn 0'
+                            ? 'Trọng lượng phải lớn hơn 0'
                             : true
                       }}
                       render={({ field }) => (
                         <TextField
-                          label='Khối lượng (gram)'
+                          label='Trọng lượng gói hàng (gram)'
                           type='number'
                           fullWidth
                           disabled={!overridePackageSize}

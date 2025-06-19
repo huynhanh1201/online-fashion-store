@@ -186,8 +186,8 @@ const ProductManagement = () => {
         const sizePalette = await getSizePaletteId(product._id)
 
         // Bạn có thể lưu dữ liệu này vào state nếu cần dùng ở modal
-        setColorPalette(colorPalette)
-        setSizePalette(sizePalette)
+        setColorPalette(colorPalette || [])
+        setSizePalette(sizePalette || [])
       } catch (error) {
         console.error('Lỗi khi lấy dữ liệu palette:', error)
       }
