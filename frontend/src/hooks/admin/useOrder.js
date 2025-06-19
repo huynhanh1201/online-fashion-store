@@ -4,7 +4,8 @@ import {
   getOrderById,
   getOrderItems,
   getOrderHistories,
-  updateOrder
+  updateOrder,
+  deleteOrderById
 } from '~/services/admin/orderService'
 
 const useOrder = () => {
@@ -71,13 +72,27 @@ const useOrder = () => {
     }
   }
 
-  const updateOrderById = async (orderId, updateData) => {
+  const updateOrderById = async (id, data) => {
     try {
-      const updatedOrder = await updateOrder(orderId, updateData)
-      return updatedOrder
-    } catch (error) {
-      console.error('Lỗi khi cập nhật đơn hàng:', error)
+      const updated = await updateOrder(id, data)
+      setOrders((prev) =>
+        prev.map((d) => (d._id === updated._id ? updated : d))
+      )
+      return updated
+    } catch (err) {
+      console.error('Error updating category:', err)
       return null
+    }
+  }
+  const remove = async (id) => {
+    try {
+      await deleteOrderById(id)
+      setOrders((prev) => prev.filter((d) => d._id !== id))
+      setTotalPages((prev) => prev - 1)
+      return true
+    } catch (err) {
+      console.error('Error deleting order:', err)
+      return false
     }
   }
 
@@ -94,7 +109,8 @@ const useOrder = () => {
     getOrderHistoriesByOrderId,
     updateOrderById,
     getOrderId,
-    Save
+    Save,
+    remove
   }
 }
 

@@ -42,18 +42,57 @@ const useVariants = () => {
   }
 
   const createNewVariant = async (data) => {
-    const result = await createVariant(data)
-    return result
+    try {
+      const result = await createVariant(data)
+      if (result) {
+        setVariants((prev) => [...prev, result])
+        return result
+      } else {
+        throw new Error('Không thể tạo biến thể mới')
+      }
+    } catch (error) {
+      console.error('Lỗi khi tạo biến thể mới:', error)
+      throw error // Ném lỗi để xử lý bên ngoài nếu cần
+    }
   }
 
   const updateVariantById = async (id, data) => {
-    const result = await updateVariant(id, data)
-    return result
+    try {
+      const result = await updateVariant(id, data)
+      if (result) {
+        setVariants((prev) => {
+          return prev.map((variant) =>
+            String(variant._id) === String(id)
+              ? { ...variant, ...data }
+              : variant
+          )
+        })
+        return result
+      } else {
+        throw new Error('Không thể cập nhật biến thể')
+      }
+    } catch (error) {
+      console.error('Lỗi khi cập nhật biến thể:', error)
+      throw error // Ném lỗi để xử lý bên ngoài nếu cần
+    }
   }
 
   const deleteVariantById = async (id) => {
-    const result = await deleteVariant(id)
-    return result
+    try {
+      const result = await deleteVariant(id)
+      if (result) {
+        setVariants((prev) =>
+          prev.filter((variant) => String(variant._id) !== String(id))
+        )
+        setTotalPages((prev) => prev - 1)
+        return result
+      } else {
+        throw new Error('Không thể xoá biến thể')
+      }
+    } catch (error) {
+      console.error('Lỗi khi xoá biến thể:', error)
+      throw error // Ném lỗi để xử lý bên ngoài nếu cần
+    }
   }
   const fetchVariantId = async (id) => {
     const result = await getVariantId(id)

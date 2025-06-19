@@ -18,7 +18,6 @@ import AddPhotoAlternateIcon from '@mui/icons-material/AddPhotoAlternate'
 
 import { useForm } from 'react-hook-form'
 import StyleAdmin from '~/assets/StyleAdmin.jsx'
-import { addCategory } from '~/services/admin/categoryService.js'
 import { CloudinaryCategory, URI } from '~/utils/constants'
 
 const uploadToCloudinary = async (file, folder = CloudinaryCategory) => {
@@ -37,7 +36,7 @@ const uploadToCloudinary = async (file, folder = CloudinaryCategory) => {
   return data.secure_url
 }
 
-const AddCategoryModal = ({ open, onClose, onAdded, onSave }) => {
+const AddCategoryModal = ({ open, onClose, onAdded }) => {
   const {
     register,
     handleSubmit,
@@ -63,18 +62,20 @@ const AddCategoryModal = ({ open, onClose, onAdded, onSave }) => {
         image: imageUrl || ''
       }
 
-      const result = await addCategory(payload)
-
-      if (result) {
-        if (onSave) onSave()
-        onAdded()
-        onClose()
-        reset()
-        setImageFile(null)
-        setPreviewUrl('')
-      } else {
-        console.log('Thêm danh mục thất bại. Vui lòng thử lại!')
-      }
+      await onAdded(payload, 'add')
+      onClose()
+      reset()
+      setImageFile(null)
+      // setPreviewUrl('')
+      // if (result) {
+      //   if (onSave) onSave()
+      //   onClose()
+      //   reset()
+      //   setImageFile(null)
+      //   setPreviewUrl('')
+      // } else {
+      //   console.log('Thêm danh mục thất bại. Vui lòng thử lại!')
+      // }
     } catch (error) {
       console.log('Lỗi khi tải ảnh hoặc thêm danh mục!', error)
     }

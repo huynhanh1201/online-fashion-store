@@ -1,7 +1,10 @@
 import { useState } from 'react'
 import {
   getCategories,
-  getCategoryById
+  getCategoryById,
+  addCategory,
+  deleteCategory,
+  updateCategory
 } from '~/services/admin/categoryService'
 
 const useCategories = () => {
@@ -36,6 +39,47 @@ const useCategories = () => {
     }
     setloading(false)
   }
+  const add = async (data) => {
+    try {
+      const newCategory = await addCategory(data)
+      setCategories((prev) => {
+        const updated = [newCategory, ...prev]
+        return updated.slice(0, 10) // ✅ chỉ giữ lại 10 danh mục mới nhất
+      })
+      setTotalPages((prev) => prev + 1)
+      return newCategory
+    } catch (err) {
+      console.error('Error adding category:', err)
+      return null
+    }
+  }
+
+  const update = async (id, data) => {
+    try {
+      const updatedCategory = await updateCategory(id, data)
+      setCategories((prev) =>
+        prev.map((cat) =>
+          cat._id === updatedCategory._id ? updatedCategory : cat
+        )
+      )
+      return updatedCategory
+    } catch (err) {
+      console.error('Error updating category:', err)
+      return null
+    }
+  }
+
+  const remove = async (id) => {
+    try {
+      await deleteCategory(id)
+      setCategories((prev) => prev.filter((cat) => cat._id !== id))
+      setTotalPages((prev) => prev - 1)
+      return true
+    } catch (err) {
+      console.error('Error deleting category:', err)
+      return false
+    }
+  }
 
   const fetchById = async (id) => {
     try {
@@ -57,7 +101,10 @@ const useCategories = () => {
     fetchCategories,
     loading,
     fetchById,
-    Save
+    Save,
+    add,
+    remove,
+    update
   }
 }
 

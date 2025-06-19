@@ -11,7 +11,7 @@ import {
 } from '@mui/material'
 import { useForm } from 'react-hook-form'
 import { toast } from 'react-toastify'
-const AddPartnerModal = ({ open, onClose, addPartner }) => {
+const AddPartnerModal = ({ open, onClose, addPartner, onSave }) => {
   const {
     register,
     handleSubmit,
@@ -19,7 +19,7 @@ const AddPartnerModal = ({ open, onClose, addPartner }) => {
     formState: { errors }
   } = useForm()
 
-  const onSubmit = (data) => {
+  const onSubmit = async (data) => {
     // Thực hiện xử lý với data ở đây
     const { type, phone, email } = data
 
@@ -44,8 +44,11 @@ const AddPartnerModal = ({ open, onClose, addPartner }) => {
         email: email || null
       }
     }
-
-    addPartner(formattedData, 'add')
+    if (onSave) {
+      await onSave(formattedData)
+    } else {
+      await addPartner(formattedData, 'add')
+    }
     reset()
     onClose()
   }

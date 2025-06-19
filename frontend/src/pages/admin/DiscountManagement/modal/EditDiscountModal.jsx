@@ -91,7 +91,7 @@ const EditDiscountModal = ({ open, onClose, discount, onSave }) => {
     }
 
     try {
-      await onSave(discount._id, payload)
+      await onSave(payload, 'edit', discount._id)
       onClose()
     } catch (error) {
       console.error('Lỗi khi cập nhật mã giảm giá:', error)

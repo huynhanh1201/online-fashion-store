@@ -149,17 +149,9 @@ const BatchesTab = () => {
   }
   const handleSave = async (batch, type, batchId) => {
     if (type === 'edit') {
-      const updatedBatch = await updateBatchById(batchId, batch)
-      if (updatedBatch) {
-        const data = await fetchBatchId(batchId)
-        console.log('Updated batch data:', data)
-        if (data) {
-          Save(data)
-        }
-      }
+      await updateBatchById(batchId, batch)
     } else if (type === 'delete') {
       await deleteBatchById(batch)
-      fetchBatches(page, rowsPerPage, filter) // Refresh danh sách sau khi lưu
     }
   }
 

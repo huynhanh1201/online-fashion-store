@@ -92,7 +92,7 @@ const EditCategoryModal = ({ open, onClose, category, onSave }) => {
         image: imageUrl
       }
 
-      await onSave(category._id, payload)
+      await onSave(payload, 'edit', category._id)
       handleClose()
     } catch (error) {
       console.log('Lỗi khi lưu danh mục:', error)

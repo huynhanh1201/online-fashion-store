@@ -131,7 +131,7 @@ export default function ColorRow({ color, index, columns, handleOpenModal }) {
             )
             .join(' ')
 
-          color.name = formattedName // cập nhật lại nếu bạn cần dùng sau
+          color.name = originalName // cập nhật lại nếu bạn cần dùng sau
 
           return (
             <TableCell

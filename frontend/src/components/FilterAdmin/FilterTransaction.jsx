@@ -167,7 +167,7 @@ export default function FilterTransaction({
       <Box sx={{ display: 'flex', gap: 2 }}>
         <SearchWithSuggestions
           label='Mã đơn hàng'
-          options={transactions.map((t) => t.orderId.code)}
+          options={transactions.map((t) => t.orderCode)}
           loading={loading}
           keyword={keyword}
           inputValue={inputValue}

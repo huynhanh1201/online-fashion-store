@@ -1,13 +1,6 @@
 import React from 'react'
-import { Typography } from '@mui/material'
-import { Button } from '@mui/material'
 import CategoryTable from './CategoryTable'
-import CategoryPagination from './CategoryPagination'
 import useCategories from '~/hooks/admin/useCategories'
-import {
-  updateCategory,
-  deleteCategory
-} from '~/services/admin/categoryService'
 // Lazy load các modal
 const AddCategoryModal = React.lazy(() => import('./modal/AddCategoryModal'))
 const ViewCategoryModal = React.lazy(() => import('./modal/ViewCategoryModal'))
@@ -23,8 +16,17 @@ const CategoryManagement = () => {
   const [selectedCategory, setSelectedCategory] = React.useState(null)
   const [modalType, setModalType] = React.useState(null)
 
-  const { categories, fetchCategories, Loading, totalPages, Save, fetchById } =
-    useCategories()
+  const {
+    categories,
+    fetchCategories,
+    Loading,
+    totalPages,
+    Save,
+    fetchById,
+    add,
+    update,
+    remove
+  } = useCategories()
 
   React.useEffect(() => {
     fetchCategories(page, limit, filters)
@@ -42,40 +44,43 @@ const CategoryManagement = () => {
     setSelectedCategory(null)
     setModalType(null)
   }
-
-  const handleSaveCategory = async (categoryId, updatedData) => {
+  const handleSave = async (data, type, id) => {
     try {
-      const response = await updateCategory(categoryId, updatedData)
-
-      if (response) {
-        const updatedCategory = await fetchById(categoryId)
-
-        if (updatedCategory) {
-          Save(updatedCategory)
-        }
-      } else {
-        console.log('Cập nhật không thành công')
+      if (type === 'add') {
+        await add(data)
+      } else if (type === 'edit') {
+        await update(id, data)
+      } else if (type === 'delete') {
+        await remove(data)
       }
     } catch (error) {
       console.error('Lỗi:', error)
     }
   }
 
-  const handleDeleteCategory = async (categoryId) => {
-    try {
-      const result = await deleteCategory(categoryId)
-      if (result) {
-        const deleteCategory = await fetchById(categoryId)
-        if (deleteCategory) {
-          Save(deleteCategory)
-        }
-      } else {
-        console.log('Xoá không thành công')
-      }
-    } catch (error) {
-      console.error('Lỗi:', error)
-    }
-  }
+  // const handleSaveCategory = async (categoryId, updatedData) => {
+  //   try {
+  //     await update(categoryId, updatedData)
+  //   } catch (error) {
+  //     console.error('Lỗi:', error)
+  //   }
+  // }
+  //
+  // const handleDeleteCategory = async (categoryId) => {
+  //   try {
+  //     const result = await remove(categoryId)
+  //     if (result) {
+  //       const deleteCategory = await fetchById(categoryId)
+  //       if (deleteCategory) {
+  //         Save(deleteCategory)
+  //       }
+  //     } else {
+  //       console.log('Xoá không thành công')
+  //     }
+  //   } catch (error) {
+  //     console.error('Lỗi:', error)
+  //   }
+  // }
 
   const isEqual = (obj1, obj2) => JSON.stringify(obj1) === JSON.stringify(obj2)
 
@@ -109,9 +114,7 @@ const CategoryManagement = () => {
           <AddCategoryModal
             open
             onClose={handleCloseModal}
-            onAdded={() => {
-              fetchCategories(page, limit, filters)
-            }}
+            onAdded={handleSave}
           />
         )}
         {modalType === 'view' && selectedCategory && (
@@ -127,7 +130,7 @@ const CategoryManagement = () => {
             open
             onClose={handleCloseModal}
             category={selectedCategory}
-            onSave={handleSaveCategory}
+            onSave={handleSave}
           />
         )}
 
@@ -136,7 +139,7 @@ const CategoryManagement = () => {
             open
             onClose={handleCloseModal}
             category={selectedCategory}
-            onDelete={handleDeleteCategory}
+            onDelete={handleSave}
           />
         )}
       </React.Suspense>

@@ -16,7 +16,15 @@ export default function DeleteWarehouseModal({
   onSave
 }) {
   if (!warehouse) return null
-
+  const handleDelete = async (id) => {
+    try {
+      onSave(id, 'delete')
+      onClose()
+    } catch (error) {
+      console.error('Error deleting warehouse:', error)
+      alert('Xóa kho hàng thất bại. Vui lòng thử lại!')
+    }
+  }
   return (
     <Dialog open={open} onClose={onClose} maxWidth='sm' fullWidth>
       <DialogTitle>Ẩn kho hàng</DialogTitle>
@@ -37,10 +45,7 @@ export default function DeleteWarehouseModal({
           Hủy
         </Button>
         <Button
-          onClick={() => {
-            onSave(warehouse._id)
-            onClose()
-          }}
+          onClick={() => handleDelete(warehouse._id)}
           color='error'
           variant='contained'
           sx={{ textTransform: 'none' }}

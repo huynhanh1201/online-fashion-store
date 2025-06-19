@@ -18,7 +18,6 @@ import { useForm, Controller } from 'react-hook-form'
 import useCategories from '~/hooks/admin/useCategories.js'
 import AddCategoryModal from '~/pages/admin/CategorieManagement/modal/AddCategoryModal.jsx'
 import StyleAdmin from '~/assets/StyleAdmin.jsx'
-import { addProduct } from '~/services/admin/productService.js'
 import { Editor } from 'react-draft-wysiwyg'
 import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css'
 import { EditorState, convertToRaw } from 'draft-js'
@@ -59,6 +58,7 @@ const AddProductModal = ({ open, onClose, onSuccess }) => {
   const {
     control,
     handleSubmit,
+    setValue,
     formState: { errors },
     reset
   } = useForm({
@@ -66,6 +66,7 @@ const AddProductModal = ({ open, onClose, onSuccess }) => {
       name: '',
       description: '',
       categoryId: '',
+      categoryName: '',
       price: '',
       importPrice: '',
       exportPrice: '',
@@ -82,7 +83,7 @@ const AddProductModal = ({ open, onClose, onSuccess }) => {
   const [productImagePreview, setProductImagePreview] = useState([])
   const [editorState, setEditorState] = useState(EditorState.createEmpty())
 
-  const { categories, fetchCategories, loading } = useCategories()
+  const { categories, fetchCategories, loading, add } = useCategories()
 
   useEffect(() => {
     if (open) {
@@ -93,6 +94,56 @@ const AddProductModal = ({ open, onClose, onSuccess }) => {
       setEditorState(EditorState.createEmpty())
     }
   }, [open, reset])
+
+  // const onSubmit = async (data) => {
+  //   try {
+  //     if (productImages.length === 0) {
+  //       console.log('Vui lòng thêm ít nhất một ảnh sản phẩm')
+  //       return
+  //     }
+  //
+  //     const finalProduct = {
+  //       name: data.name,
+  //       description: data.description,
+  //       exportPrice: Number(data.price),
+  //       importPrice: data.importPrice ? Number(data.importPrice) : undefined,
+  //       categoryId: data.categoryId,
+  //       image: productImages,
+  //       packageSize: {
+  //         length: Number(data.packageSize?.length || 0),
+  //         width: Number(data.packageSize?.width || 0),
+  //         height: Number(data.packageSize?.height || 0),
+  //         weight: Number(data.packageSize?.weight || 0)
+  //       }
+  //     }
+  //
+  //     await onSuccess(finalProduct, 'add')
+  //
+  //     onClose()
+  //     reset()
+  //     setProductImages([])
+  //     setProductImagePreview([])
+  //     setEditorState(EditorState.createEmpty())
+  //   } catch (error) {
+  //     console.error('Lỗi khi thêm sản phẩm:', error)
+  //     alert('Có lỗi xảy ra, vui lòng thử lại')
+  //   }
+  // }
+
+  const handAddCategory = async (category) => {
+    const newCategory = await add(category) // category trả về từ add()
+
+    // Gọi lại danh sách nếu cần thiết
+    fetchCategories()
+
+    // ✅ Đặt category mới làm giá trị cho select
+    setValue('categoryId', {
+      id: newCategory._id,
+      name: newCategory.name
+    })
+
+    setCategoryOpen(false) // Đóng modal
+  }
 
   const onSubmit = async (data) => {
     try {
@@ -106,7 +157,7 @@ const AddProductModal = ({ open, onClose, onSuccess }) => {
         description: data.description,
         exportPrice: Number(data.price),
         importPrice: data.importPrice ? Number(data.importPrice) : undefined,
-        categoryId: data.categoryId,
+        categoryId: data.categoryId.id, // ✅ lấy id
         image: productImages,
         packageSize: {
           length: Number(data.packageSize?.length || 0),
@@ -116,25 +167,21 @@ const AddProductModal = ({ open, onClose, onSuccess }) => {
         }
       }
 
-      console.log('Final Product:', typeof finalProduct.packageSize.weight)
+      console.log('finalProduct:', finalProduct)
 
-      const result = await addProduct(finalProduct)
+      await onSuccess(finalProduct, 'add')
 
-      if (result) {
-        onSuccess()
-        onClose()
-        reset()
-        setProductImages([])
-        setProductImagePreview([])
-        setEditorState(EditorState.createEmpty())
-      } else {
-        alert('Thêm sản phẩm không thành công')
-      }
+      onClose()
+      reset()
+      setProductImages([])
+      setProductImagePreview([])
+      setEditorState(EditorState.createEmpty())
     } catch (error) {
       console.error('Lỗi khi thêm sản phẩm:', error)
       alert('Có lỗi xảy ra, vui lòng thử lại')
     }
   }
+
   const formatNumber = (value) => {
     const number = value.replace(/\D/g, '') // Xóa ký tự không phải số
     return number.replace(/\B(?=(\d{3})+(?!\d))/g, '.') // Thêm dấu chấm ngăn cách
@@ -235,22 +282,55 @@ const AddProductModal = ({ open, onClose, onSuccess }) => {
                 control={control}
                 rules={{ required: 'Danh mục không được bỏ trống' }}
                 render={({ field }) => (
+                  // <Select
+                  //   {...field}
+                  //   label='Danh mục'
+                  //   value={field.value || ''}
+                  //   disabled={loading}
+                  //   MenuProps={{
+                  //     PaperProps: { sx: StyleAdmin.FormSelect.SelectMenu }
+                  //   }}
+                  // >
+                  //   {categories
+                  //     ?.filter((c) => !c.destroy)
+                  //     .map((cat) => (
+                  //       <MenuItem key={cat._id} value={cat._id}>
+                  //         {cat.name}
+                  //       </MenuItem>
+                  //     ))}
+                  //   <MenuItem onClick={() => setCategoryOpen(true)}>
+                  //     Thêm danh mục mới
+                  //   </MenuItem>
+                  // </Select>
+
                   <Select
-                    {...field}
                     label='Danh mục'
                     value={field.value || ''}
-                    disabled={loading}
-                    MenuProps={{
-                      PaperProps: { sx: StyleAdmin.FormSelect.SelectMenu }
+                    onChange={(e) => {
+                      field.onChange(e.target.value)
                     }}
+                    MenuProps={{
+                      PaperProps: {
+                        sx: {
+                          ...StyleAdmin.FormSelect.SelectMenu,
+                          maxHeight: 300, // ✅ Chiều cao tối đa của danh sách dropdown
+                          overflowY: 'auto' // ✅ Hiển thị thanh cuộn dọc
+                        }
+                      }
+                    }}
+                    renderValue={(selected) => selected?.name || ''}
+                    disabled={loading}
                   >
                     {categories
                       ?.filter((c) => !c.destroy)
-                      .map((cat) => (
-                        <MenuItem key={cat._id} value={cat._id}>
-                          {cat.name}
-                        </MenuItem>
-                      ))}
+                      .map((cat) => {
+                        const option = { id: cat._id, name: cat.name }
+                        return (
+                          <MenuItem key={cat._id} value={option}>
+                            {cat.name}
+                          </MenuItem>
+                        )
+                      })}
                     <MenuItem onClick={() => setCategoryOpen(true)}>
                       Thêm danh mục mới
                     </MenuItem>
@@ -362,7 +442,7 @@ const AddProductModal = ({ open, onClose, onSuccess }) => {
                   control={control}
                   render={({ field }) => (
                     <TextField
-                      label='Khối lượng (kg)'
+                      label='Khối lượng (gram)'
                       type='number'
                       fullWidth
                       inputProps={{ min: 0, step: '0.01' }}
@@ -462,10 +542,7 @@ const AddProductModal = ({ open, onClose, onSuccess }) => {
       <AddCategoryModal
         open={categoryOpen}
         onClose={() => setCategoryOpen(false)}
-        onSave={() => {
-          setCategoryOpen(false)
-          fetchCategories()
-        }}
+        onAdded={handAddCategory}
       />
     </Dialog>
   )

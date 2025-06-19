@@ -34,6 +34,9 @@ const ViewVariantModal = ({ open, onClose, variant }) => {
       second: '2-digit'
     })
   }
+  const VariantName = variant?.name || 'Không có tên biến thể'
+  const variantColorName = variant?.color?.name || 'Không có màu sắc'
+  console.log(variant)
   return (
     <Dialog
       open={open}
@@ -99,8 +102,7 @@ const ViewVariantModal = ({ open, onClose, variant }) => {
                     <strong>Tên biến thể</strong>
                   </TableCell>
                   <TableCell>
-                    {variant?.name
-                      .split(' ')
+                    {VariantName.split(' ')
                       .map(
                         (word) =>
                           word.charAt(0).toUpperCase() +
@@ -114,7 +116,7 @@ const ViewVariantModal = ({ open, onClose, variant }) => {
                     <strong>Màu sắc</strong>
                   </TableCell>
                   <TableCell>
-                    {variant?.color?.name
+                    {variantColorName
                       .split(' ')
                       .map(
                         (word) =>
