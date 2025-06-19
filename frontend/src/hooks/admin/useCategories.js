@@ -42,6 +42,10 @@ const useCategories = () => {
   const add = async (data) => {
     try {
       const newCategory = await addCategory(data)
+      if (!newCategory) {
+        console.error('Failed to add category')
+        return null
+      }
       setCategories((prev) => {
         const updated = [newCategory, ...prev]
         return updated.slice(0, 10) // ✅ chỉ giữ lại 10 danh mục mới nhất

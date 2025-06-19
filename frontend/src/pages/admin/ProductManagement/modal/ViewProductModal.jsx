@@ -401,10 +401,7 @@ const ViewProductModal = ({
                   <TableCell align='left' sx={{ fontWeight: 700, width: 100 }}>
                     Ảnh
                   </TableCell>
-                  <TableCell
-                    align='left'
-                    sx={{ width: '30%', fontWeight: 700 }}
-                  >
+                  <TableCell align='left' sx={{ fontWeight: 700 }}>
                     Tên màu
                   </TableCell>
                   <TableCell align='left' sx={{ width: 200, fontWeight: 700 }}>
@@ -412,6 +409,9 @@ const ViewProductModal = ({
                   </TableCell>
                   <TableCell align='left' sx={{ width: 200, fontWeight: 700 }}>
                     Ngày cập nhật
+                  </TableCell>
+                  <TableCell align='left' sx={{ width: 150, fontWeight: 700 }}>
+                    Trạng thái
                   </TableCell>
                   <TableCell
                     align='left'
@@ -461,7 +461,11 @@ const ViewProductModal = ({
                         sx={{
                           textAlign: 'left',
                           ...styles.cellPadding,
-                          ...styles.cellPaddingColor
+                          ...styles.cellPaddingColor,
+                          maxWidth: 150,
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                          whiteSpace: 'nowrap'
                         }}
                       >
                         {color?.name}
@@ -472,7 +476,7 @@ const ViewProductModal = ({
                           ...styles.cellPaddingColor
                         }}
                       >
-                        {formatDate(colorPalette.createdAt)}
+                        {formatDate(colorCreatedAt)}
                       </TableCell>
                       <TableCell
                         sx={{
@@ -480,7 +484,20 @@ const ViewProductModal = ({
                           ...styles.cellPaddingColor
                         }}
                       >
-                        {formatDate(colorPalette.updatedAt)}
+                        {formatDate(colorUpdatedAt)}
+                      </TableCell>
+                      <TableCell
+                        sx={{
+                          ...styles.cellPadding,
+                          ...styles.cellPaddingColor
+                        }}
+                      >
+                        <Chip
+                          label={color.isActive ? 'Đang bán' : 'Ngừng bán'}
+                          color={color.destroy ? 'error' : 'success'}
+                          size='large'
+                          sx={{ width: '120px', fontWeight: '800' }}
+                        />
                       </TableCell>
                       <TableCell
                         align='center'
@@ -544,10 +561,7 @@ const ViewProductModal = ({
                   >
                     STT
                   </TableCell>
-                  <TableCell
-                    align='left'
-                    sx={{ fontWeight: 700, width: '40%' }}
-                  >
+                  <TableCell align='left' sx={{ fontWeight: 700 }}>
                     Tên kích thước
                   </TableCell>
                   <TableCell align='left' sx={{ fontWeight: 700, width: 200 }}>
@@ -555,6 +569,9 @@ const ViewProductModal = ({
                   </TableCell>
                   <TableCell align='left' sx={{ fontWeight: 700, width: 200 }}>
                     Ngày cập nhật
+                  </TableCell>
+                  <TableCell align='left' sx={{ fontWeight: 700, width: 150 }}>
+                    Trạng thái
                   </TableCell>
                   <TableCell align='left' sx={{ fontWeight: 700, width: 150 }}>
                     Thao tác
@@ -574,15 +591,35 @@ const ViewProductModal = ({
                         {index + 1}
                       </TableCell>
                       <TableCell
-                        sx={{ textAlign: 'left', ...styles.cellPadding }}
+                        sx={{
+                          textAlign: 'left',
+                          ...styles.cellPadding,
+                          maxWidth: 150,
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                          whiteSpace: 'nowrap'
+                        }}
                       >
                         {size?.name}
                       </TableCell>
                       <TableCell sx={styles.cellPadding}>
-                        {formatDate(sizePalette.createdAt)}
+                        {formatDate(sizeCreatedAt)}
                       </TableCell>
                       <TableCell sx={styles.cellPadding}>
-                        {formatDate(sizePalette.updatedAt)}
+                        {formatDate(sizeUpdatedAt)}
+                      </TableCell>
+                      <TableCell
+                        sx={{
+                          ...styles.cellPadding,
+                          ...styles.cellPaddingColor
+                        }}
+                      >
+                        <Chip
+                          label={size?.isActive ? 'Đang bán' : 'Ngừng bán'}
+                          color={size?.destroy ? 'error' : 'success'}
+                          size='large'
+                          sx={{ width: '120px', fontWeight: '800' }}
+                        />
                       </TableCell>
                       <TableCell
                         align='center'

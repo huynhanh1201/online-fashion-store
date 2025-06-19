@@ -115,6 +115,7 @@ const CategoryManagement = () => {
             open
             onClose={handleCloseModal}
             onAdded={handleSave}
+            categories={categories}
           />
         )}
         {modalType === 'view' && selectedCategory && (
@@ -131,6 +132,7 @@ const CategoryManagement = () => {
             onClose={handleCloseModal}
             category={selectedCategory}
             onSave={handleSave}
+            categories={categories}
           />
         )}
 
