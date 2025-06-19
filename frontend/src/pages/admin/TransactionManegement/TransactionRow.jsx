@@ -217,7 +217,7 @@ const TransactionRow = ({ transaction, index, onView, onEdit, onDelete }) => {
     <TableRow hover>
       <TableCell sx={StyleAdmin.TableColumnSTT}>{index + 1}</TableCell>
       <TableCell sx={styles.cell} title={transaction?.orderId?.code}>
-        {transaction?.orderId?.code || '—'}
+        {transaction?.orderCode || '—'}
       </TableCell>
       <TableCell sx={styles.cell} title={transaction.transactionId}>
         {transaction.transactionId || '(Thanh toán COD)'}

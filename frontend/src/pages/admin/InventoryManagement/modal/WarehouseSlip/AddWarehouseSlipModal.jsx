@@ -471,12 +471,12 @@ export default function AddWarehouseSlipModal({
         <AddPartnerModal
           open={openAddDialog}
           onClose={handleCloseAddDialog}
-          addPartner={addPartner}
+          onSave={addPartner}
         />
         <AddWarehouseModal
           open={openAddWarehouse}
           onClose={() => setOpenAddWarehouse(false)}
-          onSave={addWarehouse}
+          Add={addWarehouse}
         />
         <Snackbar
           open={snackbarOpen}

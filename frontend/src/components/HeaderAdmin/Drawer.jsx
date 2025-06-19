@@ -83,7 +83,12 @@ export default function AdminDrawer({
     dispatch(logoutUserAPI())
     onClose()
   }
-
+  const roleMap = {
+    technical_admin: 'Kỹ thuật viên hệ thống',
+    owner: 'Chủ cửa hàng',
+    staff: 'Nhân viên quản lý',
+    customer: 'Khách hàng'
+  }
   if (!open) {
     return (
       <Box
@@ -225,7 +230,9 @@ export default function AdminDrawer({
             </Typography>
             <CheckCircleIcon sx={{ color: '#61b865' }} fontSize='small' />
           </Box>
-          <Typography variant='caption'>Quản trị viên</Typography>
+          <Typography variant='caption'>
+            {roleMap[profile?.role] || 'Không xác định'}
+          </Typography>
         </Box>
       </Box>
 

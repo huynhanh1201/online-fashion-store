@@ -2,7 +2,9 @@ import { useState } from 'react'
 import {
   getColors,
   addColor,
-  getColorById
+  getColorById,
+  deleteColor,
+  updateColor
 } from '~/services/admin/ColorService'
 
 const useColors = () => {
@@ -38,11 +40,40 @@ const useColors = () => {
 
   const createNewColor = async (data) => {
     try {
-      const result = await addColor(data)
-      return result
+      const newColor = await addColor(data)
+      setColors((prev) => {
+        const updated = [newColor, ...prev]
+        return updated.slice(0, 10) // Chỉ giữ lại 10 màu mới nhất
+      })
+      setTotalPages((prev) => prev + 1)
+      return newColor
     } catch (error) {
-      console.error('Lỗi khi tạo màu mới:', error)
+      console.error('Lỗi khi thêm màu mới:', error)
       return null
+    }
+  }
+  const update = async (id, data) => {
+    try {
+      const updated = await updateColor(id, data)
+      setColors((prev) =>
+        prev.map((d) => (d._id === updated._id ? updated : d))
+      )
+      return updated
+    } catch (err) {
+      console.error('Error updating category:', err)
+      return null
+    }
+  }
+
+  const remove = async (id) => {
+    try {
+      await deleteColor(id)
+      setColors((prev) => prev.filter((d) => d._id !== id))
+      setTotalPages((prev) => prev - 1)
+      return true
+    } catch (err) {
+      console.error('Error deleting category:', err)
+      return false
     }
   }
   const getColorId = async (id) => {
@@ -65,7 +96,9 @@ const useColors = () => {
     loading,
     createNewColor,
     getColorId,
-    saveColor
+    saveColor,
+    update,
+    remove
   }
 }
 

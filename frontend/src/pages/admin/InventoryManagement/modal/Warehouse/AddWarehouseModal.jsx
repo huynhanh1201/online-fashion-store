@@ -16,7 +16,7 @@ import axios from 'axios'
 
 import { GHN_TOKEN_API } from '~/utils/constants'
 
-const AddWarehouseModal = ({ open, onClose, onSave }) => {
+const AddWarehouseModal = ({ open, onClose, onSave, Add }) => {
   const {
     register,
     handleSubmit,
@@ -96,26 +96,30 @@ const AddWarehouseModal = ({ open, onClose, onSave }) => {
     setSelectedWard(newValue)
   }
 
-  const onSubmit = (data) => {
-    if (!selectedProvince || !selectedDistrict || !selectedWard) {
-      alert('Vui lòng chọn đầy đủ Tỉnh/TP, Quận/Huyện, Phường/Xã')
-      return
-    }
-    const payload = {
-      name: data.name, // nếu backend yêu cầu là fullName
-      phone: data.phone, // nếu có trường phone
-      address: data.address,
-      ward: selectedWard.WardName,
-      district: selectedDistrict.DistrictName,
-      city: selectedProvince.ProvinceName,
-      cityId: String(selectedProvince.ProvinceID),
-      districtId: String(selectedDistrict.DistrictID),
-      wardId: String(selectedWard.WardCode)
-    }
-    console.log('Payload to save:', typeof payload.wardId)
+  const onSubmit = async (data) => {
+    try {
+      if (!selectedProvince || !selectedDistrict || !selectedWard) {
+        alert('Vui lòng chọn đầy đủ Tỉnh/TP, Quận/Huyện, Phường/Xã')
+        return
+      }
+      const payload = {
+        name: data.name, // nếu backend yêu cầu là fullName
+        phone: data.phone, // nếu có trường phone
+        address: data.address,
+        ward: selectedWard.WardName,
+        district: selectedDistrict.DistrictName,
+        city: selectedProvince.ProvinceName,
+        cityId: String(selectedProvince.ProvinceID),
+        districtId: String(selectedDistrict.DistrictID),
+        wardId: String(selectedWard.WardCode)
+      }
+      console.log('Payload to save:', typeof payload.wardId)
 
-    const result = onSave(payload)
-    if (result) {
+      if (Add) {
+        await Add(payload)
+      } else {
+        await onSave(payload, 'add')
+      }
       reset()
       setSelectedProvince(null)
       setSelectedDistrict(null)
@@ -123,8 +127,8 @@ const AddWarehouseModal = ({ open, onClose, onSave }) => {
       setDistricts([])
       setWards([])
       onClose()
-    } else {
-      alert('Thêm kho hàng thất bại!')
+    } catch (error) {
+      console.error('Lỗi khi thêm kho:', error)
     }
   }
 

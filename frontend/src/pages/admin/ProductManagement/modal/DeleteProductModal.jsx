@@ -17,7 +17,7 @@ const DeleteProductModal = ({ open, onClose, product, onDelete }) => {
   const handleConfirmDelete = async () => {
     setIsDeleting(true) // Bắt đầu trạng thái đang xoá
     try {
-      await onDelete(product._id) // Giả sử onDelete là một async function
+      await onDelete(product._id, 'delete') // Giả sử onDelete là một async function
     } catch (error) {
       console.error('Xoá sản phẩm thất bại:', error)
     } finally {

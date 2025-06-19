@@ -174,7 +174,6 @@ export const deleteProduct = async (productId) => {
 // Thêm sản phẩm mới
 export const addProduct = async (data) => {
   try {
-    console.log('data', data)
     const response = await AuthorizedAxiosInstance.post(
       `${API_ROOT}/v1/products`,
       data

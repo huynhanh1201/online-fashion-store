@@ -110,6 +110,7 @@ export default function FilterCategory({
           { label: 'Hoạt động', value: false },
           { label: 'Không hoạt động', value: true }
         ]}
+        sx={{ width: 160 }}
       />
 
       <FilterSelect value={sort} onChange={setSort} />

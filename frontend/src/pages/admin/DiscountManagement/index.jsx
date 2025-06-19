@@ -5,7 +5,6 @@ import {
   updateDiscount,
   deleteDiscount
 } from '~/services/admin/discountService'
-import { deleteColor } from '~/services/admin/ColorService.js'
 
 // Lazy load modals
 const AddDiscountModal = React.lazy(() => import('./modal/AddDiscountModal'))
@@ -31,7 +30,10 @@ function DiscountManagement() {
     loading,
     fetchDiscounts,
     saveDiscount,
-    fetchDiscountById
+    fetchDiscountById,
+    add,
+    remove,
+    update
   } = useDiscounts()
 
   React.useEffect(() => {
@@ -51,33 +53,47 @@ function DiscountManagement() {
 
   const handleChangePage = (event, value) => setPage(value)
 
-  const handleSaveDiscount = async (discountId, updatedData) => {
-    try {
-      const response = await updateDiscount(discountId, updatedData)
-      if (response) {
-        const updatedDiscount = await fetchDiscountById(discountId)
-        if (updatedDiscount) {
-          saveDiscount(updatedDiscount)
-        }
-      } else {
-        console.log('Cập nhật không thành công')
-      }
-    } catch (error) {
-      console.error('Lỗi:', error)
-    }
-  }
+  // const handleSaveDiscount = async (discountId, updatedData) => {
+  //   try {
+  //     const response = await updateDiscount(discountId, updatedData)
+  //     if (response) {
+  //       const updatedDiscount = await fetchDiscountById(discountId)
+  //       if (updatedDiscount) {
+  //         saveDiscount(updatedDiscount)
+  //       }
+  //     } else {
+  //       console.log('Cập nhật không thành công')
+  //     }
+  //   } catch (error) {
+  //     console.error('Lỗi:', error)
+  //   }
+  // }
+  //
+  // const handleDeleteDiscount = async (discountId) => {
+  //   try {
+  //     const response = await deleteDiscount(discountId)
+  //     if (response) {
+  //       fetchDiscounts(page, limit, filters)
+  //       // const deletedDiscount = await fetchDiscountById(discountId)
+  //       // if (deletedDiscount) {
+  //       //   saveDiscount(deletedDiscount)
+  //       // }
+  //     } else {
+  //       console.log('Xóa không thành công')
+  //     }
+  //   } catch (error) {
+  //     console.error('Lỗi:', error)
+  //   }
+  // }
 
-  const handleDeleteDiscount = async (discountId) => {
+  const handleSave = async (data, type, id) => {
     try {
-      const response = await deleteDiscount(discountId)
-      if (response) {
-        fetchDiscounts(page, limit, filters)
-        // const deletedDiscount = await fetchDiscountById(discountId)
-        // if (deletedDiscount) {
-        //   saveDiscount(deletedDiscount)
-        // }
-      } else {
-        console.log('Xóa không thành công')
+      if (type === 'add') {
+        await add(data)
+      } else if (type === 'edit') {
+        await update(id, data)
+      } else if (type === 'delete') {
+        await remove(data)
       }
     } catch (error) {
       console.error('Lỗi:', error)
@@ -131,7 +147,7 @@ function DiscountManagement() {
         <AddDiscountModal
           open
           onClose={handleCloseModal}
-          onAdded={() => fetchDiscounts(page, limit, filters)}
+          onAdded={handleSave}
         />
       )}
 
@@ -148,7 +164,7 @@ function DiscountManagement() {
           open
           onClose={handleCloseModal}
           discount={selectedDiscount}
-          onSave={handleSaveDiscount}
+          onSave={handleSave}
         />
       )}
 
@@ -157,7 +173,7 @@ function DiscountManagement() {
           open
           onClose={handleCloseModal}
           discount={selectedDiscount}
-          onDelete={handleDeleteDiscount}
+          onDelete={handleSave}
         />
       )}
 

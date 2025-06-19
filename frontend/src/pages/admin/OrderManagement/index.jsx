@@ -7,7 +7,6 @@ import EditOrderModal from './modal/EditOrderModal' // import modal sửa
 import DeleteOrderModal from './modal/DeleteOrderModal' // import modal xoá
 import useOrder from '~/hooks/admin/useOrder'
 import useDiscounts from '~/hooks/admin/useDiscount'
-import { deleteOrderById } from '~/services/admin/orderService'
 import useUsers from '~/hooks/admin/useUsers.js'
 const OrderManagement = () => {
   const [page, setPage] = React.useState(1)
@@ -30,7 +29,8 @@ const OrderManagement = () => {
     getOrderDetailsByOrderId,
     updateOrderById,
     getOrderId,
-    Save
+    Save,
+    remove
   } = useOrder()
 
   const { discounts, fetchDiscounts } = useDiscounts() // lấy danh sách mã giảm giá nếu cần
@@ -92,28 +92,16 @@ const OrderManagement = () => {
   // Xử lý update đơn hàng
   const handleUpdateOrder = async (orderId, data) => {
     try {
-      const response = await updateOrderById(orderId, data)
-      if (response) {
-        const update = await getOrderId(orderId)
-        if (update) {
-          Save(update) // Lưu đơn hàng đã cập nhật
-          handleCloseModalEdit() // Đóng modal sửa
-        }
-      }
+      await updateOrderById(orderId, data)
+      handleCloseModalEdit()
     } catch (error) {
       console.error('Lỗi cập nhật đơn hàng:', error)
     }
   }
   const handleChangStatusOrder = async (orderId, data) => {
     try {
-      const response = await updateOrderById(orderId, data)
-      if (response) {
-        const update = await getOrderId(orderId)
-        if (update) {
-          Save(update) // Lưu đơn hàng đã cập nhật
-          handleCloseModalEdit() // Đóng modal sửa
-        }
-      }
+      await updateOrderById(orderId, data)
+      handleCloseModalView()
     } catch (error) {
       console.error('Lỗi cập nhật đơn hàng:', error)
     }
@@ -123,16 +111,8 @@ const OrderManagement = () => {
   const handleDeleteOrder = async () => {
     try {
       if (!selectedOrder) return
-      const success = await deleteOrderById(selectedOrder._id)
-      if (success) {
-        const deleteOrder = await getOrderId(selectedOrder._id)
-        if (deleteOrder) {
-          Save(deleteOrder) // Lưu đơn hàng đã xoá
-          handleCloseModalDelete() // Đóng modal xoá
-        }
-      } else {
-        alert('Xoá đơn hàng thất bại, vui lòng thử lại.')
-      }
+      await remove(selectedOrder._id)
+      handleCloseModalDelete() // Đóng modal xoá
     } catch (error) {
       console.error('Lỗi xoá đơn hàng:', error)
     }

@@ -18,7 +18,7 @@ const DeleteDiscountModal = ({ open, onClose, discount, onDelete }) => {
     if (!discount || !discount._id) return
 
     setLoading(true) // Bắt đầu quá trình xóa
-    await onDelete(discount._id)
+    await onDelete(discount._id, 'delete') // Gọi hàm xóa từ props
     setLoading(false) // Kết thúc quá trình xóa
     onClose() // Đóng modal sau khi xóa thành công
   }

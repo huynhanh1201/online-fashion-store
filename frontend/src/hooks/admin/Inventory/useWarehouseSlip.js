@@ -41,9 +41,19 @@ const useWarehouseSlips = () => {
     }
   }
   const createNewWarehouseSlip = async (data) => {
-    const result = await createWarehouseSlip(data)
-    if (result) await fetchWarehouseSlips()
-    return result
+    try {
+      const result = await createWarehouseSlip(data)
+      if (result) {
+        setWarehouseSlips((prev) => [...prev, result])
+        setTotalPages((prev) => prev + 1)
+        return result
+      } else {
+        throw new Error('Không thể tạo phiếu kho mới')
+      }
+    } catch (error) {
+      console.error('Lỗi khi tạo phiếu kho mới:', error)
+      throw error // Ném lỗi để xử lý bên ngoài nếu cần
+    }
   }
   const getWarehouseSlipId = async (id) => {
     const result = await getWarehouseSlipById(id)

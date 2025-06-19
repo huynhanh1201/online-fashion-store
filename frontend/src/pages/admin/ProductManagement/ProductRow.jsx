@@ -80,7 +80,7 @@ const ProductRow = ({ product, index, columns, onAction }) => {
           if (id === 'name') {
             if (id === 'name') {
               const name = product.name || 'Không có tên'
-              product.name = name
+              name
                 .split(' ')
                 .map(
                   (word) =>
@@ -104,10 +104,10 @@ const ProductRow = ({ product, index, columns, onAction }) => {
             )
           }
           if (id === 'category') {
+            const CategoryName = product.categoryId?.name || 'Không có danh mục'
             return (
               <TableCell key={id} align={align} sx={styles.cellPadding}>
-                {product?.categoryId?.name
-                  .split(' ')
+                {CategoryName.split(' ')
                   .map(
                     (word) =>
                       word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()

@@ -43,19 +43,56 @@ const useWarehouses = () => {
   }
 
   const createNewWarehouse = async (data) => {
-    const result = await createWarehouse(data)
-    await fetchWarehouses()
-    return result
+    try {
+      const result = await createWarehouse(data)
+      if (result) {
+        setWarehouses((prev) => [...prev, result])
+        setTotalPages((prev) => prev + 1)
+        return result
+      } else {
+        throw new Error('Failed to create warehouse')
+      }
+    } catch (error) {
+      console.error('Error creating warehouse:', error)
+      throw error
+    }
   }
 
   const updateWarehouseById = async (id, data) => {
-    const result = await updateWarehouse(id, data)
-    return result
+    try {
+      const result = await updateWarehouse(id, data)
+      if (result) {
+        setWarehouses((prev) =>
+          prev.map((warehouse) =>
+            warehouse.id === id ? { ...warehouse, ...data } : warehouse
+          )
+        )
+        return result
+      } else {
+        throw new Error('Failed to update warehouse')
+      }
+    } catch (error) {
+      console.error('Error updating warehouse:', error)
+      throw error
+    }
   }
 
   const deleteWarehouseById = async (id) => {
-    const result = await deleteWarehouse(id)
-    return result
+    try {
+      const result = await deleteWarehouse(id)
+      if (result) {
+        setWarehouses((prev) =>
+          prev.filter((warehouse) => warehouse._id !== id)
+        )
+        setTotalPages((prev) => prev - 1)
+        return result
+      } else {
+        throw new Error('Failed to delete warehouse')
+      }
+    } catch (error) {
+      console.error('Error deleting warehouse:', error)
+      throw error
+    }
   }
 
   return {

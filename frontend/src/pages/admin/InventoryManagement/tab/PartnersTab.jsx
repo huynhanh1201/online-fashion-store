@@ -141,19 +141,10 @@ const PartnersTab = () => {
   const handleSave = async (partner, type, partnerId) => {
     if (type === 'add') {
       await createNewPartner(partner)
-      fetchPartners(page, rowsPerPage, filter)
     } else if (type === 'edit') {
-      const updatedBatch = await updateExistingPartner(partnerId, partner)
-      if (updatedBatch) {
-        const data = await fetchPartnerById(partnerId)
-        console.log('Updated batch data:', data)
-        if (data) {
-          Save(data)
-        }
-      }
+      await updateExistingPartner(partnerId, partner)
     } else if (type === 'delete') {
       await removePartner(partner)
-      fetchPartners(page, rowsPerPage, filter) // Refresh danh sách sau khi lưu
     }
   }
 
