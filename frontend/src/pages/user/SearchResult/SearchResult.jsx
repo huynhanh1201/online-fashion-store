@@ -10,14 +10,17 @@ import {
   Typography,
   CircularProgress,
   styled,
-  Pagination
+  Pagination,
+  Breadcrumbs,
+  Link
 } from '@mui/material'
 import { useDispatch } from 'react-redux'
 import { setCartItems } from '~/redux/cart/cartSlice'
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward'
 import SortByAlphaIcon from '@mui/icons-material/SortByAlpha'
+import NavigateNextIcon from '@mui/icons-material/NavigateNext'
 
-const ITEMS_PER_PAGE = 15
+const ITEMS_PER_PAGE = 10
 
 // Custom styled button to mimic the dropdown in the image
 const SortDropdownButton = styled('button')(({ theme }) => ({
@@ -271,6 +274,48 @@ export default function SearchResults() {
 
   return (
     <div style={styles.container}>
+      <Box
+        sx={{
+          bottom: { xs: '20px', sm: '30px', md: '40px' },
+          left: { xs: '20px', sm: '30px', md: '40px' },
+          right: { xs: '20px', sm: '30px', md: '40px' },
+          padding: '12px',
+          maxWidth: '1800px',
+          margin: '0 auto'
+        }}
+      >
+        <Breadcrumbs
+          separator={<NavigateNextIcon fontSize='small' />}
+          aria-label='breadcrumb'
+        >
+          <Link
+            underline='hover'
+            sx={{
+              maxWidth: '1800px',
+              display: 'flex',
+              alignItems: 'center',
+              color: '#007bff',
+              textDecoration: 'none',
+              '&:hover': {
+                color: 'primary.main'
+              }
+            }}
+            href='/'
+          >
+            Trang chủ
+          </Link>
+          <Typography
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              color: 'text.primary',
+              fontWeight: 500
+            }}
+          >
+           Kết quả tìm kiếm
+          </Typography>
+        </Breadcrumbs>
+      </Box>
       <main style={{ padding: '0 1.5rem' }}>
         <div style={styles.header}>
           <div style={styles.resultsHeader}>

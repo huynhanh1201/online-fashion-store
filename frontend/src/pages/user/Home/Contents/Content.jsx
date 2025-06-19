@@ -5,6 +5,7 @@ import { getProducts } from '~/services/productService.js'
 import FlashSaleSection from '~/pages/user/Home/FlashSaleSection/FlashSaleSection.jsx'
 import CouponList from '~/pages/user/Home/CouponList/CouponList.jsx'
 import { Link } from 'react-router-dom'
+import ProductsCardNew from '~/pages/user/NewProducts/ProductsCardNew'
 const Content = () => {
   const [products, setProducts] = useState([])
   const [loading, setLoading] = useState(true)
@@ -140,13 +141,13 @@ const Content = () => {
       {/* Stitch Products */}
       <div className='product-grid'>
         {[...products.slice(-5)].reverse().map((product) => (
-          <ProductCard key={product._id || product.id} product={product} />
+          <ProductsCardNew key={product._id || product.id} product={product} />
         ))}
       </div>
 
       {products.length > 0 && (
         <div style={{ textAlign: 'center', marginBottom: '32px' }}>
-          <Link to='/product'>
+          <Link to='/productnews'>
             <button className='cta-button'>Xem tất cả</button>
           </Link>
         </div>

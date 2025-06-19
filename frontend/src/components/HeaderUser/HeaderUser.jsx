@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useRef } from 'react'
 import {
   AppBar,
   Toolbar,
@@ -33,6 +33,7 @@ const StyledAppBar = styled(AppBar)(({ theme }) => ({
 
 const HeaderUser = () => {
   const [mobileOpen, setMobileOpen] = useState(false)
+  const headerRef = useRef()
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen)
@@ -42,7 +43,7 @@ const HeaderUser = () => {
     <>
       <Topbar />
       <StyledAppBar>
-        <Container maxWidth='1450px'>
+        <Container maxWidth='1450px' ref={headerRef}>
           <Toolbar
             disableGutters
             sx={{
@@ -53,7 +54,7 @@ const HeaderUser = () => {
               px: { xs: 1, sm: 2, md: 3 }
             }}
           >
-            {/* Left: Menu icon + Logo */}
+            {/* Left */}
             <Box
               sx={{
                 display: 'flex',
@@ -85,7 +86,7 @@ const HeaderUser = () => {
               </Typography>
             </Box>
 
-            {/* Center: Menu */}
+            {/* Center */}
             <Box
               sx={{
                 display: { xs: 'none', md: 'flex' },
@@ -97,10 +98,10 @@ const HeaderUser = () => {
                 userSelect: 'none'
               }}
             >
-              <Menu />
+              <Menu headerRef={headerRef} />
             </Box>
 
-            {/* Right: Search + Auth + HeaderAction */}
+            {/* Right */}
             <Box
               sx={{
                 display: 'flex',
@@ -109,7 +110,8 @@ const HeaderUser = () => {
                 justifyContent: 'flex-end',
                 flexBasis: { xs: 'auto', md: '25%' },
                 flexShrink: 0,
-                minWidth: { xs: 'auto', md: 250 }
+                minWidth: { xs: 'auto', md: 250 },
+                zIndex: 1301
               }}
             >
               <Search />

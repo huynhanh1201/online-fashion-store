@@ -17,10 +17,11 @@ import { setCartItems } from '~/redux/cart/cartSlice'
 import ProductCard from '~/components/ProductCards/ProductCards'
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward'
 import NavigateNextIcon from '@mui/icons-material/NavigateNext'
+import HomeIcon from '@mui/icons-material/Home'
 import { getProducts } from '~/services/productService'
-import ProductCategories from './ProductCategories/ProductCategories'
+import ProductsCardNew from './ProductsCardNew'
 
-const ITEMS_PER_PAGE = 5
+const ITEMS_PER_PAGE = 15
 
 // Custom styled button to mimic the dropdown in the image
 const SortDropdownButton = styled('button')(({ theme }) => ({
@@ -67,21 +68,21 @@ const SortMenuItem = styled('div')(({ theme }) => ({
 }))
 
 const sortOptions = [
-  { value: 'Sản phẩm nỗi bật', label: 'Sản phẩm nổi bật' },
+  { value: 'createdAtDesc', label: 'Sản phẩm mới nhất' },
   { value: 'priceAsc', label: 'Giá tăng dần' },
   { value: 'priceDesc', label: 'Giá giảm dần' },
   { value: 'nameAsc', label: 'Sản phẩm từ A-Z' },
   { value: 'nameDesc', label: 'Sản phẩm từ Z-A' }
 ]
 
-const Product = () => {
+const NewProducts = () => {
   const dispatch = useDispatch()
   const [products, setProducts] = useState([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
   const [page, setPage] = useState(1)
   const [totalPages, setTotalPages] = useState(1)
-  const [sortOption, setSortOption] = useState('')
+  const [sortOption, setSortOption] = useState('createdAtDesc') // Default to newest first
   const [snackbar, setSnackbar] = useState(null)
   const [isAdding, setIsAdding] = useState({})
   const [sortMenuOpen, setSortMenuOpen] = useState(false)
@@ -94,6 +95,7 @@ const Product = () => {
 
       // Map sort option to API sort parameter
       const sortMap = {
+        createdAtDesc: 'createdAt_desc',
         priceAsc: 'price_asc',
         priceDesc: 'price_desc',
         nameAsc: 'name_asc',
@@ -103,8 +105,9 @@ const Product = () => {
       const params = {
         page,
         limit: ITEMS_PER_PAGE,
-        sort: sortMap[sortOption] || ''
+        sort: sortMap[sortOption] || 'createdAt_desc'
       }
+
       console.log('Fetching products with params:', params)
 
       const response = await getProducts(params)
@@ -119,7 +122,11 @@ const Product = () => {
         throw new Error('Dữ liệu sản phẩm không hợp lệ')
       }
 
-      setProducts(response.products)
+      setProducts(
+        (response.products || []).slice().sort(
+          (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+        )
+      )
       setTotalPages(response.totalPages)
     } catch (error) {
       console.error('Chi tiết lỗi:', error)
@@ -242,26 +249,10 @@ const Product = () => {
               fontWeight: 500
             }}
           >
-            Tất cả sản phẩm
+            Hàng mới
           </Typography>
         </Breadcrumbs>
       </Box>
-      <Box
-        sx={{
-          width: '100%',
-          maxWidth: '1800px',
-          height: { xs: '200px', sm: '300px', md: '400px' },
-          backgroundImage:
-            'url(https://file.hstatic.net/1000360022/collection/tat_ca_san_pham_3682cf864f2d4433a1f0bdfb4ffe24de.jpg)',
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          position: 'relative',
-          mb: 4,
-          margin: '0 auto',
-          px: { xs: 2, sm: 3, md: 4 }
-        }}
-      ></Box>
-      <ProductCategories />
       <Box sx={{ p: 2, maxWidth: '1800px', mx: 'auto' }}>
         <Box
           sx={{
@@ -360,7 +351,7 @@ const Product = () => {
               <div className='product-grid'>
                 {products.map((product) => (
                   <div key={product._id}>
-                    <ProductCard
+                    <ProductsCardNew
                       product={product}
                       handleAddToCart={handleAddToCart}
                       isAdding={!!isAdding[product._id]}
@@ -407,4 +398,4 @@ const Product = () => {
   )
 }
 
-export default Product
+export default NewProducts

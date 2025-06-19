@@ -1,5 +1,12 @@
 import React, { useRef, useState, useEffect } from 'react'
-import { Box, Button, Popover, Typography, useMediaQuery } from '@mui/material'
+import {
+  Box,
+  Button,
+  Popover,
+  Typography,
+  useMediaQuery,
+  Badge
+} from '@mui/material'
 import { styled } from '@mui/system'
 import { getCategories } from '~/services/categoryService'
 import { useTheme } from '@mui/material/styles'
@@ -42,70 +49,15 @@ const CategoryButton = styled(Button)(({ theme }) => ({
   }
 }))
 
-// Tạo keyframes cho hiệu ứng slide down từ trên xuống
-const slideDownKeyframes = `
-  @keyframes slideDown {
-    from {
-      opacity: 0;
-      transform: translateY(-20px) scaleY(0);
-      transform-origin: top;
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0) scaleY(1);
-      transform-origin: top;
-    }
-  }
-
-  @keyframes slideUp {
-    from {
-      opacity: 1;
-      transform: translateY(0) scaleY(1);
-      transform-origin: top;
-    }
-    to {
-      opacity: 0;
-      transform: translateY(-20px) scaleY(0);
-      transform-origin: top;
-    }
-  }
-`
-
-const AnimatedPopover = styled(Popover)(({ theme }) => ({
-  '& .MuiPaper-root': {
-    transformOrigin: 'top center',
-    animation: 'slideDown 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
-    '&.closing': {
-      animation: 'slideUp 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-    }
-  }
-}))
-
-// Thêm CSS vào head
-const addGlobalStyles = () => {
-  if (!document.getElementById('megamenu-styles')) {
-    const style = document.createElement('style')
-    style.id = 'megamenu-styles'
-    style.textContent = slideDownKeyframes
-    document.head.appendChild(style)
-  }
-}
-
-const Menu = () => {
-  const [hovered, setHovered] = useState({ open: false, anchorEl: null })
-  const [categories, setCategories] = useState([])
-  const hoverTimeout = useRef(null)
+const Menu = ({ headerRef }) => {
   const [productMenuOpen, setProductMenuOpen] = useState(false)
-  const [productMenuAnchor, setProductMenuAnchor] = useState(null)
   const [isDrawerHovered, setIsDrawerHovered] = useState(false)
   const [isClosing, setIsClosing] = useState(false)
-  const closeTimeout = useRef(null)
+  const [categories, setCategories] = useState([])
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('md'))
 
   useEffect(() => {
-    addGlobalStyles()
-    
     const fetchCategories = async () => {
       try {
         const response = await getCategories(1, 100)
@@ -113,29 +65,13 @@ const Menu = () => {
         setCategories(categories)
       } catch (error) {
         console.error('Lỗi khi lấy danh mục:', error)
-        setCategories([]) // fallback an toàn
+        setCategories([])
       }
     }
     fetchCategories()
   }, [])
 
-  const handleEnter = (el) => {
-    clearTimeout(hoverTimeout.current)
-    setHovered({ open: true, anchorEl: el })
-  }
-
-  const handleLeave = () => {
-    hoverTimeout.current = setTimeout(() => {
-      setHovered({ open: false, anchorEl: null })
-    }, 200)
-  }
-
-  const handleProductEnter = (e) => {
-    if (closeTimeout.current) {
-      clearTimeout(closeTimeout.current)
-      closeTimeout.current = null
-    }
-    setProductMenuAnchor(e.currentTarget)
+  const handleProductEnter = () => {
     setIsClosing(false)
     setProductMenuOpen(true)
   }
@@ -144,17 +80,11 @@ const Menu = () => {
     if (!isDrawerHovered) {
       setIsClosing(true)
       setProductMenuOpen(false)
-      setProductMenuAnchor(null)
-      setIsClosing(false)
     }
   }
 
   const handleDrawerEnter = () => {
     setIsDrawerHovered(true)
-    if (closeTimeout.current) {
-      clearTimeout(closeTimeout.current)
-      closeTimeout.current = null
-    }
     setIsClosing(false)
   }
 
@@ -162,71 +92,22 @@ const Menu = () => {
     setIsDrawerHovered(false)
     setIsClosing(true)
     setProductMenuOpen(false)
-    setProductMenuAnchor(null)
-    setIsClosing(false)
-    setIsDrawerHovered(false)
   }
 
-  // Đóng menu khi scroll
   useEffect(() => {
     const handleScroll = () => {
       setIsClosing(true)
       setProductMenuOpen(false)
-      setProductMenuAnchor(null)
-      setIsClosing(false)
-      setIsDrawerHovered(false)
     }
     window.addEventListener('scroll', handleScroll)
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
-  const columns = 4
-  const categoriesPerCol = Math.ceil(categories.length / columns)
-  const categoryColumns = Array.from({ length: columns }, (_, i) =>
-    categories.slice(i * categoriesPerCol, (i + 1) * categoriesPerCol)
-  )
-
-  // Dữ liệu nhóm danh mục cứng theo mẫu
-  const menuColumns = [
-    {
-      title: 'ÁO',
-      items: [
-        'Áo Thun', 'Áo Polo', 'Áo Sơmi', 'Áo Khoác', 'Áo Nỉ Và Len', 'Hoodie', 'Tank Top - Áo Ba Lỗ', 'Set đồ', 'BEST SELLER'
-      ]
-    },
-    {
-      title: 'QUẦN',
-      items: [
-        'Quần Jean', 'Quần Short', 'Quần Kaki & Chino', 'Quần Jogger - Quần Dài', 'Quần Tây', 'Quần Boxer', 'Set Đồ', 'OUTLET - ƯU ĐÃI 30% - 70%'
-      ]
-    },
-    {
-      title: 'GIÀY & PHỤ KIỆN',
-      items: [
-        'Giày & Dép', 'Balo, Túi & Ví', 'Nón', 'Thắt Lưng', 'Vớ', 'Mắt Kính'
-      ]
-    },
-    {
-      title: 'SMART JEANS',
-      items: []
-    }
-  ]
-
-  const renderPopoverContent = () => (
-    <Box sx={{ p: 2 }}>
-      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-        {categories.map((cat) => (
-          <CategoryButton
-            key={cat._id}
-            href={`/productbycategory/${cat._id}`}
-            size='small'
-          >
-            {cat.name}
-          </CategoryButton>
-        ))}
-      </Box>
-    </Box>
-  )
+  // Organize categories for megamenu
+  const menuColumns = categories.map(category => ({
+    title: category.name,
+    items: category.parent ? [category.parent.name] : []
+  }))
 
   return (
     <Box
@@ -236,21 +117,23 @@ const Menu = () => {
         gap: 2
       }}
     >
+      {/* Sản phẩm - MegaMenu */}
       <Box
         onMouseEnter={handleProductEnter}
         onMouseLeave={handleProductLeave}
         sx={{ position: 'relative' }}
       >
-        <StyledButton 
+        <StyledButton
           href='/product'
           active={productMenuOpen || isDrawerHovered}
         >
           Sản phẩm
         </StyledButton>
+
         <Popover
           open={productMenuOpen}
-          anchorEl={productMenuAnchor}
-          onClose={() => {}} // Tắt auto close
+          anchorEl={headerRef?.current || null}
+          onClose={() => {}}
           anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
           transformOrigin={{ vertical: 'top', horizontal: 'center' }}
           PaperProps={{
@@ -258,62 +141,54 @@ const Menu = () => {
             onMouseLeave: handleDrawerLeave,
             sx: {
               mt: 1,
-              maxWidth: 1800,
-              width: isMobile ? '100vw' : '1800px',
-              position: 'fixed',
-              left: '50%',
-              top: isMobile ? 56 : 80,
-              transform: (productMenuOpen && !isClosing) ? 'translate(-50%, 0)' : 'translate(-50%, 1px)',
-              opacity: 1,
+              width: isMobile ? '100vw' : '1500px',
+              maxWidth: '95vw',
               borderRadius: 2,
-              boxShadow: '0 4px 24px rgba(0,0,0,0.12)',
+              boxShadow: 3,
               p: 3,
-              overflowX: 'auto',
-              transformOrigin: 'top center',
-              transition: 'transform 0.3s cubic-bezier(0.4,0,0.2,1)',
-              zIndex: 1400,
+              zIndex: 1400
             }
           }}
           disableRestoreFocus
           disableAutoFocus
           disableEnforceFocus
-          disableEscapeKeyDown
         >
           <Box
             sx={{
               display: 'grid',
-              gridTemplateColumns: isMobile ? '1fr' : `repeat(${menuColumns.length}, 1fr)`,
-              gap: 5,
-              width: '100%',
-              maxWidth: 1500,
+              gridTemplateColumns: isMobile ? '1fr' : `repeat(${Math.min(menuColumns.length, 4)}, 1fr)`,
+              gap: 5
             }}
           >
-            {menuColumns.map((col, idx) => (
-              <Box key={col.title} sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-                <Typography sx={{ 
-                  fontWeight: 'bold', 
-                  borderBottom: '2px solid #000', 
-                  mb: 1, 
-                  textTransform: 'uppercase', 
-                  fontSize: '1.08rem'
-                }}>
+            {menuColumns.map((col, index) => (
+              <Box key={col.title + index} sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                <Typography
+                  sx={{
+                    fontWeight: 'bold',
+                    borderBottom: '2px solid #000',
+                    mb: 1,
+                    textTransform: 'uppercase',
+                    fontSize: '1.08rem'
+                  }}
+                >
                   {col.title}
                 </Typography>
                 {col.items.map((item, i) => (
                   <Button
                     key={item + i}
+                    href={`/productbycategory/${categories[index]._id}`}
                     sx={{
                       justifyContent: 'flex-start',
                       textAlign: 'left',
                       color: '#222',
-                      fontWeight: item === item.toUpperCase() ? 700 : 400,
+                      fontWeight: 400,
                       fontSize: '1rem',
                       px: 0,
                       minWidth: 0,
                       background: 'none',
                       boxShadow: 'none',
-                      '&:hover': { 
-                        color: '#1976d2', 
+                      '&:hover': {
+                        color: '#1976d2',
                         background: 'none',
                         transform: 'translateX(5px)',
                         transition: 'all 0.2s ease'
@@ -327,12 +202,36 @@ const Menu = () => {
             ))}
           </Box>
         </Popover>
+        
       </Box>
-      {categories.map((cat) => (
-        <StyledButton
-          key={cat._id}
-          href={`/productbycategory/${cat._id}`}
+      {/* Hàng mới với nhãn dán news */}
+      <Box sx={{ display: 'inline-flex', alignItems: 'center', position: 'relative', mr: 0.5 }}>
+        <Badge
+          badgeContent={<span style={{ fontSize: '12px', fontWeight: 700, color: 'red' }}>new</span>}
+          color="default"
+          anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+          sx={{
+            '& .MuiBadge-badge': {
+              top: 2,
+              right: 2,
+              padding: 0,
+              minWidth: 0,
+              height: 'auto',
+              background: 'none',
+              borderRadius: 0,
+              zIndex: 1
+            }
+          }}
         >
+          <StyledButton href='/productnews' sx={{ pr: 2 }}>
+            Hàng mới
+          </StyledButton>
+        </Badge>
+      </Box>
+
+      {/* Các danh mục khác */}
+      {categories.map((cat) => (
+        <StyledButton key={cat._id} href={`/productbycategory/${cat._id}`}>
           {cat.name}
         </StyledButton>
       ))}

@@ -8,7 +8,7 @@ import {
   Fade,
   Paper,
   Avatar,
-  Typography,
+  Typography
 } from '@mui/material'
 import PersonIcon from '@mui/icons-material/Person'
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart'
@@ -119,9 +119,9 @@ const HeaderAction = () => {
 
   return (
     <>
-       <IconButton color='inherit' component={Link} to='/cart' sx={{ mt: 0.6 }}>
+      <IconButton color='inherit' component={Link} to='/cart' sx={{ mt: 0.7 }}>
         <Badge badgeContent={cartCount} color='error'>
-          <ShoppingCartIcon sx={{ fontSize: 26}} />
+          <ShoppingCartIcon sx={{ fontSize: 26 }} />
         </Badge>
       </IconButton>
       <IconButton color='inherit' onClick={handleClick}>
@@ -154,9 +154,9 @@ const HeaderAction = () => {
           component: Paper,
           elevation: 6,
           sx: {
-            mt: 1.6,
+            mt: 2,
             minWidth: 160,
-            zIndex: (theme) => theme.zIndex.tooltip + 10,
+            zIndex: 1400,
             '& .MuiMenuItem-root': {
               transition: 'background-color 0.2s ease-in-out',
               '&:hover': {
@@ -168,7 +168,7 @@ const HeaderAction = () => {
         MenuListProps={{ ref: menuRef }}
       >
         <Fade in={open} timeout={{ enter: 500, exit: 200 }}>
-          <div style={{borderRadius: '20px', padding: '10px'}}>
+          <div style={{ borderRadius: '20px', padding: '10px' }}>
             {currentUser ? (
               <>
                 <MenuItem
@@ -195,7 +195,7 @@ const HeaderAction = () => {
                       height: 46,
                       border: '2px solid #1976d2',
                       boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-                      transition: 'transform 0.2s ease-in-out',
+                      transition: 'transform 0.2s ease-in-out'
                     }}
                   />
                   <Typography
@@ -219,44 +219,75 @@ const HeaderAction = () => {
                     />
                   </Typography>
                 </MenuItem>
-                <MenuItem style={{marginBottom: '10px',fontWeight: '300'}} onClick={handleClose} component={Link} to='/profile'>
+                <MenuItem
+                  style={{ marginBottom: '10px', fontWeight: '300' }}
+                  onClick={handleClose}
+                  component={Link}
+                  to='/profile'
+                >
                   Trang cá nhân
                 </MenuItem>
                 <div style={{ width: '100%', padding: '5px' }}>
-                  <hr style={{ border: 0, borderTop: '1px solid #eee', margin: '0 0 8px 0' }} />
+                  <hr
+                    style={{
+                      border: 0,
+                      borderTop: '1px solid #eee',
+                      margin: '0 0 8px 0'
+                    }}
+                  />
                 </div>
-               
               </>
             ) : (
-              <MenuItem style={{fontWeight: '300'}} onClick={handleClose} component={Link} to='/login'>
+              <MenuItem
+                style={{ fontWeight: '300' }}
+                onClick={handleClose}
+                component={Link}
+                to='/login'
+              >
                 Đăng nhập
               </MenuItem>
             )}
-            <MenuItem style={{fontWeight: '300'}} onClick={handleClose} component={Link} to='/cart'>
+            <MenuItem
+              style={{ fontWeight: '300' }}
+              onClick={handleClose}
+              component={Link}
+              to='/cart'
+            >
               Giỏ hàng
             </MenuItem>
-            <MenuItem style={{fontWeight: '300'}} onClick={handleClose} component={Link} to='/orders'>
+            <MenuItem
+              style={{ fontWeight: '300' }}
+              onClick={handleClose}
+              component={Link}
+              to='/orders'
+            >
               Thông tin đơn hàng
             </MenuItem>
             <div style={{ width: '100%', padding: '5px' }}>
-                  <hr style={{ border: 0, borderTop: '1px solid #eee', margin: '0 0 8px 0' }} />
-                </div>
-            <MenuItem style={{fontWeight: '300'}} onClick={handleLogout}>
+              <hr
+                style={{
+                  border: 0,
+                  borderTop: '1px solid #eee',
+                  margin: '0 0 8px 0'
+                }}
+              />
+            </div>
+            <MenuItem style={{ fontWeight: '300' }} onClick={handleLogout}>
               <span style={{ display: 'flex', alignItems: 'center' }}>
                 <svg
-                  xmlns="http://www.w3.org/2000/svg"
+                  xmlns='http://www.w3.org/2000/svg'
                   style={{ marginRight: 8 }}
-                  width="22"
-                  height="22"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
+                  width='22'
+                  height='22'
+                  fill='none'
+                  viewBox='0 0 24 24'
+                  stroke='currentColor'
                 >
                   <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
+                    strokeLinecap='round'
+                    strokeLinejoin='round'
                     strokeWidth={2}
-                    d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a2 2 0 01-2 2H7a2 2 0 01-2-2V7a2 2 0 012-2h4a2 2 0 012 2v1"
+                    d='M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a2 2 0 01-2 2H7a2 2 0 01-2-2V7a2 2 0 012-2h4a2 2 0 012 2v1'
                   />
                 </svg>
                 Đăng xuất

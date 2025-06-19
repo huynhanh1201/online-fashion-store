@@ -1,78 +1,85 @@
 import React from 'react'
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Paper,
-  IconButton,
-  Typography
+  Box,
+  Typography,
+  Button,
+  Chip,
+  Stack
 } from '@mui/material'
-import VisibilityIcon from '@mui/icons-material/Visibility'
-import EditIcon from '@mui/icons-material/Edit'
-import DeleteIcon from '@mui/icons-material/Delete'
 
-function AddressTable({ addresses, onView, onEdit, onDelete }) {
+function AddressList({ addresses, onEdit, onDelete }) {
+  if (addresses.length === 0) {
+    return (
+      <Typography textAlign='center' color='text.secondary'>
+        Chưa có địa chỉ giao hàng
+      </Typography>
+    )
+  }
+
   return (
-    <TableContainer component={Paper} sx={{ width: '100%' }}>
-      <Table
-        sx={{ minWidth: { xs: '100%', sm: 450 }, width: '100%' }}
-        aria-label='address table'
-      >
-        <TableHead>
-          <TableRow>
-            <TableCell>Họ và tên</TableCell>
-            <TableCell>Số điện thoại</TableCell>
-            <TableCell>Địa chỉ</TableCell>
-            <TableCell>Phường/Xã</TableCell>
-            <TableCell>Quận/Huyện</TableCell>
-            <TableCell>Tỉnh/Thành</TableCell>
-            <TableCell align='right'>Hành động</TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {addresses.length === 0 ? (
-            <TableRow>
-              <TableCell colSpan={7} align='center'>
-                <Typography color='text.secondary'>
-                  Chưa có địa chỉ giao hàng
+    <Stack spacing={2}>
+      {addresses.map((addr) => (
+        <Box
+          key={addr._id}
+          sx={{
+            border: '1px solid #ddd',
+            borderRadius: 2,
+            p: 2,
+            position: 'relative'
+          }}
+        >
+          <Box display='flex' justifyContent='space-between' alignItems='center'>
+            <Box>
+              <Typography fontWeight={600}>
+                {addr.fullName}{' '}
+                <Typography
+                  component='span'
+                  variant='body2'
+                  color='text.secondary'
+                  sx={{ ml: 1 }}
+                >
+                  (+84) {addr.phone.replace(/^0/, '')}
                 </Typography>
-              </TableCell>
-            </TableRow>
-          ) : (
-            addresses.map((addr) => (
-              <TableRow
-                key={addr._id}
-                sx={{
-                  '&:last-child td, &:last-child th': { border: 0 }
-                }}
+              </Typography>
+            </Box>
+            <Box>
+              <Button
+                size='small'
+                onClick={() => onEdit(addr)}
+                sx={{ textTransform: 'none', color: 'primary.main', fontWeight: 500 }}
               >
-                <TableCell>{addr.fullName}</TableCell>
-                <TableCell>{addr.phone}</TableCell>
-                <TableCell>{addr.address}</TableCell>
-                <TableCell>{addr.ward}</TableCell>
-                <TableCell>{addr.district}</TableCell>
-                <TableCell>{addr.city}</TableCell>
-                <TableCell align='right'>
-                  <IconButton onClick={() => onView(addr)} sx={{ mr: 1 }}>
-                    <VisibilityIcon color='info' />
-                  </IconButton>
-                  <IconButton onClick={() => onEdit(addr)} sx={{ mr: 1 }}>
-                    <EditIcon color='primary' />
-                  </IconButton>
-                  <IconButton onClick={() => onDelete(addr._id)}>
-                    <DeleteIcon color='error' />
-                  </IconButton>
-                </TableCell>
-              </TableRow>
-            ))
+                Cập nhật
+              </Button>
+              <Button
+                size='small'
+                onClick={() => onDelete(addr._id)}
+                sx={{ textTransform: 'none', color: 'primary.main', fontWeight: 500 }}
+              >
+                Xoá
+              </Button>
+            </Box>
+          </Box>
+
+          <Typography color='text.secondary' mt={0.5}>
+            {addr.address}
+          </Typography>
+          <Typography color='text.secondary'>
+            {addr.ward}, {addr.district}, {addr.city}
+          </Typography>
+
+          {addr.isDefault && (
+            <Chip
+              label='Mặc định'
+              color='error'
+              variant='outlined'
+              size='small'
+              sx={{ mt: 1 }}
+            />
           )}
-        </TableBody>
-      </Table>
-    </TableContainer>
+        </Box>
+      ))}
+    </Stack>
   )
 }
 
-export default AddressTable
+export default AddressList
