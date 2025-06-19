@@ -108,7 +108,7 @@ const getProfile = async (userId) => {
   // eslint-disable-next-line no-useless-catch
   try {
     const result = await UserModel.findById(userId).select(
-      '_id name email avatarUrl createdAt updatedAt'
+      '_id name email avatarUrl createdAt updatedAt role'
     )
 
     return result
