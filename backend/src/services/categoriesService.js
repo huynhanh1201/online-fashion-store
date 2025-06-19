@@ -14,7 +14,9 @@ const createCategory = async (reqBody) => {
       description: reqBody.description,
       slug: slugify(reqBody.name),
       destroy: false,
-      image: reqBody.image || null
+      image: reqBody.image || null,
+
+      parent: reqBody.parent || null
     }
 
     const category = await CategoryModel.create(newCategory)
@@ -81,6 +83,10 @@ const getCategoryList = async (queryString) => {
       .sort(sortField)
       .skip((page - 1) * limit)
       .limit(limit)
+      .populate({
+        path: 'parent',
+        select: 'name slug'
+      })
       .lean(),
 
     CategoryModel.countDocuments(filter)

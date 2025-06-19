@@ -44,7 +44,7 @@ const getCouponList = async (queryString) => {
     validatePagination(page, limit)
 
     // Xử lý thông tin Filter
-    const filter = { isActive: true }
+    const filter = {}
 
     if (type) filter.type = type.toLowerCase()
 
@@ -139,7 +139,16 @@ const updateCoupon = async (couponId, reqBody) => {
 const deleteCoupon = async (couponId) => {
   // eslint-disable-next-line no-useless-catch
   try {
-    const couponUpdated = await CouponModel.findOneAndDelete({ _id: couponId })
+    const couponUpdated = await CouponModel.findOneAndUpdate(
+      { _id: couponId },
+      {
+        isActive: false
+      },
+      {
+        new: true,
+        runValidators: true
+      }
+    )
 
     return couponUpdated
   } catch (err) {

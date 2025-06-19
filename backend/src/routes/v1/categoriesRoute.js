@@ -11,7 +11,7 @@ const Router = express.Router()
 // Tạo Danh mục sản phẩm mới
 Router.route('/').post(
   authMiddleware.isAuthorized,
-  rbacMiddleware.isValidPermission(['category:create']),
+  // rbacMiddleware.isValidPermission(['category:create']),
   categoriesValidation.category,
   categoriesController.createCategory
 )
