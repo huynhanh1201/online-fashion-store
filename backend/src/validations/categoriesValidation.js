@@ -30,7 +30,9 @@ const category = async (req, res, next) => {
     image: Joi.string() // name bắt buộc, chuỗi
       .max(150) // tối đa 50 ký tự
       .trim() // loại bỏ khoảng trắng đầu/cuối
-      .allow('', null)
+      .allow('', null),
+
+    parent: Joi.string().length(24).hex().allow('', null) // parent là ObjectId, có thể null hoặc rỗng
   })
 
   try {

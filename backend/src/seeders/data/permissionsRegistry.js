@@ -1,126 +1,155 @@
 export const permissions = [
-  // Users
+  // User
   { key: 'user:create', label: 'Tạo tài khoản nhân viên', group: 'Tài khoản' },
   { key: 'user:read', label: 'Xem tài khoản nhân viên', group: 'Tài khoản' },
   { key: 'user:update', label: 'Sửa tài khoản nhân viên', group: 'Tài khoản' },
   { key: 'user:delete', label: 'Xóa tài khoản nhân viên', group: 'Tài khoản' },
 
-  // Products
-  { key: 'product:create', label: 'Tạo sản phẩm mới', group: 'Sản phẩm' },
-  { key: 'product:read', label: 'Xem sản phẩm', group: 'Sản phẩm' },
-  { key: 'product:update', label: 'Cập nhật sản phẩm', group: 'Sản phẩm' },
-  { key: 'product:delete', label: 'Xóa sản phẩm', group: 'Sản phẩm' },
-
-  // Categories
+  // Category
   { key: 'category:create', label: 'Tạo danh mục sản phẩm', group: 'Danh mục' },
   { key: 'category:read', label: 'Xem danh mục sản phẩm', group: 'Danh mục' },
   { key: 'category:update', label: 'Sửa danh mục sản phẩm', group: 'Danh mục' },
   { key: 'category:delete', label: 'Xóa danh mục sản phẩm', group: 'Danh mục' },
 
-  // Orders
-  { key: 'order:create', label: 'Tạo đơn hàng', group: 'Đơn hàng' },
+  // Product
+  { key: 'product:create', label: 'Tạo sản phẩm', group: 'Sản phẩm' },
+  { key: 'product:read', label: 'Xem sản phẩm', group: 'Sản phẩm' },
+  { key: 'product:update', label: 'Sửa sản phẩm', group: 'Sản phẩm' },
+  { key: 'product:delete', label: 'Xóa sản phẩm', group: 'Sản phẩm' },
+
+  // Variant
+  { key: 'variant:create', label: 'Tạo biến thể', group: 'Biến thể sản phẩm' },
+  { key: 'variant:read', label: 'Xem biến thể', group: 'Biến thể sản phẩm' },
+  { key: 'variant:update', label: 'Sửa biến thể', group: 'Biến thể sản phẩm' },
+  { key: 'variant:delete', label: 'Xóa biến thể', group: 'Biến thể sản phẩm' },
+
+  // Color
+  { key: 'color:create', label: 'Tạo màu', group: 'Thuộc tính sản phẩm' },
+  { key: 'color:read', label: 'Xem màu', group: 'Thuộc tính sản phẩm' },
+  { key: 'color:update', label: 'Sửa màu', group: 'Thuộc tính sản phẩm' },
+  { key: 'color:delete', label: 'Xóa màu', group: 'Thuộc tính sản phẩm' },
+
+  // Color Palette
+  {
+    key: 'colorPalette:create',
+    label: 'Tạo bảng màu',
+    group: 'Thuộc tính sản phẩm'
+  },
+  {
+    key: 'colorPalette:read',
+    label: 'Xem bảng màu',
+    group: 'Thuộc tính sản phẩm'
+  },
+  {
+    key: 'colorPalette:update',
+    label: 'Sửa bảng màu',
+    group: 'Thuộc tính sản phẩm'
+  },
+  {
+    key: 'colorPalette:delete',
+    label: 'Xóa bảng màu',
+    group: 'Thuộc tính sản phẩm'
+  },
+
+  // Size
+  { key: 'size:create', label: 'Tạo kích cỡ', group: 'Thuộc tính sản phẩm' },
+  { key: 'size:read', label: 'Xem kích cỡ', group: 'Thuộc tính sản phẩm' },
+  { key: 'size:update', label: 'Sửa kích cỡ', group: 'Thuộc tính sản phẩm' },
+  { key: 'size:delete', label: 'Xóa kích cỡ', group: 'Thuộc tính sản phẩm' },
+
+  // Size Palette
+  {
+    key: 'sizePalette:create',
+    label: 'Tạo bảng kích cỡ',
+    group: 'Thuộc tính sản phẩm'
+  },
+  {
+    key: 'sizePalette:read',
+    label: 'Xem bảng kích cỡ',
+    group: 'Thuộc tính sản phẩm'
+  },
+  {
+    key: 'sizePalette:update',
+    label: 'Sửa bảng kích cỡ',
+    group: 'Thuộc tính sản phẩm'
+  },
+  {
+    key: 'sizePalette:delete',
+    label: 'Xóa bảng kích cỡ',
+    group: 'Thuộc tính sản phẩm'
+  },
+
+  // Order
   { key: 'order:read', label: 'Xem đơn hàng', group: 'Đơn hàng' },
   { key: 'order:update', label: 'Cập nhật đơn hàng', group: 'Đơn hàng' },
-  { key: 'order:delete', label: 'Xóa đơn hàng', group: 'Đơn hàng' },
 
-  // Order Items
+  // Payment Transaction
   {
-    key: 'orderItem:read',
-    label: 'Xem chi tiết sản phẩm trong đơn hàng',
-    group: 'Đơn hàng'
-  },
-
-  // Shipping Addresses
-  {
-    key: 'shippingAddress:create',
-    label: 'Thêm địa chỉ giao hàng',
-    group: 'Giao hàng'
-  },
-  {
-    key: 'shippingAddress:read',
-    label: 'Xem địa chỉ giao hàng',
-    group: 'Giao hàng'
-  },
-  {
-    key: 'shippingAddress:update',
-    label: 'Cập nhật địa chỉ giao hàng',
-    group: 'Giao hàng'
-  },
-  {
-    key: 'shippingAddress:delete',
-    label: 'Xóa địa chỉ giao hàng',
-    group: 'Giao hàng'
-  },
-
-  // Payment Transactions
-  {
-    key: 'payment:read',
+    key: 'paymentTransaction:read',
     label: 'Xem giao dịch thanh toán',
     group: 'Thanh toán'
   },
   {
-    key: 'payment:update',
-    label: 'Cập nhật trạng thái thanh toán',
+    key: 'paymentTransaction:update',
+    label: 'Cập nhật giao dịch thanh toán',
     group: 'Thanh toán'
   },
 
-  // Order Status History
-  {
-    key: 'orderStatusHistory:read',
-    label: 'Xem lịch sử trạng thái đơn hàng',
-    group: 'Đơn hàng'
-  },
-  {
-    key: 'orderStatusHistory:create',
-    label: 'Cập nhật lịch sử đơn hàng',
-    group: 'Đơn hàng'
-  },
-
-  // Coupons
+  // Coupon
   { key: 'coupon:create', label: 'Tạo mã giảm giá', group: 'Khuyến mãi' },
   { key: 'coupon:read', label: 'Xem mã giảm giá', group: 'Khuyến mãi' },
-  { key: 'coupon:update', label: 'Cập nhật mã giảm giá', group: 'Khuyến mãi' },
+  { key: 'coupon:update', label: 'Sửa mã giảm giá', group: 'Khuyến mãi' },
   { key: 'coupon:delete', label: 'Xóa mã giảm giá', group: 'Khuyến mãi' },
 
-  // Cart
-  { key: 'cart:read', label: 'Xem giỏ hàng', group: 'Giỏ hàng' },
-  { key: 'cart:update', label: 'Cập nhật giỏ hàng', group: 'Giỏ hàng' },
+  // Statistics
+  { key: 'statistics:read', label: 'Xem thống kê', group: 'Thống kê' },
 
-  // Color Palette
-  { key: 'colorPalette:read', label: 'Xem màu sản phẩm', group: 'Sản phẩm' },
+  // Inventory
+  { key: 'inventory:read', label: 'Xem tồn kho', group: 'Kho hàng' },
+  { key: 'inventory:update', label: 'Sửa tồn kho', group: 'Kho hàng' },
+
+  // Warehouse Slip
+  { key: 'warehouseSlip:create', label: 'Tạo phiếu kho', group: 'Kho hàng' },
+  { key: 'warehouseSlip:read', label: 'Xem phiếu kho', group: 'Kho hàng' },
+
+  // Inventory Log
+  { key: 'inventoryLog:read', label: 'Xem lịch sử tồn kho', group: 'Kho hàng' },
+
+  // Warehouse
+  { key: 'warehouse:create', label: 'Tạo kho', group: 'Kho hàng' },
+  { key: 'warehouse:read', label: 'Xem kho', group: 'Kho hàng' },
+  { key: 'warehouse:update', label: 'Sửa kho', group: 'Kho hàng' },
+  { key: 'warehouse:delete', label: 'Xóa kho', group: 'Kho hàng' },
+
+  // Batch
+  { key: 'batch:read', label: 'Xem lô hàng', group: 'Lô hàng' },
+  { key: 'batch:update', label: 'Sửa lô hàng', group: 'Lô hàng' },
+
+  // Partner
+  { key: 'partner:create', label: 'Tạo đối tác', group: 'Đối tác' },
+  { key: 'partner:read', label: 'Xem đối tác', group: 'Đối tác' },
+  { key: 'partner:update', label: 'Sửa đối tác', group: 'Đối tác' },
+  { key: 'partner:delete', label: 'Xóa đối tác', group: 'Đối tác' },
+
+  // Shipping Address
   {
-    key: 'colorPalette:update',
-    label: 'Cập nhật màu sản phẩm',
-    group: 'Sản phẩm'
-  },
-
-  // Size Palette
-  {
-    key: 'sizePalette:read',
-    label: 'Xem kích thước sản phẩm',
-    group: 'Sản phẩm'
+    key: 'shippingAddress:read',
+    label: 'Xem địa chỉ giao hàng',
+    group: 'Địa chỉ giao hàng'
   },
   {
-    key: 'sizePalette:update',
-    label: 'Cập nhật kích thước sản phẩm',
-    group: 'Sản phẩm'
+    key: 'shippingAddress:create',
+    label: 'Tạo địa chỉ giao hàng',
+    group: 'Địa chỉ giao hàng'
   },
-
-  // Colors
-  { key: 'color:create', label: 'Tạo màu mới', group: 'Danh mục phụ' },
-  { key: 'color:read', label: 'Xem danh sách màu', group: 'Danh mục phụ' },
-  { key: 'color:update', label: 'Cập nhật màu', group: 'Danh mục phụ' },
-  { key: 'color:delete', label: 'Xóa màu', group: 'Danh mục phụ' },
-
-  // Sizes
-  { key: 'size:create', label: 'Tạo kích cỡ mới', group: 'Danh mục phụ' },
-  { key: 'size:read', label: 'Xem danh sách kích cỡ', group: 'Danh mục phụ' },
-  { key: 'size:update', label: 'Cập nhật kích cỡ', group: 'Danh mục phụ' },
-  { key: 'size:delete', label: 'Xóa kích cỡ', group: 'Danh mục phụ' },
-
-  // Warehouses
-  { key: 'warehouse:create', label: 'Tạo kho hàng mới', group: 'Kho hàng' },
-  { key: 'warehouse:read', label: 'Xem kho hàng', group: 'Kho hàng' },
-  { key: 'warehouse:update', label: 'Cập nhật kho hàng', group: 'Kho hàng' },
-  { key: 'warehouse:delete', label: 'Xóa kho hàng', group: 'Kho hàng' }
+  {
+    key: 'shippingAddress:update',
+    label: 'Sửa địa chỉ giao hàng',
+    group: 'Địa chỉ giao hàng'
+  },
+  {
+    key: 'shippingAddress:delete',
+    label: 'Xóa địa chỉ giao hàng',
+    group: 'Địa chỉ giao hàng'
+  }
 ]
