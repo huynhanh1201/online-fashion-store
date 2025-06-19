@@ -27,7 +27,7 @@ import IconButton from '@mui/material/IconButton'
 import Tooltip from '@mui/material/Tooltip'
 import Stack from '@mui/material/Stack'
 import TableNoneData from '~/components/TableAdmin/NoneData.jsx'
-
+import { TableHead } from '@mui/material'
 const styles = {
   groupIcon: {
     display: 'flex',
@@ -46,6 +46,11 @@ const styles = {
     overflow: 'hidden',
     textOverflow: 'ellipsis',
     verticalAlign: 'middle'
+  },
+  cellPaddingColor: {
+    height: 53,
+    minHeight: 53,
+    maxHeight: 53
   }
 }
 
@@ -109,6 +114,8 @@ const ViewProductModal = ({
   const sizeCreatedAt = sizePalette?.createdAt
   const sizeUpdatedAt = sizePalette?.updatedAt
 
+  const productName = product?.name || 'Không có tên sản phẩm'
+
   const formatDate = (dateString) => {
     if (!dateString) return 'Không có thông tin'
     const date = new Date(dateString)
@@ -151,7 +158,6 @@ const ViewProductModal = ({
             textColor='primary'
             variant='scrollable'
             scrollButtons='auto'
-            sx={{ mb: 2 }}
           >
             <Tab label='Thông tin sản phẩm' value='1' />
             <Tab label='Màu sắc sản phẩm' value='2' />
@@ -231,7 +237,16 @@ const ViewProductModal = ({
                         >
                           Tên sản phẩm
                         </TableCell>
-                        <TableCell>{product.name}</TableCell>
+                        <TableCell>
+                          {productName
+                            .split(' ')
+                            .map(
+                              (word) =>
+                                word.charAt(0).toUpperCase() +
+                                word.slice(1).toLowerCase()
+                            )
+                            .join(' ') || 'Không có tên'}
+                        </TableCell>
                       </TableRow>
                       <TableRow>
                         <TableCell variant='head' sx={{ fontWeight: 500 }}>
@@ -360,30 +375,57 @@ const ViewProductModal = ({
 
           <TabPanel value='2'>
             <Typography variant='h6' gutterBottom>
-              Danh sách màu sắc
+              Danh sách màu sắc của sản phẩm:{' '}
+              <strong>
+                {productName
+                  .split(' ')
+                  .map(
+                    (word) =>
+                      word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+                  )
+                  .join(' ') || 'Không có tên'}
+              </strong>
             </Typography>
-            <Table size='small'>
-              <TableBody>
-                <TableRow sx={{ fontWeight: 600 }}>
-                  <TableCell sx={StyleAdmin.TableColumnSTT}>STT</TableCell>
-                  <TableCell align='left'>Ảnh</TableCell>
-                  <TableCell align='left' sx={{ width: '30%' }}>
+            <Table size='small' sx={{ tableLayout: 'fixed', width: '100%' }}>
+              <TableHead>
+                <TableRow>
+                  <TableCell
+                    sx={{
+                      ...StyleAdmin.TableColumnSTT,
+                      fontWeight: 700,
+                      width: 54
+                    }}
+                  >
+                    STT
+                  </TableCell>
+                  <TableCell align='left' sx={{ fontWeight: 700, width: 100 }}>
+                    Ảnh
+                  </TableCell>
+                  <TableCell
+                    align='left'
+                    sx={{ width: '30%', fontWeight: 700 }}
+                  >
                     Tên màu
                   </TableCell>
-                  <TableCell align='left' sx={{ width: 200 }}>
+                  <TableCell align='left' sx={{ width: 200, fontWeight: 700 }}>
                     Ngày tạo
                   </TableCell>
-                  <TableCell align='left' sx={{ width: 200 }}>
+                  <TableCell align='left' sx={{ width: 200, fontWeight: 700 }}>
                     Ngày cập nhật
                   </TableCell>
-                  <TableCell align='left' sx={{ width: 150, maxWidth: 150 }}>
+                  <TableCell
+                    align='left'
+                    sx={{ width: 150, maxWidth: 150, fontWeight: 700 }}
+                  >
                     Thao tác
                   </TableCell>
                 </TableRow>
+              </TableHead>
+              <TableBody>
                 {filteredColors.length === 0 ? (
                   <TableNoneData
                     col={6}
-                    message='Không có dữ liệu màu sắc cảu sản phẩm.'
+                    message='Không có dữ liệu màu sắc của sản phẩm.'
                   />
                 ) : (
                   filteredColors.map((color, index) => (
@@ -394,12 +436,12 @@ const ViewProductModal = ({
                       <TableCell
                         sx={{
                           ...styles.cellPadding,
+                          ...styles.cellPaddingColor,
                           display: 'flex',
-                          justifyContent: 'start',
                           alignItems: 'center',
-                          height: 50,
-                          minHeight: 55,
-                          maxHeight: 55
+                          height: 53.5,
+                          minHeight: 53.5,
+                          maxHeight: 53.5
                         }}
                       >
                         <Box
@@ -416,19 +458,37 @@ const ViewProductModal = ({
                         />
                       </TableCell>
                       <TableCell
-                        sx={{ textAlign: 'left', ...styles.cellPadding }}
+                        sx={{
+                          textAlign: 'left',
+                          ...styles.cellPadding,
+                          ...styles.cellPaddingColor
+                        }}
                       >
                         {color?.name}
                       </TableCell>
-                      <TableCell sx={styles.cellPadding}>
-                        {formatDate(colorCreatedAt)}
+                      <TableCell
+                        sx={{
+                          ...styles.cellPadding,
+                          ...styles.cellPaddingColor
+                        }}
+                      >
+                        {formatDate(colorPalette.createdAt)}
                       </TableCell>
-                      <TableCell sx={styles.cellPadding}>
-                        {formatDate(colorUpdatedAt)}
+                      <TableCell
+                        sx={{
+                          ...styles.cellPadding,
+                          ...styles.cellPaddingColor
+                        }}
+                      >
+                        {formatDate(colorPalette.updatedAt)}
                       </TableCell>
                       <TableCell
                         align='center'
-                        sx={{ maxWidth: 150, ...styles.cellPadding }}
+                        sx={{
+                          maxWidth: 150,
+                          ...styles.cellPadding,
+                          ...styles.cellPaddingColor
+                        }}
                       >
                         <Stack
                           direction='row'
@@ -461,25 +521,51 @@ const ViewProductModal = ({
 
           <TabPanel value='3'>
             <Typography variant='h6' gutterBottom>
-              Danh sách kích thước
+              Danh sách kích thước của sản phẩm:{' '}
+              <strong>
+                {productName
+                  .split(' ')
+                  .map(
+                    (word) =>
+                      word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+                  )
+                  .join(' ') || 'Không có tên'}
+              </strong>
             </Typography>
-            <Table size='small'>
-              <TableBody>
-                <TableRow sx={{ fontWeight: 600 }}>
-                  <TableCell sx={StyleAdmin.TableColumnSTT}>STT</TableCell>
-                  <TableCell align='left' sx={{ width: '30%' }}>
+            <Table size='small' sx={{ tableLayout: 'fixed', width: '100%' }}>
+              <TableHead>
+                <TableRow>
+                  <TableCell
+                    sx={{
+                      ...StyleAdmin.TableColumnSTT,
+                      fontWeight: 700,
+                      width: 54
+                    }}
+                  >
+                    STT
+                  </TableCell>
+                  <TableCell
+                    align='left'
+                    sx={{ fontWeight: 700, width: '40%' }}
+                  >
                     Tên kích thước
                   </TableCell>
-                  <TableCell align='left'>Ngày tạo</TableCell>
-                  <TableCell align='left'>Ngày cập nhật</TableCell>
-                  <TableCell align='left' sx={{ width: 150, maxWidth: 150 }}>
+                  <TableCell align='left' sx={{ fontWeight: 700, width: 200 }}>
+                    Ngày tạo
+                  </TableCell>
+                  <TableCell align='left' sx={{ fontWeight: 700, width: 200 }}>
+                    Ngày cập nhật
+                  </TableCell>
+                  <TableCell align='left' sx={{ fontWeight: 700, width: 150 }}>
                     Thao tác
                   </TableCell>
                 </TableRow>
+              </TableHead>
+              <TableBody>
                 {filteredSizes.length === 0 ? (
                   <TableNoneData
                     col={5}
-                    message='Không có dữ liệu kích thước cảu sản phẩm.'
+                    message='Không có dữ liệu kích thước của sản phẩm.'
                   />
                 ) : (
                   filteredSizes.map((size, index) => (
@@ -487,14 +573,21 @@ const ViewProductModal = ({
                       <TableCell sx={StyleAdmin.TableColumnSTT}>
                         {index + 1}
                       </TableCell>
-                      <TableCell sx={styles.cellPadding}>{size.name}</TableCell>
-                      <TableCell sx={styles.cellPadding}>
-                        {formatDate(sizeCreatedAt)}
+                      <TableCell
+                        sx={{ textAlign: 'left', ...styles.cellPadding }}
+                      >
+                        {size?.name}
                       </TableCell>
                       <TableCell sx={styles.cellPadding}>
-                        {formatDate(sizeUpdatedAt)}
+                        {formatDate(sizePalette.createdAt)}
                       </TableCell>
-                      <TableCell align='center'>
+                      <TableCell sx={styles.cellPadding}>
+                        {formatDate(sizePalette.updatedAt)}
+                      </TableCell>
+                      <TableCell
+                        align='center'
+                        sx={{ maxWidth: 150, ...styles.cellPadding }}
+                      >
                         <Stack
                           direction='row'
                           spacing={1}
