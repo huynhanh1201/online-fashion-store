@@ -1,6 +1,6 @@
 import { useSelector } from 'react-redux'
 import { selectCurrentUser } from '~/redux/user/userSlice'
-import { ROLE_PERMISSIONS } from '../../config/rbacConfig'
+import { ROLE_PERMISSIONS } from '~/config/rbacConfig'
 
 // Custom hook dùng để kiểm tra quyền hạn của user theo role và permission (RBAC - Role-Based Access Control)
 const usePermissions = () => {
