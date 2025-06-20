@@ -147,8 +147,6 @@ export const ROLE_PERMISSIONS = {
     // Coupon
     'coupon:read',
 
-    // Statistics
-    'statistics:read',
 
     // Inventory
     'inventory:read',
