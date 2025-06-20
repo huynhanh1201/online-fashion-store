@@ -143,6 +143,8 @@ import ProductPagination from './ProductPagination'
 
 import useProducts from '~/hooks/admin/useProducts'
 import useCategories from '~/hooks/admin/useCategories'
+import usePermissions from '~/hooks/usePermissions'
+import { PermissionWrapper, RouteGuard } from '~/components/PermissionGuard'
 
 import { updateProduct, deleteProduct } from '~/services/admin/productService'
 
@@ -167,6 +169,9 @@ const ProductManagement = () => {
   const { products, fetchProducts, loading, total, Save, fetchProductById } =
     useProducts()
   const { categories, fetchCategories } = useCategories()
+  // Lấy trực tiếp user từ localStorage kh phải qua state, và xác thực xem có thuộc nằm trong phạm vi của permission hay không
+  const { hasPermission } = usePermissions()
+  console.log('hasPermission', hasPermission('product:create')) // true (admin:access và product):read)
   // const [showAdvancedFilter, setShowAdvancedFilter] = React.useState(false)
 
   const [colorPalette, setColorPalette] = React.useState(null)
@@ -243,7 +248,7 @@ const ProductManagement = () => {
   }
 
   return (
-    <>
+    <RouteGuard requiredPermissions={['admin:access', 'product:read']}>
       <Box
         sx={{
           display: 'flex',
@@ -269,16 +274,26 @@ const ProductManagement = () => {
         categories={categories}
         fetchCategories={fetchCategories}
         fetchProducts={fetchProducts}
+        // Truyền quyền xuống component con
+        permissions={{
+          canCreate: hasPermission('product:create'),
+          canEdit: hasPermission('product:update'),
+          canDelete: hasPermission('product:delete'),
+          canView: hasPermission('product:read')
+        }}
       />
 
       <React.Suspense fallback={<></>}>
-        {modalType === 'add' && (
-          <AddProductModal
-            open
-            onClose={handleCloseModal}
-            onSuccess={() => fetchProducts()}
-          />
-        )}
+        <PermissionWrapper requiredPermissions={['product:create']}>
+          {modalType === 'add' && (
+            <AddProductModal
+              open
+              onClose={handleCloseModal}
+              onSuccess={() => fetchProducts()}
+            />
+          )}
+        </PermissionWrapper>
+
         {modalType === 'view' && selectedProduct && (
           <ViewProductModal
             open
@@ -288,22 +303,29 @@ const ProductManagement = () => {
             sizePalette={sizePalette}
           />
         )}
-        {modalType === 'edit' && selectedProduct && (
-          <EditProductModal
-            open
-            onClose={handleCloseModal}
-            product={selectedProduct}
-            onSave={handleSaveProduct}
-          />
-        )}
-        {modalType === 'delete' && selectedProduct && (
-          <DeleteProductModal
-            open
-            onClose={handleCloseModal}
-            product={selectedProduct}
-            onDelete={handleDeleteProduct}
-          />
-        )}
+
+        <PermissionWrapper requiredPermissions={['product:update']}>
+          {modalType === 'edit' && selectedProduct && (
+            <EditProductModal
+              open
+              onClose={handleCloseModal}
+              product={selectedProduct}
+              onSave={handleSaveProduct}
+            />
+          )}
+        </PermissionWrapper>
+
+        <PermissionWrapper requiredPermissions={['product:delete']}>
+          {modalType === 'delete' && selectedProduct && (
+            <DeleteProductModal
+              open
+              onClose={handleCloseModal}
+              product={selectedProduct}
+              onDelete={handleDeleteProduct}
+            />
+          )}
+        </PermissionWrapper>
+
         {modalType === 'viewDesc' && selectedProduct && (
           <ViewDescriptionModal
             open
@@ -312,7 +334,7 @@ const ProductManagement = () => {
           />
         )}
       </React.Suspense>
-    </>
+    </RouteGuard>
   )
 }
 

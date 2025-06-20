@@ -199,7 +199,8 @@ const ProductTable = ({
   categories,
   fetchCategories,
   onFilter,
-  fetchProducts
+  fetchProducts,
+  permissions = {}
 }) => {
   const columns = [
     { id: 'index', label: 'STT', minWidth: 50, align: 'center' },
@@ -251,21 +252,23 @@ const ProductTable = ({
                     <Typography variant='h6' sx={{ fontWeight: '800' }}>
                       Danh sách sản phẩm
                     </Typography>
-                    <Button
-                      variant='contained'
-                      sx={{
-                        textTransform: 'none',
-                        width: 100,
-                        display: 'flex',
-                        alignItems: 'center',
-                        backgroundColor: '#001f5d',
-                        color: '#fff'
-                      }}
-                      startIcon={<AddIcon />}
-                      onClick={addProduct}
-                    >
-                      Thêm
-                    </Button>
+                    {permissions.canCreate && (
+                      <Button
+                        variant='contained'
+                        sx={{
+                          textTransform: 'none',
+                          width: 100,
+                          display: 'flex',
+                          alignItems: 'center',
+                          backgroundColor: '#001f5d',
+                          color: '#fff'
+                        }}
+                        startIcon={<AddIcon />}
+                        onClick={addProduct}
+                      >
+                        Thêm
+                      </Button>
+                    )}
                   </Box>
                   <FilterProduct
                     categories={categories}
@@ -316,6 +319,7 @@ const ProductTable = ({
                   index={page * rowsPerPage + idx + 1}
                   columns={columns}
                   onAction={handleOpenModal}
+                  permissions={permissions}
                 />
               ))
             ) : (
