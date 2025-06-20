@@ -53,9 +53,14 @@ const usePartner = () => {
   const createNewPartner = async (data) => {
     try {
       const newPartner = await createPartner(data)
+      setPartners((prev) => {
+        const updated = [newPartner, ...prev]
+        return updated.slice(0, 10) // Keep only the 10 most recent partners
+      })
+      setTotal((prev) => prev + 1)
       return newPartner
     } catch (error) {
-      console.error('Error creating partner:', error)
+      console.error('Error creating new partner:', error)
       return null
     }
   }
@@ -63,6 +68,11 @@ const usePartner = () => {
   const updateExistingPartner = async (id, data) => {
     try {
       const updatedPartner = await updatePartner(id, data)
+      setPartners((prev) =>
+        prev.map((partner) =>
+          partner._id === updatedPartner._id ? updatedPartner : partner
+        )
+      )
       return updatedPartner
     } catch (error) {
       console.error('Error updating partner:', error)
@@ -73,6 +83,8 @@ const usePartner = () => {
   const removePartner = async (id) => {
     try {
       await deletePartner(id)
+      setPartners((prev) => prev.filter((partner) => partner._id !== id))
+      setTotal((prev) => prev - 1)
       return true
     } catch (error) {
       console.error('Error deleting partner:', error)

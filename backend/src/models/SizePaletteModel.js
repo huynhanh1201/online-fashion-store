@@ -34,4 +34,7 @@ const sizePaletteSchema = new Schema(
 )
 
 // Tạo Model
-export const SizePaletteModel = model('SizePalette', sizePaletteSchema)
+export const SizePaletteModel = model(
+  'ViewSizePaletteModal.jsx',
+  sizePaletteSchema
+)

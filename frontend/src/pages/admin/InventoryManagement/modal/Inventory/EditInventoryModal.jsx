@@ -81,6 +81,8 @@ const EditInventoryModal = ({
       BackdropProps={{
         sx: StyleAdmin.OverlayModal
       }}
+      fullWidth
+      maxWidth='sm'
     >
       <DialogTitle>Sửa thông tin tồn kho</DialogTitle>
       <Divider />
@@ -95,54 +97,54 @@ const EditInventoryModal = ({
           fullWidth
           inputProps={{ min: 0 }} // Ngăn nhập số âm
         />
-        <TextField
-          margin='dense'
-          label='Giá nhập (đ)'
-          name='importPrice'
-          type='text'
-          value={formatCurrency(formData.importPrice)}
-          onChange={(e) =>
-            handleChange({
-              target: {
-                name: 'importPrice',
-                value: parseCurrency(e.target.value)
-              }
-            })
-          }
-          fullWidth
-          inputProps={{ inputMode: 'numeric' }} // Gợi ý bàn phím số trên di động
-        />
+        {/*<TextField*/}
+        {/*  margin='dense'*/}
+        {/*  label='Giá nhập (đ)'*/}
+        {/*  name='importPrice'*/}
+        {/*  type='text'*/}
+        {/*  value={formatCurrency(formData.importPrice)}*/}
+        {/*  onChange={(e) =>*/}
+        {/*    handleChange({*/}
+        {/*      target: {*/}
+        {/*        name: 'importPrice',*/}
+        {/*        value: parseCurrency(e.target.value)*/}
+        {/*      }*/}
+        {/*    })*/}
+        {/*  }*/}
+        {/*  fullWidth*/}
+        {/*  inputProps={{ inputMode: 'numeric' }} // Gợi ý bàn phím số trên di động*/}
+        {/*/>*/}
 
-        <TextField
-          margin='dense'
-          label='Giá bán (đ)'
-          name='exportPrice'
-          type='text'
-          value={formatCurrency(formData.exportPrice)}
-          onChange={(e) =>
-            handleChange({
-              target: {
-                name: 'exportPrice',
-                value: parseCurrency(e.target.value)
-              }
-            })
-          }
-          fullWidth
-          inputProps={{ inputMode: 'numeric' }}
-        />
-        <FormControl fullWidth margin='dense'>
-          <InputLabel>Trạng thái</InputLabel>
-          <Select
-            name='status'
-            value={formData.status}
-            onChange={handleChange}
-            label='Trạng thái'
-          >
-            <MenuItem value='in-stock'>Còn hàng</MenuItem>
-            <MenuItem value='low-stock'>Cảnh báo</MenuItem>
-            <MenuItem value='out-of-stock'>Hết hàng</MenuItem>
-          </Select>
-        </FormControl>
+        {/*<TextField*/}
+        {/*  margin='dense'*/}
+        {/*  label='Giá bán (đ)'*/}
+        {/*  name='exportPrice'*/}
+        {/*  type='text'*/}
+        {/*  value={formatCurrency(formData.exportPrice)}*/}
+        {/*  onChange={(e) =>*/}
+        {/*    handleChange({*/}
+        {/*      target: {*/}
+        {/*        name: 'exportPrice',*/}
+        {/*        value: parseCurrency(e.target.value)*/}
+        {/*      }*/}
+        {/*    })*/}
+        {/*  }*/}
+        {/*  fullWidth*/}
+        {/*  inputProps={{ inputMode: 'numeric' }}*/}
+        {/*/>*/}
+        {/*<FormControl fullWidth margin='dense'>*/}
+        {/*  <InputLabel>Trạng thái</InputLabel>*/}
+        {/*  <Select*/}
+        {/*    name='status'*/}
+        {/*    value={formData.status}*/}
+        {/*    onChange={handleChange}*/}
+        {/*    label='Trạng thái'*/}
+        {/*  >*/}
+        {/*    <MenuItem value='in-stock'>Còn hàng</MenuItem>*/}
+        {/*    <MenuItem value='low-stock'>Cảnh báo</MenuItem>*/}
+        {/*    <MenuItem value='out-of-stock'>Hết hàng</MenuItem>*/}
+        {/*  </Select>*/}
+        {/*</FormControl>*/}
       </DialogContent>
       <Divider />
       <DialogActions sx={{ padding: '16px 24px' }}>

@@ -88,6 +88,14 @@ const ViewCategoryModal = ({ open, onClose, category }) => {
                 </Typography>
                 <Typography>{category.name || '—'}</Typography>
               </Box>
+              {category?.parent?.name && (
+                <Box mb={2}>
+                  <Typography variant='subtitle2' fontWeight='bold'>
+                    Tên danh mục cha
+                  </Typography>
+                  <Typography>{category?.parent?.name || '—'}</Typography>
+                </Box>
+              )}
 
               <Box mb={2}>
                 <Typography variant='subtitle2' fontWeight='bold'>

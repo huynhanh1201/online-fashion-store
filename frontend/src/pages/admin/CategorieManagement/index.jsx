@@ -1,8 +1,5 @@
 import React from 'react'
-import { Typography } from '@mui/material'
-import { Button } from '@mui/material'
 import CategoryTable from './CategoryTable'
-import CategoryPagination from './CategoryPagination'
 import useCategories from '~/hooks/admin/useCategories'
 import usePermissions from '~/hooks/usePermissions'
 import { PermissionWrapper, RouteGuard } from '~/components/PermissionGuard'
@@ -24,11 +21,19 @@ const CategoryManagement = () => {
   const [filters, setFilters] = React.useState({})
   const [selectedCategory, setSelectedCategory] = React.useState(null)
   const [modalType, setModalType] = React.useState(null)
-
-  const { categories, fetchCategories, Loading, totalPages, Save, fetchById } =
-    useCategories()
-  
   const { hasPermission } = usePermissions()
+
+  const {
+    categories,
+    fetchCategories,
+    Loading,
+    totalPages,
+    Save,
+    fetchById,
+    add,
+    update,
+    remove
+  } = useCategories()
 
   React.useEffect(() => {
     fetchCategories(page, limit, filters)
@@ -46,40 +51,43 @@ const CategoryManagement = () => {
     setSelectedCategory(null)
     setModalType(null)
   }
-
-  const handleSaveCategory = async (categoryId, updatedData) => {
+  const handleSave = async (data, type, id) => {
     try {
-      const response = await updateCategory(categoryId, updatedData)
-
-      if (response) {
-        const updatedCategory = await fetchById(categoryId)
-
-        if (updatedCategory) {
-          Save(updatedCategory)
-        }
-      } else {
-        console.log('Cập nhật không thành công')
+      if (type === 'add') {
+        await add(data)
+      } else if (type === 'edit') {
+        await update(id, data)
+      } else if (type === 'delete') {
+        await remove(data)
       }
     } catch (error) {
       console.error('Lỗi:', error)
     }
   }
 
-  const handleDeleteCategory = async (categoryId) => {
-    try {
-      const result = await deleteCategory(categoryId)
-      if (result) {
-        const deleteCategory = await fetchById(categoryId)
-        if (deleteCategory) {
-          Save(deleteCategory)
-        }
-      } else {
-        console.log('Xoá không thành công')
-      }
-    } catch (error) {
-      console.error('Lỗi:', error)
-    }
-  }
+  // const handleSaveCategory = async (categoryId, updatedData) => {
+  //   try {
+  //     await update(categoryId, updatedData)
+  //   } catch (error) {
+  //     console.error('Lỗi:', error)
+  //   }
+  // }
+  //
+  // const handleDeleteCategory = async (categoryId) => {
+  //   try {
+  //     const result = await remove(categoryId)
+  //     if (result) {
+  //       const deleteCategory = await fetchById(categoryId)
+  //       if (deleteCategory) {
+  //         Save(deleteCategory)
+  //       }
+  //     } else {
+  //       console.log('Xoá không thành công')
+  //     }
+  //   } catch (error) {
+  //     console.error('Lỗi:', error)
+  //   }
+  // }
 
   const isEqual = (obj1, obj2) => JSON.stringify(obj1) === JSON.stringify(obj2)
 
@@ -121,13 +129,11 @@ const CategoryManagement = () => {
             <AddCategoryModal
               open
               onClose={handleCloseModal}
-              onAdded={() => {
-                fetchCategories(page, limit, filters)
-              }}
+              onAdded={handleSave}
+              categories={categories}
             />
           )}
         </PermissionWrapper>
-
         {modalType === 'view' && selectedCategory && (
           <ViewCategoryModal
             open
@@ -135,36 +141,35 @@ const CategoryManagement = () => {
             category={selectedCategory}
           />
         )}
-
         <PermissionWrapper requiredPermissions={['category:update']}>
           {modalType === 'edit' && selectedCategory && (
             <EditCategoryModal
               open
               onClose={handleCloseModal}
               category={selectedCategory}
-              onSave={handleSaveCategory}
+              onSave={handleSave}
+              categories={categories}
             />
           )}
         </PermissionWrapper>
-
         <PermissionWrapper requiredPermissions={['category:delete']}>
           {modalType === 'delete' && selectedCategory && (
             <DeleteCategoryModal
               open
               onClose={handleCloseModal}
               category={selectedCategory}
-              onDelete={handleDeleteCategory}
+              onDelete={handleSave}
             />
           )}
         </PermissionWrapper>
-      </React.Suspense>
+      </React.Suspense >
 
       {/*<CategoryPagination*/}
       {/*  page={page}*/}
       {/*  totalPages={totalPages}*/}
       {/*  onPageChange={handleChangePage}*/}
       {/*/>*/}
-    </RouteGuard>
+    </RouteGuard >
   )
 }
 

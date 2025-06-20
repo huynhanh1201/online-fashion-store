@@ -59,12 +59,21 @@ const createProduct = async (reqBody) => {
       quantity: 0,
       destroy: false,
 
-      packageSize: reqBody.packageSize
+      packageSize: reqBody.packageSize,
+
+      status: reqBody.status
     }
 
     const product = await ProductModel.create(newProduct)
 
-    return product
+    const populatedProduct = await ProductModel.findById(product._id)
+      .populate({
+        path: 'categoryId',
+        select: 'name'
+      })
+      .lean()
+
+    return populatedProduct
   } catch (err) {
     throw err
   }

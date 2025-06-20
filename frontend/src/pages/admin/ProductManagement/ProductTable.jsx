@@ -314,7 +314,7 @@ const ProductTable = ({
             ) : products.length > 0 ? (
               products.map((product, idx) => (
                 <ProductRow
-                  key={product._id || idx}
+                  key={idx}
                   product={product}
                   index={page * rowsPerPage + idx + 1}
                   columns={columns}

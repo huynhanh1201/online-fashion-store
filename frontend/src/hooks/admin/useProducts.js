@@ -33,7 +33,9 @@ import { useState } from 'react'
 import {
   getProducts,
   getProductById,
-  addProduct
+  addProduct,
+  deleteProduct,
+  updateProduct
 } from '~/services/admin/productService'
 
 const useProducts = () => {
@@ -87,9 +89,35 @@ const useProducts = () => {
   const createNewProduct = async (data) => {
     try {
       const result = await addProduct(data)
+      setProducts((prev) => {
+        const newProducts = [result, ...prev]
+        return newProducts.slice(0, 10) // ✅ Giới hạn danh sách còn 10 item
+      })
+      setTotal((prev) => prev + 1)
       return result
     } catch (error) {
       console.error('Lỗi khi tạo sản phẩm mới:', error)
+      return null
+    }
+  }
+  const deleteProductById = async (productId) => {
+    try {
+      await deleteProduct(productId)
+      setProducts((prev) => prev.filter((p) => p._id !== productId))
+      setTotal((prev) => prev - 1)
+    } catch (error) {
+      console.error('Lỗi khi xóa sản phẩm:', error)
+    }
+  }
+  const updateProductById = async (productId, data) => {
+    try {
+      const updatedProduct = await updateProduct(productId, data)
+      setProducts((prev) =>
+        prev.map((p) => (p._id === productId ? updatedProduct : p))
+      )
+      return updatedProduct
+    } catch (error) {
+      console.error('Lỗi khi cập nhật sản phẩm:', error)
       return null
     }
   }
@@ -106,7 +134,9 @@ const useProducts = () => {
     loading,
     fetchProductById,
     createNewProduct,
-    Save
+    Save,
+    deleteProductById,
+    updateProductById
   }
 }
 

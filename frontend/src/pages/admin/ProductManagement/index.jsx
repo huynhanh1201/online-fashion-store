@@ -127,26 +127,14 @@
 // export default ProductManagement
 
 import React from 'react'
-import Button from '@mui/material/Button'
 import Box from '@mui/material/Box'
-import AddIcon from '@mui/icons-material/Add'
-import Select from '@mui/material/Select'
-import MenuItem from '@mui/material/MenuItem'
-import InputLabel from '@mui/material/InputLabel'
-import FormControl from '@mui/material/FormControl'
-import TextField from '@mui/material/TextField'
-import SearchIcon from '@mui/icons-material/Search'
-import FilterListIcon from '@mui/icons-material/FilterList'
 
 import ProductTable from './ProductTable'
-import ProductPagination from './ProductPagination'
 
 import useProducts from '~/hooks/admin/useProducts'
 import useCategories from '~/hooks/admin/useCategories'
 import usePermissions from '~/hooks/usePermissions'
 import { PermissionWrapper, RouteGuard } from '~/components/PermissionGuard'
-
-import { updateProduct, deleteProduct } from '~/services/admin/productService'
 
 const AddProductModal = React.lazy(() => import('./modal/AddProductModal'))
 const EditProductModal = React.lazy(() => import('./modal/EditProductModal'))
@@ -155,7 +143,6 @@ const DeleteProductModal = React.lazy(
 )
 const ViewProductModal = React.lazy(() => import('./modal/ViewProductModal'))
 const ViewDesc = React.lazy(() => import('./modal/ViewDescriptionModal.jsx'))
-import StyleAdmin from '~/assets/StyleAdmin.jsx'
 import ViewDescriptionModal from '~/pages/admin/ProductManagement/modal/ViewDescriptionModal.jsx'
 import useColorPalettes from '~/hooks/admin/useColorPalettes.js'
 import useSizePalettes from '~/hooks/admin/useSizePalettes.js'
@@ -166,8 +153,17 @@ const ProductManagement = () => {
   const [modalType, setModalType] = React.useState(null)
   const [selectedProduct, setSelectedProduct] = React.useState(null)
   const [filters, setFilters] = React.useState({})
-  const { products, fetchProducts, loading, total, Save, fetchProductById } =
-    useProducts()
+  const {
+    products,
+    fetchProducts,
+    loading,
+    total,
+    Save,
+    fetchProductById,
+    updateProductById,
+    deleteProductById,
+    createNewProduct
+  } = useProducts()
   const { categories, fetchCategories } = useCategories()
   // Lấy trực tiếp user từ localStorage kh phải qua state, và xác thực xem có thuộc nằm trong phạm vi của permission hay không
   const { hasPermission } = usePermissions()
@@ -195,8 +191,8 @@ const ProductManagement = () => {
         const sizePalette = await getSizePaletteId(product._id)
 
         // Bạn có thể lưu dữ liệu này vào state nếu cần dùng ở modal
-        setColorPalette(colorPalette)
-        setSizePalette(sizePalette)
+        setColorPalette(colorPalette || [])
+        setSizePalette(sizePalette || [])
       } catch (error) {
         console.error('Lỗi khi lấy dữ liệu palette:', error)
       }
@@ -207,37 +203,52 @@ const ProductManagement = () => {
     setModalType(null)
   }
 
-  const handleSaveProduct = async (id, updatedData) => {
+  // const handleSaveProduct = async (id, updatedData) => {
+  //   try {
+  //     const result = await updateProductById(id, updatedData)
+  //     if (result) {
+  //       const update = await fetchProductById(id)
+  //       if (update) {
+  //         Save(update)
+  //       }
+  //     }
+  //     return result // Explicitly return the result
+  //   } catch (error) {
+  //     console.error('Error in handleSaveProduct:', error)
+  //     return false // Return false on error
+  //   }
+  // }
+  //
+  // const handleDeleteProduct = async (id) => {
+  //   try {
+  //     const result = await deleteProductById(id)
+  //     if (result) {
+  //       const remove = await fetchProductById(id)
+  //       if (remove) {
+  //         Save(remove)
+  //       }
+  //     }
+  //     return result // Explicitly return the result
+  //   } catch (error) {
+  //     console.error('Error in handleSaveProduct:', error)
+  //     return false // Return false on error
+  //   }
+  // }
+
+  const handleSave = async (data, type, id) => {
     try {
-      const result = await updateProduct(id, updatedData)
-      if (result) {
-        const update = await fetchProductById(id)
-        if (update) {
-          Save(update)
-        }
+      if (type === 'add') {
+        await createNewProduct(data)
+      } else if (type === 'edit') {
+        await updateProductById(id, data)
+      } else if (type === 'delete') {
+        await deleteProductById(data)
       }
-      return result // Explicitly return the result
     } catch (error) {
-      console.error('Error in handleSaveProduct:', error)
-      return false // Return false on error
+      console.error('Lỗi:', error)
     }
   }
 
-  const handleDeleteProduct = async (id) => {
-    try {
-      const result = await deleteProduct(id)
-      if (result) {
-        const remove = await fetchProductById(id)
-        if (remove) {
-          Save(remove)
-        }
-      }
-      return result // Explicitly return the result
-    } catch (error) {
-      console.error('Error in handleSaveProduct:', error)
-      return false // Return false on error
-    }
-  }
   const isEqual = (obj1, obj2) => JSON.stringify(obj1) === JSON.stringify(obj2)
 
   const handleFilter = (newFilters) => {
@@ -289,7 +300,7 @@ const ProductManagement = () => {
             <AddProductModal
               open
               onClose={handleCloseModal}
-              onSuccess={() => fetchProducts()}
+              onSuccess={handleSave}
             />
           )}
         </PermissionWrapper>
@@ -310,7 +321,7 @@ const ProductManagement = () => {
               open
               onClose={handleCloseModal}
               product={selectedProduct}
-              onSave={handleSaveProduct}
+              onSave={handleSave}
             />
           )}
         </PermissionWrapper>
@@ -321,20 +332,22 @@ const ProductManagement = () => {
               open
               onClose={handleCloseModal}
               product={selectedProduct}
-              onDelete={handleDeleteProduct}
+              onDelete={handleSave}
             />
           )}
         </PermissionWrapper>
 
-        {modalType === 'viewDesc' && selectedProduct && (
-          <ViewDescriptionModal
-            open
-            onClose={handleCloseModal}
-            product={selectedProduct}
-          />
-        )}
-      </React.Suspense>
-    </RouteGuard>
+        {
+          modalType === 'viewDesc' && selectedProduct && (
+            <ViewDescriptionModal
+              open
+              onClose={handleCloseModal}
+              product={selectedProduct}
+            />
+          )
+        }
+      </React.Suspense >
+    </RouteGuard >
   )
 }
 

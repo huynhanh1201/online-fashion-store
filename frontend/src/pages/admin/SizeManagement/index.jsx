@@ -21,8 +21,17 @@ const SizeManagement = () => {
   const [selectedSize, setSelectedSize] = React.useState(null)
   const [modalType, setModalType] = React.useState(null)
 
-  const { sizes, totalPages, fetchSizes, Loading, fetchSizeById, Save } =
-    useSizes()
+  const {
+    sizes,
+    totalPages,
+    fetchSizes,
+    Loading,
+    fetchSizeById,
+    Save,
+    remove,
+    update,
+    createNewSize
+  } = useSizes()
 
   React.useEffect(() => {
     fetchSizes(page, limit, filters)
@@ -41,37 +50,52 @@ const SizeManagement = () => {
 
   const handleChangePage = (event, value) => setPage(value)
 
-  const handleSaveSize = async (sizeId, updatedData) => {
+  // const handleSaveSize = async (sizeId, updatedData) => {
+  //   try {
+  //     const response = await updateSize(sizeId, updatedData)
+  //     if (response) {
+  //       const updatedSize = await fetchSizeById(sizeId)
+  //       if (updatedSize) {
+  //         Save(updatedSize)
+  //       }
+  //     } else {
+  //       console.log('Cập nhật không thành công')
+  //     }
+  //   } catch (error) {
+  //     console.error('Lỗi:', error)
+  //   }
+  // }
+  //
+  // const handleDeleteSize = async (sizeId) => {
+  //   try {
+  //     const result = await deleteSize(sizeId)
+  //     if (result) {
+  //       const removeSize = await fetchSizeById(sizeId)
+  //       if (removeSize) {
+  //         Save(removeSize)
+  //       }
+  //     } else {
+  //       console.log('Xoá không thành công')
+  //     }
+  //   } catch (error) {
+  //     console.error('Lỗi:', error)
+  //   }
+  // }
+
+  const handleSave = async (data, type, id) => {
     try {
-      const response = await updateSize(sizeId, updatedData)
-      if (response) {
-        const updatedSize = await fetchSizeById(sizeId)
-        if (updatedSize) {
-          Save(updatedSize)
-        }
-      } else {
-        console.log('Cập nhật không thành công')
+      if (type === 'add') {
+        await createNewSize(data)
+      } else if (type === 'edit') {
+        await update(id, data)
+      } else if (type === 'delete') {
+        await remove(data)
       }
     } catch (error) {
       console.error('Lỗi:', error)
     }
   }
 
-  const handleDeleteSize = async (sizeId) => {
-    try {
-      const result = await deleteSize(sizeId)
-      if (result) {
-        const removeSize = await fetchSizeById(sizeId)
-        if (removeSize) {
-          Save(removeSize)
-        }
-      } else {
-        console.log('Xoá không thành công')
-      }
-    } catch (error) {
-      console.error('Lỗi:', error)
-    }
-  }
   const isEqual = (obj1, obj2) => JSON.stringify(obj1) === JSON.stringify(obj2)
 
   const handleFilter = (newFilters) => {
@@ -101,11 +125,7 @@ const SizeManagement = () => {
 
       <React.Suspense fallback={<></>}>
         {modalType === 'add' && (
-          <AddSizeModal
-            open
-            onClose={handleCloseModal}
-            onAdded={() => fetchSizes(page, limit, filters)}
-          />
+          <AddSizeModal open onClose={handleCloseModal} onAdded={handleSave} />
         )}
 
         {modalType === 'view' && selectedSize && (
@@ -117,7 +137,7 @@ const SizeManagement = () => {
             open
             onClose={handleCloseModal}
             size={selectedSize}
-            onSave={handleSaveSize}
+            onSave={handleSave}
           />
         )}
 
@@ -126,7 +146,7 @@ const SizeManagement = () => {
             open
             onClose={handleCloseModal}
             size={selectedSize}
-            onDelete={handleDeleteSize}
+            onDelete={handleSave}
           />
         )}
       </React.Suspense>

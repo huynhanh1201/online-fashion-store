@@ -263,11 +263,11 @@ const OrderRow = ({ order, index, columns, onView, onEdit, onDelete }) => {
                     <BorderColorIcon color='warning' />
                   </IconButton>
                 </Tooltip>
-                <Tooltip title='Ẩn'>
-                  <IconButton onClick={() => onDelete(order)} size='small'>
-                    <VisibilityOffIcon color='error' />
-                  </IconButton>
-                </Tooltip>
+                {/*<Tooltip title='Ẩn'>*/}
+                {/*  <IconButton onClick={() => onDelete(order)} size='small'>*/}
+                {/*    <VisibilityOffIcon color='error' />*/}
+                {/*  </IconButton>*/}
+                {/*</Tooltip>*/}
               </Stack>
             )
             break

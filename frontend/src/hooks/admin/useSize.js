@@ -1,5 +1,11 @@
 import { useState } from 'react'
-import { getSizes, addSize, getSizeById } from '~/services/admin/sizeService'
+import {
+  getSizes,
+  addSize,
+  getSizeById,
+  updateSize,
+  deleteSize
+} from '~/services/admin/sizeService'
 
 const useSizes = () => {
   const [sizes, setSizes] = useState([])
@@ -34,11 +40,38 @@ const useSizes = () => {
 
   const createNewSize = async (data) => {
     try {
-      const result = await addSize(data)
-      return result
+      const newSize = await addSize(data)
+      setSizes((prev) => {
+        const updated = [newSize, ...prev]
+        return updated.slice(0, 10) // Chỉ giữ lại 10 màu mới nhất
+      })
+      setTotalPages((prev) => prev + 1)
+      return newSize
     } catch (error) {
-      console.error('Lỗi khi tạo kích thước mới:', error)
+      console.error('Lỗi khi thêm màu mới:', error)
       return null
+    }
+  }
+  const update = async (id, data) => {
+    try {
+      const updated = await updateSize(id, data)
+      setSizes((prev) => prev.map((d) => (d._id === updated._id ? updated : d)))
+      return updated
+    } catch (err) {
+      console.error('Error updating category:', err)
+      return null
+    }
+  }
+
+  const remove = async (id) => {
+    try {
+      await deleteSize(id)
+      setSizes((prev) => prev.filter((d) => d._id !== id))
+      setTotalPages((prev) => prev - 1)
+      return true
+    } catch (err) {
+      console.error('Error deleting category:', err)
+      return false
     }
   }
   const fetchSizeById = async (id) => {
@@ -61,7 +94,9 @@ const useSizes = () => {
     loading,
     createNewSize,
     fetchSizeById,
-    Save
+    Save,
+    update,
+    remove
   }
 }
 

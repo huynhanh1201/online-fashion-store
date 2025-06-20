@@ -15,7 +15,7 @@ const DeleteSizeModal = ({ open, onClose, size, onDelete }) => {
   const handleDelete = async () => {
     setIsDeleting(true)
     try {
-      await onDelete(size._id)
+      await onDelete(size._id, 'delete')
       onClose()
     } catch (error) {
       console.error('Xoá kích thước thất bại:', error)

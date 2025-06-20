@@ -20,8 +20,17 @@ const ColorManagement = () => {
   const [limit, setLimit] = React.useState(10) // Giới hạn số lượng màu hiển thị mỗi trang
   const [modalType, setModalType] = React.useState(null)
   const [filters, setFilters] = React.useState({})
-  const { colors, totalPages, fetchColors, Loading, getColorId, saveColor } =
-    useColors()
+  const {
+    colors,
+    totalPages,
+    fetchColors,
+    Loading,
+    getColorId,
+    saveColor,
+    remove,
+    update,
+    createNewColor
+  } = useColors()
 
   React.useEffect(() => {
     fetchColors(page, limit, filters)
@@ -40,32 +49,45 @@ const ColorManagement = () => {
 
   const handleChangePage = (event, value) => setPage(value)
 
-  const handleSaveColor = async (colorId, updatedData) => {
+  // const handleSaveColor = async (colorId, updatedData) => {
+  //   try {
+  //     const response = await updateColor(colorId, updatedData)
+  //     if (response) {
+  //       const updatedColor = await getColorId(colorId)
+  //       if (updatedColor) {
+  //         saveColor(updatedColor)
+  //       }
+  //     } else {
+  //       console.log('Cập nhật không thành công')
+  //     }
+  //   } catch (error) {
+  //     console.error('Lỗi:', error)
+  //   }
+  // }
+  //
+  // const handleDeleteColor = async (colorId) => {
+  //   try {
+  //     const result = await deleteColor(colorId)
+  //     if (result) {
+  //       const deletedColor = await getColorId(colorId)
+  //       if (deletedColor) {
+  //         saveColor(deletedColor)
+  //       }
+  //     } else {
+  //       console.log('Xoá không thành công')
+  //     }
+  //   } catch (error) {
+  //     console.error('Lỗi:', error)
+  //   }
+  // }
+  const handleSave = async (data, type, id) => {
     try {
-      const response = await updateColor(colorId, updatedData)
-      if (response) {
-        const updatedColor = await getColorId(colorId)
-        if (updatedColor) {
-          saveColor(updatedColor)
-        }
-      } else {
-        console.log('Cập nhật không thành công')
-      }
-    } catch (error) {
-      console.error('Lỗi:', error)
-    }
-  }
-
-  const handleDeleteColor = async (colorId) => {
-    try {
-      const result = await deleteColor(colorId)
-      if (result) {
-        const deletedColor = await getColorId(colorId)
-        if (deletedColor) {
-          saveColor(deletedColor)
-        }
-      } else {
-        console.log('Xoá không thành công')
+      if (type === 'add') {
+        await createNewColor(data)
+      } else if (type === 'edit') {
+        await update(id, data)
+      } else if (type === 'delete') {
+        await remove(data)
       }
     } catch (error) {
       console.error('Lỗi:', error)
@@ -100,11 +122,7 @@ const ColorManagement = () => {
 
       <React.Suspense fallback={<></>}>
         {modalType === 'add' && (
-          <AddColorModal
-            open
-            onClose={handleCloseModal}
-            onAdded={() => fetchColors(page, limit, filters)}
-          />
+          <AddColorModal open onClose={handleCloseModal} onAdded={handleSave} />
         )}
 
         {modalType === 'view' && selectedColor && (
@@ -120,7 +138,7 @@ const ColorManagement = () => {
             open
             onClose={handleCloseModal}
             color={selectedColor}
-            onSave={handleSaveColor}
+            onSave={handleSave}
           />
         )}
 
@@ -129,7 +147,7 @@ const ColorManagement = () => {
             open
             onClose={handleCloseModal}
             color={selectedColor}
-            onDelete={handleDeleteColor}
+            onDelete={handleSave}
           />
         )}
       </React.Suspense>

@@ -44,13 +44,28 @@ const useInventorys = () => {
     }
   }
   const updateInventoryById = async (id, data) => {
-    const result = await updateInventory(id, data)
-    return result
+    try {
+      const result = await updateInventory(id, data)
+      setInventories((prev) =>
+        prev.map((item) => (item._id === id ? { ...item, ...data } : item))
+      )
+      return result
+    } catch (error) {
+      console.error('Error updating inventory:', error)
+      return null
+    }
   }
 
   const deleteInventoryById = async (id) => {
-    const result = await deleteInventory(id)
-    return result
+    try {
+      const result = await deleteInventory(id)
+      setInventories((prev) => prev.filter((item) => item._id !== id))
+      setTotalPages((prev) => Math.max(1, prev - 1)) // Giảm tổng số trang nếu có
+      return result
+    } catch (error) {
+      console.error('Error deleting inventory:', error)
+      return null
+    }
   }
 
   const createNewInventory = async (data) => {

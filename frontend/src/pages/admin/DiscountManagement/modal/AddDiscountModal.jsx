@@ -18,7 +18,6 @@ import {
   Box
 } from '@mui/material'
 import { toast } from 'react-toastify'
-import { addDiscount } from '~/services/admin/discountService'
 import StyleAdmin from '~/assets/StyleAdmin.jsx'
 
 const AddDiscountModal = ({ open, onClose, onAdded }) => {
@@ -60,7 +59,7 @@ const AddDiscountModal = ({ open, onClose, onAdded }) => {
         validUntil: new Date(data.validUntil).toISOString()
       }
 
-      const result = await addDiscount(payload)
+      await onAdded(payload, 'add')
       if (!data.code) {
         toast.error('Vui lòng nhập mã giảm giá!')
         return
@@ -70,14 +69,9 @@ const AddDiscountModal = ({ open, onClose, onAdded }) => {
         toast.error('Vui lòng nhập giá trị giảm!')
         return
       }
-      if (result) {
-        toast.success('Thêm mã giảm giá thành công!')
-        onAdded()
-        reset()
-        onClose()
-      } else {
-        toast.error('Thêm mã giảm giá thất bại. Vui lòng thử lại!')
-      }
+      toast.success('Thêm mã giảm giá thành công!')
+      reset()
+      onClose()
     } catch (error) {
       toast.error('Đã có lỗi xảy ra. Vui lòng thử lại sau!')
       console.error(error)

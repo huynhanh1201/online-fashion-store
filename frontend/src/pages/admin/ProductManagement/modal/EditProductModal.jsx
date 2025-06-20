@@ -93,7 +93,7 @@ const EditProductModal = ({ open, onClose, onSave, product }) => {
   const [selectedImageUrl, setSelectedImageUrl] = useState(null)
 
   const replaceImageInputRef = useRef()
-  const { categories, fetchCategories, loading } = useCategories()
+  const { categories, fetchCategories, loading, update } = useCategories()
 
   // Hàm thay thế URL ảnh trong mô tả
   const replaceImageInDescription = (editorState, oldImageUrl, newImageUrl) => {
@@ -249,7 +249,20 @@ const EditProductModal = ({ open, onClose, onSave, product }) => {
       }
     }
   }, [open, reset, product])
+  const handEditCategory = async (category) => {
+    const newCategory = await update(category) // category trả về từ add()
 
+    // Gọi lại danh sách nếu cần thiết
+    fetchCategories()
+
+    // ✅ Đặt category mới làm giá trị cho select
+    setValue('categoryId', {
+      id: newCategory._id,
+      name: newCategory.name
+    })
+
+    setCategoryOpen(false) // Đóng modal
+  }
   const onSubmit = async (data) => {
     try {
       if (productImages.length === 0) {
@@ -276,17 +289,13 @@ const EditProductModal = ({ open, onClose, onSave, product }) => {
         }
       }
 
-      const result = await onSave(product._id, finalProduct)
+      await onSave(finalProduct, 'edit', product._id)
 
-      if (result) {
-        onClose()
-        reset()
-        setProductImages([])
-        setProductImagePreview([])
-        setEditorState(EditorState.createEmpty())
-      } else {
-        alert('Cập nhật sản phẩm không thành công')
-      }
+      onClose()
+      reset()
+      setProductImages([])
+      setProductImagePreview([])
+      setEditorState(EditorState.createEmpty())
     } catch (error) {
       console.error('Lỗi khi cập nhật sản phẩm:', error)
       alert('Có lỗi xảy ra, vui lòng thử lại')
@@ -460,7 +469,7 @@ const EditProductModal = ({ open, onClose, onSave, product }) => {
                   control={control}
                   render={({ field }) => (
                     <TextField
-                      label='Dài (cm)'
+                      label='Chiều dài gói hàng (cm)'
                       type='number'
                       fullWidth
                       inputProps={{ min: 0 }}
@@ -476,7 +485,7 @@ const EditProductModal = ({ open, onClose, onSave, product }) => {
                   control={control}
                   render={({ field }) => (
                     <TextField
-                      label='Rộng (cm)'
+                      label='Chiều rộng gói hàng (cm)'
                       type='number'
                       fullWidth
                       inputProps={{ min: 0 }}
@@ -492,7 +501,7 @@ const EditProductModal = ({ open, onClose, onSave, product }) => {
                   control={control}
                   render={({ field }) => (
                     <TextField
-                      label='Cao (cm)'
+                      label='Chiều cao gói hàng (cm)'
                       type='number'
                       fullWidth
                       inputProps={{ min: 0 }}
@@ -508,7 +517,7 @@ const EditProductModal = ({ open, onClose, onSave, product }) => {
                   control={control}
                   render={({ field }) => (
                     <TextField
-                      label='Khối lượng (kg)'
+                      label='Trọng lượng gói hàng (gram)'
                       type='number'
                       fullWidth
                       inputProps={{ min: 0, step: '0.01' }}
@@ -618,10 +627,7 @@ const EditProductModal = ({ open, onClose, onSave, product }) => {
       <AddCategoryModal
         open={categoryOpen}
         onClose={() => setCategoryOpen(false)}
-        onSave={() => {
-          setCategoryOpen(false)
-          fetchCategories()
-        }}
+        onSave={handEditCategory}
       />
     </Dialog>
   )
