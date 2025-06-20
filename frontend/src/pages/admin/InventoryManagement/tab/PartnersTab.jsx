@@ -27,7 +27,9 @@ import TablePaginationActions from '~/components/PaginationAdmin/TablePagination
 import TableNoneData from '~/components/TableAdmin/NoneData.jsx'
 import { Stack } from '@mui/system'
 import Tooltip from '@mui/material/Tooltip'
+import usePermissions from '~/hooks/usePermissions'
 const PartnersTab = () => {
+  const { hasPermission } = usePermissions()
   const {
     partners,
     fetchPartners,
@@ -228,22 +230,24 @@ const PartnersTab = () => {
                     <Typography variant='h6' sx={{ fontWeight: '800' }}>
                       Danh Sách Đối tác
                     </Typography>
-                    <Button
-                      variant='contained'
-                      color='primary'
-                      onClick={handleAddPartner}
-                      startIcon={<AddIcon />}
-                      sx={{
-                        textTransform: 'none',
-                        width: 100,
-                        display: 'flex',
-                        alignItems: 'center',
-                        backgroundColor: '#001f5d',
-                        color: '#fff'
-                      }}
-                    >
-                      Thêm
-                    </Button>
+                    {hasPermission('partner:create') && (
+                      <Button
+                        variant='contained'
+                        color='primary'
+                        onClick={handleAddPartner}
+                        startIcon={<AddIcon />}
+                        sx={{
+                          textTransform: 'none',
+                          width: 100,
+                          display: 'flex',
+                          alignItems: 'center',
+                          backgroundColor: '#001f5d',
+                          color: '#fff'
+                        }}
+                      >
+                        Thêm
+                      </Button>
+                    )}
                   </Box>
                   <FilterPartner
                     partners={partners}
@@ -345,30 +349,36 @@ const PartnersTab = () => {
                   if (col.id === 'action') {
                     content = (
                       <Stack direction='row' spacing={1} justifyContent='start'>
-                        <Tooltip title='Xem'>
-                          <IconButton
-                            onClick={() => handleViewPartner(row)}
-                            size='small'
-                          >
-                            <RemoveRedEyeIcon color='primary' />
-                          </IconButton>
-                        </Tooltip>
-                        <Tooltip title='Sửa'>
-                          <IconButton
-                            onClick={() => handleEditPartner(row)}
-                            size='small'
-                          >
-                            <BorderColorIcon color='warning' />
-                          </IconButton>
-                        </Tooltip>
-                        <Tooltip title='Xoá'>
-                          <IconButton
-                            onClick={() => handleDeletePartner(row)}
-                            size='small'
-                          >
-                            <DeleteForeverIcon color='error' />
-                          </IconButton>
-                        </Tooltip>
+                        {hasPermission('partner:read') && (
+                          <Tooltip title='Xem'>
+                            <IconButton
+                              onClick={() => handleViewPartner(row)}
+                              size='small'
+                            >
+                              <RemoveRedEyeIcon color='primary' />
+                            </IconButton>
+                          </Tooltip>
+                        )}
+                        {hasPermission('partner:update') && (
+                          <Tooltip title='Sửa'>
+                            <IconButton
+                              onClick={() => handleEditPartner(row)}
+                              size='small'
+                            >
+                              <BorderColorIcon color='warning' />
+                            </IconButton>
+                          </Tooltip>
+                        )}
+                        {hasPermission('partner:delete') && (
+                          <Tooltip title='Xoá'>
+                            <IconButton
+                              onClick={() => handleDeletePartner(row)}
+                              size='small'
+                            >
+                              <DeleteForeverIcon color='error' />
+                            </IconButton>
+                          </Tooltip>
+                        )}
                       </Stack>
                     )
                   }

@@ -1,5 +1,6 @@
 import React from 'react'
 import Typography from '@mui/material/Typography'
+import { Box } from '@mui/material'
 import OrderTable from './OrderTable'
 import OrderPagination from './OrderPagination'
 import ViewOrderModal from './modal/ViewOrderModal'
@@ -8,7 +9,9 @@ import DeleteOrderModal from './modal/DeleteOrderModal' // import modal xoá
 import useOrder from '~/hooks/admin/useOrder'
 import useDiscounts from '~/hooks/admin/useDiscount'
 import useUsers from '~/hooks/admin/useUsers.js'
+import usePermissions from '~/hooks/usePermissions'
 const OrderManagement = () => {
+  const { hasPermission } = usePermissions()
   const [page, setPage] = React.useState(1)
   const [limit, setLimit] = React.useState(10)
   const [filters, setFilters] = React.useState({}) // nếu cần lọc thì thêm filters
@@ -35,6 +38,18 @@ const OrderManagement = () => {
 
   const { discounts, fetchDiscounts } = useDiscounts() // lấy danh sách mã giảm giá nếu cần
   const { users, fetchUsers } = useUsers()
+
+  // Kiểm tra quyền truy cập order management
+  if (!hasPermission('order:read')) {
+    return (
+      <Box sx={{ p: 3, textAlign: 'center' }}>
+        <Typography variant='h6' color='error'>
+          Bạn không có quyền truy cập quản lý đơn hàng
+        </Typography>
+      </Box>
+    )
+  }
+
   React.useEffect(() => {
     fetchUsers()
     fetchDiscounts()
@@ -44,6 +59,7 @@ const OrderManagement = () => {
   }, [page, limit, filters])
   // Mở modal xem
   const handleOpenModalView = async (order) => {
+    if (!hasPermission('order:read')) return
     setSelectedOrder(order)
     const [historiesData, detailsData] = await Promise.all([
       getOrderHistoriesByOrderId(order._id),
@@ -63,6 +79,7 @@ const OrderManagement = () => {
 
   // Mở modal sửa
   const handleOpenModalEdit = async (order) => {
+    if (!hasPermission('order:update')) return
     setLoadingEdit(true)
     setSelectedOrder(order)
     // Nếu cần fetch thêm data thì await ở đây
@@ -78,6 +95,7 @@ const OrderManagement = () => {
 
   // Mở modal xoá
   const handleOpenModalDelete = (order) => {
+    if (!hasPermission('order:delete')) return
     setSelectedOrder(order)
     setOpenDeleteModal(true)
     setLoadingDelete(false) // chưa xoá

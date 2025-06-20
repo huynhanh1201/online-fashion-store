@@ -3,7 +3,7 @@ import { Navigate } from 'react-router-dom'
 import usePermissions from '~/hooks/usePermissions'
 
 // Component bảo vệ route - chuyển hướng nếu không có quyền
-const RouteGuard = ({ children, requiredPermissions = [], fallbackPath = '/' }) => {
+const RouteGuard = ({ children, requiredPermissions = [], fallbackPath = '/login' }) => {
   const { hasAllPermissions, canAccessAdmin } = usePermissions()
 
   // Nếu cần quyền admin access

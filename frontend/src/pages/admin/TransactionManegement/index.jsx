@@ -6,9 +6,12 @@ import ViewTransactionModal from './modal/ViewTransactionModal'
 import EditTransactionModal from './modal/EditTransactionModal'
 import DeleteTransactionModal from './modal/DeleteTransactionModal'
 import useTransactions from '~/hooks/admin/useTransactions'
+import usePermissions from '~/hooks/usePermissions'
+import { RouteGuard, PermissionWrapper } from '~/components/PermissionGuard'
 // import useOrder from '~/hook/useOrder.js'
 
 const TransactionManagement = () => {
+  const { hasPermission } = usePermissions()
   const [page, setPage] = useState(1)
   const [limit, setLimit] = useState(10)
   const [filters, setFilters] = useState({})
@@ -33,18 +36,24 @@ const TransactionManagement = () => {
   }, [page, limit, filters])
 
   const handleOpenView = async (transaction) => {
+    if (!hasPermission('payment:read')) return
+
     const detail = await getTransactionDetail(transaction._id)
     setSelectedTransaction(detail)
     setOpenView(true)
   }
 
   const handleOpenEdit = async (transaction) => {
+    if (!hasPermission('payment:update')) return
+
     const detail = await getTransactionDetail(transaction._id)
     setSelectedTransaction(detail)
     setOpenEdit(true)
   }
 
   const handleOpenDelete = async (transaction) => {
+    if (!hasPermission('payment:delete')) return
+
     const detail = await getTransactionDetail(transaction._id)
     setSelectedTransaction(detail)
     setOpenDelete(true)
@@ -79,7 +88,7 @@ const TransactionManagement = () => {
     }
   }
   return (
-    <>
+    <RouteGuard requiredPermissions={['admin:access', 'payment:read']}>
       <TransactionTable
         transactions={transactions}
         loading={loading}
@@ -96,6 +105,11 @@ const TransactionManagement = () => {
           setLimit(newLimit)
         }}
         fetchTransactions={fetchTransactions}
+        permissions={{
+          canView: hasPermission('payment:read'),
+          canEdit: hasPermission('payment:update'),
+          canDelete: hasPermission('payment:delete')
+        }}
       />
 
       {/*<TransactionPagination*/}
@@ -104,34 +118,40 @@ const TransactionManagement = () => {
       {/*  onPageChange={setPage}*/}
       {/*/>*/}
 
-      {selectedTransaction && (
-        <ViewTransactionModal
-          open={openView}
-          onClose={() => setOpenView(false)}
-          transaction={selectedTransaction}
-        />
-      )}
+      <PermissionWrapper requiredPermissions={['payment:read']}>
+        {selectedTransaction && (
+          <ViewTransactionModal
+            open={openView}
+            onClose={() => setOpenView(false)}
+            transaction={selectedTransaction}
+          />
+        )}
+      </PermissionWrapper>
 
-      {selectedTransaction && (
-        <EditTransactionModal
-          open={openEdit}
-          onClose={() => setOpenEdit(false)}
-          transaction={selectedTransaction}
-          onUpdate={handleUpdateTransaction}
-          loading={loading}
-        />
-      )}
+      <PermissionWrapper requiredPermissions={['payment:update']}>
+        {selectedTransaction && (
+          <EditTransactionModal
+            open={openEdit}
+            onClose={() => setOpenEdit(false)}
+            transaction={selectedTransaction}
+            onUpdate={handleUpdateTransaction}
+            loading={loading}
+          />
+        )}
+      </PermissionWrapper>
 
-      {selectedTransaction && (
-        <DeleteTransactionModal
-          open={openDelete}
-          onClose={() => setOpenDelete(false)}
-          transaction={selectedTransaction}
-          onDelete={handleDeleteTransaction}
-          loading={loading}
-        />
-      )}
-    </>
+      <PermissionWrapper requiredPermissions={['payment:delete']}>
+        {selectedTransaction && (
+          <DeleteTransactionModal
+            open={openDelete}
+            onClose={() => setOpenDelete(false)}
+            transaction={selectedTransaction}
+            onDelete={handleDeleteTransaction}
+            loading={loading}
+          />
+        )}
+      </PermissionWrapper>
+    </RouteGuard>
   )
 }
 

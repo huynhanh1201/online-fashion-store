@@ -187,7 +187,8 @@ const DiscountTable = ({
   onFilter,
   onPageChange,
   onChangeRowsPerPage,
-  addDiscount
+  addDiscount,
+  permissions = {}
 }) => {
   const columns = [
     { id: 'index', label: 'STT', align: 'center', width: 50 },
@@ -237,22 +238,24 @@ const DiscountTable = ({
                     <Typography variant='h6' sx={{ fontWeight: '800' }}>
                       Danh Sách Mã Giảm Giá
                     </Typography>
-                    <Button
-                      variant='contained'
-                      color='primary'
-                      onClick={addDiscount}
-                      startIcon={<AddIcon />}
-                      sx={{
-                        textTransform: 'none',
-                        width: 100,
-                        display: 'flex',
-                        alignItems: 'center',
-                        backgroundColor: '#001f5d',
-                        color: '#fff'
-                      }}
-                    >
-                      Thêm
-                    </Button>
+                    {permissions.canCreate && (
+                      <Button
+                        variant='contained'
+                        color='primary'
+                        onClick={addDiscount}
+                        startIcon={<AddIcon />}
+                        sx={{
+                          textTransform: 'none',
+                          width: 100,
+                          display: 'flex',
+                          alignItems: 'center',
+                          backgroundColor: '#001f5d',
+                          color: '#fff'
+                        }}
+                      >
+                        Thêm
+                      </Button>
+                    )}
                   </Box>
                   <FilterDiscount
                     fetchDiscounts={fetchDiscounts}
@@ -300,6 +303,7 @@ const DiscountTable = ({
                   index={page * rowsPerPage + idx + 1}
                   columns={columns}
                   onAction={onAction}
+                  permissions={permissions}
                 />
               ))
             ) : (

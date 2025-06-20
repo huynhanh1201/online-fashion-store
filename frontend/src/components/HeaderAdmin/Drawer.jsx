@@ -33,6 +33,7 @@ import { optimizeCloudinaryUrl } from '~/utils/cloudinary.js'
 
 import { useDispatch } from 'react-redux'
 import { logoutUserAPI } from '~/redux/user/userSlice'
+import usePermissions from '~/hooks/usePermissions'
 
 export default function AdminDrawer({
   open,
@@ -42,6 +43,7 @@ export default function AdminDrawer({
   onProfileOpen
 }) {
   const location = useLocation()
+  const { hasPermission, hasAnyPermission } = usePermissions()
   const [openProduct, setOpenProduct] = React.useState(false)
   const [openOrder, setOpenOrder] = React.useState(false)
   const [openInventory, setOpenInventory] = React.useState(false)
@@ -89,6 +91,147 @@ export default function AdminDrawer({
     staff: 'Nhân viên quản lý',
     customer: 'Khách hàng'
   }
+
+  // Cấu hình menu với quyền tương ứng
+  const menuConfig = {
+    statistics: {
+      permission: 'statistics:read',
+      label: 'Thống kê',
+      path: '/admin',
+      icon: <PollIcon />
+    },
+    userManagement: {
+      permission: 'user:read',
+      label: 'Quản lý người dùng',
+      path: '/admin/user-management',
+      icon: <PersonIcon />
+    },
+    productManagement: {
+      permissions: ['product:read', 'category:read', 'color:read', 'size:read', 'review:read'],
+      label: 'Quản lý sản phẩm',
+      icon: <InventoryIcon />,
+      children: [
+        {
+          permission: 'category:read',
+          label: 'Quản lý danh mục',
+          path: '/admin/categorie-management',
+          icon: <CategoryIcon />
+        },
+        {
+          permission: 'product:read',
+          label: 'Quản lý sản phẩm',
+          path: '/admin/product-management',
+          icon: <InventoryIcon />
+        },
+        {
+          permission: 'review:read',
+          label: 'Quản lý đánh giá',
+          path: '/admin/review-management'
+        },
+        {
+          permission: 'variant:read',
+          label: 'Quản lý biến thể',
+          path: '/admin/variant-management'
+        },
+        {
+          permission: 'color:read',
+          label: 'Quản lý màu sắc',
+          path: '/admin/color-management',
+          icon: <PaletteIcon />
+        },
+        {
+          permission: 'size:read',
+          label: 'Quản lý kích thước',
+          path: '/admin/size-management',
+          icon: <StraightenIcon />
+        }
+      ]
+    },
+    orderManagement: {
+      permissions: ['order:read', 'coupon:read', 'payment:read'],
+      label: 'Quản lý đơn hàng',
+      icon: <ReceiptLongIcon />,
+      children: [
+        {
+          permission: 'order:read',
+          label: 'Quản lý đơn hàng',
+          path: '/admin/order-management',
+          icon: <ReceiptLongIcon />
+        },
+        {
+          permission: 'coupon:read',
+          label: 'Quản lý mã giảm giá',
+          path: '/admin/discount-management',
+          icon: <LocalOfferIcon />
+        },
+        {
+          permission: 'payment:read',
+          label: 'Quản lý giao dịch',
+          path: '/admin/transaction-management',
+          icon: <PaymentIcon />
+        }
+      ]
+    },
+    inventoryManagement: {
+      permissions: ['inventory:read', 'warehouse:read', 'warehouseSlip:read', 'inventoryLog:read', 'batch:read', 'partner:read'],
+      label: 'Quản lý kho',
+      icon: <WarehouseIcon />,
+      children: [
+        {
+          permission: 'statistics:read',
+          label: 'Thống kê kho',
+          path: '/admin/warehouse-statistic-management',
+          icon: <ReceiptLongIcon />
+        },
+        {
+          permission: 'inventory:read',
+          label: 'Quản lý kho',
+          path: '/admin/inventory-management'
+        },
+        {
+          permission: 'warehouseSlip:read',
+          label: 'Quản lý xuất/nhập kho',
+          path: '/admin/warehouse-slips-management'
+        },
+        {
+          permission: 'inventoryLog:read',
+          label: 'Quản lý nhật ký kho',
+          path: '/admin/inventory-log-management'
+        },
+        {
+          permission: 'warehouse:read',
+          label: 'Quản lý kho hàng',
+          path: '/admin/warehouses-management'
+        },
+        {
+          permission: 'batch:read',
+          label: 'Quản lý lô hàng',
+          path: '/admin/batches-management'
+        },
+        {
+          permission: 'partner:read',
+          label: 'Quản lý đối tác',
+          path: '/admin/partner-management'
+        }
+      ]
+    }
+  }
+
+  // Kiểm tra xem user có quyền truy cập menu không
+  const canAccessMenu = (menuItem) => {
+    if (menuItem.permission) {
+      return hasPermission(menuItem.permission)
+    }
+    if (menuItem.permissions) {
+      return hasAnyPermission(menuItem.permissions)
+    }
+    return false
+  }
+
+  // Lọc children dựa trên quyền
+  const getVisibleChildren = (children) => {
+    return children.filter(child => canAccessMenu(child))
+  }
   if (!open) {
     return (
       <Box
@@ -117,55 +260,63 @@ export default function AdminDrawer({
 
         <Divider sx={{ my: 0 }} />
         <List sx={{ flexGrow: 1, pt: 0 }}>
-          <ListItem disablePadding sx={{ height: 48 }}>
-            <ListItemButton
-              selected={isActive('/admin')}
-              sx={{ padding: '12px 24px', ...activeButtonStyle }}
-            >
-              <ListItemIcon>
-                <PollIcon />
-              </ListItemIcon>
-            </ListItemButton>
-          </ListItem>
-          <ListItem disablePadding sx={{ height: 48 }}>
-            <ListItemButton
-              selected={isActive('/admin/user-management')}
-              sx={{ padding: '12px 24px', ...activeButtonStyle }}
-            >
-              <ListItemIcon>
-                <PersonIcon />
-              </ListItemIcon>
-            </ListItemButton>
-          </ListItem>
-          <ListItem disablePadding sx={{ height: 48 }}>
-            <ListItemButton
-              onClick={toggleProduct}
-              sx={{ padding: '12px 24px' }}
-            >
-              <ListItemIcon sx={{ minWidth: 45 }}>
-                <InventoryIcon />
-                {/*<ExpandLess sx={{ transform: 'rotate(90deg)' }} />*/}
-              </ListItemIcon>
-            </ListItemButton>
-          </ListItem>
-          <ListItem disablePadding sx={{ height: 48 }}>
-            <ListItemButton onClick={toggleOrder} sx={{ padding: '12px 24px' }}>
-              <ListItemIcon sx={{ minWidth: 35 }}>
-                <ReceiptLongIcon />
-                {/*<ExpandLess sx={{ transform: 'rotate(90deg)' }} />*/}
-              </ListItemIcon>
-            </ListItemButton>
-          </ListItem>
-          <ListItem disablePadding sx={{ height: 48 }}>
-            <ListItemButton
-              selected={isActive('/admin/inventory-management')}
-              sx={{ padding: '12px 24px', ...activeButtonStyle }}
-            >
-              <ListItemIcon>
-                <WarehouseIcon />
-              </ListItemIcon>
-            </ListItemButton>
-          </ListItem>
+          {canAccessMenu(menuConfig.statistics) && (
+            <ListItem disablePadding sx={{ height: 48 }}>
+              <ListItemButton
+                selected={isActive('/admin')}
+                sx={{ padding: '12px 24px', ...activeButtonStyle }}
+              >
+                <ListItemIcon>
+                  <PollIcon />
+                </ListItemIcon>
+              </ListItemButton>
+            </ListItem>
+          )}
+          {canAccessMenu(menuConfig.userManagement) && (
+            <ListItem disablePadding sx={{ height: 48 }}>
+              <ListItemButton
+                selected={isActive('/admin/user-management')}
+                sx={{ padding: '12px 24px', ...activeButtonStyle }}
+              >
+                <ListItemIcon>
+                  <PersonIcon />
+                </ListItemIcon>
+              </ListItemButton>
+            </ListItem>
+          )}
+          {canAccessMenu(menuConfig.productManagement) && (
+            <ListItem disablePadding sx={{ height: 48 }}>
+              <ListItemButton
+                onClick={toggleProduct}
+                sx={{ padding: '12px 24px' }}
+              >
+                <ListItemIcon sx={{ minWidth: 45 }}>
+                  <InventoryIcon />
+                </ListItemIcon>
+              </ListItemButton>
+            </ListItem>
+          )}
+          {canAccessMenu(menuConfig.orderManagement) && (
+            <ListItem disablePadding sx={{ height: 48 }}>
+              <ListItemButton onClick={toggleOrder} sx={{ padding: '12px 24px' }}>
+                <ListItemIcon sx={{ minWidth: 35 }}>
+                  <ReceiptLongIcon />
+                </ListItemIcon>
+              </ListItemButton>
+            </ListItem>
+          )}
+          {canAccessMenu(menuConfig.inventoryManagement) && (
+            <ListItem disablePadding sx={{ height: 48 }}>
+              <ListItemButton
+                selected={isActive('/admin/inventory-management')}
+                sx={{ padding: '12px 24px', ...activeButtonStyle }}
+              >
+                <ListItemIcon>
+                  <WarehouseIcon />
+                </ListItemIcon>
+              </ListItemButton>
+            </ListItem>
+          )}
         </List>
         <Divider sx={{ my: 0 }} />
         <Box sx={{ p: 0, textAlign: 'center' }}>
@@ -245,189 +396,139 @@ export default function AdminDrawer({
         }}
       >
         <List sx={{ flexGrow: 1, pt: 0 }}>
-          <Link
-            to='/admin'
-            style={{ textDecoration: 'none', color: 'inherit' }}
-          >
-            <ListItem disablePadding>
-              <ListItemButton
-                selected={isActive('/admin')}
-                sx={activeButtonStyle}
-              >
-                <ListItemIcon>
-                  <PollIcon />
-                </ListItemIcon>
-                <ListItemText primary='Thống kê' />
-              </ListItemButton>
-            </ListItem>
-          </Link>
-
-          <Link
-            to='/admin/user-management'
-            style={{ textDecoration: 'none', color: 'inherit' }}
-          >
-            <ListItem disablePadding>
-              <ListItemButton
-                selected={isActive('/admin/user-management')}
-                sx={activeButtonStyle}
-              >
-                <ListItemIcon>
-                  <PersonIcon />
-                </ListItemIcon>
-                <ListItemText primary='Quản lý người dùng' />
-              </ListItemButton>
-            </ListItem>
-          </Link>
-
-          <ListItem disablePadding>
-            <ListItemButton onClick={toggleProduct} sx={activeButtonStyle}>
-              <ListItemIcon>
-                <InventoryIcon />
-              </ListItemIcon>
-              <ListItemText primary='Quản lý sản phẩm' />
-              {openProduct ? <ExpandLess /> : <ExpandMore />}
-            </ListItemButton>
-          </ListItem>
-          <Collapse in={openProduct} timeout='auto' unmountOnExit>
-            <List component='div' disablePadding>
-              {[
-                {
-                  label: 'Quản lý danh mục',
-                  path: '/admin/categorie-management',
-                  icon: <CategoryIcon />
-                },
-                {
-                  label: 'Quản lý sản phẩm',
-                  path: '/admin/product-management',
-                  icon: <InventoryIcon />
-                },
-                { label: 'Quản lý đánh giá', path: '/admin/review-management' },
-                {
-                  label: 'Quản lý biến thể',
-                  path: '/admin/variant-management'
-                },
-                {
-                  label: 'Quản lý màu sắc',
-                  path: '/admin/color-management',
-                  icon: <PaletteIcon />
-                },
-                {
-                  label: 'Quản lý kích thước',
-                  path: '/admin/size-management',
-                  icon: <StraightenIcon />
-                }
-              ].map((item) => (
-                <Link
-                  key={item.path}
-                  to={item.path}
-                  style={{ textDecoration: 'none', color: 'inherit' }}
+          {canAccessMenu(menuConfig.statistics) && (
+            <Link
+              to='/admin'
+              style={{ textDecoration: 'none', color: 'inherit' }}
+            >
+              <ListItem disablePadding>
+                <ListItemButton
+                  selected={isActive('/admin')}
+                  sx={activeButtonStyle}
                 >
-                  <ListItemButton
-                    selected={isActive(item.path)}
-                    sx={{ pl: 2, ...activeButtonStyle }}
-                  >
-                    <ListItemText primary={item.label} sx={{ ml: 7 }} />
-                  </ListItemButton>
-                </Link>
-              ))}
-            </List>
-          </Collapse>
+                  <ListItemIcon>
+                    <PollIcon />
+                  </ListItemIcon>
+                  <ListItemText primary='Thống kê' />
+                </ListItemButton>
+              </ListItem>
+            </Link>
+          )}
 
-          <ListItem disablePadding>
-            <ListItemButton onClick={toggleOrder} sx={activeButtonStyle}>
-              <ListItemIcon>
-                <ReceiptLongIcon />
-              </ListItemIcon>
-              <ListItemText primary='Quản lý đơn hàng' />
-              {openOrder ? <ExpandLess /> : <ExpandMore />}
-            </ListItemButton>
-          </ListItem>
-          <Collapse in={openOrder} timeout='auto' unmountOnExit>
-            <List component='div' disablePadding>
-              {[
-                {
-                  label: 'Quản lý đơn hàng',
-                  path: '/admin/order-management',
-                  icon: <ReceiptLongIcon />
-                },
-                {
-                  label: 'Quản lý mã giảm giá',
-                  path: '/admin/discount-management',
-                  icon: <LocalOfferIcon />
-                },
-                {
-                  label: 'Quản lý giao dịch',
-                  path: '/admin/transaction-management',
-                  icon: <PaymentIcon />
-                }
-              ].map((item) => (
-                <Link
-                  key={item.path}
-                  to={item.path}
-                  style={{ textDecoration: 'none', color: 'inherit' }}
+          {canAccessMenu(menuConfig.userManagement) && (
+            <Link
+              to='/admin/user-management'
+              style={{ textDecoration: 'none', color: 'inherit' }}
+            >
+              <ListItem disablePadding>
+                <ListItemButton
+                  selected={isActive('/admin/user-management')}
+                  sx={activeButtonStyle}
                 >
-                  <ListItemButton
-                    selected={isActive(item.path)}
-                    sx={{ pl: 2, ...activeButtonStyle }}
-                  >
-                    <ListItemText primary={item.label} sx={{ ml: 7 }} />
-                  </ListItemButton>
-                </Link>
-              ))}
-            </List>
-          </Collapse>
+                  <ListItemIcon>
+                    <PersonIcon />
+                  </ListItemIcon>
+                  <ListItemText primary='Quản lý người dùng' />
+                </ListItemButton>
+              </ListItem>
+            </Link>
+          )}
 
-          <ListItem disablePadding>
-            <ListItemButton onClick={toggleInventory} sx={activeButtonStyle}>
-              <ListItemIcon>
-                <WarehouseIcon />
-              </ListItemIcon>
-              <ListItemText primary='Quản lý kho' />
-              {openInventory ? <ExpandLess /> : <ExpandMore />}
-            </ListItemButton>
-          </ListItem>
-          <Collapse in={openInventory} timeout='auto' unmountOnExit>
-            <List component='div' disablePadding>
-              {[
-                {
-                  label: 'Thống kê kho',
-                  path: '/admin/warehouse-statistic-management',
-                  icon: <ReceiptLongIcon />
-                },
-                { label: 'Quản lý kho', path: '/admin/inventory-management' },
-                {
-                  label: 'Quản lý xuất/nhập kho',
-                  path: '/admin/warehouse-slips-management'
-                },
-                {
-                  label: 'Quản lý nhật ký kho',
-                  path: '/admin/inventory-log-management'
-                },
-                {
-                  label: 'Quản lý kho hàng',
-                  path: '/admin/warehouses-management'
-                },
-                { label: 'Quản lý lô hàng', path: '/admin/batches-management' },
-                {
-                  label: 'Quản lý đối tác',
-                  path: '/admin/partner-management'
-                }
-              ].map((item) => (
-                <Link
-                  key={item.path}
-                  to={item.path}
-                  style={{ textDecoration: 'none', color: 'inherit' }}
-                >
-                  <ListItemButton
-                    selected={isActive(item.path)}
-                    sx={{ pl: 2, ...activeButtonStyle }}
-                  >
-                    <ListItemText primary={item.label} sx={{ ml: 7 }} />
-                  </ListItemButton>
-                </Link>
-              ))}
-            </List>
-          </Collapse>
+          {canAccessMenu(menuConfig.productManagement) && (
+            <>
+              <ListItem disablePadding>
+                <ListItemButton onClick={toggleProduct} sx={activeButtonStyle}>
+                  <ListItemIcon>
+                    <InventoryIcon />
+                  </ListItemIcon>
+                  <ListItemText primary='Quản lý sản phẩm' />
+                  {openProduct ? <ExpandLess /> : <ExpandMore />}
+                </ListItemButton>
+              </ListItem>
+              <Collapse in={openProduct} timeout='auto' unmountOnExit>
+                <List component='div' disablePadding>
+                  {getVisibleChildren(menuConfig.productManagement.children).map((item) => (
+                    <Link
+                      key={item.path}
+                      to={item.path}
+                      style={{ textDecoration: 'none', color: 'inherit' }}
+                    >
+                      <ListItemButton
+                        selected={isActive(item.path)}
+                        sx={{ pl: 2, ...activeButtonStyle }}
+                      >
+                        <ListItemText primary={item.label} sx={{ ml: 7 }} />
+                      </ListItemButton>
+                    </Link>
+                  ))}
+                </List>
+              </Collapse>
+            </>
+          )}
+
+          {canAccessMenu(menuConfig.orderManagement) && (
+            <>
+              <ListItem disablePadding>
+                <ListItemButton onClick={toggleOrder} sx={activeButtonStyle}>
+                  <ListItemIcon>
+                    <ReceiptLongIcon />
+                  </ListItemIcon>
+                  <ListItemText primary='Quản lý đơn hàng' />
+                  {openOrder ? <ExpandLess /> : <ExpandMore />}
+                </ListItemButton>
+              </ListItem>
+              <Collapse in={openOrder} timeout='auto' unmountOnExit>
+                <List component='div' disablePadding>
+                  {getVisibleChildren(menuConfig.orderManagement.children).map((item) => (
+                    <Link
+                      key={item.path}
+                      to={item.path}
+                      style={{ textDecoration: 'none', color: 'inherit' }}
+                    >
+                      <ListItemButton
+                        selected={isActive(item.path)}
+                        sx={{ pl: 2, ...activeButtonStyle }}
+                      >
+                        <ListItemText primary={item.label} sx={{ ml: 7 }} />
+                      </ListItemButton>
+                    </Link>
+                  ))}
+                </List>
+              </Collapse>
+            </>
+          )}
+
+          {canAccessMenu(menuConfig.inventoryManagement) && (
+            <>
+              <ListItem disablePadding>
+                <ListItemButton onClick={toggleInventory} sx={activeButtonStyle}>
+                  <ListItemIcon>
+                    <WarehouseIcon />
+                  </ListItemIcon>
+                  <ListItemText primary='Quản lý kho' />
+                  {openInventory ? <ExpandLess /> : <ExpandMore />}
+                </ListItemButton>
+              </ListItem>
+              <Collapse in={openInventory} timeout='auto' unmountOnExit>
+                <List component='div' disablePadding>
+                  {getVisibleChildren(menuConfig.inventoryManagement.children).map((item) => (
+                    <Link
+                      key={item.path}
+                      to={item.path}
+                      style={{ textDecoration: 'none', color: 'inherit' }}
+                    >
+                      <ListItemButton
+                        selected={isActive(item.path)}
+                        sx={{ pl: 2, ...activeButtonStyle }}
+                      >
+                        <ListItemText primary={item.label} sx={{ ml: 7 }} />
+                      </ListItemButton>
+                    </Link>
+                  ))}
+                </List>
+              </Collapse>
+            </>
+          )}
         </List>
       </Box>
       <Divider sx={{ my: 0 }} />

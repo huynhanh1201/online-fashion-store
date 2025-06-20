@@ -143,6 +143,7 @@ import BorderColorIcon from '@mui/icons-material/BorderColor'
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff'
 import dayjs from 'dayjs'
 import { Tooltip } from '@mui/material'
+import usePermissions from '~/hooks/usePermissions'
 const styles = {
   groupIcon: {
     display: 'flex',
@@ -166,6 +167,7 @@ const styles = {
 }
 
 const OrderRow = ({ order, index, columns, onView, onEdit, onDelete }) => {
+  const { hasPermission } = usePermissions()
   const formatDate = (date) =>
     date ? dayjs(date).format('DD/MM/YYYY') : 'Không có dữ liệu'
 
@@ -253,21 +255,27 @@ const OrderRow = ({ order, index, columns, onView, onEdit, onDelete }) => {
           case 'action':
             value = (
               <Stack direction='row' sx={styles.groupIcon}>
-                <Tooltip title='Xem'>
-                  <IconButton onClick={() => onView(order)} size='small'>
-                    <RemoveRedEyeIcon color='primary' />
-                  </IconButton>
-                </Tooltip>
-                <Tooltip title='Sửa'>
-                  <IconButton onClick={() => onEdit(order)} size='small'>
-                    <BorderColorIcon color='warning' />
-                  </IconButton>
-                </Tooltip>
-                {/*<Tooltip title='Ẩn'>*/}
-                {/*  <IconButton onClick={() => onDelete(order)} size='small'>*/}
-                {/*    <VisibilityOffIcon color='error' />*/}
-                {/*  </IconButton>*/}
-                {/*</Tooltip>*/}
+                {hasPermission('order:read') && (
+                  <Tooltip title='Xem'>
+                    <IconButton onClick={() => onView(order)} size='small'>
+                      <RemoveRedEyeIcon color='primary' />
+                    </IconButton>
+                  </Tooltip>
+                )}
+                {hasPermission('order:update') && (
+                  <Tooltip title='Sửa'>
+                    <IconButton onClick={() => onEdit(order)} size='small'>
+                      <BorderColorIcon color='warning' />
+                    </IconButton>
+                  </Tooltip>
+                )}
+                {hasPermission('order:delete') && (
+                  <Tooltip title='Xóa'>
+                    <IconButton onClick={() => onDelete(order)} size='small'>
+                      <VisibilityOffIcon color='error' />
+                    </IconButton>
+                  </Tooltip>
+                )}
               </Stack>
             )
             break

@@ -58,12 +58,15 @@ export const ROLE_PERMISSIONS = {
     'sizePalette:delete',
 
     // Order
+    'order:create',
     'order:read',
     'order:update',
+    'order:delete',
 
     // Payment Transaction
-    'paymentTransaction:read',
-    'paymentTransaction:update',
+    'payment:read',
+    'payment:update',
+    'payment:delete',
 
     // Coupon
     'coupon:create',
@@ -100,6 +103,11 @@ export const ROLE_PERMISSIONS = {
     'partner:read',
     'partner:update',
     'partner:delete',
+
+    // Review
+    'review:read',
+    'review:update',
+    'review:delete',
 
     // Admin access
     'admin:access'
@@ -160,15 +168,24 @@ export const ROLE_PERMISSIONS = {
     // Partner
     'partner:read',
 
+    // Review
+    'review:read',
+
     // Admin access
     'admin:access'
   ],
   [roles.STAFF]: [
-    // Order
+    // Order Management
     'order:read',
     'order:update',
 
-    // Inventory
+    // Coupon (để có thể xem và áp dụng mã giảm giá khi xử lý đơn hàng)
+    'coupon:read',
+
+    // Payment (để có thể xem thông tin giao dịch khi xử lý đơn hàng)
+    'payment:read',
+
+    // Inventory Management
     'inventory:read',
     'inventory:update',
 
@@ -178,6 +195,15 @@ export const ROLE_PERMISSIONS = {
 
     // Inventory Log
     'inventoryLog:read',
+
+    // Warehouse (để có thể xem thông tin kho khi quản lý inventory)
+    'warehouse:read',
+
+    // Batch (để có thể xem thông tin lô hàng khi quản lý inventory)
+    'batch:read',
+
+    // Partner (để có thể xem thông tin đối tác khi tạo phiếu kho)
+    'partner:read',
 
     // Statistics
     'statistics:read',

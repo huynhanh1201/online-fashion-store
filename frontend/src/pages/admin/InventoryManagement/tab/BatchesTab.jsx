@@ -28,8 +28,10 @@ import Chip from '@mui/material/Chip'
 import TableNoneData from '~/components/TableAdmin/NoneData.jsx'
 import Stack from '@mui/material/Stack'
 import Tooltip from '@mui/material/Tooltip'
+import usePermissions from '~/hooks/usePermissions'
 
 const BatchesTab = () => {
+  const { hasPermission } = usePermissions()
   const {
     batches,
     fetchBatches,
@@ -302,30 +304,36 @@ const BatchesTab = () => {
                           justifyContent='start'
                           alignItems='start'
                         >
-                          <Tooltip title='Xem'>
-                            <IconButton
-                              onClick={() => handleViewBatch(row)}
-                              size='small'
-                            >
-                              <RemoveRedEyeIcon color='primary' />
-                            </IconButton>
-                          </Tooltip>
-                          <Tooltip title='Sửa'>
-                            <IconButton
-                              onClick={() => handleEditBatch(row)}
-                              size='small'
-                            >
-                              <BorderColorIcon color='warning' />
-                            </IconButton>
-                          </Tooltip>
-                          <Tooltip title='Xoá'>
-                            <IconButton
-                              onClick={() => handleDeleteBatch(row)}
-                              size='small'
-                            >
-                              <VisibilityOffIcon color='error' />
-                            </IconButton>
-                          </Tooltip>
+                          {hasPermission('batch:read') && (
+                            <Tooltip title='Xem'>
+                              <IconButton
+                                onClick={() => handleViewBatch(row)}
+                                size='small'
+                              >
+                                <RemoveRedEyeIcon color='primary' />
+                              </IconButton>
+                            </Tooltip>
+                          )}
+                          {hasPermission('batch:update') && (
+                            <Tooltip title='Sửa'>
+                              <IconButton
+                                onClick={() => handleEditBatch(row)}
+                                size='small'
+                              >
+                                <BorderColorIcon color='warning' />
+                              </IconButton>
+                            </Tooltip>
+                          )}
+                          {hasPermission('batch:update') && (
+                            <Tooltip title='Xoá'>
+                              <IconButton
+                                onClick={() => handleDeleteBatch(row)}
+                                size='small'
+                              >
+                                <VisibilityOffIcon color='error' />
+                              </IconButton>
+                            </Tooltip>
+                          )}
                         </Stack>
                       )
                     }

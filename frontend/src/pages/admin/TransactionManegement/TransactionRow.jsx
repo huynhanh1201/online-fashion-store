@@ -169,6 +169,7 @@ import BorderColorIcon from '@mui/icons-material/BorderColor'
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff'
 import StyleAdmin from '~/assets/StyleAdmin.jsx'
 import Tooltip from '@mui/material/Tooltip'
+import usePermissions from '~/hooks/usePermissions'
 const styles = {
   cell: {
     height: 55,
@@ -192,6 +193,7 @@ const styles = {
 }
 
 const TransactionRow = ({ transaction, index, onView, onEdit, onDelete }) => {
+  const { hasPermission } = usePermissions()
   const statusLabel = {
     Pending: 'Đang xử lý',
     Completed: 'Thành công',
@@ -207,10 +209,10 @@ const TransactionRow = ({ transaction, index, onView, onEdit, onDelete }) => {
   const formatDate = (date) =>
     date
       ? new Date(date).toLocaleDateString('vi-VN', {
-          day: '2-digit',
-          month: '2-digit',
-          year: 'numeric'
-        })
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric'
+      })
       : '—'
 
   return (
@@ -244,21 +246,27 @@ const TransactionRow = ({ transaction, index, onView, onEdit, onDelete }) => {
       </TableCell>
       <TableCell align='center' sx={{ ...styles.cell, width: '130px' }}>
         <Stack direction='row' sx={styles.groupIcon}>
-          <Tooltip title='Xem'>
-            <IconButton onClick={() => onView(transaction)} size='small'>
-              <RemoveRedEyeIcon color='primary' />
-            </IconButton>
-          </Tooltip>
-          <Tooltip title='Sửa'>
-            <IconButton onClick={() => onEdit(transaction)} size='small'>
-              <BorderColorIcon color='warning' />
-            </IconButton>
-          </Tooltip>
-          <Tooltip title='Ẩn'>
-            <IconButton onClick={() => onDelete(transaction)} size='small'>
-              <VisibilityOffIcon color='error' />
-            </IconButton>
-          </Tooltip>
+          {hasPermission('payment:read') && (
+            <Tooltip title='Xem'>
+              <IconButton onClick={() => onView(transaction)} size='small'>
+                <RemoveRedEyeIcon color='primary' />
+              </IconButton>
+            </Tooltip>
+          )}
+          {hasPermission('payment:update') && (
+            <Tooltip title='Sửa'>
+              <IconButton onClick={() => onEdit(transaction)} size='small'>
+                <BorderColorIcon color='warning' />
+              </IconButton>
+            </Tooltip>
+          )}
+          {hasPermission('payment:delete') && (
+            <Tooltip title='Ẩn'>
+              <IconButton onClick={() => onDelete(transaction)} size='small'>
+                <VisibilityOffIcon color='error' />
+              </IconButton>
+            </Tooltip>
+          )}
         </Stack>
       </TableCell>
     </TableRow>
