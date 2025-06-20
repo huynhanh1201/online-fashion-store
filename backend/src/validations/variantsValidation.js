@@ -43,7 +43,9 @@ const variant = async (req, res, next) => {
       height: Joi.number().positive(),
 
       weight: Joi.number().positive()
-    })
+    }),
+
+    status: Joi.string().valid('draft', 'active', 'inactive').default('draft')
   })
 
   try {

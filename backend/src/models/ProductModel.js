@@ -84,6 +84,12 @@ const productSchema = new Schema(
         required: true,
         min: 0
       }
+    },
+
+    status: {
+      type: String,
+      enum: ['draft', 'active', 'inactive'], // Trạng thái sản phẩm
+      default: 'draft' // Mặc định là 'draft'
     }
   },
   {
