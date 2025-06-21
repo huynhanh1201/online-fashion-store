@@ -39,6 +39,11 @@ const OrderItemSchema = new Schema(
       type: Number,
       required: true, // subtotal = price * quantity
       min: 0 // tối thiểu 0
+    },
+    variantId: {
+      type: Schema.Types.ObjectId,
+      ref: 'Variant', // Tham chiếu đến sản phẩm
+      required: true
     }
   },
   {
