@@ -29,6 +29,7 @@ import {
 import { Link, useLocation } from 'react-router-dom'
 import ExitToAppIcon from '@mui/icons-material/ExitToApp'
 import AccountCircleIcon from '@mui/icons-material/AccountCircle'
+import SourceIcon from '@mui/icons-material/Source'
 import { optimizeCloudinaryUrl } from '~/utils/cloudinary.js'
 
 import { useDispatch } from 'react-redux'
@@ -278,7 +279,22 @@ export default function AdminDrawer({
               </ListItemButton>
             </ListItem>
           </Link>
-
+          <Link
+            to='/admin/content-management'
+            style={{ textDecoration: 'none', color: 'inherit' }}
+          >
+            <ListItem disablePadding>
+              <ListItemButton
+                selected={isActive('/admin/content-management')}
+                sx={activeButtonStyle}
+              >
+                <ListItemIcon>
+                  <SourceIcon />
+                </ListItemIcon>
+                <ListItemText primary='Quản lý nội dung' />
+              </ListItemButton>
+            </ListItem>
+          </Link>
           <ListItem disablePadding>
             <ListItemButton onClick={toggleProduct} sx={activeButtonStyle}>
               <ListItemIcon>

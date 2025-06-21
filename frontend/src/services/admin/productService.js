@@ -180,6 +180,7 @@ export const addProduct = async (data) => {
     )
     return response.data
   } catch (error) {
-    return error
+    console.error('Lỗi khi tạo sản phẩm mới:', error)
+    return null
   }
 }
