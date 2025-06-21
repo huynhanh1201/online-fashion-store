@@ -32,7 +32,7 @@ const orderService = {
 
 // ... phần còn lại giữ nguyên như bạn đã viết
 export const getOrders = async (userId, page = 1, limit = 10, status = '') => {
-  let url = `${API_ROOT}/v1/orders?userId=${userId}&page=${page}&limit=${limit}`
+  let url = `${API_ROOT}/v1/orders?sort=newest&userId=${userId}&page=${page}&limit=${limit}`
   if (status && status !== 'All') {
     url += `&status=${status}`
   }

@@ -178,7 +178,7 @@ export const ROLE_PERMISSIONS = {
     'order:update',
 
     // Coupon (để có thể xem và áp dụng mã giảm giá khi xử lý đơn hàng)
-    'coupon:read',
+    // 'coupon:read',
 
     // Payment (để có thể xem thông tin giao dịch khi xử lý đơn hàng)
     'payment:read',
@@ -192,18 +192,18 @@ export const ROLE_PERMISSIONS = {
     'warehouseSlip:read',
 
     // Inventory Log
-    'inventoryLog:read',
+    // 'inventoryLog:read',
 
-    // Warehouse (để có thể xem thông tin kho khi quản lý inventory)
-    'warehouse:read',
+    // // Warehouse (để có thể xem thông tin kho khi quản lý inventory)
+    // 'warehouse:read',
 
-    // Batch (để có thể xem thông tin lô hàng khi quản lý inventory)
-    'batch:read',
+    // // Batch (để có thể xem thông tin lô hàng khi quản lý inventory)
+    // 'batch:read',
 
-    // Partner (để có thể xem thông tin đối tác khi tạo phiếu kho)
-    'partner:read',
+    // // Partner (để có thể xem thông tin đối tác khi tạo phiếu kho)
+    // 'partner:read',
 
-    // Statistics
+    // // Statistics
     'statistics:read',
 
     // Admin access
