@@ -30,6 +30,7 @@ import { statisticsRoute } from '~/routes/v1/statisticsRoute'
 import { deliveriesRoute } from '~/routes/v1/deliveriesRoute'
 import { reviewsRoute } from '~/routes/v1/reviewsRoute'
 import { transactionsRoute } from '~/routes/v1/transactionsRoute'
+import { websiteConfigsRoute } from '~/routes/v1/websiteConfigsRoute'
 
 const Router = express.Router()
 
@@ -90,5 +91,7 @@ Router.use('/statistics', statisticsRoute)
 Router.use('/deliveries', deliveriesRoute)
 
 Router.use('/reviews', reviewsRoute)
+
+Router.use('/website-configs', websiteConfigsRoute)
 
 export const APIs_V1 = Router

@@ -1,7 +1,7 @@
 import mongoose from 'mongoose'
 
 import { CONNECT_DB } from '../../config/mongodb.js'
-import { permissions } from '../data/permissionsRegistry.js'
+import { permissions } from '../data/permissionsData.js'
 import { PermissionModel } from '../../models/PermissionModel.js'
 
 export async function seedPermissions() {
