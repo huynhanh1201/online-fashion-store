@@ -120,7 +120,8 @@ const HeaderManagement = () => {
     },
     {
       title: 'Banner hiển thị',
-      value: headerData?.content?.topBanner?.filter(b => b.visible)?.length || 0,
+      value:
+        headerData?.content?.topBanner?.filter((b) => b.visible)?.length || 0,
       icon: <BannerIcon />,
       color: '#ed6c02'
     }
@@ -130,23 +131,30 @@ const HeaderManagement = () => {
   const LoadingSkeleton = () => (
     <TableRow>
       <TableCell>
-        <Skeleton variant="rectangular" width={80} height={60} />
+        <Skeleton variant='rectangular' width={80} height={60} />
       </TableCell>
       <TableCell>
-        <Skeleton variant="text" width="60%" />
-        <Skeleton variant="text" width="40%" />
+        <Skeleton variant='text' width='60%' />
+        <Skeleton variant='text' width='40%' />
       </TableCell>
       <TableCell>
-        <Skeleton variant="rectangular" width={80} height={24} />
+        <Skeleton variant='rectangular' width={80} height={24} />
       </TableCell>
       <TableCell>
-        <Skeleton variant="circular" width={32} height={32} />
+        <Skeleton variant='circular' width={32} height={32} />
       </TableCell>
     </TableRow>
   )
 
   return (
-    <Box sx={{ p: 3, backgroundColor: '#f8fafc',borderRadius: 3, minHeight: '100vh' }}>
+    <Box
+      sx={{
+        p: 3,
+        backgroundColor: '#f8fafc',
+        borderRadius: 3,
+        minHeight: '100vh'
+      }}
+    >
       {/* Header */}
       <Box sx={{ mb: 4 }}>
         <Typography
@@ -170,11 +178,11 @@ const HeaderManagement = () => {
 
       {/* Error Alert */}
       {error && (
-        <Alert 
-          severity="error" 
+        <Alert
+          severity='error'
           sx={{ mb: 3 }}
           action={
-            <Button color="inherit" size="small" onClick={handleRefresh}>
+            <Button color='inherit' size='small' onClick={handleRefresh}>
               Thử lại
             </Button>
           }
@@ -238,7 +246,14 @@ const HeaderManagement = () => {
       </Grid>
 
       {/* Action Buttons */}
-      <Box sx={{ mb: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+      <Box
+        sx={{
+          mb: 3,
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center'
+        }}
+      >
         <Button
           variant='contained'
           startIcon={<AddIcon />}
@@ -250,7 +265,8 @@ const HeaderManagement = () => {
             textTransform: 'none',
             fontSize: '1rem',
             fontWeight: 600,
-            background: 'linear-gradient(135deg,rgb(17, 58, 122) 0%,rgb(11, 49, 156) 100%)',
+            background:
+              'linear-gradient(135deg,rgb(17, 58, 122) 0%,rgb(11, 49, 156) 100%)',
             boxShadow: '0 4px 16px rgba(59, 130, 246, 0.3)',
             '&:hover': {
               background: 'linear-gradient(135deg, #2563eb 0%, #1e40af 100%)',
@@ -259,11 +275,11 @@ const HeaderManagement = () => {
             }
           }}
         >
-          {headerData ? 'Chỉnh sửa Header' : 'Tạo Header mới'}
+          {headerData ? 'Chỉnh sửa nội dung' : 'Tạo nội dung mới'}
         </Button>
-        
+
         <Button
-          variant="outlined"
+          variant='outlined'
           startIcon={<RefreshIcon />}
           onClick={handleRefresh}
           disabled={refreshing}
@@ -329,10 +345,13 @@ const HeaderManagement = () => {
                     >
                       {headerData.content?.logo?.imageUrl ? (
                         <img
-                          src={optimizeCloudinaryUrl(headerData.content.logo.imageUrl, { 
-                            width: 80, 
-                            height: 60 
-                          })}
+                          src={optimizeCloudinaryUrl(
+                            headerData.content.logo.imageUrl,
+                            {
+                              width: 80,
+                              height: 60
+                            }
+                          )}
                           alt={headerData.content.logo.alt || 'Logo'}
                           style={{
                             width: 80,
@@ -371,7 +390,7 @@ const HeaderManagement = () => {
                     {headerData.content?.topBanner?.length > 0 ? (
                       <List dense>
                         {headerData.content.topBanner
-                          .filter(banner => banner.visible)
+                          .filter((banner) => banner.visible)
                           .map((banner, idx) => (
                             <ListItem key={idx} sx={{ py: 0.5 }}>
                               <ListItemText
@@ -388,7 +407,7 @@ const HeaderManagement = () => {
                           ))}
                       </List>
                     ) : (
-                      <Typography variant="body2" color="text.secondary">
+                      <Typography variant='body2' color='text.secondary'>
                         Không có banner nào
                       </Typography>
                     )}
@@ -425,11 +444,11 @@ const HeaderManagement = () => {
                 // No data
                 <TableRow>
                   <TableCell colSpan={4} sx={{ textAlign: 'center', py: 4 }}>
-                    <Typography variant="body1" color="text.secondary">
+                    <Typography variant='body1' color='text.secondary'>
                       Chưa có cấu hình header nào
                     </Typography>
                     <Button
-                      variant="outlined"
+                      variant='outlined'
                       startIcon={<AddIcon />}
                       onClick={() => setOpenModal(true)}
                       sx={{ mt: 2 }}

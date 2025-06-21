@@ -41,7 +41,11 @@ import {
   Schedule as ScheduleIcon
 } from '@mui/icons-material'
 import AddBanner from './Modal/AddBanner.jsx'
-import { getBanners, deleteBanner, updateBanner } from '~/services/admin/webConfig/bannerService.js'
+import {
+  getBanners,
+  deleteBanner,
+  updateBanner
+} from '~/services/admin/webConfig/bannerService.js'
 import { optimizeCloudinaryUrl } from '~/utils/cloudinary.js'
 
 const DisplayManagement = () => {
@@ -156,14 +160,14 @@ const DisplayManagement = () => {
 
   const isBannerActive = (banner) => {
     if (!banner.visible) return false
-    
+
     const now = new Date()
     const startDate = banner.startDate ? new Date(banner.startDate) : null
     const endDate = banner.endDate ? new Date(banner.endDate) : null
-    
+
     if (startDate && now < startDate) return false
     if (endDate && now > endDate) return false
-    
+
     return true
   }
 
@@ -183,7 +187,7 @@ const DisplayManagement = () => {
     },
     {
       title: 'Đang hoạt động',
-      value: banners.filter(b => isBannerActive(b)).length,
+      value: banners.filter((b) => isBannerActive(b)).length,
       icon: <CalendarIcon />,
       color: '#ed6c02'
     },
@@ -199,30 +203,37 @@ const DisplayManagement = () => {
   const LoadingSkeleton = () => (
     <TableRow>
       <TableCell>
-        <Skeleton variant="rectangular" width={60} height={40} />
+        <Skeleton variant='rectangular' width={60} height={40} />
       </TableCell>
       <TableCell>
-        <Skeleton variant="text" width="60%" />
-        <Skeleton variant="text" width="40%" />
+        <Skeleton variant='text' width='60%' />
+        <Skeleton variant='text' width='40%' />
       </TableCell>
       <TableCell>
-        <Skeleton variant="rectangular" width={80} height={24} />
+        <Skeleton variant='rectangular' width={80} height={24} />
       </TableCell>
       <TableCell>
-        <Skeleton variant="text" width="60%" />
-        <Skeleton variant="text" width="40%" />
+        <Skeleton variant='text' width='60%' />
+        <Skeleton variant='text' width='40%' />
       </TableCell>
       <TableCell>
-        <Skeleton variant="rectangular" width={60} height={24} />
+        <Skeleton variant='rectangular' width={60} height={24} />
       </TableCell>
       <TableCell>
-        <Skeleton variant="circular" width={32} height={32} />
+        <Skeleton variant='circular' width={32} height={32} />
       </TableCell>
     </TableRow>
   )
 
   return (
-    <Box sx={{ p: 3, backgroundColor: '#f8fafc',borderRadius: 3, minHeight: '100vh' }}>
+    <Box
+      sx={{
+        p: 3,
+        backgroundColor: '#f8fafc',
+        borderRadius: 3,
+        minHeight: '100vh'
+      }}
+    >
       <Box sx={{ mb: 4 }}>
         <Typography
           variant='h4'
@@ -245,11 +256,11 @@ const DisplayManagement = () => {
 
       {/* Error Alert */}
       {error && (
-        <Alert 
-          severity="error" 
+        <Alert
+          severity='error'
           sx={{ mb: 3 }}
           action={
-            <Button color="inherit" size="small" onClick={handleRefresh}>
+            <Button color='inherit' size='small' onClick={handleRefresh}>
               Thử lại
             </Button>
           }
@@ -311,7 +322,14 @@ const DisplayManagement = () => {
         ))}
       </Grid>
 
-      <Box sx={{ mb: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+      <Box
+        sx={{
+          mb: 3,
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center'
+        }}
+      >
         <Button
           variant='contained'
           startIcon={<AddIcon />}
@@ -327,7 +345,8 @@ const DisplayManagement = () => {
             textTransform: 'none',
             fontSize: '1rem',
             fontWeight: 600,
-            background: 'linear-gradient(135deg,rgb(17, 58, 122) 0%,rgb(11, 49, 156) 100%)',
+            background:
+              'linear-gradient(135deg,rgb(17, 58, 122) 0%,rgb(11, 49, 156) 100%)',
             boxShadow: '0 4px 16px rgba(59, 130, 246, 0.3)',
             '&:hover': {
               background: 'linear-gradient(135deg, #2563eb 0%, #1e40af 100%)',
@@ -336,11 +355,11 @@ const DisplayManagement = () => {
             }
           }}
         >
-          Thêm banner mới
+          Thêm băng rôn mới
         </Button>
-        
+
         <Button
-          variant="outlined"
+          variant='outlined'
           startIcon={<RefreshIcon />}
           onClick={handleRefresh}
           disabled={refreshing}
@@ -366,7 +385,7 @@ const DisplayManagement = () => {
             <TableHead>
               <TableRow sx={{ backgroundColor: '#f8fafc' }}>
                 {[
-                  'Banner',
+                  'Băng rôn',
                   'Vị trí',
                   'Thời gian',
                   'Hiệu suất',
@@ -398,7 +417,14 @@ const DisplayManagement = () => {
                       <TableCell sx={{ py: 2 }}>
                         <Stack direction='row' spacing={2} alignItems='center'>
                           <Avatar
-                            src={banner.imageUrl ? optimizeCloudinaryUrl(banner.imageUrl, { width: 60, height: 40 }) : undefined}
+                            src={
+                              banner.imageUrl
+                                ? optimizeCloudinaryUrl(banner.imageUrl, {
+                                    width: 60,
+                                    height: 40
+                                  })
+                                : undefined
+                            }
                             sx={{
                               width: 60,
                               height: 40,
@@ -417,7 +443,10 @@ const DisplayManagement = () => {
                               {banner.title}
                             </Typography>
                             {banner.subtitle && (
-                              <Typography variant='caption' color='text.secondary'>
+                              <Typography
+                                variant='caption'
+                                color='text.secondary'
+                              >
                                 {banner.subtitle}
                               </Typography>
                             )}
@@ -442,7 +471,11 @@ const DisplayManagement = () => {
 
                       <TableCell>
                         <Stack spacing={0.5}>
-                          <Stack direction='row' spacing={1} alignItems='center'>
+                          <Stack
+                            direction='row'
+                            spacing={1}
+                            alignItems='center'
+                          >
                             <CalendarIcon
                               sx={{ fontSize: 14, color: '#059669' }}
                             />
@@ -453,7 +486,11 @@ const DisplayManagement = () => {
                               Bắt đầu: {formatDate(banner.startDate)}
                             </Typography>
                           </Stack>
-                          <Stack direction='row' spacing={1} alignItems='center'>
+                          <Stack
+                            direction='row'
+                            spacing={1}
+                            alignItems='center'
+                          >
                             <CalendarIcon
                               sx={{ fontSize: 14, color: '#dc2626' }}
                             />
@@ -470,7 +507,10 @@ const DisplayManagement = () => {
                       <TableCell>
                         <Stack spacing={1}>
                           <Box sx={{ display: 'flex', gap: 1 }}>
-                            <Typography variant='caption' color='text.secondary'>
+                            <Typography
+                              variant='caption'
+                              color='text.secondary'
+                            >
                               Click:
                             </Typography>
                             <Typography
@@ -481,7 +521,10 @@ const DisplayManagement = () => {
                             </Typography>
                           </Box>
                           <Box sx={{ display: 'flex', gap: 1 }}>
-                            <Typography variant='caption' color='text.secondary'>
+                            <Typography
+                              variant='caption'
+                              color='text.secondary'
+                            >
                               CTR:
                             </Typography>
                             <Typography
@@ -499,7 +542,9 @@ const DisplayManagement = () => {
                           control={
                             <Switch
                               checked={banner.visible}
-                              onChange={() => handleToggleVisibility(index, banner.visible)}
+                              onChange={() =>
+                                handleToggleVisibility(index, banner.visible)
+                              }
                               sx={{
                                 '& .MuiSwitch-switchBase.Mui-checked': {
                                   color: '#10b981'
@@ -510,7 +555,10 @@ const DisplayManagement = () => {
                             />
                           }
                           label={
-                            <Typography variant='body2' sx={{ fontWeight: 600 }}>
+                            <Typography
+                              variant='body2'
+                              sx={{ fontWeight: 600 }}
+                            >
                               {banner.visible ? 'Hiển thị' : 'Ẩn'}
                             </Typography>
                           }
@@ -553,11 +601,11 @@ const DisplayManagement = () => {
                 // No data
                 <TableRow>
                   <TableCell colSpan={6} sx={{ textAlign: 'center', py: 4 }}>
-                    <Typography variant="body1" color="text.secondary">
+                    <Typography variant='body1' color='text.secondary'>
                       Chưa có banner nào
                     </Typography>
                     <Button
-                      variant="outlined"
+                      variant='outlined'
                       startIcon={<AddIcon />}
                       onClick={() => setOpenModal(true)}
                       sx={{ mt: 2 }}

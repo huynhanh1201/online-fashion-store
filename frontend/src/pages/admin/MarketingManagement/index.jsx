@@ -56,7 +56,7 @@ const MarketingManagement = () => {
   }
 
   return (
-    <Box sx={{ p: 3,  minHeight: '100vh' }}>
+    <Box sx={{ p: 3, minHeight: '100vh' }}>
       {/* Header */}
       <Box sx={{ mb: 4 }}>
         <Typography
@@ -71,7 +71,7 @@ const MarketingManagement = () => {
           }}
         >
           <LocalOfferIcon sx={{ fontSize: 40, color: '#1A3C7B' }} />
-          Quản lý các chiến dịch Marketing
+          Quản lý các chiến dịch quảng cáo
         </Typography>
       </Box>
 
@@ -118,31 +118,31 @@ const MarketingManagement = () => {
             <Tab
               icon={<ViewQuiltIcon />}
               iconPosition='start'
-              label='Banner'
+              label='Băng rôn'
               {...a11yProps(0)}
             />
             <Tab
               icon={<LocalOfferIcon />}
               iconPosition='start'
-              label='Voucher'
+              label='Mã giảm giá'
               {...a11yProps(1)}
             />
             <Tab
               icon={<FlashOnIcon />}
               iconPosition='start'
-              label='Flash Sale'
+              label='Khuyến mãi'
               {...a11yProps(2)}
             />
             <Tab
               icon={<ImageIcon />}
               iconPosition='start'
-              label='Header'
+              label='Nội dung đầu trang'
               {...a11yProps(3)}
             />
             <Tab
               icon={<ImageIcon />}
               iconPosition='start'
-              label='Footer'
+              label='Nội dung chân trang'
               {...a11yProps(4)}
             />
 
