@@ -1,7 +1,8 @@
 import * as React from 'react'
-import Typography from '@mui/material/Typography'
+import { Typography, Box } from '@mui/material'
 import UserTable from './UserTable'
 import useUsers from '~/hooks/admin/useUsers'
+import usePermissions from '~/hooks/usePermissions'
 // Lazy load các modal
 const EditUserModal = React.lazy(() => import('./modal/EditUserModal'))
 const DeleteUserModal = React.lazy(() => import('./modal/DeleteUserModal'))
@@ -10,6 +11,7 @@ const ViewUserModal = React.lazy(() => import('./modal/ViewUserModal'))
 const ROWS_PER_PAGE = 10
 
 export default function UserManagement() {
+  const { hasPermission } = usePermissions()
   const [page, setPage] = React.useState(1)
   const [filters, setFilters] = React.useState()
   const [selectedUser, setSelectedUser] = React.useState(null)
@@ -17,6 +19,17 @@ export default function UserManagement() {
   const [ModalComponent, setModalComponent] = React.useState(null)
 
   const { users, fetchUsers, removeUser, Loading } = useUsers()
+
+  // Kiểm tra quyền truy cập user management
+  if (!hasPermission('user:read')) {
+    return (
+      <Box sx={{ p: 3, textAlign: 'center' }}>
+        <Typography variant='h6' color='error'>
+          Bạn không có quyền truy cập quản lý người dùng
+        </Typography>
+      </Box>
+    )
+  }
 
   // Gọi API duy nhất một lần khi component mount
   React.useEffect(() => {
@@ -28,6 +41,12 @@ export default function UserManagement() {
 
   const handleOpenModal = async (type, user) => {
     if (!user || !user._id) return
+    
+    // Kiểm tra quyền trước khi mở modal
+    if (type === 'view' && !hasPermission('user:read')) return
+    if (type === 'edit' && !hasPermission('user:update')) return
+    if (type === 'delete' && !hasPermission('user:delete')) return
+    
     setSelectedUser(user)
     setModalType(type)
 

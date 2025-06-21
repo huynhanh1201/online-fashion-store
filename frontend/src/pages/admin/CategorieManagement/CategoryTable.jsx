@@ -29,7 +29,8 @@ const CategoryTable = ({
   fetchCategories,
   total,
   onPageChange,
-  onChangeRowsPerPage
+  onChangeRowsPerPage,
+  permissions = {}
 }) => {
   const columns = [
     { id: 'index', label: 'STT', align: 'center', width: 50 },
@@ -84,20 +85,22 @@ const CategoryTable = ({
                     <Typography variant='h6' sx={{ fontWeight: '800' }}>
                       Danh Sách Danh Mục
                     </Typography>
-                    <Button
-                      onClick={addCategory}
-                      startIcon={<AddIcon />}
-                      sx={{
-                        textTransform: 'none',
-                        width: 100,
-                        display: 'flex',
-                        alignItems: 'center',
-                        backgroundColor: '#001f5d',
-                        color: '#fff'
-                      }}
-                    >
-                      Thêm
-                    </Button>
+                    {permissions.canCreate && (
+                      <Button
+                        onClick={addCategory}
+                        startIcon={<AddIcon />}
+                        sx={{
+                          textTransform: 'none',
+                          width: 100,
+                          display: 'flex',
+                          alignItems: 'center',
+                          backgroundColor: '#001f5d',
+                          color: '#fff'
+                        }}
+                      >
+                        Thêm
+                      </Button>
+                    )}
                   </Box>
                   <FilterCategory
                     onFilter={onFilter}
@@ -144,6 +147,7 @@ const CategoryTable = ({
                   index={page * rowsPerPage + idx + 1}
                   columns={columns}
                   handleOpenModal={handleOpenModal}
+                  permissions={permissions}
                 />
               ))
             ) : (

@@ -113,7 +113,7 @@ const styles = {
   }
 }
 
-export default function SizeRow({ size, index, columns, handleOpenModal }) {
+export default function SizeRow({ size, index, columns, handleOpenModal, permissions = {} }) {
   return (
     <TableRow hover>
       {columns.map(({ id, align }) => {
@@ -137,30 +137,36 @@ export default function SizeRow({ size, index, columns, handleOpenModal }) {
         } else if (id === 'action') {
           content = (
             <Stack direction='row' sx={styles.groupIcon}>
-              <Tooltip title='Xem'>
-                <IconButton
-                  onClick={() => handleOpenModal('view', size)}
-                  size='small'
-                >
-                  <RemoveRedEyeIcon color='primary' />
-                </IconButton>
-              </Tooltip>
-              <Tooltip title='Sửa'>
-                <IconButton
-                  onClick={() => handleOpenModal('edit', size)}
-                  size='small'
-                >
-                  <BorderColorIcon color='warning' />
-                </IconButton>
-              </Tooltip>
-              <Tooltip title='Xoá'>
-                <IconButton
-                  onClick={() => handleOpenModal('delete', size)}
-                  size='small'
-                >
-                  <DeleteForeverIcon color='error' />
-                </IconButton>
-              </Tooltip>
+              {permissions.canView && (
+                <Tooltip title='Xem'>
+                  <IconButton
+                    onClick={() => handleOpenModal('view', size)}
+                    size='small'
+                  >
+                    <RemoveRedEyeIcon color='primary' />
+                  </IconButton>
+                </Tooltip>
+              )}
+              {permissions.canEdit && (
+                <Tooltip title='Sửa'>
+                  <IconButton
+                    onClick={() => handleOpenModal('edit', size)}
+                    size='small'
+                  >
+                    <BorderColorIcon color='warning' />
+                  </IconButton>
+                </Tooltip>
+              )}
+              {permissions.canDelete && (
+                <Tooltip title='Xoá'>
+                  <IconButton
+                    onClick={() => handleOpenModal('delete', size)}
+                    size='small'
+                  >
+                    <DeleteForeverIcon color='error' />
+                  </IconButton>
+                </Tooltip>
+              )}
             </Stack>
           )
         } else {

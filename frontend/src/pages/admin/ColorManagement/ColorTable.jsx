@@ -185,7 +185,8 @@ const ColorTable = ({
   fetchColors,
   onPageChange,
   onChangeRowsPerPage,
-  total
+  total,
+  permissions = {}
 }) => {
   const columns = [
     { id: 'index', label: 'STT', align: 'center', width: 50 },
@@ -233,22 +234,24 @@ const ColorTable = ({
                     <Typography variant='h6' sx={{ fontWeight: '800' }}>
                       Danh sách màu sắc
                     </Typography>
-                    <Button
-                      variant='contained'
-                      color='primary'
-                      onClick={addColor}
-                      startIcon={<AddIcon />}
-                      sx={{
-                        textTransform: 'none',
-                        width: 100,
-                        display: 'flex',
-                        alignItems: 'center',
-                        backgroundColor: '#001f5d',
-                        color: '#fff'
-                      }}
-                    >
-                      Thêm
-                    </Button>
+                    {permissions.canCreate && (
+                      <Button
+                        variant='contained'
+                        color='primary'
+                        onClick={addColor}
+                        startIcon={<AddIcon />}
+                        sx={{
+                          textTransform: 'none',
+                          width: 100,
+                          display: 'flex',
+                          alignItems: 'center',
+                          backgroundColor: '#001f5d',
+                          color: '#fff'
+                        }}
+                      >
+                        Thêm
+                      </Button>
+                    )}
                   </Box>
                   <FilterColor
                     onFilter={onFilters}
@@ -295,6 +298,7 @@ const ColorTable = ({
                   index={page * rowsPerPage + idx + 1}
                   columns={columns}
                   handleOpenModal={handleOpenModal}
+                  permissions={permissions}
                 />
               ))
             ) : (

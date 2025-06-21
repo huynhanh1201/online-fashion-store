@@ -2,6 +2,8 @@ import { Grid, Typography, Box } from '@mui/material'
 import CustomerCard from '~/components/dashboard/CustomerCard'
 import OrderCard from '~/components/dashboard/OrderCard'
 import ProductCard from '~/components/dashboard/ProductCard'
+import { RouteGuard } from '~/components/PermissionGuard'
+
 export default function AdminHome() {
   // Dữ liệu giả lập
   const newCustomers = 5
@@ -10,7 +12,7 @@ export default function AdminHome() {
   const totalProducts = 123
 
   return (
-    <>
+    <RouteGuard requiredPermissions={['admin:access']}>
       <Typography variant='h4' gutterBottom>
         Thống kê tổng quan
       </Typography>
@@ -34,6 +36,6 @@ export default function AdminHome() {
           </Box>
         </Grid>
       </Grid>
-    </>
+    </RouteGuard>
   )
 }

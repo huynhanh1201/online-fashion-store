@@ -33,7 +33,8 @@ export default function CategoryRow({
   category,
   index,
   columns,
-  handleOpenModal
+  handleOpenModal,
+  permissions = {}
 }) {
   return (
     <TableRow hover role='checkbox' tabIndex={-1}>
@@ -149,33 +150,39 @@ export default function CategoryRow({
               sx={styles.cellPadding}
             >
               <Stack direction='row' sx={styles.groupIcon}>
-                <Tooltip title='Xem'>
-                  <IconButton
-                    onClick={() => handleOpenModal('view', category)}
-                    size='small'
-                    color='primary'
-                  >
-                    <RemoveRedEyeIcon color='primary' />
-                  </IconButton>
-                </Tooltip>
-                <Tooltip title='Sửa'>
-                  <IconButton
-                    onClick={() => handleOpenModal('edit', category)}
-                    size='small'
-                    color='info'
-                  >
-                    <BorderColorIcon color='warning' />
-                  </IconButton>
-                </Tooltip>
-                <Tooltip title='Xoá'>
-                  <IconButton
-                    onClick={() => handleOpenModal('delete', category)}
-                    size='small'
-                    color='error'
-                  >
-                    <DeleteForeverIcon color='error' />
-                  </IconButton>
-                </Tooltip>
+                {permissions.canView && (
+                  <Tooltip title='Xem'>
+                    <IconButton
+                      onClick={() => handleOpenModal('view', category)}
+                      size='small'
+                      color='primary'
+                    >
+                      <RemoveRedEyeIcon color='primary' />
+                    </IconButton>
+                  </Tooltip>
+                )}
+                {permissions.canEdit && (
+                  <Tooltip title='Sửa'>
+                    <IconButton
+                      onClick={() => handleOpenModal('edit', category)}
+                      size='small'
+                      color='info'
+                    >
+                      <BorderColorIcon color='warning' />
+                    </IconButton>
+                  </Tooltip>
+                )}
+                {permissions.canDelete && (
+                  <Tooltip title='Xoá'>
+                    <IconButton
+                      onClick={() => handleOpenModal('delete', category)}
+                      size='small'
+                      color='error'
+                    >
+                      <DeleteForeverIcon color='error' />
+                    </IconButton>
+                  </Tooltip>
+                )}
               </Stack>
             </TableCell>
           )

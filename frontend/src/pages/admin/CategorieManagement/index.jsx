@@ -1,6 +1,12 @@
 import React from 'react'
 import CategoryTable from './CategoryTable'
 import useCategories from '~/hooks/admin/useCategories'
+import usePermissions from '~/hooks/usePermissions'
+import { PermissionWrapper, RouteGuard } from '~/components/PermissionGuard'
+import {
+  updateCategory,
+  deleteCategory
+} from '~/services/admin/categoryService'
 // Lazy load các modal
 const AddCategoryModal = React.lazy(() => import('./modal/AddCategoryModal'))
 const ViewCategoryModal = React.lazy(() => import('./modal/ViewCategoryModal'))
@@ -18,6 +24,7 @@ const CategoryManagement = () => {
   })
   const [selectedCategory, setSelectedCategory] = React.useState(null)
   const [modalType, setModalType] = React.useState(null)
+  const { hasPermission } = usePermissions()
 
   const {
     categories,
@@ -95,7 +102,7 @@ const CategoryManagement = () => {
   // }
 
   return (
-    <>
+    <RouteGuard requiredPermissions={['admin:access', 'category:read']}>
       <CategoryTable
         categories={categories}
         loading={Loading}
@@ -111,17 +118,26 @@ const CategoryManagement = () => {
           setPage(1)
           setLimit(newLimit)
         }}
+        // Truyền quyền xuống component con
+        permissions={{
+          canCreate: hasPermission('category:create'),
+          canEdit: hasPermission('category:update'),
+          canDelete: hasPermission('category:delete'),
+          canView: hasPermission('category:read')
+        }}
       />
 
       <React.Suspense fallback={<></>}>
-        {modalType === 'add' && (
-          <AddCategoryModal
-            open
-            onClose={handleCloseModal}
-            onAdded={handleSave}
-            categories={categories}
-          />
-        )}
+        <PermissionWrapper requiredPermissions={['category:create']}>
+          {modalType === 'add' && (
+            <AddCategoryModal
+              open
+              onClose={handleCloseModal}
+              onAdded={handleSave}
+              categories={categories}
+            />
+          )}
+        </PermissionWrapper>
         {modalType === 'view' && selectedCategory && (
           <ViewCategoryModal
             open
@@ -129,33 +145,35 @@ const CategoryManagement = () => {
             category={selectedCategory}
           />
         )}
-
-        {modalType === 'edit' && selectedCategory && (
-          <EditCategoryModal
-            open
-            onClose={handleCloseModal}
-            category={selectedCategory}
-            onSave={handleSave}
-            categories={categories}
-          />
-        )}
-
-        {modalType === 'delete' && selectedCategory && (
-          <DeleteCategoryModal
-            open
-            onClose={handleCloseModal}
-            category={selectedCategory}
-            onDelete={handleSave}
-          />
-        )}
-      </React.Suspense>
+        <PermissionWrapper requiredPermissions={['category:update']}>
+          {modalType === 'edit' && selectedCategory && (
+            <EditCategoryModal
+              open
+              onClose={handleCloseModal}
+              category={selectedCategory}
+              onSave={handleSave}
+              categories={categories}
+            />
+          )}
+        </PermissionWrapper>
+        <PermissionWrapper requiredPermissions={['category:delete']}>
+          {modalType === 'delete' && selectedCategory && (
+            <DeleteCategoryModal
+              open
+              onClose={handleCloseModal}
+              category={selectedCategory}
+              onDelete={handleSave}
+            />
+          )}
+        </PermissionWrapper>
+      </React.Suspense >
 
       {/*<CategoryPagination*/}
       {/*  page={page}*/}
       {/*  totalPages={totalPages}*/}
       {/*  onPageChange={handleChangePage}*/}
       {/*/>*/}
-    </>
+    </RouteGuard >
   )
 }
 

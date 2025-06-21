@@ -190,7 +190,8 @@ const SizeTable = ({
   total,
   onPageChange,
   onFilters,
-  fetchSizes
+  fetchSizes,
+  permissions = {}
 }) => {
   const columns = [
     { id: 'index', label: 'STT', minWidth: 50, align: 'center' },
@@ -226,20 +227,22 @@ const SizeTable = ({
                     <Typography variant='h6' sx={{ fontWeight: '800' }}>
                       Danh Sách Kích Thước
                     </Typography>
-                    <Button
-                      variant='contained'
-                      color='primary'
-                      onClick={addSize}
-                      startIcon={<AddIcon />}
-                      sx={{
-                        textTransform: 'none',
-                        width: 100,
-                        backgroundColor: '#001f5d',
-                        color: '#fff'
-                      }}
-                    >
-                      Thêm
-                    </Button>
+                    {permissions.canCreate && (
+                      <Button
+                        variant='contained'
+                        color='primary'
+                        onClick={addSize}
+                        startIcon={<AddIcon />}
+                        sx={{
+                          textTransform: 'none',
+                          width: 100,
+                          backgroundColor: '#001f5d',
+                          color: '#fff'
+                        }}
+                      >
+                        Thêm
+                      </Button>
+                    )}
                   </Box>
                   <FilterSize
                     onFilter={onFilters}
@@ -286,6 +289,7 @@ const SizeTable = ({
                   index={page * rowsPerPage + idx + 1}
                   columns={columns}
                   handleOpenModal={handleOpenModal}
+                  permissions={permissions}
                 />
               ))
             ) : (

@@ -5,6 +5,8 @@ import {
   updateDiscount,
   deleteDiscount
 } from '~/services/admin/discountService'
+import usePermissions from '~/hooks/usePermissions'
+import { RouteGuard, PermissionWrapper } from '~/components/PermissionGuard'
 
 // Lazy load modals
 const AddDiscountModal = React.lazy(() => import('./modal/AddDiscountModal'))
@@ -18,6 +20,7 @@ const DiscountTable = React.lazy(() => import('./DiscountTable'))
 const DiscountPagination = React.lazy(() => import('./DiscountPagination'))
 
 function DiscountManagement() {
+  const { hasPermission } = usePermissions()
   const [page, setPage] = React.useState(1)
   const [limit, setLimit] = React.useState(10)
   const [filters, setFilters] = React.useState({
@@ -45,6 +48,12 @@ function DiscountManagement() {
 
   const handleOpenModal = (type, discount) => {
     if (!discount || !discount._id) return
+
+    // Kiểm tra quyền trước khi mở modal
+    if (type === 'edit' && !hasPermission('coupon:update')) return
+    if (type === 'delete' && !hasPermission('coupon:delete')) return
+    if (type === 'view' && !hasPermission('coupon:read')) return
+
     setSelectedDiscount(discount)
     setModalType(type)
   }
@@ -128,12 +137,16 @@ function DiscountManagement() {
   }
 
   return (
-    <>
+    <RouteGuard requiredPermissions={['admin:access', 'coupon:read']}>
       <DiscountTable
         discounts={discounts}
         loading={loading}
         onAction={handleOpenModal}
-        addDiscount={() => setModalType('add')}
+        addDiscount={() => {
+          if (hasPermission('coupon:create')) {
+            setModalType('add')
+          }
+        }}
         onFilter={handleFilter}
         fetchDiscounts={fetchDiscounts}
         page={page - 1}
@@ -144,48 +157,62 @@ function DiscountManagement() {
           setPage(1)
           setLimit(newLimit)
         }}
+        permissions={{
+          canCreate: hasPermission('coupon:create'),
+          canEdit: hasPermission('coupon:update'),
+          canDelete: hasPermission('coupon:delete'),
+          canView: hasPermission('coupon:read')
+        }}
       />
 
-      {modalType === 'add' && (
-        <AddDiscountModal
-          open
-          onClose={handleCloseModal}
-          onAdded={handleSave}
-        />
-      )}
+      <PermissionWrapper requiredPermissions={['coupon:create']}>
+        {modalType === 'add' && (
+          <AddDiscountModal
+            open
+            onClose={handleCloseModal}
+            onAdded={handleSave}
+          />
+        )}
+      </PermissionWrapper>
 
-      {modalType === 'view' && selectedDiscount && (
-        <ViewDiscountModal
-          open
-          onClose={handleCloseModal}
-          discount={selectedDiscount}
-        />
-      )}
+      <PermissionWrapper requiredPermissions={['coupon:read']}>
+        {modalType === 'view' && selectedDiscount && (
+          <ViewDiscountModal
+            open
+            onClose={handleCloseModal}
+            discount={selectedDiscount}
+          />
+        )}
+      </PermissionWrapper>
 
-      {modalType === 'edit' && selectedDiscount && (
-        <EditDiscountModal
-          open
-          onClose={handleCloseModal}
-          discount={selectedDiscount}
-          onSave={handleSave}
-        />
-      )}
+      <PermissionWrapper requiredPermissions={['coupon:update']}>
+        {modalType === 'edit' && selectedDiscount && (
+          <EditDiscountModal
+            open
+            onClose={handleCloseModal}
+            discount={selectedDiscount}
+            onSave={handleSave}
+          />
+        )}
+      </PermissionWrapper>
 
-      {modalType === 'delete' && selectedDiscount && (
-        <DeleteDiscountModal
-          open
-          onClose={handleCloseModal}
-          discount={selectedDiscount}
-          onDelete={handleSave}
-        />
-      )}
+      <PermissionWrapper requiredPermissions={['coupon:delete']}>
+        {modalType === 'delete' && selectedDiscount && (
+          <DeleteDiscountModal
+            open
+            onClose={handleCloseModal}
+            discount={selectedDiscount}
+            onDelete={handleSave}
+          />
+        )}
+      </PermissionWrapper>
 
       {/*<DiscountPagination*/}
       {/*  page={page}*/}
       {/*  totalPages={totalPages}*/}
       {/*  onPageChange={handleChangePage}*/}
       {/*/>*/}
-    </>
+    </RouteGuard>
   )
 }
 

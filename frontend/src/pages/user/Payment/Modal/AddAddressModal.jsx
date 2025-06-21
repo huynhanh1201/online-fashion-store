@@ -18,6 +18,14 @@ import {
   updateShippingAddress
 } from '~/services/addressService'
 import addressGHNService from '~/services/addressGHNService'
+import {
+  Person as PersonIcon,
+  Phone as PhoneIcon,
+  Edit as EditIcon,
+  Add as AddIcon,
+  Home as HomeIcon
+} from '@mui/icons-material'
+import LocationOnIcon from '@mui/icons-material/LocationOn'
 
 export default function AddAddressModal({
   open,
@@ -306,11 +314,16 @@ export default function AddAddressModal({
   return (
     <Dialog open={open} onClose={onClose} maxWidth='sm' fullWidth>
       <DialogTitle sx={{ m: 0, p: 2 }}>
-        {viewOnly
-          ? 'Xem địa chỉ'
-          : isEditMode
-            ? 'Chỉnh sửa địa chỉ'
-            : 'Thêm địa chỉ mới'}
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, color: '#1A3C7B' }}>
+          <LocationOnIcon sx={{ color: '#1A3C7B' }} />
+          <Typography variant="h6">
+            {viewOnly
+              ? 'Xem địa chỉ'
+              : isEditMode
+                ? 'Chỉnh sửa địa chỉ'
+                : 'Thêm địa chỉ mới'}
+          </Typography>
+        </Box>
         <IconButton
           aria-label='close'
           onClick={onClose}
@@ -323,6 +336,7 @@ export default function AddAddressModal({
         >
           <CloseIcon />
         </IconButton>
+
       </DialogTitle>
       <Divider />
       <DialogContent dividers>
@@ -445,11 +459,39 @@ export default function AddAddressModal({
         )}
       </DialogContent>
       {!viewOnly && (
-        <DialogActions>
-          <Button onClick={onClose} color='inherit'>
+        <DialogActions sx={{ p: 3, backgroundColor: 'white', gap: 2 }}>
+          <Button
+            onClick={onClose}
+            sx={{
+              color: '#64748b',
+              textTransform: 'none',
+              fontWeight: 600,
+              px: 3,
+              py: 1,
+              '&:hover': {
+                backgroundColor: '#f1f5f9',
+              }
+            }}
+          >
             Hủy
           </Button>
-          <Button onClick={handleSubmit} variant='contained'>
+          <Button
+            onClick={handleSubmit}
+            variant='contained'
+            sx={{
+              background: '#1A3C7B',
+              borderRadius: 2,
+              px: 4,
+              py: 1,
+              textTransform: 'none',
+              fontWeight: 600,
+              boxShadow: '0 4px 15px rgba(26, 60, 123, 0.4)',
+              '&:hover': {
+                background: '#153056',
+                boxShadow: '0 6px 20px rgba(26, 60, 123, 0.6)',
+              },
+            }}
+          >
             {isEditMode ? 'Lưu' : 'Thêm'}
           </Button>
         </DialogActions>

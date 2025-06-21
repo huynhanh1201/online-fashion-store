@@ -408,7 +408,9 @@ import TablePaginationActions from '~/components/PaginationAdmin/TablePagination
 import TableNoneData from '~/components/TableAdmin/NoneData.jsx'
 import { Stack } from '@mui/system'
 import Tooltip from '@mui/material/Tooltip'
+import usePermissions from '~/hooks/usePermissions'
 const InventoryTab = () => {
+  const { hasPermission } = usePermissions()
   const { variants, fetchVariants } = useVariants()
   const {
     inventories,
@@ -709,22 +711,26 @@ const InventoryTab = () => {
                           spacing={1}
                           justifyContent='start'
                         >
-                          <Tooltip title='Xem'>
-                            <IconButton
-                              onClick={() => handleViewInventory(row)}
-                              size='small'
-                            >
-                              <RemoveRedEyeIcon color='primary' />
-                            </IconButton>
-                          </Tooltip>
-                          <Tooltip title='Sửa'>
-                            <IconButton
-                              onClick={() => handleEditInventory(row)}
-                              size='small'
-                            >
-                              <BorderColorIcon color='warning' />
-                            </IconButton>
-                          </Tooltip>
+                          {hasPermission('inventory:read') && (
+                            <Tooltip title='Xem'>
+                              <IconButton
+                                onClick={() => handleViewInventory(row)}
+                                size='small'
+                              >
+                                <RemoveRedEyeIcon color='primary' />
+                              </IconButton>
+                            </Tooltip>
+                          )}
+                          {hasPermission('inventory:update') && (
+                            <Tooltip title='Sửa'>
+                              <IconButton
+                                onClick={() => handleEditInventory(row)}
+                                size='small'
+                              >
+                                <BorderColorIcon color='warning' />
+                              </IconButton>
+                            </Tooltip>
+                          )}
                           {/*<Tooltip title='Ẩn'>*/}
                           {/*  <IconButton*/}
                           {/*    onClick={() => handleDeleteInventory(row)}*/}

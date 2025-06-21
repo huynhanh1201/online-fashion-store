@@ -10,6 +10,7 @@ import {
 import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye'
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever'
 import StarIcon from '@mui/icons-material/Star'
+import usePermissions from '~/hooks/usePermissions'
 
 const styles = {
   groupIcon: {
@@ -34,6 +35,8 @@ const styles = {
 }
 
 export default function ReviewRow({ review, index, columns, handleOpenModal }) {
+  const { hasPermission } = usePermissions()
+
   return (
     <TableRow hover role='checkbox' tabIndex={-1}>
       {columns.map((column) => {
@@ -122,24 +125,28 @@ export default function ReviewRow({ review, index, columns, handleOpenModal }) {
           return (
             <TableCell key={colId} align='center' sx={styles.cellPadding}>
               <Stack direction='row' sx={styles.groupIcon}>
-                <Tooltip title='Xem chi tiết'>
-                  <IconButton
-                    onClick={() => handleOpenModal('view', review)}
-                    size='small'
-                    color='primary'
-                  >
-                    <RemoveRedEyeIcon />
-                  </IconButton>
-                </Tooltip>
-                <Tooltip title='Xoá đánh giá'>
-                  <IconButton
-                    onClick={() => handleOpenModal('delete', review)}
-                    size='small'
-                    color='error'
-                  >
-                    <DeleteForeverIcon />
-                  </IconButton>
-                </Tooltip>
+                {hasPermission('review:read') && (
+                  <Tooltip title='Xem chi tiết'>
+                    <IconButton
+                      onClick={() => handleOpenModal('view', review)}
+                      size='small'
+                      color='primary'
+                    >
+                      <RemoveRedEyeIcon />
+                    </IconButton>
+                  </Tooltip>
+                )}
+                {hasPermission('review:delete') && (
+                  <Tooltip title='Xoá đánh giá'>
+                    <IconButton
+                      onClick={() => handleOpenModal('delete', review)}
+                      size='small'
+                      color='error'
+                    >
+                      <DeleteForeverIcon />
+                    </IconButton>
+                  </Tooltip>
+                )}
               </Stack>
             </TableCell>
           )

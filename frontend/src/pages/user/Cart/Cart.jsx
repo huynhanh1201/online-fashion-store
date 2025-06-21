@@ -266,6 +266,10 @@ const Cart = () => {
     const qty = selected?.quantity || item.quantity
     return sum + (item.variant.exportPrice || 0) * qty
   }, 0)
+  const capitalizeFirstLetter = (str) => {
+    if (!str) return ''
+    return str.charAt(0).toUpperCase() + str.slice(1)
+  }
 
   const handleClearCart = async () => {
     await clearCart()
@@ -359,11 +363,11 @@ const Cart = () => {
       <Paper
         elevation={0}
         sx={{
-          p: 3,
-          mb: 3,
+          p: 2,
+          mb: 2,
           borderRadius: 2,
           background: 'linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%)',
-          boxShadow: '0 4px 20px rgba(0,0,0,0.05)',
+          boxShadow: '0 4px 20px rgba(0,0,0,0.05)'
         }}
       >
         <Box
@@ -396,8 +400,8 @@ const Cart = () => {
         <Paper
           elevation={0}
           sx={{
-            p: { xs: 2, sm: 3 },
-            mb: 3,
+            p: 1,
+            mb: 1,
             borderRadius: 2,
             border: '1px dashed #1A3C7B',
             backgroundColor: '#E3F2FD',
@@ -642,7 +646,7 @@ const Cart = () => {
                             }}
                             title={variant.name}
                           >
-                            {variant.name}
+                            {capitalizeFirstLetter(variant.name)}
                           </Typography>
                           <Box display="flex" gap={1} flexWrap="wrap">
                             <Chip
@@ -858,9 +862,9 @@ const Cart = () => {
       </Box>
 
       {/* Dialogs and Alerts */}
-        <Box sx={{mt: 4}}>
-          <SuggestionProducts />
-        </Box>
+      <Box sx={{ mt: 4 }}>
+        <SuggestionProducts />
+      </Box>
       <Dialog
         open={confirmClearOpen}
         onClose={() => setConfirmClearOpen(false)}

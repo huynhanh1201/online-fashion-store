@@ -13,6 +13,7 @@ import usePartner from '~/hooks/admin/Inventory/usePartner.js'
 import useVariants from '~/hooks/admin/Inventory/useVariants.js'
 import useWarehouses from '~/hooks/admin/Inventory/useWarehouses.js'
 import useWarehouseSlips from '~/hooks/admin/Inventory/useWarehouseSlip.js'
+import usePermissions from '~/hooks/usePermissions'
 const styles = {
   header: {
     borderBottom: '1px solid #ccc',
@@ -30,6 +31,7 @@ const styles = {
 }
 
 function WarehouseStatisticTab() {
+  const { hasPermission } = usePermissions()
   const { warehouses, fetchWarehouses, createNewWarehouse } = useWarehouses()
   const { variants, fetchVariants } = useVariants()
   const { batches } = useBatches()
@@ -41,6 +43,17 @@ function WarehouseStatisticTab() {
   React.useEffect(() => {
     fetchStatistics()
   }, [])
+
+  // Kiểm tra quyền truy cập thống kê
+  if (!hasPermission('statistics:read')) {
+    return (
+      <Box sx={{ p: 3, textAlign: 'center' }}>
+        <Typography variant='h6' color='error'>
+          Bạn không có quyền truy cập thống kê kho hàng
+        </Typography>
+      </Box>
+    )
+  }
 
   return (
     <div
