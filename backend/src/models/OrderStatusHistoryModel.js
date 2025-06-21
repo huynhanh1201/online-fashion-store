@@ -27,7 +27,7 @@ const OrderStatusHistorySchema = new Schema(
       role: {
         type: String,
         required: true,
-        enum: ['customer', 'admin'] // hoặc các role khác bạn có
+        enum: ['owner', 'technical_admin', 'staff', 'customer'] // hoặc các role khác bạn có
       }
     }
   },
