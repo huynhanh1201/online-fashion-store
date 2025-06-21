@@ -14,7 +14,10 @@ const TransactionManagement = () => {
   const { hasPermission } = usePermissions()
   const [page, setPage] = useState(1)
   const [limit, setLimit] = useState(10)
-  const [filters, setFilters] = useState({})
+  const [filters, setFilters] = useState({
+    status: 'false',
+    sort: 'newest'
+  })
   const [selectedTransaction, setSelectedTransaction] = useState(null)
   const [openView, setOpenView] = useState(false)
   const [openEdit, setOpenEdit] = useState(false)

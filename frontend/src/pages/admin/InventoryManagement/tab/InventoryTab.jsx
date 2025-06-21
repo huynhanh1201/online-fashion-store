@@ -425,7 +425,10 @@ const InventoryTab = () => {
   const { warehouses, fetchWarehouses } = useWarehouses()
   const [page, setPage] = useState(1)
   const [rowsPerPage, setRowsPerPage] = useState(10)
-  const [filter, setFilter] = useState({})
+  const [filter, setFilter] = useState({
+    status: 'false',
+    sort: 'newest'
+  })
   const [openViewModal, setOpenViewModal] = useState(false)
   const [openEditModal, setOpenEditModal] = useState(false)
   const [openDeleteModal, setOpenDeleteModal] = useState(false)
@@ -506,11 +509,11 @@ const InventoryTab = () => {
     setOpenEditModal(true)
   }
 
-  const handleDeleteInventory = async (inventory) => {
-    const inventoryDetails = await getInventoryId(inventory._id)
-    setSelectedInventory(inventoryDetails)
-    setOpenDeleteModal(true)
-  }
+  // const handleDeleteInventory = async (inventory) => {
+  //   const inventoryDetails = await getInventoryId(inventory._id)
+  //   setSelectedInventory(inventoryDetails)
+  //   setOpenDeleteModal(true)
+  // }
 
   const handleCloseEditModal = () => {
     setSelectedInventory(null)

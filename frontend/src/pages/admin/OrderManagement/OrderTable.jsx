@@ -254,7 +254,7 @@ const OrderTable = ({
                     ...(column.id === 'action' && {
                       width: '130px',
                       maxWidth: '130px',
-                      paddingLeft: '20px'
+                      paddingLeft: '10px'
                     })
                   }}
                 >
@@ -273,7 +273,7 @@ const OrderTable = ({
             ) : orders.length > 0 ? (
               orders.map((order, index) => (
                 <OrderRow
-                  key={order._id}
+                  key={order._id || index}
                   order={order}
                   index={page * rowsPerPage + index + 1}
                   columns={columns}

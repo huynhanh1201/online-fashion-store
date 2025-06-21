@@ -42,16 +42,33 @@ const useWarehouses = () => {
     }
   }
 
-  const createNewWarehouse = async (data) => {
+  const createNewWarehouse = async (data, filters = {}) => {
     try {
       const result = await createWarehouse(data)
-      if (result) {
-        setWarehouses((prev) => [...prev, result])
-        setTotalPages((prev) => prev + 1)
-        return result
-      } else {
+      if (!result) {
         throw new Error('Failed to create warehouse')
       }
+
+      setWarehouses((prev) => {
+        const sort = filters?.sort
+        let updated = [...prev]
+
+        if (sort === 'newest') {
+          updated = [result, ...prev].slice(0, 10)
+        } else if (sort === 'oldest') {
+          if (prev.length < 10) {
+            updated = [...prev, result]
+          }
+          // Nếu đã đủ 10 phần tử thì không thêm
+        } else {
+          updated = [result, ...prev].slice(0, 10) // Mặc định giống newest
+        }
+
+        return updated
+      })
+
+      setTotalPages((prev) => prev + 1)
+      return result
     } catch (error) {
       console.error('Error creating warehouse:', error)
       throw error

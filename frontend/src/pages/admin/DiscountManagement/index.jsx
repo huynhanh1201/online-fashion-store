@@ -23,7 +23,10 @@ function DiscountManagement() {
   const { hasPermission } = usePermissions()
   const [page, setPage] = React.useState(1)
   const [limit, setLimit] = React.useState(10)
-  const [filters, setFilters] = React.useState({})
+  const [filters, setFilters] = React.useState({
+    status: 'false',
+    sort: 'newest'
+  })
   const [selectedDiscount, setSelectedDiscount] = React.useState(null)
   const [modalType, setModalType] = React.useState(null)
 
@@ -98,7 +101,7 @@ function DiscountManagement() {
   const handleSave = async (data, type, id) => {
     try {
       if (type === 'add') {
-        await add(data)
+        await add(data, filters)
       } else if (type === 'edit') {
         await update(id, data)
       } else if (type === 'delete') {

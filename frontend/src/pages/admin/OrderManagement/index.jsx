@@ -14,7 +14,7 @@ const OrderManagement = () => {
   const { hasPermission } = usePermissions()
   const [page, setPage] = React.useState(1)
   const [limit, setLimit] = React.useState(10)
-  const [filters, setFilters] = React.useState({}) // nếu cần lọc thì thêm filters
+  const [filters, setFilters] = React.useState({ sort: 'newest' }) // nếu cần lọc thì thêm filters
   const [openViewModal, setOpenViewModal] = React.useState(false)
   const [openEditModal, setOpenEditModal] = React.useState(false) // modal sửa
   const [openDeleteModal, setOpenDeleteModal] = React.useState(false) // modal xoá

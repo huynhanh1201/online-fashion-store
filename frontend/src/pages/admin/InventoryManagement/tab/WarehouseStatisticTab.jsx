@@ -116,7 +116,7 @@ function WarehouseStatisticTab() {
         </Typography>
         <ChartDashboard data={statistics} loading={loading} />
       </Box>
-      <Box sx={styles.BoxCard}>
+      <Box sx={{ ...styles.BoxCard, pb: 0 }}>
         <Typography
           variant='h5'
           gutterBottom
@@ -127,6 +127,7 @@ function WarehouseStatisticTab() {
         </Typography>
         <LowStockAlertCard
           data={statistics}
+          fetchStatistics={fetchStatistics}
           loading={loading}
           warehouses={warehouses}
           variants={variants}

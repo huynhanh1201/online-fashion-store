@@ -41,18 +41,36 @@ const useVariants = () => {
     }
   }
 
-  const createNewVariant = async (data) => {
+  const createNewVariant = async (data, filters = {}) => {
     try {
       const result = await createVariant(data)
-      if (result) {
-        setVariants((prev) => [...prev, result])
-        return result
-      } else {
+      if (!result) {
         throw new Error('Không thể tạo biến thể mới')
       }
+
+      setVariants((prev) => {
+        const sort = filters?.sort
+        let updated = [...prev]
+
+        if (sort === 'newest') {
+          updated = [result, ...prev].slice(0, 10)
+        } else if (sort === 'oldest') {
+          if (prev.length < 10) {
+            updated = [...prev, result]
+          }
+          // Nếu đã đủ 10 phần tử thì không thêm
+        } else {
+          // Mặc định giống newest
+          updated = [result, ...prev].slice(0, 10)
+        }
+
+        return updated
+      })
+
+      return result
     } catch (error) {
       console.error('Lỗi khi tạo biến thể mới:', error)
-      throw error // Ném lỗi để xử lý bên ngoài nếu cần
+      throw error // ✅ vẫn giữ nguyên để xử lý ngoài nếu cần
     }
   }
 

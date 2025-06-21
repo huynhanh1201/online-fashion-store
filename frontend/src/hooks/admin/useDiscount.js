@@ -47,17 +47,37 @@ const useDiscounts = () => {
     }
   }
 
-  const add = async (data) => {
+  const add = async (data, filters = {}) => {
     try {
       const newDiscount = await addDiscount(data)
+      if (!newDiscount) {
+        console.error('Không thể thêm giảm giá mới')
+        return null
+      }
+
       setDiscounts((prev) => {
-        const updated = [newDiscount, ...prev]
-        return updated.slice(0, 10) // ✅ chỉ giữ lại 10 danh mục mới nhất
+        const sort = filters?.sort
+        let updated = [...prev]
+
+        if (sort === 'newest') {
+          updated = [newDiscount, ...prev].slice(0, 10)
+        } else if (sort === 'oldest') {
+          if (prev.length < 10) {
+            updated = [...prev, newDiscount]
+          }
+          // Nếu đủ 10 thì không thêm vào mảng
+        } else {
+          // Mặc định xử lý như 'newest'
+          updated = [newDiscount, ...prev].slice(0, 10)
+        }
+
+        return updated
       })
+
       setTotalPages((prev) => prev + 1)
       return newDiscount
     } catch (err) {
-      console.error('Error adding category:', err)
+      console.error('Lỗi khi thêm giảm giá:', err)
       return null
     }
   }

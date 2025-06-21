@@ -14,12 +14,17 @@ import {
   Button,
   IconButton
 } from '@mui/material'
+import { Suspense } from 'react'
 import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye'
 import BorderColorIcon from '@mui/icons-material/BorderColor'
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff'
 import AddIcon from '@mui/icons-material/Add'
-import AddWarehouseModal from '../modal/Warehouse/AddWarehouseModal.jsx'
-import EditWarehouseModal from '../modal/Warehouse/EditWarehouseModal.jsx'
+const AddWarehouseModal = React.lazy(
+  () => import('../modal/Warehouse/AddWarehouseModal.jsx')
+)
+const EditWarehouseModal = React.lazy(
+  () => import('../modal/Warehouse/EditWarehouseModal')
+)
 import ViewWarehouseModal from '../modal/Warehouse/ViewWarehouseModal.jsx'
 import DeleteWarehouseModal from '../modal/Warehouse/DeleteWarehouseModal.jsx' // Thêm modal mới
 import Tooltip from '@mui/material/Tooltip'
@@ -68,7 +73,10 @@ const WarehousesTab = () => {
   const [selectedWarehouse, setSelectedWarehouse] = useState(null)
   const [page, setPage] = useState(1) // State cho trang hiện tại
   const [rowsPerPage, setRowsPerPage] = useState(10) // State cho số dòng mỗi trang
-  const [filter, setFilter] = useState({})
+  const [filter, setFilter] = useState({
+    status: 'false',
+    sort: 'newest'
+  })
 
   useEffect(() => {
     fetchWarehouses(page, rowsPerPage, filter)
@@ -109,7 +117,7 @@ const WarehousesTab = () => {
 
   const handleSave = async (warehouse, type, warehouseId) => {
     if (type === 'add') {
-      await createNewWarehouse(warehouse)
+      await createNewWarehouse(warehouse, filter)
     } else if (type === 'edit') {
       await updateWarehouseById(warehouseId, warehouse)
     } else if (type === 'delete') {
@@ -353,11 +361,6 @@ const WarehousesTab = () => {
         }}
         ActionsComponent={TablePaginationActions}
       />
-      <AddWarehouseModal
-        open={openAddModal}
-        onClose={handleCloseAddModal}
-        onSave={handleSave}
-      />
 
       <ViewWarehouseModal
         open={openViewModal}
@@ -365,12 +368,23 @@ const WarehousesTab = () => {
         warehouse={selectedWarehouse}
       />
 
-      <EditWarehouseModal
-        open={openEditModal}
-        onClose={handleCloseEditModal}
-        warehouse={selectedWarehouse}
-        onSave={handleSave}
-      />
+      <Suspense fallback={<div>Loading...</div>}>
+        {openAddModal && (
+          <AddWarehouseModal
+            open={openAddModal}
+            onClose={handleCloseAddModal}
+            onSave={handleSave}
+          />
+        )}
+        {openEditModal && (
+          <EditWarehouseModal
+            open={openEditModal}
+            onClose={handleCloseEditModal}
+            warehouse={selectedWarehouse}
+            onSave={handleSave}
+          />
+        )}
+      </Suspense>
 
       <DeleteWarehouseModal
         open={openDeleteModal}

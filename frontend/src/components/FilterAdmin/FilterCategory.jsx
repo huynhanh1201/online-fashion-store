@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import {
   Box,
   FormControlLabel,
@@ -27,10 +27,15 @@ export default function FilterCategory({
   const [selectedFilter, setSelectedFilter] = useState('')
   const [startDate, setStartDate] = useState(dayjs().format('YYYY-MM-DD'))
   const [endDate, setEndDate] = useState(dayjs().format('YYYY-MM-DD'))
-  const [status, setStatus] = useState('')
-  const [sort, setSort] = useState('')
+  const [status, setStatus] = useState('false') // false: Hoạt động, true: Không hoạt động
+  const [sort, setSort] = useState('newest')
+  const hasMounted = useRef(false)
   useEffect(() => {
-    applyFilters(selectedFilter, startDate, endDate)
+    if (hasMounted.current) {
+      applyFilters(selectedFilter, startDate, endDate)
+    } else {
+      hasMounted.current = true
+    }
   }, [keyword, status, sort])
 
   const handleSearch = () => {
@@ -93,7 +98,7 @@ export default function FilterCategory({
     setStatus('')
     setSort('')
     onFilter({})
-    fetchCategories(1, 10, {}) // Reset lại danh sách categories
+    // fetchCategories(1, 10, {}) // Reset lại danh sách categories
   }
 
   return (

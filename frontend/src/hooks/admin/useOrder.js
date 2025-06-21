@@ -75,15 +75,19 @@ const useOrder = () => {
   const updateOrderById = async (id, data) => {
     try {
       const updated = await updateOrder(id, data)
+      if (!updated || !updated._id)
+        throw new Error('Dữ liệu trả về không hợp lệ')
+
       setOrders((prev) =>
         prev.map((d) => (d._id === updated._id ? updated : d))
       )
       return updated
     } catch (err) {
-      console.error('Error updating category:', err)
+      console.error('Lỗi khi cập nhật đơn hàng:', err)
       return null
     }
   }
+
   const remove = async (id) => {
     try {
       await deleteOrderById(id)

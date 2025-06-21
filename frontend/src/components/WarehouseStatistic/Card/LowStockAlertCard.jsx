@@ -147,7 +147,8 @@ export default function LowStockAlertCard({
   fetchWarehouses,
   fetchPartner,
   addPartner,
-  addWarehouse
+  addWarehouse,
+  fetchStatistics
 }) {
   const filteredWarehouses = (data ?? []).filter(
     (warehouse) => warehouse.lowStockVariants?.length > 0
@@ -194,7 +195,10 @@ export default function LowStockAlertCard({
     setOpenModal(true)
   }
 
-  const handleCloseModal = () => {
+  const handleCloseModal = (updated) => {
+    if (updated === 'updated') {
+      fetchStatistics()
+    }
     setOpenModal(false)
     setNewSlipData({
       slipId: '',
@@ -207,11 +211,6 @@ export default function LowStockAlertCard({
     })
     setItems([{ variantId: '', lot: '', quantity: '', unit: '', note: '' }])
     setModalType('input')
-  }
-
-  const handleAddSlip = async (newSlip) => {
-    await addWarehouseSlip(newSlip)
-    handleCloseModal()
   }
 
   const handleChange = (field) => (event) => {
@@ -240,27 +239,32 @@ export default function LowStockAlertCard({
     setItems(newItems)
   }
 
-  const handleAdd = () => {
-    const newSlip = {
-      type: modalType === 'input' ? 'import' : 'export',
-      date: newSlipData.date ? new Date(newSlipData.date).toISOString() : null,
-      partnerId: newSlipData.partnerId || '',
-      warehouseId: newSlipData.warehouseId || '',
-      items: items.map((item) => ({
-        variantId: item.variantId || '',
-        quantity: parseInt(item.quantity) || 0,
-        unit: item.unit || 'cái'
-      })),
-      note: newSlipData.note || ''
+  const handleAddPartner = async (partnerData) => {
+    const newPartner = await addPartner(partnerData)
+    if (newPartner) {
+      // ✅ Gán đối tượng mới được thêm vào Select
+      setNewSlipData((prev) => ({
+        ...prev,
+        partnerId: newPartner._id
+      }))
     }
-    handleAddSlip(newSlip)
+  }
+  const handleAddWarehouse = async (warehouseData) => {
+    const newWarehouse = await addWarehouse(warehouseData)
+    if (newWarehouse) {
+      // ✅ Gán đối tượng mới được thêm vào Select
+      setNewSlipData((prev) => ({
+        ...prev,
+        warehouseId: newWarehouse._id
+      }))
+    }
   }
 
   return (
     <>
       <Stack spacing={2}>
         {filteredWarehouses.length === 0 ? (
-          <Typography color='text.secondary'>
+          <Typography color='text.secondary' sx={{ pb: 2 }}>
             Không có kho nào cần cảnh báo
           </Typography>
         ) : (
@@ -273,6 +277,7 @@ export default function LowStockAlertCard({
                     backgroundColor: '#fce4ec',
                     borderRadius: 2,
                     p: 2,
+                    mb: 2,
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'space-between'
@@ -316,11 +321,10 @@ export default function LowStockAlertCard({
 
       <AddWarehouseSlipModal
         open={openModal}
-        onClose={handleCloseModal}
+        onCloseStock={handleCloseModal}
         newSlipData={newSlipData}
         handleChange={handleChange}
         handleDateChange={handleDateChange}
-        handleAdd={handleAdd}
         warehouses={warehouses}
         items={items}
         handleItemChange={handleItemChange}
@@ -332,8 +336,8 @@ export default function LowStockAlertCard({
         type={modalType}
         partners={partners}
         addWarehouseSlip={addWarehouseSlip}
-        addPartner={addPartner}
-        addWarehouse={addWarehouse}
+        addPartner={handleAddPartner}
+        addWarehouse={handleAddWarehouse}
       />
     </>
   )

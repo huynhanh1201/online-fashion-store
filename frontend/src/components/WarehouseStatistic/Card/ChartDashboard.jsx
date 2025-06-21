@@ -61,7 +61,12 @@ export default function ChartDashboard({ data }) {
                 interval={0}
               />
 
-              <YAxis />
+              <YAxis
+                tickFormatter={(value) => {
+                  if (value >= 100000) return `${Math.round(value / 1000)}N`
+                  return value
+                }}
+              />
               <RechartsTooltip content={<Tooltip />} />
               <Legend />
               <Bar dataKey='Xuất' fill='#4CAF50' barSize={25} />

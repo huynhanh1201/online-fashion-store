@@ -69,7 +69,10 @@ const VariantsTab = () => {
   const [selectedVariant, setSelectedVariant] = useState(null)
   const [page, setPage] = useState(1)
   const [rowsPerPage, setRowsPerPage] = useState(10)
-  const [filter, setFilter] = useState({})
+  const [filter, setFilter] = useState({
+    status: 'false',
+    sort: 'newest'
+  })
 
   useEffect(() => {
     fetchProducts()
@@ -130,7 +133,7 @@ const VariantsTab = () => {
 
   const handleSave = async (variant, type, variantId) => {
     if (type === 'add') {
-      await createNewVariant(variant)
+      await createNewVariant(variant, filter)
     } else if (type === 'edit') {
       await updateVariantById(variantId, variant)
     } else if (type === 'delete') {

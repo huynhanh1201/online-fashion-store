@@ -50,7 +50,9 @@ const WarehouseSlipsTab = () => {
   const [modalType, setModalType] = useState('input')
   const [page, setPage] = useState(1)
   const [rowsPerPage, setRowsPerPage] = useState(10)
-  const [filter, setFilter] = useState({})
+  const [filter, setFilter] = useState({
+    sort: 'newest'
+  })
   useEffect(() => {
     fetchWarehouses(1, 10, { status: false })
   }, [])
@@ -505,6 +507,7 @@ const WarehouseSlipsTab = () => {
         addWarehouseSlip={createNewWarehouseSlip}
         addPartner={handleAddPartner}
         addWarehouse={handleAddWarehouse}
+        filter={filter}
       />
       <ViewWarehouseSlipModal
         open={openViewModal}

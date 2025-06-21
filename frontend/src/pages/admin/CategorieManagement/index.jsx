@@ -18,7 +18,10 @@ const DeleteCategoryModal = React.lazy(
 const CategoryManagement = () => {
   const [page, setPage] = React.useState(1)
   const [limit, setLimit] = React.useState(10)
-  const [filters, setFilters] = React.useState({})
+  const [filters, setFilters] = React.useState({
+    status: 'false',
+    sort: 'newest'
+  })
   const [selectedCategory, setSelectedCategory] = React.useState(null)
   const [modalType, setModalType] = React.useState(null)
   const { hasPermission } = usePermissions()
@@ -54,7 +57,7 @@ const CategoryManagement = () => {
   const handleSave = async (data, type, id) => {
     try {
       if (type === 'add') {
-        await add(data)
+        await add(data, filters)
       } else if (type === 'edit') {
         await update(id, data)
       } else if (type === 'delete') {
@@ -62,6 +65,15 @@ const CategoryManagement = () => {
       }
     } catch (error) {
       console.error('Lỗi:', error)
+    }
+  }
+
+  const isEqual = (obj1, obj2) => JSON.stringify(obj1) === JSON.stringify(obj2)
+
+  const handleFilter = (newFilters) => {
+    if (!isEqual(filters, newFilters)) {
+      setPage(1)
+      setFilters(newFilters)
     }
   }
 
@@ -89,14 +101,6 @@ const CategoryManagement = () => {
   //   }
   // }
 
-  const isEqual = (obj1, obj2) => JSON.stringify(obj1) === JSON.stringify(obj2)
-
-  const handleFilter = (newFilters) => {
-    if (!isEqual(filters, newFilters)) {
-      setPage(1)
-      setFilters(newFilters)
-    }
-  }
   return (
     <RouteGuard requiredPermissions={['admin:access', 'category:read']}>
       <CategoryTable

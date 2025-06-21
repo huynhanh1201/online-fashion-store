@@ -187,8 +187,10 @@ export default function DiscountRow({ discount, index, columns, onAction, permis
           case 'status':
             content = (
               <Chip
-                label={discount.isActive ? 'Đang hoạt động' : 'Ngừng hoạt động'}
-                color={discount.isActive ? 'success' : 'error'}
+                label={
+                  !discount.isActive ? 'Đang hoạt động' : 'Ngừng hoạt động'
+                }
+                color={!discount.isActive ? 'success' : 'error'}
                 size='large'
                 sx={{ width: '127px', fontWeight: '800' }}
               />
