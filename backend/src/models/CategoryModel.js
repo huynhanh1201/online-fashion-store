@@ -1,4 +1,7 @@
 import mongoose from 'mongoose'
+import { consistentModel } from 'mongoose-references-integrity-checker'
+import subSec from 'mongoose-sub-references-integrity-checker'
+
 const { Schema, model } = mongoose
 
 // Tạo schema cho Danh mục sản phẩm
@@ -44,4 +47,5 @@ const categorySchema = new Schema(
 )
 
 // Tạo Model
-export const CategoryModel = model('Category', categorySchema)
+export const CategoryModel = consistentModel('Category', categorySchema)
+// export const CategoryModel = model('Category', categorySchema)
