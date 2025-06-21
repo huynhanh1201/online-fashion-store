@@ -263,7 +263,10 @@ const updateOrder = async (userId, orderId, reqBody) => {
         new: true,
         runValidators: true
       }
-    )
+    ).populate({
+      path: 'userId',
+      select: 'name'
+    })
 
     const newStatus = reqBody.status
 
