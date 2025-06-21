@@ -3,10 +3,8 @@ import CategoryTable from './CategoryTable'
 import useCategories from '~/hooks/admin/useCategories'
 import usePermissions from '~/hooks/usePermissions'
 import { PermissionWrapper, RouteGuard } from '~/components/PermissionGuard'
-import {
-  updateCategory,
-  deleteCategory
-} from '~/services/admin/categoryService'
+import { useLocation } from 'react-router-dom'
+
 // Lazy load các modal
 const AddCategoryModal = React.lazy(() => import('./modal/AddCategoryModal'))
 const ViewCategoryModal = React.lazy(() => import('./modal/ViewCategoryModal'))
@@ -18,13 +16,18 @@ const DeleteCategoryModal = React.lazy(
 const CategoryManagement = () => {
   const [page, setPage] = React.useState(1)
   const [limit, setLimit] = React.useState(10)
-  const [filters, setFilters] = React.useState({
-    status: 'false',
-    sort: 'newest'
-  })
   const [selectedCategory, setSelectedCategory] = React.useState(null)
+
   const [modalType, setModalType] = React.useState(null)
   const { hasPermission } = usePermissions()
+  const location = useLocation()
+  const queryParams = new URLSearchParams(location.search)
+  const searchFromUrl = queryParams.get('search') || ''
+  const [filters, setFilters] = React.useState(() => ({
+    status: 'false',
+    sort: 'newest',
+    ...(searchFromUrl ? { search: searchFromUrl } : {})
+  }))
 
   const {
     categories,
@@ -37,7 +40,14 @@ const CategoryManagement = () => {
     update,
     remove
   } = useCategories()
-
+  React.useEffect(() => {
+    if (searchFromUrl) {
+      // Xoá `search` khỏi URL sau khi đã đưa vào filters
+      const newParams = new URLSearchParams(location.search)
+      newParams.delete('search')
+      window.history.replaceState({}, '', `${location.pathname}?${newParams}`)
+    }
+  }, [])
   React.useEffect(() => {
     fetchCategories(page, limit, filters)
   }, [page, limit, filters])
@@ -125,6 +135,7 @@ const CategoryManagement = () => {
           canDelete: hasPermission('category:delete'),
           canView: hasPermission('category:read')
         }}
+        initialSearch={searchFromUrl}
       />
 
       <React.Suspense fallback={<></>}>
@@ -166,14 +177,14 @@ const CategoryManagement = () => {
             />
           )}
         </PermissionWrapper>
-      </React.Suspense >
+      </React.Suspense>
 
       {/*<CategoryPagination*/}
       {/*  page={page}*/}
       {/*  totalPages={totalPages}*/}
       {/*  onPageChange={handleChangePage}*/}
       {/*/>*/}
-    </RouteGuard >
+    </RouteGuard>
   )
 }
 

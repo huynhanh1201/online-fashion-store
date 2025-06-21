@@ -20,21 +20,33 @@ export default function FilterCategory({
   onFilter,
   categories,
   fetchCategories,
-  loading
+  loading,
+  initialSearch
 }) {
-  const [keyword, setKeyword] = useState('')
-  const [inputValue, setInputValue] = useState('')
+  const [keyword, setKeyword] = useState(initialSearch)
+  const [inputValue, setInputValue] = useState(initialSearch)
   const [selectedFilter, setSelectedFilter] = useState('')
   const [startDate, setStartDate] = useState(dayjs().format('YYYY-MM-DD'))
   const [endDate, setEndDate] = useState(dayjs().format('YYYY-MM-DD'))
   const [status, setStatus] = useState('false') // false: Hoạt động, true: Không hoạt động
   const [sort, setSort] = useState('newest')
   const hasMounted = useRef(false)
+  // useEffect(() => {
+  //   if (hasMounted.current) {
+  //     applyFilters(selectedFilter, startDate, endDate)
+  //   } else {
+  //     hasMounted.current = true
+  //   }
+  // }, [keyword, status, sort])
+  useEffect(() => {
+    // Gọi lọc ngay sau khi mount nếu có `search` từ URL
+    applyFilters(selectedFilter, startDate, endDate)
+    hasMounted.current = true
+  }, []) // chỉ chạy một lần khi load
+
   useEffect(() => {
     if (hasMounted.current) {
       applyFilters(selectedFilter, startDate, endDate)
-    } else {
-      hasMounted.current = true
     }
   }, [keyword, status, sort])
 
