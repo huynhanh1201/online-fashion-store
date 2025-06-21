@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import {
   Box,
   Button,
@@ -27,24 +27,50 @@ import {
   Edit as EditIcon,
   Delete as DeleteIcon,
   Image as ImageIcon,
-  Announcement as BannerIcon,
-  TrendingUp as TrendingUpIcon
+  Info as InfoIcon,
+  Menu as MenuIcon,
+  Link as LinkIcon,
+  TrendingUp as TrendingUpIcon,
+  Refresh as RefreshIcon
 } from '@mui/icons-material'
 
-const mockHeaders = [
+const mockFooters = [
   {
-    id: 'header001',
-    logo: '/Uploads/logo.png',
-    textBanners: [
-      'Miễn phí vận chuyển cho đơn hàng từ 500.000đ',
-      'Giảm giá 10% cho khách hàng mới'
+    id: 'footer001',
+    logo: '/Uploads/logo-footer.png',
+    about: [
+      {
+        text: 'Cửa hàng thời trang hiện đại, uy tín, phục vụ bạn từ năm 2020.',
+        address: '123 Đường ABC, Quận 1, TP.HCM',
+        phone: '0123 456 789',
+        email: 'support@example.com'
+      }
+    ],
+    menuColumns: [
+      {
+        title: 'Chính sách',
+        subtitle: 'Chính sách của FashionStore',
+        text: 'abcxyz'
+      },
+      {
+        title: 'Hỗ trợ',
+        items: [
+          { label: 'Hướng dẫn mua hàng', link: '/help' },
+          { label: 'Chính sách đổi trả', link: '/policy/return' }
+        ]
+      }
+    ],
+    socialLinks: [
+      { image: 'facebook', link: 'https://facebook.com/example' },
+      { image: 'instagram', link: 'https://instagram.com/example' }
     ],
     status: 'Đang sử dụng'
   }
 ]
 
-const HeaderManagement = () => {
+const FooterManagement = () => {
   const theme = useTheme()
+  const [refreshing, setRefreshing] = useState(false)
 
   const getStatusColor = (status) => {
     switch (status) {
@@ -57,24 +83,38 @@ const HeaderManagement = () => {
     }
   }
 
+  const handleRefresh = async () => {
+    setRefreshing(true)
+    // Simulate refresh delay
+    setTimeout(() => {
+      setRefreshing(false)
+    }, 1000)
+  }
+
   const summaryData = [
     {
-      title: 'Tổng header',
-      value: mockHeaders.length,
+      title: 'Tổng footer',
+      value: mockFooters.length,
       icon: <ImageIcon />,
       color: '#1976d2'
     },
     {
       title: 'Đang sử dụng',
-      value: mockHeaders.filter((h) => h.status === 'Đang sử dụng').length,
+      value: mockFooters.filter((f) => f.status === 'Đang sử dụng').length,
       icon: <TrendingUpIcon />,
       color: '#2e7d32'
     },
     {
-      title: 'Banner hiển thị',
-      value: mockHeaders.reduce((sum, h) => sum + h.textBanners.length, 0),
-      icon: <BannerIcon />,
+      title: 'Menu liên kết',
+      value: mockFooters.reduce((sum, f) => sum + f.menuColumns.length, 0),
+      icon: <MenuIcon />,
       color: '#ed6c02'
+    },
+    {
+      title: 'Mạng xã hội',
+      value: mockFooters.reduce((sum, f) => sum + f.socialLinks.length, 0),
+      icon: <LinkIcon />,
+      color: '#9c27b0'
     }
   ]
 
@@ -93,18 +133,18 @@ const HeaderManagement = () => {
             gap: 2
           }}
         >
-          <ImageIcon sx={{ fontSize: 40, color: '#3b82f6' }} />
-          Quản lý Header
+          <ImageIcon sx={{ fontSize: 40, color: '#1A3C7B' }} />
+          Quản lý Footer
         </Typography>
         <Typography variant='body1' color='text.secondary'>
-          Cấu hình và quản lý nội dung header cho website
+          Cấu hình và quản lý nội dung footer cho website
         </Typography>
       </Box>
 
       {/* Summary Cards */}
       <Grid container spacing={3} sx={{ mb: 4 }}>
         {summaryData.map((item, index) => (
-          <Grid item xs={12} sm={6} md={4} key={index}>
+          <Grid item xs={12} sm={6} md={3} key={index}>
             <Card
               sx={{
                 background: `linear-gradient(135deg, ${item.color}15 0%, ${item.color}25 100%)`,
@@ -155,8 +195,8 @@ const HeaderManagement = () => {
         ))}
       </Grid>
 
-      {/* Action Button */}
-      <Box sx={{ mb: 3, display: 'flex', justifyContent: 'flex-end' }}>
+      {/* Action Buttons */}
+      <Box sx={{ mb: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <Button
           variant='contained'
           startIcon={<AddIcon />}
@@ -167,7 +207,7 @@ const HeaderManagement = () => {
             textTransform: 'none',
             fontSize: '1rem',
             fontWeight: 600,
-            background: 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)',
+            background: 'linear-gradient(135deg,rgb(17, 58, 122) 0%,rgb(11, 49, 156) 100%)',
             boxShadow: '0 4px 16px rgba(59, 130, 246, 0.3)',
             '&:hover': {
               background: 'linear-gradient(135deg, #2563eb 0%, #1e40af 100%)',
@@ -176,7 +216,21 @@ const HeaderManagement = () => {
             }
           }}
         >
-          Cấu hình Header mới
+          Cấu hình Footer mới
+        </Button>
+        
+        <Button
+          variant="outlined"
+          startIcon={<RefreshIcon />}
+          onClick={handleRefresh}
+          disabled={refreshing}
+          sx={{
+            borderRadius: 2,
+            textTransform: 'none',
+            fontWeight: 600
+          }}
+        >
+          {refreshing ? 'Đang tải...' : 'Làm mới'}
         </Button>
       </Box>
 
@@ -196,7 +250,13 @@ const HeaderManagement = () => {
                   Logo
                 </TableCell>
                 <TableCell sx={{ fontWeight: 700, color: '#334155', py: 2 }}>
-                  Top Banner
+                  Giới thiệu
+                </TableCell>
+                <TableCell sx={{ fontWeight: 700, color: '#334155', py: 2 }}>
+                  Menu
+                </TableCell>
+                <TableCell sx={{ fontWeight: 700, color: '#334155', py: 2 }}>
+                  Mạng xã hội
                 </TableCell>
                 <TableCell sx={{ fontWeight: 700, color: '#334155', py: 2 }}>
                   Trạng thái
@@ -207,9 +267,9 @@ const HeaderManagement = () => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {mockHeaders.map((header) => (
+              {mockFooters.map((footer) => (
                 <TableRow
-                  key={header.id}
+                  key={footer.id}
                   sx={{
                     '&:hover': {
                       backgroundColor: alpha(theme.palette.primary.main, 0.04)
@@ -226,7 +286,7 @@ const HeaderManagement = () => {
                       }}
                     >
                       <img
-                        src={header.logo}
+                        src={footer.logo}
                         alt='logo'
                         style={{
                           width: 80,
@@ -240,13 +300,47 @@ const HeaderManagement = () => {
                         color='text.secondary'
                         sx={{ fontFamily: 'monospace' }}
                       >
-                        {header.id}
+                        {footer.id}
                       </Typography>
                     </Box>
                   </TableCell>
                   <TableCell sx={{ py: 2 }}>
                     <List dense>
-                      {header.textBanners.map((text, idx) => (
+                      {footer.about.map((item, index) => (
+                        <ListItem key={index} sx={{ py: 0 }}>
+                          <ListItemText
+                            primary={
+                              <Typography
+                                variant='body2'
+                                sx={{ fontWeight: 600, color: '#1e293b' }}
+                              >
+                                {item.text}
+                              </Typography>
+                            }
+                            secondary={
+                              <Stack spacing={0.5}>
+                                <Typography
+                                  variant='caption'
+                                  color='text.secondary'
+                                >
+                                  {item.address}
+                                </Typography>
+                                <Typography
+                                  variant='caption'
+                                  color='text.secondary'
+                                >
+                                  {item.phone} | {item.email}
+                                </Typography>
+                              </Stack>
+                            }
+                          />
+                        </ListItem>
+                      ))}
+                    </List>
+                  </TableCell>
+                  <TableCell sx={{ py: 2 }}>
+                    <List dense>
+                      {footer.menuColumns.map((col, idx) => (
                         <ListItem key={idx} sx={{ py: 0.5 }}>
                           <ListItemText
                             primary={
@@ -254,7 +348,49 @@ const HeaderManagement = () => {
                                 variant='body2'
                                 sx={{ fontWeight: 600, color: '#1e293b' }}
                               >
-                                {text}
+                                {col.title}
+                              </Typography>
+                            }
+                            secondary={
+                              <Typography
+                                variant='caption'
+                                color='text.secondary'
+                              >
+                                {col.subtitle ||
+                                  (col.items
+                                    ? col.items.map((i) => i.label).join(', ')
+                                    : col.text)}
+                              </Typography>
+                            }
+                          />
+                        </ListItem>
+                      ))}
+                    </List>
+                  </TableCell>
+                  <TableCell sx={{ py: 2 }}>
+                    <List dense>
+                      {footer.socialLinks.map((s, i) => (
+                        <ListItem key={i} sx={{ py: 0.5 }}>
+                          <ListItemText
+                            primary={
+                              <Typography
+                                variant='body2'
+                                sx={{
+                                  fontWeight: 600,
+                                  textTransform: 'capitalize',
+                                  color: '#1e293b'
+                                }}
+                              >
+                                {s.image}
+                              </Typography>
+                            }
+                            secondary={
+                              <Typography
+                                variant='caption'
+                                color='text.secondary'
+                                sx={{ wordBreak: 'break-all' }}
+                              >
+                                {s.link}
                               </Typography>
                             }
                           />
@@ -264,8 +400,8 @@ const HeaderManagement = () => {
                   </TableCell>
                   <TableCell sx={{ py: 2 }}>
                     <Chip
-                      label={header.status}
-                      color={getStatusColor(header.status)}
+                      label={footer.status}
+                      color={getStatusColor(footer.status)}
                       size='small'
                       sx={{
                         fontWeight: 600,
@@ -309,4 +445,4 @@ const HeaderManagement = () => {
   )
 }
 
-export default HeaderManagement
+export default FooterManagement

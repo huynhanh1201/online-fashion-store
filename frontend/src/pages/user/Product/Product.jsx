@@ -9,7 +9,8 @@ import {
   styled,
   Pagination,
   Breadcrumbs,
-  Link
+  Link,
+  Skeleton
 } from '@mui/material'
 import { addToCart, getCart } from '~/services/cartService'
 import { useDispatch } from 'react-redux'
@@ -19,6 +20,8 @@ import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward'
 import NavigateNextIcon from '@mui/icons-material/NavigateNext'
 import { getProducts } from '~/services/productService'
 import ProductCategories from './ProductCategories/ProductCategories'
+import { getBanners } from '~/services/admin/webConfig/bannerService.js'
+import { optimizeCloudinaryUrl } from '~/utils/cloudinary.js'
 
 const ITEMS_PER_PAGE = 15
 
@@ -88,6 +91,28 @@ const Product = () => {
   const [snackbar, setSnackbar] = useState(null)
   const [isAdding, setIsAdding] = useState({})
   const [sortMenuOpen, setSortMenuOpen] = useState(false)
+  const [productBanner, setProductBanner] = useState(null)
+  const [bannerLoading, setBannerLoading] = useState(true)
+
+  // Fetch product banner
+  useEffect(() => {
+    const fetchProductBanner = async () => {
+      try {
+        const allBanners = await getBanners()
+        // Filter banner with position 'product' and visible = true
+        const productBanner = allBanners.find(banner => 
+          banner.position === 'product' && banner.visible === true
+        )
+        setProductBanner(productBanner)
+      } catch (error) {
+        console.error('Error fetching product banner:', error)
+      } finally {
+        setBannerLoading(false)
+      }
+    }
+
+    fetchProductBanner()
+  }, [])
 
   // Fetch products with pagination and sorting
   const fetchProducts = async () => {
@@ -249,21 +274,94 @@ const Product = () => {
           </Typography>
         </Breadcrumbs>
       </Box>
+      
+      {/* Product Banner Section */}
       <Box
         sx={{
           width: '100%',
           maxWidth: '1800px',
           height: { xs: '200px', sm: '300px', md: '400px' },
-          backgroundImage:
-            'url(https://file.hstatic.net/1000360022/collection/tat_ca_san_pham_3682cf864f2d4433a1f0bdfb4ffe24de.jpg)',
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
           position: 'relative',
           mb: 4,
           margin: '0 auto',
           px: { xs: 2, sm: 3, md: 4 }
         }}
-      ></Box>
+      >
+        {bannerLoading ? (
+          <Skeleton
+            variant="rectangular"
+            width="100%"
+            height="100%"
+            sx={{ borderRadius: 0 }}
+          />
+        ) : productBanner ? (
+          productBanner.link ? (
+            <Box
+              component="a"
+              href={productBanner.link}
+              target="_blank"
+              rel="noopener noreferrer"
+              sx={{
+                display: 'block',
+                width: '100%',
+                height: '100%',
+                textDecoration: 'none',
+                cursor: 'pointer'
+              }}
+            >
+              <Box
+                sx={{
+                  width: '100%',
+                  height: '100%',
+                  backgroundImage: `url(${optimizeCloudinaryUrl(productBanner.imageUrl, { 
+                    width: 1800, 
+                    height: 400,
+                    quality: 'auto',
+                    format: 'auto'
+                  })})`,
+                  backgroundSize: 'cover',
+                  backgroundPosition: 'center',
+                  borderRadius: '8px',
+                  transition: 'transform 0.3s ease',
+                  '&:hover': {
+                    transform: 'scale(1.02)'
+                  }
+                }}
+              />
+            </Box>
+          ) : (
+            <Box
+              sx={{
+                width: '100%',
+                height: '100%',
+                backgroundImage: `url(${optimizeCloudinaryUrl(productBanner.imageUrl, { 
+                  width: 1800, 
+                  height: 400,
+                  quality: 'auto',
+                  format: 'auto'
+                })})`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+                borderRadius: '8px'
+              }}
+            />
+          )
+        ) : (
+          // Fallback banner when no product banner found
+          <Box
+            sx={{
+              width: '100%',
+              height: '100%',
+              backgroundImage:
+                'url(https://file.hstatic.net/1000360022/collection/tat_ca_san_pham_3682cf864f2d4433a1f0bdfb4ffe24de.jpg)',
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
+              borderRadius: '8px'
+            }}
+          />
+        )}
+      </Box>
+      
       <ProductCategories />
       <Box sx={{ p: 2, maxWidth: '1800px', mx: 'auto' }}>
         <Box

@@ -6,10 +6,15 @@ import FlashSaleSection from '~/pages/user/Home/FlashSaleSection/FlashSaleSectio
 import CouponList from '~/pages/user/Home/CouponList/CouponList.jsx'
 import { Link } from 'react-router-dom'
 import ProductsCardNew from '~/pages/user/NewProducts/ProductsCardNew'
+import { getBanners } from '~/services/admin/webConfig/bannerService.js'
+import { optimizeCloudinaryUrl } from '~/utils/cloudinary.js'
+
 const Content = () => {
   const [products, setProducts] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
+  const [middleBanners, setMiddleBanners] = useState([])
+  const [bannerLoading, setBannerLoading] = useState(true)
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -27,6 +32,27 @@ const Content = () => {
 
     fetchProducts()
   }, [])
+
+  // Fetch middle banners
+  useEffect(() => {
+    const fetchMiddleBanners = async () => {
+      try {
+        const allBanners = await getBanners()
+        // Filter banners with position 'middle' and visible = true
+        const middleBanners = allBanners.filter(banner => 
+          banner.position === 'middle' && banner.visible === true
+        )
+        setMiddleBanners(middleBanners)
+      } catch (error) {
+        console.error('Error fetching middle banners:', error)
+      } finally {
+        setBannerLoading(false)
+      }
+    }
+
+    fetchMiddleBanners()
+  }, [])
+
   // Sample data
   const categories = [
     {
@@ -63,6 +89,7 @@ const Content = () => {
       link: '/categories/ao-so-mi'
     }
   ]
+
   return (
     <div className='content-container'>
       {/* Features Section */}
@@ -135,8 +162,59 @@ const Content = () => {
         ))}
       </div>
       <CouponList />
-      {/* Stitch Collection Banner */}
-      <div className='stitch-banner'></div>
+      
+      {/* Middle Banners Section */}
+      {!bannerLoading && middleBanners.length > 0 && (
+        <div className='middle-banners-section'>
+          {middleBanners.map((banner, index) => (
+            <div key={banner._id || index} className='middle-banner'>
+              {banner.link ? (
+                <a 
+                  href={banner.link} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  style={{ textDecoration: 'none', color: 'inherit' }}
+                >
+                  <img
+                    src={optimizeCloudinaryUrl(banner.imageUrl, { 
+                      width: 1200, 
+                      height: 400,
+                      quality: 'auto',
+                      format: 'auto'
+                    })}
+                    alt={banner.title || `Banner ${index + 1}`}
+                    style={{
+                      width: '100%',
+                      height: 'auto',
+                      maxHeight: '400px',
+                      objectFit: 'cover',
+                      borderRadius: '8px',
+                      cursor: 'pointer'
+                    }}
+                  />
+                </a>
+              ) : (
+                <img
+                  src={optimizeCloudinaryUrl(banner.imageUrl, { 
+                    width: 1200, 
+                    height: 400,
+                    quality: 'auto',
+                    format: 'auto'
+                  })}
+                  alt={banner.title || `Banner ${index + 1}`}
+                  style={{
+                    width: '100%',
+                    height: 'auto',
+                    maxHeight: '400px',
+                    objectFit: 'cover',
+                    borderRadius: '8px'
+                  }}
+                />
+              )}
+            </div>
+          ))}
+        </div>
+      )}
 
       {/* Stitch Products */}
       <div className='product-grid'>

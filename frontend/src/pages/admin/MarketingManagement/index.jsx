@@ -17,13 +17,13 @@ import {
   Star as StarIcon
 } from '@mui/icons-material'
 
-import PromotionManagement from './PromotionManagement.jsx'
-import DisplayManagement from './DisplayManagement'
-import FlashSaleManagement from './FlashSaleManagement'
-import FooterManagement from './FooterManagement.jsx'
-import HeaderManagement from './HeaderManagement.jsx'
-import FeaturedCategoryManagement from '~/pages/admin/MarketingManagement/FeaturedCategoryManagement.jsx'
-import ServiceHighlightManagement from '~/pages/admin/MarketingManagement/ServiceHighlightManagement.jsx'
+import PromotionManagement from './PromotionManagement/PromotionManagement.jsx'
+import DisplayManagement from './DisplayManagement/DisplayManagement.jsx'
+import FlashSaleManagement from './FlashSaleManagement/FlashSaleManagement.jsx'
+import FooterManagement from './FooterManagement/FooterManagement.jsx'
+import HeaderManagement from './HeaderManagement/HeaderManagement.jsx'
+import FeaturedCategoryManagement from '~/pages/admin/MarketingManagement/FeaturedCategoryManagement/FeaturedCategoryManagement.jsx'
+import ServiceHighlightManagement from '~/pages/admin/MarketingManagement/ServiceHighlightManagement/ServiceHighlightManagement.jsx'
 
 function a11yProps(index) {
   return {
@@ -70,7 +70,7 @@ const MarketingManagement = () => {
             gap: 2
           }}
         >
-          <LocalOfferIcon sx={{ fontSize: 40, color: '#3b82f6' }} />
+          <LocalOfferIcon sx={{ fontSize: 40, color: '#1A3C7B' }} />
           Quản lý các chiến dịch Marketing
         </Typography>
       </Box>
@@ -95,17 +95,17 @@ const MarketingManagement = () => {
                 textTransform: 'none',
                 fontWeight: 600,
                 fontSize: '1rem',
-                color: '#64748b',
+                color: '#1A3C7B',
                 borderRadius: 2,
                 transition: 'all 0.3s ease',
                 '&:hover': {
-                  backgroundColor: alpha(theme.palette.primary.main, 0.08),
-                  color: theme.palette.primary.main
+                  backgroundColor: '#ffff',
+                  color: '#1A3C7B'
                 }
               },
               '& .Mui-selected': {
                 backgroundColor: alpha(theme.palette.primary.main, 0.12),
-                color: theme.palette.primary.main,
+                color: '#4575cc',
                 fontWeight: 700
               },
               '& .MuiTabs-indicator': {

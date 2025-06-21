@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import {
   Box,
   Button,
@@ -23,7 +23,8 @@ import {
   Edit as EditIcon,
   Delete as DeleteIcon,
   Star as StarIcon,
-  Image as ImageIcon
+  Image as ImageIcon,
+  Refresh as RefreshIcon
 } from '@mui/icons-material'
 
 const mockServiceHighlights = [
@@ -55,6 +56,7 @@ const mockServiceHighlights = [
 
 const ServiceHighlightManagement = () => {
   const theme = useTheme()
+  const [refreshing, setRefreshing] = useState(false)
 
   const summaryData = [
     {
@@ -71,6 +73,14 @@ const ServiceHighlightManagement = () => {
     }
   ]
 
+  const handleRefresh = async () => {
+    setRefreshing(true)
+    // Simulate refresh delay
+    setTimeout(() => {
+      setRefreshing(false)
+    }, 1000)
+  }
+
   return (
     <Box sx={{ p: 3, backgroundColor: '#f8fafc', minHeight: '100vh' }}>
       {/* Header */}
@@ -86,7 +96,7 @@ const ServiceHighlightManagement = () => {
             gap: 2
           }}
         >
-          <StarIcon sx={{ fontSize: 40, color: '#3b82f6' }} />
+          <StarIcon sx={{ fontSize: 40, color: '#1A3C7B' }} />
           Quản lý Dịch vụ Nổi bật
         </Typography>
         <Typography variant='body1' color='text.secondary'>
@@ -148,8 +158,8 @@ const ServiceHighlightManagement = () => {
         ))}
       </Grid>
 
-      {/* Action Button */}
-      <Box sx={{ mb: 3, display: 'flex', justifyContent: 'flex-end' }}>
+      {/* Action Buttons */}
+      <Box sx={{ mb: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <Button
           variant='contained'
           startIcon={<AddIcon />}
@@ -160,7 +170,7 @@ const ServiceHighlightManagement = () => {
             textTransform: 'none',
             fontSize: '1rem',
             fontWeight: 600,
-            background: 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)',
+            background: 'linear-gradient(135deg,rgb(17, 58, 122) 0%,rgb(11, 49, 156) 100%)',
             boxShadow: '0 4px 16px rgba(59, 130, 246, 0.3)',
             '&:hover': {
               background: 'linear-gradient(135deg, #2563eb 0%, #1e40af 100%)',
@@ -170,6 +180,20 @@ const ServiceHighlightManagement = () => {
           }}
         >
           Thêm dịch vụ mới
+        </Button>
+        
+        <Button
+          variant="outlined"
+          startIcon={<RefreshIcon />}
+          onClick={handleRefresh}
+          disabled={refreshing}
+          sx={{
+            borderRadius: 2,
+            textTransform: 'none',
+            fontWeight: 600
+          }}
+        >
+          {refreshing ? 'Đang tải...' : 'Làm mới'}
         </Button>
       </Box>
 
