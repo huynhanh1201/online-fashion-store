@@ -224,6 +224,7 @@ const EditProductModal = ({ open, onClose, onSave, product }) => {
         categoryId: product.categoryId?._id || product.categoryId || '',
         price: product.exportPrice || '',
         importPrice: product.importPrice || '',
+        status: product.status || 'draft',
         packageSize: {
           length: product.packageSize?.length || '',
           width: product.packageSize?.width || '',
@@ -640,7 +641,6 @@ const EditProductModal = ({ open, onClose, onSave, product }) => {
                     <Chip
                       key={item.value}
                       label={item.label}
-                      defaultValue={item.value || 'draft'}
                       onClick={() => setValue('status', item.value)}
                       variant={isSelected ? 'filled' : 'outlined'}
                       clickable

@@ -134,10 +134,10 @@ export const getProductById = async (productId) => {
     const response = await AuthorizedAxiosInstance.get(
       `${API_ROOT}/v1/products/${productId}`
     )
-    return response.data || {}
+    return response.data || []
   } catch (error) {
     console.error('Lỗi khi lấy sản phẩm:', error.response?.data || error)
-    return {}
+    return []
   }
 }
 

@@ -273,7 +273,7 @@ const OrderTable = ({
             ) : orders.length > 0 ? (
               orders.map((order, index) => (
                 <OrderRow
-                  key={order._id}
+                  key={order._id || index}
                   order={order}
                   index={page * rowsPerPage + index + 1}
                   columns={columns}

@@ -13,7 +13,8 @@ import {
   Tooltip,
   Checkbox,
   FormControlLabel,
-  Grid
+  Grid,
+  Chip
 } from '@mui/material'
 import { useForm, Controller } from 'react-hook-form'
 import { toast } from 'react-toastify'
@@ -64,6 +65,7 @@ const EditVariantModal = ({
       overridePrice: false,
       overridePackageSize: false,
       colorImage: '',
+      status: 'draft',
       packageSize: {
         length: '',
         width: '',
@@ -86,6 +88,7 @@ const EditVariantModal = ({
         overridePrice: variant.overridePrice || false,
         overridePackageSize: variant.overridePackageSize || false,
         colorImage: variant.color?.image || '',
+        status: variant.status || 'draft',
         packageSize: {
           length: variant.packageSize?.length || '',
           width: variant.packageSize?.width || '',
@@ -118,6 +121,7 @@ const EditVariantModal = ({
         color: {
           image: data.colorImage
         },
+        status: data.status || 'draft',
         packageSize: data.overridePackageSize
           ? {
               length: Number(data.packageSize.length),
@@ -159,7 +163,7 @@ const EditVariantModal = ({
             sx={{
               position: 'relative',
               width: 403,
-              height: 444,
+              height: 530,
               border: '1px dashed #ccc',
               backgroundColor: '#f9f9f9',
               borderRadius: 2,
@@ -491,6 +495,39 @@ const EditVariantModal = ({
                 </Box>
               </Box>
             </Box>
+            {/*Trạng thái sản phẩm*/}
+            <Grid item size={12}>
+              <Box>
+                <Typography variant='h6'>Trạng thái biến thể</Typography>
+                <Box sx={{ display: 'flex', gap: 1, mt: 1 }}>
+                  {[
+                    { label: 'Bản nháp', value: 'draft' },
+                    { label: 'Hoạt động', value: 'active' },
+                    { label: 'Không hoạt động', value: 'inactive' }
+                  ].map((item) => {
+                    const isSelected = watch('status') === item.value
+                    return (
+                      <Chip
+                        key={item.value}
+                        label={item.label}
+                        onClick={() => setValue('status', item.value)}
+                        variant={isSelected ? 'filled' : 'outlined'}
+                        clickable
+                        sx={{
+                          ...(isSelected && {
+                            backgroundColor: '#001f5d',
+                            color: '#fff',
+                            '&:hover': {
+                              backgroundColor: '#001f5d'
+                            }
+                          })
+                        }}
+                      />
+                    )
+                  })}
+                </Box>
+              </Box>
+            </Grid>
           </Box>
         </DialogContent>
         <Divider />

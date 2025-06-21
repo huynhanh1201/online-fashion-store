@@ -90,6 +90,9 @@ export default function AdminDrawer({
     staff: 'Nhân viên quản lý',
     customer: 'Khách hàng'
   }
+
+  const profileName = profile?.name || 'Không có dữ liệu'
+
   if (!open) {
     return (
       <Box
@@ -217,13 +220,13 @@ export default function AdminDrawer({
       >
         <Avatar
           src={optimizeCloudinaryUrl(profile?.avatarUrl)}
-          alt={profile?.name}
+          alt={profileName}
           sx={{ width: 48, height: 48, mr: 2 }}
         />
         <Box>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
             <Typography fontWeight='bold' fontSize={14}>
-              {profile?.name
+              {profileName
                 ?.toLowerCase()
                 .split(' ')
                 .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
