@@ -61,7 +61,6 @@ export const ROLE_PERMISSIONS = {
     'order:create',
     'order:read',
     'order:update',
-    'order:delete',
 
     // Payment Transaction
     'payment:read',

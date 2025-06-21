@@ -269,13 +269,6 @@ const OrderRow = ({ order, index, columns, onView, onEdit, onDelete }) => {
                     </IconButton>
                   </Tooltip>
                 )}
-                {hasPermission('order:delete') && (
-                  <Tooltip title='Xóa'>
-                    <IconButton onClick={() => onDelete(order)} size='small'>
-                      <VisibilityOffIcon color='error' />
-                    </IconButton>
-                  </Tooltip>
-                )}
               </Stack>
             )
             break
