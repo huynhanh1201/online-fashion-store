@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { Box, Button } from '@mui/material'
 import dayjs from 'dayjs'
 import FilterSelect from '~/components/FilterAdmin/common/FilterSelect'
@@ -19,13 +19,17 @@ export default function FilterWarehouseSlip({
   const [type, setType] = useState('')
   const [createdBy, setCreatedBy] = useState('')
   const [status, setStatus] = useState('')
-  const [sort, setSort] = useState('')
+  const [sort, setSort] = useState('newest')
   const [selectedFilter, setSelectedFilter] = useState('')
   const [startDate, setStartDate] = useState(dayjs().format('YYYY-MM-DD'))
   const [endDate, setEndDate] = useState(dayjs().format('YYYY-MM-DD'))
-
+  const hasMounted = useRef(false)
   useEffect(() => {
-    applyFilters()
+    if (hasMounted.current) {
+      applyFilters()
+    } else {
+      hasMounted.current = true
+    }
   }, [code, warehouseId, type, createdBy, status, sort])
 
   const handleSearch = () => {
@@ -100,7 +104,7 @@ export default function FilterWarehouseSlip({
     setStartDate(dayjs().format('YYYY-MM-DD'))
     setEndDate(dayjs().format('YYYY-MM-DD'))
     onFilter({})
-    fetchData?.()
+    // fetchData?.()
   }
 
   return (

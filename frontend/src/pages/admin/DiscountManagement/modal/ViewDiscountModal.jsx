@@ -82,9 +82,9 @@ const ViewDiscountModal = ({ open, onClose, discount }) => {
               <TableCell>
                 <Chip
                   label={
-                    discount.isActive ? 'Đang hoạt động' : 'Không hoạt động'
+                    !discount.isActive ? 'Đang hoạt động' : 'Không hoạt động'
                   }
-                  color={discount.isActive ? 'success' : 'error'}
+                  color={!discount.isActive ? 'success' : 'error'}
                   size='large'
                   sx={{ width: '127px', fontWeight: '800' }}
                 />

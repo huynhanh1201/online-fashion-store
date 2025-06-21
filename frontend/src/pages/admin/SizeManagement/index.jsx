@@ -6,7 +6,6 @@ import SizeTable from './SizeTable.jsx'
 import SizePagination from './SizePagination'
 
 import useSizes from '~/hooks/admin/useSize'
-import { updateSize, deleteSize } from '~/services/admin/sizeService'
 
 // Lazy load các modal
 const AddSizeModal = React.lazy(() => import('./modal/AddSizeModal'))
@@ -17,7 +16,10 @@ const DeleteSizeModal = React.lazy(() => import('./modal/DeleteSizeModal'))
 const SizeManagement = () => {
   const [page, setPage] = React.useState(1)
   const [limit, setLimit] = React.useState(10) // Giới hạn số lượng kích thước trên mỗi trang
-  const [filters, setFilters] = React.useState('') // Bộ lọc tìm kiếm
+  const [filters, setFilters] = React.useState({
+    status: 'false',
+    sort: 'newest'
+  }) // Bộ lọc tìm kiếm
   const [selectedSize, setSelectedSize] = React.useState(null)
   const [modalType, setModalType] = React.useState(null)
 
@@ -85,7 +87,7 @@ const SizeManagement = () => {
   const handleSave = async (data, type, id) => {
     try {
       if (type === 'add') {
-        await createNewSize(data)
+        await createNewSize(data, filters)
       } else if (type === 'edit') {
         await update(id, data)
       } else if (type === 'delete') {

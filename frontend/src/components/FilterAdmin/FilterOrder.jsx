@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import {
   Box,
   Button,
@@ -32,9 +32,14 @@ export default function FilterOrder({
   const [startDate, setStartDate] = useState(dayjs().format('YYYY-MM-DD'))
   const [endDate, setEndDate] = useState(dayjs().format('YYYY-MM-DD'))
   const [userInput, setUserInput] = useState('')
-  const [sort, setSort] = useState('')
+  const [sort, setSort] = useState('newest')
+  const hasMounted = useRef(false)
   useEffect(() => {
-    applyFilters()
+    if (hasMounted.current) {
+      applyFilters()
+    } else {
+      hasMounted.current = true
+    }
   }, [keyword, userId, status, sort, paymentMethod, paymentStatus])
 
   const handleSearch = () => {
@@ -119,7 +124,7 @@ export default function FilterOrder({
     setStartDate(dayjs().format('YYYY-MM-DD'))
     setEndDate(dayjs().format('YYYY-MM-DD'))
     onFilter({})
-    fetchOrders()
+    // fetchOrders()
   }
 
   return (

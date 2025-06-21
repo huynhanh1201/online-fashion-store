@@ -351,14 +351,14 @@ export default function AdminDrawer({
                   icon: <ReceiptLongIcon />
                 },
                 {
-                  label: 'Quản lý mã giảm giá',
-                  path: '/admin/discount-management',
-                  icon: <LocalOfferIcon />
-                },
-                {
                   label: 'Quản lý giao dịch',
                   path: '/admin/transaction-management',
                   icon: <PaymentIcon />
+                },
+                {
+                  label: 'Quản lý mã giảm giá',
+                  path: '/admin/discount-management',
+                  icon: <LocalOfferIcon />
                 }
               ].map((item) => (
                 <Link

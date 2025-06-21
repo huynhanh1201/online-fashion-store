@@ -51,7 +51,9 @@ export default function AddWarehouseSlipModal({
   partners,
   addWarehouseSlip,
   addPartner,
-  addWarehouse
+  addWarehouse,
+  onCloseStock,
+  filter
 }) {
   const [isEditing, setIsEditing] = useState(false)
   const [openAddDialog, setOpenAddDialog] = useState(false)
@@ -183,11 +185,12 @@ export default function AddWarehouseSlipModal({
         })),
         note: newSlipData.note || ''
       }
-      await addWarehouseSlip(formattedData)
+      await addWarehouseSlip(formattedData, filter)
       setErrorMessage(
         `Tạo phiếu ${type === 'input' ? 'nhập' : 'xuất'} kho thành công!`
       )
       setSnackbarOpen(true)
+      if (onCloseStock) onCloseStock('updated')
       onClose()
     } catch (error) {
       setErrorMessage(
@@ -243,7 +246,7 @@ export default function AddWarehouseSlipModal({
             {/*  </Button>*/}
             {/*)}*/}
             <Button
-              onClick={onClose}
+              onClick={onClose || onCloseStock}
               sx={{ textTransform: 'none' }}
               variant='outlined'
               color='error'

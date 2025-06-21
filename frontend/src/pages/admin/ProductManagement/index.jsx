@@ -150,7 +150,10 @@ const ProductManagement = () => {
   const [limit, setLimit] = React.useState(10)
   const [modalType, setModalType] = React.useState(null)
   const [selectedProduct, setSelectedProduct] = React.useState(null)
-  const [filters, setFilters] = React.useState({})
+  const [filters, setFilters] = React.useState({
+    status: 'false',
+    sort: 'newest'
+  })
   const {
     products,
     fetchProducts,
@@ -233,7 +236,7 @@ const ProductManagement = () => {
   const handleSave = async (data, type, id) => {
     try {
       if (type === 'add') {
-        await createNewProduct(data)
+        await createNewProduct(data, filters)
       } else if (type === 'edit') {
         await updateProductById(id, data)
       } else if (type === 'delete') {

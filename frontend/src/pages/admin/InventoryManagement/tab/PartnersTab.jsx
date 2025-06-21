@@ -86,7 +86,10 @@ const PartnersTab = () => {
   const [selectedPartner, setSelectedPartner] = useState(null)
   const [page, setPage] = useState(1)
   const [rowsPerPage, setRowsPerPage] = useState(10)
-  const [filter, setFilter] = useState({})
+  const [filter, setFilter] = useState({
+    status: 'false',
+    sort: 'newest'
+  })
 
   useEffect(() => {
     fetchPartners(page, rowsPerPage, filter)
@@ -140,7 +143,7 @@ const PartnersTab = () => {
 
   const handleSave = async (partner, type, partnerId) => {
     if (type === 'add') {
-      await createNewPartner(partner)
+      await createNewPartner(partner, filter)
     } else if (type === 'edit') {
       await updateExistingPartner(partnerId, partner)
     } else if (type === 'delete') {

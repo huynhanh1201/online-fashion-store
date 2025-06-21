@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { Box, Button } from '@mui/material'
 import dayjs from 'dayjs'
 import FilterByTime from '~/components/FilterAdmin/common/FilterByTime.jsx'
@@ -16,11 +16,15 @@ export default function FilterSize({
   const [selectedFilter, setSelectedFilter] = useState('')
   const [startDate, setStartDate] = useState(dayjs().format('YYYY-MM-DD'))
   const [endDate, setEndDate] = useState(dayjs().format('YYYY-MM-DD'))
-  const [status, setStatus] = useState('')
-  const [sort, setSort] = useState('')
-
+  const [status, setStatus] = useState('false')
+  const [sort, setSort] = useState('newest')
+  const hasMounted = useRef(false)
   useEffect(() => {
-    applyFilters(selectedFilter, startDate, endDate)
+    if (hasMounted.current) {
+      applyFilters(selectedFilter, startDate, endDate)
+    } else {
+      hasMounted.current = true
+    }
   }, [keyword, status, sort])
 
   const handleApplyTimeFilter = (selected) => {
@@ -70,7 +74,7 @@ export default function FilterSize({
     setEndDate(dayjs().format('YYYY-MM-DD'))
     setStatus('')
     onFilter({})
-    fetchSizes(1, 10) // Reset lại dữ liệu
+    // fetchSizes(1, 10) // Reset lại dữ liệu
   }
 
   return (

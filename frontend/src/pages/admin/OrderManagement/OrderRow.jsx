@@ -146,7 +146,7 @@ import { Tooltip } from '@mui/material'
 const styles = {
   groupIcon: {
     display: 'flex',
-    justifyContent: 'center',
+    justifyContent: 'start',
     alignItems: 'center',
     gap: 1,
     width: '130px'
