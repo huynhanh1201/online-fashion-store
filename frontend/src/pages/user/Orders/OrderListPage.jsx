@@ -33,7 +33,7 @@ import {
   Warning,
   Sync
 } from '@mui/icons-material'
-import ScheduleIcon from '@mui/icons-material/Schedule';
+import ScheduleIcon from '@mui/icons-material/Schedule'
 import { getOrders, getOrderItems } from '~/services/orderService'
 import { useOrder } from '~/hooks/useOrder'
 import { useNavigate } from 'react-router-dom'
@@ -386,19 +386,22 @@ const OrderRow = ({ order, onOrderUpdate }) => {
                   Mua lại
                 </Button>
               ) : (
-                <Button
-                  variant="outlined"
-                  color="error"
-                  startIcon={<Cancel />}
-                  onClick={() => setOpenCancelModal(true)}
-                  sx={{
-                    borderRadius: 2,
-                    textTransform: 'none',
-                    fontWeight: 600
-                  }}
-                >
-                  Hủy đơn
-                </Button>
+                // Chỉ hiển thị nút "Hủy đơn" với các trạng thái có thể hủy
+                (order.status === 'Pending' || order.status === 'Processing') && (
+                  <Button
+                    variant="outlined"
+                    color="error"
+                    startIcon={<Cancel />}
+                    onClick={() => setOpenCancelModal(true)}
+                    sx={{
+                      borderRadius: 2,
+                      textTransform: 'none',
+                      fontWeight: 600
+                    }}
+                  >
+                    Hủy đơn
+                  </Button>
+                )
               )}
             </Box>
           </Box>
@@ -421,26 +424,62 @@ const OrderRow = ({ order, onOrderUpdate }) => {
 const OrderListPage = () => {
   const [orders, setOrders] = useState([])
   const [loading, setLoading] = useState(true)
+  const [loadingMore, setLoadingMore] = useState(false)
+  const [tabLoading, setTabLoading] = useState(false)
   const [selectedTab, setSelectedTab] = useState('All')
+  const [currentPage, setCurrentPage] = useState(1)
+  const [hasMore, setHasMore] = useState(true)
+  const [totalPages, setTotalPages] = useState(1)
   const currentUser = useSelector(selectCurrentUser)
   const userId = currentUser?._id
 
-  const fetchOrders = async () => {
+  const fetchOrders = async (page = 1, isLoadMore = false, isTabChange = false) => {
     if (!userId) return
     try {
-      setLoading(true)
-      const orders = await getOrders(userId)
-      console.log('Fetched orders:', orders)   // 👈 Kiểm tra ở console
-      setOrders(orders)
+      if (isLoadMore) {
+        setLoadingMore(true)
+      } else if (isTabChange) {
+        setTabLoading(true)
+        setCurrentPage(1)
+      } else {
+        setLoading(true)
+        setCurrentPage(1)
+      }
+
+      const response = await getOrders(userId, page, 10, selectedTab)
+      console.log('Fetched orders:', response)
+
+      if (isLoadMore) {
+        setOrders(prev => [...prev, ...response.data])
+      } else {
+        setOrders(response.data)
+      }
+
+      setTotalPages(response.meta.totalPages)
+      setHasMore(page < response.meta.totalPages)
+      setCurrentPage(page)
     } catch (error) {
       console.error('Lỗi khi lấy đơn hàng:', error)
+      if (!isLoadMore) {
+        setOrders([])
+      }
     } finally {
       setLoading(false)
+      setLoadingMore(false)
+      setTabLoading(false)
     }
   }
 
   useEffect(() => {
-    fetchOrders()
+    if (userId) {
+      fetchOrders(1, false, true) // isTabChange = true
+    }
+  }, [selectedTab])
+
+  useEffect(() => {
+    if (userId) {
+      fetchOrders()
+    }
   }, [userId])
 
   // Handle tab change
@@ -448,15 +487,15 @@ const OrderListPage = () => {
     setSelectedTab(newValue)
   }
 
-  // Filter orders based on selected tab
-  const filteredOrders = Array.isArray(orders)
-    ? selectedTab === 'All'
-      ? orders
-      : orders.filter((order) => order.status === selectedTab)
-    : []
+  // Handle load more
+  const handleLoadMore = () => {
+    if (hasMore && !loadingMore) {
+      fetchOrders(currentPage + 1, true)
+    }
+  }
 
-  // Reverse the filtered orders to show newest at the top
-  const reversedOrders = [...filteredOrders].reverse()
+  // Orders are already sorted by newest first from backend, no need to reverse
+  const displayOrders = Array.isArray(orders) ? orders : []
 
   if (loading) {
     return (
@@ -540,7 +579,7 @@ const OrderListPage = () => {
       </Paper>
 
       {/* Order List */}
-      {reversedOrders.length === 0 ? (
+      {displayOrders.length === 0 ? (
         <Paper
           sx={{
             p: 6,
@@ -562,11 +601,67 @@ const OrderListPage = () => {
           </Typography>
         </Paper>
       ) : (
-        <Stack spacing={3}>
-          {reversedOrders.map((order) => (
-            <OrderRow key={order._id} order={order} onOrderUpdate={fetchOrders} />
-          ))}
-        </Stack>
+        <>
+          <Box position="relative">
+            {/* Tab Loading Overlay */}
+            {tabLoading && (
+              <Box
+                position="absolute"
+                top={0}
+                left={0}
+                right={0}
+                bottom={0}
+                display="flex"
+                alignItems="center"
+                justifyContent="center"
+                bgcolor="rgba(255, 255, 255, 0.8)"
+                zIndex={1}
+                borderRadius={3}
+              >
+                <Box display="flex" flexDirection="column" alignItems="center" gap={2}>
+                  <CircularProgress size={40} />
+                  <Typography variant="body2" color="text.secondary">
+                    Đang tải đơn hàng...
+                  </Typography>
+                </Box>
+              </Box>
+            )}
+
+            <Stack spacing={3} sx={{ opacity: tabLoading ? 0.5 : 1, transition: 'opacity 0.3s ease' }}>
+              {displayOrders.map((order) => (
+                <OrderRow key={order._id} order={order} onOrderUpdate={() => fetchOrders()} />
+              ))}
+            </Stack>
+          </Box>
+
+          {/* Load More Button */}
+          {hasMore && !tabLoading && (
+            <Box display="flex" justifyContent="center" mt={4}>
+              <Button
+                variant="outlined"
+                size="large"
+                onClick={handleLoadMore}
+                disabled={loadingMore}
+                startIcon={loadingMore ? <CircularProgress size={20} /> : null}
+                sx={{
+                  borderRadius: 3,
+                  textTransform: 'none',
+                  fontWeight: 600,
+                  px: 4,
+                  py: 1.5,
+                  borderColor: '#1a3c7b',
+                  color: '#1a3c7b',
+                  '&:hover': {
+                    borderColor: '#1a3c7b',
+                    backgroundColor: 'rgba(26, 60, 123, 0.04)'
+                  }
+                }}
+              >
+                {loadingMore ? 'Đang tải...' : 'Xem thêm đơn hàng'}
+              </Button>
+            </Box>
+          )}
+        </>
       )}
     </Container>
   )

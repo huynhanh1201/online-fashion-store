@@ -299,15 +299,10 @@ const ProductItem = ({ name, price, quantity, image, color, size }) => {
         </Box>
       </td>
       <td style={{ textAlign: 'center' }}>
-        <Chip
-          label={quantity}
-          color="primary"
-          sx={{
-            backgroundColor: '#1A3C7B',
-            color: 'white',
-            fontWeight: 600
-          }}
-        />
+        <Typography fontWeight={600} sx={{ mb: 0.5 }}>
+          {quantity}
+        </Typography>
+
       </td>
       <td style={{ textAlign: 'right' }}>
         <Typography fontWeight={600} color="#1A3C7B">
@@ -912,35 +907,59 @@ const Payment = () => {
                   </Box>
                 ) : (
                   <Box sx={{ mb: 3 }}>
-                    <ProductTable>
-                      <thead>
-                        <tr>
-                          <th style={{ textAlign: 'left' }}>Sản phẩm</th>
-                          <th style={{ textAlign: 'center' }}>SL</th>
-                          <th style={{ textAlign: 'right' }}>Thành tiền</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {selectedCartItems.map((item, index) => {
-                          const variant = cartItems.find(cartItem =>
-                            String(cartItem.variantId?._id || cartItem.variantId) === item.variantId &&
-                            cartItem.color === item.color &&
-                            cartItem.size === item.size
-                          )?.variantId || {}
-                          return (
-                            <ProductItem
-                              key={index}
-                              name={variant.name || 'Sản phẩm không tên'}
-                              price={variant.exportPrice || 0}
-                              quantity={item.quantity || 1}
-                              image={variant.color?.image}
-                              color={variant.color?.name}
-                              size={variant.size?.name}
-                            />
-                          )
-                        })}
-                      </tbody>
-                    </ProductTable>
+                    <Box
+                      sx={{
+                        maxHeight: '400px',
+                        overflowY: 'auto',
+                        border: '1px solid #f0f0f0',
+                        borderRadius: '12px',
+                        paddingRight: '12px',
+                        '&::-webkit-scrollbar': {
+                          width: '8px',
+                        },
+                        '&::-webkit-scrollbar-track': {
+                          background: '#f1f1f1',
+                          borderRadius: '4px',
+                        },
+                        '&::-webkit-scrollbar-thumb': {
+                          background: '#1A3C7B',
+                          borderRadius: '4px',
+                          '&:hover': {
+                            background: '#2c5aa0',
+                          },
+                        },
+                      }}
+                    >
+                      <ProductTable>
+                        <thead>
+                          <tr>
+                            <th style={{ textAlign: 'left' }}>Sản phẩm</th>
+                            <th style={{ textAlign: 'center' }}>SL</th>
+                            <th style={{ textAlign: 'right' }}>Thành tiền</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {selectedCartItems.map((item, index) => {
+                            const variant = cartItems.find(cartItem =>
+                              String(cartItem.variantId?._id || cartItem.variantId) === item.variantId &&
+                              cartItem.color === item.color &&
+                              cartItem.size === item.size
+                            )?.variantId || {}
+                            return (
+                              <ProductItem
+                                key={index}
+                                name={variant.name || 'Sản phẩm không tên'}
+                                price={variant.exportPrice || 0}
+                                quantity={item.quantity || 1}
+                                image={variant.color?.image}
+                                color={variant.color?.name}
+                                size={variant.size?.name}
+                              />
+                            )
+                          })}
+                        </tbody>
+                      </ProductTable>
+                    </Box>
                   </Box>
                 )}
 
@@ -1008,15 +1027,26 @@ const Payment = () => {
                   ) : (
                     <Box
                       sx={{
-                        maxWidth: 600,
+                        maxWidth: 500,
                         overflowX: 'auto',
                         display: 'flex',
+                        mx: 'auto',
                         gap: 2,
-                        pb: 1,
-                        '&::-webkit-scrollbar': { height: 8 },
+                        pb: 2,
+                        paddingBottom: '12px',
+                        '&::-webkit-scrollbar': {
+                          height: '8px'
+                        },
+                        '&::-webkit-scrollbar-track': {
+                          background: '#f1f1f1',
+                          borderRadius: '4px',
+                        },
                         '&::-webkit-scrollbar-thumb': {
-                          backgroundColor: '#ccc',
-                          borderRadius: 3
+                          backgroundColor: '#1A3C7B',
+                          borderRadius: '4px',
+                          '&:hover': {
+                            backgroundColor: '#2c5aa0',
+                          },
                         }
                       }}
                     >
