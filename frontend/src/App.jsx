@@ -141,6 +141,7 @@ function App() {
           />
           <Route path='warehouses-management' element={<WarehousesTab />} />
           <Route path='batches-management' element={<BatchesTab />} />
+          {/*<Route path='content-management' element={<ContentManegement />} />*/}
         </Route>
       </Route>
 

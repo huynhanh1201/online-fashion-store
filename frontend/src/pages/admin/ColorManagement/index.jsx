@@ -19,7 +19,10 @@ const ColorManagement = () => {
   const [selectedColor, setSelectedColor] = React.useState(null)
   const [limit, setLimit] = React.useState(10) // Giới hạn số lượng màu hiển thị mỗi trang
   const [modalType, setModalType] = React.useState(null)
-  const [filters, setFilters] = React.useState({})
+  const [filters, setFilters] = React.useState({
+    status: 'false',
+    sort: 'newest'
+  })
   const {
     colors,
     totalPages,
@@ -83,7 +86,7 @@ const ColorManagement = () => {
   const handleSave = async (data, type, id) => {
     try {
       if (type === 'add') {
-        await createNewColor(data)
+        await createNewColor(data, filters)
       } else if (type === 'edit') {
         await update(id, data)
       } else if (type === 'delete') {

@@ -19,11 +19,10 @@ const statusOptions = [
   'Pending',
   'Processing',
   'Shipped',
-  'Shipping',
   'Delivered',
   'Cancelled'
 ]
-
+// [Pending, Processing, Shipped, Delivered, Cancelled]
 const translateStatus = (status) => {
   switch (status) {
     case 'Pending':
@@ -32,8 +31,6 @@ const translateStatus = (status) => {
       return 'Đang xử lý'
     case 'Shipped':
       return 'Đã gửi hàng'
-    case 'Shipping':
-      return 'Đang giao hàng'
     case 'Delivered':
       return 'Đã giao hàng'
     case 'Cancelled':
@@ -67,8 +64,14 @@ const EditOrderModal = ({ open, onClose, order, onUpdate, loading }) => {
   }, [order, reset])
 
   const onSubmit = (data) => {
-    if (order?._id) {
-      onUpdate(order._id, data)
+    try {
+      if (order?._id) {
+        onUpdate(order._id, data)
+      } else {
+        console.error('Không có ID đơn hàng để cập nhật')
+      }
+    } catch (error) {
+      console.error('Lỗi cập nhật đơn hàng:', error)
     }
   }
 

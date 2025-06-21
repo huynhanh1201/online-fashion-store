@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { Box, Button } from '@mui/material'
 import dayjs from 'dayjs'
 import FilterSelect from '~/components/FilterAdmin/common/FilterSelect'
@@ -18,18 +18,22 @@ export default function FilterBatches({
   const [inputValue, setInputValue] = useState('')
   const [variantId, setVariantId] = useState('')
   const [warehouseId, setWarehouseId] = useState('')
-  const [destroy, setDestroy] = useState('')
+  const [destroy, setDestroy] = useState('false')
+  const [sort, setSort] = useState('newest')
   const [selectedFilter, setSelectedFilter] = useState('')
   const [startDate, setStartDate] = useState(dayjs().format('YYYY-MM-DD'))
   const [endDate, setEndDate] = useState(dayjs().format('YYYY-MM-DD'))
-  const [sort, setSort] = useState('')
   const [quantityMin, setQuantityMin] = useState('')
   const [quantityMax, setQuantityMax] = useState('')
   const [importPriceMin, setImportPriceMin] = useState('')
   const [importPriceMax, setImportPriceMax] = useState('')
-
+  const hasMounted = useRef(false)
   useEffect(() => {
-    applyFilters()
+    if (hasMounted.current) {
+      applyFilters()
+    } else {
+      hasMounted.current = true
+    }
   }, [keyword, variantId, warehouseId, destroy, sort])
 
   const handleSearch = () => {
@@ -123,7 +127,7 @@ export default function FilterBatches({
     setStartDate(dayjs().format('YYYY-MM-DD'))
     setEndDate(dayjs().format('YYYY-MM-DD'))
     onFilter({})
-    fetchData?.()
+    // fetchData?.()
   }
 
   return (

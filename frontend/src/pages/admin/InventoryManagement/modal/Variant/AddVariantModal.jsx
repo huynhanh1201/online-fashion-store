@@ -17,7 +17,9 @@ import {
   Typography,
   Autocomplete,
   Divider,
-  Tooltip
+  Tooltip,
+  Grid,
+  Chip
 } from '@mui/material'
 import { useForm, Controller } from 'react-hook-form'
 import { toast } from 'react-toastify'
@@ -231,6 +233,7 @@ const AddVariantModal = ({
       color,
       colorImage,
       size,
+      status,
       importPrice,
       exportPrice,
       overridePrice,
@@ -269,6 +272,7 @@ const AddVariantModal = ({
         exportPrice: overridePrice ? Number(exportPrice) : productExportPrice,
         overridePrice,
         overridePackageSize,
+        status: status || 'draft',
         packageSize: finalPackageSize
       }
 
@@ -289,6 +293,7 @@ const AddVariantModal = ({
       size: '',
       importPrice: '',
       exportPrice: '',
+      status: 'draft',
       overridePrice: false,
       overridePackageSize: false,
       packageSize: {
@@ -328,7 +333,7 @@ const AddVariantModal = ({
             sx={{
               position: 'relative',
               width: 403,
-              height: 444,
+              height: 548,
               minWidth: 403,
               minHeight: 403,
               border: '1px dashed #ccc',
@@ -810,6 +815,39 @@ const AddVariantModal = ({
                 </Box>
               </Box>
             </Box>
+            {/*Trạng thái sản phẩm*/}
+            <Grid item size={12}>
+              <Box>
+                <Typography variant='h6'>Trạng thái biến thể</Typography>
+                <Box sx={{ display: 'flex', gap: 1, mt: 1 }}>
+                  {[
+                    { label: 'Bản nháp', value: 'draft' },
+                    { label: 'Hoạt động', value: 'active' },
+                    { label: 'Không hoạt động', value: 'inactive' }
+                  ].map((item) => {
+                    const isSelected = watch('status') === item.value
+                    return (
+                      <Chip
+                        key={item.value}
+                        label={item.label}
+                        onClick={() => setValue('status', item.value)}
+                        variant={isSelected ? 'filled' : 'outlined'}
+                        clickable
+                        sx={{
+                          ...(isSelected && {
+                            backgroundColor: '#001f5d',
+                            color: '#fff',
+                            '&:hover': {
+                              backgroundColor: '#001f5d'
+                            }
+                          })
+                        }}
+                      />
+                    )
+                  })}
+                </Box>
+              </Box>
+            </Grid>
           </Box>
         </DialogContent>
         <Divider />

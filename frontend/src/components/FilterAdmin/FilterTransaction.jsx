@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { Box, Button } from '@mui/material'
 import TextField from '@mui/material/TextField'
 import dayjs from 'dayjs'
@@ -17,8 +17,8 @@ export default function FilterTransaction({
   const [orderId, setOrderId] = useState('')
   const [method, setMethod] = useState('')
   const [status, setStatus] = useState('')
-  const [destroy, setDestroy] = useState('')
-  const [sort, setSort] = useState('')
+  const [destroy, setDestroy] = useState('false')
+  const [sort, setSort] = useState('newest')
 
   // Thời gian tạo
   const [selectedFilter, setSelectedFilter] = useState('')
@@ -29,9 +29,13 @@ export default function FilterTransaction({
   const [paidFilter, setPaidFilter] = useState('')
   const [paidFrom, setPaidFrom] = useState(dayjs().format('YYYY-MM-DD'))
   const [paidTo, setPaidTo] = useState(dayjs().format('YYYY-MM-DD'))
-
+  const hasMounted = useRef(false)
   useEffect(() => {
-    applyFilters(selectedFilter, startDate, endDate)
+    if (hasMounted.current) {
+      applyFilters(selectedFilter, startDate, endDate)
+    } else {
+      hasMounted.current = true
+    }
   }, [keyword, orderId, method, status, destroy, sort])
 
   const applyFilters = (selectedTime, fromDate, toDate) => {
@@ -102,7 +106,7 @@ export default function FilterTransaction({
     setPaidFrom(dayjs().format('YYYY-MM-DD'))
     setPaidTo(dayjs().format('YYYY-MM-DD'))
     onFilter({})
-    fetchTransactions(1, 10)
+    // fetchTransactions(1, 10)
   }
 
   return (

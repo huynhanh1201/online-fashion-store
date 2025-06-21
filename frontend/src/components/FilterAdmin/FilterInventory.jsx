@@ -221,7 +221,7 @@
 //   )
 // }
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { Box, Button } from '@mui/material'
 import dayjs from 'dayjs'
 import FilterSelect from '~/components/FilterAdmin/common/FilterSelect'
@@ -239,14 +239,18 @@ export default function FilterInventory({
   const [inputValue, setInputValue] = useState('')
   const [warehouseId, setWarehouseId] = useState('')
   const [status, setStatus] = useState('')
-  const [destroy, setDestroy] = useState('')
-  const [sort, setSort] = useState('')
+  const [destroy, setDestroy] = useState('false')
+  const [sort, setSort] = useState('newest')
   const [selectedFilter, setSelectedFilter] = useState('')
   const [startDate, setStartDate] = useState(dayjs().format('YYYY-MM-DD'))
   const [endDate, setEndDate] = useState(dayjs().format('YYYY-MM-DD'))
-
+  const hasMounted = useRef(false)
   useEffect(() => {
-    applyFilters(selectedFilter, startDate, endDate)
+    if (hasMounted.current) {
+      applyFilters(selectedFilter, startDate, endDate)
+    } else {
+      hasMounted.current = true
+    }
   }, [keyword, warehouseId, status, destroy, sort])
 
   const handleSearch = () => {
@@ -312,7 +316,7 @@ export default function FilterInventory({
     setStartDate(dayjs().format('YYYY-MM-DD'))
     setEndDate(dayjs().format('YYYY-MM-DD'))
     onFilter({})
-    fetchInventories(1, 10)
+    // fetchInventories(1, 10)
   }
 
   return (

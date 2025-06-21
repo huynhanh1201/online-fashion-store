@@ -36,7 +36,6 @@ const ViewVariantModal = ({ open, onClose, variant }) => {
   }
   const VariantName = variant?.name || 'Không có tên biến thể'
   const variantColorName = variant?.color?.name || 'Không có màu sắc'
-  console.log(variant)
   return (
     <Dialog
       open={open}

@@ -50,17 +50,36 @@ const usePartner = () => {
     }
   }
 
-  const createNewPartner = async (data) => {
+  const createNewPartner = async (data, filters = {}) => {
     try {
       const newPartner = await createPartner(data)
+      if (!newPartner) {
+        console.error('Không thể tạo đối tác mới')
+        return null
+      }
+
       setPartners((prev) => {
-        const updated = [newPartner, ...prev]
-        return updated.slice(0, 10) // Keep only the 10 most recent partners
+        const sort = filters?.sort
+        let updated = [...prev]
+
+        if (sort === 'newest') {
+          updated = [newPartner, ...prev].slice(0, 10)
+        } else if (sort === 'oldest') {
+          if (prev.length < 10) {
+            updated = [...prev, newPartner]
+          }
+          // Đủ 10 phần tử thì không thêm
+        } else {
+          updated = [newPartner, ...prev].slice(0, 10)
+        }
+
+        return updated
       })
+
       setTotal((prev) => prev + 1)
       return newPartner
     } catch (error) {
-      console.error('Error creating new partner:', error)
+      console.error('Lỗi khi tạo đối tác mới:', error)
       return null
     }
   }

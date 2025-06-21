@@ -187,7 +187,7 @@
 //   )
 // }
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { Box, Button } from '@mui/material'
 import FilterByTime from '~/components/FilterAdmin/common/FilterByTime.jsx'
 import FilterByPrice from '~/components/FilterAdmin/common/FilterByPrice'
@@ -208,19 +208,22 @@ export default function FilterProduct({
   const [category, setCategory] = useState('')
   const [priceMin, setPriceMin] = useState('')
   const [priceMax, setPriceMax] = useState('')
-  const [status, setStatus] = useState('')
-  const [sort, setSort] = useState('')
+  const [status, setStatus] = useState('false')
+  const [sort, setSort] = useState('newest')
   const [selectedFilter, setSelectedFilter] = useState('')
   const [startDate, setStartDate] = useState(dayjs().format('YYYY-MM-DD'))
   const [endDate, setEndDate] = useState(dayjs().format('YYYY-MM-DD'))
-
+  const hasMounted = useRef(false)
+  useEffect(() => {
+    if (hasMounted.current) {
+      applyFilters(selectedFilter, startDate, endDate)
+    } else {
+      hasMounted.current = true
+    }
+  }, [keyword, status, category, sort, priceMin, priceMax])
   useEffect(() => {
     fetchCategories()
   }, [])
-
-  useEffect(() => {
-    applyFilters(selectedFilter, startDate, endDate)
-  }, [keyword, status, category, sort, priceMin, priceMax])
 
   const handleSearch = () => {
     setKeyword(inputValue)
@@ -287,7 +290,7 @@ export default function FilterProduct({
     setStartDate(dayjs().format('YYYY-MM-DD'))
     setEndDate(dayjs().format('YYYY-MM-DD'))
     onFilter({})
-    fetchProducts(1, 10)
+    // fetchProducts(1, 10)
   }
 
   return (

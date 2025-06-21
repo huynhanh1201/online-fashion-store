@@ -86,13 +86,32 @@ const useProducts = () => {
     }
   }
 
-  const createNewProduct = async (data) => {
+  const createNewProduct = async (data, filters = {}) => {
     try {
       const result = await addProduct(data)
+      if (!result) {
+        console.error('Không thể tạo sản phẩm mới')
+        return null
+      }
+
       setProducts((prev) => {
-        const newProducts = [result, ...prev]
-        return newProducts.slice(0, 10) // ✅ Giới hạn danh sách còn 10 item
+        const sort = filters?.sort
+        let updated = [...prev]
+
+        if (sort === 'newest') {
+          updated = [result, ...prev].slice(0, 10)
+        } else if (sort === 'oldest') {
+          if (prev.length < 10) {
+            updated = [...prev, result]
+          }
+          // Nếu đã đủ 10 thì không thêm
+        } else {
+          updated = [result, ...prev].slice(0, 10)
+        }
+
+        return updated
       })
+
       setTotal((prev) => prev + 1)
       return result
     } catch (error) {
@@ -100,6 +119,7 @@ const useProducts = () => {
       return null
     }
   }
+
   const deleteProductById = async (productId) => {
     try {
       await deleteProduct(productId)

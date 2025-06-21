@@ -146,7 +146,7 @@ import { Tooltip } from '@mui/material'
 const styles = {
   groupIcon: {
     display: 'flex',
-    justifyContent: 'center',
+    justifyContent: 'start',
     alignItems: 'center',
     gap: 1,
     width: '130px'
@@ -168,7 +168,7 @@ const styles = {
 const OrderRow = ({ order, index, columns, onView, onEdit, onDelete }) => {
   const formatDate = (date) =>
     date ? dayjs(date).format('DD/MM/YYYY') : 'Không có dữ liệu'
-
+  const orderUserId = order.userId?.name || 'không có dữ liệu'
   return (
     <TableRow hover>
       {columns.map((col) => {
@@ -184,7 +184,7 @@ const OrderRow = ({ order, index, columns, onView, onEdit, onDelete }) => {
             break
           case 'customerName':
             value =
-              order.userId?.name
+              orderUserId
                 .split(' ')
                 .map(
                   (word) =>
