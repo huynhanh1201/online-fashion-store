@@ -89,7 +89,7 @@ const FlashSaleSection = ({ products, loading, error }) => {
         ))}
       </div>
 
-      <button style={styles.viewAllButton}>Xem tất cả</button>
+      <button className='cta-button'>Xem tất cả</button>
     </section>
   )
 }

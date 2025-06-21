@@ -9,7 +9,6 @@ import {
 } from '~/services/addressService'
 import AddressTable from './AddressTable'
 import AddressDialog from './AddressDialog'
-import ViewAddressDialog from './ViewAddressDialog'
 import ConfirmDeleteDialog from './ConfirmDeleteDialog'
 import { GHN_TOKEN_API } from '~/utils/constants'
 
@@ -19,11 +18,9 @@ const VN_PHONE_REGEX = /^(0(3[2-9]|5[2-9]|7[0-9]|8[1-9]|9[0-9])[0-9]{7}|0(2[0-9]
 function ShippingAddress({ showSnackbar }) {
   const [addresses, setAddresses] = useState([])
   const [openAddressDialog, setOpenAddressDialog] = useState(false)
-  const [openViewDialog, setOpenViewDialog] = useState(false)
   const [openConfirmDialog, setOpenConfirmDialog] = useState(false)
   const [addressToDelete, setAddressToDelete] = useState(null)
   const [editAddressId, setEditAddressId] = useState(null)
-  const [viewAddress, setViewAddress] = useState(null)
   const [provinces, setProvinces] = useState([])
   const [districts, setDistricts] = useState([])
   const [wards, setWards] = useState([])
@@ -436,18 +433,6 @@ function ShippingAddress({ showSnackbar }) {
     }
   }
 
-  const handleViewAddress = (address) => {
-    if (
-      !address._id ||
-      typeof address._id !== 'string' ||
-      address._id.trim() === ''
-    ) {
-      showSnackbar?.('ID địa chỉ không hợp lệ!', 'error')
-      return
-    }
-    setViewAddress(address)
-    setOpenViewDialog(true)
-  }
 
   const handleFormChange = (field, value) => {
     setFormData((prev) => ({ ...prev, [field]: value }))
@@ -508,7 +493,6 @@ function ShippingAddress({ showSnackbar }) {
         <Divider sx={{ mb: 2 }} />
         <AddressTable
           addresses={addresses}
-          onView={handleViewAddress}
           onEdit={handleEditAddress}
           onDelete={handleDeleteAddress}
         />
@@ -539,12 +523,6 @@ function ShippingAddress({ showSnackbar }) {
         onSave={handleAddOrUpdateAddress}
         showSnackbar={showSnackbar}
         duplicateError={duplicateError}
-      />
-
-      <ViewAddressDialog
-        open={openViewDialog}
-        onClose={() => setOpenViewDialog(false)}
-        address={viewAddress}
       />
 
       <ConfirmDeleteDialog

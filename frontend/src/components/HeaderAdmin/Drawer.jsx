@@ -283,12 +283,12 @@ export default function AdminDrawer({
             </ListItem>
           </Link>
           <Link
-            to='/admin/content-management'
+            to='/admin/marketing-management'
             style={{ textDecoration: 'none', color: 'inherit' }}
           >
             <ListItem disablePadding>
               <ListItemButton
-                selected={isActive('/admin/content-management')}
+                selected={isActive('/admin/marketing-management')}
                 sx={activeButtonStyle}
               >
                 <ListItemIcon>

@@ -1,0 +1,72 @@
+/* scrollbar.css */
+
+/* Luôn hiển thị scrollbar, mảnh, màu sắc đồng bộ */
+html, body, * {
+  scrollbar-width: thin;
+  scrollbar-color: #06298a #f0f0f0;
+}
+
+/* Chrome, Edge, Safari */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 8px;
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #1a1897;
+  border-radius: 4px;
+  border: 1px solid transparent;
+  background-clip: content-box;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: #323ee4;
+}
+
+::-webkit-scrollbar-track {
+  background: #f0f0f0;
+}
+
+body {
+  scrollbar-width: thin;
+  scrollbar-color: #999 #f0f0f0;
+}
+
+/* Đảm bảo mọi vùng scroll đều có scrollbar đẹp, kể cả Popover/Menu/Portal */
+*,
+*::before,
+*::after,
+.MuiPopover-paper,
+.MuiMenu-paper,
+[role="presentation"],
+[role="menu"],
+[role="dialog"] {
+  scrollbar-width: thin !important;
+  scrollbar-color: #06298a #f0f0f0 !important;
+}
+
+.MuiPopover-paper::-webkit-scrollbar,
+.MuiMenu-paper::-webkit-scrollbar,
+[role="presentation"]::-webkit-scrollbar,
+[role="menu"]::-webkit-scrollbar,
+[role="dialog"]::-webkit-scrollbar {
+  width: 6px !important;
+  background: transparent !important;
+}
+.MuiPopover-paper::-webkit-scrollbar-thumb,
+.MuiMenu-paper::-webkit-scrollbar-thumb,
+[role="presentation"]::-webkit-scrollbar-thumb,
+[role="menu"]::-webkit-scrollbar-thumb,
+[role="dialog"]::-webkit-scrollbar-thumb {
+  background-color: #999 !important;
+  border-radius: 4px !important;
+}
+.MuiPopover-paper::-webkit-scrollbar-track,
+.MuiMenu-paper::-webkit-scrollbar-track,
+[role="presentation"]::-webkit-scrollbar-track,
+[role="menu"]::-webkit-scrollbar-track,
+[role="dialog"]::-webkit-scrollbar-track {
+  background: #f0f0f0 !important;
+}
+  
