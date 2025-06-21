@@ -222,7 +222,7 @@ const DisplayManagement = () => {
   )
 
   return (
-    <Box sx={{ p: 3, backgroundColor: '#f8fafc', minHeight: '100vh' }}>
+    <Box sx={{ p: 3, backgroundColor: '#f8fafc',borderRadius: 3, minHeight: '100vh' }}>
       <Box sx={{ mb: 4 }}>
         <Typography
           variant='h4'
@@ -236,10 +236,10 @@ const DisplayManagement = () => {
           }}
         >
           <DashboardIcon sx={{ fontSize: 40, color: '#3b82f6' }} />
-          Quản lý Banner & Hiển thị
+          Quản lý băng rôn & Hiển thị
         </Typography>
         <Typography variant='body1' color='text.secondary'>
-          Quản lý và theo dõi hiệu suất các banner quảng cáo trên website
+          Quản lý và theo dõi hiệu suất các băng rôn quảng cáo trên website
         </Typography>
       </Box>
 

@@ -136,7 +136,7 @@ const FlashSaleManagement = () => {
   ]
 
   return (
-    <Box sx={{ p: 3, backgroundColor: '#f8fafc', minHeight: '100vh' }}>
+    <Box sx={{ p: 3, backgroundColor: '#f8fafc',borderRadius: 3, minHeight: '100vh' }}>
       {/* Header */}
       <Box sx={{ mb: 4 }}>
         <Typography
@@ -151,10 +151,10 @@ const FlashSaleManagement = () => {
           }}
         >
           <OfferIcon sx={{ fontSize: 40, color: '#1A3C7B' }} />
-          Quản lý Flash Sale
+          Quản lý trương trình khuyến mãi
         </Typography>
         <Typography variant='body1' color='text.secondary'>
-          Quản lý và theo dõi các chương trình khuyến mãi flash sale
+          Quản lý và theo dõi các chương trình khuyến mãi
         </Typography>
       </Box>
 

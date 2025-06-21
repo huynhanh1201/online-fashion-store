@@ -239,7 +239,7 @@ const PromotionManagement = () => {
   )
 
   return (
-    <Box sx={{ p: 3, backgroundColor: '#f8fafc', minHeight: '100vh' }}>
+    <Box sx={{ p: 3, backgroundColor: '#f8fafc',borderRadius: 3, minHeight: '100vh' }}>
       {/* Header */}
       <Box sx={{ mb: 4 }}>
         <Typography
@@ -254,7 +254,7 @@ const PromotionManagement = () => {
           }}
         >
           <OfferIcon sx={{ fontSize: 40, color: '#1A3C7B' }} />
-          Quản lý Khuyến mãi & Voucher
+          Quản lý Khuyến mãi & Mã giảm giá
         </Typography>
         <Typography variant='body1' color='text.secondary'>
           Tạo và quản lý các chương trình khuyến mãi, mã giảm giá cho khách hàng

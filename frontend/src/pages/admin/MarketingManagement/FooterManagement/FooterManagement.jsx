@@ -119,7 +119,7 @@ const FooterManagement = () => {
   ]
 
   return (
-    <Box sx={{ p: 3, backgroundColor: '#f8fafc', minHeight: '100vh' }}>
+    <Box sx={{ p: 3, backgroundColor: '#f8fafc',borderRadius: 3, minHeight: '100vh' }}>
       {/* Header */}
       <Box sx={{ mb: 4 }}>
         <Typography
@@ -134,10 +134,10 @@ const FooterManagement = () => {
           }}
         >
           <ImageIcon sx={{ fontSize: 40, color: '#1A3C7B' }} />
-          Quản lý Footer
+          Quản lý nội dung chân trang
         </Typography>
         <Typography variant='body1' color='text.secondary'>
-          Cấu hình và quản lý nội dung footer cho website
+          Cấu hình và quản lý nội dung chân trang cho website
         </Typography>
       </Box>
 

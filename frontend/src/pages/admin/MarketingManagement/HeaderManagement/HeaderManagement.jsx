@@ -146,7 +146,7 @@ const HeaderManagement = () => {
   )
 
   return (
-    <Box sx={{ p: 3, backgroundColor: '#f8fafc', minHeight: '100vh' }}>
+    <Box sx={{ p: 3, backgroundColor: '#f8fafc',borderRadius: 3, minHeight: '100vh' }}>
       {/* Header */}
       <Box sx={{ mb: 4 }}>
         <Typography
@@ -161,10 +161,10 @@ const HeaderManagement = () => {
           }}
         >
           <ImageIcon sx={{ fontSize: 40, color: '#1A3C7B' }} />
-          Quản lý Header
+          Quản lý đầu trang
         </Typography>
         <Typography variant='body1' color='text.secondary'>
-          Cấu hình và quản lý nội dung header cho website
+          Cấu hình và quản lý nội dung đầu trang cho website
         </Typography>
       </Box>
 
