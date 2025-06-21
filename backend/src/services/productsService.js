@@ -59,7 +59,9 @@ const createProduct = async (reqBody) => {
       quantity: 0,
       destroy: false,
 
-      packageSize: reqBody.packageSize
+      packageSize: reqBody.packageSize,
+
+      status: reqBody.status
     }
 
     const product = await ProductModel.create(newProduct)
