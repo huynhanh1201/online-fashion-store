@@ -524,23 +524,9 @@ const InventoryTab = () => {
 
   const handleSave = async (inventory, type, inventoryId) => {
     if (type === 'edit') {
-      const edit = await updateInventoryById(inventoryId, inventory)
-      if (edit) {
-        const data = await getInventoryId(inventoryId)
-        if (data) {
-          Save(data)
-        }
-      }
+      await updateInventoryById(inventoryId, inventory)
     } else if (type === 'delete') {
       await deleteInventoryById(inventory)
-      fetchInventories(page, rowsPerPage, filter)
-      // const deleteInventory = await deleteInventoryById(inventory)
-      // if (deleteInventory) {
-      //   const data = await getInventoryId(inventory)
-      //   if (data) {
-      //     Save(data)
-      //   }
-      // }
     }
   }
 
@@ -736,14 +722,14 @@ const InventoryTab = () => {
                               <BorderColorIcon color='warning' />
                             </IconButton>
                           </Tooltip>
-                          <Tooltip title='Ẩn'>
-                            <IconButton
-                              onClick={() => handleDeleteInventory(row)}
-                              size='small'
-                            >
-                              <VisibilityOffIcon color='error' />
-                            </IconButton>
-                          </Tooltip>
+                          {/*<Tooltip title='Ẩn'>*/}
+                          {/*  <IconButton*/}
+                          {/*    onClick={() => handleDeleteInventory(row)}*/}
+                          {/*    size='small'*/}
+                          {/*  >*/}
+                          {/*    <VisibilityOffIcon color='error' />*/}
+                          {/*  </IconButton>*/}
+                          {/*</Tooltip>*/}
                         </Stack>
                       )
                     }

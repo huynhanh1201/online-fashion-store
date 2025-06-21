@@ -120,16 +120,7 @@ const VariantsTab = () => {
     if (type === 'add') {
       await createNewVariant(variant)
     } else if (type === 'edit') {
-      // await updateVariantById(variantId, variant)
-      const edit = await updateVariantById(variantId, variant)
-      console.log(edit)
-      if (edit) {
-        const updatedVariant = await fetchVariantId(variantId)
-        console.log('Cập nhật biến thể:', updatedVariant)
-        if (updatedVariant) {
-          Save(updatedVariant)
-        }
-      }
+      await updateVariantById(variantId, variant)
     } else if (type === 'delete') {
       await deleteVariantById(variant)
     }
@@ -321,8 +312,9 @@ const VariantsTab = () => {
                     }
                     if (format) content = format(rawValue)
                     if (id === 'color.name') {
+                      const colorName = row.color?.name || 'Không có màu sắc'
                       content =
-                        row.color?.name
+                        colorName
                           .split(' ')
                           .map(
                             (word) =>

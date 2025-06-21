@@ -33,7 +33,7 @@ const EditColorModal = ({ open, onClose, color, onSave }) => {
   }, [open, color, reset])
 
   const onSubmit = async (data) => {
-    await onSave(color._id, data)
+    await onSave(data, 'edit', color._id)
     onClose()
   }
 

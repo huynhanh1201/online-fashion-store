@@ -33,7 +33,7 @@ const EditSizeModal = ({ open, onClose, size, onSave }) => {
   }, [open, size, reset])
 
   const onSubmit = async (data) => {
-    await onSave(size._id, data)
+    await onSave(data, 'edit', size._id)
     onClose()
   }
 

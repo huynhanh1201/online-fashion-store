@@ -53,7 +53,9 @@ const product = async (req, res, next) => {
       height: Joi.number().positive().required(),
 
       weight: Joi.number().positive().required()
-    })
+    }),
+
+    status: Joi.string().valid('draft', 'active', 'inactive').default('draft')
   })
 
   try {

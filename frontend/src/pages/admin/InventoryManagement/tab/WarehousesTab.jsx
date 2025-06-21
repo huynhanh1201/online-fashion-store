@@ -93,7 +93,6 @@ const WarehousesTab = () => {
   const handleCloseEditModal = () => {
     setOpenEditModal(false)
     setSelectedWarehouse(null)
-    fetchWarehouses(page, rowsPerPage, filter)
   }
 
   const handleDeleteWarehouse = (warehouse) => {
@@ -104,8 +103,18 @@ const WarehousesTab = () => {
   const handleCloseDeleteModal = () => {
     setOpenDeleteModal(false)
     setSelectedWarehouse(null)
-    fetchWarehouses(page, rowsPerPage, filter)
   }
+
+  const handleSave = async (warehouse, type, warehouseId) => {
+    if (type === 'add') {
+      await createNewWarehouse(warehouse)
+    } else if (type === 'edit') {
+      await updateWarehouseById(warehouseId, warehouse)
+    } else if (type === 'delete') {
+      await deleteWarehouseById(warehouse)
+    }
+  }
+
   const isEqual = (obj1, obj2) => JSON.stringify(obj1) === JSON.stringify(obj2)
 
   const handleFilter = (newFilters) => {
@@ -147,29 +156,31 @@ const WarehousesTab = () => {
                       display: 'flex',
                       flexDirection: 'column',
                       gap: 1,
-                      minWidth: 250
+                      minWidth: 250,
+                      minHeight: 76.5
                     }}
                   >
                     <Typography variant='h6' sx={{ fontWeight: '800' }}>
                       Danh Sách Kho Hàng
                     </Typography>
-                    <Button
-                      variant='contained'
-                      color='primary'
-                      onClick={handleAddWarehouse}
-                      startIcon={<AddIcon />}
-                      disabled={isAddDisabled}
-                      sx={{
-                        textTransform: 'none',
-                        width: 100,
-                        display: 'flex',
-                        alignItems: 'center',
-                        backgroundColor: '#001f5d',
-                        color: '#fff'
-                      }}
-                    >
-                      Thêm
-                    </Button>
+                    {!isAddDisabled && (
+                      <Button
+                        variant='contained'
+                        color='primary'
+                        onClick={handleAddWarehouse}
+                        startIcon={<AddIcon />}
+                        sx={{
+                          textTransform: 'none',
+                          width: 100,
+                          display: 'flex',
+                          alignItems: 'center',
+                          backgroundColor: '#001f5d',
+                          color: '#fff'
+                        }}
+                      >
+                        Thêm
+                      </Button>
+                    )}
                   </Box>
                   <FilterWarehouse
                     loading={loadingWarehouse}
@@ -337,7 +348,7 @@ const WarehousesTab = () => {
       <AddWarehouseModal
         open={openAddModal}
         onClose={handleCloseAddModal}
-        onSave={createNewWarehouse}
+        onSave={handleSave}
       />
 
       <ViewWarehouseModal
@@ -350,14 +361,14 @@ const WarehousesTab = () => {
         open={openEditModal}
         onClose={handleCloseEditModal}
         warehouse={selectedWarehouse}
-        onSave={updateWarehouseById}
+        onSave={handleSave}
       />
 
       <DeleteWarehouseModal
         open={openDeleteModal}
         onClose={handleCloseDeleteModal}
         warehouse={selectedWarehouse}
-        onSave={deleteWarehouseById}
+        onSave={handleSave}
       />
     </Paper>
   )

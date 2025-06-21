@@ -4,7 +4,12 @@ const { Schema, model } = mongoose
 // Tạo schema cho Danh mục sản phẩm
 const paymentSessionDraftSchema = new Schema(
   {
-    orderId: { type: Schema.Types.Mixed },
+    orderId: {
+      type: mongoose.Types.ObjectId,
+      ref: 'Order',
+      required: true,
+      index: true
+    },
     cartItems: { type: Schema.Types.Mixed },
     variantMap: { type: Schema.Types.Mixed },
     order: { type: Schema.Types.Mixed },

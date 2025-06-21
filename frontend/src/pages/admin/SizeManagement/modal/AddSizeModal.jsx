@@ -7,10 +7,9 @@ import TextField from '@mui/material/TextField'
 import Button from '@mui/material/Button'
 import Divider from '@mui/material/Divider'
 import { useForm } from 'react-hook-form'
-import { addSize } from '~/services/admin/sizeService'
 import StyleAdmin from '~/assets/StyleAdmin.jsx'
 
-const AddSizeModal = ({ open, onClose, onAdded }) => {
+const AddSizeModal = ({ open, onClose, onAdded, onSave }) => {
   const {
     register,
     handleSubmit,
@@ -23,14 +22,13 @@ const AddSizeModal = ({ open, onClose, onAdded }) => {
       const payload = {
         name: data.name.trim()
       }
-      const result = await addSize(payload)
-      if (onAdded) onAdded()
-      if (result) {
-        onClose(result)
-        reset()
+      if (onSave) {
+        await onSave(payload)
       } else {
-        alert('Thêm kích thước thất bại. Vui lòng thử lại!')
+        await onAdded(payload, 'add')
       }
+      onClose()
+      reset()
     } catch (error) {
       console.error('Lỗi khi thêm kích thước:', error)
       alert('Thêm kích thước thất bại. Vui lòng thử lại!')

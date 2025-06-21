@@ -1,5 +1,11 @@
 import { useState } from 'react'
-import { getDiscounts, getDiscountById } from '~/services/admin/discountService'
+import {
+  getDiscounts,
+  getDiscountById,
+  updateDiscount,
+  addDiscount,
+  deleteDiscount
+} from '~/services/admin/discountService'
 
 const useDiscounts = () => {
   const [discounts, setDiscounts] = useState([])
@@ -41,6 +47,46 @@ const useDiscounts = () => {
     }
   }
 
+  const add = async (data) => {
+    try {
+      const newDiscount = await addDiscount(data)
+      setDiscounts((prev) => {
+        const updated = [newDiscount, ...prev]
+        return updated.slice(0, 10) // ✅ chỉ giữ lại 10 danh mục mới nhất
+      })
+      setTotalPages((prev) => prev + 1)
+      return newDiscount
+    } catch (err) {
+      console.error('Error adding category:', err)
+      return null
+    }
+  }
+
+  const update = async (id, data) => {
+    try {
+      const updated = await updateDiscount(id, data)
+      setDiscounts((prev) =>
+        prev.map((d) => (d._id === updated._id ? updated : d))
+      )
+      return updated
+    } catch (err) {
+      console.error('Error updating category:', err)
+      return null
+    }
+  }
+
+  const remove = async (id) => {
+    try {
+      await deleteDiscount(id)
+      setDiscounts((prev) => prev.filter((d) => d._id !== id))
+      setTotalPages((prev) => prev - 1)
+      return true
+    } catch (err) {
+      console.error('Error deleting category:', err)
+      return false
+    }
+  }
+
   const saveDiscount = (data) => {
     setDiscounts((prev) => prev.map((d) => (d._id === data._id ? data : d)))
   }
@@ -50,7 +96,10 @@ const useDiscounts = () => {
     loading,
     fetchDiscounts,
     fetchDiscountById,
-    saveDiscount
+    saveDiscount,
+    add,
+    update,
+    remove
   }
 }
 

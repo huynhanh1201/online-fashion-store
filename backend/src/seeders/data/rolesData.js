@@ -9,106 +9,55 @@ export const roles = [
       'user:update',
       'user:delete',
 
-      // Product
-      'product:create',
-      'product:read',
-      'product:update',
-      'product:delete',
-
       // Category
       'category:create',
       'category:read',
       'category:update',
       'category:delete',
 
-      // Order
-      'order:create',
-      'order:read',
-      'order:update',
-      'order:delete',
-      'orderItem:read',
+      // Product
+      'product:create',
+      'product:read',
+      'product:update',
+      'product:delete',
 
-      // Shipping Address
-      'shippingAddress:create',
-      'shippingAddress:read',
-      'shippingAddress:update',
-      'shippingAddress:delete',
+      // Variant
+      'variant:create',
+      'variant:read',
+      'variant:update',
+      'variant:delete',
 
-      // Payment Transaction
-      'payment:read',
-      'payment:update',
-
-      // Order Status History
-      'orderStatusHistory:read',
-      'orderStatusHistory:create',
-
-      // Coupon
-      'coupon:create',
-      'coupon:read',
-      'coupon:update',
-      'coupon:delete',
-
-      // Cart
-      'cart:read',
-      'cart:update',
-
-      // Color Palette
-      'colorPalette:read',
-      'colorPalette:update',
-      'sizePalette:read',
-      'sizePalette:update',
-
-      // Colors
+      // Color
       'color:create',
       'color:read',
       'color:update',
       'color:delete',
 
-      // Sizes
+      // Color Palette
+      'colorPalette:create',
+      'colorPalette:read',
+      'colorPalette:update',
+      'colorPalette:delete',
+
+      // Size
       'size:create',
       'size:read',
       'size:update',
       'size:delete',
 
-      // Warehouse
-      'warehouse:create',
-      'warehouse:read',
-      'warehouse:update',
-      'warehouse:delete'
-    ]
-  },
-  {
-    name: 'technical_admin',
-    label: 'Kỹ thuật viên hệ thống',
-    permissions: [
-      'product:read',
-      'category:read',
-      'coupon:read',
-      'color:read',
-      'size:read',
-      'warehouse:read',
-
-      'colorPalette:update',
+      // Size Palette
+      'sizePalette:create',
+      'sizePalette:read',
       'sizePalette:update',
-      'colorPalette:read',
-      'sizePalette:read'
-    ]
-  },
-  {
-    name: 'staff',
-    label: 'Nhân viên quản lý',
-    permissions: [
-      // Product
-      'product:create',
-      'product:read',
-      'product:update',
-      'product:delete',
+      'sizePalette:delete',
 
-      // Category
-      'category:create',
-      'category:read',
-      'category:update',
-      'category:delete',
+      // Order
+      'order:read',
+      'order:update',
+
+      // Payment Transaction
+      'paymentTransaction:read',
+      'paymentTransaction:update',
 
       // Coupon
       'coupon:create',
@@ -116,29 +65,19 @@ export const roles = [
       'coupon:update',
       'coupon:delete',
 
-      // Cart
-      'cart:read',
-      'cart:update',
+      // Statistics
+      'statistics:read',
 
-      // Order
-      'order:create',
-      'order:read',
-      'order:update',
-      'order:delete',
-      'orderItem:read',
+      // Inventory
+      'inventory:read',
+      'inventory:update',
 
-      // Order status history
-      'orderStatusHistory:read',
-      'orderStatusHistory:create',
+      // Warehouse Slip
+      'warehouseSlip:create',
+      'warehouseSlip:read',
 
-      // Shipping address
-      'shippingAddress:create',
-      'shippingAddress:read',
-      'shippingAddress:update',
-      'shippingAddress:delete',
-
-      // Payment transaction (chỉ xem)
-      'payment:read',
+      // Inventory Log
+      'inventoryLog:read',
 
       // Warehouse
       'warehouse:create',
@@ -146,55 +85,138 @@ export const roles = [
       'warehouse:update',
       'warehouse:delete',
 
-      // Color & Size palette
-      'colorPalette:update',
+      // Batch
+      'batch:read',
+      'batch:update',
+
+      // Partner
+      'partner:create',
+      'partner:read',
+      'partner:update',
+      'partner:delete'
+    ]
+  },
+  {
+    name: 'technical_admin',
+    label: 'Kỹ thuật viên hệ thống',
+    permissions: [
+      // User (service‑account support)
+      'user:read',
+      'user:update',
+
+      // Category
+      'category:read',
+
+      // Product
+      'product:read',
+
+      // Variant
+      'variant:read',
+
+      // Color
+      'color:read',
+
+      // Color Palette
       'colorPalette:read',
-      'sizePalette:update',
+
+      // Size
+      'size:read',
+
+      // Size Palette
       'sizePalette:read',
 
-      // Colors
-      'color:create',
-      'color:read',
-      'color:update',
-      'color:delete',
+      // Order
+      'order:read',
 
-      // Sizes
-      'size:create',
-      'size:read',
-      'size:update',
-      'size:delete'
+      // Payment Transaction
+      'payment:read',
+
+      // Coupon
+      'coupon:read',
+
+      // Statistics
+      'statistics:read',
+
+      // Inventory
+      'inventory:read',
+
+      // Warehouse Slip
+      'warehouseSlip:read',
+
+      // Inventory Log
+      'inventoryLog:read',
+
+      // Warehouse
+      'warehouse:read',
+
+      // Batch
+      'batch:read',
+
+      // Partner
+      'partner:read'
+    ]
+  },
+  {
+    name: 'staff',
+    label: 'Nhân viên quản lý',
+    permissions: [
+      // Order
+      'order:read',
+      'order:update',
+
+      // Inventory
+      'inventory:read',
+      'inventory:update',
+
+      // Warehose Slip
+      'warehouseSlip:create',
+      'warehouseSlip:read',
+
+      // Inventory Log
+      'inventoryLog:read',
+
+      // statistics
+      'statistics:read'
     ]
   },
   {
     name: 'customer',
     label: 'Khách hàng',
     permissions: [
+      // User - xem và cập nhật tài khoản của chính họ
+      'user:read',
+      'user:update',
+
+      // Product  - để duyệt sản phẩm
       'product:read',
-      'category:read',
 
-      // Cart
-      'cart:read',
-      'cart:update',
+      // Variant - để xem các biến thể của sản phẩm
+      'variant:read',
 
-      // Order
+      // Color Palette - để chọn lựa
+      'colorPalette:read',
+
+      // Size Palette - để chọn lựa
+      'sizePalette:read',
+
+      // Order - tạo đơn và xem đơn hàng cá nhân
+      'order:read', // có thể cần filter theo userId ở backend
       'order:create',
-      'order:read',
-      'orderItem:read',
 
-      // Shipping address
-      'shippingAddress:create',
+      // Payment Transaction - theo dõi trạng thái thanh toán
+      'paymentTransaction:read',
+
+      // Coupon - áp dụng mã
+      'coupon:read',
+
+      // Inventory - (nếu muốn show "còn hàng / hết hàng")
+      'inventory:read',
+
+      //Shipping Addresses
       'shippingAddress:read',
+      'shippingAddress:create',
       'shippingAddress:update',
-      'shippingAddress:delete',
-
-      // Payment Transaction
-      'payment:read',
-
-      // Order Status
-      'orderStatusHistory:read',
-
-      // Coupon
-      'coupon:read'
+      'shippingAddress:delete'
     ]
   }
 ]

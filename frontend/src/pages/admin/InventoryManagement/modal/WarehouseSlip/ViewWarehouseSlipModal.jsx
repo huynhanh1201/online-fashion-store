@@ -19,7 +19,8 @@ import StyleAdmin from '~/assets/StyleAdmin.jsx'
 
 const ViewWarehouseSlipModal = ({ open, onClose, slip }) => {
   if (!slip) return null
-
+  const warehouseName = slip.warehouseId?.name || 'Không có kho hàng'
+  const partnerName = slip.partnerId?.name || 'Không có đối tác'
   return (
     <Dialog
       open={open}
@@ -63,7 +64,7 @@ const ViewWarehouseSlipModal = ({ open, onClose, slip }) => {
                 <strong>Kho hàng</strong>
               </TableCell>
               <TableCell>
-                {slip.warehouseId?.name
+                {warehouseName
                   .split(' ')
                   .map(
                     (word) =>
@@ -77,7 +78,7 @@ const ViewWarehouseSlipModal = ({ open, onClose, slip }) => {
                 <strong>Tên đối tác</strong>
               </TableCell>
               <TableCell>
-                {slip.partnerId?.name
+                {partnerName
                   .split(' ')
                   .map(
                     (word) =>
@@ -144,27 +145,32 @@ const ViewWarehouseSlipModal = ({ open, onClose, slip }) => {
           </TableHead>
           <TableBody>
             {slip.items.length > 0 ? (
-              slip.items.map((item, index) => (
-                <TableRow key={index}>
-                  <TableCell>{item.variantId.sku}</TableCell>
-                  <TableCell>
-                    {item.variantId.name
-                      .split(' ')
-                      .map(
-                        (word) =>
-                          word.charAt(0).toUpperCase() +
-                          word.slice(1).toLowerCase()
-                      )
-                      .join(' ')}
-                  </TableCell>
-                  <TableCell align='right'>
-                    {item.quantity
-                      ? `${Number(item.quantity).toLocaleString('vi-VN')}`
-                      : 0}
-                  </TableCell>
-                  <TableCell>{item.unit || 'cái'}</TableCell>
-                </TableRow>
-              ))
+              slip.items.map((item, index) => {
+                const variantName = item.variantId?.name || 'Không có tên'
+                return (
+                  <TableRow key={index}>
+                    <TableCell>
+                      {item.variantId.sku || 'Không có mã biến thể'}
+                    </TableCell>
+                    <TableCell>
+                      {variantName
+                        .split(' ')
+                        .map(
+                          (word) =>
+                            word.charAt(0).toUpperCase() +
+                            word.slice(1).toLowerCase()
+                        )
+                        .join(' ')}
+                    </TableCell>
+                    <TableCell align='right'>
+                      {item.quantity
+                        ? `${Number(item.quantity).toLocaleString('vi-VN')}`
+                        : 0}
+                    </TableCell>
+                    <TableCell>{item.unit || 'cái'}</TableCell>
+                  </TableRow>
+                )
+              })
             ) : (
               <TableRow>
                 <TableCell colSpan={4} align='center'>

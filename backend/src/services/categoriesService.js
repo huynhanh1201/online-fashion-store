@@ -21,7 +21,14 @@ const createCategory = async (reqBody) => {
 
     const category = await CategoryModel.create(newCategory)
 
-    return category
+    const categoryPopulated = await CategoryModel.findById(category._id)
+      .populate({
+        path: 'parent',
+        select: 'name'
+      })
+      .lean()
+
+    return categoryPopulated
   } catch (err) {
     throw new ApiError(StatusCodes.CONFLICT, 'Danh mục sản phẩm đã tồn tại!')
   }

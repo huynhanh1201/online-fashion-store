@@ -26,7 +26,8 @@ import useSizePalettes from '~/hooks/admin/useSizePalettes'
 import { getVariantById } from '~/services/admin/Inventory/VariantService.js'
 import AddColorModal from '~/pages/admin/ColorManagement/modal/AddColorModal'
 import AddSizeModal from '~/pages/admin/SizeManagement/modal/AddSizeModal'
-
+import useColor from '~/hooks/admin/useColor.js'
+import useSize from '~/hooks/admin/useSize.js'
 import { URI, CloudinaryColor } from '~/utils/constants'
 import AddPhotoAlternateIcon from '@mui/icons-material/AddPhotoAlternate'
 import EditIcon from '@mui/icons-material/Edit'
@@ -88,7 +89,8 @@ const AddVariantModal = ({
       }
     }
   })
-
+  const { createNewColor } = useColor()
+  const { createNewSize } = useSize()
   const { addColorPalette } = useColorPalettes(watch('productId'))
   const { addSizePalette } = useSizePalettes(watch('productId'))
   const [openColorModal, setOpenColorModal] = useState(false)
@@ -171,25 +173,18 @@ const AddVariantModal = ({
     setOpenColorModal(true)
   }
 
-  const handleCloseColorModal = async (newColor) => {
+  const handleCloseColorModal = async () => {
     setOpenColorModal(false)
-    await fetchColors() // hoặc load lại danh sách màu
-
-    if (newColor?.name) {
-      setValue('color', newColor.name)
-    }
+    await fetchColors()
   }
 
   const handleOpenSizeModal = () => {
     setOpenSizeModal(true)
   }
 
-  const handleCloseSizeModal = async (newSize) => {
+  const handleCloseSizeModal = async () => {
     setOpenSizeModal(false)
     await fetchSizes()
-    if (newSize?.name) {
-      setValue('size', newSize.name)
-    }
   }
 
   const handleUploadImage = async (e) => {
@@ -201,6 +196,32 @@ const AddVariantModal = ({
       toast.success('Upload ảnh thành công')
     } catch {
       toast.error('Lỗi khi upload ảnh')
+    }
+  }
+
+  const handleSaveColor = async (data) => {
+    try {
+      const newColor = await createNewColor(data)
+      if (newColor?.name) {
+        setValue('color', newColor.name) // ✅ gán tên màu mới vào field 'color'
+      }
+      toast.success('Thêm màu thành công')
+    } catch (error) {
+      console.error('Lỗi khi thêm màu:', error)
+      toast.error('Lỗi khi thêm màu')
+    }
+  }
+
+  const handleSaveSize = async (data) => {
+    try {
+      const newSize = await createNewSize(data)
+      if (newSize?.name) {
+        setValue('size', newSize.name) // ✅ gán tên size mới vào field 'size'
+      }
+      toast.success('Thêm kích thước thành công')
+    } catch (error) {
+      console.error('Lỗi khi thêm kích thước:', error)
+      toast.error('Lỗi khi thêm kích thước')
     }
   }
 
@@ -284,7 +305,7 @@ const AddVariantModal = ({
     <Dialog
       open={open}
       onClose={handleClose}
-      maxWidth='lg'
+      maxWidth='xl'
       fullWidth
       sx={{ padding: '16px 24px' }}
       BackdropProps={{
@@ -307,7 +328,7 @@ const AddVariantModal = ({
             sx={{
               position: 'relative',
               width: 403,
-              height: 403,
+              height: 444,
               minWidth: 403,
               minHeight: 403,
               border: '1px dashed #ccc',
@@ -456,7 +477,18 @@ const AddVariantModal = ({
                   }
                 }}
                 render={({ field }) => (
-                  <Select {...field} label='Màu sắc'>
+                  <Select
+                    {...field}
+                    label='Màu sắc'
+                    MenuProps={{
+                      PaperProps: {
+                        sx: {
+                          maxHeight: 412, // ✅ Chiều cao tối đa của danh sách dropdown
+                          overflowY: 'auto' // ✅ Hiển thị thanh cuộn dọc
+                        }
+                      }
+                    }}
+                  >
                     {colors.map((c) => {
                       const disabled =
                         watch('size') && isColorDisabled(watch('size'), c.name)
@@ -514,7 +546,18 @@ const AddVariantModal = ({
                   }
                 }}
                 render={({ field }) => (
-                  <Select {...field} label='Kích thước'>
+                  <Select
+                    {...field}
+                    label='Kích thước'
+                    MenuProps={{
+                      PaperProps: {
+                        sx: {
+                          maxHeight: 412, // ✅ Chiều cao tối đa của danh sách dropdown
+                          overflowY: 'auto' // ✅ Hiển thị thanh cuộn dọc
+                        }
+                      }
+                    }}
+                  >
                     {sizes.map((s) => {
                       const disabled =
                         watch('color') && isSizeDisabled(watch('color'), s.name)
@@ -555,10 +598,13 @@ const AddVariantModal = ({
                 display: 'flex',
                 justifyContent: 'space-between',
                 alignItems: 'start',
+                flexDirection: 'column',
                 gap: 2
               }}
             >
-              <Box sx={{ flex: 1 }}>
+              <Box
+                sx={{ display: 'flex', flexDirection: 'column', width: '100%' }}
+              >
                 {/* Ghi đè giá */}
                 <FormControlLabel
                   control={
@@ -573,61 +619,64 @@ const AddVariantModal = ({
                   sx={{ mb: 1 }}
                   label='Đặt giá riêng cho biến thể'
                 />
-                {/* Giá nhập */}
-                <Controller
-                  name='importPrice'
-                  control={control}
-                  rules={{
-                    required: overridePrice ? 'Vui lòng nhập giá nhập' : false,
-                    validate: (val) =>
-                      overridePrice && Number(val) < 0
-                        ? 'Giá nhập không được âm'
-                        : true
-                  }}
-                  render={({ field }) => (
-                    <TextField
-                      sx={{ mb: 2 }}
-                      label='Giá nhập (đ)'
-                      disabled={!overridePrice}
-                      type='text'
-                      fullWidth
-                      value={formatCurrency(field.value)}
-                      onChange={(e) =>
-                        field.onChange(parseCurrency(e.target.value))
-                      }
-                      error={!!errors.importPrice}
-                      helperText={errors.importPrice?.message}
-                    />
-                  )}
-                />
-                {/* Giá bán */}
-                <Controller
-                  name='exportPrice'
-                  control={control}
-                  rules={{
-                    required: overridePrice ? 'Vui lòng nhập giá bán' : false,
-                    validate: (val) =>
-                      overridePrice && Number(val) < 0
-                        ? 'Giá bán không được âm'
-                        : true
-                  }}
-                  render={({ field }) => (
-                    <TextField
-                      label='Giá bán (đ)'
-                      disabled={!overridePrice}
-                      type='text'
-                      fullWidth
-                      value={formatCurrency(field.value)}
-                      onChange={(e) =>
-                        field.onChange(parseCurrency(e.target.value))
-                      }
-                      error={!!errors.exportPrice}
-                      helperText={errors.exportPrice?.message}
-                    />
-                  )}
-                />
+                <Box sx={{ width: '100%', display: 'flex', gap: 2 }}>
+                  {/* Giá nhập */}
+                  <Controller
+                    name='importPrice'
+                    control={control}
+                    rules={{
+                      required: overridePrice
+                        ? 'Vui lòng nhập giá nhập'
+                        : false,
+                      validate: (val) =>
+                        overridePrice && Number(val) < 0
+                          ? 'Giá nhập không được âm'
+                          : true
+                    }}
+                    render={({ field }) => (
+                      <TextField
+                        label='Giá nhập (đ)'
+                        disabled={!overridePrice}
+                        type='text'
+                        fullWidth
+                        value={formatCurrency(field.value)}
+                        onChange={(e) =>
+                          field.onChange(parseCurrency(e.target.value))
+                        }
+                        error={!!errors.importPrice}
+                        helperText={errors.importPrice?.message}
+                      />
+                    )}
+                  />
+                  {/* Giá bán */}
+                  <Controller
+                    name='exportPrice'
+                    control={control}
+                    rules={{
+                      required: overridePrice ? 'Vui lòng nhập giá bán' : false,
+                      validate: (val) =>
+                        overridePrice && Number(val) < 0
+                          ? 'Giá bán không được âm'
+                          : true
+                    }}
+                    render={({ field }) => (
+                      <TextField
+                        label='Giá bán (đ)'
+                        disabled={!overridePrice}
+                        type='text'
+                        fullWidth
+                        value={formatCurrency(field.value)}
+                        onChange={(e) =>
+                          field.onChange(parseCurrency(e.target.value))
+                        }
+                        error={!!errors.exportPrice}
+                        helperText={errors.exportPrice?.message}
+                      />
+                    )}
+                  />
+                </Box>
               </Box>
-              <Box sx={{ flex: 1 }}>
+              <Box sx={{ width: '100%' }}>
                 {/* Ghi đè kích thước đóng gói */}
                 <FormControlLabel
                   control={
@@ -642,120 +691,122 @@ const AddVariantModal = ({
                   sx={{ mb: 1 }}
                   label='Đặt kích thước đóng gói riêng cho biến thể'
                 />
-                <Box sx={{ display: 'flex', gap: 2, mb: 2 }}>
-                  {/* Dài */}
-                  <Controller
-                    name='packageSize.length'
-                    control={control}
-                    rules={{
-                      required: overridePackageSize
-                        ? 'Chiều dài là bắt buộc'
-                        : false,
-                      validate: (val) =>
-                        overridePackageSize && Number(val) <= 0
-                          ? 'Chiều dài phải lớn hơn 0'
-                          : true
-                    }}
-                    render={({ field }) => (
-                      <TextField
-                        label='Dài (cm)'
-                        type='number'
-                        fullWidth
-                        disabled={!overridePackageSize}
-                        value={field.value}
-                        onChange={field.onChange}
-                        error={!!errors.packageSize?.length}
-                        helperText={errors.packageSize?.length?.message}
-                        inputProps={{ min: 0 }}
-                      />
-                    )}
-                  />
+                <Box sx={{ display: 'flex', gap: 2, width: '100%' }}>
+                  <Box sx={{ display: 'flex', gap: 2, mb: 2, width: '100%' }}>
+                    {/* Dài */}
+                    <Controller
+                      name='packageSize.length'
+                      control={control}
+                      rules={{
+                        required: overridePackageSize
+                          ? 'Chiều dài là bắt buộc'
+                          : false,
+                        validate: (val) =>
+                          overridePackageSize && Number(val) <= 0
+                            ? 'Chiều dài phải lớn hơn 0'
+                            : true
+                      }}
+                      render={({ field }) => (
+                        <TextField
+                          label='Chiều dài gói hàng (cm)'
+                          type='number'
+                          fullWidth
+                          disabled={!overridePackageSize}
+                          value={field.value}
+                          onChange={field.onChange}
+                          error={!!errors.packageSize?.length}
+                          helperText={errors.packageSize?.length?.message}
+                          inputProps={{ min: 0 }}
+                        />
+                      )}
+                    />
 
-                  {/* Rộng */}
-                  <Controller
-                    name='packageSize.width'
-                    control={control}
-                    rules={{
-                      required: overridePackageSize
-                        ? 'Chiều rộng là bắt buộc'
-                        : false,
-                      validate: (val) =>
-                        overridePackageSize && Number(val) <= 0
-                          ? 'Chiều rộng phải lớn hơn 0'
-                          : true
-                    }}
-                    render={({ field }) => (
-                      <TextField
-                        label='Rộng (cm)'
-                        type='number'
-                        fullWidth
-                        disabled={!overridePackageSize}
-                        value={field.value}
-                        onChange={field.onChange}
-                        error={!!errors.packageSize?.width}
-                        helperText={errors.packageSize?.width?.message}
-                        inputProps={{ min: 0 }}
-                      />
-                    )}
-                  />
-                </Box>
-                <Box sx={{ display: 'flex', gap: 2 }}>
-                  {/* Cao */}
-                  <Controller
-                    name='packageSize.height'
-                    control={control}
-                    rules={{
-                      required: overridePackageSize
-                        ? 'Chiều cao là bắt buộc'
-                        : false,
-                      validate: (val) =>
-                        overridePackageSize && Number(val) <= 0
-                          ? 'Chiều cao phải lớn hơn 0'
-                          : true
-                    }}
-                    render={({ field }) => (
-                      <TextField
-                        sx={{ mb: 2 }}
-                        label='Cao (cm)'
-                        type='number'
-                        fullWidth
-                        disabled={!overridePackageSize}
-                        value={field.value}
-                        onChange={field.onChange}
-                        error={!!errors.packageSize?.height}
-                        helperText={errors.packageSize?.height?.message}
-                        inputProps={{ min: 0 }}
-                      />
-                    )}
-                  />
+                    {/* Rộng */}
+                    <Controller
+                      name='packageSize.width'
+                      control={control}
+                      rules={{
+                        required: overridePackageSize
+                          ? 'Chiều rộng là bắt buộc'
+                          : false,
+                        validate: (val) =>
+                          overridePackageSize && Number(val) <= 0
+                            ? 'Chiều rộng phải lớn hơn 0'
+                            : true
+                      }}
+                      render={({ field }) => (
+                        <TextField
+                          label='Chiều rộng gói hàng (cm)'
+                          type='number'
+                          fullWidth
+                          disabled={!overridePackageSize}
+                          value={field.value}
+                          onChange={field.onChange}
+                          error={!!errors.packageSize?.width}
+                          helperText={errors.packageSize?.width?.message}
+                          inputProps={{ min: 0 }}
+                        />
+                      )}
+                    />
+                  </Box>
+                  <Box sx={{ display: 'flex', gap: 2, width: '100%' }}>
+                    {/* Cao */}
+                    <Controller
+                      name='packageSize.height'
+                      control={control}
+                      rules={{
+                        required: overridePackageSize
+                          ? 'Chiều cao là bắt buộc'
+                          : false,
+                        validate: (val) =>
+                          overridePackageSize && Number(val) <= 0
+                            ? 'Chiều cao phải lớn hơn 0'
+                            : true
+                      }}
+                      render={({ field }) => (
+                        <TextField
+                          sx={{ mb: 2 }}
+                          label='Chiều cao gói hàng (cm)'
+                          type='number'
+                          fullWidth
+                          disabled={!overridePackageSize}
+                          value={field.value}
+                          onChange={field.onChange}
+                          error={!!errors.packageSize?.height}
+                          helperText={errors.packageSize?.height?.message}
+                          inputProps={{ min: 0 }}
+                        />
+                      )}
+                    />
 
-                  {/* Khối lượng */}
-                  <Controller
-                    name='packageSize.weight'
-                    control={control}
-                    rules={{
-                      required: overridePackageSize
-                        ? 'Khối lượng là bắt buộc'
-                        : false,
-                      validate: (val) =>
-                        overridePackageSize && Number(val) <= 0
-                          ? 'Khối lượng phải lớn hơn 0'
-                          : true
-                    }}
-                    render={({ field }) => (
-                      <TextField
-                        label='Khối lượng (gram)'
-                        type='number'
-                        fullWidth
-                        disabled={!overridePackageSize}
-                        value={field.value}
-                        onChange={field.onChange}
-                        error={!!errors.packageSize?.weight}
-                        helperText={errors.packageSize?.weight?.message}
-                        inputProps={{ min: 0 }}
-                      />
-                    )}
-                  />
+                    {/* Khối lượng */}
+                    <Controller
+                      name='packageSize.weight'
+                      control={control}
+                      rules={{
+                        required: overridePackageSize
+                          ? 'Trọng lượng là bắt buộc'
+                          : false,
+                        validate: (val) =>
+                          overridePackageSize && Number(val) <= 0
+                            ? 'Trọng lượng phải lớn hơn 0'
+                            : true
+                      }}
+                      render={({ field }) => (
+                        <TextField
+                          label='Trọng lượng gói hàng (gram)'
+                          type='number'
+                          fullWidth
+                          disabled={!overridePackageSize}
+                          value={field.value}
+                          onChange={field.onChange}
+                          error={!!errors.packageSize?.weight}
+                          helperText={errors.packageSize?.weight?.message}
+                          inputProps={{ min: 0 }}
+                        />
+                      )}
+                    />
+                  </Box>
                 </Box>
               </Box>
             </Box>
@@ -785,11 +836,13 @@ const AddVariantModal = ({
       </form>
       <AddColorModal
         open={openColorModal}
-        onClose={(newColor) => handleCloseColorModal(newColor)}
+        onClose={handleCloseColorModal}
+        onSave={handleSaveColor}
       />
       <AddSizeModal
         open={openSizeModal}
-        onClose={(newSize) => handleCloseSizeModal(newSize)}
+        onClose={handleCloseSizeModal}
+        onSave={handleSaveSize}
       />
     </Dialog>
   )

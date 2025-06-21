@@ -15,7 +15,7 @@ const DeleteCategoryModal = ({ open, onClose, category, onDelete }) => {
   const handleDelete = async () => {
     setIsDeleting(true)
     try {
-      await onDelete(category._id) // Đợi quá trình xoá hoàn tất
+      await onDelete(category._id, 'delete') // Đợi quá trình xoá hoàn tất
       onClose()
     } catch (error) {
       console.error('Xoá thất bại:', error)

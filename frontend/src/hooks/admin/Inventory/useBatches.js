@@ -42,18 +42,45 @@ const useBatches = () => {
   }
 
   const createNewBatch = async (data) => {
-    const result = await createBatch(data)
-    return result
+    try {
+      const newBatch = await createBatch(data)
+      setBatches((prev) => {
+        const updated = [newBatch, ...prev]
+        return updated.slice(0, 10) // Keep only the 10 most recent batches
+      })
+      setTotalPages((prev) => prev + 1)
+      return newBatch
+    } catch (error) {
+      console.error('Error creating new batch:', error)
+      return null
+    }
   }
 
   const updateBatchById = async (id, data) => {
-    const result = await updateBatch(id, data)
-    return result
+    try {
+      const updatedBatch = await updateBatch(id, data)
+      setBatches((prev) =>
+        prev.map((batch) =>
+          batch._id === updatedBatch._id ? updatedBatch : batch
+        )
+      )
+      return updatedBatch
+    } catch (error) {
+      console.error('Error updating batch:', error)
+      return null
+    }
   }
 
   const deleteBatchById = async (id) => {
-    const result = await deleteBatch(id)
-    return result
+    try {
+      await deleteBatch(id)
+      setBatches((prev) => prev.filter((batch) => batch._id !== id))
+      setTotalPages((prev) => prev - 1)
+      return true
+    } catch (error) {
+      console.error('Error deleting batch:', error)
+      return false
+    }
   }
   const fetchBatchId = async (id) => {
     const result = await getBatchById(id)

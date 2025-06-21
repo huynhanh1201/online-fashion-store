@@ -59,7 +59,15 @@ const ViewColorModal = ({ open, onClose, color }) => {
               <TableCell sx={{ fontWeight: 'bold', width: '35%' }}>
                 Tên màu
               </TableCell>
-              <TableCell>{color.name || 'Không có tên'}</TableCell>
+              <TableCell>
+                {color?.name
+                  .split(' ')
+                  .map(
+                    (word) =>
+                      word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+                  )
+                  .join(' ') || 'Không có tên'}
+              </TableCell>
             </TableRow>
 
             <TableRow>

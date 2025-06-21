@@ -12,4 +12,6 @@ Router.route('/calculate-fee').post(
   deliveriesController.getDeliveryFee
 )
 
+Router.route('/webhook/ghn').post(deliveriesController.getDeliveryFee)
+
 export const deliveriesRoute = Router

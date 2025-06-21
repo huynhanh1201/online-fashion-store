@@ -15,7 +15,7 @@ const DeleteColorModal = ({ open, onClose, color, onDelete }) => {
   const handleDelete = async () => {
     setIsDeleting(true)
     try {
-      await onDelete(color._id)
+      await onDelete(color._id, 'delete')
       onClose()
     } catch (error) {
       console.error('Xoá màu thất bại:', error)

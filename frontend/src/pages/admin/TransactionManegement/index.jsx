@@ -52,16 +52,8 @@ const TransactionManagement = () => {
 
   const handleUpdateTransaction = async (transactionId, data) => {
     try {
-      const response = await updateTransaction(transactionId, data)
-      if (response) {
-        const update = await getTransactionDetail(transactionId)
-        if (update) {
-          Save(update)
-          setOpenEdit(false)
-        }
-      } else {
-        console.log('Câp nhật giao dịch thất bại')
-      }
+      await updateTransaction(transactionId, data)
+      setOpenEdit(false)
     } catch (error) {
       console.error('Cập nhật giao dịch thất bại:', error)
     }
@@ -69,16 +61,8 @@ const TransactionManagement = () => {
 
   const handleDeleteTransaction = async (transactionId) => {
     try {
-      const response = await deleteTransaction(transactionId)
-      if (response) {
-        const remove = await getTransactionDetail(transactionId)
-        if (remove) {
-          Save(remove)
-          setOpenDelete(false)
-        }
-      } else {
-        console.log('Xoá giao dịch thất bại')
-      }
+      await deleteTransaction(transactionId)
+      setOpenDelete(false)
     } catch (error) {
       console.error('Xoá giao dịch thất bại:', error)
     }

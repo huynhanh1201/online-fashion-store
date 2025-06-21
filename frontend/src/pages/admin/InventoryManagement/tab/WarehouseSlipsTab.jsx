@@ -137,6 +137,27 @@ const WarehouseSlipsTab = () => {
     setOpenViewModal(true)
   }
 
+  const handleAddPartner = async (partnerData) => {
+    const newPartner = await createNewPartner(partnerData)
+    if (newPartner) {
+      // ✅ Gán đối tượng mới được thêm vào Select
+      setNewSlipData((prev) => ({
+        ...prev,
+        partnerId: newPartner._id
+      }))
+    }
+  }
+  const handleAddWarehouse = async (warehouseData) => {
+    const newWarehouse = await createNewWarehouse(warehouseData)
+    if (newWarehouse) {
+      // ✅ Gán đối tượng mới được thêm vào Select
+      setNewSlipData((prev) => ({
+        ...prev,
+        warehouseId: newWarehouse._id
+      }))
+    }
+  }
+
   const enrichedWarehouseSlips = warehouseSlips.map((slip) => {
     // const warehouseId =
     //   slip.warehouseId && typeof slip.warehouseId === 'object'
@@ -454,8 +475,8 @@ const WarehouseSlipsTab = () => {
         type={modalType}
         partners={partners}
         addWarehouseSlip={createNewWarehouseSlip}
-        addPartner={createNewPartner}
-        addWarehouse={createNewWarehouse}
+        addPartner={handleAddPartner}
+        addWarehouse={handleAddWarehouse}
       />
       <ViewWarehouseSlipModal
         open={openViewModal}
