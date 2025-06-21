@@ -187,6 +187,7 @@ const updateVariant = async (variantId, reqBody) => {
       { $set: updateOps },
       { new: true }
     )
+
     return updatedVariant
   } catch (err) {
     throw err
