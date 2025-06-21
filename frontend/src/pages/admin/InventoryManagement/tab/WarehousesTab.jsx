@@ -361,7 +361,7 @@ const WarehousesTab = () => {
       />
 
       <Suspense fallback={<div>Loading...</div>}>
-        {openAddModal && (
+        {openAddModal && !isAddDisabled && (
           <AddWarehouseModal
             open={openAddModal}
             onClose={handleCloseAddModal}
