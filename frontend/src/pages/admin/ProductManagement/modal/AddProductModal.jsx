@@ -12,7 +12,9 @@ import {
   InputLabel,
   FormControl,
   Typography,
-  Box
+  Box,
+  FormLabel,
+  Chip
 } from '@mui/material'
 import { useForm, Controller } from 'react-hook-form'
 import useCategories from '~/hooks/admin/useCategories.js'
@@ -59,6 +61,7 @@ const AddProductModal = ({ open, onClose, onSuccess }) => {
     control,
     handleSubmit,
     setValue,
+    watch,
     formState: { errors },
     reset
   } = useForm({
@@ -75,14 +78,14 @@ const AddProductModal = ({ open, onClose, onSuccess }) => {
         width: '',
         height: '',
         weight: ''
-      }
+      },
+      status: 'draft'
     }
   })
   const [categoryOpen, setCategoryOpen] = useState(false)
   const [productImages, setProductImages] = useState([])
   const [productImagePreview, setProductImagePreview] = useState([])
   const [editorState, setEditorState] = useState(EditorState.createEmpty())
-
   const { categories, fetchCategories, loading, add } = useCategories()
 
   useEffect(() => {
@@ -164,7 +167,8 @@ const AddProductModal = ({ open, onClose, onSuccess }) => {
           width: Number(data.packageSize?.width || 0),
           height: Number(data.packageSize?.height || 0),
           weight: Number(data.packageSize?.weight || 0)
-        }
+        },
+        status: data.status || 'draft'
       }
 
       console.log('finalProduct:', finalProduct)
@@ -536,6 +540,39 @@ const AddProductModal = ({ open, onClose, onSuccess }) => {
                 </>
               )}
             />
+          </Grid>
+          {/*Trạng thái sản phẩm*/}
+          <Grid item size={12}>
+            <Box>
+              <Typography variant='h6'>Kích thước đóng gói</Typography>
+              <Box sx={{ display: 'flex', gap: 1, mt: 1 }}>
+                {[
+                  { label: 'Bản nháp', value: 'draft' },
+                  { label: 'Hoạt động', value: 'active' },
+                  { label: 'Không hoạt động', value: 'inactive' }
+                ].map((item) => {
+                  const isSelected = watch('status') === item.value
+                  return (
+                    <Chip
+                      key={item.value}
+                      label={item.label}
+                      onClick={() => setValue('status', item.value)}
+                      variant={isSelected ? 'filled' : 'outlined'}
+                      clickable
+                      sx={{
+                        ...(isSelected && {
+                          backgroundColor: '#001f5d',
+                          color: '#fff',
+                          '&:hover': {
+                            backgroundColor: '#001f5d'
+                          }
+                        })
+                      }}
+                    />
+                  )
+                })}
+              </Box>
+            </Box>
           </Grid>
         </Grid>
       </DialogContent>

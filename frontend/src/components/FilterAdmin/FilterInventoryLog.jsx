@@ -251,7 +251,7 @@
 //   )
 // }
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { Box, Button } from '@mui/material'
 import dayjs from 'dayjs'
 import FilterSelect from '~/components/FilterAdmin/common/FilterSelect'
@@ -261,10 +261,10 @@ import SearchWithSuggestions from '~/components/FilterAdmin/common/SearchWithSug
 
 export default function FilterInventoryLog({
   onFilter,
-  inventories = [],
-  warehouses = [],
-  batches = [],
-  users = [],
+  // inventories = [],
+  // warehouses = [],
+  // batches = [],
+  // users = [],
   loading,
   inventoryLog = []
 }) {
@@ -274,7 +274,7 @@ export default function FilterInventoryLog({
   const [warehouseId, setWarehouseId] = useState('')
   const [batchId, setBatchId] = useState('')
   const [type, setType] = useState('')
-  const [sort, setSort] = useState('')
+  const [sort, setSort] = useState('newest')
   const [amountMin, setAmountMin] = useState('')
   const [amountMax, setAmountMax] = useState('')
   const [importPriceMin, setImportPriceMin] = useState('')
@@ -285,9 +285,13 @@ export default function FilterInventoryLog({
   const [selectedFilter, setSelectedFilter] = useState('')
   const [startDate, setStartDate] = useState(dayjs().format('YYYY-MM-DD'))
   const [endDate, setEndDate] = useState(dayjs().format('YYYY-MM-DD'))
-
+  const hasMounted = useRef(false)
   useEffect(() => {
-    applyFilters(selectedFilter, startDate, endDate)
+    if (hasMounted.current) {
+      applyFilters(selectedFilter, startDate, endDate)
+    } else {
+      hasMounted.current = true
+    }
   }, [keyword, inventoryId, warehouseId, batchId, type, createdById, sort])
 
   const handleSearch = () => {

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useRef } from 'react'
 import { Box, Button } from '@mui/material'
 import dayjs from 'dayjs'
 import FilterSelect from '~/components/FilterAdmin/common/FilterSelect'
@@ -24,8 +24,8 @@ export default function FilterDiscount({
   const [usageMax, setUsageMax] = useState('')
   const [usedCountMin, setUsedCountMin] = useState('')
   const [usedCountMax, setUsedCountMax] = useState('')
-  const [isActive, setIsActive] = useState('')
-  const [sort, setSort] = useState('')
+  const [isActive, setIsActive] = useState('false') // true: Đang hoạt động, false: Ngừng hoạt động
+  const [sort, setSort] = useState('newest')
 
   const [validFromStart, setValidFromStart] = useState(
     dayjs().format('YYYY-MM-DD')
@@ -43,9 +43,13 @@ export default function FilterDiscount({
   const [validFromFilter, setValidFromFilter] = useState('')
   const [validUntilFilter, setValidUntilFilter] = useState('')
   const [createdFilter, setCreatedFilter] = useState('')
-
+  const hasMounted = useRef(false)
   useEffect(() => {
-    applyFilters()
+    if (hasMounted.current) {
+      applyFilters()
+    } else {
+      hasMounted.current = true
+    }
   }, [keyword, type, isActive, sort])
 
   const handleSelectFilter = (filter) => {
@@ -162,7 +166,7 @@ export default function FilterDiscount({
     setValidUntilFilter('')
     setCreatedFilter('')
     onFilter({})
-    fetchDiscounts(1, 10)
+    // fetchDiscounts(1, 10)
   }
 
   return (
@@ -217,8 +221,8 @@ export default function FilterDiscount({
         }}
         options={[
           { label: 'Tất cả', value: '' },
-          { label: 'Đang hoạt động', value: 'true' },
-          { label: 'Ngừng hoạt động', value: 'false' }
+          { label: 'Đang hoạt động', value: 'false' },
+          { label: 'Ngừng hoạt động', value: 'true' }
         ]}
       />
       <FilterSelect value={sort} onChange={setSort} />

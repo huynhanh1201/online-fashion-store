@@ -12,7 +12,8 @@ import {
   InputLabel,
   FormControl,
   Typography,
-  Box
+  Box,
+  Chip
 } from '@mui/material'
 import IconButton from '@mui/material/IconButton'
 import { useForm, Controller } from 'react-hook-form'
@@ -67,6 +68,7 @@ const EditProductModal = ({ open, onClose, onSave, product }) => {
     handleSubmit,
     formState: { errors },
     reset,
+    watch,
     setValue
   } = useForm({
     defaultValues: {
@@ -222,6 +224,7 @@ const EditProductModal = ({ open, onClose, onSave, product }) => {
         categoryId: product.categoryId?._id || product.categoryId || '',
         price: product.exportPrice || '',
         importPrice: product.importPrice || '',
+        status: product.status || 'draft',
         packageSize: {
           length: product.packageSize?.length || '',
           width: product.packageSize?.width || '',
@@ -286,7 +289,8 @@ const EditProductModal = ({ open, onClose, onSave, product }) => {
           width: Number(data.packageSize?.width || 0),
           height: Number(data.packageSize?.height || 0),
           weight: Number(data.packageSize?.weight || 0)
-        }
+        },
+        status: data.status || 'draft'
       }
 
       await onSave(finalProduct, 'edit', product._id)
@@ -364,8 +368,8 @@ const EditProductModal = ({ open, onClose, onSave, product }) => {
                 <TextField
                   label='Tên sản phẩm'
                   fullWidth
-                  error={!!errors.name}
-                  helperText={errors.name?.message}
+                  error={!!errors?.name}
+                  helperText={errors?.name?.message}
                   {...field}
                 />
               )}
@@ -621,6 +625,39 @@ const EditProductModal = ({ open, onClose, onSave, product }) => {
                 </>
               )}
             />
+          </Grid>
+          {/*Trạng thái sản phẩm*/}
+          <Grid item size={12}>
+            <Box>
+              <Typography variant='h6'>Kích thước đóng gói</Typography>
+              <Box sx={{ display: 'flex', gap: 1, mt: 1 }}>
+                {[
+                  { label: 'Bản nháp', value: 'draft' },
+                  { label: 'Hoạt động', value: 'active' },
+                  { label: 'Không hoạt động', value: 'inactive' }
+                ].map((item) => {
+                  const isSelected = watch('status') === item.value
+                  return (
+                    <Chip
+                      key={item.value}
+                      label={item.label}
+                      onClick={() => setValue('status', item.value)}
+                      variant={isSelected ? 'filled' : 'outlined'}
+                      clickable
+                      sx={{
+                        ...(isSelected && {
+                          backgroundColor: '#001f5d',
+                          color: '#fff',
+                          '&:hover': {
+                            backgroundColor: '#001f5d'
+                          }
+                        })
+                      }}
+                    />
+                  )
+                })}
+              </Box>
+            </Box>
           </Grid>
         </Grid>
       </DialogContent>

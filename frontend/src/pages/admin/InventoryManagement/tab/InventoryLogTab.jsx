@@ -41,7 +41,9 @@ const InventoryLogTab = () => {
 
   const [page, setPage] = useState(1) // State cho trang hiện tại
   const [rowsPerPage, setRowsPerPage] = useState(10) // State cho số dòng mỗi trang
-  const [filters, setFilters] = useState({}) // State cho kho
+  const [filters, setFilters] = useState({
+    sort: 'newest'
+  }) // State cho kho
   const [openViewModal, setOpenViewModal] = useState(false) // State cho modal xem
   const [selectedLog, setSelectedLog] = useState(null) // State cho bản ghi được chọn
   useEffect(() => {

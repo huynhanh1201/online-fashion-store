@@ -38,20 +38,41 @@ const useSizes = () => {
     setLoading(false)
   }
 
-  const createNewSize = async (data) => {
+  const createNewSize = async (data, filters = {}) => {
     try {
       const newSize = await addSize(data)
+      if (!newSize) {
+        console.error('Không thể thêm size mới')
+        return null
+      }
+
       setSizes((prev) => {
-        const updated = [newSize, ...prev]
-        return updated.slice(0, 10) // Chỉ giữ lại 10 màu mới nhất
+        const sort = filters?.sort
+        let updated = [...prev]
+
+        if (sort === 'newest') {
+          updated = [newSize, ...prev].slice(0, 10)
+        } else if (sort === 'oldest') {
+          if (prev.length < 10) {
+            updated = [...prev, newSize]
+          }
+          // Nếu đã đủ 10 thì không thêm
+        } else {
+          // Mặc định: xử lý như newest
+          updated = [newSize, ...prev].slice(0, 10)
+        }
+
+        return updated
       })
+
       setTotalPages((prev) => prev + 1)
       return newSize
     } catch (error) {
-      console.error('Lỗi khi thêm màu mới:', error)
+      console.error('Lỗi khi thêm size mới:', error)
       return null
     }
   }
+
   const update = async (id, data) => {
     try {
       const updated = await updateSize(id, data)

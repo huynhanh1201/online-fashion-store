@@ -39,17 +39,31 @@ const useCategories = () => {
     }
     setloading(false)
   }
-  const add = async (data) => {
+  const add = async (data, filters = {}) => {
     try {
       const newCategory = await addCategory(data)
       if (!newCategory) {
         console.error('Failed to add category')
         return null
       }
+
       setCategories((prev) => {
-        const updated = [newCategory, ...prev]
-        return updated.slice(0, 10) // ✅ chỉ giữ lại 10 danh mục mới nhất
+        const sort = filters?.sort
+        let updated = [...prev]
+
+        if (sort === 'newest') {
+          updated = [newCategory, ...prev].slice(0, 10)
+        } else if (sort === 'oldest') {
+          if (prev.length < 10) {
+            updated = [...prev, newCategory]
+          } // nếu >=10 thì bỏ qua
+        } else {
+          updated = [newCategory, ...prev].slice(0, 10)
+        }
+
+        return updated
       })
+
       setTotalPages((prev) => prev + 1)
       return newCategory
     } catch (err) {

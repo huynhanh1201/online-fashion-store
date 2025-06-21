@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useRef } from 'react'
 // import axios from 'axios'
 import { Box, Button } from '@mui/material'
 import FilterByTime from '~/components/FilterAdmin/common/FilterByTime'
@@ -17,8 +17,8 @@ export default function FilterWarehouse({
   const [provinceName, setProvinceName] = useState('')
   const [districtName, setDistrictName] = useState('')
   const [wardName, setWardName] = useState('')
-  const [destroy, setDestroy] = useState('')
-  const [sort, setSort] = useState('')
+  const [destroy, setDestroy] = useState('false')
+  const [sort, setSort] = useState('newest')
   // const [provinces, setProvinces] = useState([])
   // const [districts, setDistricts] = useState([])
   // const [wards, setWards] = useState([])
@@ -37,15 +37,19 @@ export default function FilterWarehouse({
   //     .then((res) => setProvinces(res.data))
   //     .catch((err) => console.error('Lỗi load tỉnh/thành: ', err))
   // }, [])
+  const hasMounted = useRef(false)
 
   useEffect(() => {
-    applyFilters()
-  }, [keyword, destroy, sort])
-  useEffect(() => {
-    if (selectedFilter !== 'custom') {
-      applyFilters()
+    if (hasMounted.current) {
+      if (selectedFilter !== 'custom') {
+        applyFilters()
+      }
     }
-  }, [selectedFilter])
+  }, [keyword, destroy, sort, selectedFilter])
+
+  useEffect(() => {
+    hasMounted.current = true
+  }, [])
 
   const handleSelectFilter = (filter) => {
     if (filter === selectedFilter) {
@@ -190,7 +194,7 @@ export default function FilterWarehouse({
     setStartDate(dayjs().format('YYYY-MM-DD'))
     setEndDate(dayjs().format('YYYY-MM-DD'))
     onFilter({})
-    fetchWarehouses(1, 10)
+    // fetchWarehouses(1, 10)
   }
 
   return (

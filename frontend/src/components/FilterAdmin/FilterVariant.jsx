@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useRef } from 'react'
 import { Box, Button } from '@mui/material'
 import dayjs from 'dayjs'
 
@@ -23,8 +23,8 @@ export default function FilterVariant({
   const [colorName, setColorName] = useState('')
   const [sizeName, setSizeName] = useState('')
   const [overridePrice, setOverridePrice] = useState('')
-  const [destroy, setDestroy] = useState('')
-  const [sort, setSort] = useState('')
+  const [destroy, setDestroy] = useState('false')
+  const [sort, setSort] = useState('newest')
   const [importPriceMin, setImportPriceMin] = useState('')
   const [importPriceMax, setImportPriceMax] = useState('')
   const [exportPriceMin, setExportPriceMin] = useState('')
@@ -33,14 +33,17 @@ export default function FilterVariant({
   const [selectedFilter, setSelectedFilter] = useState('')
   const [startDate, setStartDate] = useState(dayjs().format('YYYY-MM-DD'))
   const [endDate, setEndDate] = useState(dayjs().format('YYYY-MM-DD'))
-
+  const hasMounted = useRef(false)
+  useEffect(() => {
+    if (hasMounted.current) {
+      applyFilters()
+    } else {
+      hasMounted.current = true
+    }
+  }, [keyword, destroy, colorName, sizeName, productId, overridePrice, sort])
   useEffect(() => {
     fetchProducts?.()
   }, [])
-
-  useEffect(() => {
-    applyFilters()
-  }, [keyword, destroy, colorName, sizeName, productId, overridePrice, sort])
 
   const handleSearch = () => {
     setKeyword(inputValue)
@@ -137,7 +140,7 @@ export default function FilterVariant({
     setStartDate(dayjs().format('YYYY-MM-DD'))
     setEndDate(dayjs().format('YYYY-MM-DD'))
     onFilter({})
-    fetchVariants?.(1, 10)
+    // fetchVariants?.(1, 10)
   }
 
   return (

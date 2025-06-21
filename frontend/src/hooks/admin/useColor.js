@@ -38,13 +38,33 @@ const useColors = () => {
     setLoading(false)
   }
 
-  const createNewColor = async (data) => {
+  const createNewColor = async (data, filters = {}) => {
     try {
       const newColor = await addColor(data)
+      if (!newColor) {
+        console.error('Không thể thêm màu mới')
+        return null
+      }
+
       setColors((prev) => {
-        const updated = [newColor, ...prev]
-        return updated.slice(0, 10) // Chỉ giữ lại 10 màu mới nhất
+        const sort = filters?.sort
+        let updated = [...prev]
+
+        if (sort === 'newest') {
+          updated = [newColor, ...prev].slice(0, 10)
+        } else if (sort === 'oldest') {
+          if (prev.length < 10) {
+            updated = [...prev, newColor]
+          }
+          // Nếu đã đủ 10 thì không thêm
+        } else {
+          // Mặc định giống newest
+          updated = [newColor, ...prev].slice(0, 10)
+        }
+
+        return updated
       })
+
       setTotalPages((prev) => prev + 1)
       return newColor
     } catch (error) {
@@ -52,6 +72,7 @@ const useColors = () => {
       return null
     }
   }
+
   const update = async (id, data) => {
     try {
       const updated = await updateColor(id, data)

@@ -29,6 +29,7 @@ import {
 import { Link, useLocation } from 'react-router-dom'
 import ExitToAppIcon from '@mui/icons-material/ExitToApp'
 import AccountCircleIcon from '@mui/icons-material/AccountCircle'
+import SourceIcon from '@mui/icons-material/Source'
 import { optimizeCloudinaryUrl } from '~/utils/cloudinary.js'
 
 import { useDispatch } from 'react-redux'
@@ -89,6 +90,9 @@ export default function AdminDrawer({
     staff: 'Nhân viên quản lý',
     customer: 'Khách hàng'
   }
+
+  const profileName = profile?.name || 'Không có dữ liệu'
+
   if (!open) {
     return (
       <Box
@@ -216,13 +220,13 @@ export default function AdminDrawer({
       >
         <Avatar
           src={optimizeCloudinaryUrl(profile?.avatarUrl)}
-          alt={profile?.name}
+          alt={profileName}
           sx={{ width: 48, height: 48, mr: 2 }}
         />
         <Box>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
             <Typography fontWeight='bold' fontSize={14}>
-              {profile?.name
+              {profileName
                 ?.toLowerCase()
                 .split(' ')
                 .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
@@ -278,7 +282,22 @@ export default function AdminDrawer({
               </ListItemButton>
             </ListItem>
           </Link>
-
+          <Link
+            to='/admin/marketing-management'
+            style={{ textDecoration: 'none', color: 'inherit' }}
+          >
+            <ListItem disablePadding>
+              <ListItemButton
+                selected={isActive('/admin/marketing-management')}
+                sx={activeButtonStyle}
+              >
+                <ListItemIcon>
+                  <SourceIcon />
+                </ListItemIcon>
+                <ListItemText primary='Quản lý nội dung' />
+              </ListItemButton>
+            </ListItem>
+          </Link>
           <ListItem disablePadding>
             <ListItemButton onClick={toggleProduct} sx={activeButtonStyle}>
               <ListItemIcon>
@@ -351,14 +370,14 @@ export default function AdminDrawer({
                   icon: <ReceiptLongIcon />
                 },
                 {
-                  label: 'Quản lý mã giảm giá',
-                  path: '/admin/discount-management',
-                  icon: <LocalOfferIcon />
-                },
-                {
                   label: 'Quản lý giao dịch',
                   path: '/admin/transaction-management',
                   icon: <PaymentIcon />
+                },
+                {
+                  label: 'Quản lý mã giảm giá',
+                  path: '/admin/discount-management',
+                  icon: <LocalOfferIcon />
                 }
               ].map((item) => (
                 <Link

@@ -67,7 +67,7 @@ export default function Search({
       const spaceAbove = rect.top
 
       // Force dropdown to appear above for rows 4 and beyond (index.jsx >= 3)
-      if (index >= 3) {
+      if (index >= 2) {
         setDropdownPosition({ top: true, bottom: false })
       } else {
         // For rows 0-2, prefer below but switch to above if spaceAbove is insufficient
@@ -137,11 +137,11 @@ export default function Search({
             position: 'absolute',
             width: 680,
             zIndex: 1000,
-            maxHeight: 150,
+            maxHeight: 148,
             overflowY: 'auto',
             boxShadow: 3,
-            ...(dropdownPosition.top && { bottom: '100%', mb: 1 }),
-            ...(dropdownPosition.bottom && { top: '100%', mt: 1 })
+            ...(dropdownPosition.top && { bottom: '100%' }),
+            ...(dropdownPosition.bottom && { top: '100%' })
           }}
         >
           <List sx={{ padding: 0 }}>
