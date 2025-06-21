@@ -1,5 +1,7 @@
 import React from 'react'
+import { Box, Typography } from '@mui/material'
 import ReviewTable from './ReviewTable'
+import usePermissions from '~/hooks/usePermissions'
 
 // Lazy load các modal
 const ViewReviewModal = React.lazy(() => import('./modal/ViewReviewModal'))
@@ -42,6 +44,7 @@ const mockData = [
 ]
 
 const ProductReviewManagement = () => {
+  const { hasPermission } = usePermissions()
   const [page, setPage] = React.useState(1)
   const [limit, setLimit] = React.useState(10)
   const [filters, setFilters] = React.useState({})
@@ -51,6 +54,17 @@ const ProductReviewManagement = () => {
 
   const totalPages = Math.ceil(reviews.length / limit)
   const loading = false
+
+  // Kiểm tra quyền truy cập review
+  if (!hasPermission('review:read')) {
+    return (
+      <Box sx={{ p: 3, textAlign: 'center' }}>
+        <Typography variant='h6' color='error'>
+          Bạn không có quyền truy cập quản lý đánh giá
+        </Typography>
+      </Box>
+    )
+  }
 
   const handleChangePage = (_, value) => setPage(value)
 

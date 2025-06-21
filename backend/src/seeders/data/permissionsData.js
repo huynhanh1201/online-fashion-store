@@ -80,8 +80,10 @@ export const permissions = [
   },
 
   // Order
+  { key: 'order:create', label: 'Tạo đơn hàng', group: 'Đơn hàng' },
   { key: 'order:read', label: 'Xem đơn hàng', group: 'Đơn hàng' },
   { key: 'order:update', label: 'Cập nhật đơn hàng', group: 'Đơn hàng' },
+  { key: 'order:delete', label: 'Xóa đơn hàng', group: 'Đơn hàng' },
 
   // Payment Transaction
   {
@@ -151,5 +153,17 @@ export const permissions = [
     key: 'shippingAddress:delete',
     label: 'Xóa địa chỉ giao hàng',
     group: 'Địa chỉ giao hàng'
-  }
+  },
+
+  // Review
+  { key: 'review:create', label: 'Tạo đánh giá', group: 'Đánh giá' },
+  { key: 'review:read', label: 'Xem đánh giá', group: 'Đánh giá' },
+  { key: 'review:update', label: 'Sửa đánh giá', group: 'Đánh giá' },
+  { key: 'review:delete', label: 'Xóa đánh giá', group: 'Đánh giá' },
+
+  // Cart
+  { key: 'cart:create', label: 'Tạo giỏ hàng', group: 'Giỏ hàng' },
+  { key: 'cart:read', label: 'Xem giỏ hàng', group: 'Giỏ hàng' },
+  { key: 'cart:update', label: 'Cập nhật giỏ hàng', group: 'Giỏ hàng' },
+  { key: 'cart:delete', label: 'Xóa giỏ hàng', group: 'Giỏ hàng' }
 ]

@@ -34,8 +34,10 @@ import TablePaginationActions from '~/components/PaginationAdmin/TablePagination
 import Chip from '@mui/material/Chip'
 import TableNoneData from '~/components/TableAdmin/NoneData.jsx'
 import Stack from '@mui/material/Stack'
+import usePermissions from '~/hooks/usePermissions'
 
 const WarehousesTab = () => {
+  const { hasPermission } = usePermissions()
   const {
     warehouses,
     fetchWarehouses,
@@ -142,8 +144,8 @@ const WarehousesTab = () => {
     (warehouse) => warehouse.destroy === false
   )
 
-  // Điều kiện: Chỉ cho phép bấm nút nếu activeWarehouses.length <= 1
-  const isAddDisabled = activeWarehouses.length >= 1
+  // Điều kiện: Chỉ cho phép bấm nút nếu activeWarehouses.length <= 1 và có quyền tạo
+  const isAddDisabled = activeWarehouses.length >= 1 || !hasPermission('warehouse:create')
 
   return (
     <Paper sx={{ border: '1px solid #ccc', width: '100%', overflow: 'hidden' }}>
@@ -277,30 +279,36 @@ const WarehousesTab = () => {
                           spacing={1}
                           justifyContent='start'
                         >
-                          <Tooltip title='Xem'>
-                            <IconButton
-                              onClick={() => handleViewWarehouse(row)}
-                              size='small'
-                            >
-                              <RemoveRedEyeIcon color='primary' />
-                            </IconButton>
-                          </Tooltip>
-                          <Tooltip title='Sửa'>
-                            <IconButton
-                              onClick={() => handleEditWarehouse(row)}
-                              size='small'
-                            >
-                              <BorderColorIcon color='warning' />
-                            </IconButton>
-                          </Tooltip>
-                          <Tooltip title='Ẩn'>
-                            <IconButton
-                              onClick={() => handleDeleteWarehouse(row)}
-                              size='small'
-                            >
-                              <VisibilityOffIcon color='error' />
-                            </IconButton>
-                          </Tooltip>
+                          {hasPermission('warehouse:read') && (
+                            <Tooltip title='Xem'>
+                              <IconButton
+                                onClick={() => handleViewWarehouse(row)}
+                                size='small'
+                              >
+                                <RemoveRedEyeIcon color='primary' />
+                              </IconButton>
+                            </Tooltip>
+                          )}
+                          {hasPermission('warehouse:update') && (
+                            <Tooltip title='Sửa'>
+                              <IconButton
+                                onClick={() => handleEditWarehouse(row)}
+                                size='small'
+                              >
+                                <BorderColorIcon color='warning' />
+                              </IconButton>
+                            </Tooltip>
+                          )}
+                          {hasPermission('warehouse:delete') && (
+                            <Tooltip title='Ẩn'>
+                              <IconButton
+                                onClick={() => handleDeleteWarehouse(row)}
+                                size='small'
+                              >
+                                <VisibilityOffIcon color='error' />
+                              </IconButton>
+                            </Tooltip>
+                          )}
                         </Stack>
                       )
                     }

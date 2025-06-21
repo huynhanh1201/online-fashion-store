@@ -15,7 +15,7 @@ const CouponItem = ({ coupon, onCopy, copiedCode, formatCurrencyShort, disabled 
       <Card
         sx={{
           borderRadius: 4,
-          boxShadow: 6,
+
           p: 1,
           backgroundColor: '#fff',
           border: '2px dashed #a6a6a6',
@@ -50,7 +50,6 @@ const CouponItem = ({ coupon, onCopy, copiedCode, formatCurrencyShort, disabled 
     <Card
       sx={{
         borderRadius: 4,
-        boxShadow: 6,
         p: 1,
         backgroundColor: '#fff',
         border: '2px dashed #a6a6a6',

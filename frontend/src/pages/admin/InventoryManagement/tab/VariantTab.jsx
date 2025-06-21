@@ -32,7 +32,11 @@ import Chip from '@mui/material/Chip'
 import Stack from '@mui/material/Stack'
 import TableNoneData from '~/components/TableAdmin/NoneData.jsx'
 import Tooltip from '@mui/material/Tooltip'
+import usePermissions from '~/hooks/usePermissions'
+import { PermissionWrapper, RouteGuard } from '~/components/PermissionGuard'
+
 const VariantsTab = () => {
+  const { hasPermission } = usePermissions()
   const {
     variants,
     fetchVariants,
@@ -79,7 +83,9 @@ const VariantsTab = () => {
     fetchVariants(page, rowsPerPage, filter)
   }, [page, rowsPerPage, filter])
   const handleAddVariant = () => {
-    setOpenAddModal(true)
+    if (hasPermission('variant:create')) {
+      setOpenAddModal(true)
+    }
   }
 
   const handleCloseAddModal = () => {
@@ -88,18 +94,24 @@ const VariantsTab = () => {
   }
 
   const handleViewVariant = (variant) => {
-    setSelectedVariant(variant)
-    setOpenViewModal(true)
+    if (hasPermission('variant:read')) {
+      setSelectedVariant(variant)
+      setOpenViewModal(true)
+    }
   }
 
   const handleEditVariant = (variant) => {
-    setSelectedVariant(variant)
-    setOpenEditModal(true)
+    if (hasPermission('variant:update')) {
+      setSelectedVariant(variant)
+      setOpenEditModal(true)
+    }
   }
 
   const handleDeleteVariant = (variant) => {
-    setSelectedVariant(variant)
-    setOpenDeleteModal(true)
+    if (hasPermission('variant:delete')) {
+      setSelectedVariant(variant)
+      setOpenDeleteModal(true)
+    }
   }
 
   const handleCloseViewModal = () => {
@@ -198,271 +210,292 @@ const VariantsTab = () => {
     setRowsPerPage(newLimit)
   }
   return (
-    <Paper sx={{ border: '1px solid #ccc', width: '100%', overflow: 'hidden' }}>
-      <TableContainer>
-        <Table stickyHeader aria-label='variants table'>
-          <TableHead>
-            <TableRow>
-              <TableCell colSpan={variantColumns.length}>
-                <Box
-                  sx={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'start'
-                  }}
-                >
+    <RouteGuard requiredPermissions={['admin:access', 'variant:read']}>
+      <Paper sx={{ border: '1px solid #ccc', width: '100%', overflow: 'hidden' }}>
+        <TableContainer>
+          <Table stickyHeader aria-label='variants table'>
+            <TableHead>
+              <TableRow>
+                <TableCell colSpan={variantColumns.length}>
                   <Box
                     sx={{
                       display: 'flex',
-                      flexDirection: 'column',
-                      gap: 1,
-                      minWidth: 250
+                      justifyContent: 'space-between',
+                      alignItems: 'start'
                     }}
                   >
-                    <Typography variant='h6' sx={{ fontWeight: '800' }}>
-                      Danh Sách Biến Thể
-                    </Typography>
-                    <Button
-                      variant='contained'
-                      color='primary'
-                      onClick={handleAddVariant}
-                      startIcon={<AddIcon />}
+                    <Box
                       sx={{
-                        textTransform: 'none',
-                        width: 100,
                         display: 'flex',
-                        alignItems: 'center',
-                        backgroundColor: '#001f5d',
-                        color: '#fff'
+                        flexDirection: 'column',
+                        gap: 1,
+                        minWidth: 250
                       }}
                     >
-                      Thêm
-                    </Button>
+                      <Typography variant='h6' sx={{ fontWeight: '800' }}>
+                        Danh Sách Biến Thể
+                      </Typography>
+                      {hasPermission('variant:create') && (
+                        <Button
+                          variant='contained'
+                          color='primary'
+                          onClick={handleAddVariant}
+                          startIcon={<AddIcon />}
+                          sx={{
+                            textTransform: 'none',
+                            width: 100,
+                            display: 'flex',
+                            alignItems: 'center',
+                            backgroundColor: '#001f5d',
+                            color: '#fff'
+                          }}
+                        >
+                          Thêm
+                        </Button>
+                      )}
+                    </Box>
+                    <FilterVariant
+                      onFilter={handleFilter}
+                      products={products}
+                      variants={variants}
+                      loading={loadingVariant}
+                      fetchVariants={fetchVariants}
+                      colors={colors}
+                      sizes={sizes}
+                    />
                   </Box>
-                  <FilterVariant
-                    onFilter={handleFilter}
-                    products={products}
-                    variants={variants}
-                    loading={loadingVariant}
-                    fetchVariants={fetchVariants}
-                    colors={colors}
-                    sizes={sizes}
-                  />
-                </Box>
-              </TableCell>
-            </TableRow>
-            <TableRow>
-              {variantColumns.map((column) => (
-                <TableCell
-                  key={column.id}
-                  align={column.align || 'left'}
-                  sx={{
-                    minWidth: column.minWidth,
-                    width: column.width,
-                    px: 1,
-                    pr: column.pr,
-                    ...(column.maxWidth && { maxWidth: column.maxWidth }),
-                    ...(column.id === 'action' && {
-                      width: '130px',
-                      maxWidth: '130px',
-                      paddingLeft: '20px'
-                    })
-                  }}
-                >
-                  {column.label}
-                </TableCell>
-              ))}
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {loadingVariant ? (
-              <TableRow>
-                <TableCell colSpan={variantColumns.length} align='center'>
-                  Đang tải dữ liệu...
                 </TableCell>
               </TableRow>
-            ) : enrichedVariants.length === 0 ? (
-              <TableNoneData
-                col={variantColumns.length}
-                message='Không có dữ liệu biến thể.'
-              />
-            ) : (
-              enrichedVariants.map((row, index) => (
-                <TableRow hover role='checkbox' tabIndex={-1} key={index}>
-                  {variantColumns.map((column) => {
-                    const getValueByPath = (obj, path) =>
-                      path
-                        .split('.')
-                        .reduce((acc, key) => (acc ? acc[key] : undefined), obj)
+              <TableRow>
+                {variantColumns.map((column) => (
+                  <TableCell
+                    key={column.id}
+                    align={column.align || 'left'}
+                    sx={{
+                      minWidth: column.minWidth,
+                      width: column.width,
+                      px: 1,
+                      pr: column.pr,
+                      ...(column.maxWidth && { maxWidth: column.maxWidth }),
+                      ...(column.id === 'action' && {
+                        width: '130px',
+                        maxWidth: '130px',
+                        paddingLeft: '20px'
+                      })
+                    }}
+                  >
+                    {column.label}
+                  </TableCell>
+                ))}
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {loadingVariant ? (
+                <TableRow>
+                  <TableCell colSpan={variantColumns.length} align='center'>
+                    Đang tải dữ liệu...
+                  </TableCell>
+                </TableRow>
+              ) : enrichedVariants.length === 0 ? (
+                <TableNoneData
+                  col={variantColumns.length}
+                  message='Không có dữ liệu biến thể.'
+                />
+              ) : (
+                enrichedVariants.map((row, index) => (
+                  <TableRow hover role='checkbox' tabIndex={-1} key={index}>
+                    {variantColumns.map((column) => {
+                      const getValueByPath = (obj, path) =>
+                        path
+                          .split('.')
+                          .reduce((acc, key) => (acc ? acc[key] : undefined), obj)
 
-                    const { id, align, format } = column
-                    const rawValue = id.includes('.')
-                      ? getValueByPath(row, id)
-                      : row[id]
-                    let content = rawValue ?? '—'
-                    if (column.id === 'index') {
-                      content = (page - 1) * rowsPerPage + index + 1
-                    }
-                    if (id === 'name') {
-                      const name = row.name || 'Không có tên sản phẩm'
-                      content = name
-                        .toLowerCase()
-                        .split(' ')
-                        .map(
-                          (word) => word.charAt(0).toUpperCase() + word.slice(1)
-                        )
-                        .join(' ')
-                    }
-                    if (format) content = format(rawValue)
-                    if (id === 'color.name') {
-                      const colorName = row.color?.name || 'Không có màu sắc'
-                      content =
-                        colorName
+                      const { id, align, format } = column
+                      const rawValue = id.includes('.')
+                        ? getValueByPath(row, id)
+                        : row[id]
+                      let content = rawValue ?? '—'
+                      if (column.id === 'index') {
+                        content = (page - 1) * rowsPerPage + index + 1
+                      }
+                      if (id === 'name') {
+                        const name = row.name || 'Không có tên sản phẩm'
+                        content = name
+                          .toLowerCase()
                           .split(' ')
                           .map(
-                            (word) =>
-                              word.charAt(0).toUpperCase() +
-                              word.slice(1).toLowerCase()
+                            (word) => word.charAt(0).toUpperCase() + word.slice(1)
                           )
-                          .join(' ') || 'Không có màu sắc'
-                    }
-                    if (id === 'size.name') {
-                      content =
-                        row.size?.name.toUpperCase() || 'Không có màu sắc'
-                    }
-                    if (id === 'destroy') {
-                      content = (
-                        <Chip
-                          label={rawValue ? 'Đã huỷ' : 'Còn hàng'}
-                          color={rawValue ? 'error' : 'success'}
-                          size='large'
-                          sx={{ width: 127, fontWeight: 800 }}
-                        />
-                      )
-                    }
+                          .join(' ')
+                      }
+                      if (format) content = format(rawValue)
+                      if (id === 'color.name') {
+                        const colorName = row.color?.name || 'Không có màu sắc'
+                        content =
+                          colorName
+                            .split(' ')
+                            .map(
+                              (word) =>
+                                word.charAt(0).toUpperCase() +
+                                word.slice(1).toLowerCase()
+                            )
+                            .join(' ') || 'Không có màu sắc'
+                      }
+                      if (id === 'size.name') {
+                        content =
+                          row.size?.name.toUpperCase() || 'Không có màu sắc'
+                      }
+                      if (id === 'destroy') {
+                        content = (
+                          <Chip
+                            label={rawValue ? 'Đã huỷ' : 'Còn hàng'}
+                            color={rawValue ? 'error' : 'success'}
+                            size='large'
+                            sx={{ width: 127, fontWeight: 800 }}
+                          />
+                        )
+                      }
 
-                    if (id === 'action') {
-                      content = (
-                        <Stack
-                          direction='row'
-                          spacing={1}
-                          justifyContent='center'
+                      if (id === 'action') {
+                        content = (
+                          <Stack
+                            direction='row'
+                            spacing={1}
+                            justifyContent='center'
+                          >
+                            {hasPermission('variant:read') && (
+                              <Tooltip title='Xem'>
+                                <IconButton
+                                  onClick={() => handleViewVariant(row)}
+                                  size='small'
+                                >
+                                  <RemoveRedEyeIcon color='primary' />
+                                </IconButton>
+                              </Tooltip>
+                            )}
+                            {hasPermission('variant:update') && (
+                              <Tooltip title='Sửa'>
+                                <IconButton
+                                  onClick={() => handleEditVariant(row)}
+                                  size='small'
+                                >
+                                  <BorderColorIcon color='warning' />
+                                </IconButton>
+                              </Tooltip>
+                            )}
+                            {hasPermission('variant:delete') && (
+                              <Tooltip title='Xoá'>
+                                <IconButton
+                                  onClick={() => handleDeleteVariant(row)}
+                                  size='small'
+                                >
+                                  <DeleteForeverIcon color='error' />
+                                </IconButton>
+                              </Tooltip>
+                            )}
+                          </Stack>
+                        )
+                      }
+
+                      return (
+                        <TableCell
+                          key={id}
+                          align={align || 'left'}
+                          title={
+                            typeof content === 'string' ? content : undefined
+                          }
+                          sx={{
+                            height: 55,
+                            minHeight: 55,
+                            maxHeight: 55,
+                            py: 0,
+                            px: 1,
+                            whiteSpace: 'nowrap',
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            verticalAlign: 'middle',
+                            ...(id === 'sku' || id === 'name'
+                              ? { maxWidth: 150 } // Ẩn tràn nếu mã hoặc tên dài
+                              : {}),
+                            ...(id === 'exportPrice' && { pr: column.pr })
+                          }}
                         >
-                          <Tooltip title='Xem'>
-                            <IconButton
-                              onClick={() => handleViewVariant(row)}
-                              size='small'
-                            >
-                              <RemoveRedEyeIcon color='primary' />
-                            </IconButton>
-                          </Tooltip>
-                          <Tooltip title='Sửa'>
-                            <IconButton
-                              onClick={() => handleEditVariant(row)}
-                              size='small'
-                            >
-                              <BorderColorIcon color='warning' />
-                            </IconButton>
-                          </Tooltip>
-                          <Tooltip title='Xoá'>
-                            <IconButton
-                              onClick={() => handleDeleteVariant(row)}
-                              size='small'
-                            >
-                              <DeleteForeverIcon color='error' />
-                            </IconButton>
-                          </Tooltip>
-                        </Stack>
+                          {content}
+                        </TableCell>
                       )
-                    }
+                    })}
+                  </TableRow>
+                ))
+              )}
+            </TableBody>
+          </Table>
+        </TableContainer>
+        <TablePagination
+          rowsPerPageOptions={[10, 25, 100]}
+          component='div'
+          count={totalVariant || 0}
+          rowsPerPage={rowsPerPage}
+          page={page - 1}
+          onPageChange={(event, newPage) => handleChangePage(event, newPage + 1)} // truyền lại đúng logic cho parent
+          onRowsPerPageChange={(event) => {
+            const newLimit = parseInt(event.target.value, 10)
+            if (onChangeRowsPerPage) {
+              onChangeRowsPerPage(newLimit)
+            }
+          }}
+          labelRowsPerPage='Số dòng mỗi trang'
+          labelDisplayedRows={({ from, to, count }) => {
+            const totalPages = Math.ceil(count / rowsPerPage)
+            return `${from}–${to} trên ${count} | Trang ${page} / ${totalPages}`
+          }}
+          ActionsComponent={TablePaginationActions}
+        />
 
-                    return (
-                      <TableCell
-                        key={id}
-                        align={align || 'left'}
-                        title={
-                          typeof content === 'string' ? content : undefined
-                        }
-                        sx={{
-                          height: 55,
-                          minHeight: 55,
-                          maxHeight: 55,
-                          py: 0,
-                          px: 1,
-                          whiteSpace: 'nowrap',
-                          overflow: 'hidden',
-                          textOverflow: 'ellipsis',
-                          verticalAlign: 'middle',
-                          ...(id === 'sku' || id === 'name'
-                            ? { maxWidth: 150 } // Ẩn tràn nếu mã hoặc tên dài
-                            : {}),
-                          ...(id === 'exportPrice' && { pr: column.pr })
-                        }}
-                      >
-                        {content}
-                      </TableCell>
-                    )
-                  })}
-                </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
-      </TableContainer>
-      <TablePagination
-        rowsPerPageOptions={[10, 25, 100]}
-        component='div'
-        count={totalVariant || 0}
-        rowsPerPage={rowsPerPage}
-        page={page - 1}
-        onPageChange={(event, newPage) => handleChangePage(event, newPage + 1)} // truyền lại đúng logic cho parent
-        onRowsPerPageChange={(event) => {
-          const newLimit = parseInt(event.target.value, 10)
-          if (onChangeRowsPerPage) {
-            onChangeRowsPerPage(newLimit)
-          }
-        }}
-        labelRowsPerPage='Số dòng mỗi trang'
-        labelDisplayedRows={({ from, to, count }) => {
-          const totalPages = Math.ceil(count / rowsPerPage)
-          return `${from}–${to} trên ${count} | Trang ${page} / ${totalPages}`
-        }}
-        ActionsComponent={TablePaginationActions}
-      />
-      <AddVariantModal
-        open={openAddModal}
-        onClose={handleCloseAddModal}
-        addVariant={handleSave}
-        products={products}
-        parseCurrency={parseCurrency}
-        formatCurrency={formatCurrency}
-        colors={colors}
-        sizes={sizes}
-        fetchColors={fetchColors}
-        fetchSizes={fetchSizes}
-      />
-      <ViewVariantModal
-        open={openViewModal}
-        onClose={handleCloseViewModal}
-        variant={selectedVariant}
-        products={products}
-      />
-      <EditVariantModal
-        open={openEditModal}
-        onClose={handleCloseEditModal}
-        variant={selectedVariant}
-        onUpdateVariant={handleSave}
-        products={products}
-        parseCurrency={parseCurrency}
-        formatCurrency={formatCurrency}
-      />
-      <DeleteVariantModal
-        open={openDeleteModal}
-        onClose={handleCloseDeleteModal}
-        variant={selectedVariant}
-        deleteVariant={handleSave}
-      />
-    </Paper>
+        <PermissionWrapper requiredPermissions={['variant:create']}>
+          <AddVariantModal
+            open={openAddModal}
+            onClose={handleCloseAddModal}
+            addVariant={handleSave}
+            products={products}
+            parseCurrency={parseCurrency}
+            formatCurrency={formatCurrency}
+            colors={colors}
+            sizes={sizes}
+            fetchColors={fetchColors}
+            fetchSizes={fetchSizes}
+          />
+        </PermissionWrapper>
+
+        <ViewVariantModal
+          open={openViewModal}
+          onClose={handleCloseViewModal}
+          variant={selectedVariant}
+          products={products}
+        />
+
+        <PermissionWrapper requiredPermissions={['variant:update']}>
+          <EditVariantModal
+            open={openEditModal}
+            onClose={handleCloseEditModal}
+            variant={selectedVariant}
+            onUpdateVariant={handleSave}
+            products={products}
+            parseCurrency={parseCurrency}
+            formatCurrency={formatCurrency}
+          />
+        </PermissionWrapper>
+
+        <PermissionWrapper requiredPermissions={['variant:delete']}>
+          <DeleteVariantModal
+            open={openDeleteModal}
+            onClose={handleCloseDeleteModal}
+            variant={selectedVariant}
+            deleteVariant={handleSave}
+          />
+        </PermissionWrapper>
+
+      </Paper>
+    </RouteGuard>
   )
 }
 

@@ -29,7 +29,7 @@ const styles = {
   }
 }
 
-const ProductRow = ({ product, index, columns, onAction }) => {
+const ProductRow = ({ product, index, columns, onAction, permissions = {} }) => {
   const [openImage, setOpenImage] = useState(false)
 
   const handleImageClick = () => setOpenImage(true)
@@ -173,30 +173,36 @@ const ProductRow = ({ product, index, columns, onAction }) => {
             return (
               <TableCell key={id} align={align} sx={styles.cellPadding}>
                 <Stack direction='row' sx={styles.groupIcon}>
-                  <Tooltip title='Xem'>
-                    <IconButton
-                      onClick={() => onAction('view', product)}
-                      size='small'
-                    >
-                      <RemoveRedEyeIcon color='primary' />
-                    </IconButton>
-                  </Tooltip>
-                  <Tooltip title='Sửa'>
-                    <IconButton
-                      onClick={() => onAction('edit', product)}
-                      size='small'
-                    >
-                      <BorderColorIcon color='warning' />
-                    </IconButton>
-                  </Tooltip>
-                  <Tooltip title='Xoá'>
-                    <IconButton
-                      onClick={() => onAction('delete', product)}
-                      size='small'
-                    >
-                      <DeleteForeverIcon color='error' />
-                    </IconButton>
-                  </Tooltip>
+                  {permissions.canView && (
+                    <Tooltip title='Xem'>
+                      <IconButton
+                        onClick={() => onAction('view', product)}
+                        size='small'
+                      >
+                        <RemoveRedEyeIcon color='primary' />
+                      </IconButton>
+                    </Tooltip>
+                  )}
+                  {permissions.canEdit && (
+                    <Tooltip title='Sửa'>
+                      <IconButton
+                        onClick={() => onAction('edit', product)}
+                        size='small'
+                      >
+                        <BorderColorIcon color='warning' />
+                      </IconButton>
+                    </Tooltip>
+                  )}
+                  {permissions.canDelete && (
+                    <Tooltip title='Xoá'>
+                      <IconButton
+                        onClick={() => onAction('delete', product)}
+                        size='small'
+                      >
+                        <DeleteForeverIcon color='error' />
+                      </IconButton>
+                    </Tooltip>
+                  )}
                 </Stack>
               </TableCell>
             )

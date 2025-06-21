@@ -6,6 +6,9 @@ import SizeTable from './SizeTable.jsx'
 import SizePagination from './SizePagination'
 
 import useSizes from '~/hooks/admin/useSize'
+import usePermissions from '~/hooks/usePermissions'
+import { PermissionWrapper, RouteGuard } from '~/components/PermissionGuard'
+import { updateSize, deleteSize } from '~/services/admin/sizeService'
 
 // Lazy load các modal
 const AddSizeModal = React.lazy(() => import('./modal/AddSizeModal'))
@@ -23,6 +26,7 @@ const SizeManagement = () => {
   const [selectedSize, setSelectedSize] = React.useState(null)
   const [modalType, setModalType] = React.useState(null)
 
+
   const {
     sizes,
     totalPages,
@@ -34,6 +38,7 @@ const SizeManagement = () => {
     update,
     createNewSize
   } = useSizes()
+  const { hasPermission } = usePermissions()
 
   React.useEffect(() => {
     fetchSizes(page, limit, filters)
@@ -41,6 +46,12 @@ const SizeManagement = () => {
 
   const handleOpenModal = (type, size) => {
     if (!size || !size._id) return
+
+    // Kiểm tra quyền trước khi mở modal
+    if (type === 'edit' && !hasPermission('size:update')) return
+    if (type === 'delete' && !hasPermission('size:delete')) return
+    if (type === 'view' && !hasPermission('size:read')) return
+
     setSelectedSize(size)
     setModalType(type)
   }
@@ -107,12 +118,16 @@ const SizeManagement = () => {
     }
   }
   return (
-    <>
+    <RouteGuard requiredPermissions={['admin:access', 'size:read']}>
       <SizeTable
         sizes={sizes}
         loading={Loading}
         handleOpenModal={handleOpenModal}
-        addSize={() => setModalType('add')}
+        addSize={() => {
+          if (hasPermission('size:create')) {
+            setModalType('add')
+          }
+        }}
         onFilters={handleFilter}
         page={page - 1}
         rowsPerPage={limit}
@@ -123,42 +138,55 @@ const SizeManagement = () => {
           setLimit(newLimit)
         }}
         fetchSizes={fetchSizes}
+        // Truyền quyền xuống component con
+        permissions={{
+          canCreate: hasPermission('size:create'),
+          canEdit: hasPermission('size:update'),
+          canDelete: hasPermission('size:delete'),
+          canView: hasPermission('size:read')
+        }}
       />
 
       <React.Suspense fallback={<></>}>
-        {modalType === 'add' && (
-          <AddSizeModal open onClose={handleCloseModal} onAdded={handleSave} />
-        )}
+        <PermissionWrapper requiredPermissions={['size:create']}>
+          {modalType === 'add' && (
+            <AddSizeModal open onClose={handleCloseModal} onAdded={handleSave} />
+          )}
+        </PermissionWrapper>
 
         {modalType === 'view' && selectedSize && (
           <ViewSizeModal open onClose={handleCloseModal} size={selectedSize} />
         )}
 
-        {modalType === 'edit' && selectedSize && (
-          <EditSizeModal
-            open
-            onClose={handleCloseModal}
-            size={selectedSize}
-            onSave={handleSave}
-          />
-        )}
+        <PermissionWrapper requiredPermissions={['size:update']}>
+          {modalType === 'edit' && selectedSize && (
+            <EditSizeModal
+              open
+              onClose={handleCloseModal}
+              size={selectedSize}
+              onSave={handleSave}
+            />
+          )}
+        </PermissionWrapper>
 
-        {modalType === 'delete' && selectedSize && (
-          <DeleteSizeModal
-            open
-            onClose={handleCloseModal}
-            size={selectedSize}
-            onDelete={handleSave}
-          />
-        )}
+        <PermissionWrapper requiredPermissions={['size:delete']}>
+          {modalType === 'delete' && selectedSize && (
+            <DeleteSizeModal
+              open
+              onClose={handleCloseModal}
+              size={selectedSize}
+              onDelete={handleSave}
+            />
+          )}
+        </PermissionWrapper>
       </React.Suspense>
 
-      {/*<SizePagination*/}
-      {/*  page={page}*/}
-      {/*  totalPages={totalPages}*/}
-      {/*  onPageChange={handleChangePage}*/}
-      {/*/>*/}
-    </>
+      {/*<SizePagination
+        page={page}
+        totalPages={totalPages}
+        onPageChange={handleChangePage}
+      />*/}
+    </RouteGuard>
   )
 }
 

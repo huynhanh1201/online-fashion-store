@@ -15,10 +15,17 @@ import {
   Card,
   CardContent,
   Stack,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  DialogContentText,
 } from '@mui/material'
 import { useParams, useNavigate } from 'react-router-dom'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack'
+import { Cancel, Warning } from '@mui/icons-material'
 import { useOrderDetail } from '~/hooks/useOrderDetail'
+import { useOrder } from '~/hooks/useOrder'
 import ReviewModal from './modal/ReviewModal'
 import { createReview, getUserReviews } from '~/services/reviewService'
 import { useSelector } from 'react-redux'
@@ -33,16 +40,112 @@ const statusLabels = {
   Cancelled: ['Đã hủy', 'error'],
 }
 
+// Confirmation Modal Component
+const CancelOrderModal = ({ open, onClose, onConfirm, order, loading }) => {
+  return (
+    <Dialog
+      open={open}
+      onClose={onClose}
+      maxWidth="sm"
+      fullWidth
+      PaperProps={{
+        sx: {
+          borderRadius: 3,
+          boxShadow: '0 10px 40px rgba(0,0,0,0.1)'
+        }
+      }}
+    >
+      <DialogTitle sx={{ pb: 1 }}>
+        <Box display="flex" alignItems="center" gap={2}>
+          <Box
+            sx={{
+              p: 1.5,
+              borderRadius: '50%',
+              backgroundColor: 'error.50',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}
+          >
+            <Warning sx={{ color: 'error.main', fontSize: 28 }} />
+          </Box>
+          <Box>
+            <Typography variant="h6" fontWeight="600" color="text.primary">
+              Xác nhận hủy đơn hàng
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              Đơn hàng #{order?.code}
+            </Typography>
+          </Box>
+        </Box>
+      </DialogTitle>
+
+      <DialogContent sx={{ py: 2 }}>
+        <DialogContentText sx={{ fontSize: '1rem', color: 'text.primary' }}>
+          Bạn có chắc chắn muốn hủy đơn hàng này không?
+          <br />
+          <Typography
+            component="span"
+            sx={{
+              fontWeight: 600,
+              color: 'error.main',
+              mt: 1,
+              display: 'block'
+            }}
+          >
+            Hành động này không thể hoàn tác!
+          </Typography>
+        </DialogContentText>
+      </DialogContent>
+
+      <DialogActions sx={{ p: 3, pt: 1 }}>
+        <Button
+          onClick={onClose}
+          variant="outlined"
+          disabled={loading}
+          sx={{
+            borderRadius: 2,
+            textTransform: 'none',
+            fontWeight: 600,
+            px: 3
+          }}
+        >
+          Không, giữ lại
+        </Button>
+        <Button
+          onClick={onConfirm}
+          variant="contained"
+          color="error"
+          disabled={loading}
+          startIcon={loading ? <CircularProgress size={16} /> : <Cancel />}
+          sx={{
+            borderRadius: 2,
+            textTransform: 'none',
+            fontWeight: 600,
+            px: 3,
+            boxShadow: '0 4px 12px rgba(211, 47, 47, 0.3)'
+          }}
+        >
+          {loading ? 'Đang hủy...' : 'Có, hủy đơn'}
+        </Button>
+      </DialogActions>
+    </Dialog>
+  )
+}
+
 const OrderDetail = () => {
   const { orderId } = useParams()
   const navigate = useNavigate()
   const { order, items, loading, error } = useOrderDetail(orderId)
+  const { cancelOrder } = useOrder()
   const currentUser = useSelector(selectCurrentUser)
 
   const [snackbarOpen, setSnackbarOpen] = useState(false)
   const [openReviewModal, setOpenReviewModal] = useState(false)
   const [hasReviewed, setHasReviewed] = useState(false)     // Track if order is reviewed
   const [selectedProduct, setSelectedProduct] = useState(null)
+  const [openCancelModal, setOpenCancelModal] = useState(false)
+  const [cancelling, setCancelling] = useState(false)
 
   useEffect(() => {
     const fetchUserReviews = async () => {
@@ -93,11 +196,18 @@ const OrderDetail = () => {
   const isOrderCancellable = ['Pending', 'Processing'].includes(order.status) && order.paymentStatus !== 'paid'
 
   const handleCancelOrder = async () => {
+    setCancelling(true)
     try {
-      console.log('Hủy đơn hàng:', orderId)
+      await cancelOrder(orderId)
+      console.log('Đã hủy đơn hàng:', orderId)
+      setOpenCancelModal(false)
+      // Refresh page or navigate back to orders list
       navigate('/orders')
-    } catch (err) {
-      console.error('Lỗi khi hủy đơn hàng:', err)
+    } catch (error) {
+      console.error('Lỗi khi hủy đơn hàng:', error)
+      // You can show a snackbar or toast here instead of alert
+    } finally {
+      setCancelling(false)
     }
   }
 
@@ -138,8 +248,8 @@ const OrderDetail = () => {
         })
 
         // Use createReview with FormData (assume service supports it)
-        await createReview(formData, { 
-          headers: { 'Content-Type': 'multipart/form-data' } 
+        await createReview(formData, {
+          headers: { 'Content-Type': 'multipart/form-data' }
         })
       }
 
@@ -338,6 +448,22 @@ const OrderDetail = () => {
                       Đánh giá
                     </Button>
                   )}
+                  {isOrderCancellable && (
+                    <Button
+                      variant="outlined"
+                      color="error"
+                      size="medium"
+                      startIcon={<Cancel />}
+                      sx={{
+                        borderRadius: 2,
+                        textTransform: 'none',
+                        fontWeight: 600
+                      }}
+                      onClick={() => setOpenCancelModal(true)}
+                    >
+                      Hủy đơn
+                    </Button>
+                  )}
                   <Button
                     variant="outlined"
                     size="medium"
@@ -406,7 +532,7 @@ const OrderDetail = () => {
                 </Typography>
               </Box>
               <Box display="flex" justifyContent="space-between" mt={1}>
-                <Typography fontWeight="600">Thanh toán:</Typography>
+                <Typography fontWeight="600">Phương thức thanh toán:</Typography>
                 <Typography fontWeight={600}>
                   {order.paymentMethod?.toLowerCase() === 'cod' ? 'Thanh toán khi nhận hàng (COD)' : 'VNPay'}
                 </Typography>
@@ -437,12 +563,13 @@ const OrderDetail = () => {
               <Button
                 variant="outlined"
                 color="error"
+                startIcon={<Cancel />}
                 sx={{
                   borderRadius: 2,
                   textTransform: 'none',
                   fontWeight: 600
                 }}
-                onClick={handleCancelOrder}
+                onClick={() => setOpenCancelModal(true)}
               >
                 Hủy đơn
               </Button>
@@ -477,6 +604,15 @@ const OrderDetail = () => {
         onSubmit={handleSubmitReview}
         orderItems={selectedProduct ? selectedProduct.variants : items}
         products={selectedProduct ? [selectedProduct] : uniqueProducts}
+      />
+
+      {/* Cancel Order Modal */}
+      <CancelOrderModal
+        open={openCancelModal}
+        onClose={() => setOpenCancelModal(false)}
+        onConfirm={handleCancelOrder}
+        order={order}
+        loading={cancelling}
       />
     </Box>
   )

@@ -27,7 +27,10 @@ import usePartner from '~/hooks/admin/Inventory/usePartner.js'
 import TablePaginationActions from '~/components/PaginationAdmin/TablePaginationActions.jsx'
 import TableNoneData from '~/components/TableAdmin/NoneData.jsx'
 import Tooltip from '@mui/material/Tooltip'
+import usePermissions from '~/hooks/usePermissions'
 const WarehouseSlipsTab = () => {
+  const { hasPermission } = usePermissions()
+
   const {
     warehouseSlips,
     fetchWarehouseSlips,
@@ -170,8 +173,8 @@ const WarehouseSlipsTab = () => {
       typeof slip.warehouseId === 'object'
         ? slip.warehouseId.name
         : warehouses.find(
-            (w) => w._id === slip.warehouseId || w.id === slip.warehouseId
-          )?.name
+          (w) => w._id === slip.warehouseId || w.id === slip.warehouseId
+        )?.name
 
     return {
       ...slip,
@@ -254,34 +257,50 @@ const WarehouseSlipsTab = () => {
                           gap: 1
                         }}
                       >
-                        <Button
-                          variant='contained'
-                          color='primary'
-                          onClick={() => handleOpenModal('input')}
-                          sx={{
-                            textTransform: 'none',
-                            flex: 1,
-                            display: 'flex',
-                            alignItems: 'center',
-                            backgroundColor: '#001f5d',
-                            color: '#fff'
-                          }}
-                        >
-                          Nhập kho
-                        </Button>
-                        <Button
-                          variant='contained'
-                          color='secondary'
-                          onClick={() => handleOpenModal('output')}
-                          sx={{
-                            textTransform: 'none',
-                            flex: 1,
-                            display: 'flex',
-                            alignItems: 'center'
-                          }}
-                        >
-                          Xuất kho
-                        </Button>
+                        {hasPermission('warehouseSlip:create') ? (
+                          <>
+                            <Button
+                              variant='contained'
+                              color='primary'
+                              onClick={() => handleOpenModal('input')}
+                              sx={{
+                                textTransform: 'none',
+                                flex: 1,
+                                display: 'flex',
+                                alignItems: 'center',
+                                backgroundColor: '#001f5d',
+                                color: '#fff'
+                              }}
+                            >
+                              Nhập kho
+                            </Button>
+                            <Button
+                              variant='contained'
+                              color='secondary'
+                              onClick={() => handleOpenModal('output')}
+                              sx={{
+                                textTransform: 'none',
+                                flex: 1,
+                                display: 'flex',
+                                alignItems: 'center'
+                              }}
+                            >
+                              Xuất kho
+                            </Button>
+                          </>
+                        ) : (
+                          <Typography
+                            variant='body2'
+                            color='text.secondary'
+                            sx={{
+                              fontStyle: 'italic',
+                              textAlign: 'center',
+                              py: 1
+                            }}
+                          >
+                            Bạn không có quyền tạo phiếu kho
+                          </Typography>
+                        )}
                       </Box>
                     </Box>
                   </Box>
@@ -400,15 +419,24 @@ const WarehouseSlipsTab = () => {
                     // Nút hành động
                     if (col.id === 'action') {
                       content = (
-                        <Tooltip title='Xem'>
-                          <IconButton
-                            onClick={() => handleViewSlip(row)}
-                            size='small'
-                            color='primary'
-                          >
-                            <RemoveRedEyeIcon color='primary' />
-                          </IconButton>
-                        </Tooltip>
+                        <Box sx={{ display: 'flex', gap: 0.5 }}>
+                          {hasPermission('warehouseSlip:read') && (
+                            <Tooltip title='Xem'>
+                              <IconButton
+                                onClick={() => handleViewSlip(row)}
+                                size='small'
+                                color='primary'
+                              >
+                                <RemoveRedEyeIcon color='primary' />
+                              </IconButton>
+                            </Tooltip>
+                          )}
+                          {!hasPermission('warehouseSlip:read') && (
+                            <Typography variant='caption' color='text.secondary'>
+                              Không có quyền
+                            </Typography>
+                          )}
+                        </Box>
                       )
                     }
 

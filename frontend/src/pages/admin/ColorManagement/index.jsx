@@ -6,6 +6,8 @@ import ColorTable from './ColorTable'
 import ColorPagination from './ColorPagination'
 
 import useColors from '~/hooks/admin/useColor'
+import usePermissions from '~/hooks/usePermissions'
+import { PermissionWrapper, RouteGuard } from '~/components/PermissionGuard'
 import { updateColor, deleteColor } from '~/services/admin/ColorService'
 
 // Lazy load các modal
@@ -34,6 +36,7 @@ const ColorManagement = () => {
     update,
     createNewColor
   } = useColors()
+  const { hasPermission } = usePermissions()
 
   React.useEffect(() => {
     fetchColors(page, limit, filters)
@@ -105,7 +108,7 @@ const ColorManagement = () => {
     }
   }
   return (
-    <>
+    <RouteGuard requiredPermissions={['admin:access', 'color:read']}>
       <ColorTable
         colors={colors}
         loading={Loading}
@@ -121,12 +124,21 @@ const ColorManagement = () => {
           setPage(1)
           setLimit(newLimit)
         }}
+        // Truyền quyền xuống component con
+        permissions={{
+          canCreate: hasPermission('color:create'),
+          canEdit: hasPermission('color:update'),
+          canDelete: hasPermission('color:delete'),
+          canView: hasPermission('color:read')
+        }}
       />
 
       <React.Suspense fallback={<></>}>
-        {modalType === 'add' && (
-          <AddColorModal open onClose={handleCloseModal} onAdded={handleSave} />
-        )}
+        <PermissionWrapper requiredPermissions={['color:create']}>
+          {modalType === 'add' && (
+            <AddColorModal open onClose={handleCloseModal} onAdded={handleSave} />
+          )}
+        </PermissionWrapper>
 
         {modalType === 'view' && selectedColor && (
           <ViewColorModal
@@ -136,23 +148,27 @@ const ColorManagement = () => {
           />
         )}
 
-        {modalType === 'edit' && selectedColor && (
-          <EditColorModal
-            open
-            onClose={handleCloseModal}
-            color={selectedColor}
-            onSave={handleSave}
-          />
-        )}
+        <PermissionWrapper requiredPermissions={['color:update']}>
+          {modalType === 'edit' && selectedColor && (
+            <EditColorModal
+              open
+              onClose={handleCloseModal}
+              color={selectedColor}
+              onSave={handleSave}
+            />
+          )}
+        </PermissionWrapper>
 
-        {modalType === 'delete' && selectedColor && (
-          <DeleteColorModal
-            open
-            onClose={handleCloseModal}
-            color={selectedColor}
-            onDelete={handleSave}
-          />
-        )}
+        <PermissionWrapper requiredPermissions={['color:delete']}>
+          {modalType === 'delete' && selectedColor && (
+            <DeleteColorModal
+              open
+              onClose={handleCloseModal}
+              color={selectedColor}
+              onDelete={handleSave}
+            />
+          )}
+        </PermissionWrapper>
       </React.Suspense>
 
       {/*<ColorPagination*/}
@@ -160,7 +176,7 @@ const ColorManagement = () => {
       {/*  totalPages={totalPages}*/}
       {/*  onPageChange={handleChangePage}*/}
       {/*/>*/}
-    </>
+    </RouteGuard>
   )
 }
 

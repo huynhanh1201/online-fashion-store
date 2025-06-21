@@ -123,10 +123,10 @@ import VisibilityOffIcon from '@mui/icons-material/VisibilityOff'
 const formatDate = (iso) =>
   iso
     ? new Date(iso).toLocaleDateString('vi-VN', {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric'
-      })
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric'
+    })
     : '—'
 
 const styles = {
@@ -151,7 +151,7 @@ const styles = {
   }
 }
 
-export default function DiscountRow({ discount, index, columns, onAction }) {
+export default function DiscountRow({ discount, index, columns, onAction, permissions = {} }) {
   const remaining = discount.usageLimit - discount.usedCount
 
   return (
@@ -205,30 +205,36 @@ export default function DiscountRow({ discount, index, columns, onAction }) {
           case 'action':
             content = (
               <Stack direction='row' sx={styles.groupIcon}>
-                <Tooltip title='Xem'>
-                  <IconButton
-                    onClick={() => onAction('view', discount)}
-                    size='small'
-                  >
-                    <RemoveRedEyeIcon color='primary' />
-                  </IconButton>
-                </Tooltip>
-                <Tooltip title='Sửa'>
-                  <IconButton
-                    onClick={() => onAction('edit', discount)}
-                    size='small'
-                  >
-                    <BorderColorIcon color='warning' />
-                  </IconButton>
-                </Tooltip>
-                <Tooltip title='Ẩn'>
-                  <IconButton
-                    onClick={() => onAction('delete', discount)}
-                    size='small'
-                  >
-                    <VisibilityOffIcon color='error' />
-                  </IconButton>
-                </Tooltip>
+                {permissions.canView && (
+                  <Tooltip title='Xem'>
+                    <IconButton
+                      onClick={() => onAction('view', discount)}
+                      size='small'
+                    >
+                      <RemoveRedEyeIcon color='primary' />
+                    </IconButton>
+                  </Tooltip>
+                )}
+                {permissions.canEdit && (
+                  <Tooltip title='Sửa'>
+                    <IconButton
+                      onClick={() => onAction('edit', discount)}
+                      size='small'
+                    >
+                      <BorderColorIcon color='warning' />
+                    </IconButton>
+                  </Tooltip>
+                )}
+                {permissions.canDelete && (
+                  <Tooltip title='Ẩn'>
+                    <IconButton
+                      onClick={() => onAction('delete', discount)}
+                      size='small'
+                    >
+                      <VisibilityOffIcon color='error' />
+                    </IconButton>
+                  </Tooltip>
+                )}
               </Stack>
             )
             break

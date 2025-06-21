@@ -75,6 +75,7 @@ import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye'
 import BorderColorIcon from '@mui/icons-material/BorderColor'
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever'
 import { StyledTableCell, StyledTableRow } from '~/assets/StyleAdmin.jsx'
+import usePermissions from '~/hooks/usePermissions'
 
 const styles = {
   groupIcon: {
@@ -91,7 +92,8 @@ export default React.memo(function UserRow({
   handleOpenModal,
   columns
 }) {
-  // console.log('UserRow render', index.jsx)
+  const { hasPermission } = usePermissions()
+
   return (
     <TableRow hover role='checkbox' tabIndex={-1}>
       {columns.map((column) => {
@@ -103,27 +105,33 @@ export default React.memo(function UserRow({
               sx={{ minHeight: 90, height: 90 }}
             >
               <Stack direction='row' sx={styles.groupIcon}>
-                <IconButton
-                  onClick={() => handleOpenModal('view', user)}
-                  size='small'
-                  color='primary'
-                >
-                  <RemoveRedEyeIcon color='primary' />
-                </IconButton>
-                <IconButton
-                  onClick={() => handleOpenModal('edit', user)}
-                  size='small'
-                  color='info'
-                >
-                  <BorderColorIcon color='warning' />
-                </IconButton>
-                <IconButton
-                  onClick={() => handleOpenModal('delete', user)}
-                  size='small'
-                  color='error'
-                >
-                  <DeleteForeverIcon color='error' />
-                </IconButton>
+                {hasPermission('user:read') && (
+                  <IconButton
+                    onClick={() => handleOpenModal('view', user)}
+                    size='small'
+                    color='primary'
+                  >
+                    <RemoveRedEyeIcon color='primary' />
+                  </IconButton>
+                )}
+                {hasPermission('user:update') && (
+                  <IconButton
+                    onClick={() => handleOpenModal('edit', user)}
+                    size='small'
+                    color='info'
+                  >
+                    <BorderColorIcon color='warning' />
+                  </IconButton>
+                )}
+                {hasPermission('user:delete') && (
+                  <IconButton
+                    onClick={() => handleOpenModal('delete', user)}
+                    size='small'
+                    color='error'
+                  >
+                    <DeleteForeverIcon color='error' />
+                  </IconButton>
+                )}
               </Stack>
             </TableCell>
           )
@@ -144,10 +152,10 @@ export default React.memo(function UserRow({
           >
             {column.id === 'name' && value
               ? value
-                  .toLowerCase()
-                  .split(' ')
-                  .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-                  .join(' ')
+                .toLowerCase()
+                .split(' ')
+                .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+                .join(' ')
               : column.id === 'role'
                 ? value === 'admin'
                   ? 'QUẢN TRỊ'

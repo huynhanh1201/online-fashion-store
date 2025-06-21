@@ -216,7 +216,19 @@ export const roles = [
       'shippingAddress:read',
       'shippingAddress:create',
       'shippingAddress:update',
-      'shippingAddress:delete'
+      'shippingAddress:delete',
+
+      // Review - khách hàng có thể tạo và quản lý đánh giá của mình
+      'review:create',
+      'review:read',
+      'review:update',
+      'review:delete',
+
+      // Cart - quản lý giỏ hàng
+      'cart:create',
+      'cart:read',
+      'cart:update',
+      'cart:delete'
     ]
   }
 ]
