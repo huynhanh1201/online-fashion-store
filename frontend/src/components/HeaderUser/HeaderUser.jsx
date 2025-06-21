@@ -51,7 +51,7 @@ const HeaderUser = () => {
               justifyContent: 'space-between',
               alignItems: 'center',
               minHeight: { xs: 56, sm: 64, md: 72 },
-              px: { xs: 1, sm: 2, md: 3 }
+              px: { xs: 1, sm: 2, md: 3 },
             }}
           >
             {/* Left */}

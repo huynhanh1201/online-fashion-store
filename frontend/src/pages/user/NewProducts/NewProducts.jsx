@@ -368,9 +368,41 @@ const NewProducts = () => {
                   page={page}
                   onChange={handlePageChange}
                   color='primary'
-                  size='large'
-                  showFirstButton
-                  showLastButton
+                  size='small'
+                  boundaryCount={1}
+                  siblingCount={1}
+                  shape='rounded'
+                  sx={{
+                    '& .MuiPagination-ul': {
+                      justifyContent: 'center',
+                      gap: '8px',
+                      padding: '8px 0',
+                    },
+                    mt: 3,
+                    mb: 2,
+                    '& .MuiPaginationItem-root': {
+                      borderRadius: '6px',
+                      border: '1.5px solid #e0e0e0',
+                      fontWeight: 500,
+                      fontSize: '1rem',
+                      minWidth: 44,
+                      minHeight: 44,
+                      color: '#757575',
+                      background: '#fff',
+                      boxShadow: 'none',
+                      transition: 'all 0.2s',
+                      '&:hover': {
+                        borderColor: '#000',
+                        background: '#fafafa',
+                        color: '#111',
+                      },
+                      '&.Mui-selected': {
+                        background: '#111',
+                        color: '#fff',
+                        borderColor: '#111',
+                      },
+                    },
+                  }}
                 />
               </Box>
             </>

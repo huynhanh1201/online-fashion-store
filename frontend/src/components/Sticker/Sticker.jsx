@@ -3,15 +3,16 @@ import React from 'react'
 const Sticker = ({
   text = '',
   color = 'white',
-  backgroundColor = '#e53935',
-  top =11,
-  right = -10 ,
+  background = 'linear-gradient(135deg,rgb(74, 131, 196) 0%, #1A3C7B 100%)',
+  top = 0,
+  right = 0,
   left,
   bottom,
-  fontSize = '15px',
-  fontWeight = 700,
-  padding = '6px 10px',
-  borderRadius = '10px',
+  fontSize = '14px',
+  fontWeight = 600,
+  padding = '5px 15px 5px 10px',
+  borderRadius = 0,
+  boxShadow = '4px  4px 4px 10px rgba(0, 0, 0, 0.1)',
   style = {},
   ...props
 }) => (
@@ -23,19 +24,17 @@ const Sticker = ({
       left,
       bottom,
       zIndex: 6,
-      backgroundColor,
+      background,
       color,
       fontWeight,
       fontSize,
       padding,
+      boxShadow,
       borderRadius,
-      letterSpacing: 1,
-      boxShadow: '0 2px 8px rgba(229,57,53,0.15)',
-      border: '2px dashed #fff',
       textTransform: 'uppercase',
       fontFamily: 'inherit',
-      transform: 'rotate(35deg)',
-      ...style,
+      clipPath: 'polygon(0 0, 100% 0, calc(100% - 10px) 50%, 100% 100%, 0 100%)',
+      ...style
     }}
     {...props}
   >

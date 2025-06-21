@@ -14,7 +14,8 @@ const styles = {
     position: 'relative',
     cursor: 'pointer',
     paddingBottom: '6px',
-    transition: 'color 0.3s ease'
+    transition: 'color 0.3s ease',
+    marginRight: '20px'
   },
   underline: {
     position: 'absolute',

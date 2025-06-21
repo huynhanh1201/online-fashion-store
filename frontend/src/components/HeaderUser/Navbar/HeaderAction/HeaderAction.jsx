@@ -1,14 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react'
 import {
   IconButton,
-  Menu,
-  MenuItem,
-  Badge,
-  Grow,
-  Fade,
-  Paper,
+  Box,
+  Typography,
   Avatar,
-  Typography
+  Badge,
+  Button
 } from '@mui/material'
 import PersonIcon from '@mui/icons-material/Person'
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart'
@@ -136,166 +133,203 @@ const HeaderAction = () => {
         )}
       </IconButton>
 
-      <Menu
-        anchorEl={anchorEl}
-        open={open}
-        onClose={handleClose}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-        transformOrigin={{ vertical: 'top', horizontal: 'right' }}
-        TransitionComponent={Grow}
-        TransitionProps={{
-          timeout: { enter: 400, exit: 200 },
-          easing: {
-            enter: 'cubic-bezier(0.4, 0, 0.2, 1)',
-            exit: 'cubic-bezier(0.4, 0, 0.2, 1)'
-          }
+      <Box
+        ref={menuRef}
+        sx={{
+          position: 'absolute',
+          top: '100%',
+          right: 0,
+          transform: open ? 'translateY(0) scaleY(1)' : 'translateY(0) scaleY(0)',
+          transformOrigin: 'top',
+          minWidth: 160,
+          zIndex: 1400,
+          backgroundColor: 'white',
+          borderRadius: '20px',
+          padding: open ? '10px' : '0',
+          boxShadow: '0 4px 10px rgba(0,0,0,0.1)',
+          overflow: 'hidden',
+          transition: 'transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), padding 0.2s ease, opacity 0.4s ease',
+          opacity: open ? 1 : 0,
+          pointerEvents: open ? 'auto' : 'none'
         }}
-        PaperProps={{
-          component: Paper,
-          elevation: 6,
-          sx: {
-            mt: 2,
-            minWidth: 160,
-            zIndex: 1400,
-            '& .MuiMenuItem-root': {
-              transition: 'background-color 0.2s ease-in-out',
-              '&:hover': {
-                backgroundColor: 'rgba(0, 0, 0, 0.04)'
-              }
-            }
-          }
-        }}
-        MenuListProps={{ ref: menuRef }}
       >
-        <Fade in={open} timeout={{ enter: 500, exit: 200 }}>
-          <div style={{ borderRadius: '20px', padding: '10px' }}>
-            {currentUser ? (
-              <>
-                <MenuItem
-                  onClick={handleClose}
-                  component={Link}
-                  to='/profile'
-                  sx={{
-                    fontWeight: 'bold',
-                    opacity: 1,
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 1,
-                    padding: '12px 16px',
-                    '&:hover': {
-                      backgroundColor: 'rgba(0, 0, 0, 0.08)'
-                    }
-                  }}
-                >
-                  <Avatar
-                    src={optimizeCloudinaryUrl(currentUser.avatarUrl)}
-                    alt={currentUser.name || 'User'}
-                    sx={{
-                      width: 46,
-                      height: 46,
-                      border: '2px solid #1976d2',
-                      boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-                      transition: 'transform 0.2s ease-in-out'
-                    }}
-                  />
-                  <Typography
-                    sx={{
-                      color: '#1976d2',
-                      fontSize: '1rem',
-                      fontWeight: 600,
-                      letterSpacing: '0.5px',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: 0.5
-                    }}
-                  >
-                    {currentUser.name}
-                    <CheckCircleIcon
-                      sx={{
-                        fontSize: '1.1rem',
-                        color: '#4caf50',
-                        ml: 0.5
-                      }}
-                    />
-                  </Typography>
-                </MenuItem>
-                <MenuItem
-                  style={{ marginBottom: '10px', fontWeight: '300' }}
-                  onClick={handleClose}
-                  component={Link}
-                  to='/profile'
-                >
-                  Trang cá nhân
-                </MenuItem>
-                <div style={{ width: '100%', padding: '5px' }}>
-                  <hr
-                    style={{
-                      border: 0,
-                      borderTop: '1px solid #eee',
-                      margin: '0 0 8px 0'
-                    }}
-                  />
-                </div>
-              </>
-            ) : (
-              <MenuItem
-                style={{ fontWeight: '300' }}
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
+          {currentUser ? (
+            <>
+              <Button
                 onClick={handleClose}
                 component={Link}
-                to='/login'
-              >
-                Đăng nhập
-              </MenuItem>
-            )}
-            <MenuItem
-              style={{ fontWeight: '300' }}
-              onClick={handleClose}
-              component={Link}
-              to='/cart'
-            >
-              Giỏ hàng
-            </MenuItem>
-            <MenuItem
-              style={{ fontWeight: '300' }}
-              onClick={handleClose}
-              component={Link}
-              to='/orders'
-            >
-              Thông tin đơn hàng
-            </MenuItem>
-            <div style={{ width: '100%', padding: '5px' }}>
-              <hr
-                style={{
-                  border: 0,
-                  borderTop: '1px solid #eee',
-                  margin: '0 0 8px 0'
+                to='/profile'
+                sx={{
+                  fontWeight: 'bold',
+                  opacity: 1,
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 1,
+                  padding: '12px 16px',
+                  justifyContent: 'flex-start',
+                  textTransform: 'none',
+                  '&:hover': {
+                    backgroundColor: 'rgba(0, 0, 0, 0.08)'
+                  }
                 }}
-              />
-            </div>
-            <MenuItem style={{ fontWeight: '300' }} onClick={handleLogout}>
-              <span style={{ display: 'flex', alignItems: 'center' }}>
-                <svg
-                  xmlns='http://www.w3.org/2000/svg'
-                  style={{ marginRight: 8 }}
-                  width='22'
-                  height='22'
-                  fill='none'
-                  viewBox='0 0 24 24'
-                  stroke='currentColor'
+              >
+                <Avatar
+                  src={optimizeCloudinaryUrl(currentUser.avatarUrl)}
+                  alt={currentUser.name || 'User'}
+                  sx={{
+                    width: 46,
+                    height: 46,
+                    border: '2px solid #1976d2',
+                    boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+                    transition: 'transform 0.2s ease-in-out'
+                  }}
+                />
+                <Typography
+                  sx={{
+                    color: '#1976d2',
+                    fontSize: '1rem',
+                    fontWeight: 600,
+                    letterSpacing: '0.5px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 0.5
+                  }}
                 >
-                  <path
-                    strokeLinecap='round'
-                    strokeLinejoin='round'
-                    strokeWidth={2}
-                    d='M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a2 2 0 01-2 2H7a2 2 0 01-2-2V7a2 2 0 012-2h4a2 2 0 012 2v1'
+                  {currentUser.name}
+                  <CheckCircleIcon
+                    sx={{
+                      fontSize: '1.1rem',
+                      color: '#4caf50',
+                      ml: 0.5
+                    }}
                   />
-                </svg>
-                Đăng xuất
-              </span>
-            </MenuItem>
-          </div>
-        </Fade>
-      </Menu>
+                </Typography>
+              </Button>
+              <Button
+                onClick={handleClose}
+                component={Link}
+                to='/profile'
+                sx={{
+                  fontWeight: '300',
+                  padding: '12px 16px',
+                  justifyContent: 'flex-start',
+                  textTransform: 'none',
+                  color: 'text.primary',
+                  '&:hover': {
+                    backgroundColor: 'rgba(0, 0, 0, 0.04)'
+                  }
+                }}
+              >
+                Trang cá nhân
+              </Button>
+              <Box sx={{ width: '100%', padding: '5px' }}>
+                <hr
+                  style={{
+                    border: 0,
+                    borderTop: '1px solid #eee',
+                    margin: '0 0 8px 0'
+                  }}
+                />
+              </Box>
+            </>
+          ) : (
+            <Button
+              onClick={handleClose}
+              component={Link}
+              to='/login'
+              sx={{
+                fontWeight: '300',
+                padding: '12px 16px',
+                justifyContent: 'flex-start',
+                textTransform: 'none',
+                color: 'text.primary',
+                '&:hover': {
+                    backgroundColor: 'rgba(0, 0, 0, 0.04)'
+                }
+              }}
+            >
+              Đăng nhập
+            </Button>
+          )}
+          <Button
+            onClick={handleClose}
+            component={Link}
+            to='/cart'
+            sx={{
+              fontWeight: '300',
+              padding: '12px 16px',
+              justifyContent: 'flex-start',
+              textTransform: 'none',
+              color: 'text.primary',
+              '&:hover': {
+                backgroundColor: 'rgba(0, 0, 0, 0.04)'
+              }}
+            }
+          >
+            Giỏ hàng
+          </Button>
+          <Button
+            onClick={handleClose}
+            component={Link}
+            to='/orders'
+            sx={{
+              fontWeight: '300',
+              padding: '12px 16px',
+              justifyContent: 'flex-start',
+              textTransform: 'none',
+              color: 'text.primary',
+              '&:hover': {
+                backgroundColor: 'rgba(0, 0, 0, 0.04)'
+              }}
+            }
+          >
+            Thông tin đơn hàng
+          </Button>
+          <Box sx={{ width: '100%', padding: '5px' }}>
+            <hr
+              style={{
+                border: 0,
+                borderTop: '1px solid #eee',
+                margin: '0 0 8px 0'
+              }}
+            />
+          </Box>
+          <Button
+            onClick={handleLogout}
+            sx={{
+              fontWeight: '300',
+              padding: '12px 16px',
+              justifyContent: 'flex-start',
+              textTransform: 'none',
+              color: 'text.primary',
+              '&:hover': {
+                backgroundColor: 'rgba(0, 0, 0, 0.04)'
+              }}
+            }
+          >
+            <span style={{ display: 'flex', alignItems: 'center' }}>
+              <svg
+                xmlns='http://www.w3.org/2000/svg'
+                style={{ marginRight: 8 }}
+                width='22'
+                height='22'
+                fill='none'
+                viewBox='0 0 24 24'
+                stroke='currentColor'
+              >
+                <path
+                  strokeLinecap='round'
+                  strokeLinejoin='round'
+                  strokeWidth={2}
+                  d='M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a2 2 0 01-2 2H7a2 2 0 01-2-2V7a2 2 0 012-2h4a2 2 0 012 2v1'
+                />
+              </svg>
+              Đăng xuất
+            </span>
+          </Button>
+        </Box>
+      </Box>
     </>
   )
 }

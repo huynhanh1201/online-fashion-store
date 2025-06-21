@@ -1,6 +1,6 @@
 import { Routes, Route, Navigate, Outlet } from 'react-router-dom'
 import { useSelector } from 'react-redux'
-
+import './assets/scrollbar.css'
 import { selectCurrentUser } from '~/redux/user/userSlice'
 
 // Trang người dùng
@@ -23,6 +23,7 @@ import SearchResult from '~/pages/user/SearchResult/SearchResult'
 import Blog from '~/pages/user/Blog/Blog'
 import ProductbyCategory from '~/pages/user/ProductbyCategory/ProductbyCategory'
 import NewProducts from '~/pages/user/NewProducts/NewProducts'
+import Policy from '~/pages/user/Policy/Policy'
 // Trang HeaderAdmin
 import AdminLayout from '~/layout/AdminLayout'
 import AdminHome from '~/pages/admin/Home/index'
@@ -47,7 +48,8 @@ import WarehousesTab from '~/pages/admin/InventoryManagement/tab/WarehousesTab.j
 import BatchesTab from '~/pages/admin/InventoryManagement/tab/BatchesTab.jsx'
 // Trang 404
 import NotFound from '~/pages/404/NotFound'
-
+//Trang quản lí giao diện Website
+import MarketingManagement from '~/pages/admin/MarketingManagement/index.jsx'
 // Hook
 import { useAutoClearTempCart } from './hooks/useAutoClearTempCart'
 import OrderDetail from './pages/user/Orders/OrderDetail'
@@ -81,6 +83,7 @@ function App() {
           element={<ProductbyCategory />}
         />
         <Route path='productnews' element={<NewProducts />} />
+        <Route path='policy' element={<Policy />} />
         {/*Protected Routes (Hiểu đơn giản trong dự án của chúng ta là những route chỉ cho phép truy cập sau khi đã login)*/}
         <Route element={<ProtectedRoute user={currentUser} />}>
           {/*<Outlet/> của react-router-dom sẽ chạy vào các child route trong này*/}
@@ -143,6 +146,7 @@ function App() {
           />
           <Route path='warehouses-management' element={<WarehousesTab />} />
           <Route path='batches-management' element={<BatchesTab />} />
+          <Route path='marketing-management' element={<MarketingManagement />} />
         </Route>
       </Route>
 

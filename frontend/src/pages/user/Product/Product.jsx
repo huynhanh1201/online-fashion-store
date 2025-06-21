@@ -20,7 +20,7 @@ import NavigateNextIcon from '@mui/icons-material/NavigateNext'
 import { getProducts } from '~/services/productService'
 import ProductCategories from './ProductCategories/ProductCategories'
 
-const ITEMS_PER_PAGE = 5
+const ITEMS_PER_PAGE = 15
 
 // Custom styled button to mimic the dropdown in the image
 const SortDropdownButton = styled('button')(({ theme }) => ({
@@ -61,8 +61,11 @@ const SortMenuItem = styled('div')(({ theme }) => ({
   cursor: 'pointer',
   color: '#222',
   background: '#fff',
+  transition: 'background 0.2s, color 0.2s, font-weight 0.2s',
   '&:hover': {
-    background: '#f5f5f5'
+    background: '#e3e6f0',
+    color: '#1976d2',
+    fontWeight: 600
   }
 }))
 
@@ -370,16 +373,53 @@ const Product = () => {
               </div>
 
               <Box
-                sx={{ display: 'flex', justifyContent: 'center', mt: 4, mb: 2 }}
+                sx={{ display: 'flex', justifyContent: 'center', mt: 4, mb: 4 }}
               >
                 <Pagination
                   count={totalPages}
                   page={page}
                   onChange={handlePageChange}
                   color='primary'
-                  size='large'
+                  size='small'
                   showFirstButton
                   showLastButton
+                  boundaryCount={0}
+                  siblingCount={2}
+                  shape='rounded'
+                  sx={{
+                    '& .MuiPagination-ul': {
+                      justifyContent: 'center',
+                      gap: '8px',
+                      padding: '8px 0',
+                    },
+                    mt: 3,
+                    mb: 2,
+                    '& .MuiPaginationItem-root': {
+                      borderRadius: '6px',
+                      border: '1.5px solid #e0e0e0',
+                      fontWeight: 500,
+                      fontSize: '1rem',
+                      minWidth: 44,
+                      minHeight: 44,
+                      color: '#757575',
+                      background: '#fff',
+                      boxShadow: 'none',
+                      transition: 'all 0.2s',
+                      '&:hover': {
+                        borderColor: '#000',
+                        background: '#fafafa',
+                        color: '#111',
+                      },
+                      '&.Mui-selected': {
+                        background: '#111',
+                        color: '#fff',
+                        borderColor: '#111',
+                      },
+                    },
+                    '& .MuiPaginationItem-ellipsis': {
+                      display: 'none',
+                    },
+                  }}
                 />
               </Box>
             </>
