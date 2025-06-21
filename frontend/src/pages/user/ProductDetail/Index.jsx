@@ -9,6 +9,9 @@ import VoucherDrawer from './VoucherDrawer'
 import SnackbarAlert from './SnackbarAlert'
 import RelatedProducts from './RelatedProducts'
 import { getCategoryById } from '~/services/categoryService'
+import Breadcrumbs from '@mui/material/Breadcrumbs'
+import { Link } from '@mui/material'
+import NavigateNextIcon from '@mui/icons-material/NavigateNext'
 
 const ProductDetail = () => {
   const { productId } = useParams()
@@ -111,65 +114,66 @@ const ProductDetail = () => {
         mx: 'auto'
       }}
     >
-      <Box sx={{ mb: 2, mt: 0, p: 1 }}>
-        <Box
-          sx={{
-            display: 'flex',
-            alignItems: 'center',
-            fontSize: 15,
-            py: 1,
-            px: 0,
-            borderRadius: 1
-          }}
+      <Box
+        sx={{
+          bottom: { xs: '20px', sm: '30px', md: '40px' },
+          left: { xs: '20px', sm: '30px', md: '40px' },
+          right: { xs: '20px', sm: '30px', md: '40px' },
+          padding: '12px',
+          maxWidth: '1800px',
+          margin: '0 auto'
+        }}
+      >
+        <Breadcrumbs
+          separator={<NavigateNextIcon fontSize='small' />}
+          aria-label='breadcrumb'
         >
-          <Typography
-            component={RouterLink}
-            to='/'
+          <Link
+            underline='hover'
             sx={{
-              color: '#1976d2',
+              display: 'flex',
+              alignItems: 'center',
+              color: '#007bff',
               textDecoration: 'none',
-              fontSize: 15,
-              '&:hover': { textDecoration: 'underline' },
-              mr: 0.5
+              '&:hover': {
+                color: 'primary.main'
+              }
             }}
+            href='/'
           >
             Trang chủ
-          </Typography>
-          <Typography sx={{ mx: 0.5, color: '#888' }}>/</Typography>
+          </Link>
           <Typography
-            component={RouterLink}
-            to='/product'
             sx={{
-              color: '#1976d2',
-              textDecoration: 'none',
-              fontSize: 15,
-              '&:hover': { textDecoration: 'underline' },
-              mr: 0.5
+              display: 'flex',
+              alignItems: 'center',
+              color: 'text.primary',
+              fontWeight: 500
             }}
           >
             Sản phẩm
           </Typography>
-          <Typography sx={{ mx: 0.5, color: '#888' }}>/</Typography>
           <Typography
-            component={RouterLink}
-            to={`/productbycategory/${category?._id}`}
             sx={{
-              color: '#1976d2',
-              textDecoration: 'none',
-              fontSize: 15,
-              '&:hover': { textDecoration: 'underline' },
-              mr: 0.5
+              display: 'flex',
+              alignItems: 'center',
+              color: 'text.primary',
+              fontWeight: 500
             }}
           >
-            {category?.name || 'Danh mục'}
+            {category?.name}
           </Typography>
-          <Typography sx={{ mx: 0.5, color: '#888' }}>/</Typography>
           <Typography
-            sx={{ fontWeight: 500, fontSize: 15, color: 'text.primary' }}
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              color: 'text.primary',
+              fontWeight: 500
+            }}
           >
-            {product?.name || 'Chi tiết sản phẩm'}
+            {product.name}
           </Typography>
-        </Box>
+        </Breadcrumbs>
       </Box>
 
       <Grid

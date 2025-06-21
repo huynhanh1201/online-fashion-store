@@ -10,14 +10,17 @@ import {
   Typography,
   CircularProgress,
   styled,
-  Pagination
+  Pagination,
+  Breadcrumbs,
+  Link
 } from '@mui/material'
 import { useDispatch } from 'react-redux'
 import { setCartItems } from '~/redux/cart/cartSlice'
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward'
 import SortByAlphaIcon from '@mui/icons-material/SortByAlpha'
+import NavigateNextIcon from '@mui/icons-material/NavigateNext'
 
-const ITEMS_PER_PAGE = 15
+const ITEMS_PER_PAGE = 10
 
 // Custom styled button to mimic the dropdown in the image
 const SortDropdownButton = styled('button')(({ theme }) => ({
@@ -58,8 +61,11 @@ const SortMenuItem = styled('div')(({ theme }) => ({
   cursor: 'pointer',
   color: '#222',
   background: '#fff',
+  transition: 'background 0.2s, color 0.2s, font-weight 0.2s',
   '&:hover': {
-    background: '#f5f5f5'
+    background: '#e3e6f0',
+    color: '#1976d2',
+    fontWeight: 600
   }
 }))
 
@@ -271,6 +277,48 @@ export default function SearchResults() {
 
   return (
     <div style={styles.container}>
+      <Box
+        sx={{
+          bottom: { xs: '20px', sm: '30px', md: '40px' },
+          left: { xs: '20px', sm: '30px', md: '40px' },
+          right: { xs: '20px', sm: '30px', md: '40px' },
+          padding: '12px',
+          maxWidth: '1800px',
+          margin: '0 auto'
+        }}
+      >
+        <Breadcrumbs
+          separator={<NavigateNextIcon fontSize='small' />}
+          aria-label='breadcrumb'
+        >
+          <Link
+            underline='hover'
+            sx={{
+              maxWidth: '1800px',
+              display: 'flex',
+              alignItems: 'center',
+              color: '#007bff',
+              textDecoration: 'none',
+              '&:hover': {
+                color: 'primary.main'
+              }
+            }}
+            href='/'
+          >
+            Trang chủ
+          </Link>
+          <Typography
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              color: 'text.primary',
+              fontWeight: 500
+            }}
+          >
+           Kết quả tìm kiếm
+          </Typography>
+        </Breadcrumbs>
+      </Box>
       <main style={{ padding: '0 1.5rem' }}>
         <div style={styles.header}>
           <div style={styles.resultsHeader}>
@@ -379,9 +427,41 @@ export default function SearchResults() {
                 page={page}
                 onChange={handlePageChange}
                 color='primary'
-                size='large'
-                showFirstButton
-                showLastButton
+                size='small'
+                boundaryCount={1}
+                siblingCount={1}
+                shape='rounded'
+                sx={{
+                  '& .MuiPagination-ul': {
+                    justifyContent: 'center',
+                    gap: '8px',
+                    padding: '8px 0',
+                  },
+                  mt: 3,
+                  mb: 2,
+                  '& .MuiPaginationItem-root': {
+                    borderRadius: '6px',
+                    border: '1.5px solid #e0e0e0',
+                    fontWeight: 500,
+                    fontSize: '1rem',
+                    minWidth: 44,
+                    minHeight: 44,
+                    color: '#757575',
+                    background: '#fff',
+                    boxShadow: 'none',
+                    transition: 'all 0.2s',
+                    '&:hover': {
+                      borderColor: '#000',
+                      background: '#fafafa',
+                      color: '#111',
+                    },
+                    '&.Mui-selected': {
+                      background: '#111',
+                      color: '#fff',
+                      borderColor: '#111',
+                    },
+                  },
+                }}
               />
             </Box>
           </>

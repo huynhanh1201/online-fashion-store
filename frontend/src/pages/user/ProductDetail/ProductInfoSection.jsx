@@ -295,13 +295,15 @@ const ProductInfoSection = ({
           >
             <AddIcon fontSize='small' />
           </IconButton>
-          <Typography color='text.secondary' sx={{ fontSize: 13 }}>
-            Kho:{' '}
-            {inventory?.quantity ??
-              selectedVariant?.quantity ??
-              product?.quantity ??
-              0}
-          </Typography>
+          {selectedColor && selectedSize && (
+            <Typography color='text.secondary' sx={{ fontSize: 13 }}>
+              Kho:{' '}
+              {inventory?.quantity ??
+                selectedVariant?.quantity ??
+                product?.quantity ??
+                0}
+            </Typography>
+          )}
         </Box>
 
         {/* Bên phải: Hướng dẫn chọn size */}

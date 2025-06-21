@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { styled } from '@mui/system'
 import { Box } from '@mui/material'
-import { getDiscounts } from '~/services/discountService'
+import { getHeaderConfig } from '~/services/admin/webConfig/headerService'
 
 const TopBar = styled(Box)(({ theme }) => ({
   backgroundColor: '#1A3C7B',
@@ -50,44 +50,52 @@ const formatCurrencyShort = (value) => {
 }
 
 function Topbar() {
-  const [couponText, setCouponText] = useState('🎉 Đang tải ưu đãi...')
+  const [topBannerText, setTopBannerText] = useState('🎉 Đang tải thông báo...')
 
   useEffect(() => {
-    const fetchCoupons = async () => {
+    const fetchTopBanners = async () => {
       try {
-        const { discounts } = await getDiscounts()
-        const activeCoupons = discounts.filter((c) => c.isActive)
+        console.log('Fetching header config...')
+        const headerConfig = await getHeaderConfig()
+        console.log('Header config received:', headerConfig)
+        
+        if (headerConfig && headerConfig.content && headerConfig.content.topBanner) {
+          console.log('Top banner content:', headerConfig.content.topBanner)
+          
+          // Filter visible top banners
+          const visibleTopBanners = headerConfig.content.topBanner.filter(banner => 
+            banner.visible === true && banner.text && banner.text.trim()
+          )
+          
+          console.log('Visible top banners:', visibleTopBanners)
 
-        const apiTexts = activeCoupons.map((coupon) => {
-          const value =
-            coupon.type === 'percent'
-              ? `${coupon.amount}%`
-              : `${formatCurrencyShort(coupon.amount)}`
-          const min = coupon.minOrderValue
-            ? `CHO ĐƠN HÀNG TỐI THIỂU ${formatCurrencyShort(coupon.minOrderValue)}`
-            : ''
-          return `🎁 VOUCHER ${value} ${min}`
-        })
-
-        const mockTexts = [
-          '🚚 FREE SHIP VỚI ĐƠN HÀNG TRÊN 1 TRIỆU',
-          '💸 GIẢM GIÁ LÊN ĐÊN 99%',
-          '🎉 ƯU ĐÃI SIÊU HOT MỖI NGÀY TẠI FASHION STORE'
-        ]
-
-        const finalText = [...apiTexts, ...mockTexts].join('   ') // chỉ khoảng trắng, không có dấu "-"
-        setCouponText(finalText || '⚡ Hiện tại không có ưu đãi nào khả dụng.')
+          if (visibleTopBanners.length > 0) {
+            // Combine all visible top banner texts
+            const bannerTexts = visibleTopBanners.map(banner => banner.text.trim())
+            const finalText = bannerTexts.join('   ') // chỉ khoảng trắng, không có dấu "-"
+            console.log('Final banner text:', finalText)
+            setTopBannerText(finalText)
+          } else {
+            console.log('No visible top banners found')
+            setTopBannerText('⚡ Chào mừng bạn đến với Cửa Hàng!')
+          }
+        } else {
+          console.log('No header config or topBanner found')
+          // Fallback text when no top banners
+          setTopBannerText('⚡ Chào mừng bạn đến với Cửa Hàng!')
+        }
       } catch (error) {
-        setCouponText('⚠️ Lỗi khi tải ưu đãi')
+        console.error('Error fetching top banners:', error)
+        setTopBannerText('⚡ Chào mừng bạn đến với Cửa Hàng!')
       }
     }
 
-    fetchCoupons()
+    fetchTopBanners()
   }, [])
 
   return (
     <TopBar>
-      <MarqueeText>{couponText}</MarqueeText>
+      <MarqueeText>{topBannerText}</MarqueeText>
     </TopBar>
   )
 }

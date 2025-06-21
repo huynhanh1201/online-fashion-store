@@ -97,14 +97,20 @@ function Footer() {
           {/* Cột 2: Chính sách */}
           <Box sx={{ flex: 1, minWidth: 180 }}>
             <Typography variant='subtitle1' sx={{ fontWeight: 600, mb: 1 }}>
+              CHÍNH SÁCH WEBSITE
+            </Typography>
+            <Stack spacing={0.5}>
+              <Typography component="a" href="/policy" sx={{ color: 'inherit', textDecoration: 'none', cursor: 'pointer', '&:hover': { textDecoration: 'underline' } }}>
+                Chính sách của FashionStore
+              </Typography>
+            </Stack>
+            <Typography variant='subtitle1' sx={{ fontWeight: 600, mb: 1 , mt: 2}}>
               HỖ TRỢ KHÁCH HÀNG
             </Typography>
             <Stack spacing={0.5}>
-              <Typography>Chính sách đổi hàng và bảo hành</Typography>
-              <Typography>Chính sách Membership</Typography>
-              <Typography>Chính sách ưu đãi sinh nhật</Typography>
-              <Typography>Chính sách bảo mật</Typography>
-              <Typography>Chính sách giao hàng</Typography>
+              <Typography component="a" href="/policy" sx={{ color: 'inherit', textDecoration: 'none', cursor: 'pointer', '&:hover': { textDecoration: 'underline' } }}>
+                032323232323
+              </Typography>
             </Stack>
           </Box>
 

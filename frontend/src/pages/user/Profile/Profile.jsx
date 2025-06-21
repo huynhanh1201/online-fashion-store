@@ -234,7 +234,6 @@ const Profile = () => {
   return (
     <Box
       sx={{
-        minHeight: '100vh',
         bgcolor: '#f5f5f5',
         p: isMobile ? 2 : 4,
         display: 'flex',
