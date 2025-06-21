@@ -1,87 +1,190 @@
-import React, { useState } from 'react';
+import React, { useState } from 'react'
 import {
   Box,
   Typography,
   Tabs,
   Tab,
-  Paper
-} from '@mui/material';
-import CampaignIcon from '@mui/icons-material/Campaign';
-import ViewQuiltIcon from '@mui/icons-material/ViewQuilt';
-import LocalOfferIcon from '@mui/icons-material/LocalOffer';
-import FlashOnIcon from '@mui/icons-material/FlashOn';
+  Card,
+  useTheme,
+  alpha
+} from '@mui/material'
+import {
+  ViewQuilt as ViewQuiltIcon,
+  LocalOffer as LocalOfferIcon,
+  FlashOn as FlashOnIcon,
+  Image as ImageIcon,
+  Category as CategoryIcon,
+  Star as StarIcon
+} from '@mui/icons-material'
 
-import CampaignManagement from './CampaignManagement';
-import DisplayManagement from './DisplayManagement';
-import PromotionManagement from './PromotionManagement';
-import FlashSaleManagement from './FlashSaleManagement';
+import PromotionManagement from './PromotionManagement.jsx'
+import DisplayManagement from './DisplayManagement'
+import FlashSaleManagement from './FlashSaleManagement'
+import FooterManagement from './FooterManagement.jsx'
+import HeaderManagement from './HeaderManagement.jsx'
+import FeaturedCategoryManagement from '~/pages/admin/MarketingManagement/FeaturedCategoryManagement.jsx'
+import ServiceHighlightManagement from '~/pages/admin/MarketingManagement/ServiceHighlightManagement.jsx'
 
 function a11yProps(index) {
   return {
     id: `marketing-tab-${index}`,
     'aria-controls': `marketing-tabpanel-${index}`
-  };
+  }
 }
 
 const TabPanel = (props) => {
-  const { children, value, index, ...other } = props;
+  const { children, value, index, ...other } = props
   return (
     <div
-      role="tabpanel"
+      role='tabpanel'
       hidden={value !== index}
       id={`marketing-tabpanel-${index}`}
       aria-labelledby={`marketing-tab-${index}`}
       {...other}
     >
-      {value === index && (
-        <Box sx={{ p: 3 }}>
-          {children}
-        </Box>
-      )}
+      {value === index && <Box sx={{ p: 3 }}>{children}</Box>}
     </div>
-  );
-};
+  )
+}
 
 const MarketingManagement = () => {
-  const [tab, setTab] = useState(0);
+  const theme = useTheme()
+  const [tab, setTab] = useState(0)
 
   const handleTabChange = (event, newValue) => {
-    setTab(newValue);
-  };
+    setTab(newValue)
+  }
 
   return (
-    <Paper elevation={3} sx={{ p: 2, m: 2, borderRadius: 2 }}>
-      <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 2 }}>
-        <Typography variant="h5" gutterBottom sx={{ p: 2, fontWeight: 'bold' }}>
-          Quản lý Marketing
-        </Typography>
-        <Tabs
-          value={tab}
-          onChange={handleTabChange}
-          aria-label="marketing management tabs"
-          variant="fullWidth"
+    <Box sx={{ p: 3, backgroundColor: '#f8fafc', minHeight: '100vh' }}>
+      {/* Header */}
+      <Box sx={{ mb: 4 }}>
+        <Typography
+          variant='h4'
+          sx={{
+            fontWeight: 700,
+            color: '#1e293b',
+            mb: 1,
+            display: 'flex',
+            alignItems: 'center',
+            gap: 2
+          }}
         >
-          <Tab icon={<CampaignIcon />} iconPosition="start" label="Chiến dịch" {...a11yProps(0)} />
-          <Tab icon={<ViewQuiltIcon />} iconPosition="start" label="Banner" {...a11yProps(1)} />
-          <Tab icon={<LocalOfferIcon />} iconPosition="start" label="Voucher" {...a11yProps(2)} />
-          <Tab icon={<FlashOnIcon />} iconPosition="start" label="Flash Sale" {...a11yProps(3)} />
-        </Tabs>
+          <LocalOfferIcon sx={{ fontSize: 40, color: '#3b82f6' }} />
+          Quản lý các chiến dịch Marketing
+        </Typography>
       </Box>
 
-      <TabPanel value={tab} index={0}>
-        <CampaignManagement />
-      </TabPanel>
-      <TabPanel value={tab} index={1}>
-        <DisplayManagement />
-      </TabPanel>
-      <TabPanel value={tab} index={2}>
-        <PromotionManagement />
-      </TabPanel>
-      <TabPanel value={tab} index={3}>
-        <FlashSaleManagement />
-      </TabPanel>
-    </Paper>
-  );
-};
+      {/* Tabs */}
+      <Card
+        sx={{
+          borderRadius: 3,
+          boxShadow: '0 4px 24px rgba(0, 0, 0, 0.06)',
+          border: '1px solid #e2e8f0'
+        }}
+      >
+        <Box sx={{ borderBottom: 1, borderColor: 'divider', p: 2 }}>
+          <Tabs
+            value={tab}
+            onChange={handleTabChange}
+            aria-label='marketing management tabs'
+            variant='scrollable'
+            scrollButtons='auto'
+            sx={{
+              '& .MuiTab-root': {
+                textTransform: 'none',
+                fontWeight: 600,
+                fontSize: '1rem',
+                color: '#64748b',
+                borderRadius: 2,
+                transition: 'all 0.3s ease',
+                '&:hover': {
+                  backgroundColor: alpha(theme.palette.primary.main, 0.08),
+                  color: theme.palette.primary.main
+                }
+              },
+              '& .Mui-selected': {
+                backgroundColor: alpha(theme.palette.primary.main, 0.12),
+                color: theme.palette.primary.main,
+                fontWeight: 700
+              },
+              '& .MuiTabs-indicator': {
+                backgroundColor: theme.palette.primary.main,
+                height: 3,
+                borderRadius: '3px 3px 0 0'
+              }
+            }}
+          >
+            <Tab
+              icon={<ViewQuiltIcon />}
+              iconPosition='start'
+              label='Banner'
+              {...a11yProps(0)}
+            />
+            <Tab
+              icon={<LocalOfferIcon />}
+              iconPosition='start'
+              label='Voucher'
+              {...a11yProps(1)}
+            />
+            <Tab
+              icon={<FlashOnIcon />}
+              iconPosition='start'
+              label='Flash Sale'
+              {...a11yProps(2)}
+            />
+            <Tab
+              icon={<ImageIcon />}
+              iconPosition='start'
+              label='Header'
+              {...a11yProps(3)}
+            />
+            <Tab
+              icon={<ImageIcon />}
+              iconPosition='start'
+              label='Footer'
+              {...a11yProps(4)}
+            />
 
-export default MarketingManagement;
+            <Tab
+              icon={<CategoryIcon />}
+              iconPosition='start'
+              label='Danh mục nổi bật'
+              {...a11yProps(5)}
+            />
+            <Tab
+              icon={<StarIcon />}
+              iconPosition='start'
+              label='Dịch vụ nổi bật'
+              {...a11yProps(6)}
+            />
+          </Tabs>
+        </Box>
+
+        <TabPanel value={tab} index={0}>
+          <DisplayManagement />
+        </TabPanel>
+        <TabPanel value={tab} index={1}>
+          <PromotionManagement />
+        </TabPanel>
+        <TabPanel value={tab} index={2}>
+          <FlashSaleManagement />
+        </TabPanel>
+        <TabPanel value={tab} index={3}>
+          <HeaderManagement />
+        </TabPanel>
+        <TabPanel value={tab} index={4}>
+          <FooterManagement />
+        </TabPanel>
+        <TabPanel value={tab} index={5}>
+          <FeaturedCategoryManagement />
+        </TabPanel>
+        <TabPanel value={tab} index={6}>
+          <ServiceHighlightManagement />
+        </TabPanel>
+      </Card>
+    </Box>
+  )
+}
+
+export default MarketingManagement
