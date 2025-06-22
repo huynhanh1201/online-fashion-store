@@ -52,8 +52,8 @@ categorySchema.plugin(refIntegrityPlugin, {
     { model: 'Category', foreignField: 'parent' },
 
     {
-      model: 'Product', // tên model tham chiếu tới
-      foreignField: 'categoryId' // field trong Book đang trỏ đến Author
+      model: 'Product',
+      foreignField: 'categoryId'
     }
   ]
 })
