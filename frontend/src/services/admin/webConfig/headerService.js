@@ -54,6 +54,82 @@ export const updateHeaderConfig = async (content) => {
   }
 }
 
+// Menu Management Functions
+export const getMenuConfig = async () => {
+  try {
+    const response = await AuthorizedAxiosInstance.get(
+      `${API_ROOT}/v1/website-configs`
+    )
+    
+    const websiteConfigs = response.data.data || response.data
+    const menu = websiteConfigs.find((item) => item.key === 'menu')
+    return menu || null
+  } catch (error) {
+    console.error('Lỗi khi lấy cấu hình menu:', error)
+    throw new Error(
+      error.response?.data?.message || 
+      'Không thể tải cấu hình menu. Vui lòng thử lại.'
+    )
+  }
+}
+
+export const updateMenuConfig = async (content) => {
+  try {
+    // Trước tiên lấy menu config hiện tại để lấy ID
+    const currentMenu = await getMenuConfig()
+    
+    if (!currentMenu?._id) {
+      throw new Error('Không tìm thấy cấu hình menu để cập nhật')
+    }
+
+    const payload = {
+      key: 'menu',
+      title: 'Menu Configuration',
+      description: 'Cấu hình menu của website',
+      content,
+      status: 'active'
+    }
+    
+    const response = await AuthorizedAxiosInstance.patch(
+      `${API_ROOT}/v1/website-configs/${currentMenu._id}`,
+      payload
+    )
+    return response.data
+  } catch (error) {
+    console.error('Lỗi khi cập nhật cấu hình menu:', error)
+    throw new Error(
+      error.response?.data?.message || 
+      error.message ||
+      'Không thể cập nhật cấu hình menu. Vui lòng thử lại.'
+    )
+  }
+}
+
+export const createMenuConfig = async (content) => {
+  try {
+    const payload = {
+      key: 'menu',
+      title: 'Menu Configuration',
+      description: 'Cấu hình menu của website',
+      content,
+      status: 'active'
+    }
+    
+    const response = await AuthorizedAxiosInstance.post(
+      `${API_ROOT}/v1/website-configs`,
+      payload
+    )
+    return response.data
+  } catch (error) {
+    console.error('Lỗi khi tạo cấu hình menu:', error)
+    throw new Error(
+      error.response?.data?.message || 
+      error.message ||
+      'Không thể tạo cấu hình menu. Vui lòng thử lại.'
+    )
+  }
+}
+
 // Helper function to validate header content
 export const validateHeaderContent = (content) => {
   const errors = []
@@ -74,4 +150,240 @@ export const validateHeaderContent = (content) => {
   })
 
   return errors
+}
+
+// Helper function to validate menu content
+export const validateMenuContent = (content) => {
+  const errors = []
+
+  // Validate main menu
+  if (content.mainMenu) {
+    if (!Array.isArray(content.mainMenu)) {
+      errors.push('Main menu phải là một mảng')
+    } else {
+      content.mainMenu.forEach((item, index) => {
+        if (!item.label?.trim()) {
+          errors.push(`Menu item ${index + 1} thiếu label`)
+        }
+        if (!item.url?.trim()) {
+          errors.push(`Menu item ${index + 1} thiếu URL`)
+        }
+        if (item.children && !Array.isArray(item.children)) {
+          errors.push(`Submenu của item ${index + 1} phải là một mảng`)
+        }
+        // Validate submenu items
+        if (item.children) {
+          item.children.forEach((subItem, subIndex) => {
+            if (!subItem.label?.trim()) {
+              errors.push(`Submenu item ${subIndex + 1} của menu ${index + 1} thiếu label`)
+            }
+            if (!subItem.url?.trim()) {
+              errors.push(`Submenu item ${subIndex + 1} của menu ${index + 1} thiếu URL`)
+            }
+          })
+        }
+      })
+    }
+  }
+
+  // Validate mobile menu
+  if (content.mobileMenu) {
+    if (!Array.isArray(content.mobileMenu)) {
+      errors.push('Mobile menu phải là một mảng')
+    } else {
+      content.mobileMenu.forEach((item, index) => {
+        if (!item.label?.trim()) {
+          errors.push(`Mobile menu item ${index + 1} thiếu label`)
+        }
+        if (!item.url?.trim()) {
+          errors.push(`Mobile menu item ${index + 1} thiếu URL`)
+        }
+      })
+    }
+  }
+
+  // Validate footer menu
+  if (content.footerMenu) {
+    if (!Array.isArray(content.footerMenu)) {
+      errors.push('Footer menu phải là một mảng')
+    } else {
+      content.footerMenu.forEach((item, index) => {
+        if (!item.label?.trim()) {
+          errors.push(`Footer menu item ${index + 1} thiếu label`)
+        }
+        if (!item.url?.trim()) {
+          errors.push(`Footer menu item ${index + 1} thiếu URL`)
+        }
+      })
+    }
+  }
+
+  return errors
+}
+
+// Helper function to get default menu structure
+export const getDefaultMenuStructure = () => {
+  return {
+    mainMenu: [
+      {
+        label: 'Trang chủ',
+        url: '/',
+        icon: 'home',
+        visible: true,
+        order: 1
+      },
+      {
+        label: 'Sản phẩm',
+        url: '/products',
+        icon: 'shopping-bag',
+        visible: true,
+        order: 2,
+        children: [
+          {
+            label: 'Tất cả sản phẩm',
+            url: '/products',
+            visible: true,
+            order: 1
+          },
+          {
+            label: 'Sản phẩm mới',
+            url: '/new-products',
+            visible: true,
+            order: 2
+          },
+          {
+            label: 'Sản phẩm bán chạy',
+            url: '/best-selling',
+            visible: true,
+            order: 3
+          },
+          {
+            label: 'Sản phẩm giảm giá',
+            url: '/discounted',
+            visible: true,
+            order: 4
+          }
+        ]
+      },
+      {
+        label: 'Danh mục',
+        url: '/categories',
+        icon: 'grid',
+        visible: true,
+        order: 3,
+        children: [
+          {
+            label: 'Thời trang nam',
+            url: '/category/men',
+            visible: true,
+            order: 1
+          },
+          {
+            label: 'Thời trang nữ',
+            url: '/category/women',
+            visible: true,
+            order: 2
+          },
+          {
+            label: 'Thời trang trẻ em',
+            url: '/category/kids',
+            visible: true,
+            order: 3
+          }
+        ]
+      },
+      {
+        label: 'Liên hệ',
+        url: '/contact',
+        icon: 'phone',
+        visible: true,
+        order: 4
+      }
+    ],
+    mobileMenu: [
+      {
+        label: 'Trang chủ',
+        url: '/',
+        icon: 'home',
+        visible: true,
+        order: 1
+      },
+      {
+        label: 'Sản phẩm',
+        url: '/products',
+        icon: 'shopping-bag',
+        visible: true,
+        order: 2
+      },
+      {
+        label: 'Giỏ hàng',
+        url: '/cart',
+        icon: 'shopping-cart',
+        visible: true,
+        order: 3
+      },
+      {
+        label: 'Tài khoản',
+        url: '/profile',
+        icon: 'user',
+        visible: true,
+        order: 4
+      }
+    ],
+    footerMenu: [
+      {
+        label: 'Về chúng tôi',
+        url: '/about',
+        visible: true,
+        order: 1
+      },
+      {
+        label: 'Chính sách',
+        url: '/policy',
+        visible: true,
+        order: 2
+      },
+      {
+        label: 'Điều khoản',
+        url: '/terms',
+        visible: true,
+        order: 3
+      },
+      {
+        label: 'Liên hệ',
+        url: '/contact',
+        visible: true,
+        order: 4
+      }
+    ],
+    settings: {
+      showSearch: true,
+      showCart: true,
+      showUserMenu: true,
+      stickyHeader: true,
+      mobileBreakpoint: 768,
+      megamenuSettings: {
+        maxColumns: 4,
+        columnWidth: 'auto',
+        showIcons: true,
+        animationDuration: 350
+      }
+    }
+  }
+}
+
+// Helper function to save or update menu config
+export const saveMenuConfig = async (content) => {
+  try {
+    const existingMenu = await getMenuConfig()
+    
+    if (existingMenu) {
+      return await updateMenuConfig(content)
+    } else {
+      return await createMenuConfig(content)
+    }
+  } catch (error) {
+    console.error('Lỗi khi lưu cấu hình menu:', error)
+    throw error
+  }
 }

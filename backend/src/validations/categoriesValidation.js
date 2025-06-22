@@ -32,7 +32,9 @@ const category = async (req, res, next) => {
       .trim() // loại bỏ khoảng trắng đầu/cuối
       .allow('', null),
 
-    parent: Joi.string().length(24).hex().allow('', null) // parent là ObjectId, có thể null hoặc rỗng
+    parent: Joi.string().length(24).hex().allow('', null), // parent là ObjectId, có thể null hoặc rỗng
+
+    destroy: Joi.boolean() // cho phép cập nhật trạng thái destroy
   })
 
   try {
@@ -51,7 +53,50 @@ const category = async (req, res, next) => {
   }
 }
 
+const categoryUpdate = async (req, res, next) => {
+  // Validation cho việc cập nhật category (không yêu cầu name)
+  const correctCondition = Joi.object({
+    name: Joi.string()
+      .min(1)
+      .max(50)
+      .trim()
+      .optional(), // Không bắt buộc khi update
+
+    description: Joi.string()
+      .max(500)
+      .trim()
+      .allow('', null)
+      .optional(),
+
+    image: Joi.string()
+      .max(150)
+      .trim()
+      .allow('', null)
+      .optional(),
+
+    parent: Joi.string().length(24).hex().allow('', null).optional(),
+
+    destroy: Joi.boolean().optional()
+  })
+
+  try {
+    await correctCondition.validateAsync(req.body, {
+      abortEarly: false
+    })
+
+    next()
+  } catch (err) {
+    const errorMessage = new Error(err).message
+    const customError = new ApiError(
+      StatusCodes.UNPROCESSABLE_ENTITY,
+      errorMessage
+    )
+    next(customError)
+  }
+}
+
 export const categoriesValidation = {
   verifyId,
-  category
+  category,
+  categoryUpdate
 }

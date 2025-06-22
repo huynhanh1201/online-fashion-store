@@ -28,7 +28,7 @@ Router.route('/:categoryId').get(
 // Cập nhật thông tin Danh mục sản phẩm
 Router.route('/:categoryId').patch(
   categoriesValidation.verifyId,
-  categoriesValidation.category,
+  categoriesValidation.categoryUpdate,
   categoriesController.updateCategory
 )
 
