@@ -17,7 +17,9 @@ const useSizePalettes = (productId) => {
     if (!productId) return
     setLoading(true)
     try {
-      const data = await getSizePalettes(productId)
+      const data = await getSizePalettes(
+        (productId = '6853ef5fa2331414899bfaf2')
+      )
       setSizePalettes(data.sizes || [])
       setPaletteId(data.paletteId || null)
     } catch (error) {
@@ -70,9 +72,9 @@ const useSizePalettes = (productId) => {
     }
   }
 
-  useEffect(() => {
-    fetchSizePalettes()
-  }, [productId])
+  // useEffect(() => {
+  //   fetchSizePalettes()
+  // }, [productId])
 
   return {
     sizePalettes,

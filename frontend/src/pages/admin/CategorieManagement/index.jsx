@@ -87,30 +87,6 @@ const CategoryManagement = () => {
     }
   }
 
-  // const handleSaveCategory = async (categoryId, updatedData) => {
-  //   try {
-  //     await update(categoryId, updatedData)
-  //   } catch (error) {
-  //     console.error('Lỗi:', error)
-  //   }
-  // }
-  //
-  // const handleDeleteCategory = async (categoryId) => {
-  //   try {
-  //     const result = await remove(categoryId)
-  //     if (result) {
-  //       const deleteCategory = await fetchById(categoryId)
-  //       if (deleteCategory) {
-  //         Save(deleteCategory)
-  //       }
-  //     } else {
-  //       console.log('Xoá không thành công')
-  //     }
-  //   } catch (error) {
-  //     console.error('Lỗi:', error)
-  //   }
-  // }
-
   return (
     <RouteGuard requiredPermissions={['admin:access', 'category:read']}>
       <CategoryTable
