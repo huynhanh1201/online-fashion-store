@@ -1,4 +1,5 @@
 import mongoose from 'mongoose'
+import { refIntegrityPlugin } from '~/plugins/refIntegrityPlugin'
 const { Schema, model } = mongoose
 
 // Tạo schema cho Danh mục sản phẩm
@@ -61,6 +62,27 @@ const warehouseSchema = new Schema(
     timestamps: true
   }
 )
+
+// Gắn plugin kiểm tra liên kết
+warehouseSchema.plugin(refIntegrityPlugin, {
+  references: [
+    { model: 'InventoryLog', foreignField: 'warehouseId' },
+
+    {
+      model: 'Inventory',
+      foreignField: 'warehouseId'
+    },
+
+    {
+      model: 'WarehouseSlip',
+      foreignField: 'warehouseId'
+    },
+    {
+      model: 'Batch',
+      foreignField: 'warehouseId'
+    }
+  ]
+})
 
 // Tạo Model
 export const WarehouseModel = model('Warehouse', warehouseSchema)

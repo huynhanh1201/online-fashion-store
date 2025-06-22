@@ -1,4 +1,5 @@
 import mongoose from 'mongoose'
+import { refIntegrityPlugin } from '~/plugins/refIntegrityPlugin'
 const { Schema, model } = mongoose
 
 // Tạo schema cho Danh mục sản phẩm
@@ -57,6 +58,11 @@ const partnerSchema = new Schema(
     timestamps: true
   }
 )
+
+// Gắn plugin kiểm tra liên kết
+partnerSchema.plugin(refIntegrityPlugin, {
+  references: [{ model: 'WarehouseSlip', foreignField: 'partnerId' }]
+})
 
 // Tạo Model
 export const PartnerModel = model('PartnerManagement', partnerSchema)

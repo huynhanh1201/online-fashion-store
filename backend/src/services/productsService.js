@@ -227,18 +227,6 @@ const updateProduct = async (productId, reqBody) => {
 const deleteProduct = async (productId) => {
   // eslint-disable-next-line no-useless-catch
   try {
-    const isVariantExists = await VariantModel.exists({
-      productId,
-      destroy: false
-    })
-
-    if (isVariantExists) {
-      throw new ApiError(
-        StatusCodes.CONFLICT,
-        'Không thể xóa SẢN PHẨM khi vẫn còn BIẾN THỂ hoạt động.'
-      )
-    }
-
     // Xóa mềm khi không còn Variant
     const productUpdated = await ProductModel.findOneAndUpdate(
       {

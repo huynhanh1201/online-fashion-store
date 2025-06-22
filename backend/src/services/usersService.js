@@ -71,22 +71,6 @@ const updateUser = async (userId, reqBody) => {
 const deleteUser = async (userId) => {
   // eslint-disable-next-line no-useless-catch
   try {
-    const orderPromise = OrderModel.exists({
-      userId,
-      status: { $in: ['Pending', 'Processing', 'Shipping'] }
-    })
-
-    const cartPromise = CartModel.deleteOne({ userId })
-
-    const [orderExists] = await Promise.all([orderPromise, cartPromise])
-
-    if (orderExists) {
-      throw new ApiError(
-        StatusCodes.CONFLICT,
-        'Không thể xóa TÀI KHOẢN KHÁCH HÀNG khi vẫn còn ĐƠN HÀNG hoạt động.'
-      )
-    }
-
     const user = await UserModel.updateOne(
       { _id: userId },
       {

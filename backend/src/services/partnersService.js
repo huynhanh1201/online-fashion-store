@@ -2,7 +2,8 @@ import { PartnerModel } from '~/models/PartnerModel'
 import generateSequentialCode from '~/utils/generateSequentialCode'
 import validatePagination from '~/utils/validatePagination'
 import getDateRange from '~/utils/getDateRange'
-import { SizeModel } from '~/models/SizeModel'
+import ApiError from '~/utils/ApiError'
+import { StatusCodes } from 'http-status-codes'
 
 const createPartner = async (reqBody) => {
   // eslint-disable-next-line no-useless-catch
@@ -182,6 +183,10 @@ const deletePartner = async (partnerId) => {
       { destroy: true },
       { new: true }
     )
+
+    if (!partnerDeleted) {
+      throw new ApiError(StatusCodes.NOT_FOUND, 'Đối tác không tồn tại.')
+    }
 
     return partnerDeleted
   } catch (err) {
