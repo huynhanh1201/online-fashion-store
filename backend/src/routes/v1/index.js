@@ -32,6 +32,7 @@ import { reviewsRoute } from '~/routes/v1/reviewsRoute'
 import { transactionsRoute } from '~/routes/v1/transactionsRoute'
 import { websiteConfigsRoute } from '~/routes/v1/websiteConfigsRoute'
 import { rolesRoute } from '~/routes/v1/rolesRoute'
+import { permissionsRoute } from '~/routes/v1/permissionsRoute'
 
 const Router = express.Router()
 
@@ -96,5 +97,7 @@ Router.use('/reviews', reviewsRoute)
 Router.use('/website-configs', websiteConfigsRoute)
 
 Router.use('/roles', rolesRoute)
+
+Router.use('/permissions', permissionsRoute)
 
 export const APIs_V1 = Router
