@@ -3,10 +3,8 @@ import { StatusCodes } from 'http-status-codes'
 import { CategoryModel } from '~/models/CategoryModel'
 import ApiError from '~/utils/ApiError'
 import { slugify } from '~/utils/formatters'
-import { ProductModel } from '~/models/ProductModel'
 import getDateRange from '~/utils/getDateRange'
 import validatePagination from '~/utils/validatePagination'
-import apiError from '~/utils/ApiError'
 
 const createCategory = async (reqBody) => {
   try {
