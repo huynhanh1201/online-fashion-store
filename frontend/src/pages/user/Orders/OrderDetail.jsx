@@ -448,22 +448,6 @@ const OrderDetail = () => {
                       Đánh giá
                     </Button>
                   )}
-                  {isOrderCancellable && (
-                    <Button
-                      variant="outlined"
-                      color="error"
-                      size="medium"
-                      startIcon={<Cancel />}
-                      sx={{
-                        borderRadius: 2,
-                        textTransform: 'none',
-                        fontWeight: 600
-                      }}
-                      onClick={() => setOpenCancelModal(true)}
-                    >
-                      Hủy đơn
-                    </Button>
-                  )}
                   <Button
                     variant="outlined"
                     size="medium"
@@ -515,7 +499,7 @@ const OrderDetail = () => {
               <Box display="flex" justifyContent="space-between">
                 <Typography>Giảm giá:</Typography>
                 <Typography fontWeight={600} color={order.couponId ? 'error' : 'inherit'}>
-                  -{formatPrice(order.discountAmount || 0)}
+                  {formatPrice(order.discountAmount || 0)}
                 </Typography>
               </Box>
               <Divider />
