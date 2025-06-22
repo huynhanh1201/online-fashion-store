@@ -149,46 +149,23 @@ const updateCategory = async (categoryId, reqBody) => {
 const deleteCategory = async (categoryId) => {
   // eslint-disable-next-line no-useless-catch
   try {
-    // const isProductExist = await ProductModel.exists({
-    //   categoryId: categoryId,
-    //   destroy: false
-    // })
-    //
-    // if (isProductExist) {
-    //   throw new ApiError(
-    //     StatusCodes.CONFLICT,
-    //     'Không thể xóa DANH MỤC SẢN PHẨM khi vẫn còn SẢN PHẨM hoạt động.'
-    //   )
-    // }
-
-    const result = await CategoryModel.deleteOne({ _id: categoryId })
-
-    // const categoryUpdated = await CategoryModel.findOneAndUpdate(
-    //   { _id: categoryId },
-    //   {
-    //     destroy: true
-    //   },
-    //   {
-    //     new: true
-    //   }
-    // )
-
-    // if (!categoryUpdated) {
-    //   throw new ApiError(
-    //     StatusCodes.NOT_FOUND,
-    //     'Danh mục sản phẩm không tồn tại.'
-    //   )
-    // }
-
-    // return categoryUpdated
-  } catch (err) {
-    if (err?.options?.modelRef) {
-      const refInfo = err.options
-      throw new apiError(
-        StatusCodes.BAD_REQUEST,
-        `Không thể xoá danh mục vì đang được tham chiếu bởi trường "${refInfo.pathRef}" của ${refInfo.modelRef} (ID: ${refInfo.whoIsBlocking})`
+    const categoryUpdated = await CategoryModel.findOneAndUpdate(
+      { _id: categoryId },
+      {
+        destroy: true
+      },
+      {
+        new: true
+      }
+    )
+    if (!categoryUpdated) {
+      throw new ApiError(
+        StatusCodes.NOT_FOUND,
+        'Danh mục sản phẩm không tồn tại.'
       )
     }
+    return categoryUpdated
+  } catch (err) {
     throw err
   }
 }
