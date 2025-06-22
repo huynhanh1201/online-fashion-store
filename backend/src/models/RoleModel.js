@@ -17,6 +17,11 @@ const roleSchema = new Schema(
     permissions: {
       type: [String], // Mảng permission objects
       default: []
+    },
+
+    destroy: {
+      type: Boolean,
+      default: false // Đặt mặc định là false
     }
   },
   {
