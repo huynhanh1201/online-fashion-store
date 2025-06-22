@@ -1,4 +1,5 @@
 import mongoose from 'mongoose'
+import { refIntegrityPlugin } from '~/plugins/refIntegrityPlugin'
 const { Schema, model } = mongoose
 
 // Tạo schema cho người dùng
@@ -74,6 +75,18 @@ const userSchema = new Schema(
     timestamps: true
   }
 )
+
+// Gắn plugin kiểm tra liên kết
+userSchema.plugin(refIntegrityPlugin, {
+  references: [
+    { model: 'ShippingAddress', foreignField: 'userId' },
+
+    {
+      model: 'Product',
+      foreignField: 'categoryId'
+    }
+  ]
+})
 
 // Tạo Model
 export const UserModel = model('User', userSchema)

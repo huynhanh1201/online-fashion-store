@@ -307,6 +307,10 @@ const deleteOrder = async (orderId) => {
       }
     )
 
+    if (!orderUpdated) {
+      throw new ApiError(StatusCodes.NOT_FOUND, 'Đơn hàng không tồn tại.')
+    }
+
     return orderUpdated
   } catch (err) {
     throw err
