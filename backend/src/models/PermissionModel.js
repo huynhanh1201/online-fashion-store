@@ -15,6 +15,11 @@ const permissionSchema = new Schema(
     group: {
       type: String,
       required: true // Nhóm chức năng, ví dụ: "Tài khoản", "Sản phẩm"
+    },
+
+    destroy: {
+      type: Boolean,
+      default: false // Xóa mềm, mặc định là false
     }
   },
   {
