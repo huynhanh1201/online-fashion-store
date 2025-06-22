@@ -5,7 +5,7 @@ import { API_ROOT } from '~/utils/constants.js'
 export const getRoles = async () => {
   try {
     const response = await AuthorizedAxiosInstance.get(`${API_ROOT}/v1/roles`)
-    return response.data
+    return response.data.data
   } catch (error) {
     console.error('Lỗi khi lấy danh sách vai trò:', error)
     return []

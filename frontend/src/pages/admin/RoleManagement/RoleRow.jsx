@@ -1,26 +1,154 @@
-// components/admin/RolePermissionRow.jsx
 import React from 'react'
-import { TableRow, TableCell, Checkbox } from '@mui/material'
+import { TableCell, TableRow, IconButton, Stack, Chip } from '@mui/material'
+import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye'
+import BorderColorIcon from '@mui/icons-material/BorderColor'
+import DeleteForeverIcon from '@mui/icons-material/DeleteForever'
+import Tooltip from '@mui/material/Tooltip'
 
-const actions = ['create', 'read', 'update', 'delete']
+const formatDateTime = (isoString) => {
+  if (!isoString) return 'Không xác định'
+  const date = new Date(isoString)
+  return date.toLocaleDateString('vi-VN', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric'
+  })
+}
 
-const RolePermissionRow = ({ permissionGroup, roles }) => {
+const styles = {
+  groupIcon: {
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: 1,
+    width: '130px'
+  },
+  cellPadding: {
+    height: 55,
+    minHeight: 55,
+    maxHeight: 55,
+    lineHeight: '49px',
+    py: 0,
+    px: 1,
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    verticalAlign: 'middle'
+  }
+}
+
+export default function RoleRow({
+  role,
+  index,
+  columns,
+  handleOpenModal,
+  permissions = {}
+}) {
   return (
-    <TableRow>
-      <TableCell>{permissionGroup.label}</TableCell>
-      {roles.map((role) =>
-        actions.map((action) => {
-          const permissionKey = `${permissionGroup.key}:${action}`
-          const hasPermission = role.permissions.includes(permissionKey)
+    <TableRow hover role='checkbox' tabIndex={-1}>
+      {columns.map((column) => {
+        if (column.id === 'name') {
+          const originalName = role.label || 'Không có tên'
           return (
-            <TableCell key={`${role._id}-${permissionKey}`} align='center'>
-              <Checkbox checked={hasPermission} disabled />
+            <TableCell
+              key={column.id}
+              align={column.align}
+              title={originalName}
+              sx={{
+                ...styles.cellPadding,
+                maxWidth: 200,
+                display: 'table-cell'
+              }}
+            >
+              {originalName}
             </TableCell>
           )
-        })
-      )}
+        }
+        if (column.id === 'permissionCount') {
+          return (
+            <TableCell
+              key={column.id}
+              align={column.align}
+              sx={{ ...styles.cellPadding, pr: column.pr }}
+            >
+              {role.permissions?.length || 0}
+            </TableCell>
+          )
+        }
+
+        // Trạng thái
+        if (column.id === 'destroy') {
+          return (
+            <TableCell
+              key={column.id}
+              align={column.align}
+              sx={styles.cellPadding}
+            >
+              <Chip
+                label={role.destroy ? 'Không hoạt động' : 'Hoạt động'}
+                color={role.destroy ? 'error' : 'success'}
+                size='medium'
+                sx={{ width: '127px', fontWeight: 'bold' }}
+              />
+            </TableCell>
+          )
+        }
+
+        // Hành động
+        if (column.id === 'action') {
+          return (
+            <TableCell
+              key={column.id}
+              align={column.align}
+              sx={styles.cellPadding}
+            >
+              <Stack direction='row' sx={styles.groupIcon}>
+                <Tooltip title='Xem'>
+                  <IconButton
+                    onClick={() => handleOpenModal('view', role)}
+                    size='small'
+                  >
+                    <RemoveRedEyeIcon color='primary' />
+                  </IconButton>
+                </Tooltip>
+                <Tooltip title='Sửa'>
+                  <IconButton
+                    onClick={() => handleOpenModal('edit', role)}
+                    size='small'
+                  >
+                    <BorderColorIcon color='warning' />
+                  </IconButton>
+                </Tooltip>
+                <Tooltip title='Xoá'>
+                  <IconButton
+                    onClick={() => handleOpenModal('delete', role)}
+                    size='small'
+                  >
+                    <DeleteForeverIcon color='error' />
+                  </IconButton>
+                </Tooltip>
+              </Stack>
+            </TableCell>
+          )
+        }
+
+        let value = ''
+        if (column.id === 'index') value = index
+        else if (['createdAt', 'updatedAt'].includes(column.id))
+          value = formatDateTime(role[column.id])
+        else value = role[column.id]
+
+        return (
+          <TableCell
+            key={column.id}
+            align={column.align}
+            title={typeof value === 'string' ? value : undefined}
+            sx={styles.cellPadding}
+          >
+            {value ?? 'Không có dữ liệu'}
+          </TableCell>
+        )
+      })}
     </TableRow>
   )
 }
-
-export default RolePermissionRow

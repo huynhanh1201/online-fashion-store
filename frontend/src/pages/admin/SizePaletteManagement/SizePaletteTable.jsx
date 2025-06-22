@@ -127,8 +127,8 @@ const SizePaletteTable = ({
       <TablePagination
         component='div'
         rowsPerPageOptions={[10, 25, 100]}
-        count={total}
-        rowsPerPage={rowsPerPage}
+        count={total || 1}
+        rowsPerPage={rowsPerPage || 10}
         page={page}
         onPageChange={onPageChange}
         onRowsPerPageChange={(e) => {

@@ -15,6 +15,8 @@ export const refIntegrityPlugin = (schema, { references = [] }) => {
       const RefModel = mongoose.model(model)
       const count = await RefModel.countDocuments({ [foreignField]: doc._id })
 
+      console.log('count:', count)
+
       if (count > 0) {
         throw new apiError(
           StatusCodes.UNPROCESSABLE_ENTITY,

@@ -27,6 +27,7 @@ import draftToHtml from 'draftjs-to-html'
 import htmlToDraft from 'html-to-draftjs'
 import { InputAdornment } from '@mui/material'
 import ProductImages from '../component/ProductImageUploader.jsx'
+import ProductDescriptionEditor from '../component/ProductDescriptionEditor.jsx'
 import { CloudinaryColor, CloudinaryProduct, URI } from '~/utils/constants'
 
 const uploadToCloudinary = async (file, folder = CloudinaryColor) => {
@@ -46,22 +47,6 @@ const uploadToCloudinary = async (file, folder = CloudinaryColor) => {
   return data.secure_url
 }
 
-const uploadImageFunction = async (file) => {
-  try {
-    const secureUrl = await uploadToCloudinary(file, CloudinaryProduct)
-    return { data: { link: secureUrl } }
-  } catch (error) {
-    console.error('Lỗi khi upload ảnh:', error)
-    return Promise.reject(error)
-  }
-}
-// Hàm định dạng số và bỏ định dạng
-const formatNumber = (value) => {
-  const number = value?.toString().replace(/\D/g, '') || ''
-  return number.replace(/\B(?=(\d{3})+(?!\d))/g, '.')
-}
-
-const parseNumber = (formatted) => formatted.replace(/\./g, '')
 const EditProductModal = ({ open, onClose, onSave, product }) => {
   const {
     control,
@@ -96,6 +81,23 @@ const EditProductModal = ({ open, onClose, onSave, product }) => {
 
   const replaceImageInputRef = useRef()
   const { categories, fetchCategories, loading, update } = useCategories()
+
+  const uploadImageFunction = async (file) => {
+    try {
+      const secureUrl = await uploadToCloudinary(file, CloudinaryProduct)
+      return { data: { link: secureUrl } }
+    } catch (error) {
+      console.error('Lỗi khi upload ảnh:', error)
+      return Promise.reject(error)
+    }
+  }
+  // Hàm định dạng số và bỏ định dạng
+  const formatNumber = (value) => {
+    const number = value?.toString().replace(/\D/g, '') || ''
+    return number.replace(/\B(?=(\d{3})+(?!\d))/g, '.')
+  }
+
+  const parseNumber = (formatted) => formatted.replace(/\./g, '')
 
   // Hàm thay thế URL ảnh trong mô tả
   const replaceImageInDescription = (editorState, oldImageUrl, newImageUrl) => {
@@ -534,96 +536,10 @@ const EditProductModal = ({ open, onClose, onSave, product }) => {
           </Grid>
           {/*mô tả*/}
           <Grid item size={12}>
-            <Controller
-              name='description'
+            <ProductDescriptionEditor
               control={control}
-              defaultValue=''
-              render={({ field }) => (
-                <>
-                  <label
-                    style={{
-                      fontWeight: 500,
-                      marginBottom: 8,
-                      display: 'block'
-                    }}
-                  >
-                    Mô tả sản phẩm
-                  </label>
-                  <Editor
-                    editorState={editorState}
-                    onEditorStateChange={(newState) => {
-                      setEditorState(newState)
-                      const content = draftToHtml(
-                        convertToRaw(newState.getCurrentContent())
-                      )
-                      field.onChange(content)
-                    }}
-                    wrapperClassName='editor-wrapper'
-                    editorClassName='editor-content'
-                    blockRendererFn={blockRendererFn}
-                    toolbar={{
-                      options: [
-                        'inline',
-                        'fontSize',
-                        'fontFamily',
-                        'list',
-                        'link',
-                        'image'
-                      ],
-                      inline: {
-                        options: [
-                          'bold',
-                          'italic',
-                          'underline',
-                          'strikethrough'
-                        ]
-                      },
-                      fontSize: {
-                        options: [
-                          8, 9, 10, 11, 12, 14, 16, 18, 24, 30, 36, 48, 60
-                        ]
-                      },
-                      fontFamily: {
-                        options: [
-                          'Arial',
-                          'Georgia',
-                          'Impact',
-                          'Tahoma',
-                          'Times New Roman',
-                          'Verdana'
-                        ]
-                      },
-                      image: {
-                        uploadCallback: uploadImageFunction,
-                        previewImage: false,
-                        alt: { present: false },
-                        urlEnabled: false,
-                        inputAccept: 'image/*',
-                        defaultSize: {
-                          height: 'auto',
-                          width: '100%'
-                        }
-                      }
-                    }}
-                    editorStyle={{
-                      minHeight: '150px',
-                      border: '1px solid #ccc',
-                      padding: '10px',
-                      borderRadius: '4px',
-                      backgroundColor: '#fff'
-                    }}
-                  />
-                  {selectedImageUrl && (
-                    <input
-                      type='file'
-                      accept='image/*'
-                      hidden
-                      ref={replaceImageInputRef}
-                      onChange={handleReplaceImage}
-                    />
-                  )}
-                </>
-              )}
+              setValue={setValue}
+              initialHtml={product?.description || ''}
             />
           </Grid>
           {/*Trạng thái sản phẩm*/}
