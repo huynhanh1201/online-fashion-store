@@ -1,4 +1,5 @@
 import mongoose from 'mongoose'
+import { refIntegrityPlugin } from '~/plugins/refIntegrityPlugin'
 const { Schema, model } = mongoose
 
 // Định nghĩa schema cho đơn hàng
@@ -53,6 +54,11 @@ const CouponSchema = new Schema(
     timestamps: true // Tự động thêm createdAt và updatedAt
   }
 )
+
+// Gắn plugin kiểm tra liên kết
+CouponSchema.plugin(refIntegrityPlugin, {
+  references: [{ model: 'Order', foreignField: 'couponId' }]
+})
 
 // Tạo Model
 export const CouponModel = model('Coupon', CouponSchema)

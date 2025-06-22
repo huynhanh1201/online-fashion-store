@@ -172,35 +172,6 @@ const updateWarehouse = async (warehouseId, reqBody) => {
 const deleteWarehouse = async (warehouseId) => {
   // eslint-disable-next-line no-useless-catch
   try {
-    const inventoryPromise = InventoryModel.exists({
-      warehouseId,
-      destroy: false
-    })
-
-    const warehouseSlipPromise = WarehouseSlipModel.exists({
-      warehouseId,
-      destroy: false
-    })
-
-    const [inventoryExsits, warehouseSlipExsits] = await Promise.all([
-      inventoryPromise,
-      warehouseSlipPromise
-    ])
-
-    if (inventoryExsits) {
-      throw new ApiError(
-        StatusCodes.CONFLICT,
-        'Không thể xóa KHO HÀNG khi vẫn còn TỒN KHO hoạt động.'
-      )
-    }
-
-    if (warehouseSlipExsits) {
-      throw new ApiError(
-        StatusCodes.CONFLICT,
-        'Không thể xóa KHO HÀNG khi vẫn còn PHIẾU NHÂP/XUẤT hoạt động.'
-      )
-    }
-
     const warehouseDeleted = await WarehouseModel.findOneAndUpdate(
       { _id: warehouseId },
       { destroy: true },

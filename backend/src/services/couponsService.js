@@ -1,6 +1,8 @@
 import { CouponModel } from '~/models/CouponModel'
 import validatePagination from '~/utils/validatePagination'
 import getDateRange from '~/utils/getDateRange'
+import ApiError from '~/utils/ApiError'
+import { StatusCodes } from 'http-status-codes'
 
 const createCoupon = async (reqBody) => {
   // eslint-disable-next-line no-useless-catch
@@ -139,7 +141,7 @@ const updateCoupon = async (couponId, reqBody) => {
 const deleteCoupon = async (couponId) => {
   // eslint-disable-next-line no-useless-catch
   try {
-    const couponUpdated = await CouponModel.findOneAndUpdate(
+    const couponDeleted = await CouponModel.findOneAndUpdate(
       { _id: couponId },
       {
         isActive: false
@@ -150,7 +152,11 @@ const deleteCoupon = async (couponId) => {
       }
     )
 
-    return couponUpdated
+    if (!couponDeleted) {
+      throw new ApiError(StatusCodes.NOT_FOUND, 'Mã giảm giá không tồn tại.')
+    }
+
+    return couponDeleted
   } catch (err) {
     throw err
   }

@@ -1,6 +1,6 @@
 import mongoose from 'mongoose'
-import { consistentModel } from 'mongoose-references-integrity-checker'
-import subSec from 'mongoose-sub-references-integrity-checker'
+
+import { refIntegrityPlugin } from '~/plugins/refIntegrityPlugin'
 
 const { Schema, model } = mongoose
 
@@ -46,6 +46,17 @@ const categorySchema = new Schema(
   }
 )
 
+// Gắn plugin kiểm tra liên kết
+categorySchema.plugin(refIntegrityPlugin, {
+  references: [
+    { model: 'Category', foreignField: 'parent' },
+
+    {
+      model: 'Product',
+      foreignField: 'categoryId'
+    }
+  ]
+})
+
 // Tạo Model
-export const CategoryModel = consistentModel('Category', categorySchema)
-// export const CategoryModel = model('Category', categorySchema)
+export const CategoryModel = model('Category', categorySchema)

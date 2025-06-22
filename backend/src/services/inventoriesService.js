@@ -1,7 +1,7 @@
 import { InventoryModel } from '~/models/InventoryModel'
 import getDateRange from '~/utils/getDateRange'
 import validatePagination from '~/utils/validatePagination'
-import apiError from '~/utils/ApiError'
+import ApiError from '~/utils/ApiError'
 import { StatusCodes } from 'http-status-codes'
 
 const handleCreateInventory = async () => {
@@ -151,6 +151,10 @@ const deleteInventory = async (inventoryId) => {
       { destroy: true },
       { new: true }
     )
+
+    if (!inventoryDeleted) {
+      throw new ApiError(StatusCodes.NOT_FOUND, 'Tồn kho không tồn tại.')
+    }
 
     return inventoryDeleted
   } catch (err) {
