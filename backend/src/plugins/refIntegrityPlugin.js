@@ -12,6 +12,8 @@ export const refIntegrityPlugin = (schema, { references = [] }) => {
   // Hàm kiểm tra xem document có đang bị liên kết bởi model khác không
   const checkReferences = async (doc) => {
     for (const { model, foreignField } of references) {
+      console.log('mongoose.model: ', model)
+
       const RefModel = mongoose.model(model)
       const count = await RefModel.countDocuments({ [foreignField]: doc._id })
 
