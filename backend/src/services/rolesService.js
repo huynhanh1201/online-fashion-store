@@ -25,6 +25,7 @@ const getRoleList = async (queryString) => {
   let {
     page = 1,
     limit = 10,
+    roleName,
     search,
     status,
     sort,
@@ -38,6 +39,10 @@ const getRoleList = async (queryString) => {
 
   // Xử lý thông tin Filter
   const filter = {}
+
+  if (roleName) {
+    filter.name = roleName
+  }
 
   if (status === 'true' || status === 'false') {
     status = JSON.parse(status)
