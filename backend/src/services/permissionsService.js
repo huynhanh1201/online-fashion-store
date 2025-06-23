@@ -1,6 +1,7 @@
 import { PermissionModel } from '~/models/PermissionModel'
 import validatePagination from '~/utils/validatePagination'
 import getDateRange from '~/utils/getDateRange'
+import { permissionsHelpers } from '~/helpers/permissionsHelpers'
 
 const createPermission = async (reqBody) => {
   // eslint-disable-next-line no-useless-catch
@@ -82,8 +83,11 @@ const getPermissionList = async (queryString) => {
     PermissionModel.countDocuments(filter)
   ])
 
+  // Xử lý data permissions
+  const dataHandled = permissionsHelpers.groupPermissions(permissions)
+
   const result = {
-    data: permissions,
+    data: dataHandled,
     meta: {
       total,
       page,
