@@ -56,8 +56,8 @@ export const roles = [
       'order:update',
 
       // Payment Transaction
-      'paymentTransaction:read',
-      'paymentTransaction:update',
+      'payment:read',
+      'payment:update',
 
       // Coupon
       'coupon:create',
