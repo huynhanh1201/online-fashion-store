@@ -67,20 +67,18 @@ export default function PermissionTable({
                     <Typography variant='h6' fontWeight='800'>
                       Danh sách quyền
                     </Typography>
-                    {permissions.canCreate && (
-                      <Button
-                        onClick={onAdd}
-                        startIcon={<AddIcon />}
-                        sx={{
-                          textTransform: 'none',
-                          width: 100,
-                          backgroundColor: '#001f5d',
-                          color: '#fff'
-                        }}
-                      >
-                        Thêm
-                      </Button>
-                    )}
+                    <Button
+                      onClick={onAdd}
+                      startIcon={<AddIcon />}
+                      sx={{
+                        textTransform: 'none',
+                        width: 100,
+                        backgroundColor: '#001f5d',
+                        color: '#fff'
+                      }}
+                    >
+                      Thêm
+                    </Button>
                   </Box>
                 </Box>
               </TableCell>
