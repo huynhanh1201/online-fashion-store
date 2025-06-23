@@ -159,7 +159,6 @@ const OrderRow = ({ order, onOrderUpdate }) => {
   const { cancelOrder } = useOrder()
 
 
-
   useEffect(() => {
     const fetchItems = async () => {
       try {
@@ -430,8 +429,8 @@ const OrderListPage = () => {
     try {
       setLoading(true)
       const orders = await getOrders(userId)
-      console.log('Fetched orders:', orders)   // 👈 Kiểm tra ở console
-      setOrders(orders)
+      console.log('Fetched orders:', orders.data) // Kiểm tra ở console
+      setOrders(orders.data)
     } catch (error) {
       console.error('Lỗi khi lấy đơn hàng:', error)
     } finally {
