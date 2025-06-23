@@ -218,6 +218,13 @@ const updateProduct = async (productId, reqBody) => {
       }
     )
 
+    if (updatedProduct) {
+      await VariantModel.findOneAndUpdate(
+        { productId },
+        { status: updatedProduct.status }
+      )
+    }
+
     return updatedProduct
   } catch (err) {
     throw err
