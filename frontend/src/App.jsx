@@ -36,6 +36,7 @@ import TransactionManegement from '~/pages/admin/TransactionManegement/index.jsx
 import ColorManagement from '~/pages/admin/ColorManagement/index.jsx'
 import NotificationManagement from '~/pages/admin/NotificationManagement/index.jsx'
 import ReviewManagement from '~/pages/admin/ReviewManagement/index.jsx'
+import BlogManagement from '~/pages/admin/BlogManagement/index.jsx'
 // kho
 import WarehouseStatisticTab from '~/pages/admin/InventoryManagement/tab/WarehouseStatisticTab.jsx'
 import PartnerTab from '~/pages/admin/InventoryManagement/tab/PartnersTab.jsx'
@@ -147,6 +148,7 @@ function App() {
           <Route path='warehouses-management' element={<WarehousesTab />} />
           <Route path='batches-management' element={<BatchesTab />} />
           <Route path='marketing-management' element={<MarketingManagement />} />
+          <Route path='blog-management' element={<BlogManagement />} />
         </Route>
       </Route>
 
