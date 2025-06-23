@@ -147,7 +147,7 @@ const updateCategory = async (categoryId, reqBody) => {
 const deleteCategory = async (categoryId) => {
   // eslint-disable-next-line no-useless-catch
   try {
-    const categoryUpdated = await CategoryModel.findOneAndUpdate(
+    const categoryUpdated = await CategoryModel.updateOne(
       { _id: categoryId },
       {
         destroy: true

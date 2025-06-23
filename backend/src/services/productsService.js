@@ -218,6 +218,13 @@ const updateProduct = async (productId, reqBody) => {
       }
     )
 
+    if (updatedProduct) {
+      await VariantModel.findOneAndUpdate(
+        { productId },
+        { status: updatedProduct.status }
+      )
+    }
+
     return updatedProduct
   } catch (err) {
     throw err
@@ -228,7 +235,7 @@ const deleteProduct = async (productId) => {
   // eslint-disable-next-line no-useless-catch
   try {
     // Xóa mềm khi không còn Variant
-    const productUpdated = await ProductModel.findOneAndUpdate(
+    const productUpdated = await ProductModel.updateOne(
       {
         _id: productId
       },

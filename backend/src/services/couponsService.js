@@ -141,7 +141,7 @@ const updateCoupon = async (couponId, reqBody) => {
 const deleteCoupon = async (couponId) => {
   // eslint-disable-next-line no-useless-catch
   try {
-    const couponDeleted = await CouponModel.findOneAndUpdate(
+    const couponDeleted = await CouponModel.updateOne(
       { _id: couponId },
       {
         isActive: false

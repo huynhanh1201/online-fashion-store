@@ -197,7 +197,7 @@ const updateVariant = async (variantId, reqBody) => {
 const deleteVariant = async (variantId) => {
   // eslint-disable-next-line no-useless-catch
   try {
-    const variantDeleted = await VariantModel.findOneAndUpdate(
+    const variantDeleted = await VariantModel.updateOne(
       { _id: variantId },
       { destroy: true },
       { new: true }

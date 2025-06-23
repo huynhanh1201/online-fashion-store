@@ -1,28 +1,47 @@
-import { PermissionModel } from '~/models/PermissionModel'
+import { BlogModel } from '~/models/BlogModel'
 import validatePagination from '~/utils/validatePagination'
 import getDateRange from '~/utils/getDateRange'
-import { permissionsHelpers } from '~/helpers/permissionsHelpers'
+import { slugify } from '~/utils/formatters'
+import { UserModel } from '~/models/UserModel'
 
-const createPermission = async (reqBody) => {
+const createBlog = async (reqBody, jwtDecoded) => {
   // eslint-disable-next-line no-useless-catch
   try {
-    const newPermission = {
-      key: reqBody.key,
-      label: reqBody.label,
-      group: reqBody.group,
+    const user = await UserModel.findById(jwtDecoded._id)
+
+    console.log(user)
+
+    const newBlog = {
+      title: reqBody.title,
+      excerpt: reqBody.excerpt,
+      content: reqBody.content,
+      coverImage: reqBody.coverImage,
+      images: reqBody.images,
+      tags: reqBody.tags,
+      category: reqBody.category,
+      brand: reqBody.brand,
+      status: reqBody.status,
+      meta: reqBody.meta,
+
+      slug: slugify(reqBody.title),
+      author: {
+        id: user._id,
+        name: user.name,
+        avatar: user.avatarUrl
+      },
 
       destroy: false
     }
 
-    const permissions = await PermissionModel.create(newPermission)
+    const blogs = await BlogModel.create(newBlog)
 
-    return permissions
+    return blogs
   } catch (err) {
     throw err
   }
 }
 
-const getPermissionList = async (queryString) => {
+const getBlogList = async (queryString) => {
   let {
     page = 1,
     limit = 10,
@@ -72,22 +91,19 @@ const getPermissionList = async (queryString) => {
     sortField = sortMap[sort]
   }
 
-  const [permissions, total] = await Promise.all([
-    PermissionModel.find(filter)
+  const [blogs, total] = await Promise.all([
+    BlogModel.find(filter)
       .collation({ locale: 'vi', strength: 1 })
       .sort(sortField)
       .skip((page - 1) * limit)
       .limit(limit)
       .lean(),
 
-    PermissionModel.countDocuments(filter)
+    BlogModel.countDocuments(filter)
   ])
 
-  // Xử lý data permissions
-  const dataHandled = permissionsHelpers.groupPermissions(permissions)
-
   const result = {
-    data: dataHandled,
+    data: blogs,
     meta: {
       total,
       page,
@@ -99,10 +115,10 @@ const getPermissionList = async (queryString) => {
   return result
 }
 
-const getPermission = async (permissionId) => {
+const getBlog = async (blogId) => {
   // eslint-disable-next-line no-useless-catch
   try {
-    const result = await PermissionModel.findById(permissionId).lean()
+    const result = await BlogModel.findById(blogId).lean()
 
     return result
   } catch (err) {
@@ -110,40 +126,40 @@ const getPermission = async (permissionId) => {
   }
 }
 
-const updatePermission = async (permissionId, reqBody) => {
+const updateBlog = async (blogId, reqBody) => {
   // eslint-disable-next-line no-useless-catch
   try {
-    const updatedPermission = await PermissionModel.findOneAndUpdate(
-      { _id: permissionId },
+    const updatedBlog = await BlogModel.findOneAndUpdate(
+      { _id: blogId },
       reqBody,
       { new: true }
     )
 
-    return updatedPermission
+    return updatedBlog
   } catch (err) {
     throw err
   }
 }
 
-const deletePermission = async (permissionId) => {
+const deleteBlog = async (blogId) => {
   // eslint-disable-next-line no-useless-catch
   try {
-    const permissionDeleted = await PermissionModel.findOneAndUpdate(
-      { _id: permissionId },
+    const blogDeleted = await BlogModel.findOneAndUpdate(
+      { _id: blogId },
       { destroy: true },
       { new: true }
     )
 
-    return permissionDeleted
+    return blogDeleted
   } catch (err) {
     throw err
   }
 }
 
-export const permissionsService = {
-  createPermission,
-  getPermissionList,
-  getPermission,
-  updatePermission,
-  deletePermission
+export const blogsService = {
+  createBlog,
+  getBlogList,
+  getBlog,
+  updateBlog,
+  deleteBlog
 }
