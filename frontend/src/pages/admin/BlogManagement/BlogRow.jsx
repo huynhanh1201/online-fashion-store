@@ -1,84 +1,116 @@
+// src/pages/admin/blogs/BlogRow.jsx
+import React from 'react'
 import {
   TableRow,
   TableCell,
-  IconButton,
-  Chip,
   Avatar,
-  Stack
+  Typography,
+  Chip,
+  IconButton,
+  Stack,
+  Tooltip
 } from '@mui/material'
-import Tooltip from '@mui/material/Tooltip'
-import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye'
 import BorderColorIcon from '@mui/icons-material/BorderColor'
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever'
-import React from 'react'
-
-const BlogRow = ({ index, post, onEdit, onDelete, onView }) => {
-  const styles = {
-    groupIcon: {
-      display: 'flex',
-      justifyContent: 'start',
-      alignItems: 'center',
-      gap: 1,
-      width: '130px'
-    },
-    cellPadding: {
-      height: 55,
-      minHeight: 55,
-      maxHeight: 55,
-      lineHeight: '49px',
-      py: 0,
-      px: 1,
-      whiteSpace: 'nowrap',
-      overflow: 'hidden',
-      textOverflow: 'ellipsis',
-      verticalAlign: 'middle'
-    }
+import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye'
+const styles = {
+  groupIcon: {
+    display: 'flex',
+    justifyContent: 'start',
+    alignItems: 'center',
+    gap: 1,
+    width: '130px'
+  },
+  cellPadding: {
+    height: 54,
+    minHeight: 54,
+    maxHeight: 54,
+    lineHeight: '49px',
+    py: 0,
+    px: 1,
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    verticalAlign: 'middle'
   }
+}
+const BlogRow = ({ blog, onEdit, onDelete, onView, index }) => {
+  const formatDate = (dateStr) =>
+    new Date(dateStr).toLocaleDateString('vi-VN', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric'
+    })
 
   return (
-    <TableRow hover>
-      <TableCell align='center'>{index}</TableCell>
-      <TableCell sx={styles.cellPadding}>
-        <Avatar src={post.image || ''} alt={post.title} variant='rounded' />
+    <TableRow hover role='checkbox' tabIndex={-1}>
+      <TableCell align='center' sx={{ ...styles.cellPadding, width: 50 }}>
+        {index}
       </TableCell>
-      <TableCell sx={styles.cellPadding}>
-        {post.title || 'Không có tiêu đề'}
-      </TableCell>
-      <TableCell sx={styles.cellPadding}>
-        {post.content?.slice(0, 100) || 'Không có nội dung'}
-      </TableCell>
-      <TableCell sx={styles.cellPadding}>{post.createdAt}</TableCell>
-      <TableCell sx={styles.cellPadding}>{post.updatedAt}</TableCell>
-      <TableCell sx={styles.cellPadding}>
-        <Chip
-          label={post.isActive ? 'Hoạt động' : 'Ẩn'}
-          color={post.isActive ? 'success' : 'default'}
-          size='medium'
-          sx={{ fontWeight: 600, width: 127 }}
+      <TableCell align='left' sx={styles.cellPadding}>
+        <Avatar
+          variant='rounded'
+          src={blog.coverImage || ''}
+          alt={blog.title}
+          sx={{ width: 35, height: 35 }}
         />
       </TableCell>
+
+      <TableCell
+        align='left'
+        title={blog.title}
+        sx={{ whiteSpace: 'nowrap', maxWidth: 300, ...styles.cellPadding }}
+      >
+        {blog.title || 'Không có tiêu đề'}
+      </TableCell>
+
+      <TableCell align='left' sx={styles.cellPadding}>
+        {blog.category || 'Không có chuyên mục'}
+      </TableCell>
+
+      <TableCell align='left' sx={styles.cellPadding}>
+        {blog.author?.name || 'Không rõ'}
+      </TableCell>
+
+      <TableCell sx={styles.cellPadding}>
+        <Chip
+          size='large'
+          sx={{ width: '127px', fontWeight: '800' }}
+          label={
+            blog.status === 'published'
+              ? 'Đã xuất bản'
+              : blog.status === 'draft'
+                ? 'Bản nháp'
+                : 'Lưu trữ'
+          }
+          color={
+            blog.status === 'published'
+              ? 'success'
+              : blog.status === 'draft'
+                ? 'default'
+                : 'warning'
+          }
+        />
+      </TableCell>
+
+      <TableCell align='left' sx={styles.cellPadding}>
+        {formatDate(blog.publishedAt)}
+      </TableCell>
+
       <TableCell align='left' sx={styles.cellPadding}>
         <Stack direction='row' sx={styles.groupIcon}>
           <Tooltip title='Xem'>
-            <IconButton
-              onClick={() => onView(post)}
-              size='small'
-              color='primary'
-            >
+            <IconButton size='small' onClick={() => onView(blog)}>
               <RemoveRedEyeIcon color='primary' />
             </IconButton>
           </Tooltip>
           <Tooltip title='Sửa'>
-            <IconButton onClick={() => onEdit(post)} size='small' color='info'>
+            <IconButton size='small' onClick={() => onEdit(blog)}>
               <BorderColorIcon color='warning' />
             </IconButton>
           </Tooltip>
           <Tooltip title='Xoá'>
-            <IconButton
-              onClick={() => onDelete(post)}
-              size='small'
-              color='error'
-            >
+            <IconButton size='small' onClick={() => onDelete(blog)}>
               <DeleteForeverIcon color='error' />
             </IconButton>
           </Tooltip>

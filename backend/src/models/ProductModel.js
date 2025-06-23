@@ -2,6 +2,12 @@ import mongoose from 'mongoose'
 import { refIntegrityPlugin } from '~/plugins/refIntegrityPlugin'
 const { Schema, model } = mongoose
 
+import './SizePaletteModel'
+import './ColorPaletteModel'
+import './VariantModel'
+import './OrderItemModel'
+import './ReviewModel'
+
 // Tạo schema cho Sản phẩm
 const productSchema = new Schema(
   {
