@@ -50,6 +50,7 @@ import WarehousesTab from '~/pages/admin/InventoryManagement/tab/WarehousesTab.j
 import BatchesTab from '~/pages/admin/InventoryManagement/tab/BatchesTab.jsx'
 import BlogManagement from '~/pages/admin/BlogManagement/index.jsx'
 import RoleManagement from '~/pages/admin/RoleManagement/index.jsx'
+import PermissionManagement from '~/pages/admin/PermissionManagemenet/index.jsx'
 // Trang 404
 import NotFound from '~/pages/404/NotFound'
 //Trang quản lí giao diện Website
@@ -164,6 +165,10 @@ function App() {
           />
           <Route path='blog-management' element={<BlogManagement />} />
           <Route path='role-management' element={<RoleManagement />} />
+          <Route
+            path='permission-management'
+            element={<PermissionManagement />}
+          />
         </Route>
       </Route>
 

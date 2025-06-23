@@ -222,7 +222,7 @@
 //
 // export default EditBlogModal
 
-import React from 'react'
+import React, { useEffect } from 'react'
 import {
   Dialog,
   DialogTitle,
@@ -232,23 +232,31 @@ import {
   Button
 } from '@mui/material'
 import { useForm } from 'react-hook-form'
+import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css'
+import 'draft-js/dist/Draft.css'
+import ProductDescriptionEditor from '~/pages/admin/ProductManagement/component/ProductDescriptionEditor.jsx'
 
 const EditBlogModal = ({ open, onClose, onSave, blog }) => {
-  const { register, handleSubmit, reset } = useForm({
+  const { register, handleSubmit, control, reset, setValue } = useForm({
     defaultValues: blog
   })
 
-  React.useEffect(() => {
+  useEffect(() => {
     reset(blog)
   }, [blog])
 
   const onSubmit = (data) => {
-    const updatedBlog = { ...blog, ...data, updatedAt: new Date() }
+    const updatedBlog = {
+      ...blog,
+      ...data,
+      content: data.description,
+      updatedAt: new Date()
+    }
     onSave(updatedBlog)
   }
 
   return (
-    <Dialog open={open} onClose={onClose} fullWidth maxWidth='sm'>
+    <Dialog open={open} onClose={onClose} fullWidth maxWidth='xl'>
       <DialogTitle>Chỉnh sửa bài viết</DialogTitle>
       <form onSubmit={handleSubmit(onSubmit)}>
         <DialogContent dividers>
@@ -276,6 +284,12 @@ const EditBlogModal = ({ open, onClose, onSave, blog }) => {
             fullWidth
             margin='normal'
             {...register('category')}
+          />
+          <ProductDescriptionEditor
+            control={control}
+            name='description'
+            initialHtml={blog?.content || ''}
+            setValue={setValue}
           />
         </DialogContent>
         <DialogActions>

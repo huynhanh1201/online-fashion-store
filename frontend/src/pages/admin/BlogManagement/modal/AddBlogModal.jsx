@@ -211,7 +211,7 @@
 //
 // export default AddBlogModal
 
-import React from 'react'
+import React, { useEffect } from 'react'
 import {
   Dialog,
   DialogTitle,
@@ -221,21 +221,23 @@ import {
   Button
 } from '@mui/material'
 import { useForm } from 'react-hook-form'
+import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css'
+import 'draft-js/dist/Draft.css'
+import ProductDescriptionEditor from '~/pages/admin/ProductManagement/component/ProductDescriptionEditor.jsx'
 
 const AddBlogModal = ({ open, onClose, onSave }) => {
-  const { register, handleSubmit, reset } = useForm()
+  const { register, handleSubmit, control, reset, setValue } = useForm()
 
   const onSubmit = (data) => {
     const newBlog = {
       title: data.title,
-      slug: data.title.toLowerCase().replace(/\s+/g, '-'),
       excerpt: data.excerpt,
       coverImage: data.coverImage,
       category: data.category,
       publishedAt: new Date(),
       author: { name: 'Admin', avatar: '', id: 'admin' },
       status: 'draft',
-      content: '',
+      content: data.description,
       images: [],
       tags: [],
       brand: '',
@@ -249,7 +251,7 @@ const AddBlogModal = ({ open, onClose, onSave }) => {
   }
 
   return (
-    <Dialog open={open} onClose={onClose} fullWidth maxWidth='sm'>
+    <Dialog open={open} onClose={onClose} fullWidth maxWidth='xl'>
       <DialogTitle>Thêm bài viết</DialogTitle>
       <form onSubmit={handleSubmit(onSubmit)}>
         <DialogContent dividers>
@@ -277,6 +279,11 @@ const AddBlogModal = ({ open, onClose, onSave }) => {
             fullWidth
             margin='normal'
             {...register('category')}
+          />
+          <ProductDescriptionEditor
+            control={control}
+            name='description'
+            setValue={setValue}
           />
         </DialogContent>
         <DialogActions>
