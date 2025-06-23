@@ -93,12 +93,12 @@ export const permissions = [
 
   // Payment Transaction
   {
-    key: 'paymentTransaction:read',
+    key: 'payment:read',
     label: 'Xem giao dịch thanh toán',
     group: 'Thanh toán'
   },
   {
-    key: 'paymentTransaction:update',
+    key: 'payment:update',
     label: 'Cập nhật giao dịch thanh toán',
     group: 'Thanh toán'
   },

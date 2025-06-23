@@ -4,7 +4,11 @@ import usePermissions from '~/hooks/usePermissions'
 
 // Component bảo vệ route - chuyển hướng nếu không có quyền
 const RouteGuard = ({ children, requiredPermissions = [], fallbackPath = '/login' }) => {
-  const { hasAllPermissions, canAccessAdmin } = usePermissions()
+  const { hasAllPermissions, canAccessAdmin, currentUser, permissions } = usePermissions()
+
+  // Fallback cho admin roles
+  const isAdminRole = ['owner', 'technical_admin', 'staff'].includes(currentUser?.role)
+  const hasNoPermissions = permissions.length === 0
 
   // Nếu cần quyền admin access
   if (requiredPermissions.includes('admin:access') && !canAccessAdmin()) {
@@ -13,6 +17,10 @@ const RouteGuard = ({ children, requiredPermissions = [], fallbackPath = '/login
 
   // Nếu cần các quyền khác
   if (requiredPermissions.length > 0 && !hasAllPermissions(requiredPermissions)) {
+    // Fallback: nếu là admin role và không có permissions từ API, cho phép truy cập
+    if (isAdminRole && hasNoPermissions) {
+      return children
+    }
     return <Navigate to={fallbackPath} replace />
   }
 

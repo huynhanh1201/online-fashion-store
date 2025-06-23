@@ -39,8 +39,20 @@ const OrderManagement = () => {
   const { discounts, fetchDiscounts } = useDiscounts() // lấy danh sách mã giảm giá nếu cần
   const { users, fetchUsers } = useUsers()
 
+  // Lưu quyền vào biến để tránh gọi hook trong điều kiện
+  const canReadOrder = hasPermission('order:read')
+  const canUpdateOrder = hasPermission('order:update')
+  const canDeleteOrder = hasPermission('order:delete')
+
+  // Debug
+  console.log('=== ORDER MANAGEMENT DEBUG ===')
+  console.log('canReadOrder:', canReadOrder)
+  console.log('orders:', orders)
+  console.log('loading:', loading)
+  console.log('totalPages:', totalPages)
+
   // Kiểm tra quyền truy cập order management
-  if (!hasPermission('order:read')) {
+  if (!canReadOrder) {
     return (
       <Box sx={{ p: 3, textAlign: 'center' }}>
         <Typography variant='h6' color='error'>
@@ -59,7 +71,7 @@ const OrderManagement = () => {
   }, [page, limit, filters])
   // Mở modal xem
   const handleOpenModalView = async (order) => {
-    if (!hasPermission('order:read')) return
+    if (!canReadOrder) return
     setSelectedOrder(order)
     const [historiesData, detailsData] = await Promise.all([
       getOrderHistoriesByOrderId(order._id),
@@ -79,7 +91,7 @@ const OrderManagement = () => {
 
   // Mở modal sửa
   const handleOpenModalEdit = async (order) => {
-    if (!hasPermission('order:update')) return
+    if (!canUpdateOrder) return
     setLoadingEdit(true)
     setSelectedOrder(order)
     // Nếu cần fetch thêm data thì await ở đây
@@ -95,7 +107,7 @@ const OrderManagement = () => {
 
   // Mở modal xoá
   const handleOpenModalDelete = (order) => {
-    if (!hasPermission('order:delete')) return
+    if (!canDeleteOrder) return
     setSelectedOrder(order)
     setOpenDeleteModal(true)
     setLoadingDelete(false) // chưa xoá

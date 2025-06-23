@@ -1,60 +1,126 @@
 import { useSelector } from 'react-redux'
+import { useState, useEffect, useCallback } from 'react'
 import { selectCurrentUser } from '~/redux/user/userSlice'
-import { ROLE_PERMISSIONS } from '~/config/rbacConfig'
+import AuthorizedAxiosInstance from '~/utils/authorizedAxios.js'
+import { API_ROOT } from '~/utils/constants.js'
 
-// Custom hook dùng để kiểm tra quyền hạn của user theo role và permission (RBAC - Role-Based Access Control)
+// Bộ nhớ tạm để cache quyền theo role tránh gọi lại API nếu role không đổi
+const permissionsCache = {}
+
 const usePermissions = () => {
   const currentUser = useSelector(selectCurrentUser)
+  const [permissions, setPermissions] = useState([])
+  const [isLoading, setIsLoading] = useState(false)
+  const [isInitialized, setIsInitialized] = useState(false)
 
-  // Lấy quyền của user hiện tại để truyền vào hasPermission
-  const getUserPermissions = () => {
-    if (!currentUser || !currentUser.role) {
+  // Async: lấy quyền theo role hiện tại
+  const getUserPermissions = useCallback(async () => {
+    const roleName = currentUser?.role
+    if (!roleName) return []
+
+    // Nếu đã có trong cache → trả lại ngay
+    if (permissionsCache[roleName]) return permissionsCache[roleName]
+
+    try {
+      setIsLoading(true)
+      const query = new URLSearchParams({
+        page: 1,
+        limit: 10,
+        roleName
+      }).toString()
+
+      const res = await AuthorizedAxiosInstance.get(`${API_ROOT}/v1/roles?${query}`)
+      const permissions = res?.data?.data?.[0]?.permissions || []
+
+      // Lưu vào cache
+      permissionsCache[roleName] = permissions
+
+      return permissions
+    } catch (error) {
+      console.error('Lỗi khi lấy quyền người dùng:', error)
       return []
+    } finally {
+      setIsLoading(false)
     }
-    // Lấy role của ng dùng để truyền vào ROLE_PERMISSIONS để lấy ra danh sách quyền của user đó
-    return ROLE_PERMISSIONS[currentUser.role] || []
-  }
+  }, [currentUser?.role])
 
-  // Kiểm tra user có quyền cụ thể không nhận vào permission để kiểm tra
-  const hasPermission = (permission) => {
-    // Lấy và gán vào biến userPermissions 1 mảng danh sách các quyền của user hiện tại
-    const userPermissions = getUserPermissions()
-    // Kiểm tra permission đầu vào có nằm trong mảng userPermissions hay không
+  // Load permissions khi component mount hoặc role thay đổi
+  useEffect(() => {
+    const loadPermissions = async () => {
+      if (currentUser?.role) {
+        const userPermissions = await getUserPermissions()
+        setPermissions(userPermissions)
+        setIsInitialized(true)
+      } else {
+        setPermissions([])
+        setIsInitialized(true)
+      }
+    }
+
+    loadPermissions()
+  }, [currentUser?.role, getUserPermissions])
+
+  // Sync functions để sử dụng trong render
+  const hasPermission = useCallback((permission) => {
+    return permissions.includes(permission)
+  }, [permissions])
+
+  const hasAnyPermission = useCallback((permissionsToCheck) => {
+    return permissionsToCheck.some(p => permissions.includes(p))
+  }, [permissions])
+
+  const hasAllPermissions = useCallback((permissionsToCheck) => {
+    return permissionsToCheck.every(p => permissions.includes(p))
+  }, [permissions])
+
+  const canAccessAdmin = useCallback(() => {
+    // Fallback: nếu không có quyền admin:access, kiểm tra role
+    const hasAdminPermission = hasPermission('admin:access')
+    const isAdminRole = ['owner', 'technical_admin', 'staff'].includes(currentUser?.role)
+    
+    
+    return hasAdminPermission || isAdminRole
+  }, [hasPermission, currentUser?.role])
+
+  const isRole = useCallback((role) => {
+    return currentUser?.role === role
+  }, [currentUser?.role])
+
+  // Async versions (giữ lại để backward compatibility)
+  const hasPermissionAsync = async (permission) => {
+    const userPermissions = await getUserPermissions()
     return userPermissions.includes(permission)
   }
 
-  // Kiểm tra xem người dùng có ít nhất một quyền trong danh sách các quyền được truyền vào
-  const hasAnyPermission = (permissions) => {
-    // Lấy và gán vào biến userPermissions 1 mảng danh sách các quyền
-    const userPermissions = getUserPermissions()
-    return permissions.some(permission => userPermissions.includes(permission))
+  const hasAnyPermissionAsync = async (permissionsToCheck) => {
+    const userPermissions = await getUserPermissions()
+    return permissionsToCheck.some(p => userPermissions.includes(p))
   }
 
-  // Kiểm tra user có tất cả các quyền không
-  const hasAllPermissions = (permissions) => {
-    const userPermissions = getUserPermissions()
-    return permissions.every(permission => userPermissions.includes(permission))
+  const hasAllPermissionsAsync = async (permissionsToCheck) => {
+    const userPermissions = await getUserPermissions()
+    return permissionsToCheck.every(p => userPermissions.includes(p))
   }
 
-  // Kiểm tra user có thể truy cập trang admin không
-  const canAccessAdmin = () => {
-    return hasPermission('admin:access')
-  }
-
-  // Kiểm tra role của user
-  const isRole = (role) => {
-    return currentUser?.role === role
-  }
-
+  const canAccessAdminAsync = async () => hasPermissionAsync('admin:access')
 
   return {
     currentUser,
+    permissions,
+    isLoading,
+    isInitialized,
     getUserPermissions,
+    // Sync functions (recommended for render)
     hasPermission,
     hasAnyPermission,
     hasAllPermissions,
     canAccessAdmin,
     isRole,
+    // Async functions (for backward compatibility)
+    hasPermissionAsync,
+    hasAnyPermissionAsync,
+    hasAllPermissionsAsync,
+    canAccessAdminAsync
   }
 }
 
