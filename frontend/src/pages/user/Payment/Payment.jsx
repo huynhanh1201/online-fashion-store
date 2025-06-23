@@ -1090,7 +1090,7 @@ const Payment = () => {
 
                   <PriceRow>
                     <Typography>Giảm giá:</Typography>
-                    <Typography fontWeight={600} color="success.main">
+                    <Typography fontWeight={600} color="red">
                       {discount.toLocaleString('vi-VN')}đ
                     </Typography>
                   </PriceRow>
@@ -1182,8 +1182,12 @@ const Payment = () => {
             Bạn có chắc chắn muốn đặt hàng không?
           </Typography>
           <Typography variant="body2" color="text.secondary">
-            Tổng thanh toán: <strong>{totalFeeShipping.toLocaleString('vi-VN')}đ</strong>
+            Tổng thanh toán:{' '}
+            <strong style={{ fontSize: '1.2rem' }}>
+              {totalFeeShipping.toLocaleString('vi-VN')}đ
+            </strong>
           </Typography>
+
         </DialogContent>
         <DialogActions sx={{ justifyContent: 'flex-end', gap: 1, pb: 3 }}>
           <Button
