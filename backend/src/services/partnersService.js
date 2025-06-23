@@ -178,7 +178,7 @@ const updatePartner = async (partnerId, reqBody) => {
 const deletePartner = async (partnerId) => {
   // eslint-disable-next-line no-useless-catch
   try {
-    const partnerDeleted = await PartnerModel.findOneAndUpdate(
+    const partnerDeleted = await PartnerModel.updateOne(
       { _id: partnerId },
       { destroy: true },
       { new: true }
