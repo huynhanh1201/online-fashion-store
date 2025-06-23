@@ -77,16 +77,9 @@ const userSchema = new Schema(
 )
 
 // Gắn plugin kiểm tra liên kết
-userSchema.plugin(refIntegrityPlugin, {
-  references: [
-    { model: 'ShippingAddress', foreignField: 'userId' },
-
-    {
-      model: 'Product',
-      foreignField: 'categoryId'
-    }
-  ]
-})
+// userSchema.plugin(refIntegrityPlugin, {
+//   references: [{ model: 'ShippingAddress', foreignField: 'userId' }]
+// })
 
 // Tạo Model
 export const UserModel = model('User', userSchema)
