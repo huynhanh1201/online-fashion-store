@@ -172,7 +172,7 @@ const updateWarehouse = async (warehouseId, reqBody) => {
 const deleteWarehouse = async (warehouseId) => {
   // eslint-disable-next-line no-useless-catch
   try {
-    const warehouseDeleted = await WarehouseModel.findOneAndUpdate(
+    const warehouseDeleted = await WarehouseModel.updateOne(
       { _id: warehouseId },
       { destroy: true },
       { new: true }

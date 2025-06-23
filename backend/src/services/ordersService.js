@@ -295,7 +295,7 @@ const updateOrder = async (userId, orderId, reqBody) => {
 const deleteOrder = async (orderId) => {
   // eslint-disable-next-line no-useless-catch
   try {
-    const orderUpdated = await OrderModel.findOneAndUpdate(
+    const orderUpdated = await OrderModel.updateOne(
       {
         _id: orderId
       },

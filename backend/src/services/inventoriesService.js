@@ -146,7 +146,7 @@ const updateInventory = async (inventoryId, reqBody) => {
 const deleteInventory = async (inventoryId) => {
   // eslint-disable-next-line no-useless-catch
   try {
-    const inventoryDeleted = await InventoryModel.findOneAndUpdate(
+    const inventoryDeleted = await InventoryModel.updateOne(
       { _id: inventoryId },
       { destroy: true },
       { new: true }

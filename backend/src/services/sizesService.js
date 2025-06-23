@@ -121,7 +121,7 @@ const updateSize = async (sizeId, reqBody) => {
 const deleteSize = async (sizeId) => {
   // eslint-disable-next-line no-useless-catch
   try {
-    const sizeDeleted = await SizeModel.findOneAndUpdate(
+    const sizeDeleted = await SizeModel.updateOne(
       { _id: sizeId },
       { destroy: true },
       { new: true }

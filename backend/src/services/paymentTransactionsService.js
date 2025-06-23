@@ -128,18 +128,17 @@ const updatePaymentTransaction = async (paymentTransactionId, reqBody) => {
 const deletePaymentTransaction = async (paymentTransactionId) => {
   // eslint-disable-next-line no-useless-catch
   try {
-    const paymentTransactionUpdated =
-      await PaymentTransactionModel.findOneAndUpdate(
-        {
-          _id: paymentTransactionId
-        },
-        {
-          $set: { destroy: true }
-        },
-        {
-          new: true
-        }
-      )
+    const paymentTransactionUpdated = await PaymentTransactionModel.updateOne(
+      {
+        _id: paymentTransactionId
+      },
+      {
+        $set: { destroy: true }
+      },
+      {
+        new: true
+      }
+    )
 
     return paymentTransactionUpdated
   } catch (err) {

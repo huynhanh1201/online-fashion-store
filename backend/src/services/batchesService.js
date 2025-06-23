@@ -135,7 +135,7 @@ const updateBatch = async (batchId, reqBody) => {
 const deleteBatch = async (batchId) => {
   // eslint-disable-next-line no-useless-catch
   try {
-    const batchDeleted = await BatchModel.findOneAndUpdate(
+    const batchDeleted = await BatchModel.updateOne(
       { _id: batchId },
       { destroy: true },
       { new: true }
