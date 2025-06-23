@@ -1,4 +1,10 @@
 export const permissions = [
+  // Admin
+  {
+    key: 'admin:access',
+    label: 'Cho phep truy cập trang quản lý',
+    group: 'Quản trị hệ thống'
+  },
   // User
   { key: 'user:create', label: 'Tạo tài khoản nhân viên', group: 'Tài khoản' },
   { key: 'user:read', label: 'Xem tài khoản nhân viên', group: 'Tài khoản' },

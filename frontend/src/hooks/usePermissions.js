@@ -46,20 +46,6 @@ const usePermissions = () => {
     return currentUser?.role === role
   }
 
-  // Kiểm tra user có phải admin không (owner hoặc technical_admin)
-  const isAdmin = () => {
-    return isRole('owner') || isRole('technical_admin')
-  }
-
-  // Kiểm tra user có phải staff không
-  const isStaff = () => {
-    return isRole('staff')
-  }
-
-  // Kiểm tra user có phải customer không
-  const isCustomer = () => {
-    return isRole('customer')
-  }
 
   return {
     currentUser,
@@ -69,9 +55,6 @@ const usePermissions = () => {
     hasAllPermissions,
     canAccessAdmin,
     isRole,
-    isAdmin,
-    isStaff,
-    isCustomer
   }
 }
 

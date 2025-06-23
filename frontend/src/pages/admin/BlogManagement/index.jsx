@@ -12,7 +12,7 @@ import {
   createBlog,
   updateBlog,
   deleteBlog
-} from '~/services/blogService'
+} from '~/services/admin/blogService'
 
 export default function BlogManagementPage() {
   const [blogs, setBlogs] = useState([])
@@ -112,39 +112,34 @@ export default function BlogManagementPage() {
 
   // Function để tạo dữ liệu mẫu
   const createSampleData = async () => {
-    const sampleBlog = {
-      title: "Xu hướng thời trang hè 2025",
-      excerpt: "Khám phá những xu hướng hot nhất mùa hè này!",
-      content: "<p>Trong năm 2025, xu hướng thời trang thiên về sự thoải mái, nhẹ nhàng và thân thiện với môi trường...</p>",
-      coverImage: "https://cdn.example.com/images/blog/cover-summer-2025.jpg",
-      images: [
-        "https://cdn.example.com/images/blog/img1.jpg",
-        "https://cdn.example.com/images/blog/img2.jpg"
-      ],
-      tags: [
-        "thời trang",
-        "mùa hè",
-        "eco-friendly"
-      ],
-      category: "Trang phục",
-      brand: "Zara",
-      status: "published",
-      meta: {
-        title: "Xu hướng thời trang mùa hè 2025",
-        description: "Tổng hợp các phong cách thời trang nổi bật nhất mùa hè 2025",
-        keywords: [
-          "thời trang",
-          "mùa hè 2025",
-          "xu hướng",
-          "Zara"
-        ]
-      }
-    }
-
     try {
-      await createBlog(sampleBlog)
-      toast.success('Tạo dữ liệu mẫu thành công!')
-      fetchBlogs(pagination.page, pagination.limit)
+      // Import dữ liệu mẫu
+      const { createSampleBlogs } = await import('~/utils/blogSampleData')
+      const sampleBlogs = createSampleBlogs()
+      
+      let successCount = 0
+      let errorCount = 0
+      
+      for (const blogData of sampleBlogs) {
+        try {
+          await createBlog(blogData)
+          successCount++
+          console.log(`✅ Tạo thành công: ${blogData.title}`)
+        } catch (error) {
+          errorCount++
+          console.error(`❌ Lỗi khi tạo: ${blogData.title}`, error)
+        }
+      }
+      
+      if (successCount > 0) {
+        toast.success(`Tạo thành công ${successCount} bài viết mẫu!`)
+        fetchBlogs(pagination.page, pagination.limit)
+      }
+      
+      if (errorCount > 0) {
+        toast.warning(`Có ${errorCount} bài viết không tạo được`)
+      }
+      
     } catch (error) {
       console.error('Lỗi khi tạo dữ liệu mẫu:', error)
       toast.error('Không thể tạo dữ liệu mẫu')
