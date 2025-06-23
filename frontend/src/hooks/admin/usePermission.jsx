@@ -17,8 +17,8 @@ const usePermissions = () => {
     setLoading(true)
     try {
       const response = await getPermissions(page, limit)
-      setPermissions(response)
-      setTotalPages(response.totalPages)
+      setPermissions(response.data)
+      setTotalPages(response.total)
     } catch (err) {
       setError(err)
     } finally {

@@ -5,66 +5,89 @@ import {
   DialogContent,
   DialogActions,
   Button,
-  TextField
+  TextField,
+  MenuItem
 } from '@mui/material'
-import { useForm, Controller } from 'react-hook-form'
+import { useForm } from 'react-hook-form'
 
 export default function AddPermissionModal({ open, onClose, onSuccess }) {
-  const { control, handleSubmit, reset } = useForm({
-    defaultValues: { key: '', label: '', group: '' }
-  })
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors }
+  } = useForm()
 
-  const onSubmit = async (values) => {
-    try {
-      // await addPermission(values)
-      onSuccess()
-      reset()
-      onClose()
-    } catch (err) {
-      console.error(err)
-    }
+  const groups = [
+    'Tài khoản',
+    'Danh mục',
+    'Sản phẩm',
+    'Biến thể sản phẩm',
+    'Thuộc tính sản phẩm',
+    'Đơn hàng',
+    'Thanh toán',
+    'Khuyến mãi',
+    'Thống kê',
+    'Kho hàng',
+    'Lô hàng',
+    'Đối tác',
+    'Địa chỉ giao hàng'
+  ]
+
+  const onSubmit = (data) => {
+    onSuccess(data)
+    reset()
   }
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth='sm' fullWidth>
+    <Dialog open={open} onClose={onClose}>
       <DialogTitle>Thêm quyền mới</DialogTitle>
-      <DialogContent dividers>
-        <Controller
-          name='key'
-          control={control}
-          render={({ field }) => (
-            <TextField {...field} label='Key' fullWidth margin='normal' />
-          )}
-        />
-        <Controller
-          name='label'
-          control={control}
-          render={({ field }) => (
-            <TextField
-              {...field}
-              label='Tên hiển thị'
-              fullWidth
-              margin='normal'
-            />
-          )}
-        />
-        <Controller
-          name='group'
-          control={control}
-          render={({ field }) => (
-            <TextField
-              {...field}
-              label='Nhóm quyền'
-              fullWidth
-              margin='normal'
-            />
-          )}
-        />
+      <DialogContent>
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <TextField
+            select
+            label='Nhóm quyền'
+            fullWidth
+            margin='normal'
+            {...register('group', { required: 'Vui lòng chọn nhóm quyền' })}
+            error={!!errors.group}
+            helperText={errors.group?.message}
+          >
+            {groups.map((group) => (
+              <MenuItem key={group} value={group}>
+                {group}
+              </MenuItem>
+            ))}
+          </TextField>
+          <TextField
+            label='Key'
+            fullWidth
+            margin='normal'
+            {...register('key', {
+              required: 'Vui lòng nhập key',
+              pattern: {
+                value: /^[a-z]+:[a-z]+$/,
+                message:
+                  'Key phải có định dạng "tên:chức năng" (ví dụ: user:read)'
+              }
+            })}
+            error={!!errors.key}
+            helperText={errors.key?.message}
+          />
+          <TextField
+            label='Tên quyền'
+            fullWidth
+            margin='normal'
+            {...register('label', { required: 'Vui lòng nhập tên quyền' })}
+            error={!!errors.label}
+            helperText={errors.label?.message}
+          />
+        </form>
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose}>Hủy</Button>
         <Button onClick={handleSubmit(onSubmit)} variant='contained'>
-          Lưu
+          Thêm
         </Button>
       </DialogActions>
     </Dialog>

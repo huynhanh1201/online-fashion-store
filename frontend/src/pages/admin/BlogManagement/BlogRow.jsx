@@ -1,4 +1,3 @@
-// src/pages/admin/blogs/BlogRow.jsx
 import React from 'react'
 import {
   TableRow,

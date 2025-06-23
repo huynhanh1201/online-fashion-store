@@ -10,31 +10,26 @@ import {
 
 export default function DeletePermissionModal({
   open,
+  permission,
   onClose,
-  onConfirm,
-  permission
+  onConfirm
 }) {
-  const handleDelete = async () => {
-    try {
-      // await deletePermission(permission.key)
-      onConfirm()
-      onClose()
-    } catch (err) {
-      console.error(err)
-    }
-  }
+  if (!permission) return null
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth='xs' fullWidth>
+    <Dialog open={open} onClose={onClose}>
       <DialogTitle>Xóa quyền</DialogTitle>
-      <DialogContent dividers>
+      <DialogContent>
         <Typography>
-          Bạn có chắc chắn muốn xóa quyền <strong>{permission.label}</strong>?
+          Bạn có chắc muốn xóa quyền <strong>{permission.label}</strong>?
+        </Typography>
+        <Typography color='error' sx={{ mt: 2 }}>
+          Hành động này không thể hoàn tác.
         </Typography>
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose}>Hủy</Button>
-        <Button onClick={handleDelete} color='error' variant='contained'>
+        <Button onClick={onConfirm} variant='contained' color='error'>
           Xóa
         </Button>
       </DialogActions>

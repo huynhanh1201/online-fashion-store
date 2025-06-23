@@ -3,27 +3,42 @@ import {
   Dialog,
   DialogTitle,
   DialogContent,
+  DialogActions,
+  Button,
   Typography,
-  Box
+  Grid
 } from '@mui/material'
 
-export default function ViewPermissionModal({ open, onClose, permission }) {
+export default function ViewPermissionModal({ open, permission, onClose }) {
+  if (!permission) return null
+
   return (
-    <Dialog open={open} onClose={onClose} maxWidth='sm' fullWidth>
-      <DialogTitle>Chi tiết quyền</DialogTitle>
-      <DialogContent dividers>
-        <Box>
-          <Typography variant='body1'>
-            <strong>Key:</strong> {permission.key}
-          </Typography>
-          <Typography variant='body1'>
-            <strong>Tên hiển thị:</strong> {permission.label}
-          </Typography>
-          <Typography variant='body1'>
-            <strong>Nhóm:</strong> {permission.group}
-          </Typography>
-        </Box>
+    <Dialog open={open} onClose={onClose}>
+      <DialogTitle>Thông tin quyền</DialogTitle>
+      <DialogContent>
+        <Grid container spacing={2}>
+          <Grid item xs={12}>
+            <Typography>
+              <strong>Nhóm quyền:</strong> {permission.group}
+            </Typography>
+          </Grid>
+          <Grid item xs={12}>
+            <Typography>
+              <strong>Key:</strong> {permission.key}
+            </Typography>
+          </Grid>
+          <Grid item xs={12}>
+            <Typography>
+              <strong>Tên quyền:</strong> {permission.label}
+            </Typography>
+          </Grid>
+        </Grid>
       </DialogContent>
+      <DialogActions>
+        <Button onClick={onClose} variant='contained'>
+          Đóng
+        </Button>
+      </DialogActions>
     </Dialog>
   )
 }

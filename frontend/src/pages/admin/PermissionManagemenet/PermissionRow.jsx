@@ -1,63 +1,77 @@
-import React, { useState } from 'react'
+import React from 'react'
 import {
-  Accordion,
-  AccordionSummary,
-  AccordionDetails,
+  TableRow,
+  TableCell,
   Typography,
-  Chip,
-  Box,
-  Checkbox,
-  IconButton
+  IconButton,
+  Tooltip,
+  Stack
 } from '@mui/material'
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
-import EditIcon from '@mui/icons-material/Edit'
-import DeleteIcon from '@mui/icons-material/Delete'
-import VisibilityIcon from '@mui/icons-material/Visibility'
+import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye'
+import BorderColorIcon from '@mui/icons-material/BorderColor'
+import DeleteForeverIcon from '@mui/icons-material/DeleteForever'
 
-export default function PermissionRow({ group, permissions }) {
-  const [selectedKeys, setSelectedKeys] = useState([])
-
-  const toggleCheckbox = (key) => {
-    setSelectedKeys((prev) =>
-      prev.includes(key) ? prev.filter((k) => k !== key) : [...prev, key]
-    )
+const styles = {
+  groupIcon: {
+    display: 'flex',
+    justifyContent: 'start',
+    alignItems: 'center',
+    gap: 1,
+    width: '130px'
+  },
+  cellPadding: {
+    height: 54,
+    minHeight: 54,
+    maxHeight: 54,
+    py: 0,
+    px: 1,
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    verticalAlign: 'middle'
   }
+}
 
+export default function PermissionRow({
+  permission,
+  index,
+  onView,
+  onEdit,
+  onDelete
+}) {
   return (
-    <Accordion>
-      <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-        <Typography sx={{ flexGrow: 1 }}>{group}</Typography>
-        <Chip
-          color={
-            selectedKeys.length === permissions.length ? 'primary' : 'default'
-          }
-          label={`${selectedKeys.length}/${permissions.length}`}
-          size='small'
-        />
-      </AccordionSummary>
-
-      <AccordionDetails>
-        <Box display='flex' flexDirection='column' gap={1}>
-          {permissions.map((item) => (
-            <Box key={item.key} display='flex' alignItems='center' gap={1}>
-              <Checkbox
-                checked={selectedKeys.includes(item.key)}
-                onChange={() => toggleCheckbox(item.key)}
-              />
-              <Typography flexGrow={1}>{item.label}</Typography>
-              <IconButton color='info'>
-                <VisibilityIcon />
-              </IconButton>
-              <IconButton color='primary'>
-                <EditIcon />
-              </IconButton>
-              <IconButton color='error'>
-                <DeleteIcon />
-              </IconButton>
-            </Box>
-          ))}
-        </Box>
-      </AccordionDetails>
-    </Accordion>
+    <TableRow hover role='checkbox' tabIndex={-1}>
+      <TableCell align='center' sx={styles.cellPadding}>
+        {index}
+      </TableCell>
+      <TableCell align='left' sx={styles.cellPadding}>
+        {permission.key}
+      </TableCell>
+      <TableCell align='left' sx={styles.cellPadding}>
+        {permission.label}
+      </TableCell>
+      <TableCell align='left' sx={styles.cellPadding}>
+        {permission.group}
+      </TableCell>
+      <TableCell align='center' sx={styles.cellPadding}>
+        <Stack direction='row' spacing={1} justifyContent='center'>
+          <Tooltip title='Xem'>
+            <IconButton size='small' onClick={() => onView(permission)}>
+              <RemoveRedEyeIcon color='primary' />
+            </IconButton>
+          </Tooltip>
+          <Tooltip title='Sửa'>
+            <IconButton size='small' onClick={() => onEdit(permission)}>
+              <BorderColorIcon color='warning' />
+            </IconButton>
+          </Tooltip>
+          <Tooltip title='Xoá'>
+            <IconButton size='small' onClick={() => onDelete(permission)}>
+              <DeleteForeverIcon color='error' />
+            </IconButton>
+          </Tooltip>
+        </Stack>
+      </TableCell>
+    </TableRow>
   )
 }

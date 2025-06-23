@@ -6,7 +6,10 @@ export const getPermissions = async () => {
     const response = await AuthorizedAxiosInstance.get(
       `${API_ROOT}/v1/permissions`
     )
-    return response.data.data
+    return {
+      data: response.data.data,
+      total: response.data.meta.total
+    }
   } catch (error) {
     console.error('Error fetching permissions:', error)
     return []
