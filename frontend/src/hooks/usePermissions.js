@@ -1,65 +1,98 @@
 import { useSelector } from 'react-redux'
+import { useEffect, useState, useCallback } from 'react'
 import { selectCurrentUser } from '~/redux/user/userSlice'
-import { ROLE_PERMISSIONS } from '~/config/rbacConfig'
+import {
+  ROLE_PERMISSIONS,
+  initRolePermissions,
+  isRolesInitialized
+} from '~/config/rbacConfig'
 
-// Custom hook dùng để kiểm tra quyền hạn của user theo role và permission (RBAC - Role-Based Access Control)
 const usePermissions = () => {
   const currentUser = useSelector(selectCurrentUser)
+  const [rolesLoaded, setRolesLoaded] = useState(isRolesInitialized())
+  const [loading, setLoading] = useState(false)
 
-  // Lấy quyền của user hiện tại để truyền vào hasPermission
-  const getUserPermissions = () => {
-    if (!currentUser || !currentUser.role) {
+  // Tải roles từ API nếu chưa có
+  useEffect(() => {
+    let isMounted = true
+
+    const loadRoles = async () => {
+      if (!isRolesInitialized()) {
+        setLoading(true)
+        try {
+          await initRolePermissions()
+          if (isMounted) {
+            setRolesLoaded(true)
+            setLoading(false)
+          }
+        } catch (error) {
+          console.error('Failed to load roles in usePermissions:', error)
+          if (isMounted) {
+            setRolesLoaded(false)
+            setLoading(false)
+          }
+        }
+      } else {
+        setRolesLoaded(true)
+        setLoading(false)
+      }
+    }
+
+    loadRoles()
+
+    return () => {
+      isMounted = false
+    }
+  }, [])
+
+  const getUserPermissions = useCallback(() => {
+    if (!currentUser?.role || !rolesLoaded) {
+      console.log('getUserPermissions: No user role or roles not loaded', {
+        hasUser: !!currentUser,
+        userRole: currentUser?.role,
+        rolesLoaded
+      })
       return []
     }
-    // Lấy role của ng dùng để truyền vào ROLE_PERMISSIONS để lấy ra danh sách quyền của user đó
-    return ROLE_PERMISSIONS[currentUser.role] || []
-  }
 
-  // Kiểm tra user có quyền cụ thể không nhận vào permission để kiểm tra
-  const hasPermission = (permission) => {
-    // Lấy và gán vào biến userPermissions 1 mảng danh sách các quyền của user hiện tại
-    const userPermissions = getUserPermissions()
-    // Kiểm tra permission đầu vào có nằm trong mảng userPermissions hay không
-    return userPermissions.includes(permission)
-  }
+    const permissions = ROLE_PERMISSIONS[currentUser.role] || []
+    console.log(
+      `getUserPermissions for role "${currentUser.role}":`,
+      permissions
+    )
+    return permissions
+  }, [currentUser, rolesLoaded])
 
-  // Kiểm tra xem người dùng có ít nhất một quyền trong danh sách các quyền được truyền vào
-  const hasAnyPermission = (permissions) => {
-    // Lấy và gán vào biến userPermissions 1 mảng danh sách các quyền
-    const userPermissions = getUserPermissions()
-    return permissions.some(permission => userPermissions.includes(permission))
-  }
+  const hasPermission = useCallback(
+    (permission) => getUserPermissions().includes(permission),
+    [getUserPermissions]
+  )
 
-  // Kiểm tra user có tất cả các quyền không
-  const hasAllPermissions = (permissions) => {
-    const userPermissions = getUserPermissions()
-    return permissions.every(permission => userPermissions.includes(permission))
-  }
+  const hasAnyPermission = useCallback(
+    (permissions) => permissions.some((p) => getUserPermissions().includes(p)),
+    [getUserPermissions]
+  )
 
-  // Kiểm tra user có thể truy cập trang admin không
-  const canAccessAdmin = () => {
-    return hasPermission('admin:access')
-  }
+  const hasAllPermissions = useCallback(
+    (permissions) => permissions.every((p) => getUserPermissions().includes(p)),
+    [getUserPermissions]
+  )
 
-  // Kiểm tra role của user
-  const isRole = (role) => {
-    return currentUser?.role === role
-  }
+  const canAccessAdmin = useCallback(() => {
+    const hasAccess = hasPermission('admin:access')
+    console.log('canAccessAdmin check:', {
+      currentUser: currentUser?.email || 'No user',
+      role: currentUser?.role || 'No role',
+      hasAccess,
+      allPermissions: getUserPermissions()
+    })
+    return hasAccess
+  }, [hasPermission, currentUser, getUserPermissions])
 
-  // Kiểm tra user có phải admin không (owner hoặc technical_admin)
-  const isAdmin = () => {
-    return isRole('owner') || isRole('technical_admin')
-  }
-
-  // Kiểm tra user có phải staff không
-  const isStaff = () => {
-    return isRole('staff')
-  }
-
-  // Kiểm tra user có phải customer không
-  const isCustomer = () => {
-    return isRole('customer')
-  }
+  const isRole = useCallback(
+    (role) => currentUser?.role === role,
+    [currentUser]
+  )
 
   return {
     currentUser,
@@ -69,9 +102,9 @@ const usePermissions = () => {
     hasAllPermissions,
     canAccessAdmin,
     isRole,
-    isAdmin,
-    isStaff,
-    isCustomer
+    rolesLoaded,
+    loading,
+    isRolesInitialized: () => isRolesInitialized()
   }
 }
 

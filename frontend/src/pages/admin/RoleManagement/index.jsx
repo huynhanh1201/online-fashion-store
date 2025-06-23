@@ -17,6 +17,10 @@ const DeleteRoleModal = React.lazy(() => import('./modal/DeleteRoleModal'))
 const RoleManagement = () => {
   const [page, setPage] = React.useState(1)
   const [limit, setLimit] = React.useState(10)
+  const [filters, setFilters] = React.useState({
+    status: 'false',
+    sort: 'newest'
+  })
   const [selectedRole, setSelectedRole] = React.useState(null)
   const [modalType, setModalType] = React.useState(null)
 
@@ -26,9 +30,11 @@ const RoleManagement = () => {
   const { hasPermission } = usePermissions()
   const { permissions, fetchPermissions } = usePermission()
   React.useEffect(() => {
-    fetchRoles(page, limit)
+    fetchRoles(page, limit, filters)
+  }, [page, limit, filters])
+  React.useEffect(() => {
     fetchPermissions()
-  }, [page, limit])
+  }, [])
   const handleOpenModal = (type, role) => {
     if (!role || !role._id) return
     setSelectedRole(role)
@@ -51,12 +57,18 @@ const RoleManagement = () => {
       } else if (type === 'delete') {
         await remove(data)
       }
-      fetchRoles(page, limit)
     } catch (err) {
       console.error('Lỗi:', err)
     }
   }
+  const isEqual = (obj1, obj2) => JSON.stringify(obj1) === JSON.stringify(obj2)
 
+  const handleFilter = (newFilters) => {
+    if (!isEqual(filters, newFilters)) {
+      setPage(1)
+      setFilters(newFilters)
+    }
+  }
   return (
     <>
       <RoleTable
@@ -78,24 +90,35 @@ const RoleManagement = () => {
           canDelete: hasPermission('role:delete'),
           canView: hasPermission('role:read')
         }}
+        onFilter={handleFilter}
       />
 
       <React.Suspense fallback={<></>}>
         {modalType === 'add' && (
-          <AddRoleModal open onClose={handleCloseModal} onSubmit={handleSave} />
+          <AddRoleModal
+            open
+            onClose={handleCloseModal}
+            onSubmit={handleSave}
+            p={permissions}
+          />
         )}
 
         {modalType === 'view' && selectedRole && (
-          <ViewRoleModal open onClose={handleCloseModal} role={selectedRole} />
+          <ViewRoleModal
+            open
+            onClose={handleCloseModal}
+            role={selectedRole}
+            p={permissions}
+          />
         )}
 
         {modalType === 'edit' && selectedRole && (
           <EditRoleModal
             open
             onClose={handleCloseModal}
-            role={selectedRole}
             onSubmit={handleSave}
             p={permissions}
+            defaultValues={selectedRole}
           />
         )}
 

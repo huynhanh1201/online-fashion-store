@@ -16,7 +16,7 @@ import RoleRow from './RoleRow'
 import AddIcon from '@mui/icons-material/Add'
 import TablePaginationActions from '~/components/PaginationAdmin/TablePaginationActions.jsx'
 import TableNoneData from '~/components/TableAdmin/NoneData.jsx'
-
+import FilterRole from '~/components/FilterAdmin/FilterRole.jsx'
 const RoleTable = ({
   roles,
   loading,
@@ -27,7 +27,8 @@ const RoleTable = ({
   onPageChange,
   onChangeRowsPerPage,
   total,
-  permissions = {}
+  permissions = {},
+  onFilter
 }) => {
   const columns = [
     { id: 'index', label: 'STT', align: 'center', width: 50 },
@@ -95,6 +96,11 @@ const RoleTable = ({
                       Thêm
                     </Button>
                   </Box>
+                  <FilterRole
+                    onFilter={onFilter}
+                    roles={roles}
+                    loading={loading}
+                  />
                 </Box>
               </TableCell>
             </TableRow>

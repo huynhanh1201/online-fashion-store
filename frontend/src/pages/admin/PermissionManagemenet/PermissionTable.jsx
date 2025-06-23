@@ -37,7 +37,7 @@ export default function PermissionTable({
     { id: 'key', label: 'Key', align: 'left', minWidth: 150 },
     { id: 'label', label: 'Tên hiển thị', align: 'left', minWidth: 200 },
     { id: 'group', label: 'Nhóm quyền', align: 'left', minWidth: 180 },
-    { id: 'action', label: 'Hành động', align: 'center', width: 150 }
+    { id: 'action', label: 'Hành động', align: 'left', width: 150 }
   ]
 
   const flattenPermissions = data.flatMap((groupItem) =>

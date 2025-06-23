@@ -51,6 +51,7 @@ import BatchesTab from '~/pages/admin/InventoryManagement/tab/BatchesTab.jsx'
 import BlogManagement from '~/pages/admin/BlogManagement/index.jsx'
 import RoleManagement from '~/pages/admin/RoleManagement/index.jsx'
 import PermissionManagement from '~/pages/admin/PermissionManagemenet/index.jsx'
+import { RouteGuard } from '~/components/PermissionGuard'
 // Trang 404
 import NotFound from '~/pages/404/NotFound'
 //Trang quản lí giao diện Website

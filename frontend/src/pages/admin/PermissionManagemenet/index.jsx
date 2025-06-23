@@ -62,6 +62,9 @@ export default function PermissionManagementPage() {
           setSelectedPermission(perm)
           setOpenDelete(true)
         }}
+        onAdd={() => {
+          setOpenAdd(true)
+        }}
         loading={loading}
         page={page - 1}
         rowsPerPage={limit}

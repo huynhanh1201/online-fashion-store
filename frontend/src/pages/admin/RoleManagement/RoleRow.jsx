@@ -48,7 +48,7 @@ export default function RoleRow({
     <TableRow hover role='checkbox' tabIndex={-1}>
       {columns.map((column) => {
         if (column.id === 'name') {
-          const originalName = role.label || 'Không có tên'
+          const originalName = role.name || 'Không có tên'
           return (
             <TableCell
               key={column.id}
@@ -64,6 +64,7 @@ export default function RoleRow({
             </TableCell>
           )
         }
+
         if (column.id === 'permissionCount') {
           return (
             <TableCell

@@ -2,10 +2,16 @@
 import AuthorizedAxiosInstance from '~/utils/authorizedAxios.js'
 import { API_ROOT } from '~/utils/constants.js'
 
-export const getRoles = async () => {
+export const getRoles = async (filter) => {
   try {
-    const response = await AuthorizedAxiosInstance.get(`${API_ROOT}/v1/roles`)
-    return response.data.data
+    const queryString = new URLSearchParams(filter).toString()
+    const response = await AuthorizedAxiosInstance.get(
+      `${API_ROOT}/v1/roles?${queryString}`
+    )
+    return {
+      data: response.data.data,
+      total: response.data.meta.total
+    }
   } catch (error) {
     console.error('Lỗi khi lấy danh sách vai trò:', error)
     return []
@@ -39,7 +45,7 @@ export const addRole = async (data) => {
 
 export const updateRole = async (roleId, updatedData) => {
   try {
-    const response = await AuthorizedAxiosInstance.put(
+    const response = await AuthorizedAxiosInstance.patch(
       `${API_ROOT}/v1/roles/${roleId}`,
       updatedData
     )
