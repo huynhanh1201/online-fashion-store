@@ -81,6 +81,8 @@ const AddVariantModal = ({
       size: '',
       importPrice: '',
       exportPrice: '',
+      discountPrice: '',
+      status: 'draft',
       overridePrice: false,
       overridePackageSize: false,
       packageSize: {
@@ -237,6 +239,7 @@ const AddVariantModal = ({
       importPrice,
       exportPrice,
       overridePrice,
+      discountPrice,
       overridePackageSize,
       packageSize = {}
     } = data
@@ -271,6 +274,7 @@ const AddVariantModal = ({
         importPrice: overridePrice ? Number(importPrice) : productImportPrice,
         exportPrice: overridePrice ? Number(exportPrice) : productExportPrice,
         overridePrice,
+        discountPrice: Number(discountPrice) || 0,
         overridePackageSize,
         status: status || 'draft',
         packageSize: finalPackageSize
@@ -293,6 +297,7 @@ const AddVariantModal = ({
       size: '',
       importPrice: '',
       exportPrice: '',
+      discountPrice: '',
       status: 'draft',
       overridePrice: false,
       overridePackageSize: false,
@@ -597,6 +602,28 @@ const AddVariantModal = ({
                 </p>
               )}
             </FormControl>
+            {/* Giảm giá */}
+            <Controller
+              name='discountPrice'
+              control={control}
+              rules={{
+                validate: (val) =>
+                  Number(val) >= 0 ? true : 'Giá giảm không được âm'
+              }}
+              render={({ field }) => (
+                <TextField
+                  label='Giá giảm (đ)'
+                  type='text'
+                  fullWidth
+                  value={formatCurrency(field.value)}
+                  onChange={(e) =>
+                    field.onChange(parseCurrency(e.target.value))
+                  }
+                  error={!!errors.discountPrice}
+                  helperText={errors.discountPrice?.message}
+                />
+              )}
+            />
 
             <Box
               sx={{

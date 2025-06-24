@@ -25,8 +25,21 @@ import AddIcon from '@mui/icons-material/Add'
 import TableNoneData from '~/components/TableAdmin/NoneData.jsx'
 import BlogRow from './BlogRow'
 import TablePaginationActions from '~/components/PaginationAdmin/TablePaginationActions.jsx'
-
-const BlogTable = ({ blogs, onAdd, onEdit, onDelete, onView }) => {
+import FilterBlog from '~/components/FilterAdmin/FilterBlog.jsx'
+const BlogTable = ({
+  blogs,
+  onAdd,
+  onEdit,
+  onDelete,
+  onView,
+  onPageChange,
+  onChangeRowsPerPage,
+  page,
+  rowsPerPage,
+  total,
+  onFilter,
+  loading
+}) => {
   const columns = [
     { id: 'index', label: 'STT', align: 'center', width: 50 },
     { id: 'coverImage', label: 'Ảnh bìa', align: 'left', width: 100 },
@@ -77,6 +90,7 @@ const BlogTable = ({ blogs, onAdd, onEdit, onDelete, onView }) => {
             Thêm
           </Button>
         </Box>
+        <FilterBlog blogs={blogs} onFilter={onFilter} loading={loading} />
       </Box>
       {/* Table */}
       <TableContainer>
@@ -109,11 +123,7 @@ const BlogTable = ({ blogs, onAdd, onEdit, onDelete, onView }) => {
               blogs.map((blog, index) => (
                 <BlogRow
                   key={blog._id}
-                  index={
-                    (pagination?.page - 1) * (pagination?.limit || 10) +
-                    index +
-                    1
-                  }
+                  index={page * rowsPerPage + index + 1}
                   blog={blog}
                   onEdit={onEdit}
                   onDelete={onDelete}

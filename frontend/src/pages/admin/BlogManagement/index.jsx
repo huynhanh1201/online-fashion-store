@@ -14,15 +14,12 @@ import BlogModal from './modal/AddBlogModal'
 import ViewBlogModal from './modal/ViewBlogModal'
 import DeleteBlogModal from './modal/DeleteBlogModal'
 import {
-  getBlogs,
   createBlog,
   updateBlog,
   deleteBlog
 } from '~/services/admin/blogService'
-
+import useBlog from '~/hooks/admin/useBlog'
 export default function BlogManagementPage() {
-  const [blogs, setBlogs] = useState([])
-  const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [openBlogModal, setOpenBlogModal] = useState(false)
   const [blogModalMode, setBlogModalMode] = useState('add') // 'add' hoặc 'edit'
@@ -31,27 +28,12 @@ export default function BlogManagementPage() {
   const [selectedBlog, setSelectedBlog] = useState(null)
   const [page, setPage] = React.useState(1)
   const [limit, setLimit] = React.useState(10)
-  const [filters, setFilters] = React.useState(() => ({
-    status: 'false',
+  const [filters, setFilters] = React.useState({
+    status: 'draft',
     sort: 'newest'
-  }))
+  })
   // Fetch blogs từ API
-  const fetchBlogs = async (page = 1, limit = 10, filters = {}) => {
-    try {
-      setLoading(true)
-      setError(null)
-      const response = await getBlogs(page, limit, filters)
-      console.log(response.data)
-      setBlogs(response.blogs)
-    } catch (error) {
-      console.error('Lỗi khi tải danh sách blog:', error)
-      setError('Không thể tải danh sách blog. Vui lòng thử lại.')
-      toast.error('Không thể tải danh sách blog')
-    } finally {
-      setLoading(false)
-    }
-  }
-
+  const { blogs, fetchBlogs, totalPages, loading } = useBlog()
   // Load blogs khi component mount
   useEffect(() => {
     fetchBlogs(page, limit, filters)
@@ -98,9 +80,7 @@ export default function BlogManagementPage() {
     }
   }
 
-  const handlePageChange = (newPage) => {
-    fetchBlogs(newPage, limit)
-  }
+  const handleChangePage = (event, value) => setPage(value)
   const isEqual = (obj1, obj2) => JSON.stringify(obj1) === JSON.stringify(obj2)
 
   const handleFilter = (newFilters) => {
@@ -161,11 +141,12 @@ export default function BlogManagementPage() {
         page={page - 1}
         rowsPerPage={limit}
         total={totalPages}
-        onPageChange={handlePageChange}
+        onPageChange={handleChangePage}
         onChangeRowsPerPage={(newLimit) => {
           setPage(1)
           setLimit(newLimit)
         }}
+        loading={loading}
       />
 
       <BlogModal
