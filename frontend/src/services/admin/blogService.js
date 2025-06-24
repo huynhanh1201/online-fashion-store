@@ -6,13 +6,7 @@ import { API_ROOT } from '~/utils/constants.js'
 export const getBlogs = async (page = 1, limit = 10, filters = {}) => {
   try {
     let queryParams = `page=${page}&limit=${limit}`
-    
-    // Thêm các filter nếu có
-    if (filters.status) queryParams += `&status=${filters.status}`
-    if (filters.category) queryParams += `&category=${filters.category}`
-    if (filters.brand) queryParams += `&brand=${filters.brand}`
-    if (filters.search) queryParams += `&search=${filters.search}`
-    
+
     const response = await AuthorizedAxiosInstance.get(
       `${API_ROOT}/v1/blogs?${queryParams}`
     )
@@ -90,7 +84,7 @@ export const uploadBlogImage = async (imageFile) => {
   try {
     const formData = new FormData()
     formData.append('image', imageFile)
-    
+
     const response = await AuthorizedAxiosInstance.post(
       `${API_ROOT}/v1/blogs/upload-image`,
       formData,

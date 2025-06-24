@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import {
   Dialog,
   DialogTitle,
@@ -6,7 +6,6 @@ import {
   DialogActions,
   TextField,
   Button,
-  Grid,
   FormControl,
   InputLabel,
   Select,
@@ -16,14 +15,11 @@ import {
   Typography,
   Autocomplete,
   Stack,
-  Divider,
-  Card,
-  CardContent,
   IconButton,
   Paper,
-  Avatar,
   CircularProgress,
-  Alert
+  useTheme,
+  useMediaQuery
 } from '@mui/material'
 import {
   Close as CloseIcon,
@@ -31,15 +27,17 @@ import {
   Image as ImageIcon,
   Tag as TagIcon,
   Search as SearchIcon,
-  Visibility as PreviewIcon,
   Save as SaveIcon,
   CloudUpload as UploadIcon,
-  Delete as DeleteIcon
+  Delete as DeleteIcon,
+  Edit as EditIcon
 } from '@mui/icons-material'
 import { useForm, Controller } from 'react-hook-form'
 import { toast } from 'react-toastify'
 import ProductDescriptionEditor from '~/pages/admin/ProductManagement/component/ProductDescriptionEditor.jsx'
 import { CloudinaryColor, CloudinaryProduct, URI } from '~/utils/constants'
+import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css'
+import 'draft-js/dist/Draft.css'
 
 const uploadToCloudinary = async (file, folder = CloudinaryColor) => {
   const formData = new FormData()
@@ -58,17 +56,36 @@ const uploadToCloudinary = async (file, folder = CloudinaryColor) => {
   return data.secure_url
 }
 
-const uploadImageFunction = async (file) => {
-  try {
-    const secureUrl = await uploadToCloudinary(file, CloudinaryProduct)
-    return { data: { link: secureUrl } }
-  } catch (error) {
-    console.error('Lỗi khi upload ảnh:', error)
-    return Promise.reject(error)
-  }
-}
 
-const AddBlogModal = ({ open, onClose, onSave }) => {
+// Unified input styles for consistent appearance
+const getInputStyles = () => ({
+  '& .MuiOutlinedInput-root': {
+    borderRadius: 2,
+    minHeight: '56px', // Consistent height for all inputs
+    backgroundColor: 'white',
+    '&:hover fieldset': {
+      borderColor: '#0052cc'
+    },
+    '&.Mui-focused fieldset': {
+      borderColor: '#0052cc',
+      borderWidth: 2
+    }
+  },
+  '& .MuiInputLabel-root': {
+    color: '#4a4a4a',
+    '&.Mui-focused': { color: '#0052cc' }
+  },
+  '& .MuiInputBase-input': {
+    fontSize: '0.95rem',
+    padding: '16.5px 14px'
+  }
+})
+
+const BlogModal = ({ open, onClose, onSave, blogData = null, mode = 'add' }) => {
+  const theme = useTheme()
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
+  const isEditMode = mode === 'edit' && blogData
+
   const { register, handleSubmit, control, reset, setValue, watch, formState: { errors } } = useForm({
     defaultValues: {
       title: '',
@@ -90,7 +107,6 @@ const AddBlogModal = ({ open, onClose, onSave }) => {
   const [uploading, setUploading] = useState(false)
   const [uploadingIndex, setUploadingIndex] = useState(null)
 
-  // Danh sách categories có sẵn
   const categories = [
     'Trang phục',
     'Phụ kiện',
@@ -100,7 +116,6 @@ const AddBlogModal = ({ open, onClose, onSave }) => {
     'Xu hướng thời trang'
   ]
 
-  // Danh sách brands có sẵn
   const brands = [
     'Zara',
     'H&M',
@@ -113,6 +128,51 @@ const AddBlogModal = ({ open, onClose, onSave }) => {
     'Dior',
     'Prada'
   ]
+
+  // Effect to populate form when editing
+  useEffect(() => {
+    if (isEditMode && blogData) {
+      // Reset form with blog data
+      reset({
+        title: blogData.title || '',
+        excerpt: blogData.excerpt || '',
+        content: blogData.content || '',
+        coverImage: blogData.coverImage || '',
+        images: blogData.images || [],
+        tags: blogData.tags || [],
+        category: blogData.category || '',
+        brand: blogData.brand || '',
+        status: blogData.status || 'draft',
+        metaTitle: blogData.meta?.title || '',
+        metaDescription: blogData.meta?.description || '',
+        metaKeywords: blogData.meta?.keywords || []
+      })
+
+      // Set image URLs for additional images
+      if (blogData.images && blogData.images.length > 0) {
+        setImageUrls([...blogData.images, ''])
+      } else {
+        setImageUrls([''])
+      }
+    } else {
+      // Reset to default values for add mode
+      reset({
+        title: '',
+        excerpt: '',
+        content: '',
+        coverImage: '',
+        images: [],
+        tags: [],
+        category: '',
+        brand: '',
+        status: 'draft',
+        metaTitle: '',
+        metaDescription: '',
+        metaKeywords: []
+      })
+      setImageUrls([''])
+    }
+  }, [isEditMode, blogData, reset])
 
   const handleAddImageUrl = () => {
     setImageUrls([...imageUrls, ''])
@@ -129,7 +189,6 @@ const AddBlogModal = ({ open, onClose, onSave }) => {
     setImageUrls(newUrls)
   }
 
-  // Upload ảnh bìa
   const handleCoverImageUpload = async (event) => {
     const file = event.target.files[0]
     if (!file) return
@@ -156,7 +215,6 @@ const AddBlogModal = ({ open, onClose, onSave }) => {
     }
   }
 
-  // Upload ảnh bổ sung
   const handleImageUpload = async (event, index) => {
     const file = event.target.files[0]
     if (!file) return
@@ -184,17 +242,7 @@ const AddBlogModal = ({ open, onClose, onSave }) => {
   }
 
   const onSubmit = (data) => {
-    // Tạo slug từ title
-    const slug = data.title
-      .toLowerCase()
-      .normalize('NFD')
-      .replace(/[\u0300-\u036f]/g, '')
-      .replace(/[^a-z0-9\s-]/g, '')
-      .replace(/\s+/g, '-')
-      .replace(/-+/g, '-')
-      .trim('-')
-
-    const newBlog = {
+    const blogPayload = {
       title: data.title,
       excerpt: data.excerpt,
       content: data.content,
@@ -204,15 +252,14 @@ const AddBlogModal = ({ open, onClose, onSave }) => {
       category: data.category,
       brand: data.brand,
       status: data.status,
-
       meta: {
         title: data.metaTitle || data.title,
         description: data.metaDescription || data.excerpt,
         keywords: data.metaKeywords
-      },
+      }
     }
 
-    onSave(newBlog)
+    onSave(blogPayload, isEditMode)
     handleClose()
   }
 
@@ -229,211 +276,207 @@ const AddBlogModal = ({ open, onClose, onSave }) => {
       open={open}
       onClose={handleClose}
       fullWidth
-      maxWidth='lg'
+      maxWidth={isMobile ? 'sm' : 'lg'}
+      fullScreen={isMobile}
       PaperProps={{
         sx: {
-          borderRadius: 3,
-          boxShadow: '0 20px 40px rgba(0, 31, 93, 0.15)',
+          borderRadius: isMobile ? 0 : '12px',
+          boxShadow: '0 8px 24px rgba(0, 31, 93, 0.12)',
+          maxHeight: '80vh',
+          margin: isMobile ? 0 : '16px'
         }
       }}
     >
       <DialogTitle sx={{
-        background: 'linear-gradient(135deg, #001f5d 0%, #0d47a1 100%)',
+        background: 'linear-gradient(135deg, #0052cc 0%, #2684ff 100%)',
         color: 'white',
-        py: 2
+        py: isMobile ? 1.5 : 2,
+        px: isMobile ? 2 : 3,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        minHeight: isMobile ? '56px' : '64px'
       }}>
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-            <ArticleIcon sx={{ fontSize: 24 }} />
-            <Typography variant="h6" component="div" sx={{ fontWeight: 600 }}>
-              Tạo bài viết mới
-            </Typography>
-          </Box>
-          <IconButton
-            onClick={handleClose}
-            size="small"
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+          {isEditMode ? (
+            <EditIcon sx={{ fontSize: isMobile ? 20 : 24 }} />
+          ) : (
+            <ArticleIcon sx={{ fontSize: isMobile ? 20 : 24 }} />
+          )}
+          <Typography
+            variant={isMobile ? 'subtitle1' : 'h6'}
             sx={{
-              color: 'white',
-              '&:hover': { backgroundColor: 'rgba(255, 255, 255, 0.1)' }
+              fontWeight: 600,
+              fontSize: isMobile ? '1rem' : '1.25rem',
+              lineHeight: 1.2
             }}
           >
-            <CloseIcon />
-          </IconButton>
+            {isEditMode ? 'Chỉnh sửa bài viết' : 'Tạo bài viết mới'}
+          </Typography>
         </Box>
+        <IconButton
+          onClick={handleClose}
+          size={isMobile ? 'small' : 'medium'}
+          sx={{
+            color: 'white',
+            '&:hover': { backgroundColor: 'rgba(255, 255, 255, 0.12)' }
+          }}
+        >
+          <CloseIcon />
+        </IconButton>
       </DialogTitle>
 
       <form onSubmit={handleSubmit(onSubmit)}>
-        <DialogContent dividers sx={{
-          maxHeight: '75vh',
-          backgroundColor: '#fafbff',
-          p: 3
+        <DialogContent sx={{
+          p: isMobile ? 2 : 3,
+          backgroundColor: '#f9fafb',
+          overflowY: 'auto',
+          maxHeight: isMobile ? 'calc(70vh - 120px)' : 'calc(70vh - 140px)'
         }}>
-          <Grid container spacing={3}>
-            {/* Thông tin cơ bản */}
-            <Grid item xs={12}>
-              <Paper
-                elevation={0}
+          {/* Main Container using Flexbox */}
+          <Box sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: isMobile ? 2 : 3
+          }}>
+
+            {/* Section 1: Basic Information */}
+            <Paper sx={{
+              p: isMobile ? 2 : 2.5,
+              borderRadius: '8px',
+              border: '1px solid #e8ecef',
+              boxShadow: '0 2px 8px rgba(0, 31, 93, 0.06)'
+            }}>
+              <Typography
+                variant="subtitle1"
                 sx={{
-                  p: 2.5,
-                  backgroundColor: 'white',
-                  borderRadius: 2,
-                  border: '1px solid #e3f2fd'
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 1,
+                  color: '#1a202c',
+                  fontWeight: 600,
+                  mb: 2,
+                  fontSize: isMobile ? '1rem' : '1.1rem'
                 }}
               >
-                <Typography
-                  variant="subtitle1"
-                  gutterBottom
-                  sx={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 1,
-                    color: '#001f5d',
-                    fontWeight: 600,
-                    mb: 2
-                  }}
-                >
-                  <Box sx={{
-                    p: 0.5,
-                    borderRadius: 1,
-                    backgroundColor: '#e3f2fd',
-                    display: 'flex',
-                    alignItems: 'center'
-                  }}>
-                    <ArticleIcon sx={{ color: '#001f5d', fontSize: 18 }} />
-                  </Box>
-                  Thông tin cơ bản
-                </Typography>
+                <ArticleIcon sx={{ color: '#0052cc', fontSize: 20 }} />
+                Thông tin cơ bản
+              </Typography>
 
-                <Grid container spacing={2}>
-                  <Grid item xs={12} md={8}>
-                    <TextField
-                      label="Tiêu đề bài viết *"
-                      fullWidth
-                      variant="outlined"
-                      {...register('title', { required: 'Vui lòng nhập tiêu đề' })}
-                      error={!!errors.title}
-                      helperText={errors.title?.message}
-                      sx={{
-                        '& .MuiOutlinedInput-root': {
-                          borderRadius: 2,
-                          '&:hover fieldset': { borderColor: '#001f5d' },
-                          '&.Mui-focused fieldset': {
-                            borderColor: '#001f5d',
-                            borderWidth: 2
-                          }
-                        },
-                        '& .MuiInputLabel-root.Mui-focused': { color: '#001f5d' }
-                      }}
+              {/* Title and Status Row */}
+              <Box sx={{
+                display: 'flex',
+                flexDirection: isMobile ? 'column' : 'row',
+                gap: 2,
+                mb: 2
+              }}>
+                <Box sx={{ flex: isMobile ? '1' : '2' }}>
+                  <TextField
+                    label="Tiêu đề bài viết *"
+                    fullWidth
+                    variant="outlined"
+                    {...register('title', { required: 'Vui lòng nhập tiêu đề' })}
+                    error={!!errors.title}
+                    helperText={errors.title?.message}
+                    sx={getInputStyles(theme)}
+                  />
+                </Box>
+
+                <Box sx={{ flex: isMobile ? '1' : '1' }}>
+                  <FormControl fullWidth>
+                    <InputLabel>Trạng thái *</InputLabel>
+                    <Controller
+                      name="status"
+                      control={control}
+                      rules={{ required: 'Vui lòng chọn trạng thái' }}
+                      render={({ field }) => (
+                        <Select
+                          {...field}
+                          label="Trạng thái *"
+                          sx={{
+                            ...getInputStyles(theme),
+                            '& .MuiSelect-select': {
+                              padding: '16.5px 14px'
+                            }
+                          }}
+                        >
+                          <MenuItem value="draft">
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                              <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: '#ff9800' }} />
+                              Bản nháp
+                            </Box>
+                          </MenuItem>
+                          <MenuItem value="published">
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                              <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: '#4caf50' }} />
+                              Đã xuất bản
+                            </Box>
+                          </MenuItem>
+                          <MenuItem value="archived">
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                              <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: '#9e9e9e' }} />
+                              Lưu trữ
+                            </Box>
+                          </MenuItem>
+                        </Select>
+                      )}
                     />
-                  </Grid>
+                  </FormControl>
+                </Box>
+              </Box>
 
-                  <Grid item xs={12} md={4}>
-                    <FormControl fullWidth>
-                      <InputLabel>Trạng thái *</InputLabel>
-                      <Controller
-                        name="status"
-                        control={control}
-                        rules={{ required: 'Vui lòng chọn trạng thái' }}
-                        render={({ field }) => (
-                          <Select
-                            {...field}
-                            label="Trạng thái *"
-                            sx={{
-                              borderRadius: 2,
-                              '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: '#001f5d' },
-                              '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                                borderColor: '#001f5d',
-                                borderWidth: 2
-                              }
-                            }}
-                          >
-                            <MenuItem value="draft">
-                              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                <Box sx={{ width: 8, height: 8, borderRadius: '50%', backgroundColor: '#ff9800' }} />
-                                Bản nháp
-                              </Box>
-                            </MenuItem>
-                            <MenuItem value="published">
-                              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                <Box sx={{ width: 8, height: 8, borderRadius: '50%', backgroundColor: '#4caf50' }} />
-                                Đã xuất bản
-                              </Box>
-                            </MenuItem>
-                            <MenuItem value="archived">
-                              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                <Box sx={{ width: 8, height: 8, borderRadius: '50%', backgroundColor: '#9e9e9e' }} />
-                                Lưu trữ
-                              </Box>
-                            </MenuItem>
-                          </Select>
-                        )}
-                      />
-                    </FormControl>
-                  </Grid>
-
-                  <Grid item xs={12}>
-                    <TextField
-                      label="Mô tả ngắn (Excerpt)"
-                      fullWidth
-                      multiline
-                      rows={2}
-                      variant="outlined"
-                      {...register('excerpt')}
-                      helperText="Đoạn mô tả ngắn hiển thị trong danh sách bài viết"
-                      sx={{
-                        '& .MuiOutlinedInput-root': {
-                          borderRadius: 2,
-                          '&:hover fieldset': { borderColor: '#001f5d' },
-                          '&.Mui-focused fieldset': {
-                            borderColor: '#001f5d',
-                            borderWidth: 2
-                          }
-                        },
-                        '& .MuiInputLabel-root.Mui-focused': { color: '#001f5d' }
-                      }}
-                    />
-                  </Grid>
-                </Grid>
-              </Paper>
-            </Grid>
-
-            {/* Phân loại */}
-            <Grid item xs={12}>
-              <Paper
-                elevation={0}
+              {/* Excerpt */}
+              <TextField
+                label="Mô tả ngắn (Excerpt)"
+                fullWidth
+                multiline
+                rows={isMobile ? 2 : 3}
+                variant="outlined"
+                {...register('excerpt')}
+                helperText="Đoạn mô tả ngắn hiển thị trong danh sách bài viết"
                 sx={{
-                  p: 2.5,
-                  backgroundColor: 'white',
-                  borderRadius: 2,
-                  border: '1px solid #e3f2fd'
+                  ...getInputStyles(theme),
+                  '& .MuiOutlinedInput-root': {
+                    ...getInputStyles(theme)['& .MuiOutlinedInput-root'],
+                    minHeight: 'auto'
+                  }
                 }}
-              >
-                <Typography
-                  variant="subtitle1"
-                  gutterBottom
-                  sx={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 1,
-                    color: '#001f5d',
-                    fontWeight: 600,
-                    mb: 2
-                  }}
-                >
-                  <Box sx={{
-                    p: 0.5,
-                    borderRadius: 1,
-                    backgroundColor: '#e8f5e8',
-                    display: 'flex',
-                    alignItems: 'center'
-                  }}>
-                    <TagIcon sx={{ color: '#2e7d32', fontSize: 18 }} />
-                  </Box>
-                  Phân loại & Thương hiệu
-                </Typography>
+              />
+            </Paper>
 
-                <Grid container spacing={2}>
-                  <Grid item xs={12} md={6}>
+            {/* Section 2: Two Column Layout for Category/Brand and Cover Image */}
+            <Box sx={{
+              display: 'flex',
+              flexDirection: isMobile ? 'column' : 'row',
+              gap: isMobile ? 2 : 3
+            }}>
+
+              {/* Left Column: Category & Brand */}
+              <Box sx={{ flex: 1 }}>
+                <Paper sx={{
+                  p: isMobile ? 2 : 2.5,
+                  borderRadius: '8px',
+                  border: '1px solid #e8ecef',
+                  boxShadow: '0 2px 8px rgba(0, 31, 93, 0.06)',
+                  height: 'fit-content'
+                }}>
+                  <Typography
+                    variant="subtitle1"
+                    sx={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 1,
+                      color: '#1a202c',
+                      fontWeight: 600,
+                      mb: 2,
+                      fontSize: isMobile ? '1rem' : '1.1rem'
+                    }}
+                  >
+                    <TagIcon sx={{ color: '#0052cc', fontSize: 20 }} />
+                    Phân loại & Thương hiệu
+                  </Typography>
+
+                  <Stack spacing={2}>
                     <Controller
                       name="category"
                       control={control}
@@ -450,25 +493,13 @@ const AddBlogModal = ({ open, onClose, onSave }) => {
                               label="Chuyên mục *"
                               variant="outlined"
                               helperText="Chọn hoặc nhập chuyên mục"
-                              sx={{
-                                '& .MuiOutlinedInput-root': {
-                                  borderRadius: 2,
-                                  '&:hover fieldset': { borderColor: '#001f5d' },
-                                  '&.Mui-focused fieldset': {
-                                    borderColor: '#001f5d',
-                                    borderWidth: 2
-                                  }
-                                },
-                                '& .MuiInputLabel-root.Mui-focused': { color: '#001f5d' }
-                              }}
+                              sx={getInputStyles(theme)}
                             />
                           )}
                         />
                       )}
                     />
-                  </Grid>
 
-                  <Grid item xs={12} md={6}>
                     <Controller
                       name="brand"
                       control={control}
@@ -485,105 +516,69 @@ const AddBlogModal = ({ open, onClose, onSave }) => {
                               label="Thương hiệu"
                               variant="outlined"
                               helperText="Chọn hoặc nhập thương hiệu"
-                              sx={{
-                                '& .MuiOutlinedInput-root': {
-                                  borderRadius: 2,
-                                  '&:hover fieldset': { borderColor: '#001f5d' },
-                                  '&.Mui-focused fieldset': {
-                                    borderColor: '#001f5d',
-                                    borderWidth: 2
-                                  }
-                                },
-                                '& .MuiInputLabel-root.Mui-focused': { color: '#001f5d' }
-                              }}
+                              sx={getInputStyles(theme)}
                             />
                           )}
                         />
                       )}
                     />
-                  </Grid>
-                </Grid>
-              </Paper>
-            </Grid>
+                  </Stack>
+                </Paper>
+              </Box>
 
-            {/* Hình ảnh */}
-            <Grid item xs={12}>
-              <Paper
-                elevation={0}
-                sx={{
-                  p: 2.5,
-                  backgroundColor: 'white',
-                  borderRadius: 2,
-                  border: '1px solid #e3f2fd'
-                }}
-              >
-                <Typography
-                  variant="subtitle1"
-                  gutterBottom
-                  sx={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 1,
-                    color: '#001f5d',
-                    fontWeight: 600,
-                    mb: 2
-                  }}
-                >
-                  <Box sx={{
-                    p: 0.5,
-                    borderRadius: 1,
-                    backgroundColor: '#fff3e0',
-                    display: 'flex',
-                    alignItems: 'center'
-                  }}>
-                    <ImageIcon sx={{ color: '#f57c00', fontSize: 18 }} />
-                  </Box>
-                  Hình ảnh bài viết
-                </Typography>
-
-                {/* Ảnh bìa */}
-                <Box sx={{ mb: 3 }}>
-                  <Typography variant="body2" gutterBottom sx={{
-                    color: '#001f5d',
-                    fontWeight: 500,
-                    mb: 1.5
-                  }}>
+              {/* Right Column: Cover Image */}
+              <Box sx={{ flex: 1 }}>
+                <Paper sx={{
+                  p: isMobile ? 2 : 2.5,
+                  borderRadius: '8px',
+                  border: '1px solid #e8ecef',
+                  boxShadow: '0 2px 8px rgba(0, 31, 93, 0.06)',
+                  height: 'fit-content'
+                }}>
+                  <Typography
+                    variant="subtitle1"
+                    sx={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 1,
+                      color: '#1a202c',
+                      fontWeight: 600,
+                      mb: 2,
+                      fontSize: isMobile ? '1rem' : '1.1rem'
+                    }}
+                  >
+                    <ImageIcon sx={{ color: '#0052cc', fontSize: 20 }} />
                     Ảnh bìa chính
                   </Typography>
 
-                  <Box sx={{ display: 'flex', gap: 1.5, alignItems: 'flex-start', mb: 1.5 }}>
+                  <Box sx={{
+                    display: 'flex',
+                    flexDirection: isMobile ? 'column' : 'row',
+                    gap: 1.5,
+                    alignItems: 'flex-start',
+                    mb: 2
+                  }}>
                     <TextField
                       label="URL ảnh bìa *"
                       fullWidth
-                      size="small"
                       variant="outlined"
                       {...register('coverImage')}
                       helperText="Nhập URL hoặc upload file"
-                      sx={{
-                        '& .MuiOutlinedInput-root': {
-                          borderRadius: 2,
-                          '&:hover fieldset': { borderColor: '#001f5d' },
-                          '&.Mui-focused fieldset': {
-                            borderColor: '#001f5d',
-                            borderWidth: 2
-                          }
-                        },
-                        '& .MuiInputLabel-root.Mui-focused': { color: '#001f5d' }
-                      }}
+                      sx={getInputStyles(theme)}
                     />
 
                     <Button
                       variant="contained"
                       component="label"
-                      size="small"
                       startIcon={uploading ? <CircularProgress size={14} color="inherit" /> : <UploadIcon />}
                       disabled={uploading}
                       sx={{
-                        minWidth: '100px',
+                        minWidth: isMobile ? '100%' : '120px',
+                        height: '56px',
                         borderRadius: 2,
-                        backgroundColor: '#001f5d',
+                        backgroundColor: '#0052cc',
                         '&:hover': {
-                          backgroundColor: '#001a4d'
+                          backgroundColor: '#003d99'
                         }
                       }}
                     >
@@ -599,9 +594,8 @@ const AddBlogModal = ({ open, onClose, onSave }) => {
 
                   {watchedValues.coverImage && (
                     <Box sx={{
-                      mt: 2,
                       p: 1.5,
-                      border: '1px dashed #e3f2fd',
+                      border: '1px dashed #e8ecef',
                       borderRadius: 2,
                       backgroundColor: '#fafbff'
                     }}>
@@ -610,7 +604,7 @@ const AddBlogModal = ({ open, onClose, onSave }) => {
                         alt="Preview ảnh bìa"
                         style={{
                           width: '100%',
-                          maxHeight: '200px',
+                          maxHeight: isMobile ? '150px' : '200px',
                           objectFit: 'cover',
                           borderRadius: '8px'
                         }}
@@ -620,81 +614,220 @@ const AddBlogModal = ({ open, onClose, onSave }) => {
                       />
                     </Box>
                   )}
-                </Box>
-              </Paper>
-            </Grid>
+                </Paper>
+              </Box>
+            </Box>
 
-            {/* Ảnh bổ sung */}
-            <Grid item xs={12}>
-              <Paper
-                elevation={0}
+            {/* Section 3: Two Column Layout for Tags and SEO */}
+            <Box sx={{
+              display: 'flex',
+              flexDirection: isMobile ? 'column' : 'row',
+              gap: isMobile ? 2 : 3
+            }}>
+
+              {/* Left Column: Tags */}
+              <Box sx={{ flex: 1 }}>
+                <Paper sx={{
+                  p: isMobile ? 2 : 2.5,
+                  borderRadius: '8px',
+                  border: '1px solid #e8ecef',
+                  boxShadow: '0 2px 8px rgba(0, 31, 93, 0.06)',
+                  height: 'fit-content'
+                }}>
+                  <Typography
+                    variant="subtitle1"
+                    sx={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 1,
+                      color: '#1a202c',
+                      fontWeight: 600,
+                      mb: 2,
+                      fontSize: isMobile ? '1rem' : '1.1rem'
+                    }}
+                  >
+                    <TagIcon sx={{ color: '#0052cc', fontSize: 20 }} />
+                    Tags
+                  </Typography>
+
+                  <Controller
+                    name="tags"
+                    control={control}
+                    render={({ field }) => (
+                      <Autocomplete
+                        {...field}
+                        multiple
+                        freeSolo
+                        options={[]}
+                        value={field.value}
+                        onChange={(event, newValue) => field.onChange(newValue)}
+                        renderTags={(value, getTagProps) =>
+                          value.map((option, index) => (
+                            <Chip
+                              variant="filled"
+                              size="small"
+                              label={option}
+                              {...getTagProps({ index })}
+                              key={index}
+                              sx={{
+                                backgroundColor: '#e3f2fd',
+                                color: '#0052cc',
+                                fontWeight: 500,
+                                '&:hover': { backgroundColor: '#bbdefb' },
+                                '& .MuiChip-deleteIcon': {
+                                  color: '#0052cc',
+                                  '&:hover': { color: '#003d99' }
+                                }
+                              }}
+                            />
+                          ))
+                        }
+                        renderInput={(params) => (
+                          <TextField
+                            {...params}
+                            label="Tags"
+                            placeholder="Nhập tag và nhấn Enter"
+                            helperText="VD: thời trang, xu hướng"
+                            variant="outlined"
+                            sx={getInputStyles(theme)}
+                          />
+                        )}
+                      />
+                    )}
+                  />
+                </Paper>
+              </Box>
+
+              {/* Right Column: SEO */}
+              <Box sx={{ flex: 1 }}>
+                <Paper sx={{
+                  p: isMobile ? 2 : 2.5,
+                  borderRadius: '8px',
+                  border: '1px solid #e8ecef',
+                  boxShadow: '0 2px 8px rgba(0, 31, 93, 0.06)',
+                  height: 'fit-content'
+                }}>
+                  <Typography
+                    variant="subtitle1"
+                    sx={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 1,
+                      color: '#1a202c',
+                      fontWeight: 600,
+                      mb: 2,
+                      fontSize: isMobile ? '1rem' : '1.1rem'
+                    }}
+                  >
+                    <SearchIcon sx={{ color: '#0052cc', fontSize: 20 }} />
+                    SEO
+                  </Typography>
+
+                  <Stack spacing={2}>
+                    <TextField
+                      label="Meta Title"
+                      fullWidth
+                      {...register('metaTitle')}
+                      helperText="Tiêu đề SEO (để trống = dùng tiêu đề)"
+                      sx={getInputStyles(theme)}
+                    />
+
+                    <TextField
+                      label="Meta Description"
+                      fullWidth
+                      multiline
+                      rows={2}
+                      {...register('metaDescription')}
+                      helperText="Mô tả SEO (để trống = dùng excerpt)"
+                      sx={{
+                        ...getInputStyles(theme),
+                        '& .MuiOutlinedInput-root': {
+                          ...getInputStyles(theme)['& .MuiOutlinedInput-root'],
+                          minHeight: 'auto'
+                        }
+                      }}
+                    />
+                  </Stack>
+                </Paper>
+              </Box>
+            </Box>
+
+            {/* Section 4: Additional Images */}
+            <Paper sx={{
+              p: isMobile ? 2 : 2.5,
+              borderRadius: '8px',
+              border: '1px solid #e8ecef',
+              boxShadow: '0 2px 8px rgba(0, 31, 93, 0.06)'
+            }}>
+              <Typography
+                variant="subtitle1"
                 sx={{
-                  p: 2.5,
-                  backgroundColor: 'white',
-                  borderRadius: 2,
-                  border: '1px solid #e3f2fd'
-                }}
-              >
-                <Typography variant="body2" gutterBottom sx={{
-                  color: '#001f5d',
-                  fontWeight: 500,
-                  mb: 2,
                   display: 'flex',
                   alignItems: 'center',
-                  gap: 1
-                }}>
-                  <ImageIcon fontSize="small" /> Ảnh bổ sung
-                </Typography>
+                  gap: 1,
+                  color: '#1a202c',
+                  fontWeight: 600,
+                  mb: 2,
+                  fontSize: isMobile ? '1rem' : '1.1rem'
+                }}
+              >
+                <ImageIcon sx={{ color: '#0052cc', fontSize: 20 }} />
+                Ảnh bổ sung
+              </Typography>
 
-                <Stack spacing={2}>
-                  {imageUrls.map((url, index) => (
-                    <Box
-                      key={index}
-                      sx={{
-                        p: 1.5,
-                        backgroundColor: '#fafbff',
-                        border: '1px solid #e8f4fd',
-                        borderRadius: 2
-                      }}
-                    >
-                      <Box sx={{ display: 'flex', gap: 1.5, alignItems: 'flex-start' }}>
-                        <TextField
-                          label={`Ảnh ${index + 1}`}
-                          fullWidth
-                          size="small"
-                          value={url}
-                          onChange={(e) => handleImageUrlChange(index, e.target.value)}
-                          variant="outlined"
-                          sx={{
-                            '& .MuiOutlinedInput-root': {
-                              borderRadius: 2,
-                              backgroundColor: 'white',
-                              '&:hover fieldset': { borderColor: '#001f5d' },
-                              '&.Mui-focused fieldset': {
-                                borderColor: '#001f5d',
-                                borderWidth: 2
-                              }
-                            },
-                            '& .MuiInputLabel-root.Mui-focused': { color: '#001f5d' }
-                          }}
-                        />
+              <Stack spacing={2}>
+                {imageUrls.map((url, index) => (
+                  <Box
+                    key={index}
+                    sx={{
+                      p: isMobile ? 1.5 : 2,
+                      backgroundColor: '#fafbff',
+                      border: '1px solid #e8f4fd',
+                      borderRadius: 2
+                    }}
+                  >
+                    <Box sx={{
+                      display: 'flex',
+                      flexDirection: isMobile ? 'column' : 'row',
+                      gap: 1.5,
+                      alignItems: 'flex-start'
+                    }}>
+                      <TextField
+                        label={`Ảnh ${index + 1}`}
+                        fullWidth
+                        value={url}
+                        onChange={(e) => handleImageUrlChange(index, e.target.value)}
+                        variant="outlined"
+                        sx={{
+                          ...getInputStyles(theme),
+                          '& .MuiOutlinedInput-root': {
+                            ...getInputStyles(theme)['& .MuiOutlinedInput-root'],
+                            backgroundColor: 'white'
+                          }
+                        }}
+                      />
 
+                      <Box sx={{
+                        display: 'flex',
+                        gap: 1,
+                        width: isMobile ? '100%' : 'auto'
+                      }}>
                         <Button
                           variant="contained"
                           component="label"
-                          size="small"
                           startIcon={uploadingIndex === index ? <CircularProgress size={14} color="inherit" /> : <UploadIcon />}
                           disabled={uploadingIndex === index}
                           sx={{
-                            minWidth: '80px',
+                            minWidth: isMobile ? '50%' : '100px',
+                            height: '56px',
                             borderRadius: 2,
-                            backgroundColor: '#001f5d',
+                            backgroundColor: '#0052cc',
                             '&:hover': {
-                              backgroundColor: '#001a4d'
+                              backgroundColor: '#003d99'
                             }
                           }}
                         >
-                          {uploadingIndex === index ? 'Tải...' : 'Up'}
+                          {uploadingIndex === index ? 'Tải...' : 'Upload'}
                           <input
                             type="file"
                             hidden
@@ -706,11 +839,11 @@ const AddBlogModal = ({ open, onClose, onSave }) => {
                         <Button
                           variant="outlined"
                           color="error"
-                          size="small"
                           onClick={() => handleRemoveImageUrl(index)}
                           disabled={imageUrls.length === 1}
                           sx={{
-                            minWidth: '60px',
+                            minWidth: isMobile ? '50%' : '80px',
+                            height: '56px',
                             borderRadius: 2
                           }}
                         >
@@ -718,270 +851,88 @@ const AddBlogModal = ({ open, onClose, onSave }) => {
                         </Button>
                       </Box>
                     </Box>
-                  ))}
+                  </Box>
+                ))}
 
-                  <Button
-                    variant="outlined"
-                    size="small"
-                    startIcon={<ImageIcon />}
-                    onClick={handleAddImageUrl}
-                    sx={{
-                      py: 1,
-                      borderRadius: 2,
-                      borderColor: '#001f5d',
-                      color: '#001f5d',
-                      borderStyle: 'dashed',
-                      '&:hover': {
-                        borderColor: '#001a4d',
-                        backgroundColor: '#f0f4ff',
-                        borderStyle: 'solid'
-                      }
-                    }}
-                  >
-                    Thêm ảnh
-                  </Button>
-                </Stack>
-              </Paper>
-            </Grid>
-
-            {/* Tags */}
-            <Grid item xs={12} md={6}>
-              <Paper
-                elevation={0}
-                sx={{
-                  p: 2.5,
-                  backgroundColor: 'white',
-                  borderRadius: 2,
-                  border: '1px solid #e3f2fd'
-                }}
-              >
-                <Typography
-                  variant="subtitle1"
-                  gutterBottom
+                <Button
+                  variant="outlined"
+                  startIcon={<ImageIcon />}
+                  onClick={handleAddImageUrl}
                   sx={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 1,
-                    color: '#001f5d',
-                    fontWeight: 600,
-                    mb: 2
+                    py: 1.5,
+                    borderRadius: 2,
+                    borderColor: '#0052cc',
+                    color: '#0052cc',
+                    borderStyle: 'dashed',
+                    '&:hover': {
+                      borderColor: '#003d99',
+                      backgroundColor: '#f0f4ff',
+                      borderStyle: 'solid'
+                    }
                   }}
                 >
-                  <Box sx={{
-                    p: 0.5,
-                    borderRadius: 1,
-                    backgroundColor: '#f3e5f5',
-                    display: 'flex',
-                    alignItems: 'center'
-                  }}>
-                    <TagIcon sx={{ color: '#7b1fa2', fontSize: 18 }} />
-                  </Box>
-                  Tags
-                </Typography>
+                  Thêm ảnh
+                </Button>
+              </Stack>
+            </Paper>
 
-                <Controller
-                  name="tags"
+            {/* Section 5: Content Editor */}
+            <Paper sx={{
+              p: isMobile ? 2 : 2.5,
+              borderRadius: '8px',
+              border: '1px solid #e8ecef',
+              boxShadow: '0 2px 8px rgba(0, 31, 93, 0.06)'
+            }}>
+              <Typography
+                variant="subtitle1"
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 1,
+                  color: '#1a202c',
+                  fontWeight: 600,
+                  mb: 2,
+                  fontSize: isMobile ? '1rem' : '1.1rem'
+                }}
+              >
+                <ArticleIcon sx={{ color: '#0052cc', fontSize: 20 }} />
+                Nội dung bài viết
+              </Typography>
+
+              <Box sx={{
+                border: '1px solid #e8f4fd',
+                borderRadius: 2,
+                overflow: 'hidden',
+                minHeight: isMobile ? '250px' : '300px'
+              }}>
+                <ProductDescriptionEditor
                   control={control}
-                  render={({ field }) => (
-                    <Autocomplete
-                      {...field}
-                      size="small"
-                      multiple
-                      freeSolo
-                      options={[]}
-                      value={field.value}
-                      onChange={(event, newValue) => field.onChange(newValue)}
-                      renderTags={(value, getTagProps) =>
-                        value.map((option, index) => (
-                          <Chip
-                            variant="filled"
-                            size="small"
-                            label={option}
-                            {...getTagProps({ index })}
-                            key={index}
-                            sx={{
-                              backgroundColor: '#e3f2fd',
-                              color: '#001f5d',
-                              fontWeight: 500,
-                              '&:hover': { backgroundColor: '#bbdefb' },
-                              '& .MuiChip-deleteIcon': {
-                                color: '#001f5d',
-                                '&:hover': { color: '#001a4d' }
-                              }
-                            }}
-                          />
-                        ))
-                      }
-                      renderInput={(params) => (
-                        <TextField
-                          {...params}
-                          label="Tags"
-                          placeholder="Nhập tag và nhấn Enter"
-                          helperText="VD: thời trang, xu hướng"
-                          variant="outlined"
-                          sx={{
-                            '& .MuiOutlinedInput-root': {
-                              borderRadius: 2,
-                              '&:hover fieldset': { borderColor: '#001f5d' },
-                              '&.Mui-focused fieldset': {
-                                borderColor: '#001f5d',
-                                borderWidth: 2
-                              }
-                            },
-                            '& .MuiInputLabel-root.Mui-focused': { color: '#001f5d' }
-                          }}
-                        />
-                      )}
-                    />
-                  )}
+                  name="content"
+                  setValue={setValue}
                 />
-              </Paper>
-            </Grid>
+              </Box>
+            </Paper>
 
-            {/* SEO Meta */}
-            <Grid item xs={12} md={6}>
-              <Paper
-                elevation={0}
-                sx={{
-                  p: 2.5,
-                  backgroundColor: 'white',
-                  borderRadius: 2,
-                  border: '1px solid #e3f2fd'
-                }}
-              >
-                <Typography
-                  variant="subtitle1"
-                  gutterBottom
-                  sx={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 1,
-                    color: '#001f5d',
-                    fontWeight: 600,
-                    mb: 2
-                  }}
-                >
-                  <Box sx={{
-                    p: 0.5,
-                    borderRadius: 1,
-                    backgroundColor: '#fff8e1',
-                    display: 'flex',
-                    alignItems: 'center'
-                  }}>
-                    <SearchIcon sx={{ color: '#f57f17', fontSize: 18 }} />
-                  </Box>
-                  SEO
-                </Typography>
-
-                <Stack spacing={2}>
-                  <TextField
-                    label="Meta Title"
-                    fullWidth
-                    size="small"
-                    {...register('metaTitle')}
-                    helperText="Tiêu đề SEO (để trống = dùng tiêu đề)"
-                    sx={{
-                      '& .MuiOutlinedInput-root': {
-                        borderRadius: 2,
-                        '&:hover fieldset': { borderColor: '#001f5d' },
-                        '&.Mui-focused fieldset': {
-                          borderColor: '#001f5d',
-                          borderWidth: 2
-                        }
-                      },
-                      '& .MuiInputLabel-root.Mui-focused': { color: '#001f5d' }
-                    }}
-                  />
-
-                  <TextField
-                    label="Meta Description"
-                    fullWidth
-                    multiline
-                    rows={2}
-                    size="small"
-                    {...register('metaDescription')}
-                    helperText="Mô tả SEO (để trống = dùng excerpt)"
-                    sx={{
-                      '& .MuiOutlinedInput-root': {
-                        borderRadius: 2,
-                        '&:hover fieldset': { borderColor: '#001f5d' },
-                        '&.Mui-focused fieldset': {
-                          borderColor: '#001f5d',
-                          borderWidth: 2
-                        }
-                      },
-                      '& .MuiInputLabel-root.Mui-focused': { color: '#001f5d' }
-                    }}
-                  />
-                </Stack>
-              </Paper>
-            </Grid>
-
-            {/* Nội dung */}
-            <Grid item xs={12}>
-              <Paper
-                elevation={0}
-                sx={{
-                  p: 2.5,
-                  backgroundColor: 'white',
-                  borderRadius: 2,
-                  border: '1px solid #e3f2fd'
-                }}
-              >
-                <Typography
-                  variant="subtitle1"
-                  gutterBottom
-                  sx={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 1,
-                    color: '#001f5d',
-                    fontWeight: 600,
-                    mb: 2
-                  }}
-                >
-                  <Box sx={{
-                    p: 0.5,
-                    borderRadius: 1,
-                    backgroundColor: '#e8f5e8',
-                    display: 'flex',
-                    alignItems: 'center'
-                  }}>
-                    <ArticleIcon sx={{ color: '#2e7d32', fontSize: 18 }} />
-                  </Box>
-                  Nội dung bài viết
-                </Typography>
-
-                <Box sx={{
-                  border: '1px solid #e8f4fd',
-                  borderRadius: 2,
-                  overflow: 'hidden',
-                  minHeight: '200px'
-                }}>
-                  <ProductDescriptionEditor
-                    control={control}
-                    name="content"
-                    setValue={setValue}
-                  />
-                </Box>
-              </Paper>
-            </Grid>
-
-
-          </Grid>
+          </Box>
         </DialogContent>
 
         <DialogActions sx={{
-          p: 2,
+          p: isMobile ? 2 : 3,
           backgroundColor: '#fafbff',
-          borderTop: '1px solid #e3f2fd',
-          gap: 1.5
+          borderTop: '1px solid #e8ecef',
+          gap: 1.5,
+          display: 'flex',
+          flexDirection: isMobile ? 'column-reverse' : 'row',
+          '& > *': {
+            width: isMobile ? '100%' : 'auto'
+          }
         }}>
           <Button
             onClick={handleClose}
             variant="outlined"
             sx={{
-              minWidth: '100px',
+              minWidth: isMobile ? '100%' : '120px',
+              height: '48px',
               borderRadius: 2,
               borderColor: '#9e9e9e',
               color: '#616161',
@@ -996,17 +947,18 @@ const AddBlogModal = ({ open, onClose, onSave }) => {
           <Button
             type="submit"
             variant="contained"
-            startIcon={<SaveIcon />}
+            startIcon={isEditMode ? <EditIcon /> : <SaveIcon />}
             sx={{
-              minWidth: '140px',
+              minWidth: isMobile ? '100%' : '160px',
+              height: '48px',
               borderRadius: 2,
-              backgroundColor: '#001f5d',
+              backgroundColor: '#0052cc',
               '&:hover': {
-                backgroundColor: '#001a4d'
+                backgroundColor: '#003d99'
               }
             }}
           >
-            Tạo bài viết
+            {isEditMode ? 'Cập nhật bài viết' : 'Tạo bài viết'}
           </Button>
         </DialogActions>
       </form>
@@ -1014,4 +966,4 @@ const AddBlogModal = ({ open, onClose, onSave }) => {
   )
 }
 
-export default AddBlogModal
+export default BlogModal

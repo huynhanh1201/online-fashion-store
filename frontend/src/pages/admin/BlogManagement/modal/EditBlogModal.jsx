@@ -1,702 +1,710 @@
-import React, { useEffect, useState } from 'react'
-import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  TextField,
-  Button,
-  Grid,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
-  Chip,
-  Box,
-  Typography,
-  Autocomplete,
-  Divider,
-  Card,
-  IconButton,
-  CircularProgress
-} from '@mui/material'
-import {
-  Close as CloseIcon,
-  Article as ArticleIcon,
-  Image as ImageIcon,
-  Tag as TagIcon,
-  Search as SearchIcon,
-  CloudUpload as UploadIcon,
-  Save as SaveIcon
-} from '@mui/icons-material'
-import { useForm, Controller } from 'react-hook-form'
-import { toast } from 'react-toastify'
-import ProductDescriptionEditor from '~/pages/admin/ProductManagement/component/ProductDescriptionEditor.jsx'
-import { uploadImageToCloudinary } from '~/utils/cloudinary.js'
+// import React, { useEffect, useState } from 'react'
+// import {
+//   Dialog,
+//   DialogTitle,
+//   DialogContent,
+//   DialogActions,
+//   TextField,
+//   Button,
+//   FormControl,
+//   InputLabel,
+//   Select,
+//   MenuItem,
+//   Chip,
+//   Box,
+//   Typography,
+//   Autocomplete,
+//   Card,
+//   IconButton,
+//   CircularProgress,
+//   useTheme,
+//   useMediaQuery,
+//   Stack,
+//   Paper
+// } from '@mui/material'
+// import {
+//   Close as CloseIcon,
+//   Article as ArticleIcon,
+//   Image as ImageIcon,
+//   Tag as TagIcon,
+//   Search as SearchIcon,
+//   CloudUpload as UploadIcon,
+//   Save as SaveIcon,
+//   Category as CategoryIcon
+// } from '@mui/icons-material'
+// import { useForm, Controller } from 'react-hook-form'
+// import { toast } from 'react-toastify'
+// import ProductDescriptionEditor from '~/pages/admin/ProductManagement/component/ProductDescriptionEditor.jsx'
+// import { uploadImageToCloudinary } from '~/utils/cloudinary.js'
 
-const EditBlogModal = ({ open, onClose, onSave, blog }) => {
-  const { register, handleSubmit, control, reset, setValue, watch } = useForm()
-  const [imageUrls, setImageUrls] = useState([''])
-  const [uploading, setUploading] = useState(false)
-  const [uploadingIndex, setUploadingIndex] = useState(null)
+// // Unified input styles for consistent appearance
+// const getInputStyles = (theme) => ({
+//   '& .MuiOutlinedInput-root': {
+//     borderRadius: 2,
+//     minHeight: '56px', // Consistent height for all inputs
+//     backgroundColor: 'white',
+//     '&:hover fieldset': {
+//       borderColor: '#0052cc'
+//     },
+//     '&.Mui-focused fieldset': {
+//       borderColor: '#0052cc',
+//       borderWidth: 2
+//     }
+//   },
+//   '& .MuiInputLabel-root': {
+//     color: '#4a4a4a',
+//     '&.Mui-focused': { color: '#0052cc' }
+//   },
+//   '& .MuiInputBase-input': {
+//     fontSize: '0.95rem',
+//     padding: '16.5px 14px'
+//   }
+// })
 
-  // Danh sách categories có sẵn
-  const categories = [
-    'Trang phục',
-    'Phụ kiện',
-    'Giày dép',
-    'Túi xách',
-    'Tư vấn phối đồ',
-    'Xu hướng thời trang'
-  ]
+// const EditBlogModal = ({ open, onClose, onSave, blog }) => {
+//   const theme = useTheme()
+//   const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
 
-  // Danh sách brands có sẵn
-  const brands = [
-    'Zara',
-    'H&M',
-    'Gucci',
-    'Louis Vuitton',
-    'Nike',
-    'Adidas',
-    'Uniqlo',
-    'Chanel',
-    'Dior',
-    'Prada'
-  ]
+//   const { register, handleSubmit, control, reset, setValue, watch, formState: { errors } } = useForm({
+//     defaultValues: {
+//       title: '',
+//       excerpt: '',
+//       content: '',
+//       coverImage: '',
+//       tags: [],
+//       category: '',
+//       brand: '',
+//       status: 'draft',
+//       metaTitle: '',
+//       metaDescription: '',
+//       metaKeywords: []
+//     }
+//   })
+//   const [imageUrls, setImageUrls] = useState([''])
+//   const [uploading, setUploading] = useState(false)
+//   const [uploadingIndex, setUploadingIndex] = useState(null)
 
-  useEffect(() => {
-    if (blog && open) {
-      reset({
-        title: blog.title || '',
-        excerpt: blog.excerpt || '',
-        content: blog.content || '',
-        coverImage: blog.coverImage || '',
-        tags: blog.tags || [],
-        category: blog.category || '',
-        brand: blog.brand || '',
-        status: blog.status || 'draft',
-        metaTitle: blog.meta?.title || '',
-        metaDescription: blog.meta?.description || '',
-        metaKeywords: blog.meta?.keywords || []
-      })
-      setImageUrls(blog.images && blog.images.length > 0 ? blog.images : [''])
-    }
-  }, [blog, open, reset])
+//   // Danh sách categories có sẵn
+//   const categories = [
+//     'Trang phục',
+//     'Phụ kiện',
+//     'Giày dép',
+//     'Túi xách',
+//     'Tư vấn phối đồ',
+//     'Xu hướng thời trang'
+//   ]
 
-  const handleAddImageUrl = () => {
-    setImageUrls([...imageUrls, ''])
-  }
+//   // Danh sách brands có sẵn
+//   const brands = [
+//     'Zara',
+//     'H&M',
+//     'Gucci',
+//     'Louis Vuitton',
+//     'Nike',
+//     'Adidas',
+//     'Uniqlo',
+//     'Chanel',
+//     'Dior',
+//     'Prada'
+//   ]
 
-  const handleRemoveImageUrl = (index) => {
-    const newUrls = imageUrls.filter((_, i) => i !== index)
-    setImageUrls(newUrls)
-  }
+//   useEffect(() => {
+//     if (blog && open) {
+//       reset({
+//         title: blog.title || '',
+//         excerpt: blog.excerpt || '',
+//         content: blog.content || '',
+//         coverImage: blog.coverImage || '',
+//         tags: blog.tags || [],
+//         category: blog.category || '',
+//         brand: blog.brand || '',
+//         status: blog.status || 'draft',
+//         metaTitle: blog.meta?.title || '',
+//         metaDescription: blog.meta?.description || '',
+//         metaKeywords: blog.meta?.keywords || []
+//       })
+//       setImageUrls(blog.images && blog.images.length > 0 ? blog.images : [''])
+//     }
+//   }, [blog, open, reset])
 
-  const handleImageUrlChange = (index, value) => {
-    const newUrls = [...imageUrls]
-    newUrls[index] = value
-    setImageUrls(newUrls)
-  }
+//   const handleAddImageUrl = () => {
+//     setImageUrls([...imageUrls, ''])
+//   }
 
-  // Upload ảnh bìa
-  const handleCoverImageUpload = async (event) => {
-    const file = event.target.files[0]
-    if (!file) return
+//   const handleRemoveImageUrl = (index) => {
+//     const newUrls = imageUrls.filter((_, i) => i !== index)
+//     setImageUrls(newUrls)
+//   }
 
-    if (!file.type.startsWith('image/')) {
-      toast.error('Vui lòng chọn file hình ảnh')
-      return
-    }
+//   const handleImageUrlChange = (index, value) => {
+//     const newUrls = [...imageUrls]
+//     newUrls[index] = value
+//     setImageUrls(newUrls)
+//   }
 
-    if (file.size > 5 * 1024 * 1024) {
-      toast.error('Kích thước file không được vượt quá 5MB')
-      return
-    }
+//   const handleImageUpload = async (event, index) => {
+//     const file = event.target.files[0]
+//     if (!file) return
 
-    setUploading(true)
-    try {
-      const result = await uploadImageToCloudinary(file, 'blog_covers')
-      if (result.success) {
-        setValue('coverImage', result.url)
-        toast.success('Upload ảnh bìa thành công!')
-      } else {
-        toast.error('Upload ảnh bìa thất bại: ' + result.error)
-      }
-    } catch (error) {
-      toast.error('Có lỗi xảy ra khi upload ảnh')
-    } finally {
-      setUploading(false)
-    }
-  }
+//     setUploading(true)
+//     setUploadingIndex(index)
 
-  // Upload ảnh bổ sung
-  const handleImageUpload = async (event, index) => {
-    const file = event.target.files[0]
-    if (!file) return
+//     try {
+//       const imageUrl = await uploadImageToCloudinary(file)
+//       const newUrls = [...imageUrls]
+//       newUrls[index] = imageUrl
+//       setImageUrls(newUrls)
+//       toast.success('Upload ảnh thành công!')
+//     } catch (error) {
+//       console.error('Error uploading image:', error)
+//       toast.error('Lỗi upload ảnh!')
+//     } finally {
+//       setUploading(false)
+//       setUploadingIndex(null)
+//     }
+//   }
 
-    if (!file.type.startsWith('image/')) {
-      toast.error('Vui lòng chọn file hình ảnh')
-      return
-    }
+//   const onSubmit = (data) => {
+//     const updatedBlog = {
+//       ...blog,
+//       title: data.title,
+//       excerpt: data.excerpt,
+//       content: data.content,
+//       coverImage: data.coverImage,
+//       tags: data.tags,
+//       category: data.category,
+//       brand: data.brand,
+//       status: data.status,
+//       images: imageUrls.filter(url => url.trim() !== ''),
+//       updatedAt: new Date().toISOString(),
+//       meta: {
+//         title: data.metaTitle || data.title,
+//         description: data.metaDescription || data.excerpt,
+//         keywords: data.metaKeywords
+//       }
+//     }
 
-    if (file.size > 5 * 1024 * 1024) {
-      toast.error('Kích thước file không được vượt quá 5MB')
-      return
-    }
+//     onSave(updatedBlog)
+//     handleClose()
+//   }
 
-    setUploadingIndex(index)
-    try {
-      const result = await uploadImageToCloudinary(file, 'blog_images')
-      if (result.success) {
-        handleImageUrlChange(index, result.url)
-        toast.success('Upload ảnh thành công!')
-      } else {
-        toast.error('Upload ảnh thất bại: ' + result.error)
-      }
-    } catch (error) {
-      toast.error('Có lỗi xảy ra khi upload ảnh')
-    } finally {
-      setUploadingIndex(null)
-    }
-  }
+//   const handleClose = () => {
+//     onClose()
+//   }
 
-  const onSubmit = (data) => {
-    // Tạo slug từ title nếu title thay đổi
-    const slug = data.title
-      .toLowerCase()
-      .normalize('NFD')
-      .replace(/[\u0300-\u036f]/g, '')
-      .replace(/[^a-z0-9\s-]/g, '')
-      .replace(/\s+/g, '-')
-      .replace(/-+/g, '-')
-      .trim('-')
+//   // Don't render if no blog data or form is not ready
+//   if (!blog || !control) return null
 
-    const updatedBlog = {
-      ...blog,
-      title: data.title,
-      slug: data.title !== blog.title ? slug : blog.slug,
-      excerpt: data.excerpt,
-      content: data.content,
-      coverImage: data.coverImage,
-      images: imageUrls.filter(url => url.trim() !== ''),
-      tags: data.tags,
-      category: data.category,
-      brand: data.brand,
-      status: data.status,
-      publishedAt: data.status === 'published' && blog.status !== 'published' 
-        ? new Date().toISOString() 
-        : blog.publishedAt,
-      updatedAt: new Date().toISOString(),
-      meta: {
-        title: data.metaTitle || data.title,
-        description: data.metaDescription || data.excerpt,
-        keywords: data.metaKeywords
-      }
-    }
+//   return (
+//     <Dialog
+//       open={open}
+//       onClose={handleClose}
+//       fullWidth
+//       maxWidth={isMobile ? 'sm' : 'lg'}
+//       fullScreen={isMobile}
+//       PaperProps={{
+//         sx: {
+//           borderRadius: isMobile ? 0 : '12px',
+//           boxShadow: '0 8px 24px rgba(0, 31, 93, 0.12)',
+//           maxHeight: '80vh',
+//           margin: isMobile ? 0 : '16px'
+//         }
+//       }}
+//     >
+//       <DialogTitle sx={{
+//         background: 'linear-gradient(135deg, #0052cc 0%, #2684ff 100%)',
+//         color: 'white',
+//         py: isMobile ? 1.5 : 2,
+//         px: isMobile ? 2 : 3,
+//         display: 'flex',
+//         alignItems: 'center',
+//         justifyContent: 'space-between',
+//         minHeight: isMobile ? '56px' : '64px'
+//       }}>
+//         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+//           <ArticleIcon sx={{ fontSize: isMobile ? 20 : 24 }} />
+//           <Typography
+//             variant={isMobile ? "subtitle1" : "h6"}
+//             sx={{
+//               fontWeight: 600,
+//               fontSize: isMobile ? '1rem' : '1.25rem',
+//               lineHeight: 1.2
+//             }}
+//           >
+//             Chỉnh sửa bài viết
+//           </Typography>
+//         </Box>
+//         <IconButton
+//           onClick={handleClose}
+//           size={isMobile ? "small" : "medium"}
+//           sx={{
+//             color: 'white',
+//             '&:hover': { backgroundColor: 'rgba(255, 255, 255, 0.12)' }
+//           }}
+//         >
+//           <CloseIcon />
+//         </IconButton>
+//       </DialogTitle>
 
-    onSave(updatedBlog)
-    handleClose()
-  }
+//       <form onSubmit={handleSubmit(onSubmit)}>
+//         <DialogContent sx={{
+//           p: isMobile ? 2 : 3,
+//           backgroundColor: '#f9fafb',
+//           overflowY: 'auto',
+//           maxHeight: isMobile ? 'calc(80vh - 120px)' : 'calc(80vh - 140px)'
+//         }}>
+//           {/* Main Container using Flexbox */}
+//           <Box sx={{
+//             display: 'flex',
+//             flexDirection: 'column',
+//             gap: isMobile ? 2 : 3
+//           }}>
 
-  const handleClose = () => {
-    onClose()
-  }
+//             {/* Section 1: Basic Information */}
+//             <Paper sx={{
+//               p: isMobile ? 2 : 2.5,
+//               borderRadius: '8px',
+//               border: '1px solid #e8ecef',
+//               boxShadow: '0 2px 8px rgba(0, 31, 93, 0.06)'
+//             }}>
+//               <Typography
+//                 variant="subtitle1"
+//                 sx={{
+//                   display: 'flex',
+//                   alignItems: 'center',
+//                   gap: 1,
+//                   color: '#1a202c',
+//                   fontWeight: 600,
+//                   mb: 2,
+//                   fontSize: isMobile ? '1rem' : '1.1rem'
+//                 }}
+//               >
+//                 <ArticleIcon sx={{ color: '#0052cc', fontSize: 20 }} />
+//                 Thông tin cơ bản
+//               </Typography>
 
-  if (!blog) return null
+//               {/* Title and Status Row */}
+//               <Box sx={{
+//                 display: 'flex',
+//                 flexDirection: isMobile ? 'column' : 'row',
+//                 gap: 2,
+//                 mb: 2
+//               }}>
+//                 <Box sx={{ flex: isMobile ? '1' : '2' }}>
+//                   <TextField
+//                     label="Tiêu đề bài viết *"
+//                     fullWidth
+//                     variant="outlined"
+//                     {...register('title', { required: 'Vui lòng nhập tiêu đề' })}
+//                     error={!!errors.title}
+//                     helperText={errors.title?.message}
+//                     sx={getInputStyles(theme)}
+//                   />
+//                 </Box>
 
-  return (
-    <Dialog open={open} onClose={handleClose} fullWidth maxWidth='lg'>
-      <DialogTitle>
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <Typography variant="h6" component="div">
-            Chỉnh sửa bài viết: {blog.title}
-          </Typography>
-          <IconButton onClick={handleClose} size="small">
-            <CloseIcon />
-          </IconButton>
-        </Box>
-      </DialogTitle>
-      
-      <form onSubmit={handleSubmit(onSubmit)}>
-        <DialogContent dividers sx={{ maxHeight: '80vh' }}>
-          <Grid container spacing={3}>
-            {/* Thông tin cơ bản */}
-            <Grid item xs={12}>
-              <Typography variant="h6" gutterBottom color="primary" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                <ArticleIcon fontSize="small" /> Thông tin cơ bản
-              </Typography>
-            </Grid>
+//                 <Box sx={{ flex: 1 }}>
+//                   <FormControl fullWidth>
+//                     <InputLabel>Trạng thái *</InputLabel>
+//                     <Controller
+//                       name="status"
+//                       control={control}
+//                       rules={{ required: 'Vui lòng chọn trạng thái' }}
+//                       render={({ field }) => (
+//                         <Select
+//                           {...field}
+//                           label="Trạng thái *"
+//                           sx={{
+//                             ...getInputStyles(theme),
+//                             '& .MuiSelect-select': {
+//                               padding: '16.5px 14px'
+//                             }
+//                           }}
+//                         >
+//                           <MenuItem value="draft">
+//                             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+//                               <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: '#ff9800' }} />
+//                               Bản nháp
+//                             </Box>
+//                           </MenuItem>
+//                           <MenuItem value="published">
+//                             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+//                               <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: '#4caf50' }} />
+//                               Đã xuất bản
+//                             </Box>
+//                           </MenuItem>
+//                           <MenuItem value="archived">
+//                             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+//                               <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: '#9e9e9e' }} />
+//                               Lưu trữ
+//                             </Box>
+//                           </MenuItem>
+//                         </Select>
+//                       )}
+//                     />
+//                   </FormControl>
+//                 </Box>
+//               </Box>
 
-            <Grid item xs={12} md={8}>
-              <TextField
-                label="Tiêu đề bài viết *"
-                fullWidth
-                size="small"
-                {...register('title', { required: 'Vui lòng nhập tiêu đề' })}
-                sx={{
-                  '& .MuiOutlinedInput-root': {
-                    '&:hover fieldset': { borderColor: '#001f5d' },
-                    '&.Mui-focused fieldset': { borderColor: '#001f5d' }
-                  },
-                  '& .MuiInputLabel-root.Mui-focused': { color: '#001f5d' }
-                }}
-              />
-            </Grid>
+//               {/* Excerpt */}
+//               <TextField
+//                 label="Mô tả ngắn (Excerpt)"
+//                 fullWidth
+//                 multiline
+//                 rows={isMobile ? 2 : 3}
+//                 variant="outlined"
+//                 {...register('excerpt')}
+//                 helperText="Đoạn mô tả ngắn hiển thị trong danh sách bài viết"
+//                 sx={{
+//                   ...getInputStyles(theme),
+//                   '& .MuiOutlinedInput-root': {
+//                     ...getInputStyles(theme)['& .MuiOutlinedInput-root'],
+//                     minHeight: 'auto'
+//                   }
+//                 }}
+//               />
+//             </Paper>
 
-            <Grid item xs={12} md={4}>
-              <FormControl fullWidth size="small">
-                <InputLabel>Trạng thái *</InputLabel>
-                <Controller
-                  name="status"
-                  control={control}
-                  rules={{ required: 'Vui lòng chọn trạng thái' }}
-                  render={({ field }) => (
-                    <Select 
-                      {...field} 
-                      label="Trạng thái *"
-                      sx={{
-                        '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: '#001f5d' },
-                        '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: '#001f5d' }
-                      }}
-                    >
-                      <MenuItem value="draft">Bản nháp</MenuItem>
-                      <MenuItem value="published">Đã xuất bản</MenuItem>
-                      <MenuItem value="archived">Lưu trữ</MenuItem>
-                    </Select>
-                  )}
-                />
-              </FormControl>
-            </Grid>
+//             {/* Two Column Layout */}
+//             <Box sx={{
+//               display: 'flex',
+//               flexDirection: isMobile ? 'column' : 'row',
+//               gap: isMobile ? 2 : 3
+//             }}>
 
-            <Grid item xs={12}>
-              <TextField
-                label="Mô tả ngắn (Excerpt)"
-                fullWidth
-                multiline
-                rows={2}
-                size="small"
-                {...register('excerpt')}
-                helperText="Đoạn mô tả ngắn hiển thị trong danh sách bài viết"
-                sx={{
-                  '& .MuiOutlinedInput-root': {
-                    '&:hover fieldset': { borderColor: '#001f5d' },
-                    '&.Mui-focused fieldset': { borderColor: '#001f5d' }
-                  },
-                  '& .MuiInputLabel-root.Mui-focused': { color: '#001f5d' }
-                }}
-              />
-            </Grid>
+//               {/* Left Column: Category & Brand */}
+//               <Box sx={{ flex: 1 }}>
+//                 <Paper sx={{
+//                   p: isMobile ? 2 : 2.5,
+//                   borderRadius: '8px',
+//                   border: '1px solid #e8ecef',
+//                   boxShadow: '0 2px 8px rgba(0, 31, 93, 0.06)',
+//                   height: 'fit-content'
+//                 }}>
+//                   <Typography
+//                     variant="subtitle1"
+//                     sx={{
+//                       display: 'flex',
+//                       alignItems: 'center',
+//                       gap: 1,
+//                       color: '#1a202c',
+//                       fontWeight: 600,
+//                       mb: 2,
+//                       fontSize: isMobile ? '1rem' : '1.1rem'
+//                     }}
+//                   >
+//                     <TagIcon sx={{ color: '#0052cc', fontSize: 20 }} />
+//                     Phân loại & Thương hiệu
+//                   </Typography>
 
-            <Grid item xs={12} md={6}>
-              <Controller
-                name="category"
-                control={control}
-                render={({ field }) => (
-                  <Autocomplete
-                    {...field}
-                    size="small"
-                    options={categories}
-                    freeSolo
-                    value={field.value}
-                    onChange={(event, newValue) => {
-                      field.onChange(newValue)
-                    }}
-                    renderInput={(params) => (
-                      <TextField 
-                        {...params} 
-                        label="Chuyên mục *" 
-                        variant="outlined"
-                        helperText="Chọn hoặc nhập chuyên mục"
-                        sx={{
-                          '& .MuiOutlinedInput-root': {
-                            '&:hover fieldset': { borderColor: '#001f5d' },
-                            '&.Mui-focused fieldset': { borderColor: '#001f5d' }
-                          },
-                          '& .MuiInputLabel-root.Mui-focused': { color: '#001f5d' }
-                        }}
-                      />
-                    )}
-                  />
-                )}
-              />
-            </Grid>
+//                   <Stack spacing={2}>
+//                     <Controller
+//                       name="category"
+//                       control={control}
+//                       render={({ field }) => (
+//                         <Autocomplete
+//                           {...field}
+//                           options={categories}
+//                           freeSolo
+//                           value={field.value || ''}
+//                           onChange={(event, newValue) => field.onChange(newValue)}
+//                           renderInput={(params) => (
+//                             <TextField
+//                               {...params}
+//                               label="Chuyên mục *"
+//                               variant="outlined"
+//                               helperText="Chọn hoặc nhập chuyên mục"
+//                               sx={getInputStyles(theme)}
+//                             />
+//                           )}
+//                         />
+//                       )}
+//                     />
 
-            <Grid item xs={12} md={6}>
-              <Controller
-                name="brand"
-                control={control}
-                render={({ field }) => (
-                  <Autocomplete
-                    {...field}
-                    size="small"
-                    options={brands}
-                    freeSolo
-                    value={field.value}
-                    onChange={(event, newValue) => {
-                      field.onChange(newValue)
-                    }}
-                    renderInput={(params) => (
-                      <TextField 
-                        {...params} 
-                        label="Thương hiệu" 
-                        variant="outlined"
-                        helperText="Chọn hoặc nhập thương hiệu"
-                        sx={{
-                          '& .MuiOutlinedInput-root': {
-                            '&:hover fieldset': { borderColor: '#001f5d' },
-                            '&.Mui-focused fieldset': { borderColor: '#001f5d' }
-                          },
-                          '& .MuiInputLabel-root.Mui-focused': { color: '#001f5d' }
-                        }}
-                      />
-                    )}
-                  />
-                )}
-              />
-            </Grid>
+//                     <Controller
+//                       name="brand"
+//                       control={control}
+//                       render={({ field }) => (
+//                         <Autocomplete
+//                           {...field}
+//                           options={brands}
+//                           freeSolo
+//                           value={field.value || ''}
+//                           onChange={(event, newValue) => field.onChange(newValue)}
+//                           renderInput={(params) => (
+//                             <TextField
+//                               {...params}
+//                               label="Thương hiệu"
+//                               variant="outlined"
+//                               helperText="Chọn hoặc nhập thương hiệu"
+//                               sx={getInputStyles(theme)}
+//                             />
+//                           )}
+//                         />
+//                       )}
+//                     />
 
-            {/* Hình ảnh */}
-            <Grid item xs={12}>
-              <Divider sx={{ my: 2 }} />
-              <Typography variant="h6" gutterBottom color="primary" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                <ImageIcon fontSize="small" /> Hình ảnh
-              </Typography>
-            </Grid>
+//                     <Controller
+//                       name="tags"
+//                       control={control}
+//                       render={({ field }) => (
+//                         <Autocomplete
+//                           {...field}
+//                           multiple
+//                           freeSolo
+//                           options={[]}
+//                           value={field.value || []}
+//                           onChange={(event, newValue) => field.onChange(newValue)}
+//                           renderTags={(value, getTagProps) =>
+//                             value.map((option, index) => (
+//                               <Chip
+//                                 variant="outlined"
+//                                 label={option}
+//                                 size="small"
+//                                 {...getTagProps({ index })}
+//                                 key={index}
+//                                 sx={{
+//                                   borderColor: '#0052cc',
+//                                   color: '#0052cc',
+//                                   '&:hover': { backgroundColor: '#f0f4ff' }
+//                                 }}
+//                               />
+//                             ))
+//                           }
+//                           renderInput={(params) => (
+//                             <TextField
+//                               {...params}
+//                               label="Tags"
+//                               variant="outlined"
+//                               placeholder="Nhập tags và nhấn Enter"
+//                               helperText="Thêm các từ khóa liên quan"
+//                               sx={getInputStyles(theme)}
+//                             />
+//                           )}
+//                         />
+//                       )}
+//                     />
+//                   </Stack>
+//                 </Paper>
+//               </Box>
 
-            <Grid item xs={12}>
-              <Card sx={{ p: 2, backgroundColor: '#f8faff', border: '1px solid #e3e8ff' }}>
-                <Typography variant="subtitle1" gutterBottom sx={{ color: '#001f5d', display: 'flex', alignItems: 'center', gap: 1 }}>
-                  <ImageIcon fontSize="small" /> Ảnh bìa chính
-                </Typography>
-                
-                <Box sx={{ display: 'flex', gap: 2, alignItems: 'flex-start' }}>
-                  <TextField
-                    label="URL ảnh bìa *"
-                    fullWidth
-                    size="small"
-                    variant="outlined"
-                    {...register('coverImage')}
-                    helperText="Nhập đường dẫn URL của ảnh bìa hoặc upload file"
-                    sx={{
-                      '& .MuiOutlinedInput-root': {
-                        '&:hover fieldset': { borderColor: '#001f5d' },
-                        '&.Mui-focused fieldset': { borderColor: '#001f5d' }
-                      },
-                      '& .MuiInputLabel-root.Mui-focused': { color: '#001f5d' }
-                    }}
-                  />
-                  
-                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-                    <Button
-                      variant="outlined"
-                      component="label"
-                      startIcon={uploading ? <CircularProgress size={16} /> : <UploadIcon />}
-                      disabled={uploading}
-                      sx={{ 
-                        minWidth: '120px',
-                        borderColor: '#001f5d',
-                        color: '#001f5d',
-                        '&:hover': { borderColor: '#001a4d', backgroundColor: '#f0f4ff' }
-                      }}
-                    >
-                      {uploading ? 'Đang tải...' : 'Upload'}
-                      <input
-                        type="file"
-                        hidden
-                        accept="image/*"
-                        onChange={handleCoverImageUpload}
-                      />
-                    </Button>
-                  </Box>
-                </Box>
+//               {/* Right Column: Images & SEO */}
+//               <Box sx={{ flex: 1 }}>
+//                 <Stack spacing={isMobile ? 2 : 3}>
+//                   {/* Cover Image Section */}
+//                   <Paper sx={{
+//                     p: isMobile ? 2 : 2.5,
+//                     borderRadius: '8px',
+//                     border: '1px solid #e8ecef',
+//                     boxShadow: '0 2px 8px rgba(0, 31, 93, 0.06)'
+//                   }}>
+//                     <Typography
+//                       variant="subtitle1"
+//                       sx={{
+//                         display: 'flex',
+//                         alignItems: 'center',
+//                         gap: 1,
+//                         color: '#1a202c',
+//                         fontWeight: 600,
+//                         mb: 2,
+//                         fontSize: isMobile ? '1rem' : '1.1rem'
+//                       }}
+//                     >
+//                       <ImageIcon sx={{ color: '#0052cc', fontSize: 20 }} />
+//                       Ảnh bìa
+//                     </Typography>
 
-                {watch('coverImage') && (
-                  <Box sx={{ mt: 2 }}>
-                    <img
-                      src={watch('coverImage')}
-                      alt="Preview ảnh bìa"
-                      style={{
-                        width: '100%',
-                        maxHeight: '200px',
-                        objectFit: 'cover',
-                        borderRadius: '8px',
-                        border: '1px solid #e0e0e0'
-                      }}
-                      onError={(e) => {
-                        e.target.style.display = 'none'
-                      }}
-                    />
-                  </Box>
-                )}
-              </Card>
-            </Grid>
+//                     <TextField
+//                       label="URL ảnh bìa"
+//                       fullWidth
+//                       variant="outlined"
+//                       {...register('coverImage')}
+//                       helperText="Nhập URL ảnh bìa cho bài viết"
+//                       sx={getInputStyles(theme)}
+//                     />
+//                   </Paper>
 
-            <Grid item xs={12}>
-              <Card sx={{ p: 2, backgroundColor: '#f8faff', border: '1px solid #e3e8ff' }}>
-                <Typography variant="subtitle1" gutterBottom sx={{ color: '#001f5d', display: 'flex', alignItems: 'center', gap: 1 }}>
-                  <ImageIcon fontSize="small" /> Ảnh bổ sung
-                </Typography>
-                {imageUrls.map((url, index) => (
-                  <Box key={index} sx={{ display: 'flex', gap: 1, mb: 2, alignItems: 'flex-start' }}>
-                    <TextField
-                      label={`Ảnh ${index + 1} URL`}
-                      fullWidth
-                      value={url}
-                      onChange={(e) => handleImageUrlChange(index, e.target.value)}
-                      variant="outlined"
-                      size="small"
-                      sx={{
-                        '& .MuiOutlinedInput-root': {
-                          '&:hover fieldset': { borderColor: '#001f5d' },
-                          '&.Mui-focused fieldset': { borderColor: '#001f5d' }
-                        },
-                        '& .MuiInputLabel-root.Mui-focused': { color: '#001f5d' }
-                      }}
-                    />
-                    
-                    <Button
-                      variant="outlined"
-                      component="label"
-                      startIcon={uploadingIndex === index ? <CircularProgress size={16} /> : <UploadIcon />}
-                      disabled={uploadingIndex === index}
-                      sx={{ 
-                        minWidth: '100px',
-                        borderColor: '#001f5d',
-                        color: '#001f5d',
-                        '&:hover': { borderColor: '#001a4d', backgroundColor: '#f0f4ff' }
-                      }}
-                    >
-                      Upload
-                      <input
-                        type="file"
-                        hidden
-                        accept="image/*"
-                        onChange={(e) => handleImageUpload(e, index)}
-                      />
-                    </Button>
-                    
-                    <Button
-                      variant="outlined"
-                      color="error"
-                      size="small"
-                      onClick={() => handleRemoveImageUrl(index)}
-                      disabled={imageUrls.length === 1}
-                      sx={{ minWidth: '60px' }}
-                    >
-                      Xóa
-                    </Button>
-                  </Box>
-                ))}
-                <Button 
-                  variant="outlined" 
-                  onClick={handleAddImageUrl}
-                  sx={{
-                    borderColor: '#001f5d',
-                    color: '#001f5d',
-                    '&:hover': { borderColor: '#001a4d', backgroundColor: '#f0f4ff' }
-                  }}
-                >
-                  Thêm ảnh
-                </Button>
-              </Card>
-            </Grid>
+//                   {/* SEO Meta Section */}
+//                   <Paper sx={{
+//                     p: isMobile ? 2 : 2.5,
+//                     borderRadius: '8px',
+//                     border: '1px solid #e8ecef',
+//                     boxShadow: '0 2px 8px rgba(0, 31, 93, 0.06)'
+//                   }}>
+//                     <Typography
+//                       variant="subtitle1"
+//                       sx={{
+//                         display: 'flex',
+//                         alignItems: 'center',
+//                         gap: 1,
+//                         color: '#1a202c',
+//                         fontWeight: 600,
+//                         mb: 2,
+//                         fontSize: isMobile ? '1rem' : '1.1rem'
+//                       }}
+//                     >
+//                       <SearchIcon sx={{ color: '#0052cc', fontSize: 20 }} />
+//                       SEO Meta
+//                     </Typography>
 
-            {/* Tags */}
-            <Grid item xs={12}>
-              <Divider sx={{ my: 2 }} />
-              <Typography variant="h6" gutterBottom color="primary" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                <TagIcon fontSize="small" /> Tags và từ khóa
-              </Typography>
-            </Grid>
+//                     <Stack spacing={2}>
+//                       <TextField
+//                         label="Meta Title"
+//                         fullWidth
+//                         variant="outlined"
+//                         {...register('metaTitle')}
+//                         helperText="Tiêu đề SEO (để trống sẽ dùng title)"
+//                         sx={getInputStyles(theme)}
+//                       />
 
-            <Grid item xs={12}>
-              <Controller
-                name="tags"
-                control={control}
-                render={({ field }) => (
-                  <Autocomplete
-                    {...field}
-                    size="small"
-                    multiple
-                    freeSolo
-                    options={[]}
-                    value={field.value || []}
-                    onChange={(event, newValue) => {
-                      field.onChange(newValue)
-                    }}
-                    renderTags={(value, getTagProps) =>
-                      value.map((option, index) => (
-                        <Chip
-                          variant="outlined"
-                          label={option}
-                          size="small"
-                          {...getTagProps({ index })}
-                          key={index}
-                          sx={{
-                            borderColor: '#001f5d',
-                            color: '#001f5d',
-                            '&:hover': { backgroundColor: '#f0f4ff' }
-                          }}
-                        />
-                      ))
-                    }
-                    renderInput={(params) => (
-                      <TextField
-                        {...params}
-                        label="Tags"
-                        placeholder="Nhập tag và nhấn Enter"
-                        helperText="VD: thời trang, mùa hè, gucci"
-                        variant="outlined"
-                        sx={{
-                          '& .MuiOutlinedInput-root': {
-                            '&:hover fieldset': { borderColor: '#001f5d' },
-                            '&.Mui-focused fieldset': { borderColor: '#001f5d' }
-                          },
-                          '& .MuiInputLabel-root.Mui-focused': { color: '#001f5d' }
-                        }}
-                      />
-                    )}
-                  />
-                )}
-              />
-            </Grid>
+//                       <TextField
+//                         label="Meta Description"
+//                         fullWidth
+//                         multiline
+//                         rows={2}
+//                         variant="outlined"
+//                         {...register('metaDescription')}
+//                         helperText="Mô tả SEO (để trống sẽ dùng excerpt)"
+//                         sx={{
+//                           ...getInputStyles(theme),
+//                           '& .MuiOutlinedInput-root': {
+//                             ...getInputStyles(theme)['& .MuiOutlinedInput-root'],
+//                             minHeight: 'auto'
+//                           }
+//                         }}
+//                       />
 
-            {/* Nội dung */}
-            <Grid item xs={12}>
-              <Divider sx={{ my: 2 }} />
-              <Typography variant="h6" gutterBottom color="primary" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                <ArticleIcon fontSize="small" /> Nội dung bài viết
-              </Typography>
-            </Grid>
+//                       <Controller
+//                         name="metaKeywords"
+//                         control={control}
+//                         render={({ field }) => (
+//                           <Autocomplete
+//                             {...field}
+//                             multiple
+//                             freeSolo
+//                             options={[]}
+//                             value={field.value || []}
+//                             onChange={(event, newValue) => field.onChange(newValue)}
+//                             renderTags={(value, getTagProps) =>
+//                               value.map((option, index) => (
+//                                 <Chip
+//                                   variant="outlined"
+//                                   label={option}
+//                                   size="small"
+//                                   {...getTagProps({ index })}
+//                                   key={index}
+//                                   sx={{
+//                                     borderColor: '#0052cc',
+//                                     color: '#0052cc',
+//                                     '&:hover': { backgroundColor: '#f0f4ff' }
+//                                   }}
+//                                 />
+//                               ))
+//                             }
+//                             renderInput={(params) => (
+//                               <TextField
+//                                 {...params}
+//                                 label="Meta Keywords"
+//                                 variant="outlined"
+//                                 placeholder="Nhập từ khóa SEO và nhấn Enter"
+//                                 helperText="Từ khóa SEO để tối ưu tìm kiếm"
+//                                 sx={getInputStyles(theme)}
+//                               />
+//                             )}
+//                           />
+//                         )}
+//                       />
+//                     </Stack>
+//                   </Paper>
+//                 </Stack>
+//               </Box>
+//             </Box>
 
-            <Grid item xs={12}>
-              <Card sx={{ p: 2, backgroundColor: '#f8faff', border: '1px solid #e3e8ff' }}>
-                <ProductDescriptionEditor
-                  control={control}
-                  name="content"
-                  setValue={setValue}
-                  initialHtml={blog.content || ''}
-                />
-              </Card>
-            </Grid>
+//             {/* Content Section */}
+//             <Paper sx={{
+//               p: isMobile ? 2 : 2.5,
+//               borderRadius: '8px',
+//               border: '1px solid #e8ecef',
+//               boxShadow: '0 2px 8px rgba(0, 31, 93, 0.06)'
+//             }}>
+//               <Typography
+//                 variant="subtitle1"
+//                 sx={{
+//                   display: 'flex',
+//                   alignItems: 'center',
+//                   gap: 1,
+//                   color: '#1a202c',
+//                   fontWeight: 600,
+//                   mb: 2,
+//                   fontSize: isMobile ? '1rem' : '1.1rem'
+//                 }}
+//               >
+//                 <ArticleIcon sx={{ color: '#0052cc', fontSize: 20 }} />
+//                 Nội dung bài viết
+//               </Typography>
 
-            {/* SEO Meta */}
-            <Grid item xs={12}>
-              <Divider sx={{ my: 2 }} />
-              <Typography variant="h6" gutterBottom color="primary" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                <SearchIcon fontSize="small" /> SEO Meta Tags
-              </Typography>
-            </Grid>
+//               <Controller
+//                 name="content"
+//                 control={control}
+//                 render={({ field }) => (
+//                   <ProductDescriptionEditor
+//                     value={field.value || ''}
+//                     onChange={field.onChange}
+//                     placeholder="Nhập nội dung bài viết..."
+//                   />
+//                 )}
+//               />
+//             </Paper>
+//           </Box>
+//         </DialogContent>
 
-            <Grid item xs={12}>
-              <TextField
-                label="Meta Title"
-                fullWidth
-                size="small"
-                {...register('metaTitle')}
-                helperText="Tiêu đề hiển thị trên search engine (để trống sẽ dùng tiêu đề bài viết)"
-                sx={{
-                  '& .MuiOutlinedInput-root': {
-                    '&:hover fieldset': { borderColor: '#001f5d' },
-                    '&.Mui-focused fieldset': { borderColor: '#001f5d' }
-                  },
-                  '& .MuiInputLabel-root.Mui-focused': { color: '#001f5d' }
-                }}
-              />
-            </Grid>
+//         <DialogActions sx={{
+//           p: isMobile ? 2 : 3,
+//           backgroundColor: '#fafbff',
+//           borderTop: '1px solid #e8ecef',
+//           gap: 1.5,
+//           display: 'flex',
+//           flexDirection: isMobile ? 'column-reverse' : 'row',
+//           '& > *': {
+//             width: isMobile ? '100%' : 'auto'
+//           }
+//         }}>
+//           <Button
+//             onClick={handleClose}
+//             variant="outlined"
+//             sx={{
+//               minWidth: isMobile ? '100%' : '120px',
+//               height: '48px',
+//               borderRadius: 2,
+//               borderColor: '#9e9e9e',
+//               color: '#616161',
+//               '&:hover': {
+//                 borderColor: '#757575',
+//                 backgroundColor: '#f5f5f5'
+//               }
+//             }}
+//           >
+//             Hủy
+//           </Button>
+//           <Button
+//             type="submit"
+//             variant="contained"
+//             startIcon={<SaveIcon />}
+//             sx={{
+//               minWidth: isMobile ? '100%' : '160px',
+//               height: '48px',
+//               borderRadius: 2,
+//               backgroundColor: '#0052cc',
+//               '&:hover': {
+//                 backgroundColor: '#003d99'
+//               }
+//             }}
+//           >
+//             Cập nhật bài viết
+//           </Button>
+//         </DialogActions>
+//       </form>
+//     </Dialog>
+//   )
+// }
 
-            <Grid item xs={12}>
-              <TextField
-                label="Meta Description"
-                fullWidth
-                multiline
-                rows={2}
-                size="small"
-                {...register('metaDescription')}
-                helperText="Mô tả hiển thị trên search engine (để trống sẽ dùng excerpt)"
-                sx={{
-                  '& .MuiOutlinedInput-root': {
-                    '&:hover fieldset': { borderColor: '#001f5d' },
-                    '&.Mui-focused fieldset': { borderColor: '#001f5d' }
-                  },
-                  '& .MuiInputLabel-root.Mui-focused': { color: '#001f5d' }
-                }}
-              />
-            </Grid>
-
-            <Grid item xs={12}>
-              <Controller
-                name="metaKeywords"
-                control={control}
-                render={({ field }) => (
-                  <Autocomplete
-                    {...field}
-                    size="small"
-                    multiple
-                    freeSolo
-                    options={[]}
-                    value={field.value || []}
-                    onChange={(event, newValue) => {
-                      field.onChange(newValue)
-                    }}
-                    renderTags={(value, getTagProps) =>
-                      value.map((option, index) => (
-                        <Chip
-                          variant="outlined"
-                          label={option}
-                          size="small"
-                          {...getTagProps({ index })}
-                          key={index}
-                          sx={{
-                            borderColor: '#001f5d',
-                            color: '#001f5d',
-                            '&:hover': { backgroundColor: '#f0f4ff' }
-                          }}
-                        />
-                      ))
-                    }
-                    renderInput={(params) => (
-                      <TextField
-                        {...params}
-                        label="Meta Keywords"
-                        placeholder="Nhập từ khóa SEO và nhấn Enter"
-                        helperText="Từ khóa SEO để tối ưu tìm kiếm"
-                        variant="outlined"
-                        sx={{
-                          '& .MuiOutlinedInput-root': {
-                            '&:hover fieldset': { borderColor: '#001f5d' },
-                            '&.Mui-focused fieldset': { borderColor: '#001f5d' }
-                          },
-                          '& .MuiInputLabel-root.Mui-focused': { color: '#001f5d' }
-                        }}
-                      />
-                    )}
-                  />
-                )}
-              />
-            </Grid>
-          </Grid>
-        </DialogContent>
-
-        <DialogActions sx={{ p: 2 }}>
-          <Button onClick={handleClose} variant="outlined">
-            Hủy
-          </Button>
-          <Button 
-            type="submit" 
-            variant="contained"
-            startIcon={<SaveIcon />}
-            sx={{ 
-              backgroundColor: '#001f5d',
-              '&:hover': { backgroundColor: '#001a4d' }
-            }}
-          >
-            Cập nhật bài viết
-          </Button>
-        </DialogActions>
-      </form>
-    </Dialog>
-  )
-}
-
-export default EditBlogModal
+// export default EditBlogModal

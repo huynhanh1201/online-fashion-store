@@ -46,6 +46,7 @@ import SizeManagement from '~/pages/admin/SizeManagement/index.jsx'
 import InventoryLogTab from '~/pages/admin/InventoryManagement/tab/InventoryLogTab.jsx'
 import WarehousesTab from '~/pages/admin/InventoryManagement/tab/WarehousesTab.jsx'
 import BatchesTab from '~/pages/admin/InventoryManagement/tab/BatchesTab.jsx'
+import BlogManagement from './pages/admin/BlogManagement'
 // Trang 404
 import NotFound from '~/pages/404/NotFound'
 //Trang quản lí giao diện Website
@@ -147,6 +148,7 @@ function App() {
           <Route path='warehouses-management' element={<WarehousesTab />} />
           <Route path='batches-management' element={<BatchesTab />} />
           <Route path='marketing-management' element={<MarketingManagement />} />
+          <Route path='blog-management' element={<BlogManagement />} />
         </Route>
       </Route>
 

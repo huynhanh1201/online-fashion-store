@@ -3,8 +3,7 @@ import { Typography, Button, Paper, CircularProgress, Alert, Box } from '@mui/ma
 import AddIcon from '@mui/icons-material/Add'
 import { toast } from 'react-toastify'
 import BlogTable from './BlogTable'
-import AddBlogModal from './modal/AddBlogModal'
-import EditBlogModal from './modal/EditBlogModal'
+import BlogModal from './modal/AddBlogModal'
 import ViewBlogModal from './modal/ViewBlogModal'
 import DeleteBlogModal from './modal/DeleteBlogModal'
 import {
@@ -24,8 +23,8 @@ export default function BlogManagementPage() {
     total: 0,
     totalPages: 0
   })
-  const [openAdd, setOpenAdd] = useState(false)
-  const [openEdit, setOpenEdit] = useState(false)
+  const [openBlogModal, setOpenBlogModal] = useState(false)
+  const [blogModalMode, setBlogModalMode] = useState('add') // 'add' hoặc 'edit'
   const [openView, setOpenView] = useState(false)
   const [openDelete, setOpenDelete] = useState(false)
   const [selectedBlog, setSelectedBlog] = useState(null)
@@ -57,30 +56,30 @@ export default function BlogManagementPage() {
     fetchBlogs()
   }, [])
 
-  const handleAdd = async (newBlogData) => {
+  const handleBlogSave = async (blogData, isEditMode) => {
     try {
-      const createdBlog = await createBlog(newBlogData)
-      toast.success('Tạo blog thành công!')
-      setOpenAdd(false)
+      if (isEditMode) {
+        // Cập nhật blog
+        const updatedBlog = await updateBlog(selectedBlog._id, blogData)
+        toast.success('Cập nhật blog thành công!')
+      } else {
+        // Tạo blog mới
+        const createdBlog = await createBlog(blogData)
+        toast.success('Tạo blog thành công!')
+      }
+
+      setOpenBlogModal(false)
+      setSelectedBlog(null)
+      setBlogModalMode('add')
       // Refresh lại danh sách để đảm bảo dữ liệu mới nhất
       fetchBlogs(pagination.page, pagination.limit)
     } catch (error) {
-      console.error('Lỗi khi tạo blog:', error)
-      toast.error('Không thể tạo blog. Vui lòng thử lại.')
-    }
-  }
-
-  const handleEdit = async (updatedBlogData) => {
-    try {
-      const updatedBlog = await updateBlog(selectedBlog._id, updatedBlogData)
-      toast.success('Cập nhật blog thành công!')
-      setOpenEdit(false)
-      setSelectedBlog(null)
-      // Refresh lại danh sách
-      fetchBlogs(pagination.page, pagination.limit)
-    } catch (error) {
-      console.error('Lỗi khi cập nhật blog:', error)
-      toast.error('Không thể cập nhật blog. Vui lòng thử lại.')
+      console.error('Lỗi khi xử lý blog:', error)
+      if (isEditMode) {
+        toast.error('Không thể cập nhật blog. Vui lòng thử lại.')
+      } else {
+        toast.error('Không thể tạo blog. Vui lòng thử lại.')
+      }
     }
   }
 
@@ -111,40 +110,7 @@ export default function BlogManagementPage() {
   }
 
   // Function để tạo dữ liệu mẫu
-  const createSampleData = async () => {
-    try {
-      // Import dữ liệu mẫu
-      const { createSampleBlogs } = await import('~/utils/blogSampleData')
-      const sampleBlogs = createSampleBlogs()
-      
-      let successCount = 0
-      let errorCount = 0
-      
-      for (const blogData of sampleBlogs) {
-        try {
-          await createBlog(blogData)
-          successCount++
-          console.log(`✅ Tạo thành công: ${blogData.title}`)
-        } catch (error) {
-          errorCount++
-          console.error(`❌ Lỗi khi tạo: ${blogData.title}`, error)
-        }
-      }
-      
-      if (successCount > 0) {
-        toast.success(`Tạo thành công ${successCount} bài viết mẫu!`)
-        fetchBlogs(pagination.page, pagination.limit)
-      }
-      
-      if (errorCount > 0) {
-        toast.warning(`Có ${errorCount} bài viết không tạo được`)
-      }
-      
-    } catch (error) {
-      console.error('Lỗi khi tạo dữ liệu mẫu:', error)
-      toast.error('Không thể tạo dữ liệu mẫu')
-    }
-  }
+
 
   if (loading) {
     return (
@@ -165,9 +131,6 @@ export default function BlogManagementPage() {
           <Button variant="contained" onClick={() => fetchBlogs()}>
             Thử lại
           </Button>
-          <Button variant="outlined" onClick={createSampleData}>
-            Tạo dữ liệu mẫu
-          </Button>
         </Box>
       </Paper>
     )
@@ -178,10 +141,15 @@ export default function BlogManagementPage() {
       <BlogTable
         blogs={blogs}
         pagination={pagination}
-        onAdd={() => setOpenAdd(true)}
+        onAdd={() => {
+          setBlogModalMode('add')
+          setSelectedBlog(null)
+          setOpenBlogModal(true)
+        }}
         onEdit={(blog) => {
           setSelectedBlog(blog)
-          setOpenEdit(true)
+          setBlogModalMode('edit')
+          setOpenBlogModal(true)
         }}
         onView={(blog) => {
           setSelectedBlog(blog)
@@ -194,22 +162,18 @@ export default function BlogManagementPage() {
         onPageChange={handlePageChange}
         onSearch={handleSearch}
         onFilter={handleFilter}
-        onCreateSample={createSampleData}
       />
 
-      <AddBlogModal
-        open={openAdd}
-        onClose={() => setOpenAdd(false)}
-        onSave={handleAdd}
-      />
-      <EditBlogModal
-        open={openEdit}
-        blog={selectedBlog}
+      <BlogModal
+        open={openBlogModal}
         onClose={() => {
-          setOpenEdit(false)
+          setOpenBlogModal(false)
           setSelectedBlog(null)
+          setBlogModalMode('add')
         }}
-        onSave={handleEdit}
+        onSave={handleBlogSave}
+        blogData={selectedBlog}
+        mode={blogModalMode}
       />
       <ViewBlogModal
         open={openView}

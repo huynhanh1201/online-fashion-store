@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import Typography from '@mui/material/Typography'
 import { Box } from '@mui/material'
 import OrderTable from './OrderTable'
@@ -39,20 +39,16 @@ const OrderManagement = () => {
   const { discounts, fetchDiscounts } = useDiscounts() // lấy danh sách mã giảm giá nếu cần
   const { users, fetchUsers } = useUsers()
 
-  // Lưu quyền vào biến để tránh gọi hook trong điều kiện
-  const canReadOrder = hasPermission('order:read')
-  const canUpdateOrder = hasPermission('order:update')
-  const canDeleteOrder = hasPermission('order:delete')
-
-  // Debug
-  console.log('=== ORDER MANAGEMENT DEBUG ===')
-  console.log('canReadOrder:', canReadOrder)
-  console.log('orders:', orders)
-  console.log('loading:', loading)
-  console.log('totalPages:', totalPages)
+  useEffect(() => {
+    fetchUsers()
+    fetchDiscounts()
+  }, [])
+  useEffect(() => {
+    fetchOrders(page, limit, filters)
+  }, [page, limit, filters])
 
   // Kiểm tra quyền truy cập order management
-  if (!canReadOrder) {
+  if (!hasPermission('order:read')) {
     return (
       <Box sx={{ p: 3, textAlign: 'center' }}>
         <Typography variant='h6' color='error'>
@@ -62,16 +58,9 @@ const OrderManagement = () => {
     )
   }
 
-  React.useEffect(() => {
-    fetchUsers()
-    fetchDiscounts()
-  }, [])
-  React.useEffect(() => {
-    fetchOrders(page, limit, filters)
-  }, [page, limit, filters])
   // Mở modal xem
   const handleOpenModalView = async (order) => {
-    if (!canReadOrder) return
+    if (!hasPermission('order:read')) return
     setSelectedOrder(order)
     const [historiesData, detailsData] = await Promise.all([
       getOrderHistoriesByOrderId(order._id),
@@ -91,7 +80,7 @@ const OrderManagement = () => {
 
   // Mở modal sửa
   const handleOpenModalEdit = async (order) => {
-    if (!canUpdateOrder) return
+    if (!hasPermission('order:update')) return
     setLoadingEdit(true)
     setSelectedOrder(order)
     // Nếu cần fetch thêm data thì await ở đây
@@ -107,7 +96,7 @@ const OrderManagement = () => {
 
   // Mở modal xoá
   const handleOpenModalDelete = (order) => {
-    if (!canDeleteOrder) return
+    if (!hasPermission('order:delete')) return
     setSelectedOrder(order)
     setOpenDeleteModal(true)
     setLoadingDelete(false) // chưa xoá
