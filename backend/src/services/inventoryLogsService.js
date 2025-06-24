@@ -1,7 +1,4 @@
 import { InventoryLogModel } from '~/models/InventoryLogModel'
-import apiError from '~/utils/ApiError'
-import { StatusCodes } from 'http-status-codes'
-import { InventoryModel } from '~/models/InventoryModel'
 import validatePagination from '~/utils/validatePagination'
 import getDateRange from '~/utils/getDateRange'
 
@@ -153,7 +150,7 @@ const updateInventoryLog = async (inventoryLogId, reqBody) => {
 const deleteInventoryLog = async (inventoryLogId) => {
   // eslint-disable-next-line no-useless-catch
   try {
-    const inventoryLogDeleted = await InventoryLogModel.findOneAndUpdate(
+    const inventoryLogDeleted = await InventoryLogModel.updateOne(
       { _id: inventoryLogId },
       { destroy: true },
       { new: true }

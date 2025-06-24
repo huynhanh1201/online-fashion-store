@@ -8,6 +8,7 @@ const Router = express.Router()
 
 // Tạo Màu sắc sản phẩm mới
 Router.route('/').post(
+  authMiddleware.isAuthorized,
   variantsValidation.variant,
   variantsController.createVariant
 )
@@ -23,6 +24,7 @@ Router.route('/:variantId').get(
 
 // Cập nhật thông tin Màu sắc sản phẩm
 Router.route('/:variantId').patch(
+  authMiddleware.isAuthorized,
   variantsValidation.verifyId,
   variantsValidation.variantUpdate,
   variantsController.updateVariant
@@ -30,6 +32,7 @@ Router.route('/:variantId').patch(
 
 // Xoá Màu sắc sản phẩm (Xóa mềm)
 Router.route('/:variantId').delete(
+  authMiddleware.isAuthorized,
   variantsValidation.verifyId,
   variantsController.deleteVariant
 )

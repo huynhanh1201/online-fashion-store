@@ -1,4 +1,5 @@
 import mongoose from 'mongoose'
+import { refIntegrityPlugin } from '~/plugins/refIntegrityPlugin'
 const { Schema, model } = mongoose
 
 // Tạo schema cho Danh mục sản phẩm
@@ -107,6 +108,12 @@ const variantSchema = new Schema(
       type: String,
       enum: ['draft', 'active', 'inactive'], // Trạng thái sản phẩm
       default: 'draft' // Mặc định là 'draft'
+    },
+
+    discountPrice: {
+      type: Number,
+      default: 0,
+      min: 0
     }
   },
   {
@@ -114,6 +121,28 @@ const variantSchema = new Schema(
     timestamps: true
   }
 )
+
+// Gắn plugin kiểm tra liên kết
+variantSchema.plugin(refIntegrityPlugin, {
+  references: [
+    { model: 'Inventory', foreignField: 'variantId' },
+
+    {
+      model: 'Batch',
+      foreignField: 'variantId'
+    },
+
+    {
+      model: 'WarehouseSlip',
+      foreignField: 'variantId'
+    },
+
+    {
+      model: 'CartItem',
+      foreignField: 'variantId'
+    }
+  ]
+})
 
 // Tạo Model
 export const VariantModel = model('Variant', variantSchema)

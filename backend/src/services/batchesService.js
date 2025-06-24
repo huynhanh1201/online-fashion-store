@@ -1,6 +1,8 @@
 import { BatchModel } from '~/models/BatchModel'
 import validatePagination from '~/utils/validatePagination'
 import getDateRange from '~/utils/getDateRange'
+import ApiError from '~/utils/ApiError'
+import { StatusCodes } from 'http-status-codes'
 
 const getBatchList = async (queryString) => {
   let {
@@ -133,11 +135,15 @@ const updateBatch = async (batchId, reqBody) => {
 const deleteBatch = async (batchId) => {
   // eslint-disable-next-line no-useless-catch
   try {
-    const batchDeleted = await BatchModel.findOneAndUpdate(
+    const batchDeleted = await BatchModel.updateOne(
       { _id: batchId },
       { destroy: true },
       { new: true }
     )
+
+    if (!batchDeleted) {
+      throw new ApiError(StatusCodes.NOT_FOUND, 'Lô hàng không tồn tại.')
+    }
 
     return batchDeleted
   } catch (err) {

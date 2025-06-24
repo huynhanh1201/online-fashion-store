@@ -115,13 +115,31 @@ const createOrder = async (userId, reqBody, ipAddr, jwtDecoded) => {
       )
 
       // Xử lý tất cả promise song song
-      await Promise.all([
+      const [
+        warehouseSlip,
+        orderItems,
+        transaction,
+        cartItemsUpdated,
+        createDeliveryOrder
+      ] = await Promise.all([
         warehouseSlipPromise,
         orderItemsPromise,
         transactionPromise,
         cartItemPromise,
         createDeliveryOrderPromise
       ])
+
+      // Cập nhật mã ghnOrderCode
+      await OrderModel.findOneAndUpdate(
+        { _id: order._id },
+        {
+          ghnOrderCode: createDeliveryOrder?.data?.data?.order_code
+        },
+        {
+          new: true,
+          session: session
+        }
+      )
     } else {
       await PaymentSessionDraftModel.create(
         [
@@ -295,7 +313,7 @@ const updateOrder = async (userId, orderId, reqBody) => {
 const deleteOrder = async (orderId) => {
   // eslint-disable-next-line no-useless-catch
   try {
-    const orderUpdated = await OrderModel.findOneAndUpdate(
+    const orderUpdated = await OrderModel.updateOne(
       {
         _id: orderId
       },
@@ -306,6 +324,10 @@ const deleteOrder = async (orderId) => {
         new: true
       }
     )
+
+    if (!orderUpdated) {
+      throw new ApiError(StatusCodes.NOT_FOUND, 'Đơn hàng không tồn tại.')
+    }
 
     return orderUpdated
   } catch (err) {

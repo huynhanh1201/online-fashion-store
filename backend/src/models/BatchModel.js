@@ -1,4 +1,5 @@
 import mongoose from 'mongoose'
+import { refIntegrityPlugin } from '~/plugins/refIntegrityPlugin'
 const { Schema, model } = mongoose
 
 // Tạo schema cho Danh mục sản phẩm
@@ -56,6 +57,11 @@ const batchSchema = new Schema(
     timestamps: true
   }
 )
+
+// Gắn plugin kiểm tra liên kết
+batchSchema.plugin(refIntegrityPlugin, {
+  references: [{ model: 'InventoryLog', foreignField: 'batchId' }]
+})
 
 // Tạo Model
 export const BatchModel = model('Batch', batchSchema)

@@ -1,4 +1,5 @@
 import mongoose from 'mongoose'
+import { refIntegrityPlugin } from '~/plugins/refIntegrityPlugin'
 const { Schema, model } = mongoose
 
 // Định nghĩa schema cho đơn hàng
@@ -113,12 +114,46 @@ const OrderSchema = new Schema(
       unique: true,
       trim: true,
       required: true
+    },
+
+    ghnOrderCode: {
+      type: String,
+      trim: true,
+      default: '',
+      sparse: true
     }
   },
   {
     timestamps: true // Tự động thêm và cập nhật createdAt & updatedAt :contentReference[oaicite:0]{index.jsx=0}:contentReference[oaicite:1]{index.jsx=1}
   }
 )
+
+// Gắn plugin kiểm tra liên kết
+OrderSchema.plugin(refIntegrityPlugin, {
+  references: [
+    { model: 'PaymentSessionDraft', foreignField: 'orderId' },
+
+    {
+      model: 'OrderItem',
+      foreignField: 'orderId'
+    },
+
+    {
+      model: 'PaymentTransaction',
+      foreignField: 'orderId'
+    },
+
+    {
+      model: 'OrderStatusHistory',
+      foreignField: 'orderId'
+    },
+
+    {
+      model: 'Review',
+      foreignField: 'orderId'
+    }
+  ]
+})
 
 // Tạo Model
 export const OrderModel = model('Order', OrderSchema)

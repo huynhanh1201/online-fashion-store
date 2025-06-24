@@ -2,7 +2,6 @@ import express from 'express'
 
 import { authValidation } from '~/validations/authValidation'
 import { authController } from '~/controllers/authController'
-import { authMiddleware } from '~/middlewares/authMiddleware'
 
 const Router = express.Router()
 

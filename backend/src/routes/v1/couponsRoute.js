@@ -7,7 +7,11 @@ import { authMiddleware } from '~/middlewares/authMiddleware'
 const Router = express.Router()
 
 // Tạo Mã giảm giá mới
-Router.route('/').post(couponsValidation.coupon, couponsController.createCoupon)
+Router.route('/').post(
+  authMiddleware.isAuthorized,
+  couponsValidation.coupon,
+  couponsController.createCoupon
+)
 
 // Kiểm tra Mã giảm giá trước khi thanh toán
 Router.route('/validate').post(
@@ -27,6 +31,7 @@ Router.route('/:couponId').get(
 
 // Cập nhật thông tin Mã giảm giá
 Router.route('/:couponId').patch(
+  authMiddleware.isAuthorized,
   couponsValidation.verifyId,
   couponsValidation.coupon,
   couponsController.updateCoupon
@@ -34,6 +39,7 @@ Router.route('/:couponId').patch(
 
 // Xoá Mã giảm giá (Xóa mềm)
 Router.route('/:couponId').delete(
+  authMiddleware.isAuthorized,
   couponsValidation.verifyId,
   couponsController.deleteCoupon
 )

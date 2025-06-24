@@ -8,10 +8,11 @@ const Router = express.Router()
 
 // Tính phí giao hàng
 Router.route('/calculate-fee').post(
+  authMiddleware.isAuthorized,
   deliveriesValidation.deliveryGHN,
   deliveriesController.getDeliveryFee
 )
 
-Router.route('/webhook/ghn').post(deliveriesController.getDeliveryFee)
+Router.route('/webhook/ghn').post(deliveriesController.ghnWebhook)
 
 export const deliveriesRoute = Router

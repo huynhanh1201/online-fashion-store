@@ -1,5 +1,12 @@
 import mongoose from 'mongoose'
+import { refIntegrityPlugin } from '~/plugins/refIntegrityPlugin'
 const { Schema, model } = mongoose
+
+import './SizePaletteModel'
+import './ColorPaletteModel'
+import './VariantModel'
+import './OrderItemModel'
+import './ReviewModel'
 
 // Tạo schema cho Sản phẩm
 const productSchema = new Schema(
@@ -97,6 +104,29 @@ const productSchema = new Schema(
     timestamps: true
   }
 )
+
+// Gắn plugin kiểm tra liên kết
+productSchema.plugin(refIntegrityPlugin, {
+  references: [
+    { model: 'SizePalette', foreignField: 'productId' },
+    {
+      model: 'ColorPalette',
+      foreignField: 'productId'
+    },
+    {
+      model: 'Variant',
+      foreignField: 'productId'
+    },
+    {
+      model: 'OrderItem',
+      foreignField: 'productId'
+    },
+    {
+      model: 'Review',
+      foreignField: 'productId'
+    }
+  ]
+})
 
 // Tạo Model
 export const ProductModel = model('Product', productSchema)

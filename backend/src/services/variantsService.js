@@ -4,10 +4,9 @@ import ApiError from '~/utils/ApiError'
 import { VariantModel } from '~/models/VariantModel'
 import { ProductModel } from '~/models/ProductModel'
 import generateSKU from '~/utils/generateSKU'
-import { InventoryModel } from '~/models/InventoryModel'
-import { CartModel } from '~/models/CartModel'
 import validatePagination from '~/utils/validatePagination'
 import getDateRange from '~/utils/getDateRange'
+import Joi from 'joi'
 
 const createVariant = async (reqBody) => {
   // eslint-disable-next-line no-useless-catch
@@ -59,7 +58,9 @@ const createVariant = async (reqBody) => {
         ? product.packageSize
         : reqBody.packageSize,
 
-      status: reqBody.status
+      status: reqBody.status,
+
+      discountPrice: reqBody.discountPrice || 0
     }
 
     const variants = await VariantModel.create(newVariant)
@@ -187,6 +188,7 @@ const updateVariant = async (variantId, reqBody) => {
       { $set: updateOps },
       { new: true }
     )
+
     return updatedVariant
   } catch (err) {
     throw err
@@ -196,35 +198,7 @@ const updateVariant = async (variantId, reqBody) => {
 const deleteVariant = async (variantId) => {
   // eslint-disable-next-line no-useless-catch
   try {
-    const isInventoryExsitsPromise = InventoryModel.exists({
-      variantId,
-      destroy: false
-    })
-
-    const isVariantOfCartPromise = CartModel.exists({
-      'cartItems.variantId': variantId
-    })
-
-    const [isInventoryExsits, isVariantOfCart] = await Promise.all([
-      isInventoryExsitsPromise,
-      isVariantOfCartPromise
-    ])
-
-    if (isInventoryExsits) {
-      throw new ApiError(
-        StatusCodes.CONFLICT,
-        'Không thể xóa BIẾN THỂ khi vẫn còn TỒN KHO CỦA BIẾN THỂ hoạt động.'
-      )
-    }
-
-    if (isVariantOfCart) {
-      throw new ApiError(
-        StatusCodes.CONFLICT,
-        'Không thể xóa BIẾN THỂ khi vẫn còn GIỎ HÀNG hoạt động.'
-      )
-    }
-
-    const variantDeleted = await VariantModel.findOneAndUpdate(
+    const variantDeleted = await VariantModel.updateOne(
       { _id: variantId },
       { destroy: true },
       { new: true }

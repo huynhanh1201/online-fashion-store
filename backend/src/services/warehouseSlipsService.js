@@ -295,7 +295,7 @@ const importStockWarehouseSlip = async (reqBody, jwtDecoded, session) => {
           minQuantity: variant.minQuantity, // Lấy từ variant gốc
           importPrice: variant.importPrice,
           exportPrice: variant.exportPrice,
-          status: variant.status,
+          status: 'in-stock',
           destroy: false
         }
 
@@ -407,7 +407,17 @@ const importStockWarehouseSlip = async (reqBody, jwtDecoded, session) => {
 
     await InventoryLogModel.insertMany(inventoryLogs, { session })
 
-    return warehouseSlip
+    const warehouseSlipResult = await WarehouseSlipModel.findOne({
+      _id: warehouseSlip._id
+    })
+      .session(session)
+      .populate([
+        { path: 'items.variantId', select: 'name sku' },
+        { path: 'partnerId', select: 'name' },
+        { path: 'warehouseId', select: 'name' }
+      ])
+
+    return warehouseSlipResult
   } catch (err) {
     throw err
   }
@@ -560,7 +570,17 @@ const exportStockWarehouseSlip = async (reqBody, jwtDecoded, session) => {
     // Insert nhiều log 1 lần
     await InventoryLogModel.insertMany(inventoryLogs, { session })
 
-    return warehouseSlip
+    const warehouseSlipResult = await WarehouseSlipModel.findById(
+      warehouseSlip._id
+    )
+      .session(session)
+      .populate([
+        { path: 'items.variantId', select: 'name sku' },
+        { path: 'partnerId', select: 'name' },
+        { path: 'warehouseId', select: 'name' }
+      ])
+
+    return warehouseSlipResult
   } catch (err) {
     throw err
   }

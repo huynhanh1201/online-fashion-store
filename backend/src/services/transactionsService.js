@@ -102,12 +102,24 @@ const vnpayIPN = async (req) => {
       ])
 
       // Tạo đơn hàng vận chuyển (GHN)
-      await deliveriesService.createDeliveryOrder(
+      const createDeliveryOrder = await deliveriesService.createDeliveryOrder(
         reqBody,
         cartItems,
         order,
         address,
         variantMap
+      )
+
+      // Cập nhật mã ghnOrderCode
+      await OrderModel.findOneAndUpdate(
+        { _id: order._id },
+        {
+          ghnOrderCode: createDeliveryOrder?.data?.data?.order_code
+        },
+        {
+          new: true,
+          session: session
+        }
       )
 
       // Xóa sản phẩm trong giỏ hàng
