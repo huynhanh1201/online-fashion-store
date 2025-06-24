@@ -1,12 +1,84 @@
-import React from 'react'
+import React, { useEffect, useState, useRef } from 'react'
 import ProductCard from '~/components/ProductCards/ProductCards'
+import { getFlashSaleConfig } from '~/services/admin/webConfig/flashsaleService'
+import { getProducts } from '~/services/productService'
 
-const FlashSaleSection = ({ products, loading, error }) => {
+const FlashSaleSection = () => {
+  const [flashSaleProducts, setFlashSaleProducts] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
+  const [endTime, setEndTime] = useState(null)
+  const [countdown, setCountdown] = useState('')
+  const intervalRef = useRef(null)
+
+  // Countdown logic
+  useEffect(() => {
+    if (!endTime) return
+    function updateCountdown() {
+      const now = new Date()
+      const end = new Date(endTime)
+      const diff = end - now
+      if (diff <= 0) {
+        setCountdown('Đã kết thúc')
+        clearInterval(intervalRef.current)
+        return
+      }
+      const days = Math.floor(diff / (1000 * 60 * 60 * 24))
+      const hours = Math.floor((diff / (1000 * 60 * 60)) % 24)
+      const minutes = Math.floor((diff / (1000 * 60)) % 60)
+      const seconds = Math.floor((diff / 1000) % 60)
+      const pad = (n) => String(n).padStart(2, '0')
+      if (days > 0) {
+        setCountdown(`${days} ngày ${pad(hours)}:${pad(minutes)}:${pad(seconds)}`)
+      } else {
+        setCountdown(`${pad(hours)}:${pad(minutes)}:${pad(seconds)}`)
+      }
+    }
+    updateCountdown()
+    intervalRef.current = setInterval(updateCountdown, 1000)
+    return () => clearInterval(intervalRef.current)
+  }, [endTime])
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true)
+        setError(null)
+        // Lấy flash sale config
+        const config = await getFlashSaleConfig()
+        setEndTime(config.endTime)
+        const flashSaleItems = config.products || []
+        if (!flashSaleItems.length) {
+          setFlashSaleProducts([])
+          setLoading(false)
+          return
+        }
+        // Lấy toàn bộ sản phẩm
+        const { products: allProducts } = await getProducts({ page: 1, limit: 1000 })
+        // Join dữ liệu flash sale với sản phẩm chi tiết
+        const joined = flashSaleItems.map(item => {
+          const prod = allProducts.find(p => p._id === item.productId)
+          if (!prod) return null
+          return {
+            ...prod,
+            exportPrice: item.originalPrice, // Giá gốc tại thời điểm flash sale
+            flashPrice: item.flashPrice,     // Giá flash sale
+            isFlashSale: true
+          }
+        }).filter(Boolean)
+        setFlashSaleProducts(joined)
+      } catch (err) {
+        setError('Failed to load flash sale products.')
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchData()
+  }, [])
+
   if (loading) return <div>Loading flash sale...</div>
-  if (error) return <div>Failed to load flash sale products.</div>
-  if (!products || products.length === 0) return null
-
-  const flashSaleProducts = products.slice(0, 5)
+  if (error) return <div>{error}</div>
+  if (!flashSaleProducts || flashSaleProducts.length === 0) return null
 
   // ======= STYLES =======
   const styles = {
@@ -34,17 +106,16 @@ const FlashSaleSection = ({ products, loading, error }) => {
     },
     countdown: {
       display: 'flex',
-      gap: '8px'
-    },
-    countdownItem: {
-      background: '#f44336',
-      color: 'white',
-      padding: '8px 12px',
-      borderRadius: '8px',
+      gap: '8px',
+      alignItems: 'center',
+      fontSize: '20px',
       fontWeight: 'bold',
-      fontSize: '16px',
-      minWidth: '40px',
-      textAlign: 'center'
+      background: '#f44336',
+      padding: '8px 20px',
+      borderRadius: '12px',
+      letterSpacing: '2px',
+      minWidth: '120px',
+      justifyContent: 'center',
     },
     productGrid: {
       display: 'grid',
@@ -75,16 +146,14 @@ const FlashSaleSection = ({ products, loading, error }) => {
       <div style={styles.flashSaleHeader}>
         <h2 style={styles.flashSaleTitle}>⚡ Flash Sale</h2>
         <div style={styles.countdown}>
-          <div style={styles.countdownItem}>01</div>
-          <div style={styles.countdownItem}>23</div>
-          <div style={styles.countdownItem}>59</div>
+          {countdown}
         </div>
       </div>
 
       <div className='product-grid'>
-        {flashSaleProducts.map((product) => (
+        {flashSaleProducts.slice(0, 5).map((product) => (
           <div key={product._id} style={styles.flashSaleCard}>
-            <ProductCard product={product} />
+            <ProductCard product={product} isFlashSale={true} />
           </div>
         ))}
       </div>

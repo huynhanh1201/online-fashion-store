@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import {
   Box,
   Button,
@@ -16,7 +16,10 @@ import {
   IconButton,
   Tooltip,
   useTheme,
-  alpha
+  alpha,
+  Alert,
+  CircularProgress,
+  Skeleton
 } from '@mui/material'
 import {
   Add as AddIcon,
@@ -26,63 +29,115 @@ import {
   Image as ImageIcon,
   Refresh as RefreshIcon
 } from '@mui/icons-material'
-
-const mockServiceHighlights = [
-  {
-    id: 'service001',
-    imageUrl: '/Uploads/icons/free-delivery.png',
-    title: 'Miễn phí vận chuyển',
-    subtitle: 'Đơn hàng trên 500K'
-  },
-  {
-    id: 'service002',
-    imageUrl: '/Uploads/icons/cod.png',
-    title: 'Ship COD toàn quốc',
-    subtitle: 'Yên tâm mua sắm'
-  },
-  {
-    id: 'service003',
-    imageUrl: '/Uploads/icons/return.png',
-    title: 'Đổi trả dễ dàng',
-    subtitle: '7 ngày đổi trả'
-  },
-  {
-    id: 'service004',
-    imageUrl: '/Uploads/icons/support.png',
-    title: 'Hotline: 0123456789',
-    subtitle: 'Hỗ trợ bạn 24/24'
-  }
-]
+import AddServiceHighlight from './Modal/AddServiceHighlight.jsx'
+import { 
+  getServiceHighlights, 
+  deleteServiceHighlight 
+} from '~/services/admin/webConfig/highlightedService.js'
+import { optimizeCloudinaryUrl } from '~/utils/cloudinary.js'
 
 const ServiceHighlightManagement = () => {
   const theme = useTheme()
+  const [openModal, setOpenModal] = useState(false)
+  const [editIndex, setEditIndex] = useState(null)
+  const [serviceHighlights, setServiceHighlights] = useState([])
+  const [loading, setLoading] = useState(true)
   const [refreshing, setRefreshing] = useState(false)
+  const [error, setError] = useState('')
+
+  // Fetch service highlights data
+  const fetchServiceHighlights = async () => {
+    try {
+      setError('')
+      const data = await getServiceHighlights()
+      setServiceHighlights(data || [])
+    } catch (err) {
+      setError(err.message)
+      console.error('Error fetching service highlights:', err)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  // Refresh data
+  const handleRefresh = async () => {
+    setRefreshing(true)
+    await fetchServiceHighlights()
+    setRefreshing(false)
+  }
+
+  // Handle success from modal
+  const handleModalSuccess = (result) => {
+    console.log('Service highlight updated successfully:', result)
+    // Refresh data after successful update
+    fetchServiceHighlights()
+  }
+
+  // Handle edit
+  const handleEdit = (index) => {
+    setEditIndex(index)
+    setOpenModal(true)
+  }
+
+  // Handle delete
+  const handleDelete = async (index) => {
+    if (window.confirm('Bạn có chắc chắn muốn xóa dịch vụ này?')) {
+      try {
+        await deleteServiceHighlight(index)
+        // Refresh data after successful delete
+        fetchServiceHighlights()
+      } catch (error) {
+        setError(error.message)
+        console.error('Error deleting service highlight:', error)
+      }
+    }
+  }
+
+  // Handle add new
+  const handleAddNew = () => {
+    setEditIndex(null)
+    setOpenModal(true)
+  }
+
+  useEffect(() => {
+    fetchServiceHighlights()
+  }, [])
 
   const summaryData = [
     {
       title: 'Tổng dịch vụ',
-      value: mockServiceHighlights.length,
+      value: loading ? <Skeleton width={40} /> : serviceHighlights.length,
       icon: <StarIcon />,
       color: '#1976d2'
     },
     {
       title: 'Hình ảnh dịch vụ',
-      value: mockServiceHighlights.filter((service) => service.imageUrl).length,
+      value: loading ? <Skeleton width={40} /> : serviceHighlights.filter((service) => service.imageUrl).length,
       icon: <ImageIcon />,
       color: '#2e7d32'
     }
   ]
 
-  const handleRefresh = async () => {
-    setRefreshing(true)
-    // Simulate refresh delay
-    setTimeout(() => {
-      setRefreshing(false)
-    }, 1000)
-  }
+  // Loading skeleton
+  const LoadingSkeleton = () => (
+    <TableRow>
+      <TableCell>
+        <Skeleton variant='rectangular' width={50} height={50} />
+      </TableCell>
+      <TableCell>
+        <Skeleton variant='text' width='60%' />
+      </TableCell>
+      <TableCell>
+        <Skeleton variant='text' width='40%' />
+      </TableCell>
+      <TableCell>
+        <Skeleton variant='circular' width={32} height={32} />
+      </TableCell>
+    </TableRow>
+  )
 
   return (
-    <Box sx={{ p: 3, backgroundColor: '#f8fafc',borderRadius: 3, minHeight: '100vh' }}>
+    <Box sx={{ p: 3, backgroundColor: '#f8fafc', borderRadius: 3, minHeight: '100vh' }}>
       {/* Header */}
       <Box sx={{ mb: 4 }}>
         <Typography
@@ -103,6 +158,21 @@ const ServiceHighlightManagement = () => {
           Cấu hình và quản lý các dịch vụ nổi bật hiển thị trên website
         </Typography>
       </Box>
+
+      {/* Error Alert */}
+      {error && (
+        <Alert
+          severity='error'
+          sx={{ mb: 3 }}
+          action={
+            <Button color='inherit' size='small' onClick={handleRefresh}>
+              Thử lại
+            </Button>
+          }
+        >
+          {error}
+        </Alert>
+      )}
 
       {/* Summary Cards */}
       <Grid container spacing={3} sx={{ mb: 4 }}>
@@ -163,6 +233,7 @@ const ServiceHighlightManagement = () => {
         <Button
           variant='contained'
           startIcon={<AddIcon />}
+          onClick={handleAddNew}
           sx={{
             px: 3,
             py: 1.5,
@@ -224,88 +295,144 @@ const ServiceHighlightManagement = () => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {mockServiceHighlights.map((item) => (
-                <TableRow
-                  key={item.id}
-                  sx={{
-                    '&:hover': {
-                      backgroundColor: alpha(theme.palette.primary.main, 0.04)
-                    },
-                    '&:last-child td, &:last-child th': { border: 0 }
-                  }}
-                >
-                  <TableCell sx={{ py: 2 }}>
-                    <Box
-                      sx={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: 1
-                      }}
-                    >
-                      <img
-                        src={item.imageUrl}
-                        alt={item.title}
-                        style={{
-                          width: 50,
-                          height: 'auto',
-                          borderRadius: 4,
-                          border: '1px solid #e2e8f0'
+              {loading ? (
+                // Loading skeleton
+                Array.from({ length: 4 }).map((_, index) => (
+                  <LoadingSkeleton key={index} />
+                ))
+              ) : serviceHighlights.length > 0 ? (
+                // Actual data
+                serviceHighlights.map((item, index) => (
+                  <TableRow
+                    key={index}
+                    sx={{
+                      '&:hover': {
+                        backgroundColor: alpha(theme.palette.primary.main, 0.04)
+                      },
+                      '&:last-child td, &:last-child th': { border: 0 }
+                    }}
+                  >
+                    <TableCell sx={{ py: 2 }}>
+                      <Box
+                        sx={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: 1
                         }}
-                      />
-                      <Typography
-                        variant='caption'
-                        color='text.secondary'
-                        sx={{ fontFamily: 'monospace' }}
                       >
-                        {item.id}
+                        {item.imageUrl ? (
+                          <img
+                            src={optimizeCloudinaryUrl(item.imageUrl, {
+                              width: 50,
+                              height: 50
+                            })}
+                            alt={item.title}
+                            style={{
+                              width: 50,
+                              height: 50,
+                              objectFit: 'contain',
+                              borderRadius: 4,
+                              border: '1px solid #e2e8f0'
+                            }}
+                          />
+                        ) : (
+                          <Box
+                            sx={{
+                              width: 50,
+                              height: 50,
+                              borderRadius: 4,
+                              border: '1px solid #e2e8f0',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              backgroundColor: '#f8fafc'
+                            }}
+                          >
+                            <ImageIcon sx={{ color: '#cbd5e1', fontSize: 24 }} />
+                          </Box>
+                        )}
+                        <Typography
+                          variant='caption'
+                          color='text.secondary'
+                          sx={{ fontFamily: 'monospace' }}
+                        >
+                          #{index + 1}
+                        </Typography>
+                      </Box>
+                    </TableCell>
+                    <TableCell sx={{ py: 2 }}>
+                      <Typography
+                        variant='body2'
+                        sx={{ fontWeight: 600, color: '#1e293b' }}
+                      >
+                        {item.title}
                       </Typography>
-                    </Box>
-                  </TableCell>
-                  <TableCell sx={{ py: 2 }}>
-                    <Typography
-                      variant='body2'
-                      sx={{ fontWeight: 600, color: '#1e293b' }}
+                    </TableCell>
+                    <TableCell sx={{ py: 2 }}>
+                      <Typography variant='body2' color='text.secondary'>
+                        {item.subtitle}
+                      </Typography>
+                    </TableCell>
+                    <TableCell sx={{ py: 2 }}>
+                      <Stack direction='row' spacing={1}>
+                        <Tooltip title='Chỉnh sửa'>
+                          <IconButton
+                            size='small'
+                            sx={{
+                              color: '#3b82f6',
+                              '&:hover': { backgroundColor: '#dbeafe' }
+                            }}
+                            onClick={() => handleEdit(index)}
+                          >
+                            <EditIcon fontSize='small' />
+                          </IconButton>
+                        </Tooltip>
+                        <Tooltip title='Xóa'>
+                          <IconButton
+                            size='small'
+                            sx={{
+                              color: '#ef4444',
+                              '&:hover': { backgroundColor: '#fee2e2' }
+                            }}
+                            onClick={() => handleDelete(index)}
+                          >
+                            <DeleteIcon fontSize='small' />
+                          </IconButton>
+                        </Tooltip>
+                      </Stack>
+                    </TableCell>
+                  </TableRow>
+                ))
+              ) : (
+                // No data
+                <TableRow>
+                  <TableCell colSpan={4} sx={{ textAlign: 'center', py: 4 }}>
+                    <Typography variant='body1' color='text.secondary'>
+                      Chưa có dịch vụ nổi bật nào
+                    </Typography>
+                    <Button
+                      variant='outlined'
+                      startIcon={<AddIcon />}
+                      onClick={handleAddNew}
+                      sx={{ mt: 2 }}
                     >
-                      {item.title}
-                    </Typography>
-                  </TableCell>
-                  <TableCell sx={{ py: 2 }}>
-                    <Typography variant='body2' color='text.secondary'>
-                      {item.subtitle}
-                    </Typography>
-                  </TableCell>
-                  <TableCell sx={{ py: 2 }}>
-                    <Stack direction='row' spacing={1}>
-                      <Tooltip title='Chỉnh sửa'>
-                        <IconButton
-                          size='small'
-                          sx={{
-                            color: '#3b82f6',
-                            '&:hover': { backgroundColor: '#dbeafe' }
-                          }}
-                        >
-                          <EditIcon fontSize='small' />
-                        </IconButton>
-                      </Tooltip>
-                      <Tooltip title='Xóa'>
-                        <IconButton
-                          size='small'
-                          sx={{
-                            color: '#ef4444',
-                            '&:hover': { backgroundColor: '#fee2e2' }
-                          }}
-                        >
-                          <DeleteIcon fontSize='small' />
-                        </IconButton>
-                      </Tooltip>
-                    </Stack>
+                      Thêm dịch vụ đầu tiên
+                    </Button>
                   </TableCell>
                 </TableRow>
-              ))}
+              )}
             </TableBody>
           </Table>
         </TableContainer>
       </Card>
+
+      {/* Modal */}
+      <AddServiceHighlight
+        open={openModal}
+        onClose={() => setOpenModal(false)}
+        onSuccess={handleModalSuccess}
+        editIndex={editIndex}
+      />
     </Box>
   )
 }

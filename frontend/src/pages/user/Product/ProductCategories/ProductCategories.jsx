@@ -1,29 +1,72 @@
-import React from 'react'
-import { Box, Grid, Typography } from '@mui/material'
+import React, { useState, useEffect } from 'react'
+import { Box, Grid, Typography, Skeleton, CircularProgress } from '@mui/material'
 import { Link } from 'react-router-dom'
-
-const categories = [
-  {
-    label: 'Áo',
-    image:
-      'https://bizweb.dktcdn.net/100/287/440/products/ao-thun-den-streetwear-nen-mua.png?v=1602834266997',
-    link: '/ao'
-  },
-  {
-    label: 'Quần',
-    image:
-      'https://dytbw3ui6vsu6.cloudfront.net/media/catalog/product/ADLV/25SS-BT-DJ-LG-DDP-LBU/25SS-BT-DJ-LG-DDP-LBU-002.webp',
-    link: '/quan'
-  },
-  {
-    label: 'Phụ kiện',
-    image:
-      'https://bizweb.dktcdn.net/thumb/large/100/323/626/products/fl285-newyork-vintage-blank-blue-02.jpg?v=1724387391903',
-    link: '/phu-kien'
-  }
-]
+import { getCategories } from '~/services/admin/categoryService.js'
+import { optimizeCloudinaryUrl } from '~/utils/cloudinary.js'
 
 const ProductCategories = () => {
+  const [categories, setCategories] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
+
+  useEffect(() => {
+    fetchCategories()
+  }, [])
+
+  const fetchCategories = async () => {
+    try {
+      setLoading(true)
+      setError('')
+      
+      const response = await getCategories({})
+      const categoryData = response.categories || []
+      
+      // Filter out categories that are marked as destroyed (hidden)
+      const activeCategories = categoryData.filter(category => category.destroy === false)
+      
+      setCategories(activeCategories)
+    } catch (err) {
+      console.error('Error fetching categories:', err)
+      setError('Không thể tải danh mục sản phẩm')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  // Don't render anything if loading
+  if (loading) {
+    return (
+      <Box
+        sx={{ padding: '5px', borderRadius: '20px', margin: '30px', gap: '50px' }}
+      >
+        <Grid
+          container
+          direction='row'
+          justifyContent='center'
+          alignItems='center'
+          sx={{ marginTop: '50px', gap: '100px' }}
+        >
+          {[1, 2, 3].map((index) => (
+            <Box key={index} sx={{ textAlign: 'center' }}>
+              <Skeleton
+                variant="circular"
+                width={100}
+                height={100}
+                sx={{ mb: 1 }}
+              />
+              <Skeleton variant="text" width={80} height={24} />
+            </Box>
+          ))}
+        </Grid>
+      </Box>
+    )
+  }
+
+  // Don't render anything if no categories or error
+  if (categories.length === 0) {
+    return null
+  }
+
   return (
     <Box
       sx={{ padding: '5px', borderRadius: '20px', margin: '30px', gap: '50px' }}
@@ -38,8 +81,8 @@ const ProductCategories = () => {
         {categories.map((category, index) => (
           <Box
             component={Link}
-            to={category.link}
-            key={index}
+            to={category.link || `/productbycategory/${category._id}`}
+            key={category._id}
             sx={{
               textAlign: 'center',
               textDecoration: 'none',
@@ -50,19 +93,24 @@ const ProductCategories = () => {
           >
             <Box
               component='img'
-              src={category.image}
-              alt={`Nhóm ${category.label}`}
+              src={
+                category.image 
+                  ? optimizeCloudinaryUrl(category.image, { width: 100, height: 100 })
+                  : 'https://via.placeholder.com/100x100?text=No+Image'
+              }
+              alt={`Nhóm ${category.name}`}
               sx={{
                 width: 100,
                 height: 100,
                 objectFit: 'cover',
+                borderRadius: '50%',
                 transition: 'transform 0.3s ease'
               }}
             />
             <Typography
               variant='h6'
               mt={1}
-            >{`Nhóm ${category.label}`}</Typography>
+            >{`Nhóm ${category.name}`}</Typography>
           </Box>
         ))}
       </Grid>

@@ -515,7 +515,22 @@ export default function AdminDrawer({
               </ListItemButton>
             </ListItem>
           )}
-
+          <Link
+            to='/admin/marketing-management'
+            style={{ textDecoration: 'none', color: 'inherit' }}
+          >
+            <ListItem disablePadding>
+              <ListItemButton
+                selected={isActive('/admin/marketing-management')}
+                sx={activeButtonStyle}
+              >
+                <ListItemIcon>
+                  <PersonIcon />
+                </ListItemIcon>
+                <ListItemText primary='Quản lý nội dung' />
+              </ListItemButton>
+            </ListItem>
+          </Link>
           {canAccessMenu(menuConfig.productManagement) && (
             <>
               <ListItem disablePadding>
