@@ -114,6 +114,13 @@ const OrderSchema = new Schema(
       unique: true,
       trim: true,
       required: true
+    },
+
+    ghnOrderCode: {
+      type: String,
+      trim: true,
+      default: '',
+      sparse: true
     }
   },
   {

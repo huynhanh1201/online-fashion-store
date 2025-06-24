@@ -94,8 +94,7 @@ const createDeliveryOrder = async (
 const ghnWebhook = async (reqBody) => {
   // eslint-disable-next-line no-useless-catch
   try {
-    const { OrderCode, ClientOrderCode, Status, Type, Time, Description } =
-      reqBody
+    console.log('reqBody: ', reqBody)
   } catch (err) {
     throw err
   }

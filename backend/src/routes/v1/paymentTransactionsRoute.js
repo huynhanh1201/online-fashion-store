@@ -7,16 +7,21 @@ import { authMiddleware } from '~/middlewares/authMiddleware'
 const Router = express.Router()
 
 // Danh sách Giao dịch thanh toán theo Order
-Router.route('/').get(paymentTransactionsController.getPaymentTransactionList)
+Router.route('/').get(
+  authMiddleware.isAuthorized,
+  paymentTransactionsController.getPaymentTransactionList
+)
 
 // Lấy thông tin một Giao dịch thanh toán.
 Router.route('/:paymentTransactionId').get(
+  authMiddleware.isAuthorized,
   paymentTransactionsValidation.verifyId,
   paymentTransactionsController.getPaymentTransaction
 )
 
 // Cập nhật thông tin Giao dịch thanh toán
 Router.route('/:paymentTransactionId').patch(
+  authMiddleware.isAuthorized,
   paymentTransactionsValidation.verifyId,
   paymentTransactionsValidation.paymentTransaction,
   paymentTransactionsController.updatePaymentTransaction
@@ -24,6 +29,7 @@ Router.route('/:paymentTransactionId').patch(
 
 // Xoá Giao dịch thanh toán (Xóa mềm)
 Router.route('/:paymentTransactionId').delete(
+  authMiddleware.isAuthorized,
   paymentTransactionsValidation.verifyId,
   paymentTransactionsController.deletePaymentTransaction
 )

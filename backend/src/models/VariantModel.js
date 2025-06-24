@@ -108,6 +108,12 @@ const variantSchema = new Schema(
       type: String,
       enum: ['draft', 'active', 'inactive'], // Trạng thái sản phẩm
       default: 'draft' // Mặc định là 'draft'
+    },
+
+    discountPrice: {
+      type: Number,
+      default: 0,
+      min: 0
     }
   },
   {

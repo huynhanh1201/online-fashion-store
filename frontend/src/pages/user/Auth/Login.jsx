@@ -71,7 +71,6 @@ function Login() {
       try {
         const profileData = await getProfileUser()
         dispatch({ type: 'user/loginUserAPI/fulfilled', payload: profileData })
-        console.log('Thông tin người dùng từ API:', profileData)
       } catch (error) {
         toast.error(error.message || 'Lỗi tải thông tin người dùng')
         dispatch(logoutUserAPI(false))

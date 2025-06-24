@@ -27,6 +27,7 @@ Router.route('/:categoryId').get(
 
 // Cập nhật thông tin Danh mục sản phẩm
 Router.route('/:categoryId').patch(
+  authMiddleware.isAuthorized,
   categoriesValidation.verifyId,
   categoriesValidation.category,
   categoriesController.updateCategory
@@ -34,6 +35,7 @@ Router.route('/:categoryId').patch(
 
 // Xoá Danh mục sản phẩm (Xóa mềm)
 Router.route('/:categoryId').delete(
+  authMiddleware.isAuthorized,
   categoriesValidation.verifyId,
   categoriesController.deleteCategory
 )
