@@ -7,6 +7,7 @@ import ImageNotSupportedIcon from '@mui/icons-material/ImageNotSupported'
 import ProductImageModal from './modal/ProductImageModal'
 import { optimizeCloudinaryUrl } from '~/utils/cloudinary.js'
 import Tooltip from '@mui/material/Tooltip'
+import { useNavigate } from 'react-router-dom'
 const styles = {
   groupIcon: {
     display: 'flex',
@@ -29,9 +30,15 @@ const styles = {
   }
 }
 
-const ProductRow = ({ product, index, columns, onAction, permissions = {} }) => {
+const ProductRow = ({
+  product,
+  index,
+  columns,
+  onAction,
+  permissions = {}
+}) => {
   const [openImage, setOpenImage] = useState(false)
-
+  const navigate = useNavigate()
   const handleImageClick = () => setOpenImage(true)
   const handleClose = () => setOpenImage(false)
 
@@ -105,14 +112,34 @@ const ProductRow = ({ product, index, columns, onAction, permissions = {} }) => 
           }
           if (id === 'category') {
             const CategoryName = product.categoryId?.name || 'Không có danh mục'
+            const formattedName = CategoryName.split(' ')
+              .map(
+                (word) =>
+                  word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+              )
+              .join(' ')
+
             return (
-              <TableCell key={id} align={align} sx={styles.cellPadding}>
-                {CategoryName.split(' ')
-                  .map(
-                    (word) =>
-                      word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
-                  )
-                  .join(' ')}
+              <TableCell
+                key={id}
+                align={align}
+                sx={{
+                  ...styles.cellPadding,
+                  cursor: product.categoryId ? 'pointer' : 'default',
+                  color: product.categoryId ? '#1976d2' : 'inherit',
+                  '&:hover': product.categoryId
+                    ? { textDecoration: 'underline' }
+                    : undefined
+                }}
+                onClick={() => {
+                  if (product.categoryId) {
+                    navigate(
+                      `/admin/categorie-management?search=${encodeURIComponent(formattedName)}`
+                    )
+                  }
+                }}
+              >
+                {formattedName}
               </TableCell>
             )
           }

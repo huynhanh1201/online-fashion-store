@@ -3,8 +3,19 @@ import { Navigate } from 'react-router-dom'
 import usePermissions from '~/hooks/usePermissions'
 
 // Component bảo vệ route - chuyển hướng nếu không có quyền
-const RouteGuard = ({ children, requiredPermissions = [], fallbackPath = '/login' }) => {
-  const { hasAllPermissions, canAccessAdmin } = usePermissions()
+const RouteGuard = ({
+  children,
+  requiredPermissions = [],
+  fallbackPath = '/login'
+}) => {
+  const { hasAllPermissions, canAccessAdmin, currentUser, permissions } =
+    usePermissions()
+
+  // Fallback cho admin roles
+  const isAdminRole = ['owner', 'technical_admin', 'staff'].includes(
+    currentUser?.role
+  )
+  const hasNoPermissions = permissions.length === 0
 
   // Nếu cần quyền admin access
   if (requiredPermissions.includes('admin:access') && !canAccessAdmin()) {
@@ -12,7 +23,14 @@ const RouteGuard = ({ children, requiredPermissions = [], fallbackPath = '/login
   }
 
   // Nếu cần các quyền khác
-  if (requiredPermissions.length > 0 && !hasAllPermissions(requiredPermissions)) {
+  if (
+    requiredPermissions.length > 0 &&
+    !hasAllPermissions(requiredPermissions)
+  ) {
+    // Fallback: nếu là admin role và không có permissions từ API, cho phép truy cập
+    if (isAdminRole && hasNoPermissions) {
+      return children
+    }
     return <Navigate to={fallbackPath} replace />
   }
 
@@ -26,7 +44,8 @@ const PermissionWrapper = ({
   requireAll = true,
   fallback = null
 }) => {
-  const { hasPermission, hasAllPermissions, hasAnyPermission } = usePermissions()
+  const { hasPermission, hasAllPermissions, hasAnyPermission } =
+    usePermissions()
 
   let hasAccess = false
 
@@ -52,7 +71,7 @@ const AdminOnly = ({ children, fallback = null }) => {
 // Component kiểm tra role cụ thể
 const RoleGuard = ({ children, allowedRoles = [], fallback = null }) => {
   const { isRole } = usePermissions()
-  const hasRole = allowedRoles.some(role => isRole(role))
+  const hasRole = allowedRoles.some((role) => isRole(role))
   return hasRole ? children : fallback
 }
 

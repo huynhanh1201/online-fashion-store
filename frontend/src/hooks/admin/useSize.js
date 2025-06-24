@@ -76,6 +76,10 @@ const useSizes = () => {
   const update = async (id, data) => {
     try {
       const updated = await updateSize(id, data)
+      if (!updated || !updated._id) {
+        console.error('Dữ liệu trả về không hợp lệ')
+        return null
+      }
       setSizes((prev) => prev.map((d) => (d._id === updated._id ? updated : d)))
       return updated
     } catch (err) {
@@ -86,7 +90,11 @@ const useSizes = () => {
 
   const remove = async (id) => {
     try {
-      await deleteSize(id)
+      const remove = await deleteSize(id)
+      if (!remove) {
+        console.error('Không thể xoá kích thước')
+        return null
+      }
       setSizes((prev) => prev.filter((d) => d._id !== id))
       setTotalPages((prev) => prev - 1)
       return true

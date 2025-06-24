@@ -16,6 +16,10 @@ export default function useProfile() {
     setLoading(true)
     const updated = await updateProfile(newData)
     if (updated) setProfile(updated)
+    else {
+      console.error('Không thể cập nhật thông tin người dùng')
+      return null
+    }
     setLoading(false)
   }
 

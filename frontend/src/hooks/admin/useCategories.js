@@ -75,6 +75,10 @@ const useCategories = () => {
   const update = async (id, data) => {
     try {
       const updatedCategory = await updateCategory(id, data)
+      if (!updatedCategory) {
+        console.error('Failed to update category')
+        return null
+      }
       setCategories((prev) =>
         prev.map((cat) =>
           cat._id === updatedCategory._id ? updatedCategory : cat
@@ -89,7 +93,11 @@ const useCategories = () => {
 
   const remove = async (id) => {
     try {
-      await deleteCategory(id)
+      const remove = await deleteCategory(id)
+      if (!remove) {
+        console.error('Failed to delete category')
+        return null
+      }
       setCategories((prev) => prev.filter((cat) => cat._id !== id))
       setTotalPages((prev) => prev - 1)
       return true

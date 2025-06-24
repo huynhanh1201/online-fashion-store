@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useMemo } from 'react'
 import {
   Avatar,
   Box,
@@ -9,7 +9,8 @@ import {
   ListItemButton,
   ListItemIcon,
   ListItemText,
-  Typography
+  Typography,
+  CircularProgress
 } from '@mui/material'
 import {
   ExpandLess,
@@ -28,8 +29,6 @@ import {
 } from '@mui/icons-material'
 import { Link, useLocation } from 'react-router-dom'
 import ExitToAppIcon from '@mui/icons-material/ExitToApp'
-import AccountCircleIcon from '@mui/icons-material/AccountCircle'
-import SourceIcon from '@mui/icons-material/Source'
 import { optimizeCloudinaryUrl } from '~/utils/cloudinary.js'
 
 import { useDispatch } from 'react-redux'
@@ -44,10 +43,18 @@ export default function AdminDrawer({
   onProfileOpen
 }) {
   const location = useLocation()
-  const { hasPermission, hasAnyPermission } = usePermissions()
+  const {
+    hasPermission,
+    hasAnyPermission,
+    isLoading,
+    isInitialized,
+    permissions,
+    currentUser
+  } = usePermissions()
   const [openProduct, setOpenProduct] = React.useState(false)
   const [openOrder, setOpenOrder] = React.useState(false)
   const [openInventory, setOpenInventory] = React.useState(false)
+
   const toggleProduct = () => setOpenProduct(!openProduct)
   const toggleOrder = () => setOpenOrder(!openOrder)
   const toggleInventory = () => setOpenInventory(!openInventory)
@@ -81,11 +88,11 @@ export default function AdminDrawer({
   }
 
   const dispatch = useDispatch()
-  // const navigate = useNavigate()
   const handleLogout = () => {
     dispatch(logoutUserAPI())
     onClose()
   }
+
   const roleMap = {
     technical_admin: 'Kỹ thuật viên hệ thống',
     owner: 'Chủ cửa hàng',
@@ -94,159 +101,216 @@ export default function AdminDrawer({
   }
 
   // Cấu hình menu với quyền tương ứng
-  const menuConfig = {
-    statistics: {
-      permission: 'statistics:read',
-      label: 'Thống kê',
-      path: '/admin',
-      icon: <PollIcon />
-    },
-    userManagement: {
-      permission: 'user:read',
-      label: 'Quản lý người dùng',
-      path: '/admin/user-management',
-      icon: <PersonIcon />
-    },
-    productManagement: {
-      permissions: [
-        'product:read',
-        'category:read',
-        'color:read',
-        'size:read',
-        'review:read'
-      ],
-      label: 'Quản lý sản phẩm',
-      icon: <InventoryIcon />,
-      children: [
-        {
-          permission: 'category:read',
-          label: 'Quản lý danh mục',
-          path: '/admin/categorie-management',
-          icon: <CategoryIcon />
-        },
-        {
-          permission: 'product:read',
-          label: 'Quản lý sản phẩm',
-          path: '/admin/product-management',
-          icon: <InventoryIcon />
-        },
-        {
-          permission: 'review:read',
-          label: 'Quản lý đánh giá',
-          path: '/admin/review-management'
-        },
-        {
-          permission: 'variant:read',
-          label: 'Quản lý biến thể',
-          path: '/admin/variant-management'
-        },
-        {
-          permission: 'color:read',
-          label: 'Quản lý màu sắc',
-          path: '/admin/color-management',
-          icon: <PaletteIcon />
-        },
-        {
-          permission: 'size:read',
-          label: 'Quản lý kích thước',
-          path: '/admin/size-management',
-          icon: <StraightenIcon />
-        }
-      ]
-    },
-    orderManagement: {
-      permissions: ['order:read', 'coupon:read', 'payment:read'],
-      label: 'Quản lý đơn hàng',
-      icon: <ReceiptLongIcon />,
-      children: [
-        {
-          permission: 'order:read',
-          label: 'Quản lý đơn hàng',
-          path: '/admin/order-management',
-          icon: <ReceiptLongIcon />
-        },
-        {
-          permission: 'coupon:read',
-          label: 'Quản lý mã giảm giá',
-          path: '/admin/discount-management',
-          icon: <LocalOfferIcon />
-        },
-        {
-          permission: 'payment:read',
-          label: 'Quản lý giao dịch',
-          path: '/admin/transaction-management',
-          icon: <PaymentIcon />
-        }
-      ]
-    },
-    inventoryManagement: {
-      permissions: [
-        'inventory:read',
-        'warehouse:read',
-        'warehouseSlip:read',
-        'inventoryLog:read',
-        'batch:read',
-        'partner:read'
-      ],
-      label: 'Quản lý kho',
-      icon: <WarehouseIcon />,
-      children: [
-        {
-          permission: 'statistics:read',
-          label: 'Thống kê kho',
-          path: '/admin/warehouse-statistic-management',
-          icon: <ReceiptLongIcon />
-        },
-        {
-          permission: 'inventory:read',
-          label: 'Quản lý kho',
-          path: '/admin/inventory-management'
-        },
-        {
-          permission: 'warehouseSlip:read',
-          label: 'Quản lý xuất/nhập kho',
-          path: '/admin/warehouse-slips-management'
-        },
-        {
-          permission: 'inventoryLog:read',
-          label: 'Quản lý nhật ký kho',
-          path: '/admin/inventory-log-management'
-        },
-        {
-          permission: 'warehouse:read',
-          label: 'Quản lý kho hàng',
-          path: '/admin/warehouses-management'
-        },
-        {
-          permission: 'batch:read',
-          label: 'Quản lý lô hàng',
-          path: '/admin/batches-management'
-        },
-        {
-          permission: 'partner:read',
-          label: 'Quản lý đối tác',
-          path: '/admin/partner-management'
-        }
-      ]
-    }
-  }
+  const menuConfig = useMemo(
+    () => ({
+      statistics: {
+        permission: 'statistics:read',
+        label: 'Thống kê',
+        path: '/admin',
+        icon: <PollIcon />
+      },
+      userManagement: {
+        permission: 'user:read',
+        label: 'Quản lý người dùng',
+        path: '/admin/user-management',
+        icon: <PersonIcon />
+      },
+      productManagement: {
+        permissions: [
+          'product:read',
+          'category:read',
+          'color:read',
+          'size:read',
+          'review:read'
+        ],
+        label: 'Quản lý sản phẩm',
+        icon: <InventoryIcon />,
+        children: [
+          {
+            permission: 'category:read',
+            label: 'Quản lý danh mục',
+            path: '/admin/categorie-management',
+            icon: <CategoryIcon />
+          },
+          {
+            permission: 'product:read',
+            label: 'Quản lý sản phẩm',
+            path: '/admin/product-management',
+            icon: <InventoryIcon />
+          },
+          {
+            permission: 'review:read',
+            label: 'Quản lý đánh giá',
+            path: '/admin/review-management'
+          },
+          {
+            permission: 'variant:read',
+            label: 'Quản lý biến thể',
+            path: '/admin/variant-management'
+          },
+          {
+            permission: 'color:read',
+            label: 'Quản lý màu sắc',
+            path: '/admin/color-management',
+            icon: <PaletteIcon />
+          },
+          {
+            permission: 'size:read',
+            label: 'Quản lý kích thước',
+            path: '/admin/size-management',
+            icon: <StraightenIcon />
+          }
+        ]
+      },
+      orderManagement: {
+        permissions: ['order:read', 'coupon:read', 'payment:read'],
+        label: 'Quản lý đơn hàng',
+        icon: <ReceiptLongIcon />,
+        children: [
+          {
+            permission: 'order:read',
+            label: 'Quản lý đơn hàng',
+            path: '/admin/order-management',
+            icon: <ReceiptLongIcon />
+          },
+          {
+            permission: 'coupon:read',
+            label: 'Quản lý mã giảm giá',
+            path: '/admin/discount-management',
+            icon: <LocalOfferIcon />
+          },
+          {
+            permission: 'payment:read',
+            label: 'Quản lý giao dịch',
+            path: '/admin/transaction-management',
+            icon: <PaymentIcon />
+          }
+        ]
+      },
+      inventoryManagement: {
+        permissions: [
+          'inventory:read',
+          'warehouse:read',
+          'warehouseSlip:read',
+          'inventoryLog:read',
+          'batch:read',
+          'partner:read'
+        ],
+        label: 'Quản lý kho',
+        icon: <WarehouseIcon />,
+        children: [
+          {
+            permission: 'statistics:read',
+            label: 'Thống kê kho',
+            path: '/admin/warehouse-statistic-management',
+            icon: <ReceiptLongIcon />
+          },
+          {
+            permission: 'inventory:read',
+            label: 'Quản lý kho',
+            path: '/admin/inventory-management'
+          },
+          {
+            permission: 'warehouseSlip:read',
+            label: 'Quản lý xuất/nhập kho',
+            path: '/admin/warehouse-slips-management'
+          },
+          {
+            permission: 'inventoryLog:read',
+            label: 'Quản lý nhật ký kho',
+            path: '/admin/inventory-log-management'
+          },
+          {
+            permission: 'warehouse:read',
+            label: 'Quản lý kho hàng',
+            path: '/admin/warehouses-management'
+          },
+          {
+            permission: 'batch:read',
+            label: 'Quản lý lô hàng',
+            path: '/admin/batches-management'
+          },
+          {
+            permission: 'partner:read',
+            label: 'Quản lý đối tác',
+            path: '/admin/partner-management'
+          }
+        ]
+      }
+    }),
+    []
+  )
 
-  // Kiểm tra xem user có quyền truy cập menu không
+  // Kiểm tra xem user có quyền truy cập menu không (sync function)
   const canAccessMenu = (menuItem) => {
+    // Chỉ kiểm tra quyền cụ thể, không dựa vào admin:access
+
+    // Kiểm tra quyền đơn lẻ
     if (menuItem.permission) {
-      return hasPermission(menuItem.permission)
+      const resource = menuItem.permission.split(':')[0]
+      // Kiểm tra các quyền: read, create, update, delete
+      const relatedPermissions = [
+        `${resource}:read`,
+        `${resource}:create`,
+        `${resource}:update`,
+        `${resource}:delete`
+      ]
+      return hasAnyPermission(relatedPermissions)
     }
+
+    // Kiểm tra danh sách quyền
     if (menuItem.permissions) {
-      return hasAnyPermission(menuItem.permissions)
+      // Tạo danh sách tất cả quyền liên quan từ các resource
+      const allRelatedPermissions = []
+      menuItem.permissions.forEach((permission) => {
+        const resource = permission.split(':')[0]
+        allRelatedPermissions.push(
+          `${resource}:read`,
+          `${resource}:create`,
+          `${resource}:update`,
+          `${resource}:delete`
+        )
+      })
+      return hasAnyPermission(allRelatedPermissions)
     }
+
     return false
   }
 
-  // Lọc children dựa trên quyền
-  const getVisibleChildren = (children) => {
-    return children.filter((child) => canAccessMenu(child))
-  }
+  // Lọc children dựa trên quyền (memoized)
+  const getVisibleChildren = useMemo(() => {
+    return (children) => {
+      if (!isInitialized) return []
+      return children.filter((child) => canAccessMenu(child))
+    }
+  }, [isInitialized, hasPermission, hasAnyPermission])
+
   const profileName = profile?.name || 'Không có dữ liệu'
+
+  // Hiển thị loading khi đang tải permissions
+  if (isLoading || !isInitialized) {
+    return (
+      <Box
+        sx={{
+          width: open ? 270 : 80,
+          height: '100vh',
+          backgroundColor: 'white',
+          boxShadow: 3,
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          zIndex: 1200,
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center'
+        }}
+      >
+        <CircularProgress />
+        <Typography sx={{ mt: 2 }}>Đang tải quyền...</Typography>
+      </Box>
+    )
+  }
 
   if (!open) {
     return (
@@ -279,6 +343,8 @@ export default function AdminDrawer({
           {canAccessMenu(menuConfig.statistics) && (
             <ListItem disablePadding sx={{ height: 48 }}>
               <ListItemButton
+                component={Link}
+                to='/admin'
                 selected={isActive('/admin')}
                 sx={{ padding: '12px 24px', ...activeButtonStyle }}
               >
@@ -291,6 +357,8 @@ export default function AdminDrawer({
           {canAccessMenu(menuConfig.userManagement) && (
             <ListItem disablePadding sx={{ height: 48 }}>
               <ListItemButton
+                component={Link}
+                to='/admin/user-management'
                 selected={isActive('/admin/user-management')}
                 sx={{ padding: '12px 24px', ...activeButtonStyle }}
               >
@@ -327,7 +395,7 @@ export default function AdminDrawer({
           {canAccessMenu(menuConfig.inventoryManagement) && (
             <ListItem disablePadding sx={{ height: 48 }}>
               <ListItemButton
-                selected={isActive('/admin/inventory-management')}
+                onClick={toggleInventory}
                 sx={{ padding: '12px 24px', ...activeButtonStyle }}
               >
                 <ListItemIcon>
@@ -342,6 +410,7 @@ export default function AdminDrawer({
           <List sx={{ flexGrow: 1, p: 0 }}>
             <ListItem disablePadding sx={{ height: 48 }}>
               <ListItemButton
+                onClick={handleLogout}
                 sx={{ padding: '12px 24px', ...activeButtonStyle }}
               >
                 <ListItemIcon>
@@ -416,41 +485,35 @@ export default function AdminDrawer({
       >
         <List sx={{ flexGrow: 1, pt: 0 }}>
           {canAccessMenu(menuConfig.statistics) && (
-            <Link
-              to='/admin'
-              style={{ textDecoration: 'none', color: 'inherit' }}
-            >
-              <ListItem disablePadding>
-                <ListItemButton
-                  selected={isActive('/admin')}
-                  sx={activeButtonStyle}
-                >
-                  <ListItemIcon>
-                    <PollIcon />
-                  </ListItemIcon>
-                  <ListItemText primary='Thống kê' />
-                </ListItemButton>
-              </ListItem>
-            </Link>
+            <ListItem disablePadding>
+              <ListItemButton
+                component={Link}
+                to='/admin'
+                selected={isActive('/admin')}
+                sx={activeButtonStyle}
+              >
+                <ListItemIcon>
+                  <PollIcon />
+                </ListItemIcon>
+                <ListItemText primary='Thống kê' />
+              </ListItemButton>
+            </ListItem>
           )}
 
           {canAccessMenu(menuConfig.userManagement) && (
-            <Link
-              to='/admin/user-management'
-              style={{ textDecoration: 'none', color: 'inherit' }}
-            >
-              <ListItem disablePadding>
-                <ListItemButton
-                  selected={isActive('/admin/user-management')}
-                  sx={activeButtonStyle}
-                >
-                  <ListItemIcon>
-                    <PersonIcon />
-                  </ListItemIcon>
-                  <ListItemText primary='Quản lý người dùng' />
-                </ListItemButton>
-              </ListItem>
-            </Link>
+            <ListItem disablePadding>
+              <ListItemButton
+                component={Link}
+                to='/admin/user-management'
+                selected={isActive('/admin/user-management')}
+                sx={activeButtonStyle}
+              >
+                <ListItemIcon>
+                  <PersonIcon />
+                </ListItemIcon>
+                <ListItemText primary='Quản lý người dùng' />
+              </ListItemButton>
+            </ListItem>
           )}
           <Link
             to='/admin/marketing-management'
@@ -484,18 +547,15 @@ export default function AdminDrawer({
                   {getVisibleChildren(
                     menuConfig.productManagement.children
                   ).map((item) => (
-                    <Link
+                    <ListItemButton
                       key={item.path}
+                      component={Link}
                       to={item.path}
-                      style={{ textDecoration: 'none', color: 'inherit' }}
+                      selected={isActive(item.path)}
+                      sx={{ pl: 2, ...activeButtonStyle }}
                     >
-                      <ListItemButton
-                        selected={isActive(item.path)}
-                        sx={{ pl: 2, ...activeButtonStyle }}
-                      >
-                        <ListItemText primary={item.label} sx={{ ml: 7 }} />
-                      </ListItemButton>
-                    </Link>
+                      <ListItemText primary={item.label} sx={{ ml: 7 }} />
+                    </ListItemButton>
                   ))}
                 </List>
               </Collapse>
@@ -517,18 +577,15 @@ export default function AdminDrawer({
                 <List component='div' disablePadding>
                   {getVisibleChildren(menuConfig.orderManagement.children).map(
                     (item) => (
-                      <Link
+                      <ListItemButton
                         key={item.path}
+                        component={Link}
                         to={item.path}
-                        style={{ textDecoration: 'none', color: 'inherit' }}
+                        selected={isActive(item.path)}
+                        sx={{ pl: 2, ...activeButtonStyle }}
                       >
-                        <ListItemButton
-                          selected={isActive(item.path)}
-                          sx={{ pl: 2, ...activeButtonStyle }}
-                        >
-                          <ListItemText primary={item.label} sx={{ ml: 7 }} />
-                        </ListItemButton>
-                      </Link>
+                        <ListItemText primary={item.label} sx={{ ml: 7 }} />
+                      </ListItemButton>
                     )
                   )}
                 </List>
@@ -555,18 +612,15 @@ export default function AdminDrawer({
                   {getVisibleChildren(
                     menuConfig.inventoryManagement.children
                   ).map((item) => (
-                    <Link
+                    <ListItemButton
                       key={item.path}
+                      component={Link}
                       to={item.path}
-                      style={{ textDecoration: 'none', color: 'inherit' }}
+                      selected={isActive(item.path)}
+                      sx={{ pl: 2, ...activeButtonStyle }}
                     >
-                      <ListItemButton
-                        selected={isActive(item.path)}
-                        sx={{ pl: 2, ...activeButtonStyle }}
-                      >
-                        <ListItemText primary={item.label} sx={{ ml: 7 }} />
-                      </ListItemButton>
-                    </Link>
+                      <ListItemText primary={item.label} sx={{ ml: 7 }} />
+                    </ListItemButton>
                   ))}
                 </List>
               </Collapse>

@@ -28,7 +28,7 @@ import ProductImages from '../component/ProductImageUploader'
 import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css'
 import 'draft-js/dist/Draft.css'
 import { CloudinaryColor, CloudinaryProduct, URI } from '~/utils/constants'
-
+import ProductDescriptionEditor from '../component/ProductDescriptionEditor.jsx'
 const uploadToCloudinary = async (file, folder = CloudinaryColor) => {
   const formData = new FormData()
   formData.append('file', file)
@@ -44,16 +44,6 @@ const uploadToCloudinary = async (file, folder = CloudinaryColor) => {
 
   const data = await res.json()
   return data.secure_url
-}
-
-const uploadImageFunction = async (file) => {
-  try {
-    const secureUrl = await uploadToCloudinary(file, CloudinaryProduct)
-    return { data: { link: secureUrl } }
-  } catch (error) {
-    console.error('Lỗi khi upload ảnh:', error)
-    return Promise.reject(error)
-  }
 }
 
 const AddProductModal = ({ open, onClose, onSuccess }) => {
@@ -87,7 +77,6 @@ const AddProductModal = ({ open, onClose, onSuccess }) => {
   const [productImagePreview, setProductImagePreview] = useState([])
   const [editorState, setEditorState] = useState(EditorState.createEmpty())
   const { categories, fetchCategories, loading, add } = useCategories()
-
   useEffect(() => {
     if (open) {
       fetchCategories()
@@ -98,41 +87,15 @@ const AddProductModal = ({ open, onClose, onSuccess }) => {
     }
   }, [open, reset])
 
-  // const onSubmit = async (data) => {
-  //   try {
-  //     if (productImages.length === 0) {
-  //       console.log('Vui lòng thêm ít nhất một ảnh sản phẩm')
-  //       return
-  //     }
-  //
-  //     const finalProduct = {
-  //       name: data.name,
-  //       description: data.description,
-  //       exportPrice: Number(data.price),
-  //       importPrice: data.importPrice ? Number(data.importPrice) : undefined,
-  //       categoryId: data.categoryId,
-  //       image: productImages,
-  //       packageSize: {
-  //         length: Number(data.packageSize?.length || 0),
-  //         width: Number(data.packageSize?.width || 0),
-  //         height: Number(data.packageSize?.height || 0),
-  //         weight: Number(data.packageSize?.weight || 0)
-  //       }
-  //     }
-  //
-  //     await onSuccess(finalProduct, 'add')
-  //
-  //     onClose()
-  //     reset()
-  //     setProductImages([])
-  //     setProductImagePreview([])
-  //     setEditorState(EditorState.createEmpty())
-  //   } catch (error) {
-  //     console.error('Lỗi khi thêm sản phẩm:', error)
-  //     alert('Có lỗi xảy ra, vui lòng thử lại')
-  //   }
-  // }
-
+  const uploadImageFunction = async (file) => {
+    try {
+      const secureUrl = await uploadToCloudinary(file, CloudinaryProduct)
+      return { data: { link: secureUrl } }
+    } catch (error) {
+      console.error('Lỗi khi upload ảnh:', error)
+      return Promise.reject(error)
+    }
+  }
   const handAddCategory = async (category) => {
     const newCategory = await add(category) // category trả về từ add()
 
@@ -459,86 +422,10 @@ const AddProductModal = ({ open, onClose, onSuccess }) => {
           </Grid>
           {/*Mô tả*/}
           <Grid item size={12}>
-            <Controller
-              name='description'
+            <ProductDescriptionEditor
               control={control}
-              defaultValue=''
-              render={({ field }) => (
-                <>
-                  <label
-                    style={{
-                      fontWeight: 500,
-                      marginBottom: 8,
-                      display: 'block'
-                    }}
-                  >
-                    Mô tả sản phẩm
-                  </label>
-                  <Editor
-                    editorState={editorState}
-                    onEditorStateChange={(newState) => {
-                      setEditorState(newState)
-                      const content = draftToHtml(
-                        convertToRaw(newState.getCurrentContent())
-                      )
-                      field.onChange(content)
-                    }}
-                    wrapperClassName='editor-wrapper'
-                    editorClassName='editor-content'
-                    toolbar={{
-                      options: [
-                        'inline',
-                        'fontSize',
-                        'fontFamily',
-                        'list',
-                        'link',
-                        'image'
-                      ],
-                      inline: {
-                        options: [
-                          'bold',
-                          'italic',
-                          'underline',
-                          'strikethrough'
-                        ]
-                      },
-                      fontSize: {
-                        options: [
-                          8, 9, 10, 11, 12, 14, 16, 18, 24, 30, 36, 48, 60
-                        ]
-                      },
-                      fontFamily: {
-                        options: [
-                          'Arial',
-                          'Georgia',
-                          'Impact',
-                          'Tahoma',
-                          'Times New Roman',
-                          'Verdana'
-                        ]
-                      },
-                      image: {
-                        uploadCallback: uploadImageFunction,
-                        previewImage: false, // Tắt preview
-                        alt: { present: false }, // Không yêu cầu ALT
-                        urlEnabled: false, // Ẩn URL input
-                        inputAccept: 'image/*',
-                        defaultSize: {
-                          height: 'auto',
-                          width: '100%'
-                        }
-                      }
-                    }}
-                    editorStyle={{
-                      minHeight: '150px',
-                      border: '1px solid #ccc',
-                      padding: '10px',
-                      borderRadius: '4px',
-                      backgroundColor: '#fff'
-                    }}
-                  />
-                </>
-              )}
+              setValue={setValue}
+              initialHtml={''}
             />
           </Grid>
           {/*Trạng thái sản phẩm*/}

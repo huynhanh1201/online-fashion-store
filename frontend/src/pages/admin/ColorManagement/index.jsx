@@ -8,7 +8,6 @@ import ColorPagination from './ColorPagination'
 import useColors from '~/hooks/admin/useColor'
 import usePermissions from '~/hooks/usePermissions'
 import { PermissionWrapper, RouteGuard } from '~/components/PermissionGuard'
-import { updateColor, deleteColor } from '~/services/admin/ColorService'
 
 // Lazy load các modal
 const AddColorModal = React.lazy(() => import('./modal/AddColorModal'))
@@ -55,37 +54,6 @@ const ColorManagement = () => {
 
   const handleChangePage = (event, value) => setPage(value)
 
-  // const handleSaveColor = async (colorId, updatedData) => {
-  //   try {
-  //     const response = await updateColor(colorId, updatedData)
-  //     if (response) {
-  //       const updatedColor = await getColorId(colorId)
-  //       if (updatedColor) {
-  //         saveColor(updatedColor)
-  //       }
-  //     } else {
-  //       console.log('Cập nhật không thành công')
-  //     }
-  //   } catch (error) {
-  //     console.error('Lỗi:', error)
-  //   }
-  // }
-  //
-  // const handleDeleteColor = async (colorId) => {
-  //   try {
-  //     const result = await deleteColor(colorId)
-  //     if (result) {
-  //       const deletedColor = await getColorId(colorId)
-  //       if (deletedColor) {
-  //         saveColor(deletedColor)
-  //       }
-  //     } else {
-  //       console.log('Xoá không thành công')
-  //     }
-  //   } catch (error) {
-  //     console.error('Lỗi:', error)
-  //   }
-  // }
   const handleSave = async (data, type, id) => {
     try {
       if (type === 'add') {
@@ -136,7 +104,11 @@ const ColorManagement = () => {
       <React.Suspense fallback={<></>}>
         <PermissionWrapper requiredPermissions={['color:create']}>
           {modalType === 'add' && (
-            <AddColorModal open onClose={handleCloseModal} onAdded={handleSave} />
+            <AddColorModal
+              open
+              onClose={handleCloseModal}
+              onAdded={handleSave}
+            />
           )}
         </PermissionWrapper>
 
