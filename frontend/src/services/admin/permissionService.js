@@ -1,10 +1,10 @@
 import AuthorizedAxiosInstance from '~/utils/authorizedAxios.js'
 import { API_ROOT } from '~/utils/constants.js'
 
-export const getPermissions = async (page, limit) => {
+export const getPermissions = async (page = 1, limit = 10000) => {
   try {
     const response = await AuthorizedAxiosInstance.get(
-      `${API_ROOT}/v1/permissions?page=${page}&limit=${limit}&sort=newest`
+      `${API_ROOT}/v1/permissions?page=${page}&limit=${limit}`
     )
     return {
       data: response.data.data,
