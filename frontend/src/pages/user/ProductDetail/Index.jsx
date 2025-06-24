@@ -52,7 +52,6 @@ const ProductDetail = () => {
     formatCurrencyShort,
     inventory
   } = useProductDetail(productId)
-
   const selectedColorObj = availableColors?.find(
     (color) => color.name === selectedColor
   )

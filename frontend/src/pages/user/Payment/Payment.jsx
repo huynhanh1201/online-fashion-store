@@ -35,6 +35,8 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import CouponItem from '~/components/Coupon/CouponItem'
 import { getDiscounts } from '~/services/discountService'
 import { optimizeCloudinaryUrl } from '~/utils/cloudinary'
+import AuthorizedAxiosInstance from '~/utils/authorizedAxios.js'
+import { API_ROOT } from '~/utils/constants.js'
 
 // Styled Components
 const StyledContainer = styled(Container)(({ theme }) => ({
@@ -248,8 +250,8 @@ const PriceRow = styled(Box)(({ theme, isTotal }) => ({
   borderBottom: isTotal ? 'none' : '1px solid #f0f0f0',
 }))
 
-const ProductItem = ({ name, price, quantity, image, color, size }) => {
-  if (!name || typeof price !== 'number' || typeof quantity !== 'number') {
+const ProductItem = ({ name, variant, quantity, image, color, size, getFinalPrice }) => {
+  if (!name || typeof quantity !== 'number') {
     return (
       <tr>
         <td colSpan={3} style={{ color: 'red', padding: 16, textAlign: 'center' }}>
@@ -260,6 +262,8 @@ const ProductItem = ({ name, price, quantity, image, color, size }) => {
   }
 
   const truncatedName = name.length > 20 ? name.slice(0, 20) + '...' : name
+  const finalPrice = getFinalPrice(variant)
+  const hasDiscount = variant.discountPrice && variant.discountPrice > 0
 
   return (
     <tr>
@@ -281,7 +285,7 @@ const ProductItem = ({ name, price, quantity, image, color, size }) => {
             <Typography fontWeight={600} sx={{ mb: 0.5 }}>
               {truncatedName}
             </Typography>
-            <Box sx={{ display: 'flex', gap: 1 }}>
+            <Box sx={{ display: 'flex', gap: 1, mb: 1 }}>
               <Chip
                 label={color || 'Chưa chọn màu'}
                 size="small"
@@ -302,12 +306,26 @@ const ProductItem = ({ name, price, quantity, image, color, size }) => {
         <Typography fontWeight={600} sx={{ mb: 0.5 }}>
           {quantity}
         </Typography>
-
       </td>
       <td style={{ textAlign: 'right' }}>
-        <Typography fontWeight={600} color="#1A3C7B">
-          {(price * quantity).toLocaleString('vi-VN')}đ
-        </Typography>
+        <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 0.5 }}>
+          <Typography fontWeight={600} color="#1A3C7B" sx={{ fontSize: '1rem' }}>
+            {(finalPrice * quantity).toLocaleString('vi-VN')}đ
+          </Typography>
+          {hasDiscount && (
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, flexWrap: 'wrap', justifyContent: 'flex-end' }}>
+              <Typography
+                sx={{
+                  fontSize: '1rem',
+                  color: 'text.secondary',
+                  textDecoration: 'line-through',
+                }}
+              >
+                {(variant.exportPrice * quantity).toLocaleString('vi-VN')}đ
+              </Typography>
+            </Box>
+          )}
+        </Box>
       </td>
     </tr>
   )
@@ -347,8 +365,16 @@ const Payment = () => {
   const [shippingPrice, setShippingPrice] = useState(0)
   const [shippingPriceLoading, setShippingPriceLoading] = useState(false)
 
+  // Helper function to get final price (exportPrice minus discountPrice)
+  const getFinalPrice = (variant) => {
+    const basePrice = variant.exportPrice || 0
+    const discount = variant.discountPrice || 0
+    return Math.max(basePrice - discount, 0) // Đảm bảo giá không âm
+  }
+
   // Tính selectedCartItems + subTotal
   let subTotal = 0
+  let totalSavings = 0
   const selectedCartItems = cartItems
     .filter(item => {
       if (isBuyNow) return true
@@ -365,9 +391,16 @@ const Payment = () => {
     .map(item => {
       const variant = item.variantId || {}
       const variantId = String(variant._id || item.variantId)
-      const price = typeof variant.exportPrice === 'number' ? variant.exportPrice : 0
+      const finalPrice = getFinalPrice(variant)
       const quantity = typeof item.quantity === 'number' ? item.quantity : 1
-      subTotal += price * quantity
+
+      subTotal += finalPrice * quantity
+
+      // Tính tiết kiệm được
+      if (variant.discountPrice && variant.discountPrice > 0) {
+        totalSavings += variant.discountPrice * quantity
+      }
+
       return { variantId, color: item.color, size: item.size, quantity }
     })
 
@@ -389,31 +422,18 @@ const Payment = () => {
     try {
       setShippingPriceLoading(true)
 
-      // Tạo payload theo format mới
       const payload = {
         cartItems: items.map(item => ({
           variantId: item.variantId,
-          quantity: item.quantity
+          quantity: item.quantity,
         })),
         to_district_id: parseInt(address.districtId, 10),
-        to_ward_code: address.wardId
+        to_ward_code: address.wardId,
       }
 
-      console.log('fetchShippingPrice payload:', payload)
+      const response = await AuthorizedAxiosInstance.post(`${API_ROOT}/v1/deliveries/calculate-fee`, payload)
 
-      const response = await fetch('http://localhost:8017/v1/deliveries/calculate-fee', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(payload),
-      })
-
-      if (!response.ok) {
-        throw new Error(`Lỗi từ API: ${response.status} - ${response.statusText}`)
-      }
-
-      const data = await response.json()
+      const data = response.data  // Axios tự parse JSON
       console.log('fetchShippingPrice response:', data)
 
       const fee = data?.totalFeeShipping
@@ -434,6 +454,7 @@ const Payment = () => {
       setShippingPriceLoading(false)
     }
   }
+
 
   // Debug Redux state
   useEffect(() => {
@@ -949,11 +970,12 @@ const Payment = () => {
                               <ProductItem
                                 key={index}
                                 name={variant.name || 'Sản phẩm không tên'}
-                                price={variant.exportPrice || 0}
+                                variant={variant}
                                 quantity={item.quantity || 1}
                                 image={variant.color?.image}
                                 color={variant.color?.name}
                                 size={variant.size?.name}
+                                getFinalPrice={getFinalPrice}
                               />
                             )
                           })}
@@ -1074,6 +1096,31 @@ const Payment = () => {
                       {subTotal.toLocaleString('vi-VN')}đ
                     </Typography>
                   </PriceRow>
+
+                  {totalSavings > 0 && (
+                    <PriceRow>
+                      <Typography
+                        variant="body2"
+                        sx={{
+                          color: '#4caf50',
+                          fontSize: '0.9rem',
+                          fontStyle: 'italic'
+                        }}
+                      >
+                        Tiết kiệm được:
+                      </Typography>
+                      <Typography
+                        variant="body2"
+                        sx={{
+                          fontWeight: 600,
+                          color: '#4caf50',
+                          fontSize: '0.9rem'
+                        }}
+                      >
+                        {totalSavings.toLocaleString('vi-VN')}đ
+                      </Typography>
+                    </PriceRow>
+                  )}
 
                   <PriceRow>
                     <Typography>Phí vận chuyển:</Typography>

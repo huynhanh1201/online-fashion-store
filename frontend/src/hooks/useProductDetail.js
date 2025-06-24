@@ -6,6 +6,8 @@ import { getDiscounts } from '~/services/discountService'
 import { addToCart, getCart } from '~/services/cartService'
 import { getProductVariants } from '~/services/variantService'
 import { setCartItems, setTempCart } from '~/redux/cart/cartSlice'
+import AuthorizedAxiosInstance from '~/utils/authorizedAxios.js'
+import { API_ROOT } from '~/utils/constants.js'
 
 const useProductDetail = (productId) => {
   const [product, setProduct] = useState(null)
@@ -232,10 +234,9 @@ const useProductDetail = (productId) => {
 
   const fetchInventory = async (variantId) => {
     try {
-      const response = await fetch(`http://localhost:8017/v1/inventories?variantId=${variantId}`)
-      if (!response.ok) throw new Error(`Lỗi HTTP ${response.status}`)
-      const result = await response.json()
-      const inventoryList = result.data
+      const response = await AuthorizedAxiosInstance.get(`${API_ROOT}/v1/inventories?variantId=${variantId}`)
+      const result = response.data
+      const inventoryList = result.data || []
       const inventory = Array.isArray(inventoryList) ? inventoryList[0] : inventoryList
       setInventory(inventory)
       console.log('Thông tin kho:', inventory)

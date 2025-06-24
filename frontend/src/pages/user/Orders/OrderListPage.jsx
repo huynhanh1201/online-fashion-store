@@ -45,9 +45,9 @@ import { optimizeCloudinaryUrl } from '~/utils/cloudinary'
 // Define status labels with icons and colors
 const statusLabels = {
   All: ['Tất cả', 'default', <ShoppingBag key="all" />],
-  Pending: ['Đang chờ', 'warning', <ScheduleIcon key="pending" />],
   Processing: ['Đang xử lý', 'info', <Sync key="processing" />],
   Shipped: ['Đã gửi hàng', 'primary', <LocalShipping key="shipped" />],
+  Shipping: ['Đang giao hàng', 'primary', <LocalShipping key="shipping" />],
   Delivered: ['Đã giao', 'success', <CheckCircle key="delivered" />],
   Cancelled: ['Đã hủy', 'error', <Cancel key="cancelled" />],
   Failed: ['Thanh toán thất bại', 'error', <Cancel key="failed" />]
