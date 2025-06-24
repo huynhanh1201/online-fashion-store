@@ -65,6 +65,7 @@ const EditVariantModal = ({
       overridePrice: false,
       overridePackageSize: false,
       colorImage: '',
+      discountPrice: '',
       status: 'draft',
       packageSize: {
         length: '',
@@ -89,6 +90,7 @@ const EditVariantModal = ({
         overridePackageSize: variant.overridePackageSize || false,
         colorImage: variant.color?.image || '',
         status: variant.status || 'draft',
+        discountPrice: variant.discountPrice || 0,
         packageSize: {
           length: variant.packageSize?.length || '',
           width: variant.packageSize?.width || '',
@@ -118,6 +120,7 @@ const EditVariantModal = ({
         exportPrice: Number(data.exportPrice),
         overridePrice: data.overridePrice,
         overridePackageSize: data.overridePackageSize,
+        discountPrice: Number(data.discountPrice) || 0,
         color: {
           image: data.colorImage
         },
@@ -261,20 +264,43 @@ const EditVariantModal = ({
               InputProps={{ readOnly: true }}
               disabled
             />
-            <TextField
-              label='Màu sắc'
-              value={variant?.color?.name || '---'}
-              fullWidth
-              InputProps={{ readOnly: true }}
-              disabled
-            />
+            <Box sx={{ display: 'flex', gap: 2 }}>
+              <TextField
+                label='Màu sắc'
+                value={variant?.color?.name || '---'}
+                fullWidth
+                InputProps={{ readOnly: true }}
+                disabled
+              />
 
-            <TextField
-              label='Kích thước'
-              value={variant?.size?.name || '---'}
-              fullWidth
-              InputProps={{ readOnly: true }}
-              disabled
+              <TextField
+                label='Kích thước'
+                value={variant?.size?.name || '---'}
+                fullWidth
+                InputProps={{ readOnly: true }}
+                disabled
+              />
+            </Box>
+            <Controller
+              name='discountPrice'
+              control={control}
+              rules={{
+                validate: (val) =>
+                  Number(val) >= 0 ? true : 'Giá giảm không được âm'
+              }}
+              render={({ field }) => (
+                <TextField
+                  label='Giá giảm cho biến thể (đ)'
+                  type='text'
+                  fullWidth
+                  value={formatCurrency(field.value)}
+                  onChange={(e) =>
+                    field.onChange(parseCurrency(e.target.value))
+                  }
+                  error={!!errors.discountPrice}
+                  helperText={errors.discountPrice?.message}
+                />
+              )}
             />
 
             <Box

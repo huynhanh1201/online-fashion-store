@@ -444,8 +444,18 @@ const ViewBlogModal = ({ open, onClose, blog, isMobile }) => {
       open={open}
       onClose={onClose}
       fullWidth
-      maxWidth='md'
+      maxWidth='xl'
       fullScreen={isMobile}
+      sx={{
+        mt: '64px',
+        '& .MuiDialog-container': { alignItems: 'end' },
+        '& .MuiDialog-paper': {
+          maxHeight: '96%',
+          height: '96%',
+          mt: 0,
+          mb: 2.4
+        }
+      }}
       PaperProps={{
         sx: {
           borderRadius: isMobile ? 0 : 2,
@@ -477,7 +487,7 @@ const ViewBlogModal = ({ open, onClose, blog, isMobile }) => {
       >
         {/* Tiêu đề và mô tả ngắn */}
         <Box mb={2}>
-          <Typography variant='h5' gutterBottom>
+          <Typography variant='h5' gutterBottom fontWeight='900'>
             {blog?.title}
           </Typography>
           <Typography color='text.secondary'>{blog?.excerpt}</Typography>
@@ -490,12 +500,13 @@ const ViewBlogModal = ({ open, onClose, blog, isMobile }) => {
               component='img'
               image={blog?.coverImage}
               alt='cover'
-              height='300'
-              sx={{ objectFit: 'cover' }}
+              height='100%'
+              sx={{ objectFit: 'contain' }}
             />
           </Card>
         )}
 
+        
         {/* Tác giả */}
         <Box display='flex' alignItems='center' gap={2} mb={2}>
           <Avatar src={blog?.author?.avatar} />
@@ -506,23 +517,6 @@ const ViewBlogModal = ({ open, onClose, blog, isMobile }) => {
             </Typography>
           </Box>
         </Box>
-
-        {/* Nội dung */}
-        <Card sx={{ p: 2, mb: 2 }}>
-          <Typography fontWeight={600} gutterBottom>
-            Nội dung bài viết
-          </Typography>
-          <Box
-            sx={{
-              '& img': { maxWidth: '100%', height: 'auto' },
-              '& p': { marginBottom: 1 }
-            }}
-            dangerouslySetInnerHTML={{
-              __html: blog?.content || '<p>Không có nội dung</p>'
-            }}
-          />
-        </Card>
-
         {/* Tags */}
         <Box mb={2}>
           <Typography fontWeight={600}>Thẻ (tags):</Typography>
@@ -542,27 +536,6 @@ const ViewBlogModal = ({ open, onClose, blog, isMobile }) => {
             </Typography>
           )}
         </Box>
-
-        {/* Ảnh bổ sung */}
-        {blog?.images && blog?.images.length > 0 && (
-          <Box mb={2}>
-            <Typography fontWeight={600} gutterBottom>
-              Thư viện ảnh
-            </Typography>
-            <Box sx={{ display: 'flex', gap: 1.5, flexWrap: 'wrap' }}>
-              {blog?.images.map((img, i) => (
-                <Card key={i} sx={{ width: 120 }}>
-                  <CardMedia
-                    component='img'
-                    image={img}
-                    alt={`Ảnh ${i + 1}`}
-                    height='100'
-                  />
-                </Card>
-              ))}
-            </Box>
-          </Box>
-        )}
 
         {/* Thông tin thêm */}
         <Box mb={3}>
@@ -586,6 +559,33 @@ const ViewBlogModal = ({ open, onClose, blog, isMobile }) => {
               <TableRow>
                 <TableCell sx={{ width: 400, fontWeight: 700 }}>Slug</TableCell>
                 <TableCell>{blog?.slug || 'Không có'}</TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell sx={{ width: 400, fontWeight: 700 }}>
+                  Trạng thái
+                </TableCell>
+                <TableCell>
+                  {blog?.status && (
+                    <Chip
+                      label={
+                        blog.status === 'draft'
+                          ? 'Bản nháp'
+                          : blog.status === 'published'
+                            ? 'Đã xuất bản'
+                            : 'Đã lưu trữ'
+                      }
+                      color={
+                        blog.status === 'draft'
+                          ? 'default'
+                          : blog.status === 'published'
+                            ? 'success'
+                            : 'error'
+                      }
+                      size='large'
+                      sx={{ width: '127px', fontWeight: '800' }}
+                    />
+                  )}
+                </TableCell>
               </TableRow>
               <TableRow>
                 <TableCell sx={{ width: 400, fontWeight: 700 }}>
@@ -635,18 +635,21 @@ const ViewBlogModal = ({ open, onClose, blog, isMobile }) => {
             </TableBody>
           </Table>
         </Box>
-
-        {/* Trạng thái */}
-        <Box mb={1}>
-          <Typography fontWeight={600} sx={{ mb: 2 }}>
-            Trạng thái:
+        {/* Nội dung */}
+        <Card sx={{ p: 2, mb: 2 }}>
+          <Typography fontWeight={600} gutterBottom>
+            Nội dung bài viết
           </Typography>
-          <Chip
-            label={getStatusLabel(blog?.status)}
-            color={getStatusColor(blog?.status)}
-            sx={{ mr: 1 }}
+          <Box
+            sx={{
+              '& img': { maxWidth: '100%', height: 'auto' },
+              '& p': { marginBottom: 1 }
+            }}
+            dangerouslySetInnerHTML={{
+              __html: blog?.content || '<p>Không có nội dung</p>'
+            }}
           />
-        </Box>
+        </Card>
       </DialogContent>
     </Dialog>
   )

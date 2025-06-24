@@ -35,7 +35,7 @@ import {
 } from '@mui/icons-material'
 import { useForm, Controller } from 'react-hook-form'
 import { toast } from 'react-toastify'
-import ProductDescriptionEditor from '~/pages/admin/ProductManagement/component/ProductDescriptionEditor.jsx'
+import BlogDescriptionEditor from '~/pages/admin/BlogManagement/modal/Desc.jsx'
 import { CloudinaryColor, CloudinaryProduct, URI } from '~/utils/constants'
 import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css'
 import 'draft-js/dist/Draft.css'
@@ -92,7 +92,6 @@ const BlogModal = ({
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
   const isEditMode = mode === 'edit' && blogData
-
   const {
     register,
     handleSubmit,
@@ -255,6 +254,14 @@ const BlogModal = ({
       setUploadingIndex(null)
     }
   }
+  const handleImageInsertFromEditor = (url) => {
+    // Chỉ thêm nếu ảnh chưa có trong imageUrls
+    setImageUrls((prev) => {
+      const trimmed = prev.map((u) => u.trim())
+      if (!trimmed.includes(url)) return [...trimmed.filter((u) => u), url, '']
+      return [...trimmed, '']
+    })
+  }
 
   const onSubmit = (data) => {
     const blogPayload = {
@@ -293,6 +300,16 @@ const BlogModal = ({
       fullWidth
       maxWidth={isMobile ? 'sm' : 'xl'}
       fullScreen={isMobile}
+      sx={{
+        mt: '64px',
+        '& .MuiDialog-container': { alignItems: 'end' },
+        '& .MuiDialog-paper': {
+          maxHeight: '96%',
+          height: '96%',
+          mt: 0,
+          mb: 2.4
+        }
+      }}
       PaperProps={{
         sx: {
           borderRadius: isMobile ? 0 : '12px',
@@ -795,8 +812,8 @@ const BlogModal = ({
                           alt='Ảnh bìa'
                           style={{
                             width: '100%',
-                            maxHeight: isMobile ? 150 : 200,
-                            objectFit: 'contain',
+                            maxHeight: isMobile ? 150 : 365,
+                            objectFit: 'cover',
                             borderRadius: 8
                           }}
                           onError={(e) => (e.target.style.display = 'none')}
@@ -926,144 +943,144 @@ const BlogModal = ({
             </Box>
 
             {/* Section 4: Additional Images */}
-            <Paper
-              sx={{
-                p: isMobile ? 2 : 2.5,
-                borderRadius: '8px',
-                border: '1px solid #e8ecef',
-                boxShadow: '0 2px 8px rgba(0, 31, 93, 0.06)'
-              }}
-            >
-              <Typography
-                variant='subtitle1'
-                sx={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 1,
-                  color: '#1a202c',
-                  fontWeight: 600,
-                  mb: 2,
-                  fontSize: isMobile ? '1rem' : '1.1rem'
-                }}
-              >
-                <ImageIcon sx={{ color: '#0052cc', fontSize: 20 }} />
-                Ảnh bổ sung
-              </Typography>
+            {/*<Paper*/}
+            {/*  sx={{*/}
+            {/*    p: isMobile ? 2 : 2.5,*/}
+            {/*    borderRadius: '8px',*/}
+            {/*    border: '1px solid #e8ecef',*/}
+            {/*    boxShadow: '0 2px 8px rgba(0, 31, 93, 0.06)'*/}
+            {/*  }}*/}
+            {/*>*/}
+            {/*  <Typography*/}
+            {/*    variant='subtitle1'*/}
+            {/*    sx={{*/}
+            {/*      display: 'flex',*/}
+            {/*      alignItems: 'center',*/}
+            {/*      gap: 1,*/}
+            {/*      color: '#1a202c',*/}
+            {/*      fontWeight: 600,*/}
+            {/*      mb: 2,*/}
+            {/*      fontSize: isMobile ? '1rem' : '1.1rem'*/}
+            {/*    }}*/}
+            {/*  >*/}
+            {/*    <ImageIcon sx={{ color: '#0052cc', fontSize: 20 }} />*/}
+            {/*    Ảnh bổ sung*/}
+            {/*  </Typography>*/}
 
-              <Stack spacing={2}>
-                {imageUrls.map((url, index) => (
-                  <Box
-                    key={index}
-                    sx={{
-                      p: isMobile ? 1.5 : 2,
-                      backgroundColor: '#fafbff',
-                      border: '1px solid #e8f4fd',
-                      borderRadius: 2
-                    }}
-                  >
-                    <Box
-                      sx={{
-                        display: 'flex',
-                        flexDirection: isMobile ? 'column' : 'row',
-                        gap: 1.5,
-                        alignItems: 'flex-start'
-                      }}
-                    >
-                      <TextField
-                        label={`Ảnh ${index + 1}`}
-                        fullWidth
-                        value={url}
-                        onChange={(e) =>
-                          handleImageUrlChange(index, e.target.value)
-                        }
-                        variant='outlined'
-                        sx={{
-                          ...getInputStyles(theme),
-                          '& .MuiOutlinedInput-root': {
-                            ...getInputStyles(theme)[
-                              '& .MuiOutlinedInput-root'
-                            ],
-                            backgroundColor: 'white'
-                          }
-                        }}
-                      />
+            {/*  <Stack spacing={2}>*/}
+            {/*    {imageUrls.map((url, index) => (*/}
+            {/*      <Box*/}
+            {/*        key={index}*/}
+            {/*        sx={{*/}
+            {/*          p: isMobile ? 1.5 : 2,*/}
+            {/*          backgroundColor: '#fafbff',*/}
+            {/*          border: '1px solid #e8f4fd',*/}
+            {/*          borderRadius: 2*/}
+            {/*        }}*/}
+            {/*      >*/}
+            {/*        <Box*/}
+            {/*          sx={{*/}
+            {/*            display: 'flex',*/}
+            {/*            flexDirection: isMobile ? 'column' : 'row',*/}
+            {/*            gap: 1.5,*/}
+            {/*            alignItems: 'flex-start'*/}
+            {/*          }}*/}
+            {/*        >*/}
+            {/*          <TextField*/}
+            {/*            label={`Ảnh ${index + 1}`}*/}
+            {/*            fullWidth*/}
+            {/*            value={url}*/}
+            {/*            onChange={(e) =>*/}
+            {/*              handleImageUrlChange(index, e.target.value)*/}
+            {/*            }*/}
+            {/*            variant='outlined'*/}
+            {/*            sx={{*/}
+            {/*              ...getInputStyles(theme),*/}
+            {/*              '& .MuiOutlinedInput-root': {*/}
+            {/*                ...getInputStyles(theme)[*/}
+            {/*                  '& .MuiOutlinedInput-root'*/}
+            {/*                ],*/}
+            {/*                backgroundColor: 'white'*/}
+            {/*              }*/}
+            {/*            }}*/}
+            {/*          />*/}
 
-                      <Box
-                        sx={{
-                          display: 'flex',
-                          gap: 1,
-                          width: isMobile ? '100%' : 'auto'
-                        }}
-                      >
-                        <Button
-                          variant='contained'
-                          component='label'
-                          startIcon={
-                            uploadingIndex === index ? (
-                              <CircularProgress size={14} color='inherit' />
-                            ) : (
-                              <UploadIcon />
-                            )
-                          }
-                          disabled={uploadingIndex === index}
-                          sx={{
-                            minWidth: isMobile ? '50%' : '100px',
-                            height: '56px',
-                            borderRadius: 2,
-                            backgroundColor: '#0052cc',
-                            '&:hover': {
-                              backgroundColor: '#003d99'
-                            }
-                          }}
-                        >
-                          {uploadingIndex === index ? 'Tải...' : 'Upload'}
-                          <input
-                            type='file'
-                            hidden
-                            accept='image/*'
-                            onChange={(e) => handleImageUpload(e, index)}
-                          />
-                        </Button>
+            {/*          <Box*/}
+            {/*            sx={{*/}
+            {/*              display: 'flex',*/}
+            {/*              gap: 1,*/}
+            {/*              width: isMobile ? '100%' : 'auto'*/}
+            {/*            }}*/}
+            {/*          >*/}
+            {/*            <Button*/}
+            {/*              variant='contained'*/}
+            {/*              component='label'*/}
+            {/*              startIcon={*/}
+            {/*                uploadingIndex === index ? (*/}
+            {/*                  <CircularProgress size={14} color='inherit' />*/}
+            {/*                ) : (*/}
+            {/*                  <UploadIcon />*/}
+            {/*                )*/}
+            {/*              }*/}
+            {/*              disabled={uploadingIndex === index}*/}
+            {/*              sx={{*/}
+            {/*                minWidth: isMobile ? '50%' : '100px',*/}
+            {/*                height: '56px',*/}
+            {/*                borderRadius: 2,*/}
+            {/*                backgroundColor: '#0052cc',*/}
+            {/*                '&:hover': {*/}
+            {/*                  backgroundColor: '#003d99'*/}
+            {/*                }*/}
+            {/*              }}*/}
+            {/*            >*/}
+            {/*              {uploadingIndex === index ? 'Tải...' : 'Upload'}*/}
+            {/*              <input*/}
+            {/*                type='file'*/}
+            {/*                hidden*/}
+            {/*                accept='image/*'*/}
+            {/*                onChange={(e) => handleImageUpload(e, index)}*/}
+            {/*              />*/}
+            {/*            </Button>*/}
 
-                        <Button
-                          variant='outlined'
-                          color='error'
-                          onClick={() => handleRemoveImageUrl(index)}
-                          disabled={imageUrls.length === 1}
-                          sx={{
-                            minWidth: isMobile ? '50%' : '80px',
-                            height: '56px',
-                            borderRadius: 2
-                          }}
-                        >
-                          Xóa
-                        </Button>
-                      </Box>
-                    </Box>
-                  </Box>
-                ))}
+            {/*            <Button*/}
+            {/*              variant='outlined'*/}
+            {/*              color='error'*/}
+            {/*              onClick={() => handleRemoveImageUrl(index)}*/}
+            {/*              disabled={imageUrls.length === 1}*/}
+            {/*              sx={{*/}
+            {/*                minWidth: isMobile ? '50%' : '80px',*/}
+            {/*                height: '56px',*/}
+            {/*                borderRadius: 2*/}
+            {/*              }}*/}
+            {/*            >*/}
+            {/*              Xóa*/}
+            {/*            </Button>*/}
+            {/*          </Box>*/}
+            {/*        </Box>*/}
+            {/*      </Box>*/}
+            {/*    ))}*/}
 
-                <Button
-                  variant='outlined'
-                  startIcon={<ImageIcon />}
-                  onClick={handleAddImageUrl}
-                  sx={{
-                    py: 1.5,
-                    borderRadius: 2,
-                    borderColor: '#0052cc',
-                    color: '#0052cc',
-                    borderStyle: 'dashed',
-                    '&:hover': {
-                      borderColor: '#003d99',
-                      backgroundColor: '#f0f4ff',
-                      borderStyle: 'solid'
-                    }
-                  }}
-                >
-                  Thêm ảnh
-                </Button>
-              </Stack>
-            </Paper>
+            {/*    <Button*/}
+            {/*      variant='outlined'*/}
+            {/*      startIcon={<ImageIcon />}*/}
+            {/*      onClick={handleAddImageUrl}*/}
+            {/*      sx={{*/}
+            {/*        py: 1.5,*/}
+            {/*        borderRadius: 2,*/}
+            {/*        borderColor: '#0052cc',*/}
+            {/*        color: '#0052cc',*/}
+            {/*        borderStyle: 'dashed',*/}
+            {/*        '&:hover': {*/}
+            {/*          borderColor: '#003d99',*/}
+            {/*          backgroundColor: '#f0f4ff',*/}
+            {/*          borderStyle: 'solid'*/}
+            {/*        }*/}
+            {/*      }}*/}
+            {/*    >*/}
+            {/*      Thêm ảnh*/}
+            {/*    </Button>*/}
+            {/*  </Stack>*/}
+            {/*</Paper>*/}
 
             {/* Section 5: Content Editor */}
             <Paper
@@ -1098,10 +1115,12 @@ const BlogModal = ({
                   minHeight: isMobile ? '250px' : '300px'
                 }}
               >
-                <ProductDescriptionEditor
+                <BlogDescriptionEditor
                   control={control}
                   name='content'
                   setValue={setValue}
+                  initialHtml={blogData?.content || ''}
+                  onImageInsert={handleImageInsertFromEditor}
                 />
               </Box>
             </Paper>
