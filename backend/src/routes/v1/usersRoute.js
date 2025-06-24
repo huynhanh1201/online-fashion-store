@@ -30,16 +30,22 @@ Router.route('/password').patch(
 Router.route('/').get(authMiddleware.isAuthorized, usersController.getUserList)
 
 // Lấy thông tin một người dùng người dùng.
-Router.route('/:userId').get(usersValidation.verifyId, usersController.getUser)
+Router.route('/:userId').get(
+  authMiddleware.isAuthorized,
+  usersValidation.verifyId,
+  usersController.getUser
+)
 
 // Cập nhật thông tin user
 Router.route('/:userId').patch(
+  authMiddleware.isAuthorized,
   usersValidation.verifyId,
   usersController.updateUser
 )
 
 // Xoá tài khoản (Xóa mềm)
 Router.route('/:userId').delete(
+  authMiddleware.isAuthorized,
   usersValidation.verifyId,
   usersController.deleteUser
 )

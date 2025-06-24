@@ -8,21 +8,27 @@ const Router = express.Router()
 
 // Tạo Màu sắc sản phẩm mới
 Router.route('/').post(
+  authMiddleware.isAuthorized,
   permissionsValidation.permission,
   permissionsController.createPermission
 )
 
 // Danh sách Màu sắc sản phẩm
-Router.route('/').get(permissionsController.getPermissionList)
+Router.route('/').get(
+  authMiddleware.isAuthorized,
+  permissionsController.getPermissionList
+)
 
 // Lấy thông tin một Màu sắc sản phẩm.
 Router.route('/:permissionId').get(
+  authMiddleware.isAuthorized,
   permissionsValidation.verifyId,
   permissionsController.getPermission
 )
 
 // Cập nhật thông tin Màu sắc sản phẩm
 Router.route('/:permissionId').patch(
+  authMiddleware.isAuthorized,
   permissionsValidation.verifyId,
   permissionsValidation.permission,
   permissionsController.updatePermission
@@ -30,6 +36,7 @@ Router.route('/:permissionId').patch(
 
 // Xoá Màu sắc sản phẩm (Xóa mềm)
 Router.route('/:permissionId').delete(
+  authMiddleware.isAuthorized,
   permissionsValidation.verifyId,
   permissionsController.deletePermission
 )

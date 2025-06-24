@@ -4,10 +4,9 @@ import ApiError from '~/utils/ApiError'
 import { VariantModel } from '~/models/VariantModel'
 import { ProductModel } from '~/models/ProductModel'
 import generateSKU from '~/utils/generateSKU'
-import { InventoryModel } from '~/models/InventoryModel'
-import { CartModel } from '~/models/CartModel'
 import validatePagination from '~/utils/validatePagination'
 import getDateRange from '~/utils/getDateRange'
+import Joi from 'joi'
 
 const createVariant = async (reqBody) => {
   // eslint-disable-next-line no-useless-catch
@@ -59,7 +58,9 @@ const createVariant = async (reqBody) => {
         ? product.packageSize
         : reqBody.packageSize,
 
-      status: reqBody.status
+      status: reqBody.status,
+
+      discountPrice: reqBody.discountPrice || 0
     }
 
     const variants = await VariantModel.create(newVariant)

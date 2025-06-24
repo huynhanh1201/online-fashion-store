@@ -115,13 +115,31 @@ const createOrder = async (userId, reqBody, ipAddr, jwtDecoded) => {
       )
 
       // Xử lý tất cả promise song song
-      await Promise.all([
+      const [
+        warehouseSlip,
+        orderItems,
+        transaction,
+        cartItemsUpdated,
+        createDeliveryOrder
+      ] = await Promise.all([
         warehouseSlipPromise,
         orderItemsPromise,
         transactionPromise,
         cartItemPromise,
         createDeliveryOrderPromise
       ])
+
+      // Cập nhật mã ghnOrderCode
+      await OrderModel.findOneAndUpdate(
+        { _id: order._id },
+        {
+          ghnOrderCode: createDeliveryOrder?.data?.data?.order_code
+        },
+        {
+          new: true,
+          session: session
+        }
+      )
     } else {
       await PaymentSessionDraftModel.create(
         [
