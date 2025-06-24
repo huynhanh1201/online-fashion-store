@@ -20,9 +20,13 @@ const Slider = () => {
       setError('')
       const allBanners = await getBanners()
       // Filter banners with position 'hero' and visible = true
-      const heroBanners = allBanners.filter(banner => 
-        banner.position === 'hero' && banner.visible === true
-      )
+      const today = new Date().setHours(0,0,0,0)
+      const heroBanners = allBanners.filter(banner => {
+        if (banner.position !== 'hero' || banner.visible !== true) return false;
+        if (!banner.endDate) return true; // Nếu không có endDate thì luôn hiển thị
+        const end = new Date(banner.endDate).setHours(23,59,59,999)
+        return end >= today
+      })
       setBanners(heroBanners)
     } catch (err) {
       setError(err.message)

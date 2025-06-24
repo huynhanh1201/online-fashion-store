@@ -7,6 +7,8 @@ import CouponList from '~/pages/user/Home/CouponList/CouponList.jsx'
 import { Link } from 'react-router-dom'
 import ProductsCardNew from '~/pages/user/NewProducts/ProductsCardNew'
 import { getBanners } from '~/services/admin/webConfig/bannerService.js'
+import { getFeaturedCategories } from '~/services/admin/webConfig/featuredcategoryService.js'
+import { getServiceHighlights } from '~/services/admin/webConfig/highlightedService.js'
 import { optimizeCloudinaryUrl } from '~/utils/cloudinary.js'
 
 const Content = () => {
@@ -15,6 +17,10 @@ const Content = () => {
   const [error, setError] = useState(null)
   const [middleBanners, setMiddleBanners] = useState([])
   const [bannerLoading, setBannerLoading] = useState(true)
+  const [featuredCategories, setFeaturedCategories] = useState([])
+  const [featuredCategoriesLoading, setFeaturedCategoriesLoading] = useState(true)
+  const [serviceHighlights, setServiceHighlights] = useState([])
+  const [serviceHighlightsLoading, setServiceHighlightsLoading] = useState(true)
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -53,8 +59,40 @@ const Content = () => {
     fetchMiddleBanners()
   }, [])
 
-  // Sample data
-  const categories = [
+  // Fetch featured categories
+  useEffect(() => {
+    const fetchFeaturedCategories = async () => {
+      try {
+        const data = await getFeaturedCategories()
+        setFeaturedCategories(data || [])
+      } catch (error) {
+        console.error('Error fetching featured categories:', error)
+      } finally {
+        setFeaturedCategoriesLoading(false)
+      }
+    }
+
+    fetchFeaturedCategories()
+  }, [])
+
+  // Fetch service highlights
+  useEffect(() => {
+    const fetchServiceHighlights = async () => {
+      try {
+        const data = await getServiceHighlights()
+        setServiceHighlights(data || [])
+      } catch (error) {
+        console.error('Error fetching service highlights:', error)
+      } finally {
+        setServiceHighlightsLoading(false)
+      }
+    }
+
+    fetchServiceHighlights()
+  }, [])
+
+  // Fallback categories if API fails or no data
+  const fallbackCategories = [
     {
       title: 'Váy giá tốt chọn',
       subtitle: 'TechUrban',
@@ -90,73 +128,100 @@ const Content = () => {
     }
   ]
 
+  // Use featured categories from API or fallback
+  const categories = featuredCategoriesLoading || featuredCategories.length === 0 
+    ? fallbackCategories 
+    : featuredCategories
+
   return (
     <div className='content-container'>
-      {/* Features Section */}
-      <div className='features-grid'>
-        {[
-          {
-            title: 'Miễn phí vận chuyển',
-            desc: 'Đơn hàng trên 500K',
-            image:
-              'https://file.hstatic.net/1000360022/file/giaohangnhanh_abaa5d524e464a0c8547a91ad9b50968.png'
-          },
-          {
-            title: 'Ship COD toàn quốc',
-            desc: 'Yên tâm mua sắm ',
-            image:
-              'https://file.hstatic.net/1000360022/file/cod_5631433f0ad24c949e44e512b8535c43.png' // ví dụ minh họa
-          },
-          {
-            title: 'Đổi trả dễ dàng',
-            desc: '7 ngày đổi trả',
-            image:
-              'https://file.hstatic.net/1000360022/file/giaohang_2943ae148bf64680bf20c3d881c898c9.png' // ví dụ minh họa
-          },
-          {
-            title: 'Hotline: 0123456789',
-            desc: 'Hỗ trợ bạn 24/24 ',
-            image:
-              'https://file.hstatic.net/1000360022/file/cod_5631433f0ad24c949e44e512b8535c43.png' // ví dụ minh họa
-          }
-        ].map((feature, index) => (
-          <div key={index} className='feature-card'>
-            <div className='feature-icon'>
-              {feature.image ? (
-                <img
-                  src={feature.image}
-                  alt={feature.title}
-                  style={{ width: 40, height: 40, objectFit: 'contain' }}
-                />
-              ) : (
-                feature.icon
-              )}
+      {/* Features Section - Only show if there's data */}
+      {!serviceHighlightsLoading && serviceHighlights.length > 0 && (
+        <div className='features-grid'>
+          {serviceHighlights.map((service, index) => (
+            <div key={index} className='feature-card'>
+              <div className='feature-icon'>
+                {service.imageUrl ? (
+                  <img
+                    src={optimizeCloudinaryUrl(service.imageUrl, {
+                      width: 40,
+                      height: 40,
+                      quality: 'auto',
+                      format: 'auto'
+                    })}
+                    alt={service.title}
+                    style={{ width: 40, height: 40, objectFit: 'contain' }}
+                  />
+                ) : (
+                  <div style={{
+                    width: 40,
+                    height: 40,
+                    backgroundColor: '#f3f4f6',
+                    borderRadius: '50%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                  }}>
+                    <span style={{ fontSize: '20px', color: '#9ca3af' }}>⚡</span>
+                  </div>
+                )}
+              </div>
+              <div className='feature-title'>{service.title}</div>
+              <div className='feature-desc'>{service.subtitle}</div>
             </div>
-            <div className='feature-title'>{feature.title}</div>
-            <div className='feature-desc'>{feature.desc}</div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
 
       {/* Category Section */}
       <div className='category-grid'>
         {categories.map((category, index) => (
           <a
             key={index}
-            href={category.link}
+            href={featuredCategoriesLoading || featuredCategories.length === 0 
+              ? category.link 
+              : category.link || '#'
+            }
             className='category-card'
             style={{ textDecoration: 'none', color: 'inherit' }}
           >
             <div
               className='category-image'
               style={{
-                backgroundImage: `url(${category.imageUrl})`,
+                backgroundImage: featuredCategoriesLoading || featuredCategories.length === 0
+                  ? `url(${category.imageUrl})`
+                  : `url(${optimizeCloudinaryUrl(category.imageUrl, {
+                      width: 400,
+                      height: 300,
+                      quality: 'auto',
+                      format: 'auto'
+                    })})`,
                 backgroundSize: 'cover',
                 backgroundPosition: 'center',
                 position: 'relative'
               }}
             >
               <div className='category-overlay'></div>
+              {/* Show category name if it's from API */}
+              {!featuredCategoriesLoading && featuredCategories.length > 0 && (
+                <div style={{
+                  position: 'absolute',
+                  bottom: '20px',
+                  left: '20px',
+                  right: '20px',
+                  color: 'white',
+                  zIndex: 2
+                }}>
+                  <h3 style={{
+                    margin: 0,
+                    fontSize: '1.2rem',
+                    fontWeight: 'bold',
+                    textShadow: '2px 2px 4px rgba(0,0,0,0.7)'
+                  }}>
+                    {category.name}
+                  </h3>
+                </div>
+              )}
             </div>
           </a>
         ))}

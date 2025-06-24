@@ -108,7 +108,13 @@ export default function AdminDrawer({
       icon: <PersonIcon />
     },
     productManagement: {
-      permissions: ['product:read', 'category:read', 'color:read', 'size:read', 'review:read'],
+      permissions: [
+        'product:read',
+        'category:read',
+        'color:read',
+        'size:read',
+        'review:read'
+      ],
       label: 'Quản lý sản phẩm',
       icon: <InventoryIcon />,
       children: [
@@ -174,7 +180,14 @@ export default function AdminDrawer({
       ]
     },
     inventoryManagement: {
-      permissions: ['inventory:read', 'warehouse:read', 'warehouseSlip:read', 'inventoryLog:read', 'batch:read', 'partner:read'],
+      permissions: [
+        'inventory:read',
+        'warehouse:read',
+        'warehouseSlip:read',
+        'inventoryLog:read',
+        'batch:read',
+        'partner:read'
+      ],
       label: 'Quản lý kho',
       icon: <WarehouseIcon />,
       children: [
@@ -231,7 +244,7 @@ export default function AdminDrawer({
 
   // Lọc children dựa trên quyền
   const getVisibleChildren = (children) => {
-    return children.filter(child => canAccessMenu(child))
+    return children.filter((child) => canAccessMenu(child))
   }
   const profileName = profile?.name || 'Không có dữ liệu'
 
@@ -301,7 +314,10 @@ export default function AdminDrawer({
           )}
           {canAccessMenu(menuConfig.orderManagement) && (
             <ListItem disablePadding sx={{ height: 48 }}>
-              <ListItemButton onClick={toggleOrder} sx={{ padding: '12px 24px' }}>
+              <ListItemButton
+                onClick={toggleOrder}
+                sx={{ padding: '12px 24px' }}
+              >
                 <ListItemIcon sx={{ minWidth: 35 }}>
                   <ReceiptLongIcon />
                 </ListItemIcon>
@@ -436,7 +452,22 @@ export default function AdminDrawer({
               </ListItem>
             </Link>
           )}
-
+          <Link
+            to='/admin/marketing-management'
+            style={{ textDecoration: 'none', color: 'inherit' }}
+          >
+            <ListItem disablePadding>
+              <ListItemButton
+                selected={isActive('/admin/marketing-management')}
+                sx={activeButtonStyle}
+              >
+                <ListItemIcon>
+                  <PersonIcon />
+                </ListItemIcon>
+                <ListItemText primary='Quản lý nội dung' />
+              </ListItemButton>
+            </ListItem>
+          </Link>
           {canAccessMenu(menuConfig.productManagement) && (
             <>
               <ListItem disablePadding>
@@ -450,7 +481,9 @@ export default function AdminDrawer({
               </ListItem>
               <Collapse in={openProduct} timeout='auto' unmountOnExit>
                 <List component='div' disablePadding>
-                  {getVisibleChildren(menuConfig.productManagement.children).map((item) => (
+                  {getVisibleChildren(
+                    menuConfig.productManagement.children
+                  ).map((item) => (
                     <Link
                       key={item.path}
                       to={item.path}
@@ -482,20 +515,22 @@ export default function AdminDrawer({
               </ListItem>
               <Collapse in={openOrder} timeout='auto' unmountOnExit>
                 <List component='div' disablePadding>
-                  {getVisibleChildren(menuConfig.orderManagement.children).map((item) => (
-                    <Link
-                      key={item.path}
-                      to={item.path}
-                      style={{ textDecoration: 'none', color: 'inherit' }}
-                    >
-                      <ListItemButton
-                        selected={isActive(item.path)}
-                        sx={{ pl: 2, ...activeButtonStyle }}
+                  {getVisibleChildren(menuConfig.orderManagement.children).map(
+                    (item) => (
+                      <Link
+                        key={item.path}
+                        to={item.path}
+                        style={{ textDecoration: 'none', color: 'inherit' }}
                       >
-                        <ListItemText primary={item.label} sx={{ ml: 7 }} />
-                      </ListItemButton>
-                    </Link>
-                  ))}
+                        <ListItemButton
+                          selected={isActive(item.path)}
+                          sx={{ pl: 2, ...activeButtonStyle }}
+                        >
+                          <ListItemText primary={item.label} sx={{ ml: 7 }} />
+                        </ListItemButton>
+                      </Link>
+                    )
+                  )}
                 </List>
               </Collapse>
             </>
@@ -504,7 +539,10 @@ export default function AdminDrawer({
           {canAccessMenu(menuConfig.inventoryManagement) && (
             <>
               <ListItem disablePadding>
-                <ListItemButton onClick={toggleInventory} sx={activeButtonStyle}>
+                <ListItemButton
+                  onClick={toggleInventory}
+                  sx={activeButtonStyle}
+                >
                   <ListItemIcon>
                     <WarehouseIcon />
                   </ListItemIcon>
@@ -514,7 +552,9 @@ export default function AdminDrawer({
               </ListItem>
               <Collapse in={openInventory} timeout='auto' unmountOnExit>
                 <List component='div' disablePadding>
-                  {getVisibleChildren(menuConfig.inventoryManagement.children).map((item) => (
+                  {getVisibleChildren(
+                    menuConfig.inventoryManagement.children
+                  ).map((item) => (
                     <Link
                       key={item.path}
                       to={item.path}

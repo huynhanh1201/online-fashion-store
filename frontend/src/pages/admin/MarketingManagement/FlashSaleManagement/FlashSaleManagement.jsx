@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import {
   Box,
   Typography,
@@ -31,35 +31,55 @@ import {
   Refresh as RefreshIcon
 } from '@mui/icons-material'
 import AddFlashSale from './Modal/AddFlashSale.jsx'
+import { getFlashSaleConfig } from '~/services/admin/webConfig/flashsaleService'
+import { getProducts } from '~/services/productService'
+import EditFlashSaleModal from './Modal/EditFlashSaleModal'
+import DeleteFlashSaleModal from './Modal/DeleteFlashSaleModal'
+import { updateProductInFlashSale, removeProductFromFlashSale } from '~/services/admin/webConfig/flashsaleService'
 
 const FlashSaleManagement = () => {
   const theme = useTheme()
 
-  const [flashSales, setFlashSales] = useState([
-    {
-      id: 'fs001',
-      productName: 'Áo thun nam trắng',
-      originalPrice: 250000,
-      flashPrice: 99000,
-      stock: 100,
-      startTime: '2025-06-25T09:00:00',
-      endTime: '2025-06-25T11:00:00',
-      status: 'Đã lên lịch'
-    },
-    {
-      id: 'fs002',
-      productName: 'Giày sneaker nữ',
-      originalPrice: 450000,
-      flashPrice: 199000,
-      stock: 50,
-      startTime: '2025-07-01T12:00:00',
-      endTime: '2025-07-01T14:00:00',
-      status: 'Sắp diễn ra'
-    }
-  ])
+  const [flashSales, setFlashSales] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
 
   const [openAddModal, setOpenAddModal] = useState(false)
   const [refreshing, setRefreshing] = useState(false)
+  const [editModalOpen, setEditModalOpen] = useState(false)
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false)
+  const [selectedProduct, setSelectedProduct] = useState(null)
+
+  useEffect(() => {
+    const fetchFlashSales = async () => {
+      setLoading(true)
+      setError('')
+      try {
+        const config = await getFlashSaleConfig()
+        const { products: allProducts = [] } = await getProducts({ page: 1, limit: 1000 })
+        const flashSaleProducts = Array.isArray(config.products) ? config.products : []
+        const merged = flashSaleProducts
+          .filter(item => typeof item.flashPrice === 'number' && !isNaN(item.flashPrice))
+          .map(item => {
+            const prod = allProducts.find(p => p._id === item.productId)
+            return {
+              ...item,
+              productName: item.productName || prod?.name || '---',
+              image: prod?.image || [],
+              stock: prod?.stock,
+              startTime: config.startTime,
+              endTime: config.endTime
+            }
+          })
+        setFlashSales(merged)
+      } catch (err) {
+        setError('Không thể tải dữ liệu Flash Sale')
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchFlashSales()
+  }, [])
 
   const formatTime = (isoString) => new Date(isoString).toLocaleString('vi-VN')
 
@@ -84,20 +104,32 @@ const FlashSaleManagement = () => {
     return Math.round(((originalPrice - flashPrice) / originalPrice) * 100)
   }
 
-  const handleAddFlashSale = (newItem) => {
-    setFlashSales((prev) => [
-      ...prev,
-      {
-        id: `fs${Date.now()}`,
-        productName: `SP-${newItem.productId}`,
-        originalPrice: newItem.originalPrice,
-        flashPrice: newItem.flashPrice,
-        stock: 0,
-        startTime: '',
-        endTime: '',
-        status: 'Chưa thiết lập'
-      }
-    ])
+  const handleAddFlashSale = async (newItem) => {
+    setLoading(true)
+    setError('')
+    try {
+      const config = await getFlashSaleConfig()
+      const { products: allProducts = [] } = await getProducts({ page: 1, limit: 1000 })
+      const flashSaleProducts = Array.isArray(config.products) ? config.products : []
+      const merged = flashSaleProducts
+        .filter(item => typeof item.flashPrice === 'number' && !isNaN(item.flashPrice))
+        .map(item => {
+          const prod = allProducts.find(p => p._id === item.productId)
+          return {
+            ...item,
+            productName: item.productName || prod?.name || '---',
+            image: prod?.image || [],
+            stock: prod?.stock,
+            startTime: config.startTime,
+            endTime: config.endTime
+          }
+        })
+      setFlashSales(merged)
+    } catch (err) {
+      setError('Không thể tải dữ liệu Flash Sale')
+    } finally {
+      setLoading(false)
+    }
   }
 
   const handleRefresh = async () => {
@@ -106,6 +138,38 @@ const FlashSaleManagement = () => {
     setTimeout(() => {
       setRefreshing(false)
     }, 1000)
+  }
+
+  const handleEditClick = (product) => {
+    setSelectedProduct(product)
+    setEditModalOpen(true)
+  }
+
+  const handleEditSave = async (updatedProduct) => {
+    setEditModalOpen(false)
+    setSelectedProduct(null)
+    try {
+      await updateProductInFlashSale(updatedProduct.productId, { flashPrice: updatedProduct.flashPrice })
+      await fetchFlashSales()
+    } catch (err) {
+      setError('Không thể cập nhật Flash Sale')
+    }
+  }
+
+  const handleDeleteClick = (product) => {
+    setSelectedProduct(product)
+    setDeleteModalOpen(true)
+  }
+
+  const handleDeleteConfirm = async (product) => {
+    setDeleteModalOpen(false)
+    setSelectedProduct(null)
+    try {
+      await removeProductFromFlashSale(product.productId)
+      await fetchFlashSales()
+    } catch (err) {
+      setError('Không thể xóa Flash Sale')
+    }
   }
 
   const summaryData = [
@@ -270,7 +334,22 @@ const FlashSaleManagement = () => {
       <AddFlashSale
         open={openAddModal}
         onClose={() => setOpenAddModal(false)}
-        onSubmit={handleAddFlashSale}
+        onSave={handleAddFlashSale}
+      />
+
+      {/* Edit Modal */}
+      <EditFlashSaleModal
+        open={editModalOpen}
+        onClose={() => setEditModalOpen(false)}
+        product={selectedProduct}
+        onSave={handleEditSave}
+      />
+      {/* Delete Modal */}
+      <DeleteFlashSaleModal
+        open={deleteModalOpen}
+        onClose={() => setDeleteModalOpen(false)}
+        product={selectedProduct}
+        onDelete={handleDeleteConfirm}
       />
 
       {/* Table */}
@@ -282,6 +361,13 @@ const FlashSaleManagement = () => {
         }}
       >
         <TableContainer>
+          {loading ? (
+            <Box sx={{ p: 4, textAlign: 'center' }}>
+              Đang tải dữ liệu Flash Sale...
+            </Box>
+          ) : error ? (
+            <Box sx={{ p: 4, textAlign: 'center', color: 'red' }}>{error}</Box>
+          ) : (
           <Table>
             <TableHead>
               <TableRow sx={{ backgroundColor: '#f8fafc' }}>
@@ -314,7 +400,7 @@ const FlashSaleManagement = () => {
             <TableBody>
               {flashSales.map((item, index) => (
                 <TableRow
-                  key={item.id}
+                  key={item.productId || index}
                   sx={{
                     '&:hover': {
                       backgroundColor: alpha(theme.palette.primary.main, 0.04)
@@ -330,7 +416,7 @@ const FlashSaleManagement = () => {
                       {item.productName}
                     </Typography>
                     <Typography variant='caption' color='text.secondary'>
-                      ID: {item.id}
+                      ID: {item.productId}
                     </Typography>
                   </TableCell>
                   <TableCell sx={{ py: 2 }}>
@@ -338,7 +424,7 @@ const FlashSaleManagement = () => {
                       variant='body1'
                       sx={{ color: '#64748b', textDecoration: 'line-through' }}
                     >
-                      {item.originalPrice.toLocaleString()}đ
+                      {item.originalPrice != null ? Number(item.originalPrice).toLocaleString() : '---'}đ
                     </Typography>
                   </TableCell>
                   <TableCell sx={{ py: 2 }}>
@@ -350,7 +436,7 @@ const FlashSaleManagement = () => {
                         fontSize: '1.1rem'
                       }}
                     >
-                      {item.flashPrice.toLocaleString()}đ
+                      {item.flashPrice != null ? Number(item.flashPrice).toLocaleString() : '---'}đ
                     </Typography>
                   </TableCell>
                   <TableCell sx={{ py: 2 }}>
@@ -369,7 +455,7 @@ const FlashSaleManagement = () => {
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                       <InventoryIcon sx={{ fontSize: 16, color: '#6b7280' }} />
                       <Typography variant='body2' sx={{ fontWeight: 600 }}>
-                        {item.stock}
+                        {item.stock != null ? item.stock : 0}
                       </Typography>
                     </Box>
                   </TableCell>
@@ -415,6 +501,7 @@ const FlashSaleManagement = () => {
                             color: '#3b82f6',
                             '&:hover': { backgroundColor: '#dbeafe' }
                           }}
+                          onClick={() => handleEditClick(item)}
                         >
                           <EditIcon fontSize='small' />
                         </IconButton>
@@ -426,6 +513,7 @@ const FlashSaleManagement = () => {
                             color: '#ef4444',
                             '&:hover': { backgroundColor: '#fee2e2' }
                           }}
+                          onClick={() => handleDeleteClick(item)}
                         >
                           <DeleteIcon fontSize='small' />
                         </IconButton>
@@ -436,6 +524,7 @@ const FlashSaleManagement = () => {
               ))}
             </TableBody>
           </Table>
+          )}
         </TableContainer>
       </Card>
     </Box>

@@ -43,6 +43,58 @@ export const getFlashSaleProducts = async () => {
   }
 }
 
+// Hàm trả về cấu trúc mặc định cho content Flash Sale
+export const getDefaultFlashSaleContent = () => ({
+  enabled: false,
+  title: '',
+  startTime: '',
+  endTime: '',
+  status: 'inactive',
+  products: []
+})
+
+// Tạo cấu hình Flash Sale mới
+export const createFlashSaleConfig = async (flashSaleContent) => {
+  try {
+    // Log dữ liệu đầu vào để debug
+    console.log('Dữ liệu đầu vào flashSaleContent:', flashSaleContent)
+    if (typeof flashSaleContent !== 'object' || Array.isArray(flashSaleContent)) {
+      console.warn('flashSaleContent không phải object hoặc là mảng!')
+    }
+    // Đảm bảo content là object đủ trường
+    const defaultContent = getDefaultFlashSaleContent()
+    const content = { ...defaultContent, ...flashSaleContent }
+    const payload = {
+      key: 'flashSale',
+      title: 'Flash Sale Configuration',
+      description: 'Cấu hình Flash Sale của website',
+      content: {
+        enabled: flashSaleContent.enabled ?? true,
+        title: flashSaleContent.title || '',
+        startTime: flashSaleContent.startTime || '',
+        endTime: flashSaleContent.endTime || '',
+        status: flashSaleContent.status || 'inactive',
+        products: flashSaleContent.products || []
+      },
+      status: 'active'
+    }
+    
+    console.log('Payload gửi lên khi tạo Flash Sale:', payload)
+    const response = await AuthorizedAxiosInstance.post(
+      `${API_ROOT}/v1/website-configs`,
+      payload
+    )
+    return response.data
+  } catch (error) {
+    console.error('Lỗi khi tạo cấu hình Flash Sale:', error)
+    throw new Error(
+      error.response?.data?.message ||
+      error.message ||
+      'Không thể tạo cấu hình Flash Sale. Vui lòng thử lại.'
+    )
+  }
+}
+
 // Cập nhật cấu hình Flash Sale
 export const updateFlashSaleConfig = async (configData) => {
   try {
@@ -58,15 +110,16 @@ export const updateFlashSaleConfig = async (configData) => {
       title: 'Flash Sale Configuration',
       description: 'Cấu hình Flash Sale của website',
       content: {
-        enabled: configData.enabled ?? true,
-        title: configData.title || '',
-        startTime: configData.startTime || '',
-        endTime: configData.endTime || '',
-        status: configData.status || 'inactive',
-        products: configData.products || []
+        enabled: flashSaleContent.enabled ?? true,
+        title: flashSaleContent.title || '',
+        startTime: flashSaleContent.startTime || '',
+        endTime: flashSaleContent.endTime || '',
+        status: flashSaleContent.status || 'inactive',
+        products: flashSaleContent.products || []
       },
       status: 'active'
     }
+    
     
     if (flashSaleConfig) {
       // Update config hiện tại
@@ -74,14 +127,13 @@ export const updateFlashSaleConfig = async (configData) => {
         `${API_ROOT}/v1/website-configs/${flashSaleConfig._id}`,
         payload
       )
+      console.log('PATCH response:', updateResponse.data)
       return updateResponse.data
     } else {
       // Tạo config mới
-      const createResponse = await AuthorizedAxiosInstance.post(
-        `${API_ROOT}/v1/website-configs`,
-        payload
-      )
-      return createResponse.data
+      const createResponse = await createFlashSaleConfig(payload.content)
+      console.log('POST response:', createResponse)
+      return createResponse
     }
   } catch (error) {
     console.error('Lỗi khi cập nhật cấu hình Flash Sale:', error)
@@ -256,5 +308,63 @@ export const getFlashSaleStatus = async () => {
   } catch (error) {
     console.error('Lỗi khi kiểm tra trạng thái Flash Sale:', error)
     return 'error'
+  }
+}
+
+// Hàm tạo mới flash sale (public API)
+export const createFlashSale = async (content) => {
+  try {
+    // Đảm bảo content đủ trường
+    const defaultContent = getDefaultFlashSaleContent()
+    let fullContent = { ...defaultContent, ...content }
+
+    // Kiểm tra products phải là mảng và có ít nhất 1 phần tử
+    if (!Array.isArray(fullContent.products) || fullContent.products.length === 0) {
+      throw new Error('Products phải là mảng và có ít nhất 1 sản phẩm')
+    }
+    // Kiểm tra từng sản phẩm trong products
+    fullContent.products = fullContent.products.map((p, idx) => {
+      if (!p.productId || typeof p.productId !== 'string') {
+        throw new Error(`Sản phẩm thứ ${idx + 1} thiếu productId hoặc productId không hợp lệ`)
+      }
+      // Đảm bảo originalPrice và flashPrice là number
+      const originalPrice = Number(p.originalPrice)
+      const flashPrice = Number(p.flashPrice)
+      if (isNaN(originalPrice) || isNaN(flashPrice)) {
+        throw new Error(`Sản phẩm thứ ${idx + 1} phải có originalPrice và flashPrice là số`)
+      }
+      if (flashPrice >= originalPrice) {
+        throw new Error(`Sản phẩm thứ ${idx + 1} flashPrice phải nhỏ hơn originalPrice`)
+      }
+      return {
+        productId: p.productId,
+        originalPrice,
+        flashPrice
+      }
+    })
+    // Đảm bảo các trường khác không bị thiếu
+    if (!fullContent.title || !fullContent.startTime || !fullContent.endTime) {
+      throw new Error('Vui lòng nhập đầy đủ tiêu đề, thời gian bắt đầu và kết thúc')
+    }
+    const payload = {
+      key: 'flashSale',
+      title: 'Flash Sale Configuration',
+      description: 'Cấu hình Flash Sale của website',
+      content: fullContent,
+      status: 'active'
+    }
+    console.log('Payload gửi lên khi tạo mới flash sale (đã kiểm tra):', payload)
+    const response = await AuthorizedAxiosInstance.post(
+      `${API_ROOT}/v1/website-configs`,
+      payload
+    )
+    return response.data
+  } catch (error) {
+    console.error('Lỗi khi tạo mới flash sale:', error)
+    throw new Error(
+      error.response?.data?.message ||
+      error.message ||
+      'Không thể tạo mới flash sale. Vui lòng thử lại.'
+    )
   }
 }
