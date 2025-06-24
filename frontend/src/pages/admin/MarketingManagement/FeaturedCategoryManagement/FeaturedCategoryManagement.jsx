@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import {
   Box,
   Button,
@@ -16,7 +16,10 @@ import {
   IconButton,
   Tooltip,
   useTheme,
-  alpha
+  alpha,
+  Alert,
+  CircularProgress,
+  Skeleton
 } from '@mui/material'
 import {
   Add as AddIcon,
@@ -26,49 +29,115 @@ import {
   Collections as CollectionsIcon,
   Refresh as RefreshIcon
 } from '@mui/icons-material'
-
-const mockFeaturedCategories = [
-  {
-    id: 'cat001',
-    name: 'Áo đi làm',
-    imageUrl: '/Uploads/ao-di-lam.jpg'
-  },
-  {
-    id: 'cat002',
-    name: 'Đồ mặc hằng ngày',
-    imageUrl: '/Uploads/do-mac-hang-ngay.jpg'
-  }
-]
+import AddFeaturedCategory from './Modal/AddFeaturedCategory.jsx'
+import { 
+  getFeaturedCategories, 
+  deleteFeaturedCategory 
+} from '~/services/admin/webConfig/featuredcategoryService.js'
+import { optimizeCloudinaryUrl } from '~/utils/cloudinary.js'
 
 const FeaturedCategoryManagement = () => {
   const theme = useTheme()
+  const [openModal, setOpenModal] = useState(false)
+  const [editIndex, setEditIndex] = useState(null)
+  const [featuredCategories, setFeaturedCategories] = useState([])
+  const [loading, setLoading] = useState(true)
   const [refreshing, setRefreshing] = useState(false)
+  const [error, setError] = useState('')
+
+  // Fetch featured categories data
+  const fetchFeaturedCategories = async () => {
+    try {
+      setError('')
+      const data = await getFeaturedCategories()
+      setFeaturedCategories(data || [])
+    } catch (err) {
+      setError(err.message)
+      console.error('Error fetching featured categories:', err)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  // Refresh data
+  const handleRefresh = async () => {
+    setRefreshing(true)
+    await fetchFeaturedCategories()
+    setRefreshing(false)
+  }
+
+  // Handle success from modal
+  const handleModalSuccess = (result) => {
+    console.log('Featured category updated successfully:', result)
+    // Refresh data after successful update
+    fetchFeaturedCategories()
+  }
+
+  // Handle edit
+  const handleEdit = (index) => {
+    setEditIndex(index)
+    setOpenModal(true)
+  }
+
+  // Handle delete
+  const handleDelete = async (index) => {
+    if (window.confirm('Bạn có chắc chắn muốn xóa danh mục này?')) {
+      try {
+        await deleteFeaturedCategory(index)
+        // Refresh data after successful delete
+        fetchFeaturedCategories()
+      } catch (error) {
+        setError(error.message)
+        console.error('Error deleting featured category:', error)
+      }
+    }
+  }
+
+  // Handle add new
+  const handleAddNew = () => {
+    setEditIndex(null)
+    setOpenModal(true)
+  }
+
+  useEffect(() => {
+    fetchFeaturedCategories()
+  }, [])
 
   const summaryData = [
     {
       title: 'Tổng danh mục',
-      value: mockFeaturedCategories.length,
+      value: loading ? <Skeleton width={40} /> : featuredCategories.length,
       icon: <CategoryIcon />,
       color: '#1976d2'
     },
     {
       title: 'Hình ảnh danh mục',
-      value: mockFeaturedCategories.filter((cat) => cat.imageUrl).length,
+      value: loading ? <Skeleton width={40} /> : featuredCategories.filter((cat) => cat.imageUrl).length,
       icon: <CollectionsIcon />,
       color: '#2e7d32'
     }
   ]
 
-  const handleRefresh = async () => {
-    setRefreshing(true)
-    // Simulate refresh delay
-    setTimeout(() => {
-      setRefreshing(false)
-    }, 1000)
-  }
+  // Loading skeleton
+  const LoadingSkeleton = () => (
+    <TableRow>
+      <TableCell>
+        <Skeleton variant='rectangular' width={80} height={60} />
+      </TableCell>
+      <TableCell>
+        <Skeleton variant='text' width='60%' />
+      </TableCell>
+      <TableCell>
+        <Skeleton variant='text' width='40%' />
+      </TableCell>
+      <TableCell>
+        <Skeleton variant='circular' width={32} height={32} />
+      </TableCell>
+    </TableRow>
+  )
 
   return (
-    <Box sx={{ p: 3, backgroundColor: '#f8fafc',borderRadius: 3, minHeight: '100vh' }}>
+    <Box sx={{ p: 3, backgroundColor: '#f8fafc', borderRadius: 3, minHeight: '100vh' }}>
       {/* Header */}
       <Box sx={{ mb: 4 }}>
         <Typography
@@ -89,6 +158,21 @@ const FeaturedCategoryManagement = () => {
           Cấu hình và quản lý các danh mục nổi bật hiển thị trên website
         </Typography>
       </Box>
+
+      {/* Error Alert */}
+      {error && (
+        <Alert
+          severity='error'
+          sx={{ mb: 3 }}
+          action={
+            <Button color='inherit' size='small' onClick={handleRefresh}>
+              Thử lại
+            </Button>
+          }
+        >
+          {error}
+        </Alert>
+      )}
 
       {/* Summary Cards */}
       <Grid container spacing={3} sx={{ mb: 4 }}>
@@ -149,6 +233,7 @@ const FeaturedCategoryManagement = () => {
         <Button
           variant='contained'
           startIcon={<AddIcon />}
+          onClick={handleAddNew}
           sx={{
             px: 3,
             py: 1.5,
@@ -202,88 +287,177 @@ const FeaturedCategoryManagement = () => {
                   Tên danh mục
                 </TableCell>
                 <TableCell sx={{ fontWeight: 700, color: '#334155', py: 2 }}>
+                  Link
+                </TableCell>
+                <TableCell sx={{ fontWeight: 700, color: '#334155', py: 2 }}>
                   Thao tác
                 </TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
-              {mockFeaturedCategories.map((item) => (
-                <TableRow
-                  key={item.id}
-                  sx={{
-                    '&:hover': {
-                      backgroundColor: alpha(theme.palette.primary.main, 0.04)
-                    },
-                    '&:last-child td, &:last-child th': { border: 0 }
-                  }}
-                >
-                  <TableCell sx={{ py: 2 }}>
-                    <Box
-                      sx={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: 1
-                      }}
-                    >
-                      <img
-                        src={item.imageUrl}
-                        alt={item.name}
-                        style={{
-                          width: 80,
-                          height: 'auto',
-                          borderRadius: 8,
-                          border: '1px solid #e2e8f0'
+              {loading ? (
+                // Loading skeleton
+                Array.from({ length: 3 }).map((_, index) => (
+                  <LoadingSkeleton key={index} />
+                ))
+              ) : featuredCategories.length > 0 ? (
+                // Actual data
+                featuredCategories.map((item, index) => (
+                  <TableRow
+                    key={index}
+                    sx={{
+                      '&:hover': {
+                        backgroundColor: alpha(theme.palette.primary.main, 0.04)
+                      },
+                      '&:last-child td, &:last-child th': { border: 0 }
+                    }}
+                  >
+                    <TableCell sx={{ py: 2 }}>
+                      <Box
+                        sx={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: 1
                         }}
-                      />
-                      <Typography
-                        variant='caption'
-                        color='text.secondary'
-                        sx={{ fontFamily: 'monospace' }}
                       >
-                        {item.id}
+                        {item.imageUrl ? (
+                          <img
+                            src={optimizeCloudinaryUrl(item.imageUrl, {
+                              width: 80,
+                              height: 60
+                            })}
+                            alt={item.name}
+                            style={{
+                              width: 80,
+                              height: 60,
+                              objectFit: 'cover',
+                              borderRadius: 8,
+                              border: '1px solid #e2e8f0'
+                            }}
+                          />
+                        ) : (
+                          <Box
+                            sx={{
+                              width: 80,
+                              height: 60,
+                              borderRadius: 8,
+                              border: '1px solid #e2e8f0',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              backgroundColor: '#f8fafc'
+                            }}
+                          >
+                            <CollectionsIcon sx={{ color: '#cbd5e1', fontSize: 24 }} />
+                          </Box>
+                        )}
+                        <Typography
+                          variant='caption'
+                          color='text.secondary'
+                          sx={{ fontFamily: 'monospace' }}
+                        >
+                          #{index + 1}
+                        </Typography>
+                      </Box>
+                    </TableCell>
+                    <TableCell sx={{ py: 2 }}>
+                      <Typography
+                        variant='body2'
+                        sx={{ fontWeight: 600, color: '#1e293b' }}
+                      >
+                        {item.name}
                       </Typography>
-                    </Box>
-                  </TableCell>
-                  <TableCell sx={{ py: 2 }}>
-                    <Typography
-                      variant='body2'
-                      sx={{ fontWeight: 600, color: '#1e293b' }}
-                    >
-                      {item.name}
+                    </TableCell>
+                    <TableCell sx={{ py: 2 }}>
+                      <Typography
+                        variant='body2'
+                        sx={{ 
+                          fontFamily: 'monospace',
+                          color: '#3b82f6',
+                          fontWeight: 500,
+                          wordBreak: 'break-all',
+                          cursor: 'pointer',
+                          '&:hover': {
+                            textDecoration: 'underline'
+                          }
+                        }}
+                        onClick={() => {
+                          if (item.link) {
+                            navigator.clipboard.writeText(item.link)
+                              .then(() => {
+                                // You could add a toast notification here
+                                console.log('Link copied to clipboard')
+                              })
+                              .catch(err => {
+                                console.error('Failed to copy link:', err)
+                              })
+                          }
+                        }}
+                        title="Click to copy link"
+                      >
+                        {item.link || 'Chưa có link'}
+                      </Typography>
+                    </TableCell>
+                    <TableCell sx={{ py: 2 }}>
+                      <Stack direction='row' spacing={1}>
+                        <Tooltip title='Chỉnh sửa'>
+                          <IconButton
+                            size='small'
+                            sx={{
+                              color: '#3b82f6',
+                              '&:hover': { backgroundColor: '#dbeafe' }
+                            }}
+                            onClick={() => handleEdit(index)}
+                          >
+                            <EditIcon fontSize='small' />
+                          </IconButton>
+                        </Tooltip>
+                        <Tooltip title='Xóa'>
+                          <IconButton
+                            size='small'
+                            sx={{
+                              color: '#ef4444',
+                              '&:hover': { backgroundColor: '#fee2e2' }
+                            }}
+                            onClick={() => handleDelete(index)}
+                          >
+                            <DeleteIcon fontSize='small' />
+                          </IconButton>
+                        </Tooltip>
+                      </Stack>
+                    </TableCell>
+                  </TableRow>
+                ))
+              ) : (
+                // No data
+                <TableRow>
+                  <TableCell colSpan={4} sx={{ textAlign: 'center', py: 4 }}>
+                    <Typography variant='body1' color='text.secondary'>
+                      Chưa có danh mục nổi bật nào
                     </Typography>
-                  </TableCell>
-                  <TableCell sx={{ py: 2 }}>
-                    <Stack direction='row' spacing={1}>
-                      <Tooltip title='Chỉnh sửa'>
-                        <IconButton
-                          size='small'
-                          sx={{
-                            color: '#3b82f6',
-                            '&:hover': { backgroundColor: '#dbeafe' }
-                          }}
-                        >
-                          <EditIcon fontSize='small' />
-                        </IconButton>
-                      </Tooltip>
-                      <Tooltip title='Xóa'>
-                        <IconButton
-                          size='small'
-                          sx={{
-                            color: '#ef4444',
-                            '&:hover': { backgroundColor: '#fee2e2' }
-                          }}
-                        >
-                          <DeleteIcon fontSize='small' />
-                        </IconButton>
-                      </Tooltip>
-                    </Stack>
+                    <Button
+                      variant='outlined'
+                      startIcon={<AddIcon />}
+                      onClick={handleAddNew}
+                      sx={{ mt: 2 }}
+                    >
+                      Thêm danh mục đầu tiên
+                    </Button>
                   </TableCell>
                 </TableRow>
-              ))}
+              )}
             </TableBody>
           </Table>
         </TableContainer>
       </Card>
+
+      {/* Modal */}
+      <AddFeaturedCategory
+        open={openModal}
+        onClose={() => setOpenModal(false)}
+        onSuccess={handleModalSuccess}
+        editIndex={editIndex}
+      />
     </Box>
   )
 }

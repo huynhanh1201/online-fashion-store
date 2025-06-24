@@ -77,7 +77,7 @@ const useProductDetail = (productId) => {
           price: data.price || 0,
           discountPrice: data.discountPrice || null,
           quantity: data.quantity || 0,
-          category: data.categoryId,
+          category: data.categoryId
         })
       } else {
         setError('Sản phẩm không tồn tại hoặc dữ liệu không hợp lệ.')
@@ -86,8 +86,8 @@ const useProductDetail = (productId) => {
       console.error('Error fetching product:', err.response || err)
       setError(
         err?.response?.data?.message ||
-        err.message ||
-        'Không thể tải thông tin sản phẩm.'
+          err.message ||
+          'Không thể tải thông tin sản phẩm.'
       )
     } finally {
       setIsLoading(false)
@@ -253,31 +253,38 @@ const useProductDetail = (productId) => {
   }, [selectedVariant])
   // Handle add to cart
   const handleAddToCart = async (productId) => {
-    if (isAdding[productId] || !product) return;
+    if (isAdding[productId] || !product) return
 
     if (!selectedVariant) {
-      setSnackbar({ open: true, severity: 'warning', message: 'Vui lòng chọn màu sắc và kích thước!' })
+      setSnackbar({
+        open: true,
+        severity: 'warning',
+        message: 'Vui lòng chọn màu sắc và kích thước!'
+      })
       return
     }
 
     const variantId = selectedVariant._id
-    const availableQuantity = inventory?.quantity ?? selectedVariant?.quantity ?? 0
+    const availableQuantity =
+      inventory?.quantity ?? selectedVariant?.quantity ?? 0
 
     if (availableQuantity === 0) {
-      setSnackbar({ open: true, severity: 'warning', message: 'Sản phẩm này hiện đang hết hàng!' })
+      setSnackbar({
+        open: true,
+        severity: 'warning',
+        message: 'Sản phẩm này hiện đang hết hàng!'
+      })
       return
     }
 
-    const updatedCart = await getCart();
-    const existingItem = updatedCart?.cartItems?.find(
-      item => {
-        const itemVariantId = typeof item.variantId === 'object' ? item.variantId._id : item.variantId;
-        return itemVariantId === variantId
-      }
-    );
+    const updatedCart = await getCart()
+    const existingItem = updatedCart?.cartItems?.find((item) => {
+      const itemVariantId =
+        typeof item.variantId === 'object' ? item.variantId._id : item.variantId
+      return itemVariantId === variantId
+    })
 
     const currentQty = existingItem?.quantity || 0
-
 
     if (currentQty + quantity > availableQuantity) {
       const remainingQty = availableQuantity - currentQty
@@ -293,9 +300,9 @@ const useProductDetail = (productId) => {
     }
 
     try {
-      setIsAdding(prev => ({ ...prev, [productId]: true }));
+      setIsAdding((prev) => ({ ...prev, [productId]: true }))
 
-      const res = await addToCart({ variant: selectedVariant, quantity });
+      const res = await addToCart({ variant: selectedVariant, quantity })
 
       if (!res) throw new Error('Thêm giỏ hàng thất bại')
 
@@ -315,17 +322,24 @@ const useProductDetail = (productId) => {
       console.error('Thêm vào giỏ hàng lỗi:', error)
       const messageFromServer = error.response?.data?.message || ''
       if (messageFromServer.includes('ValidationError')) {
-        setSnackbar({ open: true, severity: 'warning', message: 'Số lượng thêm vượt quá tồn kho!' })
+        setSnackbar({
+          open: true,
+          severity: 'warning',
+          message: 'Số lượng thêm vượt quá tồn kho!'
+        })
       } else {
-        setSnackbar({ open: true, severity: 'error', message: 'Thêm sản phẩm thất bại!' })
+        setSnackbar({
+          open: true,
+          severity: 'error',
+          message: 'Thêm sản phẩm thất bại!'
+        })
       }
     } finally {
       setTimeout(() => {
-        setIsAdding(prev => ({ ...prev, [productId]: false }))
+        setIsAdding((prev) => ({ ...prev, [productId]: false }))
       }, 500)
     }
   }
-
 
   // Handle buy now
   const handleBuyNow = () => {
@@ -340,7 +354,8 @@ const useProductDetail = (productId) => {
       return
     }
 
-    const maxQuantity = inventory?.quantity ?? selectedVariant?.quantity ?? product?.quantity ?? 0
+    const maxQuantity =
+      inventory?.quantity ?? selectedVariant?.quantity ?? product?.quantity ?? 0
     if (maxQuantity === 0) {
       setSnackbar({
         open: true,

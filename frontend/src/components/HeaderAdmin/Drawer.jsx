@@ -108,7 +108,13 @@ export default function AdminDrawer({
       icon: <PersonIcon />
     },
     productManagement: {
-      permissions: ['product:read', 'category:read', 'color:read', 'size:read', 'review:read'],
+      permissions: [
+        'product:read',
+        'category:read',
+        'color:read',
+        'size:read',
+        'review:read'
+      ],
       label: 'Quản lý sản phẩm',
       icon: <InventoryIcon />,
       children: [
@@ -174,7 +180,14 @@ export default function AdminDrawer({
       ]
     },
     inventoryManagement: {
-      permissions: ['inventory:read', 'warehouse:read', 'warehouseSlip:read', 'inventoryLog:read', 'batch:read', 'partner:read'],
+      permissions: [
+        'inventory:read',
+        'warehouse:read',
+        'warehouseSlip:read',
+        'inventoryLog:read',
+        'batch:read',
+        'partner:read'
+      ],
       label: 'Quản lý kho',
       icon: <WarehouseIcon />,
       children: [
@@ -359,7 +372,10 @@ export default function AdminDrawer({
           )}
           {canAccessMenu(menuConfig.orderManagement) && (
             <ListItem disablePadding sx={{ height: 48 }}>
-              <ListItemButton onClick={toggleOrder} sx={{ padding: '12px 24px' }}>
+              <ListItemButton
+                onClick={toggleOrder}
+                sx={{ padding: '12px 24px' }}
+              >
                 <ListItemIcon sx={{ minWidth: 35 }}>
                   <ReceiptLongIcon />
                 </ListItemIcon>
@@ -489,7 +505,22 @@ export default function AdminDrawer({
               </ListItemButton>
             </ListItem>
           )}
-
+          <Link
+            to='/admin/marketing-management'
+            style={{ textDecoration: 'none', color: 'inherit' }}
+          >
+            <ListItem disablePadding>
+              <ListItemButton
+                selected={isActive('/admin/marketing-management')}
+                sx={activeButtonStyle}
+              >
+                <ListItemIcon>
+                  <PersonIcon />
+                </ListItemIcon>
+                <ListItemText primary='Quản lý nội dung' />
+              </ListItemButton>
+            </ListItem>
+          </Link>
           {canAccessMenu(menuConfig.productManagement) && (
             <>
               <ListItem disablePadding>
@@ -551,7 +582,10 @@ export default function AdminDrawer({
           {canAccessMenu(menuConfig.inventoryManagement) && (
             <>
               <ListItem disablePadding>
-                <ListItemButton onClick={toggleInventory} sx={activeButtonStyle}>
+                <ListItemButton
+                  onClick={toggleInventory}
+                  sx={activeButtonStyle}
+                >
                   <ListItemIcon>
                     <WarehouseIcon />
                   </ListItemIcon>

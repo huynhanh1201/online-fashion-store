@@ -29,7 +29,7 @@ Router.route('/:categoryId').get(
 Router.route('/:categoryId').patch(
   authMiddleware.isAuthorized,
   categoriesValidation.verifyId,
-  categoriesValidation.category,
+  categoriesValidation.categoryUpdate,
   categoriesController.updateCategory
 )
 
