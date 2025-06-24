@@ -33,7 +33,7 @@ import {
   Warning,
   Sync
 } from '@mui/icons-material'
-import ScheduleIcon from '@mui/icons-material/Schedule'
+import ScheduleIcon from '@mui/icons-material/Schedule';
 import { getOrders, getOrderItems } from '~/services/orderService'
 import { useOrder } from '~/hooks/useOrder'
 import { useNavigate } from 'react-router-dom'
@@ -45,9 +45,9 @@ import { optimizeCloudinaryUrl } from '~/utils/cloudinary'
 // Define status labels with icons and colors
 const statusLabels = {
   All: ['Tất cả', 'default', <ShoppingBag key="all" />],
-  Pending: ['Đang chờ', 'warning', <ScheduleIcon key="pending" />],
   Processing: ['Đang xử lý', 'info', <Sync key="processing" />],
   Shipped: ['Đã gửi hàng', 'primary', <LocalShipping key="shipped" />],
+  Shipping: ['Đang giao hàng', 'primary', <LocalShipping key="shipping" />],
   Delivered: ['Đã giao', 'success', <CheckCircle key="delivered" />],
   Cancelled: ['Đã hủy', 'error', <Cancel key="cancelled" />],
   Failed: ['Thanh toán thất bại', 'error', <Cancel key="failed" />]
@@ -147,7 +147,7 @@ const CancelOrderModal = ({ open, onClose, onConfirm, order, loading }) => {
 }
 
 // Enhanced OrderRow component
-const OrderRow = ({ order, onOrderUpdate }) => {
+const OrderRow = ({ order, onOrderUpdate, onOrderCancelled }) => {
   const [items, setItems] = useState([])
   const [loadingItems, setLoadingItems] = useState(true)
   const [openCancelModal, setOpenCancelModal] = useState(false)
@@ -157,7 +157,6 @@ const OrderRow = ({ order, onOrderUpdate }) => {
   const [label, color, icon] = statusLabels[order.status] || ['Không xác định', 'default', <Cancel key="unknown" />]
   const { addToCart } = useCart()
   const { cancelOrder } = useOrder()
-
 
 
   useEffect(() => {
@@ -174,7 +173,7 @@ const OrderRow = ({ order, onOrderUpdate }) => {
     }
 
     fetchItems()
-  }, [order._id])
+  }, [])
 
   // Handle cancel order confirmation
   const handleCancelOrder = async () => {
@@ -186,6 +185,10 @@ const OrderRow = ({ order, onOrderUpdate }) => {
       // Call parent callback to refresh orders
       if (onOrderUpdate) {
         onOrderUpdate()
+      }
+      // Call callback to switch to cancelled tab
+      if (onOrderCancelled) {
+        onOrderCancelled()
       }
     } catch (error) {
       console.error('Lỗi khi hủy đơn hàng:', error)
@@ -363,14 +366,51 @@ const OrderRow = ({ order, onOrderUpdate }) => {
                   startIcon={<Replay />}
                   onClick={async () => {
                     try {
-                      // Lặp qua từng sản phẩm trong đơn hàng, chỉ thêm 1 sản phẩm mỗi loại vào giỏ
-                      for (const item of items) {
+                      console.log('Items to add back to cart:', items)
+                      console.log('Total items to process:', items.length)
+
+                      let successCount = 0
+                      let failCount = 0
+
+                      // Lặp qua từng sản phẩm trong đơn hàng với đúng số lượng từ order item
+                      for (let i = 0; i < items.length; i++) {
+                        const item = items[i]
                         const variantId = typeof item.variantId === 'object' ? item.variantId._id : item.variantId
-                        if (!variantId) continue
-                        await addToCart({ variantId, quantity: 1 })
+
+
+                        if (!variantId) {
+                          console.warn('Variant ID not found for item:', item)
+                          failCount++
+                          continue
+                        }
+
+                        try {
+                          const result = await addToCart({ variantId, quantity: 1 })
+                          if (result) {
+                            successCount++
+                          } else {
+                            failCount++
+                          }
+                        } catch (error) {
+                          failCount++
+                        }
+
+                        // Add small delay between requests to avoid overwhelming the server
+                        if (i < items.length - 1) {
+                          await new Promise(resolve => setTimeout(resolve, 200))
+                        }
                       }
 
-                      navigate('/cart')
+                      console.log(`Add to cart results: ${successCount} success, ${failCount} failed`)
+
+                      if (successCount > 0) {
+                        // Force refresh cart data before navigating
+                        setTimeout(() => {
+                          navigate('/cart')
+                        }, 100)
+                      } else {
+                        console.error('No items were added to cart')
+                      }
                     } catch (err) {
                       console.error('Lỗi khi mua lại:', err)
                     }
@@ -386,22 +426,19 @@ const OrderRow = ({ order, onOrderUpdate }) => {
                   Mua lại
                 </Button>
               ) : (
-                // Chỉ hiển thị nút "Hủy đơn" với các trạng thái có thể hủy
-                (order.status === 'Pending' || order.status === 'Processing') && (
-                  <Button
-                    variant="outlined"
-                    color="error"
-                    startIcon={<Cancel />}
-                    onClick={() => setOpenCancelModal(true)}
-                    sx={{
-                      borderRadius: 2,
-                      textTransform: 'none',
-                      fontWeight: 600
-                    }}
-                  >
-                    Hủy đơn
-                  </Button>
-                )
+                <Button
+                  variant="outlined"
+                  color="error"
+                  startIcon={<Cancel />}
+                  onClick={() => setOpenCancelModal(true)}
+                  sx={{
+                    borderRadius: 2,
+                    textTransform: 'none',
+                    fontWeight: 600
+                  }}
+                >
+                  Hủy đơn
+                </Button>
               )}
             </Box>
           </Box>
@@ -424,62 +461,26 @@ const OrderRow = ({ order, onOrderUpdate }) => {
 const OrderListPage = () => {
   const [orders, setOrders] = useState([])
   const [loading, setLoading] = useState(true)
-  const [loadingMore, setLoadingMore] = useState(false)
-  const [tabLoading, setTabLoading] = useState(false)
   const [selectedTab, setSelectedTab] = useState('All')
-  const [currentPage, setCurrentPage] = useState(1)
-  const [hasMore, setHasMore] = useState(true)
-  const [totalPages, setTotalPages] = useState(1)
   const currentUser = useSelector(selectCurrentUser)
   const userId = currentUser?._id
 
-  const fetchOrders = async (page = 1, isLoadMore = false, isTabChange = false) => {
+  const fetchOrders = async () => {
     if (!userId) return
     try {
-      if (isLoadMore) {
-        setLoadingMore(true)
-      } else if (isTabChange) {
-        setTabLoading(true)
-        setCurrentPage(1)
-      } else {
-        setLoading(true)
-        setCurrentPage(1)
-      }
-
-      const response = await getOrders(userId, page, 10, selectedTab)
-      console.log('Fetched orders:', response)
-
-      if (isLoadMore) {
-        setOrders(prev => [...prev, ...response.data])
-      } else {
-        setOrders(response.data)
-      }
-
-      setTotalPages(response.meta.totalPages)
-      setHasMore(page < response.meta.totalPages)
-      setCurrentPage(page)
+      setLoading(true)
+      const orders = await getOrders(userId)
+      console.log('Fetched orders:', orders.data) // Kiểm tra ở console
+      setOrders(orders.data)
     } catch (error) {
       console.error('Lỗi khi lấy đơn hàng:', error)
-      if (!isLoadMore) {
-        setOrders([])
-      }
     } finally {
       setLoading(false)
-      setLoadingMore(false)
-      setTabLoading(false)
     }
   }
 
   useEffect(() => {
-    if (userId) {
-      fetchOrders(1, false, true) // isTabChange = true
-    }
-  }, [selectedTab])
-
-  useEffect(() => {
-    if (userId) {
-      fetchOrders()
-    }
+    fetchOrders()
   }, [userId])
 
   // Handle tab change
@@ -487,15 +488,19 @@ const OrderListPage = () => {
     setSelectedTab(newValue)
   }
 
-  // Handle load more
-  const handleLoadMore = () => {
-    if (hasMore && !loadingMore) {
-      fetchOrders(currentPage + 1, true)
-    }
+  // Handle order cancellation - switch to cancelled tab
+  const handleOrderCancelled = () => {
+    setSelectedTab('Cancelled')
   }
 
-  // Orders are already sorted by newest first from backend, no need to reverse
-  const displayOrders = Array.isArray(orders) ? orders : []
+  // Filter orders based on selected tab
+  const filteredOrders = Array.isArray(orders)
+    ? selectedTab === 'All'
+      ? orders
+      : orders.filter((order) => order.status === selectedTab)
+    : []
+
+  // Orders are already sorted by backend (newest first), no need to reverse
 
   if (loading) {
     return (
@@ -579,7 +584,7 @@ const OrderListPage = () => {
       </Paper>
 
       {/* Order List */}
-      {displayOrders.length === 0 ? (
+      {filteredOrders.length === 0 ? (
         <Paper
           sx={{
             p: 6,
@@ -601,67 +606,16 @@ const OrderListPage = () => {
           </Typography>
         </Paper>
       ) : (
-        <>
-          <Box position="relative">
-            {/* Tab Loading Overlay */}
-            {tabLoading && (
-              <Box
-                position="absolute"
-                top={0}
-                left={0}
-                right={0}
-                bottom={0}
-                display="flex"
-                alignItems="center"
-                justifyContent="center"
-                bgcolor="rgba(255, 255, 255, 0.8)"
-                zIndex={1}
-                borderRadius={3}
-              >
-                <Box display="flex" flexDirection="column" alignItems="center" gap={2}>
-                  <CircularProgress size={40} />
-                  <Typography variant="body2" color="text.secondary">
-                    Đang tải đơn hàng...
-                  </Typography>
-                </Box>
-              </Box>
-            )}
-
-            <Stack spacing={3} sx={{ opacity: tabLoading ? 0.5 : 1, transition: 'opacity 0.3s ease' }}>
-              {displayOrders.map((order) => (
-                <OrderRow key={order._id} order={order} onOrderUpdate={() => fetchOrders()} />
-              ))}
-            </Stack>
-          </Box>
-
-          {/* Load More Button */}
-          {hasMore && !tabLoading && (
-            <Box display="flex" justifyContent="center" mt={4}>
-              <Button
-                variant="outlined"
-                size="large"
-                onClick={handleLoadMore}
-                disabled={loadingMore}
-                startIcon={loadingMore ? <CircularProgress size={20} /> : null}
-                sx={{
-                  borderRadius: 3,
-                  textTransform: 'none',
-                  fontWeight: 600,
-                  px: 4,
-                  py: 1.5,
-                  borderColor: '#1a3c7b',
-                  color: '#1a3c7b',
-                  '&:hover': {
-                    borderColor: '#1a3c7b',
-                    backgroundColor: 'rgba(26, 60, 123, 0.04)'
-                  }
-                }}
-              >
-                {loadingMore ? 'Đang tải...' : 'Xem thêm đơn hàng'}
-              </Button>
-            </Box>
-          )}
-        </>
+        <Stack spacing={3}>
+          {filteredOrders.map((order) => (
+            <OrderRow
+              key={order._id}
+              order={order}
+              onOrderUpdate={fetchOrders}
+              onOrderCancelled={handleOrderCancelled}
+            />
+          ))}
+        </Stack>
       )}
     </Container>
   )

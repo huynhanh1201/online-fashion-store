@@ -31,6 +31,9 @@ const vnpayIPN = async (req) => {
     }
 
     if (rspCode === '00') {
+
+      console.log('da chay ham vnpayIPN')
+
       // Bắt đầu transaction
       session.startTransaction()
 
@@ -64,7 +67,7 @@ const vnpayIPN = async (req) => {
       const variantMap = new Map(Object.entries(variantObjMap))
 
       // Cập nhật trạng thái đơn hàng
-      const orderPromise = OrderModel.updateOne(
+      const orderPromise = OrderModel.findOneAndUpdate(
         { _id: orderId },
         { status: 'Processing', paymentStatus: 'Completed' }
       ).session(session)
@@ -94,33 +97,39 @@ const vnpayIPN = async (req) => {
       )
 
       // Xử lý tất cả promise song song
-      await Promise.all([
-        warehouseSlipPromise,
-        orderPromise,
-        transactionPromise,
-        orderItemsPromise
-      ])
-
+      const [warehouseSlip,
+        orderData,
+        transaction,
+        orderItems] = await Promise.all([
+          warehouseSlipPromise,
+          orderPromise,
+          transactionPromise,
+          orderItemsPromise
+        ])
+      console.log('warehouseSlip', warehouseSlip)
+      console.log('orderData', orderData)
+      console.log('transaction', transaction)
+      console.log('orderItems', orderItems)
       // Tạo đơn hàng vận chuyển (GHN)
-      const createDeliveryOrder = await deliveriesService.createDeliveryOrder(
-        reqBody,
-        cartItems,
-        order,
-        address,
-        variantMap
-      )
+      // const createDeliveryOrder = await deliveriesService.createDeliveryOrder(
+      //   reqBody,
+      //   cartItems,
+      //   order,
+      //   address,
+      //   variantMap
+      // )
 
-      // Cập nhật mã ghnOrderCode
-      await OrderModel.findOneAndUpdate(
-        { _id: order._id },
-        {
-          ghnOrderCode: createDeliveryOrder?.data?.data?.order_code
-        },
-        {
-          new: true,
-          session: session
-        }
-      )
+      // // Cập nhật mã ghnOrderCode
+      // await OrderModel.findOneAndUpdate(
+      //   { _id: order._id },
+      //   {
+      //     ghnOrderCode: createDeliveryOrder?.data?.data?.order_code
+      //   },
+      //   {
+      //     new: true,
+      //     session: session
+      //   }
+      // )
 
       // Xóa sản phẩm trong giỏ hàng
       await orderHelpers.handleDeleteCartItems(userId, variantIds, session)

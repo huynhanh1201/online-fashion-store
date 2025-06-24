@@ -8,9 +8,12 @@ const OrderSuccess = () => {
   const navigate = useNavigate()
   const { refresh } = useCart()
 
+  React.useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'auto' })
+  }, [])
+
   const handleGoHome = () => {
     navigate('/')
-    // Gọi refresh sau khi đã chuyển trang
     setTimeout(() => {
       refresh()
     }, 0)
@@ -22,6 +25,7 @@ const OrderSuccess = () => {
       refresh()
     }, 0)
   }
+
   return (
     <Box
       sx={{
@@ -59,24 +63,28 @@ const OrderSuccess = () => {
         </Typography>
 
         <Stack direction="row" spacing={2} justifyContent="center">
-          <Button variant="contained"
+          <Button
+            variant="contained"
             onClick={handleGoHome}
             sx={{
               backgroundColor: '#1A3C7B',
               '&:hover': {
                 backgroundColor: '#162f61',
               }
-            }}>
+            }}
+          >
             Quay về trang chủ
           </Button>
-          <Button variant="contained"
+          <Button
+            variant="contained"
             sx={{
               backgroundColor: '#1A3C7B',
               '&:hover': {
                 backgroundColor: '#162f61',
               }
             }}
-            onClick={handleGoOrders}>
+            onClick={handleGoOrders}
+          >
             Đơn mua của bạn
           </Button>
         </Stack>

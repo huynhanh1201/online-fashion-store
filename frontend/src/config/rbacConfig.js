@@ -1,81 +1,212 @@
-import { getRoles } from '~/services/admin/roleService'
-import { getPermissions } from '~/services/admin/permissionService'
+// export const roles = {
+//   OWNER: 'owner',
+//   TECHNICAL_ADMIN: 'technical_admin',
+//   STAFF: 'staff',
+//   CUSTOMER: 'customer'
+// }
 
-// Role constants (map by name)
-export const roles = {}
+// // Định nghĩa quyền theo role
+// export const ROLE_PERMISSIONS = {
+//   // [roles.OWNER]: Object.values(permission),
+//   [roles.OWNER]: [
+//     // User
+//     'user:create',
+//     'user:read',
+//     'user:update',
+//     'user:delete',
 
-// Map role name => list of permissions
-export const ROLE_PERMISSIONS = {}
+//     // Category
+//     'category:create',
+//     'category:read',
+//     'category:update',
+//     'category:delete',
 
-// Danh sách tất cả quyền (nếu muốn sử dụng sau)
-export const ALL_PERMISSIONS = []
+//     // Product
+//     'product:create',
+//     'product:read',
+//     'product:update',
+//     'product:delete',
 
-// Hàm khởi tạo dữ liệu từ API
-export const initRolePermissions = async () => {
-  try {
-    const [roleRes, permissionRes] = await Promise.all([
-      getRoles(),
-      getPermissions()
-    ])
+//     // Variant
+//     'variant:create',
+//     'variant:read',
+//     'variant:update',
+//     'variant:delete',
 
-    const fetchedRoles = roleRes.data || []
-    const fetchedPermissions = permissionRes.data || []
+//     // Color
+//     'color:create',
+//     'color:read',
+//     'color:update',
+//     'color:delete',
 
-    // Reset
-    Object.keys(roles).forEach((k) => delete roles[k])
-    Object.keys(ROLE_PERMISSIONS).forEach((k) => delete ROLE_PERMISSIONS[k])
-    ALL_PERMISSIONS.length = 0
+//     // Color Palette
+//     'colorPalette:create',
+//     'colorPalette:read',
+//     'colorPalette:update',
+//     'colorPalette:delete',
 
-    // Gán role constant
-    fetchedRoles.forEach((role) => {
-      roles[role.name.toUpperCase()] = role.name
-      // Đảm bảo permissions là array của strings
-      const permissions = Array.isArray(role.permissions)
-        ? role.permissions.map((p) =>
-            typeof p === 'string' ? p : p.name || p.permission
-          )
-        : []
-      ROLE_PERMISSIONS[role.name] = permissions
-    })
+//     // Size
+//     'size:create',
+//     'size:read',
+//     'size:update',
+//     'size:delete',
 
-    // Gán danh sách quyền (nếu cần dùng sau)
-    ALL_PERMISSIONS.push(...fetchedPermissions)
+//     // Size Palette
+//     'sizePalette:create',
+//     'sizePalette:read',
+//     'sizePalette:update',
+//     'sizePalette:delete',
 
-    console.log('=== RBAC Configuration Loaded ===')
-    console.log('Roles:', roles)
-    console.log('ROLE_PERMISSIONS:', ROLE_PERMISSIONS)
-    console.log('ALL_PERMISSIONS:', ALL_PERMISSIONS)
+//     // Order
+//     'order:create',
+//     'order:read',
+//     'order:update',
 
-    // Debug: Kiểm tra xem có role nào có quyền admin:access không
-    Object.entries(ROLE_PERMISSIONS).forEach(([roleName, permissions]) => {
-      if (permissions.includes('admin:access')) {
-        console.log(`✅ Role "${roleName}" has admin:access permission`)
-      } else {
-        console.log(
-          `❌ Role "${roleName}" does NOT have admin:access permission`
-        )
-      }
-    })
+//     // Payment Transaction
+//     'payment:read',
+//     'payment:update',
+//     'payment:delete',
 
-    return { roles, ROLE_PERMISSIONS, ALL_PERMISSIONS }
-  } catch (err) {
-    console.error('Failed to init roles and permissions:', err)
-    throw err
-  }
-}
+//     // Coupon
+//     'coupon:create',
+//     'coupon:read',
+//     'coupon:update',
+//     'coupon:delete',
 
-// Kiểm tra roles đã load chưa
-export const isRolesInitialized = () => {
-  return Object.keys(ROLE_PERMISSIONS).length > 0
-}
+//     // Statistics
+//     'statistics:read',
 
-// Lấy quyền theo role
-export const getRolePermissions = (roleName) => {
-  return ROLE_PERMISSIONS[roleName] || []
-}
+//     // Inventory
+//     'inventory:read',
+//     'inventory:update',
 
-// Kiểm tra role có quyền cụ thể không
-export const hasRolePermission = (roleName, permission) => {
-  const permissions = getRolePermissions(roleName)
-  return permissions.includes(permission)
-}
+//     // Warehouse Slip
+//     'warehouseSlip:create',
+//     'warehouseSlip:read',
+
+//     // Inventory Log
+//     'inventoryLog:read',
+
+//     // Warehouse
+//     'warehouse:create',
+//     'warehouse:read',
+//     'warehouse:update',
+//     'warehouse:delete',
+
+//     // Batch
+//     'batch:read',
+//     'batch:update',
+
+//     // Partner
+//     'partner:create',
+//     'partner:read',
+//     'partner:update',
+//     'partner:delete',
+
+//     // Review
+//     'review:read',
+//     'review:update',
+//     'review:delete',
+
+//     // Admin access
+//     'admin:access'
+//   ],
+//   [roles.TECHNICAL_ADMIN]: [
+//     // User (service‑account support)
+//     'user:read',
+//     'user:update',
+
+//     // Category
+//     'category:read',
+
+//     // Product
+//     'product:read',
+
+//     // Variant
+//     'variant:read',
+
+//     // Color
+//     'color:read',
+
+//     // Color Palette
+//     'colorPalette:read',
+
+//     // Size
+//     'size:read',
+
+//     // Size Palette
+//     'sizePalette:read',
+
+//     // Order
+//     'order:read',
+
+//     // Payment Transaction
+//     'payment:read',
+
+//     // Coupon
+//     'coupon:read',
+
+
+//     // Inventory
+//     'inventory:read',
+
+//     // Warehouse Slip
+//     'warehouseSlip:read',
+
+//     // Inventory Log
+//     'inventoryLog:read',
+
+//     // Warehouse
+//     'warehouse:read',
+
+//     // Batch
+//     'batch:read',
+
+//     // Partner
+//     'partner:read',
+
+//     // Review
+//     'review:read',
+
+//     // Admin access
+//     'admin:access'
+//   ],
+//   [roles.STAFF]: [
+//     // Order Management
+//     'order:read',
+//     'order:update',
+
+//     // Coupon (để có thể xem và áp dụng mã giảm giá khi xử lý đơn hàng)
+//     // 'coupon:read',
+
+//     // Payment (để có thể xem thông tin giao dịch khi xử lý đơn hàng)
+//     'payment:read',
+
+//     // Inventory Management
+//     'inventory:read',
+//     'inventory:update',
+
+//     // Warehouse Slip
+//     'warehouseSlip:create',
+//     'warehouseSlip:read',
+
+//     // Inventory Log
+//     // 'inventoryLog:read',
+
+//     // // Warehouse (để có thể xem thông tin kho khi quản lý inventory)
+//     // 'warehouse:read',
+
+//     // // Batch (để có thể xem thông tin lô hàng khi quản lý inventory)
+//     // 'batch:read',
+
+//     // // Partner (để có thể xem thông tin đối tác khi tạo phiếu kho)
+//     // 'partner:read',
+
+//     // // Statistics
+//     'statistics:read',
+
+//     // Admin access
+//     'admin:access'
+//   ],
+//   [roles.CUSTOMER]: []
+// }

@@ -1,5 +1,5 @@
 /* eslint-disable no-console */
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import {
   Box,
   Container,
@@ -45,9 +45,12 @@ import {
 import { optimizeCloudinaryUrl } from '~/utils/cloudinary'
 import { getDiscounts } from '~/services/discountService'
 import SuggestionProducts from './SuggestionProducts'
+import inventoryService from '~/services/inventoryService'
 
 const Cart = () => {
   const { cart, loading, deleteItem, clearCart, updateItem } = useCart()
+
+  console.log('Cart component - loading:', loading, 'cart:', cart)
   const [selectedItems, setSelectedItems] = useState([])
   const [cartItems, setCartItems] = useState([])
   const [showMaxQuantityAlert, setShowMaxQuantityAlert] = useState(false)
@@ -63,6 +66,19 @@ const Cart = () => {
   const tempQuantities = useSelector((state) => state.cart.tempQuantities || {})
   const [processingVariantId, setProcessingVariantId] = useState(null)
 
+  // Refs để tránh stale closure
+  const inventoryQuantitiesRef = useRef(inventoryQuantities)
+  const fetchingVariantsRef = useRef(fetchingVariants)
+
+  // Cập nhật refs khi state thay đổi
+  useEffect(() => {
+    inventoryQuantitiesRef.current = inventoryQuantities
+  }, [inventoryQuantities])
+
+  useEffect(() => {
+    fetchingVariantsRef.current = fetchingVariants
+  }, [fetchingVariants])
+
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'auto' })
   }, [])
@@ -75,11 +91,14 @@ const Cart = () => {
     const fetchInventories = async () => {
       if (cartItems.length === 0) return
 
+      const currentInventory = inventoryQuantitiesRef.current
+      const currentFetching = fetchingVariantsRef.current
+
       const newVariantsToFetch = cartItems
         .filter(
           (item) =>
-            !inventoryQuantities[item.variant._id] &&
-            !fetchingVariants.has(item.variant._id),
+            !currentInventory[item.variant._id] &&
+            !currentFetching.has(item.variant._id),
         )
         .map((item) => item.variant._id)
 
@@ -89,29 +108,25 @@ const Cart = () => {
 
       try {
         const fetchPromises = newVariantsToFetch.map(async (variantId) => {
-          try {
-            const res = await fetch(
-              `http://localhost:8017/v1/inventories?variantId=${variantId}`,
-            )
-            const result = await res.json()
-            const inventoryList = result.data
-            const inventory = Array.isArray(inventoryList)
-              ? inventoryList[0]
-              : inventoryList
-            return { variantId, quantity: inventory?.quantity ?? 0 }
-          } catch (error) {
-            console.error(`Lỗi lấy tồn kho cho variant ${variantId}:`, error)
-            return { variantId, quantity: 0 }
-          }
+          const inventory = await inventoryService.fetchInventory(variantId)
+          console.log('Inventory data for', variantId, ':', inventory)
+          return { variantId, inventory }
         })
 
         const results = await Promise.all(fetchPromises)
-        const newInventoryQuantities = { ...inventoryQuantities }
-        results.forEach(({ variantId, quantity }) => {
-          newInventoryQuantities[variantId] = quantity
-        })
 
-        setInventoryQuantities(newInventoryQuantities)
+        setInventoryQuantities((prev) => {
+          const updated = { ...prev }
+          results.forEach(({ variantId, inventory }) => {
+            // Thử các trường hợp có thể có
+            const quantity = inventory?.quantity || inventory?.availableQuantity || inventory?.stock || 0
+            console.log('Setting quantity for', variantId, ':', quantity)
+            updated[variantId] = quantity
+          })
+          return updated
+        })
+      } catch (error) {
+        console.error('Error fetching inventory:', error)
       } finally {
         setFetchingVariants((prev) => {
           const newSet = new Set(prev)
@@ -122,7 +137,7 @@ const Cart = () => {
     }
 
     fetchInventories()
-  }, [cartItems, inventoryQuantities, fetchingVariants])
+  }, [cartItems])
 
   useEffect(() => {
     if (hasFetchedCoupons) return
@@ -261,10 +276,30 @@ const Cart = () => {
     dispatch(setSelectedItemsAction(selectedItems))
   }, [selectedItems])
 
+  // Helper function to get final price (exportPrice minus discountPrice)
+  const getFinalPrice = (variant) => {
+    const basePrice = variant.exportPrice || 0
+    const discount = variant.discountPrice || 0
+    return Math.max(basePrice - discount, 0) // Đảm bảo giá không âm
+  }
+
   const totalPrice = selectedCartItems.reduce((sum, item) => {
     const selected = selectedItems.find((i) => i.variantId === item.variant._id)
     const qty = selected?.quantity || item.quantity
-    return sum + (item.variant.exportPrice || 0) * qty
+    return sum + getFinalPrice(item.variant) * qty
+  }, 0)
+
+  // Tính tổng tiết kiệm từ các sản phẩm đã giảm giá
+  const totalSavings = selectedCartItems.reduce((sum, item) => {
+    const selected = selectedItems.find((i) => i.variantId === item.variant._id)
+    const qty = selected?.quantity || item.quantity
+    const variant = item.variant
+
+    // Chỉ tính tiết kiệm nếu có discountPrice
+    if (variant.discountPrice && variant.discountPrice > 0) {
+      return sum + (variant.discountPrice * qty)
+    }
+    return sum
   }, 0)
   const capitalizeFirstLetter = (str) => {
     if (!str) return ''
@@ -660,15 +695,51 @@ const Cart = () => {
                               sx={{ fontSize: '0.75rem' }}
                             />
                           </Box>
-                          <Typography
-                            sx={{
-                              fontWeight: 700,
-                              color: '#d32f2f',
-                              fontSize: { xs: '0.9rem', sm: '1rem' },
-                            }}
-                          >
-                            {formatPrice(variant.exportPrice)}
-                          </Typography>
+                          <Box display="flex" alignItems="center" gap={1} flexWrap="wrap">
+                            {variant.discountPrice && variant.discountPrice > 0 ? (
+                              <>
+                                <Typography
+                                  sx={{
+                                    fontWeight: 700,
+                                    color: '#d32f2f',
+                                    fontSize: { xs: '0.9rem', sm: '1rem' },
+                                  }}
+                                >
+                                  {formatPrice(getFinalPrice(variant))}
+                                </Typography>
+                                <Typography
+                                  sx={{
+                                    fontWeight: 500,
+                                    color: 'text.secondary',
+                                    fontSize: { xs: '0.8rem', sm: '0.9rem' },
+                                    textDecoration: 'line-through',
+                                  }}
+                                >
+                                  {formatPrice(variant.exportPrice)}
+                                </Typography>
+                                <Chip
+                                  size="small"
+                                  label={`-${Math.round((variant.discountPrice / variant.exportPrice) * 100)}%`}
+                                  sx={{
+                                    backgroundColor: '#ff5722',
+                                    color: 'white',
+                                    fontSize: '0.7rem',
+                                    height: 18,
+                                  }}
+                                />
+                              </>
+                            ) : (
+                              <Typography
+                                sx={{
+                                  fontWeight: 700,
+                                  color: '#d32f2f',
+                                  fontSize: { xs: '0.9rem', sm: '1rem' },
+                                }}
+                              >
+                                {formatPrice(variant.exportPrice)}
+                              </Typography>
+                            )}
+                          </Box>
                         </Box>
 
                         {/* Quantity and Delete */}
@@ -796,6 +867,30 @@ const Cart = () => {
                     {formatPrice(totalPrice)}
                   </Typography>
                 </Box>
+                {totalSavings > 0 && (
+                  <Box display="flex" justifyContent="space-between" mb={1}>
+                    <Typography
+                      variant="body2"
+                      sx={{
+                        color: '#4caf50',
+                        fontSize: '0.85rem',
+                        fontStyle: 'italic'
+                      }}
+                    >
+                      Tiết kiệm được:
+                    </Typography>
+                    <Typography
+                      variant="body2"
+                      sx={{
+                        fontWeight: 600,
+                        color: '#4caf50',
+                        fontSize: '0.85rem'
+                      }}
+                    >
+                      {formatPrice(totalSavings)}
+                    </Typography>
+                  </Box>
+                )}
                 {applicableCoupon && (
                   <Box display="flex" justifyContent="space-between" mb={1}>
                     <Typography color="text.secondary">Giảm giá:</Typography>

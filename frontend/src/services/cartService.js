@@ -13,9 +13,15 @@ export const getCart = async () => {
 }
 
 // Thêm sản phẩm vào giỏ hàng
-export const addToCart = async ({ variant, quantity }) => {
+export const addToCart = async ({ variant, variantId, quantity }) => {
   try {
-    const payload = { variantId: variant._id, quantity }  // gửi variantId thay vì object variant
+    // Support both variant object and variantId string
+    const finalVariantId = variantId || (variant && variant._id)
+    if (!finalVariantId) {
+      throw new Error('Variant ID is required')
+    }
+
+    const payload = { variantId: finalVariantId, quantity }
     console.log('Thêm sản phẩm vào giỏ:', payload)
     const response = await AuthorizedAxiosInstance.post(
       `${API_ROOT}/v1/carts`,

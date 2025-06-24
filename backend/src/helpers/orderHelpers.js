@@ -170,7 +170,7 @@ const calculatedSubtotal = (cartItems, variantMap) => {
 
     if (variant) {
       return (
-        acc + item.quantity * (variant.discountPrice || variant.exportPrice)
+        acc + item.quantity * (variant.discountPrice ? variant.exportPrice - variant.discountPrice : variant.exportPrice)
       )
     }
     return acc

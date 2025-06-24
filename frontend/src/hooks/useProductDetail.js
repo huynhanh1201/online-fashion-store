@@ -234,14 +234,10 @@ const useProductDetail = (productId) => {
 
   const fetchInventory = async (variantId) => {
     try {
-      const response = await AuthorizedAxiosInstance.get(
-        `${API_ROOT}/v1/inventories?variantId=${variantId}`
-      )
+      const response = await AuthorizedAxiosInstance.get(`${API_ROOT}/v1/inventories?variantId=${variantId}`)
       const result = response.data
       const inventoryList = result.data || []
-      const inventory = Array.isArray(inventoryList)
-        ? inventoryList[0]
-        : inventoryList
+      const inventory = Array.isArray(inventoryList) ? inventoryList[0] : inventoryList
       setInventory(inventory)
       console.log('Thông tin kho:', inventory)
     } catch (error) {

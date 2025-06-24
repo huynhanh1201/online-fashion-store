@@ -5,7 +5,6 @@ export const permissions = [
     label: 'Cho phep truy cập trang quản lý',
     group: 'Quản trị hệ thống'
   },
-
   // User
   { key: 'user:create', label: 'Tạo tài khoản nhân viên', group: 'Tài khoản' },
   { key: 'user:read', label: 'Xem tài khoản nhân viên', group: 'Tài khoản' },
@@ -94,12 +93,12 @@ export const permissions = [
 
   // Payment Transaction
   {
-    key: 'paymentTransaction:read',
+    key: 'payment:read',
     label: 'Xem giao dịch thanh toán',
     group: 'Thanh toán'
   },
   {
-    key: 'paymentTransaction:update',
+    key: 'payment:update',
     label: 'Cập nhật giao dịch thanh toán',
     group: 'Thanh toán'
   },
