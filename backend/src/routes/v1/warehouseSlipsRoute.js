@@ -14,16 +14,21 @@ Router.route('/').post(
 )
 
 // Danh sách Kho (Biến thể) sản phẩm
-Router.route('/').get(warehouseSlipsController.getWarehouseSlipList)
+Router.route('/').get(
+  authMiddleware.isAuthorized,
+  warehouseSlipsController.getWarehouseSlipList
+)
 
 // Lấy thông tin một Kho (Biến thể) sản phẩm.
 Router.route('/:warehouseSlipId').get(
+  authMiddleware.isAuthorized,
   warehouseSlipsValidation.verifyId,
   warehouseSlipsController.getWarehouseSlip
 )
 
 // Cập nhật thông tin Kho (Biến thể) sản phẩm
 Router.route('/:warehouseSlipId').patch(
+  authMiddleware.isAuthorized,
   warehouseSlipsValidation.verifyId,
   warehouseSlipsValidation.warehouseSlipUpdate,
   warehouseSlipsController.updateWarehouseSlip
@@ -31,6 +36,7 @@ Router.route('/:warehouseSlipId').patch(
 
 // Xoá Kho (Biến thể) sản phẩm (Xóa mềm)
 Router.route('/:warehouseSlipId').delete(
+  authMiddleware.isAuthorized,
   warehouseSlipsValidation.verifyId,
   warehouseSlipsController.deleteWarehouseSlip
 )

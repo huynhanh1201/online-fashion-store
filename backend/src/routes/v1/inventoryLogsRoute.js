@@ -8,21 +8,27 @@ const Router = express.Router()
 
 // Tạo Màu sắc sản phẩm mới
 Router.route('/').post(
+  authMiddleware.isAuthorized,
   inventoryLogsValidation.inventoryLog,
   inventoryLogsController.createInventoryLog
 )
 
 // Danh sách Màu sắc sản phẩm
-Router.route('/').get(inventoryLogsController.getInventoryLogList)
+Router.route('/').get(
+  authMiddleware.isAuthorized,
+  inventoryLogsController.getInventoryLogList
+)
 
 // Lấy thông tin một Màu sắc sản phẩm.
 Router.route('/:inventoryLogId').get(
+  authMiddleware.isAuthorized,
   inventoryLogsValidation.verifyId,
   inventoryLogsController.getInventoryLog
 )
 
 // Cập nhật thông tin Màu sắc sản phẩm
 Router.route('/:inventoryLogId').patch(
+  authMiddleware.isAuthorized,
   inventoryLogsValidation.verifyId,
   inventoryLogsValidation.inventoryLog,
   inventoryLogsController.updateInventoryLog
@@ -30,6 +36,7 @@ Router.route('/:inventoryLogId').patch(
 
 // Xoá Màu sắc sản phẩm (Xóa mềm)
 Router.route('/:inventoryLogId').delete(
+  authMiddleware.isAuthorized,
   inventoryLogsValidation.verifyId,
   inventoryLogsController.deleteInventoryLog
 )
