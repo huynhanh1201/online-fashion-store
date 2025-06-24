@@ -612,11 +612,11 @@ const AddVariantModal = ({
               control={control}
               rules={{
                 validate: (val) =>
-                  Number(val) >= 0 ? true : 'Giá giảm không được âm'
+                  Number(val) >= 0 ? true : 'Giảm giá không được âm'
               }}
               render={({ field }) => (
                 <TextField
-                  label='Giá giảm cho biến thể (đ)'
+                  label='Giảm giá cho biến thể (đ)'
                   type='text'
                   fullWidth
                   value={formatCurrency(field.value)}
