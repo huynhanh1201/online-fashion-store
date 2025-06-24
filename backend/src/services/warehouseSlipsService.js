@@ -295,7 +295,7 @@ const importStockWarehouseSlip = async (reqBody, jwtDecoded, session) => {
           minQuantity: variant.minQuantity, // Lấy từ variant gốc
           importPrice: variant.importPrice,
           exportPrice: variant.exportPrice,
-          status: variant.status,
+          status: 'in-stock',
           destroy: false
         }
 
