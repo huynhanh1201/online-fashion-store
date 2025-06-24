@@ -45,7 +45,9 @@ const variant = async (req, res, next) => {
       weight: Joi.number().positive()
     }),
 
-    status: Joi.string().valid('draft', 'active', 'inactive').default('draft')
+    status: Joi.string().valid('draft', 'active', 'inactive').default('draft'),
+
+    discountPrice: Joi.number().min(0).default(0)
   })
 
   try {
@@ -89,7 +91,8 @@ const variantUpdate = async (req, res, next) => {
       weight: Joi.number().positive()
     }),
 
-    status: Joi.string().valid('draft', 'active', 'inactive').default('draft')
+    status: Joi.string().valid('draft', 'active', 'inactive').default('draft'),
+    discountPrice: Joi.number().min(0).default(0)
   })
 
   try {
