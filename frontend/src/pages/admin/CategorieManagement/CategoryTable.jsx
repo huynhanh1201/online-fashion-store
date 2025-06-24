@@ -30,7 +30,8 @@ const CategoryTable = ({
   total,
   onPageChange,
   onChangeRowsPerPage,
-  permissions = {}
+  permissions = {},
+  initialSearch
 }) => {
   const columns = [
     { id: 'index', label: 'STT', align: 'center', width: 50 },
@@ -45,6 +46,7 @@ const CategoryTable = ({
 
     { id: 'createdAt', label: 'Ngày tạo', align: 'start', minWidth: 150 },
     { id: 'updatedAt', label: 'Ngày cập nhật', align: 'start', minWidth: 150 },
+    { id: 'more', label: 'Xem các sản phẩm', align: 'start', minWidth: 150 },
     {
       id: 'destroy',
       label: 'Trạng thái danh mục',
@@ -107,6 +109,7 @@ const CategoryTable = ({
                     categories={categories}
                     fetchCategories={fetchCategories}
                     loading={loading}
+                    initialSearch={initialSearch}
                   />
                 </Box>
               </TableCell>

@@ -29,7 +29,9 @@ const usePermissions = () => {
         roleName
       }).toString()
 
-      const res = await AuthorizedAxiosInstance.get(`${API_ROOT}/v1/roles?${query}`)
+      const res = await AuthorizedAxiosInstance.get(
+        `${API_ROOT}/v1/roles?${query}`
+      )
       const permissions = res?.data?.data?.[0]?.permissions || []
 
       // Lưu vào cache

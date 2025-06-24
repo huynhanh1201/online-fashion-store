@@ -1,5 +1,12 @@
 import React, { useState, useEffect } from 'react'
-import { Typography, Button, Paper, CircularProgress, Alert, Box } from '@mui/material'
+import {
+  Typography,
+  Button,
+  Paper,
+  CircularProgress,
+  Alert,
+  Box
+} from '@mui/material'
 import AddIcon from '@mui/icons-material/Add'
 import { toast } from 'react-toastify'
 import BlogTable from './BlogTable'
@@ -7,54 +14,30 @@ import BlogModal from './modal/AddBlogModal'
 import ViewBlogModal from './modal/ViewBlogModal'
 import DeleteBlogModal from './modal/DeleteBlogModal'
 import {
-  getBlogs,
   createBlog,
   updateBlog,
   deleteBlog
 } from '~/services/admin/blogService'
-
+import useBlog from '~/hooks/admin/useBlog'
 export default function BlogManagementPage() {
-  const [blogs, setBlogs] = useState([])
-  const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
-  const [pagination, setPagination] = useState({
-    page: 1,
-    limit: 10,
-    total: 0,
-    totalPages: 0
-  })
   const [openBlogModal, setOpenBlogModal] = useState(false)
   const [blogModalMode, setBlogModalMode] = useState('add') // 'add' hoặc 'edit'
   const [openView, setOpenView] = useState(false)
   const [openDelete, setOpenDelete] = useState(false)
   const [selectedBlog, setSelectedBlog] = useState(null)
-
+  const [page, setPage] = React.useState(1)
+  const [limit, setLimit] = React.useState(10)
+  const [filters, setFilters] = React.useState({
+    status: 'draft',
+    sort: 'newest'
+  })
   // Fetch blogs từ API
-  const fetchBlogs = async (page = 1, limit = 10, filters = {}) => {
-    try {
-      setLoading(true)
-      setError(null)
-      const response = await getBlogs(page, limit, filters)
-      setBlogs(response.blogs)
-      setPagination({
-        page: response.currentPage,
-        limit,
-        total: response.total,
-        totalPages: response.totalPages
-      })
-    } catch (error) {
-      console.error('Lỗi khi tải danh sách blog:', error)
-      setError('Không thể tải danh sách blog. Vui lòng thử lại.')
-      toast.error('Không thể tải danh sách blog')
-    } finally {
-      setLoading(false)
-    }
-  }
-
+  const { blogs, fetchBlogs, totalPages, loading } = useBlog()
   // Load blogs khi component mount
   useEffect(() => {
-    fetchBlogs()
-  }, [])
+    fetchBlogs(page, limit, filters)
+  }, [page, limit, filters])
 
   const handleBlogSave = async (blogData, isEditMode) => {
     try {
@@ -72,7 +55,7 @@ export default function BlogManagementPage() {
       setSelectedBlog(null)
       setBlogModalMode('add')
       // Refresh lại danh sách để đảm bảo dữ liệu mới nhất
-      fetchBlogs(pagination.page, pagination.limit)
+      fetchBlogs(page, limit, filters)
     } catch (error) {
       console.error('Lỗi khi xử lý blog:', error)
       if (isEditMode) {
@@ -90,27 +73,23 @@ export default function BlogManagementPage() {
       setOpenDelete(false)
       setSelectedBlog(null)
       // Refresh lại danh sách
-      fetchBlogs(pagination.page, pagination.limit)
+      fetchBlogs(page, limit, filters)
     } catch (error) {
       console.error('Lỗi khi xóa blog:', error)
       toast.error('Không thể xóa blog. Vui lòng thử lại.')
     }
   }
 
-  const handlePageChange = (newPage) => {
-    fetchBlogs(newPage, pagination.limit)
-  }
+  const handleChangePage = (event, value) => setPage(value)
+  const isEqual = (obj1, obj2) => JSON.stringify(obj1) === JSON.stringify(obj2)
 
-  const handleSearch = (searchTerm) => {
-    fetchBlogs(1, pagination.limit, { search: searchTerm })
+  const handleFilter = (newFilters) => {
+    if (!isEqual(filters, newFilters)) {
+      setPage(1)
+      setFilters(newFilters)
+    }
   }
-
-  const handleFilter = (filters) => {
-    fetchBlogs(1, pagination.limit, filters)
-  }
-
   // Function để tạo dữ liệu mẫu
-
 
   if (loading) {
     return (
@@ -124,11 +103,11 @@ export default function BlogManagementPage() {
   if (error) {
     return (
       <Paper sx={{ p: 3 }}>
-        <Alert severity="error" sx={{ mb: 2 }}>
+        <Alert severity='error' sx={{ mb: 2 }}>
           {error}
         </Alert>
         <Box sx={{ display: 'flex', gap: 2 }}>
-          <Button variant="contained" onClick={() => fetchBlogs()}>
+          <Button variant='contained' onClick={() => fetchBlogs()}>
             Thử lại
           </Button>
         </Box>
@@ -140,7 +119,6 @@ export default function BlogManagementPage() {
     <>
       <BlogTable
         blogs={blogs}
-        pagination={pagination}
         onAdd={() => {
           setBlogModalMode('add')
           setSelectedBlog(null)
@@ -159,9 +137,16 @@ export default function BlogManagementPage() {
           setSelectedBlog(blog)
           setOpenDelete(true)
         }}
-        onPageChange={handlePageChange}
-        onSearch={handleSearch}
         onFilter={handleFilter}
+        page={page - 1}
+        rowsPerPage={limit}
+        total={totalPages}
+        onPageChange={handleChangePage}
+        onChangeRowsPerPage={(newLimit) => {
+          setPage(1)
+          setLimit(newLimit)
+        }}
+        loading={loading}
       />
 
       <BlogModal

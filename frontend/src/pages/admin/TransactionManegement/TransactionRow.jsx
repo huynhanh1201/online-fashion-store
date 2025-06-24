@@ -185,7 +185,7 @@ const styles = {
   },
   groupIcon: {
     display: 'flex',
-    justifyContent: 'center',
+    justifyContent: 'start',
     alignItems: 'center',
     gap: 1,
     width: '130px'
@@ -209,10 +209,10 @@ const TransactionRow = ({ transaction, index, onView, onEdit, onDelete }) => {
   const formatDate = (date) =>
     date
       ? new Date(date).toLocaleDateString('vi-VN', {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric'
-      })
+          day: '2-digit',
+          month: '2-digit',
+          year: 'numeric'
+        })
       : '—'
 
   return (
@@ -244,7 +244,7 @@ const TransactionRow = ({ transaction, index, onView, onEdit, onDelete }) => {
           sx={{ width: '120px', fontWeight: '800' }}
         />
       </TableCell>
-      <TableCell align='center' sx={{ ...styles.cell, width: '130px' }}>
+      <TableCell align='left' sx={{ ...styles.cell, width: '130px' }}>
         <Stack direction='row' sx={styles.groupIcon}>
           {hasPermission('payment:read') && (
             <Tooltip title='Xem'>

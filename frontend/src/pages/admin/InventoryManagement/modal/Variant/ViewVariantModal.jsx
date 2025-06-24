@@ -66,7 +66,7 @@ const ViewVariantModal = ({ open, onClose, variant }) => {
                   alt='color'
                   sx={{
                     width: 470,
-                    height: 595,
+                    height: 552,
                     objectFit: 'contain',
                     backgroundColor: '#f5f5f5',
                     borderRadius: 2,
@@ -81,7 +81,12 @@ const ViewVariantModal = ({ open, onClose, variant }) => {
           {/*<Grid item size={1}></Grid>*/}
           {/* Thông tin chi tiết bên phải */}
           <Grid item size={7}>
-            <Table>
+            <Table
+              sx={{
+                '& td': { py: 1.5 }, // áp dụng cho TableCell
+                '& th': { py: 1.5 } // nếu có TableHead thì áp dụng luôn
+              }}
+            >
               <TableBody>
                 <TableRow>
                   <TableCell>
@@ -143,6 +148,14 @@ const ViewVariantModal = ({ open, onClose, variant }) => {
                     <strong>Giá bán</strong>
                   </TableCell>
                   <TableCell>{formatCurrency(variant?.exportPrice)}</TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell>
+                    <strong>Giá giảm cho biến thể</strong>
+                  </TableCell>
+                  <TableCell>
+                    {formatCurrency(variant?.discountPrice || 0)}
+                  </TableCell>
                 </TableRow>
                 <TableRow>
                   <TableCell>

@@ -215,7 +215,7 @@ const TransactionTable = ({
             </TableCell>
             <TableCell
               align='start'
-              sx={{ minWidth: 130, maxWidth: 130, px: 2, paddingLeft: '20px' }}
+              sx={{ minWidth: 130, maxWidth: 130, px: 1, paddingLeft: '10px' }}
             >
               Hành động
             </TableCell>

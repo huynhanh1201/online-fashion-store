@@ -75,9 +75,10 @@ const useOrder = () => {
   const updateOrderById = async (id, data) => {
     try {
       const updated = await updateOrder(id, data)
-      if (!updated || !updated._id)
-        throw new Error('Dữ liệu trả về không hợp lệ')
-
+      if (!updated || !updated._id) {
+        console.error('Dữ liệu trả về không hợp lệ')
+        return null
+      }
       setOrders((prev) =>
         prev.map((d) => (d._id === updated._id ? updated : d))
       )
@@ -90,7 +91,11 @@ const useOrder = () => {
 
   const remove = async (id) => {
     try {
-      await deleteOrderById(id)
+      const remove = await deleteOrderById(id)
+      if (!remove) {
+        console.error('Không thể xoá đơn hàng')
+        return null
+      }
       setOrders((prev) => prev.filter((d) => d._id !== id))
       setTotalPages((prev) => prev - 1)
       return true

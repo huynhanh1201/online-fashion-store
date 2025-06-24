@@ -75,7 +75,7 @@ const VariantsTab = () => {
   })
 
   useEffect(() => {
-    fetchProducts()
+    fetchProducts(1, 100000)
     fetchColors()
     fetchSizes()
   }, [])
@@ -211,7 +211,9 @@ const VariantsTab = () => {
   }
   return (
     <RouteGuard requiredPermissions={['admin:access', 'variant:read']}>
-      <Paper sx={{ border: '1px solid #ccc', width: '100%', overflow: 'hidden' }}>
+      <Paper
+        sx={{ border: '1px solid #ccc', width: '100%', overflow: 'hidden' }}
+      >
         <TableContainer>
           <Table stickyHeader aria-label='variants table'>
             <TableHead>
@@ -308,7 +310,10 @@ const VariantsTab = () => {
                       const getValueByPath = (obj, path) =>
                         path
                           .split('.')
-                          .reduce((acc, key) => (acc ? acc[key] : undefined), obj)
+                          .reduce(
+                            (acc, key) => (acc ? acc[key] : undefined),
+                            obj
+                          )
 
                       const { id, align, format } = column
                       const rawValue = id.includes('.')
@@ -324,7 +329,8 @@ const VariantsTab = () => {
                           .toLowerCase()
                           .split(' ')
                           .map(
-                            (word) => word.charAt(0).toUpperCase() + word.slice(1)
+                            (word) =>
+                              word.charAt(0).toUpperCase() + word.slice(1)
                           )
                           .join(' ')
                       }
@@ -436,7 +442,9 @@ const VariantsTab = () => {
           count={totalVariant || 0}
           rowsPerPage={rowsPerPage}
           page={page - 1}
-          onPageChange={(event, newPage) => handleChangePage(event, newPage + 1)} // truyền lại đúng logic cho parent
+          onPageChange={(event, newPage) =>
+            handleChangePage(event, newPage + 1)
+          } // truyền lại đúng logic cho parent
           onRowsPerPageChange={(event) => {
             const newLimit = parseInt(event.target.value, 10)
             if (onChangeRowsPerPage) {
@@ -493,7 +501,6 @@ const VariantsTab = () => {
             deleteVariant={handleSave}
           />
         </PermissionWrapper>
-
       </Paper>
     </RouteGuard>
   )

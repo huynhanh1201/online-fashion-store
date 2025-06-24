@@ -74,9 +74,6 @@ export default function UserManagement() {
   }
   return (
     <>
-      <Typography variant='h5' sx={{ mb: 2 }}>
-        Quản lý người dùng
-      </Typography>
       <UserTable
         users={users}
         page={page}

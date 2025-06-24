@@ -3,16 +3,16 @@ import AuthorizedAxiosInstance from '~/utils/authorizedAxios.js'
 import { API_ROOT } from '~/utils/constants.js'
 
 // Lấy danh sách blogs với phân trang
-export const getBlogs = async (page = 1, limit = 10, filters = {}) => {
+export const getBlogs = async (filter) => {
   try {
-    let queryParams = `page=${page}&limit=${limit}`
+    const queryString = new URLSearchParams(filter).toString()
 
     const response = await AuthorizedAxiosInstance.get(
-      `${API_ROOT}/v1/blogs?${queryParams}`
+      `${API_ROOT}/v1/blogs?${queryString}`
     )
     return {
       blogs: response.data.data || [],
-      total: response.data.total || 0,
+      total: response.data.meta.total || 0,
       totalPages: response.data.totalPages || 0,
       currentPage: response.data.currentPage || 1
     }

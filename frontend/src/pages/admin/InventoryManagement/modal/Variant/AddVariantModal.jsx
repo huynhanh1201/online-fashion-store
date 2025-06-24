@@ -81,6 +81,8 @@ const AddVariantModal = ({
       size: '',
       importPrice: '',
       exportPrice: '',
+      discountPrice: '',
+      status: 'draft',
       overridePrice: false,
       overridePackageSize: false,
       packageSize: {
@@ -237,6 +239,7 @@ const AddVariantModal = ({
       importPrice,
       exportPrice,
       overridePrice,
+      discountPrice,
       overridePackageSize,
       packageSize = {}
     } = data
@@ -271,6 +274,7 @@ const AddVariantModal = ({
         importPrice: overridePrice ? Number(importPrice) : productImportPrice,
         exportPrice: overridePrice ? Number(exportPrice) : productExportPrice,
         overridePrice,
+        discountPrice: Number(discountPrice) || 0,
         overridePackageSize,
         status: status || 'draft',
         packageSize: finalPackageSize
@@ -293,6 +297,7 @@ const AddVariantModal = ({
       size: '',
       importPrice: '',
       exportPrice: '',
+      discountPrice: '',
       status: 'draft',
       overridePrice: false,
       overridePackageSize: false,
@@ -460,143 +465,169 @@ const AddVariantModal = ({
                 </p>
               )}
             </FormControl>
-            {/* Màu sắc */}
-            <FormControl fullWidth error={!!errors.color}>
-              <InputLabel>Màu sắc</InputLabel>
-              <Controller
-                name='color'
-                control={control}
-                rules={{
-                  required: 'Vui lòng chọn màu sắc',
-                  validate: (selectedColor) => {
-                    const selectedSize = watch('size')
-                    if (!selectedSize) return true
-                    const isExisted = existingVariants.some(
-                      (variant) =>
-                        variant.color?.name === selectedColor &&
-                        variant.size?.name === selectedSize
-                    )
-                    return isExisted
-                      ? 'Đã có biến thể này, vui lòng chọn màu khác'
-                      : true
-                  }
-                }}
-                render={({ field }) => (
-                  <Select
-                    {...field}
-                    label='Màu sắc'
-                    MenuProps={{
-                      PaperProps: {
-                        sx: {
-                          maxHeight: 412, // ✅ Chiều cao tối đa của danh sách dropdown
-                          overflowY: 'auto' // ✅ Hiển thị thanh cuộn dọc
-                        }
-                      }
-                    }}
-                  >
-                    {colors.map((c) => {
-                      const disabled =
-                        watch('size') && isColorDisabled(watch('size'), c.name)
-                      return (
-                        <MenuItem
-                          key={c.name}
-                          value={c.name}
-                          disabled={disabled}
-                          sx={{
-                            whiteSpace: 'normal',
-                            wordBreak: 'break-word',
-                            display: '-webkit-box',
-                            WebkitLineClamp: 3,
-                            WebkitBoxOrient: 'vertical',
-                            overflow: 'hidden'
-                          }}
-                        >
-                          {c.name} {disabled ? ' (đã tồn tại)' : ''}
-                        </MenuItem>
+            <Box sx={{ display: 'flex', gap: 2 }}>
+              {/* Màu sắc */}
+              <FormControl fullWidth error={!!errors.color}>
+                <InputLabel>Màu sắc</InputLabel>
+                <Controller
+                  name='color'
+                  control={control}
+                  rules={{
+                    required: 'Vui lòng chọn màu sắc',
+                    validate: (selectedColor) => {
+                      const selectedSize = watch('size')
+                      if (!selectedSize) return true
+                      const isExisted = existingVariants.some(
+                        (variant) =>
+                          variant.color?.name === selectedColor &&
+                          variant.size?.name === selectedSize
                       )
-                    })}
-
-                    <MenuItem onClick={handleOpenColorModal}>
-                      <em>Thêm màu mới</em>
-                    </MenuItem>
-                  </Select>
-                )}
-              />
-              {errors.color && (
-                <p style={{ color: 'red', fontSize: '0.75rem' }}>
-                  {errors.color.message}
-                </p>
-              )}
-            </FormControl>
-
-            {/* Kích thước */}
-            <FormControl fullWidth error={!!errors.size}>
-              <InputLabel>Kích thước</InputLabel>
-              <Controller
-                name='size'
-                control={control}
-                rules={{
-                  required: 'Vui lòng chọn kích thước',
-                  validate: (selectedSize) => {
-                    const selectedColor = watch('color')
-                    if (!selectedColor) return true
-                    const isExisted = existingVariants.some(
-                      (variant) =>
-                        variant.size?.name === selectedSize &&
-                        variant.color?.name === selectedColor
-                    )
-                    return isExisted
-                      ? 'Đã có biến thể này, vui lòng chọn kích thước khác'
-                      : true
-                  }
-                }}
-                render={({ field }) => (
-                  <Select
-                    {...field}
-                    label='Kích thước'
-                    MenuProps={{
-                      PaperProps: {
-                        sx: {
-                          maxHeight: 412, // ✅ Chiều cao tối đa của danh sách dropdown
-                          overflowY: 'auto' // ✅ Hiển thị thanh cuộn dọc
+                      return isExisted
+                        ? 'Đã có biến thể này, vui lòng chọn màu khác'
+                        : true
+                    }
+                  }}
+                  render={({ field }) => (
+                    <Select
+                      {...field}
+                      label='Màu sắc'
+                      MenuProps={{
+                        PaperProps: {
+                          sx: {
+                            maxHeight: 412, // ✅ Chiều cao tối đa của danh sách dropdown
+                            overflowY: 'auto' // ✅ Hiển thị thanh cuộn dọc
+                          }
                         }
-                      }
-                    }}
-                  >
-                    {sizes.map((s) => {
-                      const disabled =
-                        watch('color') && isSizeDisabled(watch('color'), s.name)
-                      return (
-                        <MenuItem
-                          key={s.name}
-                          value={s.name}
-                          disabled={disabled}
-                          sx={{
-                            whiteSpace: 'normal',
-                            wordBreak: 'break-word',
-                            display: '-webkit-box',
-                            WebkitLineClamp: 3,
-                            WebkitBoxOrient: 'vertical',
-                            overflow: 'hidden'
-                          }}
-                        >
-                          {s.name} {disabled ? ' (đã tồn tại)' : ''}
-                        </MenuItem>
-                      )
-                    })}
+                      }}
+                    >
+                      {colors.map((c) => {
+                        const disabled =
+                          watch('size') &&
+                          isColorDisabled(watch('size'), c.name)
+                        return (
+                          <MenuItem
+                            key={c.name}
+                            value={c.name}
+                            disabled={disabled}
+                            sx={{
+                              whiteSpace: 'normal',
+                              wordBreak: 'break-word',
+                              display: '-webkit-box',
+                              WebkitLineClamp: 3,
+                              WebkitBoxOrient: 'vertical',
+                              overflow: 'hidden'
+                            }}
+                          >
+                            {c.name} {disabled ? ' (đã tồn tại)' : ''}
+                          </MenuItem>
+                        )
+                      })}
 
-                    <MenuItem onClick={handleOpenSizeModal}>
-                      <em>Thêm kích thước mới</em>
-                    </MenuItem>
-                  </Select>
+                      <MenuItem onClick={handleOpenColorModal}>
+                        <em>Thêm màu mới</em>
+                      </MenuItem>
+                    </Select>
+                  )}
+                />
+                {errors.color && (
+                  <p style={{ color: 'red', fontSize: '0.75rem' }}>
+                    {errors.color.message}
+                  </p>
                 )}
-              />
-              {errors.size && (
-                <p style={{ color: 'red', fontSize: '0.75rem' }}>
-                  {errors.size.message}
-                </p>
+              </FormControl>
+
+              {/* Kích thước */}
+              <FormControl fullWidth error={!!errors.size}>
+                <InputLabel>Kích thước</InputLabel>
+                <Controller
+                  name='size'
+                  control={control}
+                  rules={{
+                    required: 'Vui lòng chọn kích thước',
+                    validate: (selectedSize) => {
+                      const selectedColor = watch('color')
+                      if (!selectedColor) return true
+                      const isExisted = existingVariants.some(
+                        (variant) =>
+                          variant.size?.name === selectedSize &&
+                          variant.color?.name === selectedColor
+                      )
+                      return isExisted
+                        ? 'Đã có biến thể này, vui lòng chọn kích thước khác'
+                        : true
+                    }
+                  }}
+                  render={({ field }) => (
+                    <Select
+                      {...field}
+                      label='Kích thước'
+                      MenuProps={{
+                        PaperProps: {
+                          sx: {
+                            maxHeight: 412, // ✅ Chiều cao tối đa của danh sách dropdown
+                            overflowY: 'auto' // ✅ Hiển thị thanh cuộn dọc
+                          }
+                        }
+                      }}
+                    >
+                      {sizes.map((s) => {
+                        const disabled =
+                          watch('color') &&
+                          isSizeDisabled(watch('color'), s.name)
+                        return (
+                          <MenuItem
+                            key={s.name}
+                            value={s.name}
+                            disabled={disabled}
+                            sx={{
+                              whiteSpace: 'normal',
+                              wordBreak: 'break-word',
+                              display: '-webkit-box',
+                              WebkitLineClamp: 3,
+                              WebkitBoxOrient: 'vertical',
+                              overflow: 'hidden'
+                            }}
+                          >
+                            {s.name} {disabled ? ' (đã tồn tại)' : ''}
+                          </MenuItem>
+                        )
+                      })}
+
+                      <MenuItem onClick={handleOpenSizeModal}>
+                        <em>Thêm kích thước mới</em>
+                      </MenuItem>
+                    </Select>
+                  )}
+                />
+                {errors.size && (
+                  <p style={{ color: 'red', fontSize: '0.75rem' }}>
+                    {errors.size.message}
+                  </p>
+                )}
+              </FormControl>
+            </Box>
+            {/* Giảm giá */}
+            <Controller
+              name='discountPrice'
+              control={control}
+              rules={{
+                validate: (val) =>
+                  Number(val) >= 0 ? true : 'Giảm giá không được âm'
+              }}
+              render={({ field }) => (
+                <TextField
+                  label='Giảm giá cho biến thể (đ)'
+                  type='text'
+                  fullWidth
+                  value={formatCurrency(field.value)}
+                  onChange={(e) =>
+                    field.onChange(parseCurrency(e.target.value))
+                  }
+                  error={!!errors.discountPrice}
+                  helperText={errors.discountPrice?.message}
+                />
               )}
-            </FormControl>
+            />
 
             <Box
               sx={{

@@ -85,6 +85,10 @@ const useDiscounts = () => {
   const update = async (id, data) => {
     try {
       const updated = await updateDiscount(id, data)
+      if (!updated) {
+        console.error('Không thể cập nhật giảm giá')
+        return null
+      }
       setDiscounts((prev) =>
         prev.map((d) => (d._id === updated._id ? updated : d))
       )
@@ -97,7 +101,11 @@ const useDiscounts = () => {
 
   const remove = async (id) => {
     try {
-      await deleteDiscount(id)
+      const remove = await deleteDiscount(id)
+      if (!remove) {
+        console.error('Không thể xoá giảm giá')
+        return null
+      }
       setDiscounts((prev) => prev.filter((d) => d._id !== id))
       setTotalPages((prev) => prev - 1)
       return true

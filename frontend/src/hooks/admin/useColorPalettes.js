@@ -16,7 +16,9 @@ const useColorPalettes = (productId) => {
     if (!productId) return
     setLoading(true)
     try {
-      const data = await getColorPalettes(productId)
+      const data = await getColorPalettes(
+        (productId = '6853ef5fa2331414899bfaf2')
+      )
       setColorPalettes(data.colors)
       setPaletteId(data.paletteId)
     } catch (error) {
@@ -68,10 +70,10 @@ const useColorPalettes = (productId) => {
       throw error
     }
   }
-
-  useEffect(() => {
-    fetchColorPalettes()
-  }, [productId])
+  //
+  // useEffect(() => {
+  //   fetchColorPalettes()
+  // }, [productId])
 
   return {
     colorPalettes,

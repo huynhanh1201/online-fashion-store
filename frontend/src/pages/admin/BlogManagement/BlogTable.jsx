@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React from 'react'
 import {
   Table,
   TableBody,
@@ -18,29 +18,28 @@ import {
   InputLabel,
   Pagination,
   Stack,
-  Chip
+  Chip,
+  TablePagination
 } from '@mui/material'
 import AddIcon from '@mui/icons-material/Add'
-import SearchIcon from '@mui/icons-material/Search'
-import DataObjectIcon from '@mui/icons-material/DataObject'
+import TableNoneData from '~/components/TableAdmin/NoneData.jsx'
 import BlogRow from './BlogRow'
-
+import TablePaginationActions from '~/components/PaginationAdmin/TablePaginationActions.jsx'
+import FilterBlog from '~/components/FilterAdmin/FilterBlog.jsx'
 const BlogTable = ({
   blogs,
-  pagination,
   onAdd,
   onEdit,
   onDelete,
   onView,
   onPageChange,
-  onSearch,
+  onChangeRowsPerPage,
+  page,
+  rowsPerPage,
+  total,
   onFilter,
-  onCreateSample
+  loading
 }) => {
-  const [searchTerm, setSearchTerm] = useState('')
-  const [statusFilter, setStatusFilter] = useState('')
-  const [categoryFilter, setCategoryFilter] = useState('')
-
   const columns = [
     { id: 'index', label: 'STT', align: 'center', width: 50 },
     { id: 'coverImage', label: 'Ảnh bìa', align: 'left', width: 100 },
@@ -51,44 +50,6 @@ const BlogTable = ({
     { id: 'publishedAt', label: 'Ngày xuất bản', align: 'left', width: 150 },
     { id: 'action', label: 'Hành động', align: 'left' }
   ]
-
-  const handleSearchChange = (event) => {
-    const value = event.target.value
-    setSearchTerm(value)
-    if (onSearch) {
-      onSearch(value)
-    }
-  }
-
-  const handleStatusFilterChange = (event) => {
-    const value = event.target.value
-    setStatusFilter(value)
-    if (onFilter) {
-      onFilter({ status: value, category: categoryFilter })
-    }
-  }
-
-  const handleCategoryFilterChange = (event) => {
-    const value = event.target.value
-    setCategoryFilter(value)
-    if (onFilter) {
-      onFilter({ status: statusFilter, category: value })
-    }
-  }
-
-  const handlePageChange = (event, newPage) => {
-    if (onPageChange) {
-      onPageChange(newPage)
-    }
-  }
-
-  const clearFilters = () => {
-    setSearchTerm('')
-    setStatusFilter('')
-    setCategoryFilter('')
-    if (onSearch) onSearch('')
-    if (onFilter) onFilter({})
-  }
 
   return (
     <Paper sx={{ border: '1px solid #ccc', width: '100%', overflow: 'hidden' }}>
@@ -113,107 +74,24 @@ const BlogTable = ({
           <Typography variant='h6' fontWeight={800}>
             Danh sách bài viết
           </Typography>
-          {pagination && (
-            <Typography variant="body2" color="text.secondary">
-              Tổng cộng: {pagination.total} bài viết
-            </Typography>
-          )}
-        </Box>
-
-        <Box sx={{ display: 'flex', gap: 1 }}>
-          {(!blogs || blogs.length === 0) && (
-            <Button
-              startIcon={<DataObjectIcon />}
-              variant='outlined'
-              onClick={onCreateSample}
-              sx={{
-                textTransform: 'none',
-                color: '#1976d2',
-                borderColor: '#1976d2',
-                '&:hover': {
-                  backgroundColor: '#e3f2fd'
-                }
-              }}
-            >
-              Tạo dữ liệu mẫu
-            </Button>
-          )}
           <Button
             startIcon={<AddIcon />}
             variant='contained'
             onClick={onAdd}
             sx={{
               textTransform: 'none',
+              width: 100,
+              display: 'flex',
+              alignItems: 'center',
               backgroundColor: '#001f5d',
-              color: '#fff',
-              '&:hover': {
-                backgroundColor: '#001a4d'
-              }
+              color: '#fff'
             }}
           >
-            Thêm bài viết
+            Thêm
           </Button>
         </Box>
+        <FilterBlog blogs={blogs} onFilter={onFilter} loading={loading} />
       </Box>
-
-      {/* Search và Filter */}
-      <Box sx={{ p: 2, borderBottom: '1px solid #e0e0e0' }}>
-        <Stack direction={{ xs: 'column', md: 'row' }} spacing={2} alignItems="center">
-          <TextField
-            placeholder="Tìm kiếm bài viết..."
-            value={searchTerm}
-            onChange={handleSearchChange}
-            size="small"
-            sx={{ minWidth: 300 }}
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <SearchIcon />
-                </InputAdornment>
-              ),
-            }}
-          />
-
-          <FormControl size="small" sx={{ minWidth: 150 }}>
-            <InputLabel>Trạng thái</InputLabel>
-            <Select
-              value={statusFilter}
-              label="Trạng thái"
-              onChange={handleStatusFilterChange}
-            >
-              <MenuItem value="">Tất cả</MenuItem>
-              <MenuItem value="published">Đã xuất bản</MenuItem>
-              <MenuItem value="draft">Bản nháp</MenuItem>
-            </Select>
-          </FormControl>
-
-          <FormControl size="small" sx={{ minWidth: 150 }}>
-            <InputLabel>Chuyên mục</InputLabel>
-            <Select
-              value={categoryFilter}
-              label="Chuyên mục"
-              onChange={handleCategoryFilterChange}
-            >
-              <MenuItem value="">Tất cả</MenuItem>
-              <MenuItem value="Trang phục">Trang phục</MenuItem>
-              <MenuItem value="Phụ kiện">Phụ kiện</MenuItem>
-              <MenuItem value="Giày dép">Giày dép</MenuItem>
-              <MenuItem value="Túi xách">Túi xách</MenuItem>
-            </Select>
-          </FormControl>
-
-          {(statusFilter || categoryFilter || searchTerm) && (
-            <Button
-              variant="outlined"
-              size="small"
-              onClick={clearFilters}
-            >
-              Xóa bộ lọc
-            </Button>
-          )}
-        </Stack>
-      </Box>
-
       {/* Table */}
       <TableContainer>
         <Table stickyHeader aria-label='blogs table'>
@@ -245,7 +123,7 @@ const BlogTable = ({
               blogs.map((blog, index) => (
                 <BlogRow
                   key={blog._id}
-                  index={(pagination?.page - 1) * (pagination?.limit || 10) + index + 1}
+                  index={page * rowsPerPage + index + 1}
                   blog={blog}
                   onEdit={onEdit}
                   onDelete={onDelete}
@@ -253,40 +131,35 @@ const BlogTable = ({
                 />
               ))
             ) : (
-              <TableRow>
-                <TableCell colSpan={columns.length} align='center' sx={{ py: 4 }}>
-                  <Typography variant="body1" color="text.secondary">
-                    {searchTerm || statusFilter || categoryFilter
-                      ? 'Không tìm thấy bài viết nào phù hợp với bộ lọc.'
-                      : 'Chưa có bài viết nào. Hãy thêm bài viết đầu tiên hoặc tạo dữ liệu mẫu!'
-                    }
-                  </Typography>
-                </TableCell>
-              </TableRow>
+              <TableNoneData
+                col={columns.length}
+                message='Không có dữ liệu bài viết.'
+              />
             )}
           </TableBody>
         </Table>
       </TableContainer>
 
-      {/* Pagination */}
-      {pagination && pagination.totalPages > 1 && (
-        <Box sx={{ p: 2, display: 'flex', justifyContent: 'center', borderTop: '1px solid #e0e0e0' }}>
-          <Stack spacing={2} alignItems="center">
-            <Pagination
-              count={pagination.totalPages}
-              page={pagination.page}
-              onChange={handlePageChange}
-              color="primary"
-              showFirstButton
-              showLastButton
-            />
-            <Typography variant="body2" color="text.secondary">
-              Trang {pagination.page} / {pagination.totalPages}
-              ({pagination.total} bài viết)
-            </Typography>
-          </Stack>
-        </Box>
-      )}
+      <TablePagination
+        rowsPerPageOptions={[10, 25, 100]}
+        component='div'
+        count={total || 0}
+        rowsPerPage={rowsPerPage}
+        page={page}
+        onPageChange={(event, newPage) => onPageChange(event, newPage + 1)} // truyền lại đúng logic cho parent
+        onRowsPerPageChange={(event) => {
+          const newLimit = parseInt(event.target.value, 10)
+          if (onChangeRowsPerPage) {
+            onChangeRowsPerPage(newLimit)
+          }
+        }}
+        labelRowsPerPage='Số dòng mỗi trang'
+        labelDisplayedRows={({ from, to, count }) => {
+          const totalPages = Math.ceil(count / rowsPerPage)
+          return `${from}–${to} trên ${count} | Trang ${page + 1} / ${totalPages}`
+        }}
+        ActionsComponent={TablePaginationActions}
+      />
     </Paper>
   )
 }

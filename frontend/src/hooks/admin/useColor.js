@@ -76,6 +76,10 @@ const useColors = () => {
   const update = async (id, data) => {
     try {
       const updated = await updateColor(id, data)
+      if (!updated) {
+        console.error('Không thể cập nhật màu')
+        return null
+      }
       setColors((prev) =>
         prev.map((d) => (d._id === updated._id ? updated : d))
       )
@@ -88,7 +92,11 @@ const useColors = () => {
 
   const remove = async (id) => {
     try {
-      await deleteColor(id)
+      const remove = await deleteColor(id)
+      if (!remove) {
+        console.error('Không thể xoá màu')
+        return null
+      }
       setColors((prev) => prev.filter((d) => d._id !== id))
       setTotalPages((prev) => prev - 1)
       return true
