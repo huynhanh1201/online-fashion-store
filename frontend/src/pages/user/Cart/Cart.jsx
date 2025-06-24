@@ -1,5 +1,5 @@
 /* eslint-disable no-console */
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import {
   Box,
   Container,
@@ -49,6 +49,8 @@ import inventoryService from '~/services/inventoryService'
 
 const Cart = () => {
   const { cart, loading, deleteItem, clearCart, updateItem } = useCart()
+
+  console.log('Cart component - loading:', loading, 'cart:', cart)
   const [selectedItems, setSelectedItems] = useState([])
   const [cartItems, setCartItems] = useState([])
   const [showMaxQuantityAlert, setShowMaxQuantityAlert] = useState(false)
@@ -64,6 +66,19 @@ const Cart = () => {
   const tempQuantities = useSelector((state) => state.cart.tempQuantities || {})
   const [processingVariantId, setProcessingVariantId] = useState(null)
 
+  // Refs để tránh stale closure
+  const inventoryQuantitiesRef = useRef(inventoryQuantities)
+  const fetchingVariantsRef = useRef(fetchingVariants)
+
+  // Cập nhật refs khi state thay đổi
+  useEffect(() => {
+    inventoryQuantitiesRef.current = inventoryQuantities
+  }, [inventoryQuantities])
+
+  useEffect(() => {
+    fetchingVariantsRef.current = fetchingVariants
+  }, [fetchingVariants])
+
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'auto' })
   }, [])
@@ -76,11 +91,14 @@ const Cart = () => {
     const fetchInventories = async () => {
       if (cartItems.length === 0) return
 
+      const currentInventory = inventoryQuantitiesRef.current
+      const currentFetching = fetchingVariantsRef.current
+
       const newVariantsToFetch = cartItems
         .filter(
           (item) =>
-            !inventoryQuantities[item.variant._id] &&
-            !fetchingVariants.has(item.variant._id),
+            !currentInventory[item.variant._id] &&
+            !currentFetching.has(item.variant._id),
         )
         .map((item) => item.variant._id)
 
@@ -89,17 +107,26 @@ const Cart = () => {
       setFetchingVariants((prev) => new Set([...prev, ...newVariantsToFetch]))
 
       try {
-        const fetchPromises = newVariantsToFetch.map((variantId) =>
-          inventoryService.fetchInventory(variantId),
-        )
-
-        const results = await Promise.all(fetchPromises)
-        const newInventoryQuantities = { ...inventoryQuantities }
-        results.forEach(({ variantId, quantity }) => {
-          newInventoryQuantities[variantId] = quantity
+        const fetchPromises = newVariantsToFetch.map(async (variantId) => {
+          const inventory = await inventoryService.fetchInventory(variantId)
+          console.log('Inventory data for', variantId, ':', inventory)
+          return { variantId, inventory }
         })
 
-        setInventoryQuantities(newInventoryQuantities)
+        const results = await Promise.all(fetchPromises)
+
+        setInventoryQuantities((prev) => {
+          const updated = { ...prev }
+          results.forEach(({ variantId, inventory }) => {
+            // Thử các trường hợp có thể có
+            const quantity = inventory?.quantity || inventory?.availableQuantity || inventory?.stock || 0
+            console.log('Setting quantity for', variantId, ':', quantity)
+            updated[variantId] = quantity
+          })
+          return updated
+        })
+      } catch (error) {
+        console.error('Error fetching inventory:', error)
       } finally {
         setFetchingVariants((prev) => {
           const newSet = new Set(prev)
@@ -110,7 +137,7 @@ const Cart = () => {
     }
 
     fetchInventories()
-  }, [cartItems, inventoryQuantities, fetchingVariants])
+  }, [cartItems])
 
   useEffect(() => {
     if (hasFetchedCoupons) return

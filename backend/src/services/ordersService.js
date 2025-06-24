@@ -50,7 +50,6 @@ const createOrder = async (userId, reqBody, ipAddr, jwtDecoded) => {
       cartItems,
       variantMap
     )
-
     // Kiểm tra tổng giá tri của đơn hàng FE gửi lên có đúng không
     await orderHelpers.validateOrderTotal(calculatedSubtotal, total)
 

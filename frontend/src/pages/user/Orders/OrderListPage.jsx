@@ -147,7 +147,7 @@ const CancelOrderModal = ({ open, onClose, onConfirm, order, loading }) => {
 }
 
 // Enhanced OrderRow component
-const OrderRow = ({ order, onOrderUpdate }) => {
+const OrderRow = ({ order, onOrderUpdate, onOrderCancelled }) => {
   const [items, setItems] = useState([])
   const [loadingItems, setLoadingItems] = useState(true)
   const [openCancelModal, setOpenCancelModal] = useState(false)
@@ -173,7 +173,7 @@ const OrderRow = ({ order, onOrderUpdate }) => {
     }
 
     fetchItems()
-  }, [order._id])
+  }, [])
 
   // Handle cancel order confirmation
   const handleCancelOrder = async () => {
@@ -185,6 +185,10 @@ const OrderRow = ({ order, onOrderUpdate }) => {
       // Call parent callback to refresh orders
       if (onOrderUpdate) {
         onOrderUpdate()
+      }
+      // Call callback to switch to cancelled tab
+      if (onOrderCancelled) {
+        onOrderCancelled()
       }
     } catch (error) {
       console.error('Lỗi khi hủy đơn hàng:', error)
@@ -362,14 +366,51 @@ const OrderRow = ({ order, onOrderUpdate }) => {
                   startIcon={<Replay />}
                   onClick={async () => {
                     try {
-                      // Lặp qua từng sản phẩm trong đơn hàng, chỉ thêm 1 sản phẩm mỗi loại vào giỏ
-                      for (const item of items) {
+                      console.log('Items to add back to cart:', items)
+                      console.log('Total items to process:', items.length)
+
+                      let successCount = 0
+                      let failCount = 0
+
+                      // Lặp qua từng sản phẩm trong đơn hàng với đúng số lượng từ order item
+                      for (let i = 0; i < items.length; i++) {
+                        const item = items[i]
                         const variantId = typeof item.variantId === 'object' ? item.variantId._id : item.variantId
-                        if (!variantId) continue
-                        await addToCart({ variantId, quantity: 1 })
+
+
+                        if (!variantId) {
+                          console.warn('Variant ID not found for item:', item)
+                          failCount++
+                          continue
+                        }
+
+                        try {
+                          const result = await addToCart({ variantId, quantity: 1 })
+                          if (result) {
+                            successCount++
+                          } else {
+                            failCount++
+                          }
+                        } catch (error) {
+                          failCount++
+                        }
+
+                        // Add small delay between requests to avoid overwhelming the server
+                        if (i < items.length - 1) {
+                          await new Promise(resolve => setTimeout(resolve, 200))
+                        }
                       }
 
-                      navigate('/cart')
+                      console.log(`Add to cart results: ${successCount} success, ${failCount} failed`)
+
+                      if (successCount > 0) {
+                        // Force refresh cart data before navigating
+                        setTimeout(() => {
+                          navigate('/cart')
+                        }, 100)
+                      } else {
+                        console.error('No items were added to cart')
+                      }
                     } catch (err) {
                       console.error('Lỗi khi mua lại:', err)
                     }
@@ -447,6 +488,11 @@ const OrderListPage = () => {
     setSelectedTab(newValue)
   }
 
+  // Handle order cancellation - switch to cancelled tab
+  const handleOrderCancelled = () => {
+    setSelectedTab('Cancelled')
+  }
+
   // Filter orders based on selected tab
   const filteredOrders = Array.isArray(orders)
     ? selectedTab === 'All'
@@ -454,8 +500,7 @@ const OrderListPage = () => {
       : orders.filter((order) => order.status === selectedTab)
     : []
 
-  // Reverse the filtered orders to show newest at the top
-  const reversedOrders = [...filteredOrders].reverse()
+  // Orders are already sorted by backend (newest first), no need to reverse
 
   if (loading) {
     return (
@@ -539,7 +584,7 @@ const OrderListPage = () => {
       </Paper>
 
       {/* Order List */}
-      {reversedOrders.length === 0 ? (
+      {filteredOrders.length === 0 ? (
         <Paper
           sx={{
             p: 6,
@@ -562,8 +607,13 @@ const OrderListPage = () => {
         </Paper>
       ) : (
         <Stack spacing={3}>
-          {reversedOrders.map((order) => (
-            <OrderRow key={order._id} order={order} onOrderUpdate={fetchOrders} />
+          {filteredOrders.map((order) => (
+            <OrderRow
+              key={order._id}
+              order={order}
+              onOrderUpdate={fetchOrders}
+              onOrderCancelled={handleOrderCancelled}
+            />
           ))}
         </Stack>
       )}

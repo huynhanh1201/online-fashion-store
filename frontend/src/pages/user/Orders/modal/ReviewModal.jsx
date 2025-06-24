@@ -97,7 +97,7 @@ const ReviewModal = ({ open, onClose, onSubmit, orderItems }) => {
   const videoInputRef = useRef(null)
 
   // Constants for file limits
-  const MAX_IMAGES = 2
+  const MAX_IMAGES = 5
   const MAX_VIDEOS = 2
   const MAX_IMAGE_SIZE = 5 * 1024 * 1024 // 5MB
   const MAX_VIDEO_SIZE = 10 * 1024 * 1024 // 50MB
