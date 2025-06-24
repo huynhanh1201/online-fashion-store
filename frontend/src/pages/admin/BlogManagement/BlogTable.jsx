@@ -9,10 +9,22 @@ import {
   Paper,
   Typography,
   Button,
-  Box
+  Box,
+  TextField,
+  InputAdornment,
+  Select,
+  MenuItem,
+  FormControl,
+  InputLabel,
+  Pagination,
+  Stack,
+  Chip,
+  TablePagination
 } from '@mui/material'
 import AddIcon from '@mui/icons-material/Add'
+import TableNoneData from '~/components/TableAdmin/NoneData.jsx'
 import BlogRow from './BlogRow'
+import TablePaginationActions from '~/components/PaginationAdmin/TablePaginationActions.jsx'
 
 const BlogTable = ({ blogs, onAdd, onEdit, onDelete, onView }) => {
   const columns = [
@@ -28,12 +40,14 @@ const BlogTable = ({ blogs, onAdd, onEdit, onDelete, onView }) => {
 
   return (
     <Paper sx={{ border: '1px solid #ccc', width: '100%', overflow: 'hidden' }}>
+      {/* Header với title và buttons */}
       <Box
         sx={{
           p: 2,
           display: 'flex',
           justifyContent: 'space-between',
-          alignItems: 'center'
+          alignItems: 'center',
+          borderBottom: '1px solid #e0e0e0'
         }}
       >
         <Box
@@ -64,6 +78,7 @@ const BlogTable = ({ blogs, onAdd, onEdit, onDelete, onView }) => {
           </Button>
         </Box>
       </Box>
+      {/* Table */}
       <TableContainer>
         <Table stickyHeader aria-label='blogs table'>
           <TableHead>
@@ -94,7 +109,11 @@ const BlogTable = ({ blogs, onAdd, onEdit, onDelete, onView }) => {
               blogs.map((blog, index) => (
                 <BlogRow
                   key={blog._id}
-                  index={index + 1}
+                  index={
+                    (pagination?.page - 1) * (pagination?.limit || 10) +
+                    index +
+                    1
+                  }
                   blog={blog}
                   onEdit={onEdit}
                   onDelete={onDelete}
@@ -102,15 +121,35 @@ const BlogTable = ({ blogs, onAdd, onEdit, onDelete, onView }) => {
                 />
               ))
             ) : (
-              <TableRow>
-                <TableCell colSpan={columns.length} align='center'>
-                  Không có dữ liệu bài viết.
-                </TableCell>
-              </TableRow>
+              <TableNoneData
+                col={columns.length}
+                message='Không có dữ liệu bài viết.'
+              />
             )}
           </TableBody>
         </Table>
       </TableContainer>
+
+      <TablePagination
+        rowsPerPageOptions={[10, 25, 100]}
+        component='div'
+        count={total || 0}
+        rowsPerPage={rowsPerPage}
+        page={page}
+        onPageChange={(event, newPage) => onPageChange(event, newPage + 1)} // truyền lại đúng logic cho parent
+        onRowsPerPageChange={(event) => {
+          const newLimit = parseInt(event.target.value, 10)
+          if (onChangeRowsPerPage) {
+            onChangeRowsPerPage(newLimit)
+          }
+        }}
+        labelRowsPerPage='Số dòng mỗi trang'
+        labelDisplayedRows={({ from, to, count }) => {
+          const totalPages = Math.ceil(count / rowsPerPage)
+          return `${from}–${to} trên ${count} | Trang ${page + 1} / ${totalPages}`
+        }}
+        ActionsComponent={TablePaginationActions}
+      />
     </Paper>
   )
 }

@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import Typography from '@mui/material/Typography'
 import { Box } from '@mui/material'
 import OrderTable from './OrderTable'
@@ -39,6 +39,14 @@ const OrderManagement = () => {
   const { discounts, fetchDiscounts } = useDiscounts() // lấy danh sách mã giảm giá nếu cần
   const { users, fetchUsers } = useUsers()
 
+  useEffect(() => {
+    fetchUsers()
+    fetchDiscounts()
+  }, [])
+  useEffect(() => {
+    fetchOrders(page, limit, filters)
+  }, [page, limit, filters])
+
   // Kiểm tra quyền truy cập order management
   if (!hasPermission('order:read')) {
     return (
@@ -50,13 +58,6 @@ const OrderManagement = () => {
     )
   }
 
-  React.useEffect(() => {
-    fetchUsers()
-    fetchDiscounts()
-  }, [])
-  React.useEffect(() => {
-    fetchOrders(page, limit, filters)
-  }, [page, limit, filters])
   // Mở modal xem
   const handleOpenModalView = async (order) => {
     if (!hasPermission('order:read')) return

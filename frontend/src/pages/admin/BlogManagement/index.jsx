@@ -1,101 +1,153 @@
-import React, { useState } from 'react'
-import { Typography, Button, Paper } from '@mui/material'
+import React, { useState, useEffect } from 'react'
+import {
+  Typography,
+  Button,
+  Paper,
+  CircularProgress,
+  Alert,
+  Box
+} from '@mui/material'
 import AddIcon from '@mui/icons-material/Add'
+import { toast } from 'react-toastify'
 import BlogTable from './BlogTable'
-import AddBlogModal from './modal/AddBlogModal'
-import EditBlogModal from './modal/EditBlogModal'
+import BlogModal from './modal/AddBlogModal'
 import ViewBlogModal from './modal/ViewBlogModal'
 import DeleteBlogModal from './modal/DeleteBlogModal'
-
-const mockBlogs = [
-  {
-    _id: '1',
-    title: 'Thời trang mùa hè 2025',
-    slug: 'thoi-trang-mua-he-2025',
-    excerpt: 'Khám phá những xu hướng thời trang hot nhất mùa hè năm nay...',
-    content: '<p>Nội dung chi tiết bài viết về thời trang hè 2025...</p>',
-    coverImage: 'https://example.com/cover1.jpg',
-    images: ['https://example.com/img1.jpg', 'https://example.com/img2.jpg'],
-    author: {
-      name: 'Nguyễn Văn A',
-      avatar: 'https://example.com/avatar1.jpg',
-      id: 'user1'
-    },
-    tags: ['váy', 'mùa hè', 'gucci'],
-    category: 'Trang phục',
-    brand: 'Gucci',
-    publishedAt: '2025-06-01T00:00:00.000Z',
-    updatedAt: '2025-06-10T00:00:00.000Z',
-    status: 'published',
-    meta: {
-      title: 'Thời trang hè 2025',
-      description: 'Tổng hợp những xu hướng hot nhất mùa hè 2025',
-      keywords: ['thời trang', 'mùa hè', 'gucci']
-    },
-    views: 1234,
-    likes: 120
-  },
-  {
-    _id: '2',
-    title: 'Phụ kiện nổi bật cho mùa lễ hội',
-    slug: 'phu-kien-noi-bat-cho-mua-le-hoi',
-    excerpt:
-      'Gợi ý những phụ kiện bạn không thể bỏ qua cho các bữa tiệc cuối năm...',
-    content: '<p>Chi tiết về các loại phụ kiện nổi bật trong mùa lễ hội...</p>',
-    coverImage: 'https://example.com/cover2.jpg',
-    images: ['https://example.com/img3.jpg'],
-    author: {
-      name: 'Trần Thị B',
-      avatar: 'https://example.com/avatar2.jpg',
-      id: 'user2'
-    },
-    tags: ['phụ kiện', 'lễ hội'],
-    category: 'Phụ kiện',
-    brand: 'Zara',
-    publishedAt: '2025-05-20T00:00:00.000Z',
-    updatedAt: '2025-05-25T00:00:00.000Z',
-    status: 'draft',
-    meta: {
-      title: 'Phụ kiện mùa lễ hội',
-      description: 'Tăng sức hút với những phụ kiện nổi bật',
-      keywords: ['phụ kiện', 'zara', 'lễ hội']
-    },
-    views: 800,
-    likes: 90
-  }
-]
+import {
+  getBlogs,
+  createBlog,
+  updateBlog,
+  deleteBlog
+} from '~/services/admin/blogService'
 
 export default function BlogManagementPage() {
-  const [blogs, setBlogs] = useState(mockBlogs)
-  const [openAdd, setOpenAdd] = useState(false)
-  const [openEdit, setOpenEdit] = useState(false)
+  const [blogs, setBlogs] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
+  const [openBlogModal, setOpenBlogModal] = useState(false)
+  const [blogModalMode, setBlogModalMode] = useState('add') // 'add' hoặc 'edit'
   const [openView, setOpenView] = useState(false)
   const [openDelete, setOpenDelete] = useState(false)
   const [selectedBlog, setSelectedBlog] = useState(null)
-
-  const handleAdd = (newBlog) => {
-    setBlogs([newBlog, ...blogs])
-    setOpenAdd(false)
+  const [page, setPage] = React.useState(1)
+  const [limit, setLimit] = React.useState(10)
+  const [filters, setFilters] = React.useState(() => ({
+    status: 'false',
+    sort: 'newest'
+  }))
+  // Fetch blogs từ API
+  const fetchBlogs = async (page = 1, limit = 10, filters = {}) => {
+    try {
+      setLoading(true)
+      setError(null)
+      const response = await getBlogs(page, limit, filters)
+      console.log(response.data)
+      setBlogs(response.blogs)
+    } catch (error) {
+      console.error('Lỗi khi tải danh sách blog:', error)
+      setError('Không thể tải danh sách blog. Vui lòng thử lại.')
+      toast.error('Không thể tải danh sách blog')
+    } finally {
+      setLoading(false)
+    }
   }
 
-  const handleEdit = (updatedBlog) => {
-    setBlogs(blogs.map((b) => (b._id === updatedBlog._id ? updatedBlog : b)))
-    setOpenEdit(false)
+  // Load blogs khi component mount
+  useEffect(() => {
+    fetchBlogs(page, limit, filters)
+  }, [page, limit, filters])
+
+  const handleBlogSave = async (blogData, isEditMode) => {
+    try {
+      if (isEditMode) {
+        // Cập nhật blog
+        const updatedBlog = await updateBlog(selectedBlog._id, blogData)
+        toast.success('Cập nhật blog thành công!')
+      } else {
+        // Tạo blog mới
+        const createdBlog = await createBlog(blogData)
+        toast.success('Tạo blog thành công!')
+      }
+
+      setOpenBlogModal(false)
+      setSelectedBlog(null)
+      setBlogModalMode('add')
+      // Refresh lại danh sách để đảm bảo dữ liệu mới nhất
+      fetchBlogs(page, limit, filters)
+    } catch (error) {
+      console.error('Lỗi khi xử lý blog:', error)
+      if (isEditMode) {
+        toast.error('Không thể cập nhật blog. Vui lòng thử lại.')
+      } else {
+        toast.error('Không thể tạo blog. Vui lòng thử lại.')
+      }
+    }
   }
 
-  const handleDelete = (id) => {
-    setBlogs(blogs.filter((b) => b._id !== id))
-    setOpenDelete(false)
+  const handleDelete = async () => {
+    try {
+      await deleteBlog(selectedBlog._id)
+      toast.success('Xóa blog thành công!')
+      setOpenDelete(false)
+      setSelectedBlog(null)
+      // Refresh lại danh sách
+      fetchBlogs(page, limit, filters)
+    } catch (error) {
+      console.error('Lỗi khi xóa blog:', error)
+      toast.error('Không thể xóa blog. Vui lòng thử lại.')
+    }
+  }
+
+  const handlePageChange = (newPage) => {
+    fetchBlogs(newPage, limit)
+  }
+  const isEqual = (obj1, obj2) => JSON.stringify(obj1) === JSON.stringify(obj2)
+
+  const handleFilter = (newFilters) => {
+    if (!isEqual(filters, newFilters)) {
+      setPage(1)
+      setFilters(newFilters)
+    }
+  }
+  // Function để tạo dữ liệu mẫu
+
+  if (loading) {
+    return (
+      <Paper sx={{ p: 3, textAlign: 'center' }}>
+        <CircularProgress />
+        <Typography sx={{ mt: 2 }}>Đang tải danh sách blog...</Typography>
+      </Paper>
+    )
+  }
+
+  if (error) {
+    return (
+      <Paper sx={{ p: 3 }}>
+        <Alert severity='error' sx={{ mb: 2 }}>
+          {error}
+        </Alert>
+        <Box sx={{ display: 'flex', gap: 2 }}>
+          <Button variant='contained' onClick={() => fetchBlogs()}>
+            Thử lại
+          </Button>
+        </Box>
+      </Paper>
+    )
   }
 
   return (
     <>
       <BlogTable
         blogs={blogs}
-        onAdd={() => setOpenAdd(true)}
+        onAdd={() => {
+          setBlogModalMode('add')
+          setSelectedBlog(null)
+          setOpenBlogModal(true)
+        }}
         onEdit={(blog) => {
           setSelectedBlog(blog)
-          setOpenEdit(true)
+          setBlogModalMode('edit')
+          setOpenBlogModal(true)
         }}
         onView={(blog) => {
           setSelectedBlog(blog)
@@ -105,29 +157,44 @@ export default function BlogManagementPage() {
           setSelectedBlog(blog)
           setOpenDelete(true)
         }}
+        onFilter={handleFilter}
+        page={page - 1}
+        rowsPerPage={limit}
+        total={totalPages}
+        onPageChange={handlePageChange}
+        onChangeRowsPerPage={(newLimit) => {
+          setPage(1)
+          setLimit(newLimit)
+        }}
       />
 
-      <AddBlogModal
-        open={openAdd}
-        onClose={() => setOpenAdd(false)}
-        onSave={handleAdd}
-      />
-      <EditBlogModal
-        open={openEdit}
-        blog={selectedBlog}
-        onClose={() => setOpenEdit(false)}
-        onSave={handleEdit}
+      <BlogModal
+        open={openBlogModal}
+        onClose={() => {
+          setOpenBlogModal(false)
+          setSelectedBlog(null)
+          setBlogModalMode('add')
+        }}
+        onSave={handleBlogSave}
+        blogData={selectedBlog}
+        mode={blogModalMode}
       />
       <ViewBlogModal
         open={openView}
         blog={selectedBlog}
-        onClose={() => setOpenView(false)}
+        onClose={() => {
+          setOpenView(false)
+          setSelectedBlog(null)
+        }}
       />
       <DeleteBlogModal
         open={openDelete}
         blog={selectedBlog}
-        onClose={() => setOpenDelete(false)}
-        onConfirm={() => handleDelete(selectedBlog._id)}
+        onClose={() => {
+          setOpenDelete(false)
+          setSelectedBlog(null)
+        }}
+        onConfirm={handleDelete}
       />
     </>
   )

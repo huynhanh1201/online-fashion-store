@@ -93,7 +93,7 @@ const BlogRow = ({ blog, onEdit, onDelete, onView, index }) => {
       </TableCell>
 
       <TableCell align='left' sx={styles.cellPadding}>
-        {formatDate(blog.publishedAt)}
+        {formatDate(blog.createdAt)}
       </TableCell>
 
       <TableCell align='left' sx={styles.cellPadding}>

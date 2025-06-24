@@ -19,6 +19,13 @@ export default function UserManagement() {
   const [ModalComponent, setModalComponent] = React.useState(null)
 
   const { users, fetchUsers, removeUser, Loading } = useUsers()
+  // Gọi API duy nhất một lần khi component mount
+  React.useEffect(() => {
+    const loadData = async () => {
+      await fetchUsers(page, ROWS_PER_PAGE)
+    }
+    loadData()
+  }, [page])
 
   // Kiểm tra quyền truy cập user management
   if (!hasPermission('user:read')) {
@@ -31,22 +38,14 @@ export default function UserManagement() {
     )
   }
 
-  // Gọi API duy nhất một lần khi component mount
-  React.useEffect(() => {
-    const loadData = async () => {
-      await fetchUsers(page, ROWS_PER_PAGE)
-    }
-    loadData()
-  }, [page])
-
   const handleOpenModal = async (type, user) => {
     if (!user || !user._id) return
-    
+
     // Kiểm tra quyền trước khi mở modal
     if (type === 'view' && !hasPermission('user:read')) return
     if (type === 'edit' && !hasPermission('user:update')) return
     if (type === 'delete' && !hasPermission('user:delete')) return
-    
+
     setSelectedUser(user)
     setModalType(type)
 
@@ -75,9 +74,6 @@ export default function UserManagement() {
   }
   return (
     <>
-      <Typography variant='h5' sx={{ mb: 2 }}>
-        Quản lý người dùng
-      </Typography>
       <UserTable
         users={users}
         page={page}

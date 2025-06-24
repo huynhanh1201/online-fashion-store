@@ -87,13 +87,16 @@ function ViewOrderModal({
   const style = {
     nonePadding: {
       py: 1.5
+    },
+    tableRow: {
+      minWidth: 200
     }
   }
   return (
     <Dialog
       open={open}
       onClose={onClose}
-      maxWidth='md'
+      maxWidth='xl'
       fullWidth
       PaperProps={{
         sx: {
@@ -145,7 +148,7 @@ function ViewOrderModal({
           <Table sx={style.nonePadding}>
             <TableBody>
               <TableRow sx={style.nonePadding}>
-                <TableCell sx={style.nonePadding}>
+                <TableCell sx={{ ...style.nonePadding, ...style.tableRow }}>
                   <strong>Mã đơn hàng</strong>
                 </TableCell>
                 <TableCell sx={style.nonePadding}>
@@ -154,7 +157,7 @@ function ViewOrderModal({
               </TableRow>
 
               <TableRow sx={style.nonePadding}>
-                <TableCell sx={style.nonePadding}>
+                <TableCell sx={{ ...style.nonePadding, ...style.tableRow }}>
                   <strong>Người nhận</strong>
                 </TableCell>
                 <TableCell sx={style.nonePadding}>
@@ -170,7 +173,7 @@ function ViewOrderModal({
               </TableRow>
 
               <TableRow sx={style.nonePadding}>
-                <TableCell sx={style.nonePadding}>
+                <TableCell sx={{ ...style.nonePadding, ...style.tableRow }}>
                   <strong>SĐT</strong>
                 </TableCell>
                 <TableCell sx={style.nonePadding}>
@@ -179,7 +182,7 @@ function ViewOrderModal({
               </TableRow>
 
               <TableRow sx={style.nonePadding}>
-                <TableCell sx={style.nonePadding}>
+                <TableCell sx={{ ...style.nonePadding, ...style.tableRow }}>
                   <strong>Địa chỉ giao hàng</strong>
                 </TableCell>
                 <TableCell sx={style.nonePadding}>
@@ -190,7 +193,7 @@ function ViewOrderModal({
               </TableRow>
 
               <TableRow sx={style.nonePadding}>
-                <TableCell sx={style.nonePadding}>
+                <TableCell sx={{ ...style.nonePadding, ...style.tableRow }}>
                   <strong>Phương thức thanh toán</strong>
                 </TableCell>
                 <TableCell sx={style.nonePadding}>
@@ -199,7 +202,7 @@ function ViewOrderModal({
               </TableRow>
 
               <TableRow sx={style.nonePadding}>
-                <TableCell sx={style.nonePadding}>
+                <TableCell sx={{ ...style.nonePadding, ...style.tableRow }}>
                   <strong>Trạng thái thanh toán</strong>
                 </TableCell>
                 <TableCell sx={style.nonePadding}>
@@ -227,7 +230,7 @@ function ViewOrderModal({
               </TableRow>
 
               <TableRow sx={style.nonePadding}>
-                <TableCell sx={style.nonePadding}>
+                <TableCell sx={{ ...style.nonePadding, ...style.tableRow }}>
                   <strong>Trạng thái đơn hàng</strong>
                 </TableCell>
                 <TableCell sx={style.nonePadding}>
@@ -288,7 +291,7 @@ function ViewOrderModal({
               </TableRow>
 
               <TableRow sx={style.nonePadding}>
-                <TableCell sx={style.nonePadding}>
+                <TableCell sx={{ ...style.nonePadding, ...style.tableRow }}>
                   <strong>Giao hàng</strong>
                 </TableCell>
                 <TableCell sx={style.nonePadding}>
@@ -302,7 +305,7 @@ function ViewOrderModal({
               </TableRow>
 
               <TableRow sx={style.nonePadding}>
-                <TableCell sx={style.nonePadding}>
+                <TableCell sx={{ ...style.nonePadding, ...style.tableRow }}>
                   <strong>Giảm giá</strong>
                 </TableCell>
                 <TableCell sx={style.nonePadding}>
@@ -313,7 +316,7 @@ function ViewOrderModal({
               </TableRow>
 
               <TableRow sx={style.nonePadding}>
-                <TableCell sx={style.nonePadding}>
+                <TableCell sx={{ ...style.nonePadding, ...style.tableRow }}>
                   <strong>Tổng tiền</strong>
                 </TableCell>
                 <TableCell sx={style.nonePadding}>
@@ -322,7 +325,7 @@ function ViewOrderModal({
               </TableRow>
 
               <TableRow sx={style.nonePadding}>
-                <TableCell sx={style.nonePadding}>
+                <TableCell sx={{ ...style.nonePadding, ...style.tableRow }}>
                   <strong>Ngày tạo</strong>
                 </TableCell>
                 <TableCell sx={style.nonePadding}>
@@ -331,7 +334,7 @@ function ViewOrderModal({
               </TableRow>
 
               <TableRow sx={style.nonePadding}>
-                <TableCell sx={style.nonePadding}>
+                <TableCell sx={{ ...style.nonePadding, ...style.tableRow }}>
                   <strong>Ngày cập nhật</strong>
                 </TableCell>
                 <TableCell sx={style.nonePadding}>
@@ -340,7 +343,7 @@ function ViewOrderModal({
               </TableRow>
 
               <TableRow sx={style.nonePadding}>
-                <TableCell sx={style.nonePadding}>
+                <TableCell sx={{ ...style.nonePadding, ...style.tableRow }}>
                   <strong>Lời nhắn</strong>
                 </TableCell>
                 <TableCell sx={style.nonePadding}>
