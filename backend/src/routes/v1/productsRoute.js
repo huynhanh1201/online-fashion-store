@@ -8,6 +8,7 @@ const Router = express.Router()
 
 // Tạo Sản phẩm mới
 Router.route('/').post(
+  authMiddleware.isAuthorized,
   productsValidation.product,
   productsController.createProduct
 )
@@ -29,6 +30,7 @@ Router.route('/:productId').get(
 
 // Cập nhật thông tin Sản phẩm
 Router.route('/:productId').patch(
+  authMiddleware.isAuthorized,
   productsValidation.verifyId,
   productsValidation.product,
   productsController.updateProduct
@@ -36,6 +38,7 @@ Router.route('/:productId').patch(
 
 // Xoá Sản phẩm (Xóa mềm)
 Router.route('/:productId').delete(
+  authMiddleware.isAuthorized,
   productsValidation.verifyId,
   productsController.deleteProduct
 )

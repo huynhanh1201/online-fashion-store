@@ -8,6 +8,7 @@ const Router = express.Router()
 
 // Tạo Màu sắc sản phẩm mới
 Router.route('/').post(
+  authMiddleware.isAuthorized,
   websiteConfigsValidation.websiteConfig,
   websiteConfigsController.createWebsiteConfig
 )
@@ -23,6 +24,7 @@ Router.route('/:websiteConfigId').get(
 
 // Cập nhật thông tin Màu sắc sản phẩm
 Router.route('/:websiteConfigId').patch(
+  authMiddleware.isAuthorized,
   websiteConfigsValidation.verifyId,
   websiteConfigsValidation.websiteConfig,
   websiteConfigsController.updateWebsiteConfig
@@ -30,6 +32,7 @@ Router.route('/:websiteConfigId').patch(
 
 // Xoá Màu sắc sản phẩm (Xóa mềm)
 Router.route('/:websiteConfigId').delete(
+  authMiddleware.isAuthorized,
   websiteConfigsValidation.verifyId,
   websiteConfigsController.deleteWebsiteConfig
 )

@@ -8,21 +8,27 @@ const Router = express.Router()
 
 // Tạo Màu sắc sản phẩm mới
 Router.route('/').post(
+  authMiddleware.isAuthorized,
   partnersValidation.partner,
   partnersController.createPartner
 )
 
 // Danh sách Màu sắc sản phẩm
-Router.route('/').get(partnersController.getPartnerList)
+Router.route('/').get(
+  authMiddleware.isAuthorized,
+  partnersController.getPartnerList
+)
 
 // Lấy thông tin một Màu sắc sản phẩm.
 Router.route('/:partnerId').get(
+  authMiddleware.isAuthorized,
   partnersValidation.verifyId,
   partnersController.getPartner
 )
 
 // Cập nhật thông tin Màu sắc sản phẩm
 Router.route('/:partnerId').patch(
+  authMiddleware.isAuthorized,
   partnersValidation.verifyId,
   partnersValidation.partner,
   partnersController.updatePartner
@@ -30,6 +36,7 @@ Router.route('/:partnerId').patch(
 
 // Xoá Màu sắc sản phẩm (Xóa mềm)
 Router.route('/:partnerId').delete(
+  authMiddleware.isAuthorized,
   partnersValidation.verifyId,
   partnersController.deletePartner
 )

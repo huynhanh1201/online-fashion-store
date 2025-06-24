@@ -9,12 +9,14 @@ const Router = express.Router()
 // Tạo Đơn hàng chi tiết mới
 Router.route('/').post(
   authMiddleware.isAuthorized,
+  authMiddleware.isAuthorized,
   shippingAddressesValidation.shippingAddress,
   shippingAddressesController.createShippingAddress
 )
 
 // Danh sách Đơn hàng chi tiết
 Router.route('/').get(
+  authMiddleware.isAuthorized,
   authMiddleware.isAuthorized,
   shippingAddressesController.getShippingAddressList
 )
