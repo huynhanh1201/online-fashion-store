@@ -76,12 +76,19 @@ const ProductCard = ({ product, isFlashSale = false }) => {
             {truncateProductName(product.name)}
           </h3>
           <div style={styles.priceRow}>
-            <span style={styles.currentPrice}>
-              {(product.exportPrice ?? 0).toLocaleString()}₫
-            </span>
-            {product.originalPrice && (
-              <span style={styles.originalPrice}>
-                {product.originalPrice.toLocaleString()}₫
+            {isFlashSale && product.flashPrice ? (
+              <>
+                <span style={styles.flashSalePrice}>
+                  {product.flashPrice.toLocaleString()}₫
+                </span>
+                <span style={styles.originalPrice}>
+                  {product.exportPrice.toLocaleString()}₫
+                </span>
+                <span style={styles.flashSaleBadge}>Flash Sale</span>
+              </>
+            ) : (
+              <span style={styles.currentPrice}>
+                {(product.exportPrice ?? 0).toLocaleString()}₫
               </span>
             )}
           </div>
@@ -215,7 +222,25 @@ const styles = {
     fontSize: '13px',
     color: '#888',
     fontWeight: '500'
-  }
+  },
+  flashSalePrice: {
+    fontSize: '22px',
+    fontWeight: '900',
+    color: '#e53935',
+    marginRight: '8px',
+  },
+  flashSaleBadge: {
+    background: 'linear-gradient(90deg, #ff9800 0%, #ff3d00 100%)',
+    color: 'white',
+    fontWeight: 'bold',
+    fontSize: '12px',
+    borderRadius: '6px',
+    padding: '2px 8px',
+    marginLeft: '8px',
+    letterSpacing: '1px',
+    textTransform: 'uppercase',
+    boxShadow: '0 2px 8px rgba(255,61,0,0.15)'
+  },
 }
 
 export default ProductCard

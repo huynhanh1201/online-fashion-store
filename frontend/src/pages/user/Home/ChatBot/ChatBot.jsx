@@ -20,6 +20,7 @@ const OPENAI_API_KEY =
 
 const ChatBot = () => {
   const [open, setOpen] = useState(false)
+  const [showIcon, setShowIcon] = useState(true) // State to control chat icon visibility
   const [messages, setMessages] = useState([
     {
       sender: 'bot',
@@ -43,17 +44,22 @@ const ChatBot = () => {
   // Hiệu ứng bounce cho icon chat
   useEffect(() => {
     const bounceInterval = setInterval(() => {
-      if (!open) {
+      if (!open && showIcon) {
         setBounce(true)
         setTimeout(() => setBounce(false), 600)
       }
     }, 3000)
 
     return () => clearInterval(bounceInterval)
-  }, [open])
+  }, [open, showIcon])
 
   const toggleChat = () => {
-    setOpen(!open)
+    if (open) {
+      setOpen(false) // Start closing the chat
+    } else {
+      setOpen(true)
+      setShowIcon(false) // Hide icon when opening chat
+    }
   }
 
   const sendMessage = async () => {
@@ -207,7 +213,7 @@ const ChatBot = () => {
 
   return (
     <Box sx={{ position: 'fixed', bottom: 20, right: 20, zIndex: 1000 }}>
-      <Zoom in={!open} timeout={300}>
+      {showIcon && (
         <IconButton
           color='primary'
           onClick={toggleChat}
@@ -233,9 +239,16 @@ const ChatBot = () => {
         >
           <Chat sx={{ color: 'white', fontSize: 28 }} />
         </IconButton>
-      </Zoom>
+      )}
 
-      <Slide direction='up' in={open} mountOnEnter unmountOnExit timeout={400}>
+      <Slide
+        direction='up'
+        in={open}
+        mountOnEnter
+        unmountOnExit
+        timeout={400}
+        onExit={() => setTimeout(() => setShowIcon(true), 400)} // Show icon after animation completes
+      >
         <Paper
           elevation={0}
           sx={{

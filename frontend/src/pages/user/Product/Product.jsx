@@ -80,6 +80,23 @@ const sortOptions = [
   { value: 'nameDesc', label: 'Sản phẩm từ Z-A' }
 ]
 
+// Helper to generate pagination items with ellipsis
+function getPaginationItems(current, total) {
+  const pages = [];
+  if (total <= 7) {
+    for (let i = 1; i <= total; i++) pages.push(i);
+    return pages;
+  }
+  if (current <= 4) {
+    pages.push(1, 2, 3, 4, '...', total);
+  } else if (current >= total - 3) {
+    pages.push(1, '...', total - 3, total - 2, total - 1, total);
+  } else {
+    pages.push(1, '...', current - 1, current, current + 1, '...', total);
+  }
+  return pages;
+}
+
 const Product = () => {
   const dispatch = useDispatch()
   const [products, setProducts] = useState([])
@@ -479,8 +496,6 @@ const Product = () => {
                   onChange={handlePageChange}
                   color='primary'
                   size='small'
-                  showFirstButton
-                  showLastButton
                   boundaryCount={0}
                   siblingCount={2}
                   shape='rounded'
@@ -515,7 +530,11 @@ const Product = () => {
                       },
                     },
                     '& .MuiPaginationItem-ellipsis': {
-                      display: 'none',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontSize: '1.2rem',
+                      paddingTop: 0,
                     },
                   }}
                 />
