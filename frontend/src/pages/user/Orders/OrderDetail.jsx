@@ -216,48 +216,26 @@ const OrderDetail = () => {
     setSelectedProduct(null)
   }
 
-  const handleSubmitReview = async ({ rating, comment, images = [], videos = [] }) => {
+  const handleSubmitReview = async (reviewData) => {
     try {
       if (hasReviewed) {
         console.error('Đơn hàng này đã được đánh giá.')
         return
       }
 
-      // Review all products in the order
-      for (const product of uniqueProducts) {
-        const productId = product.productId
-        const userId = currentUser?._id
-        if (!productId || !userId) continue
+      console.log('Review data received:', reviewData)
+      console.log('Current user ID:', currentUser?._id)
+      console.log('Order ID:', orderId)
 
-        // Create FormData to handle file uploads
-        const formData = new FormData()
-        formData.append('productId', productId)
-        formData.append('userId', userId)
-        formData.append('rating', rating)
-        formData.append('comment', comment)
-        formData.append('orderId', orderId)
-
-        // Add images
-        images.forEach((image, index) => {
-          formData.append('images', image)
-        })
-
-        // Add videos  
-        videos.forEach((video, index) => {
-          formData.append('videos', video)
-        })
-
-        // Use createReview with FormData (assume service supports it)
-        await createReview(formData, {
-          headers: { 'Content-Type': 'multipart/form-data' }
-        })
-      }
+      // Gửi đánh giá với payload đầy đủ
+      await createReview(reviewData)
 
       setHasReviewed(true)     // Mark order as reviewed
       handleCloseModal()
       setSnackbarOpen(true)
     } catch (error) {
       console.error('Lỗi gửi đánh giá:', error)
+      console.error('Error details:', error)
     }
   }
 
@@ -587,7 +565,9 @@ const OrderDetail = () => {
         onClose={handleCloseModal}
         onSubmit={handleSubmitReview}
         orderItems={selectedProduct ? selectedProduct.variants : items}
-        products={selectedProduct ? [selectedProduct] : uniqueProducts}
+        productId={selectedProduct?.productId || uniqueProducts[0]?.productId}
+        userId={currentUser?._id}
+        orderId={orderId}
       />
 
       {/* Cancel Order Modal */}

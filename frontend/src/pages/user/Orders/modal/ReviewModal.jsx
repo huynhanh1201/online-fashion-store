@@ -84,7 +84,7 @@ const getVideoThumbnail = (videoUrl) => {
     .replace(/\.(mp4|webm|ogg)$/, '.jpg')
 }
 
-const ReviewModal = ({ open, onClose, onSubmit, orderItems }) => {
+const ReviewModal = ({ open, onClose, onSubmit, orderItems, productId, userId, orderId }) => {
   const [rating, setRating] = useState(0)
   const [comment, setComment] = useState('')
   const [images, setImages] = useState([])
@@ -306,8 +306,11 @@ const ReviewModal = ({ open, onClose, onSubmit, orderItems }) => {
   const handleSubmit = () => {
     if (rating && comment.trim() && contentValidation.isValid) {
       onSubmit({
+        productId,
+        userId,
         rating,
         comment: contentValidation.filteredText || comment,
+        orderId,
         images: images.map(img => img.url),
         videos: videos.map(vid => vid.url)
       })
