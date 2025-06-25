@@ -3,6 +3,9 @@ export const roles = [
     name: 'owner',
     label: 'Chủ cửa hàng',
     permissions: [
+      // Admin
+      'admin:access',
+
       // User
       'user:create',
       'user:read',

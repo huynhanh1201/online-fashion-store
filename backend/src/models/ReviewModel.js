@@ -37,6 +37,15 @@ const reviewSchema = new Schema(
       type: Schema.Types.ObjectId,
       ref: 'Order',
       required: true
+    },
+
+    images: {
+      type: [String],
+      default: []
+    },
+    videos: {
+      type: [String],
+      default: []
     }
   },
   {

@@ -20,7 +20,10 @@ const review = async (req, res, next) => {
     userId: Joi.string().length(24).hex().required(),
     rating: Joi.number().integer().min(1).max(5).required(),
     comment: Joi.string().trim().required(),
-    orderId: Joi.string().length(24).hex().required()
+    orderId: Joi.string().length(24).hex().required(),
+
+    images: Joi.array().items(Joi.string()).default([]),
+    videos: Joi.array().items(Joi.string()).default([])
   })
 
   try {
@@ -43,7 +46,10 @@ const reviewUpdate = async (req, res, next) => {
   // Xác thực dữ liệu đầu vào correctCondition: điều kiện đúng
   const correctCondition = Joi.object({
     rating: Joi.number().integer().min(1).max(5).required(),
-    comment: Joi.string().trim().required()
+    comment: Joi.string().trim().required(),
+
+    images: Joi.array().items(Joi.string()).default([]),
+    videos: Joi.array().items(Joi.string()).default([])
   })
 
   try {
