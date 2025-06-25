@@ -25,7 +25,9 @@ import {
   LocalOffer as LocalOfferIcon,
   Payment as PaymentIcon,
   Warehouse as WarehouseIcon,
-  CheckCircle as CheckCircleIcon
+  CheckCircle as CheckCircleIcon,
+  ViewQuilt as ViewQuiltIcon,
+  FlashOn as FlashOnIcon
 } from '@mui/icons-material'
 import { Link, useLocation } from 'react-router-dom'
 import ExitToAppIcon from '@mui/icons-material/ExitToApp'
@@ -47,10 +49,12 @@ export default function AdminDrawer({
   const [openProduct, setOpenProduct] = React.useState(false)
   const [openOrder, setOpenOrder] = React.useState(false)
   const [openInventory, setOpenInventory] = React.useState(false)
+  const [openContent, setOpenContent] = React.useState(false)
 
   const toggleProduct = () => setOpenProduct(!openProduct)
   const toggleOrder = () => setOpenOrder(!openOrder)
   const toggleInventory = () => setOpenInventory(!openInventory)
+  const toggleContent = () => setOpenContent(!openContent)
   const currentPath = location.pathname
 
   const isActive = (path) => {
@@ -154,6 +158,7 @@ export default function AdminDrawer({
         }
       ]
     },
+    
     orderManagement: {
       permissions: ['order:read', 'coupon:read', 'payment:read'],
       label: 'Quản lý đơn hàng',
@@ -505,22 +510,66 @@ export default function AdminDrawer({
               </ListItemButton>
             </ListItem>
           )}
-          <Link
-            to='/admin/marketing-management'
-            style={{ textDecoration: 'none', color: 'inherit' }}
-          >
-            <ListItem disablePadding>
+          <ListItem disablePadding>
+            <ListItemButton onClick={toggleContent} sx={activeButtonStyle}>
+              <ListItemIcon>
+                <LocalOfferIcon />
+              </ListItemIcon>
+              <ListItemText primary='Quản lý nội dung' />
+              {openContent ? <ExpandLess /> : <ExpandMore />}
+            </ListItemButton>
+          </ListItem>
+          <Collapse in={openContent} timeout='auto' unmountOnExit>
+            <List component='div' disablePadding>
               <ListItemButton
-                selected={isActive('/admin/marketing-management')}
-                sx={activeButtonStyle}
+                component={Link}
+                to='/admin/display-management'
+                selected={isActive('/display-management')}
+                sx={{ pl: 2, ...activeButtonStyle }}
               >
-                <ListItemIcon>
-                  <PersonIcon />
-                </ListItemIcon>
-                <ListItemText primary='Quản lý nội dung' />
+                <ListItemIcon></ListItemIcon>
+                <ListItemText primary='Băng rôn'  />
               </ListItemButton>
-            </ListItem>
-          </Link>
+
+              <ListItemButton
+                component={Link}
+                to='/admin/flashsale-management'
+                selected={isActive('/flashsale-management')}
+                sx={{ pl: 2, ...activeButtonStyle }}
+              >
+                <ListItemIcon></ListItemIcon>
+                <ListItemText primary='Trương trình khuyến mãi'  />
+              </ListItemButton>
+              <ListItemButton
+                component={Link}
+                to='/admin/header-management'
+                selected={isActive('/header-management')}
+                sx={{ pl: 2, ...activeButtonStyle }}
+              >
+                <ListItemIcon></ListItemIcon>
+                <ListItemText primary='Nội dung đầu trang' />
+              </ListItemButton>
+              <ListItemButton
+                component={Link}
+                to='/admin/featured-category-management'
+                selected={isActive('/featured-category-management')}
+                sx={{ pl: 2, ...activeButtonStyle }}
+              >
+                <ListItemIcon></ListItemIcon>
+                <ListItemText primary='Danh mục nổi bật'  />
+              </ListItemButton>
+              <ListItemButton
+                component={Link}
+                to='/admin/service-highlight-management'
+                selected={isActive('/service-highlight-management')}
+                sx={{ pl: 2, ...activeButtonStyle }}
+              >
+                <ListItemIcon></ListItemIcon>
+                <ListItemText primary='Dịch vụ nổi bật'  />
+              </ListItemButton>
+              
+            </List>
+          </Collapse>
           {canAccessMenu(menuConfig.productManagement) && (
             <>
               <ListItem disablePadding>
