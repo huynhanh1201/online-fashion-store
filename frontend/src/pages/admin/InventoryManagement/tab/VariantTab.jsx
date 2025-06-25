@@ -75,9 +75,9 @@ const VariantsTab = () => {
   })
 
   useEffect(() => {
-    fetchProducts(1, 100000)
-    fetchColors()
-    fetchSizes()
+    fetchProducts(1, 100000, { status: 'false' })
+    fetchColors(1, 100000, { status: 'false' })
+    fetchSizes(1, 100000, { status: 'false' })
   }, [])
   useEffect(() => {
     fetchVariants(page, rowsPerPage, filter)
@@ -152,7 +152,7 @@ const VariantsTab = () => {
     },
     { id: 'sku', label: 'Mã biến thể', minWidth: 100 },
     { id: 'name', label: 'Tên sản phẩm', minWidth: 250 },
-    { id: 'color.name', label: 'Màu sắc', minWidth: 150 },
+    { id: 'color', label: 'Màu sắc', minWidth: 150 },
     { id: 'size.name', label: 'Kích thước', minWidth: 150 },
     {
       id: 'importPrice',
@@ -171,12 +171,12 @@ const VariantsTab = () => {
       pr: 8,
       format: (value) => `${value.toLocaleString('vi-VN')}đ`
     },
-    {
-      id: 'destroy',
-      label: 'Trạng thái biến thể',
-      minWidth: 150,
-      align: 'start'
-    },
+    // {
+    //   id: 'destroy',
+    //   label: 'Trạng thái biến thể',
+    //   minWidth: 150,
+    //   align: 'start'
+    // },
     {
       id: 'createdAt',
       label: 'Ngày tạo',
@@ -231,7 +231,7 @@ const VariantsTab = () => {
                         display: 'flex',
                         flexDirection: 'column',
                         gap: 1,
-                        minWidth: 250
+                        minWidth: 200
                       }}
                     >
                       <Typography variant='h6' sx={{ fontWeight: '800' }}>
@@ -335,17 +335,16 @@ const VariantsTab = () => {
                           .join(' ')
                       }
                       if (format) content = format(rawValue)
-                      if (id === 'color.name') {
+                      if (id === 'color') {
                         const colorName = row.color?.name || 'Không có màu sắc'
-                        content =
-                          colorName
-                            .split(' ')
-                            .map(
-                              (word) =>
-                                word.charAt(0).toUpperCase() +
-                                word.slice(1).toLowerCase()
-                            )
-                            .join(' ') || 'Không có màu sắc'
+                        content = colorName
+                          .split(' ')
+                          .map(
+                            (word) =>
+                              word.charAt(0).toUpperCase() +
+                              word.slice(1).toLowerCase()
+                          )
+                          .join(' ')
                       }
                       if (id === 'size.name') {
                         content =

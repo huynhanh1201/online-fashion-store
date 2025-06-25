@@ -166,6 +166,26 @@ const styles = {
   }
 }
 
+const orderOptions = [
+  { value: 'Pending', label: 'Đang chờ' },
+  { value: 'Processing', label: 'Đang xử lý' },
+  { value: 'Shipping', label: 'Đang vận chuyển' },
+  { value: 'Shipped', label: 'Đã gửi hàng' },
+  { value: 'Delivered', label: 'Đã giao' },
+  { value: 'Cancelled', label: 'Đã hủy' },
+  { value: 'Failed', label: 'Thất bại' }
+]
+
+const colorOrder = [
+  { value: 'Pending', color: 'warning' },
+  { value: 'Processing', color: 'info' },
+  { value: 'Shipping', color: 'primary' },
+  { value: 'Shipped', color: 'success' },
+  { value: 'Delivered', color: 'success' },
+  { value: 'Cancelled', color: 'error' },
+  { value: 'Failed', color: 'error' }
+]
+
 const OrderRow = ({ order, index, columns, onView, onEdit, onDelete }) => {
   const { hasPermission } = usePermissions()
   const formatDate = (date) =>
@@ -201,24 +221,12 @@ const OrderRow = ({ order, index, columns, onView, onEdit, onDelete }) => {
             value = (
               <Chip
                 label={
-                  order.status === 'Pending'
-                    ? 'Đang chờ'
-                    : order.status === 'Processing'
-                      ? 'Đang xử lý'
-                      : order.status === 'Shipped'
-                        ? 'Đã gửi hàng'
-                        : order.status === 'Delivered'
-                          ? 'Đã giao'
-                          : order.status === 'Cancelled'
-                            ? 'Đã hủy'
-                            : 'Không xác định'
+                  orderOptions.find((option) => option.value === order.status)
+                    ?.label || 'Không xác định'
                 }
                 color={
-                  order.status === 'Pending'
-                    ? 'warning'
-                    : order.status === 'Cancelled'
-                      ? 'error'
-                      : 'success'
+                  colorOrder.find((option) => option.value === order.status)
+                    ?.color || 'primary'
                 }
                 size='large'
                 sx={{ width: '120px', fontWeight: '800' }}

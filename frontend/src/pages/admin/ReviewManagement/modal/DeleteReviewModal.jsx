@@ -1,37 +1,55 @@
-import React from 'react'
+import React, { useState } from 'react'
 import {
   Dialog,
   DialogTitle,
   DialogContent,
   DialogActions,
-  Typography,
-  Button
+  Button,
+  Divider
 } from '@mui/material'
+import StyleAdmin from '~/assets/StyleAdmin.jsx'
 
 const DeleteReviewModal = ({ open, onClose, review, onDelete }) => {
-  if (!review) return null
+  const [isDeleting, setIsDeleting] = useState(false)
+
+  const handleDelete = async () => {
+    setIsDeleting(true)
+    try {
+      await onDelete(review._id, 'delete')
+      onClose()
+    } catch (error) {
+      console.error('Xoá đánh giá thất bại:', error)
+    } finally {
+      setIsDeleting(false)
+    }
+  }
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth='xs' fullWidth>
-      <DialogTitle>Xác nhận xoá đánh giá</DialogTitle>
-      <DialogContent dividers>
-        <Typography>
-          Bạn có chắc chắn muốn xoá đánh giá của{' '}
-          <strong>{review.user.fullName}</strong> cho sản phẩm{' '}
-          <strong>{review.productId}</strong> không?
-        </Typography>
-        <Typography variant='body2' color='text.secondary' mt={1}>
-          "{review.comment}"
-        </Typography>
+    <Dialog
+      open={open}
+      onClose={onClose}
+      fullWidth
+      maxWidth='sm'
+      BackdropProps={{ sx: StyleAdmin.OverlayModal }}
+    >
+      <DialogTitle>Xoá đánh giá</DialogTitle>
+      <Divider />
+      <DialogContent>
+        Bạn có chắc chắn muốn xoá đánh giá của sản phẩm{' '}
+        <strong>{review?.productId || 'Không rõ'}</strong> không?
       </DialogContent>
-      <DialogActions>
-        <Button onClick={onClose}>Huỷ</Button>
+      <Divider />
+      <DialogActions sx={{ padding: '16px 24px' }}>
+        <Button onClick={onClose} color='inherit' disabled={isDeleting}>
+          Hủy
+        </Button>
         <Button
-          onClick={() => onDelete(review.id)}
-          variant='contained'
+          onClick={handleDelete}
           color='error'
+          variant='contained'
+          disabled={isDeleting}
         >
-          Xoá
+          {isDeleting ? 'Đang xoá...' : 'Xoá'}
         </Button>
       </DialogActions>
     </Dialog>

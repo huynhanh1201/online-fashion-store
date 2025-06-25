@@ -1,11 +1,16 @@
 import React from 'react'
-import { getBlogs } from '~/services/admin/blogService.js'
+import {
+  getBlogs,
+  updateBlog,
+  deleteBlog,
+  createBlog
+} from '~/services/admin/blogService.js'
 
 const useBlog = () => {
   const [blogs, setBlogs] = React.useState([])
   const [loading, setLoading] = React.useState(false)
   const [totalPages, setTotalPages] = React.useState(0)
-
+  const ROWS_PER_PAGE = 10
   const fetchBlogs = async (page = 1, limit = 10, filters = {}) => {
     try {
       setLoading(true)
@@ -32,8 +37,78 @@ const useBlog = () => {
       setLoading(false)
     }
   }
+  const addBlog = async (data, filters = {}) => {
+    try {
+      const newBlog = await createBlog(data)
+      if (!newBlog) {
+        console.error('Tạo blog thất bại')
+        return null
+      }
 
-  return { blogs, loading, totalPages, fetchBlogs }
+      setBlogs((prev) => {
+        const sort = filters?.sort
+        let updated = [...prev]
+
+        if (sort === 'newest') {
+          updated = [newBlog, ...prev].slice(0, ROWS_PER_PAGE)
+        } else if (sort === 'oldest') {
+          if (prev.length < ROWS_PER_PAGE) {
+            updated = [...prev, newBlog]
+          }
+        } else {
+          updated = [newBlog, ...prev].slice(0, ROWS_PER_PAGE)
+        }
+
+        return updated
+      })
+
+      setTotalPages((prev) => prev + 1)
+      return newBlog
+    } catch (err) {
+      console.error('Lỗi khi thêm blog:', err)
+      return null
+    }
+  }
+
+  const updateBlogById = async (id, data) => {
+    try {
+      const updated = await updateBlog(id, data)
+      if (!updated) {
+        console.error('Cập nhật blog thất bại')
+        return null
+      }
+      setBlogs((prev) => prev.map((b) => (b._id === updated._id ? updated : b)))
+      return updated
+    } catch (err) {
+      console.error('Lỗi khi cập nhật blog:', err)
+      return null
+    }
+  }
+
+  const removeBlog = async (id) => {
+    try {
+      const result = await deleteBlog(id)
+      if (!result) {
+        console.error('Xoá blog thất bại')
+        return null
+      }
+      setBlogs((prev) => prev.filter((b) => b._id !== id))
+      setTotalPages((prev) => Math.max(1, prev - 1))
+      return true
+    } catch (err) {
+      console.error('Lỗi khi xoá blog:', err)
+      return false
+    }
+  }
+  return {
+    blogs,
+    loading,
+    totalPages,
+    fetchBlogs,
+    addBlog,
+    removeBlog,
+    updateBlogById
+  }
 }
 
 export default useBlog

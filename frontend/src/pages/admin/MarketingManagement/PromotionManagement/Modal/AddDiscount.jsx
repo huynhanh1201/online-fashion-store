@@ -1,106 +1,81 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { useForm, Controller } from 'react-hook-form'
 
-import Dialog from '@mui/material/Dialog'
-import DialogTitle from '@mui/material/DialogTitle'
-import DialogContent from '@mui/material/DialogContent'
-import DialogActions from '@mui/material/DialogActions'
-import Button from '@mui/material/Button'
-import TextField from '@mui/material/TextField'
-import MenuItem from '@mui/material/MenuItem'
-import FormControlLabel from '@mui/material/FormControlLabel'
-import Checkbox from '@mui/material/Checkbox'
-import Divider from '@mui/material/Divider'
-import Box from '@mui/material/Box'
-import InputLabel from '@mui/material/InputLabel'
-import Select from '@mui/material/Select'
-import FormControl from '@mui/material/FormControl'
+import {
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Button,
+  TextField,
+  MenuItem,
+  FormControlLabel,
+  Checkbox,
+  Divider,
+  FormControl,
+  InputLabel,
+  Select,
+  Box
+} from '@mui/material'
 import { toast } from 'react-toastify'
 import StyleAdmin from '~/assets/StyleAdmin.jsx'
 
-// Hàm định dạng lại datetime cho input type="datetime-local"
-const formatDateTimeLocal = (isoString) => {
-  if (!isoString) return ''
-  const date = new Date(isoString)
-  const offset = date.getTimezoneOffset() * 60000
-  return new Date(date - offset).toISOString().slice(0, 16)
-}
-
-const EditDiscountModal = ({ open, onClose, discount, onSave }) => {
+const AddDiscountModal = ({ open, onClose, onAdded }) => {
   const {
     register,
     watch,
     handleSubmit,
-    control,
     reset,
-    // setValue,
-    setError,
+    setValue,
+    control,
     formState: { isSubmitting }
   } = useForm({
     defaultValues: {
-      code: '',
       type: 'fixed',
-      amount: '',
-      minOrderValue: '',
-      usageLimit: '',
-      validFrom: '',
-      validUntil: '',
-      isActive: false
+      isActive: true
     }
   })
 
-  const type = watch('type', 'fixed')
-  // const code = watch('code')
+  const type = watch('type')
 
-  React.useEffect(() => {
-    if (discount) {
-      reset({
-        ...discount,
-        validFrom: formatDateTimeLocal(discount.validFrom),
-        validUntil: formatDateTimeLocal(discount.validUntil)
-      })
-    }
-  }, [discount, reset])
-  // React.useEffect(() => {
-  //   setValue('amount', '') // reset về rỗng
-  // }, [code, setValue])
+  // Reset amount khi thay đổi loại giảm giá
+  useEffect(() => {
+    setValue('amount', '') // reset giá trị giảm
+  }, [type, setValue])
+
   const onSubmit = async (data) => {
-    if (!data.amount) {
-      toast.error('Vui lòng nhập giá trị giảm!')
-      return
-    }
-
-    if (data.type === 'percent' && (data.amount < 0 || data.amount > 100)) {
-      toast.error('Giá trị giảm (%) phải nằm trong khoảng 0 đến 100!')
-      setError('amount', {
-        type: 'manual',
-        message: 'Giá trị giảm (%) không hợp lệ'
-      })
-      return
-    }
-
-    const payload = {
-      code: data.code,
-      type: data.type,
-      amount: Number(data.amount),
-      minOrderValue: Number(data.minOrderValue),
-      usageLimit: Number(data.usageLimit),
-      validFrom: new Date(data.validFrom).toISOString(),
-      validUntil: new Date(data.validUntil).toISOString(),
-      isActive: data.isActive === true || data.isActive === 'true'
-    }
-
     try {
-      await onSave(payload, 'edit', discount._id)
+      if (data.type === 'percent' && (data.amount < 0 || data.amount > 100)) {
+        toast.error('Giá trị giảm (%) phải nằm trong khoảng từ 0 đến 100!')
+        return
+      }
+
+      const payload = {
+        ...data,
+        amount: Number(data.amount),
+        minOrderValue: Number(data.minOrderValue),
+        usageLimit: Number(data.usageLimit),
+        validFrom: new Date(data.validFrom).toISOString(),
+        validUntil: new Date(data.validUntil).toISOString()
+      }
+
+      await onAdded(payload, 'add')
+      if (!data.code) {
+        toast.error('Vui lòng nhập mã giảm giá!')
+        return
+      }
+
+      if (!data.amount) {
+        toast.error('Vui lòng nhập giá trị giảm!')
+        return
+      }
+      toast.success('Thêm mã giảm giá thành công!')
+      reset()
       onClose()
     } catch (error) {
-      console.error('Lỗi khi cập nhật mã giảm giá:', error)
+      toast.error('Đã có lỗi xảy ra. Vui lòng thử lại sau!')
+      console.error(error)
     }
-  }
-
-  const handleClose = () => {
-    reset()
-    onClose()
   }
   const formatNumber = (value) => {
     const number = value?.toString().replace(/\D/g, '') || ''
@@ -110,6 +85,12 @@ const EditDiscountModal = ({ open, onClose, discount, onSave }) => {
   const parseNumber = (formatted) => formatted.replace(/\./g, '')
   const minOrderValue = watch('minOrderValue')
   const usageLimit = watch('usageLimit')
+
+  const handleClose = () => {
+    reset()
+    onClose()
+  }
+
   return (
     <Dialog
       open={open}
@@ -120,7 +101,7 @@ const EditDiscountModal = ({ open, onClose, discount, onSave }) => {
         sx: StyleAdmin.OverlayModal
       }}
     >
-      <DialogTitle>Sửa thông tin mã giảm giá</DialogTitle>
+      <DialogTitle>Thêm mã giảm giá mới</DialogTitle>
       <Divider sx={{ my: 0 }} />
       <form onSubmit={handleSubmit(onSubmit)}>
         <DialogContent>
@@ -138,35 +119,24 @@ const EditDiscountModal = ({ open, onClose, discount, onSave }) => {
                 {...register('code', { required: true })}
                 sx={StyleAdmin.InputCustom}
               />
-              <Controller
-                name='type'
-                control={control}
-                rules={{ required: 'Vui lòng chọn loại giảm giá' }}
-                render={({ field, fieldState: { error } }) => (
-                  <FormControl
-                    fullWidth
-                    margin='normal'
-                    error={!!error}
-                    sx={StyleAdmin.FormSelect}
-                  >
-                    <InputLabel id='type-label'>Loại giảm giá</InputLabel>
-                    <Select
-                      disabled
-                      labelId='type-label'
-                      label='Loại giảm giá'
-                      {...field}
-                      MenuProps={{
-                        PaperProps: {
-                          sx: StyleAdmin.FormSelect.SelectMenu
-                        }
-                      }}
-                    >
-                      <MenuItem value='fixed'>Giảm theo số tiền</MenuItem>
-                      <MenuItem value='percent'>Giảm theo phần trăm</MenuItem>
-                    </Select>
-                  </FormControl>
-                )}
-              />
+
+              <FormControl fullWidth margin='normal' sx={StyleAdmin.FormSelect}>
+                <InputLabel id='type-label'>Loại giảm giá</InputLabel>
+                <Select
+                  labelId='type-label'
+                  label='Loại giảm giá'
+                  value={type}
+                  {...register('type', { required: true })}
+                  MenuProps={{
+                    PaperProps: {
+                      sx: StyleAdmin.FormSelect.SelectMenu
+                    }
+                  }}
+                >
+                  <MenuItem value='fixed'>Giảm theo số tiền</MenuItem>
+                  <MenuItem value='percent'>Giảm theo phần trăm</MenuItem>
+                </Select>
+              </FormControl>
 
               <Controller
                 name='amount'
@@ -176,7 +146,8 @@ const EditDiscountModal = ({ open, onClose, discount, onSave }) => {
                   validate: (value) => {
                     const number = parseInt(value)
                     if (isNaN(number)) return 'Giá trị không hợp lệ'
-                    if (number < 0) return 'Giá trị không được âm'
+                    if (number < 1)
+                      return 'Giá trị giảm phải lớn hơn hoặc bằng 1'
                     if (type === 'percent' && number > 100)
                       return 'Phần trăm giảm tối đa là 100%'
                     return true
@@ -187,30 +158,26 @@ const EditDiscountModal = ({ open, onClose, discount, onSave }) => {
                   fieldState: { error }
                 }) => (
                   <TextField
-                    disabled
                     label={
                       type === 'fixed' ? 'Giá trị giảm (đ)' : 'Giá trị giảm (%)'
                     }
+                    type='text'
                     fullWidth
                     margin='normal'
                     value={formatNumber(value)}
-                    onChange={(e) => onChange(parseNumber(e.target.value))}
+                    onChange={(e) => {
+                      const rawValue = parseNumber(e.target.value)
+                      onChange(rawValue)
+                    }}
                     error={!!error}
                     helperText={error?.message}
-                    InputProps={{ inputMode: 'numeric' }}
                     sx={StyleAdmin.InputCustom}
                   />
                 )}
               />
 
               <FormControlLabel
-                control={
-                  <Checkbox
-                    defaultChecked={discount.isActive}
-                    {...register('isActive')}
-                    sx={StyleAdmin.InputCustom}
-                  />
-                }
+                control={<Checkbox defaultChecked {...register('isActive')} />}
                 label='Kích hoạt'
                 sx={{ mt: 1 }}
               />
@@ -218,6 +185,7 @@ const EditDiscountModal = ({ open, onClose, discount, onSave }) => {
 
             {/* Cột phải */}
             <Box flex={1}>
+              {/* Giá trị đơn hàng tối thiểu */}
               <Controller
                 name='minOrderValue'
                 control={control}
@@ -233,18 +201,22 @@ const EditDiscountModal = ({ open, onClose, discount, onSave }) => {
                 }) => (
                   <TextField
                     label='Giá trị đơn hàng tối thiểu (đ)'
+                    type='text'
                     fullWidth
                     margin='normal'
                     value={formatNumber(value)}
-                    onChange={(e) => onChange(parseNumber(e.target.value))}
+                    onChange={(e) => {
+                      const rawValue = parseNumber(e.target.value)
+                      onChange(rawValue)
+                    }}
                     error={!!error}
                     helperText={error?.message}
-                    InputProps={{ inputMode: 'numeric' }}
                     sx={StyleAdmin.InputCustom}
                   />
                 )}
               />
 
+              {/* Số lượt sử dụng tối đa */}
               <Controller
                 name='usageLimit'
                 control={control}
@@ -260,13 +232,16 @@ const EditDiscountModal = ({ open, onClose, discount, onSave }) => {
                 }) => (
                   <TextField
                     label='Số lượt sử dụng tối đa'
+                    type='text'
                     fullWidth
                     margin='normal'
                     value={formatNumber(value)}
-                    onChange={(e) => onChange(parseNumber(e.target.value))}
+                    onChange={(e) => {
+                      const rawValue = parseNumber(e.target.value)
+                      onChange(rawValue)
+                    }}
                     error={!!error}
                     helperText={error?.message}
-                    InputProps={{ inputMode: 'numeric' }}
                     sx={StyleAdmin.InputCustom}
                   />
                 )}
@@ -313,7 +288,7 @@ const EditDiscountModal = ({ open, onClose, discount, onSave }) => {
             }}
             disabled={isSubmitting}
           >
-            {isSubmitting ? 'Đang lưu...' : 'Lưu'}
+            {isSubmitting ? 'Đang thêm...' : 'Thêm'}
           </Button>
         </DialogActions>
       </form>
@@ -321,4 +296,4 @@ const EditDiscountModal = ({ open, onClose, discount, onSave }) => {
   )
 }
 
-export default EditDiscountModal
+export default AddDiscountModal

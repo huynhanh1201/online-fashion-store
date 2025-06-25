@@ -203,7 +203,7 @@ export default function ProductDescriptionEditor({
               }
             }}
             editorStyle={{
-              minHeight: '150px',
+              minHeight: '400px',
               border: '1px solid #ccc',
               padding: '10px',
               borderRadius: '4px',

@@ -51,14 +51,10 @@ import BatchesTab from '~/pages/admin/InventoryManagement/tab/BatchesTab.jsx'
 import BlogManagement from '~/pages/admin/BlogManagement/index.jsx'
 import RoleManagement from '~/pages/admin/RoleManagement/index.jsx'
 import PermissionManagement from '~/pages/admin/PermissionManagemenet/index.jsx'
-// Quản lý nội dung
-import DisplayManagement from '~/pages/admin/MarketingManagement/DisplayManagement/DisplayManagement.jsx'
-import FlashSaleManagement from '~/pages/admin/MarketingManagement/FlashSaleManagement/FlashSaleManagement.jsx'
-import HeaderManagement from '~/pages/admin/MarketingManagement/HeaderManagement/HeaderManagement.jsx'
-import FeaturedCategoryManagement from '~/pages/admin/MarketingManagement/FeaturedCategoryManagement/FeaturedCategoryManagement.jsx'
-import ServiceHighlightManagement from '~/pages/admin/MarketingManagement/ServiceHighlightManagement/ServiceHighlightManagement.jsx'
 // Trang 404
 import NotFound from '~/pages/404/NotFound'
+//Trang quản lí giao diện Website
+import MarketingManagement from '~/pages/admin/MarketingManagement/index.jsx'
 // Hook
 import { useAutoClearTempCart } from '~/hooks/useAutoClearTempCart'
 import OrderDetail from '~/pages/user/Orders/OrderDetail'
@@ -159,6 +155,10 @@ function App() {
           <Route path='warehouses-management' element={<WarehousesTab />} />
           <Route path='batches-management' element={<BatchesTab />} />
           <Route
+            path='marketing-management'
+            element={<MarketingManagement />}
+          />
+          <Route
             path='color-palette-management'
             element={<ColorPaletteManagement />}
           />
@@ -166,11 +166,6 @@ function App() {
             path='size-palette-management'
             element={<SizePaletteManagement />}
           />
-          <Route path='display-management' element={<DisplayManagement />} />
-          <Route path='flashsale-management' element={<FlashSaleManagement />} />
-          <Route path='header-management' element={<HeaderManagement />} />
-          <Route path='featured-category-management' element={<FeaturedCategoryManagement />} />
-          <Route path='service-highlight-management' element={<ServiceHighlightManagement />} />
           <Route path='blog-management' element={<BlogManagement />} />
           <Route path='role-management' element={<RoleManagement />} />
           <Route

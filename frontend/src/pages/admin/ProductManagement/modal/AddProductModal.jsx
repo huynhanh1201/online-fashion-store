@@ -22,8 +22,7 @@ import AddCategoryModal from '~/pages/admin/CategorieManagement/modal/AddCategor
 import StyleAdmin from '~/assets/StyleAdmin.jsx'
 import { Editor } from 'react-draft-wysiwyg'
 import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css'
-import { EditorState, convertToRaw } from 'draft-js'
-import draftToHtml from 'draftjs-to-html'
+import { EditorState } from 'draft-js'
 import ProductImages from '../component/ProductImageUploader'
 import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css'
 import 'draft-js/dist/Draft.css'
@@ -87,15 +86,6 @@ const AddProductModal = ({ open, onClose, onSuccess }) => {
     }
   }, [open, reset])
 
-  const uploadImageFunction = async (file) => {
-    try {
-      const secureUrl = await uploadToCloudinary(file, CloudinaryProduct)
-      return { data: { link: secureUrl } }
-    } catch (error) {
-      console.error('Lỗi khi upload ảnh:', error)
-      return Promise.reject(error)
-    }
-  }
   const handAddCategory = async (category) => {
     const newCategory = await add(category) // category trả về từ add()
 

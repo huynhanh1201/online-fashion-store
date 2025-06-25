@@ -17,16 +17,8 @@ import {
   Grid,
   useTheme,
   alpha,
-  Stack,
-  Accordion,
-  AccordionSummary,
-  AccordionDetails,
-  Switch,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Tooltip // Added Tooltip import
+  Tooltip,
+  Stack
 } from '@mui/material'
 import {
   Add as AddIcon,
@@ -36,111 +28,75 @@ import {
   Schedule as ScheduleIcon,
   Inventory as InventoryIcon,
   TrendingUp as TrendingUpIcon,
-  Refresh as RefreshIcon,
-  ExpandMore as ExpandMoreIcon
+  Refresh as RefreshIcon
 } from '@mui/icons-material'
 import AddFlashSale from './Modal/AddFlashSale.jsx'
+import { getFlashSaleConfig } from '~/services/admin/webConfig/flashsaleService'
+import { getProducts } from '~/services/productService'
 import EditFlashSaleModal from './Modal/EditFlashSaleModal'
 import DeleteFlashSaleModal from './Modal/DeleteFlashSaleModal'
-import {
-  getFlashSaleCampaigns,
-  getFlashSaleCampaignStatus,
-  updateFlashSaleCampaign,
-  deleteFlashSaleCampaign,
-  updateProductInFlashSaleCampaign,
-  removeProductFromFlashSaleCampaign
-} from '~/services/admin/webConfig/flashSaleService'
-import { getProducts } from '~/services/productService'
+import { updateProductInFlashSale, removeProductFromFlashSale } from '~/services/admin/webConfig/flashsaleService'
 
 const FlashSaleManagement = () => {
   const theme = useTheme()
 
-  const [campaigns, setCampaigns] = useState([])
+  const [flashSales, setFlashSales] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
-  const [openAddModal, setModal] = useState(false) // Fixed: Renamed setOpenAddModal to avoid conflict with setter name
-  const [refreshing, setRefreshing] = useState(false) // Fixed: Added comma for consistency
-  const [editModalOpen, setEditModalOpen] = useState(false) // Fixed: Renamed for clarity
-  const [deleteModal, setDeleteModalOpen] = useState(false) // Fixed: Renamed for clarity
-  const [deleteCampaignModalOpen, setDeleteModal] = useState(false) // Fixed: Renamed for clarity
+
+  const [openAddModal, setOpenAddModal] = useState(false)
+  const [refreshing, setRefreshing] = useState(false)
+  const [editModalOpen, setEditModalOpen] = useState(false)
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false)
   const [selectedProduct, setSelectedProduct] = useState(null)
-  const [selectedCampaignId, setSelectedCampaignId] = useState(null) // Fixed: Renamed for clarity
-  const [deleteCampaign, setSelectedDeleteCampaign] = useState(null) // Fixed: Renamed for clarity
-  const [editCampaignData, setEditCampaignData] = useState(null)
 
   useEffect(() => {
-    fetchCampaigns()
-  }, [])
-
-  const fetchCampaigns = async () => {
-    setLoading(true)
-    setError('')
-    try {
-      const campaignsData = await getFlashSaleCampaigns()
-      const { products: allProducts = [] } = await getProducts({
-        page: 1,
-        limit: 1000
-      })
-
-      const enrichedCampaigns = await Promise.all(
-        campaignsData.map(async (campaign) => {
-          const status = await getFlashSaleCampaignStatus(campaign.id)
-          const enrichedProducts = campaign.products.map((item) => {
-            const prod = allProducts.find((p) => p._id === item.productId)
+    const fetchFlashSales = async () => {
+      setLoading(true)
+      setError('')
+      try {
+        const config = await getFlashSaleConfig()
+        const { products: allProducts = [] } = await getProducts({ page: 1, limit: 1000 })
+        const flashSaleProducts = Array.isArray(config.products) ? config.products : []
+        const merged = flashSaleProducts
+          .filter(item => typeof item.flashPrice === 'number' && !isNaN(item.flashPrice))
+          .map(item => {
+            const prod = allProducts.find(p => p._id === item.productId)
             return {
               ...item,
-              productName: item.name || prod?.name || '---',
+              productName: item.productName || prod?.name || '---',
               image: prod?.image || [],
               stock: prod?.stock,
-              campaignId: campaign.id
+              startTime: config.startTime,
+              endTime: config.endTime
             }
           })
-          return {
-            ...campaign,
-            status,
-            products: enrichedProducts
-          }
-        })
-      )
-
-      setCampaigns(enrichedCampaigns)
-    } catch (err) {
-      setError('Không thể tải dữ liệu Flash Sale')
-      console.error(err)
-    } finally {
-      setLoading(false)
+        setFlashSales(merged)
+      } catch (err) {
+        setError('Không thể tải dữ liệu Flash Sale')
+      } finally {
+        setLoading(false)
+      }
     }
-  }
+    fetchFlashSales()
+  }, [])
 
   const formatTime = (isoString) => new Date(isoString).toLocaleString('vi-VN')
 
   const getStatusColor = (status) => {
     switch (status) {
-      case 'upcoming':
+      case 'Đã lên lịch':
+        return 'info'
+      case 'Sắp diễn ra':
         return 'warning'
-      case 'active':
+      case 'Đang diễn ra':
         return 'success'
-      case 'expired':
+      case 'Đã kết thúc':
         return 'default'
-      case 'disabled':
+      case 'Chưa thiết lập':
         return 'error'
       default:
         return 'default'
-    }
-  }
-
-  const getStatusLabel = (status) => {
-    switch (status) {
-      case 'upcoming':
-        return 'Sắp diễn ra'
-      case 'active':
-        return 'Đang diễn ra'
-      case 'expired':
-        return 'Đã kết thúc'
-      case 'disabled':
-        return 'Đã tắt'
-      default:
-        return 'Không xác định'
     }
   }
 
@@ -148,120 +104,96 @@ const FlashSaleManagement = () => {
     return Math.round(((originalPrice - flashPrice) / originalPrice) * 100)
   }
 
-  const handleAddFlashSale = async () => {
-    await fetchCampaigns()
-    setModal(false)
+  const handleAddFlashSale = async (newItem) => {
+    setLoading(true)
+    setError('')
+    try {
+      const config = await getFlashSaleConfig()
+      const { products: allProducts = [] } = await getProducts({ page: 1, limit: 1000 })
+      const flashSaleProducts = Array.isArray(config.products) ? config.products : []
+      const merged = flashSaleProducts
+        .filter(item => typeof item.flashPrice === 'number' && !isNaN(item.flashPrice))
+        .map(item => {
+          const prod = allProducts.find(p => p._id === item.productId)
+          return {
+            ...item,
+            productName: item.productName || prod?.name || '---',
+            image: prod?.image || [],
+            stock: prod?.stock,
+            startTime: config.startTime,
+            endTime: config.endTime
+          }
+        })
+      setFlashSales(merged)
+    } catch (err) {
+      setError('Không thể tải dữ liệu Flash Sale')
+    } finally {
+      setLoading(false)
+    }
   }
 
   const handleRefresh = async () => {
     setRefreshing(true)
-    await fetchCampaigns()
-    setRefreshing(false)
+    // Simulate refresh delay
+    setTimeout(() => {
+      setRefreshing(false)
+    }, 1000)
   }
 
-  const handleEditClick = (product, campaignId) => {
+  const handleEditClick = (product) => {
     setSelectedProduct(product)
-    setSelectedCampaignId(campaignId)
     setEditModalOpen(true)
   }
 
   const handleEditSave = async (updatedProduct) => {
     setEditModalOpen(false)
+    setSelectedProduct(null)
     try {
-      await updateProductInFlashSaleCampaign(
-        selectedCampaignId,
-        updatedProduct.productId,
-        {
-          flashPrice: updatedProduct.flashPrice
-        }
-      )
-      await fetchCampaigns()
+      await updateProductInFlashSale(updatedProduct.productId, { flashPrice: updatedProduct.flashPrice })
+      await fetchFlashSales()
     } catch (err) {
-      setError('Không thể cập nhật sản phẩm Flash Sale')
-    } finally {
-      setSelectedProduct(null)
-      setSelectedCampaignId(null)
+      setError('Không thể cập nhật Flash Sale')
     }
   }
 
-  const handleDeleteClick = (product, campaignId) => {
+  const handleDeleteClick = (product) => {
     setSelectedProduct(product)
-    setSelectedCampaignId(campaignId)
     setDeleteModalOpen(true)
   }
 
-  const handleDeleteConfirm = async () => {
+  const handleDeleteConfirm = async (product) => {
     setDeleteModalOpen(false)
+    setSelectedProduct(null)
     try {
-      await removeProductFromFlashSaleCampaign(
-        selectedCampaignId,
-        selectedProduct.productId
-      )
-      await fetchCampaigns()
+      await removeProductFromFlashSale(product.productId)
+      await fetchFlashSales()
     } catch (err) {
-      setError('Không thể xóa sản phẩm Flash Sale')
-    } finally {
-      setSelectedProduct(null)
-      setSelectedCampaignId(null)
-    }
-  }
-
-  const handleToggleCampaign = async (campaign) => {
-    try {
-      const updatedCampaign = { ...campaign, enabled: !campaign.enabled }
-      await updateFlashSaleCampaign(campaign.id, updatedCampaign)
-      await fetchCampaigns()
-    } catch (err) {
-      setError('Không thể cập nhật trạng thái chiến dịch')
-      console.error(err)
-    }
-  }
-
-  const handleEditCampaign = (campaign) => {
-    setEditCampaignData(campaign)
-    setModal(true)
-  }
-
-  const handleDeleteCampaignClick = (campaign) => {
-    setSelectedDeleteCampaign(campaign)
-    setDeleteModal(true)
-  }
-
-  const handleDeleteCampaignConfirm = async () => {
-    setDeleteModal(false)
-    try {
-      await deleteFlashSaleCampaign(deleteCampaign.id)
-      await fetchCampaigns()
-    } catch (err) {
-      setError('Không thể xóa chiến dịch Flash Sale')
-      console.error(err)
-    } finally {
-      setSelectedDeleteCampaign(null)
+      setError('Không thể xóa Flash Sale')
     }
   }
 
   const summaryData = [
     {
-      title: 'Tổng chiến dịch',
-      value: campaigns.length,
+      title: 'Tổng Flash Sale',
+      value: flashSales.length,
       icon: <OfferIcon />,
       color: '#1976d2'
     },
     {
       title: 'Đang hoạt động',
-      value: campaigns.filter((item) => item.status === 'active').length,
+      value: flashSales.filter((item) => item.status === 'Đang diễn ra').length,
       icon: <TrendingUpIcon />,
       color: '#2e7d32'
     },
     {
       title: 'Sắp diễn ra',
-      value: campaigns.filter((item) => item.status === 'upcoming').length,
+      value: flashSales.filter((item) => item.status === 'Sắp diễn ra').length,
       icon: <ScheduleIcon />,
       color: '#ed6c02'
     },
     {
       title: 'Tổng sản phẩm',
-      value: campaigns.reduce((sum, item) => sum + item.products.length, 0),
+      value: flashSales.reduce((sum, item) => sum + item.stock, 0),
       icon: <InventoryIcon />,
       color: '#9c27b0'
     }
@@ -290,10 +222,10 @@ const FlashSaleManagement = () => {
           }}
         >
           <OfferIcon sx={{ fontSize: 40, color: '#1A3C7B' }} />
-          Quản lý chương trình Flash Sale
+          Quản lý trương trình khuyến mãi
         </Typography>
         <Typography variant='body1' color='text.secondary'>
-          Quản lý và theo dõi các chiến dịch Flash Sale
+          Quản lý và theo dõi các chương trình khuyến mãi
         </Typography>
       </Box>
 
@@ -363,10 +295,7 @@ const FlashSaleManagement = () => {
         <Button
           variant='contained'
           startIcon={<AddIcon />}
-          onClick={() => {
-            setEditCampaignData(null)
-            setModal(true)
-          }}
+          onClick={() => setOpenAddModal(true)}
           sx={{
             px: 3,
             py: 1.5,
@@ -375,16 +304,16 @@ const FlashSaleManagement = () => {
             fontSize: '1rem',
             fontWeight: 600,
             background:
-              'linear-gradient(135deg, rgb(17, 58, 122) 0%, rgb(11, 49, 156) 100%)',
+              'linear-gradient(135deg,rgb(17, 58, 122) 0%,rgb(11, 49, 156) 100%)',
             boxShadow: '0 4px 16px rgba(59, 130, 246, 0.3)',
             '&:hover': {
               background: 'linear-gradient(135deg, #2563eb 0%, #1e40af 100%)',
-              boxShadow: '0 6px 20px rgba(59, 130, 246, 0.6)',
+              boxShadow: '0 6px 20px rgba(59, 130, 246, 0.4)',
               transform: 'translateY(-1px)'
             }
           }}
         >
-          Thêm chiến dịch mới
+          Thêm trương trình mới
         </Button>
 
         <Button
@@ -404,9 +333,8 @@ const FlashSaleManagement = () => {
 
       <AddFlashSale
         open={openAddModal}
-        onClose={() => setModal(false)}
+        onClose={() => setOpenAddModal(false)}
         onSave={handleAddFlashSale}
-        initialData={editCampaignData}
       />
 
       {/* Edit Modal */}
@@ -416,343 +344,188 @@ const FlashSaleManagement = () => {
         product={selectedProduct}
         onSave={handleEditSave}
       />
-      {/* Delete Product Modal */}
+      {/* Delete Modal */}
       <DeleteFlashSaleModal
-        open={deleteModal}
+        open={deleteModalOpen}
         onClose={() => setDeleteModalOpen(false)}
         product={selectedProduct}
         onDelete={handleDeleteConfirm}
       />
-      {/* Delete Campaign Modal */}
-      <Dialog
-        open={deleteCampaignModalOpen}
-        onClose={() => setDeleteModal(false)}
-        maxWidth='sm'
-        fullWidth
-      >
-        <DialogTitle
-          sx={{
-            backgroundColor: '#f8fafc',
-            borderBottom: '1px solid #e2e8f0',
-            py: 2,
-            fontWeight: 700,
-            color: '#1e293b'
-          }}
-        >
-          Xác nhận xóa chiến dịch
-        </DialogTitle>
-        <DialogContent sx={{ py: 3 }}>
-          <Typography variant='body1'>
-            Bạn có chắc chắn muốn xóa chiến dịch{' '}
-            <strong>{deleteCampaign?.title}</strong> (ID: {deleteCampaign?.id})?
-            Hành động này không thể hoàn tác.
-          </Typography>
-        </DialogContent>
-        <DialogActions
-          sx={{
-            p: 2,
-            backgroundColor: '#f8fafc',
-            borderTop: '1px solid #e2e8f0'
-          }}
-        >
-          <Button
-            onClick={() => setDeleteModal(false)}
-            sx={{
-              borderRadius: 2,
-              textTransform: 'none',
-              fontWeight: 600,
-              color: '#64748b'
-            }}
-          >
-            Hủy
-          </Button>
-          <Button
-            variant='contained'
-            color='error'
-            onClick={handleDeleteCampaignConfirm}
-            sx={{
-              borderRadius: 2,
-              textTransform: 'none',
-              fontWeight: 600
-            }}
-          >
-            Xóa
-          </Button>
-        </DialogActions>
-      </Dialog>
 
-      {/* Campaign List */}
+      {/* Table */}
       <Card
         sx={{
           borderRadius: 3,
-          boxShadow: '0 4px 24px rgba(0,0,0,0.06)',
+          boxShadow: '0 4px 24px rgba(0, 0, 0, 0.06)',
           border: '1px solid #e2e8f0'
         }}
       >
-        {loading ? (
-          <Box sx={{ p: 4, textAlign: 'center' }}>
-            Đang tải dữ liệu Flash Sale...
-          </Box>
-        ) : error ? (
-          <Box sx={{ p: 4, textAlign: 'center', color: 'red' }}>{error}</Box>
-        ) : campaigns.length === 0 ? (
-          <Box sx={{ p: 4, textAlign: 'center' }}>
-            <Typography variant='body1' color='text.secondary'>
-              Chưa có chiến dịch Flash Sale nào.
-            </Typography>
-          </Box>
-        ) : (
-          campaigns.map((campaign) => (
-            <Accordion key={campaign.id}>
-              <AccordionSummary
-                expandIcon={<ExpandMoreIcon />}
-                sx={{
-                  backgroundColor: '#f8f6fc',
-                  '&:hover': {
-                    backgroundColor: alpha(theme.palette.primary.main, 0.04)
-                  }
-                }}
-              >
-                <Box
+        <TableContainer>
+          {loading ? (
+            <Box sx={{ p: 4, textAlign: 'center' }}>
+              Đang tải dữ liệu Flash Sale...
+            </Box>
+          ) : error ? (
+            <Box sx={{ p: 4, textAlign: 'center', color: 'red' }}>{error}</Box>
+          ) : (
+          <Table>
+            <TableHead>
+              <TableRow sx={{ backgroundColor: '#f8fafc' }}>
+                <TableCell sx={{ fontWeight: 700, color: '#334155', py: 2 }}>
+                  Sản phẩm
+                </TableCell>
+                <TableCell sx={{ fontWeight: 700, color: '#334155', py: 2 }}>
+                  Giá gốc
+                </TableCell>
+                <TableCell sx={{ fontWeight: 700, color: '#334155', py: 2 }}>
+                  Giá Flash
+                </TableCell>
+                <TableCell sx={{ fontWeight: 700, color: '#334155', py: 2 }}>
+                  Giảm giá
+                </TableCell>
+                <TableCell sx={{ fontWeight: 700, color: '#334155', py: 2 }}>
+                  Số lượng
+                </TableCell>
+                <TableCell sx={{ fontWeight: 700, color: '#334155', py: 2 }}>
+                  Thời gian
+                </TableCell>
+                <TableCell sx={{ fontWeight: 700, color: '#334155', py: 2 }}>
+                  Trạng thái
+                </TableCell>
+                <TableCell sx={{ fontWeight: 700, color: '#334155', py: 2 }}>
+                  Thao tác
+                </TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {flashSales.map((item, index) => (
+                <TableRow
+                  key={item.productId || index}
                   sx={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 2,
-                    width: '100%'
+                    '&:hover': {
+                      backgroundColor: alpha(theme.palette.primary.main, 0.04)
+                    },
+                    '&:last-child td, &:last-child th': { border: 0 }
                   }}
                 >
-                  <Typography variant='h6' sx={{ fontWeight: 600, flex: 1 }}>
-                    {campaign.title} (ID: {campaign.id})
-                  </Typography>
-                  <Stack direction='row' spacing={1} alignItems='center'>
-                    <Tooltip
-                      title={
-                        campaign.enabled ? 'Tắt chiến dịch' : 'Bật chiến dịch'
-                      }
+                  <TableCell sx={{ py: 2 }}>
+                    <Typography
+                      variant='body1'
+                      sx={{ fontWeight: 600, color: '#1e293b' }}
                     >
-                      <Switch
-                        checked={campaign.enabled}
-                        onChange={() => handleToggleCampaign(campaign)}
-                        color='primary'
-                      />
-                    </Tooltip>
-                    <Tooltip title='Chỉnh sửa chiến dịch'>
-                      <IconButton
-                        size='small'
-                        sx={{
-                          color: '#3b82f6',
-                          '&:hover': { backgroundColor: '#dbeafe' }
-                        }}
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          handleEditCampaign(campaign)
-                        }}
-                      >
-                        <EditIcon fontSize='small' />
-                      </IconButton>
-                    </Tooltip>
-                    <Tooltip title='Xóa chiến dịch'>
-                      <IconButton
-                        size='small'
-                        sx={{
-                          color: '#ef4444',
-                          '&:hover': { backgroundColor: '#fee2e2' }
-                        }}
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          handleDeleteCampaignClick(campaign)
-                        }}
-                      >
-                        <DeleteIcon fontSize='small' />
-                      </IconButton>
-                    </Tooltip>
+                      {item.productName}
+                    </Typography>
+                    <Typography variant='caption' color='text.secondary'>
+                      ID: {item.productId}
+                    </Typography>
+                  </TableCell>
+                  <TableCell sx={{ py: 2 }}>
+                    <Typography
+                      variant='body1'
+                      sx={{ color: '#64748b', textDecoration: 'line-through' }}
+                    >
+                      {item.originalPrice != null ? Number(item.originalPrice).toLocaleString() : '---'}đ
+                    </Typography>
+                  </TableCell>
+                  <TableCell sx={{ py: 2 }}>
+                    <Typography
+                      variant='body1'
+                      sx={{
+                        fontWeight: 700,
+                        color: '#dc2626',
+                        fontSize: '1.1rem'
+                      }}
+                    >
+                      {item.flashPrice != null ? Number(item.flashPrice).toLocaleString() : '---'}đ
+                    </Typography>
+                  </TableCell>
+                  <TableCell sx={{ py: 2 }}>
                     <Chip
-                      label={getStatusLabel(campaign.status)}
-                      color={getStatusColor(campaign.status)}
+                      label={`-${calculateDiscount(item.originalPrice, item.flashPrice)}%`}
                       size='small'
-                      sx={{ fontWeight: 600, borderRadius: 2 }}
+                      sx={{
+                        backgroundColor: '#fef2f2',
+                        color: '#dc2626',
+                        fontWeight: 600,
+                        border: '1px solid #fecaca'
+                      }}
                     />
-                  </Stack>
-                </Box>
-              </AccordionSummary>
-              <AccordionDetails>
-                <Box sx={{ mb: 2 }}>
-                  <Typography variant='body2' color='text.secondary'>
-                    Bắt đầu:{' '}
-                    {campaign.startTime
-                      ? formatTime(campaign.startTime)
-                      : '---'}
-                  </Typography>
-                  <Typography variant='body2' color='text.secondary'>
-                    Kết thúc:{' '}
-                    {campaign.endTime ? formatTime(campaign.endTime) : '---'}
-                  </Typography>
-                </Box>
-                <TableContainer component={Paper}>
-                  <Table>
-                    <TableHead>
-                      <TableRow sx={{ backgroundColor: '#f8fafc' }}>
-                        <TableCell
-                          sx={{ fontWeight: 700, color: '#334155', py: 2 }}
+                  </TableCell>
+                  <TableCell sx={{ py: 2 }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                      <InventoryIcon sx={{ fontSize: 16, color: '#6b7280' }} />
+                      <Typography variant='body2' sx={{ fontWeight: 600 }}>
+                        {item.stock != null ? item.stock : 0}
+                      </Typography>
+                    </Box>
+                  </TableCell>
+                  <TableCell sx={{ py: 2 }}>
+                    {item.startTime && item.endTime ? (
+                      <Box>
+                        <Typography
+                          variant='caption'
+                          sx={{ display: 'block', color: '#059669' }}
                         >
-                          Sản phẩm
-                        </TableCell>
-                        <TableCell
-                          sx={{ fontWeight: 700, color: '#334155', py: 2 }}
+                          Bắt đầu: {formatTime(item.startTime)}
+                        </Typography>
+                        <Typography
+                          variant='caption'
+                          sx={{ display: 'block', color: '#dc2626' }}
                         >
-                          Giá gốc
-                        </TableCell>
-                        <TableCell
-                          sx={{ fontWeight: 700, color: '#334155', py: 2 }}
-                        >
-                          Giá Flash
-                        </TableCell>
-                        <TableCell
-                          sx={{ fontWeight: 700, color: '#334155', py: 2 }}
-                        >
-                          Giảm giá
-                        </TableCell>
-                        <TableCell
-                          sx={{ fontWeight: 700, color: '#334155', py: 2 }}
-                        >
-                          Số lượng
-                        </TableCell>
-                        <TableCell
-                          sx={{ fontWeight: 700, color: '#334155', py: 2 }}
-                        >
-                          Thao tác
-                        </TableCell>
-                      </TableRow>
-                    </TableHead>
-                    <TableBody>
-                      {campaign.products.map((item, index) => (
-                        <TableRow
-                          key={item.productId || index}
+                          Kết thúc: {formatTime(item.endTime)}
+                        </Typography>
+                      </Box>
+                    ) : (
+                      <Typography variant='body2' color='text.secondary'>
+                        ---
+                      </Typography>
+                    )}
+                  </TableCell>
+                  <TableCell sx={{ py: 2 }}>
+                    <Chip
+                      label={item.status}
+                      color={getStatusColor(item.status)}
+                      size='small'
+                      sx={{
+                        fontWeight: 600,
+                        borderRadius: 2
+                      }}
+                    />
+                  </TableCell>
+                  <TableCell sx={{ py: 2 }}>
+                    <Stack direction='row' spacing={1}>
+                      <Tooltip title='Chỉnh sửa'>
+                        <IconButton
+                          size='small'
                           sx={{
-                            '&:hover': {
-                              backgroundColor: alpha(
-                                theme.palette.primary.main,
-                                0.04
-                              )
-                            },
-                            '&:last-child td, &:last-child th': { border: 0 }
+                            color: '#3b82f6',
+                            '&:hover': { backgroundColor: '#dbeafe' }
                           }}
+                          onClick={() => handleEditClick(item)}
                         >
-                          <TableCell sx={{ py: 2 }}>
-                            <Typography
-                              variant='body1'
-                              sx={{ fontWeight: 600, color: '#1e293b' }}
-                            >
-                              {item.productName}
-                            </Typography>
-                            <Typography
-                              variant='caption'
-                              color='text.secondary'
-                            >
-                              ID: {item.productId}
-                            </Typography>
-                          </TableCell>
-                          <TableCell sx={{ py: 2 }}>
-                            <Typography
-                              variant='body1'
-                              sx={{
-                                color: '#64748b',
-                                textDecoration: 'line-through'
-                              }}
-                            >
-                              {item.originalPrice != null
-                                ? Number(item.originalPrice).toLocaleString()
-                                : '---'}
-                              đ
-                            </Typography>
-                          </TableCell>
-                          <TableCell sx={{ py: 2 }}>
-                            <Typography
-                              variant='body1'
-                              sx={{
-                                fontWeight: 700,
-                                color: '#dc2626',
-                                fontSize: '1.1rem'
-                              }}
-                            >
-                              {item.flashPrice != null
-                                ? Number(item.flashPrice).toLocaleString()
-                                : '---'}
-                              đ
-                            </Typography>
-                          </TableCell>
-                          <TableCell sx={{ py: 2 }}>
-                            <Chip
-                              label={`-${calculateDiscount(item.originalPrice, item.flashPrice)}%`}
-                              size='small'
-                              sx={{
-                                backgroundColor: '#fef2f2',
-                                color: '#dc2626',
-                                fontWeight: 600,
-                                border: '1px solid #fecaca'
-                              }}
-                            />
-                          </TableCell>
-                          <TableCell sx={{ py: 2 }}>
-                            <Box
-                              sx={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: 1
-                              }}
-                            >
-                              <InventoryIcon
-                                sx={{ fontSize: 16, color: '#6b7280' }}
-                              />
-                              <Typography
-                                variant='body2'
-                                sx={{ fontWeight: 600 }}
-                              >
-                                {item.stock != null ? item.stock : 0}
-                              </Typography>
-                            </Box>
-                          </TableCell>
-                          <TableCell sx={{ py: 2 }}>
-                            <Stack direction='row' spacing={1}>
-                              <Tooltip title='Chỉnh sửa'>
-                                <IconButton
-                                  size='small'
-                                  sx={{
-                                    color: '#3b82f6',
-                                    '&:hover': { backgroundColor: '#dbeafe' }
-                                  }}
-                                  onClick={() =>
-                                    handleEditClick(item, campaign.id)
-                                  }
-                                >
-                                  <EditIcon fontSize='small' />
-                                </IconButton>
-                              </Tooltip>
-                              <Tooltip title='Xóa'>
-                                <IconButton
-                                  size='small'
-                                  sx={{
-                                    color: '#ef4444',
-                                    '&:hover': { backgroundColor: '#fee2e2' }
-                                  }}
-                                  onClick={() =>
-                                    handleDeleteClick(item, campaign.id)
-                                  }
-                                >
-                                  <DeleteIcon fontSize='small' />
-                                </IconButton>
-                              </Tooltip>
-                            </Stack>
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </TableContainer>
-              </AccordionDetails>
-            </Accordion>
-          ))
-        )}
+                          <EditIcon fontSize='small' />
+                        </IconButton>
+                      </Tooltip>
+                      <Tooltip title='Xóa'>
+                        <IconButton
+                          size='small'
+                          sx={{
+                            color: '#ef4444',
+                            '&:hover': { backgroundColor: '#fee2e2' }
+                          }}
+                          onClick={() => handleDeleteClick(item)}
+                        >
+                          <DeleteIcon fontSize='small' />
+                        </IconButton>
+                      </Tooltip>
+                    </Stack>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+          )}
+        </TableContainer>
       </Card>
     </Box>
   )

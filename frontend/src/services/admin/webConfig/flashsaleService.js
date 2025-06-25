@@ -7,585 +7,297 @@ export const getFlashSaleConfig = async () => {
     const response = await AuthorizedAxiosInstance.get(
       `${API_ROOT}/v1/website-configs`
     )
-
+    
     // API trả về cấu trúc { data: [...], meta: {...} }
     const websiteConfigs = response.data.data || response.data
-
-    const flashSaleConfig = websiteConfigs.find(
-      (item) => item.key === 'flashSale'
-    )
-    return (
-      flashSaleConfig?.content || {
-        campaigns: []
-      }
-    )
+    
+    const flashSaleConfig = websiteConfigs.find((item) => item.key === 'flashSale')
+    return flashSaleConfig?.content || {
+      enabled: false,
+      title: '',
+      startTime: '',
+      endTime: '',
+      status: 'inactive',
+      products: []
+    }
   } catch (error) {
     console.error('Lỗi khi lấy cấu hình Flash Sale:', error)
     throw new Error(
-      error.response?.data?.message ||
-        'Không thể tải cấu hình Flash Sale. Vui lòng thử lại.'
+      error.response?.data?.message || 
+      'Không thể tải cấu hình Flash Sale. Vui lòng thử lại.'
     )
   }
 }
 
-// Lấy danh sách tất cả campaigns Flash Sale
-export const getFlashSaleCampaigns = async () => {
+// Lấy danh sách sản phẩm Flash Sale
+export const getFlashSaleProducts = async () => {
   try {
     const flashSaleConfig = await getFlashSaleConfig()
-    return flashSaleConfig.campaigns || []
+    return flashSaleConfig.products || []
   } catch (error) {
-    console.error('Lỗi khi lấy danh sách campaigns Flash Sale:', error)
+    console.error('Lỗi khi lấy danh sách sản phẩm Flash Sale:', error)
     throw new Error(
-      error.response?.data?.message ||
-        'Không thể tải danh sách campaigns Flash Sale. Vui lòng thử lại.'
+      error.response?.data?.message || 
+      'Không thể tải danh sách sản phẩm Flash Sale. Vui lòng thử lại.'
     )
   }
 }
 
-// Lấy thông tin một campaign cụ thể
-export const getFlashSaleCampaign = async (campaignId) => {
-  try {
-    const flashSaleConfig = await getFlashSaleConfig()
-    const campaign = flashSaleConfig.campaigns.find((c) => c.id === campaignId)
-    if (!campaign) {
-      throw new Error('Không tìm thấy campaign Flash Sale')
-    }
-    return campaign
-  } catch (error) {
-    console.error('Lỗi khi lấy campaign Flash Sale:', error)
-    throw new Error(
-      error.response?.data?.message ||
-        'Không thể tải campaign Flash Sale. Vui lòng thử lại.'
-    )
-  }
-}
-
-// Hàm trả về cấu trúc mặc định cho campaign Flash Sale
-export const getDefaultCampaignContent = () => ({
-  id: '',
-  title: '',
+// Hàm trả về cấu trúc mặc định cho content Flash Sale
+export const getDefaultFlashSaleContent = () => ({
   enabled: false,
+  title: '',
   startTime: '',
   endTime: '',
   status: 'inactive',
   products: []
 })
 
-// Hàm trả về cấu trúc mặc định cho content Flash Sale
-export const getDefaultFlashSaleContent = () => ({
-  campaigns: []
-})
-
-// Tạo campaign Flash Sale mới
-export const createFlashSaleCampaign = async (campaignContent) => {
+// Tạo cấu hình Flash Sale mới
+export const createFlashSaleConfig = async (flashSaleContent) => {
   try {
-    console.log('Dữ liệu đầu vào campaignContent:', campaignContent)
-
-    // Validate input
-    if (typeof campaignContent !== 'object' || Array.isArray(campaignContent)) {
-      throw new Error('campaignContent không phải object hoặc là mảng!')
+    // Log dữ liệu đầu vào để debug
+    console.log('Dữ liệu đầu vào flashSaleContent:', flashSaleContent)
+    if (typeof flashSaleContent !== 'object' || Array.isArray(flashSaleContent)) {
+      console.warn('flashSaleContent không phải object hoặc là mảng!')
     }
-
-    // Đảm bảo campaign content đủ trường
-    const defaultCampaign = getDefaultCampaignContent()
-    const content = {
-      ...defaultCampaign,
-      ...campaignContent,
-      id:
-        campaignContent.id ||
-        `${new Date().getFullYear()}-${new Date().getMonth() + 1}`,
-      enabled: campaignContent.enabled ?? true,
-      status: campaignContent.status || 'inactive',
-      products: campaignContent.products || []
-    }
-
-    // Lấy config hiện tại
-    const currentConfig = await getFlashSaleConfig()
-    const currentCampaigns = currentConfig.campaigns || []
-
-    // Kiểm tra campaign id đã tồn tại
-    if (currentCampaigns.some((c) => c.id === content.id)) {
-      throw new Error('Campaign ID đã tồn tại')
-    }
-
+    // Đảm bảo content là object đủ trường
+    const defaultContent = getDefaultFlashSaleContent()
+    const content = { ...defaultContent, ...flashSaleContent }
     const payload = {
       key: 'flashSale',
       title: 'Flash Sale Configuration',
       description: 'Cấu hình Flash Sale của website',
       content: {
-        campaigns: [...currentCampaigns, content]
+        enabled: flashSaleContent.enabled ?? true,
+        title: flashSaleContent.title || '',
+        startTime: flashSaleContent.startTime || '',
+        endTime: flashSaleContent.endTime || '',
+        status: flashSaleContent.status || 'inactive',
+        products: flashSaleContent.products || []
       },
       status: 'active'
     }
+    
+    console.log('Payload gửi lên khi tạo Flash Sale:', payload)
+    const response = await AuthorizedAxiosInstance.post(
+      `${API_ROOT}/v1/website-configs`,
+      payload
+    )
+    return response.data
+  } catch (error) {
+    console.error('Lỗi khi tạo cấu hình Flash Sale:', error)
+    throw new Error(
+      error.response?.data?.message ||
+      error.message ||
+      'Không thể tạo cấu hình Flash Sale. Vui lòng thử lại.'
+    )
+  }
+}
 
-    console.log('Payload gửi lên khi tạo campaign:', payload)
-
-    // Kiểm tra xem đã có flash sale config chưa
+// Cập nhật cấu hình Flash Sale
+export const updateFlashSaleConfig = async (configData) => {
+  try {
+    // Trước tiên lấy flash sale config hiện tại
     const response = await AuthorizedAxiosInstance.get(
       `${API_ROOT}/v1/website-configs`
     )
     const websiteConfigs = response.data.data || response.data
-    const flashSaleConfig = websiteConfigs.find(
-      (item) => item.key === 'flashSale'
-    )
-
-    let finalResponse
+    const flashSaleConfig = websiteConfigs.find((item) => item.key === 'flashSale')
+    
+    const payload = {
+      key: 'flashSale',
+      title: 'Flash Sale Configuration',
+      description: 'Cấu hình Flash Sale của website',
+      content: {
+        enabled: flashSaleContent.enabled ?? true,
+        title: flashSaleContent.title || '',
+        startTime: flashSaleContent.startTime || '',
+        endTime: flashSaleContent.endTime || '',
+        status: flashSaleContent.status || 'inactive',
+        products: flashSaleContent.products || []
+      },
+      status: 'active'
+    }
+    
+    
     if (flashSaleConfig) {
-      finalResponse = await AuthorizedAxiosInstance.patch(
+      // Update config hiện tại
+      const updateResponse = await AuthorizedAxiosInstance.patch(
         `${API_ROOT}/v1/website-configs/${flashSaleConfig._id}`,
         payload
       )
+      console.log('PATCH response:', updateResponse.data)
+      return updateResponse.data
     } else {
-      finalResponse = await AuthorizedAxiosInstance.post(
-        `${API_ROOT}/v1/website-configs`,
-        payload
-      )
+      // Tạo config mới
+      const createResponse = await createFlashSaleConfig(payload.content)
+      console.log('POST response:', createResponse)
+      return createResponse
     }
-
-    return finalResponse.data
   } catch (error) {
-    console.error('Lỗi khi tạo campaign Flash Sale:', error)
+    console.error('Lỗi khi cập nhật cấu hình Flash Sale:', error)
     throw new Error(
-      error.response?.data?.message ||
-        error.message ||
-        'Không thể tạo campaign Flash Sale. Vui lòng thử lại.'
+      error.response?.data?.message || 
+      'Không thể cập nhật cấu hình Flash Sale. Vui lòng thử lại.'
     )
   }
 }
 
-// Cập nhật campaign Flash Sale
-export const updateFlashSaleCampaign = async (campaignId, campaignData) => {
+// Thêm sản phẩm vào Flash Sale
+export const addProductToFlashSale = async (productData) => {
   try {
     const currentConfig = await getFlashSaleConfig()
-    const currentCampaigns = currentConfig.campaigns || []
-
-    const campaignIndex = currentCampaigns.findIndex((c) => c.id === campaignId)
-    if (campaignIndex === -1) {
-      throw new Error('Không tìm thấy campaign Flash Sale')
-    }
-
-    const updatedCampaign = {
-      ...currentCampaigns[campaignIndex],
-      ...campaignData
-    }
-
-    currentCampaigns[campaignIndex] = updatedCampaign
-
-    const payload = {
-      key: 'flashSale',
-      title: 'Flash Sale Configuration',
-      description: 'Cấu hình Flash Sale của website',
-      content: {
-        campaigns: currentCampaigns
-      },
-      status: 'active'
-    }
-
-    const response = await AuthorizedAxiosInstance.get(
-      `${API_ROOT}/v1/website-configs`
-    )
-    const websiteConfigs = response.data.data || response.data
-    const flashSaleConfig = websiteConfigs.find(
-      (item) => item.key === 'flashSale'
-    )
-
-    const updateResponse = await AuthorizedAxiosInstance.patch(
-      `${API_ROOT}/v1/website-configs/${flashSaleConfig._id}`,
-      payload
-    )
-
-    return updateResponse.data
-  } catch (error) {
-    console.error('Lỗi khi cập nhật campaign Flash Sale:', error)
-    throw new Error(
-      error.response?.data?.message ||
-        'Không thể cập nhật campaign Flash Sale. Vui lòng thử lại.'
-    )
-  }
-}
-
-// Thêm sản phẩm vào campaign Flash Sale
-export const addProductToFlashSaleCampaign = async (
-  campaignId,
-  productData
-) => {
-  try {
-    const currentConfig = await getFlashSaleConfig()
-    const currentCampaigns = currentConfig.campaigns || []
-
-    const campaignIndex = currentCampaigns.findIndex((c) => c.id === campaignId)
-    if (campaignIndex === -1) {
-      throw new Error('Không tìm thấy campaign Flash Sale')
-    }
-
+    const currentProducts = currentConfig.products || []
+    
     const newProduct = {
       productId: productData.productId,
       originalPrice: productData.originalPrice,
       flashPrice: productData.flashPrice
     }
-
-    currentCampaigns[campaignIndex].products = [
-      ...(currentCampaigns[campaignIndex].products || []),
-      newProduct
-    ]
-
-    const payload = {
-      key: 'flashSale',
-      title: 'Flash Sale Configuration',
-      description: 'Cấu hình Flash Sale của website',
-      content: {
-        campaigns: currentCampaigns
-      },
-      status: 'active'
-    }
-
-    const response = await AuthorizedAxiosInstance.get(
-      `${API_ROOT}/v1/website-configs`
-    )
-    const websiteConfigs = response.data.data || response.data
-    const flashSaleConfig = websiteConfigs.find(
-      (item) => item.key === 'flashSale'
-    )
-
-    const updateResponse = await AuthorizedAxiosInstance.patch(
-      `${API_ROOT}/v1/website-configs/${flashSaleConfig._id}`,
-      payload
-    )
-
+    
+    const updatedProducts = [...currentProducts, newProduct]
+    
+    await updateFlashSaleConfig({
+      ...currentConfig,
+      products: updatedProducts
+    })
+    
     return newProduct
   } catch (error) {
-    console.error('Lỗi khi thêm sản phẩm vào campaign:', error)
+    console.error('Lỗi khi thêm sản phẩm vào Flash Sale:', error)
     throw new Error(
-      error.response?.data?.message ||
-        'Không thể thêm sản phẩm vào campaign Flash Sale. Vui lòng thử lại.'
+      error.response?.data?.message || 
+      'Không thể thêm sản phẩm vào Flash Sale. Vui lòng thử lại.'
     )
   }
 }
 
-// Cập nhật sản phẩm trong campaign Flash Sale
-export const updateProductInFlashSaleCampaign = async (
-  campaignId,
-  productId,
-  updatedData
-) => {
+// Cập nhật sản phẩm trong Flash Sale
+export const updateProductInFlashSale = async (productId, updatedData) => {
   try {
     const currentConfig = await getFlashSaleConfig()
-    const currentCampaigns = currentConfig.campaigns || []
-
-    const campaignIndex = currentCampaigns.findIndex((c) => c.id === campaignId)
-    if (campaignIndex === -1) {
-      throw new Error('Không tìm thấy campaign Flash Sale')
-    }
-
-    const updatedProducts = currentCampaigns[campaignIndex].products.map(
-      (product) =>
-        product.productId === productId
-          ? { ...product, ...updatedData }
-          : product
+    const currentProducts = currentConfig.products || []
+    
+    const updatedProducts = currentProducts.map(product => 
+      product.productId === productId 
+        ? { ...product, ...updatedData }
+        : product
     )
-
-    currentCampaigns[campaignIndex].products = updatedProducts
-
-    const payload = {
-      key: 'flashSale',
-      title: 'Flash Sale Configuration',
-      description: 'Cấu hình Flash Sale của website',
-      content: {
-        campaigns: currentCampaigns
-      },
-      status: 'active'
-    }
-
-    const response = await AuthorizedAxiosInstance.get(
-      `${API_ROOT}/v1/website-configs`
-    )
-    const websiteConfigs = response.data.data || response.data
-    const flashSaleConfig = websiteConfigs.find(
-      (item) => item.key === 'flashSale'
-    )
-
-    const updateResponse = await AuthorizedAxiosInstance.patch(
-      `${API_ROOT}/v1/website-configs/${flashSaleConfig._id}`,
-      payload
-    )
-
-    return updatedProducts.find((p) => p.productId === productId)
+    
+    await updateFlashSaleConfig({
+      ...currentConfig,
+      products: updatedProducts
+    })
+    
+    return updatedProducts.find(p => p.productId === productId)
   } catch (error) {
-    console.error('Lỗi khi cập nhật sản phẩm trong campaign:', error)
+    console.error('Lỗi khi cập nhật sản phẩm trong Flash Sale:', error)
     throw new Error(
-      error.response?.data?.message ||
-        'Không thể cập nhật sản phẩm trong campaign Flash Sale. Vui lòng thử lại.'
+      error.response?.data?.message || 
+      'Không thể cập nhật sản phẩm trong Flash Sale. Vui lòng thử lại.'
     )
   }
 }
 
-// Xóa sản phẩm khỏi campaign Flash Sale
-export const removeProductFromFlashSaleCampaign = async (
-  campaignId,
-  productId
-) => {
+// Xóa sản phẩm khỏi Flash Sale
+export const removeProductFromFlashSale = async (productId) => {
   try {
     const currentConfig = await getFlashSaleConfig()
-    const currentCampaigns = currentConfig.campaigns || []
-
-    const campaignIndex = currentCampaigns.findIndex((c) => c.id === campaignId)
-    if (campaignIndex === -1) {
-      throw new Error('Không tìm thấy campaign Flash Sale')
-    }
-
-    const updatedProducts = currentCampaigns[campaignIndex].products.filter(
-      (product) => product.productId !== productId
+    const currentProducts = currentConfig.products || []
+    
+    const updatedProducts = currentProducts.filter(product => 
+      product.productId !== productId
     )
-
-    currentCampaigns[campaignIndex].products = updatedProducts
-
-    const payload = {
-      key: 'flashSale',
-      title: 'Flash Sale Configuration',
-      description: 'Cấu hình Flash Sale của website',
-      content: {
-        campaigns: currentCampaigns
-      },
-      status: 'active'
-    }
-
-    const response = await AuthorizedAxiosInstance.get(
-      `${API_ROOT}/v1/website-configs`
-    )
-    const websiteConfigs = response.data.data || response.data
-    const flashSaleConfig = websiteConfigs.find(
-      (item) => item.key === 'flashSale'
-    )
-
-    const updateResponse = await AuthorizedAxiosInstance.patch(
-      `${API_ROOT}/v1/website-configs/${flashSaleConfig._id}`,
-      payload
-    )
-
+    
+    await updateFlashSaleConfig({
+      ...currentConfig,
+      products: updatedProducts
+    })
+    
     return true
   } catch (error) {
-    console.error('Lỗi khi xóa sản phẩm khỏi campaign:', error)
+    console.error('Lỗi khi xóa sản phẩm khỏi Flash Sale:', error)
     throw new Error(
-      error.response?.data?.message ||
-        'Không thể xóa sản phẩm khỏi campaign Flash Sale. Vui lòng thử lại.'
+      error.response?.data?.message || 
+      'Không thể xóa sản phẩm khỏi Flash Sale. Vui lòng thử lại.'
     )
   }
 }
 
-// Xóa campaign Flash Sale
-export const deleteFlashSaleCampaign = async (campaignId) => {
-  try {
-    // Lấy cấu hình Flash Sale hiện tại
-    const currentConfig = await getFlashSaleConfig()
-    const currentCampaigns = currentConfig.campaigns || []
-
-    // Kiểm tra xem campaign có tồn tại không
-    const campaignIndex = currentCampaigns.findIndex((c) => c.id === campaignId)
-    if (campaignIndex === -1) {
-      throw new Error('Không tìm thấy campaign Flash Sale')
-    }
-
-    // Xóa campaign khỏi danh sách
-    const updatedCampaigns = currentCampaigns.filter((c) => c.id !== campaignId)
-
-    // Tạo payload để cập nhật cấu hình
-    const payload = {
-      key: 'flashSale',
-      title: 'Flash Sale Configuration',
-      description: 'Cấu hình Flash Sale của website',
-      content: {
-        campaigns: updatedCampaigns
-      },
-      status: 'active'
-    }
-
-    // Lấy danh sách website-configs để tìm _id của flashSale config
-    const response = await AuthorizedAxiosInstance.get(
-      `${API_ROOT}/v1/website-configs`
-    )
-    const websiteConfigs = response.data.data || response.data
-    const flashSaleConfig = websiteConfigs.find(
-      (item) => item.key === 'flashSale'
-    )
-
-    if (!flashSaleConfig) {
-      throw new Error('Không tìm thấy cấu hình Flash Sale')
-    }
-
-    // Cập nhật cấu hình với danh sách campaigns mới
-    const updateResponse = await AuthorizedAxiosInstance.patch(
-      `${API_ROOT}/v1/website-configs/${flashSaleConfig._id}`,
-      payload
-    )
-
-    return updateResponse.data
-  } catch (error) {
-    console.error('Lỗi khi xóa campaign Flash Sale:', error)
-    throw new Error(
-      error.response?.data?.message ||
-        'Không thể xóa campaign Flash Sale. Vui lòng thử lại.'
-    )
-  }
-}
-
-// Kích hoạt/Hủy kích hoạt campaign Flash Sale
-export const toggleFlashSaleCampaignStatus = async (campaignId, enabled) => {
+// Kích hoạt/Hủy kích hoạt Flash Sale
+export const toggleFlashSaleStatus = async (enabled) => {
   try {
     const currentConfig = await getFlashSaleConfig()
-    const currentCampaigns = currentConfig.campaigns || []
-
-    const campaignIndex = currentCampaigns.findIndex((c) => c.id === campaignId)
-    if (campaignIndex === -1) {
-      throw new Error('Không tìm thấy campaign Flash Sale')
-    }
-
-    currentCampaigns[campaignIndex].enabled = enabled
-
-    const payload = {
-      key: 'flashSale',
-      title: 'Flash Sale Configuration',
-      description: 'Cấu hình Flash Sale của website',
-      content: {
-        campaigns: currentCampaigns
-      },
-      status: 'active'
-    }
-
-    const response = await AuthorizedAxiosInstance.get(
-      `${API_ROOT}/v1/website-configs`
-    )
-    const websiteConfigs = response.data.data || response.data
-    const flashSaleConfig = websiteConfigs.find(
-      (item) => item.key === 'flashSale'
-    )
-
-    const updateResponse = await AuthorizedAxiosInstance.patch(
-      `${API_ROOT}/v1/website-configs/${flashSaleConfig._id}`,
-      payload
-    )
-
+    
+    await updateFlashSaleConfig({
+      ...currentConfig,
+      enabled: enabled
+    })
+    
     return true
   } catch (error) {
-    console.error('Lỗi khi thay đổi trạng thái campaign:', error)
+    console.error('Lỗi khi thay đổi trạng thái Flash Sale:', error)
     throw new Error(
-      error.response?.data?.message ||
-        'Không thể thay đổi trạng thái campaign Flash Sale. Vui lòng thử lại.'
+      error.response?.data?.message || 
+      'Không thể thay đổi trạng thái Flash Sale. Vui lòng thử lại.'
     )
   }
 }
 
-// Cập nhật thời gian campaign Flash Sale
-export const updateFlashSaleCampaignTime = async (
-  campaignId,
-  startTime,
-  endTime
-) => {
+// Cập nhật thời gian Flash Sale
+export const updateFlashSaleTime = async (startTime, endTime) => {
   try {
     const currentConfig = await getFlashSaleConfig()
-    const currentCampaigns = currentConfig.campaigns || []
-
-    const campaignIndex = currentCampaigns.findIndex((c) => c.id === campaignId)
-    if (campaignIndex === -1) {
-      throw new Error('Không tìm thấy campaign Flash Sale')
-    }
-
-    currentCampaigns[campaignIndex] = {
-      ...currentCampaigns[campaignIndex],
-      startTime,
-      endTime
-    }
-
-    const payload = {
-      key: 'flashSale',
-      title: 'Flash Sale Configuration',
-      description: 'Cấu hình Flash Sale của website',
-      content: {
-        campaigns: currentCampaigns
-      },
-      status: 'active'
-    }
-
-    const response = await AuthorizedAxiosInstance.get(
-      `${API_ROOT}/v1/website-configs`
-    )
-    const websiteConfigs = response.data.data || response.data
-    const flashSaleConfig = websiteConfigs.find(
-      (item) => item.key === 'flashSale'
-    )
-
-    const updateResponse = await AuthorizedAxiosInstance.patch(
-      `${API_ROOT}/v1/website-configs/${flashSaleConfig._id}`,
-      payload
-    )
-
+    
+    await updateFlashSaleConfig({
+      ...currentConfig,
+      startTime: startTime,
+      endTime: endTime
+    })
+    
     return true
   } catch (error) {
-    console.error('Lỗi khi cập nhật thời gian campaign:', error)
+    console.error('Lỗi khi cập nhật thời gian Flash Sale:', error)
     throw new Error(
-      error.response?.data?.message ||
-        'Không thể cập nhật thời gian campaign Flash Sale. Vui lòng thử lại.'
+      error.response?.data?.message || 
+      'Không thể cập nhật thời gian Flash Sale. Vui lòng thử lại.'
     )
   }
 }
 
-// Cập nhật tiêu đề campaign Flash Sale
-export const updateFlashSaleCampaignTitle = async (campaignId, title) => {
+// Cập nhật tiêu đề Flash Sale
+export const updateFlashSaleTitle = async (title) => {
   try {
     const currentConfig = await getFlashSaleConfig()
-    const currentCampaigns = currentConfig.campaigns || []
-
-    const campaignIndex = currentCampaigns.findIndex((c) => c.id === campaignId)
-    if (campaignIndex === -1) {
-      throw new Error('Không tìm thấy campaign Flash Sale')
-    }
-
-    currentCampaigns[campaignIndex].title = title
-
-    const payload = {
-      key: 'flashSale',
-      title: 'Flash Sale Configuration',
-      description: 'Cấu hình Flash Sale của website',
-      content: {
-        campaigns: currentCampaigns
-      },
-      status: 'active'
-    }
-
-    const response = await AuthorizedAxiosInstance.get(
-      `${API_ROOT}/v1/website-configs`
-    )
-    const websiteConfigs = response.data.data || response.data
-    const flashSaleConfig = websiteConfigs.find(
-      (item) => item.key === 'flashSale'
-    )
-
-    const updateResponse = await AuthorizedAxiosInstance.patch(
-      `${API_ROOT}/v1/website-configs/${flashSaleConfig._id}`,
-      payload
-    )
-
+    
+    await updateFlashSaleConfig({
+      ...currentConfig,
+      title: title
+    })
+    
     return true
   } catch (error) {
-    console.error('Lỗi khi cập nhật tiêu đề campaign:', error)
+    console.error('Lỗi khi cập nhật tiêu đề Flash Sale:', error)
     throw new Error(
-      error.response?.data?.message ||
-        'Không thể cập nhật tiêu đề campaign Flash Sale. Vui lòng thử lại.'
+      error.response?.data?.message || 
+      'Không thể cập nhật tiêu đề Flash Sale. Vui lòng thử lại.'
     )
   }
 }
 
-// Kiểm tra trạng thái campaign Flash Sale
-export const getFlashSaleCampaignStatus = async (campaignId) => {
+// Kiểm tra trạng thái Flash Sale
+export const getFlashSaleStatus = async () => {
   try {
-    const campaign = await getFlashSaleCampaign(campaignId)
+    const config = await getFlashSaleConfig()
     const now = new Date()
-    const startTime = new Date(campaign.startTime)
-    const endTime = new Date(campaign.endTime)
-
-    if (!campaign.enabled) {
+    const startTime = new Date(config.startTime)
+    const endTime = new Date(config.endTime)
+    
+    if (!config.enabled) {
       return 'disabled'
     }
-
+    
     if (now < startTime) {
       return 'upcoming'
     } else if (now >= startTime && now <= endTime) {
@@ -594,45 +306,35 @@ export const getFlashSaleCampaignStatus = async (campaignId) => {
       return 'expired'
     }
   } catch (error) {
-    console.error('Lỗi khi kiểm tra trạng thái campaign:', error)
+    console.error('Lỗi khi kiểm tra trạng thái Flash Sale:', error)
     return 'error'
   }
 }
 
-// Tạo mới flash sale campaign (public API)
-export const createFlashSale = async (campaignContent) => {
+// Hàm tạo mới flash sale (public API)
+export const createFlashSale = async (content) => {
   try {
     // Đảm bảo content đủ trường
-    const defaultCampaign = getDefaultCampaignContent()
-    let fullContent = { ...defaultCampaign, ...campaignContent }
+    const defaultContent = getDefaultFlashSaleContent()
+    let fullContent = { ...defaultContent, ...content }
 
     // Kiểm tra products phải là mảng và có ít nhất 1 phần tử
-    if (
-      !Array.isArray(fullContent.products) ||
-      fullContent.products.length === 0
-    ) {
+    if (!Array.isArray(fullContent.products) || fullContent.products.length === 0) {
       throw new Error('Products phải là mảng và có ít nhất 1 sản phẩm')
     }
-
     // Kiểm tra từng sản phẩm trong products
     fullContent.products = fullContent.products.map((p, idx) => {
       if (!p.productId || typeof p.productId !== 'string') {
-        throw new Error(
-          `Sản phẩm thứ ${idx + 1} thiếu productId hoặc productId không hợp lệ`
-        )
+        throw new Error(`Sản phẩm thứ ${idx + 1} thiếu productId hoặc productId không hợp lệ`)
       }
       // Đảm bảo originalPrice và flashPrice là number
       const originalPrice = Number(p.originalPrice)
       const flashPrice = Number(p.flashPrice)
       if (isNaN(originalPrice) || isNaN(flashPrice)) {
-        throw new Error(
-          `Sản phẩm thứ ${idx + 1} phải có originalPrice và flashPrice là số`
-        )
+        throw new Error(`Sản phẩm thứ ${idx + 1} phải có originalPrice và flashPrice là số`)
       }
       if (flashPrice >= originalPrice) {
-        throw new Error(
-          `Sản phẩm thứ ${idx + 1} flashPrice phải nhỏ hơn originalPrice`
-        )
+        throw new Error(`Sản phẩm thứ ${idx + 1} flashPrice phải nhỏ hơn originalPrice`)
       }
       return {
         productId: p.productId,
@@ -640,68 +342,29 @@ export const createFlashSale = async (campaignContent) => {
         flashPrice
       }
     })
-
     // Đảm bảo các trường khác không bị thiếu
-    if (
-      !fullContent.id ||
-      !fullContent.title ||
-      !fullContent.startTime ||
-      !fullContent.endTime
-    ) {
-      throw new Error(
-        'Vui lòng nhập đầy đủ ID, tiêu đề, thời gian bắt đầu và kết thúc'
-      )
+    if (!fullContent.title || !fullContent.startTime || !fullContent.endTime) {
+      throw new Error('Vui lòng nhập đầy đủ tiêu đề, thời gian bắt đầu và kết thúc')
     }
-
-    // Lấy config hiện tại
-    const currentConfig = await getFlashSaleConfig()
-    const currentCampaigns = currentConfig.campaigns || []
-
-    // Kiểm tra campaign id đã tồn tại
-    if (currentCampaigns.some((c) => c.id === fullContent.id)) {
-      throw new Error('Campaign ID đã tồn tại')
-    }
-
     const payload = {
       key: 'flashSale',
       title: 'Flash Sale Configuration',
       description: 'Cấu hình Flash Sale của website',
-      content: {
-        campaigns: [...currentCampaigns, fullContent]
-      },
+      content: fullContent,
       status: 'active'
     }
-
-    console.log('Payload gửi lên khi tạo mới campaign (đã kiểm tra):', payload)
-
-    const response = await AuthorizedAxiosInstance.get(
-      `${API_ROOT}/v1/website-configs`
+    console.log('Payload gửi lên khi tạo mới flash sale (đã kiểm tra):', payload)
+    const response = await AuthorizedAxiosInstance.post(
+      `${API_ROOT}/v1/website-configs`,
+      payload
     )
-    const websiteConfigs = response.data.data || response.data
-    const flashSaleConfig = websiteConfigs.find(
-      (item) => item.key === 'flashSale'
-    )
-
-    let finalResponse
-    if (flashSaleConfig) {
-      finalResponse = await AuthorizedAxiosInstance.patch(
-        `${API_ROOT}/v1/website-configs/${flashSaleConfig._id}`,
-        payload
-      )
-    } else {
-      finalResponse = await AuthorizedAxiosInstance.post(
-        `${API_ROOT}/v1/website-configs`,
-        payload
-      )
-    }
-
-    return finalResponse.data
+    return response.data
   } catch (error) {
-    console.error('Lỗi khi tạo mới campaign:', error)
+    console.error('Lỗi khi tạo mới flash sale:', error)
     throw new Error(
       error.response?.data?.message ||
-        error.message ||
-        'Không thể tạo mới campaign Flash Sale. Vui lòng thử lại.'
+      error.message ||
+      'Không thể tạo mới flash sale. Vui lòng thử lại.'
     )
   }
 }
