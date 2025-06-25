@@ -97,7 +97,9 @@ const FlashSaleSection = () => {
 
   if (loading) return <div>Loading flash sale...</div>
   if (error) return <div>{error}</div>
-  if (!campaigns || campaigns.length === 0) return null
+  // Lọc các campaign được enable
+  const enabledCampaigns = (campaigns || []).filter(c => c.enabled !== false)
+  if (!enabledCampaigns || enabledCampaigns.length === 0) return null
 
   // ======= STYLES =======
   const styles = {
@@ -156,7 +158,7 @@ const FlashSaleSection = () => {
 
   return (
     <>
-      {campaigns.map((campaign) => (
+      {enabledCampaigns.map((campaign) => (
         <section key={campaign.id} style={styles.flashSale}>
           <div style={styles.flashSaleHeader}>
             <h2 style={styles.flashSaleTitle}>⚡ {campaign.title}</h2>

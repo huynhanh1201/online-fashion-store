@@ -142,26 +142,36 @@ const ProductDetail = () => {
           >
             Trang chủ
           </Link>
-          <Typography
-            sx={{
-              display: 'flex',
-              alignItems: 'center',
-              color: 'text.primary',
-              fontWeight: 500
-            }}
+          <Link
+             underline='hover'
+             sx={{
+               display: 'flex',
+               alignItems: 'center',
+               color: '#007bff',
+               textDecoration: 'none',
+               '&:hover': {
+                 color: 'primary.main'
+               }
+             }}
+             href='/product'
           >
             Sản phẩm
-          </Typography>
-          <Typography
-            sx={{
-              display: 'flex',
-              alignItems: 'center',
-              color: 'text.primary',
-              fontWeight: 500
-            }}
+          </Link>
+          <Link
+             underline='hover'
+             sx={{
+               display: 'flex',
+               alignItems: 'center',
+               color: '#007bff',
+               textDecoration: 'none',
+               '&:hover': {
+                 color: 'primary.main'
+               }
+             }}
+             href={`/productbycategory/${product?.categoryId?._id || product?.categoryId}`}
           >
             {category?.name}
-          </Typography>
+          </Link>
           <Typography
             sx={{
               display: 'flex',
