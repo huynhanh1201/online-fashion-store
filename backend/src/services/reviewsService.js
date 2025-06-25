@@ -11,7 +11,12 @@ const createReview = async (reqBody) => {
 
       isVerified: true,
 
-      orderId: reqBody.orderId
+      orderId: reqBody.orderId,
+
+      images: reqBody.images,
+      videos: reqBody.videos,
+
+      moderationStatus: 'pending'
     }
 
     const reviews = await ReviewModel.create(newReview)
@@ -40,12 +45,23 @@ const getReviewList = async (queryString) => {
   return result
 }
 
-const updateReview = async (reviewId, reqBody) => {
+const updateReview = async (reviewId, reqBody, jwtDecoded) => {
   // eslint-disable-next-line no-useless-catch
   try {
+    const infoUpdate = {
+      moderationStatus: reqBody.moderationStatus,
+      moderatedAt: new Date(),
+      moderatedBy: {
+        _id: jwtDecoded._id,
+        name: jwtDecoded.name,
+        role: jwtDecoded.role,
+        email: jwtDecoded.email
+      }
+    }
+
     const updatedReview = await ReviewModel.findOneAndUpdate(
       { _id: reviewId },
-      reqBody,
+      infoUpdate,
       { new: true }
     )
 

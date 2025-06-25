@@ -3,6 +3,9 @@ export const roles = [
     name: 'owner',
     label: 'Chủ cửa hàng',
     permissions: [
+      // Admin
+      'admin:access',
+
       // User
       'user:create',
       'user:read',
@@ -93,7 +96,13 @@ export const roles = [
       'partner:create',
       'partner:read',
       'partner:update',
-      'partner:delete'
+      'partner:delete',
+
+      // Review
+      'review:create',
+      'review:read',
+      'review:update',
+      'review:delete'
     ]
   },
   {
