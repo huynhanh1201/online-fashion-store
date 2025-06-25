@@ -46,6 +46,23 @@ const reviewSchema = new Schema(
     videos: {
       type: [String],
       default: []
+    },
+
+    moderationStatus: {
+      type: String,
+      enum: ['pending', 'approved', 'rejected'],
+      default: 'pending',
+      required: true
+    },
+    moderatedAt: {
+      type: Date,
+      default: null // chỉ có khi đã kiểm duyệt
+    },
+    moderatedBy: {
+      _id: { type: mongoose.Types.ObjectId, required: true },
+      name: { type: String, required: true },
+      role: { type: String, required: true },
+      email: { type: String, required: true }
     }
   },
   {

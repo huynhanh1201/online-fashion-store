@@ -29,9 +29,14 @@ const getReviewList = async (req, res, next) => {
 
 const updateReview = async (req, res, next) => {
   try {
+    const jwtDecoded = req.jwtDecoded
     const reviewId = req.params.reviewId
 
-    const result = await reviewsService.updateReview(reviewId, req.body)
+    const result = await reviewsService.updateReview(
+      reviewId,
+      req.body,
+      jwtDecoded
+    )
 
     res.status(StatusCodes.OK).json(result)
   } catch (err) {

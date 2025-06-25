@@ -45,11 +45,7 @@ const review = async (req, res, next) => {
 const reviewUpdate = async (req, res, next) => {
   // Xác thực dữ liệu đầu vào correctCondition: điều kiện đúng
   const correctCondition = Joi.object({
-    rating: Joi.number().integer().min(1).max(5).required(),
-    comment: Joi.string().trim().required(),
-
-    images: Joi.array().items(Joi.string()).default([]),
-    videos: Joi.array().items(Joi.string()).default([])
+    moderationStatus: Joi.string().trim().required()
   })
 
   try {
