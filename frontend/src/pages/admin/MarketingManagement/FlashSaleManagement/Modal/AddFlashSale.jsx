@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react'
 import {
   Dialog,
   DialogTitle,
@@ -25,64 +25,93 @@ import {
   ListItemText,
   Paper,
   InputAdornment,
-  Portal,
-} from '@mui/material';
-import { Delete as DeleteIcon, AddCircleOutline as AddCircleOutlineIcon, Search as SearchIcon } from '@mui/icons-material';
-import { getProducts } from '~/services/productService';
-import { createFlashSale, getFlashSaleConfig, updateFlashSaleConfig } from '~/services/admin/webConfig/flashsaleService';
+  Portal
+} from '@mui/material'
+import {
+  Delete as DeleteIcon,
+  AddCircleOutline as AddCircleOutlineIcon,
+  Search as SearchIcon
+} from '@mui/icons-material'
+import { getProducts } from '~/services/productService'
+import {
+  createFlashSale,
+  getFlashSaleCampaigns,
+  updateFlashSaleCampaign
+} from '~/services/admin/webConfig/flashSaleService'
 
 const AddFlashSale = ({ open, onClose, onSave, initialData }) => {
-  const theme = useTheme();
+  const theme = useTheme()
   const [form, setForm] = useState({
+    id: '',
     enabled: true,
     title: '',
     startTime: '',
     endTime: '',
-    products: [],
-  });
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [productSuggestions, setProductSuggestions] = useState([]);
-  const [suggestionLoading, setSuggestionLoading] = useState(false);
-  const [showSuggestions, setShowSuggestions] = useState({});
-  const [dropdownPosition, setDropdownPosition] = useState({});
-  const [allProducts, setAllProducts] = useState([]);
-  const suggestionRefs = useRef({});
-  const inputRefs = useRef({});
+    products: []
+  })
+  const [error, setError] = useState('')
+  const [success, setSuccess] = useState('')
+  const [warning, setWarning] = useState('')
+  const [loading, setLoading] = useState(false)
+  const [productSuggestions, setProductSuggestions] = useState([])
+  const [suggestionLoading, setSuggestionLoading] = useState(false)
+  const [showSuggestions, setShowSuggestions] = useState({})
+  const [dropdownPosition, setDropdownPosition] = useState({})
+  const [allProducts, setAllProducts] = useState([])
+  const suggestionRefs = useRef({})
+  const inputRefs = useRef({})
 
   // Khởi tạo form khi dialog mở
   useEffect(() => {
     if (open) {
       if (initialData) {
-        setForm(initialData);
+        setForm({
+          id: initialData.id,
+          enabled: initialData.enabled,
+          title: initialData.title,
+          startTime: initialData.startTime
+            ? new Date(initialData.startTime).toISOString().slice(0, 16)
+            : '',
+          endTime: initialData.endTime
+            ? new Date(initialData.endTime).toISOString().slice(0, 16)
+            : '',
+          products: initialData.products.map((p) => ({
+            _id: p.productId,
+            productName: p.name || '',
+            originalPrice: p.originalPrice,
+            flashPrice: p.flashPrice,
+            image: p.image || [],
+            isDisabled: true
+          }))
+        })
       } else {
         setForm({
+          id: '',
           enabled: true,
           title: '',
           startTime: '',
           endTime: '',
-          products: [],
-        });
+          products: []
+        })
       }
-      setError('');
-      setSuccess('');
+      setError('')
+      setSuccess('')
+      setWarning('')
     }
-  }, [open, initialData]);
+  }, [open, initialData])
 
   // Lấy danh sách sản phẩm khi component mount
   useEffect(() => {
     const fetchAllProducts = async () => {
       try {
-        const { products } = await getProducts({ page: 1, limit: 1000 });
-        console.log('Danh sách sản phẩm:', products);
-        setAllProducts(products);
+        const { products } = await getProducts({ page: 1, limit: 1000 })
+        setAllProducts(products)
       } catch (err) {
-        console.error('Lỗi khi lấy danh sách sản phẩm:', err);
+        console.error('Lỗi khi lấy danh sách sản phẩm:', err)
       }
-    };
-    fetchAllProducts();
-  }, []);
+    }
+    fetchAllProducts()
+  }, [])
 
   // Xử lý click ngoài để đóng danh sách gợi ý
   useEffect(() => {
@@ -90,256 +119,324 @@ const AddFlashSale = ({ open, onClose, onSave, initialData }) => {
       Object.keys(showSuggestions).forEach((index) => {
         if (showSuggestions[index] && suggestionRefs.current[index]) {
           if (!suggestionRefs.current[index].contains(event.target)) {
-            setShowSuggestions((prev) => ({ ...prev, [index]: false }));
-            setProductSuggestions([]);
+            setShowSuggestions((prev) => ({ ...prev, [index]: false }))
+            setProductSuggestions([])
           }
         }
-      });
-    };
+      })
+    }
 
-    document.addEventListener('click', handleClickOutside);
-    return () => {
-      document.removeEventListener('click', handleClickOutside);
-    };
-  }, [showSuggestions]);
+    document.addEventListener('click', handleClickOutside)
+    return () => document.removeEventListener('click', handleClickOutside)
+  }, [showSuggestions])
 
   const handleChange = (field, value) => {
-    setForm((prev) => ({ ...prev, [field]: value }));
-    clearMessages();
-  };
+    setForm((prev) => ({ ...prev, [field]: value ?? '' }))
+    clearMessages()
+  }
 
   const handleProductChange = (index, field, value) => {
-    const updated = [...form.products];
-    updated[index][field] = value;
-    setForm((prev) => ({ ...prev, products: updated }));
-    clearMessages();
-  };
+    const updated = [...form.products]
+    updated[index][field] = value
+    setForm((prev) => ({ ...prev, products: updated }))
+    clearMessages()
+  }
 
   const handleAddProduct = () => {
     setForm((prev) => ({
       ...prev,
       products: [
         ...prev.products,
-        { _id: '', productName: '', originalPrice: '', flashPrice: '', image: [] },
-      ],
-    }));
-    clearMessages();
-  };
+        {
+          _id: '',
+          productName: '',
+          originalPrice: '',
+          flashPrice: '',
+          image: [],
+          isDisabled: false
+        }
+      ]
+    }))
+    clearMessages()
+  }
 
   const handleRemoveProduct = (index) => {
-    const updated = [...form.products];
-    updated.splice(index, 1);
-    setForm((prev) => ({ ...prev, products: updated }));
-    clearMessages();
-  };
+    const updated = [...form.products]
+    updated.splice(index, 1)
+    setForm((prev) => ({ ...prev, products: updated }))
+    clearMessages()
+  }
 
   const clearMessages = () => {
-    setError('');
-    setSuccess('');
-  };
+    setError('')
+    setSuccess('')
+    setWarning('')
+  }
 
   // Lấy gợi ý sản phẩm dựa trên tìm kiếm
   const fetchProductSuggestions = async (searchText, index) => {
     if (!searchText.trim()) {
-      setProductSuggestions([]);
-      setShowSuggestions((prev) => ({ ...prev, [index]: false }));
-      return;
+      setProductSuggestions([])
+      setShowSuggestions((prev) => ({ ...prev, [index]: false }))
+      return
     }
 
-    setSuggestionLoading(true);
+    setSuggestionLoading(true)
     try {
       const filtered = allProducts
-        .filter((product) => product.name.toLowerCase().includes(searchText.toLowerCase()))
-        .slice(0, 5);
-      setProductSuggestions(filtered);
-      setShowSuggestions((prev) => ({ ...prev, [index]: true }));
+        .filter((product) =>
+          product.name.toLowerCase().includes(searchText.toLowerCase())
+        )
+        .slice(0, 5)
+      setProductSuggestions(filtered)
+      setShowSuggestions((prev) => ({ ...prev, [index]: true }))
     } catch (error) {
-      console.error('Lỗi khi tìm kiếm sản phẩm:', error);
-      setProductSuggestions([]);
+      console.error('Lỗi khi tìm kiếm sản phẩm:', error)
+      setProductSuggestions([])
     } finally {
-      setSuggestionLoading(false);
+      setSuggestionLoading(false)
     }
-  };
+  }
 
   // Cập nhật vị trí dropdown gợi ý
   const updateDropdownPosition = (index) => {
     if (inputRefs.current[index]) {
-      const rect = inputRefs.current[index].getBoundingClientRect();
+      const rect = inputRefs.current[index].getBoundingClientRect()
       setDropdownPosition((prev) => ({
         ...prev,
         [index]: {
           top: rect.bottom,
           left: rect.left,
-          width: rect.width,
-        },
-      }));
+          width: rect.width
+        }
+      }))
     }
-  };
+  }
 
   // Xử lý thay đổi tên sản phẩm với debounce
   const handleProductNameChange = (index, value) => {
-    handleProductChange(index, 'productName', value);
-    handleProductChange(index, '_id', '');
+    if (form.products[index].isDisabled) return // Không cho thay đổi nếu sản phẩm bị vô hiệu hóa
+    handleProductChange(index, 'productName', value)
+    handleProductChange(index, '_id', '')
 
     if (!value.trim()) {
-      setShowSuggestions((prev) => ({ ...prev, [index]: false }));
-      setProductSuggestions([]);
-      return;
+      setShowSuggestions((prev) => ({ ...prev, [index]: false }))
+      setProductSuggestions([])
+      return
     }
 
-    updateDropdownPosition(index);
+    updateDropdownPosition(index)
 
     const timeoutId = setTimeout(() => {
-      fetchProductSuggestions(value, index);
-    }, 300);
+      fetchProductSuggestions(value, index)
+    }, 300)
 
-    return () => clearTimeout(timeoutId);
-  };
+    return () => clearTimeout(timeoutId)
+  }
 
   // Xử lý chọn sản phẩm từ gợi ý
   const handleProductSelect = (index, product) => {
-    const prod = allProducts.find((p) => p._id === product._id);
+    const prod = allProducts.find((p) => p._id === product._id)
     if (prod) {
-      const newProduct = {
-        _id: prod._id,
-        productName: prod.name,
-        exportPrice: prod.exportPrice || prod.price || 0,
-        flashPrice: form.products[index]?.flashPrice || '',
-        image: prod.image || [],
-      };
-      const updatedProducts = [...form.products];
-      updatedProducts[index] = newProduct;
-      setForm((prev) => ({ ...prev, products: updatedProducts }));
+      // Kiểm tra trùng lặp trong tất cả sản phẩm hiện tại (bao gồm initialData nếu có)
+      const existingProductIndex = [
+        ...form.products,
+        ...(initialData?.products || []).map((p) => ({ _id: p.productId }))
+      ].findIndex((p) => p._id === prod._id)
+
+      let updatedProducts = [...form.products]
+
+      if (existingProductIndex !== -1) {
+        // Sản phẩm đã tồn tại, thông báo và không thêm mới
+        setWarning(
+          `Sản phẩm "${prod.name}" (ID: ${prod._id}) đã tồn tại trong chiến dịch.`
+        )
+        if (existingProductIndex >= form.products.length) {
+          // Nếu sản phẩm từ initialData, chỉ cập nhật flashPrice nếu cần
+          updatedProducts[index] = {
+            _id: prod._id,
+            productName: prod.name,
+            originalPrice: prod.exportPrice || prod.price || 0,
+            flashPrice:
+              form.products[index]?.flashPrice ||
+              initialData.products[existingProductIndex - form.products.length]
+                ?.flashPrice ||
+              '',
+            image: prod.image || [],
+            isDisabled: true
+          }
+        } else {
+          // Nếu sản phẩm từ form hiện tại, không làm gì thêm
+          return
+        }
+      } else {
+        // Sản phẩm mới, thêm bình thường
+        updatedProducts[index] = {
+          _id: prod._id,
+          productName: prod.name,
+          originalPrice: prod.exportPrice || prod.price || 0,
+          flashPrice: form.products[index]?.flashPrice || '',
+          image: prod.image || [],
+          isDisabled: false
+        }
+      }
+
+      setForm((prev) => ({ ...prev, products: updatedProducts }))
     }
-    setShowSuggestions((prev) => ({ ...prev, [index]: false }));
-    setProductSuggestions([]);
-  };
+    setShowSuggestions((prev) => ({ ...prev, [index]: false }))
+    setProductSuggestions([])
+  }
 
   // Kiểm tra dữ liệu form
   const validateForm = () => {
-    const errors = [];
+    const errors = []
+
+    if (!form.id?.trim()) {
+      errors.push('ID chiến dịch không được để trống')
+    }
 
     if (!form.title?.trim()) {
-      errors.push('Tiêu đề không được để trống');
+      errors.push('Tiêu đề không được để trống')
     }
 
     if (!form.startTime) {
-      errors.push('Thời gian bắt đầu không được để trống');
+      errors.push('Thời gian bắt đầu không được để trống')
     }
 
     if (!form.endTime) {
-      errors.push('Thời gian kết thúc không được để trống');
+      errors.push('Thời gian kết thúc không được để trống')
     }
 
-    if (form.startTime && form.endTime && new Date(form.startTime) >= new Date(form.endTime)) {
-      errors.push('Thời gian bắt đầu phải trước thời gian kết thúc');
+    if (
+      form.startTime &&
+      form.endTime &&
+      new Date(form.startTime) >= new Date(form.endTime)
+    ) {
+      errors.push('Thời gian bắt đầu phải trước thời gian kết thúc')
     }
 
     if (form.products.length === 0) {
-      errors.push('Vui lòng thêm ít nhất một sản phẩm');
+      errors.push('Vui lòng thêm ít nhất một sản phẩm')
     }
 
     form.products.forEach((product, index) => {
       if (!product._id?.trim()) {
-        errors.push(`Sản phẩm ${index + 1} chưa được chọn`);
-      }
-      if (!product.exportPrice || isNaN(product.exportPrice) || product.exportPrice <= 0) {
-        errors.push(`Giá bán hiện tại của sản phẩm ${index + 1} phải là số dương`);
-      }
-      if (!product.flashPrice || isNaN(product.flashPrice) || product.flashPrice <= 0) {
-        errors.push(`Giá Flash Sale của sản phẩm ${index + 1} phải là số dương`);
+        errors.push(`Sản phẩm ${index + 1} chưa được chọn`)
       }
       if (
-        product.exportPrice &&
-        product.flashPrice &&
-        parseFloat(product.flashPrice) >= parseFloat(product.exportPrice)
+        !product.originalPrice ||
+        isNaN(product.originalPrice) ||
+        product.originalPrice <= 0
       ) {
-        errors.push(`Giá Flash Sale của sản phẩm ${index + 1} phải thấp hơn giá bán hiện tại`);
+        errors.push(`Giá gốc của sản phẩm ${index + 1} phải là số dương`)
       }
-    });
+      if (
+        !product.flashPrice ||
+        isNaN(product.flashPrice) ||
+        product.flashPrice <= 0
+      ) {
+        errors.push(`Giá Flash Sale của sản phẩm ${index + 1} phải là số dương`)
+      }
+      if (
+        product.originalPrice &&
+        product.flashPrice &&
+        parseFloat(product.flashPrice) >= parseFloat(product.originalPrice)
+      ) {
+        errors.push(
+          `Giá Flash Sale của sản phẩm ${index + 1} phải thấp hơn giá gốc`
+        )
+      }
+    })
 
-    return errors;
-  };
+    return errors
+  }
 
-  // Xử lý lưu Flash Sale
+  // Xử lý lưu Flash Sale campaign
   const handleSave = async () => {
-    setLoading(true);
-    setError('');
-    setSuccess('');
+    setLoading(true)
+    setError('')
+    setSuccess('')
+    setWarning('')
 
     try {
       const cleanedProducts = form.products
-        .filter((p) => p._id && p._id.trim() !== '' && p.flashPrice && !isNaN(p.flashPrice))
+        .filter(
+          (p) =>
+            p._id && p._id.trim() !== '' && p.flashPrice && !isNaN(p.flashPrice)
+        )
         .map((p) => ({
           productId: p._id,
-          name: p.productName,
-          originalPrice: Number(p.exportPrice),
-          flashPrice: Number(p.flashPrice),
-        }));
-    
+          originalPrice: Number(p.originalPrice),
+          flashPrice: Number(p.flashPrice)
+        }))
+
       if (!Array.isArray(cleanedProducts) || cleanedProducts.length === 0) {
-        setError('Bạn phải chọn ít nhất 1 sản phẩm hợp lệ cho Flash Sale!');
-        setLoading(false);
-        return;
+        setError('Bạn phải chọn ít nhất 1 sản phẩm hợp lệ cho Flash Sale!')
+        setLoading(false)
+        return
       }
+
       const cleanedForm = {
+        id: form.id,
         enabled: form.enabled,
         title: form.title,
         startTime: new Date(form.startTime).toISOString(),
         endTime: new Date(form.endTime).toISOString(),
         products: cleanedProducts
-      };
-      const errors = validateForm();
+      }
+
+      const errors = validateForm()
       if (errors.length > 0) {
-        setError(errors.join(', '));
-        setLoading(false);
-        return;
+        setError(errors.join(', '))
+        setLoading(false)
+        return
       }
-      let hasConfig = false;
-      let configId = null;
+
+      // Kiểm tra xem campaign đã tồn tại chưa
+      let isExistingCampaign = false
       try {
-        const config = await getFlashSaleConfig();
-        if (config && config.products !== undefined) {
-          hasConfig = true;
-          configId = config._id;
-        }
+        const campaigns = await getFlashSaleCampaigns()
+        isExistingCampaign = campaigns.some((c) => c.id === form.id)
       } catch (e) {
-        console.log('Chưa có cấu hình Flash Sale, sẽ tạo mới.');
+        console.log('Chưa có campaign Flash Sale nào hoặc lỗi khi kiểm tra.')
       }
-      if (hasConfig && configId) {
-        const result = await updateFlashSaleConfig({
-          ...cleanedForm,
-          _id: configId,
-        });
-        setSuccess('Cập nhật Flash Sale thành công!');
+
+      if (isExistingCampaign) {
+        await updateFlashSaleCampaign(form.id, cleanedForm)
+        setSuccess('Cập nhật chiến dịch Flash Sale thành công!')
       } else {
-        const result = await createFlashSale(cleanedForm);
-        setSuccess('Tạo Flash Sale thành công!');
+        await createFlashSale(cleanedForm)
+        setSuccess('Tạo chiến dịch Flash Sale thành công!')
       }
-      onSave(cleanedForm);
+
+      onSave(cleanedForm)
       setTimeout(() => {
-        onClose();
-      }, 1500);
+        onClose()
+      }, 1500)
     } catch (err) {
-      console.error('Chi tiết lỗi:', err);
-      setError(err.response?.data?.message || err.message || 'Có lỗi xảy ra khi lưu Flash Sale.');
+      console.error('Chi tiết lỗi:', err)
+      setError(
+        err.response?.data?.message ||
+          err.message ||
+          'Có lỗi xảy ra khi lưu chiến dịch Flash Sale.'
+      )
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   return (
     <Dialog
       open={open}
       onClose={onClose}
-      maxWidth="md"
+      maxWidth='md'
       fullWidth
       sx={{
         '& .MuiDialog-paper': {
           borderRadius: 3,
           boxShadow: '0 4px 24px rgba(0, 0, 0, 0.06)',
-          border: '1px solid #e2e8f0',
-        },
+          border: '1px solid #e2e8f0'
+        }
       }}
     >
       <DialogTitle
@@ -349,20 +446,22 @@ const AddFlashSale = ({ open, onClose, onSave, initialData }) => {
           py: 2,
           fontWeight: 700,
           fontSize: '1.5rem',
-          color: '#1e293b',
+          color: '#1e293b'
         }}
       >
-        {initialData ? 'Chỉnh sửa Flash Sale' : 'Thêm Flash Sale'}
+        {initialData
+          ? 'Chỉnh sửa chiến dịch Flash Sale'
+          : 'Thêm chiến dịch Flash Sale'}
       </DialogTitle>
       <DialogContent dividers sx={{ backgroundColor: '#f8fafc', py: 3 }}>
         {error && (
           <Alert
-            severity="error"
+            severity='error'
             sx={{
               mb: 3,
               borderRadius: 2,
               backgroundColor: alpha(theme.palette.error.main, 0.08),
-              border: `1px solid ${alpha(theme.palette.error.main, 0.3)}`,
+              border: `1px solid ${alpha(theme.palette.error.main, 0.3)}`
             }}
           >
             {error}
@@ -371,19 +470,48 @@ const AddFlashSale = ({ open, onClose, onSave, initialData }) => {
 
         {success && (
           <Alert
-            severity="success"
+            severity='success'
             sx={{
               mb: 3,
               borderRadius: 2,
               backgroundColor: alpha(theme.palette.success.main, 0.08),
-              border: `1px solid ${alpha(theme.palette.success.main, 0.3)}`,
+              border: `1px solid ${alpha(theme.palette.success.main, 0.3)}`
             }}
           >
             {success}
           </Alert>
         )}
 
+        {warning && (
+          <Alert
+            severity='warning'
+            sx={{
+              mb: 3,
+              borderRadius: 2,
+              backgroundColor: alpha(theme.palette.warning.main, 0.08),
+              border: `1px solid ${alpha(theme.palette.warning.main, 0.3)}`
+            }}
+          >
+            {warning}
+          </Alert>
+        )}
+
         <Stack spacing={3}>
+          <TextField
+            fullWidth
+            label='ID chiến dịch *'
+            value={form.id}
+            onChange={(e) => handleChange('id', e.target.value)}
+            required
+            disabled={!!initialData}
+            sx={{
+              '& .MuiOutlinedInput-root': {
+                borderRadius: 2,
+                backgroundColor: '#fff'
+              }
+            }}
+          />
+
           <FormControlLabel
             control={
               <Checkbox
@@ -392,29 +520,32 @@ const AddFlashSale = ({ open, onClose, onSave, initialData }) => {
                 sx={{
                   color: '#3b82f6',
                   '&.Mui-checked': {
-                    color: '#3b82f6',
-                  },
+                    color: '#3b82f6'
+                  }
                 }}
               />
             }
             label={
-              <Typography variant="body2" sx={{ color: '#1e293b', fontWeight: 500 }}>
-                Kích hoạt Flash Sale
+              <Typography
+                variant='body2'
+                sx={{ color: '#1e293b', fontWeight: 500 }}
+              >
+                Kích hoạt chiến dịch Flash Sale
               </Typography>
             }
           />
 
           <TextField
             fullWidth
-            label="Tiêu đề *"
+            label='Tiêu đề *'
             value={form.title}
             onChange={(e) => handleChange('title', e.target.value)}
             required
             sx={{
               '& .MuiOutlinedInput-root': {
                 borderRadius: 2,
-                backgroundColor: '#fff',
-              },
+                backgroundColor: '#fff'
+              }
             }}
           />
 
@@ -422,8 +553,8 @@ const AddFlashSale = ({ open, onClose, onSave, initialData }) => {
             <Grid item xs={12} sm={6}>
               <TextField
                 fullWidth
-                type="datetime-local"
-                label="Thời gian bắt đầu *"
+                type='datetime-local'
+                label='Thời gian bắt đầu *'
                 value={form.startTime}
                 onChange={(e) => handleChange('startTime', e.target.value)}
                 InputLabelProps={{ shrink: true }}
@@ -431,16 +562,16 @@ const AddFlashSale = ({ open, onClose, onSave, initialData }) => {
                 sx={{
                   '& .MuiOutlinedInput-root': {
                     borderRadius: 2,
-                    backgroundColor: '#fff',
-                  },
+                    backgroundColor: '#fff'
+                  }
                 }}
               />
             </Grid>
             <Grid item xs={12} sm={6}>
               <TextField
                 fullWidth
-                type="datetime-local"
-                label="Thời gian kết thúc *"
+                type='datetime-local'
+                label='Thời gian kết thúc *'
                 value={form.endTime}
                 onChange={(e) => handleChange('endTime', e.target.value)}
                 InputLabelProps={{ shrink: true }}
@@ -448,8 +579,8 @@ const AddFlashSale = ({ open, onClose, onSave, initialData }) => {
                 sx={{
                   '& .MuiOutlinedInput-root': {
                     borderRadius: 2,
-                    backgroundColor: '#fff',
-                  },
+                    backgroundColor: '#fff'
+                  }
                 }}
               />
             </Grid>
@@ -457,14 +588,14 @@ const AddFlashSale = ({ open, onClose, onSave, initialData }) => {
 
           <Box>
             <Typography
-              variant="h6"
+              variant='h6'
               sx={{
                 mb: 2,
                 fontWeight: 600,
                 color: '#1e293b',
                 display: 'flex',
                 alignItems: 'center',
-                gap: 1,
+                gap: 1
               }}
             >
               <AddCircleOutlineIcon sx={{ color: '#3b82f6' }} />
@@ -476,19 +607,19 @@ const AddFlashSale = ({ open, onClose, onSave, initialData }) => {
                 overflowY: 'auto',
                 pr: 1,
                 '&::-webkit-scrollbar': {
-                  width: '8px',
+                  width: '8px'
                 },
                 '&::-webkit-scrollbar-track': {
                   background: '#f1f5f9',
-                  borderRadius: '4px',
+                  borderRadius: '4px'
                 },
                 '&::-webkit-scrollbar-thumb': {
                   background: '#cbd5e1',
                   borderRadius: '4px',
                   '&:hover': {
-                    background: '#94a3b8',
-                  },
-                },
+                    background: '#94a3b8'
+                  }
+                }
               }}
             >
               {form.products.map((product, index) => (
@@ -499,42 +630,64 @@ const AddFlashSale = ({ open, onClose, onSave, initialData }) => {
                     p: 2,
                     borderRadius: 2,
                     border: '1px solid #e2e8f0',
-                    backgroundColor: '#fff',
+                    backgroundColor: product.isDisabled ? '#f1f5f9' : '#fff',
                     transition: 'all 0.3s ease',
                     '&:hover': {
-                      boxShadow: `0 4px 16px ${alpha(theme.palette.primary.main, 0.2)}`,
-                    },
+                      boxShadow: `0 4px 16px ${alpha(theme.palette.primary.main, 0.2)}`
+                    }
                   }}
                 >
-                  <Grid container spacing={2} alignItems="center">
+                  <Grid container spacing={2} alignItems='center'>
                     <Grid item xs={12} sm={4}>
-                      <Box sx={{ position: 'relative' }} ref={(el) => (suggestionRefs.current[index] = el)}>
+                      <Box
+                        sx={{ position: 'relative' }}
+                        ref={(el) => (suggestionRefs.current[index] = el)}
+                      >
                         <TextField
                           ref={(el) => (inputRefs.current[index] = el)}
                           fullWidth
-                          label="Tên sản phẩm *"
+                          label='Tên sản phẩm *'
                           value={product.productName || ''}
-                          onChange={(e) => handleProductNameChange(index, e.target.value)}
+                          onChange={(e) =>
+                            handleProductNameChange(index, e.target.value)
+                          }
                           onFocus={() => {
-                            updateDropdownPosition(index);
-                            if (product.productName && productSuggestions.length > 0) {
-                              setShowSuggestions((prev) => ({ ...prev, [index]: true }));
+                            if (!product.isDisabled) {
+                              updateDropdownPosition(index)
+                              if (
+                                product.productName &&
+                                productSuggestions.length > 0
+                              ) {
+                                setShowSuggestions((prev) => ({
+                                  ...prev,
+                                  [index]: true
+                                }))
+                              }
                             }
                           }}
                           required
+                          disabled={product.isDisabled}
                           InputProps={{
                             endAdornment: (
-                              <InputAdornment position="end">
-                                {suggestionLoading && showSuggestions[index] && <CircularProgress size={20} />}
-                                <SearchIcon sx={{ color: '#64748b' }} />
+                              <InputAdornment position='end'>
+                                {suggestionLoading &&
+                                  showSuggestions[index] &&
+                                  !product.isDisabled && (
+                                    <CircularProgress size={20} />
+                                  )}
+                                {!product.isDisabled && (
+                                  <SearchIcon sx={{ color: '#64748b' }} />
+                                )}
                               </InputAdornment>
-                            ),
+                            )
                           }}
                           sx={{
                             '& .MuiOutlinedInput-root': {
                               borderRadius: 2,
-                              backgroundColor: '#fff',
-                            },
+                              backgroundColor: product.isDisabled
+                                ? '#e2e8f0'
+                                : '#fff'
+                            }
                           }}
                         />
                       </Box>
@@ -542,34 +695,46 @@ const AddFlashSale = ({ open, onClose, onSave, initialData }) => {
                     <Grid item xs={12} sm={3}>
                       <TextField
                         fullWidth
-                        label="Giá bán hiện tại (exportPrice) *"
-                        type="number"
-                        value={product.exportPrice ?? ''}
+                        label='Giá gốc *'
+                        type='number'
+                        value={product.originalPrice ?? ''}
                         InputProps={{ readOnly: true }}
                         required
+                        disabled={product.isDisabled}
                         inputProps={{ min: 0 }}
                         sx={{
                           '& .MuiOutlinedInput-root': {
                             borderRadius: 2,
-                            backgroundColor: '#fff',
-                          },
+                            backgroundColor: product.isDisabled
+                              ? '#e2e8f0'
+                              : '#fff'
+                          }
                         }}
                       />
                     </Grid>
                     <Grid item xs={12} sm={3}>
                       <TextField
                         fullWidth
-                        label="Giá Flash Sale *"
-                        type="number"
+                        label='Giá Flash Sale *'
+                        type='number'
                         value={product.flashPrice}
-                        onChange={(e) => handleProductChange(index, 'flashPrice', e.target.value)}
+                        onChange={(e) =>
+                          handleProductChange(
+                            index,
+                            'flashPrice',
+                            e.target.value
+                          )
+                        }
                         required
+                        disabled={product.isDisabled}
                         inputProps={{ min: 0 }}
                         sx={{
                           '& .MuiOutlinedInput-root': {
                             borderRadius: 2,
-                            backgroundColor: '#fff',
-                          },
+                            backgroundColor: product.isDisabled
+                              ? '#e2e8f0'
+                              : '#fff'
+                          }
                         }}
                       />
                     </Grid>
@@ -579,20 +744,30 @@ const AddFlashSale = ({ open, onClose, onSave, initialData }) => {
                           src={product.image[0] || '/fallback.jpg'}
                           alt={product.productName}
                           onError={(e) => {
-                            e.target.onerror = null;
-                            e.target.src = '/fallback.jpg';
+                            e.target.onerror = null
+                            e.target.src = '/fallback.jpg'
                           }}
-                          style={{ width: 50, height: 50, objectFit: 'cover', borderRadius: 4 }}
+                          style={{
+                            width: 50,
+                            height: 50,
+                            objectFit: 'cover',
+                            borderRadius: 4
+                          }}
                         />
                       )}
                     </Grid>
-                    <Grid item xs={12} sm={1} sx={{ textAlign: { sm: 'right' } }}>
-                      <Tooltip title="Xóa sản phẩm">
+                    <Grid
+                      item
+                      xs={12}
+                      sm={1}
+                      sx={{ textAlign: { sm: 'right' } }}
+                    >
+                      <Tooltip title='Xóa sản phẩm'>
                         <IconButton
                           onClick={() => handleRemoveProduct(index)}
                           sx={{
                             color: '#ef4444',
-                            '&:hover': { backgroundColor: '#fee2e2' },
+                            '&:hover': { backgroundColor: '#fee2e2' }
                           }}
                         >
                           <DeleteIcon />
@@ -605,7 +780,7 @@ const AddFlashSale = ({ open, onClose, onSave, initialData }) => {
             </Box>
             <Button
               onClick={handleAddProduct}
-              variant="outlined"
+              variant='outlined'
               startIcon={<AddCircleOutlineIcon />}
               sx={{
                 mt: 2,
@@ -618,8 +793,8 @@ const AddFlashSale = ({ open, onClose, onSave, initialData }) => {
                 py: 1,
                 '&:hover': {
                   backgroundColor: alpha(theme.palette.primary.main, 0.08),
-                  borderColor: '#2563eb',
-                },
+                  borderColor: '#2563eb'
+                }
               }}
             >
               Thêm sản phẩm
@@ -627,7 +802,13 @@ const AddFlashSale = ({ open, onClose, onSave, initialData }) => {
           </Box>
         </Stack>
       </DialogContent>
-      <DialogActions sx={{ p: 2, backgroundColor: '#f8fafc', borderTop: '1px solid #e2e8f0' }}>
+      <DialogActions
+        sx={{
+          p: 2,
+          backgroundColor: '#f8fafc',
+          borderTop: '1px solid #e2e8f0'
+        }}
+      >
         <Button
           onClick={onClose}
           disabled={loading}
@@ -639,16 +820,20 @@ const AddFlashSale = ({ open, onClose, onSave, initialData }) => {
             px: 3,
             py: 1,
             '&:hover': {
-              backgroundColor: alpha(theme.palette.grey[500], 0.08),
-            },
+              backgroundColor: alpha(theme.palette.grey[500], 0.08)
+            }
           }}
         >
           Hủy
         </Button>
         <Button
-          variant="contained"
+          variant='contained'
           onClick={handleSave}
-          disabled={loading || form.products.length === 0 || form.products.some((p) => !p._id)}
+          disabled={
+            loading ||
+            form.products.length === 0 ||
+            form.products.some((p) => !p._id)
+          }
           startIcon={loading ? <CircularProgress size={20} /> : null}
           sx={{
             borderRadius: 2,
@@ -662,12 +847,12 @@ const AddFlashSale = ({ open, onClose, onSave, initialData }) => {
             '&:hover': {
               background: 'linear-gradient(135deg, #2563eb 0%, #1e40af 100%)',
               boxShadow: '0 6px 20px rgba(59, 130, 246, 0.4)',
-              transform: 'translateY(-1px)',
+              transform: 'translateY(-1px)'
             },
             '&:disabled': {
               background: 'linear-gradient(135deg, #93c5fd 0%, #a5b4fc 100%)',
-              color: '#fff',
-            },
+              color: '#fff'
+            }
           }}
         >
           {loading ? 'Đang lưu...' : 'Lưu'}
@@ -676,7 +861,11 @@ const AddFlashSale = ({ open, onClose, onSave, initialData }) => {
 
       {/* Render dropdowns using Portal */}
       {Object.keys(showSuggestions).map((index) => {
-        if (showSuggestions[index] && productSuggestions.length > 0 && dropdownPosition[index]) {
+        if (
+          showSuggestions[index] &&
+          productSuggestions.length > 0 &&
+          dropdownPosition[index]
+        ) {
           return (
             <Portal key={index}>
               <Paper
@@ -691,42 +880,68 @@ const AddFlashSale = ({ open, onClose, onSave, initialData }) => {
                   boxShadow: '0 4px 20px rgba(0, 0, 0, 0.15)',
                   border: '1px solid #e2e8f0',
                   borderRadius: 2,
-                  backgroundColor: '#fff',
+                  backgroundColor: '#fff'
                 }}
               >
                 <List sx={{ padding: 0 }}>
                   {productSuggestions.map((suggestion) => (
-                    <ListItem key={suggestion._id} disablePadding sx={{ borderBottom: '1px solid #f1f5f9' }}>
+                    <ListItem
+                      key={suggestion._id}
+                      disablePadding
+                      sx={{ borderBottom: '1px solid #f1f5f9' }}
+                    >
                       <ListItemButton
-                        onClick={() => handleProductSelect(parseInt(index), suggestion)}
+                        onClick={() =>
+                          handleProductSelect(parseInt(index), suggestion)
+                        }
                         sx={{
                           '&:hover': {
-                            backgroundColor: alpha(theme.palette.primary.main, 0.08),
-                          },
+                            backgroundColor: alpha(
+                              theme.palette.primary.main,
+                              0.08
+                            )
+                          }
                         }}
                       >
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, width: '100%' }}>
+                        <Box
+                          sx={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: 2,
+                            width: '100%'
+                          }}
+                        >
                           <img
                             src={suggestion.image?.[0] || '/fallback.jpg'}
                             alt={suggestion.name}
                             onError={(e) => {
-                              e.target.onerror = null;
-                              e.target.src = '/fallback.jpg';
+                              e.target.onerror = null
+                              e.target.src = '/fallback.jpg'
                             }}
                             style={{
                               width: 40,
                               height: 40,
                               objectFit: 'cover',
                               borderRadius: 4,
-                              flexShrink: 0,
+                              flexShrink: 0
                             }}
                           />
                           <Box sx={{ flex: 1, overflow: 'hidden' }}>
-                            <Typography variant="subtitle2" fontWeight={600} noWrap sx={{ maxWidth: '200px' }}>
+                            <Typography
+                              variant='subtitle2'
+                              fontWeight={600}
+                              noWrap
+                              sx={{ maxWidth: '200px' }}
+                            >
                               {suggestion.name}
                             </Typography>
-                            <Typography variant="body2" color="primary" fontWeight={500}>
-                              {(suggestion.exportPrice || 0).toLocaleString()} VND
+                            <Typography
+                              variant='body2'
+                              color='primary'
+                              fontWeight={500}
+                            >
+                              {(suggestion.exportPrice || 0).toLocaleString()}{' '}
+                              VND
                             </Typography>
                           </Box>
                         </Box>
@@ -736,12 +951,12 @@ const AddFlashSale = ({ open, onClose, onSave, initialData }) => {
                 </List>
               </Paper>
             </Portal>
-          );
+          )
         }
-        return null;
+        return null
       })}
     </Dialog>
-  );
-};
+  )
+}
 
-export default AddFlashSale;
+export default AddFlashSale
