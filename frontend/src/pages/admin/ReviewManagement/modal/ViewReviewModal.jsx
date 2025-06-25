@@ -4,101 +4,182 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
-  Typography,
   Button,
-  Grid,
-  Rating,
+  Typography,
+  Box,
+  Divider,
   Chip,
-  Table,
-  TableBody,
-  TableCell,
-  TableRow,
-  Box
+  Stack,
+  Avatar
 } from '@mui/material'
+import ImageNotSupportedIcon from '@mui/icons-material/ImageNotSupported'
+import StyleAdmin from '~/assets/StyleAdmin.jsx'
 
-const ViewReviewModal = ({ open, onClose, review }) => {
-  if (!review) return null
+const formatDate = (date) => {
+  if (!date) return 'Không xác định'
+  return new Date(date).toLocaleString('vi-VN', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
+  })
+}
+
+const ViewReviewModal = ({ open, onClose, review, onApprove }) => {
+  const handleApprove = () => {
+    if (review && review._id) {
+      onApprove(review._id, { moderationStatus: 'approved' })
+    }
+  }
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth='sm' fullWidth>
+    <Dialog
+      open={open}
+      onClose={onClose}
+      fullWidth
+      maxWidth='md'
+      BackdropProps={{ sx: StyleAdmin.OverlayModal }}
+    >
       <DialogTitle>Chi tiết đánh giá</DialogTitle>
-      <DialogContent dividers>
-        <Table size='small'>
-          <TableBody>
-            <TableRow>
-              <TableCell variant='head'>Người dùng</TableCell>
-              <TableCell>
-                {review.user.fullName} ({review.user.email})
-              </TableCell>
-            </TableRow>
+      <Divider />
+      <DialogContent sx={{ maxHeight: '70vh' }}>
+        {review ? (
+          <Box display='flex' flexDirection='column' gap={2}>
+            <Box>
+              <Typography variant='subtitle2' fontWeight='bold'>
+                Nội dung đánh giá
+              </Typography>
+              <Typography>{review.comment || 'Không có nội dung'}</Typography>
+            </Box>
 
-            <TableRow>
-              <TableCell variant='head'>Sản phẩm</TableCell>
-              <TableCell>{review.productId}</TableCell>
-            </TableRow>
+            <Box>
+              <Typography variant='subtitle2' fontWeight='bold'>
+                Số sao
+              </Typography>
+              <Typography>{review.rating}/5</Typography>
+            </Box>
 
-            <TableRow>
-              <TableCell variant='head'>Đánh giá</TableCell>
-              <TableCell>
-                <Rating value={review.rating} readOnly />
-              </TableCell>
-            </TableRow>
+            <Box>
+              <Typography variant='subtitle2' fontWeight='bold'>
+                Trạng thái kiểm duyệt
+              </Typography>
+              <Chip
+                label={
+                  review.moderationStatus === 'approved'
+                    ? 'Đã duyệt'
+                    : review.moderationStatus === 'rejected'
+                      ? 'Bị từ chối'
+                      : 'Chờ duyệt'
+                }
+                color={
+                  review.moderationStatus === 'approved'
+                    ? 'success'
+                    : review.moderationStatus === 'rejected'
+                      ? 'error'
+                      : 'warning'
+                }
+              />
+            </Box>
 
-            <TableRow>
-              <TableCell variant='head'>Trạng thái</TableCell>
-              <TableCell>
-                <Chip
-                  label={review.status}
-                  color={review.status === 'approved' ? 'success' : 'warning'}
-                  size='small'
-                />
-              </TableCell>
-            </TableRow>
-
-            <TableRow>
-              <TableCell variant='head'>Bình luận</TableCell>
-              <TableCell>{review.comment}</TableCell>
-            </TableRow>
-
-            {review.images.length > 0 && (
-              <TableRow>
-                <TableCell variant='head'>Hình ảnh</TableCell>
-                <TableCell>
-                  <Grid container spacing={1}>
-                    {review.images.map((img, idx) => (
-                      <Grid item xs={4} key={idx}>
-                        <img
-                          src={img}
-                          alt={`Ảnh ${idx + 1}`}
-                          style={{ width: '100%', borderRadius: 4 }}
-                        />
-                      </Grid>
-                    ))}
-                  </Grid>
-                </TableCell>
-              </TableRow>
+            {review.moderatedBy && (
+              <Box>
+                <Typography variant='subtitle2' fontWeight='bold'>
+                  Người duyệt
+                </Typography>
+                <Typography>{review.moderatedBy}</Typography>
+              </Box>
             )}
 
-            <TableRow>
-              <TableCell variant='head'>Tạo lúc</TableCell>
-              <TableCell>
-                {new Date(review.createdAt).toLocaleString()}
-              </TableCell>
-            </TableRow>
+            {review.moderatedAt && (
+              <Box>
+                <Typography variant='subtitle2' fontWeight='bold'>
+                  Ngày duyệt
+                </Typography>
+                <Typography>{formatDate(review.moderatedAt)}</Typography>
+              </Box>
+            )}
 
-            <TableRow>
-              <TableCell variant='head'>Cập nhật</TableCell>
-              <TableCell>
-                {new Date(review.updatedAt).toLocaleString()}
-              </TableCell>
-            </TableRow>
-          </TableBody>
-        </Table>
+            <Box>
+              <Typography variant='subtitle2' fontWeight='bold'>
+                Người đánh giá
+              </Typography>
+              <Typography>{review.userId || 'Không xác định'}</Typography>
+            </Box>
+
+            <Box>
+              <Typography variant='subtitle2' fontWeight='bold'>
+                Sản phẩm
+              </Typography>
+              <Typography>{review.productId || 'Không xác định'}</Typography>
+            </Box>
+
+            <Box>
+              <Typography variant='subtitle2' fontWeight='bold'>
+                Đánh giá xác thực
+              </Typography>
+              <Typography>{review.isVerified ? 'Có' : 'Không'}</Typography>
+            </Box>
+
+            {review.images?.length > 0 && (
+              <Box>
+                <Typography variant='subtitle2' fontWeight='bold'>
+                  Ảnh đánh giá
+                </Typography>
+                <Stack direction='row' spacing={1} flexWrap='wrap'>
+                  {review.images.map((img, idx) => (
+                    <Avatar
+                      key={idx}
+                      src={img}
+                      variant='rounded'
+                      sx={{ width: 72, height: 72 }}
+                    />
+                  ))}
+                </Stack>
+              </Box>
+            )}
+
+            {review.videos?.length > 0 && (
+              <Box>
+                <Typography variant='subtitle2' fontWeight='bold'>
+                  Video đánh giá
+                </Typography>
+                <Stack spacing={1}>
+                  {review.videos.map((video, idx) => (
+                    <video
+                      key={idx}
+                      src={video}
+                      controls
+                      width='100%'
+                      style={{ maxWidth: 400 }}
+                    />
+                  ))}
+                </Stack>
+              </Box>
+            )}
+          </Box>
+        ) : (
+          <Box textAlign='center' color='text.secondary' py={4}>
+            <ImageNotSupportedIcon fontSize='large' />
+            <Typography>Không có dữ liệu đánh giá</Typography>
+          </Box>
+        )}
       </DialogContent>
-      <DialogActions>
-        <Button onClick={onClose} variant='contained'>
+      <Divider />
+      <DialogActions sx={{ padding: '16px 24px' }}>
+        <Button onClick={onClose} color='inherit' variant='outlined'>
           Đóng
         </Button>
+        {review?.moderationStatus === 'pending' && (
+          <Button
+            onClick={handleApprove}
+            color='primary'
+            variant='contained'
+            sx={{ textTransform: 'none' }}
+          >
+            Duyệt
+          </Button>
+        )}
       </DialogActions>
     </Dialog>
   )
