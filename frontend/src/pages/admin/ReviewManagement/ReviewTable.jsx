@@ -12,39 +12,49 @@ import {
   TablePagination,
   Button
 } from '@mui/material'
-import TablePaginationActions from '~/components/PaginationAdmin/TablePaginationActions'
-import TableNoneData from '~/components/TableAdmin/NoneData'
-import FilterReview from '~/components/FilterAdmin/FilterReview'
 import ReviewRow from './ReviewRow'
-import VisibilityIcon from '@mui/icons-material/Visibility'
+import FilterReview from '~/components/FilterAdmin/FilterReview.jsx'
+import TablePaginationActions from '~/components/PaginationAdmin/TablePaginationActions.jsx'
+import TableNoneData from '~/components/TableAdmin/NoneData.jsx'
 
 const ReviewTable = ({
   reviews,
-  page,
-  rowsPerPage,
   loading,
   handleOpenModal,
-  onFilter,
-  fetchReviews,
   total,
+  permissions = {},
+  onFilter,
+  onChangeRowsPerPage,
   onPageChange,
-  onChangeRowsPerPage
+  page,
+  rowsPerPage
 }) => {
   const columns = [
     { id: 'index', label: 'STT', align: 'center', width: 50 },
-    { id: 'productId', label: 'Sản phẩm', align: 'left', minWidth: 150 },
-    { id: 'user', label: 'Người đánh giá', align: 'left', minWidth: 180 },
-    { id: 'rating', label: 'Số sao', align: 'center', width: 80 },
-    { id: 'comment', label: 'Bình luận', align: 'left', minWidth: 250 },
-    { id: 'status', label: 'Trạng thái', align: 'center', minWidth: 120 },
-    { id: 'createdAt', label: 'Ngày tạo', align: 'start', minWidth: 100 },
-    { id: 'action', label: 'Hành động', align: 'center', width: 150 }
+    { id: 'product', label: 'Sản phẩm', align: 'left', minWidth: 200 },
+    { id: 'user', label: 'Người dùng', align: 'left', minWidth: 150 },
+    { id: 'rating', label: 'Số sao', align: 'right', minWidth: 200, pr: 10 },
+    {
+      id: 'moderationStatus',
+      label: 'Trạng thái kiểm duyệt',
+      align: 'left',
+      minWidth: 160
+    },
+    { id: 'createdAt', label: 'Ngày đánh giá', align: 'left', minWidth: 200 },
+    {
+      id: 'action',
+      label: 'Hành động',
+      align: 'left',
+      width: 130,
+      maxWidth: 130,
+      pl: '20px'
+    }
   ]
 
   return (
     <Paper sx={{ border: '1px solid #ccc', width: '100%', overflow: 'hidden' }}>
       <TableContainer>
-        <Table stickyHeader>
+        <Table stickyHeader aria-label='reviews table'>
           <TableHead>
             <TableRow>
               <TableCell colSpan={columns.length}>
@@ -52,34 +62,19 @@ const ReviewTable = ({
                   sx={{
                     display: 'flex',
                     justifyContent: 'space-between',
-                    alignItems: 'start'
+                    alignItems: 'start',
+                    minHeight: 76.5
                   }}
                 >
-                  <Box
-                    sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}
+                  <Typography
+                    variant='h6'
+                    sx={{ fontWeight: '800', minWidth: 274 }}
                   >
-                    <Typography variant='h6' fontWeight={800}>
-                      Danh sách đánh giá sản phẩm
-                    </Typography>
-                    <Button
-                      startIcon={<VisibilityIcon />}
-                      sx={{
-                        width: 120,
-                        textTransform: 'none',
-                        backgroundColor: '#001f5d',
-                        color: '#fff'
-                      }}
-                      onClick={() => fetchReviews()}
-                    >
-                      Làm mới
-                    </Button>
-                  </Box>
-
+                    Danh sách đánh giá sản phẩm
+                  </Typography>
                   <FilterReview
                     onFilter={onFilter}
                     reviews={reviews}
-                    users={reviews.map((r) => r.user)}
-                    fetchReviews={fetchReviews}
                     loading={loading}
                   />
                 </Box>
@@ -89,12 +84,17 @@ const ReviewTable = ({
               {columns.map((column) => (
                 <TableCell
                   key={column.id}
-                  align={column.align}
+                  align={column.align || 'left'}
                   sx={{
-                    minWidth: column.minWidth,
-                    width: column.width,
-                    maxWidth: column.maxWidth,
-                    px: 1
+                    px: 1,
+                    ...(column.minWidth && { minWidth: column.minWidth }),
+                    ...(column.width && { width: column.width }),
+                    ...(column.maxWidth && { maxWidth: column.maxWidth }),
+                    ...(column.pl && {
+                      paddingLeft: (theme) => theme.spacing(column.pl)
+                    }),
+                    pr: column.pr,
+                    whiteSpace: 'nowrap'
                   }}
                 >
                   {column.label}
@@ -102,7 +102,6 @@ const ReviewTable = ({
               ))}
             </TableRow>
           </TableHead>
-
           <TableBody>
             {loading ? (
               <TableRow>
@@ -113,23 +112,23 @@ const ReviewTable = ({
             ) : reviews.length > 0 ? (
               reviews.map((review, idx) => (
                 <ReviewRow
-                  key={review.id}
+                  key={review._id}
                   review={review}
                   index={page * rowsPerPage + idx + 1}
                   columns={columns}
                   handleOpenModal={handleOpenModal}
+                  permissions={permissions}
                 />
               ))
             ) : (
               <TableNoneData
                 col={columns.length}
-                message='Không có đánh giá nào phù hợp.'
+                message='Không có dữ liệu đánh giá.'
               />
             )}
           </TableBody>
         </Table>
       </TableContainer>
-
       <TablePagination
         rowsPerPageOptions={[10, 25, 100]}
         component='div'

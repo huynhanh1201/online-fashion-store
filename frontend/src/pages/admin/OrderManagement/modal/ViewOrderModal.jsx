@@ -52,9 +52,11 @@ function ViewOrderModal({
     const map = {
       Pending: { label: 'Đang chờ', color: 'warning' },
       Processing: { label: 'Đang xử lý', color: 'info' },
+      Shipping: { label: 'Đang vận chuyển', color: 'primary' },
       Shipped: { label: 'Đã gửi hàng', color: 'primary' },
       Delivered: { label: 'Đã giao', color: 'success' },
-      Cancelled: { label: 'Đã hủy', color: 'error' }
+      Cancelled: { label: 'Đã hủy', color: 'error' },
+      Failed: { label: 'Thất bại', color: 'error' }
     }
 
     const config = map[status] || { label: '—', color: 'default' }
@@ -72,9 +74,11 @@ function ViewOrderModal({
     const map = {
       Pending: 'Đang chờ',
       Processing: 'Đang xử lý',
+      Shipping: 'Đang vận chuyển',
       Shipped: 'Đã gửi hàng',
       Delivered: 'Đã giao',
-      Cancelled: 'Đã hủy'
+      Cancelled: 'Đã hủy',
+      Failed: 'Thất bại'
     }
     return map[status] || status
   }
@@ -92,6 +96,15 @@ function ViewOrderModal({
       minWidth: 200
     }
   }
+  const colorOrder = [
+    { value: 'Pending', color: 'warning' },
+    { value: 'Processing', color: 'info' },
+    { value: 'Shipping', color: 'primary' },
+    { value: 'Shipped', color: 'success' },
+    { value: 'Delivered', color: 'success' },
+    { value: 'Cancelled', color: 'error' },
+    { value: 'Failed', color: 'error' }
+  ]
   return (
     <Dialog
       open={open}
@@ -240,17 +253,8 @@ function ViewOrderModal({
                         key={index}
                         label={renderStatusLabel(status)}
                         color={
-                          status === 'Cancelled'
-                            ? 'error'
-                            : status === 'Pending'
-                              ? 'warning'
-                              : status === 'Processing'
-                                ? 'info'
-                                : status === 'Shipped'
-                                  ? 'primary'
-                                  : status === 'Delivered'
-                                    ? 'success'
-                                    : 'default'
+                          colorOrder.find((option) => option.value === status)
+                            ?.color || 'primary'
                         }
                         size='large'
                         sx={{ width: '120px', fontWeight: '800' }}
@@ -275,17 +279,17 @@ function ViewOrderModal({
                       size='large'
                       sx={{ width: '120px', fontWeight: '800' }}
                     />
-                    {getNextStatus(order.status) && (
-                      <Chip
-                        icon={<ArrowForwardIcon />}
-                        label={renderStatusLabel(getNextStatus(order.status))}
-                        variant='outlined'
-                        size='large'
-                        sx={{ width: '120px', fontWeight: '800' }}
-                        color='info'
-                        onClick={handleNextStatus}
-                      />
-                    )}
+                    {/*{getNextStatus(order.status) && (*/}
+                    {/*  <Chip*/}
+                    {/*    icon={<ArrowForwardIcon />}*/}
+                    {/*    label={renderStatusLabel(getNextStatus(order.status))}*/}
+                    {/*    variant='outlined'*/}
+                    {/*    size='large'*/}
+                    {/*    sx={{ width: '120px', fontWeight: '800' }}*/}
+                    {/*    color='info'*/}
+                    {/*    onClick={handleNextStatus}*/}
+                    {/*  />*/}
+                    {/*)}*/}
                   </Stack>
                 </TableCell>
               </TableRow>
@@ -410,32 +414,35 @@ function ViewOrderModal({
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {orderDetails.map((item) => (
-                    <TableRow key={item._id}>
-                      <TableCell>
-                        {item.name
-                          .split(' ')
-                          .map(
-                            (word) =>
-                              word.charAt(0).toUpperCase() +
-                              word.slice(1).toLowerCase()
-                          )
-                          .join(' ') || 'Không có tên'}
-                      </TableCell>
-                      <TableCell align='right'>
-                        {item.quantity.toLocaleString('vi-VN')}
-                      </TableCell>
-                      <TableCell align='right'>
-                        {item.subtotal.toLocaleString('vi-VN')}đ
-                      </TableCell>
-                      <TableCell align='right'>
-                        {(item.subtotal * item.quantity).toLocaleString(
-                          'vi-VN'
-                        )}
-                        đ
-                      </TableCell>
-                    </TableRow>
-                  ))}
+                  {orderDetails.map((item) => {
+                    const ProductName =
+                      item.name || item?.productId?.name || 'không có tên'
+                    return (
+                      <TableRow key={item._id}>
+                        <TableCell>
+                          {ProductName.split(' ')
+                            .map(
+                              (word) =>
+                                word.charAt(0).toUpperCase() +
+                                word.slice(1).toLowerCase()
+                            )
+                            .join(' ') || 'Không có tên'}
+                        </TableCell>
+                        <TableCell align='right'>
+                          {item.quantity.toLocaleString('vi-VN')}
+                        </TableCell>
+                        <TableCell align='right'>
+                          {item.subtotal.toLocaleString('vi-VN')}đ
+                        </TableCell>
+                        <TableCell align='right'>
+                          {(item.subtotal * item.quantity).toLocaleString(
+                            'vi-VN'
+                          )}
+                          đ
+                        </TableCell>
+                      </TableRow>
+                    )
+                  })}
                 </TableBody>
               </Table>
             )}

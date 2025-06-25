@@ -13,11 +13,6 @@ import BlogTable from './BlogTable'
 import BlogModal from './modal/AddBlogModal'
 import ViewBlogModal from './modal/ViewBlogModal'
 import DeleteBlogModal from './modal/DeleteBlogModal'
-import {
-  createBlog,
-  updateBlog,
-  deleteBlog
-} from '~/services/admin/blogService'
 import useBlog from '~/hooks/admin/useBlog'
 export default function BlogManagementPage() {
   const [error, setError] = useState(null)
@@ -33,7 +28,15 @@ export default function BlogManagementPage() {
     sort: 'newest'
   })
   // Fetch blogs từ API
-  const { blogs, fetchBlogs, totalPages, loading } = useBlog()
+  const {
+    blogs,
+    fetchBlogs,
+    totalPages,
+    loading,
+    removeBlog,
+    updateBlogById,
+    addBlog
+  } = useBlog()
   // Load blogs khi component mount
   useEffect(() => {
     fetchBlogs(page, limit, filters)
@@ -42,20 +45,17 @@ export default function BlogManagementPage() {
   const handleBlogSave = async (blogData, isEditMode) => {
     try {
       if (isEditMode) {
-        // Cập nhật blog
-        const updatedBlog = await updateBlog(selectedBlog._id, blogData)
+        await updateBlogById(selectedBlog._id, blogData)
         toast.success('Cập nhật blog thành công!')
       } else {
         // Tạo blog mới
-        const createdBlog = await createBlog(blogData)
+        await addBlog(blogData)
         toast.success('Tạo blog thành công!')
       }
 
       setOpenBlogModal(false)
       setSelectedBlog(null)
       setBlogModalMode('add')
-      // Refresh lại danh sách để đảm bảo dữ liệu mới nhất
-      fetchBlogs(page, limit, filters)
     } catch (error) {
       console.error('Lỗi khi xử lý blog:', error)
       if (isEditMode) {
@@ -68,12 +68,10 @@ export default function BlogManagementPage() {
 
   const handleDelete = async () => {
     try {
-      await deleteBlog(selectedBlog._id)
+      await removeBlog(selectedBlog._id)
       toast.success('Xóa blog thành công!')
       setOpenDelete(false)
       setSelectedBlog(null)
-      // Refresh lại danh sách
-      fetchBlogs(page, limit, filters)
     } catch (error) {
       console.error('Lỗi khi xóa blog:', error)
       toast.error('Không thể xóa blog. Vui lòng thử lại.')

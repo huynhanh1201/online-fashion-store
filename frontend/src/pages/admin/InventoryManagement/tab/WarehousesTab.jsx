@@ -62,7 +62,7 @@ const WarehousesTab = () => {
     { id: 'city', label: 'Thành phố', minWidth: 100 },
     { id: 'district', label: 'Quận', minWidth: 100 },
     { id: 'ward', label: 'Huyện', minWidth: 100 },
-    { id: 'destroy', label: 'Trạng thái kho hàng', minWidth: 150 },
+    // { id: 'destroy', label: 'Trạng thái kho hàng', minWidth: 150 },
     { id: 'action', label: 'Hành động', minWidth: 150, align: 'start' }
   ]
 
@@ -145,7 +145,8 @@ const WarehousesTab = () => {
   )
 
   // Điều kiện: Chỉ cho phép bấm nút nếu activeWarehouses.length <= 1 và có quyền tạo
-  const isAddDisabled = activeWarehouses.length >= 1 || !hasPermission('warehouse:create')
+  const isAddDisabled =
+    activeWarehouses.length >= 1 || !hasPermission('warehouse:create')
 
   return (
     <Paper sx={{ border: '1px solid #ccc', width: '100%', overflow: 'hidden' }}>

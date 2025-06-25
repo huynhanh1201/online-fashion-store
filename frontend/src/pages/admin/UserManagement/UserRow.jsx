@@ -1,171 +1,202 @@
-// // UserRow.jsx
-// import React from 'react'
-//
-// import IconButton from '@mui/material/IconButton'
-// import TableRow from '@mui/material/TableRow'
-// import Stack from '@mui/material/Stack'
-//
-// import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye'
-// import BorderColorIcon from '@mui/icons-material/BorderColor'
-// import DeleteForeverIcon from '@mui/icons-material/DeleteForever'
-//
-// import { StyledTableCell, StyledTableRow } from '~/assets/StyleAdmin.jsx'
-//
-// const styles = {
-//   groupIcon: {
-//     display: 'flex',
-//     justifyContent: 'space-between',
-//     alignItems: 'center',
-//     width: '100%'
-//   },
-//   iconStyle: {
-//     cursor: 'pointer'
-//   }
-// }
-//
-// export default React.memo(function UserRow({ user, index.jsx, handleOpenModal }) {
-//   return (
-//     <StyledTableRow>
-//       <StyledTableCell sx={{ textAlign: 'center' }}>{index.jsx}</StyledTableCell>
-//       <StyledTableCell title={user.name}>
-//         {user.name
-//           ?.toLowerCase()
-//           .split(' ')
-//           .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-//           .join(' ') || ''}
-//       </StyledTableCell>
-//       <StyledTableCell title={user.email}>{user.email}</StyledTableCell>
-//       <StyledTableCell>
-//         {user.role === 'admin' ? 'QUẢN TRỊ' : 'KHÁCH HÀNG'}
-//       </StyledTableCell>
-//       <StyledTableCell className='hide-on-mobile'>
-//         {new Date(user.createdAt).toLocaleDateString()}
-//       </StyledTableCell>
-//       <StyledTableCell className='hide-on-mobile'>
-//         {new Date(user.updatedAt).toLocaleDateString()}
-//       </StyledTableCell>
-//       <StyledTableCell>
-//         <Stack direction='row' spacing={1} sx={styles.groupIcon}>
-//           <IconButton
-//             onClick={() => handleOpenModal('view', user)}
-//             size='small'
-//           >
-//             <RemoveRedEyeIcon color='primary' />
-//           </IconButton>
-//           <IconButton
-//             onClick={() => handleOpenModal('edit', user)}
-//             size='small'
-//           >
-//             <BorderColorIcon color='warning' />
-//           </IconButton>
-//           <IconButton
-//             onClick={() => handleOpenModal('delete', user)}
-//             size='small'
-//           >
-//             <DeleteForeverIcon color='error' />
-//           </IconButton>
-//         </Stack>
-//       </StyledTableCell>
-//     </StyledTableRow>
-//   )
-// })
 import React from 'react'
-import { TableCell, TableRow, IconButton, Stack } from '@mui/material'
+import {
+  TableCell,
+  TableRow,
+  IconButton,
+  Stack,
+  Chip,
+  Avatar,
+  Tooltip
+} from '@mui/material'
 import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye'
 import BorderColorIcon from '@mui/icons-material/BorderColor'
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever'
-import { StyledTableCell, StyledTableRow } from '~/assets/StyleAdmin.jsx'
-import usePermissions from '~/hooks/usePermissions'
+
+const formatDateTime = (isoString) => {
+  if (!isoString) return 'Không xác định'
+  const date = new Date(isoString)
+  return date.toLocaleDateString('vi-VN', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric'
+  })
+}
 
 const styles = {
   groupIcon: {
     display: 'flex',
-    justifyContent: 'center',
+    justifyContent: 'start',
     alignItems: 'center',
-    gap: 1
+    gap: 1,
+    width: '130px'
+  },
+  cellPadding: {
+    height: 55,
+    minHeight: 55,
+    maxHeight: 55,
+    lineHeight: '49px',
+    py: 0,
+    px: 1,
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    verticalAlign: 'middle'
   }
 }
 
-export default React.memo(function UserRow({
+export default function UserRow({
   user,
   index,
+  columns,
   handleOpenModal,
-  columns
+  permissions = {}
 }) {
-  const { hasPermission } = usePermissions()
-
   return (
     <TableRow hover role='checkbox' tabIndex={-1}>
       {columns.map((column) => {
+        if (column.id === 'avatar') {
+          return (
+            <TableCell
+              key={column.id}
+              align={column.align}
+              sx={styles.cellPadding}
+            >
+              <Avatar
+                src={user.avatarUrl}
+                alt={user.name}
+                sx={{
+                  borderRadius: 0, // hoặc '4px', '50%', v.v.
+                  width: 40,
+                  height: 40,
+                  bgcolor: '#ccc'
+                }}
+              />
+            </TableCell>
+          )
+        }
+
+        if (column.id === 'name') {
+          const originalName = user.name || 'Không có tên'
+          const formattedName = originalName
+            .split(' ')
+            .map(
+              (word) =>
+                word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+            )
+            .join(' ')
+
+          user.name = originalName // cập nhật lại nếu bạn cần dùng sau
+
+          return (
+            <TableCell
+              key={column.id}
+              align={column.align}
+              title={formattedName}
+              sx={{
+                ...styles.cellPadding,
+                maxWidth: 300,
+                display: 'table-cell'
+              }}
+            >
+              {formattedName}
+            </TableCell>
+          )
+        }
+
+        if (column.id === 'email') {
+          return (
+            <TableCell
+              key={column.id}
+              align={column.align}
+              title={user.email}
+              sx={{ ...styles.cellPadding, maxWidth: 200 }}
+            >
+              {user.email || 'Không có email'}
+            </TableCell>
+          )
+        }
+
+        if (column.id === 'role') {
+          return (
+            <TableCell
+              key={column.id}
+              align={column.align}
+              sx={styles.cellPadding}
+            >
+              <Chip
+                label={user?.role.toUpperCase() || 'Không có vai trò'}
+                size='large'
+                sx={{
+                  width: 130,
+                  fontWeight: 800,
+                  backgroundColor: '#001f5d',
+                  color: '#fff'
+                }}
+              />
+            </TableCell>
+          )
+        }
+
         if (column.id === 'action') {
           return (
             <TableCell
               key={column.id}
               align={column.align}
-              sx={{ minHeight: 90, height: 90 }}
+              sx={styles.cellPadding}
             >
               <Stack direction='row' sx={styles.groupIcon}>
-                {hasPermission('user:read') && (
-                  <IconButton
-                    onClick={() => handleOpenModal('view', user)}
-                    size='small'
-                    color='primary'
-                  >
-                    <RemoveRedEyeIcon color='primary' />
-                  </IconButton>
+                {permissions.canView && (
+                  <Tooltip title='Xem'>
+                    <IconButton
+                      onClick={() => handleOpenModal('view', user)}
+                      size='small'
+                    >
+                      <RemoveRedEyeIcon color='primary' />
+                    </IconButton>
+                  </Tooltip>
                 )}
-                {hasPermission('user:update') && (
-                  <IconButton
-                    onClick={() => handleOpenModal('edit', user)}
-                    size='small'
-                    color='info'
-                  >
-                    <BorderColorIcon color='warning' />
-                  </IconButton>
+                {permissions.canEdit && (
+                  <Tooltip title='Sửa'>
+                    <IconButton
+                      onClick={() => handleOpenModal('edit', user)}
+                      size='small'
+                    >
+                      <BorderColorIcon color='warning' />
+                    </IconButton>
+                  </Tooltip>
                 )}
-                {hasPermission('user:delete') && (
-                  <IconButton
-                    onClick={() => handleOpenModal('delete', user)}
-                    size='small'
-                    color='error'
-                  >
-                    <DeleteForeverIcon color='error' />
-                  </IconButton>
+                {permissions.canDelete && (
+                  <Tooltip title='Xoá'>
+                    <IconButton
+                      onClick={() => handleOpenModal('delete', user)}
+                      size='small'
+                    >
+                      <DeleteForeverIcon color='error' />
+                    </IconButton>
+                  </Tooltip>
                 )}
               </Stack>
             </TableCell>
           )
         }
 
-        const value = column.id === 'index' ? index : user[column.id]
+        let value = ''
+        if (column.id === 'index') value = index
+        else if (['createdAt', 'updatedAt'].includes(column.id))
+          value = formatDateTime(user[column.id])
+        else value = user[column.id]
+
         return (
           <TableCell
             key={column.id}
             align={column.align}
-            title={['name', 'email'].includes(column.id) ? value : undefined}
-            className={
-              ['createdAt', 'updatedAt'].includes(column.id)
-                ? 'hide-on-mobile'
-                : ''
-            }
-            sx={{ minHeight: 90, height: 90 }}
+            title={typeof value === 'string' ? value : undefined}
+            sx={styles.cellPadding}
           >
-            {column.id === 'name' && value
-              ? value
-                .toLowerCase()
-                .split(' ')
-                .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-                .join(' ')
-              : column.id === 'role'
-                ? value === 'admin'
-                  ? 'QUẢN TRỊ'
-                  : 'KHÁCH HÀNG'
-                : column.format && value
-                  ? column.format(value)
-                  : (value ?? 'Không có dữ liệu')}
+            {value ?? 'Không có dữ liệu'}
           </TableCell>
         )
       })}
     </TableRow>
   )
-})
+}

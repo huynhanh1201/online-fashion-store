@@ -16,8 +16,6 @@ import MobileDrawer from './Navbar/MobileDrawer/MobileDrawer'
 import Topbar from '../HeaderUser/Topbar/Topbar'
 import Menu from './Navbar/Menu/Menu'
 import AuthButtons from './Navbar/AuthButtons/AuthButtons'
-import { useSelector } from 'react-redux'
-import { selectCurrentUser } from '~/redux/user/userSlice'
 
 const StyledAppBar = styled(AppBar)(({ theme }) => ({
   background: 'linear-gradient(90deg, #ffffff 0%, #f8f9fa 100%)',
@@ -36,7 +34,6 @@ const StyledAppBar = styled(AppBar)(({ theme }) => ({
 const HeaderUser = () => {
   const [mobileOpen, setMobileOpen] = useState(false)
   const headerRef = useRef()
-  const currentUser = useSelector(selectCurrentUser)
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen)
@@ -119,7 +116,7 @@ const HeaderUser = () => {
             >
               <Search />
               <AuthButtons />
-              {currentUser && <HeaderAction />}
+              <HeaderAction />
             </Box>
           </Toolbar>
         </Container>

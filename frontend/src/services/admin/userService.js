@@ -21,6 +21,20 @@ export const getUserById = async (userId) => {
   )
   return response.data
 }
+
+export const updateUser = async (id, data) => {
+  try {
+    const response = await AuthorizedAxiosInstance.patch(
+      `${API_ROOT}/v1/users/${id}`,
+      data
+    )
+    return response.data
+  } catch (error) {
+    console.error('Lỗi khi cập nhật người dùng:', error)
+    throw error
+  }
+}
+
 export const deleteUser = async (id) => {
   try {
     await AuthorizedAxiosInstance.delete(`${API_ROOT}/v1/users/${id}`)

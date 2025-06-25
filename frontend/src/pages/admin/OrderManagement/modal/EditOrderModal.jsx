@@ -18,9 +18,11 @@ import StyleAdmin from '~/assets/StyleAdmin.jsx'
 const statusOptions = [
   'Pending',
   'Processing',
+  'Shipping',
   'Shipped',
   'Delivered',
-  'Cancelled'
+  'Cancelled',
+  'Failed'
 ]
 // [Pending, Processing, Shipped, Delivered, Cancelled]
 const translateStatus = (status) => {
@@ -29,12 +31,16 @@ const translateStatus = (status) => {
       return 'Đang chờ'
     case 'Processing':
       return 'Đang xử lý'
+    case 'Shipping':
+      return 'Đang vận chuyển'
     case 'Shipped':
       return 'Đã gửi hàng'
     case 'Delivered':
       return 'Đã giao hàng'
     case 'Cancelled':
       return 'Đã hủy'
+    case 'Failed':
+      return 'Thất bại'
     default:
       return status
   }

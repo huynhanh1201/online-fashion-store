@@ -439,7 +439,18 @@ const AddVariantModal = ({
                 control={control}
                 rules={{ required: 'Vui lòng chọn sản phẩm' }}
                 render={({ field }) => (
-                  <Select {...field} label='Sản phẩm'>
+                  <Select
+                    {...field}
+                    label='Sản phẩm'
+                    MenuProps={{
+                      PaperProps: {
+                        sx: {
+                          maxHeight: 412, // ✅ Chiều cao tối đa của danh sách dropdown
+                          overflowY: 'auto' // ✅ Hiển thị thanh cuộn dọc
+                        }
+                      }
+                    }}
+                  >
                     {products.map((p) => (
                       <MenuItem
                         key={p._id}
@@ -468,8 +479,13 @@ const AddVariantModal = ({
             <Box sx={{ display: 'flex', gap: 2 }}>
               {/* Màu sắc */}
               <FormControl fullWidth error={!!errors.color}>
-                <InputLabel>Màu sắc</InputLabel>
+                <InputLabel
+                  sx={{ color: !productId ? '#00000061' : 'inherit' }}
+                >
+                  Màu sắc
+                </InputLabel>
                 <Controller
+                  disabled={!productId}
                   name='color'
                   control={control}
                   rules={{
@@ -535,11 +551,15 @@ const AddVariantModal = ({
                   </p>
                 )}
               </FormControl>
-
               {/* Kích thước */}
               <FormControl fullWidth error={!!errors.size}>
-                <InputLabel>Kích thước</InputLabel>
+                <InputLabel
+                  sx={{ color: !productId ? '#00000061' : 'inherit' }}
+                >
+                  Kích thước
+                </InputLabel>
                 <Controller
+                  disabled={!productId}
                   name='size'
                   control={control}
                   rules={{
@@ -616,6 +636,7 @@ const AddVariantModal = ({
               }}
               render={({ field }) => (
                 <TextField
+                  disabled={!productId}
                   label='Giảm giá cho biến thể (đ)'
                   type='text'
                   fullWidth

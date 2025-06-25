@@ -123,10 +123,10 @@ import VisibilityOffIcon from '@mui/icons-material/VisibilityOff'
 const formatDate = (iso) =>
   iso
     ? new Date(iso).toLocaleDateString('vi-VN', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric'
-    })
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric'
+      })
     : '—'
 
 const styles = {
@@ -151,7 +151,13 @@ const styles = {
   }
 }
 
-export default function DiscountRow({ discount, index, columns, onAction, permissions = {} }) {
+export default function DiscountRow({
+  discount,
+  index,
+  columns,
+  onAction,
+  permissions = {}
+}) {
   const remaining = discount.usageLimit - discount.usedCount
 
   return (
@@ -187,10 +193,8 @@ export default function DiscountRow({ discount, index, columns, onAction, permis
           case 'status':
             content = (
               <Chip
-                label={
-                  !discount.isActive ? 'Đang hoạt động' : 'Ngừng hoạt động'
-                }
-                color={!discount.isActive ? 'success' : 'error'}
+                label={discount.isActive ? 'Đang hoạt động' : 'Ngừng hoạt động'}
+                color={discount.isActive ? 'success' : 'error'}
                 size='large'
                 sx={{ width: '127px', fontWeight: '800' }}
               />

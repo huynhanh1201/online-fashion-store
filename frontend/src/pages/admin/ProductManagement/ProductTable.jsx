@@ -223,7 +223,7 @@ const ProductTable = ({
       pr: 7
     },
     { id: 'description', label: 'Mô tả', minWidth: 150, align: 'start' },
-    { id: 'status', label: 'Trạng thái', minWidth: 130, align: 'start' },
+    // { id: 'status', label: 'Trạng thái', minWidth: 130, align: 'start' },
     { id: 'action', label: 'Hành động', minWidth: 130, align: 'start' }
   ]
 
