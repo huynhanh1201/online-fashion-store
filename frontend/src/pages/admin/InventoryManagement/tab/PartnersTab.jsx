@@ -179,19 +179,19 @@ const PartnersTab = () => {
       minWidth: 130,
       format: (val) => (val ? new Date(val).toLocaleDateString('vi-VN') : '—')
     },
-    {
-      id: 'destroy',
-      label: 'Trạng thái hoạt động',
-      minWidth: 150,
-      format: (val) => (
-        <Chip
-          label={val ? 'Không hoạt động' : 'Hoạt động'}
-          color={val ? 'error' : 'success'}
-          size='large'
-          sx={{ width: 127, fontWeight: 800 }}
-        />
-      )
-    },
+    // {
+    //   id: 'destroy',
+    //   label: 'Trạng thái hoạt động',
+    //   minWidth: 150,
+    //   format: (val) => (
+    //     <Chip
+    //       label={val ? 'Không hoạt động' : 'Hoạt động'}
+    //       color={val ? 'error' : 'success'}
+    //       size='large'
+    //       sx={{ width: 127, fontWeight: 800 }}
+    //     />
+    //   )
+    // },
     {
       id: 'action',
       label: 'Hành động',

@@ -6,7 +6,7 @@ import FilterByTime from '~/components/FilterAdmin/common/FilterByTime.jsx'
 import FilterSelect from '~/components/FilterAdmin/common/FilterSelect.jsx'
 import SearchWithSuggestions from '~/components/FilterAdmin/common/SearchWithSuggestions.jsx'
 
-export default function FilterUser({ onFilter, users, loading }) {
+export default function FilterUser({ onFilter, users, loading, roles }) {
   const [keyword, setKeyword] = useState('')
   const [inputValue, setInputValue] = useState('')
   const [selectedFilter, setSelectedFilter] = useState('')
@@ -95,13 +95,10 @@ export default function FilterUser({ onFilter, users, loading }) {
           setRole(value)
           applyFilters(selectedFilter, startDate, endDate)
         }}
-        options={[
-          { label: 'Tất cả', value: '' },
-          { label: 'Chủ sở hữu', value: 'owner' },
-          { label: 'Quản trị viên', value: 'admin' },
-          { label: 'Nhân viên', value: 'staff' },
-          { label: 'Khách hàng', value: 'customer' }
-        ]}
+        options={roles.map((role) => ({
+          label: role.label,
+          value: role._id
+        }))}
         sx={{ width: 160 }}
       />
 

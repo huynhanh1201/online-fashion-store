@@ -90,12 +90,12 @@ const BatchesTab = () => {
       pr: 6,
       format: (value) => `${value.toLocaleString('vi-VN')}đ`
     },
-    {
-      id: 'destroy',
-      label: 'Trạng thái lô hàng',
-      align: 'start',
-      minWidth: 130
-    },
+    // {
+    //   id: 'destroy',
+    //   label: 'Trạng thái lô hàng',
+    //   align: 'start',
+    //   minWidth: 130
+    // },
     {
       id: 'importedAt',
       label: 'Ngày nhập',

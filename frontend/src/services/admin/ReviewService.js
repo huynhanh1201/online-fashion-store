@@ -9,7 +9,7 @@ export const getReviews = async (filter) => {
     )
     return {
       data: response.data || [],
-      total: response.data.lenght || 0
+      total: response.data.length || 1
     }
   } catch (error) {
     console.error('Lỗi khi lấy danh sách đánh giá:', error)

@@ -36,12 +36,12 @@ const ColorTable = ({
     { id: 'name', label: 'Tên màu', align: 'left', minWidth: 200 },
     { id: 'createdAt', label: 'Ngày tạo', align: 'left', minWidth: 200 },
     { id: 'updatedAt', label: 'Ngày cập nhật', align: 'left', minWidth: 200 },
-    {
-      id: 'destroy',
-      label: 'Trạng thái màu sắc',
-      align: 'left',
-      minWidth: 150
-    },
+    // {
+    //   id: 'destroy',
+    //   label: 'Trạng thái màu sắc',
+    //   align: 'left',
+    //   minWidth: 150
+    // },
     {
       id: 'action',
       label: 'Hành động',

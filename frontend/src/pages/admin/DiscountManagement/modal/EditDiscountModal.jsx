@@ -151,6 +151,7 @@ const EditDiscountModal = ({ open, onClose, discount, onSave }) => {
                   >
                     <InputLabel id='type-label'>Loại giảm giá</InputLabel>
                     <Select
+                      disabled
                       labelId='type-label'
                       label='Loại giảm giá'
                       {...field}
@@ -186,6 +187,7 @@ const EditDiscountModal = ({ open, onClose, discount, onSave }) => {
                   fieldState: { error }
                 }) => (
                   <TextField
+                    disabled
                     label={
                       type === 'fixed' ? 'Giá trị giảm (đ)' : 'Giá trị giảm (%)'
                     }

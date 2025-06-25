@@ -44,7 +44,7 @@ const ReviewManagement = () => {
       setFilter(newFilters)
     }
   }
-
+  const handleChangePage = (event, value) => setPage(value)
   return (
     <RouteGuard requiredPermissions={['review:read']}>
       <ReviewTable
@@ -53,12 +53,12 @@ const ReviewManagement = () => {
         page={page - 1}
         rowsPerPage={limit}
         total={totalPages}
-        handleOpenModal={handleOpenModal}
-        onPageChange={(_, value) => setPage(value)}
+        onPageChange={handleChangePage}
         onChangeRowsPerPage={(newLimit) => {
           setPage(1)
           setLimit(newLimit)
         }}
+        handleOpenModal={handleOpenModal}
         permissions={{
           canView: hasPermission('review:read'),
           canDelete: hasPermission('review:delete')

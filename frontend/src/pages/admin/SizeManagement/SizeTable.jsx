@@ -199,12 +199,12 @@ const SizeTable = ({
 
     { id: 'createdAt', label: 'Ngày tạo', minWidth: 200, align: 'left' },
     { id: 'updatedAt', label: 'Ngày cập nhật', minWidth: 200, align: 'left' },
-    {
-      id: 'destroy',
-      label: 'Trạng thái kích thước',
-      minWidth: 150,
-      align: 'left'
-    },
+    // {
+    //   id: 'destroy',
+    //   label: 'Trạng thái kích thước',
+    //   minWidth: 150,
+    //   align: 'left'
+    // },
     { id: 'action', label: 'Hành động', minWidth: 150, align: 'left' }
   ]
   return (

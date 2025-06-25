@@ -9,7 +9,11 @@ import {
   Box,
   Divider,
   Avatar,
-  Chip
+  Chip,
+  Table,
+  TableBody,
+  TableRow,
+  TableCell
 } from '@mui/material'
 import ImageNotSupportedIcon from '@mui/icons-material/ImageNotSupported'
 import StyleAdmin from '~/assets/StyleAdmin.jsx'
@@ -54,7 +58,6 @@ const ViewUserModal = ({ open, onClose, user }) => {
               justifyContent='center'
               border='2px dashed #ccc'
               borderRadius={2}
-              p={2}
               minHeight={200}
               sx={{
                 backgroundColor: '#fafafa',
@@ -66,7 +69,7 @@ const ViewUserModal = ({ open, onClose, user }) => {
                 <Avatar
                   src={optimizeCloudinaryUrl(user.avatarUrl)}
                   alt={user.name}
-                  sx={{ width: 150, height: 150 }}
+                  sx={{ width: '100%', height: '100%', borderRadius: '0' }}
                 />
               ) : (
                 <Box textAlign='center' color='#999'>
@@ -80,51 +83,50 @@ const ViewUserModal = ({ open, onClose, user }) => {
 
             {/* Thông tin phải */}
             <Box flex={1}>
-              <Box mb={2}>
-                <Typography variant='subtitle2' fontWeight='bold'>
-                  Tên người dùng
-                </Typography>
-                <Typography>{user.name || '—'}</Typography>
-              </Box>
+              <Table>
+                <TableBody>
+                  <TableRow>
+                    <TableCell sx={{ fontWeight: 'bold', width: '30%' }}>
+                      Tên người dùng
+                    </TableCell>
+                    <TableCell>{user.name || '—'}</TableCell>
+                  </TableRow>
 
-              <Box mb={2}>
-                <Typography variant='subtitle2' fontWeight='bold'>
-                  Email
-                </Typography>
-                <Typography>{user.email || '—'}</Typography>
-              </Box>
+                  <TableRow>
+                    <TableCell sx={{ fontWeight: 'bold' }}>Email</TableCell>
+                    <TableCell>{user.email || '—'}</TableCell>
+                  </TableRow>
 
-              <Box mb={2}>
-                <Typography variant='subtitle2' fontWeight='bold'>
-                  Vai trò
-                </Typography>
-                <Typography sx={{ textTransform: 'capitalize' }}>
-                  <Chip
-                    label={user?.role.toUpperCase() || 'Không có vai trò'}
-                    size='large'
-                    sx={{
-                      width: 130,
-                      fontWeight: 800,
-                      backgroundColor: '#001f5d',
-                      color: '#fff'
-                    }}
-                  />
-                </Typography>
-              </Box>
+                  <TableRow>
+                    <TableCell sx={{ fontWeight: 'bold' }}>Vai trò</TableCell>
+                    <TableCell>
+                      <Chip
+                        label={user?.role?.toUpperCase() || 'Không có vai trò'}
+                        size='medium'
+                        sx={{
+                          width: 130,
+                          fontWeight: 800,
+                          backgroundColor: '#001f5d',
+                          color: '#fff',
+                          textTransform: 'uppercase'
+                        }}
+                      />
+                    </TableCell>
+                  </TableRow>
 
-              <Box mb={2}>
-                <Typography variant='subtitle2' fontWeight='bold'>
-                  Ngày tạo
-                </Typography>
-                <Typography>{formatDate(user.createdAt)}</Typography>
-              </Box>
+                  <TableRow>
+                    <TableCell sx={{ fontWeight: 'bold' }}>Ngày tạo</TableCell>
+                    <TableCell>{formatDate(user.createdAt)}</TableCell>
+                  </TableRow>
 
-              <Box>
-                <Typography variant='subtitle2' fontWeight='bold'>
-                  Ngày cập nhật
-                </Typography>
-                <Typography>{formatDate(user.updatedAt)}</Typography>
-              </Box>
+                  <TableRow>
+                    <TableCell sx={{ fontWeight: 'bold' }}>
+                      Ngày cập nhật
+                    </TableCell>
+                    <TableCell>{formatDate(user.updatedAt)}</TableCell>
+                  </TableRow>
+                </TableBody>
+              </Table>
             </Box>
           </Box>
         ) : (

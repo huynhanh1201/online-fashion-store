@@ -27,6 +27,7 @@ const UserTable = ({
   onPageChange,
   onChangeRowsPerPage,
   total,
+  roles,
   permissions = {}
 }) => {
   const columns = [
@@ -74,6 +75,7 @@ const UserTable = ({
                     onFilter={onFilters}
                     users={users}
                     loading={loading}
+                    roles={roles}
                   />
                 </Box>
               </TableCell>

@@ -20,34 +20,31 @@ import TableNoneData from '~/components/TableAdmin/NoneData.jsx'
 const ReviewTable = ({
   reviews,
   loading,
-  page,
-  rowsPerPage,
   handleOpenModal,
-  onFilters,
-  fetchReviews,
-  onPageChange,
-  onChangeRowsPerPage,
   total,
   permissions = {},
-  onFilter
+  onFilter,
+  onChangeRowsPerPage,
+  onPageChange,
+  page,
+  rowsPerPage
 }) => {
   const columns = [
     { id: 'index', label: 'STT', align: 'center', width: 50 },
+    { id: 'product', label: 'Sản phẩm', align: 'left', minWidth: 200 },
     { id: 'user', label: 'Người dùng', align: 'left', minWidth: 150 },
-    { id: 'rating', label: 'Số sao', align: 'center', minWidth: 100 },
-    { id: 'comment', label: 'Bình luận', align: 'left', minWidth: 300 },
-    { id: 'isVerified', label: 'Đã mua', align: 'center', minWidth: 100 },
+    { id: 'rating', label: 'Số sao', align: 'right', minWidth: 200, pr: 10 },
     {
       id: 'moderationStatus',
       label: 'Trạng thái kiểm duyệt',
-      align: 'center',
+      align: 'left',
       minWidth: 160
     },
     { id: 'createdAt', label: 'Ngày đánh giá', align: 'left', minWidth: 200 },
     {
       id: 'action',
       label: 'Hành động',
-      align: 'center',
+      align: 'left',
       width: 130,
       maxWidth: 130,
       pl: '20px'
@@ -65,10 +62,14 @@ const ReviewTable = ({
                   sx={{
                     display: 'flex',
                     justifyContent: 'space-between',
-                    alignItems: 'start'
+                    alignItems: 'start',
+                    minHeight: 76.5
                   }}
                 >
-                  <Typography variant='h6' sx={{ fontWeight: '800' }}>
+                  <Typography
+                    variant='h6'
+                    sx={{ fontWeight: '800', minWidth: 274 }}
+                  >
                     Danh sách đánh giá sản phẩm
                   </Typography>
                   <FilterReview
@@ -92,6 +93,7 @@ const ReviewTable = ({
                     ...(column.pl && {
                       paddingLeft: (theme) => theme.spacing(column.pl)
                     }),
+                    pr: column.pr,
                     whiteSpace: 'nowrap'
                   }}
                 >

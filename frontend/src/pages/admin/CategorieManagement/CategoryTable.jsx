@@ -47,12 +47,12 @@ const CategoryTable = ({
     { id: 'createdAt', label: 'Ngày tạo', align: 'start', minWidth: 150 },
     { id: 'updatedAt', label: 'Ngày cập nhật', align: 'start', minWidth: 150 },
     { id: 'more', label: 'Xem các sản phẩm', align: 'start', minWidth: 150 },
-    {
-      id: 'destroy',
-      label: 'Trạng thái danh mục',
-      align: 'center',
-      minWidth: 170
-    },
+    // {
+    //   id: 'destroy',
+    //   label: 'Trạng thái danh mục',
+    //   align: 'center',
+    //   minWidth: 170
+    // },
     {
       id: 'action',
       label: 'Hành động',

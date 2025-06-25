@@ -209,7 +209,7 @@ const DiscountTable = ({
       align: 'right',
       pr: 9
     },
-    { id: 'status', label: 'Trạng thái hoạt động', minWidth: 150 },
+    // { id: 'status', label: 'Trạng thái hoạt động', minWidth: 150 },
     { id: 'action', label: 'Hành động', minWidth: 150, align: 'start' }
   ]
 

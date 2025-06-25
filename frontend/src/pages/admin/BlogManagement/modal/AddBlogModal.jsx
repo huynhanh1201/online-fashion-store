@@ -119,7 +119,7 @@ const BlogModal = ({
 
   const [imageUrls, setImageUrls] = useState([''])
   const [uploading, setUploading] = useState(false)
-  const [uploadingIndex, setUploadingIndex] = useState(null)
+  const [currentTagInput, setCurrentTagInput] = useState('')
   const fileInputRef = useRef()
   const categories = [
     'Trang phục',
@@ -159,9 +159,8 @@ const BlogModal = ({
         status: blogData.status || 'draft',
         metaTitle: blogData.meta?.title || '',
         metaDescription: blogData.meta?.description || '',
-        metaKeywords: blogData.meta?.keywords || []
+        metaKeywords: blogData.meta?.title || []
       })
-
       // Set image URLs for additional images
       if (blogData.images && blogData.images.length > 0) {
         setImageUrls([...blogData.images, ''])
@@ -187,21 +186,6 @@ const BlogModal = ({
       setImageUrls([''])
     }
   }, [isEditMode, blogData, reset])
-
-  const handleAddImageUrl = () => {
-    setImageUrls([...imageUrls, ''])
-  }
-
-  const handleRemoveImageUrl = (index) => {
-    const newUrls = imageUrls.filter((_, i) => i !== index)
-    setImageUrls(newUrls)
-  }
-
-  const handleImageUrlChange = (index, value) => {
-    const newUrls = [...imageUrls]
-    newUrls[index] = value
-    setImageUrls(newUrls)
-  }
 
   const handleCoverImageUpload = async (event) => {
     const file = event.target.files[0]
@@ -229,31 +213,6 @@ const BlogModal = ({
     }
   }
 
-  const handleImageUpload = async (event, index) => {
-    const file = event.target.files[0]
-    if (!file) return
-
-    if (!file.type.startsWith('image/')) {
-      toast.error('Vui lòng chọn file hình ảnh')
-      return
-    }
-
-    if (file.size > 5 * 1024 * 1024) {
-      toast.error('Kích thước file không được vượt quá 5MB')
-      return
-    }
-
-    setUploadingIndex(index)
-    try {
-      const imageUrl = await uploadToCloudinary(file, 'blog_images')
-      handleImageUrlChange(index, imageUrl)
-      toast.success('Upload ảnh thành công!')
-    } catch (error) {
-      toast.error('Có lỗi xảy ra khi upload ảnh: ' + error.message)
-    } finally {
-      setUploadingIndex(null)
-    }
-  }
   const handleImageInsertFromEditor = (url) => {
     // Chỉ thêm nếu ảnh chưa có trong imageUrls
     setImageUrls((prev) => {
@@ -264,23 +223,27 @@ const BlogModal = ({
   }
 
   const onSubmit = (data) => {
+    let finalTags = data.tags || []
+    if (currentTagInput.trim() !== '') {
+      finalTags = [...finalTags, currentTagInput.trim()]
+    }
+
     const blogPayload = {
       title: data.title,
       excerpt: data.excerpt,
       content: data.content,
       coverImage: data.coverImage,
       images: imageUrls.filter((url) => url.trim() !== ''),
-      tags: data.tags,
+      tags: finalTags,
       category: data.category,
       brand: data.brand,
       status: data.status,
       meta: {
         title: data.metaTitle || data.title,
         description: data.metaDescription || data.excerpt,
-        keywords: data.metaKeywords
+        keywords: Array(data.metaTitle || data.title)
       }
     }
-
     onSave(blogPayload, isEditMode)
     handleClose()
   }
@@ -292,6 +255,18 @@ const BlogModal = ({
   }
 
   const watchedValues = watch()
+  // Ở trong component BlogModal
+  const statusOptions = [
+    { value: 'draft', label: 'Bản nháp', color: '#ff9800' },
+    { value: 'published', label: 'Đã xuất bản', color: '#4caf50' },
+    { value: 'archived', label: 'Lưu trữ', color: '#9e9e9e' }
+  ]
+
+  // Lọc trạng thái khi blog đã từng là 'published' hoặc 'archived'
+  const filteredStatusOptions =
+    isEditMode && ['published', 'archived'].includes(blogData?.status)
+      ? statusOptions.filter((s) => s.value !== 'draft')
+      : statusOptions
 
   return (
     <Dialog
@@ -321,75 +296,6 @@ const BlogModal = ({
       }}
     >
       <form onSubmit={handleSubmit(onSubmit)}>
-        {/*<DialogTitle*/}
-        {/*  sx={{*/}
-        {/*    // background: 'linear-gradient(135deg, #0052cc 0%, #2684ff 100%)',*/}
-        {/*    color: 'white',*/}
-        {/*    py: isMobile ? 1.5 : 2,*/}
-        {/*    px: isMobile ? 2 : 3,*/}
-        {/*    display: 'flex',*/}
-        {/*    alignItems: 'start',*/}
-        {/*    justifyContent: 'space-between',*/}
-        {/*    minHeight: isMobile ? '56px' : '64px'*/}
-        {/*  }}*/}
-        {/*>*/}
-        {/*  <Box*/}
-        {/*    sx={{*/}
-        {/*      display: 'flex',*/}
-        {/*      alignItems: 'start',*/}
-        {/*      gap: 1.5,*/}
-        {/*      flexDirection: 'column'*/}
-        {/*    }}*/}
-        {/*  >*/}
-        {/*    /!*{isEditMode ? (*!/*/}
-        {/*    /!*  <EditIcon sx={{ fontSize: isMobile ? 20 : 24 }} />*!/*/}
-        {/*    /!*) : (*!/*/}
-        {/*    /!*  <ArticleIcon sx={{ fontSize: isMobile ? 20 : 24 }} />*!/*/}
-        {/*    /!*)}*!/*/}
-        {/*    <Typography*/}
-        {/*      variant={isMobile ? 'subtitle1' : 'h6'}*/}
-        {/*      sx={{*/}
-        {/*        color: '#000',*/}
-        {/*        fontWeight: 600,*/}
-        {/*        fontSize: isMobile ? '1rem' : '1.25rem',*/}
-        {/*        lineHeight: 1.2*/}
-        {/*      }}*/}
-        {/*    >*/}
-        {/*      {isEditMode ? 'Chỉnh sửa bài viết' : 'Tạo bài viết mới'}*/}
-        {/*    </Typography>*/}
-        {/*    <DialogActions sx={{ px: 0 }}>*/}
-        {/*      <Button*/}
-        {/*        onClick={handleClose}*/}
-        {/*        variant='outlined'*/}
-        {/*        color='error'*/}
-        {/*        sx={{ textTransform: 'none' }}*/}
-        {/*      >*/}
-        {/*        Hủy*/}
-        {/*      </Button>*/}
-        {/*      <Button*/}
-        {/*        type='submit'*/}
-        {/*        variant='contained'*/}
-        {/*        sx={{*/}
-        {/*          backgroundColor: '#001f5d',*/}
-        {/*          color: '#fff',*/}
-        {/*          textTransform: 'none'*/}
-        {/*        }}*/}
-        {/*      >*/}
-        {/*        {isEditMode ? 'Cập nhật bài viết' : 'Tạo bài viết'}*/}
-        {/*      </Button>*/}
-        {/*    </DialogActions>*/}
-        {/*  </Box>*/}
-
-        {/*  /!*<IconButton*!/*/}
-        {/*  /!*  onClick={handleClose}*!/*/}
-        {/*  /!*  size={isMobile ? 'small' : 'medium'}*!/*/}
-        {/*  /!*  sx={{*!/*/}
-        {/*  /!*    color: 'white',*!/*/}
-        {/*  /!*    '&:hover': { backgroundColor: 'rgba(255, 255, 255, 0.12)' }*!/*/}
-        {/*  /!*  }}*!/*/}
-        {/*  /!*>*!/*/}
-        {/*  /!*  <CloseIcon />*!/*/}
-        {/*  /!*</IconButton>*!/*/}
         {/*</DialogTitle>*/}
         <DialogTitle
           sx={{
@@ -511,63 +417,27 @@ const BlogModal = ({
                             }
                           }}
                         >
-                          <MenuItem value='draft'>
-                            <Box
-                              sx={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: 1
-                              }}
-                            >
+                          {filteredStatusOptions.map((status) => (
+                            <MenuItem key={status.value} value={status.value}>
                               <Box
                                 sx={{
-                                  width: 8,
-                                  height: 8,
-                                  borderRadius: '50%',
-                                  bgcolor: '#ff9800'
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  gap: 1
                                 }}
-                              />
-                              Bản nháp
-                            </Box>
-                          </MenuItem>
-                          <MenuItem value='published'>
-                            <Box
-                              sx={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: 1
-                              }}
-                            >
-                              <Box
-                                sx={{
-                                  width: 8,
-                                  height: 8,
-                                  borderRadius: '50%',
-                                  bgcolor: '#4caf50'
-                                }}
-                              />
-                              Đã xuất bản
-                            </Box>
-                          </MenuItem>
-                          <MenuItem value='archived'>
-                            <Box
-                              sx={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: 1
-                              }}
-                            >
-                              <Box
-                                sx={{
-                                  width: 8,
-                                  height: 8,
-                                  borderRadius: '50%',
-                                  bgcolor: '#9e9e9e'
-                                }}
-                              />
-                              Lưu trữ
-                            </Box>
-                          </MenuItem>
+                              >
+                                <Box
+                                  sx={{
+                                    width: 8,
+                                    height: 8,
+                                    borderRadius: '50%',
+                                    bgcolor: status.color
+                                  }}
+                                />
+                                {status.label}
+                              </Box>
+                            </MenuItem>
+                          ))}
                         </Select>
                       )}
                     />
@@ -714,14 +584,18 @@ const BlogModal = ({
                       control={control}
                       render={({ field }) => (
                         <Autocomplete
-                          {...field}
                           multiple
                           freeSolo
-                          options={[]}
-                          value={field.value}
-                          onChange={(event, newValue) =>
-                            field.onChange(newValue)
+                          options={[]} // nếu có gợi ý thì thêm vào
+                          value={field.value || []}
+                          inputValue={currentTagInput}
+                          onInputChange={(_, newInputValue) =>
+                            setCurrentTagInput(newInputValue)
                           }
+                          onChange={(_, newValue) => {
+                            field.onChange(newValue)
+                            setCurrentTagInput('')
+                          }}
                           renderTags={(value, getTagProps) =>
                             value.map((option, index) => (
                               <Chip
@@ -734,7 +608,6 @@ const BlogModal = ({
                                   backgroundColor: '#e3f2fd',
                                   color: '#0052cc',
                                   fontWeight: 500,
-                                  '&:hover': { backgroundColor: '#bbdefb' },
                                   '& .MuiChip-deleteIcon': {
                                     color: '#0052cc',
                                     '&:hover': { color: '#003d99' }
@@ -750,7 +623,7 @@ const BlogModal = ({
                               placeholder='Nhập tag và nhấn Enter'
                               helperText='VD: thời trang, xu hướng'
                               variant='outlined'
-                              sx={getInputStyles(theme)}
+                              sx={getInputStyles()}
                             />
                           )}
                         />
@@ -941,146 +814,6 @@ const BlogModal = ({
                 </Paper>
               </Box>
             </Box>
-
-            {/* Section 4: Additional Images */}
-            {/*<Paper*/}
-            {/*  sx={{*/}
-            {/*    p: isMobile ? 2 : 2.5,*/}
-            {/*    borderRadius: '8px',*/}
-            {/*    border: '1px solid #e8ecef',*/}
-            {/*    boxShadow: '0 2px 8px rgba(0, 31, 93, 0.06)'*/}
-            {/*  }}*/}
-            {/*>*/}
-            {/*  <Typography*/}
-            {/*    variant='subtitle1'*/}
-            {/*    sx={{*/}
-            {/*      display: 'flex',*/}
-            {/*      alignItems: 'center',*/}
-            {/*      gap: 1,*/}
-            {/*      color: '#1a202c',*/}
-            {/*      fontWeight: 600,*/}
-            {/*      mb: 2,*/}
-            {/*      fontSize: isMobile ? '1rem' : '1.1rem'*/}
-            {/*    }}*/}
-            {/*  >*/}
-            {/*    <ImageIcon sx={{ color: '#0052cc', fontSize: 20 }} />*/}
-            {/*    Ảnh bổ sung*/}
-            {/*  </Typography>*/}
-
-            {/*  <Stack spacing={2}>*/}
-            {/*    {imageUrls.map((url, index) => (*/}
-            {/*      <Box*/}
-            {/*        key={index}*/}
-            {/*        sx={{*/}
-            {/*          p: isMobile ? 1.5 : 2,*/}
-            {/*          backgroundColor: '#fafbff',*/}
-            {/*          border: '1px solid #e8f4fd',*/}
-            {/*          borderRadius: 2*/}
-            {/*        }}*/}
-            {/*      >*/}
-            {/*        <Box*/}
-            {/*          sx={{*/}
-            {/*            display: 'flex',*/}
-            {/*            flexDirection: isMobile ? 'column' : 'row',*/}
-            {/*            gap: 1.5,*/}
-            {/*            alignItems: 'flex-start'*/}
-            {/*          }}*/}
-            {/*        >*/}
-            {/*          <TextField*/}
-            {/*            label={`Ảnh ${index + 1}`}*/}
-            {/*            fullWidth*/}
-            {/*            value={url}*/}
-            {/*            onChange={(e) =>*/}
-            {/*              handleImageUrlChange(index, e.target.value)*/}
-            {/*            }*/}
-            {/*            variant='outlined'*/}
-            {/*            sx={{*/}
-            {/*              ...getInputStyles(theme),*/}
-            {/*              '& .MuiOutlinedInput-root': {*/}
-            {/*                ...getInputStyles(theme)[*/}
-            {/*                  '& .MuiOutlinedInput-root'*/}
-            {/*                ],*/}
-            {/*                backgroundColor: 'white'*/}
-            {/*              }*/}
-            {/*            }}*/}
-            {/*          />*/}
-
-            {/*          <Box*/}
-            {/*            sx={{*/}
-            {/*              display: 'flex',*/}
-            {/*              gap: 1,*/}
-            {/*              width: isMobile ? '100%' : 'auto'*/}
-            {/*            }}*/}
-            {/*          >*/}
-            {/*            <Button*/}
-            {/*              variant='contained'*/}
-            {/*              component='label'*/}
-            {/*              startIcon={*/}
-            {/*                uploadingIndex === index ? (*/}
-            {/*                  <CircularProgress size={14} color='inherit' />*/}
-            {/*                ) : (*/}
-            {/*                  <UploadIcon />*/}
-            {/*                )*/}
-            {/*              }*/}
-            {/*              disabled={uploadingIndex === index}*/}
-            {/*              sx={{*/}
-            {/*                minWidth: isMobile ? '50%' : '100px',*/}
-            {/*                height: '56px',*/}
-            {/*                borderRadius: 2,*/}
-            {/*                backgroundColor: '#0052cc',*/}
-            {/*                '&:hover': {*/}
-            {/*                  backgroundColor: '#003d99'*/}
-            {/*                }*/}
-            {/*              }}*/}
-            {/*            >*/}
-            {/*              {uploadingIndex === index ? 'Tải...' : 'Upload'}*/}
-            {/*              <input*/}
-            {/*                type='file'*/}
-            {/*                hidden*/}
-            {/*                accept='image/*'*/}
-            {/*                onChange={(e) => handleImageUpload(e, index)}*/}
-            {/*              />*/}
-            {/*            </Button>*/}
-
-            {/*            <Button*/}
-            {/*              variant='outlined'*/}
-            {/*              color='error'*/}
-            {/*              onClick={() => handleRemoveImageUrl(index)}*/}
-            {/*              disabled={imageUrls.length === 1}*/}
-            {/*              sx={{*/}
-            {/*                minWidth: isMobile ? '50%' : '80px',*/}
-            {/*                height: '56px',*/}
-            {/*                borderRadius: 2*/}
-            {/*              }}*/}
-            {/*            >*/}
-            {/*              Xóa*/}
-            {/*            </Button>*/}
-            {/*          </Box>*/}
-            {/*        </Box>*/}
-            {/*      </Box>*/}
-            {/*    ))}*/}
-
-            {/*    <Button*/}
-            {/*      variant='outlined'*/}
-            {/*      startIcon={<ImageIcon />}*/}
-            {/*      onClick={handleAddImageUrl}*/}
-            {/*      sx={{*/}
-            {/*        py: 1.5,*/}
-            {/*        borderRadius: 2,*/}
-            {/*        borderColor: '#0052cc',*/}
-            {/*        color: '#0052cc',*/}
-            {/*        borderStyle: 'dashed',*/}
-            {/*        '&:hover': {*/}
-            {/*          borderColor: '#003d99',*/}
-            {/*          backgroundColor: '#f0f4ff',*/}
-            {/*          borderStyle: 'solid'*/}
-            {/*        }*/}
-            {/*      }}*/}
-            {/*    >*/}
-            {/*      Thêm ảnh*/}
-            {/*    </Button>*/}
-            {/*  </Stack>*/}
-            {/*</Paper>*/}
 
             {/* Section 5: Content Editor */}
             <Paper

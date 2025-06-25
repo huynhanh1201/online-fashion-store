@@ -23,7 +23,6 @@ import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css'
 import ProductImages from '../component/ProductImageUploader.jsx'
 import ProductDescriptionEditor from '../component/ProductDescriptionEditor.jsx'
 import { CloudinaryColor, CloudinaryProduct, URI } from '~/utils/constants'
-import useVariants from '~/hooks/admin/Inventory/useVariants.js'
 const uploadToCloudinary = async (file, folder = CloudinaryColor) => {
   const formData = new FormData()
   formData.append('file', file)
@@ -65,7 +64,6 @@ const EditProductModal = ({ open, onClose, onSave, product }) => {
       }
     }
   })
-  const { variants, fetchVariants } = useVariants()
   const [categoryOpen, setCategoryOpen] = useState(false)
   const [productImages, setProductImages] = useState(product.imageUrls || [])
   const [productImagePreview, setProductImagePreview] = useState(
@@ -80,17 +78,6 @@ const EditProductModal = ({ open, onClose, onSave, product }) => {
   }
 
   const parseNumber = (formatted) => formatted.replace(/\./g, '')
-
-  const [hasVariants, setHasVariants] = useState(false)
-  useEffect(() => {
-    if (open && product) {
-      fetchVariants(1, 1, { productId: product._id })
-    }
-  }, [product, open])
-
-  useEffect(() => {
-    setHasVariants(variants.length > 0)
-  }, [variants])
 
   // Load dữ liệu sản phẩm khi modal mở
   useEffect(() => {
@@ -228,12 +215,8 @@ const EditProductModal = ({ open, onClose, onSave, product }) => {
                   label='Tên sản phẩm'
                   fullWidth
                   error={!!errors?.name}
-                  helperText={
-                    hasVariants
-                      ? 'Sản phẩm này có các biến thể hoặc đơn hàng không thể sửa.'
-                      : errors?.name?.message
-                  }
-                  disabled={hasVariants}
+                  helperText={'Không thể sửa tên vì sản phẩm đã có liên kết'}
+                  disabled
                   {...field}
                 />
               )}

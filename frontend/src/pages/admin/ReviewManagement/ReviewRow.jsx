@@ -26,16 +26,44 @@ const ReviewRow = ({
   handleOpenModal,
   permissions = {}
 }) => {
+  const styles = {
+    groupIcon: {
+      display: 'flex',
+      justifyContent: 'start',
+      alignItems: 'center',
+      gap: 1,
+      width: '130px'
+    },
+    cellPadding: {
+      height: 55,
+      minHeight: 55,
+      maxHeight: 55,
+      lineHeight: '49px',
+      py: 0,
+      px: 1,
+      whiteSpace: 'nowrap',
+      overflow: 'hidden',
+      textOverflow: 'ellipsis',
+      verticalAlign: 'middle'
+    }
+  }
   return (
     <TableRow hover role='checkbox' tabIndex={-1}>
       {columns.map((column) => {
         let value = ''
         if (column.id === 'index') value = index
+        else if (column.id === 'user') value = review?.userId?.name
+        else if (column.id === 'product')
+          value = review?.productId?.name || 'không có dữ liệu'
         else if (column.id === 'comment') value = review.comment
         else if (column.id === 'rating') value = review.rating
         else if (column.id === 'moderationStatus') {
           return (
-            <TableCell key={column.id} align={column.align}>
+            <TableCell
+              key={column.id}
+              align={column.align}
+              sx={styles.cellPadding}
+            >
               <Chip
                 label={
                   review.moderationStatus === 'approved'
@@ -51,13 +79,19 @@ const ReviewRow = ({
                       ? 'error'
                       : 'warning'
                 }
+                size='large'
+                sx={{ width: '130px', fontWeight: 800 }}
               />
             </TableCell>
           )
         } else if (column.id === 'action') {
           return (
-            <TableCell key={column.id} align={column.align}>
-              <Stack direction='row' spacing={1}>
+            <TableCell
+              key={column.id}
+              align={column.align}
+              sx={styles.cellPadding}
+            >
+              <Stack direction='row' spacing={1} sx={styles.groupIcon}>
                 {permissions.canView && (
                   <Tooltip title='Xem chi tiết'>
                     <IconButton onClick={() => handleOpenModal('view', review)}>
@@ -68,6 +102,7 @@ const ReviewRow = ({
                 {permissions.canDelete && (
                   <Tooltip title='Xoá'>
                     <IconButton
+                      sx={{ ml: '0 !important' }}
                       onClick={() => handleOpenModal('delete', review)}
                     >
                       <DeleteIcon color='error' />
@@ -84,7 +119,14 @@ const ReviewRow = ({
         }
 
         return (
-          <TableCell key={column.id} align={column.align}>
+          <TableCell
+            key={column.id}
+            align={column.align}
+            sx={{
+              ...styles.cellPadding,
+              ...(column.id === 'rating' && { pr: column.pr })
+            }}
+          >
             {value}
           </TableCell>
         )

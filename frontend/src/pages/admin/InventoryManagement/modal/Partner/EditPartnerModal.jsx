@@ -92,7 +92,8 @@ export default function EditPartnerModal({
                   }
                 })}
                 error={!!errors.name}
-                helperText={errors.name?.message}
+                helperText={'Không thể sửa tên vì đối tác đã có liên kết'}
+                disabled
               />
             </Grid>
             <Grid item size={12} xs={12}>

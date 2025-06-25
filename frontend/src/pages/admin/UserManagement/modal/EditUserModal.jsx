@@ -15,7 +15,7 @@ import {
 import { useForm, Controller } from 'react-hook-form'
 import StyleAdmin from '~/assets/StyleAdmin.jsx'
 
-const EditUserModal = ({ open, onClose, user, onSave }) => {
+const EditUserModal = ({ open, onClose, user, onSave, roles }) => {
   const {
     control,
     handleSubmit,
@@ -40,7 +40,7 @@ const EditUserModal = ({ open, onClose, user, onSave }) => {
     onClose()
   }
 
-  const roleOptions = ['owner', 'admin', 'staff', 'customer']
+  const roleOptions = roles.map((role) => role.name)
 
   return (
     <Dialog

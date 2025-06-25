@@ -135,9 +135,7 @@ const AddCategoryModal = ({
               justifyContent='center'
               border='2px dashed #ccc'
               borderRadius={2}
-              p={2}
               position='relative'
-              minHeight={200}
               sx={{
                 backgroundColor: '#fafafa',
                 cursor: 'pointer',
@@ -154,8 +152,8 @@ const AddCategoryModal = ({
                     alt='Ảnh danh mục'
                     style={{
                       width: '100%',
-                      maxHeight: 200,
-                      objectFit: 'contain',
+                      height: '100%',
+                      objectFit: 'cover',
                       borderRadius: 8
                     }}
                   />

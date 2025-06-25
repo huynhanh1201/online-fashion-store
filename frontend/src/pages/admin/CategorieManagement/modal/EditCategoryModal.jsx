@@ -16,7 +16,6 @@ import {
 import EditIcon from '@mui/icons-material/Edit'
 import DeleteIcon from '@mui/icons-material/Delete'
 import AddPhotoAlternateIcon from '@mui/icons-material/AddPhotoAlternate'
-import useProducts from '~/hooks/admin/useProducts.js'
 import { useForm } from 'react-hook-form'
 import StyleAdmin from '~/assets/StyleAdmin.jsx'
 import { CloudinaryCategory, URI } from '~/utils/constants'
@@ -52,23 +51,10 @@ const EditCategoryModal = ({
     setValue
   } = useForm()
 
-  const { fetchProducts, products } = useProducts()
-
   const [imageFile, setImageFile] = useState(null)
   const [previewUrl, setPreviewUrl] = useState('')
   const [parentCategory, setParentCategory] = useState(null)
   const fileInputRef = useRef()
-  const [hasProducts, setHasProducts] = useState(false)
-
-  useEffect(() => {
-    if (open && category) {
-      fetchProducts(1, 1, { categoryId: category._id })
-    }
-  }, [open, category])
-
-  useEffect(() => {
-    setHasProducts(products.length > 0)
-  }, [products])
 
   useEffect(() => {
     if (open && category) {
@@ -163,13 +149,12 @@ const EditCategoryModal = ({
               justifyContent='center'
               border='2px dashed #ccc'
               borderRadius={2}
-              p={2}
               position='relative'
               sx={{
                 backgroundColor: '#fafafa',
                 cursor: 'pointer',
                 width: 350,
-                height: 345,
+                height: 355,
                 mt: '14px'
               }}
               onClick={() => !previewUrl && fileInputRef.current.click()}
@@ -181,8 +166,8 @@ const EditCategoryModal = ({
                     alt='Ảnh danh mục'
                     style={{
                       width: '100%',
-                      maxHeight: 200,
-                      objectFit: 'contain',
+                      height: '100%',
+                      objectFit: 'cover',
                       borderRadius: 8
                     }}
                   />
@@ -242,12 +227,8 @@ const EditCategoryModal = ({
                 margin='normal'
                 {...register('name', { required: 'Tên danh mục là bắt buộc' })}
                 error={!!errors.name}
-                helperText={
-                  hasProducts
-                    ? 'Không thể sửa tên vì danh mục đã có sản phẩm'
-                    : errors.name?.message
-                }
-                disabled={hasProducts}
+                helperText={'Không thể sửa tên vì danh mục đã có liên kết'}
+                disabled
               />
               <Autocomplete
                 options={filteredCategories.filter(
@@ -277,7 +258,7 @@ const EditCategoryModal = ({
                 fullWidth
                 margin='normal'
                 multiline
-                rows={10}
+                rows={6}
                 {...register('description')}
               />
             </Box>

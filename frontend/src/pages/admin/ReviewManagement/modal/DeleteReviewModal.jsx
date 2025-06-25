@@ -35,8 +35,7 @@ const DeleteReviewModal = ({ open, onClose, review, onDelete }) => {
       <DialogTitle>Xoá đánh giá</DialogTitle>
       <Divider />
       <DialogContent>
-        Bạn có chắc chắn muốn xoá đánh giá của người dùng{' '}
-        <strong>{review?.userId || 'Không rõ'}</strong> cho sản phẩm{' '}
+        Bạn có chắc chắn muốn xoá đánh giá của sản phẩm{' '}
         <strong>{review?.productId || 'Không rõ'}</strong> không?
       </DialogContent>
       <Divider />
