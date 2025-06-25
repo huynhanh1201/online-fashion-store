@@ -58,10 +58,11 @@ const AddFlashSale = ({ open, onClose, onSave, initialData }) => {
   const [showSuggestions, setShowSuggestions] = useState({})
   const [dropdownPosition, setDropdownPosition] = useState({})
   const [allProducts, setAllProducts] = useState([])
+  const [existingCampaigns, setExistingCampaigns] = useState([])
   const suggestionRefs = useRef({})
   const inputRefs = useRef({})
 
-  // Khởi tạo form khi dialog mở
+  // Khởi tạo form khi dialog mở, tự động tạo ID nếu là mới
   useEffect(() => {
     if (open) {
       if (initialData) {
@@ -85,8 +86,9 @@ const AddFlashSale = ({ open, onClose, onSave, initialData }) => {
           }))
         })
       } else {
+        const newId = generateUniqueId()
         setForm({
-          id: '',
+          id: newId,
           enabled: true,
           title: '',
           startTime: '',
@@ -100,14 +102,16 @@ const AddFlashSale = ({ open, onClose, onSave, initialData }) => {
     }
   }, [open, initialData])
 
-  // Lấy danh sách sản phẩm khi component mount
+  // Lấy danh sách sản phẩm và chiến dịch hiện tại khi component mount
   useEffect(() => {
     const fetchAllProducts = async () => {
       try {
         const { products } = await getProducts({ page: 1, limit: 1000 })
         setAllProducts(products)
+        const campaigns = await getFlashSaleCampaigns()
+        setExistingCampaigns(campaigns.map((c) => c.id))
       } catch (err) {
-        console.error('Lỗi khi lấy danh sách sản phẩm:', err)
+        console.error('Lỗi khi lấy danh sách sản phẩm hoặc chiến dịch:', err)
       }
     }
     fetchAllProducts()
@@ -238,7 +242,6 @@ const AddFlashSale = ({ open, onClose, onSave, initialData }) => {
   const handleProductSelect = (index, product) => {
     const prod = allProducts.find((p) => p._id === product._id)
     if (prod) {
-      // Kiểm tra trùng lặp trong tất cả sản phẩm hiện tại (bao gồm initialData nếu có)
       const existingProductIndex = [
         ...form.products,
         ...(initialData?.products || []).map((p) => ({ _id: p.productId }))
@@ -247,12 +250,10 @@ const AddFlashSale = ({ open, onClose, onSave, initialData }) => {
       let updatedProducts = [...form.products]
 
       if (existingProductIndex !== -1) {
-        // Sản phẩm đã tồn tại, thông báo và không thêm mới
         setWarning(
           `Sản phẩm "${prod.name}" (ID: ${prod._id}) đã tồn tại trong chiến dịch.`
         )
         if (existingProductIndex >= form.products.length) {
-          // Nếu sản phẩm từ initialData, chỉ cập nhật flashPrice nếu cần
           updatedProducts[index] = {
             _id: prod._id,
             productName: prod.name,
@@ -266,11 +267,9 @@ const AddFlashSale = ({ open, onClose, onSave, initialData }) => {
             isDisabled: true
           }
         } else {
-          // Nếu sản phẩm từ form hiện tại, không làm gì thêm
           return
         }
       } else {
-        // Sản phẩm mới, thêm bình thường
         updatedProducts[index] = {
           _id: prod._id,
           productName: prod.name,
@@ -287,13 +286,20 @@ const AddFlashSale = ({ open, onClose, onSave, initialData }) => {
     setProductSuggestions([])
   }
 
+  // Tạo ID ngẫu nhiên không trùng lặp
+  const generateUniqueId = () => {
+    let newId
+    do {
+      newId = `FS_${Date.now()}_${Math.floor(Math.random() * 1000)
+        .toString()
+        .padStart(3, '0')}`
+    } while (existingCampaigns.includes(newId))
+    return newId
+  }
+
   // Kiểm tra dữ liệu form
   const validateForm = () => {
     const errors = []
-
-    if (!form.id?.trim()) {
-      errors.push('ID chiến dịch không được để trống')
-    }
 
     if (!form.title?.trim()) {
       errors.push('Tiêu đề không được để trống')
@@ -359,30 +365,24 @@ const AddFlashSale = ({ open, onClose, onSave, initialData }) => {
     setWarning('')
 
     try {
-      const cleanedProducts = form.products
-        .filter(
-          (p) =>
-            p._id && p._id.trim() !== '' && p.flashPrice && !isNaN(p.flashPrice)
-        )
-        .map((p) => ({
-          productId: p._id,
-          originalPrice: Number(p.originalPrice),
-          flashPrice: Number(p.flashPrice)
-        }))
-
-      if (!Array.isArray(cleanedProducts) || cleanedProducts.length === 0) {
-        setError('Bạn phải chọn ít nhất 1 sản phẩm hợp lệ cho Flash Sale!')
-        setLoading(false)
-        return
-      }
-
-      const cleanedForm = {
-        id: form.id,
-        enabled: form.enabled,
-        title: form.title,
+      let cleanedForm = {
+        ...form,
+        id: initialData?.id || generateUniqueId(), // Sử dụng ID hiện có nếu chỉnh sửa, không thì tạo mới
         startTime: new Date(form.startTime).toISOString(),
         endTime: new Date(form.endTime).toISOString(),
-        products: cleanedProducts
+        products: form.products
+          .filter(
+            (p) =>
+              p._id &&
+              p._id.trim() !== '' &&
+              p.flashPrice &&
+              !isNaN(p.flashPrice)
+          )
+          .map((p) => ({
+            productId: p._id,
+            originalPrice: Number(p.originalPrice),
+            flashPrice: Number(p.flashPrice)
+          }))
       }
 
       const errors = validateForm()
@@ -392,17 +392,8 @@ const AddFlashSale = ({ open, onClose, onSave, initialData }) => {
         return
       }
 
-      // Kiểm tra xem campaign đã tồn tại chưa
-      let isExistingCampaign = false
-      try {
-        const campaigns = await getFlashSaleCampaigns()
-        isExistingCampaign = campaigns.some((c) => c.id === form.id)
-      } catch (e) {
-        console.log('Chưa có campaign Flash Sale nào hoặc lỗi khi kiểm tra.')
-      }
-
-      if (isExistingCampaign) {
-        await updateFlashSaleCampaign(form.id, cleanedForm)
+      if (initialData) {
+        await updateFlashSaleCampaign(cleanedForm.id, cleanedForm)
         setSuccess('Cập nhật chiến dịch Flash Sale thành công!')
       } else {
         await createFlashSale(cleanedForm)
@@ -499,11 +490,11 @@ const AddFlashSale = ({ open, onClose, onSave, initialData }) => {
         <Stack spacing={3}>
           <TextField
             fullWidth
-            label='ID chiến dịch *'
+            label='ID chiến dịch (Tự động tạo)'
             value={form.id}
-            onChange={(e) => handleChange('id', e.target.value)}
-            required
-            disabled={!!initialData}
+            InputProps={{
+              readOnly: true
+            }}
             sx={{
               '& .MuiOutlinedInput-root': {
                 borderRadius: 2,
