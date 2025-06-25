@@ -1,75 +1,26 @@
-import React from 'react'
-import { Box, Typography } from '@mui/material'
+import React, { useEffect, useState } from 'react'
 import ReviewTable from './ReviewTable'
+import useReviews from '~/hooks/admin/useReview'
+import ViewReviewModal from './modal/ViewReviewModal'
+import DeleteReviewModal from './modal/DeleteReviewModal'
 import usePermissions from '~/hooks/usePermissions'
+import { RouteGuard, PermissionWrapper } from '~/components/PermissionGuard'
 
-// Lazy load các modal
-const ViewReviewModal = React.lazy(() => import('./modal/ViewReviewModal'))
-const DeleteReviewModal = React.lazy(() => import('./modal/DeleteReviewModal'))
-
-const mockData = [
-  {
-    id: 'r1',
-    productId: 'p1001',
-    user: {
-      userId: 'u123',
-      fullName: 'Nguyễn Văn A',
-      email: 'vana@gmail.com'
-    },
-    rating: 4,
-    comment: 'Sản phẩm tốt, giao hàng nhanh.',
-    images: [
-      'https://cdn.example.com/review/image1.jpg',
-      'https://cdn.example.com/review/image2.jpg'
-    ],
-    status: 'approved',
-    createdAt: '2025-06-10T09:30:00.000Z',
-    updatedAt: '2025-06-11T10:00:00.000Z'
-  },
-  {
-    id: 'r2',
-    productId: 'p1002',
-    user: {
-      userId: 'u124',
-      fullName: 'Trần Thị B',
-      email: 'thib@example.com'
-    },
-    rating: 2,
-    comment: 'Sản phẩm không giống hình.',
-    images: [],
-    status: 'pending',
-    createdAt: '2025-06-15T15:45:00.000Z',
-    updatedAt: '2025-06-15T15:45:00.000Z'
-  }
-]
-
-const ProductReviewManagement = () => {
+const ReviewManagement = () => {
+  const [page, setPage] = useState(1)
+  const [limit, setLimit] = useState(10)
+  const [filter, setFilter] = useState({})
+  const [selectedReview, setSelectedReview] = useState(null)
+  const [modalType, setModalType] = useState(null)
+  const { reviews, fetchReview, loading, remove, totalPages, update } =
+    useReviews()
   const { hasPermission } = usePermissions()
-  const [page, setPage] = React.useState(1)
-  const [limit, setLimit] = React.useState(10)
-  const [filters, setFilters] = React.useState({})
-  const [selectedReview, setSelectedReview] = React.useState(null)
-  const [modalType, setModalType] = React.useState(null)
-  const [reviews, setReviews] = React.useState(mockData)
 
-  const totalPages = Math.ceil(reviews.length / limit)
-  const loading = false
-
-  // Kiểm tra quyền truy cập review
-  if (!hasPermission('review:read')) {
-    return (
-      <Box sx={{ p: 3, textAlign: 'center' }}>
-        <Typography variant='h6' color='error'>
-          Bạn không có quyền truy cập quản lý đánh giá
-        </Typography>
-      </Box>
-    )
-  }
-
-  const handleChangePage = (_, value) => setPage(value)
+  useEffect(() => {
+    fetchReview(page, limit, filter)
+  }, [page, limit, filter])
 
   const handleOpenModal = (type, review) => {
-    if (!review || !review.id) return
     setSelectedReview(review)
     setModalType(type)
   }
@@ -79,44 +30,49 @@ const ProductReviewManagement = () => {
     setModalType(null)
   }
 
-  const handleDeleteReview = (reviewId) => {
-    setReviews((prev) => prev.filter((r) => r.id !== reviewId))
+  const handleSave = async (id, data) => {
+    if (modalType === 'delete') await remove(id)
+    else await update(id, data)
     handleCloseModal()
   }
 
   const isEqual = (obj1, obj2) => JSON.stringify(obj1) === JSON.stringify(obj2)
 
   const handleFilter = (newFilters) => {
-    if (!isEqual(filters, newFilters)) {
+    if (!isEqual(filter, newFilters)) {
       setPage(1)
-      setFilters(newFilters)
-      // Có thể lọc thực tế từ mockData ở đây nếu muốn
+      setFilter(newFilters)
     }
   }
-
+  const handleChangePage = (event, value) => setPage(value)
   return (
-    <>
+    <RouteGuard requiredPermissions={['review:read']}>
       <ReviewTable
-        reviews={reviews.slice((page - 1) * limit, page * limit)}
+        reviews={reviews}
         loading={loading}
-        handleOpenModal={handleOpenModal}
-        onFilter={handleFilter}
         page={page - 1}
         rowsPerPage={limit}
-        total={reviews.length}
+        total={totalPages}
         onPageChange={handleChangePage}
         onChangeRowsPerPage={(newLimit) => {
           setPage(1)
           setLimit(newLimit)
         }}
+        handleOpenModal={handleOpenModal}
+        permissions={{
+          canView: hasPermission('review:read'),
+          canDelete: hasPermission('review:delete')
+        }}
+        onFilter={handleFilter}
       />
 
-      <React.Suspense fallback={<></>}>
+      <React.Suspense fallback={null}>
         {modalType === 'view' && selectedReview && (
           <ViewReviewModal
             open
             onClose={handleCloseModal}
             review={selectedReview}
+            onApprove={handleSave}
           />
         )}
         {modalType === 'delete' && selectedReview && (
@@ -124,12 +80,12 @@ const ProductReviewManagement = () => {
             open
             onClose={handleCloseModal}
             review={selectedReview}
-            onDelete={() => handleDeleteReview(selectedReview.id)}
+            onDelete={handleSave}
           />
         )}
       </React.Suspense>
-    </>
+    </RouteGuard>
   )
 }
 
-export default ProductReviewManagement
+export default ReviewManagement

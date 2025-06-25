@@ -1,29 +1,30 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { Box, Button } from '@mui/material'
+import dayjs from 'dayjs'
 import FilterByTime from '~/components/FilterAdmin/common/FilterByTime.jsx'
 import SearchWithSuggestions from '~/components/FilterAdmin/common/SearchWithSuggestions.jsx'
 import FilterSelect from '~/components/FilterAdmin/common/FilterSelect.jsx'
-import dayjs from 'dayjs'
 
-export default function FilterReview({
-  onFilter,
-  users = [],
-  reviews = [],
-  fetchReviews,
-  loading
-}) {
+export default function FilterReview({ onFilter, reviews = [], loading }) {
   const [keyword, setKeyword] = useState('')
   const [inputValue, setInputValue] = useState('')
   const [selectedFilter, setSelectedFilter] = useState('')
   const [startDate, setStartDate] = useState(dayjs().format('YYYY-MM-DD'))
   const [endDate, setEndDate] = useState(dayjs().format('YYYY-MM-DD'))
-  const [status, setStatus] = useState('')
-  const [rating, setRating] = useState('')
-  const [sort, setSort] = useState('')
+  const [moderationStatus, setModerationStatus] = useState('')
+  const [sort, setSort] = useState('newest')
+  const hasMounted = useRef(false)
 
   useEffect(() => {
     applyFilters(selectedFilter, startDate, endDate)
-  }, [keyword, status, rating, sort])
+    hasMounted.current = true
+  }, [])
+
+  useEffect(() => {
+    if (hasMounted.current) {
+      applyFilters(selectedFilter, startDate, endDate)
+    }
+  }, [keyword, sort, moderationStatus])
 
   const handleSearch = () => {
     setKeyword(inputValue)
@@ -50,9 +51,8 @@ export default function FilterReview({
   const applyFilters = (selectedTime, fromDate, toDate) => {
     const filters = {
       search: keyword || undefined,
-      status: status || undefined,
-      rating: rating || undefined,
-      sort: sort || undefined
+      sort: sort || undefined,
+      moderationStatus: moderationStatus || undefined
     }
 
     if (selectedTime === 'custom') {
@@ -64,11 +64,7 @@ export default function FilterReview({
     }
 
     Object.keys(filters).forEach((key) => {
-      if (
-        filters[key] === undefined ||
-        filters[key] === null ||
-        filters[key] === ''
-      ) {
+      if (!filters[key] && filters[key] !== false) {
         delete filters[key]
       }
     })
@@ -82,63 +78,33 @@ export default function FilterReview({
     setSelectedFilter('')
     setStartDate(dayjs().format('YYYY-MM-DD'))
     setEndDate(dayjs().format('YYYY-MM-DD'))
-    setStatus('')
-    setRating('')
+    setModerationStatus('')
     setSort('')
     onFilter({})
-    fetchReviews(1, 10, {}) // Gọi lại toàn bộ
   }
 
   return (
     <Box display='flex' flexWrap='wrap' gap={2} mb={2} justifyContent='end'>
+      <FilterSelect value={sort} onChange={setSort} />
+
       <FilterSelect
-        label='Trạng thái đánh giá'
-        value={status}
+        label='Trạng thái kiểm duyệt'
+        value={moderationStatus}
         onChange={(value) => {
-          setStatus(value)
+          setModerationStatus(value)
           applyFilters(selectedFilter, startDate, endDate)
         }}
         options={[
           { label: 'Tất cả', value: '' },
-          { label: 'Hiển thị', value: 'active' },
-          { label: 'Đã ẩn', value: 'hidden' },
-          { label: 'Chờ duyệt', value: 'pending' }
+          { label: 'Chờ duyệt', value: 'pending' },
+          { label: 'Đã duyệt', value: 'approved' },
+          { label: 'Từ chối', value: 'rejected' }
         ]}
-      />
-
-      <FilterSelect
-        label='Số sao'
-        value={rating}
-        onChange={(value) => {
-          setRating(value)
-          applyFilters(selectedFilter, startDate, endDate)
-        }}
-        options={[
-          { label: 'Tất cả', value: '' },
-          { label: '5 sao', value: 5 },
-          { label: '4 sao', value: 4 },
-          { label: '3 sao', value: 3 },
-          { label: '2 sao', value: 2 },
-          { label: '1 sao', value: 1 }
-        ]}
-      />
-
-      <FilterSelect
-        value={sort}
-        onChange={(value) => {
-          setSort(value)
-          applyFilters(selectedFilter, startDate, endDate)
-        }}
-        options={[
-          { label: 'Mặc định', value: '' },
-          { label: 'Mới nhất', value: 'desc' },
-          { label: 'Cũ nhất', value: 'asc' }
-        ]}
-        label='Sắp xếp'
+        sx={{ width: 160 }}
       />
 
       <FilterByTime
-        label='Thời gian đánh giá'
+        label='Lọc theo thời gian đánh giá'
         selectedFilter={selectedFilter}
         setSelectedFilter={setSelectedFilter}
         onSelectFilter={handleSelectFilter}
@@ -151,13 +117,8 @@ export default function FilterReview({
 
       <Box sx={{ display: 'flex', gap: 2 }}>
         <SearchWithSuggestions
-          label='Tên sản phẩm / người dùng'
-          options={[
-            ...new Set([
-              ...reviews.map((r) => r.product?.name).filter(Boolean),
-              ...users.map((u) => u.fullName).filter(Boolean)
-            ])
-          ]}
+          label='Tìm người dùng hoặc bình luận'
+          options={reviews.map((r) => r.user?.name || r.comment || '')}
           loading={loading}
           keyword={keyword}
           inputValue={inputValue}

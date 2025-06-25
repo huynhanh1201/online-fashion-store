@@ -122,7 +122,11 @@ const useProducts = () => {
 
   const deleteProductById = async (productId) => {
     try {
-      await deleteProduct(productId)
+      const remove = await deleteProduct(productId)
+      if (!remove) {
+        console.error('Không thể xoá sản phẩm')
+        return null
+      }
       setProducts((prev) => prev.filter((p) => p._id !== productId))
       setTotal((prev) => prev - 1)
     } catch (error) {
@@ -132,6 +136,10 @@ const useProducts = () => {
   const updateProductById = async (productId, data) => {
     try {
       const updatedProduct = await updateProduct(productId, data)
+      if (!updatedProduct) {
+        console.error('Không thể cập nhật sản phẩm')
+        return null
+      }
       setProducts((prev) =>
         prev.map((p) => (p._id === productId ? updatedProduct : p))
       )

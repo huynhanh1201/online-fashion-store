@@ -107,7 +107,8 @@ export default function FilterSelect({
           PaperProps: {
             sx: {
               maxWidth: 500, // Giới hạn chiều rộng dropdown
-              minWidth: '100px' // Bằng với FormControl
+              minWidth: '100px', // Bằng với FormControl
+              maxHeight: 500 // Giới hạn chiều cao dropdown
             }
           }
         }}

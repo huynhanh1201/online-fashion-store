@@ -87,7 +87,7 @@ const ProductInfoSection = ({
         fontWeight={500}
         sx={{ wordBreak: 'break-word', whiteSpace: 'pre-wrap', mb: 1 }}
       >
-       Mã sản phẩm: {product?.productCode}
+        {product?.productCode}
       </Typography>
 
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>

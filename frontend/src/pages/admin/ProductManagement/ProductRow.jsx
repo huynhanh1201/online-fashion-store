@@ -126,9 +126,9 @@ const ProductRow = ({
                 sx={{
                   ...styles.cellPadding,
                   cursor: product.categoryId ? 'pointer' : 'default',
-                  color: product.categoryId ? '#1976d2' : 'inherit',
+                  // color: product.categoryId ? '#1976d2' : 'inherit',
                   '&:hover': product.categoryId
-                    ? { textDecoration: 'underline' }
+                    ? { textDecoration: 'none' }
                     : undefined
                 }}
                 onClick={() => {

@@ -1,83 +1,3 @@
-// import React from 'react'
-//
-// import Table from '@mui/material/Table'
-// import TableBody from '@mui/material/TableBody'
-// import TableHead from '@mui/material/TableHead'
-// import TableRow from '@mui/material/TableRow'
-// import Paper from '@mui/material/Paper'
-//
-// import StyleAdmin, {
-//   StyledTableCell,
-//   StyledTableRow,
-//   StyledTableContainer
-// } from '~/assets/StyleAdmin.jsx'
-// import UserRow from './UserRow'
-//
-// const UserTable = React.memo(function UserTable({
-//   users,
-//   page,
-//   handleOpenModal,
-//   loading
-// }) {
-//   const validUsers = users.filter((user) => !user.destroy)
-//
-//   return (
-//     <StyledTableContainer component={Paper}>
-//       <Table>
-//         <TableHead>
-//           <TableRow>
-//             <StyledTableCell sx={StyleAdmin.TableColumnSTT}>
-//               STT
-//             </StyledTableCell>
-//             <StyledTableCell sx={{ width: '300px' }}>Tên</StyledTableCell>
-//             <StyledTableCell>Email</StyledTableCell>
-//             <StyledTableCell sx={{ width: '200px' }}>Quyền</StyledTableCell>
-//             <StyledTableCell className='hide-on-mobile'>
-//               Ngày tạo
-//             </StyledTableCell>
-//             <StyledTableCell className='hide-on-mobile'>
-//               Cập nhật
-//             </StyledTableCell>
-//             <StyledTableCell sx={{ maxWidth: '130px', width: '130px' }}>
-//               Hành động
-//             </StyledTableCell>
-//           </TableRow>
-//         </TableHead>
-//
-//         <TableBody>
-//           {loading ? (
-//             <StyledTableRow>
-//               <StyledTableCell></StyledTableCell>
-//               <StyledTableCell></StyledTableCell>
-//               <StyledTableCell></StyledTableCell>
-//               <StyledTableCell></StyledTableCell>
-//               <StyledTableCell className='hide-on-mobile'></StyledTableCell>
-//               <StyledTableCell className='hide-on-mobile'></StyledTableCell>
-//               <StyledTableCell></StyledTableCell>
-//             </StyledTableRow>
-//           ) : validUsers.length > 0 ? (
-//             validUsers.map((user, idx) => (
-//               <UserRow
-//                 key={user._id}
-//                 user={user}
-//                 index.jsx={(page - 1) * 10 + idx + 1}
-//                 handleOpenModal={handleOpenModal}
-//               />
-//             ))
-//           ) : (
-//             <TableRow>
-//               <StyledTableCell colSpan={7} align='center'>
-//                 Không có người dùng nào
-//               </StyledTableCell>
-//             </TableRow>
-//           )}
-//         </TableBody>
-//       </Table>
-//     </StyledTableContainer>
-//   )
-// })
-// export default UserTable
-
 import React from 'react'
 import {
   Table,
@@ -91,37 +11,46 @@ import {
   Box,
   TablePagination
 } from '@mui/material'
+
 import UserRow from './UserRow'
-import FilterUser from '~/components/FilterAdmin/FilterUser.jsx'
-const UserTable = React.memo(function UserTable({
+import TablePaginationActions from '~/components/PaginationAdmin/TablePaginationActions.jsx'
+import TableNoneData from '~/components/TableAdmin/NoneData.jsx'
+import FilterUser from '~/components/FilterAdmin/FilterUser' // nếu chưa có thì có thể tạo tương tự FilterColor
+
+const UserTable = ({
   users,
+  loading,
   page,
   rowsPerPage,
   handleOpenModal,
-  loading,
-  onFilter
-}) {
-  const validUsers = users.filter((user) => !user.destroy)
+  onFilters,
+  onPageChange,
+  onChangeRowsPerPage,
+  total,
+  roles,
+  permissions = {}
+}) => {
   const columns = [
-    { id: 'index', label: 'STT', minWidth: 50, align: 'center' },
-    { id: 'name', label: 'Tên', minWidth: 300 },
-    { id: 'email', label: 'Email', minWidth: 200 },
-    { id: 'role', label: 'Quyền', minWidth: 200 },
+    { id: 'index', label: 'STT', align: 'center', width: 50 },
+    { id: 'avatar', label: 'Ảnh', align: 'left', width: 100 },
+    { id: 'name', label: 'Tên người dùng', align: 'left' },
     {
-      id: 'createdAt',
-      label: 'Ngày tạo',
-      minWidth: 120,
-      align: 'center',
-      format: (value) => new Date(value).toLocaleDateString()
+      id: 'email',
+      label: 'Email',
+      align: 'left',
+      maxWidth: 200
     },
+    { id: 'role', label: 'Vai trò', align: 'left', width: 180 },
+    { id: 'createdAt', label: 'Ngày tạo', align: 'left', minWidth: 100 },
+    { id: 'updatedAt', label: 'Ngày cập nhật', align: 'left', minWidth: 100 },
     {
-      id: 'updatedAt',
-      label: 'Cập nhật',
-      minWidth: 120,
-      align: 'center',
-      format: (value) => new Date(value).toLocaleDateString()
-    },
-    { id: 'action', label: 'Hành động', minWidth: 130, align: 'center' }
+      id: 'action',
+      label: 'Hành động',
+      align: 'left',
+      width: 130,
+      maxWidth: 130,
+      pl: '11px'
+    }
   ]
 
   return (
@@ -135,13 +64,19 @@ const UserTable = React.memo(function UserTable({
                   sx={{
                     display: 'flex',
                     justifyContent: 'space-between',
-                    alignItems: 'center'
+                    alignItems: 'start',
+                    minHeight: 76.5
                   }}
                 >
                   <Typography variant='h6' sx={{ fontWeight: '800' }}>
                     Danh sách người dùng
                   </Typography>
-                  <FilterUser onFilter={onFilter} />
+                  <FilterUser
+                    onFilter={onFilters}
+                    users={users}
+                    loading={loading}
+                    roles={roles}
+                  />
                 </Box>
               </TableCell>
             </TableRow>
@@ -149,16 +84,15 @@ const UserTable = React.memo(function UserTable({
               {columns.map((column) => (
                 <TableCell
                   key={column.id}
-                  align={column.align}
+                  align={column.align || 'left'}
                   sx={{
-                    minWidth: column.minWidth,
-                    ...(column.id === 'index' && { width: '50px' })
+                    px: 1,
+                    ...(column.minWidth && { minWidth: column.minWidth }),
+                    ...(column.width && { width: column.width }),
+                    ...(column.maxWidth && { maxWidth: column.maxWidth }),
+                    pl: column.pl,
+                    whiteSpace: 'nowrap'
                   }}
-                  className={
-                    ['createdAt', 'updatedAt'].includes(column.id)
-                      ? 'hide-on-mobile'
-                      : ''
-                  }
                 >
                   {column.label}
                 </TableCell>
@@ -172,41 +106,49 @@ const UserTable = React.memo(function UserTable({
                   <TableCell key={column.id} align={column.align}></TableCell>
                 ))}
               </TableRow>
-            ) : validUsers.length > 0 ? (
-              validUsers.map((user, idx) => (
+            ) : users.length > 0 ? (
+              users.map((user, idx) => (
                 <UserRow
                   key={user._id}
                   user={user}
-                  index={idx + 1}
-                  handleOpenModal={handleOpenModal}
+                  index={page * rowsPerPage + idx + 1}
                   columns={columns}
+                  handleOpenModal={handleOpenModal}
+                  permissions={permissions}
                 />
               ))
             ) : (
-              <TableRow>
-                <TableCell colSpan={columns.length} align='center'>
-                  Không có người dùng nào
-                </TableCell>
-              </TableRow>
+              <TableNoneData
+                col={columns.length}
+                message='Không có dữ liệu người dùng.'
+              />
             )}
           </TableBody>
         </Table>
       </TableContainer>
+
       <TablePagination
         rowsPerPageOptions={[10, 25, 100]}
         component='div'
-        count={users.length || 1}
-        rowsPerPage={rowsPerPage || 10}
-        page={page || 1}
+        count={total || 0}
+        rowsPerPage={rowsPerPage}
+        page={page}
+        onPageChange={(event, newPage) => onPageChange(event, newPage + 1)}
+        onRowsPerPageChange={(event) => {
+          const newLimit = parseInt(event.target.value, 10)
+          if (onChangeRowsPerPage) {
+            onChangeRowsPerPage(newLimit)
+          }
+        }}
         labelRowsPerPage='Số dòng mỗi trang'
         labelDisplayedRows={({ from, to, count }) => {
-          const actualTo = to > count ? count : to
-          const actualFrom = from > count ? count : from
-          return `${actualFrom}–${actualTo} trên ${count !== -1 ? count : `hơn ${actualTo}`}`
+          const totalPages = Math.ceil(count / rowsPerPage)
+          return `${from}–${to} trên ${count} | Trang ${page + 1} / ${totalPages}`
         }}
+        ActionsComponent={TablePaginationActions}
       />
     </Paper>
   )
-})
+}
 
 export default UserTable

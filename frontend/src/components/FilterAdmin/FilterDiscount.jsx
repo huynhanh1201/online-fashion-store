@@ -221,8 +221,8 @@ export default function FilterDiscount({
         }}
         options={[
           { label: 'Tất cả', value: '' },
-          { label: 'Đang hoạt động', value: 'false' },
-          { label: 'Ngừng hoạt động', value: 'true' }
+          { label: 'Đang hoạt động', value: 'true' },
+          { label: 'Ngừng hoạt động', value: 'false' }
         ]}
       />
       <FilterSelect value={sort} onChange={setSort} />
