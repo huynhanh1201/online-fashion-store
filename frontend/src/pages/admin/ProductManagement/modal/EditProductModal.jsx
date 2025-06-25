@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect } from 'react'
 import {
   Dialog,
   DialogTitle,
@@ -15,21 +15,15 @@ import {
   Box,
   Chip
 } from '@mui/material'
-import IconButton from '@mui/material/IconButton'
 import { useForm, Controller } from 'react-hook-form'
 import useCategories from '~/hooks/admin/useCategories.js'
 import AddCategoryModal from '~/pages/admin/CategorieManagement/modal/AddCategoryModal.jsx'
 import StyleAdmin from '~/assets/StyleAdmin.jsx'
-import { Editor } from 'react-draft-wysiwyg'
 import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css'
-import { EditorState, convertToRaw, ContentState } from 'draft-js'
-import draftToHtml from 'draftjs-to-html'
-import htmlToDraft from 'html-to-draftjs'
-import { InputAdornment } from '@mui/material'
 import ProductImages from '../component/ProductImageUploader.jsx'
 import ProductDescriptionEditor from '../component/ProductDescriptionEditor.jsx'
 import { CloudinaryColor, CloudinaryProduct, URI } from '~/utils/constants'
-
+import useVariants from '~/hooks/admin/Inventory/useVariants.js'
 const uploadToCloudinary = async (file, folder = CloudinaryColor) => {
   const formData = new FormData()
   formData.append('file', file)
@@ -71,26 +65,14 @@ const EditProductModal = ({ open, onClose, onSave, product }) => {
       }
     }
   })
+  const { variants, fetchVariants } = useVariants()
   const [categoryOpen, setCategoryOpen] = useState(false)
   const [productImages, setProductImages] = useState(product.imageUrls || [])
   const [productImagePreview, setProductImagePreview] = useState(
     product.imageUrls || []
   )
-  const [editorState, setEditorState] = useState(EditorState.createEmpty())
-  const [selectedImageUrl, setSelectedImageUrl] = useState(null)
-
-  const replaceImageInputRef = useRef()
   const { categories, fetchCategories, loading, update } = useCategories()
 
-  const uploadImageFunction = async (file) => {
-    try {
-      const secureUrl = await uploadToCloudinary(file, CloudinaryProduct)
-      return { data: { link: secureUrl } }
-    } catch (error) {
-      console.error('Lỗi khi upload ảnh:', error)
-      return Promise.reject(error)
-    }
-  }
   // Hàm định dạng số và bỏ định dạng
   const formatNumber = (value) => {
     const number = value?.toString().replace(/\D/g, '') || ''
@@ -99,122 +81,17 @@ const EditProductModal = ({ open, onClose, onSave, product }) => {
 
   const parseNumber = (formatted) => formatted.replace(/\./g, '')
 
-  // Hàm thay thế URL ảnh trong mô tả
-  const replaceImageInDescription = (editorState, oldImageUrl, newImageUrl) => {
-    const contentState = editorState.getCurrentContent()
-    const rawContent = convertToRaw(contentState)
-    const htmlContent = draftToHtml(rawContent)
-
-    // Thay thế URL ảnh cũ bằng URL mới
-    const updatedHtmlContent = htmlContent.replace(oldImageUrl, newImageUrl)
-
-    // Chuyển đổi HTML mới thành contentState
-    const contentBlock = htmlToDraft(updatedHtmlContent)
-    const newContentState = ContentState.createFromBlockArray(
-      contentBlock.contentBlocks
-    )
-    const newEditorState = EditorState.createWithContent(newContentState)
-
-    return newEditorState
-  }
-
-  // Hàm xử lý thay thế ảnh
-  const handleReplaceImage = async (e) => {
-    const file = e.target.files[0]
-    if (file && selectedImageUrl) {
-      try {
-        const newImageUrl = await uploadToCloudinary(file, CloudinaryProduct)
-        const newEditorState = replaceImageInDescription(
-          editorState,
-          selectedImageUrl,
-          newImageUrl
-        )
-        setEditorState(newEditorState)
-
-        // Cập nhật giá trị description trong form
-        const content = draftToHtml(
-          convertToRaw(newEditorState.getCurrentContent())
-        )
-        setValue('description', content)
-
-        // Reset input và trạng thái
-        setSelectedImageUrl(null)
-        if (replaceImageInputRef.current) {
-          replaceImageInputRef.current.value = ''
-        }
-      } catch (error) {
-        alert('Có lỗi khi upload ảnh mới. Vui lòng thử lại.')
-        console.error(error)
-      }
-    }
-  }
-
-  // Tùy chỉnh hiển thị nút "Sửa ảnh" cho khối hình ảnh
-  const blockRendererFn = (contentBlock) => {
-    if (contentBlock.getType() === 'atomic') {
-      const entityKey = contentBlock.getEntityAt(0)
-      if (entityKey) {
-        const contentState = editorState.getCurrentContent()
-        const entity = contentState.getEntity(entityKey)
-        if (entity.getType() === 'IMAGE') {
-          const { src } = entity.getData()
-          return {
-            component: () => (
-              <Box
-                sx={{
-                  position: 'relative', // Container relative để icon absolute bên trong
-                  display: 'inline-block'
-                }}
-              >
-                <img
-                  src={src}
-                  alt='description-image'
-                  style={{ maxWidth: '100%', display: 'block' }} // block tránh ảnh có khoảng trắng
-                />
-                <IconButton
-                  sx={{
-                    position: 'absolute', // Phải absolute mới can thiệp top,right được
-                    top: 4, // có thể cách viền 4px cho đẹp
-                    right: 4,
-                    zIndex: 999,
-                    backgroundColor: 'rgba(255, 255, 255, 0.8)',
-                    padding: '4px',
-                    minWidth: 'unset',
-                    borderRadius: '4px',
-                    boxShadow: '0 0 5px rgba(0,0,0,0.2)',
-                    '&:hover': {
-                      backgroundColor: 'rgba(255,255,255,1)',
-                      boxShadow: 'none'
-                    }
-                  }}
-                  // onClick={() => setSelectedImageUrl(src)}
-                  // onMouseDown={() => setSelectedImageUrl(src)}
-                  onMouseUp={() => setSelectedImageUrl(src)}
-                >
-                  <Typography variant='body2' sx={{ userSelect: 'none' }}>
-                    Sửa ảnh
-                  </Typography>
-                </IconButton>
-              </Box>
-            ),
-            editable: false // không cho sửa nội dung ảnh trong editor
-          }
-        }
-      }
-    }
-    return null
-  }
-
-  // Kích hoạt input file khi chọn ảnh để thay thế
+  const [hasVariants, setHasVariants] = useState(false)
   useEffect(() => {
-    if (selectedImageUrl && replaceImageInputRef.current) {
-      const timeout = setTimeout(() => {
-        replaceImageInputRef.current.click()
-      }, 100) // delay 100ms để đảm bảo DOM đã mount
-
-      return () => clearTimeout(timeout)
+    if (open && product) {
+      fetchVariants(1, 1, { productId: product._id })
     }
-  }, [selectedImageUrl])
+  }, [product, open])
+
+  useEffect(() => {
+    setHasVariants(variants.length > 0)
+  }, [variants])
+
   // Load dữ liệu sản phẩm khi modal mở
   useEffect(() => {
     if (open && product) {
@@ -237,21 +114,6 @@ const EditProductModal = ({ open, onClose, onSave, product }) => {
 
       setProductImages(product.image || [])
       setProductImagePreview(product.image || [])
-
-      // Chuyển html description thành editorState
-      if (product.description) {
-        const contentBlock = htmlToDraft(product.description)
-        if (contentBlock) {
-          const contentState = ContentState.createFromBlockArray(
-            contentBlock.contentBlocks
-          )
-          setEditorState(EditorState.createWithContent(contentState))
-        } else {
-          setEditorState(EditorState.createEmpty())
-        }
-      } else {
-        setEditorState(EditorState.createEmpty())
-      }
     }
   }, [open, reset, product])
   const handEditCategory = async (category) => {
@@ -275,13 +137,9 @@ const EditProductModal = ({ open, onClose, onSave, product }) => {
         return
       }
 
-      const contentState = editorState.getCurrentContent()
-      const rawContent = convertToRaw(contentState)
-      const htmlContent = draftToHtml(rawContent)
-
       const finalProduct = {
         name: data.name,
-        description: htmlContent,
+        description: data.description,
         exportPrice: Number(data.price),
         importPrice: data.importPrice ? Number(data.importPrice) : undefined,
         categoryId: data.categoryId,
@@ -301,7 +159,6 @@ const EditProductModal = ({ open, onClose, onSave, product }) => {
       reset()
       setProductImages([])
       setProductImagePreview([])
-      setEditorState(EditorState.createEmpty())
     } catch (error) {
       console.error('Lỗi khi cập nhật sản phẩm:', error)
       alert('Có lỗi xảy ra, vui lòng thử lại')
@@ -371,7 +228,12 @@ const EditProductModal = ({ open, onClose, onSave, product }) => {
                   label='Tên sản phẩm'
                   fullWidth
                   error={!!errors?.name}
-                  helperText={errors?.name?.message}
+                  helperText={
+                    hasVariants
+                      ? 'Sản phẩm này có các biến thể hoặc đơn hàng không thể sửa.'
+                      : errors?.name?.message
+                  }
+                  disabled={hasVariants}
                   {...field}
                 />
               )}

@@ -1,9 +1,5 @@
 import React from 'react'
-import { Typography, Button } from '@mui/material'
-import AddIcon from '@mui/icons-material/Add'
-
 import ColorTable from './ColorTable'
-import ColorPagination from './ColorPagination'
 
 import useColors from '~/hooks/admin/useColor'
 import usePermissions from '~/hooks/usePermissions'
@@ -29,8 +25,6 @@ const ColorManagement = () => {
     totalPages,
     fetchColors,
     Loading,
-    getColorId,
-    saveColor,
     remove,
     update,
     createNewColor

@@ -1,81 +1,154 @@
 // import React from 'react'
+// import {
+//   Table,
+//   TableBody,
+//   TableHead,
+//   TableRow,
+//   TableCell,
+//   TableContainer,
+//   Paper,
+//   Typography,
+//   Box,
+//   TablePagination
+// } from '@mui/material'
 //
-// import Table from '@mui/material/Table'
-// import TableBody from '@mui/material/TableBody'
-// import TableHead from '@mui/material/TableHead'
-// import TableRow from '@mui/material/TableRow'
-// import Paper from '@mui/material/Paper'
-//
-// import StyleAdmin, {
-//   StyledTableCell,
-//   StyledTableRow,
-//   StyledTableContainer
-// } from '~/assets/StyleAdmin.jsx'
 // import UserRow from './UserRow'
+// import TablePaginationActions from '~/components/PaginationAdmin/TablePaginationActions.jsx'
+// import TableNoneData from '~/components/TableAdmin/NoneData.jsx'
+// import FilterUser from '~/components/FilterAdmin/FilterUser' // nếu chưa có thì có thể tạo tương tự FilterColor
 //
-// const UserTable = React.memo(function UserTable({
+// const UserTable = ({
 //   users,
+//   loading,
 //   page,
+//   rowsPerPage,
 //   handleOpenModal,
-//   loading
-// }) {
-//   const validUsers = users.filter((user) => !user.destroy)
+//   onFilters,
+//   onPageChange,
+//   onChangeRowsPerPage,
+//   total,
+//   permissions = {}
+// }) => {
+//   const columns = [
+//     { id: 'index', label: 'STT', align: 'center', width: 50 },
+//     { id: 'avatar', label: 'Ảnh', align: 'left', width: 100 },
+//     { id: 'name', label: 'Tên người dùng', align: 'left' },
+//     {
+//       id: 'email',
+//       label: 'Email',
+//       align: 'left',
+//       maxWidth: 200
+//     },
+//     { id: 'role', label: 'Vai trò', align: 'left', width: 180 },
+//     { id: 'createdAt', label: 'Ngày tạo', align: 'left', minWidth: 100 },
+//     { id: 'updatedAt', label: 'Ngày cập nhật', align: 'left', minWidth: 100 },
+//     {
+//       id: 'action',
+//       label: 'Hành động',
+//       align: 'left',
+//       width: 130,
+//       maxWidth: 130,
+//       pl: '11px'
+//     }
+//   ]
 //
 //   return (
-//     <StyledTableContainer component={Paper}>
-//       <Table>
-//         <TableHead>
-//           <TableRow>
-//             <StyledTableCell sx={StyleAdmin.TableColumnSTT}>
-//               STT
-//             </StyledTableCell>
-//             <StyledTableCell sx={{ width: '300px' }}>Tên</StyledTableCell>
-//             <StyledTableCell>Email</StyledTableCell>
-//             <StyledTableCell sx={{ width: '200px' }}>Quyền</StyledTableCell>
-//             <StyledTableCell className='hide-on-mobile'>
-//               Ngày tạo
-//             </StyledTableCell>
-//             <StyledTableCell className='hide-on-mobile'>
-//               Cập nhật
-//             </StyledTableCell>
-//             <StyledTableCell sx={{ maxWidth: '130px', width: '130px' }}>
-//               Hành động
-//             </StyledTableCell>
-//           </TableRow>
-//         </TableHead>
-//
-//         <TableBody>
-//           {loading ? (
-//             <StyledTableRow>
-//               <StyledTableCell></StyledTableCell>
-//               <StyledTableCell></StyledTableCell>
-//               <StyledTableCell></StyledTableCell>
-//               <StyledTableCell></StyledTableCell>
-//               <StyledTableCell className='hide-on-mobile'></StyledTableCell>
-//               <StyledTableCell className='hide-on-mobile'></StyledTableCell>
-//               <StyledTableCell></StyledTableCell>
-//             </StyledTableRow>
-//           ) : validUsers.length > 0 ? (
-//             validUsers.map((user, idx) => (
-//               <UserRow
-//                 key={user._id}
-//                 user={user}
-//                 index.jsx={(page - 1) * 10 + idx + 1}
-//                 handleOpenModal={handleOpenModal}
-//               />
-//             ))
-//           ) : (
+//     <Paper sx={{ border: '1px solid #ccc', width: '100%', overflow: 'hidden' }}>
+//       <TableContainer>
+//         <Table stickyHeader aria-label='users table'>
+//           <TableHead>
 //             <TableRow>
-//               <StyledTableCell colSpan={7} align='center'>
-//                 Không có người dùng nào
-//               </StyledTableCell>
+//               <TableCell colSpan={columns.length}>
+//                 <Box
+//                   sx={{
+//                     display: 'flex',
+//                     justifyContent: 'space-between',
+//                     alignItems: 'start',
+//                     minHeight: 76.5
+//                   }}
+//                 >
+//                   <Typography variant='h6' sx={{ fontWeight: '800' }}>
+//                     Danh sách người dùng
+//                   </Typography>
+//                   <FilterUser
+//                     onFilter={onFilters}
+//                     users={users}
+//                     loading={loading}
+//                   />
+//                 </Box>
+//               </TableCell>
 //             </TableRow>
-//           )}
-//         </TableBody>
-//       </Table>
-//     </StyledTableContainer>
+//             <TableRow>
+//               {columns.map((column) => (
+//                 <TableCell
+//                   key={column.id}
+//                   align={column.align || 'left'}
+//                   sx={{
+//                     px: 1,
+//                     ...(column.minWidth && { minWidth: column.minWidth }),
+//                     ...(column.width && { width: column.width }),
+//                     ...(column.maxWidth && { maxWidth: column.maxWidth }),
+//                     pl: column.pl,
+//                     whiteSpace: 'nowrap'
+//                   }}
+//                 >
+//                   {column.label}
+//                 </TableCell>
+//               ))}
+//             </TableRow>
+//           </TableHead>
+//           <TableBody>
+//             {loading ? (
+//               <TableRow>
+//                 {columns.map((column) => (
+//                   <TableCell key={column.id} align={column.align}></TableCell>
+//                 ))}
+//               </TableRow>
+//             ) : users.length > 0 ? (
+//               users.map((user, idx) => (
+//                 <UserRow
+//                   key={user._id}
+//                   user={user}
+//                   index={page * rowsPerPage + idx + 1}
+//                   columns={columns}
+//                   handleOpenModal={handleOpenModal}
+//                   permissions={permissions}
+//                 />
+//               ))
+//             ) : (
+//               <TableNoneData
+//                 col={columns.length}
+//                 message='Không có dữ liệu người dùng.'
+//               />
+//             )}
+//           </TableBody>
+//         </Table>
+//       </TableContainer>
+//
+//       <TablePagination
+//         rowsPerPageOptions={[10, 25, 100]}
+//         component='div'
+//         count={total || 0}
+//         rowsPerPage={rowsPerPage}
+//         page={page}
+//         onPageChange={(event, newPage) => onPageChange(event, newPage + 1)}
+//         onRowsPerPageChange={(event) => {
+//           const newLimit = parseInt(event.target.value, 10)
+//           if (onChangeRowsPerPage) {
+//             onChangeRowsPerPage(newLimit)
+//           }
+//         }}
+//         labelRowsPerPage='Số dòng mỗi trang'
+//         labelDisplayedRows={({ from, to, count }) => {
+//           const totalPages = Math.ceil(count / rowsPerPage)
+//           return `${from}–${to} trên ${count} | Trang ${page + 1} / ${totalPages}`
+//         }}
+//         ActionsComponent={TablePaginationActions}
+//       />
+//     </Paper>
 //   )
-// })
+// }
+//
 // export default UserTable
 
 import React from 'react'

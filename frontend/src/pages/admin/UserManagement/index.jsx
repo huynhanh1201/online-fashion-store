@@ -1,3 +1,123 @@
+// import React from 'react'
+// import UserTable from './UserTable'
+//
+// import useUsers from '~/hooks/admin/useUsers'
+// import usePermissions from '~/hooks/usePermissions'
+// import { PermissionWrapper, RouteGuard } from '~/components/PermissionGuard'
+//
+// // Lazy load các modal
+// const ViewUserModal = React.lazy(() => import('./modal/ViewUserModal'))
+// const EditUserModal = React.lazy(() => import('./modal/EditUserModal'))
+// const DeleteUserModal = React.lazy(() => import('./modal/DeleteUserModal'))
+//
+// const UserManagement = () => {
+//   const [page, setPage] = React.useState(1)
+//   const [selectedUser, setSelectedUser] = React.useState(null)
+//   const [limit, setLimit] = React.useState(10)
+//   const [modalType, setModalType] = React.useState(null)
+//   const [filters, setFilters] = React.useState({
+//     sort: 'newest'
+//   })
+//
+//   const { users, totalPages, fetchUsers, Loading, removeUser, updateUser } =
+//     useUsers()
+//
+//   const { hasPermission } = usePermissions()
+//
+//   React.useEffect(() => {
+//     fetchUsers(page, limit, filters)
+//   }, [page, limit, filters])
+//
+//   const handleOpenModal = (type, user) => {
+//     if (!user || !user._id) return
+//     setSelectedUser(user)
+//     setModalType(type)
+//   }
+//
+//   const handleCloseModal = () => {
+//     setSelectedUser(null)
+//     setModalType(null)
+//   }
+//
+//   const handleChangePage = (event, value) => setPage(value)
+//
+//   const handleSave = async (data, type, id) => {
+//     try {
+//       if (type === 'edit') {
+//         await updateUser(id, data)
+//       } else if (type === 'delete') {
+//         await removeUser(data)
+//       }
+//     } catch (error) {
+//       console.error('Lỗi:', error)
+//     }
+//   }
+//
+//   const isEqual = (obj1, obj2) => JSON.stringify(obj1) === JSON.stringify(obj2)
+//
+//   const handleFilter = (newFilters) => {
+//     if (!isEqual(filters, newFilters)) {
+//       setPage(1)
+//       setFilters(newFilters)
+//     }
+//   }
+//
+//   return (
+//     <RouteGuard requiredPermissions={['admin:access', 'user:read']}>
+//       <UserTable
+//         users={users}
+//         loading={Loading}
+//         handleOpenModal={handleOpenModal}
+//         onFilters={handleFilter}
+//         fetchUsers={fetchUsers}
+//         page={page - 1}
+//         rowsPerPage={limit}
+//         total={totalPages}
+//         onPageChange={handleChangePage}
+//         onChangeRowsPerPage={(newLimit) => {
+//           setPage(1)
+//           setLimit(newLimit)
+//         }}
+//         permissions={{
+//           canEdit: hasPermission('user:update'),
+//           canDelete: hasPermission('user:delete'),
+//           canView: hasPermission('user:read')
+//         }}
+//       />
+//
+//       <React.Suspense fallback={<></>}>
+//         {modalType === 'view' && selectedUser && (
+//           <ViewUserModal open onClose={handleCloseModal} user={selectedUser} />
+//         )}
+//
+//         <PermissionWrapper requiredPermissions={['user:update']}>
+//           {modalType === 'edit' && selectedUser && (
+//             <EditUserModal
+//               open
+//               onClose={handleCloseModal}
+//               user={selectedUser}
+//               onSave={handleSave}
+//             />
+//           )}
+//         </PermissionWrapper>
+//
+//         <PermissionWrapper requiredPermissions={['user:delete']}>
+//           {modalType === 'delete' && selectedUser && (
+//             <DeleteUserModal
+//               open
+//               onClose={handleCloseModal}
+//               user={selectedUser}
+//               onDelete={handleSave}
+//             />
+//           )}
+//         </PermissionWrapper>
+//       </React.Suspense>
+//     </RouteGuard>
+//   )
+// }
+//
+// export default UserManagement
+
 import * as React from 'react'
 import { Typography, Box } from '@mui/material'
 import UserTable from './UserTable'

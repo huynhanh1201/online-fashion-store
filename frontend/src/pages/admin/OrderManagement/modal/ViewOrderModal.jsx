@@ -410,32 +410,35 @@ function ViewOrderModal({
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {orderDetails.map((item) => (
-                    <TableRow key={item._id}>
-                      <TableCell>
-                        {item.name
-                          .split(' ')
-                          .map(
-                            (word) =>
-                              word.charAt(0).toUpperCase() +
-                              word.slice(1).toLowerCase()
-                          )
-                          .join(' ') || 'Không có tên'}
-                      </TableCell>
-                      <TableCell align='right'>
-                        {item.quantity.toLocaleString('vi-VN')}
-                      </TableCell>
-                      <TableCell align='right'>
-                        {item.subtotal.toLocaleString('vi-VN')}đ
-                      </TableCell>
-                      <TableCell align='right'>
-                        {(item.subtotal * item.quantity).toLocaleString(
-                          'vi-VN'
-                        )}
-                        đ
-                      </TableCell>
-                    </TableRow>
-                  ))}
+                  {orderDetails.map((item) => {
+                    const ProductName =
+                      item?.productId?.name || item.name || 'không có tên'
+                    return (
+                      <TableRow key={item._id}>
+                        <TableCell>
+                          {ProductName.split(' ')
+                            .map(
+                              (word) =>
+                                word.charAt(0).toUpperCase() +
+                                word.slice(1).toLowerCase()
+                            )
+                            .join(' ') || 'Không có tên'}
+                        </TableCell>
+                        <TableCell align='right'>
+                          {item.quantity.toLocaleString('vi-VN')}
+                        </TableCell>
+                        <TableCell align='right'>
+                          {item.subtotal.toLocaleString('vi-VN')}đ
+                        </TableCell>
+                        <TableCell align='right'>
+                          {(item.subtotal * item.quantity).toLocaleString(
+                            'vi-VN'
+                          )}
+                          đ
+                        </TableCell>
+                      </TableRow>
+                    )
+                  })}
                 </TableBody>
               </Table>
             )}

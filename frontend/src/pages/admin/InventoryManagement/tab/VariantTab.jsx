@@ -231,7 +231,7 @@ const VariantsTab = () => {
                         display: 'flex',
                         flexDirection: 'column',
                         gap: 1,
-                        minWidth: 250
+                        minWidth: 200
                       }}
                     >
                       <Typography variant='h6' sx={{ fontWeight: '800' }}>
