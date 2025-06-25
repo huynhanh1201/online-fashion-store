@@ -1,5 +1,4 @@
 import { ReviewModel } from '~/models/ReviewModel'
-import mongoose from 'mongoose'
 
 const createReview = async (reqBody) => {
   // eslint-disable-next-line no-useless-catch
