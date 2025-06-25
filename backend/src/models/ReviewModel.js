@@ -59,10 +59,10 @@ const reviewSchema = new Schema(
       default: null // chỉ có khi đã kiểm duyệt
     },
     moderatedBy: {
-      _id: { type: mongoose.Types.ObjectId, required: true },
-      name: { type: String, required: true },
-      role: { type: String, required: true },
-      email: { type: String, required: true }
+      _id: { type: mongoose.Types.ObjectId },
+      name: { type: String },
+      role: { type: String },
+      email: { type: String }
     }
   },
   {
