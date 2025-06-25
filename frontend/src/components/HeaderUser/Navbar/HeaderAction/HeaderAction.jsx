@@ -55,7 +55,6 @@ const HeaderAction = () => {
             type: 'user/loginUserAPI/fulfilled',
             payload: profileData
           })
-          await refresh()
         } else {
           throw new Error('Không tìm thấy thông tin người dùng')
         }
@@ -245,7 +244,7 @@ const HeaderAction = () => {
                 textTransform: 'none',
                 color: 'text.primary',
                 '&:hover': {
-                    backgroundColor: 'rgba(0, 0, 0, 0.04)'
+                  backgroundColor: 'rgba(0, 0, 0, 0.04)'
                 }
               }}
             >
@@ -264,7 +263,8 @@ const HeaderAction = () => {
               color: 'text.primary',
               '&:hover': {
                 backgroundColor: 'rgba(0, 0, 0, 0.04)'
-              }}
+              }
+            }
             }
           >
             Giỏ hàng
@@ -281,7 +281,8 @@ const HeaderAction = () => {
               color: 'text.primary',
               '&:hover': {
                 backgroundColor: 'rgba(0, 0, 0, 0.04)'
-              }}
+              }
+            }
             }
           >
             Thông tin đơn hàng
@@ -305,7 +306,8 @@ const HeaderAction = () => {
               color: 'text.primary',
               '&:hover': {
                 backgroundColor: 'rgba(0, 0, 0, 0.04)'
-              }}
+              }
+            }
             }
           >
             <span style={{ display: 'flex', alignItems: 'center' }}>

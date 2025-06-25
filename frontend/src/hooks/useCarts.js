@@ -15,6 +15,12 @@ export const useCart = () => {
   const cart = useSelector(state => state.cart)
 
   const fetchCart = async (options = {}) => {
+    const token = localStorage.getItem('token')
+    if (!token) {
+      setLoading(false)
+      return
+    }
+
     if (!options?.silent) setLoading(true)
     try {
       const response = await getCart()
@@ -142,7 +148,10 @@ export const useCart = () => {
   })
 
   useEffect(() => {
-    fetchCart()
+    const token = localStorage.getItem('token')
+    if (token) {
+      fetchCart()
+    }
   }, [])
 
   return {

@@ -4,6 +4,7 @@ import Slider from './Slider/Slider'
 import ChatBot from './ChatBot/ChatBot'
 import Content from './Contents/Content.jsx'
 import ProductContent from './ProductContent/ProductContent.jsx'
+import { BlogHome } from './BlogHome'
 const UserHome = () => {
   return (
     <>
@@ -11,6 +12,7 @@ const UserHome = () => {
       <ChatBot></ChatBot>
       <Content />
       <ProductContent />
+      <BlogHome />
     </>
   )
 }

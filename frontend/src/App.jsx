@@ -60,8 +60,9 @@ import ServiceHighlightManagement from '~/pages/admin/MarketingManagement/Servic
 // Trang 404
 import NotFound from '~/pages/404/NotFound'
 // Hook
-import { useAutoClearTempCart } from './hooks/useAutoClearTempCart'
-import OrderDetail from './pages/user/Orders/OrderDetail'
+import { useAutoClearTempCart } from '~/hooks/useAutoClearTempCart'
+import OrderDetail from '~/pages/user/Orders/OrderDetail'
+import { BlogDetail } from '~/pages/user/Blog'
 
 // Giải pháp Clean Code trong việc xác định các route nào cần đăng nhập tài khoản xong thì mới được truy cập
 const ProtectedRoute = ({ user }) => {
@@ -87,6 +88,8 @@ function App() {
         <Route path='product' element={<Product />} />
         <Route path='/productdetail/:productId' element={<ProductDetail />} />
         <Route path='blog' element={<Blog />} />
+        <Route path='/blog/:blogId' element={<BlogDetail />} />
+
         <Route
           path='productbycategory/:categoryId'
           element={<ProductbyCategory />}

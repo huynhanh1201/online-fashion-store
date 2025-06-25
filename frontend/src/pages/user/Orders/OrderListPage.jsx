@@ -361,7 +361,7 @@ const OrderRow = ({ order, onOrderUpdate, onOrderCancelled }) => {
                 Xem chi tiết
               </Button>
 
-              {order.status === 'Delivered' ? (
+              {order.status === 'Delivered' && (
                 <Button
                   startIcon={<Replay />}
                   onClick={async () => {
@@ -425,7 +425,9 @@ const OrderRow = ({ order, onOrderUpdate, onOrderCancelled }) => {
                 >
                   Mua lại
                 </Button>
-              ) : (
+              )}
+
+              {order.status === 'Processing' && (
                 <Button
                   variant="outlined"
                   color="error"
@@ -461,22 +463,53 @@ const OrderRow = ({ order, onOrderUpdate, onOrderCancelled }) => {
 const OrderListPage = () => {
   const [orders, setOrders] = useState([])
   const [loading, setLoading] = useState(true)
+  const [loadingMore, setLoadingMore] = useState(false)
   const [selectedTab, setSelectedTab] = useState('All')
+  const [currentPage, setCurrentPage] = useState(1)
+  const [hasMore, setHasMore] = useState(true)
   const currentUser = useSelector(selectCurrentUser)
   const userId = currentUser?._id
 
-  const fetchOrders = async () => {
+  const fetchOrders = async (page = 1, reset = true) => {
     if (!userId) return
     try {
-      setLoading(true)
-      const orders = await getOrders(userId)
-      console.log('Fetched orders:', orders.data) // Kiểm tra ở console
-      setOrders(orders.data)
+      if (reset) {
+        setLoading(true)
+        setCurrentPage(1)
+        setHasMore(true)
+      } else {
+        setLoadingMore(true)
+      }
+
+      const response = await getOrders(userId, page, 10) // 10 items per page
+      console.log('Fetched orders:', response) // Kiểm tra ở console
+
+      if (reset) {
+        setOrders(response.data || [])
+      } else {
+        setOrders(prev => [...prev, ...(response.data || [])])
+      }
+
+      // Kiểm tra nếu còn trang tiếp theo
+      // Nếu số lượng trả về ít hơn limit (10) thì không còn trang nào nữa
+      const hasMoreData = response.data && response.data.length === 10
+      setHasMore(hasMoreData)
+
+      if (!reset) {
+        setCurrentPage(page)
+      }
     } catch (error) {
       console.error('Lỗi khi lấy đơn hàng:', error)
     } finally {
       setLoading(false)
+      setLoadingMore(false)
     }
+  }
+
+  const loadMoreOrders = async () => {
+    if (!hasMore || loadingMore) return
+    const nextPage = currentPage + 1
+    await fetchOrders(nextPage, false)
   }
 
   useEffect(() => {
@@ -486,6 +519,9 @@ const OrderListPage = () => {
   // Handle tab change
   const handleTabChange = (event, newValue) => {
     setSelectedTab(newValue)
+    // Reset pagination when changing tabs
+    setCurrentPage(1)
+    setHasMore(true)
   }
 
   // Handle order cancellation - switch to cancelled tab
@@ -615,6 +651,38 @@ const OrderListPage = () => {
               onOrderCancelled={handleOrderCancelled}
             />
           ))}
+
+          {/* Load More Button */}
+          {hasMore && filteredOrders.length > 0 && (
+            <Box display="flex" justifyContent="center" mt={4}>
+              <Button
+                variant="outlined"
+                size="large"
+                onClick={loadMoreOrders}
+                disabled={loadingMore}
+                startIcon={loadingMore ? <CircularProgress size={20} /> : <KeyboardArrowDown />}
+                sx={{
+                  borderRadius: 3,
+                  textTransform: 'none',
+                  fontWeight: 600,
+                  px: 4,
+                  py: 1.5,
+                  border: '2px solid',
+                  borderColor: '#1a3c7b',
+                  color: '#1a3c7b',
+                  '&:hover': {
+                    backgroundColor: '#1a3c7b',
+                    color: 'white',
+                    transform: 'translateY(-2px)',
+                    boxShadow: '0 4px 12px rgba(26, 60, 123, 0.3)'
+                  },
+                  transition: 'all 0.3s ease'
+                }}
+              >
+                {loadingMore ? 'Đang tải...' : 'Xem thêm đơn hàng'}
+              </Button>
+            </Box>
+          )}
         </Stack>
       )}
     </Container>
