@@ -788,7 +788,7 @@ const AddFlashSale = ({ open, onClose, onSave, initialData }) => {
                 }
               }}
             >
-              Thêm sản phẩm
+              Thêm sản phẩm mới
             </Button>
           </Box>
         </Stack>
