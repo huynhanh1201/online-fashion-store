@@ -1,4 +1,6 @@
 import { ReviewModel } from '~/models/ReviewModel'
+import validatePagination from '~/utils/validatePagination'
+import getDateRange from '~/utils/getDateRange'
 
 const createReview = async (reqBody) => {
   // eslint-disable-next-line no-useless-catch
@@ -28,19 +30,70 @@ const createReview = async (reqBody) => {
 }
 
 const getReviewList = async (queryString) => {
-  const { productId, userId } = queryString
+  let {
+    page = 1,
+    limit = 10,
+    sort,
+    filterTypeDate,
+    startDate,
+    endDate,
+    productId,
+    moderationStatus,
+    userId
+  } = queryString
 
-  const filter = {
-    destroy: false
-  }
+  validatePagination(page, limit)
+
+  // Xử lý thông tin Filter
+  const filter = {}
 
   if (productId) filter.productId = productId
 
-  if (userId) filter.userId = userId
+  if (moderationStatus) filter.moderationStatus = moderationStatus
 
-  const result = await ReviewModel.find(filter)
-    .lean()
-    .populate({ path: 'userId', select: '_id name avatarUrl' })
+  const dateRange = getDateRange(filterTypeDate, startDate, endDate)
+
+  if (dateRange.startDate && dateRange.endDate) {
+    filter['createdAt'] = {
+      $gte: new Date(dateRange.startDate),
+      $lte: new Date(dateRange.endDate)
+    }
+  }
+
+  const sortMap = {
+    newest: { createdAt: -1 },
+    oldest: { createdAt: 1 }
+  }
+
+  let sortField = {}
+
+  if (sort) {
+    sortField = sortMap[sort]
+  }
+
+  const [categories, total] = await Promise.all([
+    ReviewModel.find(filter)
+      .sort(sortField)
+      .skip((page - 1) * limit)
+      .limit(limit)
+      .populate([
+        { path: 'userId', select: '_id name avatarUrl' },
+        { path: 'productId', select: 'name' }
+      ])
+      .lean(),
+
+    ReviewModel.countDocuments(filter)
+  ])
+
+  const result = {
+    data: categories,
+    meta: {
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit)
+    }
+  }
 
   return result
 }
@@ -64,6 +117,11 @@ const updateReview = async (reviewId, reqBody, jwtDecoded) => {
       infoUpdate,
       { new: true }
     )
+      .populate([
+        { path: 'userId', select: '_id name avatarUrl' },
+        { path: 'productId', select: 'name' }
+      ])
+      .lean()
 
     return updatedReview
   } catch (err) {
