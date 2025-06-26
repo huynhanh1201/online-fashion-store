@@ -2,11 +2,11 @@ import React, { Component } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Box, Typography } from '@mui/material'
 import useBlog from '~/hooks/useBlog.js'
-
+import { optimizeCloudinaryUrl } from '~/utils/cloudinary'
 class ErrorBoundary extends Component {
   state = { hasError: false }
 
-  static getDerivedStateFromError(error) {
+  static getDerivedStateFromError() {
     return { hasError: true }
   }
 
@@ -22,25 +22,13 @@ class ErrorBoundary extends Component {
 
 const BlogHome = () => {
   const navigate = useNavigate()
-  const [windowWidth, setWindowWidth] = React.useState(
-    typeof window !== 'undefined' ? window.innerWidth : 1024
-  )
 
   // Sử dụng hook blog
   const { blogs, loading, error, fetchLatestBlogs } = useBlog()
 
-  React.useEffect(() => {
-    const handleResize = () => {
-      setWindowWidth(window.innerWidth)
-    }
-
-    window.addEventListener('resize', handleResize)
-    return () => window.removeEventListener('resize', handleResize)
-  }, [])
-
   // Fetch blogs khi component mount
   React.useEffect(() => {
-    fetchLatestBlogs(6) // Lấy 6 bài viết mới nhất
+    fetchLatestBlogs(3) // Lấy 3 bài viết mới nhất
   }, [fetchLatestBlogs])
 
 
@@ -62,290 +50,330 @@ const BlogHome = () => {
     }
   }
 
-  // Sử dụng dữ liệu từ API hoặc fallback
-  const mainArticles = blogs.length > 0 ? blogs.map(formatBlogData) : []
+  // Sử dụng dữ liệu từ API hoặc fallback và giới hạn 3 bài viết
+  const mainArticles = blogs.length > 0 ? blogs.slice(0, 3).map(formatBlogData) : []
 
   return (
     <ErrorBoundary>
       <Box
         sx={{
-          fontFamily: 'Arial, sans-serif',
-          backgroundColor: '#f9fafb',
-          padding: { xs: '40px 16px', sm: '48px 20px', lg: '60px 20px' }
+          minHeight: '100vh',
+          backgroundColor: 'grey.50',
+          py: { xs: 5, sm: 6, md: 8 },
+          px: { xs: 2, sm: 3, md: 4 }
         }}
       >
-        {/* Header */}
+        {/* Container với width responsive */}
         <Box
           sx={{
-            textAlign: 'center',
-            marginBottom: { xs: '32px', sm: '40px', lg: '48px' }
+            maxWidth: {
+              xs: '100%',
+              sm: 'sm',
+              md: 'md',
+              lg: 'lg',
+              xl: 'xl'
+            },
+            mx: 'auto'
           }}
         >
-          <Typography
-            variant="h2"
-            sx={{
-              fontSize: { xs: '24px', sm: '32px', lg: '36px' },
-              fontWeight: 'bold',
-              color: '#1f2937',
-              letterSpacing: '1px',
-              margin: 0,
-              marginBottom: '8px'
-            }}
-          >
-            TIN THỜI TRANG
-          </Typography>
-          <Typography
-            sx={{
-              fontSize: '16px',
-              color: '#6b7280',
-              margin: 0
-            }}
-          >
-            Cập nhật xu hướng thời trang mới nhất
-          </Typography>
-        </Box>
-
-        {/* Loading State */}
-        {loading && (
+          {/* Header Section */}
           <Box
             sx={{
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'center',
-              minHeight: '200px',
-              fontSize: '16px',
-              color: '#6b7280'
+              textAlign: 'center',
+              mb: { xs: 4, sm: 5, md: 6 }
             }}
           >
-            Đang tải bài viết...
+            <Typography
+              variant="h2"
+              sx={{
+                fontSize: { xs: '1.875rem', sm: '2.25rem', md: '2.5rem' },
+                fontWeight: 700,
+                color: 'grey.900',
+                letterSpacing: '0.05em',
+                mb: 1
+              }}
+            >
+              TIN THỜI TRANG
+            </Typography>
+            <Typography
+              variant="body1"
+              sx={{
+                fontSize: { xs: '0.875rem', sm: '1rem' },
+                color: 'grey.600'
+              }}
+            >
+              Cập nhật xu hướng thời trang mới nhất
+            </Typography>
           </Box>
-        )}
 
-        {/* Error State */}
-        {error && !loading && (
-          <Box
-            sx={{
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'center',
-              minHeight: '200px',
-              fontSize: '16px',
-              color: '#ef4444',
-              textAlign: 'center'
-            }}
-          >
-            {error}
-          </Box>
-        )}
-
-        {/* Flex Layout với width XL - Horizontal Cards */}
-        {!loading && (
-          <Box
-            sx={{
-              maxWidth: '1800px', // XL width
-              margin: '0 auto',
-              marginBottom: '48px',
-              padding: '0 16px'
-            }}
-          >
-            {/* Flex container - vertical stack */}
+          {/* Loading State */}
+          {loading && (
             <Box
               sx={{
                 display: 'flex',
-                flexDirection: 'column',
-                gap: { xs: '20px', sm: '24px', lg: '32px' }
+                justifyContent: 'center',
+                alignItems: 'center',
+                minHeight: { xs: '150px', sm: '200px' },
+                textAlign: 'center'
               }}
             >
-              {mainArticles.map((article) => (
-                <Box
-                  key={article.id}
-                  sx={{
-                    width: '100%',
-                    cursor: 'pointer',
-                    transition: 'transform 0.3s ease, box-shadow 0.3s ease'
-                  }}
-                  onClick={() => navigate(`/blog/${article.id}`)}
-                  onMouseEnter={(e) => {
-                    e.target.closest('.article-card').style.transform = 'translateY(-4px)'
-                    e.target.closest('.article-card').style.boxShadow = '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)'
-                  }}
-                  onMouseLeave={(e) => {
-                    e.target.closest('.article-card').style.transform = 'translateY(0)'
-                    e.target.closest('.article-card').style.boxShadow = '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)'
-                  }}
-                >
+              <Typography
+                variant="body1"
+                sx={{
+                  color: 'grey.500',
+                  fontSize: { xs: '0.875rem', sm: '1rem' }
+                }}
+              >
+                Đang tải bài viết...
+              </Typography>
+            </Box>
+          )}
+
+          {/* Error State */}
+          {error && !loading && (
+            <Box
+              sx={{
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                minHeight: { xs: '150px', sm: '200px' },
+                textAlign: 'center'
+              }}
+            >
+              <Typography
+                variant="body1"
+                sx={{
+                  color: 'error.main',
+                  fontSize: { xs: '0.875rem', sm: '1rem' }
+                }}
+              >
+                {error}
+              </Typography>
+            </Box>
+          )}
+
+          {/* Grid Layout - Vertical Cards */}
+          {!loading && mainArticles.length > 0 && (
+            <Box
+              sx={{
+                mb: { xs: 4, sm: 6, md: 8 }
+              }}
+            >
+              {/* Grid container */}
+              <Box
+                sx={{
+                  display: 'grid',
+                  gridTemplateColumns: {
+                    xs: '1fr',
+                    sm: 'repeat(2, 1fr)',
+                    md: 'repeat(3, 1fr)'
+                  },
+                  gap: { xs: 2.5, sm: 3, md: 4 }
+                }}
+              >
+                {mainArticles.map((article) => (
                   <Box
-                    className='article-card'
+                    key={article.id}
                     sx={{
-                      display: 'flex',
-                      flexDirection: { xs: 'column', sm: 'row' },
-                      backgroundColor: 'white',
-                      borderRadius: '12px',
-                      overflow: 'hidden',
-                      transition: 'transform 0.3s ease, box-shadow 0.3s ease',
-                      boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
-                      height: { xs: 'auto', sm: '200px', lg: '250px' }
+                      cursor: 'pointer',
+                      transition: 'all 0.3s ease',
+                      '&:hover': {
+                        transform: 'translateY(-8px)',
+                        '& .article-card': {
+                          boxShadow: (theme) => theme.shadows[8]
+                        },
+                        '& .article-image': {
+                          transform: 'scale(1.05)'
+                        }
+                      }
                     }}
+                    onClick={() => navigate(`/blog/${article.id}`)}
                   >
-                    {/* Image Section */}
                     <Box
+                      className="article-card"
                       sx={{
-                        flex: { xs: 'none', sm: '0 0 40%' },
-                        height: { xs: '200px', sm: '100%' },
-                        position: 'relative',
-                        overflow: 'hidden'
-                      }}
-                    >
-                      <Box
-                        component="img"
-                        src={article.image}
-                        alt={article.title}
-                        sx={{
-                          width: '100%',
-                          height: '100%',
-                          objectFit: 'cover'
-                        }}
-                      />
-
-                      {/* Category Tag */}
-                      <Box
-                        sx={{
-                          position: 'absolute',
-                          top: '12px',
-                          left: '12px',
-                          backgroundColor: 'rgba(0, 0, 0, 0.8)',
-                          color: 'white',
-                          padding: '4px 8px',
-                          borderRadius: '4px',
-                          fontSize: '11px',
-                          fontWeight: 'bold',
-                          textTransform: 'uppercase',
-                          letterSpacing: '0.5px'
-                        }}
-                      >
-                        {article.category}
-                      </Box>
-                    </Box>
-
-                    {/* Content Section */}
-                    <Box
-                      sx={{
-                        flex: '1',
-                        padding: { xs: '20px', sm: '24px', lg: '32px' },
                         display: 'flex',
                         flexDirection: 'column',
-                        justifyContent: 'space-between'
+                        bgcolor: 'background.paper',
+                        borderRadius: 2,
+                        overflow: 'hidden',
+                        transition: 'all 0.3s ease',
+                        boxShadow: (theme) => theme.shadows[2],
+                        height: '100%'
                       }}
                     >
-                      <Box>
-                        <Typography
-                          variant="h3"
+                      {/* Image Section */}
+                      <Box
+                        sx={{
+                          height: { xs: 200, sm: 220, md: 240 },
+                          position: 'relative',
+                          overflow: 'hidden'
+                        }}
+                      >
+                        <Box
+                          component="img"
+                          className="article-image"
+                          src={optimizeCloudinaryUrl(article.image)}
+                          alt={article.title}
                           sx={{
-                            fontSize: { xs: '18px', sm: '20px', lg: '24px' },
-                            fontWeight: 'bold',
-                            color: '#1f2937',
-                            marginBottom: '8px',
-                            lineHeight: '1.3',
-                            margin: '0 0 8px 0',
+                            width: '100%',
+                            height: '100%',
+                            objectFit: 'cover',
+                            transition: 'transform 0.3s ease'
+                          }}
+                        />
+
+                        {/* Category Tag */}
+                        <Box
+                          sx={{
+                            position: 'absolute',
+                            top: 2,
+                            left: 2,
+                            bgcolor: 'rgba(0, 0, 0, 0.8)',
+                            color: 'common.white',
+                            px: 1.5,
+                            py: 0.75,
+                            borderRadius: 2.5,
+                            typography: 'caption',
+                            fontWeight: 700,
+                            textTransform: 'uppercase',
+                            letterSpacing: '0.05em',
+                            backdropFilter: 'blur(4px)'
+                          }}
+                        >
+                          {article.category}
+                        </Box>
+                      </Box>
+
+                      {/* Content Section */}
+                      <Box
+                        sx={{
+                          p: { xs: 2.5, sm: 3 },
+                          display: 'flex',
+                          flexDirection: 'column',
+                          flex: 1
+                        }}
+                      >
+                        <Typography
+                          variant="h6"
+                          sx={{
+                            fontSize: { xs: '1rem', sm: '1.125rem', md: '1.25rem' },
+                            fontWeight: 700,
+                            color: 'text.primary',
+                            mb: 1.5,
+                            lineHeight: 1.4,
                             display: '-webkit-box',
                             WebkitLineClamp: 2,
                             WebkitBoxOrient: 'vertical',
-                            overflow: 'hidden'
+                            overflow: 'hidden',
+                            minHeight: { xs: 40, sm: 44, md: 48 }
                           }}
                         >
                           {article.title}
                         </Typography>
 
                         <Typography
+                          variant="body2"
                           sx={{
-                            fontSize: { xs: '14px', sm: '15px', lg: '16px' },
-                            color: '#6b7280',
-                            margin: '0 0 16px 0',
-                            lineHeight: '1.6',
+                            fontSize: { xs: '0.875rem', sm: '0.9375rem' },
+                            color: 'text.secondary',
+                            mb: 2,
+                            lineHeight: 1.6,
                             display: '-webkit-box',
-                            WebkitLineClamp: { xs: 2, sm: 3 },
+                            WebkitLineClamp: 3,
                             WebkitBoxOrient: 'vertical',
-                            overflow: 'hidden'
+                            overflow: 'hidden',
+                            flex: 1
                           }}
                         >
                           {article.subtitle}
                         </Typography>
-                      </Box>
 
-                      <Box
-                        sx={{
-                          display: 'flex',
-                          justifyContent: 'space-between',
-                          alignItems: 'center',
-                          marginTop: 'auto'
-                        }}
-                      >
-                        <Typography
+                        {/* Footer */}
+                        <Box
                           sx={{
-                            fontSize: '13px',
-                            color: '#9ca3af',
-                            fontWeight: '500'
-                          }}
-                        >
-                          {article.date}
-                        </Typography>
-
-                        <Typography
-                          sx={{
-                            fontSize: '14px',
-                            color: '#3b82f6',
-                            fontWeight: '600',
                             display: 'flex',
+                            justifyContent: 'space-between',
                             alignItems: 'center',
-                            gap: '4px'
+                            mt: 'auto',
+                            pt: 2,
+                            borderTop: 1,
+                            borderColor: 'divider'
                           }}
                         >
-                          Đọc thêm →
-                        </Typography>
+                          <Typography
+                            variant="caption"
+                            sx={{
+                              color: 'text.disabled',
+                              fontWeight: 500
+                            }}
+                          >
+                            {article.date}
+                          </Typography>
+
+                          <Typography
+                            variant="body2"
+                            sx={{
+                              color: 'primary.main',
+                              fontWeight: 600,
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: 0.5,
+                              '&:hover': {
+                                color: 'primary.dark'
+                              }
+                            }}
+                          >
+                            Đọc thêm →
+                          </Typography>
+                        </Box>
                       </Box>
                     </Box>
                   </Box>
-                </Box>
-              ))}
+                ))}
+              </Box>
             </Box>
-          </Box>
-        )}
+          )}
 
-        {/* View All Button */}
-        {!loading && mainArticles.length > 0 && (
-          <Box
-            sx={{
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'center',
-              marginTop: '32px'
-            }}
-          >
+          {/* View All Button */}
+          {!loading && mainArticles.length > 0 && (
             <Box
-              component="button"
               sx={{
-                border: '1px solid #1f2937',
-                color: '#1f2937',
-                backgroundColor: 'transparent',
-                padding: { xs: '8px 20px', sm: '10px 28px' },
-                borderRadius: '9999px',
-                fontSize: '14px',
-                cursor: 'pointer',
-                transition: 'all 0.3s ease',
-                fontWeight: '500',
-                '&:hover': {
-                  backgroundColor: '#1f2937',
-                  color: 'white'
-                }
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                mt: { xs: 4, sm: 5, md: 6 }
               }}
-              onClick={() => navigate('/blog')}
             >
-              Xem tất cả ›
+              <Box
+                component="button"
+                sx={{
+                  border: 1,
+                  borderColor: 'grey.800',
+                  color: 'grey.800',
+                  bgcolor: 'transparent',
+                  px: { xs: 2.5, sm: 3.5 },
+                  py: { xs: 1, sm: 1.25 },
+                  borderRadius: '50px',
+                  typography: 'body2',
+                  cursor: 'pointer',
+                  transition: 'all 0.3s ease',
+                  fontWeight: 500,
+                  '&:hover': {
+                    bgcolor: 'grey.800',
+                    color: 'common.white',
+                    transform: 'translateY(-1px)',
+                    boxShadow: (theme) => theme.shadows[4]
+                  }
+                }}
+                onClick={() => navigate('/blog')}
+              >
+                Xem tất cả ›
+              </Box>
             </Box>
-          </Box>
-        )}
+          )}
 
-
+        </Box>
       </Box>
     </ErrorBoundary>
   )

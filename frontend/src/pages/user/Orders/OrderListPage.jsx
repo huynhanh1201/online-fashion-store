@@ -470,7 +470,7 @@ const OrderListPage = () => {
   const currentUser = useSelector(selectCurrentUser)
   const userId = currentUser?._id
 
-  const fetchOrders = async (page = 1, reset = true) => {
+  const fetchOrders = async (page = 1, reset = true, status = selectedTab) => {
     if (!userId) return
     try {
       if (reset) {
@@ -481,7 +481,8 @@ const OrderListPage = () => {
         setLoadingMore(true)
       }
 
-      const response = await getOrders(userId, page, 10) // 10 items per page
+      // Truyền status vào API call
+      const response = await getOrders(userId, page, 10, status) // 10 items per page
       console.log('Fetched orders:', response) // Kiểm tra ở console
 
       if (reset) {
@@ -509,12 +510,19 @@ const OrderListPage = () => {
   const loadMoreOrders = async () => {
     if (!hasMore || loadingMore) return
     const nextPage = currentPage + 1
-    await fetchOrders(nextPage, false)
+    await fetchOrders(nextPage, false, selectedTab)
   }
 
   useEffect(() => {
     fetchOrders()
   }, [userId])
+
+  // Thêm useEffect để gọi lại API khi tab thay đổi
+  useEffect(() => {
+    if (userId) {
+      fetchOrders(1, true, selectedTab)
+    }
+  }, [selectedTab, userId])
 
   // Handle tab change
   const handleTabChange = (event, newValue) => {
@@ -522,6 +530,7 @@ const OrderListPage = () => {
     // Reset pagination when changing tabs
     setCurrentPage(1)
     setHasMore(true)
+    // API call sẽ được gọi tự động qua useEffect
   }
 
   // Handle order cancellation - switch to cancelled tab
@@ -529,12 +538,8 @@ const OrderListPage = () => {
     setSelectedTab('Cancelled')
   }
 
-  // Filter orders based on selected tab
-  const filteredOrders = Array.isArray(orders)
-    ? selectedTab === 'All'
-      ? orders
-      : orders.filter((order) => order.status === selectedTab)
-    : []
+  // Không cần filter nữa vì data đã được filter từ server-side
+  const filteredOrders = Array.isArray(orders) ? orders : []
 
   // Orders are already sorted by backend (newest first), no need to reverse
 

@@ -545,7 +545,7 @@ const OrderDetail = () => {
         open={snackbarOpen}
         autoHideDuration={4000}
         onClose={() => setSnackbarOpen(false)}
-        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
       >
         <Alert
           onClose={() => setSnackbarOpen(false)}
@@ -556,7 +556,7 @@ const OrderDetail = () => {
             fontWeight: 600
           }}
         >
-          ⭐ Cảm ơn bạn đã đánh giá!
+          Cảm ơn bạn đã đánh giá!
         </Alert>
       </Snackbar>
 

@@ -1,6 +1,7 @@
 import React from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import useBlog from '~/hooks/useBlog.js'
+import { optimizeCloudinaryUrl } from '~/utils/cloudinary'
 
 class ErrorBoundary extends React.Component {
   state = { hasError: false }
@@ -252,7 +253,7 @@ const BlogDetail = () => {
                 </div>
               )}
               <img
-                src={currentBlog.coverImage || currentBlog.thumbnail || currentBlog.image}
+                src={optimizeCloudinaryUrl(currentBlog.coverImage || currentBlog.thumbnail || currentBlog.image)}
                 alt={currentBlog.title}
                 style={{
                   width: '100%',

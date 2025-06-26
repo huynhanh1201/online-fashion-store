@@ -1,11 +1,12 @@
 import React, { Component } from 'react'
 import { useNavigate } from 'react-router-dom'
 import useBlog from '~/hooks/useBlog.js'
+import { optimizeCloudinaryUrl } from '~/utils/cloudinary'
 
 class ErrorBoundary extends Component {
   state = { hasError: false }
 
-  static getDerivedStateFromError(error) {
+  static getDerivedStateFromError() {
     return { hasError: true }
   }
 
@@ -196,7 +197,7 @@ const Blog = () => {
                     }}
                   >
                     <img
-                      src={article.image}
+                      src={optimizeCloudinaryUrl(article.image)}
                       alt={article.title}
                       style={{
                         width: '100%',
