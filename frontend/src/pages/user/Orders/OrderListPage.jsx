@@ -147,7 +147,7 @@ const CancelOrderModal = ({ open, onClose, onConfirm, order, loading }) => {
 }
 
 // Enhanced OrderRow component
-const OrderRow = ({ order, onOrderUpdate, onOrderCancelled }) => {
+const OrderRow = ({ order, onOrderUpdate, onOrderCancelled, onReorder, reorderLoading }) => {
   const [items, setItems] = useState([])
   const [loadingItems, setLoadingItems] = useState(true)
   const [openCancelModal, setOpenCancelModal] = useState(false)
@@ -155,7 +155,6 @@ const OrderRow = ({ order, onOrderUpdate, onOrderCancelled }) => {
   const navigate = useNavigate()
 
   const [label, color, icon] = statusLabels[order.status] || ['Không xác định', 'default', <Cancel key="unknown" />]
-  const { addToCart, refresh: refreshCart } = useCart()
   const { cancelOrder } = useOrder()
 
   // Helper functions for formatting color and size
@@ -396,85 +395,21 @@ const OrderRow = ({ order, onOrderUpdate, onOrderCancelled }) => {
                 Xem chi tiết
               </Button>
 
-              {(order.status === 'Delivered' || order.status === 'Failed') && (
+              {(order.status === 'Delivered' || order.status === 'Failed' || order.status === 'Cancelled') && (
                 <Button
-                  startIcon={<Replay />}
-                  onClick={async () => {
-                    try {
-                      console.log('Items to add back to cart:', items)
-                      console.log('Total items to process:', items.length)
-
-                      let successCount = 0
-                      let failCount = 0
-
-                      // Lặp qua từng sản phẩm trong đơn hàng - luôn gửi quantity = 1
-                      for (let i = 0; i < items.length; i++) {
-                        const item = items[i]
-                        const variantId = typeof item.variantId === 'object' ? item.variantId._id : item.variantId
-
-                        console.log(`Processing item ${i + 1}/${items.length}:`, {
-                          name: item.name,
-                          variantId: variantId,
-                          quantity: 1 // Luôn luôn là 1
-                        })
-
-                        if (!variantId) {
-                          console.warn('Variant ID not found for item:', item)
-                          failCount++
-                          continue
-                        }
-
-                        try {
-                          // Đảm bảo quantity luôn là 1
-                          const result = await addToCart({
-                            variantId: variantId,
-                            quantity: 1
-                          })
-
-                          console.log(`Item ${i + 1} add to cart result:`, result)
-
-                          if (result) {
-                            successCount++
-                          } else {
-                            failCount++
-                          }
-                        } catch (error) {
-                          console.error(`Error adding item ${i + 1} to cart:`, error)
-                          failCount++
-                        }
-
-                        // Add small delay between requests to avoid overwhelming the server
-                        if (i < items.length - 1) {
-                          await new Promise(resolve => setTimeout(resolve, 200))
-                        }
-                      }
-
-                      console.log(`Add to cart results: ${successCount} success, ${failCount} failed`)
-
-                      if (successCount > 0) {
-                        // Force refresh cart data before navigating
-                        console.log('Refreshing cart data...')
-                        await refreshCart({ silent: true })
-
-                        setTimeout(() => {
-                          navigate('/cart')
-                        }, 300) // Tăng thời gian chờ để đảm bảo cart đã refresh
-                      } else {
-                        console.error('No items were added to cart')
-                      }
-                    } catch (err) {
-                      console.error('Lỗi khi mua lại:', err)
-                    }
-                  }}
+                  startIcon={reorderLoading ? <CircularProgress size={16} /> : <Replay />}
+                  onClick={() => onReorder && onReorder(items)}
+                  disabled={reorderLoading}
                   sx={{
                     color: '#1a3c7b',
                     borderRadius: 2,
                     textTransform: 'none',
                     fontWeight: 600,
-                    boxShadow: '0 4px 12px rgba(25, 118, 210, 0.3)'
+                    boxShadow: '0 4px 12px rgba(25, 118, 210, 0.3)',
+                    opacity: reorderLoading ? 0.7 : 1
                   }}
                 >
-                  Mua lại
+                  {reorderLoading ? 'Đang thêm vào giỏ...' : 'Mua lại'}
                 </Button>
               )}
 
@@ -512,44 +447,43 @@ const OrderRow = ({ order, onOrderUpdate, onOrderCancelled }) => {
 
 // Enhanced Main OrderListPage component
 const OrderListPage = () => {
-  const [orders, setOrders] = useState([])
+  const [allOrders, setAllOrders] = useState([]) // Lưu trữ tất cả orders
   const [loading, setLoading] = useState(true)
   const [loadingMore, setLoadingMore] = useState(false)
-  const [tabLoading, setTabLoading] = useState(false) // Thêm loading riêng cho tab
+  const [reorderLoading, setReorderLoading] = useState(null) // Track which order is being reordered
   const [selectedTab, setSelectedTab] = useState('All')
   const [currentPage, setCurrentPage] = useState(1)
   const [hasMore, setHasMore] = useState(true)
   const [isInitialized, setIsInitialized] = useState(false)
   const currentUser = useSelector(selectCurrentUser)
   const userId = currentUser?._id
+  const navigate = useNavigate()
 
-  const fetchOrders = async (page = 1, reset = true, status = selectedTab, isTabChange = false) => {
+  // Chỉ gọi useCart khi thực sự cần thiết
+  const { addToCart, refresh: refreshCart } = useCart()
+
+  const fetchOrders = async (page = 1, reset = true) => {
     if (!userId) return
     try {
       if (reset) {
-        if (isTabChange) {
-          setTabLoading(true) // Chỉ hiển thị tab loading khi chuyển tab
-        } else {
-          setLoading(true) // Full loading cho lần đầu
-        }
+        setLoading(true)
         setCurrentPage(1)
         setHasMore(true)
       } else {
         setLoadingMore(true)
       }
 
-      // Truyền status vào API call
-      const response = await getOrders(userId, page, 10, status) // 10 items per page
+      // Lấy tất cả orders (không filter theo status)
+      const response = await getOrders(userId, page, 10, 'All') // Luôn lấy tất cả
       console.log('Fetched orders:', response) // Kiểm tra ở console
 
       if (reset) {
-        setOrders(response.data || [])
+        setAllOrders(response.data || [])
       } else {
-        setOrders(prev => [...prev, ...(response.data || [])])
+        setAllOrders(prev => [...prev, ...(response.data || [])])
       }
 
       // Kiểm tra nếu còn trang tiếp theo
-      // Nếu số lượng trả về ít hơn limit (10) thì không còn trang nào nữa
       const hasMoreData = response.data && response.data.length === 10
       setHasMore(hasMoreData)
 
@@ -561,37 +495,25 @@ const OrderListPage = () => {
     } finally {
       setLoading(false)
       setLoadingMore(false)
-      setTabLoading(false)
     }
   }
 
   const loadMoreOrders = async () => {
     if (!hasMore || loadingMore) return
     const nextPage = currentPage + 1
-    await fetchOrders(nextPage, false, selectedTab)
+    await fetchOrders(nextPage, false)
   }
 
   useEffect(() => {
     if (userId && !isInitialized) {
-      fetchOrders(1, true, selectedTab, false) // isTabChange = false cho lần đầu
+      fetchOrders(1, true)
       setIsInitialized(true)
     }
   }, [userId, isInitialized])
 
-  // Thêm useEffect để gọi lại API khi tab thay đổi (chỉ sau khi đã initialized)
-  useEffect(() => {
-    if (userId && isInitialized) {
-      fetchOrders(1, true, selectedTab, true) // isTabChange = true
-    }
-  }, [selectedTab, userId, isInitialized])
-
-  // Handle tab change
+  // Handle tab change - chỉ thay đổi selectedTab, không gọi API
   const handleTabChange = (event, newValue) => {
     setSelectedTab(newValue)
-    // Reset pagination when changing tabs
-    setCurrentPage(1)
-    setHasMore(true)
-    // API call sẽ được gọi tự động qua useEffect
   }
 
   // Handle order cancellation - switch to cancelled tab
@@ -599,8 +521,84 @@ const OrderListPage = () => {
     setSelectedTab('Cancelled')
   }
 
-  // Không cần filter nữa vì data đã được filter từ server-side
-  const filteredOrders = Array.isArray(orders) ? orders : []
+  // Refresh orders after update (for cancel/update operations)
+  const handleOrderUpdate = () => {
+    fetchOrders(1, true)
+  }
+
+  // Handle reorder - chỉ gọi useCart khi thực sự cần
+  const handleReorder = async (items, orderId) => {
+    try {
+      setReorderLoading(orderId) // Set loading for specific order
+      console.log('Items to add back to cart:', items)
+      console.log('Total items to process:', items.length)
+
+      let successCount = 0
+
+      // Lặp qua từng sản phẩm trong đơn hàng - luôn gửi quantity = 1
+      for (let i = 0; i < items.length; i++) {
+        const item = items[i]
+        const variantId = typeof item.variantId === 'object' ? item.variantId._id : item.variantId
+
+        console.log(`Processing item ${i + 1}/${items.length}:`, {
+          name: item.name,
+          variantId: variantId,
+          quantity: 1 // Luôn luôn là 1
+        })
+
+        if (!variantId) {
+          console.warn('Variant ID not found for item:', item)
+          continue
+        }
+
+        try {
+          // Đảm bảo quantity luôn là 1
+          const result = await addToCart({
+            variantId: variantId,
+            quantity: 1
+          })
+
+          console.log(`Item ${i + 1} add to cart result:`, result)
+
+          if (result) {
+            successCount++
+          }
+        } catch (error) {
+          console.error(`Error adding item ${i + 1} to cart:`, error)
+        }
+
+        // Add small delay between requests to avoid overwhelming the server
+        if (i < items.length - 1) {
+          await new Promise(resolve => setTimeout(resolve, 200))
+        }
+      }
+
+      console.log(`Add to cart results: ${successCount} success`)
+
+      if (successCount > 0) {
+        // Force refresh cart data before navigating
+        console.log('Refreshing cart data...')
+        await refreshCart({ silent: true })
+
+        setTimeout(() => {
+          navigate('/cart')
+        }, 300) // Tăng thời gian chờ để đảm bảo cart đã refresh
+      } else {
+        console.error('No items were added to cart')
+      }
+    } catch (err) {
+      console.error('Lỗi khi mua lại:', err)
+    } finally {
+      setReorderLoading(null) // Clear loading state
+    }
+  }
+
+  // Filter orders theo selectedTab phía client
+  const filteredOrders = Array.isArray(allOrders)
+    ? selectedTab === 'All'
+      ? allOrders
+      : allOrders.filter(order => order.status === selectedTab)
+    : []
 
   // Orders are already sorted by backend (newest first), no need to reverse
 
@@ -701,32 +699,7 @@ const OrderListPage = () => {
       </Paper>
 
       {/* Order List */}
-      {tabLoading ? (
-        // Skeleton loading khi chuyển tab
-        <Stack spacing={3}>
-          {[1, 2, 3].map((index) => (
-            <Card
-              key={index}
-              sx={{
-                borderRadius: 3,
-                boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
-                border: '1px solid rgba(0,0,0,0.05)',
-              }}
-            >
-              <CardContent sx={{ p: 3 }}>
-                <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
-                  <Box display="flex" alignItems="center" gap={1}>
-                    <Box sx={{ width: 120, height: 20, bgcolor: 'grey.200', borderRadius: 1, animation: 'pulse 1.5s ease-in-out infinite' }} />
-                    <Box sx={{ width: 80, height: 16, bgcolor: 'grey.200', borderRadius: 1, animation: 'pulse 1.5s ease-in-out infinite' }} />
-                  </Box>
-                  <Box sx={{ width: 100, height: 32, bgcolor: 'grey.200', borderRadius: 2, animation: 'pulse 1.5s ease-in-out infinite' }} />
-                </Box>
-                <Box sx={{ height: 100, bgcolor: 'grey.100', borderRadius: 2, animation: 'pulse 1.5s ease-in-out infinite' }} />
-              </CardContent>
-            </Card>
-          ))}
-        </Stack>
-      ) : filteredOrders.length === 0 ? (
+      {filteredOrders.length === 0 ? (
         <Paper
           sx={{
             p: 6,
@@ -753,8 +726,10 @@ const OrderListPage = () => {
             <OrderRow
               key={order._id}
               order={order}
-              onOrderUpdate={() => fetchOrders(1, true, selectedTab, true)}
+              onOrderUpdate={handleOrderUpdate}
               onOrderCancelled={handleOrderCancelled}
+              onReorder={(items) => handleReorder(items, order._id)}
+              reorderLoading={reorderLoading === order._id}
             />
           ))}
 

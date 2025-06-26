@@ -274,7 +274,9 @@ const ProductItem = ({ name, variant, quantity, image, color, size, getFinalPric
 
   const truncatedName = name.length > 20 ? name.slice(0, 20) + '...' : name
   const finalPrice = getFinalPrice(variant)
-  const hasDiscount = variant.discountPrice && variant.discountPrice > 0
+  const exportPrice = variant.exportPrice || 0
+  const discountPrice = variant.discountPrice || 0
+  const hasDiscount = discountPrice > 0 && exportPrice > finalPrice
 
   return (
     <tr>
@@ -332,7 +334,7 @@ const ProductItem = ({ name, variant, quantity, image, color, size, getFinalPric
                   textDecoration: 'line-through',
                 }}
               >
-                {(variant.exportPrice * quantity).toLocaleString('vi-VN')}đ
+                {(exportPrice * quantity).toLocaleString('vi-VN')}đ
               </Typography>
             </Box>
           )}
