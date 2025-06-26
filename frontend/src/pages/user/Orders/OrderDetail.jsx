@@ -28,6 +28,7 @@ import { useOrderDetail } from '~/hooks/useOrderDetail'
 import { useOrder } from '~/hooks/useOrder'
 import { useCart } from '~/hooks/useCarts'
 import ReviewModal from './modal/ReviewModal'
+import ViewReviewModal from './modal/ViewReviewModal'
 import { createReview, getUserReviews } from '~/services/reviewService'
 import { useSelector } from 'react-redux'
 import { selectCurrentUser } from '~/redux/user/userSlice'
@@ -145,7 +146,8 @@ const OrderDetail = () => {
 
   const [snackbarOpen, setSnackbarOpen] = useState(false)
   const [openReviewModal, setOpenReviewModal] = useState(false)
-  const [hasReviewed, setHasReviewed] = useState(false)     // Track if order is reviewed
+  const [openViewReviewModal, setOpenViewReviewModal] = useState(false)
+  const [reviewedProducts, setReviewedProducts] = useState(new Set())     // Track which products are reviewed
   const [selectedProduct, setSelectedProduct] = useState(null)
   const [openCancelModal, setOpenCancelModal] = useState(false)
   const [cancelling, setCancelling] = useState(false)
@@ -156,9 +158,11 @@ const OrderDetail = () => {
       if (!currentUser?._id || !orderId) return
       try {
         const reviews = await getUserReviews(currentUser._id)
-        // Check if any review exists for this orderId
-        const orderReviewed = reviews.some((review) => review.orderId === orderId)
-        setHasReviewed(orderReviewed)
+        // Check which products in this order have been reviewed
+        const reviewedProductsInOrder = reviews
+          .filter((review) => review.orderId === orderId)
+          .map((review) => review.productId)
+        setReviewedProducts(new Set(reviewedProductsInOrder))
       } catch (err) {
         console.error('Lỗi khi lấy đánh giá người dùng:', err)
       }
@@ -242,21 +246,29 @@ const OrderDetail = () => {
     setSelectedProduct(null)
   }
 
+  const handleCloseViewReviewModal = () => {
+    setOpenViewReviewModal(false)
+    setSelectedProduct(null)
+  }
+
   const handleSubmitReview = async (reviewData) => {
     try {
-      if (hasReviewed) {
-        console.error('Đơn hàng này đã được đánh giá.')
+      const productId = selectedProduct?.productId
+      if (reviewedProducts.has(productId)) {
+        console.error('Sản phẩm này đã được đánh giá.')
         return
       }
 
       console.log('Review data received:', reviewData)
       console.log('Current user ID:', currentUser?._id)
       console.log('Order ID:', orderId)
+      console.log('Product ID:', productId)
 
       // Gửi đánh giá với payload đầy đủ
       await createReview(reviewData)
 
-      setHasReviewed(true)     // Mark order as reviewed
+      // Mark this specific product as reviewed
+      setReviewedProducts(prev => new Set([...prev, productId]))
       handleCloseModal()
       setSnackbarOpen(true)
     } catch (error) {
@@ -512,7 +524,7 @@ const OrderDetail = () => {
 
                 {/* Action Buttons */}
                 <Box display="flex" justifyContent="flex-end" gap={2} mt={2}>
-                  {isOrderCompleted && currentUser && !hasReviewed && (
+                  {isOrderCompleted && currentUser && !reviewedProducts.has(product.productId) && (
                     <Button
                       variant="contained"
                       size="medium"
@@ -533,6 +545,30 @@ const OrderDetail = () => {
                       }}
                     >
                       Đánh giá
+                    </Button>
+                  )}
+
+                  {isOrderCompleted && currentUser && reviewedProducts.has(product.productId) && (
+                    <Button
+                      variant="outlined"
+                      size="medium"
+                      sx={{
+                        borderRadius: 2,
+                        textTransform: 'none',
+                        fontWeight: 600,
+                        color: 'success.main',
+                        borderColor: 'success.main',
+                        '&:hover': {
+                          backgroundColor: 'success.50',
+                          borderColor: 'success.main'
+                        }
+                      }}
+                      onClick={() => {
+                        setSelectedProduct(product)
+                        setOpenViewReviewModal(true)
+                      }}
+                    >
+                      ✓ Xem đánh giá
                     </Button>
                   )}
 
@@ -703,6 +739,16 @@ const OrderDetail = () => {
         productId={selectedProduct?.productId || uniqueProducts[0]?.productId}
         userId={currentUser?._id}
         orderId={orderId}
+      />
+
+      {/* View Review Modal */}
+      <ViewReviewModal
+        open={openViewReviewModal}
+        onClose={handleCloseViewReviewModal}
+        userId={currentUser?._id}
+        productId={selectedProduct?.productId}
+        orderId={orderId}
+        productName={selectedProduct?.productName}
       />
 
       {/* Cancel Order Modal */}
