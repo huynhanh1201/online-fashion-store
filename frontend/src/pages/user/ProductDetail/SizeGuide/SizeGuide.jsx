@@ -231,7 +231,7 @@ const SizeGuide = () => {
             </Tabs>
           </Box>
 
-          {/* Tab Content */}
+          {/* Tab EditContent */}
           {activeTab === 0 && (
             <Box>
               {/* Chọn loại sản phẩm */}

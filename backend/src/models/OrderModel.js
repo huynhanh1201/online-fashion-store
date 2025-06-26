@@ -77,7 +77,7 @@ const OrderSchema = new Schema(
         'Cancelled',
         'Failed'
       ],
-      default: 'Pending'
+      default: 'Processing'
     },
     isPaid: {
       type: Boolean,

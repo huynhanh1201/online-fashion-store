@@ -23,13 +23,7 @@ const EditInventoryModal = ({
   formatCurrency,
   parseCurrency
 }) => {
-  const [formData, setFormData] = useState({
-    minQuantity: 0,
-    importPrice: 0,
-    exportPrice: 0,
-    status: 'in-stock',
-    text: 'không'
-  })
+  const [formData, setFormData] = useState({})
 
   useEffect(() => {
     if (inventory) {
@@ -92,10 +86,9 @@ const EditInventoryModal = ({
           label='Ngưỡng cảnh báo'
           name='minQuantity'
           type='number'
-          value={formData.minQuantity}
+          value={formData.minQuantity === 0 ? '' : formData.minQuantity}
           onChange={handleChange}
           fullWidth
-          inputProps={{ min: 0 }} // Ngăn nhập số âm
         />
         {/*<TextField*/}
         {/*  margin='dense'*/}

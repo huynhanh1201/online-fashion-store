@@ -16,7 +16,6 @@ import { useForm, Controller } from 'react-hook-form'
 import StyleAdmin from '~/assets/StyleAdmin.jsx'
 
 const statusOptions = [
-  'Pending',
   'Processing',
   'Shipping',
   'Shipped',
@@ -27,12 +26,9 @@ const statusOptions = [
 // [Pending, Processing, Shipped, Delivered, Cancelled]
 const translateStatus = (status) => {
   switch (status) {
-    case 'Pending':
-      return 'Đang chờ'
     case 'Processing':
       return 'Đang xử lý'
     case 'Shipping':
-      return 'Đang vận chuyển'
     case 'Shipped':
       return 'Đã gửi hàng'
     case 'Delivered':
@@ -94,7 +90,7 @@ const EditOrderModal = ({ open, onClose, order, onUpdate, loading }) => {
       {/* Header */}
       <DialogTitle>Sửa thông tin đơn hàng</DialogTitle>
 
-      {/* Content */}
+      {/* EditContent */}
       <DialogContent dividers>
         <Stack spacing={2} sx={{ mt: 1 }}>
           {/* Status */}

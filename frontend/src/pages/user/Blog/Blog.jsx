@@ -46,8 +46,6 @@ const Blog = () => {
   const isTablet = windowWidth >= 640 && windowWidth < 1024
   const isDesktop = windowWidth >= 1024
 
-
-
   // Format dữ liệu từ API để phù hợp với UI
   const formatBlogData = (blogData) => {
     return {
@@ -56,13 +54,13 @@ const Blog = () => {
       subtitle: blogData.excerpt || blogData.subtitle || '',
       category: blogData.category || 'Tip',
       image: blogData.coverImage || blogData.thumbnail || blogData.image || '',
-      date: blogData.publishedAt ?
-        new Date(blogData.publishedAt).toLocaleDateString('vi-VN') :
-        new Date(blogData.createdAt).toLocaleDateString('vi-VN'),
-      description: blogData.content ?
-        // Remove HTML tags and limit to 150 characters
-        blogData.content.replace(/<[^>]*>/g, '').substring(0, 150) + '...' :
-        blogData.excerpt || ''
+      date: blogData.publishedAt
+        ? new Date(blogData.publishedAt).toLocaleDateString('vi-VN')
+        : new Date(blogData.createdAt).toLocaleDateString('vi-VN'),
+      description: blogData.content
+        ? // Remove HTML tags and limit to 150 characters
+          blogData.content.replace(/<[^>]*>/g, '').substring(0, 150) + '...'
+        : blogData.excerpt || ''
     }
   }
 
@@ -223,7 +221,7 @@ const Blog = () => {
                       {article.category}
                     </div>
 
-                    {/* Overlay Content */}
+                    {/* Overlay EditContent */}
                     <div
                       style={{
                         position: 'absolute',
@@ -234,7 +232,11 @@ const Blog = () => {
                           'linear-gradient(to top, rgba(0,0,0,1), rgba(0,0,0,0.7), transparent)',
                         color: 'white',
                         padding: isMobile ? '12px' : isTablet ? '16px' : '24px',
-                        paddingTop: isMobile ? '32px' : isTablet ? '40px' : '48px'
+                        paddingTop: isMobile
+                          ? '32px'
+                          : isTablet
+                            ? '40px'
+                            : '48px'
                       }}
                     >
                       <h3
@@ -270,8 +272,7 @@ const Blog = () => {
                           alignItems: 'center',
                           justifyContent: 'space-between'
                         }}
-                      >
-                      </div>
+                      ></div>
                     </div>
                   </div>
                 </div>
