@@ -147,7 +147,7 @@ const CancelOrderModal = ({ open, onClose, onConfirm, order, loading }) => {
 }
 
 // Enhanced OrderRow component
-const OrderRow = ({ order, onOrderUpdate, onOrderCancelled }) => {
+const OrderRow = ({ order, onOrderUpdate, onOrderCancelled, onReorder, reorderLoading }) => {
   const [items, setItems] = useState([])
   const [loadingItems, setLoadingItems] = useState(true)
   const [openCancelModal, setOpenCancelModal] = useState(false)
@@ -155,8 +155,18 @@ const OrderRow = ({ order, onOrderUpdate, onOrderCancelled }) => {
   const navigate = useNavigate()
 
   const [label, color, icon] = statusLabels[order.status] || ['Không xác định', 'default', <Cancel key="unknown" />]
-  const { addToCart } = useCart()
   const { cancelOrder } = useOrder()
+
+  // Helper functions for formatting color and size
+  const capitalizeFirstLetter = (str) => {
+    if (!str) return ''
+    return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase()
+  }
+
+  const formatSize = (str) => {
+    if (!str) return ''
+    return str.toUpperCase()
+  }
 
 
   useEffect(() => {
@@ -292,7 +302,7 @@ const OrderRow = ({ order, onOrderUpdate, onOrderCancelled }) => {
                         color="text.secondary"
                         sx={{ mb: 0.5 }}
                       >
-                        {item.color?.name} • {item.size}
+                        Phân loại hàng: {capitalizeFirstLetter(item.color?.name)}, {formatSize(item.size)}
                       </Typography>
                       <Chip
                         label={`Số lượng: ${item.quantity}`}
@@ -304,13 +314,37 @@ const OrderRow = ({ order, onOrderUpdate, onOrderCancelled }) => {
                   </Box>
 
                   <Box textAlign="right">
-                    <Typography
-                      fontWeight={700}
-                      fontSize="1.2rem"
-                      color="#1a3c7b"
-                    >
-                      {item.price?.toLocaleString('vi-VN')}₫
-                    </Typography>
+                    {item.variantId?.discountPrice > 0 ? (
+                      <Box display="flex" flexDirection="column" alignItems="flex-end" gap={0.5}>
+                        <Typography
+                          fontWeight={700}
+                          fontSize="1.2rem"
+                          color="#1a3c7b"
+                        >
+                          {(item.price - item.variantId.discountPrice)?.toLocaleString('vi-VN')}₫
+                        </Typography>
+                        <Box display="flex" alignItems="center" gap={1}>
+                          <Typography
+                            variant="body2"
+                            sx={{
+                              textDecoration: 'line-through',
+                              color: 'text.secondary',
+                              fontSize: '0.9rem'
+                            }}
+                          >
+                            {item.price?.toLocaleString('vi-VN')}₫
+                          </Typography>
+                        </Box>
+                      </Box>
+                    ) : (
+                      <Typography
+                        fontWeight={700}
+                        fontSize="1.2rem"
+                        color="#1a3c7b"
+                      >
+                        {item.price?.toLocaleString('vi-VN')}₫
+                      </Typography>
+                    )}
                   </Box>
                 </Box>
               </Box>
@@ -361,69 +395,21 @@ const OrderRow = ({ order, onOrderUpdate, onOrderCancelled }) => {
                 Xem chi tiết
               </Button>
 
-              {order.status === 'Delivered' && (
+              {(order.status === 'Delivered' || order.status === 'Failed' || order.status === 'Cancelled') && (
                 <Button
-                  startIcon={<Replay />}
-                  onClick={async () => {
-                    try {
-                      console.log('Items to add back to cart:', items)
-                      console.log('Total items to process:', items.length)
-
-                      let successCount = 0
-                      let failCount = 0
-
-                      // Lặp qua từng sản phẩm trong đơn hàng với đúng số lượng từ order item
-                      for (let i = 0; i < items.length; i++) {
-                        const item = items[i]
-                        const variantId = typeof item.variantId === 'object' ? item.variantId._id : item.variantId
-
-
-                        if (!variantId) {
-                          console.warn('Variant ID not found for item:', item)
-                          failCount++
-                          continue
-                        }
-
-                        try {
-                          const result = await addToCart({ variantId, quantity: 1 })
-                          if (result) {
-                            successCount++
-                          } else {
-                            failCount++
-                          }
-                        } catch (error) {
-                          failCount++
-                        }
-
-                        // Add small delay between requests to avoid overwhelming the server
-                        if (i < items.length - 1) {
-                          await new Promise(resolve => setTimeout(resolve, 200))
-                        }
-                      }
-
-                      console.log(`Add to cart results: ${successCount} success, ${failCount} failed`)
-
-                      if (successCount > 0) {
-                        // Force refresh cart data before navigating
-                        setTimeout(() => {
-                          navigate('/cart')
-                        }, 100)
-                      } else {
-                        console.error('No items were added to cart')
-                      }
-                    } catch (err) {
-                      console.error('Lỗi khi mua lại:', err)
-                    }
-                  }}
+                  startIcon={reorderLoading ? <CircularProgress size={16} /> : <Replay />}
+                  onClick={() => onReorder && onReorder(items)}
+                  disabled={reorderLoading}
                   sx={{
                     color: '#1a3c7b',
                     borderRadius: 2,
                     textTransform: 'none',
                     fontWeight: 600,
-                    boxShadow: '0 4px 12px rgba(25, 118, 210, 0.3)'
+                    boxShadow: '0 4px 12px rgba(25, 118, 210, 0.3)',
+                    opacity: reorderLoading ? 0.7 : 1
                   }}
                 >
-                  Mua lại
+                  {reorderLoading ? 'Đang thêm vào giỏ...' : 'Mua lại'}
                 </Button>
               )}
 
@@ -461,14 +447,20 @@ const OrderRow = ({ order, onOrderUpdate, onOrderCancelled }) => {
 
 // Enhanced Main OrderListPage component
 const OrderListPage = () => {
-  const [orders, setOrders] = useState([])
+  const [allOrders, setAllOrders] = useState([]) // Lưu trữ tất cả orders
   const [loading, setLoading] = useState(true)
   const [loadingMore, setLoadingMore] = useState(false)
+  const [reorderLoading, setReorderLoading] = useState(null) // Track which order is being reordered
   const [selectedTab, setSelectedTab] = useState('All')
   const [currentPage, setCurrentPage] = useState(1)
   const [hasMore, setHasMore] = useState(true)
+  const [isInitialized, setIsInitialized] = useState(false)
   const currentUser = useSelector(selectCurrentUser)
   const userId = currentUser?._id
+  const navigate = useNavigate()
+
+  // Chỉ gọi useCart khi thực sự cần thiết
+  const { addToCart, refresh: refreshCart } = useCart()
 
   const fetchOrders = async (page = 1, reset = true) => {
     if (!userId) return
@@ -481,17 +473,17 @@ const OrderListPage = () => {
         setLoadingMore(true)
       }
 
-      const response = await getOrders(userId, page, 10) // 10 items per page
+      // Lấy tất cả orders (không filter theo status)
+      const response = await getOrders(userId, page, 10, 'All') // Luôn lấy tất cả
       console.log('Fetched orders:', response) // Kiểm tra ở console
 
       if (reset) {
-        setOrders(response.data || [])
+        setAllOrders(response.data || [])
       } else {
-        setOrders(prev => [...prev, ...(response.data || [])])
+        setAllOrders(prev => [...prev, ...(response.data || [])])
       }
 
       // Kiểm tra nếu còn trang tiếp theo
-      // Nếu số lượng trả về ít hơn limit (10) thì không còn trang nào nữa
       const hasMoreData = response.data && response.data.length === 10
       setHasMore(hasMoreData)
 
@@ -513,15 +505,15 @@ const OrderListPage = () => {
   }
 
   useEffect(() => {
-    fetchOrders()
-  }, [userId])
+    if (userId && !isInitialized) {
+      fetchOrders(1, true)
+      setIsInitialized(true)
+    }
+  }, [userId, isInitialized])
 
-  // Handle tab change
+  // Handle tab change - chỉ thay đổi selectedTab, không gọi API
   const handleTabChange = (event, newValue) => {
     setSelectedTab(newValue)
-    // Reset pagination when changing tabs
-    setCurrentPage(1)
-    setHasMore(true)
   }
 
   // Handle order cancellation - switch to cancelled tab
@@ -529,11 +521,83 @@ const OrderListPage = () => {
     setSelectedTab('Cancelled')
   }
 
-  // Filter orders based on selected tab
-  const filteredOrders = Array.isArray(orders)
+  // Refresh orders after update (for cancel/update operations)
+  const handleOrderUpdate = () => {
+    fetchOrders(1, true)
+  }
+
+  // Handle reorder - chỉ gọi useCart khi thực sự cần
+  const handleReorder = async (items, orderId) => {
+    try {
+      setReorderLoading(orderId) // Set loading for specific order
+      console.log('Items to add back to cart:', items)
+      console.log('Total items to process:', items.length)
+
+      let successCount = 0
+
+      // Lặp qua từng sản phẩm trong đơn hàng - luôn gửi quantity = 1
+      for (let i = 0; i < items.length; i++) {
+        const item = items[i]
+        const variantId = typeof item.variantId === 'object' ? item.variantId._id : item.variantId
+
+        console.log(`Processing item ${i + 1}/${items.length}:`, {
+          name: item.name,
+          variantId: variantId,
+          quantity: 1 // Luôn luôn là 1
+        })
+
+        if (!variantId) {
+          console.warn('Variant ID not found for item:', item)
+          continue
+        }
+
+        try {
+          // Đảm bảo quantity luôn là 1
+          const result = await addToCart({
+            variantId: variantId,
+            quantity: 1
+          })
+
+          console.log(`Item ${i + 1} add to cart result:`, result)
+
+          if (result) {
+            successCount++
+          }
+        } catch (error) {
+          console.error(`Error adding item ${i + 1} to cart:`, error)
+        }
+
+        // Add small delay between requests to avoid overwhelming the server
+        if (i < items.length - 1) {
+          await new Promise(resolve => setTimeout(resolve, 200))
+        }
+      }
+
+      console.log(`Add to cart results: ${successCount} success`)
+
+      if (successCount > 0) {
+        // Force refresh cart data before navigating
+        console.log('Refreshing cart data...')
+        await refreshCart({ silent: true })
+
+        setTimeout(() => {
+          navigate('/cart')
+        }, 300) // Tăng thời gian chờ để đảm bảo cart đã refresh
+      } else {
+        console.error('No items were added to cart')
+      }
+    } catch (err) {
+      console.error('Lỗi khi mua lại:', err)
+    } finally {
+      setReorderLoading(null) // Clear loading state
+    }
+  }
+
+  // Filter orders theo selectedTab phía client
+  const filteredOrders = Array.isArray(allOrders)
     ? selectedTab === 'All'
-      ? orders
-      : orders.filter((order) => order.status === selectedTab)
+      ? allOrders
+      : allOrders.filter(order => order.status === selectedTab)
     : []
 
   // Orders are already sorted by backend (newest first), no need to reverse
@@ -552,7 +616,22 @@ const OrderListPage = () => {
   }
 
   return (
-    <Container maxWidth="lg" sx={{ py: 4, minHeight: '70vh' }}>
+    <Container maxWidth="lg" sx={{
+      py: 4,
+      minHeight: '70vh',
+      // Thêm CSS animation cho skeleton
+      '& @keyframes pulse': {
+        '0%': {
+          opacity: 1,
+        },
+        '50%': {
+          opacity: 0.4,
+        },
+        '100%': {
+          opacity: 1,
+        },
+      }
+    }}>
       {/* Header */}
       <Box mb={4}>
         <Typography
@@ -647,8 +726,10 @@ const OrderListPage = () => {
             <OrderRow
               key={order._id}
               order={order}
-              onOrderUpdate={fetchOrders}
+              onOrderUpdate={handleOrderUpdate}
               onOrderCancelled={handleOrderCancelled}
+              onReorder={(items) => handleReorder(items, order._id)}
+              reorderLoading={reorderLoading === order._id}
             />
           ))}
 

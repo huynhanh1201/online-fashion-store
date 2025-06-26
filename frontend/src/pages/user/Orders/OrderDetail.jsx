@@ -23,21 +23,24 @@ import {
 } from '@mui/material'
 import { useParams, useNavigate } from 'react-router-dom'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack'
-import { Cancel, Warning } from '@mui/icons-material'
+import { Cancel, Warning, Replay } from '@mui/icons-material'
 import { useOrderDetail } from '~/hooks/useOrderDetail'
 import { useOrder } from '~/hooks/useOrder'
+import { useCart } from '~/hooks/useCarts'
 import ReviewModal from './modal/ReviewModal'
+import ViewReviewModal from './modal/ViewReviewModal'
 import { createReview, getUserReviews } from '~/services/reviewService'
 import { useSelector } from 'react-redux'
 import { selectCurrentUser } from '~/redux/user/userSlice'
 import { optimizeCloudinaryUrl } from '~/utils/cloudinary'
 
 const statusLabels = {
-  Pending: ['Đang chờ', 'warning'],
   Processing: ['Đang xử lý', 'info'],
   Shipped: ['Đã gửi hàng', 'primary'],
+  Shipping: ['Đang giao hàng', 'primary'],
   Delivered: ['Đã giao', 'success'],
   Cancelled: ['Đã hủy', 'error'],
+  Failed: ['Thanh toán thất bại', 'error'],
 }
 
 // Confirmation Modal Component
@@ -138,37 +141,61 @@ const OrderDetail = () => {
   const navigate = useNavigate()
   const { order, items, loading, error } = useOrderDetail(orderId)
   const { cancelOrder } = useOrder()
+  const { addToCart, refresh: refreshCart } = useCart()
   const currentUser = useSelector(selectCurrentUser)
 
   const [snackbarOpen, setSnackbarOpen] = useState(false)
   const [openReviewModal, setOpenReviewModal] = useState(false)
-  const [hasReviewed, setHasReviewed] = useState(false)     // Track if order is reviewed
+  const [openViewReviewModal, setOpenViewReviewModal] = useState(false)
+  const [reviewedProducts, setReviewedProducts] = useState(new Set())     // Track which products are reviewed
   const [selectedProduct, setSelectedProduct] = useState(null)
   const [openCancelModal, setOpenCancelModal] = useState(false)
   const [cancelling, setCancelling] = useState(false)
+  const [reorderLoading, setReorderLoading] = useState(false)
 
   useEffect(() => {
     const fetchUserReviews = async () => {
       if (!currentUser?._id || !orderId) return
       try {
         const reviews = await getUserReviews(currentUser._id)
-        // Check if any review exists for this orderId
-        const orderReviewed = reviews.some((review) => review.orderId === orderId)
-        setHasReviewed(orderReviewed)
+        // Check which products in this order have been reviewed
+        const reviewedProductsInOrder = reviews
+          .filter((review) => review.orderId === orderId)
+          .map((review) => review.productId)
+        setReviewedProducts(new Set(reviewedProductsInOrder))
       } catch (err) {
         console.error('Lỗi khi lấy đánh giá người dùng:', err)
       }
     }
     fetchUserReviews()
   }, [currentUser, orderId])
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'auto' })
+  }, [])
 
   if (loading) return <CircularProgress />
   if (error) return <Typography color="error">Lỗi: {error.message || 'Có lỗi xảy ra'}</Typography>
   if (!order) return <Typography>Không tìm thấy đơn hàng</Typography>
 
   const [label, color] = statusLabels[order.status] || ['Không xác định', 'default']
-  const totalProductsPrice = items.reduce((sum, item) => sum + item.price * item.quantity, 0)
+  const totalProductsPrice = items.reduce((sum, item) => {
+    const actualPrice = item.variantId?.discountPrice > 0
+      ? item.price - item.variantId.discountPrice
+      : item.price
+    return sum + actualPrice * item.quantity
+  }, 0)
   const formatPrice = (val) => (typeof val === 'number' ? val.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' }) : '0₫')
+
+  // Helper functions for formatting color and size
+  const capitalizeFirstLetter = (str) => {
+    if (!str) return ''
+    return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase()
+  }
+
+  const formatSize = (str) => {
+    if (!str) return ''
+    return str.toUpperCase()
+  }
 
   // Group items by product ID to handle variants
   const productGroups = items.reduce((groups, item) => {
@@ -187,7 +214,10 @@ const OrderDetail = () => {
 
     groups[productId].variants.push(item)
     groups[productId].totalQuantity += item.quantity
-    groups[productId].totalPrice += item.price * item.quantity
+    const actualPrice = item.variantId?.discountPrice > 0
+      ? item.price - item.variantId.discountPrice
+      : item.price
+    groups[productId].totalPrice += actualPrice * item.quantity
     return groups
   }, {})
 
@@ -216,26 +246,101 @@ const OrderDetail = () => {
     setSelectedProduct(null)
   }
 
+  const handleCloseViewReviewModal = () => {
+    setOpenViewReviewModal(false)
+    setSelectedProduct(null)
+  }
+
   const handleSubmitReview = async (reviewData) => {
     try {
-      if (hasReviewed) {
-        console.error('Đơn hàng này đã được đánh giá.')
+      const productId = selectedProduct?.productId
+      if (reviewedProducts.has(productId)) {
+        console.error('Sản phẩm này đã được đánh giá.')
         return
       }
 
       console.log('Review data received:', reviewData)
       console.log('Current user ID:', currentUser?._id)
       console.log('Order ID:', orderId)
+      console.log('Product ID:', productId)
 
       // Gửi đánh giá với payload đầy đủ
       await createReview(reviewData)
 
-      setHasReviewed(true)     // Mark order as reviewed
+      // Mark this specific product as reviewed
+      setReviewedProducts(prev => new Set([...prev, productId]))
       handleCloseModal()
       setSnackbarOpen(true)
     } catch (error) {
       console.error('Lỗi gửi đánh giá:', error)
       console.error('Error details:', error)
+    }
+  }
+
+  // Handle reorder - thêm tất cả items vào giỏ hàng
+  const handleReorder = async () => {
+    try {
+      setReorderLoading(true)
+      console.log('Items to add back to cart:', items)
+      console.log('Total items to process:', items.length)
+
+      let successCount = 0
+
+      // Lặp qua từng sản phẩm trong đơn hàng - luôn gửi quantity = 1
+      for (let i = 0; i < items.length; i++) {
+        const item = items[i]
+        const variantId = typeof item.variantId === 'object' ? item.variantId._id : item.variantId
+
+        console.log(`Processing item ${i + 1}/${items.length}:`, {
+          name: item.name,
+          variantId: variantId,
+          quantity: 1 // Luôn luôn là 1
+        })
+
+        if (!variantId) {
+          console.warn('Variant ID not found for item:', item)
+          continue
+        }
+
+        try {
+          // Đảm bảo quantity luôn là 1
+          const result = await addToCart({
+            variantId: variantId,
+            quantity: 1
+          })
+
+          console.log(`Item ${i + 1} add to cart result:`, result)
+
+          if (result) {
+            successCount++
+          }
+        } catch (error) {
+          console.error(`Error adding item ${i + 1} to cart:`, error)
+        }
+
+        // Add small delay between requests to avoid overwhelming the server
+        if (i < items.length - 1) {
+          await new Promise(resolve => setTimeout(resolve, 200))
+        }
+      }
+
+      console.log(`Add to cart results: ${successCount} success`)
+
+      if (successCount > 0) {
+        // Force refresh cart data before navigating
+        console.log('Refreshing cart data...')
+        await refreshCart({ silent: true })
+
+        setTimeout(() => {
+          navigate('/cart')
+        }, 300) // Tăng thời gian chờ để đảm bảo cart đã refresh
+      } else {
+        console.error('No items were added to cart')
+      }
+    } catch (err) {
+      console.error('Lỗi khi mua lại:', err)
+    } finally {
+      setReorderLoading(false)
     }
   }
 
@@ -359,12 +464,13 @@ const OrderDetail = () => {
                             >
                               {product.productName}
                             </Typography>
+
                             <Typography
                               variant="body2"
                               color="text.secondary"
                               sx={{ mb: 0.5 }}
                             >
-                              {variant.color?.name} • {variant.size}
+                              Phân loại hàng: {capitalizeFirstLetter(variant.color?.name)}, {formatSize(variant.size)}
                             </Typography>
                             <Chip
                               label={`Số lượng: ${variant.quantity}`}
@@ -376,20 +482,35 @@ const OrderDetail = () => {
                         </Box>
 
                         <Box textAlign="right">
-                          <Typography
-                            fontWeight={700}
-                            fontSize="1.2rem"
-                            color="#1a3c7b"
-                          >
-                            {formatPrice(variant.price * variant.quantity)}
-                          </Typography>
-                          {variant.originalPrice > variant.price && (
+                          {variant.variantId?.discountPrice > 0 ? (
+                            <Box display="flex" flexDirection="column" alignItems="flex-end" gap={0.5}>
+                              <Typography
+                                fontWeight={700}
+                                fontSize="1.2rem"
+                                color="#1a3c7b"
+                              >
+                                {formatPrice((variant.price - variant.variantId.discountPrice))}
+                              </Typography>
+                              <Box display="flex" alignItems="center" gap={1}>
+                                <Typography
+                                  variant="body2"
+                                  sx={{
+                                    textDecoration: 'line-through',
+                                    color: 'text.secondary',
+                                    fontSize: '0.9rem'
+                                  }}
+                                >
+                                  {formatPrice(variant.price)}
+                                </Typography>
+                              </Box>
+                            </Box>
+                          ) : (
                             <Typography
-                              variant="body2"
-                              color="text.disabled"
-                              sx={{ textDecoration: 'line-through', fontSize: '0.85rem' }}
+                              fontWeight={700}
+                              fontSize="1.2rem"
+                              color="#1a3c7b"
                             >
-                              {formatPrice(variant.originalPrice * variant.quantity)}
+                              {formatPrice(variant.price * variant.quantity)}
                             </Typography>
                           )}
                         </Box>
@@ -403,7 +524,7 @@ const OrderDetail = () => {
 
                 {/* Action Buttons */}
                 <Box display="flex" justifyContent="flex-end" gap={2} mt={2}>
-                  {isOrderCompleted && currentUser && !hasReviewed && (
+                  {isOrderCompleted && currentUser && !reviewedProducts.has(product.productId) && (
                     <Button
                       variant="contained"
                       size="medium"
@@ -426,24 +547,31 @@ const OrderDetail = () => {
                       Đánh giá
                     </Button>
                   )}
-                  <Button
-                    variant="outlined"
-                    size="medium"
-                    sx={{
-                      color: '#1a3c7b',
-                      borderColor: '#1a3c7b',
-                      borderRadius: 2,
-                      textTransform: 'none',
-                      fontWeight: 600,
-                      '&:hover': {
-                        borderColor: '#1a3c7b',
-                        backgroundColor: 'rgba(26, 60, 123, 0.04)',
-                      },
-                    }}
-                    onClick={() => navigate(`/productdetail/${product.productId}`)}
-                  >
-                    Mua lại
-                  </Button>
+
+                  {isOrderCompleted && currentUser && reviewedProducts.has(product.productId) && (
+                    <Button
+                      variant="outlined"
+                      size="medium"
+                      sx={{
+                        borderRadius: 2,
+                        textTransform: 'none',
+                        fontWeight: 600,
+                        color: 'success.main',
+                        borderColor: 'success.main',
+                        '&:hover': {
+                          backgroundColor: 'success.50',
+                          borderColor: 'success.main'
+                        }
+                      }}
+                      onClick={() => {
+                        setSelectedProduct(product)
+                        setOpenViewReviewModal(true)
+                      }}
+                    >
+                      ✓ Xem đánh giá
+                    </Button>
+                  )}
+
                 </Box>
 
                 {index < uniqueProducts.length - 1 && <Divider sx={{ my: 3 }} />}
@@ -508,6 +636,7 @@ const OrderDetail = () => {
       {isOrderCancellable && (
         <Card sx={{
           mt: 2,
+          px: 3,
           borderRadius: 3,
           boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
           border: '1px solid rgba(255, 152, 0, 0.2)'
@@ -540,12 +669,54 @@ const OrderDetail = () => {
         </Card>
       )}
 
+      {/* Reorder Button - for completed, failed, or cancelled orders */}
+      {(order?.status === 'Delivered' || order?.status === 'Failed' || order?.status === 'Cancelled') && (
+        <Card sx={{
+          mt: 2,
+          px: 3,
+          borderRadius: 3,
+          boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
+          border: '1px solid rgba(26, 60, 123, 0.2)'
+        }}>
+          <CardContent>
+            <Box display="flex" justifyContent="space-between" alignItems="center">
+              <Box>
+                <Typography variant="h6" fontWeight="600" color="#1a3c7b">
+                  Mua lại đơn hàng
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  Thêm tất cả sản phẩm từ đơn hàng này vào giỏ hàng
+                </Typography>
+              </Box>
+              <Button
+                variant="contained"
+                startIcon={reorderLoading ? <CircularProgress size={16} /> : <Replay />}
+                disabled={reorderLoading}
+                onClick={handleReorder}
+                sx={{
+                  backgroundColor: '#1a3c7b',
+                  borderRadius: 2,
+                  textTransform: 'none',
+                  fontWeight: 600,
+                  opacity: reorderLoading ? 0.7 : 1,
+                  '&:hover': {
+                    backgroundColor: '#162f63',
+                  }
+                }}
+              >
+                {reorderLoading ? 'Đang thêm vào giỏ...' : 'Mua lại'}
+              </Button>
+            </Box>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Enhanced Snackbar */}
       <Snackbar
         open={snackbarOpen}
         autoHideDuration={4000}
         onClose={() => setSnackbarOpen(false)}
-        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
       >
         <Alert
           onClose={() => setSnackbarOpen(false)}
@@ -556,7 +727,7 @@ const OrderDetail = () => {
             fontWeight: 600
           }}
         >
-          ⭐ Cảm ơn bạn đã đánh giá!
+          Cảm ơn bạn đã đánh giá!
         </Alert>
       </Snackbar>
 
@@ -568,6 +739,16 @@ const OrderDetail = () => {
         productId={selectedProduct?.productId || uniqueProducts[0]?.productId}
         userId={currentUser?._id}
         orderId={orderId}
+      />
+
+      {/* View Review Modal */}
+      <ViewReviewModal
+        open={openViewReviewModal}
+        onClose={handleCloseViewReviewModal}
+        userId={currentUser?._id}
+        productId={selectedProduct?.productId}
+        orderId={orderId}
+        productName={selectedProduct?.productName}
       />
 
       {/* Cancel Order Modal */}

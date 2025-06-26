@@ -31,6 +31,17 @@ export const getUserReviews = async (userId) => {
   }
 }
 
+export const getUserReviewForProduct = async (userId, productId, orderId) => {
+  try {
+    const response = await AuthorizedAxiosInstance.get(
+      `${API_ROOT}/v1/reviews?userId=${userId}&productId=${productId}&orderId=${orderId}`
+    )
+    return response.data
+  } catch (error) {
+    throw error.response?.data || error.message || 'Không lấy được đánh giá của sản phẩm'
+  }
+}
+
 
 export const updateReview = async (reviewId, updatedData) => {
   try {

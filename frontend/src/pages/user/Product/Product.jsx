@@ -26,7 +26,7 @@ import { optimizeCloudinaryUrl } from '~/utils/cloudinary.js'
 const ITEMS_PER_PAGE = 15
 
 // Custom styled button to mimic the dropdown in the image
-const SortDropdownButton = styled('button')(({ theme }) => ({
+const SortDropdownButton = styled('button')(({ }) => ({
   border: '1px solid #222',
   background: '#fff',
   borderRadius: 0,
@@ -73,7 +73,7 @@ const SortMenuItem = styled('div')(({ theme }) => ({
 }))
 
 const sortOptions = [
-  { value: 'Sản phẩm nỗi bật', label: 'Sản phẩm nổi bật' },
+  { value: 'featured', label: 'Sản phẩm nổi bật' },
   { value: 'priceAsc', label: 'Giá tăng dần' },
   { value: 'priceDesc', label: 'Giá giảm dần' },
   { value: 'nameAsc', label: 'Sản phẩm từ A-Z' },
@@ -104,7 +104,7 @@ const Product = () => {
   const [error, setError] = useState(null)
   const [page, setPage] = useState(1)
   const [totalPages, setTotalPages] = useState(1)
-  const [sortOption, setSortOption] = useState('')
+  const [sortOption, setSortOption] = useState('featured')
   const [snackbar, setSnackbar] = useState(null)
   const [isAdding, setIsAdding] = useState({})
   const [sortMenuOpen, setSortMenuOpen] = useState(false)
@@ -117,7 +117,7 @@ const Product = () => {
       try {
         const allBanners = await getBanners()
         // Filter banner with position 'product' and visible = true
-        const productBanner = allBanners.find(banner => 
+        const productBanner = allBanners.find(banner =>
           banner.position === 'product' && banner.visible === true
         )
         setProductBanner(productBanner)
@@ -137,10 +137,8 @@ const Product = () => {
       setLoading(true)
       setError(null)
 
-      // Map sort option to API sort parameter
-      const sortMap = {
-        priceAsc: 'price_asc',
-        priceDesc: 'price_desc',
+      // Map sort option to API sort parameter (chỉ cho backend sort)
+      const backendSortMap = {
         nameAsc: 'name_asc',
         nameDesc: 'name_desc'
       }
@@ -148,7 +146,7 @@ const Product = () => {
       const params = {
         page,
         limit: ITEMS_PER_PAGE,
-        sort: sortMap[sortOption] || ''
+        sort: backendSortMap[sortOption] || ''
       }
       console.log('Fetching products with params:', params)
 
@@ -164,13 +162,22 @@ const Product = () => {
         throw new Error('Dữ liệu sản phẩm không hợp lệ')
       }
 
-      setProducts(response.products)
+      let sortedProducts = [...response.products]
+
+      // Client-side sorting cho giá
+      if (sortOption === 'priceAsc') {
+        sortedProducts.sort((a, b) => (a.exportPrice || 0) - (b.exportPrice || 0))
+      } else if (sortOption === 'priceDesc') {
+        sortedProducts.sort((a, b) => (b.exportPrice || 0) - (a.exportPrice || 0))
+      }
+
+      setProducts(sortedProducts)
       setTotalPages(response.totalPages)
     } catch (error) {
       console.error('Chi tiết lỗi:', error)
       setError(
         error.message ||
-          'Không thể tải danh sách sản phẩm. Vui lòng thử lại sau.'
+        'Không thể tải danh sách sản phẩm. Vui lòng thử lại sau.'
       )
       setProducts([])
       setTotalPages(1)
@@ -291,7 +298,7 @@ const Product = () => {
           </Typography>
         </Breadcrumbs>
       </Box>
-      
+
       {/* Product Banner Section */}
       <Box
         sx={{
@@ -330,8 +337,8 @@ const Product = () => {
                 sx={{
                   width: '100%',
                   height: '100%',
-                  backgroundImage: `url(${optimizeCloudinaryUrl(productBanner.imageUrl, { 
-                    width: 1800, 
+                  backgroundImage: `url(${optimizeCloudinaryUrl(productBanner.imageUrl, {
+                    width: 1800,
                     height: 400,
                     quality: 'auto',
                     format: 'auto'
@@ -351,8 +358,8 @@ const Product = () => {
               sx={{
                 width: '100%',
                 height: '100%',
-                backgroundImage: `url(${optimizeCloudinaryUrl(productBanner.imageUrl, { 
-                  width: 1800, 
+                backgroundImage: `url(${optimizeCloudinaryUrl(productBanner.imageUrl, {
+                  width: 1800,
                   height: 400,
                   quality: 'auto',
                   format: 'auto'
@@ -378,7 +385,7 @@ const Product = () => {
           />
         )}
       </Box>
-      
+
       <ProductCategories />
       <Box sx={{ p: 2, maxWidth: '1800px', mx: 'auto' }}>
         <Box

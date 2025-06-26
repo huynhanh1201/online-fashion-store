@@ -250,6 +250,17 @@ const PriceRow = styled(Box)(({ theme, isTotal }) => ({
   borderBottom: isTotal ? 'none' : '1px solid #f0f0f0',
 }))
 
+// Helper functions for formatting color and size
+const capitalizeFirstLetter = (str) => {
+  if (!str) return ''
+  return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase()
+}
+
+const formatSize = (str) => {
+  if (!str) return ''
+  return str.toUpperCase()
+}
+
 const ProductItem = ({ name, variant, quantity, image, color, size, getFinalPrice }) => {
   if (!name || typeof quantity !== 'number') {
     return (
@@ -263,7 +274,9 @@ const ProductItem = ({ name, variant, quantity, image, color, size, getFinalPric
 
   const truncatedName = name.length > 20 ? name.slice(0, 20) + '...' : name
   const finalPrice = getFinalPrice(variant)
-  const hasDiscount = variant.discountPrice && variant.discountPrice > 0
+  const exportPrice = variant.exportPrice || 0
+  const discountPrice = variant.discountPrice || 0
+  const hasDiscount = discountPrice > 0 && exportPrice > finalPrice
 
   return (
     <tr>
@@ -287,13 +300,13 @@ const ProductItem = ({ name, variant, quantity, image, color, size, getFinalPric
             </Typography>
             <Box sx={{ display: 'flex', gap: 1, mb: 1 }}>
               <Chip
-                label={color || 'Chưa chọn màu'}
+                label={capitalizeFirstLetter(color) || 'Chưa chọn màu'}
                 size="small"
                 variant="outlined"
                 sx={{ fontSize: '0.75rem' }}
               />
               <Chip
-                label={size || 'Chưa chọn kích cỡ'}
+                label={formatSize(size) || 'Chưa chọn kích cỡ'}
                 size="small"
                 variant="outlined"
                 sx={{ fontSize: '0.75rem' }}
@@ -321,7 +334,7 @@ const ProductItem = ({ name, variant, quantity, image, color, size, getFinalPric
                   textDecoration: 'line-through',
                 }}
               >
-                {(variant.exportPrice * quantity).toLocaleString('vi-VN')}đ
+                {(exportPrice * quantity).toLocaleString('vi-VN')}đ
               </Typography>
             </Box>
           )}
