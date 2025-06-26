@@ -39,7 +39,15 @@ const order = async (req, res, next) => {
     total: Joi.number().min(0).required(),
 
     status: Joi.string()
-      .valid('Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled')
+      .valid(
+        'Pending',
+        'Processing',
+        'Shipping',
+        'Shipped',
+        'Delivered',
+        'Cancelled',
+        'Failed'
+      )
       .default('Pending'),
 
     isPaid: Joi.boolean().default(false),
@@ -79,7 +87,15 @@ const updateOrder = async (req, res, next) => {
   // Xác thực dữ liệu đầu vào correctCondition: điều kiện đúng
   const correctCondition = Joi.object({
     status: Joi.string()
-      .valid('Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled')
+      .valid(
+        'Pending',
+        'Processing',
+        'Shipping',
+        'Shipped',
+        'Delivered',
+        'Cancelled',
+        'Failed'
+      )
       .required()
   })
 
