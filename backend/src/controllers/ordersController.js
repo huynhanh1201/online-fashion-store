@@ -51,7 +51,7 @@ const updateOrder = async (req, res, next) => {
     const orderId = req.params.orderId
 
     const result = await ordersService.updateOrder(
-      req.jwtDecoded._id,
+      req.jwtDecoded,
       orderId,
       req.body
     )
