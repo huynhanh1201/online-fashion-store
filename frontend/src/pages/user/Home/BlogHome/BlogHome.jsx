@@ -43,7 +43,6 @@ const BlogHome = () => {
     fetchLatestBlogs(6) // Lấy 6 bài viết mới nhất
   }, [fetchLatestBlogs])
 
-
   // Format dữ liệu từ API để phù hợp với UI
   const formatBlogData = (blogData) => {
     return {
@@ -52,13 +51,13 @@ const BlogHome = () => {
       subtitle: blogData.excerpt || blogData.subtitle || '',
       category: blogData.category || 'Tip',
       image: blogData.coverImage || blogData.thumbnail || blogData.image || '',
-      date: blogData.publishedAt ?
-        new Date(blogData.publishedAt).toLocaleDateString('vi-VN') :
-        new Date(blogData.createdAt).toLocaleDateString('vi-VN'),
-      description: blogData.content ?
-        // Remove HTML tags and limit to 150 characters
-        blogData.content.replace(/<[^>]*>/g, '').substring(0, 150) + '...' :
-        blogData.excerpt || ''
+      date: blogData.publishedAt
+        ? new Date(blogData.publishedAt).toLocaleDateString('vi-VN')
+        : new Date(blogData.createdAt).toLocaleDateString('vi-VN'),
+      description: blogData.content
+        ? // Remove HTML tags and limit to 150 characters
+          blogData.content.replace(/<[^>]*>/g, '').substring(0, 150) + '...'
+        : blogData.excerpt || ''
     }
   }
 
@@ -82,7 +81,7 @@ const BlogHome = () => {
           }}
         >
           <Typography
-            variant="h2"
+            variant='h2'
             sx={{
               fontSize: { xs: '24px', sm: '32px', lg: '36px' },
               fontWeight: 'bold',
@@ -166,12 +165,16 @@ const BlogHome = () => {
                   }}
                   onClick={() => navigate(`/blog/${article.id}`)}
                   onMouseEnter={(e) => {
-                    e.target.closest('.article-card').style.transform = 'translateY(-4px)'
-                    e.target.closest('.article-card').style.boxShadow = '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)'
+                    e.target.closest('.article-card').style.transform =
+                      'translateY(-4px)'
+                    e.target.closest('.article-card').style.boxShadow =
+                      '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)'
                   }}
                   onMouseLeave={(e) => {
-                    e.target.closest('.article-card').style.transform = 'translateY(0)'
-                    e.target.closest('.article-card').style.boxShadow = '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)'
+                    e.target.closest('.article-card').style.transform =
+                      'translateY(0)'
+                    e.target.closest('.article-card').style.boxShadow =
+                      '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)'
                   }}
                 >
                   <Box
@@ -183,7 +186,8 @@ const BlogHome = () => {
                       borderRadius: '12px',
                       overflow: 'hidden',
                       transition: 'transform 0.3s ease, box-shadow 0.3s ease',
-                      boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+                      boxShadow:
+                        '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
                       height: { xs: 'auto', sm: '200px', lg: '250px' }
                     }}
                   >
@@ -197,7 +201,7 @@ const BlogHome = () => {
                       }}
                     >
                       <Box
-                        component="img"
+                        component='img'
                         src={article.image}
                         alt={article.title}
                         sx={{
@@ -227,7 +231,7 @@ const BlogHome = () => {
                       </Box>
                     </Box>
 
-                    {/* Content Section */}
+                    {/* EditContent Section */}
                     <Box
                       sx={{
                         flex: '1',
@@ -239,7 +243,7 @@ const BlogHome = () => {
                     >
                       <Box>
                         <Typography
-                          variant="h3"
+                          variant='h3'
                           sx={{
                             fontSize: { xs: '18px', sm: '20px', lg: '24px' },
                             fontWeight: 'bold',
@@ -322,7 +326,7 @@ const BlogHome = () => {
             }}
           >
             <Box
-              component="button"
+              component='button'
               sx={{
                 border: '1px solid #1f2937',
                 color: '#1f2937',
@@ -344,8 +348,6 @@ const BlogHome = () => {
             </Box>
           </Box>
         )}
-
-
       </Box>
     </ErrorBoundary>
   )

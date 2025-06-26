@@ -1,35 +1,98 @@
-// Content filter utility to prevent sensitive/inappropriate language
+// EditContent filter utility to prevent sensitive/inappropriate language
 class ContentFilter {
   constructor() {
     // Vietnamese sensitive words list
     this.sensitiveWords = [
       // Profanity & Offensive
-      'đồ', 'đ*', 'dm', 'cmm', 'cc', 'vl', 'vcl', 'clmm', 'đcm', 'dcm',
-      'đm', 'đmm', 'fuck', 'shit', 'damn', 'bitch', 'ass', 'hell',
-      'cứt', 'chó', 'lồn', 'buồi', 'cặc', 'địt', 'đụ', 'mẹ mày',
+      'đồ',
+      'đ*',
+      'dm',
+      'cmm',
+      'cc',
+      'vl',
+      'vcl',
+      'clmm',
+      'đcm',
+      'dcm',
+      'đm',
+      'đmm',
+      'fuck',
+      'shit',
+      'damn',
+      'bitch',
+      'ass',
+      'hell',
+      'cứt',
+      'chó',
+      'lồn',
+      'buồi',
+      'cặc',
+      'địt',
+      'đụ',
+      'mẹ mày',
 
       // Hate speech
-      'thù hận', 'kỳ thị', 'phân biệt chủng tộc', 'phân biệt tôn giáo',
+      'thù hận',
+      'kỳ thị',
+      'phân biệt chủng tộc',
+      'phân biệt tôn giáo',
 
       // Spam patterns
-      'mua ngay', 'khuyến mãi', 'giảm giá', 'link', 'liên hệ', 'zalo', 'facebook',
-      'telegram', 'whatsapp', 'số điện thoại', 'sdt', 'phone',
+      'mua ngay',
+      'khuyến mãi',
+      'giảm giá',
+      'link',
+      'liên hệ',
+      'zalo',
+      'facebook',
+      'telegram',
+      'whatsapp',
+      'số điện thoại',
+      'sdt',
+      'phone',
 
       // Inappropriate content
-      'sex', 'porn', 'xxx', 'adult', 'nude', 'naked',
+      'sex',
+      'porn',
+      'xxx',
+      'adult',
+      'nude',
+      'naked',
 
       // Personal info patterns (basic)
-      'email', '@gmail', '@yahoo', '@hotmail', 'password', 'mật khẩu',
+      'email',
+      '@gmail',
+      '@yahoo',
+      '@hotmail',
+      'password',
+      'mật khẩu',
 
       // Commercial spam
-      'bán hàng', 'quảng cáo', 'marketing', 'affiliate', 'ref=', 'utm_',
-      'shopee', 'tiki', 'lazada', 'sendo' // competing platforms
+      'bán hàng',
+      'quảng cáo',
+      'marketing',
+      'affiliate',
+      'ref=',
+      'utm_',
+      'shopee',
+      'tiki',
+      'lazada',
+      'sendo' // competing platforms
     ]
 
     // Warning words that should be flagged but not blocked
     this.warningWords = [
-      'tệ', 'dở', 'kém', 'tồi', 'không tốt', 'thất vọng', 'không hài lòng',
-      'chất lượng kém', 'hàng fake', 'hàng giả', 'lừa đảo'
+      'tệ',
+      'dở',
+      'kém',
+      'tồi',
+      'không tốt',
+      'thất vọng',
+      'không hài lòng',
+      'chất lượng kém',
+      'hàng fake',
+      'hàng giả',
+      'lừa đảo'
     ]
 
     // Patterns for phone numbers, emails, links
@@ -37,7 +100,8 @@ class ContentFilter {
       phone: /(\+84|0)[0-9]{8,9}|[0-9]{10,11}/g,
       email: /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g,
       url: /(https?:\/\/[^\s]+|www\.[^\s]+|\.[a-z]{2,}\/[^\s]*)/gi,
-      social: /(facebook\.com|fb\.com|instagram\.com|tiktok\.com|youtube\.com)/gi
+      social:
+        /(facebook\.com|fb\.com|instagram\.com|tiktok\.com|youtube\.com)/gi
     }
   }
 
@@ -215,7 +279,10 @@ class ContentFilter {
 
     // Replace sensitive words with asterisks
     for (const word of this.sensitiveWords) {
-      const regex = new RegExp(word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi')
+      const regex = new RegExp(
+        word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'),
+        'gi'
+      )
       cleaned = cleaned.replace(regex, '*'.repeat(word.length))
     }
 
@@ -232,11 +299,11 @@ class ContentFilter {
   // Suggest alternative words for common negative terms
   suggestAlternatives(text) {
     const suggestions = {
-      'tệ': 'chưa phù hợp',
-      'dở': 'cần cải thiện',
-      'kém': 'chưa đạt yêu cầu',
-      'tồi': 'chưa hài lòng',
-      'fake': 'không chính hãng',
+      tệ: 'chưa phù hợp',
+      dở: 'cần cải thiện',
+      kém: 'chưa đạt yêu cầu',
+      tồi: 'chưa hài lòng',
+      fake: 'không chính hãng',
       'lừa đảo': 'chưa tin cậy'
     }
 

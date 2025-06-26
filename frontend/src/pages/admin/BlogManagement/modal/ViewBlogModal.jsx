@@ -341,7 +341,7 @@
 //             </Card>
 //           )}
 //
-//           {/* Content */}
+//           {/* EditContent */}
 //           <Card sx={{ p: 2 }}>
 //             <Typography variant='h6' gutterBottom color='primary'>
 //               Nội dung bài viết
@@ -506,7 +506,6 @@ const ViewBlogModal = ({ open, onClose, blog, isMobile }) => {
           </Card>
         )}
 
-        
         {/* Tác giả */}
         <Box display='flex' alignItems='center' gap={2} mb={2}>
           <Avatar src={blog?.author?.avatar} />
