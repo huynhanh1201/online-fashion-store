@@ -33,11 +33,12 @@ import { selectCurrentUser } from '~/redux/user/userSlice'
 import { optimizeCloudinaryUrl } from '~/utils/cloudinary'
 
 const statusLabels = {
-  Pending: ['Đang chờ', 'warning'],
   Processing: ['Đang xử lý', 'info'],
   Shipped: ['Đã gửi hàng', 'primary'],
+  Shipping: ['Đang giao hàng', 'primary'],
   Delivered: ['Đã giao', 'success'],
   Cancelled: ['Đã hủy', 'error'],
+  Failed: ['Thanh toán thất bại', 'error'],
 }
 
 // Confirmation Modal Component
@@ -167,7 +168,12 @@ const OrderDetail = () => {
   if (!order) return <Typography>Không tìm thấy đơn hàng</Typography>
 
   const [label, color] = statusLabels[order.status] || ['Không xác định', 'default']
-  const totalProductsPrice = items.reduce((sum, item) => sum + item.price * item.quantity, 0)
+  const totalProductsPrice = items.reduce((sum, item) => {
+    const actualPrice = item.variantId?.discountPrice > 0
+      ? item.price - item.variantId.discountPrice
+      : item.price
+    return sum + actualPrice * item.quantity
+  }, 0)
   const formatPrice = (val) => (typeof val === 'number' ? val.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' }) : '0₫')
 
   // Helper functions for formatting color and size
@@ -198,7 +204,10 @@ const OrderDetail = () => {
 
     groups[productId].variants.push(item)
     groups[productId].totalQuantity += item.quantity
-    groups[productId].totalPrice += item.price * item.quantity
+    const actualPrice = item.variantId?.discountPrice > 0
+      ? item.price - item.variantId.discountPrice
+      : item.price
+    groups[productId].totalPrice += actualPrice * item.quantity
     return groups
   }, {})
 
@@ -395,7 +404,7 @@ const OrderDetail = () => {
                                 fontSize="1.2rem"
                                 color="#1a3c7b"
                               >
-                                {formatPrice((variant.price - variant.variantId.discountPrice) * variant.quantity)}
+                                {formatPrice((variant.price - variant.variantId.discountPrice))}
                               </Typography>
                               <Box display="flex" alignItems="center" gap={1}>
                                 <Typography
@@ -406,7 +415,7 @@ const OrderDetail = () => {
                                     fontSize: '0.9rem'
                                   }}
                                 >
-                                  {formatPrice(variant.price * variant.quantity)}
+                                  {formatPrice(variant.price)}
                                 </Typography>
                               </Box>
                             </Box>

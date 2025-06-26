@@ -504,7 +504,7 @@ const Cart = () => {
                       <Box component="span" sx={{ fontWeight: 600, mx: 0.5 }}>
                         {discountText}
                       </Box>{' '}
-                      🎉!
+                      !
                     </>
                   )
                 }
@@ -522,6 +522,10 @@ const Cart = () => {
         flexDirection={{ xs: 'column', md: 'row' }}
         alignItems="flex-start"
         gap={3}
+        sx={{
+          position: 'relative',
+
+        }}
       >
         <Box
           flex={{ xs: '1 1 100%', md: 2 }}
@@ -538,7 +542,7 @@ const Cart = () => {
             {cartItems.length === 0 ? (
               <Box
                 sx={{
-                  p: { xs: 4, sm: 6, md: 8 },
+                  p: { xs: 4, sm: 6, md: 12 },
                   textAlign: 'center',
                   display: 'flex',
                   flexDirection: 'column',
@@ -555,10 +559,9 @@ const Cart = () => {
                 </Typography>
                 <Button
                   variant="contained"
-                  color="primary"
                   onClick={() => navigate('/')}
                   startIcon={<ArrowForward />}
-                  sx={{ mt: 2, borderRadius: 6, px: 4 }}
+                  sx={{ mt: 2, borderRadius: 6, px: 4, color: '#fff', backgroundColor: '#1A3C7B' }}
                 >
                   Tiếp tục mua sắm
                 </Button>
@@ -614,7 +617,7 @@ const Cart = () => {
                     <React.Fragment key={item._id}>
                       <Box
                         sx={{
-                          p: { xs: 2, sm: 3 },
+                          p: { xs: 2, sm: 2 },
                           display: 'flex',
                           alignItems: 'center',
                           gap: { xs: 1.5, sm: 2 },
@@ -843,17 +846,26 @@ const Cart = () => {
         <Box
           flex={{ xs: '1 1 100%', md: 1 }}
           width={{ xs: '100%', md: 'auto' }}
+          sx={{
+            position: { md: 'sticky' },
+            top: { md: '120px' },
+            alignSelf: { md: 'flex-start' },
+            height: { md: 'fit-content' },
+            maxHeight: { md: 'calc(100vh - 48px)' },
+          }}
         >
           <Card
             elevation={2}
             sx={{
               borderRadius: 2,
-              position: { xs: 'static', md: 'sticky' },
-              top: { md: 100 },
               boxShadow: '0 4px 20px rgba(0,0,0,0.05)',
               height: 'fit-content',
-              maxHeight: { md: 'calc(100vh - 120px)' },
+              maxHeight: { xs: 'auto', md: '100%' },
               overflowY: { md: 'auto' },
+              transition: 'all 0.3s ease-in-out',
+              '&:hover': {
+                boxShadow: '0 8px 30px rgba(0,0,0,0.1)',
+              },
             }}
           >
             <CardContent sx={{ p: { xs: 3, sm: 4 } }}>

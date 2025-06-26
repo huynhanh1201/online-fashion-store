@@ -396,7 +396,7 @@ const OrderRow = ({ order, onOrderUpdate, onOrderCancelled }) => {
                 Xem chi tiết
               </Button>
 
-              {order.status === 'Delivered' && (
+              {(order.status === 'Delivered' || order.status === 'Failed') && (
                 <Button
                   startIcon={<Replay />}
                   onClick={async () => {
