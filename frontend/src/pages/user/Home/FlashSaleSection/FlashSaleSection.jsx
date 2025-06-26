@@ -1,74 +1,93 @@
 import React, { useEffect, useState, useRef } from 'react'
 import ProductCard from '~/components/ProductCards/ProductCards'
-import { getFlashSaleConfig } from '~/services/admin/webConfig/flashsaleService'
+import { getFlashSaleCampaigns } from '~/services/admin/webConfig/flashsaleService'
 import { getProducts } from '~/services/productService'
 
 const FlashSaleSection = () => {
-  const [flashSaleProducts, setFlashSaleProducts] = useState([])
+  const [campaigns, setCampaigns] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
-  const [endTime, setEndTime] = useState(null)
-  const [countdown, setCountdown] = useState('')
-  const intervalRef = useRef(null)
+  const intervalRefs = useRef({})
 
-  // Countdown logic
+  // Countdown logic for each campaign
   useEffect(() => {
-    if (!endTime) return
-    function updateCountdown() {
-      const now = new Date()
-      const end = new Date(endTime)
-      const diff = end - now
-      if (diff <= 0) {
-        setCountdown('Đã kết thúc')
-        clearInterval(intervalRef.current)
-        return
+    campaigns.forEach((campaign) => {
+      if (!campaign.endTime) return
+      function updateCountdown() {
+        const now = new Date()
+        const end = new Date(campaign.endTime)
+        const diff = end - now
+        if (diff <= 0) {
+          setCampaigns((prev) =>
+            prev.map((c) =>
+              c.id === campaign.id ? { ...c, countdown: 'Đã kết thúc' } : c
+            )
+          )
+          clearInterval(intervalRefs.current[campaign.id])
+          return
+        }
+        const days = Math.floor(diff / (1000 * 60 * 60 * 24))
+        const hours = Math.floor((diff / (1000 * 60 * 60)) % 24)
+        const minutes = Math.floor((diff / (1000 * 60)) % 60)
+        const seconds = Math.floor((diff / 1000) % 60)
+        const pad = (n) => String(n).padStart(2, '0')
+        const countdownText =
+          days > 0
+            ? `${days} ngày ${pad(hours)}:${pad(minutes)}:${pad(seconds)}`
+            : `${pad(hours)}:${pad(minutes)}:${pad(seconds)}`
+        setCampaigns((prev) =>
+          prev.map((c) =>
+            c.id === campaign.id ? { ...c, countdown: countdownText } : c
+          )
+        )
       }
-      const days = Math.floor(diff / (1000 * 60 * 60 * 24))
-      const hours = Math.floor((diff / (1000 * 60 * 60)) % 24)
-      const minutes = Math.floor((diff / (1000 * 60)) % 60)
-      const seconds = Math.floor((diff / 1000) % 60)
-      const pad = (n) => String(n).padStart(2, '0')
-      if (days > 0) {
-        setCountdown(`${days} ngày ${pad(hours)}:${pad(minutes)}:${pad(seconds)}`)
-      } else {
-        setCountdown(`${pad(hours)}:${pad(minutes)}:${pad(seconds)}`)
-      }
+      updateCountdown()
+      intervalRefs.current[campaign.id] = setInterval(updateCountdown, 1000)
+    })
+    return () => {
+      Object.values(intervalRefs.current).forEach(clearInterval)
     }
-    updateCountdown()
-    intervalRef.current = setInterval(updateCountdown, 1000)
-    return () => clearInterval(intervalRef.current)
-  }, [endTime])
+  }, [campaigns])
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         setLoading(true)
         setError(null)
-        // Lấy flash sale config
-        const config = await getFlashSaleConfig()
-        setEndTime(config.endTime)
-        const flashSaleItems = config.products || []
-        if (!flashSaleItems.length) {
-          setFlashSaleProducts([])
+        const campaignsData = await getFlashSaleCampaigns()
+        if (!campaignsData.length) {
+          setCampaigns([])
           setLoading(false)
           return
         }
-        // Lấy toàn bộ sản phẩm
-        const { products: allProducts } = await getProducts({ page: 1, limit: 1000 })
-        // Join dữ liệu flash sale với sản phẩm chi tiết
-        const joined = flashSaleItems.map(item => {
-          const prod = allProducts.find(p => p._id === item.productId)
-          if (!prod) return null
-          return {
-            ...prod,
-            exportPrice: item.originalPrice, // Giá gốc tại thời điểm flash sale
-            flashPrice: item.flashPrice,     // Giá flash sale
-            isFlashSale: true
-          }
-        }).filter(Boolean)
-        setFlashSaleProducts(joined)
+        const { products: allProducts = [] } = await getProducts({
+          page: 1,
+          limit: 1000
+        })
+        const enrichedCampaigns = await Promise.all(
+          campaignsData.map(async (campaign) => {
+            const joinedProducts = (campaign.products || [])
+              .map((item) => {
+                const prod = allProducts.find((p) => p._id === item.productId)
+                if (!prod) return null
+                return {
+                  ...prod,
+                  exportPrice: item.originalPrice, // Giá gốc tại thời điểm flash sale
+                  flashPrice: item.flashPrice, // Giá flash sale
+                  isFlashSale: true
+                }
+              })
+              .filter(Boolean)
+            return {
+              ...campaign,
+              products: joinedProducts,
+              countdown: '' // Initialize countdown
+            }
+          })
+        )
+        setCampaigns(enrichedCampaigns)
       } catch (err) {
-        setError('Failed to load flash sale products.')
+        setError('Failed to load flash sale campaigns.')
       } finally {
         setLoading(false)
       }
@@ -78,7 +97,7 @@ const FlashSaleSection = () => {
 
   if (loading) return <div>Loading flash sale...</div>
   if (error) return <div>{error}</div>
-  if (!flashSaleProducts || flashSaleProducts.length === 0) return null
+  if (!campaigns || campaigns.length === 0) return null
 
   // ======= STYLES =======
   const styles = {
@@ -115,13 +134,7 @@ const FlashSaleSection = () => {
       borderRadius: '12px',
       letterSpacing: '2px',
       minWidth: '120px',
-      justifyContent: 'center',
-    },
-    productGrid: {
-      display: 'grid',
-      gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-      gap: '16px',
-      marginBottom: '32px'
+      justifyContent: 'center'
     },
     flashSaleCard: {
       borderRadius: '5px',
@@ -142,24 +155,28 @@ const FlashSaleSection = () => {
   }
 
   return (
-    <section style={styles.flashSale}>
-      <div style={styles.flashSaleHeader}>
-        <h2 style={styles.flashSaleTitle}>⚡ Flash Sale</h2>
-        <div style={styles.countdown}>
-          {countdown}
-        </div>
-      </div>
-
-      <div className='product-grid'>
-        {flashSaleProducts.slice(0, 5).map((product) => (
-          <div key={product._id} style={styles.flashSaleCard}>
-            <ProductCard product={product} isFlashSale={true} />
+    <>
+      {campaigns.map((campaign) => (
+        <section key={campaign.id} style={styles.flashSale}>
+          <div style={styles.flashSaleHeader}>
+            <h2 style={styles.flashSaleTitle}>⚡ {campaign.title}</h2>
+            <div style={styles.countdown}>
+              {campaign.countdown || 'Đang tải...'}
+            </div>
           </div>
-        ))}
-      </div>
 
-      <button className='cta-button'>Xem tất cả</button>
-    </section>
+          <div className='product-grid'>
+            {campaign.products.slice(0, 5).map((product) => (
+              <div key={product._id} style={styles.flashSaleCard}>
+                <ProductCard product={product} isFlashSale={true} />
+              </div>
+            ))}
+          </div>
+
+          <button style={styles.viewAllButton}>Xem tất cả</button>
+        </section>
+      ))}
+    </>
   )
 }
 

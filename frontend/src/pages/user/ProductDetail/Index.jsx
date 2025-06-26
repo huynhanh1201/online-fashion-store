@@ -142,26 +142,28 @@ const ProductDetail = () => {
           >
             Trang chủ
           </Link>
-          <Typography
+          <Link
             sx={{
               display: 'flex',
               alignItems: 'center',
               color: 'text.primary',
               fontWeight: 500
             }}
+            href='/product'
           >
             Sản phẩm
-          </Typography>
-          <Typography
+          </Link>
+          <Link
             sx={{
               display: 'flex',
               alignItems: 'center',
               color: 'text.primary',
               fontWeight: 500
             }}
+            href='/productbycategory/{category.Id}'
           >
             {category?.name}
-          </Typography>
+          </Link>
           <Typography
             sx={{
               display: 'flex',
