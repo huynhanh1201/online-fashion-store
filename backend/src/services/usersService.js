@@ -5,8 +5,6 @@ import ApiError from '~/utils/ApiError'
 import { pickUser } from '~/utils/formatters'
 import { ROLE } from '~/utils/constants'
 import { password } from '~/utils/password'
-import { OrderModel } from '~/models/OrderModel'
-import { CartModel } from '~/models/CartModel'
 
 const getUserList = async () => {
   // eslint-disable-next-line no-useless-catch

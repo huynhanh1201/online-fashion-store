@@ -38,6 +38,11 @@ const categorySchema = new Schema(
       type: Schema.Types.ObjectId,
       ref: 'Category',
       default: null
+    },
+
+    banner: {
+      type: String,
+      default: null // Chuỗi rỗng nếu không có ảnh
     }
   },
   {

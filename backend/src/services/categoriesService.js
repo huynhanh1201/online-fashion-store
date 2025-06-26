@@ -15,7 +15,9 @@ const createCategory = async (reqBody) => {
       destroy: false,
       image: reqBody.image || null,
 
-      parent: reqBody.parent || null
+      parent: reqBody.parent || null,
+
+      banner: reqBody.banner || null
     }
 
     const category = await CategoryModel.create(newCategory)
@@ -137,6 +139,11 @@ const updateCategory = async (categoryId, reqBody) => {
       reqBody,
       { new: true }
     )
+      .populate({
+        path: 'parent',
+        select: 'name'
+      })
+      .lean()
 
     return updatedCategory
   } catch (err) {
