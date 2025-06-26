@@ -49,8 +49,7 @@ import inventoryService from '~/services/inventoryService'
 
 const Cart = () => {
   const { cart, loading, deleteItem, clearCart, updateItem } = useCart()
-
-  console.log('Cart component - loading:', loading, 'cart:', cart)
+  
   const [selectedItems, setSelectedItems] = useState([])
   const [cartItems, setCartItems] = useState([])
   const [showMaxQuantityAlert, setShowMaxQuantityAlert] = useState(false)
@@ -109,7 +108,6 @@ const Cart = () => {
       try {
         const fetchPromises = newVariantsToFetch.map(async (variantId) => {
           const inventory = await inventoryService.fetchInventory(variantId)
-          console.log('Inventory data for', variantId, ':', inventory)
           return { variantId, inventory }
         })
 
@@ -120,7 +118,6 @@ const Cart = () => {
           results.forEach(({ variantId, inventory }) => {
             // Thử các trường hợp có thể có
             const quantity = inventory?.quantity || inventory?.availableQuantity || inventory?.stock || 0
-            console.log('Setting quantity for', variantId, ':', quantity)
             updated[variantId] = quantity
           })
           return updated
