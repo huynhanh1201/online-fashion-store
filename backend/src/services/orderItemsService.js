@@ -4,10 +4,16 @@ const getOrderItemList = async (orderId) => {
   // eslint-disable-next-line no-useless-catch
   try {
     const result = await OrderItemModel.find({ orderId })
-      .populate({
-        path: 'productId',
-        select: 'name'
-      })
+      .populate([
+        {
+          path: 'productId',
+          select: 'name'
+        },
+        {
+          path: 'variantId',
+          select: 'discountPrice'
+        }
+      ])
       .lean()
 
     return result
