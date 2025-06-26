@@ -10,7 +10,9 @@ import getDateRange from '~/utils/getDateRange'
 import { orderHelpers } from '~/helpers/orderHelpers'
 import { PaymentSessionDraftModel } from '~/models/PaymentSessionDraftModel'
 import { deliveriesService } from '~/services/deliveriesService'
-import { importStockWarehouseSlip } from '~/services/warehouseSlipsService'
+import { warehouseSlipsService } from '~/services/warehouseSlipsService'
+import { OrderItemModel } from '~/models/OrderItemModel'
+import { WarehouseModel } from '~/models/WarehouseModel'
 
 const createOrder = async (userId, reqBody, ipAddr, jwtDecoded) => {
   // eslint-disable-next-line no-useless-catch
@@ -317,7 +319,34 @@ const updateOrder = async (jwtDecoded, orderId, reqBody) => {
 
       // Trả hàng lại kho
       if (['Cancelled', 'Failed'].includes(newStatus)) {
-        await importStockWarehouseSlip(reqBody, jwtDecoded, session)
+        const warehouse = await WarehouseModel.find({}).session(session)
+
+        const orderItems = await OrderItemModel.find({
+          orderId: orderId
+        }).session(session)
+
+        const itemsRollback = orderItems.map((item) => ({
+          variantId: item.variantId.toString(),
+          quantity: item.quantity,
+          unit: 'cái'
+        }))
+
+        const warehouseId = warehouse[0]._id
+
+        const dataCreateWarehouseSlipImport = {
+          type: 'import',
+          date: new Date(),
+          partnerId: updatedOrder.userId,
+          warehouseId: warehouseId,
+          items: itemsRollback,
+          note: 'Nhập trả về do đơn hàng bị hủy hoặc thất bại.'
+        }
+
+        await warehouseSlipsService.importStockWarehouseSlip(
+          dataCreateWarehouseSlipImport,
+          jwtDecoded,
+          session
+        )
       }
 
       // Commit transaction
