@@ -303,7 +303,12 @@ const Cart = () => {
   }, 0)
   const capitalizeFirstLetter = (str) => {
     if (!str) return ''
-    return str.charAt(0).toUpperCase() + str.slice(1)
+    return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase()
+  }
+
+  const formatSize = (str) => {
+    if (!str) return ''
+    return str.toUpperCase()
   }
 
   const handleClearCart = async () => {
@@ -686,12 +691,12 @@ const Cart = () => {
                           <Box display="flex" gap={1} flexWrap="wrap">
                             <Chip
                               size="small"
-                              label={variant.color?.name || 'Không rõ'}
+                              label={capitalizeFirstLetter(variant.color?.name) || 'Không rõ'}
                               sx={{ fontSize: '0.75rem' }}
                             />
                             <Chip
                               size="small"
-                              label={variant.size?.name || 'Không rõ'}
+                              label={formatSize(variant.size?.name) || 'Không rõ'}
                               sx={{ fontSize: '0.75rem' }}
                             />
                           </Box>

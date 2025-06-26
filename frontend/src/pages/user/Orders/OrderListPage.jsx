@@ -158,6 +158,17 @@ const OrderRow = ({ order, onOrderUpdate, onOrderCancelled }) => {
   const { addToCart, refresh: refreshCart } = useCart()
   const { cancelOrder } = useOrder()
 
+  // Helper functions for formatting color and size
+  const capitalizeFirstLetter = (str) => {
+    if (!str) return ''
+    return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase()
+  }
+
+  const formatSize = (str) => {
+    if (!str) return ''
+    return str.toUpperCase()
+  }
+
 
   useEffect(() => {
     const fetchItems = async () => {
@@ -292,7 +303,7 @@ const OrderRow = ({ order, onOrderUpdate, onOrderCancelled }) => {
                         color="text.secondary"
                         sx={{ mb: 0.5 }}
                       >
-                        {item.color?.name} • {item.size}
+                        {capitalizeFirstLetter(item.color?.name)} • {formatSize(item.size)}
                       </Typography>
                       <Chip
                         label={`Số lượng: ${item.quantity}`}
@@ -304,13 +315,37 @@ const OrderRow = ({ order, onOrderUpdate, onOrderCancelled }) => {
                   </Box>
 
                   <Box textAlign="right">
-                    <Typography
-                      fontWeight={700}
-                      fontSize="1.2rem"
-                      color="#1a3c7b"
-                    >
-                      {item.price?.toLocaleString('vi-VN')}₫
-                    </Typography>
+                    {item.variantId?.discountPrice > 0 ? (
+                      <Box display="flex" flexDirection="column" alignItems="flex-end" gap={0.5}>
+                        <Typography
+                          fontWeight={700}
+                          fontSize="1.2rem"
+                          color="#1a3c7b"
+                        >
+                          {(item.price - item.variantId.discountPrice)?.toLocaleString('vi-VN')}₫
+                        </Typography>
+                        <Box display="flex" alignItems="center" gap={1}>
+                          <Typography
+                            variant="body2"
+                            sx={{
+                              textDecoration: 'line-through',
+                              color: 'text.secondary',
+                              fontSize: '0.9rem'
+                            }}
+                          >
+                            {item.price?.toLocaleString('vi-VN')}₫
+                          </Typography>
+                        </Box>
+                      </Box>
+                    ) : (
+                      <Typography
+                        fontWeight={700}
+                        fontSize="1.2rem"
+                        color="#1a3c7b"
+                      >
+                        {item.price?.toLocaleString('vi-VN')}₫
+                      </Typography>
+                    )}
                   </Box>
                 </Box>
               </Box>
@@ -391,13 +426,13 @@ const OrderRow = ({ order, onOrderUpdate, onOrderCancelled }) => {
 
                         try {
                           // Đảm bảo quantity luôn là 1
-                          const result = await addToCart({ 
-                            variantId: variantId, 
-                            quantity: 1 
+                          const result = await addToCart({
+                            variantId: variantId,
+                            quantity: 1
                           })
-                          
+
                           console.log(`Item ${i + 1} add to cart result:`, result)
-                          
+
                           if (result) {
                             successCount++
                           } else {
@@ -420,7 +455,7 @@ const OrderRow = ({ order, onOrderUpdate, onOrderCancelled }) => {
                         // Force refresh cart data before navigating
                         console.log('Refreshing cart data...')
                         await refreshCart({ silent: true })
-                        
+
                         setTimeout(() => {
                           navigate('/cart')
                         }, 300) // Tăng thời gian chờ để đảm bảo cart đã refresh

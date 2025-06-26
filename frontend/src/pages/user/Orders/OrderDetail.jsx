@@ -170,6 +170,17 @@ const OrderDetail = () => {
   const totalProductsPrice = items.reduce((sum, item) => sum + item.price * item.quantity, 0)
   const formatPrice = (val) => (typeof val === 'number' ? val.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' }) : '0₫')
 
+  // Helper functions for formatting color and size
+  const capitalizeFirstLetter = (str) => {
+    if (!str) return ''
+    return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase()
+  }
+
+  const formatSize = (str) => {
+    if (!str) return ''
+    return str.toUpperCase()
+  }
+
   // Group items by product ID to handle variants
   const productGroups = items.reduce((groups, item) => {
     const productId = item.productId?._id
@@ -359,12 +370,13 @@ const OrderDetail = () => {
                             >
                               {product.productName}
                             </Typography>
+
                             <Typography
                               variant="body2"
                               color="text.secondary"
                               sx={{ mb: 0.5 }}
                             >
-                              {variant.color?.name} • {variant.size}
+                              {capitalizeFirstLetter(variant.color?.name)}, {formatSize(variant.size)}
                             </Typography>
                             <Chip
                               label={`Số lượng: ${variant.quantity}`}
@@ -376,20 +388,35 @@ const OrderDetail = () => {
                         </Box>
 
                         <Box textAlign="right">
-                          <Typography
-                            fontWeight={700}
-                            fontSize="1.2rem"
-                            color="#1a3c7b"
-                          >
-                            {formatPrice(variant.price * variant.quantity)}
-                          </Typography>
-                          {variant.originalPrice > variant.price && (
+                          {variant.variantId?.discountPrice > 0 ? (
+                            <Box display="flex" flexDirection="column" alignItems="flex-end" gap={0.5}>
+                              <Typography
+                                fontWeight={700}
+                                fontSize="1.2rem"
+                                color="#1a3c7b"
+                              >
+                                {formatPrice((variant.price - variant.variantId.discountPrice) * variant.quantity)}
+                              </Typography>
+                              <Box display="flex" alignItems="center" gap={1}>
+                                <Typography
+                                  variant="body2"
+                                  sx={{
+                                    textDecoration: 'line-through',
+                                    color: 'text.secondary',
+                                    fontSize: '0.9rem'
+                                  }}
+                                >
+                                  {formatPrice(variant.price * variant.quantity)}
+                                </Typography>
+                              </Box>
+                            </Box>
+                          ) : (
                             <Typography
-                              variant="body2"
-                              color="text.disabled"
-                              sx={{ textDecoration: 'line-through', fontSize: '0.85rem' }}
+                              fontWeight={700}
+                              fontSize="1.2rem"
+                              color="#1a3c7b"
                             >
-                              {formatPrice(variant.originalPrice * variant.quantity)}
+                              {formatPrice(variant.price * variant.quantity)}
                             </Typography>
                           )}
                         </Box>

@@ -250,6 +250,17 @@ const PriceRow = styled(Box)(({ theme, isTotal }) => ({
   borderBottom: isTotal ? 'none' : '1px solid #f0f0f0',
 }))
 
+// Helper functions for formatting color and size
+const capitalizeFirstLetter = (str) => {
+  if (!str) return ''
+  return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase()
+}
+
+const formatSize = (str) => {
+  if (!str) return ''
+  return str.toUpperCase()
+}
+
 const ProductItem = ({ name, variant, quantity, image, color, size, getFinalPrice }) => {
   if (!name || typeof quantity !== 'number') {
     return (
@@ -287,13 +298,13 @@ const ProductItem = ({ name, variant, quantity, image, color, size, getFinalPric
             </Typography>
             <Box sx={{ display: 'flex', gap: 1, mb: 1 }}>
               <Chip
-                label={color || 'Chưa chọn màu'}
+                label={capitalizeFirstLetter(color) || 'Chưa chọn màu'}
                 size="small"
                 variant="outlined"
                 sx={{ fontSize: '0.75rem' }}
               />
               <Chip
-                label={size || 'Chưa chọn kích cỡ'}
+                label={formatSize(size) || 'Chưa chọn kích cỡ'}
                 size="small"
                 variant="outlined"
                 sx={{ fontSize: '0.75rem' }}
