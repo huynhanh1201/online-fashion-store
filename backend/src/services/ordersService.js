@@ -296,7 +296,7 @@ const updateOrder = async (jwtDecoded, orderId, reqBody) => {
     const newStatus = reqBody.status
 
     if (newStatus && newStatus !== existingOrder.status) {
-      const user = await UserModel.findById(jwtDecoded.userId)
+      const user = await UserModel.findById(jwtDecoded._id)
 
       if (!user)
         throw new ApiError(StatusCodes.NOT_FOUND, 'Người dùng không tồn tại')
