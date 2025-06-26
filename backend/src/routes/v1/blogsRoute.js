@@ -14,14 +14,10 @@ Router.route('/').post(
 )
 
 // Danh sách Màu sắc sản phẩm
-Router.route('/').get(authMiddleware.isAuthorized, blogsController.getBlogList)
+Router.route('/').get(blogsController.getBlogList)
 
 // Lấy thông tin một Màu sắc sản phẩm.
-Router.route('/:blogId').get(
-  authMiddleware.isAuthorized,
-  blogsValidation.verifyId,
-  blogsController.getBlog
-)
+Router.route('/:blogId').get(blogsValidation.verifyId, blogsController.getBlog)
 
 // Cập nhật thông tin Màu sắc sản phẩm
 Router.route('/:blogId').patch(
