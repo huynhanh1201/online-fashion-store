@@ -140,20 +140,18 @@ const ProductContent = () => {
             {hasProducts && (
               <div style={{ display: 'flex', justifyContent: 'center', marginTop: 16 }}>
                 <button
-                  style={{
-                    padding: '8px 24px',
-                    borderRadius: 8,
-                    border: '1px solid #1A3C7B',
-                    background: '#fff',
-                    color: '#1A3C7B',
-                    fontWeight: 600,
-                    fontSize: 16,
-                    cursor: 'pointer',
-                    boxShadow: '0 2px 8px rgba(0,0,0,0.04)'
+                  className='view-all-btn'
+                  onMouseEnter={(e) => {
+                    e.target.style.backgroundColor = '#1f2937'
+                    e.target.style.color = 'white'
+                  }}
+                  onMouseLeave={(e) => {
+                    e.target.style.backgroundColor = 'transparent'
+                    e.target.style.color = '#1f2937'
                   }}
                   onClick={() => navigate(`/productbycategory/${activeCategory._id}`)}
                 >
-                  Xem tất cả &gt;
+                  Xem tất cả ›
                 </button>
               </div>
             )}

@@ -1,5 +1,5 @@
 import ProductCard from '~/components/ProductCards/ProductCards.jsx'
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import { CircularProgress, Typography } from '@mui/material'
 
 const styles = {
@@ -79,11 +79,27 @@ const ProductSection = ({
   loading,
   error
 }) => {
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 900)
+
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 900)
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
+  }, [])
+
   return (
     <div style={styles.section}>
-      <div className='product-grid' style={{ display: 'grid', gridTemplateColumns: '290px 1fr', gap: '20px', alignItems: 'center' }}>
+      <div
+ 
+        style={{
+          display: 'grid',
+          gridTemplateColumns: isMobile ? '1fr' : '290px 1fr',
+          gap: isMobile ? '16px' : '20px',
+          alignItems: isMobile ? 'stretch' : 'center', 
+        }}
+      >
         {/* Banner cho category hiện tại */}
-        <div style={styles.banner}>
+        <div style={{ ...styles.banner, height: isMobile ? 220 : 523 }}>
           <img
             src={
               bannerImg
@@ -91,18 +107,26 @@ const ProductSection = ({
                 : 'https://placehold.co/500x440?text=No+Category+Image'
             }
             alt={bannerTitle || 'Banner'}
-            style={styles.bannerImg}
+            style={{ ...styles.bannerImg, height: isMobile ? 220 : '100%' }}
             onError={(e) => {
               console.error('Banner image failed to load:', e.target.src)
               e.target.src =
                 'https://placehold.co/500x440?text=Image+Error'
             }}
           />
-          <div style={styles.bannerText}>
-            <h2 style={styles.bannerTitle}>
+          <div style={{
+            ...styles.bannerText,
+            top: isMobile ? 40 : 150,
+            left: isMobile ? 20 : 70,
+          }}>
+            <h2 style={{
+              ...styles.bannerTitle,
+              fontSize: isMobile ? 24 : 50,
+              marginBottom: isMobile ? 4 : 8
+            }}>
               {bannerTitle || 'Danh mục sản phẩm'}
             </h2>
-            {bannerDesc && <p style={styles.bannerDesc}>{bannerDesc}</p>}
+            {bannerDesc && <p style={{ ...styles.bannerDesc, fontSize: isMobile ? 12 : 14 }}>{bannerDesc}</p>}
           </div>
         </div>
 
@@ -123,7 +147,7 @@ const ProductSection = ({
 
         {/* Products */}
         {!loading && !error && products && products.length > 0 ? (
-          <div className="product-grid">
+          <div className="product-grid" style={{marginTop:'30px'}}>
             {products.slice(0, 4).map((product) => {
               // Xử lý ảnh sản phẩm
               let productImage =

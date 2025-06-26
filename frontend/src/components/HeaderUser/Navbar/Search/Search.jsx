@@ -12,6 +12,14 @@ import { styled } from '@mui/system'
 import { useNavigate } from 'react-router-dom'
 import { getProducts } from '~/services/productService'
 
+// Hàm loại bỏ dấu tiếng Việt
+const removeVietnameseAccents = (str) => {
+  return str
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+}
+
 // Container giữ icon và input
 const SearchWrapper = styled(Box)({
   position: 'relative',
@@ -95,10 +103,13 @@ const Search = () => {
       }
       try {
         const { products } = await getProducts(1, 20)
+        const normalizedSearchText = removeVietnameseAccents(searchText.trim())
+        
         const filtered = products
-          .filter((p) =>
-            p.name.toLowerCase().includes(searchText.toLowerCase())
-          )
+          .filter((p) => {
+            const normalizedProductName = removeVietnameseAccents(p.name)
+            return normalizedProductName.includes(normalizedSearchText)
+          })
           .slice(0, 5)
 
         if (filtered.length === 0) {

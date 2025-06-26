@@ -7,11 +7,16 @@ import {
   ListItemText,
   Typography,
   Divider,
-  Drawer
+  Drawer,
+  IconButton,
+  Collapse
 } from '@mui/material'
 import { styled } from '@mui/system'
 import { useNavigate } from 'react-router-dom'
 import { getProducts } from '~/services/productService'
+import { getCategories } from '~/services/categoryService'
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
+import ExpandLessIcon from '@mui/icons-material/ExpandLess'
 
 // Container giữ input
 const SearchWrapper = styled(Box)({
@@ -74,6 +79,8 @@ const MobileDrawer = ({ open, onClose }) => {
   const [errorMessage, setErrorMessage] = useState('')
   const inputRef = useRef(null)
   const navigate = useNavigate()
+  const [categories, setCategories] = useState([])
+  const [openDropdown, setOpenDropdown] = useState(null)
 
   // Logic lấy gợi ý tìm kiếm
   useEffect(() => {
@@ -138,6 +145,22 @@ const MobileDrawer = ({ open, onClose }) => {
     setSuggestions([])
     setErrorMessage('')
     onClose() // Đóng drawer
+  }
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const res = await getCategories(1, 100)
+        setCategories(res.categories?.data || res.categories || [])
+      } catch (e) {
+        setCategories([])
+      }
+    }
+    if (open) fetchCategories()
+  }, [open])
+
+  const handleDropdown = (idx) => {
+    setOpenDropdown(openDropdown === idx ? null : idx)
   }
 
   return (
@@ -247,9 +270,86 @@ const MobileDrawer = ({ open, onClose }) => {
         <Divider />
 
         <List>
-          <ListItem button component='a' href='/product'>
-            <ListItemText primary='Sản phẩm' />
+          {/* Sản phẩm */}
+          <ListItem button onClick={() => { navigate('/product'); onClose() }}>
+            <ListItemText primary="Sản phẩm" />
           </ListItem>
+          {/* Hàng mới với badge New */}
+          <ListItem button onClick={() => { navigate('/productnews'); onClose() }}>
+            <ListItemText
+              primary={
+                <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                  Hàng Mới
+                  <span style={{ color: 'red', fontWeight: 700, marginLeft: 6, fontSize: 13 }}>New</span>
+                </Box>
+              }
+            />
+          </ListItem>
+          {/* Danh mục động từ API */}
+          {categories.map((cat, idx) => (
+            <React.Fragment key={cat._id}>
+              <ListItem
+                button
+                onClick={() => {
+                  if (cat.children && cat.children.length > 0) {
+                    handleDropdown(idx)
+                  } else {
+                    navigate(`/productbycategory/${cat._id}`)
+                    onClose()
+                  }
+                }}
+                sx={{
+                  color: cat.color || 'inherit',
+                  fontWeight: cat.bold ? 700 : 400,
+                  ...(cat.name === 'OUTLET' && { color: 'red', fontWeight: 700 }),
+                }}
+              >
+                <ListItemText
+                  primary={
+                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                      {/* Nếu là OUTLET, in đậm đỏ và có giảm giá nếu có */}
+                      {cat.name === 'OUTLET' ? (
+                        <>
+                          {cat.discount && (
+                            <span style={{ color: 'red', fontWeight: 700, marginRight: 4 }}>{cat.discount}</span>
+                          )}
+                          OUTLET
+                        </>
+                      ) : (
+                        cat.name
+                      )}
+                      {/* Nếu có children, hiển thị dấu > */}
+                      {cat.children && cat.children.length > 0 && (
+                        <IconButton size="small" sx={{ ml: 1 }} onClick={e => { e.stopPropagation(); handleDropdown(idx) }}>
+                          {openDropdown === idx ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+                        </IconButton>
+                      )}
+                    </Box>
+                  }
+                />
+              </ListItem>
+              {/* Submenu nếu có */}
+              {cat.children && cat.children.length > 0 && (
+                <Collapse in={openDropdown === idx} timeout="auto" unmountOnExit>
+                  <List component="div" disablePadding>
+                    {cat.children.map((child) => (
+                      <ListItem
+                        button
+                        key={child._id}
+                        sx={{ pl: 4 }}
+                        onClick={() => {
+                          navigate(`/productbycategory/${child._id}`)
+                          onClose()
+                        }}
+                      >
+                        <ListItemText primary={child.name} />
+                      </ListItem>
+                    ))}
+                  </List>
+                </Collapse>
+              )}
+            </React.Fragment>
+          ))}
         </List>
       </Box>
     </Drawer>

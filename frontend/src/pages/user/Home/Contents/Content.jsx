@@ -166,8 +166,10 @@ const Content = () => {
                   </div>
                 )}
               </div>
-              <div className='feature-title'>{service.title}</div>
-              <div className='feature-desc'>{service.subtitle}</div>
+              <div className='feature-text'>
+                <div className='feature-title' style={{fontWeight:600, fontSize:'16px', color:'#222', marginBottom:2, textAlign:'left'}}>{service.title}</div>
+                <div className='feature-desc' style={{fontSize:'14px', color:'#6b7280', textAlign:'left'}}>{service.subtitle}</div>
+              </div>
             </div>
           ))}
         </div>
@@ -291,7 +293,7 @@ const Content = () => {
       {products.length > 0 && (
         <div style={{ textAlign: 'center', marginBottom: '32px' }}>
           <Link to='/productnews'>
-            <button className='cta-button'>Xem tất cả</button>
+            <button className='cta-button'>Xem tất cả ›</button>
           </Link>
         </div>
       )}

@@ -145,7 +145,7 @@ const DisplayManagement = () => {
   const getPositionText = (position) => {
     switch (position) {
       case 'hero':
-        return 'Hero (Chính)'
+        return 'Ảnh chính ( Hero )'
       case 'sidebar':
         return 'Sidebar (Bên)'
       case 'popup':
@@ -191,12 +191,6 @@ const DisplayManagement = () => {
       value: banners.filter((b) => isBannerActive(b)).length,
       icon: <CalendarIcon />,
       color: '#ed6c02'
-    },
-    {
-      title: 'Tổng lượt xem',
-      value: banners.length > 0 ? 'N/A' : '0',
-      icon: <VisibilityIcon />,
-      color: '#9c27b0'
     }
   ]
 
@@ -248,10 +242,10 @@ const DisplayManagement = () => {
           }}
         >
           <DashboardIcon sx={{ fontSize: 40, color: '#3b82f6' }} />
-          Quản lý băng rôn & Hiển thị
+          Quản lý ảnh quảng cáo & Hiển thị
         </Typography>
         <Typography variant='body1' color='text.secondary'>
-          Quản lý và theo dõi hiệu suất các băng rôn quảng cáo trên website
+          Quản lý và theo dõi hiệu suất các ảnh quảng cáo trên website
         </Typography>
       </Box>
 
@@ -356,7 +350,7 @@ const DisplayManagement = () => {
             }
           }}
         >
-          Thêm băng rôn mới
+          Thêm ảnh quảng cáo mới
         </Button>
 
         <Button
@@ -386,10 +380,9 @@ const DisplayManagement = () => {
             <TableHead>
               <TableRow sx={{ backgroundColor: '#f8fafc' }}>
                 {[
-                  'Băng rôn',
+                  'Ảnh quảng cáo',
                   'Vị trí',
                   'Thời gian',
-                  'Hiệu suất',
                   'Trạng thái',
                   'Thao tác'
                 ].map((text, idx) => (
@@ -502,39 +495,6 @@ const DisplayManagement = () => {
                               Kết thúc: {formatDate(banner.endDate)}
                             </Typography>
                           </Stack>
-                        </Stack>
-                      </TableCell>
-
-                      <TableCell>
-                        <Stack spacing={1}>
-                          <Box sx={{ display: 'flex', gap: 1 }}>
-                            <Typography
-                              variant='caption'
-                              color='text.secondary'
-                            >
-                              Click:
-                            </Typography>
-                            <Typography
-                              variant='body2'
-                              sx={{ fontWeight: 600, color: '#3b82f6' }}
-                            >
-                              N/A
-                            </Typography>
-                          </Box>
-                          <Box sx={{ display: 'flex', gap: 1 }}>
-                            <Typography
-                              variant='caption'
-                              color='text.secondary'
-                            >
-                              CTR:
-                            </Typography>
-                            <Typography
-                              variant='body2'
-                              sx={{ fontWeight: 600, color: '#059669' }}
-                            >
-                              N/A
-                            </Typography>
-                          </Box>
                         </Stack>
                       </TableCell>
 

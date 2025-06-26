@@ -44,7 +44,7 @@ export default function RelatedProducts({ currentProductId, categoryId }) {
           ))}
         </section>
       ) : (
-        <p>Không có sản phẩm gợi ý.</p>
+        <p style={{ color: 'red', marginBottom: '15px' }}>Không có sản phẩm gợi ý.</p>
       )}
     </div>
   )

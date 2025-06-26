@@ -553,47 +553,66 @@ export default function AdminDrawer({
               <ListItemButton
                 component={Link}
                 to='/admin/display-management'
-                selected={isActive('/display-management')}
-                sx={{ pl: 2, ...activeButtonStyle }}
+                selected={isActive('/admin/display-management')}
+                sx={{ ...activeButtonStyle }}
               >
-                <ListItemIcon></ListItemIcon>
-                <ListItemText primary='Băng rôn' />
+                <ListItemIcon>
+                  <LocalOfferIcon sx={{ visibility: 'hidden' }} />
+                </ListItemIcon>
+                <ListItemText primary='Ảnh quảng cáo' />
               </ListItemButton>
 
               <ListItemButton
                 component={Link}
                 to='/admin/flashsale-management'
-                selected={isActive('/flashsale-management')}
-                sx={{ pl: 2, ...activeButtonStyle }}
+                selected={isActive('/admin/flashsale-management')}
+                sx={{ ...activeButtonStyle }}
               >
-                <ListItemIcon></ListItemIcon>
-                <ListItemText primary='Trương trình khuyến mãi' />
+                <ListItemIcon>
+                  <LocalOfferIcon sx={{ visibility: 'hidden' }} />
+                </ListItemIcon>
+                <ListItemText primary='Chương trình khuyến mãi' />
               </ListItemButton>
               <ListItemButton
                 component={Link}
                 to='/admin/header-management'
-                selected={isActive('/header-management')}
-                sx={{ pl: 2, ...activeButtonStyle }}
+                selected={isActive('/admin/header-management')}
+                sx={{ ...activeButtonStyle }}
               >
-                <ListItemIcon></ListItemIcon>
+                <ListItemIcon>
+                  <LocalOfferIcon sx={{ visibility: 'hidden' }} />
+                </ListItemIcon>
                 <ListItemText primary='Nội dung đầu trang' />
               </ListItemButton>
               <ListItemButton
                 component={Link}
+                to='/admin/footer-management'
+                selected={isActive('/admin/footer-management')}
+                sx={{ ...activeButtonStyle }}
+              >
+                <ListItemIcon>
+                  <LocalOfferIcon sx={{ visibility: 'hidden' }} />
+                </ListItemIcon>
+                <ListItemText primary='Nội dung cuối trang' />
+              </ListItemButton>
+              <ListItemButton
+                component={Link}
                 to='/admin/featured-category-management'
-                selected={isActive('/featured-category-management')}
-                sx={{ pl: 2, ...activeButtonStyle }}
+                selected={isActive('/admin/featured-category-management')}
+                sx={{ ...activeButtonStyle }}
               >
                 <ListItemIcon></ListItemIcon>
                 <ListItemText primary='Danh mục nổi bật' />
+                <LocalOfferIcon sx={{ visibility: 'hidden' }} />
               </ListItemButton>
               <ListItemButton
                 component={Link}
                 to='/admin/service-highlight-management'
-                selected={isActive('/service-highlight-management')}
-                sx={{ pl: 2, ...activeButtonStyle }}
+                selected={isActive('/admin/service-highlight-management')}
+                sx={{ ...activeButtonStyle }}
               >
                 <ListItemIcon></ListItemIcon>
+
                 <ListItemText primary='Dịch vụ nổi bật' />
               </ListItemButton>
             </List>
