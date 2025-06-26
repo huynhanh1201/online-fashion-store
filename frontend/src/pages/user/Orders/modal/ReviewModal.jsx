@@ -20,7 +20,7 @@ import {
   LinearProgress,
   Stack,
   Tooltip,
-  Snackbar,
+  Snackbar
 } from '@mui/material'
 import {
   PhotoCamera,
@@ -28,10 +28,14 @@ import {
   Delete,
   Warning,
   CheckCircle,
-  Info,
+  Info
 } from '@mui/icons-material'
 import { contentFilter } from '~/utils/contentFilter'
-import { CLOUD_NAME, CloudinaryVideoFolder, CloudinaryImageFolder } from '~/utils/constants'
+import {
+  CLOUD_NAME,
+  CloudinaryVideoFolder,
+  CloudinaryImageFolder
+} from '~/utils/constants'
 import { optimizeCloudinaryUrl } from '~/utils/cloudinary'
 
 const uploadToCloudinary = async (file, folder = CloudinaryImageFolder) => {
@@ -72,26 +76,41 @@ const uploadToCloudinary = async (file, folder = CloudinaryImageFolder) => {
   return data.secure_url
 }
 
-
-
 // Function to generate video thumbnail from Cloudinary URL
 const getVideoThumbnail = (videoUrl) => {
   if (!videoUrl) return null
   // Convert video URL to thumbnail URL
   // Example: https://res.cloudinary.com/demo/video/upload/v1234/folder/video.mp4
   // To: https://res.cloudinary.com/demo/video/upload/so_0,w_200,h_120,c_fill,f_jpg/v1234/folder/video.jpg
-  return videoUrl.replace('/video/upload/', '/video/upload/so_0,w_200,h_120,c_fill,f_jpg/')
+  return videoUrl
+    .replace('/video/upload/', '/video/upload/so_0,w_200,h_120,c_fill,f_jpg/')
     .replace(/\.(mp4|webm|ogg)$/, '.jpg')
 }
 
-const ReviewModal = ({ open, onClose, onSubmit, orderItems, productId, userId, orderId }) => {
+const ReviewModal = ({
+  open,
+  onClose,
+  onSubmit,
+  orderItems,
+  productId,
+  userId,
+  orderId
+}) => {
   const [rating, setRating] = useState(0)
   const [comment, setComment] = useState('')
   const [images, setImages] = useState([])
   const [videos, setVideos] = useState([])
   const [uploading, setUploading] = useState(false)
-  const [contentValidation, setContentValidation] = useState({ isValid: true, violations: [], warnings: [] })
-  const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'info' })
+  const [contentValidation, setContentValidation] = useState({
+    isValid: true,
+    violations: [],
+    warnings: []
+  })
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: '',
+    severity: 'info'
+  })
   const inputRef = useRef(null)
   const imageInputRef = useRef(null)
   const videoInputRef = useRef(null)
@@ -110,7 +129,7 @@ const ReviewModal = ({ open, onClose, onSubmit, orderItems, productId, userId, o
   }
 
   const handleCloseSnackbar = () => {
-    setSnackbar(prev => ({ ...prev, open: false }))
+    setSnackbar((prev) => ({ ...prev, open: false }))
   }
 
   useEffect(() => {
@@ -127,7 +146,7 @@ const ReviewModal = ({ open, onClose, onSubmit, orderItems, productId, userId, o
     }
   }, [open])
 
-  // Content filter for comment
+  // EditContent filter for comment
   const handleCommentChange = (e) => {
     const text = e.target.value
     setComment(text)
@@ -149,13 +168,19 @@ const ReviewModal = ({ open, onClose, onSubmit, orderItems, productId, userId, o
       return
     }
 
-    const validFiles = files.filter(file => {
+    const validFiles = files.filter((file) => {
       if (!ALLOWED_IMAGE_TYPES.includes(file.type)) {
-        showSnackbar(`File ${file.name} không đúng định dạng. Chỉ chấp nhận: JPG, PNG, WebP`, 'error')
+        showSnackbar(
+          `File ${file.name} không đúng định dạng. Chỉ chấp nhận: JPG, PNG, WebP`,
+          'error'
+        )
         return false
       }
       if (file.size > MAX_IMAGE_SIZE) {
-        showSnackbar(`File ${file.name} quá lớn. Kích thước tối đa: 5MB`, 'error')
+        showSnackbar(
+          `File ${file.name} quá lớn. Kích thước tối đa: 5MB`,
+          'error'
+        )
         return false
       }
       return true
@@ -177,7 +202,10 @@ const ReviewModal = ({ open, onClose, onSubmit, orderItems, productId, userId, o
           })
 
           // Upload lên Cloudinary
-          const cloudinaryUrl = await uploadToCloudinary(file, CloudinaryImageFolder)
+          const cloudinaryUrl = await uploadToCloudinary(
+            file,
+            CloudinaryImageFolder
+          )
 
           // Thêm vào danh sách với URL từ Cloudinary
           const newImage = {
@@ -189,21 +217,31 @@ const ReviewModal = ({ open, onClose, onSubmit, orderItems, productId, userId, o
           }
 
           console.log('New image object:', newImage)
-          setImages(prev => [...prev, newImage])
+          setImages((prev) => [...prev, newImage])
           return newImage
         } catch (error) {
           console.error('Lỗi upload ảnh:', error)
-          showSnackbar(`Không thể upload ảnh ${file.name}. Vui lòng thử lại.`, 'error')
+          showSnackbar(
+            `Không thể upload ảnh ${file.name}. Vui lòng thử lại.`,
+            'error'
+          )
           throw error
         }
       })
 
       const results = await Promise.allSettled(uploadPromises)
-      const successCount = results.filter(result => result.status === 'fulfilled').length
-      const failureCount = results.filter(result => result.status === 'rejected').length
+      const successCount = results.filter(
+        (result) => result.status === 'fulfilled'
+      ).length
+      const failureCount = results.filter(
+        (result) => result.status === 'rejected'
+      ).length
 
       if (successCount > 0) {
-        showSnackbar(`Upload thành công ${successCount} ảnh${failureCount > 0 ? `, ${failureCount} ảnh thất bại` : ''}!`, 'success')
+        showSnackbar(
+          `Upload thành công ${successCount} ảnh${failureCount > 0 ? `, ${failureCount} ảnh thất bại` : ''}!`,
+          'success'
+        )
       }
     } catch (error) {
       console.error('Lỗi xử lý upload:', error)
@@ -225,13 +263,19 @@ const ReviewModal = ({ open, onClose, onSubmit, orderItems, productId, userId, o
       return
     }
 
-    const validFiles = files.filter(file => {
+    const validFiles = files.filter((file) => {
       if (!ALLOWED_VIDEO_TYPES.includes(file.type)) {
-        showSnackbar(`File ${file.name} không đúng định dạng. Chỉ chấp nhận: MP4, WebM, OGG`, 'error')
+        showSnackbar(
+          `File ${file.name} không đúng định dạng. Chỉ chấp nhận: MP4, WebM, OGG`,
+          'error'
+        )
         return false
       }
       if (file.size > MAX_VIDEO_SIZE) {
-        showSnackbar(`File ${file.name} quá lớn. Kích thước tối đa: 10MB`, 'error')
+        showSnackbar(
+          `File ${file.name} quá lớn. Kích thước tối đa: 10MB`,
+          'error'
+        )
         return false
       }
       return true
@@ -246,7 +290,10 @@ const ReviewModal = ({ open, onClose, onSubmit, orderItems, productId, userId, o
       const uploadPromises = validFiles.map(async (file) => {
         try {
           // Upload lên Cloudinary
-          const cloudinaryUrl = await uploadToCloudinary(file, CloudinaryVideoFolder)
+          const cloudinaryUrl = await uploadToCloudinary(
+            file,
+            CloudinaryVideoFolder
+          )
 
           // Thêm vào danh sách với URL từ Cloudinary
           const newVideo = {
@@ -257,21 +304,31 @@ const ReviewModal = ({ open, onClose, onSubmit, orderItems, productId, userId, o
           }
 
           console.log('New video object:', newVideo)
-          setVideos(prev => [...prev, newVideo])
+          setVideos((prev) => [...prev, newVideo])
           return newVideo
         } catch (error) {
           console.error('Lỗi upload video:', error)
-          showSnackbar(`Không thể upload video ${file.name}. Vui lòng thử lại.`, 'error')
+          showSnackbar(
+            `Không thể upload video ${file.name}. Vui lòng thử lại.`,
+            'error'
+          )
           throw error
         }
       })
 
       const results = await Promise.allSettled(uploadPromises)
-      const successCount = results.filter(result => result.status === 'fulfilled').length
-      const failureCount = results.filter(result => result.status === 'rejected').length
+      const successCount = results.filter(
+        (result) => result.status === 'fulfilled'
+      ).length
+      const failureCount = results.filter(
+        (result) => result.status === 'rejected'
+      ).length
 
       if (successCount > 0) {
-        showSnackbar(`Upload thành công ${successCount} video${failureCount > 0 ? `, ${failureCount} video thất bại` : ''}!`, 'success')
+        showSnackbar(
+          `Upload thành công ${successCount} video${failureCount > 0 ? `, ${failureCount} video thất bại` : ''}!`,
+          'success'
+        )
       }
     } catch (error) {
       console.error('Lỗi xử lý upload:', error)
@@ -286,12 +343,12 @@ const ReviewModal = ({ open, onClose, onSubmit, orderItems, productId, userId, o
 
   // Remove image
   const removeImage = (id) => {
-    setImages(prev => prev.filter(img => img.id !== id))
+    setImages((prev) => prev.filter((img) => img.id !== id))
   }
 
   // Remove video
   const removeVideo = (id) => {
-    setVideos(prev => prev.filter(vid => vid.id !== id))
+    setVideos((prev) => prev.filter((vid) => vid.id !== id))
   }
 
   // Format file size
@@ -311,27 +368,27 @@ const ReviewModal = ({ open, onClose, onSubmit, orderItems, productId, userId, o
         rating,
         comment: contentValidation.filteredText || comment,
         orderId,
-        images: images.map(img => img.url),
-        videos: videos.map(vid => vid.url)
+        images: images.map((img) => img.url),
+        videos: videos.map((vid) => vid.url)
       })
     }
   }
 
-  const isSubmitDisabled = !rating || !comment.trim() || !contentValidation.isValid || uploading
+  const isSubmitDisabled =
+    !rating || !comment.trim() || !contentValidation.isValid || uploading
 
   return (
     <Dialog
       open={open}
       onClose={onClose}
-      maxWidth="lg"
+      maxWidth='lg'
       fullWidth
       PaperProps={{
         sx: {
-          maxHeight: '70vh', // hoặc 60vh, tuỳ bạn muốn thấp bao nhiêu
-        },
+          maxHeight: '70vh' // hoặc 60vh, tuỳ bạn muốn thấp bao nhiêu
+        }
       }}
     >
-
       <DialogTitle sx={{ fontWeight: 'bold', fontSize: '1.4rem', pb: 1 }}>
         Đánh Giá Sản Phẩm
       </DialogTitle>
@@ -363,21 +420,28 @@ const ReviewModal = ({ open, onClose, onSubmit, orderItems, productId, userId, o
                 }}
               >
                 <Avatar
-                  src={item?.color?.image ? optimizeCloudinaryUrl(item.color.image, { width: 64, height: 64 }) : '/default.jpg'}
-                  variant="rounded"
+                  src={
+                    item?.color?.image
+                      ? optimizeCloudinaryUrl(item.color.image, {
+                          width: 64,
+                          height: 64
+                        })
+                      : '/default.jpg'
+                  }
+                  variant='rounded'
                   sx={{ width: 64, height: 64 }}
                 />
                 <Box>
-                  <Typography fontWeight={600} fontSize="1rem">
+                  <Typography fontWeight={600} fontSize='1rem'>
                     {item?.name || 'Sản phẩm'}
                   </Typography>
-                  <Typography variant="body2" color="text.secondary">
+                  <Typography variant='body2' color='text.secondary'>
                     {item?.color?.name} • {item?.size}
                   </Typography>
                   <Chip
                     label={`x${item.quantity}`}
-                    size="small"
-                    variant="outlined"
+                    size='small'
+                    variant='outlined'
                     sx={{ mt: 0.5, fontSize: '0.7rem', height: 20 }}
                   />
                 </Box>
@@ -390,23 +454,33 @@ const ReviewModal = ({ open, onClose, onSubmit, orderItems, productId, userId, o
 
         {/* Rating Section */}
         <Box mb={3}>
-          <Typography variant="h6" fontWeight="600" color="#1a3c7b" gutterBottom>
+          <Typography
+            variant='h6'
+            fontWeight='600'
+            color='#1a3c7b'
+            gutterBottom
+          >
             Chất lượng sản phẩm
           </Typography>
           <Rating
             value={rating}
             onChange={(e, newValue) => setRating(newValue)}
-            size="large"
+            size='large'
             sx={{ mb: 1 }}
           />
-          <Typography variant="body2" color="text.secondary">
+          <Typography variant='body2' color='text.secondary'>
             Vui lòng đánh giá từ 1-5 sao
           </Typography>
         </Box>
 
-        {/* Comment Section with Content Filter */}
+        {/* Comment Section with EditContent Filter */}
         <Box mb={3}>
-          <Typography variant="h6" fontWeight="600" color="#1a3c7b" gutterBottom>
+          <Typography
+            variant='h6'
+            fontWeight='600'
+            color='#1a3c7b'
+            gutterBottom
+          >
             Nhận xét của bạn
           </Typography>
 
@@ -417,8 +491,8 @@ const ReviewModal = ({ open, onClose, onSubmit, orderItems, productId, userId, o
             rows={4}
             value={comment}
             onChange={handleCommentChange}
-            placeholder="Hãy chia sẻ trải nghiệm của bạn với sản phẩm này... (Tránh chia sẻ thông tin cá nhân)"
-            variant="outlined"
+            placeholder='Hãy chia sẻ trải nghiệm của bạn với sản phẩm này... (Tránh chia sẻ thông tin cá nhân)'
+            variant='outlined'
             error={!contentValidation.isValid}
             helperText={
               !contentValidation.isValid
@@ -428,16 +502,16 @@ const ReviewModal = ({ open, onClose, onSubmit, orderItems, productId, userId, o
             inputProps={{ maxLength: 500 }}
           />
 
-          {/* Content Validation Alerts */}
+          {/* EditContent Validation Alerts */}
           {contentValidation.violations.length > 0 && (
-            <Alert severity="error" sx={{ mt: 1 }} icon={<Warning />}>
-              <Typography variant="body2">
+            <Alert severity='error' sx={{ mt: 1 }} icon={<Warning />}>
+              <Typography variant='body2'>
                 Nội dung chứa từ ngữ không phù hợp:
               </Typography>
               <ul style={{ margin: '4px 0', paddingLeft: '20px' }}>
                 {contentValidation.violations.map((violation, index) => (
                   <li key={index}>
-                    <Typography variant="caption">{violation}</Typography>
+                    <Typography variant='caption'>{violation}</Typography>
                   </li>
                 ))}
               </ul>
@@ -445,25 +519,28 @@ const ReviewModal = ({ open, onClose, onSubmit, orderItems, productId, userId, o
           )}
 
           {contentValidation.warnings.length > 0 && (
-            <Alert severity="warning" sx={{ mt: 1 }} icon={<Info />}>
-              <Typography variant="body2">
+            <Alert severity='warning' sx={{ mt: 1 }} icon={<Info />}>
+              <Typography variant='body2'>
                 Gợi ý: Hãy thử diễn đạt tích cực hơn
               </Typography>
             </Alert>
           )}
 
           {contentValidation.isValid && comment.length > 0 && (
-            <Alert severity="success" sx={{ mt: 1 }} icon={<CheckCircle />}>
-              <Typography variant="body2">
-                Nội dung phù hợp!
-              </Typography>
+            <Alert severity='success' sx={{ mt: 1 }} icon={<CheckCircle />}>
+              <Typography variant='body2'>Nội dung phù hợp!</Typography>
             </Alert>
           )}
         </Box>
 
         {/* Media Upload Section */}
         <Box>
-          <Typography variant="h6" fontWeight="600" color="#1a3c7b" gutterBottom>
+          <Typography
+            variant='h6'
+            fontWeight='600'
+            color='#1a3c7b'
+            gutterBottom
+          >
             Thêm ảnh và video (không bắt buộc)
           </Typography>
 
@@ -471,26 +548,26 @@ const ReviewModal = ({ open, onClose, onSubmit, orderItems, productId, userId, o
           {uploading && (
             <Box mb={2}>
               <LinearProgress />
-              <Typography variant="caption" color="text.secondary">
+              <Typography variant='caption' color='text.secondary'>
                 Đang tải lên...
               </Typography>
             </Box>
           )}
 
           {/* Upload Buttons */}
-          <Stack direction="row" spacing={2} mb={2}>
+          <Stack direction='row' spacing={2} mb={2}>
             <input
               ref={imageInputRef}
-              type="file"
-              accept="image/jpeg,image/png,image/webp"
+              type='file'
+              accept='image/jpeg,image/png,image/webp'
               multiple
               hidden
               onChange={handleImageUpload}
             />
             <input
               ref={videoInputRef}
-              type="file"
-              accept="video/mp4,video/webm,video/ogg"
+              type='file'
+              accept='video/mp4,video/webm,video/ogg'
               multiple
               hidden
               onChange={handleVideoUpload}
@@ -498,7 +575,7 @@ const ReviewModal = ({ open, onClose, onSubmit, orderItems, productId, userId, o
 
             <Tooltip title={`Tối đa ${MAX_IMAGES} ảnh, mỗi ảnh < 5MB`}>
               <Button
-                variant="outlined"
+                variant='outlined'
                 startIcon={<PhotoCamera />}
                 onClick={() => imageInputRef.current?.click()}
                 disabled={images.length >= MAX_IMAGES || uploading}
@@ -510,7 +587,7 @@ const ReviewModal = ({ open, onClose, onSubmit, orderItems, productId, userId, o
 
             <Tooltip title={`Tối đa ${MAX_VIDEOS} video, mỗi video < 10MB`}>
               <Button
-                variant="outlined"
+                variant='outlined'
                 startIcon={<Videocam />}
                 onClick={() => videoInputRef.current?.click()}
                 disabled={videos.length >= MAX_VIDEOS || uploading}
@@ -528,14 +605,21 @@ const ReviewModal = ({ open, onClose, onSubmit, orderItems, productId, userId, o
               <Grid item xs={6} sm={4} md={3} key={image.id}>
                 <Card sx={{ position: 'relative' }}>
                   <CardMedia
-                    component="img"
-                    height="120"
-                    image={image.url ? optimizeCloudinaryUrl(image.url, { width: 200, height: 120 }) : image.preview}
+                    component='img'
+                    height='120'
+                    image={
+                      image.url
+                        ? optimizeCloudinaryUrl(image.url, {
+                            width: 200,
+                            height: 120
+                          })
+                        : image.preview
+                    }
                     alt={image.name}
                     sx={{ objectFit: 'cover' }}
                   />
                   <IconButton
-                    size="small"
+                    size='small'
                     onClick={() => removeImage(image.id)}
                     sx={{
                       position: 'absolute',
@@ -545,13 +629,17 @@ const ReviewModal = ({ open, onClose, onSubmit, orderItems, productId, userId, o
                       '&:hover': { backgroundColor: 'rgba(255,255,255,0.9)' }
                     }}
                   >
-                    <Delete fontSize="small" />
+                    <Delete fontSize='small' />
                   </IconButton>
                   <Box p={1}>
-                    <Typography variant="caption" noWrap>
+                    <Typography variant='caption' noWrap>
                       {image.name}
                     </Typography>
-                    <Typography variant="caption" display="block" color="text.secondary">
+                    <Typography
+                      variant='caption'
+                      display='block'
+                      color='text.secondary'
+                    >
                       {formatFileSize(image.size)}
                     </Typography>
                   </Box>
@@ -565,8 +653,8 @@ const ReviewModal = ({ open, onClose, onSubmit, orderItems, productId, userId, o
                 <Card sx={{ position: 'relative' }}>
                   {video.url ? (
                     <CardMedia
-                      component="img"
-                      height="120"
+                      component='img'
+                      height='120'
                       image={getVideoThumbnail(video.url)}
                       alt={video.name}
                       sx={{
@@ -608,7 +696,7 @@ const ReviewModal = ({ open, onClose, onSubmit, orderItems, productId, userId, o
                     </Box>
                   )}
                   <IconButton
-                    size="small"
+                    size='small'
                     onClick={() => removeVideo(video.id)}
                     sx={{
                       position: 'absolute',
@@ -618,13 +706,17 @@ const ReviewModal = ({ open, onClose, onSubmit, orderItems, productId, userId, o
                       '&:hover': { backgroundColor: 'rgba(255,255,255,0.9)' }
                     }}
                   >
-                    <Delete fontSize="small" />
+                    <Delete fontSize='small' />
                   </IconButton>
                   <Box p={1}>
-                    <Typography variant="caption" noWrap>
+                    <Typography variant='caption' noWrap>
                       {video.name}
                     </Typography>
-                    <Typography variant="caption" display="block" color="text.secondary">
+                    <Typography
+                      variant='caption'
+                      display='block'
+                      color='text.secondary'
+                    >
                       {formatFileSize(video.size)}
                     </Typography>
                   </Box>
@@ -634,11 +726,17 @@ const ReviewModal = ({ open, onClose, onSubmit, orderItems, productId, userId, o
           </Grid>
 
           {/* Upload Guidelines */}
-          <Alert severity="info" sx={{ mt: 2 }}>
-            <Typography variant="body2">
+          <Alert severity='info' sx={{ mt: 2 }}>
+            <Typography variant='body2'>
               <strong>Hướng dẫn:</strong>
             </Typography>
-            <ul style={{ margin: '4px 0', paddingLeft: '20px', fontSize: '0.875rem' }}>
+            <ul
+              style={{
+                margin: '4px 0',
+                paddingLeft: '20px',
+                fontSize: '0.875rem'
+              }}
+            >
               <li>Ảnh: JPG, PNG, WebP - Tối đa 5MB/ảnh</li>
               <li>Video: MP4, WebM, OGG - Tối đa 10MB/video</li>
               <li>Chỉ upload ảnh/video liên quan đến sản phẩm</li>
@@ -651,16 +749,16 @@ const ReviewModal = ({ open, onClose, onSubmit, orderItems, productId, userId, o
       <DialogActions sx={{ px: 3, pb: 2, pt: 1 }}>
         <Button
           onClick={onClose}
-          color="inherit"
-          variant="outlined"
+          color='inherit'
+          variant='outlined'
           sx={{ textTransform: 'none' }}
         >
           Hủy bỏ
         </Button>
         <Button
           onClick={handleSubmit}
-          color="primary"
-          variant="contained"
+          color='primary'
+          variant='contained'
           disabled={isSubmitDisabled}
           sx={{ textTransform: 'none', fontWeight: 600 }}
         >
@@ -678,7 +776,7 @@ const ReviewModal = ({ open, onClose, onSubmit, orderItems, productId, userId, o
         <Alert
           onClose={handleCloseSnackbar}
           severity={snackbar.severity}
-          variant="filled"
+          variant='filled'
           sx={{ width: '100%' }}
         >
           {snackbar.message}

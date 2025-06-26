@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react'
+import React, { useState, useRef } from 'react'
 import {
   Dialog,
   DialogTitle,
@@ -11,7 +11,8 @@ import {
   Typography,
   IconButton,
   Tooltip,
-  Autocomplete
+  Autocomplete,
+  Grid
 } from '@mui/material'
 import EditIcon from '@mui/icons-material/Edit'
 import DeleteIcon from '@mui/icons-material/Delete'
@@ -51,36 +52,70 @@ const AddCategoryModal = ({
   } = useForm()
   const [imageFile, setImageFile] = useState(null)
   const [previewUrl, setPreviewUrl] = useState('')
-  const [parentCategory, setParentCategory] = useState(null)
   const fileInputRef = useRef()
+  const [parentCategory, setParentCategory] = useState(null)
+  const [bannerFile, setBannerFile] = useState(null)
+  const [bannerPreview, setBannerPreview] = useState('')
+  const bannerInputRef = useRef()
+
+  const handleImageChange = (e) => {
+    const file = e.target.files[0]
+    if (file) {
+      setImageFile(file)
+      setPreviewUrl(URL.createObjectURL(file))
+    }
+  }
+
+  const handleImageRemove = () => {
+    setImageFile(null)
+    setPreviewUrl('')
+  }
+
+  const handleBannerChange = (e) => {
+    const file = e.target.files[0]
+    if (file) {
+      setBannerFile(file)
+      setBannerPreview(URL.createObjectURL(file))
+    }
+  }
+
+  const handleBannerRemove = () => {
+    setBannerFile(null)
+    setBannerPreview('')
+  }
 
   const onSubmit = async (data) => {
     try {
       let imageUrl = ''
-      if (imageFile) {
-        imageUrl = await uploadToCloudinary(imageFile)
-      }
+      let bannerUrl = ''
+      if (imageFile) imageUrl = await uploadToCloudinary(imageFile)
+      if (bannerFile) bannerUrl = await uploadToCloudinary(bannerFile)
 
       const payload = {
         name: data.name.trim(),
         description: data.description?.trim() || '',
-        image: imageUrl || ''
+        image: imageUrl || '',
+        banner: bannerUrl || ''
       }
-      // Nếu người dùng chọn danh mục cha (parent)
+
       if (parentCategory && parentCategory._id) {
         payload.parent = parentCategory._id
       } else {
         payload.parent = null
       }
+
       if (onSave) {
         await onSave(payload)
       } else {
         await onAdded(payload, 'add')
       }
+
       onClose()
       reset()
       setImageFile(null)
       setPreviewUrl('')
+      setBannerFile(null)
+      setBannerPreview('')
       setParentCategory(null)
     } catch (error) {
       console.log('Lỗi khi tải ảnh hoặc thêm danh mục!', error)
@@ -95,18 +130,6 @@ const AddCategoryModal = ({
     onClose()
   }
 
-  const handleImageChange = (e) => {
-    const file = e.target.files[0]
-    if (file) {
-      setImageFile(file)
-      setPreviewUrl(URL.createObjectURL(file))
-    }
-  }
-
-  const handleImageRemove = () => {
-    setImageFile(null)
-    setPreviewUrl('')
-  }
   const filteredCategories = categories.filter(
     (category) => category.parent === null
   )
@@ -115,7 +138,7 @@ const AddCategoryModal = ({
       open={open}
       onClose={handleClose}
       fullWidth
-      maxWidth='lg'
+      maxWidth='xl'
       BackdropProps={{ sx: StyleAdmin.OverlayModal }}
     >
       <DialogTitle>Thêm danh mục mới</DialogTitle>
@@ -127,86 +150,176 @@ const AddCategoryModal = ({
             gap={3}
             flexDirection={{ xs: 'column', sm: 'row' }}
           >
-            {/* Vùng ảnh */}
-            <Box
-              display='flex'
-              flexDirection='column'
-              alignItems='center'
-              justifyContent='center'
-              border='2px dashed #ccc'
-              borderRadius={2}
-              position='relative'
-              sx={{
-                backgroundColor: '#fafafa',
-                cursor: 'pointer',
-                width: 350,
-                height: 345,
-                mt: '14px'
-              }}
-              onClick={() => !previewUrl && fileInputRef.current.click()}
-            >
-              {previewUrl ? (
-                <>
-                  <img
-                    src={previewUrl}
-                    alt='Ảnh danh mục'
-                    style={{
-                      width: '100%',
-                      height: '100%',
-                      objectFit: 'cover',
-                      borderRadius: 8
-                    }}
+            <Grid container spacing={2}>
+              {/* Ảnh danh mục */}
+              <Grid item xs={6}>
+                <Typography variant='subtitle2' fontWeight='bold' mb={1}>
+                  Ảnh danh mục
+                </Typography>
+                <Box
+                  display='flex'
+                  flexDirection='column'
+                  alignItems='center'
+                  justifyContent='center'
+                  border='2px dashed #ccc'
+                  borderRadius={2}
+                  position='relative'
+                  sx={{
+                    backgroundColor: '#fafafa',
+                    cursor: 'pointer',
+                    width: 350,
+                    height: 331
+                  }}
+                  onClick={() => !previewUrl && fileInputRef.current.click()}
+                >
+                  {previewUrl ? (
+                    <>
+                      <img
+                        src={previewUrl}
+                        alt='Ảnh danh mục'
+                        style={{
+                          width: '100%',
+                          height: '100%',
+                          objectFit: 'cover',
+                          borderRadius: 8
+                        }}
+                      />
+                      <Box
+                        position='absolute'
+                        top={4}
+                        right={8}
+                        display='flex'
+                        gap={1}
+                      >
+                        <Tooltip title='Sửa'>
+                          <IconButton
+                            size='small'
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              fileInputRef.current.click()
+                            }}
+                          >
+                            <EditIcon fontSize='small' color='warning' />
+                          </IconButton>
+                        </Tooltip>
+                        <Tooltip title='Xoá'>
+                          <IconButton
+                            size='small'
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              handleImageRemove()
+                            }}
+                          >
+                            <DeleteIcon fontSize='small' color='error' />
+                          </IconButton>
+                        </Tooltip>
+                      </Box>
+                    </>
+                  ) : (
+                    <Box textAlign='center' color='#999'>
+                      <AddPhotoAlternateIcon fontSize='large' />
+                      <Typography fontSize={14} mt={1}>
+                        Thêm ảnh danh mục
+                      </Typography>
+                    </Box>
+                  )}
+                  <input
+                    type='file'
+                    accept='image/*'
+                    ref={fileInputRef}
+                    style={{ display: 'none' }}
+                    onChange={handleImageChange}
                   />
-                  <Box
-                    position='absolute'
-                    top={4}
-                    right={8}
-                    display='flex'
-                    gap={1}
-                  >
-                    <Tooltip title='Sửa'>
-                      <IconButton
-                        size='small'
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          fileInputRef.current.click()
-                        }}
-                      >
-                        <EditIcon fontSize='small' color='warning' />
-                      </IconButton>
-                    </Tooltip>
-                    <Tooltip title='Xoá'>
-                      <IconButton
-                        size='small'
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          handleImageRemove()
-                        }}
-                      >
-                        <DeleteIcon fontSize='small' color='error' />
-                      </IconButton>
-                    </Tooltip>
-                  </Box>
-                </>
-              ) : (
-                <Box textAlign='center' color='#999'>
-                  <AddPhotoAlternateIcon fontSize='large' />
-                  <Typography fontSize={14} mt={1}>
-                    Thêm ảnh danh mục
-                  </Typography>
                 </Box>
-              )}
-              <input
-                type='file'
-                accept='image/*'
-                ref={fileInputRef}
-                style={{ display: 'none' }}
-                onChange={handleImageChange}
-              />
-            </Box>
+              </Grid>
+
+              {/* Ảnh quảng cáo / banner */}
+              <Grid item xs={6}>
+                <Typography variant='subtitle2' fontWeight='bold' mb={1}>
+                  Ảnh quảng cáo
+                </Typography>
+                <Box
+                  display='flex'
+                  flexDirection='column'
+                  alignItems='center'
+                  justifyContent='center'
+                  border='2px dashed #ccc'
+                  borderRadius={2}
+                  position='relative'
+                  sx={{
+                    backgroundColor: '#fafafa',
+                    cursor: 'pointer',
+                    width: 350,
+                    height: 331
+                  }}
+                  onClick={() =>
+                    !bannerPreview && bannerInputRef.current.click()
+                  }
+                >
+                  {bannerPreview ? (
+                    <>
+                      <img
+                        src={bannerPreview}
+                        alt='Ảnh banner'
+                        style={{
+                          width: '100%',
+                          height: '100%',
+                          objectFit: 'cover',
+                          borderRadius: 8
+                        }}
+                      />
+                      <Box
+                        position='absolute'
+                        top={4}
+                        right={8}
+                        display='flex'
+                        gap={1}
+                      >
+                        <Tooltip title='Sửa'>
+                          <IconButton
+                            size='small'
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              bannerInputRef.current.click()
+                            }}
+                          >
+                            <EditIcon fontSize='small' color='warning' />
+                          </IconButton>
+                        </Tooltip>
+                        <Tooltip title='Xoá'>
+                          <IconButton
+                            size='small'
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              handleBannerRemove()
+                            }}
+                          >
+                            <DeleteIcon fontSize='small' color='error' />
+                          </IconButton>
+                        </Tooltip>
+                      </Box>
+                    </>
+                  ) : (
+                    <Box textAlign='center' color='#999'>
+                      <AddPhotoAlternateIcon fontSize='large' />
+                      <Typography fontSize={14} mt={1}>
+                        Thêm ảnh quảng cáo
+                      </Typography>
+                    </Box>
+                  )}
+                  <input
+                    type='file'
+                    accept='image/*'
+                    ref={bannerInputRef}
+                    style={{ display: 'none' }}
+                    onChange={handleBannerChange}
+                  />
+                </Box>
+              </Grid>
+            </Grid>
 
             {/* Vùng nhập liệu */}
-            <Box flex={1}>
+            <Box flex={1} mt={1.6}>
               <TextField
                 label='Tên danh mục'
                 fullWidth

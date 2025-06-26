@@ -43,40 +43,84 @@ const ViewCategoryModal = ({ open, onClose, category }) => {
             gap={3}
             flexDirection={{ xs: 'column', sm: 'row' }}
           >
-            {/* Ảnh bên trái */}
-            <Box
-              display='flex'
-              flexDirection='column'
-              alignItems='center'
-              justifyContent='center'
-              border='2px dashed #ccc'
-              borderRadius={2}
-              // minHeight={200}
-              sx={{
-                backgroundColor: '#fafafa',
-                width: 350,
-                height: 345
-              }}
-            >
-              {category.image ? (
-                <img
-                  src={optimizeCloudinaryUrl(category.image)}
-                  alt='Ảnh danh mục'
-                  style={{
-                    width: '100%',
-                    maxHeight: '100%',
-                    objectFit: 'cover',
-                    borderRadius: 8
-                  }}
-                />
-              ) : (
-                <Box textAlign='center' color='#999'>
-                  <ImageNotSupportedIcon fontSize='large' />
-                  <Typography fontSize={14} mt={1}>
-                    Không có ảnh
-                  </Typography>
-                </Box>
-              )}
+            <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+              <Typography variant='subtitle2' fontWeight='bold' mb={1}>
+                Ảnh danh mục
+              </Typography>
+              {/* Ảnh bên trái */}
+              <Box
+                display='flex'
+                flexDirection='column'
+                alignItems='center'
+                justifyContent='center'
+                border='2px dashed #ccc'
+                borderRadius={2}
+                // minHeight={200}
+                sx={{
+                  backgroundColor: '#fafafa',
+                  width: 350,
+                  height: 345
+                }}
+              >
+                {category.image ? (
+                  <img
+                    src={optimizeCloudinaryUrl(category.image)}
+                    alt='Ảnh danh mục'
+                    style={{
+                      width: '100%',
+                      maxHeight: '100%',
+                      objectFit: 'cover',
+                      borderRadius: 8
+                    }}
+                  />
+                ) : (
+                  <Box textAlign='center' color='#999'>
+                    <ImageNotSupportedIcon fontSize='large' />
+                    <Typography fontSize={14} mt={1}>
+                      Không có ảnh
+                    </Typography>
+                  </Box>
+                )}
+              </Box>
+            </Box>
+            <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+              <Typography variant='subtitle2' fontWeight='bold' mb={1}>
+                Ảnh quảng cáo
+              </Typography>
+              {/* Ảnh banner (nếu có) */}
+              <Box
+                display='flex'
+                flexDirection='column'
+                alignItems='center'
+                justifyContent='center'
+                border='2px dashed #ccc'
+                borderRadius={2}
+                sx={{
+                  backgroundColor: '#fafafa',
+                  width: 350,
+                  height: 345
+                }}
+              >
+                {category.banner ? (
+                  <img
+                    src={optimizeCloudinaryUrl(category.banner)}
+                    alt='Ảnh banner'
+                    style={{
+                      width: '100%',
+                      height: '100%',
+                      objectFit: 'cover',
+                      borderRadius: 8
+                    }}
+                  />
+                ) : (
+                  <Box textAlign='center' color='#999'>
+                    <ImageNotSupportedIcon fontSize='large' />
+                    <Typography fontSize={14} mt={1}>
+                      Không có ảnh quản cáo
+                    </Typography>
+                  </Box>
+                )}
+              </Box>
             </Box>
 
             {/* Thông tin bên phải */}

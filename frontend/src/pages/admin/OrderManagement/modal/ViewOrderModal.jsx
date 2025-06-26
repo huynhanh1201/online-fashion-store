@@ -432,13 +432,10 @@ function ViewOrderModal({
                           {item.quantity.toLocaleString('vi-VN')}
                         </TableCell>
                         <TableCell align='right'>
-                          {item.subtotal.toLocaleString('vi-VN')}đ
+                          {item.price.toLocaleString('vi-VN')}đ
                         </TableCell>
                         <TableCell align='right'>
-                          {(item.subtotal * item.quantity).toLocaleString(
-                            'vi-VN'
-                          )}
-                          đ
+                          {item.subtotal.toLocaleString('vi-VN')}đ
                         </TableCell>
                       </TableRow>
                     )
