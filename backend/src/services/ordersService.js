@@ -73,6 +73,14 @@ const createOrder = async (userId, reqBody, ipAddr, jwtDecoded) => {
       session
     )
 
+    // Tạo OrderItems
+    const orderItemsPromise = orderHelpers.handleCreateOrderItems(
+      cartItems,
+      variantMap,
+      order,
+      session
+    )
+
     if (paymentMethod === 'COD') {
       // Tạo phiếu xuất kho
       const warehouseSlipPromise = orderHelpers.createWarehouseSlipFromOrder(
@@ -80,14 +88,6 @@ const createOrder = async (userId, reqBody, ipAddr, jwtDecoded) => {
         cartItems,
         session,
         'export'
-      )
-
-      // Tạo OrderItems
-      const orderItemsPromise = orderHelpers.handleCreateOrderItems(
-        cartItems,
-        variantMap,
-        order,
-        session
       )
 
       // Tạo giao dịch thanh toán
