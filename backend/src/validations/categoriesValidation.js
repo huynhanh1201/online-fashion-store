@@ -34,7 +34,12 @@ const category = async (req, res, next) => {
 
     parent: Joi.string().length(24).hex().allow('', null), // parent là ObjectId, có thể null hoặc rỗng
 
-    destroy: Joi.boolean() // cho phép cập nhật trạng thái destroy
+    destroy: Joi.boolean(), // cho phép cập nhật trạng thái destroy
+
+    banner: Joi.string() // name bắt buộc, chuỗi
+      .max(150) // tối đa 50 ký tự
+      .trim() // loại bỏ khoảng trắng đầu/cuối
+      .allow('', null)
   })
 
   try {
@@ -56,27 +61,20 @@ const category = async (req, res, next) => {
 const categoryUpdate = async (req, res, next) => {
   // Validation cho việc cập nhật category (không yêu cầu name)
   const correctCondition = Joi.object({
-    name: Joi.string()
-      .min(1)
-      .max(50)
-      .trim()
-      .optional(), // Không bắt buộc khi update
+    name: Joi.string().min(1).max(50).trim().optional(), // Không bắt buộc khi update
 
-    description: Joi.string()
-      .max(500)
-      .trim()
-      .allow('', null)
-      .optional(),
+    description: Joi.string().max(500).trim().allow('', null).optional(),
 
-    image: Joi.string()
-      .max(150)
-      .trim()
-      .allow('', null)
-      .optional(),
+    image: Joi.string().max(150).trim().allow('', null).optional(),
 
     parent: Joi.string().length(24).hex().allow('', null).optional(),
 
-    destroy: Joi.boolean().optional()
+    destroy: Joi.boolean().optional(),
+
+    banner: Joi.string() // name bắt buộc, chuỗi
+      .max(150) // tối đa 50 ký tự
+      .trim() // loại bỏ khoảng trắng đầu/cuối
+      .allow('', null)
   })
 
   try {

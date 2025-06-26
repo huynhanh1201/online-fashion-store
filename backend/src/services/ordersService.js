@@ -326,14 +326,12 @@ const updateOrder = async (jwtDecoded, orderId, reqBody) => {
         }).session(session)
 
         const itemsRollback = orderItems.map((item) => ({
-          variantId: item._id,
+          variantId: item.variantId.toString(),
           quantity: item.quantity,
           unit: 'cái'
         }))
 
         const warehouseId = warehouse[0]._id
-
-        console.log('updatedOrder: ', updatedOrder)
 
         const dataCreateWarehouseSlipImport = {
           type: 'import',
