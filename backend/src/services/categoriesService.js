@@ -137,6 +137,11 @@ const updateCategory = async (categoryId, reqBody) => {
       reqBody,
       { new: true }
     )
+      .populate({
+        path: 'parent',
+        select: 'name'
+      })
+      .lean()
 
     return updatedCategory
   } catch (err) {

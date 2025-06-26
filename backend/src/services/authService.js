@@ -37,7 +37,6 @@ const register = async (reqBody) => {
     slug: slugify(normalizedName, { lower: true }),
     destroy: false,
     verifyToken: uuidv4()
-    // Nếu modal đã set timestamps, thì không cần set createdAt, updatedAt thủ công
   }
 
   // Lưu user vào DB
