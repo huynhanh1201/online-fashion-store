@@ -39,8 +39,11 @@ const getReviewList = async (queryString) => {
   if (userId) filter.userId = userId
 
   const result = await ReviewModel.find(filter)
+    .populate([
+      { path: 'userId', select: '_id name avatarUrl' },
+      { path: 'productId', select: 'name' }
+    ])
     .lean()
-    .populate({ path: 'userId', select: '_id name avatarUrl' })
 
   return result
 }
@@ -64,6 +67,11 @@ const updateReview = async (reviewId, reqBody, jwtDecoded) => {
       infoUpdate,
       { new: true }
     )
+      .populate([
+        { path: 'userId', select: '_id name avatarUrl' },
+        { path: 'productId', select: 'name' }
+      ])
+      .lean()
 
     return updatedReview
   } catch (err) {
