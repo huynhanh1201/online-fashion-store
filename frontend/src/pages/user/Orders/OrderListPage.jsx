@@ -302,7 +302,7 @@ const OrderRow = ({ order, onOrderUpdate, onOrderCancelled, onReorder, reorderLo
                         color="text.secondary"
                         sx={{ mb: 0.5 }}
                       >
-                        {capitalizeFirstLetter(item.color?.name)} • {formatSize(item.size)}
+                        Phân loại hàng: {capitalizeFirstLetter(item.color?.name)}, {formatSize(item.size)}
                       </Typography>
                       <Chip
                         label={`Số lượng: ${item.quantity}`}

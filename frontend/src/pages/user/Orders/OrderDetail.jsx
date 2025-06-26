@@ -470,7 +470,7 @@ const OrderDetail = () => {
                               color="text.secondary"
                               sx={{ mb: 0.5 }}
                             >
-                              {capitalizeFirstLetter(variant.color?.name)}, {formatSize(variant.size)}
+                              Phân loại hàng: {capitalizeFirstLetter(variant.color?.name)}, {formatSize(variant.size)}
                             </Typography>
                             <Chip
                               label={`Số lượng: ${variant.quantity}`}
