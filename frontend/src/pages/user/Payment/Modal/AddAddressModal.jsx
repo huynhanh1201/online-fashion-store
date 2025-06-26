@@ -81,7 +81,7 @@ export default function AddAddressModal({
         field === 'fullName'
           ? !value.trim() || value.trim().length < 3
           : field === 'phone'
-            ? !value.trim() || !/^\d{10}$/.test(value.trim())
+            ? !value.trim() || !/^(0[3|5|7|8|9])[0-9]{8}$/.test(value.trim())
             : field === 'address'
               ? !value.trim() || value.trim().length < 5
               : !value
@@ -249,7 +249,7 @@ export default function AddAddressModal({
     const errors = {
       fullName:
         !formData.fullName.trim() || formData.fullName.trim().length < 3,
-      phone: !formData.phone.trim() || !/^\d{10}$/.test(formData.phone.trim()),
+      phone: !formData.phone.trim() || !/^(0[3|5|7|8|9])[0-9]{8}$/.test(formData.phone.trim()),
       address: !formData.address.trim() || formData.address.trim().length < 5,
       city: !formData.city,
       district: !formData.district,
@@ -378,7 +378,7 @@ export default function AddAddressModal({
               onChange={handleChange('phone')}
               error={formErrors.phone}
               helperText={
-                formErrors.phone ? 'Số điện thoại phải đúng 10 số' : ''
+                formErrors.phone ? 'Số điện thoại phải đúng định dạng Việt Nam (VD: 0912345678)' : ''
               }
               disabled={viewOnly}
             />
