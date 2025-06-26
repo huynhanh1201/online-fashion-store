@@ -31,7 +31,6 @@ const vnpayIPN = async (req) => {
     }
 
     if (rspCode === '00') {
-
       console.log('da chay ham vnpayIPN')
 
       // Bắt đầu transaction
@@ -88,28 +87,23 @@ const vnpayIPN = async (req) => {
         session
       )
 
-      // Tạo OrderItems
-      const orderItemsPromise = orderHelpers.handleCreateOrderItems(
-        cartItems,
-        variantMap,
-        order,
-        session
-      )
+      // // Tạo OrderItems
+      // const orderItemsPromise = orderHelpers.handleCreateOrderItems(
+      //   cartItems,
+      //   variantMap,
+      //   order,
+      //   session
+      // )
 
       // Xử lý tất cả promise song song
-      const [warehouseSlip,
-        orderData,
-        transaction,
-        orderItems] = await Promise.all([
+      const [warehouseSlip, orderData, transaction, orderItems] =
+        await Promise.all([
           warehouseSlipPromise,
           orderPromise,
-          transactionPromise,
-          orderItemsPromise
+          transactionPromise
+          // orderItemsPromise
         ])
-      console.log('warehouseSlip', warehouseSlip)
-      console.log('orderData', orderData)
-      console.log('transaction', transaction)
-      console.log('orderItems', orderItems)
+
       // Tạo đơn hàng vận chuyển (GHN)
       // const createDeliveryOrder = await deliveriesService.createDeliveryOrder(
       //   reqBody,
