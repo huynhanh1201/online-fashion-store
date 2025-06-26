@@ -146,8 +146,11 @@ const ProductDetail = () => {
             sx={{
               display: 'flex',
               alignItems: 'center',
-              color: 'text.primary',
-              fontWeight: 500
+              color: '#007bff',
+              textDecoration: 'none',
+              '&:hover': {
+                color: 'primary.main'
+              }
             }}
             href='/product'
           >
@@ -157,10 +160,13 @@ const ProductDetail = () => {
             sx={{
               display: 'flex',
               alignItems: 'center',
-              color: 'text.primary',
-              fontWeight: 500
+              color: '#007bff',
+              textDecoration: 'none',
+              '&:hover': {
+                color: 'primary.main'
+              }
             }}
-            href='/productbycategory/{category.Id}'
+            href={`/productbycategory/${category?._id}`}
           >
             {category?.name}
           </Link>

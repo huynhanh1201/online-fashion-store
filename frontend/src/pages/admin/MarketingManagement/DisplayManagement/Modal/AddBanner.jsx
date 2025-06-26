@@ -269,229 +269,220 @@ const AddBanner = ({ open, onClose, onSuccess, initialData, bannerIndex }) => {
           </Alert>
         )}
 
-        <Grid container spacing={3}>
-          {/* Row 1: Title and Subtitle */}
-          <Grid item xs={12} sm={6}>
-            <TextField
-              label='Tiêu đề *'
-              value={form.title}
-              onChange={(e) => handleChange('title', e.target.value)}
-              fullWidth
-              required
-              sx={{
-                '& .MuiOutlinedInput-root': {
-                  borderRadius: 2,
-                  backgroundColor: '#fff'
-                }
-              }}
-            />
-          </Grid>
-
-          <Grid item xs={12} sm={6}>
-            <TextField
-              label='Phụ đề'
-              value={form.subtitle}
-              onChange={(e) => handleChange('subtitle', e.target.value)}
-              fullWidth
-              sx={{
-                '& .MuiOutlinedInput-root': {
-                  borderRadius: 2,
-                  backgroundColor: '#fff'
-                }
-              }}
-            />
-          </Grid>
-
-          {/* Row 2: Link */}
-          <Grid item xs={12}>
-            <TextField
-              label='Link điều hướng *'
-              value={form.link}
-              onChange={(e) => handleChange('link', e.target.value)}
-              fullWidth
-              required
-              placeholder="/khuyen-mai/summer"
-              sx={{
-                '& .MuiOutlinedInput-root': {
-                  borderRadius: 2,
-                  backgroundColor: '#fff'
-                }
-              }}
-            />
-          </Grid>
-
-          {/* Row 3: Position and Visibility */}
-          <Grid item xs={12} sm={6}>
-            <TextField
-              select
-              label='Vị trí hiển thị'
-              value={form.position}
-              onChange={(e) => handleChange('position', e.target.value)}
-              fullWidth
-              sx={{
-                '& .MuiOutlinedInput-root': {
-                  borderRadius: 2,
-                  backgroundColor: '#fff'
+        {/* Upload/Preview Banner Image - chiếm toàn bộ chiều ngang */}
+        <Box sx={{ width: '100%', mb: 3 }}>
+          <Typography variant="subtitle1" sx={{ mb: 2, fontWeight: 600 }}>
+            Hình ảnh Banner
+          </Typography>
+          {imagePreview ? (
+            <Card 
+              sx={{ 
+                position: 'relative', 
+                width: '100%',
+                borderRadius: 2,
+                border: '1px solid #e2e8f0',
+                overflow: 'hidden',
+                transition: 'all 0.3s ease',
+                '&:hover': {
+                  boxShadow: `0 4px 16px ${alpha(theme.palette.primary.main, 0.2)}`
                 }
               }}
             >
-              <MenuItem value='hero'>Hero (Banner chính)</MenuItem>
-              <MenuItem value='product'>Product (Trang sản phẩm)</MenuItem>
-              <MenuItem value='middle'>Middle (Giữa trang)</MenuItem>
-              <MenuItem value='top'>Top (Đầu trang)</MenuItem>
-              <MenuItem value='bottom'>Bottom (Cuối trang)</MenuItem>
-            </TextField>
-          </Grid>
+              <CardMedia
+                component="img"
+                height="240"
+                image={optimizeCloudinaryUrl(imagePreview, { width: 900, height: 240 })}
+                alt="Banner preview"
+                sx={{ objectFit: 'cover', width: '100%' }}
+              />
+              <Box
+                sx={{
+                  position: 'absolute',
+                  top: 8,
+                  right: 8,
+                  backgroundColor: 'rgba(255,255,255,0.9)',
+                  borderRadius: 1
+                }}
+              >
+                <Tooltip title="Xóa ảnh">
+                  <IconButton
+                    size="small"
+                    onClick={handleRemoveImage}
+                    sx={{
+                      color: '#ef4444',
+                      '&:hover': { backgroundColor: '#fee2e2' }
+                    }}
+                  >
+                    <DeleteIcon fontSize="small" />
+                  </IconButton>
+                </Tooltip>
+              </Box>
+            </Card>
+          ) : (
+            <Box
+              sx={{
+                width: '100%',
+                border: `2px dashed ${alpha(theme.palette.primary.main, 0.3)}`,
+                borderRadius: 2,
+                p: 3,
+                textAlign: 'center',
+                backgroundColor: '#f8fafc',
+                cursor: 'pointer',
+                transition: 'all 0.3s ease',
+                '&:hover': {
+                  borderColor: theme.palette.primary.main,
+                  backgroundColor: alpha(theme.palette.primary.main, 0.04)
+                }
+              }}
+              onClick={() => imageInputRef.current?.click()}
+            >
+              <CloudUploadIcon sx={{ fontSize: 48, color: '#3b82f6', mb: 1 }} />
+              <Typography variant="body2" sx={{ color: '#1e293b', fontWeight: 600 }}>
+                Click để upload ảnh banner
+              </Typography>
+              <Typography variant="caption" color="text.secondary">
+                JPG, PNG, WebP (tối đa 5MB)
+              </Typography>
+            </Box>
+          )}
+          <input
+            ref={imageInputRef}
+            type="file"
+            accept="image/jpeg,image/png,image/webp"
+            hidden
+            onChange={handleImageUpload}
+          />
+          {uploadingImage && (
+            <Stack direction="row" alignItems="center" spacing={1} sx={{ mt: 2 }}>
+              <CircularProgress size={20} sx={{ color: '#3b82f6' }} />
+              <Typography variant="body2" sx={{ color: '#1e293b' }}>
+                Đang upload...
+              </Typography>
+            </Stack>
+          )}
+        </Box>
 
-          <Grid item xs={12} sm={6}>
-            <FormControlLabel
-              control={
-                <Checkbox
-                  checked={form.visible}
-                  onChange={(e) => handleChange('visible', e.target.checked)}
+        {/* Form nhập */}
+        <Grid container spacing={3}>
+          <Grid item xs={12} md={6}>
+            <Grid container spacing={2}>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  label='Tiêu đề *'
+                  value={form.title}
+                  onChange={(e) => handleChange('title', e.target.value)}
+                  fullWidth
+                  required
                   sx={{
-                    color: '#3b82f6',
-                    '&.Mui-checked': {
-                      color: '#3b82f6'
+                    '& .MuiOutlinedInput-root': {
+                      borderRadius: 2,
+                      backgroundColor: '#fff'
                     }
                   }}
                 />
-              }
-              label='Hiển thị banner'
-              sx={{ mt: 2 }}
-            />
-          </Grid>
-
-          {/* Row 4: Start Date and End Date */}
-          <Grid item xs={12} sm={6}>
-            <TextField
-              type='date'
-              label='Ngày bắt đầu'
-              value={form.startDate}
-              onChange={(e) => handleChange('startDate', e.target.value)}
-              fullWidth
-              InputLabelProps={{ shrink: true }}
-              sx={{
-                '& .MuiOutlinedInput-root': {
-                  borderRadius: 2,
-                  backgroundColor: '#fff'
-                }
-              }}
-            />
-          </Grid>
-
-          <Grid item xs={12} sm={6}>
-            <TextField
-              type='date'
-              label='Ngày kết thúc'
-              value={form.endDate}
-              onChange={(e) => handleChange('endDate', e.target.value)}
-              fullWidth
-              InputLabelProps={{ shrink: true }}
-              sx={{
-                '& .MuiOutlinedInput-root': {
-                  borderRadius: 2,
-                  backgroundColor: '#fff'
-                }
-              }}
-            />
-          </Grid>
-
-          {/* Row 5: Image Upload */}
-          <Grid item xs={12}>
-            <Typography variant="subtitle1" sx={{ mb: 2, fontWeight: 600 }}>
-              Hình ảnh Banner
-            </Typography>
-            
-            <Box sx={{ mb: 2 }}>
-              {imagePreview ? (
-                <Card 
-                  sx={{ 
-                    position: 'relative', 
-                    maxWidth: 300,
-                    borderRadius: 2,
-                    border: '1px solid #e2e8f0',
-                    overflow: 'hidden',
-                    transition: 'all 0.3s ease',
-                    '&:hover': {
-                      boxShadow: `0 4px 16px ${alpha(theme.palette.primary.main, 0.2)}`
-                    }
-                  }}
-                >
-                  <CardMedia
-                    component="img"
-                    height="200"
-                    image={optimizeCloudinaryUrl(imagePreview, { width: 300, height: 200 })}
-                    alt="Banner preview"
-                    sx={{ objectFit: 'cover' }}
-                  />
-                  <Box
-                    sx={{
-                      position: 'absolute',
-                      top: 8,
-                      right: 8,
-                      backgroundColor: 'rgba(255,255,255,0.9)',
-                      borderRadius: 1
-                    }}
-                  >
-                    <Tooltip title="Xóa ảnh">
-                      <IconButton
-                        size="small"
-                        onClick={handleRemoveImage}
-                        sx={{
-                          color: '#ef4444',
-                          '&:hover': { backgroundColor: '#fee2e2' }
-                        }}
-                      >
-                        <DeleteIcon fontSize="small" />
-                      </IconButton>
-                    </Tooltip>
-                  </Box>
-                </Card>
-              ) : (
-                <Box
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  label='Phụ đề'
+                  value={form.subtitle}
+                  onChange={(e) => handleChange('subtitle', e.target.value)}
+                  fullWidth
                   sx={{
-                    border: `2px dashed ${alpha(theme.palette.primary.main, 0.3)}`,
-                    borderRadius: 2,
-                    p: 3,
-                    textAlign: 'center',
-                    backgroundColor: '#f8fafc',
-                    cursor: 'pointer',
-                    transition: 'all 0.3s ease',
-                    '&:hover': {
-                      borderColor: theme.palette.primary.main,
-                      backgroundColor: alpha(theme.palette.primary.main, 0.04)
+                    '& .MuiOutlinedInput-root': {
+                      borderRadius: 2,
+                      backgroundColor: '#fff'
                     }
                   }}
-                  onClick={() => imageInputRef.current?.click()}
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <TextField
+                  label='Link điều hướng *'
+                  value={form.link}
+                  onChange={(e) => handleChange('link', e.target.value)}
+                  fullWidth
+                  required
+                  placeholder="/khuyen-mai/summer"
+                  sx={{
+                    '& .MuiOutlinedInput-root': {
+                      borderRadius: 2,
+                      backgroundColor: '#fff'
+                    }
+                  }}
+                />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  select
+                  label='Vị trí hiển thị'
+                  value={form.position}
+                  onChange={(e) => handleChange('position', e.target.value)}
+                  fullWidth
+                  sx={{
+                    '& .MuiOutlinedInput-root': {
+                      borderRadius: 2,
+                      backgroundColor: '#fff'
+                    }
+                  }}
                 >
-                  <CloudUploadIcon sx={{ fontSize: 48, color: '#3b82f6', mb: 1 }} />
-                  <Typography variant="body2" sx={{ color: '#1e293b', fontWeight: 600 }}>
-                    Click để upload ảnh banner
-                  </Typography>
-                  <Typography variant="caption" color="text.secondary">
-                    JPG, PNG, WebP (tối đa 5MB)
-                  </Typography>
-                </Box>
-              )}
-              
-              <input
-                ref={imageInputRef}
-                type="file"
-                accept="image/jpeg,image/png,image/webp"
-                hidden
-                onChange={handleImageUpload}
-              />
-              
-              {uploadingImage && (
-                <Stack direction="row" alignItems="center" spacing={1} sx={{ mt: 2 }}>
-                  <CircularProgress size={20} sx={{ color: '#3b82f6' }} />
-                  <Typography variant="body2" sx={{ color: '#1e293b' }}>
-                    Đang upload...
-                  </Typography>
-                </Stack>
-              )}
-            </Box>
+                  <MenuItem value='hero'>Ảnh chính ở trang chủ ( Banner )</MenuItem>
+                  <MenuItem value='product'>Ảnh trang sản phẩm ( Product )</MenuItem>
+                  <MenuItem value='middle'>Ảnh giữa trang ( Middle )</MenuItem>
+                  <MenuItem value='top'>Top (Đầu trang)</MenuItem>
+                  <MenuItem value='bottom'>Bottom (Cuối trang)</MenuItem>
+                </TextField>
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      checked={form.visible}
+                      onChange={(e) => handleChange('visible', e.target.checked)}
+                      sx={{
+                        color: '#3b82f6',
+                        '&.Mui-checked': {
+                          color: '#3b82f6'
+                        }
+                      }}
+                    />
+                  }
+                  label='Hiển thị banner'
+                  sx={{ mt: 2 }}
+                />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  type='date'
+                  label='Ngày bắt đầu'
+                  value={form.startDate}
+                  onChange={(e) => handleChange('startDate', e.target.value)}
+                  fullWidth
+                  InputLabelProps={{ shrink: true }}
+                  sx={{
+                    '& .MuiOutlinedInput-root': {
+                      borderRadius: 2,
+                      backgroundColor: '#fff'
+                    }
+                  }}
+                />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  type='date'
+                  label='Ngày kết thúc'
+                  value={form.endDate}
+                  onChange={(e) => handleChange('endDate', e.target.value)}
+                  fullWidth
+                  InputLabelProps={{ shrink: true }}
+                  sx={{
+                    '& .MuiOutlinedInput-root': {
+                      borderRadius: 2,
+                      backgroundColor: '#fff'
+                    }
+                  }}
+                />
+              </Grid>
+            </Grid>
           </Grid>
         </Grid>
       </DialogContent>

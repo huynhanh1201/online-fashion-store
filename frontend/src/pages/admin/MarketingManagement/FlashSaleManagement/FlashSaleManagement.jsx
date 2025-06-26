@@ -290,10 +290,10 @@ const FlashSaleManagement = () => {
           }}
         >
           <OfferIcon sx={{ fontSize: 40, color: '#1A3C7B' }} />
-          Quản lý chương trình Flash Sale
+          Quản lý chương trình khuyến mãi
         </Typography>
         <Typography variant='body1' color='text.secondary'>
-          Quản lý và theo dõi các chiến dịch Flash Sale
+          Quản lý và theo dõi các chiến dịch khuyên mãi
         </Typography>
       </Box>
 

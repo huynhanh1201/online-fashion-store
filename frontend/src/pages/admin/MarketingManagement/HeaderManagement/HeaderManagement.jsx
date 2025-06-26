@@ -367,9 +367,9 @@ const HeaderManagement = () => {
             }
           }}
         >
-          <Tab label="Nội dung đầu trang" />
-          <Tab label="Quản lý menu" />
-          <Tab label="Quản lý danh mục" />
+          <Tab label="Logo & Nội dung thông báo chạy" />
+          <Tab label="Quản lý Menu mở rộng" />
+          <Tab label="Quản lý Menu danh mục" />
         </Tabs>
       </Card>
 
@@ -639,11 +639,11 @@ const HeaderManagement = () => {
                 fontSize: '1rem',
                 fontWeight: 600,
                 background:
-                  'linear-gradient(135deg,#7c3aed 0%,#6d28d9 100%)',
-                boxShadow: '0 4px 16px rgba(124, 58, 237, 0.3)',
+                  'linear-gradient(135deg,rgb(17, 58, 122) 0%,rgb(11, 49, 156) 100%)',
+                boxShadow: '0 4px 16px rgba(59, 130, 246, 0.3)',
                 '&:hover': {
-                  background: 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)',
-                  boxShadow: '0 6px 20px rgba(124, 58, 237, 0.4)',
+                  background: 'linear-gradient(135deg, #2563eb 0%, #1e40af 100%)',
+                  boxShadow: '0 6px 20px rgba(59, 130, 246, 0.4)',
                   transform: 'translateY(-1px)'
                 }
               }}
@@ -1001,32 +1001,6 @@ const HeaderManagement = () => {
               alignItems: 'center'
             }}
           >
-            <Button
-              variant='contained'
-              startIcon={<AddIcon />}
-              onClick={() => {
-                // TODO: Open category editor modal
-                console.log('Open category editor')
-              }}
-              sx={{
-                px: 3,
-                py: 1.5,
-                borderRadius: 2,
-                textTransform: 'none',
-                fontSize: '1rem',
-                fontWeight: 600,
-                background:
-                  'linear-gradient(135deg,#059669 0%,#047857 100%)',
-                boxShadow: '0 4px 16px rgba(5, 150, 105, 0.3)',
-                '&:hover': {
-                  background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
-                  boxShadow: '0 6px 20px rgba(5, 150, 105, 0.4)',
-                  transform: 'translateY(-1px)'
-                }
-              }}
-            >
-              Thêm danh mục mới
-            </Button>
 
             <Button
               variant='outlined'

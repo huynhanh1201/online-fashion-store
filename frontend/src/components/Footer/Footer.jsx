@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import {
   Box,
   Typography,
@@ -16,8 +16,30 @@ import InstagramIcon from '@mui/icons-material/Instagram'
 import YouTubeIcon from '@mui/icons-material/YouTube'
 import LocationOnIcon from '@mui/icons-material/LocationOn'
 import SearchIcon from '@mui/icons-material/Search'
+import LinkIcon from '@mui/icons-material/Link'
+import { getFooterConfig } from '~/services/admin/webConfig/footerService.js'
 
 function Footer() {
+  const [footer, setFooter] = useState(null)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    const fetchFooter = async () => {
+      setLoading(true)
+      try {
+        const res = await getFooterConfig()
+        setFooter(res?.content?.[0] || null)
+      } catch {
+        setFooter(null)
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchFooter()
+  }, [])
+
+  if (loading) return null
+
   return (
     <Box
       sx={{ bgcolor: '#002f6c', color: 'white', pt: 6, pb: 3, fontSize: 14 }}
@@ -35,144 +57,113 @@ function Footer() {
             padding: '20px'
           }}
         >
-          {/* Cột 1: Logo + Đăng ký nhận tin */}
+          {/* Cột 1: Logo + Đăng ký nhận tin + Thông tin liên hệ */}
           <Box sx={{ flex: 1, minWidth: 220 }}>
+            {footer?.logo && (
+              <Box sx={{ mb: 1 }}>
+                <img src={footer.logo} alt='logo' style={{ width: 120, height: 'auto', borderRadius: 8, background: '#fff', padding: 4 }} />
+              </Box>
+            )}
             <Typography variant='h6' sx={{ fontWeight: 700, mb: 1 }}>
-              ICONDEWIM™
+              {footer?.about?.[0]?.phone ? `Hotline: ${footer.about[0].phone}` : 'FASHIONSTORE'}
             </Typography>
-            <Typography
-              variant='body2'
-              sx={{ display: 'flex', alignItems: 'center', mb: 0.5 }}
-            >
-              <PhoneIcon sx={{ fontSize: 16, mr: 1 }} /> Tổng đài CSKH: 0287 050
-              6060
-            </Typography>
-            <Typography
-              variant='body2'
-              sx={{ display: 'flex', alignItems: 'center', mb: 2 }}
-            >
-              <EmailIcon sx={{ fontSize: 16, mr: 1 }} /> cskh@icondewim.com
-            </Typography>
-
-            <Typography sx={{ mb: 1, fontWeight: 500 }}>
-              ĐĂNG KÝ NHẬN TIN
-            </Typography>
-            <Typography variant='caption'>
-              Hãy là người đầu tiên nhận khuyến mãi lớn!
-            </Typography>
+            {footer?.about?.[0]?.email && (
+              <Typography variant='body2' sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                <EmailIcon sx={{ fontSize: 16, mr: 1 }} /> {footer.about[0].email}
+              </Typography>
+            )}
+            <Typography sx={{ mb: 1, fontWeight: 500 }}>ĐĂNG KÝ NHẬN TIN</Typography>
+            <Typography variant='caption'>Hãy là người đầu tiên nhận khuyến mãi lớn!</Typography>
             <Box sx={{ mt: 1, display: 'flex', gap: 1 }}>
               <TextField
                 placeholder='Nhập địa chỉ email'
                 variant='outlined'
                 fullWidth
-                sx={{
-                  bgcolor: 'white',
-                  borderRadius: '4px',
-                  '& input': { fontSize: 15 }
-                }}
+                sx={{ bgcolor: 'white', borderRadius: '4px', '& input': { fontSize: 15 } }}
               />
-              <Button
-                size='small'
-                sx={{ bgcolor: '#1a3c7b', color: 'white', width: '100px' }}
-                variant='contained'
-              >
+              <Button size='small' sx={{ bgcolor: '#1a3c7b', color: 'white', width: '100px' }} variant='contained'>
                 ĐĂNG KÝ
               </Button>
             </Box>
-
-            <Typography sx={{ mt: 2, mb: 1 }}>KẾT NỐI VỚI CHÚNG TÔI</Typography>
-            <Stack direction='row' spacing={1}>
-              <IconButton color='inherit'>
-                <FacebookIcon />
-              </IconButton>
-              <IconButton color='inherit'>
-                <InstagramIcon />
-              </IconButton>
-              <IconButton color='inherit'>
-                <YouTubeIcon />
-              </IconButton>
-            </Stack>
           </Box>
 
-          {/* Cột 2: Chính sách */}
-          <Box sx={{ flex: 1, minWidth: 180 }}>
-            <Typography variant='subtitle1' sx={{ fontWeight: 600, mb: 1 }}>
-              CHÍNH SÁCH WEBSITE
-            </Typography>
-            <Stack spacing={0.5}>
-              <Typography component="a" href="/policy" sx={{ color: 'inherit', textDecoration: 'none', cursor: 'pointer', '&:hover': { textDecoration: 'underline' } }}>
-                Chính sách của FashionStore
+          {/* Cột 2: Chính sách + Hỗ trợ */}
+          {footer?.menuColumns?.length > 0 && (
+            <Box sx={{ flex: 1, minWidth: 180 }}>
+              <Typography variant='subtitle1' sx={{ fontWeight: 600, mb: 1 }}>
+                CHÍNH SÁCH WEBSITE
               </Typography>
-            </Stack>
-            <Typography variant='subtitle1' sx={{ fontWeight: 600, mb: 1 , mt: 2}}>
-              HỖ TRỢ KHÁCH HÀNG
-            </Typography>
-            <Stack spacing={0.5}>
-              <Typography component="a" href="/policy" sx={{ color: 'inherit', textDecoration: 'none', cursor: 'pointer', '&:hover': { textDecoration: 'underline' } }}>
-                032323232323
-              </Typography>
-            </Stack>
-          </Box>
+              <Stack spacing={0.5}>
+                {footer.menuColumns.map((col, idx) => (
+                  <Typography key={idx} component='a' href={col.link || '#'} sx={{ color: 'inherit', textDecoration: 'none', cursor: 'pointer', '&:hover': { textDecoration: 'underline' } }}>
+                    {col.title}
+                  </Typography>
+                ))}
+              </Stack>
+            </Box>
+          )}
 
           {/* Cột 3: Danh sách cửa hàng */}
-          <Box sx={{ flex: 1.2, minWidth: 200 }}>
-            <Typography variant='subtitle1' sx={{ fontWeight: 600, mb: 1 }}>
-              HỆ THỐNG CỬA HÀNG (11 CH)
-            </Typography>
-            <Typography sx={{ display: 'flex', mb: 1 }}>
-              <LocationOnIcon sx={{ fontSize: 16, mr: 1 }} />
-              <strong>HỒ CHÍ MINH (9 CH)</strong>
-              <br />
-            </Typography>
-            <Typography variant='body2' sx={{ ml: 3, mb: 1 }}>
-              477–479–481 D. Sư Vạn Hạnh, P.12, Q.10, HCM
-            </Typography>
-            <Typography sx={{ display: 'flex', mb: 1 }}>
-              <LocationOnIcon sx={{ fontSize: 16, mr: 1 }} />
-              <strong>ĐỒNG NAI</strong>
-            </Typography>
-            <Typography variant='body2' sx={{ ml: 3, mb: 1 }}>
-              1557 Phạm Văn Thuận, Biên Hòa, Đồng Nai
-            </Typography>
-            <Typography sx={{ display: 'flex', mb: 1 }}>
-              <LocationOnIcon sx={{ fontSize: 16, mr: 1 }} />
-              <strong>BÌNH DƯƠNG</strong>
-            </Typography>
-            <Typography variant='body2' sx={{ ml: 3 }}>
-              79 Yersin, P.Phú Cường, Thủ Dầu Một, Bình Dương
-            </Typography>
-            <Button
-              variant='text'
-              size='small'
-              sx={{ mt: 1, pl: 0, color: 'white', textTransform: 'none' }}
-            >
-              XEM TẤT CẢ CỬA HÀNG
-            </Button>
-          </Box>
+          {footer?.stores?.length > 0 && (
+            <Box sx={{ flex: 1.2, minWidth: 200 }}>
+              <Typography variant='subtitle1' sx={{ fontWeight: 600, mb: 1 }}>
+                HỆ THỐNG CỬA HÀNG
+              </Typography>
+              {footer.stores.map((store, idx) => (
+                <Box key={idx} sx={{ mb: 1 }}>
+                  <Typography sx={{ display: 'flex', alignItems: 'center' }}>
+                    <LocationOnIcon sx={{ fontSize: 16, mr: 1 }} />
+                    <strong>{store.name}</strong>
+                  </Typography>
+                  <Typography variant='body2' sx={{ ml: 3 }}>
+                    {store.address}
+                  </Typography>
+                </Box>
+              ))}
+            </Box>
+          )}
 
-          {/* Cột 4: Fanpage + thanh toán */}
-          <Box sx={{ flex: 1, minWidth: 200 }}>
-            <Typography variant='subtitle1' sx={{ fontWeight: 600, mb: 1 }}>
-              FANPAGE CHÚNG TÔI
-            </Typography>
-            <Box
-              component='img'
-              src='https://file.hstatic.net/1000360022/file/artboard_1-min_1643d2c0f0bb4e81ae8841e0ba2f1ba7.jpg'
-              alt='Fanpage'
-              sx={{ width: '100%', borderRadius: 2, mb: 2 }}
-            />
-
-            <Typography variant='subtitle1' sx={{ fontWeight: 600, mb: 1 }}>
-              PHƯƠNG THỨC THANH TOÁN
-            </Typography>
-            <Stack direction='row' spacing={1} sx={{ mb: 2 }}>
-              <Box
-                sx={{ width: '60px', height: '30px' }}
-                component='img'
-                src='https://file.hstatic.net/1000360022/file/img_payment_method_4_7fdbf4cdf59647e684a29799683114f7.png'
-              />
-            </Stack>
-          </Box>
+          {/* Cột 4: Kết nối */}
+          {footer?.socialLinks?.length > 0 && (
+            <Box sx={{ flex: 1, minWidth: 180 }}>
+              <Typography variant='subtitle1' sx={{ fontWeight: 600, mb: 1 }}>
+                KẾT NỐI VỚI CHÚNG TÔI
+              </Typography>
+              <Stack spacing={1}>
+                {footer?.socialLinks?.map((s, idx) => (
+                  <Box
+                    key={idx}
+                    component='a'
+                    href={s.link}
+                    target='_blank'
+                    rel='noopener'
+                    sx={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 1.5,
+                      color: 'inherit',
+                      textDecoration: 'none',
+                      '&:hover': {
+                        textDecoration: 'underline'
+                      }
+                    }}
+                  >
+                    <img
+                      src={s.image}
+                      alt={s.name}
+                      style={{
+                        width: 20,
+                        height: 20,
+                        borderRadius: '50%',
+                        objectFit: 'cover'
+                      }}
+                    />
+                    <Typography variant='body2'>{s.name}</Typography>
+                  </Box>
+                ))}
+              </Stack>
+            </Box>
+          )}
         </Box>
 
         <Typography variant='body2' align='center'>

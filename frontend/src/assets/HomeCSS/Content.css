@@ -241,43 +241,54 @@
 }
 
 .cta-button {
-    background: white;
-    color: black;
-    border: 2px solid black;
-    padding: 12px 32px;
-    border-radius: 10px;
-    font-weight: 500;
+    border: 1px solid #1f2937;
+    color: #1f2937;
+    background-color: transparent;
+    padding: 8px 24px;
+    border-radius: 9999px;
+    font-size: 14px;
     cursor: pointer;
-    transition: background 0.3s ease;
+    transition: all 0.3s ease;
     display: block;
     margin: 0 auto;
 }
 
 .cta-button:hover {
-    background: #1A3C7B;
+    background-color: #1f2937;
     color: white;
 }
 
 /* Features Grid */
 .features-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 16px;
+    display: flex;
+    gap: 32px;
     margin-bottom: 32px;
-    padding: 16px 0;
+    flex-wrap: wrap;
 }
 
 .feature-card {
     display: flex;
-    flex-direction: column;
     align-items: center;
-    text-align: center;
-    padding: 16px;
+    gap: 16px;
+    background: #fff;
+    border-radius: 12px;
+    padding: 12px 24px;
+    min-width: 220px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.03);
 }
 
 .feature-icon {
-    font-size: 32px;
-    margin-bottom: 12px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.feature-text {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
 }
 
 .feature-title {
@@ -312,7 +323,13 @@
     }
     
     .features-grid {
-        grid-template-columns: repeat(2, 1fr);
+        flex-direction: column;
+        gap: 16px;
+    }
+    
+    .feature-card {
+        min-width: 0;
+        padding: 10px 12px;
     }
     
     .product-grid {

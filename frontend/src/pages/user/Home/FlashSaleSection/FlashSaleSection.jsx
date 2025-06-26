@@ -141,16 +141,19 @@ const FlashSaleSection = () => {
       width: '100%'
     },
     viewAllButton: {
-      background: 'transparent',
-      border: '2px solid white',
-      color: 'white',
-      padding: '12px 32px',
-      borderRadius: '24px',
-      fontWeight: '500',
+      border: '1px solid #1f2937',
+      color: '#1f2937',
+      backgroundColor: 'transparent',
+      padding: '8px 24px',
+      borderRadius: '9999px',
+      fontSize: '14px',
       cursor: 'pointer',
       transition: 'all 0.3s ease',
       display: 'block',
-      margin: '0 auto'
+      margin: '0 auto',
+      '@media (min-width: 640px)': {
+        padding: '12px 32px'
+      }
     }
   }
 
@@ -173,7 +176,19 @@ const FlashSaleSection = () => {
             ))}
           </div>
 
-          <button style={styles.viewAllButton}>Xem tất cả</button>
+          <button 
+            style={styles.viewAllButton}
+            onMouseEnter={(e) => {
+              e.target.style.backgroundColor = '#1f2937'
+              e.target.style.color = 'white'
+            }}
+            onMouseLeave={(e) => {
+              e.target.style.backgroundColor = 'transparent'
+              e.target.style.color = '#1f2937'
+            }}
+          >
+            Xem tất cả ›
+          </button>
         </section>
       ))}
     </>
