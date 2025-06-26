@@ -5,15 +5,24 @@ import CollectionBanner from './CollectionBanner'
 import ComboSection from './ComboSection'
 import { getCategories } from '~/services/categoryService'
 import { getProductsByCategory } from '~/services/productService'
+import { useNavigate } from 'react-router-dom'
 
 const ProductContent = () => {
   const [categories, setCategories] = useState([])
-  const [activeCategoryId, setActiveCategoryId] = useState(null)
-  const [products, setProducts] = useState([])
+  const [sectionActiveIds, setSectionActiveIds] = useState([]) // Mỗi section 1 activeCategoryId
+  const [sectionProducts, setSectionProducts] = useState([]) // Mỗi section 1 mảng sản phẩm
   const [loadingCategories, setLoadingCategories] = useState(false)
-  const [loadingProducts, setLoadingProducts] = useState(false)
+  const [loadingProducts, setLoadingProducts] = useState([])
   const [errorCategories, setErrorCategories] = useState(null)
-  const [errorProducts, setErrorProducts] = useState(null)
+  const [errorProducts, setErrorProducts] = useState([])
+  const navigate = useNavigate()
+
+  // Chia categories thành các nhóm 3 (sections)
+  const categoriesPerSection = 3
+  const sections = []
+  for (let i = 0; i < categories.length; i += categoriesPerSection) {
+    sections.push(categories.slice(i, i + categoriesPerSection))
+  }
 
   // Load danh mục khi component mount
   useEffect(() => {
@@ -21,94 +30,136 @@ const ProductContent = () => {
       try {
         setLoadingCategories(true)
         setErrorCategories(null)
-
         const response = await getCategories(1, 1000)
         const fetchedCategories = response.categories?.data || []
-
-        if (
-          !Array.isArray(fetchedCategories) ||
-          fetchedCategories.length === 0
-        ) {
+        if (!Array.isArray(fetchedCategories) || fetchedCategories.length === 0) {
           throw new Error('Không có danh mục nào được tải')
         }
-
         setCategories(fetchedCategories)
-        // Set active category to first category if none is selected
-        if (!activeCategoryId) {
-          setActiveCategoryId(fetchedCategories[0]._id)
+        // Khởi tạo state cho từng section
+        const newSections = []
+        for (let i = 0; i < fetchedCategories.length; i += categoriesPerSection) {
+          const group = fetchedCategories.slice(i, i + categoriesPerSection)
+          newSections.push(group)
         }
+        setSectionActiveIds(newSections.map(group => group[0]?._id || null))
+        setSectionProducts(newSections.map(() => []))
+        setLoadingProducts(newSections.map(() => false))
+        setErrorProducts(newSections.map(() => null))
       } catch (err) {
-        console.error('Error fetching categories:', err)
         setErrorCategories(err.message || 'Lỗi khi tải danh mục')
       } finally {
         setLoadingCategories(false)
       }
     }
-
     fetchCategories()
   }, [])
 
-  // Load sản phẩm khi activeCategoryId thay đổi
+  // Load sản phẩm cho từng section khi activeCategoryId thay đổi
   useEffect(() => {
-    if (!activeCategoryId) return
+    if (!sections.length) return
+    sectionActiveIds.forEach((categoryId, idx) => {
+      if (!categoryId) return
+      setLoadingProducts(prev => {
+        const arr = [...prev]
+        arr[idx] = true
+        return arr
+      })
+      setErrorProducts(prev => {
+        const arr = [...prev]
+        arr[idx] = null
+        return arr
+      })
+      getProductsByCategory(categoryId, 1, 20)
+        .then(response => {
+          setSectionProducts(prev => {
+            const arr = [...prev]
+            arr[idx] = response && response.products ? response.products : []
+            return arr
+          })
+        })
+        .catch(err => {
+          setErrorProducts(prev => {
+            const arr = [...prev]
+            arr[idx] = err.message || 'Lỗi khi tải sản phẩm'
+            return arr
+          })
+          setSectionProducts(prev => {
+            const arr = [...prev]
+            arr[idx] = []
+            return arr
+          })
+        })
+        .finally(() => {
+          setLoadingProducts(prev => {
+            const arr = [...prev]
+            arr[idx] = false
+            return arr
+          })
+        })
+    })
+    // eslint-disable-next-line
+  }, [JSON.stringify(sectionActiveIds), sections.length])
 
-    const fetchProducts = async () => {
-      try {
-        setLoadingProducts(true)
-        setErrorProducts(null)
-
-        const response = await getProductsByCategory(activeCategoryId, 1, 20)
-
-        if (response && response.products) {
-          setProducts(response.products)
-        } else {
-          setProducts([])
-        }
-      } catch (err) {
-        setErrorProducts(err.message || 'Lỗi khi tải sản phẩm')
-        setProducts([])
-      } finally {
-        setLoadingProducts(false)
-      }
-    }
-
-    fetchProducts()
-  }, [activeCategoryId])
-
-  // Handler cho việc thay đổi category
-  const handleCategoryChange = (categoryId) => {
-    console.log('Category changed to:', categoryId)
-    setActiveCategoryId(categoryId)
+  // Handler đổi tab cho từng section
+  const handleCategoryChange = (sectionIdx, categoryId) => {
+    setSectionActiveIds(prev => {
+      const arr = [...prev]
+      arr[sectionIdx] = categoryId
+      return arr
+    })
   }
 
   if (loadingCategories) {
     return <div>Đang tải danh mục...</div>
   }
-
   if (errorCategories) {
     return <div style={{ color: 'red' }}>{errorCategories}</div>
   }
 
-  const activeCategory =
-    categories.find((c) => c._id === activeCategoryId) || {}
-
   return (
     <div className='container' style={{ maxWidth: '1780px', margin: '0 auto' }}>
-      <HeaderCategories
-        categories={categories}
-        activeCategoryId={activeCategoryId}
-        onCategoryChange={handleCategoryChange}
-      />
-
-      <ProductSection
-        bannerImg={activeCategory.bannerImg || activeCategory.image || ''}
-        bannerTitle={activeCategory.name || ''}
-        bannerDesc={activeCategory.description || 'Bộ sưu tập hot'}
-        products={products}
-        loading={loadingProducts}
-        error={errorProducts}
-      />
-
+      {sections.map((group, idx) => {
+        const activeCategory = group.find(c => c._id === sectionActiveIds[idx]) || group[0] || {}
+        const hasProducts = sectionProducts[idx] && sectionProducts[idx].length > 0;
+        return (
+          <div key={idx} style={{ marginBottom: 40 }}>
+            <HeaderCategories
+              categories={group}
+              activeCategoryId={sectionActiveIds[idx]}
+              onCategoryChange={categoryId => handleCategoryChange(idx, categoryId)}
+            />
+            <ProductSection
+              bannerImg={activeCategory.bannerImg || activeCategory.image || ''}
+              bannerTitle={activeCategory.name || ''}
+              bannerDesc={activeCategory.description || 'Bộ sưu tập hot'}
+              products={sectionProducts[idx]}
+              loading={loadingProducts[idx]}
+              error={errorProducts[idx]}
+            />
+            {hasProducts && (
+              <div style={{ display: 'flex', justifyContent: 'center', marginTop: 16 }}>
+                <button
+                  style={{
+                    padding: '8px 24px',
+                    borderRadius: 8,
+                    border: '1px solid #1A3C7B',
+                    background: '#fff',
+                    color: '#1A3C7B',
+                    fontWeight: 600,
+                    fontSize: 16,
+                    cursor: 'pointer',
+                    boxShadow: '0 2px 8px rgba(0,0,0,0.04)'
+                  }}
+                  onClick={() => navigate(`/productbycategory/${activeCategory._id}`)}
+                >
+                  Xem tất cả &gt;
+                </button>
+              </div>
+            )}
+          </div>
+        )
+      })}
       <CollectionBanner />
       <ComboSection />
     </div>

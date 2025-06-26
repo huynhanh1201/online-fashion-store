@@ -59,11 +59,7 @@ const getBlogList = async (queryString) => {
   // Xử lý thông tin Filter
   const filter = {}
 
-  if (status === 'true' || status === 'false') {
-    status = JSON.parse(status)
-
-    filter.destroy = status
-  }
+  if (status) filter.status = status
 
   if (search) {
     filter.name = { $regex: search, $options: 'i' }

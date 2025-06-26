@@ -11,7 +11,8 @@ const CouponList = ({ onCouponSelect }) => {
     const fetchCoupons = async () => {
       try {
         const { discounts } = await getDiscounts()
-        setCoupons(discounts)
+        const activeCoupons = discounts.filter(coupon => coupon.isActive === true)
+        setCoupons(activeCoupons)
       } catch (error) {
         console.error('Failed to fetch coupons:', error)
       } finally {
