@@ -398,130 +398,162 @@ const FlashSaleManagement = () => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {flashSales.map((item, index) => (
-                <TableRow
-                  key={item.productId || index}
-                  sx={{
-                    '&:hover': {
-                      backgroundColor: alpha(theme.palette.primary.main, 0.04)
-                    },
-                    '&:last-child td, &:last-child th': { border: 0 }
-                  }}
-                >
-                  <TableCell sx={{ py: 2 }}>
-                    <Typography
-                      variant='body1'
-                      sx={{ fontWeight: 600, color: '#1e293b' }}
+              {flashSales.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={8} sx={{ textAlign: 'center', py: 4 }}>
+                    {/* SVG No data icon */}
+                    <svg
+                      width='64'
+                      height='41'
+                      viewBox='0 0 64 41'
+                      xmlns='http://www.w3.org/2000/svg'
+                      style={{ marginBottom: 8 }}
                     >
-                      {item.productName}
+                      <title>No data</title>
+                      <g transform='translate(0 1)' fill='none' fillRule='evenodd'>
+                        <ellipse fill='#f5f5f5' cx='32' cy='33' rx='32' ry='7'></ellipse>
+                        <g fillRule='nonzero' stroke='#d9d9d9'>
+                          <path d='M55 12.76L44.854 1.258C44.367.474 43.656 0 42.907 0H21.093c-.749 0-1.46.474-1.947 1.257L9 12.761V22h46v-9.24z'></path>
+                          <path
+                            d='M41.613 15.931c0-1.605.994-2.93 2.227-2.931H55v18.137C55 33.26 53.68 35 52.05 35h-40.1C10.32 35 9 33.259 9 31.137V13h11.16c1.233 0 2.227 1.323 2.227 2.928v.022c0 1.605 1.005 2.901 2.237 2.901h14.752c1.232 0 2.237-1.308 2.237-2.913v-.007z'
+                            fill='#fafafa'
+                          ></path>
+                        </g>
+                      </g>
+                    </svg>
+                    <Typography variant='body1' color='text.secondary'>
+                      Không có sản phẩm Flash Sale nào
                     </Typography>
-                    <Typography variant='caption' color='text.secondary'>
-                      ID: {item.productId}
-                    </Typography>
-                  </TableCell>
-                  <TableCell sx={{ py: 2 }}>
-                    <Typography
-                      variant='body1'
-                      sx={{ color: '#64748b', textDecoration: 'line-through' }}
-                    >
-                      {item.originalPrice != null ? Number(item.originalPrice).toLocaleString() : '---'}đ
-                    </Typography>
-                  </TableCell>
-                  <TableCell sx={{ py: 2 }}>
-                    <Typography
-                      variant='body1'
-                      sx={{
-                        fontWeight: 700,
-                        color: '#dc2626',
-                        fontSize: '1.1rem'
-                      }}
-                    >
-                      {item.flashPrice != null ? Number(item.flashPrice).toLocaleString() : '---'}đ
-                    </Typography>
-                  </TableCell>
-                  <TableCell sx={{ py: 2 }}>
-                    <Chip
-                      label={`-${calculateDiscount(item.originalPrice, item.flashPrice)}%`}
-                      size='small'
-                      sx={{
-                        backgroundColor: '#fef2f2',
-                        color: '#dc2626',
-                        fontWeight: 600,
-                        border: '1px solid #fecaca'
-                      }}
-                    />
-                  </TableCell>
-                  <TableCell sx={{ py: 2 }}>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                      <InventoryIcon sx={{ fontSize: 16, color: '#6b7280' }} />
-                      <Typography variant='body2' sx={{ fontWeight: 600 }}>
-                        {item.stock != null ? item.stock : 0}
-                      </Typography>
-                    </Box>
-                  </TableCell>
-                  <TableCell sx={{ py: 2 }}>
-                    {item.startTime && item.endTime ? (
-                      <Box>
-                        <Typography
-                          variant='caption'
-                          sx={{ display: 'block', color: '#059669' }}
-                        >
-                          Bắt đầu: {formatTime(item.startTime)}
-                        </Typography>
-                        <Typography
-                          variant='caption'
-                          sx={{ display: 'block', color: '#dc2626' }}
-                        >
-                          Kết thúc: {formatTime(item.endTime)}
-                        </Typography>
-                      </Box>
-                    ) : (
-                      <Typography variant='body2' color='text.secondary'>
-                        ---
-                      </Typography>
-                    )}
-                  </TableCell>
-                  <TableCell sx={{ py: 2 }}>
-                    <Chip
-                      label={item.status}
-                      color={getStatusColor(item.status)}
-                      size='small'
-                      sx={{
-                        fontWeight: 600,
-                        borderRadius: 2
-                      }}
-                    />
-                  </TableCell>
-                  <TableCell sx={{ py: 2 }}>
-                    <Stack direction='row' spacing={1}>
-                      <Tooltip title='Chỉnh sửa'>
-                        <IconButton
-                          size='small'
-                          sx={{
-                            color: '#3b82f6',
-                            '&:hover': { backgroundColor: '#dbeafe' }
-                          }}
-                          onClick={() => handleEditClick(item)}
-                        >
-                          <EditIcon fontSize='small' />
-                        </IconButton>
-                      </Tooltip>
-                      <Tooltip title='Xóa'>
-                        <IconButton
-                          size='small'
-                          sx={{
-                            color: '#ef4444',
-                            '&:hover': { backgroundColor: '#fee2e2' }
-                          }}
-                          onClick={() => handleDeleteClick(item)}
-                        >
-                          <DeleteIcon fontSize='small' />
-                        </IconButton>
-                      </Tooltip>
-                    </Stack>
                   </TableCell>
                 </TableRow>
-              ))}
+              ) : (
+              <TableBody>
+                {flashSales.map((item, index) => (
+                  <TableRow
+                    key={item.productId || index}
+                    sx={{
+                      '&:hover': {
+                        backgroundColor: alpha(theme.palette.primary.main, 0.04)
+                      },
+                      '&:last-child td, &:last-child th': { border: 0 }
+                    }}
+                  >
+                    <TableCell sx={{ py: 2 }}>
+                      <Typography
+                        variant='body1'
+                        sx={{ fontWeight: 600, color: '#1e293b' }}
+                      >
+                        {item.productName}
+                      </Typography>
+                      <Typography variant='caption' color='text.secondary'>
+                        ID: {item.productId}
+                      </Typography>
+                    </TableCell>
+                    <TableCell sx={{ py: 2 }}>
+                      <Typography
+                        variant='body1'
+                        sx={{ color: '#64748b', textDecoration: 'line-through' }}
+                      >
+                        {item.originalPrice != null ? Number(item.originalPrice).toLocaleString() : '---'}đ
+                      </Typography>
+                    </TableCell>
+                    <TableCell sx={{ py: 2 }}>
+                      <Typography
+                        variant='body1'
+                        sx={{
+                          fontWeight: 700,
+                          color: '#dc2626',
+                          fontSize: '1.1rem'
+                        }}
+                      >
+                        {item.flashPrice != null ? Number(item.flashPrice).toLocaleString() : '---'}đ
+                      </Typography>
+                    </TableCell>
+                    <TableCell sx={{ py: 2 }}>
+                      <Chip
+                        label={`-${calculateDiscount(item.originalPrice, item.flashPrice)}%`}
+                        size='small'
+                        sx={{
+                          backgroundColor: '#fef2f2',
+                          color: '#dc2626',
+                          fontWeight: 600,
+                          border: '1px solid #fecaca'
+                        }}
+                      />
+                    </TableCell>
+                    <TableCell sx={{ py: 2 }}>
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                        <InventoryIcon sx={{ fontSize: 16, color: '#6b7280' }} />
+                        <Typography variant='body2' sx={{ fontWeight: 600 }}>
+                          {item.stock != null ? item.stock : 0}
+                        </Typography>
+                      </Box>
+                    </TableCell>
+                    <TableCell sx={{ py: 2 }}>
+                      {item.startTime && item.endTime ? (
+                        <Box>
+                          <Typography
+                            variant='caption'
+                            sx={{ display: 'block', color: '#059669' }}
+                          >
+                            Bắt đầu: {formatTime(item.startTime)}
+                          </Typography>
+                          <Typography
+                            variant='caption'
+                            sx={{ display: 'block', color: '#dc2626' }}
+                          >
+                            Kết thúc: {formatTime(item.endTime)}
+                          </Typography>
+                        </Box>
+                      ) : (
+                        <Typography variant='body2' color='text.secondary'>
+                          ---
+                        </Typography>
+                      )}
+                    </TableCell>
+                    <TableCell sx={{ py: 2 }}>
+                      <Chip
+                        label={item.status}
+                        color={getStatusColor(item.status)}
+                        size='small'
+                        sx={{
+                          fontWeight: 600,
+                          borderRadius: 2
+                        }}
+                      />
+                    </TableCell>
+                    <TableCell sx={{ py: 2 }}>
+                      <Stack direction='row' spacing={1}>
+                        <Tooltip title='Chỉnh sửa'>
+                          <IconButton
+                            size='small'
+                            sx={{
+                              color: '#3b82f6',
+                              '&:hover': { backgroundColor: '#dbeafe' }
+                            }}
+                            onClick={() => handleEditClick(item)}
+                          >
+                            <EditIcon fontSize='small' />
+                          </IconButton>
+                        </Tooltip>
+                        <Tooltip title='Xóa'>
+                          <IconButton
+                            size='small'
+                            sx={{
+                              color: '#ef4444',
+                              '&:hover': { backgroundColor: '#fee2e2' }
+                            }}
+                            onClick={() => handleDeleteClick(item)}
+                          >
+                            <DeleteIcon fontSize='small' />
+                          </IconButton>
+                        </Tooltip>
+                      </Stack>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+              )}
             </TableBody>
           </Table>
           )}

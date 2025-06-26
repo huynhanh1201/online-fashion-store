@@ -81,8 +81,8 @@ const ProductSection = ({
 }) => {
   return (
     <div style={styles.section}>
-      <div className='product-grid'>
-        {/* Banner */}
+      <div className='product-grid' style={{ display: 'grid', gridTemplateColumns: '290px 1fr', gap: '20px', alignItems: 'center' }}>
+        {/* Banner cho category hiện tại */}
         <div style={styles.banner}>
           <img
             src={
@@ -123,27 +123,29 @@ const ProductSection = ({
 
         {/* Products */}
         {!loading && !error && products && products.length > 0 ? (
-          products.slice(0, 4).map((product) => {
-            // Xử lý ảnh sản phẩm
-            let productImage =
-              'https://placehold.co/500x440?text=No+Category+Image'
+          <div className="product-grid">
+            {products.slice(0, 4).map((product) => {
+              // Xử lý ảnh sản phẩm
+              let productImage =
+                'https://placehold.co/500x440?text=No+Category+Image'
 
-            if (product.image) {
-              if (Array.isArray(product.image) && product.image.length > 0) {
-                productImage = product.image[0]
-              } else if (typeof product.image === 'string') {
-                productImage = product.image
+              if (product.image) {
+                if (Array.isArray(product.image) && product.image.length > 0) {
+                  productImage = product.image[0]
+                } else if (typeof product.image === 'string') {
+                  productImage = product.image
+                }
               }
-            }
 
-            return (
-              <div key={product._id || product.id} style={styles.productItem}>
-                <ProductCard product={product} />
-              </div>
-            )
-          })
+              return (
+                <div key={product._id || product.id} style={styles.productItem}>
+                  <ProductCard product={product} />
+                </div>
+              )
+            })}
+          </div>
         ) : !loading && !error ? (
-          <div style={styles.noProducts}>
+          <div style={{ textAlign: 'center', color: '#666', fontSize: '16px' }}>
             <Typography>Không có sản phẩm để hiển thị</Typography>
           </div>
         ) : null}
