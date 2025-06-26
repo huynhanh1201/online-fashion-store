@@ -54,15 +54,24 @@ export const useCart = () => {
         updatedCartItems = cart.cartItems.map(item => {
           const itemVariantId = typeof item.variantId === 'object' ? item.variantId._id : item.variantId
           if (itemVariantId === newVariantId) {
+            const currentQty = Number(item.quantity) || 0
+            const newQty = Number(newItem.quantity) || 0
+            const totalQty = currentQty + newQty
+
             return {
               ...item,
-              quantity: (Number(item.quantity) || 0) + (Number(newItem.quantity) || 0)
+              quantity: isNaN(totalQty) ? 1 : totalQty // Fallback to 1 if NaN
             }
           }
           return item
         })
       } else {
-        updatedCartItems = [...cart.cartItems, newItem]
+        // Đảm bảo quantity của item mới cũng hợp lệ
+        const safeNewItem = {
+          ...newItem,
+          quantity: Number(newItem.quantity) || 1 // Fallback to 1 if invalid
+        }
+        updatedCartItems = [...cart.cartItems, safeNewItem]
       }
 
       dispatch(setCartItems(updatedCartItems))
@@ -122,7 +131,10 @@ export const useCart = () => {
   }
 
   const selectedCartItems = cart.cartItems.filter(item => item.selected)
-  const cartCount = cart.cartItems.reduce((total, item) => total + (Number(item.quantity) || 0), 0)
+  const cartCount = cart.cartItems.reduce((total, item) => {
+    const qty = Number(item.quantity) || 0
+    return total + (isNaN(qty) ? 0 : qty)
+  }, 0)
 
   const getVariantId = (item) =>
     typeof item.variantId === 'object' ? item.variantId._id : item.variantId
