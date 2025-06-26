@@ -9,6 +9,8 @@ import {
 } from '@mui/material'
 import MenuIcon from '@mui/icons-material/Menu'
 import { styled } from '@mui/system'
+import { useSelector } from 'react-redux'
+import { selectCurrentUser } from '~/redux/user/userSlice'
 import Logo from './Navbar/Logo/Logo'
 import Search from './Navbar/Search/Search'
 import HeaderAction from './Navbar/HeaderAction/HeaderAction'
@@ -34,6 +36,7 @@ const StyledAppBar = styled(AppBar)(({ theme }) => ({
 const HeaderUser = () => {
   const [mobileOpen, setMobileOpen] = useState(false)
   const headerRef = useRef()
+  const currentUser = useSelector(selectCurrentUser)
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen)
@@ -116,7 +119,7 @@ const HeaderUser = () => {
             >
               <Search />
               <AuthButtons />
-              <HeaderAction />
+              {currentUser && <HeaderAction />}
             </Box>
           </Toolbar>
         </Container>
