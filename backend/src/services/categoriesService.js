@@ -15,7 +15,9 @@ const createCategory = async (reqBody) => {
       destroy: false,
       image: reqBody.image || null,
 
-      parent: reqBody.parent || null
+      parent: reqBody.parent || null,
+
+      banner: reqBody.banner || null
     }
 
     const category = await CategoryModel.create(newCategory)
