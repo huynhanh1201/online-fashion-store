@@ -118,7 +118,7 @@ export default function FilterReview({ onFilter, reviews = [], loading }) {
       <Box sx={{ display: 'flex', gap: 2 }}>
         <SearchWithSuggestions
           label='Tìm người dùng hoặc bình luận'
-          options={reviews.map((r) => r.user?.name || r.comment || '')}
+          options={[]}
           loading={loading}
           keyword={keyword}
           inputValue={inputValue}

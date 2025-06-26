@@ -62,7 +62,13 @@ const BlogDetail = () => {
           }}
         >
           {/* Back Button Skeleton */}
-          <div style={{ maxWidth: '800px', margin: '0 auto', marginBottom: '24px' }}>
+          <div
+            style={{
+              maxWidth: '800px',
+              margin: '0 auto',
+              marginBottom: '24px'
+            }}
+          >
             <div
               style={{
                 width: '100px',
@@ -95,7 +101,7 @@ const BlogDetail = () => {
               }}
             />
 
-            {/* Content Skeleton */}
+            {/* EditContent Skeleton */}
             <div style={{ padding: isMobile ? '24px 16px' : '32px 24px' }}>
               <div
                 style={{
@@ -138,7 +144,8 @@ const BlogDetail = () => {
 
           <style jsx>{`
             @keyframes pulse {
-              0%, 100% {
+              0%,
+              100% {
                 opacity: 1;
               }
               50% {
@@ -166,7 +173,9 @@ const BlogDetail = () => {
             alignItems: 'center'
           }}
         >
-          <div style={{ fontSize: '16px', color: '#ef4444', marginBottom: '16px' }}>
+          <div
+            style={{ fontSize: '16px', color: '#ef4444', marginBottom: '16px' }}
+          >
             {error || 'Không tìm thấy bài viết'}
           </div>
           <button
@@ -198,7 +207,9 @@ const BlogDetail = () => {
         }}
       >
         {/* Back Button */}
-        <div style={{ maxWidth: '1024px', margin: '0 auto', marginBottom: '24px' }}>
+        <div
+          style={{ maxWidth: '1024px', margin: '0 auto', marginBottom: '24px' }}
+        >
           <button
             onClick={() => navigate('/blog')}
             style={{
@@ -215,7 +226,7 @@ const BlogDetail = () => {
           </button>
         </div>
 
-        {/* Article Content */}
+        {/* Article EditContent */}
         <article
           style={{
             maxWidth: '1024px',
@@ -227,13 +238,17 @@ const BlogDetail = () => {
           }}
         >
           {/* Featured Image */}
-          {(currentBlog.coverImage || currentBlog.thumbnail || currentBlog.image) && (
-            <div style={{
-              width: '100%',
-              height: isMobile ? '200px' : '400px',
-              position: 'relative',
-              backgroundColor: '#f3f4f6'
-            }}>
+          {(currentBlog.coverImage ||
+            currentBlog.thumbnail ||
+            currentBlog.image) && (
+            <div
+              style={{
+                width: '100%',
+                height: isMobile ? '200px' : '400px',
+                position: 'relative',
+                backgroundColor: '#f3f4f6'
+              }}
+            >
               {!imageLoaded && (
                 <div
                   style={{
@@ -304,7 +319,9 @@ const BlogDetail = () => {
             </h1>
 
             {/* Subtitle */}
-            {(currentBlog.excerpt || currentBlog.subtitle || currentBlog.summary) && (
+            {(currentBlog.excerpt ||
+              currentBlog.subtitle ||
+              currentBlog.summary) && (
               <h2
                 style={{
                   fontSize: isMobile ? '16px' : '18px',
@@ -314,7 +331,9 @@ const BlogDetail = () => {
                   margin: '0 0 16px 0'
                 }}
               >
-                {currentBlog.excerpt || currentBlog.subtitle || currentBlog.summary}
+                {currentBlog.excerpt ||
+                  currentBlog.subtitle ||
+                  currentBlog.summary}
               </h2>
             )}
 
@@ -335,10 +354,13 @@ const BlogDetail = () => {
                 </span>
                 <span style={{ margin: '0 8px' }}>•</span>
                 <span>
-                  {currentBlog.publishedAt ?
-                    new Date(currentBlog.publishedAt).toLocaleDateString('vi-VN') :
-                    new Date(currentBlog.createdAt).toLocaleDateString('vi-VN')
-                  }
+                  {currentBlog.publishedAt
+                    ? new Date(currentBlog.publishedAt).toLocaleDateString(
+                        'vi-VN'
+                      )
+                    : new Date(currentBlog.createdAt).toLocaleDateString(
+                        'vi-VN'
+                      )}
                 </span>
               </div>
 
@@ -351,7 +373,7 @@ const BlogDetail = () => {
               )} */}
             </div>
 
-            {/* Content */}
+            {/* EditContent */}
             <div
               style={{
                 fontSize: '16px',
@@ -364,8 +386,21 @@ const BlogDetail = () => {
 
             {/* Tags */}
             {currentBlog.tags && currentBlog.tags.length > 0 && (
-              <div style={{ marginTop: '32px', paddingTop: '24px', borderTop: '1px solid #e5e7eb' }}>
-                <h3 style={{ fontSize: '14px', fontWeight: 'bold', marginBottom: '12px', color: '#6b7280' }}>
+              <div
+                style={{
+                  marginTop: '32px',
+                  paddingTop: '24px',
+                  borderTop: '1px solid #e5e7eb'
+                }}
+              >
+                <h3
+                  style={{
+                    fontSize: '14px',
+                    fontWeight: 'bold',
+                    marginBottom: '12px',
+                    color: '#6b7280'
+                  }}
+                >
                   Thẻ:
                 </h3>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>

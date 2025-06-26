@@ -35,10 +35,8 @@ import {
 } from '@mui/icons-material'
 import { useForm, Controller } from 'react-hook-form'
 import { toast } from 'react-toastify'
-import BlogDescriptionEditor from '~/pages/admin/BlogManagement/modal/Desc.jsx'
+import DescriptionEditor from '~/components/EditContent/DescriptionEditor.jsx'
 import { CloudinaryColor, CloudinaryProduct, URI } from '~/utils/constants'
-import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css'
-import 'draft-js/dist/Draft.css'
 import AddPhotoAlternateIcon from '@mui/icons-material/AddPhotoAlternate'
 
 const uploadToCloudinary = async (file, folder = CloudinaryColor) => {
@@ -104,7 +102,7 @@ const BlogModal = ({
     defaultValues: {
       title: '',
       excerpt: '',
-      content: '',
+      content: blogData?.content || '',
       coverImage: '',
       images: [],
       tags: [],
@@ -159,7 +157,7 @@ const BlogModal = ({
         status: blogData.status || 'draft',
         metaTitle: blogData.meta?.title || '',
         metaDescription: blogData.meta?.description || '',
-        metaKeywords: blogData.meta?.title || []
+        metaKeywords: blogData.meta?.keywords || []
       })
       // Set image URLs for additional images
       if (blogData.images && blogData.images.length > 0) {
@@ -244,6 +242,7 @@ const BlogModal = ({
         keywords: Array(data.metaTitle || data.title)
       }
     }
+    console.log('Dữ liệu gửi:', data)
     onSave(blogPayload, isEditMode)
     handleClose()
   }
@@ -314,7 +313,7 @@ const BlogModal = ({
           }}
         >
           <Typography
-            variant={isMobile ? 'subtitle1' : 'h6'}
+            variant='h6'
             sx={{ fontWeight: 600, fontSize: isMobile ? '1rem' : '1.25rem' }}
           >
             {isEditMode ? 'Chỉnh sửa bài viết' : 'Tạo bài viết mới'}
@@ -505,12 +504,14 @@ const BlogModal = ({
                       control={control}
                       render={({ field }) => (
                         <Autocomplete
-                          {...field}
                           options={categories}
                           freeSolo
-                          value={field.value}
-                          onChange={(event, newValue) =>
-                            field.onChange(newValue)
+                          value={field.value ?? ''}
+                          onChange={(_, newValue) =>
+                            field.onChange(newValue ?? '')
+                          }
+                          onInputChange={(_, newInputValue) =>
+                            field.onChange(newInputValue)
                           }
                           renderInput={(params) => (
                             <TextField
@@ -530,12 +531,14 @@ const BlogModal = ({
                       control={control}
                       render={({ field }) => (
                         <Autocomplete
-                          {...field}
                           options={brands}
                           freeSolo
-                          value={field.value}
-                          onChange={(event, newValue) =>
-                            field.onChange(newValue)
+                          value={field.value ?? ''}
+                          onChange={(_, newValue) =>
+                            field.onChange(newValue ?? '')
+                          }
+                          onInputChange={(_, newInputValue) =>
+                            field.onChange(newInputValue)
                           }
                           renderInput={(params) => (
                             <TextField
@@ -815,7 +818,7 @@ const BlogModal = ({
               </Box>
             </Box>
 
-            {/* Section 5: Content Editor */}
+            {/* Section 5: EditContent Editor */}
             <Paper
               sx={{
                 p: isMobile ? 2 : 2.5,
@@ -848,7 +851,7 @@ const BlogModal = ({
                   minHeight: isMobile ? '250px' : '300px'
                 }}
               >
-                <BlogDescriptionEditor
+                <DescriptionEditor
                   control={control}
                   name='content'
                   setValue={setValue}

@@ -44,7 +44,7 @@ const ProductImageModal = ({ open, onClose, imageSrc, productName }) => {
         {/*</IconButton>*/}
       </DialogTitle>
       <Divider />
-      {/* ===== Content ===== */}
+      {/* ===== EditContent ===== */}
       <DialogContent>
         <img
           src={optimizeCloudinaryUrl(imageSrc)}

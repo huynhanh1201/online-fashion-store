@@ -27,7 +27,7 @@ const NotFound = () => {
         }}
       />
 
-      {/* Text Content */}
+      {/* Text EditContent */}
       <Box>
         <Typography variant='h3' fontWeight='bold' gutterBottom>
           OOPS! PAGE

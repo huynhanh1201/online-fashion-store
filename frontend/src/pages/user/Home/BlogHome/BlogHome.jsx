@@ -31,7 +31,6 @@ const BlogHome = () => {
     fetchLatestBlogs(3) // Lấy 3 bài viết mới nhất
   }, [fetchLatestBlogs])
 
-
   // Format dữ liệu từ API để phù hợp với UI
   const formatBlogData = (blogData) => {
     return {
@@ -40,13 +39,13 @@ const BlogHome = () => {
       subtitle: blogData.excerpt || blogData.subtitle || '',
       category: blogData.category || 'Tip',
       image: blogData.coverImage || blogData.thumbnail || blogData.image || '',
-      date: blogData.publishedAt ?
-        new Date(blogData.publishedAt).toLocaleDateString('vi-VN') :
-        new Date(blogData.createdAt).toLocaleDateString('vi-VN'),
-      description: blogData.content ?
-        // Remove HTML tags and limit to 150 characters
-        blogData.content.replace(/<[^>]*>/g, '').substring(0, 150) + '...' :
-        blogData.excerpt || ''
+      date: blogData.publishedAt
+        ? new Date(blogData.publishedAt).toLocaleDateString('vi-VN')
+        : new Date(blogData.createdAt).toLocaleDateString('vi-VN'),
+      description: blogData.content
+        ? // Remove HTML tags and limit to 150 characters
+          blogData.content.replace(/<[^>]*>/g, '').substring(0, 150) + '...'
+        : blogData.excerpt || ''
     }
   }
 
