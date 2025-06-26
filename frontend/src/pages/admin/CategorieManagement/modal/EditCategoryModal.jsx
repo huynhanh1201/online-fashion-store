@@ -55,6 +55,9 @@ const EditCategoryModal = ({
   const [previewUrl, setPreviewUrl] = useState('')
   const [parentCategory, setParentCategory] = useState(null)
   const fileInputRef = useRef()
+  const [bannerFile, setBannerFile] = useState(null)
+  const [bannerPreview, setBannerPreview] = useState('')
+  const bannerInputRef = useRef()
 
   useEffect(() => {
     if (open && category) {
@@ -64,6 +67,8 @@ const EditCategoryModal = ({
       })
       setPreviewUrl(category.image || '')
       setImageFile(null)
+      setBannerPreview(category.banner || '')
+      setBannerFile(null)
 
       // Set danh mục cha nếu có
       if (category.parent && typeof category.parent === 'object') {
@@ -129,7 +134,7 @@ const EditCategoryModal = ({
       open={open}
       onClose={handleClose}
       fullWidth
-      maxWidth='lg'
+      maxWidth='xl'
       BackdropProps={{ sx: StyleAdmin.OverlayModal }}
     >
       <DialogTitle>Sửa thông tin danh mục</DialogTitle>
@@ -141,86 +146,177 @@ const EditCategoryModal = ({
             gap={3}
             flexDirection={{ xs: 'column', sm: 'row' }}
           >
-            {/* Ảnh bên trái */}
-            <Box
-              display='flex'
-              flexDirection='column'
-              alignItems='center'
-              justifyContent='center'
-              border='2px dashed #ccc'
-              borderRadius={2}
-              position='relative'
-              sx={{
-                backgroundColor: '#fafafa',
-                cursor: 'pointer',
-                width: 350,
-                height: 355,
-                mt: '14px'
-              }}
-              onClick={() => !previewUrl && fileInputRef.current.click()}
-            >
-              {previewUrl ? (
-                <>
-                  <img
-                    src={previewUrl}
-                    alt='Ảnh danh mục'
-                    style={{
-                      width: '100%',
-                      height: '100%',
-                      objectFit: 'cover',
-                      borderRadius: 8
-                    }}
-                  />
-                  <Box
-                    position='absolute'
-                    top={4}
-                    right={8}
-                    display='flex'
-                    gap={1}
-                  >
-                    <Tooltip title='Sửa'>
-                      <IconButton
-                        size='small'
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          fileInputRef.current.click()
-                        }}
-                      >
-                        <EditIcon fontSize='small' color='warning' />
-                      </IconButton>
-                    </Tooltip>
-                    <Tooltip title='Xoá'>
-                      <IconButton
-                        size='small'
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          handleImageRemove()
-                        }}
-                      >
-                        <DeleteIcon fontSize='small' color='error' />
-                      </IconButton>
-                    </Tooltip>
+            <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+              <Typography variant='subtitle2' fontWeight='bold' mb={1}>
+                Ảnh danh mục
+              </Typography>
+              {/* Ảnh bên trái */}
+              <Box
+                display='flex'
+                flexDirection='column'
+                alignItems='center'
+                justifyContent='center'
+                border='2px dashed #ccc'
+                borderRadius={2}
+                position='relative'
+                sx={{
+                  backgroundColor: '#fafafa',
+                  cursor: 'pointer',
+                  width: 350,
+                  height: 355
+                }}
+                onClick={() => !previewUrl && fileInputRef.current.click()}
+              >
+                {previewUrl ? (
+                  <>
+                    <img
+                      src={previewUrl}
+                      alt='Ảnh danh mục'
+                      style={{
+                        width: '100%',
+                        height: '100%',
+                        objectFit: 'cover',
+                        borderRadius: 8
+                      }}
+                    />
+                    <Box
+                      position='absolute'
+                      top={4}
+                      right={8}
+                      display='flex'
+                      gap={1}
+                    >
+                      <Tooltip title='Sửa'>
+                        <IconButton
+                          size='small'
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            fileInputRef.current.click()
+                          }}
+                        >
+                          <EditIcon fontSize='small' color='warning' />
+                        </IconButton>
+                      </Tooltip>
+                      <Tooltip title='Xoá'>
+                        <IconButton
+                          size='small'
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            handleImageRemove()
+                          }}
+                        >
+                          <DeleteIcon fontSize='small' color='error' />
+                        </IconButton>
+                      </Tooltip>
+                    </Box>
+                  </>
+                ) : (
+                  <Box textAlign='center' color='#999'>
+                    <AddPhotoAlternateIcon fontSize='large' />
+                    <Typography fontSize={14} mt={1}>
+                      Thêm ảnh danh mục
+                    </Typography>
                   </Box>
-                </>
-              ) : (
-                <Box textAlign='center' color='#999'>
-                  <AddPhotoAlternateIcon fontSize='large' />
-                  <Typography fontSize={14} mt={1}>
-                    Thêm ảnh danh mục
-                  </Typography>
-                </Box>
-              )}
-              <input
-                type='file'
-                accept='image/*'
-                ref={fileInputRef}
-                style={{ display: 'none' }}
-                onChange={handleImageChange}
-              />
+                )}
+                <input
+                  type='file'
+                  accept='image/*'
+                  ref={fileInputRef}
+                  style={{ display: 'none' }}
+                  onChange={handleImageChange}
+                />
+              </Box>
             </Box>
-
+            <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+              <Typography variant='subtitle2' fontWeight='bold' mb={1}>
+                Ảnh quan quảng cáo
+              </Typography>
+              {/* Ảnh banner */}
+              <Box
+                display='flex'
+                flexDirection='column'
+                alignItems='center'
+                justifyContent='center'
+                border='2px dashed #ccc'
+                borderRadius={2}
+                position='relative'
+                sx={{
+                  backgroundColor: '#fafafa',
+                  cursor: 'pointer',
+                  width: 350,
+                  height: 355
+                }}
+                onClick={() => !bannerPreview && bannerInputRef.current.click()}
+              >
+                {bannerPreview ? (
+                  <>
+                    <img
+                      src={bannerPreview}
+                      alt='Ảnh banner'
+                      style={{
+                        width: '100%',
+                        height: '100%',
+                        objectFit: 'cover',
+                        borderRadius: 8
+                      }}
+                    />
+                    <Box
+                      position='absolute'
+                      top={4}
+                      right={8}
+                      display='flex'
+                      gap={1}
+                    >
+                      <Tooltip title='Sửa'>
+                        <IconButton
+                          size='small'
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            bannerInputRef.current.click()
+                          }}
+                        >
+                          <EditIcon fontSize='small' color='warning' />
+                        </IconButton>
+                      </Tooltip>
+                      <Tooltip title='Xoá'>
+                        <IconButton
+                          size='small'
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            setBannerFile(null)
+                            setBannerPreview('')
+                          }}
+                        >
+                          <DeleteIcon fontSize='small' color='error' />
+                        </IconButton>
+                      </Tooltip>
+                    </Box>
+                  </>
+                ) : (
+                  <Box textAlign='center' color='#999'>
+                    <AddPhotoAlternateIcon fontSize='large' />
+                    <Typography fontSize={14} mt={1}>
+                      Thêm ảnh banner
+                    </Typography>
+                  </Box>
+                )}
+                <input
+                  type='file'
+                  accept='image/*'
+                  ref={bannerInputRef}
+                  style={{ display: 'none' }}
+                  onChange={(e) => {
+                    const file = e.target.files?.[0]
+                    if (file) {
+                      setBannerFile(file)
+                      setBannerPreview(URL.createObjectURL(file))
+                    }
+                  }}
+                />
+              </Box>
+            </Box>
             {/* Thông tin bên phải */}
-            <Box flex={1}>
+            <Box flex={1} mt={1.6}>
               <TextField
                 label='Tên danh mục'
                 fullWidth

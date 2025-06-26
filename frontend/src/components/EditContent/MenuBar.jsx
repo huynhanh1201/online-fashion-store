@@ -140,18 +140,6 @@ export default function MenuBar({ editor }) {
         false,
         'Clear format'
       )}
-      {btn(
-        () => editor.chain().focus().setSubscript(),
-        Subscript,
-        editor.isActive('subscript'),
-        'Subscript'
-      )}
-      {btn(
-        () => editor.chain().focus().setSuperscript(),
-        Superscript,
-        editor.isActive('superscript'),
-        'Superscript'
-      )}
 
       <Divider orientation='vertical' flexItem sx={{ mx: 0.5 }} />
 
@@ -318,15 +306,6 @@ export default function MenuBar({ editor }) {
         'Video'
       )}
       {btn(
-        () => {
-          const url = prompt('GIF URL:')
-          if (url) editor.chain().focus().setImage({ src: url }).run()
-        },
-        GifBox,
-        false,
-        'GIF'
-      )}
-      {btn(
         () =>
           editor
             .chain()
@@ -335,50 +314,6 @@ export default function MenuBar({ editor }) {
         TableChart,
         false,
         'Insert Table'
-      )}
-
-      <Divider orientation='vertical' flexItem sx={{ mx: 0.5 }} />
-
-      {/* Advanced */}
-      {btn(
-        () => {
-          const formula = prompt('Nhập LaTeX:')
-          if (formula) editor.commands.insertMath(formula)
-        },
-        Functions,
-        false,
-        'Math'
-      )}
-      {btn(
-        () => {
-          const code = prompt('Nhập Mermaid diagram:')
-          if (code) editor.commands.insertMermaid(code)
-        },
-        IntegrationInstructions,
-        false,
-        'Mermaid'
-      )}
-      {btn(
-        () => {
-          const url = prompt('Nhúng Iframe:')
-          if (url) editor.chain().focus().setIframe({ src: url }).run()
-        },
-        ViewColumn,
-        false,
-        'Iframe'
-      )}
-      {btn(
-        () => {
-          const url = prompt('File đính kèm:')
-          if (url)
-            editor
-              .chain()
-              .focus()
-              .insertContent(`<a href="${url}" download>Attachment</a>`)
-        },
-        Draw,
-        false,
-        'Attachment'
       )}
     </Stack>
   )
