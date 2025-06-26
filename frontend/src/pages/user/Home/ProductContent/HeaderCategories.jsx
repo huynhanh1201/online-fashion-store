@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 
 const styles = {
   container: {
@@ -54,6 +54,13 @@ const HeaderCategories = ({
   onCategoryChange
 }) => {
   const [prevCategoryId, setPrevCategoryId] = useState(null)
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 600)
+
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 600)
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
+  }, [])
 
   // Chia categories thành các mảng con, mỗi mảng tối đa 3 phần tử
   const categoriesPerRow = 3
@@ -72,7 +79,15 @@ const HeaderCategories = ({
   return (
     <div style={styles.container}>
       {rows.map((row, rowIdx) => (
-        <div key={rowIdx} style={styles.sectionRow}>
+        <div
+          key={rowIdx}
+          style={{
+            ...styles.sectionRow,
+            justifyContent: isMobile ? 'center' : 'flex-end',
+            flexWrap: isMobile ? 'wrap' : 'nowrap',
+            gap: isMobile ? '10px' : '20px',
+          }}
+        >
           {row.map((cat) => {
             const isActive = cat._id === activeCategoryId
             const isPrev = cat._id === prevCategoryId

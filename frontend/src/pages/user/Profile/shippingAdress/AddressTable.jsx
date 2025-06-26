@@ -53,7 +53,7 @@ function AddressList({ addresses, onEdit, onDelete }) {
               <Button
                 size='small'
                 onClick={() => onDelete(addr._id)}
-                sx={{ textTransform: 'none', color: 'primary.main', fontWeight: 500 }}
+                sx={{ textTransform: 'none', color: 'red', fontWeight: 500 }}
               >
                 Xoá
               </Button>
