@@ -38,7 +38,9 @@ const BlogDetail = () => {
     window.addEventListener('resize', handleResize)
     return () => window.removeEventListener('resize', handleResize)
   }, [])
-
+  React.useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'auto' })
+  }, [])
   React.useEffect(() => {
     if (blogId) {
       setImageLoaded(false) // Reset image loading state
