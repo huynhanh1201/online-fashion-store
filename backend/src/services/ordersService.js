@@ -10,6 +10,7 @@ import getDateRange from '~/utils/getDateRange'
 import { orderHelpers } from '~/helpers/orderHelpers'
 import { PaymentSessionDraftModel } from '~/models/PaymentSessionDraftModel'
 import { deliveriesService } from '~/services/deliveriesService'
+import { importStockWarehouseSlip } from '~/services/warehouseSlipsService'
 
 const createOrder = async (userId, reqBody, ipAddr, jwtDecoded) => {
   // eslint-disable-next-line no-useless-catch
@@ -266,10 +267,15 @@ const getOrder = async (orderId) => {
   }
 }
 
-const updateOrder = async (userId, orderId, reqBody) => {
+const updateOrder = async (jwtDecoded, orderId, reqBody) => {
   // eslint-disable-next-line no-useless-catch
+  const session = await mongoose.startSession()
   try {
+    // Bắt đầu Transactions
+    session.startTransaction()
+
     const existingOrder = await OrderModel.findById(orderId)
+      .session(session)
       .select('status')
       .lean()
 
@@ -280,32 +286,53 @@ const updateOrder = async (userId, orderId, reqBody) => {
         new: true,
         runValidators: true
       }
-    ).populate({
-      path: 'userId',
-      select: 'name'
-    })
+    )
+      .session(session)
+      .populate({
+        path: 'userId',
+        select: 'name'
+      })
 
     const newStatus = reqBody.status
 
     if (newStatus && newStatus !== existingOrder.status) {
-      const user = await UserModel.findById(userId)
+      const user = await UserModel.findById(jwtDecoded._id)
 
       if (!user)
         throw new ApiError(StatusCodes.NOT_FOUND, 'Người dùng không tồn tại')
 
       // status đã đổi, tạo history
-      await OrderStatusHistoryModel.create({
-        orderId: orderId,
-        status: newStatus,
-        note: reqBody.note || null,
-        updatedBy: { name: user.name, role: user.role },
-        updatedAt: new Date()
-      })
+      await OrderStatusHistoryModel.create(
+        [
+          {
+            orderId: orderId,
+            status: newStatus,
+            note: reqBody.note || null,
+            updatedBy: { name: user.name, role: user.role },
+            updatedAt: new Date()
+          }
+        ],
+        { session }
+      )
+
+      // Trả hàng lại kho
+      if (['Cancelled', 'Failed'].includes(newStatus)) {
+        await importStockWarehouseSlip(reqBody, jwtDecoded, session)
+      }
+
+      // Commit transaction
+      await session.commitTransaction()
+
+      return updatedOrder
     }
 
-    return updatedOrder
+    // Commit transaction
+    await session.commitTransaction()
   } catch (err) {
+    await session.abortTransaction()
     throw err
+  } finally {
+    session.endSession()
   }
 }
 
