@@ -327,6 +327,7 @@ const EditCategoryModal = ({
                 disabled
               />
               <Autocomplete
+                disabled
                 options={filteredCategories.filter(
                   (c) => c._id !== category._id
                 )}

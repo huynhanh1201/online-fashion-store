@@ -6,7 +6,7 @@ import styled from '@emotion/styled'
 const StyledEditor = styled.div`
   .ProseMirror {
     min-height: 240px;
-    padding: 12px;
+    padding: 20px;
     font-size: 16px;
     line-height: 1.5;
     border: 1px solid #ccc;

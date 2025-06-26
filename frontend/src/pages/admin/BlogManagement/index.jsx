@@ -46,11 +46,9 @@ export default function BlogManagementPage() {
     try {
       if (isEditMode) {
         await updateBlogById(selectedBlog._id, blogData)
-        toast.success('Cập nhật blog thành công!')
       } else {
         // Tạo blog mới
         await addBlog(blogData)
-        toast.success('Tạo blog thành công!')
       }
 
       setOpenBlogModal(false)

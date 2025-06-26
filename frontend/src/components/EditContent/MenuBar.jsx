@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react'
-import { Button, Divider, Stack, Tooltip } from '@mui/material'
+import { Button, Divider, Stack, Tooltip, Box } from '@mui/material'
 import {
   FormatBold,
   FormatItalic,
@@ -41,6 +41,8 @@ import {
 import { Select, MenuItem } from '@mui/material'
 import FormatSizeIcon from '@mui/icons-material/FormatSize'
 import ModalUploadImage from '~/components/EditContent/modal/ModalUploadImage.jsx'
+import { Popover } from '@mui/material'
+import PaletteIcon from '@mui/icons-material/Palette'
 const headingOptions = [
   { label: 'Paragraph', value: 'paragraph' },
   { label: 'Heading 1', value: 1 },
@@ -50,6 +52,28 @@ const headingOptions = [
   { label: 'Heading 5', value: 5 },
   { label: 'Heading 6', value: 6 }
 ]
+const colors = [
+  '#000000',
+  '#424242',
+  '#757575',
+  '#BDBDBD',
+  '#E0E0E0',
+  '#EEEEEE',
+  '#F5F5F5',
+  '#FAFAFA',
+  '#FF0000',
+  '#FF5722',
+  '#FF9800',
+  '#FFEB3B',
+  '#8BC34A',
+  '#4CAF50',
+  '#00BCD4',
+  '#2196F3',
+  '#3F51B5',
+  '#9C27B0',
+  '#E91E63'
+  // Thêm các màu khác nếu muốn
+]
 export default function MenuBar({ editor }) {
   const getCurrentValue = () => {
     for (let i = 1; i <= 6; i++) {
@@ -58,6 +82,36 @@ export default function MenuBar({ editor }) {
     return 'paragraph'
   }
   const [value, setValue] = useState(getCurrentValue())
+  const [anchorEl, setAnchorEl] = useState(null)
+  const open = Boolean(anchorEl)
+  const [anchorBg, setAnchorBg] = useState(null)
+  const openBg = Boolean(anchorBg)
+
+  const handleClickColor = (e) => {
+    setAnchorEl(e.currentTarget)
+  }
+
+  const handleCloseColor = () => {
+    setAnchorEl(null)
+  }
+
+  const handleChangeColor = (color) => {
+    editor.chain().focus().setColor(color).run()
+    handleCloseColor()
+  }
+
+  const handleClickBg = (e) => {
+    setAnchorBg(e.currentTarget)
+  }
+
+  const handleCloseBg = () => {
+    setAnchorBg(null)
+  }
+
+  const handleChangeBg = (color) => {
+    editor.chain().focus().setHighlight({ color }).run()
+    handleCloseBg()
+  }
   const [openUpload, setOpenUpload] = useState(false)
   const btn = (command, Icon, active = false, label = '') => (
     <Tooltip title={label} arrow>
@@ -108,37 +162,37 @@ export default function MenuBar({ editor }) {
         () => editor.chain().focus().toggleBold(),
         FormatBold,
         editor.isActive('bold'),
-        'Bold'
+        'Chữ đâậm'
       )}
       {btn(
         () => editor.chain().focus().toggleItalic(),
         FormatItalic,
         editor.isActive('italic'),
-        'Italic'
+        'Chữ nghiêng'
       )}
       {btn(
         () => editor.chain().focus().toggleUnderline(),
         FormatUnderlined,
         editor.isActive('underline'),
-        'Underline'
+        'Gạch chân'
       )}
       {btn(
         () => editor.chain().focus().toggleStrike(),
         StrikethroughS,
         editor.isActive('strike'),
-        'Strike'
+        'Gạch ngang'
       )}
       {btn(
         () => editor.chain().focus().toggleCode(),
         Code,
         editor.isActive('code'),
-        'Code'
+        'Mã'
       )}
       {btn(
         () => editor.chain().focus().unsetAllMarks(),
         FormatClear,
         false,
-        'Clear format'
+        'Xoá định dạng'
       )}
 
       <Divider orientation='vertical' flexItem sx={{ mx: 0.5 }} />
@@ -169,12 +223,6 @@ export default function MenuBar({ editor }) {
           </MenuItem>
         ))}
       </Select>
-      {btn(
-        () => editor.chain().focus().unsetNode('heading'),
-        FormatSize,
-        false,
-        'Paragraph'
-      )}
 
       <Divider orientation='vertical' flexItem sx={{ mx: 0.5 }} />
 
@@ -183,19 +231,19 @@ export default function MenuBar({ editor }) {
         () => editor.chain().focus().toggleBulletList(),
         FormatListBulleted,
         editor.isActive('bulletList'),
-        'Bullet List'
+        'Dấu đầu dòng'
       )}
       {btn(
         () => editor.chain().focus().toggleOrderedList(),
         FormatListNumbered,
         editor.isActive('orderedList'),
-        'Ordered List'
+        'Danh sách số'
       )}
       {btn(
         () => editor.chain().focus().toggleTaskList(),
         CodeOff,
         editor.isActive('taskList'),
-        'Task List'
+        'Danh sách công việc'
       )}
 
       <Divider orientation='vertical' flexItem sx={{ mx: 0.5 }} />
@@ -205,55 +253,143 @@ export default function MenuBar({ editor }) {
         () => editor.chain().focus().setTextAlign('left'),
         FormatAlignLeft,
         editor.isActive({ textAlign: 'left' }),
-        'Left'
+        'Canh trái'
       )}
       {btn(
         () => editor.chain().focus().setTextAlign('center'),
         FormatAlignCenter,
         editor.isActive({ textAlign: 'center' }),
-        'Center'
+        'Canh giữa'
       )}
       {btn(
         () => editor.chain().focus().setTextAlign('right'),
         FormatAlignRight,
         editor.isActive({ textAlign: 'right' }),
-        'Right'
+        'Canh phải'
       )}
       {btn(
         () => editor.chain().focus().setTextAlign('justify'),
         FormatAlignJustify,
         editor.isActive({ textAlign: 'justify' }),
-        'Justify'
+        'Canh đều'
       )}
 
       {btn(
         () => editor.chain().focus().sinkListItem('listItem'),
         FormatIndentIncrease,
         false,
-        'Indent'
+        'Qua phải'
       )}
       {btn(
         () => editor.chain().focus().liftListItem('listItem'),
         FormatIndentDecrease,
         false,
-        'Outdent'
+        'Qua trái'
       )}
 
       <Divider orientation='vertical' flexItem sx={{ mx: 0.5 }} />
 
       {/* Color & highlight */}
-      {btn(
-        () => editor.chain().focus().setColor('#F44336'),
-        FormatColorText,
-        false,
-        'Text Color'
-      )}
-      {btn(
-        () => editor.chain().focus().setHighlight({ color: '#FFFF00' }),
-        FormatColorFill,
-        false,
-        'Highlight'
-      )}
+      <Tooltip title='Màu chữ' arrow>
+        <Button
+          size='small'
+          variant='outlined'
+          onClick={handleClickColor}
+          sx={{
+            color: '#000',
+            borderColor: '#000',
+            minWidth: 36,
+            padding: '6px'
+          }}
+        >
+          <FormatColorText fontSize='small' />
+        </Button>
+      </Tooltip>
+
+      <Popover
+        open={open}
+        anchorEl={anchorEl}
+        onClose={handleCloseColor}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
+      >
+        <Box
+          sx={{
+            p: 1,
+            display: 'grid',
+            gridTemplateColumns: 'repeat(8, 24px)',
+            gap: '4px'
+          }}
+        >
+          {colors.map((color) => (
+            <Box
+              key={color}
+              onClick={() => handleChangeColor(color)}
+              sx={{
+                width: 24,
+                height: 24,
+                borderRadius: '4px',
+                bgcolor: color,
+                cursor: 'pointer',
+                border: '1px solid #ccc',
+                '&:hover': {
+                  border: '2px solid #000'
+                }
+              }}
+            />
+          ))}
+        </Box>
+      </Popover>
+
+      {/* Nút màu nền (highlight) */}
+      <Tooltip title='Màu nền' arrow>
+        <Button
+          size='small'
+          variant='outlined'
+          onClick={handleClickBg}
+          sx={{
+            color: '#000',
+            borderColor: '#000',
+            minWidth: 36,
+            padding: '6px'
+          }}
+        >
+          <FormatColorFill fontSize='small' />
+        </Button>
+      </Tooltip>
+
+      <Popover
+        open={openBg}
+        anchorEl={anchorBg}
+        onClose={handleCloseBg}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
+      >
+        <Box
+          sx={{
+            p: 1,
+            display: 'grid',
+            gridTemplateColumns: 'repeat(8, 24px)',
+            gap: '4px'
+          }}
+        >
+          {colors.map((color) => (
+            <Box
+              key={color}
+              onClick={() => handleChangeBg(color)}
+              sx={{
+                width: 24,
+                height: 24,
+                borderRadius: '4px',
+                bgcolor: color,
+                cursor: 'pointer',
+                border: '1px solid #ccc',
+                '&:hover': {
+                  border: '2px solid #000'
+                }
+              }}
+            />
+          ))}
+        </Box>
+      </Popover>
 
       <Divider orientation='vertical' flexItem sx={{ mx: 0.5 }} />
 
@@ -262,13 +398,13 @@ export default function MenuBar({ editor }) {
         () => editor.chain().focus().toggleBlockquote(),
         FormatQuote,
         editor.isActive('blockquote'),
-        'Quote'
+        'Trích dẫn'
       )}
       {btn(
         () => editor.chain().focus().setHorizontalRule(),
         HorizontalRule,
         false,
-        'Horizontal Rule'
+        'Ngăn cách'
       )}
       {btn(
         () => {
@@ -279,9 +415,9 @@ export default function MenuBar({ editor }) {
         },
         LinkIcon,
         editor.isActive('link'),
-        'Link'
+        'Đường dẫn'
       )}
-      {btn(() => setOpenUpload(true), InsertPhoto, false, 'Image')}
+      {btn(() => setOpenUpload(true), InsertPhoto, false, 'Hình ảnh')}
 
       <ModalUploadImage
         open={openUpload}
@@ -313,7 +449,7 @@ export default function MenuBar({ editor }) {
             .insertTable({ rows: 10, cols: 3, withHeaderRow: true }),
         TableChart,
         false,
-        'Insert Table'
+        'Thêm dòng'
       )}
     </Stack>
   )

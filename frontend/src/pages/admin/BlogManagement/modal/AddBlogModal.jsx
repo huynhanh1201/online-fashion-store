@@ -157,7 +157,7 @@ const BlogModal = ({
         status: blogData.status || 'draft',
         metaTitle: blogData.meta?.title || '',
         metaDescription: blogData.meta?.description || '',
-        metaKeywords: blogData.meta?.title || []
+        metaKeywords: blogData.meta?.keywords || []
       })
       // Set image URLs for additional images
       if (blogData.images && blogData.images.length > 0) {
@@ -242,6 +242,7 @@ const BlogModal = ({
         keywords: Array(data.metaTitle || data.title)
       }
     }
+    console.log('Dữ liệu gửi:', data)
     onSave(blogPayload, isEditMode)
     handleClose()
   }
@@ -503,12 +504,14 @@ const BlogModal = ({
                       control={control}
                       render={({ field }) => (
                         <Autocomplete
-                          {...field}
                           options={categories}
                           freeSolo
-                          value={field.value}
-                          onChange={(event, newValue) =>
-                            field.onChange(newValue)
+                          value={field.value ?? ''}
+                          onChange={(_, newValue) =>
+                            field.onChange(newValue ?? '')
+                          }
+                          onInputChange={(_, newInputValue) =>
+                            field.onChange(newInputValue)
                           }
                           renderInput={(params) => (
                             <TextField
@@ -528,12 +531,14 @@ const BlogModal = ({
                       control={control}
                       render={({ field }) => (
                         <Autocomplete
-                          {...field}
                           options={brands}
                           freeSolo
-                          value={field.value}
-                          onChange={(event, newValue) =>
-                            field.onChange(newValue)
+                          value={field.value ?? ''}
+                          onChange={(_, newValue) =>
+                            field.onChange(newValue ?? '')
+                          }
+                          onInputChange={(_, newInputValue) =>
+                            field.onChange(newInputValue)
                           }
                           renderInput={(params) => (
                             <TextField

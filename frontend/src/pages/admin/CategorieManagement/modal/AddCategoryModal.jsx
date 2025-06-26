@@ -168,7 +168,7 @@ const AddCategoryModal = ({
                     backgroundColor: '#fafafa',
                     cursor: 'pointer',
                     width: 350,
-                    height: 345
+                    height: 331
                   }}
                   onClick={() => !previewUrl && fileInputRef.current.click()}
                 >
