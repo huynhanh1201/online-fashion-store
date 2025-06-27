@@ -8,8 +8,8 @@ export const getReviews = async (filter) => {
       `${API_ROOT}/v1/reviews?${query}`
     )
     return {
-      data: response.data || [],
-      total: response.data.length || 1
+      data: response.data.data || [],
+      total: response.data.meta.total || 1
     }
   } catch (error) {
     console.error('Lỗi khi lấy danh sách đánh giá:', error)

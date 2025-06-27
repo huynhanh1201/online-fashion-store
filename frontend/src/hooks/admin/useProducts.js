@@ -43,7 +43,7 @@ const useProducts = () => {
   const [totalPages, setTotalPages] = useState(1)
   const [total, setTotal] = useState(0)
   const [loading, setLoading] = useState(false)
-
+  const [ROWS_PER_PAGE, setROWS_PER_PAGE] = useState(10)
   const fetchProducts = async (page = 1, limit = 10, params = {}) => {
     setLoading(true)
     const buildQuery = (input) => {
@@ -99,14 +99,13 @@ const useProducts = () => {
         let updated = [...prev]
 
         if (sort === 'newest') {
-          updated = [result, ...prev].slice(0, 10)
+          updated = [result, ...prev].slice(0, ROWS_PER_PAGE)
         } else if (sort === 'oldest') {
-          if (prev.length < 10) {
+          if (prev.length < ROWS_PER_PAGE) {
             updated = [...prev, result]
           }
-          // Nếu đã đủ 10 thì không thêm
         } else {
-          updated = [result, ...prev].slice(0, 10)
+          updated = [result, ...prev].slice(0, ROWS_PER_PAGE)
         }
 
         return updated
@@ -164,7 +163,9 @@ const useProducts = () => {
     createNewProduct,
     Save,
     deleteProductById,
-    updateProductById
+    updateProductById,
+    ROWS_PER_PAGE,
+    setROWS_PER_PAGE
   }
 }
 

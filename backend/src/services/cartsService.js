@@ -71,7 +71,8 @@ const getItemCartList = async (userId) => {
     const result = await CartModel.findOne({ userId })
       .populate({
         path: 'cartItems.variantId',
-        select: 'productId color size name importPrice exportPrice discountPrice'
+        select:
+          'productId color size name importPrice exportPrice discountPrice quantity'
       })
       .lean() // sau populate mới gọi lean
 
@@ -100,7 +101,8 @@ const updateItemCart = async (userId, reqBody) => {
     )
       .populate({
         path: 'cartItems.variantId',
-        select: 'productId color size name importPrice exportPrice discountPrice'
+        select:
+          'productId color size name importPrice exportPrice discountPrice'
       })
       .lean() // sau populate mới gọi lean
 

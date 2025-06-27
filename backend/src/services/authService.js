@@ -12,7 +12,7 @@ import { WEBSITE_DOMAIN } from '~/utils/constants'
 import { BrevoProvider } from '~/providers/BrevoProvider'
 
 const register = async (reqBody) => {
-  const { name, email, password: rawPassword, avatarUrl } = reqBody
+  const { name, email, password: rawPassword, avatarUrl, role } = reqBody
 
   // Chuẩn hóa email và tên
   const normalizedEmail = email.trim().toLowerCase()
@@ -33,7 +33,7 @@ const register = async (reqBody) => {
     email: normalizedEmail,
     password: hashedPassword,
     avatarUrl,
-    role: 'customer',
+    role: role || 'customer',
     slug: slugify(normalizedName, { lower: true }),
     destroy: false,
     verifyToken: uuidv4()
@@ -50,6 +50,10 @@ const register = async (reqBody) => {
   <a href="${verificationLink}">${verificationLink}</a>
   <p>Trân trọng,<br/>- Online Shop Store -</p>
 `
+
+  if (role) {
+    return pickUser(user)
+  }
 
   await BrevoProvider.sendEmail(
     normalizedName,
@@ -109,7 +113,7 @@ const login = async (reqBody) => {
       throw new ApiError(StatusCodes.NOT_FOUND, 'Tài khoản không tồn tại!')
     }
 
-    if (!existsUser.isActive) {
+    if (!existsUser.isActive && existsUser.role === 'customer') {
       throw new ApiError(
         StatusCodes.NOT_ACCEPTABLE,
         'Tài khoản của bạn chưa xác thực!'

@@ -120,6 +120,12 @@ const variantSchema = new Schema(
       type: Number,
       default: 0,
       min: 0
+    },
+
+    quantity: {
+      type: Number,
+      default: 0,
+      min: 0
     }
   },
   {

@@ -11,50 +11,36 @@ const FlashSaleSection = () => {
 
   // Countdown logic for each campaign
   useEffect(() => {
-    campaigns.forEach((campaign) => {
-      if (!campaign.endTime || campaign.status === 'expired') return
-      
-      function updateCountdown() {
-        const now = new Date()
-        const end = new Date(campaign.endTime)
-        const diff = end - now
-        
-        if (diff <= 0) {
-          setCampaigns((prev) =>
-            prev.map((c) =>
-              c.id === campaign.id ? { ...c, countdown: 'Đã kết thúc', status: 'expired' } : c
-            )
-          )
-          clearInterval(intervalRefs.current[campaign.id])
-          return
-        }
-        
-        const days = Math.floor(diff / (1000 * 60 * 60 * 24))
-        const hours = Math.floor((diff / (1000 * 60 * 60)) % 24)
-        const minutes = Math.floor((diff / (1000 * 60)) % 60)
-        const seconds = Math.floor((diff / 1000) % 60)
-        const pad = (n) => String(n).padStart(2, '0')
-        
-        const countdownText =
-          days > 0
-            ? `${days} ngày ${pad(hours)}:${pad(minutes)}:${pad(seconds)}`
-            : `${pad(hours)}:${pad(minutes)}:${pad(seconds)}`
-            
-        setCampaigns((prev) =>
-          prev.map((c) =>
-            c.id === campaign.id ? { ...c, countdown: countdownText } : c
-          )
-        )
-      }
-      
-      updateCountdown()
-      intervalRefs.current[campaign.id] = setInterval(updateCountdown, 1000)
-    })
-    
-    return () => {
-      Object.values(intervalRefs.current).forEach(clearInterval)
-    }
-  }, [campaigns])
+    const timer = setInterval(() => {
+      setCampaigns(prevCampaigns =>
+        prevCampaigns.map(campaign => {
+          if (!campaign.endTime || campaign.status === 'expired') return campaign;
+
+          const now = new Date();
+          const end = new Date(campaign.endTime);
+          const diff = end - now;
+
+          if (diff <= 0) {
+            return { ...campaign, countdown: 'Đã kết thúc', status: 'expired' };
+          }
+
+          const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+          const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+          const minutes = Math.floor((diff / (1000 * 60)) % 60);
+          const seconds = Math.floor((diff / 1000) % 60);
+          const pad = n => String(n).padStart(2, '0');
+
+          const countdownText =
+            days > 0
+              ? `${days} ngày ${pad(hours)}:${pad(minutes)}:${pad(seconds)}`
+              : `${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
+
+          return { ...campaign, countdown: countdownText };
+        })
+      );
+    }, 1000);
+    return () => clearInterval(timer);
+  }, []);
 
   useEffect(() => {
     const fetchData = async () => {

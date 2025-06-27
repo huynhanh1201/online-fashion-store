@@ -14,7 +14,6 @@ const DeleteColorModal = React.lazy(() => import('./modal/DeleteColorModal'))
 const ColorManagement = () => {
   const [page, setPage] = React.useState(1)
   const [selectedColor, setSelectedColor] = React.useState(null)
-  const [limit, setLimit] = React.useState(10) // Giới hạn số lượng màu hiển thị mỗi trang
   const [modalType, setModalType] = React.useState(null)
   const [filters, setFilters] = React.useState({
     status: 'false',
@@ -27,13 +26,15 @@ const ColorManagement = () => {
     Loading,
     remove,
     update,
-    createNewColor
+    createNewColor,
+    ROWS_PER_PAGE,
+    setROWS_PER_PAGE
   } = useColors()
   const { hasPermission } = usePermissions()
 
   React.useEffect(() => {
-    fetchColors(page, limit, filters)
-  }, [page, limit, filters])
+    fetchColors(page, ROWS_PER_PAGE, filters)
+  }, [page, ROWS_PER_PAGE, filters])
 
   const handleOpenModal = (type, color) => {
     if (!color || !color._id) return
@@ -79,12 +80,12 @@ const ColorManagement = () => {
         onFilters={handleFilter}
         fetchColors={fetchColors}
         page={page - 1}
-        rowsPerPage={limit}
+        rowsPerPage={ROWS_PER_PAGE}
         total={totalPages}
         onPageChange={handleChangePage}
         onChangeRowsPerPage={(newLimit) => {
           setPage(1)
-          setLimit(newLimit)
+          setROWS_PER_PAGE(newLimit)
         }}
         // Truyền quyền xuống component con
         permissions={{

@@ -15,13 +15,15 @@ import { styled } from '@mui/system'
 import { getCategories } from '~/services/categoryService'
 import { getMenuConfig } from '~/services/admin/webConfig/headerService.js'
 import { useTheme } from '@mui/material/styles'
+import { ChevronLeft, ChevronRight } from '@mui/icons-material'
 
 const StyledButton = styled(Button)(({ theme, active }) => ({
   color: '#000',
   fontWeight: 450,
-  padding: '8px',
+  padding: '8px 16px',
   borderRadius: '10px',
   position: 'relative',
+  textTransform: 'none',
   '&::after': {
     content: '""',
     position: 'absolute',
@@ -41,7 +43,6 @@ const StyledButton = styled(Button)(({ theme, active }) => ({
   }
 }))
 
-// Tạo dữ liệu megamenu: mỗi category là một cột, item là parent (nếu có)
 const getMegaMenuColumns = (categories) => {
   if (!categories || categories.length === 0) return []
   return categories.map((cat) => ({
@@ -62,8 +63,9 @@ const Menu = ({ headerRef }) => {
   const [parentChain, setParentChain] = useState([])
   const [categoryMenuOpen, setCategoryMenuOpen] = useState(false)
   const [isCategoryMenuHovered, setIsCategoryMenuHovered] = useState(false)
-  const [hoveredCategoryIdx, setHoveredCategoryIdx] = useState(null)
-  const [categoryHoverTimeout, setCategoryHoverTimeout] = useState(null)
+  const [currentRow, setCurrentRow] = useState(0)
+  const [prevRow, setPrevRow] = useState(0)
+  const [slideDirection, setSlideDirection] = useState('up')
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('md'))
   const timeoutRef = useRef(null)
@@ -71,16 +73,16 @@ const Menu = ({ headerRef }) => {
   const menuRef = useRef(null)
   const categoryMenuRef = useRef(null)
   const productButtonRef = useRef(null)
+  const [itemsPerRow, setItemsPerRow] = useState(6)
+  const menuContainerRef = useRef(null)
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // Fetch both categories and menu config
         const [categoriesResponse, menuResponse] = await Promise.all([
           getCategories(1, 100),
           getMenuConfig()
         ])
-        
         const categories = categoriesResponse.categories?.data || categoriesResponse || []
         setCategories(categories)
         setMenuConfig(menuResponse?.content || null)
@@ -92,6 +94,59 @@ const Menu = ({ headerRef }) => {
     }
     fetchData()
   }, [])
+
+  useEffect(() => {
+    function updateItemsPerRow() {
+      const width = menuContainerRef.current?.offsetWidth || window.innerWidth
+      if (width > 1200) setItemsPerRow(6)
+      else if (width > 900) setItemsPerRow(5)
+      else if (width > 700) setItemsPerRow(3)
+      else if (width > 500) setItemsPerRow(3)
+      else setItemsPerRow(3)
+    }
+    updateItemsPerRow()
+    window.addEventListener('resize', updateItemsPerRow)
+    return () => window.removeEventListener('resize', updateItemsPerRow)
+  }, [])
+
+  const getMenuRows = () => {
+    const allItems = menuConfig?.mainMenu
+      ? [
+          ...(menuConfig.mainMenu.some(item => item.visible && item.children?.length > 0) ? [{ label: 'Sản phẩm', url: '/product', hasMegaMenu: true }] : []),
+          { label: 'Hàng mới', url: '/productnews', isNew: true },
+          ...menuConfig.mainMenu
+            .filter(item => item.visible && (!item.children || item.children.length === 0))
+            .sort((a, b) => (a.order || 0) - (b.order || 0))
+            .map(item => ({ label: item.label, url: item.url })),
+          ...categories.filter(cat => !cat.destroy).map(cat => ({ label: cat.name, url: `/productbycategory/${cat._id}`, category: cat }))
+        ]
+      : [
+          { label: 'Sản phẩm', url: '/product', hasMegaMenu: true },
+          { label: 'Hàng mới', url: '/productnews', isNew: true },
+          ...categories.filter(cat => !cat.destroy).map(cat => ({ label: cat.name, url: `/productbycategory/${cat._id}`, category: cat }))
+        ]
+    const rows = []
+    for (let i = 0; i < allItems.length; i += itemsPerRow) {
+      rows.push(allItems.slice(i, i + itemsPerRow))
+    }
+    return rows
+  }
+
+  const menuRows = getMenuRows()
+  const canNavigateLeft = currentRow > 0
+  const canNavigateRight = currentRow < menuRows.length - 1
+
+  const navigateRow = (direction) => {
+    if (direction === 'left' && canNavigateLeft) {
+      setSlideDirection('down')
+      setPrevRow(currentRow)
+      setCurrentRow(prev => prev - 1)
+    } else if (direction === 'right' && canNavigateRight) {
+      setSlideDirection('down')
+      setPrevRow(currentRow)
+      setCurrentRow(prev => prev + 1)
+    }
+  }
 
   // Megamenu handlers
   const handleProductEnter = () => {
@@ -127,20 +182,17 @@ const Menu = ({ headerRef }) => {
   const handleCategoryEnter = (category) => {
     if (categoryTimeoutRef.current) clearTimeout(categoryTimeoutRef.current)
     setHoveredCategory(category)
+    setParentChain(getParentChain(category, categories))
     setCategoryMenuOpen(true)
     setIsCategoryMenuHovered(false)
   }
 
   const handleCategoryLeave = () => {
-    if (categoryHoverTimeout) {
-      clearTimeout(categoryHoverTimeout);
-    }
-    // Thêm độ trễ trước khi ẩn submenu
-    const timeout = setTimeout(() => {
-      setHoveredCategory(null);
-      setParentChain([]);
-    }, 200); // 200ms delay
-    setCategoryHoverTimeout(timeout);
+    categoryTimeoutRef.current = setTimeout(() => {
+      setHoveredCategory(null)
+      setParentChain([])
+      setCategoryMenuOpen(false)
+    }, 200)
   }
 
   const handleCategoryMenuEnter = () => {
@@ -187,326 +239,200 @@ const Menu = ({ headerRef }) => {
       document.removeEventListener('mousedown', handleOutsideClick)
       if (timeoutRef.current) clearTimeout(timeoutRef.current)
       if (categoryTimeoutRef.current) clearTimeout(categoryTimeoutRef.current)
-      if (categoryHoverTimeout) clearTimeout(categoryHoverTimeout)
     }
-  }, [categoryHoverTimeout])
+  }, [])
 
-  // Organize categories for megamenu
-  const menuColumns = categories.map((category) => ({
-    title: category.name,
-    items: category.parent ? [category.parent.name] : []
-  }))
-
-  const visibleCategories = categories.filter(cat => !cat.destroy)
-
-  // Hàm truy ngược parent chain
   const getParentChain = (category, allCategories) => {
-    const chain = [];
-    let current = category;
+    const chain = []
+    let current = category
     while (current && current.parent) {
-      const parent = allCategories.find(cat => cat._id === (typeof current.parent === 'object' ? current.parent._id : current.parent));
+      const parent = allCategories.find(cat => cat._id === (typeof current.parent === 'object' ? current.parent._id : current.parent))
       if (parent) {
-        chain.unshift(parent);
-        current = parent;
+        chain.unshift(parent)
+        current = parent
       } else {
-        break;
+        break
       }
     }
-    return chain;
-  };
-
-  // Hàm xử lý hover đơn giản
-  const handleCategoryHover = (category) => {
-    // Clear timeout cũ nếu có
-    if (categoryHoverTimeout) {
-      clearTimeout(categoryHoverTimeout);
-    }
-    
-    // Set timeout để tránh submenu xuất hiện quá nhanh
-    const timeout = setTimeout(() => {
-      setHoveredCategory(category._id);
-      setParentChain(getParentChain(category, categories));
-    }, 150); // 150ms delay
-    
-    setCategoryHoverTimeout(timeout);
-  };
+    return chain
+  }
 
   return (
-    <>
-      <Box
-        sx={{
-          display: { xs: 'none', md: 'flex' },
-          alignItems: 'center',
-          gap: 2
-        }}
-      >
-        {/* Render menu items from config or fallback to categories */}
-        {menuConfig?.mainMenu ? (
-          // Use menu config
-          <>
-            {/* Sản phẩm - MegaMenu (chỉ hiển thị nếu có items với submenu) */}
-            {menuConfig.mainMenu.some(item => item.visible && item.children?.length > 0) && (
-              <Box
-                onMouseEnter={handleProductEnter}
-                onMouseLeave={handleProductLeave}
-                sx={{ position: 'relative' }}
-              >
-                <StyledButton
-                  href='/product'
-                  active={productMenuOpen || isDrawerHovered}
-                  ref={productButtonRef}
+    <Box
+      sx={{
+        display: { xs: 'none', md: 'flex' },
+        alignItems: 'center',
+        position: 'relative',
+        flex: 1,
+        gap: 2,
+        width: '100%',
+        maxWidth: '1400px',
+      }}
+    >
+      {/* Menu container với arrow ngoài cùng bên phải, menu item luôn căn giữa và rộng rãi */}
+      <Box sx={{ display: 'flex', alignItems: 'center', flex: 1, minWidth: 0, justifyContent: 'center', position: 'relative', width: '100%', maxWidth: '1400px', mx: 'auto', height: 56 }}>
+        {/* Menu item */}
+        <Box sx={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', minWidth: 0, overflow: 'hidden', width: '100%', maxWidth: '1400px' }}>
+          <Slide
+            direction={slideDirection}
+            in={true}
+            key={currentRow}
+            mountOnEnter
+            unmountOnExit
+            timeout={350}
+          >
+            <Box
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                width: '100%',
+                minHeight: 48,
+                justifyContent: 'center',
+                position: 'relative',
+                left: 0,
+                right: 0,
+                top: 0,
+                maxWidth: '1400px',
+              }}
+            >
+              {menuRows[currentRow]?.map((item, index) => (
+                <Box
+                  key={item.label + index}
+                  sx={{ display: 'inline-flex', position: 'relative' }}
+                  onMouseEnter={() => item.category && handleCategoryEnter(item.category)}
+                  onMouseLeave={() => item.category && handleCategoryLeave()}
                 >
-                  Sản phẩm
-                </StyledButton>
-              </Box>
-            )}
-
-            {/* Hàng mới với nhãn dán news */}
-            <Box
-              sx={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                position: 'relative',
-                mr: 0.5
-              }}
-            >
-              <Badge
-                badgeContent={
-                  <span style={{ fontSize: '12px', fontWeight: 700, color: 'red' }}>
-                    mới
-                  </span>
-                }
-                color='default'
-                anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
-                sx={{
-                  '& .MuiBadge-badge': {
-                    top: 2,
-                    right: 2,
-                    padding: 0,
-                    minWidth: 0,
-                    height: 'auto',
-                    background: 'none',
-                    borderRadius: 0,
-                    zIndex: 1
-                  }
-                }}
-              >
-                <StyledButton href='/productnews' sx={{ pr: 2 }}>
-                  Hàng mới
-                </StyledButton>
-              </Badge>
-            </Box>
-
-            {/* Các menu items khác */}
-            {menuConfig.mainMenu
-              .filter(item => item.visible && (!item.children || item.children.length === 0))
-              .sort((a, b) => (a.order || 0) - (b.order || 0))
-              .map((item, index) => (
-                <StyledButton key={index} href={item.url}>
-                  {item.label}
-                </StyledButton>
+                  {item.isNew ? (
+                    <Badge
+                      badgeContent={
+                        <span style={{ fontSize: '12px', fontWeight: 700, color: 'red' }}>
+                          mới
+                        </span>
+                      }
+                      color='default'
+                      anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+                      sx={{
+                        '& .MuiBadge-badge': {
+                          top: 2,
+                          padding: 0,
+                          minWidth: 0,
+                          height: 'auto',
+                          background: 'none',
+                          borderRadius: 0,
+                        }
+                      }}
+                    >
+                      <StyledButton href={item.url}>
+                        {item.label}
+                      </StyledButton>
+                    </Badge>
+                  ) : (
+                    <StyledButton
+                      href={item.url}
+                      active={item.hasMegaMenu && (productMenuOpen || isDrawerHovered)}
+                      ref={item.hasMegaMenu ? productButtonRef : null}
+                      onMouseEnter={item.hasMegaMenu ? handleProductEnter : undefined}
+                      onMouseLeave={item.hasMegaMenu ? handleProductLeave : undefined}
+                    >
+                      {item.label}
+                    </StyledButton>
+                  )}
+                  {/* Submenu cho category */}
+                  {item.category && hoveredCategory?._id === item.category._id && parentChain.length > 0 && (
+                    <Box
+                      onMouseEnter={handleCategoryMenuEnter}
+                      onMouseLeave={handleCategoryMenuLeave}
+                      sx={{
+                        position: 'absolute',
+                        top: '100%',
+                        left: '50%',
+                        transform: 'translateX(-50%)',
+                        bgcolor: 'white',
+                        boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.1)',
+                        minWidth: 200,
+                        maxWidth: '95vw',
+                        zIndex: 1000,
+                        borderRadius: 1,
+                        border: '1px solid #e2e8f0',
+                        animation: 'slideDown 0.2s ease-out',
+                        '@keyframes slideDown': {
+                          '0%': { opacity: 0, transform: 'scaleY(0.95)' },
+                          '100%': { opacity: 1, transform: 'scaleY(1)' }
+                        }
+                      }}
+                    >
+                      <List sx={{ p: 0, m: 0 }}>
+                        {parentChain.map((parent) => (
+                          <ListItem key={parent._id} sx={{ p: 0, m: 0 }}>
+                            <ListItemButton
+                              href={`/productbycategory/${parent._id}`}
+                              sx={{
+                                color: '#333',
+                                fontWeight: 400,
+                                fontSize: '0.9rem',
+                                py: 1,
+                                px: 2,
+                                transition: 'all 0.2s ease',
+                                '&:hover': {
+                                  color: '#1976d2',
+                                  background: '#f8fafc'
+                                }
+                              }}
+                            >
+                              <ListItemText primary={parent.name} />
+                            </ListItemButton>
+                          </ListItem>
+                        ))}
+                      </List>
+                    </Box>
+                  )}
+                </Box>
               ))}
-
-            {/* Categories hiển thị trong menu */}
-            {visibleCategories.map((cat) => (
-              <Box
-                key={cat._id}
-                onMouseEnter={() => {
-                  handleCategoryHover(cat);
-                }}
-                onMouseLeave={() => {
-                  handleCategoryLeave();
-                }}
-                sx={{ position: 'relative', display: 'inline-block' }}
-              >
-                <StyledButton href={`/productbycategory/${cat._id}`}>{cat.name}</StyledButton>
-                {/* Submenu hiển thị parent chain */}
-                {hoveredCategory === cat._id && parentChain.length > 0 && (
-                  <Box
-                    onMouseEnter={() => {
-                      // Giữ submenu khi hover vào nó
-                      if (categoryHoverTimeout) {
-                        clearTimeout(categoryHoverTimeout);
-                      }
-                    }}
-                    onMouseLeave={() => {
-                      handleCategoryLeave();
-                    }}
-                    sx={{
-                      position: 'absolute',
-                      top: '100%',
-                      left: 0,
-                      bgcolor: 'white',
-                      boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.1)',
-                      minWidth: 200,
-                      zIndex: 1000,
-                      borderRadius: 1,
-                      pt: '4px',
-                      border: '1px solid #e2e8f0',
-                      animation: 'slideDown 0.2s ease-out',
-                      '@keyframes slideDown': {
-                        '0%': { opacity: 0, transform: 'scaleY(0.95)' },
-                        '100%': { opacity: 1, transform: 'scaleY(1)' }
-                      }
-                    }}
-                  >
-                    <List sx={{ p: 0, m: 0 }}>
-                      {parentChain.map((parent) => (
-                        <ListItem key={parent._id} sx={{ p: 0, m: 0 }}>
-                          <ListItemButton
-                            href={`/productbycategory/${parent._id}`}
-                            sx={{
-                              color: '#333',
-                              fontWeight: 400,
-                              fontSize: '0.9rem',
-                              py: 1,
-                              px: 2,
-                              transition: 'all 0.2s ease',
-                              '&:hover': {
-                                color: '#1976d2',
-                                background: '#f8fafc'
-                              }
-                            }}
-                          >
-                            <ListItemText primary={parent.name} />
-                          </ListItemButton>
-                        </ListItem>
-                      ))}
-                    </List>
-                  </Box>
-                )}
-              </Box>
-            ))}
-          </>
-        ) : (
-          // Fallback to original categories-based menu
-          <>
-            {/* Sản phẩm - MegaMenu */}
-            <Box
-              onMouseEnter={handleProductEnter}
-              onMouseLeave={handleProductLeave}
-              sx={{ position: 'relative' }}
-            >
-              <StyledButton
-                href='/product'
-                active={productMenuOpen || isDrawerHovered}
-                ref={productButtonRef}
-              >
-                Sản phẩm
-              </StyledButton>
             </Box>
-
-            {/* Hàng mới với nhãn dán news */}
-            <Box
-              sx={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                position: 'relative',
-                mr: 0.5
-              }}
-            >
-              <Badge
-                badgeContent={
-                  <span style={{ fontSize: '12px', fontWeight: 700, color: 'red' }}>
-                    mới
-                  </span>
-                }
-                color='default'
-                anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
-                sx={{
-                  '& .MuiBadge-badge': {
-                    top: 2,
-                    right: 2,
-                    padding: 0,
-                    minWidth: 0,
-                    height: 'auto',
-                    background: 'none',
-                    borderRadius: 0,
-                    zIndex: 1
-                  }
-                }}
-              >
-                <StyledButton href='/productnews' sx={{ pr: 2 }}>
-                  Hàng mới
-                </StyledButton>
-              </Badge>
-            </Box>
-
-            {/* Categories */}
-            {visibleCategories.map((cat) => (
-              <Box
-                key={cat._id}
-                onMouseEnter={() => {
-                  handleCategoryHover(cat);
-                }}
-                onMouseLeave={() => {
-                  handleCategoryLeave();
-                }}
-                sx={{ position: 'relative', display: 'inline-block' }}
-              >
-                <StyledButton href={`/productbycategory/${cat._id}`}>{cat.name}</StyledButton>
-                {/* Submenu hiển thị parent chain */}
-                {hoveredCategory === cat._id && parentChain.length > 0 && (
-                  <Box
-                    onMouseEnter={() => {
-                      // Giữ submenu khi hover vào nó
-                      if (categoryHoverTimeout) {
-                        clearTimeout(categoryHoverTimeout);
-                      }
-                    }}
-                    onMouseLeave={() => {
-                      handleCategoryLeave();
-                    }}
-                    sx={{
-                      position: 'absolute',
-                      top: '100%',
-                      left: 0,
-                      bgcolor: 'white',
-                      boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.1)',
-                      minWidth: 200,
-                      zIndex: 1000,
-                      borderRadius: 1,
-                      pt: '4px',
-                      border: '1px solid #e2e8f0',
-                      animation: 'slideDown 0.2s ease-out',
-                      '@keyframes slideDown': {
-                        '0%': { opacity: 0, transform: 'scaleY(0.95)' },
-                        '100%': { opacity: 1, transform: 'scaleY(1)' }
-                      }
-                    }}
-                  >
-                    <List sx={{ p: 0, m: 0 }}>
-                      {parentChain.map((parent) => (
-                        <ListItem key={parent._id} sx={{ p: 0, m: 0 }}>
-                          <ListItemButton
-                            href={`/productbycategory/${parent._id}`}
-                            sx={{
-                              color: '#333',
-                              fontWeight: 400,
-                              fontSize: '0.9rem',
-                              py: 1,
-                              px: 2,
-                              transition: 'all 0.2s ease',
-                              '&:hover': {
-                                color: '#1976d2',
-                                background: '#f8fafc'
-                              }
-                            }}
-                          >
-                            <ListItemText primary={parent.name} />
-                          </ListItemButton>
-                        </ListItem>
-                      ))}
-                    </List>
-                  </Box>
-                )}
-              </Box>
-            ))}
-          </>
-        )}
+          </Slide>
+        </Box>
+        {/* 2 arrow ngoài cùng bên phải, nhỏ lại */}
+        <Box sx={{ display: 'flex', flexDirection: 'row', ml: 0.5 }}>
+          <Button
+            onClick={() => navigateRow('left')}
+            disabled={!canNavigateLeft}
+            sx={{
+              minWidth: 8,
+              width: 20,
+              height: 20,
+              borderRadius: '6px 0 0 6px',
+              background: 'transparent',
+              boxShadow: 'none',
+              minHeight: 0,
+              '&:hover': {
+                background: 'transparent'
+              }
+            }}
+          >
+            <ChevronLeft sx={{ fontSize: 20, color: canNavigateLeft ? '#1A3C7B' : '#ccc', fontWeight: canNavigateLeft ? 700 : 400 }} />
+          </Button>
+          <Button
+            onClick={() => navigateRow('right')}
+            disabled={!canNavigateRight}
+            sx={{
+              minWidth: 8,
+              width: 20,
+              height: 20,
+              borderRadius: '0 6px 6px 0',
+              background: 'transparent',
+              boxShadow: 'none',
+              minHeight: 0,
+              '&:hover': {
+                background: 'transparent'
+              }
+            }}
+          >
+            <ChevronRight sx={{ fontSize: 20, color: canNavigateRight ? '#1A3C7B' : '#ccc', fontWeight: canNavigateRight ? 700 : 400 }} />
+          </Button>
+        </Box>
       </Box>
 
-      {/* MegaMenu Block với hiệu ứng co giãn chiều cao từ 0% đến 100% */}
+      {/* MegaMenu Block */}
       {((menuConfig?.mainMenu && menuConfig.mainMenu.some(item => item.visible && item.children?.length > 0)) || 
         (!menuConfig?.mainMenu && categories.length > 0)) && (
         <Box
@@ -521,19 +447,15 @@ const Menu = ({ headerRef }) => {
             transformOrigin: 'top',
             width: '95vw',
             maxWidth: '2000px',
-            borderTopLeftRadius: 0,
-            borderTopRightRadius: 0,
-            borderBottomLeftRadius: 8,
-            borderBottomRightRadius: 8,
+            borderRadius: '0 0 8px 8px',
             boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.1)',
             p: productMenuOpen ? 4 : 0,
             zIndex: 1400,
             backgroundColor: 'white',
             display: 'flex',
-            justifyContent: 'start',
+            justifyContent: 'center',
             overflow: 'hidden',
-            transition:
-              'transform 0.35s ease, padding 0.2s ease, opacity 0.35s ease',
+            transition: 'transform 0.35s ease, padding 0.2s ease, opacity 0.35s ease',
             opacity: productMenuOpen ? 1 : 0,
             pointerEvents: productMenuOpen ? 'auto' : 'none'
           }}
@@ -550,32 +472,31 @@ const Menu = ({ headerRef }) => {
               width: '100%',
               maxWidth: 2000,
               opacity: productMenuOpen ? 1 : 0,
-              transition: 'opacity 0.35s ease'
+              transition: 'opacity 0.35s ease',
+              alignItems: 'center',
+              justifyItems: 'center',
             }}
           >
             {menuConfig?.mainMenu ? (
-              // Use menu config for megamenu - mỗi item có submenu tạo thành 1 cột
               menuConfig.mainMenu
                 .filter(item => item.visible && item.children?.length > 0)
                 .sort((a, b) => (a.order || 0) - (b.order || 0))
                 .map((item, idx) => (
                   <Box
                     key={item.label + idx}
-                    sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}
+                    sx={{ display: 'flex', flexDirection: 'column', gap: 1, alignItems: 'center', textAlign: 'center' }}
                   >
-                    {/* Title của cột */}
                     <Typography
                       sx={{
                         fontWeight: 'bold',
                         mb: 1.2,
                         textTransform: 'uppercase',
-                        fontSize: '1.08rem'
+                        fontSize: '1.08rem',
+                        textAlign: 'center'
                       }}
                     >
                       {item.label}
                     </Typography>
-                    
-                    {/* Các items trong cột */}
                     {item.children
                       .filter(child => child.visible)
                       .sort((a, b) => (a.order || 0) - (b.order || 0))
@@ -584,8 +505,8 @@ const Menu = ({ headerRef }) => {
                           key={child.label + i}
                           href={child.url}
                           sx={{
-                            justifyContent: 'flex-start',
-                            textAlign: 'left',
+                            justifyContent: 'center',
+                            textAlign: 'center',
                             color: '#222',
                             fontWeight: 400,
                             fontSize: '1rem',
@@ -596,7 +517,7 @@ const Menu = ({ headerRef }) => {
                             '&:hover': {
                               color: '#1976d2',
                               background: 'none',
-                              transform: 'translateX(5px)',
+                              transform: 'translateY(-2px)',
                               transition: 'all 0.2s ease'
                             }
                           }}
@@ -604,14 +525,13 @@ const Menu = ({ headerRef }) => {
                           {child.label}
                         </Button>
                       ))}
-                    
-                    {/* Thông báo nếu không có items */}
                     {item.children?.filter(child => child.visible).length === 0 && (
                       <Typography
                         sx={{
                           color: 'text.secondary',
                           fontSize: '0.95rem',
-                          fontStyle: 'italic'
+                          fontStyle: 'italic',
+                          textAlign: 'center'
                         }}
                       >
                         Chưa có danh mục
@@ -620,7 +540,6 @@ const Menu = ({ headerRef }) => {
                   </Box>
                 ))
             ) : (
-              // Fallback to categories-based megamenu - chỉ khi không có menu config
               getMegaMenuColumns(categories).map((col, idx) => (
                 <Box
                   key={col.title + idx}
@@ -759,7 +678,7 @@ const Menu = ({ headerRef }) => {
           </Box>
         </Box>
       </Slide>
-    </>
+    </Box>
   )
 }
 

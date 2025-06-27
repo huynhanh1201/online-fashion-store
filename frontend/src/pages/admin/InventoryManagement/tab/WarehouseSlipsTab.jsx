@@ -36,7 +36,9 @@ const WarehouseSlipsTab = () => {
     fetchWarehouseSlips,
     createNewWarehouseSlip,
     loadingSlip,
-    totalPageSlip
+    totalPageSlip,
+    ROWS_PER_PAGE,
+    setROWS_PER_PAGE
   } = useWarehouseSlips()
 
   const { variants, fetchVariants } = useVariants()
@@ -49,7 +51,6 @@ const WarehouseSlipsTab = () => {
   const [selectedSlip, setSelectedSlip] = useState(null) // State cho phiếu được chọn
   const [modalType, setModalType] = useState('input')
   const [page, setPage] = useState(1)
-  const [rowsPerPage, setRowsPerPage] = useState(10)
   const [filter, setFilter] = useState({
     sort: 'newest'
   })
@@ -57,8 +58,8 @@ const WarehouseSlipsTab = () => {
     fetchWarehouses(1, 10, { status: false })
   }, [])
   useEffect(() => {
-    fetchWarehouseSlips(page, rowsPerPage, filter)
-  }, [page, rowsPerPage, filter])
+    fetchWarehouseSlips(page, ROWS_PER_PAGE, filter)
+  }, [page, ROWS_PER_PAGE, filter])
 
   const isEqual = (obj1, obj2) => JSON.stringify(obj1) === JSON.stringify(obj2)
 
@@ -83,9 +84,9 @@ const WarehouseSlipsTab = () => {
   ])
 
   const handleOpenModal = (type) => {
-    fetchPartners()
+    fetchPartners(1, 100000, { status: false })
     fetchWarehouses(1, 10, { status: false })
-    fetchVariants()
+    fetchVariants(1, 100000, { status: false })
     fetchBatches()
     setModalType(type)
     setNewSlipData({
@@ -173,8 +174,8 @@ const WarehouseSlipsTab = () => {
       typeof slip.warehouseId === 'object'
         ? slip.warehouseId.name
         : warehouses.find(
-          (w) => w._id === slip.warehouseId || w.id === slip.warehouseId
-        )?.name
+            (w) => w._id === slip.warehouseId || w.id === slip.warehouseId
+          )?.name
 
     return {
       ...slip,
@@ -214,7 +215,7 @@ const WarehouseSlipsTab = () => {
 
   const onChangeRowsPerPage = (newLimit) => {
     setPage(1)
-    setRowsPerPage(newLimit)
+    setROWS_PER_PAGE(newLimit)
   }
 
   return (
@@ -358,7 +359,7 @@ const WarehouseSlipsTab = () => {
                     // Xử lý các field đặc biệt
                     switch (col.id) {
                       case 'index':
-                        rawValue = index + 1 + (page - 1) * rowsPerPage
+                        rawValue = index + 1 + (page - 1) * ROWS_PER_PAGE
                         break
                       case 'createdAtFormatted': {
                         const date = new Date(row.createdAt)
@@ -432,7 +433,10 @@ const WarehouseSlipsTab = () => {
                             </Tooltip>
                           )}
                           {!hasPermission('warehouseSlip:read') && (
-                            <Typography variant='caption' color='text.secondary'>
+                            <Typography
+                              variant='caption'
+                              color='text.secondary'
+                            >
                               Không có quyền
                             </Typography>
                           )}
@@ -472,7 +476,7 @@ const WarehouseSlipsTab = () => {
         rowsPerPageOptions={[10, 25, 100]}
         component='div'
         count={totalPageSlip || 0}
-        rowsPerPage={rowsPerPage}
+        rowsPerPage={ROWS_PER_PAGE}
         page={page - 1}
         onPageChange={(event, newPage) => handleChangePage(event, newPage + 1)} // truyền lại đúng logic cho parent
         onRowsPerPageChange={(event) => {
@@ -483,7 +487,7 @@ const WarehouseSlipsTab = () => {
         }}
         labelRowsPerPage='Số dòng mỗi trang'
         labelDisplayedRows={({ from, to, count }) => {
-          const totalPages = Math.ceil(count / rowsPerPage)
+          const totalPages = Math.ceil(count / ROWS_PER_PAGE)
           return `${from}–${to} trên ${count} | Trang ${page} / ${totalPages}`
         }}
         ActionsComponent={TablePaginationActions}

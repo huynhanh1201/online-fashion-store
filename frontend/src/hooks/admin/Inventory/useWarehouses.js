@@ -80,10 +80,9 @@ const useWarehouses = () => {
       const result = await updateWarehouse(id, data)
       if (result) {
         setWarehouses((prev) =>
-          prev.map((warehouse) =>
-            warehouse.id === id ? { ...warehouse, ...data } : warehouse
-          )
+          prev.map((warehouse) => (warehouse._id === id ? result : warehouse))
         )
+        console.log('Warehouse updated successfully:', result)
         return result
       } else {
         throw new Error('Failed to update warehouse')

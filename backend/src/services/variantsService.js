@@ -6,7 +6,6 @@ import { ProductModel } from '~/models/ProductModel'
 import generateSKU from '~/utils/generateSKU'
 import validatePagination from '~/utils/validatePagination'
 import getDateRange from '~/utils/getDateRange'
-import Joi from 'joi'
 
 const createVariant = async (reqBody) => {
   // eslint-disable-next-line no-useless-catch

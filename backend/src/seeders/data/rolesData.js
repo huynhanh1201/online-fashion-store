@@ -7,102 +7,141 @@ export const roles = [
       'admin:access',
 
       // User
+      'user:use',
       'user:create',
       'user:read',
       'user:update',
       'user:delete',
 
       // Category
+      'category:use',
       'category:create',
       'category:read',
       'category:update',
       'category:delete',
 
       // Product
+      'product:use',
       'product:create',
       'product:read',
       'product:update',
       'product:delete',
 
       // Variant
+      'variant:use',
       'variant:create',
       'variant:read',
       'variant:update',
       'variant:delete',
 
       // Color
+      'color:use',
       'color:create',
       'color:read',
       'color:update',
       'color:delete',
 
       // Color Palette
+      'colorPalette:use',
       'colorPalette:create',
       'colorPalette:read',
       'colorPalette:update',
       'colorPalette:delete',
 
       // Size
+      'size:use',
       'size:create',
       'size:read',
       'size:update',
       'size:delete',
 
       // Size Palette
+      'sizePalette:use',
       'sizePalette:create',
       'sizePalette:read',
       'sizePalette:update',
       'sizePalette:delete',
 
       // Order
+      'order:use',
       'order:read',
       'order:update',
 
       // Payment Transaction
+      'paymentTransaction:use',
       'payment:read',
       'payment:update',
 
       // Coupon
+      'coupon:use',
       'coupon:create',
       'coupon:read',
       'coupon:update',
       'coupon:delete',
 
       // Statistics
+      'statistics:use',
       'statistics:read',
 
       // Inventory
+      'inventory:use',
       'inventory:read',
       'inventory:update',
 
       // Warehouse Slip
+      'warehouseSlip:use',
       'warehouseSlip:create',
       'warehouseSlip:read',
 
       // Inventory Log
+      'inventoryLog:use',
       'inventoryLog:read',
 
       // Warehouse
+      'warehouse:use',
       'warehouse:create',
       'warehouse:read',
       'warehouse:update',
       'warehouse:delete',
 
       // Batch
+      'batch:use',
       'batch:read',
       'batch:update',
 
       // Partner
+      'partner:use',
       'partner:create',
       'partner:read',
       'partner:update',
       'partner:delete',
 
       // Review
+      'review:use',
       'review:create',
       'review:read',
       'review:update',
-      'review:delete'
+      'review:delete',
+
+      // Blog
+      'blog:use',
+      'blog:create',
+      'blog:read',
+      'blog:update',
+      'blog:delete',
+
+      // Account
+      'account:use',
+      'account:create',
+      'account:read',
+      'account:update',
+      'account:delete',
+
+      // Role
+      'role:use',
+      'role:create',
+      'role:read',
+      'role:update'
     ]
   },
   {
