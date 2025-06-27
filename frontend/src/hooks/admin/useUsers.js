@@ -1,11 +1,16 @@
 import { useState } from 'react'
-import { getUsers, deleteUser, updateUser } from '~/services/admin/userService'
+import {
+  getUsers,
+  deleteUser,
+  updateUser,
+  CreateUser
+} from '~/services/admin/userService'
 
 export default function useUsers() {
   const [users, setUsers] = useState([])
   const [totalPages, setTotalPages] = useState(1)
   const [Loading, setLoading] = useState(false)
-  const ROWS_PER_PAGE = 10
+  const [ROWS_PER_PAGE, setROWS_PER_PAGE] = useState(10)
 
   const fetchUsers = async (page = 1, limit = 10, filters = {}) => {
     setLoading(true)
@@ -32,6 +37,39 @@ export default function useUsers() {
     }
 
     setLoading(false)
+  }
+
+  const add = async (data, filters = {}) => {
+    try {
+      const newAccount = await CreateUser(data)
+      if (!newAccount) {
+        console.error('Tạo blog thất bại')
+        return null
+      }
+
+      setUsers((prev) => {
+        const sort = filters?.sort
+        let updated = [...prev]
+
+        if (sort === 'newest') {
+          updated = [newAccount, ...prev].slice(0, ROWS_PER_PAGE)
+        } else if (sort === 'oldest') {
+          if (prev.length < ROWS_PER_PAGE) {
+            updated = [...prev, newAccount]
+          }
+        } else {
+          updated = [newAccount, ...prev].slice(0, ROWS_PER_PAGE)
+        }
+
+        return updated
+      })
+
+      setTotalPages((prev) => prev + 1)
+      return newAccount
+    } catch (err) {
+      console.error('Lỗi khi thêm blog:', err)
+      return null
+    }
   }
 
   const update = async (id, data) => {
@@ -65,5 +103,15 @@ export default function useUsers() {
     }
   }
 
-  return { users, totalPages, fetchUsers, removeUser, Loading, update }
+  return {
+    users,
+    totalPages,
+    fetchUsers,
+    removeUser,
+    Loading,
+    update,
+    add,
+    ROWS_PER_PAGE,
+    setROWS_PER_PAGE
+  }
 }

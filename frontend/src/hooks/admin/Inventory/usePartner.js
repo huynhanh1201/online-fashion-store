@@ -11,6 +11,7 @@ const usePartner = () => {
   const [partners, setPartners] = React.useState([])
   const [totalPartner, setTotal] = React.useState(0)
   const [loadingPartner, setLoading] = React.useState(false)
+  const [ROWS_PER_PAGE, setROWS_PER_PAGE] = React.useState(10)
   const fetchPartners = async (page = 1, limit = 10, filters = {}) => {
     setLoading(true)
     const buildQuery = (input) => {
@@ -63,14 +64,14 @@ const usePartner = () => {
         let updated = [...prev]
 
         if (sort === 'newest') {
-          updated = [newPartner, ...prev].slice(0, 10)
+          updated = [newPartner, ...prev].slice(0, ROWS_PER_PAGE)
         } else if (sort === 'oldest') {
-          if (prev.length < 10) {
+          if (prev.length < ROWS_PER_PAGE) {
             updated = [...prev, newPartner]
           }
           // Đủ 10 phần tử thì không thêm
         } else {
-          updated = [newPartner, ...prev].slice(0, 10)
+          updated = [newPartner, ...prev].slice(0, ROWS_PER_PAGE)
         }
 
         return updated
@@ -87,6 +88,10 @@ const usePartner = () => {
   const updateExistingPartner = async (id, data) => {
     try {
       const updatedPartner = await updatePartner(id, data)
+      if (!updatedPartner) {
+        console.error('Không thể cập nhật đối tác')
+        return null
+      }
       setPartners((prev) =>
         prev.map((partner) =>
           partner._id === updatedPartner._id ? updatedPartner : partner
@@ -124,7 +129,9 @@ const usePartner = () => {
     createNewPartner,
     updateExistingPartner,
     removePartner,
-    Save
+    Save,
+    ROWS_PER_PAGE,
+    setROWS_PER_PAGE
   }
 }
 

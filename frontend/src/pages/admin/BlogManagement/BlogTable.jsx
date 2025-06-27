@@ -28,6 +28,7 @@ import TablePaginationActions from '~/components/PaginationAdmin/TablePagination
 import FilterBlog from '~/components/FilterAdmin/FilterBlog.jsx'
 import usePermissions from '~/hooks/usePermissions'
 
+import CircularProgress from '@mui/material/CircularProgress'
 const BlogTable = ({
   blogs,
   onAdd,
@@ -124,7 +125,13 @@ const BlogTable = ({
             </TableRow>
           </TableHead>
           <TableBody>
-            {blogs && blogs.length > 0 ? (
+            {loading ? (
+              <TableRow>
+                <TableCell colSpan={columns.length} align='center'>
+                  <CircularProgress />
+                </TableCell>
+              </TableRow>
+            ) : blogs && blogs.length > 0 ? (
               blogs.map((blog, index) => (
                 <BlogRow
                   key={blog._id}

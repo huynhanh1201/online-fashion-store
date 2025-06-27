@@ -200,7 +200,8 @@ const ProductTable = ({
   fetchCategories,
   onFilter,
   fetchProducts,
-  permissions = {}
+  permissions = {},
+  initialSearch
 }) => {
   const columns = [
     { id: 'index', label: 'STT', minWidth: 50, align: 'center' },
@@ -276,6 +277,7 @@ const ProductTable = ({
                     onFilter={onFilter}
                     products={products}
                     fetchProducts={fetchProducts}
+                    initialSearch={initialSearch}
                   />
                 </Box>
               </TableCell>
@@ -294,6 +296,7 @@ const ProductTable = ({
                     pr: column.pr,
                     ...(column.id === 'action' && {
                       maxWidth: 130,
+                      width: '130px',
                       paddingLeft: '16px'
                     }),
                     ...(column.id === 'index' && { width: 50 })

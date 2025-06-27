@@ -201,11 +201,11 @@ export default function FilterProduct({
   fetchCategories,
   loading,
   products,
-  fetchProducts
+  initialSearch
 }) {
   const [keyword, setKeyword] = useState('')
   const [inputValue, setInputValue] = useState('')
-  const [category, setCategory] = useState('')
+  const [category, setCategory] = useState(initialSearch || '')
   const [priceMin, setPriceMin] = useState('')
   const [priceMax, setPriceMax] = useState('')
   const [status, setStatus] = useState('false')

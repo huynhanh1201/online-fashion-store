@@ -27,6 +27,16 @@ const ViewWarehouseSlipModal = ({ open, onClose, slip }) => {
       onClose={onClose}
       maxWidth='md'
       fullWidth
+      sx={{
+        mt: '64px',
+        '& .MuiDialog-container': { alignItems: 'end' },
+        '& .MuiDialog-paper': {
+          maxHeight: '96%',
+          height: '96%',
+          mt: 0,
+          mb: 2.4
+        }
+      }}
       BackdropProps={{
         sx: StyleAdmin.OverlayModal
       }}

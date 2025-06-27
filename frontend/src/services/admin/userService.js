@@ -44,3 +44,16 @@ export const deleteUser = async (id) => {
     return false
   }
 }
+
+export const CreateUser = async (data) => {
+  try {
+    const response = await AuthorizedAxiosInstance.post(
+      `${API_ROOT}/v1/auth/register`,
+      data
+    )
+    return response.data
+  } catch (error) {
+    console.error('Lỗi khi tạo người dùng:', error)
+    throw error
+  }
+}

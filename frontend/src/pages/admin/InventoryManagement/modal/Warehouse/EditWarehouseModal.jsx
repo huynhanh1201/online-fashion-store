@@ -259,8 +259,7 @@ const EditWarehouseModal = ({ open, onClose, warehouse, onSave }) => {
                   fullWidth
                   {...register('name', { required: 'Vui lòng nhập tên kho' })}
                   error={!!errors.name}
-                  helperText={'Không thể sửa tên vì kho đã có liên kết'}
-                  disabled
+                  helperText={errors.name?.message}
                 />
               </Grid>
               <Grid item size={12}>

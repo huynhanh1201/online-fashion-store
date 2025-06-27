@@ -22,9 +22,8 @@ const DiscountPagination = React.lazy(() => import('./DiscountPagination'))
 function DiscountManagement() {
   const { hasPermission } = usePermissions()
   const [page, setPage] = React.useState(1)
-  const [limit, setLimit] = React.useState(10)
   const [filters, setFilters] = React.useState({
-    status: 'false',
+    status: 'true',
     sort: 'newest'
   })
   const [selectedDiscount, setSelectedDiscount] = React.useState(null)
@@ -35,16 +34,16 @@ function DiscountManagement() {
     totalPages,
     loading,
     fetchDiscounts,
-    saveDiscount,
-    fetchDiscountById,
     add,
     remove,
-    update
+    update,
+    setROWS_PER_PAGE,
+    ROWS_PER_PAGE
   } = useDiscounts()
 
   React.useEffect(() => {
-    fetchDiscounts(page, limit, filters)
-  }, [page, limit, filters])
+    fetchDiscounts(page, ROWS_PER_PAGE, filters)
+  }, [page, ROWS_PER_PAGE, filters])
 
   const handleOpenModal = (type, discount) => {
     if (!discount || !discount._id) return
@@ -150,12 +149,12 @@ function DiscountManagement() {
         onFilter={handleFilter}
         fetchDiscounts={fetchDiscounts}
         page={page - 1}
-        rowsPerPage={limit}
+        rowsPerPage={ROWS_PER_PAGE}
         total={totalPages}
         onPageChange={handleChangePage}
         onChangeRowsPerPage={(newLimit) => {
           setPage(1)
-          setLimit(newLimit)
+          setROWS_PER_PAGE(newLimit)
         }}
         permissions={{
           canCreate: hasPermission('coupon:create'),

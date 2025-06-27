@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react'
+import React, { useState, useRef, useEffect } from 'react'
 import {
   Dialog,
   DialogTitle,
@@ -20,6 +20,7 @@ import AddPhotoAlternateIcon from '@mui/icons-material/AddPhotoAlternate'
 import { useForm } from 'react-hook-form'
 import StyleAdmin from '~/assets/StyleAdmin.jsx'
 import { CloudinaryCategory, URI } from '~/utils/constants'
+import useCategories from '~/hooks/admin/useCategories.js'
 
 const uploadToCloudinary = async (file, folder = CloudinaryCategory) => {
   const formData = new FormData()
@@ -57,7 +58,10 @@ const AddCategoryModal = ({
   const [bannerFile, setBannerFile] = useState(null)
   const [bannerPreview, setBannerPreview] = useState('')
   const bannerInputRef = useRef()
-
+  const { categories, fetchCategories } = useCategories()
+  useEffect(() => {
+    fetchCategories(1, 100000)
+  }, [])
   const handleImageChange = (e) => {
     const file = e.target.files[0]
     if (file) {
@@ -133,6 +137,7 @@ const AddCategoryModal = ({
   const filteredCategories = categories.filter(
     (category) => category.parent === null
   )
+
   return (
     <Dialog
       open={open}

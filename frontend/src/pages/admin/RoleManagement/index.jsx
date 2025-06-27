@@ -5,7 +5,7 @@ import AddIcon from '@mui/icons-material/Add'
 import RoleTable from './RoleTable'
 import useRoles from '~/hooks/admin/useRoles'
 import usePermissions from '~/hooks/usePermissions'
-import usePermission from '~/hooks/admin/usePermission.jsx'
+import usePermission from '~/hooks/admin/usePermission.js'
 import { PermissionWrapper, RouteGuard } from '~/components/PermissionGuard'
 
 // Lazy load modals
@@ -16,7 +16,6 @@ const DeleteRoleModal = React.lazy(() => import('./modal/DeleteRoleModal'))
 
 const RoleManagement = () => {
   const [page, setPage] = React.useState(1)
-  const [limit, setLimit] = React.useState(10)
   const [filters, setFilters] = React.useState({
     status: 'false',
     sort: 'newest'
@@ -24,14 +23,23 @@ const RoleManagement = () => {
   const [selectedRole, setSelectedRole] = React.useState(null)
   const [modalType, setModalType] = React.useState(null)
 
-  const { roles, fetchRoles, totalPages, loading, add, update, remove } =
-    useRoles()
+  const {
+    roles,
+    fetchRoles,
+    totalPages,
+    loading,
+    add,
+    update,
+    remove,
+    ROWS_PER_PAGE,
+    setROWS_PER_PAGE
+  } = useRoles()
 
   const { hasPermission } = usePermissions()
   const { permissions, fetchPermissions } = usePermission()
   React.useEffect(() => {
-    fetchRoles(page, limit, filters)
-  }, [page, limit, filters])
+    fetchRoles(page, ROWS_PER_PAGE, filters)
+  }, [page, ROWS_PER_PAGE, filters])
   React.useEffect(() => {
     fetchPermissions()
   }, [])
@@ -77,12 +85,12 @@ const RoleManagement = () => {
         handleOpenModal={handleOpenModal}
         addRole={() => setModalType('add')}
         page={page - 1}
-        rowsPerPage={limit}
+        rowsPerPage={ROWS_PER_PAGE}
         total={totalPages}
         onPageChange={handleChangePage}
         onChangeRowsPerPage={(newLimit) => {
           setPage(1)
-          setLimit(newLimit)
+          setROWS_PER_PAGE(newLimit)
         }}
         permissions={{
           canCreate: hasPermission('role:create'),

@@ -97,7 +97,7 @@ const useRoles = () => {
   const [roles, setRoles] = useState([])
   const [totalPages, setTotalPages] = useState(1)
   const [loading, setLoading] = useState(false)
-
+  const [ROWS_PER_PAGE, setROWS_PER_PAGE] = useState(10)
   const fetchRoles = async (page = 1, limit = 10, filters = {}) => {
     setLoading(true)
 
@@ -139,11 +139,11 @@ const useRoles = () => {
         let updated = [...prev]
 
         if (sort === 'newest') {
-          updated = [newRole, ...prev].slice(0, 10)
+          updated = [newRole, ...prev].slice(0, ROWS_PER_PAGE)
         } else if (sort === 'oldest') {
-          if (prev.length < 10) updated = [...prev, newRole]
+          if (prev.length < ROWS_PER_PAGE) updated = [...prev, newRole]
         } else {
-          updated = [newRole, ...prev].slice(0, 10)
+          updated = [newRole, ...prev].slice(0, ROWS_PER_PAGE)
         }
 
         return updated
@@ -209,7 +209,9 @@ const useRoles = () => {
     add,
     update,
     remove,
-    Save
+    Save,
+    setROWS_PER_PAGE,
+    ROWS_PER_PAGE
   }
 }
 

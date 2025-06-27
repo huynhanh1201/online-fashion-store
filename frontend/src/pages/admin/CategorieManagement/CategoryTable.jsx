@@ -10,13 +10,17 @@ import {
   Typography,
   Box,
   TablePagination,
-  Button
+  Button,
+  Tooltip
 } from '@mui/material'
 import CategoryRow from './CategoryRow'
 import AddIcon from '@mui/icons-material/Add'
 import FilterCategory from '~/components/FilterAdmin/FilterCategory.jsx'
 import TablePaginationActions from '~/components/PaginationAdmin/TablePaginationActions.jsx'
 import TableNoneData from '~/components/TableAdmin/NoneData.jsx'
+import DeleteIcon from '@mui/icons-material/Delete'
+import IconButton from '@mui/material/IconButton'
+import Stack from '@mui/material/Stack'
 
 const CategoryTable = ({
   categories,
@@ -87,23 +91,38 @@ const CategoryTable = ({
                     <Typography variant='h6' sx={{ fontWeight: '800' }}>
                       Danh Sách Danh Mục
                     </Typography>
-                    {permissions.canCreate && (
-                      <Button
-                        onClick={addCategory}
-                        startIcon={<AddIcon />}
-                        sx={{
-                          textTransform: 'none',
-                          width: 100,
-                          display: 'flex',
-                          alignItems: 'center',
-                          backgroundColor: '#001f5d',
-                          color: '#fff'
-                        }}
-                      >
-                        Thêm
-                      </Button>
-                    )}
+
+                    <Stack direction='row' spacing={1}>
+                      {permissions.canCreate && (
+                        <Button
+                          onClick={addCategory}
+                          startIcon={<AddIcon />}
+                          sx={{
+                            textTransform: 'none',
+                            width: 100,
+                            display: 'flex',
+                            alignItems: 'center',
+                            backgroundColor: '#001f5d',
+                            color: '#fff'
+                          }}
+                        >
+                          Thêm
+                        </Button>
+                      )}
+
+                      <Tooltip title='Xem danh mục đã xoá'>
+                        <IconButton
+                          onClick={() =>
+                            onFilter({ ...{ status: 'true', sort: 'newest' } })
+                          }
+                          sx={{ border: '1px solid #ccc' }}
+                        >
+                          <DeleteIcon color='error' />
+                        </IconButton>
+                      </Tooltip>
+                    </Stack>
                   </Box>
+
                   <FilterCategory
                     onFilter={onFilter}
                     categories={categories}

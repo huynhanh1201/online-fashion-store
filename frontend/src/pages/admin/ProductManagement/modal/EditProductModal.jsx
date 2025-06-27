@@ -70,7 +70,9 @@ const EditProductModal = ({ open, onClose, onSave, product }) => {
     product.imageUrls || []
   )
   const { categories, fetchCategories, loading, update } = useCategories()
-
+  const topLevelCategories = categories.filter(
+    (category) => category.parent === null
+  )
   // Hàm định dạng số và bỏ định dạng
   const formatNumber = (value) => {
     const number = value?.toString().replace(/\D/g, '') || ''
@@ -82,7 +84,7 @@ const EditProductModal = ({ open, onClose, onSave, product }) => {
   // Load dữ liệu sản phẩm khi modal mở
   useEffect(() => {
     if (open && product) {
-      fetchCategories()
+      fetchCategories(1, 100000)
 
       reset({
         name: product.name || '',
@@ -107,7 +109,7 @@ const EditProductModal = ({ open, onClose, onSave, product }) => {
     const newCategory = await update(category) // category trả về từ add()
 
     // Gọi lại danh sách nếu cần thiết
-    fetchCategories()
+    fetchCategories(1, 100000)
 
     // ✅ Đặt category mới làm giá trị cho select
     setValue('categoryId', {
@@ -250,7 +252,7 @@ const EditProductModal = ({ open, onClose, onSave, product }) => {
                       PaperProps: { sx: StyleAdmin.FormSelect.SelectMenu }
                     }}
                   >
-                    {categories
+                    {topLevelCategories
                       ?.filter((c) => !c.destroy)
                       .map((cat) => (
                         <MenuItem key={cat._id} value={cat._id}>
