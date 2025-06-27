@@ -245,9 +245,6 @@ const importStockWarehouseSlip = async (reqBody, jwtDecoded, session) => {
       _id: { $in: variantIds }
     }).session(session)
 
-    console.log('variantIds: ', variantIds)
-    console.log('variants: ', variants)
-
     const variantMap = variants.reduce((acc, variant) => {
       acc[variant._id.toString()] = variant
       return acc
@@ -286,7 +283,7 @@ const importStockWarehouseSlip = async (reqBody, jwtDecoded, session) => {
         // Lưu lại thay đổi vào DB (có dùng session của transaction)
         await existingInventory.save({ session })
 
-        console.log('exitsting: ', await existingInventory.save({ session }))
+        console.log('existingInventory: ', existingInventory)
 
         // Đẩy vào danh sách cập nhật
         inventoriesUpdated.push(existingInventory)
