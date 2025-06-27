@@ -261,7 +261,7 @@ const formatSize = (str) => {
   return str.toUpperCase()
 }
 
-const ProductItem = ({ name, variant, quantity, image, color, size, getFinalPrice }) => {
+const ProductItem = ({ name, variant, quantity, image, color, size, getFinalPrice, productId, navigate }) => {
   if (!name || typeof quantity !== 'number') {
     return (
       <tr>
@@ -278,10 +278,16 @@ const ProductItem = ({ name, variant, quantity, image, color, size, getFinalPric
   const discountPrice = variant.discountPrice || 0
   const hasDiscount = discountPrice > 0 && exportPrice > finalPrice
 
+  const handleProductClick = () => {
+    if (productId && navigate) {
+      navigate(`/productdetail/${productId}`)
+    }
+  }
+
   return (
     <tr>
       <td>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, cursor: 'pointer' }} onClick={handleProductClick}>
           <Box
             component="img"
             src={optimizeCloudinaryUrl(image) || 'https://via.placeholder.com/64'}
@@ -292,10 +298,14 @@ const ProductItem = ({ name, variant, quantity, image, color, size, getFinalPric
               borderRadius: 2,
               objectFit: 'cover',
               boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+              transition: 'transform 0.2s ease',
+              '&:hover': {
+                transform: 'scale(1.05)',
+              }
             }}
           />
           <Box>
-            <Typography fontWeight={600} sx={{ mb: 0.5 }}>
+            <Typography fontWeight={600} sx={{ mb: 0.5, '&:hover': { color: '#1A3C7B' } }}>
               {truncatedName}
             </Typography>
             <Box sx={{ display: 'flex', gap: 1, mb: 1 }}>
@@ -989,6 +999,8 @@ const Payment = () => {
                                 color={variant.color?.name}
                                 size={variant.size?.name}
                                 getFinalPrice={getFinalPrice}
+                                productId={variant.product || variant.productId}
+                                navigate={navigate}
                               />
                             )
                           })}

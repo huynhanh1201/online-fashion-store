@@ -125,9 +125,14 @@ export default function AdminDrawer({
             path: '/admin/user-management'
           },
           {
-            permission: 'user:use',
+            permission: 'role:use',
             label: 'Quản lý vai trò',
             path: '/admin/role-management'
+          },
+          {
+            permission: 'blog:use',
+            label: 'Quản lý tin tức',
+            path: '/admin/blog-management'
           }
         ]
       },

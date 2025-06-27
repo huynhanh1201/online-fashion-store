@@ -41,6 +41,7 @@ import {
   setSelectedItems as setSelectedItemsAction,
   setTempQuantity,
   removeTempQuantity,
+  clearReorderVariantIds,
 } from '~/redux/cart/cartSlice'
 import { optimizeCloudinaryUrl } from '~/utils/cloudinary'
 import { getDiscounts } from '~/services/discountService'
@@ -63,7 +64,9 @@ const Cart = () => {
   const [deleteMode, setDeleteMode] = useState('')
   const [itemToDelete, setItemToDelete] = useState(null)
   const tempQuantities = useSelector((state) => state.cart.tempQuantities || {})
+  const reorderVariantIds = useSelector((state) => state.cart.reorderVariantIds || [])
   const [processingVariantId, setProcessingVariantId] = useState(null)
+  const [hasAutoSelected, setHasAutoSelected] = useState(false)
 
   // Refs để tránh stale closure
   const inventoryQuantitiesRef = useRef(inventoryQuantities)
@@ -80,11 +83,52 @@ const Cart = () => {
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'auto' })
+    // Reset hasAutoSelected khi vào trang cart
+    setHasAutoSelected(false)
   }, [])
 
   useEffect(() => {
     if (cart?.cartItems) setCartItems(cart.cartItems)
   }, [cart])
+
+  // Tự động chọn các sản phẩm từ reorder
+  useEffect(() => {
+    // Debug: kiểm tra auto-select state
+    if (reorderVariantIds.length > 0) {
+      console.log('Auto-select check:', {
+        cartItemsCount: cartItems.length,
+        reorderVariantIds: reorderVariantIds,
+        hasAutoSelected
+      })
+    }
+
+    if (cartItems.length > 0 && reorderVariantIds.length > 0 && !hasAutoSelected) {
+      console.log('Auto-selecting reorder items:', reorderVariantIds)
+
+      const reorderSelectedItems = cartItems
+        .filter(item => {
+          // Handle cả variant._id và variantId trực tiếp
+          const variantId = item.variant?._id || item.variantId?._id || item.variantId
+          const isMatch = reorderVariantIds.includes(variantId)
+          // console.log(`Checking item ${item.name} with variantId ${variantId}: ${isMatch}`)
+          return isMatch
+        })
+        .map(item => ({
+          variantId: item.variant?._id || item.variantId?._id || item.variantId,
+          quantity: item.quantity
+        }))
+
+      if (reorderSelectedItems.length > 0) {
+        console.log('Auto-selected items count:', reorderSelectedItems.length)
+        setSelectedItems(reorderSelectedItems)
+        dispatch(setSelectedItemsAction(reorderSelectedItems))
+        setHasAutoSelected(true)
+
+        // Clear reorder variant IDs sau khi đã auto-select
+        dispatch(clearReorderVariantIds())
+      }
+    }
+  }, [cartItems, reorderVariantIds, hasAutoSelected, dispatch])
 
   useEffect(() => {
     const fetchInventories = async () => {
@@ -367,7 +411,7 @@ const Cart = () => {
           mt: 10,
         }}
       >
-        <Paper
+        <Box
           elevation={3}
           sx={{
             p: 4,
@@ -381,7 +425,7 @@ const Cart = () => {
           <Typography variant="h5" sx={{ fontWeight: 600, color: '#1A3C7B' }}>
             Đang tải giỏ hàng...
           </Typography>
-        </Paper>
+        </Box>
       </Container>
     )
   }

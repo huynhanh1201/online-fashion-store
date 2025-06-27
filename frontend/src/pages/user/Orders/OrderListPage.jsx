@@ -38,10 +38,11 @@ import ScheduleIcon from '@mui/icons-material/Schedule';
 import { getOrders, getOrderItems } from '~/services/orderService'
 import { useOrder } from '~/hooks/useOrder'
 import { useNavigate } from 'react-router-dom'
-import { useSelector } from 'react-redux'
+import { useSelector, useDispatch } from 'react-redux'
 import { selectCurrentUser } from '~/redux/user/userSlice'
 import { useCart } from '~/hooks/useCarts'
 import { optimizeCloudinaryUrl } from '~/utils/cloudinary'
+import { setReorderVariantIds } from '~/redux/cart/cartSlice'
 
 // Define status labels with icons and colors
 const statusLabels = {
@@ -244,7 +245,6 @@ const OrderRow = ({ order, onOrderUpdate, onOrderCancelled, onReorder, reorderLo
     const fetchItems = async () => {
       try {
         const res = await getOrderItems(order._id)
-        console.log('order items:', res)
         setItems(res)
       } catch (err) {
         console.error('Lỗi khi lấy sản phẩm:', err)
@@ -261,7 +261,6 @@ const OrderRow = ({ order, onOrderUpdate, onOrderCancelled, onReorder, reorderLo
     setCancelling(true)
     try {
       await cancelOrder(order._id, 'Người dùng hủy đơn')
-      console.log('Đã hủy đơn hàng:', order._id)
       setOpenCancelModal(false)
       // Call parent callback to refresh orders
       if (onOrderUpdate) {
@@ -541,6 +540,7 @@ const OrderListPage = () => {
   const currentUser = useSelector(selectCurrentUser)
   const userId = currentUser?._id
   const navigate = useNavigate()
+  const dispatch = useDispatch()
 
   // Chỉ gọi useCart khi thực sự cần thiết
   const { addToCart, refresh: refreshCart } = useCart()
@@ -563,7 +563,6 @@ const OrderListPage = () => {
 
       // Gọi API với status tương ứng, sắp xếp theo updatedAt để đơn hàng vừa cập nhật hiện lên đầu
       const response = await getOrders(userId, page, 10, status, sortBy)
-      console.log('Fetched orders with status:', status, response) // Kiểm tra ở console
 
       if (reset) {
         setOrders(response.data || [])
@@ -639,9 +638,7 @@ const OrderListPage = () => {
   // Handle reorder - chỉ gọi useCart khi thực sự cần
   const handleReorder = async (items, orderId) => {
     try {
-      setReorderLoading(orderId) // Set loading for specific order
-      console.log('Items to add back to cart:', items)
-      console.log('Total items to process:', items.length)
+      setReorderLoading(orderId)
 
       let successCount = 0
 
@@ -649,12 +646,6 @@ const OrderListPage = () => {
       for (let i = 0; i < items.length; i++) {
         const item = items[i]
         const variantId = typeof item.variantId === 'object' ? item.variantId._id : item.variantId
-
-        console.log(`Processing item ${i + 1}/${items.length}:`, {
-          name: item.name,
-          variantId: variantId,
-          quantity: 1 // Luôn luôn là 1
-        })
 
         if (!variantId) {
           console.warn('Variant ID not found for item:', item)
@@ -668,7 +659,6 @@ const OrderListPage = () => {
             quantity: 1
           })
 
-          console.log(`Item ${i + 1} add to cart result:`, result)
 
           if (result) {
             successCount++
@@ -683,11 +673,15 @@ const OrderListPage = () => {
         }
       }
 
-      console.log(`Add to cart results: ${successCount} success`)
-
       if (successCount > 0) {
+        // Lưu danh sách variantId từ reorder vào Redux để cart tự động chọn
+        const reorderVariantIds = items
+          .map(item => typeof item.variantId === 'object' ? item.variantId._id : item.variantId)
+          .filter(id => id) // Lọc bỏ các id không hợp lệ
+
+        dispatch(setReorderVariantIds(reorderVariantIds))
+
         // Force refresh cart data before navigating
-        console.log('Refreshing cart data...')
         await refreshCart({ silent: true })
 
         setTimeout(() => {

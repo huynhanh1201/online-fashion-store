@@ -7,7 +7,8 @@ const cartSlice = createSlice({
     selectedItems: [],
     tempCart: null,
     isBuyNow: false,
-    tempQuantities: {}
+    tempQuantities: {},
+    reorderVariantIds: [] // Lưu các variantId được thêm từ reorder
   },
   reducers: {
     setCartItems(state, action) {
@@ -40,6 +41,12 @@ const cartSlice = createSlice({
     },
     clearAllTempQuantities: (state) => {
       state.tempQuantities = {}
+    },
+    setReorderVariantIds: (state, action) => {
+      state.reorderVariantIds = action.payload
+    },
+    clearReorderVariantIds: (state) => {
+      state.reorderVariantIds = []
     }
   }
 })
@@ -52,7 +59,9 @@ export const {
   clearSelectedItems,
   setTempQuantity,
   removeTempQuantity,
-  clearAllTempQuantities
+  clearAllTempQuantities,
+  setReorderVariantIds,
+  clearReorderVariantIds
 } = cartSlice.actions
 
 export default cartSlice.reducer

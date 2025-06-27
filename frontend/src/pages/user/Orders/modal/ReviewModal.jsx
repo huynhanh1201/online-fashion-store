@@ -115,6 +115,16 @@ const ReviewModal = ({
   const imageInputRef = useRef(null)
   const videoInputRef = useRef(null)
 
+
+  const capitalizeFirstLetter = (str) => {
+    if (!str) return ''
+    return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase()
+  }
+
+  const formatSize = (str) => {
+    if (!str) return ''
+    return str.toUpperCase()
+  }
   // Constants for file limits
   const MAX_IMAGES = 5
   const MAX_VIDEOS = 2
@@ -423,9 +433,9 @@ const ReviewModal = ({
                   src={
                     item?.color?.image
                       ? optimizeCloudinaryUrl(item.color.image, {
-                          width: 64,
-                          height: 64
-                        })
+                        width: 64,
+                        height: 64
+                      })
                       : '/default.jpg'
                   }
                   variant='rounded'
@@ -433,16 +443,20 @@ const ReviewModal = ({
                 />
                 <Box>
                   <Typography fontWeight={600} fontSize='1rem'>
-                    {item?.name || 'Sản phẩm'}
+                    {capitalizeFirstLetter(item?.name) || 'Sản phẩm'}
                   </Typography>
-                  <Typography variant='body2' color='text.secondary'>
-                    {item?.color?.name} • {item?.size}
+                  <Typography
+                    variant="body2"
+                    color="text.secondary"
+                    sx={{ mb: 0.5 }}
+                  >
+                    Phân loại hàng: {capitalizeFirstLetter(item.color?.name)}, {formatSize(item.size)}
                   </Typography>
                   <Chip
-                    label={`x${item.quantity}`}
-                    size='small'
-                    variant='outlined'
-                    sx={{ mt: 0.5, fontSize: '0.7rem', height: 20 }}
+                    label={`Số lượng: ${item.quantity}`}
+                    size="small"
+                    variant="outlined"
+                    sx={{ fontSize: '0.7rem', height: 20 }}
                   />
                 </Box>
               </Box>
@@ -610,9 +624,9 @@ const ReviewModal = ({
                     image={
                       image.url
                         ? optimizeCloudinaryUrl(image.url, {
-                            width: 200,
-                            height: 120
-                          })
+                          width: 200,
+                          height: 120
+                        })
                         : image.preview
                     }
                     alt={image.name}

@@ -30,8 +30,9 @@ import { useCart } from '~/hooks/useCarts'
 import ReviewModal from './modal/ReviewModal'
 import ViewReviewModal from './modal/ViewReviewModal'
 import { createReview, getUserReviews } from '~/services/reviewService'
-import { useSelector } from 'react-redux'
+import { useSelector, useDispatch } from 'react-redux'
 import { selectCurrentUser } from '~/redux/user/userSlice'
+import { setReorderVariantIds } from '~/redux/cart/cartSlice'
 import { optimizeCloudinaryUrl } from '~/utils/cloudinary'
 
 const statusLabels = {
@@ -143,6 +144,7 @@ const OrderDetail = () => {
   const { cancelOrder } = useOrder()
   const { addToCart, refresh: refreshCart } = useCart()
   const currentUser = useSelector(selectCurrentUser)
+  const dispatch = useDispatch()
 
   const [snackbarOpen, setSnackbarOpen] = useState(false)
   const [openReviewModal, setOpenReviewModal] = useState(false)
@@ -158,6 +160,7 @@ const OrderDetail = () => {
       if (!currentUser?._id || !orderId) return
       try {
         const reviews = await getUserReviews(currentUser._id)
+
         // Check which products in this order have been reviewed
         const reviewedProductsInOrder = reviews
           .filter((review) => review.orderId === orderId)
@@ -165,6 +168,7 @@ const OrderDetail = () => {
         setReviewedProducts(new Set(reviewedProductsInOrder))
       } catch (err) {
         console.error('Lỗi khi lấy đánh giá người dùng:', err)
+        setReviewedProducts(new Set()) // Set empty set on error
       }
     }
     fetchUserReviews()
@@ -229,7 +233,6 @@ const OrderDetail = () => {
     setCancelling(true)
     try {
       await cancelOrder(orderId)
-      console.log('Đã hủy đơn hàng:', orderId)
       setOpenCancelModal(false)
       // Refresh page or navigate back to orders list
       navigate('/orders')
@@ -259,11 +262,6 @@ const OrderDetail = () => {
         return
       }
 
-      console.log('Review data received:', reviewData)
-      console.log('Current user ID:', currentUser?._id)
-      console.log('Order ID:', orderId)
-      console.log('Product ID:', productId)
-
       // Gửi đánh giá với payload đầy đủ
       await createReview(reviewData)
 
@@ -281,8 +279,6 @@ const OrderDetail = () => {
   const handleReorder = async () => {
     try {
       setReorderLoading(true)
-      console.log('Items to add back to cart:', items)
-      console.log('Total items to process:', items.length)
 
       let successCount = 0
 
@@ -291,11 +287,6 @@ const OrderDetail = () => {
         const item = items[i]
         const variantId = typeof item.variantId === 'object' ? item.variantId._id : item.variantId
 
-        console.log(`Processing item ${i + 1}/${items.length}:`, {
-          name: item.name,
-          variantId: variantId,
-          quantity: 1 // Luôn luôn là 1
-        })
 
         if (!variantId) {
           console.warn('Variant ID not found for item:', item)
@@ -308,8 +299,6 @@ const OrderDetail = () => {
             variantId: variantId,
             quantity: 1
           })
-
-          console.log(`Item ${i + 1} add to cart result:`, result)
 
           if (result) {
             successCount++
@@ -324,11 +313,15 @@ const OrderDetail = () => {
         }
       }
 
-      console.log(`Add to cart results: ${successCount} success`)
-
       if (successCount > 0) {
+        // Lưu danh sách variantId từ reorder vào Redux để cart tự động chọn
+        const reorderVariantIds = items
+          .map(item => typeof item.variantId === 'object' ? item.variantId._id : item.variantId)
+          .filter(id => id) // Lọc bỏ các id không hợp lệ
+
+        dispatch(setReorderVariantIds(reorderVariantIds))
+
         // Force refresh cart data before navigating
-        console.log('Refreshing cart data...')
         await refreshCart({ silent: true })
 
         setTimeout(() => {

@@ -26,6 +26,8 @@ import TableNoneData from '~/components/TableAdmin/NoneData.jsx'
 import BlogRow from './BlogRow'
 import TablePaginationActions from '~/components/PaginationAdmin/TablePaginationActions.jsx'
 import FilterBlog from '~/components/FilterAdmin/FilterBlog.jsx'
+import usePermissions from '~/hooks/usePermissions'
+
 const BlogTable = ({
   blogs,
   onAdd,
@@ -50,6 +52,7 @@ const BlogTable = ({
     { id: 'publishedAt', label: 'Ngày xuất bản', align: 'left', width: 150 },
     { id: 'action', label: 'Hành động', align: 'left' }
   ]
+  const { hasPermission } = usePermissions()
 
   return (
     <Paper sx={{ border: '1px solid #ccc', width: '100%', overflow: 'hidden' }}>
@@ -74,21 +77,23 @@ const BlogTable = ({
           <Typography variant='h6' fontWeight={800}>
             Danh sách bài viết
           </Typography>
-          <Button
-            startIcon={<AddIcon />}
-            variant='contained'
-            onClick={onAdd}
-            sx={{
-              textTransform: 'none',
-              width: 100,
-              display: 'flex',
-              alignItems: 'center',
-              backgroundColor: '#001f5d',
-              color: '#fff'
-            }}
-          >
-            Thêm
-          </Button>
+          {hasPermission('blog:create') && (
+            <Button
+              startIcon={<AddIcon />}
+              variant='contained'
+              onClick={onAdd}
+              sx={{
+                textTransform: 'none',
+                width: 100,
+                display: 'flex',
+                alignItems: 'center',
+                backgroundColor: '#001f5d',
+                color: '#fff'
+              }}
+            >
+              Thêm
+            </Button>
+          )}
         </Box>
         <FilterBlog blogs={blogs} onFilter={onFilter} loading={loading} />
       </Box>
