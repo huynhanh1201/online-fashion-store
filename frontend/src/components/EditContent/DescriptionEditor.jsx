@@ -20,6 +20,18 @@ const StyledEditor = styled.div`
     border-color: #000;
     box-shadow: 0 0 0 1px #000;
   }
+
+  .custom-image-wrapper button {
+    font-size: 14px;
+    padding: 0;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+  }
+
+  .custom-image-wrapper button:hover {
+    color: red;
+  }
 `
 export default function DescriptionEditor({
   control,
