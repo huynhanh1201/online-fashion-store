@@ -46,7 +46,6 @@ import {
 import { optimizeCloudinaryUrl } from '~/utils/cloudinary'
 import { getDiscounts } from '~/services/discountService'
 import SuggestionProducts from './SuggestionProducts'
-import inventoryService from '~/services/inventoryService'
 
 const Cart = () => {
   const { cart, loading, deleteItem, clearCart, updateItem } = useCart()
@@ -59,27 +58,12 @@ const Cart = () => {
   const [hasFetchedCoupons, setHasFetchedCoupons] = useState(false)
   const navigate = useNavigate()
   const dispatch = useDispatch()
-  const [inventoryQuantities, setInventoryQuantities] = useState({})
-  const [fetchingVariants, setFetchingVariants] = useState(new Set())
   const [deleteMode, setDeleteMode] = useState('')
   const [itemToDelete, setItemToDelete] = useState(null)
   const tempQuantities = useSelector((state) => state.cart.tempQuantities || {})
   const reorderVariantIds = useSelector((state) => state.cart.reorderVariantIds || [])
   const [processingVariantId, setProcessingVariantId] = useState(null)
   const [hasAutoSelected, setHasAutoSelected] = useState(false)
-
-  // Refs để tránh stale closure
-  const inventoryQuantitiesRef = useRef(inventoryQuantities)
-  const fetchingVariantsRef = useRef(fetchingVariants)
-
-  // Cập nhật refs khi state thay đổi
-  useEffect(() => {
-    inventoryQuantitiesRef.current = inventoryQuantities
-  }, [inventoryQuantities])
-
-  useEffect(() => {
-    fetchingVariantsRef.current = fetchingVariants
-  }, [fetchingVariants])
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'auto' })
@@ -130,55 +114,11 @@ const Cart = () => {
     }
   }, [cartItems, reorderVariantIds, hasAutoSelected, dispatch])
 
-  useEffect(() => {
-    const fetchInventories = async () => {
-      if (cartItems.length === 0) return
-
-      const currentInventory = inventoryQuantitiesRef.current
-      const currentFetching = fetchingVariantsRef.current
-
-      const newVariantsToFetch = cartItems
-        .filter(
-          (item) =>
-            !currentInventory[item.variant._id] &&
-            !currentFetching.has(item.variant._id),
-        )
-        .map((item) => item.variant._id)
-
-      if (newVariantsToFetch.length === 0) return
-
-      setFetchingVariants((prev) => new Set([...prev, ...newVariantsToFetch]))
-
-      try {
-        const fetchPromises = newVariantsToFetch.map(async (variantId) => {
-          const inventory = await inventoryService.fetchInventory(variantId)
-          return { variantId, inventory }
-        })
-
-        const results = await Promise.all(fetchPromises)
-
-        setInventoryQuantities((prev) => {
-          const updated = { ...prev }
-          results.forEach(({ variantId, inventory }) => {
-            // Thử các trường hợp có thể có
-            const quantity = inventory?.quantity || inventory?.availableQuantity || inventory?.stock || 0
-            updated[variantId] = quantity
-          })
-          return updated
-        })
-      } catch (error) {
-        console.error('Error fetching inventory:', error)
-      } finally {
-        setFetchingVariants((prev) => {
-          const newSet = new Set(prev)
-          newVariantsToFetch.forEach((id) => newSet.delete(id))
-          return newSet
-        })
-      }
-    }
-
-    fetchInventories()
-  }, [cartItems])
+  // Helper function to get max quantity for a variant
+  const getMaxQuantity = (variant) => {
+    // Sử dụng quantity từ variant, fallback về 99 nếu không có
+    return variant?.quantity || variant?.availableQuantity || variant?.stock || 99
+  }
 
   useEffect(() => {
     if (hasFetchedCoupons) return
@@ -240,7 +180,7 @@ const Cart = () => {
     if (!item) return
 
     const current = tempQuantities[variantId] ?? item.quantity
-    const max = inventoryQuantities[variantId] || 99
+    const max = getMaxQuantity(item.variant)
 
     if (delta > 0 && current >= max) {
       setShowMaxQuantityAlert(true)
@@ -299,10 +239,7 @@ const Cart = () => {
         setSelectedItems((prev) =>
           prev.filter((i) => i.variantId !== variantId),
         )
-        setInventoryQuantities((prev) => {
-          const { [variantId]: _, ...rest } = prev
-          return rest
-        })
+        // Không cần xử lý inventoryQuantities nữa vì đã bỏ
       }
     } catch (error) {
       console.error('Lỗi xoá sản phẩm:', error)
@@ -356,7 +293,6 @@ const Cart = () => {
     await clearCart()
     setCartItems([])
     setSelectedItems([])
-    setInventoryQuantities({})
     setConfirmClearOpen(false)
   }
 
@@ -852,9 +788,8 @@ const Cart = () => {
                               }
                               disabled={
                                 processingVariantId === variant._id ||
-                                !inventoryQuantities[variant._id] ||
                                 (tempQuantities[variant._id] ?? item.quantity) >=
-                                inventoryQuantities[variant._id]
+                                getMaxQuantity(variant)
                               }
                               sx={{ borderRadius: 0, p: 0.5 }}
                             >

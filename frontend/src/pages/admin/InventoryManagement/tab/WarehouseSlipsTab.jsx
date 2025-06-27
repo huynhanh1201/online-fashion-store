@@ -85,7 +85,7 @@ const WarehouseSlipsTab = () => {
   const handleOpenModal = (type) => {
     fetchPartners()
     fetchWarehouses(1, 10, { status: false })
-    fetchVariants()
+    fetchVariants(1, 100000, { status: false })
     fetchBatches()
     setModalType(type)
     setNewSlipData({
