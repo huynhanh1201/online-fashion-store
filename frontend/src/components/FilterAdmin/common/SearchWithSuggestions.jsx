@@ -34,7 +34,7 @@ export default function SearchWithSuggestions({
       }}
       freeSolo
       clearOnEscape
-      options={[]}
+      options={options}
       loading={loading}
       value={keyword}
       inputValue={inputValue}
