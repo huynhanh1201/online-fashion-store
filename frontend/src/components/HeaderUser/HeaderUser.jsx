@@ -30,6 +30,9 @@ const StyledAppBar = styled(AppBar)(({ theme }) => ({
   transition: 'top 0.3s ease',
   [theme.breakpoints.down('md')]: {
     top: 30
+  },
+  [theme.breakpoints.down('sm')]: {
+    top: 30
   }
 }))
 
@@ -46,7 +49,11 @@ const HeaderUser = () => {
     <>
       <Topbar />
       <StyledAppBar>
-        <Container maxWidth='1450px' ref={headerRef}>
+        <Container 
+          maxWidth='100%'
+          ref={headerRef}
+          
+        >
           <Toolbar
             disableGutters
             sx={{
@@ -54,78 +61,118 @@ const HeaderUser = () => {
               justifyContent: 'space-between',
               alignItems: 'center',
               minHeight: { xs: 56, sm: 64, md: 72 },
-              px: { xs: 1, sm: 2, md: 3 },
+              width: '100%',
+              position: 'relative'
             }}
           >
-            {/* Left */}
+            {/* Left Section - Logo & Menu Button */}
             <Box
               sx={{
                 display: 'flex',
                 alignItems: 'center',
-                flexBasis: { xs: 'auto', md: '20%' },
                 flexShrink: 0,
-                gap: 1
+                gap: { xs: 0.5, sm: 1 },
+                minWidth: { xs: 'auto', sm: 120, md: 150 }
               }}
             >
               <IconButton
                 color='inherit'
                 edge='start'
                 onClick={handleDrawerToggle}
-                sx={{ mr: 1, display: { md: 'none' } }}
+                sx={{ 
+                  mr: { xs: 0.5, sm: 1 }, 
+                  display: { md: 'none' },
+                  p: { xs: 1, sm: 1.5 }
+                }}
                 aria-label='open drawer'
               >
-                <MenuIcon />
+                <MenuIcon sx={{ fontSize: { xs: '1.2rem', sm: '1.5rem' } }} />
               </IconButton>
+              
               <Typography
                 variant='h6'
                 noWrap
                 sx={{
-                  fontSize: { xs: '1rem', sm: '1.1rem', md: '1.25rem' },
+                  fontSize: { xs: '0.9rem', sm: '1.1rem', md: '1.25rem' },
                   cursor: 'pointer',
-                  userSelect: 'none'
+                  userSelect: 'none',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  maxWidth: { xs: 80, sm: 120, md: 'none' }
                 }}
               >
-                <Logo href='/'>ICONDEWIM™</Logo>
+                <Logo href='/'>Logo</Logo>
               </Typography>
             </Box>
 
-            {/* Center */}
+            {/* Center Section - Desktop Menu */}
             <Box
               sx={{
                 display: { xs: 'none', md: 'flex' },
                 flexGrow: 1,
-                justifyContent: 'center',
-                maxWidth: 600,
-                minWidth: 400,
-                gap: 2,
+                justifyContent: 'start',
+                maxWidth: '800px',
+                mx: 2,
                 userSelect: 'none'
               }}
             >
               <Menu headerRef={headerRef} />
             </Box>
 
-            {/* Right */}
+            {/* Right Section - Search & Actions */}
             <Box
               sx={{
                 display: 'flex',
                 alignItems: 'center',
-                gap: { xs: 1, sm: 1.5, md: 2 },
+                gap: { xs: 0.5, sm: 1, md: 1.5 },
                 justifyContent: 'flex-end',
-                flexBasis: { xs: 'auto', md: '25%' },
                 flexShrink: 0,
-                minWidth: { xs: 'auto', md: 250 },
-                zIndex: 1301
+                minWidth: { xs: 'auto', sm: 120, md: 200 },
+                maxWidth: { xs: '50%', sm: '40%', md: 'none' }
               }}
             >
-              <Search />
-              <AuthButtons />
-              {currentUser && <HeaderAction />}
+              {/* Search Component - Hide on very small screens */}
+              <Box
+                sx={{
+                  display: { xs: 'none', sm: 'block' },
+                  flexShrink: 1,
+                  minWidth: 0
+                }}
+              >
+                <Search />
+              </Box>
+              
+              {/* Search Icon for mobile */}
+              <Box sx={{ display: { xs: 'block', sm: 'none' } }}>
+                <Search compact />
+              </Box>
+
+              {/* Auth Buttons */}
+              <Box sx={{ flexShrink: 0 }}>
+                <AuthButtons />
+              </Box>
+
+              {/* Header Action - Only show if user is logged in */}
+              {currentUser && (
+                <Box sx={{ flexShrink: 0 }}>
+                  <HeaderAction />
+                </Box>
+              )}
             </Box>
           </Toolbar>
         </Container>
       </StyledAppBar>
 
-      <MobileDrawer open={mobileOpen} onClose={handleDrawerToggle} />
+      <MobileDrawer 
+        open={mobileOpen} 
+        onClose={handleDrawerToggle}
+        sx={{
+          '& .MuiDrawer-paper': {
+            width: { xs: '100%', sm: 280 },
+            maxWidth: '100vw'
+          }
+        }}
+      />
     </>
   )
 }

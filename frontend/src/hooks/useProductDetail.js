@@ -211,14 +211,25 @@ const useProductDetail = (productId) => {
   // Get current price
   const getCurrentPrice = () => {
     if (selectedVariant) {
+      const originalPrice = selectedVariant.exportPrice || 0
+      const discountAmount = selectedVariant.discountPrice || 0
+      const displayPrice = Math.max(0, originalPrice - discountAmount)
+      
       return {
-        price: selectedVariant.exportPrice,
-        discountPrice: selectedVariant.discountPrice
+        price: originalPrice,
+        discountPrice: displayPrice,
+        originalDiscountPrice: discountAmount
       }
     }
+    
+    const originalPrice = product?.exportPrice || 0
+    const discountAmount = product?.discountPrice || 0
+    const displayPrice = Math.max(0, originalPrice - discountAmount)
+    
     return {
-      price: product?.exportPrice,
-      discountPrice: product?.discountPrice
+      price: originalPrice,
+      discountPrice: displayPrice,
+      originalDiscountPrice: discountAmount
     }
   }
 

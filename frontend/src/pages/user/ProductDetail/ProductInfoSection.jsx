@@ -90,8 +90,11 @@ const ProductInfoSection = ({
       </Typography>
 
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
-        {currentPrice?.discountPrice ? (
+        {currentPrice?.originalDiscountPrice > 0 ? (
           <>
+            <PriceTypography variant='h5' sx={{ fontSize: 22 }}>
+              {currentPrice.discountPrice.toLocaleString('vi-VN')}đ
+            </PriceTypography>
             <Typography
               variant='h5'
               sx={{
@@ -102,9 +105,17 @@ const ProductInfoSection = ({
             >
               {currentPrice.price.toLocaleString('vi-VN')}đ
             </Typography>
-            <PriceTypography variant='h5' sx={{ fontSize: 22 }}>
-              {currentPrice.discountPrice.toLocaleString('vi-VN')}đ
-            </PriceTypography>
+            <Chip
+              label={`Giảm ${Math.round((currentPrice.originalDiscountPrice / currentPrice.price) * 100)}%`}
+              size='small'
+              sx={{
+                backgroundColor: '#fef2f2',
+                color: '#dc2626',
+                fontWeight: 600,
+                border: '1px solid #fecaca',
+                fontSize: '0.75rem'
+              }}
+            />
           </>
         ) : (
           <PriceTypography variant='h5' sx={{ fontSize: 22 }}>

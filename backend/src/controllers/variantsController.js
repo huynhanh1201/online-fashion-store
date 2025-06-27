@@ -1,6 +1,7 @@
 import { StatusCodes } from 'http-status-codes'
 
 import { variantsService } from '~/services/variantsService'
+import { ApiError } from '~/utils/ApiError'
 
 const createVariant = async (req, res, next) => {
   try {
@@ -51,6 +52,37 @@ const updateVariant = async (req, res, next) => {
   }
 }
 
+// Cập nhật discountPrice cho tất cả biến thể của một sản phẩm
+const updateProductVariantsDiscountPrice = async (req, res, next) => {
+  try {
+    const productId = req.params.productId
+    const { discountPrice } = req.body
+
+    if (discountPrice === undefined || discountPrice < 0) {
+      throw new ApiError(StatusCodes.BAD_REQUEST, 'discountPrice phải là số không âm')
+    }
+
+    const result = await variantsService.updateProductVariantsDiscountPrice(productId, discountPrice)
+
+    res.status(StatusCodes.OK).json(result)
+  } catch (err) {
+    next(err)
+  }
+}
+
+// Khôi phục discountPrice về giá ban đầu cho tất cả biến thể của một sản phẩm
+const restoreProductVariantsOriginalDiscountPrice = async (req, res, next) => {
+  try {
+    const productId = req.params.productId
+
+    const result = await variantsService.restoreProductVariantsOriginalDiscountPrice(productId)
+
+    res.status(StatusCodes.OK).json(result)
+  } catch (err) {
+    next(err)
+  }
+}
+
 const deleteVariant = async (req, res, next) => {
   try {
     const variantId = req.params.variantId
@@ -68,5 +100,7 @@ export const variantsController = {
   getVariantList,
   getVariant,
   updateVariant,
+  updateProductVariantsDiscountPrice,
+  restoreProductVariantsOriginalDiscountPrice,
   deleteVariant
 }

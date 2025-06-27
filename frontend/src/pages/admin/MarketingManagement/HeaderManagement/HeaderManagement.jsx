@@ -729,223 +729,178 @@ const HeaderManagement = () => {
                         </TableCell>
                       </TableRow>
                     ))
-                  ) : menuData?.content ? (
-                    // Render all menu items from different sections
-                    (() => {
-                      const allMenuItems = []
-                      
-                      // Add main menu items
-                      if (menuData.content.mainMenu) {
-                        menuData.content.mainMenu.forEach((item, index) => {
-                          allMenuItems.push({
-                            ...item,
-                            menuType: 'Main Menu',
-                            originalIndex: index
-                          })
-                          // Add submenu items
-                          if (item.children) {
-                            item.children.forEach((child, childIndex) => {
-                              allMenuItems.push({
-                                ...child,
-                                menuType: 'Main Menu - Sub',
-                                parentLabel: item.label,
-                                originalIndex: `${index}.${childIndex}`
-                              })
-                            })
-                          }
-                        })
-                      }
-                      
-                      // Add mobile menu items
-                      if (menuData.content.mobileMenu) {
-                        menuData.content.mobileMenu.forEach((item, index) => {
-                          allMenuItems.push({
-                            ...item,
-                            menuType: 'Mobile Menu',
-                            originalIndex: index
-                          })
-                        })
-                      }
-                      
-                      // Add footer menu items
-                      if (menuData.content.footerMenu) {
-                        menuData.content.footerMenu.forEach((item, index) => {
-                          allMenuItems.push({
-                            ...item,
-                            menuType: 'Footer Menu',
-                            originalIndex: index
-                          })
-                        })
-                      }
-
-                      return allMenuItems.length > 0 ? (
-                        allMenuItems.map((item, index) => (
-                          <TableRow
-                            key={`${item.menuType}-${item.originalIndex}`}
-                            sx={{
-                              '&:hover': {
-                                backgroundColor: alpha(theme.palette.primary.main, 0.04)
-                              },
-                              '&:last-child td, &:last-child th': { border: 0 }
-                            }}
-                          >
-                            <TableCell sx={{ py: 2 }}>
-                              <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                                {index + 1}
+                  ) : menuData?.content?.mainMenu ? (
+                    // Render mainMenu và submenu dạng cây
+                    menuData.content.mainMenu.length > 0 ? (
+                      menuData.content.mainMenu.map((item, index) => [
+                        // Main menu row
+                        <TableRow key={`main-${index}`}
+                          sx={{
+                            backgroundColor: '#f8fafc',
+                            '&:hover': { backgroundColor: '#e0e7ef' },
+                            '&:last-child td, &:last-child th': { border: 0 }
+                          }}
+                        >
+                          <TableCell sx={{ py: 2 }}>
+                            <Typography variant="body2" sx={{ fontWeight: 700 }}>
+                              {index + 1}
+                            </Typography>
+                          </TableCell>
+                          <TableCell sx={{ py: 2 }}>
+                            <Stack direction="row" alignItems="center" spacing={1}>
+                              <MenuIcon sx={{ color: '#3b82f6', fontSize: 18 }} />
+                              <Typography variant="body2" sx={{ fontWeight: 700, color: '#1e293b' }}>
+                                {item.label}
                               </Typography>
-                            </TableCell>
-                            <TableCell sx={{ py: 2 }}>
-                              <Stack direction="row" alignItems="center" spacing={1}>
-                                <DragIcon sx={{ color: '#9ca3af', fontSize: 16 }} />
-                                <Box>
-                                  <Typography
-                                    variant="body2"
-                                    sx={{ 
-                                      fontWeight: 600, 
-                                      color: '#1e293b',
-                                      ml: item.parentLabel ? 2 : 0
-                                    }}
-                                  >
-                                    {item.label}
-                                  </Typography>
-                                  {item.parentLabel && (
-                                    <Typography
-                                      variant="caption"
-                                      color="text.secondary"
-                                      sx={{ ml: 2 }}
-                                    >
-                                      Parent: {item.parentLabel}
-                                    </Typography>
-                                  )}
-                                </Box>
-                              </Stack>
-                            </TableCell>
-                            <TableCell sx={{ py: 2 }}>
-                              <Typography
-                                variant="body2"
-                                sx={{ 
-                                  fontFamily: 'monospace',
-                                  color: '#3b82f6',
-                                  fontWeight: 500
+                              {!item.visible && <VisibilityOffIcon sx={{ color: '#ef4444', fontSize: 16 }} />}
+                            </Stack>
+                          </TableCell>
+                          <TableCell sx={{ py: 2 }}>
+                            <Typography variant="body2" sx={{ fontFamily: 'monospace', color: '#3b82f6', fontWeight: 500 }}>
+                              {item.url || '—'}
+                            </Typography>
+                          </TableCell>
+                          <TableCell sx={{ py: 2 }}>
+                            <Chip
+                              label={item.visible ? 'Hiển thị' : 'Ẩn'}
+                              color={item.visible ? 'success' : 'error'}
+                              size="small"
+                              sx={{ fontWeight: 600 }}
+                            />
+                          </TableCell>
+                          <TableCell sx={{ py: 2 }}>
+                            <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                              {item.children ? item.children.length : 0}
+                            </Typography>
+                          </TableCell>
+                          <TableCell sx={{ py: 2 }}>
+                            <Stack direction="row" spacing={1}>
+                              <Tooltip title="Chỉnh sửa">
+                                <IconButton size="small" sx={{ color: '#3b82f6', '&:hover': { backgroundColor: '#dbeafe' } }}
+                                  onClick={() => {
+                                    setOpenMenuModal(true)
+                                  }}
+                                >
+                                  <EditIcon fontSize="small" />
+                                </IconButton>
+                              </Tooltip>
+                              <Tooltip title="Xóa">
+                                <IconButton size="small" sx={{ color: '#ef4444', '&:hover': { backgroundColor: '#fef2f2' } }}
+                                  onClick={() => {
+                                    // TODO: Xóa menu item
+                                    console.log('Delete menu item:', item)
+                                  }}
+                                >
+                                  <DeleteIcon fontSize="small" />
+                                </IconButton>
+                              </Tooltip>
+                            </Stack>
+                          </TableCell>
+                        </TableRow>,
+                        // Submenu rows
+                        ...(item.children && item.children.length > 0
+                          ? item.children.map((child, childIdx) => (
+                              <TableRow key={`sub-${index}-${childIdx}`}
+                                sx={{
+                                  backgroundColor: '#f1f5f9',
+                                  '&:hover': { backgroundColor: '#e0e7ef' },
+                                  '&:last-child td, &:last-child th': { border: 0 }
                                 }}
                               >
-                                {item.url}
-                              </Typography>
-                            </TableCell>
-                            <TableCell sx={{ py: 2 }}>
-                              <Chip
-                                label={item.menuType}
-                                size="small"
-                                variant="outlined"
-                                sx={{
-                                  fontWeight: 600,
-                                  backgroundColor: 
-                                    item.menuType === 'Main Menu' ? '#f0f9ff' :
-                                    item.menuType === 'Mobile Menu' ? '#f0fdf4' :
-                                    item.menuType === 'Footer Menu' ? '#fef2f2' : '#f8fafc',
-                                  borderColor: 
-                                    item.menuType === 'Main Menu' ? '#3b82f6' :
-                                    item.menuType === 'Mobile Menu' ? '#059669' :
-                                    item.menuType === 'Footer Menu' ? '#dc2626' : '#6b7280',
-                                  color: 
-                                    item.menuType === 'Main Menu' ? '#1e40af' :
-                                    item.menuType === 'Mobile Menu' ? '#047857' :
-                                    item.menuType === 'Footer Menu' ? '#b91c1c' : '#374151'
-                                }}
-                              />
-                            </TableCell>
-                            <TableCell sx={{ py: 2 }}>
-                              <Stack direction="row" alignItems="center" spacing={1}>
-                                <Chip
-                                  label={item.visible ? 'Hiển thị' : 'Ẩn'}
-                                  color={item.visible ? 'success' : 'error'}
-                                  size="small"
-                                  sx={{ fontWeight: 600 }}
-                                />
-                                {!item.visible && (
-                                  <VisibilityOffIcon sx={{ color: '#ef4444', fontSize: 16 }} />
-                                )}
-                              </Stack>
-                            </TableCell>
-                            <TableCell sx={{ py: 2 }}>
-                              <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                                {item.children ? item.children.length : 0}
-                              </Typography>
-                            </TableCell>
-                            <TableCell sx={{ py: 2 }}>
-                              <Stack direction="row" spacing={1}>
-                                <Tooltip title="Chỉnh sửa">
-                                  <IconButton
+                                <TableCell sx={{ py: 2 }}>
+                                  <Typography variant="body2" sx={{ fontWeight: 500, color: '#64748b' }}>
+                                    ↳
+                                  </Typography>
+                                </TableCell>
+                                <TableCell sx={{ py: 2, pl: 4 }}>
+                                  <Stack direction="row" alignItems="center" spacing={1}>
+                                    <MenuIcon sx={{ color: '#64748b', fontSize: 16 }} />
+                                    <Typography variant="body2" sx={{ fontWeight: 500, color: '#334155' }}>
+                                      {child.label}
+                                    </Typography>
+                                    {!child.visible && <VisibilityOffIcon sx={{ color: '#ef4444', fontSize: 16 }} />}
+                                  </Stack>
+                                </TableCell>
+                                <TableCell sx={{ py: 2 }}>
+                                  <Typography variant="body2" sx={{ fontFamily: 'monospace', color: '#3b82f6', fontWeight: 500 }}>
+                                    {child.url || '—'}
+                                  </Typography>
+                                </TableCell>
+                                <TableCell sx={{ py: 2 }}>
+                                  <Chip
+                                    label={child.visible ? 'Hiển thị' : 'Ẩn'}
+                                    color={child.visible ? 'success' : 'error'}
                                     size="small"
-                                    sx={{
-                                      color: '#3b82f6',
-                                      '&:hover': { backgroundColor: '#dbeafe' }
-                                    }}
-                                    onClick={() => {
-                                      // TODO: Open edit modal
-                                      console.log('Edit menu item:', item)
-                                    }}
-                                  >
-                                    <EditIcon fontSize="small" />
-                                  </IconButton>
-                                </Tooltip>
-                                <Tooltip title="Xóa">
-                                  <IconButton
-                                    size="small"
-                                    sx={{
-                                      color: '#ef4444',
-                                      '&:hover': { backgroundColor: '#fef2f2' }
-                                    }}
-                                    onClick={() => {
-                                      // TODO: Delete menu item
-                                      console.log('Delete menu item:', item)
-                                    }}
-                                  >
-                                    <DeleteIcon fontSize="small" />
-                                  </IconButton>
-                                </Tooltip>
-                              </Stack>
-                            </TableCell>
-                          </TableRow>
-                        ))
-                      ) : (
-                        <TableRow>
-                          <TableCell colSpan={7} sx={{ textAlign: 'center', py: 4 }}>
-                            {/* SVG No data icon */}
-                            <svg
-                              width='64'
-                              height='41'
-                              viewBox='0 0 64 41'
-                              xmlns='http://www.w3.org/2000/svg'
-                              style={{ marginBottom: 8 }}
-                            >
-                              <title>No data</title>
-                              <g transform='translate(0 1)' fill='none' fillRule='evenodd'>
-                                <ellipse fill='#f5f5f5' cx='32' cy='33' rx='32' ry='7'></ellipse>
-                                <g fillRule='nonzero' stroke='#d9d9d9'>
-                                  <path d='M55 12.76L44.854 1.258C44.367.474 43.656 0 42.907 0H21.093c-.749 0-1.46.474-1.947 1.257L9 12.761V22h46v-9.24z'></path>
-                                  <path
-                                    d='M41.613 15.931c0-1.605.994-2.93 2.227-2.931H55v18.137C55 33.26 53.68 35 52.05 35h-40.1C10.32 35 9 33.259 9 31.137V13h11.16c1.233 0 2.227 1.323 2.227 2.928v.022c0 1.605 1.005 2.901 2.237 2.901h14.752c1.232 0 2.237-1.308 2.237-2.913v-.007z'
-                                    fill='#fafafa'
-                                  ></path>
-                                </g>
+                                    sx={{ fontWeight: 600 }}
+                                  />
+                                </TableCell>
+                                <TableCell sx={{ py: 2 }}>
+                                  —
+                                </TableCell>
+                                <TableCell sx={{ py: 2 }}>
+                                  <Stack direction="row" spacing={1}>
+                                    <Tooltip title="Chỉnh sửa">
+                                      <IconButton size="small" sx={{ color: '#3b82f6', '&:hover': { backgroundColor: '#dbeafe' } }}
+                                        onClick={() => {
+                                          setOpenMenuModal(true)
+                                        }}
+                                      >
+                                        <EditIcon fontSize="small" />
+                                      </IconButton>
+                                    </Tooltip>
+                                    <Tooltip title="Xóa">
+                                      <IconButton size="small" sx={{ color: '#ef4444', '&:hover': { backgroundColor: '#fef2f2' } }}
+                                        onClick={() => {
+                                          // TODO: Xóa submenu item
+                                          console.log('Delete submenu item:', child)
+                                        }}
+                                      >
+                                        <DeleteIcon fontSize="small" />
+                                      </IconButton>
+                                    </Tooltip>
+                                  </Stack>
+                                </TableCell>
+                              </TableRow>
+                            ))
+                          : [])
+                      ])
+                    ) : (
+                      <TableRow>
+                        <TableCell colSpan={6} sx={{ textAlign: 'center', py: 4 }}>
+                          {/* SVG No data icon */}
+                          <svg
+                            width='64'
+                            height='41'
+                            viewBox='0 0 64 41'
+                            xmlns='http://www.w3.org/2000/svg'
+                            style={{ marginBottom: 8 }}
+                          >
+                            <title>No data</title>
+                            <g transform='translate(0 1)' fill='none' fillRule='evenodd'>
+                              <ellipse fill='#f5f5f5' cx='32' cy='33' rx='32' ry='7'></ellipse>
+                              <g fillRule='nonzero' stroke='#d9d9d9'>
+                                <path d='M55 12.76L44.854 1.258C44.367.474 43.656 0 42.907 0H21.093c-.749 0-1.46.474-1.947 1.257L9 12.761V22h46v-9.24z'></path>
+                                <path
+                                  d='M41.613 15.931c0-1.605.994-2.93 2.227-2.931H55v18.137C55 33.26 53.68 35 52.05 35h-40.1C10.32 35 9 33.259 9 31.137V13h11.16c1.233 0 2.227 1.323 2.227 2.928v.022c0 1.605 1.005 2.901 2.237 2.901h14.752c1.232 0 2.237-1.308 2.237-2.913v-.007z'
+                                  fill='#fafafa'
+                                ></path>
                               </g>
-                            </svg>
-                            <Typography variant="body1" color="text.secondary">
-                              Chưa có menu items nào
-                            </Typography>
-                            <Button
-                              variant="outlined"
-                              startIcon={<AddIcon />}
-                              onClick={() => setOpenMenuModal(true)}
-                              sx={{ mt: 2 }}
-                            >
-                              Tạo menu đầu tiên
-                            </Button>
-                          </TableCell>
-                        </TableRow>
-                      )
-                    })()
+                            </g>
+                          </svg>
+                          <Typography variant="body1" color="text.secondary">
+                            Chưa có menu items nào
+                          </Typography>
+                          <Button
+                            variant="outlined"
+                            startIcon={<AddIcon />}
+                            onClick={() => setOpenMenuModal(true)}
+                            sx={{ mt: 2 }}
+                          >
+                            Tạo menu đầu tiên
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    )
                   ) : (
                     <TableRow>
                       <TableCell colSpan={7} sx={{ textAlign: 'center', py: 4 }}>
