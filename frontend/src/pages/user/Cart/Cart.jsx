@@ -77,14 +77,18 @@ const Cart = () => {
 
   // Tự động chọn các sản phẩm từ reorder
   useEffect(() => {
-    // Debug: kiểm tra auto-select state
-    if (reorderVariantIds.length > 0) {
-      console.log('Auto-select check:', {
-        cartItemsCount: cartItems.length,
-        reorderVariantIds: reorderVariantIds,
-        hasAutoSelected
-      })
-    }
+    console.log('Auto-select effect triggered:', {
+      cartItemsLength: cartItems.length,
+      reorderVariantIdsLength: reorderVariantIds.length,
+      hasAutoSelected,
+      reorderVariantIds,
+      cartItems: cartItems.map(item => ({
+        variantId: item.variant?._id || item.variantId?._id || item.variantId,
+        name: item.name,
+        rawVariant: item.variant,
+        rawVariantId: item.variantId
+      }))
+    })
 
     if (cartItems.length > 0 && reorderVariantIds.length > 0 && !hasAutoSelected) {
       console.log('Auto-selecting reorder items:', reorderVariantIds)
@@ -94,7 +98,7 @@ const Cart = () => {
           // Handle cả variant._id và variantId trực tiếp
           const variantId = item.variant?._id || item.variantId?._id || item.variantId
           const isMatch = reorderVariantIds.includes(variantId)
-          // console.log(`Checking item ${item.name} with variantId ${variantId}: ${isMatch}`)
+          console.log(`Checking item ${item.name} with variantId ${variantId}: ${isMatch}`)
           return isMatch
         })
         .map(item => ({
@@ -102,23 +106,21 @@ const Cart = () => {
           quantity: item.quantity
         }))
 
+      console.log('Found reorder items to select:', reorderSelectedItems)
+
       if (reorderSelectedItems.length > 0) {
-        console.log('Auto-selected items count:', reorderSelectedItems.length)
+        console.log('Auto-selected items:', reorderSelectedItems)
         setSelectedItems(reorderSelectedItems)
         dispatch(setSelectedItemsAction(reorderSelectedItems))
         setHasAutoSelected(true)
 
         // Clear reorder variant IDs sau khi đã auto-select
         dispatch(clearReorderVariantIds())
+      } else {
+        console.log('No matching items found for auto-select')
       }
     }
   }, [cartItems, reorderVariantIds, hasAutoSelected, dispatch])
-
-  // Helper function to get max quantity for a variant
-  const getMaxQuantity = (variant) => {
-    // Sử dụng quantity từ variant, fallback về 99 nếu không có
-    return variant?.quantity || variant?.availableQuantity || variant?.stock || 99
-  }
 
   useEffect(() => {
     if (hasFetchedCoupons) return
@@ -180,7 +182,7 @@ const Cart = () => {
     if (!item) return
 
     const current = tempQuantities[variantId] ?? item.quantity
-    const max = getMaxQuantity(item.variant)
+    const max = item.variant.quantity || 99
 
     if (delta > 0 && current >= max) {
       setShowMaxQuantityAlert(true)
@@ -239,7 +241,6 @@ const Cart = () => {
         setSelectedItems((prev) =>
           prev.filter((i) => i.variantId !== variantId),
         )
-        // Không cần xử lý inventoryQuantities nữa vì đã bỏ
       }
     } catch (error) {
       console.error('Lỗi xoá sản phẩm:', error)
@@ -788,8 +789,9 @@ const Cart = () => {
                               }
                               disabled={
                                 processingVariantId === variant._id ||
+                                !variant.quantity ||
                                 (tempQuantities[variant._id] ?? item.quantity) >=
-                                getMaxQuantity(variant)
+                                variant.quantity
                               }
                               sx={{ borderRadius: 0, p: 0.5 }}
                             >
