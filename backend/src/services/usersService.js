@@ -41,6 +41,13 @@ const getUser = async (userId) => {
 const updateUser = async (userId, reqBody) => {
   // eslint-disable-next-line no-useless-catch
   try {
+    if (reqBody.password) {
+      // Băm mật khẩu
+      const hashedPassword = await password.hash(reqBody.password)
+
+      reqBody.password = hashedPassword
+    }
+
     const updatedUser = await UserModel.findOneAndUpdate(
       {
         _id: userId
@@ -54,19 +61,6 @@ const updateUser = async (userId, reqBody) => {
     if (!updatedUser) {
       throw new ApiError(StatusCodes.NOT_FOUND, 'ID không tồn tại.')
     }
-
-    // const role = reqBody.role
-    // // if (!Object.values(ROLE).includes(role)) {
-    // //   throw new ApiError(
-    // //     StatusCodes.UNPROCESSABLE_ENTITY,
-    // //     'Không đúng định dạng dữ liệu.'
-    // //   )
-    // // }
-    //
-    // // Cập nhật dữ liệu
-    // user.role = role
-    //
-    // const updatedUser = await user.save()
 
     return pickUser(updatedUser)
   } catch (err) {
