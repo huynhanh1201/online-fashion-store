@@ -113,7 +113,7 @@ const login = async (reqBody) => {
       throw new ApiError(StatusCodes.NOT_FOUND, 'Tài khoản không tồn tại!')
     }
 
-    if (!existsUser.isActive && existsUser.role !== 'customer') {
+    if (!existsUser.isActive && existsUser.role === 'customer') {
       throw new ApiError(
         StatusCodes.NOT_ACCEPTABLE,
         'Tài khoản của bạn chưa xác thực!'
