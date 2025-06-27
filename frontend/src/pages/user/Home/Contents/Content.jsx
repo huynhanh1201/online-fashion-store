@@ -156,8 +156,6 @@ const Content = () => {
                   <div style={{
                     width: 40,
                     height: 40,
-                    backgroundColor: '#f3f4f6',
-                    borderRadius: '50%',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center'

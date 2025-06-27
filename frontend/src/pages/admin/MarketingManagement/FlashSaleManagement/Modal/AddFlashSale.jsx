@@ -25,12 +25,14 @@ import {
   ListItemText,
   Paper,
   InputAdornment,
-  Portal
+  Portal,
+  Chip
 } from '@mui/material'
 import {
   Delete as DeleteIcon,
   AddCircleOutline as AddCircleOutlineIcon,
-  Search as SearchIcon
+  Search as SearchIcon,
+  Info as InfoIcon
 } from '@mui/icons-material'
 import { getProducts } from '~/services/productService'
 import {
@@ -38,6 +40,7 @@ import {
   getFlashSaleCampaigns,
   updateFlashSaleCampaign
 } from '~/services/admin/webConfig/flashsaleService'
+import { getProductVariants, updateProductVariantsDiscountPrice } from '~/services/admin/variantService'
 
 const AddFlashSale = ({ open, onClose, onSave, initialData }) => {
   const theme = useTheme()
@@ -59,6 +62,8 @@ const AddFlashSale = ({ open, onClose, onSave, initialData }) => {
   const [dropdownPosition, setDropdownPosition] = useState({})
   const [allProducts, setAllProducts] = useState([])
   const [existingCampaigns, setExistingCampaigns] = useState([])
+  const [productVariants, setProductVariants] = useState({})
+  const [updatingVariants, setUpdatingVariants] = useState({})
   const suggestionRefs = useRef({})
   const inputRefs = useRef({})
 
@@ -85,6 +90,32 @@ const AddFlashSale = ({ open, onClose, onSave, initialData }) => {
             isDisabled: true
           }))
         })
+
+        // Load biến thể cho các sản phẩm đã có sẵn
+        const loadExistingProductVariants = async () => {
+          try {
+            const variantPromises = initialData.products.map(async (p) => {
+              try {
+                const variants = await getProductVariants(p.productId)
+                return { productId: p.productId, variants }
+              } catch (err) {
+                console.error(`Lỗi khi lấy biến thể cho sản phẩm ${p.productId}:`, err)
+                return { productId: p.productId, variants: [] }
+              }
+            })
+            
+            const results = await Promise.all(variantPromises)
+            const variantsMap = {}
+            results.forEach(({ productId, variants }) => {
+              variantsMap[productId] = variants
+            })
+            setProductVariants(variantsMap)
+          } catch (err) {
+            console.error('Lỗi khi load biến thể cho sản phẩm hiện có:', err)
+          }
+        }
+        
+        loadExistingProductVariants()
       } else {
         const newId = generateUniqueId()
         setForm({
@@ -99,6 +130,10 @@ const AddFlashSale = ({ open, onClose, onSave, initialData }) => {
       setError('')
       setSuccess('')
       setWarning('')
+    } else {
+      // Reset biến thể khi đóng modal
+      setProductVariants({})
+      setUpdatingVariants({})
     }
   }, [open, initialData])
 
@@ -146,6 +181,35 @@ const AddFlashSale = ({ open, onClose, onSave, initialData }) => {
     clearMessages()
   }
 
+  // Xử lý thay đổi giá Flash Sale và cập nhật discountPrice cho biến thể
+  const handleFlashPriceChange = async (index, field, value) => {
+    const updated = [...form.products]
+    updated[index][field] = value
+    setForm((prev) => ({ ...prev, products: updated }))
+    clearMessages()
+
+    // Cập nhật discountPrice cho tất cả biến thể của sản phẩm (cả edit và add mode)
+    const product = updated[index]
+    if (product._id && value && !isNaN(value) && Number(value) > 0) {
+      const flashSalePrice = Number(value)
+      if (flashSalePrice < product.originalPrice) {
+        setUpdatingVariants(prev => ({ ...prev, [product._id]: true }))
+        try {
+          // Thay thế hoàn toàn discountPrice bằng giá Flash Sale
+          await updateProductVariantsDiscountPrice(product._id, flashSalePrice)
+          setSuccess(`Đã cập nhật giá Flash Sale cho tất cả biến thể của sản phẩm "${product.productName}"`)
+        } catch (err) {
+          console.error('Lỗi khi cập nhật discountPrice:', err)
+          setError(`Không thể cập nhật giá Flash Sale cho biến thể: ${err.message}`)
+        } finally {
+          setUpdatingVariants(prev => ({ ...prev, [product._id]: false }))
+        }
+      } else {
+        setWarning(`Giá Flash Sale phải thấp hơn giá gốc (${product.originalPrice.toLocaleString()} VND)`)
+      }
+    }
+  }
+
   const handleAddProduct = () => {
     setForm((prev) => ({
       ...prev,
@@ -166,8 +230,19 @@ const AddFlashSale = ({ open, onClose, onSave, initialData }) => {
 
   const handleRemoveProduct = (index) => {
     const updated = [...form.products]
+    const removedProduct = updated[index]
     updated.splice(index, 1)
     setForm((prev) => ({ ...prev, products: updated }))
+    
+    // Xóa thông tin biến thể của sản phẩm bị xóa
+    if (removedProduct._id) {
+      setProductVariants(prev => {
+        const newVariants = { ...prev }
+        delete newVariants[removedProduct._id]
+        return newVariants
+      })
+    }
+    
     clearMessages()
   }
 
@@ -239,7 +314,7 @@ const AddFlashSale = ({ open, onClose, onSave, initialData }) => {
   }
 
   // Xử lý chọn sản phẩm từ gợi ý
-  const handleProductSelect = (index, product) => {
+  const handleProductSelect = async (index, product) => {
     const prod = allProducts.find((p) => p._id === product._id)
     if (prod) {
       const existingProductIndex = [
@@ -277,6 +352,17 @@ const AddFlashSale = ({ open, onClose, onSave, initialData }) => {
           flashPrice: form.products[index]?.flashPrice || '',
           image: prod.image || [],
           isDisabled: false
+        }
+
+        // Load biến thể của sản phẩm mới được chọn
+        try {
+          const variants = await getProductVariants(prod._id)
+          setProductVariants(prev => ({
+            ...prev,
+            [prod._id]: variants
+          }))
+        } catch (err) {
+          console.error('Lỗi khi lấy biến thể sản phẩm:', err)
         }
       }
 
@@ -592,6 +678,23 @@ const AddFlashSale = ({ open, onClose, onSave, initialData }) => {
               <AddCircleOutlineIcon sx={{ color: '#3b82f6' }} />
               Sản phẩm Flash Sale
             </Typography>
+            
+            {/* Thông báo về việc cập nhật biến thể */}
+            <Alert
+              severity='info'
+              icon={<InfoIcon />}
+              sx={{
+                mb: 2,
+                borderRadius: 2,
+                backgroundColor: alpha(theme.palette.info.main, 0.08),
+                border: `1px solid ${alpha(theme.palette.info.main, 0.3)}`
+              }}
+            >
+              <Typography variant='body2'>
+                Khi nhập giá Flash Sale, hệ thống sẽ tự động cập nhật giá giảm (discountPrice) cho tất cả biến thể của sản phẩm đó.
+              </Typography>
+            </Alert>
+
             <Box
               sx={{
                 maxHeight: 300,
@@ -704,30 +807,38 @@ const AddFlashSale = ({ open, onClose, onSave, initialData }) => {
                       />
                     </Grid>
                     <Grid item xs={12} sm={3}>
-                      <TextField
-                        fullWidth
-                        label='Giá Flash Sale *'
-                        type='number'
-                        value={product.flashPrice}
-                        onChange={(e) =>
-                          handleProductChange(
-                            index,
-                            'flashPrice',
-                            e.target.value
-                          )
-                        }
-                        required
-                        disabled={product.isDisabled}
-                        inputProps={{ min: 0 }}
-                        sx={{
-                          '& .MuiOutlinedInput-root': {
-                            borderRadius: 2,
-                            backgroundColor: product.isDisabled
-                              ? '#e2e8f0'
-                              : '#fff'
+                      <Box sx={{ position: 'relative' }}>
+                        <TextField
+                          fullWidth
+                          label='Giá giảm *'
+                          type='number'
+                          value={product.flashPrice}
+                          onChange={(e) =>
+                            handleFlashPriceChange(index, 'flashPrice', e.target.value)
                           }
-                        }}
-                      />
+                          required
+                          disabled={false}
+                          inputProps={{ min: 0 }}
+                          sx={{
+                            '& .MuiOutlinedInput-root': {
+                              borderRadius: 2,
+                              backgroundColor: '#fff'
+                            }
+                          }}
+                        />
+                        {updatingVariants[product._id] && (
+                          <CircularProgress
+                            size={20}
+                            sx={{
+                              position: 'absolute',
+                              right: 12,
+                              top: '50%',
+                              transform: 'translateY(-50%)',
+                              color: '#3b82f6'
+                            }}
+                          />
+                        )}
+                      </Box>
                     </Grid>
                     <Grid item xs={12} sm={1}>
                       {product.image && product.image.length > 0 && (
@@ -766,6 +877,40 @@ const AddFlashSale = ({ open, onClose, onSave, initialData }) => {
                       </Tooltip>
                     </Grid>
                   </Grid>
+                  
+                  {/* Hiển thị thông tin biến thể */}
+                  {productVariants[product._id] && productVariants[product._id].length > 0 && (
+                    <div className="mt-2 p-3 bg-gray-50 rounded-lg">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-sm font-medium text-gray-700">
+                          Biến thể sẽ được cập nhật ({productVariants[product._id].length} biến thể):
+                        </span>
+                        {updatingVariants[product._id] && (
+                          <div className="flex items-center text-blue-600">
+                            <CircularProgress size={16} />
+                            <span className="ml-1 text-xs">Đang cập nhật...</span>
+                          </div>
+                        )}
+                      </div>
+                      <div className="space-y-1">
+                        {productVariants[product._id].map((variant, vIndex) => (
+                          <div key={vIndex} className="text-xs text-gray-600 flex justify-between">
+                            <span>
+                              {variant.color?.name || 'N/A'} - {variant.size?.name || 'N/A'} - {variant.sku}
+                            </span>
+                            <span className="font-medium">
+                              {variant.originalPrice?.toLocaleString()} VND → {form.products[index].flashPrice ? Number(form.products[index].flashPrice).toLocaleString() : '...'} VND
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                      <div className="mt-2 text-xs text-gray-500">
+                        <p>• Giá ban đầu: {product.originalPrice?.toLocaleString()} VND</p>
+                        <p>• Giá Flash Sale sẽ thay thế hoàn toàn giá hiện tại</p>
+                        <p>• Khi hết thời gian, giá sẽ trở về giá ban đầu</p>
+                      </div>
+                    </div>
+                  )}
                 </Card>
               ))}
             </Box>

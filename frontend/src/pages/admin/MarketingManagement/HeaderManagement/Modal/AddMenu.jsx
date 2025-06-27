@@ -27,7 +27,10 @@ import {
   Divider,
   Alert,
   CircularProgress,
-  Autocomplete
+  Autocomplete,
+  Tabs,
+  Tab,
+  Paper
 } from '@mui/material'
 import {
   Close as CloseIcon,
@@ -37,7 +40,9 @@ import {
   ExpandMore as ExpandMoreIcon,
   DragIndicator as DragIcon,
   Visibility as VisibilityIcon,
-  VisibilityOff as VisibilityOffIcon
+  VisibilityOff as VisibilityOffIcon,
+  Preview as PreviewIcon,
+  Settings as SettingsIcon
 } from '@mui/icons-material'
 import { 
   saveMenuConfig, 
@@ -45,6 +50,7 @@ import {
   validateMenuContent 
 } from '~/services/admin/webConfig/headerService.js'
 import { getCategories } from '~/services/admin/categoryService.js'
+import MenuPreview from './MenuPreview.jsx'
 
 const AddMenu = ({ open, onClose, onSuccess, initialData = null }) => {
   const [loading, setLoading] = useState(false)
@@ -57,6 +63,7 @@ const AddMenu = ({ open, onClose, onSuccess, initialData = null }) => {
   const [categories, setCategories] = useState([])
   const [categoriesLoading, setCategoriesLoading] = useState(false)
   const [urlType, setUrlType] = useState('manual') // 'manual' or 'category'
+  const [activeTab, setActiveTab] = useState(0) // 0: Editor, 1: Preview
 
   useEffect(() => {
     if (initialData) {
@@ -251,185 +258,146 @@ const AddMenu = ({ open, onClose, onSuccess, initialData = null }) => {
     }
   }
 
-  const renderMenuSection = (type, title, color) => (
-    <Accordion defaultExpanded>
-      <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-        <Typography variant="h6" sx={{ fontWeight: 600, color }}>
-          {title}
+  // Đổi vị trí menu item lên/xuống
+  const moveMenuItem = (type, index, direction, subIndex = -1) => {
+    setMenuData(prev => {
+      const newData = { ...prev }
+      if (subIndex >= 0) {
+        // Submenu
+        const arr = newData[type][index].children
+        if (
+          (direction === 'up' && subIndex === 0) ||
+          (direction === 'down' && subIndex === arr.length - 1)
+        ) return prev
+        const swapWith = direction === 'up' ? subIndex - 1 : subIndex + 1
+        ;[arr[subIndex], arr[swapWith]] = [arr[swapWith], arr[subIndex]]
+        arr.forEach((item, idx) => (item.order = idx + 1))
+      } else {
+        // Main menu
+        const arr = newData[type]
+        if (
+          (direction === 'up' && index === 0) ||
+          (direction === 'down' && index === arr.length - 1)
+        ) return prev
+        const swapWith = direction === 'up' ? index - 1 : index + 1
+        ;[arr[index], arr[swapWith]] = [arr[swapWith], arr[index]]
+        arr.forEach((item, idx) => (item.order = idx + 1))
+      }
+      return newData
+    })
+  }
+
+  // Hiển thị menu dạng cây lồng nhau
+  const renderTreeMenu = (type) => (
+    <Box>
+      {menuData[type]?.length === 0 && (
+        <Typography sx={{ color: 'text.secondary', fontStyle: 'italic', mb: 2 }}>
+          Chưa có menu nào. Nhấn "Thêm menu" để bắt đầu.
         </Typography>
-        <Chip 
-          label={menuData[type]?.length || 0} 
-          size="small" 
-          sx={{ ml: 'auto', mr: 2 }}
-        />
-      </AccordionSummary>
-      <AccordionDetails>
-        <Stack spacing={2}>
-          {menuData[type]?.map((item, index) => (
-            <Box key={index} sx={{ border: '1px solid #e0e0e0', borderRadius: 2, p: 2 }}>
-              <Stack direction="row" alignItems="center" spacing={2}>
-                <DragIcon sx={{ color: '#9ca3af' }} />
-                <Box sx={{ flex: 1 }}>
-                  <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
-                    {item.label || 'Chưa có tên'}
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary" sx={{ fontFamily: 'monospace' }}>
-                    {item.url || 'Chưa có URL'}
-                  </Typography>
-                  {type === 'mainMenu' && (
-                    <Typography variant="caption" color="text.secondary">
-                      Thứ tự: {item.order || index + 1} | 
-                      {item.children?.length > 0 ? ` ${item.children.length} submenu` : ' Không có submenu'}
+      )}
+      {menuData[type]?.map((item, index) => (
+        <Box key={index} sx={{
+          border: '1px solid #e0e0e0',
+          borderRadius: 2,
+          p: 2,
+          mb: 2,
+          boxShadow: '0 2px 8px 0 rgba(60,72,88,.06)',
+          background: item.visible ? '#fff' : '#f3f4f6',
+          opacity: item.visible ? 1 : 0.6,
+        }}>
+          <Stack direction="row" alignItems="center" spacing={1}>
+            <Typography variant="subtitle1" sx={{ fontWeight: 600, flex: 1 }}>
+              {item.label || 'Chưa có tên'}
+            </Typography>
+            <Typography variant="caption" color="text.secondary" sx={{ fontFamily: 'monospace' }}>
+              {item.url || 'Chưa có URL'}
+            </Typography>
+            <IconButton size="small" onClick={() => moveMenuItem(type, index, 'up')}><ExpandMoreIcon sx={{ transform: 'rotate(-90deg)' }} /></IconButton>
+            <IconButton size="small" onClick={() => moveMenuItem(type, index, 'down')}><ExpandMoreIcon sx={{ transform: 'rotate(90deg)' }} /></IconButton>
+            <IconButton size="small" onClick={() => handleEditItem(type, index)} sx={{ color: '#3b82f6' }}><EditIcon /></IconButton>
+            <IconButton size="small" onClick={() => handleDeleteItem(type, index)} sx={{ color: '#ef4444' }}><DeleteIcon /></IconButton>
+            <FormControlLabel
+              control={<Switch checked={item.visible} onChange={e => setMenuData(prev => {
+                const arr = [...prev[type]]; arr[index].visible = e.target.checked; return { ...prev, [type]: arr } })} />}
+              label={item.visible ? 'Hiện' : 'Ẩn'}
+              sx={{ ml: 1 }}
+            />
+            <Button size="small" variant="outlined" onClick={() => handleAddSubmenu(type, index)} sx={{ ml: 1 }}>
+              + Submenu
+            </Button>
+          </Stack>
+          {/* Submenu */}
+          {item.children && item.children.length > 0 && (
+            <Box sx={{ mt: 2, ml: 4 }}>
+              {item.children.map((sub, subIdx) => (
+                <Box key={subIdx} sx={{
+                  border: '1px solid #e0e0e0',
+                  borderRadius: 2,
+                  p: 1.5,
+                  mb: 1,
+                  background: sub.visible ? '#fafafa' : '#f3f4f6',
+                  opacity: sub.visible ? 1 : 0.6,
+                }}>
+                  <Stack direction="row" alignItems="center" spacing={1}>
+                    <Typography variant="body2" sx={{ fontWeight: 500, flex: 1 }}>
+                      {sub.label || 'Chưa có tên'}
                     </Typography>
-                  )}
-                </Box>
-                <Stack direction="row" spacing={1}>
-                  <Chip
-                    label={item.visible ? 'Hiển thị' : 'Ẩn'}
-                    color={item.visible ? 'success' : 'error'}
-                    size="small"
-                  />
-                  {item.children && (
-                    <Chip
-                      label={`${item.children.length} submenu`}
-                      size="small"
-                      variant="outlined"
+                    <Typography variant="caption" color="text.secondary" sx={{ fontFamily: 'monospace' }}>
+                      {sub.url || 'Chưa có URL'}
+                    </Typography>
+                    <IconButton size="small" onClick={() => moveMenuItem(type, index, 'up', subIdx)}><ExpandMoreIcon sx={{ transform: 'rotate(-90deg)' }} /></IconButton>
+                    <IconButton size="small" onClick={() => moveMenuItem(type, index, 'down', subIdx)}><ExpandMoreIcon sx={{ transform: 'rotate(90deg)' }} /></IconButton>
+                    <IconButton size="small" onClick={() => handleEditItem(type, index, subIdx)} sx={{ color: '#3b82f6' }}><EditIcon fontSize="small" /></IconButton>
+                    <IconButton size="small" onClick={() => handleDeleteItem(type, index, subIdx)} sx={{ color: '#ef4444' }}><DeleteIcon fontSize="small" /></IconButton>
+                    <FormControlLabel
+                      control={<Switch checked={sub.visible} onChange={e => setMenuData(prev => {
+                        const arr = [...prev[type]]; arr[index].children[subIdx].visible = e.target.checked; return { ...prev, [type]: arr } })} />}
+                      label={sub.visible ? 'Hiện' : 'Ẩn'}
+                      sx={{ ml: 1 }}
                     />
-                  )}
-                  {type === 'mainMenu' && item.children?.length > 0 && (
-                    <Chip
-                      label="Megamenu"
-                      size="small"
-                      color="primary"
-                      variant="outlined"
-                    />
-                  )}
-                </Stack>
-                <IconButton
-                  size="small"
-                  onClick={() => handleEditItem(type, index)}
-                  sx={{ color: '#3b82f6' }}
-                >
-                  <EditIcon />
-                </IconButton>
-                <IconButton
-                  size="small"
-                  onClick={() => handleDeleteItem(type, index)}
-                  sx={{ color: '#ef4444' }}
-                >
-                  <DeleteIcon />
-                </IconButton>
-              </Stack>
-
-              {/* Submenu items */}
-              {item.children && item.children.length > 0 && (
-                <Box sx={{ mt: 2, ml: 4 }}>
-                  <Typography variant="subtitle2" sx={{ mb: 1, color: 'text.secondary' }}>
-                    Submenu (Megamenu columns):
-                  </Typography>
-                  <List dense>
-                    {item.children.map((subItem, subIndex) => {
-                      const linkedCategory = categories.find(cat => 
-                        cat.link === subItem.url || `/categories/${cat._id}` === subItem.url
-                      )
-                      
-                      return (
-                        <ListItem key={subIndex} sx={{ py: 0.5 }}>
-                          <ListItemText
-                            primary={
-                              <Stack direction="row" alignItems="center" spacing={1}>
-                                <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                                  {subItem.label || 'Chưa có tên'}
-                                </Typography>
-                                {linkedCategory && (
-                                  <Chip
-                                    label="Danh mục"
-                                    size="small"
-                                    color="primary"
-                                    variant="outlined"
-                                    sx={{ fontSize: '0.7rem' }}
-                                  />
-                                )}
-                              </Stack>
-                            }
-                            secondary={
-                              <Stack spacing={0.5}>
-                                <Typography variant="caption" sx={{ fontFamily: 'monospace' }}>
-                                  {subItem.url || 'Chưa có URL'}
-                                </Typography>
-                                <Typography variant="caption" color="text.secondary">
-                                  Thứ tự: {subItem.order || subIndex + 1}
-                                  {linkedCategory && ` | Danh mục: ${linkedCategory.name}`}
-                                </Typography>
-                              </Stack>
-                            }
-                          />
-                          <ListItemSecondaryAction>
-                            <Stack direction="row" spacing={1}>
-                              <Chip
-                                label={subItem.visible ? 'Hiển thị' : 'Ẩn'}
-                                color={subItem.visible ? 'success' : 'error'}
-                                size="small"
-                              />
-                              <IconButton
-                                size="small"
-                                onClick={() => handleEditItem(type, index, subIndex)}
-                                sx={{ color: '#3b82f6' }}
-                              >
-                                <EditIcon />
-                              </IconButton>
-                              <IconButton
-                                size="small"
-                                onClick={() => handleDeleteItem(type, index, subIndex)}
-                                sx={{ color: '#ef4444' }}
-                              >
-                                <DeleteIcon />
-                              </IconButton>
-                            </Stack>
-                          </ListItemSecondaryAction>
-                        </ListItem>
-                      )
-                    })}
-                  </List>
+                  </Stack>
                 </Box>
-              )}
-
-              {/* Add submenu button for main menu */}
-              {type === 'mainMenu' && (
-                <Button
-                  startIcon={<AddIcon />}
-                  size="small"
-                  onClick={() => handleAddSubmenu(type, index)}
-                  sx={{ mt: 1, ml: 4 }}
-                >
-                  Thêm submenu (Megamenu column)
-                </Button>
-              )}
+              ))}
             </Box>
-          ))}
-
-          <Button
-            startIcon={<AddIcon />}
-            variant="outlined"
-            onClick={() => handleAddItem(type)}
-            sx={{ alignSelf: 'flex-start' }}
-          >
-            Thêm menu item
-          </Button>
-        </Stack>
-      </AccordionDetails>
-    </Accordion>
+          )}
+        </Box>
+      ))}
+      <Button
+        startIcon={<AddIcon />}
+        variant="contained"
+        onClick={() => handleAddItem(type)}
+        sx={{ mt: 1, fontWeight: 600 }}
+      >
+        Thêm menu
+      </Button>
+    </Box>
   )
+
+  const renderTabContent = () => {
+    if (activeTab === 0) {
+      return (
+        <>
+          <Alert severity="info" sx={{ mb: 2 }}>
+            Kéo/thả thứ tự bằng nút Lên/Xuống. Nhấn vào từng mục để chỉnh sửa, thêm submenu hoặc xóa. Submenu sẽ hiển thị lồng bên trong.<br/>
+            <b>Lưu ý:</b> Menu chỉ hỗ trợ 2 cấp (menu & submenu).
+          </Alert>
+          {renderTreeMenu('mainMenu')}
+        </>
+      )
+    } else {
+      return <MenuPreview menuData={{ mainMenu: menuData.mainMenu }} categories={categories} />
+    }
+  }
 
   return (
     <>
       <Dialog 
         open={open} 
         onClose={onClose}
-        maxWidth="md"
+        maxWidth="lg"
         fullWidth
         PaperProps={{
-          sx: { borderRadius: 3 }
+          sx: { borderRadius: 3, height: '90vh' }
         }}
       >
         <DialogTitle sx={{ pb: 1 }}>
@@ -443,18 +411,37 @@ const AddMenu = ({ open, onClose, onSuccess, initialData = null }) => {
           </Stack>
         </DialogTitle>
 
-        <DialogContent sx={{ pb: 2 }}>
+        <DialogContent sx={{ pb: 2, p: 0 }}>
           {error && (
-            <Alert severity="error" sx={{ mb: 2 }}>
+            <Alert severity="error" sx={{ m: 2 }}>
               {error}
             </Alert>
           )}
 
-          <Stack spacing={3}>
-            {renderMenuSection('mainMenu', 'Main Menu', '#7c3aed')}
-            {renderMenuSection('mobileMenu', 'Mobile Menu', '#059669')}
-            {renderMenuSection('footerMenu', 'Footer Menu', '#dc2626')}
-          </Stack>
+          <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+            <Tabs 
+              value={activeTab} 
+              onChange={(e, newValue) => setActiveTab(newValue)}
+              sx={{ px: 2 }}
+            >
+              <Tab 
+                icon={<SettingsIcon />} 
+                label="Chỉnh sửa" 
+                iconPosition="start"
+                sx={{ minHeight: 64 }}
+              />
+              <Tab 
+                icon={<PreviewIcon />} 
+                label="Xem trước" 
+                iconPosition="start"
+                sx={{ minHeight: 64 }}
+              />
+            </Tabs>
+          </Box>
+
+          <Box sx={{ p: 2, height: 'calc(90vh - 200px)', overflow: 'auto' }}>
+            {renderTabContent()}
+          </Box>
         </DialogContent>
 
         <DialogActions sx={{ p: 3, pt: 1 }}>
