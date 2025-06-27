@@ -35,7 +35,13 @@ const register = async (req, res, next) => {
 
     confirmPassword: Joi.any()
       .valid(Joi.ref('password')) // Phải bằng password
-      .required() // Bắt buộc nhập lại
+      .required(), // Bắt buộc nhập lại
+
+    role: Joi.string() // Khai báo kiểu chuỗi
+      .min(1) // Chuỗi tối thiểu 3 ký tự
+      .max(50) // Chuỗi tối đa 50 ký tự
+      .trim() // Loại bỏ khoảng trắng đầu/cuối trước khi validate
+      .strict() // Không cho phép ký tự không hợp lệ
   })
 
   try {
