@@ -48,12 +48,12 @@ const updateUser = async (userId, reqBody) => {
     }
 
     const role = reqBody.role
-    if (!Object.values(ROLE).includes(role)) {
-      throw new ApiError(
-        StatusCodes.UNPROCESSABLE_ENTITY,
-        'Không đúng định dạng dữ liệu.'
-      )
-    }
+    // if (!Object.values(ROLE).includes(role)) {
+    //   throw new ApiError(
+    //     StatusCodes.UNPROCESSABLE_ENTITY,
+    //     'Không đúng định dạng dữ liệu.'
+    //   )
+    // }
 
     // Cập nhật dữ liệu
     user.role = role
