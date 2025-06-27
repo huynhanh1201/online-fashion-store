@@ -8,6 +8,7 @@ import OrderedList from '@tiptap/extension-ordered-list'
 import TaskList from '@tiptap/extension-task-list'
 import TaskItem from '@tiptap/extension-task-item'
 import Link from '@tiptap/extension-link'
+import Image from '@tiptap/extension-image'
 import { Video } from 'reactjs-tiptap-editor/video'
 import HorizontalRule from '@tiptap/extension-horizontal-rule'
 import Blockquote from '@tiptap/extension-blockquote'
@@ -28,8 +29,6 @@ import { Emoji } from 'reactjs-tiptap-editor/emoji'
 import { TextAlign } from 'reactjs-tiptap-editor/textalign'
 import { Iframe } from 'reactjs-tiptap-editor/iframe'
 
-import { CustomImage } from './CustomImage'
-
 export const extensions = [
   StarterKit.configure({
     codeBlock: false
@@ -49,7 +48,7 @@ export const extensions = [
   TaskList,
   TaskItem.configure({ nested: true }),
   Link.configure({ openOnClick: false }),
-  CustomImage,
+  Image,
   Video,
   HorizontalRule,
   Blockquote,
