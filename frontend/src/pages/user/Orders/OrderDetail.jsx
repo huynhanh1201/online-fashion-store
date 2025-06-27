@@ -344,6 +344,11 @@ const OrderDetail = () => {
     }
   }
 
+  // Handle click on product to navigate to product detail page
+  const handleProductClick = (productId) => {
+    navigate(`/productdetail/${productId}`)
+  }
+
   return (
     <Box maxWidth="lg" mx="auto" p={3} sx={{ minHeight: '70vh' }}>
       <Card
@@ -434,6 +439,7 @@ const OrderDetail = () => {
                         backgroundColor: variantIndex % 2 === 0 ? 'transparent' : 'grey.50',
                         border: '1px solid',
                         borderColor: 'grey.200',
+                        cursor: 'pointer',
                         transition: 'all 0.2s ease',
                         '&:hover': {
                           backgroundColor: 'grey.100',
@@ -441,6 +447,7 @@ const OrderDetail = () => {
                           transform: 'translateX(4px)'
                         }
                       }}
+                      onClick={() => handleProductClick(product.productId)}
                     >
                       <Box display="flex" justifyContent="space-between" alignItems="center">
                         <Box display="flex" alignItems="center" gap={2}>
@@ -539,7 +546,8 @@ const OrderDetail = () => {
                           boxShadow: '0 4px 12px rgba(26, 60, 123, 0.3)'
                         },
                       }}
-                      onClick={() => {
+                      onClick={(e) => {
+                        e.stopPropagation()
                         setSelectedProduct(product)
                         setOpenReviewModal(true)
                       }}
@@ -563,7 +571,8 @@ const OrderDetail = () => {
                           borderColor: 'success.main'
                         }
                       }}
-                      onClick={() => {
+                      onClick={(e) => {
+                        e.stopPropagation()
                         setSelectedProduct(product)
                         setOpenViewReviewModal(true)
                       }}
