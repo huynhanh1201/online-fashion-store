@@ -45,7 +45,10 @@ const updateUser = async (userId, reqBody) => {
       {
         _id: userId
       },
-      reqBody
+      reqBody,
+      {
+        new: true
+      }
     )
 
     if (!updatedUser) {
