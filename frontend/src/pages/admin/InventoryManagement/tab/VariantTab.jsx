@@ -154,6 +154,7 @@ const VariantsTab = () => {
     { id: 'name', label: 'Tên sản phẩm', minWidth: 250 },
     { id: 'color', label: 'Màu sắc', minWidth: 150 },
     { id: 'size.name', label: 'Kích thước', minWidth: 150 },
+    { id: 'quantity', label: 'Số lượng', minWidth: 100, align: 'right' },
     {
       id: 'importPrice',
       label: 'Giá nhập',
@@ -358,11 +359,11 @@ const VariantsTab = () => {
                         content =
                           row.size?.name.toUpperCase() || 'Không có màu sắc'
                       }
-                      if (id === 'destroy') {
+                      if (id === 'quantity') {
                         content = (
                           <Chip
-                            label={rawValue ? 'Đã huỷ' : 'Còn hàng'}
-                            color={rawValue ? 'error' : 'success'}
+                            label={rawValue === 0 ? 'Hết hàng' : 'Còn hàng'}
+                            color={rawValue === 0 ? 'error' : 'success'}
                             size='large'
                             sx={{ width: 127, fontWeight: 800 }}
                           />

@@ -136,6 +136,48 @@ export default function AdminDrawer({
           }
         ]
       },
+      contentManagement: {
+        permissions: ['user:use'],
+        label: 'Quản lý nội dung',
+        icon: <LocalOfferIcon />,
+        children: [
+          {
+            permission: 'user:use',
+            label: 'Ảnh quảng cáo',
+            path: '/admin/display-management'
+          },
+          {
+            permission: 'user:use',
+            label: 'Chương trình khuyến mãi',
+            path: '/admin/flashsale-management'
+          },
+          {
+            permission: 'user:use',
+            label: 'Nội dung đầu trang',
+            path: '/admin/header-management'
+          },
+          {
+            permission: 'user:use',
+            label: 'Nội dung cuối trang',
+            path: '/admin/footer-management'
+          },
+          {
+            permission: 'user:use',
+            label: 'Danh mục nổi bật',
+            path: '/admin/featured-category-management'
+          },
+          {
+            permission: 'user:use',
+            label: 'dịch vụ nổi bậc',
+            path: '/admin/service-highlight-management'
+          },
+          {
+            permission: 'user:use',
+            label: 'Nội dung bài viết',
+            path: '/admin/blog-management'
+          }
+        ]
+      },
       productManagement: {
         permissions: [
           'product:use',
@@ -548,85 +590,36 @@ export default function AdminDrawer({
               </Collapse>
             </>
           )}
-
-          <ListItem disablePadding>
-            <ListItemButton onClick={toggleContent} sx={activeButtonStyle}>
-              <ListItemIcon>
-                <LocalOfferIcon />
-              </ListItemIcon>
-              <ListItemText primary='Quản lý nội dung' />
-              {openContent ? <ExpandLess /> : <ExpandMore />}
-            </ListItemButton>
-          </ListItem>
-          <Collapse in={openContent} timeout='auto' unmountOnExit>
-            <List component='div' disablePadding>
-              <ListItemButton
-                component={Link}
-                to='/admin/display-management'
-                selected={isActive('/admin/display-management')}
-                sx={{ ...activeButtonStyle }}
-              >
-                <ListItemIcon>
-                  <LocalOfferIcon sx={{ visibility: 'hidden' }} />
-                </ListItemIcon>
-                <ListItemText primary='Ảnh quảng cáo' />
-              </ListItemButton>
-
-              <ListItemButton
-                component={Link}
-                to='/admin/flashsale-management'
-                selected={isActive('/admin/flashsale-management')}
-                sx={{ ...activeButtonStyle }}
-              >
-                <ListItemIcon>
-                  <LocalOfferIcon sx={{ visibility: 'hidden' }} />
-                </ListItemIcon>
-                <ListItemText primary='Chương trình khuyến mãi' />
-              </ListItemButton>
-              <ListItemButton
-                component={Link}
-                to='/admin/header-management'
-                selected={isActive('/admin/header-management')}
-                sx={{ ...activeButtonStyle }}
-              >
-                <ListItemIcon>
-                  <LocalOfferIcon sx={{ visibility: 'hidden' }} />
-                </ListItemIcon>
-                <ListItemText primary='Nội dung đầu trang' />
-              </ListItemButton>
-              <ListItemButton
-                component={Link}
-                to='/admin/footer-management'
-                selected={isActive('/admin/footer-management')}
-                sx={{ ...activeButtonStyle }}
-              >
-                <ListItemIcon>
-                  <LocalOfferIcon sx={{ visibility: 'hidden' }} />
-                </ListItemIcon>
-                <ListItemText primary='Nội dung cuối trang' />
-              </ListItemButton>
-              <ListItemButton
-                component={Link}
-                to='/admin/featured-category-management'
-                selected={isActive('/admin/featured-category-management')}
-                sx={{ ...activeButtonStyle }}
-              >
-                <ListItemIcon></ListItemIcon>
-                <ListItemText primary='Danh mục nổi bật' />
-                <LocalOfferIcon sx={{ visibility: 'hidden' }} />
-              </ListItemButton>
-              <ListItemButton
-                component={Link}
-                to='/admin/service-highlight-management'
-                selected={isActive('/admin/service-highlight-management')}
-                sx={{ ...activeButtonStyle }}
-              >
-                <ListItemIcon></ListItemIcon>
-
-                <ListItemText primary='Dịch vụ nổi bật' />
-              </ListItemButton>
-            </List>
-          </Collapse>
+          {canAccessMenu(menuConfig.contentManagement) && (
+            <>
+              <ListItem disablePadding>
+                <ListItemButton onClick={toggleContent} sx={activeButtonStyle}>
+                  <ListItemIcon>
+                    <LocalOfferIcon />
+                  </ListItemIcon>
+                  <ListItemText primary='Quản lý nội dung' />
+                  {openContent ? <ExpandLess /> : <ExpandMore />}
+                </ListItemButton>
+              </ListItem>
+              <Collapse in={openContent} timeout='auto' unmountOnExit>
+                <List component='div' disablePadding>
+                  {getVisibleChildren(
+                    menuConfig.contentManagement.children
+                  ).map((item) => (
+                    <ListItemButton
+                      key={item.path}
+                      component={Link}
+                      to={item.path}
+                      selected={isActive(item.path)}
+                      sx={{ pl: 2, ...activeButtonStyle }}
+                    >
+                      <ListItemText primary={item.label} sx={{ ml: 7 }} />
+                    </ListItemButton>
+                  ))}
+                </List>
+              </Collapse>
+            </>
+          )}
           {canAccessMenu(menuConfig.productManagement) && (
             <>
               <ListItem disablePadding>
