@@ -37,4 +37,16 @@ Router.route('/:variantId').delete(
   variantsController.deleteVariant
 )
 
+// Cập nhật discountPrice cho tất cả biến thể của một sản phẩm
+Router.route('/product/:productId/discount-price').patch(
+  variantsValidation.verifyProductId,
+  variantsController.updateProductVariantsDiscountPrice
+)
+
+// Khôi phục discountPrice về giá ban đầu cho tất cả biến thể của một sản phẩm
+Router.route('/product/:productId/restore-discount-price').patch(
+  variantsValidation.verifyProductId,
+  variantsController.restoreProductVariantsOriginalDiscountPrice
+)
+
 export const variantsRoute = Router

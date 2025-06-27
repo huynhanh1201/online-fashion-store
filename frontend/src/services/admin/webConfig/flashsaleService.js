@@ -1,5 +1,6 @@
 import AuthorizedAxiosInstance from '~/utils/authorizedAxios.js'
 import { API_ROOT } from '~/utils/constants.js'
+import { restoreProductVariantsOriginalDiscountPrice } from '~/services/admin/variantService'
 
 // Lấy cấu hình Flash Sale từ website-configs
 export const getFlashSaleConfig = async () => {
@@ -703,5 +704,64 @@ export const createFlashSale = async (campaignContent) => {
         error.message ||
         'Không thể tạo mới campaign Flash Sale. Vui lòng thử lại.'
     )
+  }
+}
+
+// Kiểm tra và khôi phục giá cho các Flash Sale đã hết thời gian
+export const checkAndRestoreExpiredFlashSales = async () => {
+  try {
+    const campaigns = await getFlashSaleCampaigns()
+    const now = new Date()
+    const expiredCampaigns = campaigns.filter(campaign => {
+      if (!campaign.enabled) return false
+      const endTime = new Date(campaign.endTime)
+      return now > endTime
+    })
+
+    const restorePromises = expiredCampaigns.map(async (campaign) => {
+      const productIds = campaign.products.map(p => p.productId)
+      const restorePromises = productIds.map(async (productId) => {
+        try {
+          await restoreProductVariantsOriginalDiscountPrice(productId)
+          console.log(`Đã khôi phục giá cho sản phẩm ${productId} trong campaign ${campaign.id}`)
+        } catch (err) {
+          console.error(`Lỗi khi khôi phục giá cho sản phẩm ${productId}:`, err)
+        }
+      })
+      await Promise.all(restorePromises)
+    })
+
+    await Promise.all(restorePromises)
+    return expiredCampaigns.length
+  } catch (error) {
+    console.error('Lỗi khi kiểm tra Flash Sale hết hạn:', error)
+    throw error
+  }
+}
+
+// Khôi phục giá cho một campaign cụ thể
+export const restoreFlashSaleCampaignPrices = async (campaignId) => {
+  try {
+    const campaign = await getFlashSaleCampaign(campaignId)
+    if (!campaign) {
+      throw new Error('Không tìm thấy campaign Flash Sale')
+    }
+
+    const productIds = campaign.products.map(p => p.productId)
+    const restorePromises = productIds.map(async (productId) => {
+      try {
+        await restoreProductVariantsOriginalDiscountPrice(productId)
+        return { productId, success: true }
+      } catch (err) {
+        console.error(`Lỗi khi khôi phục giá cho sản phẩm ${productId}:`, err)
+        return { productId, success: false, error: err.message }
+      }
+    })
+
+    const results = await Promise.all(restorePromises)
+    return results
+  } catch (error) {
+    console.error('Lỗi khi khôi phục giá cho campaign:', error)
+    throw error
   }
 }

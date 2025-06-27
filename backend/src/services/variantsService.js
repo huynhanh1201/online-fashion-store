@@ -183,6 +183,11 @@ const updateVariant = async (variantId, reqBody) => {
       updateOps['color.image'] = reqBody.color.image
     }
 
+    // Nếu có discountPrice
+    if (reqBody.discountPrice !== undefined) {
+      updateOps.discountPrice = reqBody.discountPrice
+    }
+
     const updatedVariant = await VariantModel.findByIdAndUpdate(
       { _id: variantId },
       { $set: updateOps },
@@ -190,6 +195,97 @@ const updateVariant = async (variantId, reqBody) => {
     )
 
     return updatedVariant
+  } catch (err) {
+    throw err
+  }
+}
+
+// Cập nhật discountPrice cho tất cả biến thể của một sản phẩm
+const updateProductVariantsDiscountPrice = async (productId, flashSalePrice) => {
+  // eslint-disable-next-line no-useless-catch
+  try {
+    // Kiểm tra sản phẩm có tồn tại không
+    const product = await ProductModel.findById(productId)
+    if (!product) {
+      throw new ApiError(StatusCodes.NOT_FOUND, 'Sản phẩm không tồn tại')
+    }
+
+    // Lấy tất cả biến thể hiện tại để lưu giá ban đầu
+    const currentVariants = await VariantModel.find({
+      productId: productId,
+      destroy: false
+    })
+
+    // Cập nhật discountPrice và lưu giá ban đầu cho tất cả biến thể của sản phẩm
+    const updatePromises = currentVariants.map(async (variant) => {
+      // Nếu originalDiscountPrice chưa được set (lần đầu tạo Flash Sale)
+      if (variant.originalDiscountPrice === 0 || variant.originalDiscountPrice === undefined) {
+        return VariantModel.findByIdAndUpdate(
+          variant._id,
+          { 
+            $set: { 
+              discountPrice: flashSalePrice, // Thay thế hoàn toàn bằng giá Flash Sale
+              originalDiscountPrice: variant.discountPrice // Lưu giá ban đầu (ví dụ: 10.000)
+            } 
+          },
+          { new: true }
+        )
+      } else {
+        // Nếu đã có originalDiscountPrice, chỉ cập nhật discountPrice
+        return VariantModel.findByIdAndUpdate(
+          variant._id,
+          { $set: { discountPrice: flashSalePrice } }, // Thay thế bằng giá Flash Sale mới
+          { new: true }
+        )
+      }
+    })
+
+    const results = await Promise.all(updatePromises)
+
+    return {
+      message: `Đã cập nhật giá Flash Sale cho ${results.length} biến thể`,
+      modifiedCount: results.length
+    }
+  } catch (err) {
+    throw err
+  }
+}
+
+// Khôi phục discountPrice về giá ban đầu cho tất cả biến thể của một sản phẩm
+const restoreProductVariantsOriginalDiscountPrice = async (productId) => {
+  // eslint-disable-next-line no-useless-catch
+  try {
+    // Kiểm tra sản phẩm có tồn tại không
+    const product = await ProductModel.findById(productId)
+    if (!product) {
+      throw new ApiError(StatusCodes.NOT_FOUND, 'Sản phẩm không tồn tại')
+    }
+
+    // Lấy tất cả biến thể hiện tại để có giá originalDiscountPrice
+    const currentVariants = await VariantModel.find({
+      productId: productId,
+      destroy: false
+    })
+
+    // Cập nhật discountPrice về giá ban đầu cho tất cả biến thể của sản phẩm
+    const updatePromises = currentVariants.map(async (variant) => {
+      return VariantModel.findByIdAndUpdate(
+        variant._id,
+        { 
+          $set: { 
+            discountPrice: variant.originalDiscountPrice || 0 // Sử dụng giá trị thực tế
+          } 
+        },
+        { new: true }
+      )
+    })
+
+    const results = await Promise.all(updatePromises)
+
+    return {
+      message: `Đã khôi phục giá về ban đầu cho ${results.length} biến thể`,
+      modifiedCount: results.length
+    }
   } catch (err) {
     throw err
   }
@@ -219,5 +315,7 @@ export const variantsService = {
   getVariantList,
   getVariant,
   updateVariant,
+  updateProductVariantsDiscountPrice,
+  restoreProductVariantsOriginalDiscountPrice,
   deleteVariant
 }
