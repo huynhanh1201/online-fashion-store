@@ -49,8 +49,7 @@ const ProductDetail = () => {
     handleBuyNow,
     handleCopy,
     copiedCode,
-    formatCurrencyShort,
-    inventory
+    formatCurrencyShort
   } = useProductDetail(productId)
   const selectedColorObj = availableColors?.find(
     (color) => color.name === selectedColor
@@ -264,7 +263,6 @@ const ProductDetail = () => {
             handleSizeChange={handleSizeChange}
             getCurrentPrice={getCurrentPrice}
             getCurrentImages={getCurrentImages}
-            inventory={inventory}
             setSnackbar={setSnackbar}
           />
         </Grid>

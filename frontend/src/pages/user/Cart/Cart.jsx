@@ -41,16 +41,15 @@ import {
   setSelectedItems as setSelectedItemsAction,
   setTempQuantity,
   removeTempQuantity,
+  clearReorderVariantIds,
 } from '~/redux/cart/cartSlice'
 import { optimizeCloudinaryUrl } from '~/utils/cloudinary'
 import { getDiscounts } from '~/services/discountService'
 import SuggestionProducts from './SuggestionProducts'
-import inventoryService from '~/services/inventoryService'
 
 const Cart = () => {
   const { cart, loading, deleteItem, clearCart, updateItem } = useCart()
 
-  console.log('Cart component - loading:', loading, 'cart:', cart)
   const [selectedItems, setSelectedItems] = useState([])
   const [cartItems, setCartItems] = useState([])
   const [showMaxQuantityAlert, setShowMaxQuantityAlert] = useState(false)
@@ -59,85 +58,69 @@ const Cart = () => {
   const [hasFetchedCoupons, setHasFetchedCoupons] = useState(false)
   const navigate = useNavigate()
   const dispatch = useDispatch()
-  const [inventoryQuantities, setInventoryQuantities] = useState({})
-  const [fetchingVariants, setFetchingVariants] = useState(new Set())
   const [deleteMode, setDeleteMode] = useState('')
   const [itemToDelete, setItemToDelete] = useState(null)
   const tempQuantities = useSelector((state) => state.cart.tempQuantities || {})
+  const reorderVariantIds = useSelector((state) => state.cart.reorderVariantIds || [])
   const [processingVariantId, setProcessingVariantId] = useState(null)
-
-  // Refs để tránh stale closure
-  const inventoryQuantitiesRef = useRef(inventoryQuantities)
-  const fetchingVariantsRef = useRef(fetchingVariants)
-
-  // Cập nhật refs khi state thay đổi
-  useEffect(() => {
-    inventoryQuantitiesRef.current = inventoryQuantities
-  }, [inventoryQuantities])
-
-  useEffect(() => {
-    fetchingVariantsRef.current = fetchingVariants
-  }, [fetchingVariants])
+  const [hasAutoSelected, setHasAutoSelected] = useState(false)
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'auto' })
+    // Reset hasAutoSelected khi vào trang cart
+    setHasAutoSelected(false)
   }, [])
 
   useEffect(() => {
     if (cart?.cartItems) setCartItems(cart.cartItems)
   }, [cart])
 
+  // Tự động chọn các sản phẩm từ reorder
   useEffect(() => {
-    const fetchInventories = async () => {
-      if (cartItems.length === 0) return
+    console.log('Auto-select effect triggered:', {
+      cartItemsLength: cartItems.length,
+      reorderVariantIdsLength: reorderVariantIds.length,
+      hasAutoSelected,
+      reorderVariantIds,
+      cartItems: cartItems.map(item => ({
+        variantId: item.variant?._id || item.variantId?._id || item.variantId,
+        name: item.name,
+        rawVariant: item.variant,
+        rawVariantId: item.variantId
+      }))
+    })
 
-      const currentInventory = inventoryQuantitiesRef.current
-      const currentFetching = fetchingVariantsRef.current
+    if (cartItems.length > 0 && reorderVariantIds.length > 0 && !hasAutoSelected) {
+      console.log('Auto-selecting reorder items:', reorderVariantIds)
 
-      const newVariantsToFetch = cartItems
-        .filter(
-          (item) =>
-            !currentInventory[item.variant._id] &&
-            !currentFetching.has(item.variant._id),
-        )
-        .map((item) => item.variant._id)
-
-      if (newVariantsToFetch.length === 0) return
-
-      setFetchingVariants((prev) => new Set([...prev, ...newVariantsToFetch]))
-
-      try {
-        const fetchPromises = newVariantsToFetch.map(async (variantId) => {
-          const inventory = await inventoryService.fetchInventory(variantId)
-          console.log('Inventory data for', variantId, ':', inventory)
-          return { variantId, inventory }
+      const reorderSelectedItems = cartItems
+        .filter(item => {
+          // Handle cả variant._id và variantId trực tiếp
+          const variantId = item.variant?._id || item.variantId?._id || item.variantId
+          const isMatch = reorderVariantIds.includes(variantId)
+          console.log(`Checking item ${item.name} with variantId ${variantId}: ${isMatch}`)
+          return isMatch
         })
+        .map(item => ({
+          variantId: item.variant?._id || item.variantId?._id || item.variantId,
+          quantity: item.quantity
+        }))
 
-        const results = await Promise.all(fetchPromises)
+      console.log('Found reorder items to select:', reorderSelectedItems)
 
-        setInventoryQuantities((prev) => {
-          const updated = { ...prev }
-          results.forEach(({ variantId, inventory }) => {
-            // Thử các trường hợp có thể có
-            const quantity = inventory?.quantity || inventory?.availableQuantity || inventory?.stock || 0
-            console.log('Setting quantity for', variantId, ':', quantity)
-            updated[variantId] = quantity
-          })
-          return updated
-        })
-      } catch (error) {
-        console.error('Error fetching inventory:', error)
-      } finally {
-        setFetchingVariants((prev) => {
-          const newSet = new Set(prev)
-          newVariantsToFetch.forEach((id) => newSet.delete(id))
-          return newSet
-        })
+      if (reorderSelectedItems.length > 0) {
+        console.log('Auto-selected items:', reorderSelectedItems)
+        setSelectedItems(reorderSelectedItems)
+        dispatch(setSelectedItemsAction(reorderSelectedItems))
+        setHasAutoSelected(true)
+
+        // Clear reorder variant IDs sau khi đã auto-select
+        dispatch(clearReorderVariantIds())
+      } else {
+        console.log('No matching items found for auto-select')
       }
     }
-
-    fetchInventories()
-  }, [cartItems])
+  }, [cartItems, reorderVariantIds, hasAutoSelected, dispatch])
 
   useEffect(() => {
     if (hasFetchedCoupons) return
@@ -199,7 +182,7 @@ const Cart = () => {
     if (!item) return
 
     const current = tempQuantities[variantId] ?? item.quantity
-    const max = inventoryQuantities[variantId] || 99
+    const max = item.variant.quantity || 99
 
     if (delta > 0 && current >= max) {
       setShowMaxQuantityAlert(true)
@@ -258,10 +241,6 @@ const Cart = () => {
         setSelectedItems((prev) =>
           prev.filter((i) => i.variantId !== variantId),
         )
-        setInventoryQuantities((prev) => {
-          const { [variantId]: _, ...rest } = prev
-          return rest
-        })
       }
     } catch (error) {
       console.error('Lỗi xoá sản phẩm:', error)
@@ -315,7 +294,6 @@ const Cart = () => {
     await clearCart()
     setCartItems([])
     setSelectedItems([])
-    setInventoryQuantities({})
     setConfirmClearOpen(false)
   }
 
@@ -370,7 +348,7 @@ const Cart = () => {
           mt: 10,
         }}
       >
-        <Paper
+        <Box
           elevation={3}
           sx={{
             p: 4,
@@ -384,7 +362,7 @@ const Cart = () => {
           <Typography variant="h5" sx={{ fontWeight: 600, color: '#1A3C7B' }}>
             Đang tải giỏ hàng...
           </Typography>
-        </Paper>
+        </Box>
       </Container>
     )
   }
@@ -811,9 +789,9 @@ const Cart = () => {
                               }
                               disabled={
                                 processingVariantId === variant._id ||
-                                !inventoryQuantities[variant._id] ||
+                                !variant.quantity ||
                                 (tempQuantities[variant._id] ?? item.quantity) >=
-                                inventoryQuantities[variant._id]
+                                variant.quantity
                               }
                               sx={{ borderRadius: 0, p: 0.5 }}
                             >

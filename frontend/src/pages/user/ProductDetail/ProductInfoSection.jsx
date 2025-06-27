@@ -66,8 +66,7 @@ const ProductInfoSection = ({
   selectedSize,
   handleColorChange,
   handleSizeChange,
-  getCurrentPrice,
-  inventory
+  getCurrentPrice
 }) => {
   const currentPrice = getCurrentPrice()
 
@@ -87,7 +86,7 @@ const ProductInfoSection = ({
         fontWeight={500}
         sx={{ wordBreak: 'break-word', whiteSpace: 'pre-wrap', mb: 1 }}
       >
-       Mã sản phẩm: {product?.productCode}
+        Mã sản phẩm: {product?.productCode}
       </Typography>
 
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
@@ -295,7 +294,6 @@ const ProductInfoSection = ({
             onClick={() =>
               setQuantity((q) => {
                 const maxQuantity =
-                  inventory?.quantity ??
                   selectedVariant?.quantity ??
                   product?.quantity ??
                   0
@@ -309,8 +307,7 @@ const ProductInfoSection = ({
           {selectedColor && selectedSize && (
             <Typography color='text.secondary' sx={{ fontSize: 13 }}>
               Kho:{' '}
-              {inventory?.quantity ??
-                selectedVariant?.quantity ??
+              {selectedVariant?.quantity ??
                 product?.quantity ??
                 0}
             </Typography>
@@ -327,10 +324,9 @@ const ProductInfoSection = ({
           disabled={
             isAdding ||
             quantity >
-              (inventory?.quantity ??
-                selectedVariant?.quantity ??
-                product?.quantity ??
-                0)
+            (selectedVariant?.quantity ??
+              product?.quantity ??
+              0)
           }
           onClick={() => handleAddToCart(product._id)}
           sx={{ backgroundColor: '#1A3C7B', color: 'white', flex: 1, py: 1 }}

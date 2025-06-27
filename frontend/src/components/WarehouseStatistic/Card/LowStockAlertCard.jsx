@@ -134,6 +134,7 @@
 import React, { useState } from 'react'
 import { Box, Button, Stack, Typography } from '@mui/material'
 import AddWarehouseSlipModal from '~/pages/admin/InventoryManagement/modal/WarehouseSlip/AddWarehouseSlipModal.jsx'
+import usePermissions from '~/hooks/usePermissions'
 
 export default function LowStockAlertCard({
   data,
@@ -150,6 +151,7 @@ export default function LowStockAlertCard({
   addWarehouse,
   fetchStatistics
 }) {
+  const { hasPermission } = usePermissions()
   const filteredWarehouses = (data ?? []).filter(
     (warehouse) => warehouse.lowStockVariants?.length > 0
   )
@@ -293,25 +295,27 @@ export default function LowStockAlertCard({
                         : `Còn lại: ${item.quantity} sản phẩm (Min: ${item.minQuantity})`}
                     </Typography>
                   </Box>
-                  <Button
-                    variant='contained'
-                    onClick={() =>
-                      handleOpenModal(
-                        item,
-                        warehouse._id || warehouse.warehouseId
-                      )
-                    }
-                    sx={{
-                      background: 'linear-gradient(to right, #5e35b1, #7e57c2)',
-                      borderRadius: 4,
-                      textTransform: 'none',
-                      fontWeight: 'bold',
-                      fontSize: 13,
-                      px: 2
-                    }}
-                  >
-                    Tạo Phiếu Nhập
-                  </Button>
+                  {hasPermission('warehouseSlip:create') && (
+                    <Button
+                      variant='contained'
+                      onClick={() =>
+                        handleOpenModal(
+                          item,
+                          warehouse._id || warehouse.warehouseId
+                        )
+                      }
+                      sx={{
+                        background: 'linear-gradient(to right, #5e35b1, #7e57c2)',
+                        borderRadius: 4,
+                        textTransform: 'none',
+                        fontWeight: 'bold',
+                        fontSize: 13,
+                        px: 2
+                      }}
+                    >
+                      Tạo Phiếu Nhập
+                    </Button>
+                  )}
                 </Box>
               ))}
             </Box>

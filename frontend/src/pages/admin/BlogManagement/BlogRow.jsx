@@ -12,6 +12,9 @@ import {
 import BorderColorIcon from '@mui/icons-material/BorderColor'
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever'
 import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye'
+import usePermissions from '~/hooks/usePermissions'
+
+
 const styles = {
   groupIcon: {
     display: 'flex',
@@ -33,6 +36,7 @@ const styles = {
     verticalAlign: 'middle'
   }
 }
+
 const BlogRow = ({ blog, onEdit, onDelete, onView, index }) => {
   const formatDate = (dateStr) =>
     new Date(dateStr).toLocaleDateString('vi-VN', {
@@ -40,6 +44,7 @@ const BlogRow = ({ blog, onEdit, onDelete, onView, index }) => {
       month: '2-digit',
       year: 'numeric'
     })
+  const { hasPermission } = usePermissions()
 
   return (
     <TableRow hover role='checkbox' tabIndex={-1}>
@@ -98,21 +103,27 @@ const BlogRow = ({ blog, onEdit, onDelete, onView, index }) => {
 
       <TableCell align='left' sx={styles.cellPadding}>
         <Stack direction='row' sx={styles.groupIcon}>
-          <Tooltip title='Xem'>
-            <IconButton size='small' onClick={() => onView(blog)}>
-              <RemoveRedEyeIcon color='primary' />
-            </IconButton>
-          </Tooltip>
-          <Tooltip title='Sửa'>
-            <IconButton size='small' onClick={() => onEdit(blog)}>
-              <BorderColorIcon color='warning' />
-            </IconButton>
-          </Tooltip>
-          <Tooltip title='Xoá'>
-            <IconButton size='small' onClick={() => onDelete(blog)}>
-              <DeleteForeverIcon color='error' />
-            </IconButton>
-          </Tooltip>
+          {hasPermission('blog:read') && (
+            <Tooltip title='Xem'>
+              <IconButton size='small' onClick={() => onView(blog)}>
+                <RemoveRedEyeIcon color='primary' />
+              </IconButton>
+            </Tooltip>
+          )}
+          {hasPermission('blog:update') && (
+            <Tooltip title='Sửa'>
+              <IconButton size='small' onClick={() => onEdit(blog)}>
+                <BorderColorIcon color='warning' />
+              </IconButton>
+            </Tooltip>
+          )}
+          {hasPermission('blog:delete') && (
+            <Tooltip title='Xoá'>
+              <IconButton size='small' onClick={() => onDelete(blog)}>
+                <DeleteForeverIcon color='error' />
+              </IconButton>
+            </Tooltip>
+          )}
         </Stack>
       </TableCell>
     </TableRow>

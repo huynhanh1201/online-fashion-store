@@ -17,6 +17,8 @@ import AddIcon from '@mui/icons-material/Add'
 import TablePaginationActions from '~/components/PaginationAdmin/TablePaginationActions.jsx'
 import TableNoneData from '~/components/TableAdmin/NoneData.jsx'
 import FilterRole from '~/components/FilterAdmin/FilterRole.jsx'
+import usePermissions from '~/hooks/usePermissions'
+
 const RoleTable = ({
   roles,
   loading,
@@ -52,6 +54,7 @@ const RoleTable = ({
       pl: '20px'
     }
   ]
+  const { hasPermission } = usePermissions()
 
   return (
     <Paper sx={{ border: '1px solid #ccc', width: '100%', overflow: 'hidden' }}>
@@ -78,23 +81,24 @@ const RoleTable = ({
                     <Typography variant='h6' sx={{ fontWeight: '800' }}>
                       Danh sách vai trò
                     </Typography>
-
-                    <Button
-                      variant='contained'
-                      color='primary'
-                      onClick={addRole}
-                      startIcon={<AddIcon />}
-                      sx={{
-                        textTransform: 'none',
-                        width: 100,
-                        display: 'flex',
-                        alignItems: 'center',
-                        backgroundColor: '#001f5d',
-                        color: '#fff'
-                      }}
-                    >
-                      Thêm
-                    </Button>
+                    {hasPermission('role:create') && (
+                      <Button
+                        variant='contained'
+                        color='primary'
+                        onClick={addRole}
+                        startIcon={<AddIcon />}
+                        sx={{
+                          textTransform: 'none',
+                          width: 100,
+                          display: 'flex',
+                          alignItems: 'center',
+                          backgroundColor: '#001f5d',
+                          color: '#fff'
+                        }}
+                      >
+                        Thêm
+                      </Button>
+                    )}
                   </Box>
                   <FilterRole
                     onFilter={onFilter}

@@ -9,14 +9,14 @@ const useCoupon = () => {
   const [error, setError] = useState('')
   const [couponId, setCouponId] = useState(null)
 
-  const handleInputChange = (value) => {
-    setVoucher(value.toUpperCase())
-    setError('')
-    setDiscountMessage('')
-    if (value.length > 10) {
-      setError('Mã giảm giá tối đa 10 ký tự')
-    }
-  }
+  // const handleInputChange = (value) => {
+  //   setVoucher(value.toUpperCase())
+  //   setError('')
+  //   setDiscountMessage('')
+  //   if (value.length > 10) {
+  //     setError('Mã giảm giá tối đa 10 ký tự')
+  //   }
+  // }
 
   const handleApplyVoucher = async (inputVoucher, subTotal) => {
     if (!inputVoucher) {
@@ -24,10 +24,10 @@ const useCoupon = () => {
       return { valid: false, message: 'Vui lòng nhập mã giảm giá' }
     }
 
-    if (inputVoucher.length < 5) {
-      setError('Mã giảm giá phải có ít nhất 5 ký tự')
-      return { valid: false, message: 'Mã giảm giá quá ngắn' }
-    }
+    // if (inputVoucher.length < 5) {
+    //   setError('Mã giảm giá phải có ít nhất 5 ký tự')
+    //   return { valid: false, message: 'Mã giảm giá quá ngắn' }
+    // }
 
     setLoading(true)
     setError('')
@@ -63,7 +63,7 @@ const useCoupon = () => {
   return {
     voucher,
     error,
-    setVoucher: handleInputChange,
+    setVoucher,
     discount,
     discountMessage,
     couponId,

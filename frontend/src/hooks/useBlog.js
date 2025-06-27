@@ -109,6 +109,40 @@ const useBlog = () => {
     }
   }
 
+  // Fetch blogs with pagination for "Load More" functionality
+  const fetchBlogsWithPagination = React.useCallback(async (page = 1, limit = 6) => {
+    try {
+      setError(null)
+
+      const response = await getPublicBlogs({ page, limit })
+
+      const newBlogs = response.data || []
+      const totalPages = response.meta?.totalPages || 0
+      const total = response.meta?.total || 0
+
+      return {
+        blogs: newBlogs,
+        totalPages,
+        total,
+        hasMore: page < totalPages
+      }
+    } catch (err) {
+      console.error('Error fetching blogs with pagination:', err)
+      setError('Không thể tải thêm bài viết')
+      return {
+        blogs: [],
+        totalPages: 0,
+        total: 0,
+        hasMore: false
+      }
+    }
+  }, [])
+
+  // Append more blogs to existing list
+  const appendBlogs = React.useCallback((newBlogs) => {
+    setBlogs(prevBlogs => [...prevBlogs, ...newBlogs])
+  }, [])
+
   // Reset state
   const resetBlogState = () => {
     setBlogs([])
@@ -134,6 +168,8 @@ const useBlog = () => {
     fetchBlogById,
     fetchLatestBlogs,
     fetchBlogsByCategory,
+    fetchBlogsWithPagination,
+    appendBlogs,
     resetBlogState
   }
 }

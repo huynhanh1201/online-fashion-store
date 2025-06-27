@@ -6,8 +6,6 @@ import { getDiscounts } from '~/services/discountService'
 import { addToCart, getCart } from '~/services/cartService'
 import { getProductVariants } from '~/services/variantService'
 import { setCartItems, setTempCart } from '~/redux/cart/cartSlice'
-import AuthorizedAxiosInstance from '~/utils/authorizedAxios.js'
-import { API_ROOT } from '~/utils/constants.js'
 
 const useProductDetail = (productId) => {
   const [product, setProduct] = useState(null)
@@ -30,7 +28,7 @@ const useProductDetail = (productId) => {
   const [selectedColor, setSelectedColor] = useState(null)
   const [selectedSize, setSelectedSize] = useState(null)
 
-  const [inventory, setInventory] = useState(null)
+
 
   const dispatch = useDispatch()
   const navigate = useNavigate()
@@ -86,8 +84,8 @@ const useProductDetail = (productId) => {
       console.error('Error fetching product:', err.response || err)
       setError(
         err?.response?.data?.message ||
-          err.message ||
-          'Không thể tải thông tin sản phẩm.'
+        err.message ||
+        'Không thể tải thông tin sản phẩm.'
       )
     } finally {
       setIsLoading(false)
@@ -243,25 +241,7 @@ const useProductDetail = (productId) => {
     return product?.images?.length > 0 ? product.images : ['/default.jpg']
   }
 
-  const fetchInventory = async (variantId) => {
-    try {
-      const response = await AuthorizedAxiosInstance.get(`${API_ROOT}/v1/inventories?variantId=${variantId}`)
-      const result = response.data
-      const inventoryList = result.data || []
-      const inventory = Array.isArray(inventoryList) ? inventoryList[0] : inventoryList
-      setInventory(inventory)
-      console.log('Thông tin kho:', inventory)
-    } catch (error) {
-      console.error('Lỗi lấy kho:', error)
-    }
-  }
-  useEffect(() => {
-    if (selectedVariant && selectedVariant._id) {
-      fetchInventory(selectedVariant._id)
-    } else {
-      setInventory(null)
-    }
-  }, [selectedVariant])
+
   // Handle add to cart
   const handleAddToCart = async (productId) => {
     if (isAdding[productId] || !product) return
@@ -276,8 +256,7 @@ const useProductDetail = (productId) => {
     }
 
     const variantId = selectedVariant._id
-    const availableQuantity =
-      inventory?.quantity ?? selectedVariant?.quantity ?? 0
+    const availableQuantity = selectedVariant?.quantity ?? 0
 
     if (availableQuantity === 0) {
       setSnackbar({
@@ -365,8 +344,7 @@ const useProductDetail = (productId) => {
       return
     }
 
-    const maxQuantity =
-      inventory?.quantity ?? selectedVariant?.quantity ?? product?.quantity ?? 0
+    const maxQuantity = selectedVariant?.quantity ?? product?.quantity ?? 0
     if (maxQuantity === 0) {
       setSnackbar({
         open: true,
@@ -416,8 +394,7 @@ const useProductDetail = (productId) => {
     handleBuyNow,
     handleCopy,
     copiedCode,
-    formatCurrencyShort,
-    inventory
+    formatCurrencyShort
   }
 }
 
