@@ -245,9 +245,6 @@ const importStockWarehouseSlip = async (reqBody, jwtDecoded, session) => {
       _id: { $in: variantIds }
     }).session(session)
 
-    console.log('variantIds: ', variantIds)
-    console.log('variants: ', variants)
-
     const variantMap = variants.reduce((acc, variant) => {
       acc[variant._id.toString()] = variant
       return acc
@@ -286,7 +283,15 @@ const importStockWarehouseSlip = async (reqBody, jwtDecoded, session) => {
         // Lưu lại thay đổi vào DB (có dùng session của transaction)
         await existingInventory.save({ session })
 
-        console.log('exitsting: ', await existingInventory.save({ session }))
+        console.log('existingInventory: ', existingInventory)
+
+        // Cập nhật quantity cho biến thể
+        await VariantModel.updateOne(
+          { _id: existingInventory.variantId },
+          {
+            quantity: existingInventory.quantity
+          }
+        )
 
         // Đẩy vào danh sách cập nhật
         inventoriesUpdated.push(existingInventory)
@@ -308,6 +313,14 @@ const importStockWarehouseSlip = async (reqBody, jwtDecoded, session) => {
         const [newInventory] = await InventoryModel.create(
           [inventoryInfo],
           { session } // Quan trọng: dùng session để đảm bảo nằm trong transaction
+        )
+
+        // Cập nhật quantity cho biến thể
+        await VariantModel.updateOne(
+          { _id: newInventory.variantId },
+          {
+            quantity: newInventory.quantity
+          }
         )
 
         // Cập nhật map tồn kho để các vòng lặp sau không phải tạo lại
@@ -517,7 +530,16 @@ const exportStockWarehouseSlip = async (reqBody, jwtDecoded, session) => {
         )
       }
 
-      await existingInventory.save({ session })
+      const updatedInventory = await existingInventory.save({ session })
+
+      // Cập nhật quantity cho biến thể
+      await VariantModel.updateOne(
+        { _id: updatedInventory.variantId },
+        {
+          quantity: updatedInventory.quantity
+        }
+      )
+
       reqBodyItemsMap[item.variantId.toString()] = item
     }
 
