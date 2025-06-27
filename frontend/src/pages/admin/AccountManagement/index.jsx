@@ -7,7 +7,7 @@ import usePermissions from '~/hooks/usePermissions'
 import { PermissionWrapper, RouteGuard } from '~/components/PermissionGuard'
 
 // Lazy load các modal
-const ViewAccountrModal = React.lazy(
+const ViewAccountModal = React.lazy(
   () => import('./modal/ViewAccountModal.jsx')
 )
 const EditAccountModal = React.lazy(
@@ -16,19 +16,28 @@ const EditAccountModal = React.lazy(
 const DeleteAccountModal = React.lazy(
   () => import('./modal/DeleteAccountModal.jsx')
 )
+const AddAccountModal = React.lazy(() => import('./modal/AddAccountModal.jsx'))
 
 const AccountManagement = () => {
   const { roles, fetchRoles } = useRoles()
   const [page, setPage] = React.useState(1)
   const [selectedUser, setSelectedUser] = React.useState(null)
-  const [limit, setLimit] = React.useState(10)
   const [modalType, setModalType] = React.useState(null)
   const [filters, setFilters] = React.useState({
     sort: 'newest'
   })
 
-  const { users, totalPages, fetchUsers, Loading, removeUser, update } =
-    useUsers()
+  const {
+    users,
+    totalPages,
+    fetchUsers,
+    Loading,
+    removeUser,
+    update,
+    add,
+    ROWS_PER_PAGE,
+    setROWS_PER_PAGE
+  } = useUsers()
 
   const { hasPermission } = usePermissions()
 
@@ -37,15 +46,13 @@ const AccountManagement = () => {
   }, [])
 
   React.useEffect(() => {
-    fetchUsers(page, limit, filters)
-  }, [page, limit, filters])
+    fetchUsers(page, ROWS_PER_PAGE, filters)
+  }, [page, ROWS_PER_PAGE, filters])
 
-  const handleOpenModal = (type, user) => {
-    if (!user || !user._id) return
+  const handleOpenModal = (type, user = null) => {
     setSelectedUser(user)
     setModalType(type)
   }
-
   const handleCloseModal = () => {
     setSelectedUser(null)
     setModalType(null)
@@ -55,7 +62,9 @@ const AccountManagement = () => {
 
   const handleSave = async (data, type, id) => {
     try {
-      if (type === 'edit') {
+      if (type === 'add') {
+        await add(data)
+      } else if (type === 'edit') {
         await update(id, data)
       } else if (type === 'delete') {
         await removeUser(data)
@@ -83,14 +92,15 @@ const AccountManagement = () => {
         onFilters={handleFilter}
         fetchUsers={fetchUsers}
         page={page - 1}
-        rowsPerPage={limit}
+        rowsPerPage={ROWS_PER_PAGE}
         total={totalPages}
         onPageChange={handleChangePage}
         onChangeRowsPerPage={(newLimit) => {
           setPage(1)
-          setLimit(newLimit)
+          setROWS_PER_PAGE(newLimit)
         }}
         permissions={{
+          canAdd: hasPermission('user:create'),
           canEdit: hasPermission('user:update'),
           canDelete: hasPermission('user:delete'),
           canView: hasPermission('user:read')
@@ -106,6 +116,17 @@ const AccountManagement = () => {
             user={selectedUser}
           />
         )}
+
+        <PermissionWrapper requiredPermissions={['user:create']}>
+          {modalType === 'add' && (
+            <AddAccountModal
+              open
+              onClose={handleCloseModal}
+              onSave={handleSave}
+              roles={roles}
+            />
+          )}
+        </PermissionWrapper>
 
         <PermissionWrapper requiredPermissions={['user:update']}>
           {modalType === 'edit' && selectedUser && (

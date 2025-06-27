@@ -9,13 +9,15 @@ import {
   Paper,
   Typography,
   Box,
-  TablePagination
+  TablePagination,
+  Button
 } from '@mui/material'
 
 import AccountRow from './AccountRow'
 import TablePaginationActions from '~/components/PaginationAdmin/TablePaginationActions.jsx'
 import TableNoneData from '~/components/TableAdmin/NoneData.jsx'
-import FilterUser from '~/components/FilterAdmin/FilterUser' // nếu chưa có thì có thể tạo tương tự FilterColor
+import AddIcon from '@mui/icons-material/Add'
+import FilterAccount from '~/components/FilterAdmin/filterAccount.jsx' // nếu chưa có thì có thể tạo tương tự FilterColor
 
 const AccountTable = ({
   users,
@@ -68,10 +70,34 @@ const AccountTable = ({
                     minHeight: 76.5
                   }}
                 >
-                  <Typography variant='h6' sx={{ fontWeight: '800' }}>
-                    Danh sách người dùng
-                  </Typography>
-                  <FilterUser
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: 1,
+                      minWidth: 250
+                    }}
+                  >
+                    <Typography variant='h6' fontWeight={800}>
+                      Danh sách tài khoản hệ thống
+                    </Typography>
+                    <Button
+                      startIcon={<AddIcon />}
+                      variant='contained'
+                      onClick={() => handleOpenModal('add')}
+                      sx={{
+                        textTransform: 'none',
+                        width: 100,
+                        display: 'flex',
+                        alignItems: 'center',
+                        backgroundColor: '#001f5d',
+                        color: '#fff'
+                      }}
+                    >
+                      Thêm
+                    </Button>
+                  </Box>
+                  <FilterAccount
                     onFilter={onFilters}
                     users={users}
                     loading={loading}

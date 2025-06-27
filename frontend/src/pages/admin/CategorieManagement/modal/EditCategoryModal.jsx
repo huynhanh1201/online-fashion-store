@@ -19,7 +19,7 @@ import AddPhotoAlternateIcon from '@mui/icons-material/AddPhotoAlternate'
 import { useForm } from 'react-hook-form'
 import StyleAdmin from '~/assets/StyleAdmin.jsx'
 import { CloudinaryCategory, URI } from '~/utils/constants'
-
+import useCategories from '~/hooks/admin/useCategories'
 const uploadToCloudinary = async (file, folder = CloudinaryCategory) => {
   const formData = new FormData()
   formData.append('file', file)
@@ -36,13 +36,7 @@ const uploadToCloudinary = async (file, folder = CloudinaryCategory) => {
   return data.secure_url
 }
 
-const EditCategoryModal = ({
-  open,
-  onClose,
-  category,
-  onSave,
-  categories = []
-}) => {
+const EditCategoryModal = ({ open, onClose, category, onSave }) => {
   const {
     register,
     handleSubmit,
@@ -58,7 +52,10 @@ const EditCategoryModal = ({
   const [bannerFile, setBannerFile] = useState(null)
   const [bannerPreview, setBannerPreview] = useState('')
   const bannerInputRef = useRef()
-
+  const { categories, fetchCategories } = useCategories()
+  useEffect(() => {
+    fetchCategories(1, 100000)
+  }, [])
   useEffect(() => {
     if (open && category) {
       reset({
@@ -325,7 +322,6 @@ const EditCategoryModal = ({
                 error={!!errors.name}
               />
               <Autocomplete
-                disabled
                 options={filteredCategories.filter(
                   (c) => c._id !== category._id
                 )}

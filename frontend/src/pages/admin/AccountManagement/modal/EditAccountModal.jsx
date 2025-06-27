@@ -23,6 +23,8 @@ const EditAccountModal = ({ open, onClose, user, onSave, roles }) => {
     formState: { isSubmitting }
   } = useForm({
     defaultValues: {
+      name: '',
+      password: '',
       role: ''
     }
   })
@@ -30,13 +32,25 @@ const EditAccountModal = ({ open, onClose, user, onSave, roles }) => {
   useEffect(() => {
     if (open && user) {
       reset({
+        name: user.name || '',
+        password: '',
         role: user.role || ''
       })
     }
   }, [open, user, reset])
 
   const onSubmit = async (data) => {
-    await onSave({ role: data.role }, 'edit', user._id)
+    const payload = {
+      name: data.name,
+      role: data.role
+    }
+
+    // Chỉ gửi mật khẩu nếu được nhập
+    if (data.password?.trim()) {
+      payload.password = data.password
+    }
+
+    await onSave(payload, 'edit', user._id)
     onClose()
   }
 
@@ -52,10 +66,46 @@ const EditAccountModal = ({ open, onClose, user, onSave, roles }) => {
         sx: StyleAdmin.OverlayModal
       }}
     >
-      <DialogTitle>Cập nhật vai trò người dùng</DialogTitle>
+      <DialogTitle>Cập nhật thông tin người dùng</DialogTitle>
       <Divider sx={{ my: 0 }} />
       <DialogContent>
         <form id='edit-user-form' onSubmit={handleSubmit(onSubmit)}>
+          <Controller
+            name='name'
+            control={control}
+            rules={{ required: 'Tên là bắt buộc' }}
+            render={({ field, fieldState }) => (
+              <TextField
+                {...field}
+                label='Tên người dùng'
+                fullWidth
+                margin='normal'
+                error={!!fieldState.error}
+                helperText={fieldState.error?.message}
+                sx={StyleAdmin.InputCustom}
+              />
+            )}
+          />
+
+          <Controller
+            name='password'
+            control={control}
+            render={({ field, fieldState }) => (
+              <TextField
+                {...field}
+                label='Mật khẩu mới'
+                type='password'
+                fullWidth
+                margin='normal'
+                error={!!fieldState.error}
+                helperText={
+                  fieldState.error?.message || 'Để trống nếu không đổi'
+                }
+                sx={StyleAdmin.InputCustom}
+              />
+            )}
+          />
+
           <Controller
             name='role'
             control={control}

@@ -121,7 +121,6 @@ const CategoryManagement = () => {
               open
               onClose={handleCloseModal}
               onAdded={handleSave}
-              categories={categories}
             />
           )}
         </PermissionWrapper>
@@ -139,7 +138,6 @@ const CategoryManagement = () => {
               onClose={handleCloseModal}
               category={selectedCategory}
               onSave={handleSave}
-              categories={categories}
             />
           )}
         </PermissionWrapper>

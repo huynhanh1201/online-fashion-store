@@ -109,64 +109,74 @@ export default function AdminDrawer({
   const menuConfig = useMemo(
     () => ({
       statistics: {
-        permission: 'statistics:read',
+        // permission: 'statistics:read',
         label: 'Thống kê',
         path: '/admin',
         icon: <PollIcon />
       },
       accountManagement: {
-        permissions: ['user:read'],
+        permissions: ['user:use'],
         label: 'Quản lý tài khoản',
         icon: <PaletteIcon />,
         children: [
           {
-            permission: 'user:read',
-            label: 'Quản lý người dùng',
+            permission: 'user:use',
+            label: 'Tài khoản  người dùng',
             path: '/admin/user-management'
+          },
+          {
+            permission: 'user:use',
+            label: 'Tài khoản hệ thống',
+            path: '/admin/account-management'
+          },
+          {
+            permission: 'user:use',
+            label: 'Quản lý vai trò',
+            path: '/admin/role-management'
           }
         ]
       },
       productManagement: {
         permissions: [
-          'product:read',
-          'category:read',
-          'color:read',
-          'size:read',
-          'review:read'
+          'product:use',
+          'category:use',
+          'color:use',
+          'size:use',
+          'review:use'
         ],
         label: 'Quản lý sản phẩm',
         icon: <InventoryIcon />,
         children: [
           {
-            permission: 'category:read',
+            permission: 'category:use',
             label: 'Quản lý danh mục',
             path: '/admin/categorie-management',
             icon: <CategoryIcon />
           },
           {
-            permission: 'product:read',
+            permission: 'product:use',
             label: 'Quản lý sản phẩm',
             path: '/admin/product-management',
             icon: <InventoryIcon />
           },
           {
-            permission: 'review:read',
+            permission: 'review:use',
             label: 'Quản lý đánh giá',
             path: '/admin/review-management'
           },
           {
-            permission: 'variant:read',
+            permission: 'variant:use',
             label: 'Quản lý biến thể',
             path: '/admin/variant-management'
           },
           {
-            permission: 'color:read',
+            permission: 'color:use',
             label: 'Quản lý màu sắc',
             path: '/admin/color-management',
             icon: <PaletteIcon />
           },
           {
-            permission: 'size:read',
+            permission: 'size:use',
             label: 'Quản lý kích thước',
             path: '/admin/size-management',
             icon: <StraightenIcon />
@@ -174,24 +184,24 @@ export default function AdminDrawer({
         ]
       },
       orderManagement: {
-        permissions: ['order:read', 'coupon:read', 'payment:read'],
+        permissions: ['order:use', 'coupon:use', 'payment:use'],
         label: 'Quản lý đơn hàng',
         icon: <ReceiptLongIcon />,
         children: [
           {
-            permission: 'order:read',
+            permission: 'order:use',
             label: 'Quản lý đơn hàng',
             path: '/admin/order-management',
             icon: <ReceiptLongIcon />
           },
           {
-            permission: 'coupon:read',
+            permission: 'coupon:use',
             label: 'Quản lý mã giảm giá',
             path: '/admin/discount-management',
             icon: <LocalOfferIcon />
           },
           {
-            permission: 'payment:read',
+            permission: 'payment:use',
             label: 'Quản lý giao dịch',
             path: '/admin/transaction-management',
             icon: <PaymentIcon />
@@ -200,49 +210,49 @@ export default function AdminDrawer({
       },
       inventoryManagement: {
         permissions: [
-          'inventory:read',
-          'warehouse:read',
-          'warehouseSlip:read',
-          'inventoryLog:read',
-          'batch:read',
-          'partner:read'
+          'inventory:use',
+          'warehouse:use',
+          'warehouseSlip:use',
+          'inventoryLog:use',
+          'batch:use',
+          'partner:use'
         ],
         label: 'Quản lý kho',
         icon: <WarehouseIcon />,
         children: [
           {
-            permission: 'statistics:read',
+            permission: 'statistics:use',
             label: 'Thống kê kho',
             path: '/admin/warehouse-statistic-management',
             icon: <ReceiptLongIcon />
           },
           {
-            permission: 'inventory:read',
+            permission: 'inventory:use',
             label: 'Quản lý kho',
             path: '/admin/inventory-management'
           },
           {
-            permission: 'warehouseSlip:read',
+            permission: 'warehouseSlip:use',
             label: 'Quản lý xuất/nhập kho',
             path: '/admin/warehouse-slips-management'
           },
           {
-            permission: 'inventoryLog:read',
+            permission: 'inventoryLog:use',
             label: 'Quản lý nhật ký kho',
             path: '/admin/inventory-log-management'
           },
           {
-            permission: 'warehouse:read',
+            permission: 'warehouse:use',
             label: 'Quản lý kho hàng',
             path: '/admin/warehouses-management'
           },
           {
-            permission: 'batch:read',
+            permission: 'batch:use',
             label: 'Quản lý lô hàng',
             path: '/admin/batches-management'
           },
           {
-            permission: 'partner:read',
+            permission: 'partner:use',
             label: 'Quản lý đối tác',
             path: '/admin/partner-management'
           }
