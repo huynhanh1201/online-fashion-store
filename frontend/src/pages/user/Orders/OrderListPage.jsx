@@ -20,6 +20,7 @@ import {
   DialogContent,
   DialogActions,
   DialogContentText,
+  Skeleton,
 } from '@mui/material'
 import {
   KeyboardArrowDown,
@@ -52,6 +53,76 @@ const statusLabels = {
   Cancelled: ['Đã hủy', 'error', <Cancel key="cancelled" />],
   Failed: ['Thanh toán thất bại', 'error', <Cancel key="failed" />]
 }
+
+// Skeleton Loading Component
+const OrderSkeleton = () => (
+  <Card
+    sx={{
+      mb: 3,
+      borderRadius: 3,
+      boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
+      border: '1px solid rgba(0,0,0,0.05)',
+    }}
+  >
+    <CardContent sx={{ p: 3 }}>
+      {/* Header skeleton */}
+      <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
+        <Box display="flex" alignItems="center" gap={1}>
+          <Skeleton variant="text" width={120} height={32} />
+          <Skeleton variant="text" width={80} height={24} />
+        </Box>
+        <Skeleton variant="rounded" width={100} height={32} />
+      </Box>
+
+      {/* Product skeleton */}
+      <Box
+        sx={{
+          p: 2,
+          borderRadius: 2,
+          backgroundColor: 'grey.50',
+          border: '1px solid',
+          borderColor: 'grey.200',
+        }}
+      >
+        <Box display="flex" justifyContent="space-between" alignItems="center">
+          <Box display="flex" alignItems="center" gap={2}>
+            <Skeleton variant="rounded" width={80} height={80} />
+            <Box>
+              <Skeleton variant="text" width={200} height={28} />
+              <Skeleton variant="text" width={150} height={20} sx={{ mb: 0.5 }} />
+              <Skeleton variant="rounded" width={80} height={20} />
+            </Box>
+          </Box>
+          <Box textAlign="right">
+            <Skeleton variant="text" width={100} height={28} />
+          </Box>
+        </Box>
+      </Box>
+
+      {/* Footer skeleton */}
+      <Box mt={3}>
+        <Divider sx={{ my: 2 }} />
+        <Box
+          display="flex"
+          justifyContent="space-between"
+          alignItems="center"
+          sx={{
+            p: 2,
+            borderRadius: 2,
+            backgroundColor: 'primary.50',
+          }}
+        >
+          <Skeleton variant="text" width={80} height={24} />
+          <Skeleton variant="text" width={120} height={32} />
+        </Box>
+        <Box display="flex" justifyContent="flex-end" gap={2} mt={2}>
+          <Skeleton variant="rounded" width={100} height={36} />
+          <Skeleton variant="rounded" width={80} height={36} />
+        </Box>
+      </Box>
+    </CardContent>
+  </Card>
+)
 
 // Confirmation Modal Component
 const CancelOrderModal = ({ open, onClose, onConfirm, order, loading }) => {
@@ -147,7 +218,7 @@ const CancelOrderModal = ({ open, onClose, onConfirm, order, loading }) => {
 }
 
 // Enhanced OrderRow component
-const OrderRow = ({ order, onOrderUpdate, onOrderCancelled, onReorder, reorderLoading }) => {
+const OrderRow = ({ order, onOrderUpdate, onOrderCancelled, onReorder, reorderLoading, isRecentlyUpdated }) => {
   const [items, setItems] = useState([])
   const [loadingItems, setLoadingItems] = useState(true)
   const [openCancelModal, setOpenCancelModal] = useState(false)
@@ -194,11 +265,11 @@ const OrderRow = ({ order, onOrderUpdate, onOrderCancelled, onReorder, reorderLo
       setOpenCancelModal(false)
       // Call parent callback to refresh orders
       if (onOrderUpdate) {
-        onOrderUpdate()
+        onOrderUpdate(order._id)
       }
       // Call callback to switch to cancelled tab
       if (onOrderCancelled) {
-        onOrderCancelled()
+        onOrderCancelled(order._id)
       }
     } catch (error) {
       console.error('Lỗi khi hủy đơn hàng:', error)
@@ -213,12 +284,22 @@ const OrderRow = ({ order, onOrderUpdate, onOrderCancelled, onReorder, reorderLo
       sx={{
         mb: 3,
         borderRadius: 3,
-        boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
-        border: '1px solid rgba(0,0,0,0.05)',
+        boxShadow: isRecentlyUpdated
+          ? '0 8px 30px rgba(26, 60, 123, 0.2)'
+          : '0 4px 20px rgba(0,0,0,0.08)',
+        border: isRecentlyUpdated
+          ? '2px solid #1a3c7b'
+          : '1px solid rgba(0,0,0,0.05)',
+        backgroundColor: isRecentlyUpdated
+          ? 'rgba(26, 60, 123, 0.02)'
+          : 'white',
         transition: 'all 0.3s ease',
+        transform: isRecentlyUpdated ? 'scale(1.01)' : 'scale(1)',
         '&:hover': {
-          boxShadow: '0 8px 30px rgba(0,0,0,0.12)',
-          transform: 'translateY(-2px)'
+          boxShadow: isRecentlyUpdated
+            ? '0 12px 40px rgba(26, 60, 123, 0.25)'
+            : '0 8px 30px rgba(0,0,0,0.12)',
+          transform: isRecentlyUpdated ? 'scale(1.01) translateY(-2px)' : 'translateY(-2px)'
         }
       }}
     >
@@ -447,14 +528,16 @@ const OrderRow = ({ order, onOrderUpdate, onOrderCancelled, onReorder, reorderLo
 
 // Enhanced Main OrderListPage component
 const OrderListPage = () => {
-  const [allOrders, setAllOrders] = useState([]) // Lưu trữ tất cả orders
+  const [orders, setOrders] = useState([]) // Lưu trữ orders theo status hiện tại
   const [loading, setLoading] = useState(true)
+  const [tabLoading, setTabLoading] = useState(false) // Loading riêng cho tab switching
   const [loadingMore, setLoadingMore] = useState(false)
   const [reorderLoading, setReorderLoading] = useState(null) // Track which order is being reordered
   const [selectedTab, setSelectedTab] = useState('All')
   const [currentPage, setCurrentPage] = useState(1)
   const [hasMore, setHasMore] = useState(true)
   const [isInitialized, setIsInitialized] = useState(false)
+  const [recentlyUpdatedOrderId, setRecentlyUpdatedOrderId] = useState(null) // Track recently updated order for highlighting
   const currentUser = useSelector(selectCurrentUser)
   const userId = currentUser?._id
   const navigate = useNavigate()
@@ -462,25 +545,30 @@ const OrderListPage = () => {
   // Chỉ gọi useCart khi thực sự cần thiết
   const { addToCart, refresh: refreshCart } = useCart()
 
-  const fetchOrders = async (page = 1, reset = true) => {
+  const fetchOrders = async (page = 1, reset = true, status = selectedTab, isTabSwitch = false, sortBy = 'updatedAt') => {
     if (!userId) return
     try {
       if (reset) {
-        setLoading(true)
+        // Nếu là tab switch thì chỉ set tabLoading, không set loading chính
+        if (isTabSwitch) {
+          setTabLoading(true)
+        } else {
+          setLoading(true)
+        }
         setCurrentPage(1)
         setHasMore(true)
       } else {
         setLoadingMore(true)
       }
 
-      // Lấy tất cả orders (không filter theo status)
-      const response = await getOrders(userId, page, 10, 'All') // Luôn lấy tất cả
-      console.log('Fetched orders:', response) // Kiểm tra ở console
+      // Gọi API với status tương ứng, sắp xếp theo updatedAt để đơn hàng vừa cập nhật hiện lên đầu
+      const response = await getOrders(userId, page, 10, status, sortBy)
+      console.log('Fetched orders with status:', status, response) // Kiểm tra ở console
 
       if (reset) {
-        setAllOrders(response.data || [])
+        setOrders(response.data || [])
       } else {
-        setAllOrders(prev => [...prev, ...(response.data || [])])
+        setOrders(prev => [...prev, ...(response.data || [])])
       }
 
       // Kiểm tra nếu còn trang tiếp theo
@@ -493,7 +581,11 @@ const OrderListPage = () => {
     } catch (error) {
       console.error('Lỗi khi lấy đơn hàng:', error)
     } finally {
-      setLoading(false)
+      if (isTabSwitch) {
+        setTabLoading(false)
+      } else {
+        setLoading(false)
+      }
       setLoadingMore(false)
     }
   }
@@ -501,29 +593,47 @@ const OrderListPage = () => {
   const loadMoreOrders = async () => {
     if (!hasMore || loadingMore) return
     const nextPage = currentPage + 1
-    await fetchOrders(nextPage, false)
+    await fetchOrders(nextPage, false, selectedTab)
   }
 
   useEffect(() => {
     if (userId && !isInitialized) {
-      fetchOrders(1, true)
+      fetchOrders(1, true, selectedTab)
       setIsInitialized(true)
     }
   }, [userId, isInitialized])
 
-  // Handle tab change - chỉ thay đổi selectedTab, không gọi API
+  // Handle tab change - gọi API với status tương ứng
   const handleTabChange = (event, newValue) => {
     setSelectedTab(newValue)
+    // Gọi API với status mới, đánh dấu là tab switch
+    fetchOrders(1, true, newValue, true)
   }
 
   // Handle order cancellation - switch to cancelled tab
-  const handleOrderCancelled = () => {
+  const handleOrderCancelled = async (orderId) => {
     setSelectedTab('Cancelled')
+    setRecentlyUpdatedOrderId(orderId) // Set recently updated order for highlighting
+    // Thêm delay nhỏ để đảm bảo đơn hàng đã được cập nhật trong database
+    await new Promise(resolve => setTimeout(resolve, 500))
+    // Gọi API để lấy orders có status Cancelled, sắp xếp theo updatedAt
+    await fetchOrders(1, true, 'Cancelled', true, 'updatedAt')
+    // Clear highlight after 3 seconds
+    setTimeout(() => setRecentlyUpdatedOrderId(null), 3000)
   }
 
   // Refresh orders after update (for cancel/update operations)
-  const handleOrderUpdate = () => {
-    fetchOrders(1, true)
+  const handleOrderUpdate = async (orderId) => {
+    if (orderId) {
+      setRecentlyUpdatedOrderId(orderId) // Set recently updated order for highlighting
+    }
+    // Thêm delay nhỏ để đảm bảo đơn hàng đã được cập nhật
+    await new Promise(resolve => setTimeout(resolve, 300))
+    await fetchOrders(1, true, selectedTab, false, 'updatedAt')
+    // Clear highlight after 3 seconds if orderId is provided
+    if (orderId) {
+      setTimeout(() => setRecentlyUpdatedOrderId(null), 3000)
+    }
   }
 
   // Handle reorder - chỉ gọi useCart khi thực sự cần
@@ -593,12 +703,8 @@ const OrderListPage = () => {
     }
   }
 
-  // Filter orders theo selectedTab phía client
-  const filteredOrders = Array.isArray(allOrders)
-    ? selectedTab === 'All'
-      ? allOrders
-      : allOrders.filter(order => order.status === selectedTab)
-    : []
+  // Không cần filter nữa vì đã được filter từ API
+  const filteredOrders = Array.isArray(orders) ? orders : []
 
   // Orders are already sorted by backend (newest first), no need to reverse
 
@@ -672,11 +778,17 @@ const OrderListPage = () => {
               fontWeight: 600,
               fontSize: '1rem',
               minHeight: 60,
-              px: 3
+              px: 3,
+              transition: 'all 0.2s ease',
+              '&:hover': {
+                backgroundColor: 'rgba(26, 60, 123, 0.04)',
+                color: '#1a3c7b'
+              }
             },
             '& .MuiTabs-indicator': {
               height: 3,
-              borderRadius: '3px 3px 0 0'
+              borderRadius: '3px 3px 0 0',
+              transition: 'all 0.3s ease'
             }
           }}
         >
@@ -699,14 +811,27 @@ const OrderListPage = () => {
       </Paper>
 
       {/* Order List */}
-      {filteredOrders.length === 0 ? (
+      {tabLoading ? (
+        // Hiển thị skeleton loading khi đang chuyển tab
+        <Stack spacing={3}>
+          {[1, 2, 3].map((_, index) => (
+            <OrderSkeleton key={index} />
+          ))}
+        </Stack>
+      ) : filteredOrders.length === 0 ? (
         <Paper
           sx={{
             p: 6,
             textAlign: 'center',
             borderRadius: 3,
             border: '2px dashed',
-            borderColor: 'grey.300'
+            borderColor: 'grey.300',
+            opacity: 0,
+            animation: 'fadeIn 0.3s ease-in-out forwards',
+            '@keyframes fadeIn': {
+              '0%': { opacity: 0, transform: 'translateY(10px)' },
+              '100%': { opacity: 1, transform: 'translateY(0)' }
+            }
           }}
         >
           <ShoppingBag sx={{ fontSize: 80, color: 'grey.400', mb: 2 }} />
@@ -721,7 +846,14 @@ const OrderListPage = () => {
           </Typography>
         </Paper>
       ) : (
-        <Stack spacing={3}>
+        <Stack spacing={3} sx={{
+          opacity: 0,
+          animation: 'fadeIn 0.3s ease-in-out forwards',
+          '@keyframes fadeIn': {
+            '0%': { opacity: 0, transform: 'translateY(10px)' },
+            '100%': { opacity: 1, transform: 'translateY(0)' }
+          }
+        }}>
           {filteredOrders.map((order) => (
             <OrderRow
               key={order._id}
@@ -730,6 +862,7 @@ const OrderListPage = () => {
               onOrderCancelled={handleOrderCancelled}
               onReorder={(items) => handleReorder(items, order._id)}
               reorderLoading={reorderLoading === order._id}
+              isRecentlyUpdated={recentlyUpdatedOrderId === order._id}
             />
           ))}
 

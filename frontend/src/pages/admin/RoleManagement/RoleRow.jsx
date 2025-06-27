@@ -4,6 +4,7 @@ import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye'
 import BorderColorIcon from '@mui/icons-material/BorderColor'
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever'
 import Tooltip from '@mui/material/Tooltip'
+import usePermissions from '~/hooks/usePermissions'
 
 const formatDateTime = (isoString) => {
   if (!isoString) return 'Không xác định'
@@ -42,8 +43,8 @@ export default function RoleRow({
   index,
   columns,
   handleOpenModal,
-  permissions = {}
 }) {
+  const { hasPermission } = usePermissions()
   return (
     <TableRow hover role='checkbox' tabIndex={-1}>
       {columns.map((column) => {
@@ -104,30 +105,36 @@ export default function RoleRow({
               sx={styles.cellPadding}
             >
               <Stack direction='row' sx={styles.groupIcon}>
-                <Tooltip title='Xem'>
-                  <IconButton
-                    onClick={() => handleOpenModal('view', role)}
-                    size='small'
-                  >
-                    <RemoveRedEyeIcon color='primary' />
-                  </IconButton>
-                </Tooltip>
-                <Tooltip title='Sửa'>
-                  <IconButton
-                    onClick={() => handleOpenModal('edit', role)}
-                    size='small'
-                  >
-                    <BorderColorIcon color='warning' />
-                  </IconButton>
-                </Tooltip>
-                <Tooltip title='Xoá'>
-                  <IconButton
-                    onClick={() => handleOpenModal('delete', role)}
-                    size='small'
-                  >
-                    <DeleteForeverIcon color='error' />
-                  </IconButton>
-                </Tooltip>
+                {hasPermission('role:read') && (
+                  <Tooltip title='Xem'>
+                    <IconButton
+                      onClick={() => handleOpenModal('view', role)}
+                      size='small'
+                    >
+                      <RemoveRedEyeIcon color='primary' />
+                    </IconButton>
+                  </Tooltip>
+                )}
+                {hasPermission('role:update') && (
+                  <Tooltip title='Sửa'>
+                    <IconButton
+                      onClick={() => handleOpenModal('edit', role)}
+                      size='small'
+                    >
+                      <BorderColorIcon color='warning' />
+                    </IconButton>
+                  </Tooltip>
+                )}
+                {hasPermission('role:update') && (
+                  <Tooltip title='Xoá'>
+                    <IconButton
+                      onClick={() => handleOpenModal('delete', role)}
+                      size='small'
+                    >
+                      <DeleteForeverIcon color='error' />
+                    </IconButton>
+                  </Tooltip>
+                )}
               </Stack>
             </TableCell>
           )

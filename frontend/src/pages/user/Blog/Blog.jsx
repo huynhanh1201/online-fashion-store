@@ -25,9 +25,12 @@ const Blog = () => {
   const [windowWidth, setWindowWidth] = React.useState(
     typeof window !== 'undefined' ? window.innerWidth : 1024
   )
+  const [currentPage, setCurrentPage] = React.useState(1)
+  const [hasMoreBlogs, setHasMoreBlogs] = React.useState(true)
+  const [loadingMore, setLoadingMore] = React.useState(false)
 
   // Sử dụng hook blog
-  const { blogs, loading, error, fetchLatestBlogs } = useBlog()
+  const { blogs, loading, error, fetchLatestBlogs, fetchBlogsWithPagination, appendBlogs } = useBlog()
 
   React.useEffect(() => {
     const handleResize = () => {
@@ -42,6 +45,49 @@ const Blog = () => {
   React.useEffect(() => {
     fetchLatestBlogs(6) // Lấy 6 bài viết mới nhất
   }, [fetchLatestBlogs])
+
+  // Check if there are more blogs to load
+  React.useEffect(() => {
+    const checkHasMore = async () => {
+      if (blogs.length > 0) {
+        try {
+          const result = await fetchBlogsWithPagination(2, 6) // Check trang 2
+          setHasMoreBlogs(result.hasMore || result.blogs.length > 0)
+        } catch (err) {
+          console.error('Error checking more blogs:', err)
+          setHasMoreBlogs(false)
+        }
+      }
+    }
+
+    if (blogs.length > 0 && currentPage === 1) {
+      checkHasMore()
+    }
+  }, [blogs.length, fetchBlogsWithPagination, currentPage])
+
+  // Function để load thêm blogs
+  const loadMoreBlogs = async () => {
+    if (loadingMore || !hasMoreBlogs) return
+
+    setLoadingMore(true)
+    try {
+      const nextPage = currentPage + 1
+      const result = await fetchBlogsWithPagination(nextPage, 6)
+
+      if (result.blogs.length > 0) {
+        appendBlogs(result.blogs)
+        setCurrentPage(nextPage)
+        setHasMoreBlogs(result.hasMore)
+      } else {
+        setHasMoreBlogs(false)
+      }
+    } catch (err) {
+      console.error('Error loading more blogs:', err)
+      setHasMoreBlogs(false)
+    } finally {
+      setLoadingMore(false)
+    }
+  }
 
   const isMobile = windowWidth < 640
   const isTablet = windowWidth >= 640 && windowWidth < 1024
@@ -60,7 +106,7 @@ const Blog = () => {
         : new Date(blogData.createdAt).toLocaleDateString('vi-VN'),
       description: blogData.content
         ? // Remove HTML tags and limit to 150 characters
-          blogData.content.replace(/<[^>]*>/g, '').substring(0, 150) + '...'
+        blogData.content.replace(/<[^>]*>/g, '').substring(0, 150) + '...'
         : blogData.excerpt || ''
     }
   }
@@ -282,8 +328,8 @@ const Blog = () => {
           </div>
         )}
 
-        {/* View All Button */}
-        {!loading && (
+        {/* Load More Button */}
+        {!loading && hasMoreBlogs && (
           <div
             style={{
               display: 'flex',
@@ -296,30 +342,56 @@ const Blog = () => {
             }}
           >
             <button
+              onClick={loadMoreBlogs}
+              disabled={loadingMore}
               style={{
                 border: '1px solid #1f2937',
-                color: '#1f2937',
+                color: loadingMore ? '#9ca3af' : '#1f2937',
                 backgroundColor: 'transparent',
                 padding: '8px 24px',
                 borderRadius: '9999px',
                 fontSize: '14px',
-                cursor: 'pointer',
+                cursor: loadingMore ? 'not-allowed' : 'pointer',
                 transition: 'all 0.3s ease',
+                opacity: loadingMore ? 0.6 : 1,
                 '@media (min-width: 640px)': {
                   padding: '12px 32px'
                 }
               }}
               onMouseEnter={(e) => {
-                e.target.style.backgroundColor = '#1f2937'
-                e.target.style.color = 'white'
+                if (!loadingMore) {
+                  e.target.style.backgroundColor = '#1f2937'
+                  e.target.style.color = 'white'
+                }
               }}
               onMouseLeave={(e) => {
-                e.target.style.backgroundColor = 'transparent'
-                e.target.style.color = '#1f2937'
+                if (!loadingMore) {
+                  e.target.style.backgroundColor = 'transparent'
+                  e.target.style.color = '#1f2937'
+                }
               }}
             >
-              Xem tất cả ›
+              {loadingMore ? 'Đang tải...' : 'Xem thêm ›'}
             </button>
+          </div>
+        )}
+
+        {/* No More Blogs Message */}
+        {!loading && !hasMoreBlogs && blogs.length > 0 && (
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              marginTop: '48px',
+              fontSize: '14px',
+              color: '#6b7280',
+              '@media (min-width: 640px)': {
+                marginTop: '64px'
+              }
+            }}
+          >
+            Đã hiển thị tất cả bài viết
           </div>
         )}
       </div>

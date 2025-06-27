@@ -49,7 +49,7 @@ import inventoryService from '~/services/inventoryService'
 
 const Cart = () => {
   const { cart, loading, deleteItem, clearCart, updateItem } = useCart()
-  
+
   const [selectedItems, setSelectedItems] = useState([])
   const [cartItems, setCartItems] = useState([])
   const [showMaxQuantityAlert, setShowMaxQuantityAlert] = useState(false)
