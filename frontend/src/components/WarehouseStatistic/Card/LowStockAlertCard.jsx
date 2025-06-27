@@ -170,9 +170,9 @@ export default function LowStockAlertCard({
   const [modalType, setModalType] = useState('input')
 
   const handleOpenModal = (item, warehouseId) => {
-    fetchWarehouses()
-    fetchVariants()
-    fetchPartner()
+    fetchWarehouses(1, 100000, { status: false })
+    fetchVariants(1, 100000, { status: false })
+    fetchPartner(1, 100000, { status: false })
     setModalType('input')
     setNewSlipData({
       slipId: '',

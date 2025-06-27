@@ -78,7 +78,7 @@ const AddProductModal = ({ open, onClose, onSuccess }) => {
   const { categories, fetchCategories, loading, add } = useCategories()
   useEffect(() => {
     if (open) {
-      fetchCategories()
+      fetchCategories(1, 100000)
       reset()
       setProductImages([])
       setProductImagePreview([])
@@ -90,7 +90,7 @@ const AddProductModal = ({ open, onClose, onSuccess }) => {
     const newCategory = await add(category) // category trả về từ add()
 
     // Gọi lại danh sách nếu cần thiết
-    fetchCategories()
+    fetchCategories(1, 100000)
 
     // ✅ Đặt category mới làm giá trị cho select
     setValue('categoryId', {
@@ -100,6 +100,9 @@ const AddProductModal = ({ open, onClose, onSuccess }) => {
 
     setCategoryOpen(false) // Đóng modal
   }
+  const topLevelCategories = categories.filter(
+    (category) => category.parent === null
+  )
 
   const onSubmit = async (data) => {
     try {
@@ -278,7 +281,7 @@ const AddProductModal = ({ open, onClose, onSuccess }) => {
                     renderValue={(selected) => selected?.name || ''}
                     disabled={loading}
                   >
-                    {categories
+                    {topLevelCategories
                       ?.filter((c) => !c.destroy)
                       .map((cat) => {
                         const option = { id: cat._id, name: cat.name }

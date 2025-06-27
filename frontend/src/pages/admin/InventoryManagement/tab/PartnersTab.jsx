@@ -39,7 +39,8 @@ const PartnersTab = () => {
     loadingPartner,
     totalPartner,
     Save,
-    fetchPartnerById
+    ROWS_PER_PAGE,
+    setROWS_PER_PAGE
   } = usePartner()
   const getPartnerTypeLabel = (type) => {
     switch (type) {
@@ -87,15 +88,14 @@ const PartnersTab = () => {
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false)
   const [selectedPartner, setSelectedPartner] = useState(null)
   const [page, setPage] = useState(1)
-  const [rowsPerPage, setRowsPerPage] = useState(10)
   const [filter, setFilter] = useState({
     status: 'false',
     sort: 'newest'
   })
 
   useEffect(() => {
-    fetchPartners(page, rowsPerPage, filter)
-  }, [page, rowsPerPage, filter])
+    fetchPartners(page, ROWS_PER_PAGE, filter)
+  }, [page, ROWS_PER_PAGE, filter])
 
   const isEqual = (obj1, obj2) => JSON.stringify(obj1) === JSON.stringify(obj2)
 
@@ -140,7 +140,7 @@ const PartnersTab = () => {
 
   const onChangeRowsPerPage = (newLimit) => {
     setPage(1)
-    setRowsPerPage(newLimit)
+    setROWS_PER_PAGE(newLimit)
   }
 
   const handleSave = async (partner, type, partnerId) => {
@@ -314,7 +314,7 @@ const PartnersTab = () => {
 
                   switch (col.id) {
                     case 'index':
-                      rawValue = (page - 1) * rowsPerPage + index + 1
+                      rawValue = (page - 1) * ROWS_PER_PAGE + index + 1
                       break
                     case 'name':
                       rawValue = row.name ? capitalizeWords(row.name) : '—'
@@ -414,7 +414,7 @@ const PartnersTab = () => {
         rowsPerPageOptions={[10, 25, 100]}
         component='div'
         count={totalPartner || 0}
-        rowsPerPage={rowsPerPage}
+        rowsPerPage={ROWS_PER_PAGE}
         page={page - 1}
         onPageChange={(event, newPage) => handleChangePage(event, newPage + 1)} // truyền lại đúng logic cho parent
         onRowsPerPageChange={(event) => {
@@ -425,7 +425,7 @@ const PartnersTab = () => {
         }}
         labelRowsPerPage='Số dòng mỗi trang'
         labelDisplayedRows={({ from, to, count }) => {
-          const totalPages = Math.ceil(count / rowsPerPage)
+          const totalPages = Math.ceil(count / ROWS_PER_PAGE)
           return `${from}–${to} trên ${count} | Trang ${page} / ${totalPages}`
         }}
         ActionsComponent={TablePaginationActions}

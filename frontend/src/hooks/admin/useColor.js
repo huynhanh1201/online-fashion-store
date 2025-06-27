@@ -11,7 +11,7 @@ const useColors = () => {
   const [colors, setColors] = useState([])
   const [totalPages, setTotalPages] = useState(1)
   const [loading, setLoading] = useState(false)
-
+  const [ROWS_PER_PAGE, setROWS_PER_PAGE] = useState(10)
   const fetchColors = async (page = 1, limit = 10, filters) => {
     setLoading(true)
     const buildQuery = (input) => {
@@ -51,15 +51,13 @@ const useColors = () => {
         let updated = [...prev]
 
         if (sort === 'newest') {
-          updated = [newColor, ...prev].slice(0, 10)
+          updated = [newColor, ...prev].slice(0, ROWS_PER_PAGE)
         } else if (sort === 'oldest') {
-          if (prev.length < 10) {
+          if (prev.length < ROWS_PER_PAGE) {
             updated = [...prev, newColor]
           }
-          // Nếu đã đủ 10 thì không thêm
         } else {
-          // Mặc định giống newest
-          updated = [newColor, ...prev].slice(0, 10)
+          updated = [newColor, ...prev].slice(0, ROWS_PER_PAGE)
         }
 
         return updated
@@ -119,6 +117,8 @@ const useColors = () => {
     setColors((prev) => prev.map((d) => (d._id === data._id ? data : d)))
   }
   return {
+    setROWS_PER_PAGE,
+    ROWS_PER_PAGE,
     colors,
     totalPages,
     fetchColors,

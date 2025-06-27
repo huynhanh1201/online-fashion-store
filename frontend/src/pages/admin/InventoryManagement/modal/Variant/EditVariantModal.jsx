@@ -65,7 +65,7 @@ const EditVariantModal = ({
       overridePrice: false,
       overridePackageSize: false,
       colorImage: '',
-      discountPrice: '',
+      discountPrice: '0',
       status: 'draft',
       packageSize: {
         length: '',

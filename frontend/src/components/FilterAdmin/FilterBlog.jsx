@@ -16,7 +16,7 @@ export default function FilterBlog({
   const [selectedFilter, setSelectedFilter] = useState('')
   const [startDate, setStartDate] = useState(dayjs().format('YYYY-MM-DD'))
   const [endDate, setEndDate] = useState(dayjs().format('YYYY-MM-DD'))
-  const [status, setStatus] = useState('draft')
+  const [status, setStatus] = useState('')
   const [sort, setSort] = useState('newest')
   const hasMounted = useRef(false)
 
@@ -101,9 +101,9 @@ export default function FilterBlog({
         }}
         options={[
           { label: 'Tất cả', value: '' },
-          { label: 'Công khai', value: 'published' },
-          { label: 'Nháp', value: 'draft' },
-          { label: 'Ẩn', value: 'hidden' }
+          { label: 'Nháp', value: 'pending' },
+          { label: 'Đã duyệt', value: 'approved' },
+          { label: 'Không duyệt', value: 'rejected' }
         ]}
         sx={{ width: 160 }}
       />

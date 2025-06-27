@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import {
   getBlogs,
   updateBlog,
@@ -10,7 +10,7 @@ const useBlog = () => {
   const [blogs, setBlogs] = React.useState([])
   const [loading, setLoading] = React.useState(false)
   const [totalPages, setTotalPages] = React.useState(0)
-  const ROWS_PER_PAGE = 10
+  const [ROWS_PER_PAGE, setROWS_PER_PAGE] = useState(10)
   const fetchBlogs = async (page = 1, limit = 10, filters = {}) => {
     try {
       setLoading(true)
@@ -101,6 +101,8 @@ const useBlog = () => {
     }
   }
   return {
+    ROWS_PER_PAGE,
+    setROWS_PER_PAGE,
     blogs,
     loading,
     totalPages,

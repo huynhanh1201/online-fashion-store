@@ -11,6 +11,7 @@ const useWarehouseSlips = () => {
   const [warehouseSlips, setWarehouseSlips] = useState([])
   const [totalPageSlip, setTotalPages] = useState(1)
   const [loadingSlip, setLoading] = useState(false)
+  const [ROWS_PER_PAGE, setROWS_PER_PAGE] = useState(10)
   const fetchWarehouseSlips = async (page = 1, limit = 10, filters = {}) => {
     setLoading(true)
     const buildQuery = (input) => {
@@ -52,14 +53,14 @@ const useWarehouseSlips = () => {
         let updated = [...prev]
 
         if (sort === 'newest') {
-          updated = [result, ...prev].slice(0, 10)
+          updated = [result, ...prev].slice(0, ROWS_PER_PAGE)
         } else if (sort === 'oldest') {
-          if (prev.length < 10) {
+          if (prev.length < ROWS_PER_PAGE) {
             updated = [...prev, result]
           }
           // Nếu đủ 10 thì không thêm
         } else {
-          updated = [result, ...prev].slice(0, 10)
+          updated = [result, ...prev].slice(0, ROWS_PER_PAGE)
         }
 
         return updated
@@ -97,7 +98,9 @@ const useWarehouseSlips = () => {
     createNewWarehouseSlip,
     getWarehouseSlipId,
     removeWarehouseSlip,
-    update
+    update,
+    ROWS_PER_PAGE,
+    setROWS_PER_PAGE
   }
 }
 export default useWarehouseSlips

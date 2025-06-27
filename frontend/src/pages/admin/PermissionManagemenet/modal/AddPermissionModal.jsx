@@ -19,7 +19,7 @@
 // } from '@mui/material'
 // import { Delete as DeleteIcon } from '@mui/icons-material'
 // import { useForm } from 'react-hook-form'
-// import usePermissions from '~/hooks/admin/usePermission.jsx'
+// import usePermissions from '~/hooks/admin/usePermission.js'
 // export default function AddPermissionModal({ open, onClose, onSuccess }) {
 //   const {
 //     register,
@@ -214,7 +214,7 @@ import {
 } from '@mui/material'
 import { Delete as DeleteIcon } from '@mui/icons-material'
 import { useForm } from 'react-hook-form'
-import usePermissions from '~/hooks/admin/usePermission.jsx'
+import usePermissions from '~/hooks/admin/usePermission.js'
 
 export default function AddPermissionModal({ open, onClose, onSuccess }) {
   const {

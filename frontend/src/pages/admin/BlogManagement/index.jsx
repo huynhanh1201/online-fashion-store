@@ -15,16 +15,13 @@ import ViewBlogModal from './modal/ViewBlogModal'
 import DeleteBlogModal from './modal/DeleteBlogModal'
 import useBlog from '~/hooks/admin/useBlog'
 export default function BlogManagementPage() {
-  const [error, setError] = useState(null)
   const [openBlogModal, setOpenBlogModal] = useState(false)
   const [blogModalMode, setBlogModalMode] = useState('add') // 'add' hoặc 'edit'
   const [openView, setOpenView] = useState(false)
   const [openDelete, setOpenDelete] = useState(false)
   const [selectedBlog, setSelectedBlog] = useState(null)
   const [page, setPage] = React.useState(1)
-  const [limit, setLimit] = React.useState(10)
   const [filters, setFilters] = React.useState({
-    status: 'draft',
     sort: 'newest'
   })
   // Fetch blogs từ API
@@ -35,12 +32,14 @@ export default function BlogManagementPage() {
     loading,
     removeBlog,
     updateBlogById,
-    addBlog
+    addBlog,
+    ROWS_PER_PAGE,
+    setROWS_PER_PAGE
   } = useBlog()
   // Load blogs khi component mount
   useEffect(() => {
-    fetchBlogs(page, limit, filters)
-  }, [page, limit, filters])
+    fetchBlogs(page, ROWS_PER_PAGE, filters)
+  }, [page, ROWS_PER_PAGE, filters])
 
   const handleBlogSave = async (blogData, isEditMode) => {
     try {
@@ -87,30 +86,6 @@ export default function BlogManagementPage() {
   }
   // Function để tạo dữ liệu mẫu
 
-  if (loading) {
-    return (
-      <Paper sx={{ p: 3, textAlign: 'center' }}>
-        <CircularProgress />
-        <Typography sx={{ mt: 2 }}>Đang tải danh sách blog...</Typography>
-      </Paper>
-    )
-  }
-
-  if (error) {
-    return (
-      <Paper sx={{ p: 3 }}>
-        <Alert severity='error' sx={{ mb: 2 }}>
-          {error}
-        </Alert>
-        <Box sx={{ display: 'flex', gap: 2 }}>
-          <Button variant='contained' onClick={() => fetchBlogs()}>
-            Thử lại
-          </Button>
-        </Box>
-      </Paper>
-    )
-  }
-
   return (
     <>
       <BlogTable
@@ -135,12 +110,12 @@ export default function BlogManagementPage() {
         }}
         onFilter={handleFilter}
         page={page - 1}
-        rowsPerPage={limit}
+        rowsPerPage={ROWS_PER_PAGE}
         total={totalPages}
         onPageChange={handleChangePage}
         onChangeRowsPerPage={(newLimit) => {
           setPage(1)
-          setLimit(newLimit)
+          setROWS_PER_PAGE(newLimit)
         }}
         loading={loading}
       />

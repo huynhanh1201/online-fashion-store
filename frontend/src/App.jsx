@@ -28,6 +28,7 @@ import Policy from '~/pages/user/Policy/Policy'
 import AdminLayout from '~/layout/AdminLayout'
 import AdminHome from '~/pages/admin/Home/index'
 import UserManagement from '~/pages/admin/UserManagement/index'
+import AccountManagement from '~/pages/admin/AccountManagement/index.jsx'
 import ProductManagement from '~/pages/admin/ProductManagement/index.jsx'
 import CategorieManagement from '~/pages/admin/CategorieManagement/index.jsx'
 import OrderManagement from '~/pages/admin/OrderManagement/index'
@@ -124,6 +125,7 @@ function App() {
         <Route path='/admin' element={<AdminLayout />}>
           <Route index element={<AdminHome />} />
           <Route path='user-management' element={<UserManagement />} />
+          <Route path='account-management' element={<AccountManagement />} />
           <Route path='product-management' element={<ProductManagement />} />
           <Route
             path='categorie-management'
@@ -168,10 +170,19 @@ function App() {
             element={<SizePaletteManagement />}
           />
           <Route path='display-management' element={<DisplayManagement />} />
-          <Route path='flashsale-management' element={<FlashSaleManagement />} />
+          <Route
+            path='flashsale-management'
+            element={<FlashSaleManagement />}
+          />
           <Route path='header-management' element={<HeaderManagement />} />
-          <Route path='featured-category-management' element={<FeaturedCategoryManagement />} />
-          <Route path='service-highlight-management' element={<ServiceHighlightManagement />} />
+          <Route
+            path='featured-category-management'
+            element={<FeaturedCategoryManagement />}
+          />
+          <Route
+            path='service-highlight-management'
+            element={<ServiceHighlightManagement />}
+          />
           <Route path='footer-management' element={<FooterManagement />} />
           <Route path='blog-management' element={<BlogManagement />} />
           <Route path='role-management' element={<RoleManagement />} />

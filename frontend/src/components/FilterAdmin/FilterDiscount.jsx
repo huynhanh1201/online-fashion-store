@@ -24,7 +24,7 @@ export default function FilterDiscount({
   const [usageMax, setUsageMax] = useState('')
   const [usedCountMin, setUsedCountMin] = useState('')
   const [usedCountMax, setUsedCountMax] = useState('')
-  const [isActive, setIsActive] = useState('false') // true: Đang hoạt động, false: Ngừng hoạt động
+  const [isActive, setIsActive] = useState('true') // true: Đang hoạt động, false: Ngừng hoạt động
   const [sort, setSort] = useState('newest')
 
   const [validFromStart, setValidFromStart] = useState(

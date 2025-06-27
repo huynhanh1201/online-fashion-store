@@ -7,7 +7,7 @@ import AddPermissionModal from './modal/AddPermissionModal'
 import EditPermissionModal from './modal/EditPermissionModal'
 import ViewPermissionModal from './modal/ViewPermissionModal'
 import DeletePermissionModal from './modal/DeletePermissionModal'
-import usePermissions from '~/hooks/admin/usePermission.jsx'
+import usePermissions from '~/hooks/admin/usePermission.js'
 
 export default function PermissionManagementPage() {
   const {
