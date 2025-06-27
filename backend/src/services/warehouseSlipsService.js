@@ -285,6 +285,14 @@ const importStockWarehouseSlip = async (reqBody, jwtDecoded, session) => {
 
         console.log('existingInventory: ', existingInventory)
 
+        // Cập nhật quantity cho biến thể
+        await VariantModel.updateOne(
+          { _id: existingInventory.variantId },
+          {
+            quantity: existingInventory.quantity
+          }
+        )
+
         // Đẩy vào danh sách cập nhật
         inventoriesUpdated.push(existingInventory)
       } else {
@@ -305,6 +313,14 @@ const importStockWarehouseSlip = async (reqBody, jwtDecoded, session) => {
         const [newInventory] = await InventoryModel.create(
           [inventoryInfo],
           { session } // Quan trọng: dùng session để đảm bảo nằm trong transaction
+        )
+
+        // Cập nhật quantity cho biến thể
+        await VariantModel.updateOne(
+          { _id: newInventory.variantId },
+          {
+            quantity: newInventory.quantity
+          }
         )
 
         // Cập nhật map tồn kho để các vòng lặp sau không phải tạo lại
@@ -514,7 +530,16 @@ const exportStockWarehouseSlip = async (reqBody, jwtDecoded, session) => {
         )
       }
 
-      await existingInventory.save({ session })
+      const updatedInventory = await existingInventory.save({ session })
+
+      // Cập nhật quantity cho biến thể
+      await VariantModel.updateOne(
+        { _id: updatedInventory.variantId },
+        {
+          quantity: updatedInventory.quantity
+        }
+      )
+
       reqBodyItemsMap[item.variantId.toString()] = item
     }
 

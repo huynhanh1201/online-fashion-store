@@ -12,12 +12,8 @@ export const refIntegrityPlugin = (schema, { references = [] }) => {
   // Hàm kiểm tra xem document có đang bị liên kết bởi model khác không
   const checkReferences = async (doc) => {
     for (const { model, foreignField } of references) {
-      console.log('mongoose.model: ', model)
-
       const RefModel = mongoose.model(model)
       const count = await RefModel.countDocuments({ [foreignField]: doc._id })
-
-      console.log('count:', count)
 
       if (count > 0) {
         throw new apiError(
@@ -46,9 +42,9 @@ export const refIntegrityPlugin = (schema, { references = [] }) => {
   //   if (doc) await checkReferences(doc)
   // })
 
-  // Hook: chặn update nếu cần (optional)
-  schema.pre('updateOne', async function () {
-    const doc = await this.model.findOne(this.getQuery())
-    if (doc) await checkReferences(doc)
-  })
+  // // Hook: chặn update nếu cần (optional)
+  // schema.pre('updateOne', async function () {
+  //   const doc = await this.model.findOne(this.getQuery())
+  //   if (doc) await checkReferences(doc)
+  // })
 }
