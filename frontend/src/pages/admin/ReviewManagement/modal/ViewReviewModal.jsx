@@ -95,8 +95,8 @@ const ViewReviewModal = ({ open, onClose, review, onApprove }) => {
                       Sản phẩm
                     </TableCell>
                     <TableCell>
-                      {review.product?.name ||
-                        review.productId ||
+                      {review.productId?.name ||
+                        review.productId?._id ||
                         'Không xác định'}
                     </TableCell>
                   </TableRow>
@@ -115,13 +115,6 @@ const ViewReviewModal = ({ open, onClose, review, onApprove }) => {
                     </TableCell>
                     <TableCell>
                       {review.userId ? (
-                        // <Stack direction='row' alignItems='center' gap={1}>
-                        //   <Avatar
-                        //     src={review.userId.avatarUrl}
-                        //     alt={review.userId.name}
-                        //   />
-                        //   <Typography>{review.userId.name}</Typography>
-                        // </Stack>
                         <Typography>{review.userId.name}</Typography>
                       ) : (
                         'Không xác định'

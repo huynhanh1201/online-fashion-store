@@ -7,6 +7,7 @@ import Chip from '@mui/material/Chip'
 import ImageNotSupportedIcon from '@mui/icons-material/ImageNotSupported'
 import { optimizeCloudinaryUrl } from '~/utils/cloudinary.js'
 import Tooltip from '@mui/material/Tooltip'
+import { useNavigate } from 'react-router-dom'
 const styles = {
   groupIcon: {
     display: 'flex',
@@ -36,6 +37,7 @@ export default function CategoryRow({
   handleOpenModal,
   permissions = {}
 }) {
+  const navigate = useNavigate()
   return (
     <TableRow hover role='checkbox' tabIndex={-1}>
       {columns.map((column) => {
@@ -138,6 +140,25 @@ export default function CategoryRow({
               sx={styles.cellPadding}
             >
               {formattedDate}
+            </TableCell>
+          )
+        }
+
+        if (column.id === 'more') {
+          return (
+            <TableCell
+              key={column.id}
+              align={column.align}
+              sx={{ ...styles.cellPadding, cursor: 'pointer' }}
+              onClick={() => {
+                if (category._id) {
+                  navigate(
+                    `/admin/product-management?categoryId=${category._id}`
+                  )
+                }
+              }}
+            >
+              Xem sản phẩm thuộc danh mục này
             </TableCell>
           )
         }

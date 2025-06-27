@@ -323,8 +323,6 @@ const EditCategoryModal = ({
                 margin='normal'
                 {...register('name', { required: 'Tên danh mục là bắt buộc' })}
                 error={!!errors.name}
-                helperText={'Không thể sửa tên vì danh mục đã có liên kết'}
-                disabled
               />
               <Autocomplete
                 disabled

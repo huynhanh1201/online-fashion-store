@@ -29,6 +29,7 @@ const translateStatus = (status) => {
     case 'Processing':
       return 'Đang xử lý'
     case 'Shipping':
+      return 'Đang giao hàng'
     case 'Shipped':
       return 'Đã gửi hàng'
     case 'Delivered':

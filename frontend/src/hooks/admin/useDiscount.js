@@ -11,7 +11,7 @@ const useDiscounts = () => {
   const [discounts, setDiscounts] = useState([])
   const [totalPages, setTotalPages] = useState(1)
   const [loading, setLoading] = useState(false)
-
+  const [ROWS_PER_PAGE, setROWS_PER_PAGE] = useState(10)
   const fetchDiscounts = async (page = 1, limit = 10, filters) => {
     setLoading(true)
     const buildQuery = (input) => {
@@ -60,15 +60,15 @@ const useDiscounts = () => {
         let updated = [...prev]
 
         if (sort === 'newest') {
-          updated = [newDiscount, ...prev].slice(0, 10)
+          updated = [newDiscount, ...prev].slice(0, ROWS_PER_PAGE)
         } else if (sort === 'oldest') {
-          if (prev.length < 10) {
+          if (prev.length < ROWS_PER_PAGE) {
             updated = [...prev, newDiscount]
           }
           // Nếu đủ 10 thì không thêm vào mảng
         } else {
           // Mặc định xử lý như 'newest'
-          updated = [newDiscount, ...prev].slice(0, 10)
+          updated = [newDiscount, ...prev].slice(0, ROWS_PER_PAGE)
         }
 
         return updated

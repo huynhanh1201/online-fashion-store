@@ -15,7 +15,6 @@ const DeleteCategoryModal = React.lazy(
 
 const CategoryManagement = () => {
   const [page, setPage] = React.useState(1)
-  const [limit, setLimit] = React.useState(10)
   const [selectedCategory, setSelectedCategory] = React.useState(null)
 
   const [modalType, setModalType] = React.useState(null)
@@ -35,10 +34,11 @@ const CategoryManagement = () => {
     Loading,
     totalPages,
     Save,
-    fetchById,
     add,
     update,
-    remove
+    remove,
+    setROWS_PER_PAGE,
+    ROWS_PER_PAGE
   } = useCategories()
   React.useEffect(() => {
     if (searchFromUrl) {
@@ -49,8 +49,8 @@ const CategoryManagement = () => {
     }
   }, [])
   React.useEffect(() => {
-    fetchCategories(page, limit, filters)
-  }, [page, limit, filters])
+    fetchCategories(page, ROWS_PER_PAGE, filters)
+  }, [page, ROWS_PER_PAGE, filters])
 
   const handleChangePage = (event, value) => setPage(value)
 
@@ -97,12 +97,12 @@ const CategoryManagement = () => {
         addCategory={() => setModalType('add')}
         onFilter={handleFilter}
         page={page - 1}
-        rowsPerPage={limit}
+        rowsPerPage={ROWS_PER_PAGE}
         total={totalPages}
         onPageChange={handleChangePage}
         onChangeRowsPerPage={(newLimit) => {
           setPage(1)
-          setLimit(newLimit)
+          setROWS_PER_PAGE(newLimit)
         }}
         // Truyền quyền xuống component con
         permissions={{

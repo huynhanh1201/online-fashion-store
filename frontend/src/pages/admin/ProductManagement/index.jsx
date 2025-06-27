@@ -135,7 +135,7 @@ import useProducts from '~/hooks/admin/useProducts'
 import useCategories from '~/hooks/admin/useCategories'
 import usePermissions from '~/hooks/usePermissions'
 import { PermissionWrapper, RouteGuard } from '~/components/PermissionGuard'
-
+import { useLocation } from 'react-router-dom'
 const AddProductModal = React.lazy(() => import('./modal/AddProductModal'))
 const EditProductModal = React.lazy(() => import('./modal/EditProductModal'))
 const DeleteProductModal = React.lazy(
@@ -149,25 +149,37 @@ import useSizePalettes from '~/hooks/admin/useSizePalettes.js'
 
 const ProductManagement = () => {
   const [page, setPage] = React.useState(1)
-  const [limit, setLimit] = React.useState(10)
   const [modalType, setModalType] = React.useState(null)
   const [selectedProduct, setSelectedProduct] = React.useState(null)
+  const location = useLocation()
+  const queryParams = new URLSearchParams(location.search)
+  const searchFromUrl = queryParams.get('categoryId') || ''
   const [filters, setFilters] = React.useState({
     status: 'false',
-    sort: 'newest'
+    sort: 'newest',
+    ...(searchFromUrl ? { categoryId: searchFromUrl } : {})
   })
+  const { categories, fetchCategories } = useCategories()
   const {
     products,
     fetchProducts,
     loading,
     total,
     Save,
-    fetchProductById,
     updateProductById,
     deleteProductById,
-    createNewProduct
+    createNewProduct,
+    ROWS_PER_PAGE,
+    setROWS_PER_PAGE
   } = useProducts()
-  const { categories, fetchCategories } = useCategories()
+  React.useEffect(() => {
+    if (searchFromUrl) {
+      // Xoá `search` khỏi URL sau khi đã đưa vào filters
+      const newParams = new URLSearchParams(location.categoryId)
+      newParams.delete('categoryId')
+      window.history.replaceState({}, '', `${location.pathname}?${newParams}`)
+    }
+  }, [])
   // Lấy trực tiếp user từ localStorage kh phải qua state, và xác thực xem có thuộc nằm trong phạm vi của permission hay không
   const { hasPermission } = usePermissions()
   console.log('hasPermission', hasPermission('product:create')) // true (admin:access và product):read)
@@ -179,8 +191,8 @@ const ProductManagement = () => {
   const { getSizePaletteId } = useSizePalettes()
 
   React.useEffect(() => {
-    fetchProducts(page, limit, filters)
-  }, [page, limit, filters])
+    fetchProducts(page, ROWS_PER_PAGE, filters)
+  }, [page, ROWS_PER_PAGE, filters])
 
   const handleChangePage = (event, value) => setPage(value)
 
@@ -205,38 +217,6 @@ const ProductManagement = () => {
     setSelectedProduct(null)
     setModalType(null)
   }
-
-  // const handleSaveProduct = async (id, updatedData) => {
-  //   try {
-  //     const result = await updateProductById(id, updatedData)
-  //     if (result) {
-  //       const update = await fetchProductById(id)
-  //       if (update) {
-  //         Save(update)
-  //       }
-  //     }
-  //     return result // Explicitly return the result
-  //   } catch (error) {
-  //     console.error('Error in handleSaveProduct:', error)
-  //     return false // Return false on error
-  //   }
-  // }
-  //
-  // const handleDeleteProduct = async (id) => {
-  //   try {
-  //     const result = await deleteProductById(id)
-  //     if (result) {
-  //       const remove = await fetchProductById(id)
-  //       if (remove) {
-  //         Save(remove)
-  //       }
-  //     }
-  //     return result // Explicitly return the result
-  //   } catch (error) {
-  //     console.error('Error in handleSaveProduct:', error)
-  //     return false // Return false on error
-  //   }
-  // }
 
   const handleSave = async (data, type, id) => {
     try {
@@ -277,12 +257,12 @@ const ProductManagement = () => {
         handleOpenModal={handleOpenModal}
         addProduct={() => handleOpenModal('add')}
         page={page - 1}
-        rowsPerPage={limit}
+        rowsPerPage={ROWS_PER_PAGE}
         total={total}
         onPageChange={handleChangePage}
         onChangeRowsPerPage={(newLimit) => {
           setPage(1)
-          setLimit(newLimit)
+          setROWS_PER_PAGE(newLimit)
         }}
         onFilter={handleFilter}
         categories={categories}
@@ -295,6 +275,7 @@ const ProductManagement = () => {
           canDelete: hasPermission('product:delete'),
           canView: hasPermission('product:read')
         }}
+        initialSearch={searchFromUrl}
       />
 
       <React.Suspense fallback={<></>}>
@@ -340,17 +321,15 @@ const ProductManagement = () => {
           )}
         </PermissionWrapper>
 
-        {
-          modalType === 'viewDesc' && selectedProduct && (
-            <ViewDescriptionModal
-              open
-              onClose={handleCloseModal}
-              product={selectedProduct}
-            />
-          )
-        }
-      </React.Suspense >
-    </RouteGuard >
+        {modalType === 'viewDesc' && selectedProduct && (
+          <ViewDescriptionModal
+            open
+            onClose={handleCloseModal}
+            product={selectedProduct}
+          />
+        )}
+      </React.Suspense>
+    </RouteGuard>
   )
 }
 

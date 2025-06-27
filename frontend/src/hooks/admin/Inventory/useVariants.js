@@ -11,7 +11,7 @@ const useVariants = () => {
   const [variants, setVariants] = useState([])
   const [totalVariant, setTotalPages] = useState(1)
   const [loadingVariant, setLoading] = useState(false)
-
+  const [ROWS_PER_PAGE, setROWS_PER_PAGE] = useState(10)
   const fetchVariants = async (page = 1, limit = 10, filters = {}) => {
     setLoading(true)
     const buildQuery = (input) => {
@@ -53,15 +53,15 @@ const useVariants = () => {
         let updated = [...prev]
 
         if (sort === 'newest') {
-          updated = [result, ...prev].slice(0, 10)
+          updated = [result, ...prev].slice(0, ROWS_PER_PAGE)
         } else if (sort === 'oldest') {
-          if (prev.length < 10) {
+          if (prev.length < ROWS_PER_PAGE) {
             updated = [...prev, result]
           }
           // Nếu đã đủ 10 phần tử thì không thêm
         } else {
           // Mặc định giống newest
-          updated = [result, ...prev].slice(0, 10)
+          updated = [result, ...prev].slice(0, ROWS_PER_PAGE)
         }
 
         return updated
@@ -78,20 +78,20 @@ const useVariants = () => {
     try {
       const result = await updateVariant(id, data)
       if (result) {
-        setVariants((prev) => {
-          return prev.map((variant) =>
+        setVariants((prev) =>
+          prev.map((variant) =>
             String(variant._id) === String(id)
-              ? { ...variant, ...data }
+              ? { ...variant, ...result } // ✅ Sử dụng dữ liệu từ server trả về
               : variant
           )
-        })
+        )
         return result
       } else {
         throw new Error('Không thể cập nhật biến thể')
       }
     } catch (error) {
       console.error('Lỗi khi cập nhật biến thể:', error)
-      throw error // Ném lỗi để xử lý bên ngoài nếu cần
+      throw error
     }
   }
 
@@ -137,7 +137,9 @@ const useVariants = () => {
     updateVariantById,
     deleteVariantById,
     Save,
-    fetchVariantId
+    fetchVariantId,
+    ROWS_PER_PAGE,
+    setROWS_PER_PAGE
   }
 }
 

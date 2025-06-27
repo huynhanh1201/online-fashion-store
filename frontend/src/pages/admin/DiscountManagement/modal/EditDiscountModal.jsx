@@ -137,6 +137,7 @@ const EditDiscountModal = ({ open, onClose, discount, onSave }) => {
                 margin='normal'
                 {...register('code', { required: true })}
                 sx={StyleAdmin.InputCustom}
+                disabled
               />
               <Controller
                 name='type'
@@ -211,6 +212,7 @@ const EditDiscountModal = ({ open, onClose, discount, onSave }) => {
                     sx={StyleAdmin.InputCustom}
                   />
                 }
+                disabled
                 label='Kích hoạt'
                 sx={{ mt: 1 }}
               />
@@ -232,6 +234,7 @@ const EditDiscountModal = ({ open, onClose, discount, onSave }) => {
                   fieldState: { error }
                 }) => (
                   <TextField
+                    disabled
                     label='Giá trị đơn hàng tối thiểu (đ)'
                     fullWidth
                     margin='normal'
@@ -273,6 +276,7 @@ const EditDiscountModal = ({ open, onClose, discount, onSave }) => {
               />
 
               <TextField
+                disabled
                 label='Hiệu lực từ'
                 type='datetime-local'
                 fullWidth

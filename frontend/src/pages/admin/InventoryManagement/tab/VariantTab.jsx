@@ -46,7 +46,8 @@ const VariantsTab = () => {
     loadingVariant,
     totalVariant,
     Save,
-    fetchVariantId
+    ROWS_PER_PAGE,
+    setROWS_PER_PAGE
   } = useVariants()
   const { products, fetchProducts } = useProducts()
   const { colors, fetchColors } = useColors()
@@ -68,7 +69,6 @@ const VariantsTab = () => {
   const [openDeleteModal, setOpenDeleteModal] = useState(false)
   const [selectedVariant, setSelectedVariant] = useState(null)
   const [page, setPage] = useState(1)
-  const [rowsPerPage, setRowsPerPage] = useState(10)
   const [filter, setFilter] = useState({
     status: 'false',
     sort: 'newest'
@@ -80,8 +80,8 @@ const VariantsTab = () => {
     fetchSizes(1, 100000, { status: 'false' })
   }, [])
   useEffect(() => {
-    fetchVariants(page, rowsPerPage, filter)
-  }, [page, rowsPerPage, filter])
+    fetchVariants(page, ROWS_PER_PAGE, filter)
+  }, [page, ROWS_PER_PAGE, filter])
   const handleAddVariant = () => {
     if (hasPermission('variant:create')) {
       setOpenAddModal(true)
@@ -165,10 +165,18 @@ const VariantsTab = () => {
     {
       id: 'exportPrice',
       label: 'Giá bán',
-      minWidth: 190,
-      maxWidth: 214,
+      minWidth: 150,
+      maxWidth: 150,
       align: 'right',
-      pr: 8,
+      format: (value) => `${value.toLocaleString('vi-VN')}đ`
+    },
+    {
+      id: 'discountPrice',
+      label: 'Giảm giá cho biến thế',
+      minWidth: 230,
+      maxWidth: 230,
+      align: 'right',
+      pr: 4,
       format: (value) => `${value.toLocaleString('vi-VN')}đ`
     },
     // {
@@ -196,8 +204,8 @@ const VariantsTab = () => {
     }
   }
   const formatCurrency = (value) => {
-    if (!value) return ''
-    return Number(value).toLocaleString('vi-VN') // Thêm dấu chấm theo chuẩn VNĐ
+    if (value === null || value === undefined) return ''
+    return Number(value).toLocaleString('vi-VN')
   }
 
   const parseCurrency = (value) => {
@@ -207,7 +215,7 @@ const VariantsTab = () => {
 
   const onChangeRowsPerPage = (newLimit) => {
     setPage(1)
-    setRowsPerPage(newLimit)
+    setROWS_PER_PAGE(newLimit)
   }
   return (
     <RouteGuard requiredPermissions={['admin:access', 'variant:read']}>
@@ -321,7 +329,7 @@ const VariantsTab = () => {
                         : row[id]
                       let content = rawValue ?? '—'
                       if (column.id === 'index') {
-                        content = (page - 1) * rowsPerPage + index + 1
+                        content = (page - 1) * ROWS_PER_PAGE + index + 1
                       }
                       if (id === 'name') {
                         const name = row.name || 'Không có tên sản phẩm'
@@ -422,7 +430,7 @@ const VariantsTab = () => {
                             ...(id === 'sku' || id === 'name'
                               ? { maxWidth: 150 } // Ẩn tràn nếu mã hoặc tên dài
                               : {}),
-                            ...(id === 'exportPrice' && { pr: column.pr })
+                            ...(id === 'discountPrice' && { pr: column.pr })
                           }}
                         >
                           {content}
@@ -439,7 +447,7 @@ const VariantsTab = () => {
           rowsPerPageOptions={[10, 25, 100]}
           component='div'
           count={totalVariant || 0}
-          rowsPerPage={rowsPerPage}
+          rowsPerPage={ROWS_PER_PAGE}
           page={page - 1}
           onPageChange={(event, newPage) =>
             handleChangePage(event, newPage + 1)
@@ -452,7 +460,7 @@ const VariantsTab = () => {
           }}
           labelRowsPerPage='Số dòng mỗi trang'
           labelDisplayedRows={({ from, to, count }) => {
-            const totalPages = Math.ceil(count / rowsPerPage)
+            const totalPages = Math.ceil(count / ROWS_PER_PAGE)
             return `${from}–${to} trên ${count} | Trang ${page} / ${totalPages}`
           }}
           ActionsComponent={TablePaginationActions}

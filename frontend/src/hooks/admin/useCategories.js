@@ -11,6 +11,7 @@ const useCategories = () => {
   const [categories, setCategories] = useState([])
   const [totalPages, setTotalPages] = useState(1)
   const [loading, setloading] = useState(false)
+  const [ROWS_PER_PAGE, setROWS_PER_PAGE] = useState(10)
   const fetchCategories = async (page = 1, limit = 10, filters = {}) => {
     setloading(true)
     const buildQuery = (input) => {
@@ -52,13 +53,13 @@ const useCategories = () => {
         let updated = [...prev]
 
         if (sort === 'newest') {
-          updated = [newCategory, ...prev].slice(0, 10)
+          updated = [newCategory, ...prev].slice(0, ROWS_PER_PAGE)
         } else if (sort === 'oldest') {
-          if (prev.length < 10) {
+          if (prev.length < ROWS_PER_PAGE) {
             updated = [...prev, newCategory]
-          } // nếu >=10 thì bỏ qua
+          }
         } else {
-          updated = [newCategory, ...prev].slice(0, 10)
+          updated = [newCategory, ...prev].slice(0, ROWS_PER_PAGE)
         }
 
         return updated
@@ -122,6 +123,8 @@ const useCategories = () => {
   }
 
   return {
+    ROWS_PER_PAGE,
+    setROWS_PER_PAGE,
     categories,
     totalPages,
     fetchCategories,

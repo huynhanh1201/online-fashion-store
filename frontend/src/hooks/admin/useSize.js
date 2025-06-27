@@ -11,7 +11,7 @@ const useSizes = () => {
   const [sizes, setSizes] = useState([])
   const [totalPages, setTotalPages] = useState(1)
   const [loading, setLoading] = useState(false)
-
+  const [ROWS_PER_PAGE, setROWS_PER_PAGE] = useState(10)
   const fetchSizes = async (page = 1, limit = 10, filters) => {
     setLoading(true)
     const buildQuery = (input) => {
@@ -51,15 +51,15 @@ const useSizes = () => {
         let updated = [...prev]
 
         if (sort === 'newest') {
-          updated = [newSize, ...prev].slice(0, 10)
+          updated = [newSize, ...prev].slice(0, ROWS_PER_PAGE)
         } else if (sort === 'oldest') {
-          if (prev.length < 10) {
+          if (prev.length < ROWS_PER_PAGE) {
             updated = [...prev, newSize]
           }
           // Nếu đã đủ 10 thì không thêm
         } else {
           // Mặc định: xử lý như newest
-          updated = [newSize, ...prev].slice(0, 10)
+          updated = [newSize, ...prev].slice(0, ROWS_PER_PAGE)
         }
 
         return updated
@@ -125,7 +125,9 @@ const useSizes = () => {
     fetchSizeById,
     Save,
     update,
-    remove
+    remove,
+    ROWS_PER_PAGE,
+    setROWS_PER_PAGE
   }
 }
 
