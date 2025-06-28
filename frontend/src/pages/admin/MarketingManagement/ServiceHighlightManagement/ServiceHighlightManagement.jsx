@@ -440,14 +440,17 @@ const ServiceHighlightManagement = () => {
                     <Typography variant='body1' color='text.secondary'>
                       Chưa có dịch vụ nổi bật nào
                     </Typography>
-                    <Button
-                      variant='outlined'
-                      startIcon={<AddIcon />}
-                      onClick={handleAddNew}
-                      sx={{ mt: 2 }}
-                    >
-                      Thêm dịch vụ đầu tiên
-                    </Button>
+                    {hasPermission('service:create') && (
+
+                      <Button
+                        variant='outlined'
+                        startIcon={<AddIcon />}
+                        onClick={handleAddNew}
+                        sx={{ mt: 2 }}
+                      >
+                        Thêm dịch vụ đầu tiên
+                      </Button>
+                    )}
                   </TableCell>
                 </TableRow>
               )}

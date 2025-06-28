@@ -31,7 +31,6 @@ const styles = {
 }
 
 function WarehouseStatisticTab() {
-  const { hasPermission } = usePermissions()
   const { warehouses, fetchWarehouses, createNewWarehouse } = useWarehouses()
   const { variants, fetchVariants } = useVariants()
   const { batches } = useBatches()

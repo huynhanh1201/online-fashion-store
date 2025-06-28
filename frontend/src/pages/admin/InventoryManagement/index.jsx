@@ -65,7 +65,7 @@ function InventoryManagement() {
     availableTabs.push({ label: 'Đối tác', component: PartnersTab, permission: 'partner:read' })
   }
 
-  if (hasPermission('statistics:read') && hasPermission('warehouse:read')) {
+  if (hasPermission('statisticsWarehouse:read') && hasPermission('warehouse:read')) {
     availableTabs.push({ label: 'Thống kê kho', component: WarehouseStatisticTab, permission: 'statistics:read' })
   }
 
