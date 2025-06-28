@@ -32,7 +32,7 @@ const VariantBox = styled(Box)(({ selected }) => ({
   alignItems: 'center',
   padding: '8px 12px',
   backgroundColor: selected ? 'var(--primary-color)20' : '#f9f9f9',
-  border: selected ? `1px solid var(--primary-color)` : '1px solid #e0e0e0',
+  border: selected ? '1px solid var(--primary-color)' : '1px solid #e0e0e0',
   borderRadius: '8px',
   cursor: 'pointer',
   gap: 10,
