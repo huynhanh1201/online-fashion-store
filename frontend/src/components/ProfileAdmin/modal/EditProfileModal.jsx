@@ -125,7 +125,7 @@ const EditProfileModal = ({ open, onClose, profile }) => {
           onClick={handleSubmit}
           variant='contained'
           disabled={loading}
-          sx={{ backgroundColor: '#001f5d' }}
+          sx={{ backgroundColor: 'var(--primary-color)' }}
         >
           {loading ? 'Đang lưu...' : 'Lưu thay đổi'}
         </Button>

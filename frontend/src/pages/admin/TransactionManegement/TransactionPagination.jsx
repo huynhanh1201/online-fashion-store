@@ -11,7 +11,7 @@ const TransactionPagination = ({ page, totalPages, onChange }) => {
         onChange={(e, value) => onChange(value)}
         sx={{
           '& .Mui-selected': {
-            backgroundColor: '#001f5d !important',
+            backgroundColor: 'var(--primary-color) !important',
             color: '#fff',
             fontWeight: 'bold'
           }

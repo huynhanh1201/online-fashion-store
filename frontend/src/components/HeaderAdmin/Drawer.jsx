@@ -77,18 +77,18 @@ export default function AdminDrawer({
     '&.Mui-selected': {
       backgroundColor: 'transparent',
       '& .MuiListItemIcon-root': {
-        color: 'var(--primary-color)'
+        color: '#001f5d'
       },
       '& .MuiListItemText-primary': {
-        color: 'var(--primary-color)',
+        color: '#001f5d',
         fontWeight: 700
       }
     },
     '&.Mui-selected:hover': {
-      backgroundColor: 'var(--primary-color)20'
+      backgroundColor: '#bbdefb'
     },
     '&.MuiListItemButton-root:hover': {
-      backgroundColor: 'var(--primary-color)20'
+      backgroundColor: '#bbdefb'
     }
   }
 
@@ -109,71 +109,71 @@ export default function AdminDrawer({
   const menuConfig = useMemo(
     () => ({
       statistics: {
-        permission: 'statistics:use',
+        // permission: 'statistics:read',
         label: 'Thống kê',
         path: '/admin',
         icon: <PollIcon />
       },
       accountManagement: {
-        permissions: ['user:use', 'account:use', 'role:use'],
+        permissions: ['user:use'],
         label: 'Quản lý tài khoản',
-        icon: <PersonIcon />,
+        icon: <PaletteIcon />,
         children: [
           {
             permission: 'user:use',
-            label: 'Tài khoản  khách hàng',
+            label: 'Tài khoản  người dùng',
             path: '/admin/user-management'
           },
           {
-            permission: 'account:use',
+            permission: 'user:use',
             label: 'Tài khoản hệ thống',
             path: '/admin/account-management'
           },
           {
-            permission: 'role:use',
+            permission: 'user:use',
             label: 'Quản lý vai trò',
             path: '/admin/role-management'
           }
         ]
       },
       contentManagement: {
-        permissions: ['content:use', 'banner:use', 'flashSale:use', 'headerContent:use', 'footerContent:use', 'featuredCategory:use', 'service:use', 'blog:use'],
+        permissions: ['user:use'],
         label: 'Quản lý nội dung',
         icon: <LocalOfferIcon />,
         children: [
           {
-            permission: 'banner:use',
+            permission: 'user:use',
             label: 'Ảnh quảng cáo',
             path: '/admin/display-management'
           },
           {
-            permission: 'flashSale:use',
+            permission: 'user:use',
             label: 'Chương trình khuyến mãi',
             path: '/admin/flashsale-management'
           },
           {
-            permission: 'headerContent:use',
+            permission: 'user:use',
             label: 'Nội dung đầu trang',
             path: '/admin/header-management'
           },
           {
-            permission: 'footerContent:use',
+            permission: 'user:use',
             label: 'Nội dung cuối trang',
             path: '/admin/footer-management'
           },
           {
-            permission: 'featuredCategory:use',
+            permission: 'user:use',
             label: 'Danh mục nổi bật',
             path: '/admin/featured-category-management'
           },
           {
-            permission: 'service:use',
+            permission: 'user:use',
             label: 'Dịch vụ nổi bật',
             path: '/admin/service-highlight-management'
           },
           {
             permission: 'user:use',
-            label: 'Quản lý Theme',
+            label: 'Chủ đề',
             path: '/admin/theme-management'
           },
           {
@@ -189,22 +189,15 @@ export default function AdminDrawer({
           'category:use',
           'color:use',
           'size:use',
-          'review:use',
-          'variant:use'
+          'review:use'
         ],
         label: 'Quản lý sản phẩm',
         icon: <InventoryIcon />,
         children: [
           {
-            permission: 'product:use',
-            label: 'Thống kê sản phẩm',
-            path: '/admin/product-statistic',
-            icon: <CategoryIcon />
-          },
-          {
             permission: 'category:use',
             label: 'Quản lý danh mục',
-            path: '/admin/category-management',
+            path: '/admin/categorie-management',
             icon: <CategoryIcon />
           },
           {
@@ -242,12 +235,6 @@ export default function AdminDrawer({
         label: 'Quản lý đơn hàng',
         icon: <ReceiptLongIcon />,
         children: [
-          {
-            permission: 'order:use',
-            label: 'Thống kê đơn hàng',
-            path: '/admin/order-statistic',
-            icon: <ReceiptLongIcon />
-          },
           {
             permission: 'order:use',
             label: 'Quản lý đơn hàng',
@@ -324,20 +311,35 @@ export default function AdminDrawer({
 
   // Kiểm tra xem user có quyền truy cập menu không (sync function)
   const canAccessMenu = (menuItem) => {
-    // Chỉ kiểm tra quyền use, không fallback sang quyền CRUD
+    // Chỉ kiểm tra quyền cụ thể, không dựa vào admin:access
 
     // Kiểm tra quyền đơn lẻ
     if (menuItem.permission) {
-      // Chỉ kiểm tra chính xác quyền được chỉ định (use)
-      return hasPermission(menuItem.permission)
+      const resource = menuItem.permission.split(':')[0]
+      // Kiểm tra các quyền: read, create, update, delete
+      const relatedPermissions = [
+        `${resource}:read`,
+        `${resource}:create`,
+        `${resource}:update`,
+        `${resource}:delete`
+      ]
+      return hasAnyPermission(relatedPermissions)
     }
 
     // Kiểm tra danh sách quyền
     if (menuItem.permissions) {
-      // Kiểm tra từng quyền trong danh sách (các quyền use)
-      return menuItem.permissions.some(permission =>
-        hasPermission(permission)
-      )
+      // Tạo danh sách tất cả quyền liên quan từ các resource
+      const allRelatedPermissions = []
+      menuItem.permissions.forEach((permission) => {
+        const resource = permission.split(':')[0]
+        allRelatedPermissions.push(
+          `${resource}:read`,
+          `${resource}:create`,
+          `${resource}:update`,
+          `${resource}:delete`
+        )
+      })
+      return hasAnyPermission(allRelatedPermissions)
     }
 
     return false
@@ -349,7 +351,7 @@ export default function AdminDrawer({
       if (!isInitialized) return []
       return children.filter((child) => canAccessMenu(child))
     }
-  }, [isInitialized, canAccessMenu])
+  }, [isInitialized, hasPermission, hasAnyPermission])
 
   const profileName = profile?.name || 'Không có dữ liệu'
 
@@ -450,7 +452,7 @@ export default function AdminDrawer({
                 onClick={toggleOrder}
                 sx={{ padding: '12px 24px' }}
               >
-                <ListItemIcon sx={{ minWidth: 45 }}>
+                <ListItemIcon sx={{ minWidth: 35 }}>
                   <ReceiptLongIcon />
                 </ListItemIcon>
               </ListItemButton>

@@ -100,7 +100,7 @@ const FooterPreview = ({ logo, about, menuColumns, socialLinks, stores }) => {
               </Box>
               <Box
                 sx={{ 
-                  bgcolor: '#1a3c7b', 
+                  bgcolor: 'var(--primary-color)', 
                   color: 'white', 
                   width: '100px',
                   px: 2,

@@ -138,7 +138,7 @@ function ViewOrderModal({
               color: '#001f5d !important',
               fontWeight: '900'
             },
-            '& .MuiTabs-indicator': { backgroundColor: '#001f5d' }
+            '& .MuiTabs-indicator': { backgroundColor: 'var(--primary-color)' }
           }}
         >
           <Tab label='Thông tin đơn hàng' />

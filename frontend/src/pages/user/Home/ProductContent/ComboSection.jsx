@@ -19,7 +19,7 @@ const styles = {
   },
   item: {
     textAlign: 'center',
-    backgroundColor: '#fff',
+    backgroundColor: 'var(--surface-color)',
     borderRadius: '8px',
     overflow: 'hidden',
     transition: 'all 0.3s ease'

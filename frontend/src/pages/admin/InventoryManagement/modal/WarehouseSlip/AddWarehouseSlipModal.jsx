@@ -258,7 +258,7 @@ export default function AddWarehouseSlipModal({
               color='success'
               onClick={onSubmit}
               sx={{
-                backgroundColor: '#001f5d',
+                backgroundColor: 'var(--primary-color)',
                 color: '#fff',
                 textTransform: 'none'
               }}
@@ -453,7 +453,7 @@ export default function AddWarehouseSlipModal({
             variant='contained'
             onClick={handleAddRow}
             sx={{
-              backgroundColor: '#001f5d',
+              backgroundColor: 'var(--primary-color)',
               color: '#fff',
               textTransform: 'none'
             }}

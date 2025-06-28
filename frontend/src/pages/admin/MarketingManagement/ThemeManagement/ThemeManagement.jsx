@@ -335,7 +335,7 @@ const ThemeManagement = () => {
                   variant="contained"
                   startIcon={<Save />}
                   onClick={handleSaveTheme}
-                  sx={{ minWidth: 120 }}
+                  sx={{ minWidth: 120, backgroundColor: 'var(--primary-color)', color: '#fff' }}
                 >
                   Lưu Theme
                 </Button>
@@ -343,7 +343,7 @@ const ThemeManagement = () => {
                   variant="outlined"
                   startIcon={<Refresh />}
                   onClick={handleResetTheme}
-                  sx={{ minWidth: 120 }}
+                  sx={{ minWidth: 120, color: 'var(--primary-color)', borderColor: 'var(--primary-color)' }}
                 >
                   Reset
                 </Button>
@@ -351,7 +351,7 @@ const ThemeManagement = () => {
                   variant="outlined"
                   startIcon={<Visibility />}
                   onClick={handleExportTheme}
-                  sx={{ minWidth: 120 }}
+                  sx={{ minWidth: 120, color: 'var(--primary-color)', borderColor: 'var(--primary-color)' }}
                 >
                   Xuất Theme
                 </Button>
@@ -359,7 +359,7 @@ const ThemeManagement = () => {
                   variant="outlined"
                   component="label"
                   startIcon={<VisibilityOff />}
-                  sx={{ minWidth: 120 }}
+                  sx={{ minWidth: 120, color: 'var(--primary-color)', borderColor: 'var(--primary-color)' }}
                 >
                   Nhập Theme
                   <input

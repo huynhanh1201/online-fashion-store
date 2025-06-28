@@ -195,7 +195,7 @@ const ViewReviewModal = ({ open, onClose, review, onApprove }) => {
                           position: 'relative',
                           cursor: 'pointer',
                           border: '1px solid #ccc',
-                          backgroundColor: '#eee'
+                          backgroundColor: 'var(--surface-color)'
                         }}
                       >
                         <video
@@ -238,7 +238,7 @@ const ViewReviewModal = ({ open, onClose, review, onApprove }) => {
                 color='primary'
                 variant='contained'
                 sx={{
-                  backgroundColor: '#001f5d',
+                  backgroundColor: 'var(--primary-color)',
                   color: '#fff',
                   textTransform: 'none',
                   mr: 1,

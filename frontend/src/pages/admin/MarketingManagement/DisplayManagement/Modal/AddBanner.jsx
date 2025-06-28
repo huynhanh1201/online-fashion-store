@@ -517,12 +517,9 @@ const AddBanner = ({ open, onClose, onSuccess, initialData, bannerIndex }) => {
             fontSize: '1rem',
             px: 3,
             py: 1,
-            background: 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)',
-            boxShadow: '0 4px 16px rgba(59, 130, 246, 0.3)',
+            background: 'var(--primary-color)',
             '&:hover': {
-              background: 'linear-gradient(135deg, #2563eb 0%, #1e40af 100%)',
-              boxShadow: '0 6px 20px rgba(59, 130, 246, 0.4)',
-              transform: 'translateY(-1px)'
+              background: 'var(--accent-color)'
             },
             '&:disabled': {
               background: 'linear-gradient(135deg, #93c5fd 0%, #a5b4fc 100%)',

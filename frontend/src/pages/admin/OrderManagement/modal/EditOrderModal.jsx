@@ -152,7 +152,7 @@ const EditOrderModal = ({ open, onClose, order, onUpdate, loading }) => {
           variant='contained'
           onClick={handleSubmit(onSubmit)}
           disabled={loading || isFinalStatus}
-          sx={{ backgroundColor: '#001f5d', color: '#fff' }}
+          sx={{ backgroundColor: 'var(--primary-color)', color: '#fff' }}
         >
           {loading ? 'Đang cập nhật...' : 'Cập nhật'}
         </Button>

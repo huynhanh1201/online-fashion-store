@@ -650,4 +650,4 @@ const AddMenu = ({ open, onClose, onSuccess, initialData = null }) => {
   )
 }
 
-export default AddMenu 
+export default AddMenu

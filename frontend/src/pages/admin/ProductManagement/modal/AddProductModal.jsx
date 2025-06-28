@@ -200,7 +200,7 @@ const AddProductModal = ({ open, onClose, onSuccess }) => {
             variant='contained'
             sx={{
               color: '#fff',
-              backgroundColor: '#001f5d',
+              backgroundColor: 'var(--primary-color)',
               textTransform: 'none'
             }}
           >
@@ -252,27 +252,6 @@ const AddProductModal = ({ open, onClose, onSuccess }) => {
                 control={control}
                 rules={{ required: 'Danh mục không được bỏ trống' }}
                 render={({ field }) => (
-                  // <Select
-                  //   {...field}
-                  //   label='Danh mục'
-                  //   value={field.value || ''}
-                  //   disabled={loading}
-                  //   MenuProps={{
-                  //     PaperProps: { sx: StyleAdmin.FormSelect.SelectMenu }
-                  //   }}
-                  // >
-                  //   {categories
-                  //     ?.filter((c) => !c.destroy)
-                  //     .map((cat) => (
-                  //       <MenuItem key={cat._id} value={cat._id}>
-                  //         {cat.name}
-                  //       </MenuItem>
-                  //     ))}
-                  //   <MenuItem onClick={() => setCategoryOpen(true)}>
-                  //     Thêm danh mục mới
-                  //   </MenuItem>
-                  // </Select>
-
                   <Select
                     label='Danh mục'
                     value={field.value || ''}
@@ -453,10 +432,10 @@ const AddProductModal = ({ open, onClose, onSuccess }) => {
                       clickable
                       sx={{
                         ...(isSelected && {
-                          backgroundColor: '#001f5d',
+                          backgroundColor: 'var(--primary-color)',
                           color: '#fff',
                           '&:hover': {
-                            backgroundColor: '#001f5d'
+                            backgroundColor: 'var(--primary-color)'
                           }
                         })
                       }}

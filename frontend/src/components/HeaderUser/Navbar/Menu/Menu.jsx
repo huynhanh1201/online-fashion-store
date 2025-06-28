@@ -108,9 +108,9 @@ const Menu = ({ headerRef }) => {
     function updateItemsPerRow() {
       const width = menuContainerRef.current?.offsetWidth || window.innerWidth
       if (width > 1200) setItemsPerRow(6)
-      else if (width > 900) setItemsPerRow(5)
+      else if (width > 1100) setItemsPerRow(5)
+        else if (width > 1600) setItemsPerRow(7)
       else if (width > 700) setItemsPerRow(3)
-      else if (width > 500) setItemsPerRow(3)
       else setItemsPerRow(3)
     }
     updateItemsPerRow()
@@ -634,7 +634,7 @@ const Menu = ({ headerRef }) => {
                       <Button
                         key={item + i}
                         href={
-                          col.parentId ? `/productbycategory/${col.parentId}` : '#'
+                          col.slug ? `/category/${col.slug}` : '#'
                         }
                         sx={{
                           justifyContent: 'flex-start',

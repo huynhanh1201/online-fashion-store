@@ -151,7 +151,7 @@ const FeaturedCategoryManagement = () => {
             gap: 2
           }}
         >
-          <CategoryIcon sx={{ fontSize: 40, color: '#1A3C7B' }} />
+          <CategoryIcon sx={{ fontSize: 40, color: 'var(--primary-color)' }} />
           Quản lý Danh mục Nổi bật
         </Typography>
         <Typography variant='body1' color='text.secondary'>
@@ -241,10 +241,10 @@ const FeaturedCategoryManagement = () => {
             textTransform: 'none',
             fontSize: '1rem',
             fontWeight: 600,
-            background: 'linear-gradient(135deg,rgb(17, 58, 122) 0%,rgb(11, 49, 156) 100%)',
+            background: 'var(--primary-color)',
             boxShadow: '0 4px 16px rgba(59, 130, 246, 0.3)',
             '&:hover': {
-              background: 'linear-gradient(135deg, #2563eb 0%, #1e40af 100%)',
+              background: 'var(--accent-color)',
               boxShadow: '0 6px 20px rgba(59, 130, 246, 0.4)',
               transform: 'translateY(-1px)'
             }

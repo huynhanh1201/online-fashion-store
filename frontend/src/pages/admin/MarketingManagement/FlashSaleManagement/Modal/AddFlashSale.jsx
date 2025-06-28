@@ -978,10 +978,10 @@ const AddFlashSale = ({ open, onClose, onSave, initialData }) => {
             fontSize: '1rem',
             px: 3,
             py: 1,
-            background: 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)',
+            background: 'var(--primary-color)',
             boxShadow: '0 4px 16px rgba(59, 130, 246, 0.3)',
             '&:hover': {
-              background: 'linear-gradient(135deg, #2563eb 0%, #1e40af 100%)',
+              background: 'var(--accent-color)',
               boxShadow: '0 6px 20px rgba(59, 130, 246, 0.4)',
               transform: 'translateY(-1px)'
             },

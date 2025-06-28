@@ -423,9 +423,9 @@ const AddFeaturedCategory = ({ open, onClose, onSuccess, editIndex = null }) => 
             textTransform: 'none',
             fontWeight: 600,
             px: 3,
-            background: 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)',
+            background: 'var(--primary-color)',
             '&:hover': {
-              background: 'linear-gradient(135deg, #2563eb 0%, #1e40af 100%)'
+              background: 'var(--accent-color)'
             }
           }}
         >

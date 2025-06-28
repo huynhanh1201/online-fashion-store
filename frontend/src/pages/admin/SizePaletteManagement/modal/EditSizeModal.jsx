@@ -92,15 +92,15 @@ const EditSizeModal = ({ open, onClose, size, onUpdated }) => {
                       onClick={() => setValue('status', item.value)}
                       variant={isSelected ? 'filled' : 'outlined'}
                       clickable
-                      sx={
-                        isSelected
-                          ? {
-                              backgroundColor: '#001f5d',
-                              color: '#fff',
-                              '&:hover': { backgroundColor: '#001f5d' }
-                            }
-                          : {}
-                      }
+                      sx={{
+                        ...(isSelected && {
+                          backgroundColor: 'var(--primary-color)',
+                          color: '#fff',
+                          '&:hover': {
+                            backgroundColor: 'var(--primary-color)'
+                          }
+                        })
+                      }}
                     />
                   )
                 })}
@@ -121,7 +121,7 @@ const EditSizeModal = ({ open, onClose, size, onUpdated }) => {
         <Button
           variant='contained'
           sx={{
-            backgroundColor: '#001f5d',
+            backgroundColor: 'var(--primary-color)',
             color: '#fff',
             textTransform: 'none'
           }}

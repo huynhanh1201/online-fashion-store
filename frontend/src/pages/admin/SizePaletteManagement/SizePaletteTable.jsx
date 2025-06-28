@@ -72,7 +72,7 @@ const SizePaletteTable = ({
                         width: 100,
                         display: 'flex',
                         alignItems: 'center',
-                        backgroundColor: '#001f5d',
+                        backgroundColor: 'var(--primary-color)',
                         color: '#fff'
                       }}
                     >
