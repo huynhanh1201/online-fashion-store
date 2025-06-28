@@ -52,6 +52,7 @@ import BatchesTab from '~/pages/admin/InventoryManagement/tab/BatchesTab.jsx'
 import BlogManagement from '~/pages/admin/BlogManagement/index.jsx'
 import RoleManagement from '~/pages/admin/RoleManagement/index.jsx'
 import PermissionManagement from '~/pages/admin/PermissionManagemenet/index.jsx'
+import ProductStatistic from '~/pages/admin/ProductStatistics/index.jsx'
 // Quản lý nội dung
 import DisplayManagement from '~/pages/admin/MarketingManagement/DisplayManagement/DisplayManagement.jsx'
 import FlashSaleManagement from '~/pages/admin/MarketingManagement/FlashSaleManagement/FlashSaleManagement.jsx'
@@ -126,6 +127,7 @@ function App() {
           <Route index element={<AdminHome />} />
           <Route path='user-management' element={<UserManagement />} />
           <Route path='account-management' element={<AccountManagement />} />
+          <Route path='product-statistic' element={<ProductStatistic />} />
           <Route path='product-management' element={<ProductManagement />} />
           <Route
             path='categorie-management'

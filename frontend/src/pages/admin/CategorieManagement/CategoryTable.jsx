@@ -109,17 +109,6 @@ const CategoryTable = ({
                           Thêm
                         </Button>
                       )}
-
-                      <Tooltip title='Xem danh mục đã xoá'>
-                        <IconButton
-                          onClick={() =>
-                            onFilter({ ...{ status: 'true', sort: 'newest' } })
-                          }
-                          sx={{ border: '1px solid #ccc' }}
-                        >
-                          <DeleteIcon color='error' />
-                        </IconButton>
-                      </Tooltip>
                     </Stack>
                   </Box>
 

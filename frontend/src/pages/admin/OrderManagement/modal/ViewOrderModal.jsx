@@ -33,7 +33,7 @@ function ViewOrderModal({
   if (!order) return null
   const handleTabChange = (_, newValue) => setTab(newValue)
   const getNextStatus = (currentStatus) => {
-    const flow = ['Pending', 'Processing', 'Shipped', 'Delivered']
+    const flow = ['Pending', 'Processing', 'Shipping', 'Shipped', 'Delivered']
     const index = flow.indexOf(currentStatus)
     return index >= 0 && index < flow.length - 1 ? flow[index + 1] : null
   }
@@ -50,29 +50,26 @@ function ViewOrderModal({
 
   const renderStatusChip = (status) => {
     const map = {
-      Pending: { label: 'Đang chờ', color: 'warning' },
       Processing: { label: 'Đang xử lý', color: 'info' },
       Shipping: { label: 'Đang vận chuyển', color: 'primary' },
-      Shipped: { label: 'Đã gửi hàng', color: 'primary' },
+      Shipped: { label: 'Đã gửi hàng', color: 'success' },
       Delivered: { label: 'Đã giao', color: 'success' },
       Cancelled: { label: 'Đã hủy', color: 'error' },
       Failed: { label: 'Thất bại', color: 'error' }
     }
-
     const config = map[status] || { label: '—', color: 'default' }
-
     return (
       <Chip
         label={config.label}
         color={config.color}
-        size='small'
-        sx={{ width: '120px', fontWeight: 'bold' }}
+        size='large'
+        sx={{ width: '137px', fontWeight: 'bold' }}
       />
     )
   }
+
   const renderStatusLabel = (status) => {
     const map = {
-      Pending: 'Đang chờ',
       Processing: 'Đang xử lý',
       Shipping: 'Đang vận chuyển',
       Shipped: 'Đã gửi hàng',
@@ -96,15 +93,7 @@ function ViewOrderModal({
       minWidth: 200
     }
   }
-  const colorOrder = [
-    { value: 'Pending', color: 'warning' },
-    { value: 'Processing', color: 'info' },
-    { value: 'Shipping', color: 'primary' },
-    { value: 'Shipped', color: 'success' },
-    { value: 'Delivered', color: 'success' },
-    { value: 'Cancelled', color: 'error' },
-    { value: 'Failed', color: 'error' }
-  ]
+
   return (
     <Dialog
       open={open}
@@ -249,47 +238,41 @@ function ViewOrderModal({
                 <TableCell sx={style.nonePadding}>
                   <Stack direction='row' alignItems='center' spacing={1}>
                     {previousStatuses.map((status, index) => (
-                      <Chip
-                        key={index}
-                        label={renderStatusLabel(status)}
-                        color={
-                          colorOrder.find((option) => option.value === status)
-                            ?.color || 'primary'
-                        }
-                        size='large'
-                        sx={{ width: '120px', fontWeight: '800' }}
-                        variant='outlined'
-                      />
+                      <React.Fragment key={index}>
+                        <Chip
+                          label={renderStatusLabel(status)}
+                          color={renderStatusChip(status).props.color}
+                          size='large'
+                          sx={{ width: '137px', fontWeight: '800' }}
+                          variant='contained'
+                        />
+                        {index < previousStatuses.length - 1 && (
+                          <ArrowForwardIcon />
+                        )}
+                      </React.Fragment>
                     ))}
+                    {previousStatuses.length > 0 && <ArrowForwardIcon />}
                     <Chip
                       label={renderStatusLabel(order.status)}
-                      color={
-                        order.status === 'Cancelled'
-                          ? 'error'
-                          : order.status === 'Pending'
-                            ? 'warning'
-                            : order.status === 'Processing'
-                              ? 'info'
-                              : order.status === 'Shipped'
-                                ? 'primary'
-                                : order.status === 'Delivered'
-                                  ? 'success'
-                                  : 'default'
-                      }
+                      color={renderStatusChip(order.status).props.color}
                       size='large'
-                      sx={{ width: '120px', fontWeight: '800' }}
+                      sx={{ width: '137px', fontWeight: '800' }}
                     />
-                    {/*{getNextStatus(order.status) && (*/}
-                    {/*  <Chip*/}
-                    {/*    icon={<ArrowForwardIcon />}*/}
-                    {/*    label={renderStatusLabel(getNextStatus(order.status))}*/}
-                    {/*    variant='outlined'*/}
-                    {/*    size='large'*/}
-                    {/*    sx={{ width: '120px', fontWeight: '800' }}*/}
-                    {/*    color='info'*/}
-                    {/*    onClick={handleNextStatus}*/}
-                    {/*  />*/}
-                    {/*)}*/}
+                    {getNextStatus(order.status) && (
+                      <>
+                        <ArrowForwardIcon />
+                        <Chip
+                          label={renderStatusLabel(
+                            getNextStatus(order?.status)
+                          )}
+                          variant='contained'
+                          size='large'
+                          sx={{ width: '137px', fontWeight: '800' }}
+                          color='info'
+                          onClick={handleNextStatus}
+                        />
+                      </>
+                    )}
                   </Stack>
                 </TableCell>
               </TableRow>
@@ -303,7 +286,7 @@ function ViewOrderModal({
                     label={order.isDelivered ? 'Đã giao' : 'Chưa giao'}
                     color={order.isDelivered ? 'success' : 'default'}
                     size='large'
-                    sx={{ width: '120px', fontWeight: '800' }}
+                    sx={{ width: '137px', fontWeight: '800' }}
                   />
                 </TableCell>
               </TableRow>

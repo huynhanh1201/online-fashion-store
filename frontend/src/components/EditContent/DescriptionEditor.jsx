@@ -15,22 +15,23 @@ const StyledEditor = styled.div`
     white-space: pre-wrap;
     color: #000;
   }
-
   .ProseMirror:focus {
     border-color: #000;
     box-shadow: 0 0 0 1px #000;
   }
-
-  .custom-image-wrapper button {
-    font-size: 14px;
-    padding: 0;
-    background: transparent;
-    border: none;
-    cursor: pointer;
+  .custom-image-wrapper {
+    display: block;
+    margin: 16px 0;
+    max-width: 100%;
+    pointer-events: none; /* Disable pointer events */
+    height: auto;
   }
-
-  .custom-image-wrapper button:hover {
-    color: red;
+  .custom-image-wrapper img {
+    display: block;
+    margin: 0 auto;
+    max-width: 100%;
+    height: auto;
+    border-radius: 4px;
   }
 `
 export default function DescriptionEditor({
@@ -59,7 +60,7 @@ export default function DescriptionEditor({
   }, [editor, initialHtml])
 
   return (
-    <div>
+    <div style={{ border: '1px solid #aaa' }}>
       <MenuBar editor={editor} onImageInsert={onImageInsert} />
       <StyledEditor>
         <EditorContent editor={editor} />

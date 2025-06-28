@@ -60,17 +60,6 @@ function WarehouseStatisticTab() {
       className='tab-content'
       style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}
     >
-      {/*<Box sx={styles.BoxCard}>*/}
-      {/*  <Typography*/}
-      {/*    variant='h5'*/}
-      {/*    gutterBottom*/}
-      {/*    fontWeight='700'*/}
-      {/*    sx={styles.header}*/}
-      {/*  >*/}
-      {/*    Sản phẩm & Biến thể*/}
-      {/*  </Typography>*/}
-      {/*  <VariantSummaryCard />*/}
-      {/*</Box>*/}
       <Box sx={styles.BoxCard}>
         <Typography
           variant='h5'
@@ -82,29 +71,6 @@ function WarehouseStatisticTab() {
         </Typography>
         <InventorySummaryCard data={statistics} loading={loading} />
       </Box>
-      {/*<Box sx={styles.BoxCard}>*/}
-      {/*  <Typography*/}
-      {/*    variant='h5'*/}
-      {/*    gutterBottom*/}
-      {/*    fontWeight='700'*/}
-      {/*    sx={styles.header}*/}
-      {/*  >*/}
-      {/*    Tình trạng theo kho*/}
-      {/*  </Typography>*/}
-      {/*  <StockStatus />*/}
-      {/*</Box>*/}
-      {/*<Box sx={styles.BoxCard}>*/}
-      {/*  <Typography*/}
-      {/*    variant='h5'*/}
-      {/*    gutterBottom*/}
-      {/*    fontWeight='700'*/}
-      {/*    sx={styles.header}*/}
-      {/*  >*/}
-      {/*    Tình trạng theo kho*/}
-      {/*  </Typography>*/}
-      {/*  <TopSellingSlowSellingCard />*/}
-      {/*</Box>*/}
-
       <Box sx={styles.BoxCard}>
         <Typography
           variant='h5'
@@ -141,17 +107,6 @@ function WarehouseStatisticTab() {
           fetchPartner={fetchPartners}
         />
       </Box>
-      {/*<Box sx={styles.BoxCard}>*/}
-      {/*  <Typography*/}
-      {/*    variant='h5'*/}
-      {/*    gutterBottom*/}
-      {/*    fontWeight='700'*/}
-      {/*    sx={styles.header}*/}
-      {/*  >*/}
-      {/*    Chi Tiết Sản Phẩm Theo Màu Sắc*/}
-      {/*  </Typography>*/}
-      {/*  <ProductColorDetail />*/}
-      {/*</Box>*/}
     </div>
   )
 }

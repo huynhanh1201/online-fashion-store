@@ -272,7 +272,7 @@ const BlogModal = ({
       open={open}
       onClose={handleClose}
       fullWidth
-      maxWidth={isMobile ? 'sm' : 'xl'}
+      maxWidth={isMobile ? 'sm' : 'xxl'}
       fullScreen={isMobile}
       sx={{
         mt: '64px',

@@ -11,7 +11,9 @@ import {
   Autocomplete,
   TextField
 } from '@mui/material'
-
+import { IconButton, InputAdornment } from '@mui/material'
+import { Visibility, VisibilityOff } from '@mui/icons-material'
+import { useState } from 'react'
 import { useForm, Controller } from 'react-hook-form'
 import StyleAdmin from '~/assets/StyleAdmin.jsx'
 
@@ -28,6 +30,8 @@ const EditAccountModal = ({ open, onClose, user, onSave, roles }) => {
       role: ''
     }
   })
+  const [showPassword, setShowPassword] = useState(false)
+  const toggleShowPassword = () => setShowPassword((prev) => !prev)
 
   useEffect(() => {
     if (open && user) {
@@ -66,7 +70,7 @@ const EditAccountModal = ({ open, onClose, user, onSave, roles }) => {
         sx: StyleAdmin.OverlayModal
       }}
     >
-      <DialogTitle>Cập nhật thông tin người dùng</DialogTitle>
+      <DialogTitle>Cập nhật thông tin Tài khoàn</DialogTitle>
       <Divider sx={{ my: 0 }} />
       <DialogContent>
         <form id='edit-user-form' onSubmit={handleSubmit(onSubmit)}>
@@ -77,7 +81,7 @@ const EditAccountModal = ({ open, onClose, user, onSave, roles }) => {
             render={({ field, fieldState }) => (
               <TextField
                 {...field}
-                label='Tên người dùng'
+                label='Tên tài khoản'
                 fullWidth
                 margin='normal'
                 error={!!fieldState.error}
@@ -94,7 +98,7 @@ const EditAccountModal = ({ open, onClose, user, onSave, roles }) => {
               <TextField
                 {...field}
                 label='Mật khẩu mới'
-                type='password'
+                type={showPassword ? 'text' : 'password'}
                 fullWidth
                 margin='normal'
                 error={!!fieldState.error}
@@ -102,6 +106,15 @@ const EditAccountModal = ({ open, onClose, user, onSave, roles }) => {
                   fieldState.error?.message || 'Để trống nếu không đổi'
                 }
                 sx={StyleAdmin.InputCustom}
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position='end' sx={{ pr: 1 }}>
+                      <IconButton onClick={toggleShowPassword} edge='end'>
+                        {showPassword ? <VisibilityOff /> : <Visibility />}
+                      </IconButton>
+                    </InputAdornment>
+                  )
+                }}
               />
             )}
           />

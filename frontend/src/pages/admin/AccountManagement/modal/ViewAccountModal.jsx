@@ -41,7 +41,7 @@ const ViewAccountModal = ({ open, onClose, user }) => {
       maxWidth='md'
       BackdropProps={{ sx: StyleAdmin.OverlayModal }}
     >
-      <DialogTitle>Thông tin người dùng</DialogTitle>
+      <DialogTitle>Thông tin tài khoản</DialogTitle>
       <Divider />
       <DialogContent sx={{ maxHeight: '69vh' }}>
         {user ? (
@@ -87,7 +87,7 @@ const ViewAccountModal = ({ open, onClose, user }) => {
                 <TableBody>
                   <TableRow>
                     <TableCell sx={{ fontWeight: 'bold', width: '30%' }}>
-                      Tên người dùng
+                      Tên tài khoản
                     </TableCell>
                     <TableCell>{user.name || '—'}</TableCell>
                   </TableRow>

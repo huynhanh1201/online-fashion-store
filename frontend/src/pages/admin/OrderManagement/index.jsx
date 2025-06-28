@@ -48,15 +48,15 @@ const OrderManagement = () => {
   }, [page, limit, filters])
 
   // Kiểm tra quyền truy cập order management
-  if (!hasPermission('order:read')) {
-    return (
-      <Box sx={{ p: 3, textAlign: 'center' }}>
-        <Typography variant='h6' color='error'>
-          Bạn không có quyền truy cập quản lý đơn hàng
-        </Typography>
-      </Box>
-    )
-  }
+  // if (!hasPermission('order:read')) {
+  //   return (
+  //     <Box sx={{ p: 3, textAlign: 'center' }}>
+  //       <Typography variant='h6' color='error'>
+  //         Bạn không có quyền truy cập quản lý đơn hàng
+  //       </Typography>
+  //     </Box>
+  //   )
+  // }
 
   // Mở modal xem
   const handleOpenModalView = async (order) => {
@@ -120,7 +120,6 @@ const OrderManagement = () => {
   const handleChangStatusOrder = async (orderId, data) => {
     try {
       await updateOrderById(orderId, data)
-      handleCloseModalView()
     } catch (error) {
       console.error('Lỗi cập nhật đơn hàng:', error)
     }

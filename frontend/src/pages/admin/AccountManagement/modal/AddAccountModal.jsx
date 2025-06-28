@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import {
   Dialog,
   DialogActions,
@@ -12,6 +12,8 @@ import {
 } from '@mui/material'
 import { useForm, Controller } from 'react-hook-form'
 import StyleAdmin from '~/assets/StyleAdmin.jsx'
+import { IconButton, InputAdornment } from '@mui/material'
+import { Visibility, VisibilityOff } from '@mui/icons-material'
 
 const AddAccountModal = ({ open, onClose, onSave, roles }) => {
   const {
@@ -29,6 +31,12 @@ const AddAccountModal = ({ open, onClose, onSave, roles }) => {
       role: ''
     }
   })
+  const [showPassword, setShowPassword] = useState(false)
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+
+  const toggleShowPassword = () => setShowPassword((prev) => !prev)
+  const toggleShowConfirmPassword = () =>
+    setShowConfirmPassword((prev) => !prev)
 
   const password = watch('password')
 
@@ -112,13 +120,22 @@ const AddAccountModal = ({ open, onClose, onSave, roles }) => {
             render={({ field, fieldState }) => (
               <TextField
                 {...field}
-                type='password'
+                type={showPassword ? 'text' : 'password'}
                 label='Mật khẩu'
                 fullWidth
                 margin='normal'
                 error={!!fieldState.error}
                 helperText={fieldState.error?.message}
                 sx={StyleAdmin.InputCustom}
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position='end' sx={{ pr: 1 }}>
+                      <IconButton onClick={toggleShowPassword} edge='end'>
+                        {showPassword ? <VisibilityOff /> : <Visibility />}
+                      </IconButton>
+                    </InputAdornment>
+                  )
+                }}
               />
             )}
           />
@@ -133,13 +150,29 @@ const AddAccountModal = ({ open, onClose, onSave, roles }) => {
             render={({ field, fieldState }) => (
               <TextField
                 {...field}
-                type='password'
+                type={showConfirmPassword ? 'text' : 'password'}
                 label='Xác nhận mật khẩu'
                 fullWidth
                 margin='normal'
                 error={!!fieldState.error}
                 helperText={fieldState.error?.message}
                 sx={StyleAdmin.InputCustom}
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position='end' sx={{ pr: 1 }}>
+                      <IconButton
+                        onClick={toggleShowConfirmPassword}
+                        edge='end'
+                      >
+                        {showConfirmPassword ? (
+                          <VisibilityOff />
+                        ) : (
+                          <Visibility />
+                        )}
+                      </IconButton>
+                    </InputAdornment>
+                  )
+                }}
               />
             )}
           />

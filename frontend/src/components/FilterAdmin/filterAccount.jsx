@@ -14,8 +14,8 @@ export default function FilterAccount({ onFilter, users, loading, roles }) {
   const [endDate, setEndDate] = useState(dayjs().format('YYYY-MM-DD'))
   const [role, setRole] = useState('')
   const [sort, setSort] = useState('newest')
+  const [destroy, setDestroy] = useState(false)
   const hasMounted = useRef(false)
-
   useEffect(() => {
     applyFilters(selectedFilter, startDate, endDate)
     hasMounted.current = true
@@ -53,7 +53,8 @@ export default function FilterAccount({ onFilter, users, loading, roles }) {
     const filters = {
       search: keyword || undefined,
       sort: sort || undefined,
-      roleId: role || undefined
+      roleId: role || undefined,
+      destroy: destroy || undefined
     }
 
     if (selectedTime === 'custom') {
@@ -81,11 +82,22 @@ export default function FilterAccount({ onFilter, users, loading, roles }) {
     setEndDate(dayjs().format('YYYY-MM-DD'))
     setRole('')
     setSort('')
+    setDestroy(false)
     onFilter({})
   }
 
   return (
     <Box display='flex' flexWrap='wrap' gap={2} mb={2} justifyContent='end'>
+      <FilterSelect
+        value={destroy}
+        onChange={setDestroy}
+        label='Xóa'
+        options={[
+          { label: 'Chưa xoá', value: false },
+          { label: 'Đã xóa', value: true }
+        ]}
+      />
+
       <FilterSelect value={sort} onChange={setSort} />
 
       <FilterSelect

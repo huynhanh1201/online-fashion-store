@@ -28,6 +28,7 @@ import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css'
 import 'draft-js/dist/Draft.css'
 import { CloudinaryColor, CloudinaryProduct, URI } from '~/utils/constants'
 import ProductDescriptionEditor from '../component/ProductDescriptionEditor.jsx'
+import DescriptionEditor from '~/components/EditContent/DescriptionEditor.jsx'
 const uploadToCloudinary = async (file, folder = CloudinaryColor) => {
   const formData = new FormData()
   formData.append('file', file)
@@ -101,8 +102,17 @@ const AddProductModal = ({ open, onClose, onSuccess }) => {
     setCategoryOpen(false) // Đóng modal
   }
   const topLevelCategories = categories.filter(
-    (category) => category.parent === null
+    (category) => category.parent !== null
   )
+
+  const handleImageInsertFromEditor = (url) => {
+    // Chỉ thêm nếu ảnh chưa có trong imageUrls
+    setProductImagePreview((prev) => {
+      const trimmed = prev.map((u) => u.trim())
+      if (!trimmed.includes(url)) return [...trimmed.filter((u) => u), url, '']
+      return [...trimmed, '']
+    })
+  }
 
   const onSubmit = async (data) => {
     try {
@@ -415,16 +425,18 @@ const AddProductModal = ({ open, onClose, onSuccess }) => {
           </Grid>
           {/*Mô tả*/}
           <Grid item size={12}>
-            <ProductDescriptionEditor
+            <DescriptionEditor
               control={control}
+              name='description'
               setValue={setValue}
               initialHtml={''}
+              onImageInsert={handleImageInsertFromEditor}
             />
           </Grid>
           {/*Trạng thái sản phẩm*/}
           <Grid item size={12}>
             <Box>
-              <Typography variant='h6'>Kích thước đóng gói</Typography>
+              <Typography variant='h6'>Trạng thái sản phẩm</Typography>
               <Box sx={{ display: 'flex', gap: 1, mt: 1 }}>
                 {[
                   { label: 'Bản nháp', value: 'draft' },

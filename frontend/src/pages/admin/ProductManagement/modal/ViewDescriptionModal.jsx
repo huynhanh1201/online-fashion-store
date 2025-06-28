@@ -13,26 +13,27 @@ export default function ViewDescriptionModal({ open, onClose, product }) {
     <Dialog
       open={open}
       onClose={onClose}
-      maxWidth='xl'
+      maxWidth='lg' // Adjusted to a smaller maxWidth
       fullWidth
       PaperProps={{
         sx: {
           marginTop: '50px',
-          // height: '85vh', // hoặc '600px' tùy ý
-          maxHeight: '85vh', // đảm bảo không vượt quá
+          maxHeight: '80vh', // Reduced maxHeight for a more compact view
           display: 'flex',
           flexDirection: 'column'
         }
       }}
     >
       <DialogTitle>Mô tả sản phẩm</DialogTitle>
-      <DialogContent dividers>
+      <DialogContent dividers sx={{ overflowY: 'auto' }}>
+        {' '}
+        {/* Added overflowY for scrollable content */}
         <Box
           sx={{
             width: '100%',
             '& img': {
-              width: '873px !important',
-              height: '873px !important',
+              maxWidth: '100%', // Ensure images fit within the modal
+              height: 'auto',
               display: 'block',
               margin: '8px auto',
               borderRadius: '6px',
@@ -40,7 +41,7 @@ export default function ViewDescriptionModal({ open, onClose, product }) {
             },
             '& p': {
               margin: '8px 0',
-              lineHeight: 1.6,
+              lineHeight: 1.4, // Reduced line height for compactness
               wordBreak: 'break-word'
             },
             '& ul, & ol': {
@@ -71,7 +72,9 @@ export default function ViewDescriptionModal({ open, onClose, product }) {
           dangerouslySetInnerHTML={{ __html: product?.description || '' }}
         />
       </DialogContent>
-      <DialogActions sx={{ padding: '16px 24px' }}>
+      <DialogActions sx={{ padding: '8px 16px' }}>
+        {' '}
+        {/* Reduced padding for a more compact button area */}
         <Button
           onClick={onClose}
           variant='outlined'
