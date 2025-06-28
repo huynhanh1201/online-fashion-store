@@ -24,3 +24,15 @@ export const getProductsStatistics = async () => {
     return []
   }
 }
+
+export const getOrderStatistics = async () => {
+  try {
+    const response = await AuthorizedAxiosInstance.get(
+      `${API_ROOT}/v1/statistics/order`
+    )
+    return response.data
+  } catch (error) {
+    console.error('Error fetching order statistics:', error)
+    return []
+  }
+}
