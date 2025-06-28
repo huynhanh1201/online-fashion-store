@@ -39,16 +39,16 @@ const ProductStatistics = ({ stats }) => {
   const [currentPage, setCurrentPage] = useState(0)
 
   const totalPages = Math.ceil(
-    stats.productsPerCategory.length / ITEMS_PER_PAGE
+    stats.productCountByCategory.length / ITEMS_PER_PAGE
   )
 
-  const paginatedData = stats.productsPerCategory.slice(
+  const paginatedData = stats.productCountByCategory.slice(
     currentPage * ITEMS_PER_PAGE,
     (currentPage + 1) * ITEMS_PER_PAGE
   )
 
   const chartData = {
-    labels: paginatedData.map((item) => item.category),
+    labels: paginatedData.map((item) => item.categoryName),
     datasets: [
       {
         label: 'Số lượng sản phẩm',
@@ -81,19 +81,19 @@ const ProductStatistics = ({ stats }) => {
   const summaryItems = [
     {
       label: 'Tổng sản phẩm',
-      value: stats.totalProducts,
+      value: stats.productsTotal,
       icon: <InventoryIcon color='primary' fontSize='large' />,
       color: '#4FC3F7'
     },
     {
       label: 'Tổng danh mục',
-      value: stats.totalCategories,
+      value: stats.categoriesTotal,
       icon: <CategoryIcon color='success' fontSize='large' />,
       color: '#81C784'
     },
     {
       label: 'Tổng biến thể',
-      value: stats.totalVariants,
+      value: stats.variantsTotal,
       icon: <LayersIcon color='warning' fontSize='large' />,
       color: '#FFB74D'
     }
@@ -115,7 +115,7 @@ const ProductStatistics = ({ stats }) => {
         </Typography>
         <Grid container spacing={2}>
           {summaryItems.map((item, index) => (
-            <Grid item size={4} xs={12} sm={6} md={4} key={index}>
+            <Grid item xs={12} sm={6} md={4} key={index}>
               <Box
                 sx={{
                   display: 'flex',

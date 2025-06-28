@@ -1,36 +1,12 @@
 import ProductStatistics from './ProductStatistic.jsx'
-
-const sampleStats = {
-  totalProducts: 10,
-  totalCategories: 3,
-  totalVariants: 25,
-  productsPerCategory: [
-    { category: 'Áo học', count: 4 },
-    { category: 'Phụ kiện', count: 3 },
-    { category: 'Quần áo thể thao', count: 3 },
-    { category: 'Áo học', count: 4 },
-    { category: 'Phụ kiện', count: 3 },
-    { category: 'Quần áo thể thao', count: 3 },
-    { category: 'Áo học', count: 4 },
-    { category: 'Phụ kiện', count: 3 },
-    { category: 'Quần áo thể thao', count: 3 },
-    { category: 'Áo học', count: 4 },
-    { category: 'Phụ kiện', count: 3 },
-    { category: 'Quần áo thể thao', count: 3 },
-    { category: 'Áo học', count: 4 },
-    { category: 'Phụ kiện', count: 3 },
-    { category: 'Quần áo thể thao', count: 3 },
-    { category: 'Áo học', count: 4 },
-    { category: 'Phụ kiện', count: 3 },
-    { category: 'Quần áo thể thao', count: 3 },
-    { category: 'Áo học', count: 4 },
-    { category: 'Phụ kiện', count: 3 },
-    { category: 'Quần áo thể thao', count: 3 }
-  ]
-}
-
+import React, { useEffect } from 'react'
+import useInventoryStatistics from '~/hooks/admin/useStatistic.js'
 function DashboardPage() {
-  return <ProductStatistics stats={sampleStats} />
+  const { fetchProductsStatistics, statistics } = useInventoryStatistics()
+  useEffect(() => {
+    fetchProductsStatistics()
+  }, [])
+  return <ProductStatistics stats={statistics} />
 }
 
 export default DashboardPage
