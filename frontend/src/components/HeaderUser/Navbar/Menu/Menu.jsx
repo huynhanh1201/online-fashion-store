@@ -112,22 +112,22 @@ const Menu = ({ headerRef }) => {
   const getMenuRows = () => {
     // Lọc ra các danh mục parent (không có parent hoặc parent = null)
     const parentCategories = categories.filter(cat => !cat.destroy && !cat.parent)
-
+    
     const allItems = menuConfig?.mainMenu
       ? [
-        ...(menuConfig.mainMenu.some(item => item.visible && item.children?.length > 0) ? [{ label: 'Sản phẩm', url: '/product', hasMegaMenu: true }] : []),
-        { label: 'Hàng mới', url: '/productnews', isNew: true },
-        ...menuConfig.mainMenu
-          .filter(item => item.visible && (!item.children || item.children.length === 0))
-          .sort((a, b) => (a.order || 0) - (b.order || 0))
-          .map(item => ({ label: item.label, url: item.url })),
-        ...parentCategories.map(cat => ({ label: cat.name, url: `/productbycategory/${cat._id}`, category: cat }))
-      ]
+          ...(menuConfig.mainMenu.some(item => item.visible && item.children?.length > 0) ? [{ label: 'Sản phẩm', url: '/product', hasMegaMenu: true }] : []),
+          { label: 'Hàng mới', url: '/productnews', isNew: true },
+          ...menuConfig.mainMenu
+            .filter(item => item.visible && (!item.children || item.children.length === 0))
+            .sort((a, b) => (a.order || 0) - (b.order || 0))
+            .map(item => ({ label: item.label, url: item.url })),
+          ...parentCategories.map(cat => ({ label: cat.name, url: `/productbycategory/${cat._id}`, category: cat }))
+        ]
       : [
-        { label: 'Sản phẩm', url: '/product', hasMegaMenu: true },
-        { label: 'Hàng mới', url: '/productnews', isNew: true },
-        ...parentCategories.map(cat => ({ label: cat.name, url: `/productbycategory/${cat._id}`, category: cat }))
-      ]
+          { label: 'Sản phẩm', url: '/product', hasMegaMenu: true },
+          { label: 'Hàng mới', url: '/productnews', isNew: true },
+          ...parentCategories.map(cat => ({ label: cat.name, url: `/productbycategory/${cat._id}`, category: cat }))
+        ]
     const rows = []
     for (let i = 0; i < allItems.length; i += itemsPerRow) {
       rows.push(allItems.slice(i, i + itemsPerRow))
@@ -267,9 +267,9 @@ const Menu = ({ headerRef }) => {
     if (!parentCategory || !parentCategory._id) {
       return []
     }
-    return categories.filter(cat =>
-      !cat.destroy &&
-      cat.parent &&
+    return categories.filter(cat => 
+      !cat.destroy && 
+      cat.parent && 
       (typeof cat.parent === 'object' ? cat.parent._id : cat.parent) === parentCategory._id
     )
   }
@@ -496,140 +496,82 @@ const Menu = ({ headerRef }) => {
       </Box>
 
       {/* MegaMenu Block */}
-      {((menuConfig?.mainMenu && menuConfig.mainMenu.some(item => item.visible && item.children?.length > 0)) ||
+      {((menuConfig?.mainMenu && menuConfig.mainMenu.some(item => item.visible && item.children?.length > 0)) || 
         (!menuConfig?.mainMenu && categories.length > 0)) && (
+        <Box
+          ref={menuRef}
+          sx={{
+            position: 'absolute',
+            top: '100%',
+            left: '55%',
+            transform: productMenuOpen
+              ? 'translateX(-50%) scaleY(1)'
+              : 'translateX(-50%) scaleY(0)',
+            transformOrigin: 'top',
+            width: '90vw',
+            maxWidth: '90vw',
+            borderRadius: '0 0 8px 8px',
+            boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.1)',
+            p: productMenuOpen ? 4 : 0,
+            zIndex: 1450, // Thấp hơn submenu một chút để không che phủ
+            backgroundColor: 'white',
+            display: 'flex',
+            justifyContent: 'center',
+            overflow: 'hidden',
+            transition: 'transform 0.35s ease, padding 0.2s ease, opacity 0.35s ease',
+            opacity: productMenuOpen ? 1 : 0,
+            pointerEvents: productMenuOpen ? 'auto' : 'none',
+            mx: 'auto',
+            mt:1
+          }}
+          onMouseEnter={handleDrawerEnter}
+          onMouseLeave={handleDrawerLeave}
+        >
           <Box
-            ref={menuRef}
             sx={{
-              position: 'absolute',
-              top: '100%',
-              left: '55%',
-              transform: productMenuOpen
-                ? 'translateX(-50%) scaleY(1)'
-                : 'translateX(-50%) scaleY(0)',
-              transformOrigin: 'top',
-              width: '90vw',
-              maxWidth: '90vw',
-              borderRadius: '0 0 8px 8px',
-              boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.1)',
-              p: productMenuOpen ? 4 : 0,
-              zIndex: 1450, // Thấp hơn submenu một chút để không che phủ
-              backgroundColor: 'white',
-              display: 'flex',
-              justifyContent: 'center',
-              overflow: 'hidden',
-              transition: 'transform 0.35s ease, padding 0.2s ease, opacity 0.35s ease',
+              display: 'grid',
+              gridTemplateColumns: `repeat(${menuConfig?.mainMenu ? 
+                menuConfig.mainMenu.filter(item => item.visible && item.children?.length > 0).length : 
+                getMegaMenuColumns(categories).length}, 1fr)`,
+              gap: 6,
+              width: '100%',
+              maxWidth: '95vw',
               opacity: productMenuOpen ? 1 : 0,
-              pointerEvents: productMenuOpen ? 'auto' : 'none',
-              mx: 'auto',
-              mt: 1
-            }}
-            onMouseEnter={handleDrawerEnter}
-            onMouseLeave={handleDrawerLeave}
-          >
-            <Box
-              sx={{
-                display: 'grid',
-                gridTemplateColumns: `repeat(${menuConfig?.mainMenu ?
-                  menuConfig.mainMenu.filter(item => item.visible && item.children?.length > 0).length :
-                  getMegaMenuColumns(categories).length}, 1fr)`,
-                gap: 6,
-                width: '100%',
-                maxWidth: '95vw',
-                opacity: productMenuOpen ? 1 : 0,
-                transition: 'opacity 0.35s ease',
+              transition: 'opacity 0.35s ease',
 
-                justifyItems: 'center',
-              }}
-            >
-              {menuConfig?.mainMenu ? (
-                menuConfig.mainMenu
-                  .filter(item => item.visible && item.children?.length > 0)
-                  .sort((a, b) => (a.order || 0) - (b.order || 0))
-                  .map((item, idx) => (
-                    <Box
-                      key={item.label + idx}
-                      sx={{ display: 'flex', flexDirection: 'column', gap: 1, alignItems: 'center', textAlign: 'center' }}
-                    >
-                      <Typography
-                        sx={{
-                          fontWeight: 'bold',
-                          mb: 1.2,
-                          textTransform: 'uppercase',
-                          fontSize: '1.08rem',
-                          textAlign: 'center'
-                        }}
-                      >
-                        {item.label}
-                      </Typography>
-                      {item.children
-                        .filter(child => child.visible)
-                        .sort((a, b) => (a.order || 0) - (b.order || 0))
-                        .map((child, i) => (
-                          <Button
-                            key={child.label + i}
-                            href={child.url}
-                            sx={{
-                              justifyContent: 'center',
-                              textAlign: 'center',
-                              color: '#222',
-                              fontWeight: 400,
-                              fontSize: '1rem',
-                              px: 0,
-                              minWidth: 0,
-                              background: 'none',
-                              boxShadow: 'none',
-                              '&:hover': {
-                                color: '#1976d2',
-                                background: 'none',
-                                transform: 'translateY(-2px)',
-                                transition: 'all 0.2s ease'
-                              }
-                            }}
-                          >
-                            {child.label}
-                          </Button>
-                        ))}
-                      {item.children?.filter(child => child.visible).length === 0 && (
-                        <Typography
-                          sx={{
-                            color: 'text.secondary',
-                            fontSize: '0.95rem',
-                            fontStyle: 'italic',
-                            textAlign: 'center'
-                          }}
-                        >
-                          Chưa có danh mục
-                        </Typography>
-                      )}
-                    </Box>
-                  ))
-              ) : (
-                getMegaMenuColumns(categories).map((col, idx) => (
+              justifyItems: 'center',
+            }}
+          >
+            {menuConfig?.mainMenu ? (
+              menuConfig.mainMenu
+                .filter(item => item.visible && item.children?.length > 0)
+                .sort((a, b) => (a.order || 0) - (b.order || 0))
+                .map((item, idx) => (
                   <Box
-                    key={col.title + idx}
-                    sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}
+                    key={item.label + idx}
+                    sx={{ display: 'flex', flexDirection: 'column', gap: 1, alignItems: 'center', textAlign: 'center' }}
                   >
                     <Typography
                       sx={{
                         fontWeight: 'bold',
                         mb: 1.2,
                         textTransform: 'uppercase',
-                        fontSize: '1.08rem'
+                        fontSize: '1.08rem',
+                        textAlign: 'center'
                       }}
                     >
-                      {col.title}
+                      {item.label}
                     </Typography>
-                    {col.items.length > 0 ? (
-                      col.items.map((item, i) => (
+                    {item.children
+                      .filter(child => child.visible)
+                      .sort((a, b) => (a.order || 0) - (b.order || 0))
+                      .map((child, i) => (
                         <Button
-                          key={item + i}
-                          href={
-                            col.parentId ? `/productbycategory/${col.parentId}` : '#'
-                          }
+                          key={child.label + i}
+                          href={child.url}
                           sx={{
-                            justifyContent: 'flex-start',
-                            textAlign: 'left',
+                            justifyContent: 'center',
+                            textAlign: 'center',
                             color: '#222',
                             fontWeight: 400,
                             fontSize: '1rem',
@@ -640,20 +582,21 @@ const Menu = ({ headerRef }) => {
                             '&:hover': {
                               color: '#1976d2',
                               background: 'none',
-                              transform: 'translateX(5px)',
+                              transform: 'translateY(-2px)',
                               transition: 'all 0.2s ease'
                             }
                           }}
                         >
-                          {item}
+                          {child.label}
                         </Button>
-                      ))
-                    ) : (
+                      ))}
+                    {item.children?.filter(child => child.visible).length === 0 && (
                       <Typography
                         sx={{
                           color: 'text.secondary',
                           fontSize: '0.95rem',
-                          fontStyle: 'italic'
+                          fontStyle: 'italic',
+                          textAlign: 'center'
                         }}
                       >
                         Chưa có danh mục
@@ -661,10 +604,67 @@ const Menu = ({ headerRef }) => {
                     )}
                   </Box>
                 ))
-              )}
-            </Box>
+            ) : (
+              getMegaMenuColumns(categories).map((col, idx) => (
+                <Box
+                  key={col.title + idx}
+                  sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}
+                >
+                  <Typography
+                    sx={{
+                      fontWeight: 'bold',
+                      mb: 1.2,
+                      textTransform: 'uppercase',
+                      fontSize: '1.08rem'
+                    }}
+                  >
+                    {col.title}
+                  </Typography>
+                  {col.items.length > 0 ? (
+                    col.items.map((item, i) => (
+                      <Button
+                        key={item + i}
+                        href={
+                          col.parentId ? `/productbycategory/${col.parentId}` : '#'
+                        }
+                        sx={{
+                          justifyContent: 'flex-start',
+                          textAlign: 'left',
+                          color: '#222',
+                          fontWeight: 400,
+                          fontSize: '1rem',
+                          px: 0,
+                          minWidth: 0,
+                          background: 'none',
+                          boxShadow: 'none',
+                          '&:hover': {
+                            color: '#1976d2',
+                            background: 'none',
+                            transform: 'translateX(5px)',
+                            transition: 'all 0.2s ease'
+                          }
+                        }}
+                      >
+                        {item}
+                      </Button>
+                    ))
+                  ) : (
+                    <Typography
+                      sx={{
+                        color: 'text.secondary',
+                        fontSize: '0.95rem',
+                        fontStyle: 'italic'
+                      }}
+                    >
+                      Chưa có danh mục
+                    </Typography>
+                  )}
+                </Box>
+              ))
+            )}
           </Box>
-        )}
+        </Box>
+      )}
 
     </Box>
   )

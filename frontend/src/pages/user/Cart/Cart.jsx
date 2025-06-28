@@ -194,6 +194,9 @@ const Cart = () => {
     const item = cartItems.find((i) => i.variant._id === variantId)
     if (!item) return
 
+    // Kiểm tra xem sản phẩm có hết hàng không
+    if (item.quantity === 0) return
+
     const current = tempQuantities[variantId] ?? item.quantity
     const max = item.variant.quantity || 99
 
@@ -775,67 +778,70 @@ const Cart = () => {
                           }}
                         >
                           {/* Quantity controls - chỉ hiện khi không hết hàng */}
-                          <Box
-                            display="flex"
-                            alignItems="center"
-                            onMouseLeave={() => handleMouseLeave(variant._id)}
-                            sx={{
-                              border: '1px solid #e0e0e0',
-                              borderRadius: 1,
-                              overflow: 'hidden',
-                            }}
-                          >
-                            <IconButton
-                              size="small"
-                              onMouseDown={() =>
-                                handleMouseDown(variant._id, -1)
-                              }
-                              disabled={
-                                processingVariantId === variant._id ||
-                                (tempQuantities[variant._id] ?? item.quantity) <=
-                                1
-                              }
-                              sx={{ borderRadius: 0, p: 0.5 }}
-                            >
-                              <Remove fontSize="small" />
-                            </IconButton>
-                            <TextField
-                              value={
-                                tempQuantities[variant._id] ?? item.quantity
-                              }
-                              size="small"
+
+                            <Box
+                              display="flex"
+                              alignItems="center"
+                              onMouseLeave={() => handleMouseLeave(variant._id)}
                               sx={{
-                                width: 40,
-                                '& .MuiOutlinedInput-root': {
-                                  '& fieldset': { border: 'none' },
-                                },
+                                border: '1px solid #e0e0e0',
+                                borderRadius: 1,
+                                overflow: 'hidden',
                               }}
-                              inputProps={{
-                                style: {
-                                  textAlign: 'center',
-                                  padding: '4px',
-                                  fontWeight: 600,
-                                  fontSize: '0.9rem',
-                                },
-                                readOnly: true,
-                              }}
-                            />
-                            <IconButton
-                              size="small"
-                              onMouseDown={() =>
-                                handleMouseDown(variant._id, 1)
-                              }
-                              disabled={
-                                processingVariantId === variant._id ||
-                                !variant.quantity ||
-                                (tempQuantities[variant._id] ?? item.quantity) >=
-                                variant.quantity
-                              }
-                              sx={{ borderRadius: 0, p: 0.5 }}
                             >
-                              <Add fontSize="small" />
-                            </IconButton>
-                          </Box>
+                              <IconButton
+                                size="small"
+                                onMouseDown={() =>
+                                  handleMouseDown(variant._id, -1)
+                                }
+                                disabled={
+                                  processingVariantId === variant._id ||
+                                  isOutOfStock ||
+                                  (tempQuantities[variant._id] ?? item.quantity) <=
+                                  1
+                                }
+                                sx={{ borderRadius: 0, p: 0.5 }}
+                              >
+                                <Remove fontSize="small" />
+                              </IconButton>
+                              <TextField
+                                value={
+                                  tempQuantities[variant._id] ?? item.quantity
+                                }
+                                size="small"
+                                sx={{
+                                  width: 40,
+                                  '& .MuiOutlinedInput-root': {
+                                    '& fieldset': { border: 'none' },
+                                  },
+                                }}
+                                inputProps={{
+                                  style: {
+                                    textAlign: 'center',
+                                    padding: '4px',
+                                    fontWeight: 600,
+                                    fontSize: '0.9rem',
+                                  },
+                                  readOnly: true,
+                                }}
+                              />
+                              <IconButton
+                                size="small"
+                                onMouseDown={() =>
+                                  handleMouseDown(variant._id, 1)
+                                }
+                                disabled={
+                                  processingVariantId === variant._id ||
+                                  isOutOfStock ||
+                                  (tempQuantities[variant._id] ?? item.quantity) >=
+                                  (variant.quantity || 99)
+                                }
+                                sx={{ borderRadius: 0, p: 0.5 }}
+                              >
+                                <Add fontSize="small" />
+                              </IconButton>
+                            </Box>
+
                           <IconButton
                             color="error"
                             onClick={() => {

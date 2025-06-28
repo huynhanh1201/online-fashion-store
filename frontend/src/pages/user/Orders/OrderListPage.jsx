@@ -506,28 +506,6 @@ const OrderRow = ({ order, onOrderUpdate, onOrderCancelled, onReorder, reorderLo
                 Xem chi tiết
               </Button>
 
-              {/* Nút Xem đánh giá cho đơn hàng đã giao có sản phẩm đã đánh giá */}
-              {order.status === 'Delivered' && !reviewsLoading && reviewedProducts.size > 0 && (
-                <Button
-                  startIcon={<RateReview />}
-                  onClick={() => navigate(`/order-detail/${order._id}#reviews`)}
-                  sx={{
-                    borderRadius: 2,
-                    textTransform: 'none',
-                    fontWeight: 600,
-                    color: 'success.main',
-                    borderColor: 'success.main',
-                    border: '1px solid',
-                    '&:hover': {
-                      backgroundColor: 'success.50',
-                      borderColor: 'success.main'
-                    }
-                  }}
-                >
-                  Xem đánh giá ({reviewedProducts.size})
-                </Button>
-              )}
-
               {(order.status === 'Delivered' || order.status === 'Failed' || order.status === 'Cancelled') && (
                 <Button
                   startIcon={reorderLoading ? <CircularProgress size={16} /> : <Replay />}

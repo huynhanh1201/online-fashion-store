@@ -333,7 +333,7 @@ const ProductItem = ({ name, variant, quantity, image, color, size, getFinalPric
       <td style={{ textAlign: 'right' }}>
         <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 0.5 }}>
           <Typography fontWeight={600} color="#1A3C7B" sx={{ fontSize: '1rem' }}>
-            {(finalPrice * quantity).toLocaleString('vi-VN')}đ
+            {(finalPrice * quantity).toLocaleString('vi-VN')} ₫
           </Typography>
           {hasDiscount && (
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, flexWrap: 'wrap', justifyContent: 'flex-end' }}>
@@ -344,7 +344,7 @@ const ProductItem = ({ name, variant, quantity, image, color, size, getFinalPric
                   textDecoration: 'line-through',
                 }}
               >
-                {(exportPrice * quantity).toLocaleString('vi-VN')}đ
+                {(exportPrice * quantity).toLocaleString('vi-VN')}₫
               </Typography>
             </Box>
           )}
@@ -830,7 +830,7 @@ const Payment = () => {
                                 <Chip label="Miễn phí" color="success" size="small" />
                               ) : (
                                 <Chip
-                                  label={`${shippingPrice.toLocaleString('vi-VN')}đ`}
+                                  label={`${shippingPrice.toLocaleString('vi-VN')} ₫`}
                                   color="primary"
                                   size="small"
                                   sx={{ backgroundColor: '#1A3C7B' }}
@@ -1118,7 +1118,7 @@ const Payment = () => {
                   <PriceRow>
                     <Typography>Tạm tính:</Typography>
                     <Typography fontWeight={600}>
-                      {subTotal.toLocaleString('vi-VN')}đ
+                      {subTotal.toLocaleString('vi-VN')}₫
                     </Typography>
                   </PriceRow>
 
@@ -1142,7 +1142,7 @@ const Payment = () => {
                           fontSize: '0.9rem'
                         }}
                       >
-                        {totalSavings.toLocaleString('vi-VN')}đ
+                        {totalSavings.toLocaleString('vi-VN')} ₫
                       </Typography>
                     </PriceRow>
                   )}
@@ -1155,7 +1155,7 @@ const Payment = () => {
                       ) : shippingPrice === 0 ? (
                         'Miễn phí'
                       ) : (
-                        `${shippingPrice.toLocaleString('vi-VN')}đ`
+                        `${shippingPrice.toLocaleString('vi-VN')} ₫`
                       )}
                     </Typography>
                   </PriceRow>
@@ -1163,14 +1163,14 @@ const Payment = () => {
                   <PriceRow>
                     <Typography>Giảm giá:</Typography>
                     <Typography fontWeight={600} color="red">
-                      {discount.toLocaleString('vi-VN')}đ
+                      {discount.toLocaleString('vi-VN')} ₫
                     </Typography>
                   </PriceRow>
 
                   <PriceRow isTotal>
                     <Typography fontWeight={700}>Tổng cộng:</Typography>
                     <Typography fontSize={'1.2rem'} fontWeight={700}>
-                      {totalFeeShipping.toLocaleString('vi-VN')}đ
+                      {totalFeeShipping.toLocaleString('vi-VN')} ₫
                     </Typography>
                   </PriceRow>
                 </Box>
@@ -1256,7 +1256,7 @@ const Payment = () => {
           <Typography variant="body2" color="text.secondary">
             Tổng thanh toán:{' '}
             <strong style={{ fontSize: '1.2rem' }}>
-              {totalFeeShipping.toLocaleString('vi-VN')}đ
+              {totalFeeShipping.toLocaleString('vi-VN')} ₫
             </strong>
           </Typography>
 

@@ -79,16 +79,16 @@ const ProductCard = ({ product, isFlashSale = false }) => {
             {isFlashSale && product.flashPrice ? (
               <>
                 <span style={styles.flashSalePrice}>
-                  {product.flashPrice.toLocaleString()}₫
+                  {product.flashPrice.toLocaleString('vi-VN')} ₫
                 </span>
                 <span style={styles.originalPrice}>
-                  {product.exportPrice.toLocaleString()}₫
+                  {product.exportPrice.toLocaleString('vi-VN')} ₫
                 </span>
                 <span style={styles.flashSaleBadge}>Flash Sale</span>
               </>
             ) : (
               <span style={styles.currentPrice}>
-                {(product.exportPrice ?? 0).toLocaleString()}₫
+                {(product.exportPrice ?? 0).toLocaleString('vi-VN')} ₫
               </span>
             )}
           </div>
