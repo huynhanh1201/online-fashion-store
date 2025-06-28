@@ -11,7 +11,7 @@ const getOrderItemList = async (orderId) => {
         },
         {
           path: 'variantId',
-          select: 'discountPrice'
+          select: 'discountPrice quantity'
         }
       ])
       .lean()

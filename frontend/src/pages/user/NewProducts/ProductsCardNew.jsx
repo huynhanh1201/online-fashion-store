@@ -106,11 +106,11 @@ const ProductsCardNew = ({ product, isFlashSale = false }) => {
           </h3>
           <div style={styles.priceRow}>
             <span style={styles.currentPrice}>
-              {priceInfo.discountPrice.toLocaleString()}₫
+              {priceInfo.discountPrice.toLocaleString('vi-VN')} ₫
             </span>
             {hasDiscount && (
               <span style={styles.originalPrice}>
-                {priceInfo.price.toLocaleString()}₫
+                {priceInfo.price.toLocaleString('vi-VN')} ₫
               </span>
             )}
           </div>

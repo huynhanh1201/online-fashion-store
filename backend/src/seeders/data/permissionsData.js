@@ -8,7 +8,7 @@ export const permissions = [
   // User
   {
     key: 'user:use',
-    label: 'Sửa dụng trang tài khoản nhân viên',
+    label: 'Sử dụng trang tài khoản nhân viên',
     group: 'Tài khoản'
   },
   { key: 'user:read', label: 'Xem tài khoản nhân viên', group: 'Tài khoản' },
@@ -19,7 +19,7 @@ export const permissions = [
   // Category
   {
     key: 'category:use',
-    label: 'Sửa dụng trang danh mục sản phẩm',
+    label: 'Sử dụng trang danh mục sản phẩm',
     group: 'Danh mục'
   },
   { key: 'category:read', label: 'Xem danh mục sản phẩm', group: 'Danh mục' },
@@ -28,7 +28,7 @@ export const permissions = [
   { key: 'category:delete', label: 'Xóa danh mục sản phẩm', group: 'Danh mục' },
 
   // Product
-  { key: 'product:use', label: 'Sửa dụng trang sản phẩm', group: 'Sản phẩm' },
+  { key: 'product:use', label: 'Sử dụng trang sản phẩm', group: 'Sản phẩm' },
   { key: 'product:read', label: 'Xem sản phẩm', group: 'Sản phẩm' },
   { key: 'product:create', label: 'Tạo sản phẩm', group: 'Sản phẩm' },
   { key: 'product:update', label: 'Sửa sản phẩm', group: 'Sản phẩm' },
@@ -187,45 +187,45 @@ export const permissions = [
   { key: 'inventoryLog:read', label: 'Xem lịch sử tồn kho', group: 'Kho hàng' },
 
   // Warehouse
-  { key: 'warehouse:use', label: 'Sửa dụng trang kho hàng', group: 'Kho hàng' },
+  { key: 'warehouse:use', label: 'Sử dụng trang kho hàng', group: 'Kho hàng' },
   { key: 'warehouse:read', label: 'Xem kho', group: 'Kho hàng' },
   { key: 'warehouse:create', label: 'Tạo kho', group: 'Kho hàng' },
   { key: 'warehouse:update', label: 'Sửa kho', group: 'Kho hàng' },
   { key: 'warehouse:delete', label: 'Xóa kho', group: 'Kho hàng' },
 
   // Batch
-  { key: 'batch:use', label: 'Sửa dụng trang lô hàng', group: 'Lô hàng' },
+  { key: 'batch:use', label: 'Sử dụng trang lô hàng', group: 'Lô hàng' },
   { key: 'batch:read', label: 'Xem lô hàng', group: 'Lô hàng' },
   { key: 'batch:update', label: 'Sửa lô hàng', group: 'Lô hàng' },
 
   // Partner
-  { key: 'partner:use', label: 'Sửa dụng trang đối tác', group: 'Đối tác' },
+  { key: 'partner:use', label: 'Sử dụng trang đối tác', group: 'Đối tác' },
   { key: 'partner:read', label: 'Xem đối tác', group: 'Đối tác' },
   { key: 'partner:create', label: 'Tạo đối tác', group: 'Đối tác' },
   { key: 'partner:update', label: 'Sửa đối tác', group: 'Đối tác' },
   { key: 'partner:delete', label: 'Xóa đối tác', group: 'Đối tác' },
 
-  // Shipping Address
-  {
-    key: 'shippingAddress:read',
-    label: 'Xem địa chỉ giao hàng',
-    group: 'Địa chỉ giao hàng'
-  },
-  {
-    key: 'shippingAddress:create',
-    label: 'Tạo địa chỉ giao hàng',
-    group: 'Địa chỉ giao hàng'
-  },
-  {
-    key: 'shippingAddress:update',
-    label: 'Sửa địa chỉ giao hàng',
-    group: 'Địa chỉ giao hàng'
-  },
-  {
-    key: 'shippingAddress:delete',
-    label: 'Xóa địa chỉ giao hàng',
-    group: 'Địa chỉ giao hàng'
-  },
+  // // Shipping Address
+  // {
+  //   key: 'shippingAddress:read',
+  //   label: 'Xem địa chỉ giao hàng',
+  //   group: 'Địa chỉ giao hàng'
+  // },
+  // {
+  //   key: 'shippingAddress:create',
+  //   label: 'Tạo địa chỉ giao hàng',
+  //   group: 'Địa chỉ giao hàng'
+  // },
+  // {
+  //   key: 'shippingAddress:update',
+  //   label: 'Sửa địa chỉ giao hàng',
+  //   group: 'Địa chỉ giao hàng'
+  // },
+  // {
+  //   key: 'shippingAddress:delete',
+  //   label: 'Xóa địa chỉ giao hàng',
+  //   group: 'Địa chỉ giao hàng'
+  // },
 
   // Review
   { key: 'review:use', label: 'Sửa dụng trang đánh giá', group: 'Đánh giá' },
@@ -235,10 +235,10 @@ export const permissions = [
   { key: 'review:delete', label: 'Xóa đánh giá', group: 'Đánh giá' },
 
   // Cart
-  { key: 'cart:create', label: 'Tạo giỏ hàng', group: 'Giỏ hàng' },
-  { key: 'cart:read', label: 'Xem giỏ hàng', group: 'Giỏ hàng' },
-  { key: 'cart:update', label: 'Cập nhật giỏ hàng', group: 'Giỏ hàng' },
-  { key: 'cart:delete', label: 'Xóa giỏ hàng', group: 'Giỏ hàng' },
+  // { key: 'cart:create', label: 'Tạo giỏ hàng', group: 'Giỏ hàng' },
+  // { key: 'cart:read', label: 'Xem giỏ hàng', group: 'Giỏ hàng' },
+  // { key: 'cart:update', label: 'Cập nhật giỏ hàng', group: 'Giỏ hàng' },
+  // { key: 'cart:delete', label: 'Xóa giỏ hàng', group: 'Giỏ hàng' },
 
   // Role
   { key: 'role:use', label: 'Sửa dụng trang vai trò', group: 'Vai trò' },
@@ -248,7 +248,7 @@ export const permissions = [
   { key: 'role:delete', label: 'Xóa vai trò', group: 'Vai trò' },
 
   // Blog
-  { key: 'blog:use', label: 'Sửa dụng trang blog', group: 'Blog' },
+  { key: 'blog:use', label: 'Sử dụng trang bài viết', group: 'Blog' },
   { key: 'blog:read', label: 'Xem blog', group: 'Blog' },
   { key: 'blog:create', label: 'Tạo blog', group: 'Blog' },
   { key: 'blog:update', label: 'Sửa blog', group: 'Blog' },
@@ -259,5 +259,48 @@ export const permissions = [
   { key: 'account:read', label: 'Xem tài khoản', group: 'Tài khoản' },
   { key: 'account:create', label: 'Tạo tài khoản', group: 'Tài khoản' },
   { key: 'account:update', label: 'Sửa tài khoản', group: 'Tài khoản' },
-  { key: 'account:delete', label: 'Xóa tài khoản', group: 'Tài khoản' }
+  { key: 'account:delete', label: 'Xóa tài khoản', group: 'Tài khoản' },
+
+  { key: 'banner:use', label: 'Sử dụng trang quảng cáo', group: 'Ảnh quảng cáo' },
+  { key: 'banner:create', label: 'Tạo quảng cáo', group: 'Ảnh quảng cáo' },
+  { key: 'banner:update', label: 'Cập nhật quảng cáo', group: 'Ảnh quảng cáo' },
+  { key: 'banner:delete', label: 'Xóa quảng cáo', group: 'Ảnh quảng cáo' },
+
+  // Content Management
+  { key: 'content:use', label: 'Sử dụng trang quản lý nội dung', group: 'Nội dung' },
+  { key: 'content:read', label: 'Xem nội dung', group: 'Nội dung' },
+  { key: 'content:create', label: 'Tạo nội dung', group: 'Nội dung' },
+  { key: 'content:update', label: 'Cập nhật nội dung', group: 'Nội dung' },
+  { key: 'content:delete', label: 'Xóa nội dung', group: 'Nội dung' },
+
+  // Flash Sale
+  { key: 'flashSale:use', label: 'Sử dụng trang khuyến mãi', group: 'Khuyến mãi' },
+  { key: 'flashSale:create', label: 'Tạo khuyến mãi', group: 'Khuyến mãi' },
+  { key: 'flashSale:update', label: 'Cập nhật khuyến mãi', group: 'Khuyến mãi' },
+  { key: 'flashSale:delete', label: 'Xóa khuyến mãi', group: 'Khuyến mãi' },
+
+  // Header Content
+  { key: 'headerContent:use', label: 'Sử dụng trang nội dung đầu trang', group: 'Nội dung trang' },
+  { key: 'headerContent:create', label: 'Tạo nội dung đầu trang', group: 'Nội dung trang' },
+  { key: 'headerContent:update', label: 'Cập nhật nội dung đầu trang', group: 'Nội dung trang' },
+  { key: 'headerContent:delete', label: 'Xóa nội dung đầu trang', group: 'Nội dung trang' },
+
+  // Footer Content
+  { key: 'footerContent:use', label: 'Sử dụng trang nội dung cuối trang', group: 'Nội dung trang' },
+  { key: 'footerContent:create', label: 'Tạo nội dung cuối trang', group: 'Nội dung trang' },
+  { key: 'footerContent:update', label: 'Cập nhật nội dung cuối trang', group: 'Nội dung trang' },
+  { key: 'footerContent:delete', label: 'Xóa nội dung cuối trang', group: 'Nội dung trang' },
+
+  // Featured Category
+  { key: 'featuredCategory:use', label: 'Sử dụng trang danh mục nổi bật', group: 'Danh mục nổi bật' },
+  { key: 'featuredCategory:create', label: 'Tạo danh mục nổi bật', group: 'Danh mục nổi bật' },
+  { key: 'featuredCategory:update', label: 'Cập nhật danh mục nổi bật', group: 'Danh mục nổi bật' },
+  { key: 'featuredCategory:delete', label: 'Xóa danh mục nổi bật', group: 'Danh mục nổi bật' },
+
+  // Service
+  { key: 'service:use', label: 'Sử dụng trang dịch vụ nổi bật', group: 'Dịch vụ' },
+  { key: 'service:create', label: 'Tạo dịch vụ', group: 'Dịch vụ' },
+  { key: 'service:update', label: 'Cập nhật dịch vụ', group: 'Dịch vụ' },
+  { key: 'service:delete', label: 'Xóa dịch vụ', group: 'Dịch vụ' },
+
 ]

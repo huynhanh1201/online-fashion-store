@@ -88,7 +88,7 @@ const CategoryManagement = () => {
   }
 
   return (
-    <RouteGuard requiredPermissions={['admin:access', 'category:read']}>
+    <RouteGuard requiredPermissions={['admin:access', 'category:use']}>
       <CategoryTable
         categories={categories}
         loading={Loading}

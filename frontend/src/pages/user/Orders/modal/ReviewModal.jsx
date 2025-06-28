@@ -20,17 +20,15 @@ import {
   LinearProgress,
   Stack,
   Tooltip,
-  Snackbar
+  Snackbar,
+  CircularProgress
 } from '@mui/material'
 import {
   PhotoCamera,
   Videocam,
-  Delete,
-  Warning,
-  CheckCircle,
-  Info
+  Delete
 } from '@mui/icons-material'
-import { contentFilter } from '~/utils/contentFilter'
+
 import {
   CLOUD_NAME,
   CloudinaryVideoFolder,
@@ -101,11 +99,7 @@ const ReviewModal = ({
   const [images, setImages] = useState([])
   const [videos, setVideos] = useState([])
   const [uploading, setUploading] = useState(false)
-  const [contentValidation, setContentValidation] = useState({
-    isValid: true,
-    violations: [],
-    warnings: []
-  })
+  const [submitting, setSubmitting] = useState(false) // State for submit loading
   const [snackbar, setSnackbar] = useState({
     open: false,
     message: '',
@@ -150,23 +144,15 @@ const ReviewModal = ({
       setComment('')
       setImages([])
       setVideos([])
-      setContentValidation({ isValid: true, violations: [], warnings: [] })
       setUploading(false)
+      setSubmitting(false) // Reset submit loading
       setSnackbar({ open: false, message: '', severity: 'info' })
     }
   }, [open])
 
-  // EditContent filter for comment
+  // Handle comment change
   const handleCommentChange = (e) => {
-    const text = e.target.value
-    setComment(text)
-
-    if (text.trim()) {
-      const validation = contentFilter.filterContent(text)
-      setContentValidation(validation)
-    } else {
-      setContentValidation({ isValid: true, violations: [], warnings: [] })
-    }
+    setComment(e.target.value)
   }
 
   // Handle image upload
@@ -370,22 +356,29 @@ const ReviewModal = ({
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i]
   }
 
-  const handleSubmit = () => {
-    if (rating && comment.trim() && contentValidation.isValid) {
-      onSubmit({
-        productId,
-        userId,
-        rating,
-        comment: contentValidation.filteredText || comment,
-        orderId,
-        images: images.map((img) => img.url),
-        videos: videos.map((vid) => vid.url)
-      })
+  const handleSubmit = async () => {
+    if (rating && comment.trim() && !submitting) {
+      setSubmitting(true)
+      try {
+        await onSubmit({
+          productId,
+          userId,
+          rating,
+          comment: comment,
+          orderId,
+          images: images.map((img) => img.url),
+          videos: videos.map((vid) => vid.url)
+        })
+      } catch (error) {
+        console.error('Error submitting review:', error)
+      } finally {
+        setSubmitting(false)
+      }
     }
   }
 
   const isSubmitDisabled =
-    !rating || !comment.trim() || !contentValidation.isValid || uploading
+    !rating || !comment.trim() || uploading || submitting
 
   return (
     <Dialog
@@ -507,44 +500,9 @@ const ReviewModal = ({
             onChange={handleCommentChange}
             placeholder='Hãy chia sẻ trải nghiệm của bạn với sản phẩm này... (Tránh chia sẻ thông tin cá nhân)'
             variant='outlined'
-            error={!contentValidation.isValid}
-            helperText={
-              !contentValidation.isValid
-                ? contentValidation.violations.join(', ')
-                : `${comment.length}/500 ký tự`
-            }
+            helperText={`${comment.length}/500 ký tự`}
             inputProps={{ maxLength: 500 }}
           />
-
-          {/* EditContent Validation Alerts */}
-          {contentValidation.violations.length > 0 && (
-            <Alert severity='error' sx={{ mt: 1 }} icon={<Warning />}>
-              <Typography variant='body2'>
-                Nội dung chứa từ ngữ không phù hợp:
-              </Typography>
-              <ul style={{ margin: '4px 0', paddingLeft: '20px' }}>
-                {contentValidation.violations.map((violation, index) => (
-                  <li key={index}>
-                    <Typography variant='caption'>{violation}</Typography>
-                  </li>
-                ))}
-              </ul>
-            </Alert>
-          )}
-
-          {contentValidation.warnings.length > 0 && (
-            <Alert severity='warning' sx={{ mt: 1 }} icon={<Info />}>
-              <Typography variant='body2'>
-                Gợi ý: Hãy thử diễn đạt tích cực hơn
-              </Typography>
-            </Alert>
-          )}
-
-          {contentValidation.isValid && comment.length > 0 && (
-            <Alert severity='success' sx={{ mt: 1 }} icon={<CheckCircle />}>
-              <Typography variant='body2'>Nội dung phù hợp!</Typography>
-            </Alert>
-          )}
         </Box>
 
         {/* Media Upload Section */}
@@ -774,9 +732,10 @@ const ReviewModal = ({
           color='primary'
           variant='contained'
           disabled={isSubmitDisabled}
+          startIcon={submitting ? <CircularProgress size={16} /> : null}
           sx={{ textTransform: 'none', fontWeight: 600 }}
         >
-          {uploading ? 'Đang tải...' : 'Gửi đánh giá'}
+          {submitting ? 'Đang gửi...' : uploading ? 'Đang tải...' : 'Gửi đánh giá'}
         </Button>
       </DialogActions>
 

@@ -242,7 +242,7 @@ const ProductManagement = () => {
   }
 
   return (
-    <RouteGuard requiredPermissions={['admin:access', 'product:read']}>
+    <RouteGuard requiredPermissions={['admin:access', 'product:use']}>
       <Box
         sx={{
           display: 'flex',

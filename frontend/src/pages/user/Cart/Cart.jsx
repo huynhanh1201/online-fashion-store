@@ -72,7 +72,16 @@ const Cart = () => {
   }, [])
 
   useEffect(() => {
-    if (cart?.cartItems) setCartItems(cart.cartItems)
+    if (cart?.cartItems) {
+      // Sắp xếp: sản phẩm còn hàng trước, hết hàng sau
+      const sortedItems = [...cart.cartItems].sort((a, b) => {
+        // Sản phẩm còn hàng (quantity > 0) có priority cao hơn
+        if (a.quantity > 0 && b.quantity === 0) return -1
+        if (a.quantity === 0 && b.quantity > 0) return 1
+        return 0 // Giữ nguyên thứ tự nếu cùng loại
+      })
+      setCartItems(sortedItems)
+    }
   }, [cart])
 
   // Tự động chọn các sản phẩm từ reorder
@@ -98,8 +107,9 @@ const Cart = () => {
           // Handle cả variant._id và variantId trực tiếp
           const variantId = item.variant?._id || item.variantId?._id || item.variantId
           const isMatch = reorderVariantIds.includes(variantId)
-          console.log(`Checking item ${item.name} with variantId ${variantId}: ${isMatch}`)
-          return isMatch
+          const hasStock = item.quantity > 0 // Chỉ chọn sản phẩm còn hàng
+          console.log(`Checking item ${item.name} with variantId ${variantId}: match=${isMatch}, hasStock=${hasStock}`)
+          return isMatch && hasStock
         })
         .map(item => ({
           variantId: item.variant?._id || item.variantId?._id || item.variantId,
@@ -143,15 +153,18 @@ const Cart = () => {
     fetchCoupons()
   }, [hasFetchedCoupons])
 
+  // Lọc ra các sản phẩm có thể chọn (không hết hàng)
+  const selectableItems = cartItems.filter(item => item.quantity > 0)
+
   const allSelected =
-    cartItems.length > 0 && selectedItems.length === cartItems.length
+    selectableItems.length > 0 && selectedItems.length === selectableItems.length
   const someSelected =
-    selectedItems.length > 0 && selectedItems.length < cartItems.length
+    selectedItems.length > 0 && selectedItems.length < selectableItems.length
 
   const handleSelectAll = () => {
     const newSelected = allSelected
       ? []
-      : cartItems.map((item) => ({
+      : selectableItems.map((item) => ({
         variantId: item.variant._id,
         quantity: item.quantity,
       }))
@@ -180,6 +193,9 @@ const Cart = () => {
   const handleMouseDown = (variantId, delta) => {
     const item = cartItems.find((i) => i.variant._id === variantId)
     if (!item) return
+
+    // Kiểm tra xem sản phẩm có hết hàng không
+    if (item.quantity === 0) return
 
     const current = tempQuantities[variantId] ?? item.quantity
     const max = item.variant.quantity || 99
@@ -591,6 +607,9 @@ const Cart = () => {
                   const variant = item.variant
                   if (!variant) return null
 
+                  // Kiểm tra xem sản phẩm có hết hàng không (quantity = 0)
+                  const isOutOfStock = item.quantity === 0
+
                   return (
                     <React.Fragment key={item._id}>
                       <Box
@@ -600,6 +619,8 @@ const Cart = () => {
                           alignItems: 'center',
                           gap: { xs: 1.5, sm: 2 },
                           flexWrap: { xs: 'wrap', sm: 'nowrap' },
+                          opacity: isOutOfStock ? 0.6 : 1, // Làm mờ sản phẩm hết hàng
+                          backgroundColor: isOutOfStock ? '#f5f5f5' : 'transparent',
                         }}
                       >
                         {/* Checkbox */}
@@ -607,7 +628,8 @@ const Cart = () => {
                           checked={selectedItems.some((i) => i.variantId === variant._id)}
                           onChange={() => handleSelect(item)}
                           color="primary"
-                          sx={{ alignSelf: 'center' }} // thay vì 'flex-start' hoặc bỏ hẳn nếu dùng Box bọc
+                          disabled={isOutOfStock} // Disable checkbox khi hết hàng
+                          sx={{ alignSelf: 'center' }}
                         />
 
 
@@ -652,23 +674,41 @@ const Cart = () => {
                             gap: 1,
                           }}
                         >
-                          <Typography
-                            fontWeight={600}
-                            sx={{
-                              fontSize: {
-                                xs: '0.9rem',
-                                sm: '1rem',
-                                md: '1.1rem',
-                              },
-                              maxWidth: '100%',
-                              whiteSpace: 'nowrap',
-                              overflow: 'hidden',
-                              textOverflow: 'ellipsis',
-                            }}
-                            title={variant.name}
-                          >
-                            {capitalizeFirstLetter(variant.name)}
-                          </Typography>
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                            <Typography
+                              fontWeight={600}
+                              sx={{
+                                fontSize: {
+                                  xs: '0.8rem',
+                                  sm: '0.9rem',
+                                  md: '1rem',
+                                },
+                                maxWidth: '100%',
+                                whiteSpace: 'nowrap',
+                                overflow: 'hidden',
+                                textOverflow: 'ellipsis',
+                              }}
+                              title={variant.name}
+                            >
+                              {capitalizeFirstLetter(variant.name)}
+                            </Typography>
+                            {isOutOfStock && (
+                              <Chip
+                                size="small"
+                                label="Hết hàng"
+                                sx={{
+                                  fontSize: '0.75rem',
+                                  backgroundColor: '#ff5722',
+                                  color: 'white',
+                                  fontWeight: 600,
+                                  '& .MuiChip-label': {
+                                    px: 1,
+                                  },
+                                }}
+                              />
+                            )}
+                          </Box>
+
                           <Box display="flex" gap={1} flexWrap="wrap">
                             <Chip
                               size="small"
@@ -737,67 +777,71 @@ const Cart = () => {
                             gap: 1.5
                           }}
                         >
-                          <Box
-                            display="flex"
-                            alignItems="center"
-                            onMouseLeave={() => handleMouseLeave(variant._id)}
-                            sx={{
-                              border: '1px solid #e0e0e0',
-                              borderRadius: 1,
-                              overflow: 'hidden',
-                            }}
-                          >
-                            <IconButton
-                              size="small"
-                              onMouseDown={() =>
-                                handleMouseDown(variant._id, -1)
-                              }
-                              disabled={
-                                processingVariantId === variant._id ||
-                                (tempQuantities[variant._id] ?? item.quantity) <=
-                                1
-                              }
-                              sx={{ borderRadius: 0, p: 0.5 }}
-                            >
-                              <Remove fontSize="small" />
-                            </IconButton>
-                            <TextField
-                              value={
-                                tempQuantities[variant._id] ?? item.quantity
-                              }
-                              size="small"
+                          {/* Quantity controls - chỉ hiện khi không hết hàng */}
+
+                            <Box
+                              display="flex"
+                              alignItems="center"
+                              onMouseLeave={() => handleMouseLeave(variant._id)}
                               sx={{
-                                width: 40,
-                                '& .MuiOutlinedInput-root': {
-                                  '& fieldset': { border: 'none' },
-                                },
+                                border: '1px solid #e0e0e0',
+                                borderRadius: 1,
+                                overflow: 'hidden',
                               }}
-                              inputProps={{
-                                style: {
-                                  textAlign: 'center',
-                                  padding: '4px',
-                                  fontWeight: 600,
-                                  fontSize: '0.9rem',
-                                },
-                                readOnly: true,
-                              }}
-                            />
-                            <IconButton
-                              size="small"
-                              onMouseDown={() =>
-                                handleMouseDown(variant._id, 1)
-                              }
-                              disabled={
-                                processingVariantId === variant._id ||
-                                !variant.quantity ||
-                                (tempQuantities[variant._id] ?? item.quantity) >=
-                                variant.quantity
-                              }
-                              sx={{ borderRadius: 0, p: 0.5 }}
                             >
-                              <Add fontSize="small" />
-                            </IconButton>
-                          </Box>
+                              <IconButton
+                                size="small"
+                                onMouseDown={() =>
+                                  handleMouseDown(variant._id, -1)
+                                }
+                                disabled={
+                                  processingVariantId === variant._id ||
+                                  isOutOfStock ||
+                                  (tempQuantities[variant._id] ?? item.quantity) <=
+                                  1
+                                }
+                                sx={{ borderRadius: 0, p: 0.5 }}
+                              >
+                                <Remove fontSize="small" />
+                              </IconButton>
+                              <TextField
+                                value={
+                                  tempQuantities[variant._id] ?? item.quantity
+                                }
+                                size="small"
+                                sx={{
+                                  width: 40,
+                                  '& .MuiOutlinedInput-root': {
+                                    '& fieldset': { border: 'none' },
+                                  },
+                                }}
+                                inputProps={{
+                                  style: {
+                                    textAlign: 'center',
+                                    padding: '4px',
+                                    fontWeight: 600,
+                                    fontSize: '0.9rem',
+                                  },
+                                  readOnly: true,
+                                }}
+                              />
+                              <IconButton
+                                size="small"
+                                onMouseDown={() =>
+                                  handleMouseDown(variant._id, 1)
+                                }
+                                disabled={
+                                  processingVariantId === variant._id ||
+                                  isOutOfStock ||
+                                  (tempQuantities[variant._id] ?? item.quantity) >=
+                                  (variant.quantity || 99)
+                                }
+                                sx={{ borderRadius: 0, p: 0.5 }}
+                              >
+                                <Add fontSize="small" />
+                              </IconButton>
+                            </Box>
+
                           <IconButton
                             color="error"
                             onClick={() => {

@@ -32,7 +32,7 @@ const VariantBox = styled(Box)(({ selected }) => ({
   alignItems: 'center',
   padding: '8px 12px',
   backgroundColor: selected ? 'var(--primary-color)20' : '#f9f9f9',
-  border: selected ? `1px solid var(--primary-color)` : '1px solid #e0e0e0',
+  border: selected ? '1px solid var(--primary-color)' : '1px solid #e0e0e0',
   borderRadius: '8px',
   cursor: 'pointer',
   gap: 10,
@@ -93,7 +93,7 @@ const ProductInfoSection = ({
         {currentPrice?.originalDiscountPrice > 0 ? (
           <>
             <PriceTypography variant='h5' sx={{ fontSize: 22 }}>
-              {currentPrice.discountPrice.toLocaleString('vi-VN')}đ
+              {currentPrice.discountPrice.toLocaleString('vi-VN')} ₫
             </PriceTypography>
             <Typography
               variant='h5'
@@ -103,7 +103,7 @@ const ProductInfoSection = ({
                 fontSize: 20
               }}
             >
-              {currentPrice.price.toLocaleString('vi-VN')}đ
+              {currentPrice.price.toLocaleString('vi-VN')} ₫
             </Typography>
             <Chip
               label={`Giảm ${Math.round((currentPrice.originalDiscountPrice / currentPrice.price) * 100)}%`}
@@ -120,7 +120,7 @@ const ProductInfoSection = ({
         ) : (
           <PriceTypography variant='h5' sx={{ fontSize: 22 }}>
             {typeof currentPrice?.price === 'number'
-              ? currentPrice.price.toLocaleString('vi-VN') + 'đ'
+              ? currentPrice.price.toLocaleString('vi-VN') + ' ₫'
               : 'Liên hệ'}
           </PriceTypography>
         )}
@@ -141,8 +141,8 @@ const ProductInfoSection = ({
               <Typography key={coupon.code} variant='body2' sx={{ mb: 0.25 }}>
                 👉 Nhập mã <b>{coupon.code}</b> GIẢM{' '}
                 {coupon.type === 'percent'
-                  ? `${coupon.amount}%${coupon.maxDiscount ? ` tối đa ${coupon.maxDiscount.toLocaleString()}đ` : ''}`
-                  : `${coupon.amount.toLocaleString()}đ`}
+                  ? `${coupon.amount}%${coupon.maxDiscount ? ` tối đa ${coupon.maxDiscount.toLocaleString('vi-VN')} ₫` : ''}`
+                  : `${coupon.amount.toLocaleString('vi-VN')} ₫`}
               </Typography>
             ))}
           </Box>
@@ -161,7 +161,7 @@ const ProductInfoSection = ({
           {coupons.slice(0, 3).map((coupon) => (
             <VoucherChip
               key={coupon.code}
-              label={`VOUCHER ${coupon.type === 'percent' ? `${coupon.amount}%` : `${coupon.amount.toLocaleString()}đ`}`}
+              label={`VOUCHER ${coupon.type === 'percent' ? `${coupon.amount}%` : `${coupon.amount.toLocaleString('vi-VN')} ₫`}`}
               onClick={() => setOpenVoucherDrawer(true)}
               sx={{ mr: 0.5, mb: 0.5 }}
             />

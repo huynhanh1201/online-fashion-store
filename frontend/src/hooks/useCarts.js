@@ -97,9 +97,14 @@ export const useCart = () => {
             : { _id: item.variantId }
         }))
         dispatch(setCartItems(normalizedItems))
+      } else {
+        // Fallback: fetch lại cart nếu response không đúng format
+        await fetchCart({ silent: true })
       }
     } catch (error) {
       console.error('Error updating cart item:', error?.response || error)
+      // Fetch lại cart khi có lỗi để đảm bảo data consistency
+      await fetchCart({ silent: true })
     }
   }
 

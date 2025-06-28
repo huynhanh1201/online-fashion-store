@@ -103,7 +103,7 @@ const AddFlashSale = ({ open, onClose, onSave, initialData }) => {
                 return { productId: p.productId, variants: [] }
               }
             })
-            
+
             const results = await Promise.all(variantPromises)
             const variantsMap = {}
             results.forEach(({ productId, variants }) => {
@@ -114,7 +114,7 @@ const AddFlashSale = ({ open, onClose, onSave, initialData }) => {
             console.error('Lỗi khi load biến thể cho sản phẩm hiện có:', err)
           }
         }
-        
+
         loadExistingProductVariants()
       } else {
         const newId = generateUniqueId()
@@ -233,7 +233,7 @@ const AddFlashSale = ({ open, onClose, onSave, initialData }) => {
     const removedProduct = updated[index]
     updated.splice(index, 1)
     setForm((prev) => ({ ...prev, products: updated }))
-    
+
     // Xóa thông tin biến thể của sản phẩm bị xóa
     if (removedProduct._id) {
       setProductVariants(prev => {
@@ -242,7 +242,7 @@ const AddFlashSale = ({ open, onClose, onSave, initialData }) => {
         return newVariants
       })
     }
-    
+
     clearMessages()
   }
 
@@ -494,8 +494,8 @@ const AddFlashSale = ({ open, onClose, onSave, initialData }) => {
       console.error('Chi tiết lỗi:', err)
       setError(
         err.response?.data?.message ||
-          err.message ||
-          'Có lỗi xảy ra khi lưu chiến dịch Flash Sale.'
+        err.message ||
+        'Có lỗi xảy ra khi lưu chiến dịch Flash Sale.'
       )
     } finally {
       setLoading(false)
@@ -678,7 +678,7 @@ const AddFlashSale = ({ open, onClose, onSave, initialData }) => {
               <AddCircleOutlineIcon sx={{ color: '#3b82f6' }} />
               Sản phẩm Flash Sale
             </Typography>
-            
+
             {/* Thông báo về việc cập nhật biến thể */}
             <Alert
               severity='info'
@@ -877,7 +877,7 @@ const AddFlashSale = ({ open, onClose, onSave, initialData }) => {
                       </Tooltip>
                     </Grid>
                   </Grid>
-                  
+
                   {/* Hiển thị thông tin biến thể */}
                   {productVariants[product._id] && productVariants[product._id].length > 0 && (
                     <div className="mt-2 p-3 bg-gray-50 rounded-lg">

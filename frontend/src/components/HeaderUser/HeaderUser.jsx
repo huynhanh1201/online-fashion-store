@@ -24,7 +24,7 @@ const StyledAppBar = styled(AppBar)(({ theme }) => ({
   color: 'var(--text-color)',
   top: 40,
   position: 'fixed',
-  zIndex: 1301,
+  zIndex: 1300,
   boxShadow: '0 4px 12px rgba(0,0,0,0.08)',
   borderBottom: '1px solid rgba(0,0,0,0.05)',
   transition: 'top 0.3s ease',
@@ -49,10 +49,10 @@ const HeaderUser = () => {
     <>
       <Topbar />
       <StyledAppBar>
-        <Container 
+        <Container
           maxWidth='100%'
           ref={headerRef}
-          
+          sx={{ overflow: 'visible' }}
         >
           <Toolbar
             disableGutters
@@ -62,7 +62,8 @@ const HeaderUser = () => {
               alignItems: 'center',
               minHeight: { xs: 56, sm: 64, md: 72 },
               width: '100%',
-              position: 'relative'
+              position: 'relative',
+              overflow: 'visible'
             }}
           >
             {/* Left Section - Logo & Menu Button */}
@@ -77,7 +78,7 @@ const HeaderUser = () => {
                 color='inherit'
                 edge='start'
                 onClick={handleDrawerToggle}
-                sx={{  
+                sx={{
                   display: { md: 'none' },
                   p: { xs: 1, sm: 1.5 }
                 }}
@@ -85,7 +86,7 @@ const HeaderUser = () => {
               >
                 <MenuIcon sx={{ fontSize: { xs: '1.2rem', sm: '1.5rem' } }} />
               </IconButton>
-              
+
               <Typography
                 variant='h6'
                 noWrap
@@ -108,7 +109,8 @@ const HeaderUser = () => {
                 flexGrow: 1,
                 justifyContent: 'start',
                 maxWidth: '800px',
-                userSelect: 'none'
+                userSelect: 'none',
+                overflow: 'visible'
               }}
             >
               <Menu headerRef={headerRef} />
@@ -135,7 +137,7 @@ const HeaderUser = () => {
               >
                 <Search />
               </Box>
-              
+
               {/* Search Icon for mobile */}
               <Box sx={{ display: { xs: 'block', sm: 'none' } }}>
                 <Search compact />
@@ -157,8 +159,8 @@ const HeaderUser = () => {
         </Container>
       </StyledAppBar>
 
-      <MobileDrawer 
-        open={mobileOpen} 
+      <MobileDrawer
+        open={mobileOpen}
         onClose={handleDrawerToggle}
         sx={{
           '& .MuiDrawer-paper': {
