@@ -110,6 +110,9 @@ const Menu = ({ headerRef }) => {
   }, [])
 
   const getMenuRows = () => {
+    // Lọc ra các danh mục parent (không có parent hoặc parent = null)
+    const parentCategories = categories.filter(cat => !cat.destroy && !cat.parent)
+    
     const allItems = menuConfig?.mainMenu
       ? [
           ...(menuConfig.mainMenu.some(item => item.visible && item.children?.length > 0) ? [{ label: 'Sản phẩm', url: '/product', hasMegaMenu: true }] : []),
@@ -118,12 +121,12 @@ const Menu = ({ headerRef }) => {
             .filter(item => item.visible && (!item.children || item.children.length === 0))
             .sort((a, b) => (a.order || 0) - (b.order || 0))
             .map(item => ({ label: item.label, url: item.url })),
-          ...categories.filter(cat => !cat.destroy).map(cat => ({ label: cat.name, url: `/productbycategory/${cat._id}`, category: cat }))
+          ...parentCategories.map(cat => ({ label: cat.name, url: `/productbycategory/${cat._id}`, category: cat }))
         ]
       : [
           { label: 'Sản phẩm', url: '/product', hasMegaMenu: true },
           { label: 'Hàng mới', url: '/productnews', isNew: true },
-          ...categories.filter(cat => !cat.destroy).map(cat => ({ label: cat.name, url: `/productbycategory/${cat._id}`, category: cat }))
+          ...parentCategories.map(cat => ({ label: cat.name, url: `/productbycategory/${cat._id}`, category: cat }))
         ]
     const rows = []
     for (let i = 0; i < allItems.length; i += itemsPerRow) {
@@ -135,6 +138,8 @@ const Menu = ({ headerRef }) => {
   const menuRows = getMenuRows()
   const canNavigateLeft = currentRow > 0
   const canNavigateRight = currentRow < menuRows.length - 1
+  // Chỉ hiển thị arrow khi có nhiều hơn 1 row
+  const shouldShowArrows = menuRows.length > 1
 
   const navigateRow = (direction) => {
     if (direction === 'left' && canNavigateLeft) {
@@ -257,6 +262,18 @@ const Menu = ({ headerRef }) => {
     return chain
   }
 
+  // Helper function để lấy danh mục con của một danh mục parent
+  const getChildCategories = (parentCategory) => {
+    if (!parentCategory || !parentCategory._id) {
+      return []
+    }
+    return categories.filter(cat => 
+      !cat.destroy && 
+      cat.parent && 
+      (typeof cat.parent === 'object' ? cat.parent._id : cat.parent) === parentCategory._id
+    )
+  }
+
   return (
     <Box
       sx={{
@@ -338,7 +355,7 @@ const Menu = ({ headerRef }) => {
                     </StyledButton>
                   )}
                   {/* Submenu cho category */}
-                  {item.category && hoveredCategory?._id === item.category._id && parentChain.length > 0 && (
+                  {item.category && hoveredCategory?._id === item.category._id && (
                     <Box
                       onMouseEnter={handleCategoryMenuEnter}
                       onMouseLeave={handleCategoryMenuLeave}
@@ -351,39 +368,71 @@ const Menu = ({ headerRef }) => {
                         boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.1)',
                         minWidth: 200,
                         maxWidth: '95vw',
-                        zIndex: 1000,
-                        borderRadius: 1,
+                        zIndex: 1500,
+                        borderRadius: '0 0 8px 8px',
                         border: '1px solid #e2e8f0',
                         animation: 'slideDown 0.2s ease-out',
                         '@keyframes slideDown': {
-                          '0%': { opacity: 0, transform: 'scaleY(0.95)' },
-                          '100%': { opacity: 1, transform: 'scaleY(1)' }
+                          '0%': { opacity: 0, transform: 'translateX(-50%) scaleY(0.95)' },
+                          '100%': { opacity: 1, transform: 'translateX(-50%) scaleY(1)' }
                         }
                       }}
                     >
-                      <List sx={{ p: 0, m: 0 }}>
-                        {parentChain.map((parent) => (
-                          <ListItem key={parent._id} sx={{ p: 0, m: 0 }}>
-                            <ListItemButton
-                              href={`/productbycategory/${parent._id}`}
+                      <Box
+                        sx={{
+                          display: 'flex',
+                          flexDirection: 'column',
+                          gap: 1,
+                          p: 2
+                        }}
+                      >
+                        {(() => {
+                          if (!item.category) return null
+                          const childCategories = getChildCategories(item.category)
+                          return childCategories.length > 0 ? (
+                            childCategories.map((child) => (
+                              <Button
+                                key={child._id}
+                                href={`/productbycategory/${child._id}`}
+                                sx={{
+                                  justifyContent: 'flex-start',
+                                  textAlign: 'left',
+                                  color: '#222',
+                                  fontWeight: 400,
+                                  fontSize: '1rem',
+                                  px: 2,
+                                  py: 1,
+                                  minWidth: 0,
+                                  background: 'none',
+                                  boxShadow: 'none',
+                                  textTransform: 'none',
+                                  borderRadius: 1,
+                                  transition: 'all 0.2s ease',
+                                  '&:hover': {
+                                    color: '#1976d2',
+                                    background: '#f8fafc',
+                                    transform: 'translateX(5px)'
+                                  }
+                                }}
+                              >
+                                {child.name}
+                              </Button>
+                            ))
+                          ) : (
+                            <Typography
                               sx={{
-                                color: '#333',
-                                fontWeight: 400,
-                                fontSize: '0.9rem',
-                                py: 1,
+                                color: 'text.secondary',
+                                fontSize: '0.95rem',
+                                fontStyle: 'italic',
                                 px: 2,
-                                transition: 'all 0.2s ease',
-                                '&:hover': {
-                                  color: '#1976d2',
-                                  background: '#f8fafc'
-                                }
+                                py: 1
                               }}
                             >
-                              <ListItemText primary={parent.name} />
-                            </ListItemButton>
-                          </ListItem>
-                        ))}
-                      </List>
+                              Chưa có danh mục con
+                            </Typography>
+                          )
+                        })()}
+                      </Box>
                     </Box>
                   )}
                 </Box>
@@ -392,44 +441,46 @@ const Menu = ({ headerRef }) => {
           </Slide>
         </Box>
         {/* 2 arrow ngoài cùng bên phải, nhỏ lại */}
-        <Box sx={{ display: 'flex', flexDirection: 'row', ml: 0.5 }}>
-          <Button
-            onClick={() => navigateRow('left')}
-            disabled={!canNavigateLeft}
-            sx={{
-              minWidth: 8,
-              width: 20,
-              height: 20,
-              borderRadius: '6px 0 0 6px',
-              background: 'transparent',
-              boxShadow: 'none',
-              minHeight: 0,
-              '&:hover': {
-                background: 'transparent'
-              }
-            }}
-          >
-            <ChevronLeft sx={{ fontSize: 20, color: canNavigateLeft ? '#1A3C7B' : '#ccc', fontWeight: canNavigateLeft ? 700 : 400 }} />
-          </Button>
-          <Button
-            onClick={() => navigateRow('right')}
-            disabled={!canNavigateRight}
-            sx={{
-              minWidth: 8,
-              width: 20,
-              height: 20,
-              borderRadius: '0 6px 6px 0',
-              background: 'transparent',
-              boxShadow: 'none',
-              minHeight: 0,
-              '&:hover': {
-                background: 'transparent'
-              }
-            }}
-          >
-            <ChevronRight sx={{ fontSize: 20, color: canNavigateRight ? '#1A3C7B' : '#ccc', fontWeight: canNavigateRight ? 700 : 400 }} />
-          </Button>
-        </Box>
+        {shouldShowArrows && (
+          <Box sx={{ display: 'flex', flexDirection: 'row', ml: 0.5 }}>
+            <Button
+              onClick={() => navigateRow('left')}
+              disabled={!canNavigateLeft}
+              sx={{
+                minWidth: 8,
+                width: 20,
+                height: 20,
+                borderRadius: '6px 0 0 6px',
+                background: 'transparent',
+                boxShadow: 'none',
+                minHeight: 0,
+                '&:hover': {
+                  background: 'transparent'
+                }
+              }}
+            >
+              <ChevronLeft sx={{ fontSize: 20, color: canNavigateLeft ? '#1A3C7B' : '#ccc', fontWeight: canNavigateLeft ? 700 : 400 }} />
+            </Button>
+            <Button
+              onClick={() => navigateRow('right')}
+              disabled={!canNavigateRight}
+              sx={{
+                minWidth: 8,
+                width: 20,
+                height: 20,
+                borderRadius: '0 6px 6px 0',
+                background: 'transparent',
+                boxShadow: 'none',
+                minHeight: 0,
+                '&:hover': {
+                  background: 'transparent'
+                }
+              }}
+            >
+              <ChevronRight sx={{ fontSize: 20, color: canNavigateRight ? '#1A3C7B' : '#ccc', fontWeight: canNavigateRight ? 700 : 400 }} />
+            </Button>
+          </Box>
+        )}
       </Box>
 
       {/* MegaMenu Block */}
@@ -601,83 +652,6 @@ const Menu = ({ headerRef }) => {
         </Box>
       )}
 
-      {/* Category Submenu Slide */}
-      <Slide
-        direction='up'
-        in={categoryMenuOpen && hoveredCategory}
-        timeout={200}
-        container={headerRef.current}
-      >
-        <Box
-          ref={categoryMenuRef}
-          sx={{
-            position: 'absolute',
-            bottom: headerRef.current
-              ? `-${headerRef.current.offsetHeight}px`
-              : '0',
-            left: '50%',
-            transform: 'translateX(-50%)',
-            width: isMobile ? '100vw' : '400px',
-            maxWidth: '95vw',
-            borderRadius: 2,
-            boxShadow: 3,
-            p: 3,
-            zIndex: 1400,
-            backgroundColor: 'white'
-          }}
-          onMouseEnter={handleCategoryMenuEnter}
-          onMouseLeave={handleCategoryMenuLeave}
-        >
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-            <Typography
-              sx={{
-                fontWeight: 'bold',
-                mb: 1,
-                textTransform: 'uppercase',
-                fontSize: '1.1rem',
-                color: '#1A3C7B'
-              }}
-            >
-              {hoveredCategory?.name}
-            </Typography>
-            {hoveredCategory?.parent ? (
-              <Button
-                href={`/productbycategory/${hoveredCategory.parent._id}`}
-                sx={{
-                  justifyContent: 'flex-start',
-                  textAlign: 'left',
-                  color: '#222',
-                  fontWeight: 400,
-                  fontSize: '1rem',
-                  px: 0,
-                  minWidth: 0,
-                  background: 'none',
-                  boxShadow: 'none',
-                  textTransform: 'none',
-                  '&:hover': {
-                    color: '#1976d2',
-                    background: 'none',
-                    transform: 'translateX(5px)',
-                    transition: 'all 0.2s ease'
-                  }
-                }}
-              >
-                {hoveredCategory.parent.name}
-              </Button>
-            ) : (
-              <Typography
-                sx={{
-                  color: 'text.secondary',
-                  fontSize: '0.95rem',
-                  fontStyle: 'italic'
-                }}
-              >
-                Chưa có sản phẩm
-              </Typography>
-            )}
-          </Box>
-        </Box>
-      </Slide>
     </Box>
   )
 }

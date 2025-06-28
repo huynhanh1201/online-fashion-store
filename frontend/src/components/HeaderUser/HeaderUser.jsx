@@ -71,16 +71,13 @@ const HeaderUser = () => {
                 display: 'flex',
                 alignItems: 'center',
                 flexShrink: 0,
-                gap: { xs: 0.5, sm: 1 },
-                minWidth: { xs: 'auto', sm: 120, md: 150 }
               }}
             >
               <IconButton
                 color='inherit'
                 edge='start'
                 onClick={handleDrawerToggle}
-                sx={{ 
-                  mr: { xs: 0.5, sm: 1 }, 
+                sx={{  
                   display: { md: 'none' },
                   p: { xs: 1, sm: 1.5 }
                 }}
@@ -98,7 +95,6 @@ const HeaderUser = () => {
                   userSelect: 'none',
                   overflow: 'hidden',
                   textOverflow: 'ellipsis',
-                  maxWidth: { xs: 80, sm: 120, md: 'none' }
                 }}
               >
                 <Logo href='/'>Logo</Logo>
@@ -112,7 +108,6 @@ const HeaderUser = () => {
                 flexGrow: 1,
                 justifyContent: 'start',
                 maxWidth: '800px',
-                mx: 2,
                 userSelect: 'none'
               }}
             >
@@ -127,7 +122,7 @@ const HeaderUser = () => {
                 gap: { xs: 0.5, sm: 1, md: 1.5 },
                 justifyContent: 'flex-end',
                 flexShrink: 0,
-                minWidth: { xs: 'auto', sm: 120, md: 200 },
+                minWidth: '330px',
                 maxWidth: { xs: '50%', sm: '40%', md: 'none' }
               }}
             >
@@ -136,7 +131,6 @@ const HeaderUser = () => {
                 sx={{
                   display: { xs: 'none', sm: 'block' },
                   flexShrink: 1,
-                  minWidth: 0
                 }}
               >
                 <Search />
