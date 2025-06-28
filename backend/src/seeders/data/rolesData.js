@@ -203,7 +203,7 @@ export const roles = [
       // Role
       'role:use',
       'role:read',
-      
+
       // Category
       'category:use',
       'category:read',
