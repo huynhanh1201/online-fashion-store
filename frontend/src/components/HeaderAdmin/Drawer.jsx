@@ -47,11 +47,8 @@ export default function AdminDrawer({
   const location = useLocation()
   const {
     hasPermission,
-    hasAnyPermission,
     isLoading,
     isInitialized,
-    permissions,
-    currentUser
   } = usePermissions()
   const [openProduct, setOpenProduct] = React.useState(false)
   const [openOrder, setOpenOrder] = React.useState(false)
@@ -196,7 +193,7 @@ export default function AdminDrawer({
         icon: <InventoryIcon />,
         children: [
           {
-            permission: 'product:use',
+            permission: 'productStatistics:use',
             label: 'Thống kê sản phẩm',
             path: '/admin/product-statistic',
             icon: <CategoryIcon />
@@ -204,7 +201,7 @@ export default function AdminDrawer({
           {
             permission: 'category:use',
             label: 'Quản lý danh mục',
-            path: '/admin/category-management',
+            path: '/admin/categorie-management',
             icon: <CategoryIcon />
           },
           {
@@ -243,7 +240,7 @@ export default function AdminDrawer({
         icon: <ReceiptLongIcon />,
         children: [
           {
-            permission: 'order:use',
+            permission: 'orderStatistics:use',
             label: 'Thống kê đơn hàng',
             path: '/admin/order-statistic',
             icon: <ReceiptLongIcon />

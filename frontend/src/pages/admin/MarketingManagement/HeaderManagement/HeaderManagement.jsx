@@ -49,14 +49,15 @@ import {
 } from '@mui/icons-material'
 import AddHeader from './Modal/AddHeader.jsx'
 import AddMenu from './Modal/AddMenu.jsx'
-import { 
-  getHeaderConfig, 
-  getMenuConfig, 
+import {
+  getHeaderConfig,
+  getMenuConfig,
   getDefaultMenuStructure,
-  validateMenuContent 
+  validateMenuContent
 } from '~/services/admin/webConfig/headerService.js'
 import { getCategories, updateCategory } from '~/services/admin/categoryService.js'
 import { optimizeCloudinaryUrl } from '~/utils/cloudinary.js'
+import usePermissions from '~/hooks/usePermissions'
 
 const HeaderManagement = () => {
   const theme = useTheme()
@@ -70,6 +71,7 @@ const HeaderManagement = () => {
   const [refreshing, setRefreshing] = useState(false)
   const [activeTab, setActiveTab] = useState(0)
   const [expandedCategories, setExpandedCategories] = useState(new Set())
+  const { hasPermission } = usePermissions()
 
   // Fetch header data
   const fetchHeaderData = async () => {
@@ -116,24 +118,24 @@ const HeaderManagement = () => {
   const handleToggleCategoryVisibility = async (categoryId, currentDestroyStatus) => {
     try {
       const newDestroyStatus = !currentDestroyStatus
-      
+
       // Optimistic update
-      setCategories(prevCategories => 
-        prevCategories.map(cat => 
-          cat._id === categoryId 
+      setCategories(prevCategories =>
+        prevCategories.map(cat =>
+          cat._id === categoryId
             ? { ...cat, destroy: newDestroyStatus }
             : cat
         )
       )
-      
+
       // Call API to update category destroy status
       const result = await updateCategory(categoryId, { destroy: newDestroyStatus })
-      
+
       if (!result) {
         // Revert optimistic update on error
         fetchHeaderData()
       }
-      
+
     } catch (error) {
       console.error('Error toggling category visibility:', error)
       // Revert optimistic update on error
@@ -156,8 +158,8 @@ const HeaderManagement = () => {
 
   // Get child categories for a parent
   const getChildCategories = (parentId) => {
-    return categories.filter(cat => 
-      cat.parent && 
+    return categories.filter(cat =>
+      cat.parent &&
       (typeof cat.parent === 'object' ? cat.parent._id : cat.parent) === parentId
     )
   }
@@ -254,7 +256,7 @@ const HeaderManagement = () => {
           label={item.label}
           size="small"
           variant="outlined"
-          sx={{ 
+          sx={{
             fontWeight: 600,
             backgroundColor: item.visible ? '#f0f9ff' : '#fef2f2',
             borderColor: item.visible ? '#3b82f6' : '#ef4444',
@@ -412,30 +414,32 @@ const HeaderManagement = () => {
               alignItems: 'center'
             }}
           >
-            <Button
-              variant='contained'
-              startIcon={<AddIcon />}
-              onClick={() => setOpenModal(true)}
-              sx={{
-                px: 3,
-                py: 1.5,
-                borderRadius: 2,
-                textTransform: 'none',
-                fontSize: '1rem',
-                fontWeight: 600,
-                background:
-                  'linear-gradient(135deg,rgb(17, 58, 122) 0%,rgb(11, 49, 156) 100%)',
-                boxShadow: '0 4px 16px rgba(59, 130, 246, 0.3)',
-                '&:hover': {
-                  background: 'linear-gradient(135deg, #2563eb 0%, #1e40af 100%)',
-                  boxShadow: '0 6px 20px rgba(59, 130, 246, 0.4)',
-                  transform: 'translateY(-1px)'
-                }
-              }}
-            >
-              {headerData ? 'Chỉnh sửa nội dung' : 'Tạo nội dung mới'}
-            </Button>
+            {hasPermission('headerContent:create') && (
 
+              <Button
+                variant='contained'
+                startIcon={<AddIcon />}
+                onClick={() => setOpenModal(true)}
+                sx={{
+                  px: 3,
+                  py: 1.5,
+                  borderRadius: 2,
+                  textTransform: 'none',
+                  fontSize: '1rem',
+                  fontWeight: 600,
+                  background:
+                    'linear-gradient(135deg,rgb(17, 58, 122) 0%,rgb(11, 49, 156) 100%)',
+                  boxShadow: '0 4px 16px rgba(59, 130, 246, 0.3)',
+                  '&:hover': {
+                    background: 'linear-gradient(135deg, #2563eb 0%, #1e40af 100%)',
+                    boxShadow: '0 6px 20px rgba(59, 130, 246, 0.4)',
+                    transform: 'translateY(-1px)'
+                  }
+                }}
+              >
+                {headerData ? 'Chỉnh sửa nội dung' : 'Tạo nội dung mới'}
+              </Button>
+            )}
             <Button
               variant='outlined'
               startIcon={<RefreshIcon />}
@@ -472,7 +476,7 @@ const HeaderManagement = () => {
                     <TableCell sx={{ fontWeight: 700, color: '#334155', py: 2 }}>
                       Trạng thái
                     </TableCell>
-                
+
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -581,18 +585,21 @@ const HeaderManagement = () => {
                       </TableCell>
                       <TableCell sx={{ py: 2 }}>
                         <Stack direction='row' spacing={1}>
-                          <Tooltip title='Chỉnh sửa'>
-                            <IconButton
-                              size='small'
-                              sx={{
-                                color: '#3b82f6',
-                                '&:hover': { backgroundColor: '#dbeafe' }
-                              }}
-                              onClick={() => setOpenModal(true)}
-                            >
-                              <EditIcon fontSize='small' />
-                            </IconButton>
-                          </Tooltip>
+                          {hasPermission('headerContent:create') && (
+
+                            <Tooltip title='Chỉnh sửa'>
+                              <IconButton
+                                size='small'
+                                sx={{
+                                  color: '#3b82f6',
+                                  '&:hover': { backgroundColor: '#dbeafe' }
+                                }}
+                                onClick={() => setOpenModal(true)}
+                              >
+                                <EditIcon fontSize='small' />
+                              </IconButton>
+                            </Tooltip>
+                          )}
                         </Stack>
                       </TableCell>
                     </TableRow>
@@ -652,29 +659,31 @@ const HeaderManagement = () => {
               alignItems: 'center'
             }}
           >
-            <Button
-              variant='contained'
-              onClick={() => setOpenMenuModal(true)}
-              sx={{
-                px: 3,
-                py: 1.5,
-                borderRadius: 2,
-                textTransform: 'none',
-                fontSize: '1rem',
-                fontWeight: 600,
-                background:
-                  'linear-gradient(135deg,rgb(17, 58, 122) 0%,rgb(11, 49, 156) 100%)',
-                boxShadow: '0 4px 16px rgba(59, 130, 246, 0.3)',
-                '&:hover': {
-                  background: 'linear-gradient(135deg, #2563eb 0%, #1e40af 100%)',
-                  boxShadow: '0 6px 20px rgba(59, 130, 246, 0.4)',
-                  transform: 'translateY(-1px)'
-                }
-              }}
-            >
-              {menuData ? 'Chỉnh sửa menu' : 'Tạo menu mới'}
-            </Button>
+            {hasPermission('headerContent:create') && (
 
+              <Button
+                variant='contained'
+                onClick={() => setOpenMenuModal(true)}
+                sx={{
+                  px: 3,
+                  py: 1.5,
+                  borderRadius: 2,
+                  textTransform: 'none',
+                  fontSize: '1rem',
+                  fontWeight: 600,
+                  background:
+                    'linear-gradient(135deg,rgb(17, 58, 122) 0%,rgb(11, 49, 156) 100%)',
+                  boxShadow: '0 4px 16px rgba(59, 130, 246, 0.3)',
+                  '&:hover': {
+                    background: 'linear-gradient(135deg, #2563eb 0%, #1e40af 100%)',
+                    boxShadow: '0 6px 20px rgba(59, 130, 246, 0.4)',
+                    transform: 'translateY(-1px)'
+                  }
+                }}
+              >
+                {menuData ? 'Chỉnh sửa menu' : 'Tạo menu mới'}
+              </Button>
+            )}
             <Button
               variant='outlined'
               startIcon={<RefreshIcon />}
@@ -775,37 +784,37 @@ const HeaderManagement = () => {
                         // Submenu rows
                         ...(item.children && item.children.length > 0
                           ? item.children.map((child, childIdx) => (
-                              <TableRow key={`sub-${index}-${childIdx}`}
-                                sx={{
-                                  backgroundColor: '#f1f5f9',
-                                  '&:hover': { backgroundColor: '#e0e7ef' },
-                                  '&:last-child td, &:last-child th': { border: 0 }
-                                }}
-                              >
-                                <TableCell sx={{ py: 2 }}>
-                                  <Typography variant="body2" sx={{ fontWeight: 500, color: '#64748b', pl: 8.75 }}>
-                                    ↳ {childIdx + 1}
+                            <TableRow key={`sub-${index}-${childIdx}`}
+                              sx={{
+                                backgroundColor: '#f1f5f9',
+                                '&:hover': { backgroundColor: '#e0e7ef' },
+                                '&:last-child td, &:last-child th': { border: 0 }
+                              }}
+                            >
+                              <TableCell sx={{ py: 2 }}>
+                                <Typography variant="body2" sx={{ fontWeight: 500, color: '#64748b', pl: 8.75 }}>
+                                  ↳ {childIdx + 1}
+                                </Typography>
+                              </TableCell>
+                              <TableCell sx={{ py: 2, pl: 4 }}>
+                                <Stack direction="row" alignItems="center" spacing={1}>
+                                  <MenuIcon sx={{ color: '#64748b', fontSize: 16 }} />
+                                  <Typography variant="body2" sx={{ fontWeight: 500, color: '#334155' }}>
+                                    {child.label}
                                   </Typography>
-                                </TableCell>
-                                <TableCell sx={{ py: 2, pl: 4 }}>
-                                  <Stack direction="row" alignItems="center" spacing={1}>
-                                    <MenuIcon sx={{ color: '#64748b', fontSize: 16 }} />
-                                    <Typography variant="body2" sx={{ fontWeight: 500, color: '#334155' }}>
-                                      {child.label}
-                                    </Typography>
-                                    {!child.visible && <VisibilityOffIcon sx={{ color: '#ef4444', fontSize: 16 }} />}
-                                  </Stack>
-                                </TableCell>
-                                <TableCell sx={{ py: 2 }}>
-                                  <Typography variant="body2" sx={{ fontFamily: 'monospace', color: '#3b82f6', fontWeight: 500 }}>
-                                    {child.url || '—'}
-                                  </Typography>
-                                </TableCell>
-                                <TableCell sx={{ py: 2 }}>
-                                  —
-                                </TableCell>
-                              </TableRow>
-                            ))
+                                  {!child.visible && <VisibilityOffIcon sx={{ color: '#ef4444', fontSize: 16 }} />}
+                                </Stack>
+                              </TableCell>
+                              <TableCell sx={{ py: 2 }}>
+                                <Typography variant="body2" sx={{ fontFamily: 'monospace', color: '#3b82f6', fontWeight: 500 }}>
+                                  {child.url || '—'}
+                                </Typography>
+                              </TableCell>
+                              <TableCell sx={{ py: 2 }}>
+                                —
+                              </TableCell>
+                            </TableRow>
+                          ))
                           : [])
                       ])
                     ) : (
@@ -972,20 +981,20 @@ const HeaderManagement = () => {
                     getParentCategories().map((parentCategory, index) => {
                       const childCategories = getChildCategories(parentCategory._id)
                       const isExpanded = expandedCategories.has(parentCategory._id)
-                      
+
                       return [
                         // Parent category row
-                      <TableRow
+                        <TableRow
                           key={`parent-${parentCategory._id}`}
-                        sx={{
+                          sx={{
                             backgroundColor: '#f0f9ff',
-                          '&:hover': {
+                            '&:hover': {
                               backgroundColor: '#dbeafe'
-                          },
-                          '&:last-child td, &:last-child th': { border: 0 }
-                        }}
-                      >
-                        <TableCell sx={{ py: 2 }}>
+                            },
+                            '&:last-child td, &:last-child th': { border: 0 }
+                          }}
+                        >
+                          <TableCell sx={{ py: 2 }}>
                             <Stack direction="row" alignItems="center" spacing={1}>
                               <IconButton
                                 size="small"
@@ -1001,24 +1010,24 @@ const HeaderManagement = () => {
                                 <ExpandMoreIcon />
                               </IconButton>
                               <Typography variant="body2" sx={{ fontWeight: 700 }}>
-                            {index + 1}
-                          </Typography>
-                            </Stack>
-                        </TableCell>
-                        <TableCell sx={{ py: 2 }}>
-                          <Stack direction="row" alignItems="center" spacing={1}>
-                              <DragIcon sx={{ color: '#3b82f6', fontSize: 16 }} />
-                            <Box>
-                                <Stack direction="row" alignItems="center" spacing={1}>
-                              <Typography
-                                variant="body2"
-                                sx={{ 
-                                      fontWeight: 700, 
-                                  color: '#1e293b'
-                                }}
-                              >
-                                    {parentCategory.name}
+                                {index + 1}
                               </Typography>
+                            </Stack>
+                          </TableCell>
+                          <TableCell sx={{ py: 2 }}>
+                            <Stack direction="row" alignItems="center" spacing={1}>
+                              <DragIcon sx={{ color: '#3b82f6', fontSize: 16 }} />
+                              <Box>
+                                <Stack direction="row" alignItems="center" spacing={1}>
+                                  <Typography
+                                    variant="body2"
+                                    sx={{
+                                      fontWeight: 700,
+                                      color: '#1e293b'
+                                    }}
+                                  >
+                                    {parentCategory.name}
+                                  </Typography>
                                   <Chip
                                     label="Parent"
                                     size="small"
@@ -1045,100 +1054,12 @@ const HeaderManagement = () => {
                                     />
                                   )}
                                 </Stack>
-                              <Typography
-                                variant="caption"
-                                color="text.secondary"
-                                sx={{ fontFamily: 'monospace' }}
-                              >
-                                  ID: {parentCategory._id}
-                              </Typography>
-                            </Box>
-                          </Stack>
-                        </TableCell>
-                        <TableCell sx={{ py: 2 }}>
-                          <Typography
-                            variant="body2"
-                            color="text.secondary"
-                            sx={{
-                              maxWidth: 200,
-                              overflow: 'hidden',
-                              textOverflow: 'ellipsis',
-                              whiteSpace: 'nowrap'
-                            }}
-                          >
-                              {parentCategory.description || 'Không có mô tả'}
-                          </Typography>
-                        </TableCell>
-                        <TableCell sx={{ py: 2 }}>
-                          <FormControlLabel
-                            control={
-                              <Switch
-                                  checked={parentCategory.destroy === false}
-                                  onChange={() => handleToggleCategoryVisibility(parentCategory._id, parentCategory.destroy)}
-                                color="success"
-                                size="small"
-                              />
-                            }
-                            label={
-                              <Typography variant="body2" sx={{ fontSize: '0.75rem' }}>
-                                  {parentCategory.destroy === false ? 'Hiển thị' : 'Ẩn'}
-                              </Typography>
-                            }
-                            sx={{ margin: 0 }}
-                          />
-                        </TableCell>
-                      </TableRow>,
-                      // Child category rows (only if expanded)
-                      ...(isExpanded ? childCategories.map((childCategory, childIndex) => (
-                        <TableRow
-                          key={`child-${childCategory._id}`}
-                          sx={{
-                            backgroundColor: '#f8fafc',
-                            borderLeft: '4px solid #e2e8f0',
-                            '&:hover': {
-                              backgroundColor: '#e0e7ef',
-                              borderLeft: '4px solid #3b82f6'
-                            },
-                            '&:last-child td, &:last-child th': { border: 0 }
-                          }}
-                        >
-                          <TableCell sx={{ py: 2 }}>
-                            <Typography variant="body2" sx={{ fontWeight: 500, color: '#64748b', pl: 5 }}>
-                              ↳ {childIndex + 1}
-                            </Typography>
-                          </TableCell>
-                          <TableCell sx={{ py: 2 }}>
-                            <Stack direction="row" alignItems="center" spacing={1}>
-                              <DragIcon sx={{ color: '#64748b', fontSize: 16 }} />
-                              <Box>
-                                <Stack direction="row" alignItems="center" spacing={1}>
-                                  <Typography
-                                    variant="body2"
-                                    sx={{ 
-                                      fontWeight: 500, 
-                                      color: '#334155'
-                                    }}
-                                  >
-                                    {childCategory.name}
-                                  </Typography>
-                                  <Chip
-                                    label="item"
-                                    size="small"
-                                    sx={{
-                                      backgroundColor: '#64748b',
-                                      color: 'white',
-                                      fontWeight: 600,
-                                      fontSize: '0.7rem',
-                                      height: 20
-                                    }}
-                                  />
-                                </Stack>
                                 <Typography
                                   variant="caption"
                                   color="text.secondary"
                                   sx={{ fontFamily: 'monospace' }}
                                 >
-                                  ID: {childCategory._id}
+                                  ID: {parentCategory._id}
                                 </Typography>
                               </Box>
                             </Stack>
@@ -1154,29 +1075,117 @@ const HeaderManagement = () => {
                                 whiteSpace: 'nowrap'
                               }}
                             >
-                              {childCategory.description || 'Không có mô tả'}
+                              {parentCategory.description || 'Không có mô tả'}
                             </Typography>
                           </TableCell>
                           <TableCell sx={{ py: 2 }}>
                             <FormControlLabel
                               control={
                                 <Switch
-                                  checked={childCategory.destroy === false}
-                                  onChange={() => handleToggleCategoryVisibility(childCategory._id, childCategory.destroy)}
+                                  checked={parentCategory.destroy === false}
+                                  onChange={() => handleToggleCategoryVisibility(parentCategory._id, parentCategory.destroy)}
                                   color="success"
                                   size="small"
                                 />
                               }
                               label={
                                 <Typography variant="body2" sx={{ fontSize: '0.75rem' }}>
-                                  {childCategory.destroy === false ? 'Hiển thị' : 'Ẩn'}
+                                  {parentCategory.destroy === false ? 'Hiển thị' : 'Ẩn'}
                                 </Typography>
                               }
                               sx={{ margin: 0 }}
                             />
                           </TableCell>
-                        </TableRow>
-                      )) : [])
+                        </TableRow>,
+                        // Child category rows (only if expanded)
+                        ...(isExpanded ? childCategories.map((childCategory, childIndex) => (
+                          <TableRow
+                            key={`child-${childCategory._id}`}
+                            sx={{
+                              backgroundColor: '#f8fafc',
+                              borderLeft: '4px solid #e2e8f0',
+                              '&:hover': {
+                                backgroundColor: '#e0e7ef',
+                                borderLeft: '4px solid #3b82f6'
+                              },
+                              '&:last-child td, &:last-child th': { border: 0 }
+                            }}
+                          >
+                            <TableCell sx={{ py: 2 }}>
+                              <Typography variant="body2" sx={{ fontWeight: 500, color: '#64748b', pl: 5 }}>
+                                ↳ {childIndex + 1}
+                              </Typography>
+                            </TableCell>
+                            <TableCell sx={{ py: 2 }}>
+                              <Stack direction="row" alignItems="center" spacing={1}>
+                                <DragIcon sx={{ color: '#64748b', fontSize: 16 }} />
+                                <Box>
+                                  <Stack direction="row" alignItems="center" spacing={1}>
+                                    <Typography
+                                      variant="body2"
+                                      sx={{
+                                        fontWeight: 500,
+                                        color: '#334155'
+                                      }}
+                                    >
+                                      {childCategory.name}
+                                    </Typography>
+                                    <Chip
+                                      label="item"
+                                      size="small"
+                                      sx={{
+                                        backgroundColor: '#64748b',
+                                        color: 'white',
+                                        fontWeight: 600,
+                                        fontSize: '0.7rem',
+                                        height: 20
+                                      }}
+                                    />
+                                  </Stack>
+                                  <Typography
+                                    variant="caption"
+                                    color="text.secondary"
+                                    sx={{ fontFamily: 'monospace' }}
+                                  >
+                                    ID: {childCategory._id}
+                                  </Typography>
+                                </Box>
+                              </Stack>
+                            </TableCell>
+                            <TableCell sx={{ py: 2 }}>
+                              <Typography
+                                variant="body2"
+                                color="text.secondary"
+                                sx={{
+                                  maxWidth: 200,
+                                  overflow: 'hidden',
+                                  textOverflow: 'ellipsis',
+                                  whiteSpace: 'nowrap'
+                                }}
+                              >
+                                {childCategory.description || 'Không có mô tả'}
+                              </Typography>
+                            </TableCell>
+                            <TableCell sx={{ py: 2 }}>
+                              <FormControlLabel
+                                control={
+                                  <Switch
+                                    checked={childCategory.destroy === false}
+                                    onChange={() => handleToggleCategoryVisibility(childCategory._id, childCategory.destroy)}
+                                    color="success"
+                                    size="small"
+                                  />
+                                }
+                                label={
+                                  <Typography variant="body2" sx={{ fontSize: '0.75rem' }}>
+                                    {childCategory.destroy === false ? 'Hiển thị' : 'Ẩn'}
+                                  </Typography>
+                                }
+                                sx={{ margin: 0 }}
+                              />
+                            </TableCell>
+                          </TableRow>
+                        )) : [])
                       ]
                     }).flat()
                   ) : (

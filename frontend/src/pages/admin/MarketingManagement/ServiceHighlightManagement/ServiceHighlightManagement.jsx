@@ -30,11 +30,12 @@ import {
   Refresh as RefreshIcon
 } from '@mui/icons-material'
 import AddServiceHighlight from './Modal/AddServiceHighlight.jsx'
-import { 
-  getServiceHighlights, 
-  deleteServiceHighlight 
+import {
+  getServiceHighlights,
+  deleteServiceHighlight
 } from '~/services/admin/webConfig/highlightedService.js'
 import { optimizeCloudinaryUrl } from '~/utils/cloudinary.js'
+import usePermissions from '~/hooks/usePermissions'
 
 const ServiceHighlightManagement = () => {
   const theme = useTheme()
@@ -44,6 +45,7 @@ const ServiceHighlightManagement = () => {
   const [loading, setLoading] = useState(true)
   const [refreshing, setRefreshing] = useState(false)
   const [error, setError] = useState('')
+  const { hasPermission } = usePermissions()
 
   // Fetch service highlights data
   const fetchServiceHighlights = async () => {
@@ -230,29 +232,31 @@ const ServiceHighlightManagement = () => {
 
       {/* Action Buttons */}
       <Box sx={{ mb: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <Button
-          variant='contained'
-          startIcon={<AddIcon />}
-          onClick={handleAddNew}
-          sx={{
-            px: 3,
-            py: 1.5,
-            borderRadius: 2,
-            textTransform: 'none',
-            fontSize: '1rem',
-            fontWeight: 600,
-            background: 'linear-gradient(135deg,rgb(17, 58, 122) 0%,rgb(11, 49, 156) 100%)',
-            boxShadow: '0 4px 16px rgba(59, 130, 246, 0.3)',
-            '&:hover': {
-              background: 'linear-gradient(135deg, #2563eb 0%, #1e40af 100%)',
-              boxShadow: '0 6px 20px rgba(59, 130, 246, 0.4)',
-              transform: 'translateY(-1px)'
-            }
-          }}
-        >
-          Thêm dịch vụ mới
-        </Button>
-        
+        {hasPermission('service:create') && (
+
+          <Button
+            variant='contained'
+            startIcon={<AddIcon />}
+            onClick={handleAddNew}
+            sx={{
+              px: 3,
+              py: 1.5,
+              borderRadius: 2,
+              textTransform: 'none',
+              fontSize: '1rem',
+              fontWeight: 600,
+              background: 'linear-gradient(135deg,rgb(17, 58, 122) 0%,rgb(11, 49, 156) 100%)',
+              boxShadow: '0 4px 16px rgba(59, 130, 246, 0.3)',
+              '&:hover': {
+                background: 'linear-gradient(135deg, #2563eb 0%, #1e40af 100%)',
+                boxShadow: '0 6px 20px rgba(59, 130, 246, 0.4)',
+                transform: 'translateY(-1px)'
+              }
+            }}
+          >
+            Thêm dịch vụ mới
+          </Button>
+        )}
         <Button
           variant="outlined"
           startIcon={<RefreshIcon />}
@@ -375,30 +379,36 @@ const ServiceHighlightManagement = () => {
                     </TableCell>
                     <TableCell sx={{ py: 2 }}>
                       <Stack direction='row' spacing={1}>
-                        <Tooltip title='Chỉnh sửa'>
-                          <IconButton
-                            size='small'
-                            sx={{
-                              color: '#3b82f6',
-                              '&:hover': { backgroundColor: '#dbeafe' }
-                            }}
-                            onClick={() => handleEdit(index)}
-                          >
-                            <EditIcon fontSize='small' />
-                          </IconButton>
-                        </Tooltip>
-                        <Tooltip title='Xóa'>
-                          <IconButton
-                            size='small'
-                            sx={{
-                              color: '#ef4444',
-                              '&:hover': { backgroundColor: '#fee2e2' }
-                            }}
-                            onClick={() => handleDelete(index)}
-                          >
-                            <DeleteIcon fontSize='small' />
-                          </IconButton>
-                        </Tooltip>
+                        {hasPermission('service:create') && (
+
+                          <Tooltip title='Chỉnh sửa'>
+                            <IconButton
+                              size='small'
+                              sx={{
+                                color: '#3b82f6',
+                                '&:hover': { backgroundColor: '#dbeafe' }
+                              }}
+                              onClick={() => handleEdit(index)}
+                            >
+                              <EditIcon fontSize='small' />
+                            </IconButton>
+                          </Tooltip>
+                        )}
+                        {hasPermission('service:delete') && (
+
+                          <Tooltip title='Xóa'>
+                            <IconButton
+                              size='small'
+                              sx={{
+                                color: '#ef4444',
+                                '&:hover': { backgroundColor: '#fee2e2' }
+                              }}
+                              onClick={() => handleDelete(index)}
+                            >
+                              <DeleteIcon fontSize='small' />
+                            </IconButton>
+                          </Tooltip>
+                        )}
                       </Stack>
                     </TableCell>
                   </TableRow>
