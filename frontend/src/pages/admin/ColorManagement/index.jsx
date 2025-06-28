@@ -71,7 +71,7 @@ const ColorManagement = () => {
     }
   }
   return (
-    <RouteGuard requiredPermissions={['admin:access', 'color:read']}>
+    <RouteGuard requiredPermissions={['admin:access', 'color:use']}>
       <ColorTable
         colors={colors}
         loading={Loading}

@@ -53,7 +53,7 @@ const SizePaletteManagement = ({ productId = '6853ef5fa2331414899bfaf2' }) => {
   }
 
   return (
-    <RouteGuard requiredPermissions={['admin:access', 'size:read']}>
+    <RouteGuard requiredPermissions={['admin:access', 'size:use']}>
       <SizePaletteTable
         sizePalettes={sizePalettes}
         loading={loading}

@@ -69,7 +69,7 @@ const UserManagement = () => {
   }
 
   return (
-    <RouteGuard requiredPermissions={['admin:access', 'user:read']}>
+    <RouteGuard requiredPermissions={['admin:access', 'user:use']}>
       <UserTable
         users={users}
         loading={Loading}

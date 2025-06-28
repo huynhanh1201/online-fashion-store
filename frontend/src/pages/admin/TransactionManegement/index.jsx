@@ -91,7 +91,7 @@ const TransactionManagement = () => {
     }
   }
   return (
-    <RouteGuard requiredPermissions={['admin:access', 'payment:read']}>
+    <RouteGuard requiredPermissions={['admin:access', 'payment:use']}>
       <TransactionTable
         transactions={transactions}
         loading={loading}

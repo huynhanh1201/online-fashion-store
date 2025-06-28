@@ -46,7 +46,7 @@ const ReviewManagement = () => {
   }
   const handleChangePage = (event, value) => setPage(value)
   return (
-    <RouteGuard requiredPermissions={['review:read']}>
+    <RouteGuard requiredPermissions={['review:use']}>
       <ReviewTable
         reviews={reviews}
         loading={loading}

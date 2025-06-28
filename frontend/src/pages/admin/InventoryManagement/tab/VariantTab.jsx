@@ -219,7 +219,7 @@ const VariantsTab = () => {
     setROWS_PER_PAGE(newLimit)
   }
   return (
-    <RouteGuard requiredPermissions={['admin:access', 'variant:read']}>
+    <RouteGuard requiredPermissions={['admin:access', 'variant:use']}>
       <Paper
         sx={{ border: '1px solid #ccc', width: '100%', overflow: 'hidden' }}
       >

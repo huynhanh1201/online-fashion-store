@@ -81,7 +81,7 @@ const SizeManagement = () => {
     }
   }
   return (
-    <RouteGuard requiredPermissions={['admin:access', 'size:read']}>
+    <RouteGuard requiredPermissions={['admin:access', 'size:use']}>
       <SizeTable
         sizes={sizes}
         loading={Loading}

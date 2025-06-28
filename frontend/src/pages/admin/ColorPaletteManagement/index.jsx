@@ -46,7 +46,7 @@ const ColorPaletteManagement = ({ productId = '6853ef5fa2331414899bfaf2' }) => {
   }
 
   return (
-    <RouteGuard requiredPermissions={['admin:access', 'color:read']}>
+    <RouteGuard requiredPermissions={['admin:access', 'color:use']}>
       <ColorPaletteTable
         colorPalettes={colorPalettes}
         loading={loading}

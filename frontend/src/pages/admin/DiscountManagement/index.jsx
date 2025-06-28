@@ -136,7 +136,7 @@ function DiscountManagement() {
   }
 
   return (
-    <RouteGuard requiredPermissions={['coupon:read']}>
+    <RouteGuard requiredPermissions={['coupon:use']}>
       <DiscountTable
         discounts={discounts}
         loading={loading}
