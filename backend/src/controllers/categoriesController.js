@@ -39,6 +39,18 @@ const getCategory = async (req, res, next) => {
   }
 }
 
+const getCategoryBySlug = async (req, res, next) => {
+  try {
+    const slug = req.params.slug
+
+    const result = await categoriesService.getCategoryBySlug(slug)
+
+    res.status(StatusCodes.OK).json(result)
+  } catch (err) {
+    next(err)
+  }
+}
+
 const updateCategory = async (req, res, next) => {
   try {
     const categoryId = req.params.categoryId
@@ -67,6 +79,7 @@ export const categoriesController = {
   createCategory,
   getCategoryList,
   getCategory,
+  getCategoryBySlug,
   updateCategory,
   deleteCategory
 }

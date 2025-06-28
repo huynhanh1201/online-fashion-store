@@ -12,9 +12,12 @@ import {
   Box,
   Card,
   Tooltip,
-  CircularProgress
+  CircularProgress,
+  Tabs,
+  Tab,
+  Divider
 } from '@mui/material'
-import { Add as AddIcon, Remove as RemoveIcon, AddPhotoAlternate, CloudUpload as CloudUploadIcon, Delete as DeleteIcon } from '@mui/icons-material'
+import { Add as AddIcon, Remove as RemoveIcon, AddPhotoAlternate, CloudUpload as CloudUploadIcon, Delete as DeleteIcon, Visibility as VisibilityIcon, Edit as EditIcon } from '@mui/icons-material'
 import {
   getFooterConfig,
   createFooterConfig,
@@ -27,6 +30,218 @@ const defaultAbout = { phone: '', email: '' }
 const defaultMenuColumn = { title: '', subtitle: '', text: '', items: [], link: '' }
 const defaultSocialLink = { name: '', image: '', link: '' }
 const defaultStore = { name: '', address: '' }
+
+// Preview Component
+const FooterPreview = ({ logo, about, menuColumns, socialLinks, stores }) => {
+  return (
+    <Box sx={{ 
+      bgcolor: '#002f6c', 
+      color: 'white', 
+      pt: 6, 
+      pb: 3, 
+      fontSize: 14,
+      borderRadius: 2,
+      minHeight: 400,
+      fontFamily: 'Arial, sans-serif'
+    }}>
+      <Box sx={{ maxWidth: '1450px', mx: 'auto', px: 2 }}>
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: { xs: 'column', md: 'row' },
+            justifyContent: 'space-between',
+            flexWrap: 'wrap',
+            gap: 4,
+            mb: 4,
+            justifyItems: 'center',
+            padding: '20px'
+          }}
+        >
+          {/* Cột 1: Logo + Đăng ký nhận tin + Thông tin liên hệ */}
+          <Box sx={{ flex: 1, minWidth: 220 }}>
+            {logo && (
+              <Box sx={{ mb: 1 }}>
+                <img 
+                  src={logo} 
+                  alt='logo' 
+                  style={{ 
+                    width: 120, 
+                    height: 'auto', 
+                    borderRadius: 8, 
+                    background: '#fff', 
+                    padding: 4 
+                  }} 
+                />
+              </Box>
+            )}
+            <Typography variant='h6' sx={{ fontWeight: 700, mb: 1 }}>
+              {about?.[0]?.phone ? `Hotline: ${about[0].phone}` : 'FASHIONSTORE'}
+            </Typography>
+            {about?.[0]?.email && (
+              <Typography variant='body2' sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                <span style={{ fontSize: 16, marginRight: 8 }}>✉️</span> {about[0].email}
+              </Typography>
+            )}
+            <Typography sx={{ mb: 1, fontWeight: 500 }}>ĐĂNG KÝ NHẬN TIN</Typography>
+            <Typography variant='caption'>Hãy là người đầu tiên nhận khuyến mãi lớn!</Typography>
+            <Box sx={{ mt: 1, display: 'flex', gap: 1 }}>
+              <Box
+                sx={{ 
+                  bgcolor: 'white', 
+                  borderRadius: '4px', 
+                  flex: 1,
+                  px: 2,
+                  py: 1,
+                  fontSize: 15,
+                  color: '#333'
+                }}
+              >
+                Nhập địa chỉ email
+              </Box>
+              <Box
+                sx={{ 
+                  bgcolor: '#1a3c7b', 
+                  color: 'white', 
+                  width: '100px',
+                  px: 2,
+                  py: 1,
+                  borderRadius: 1,
+                  textAlign: 'center',
+                  fontSize: 14,
+                  fontWeight: 500
+                }}
+              >
+                ĐĂNG KÝ
+              </Box>
+            </Box>
+          </Box>
+
+          {/* Cột 2: Chính sách + Hỗ trợ */}
+          {menuColumns?.length > 0 && (
+            <Box sx={{ flex: 1, minWidth: 180 }}>
+              <Typography variant='subtitle1' sx={{ fontWeight: 600, mb: 1 }}>
+                CHÍNH SÁCH WEBSITE
+              </Typography>
+              <Stack spacing={0.5}>
+                {menuColumns.map((col, idx) => (
+                  <Typography 
+                    key={idx} 
+                    sx={{ 
+                      color: 'inherit', 
+                      textDecoration: 'none', 
+                      cursor: 'pointer', 
+                      '&:hover': { textDecoration: 'underline' } 
+                    }}
+                  >
+                    {col.title}
+                  </Typography>
+                ))}
+              </Stack>
+            </Box>
+          )}
+
+          {/* Cột 3: Danh sách cửa hàng */}
+          {stores?.length > 0 && (
+            <Box sx={{ flex: 1.2, minWidth: 200 }}>
+              <Typography variant='subtitle1' sx={{ fontWeight: 600, mb: 1 }}>
+                HỆ THỐNG CỬA HÀNG
+              </Typography>
+              {stores.map((store, idx) => (
+                <Box key={idx} sx={{ mb: 1 }}>
+                  <Typography sx={{ display: 'flex', alignItems: 'center' }}>
+                    <span style={{ fontSize: 16, marginRight: 8 }}>📍</span>
+                    <strong>{store.name}</strong>
+                  </Typography>
+                  <Typography variant='body2' sx={{ ml: 3 }}>
+                    {store.address}
+                  </Typography>
+                </Box>
+              ))}
+            </Box>
+          )}
+
+          {/* Cột 4: Kết nối */}
+          {socialLinks?.length > 0 && (
+            <Box sx={{ flex: 1, minWidth: 180 }}>
+              <Typography variant='subtitle1' sx={{ fontWeight: 600, mb: 1 }}>
+                KẾT NỐI VỚI CHÚNG TÔI
+              </Typography>
+              <Stack spacing={1}>
+                {socialLinks.map((s, idx) => (
+                  <Box
+                    key={idx}
+                    sx={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 1.5,
+                      color: 'inherit',
+                      textDecoration: 'none',
+                      '&:hover': {
+                        textDecoration: 'underline'
+                      }
+                    }}
+                  >
+                    {s.image ? (
+                      <img
+                        src={s.image}
+                        alt={s.name}
+                        style={{
+                          width: 20,
+                          height: 20,
+                          borderRadius: '50%',
+                          objectFit: 'cover'
+                        }}
+                      />
+                    ) : (
+                      <Box
+                        sx={{
+                          width: 20,
+                          height: 20,
+                          borderRadius: '50%',
+                          bgcolor: '#374151',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          fontSize: 12
+                        }}
+                      >
+                        {s.name?.charAt(0) || 'S'}
+                      </Box>
+                    )}
+                    <Typography variant='body2'>{s.name}</Typography>
+                  </Box>
+                ))}
+              </Stack>
+            </Box>
+          )}
+        </Box>
+
+        <Typography variant='body2' align='center'>
+          © Bản quyền thuộc về <strong>FASHIONSTORE</strong>
+        </Typography>
+      </Box>
+
+      {/* Empty State */}
+      {!logo && (!about || about.every(a => !a.phone && !a.email)) && 
+       (!menuColumns || menuColumns.every(m => !m.title)) && 
+       (!stores || stores.every(s => !s.name && !s.address)) && 
+       (!socialLinks || socialLinks.every(s => !s.name && !s.image)) && (
+        <Box sx={{ 
+          textAlign: 'center', 
+          py: 8, 
+          color: '#9ca3af' 
+        }}>
+          <Typography variant="h6" sx={{ mb: 1 }}>
+            Chưa có nội dung
+          </Typography>
+          <Typography variant="body2">
+            Hãy thêm thông tin để xem preview
+          </Typography>
+        </Box>
+      )}
+    </Box>
+  )
+}
 
 const AddFooterModal = ({ open, onClose, onSuccess, footerConfig }) => {
   const [logo, setLogo] = useState('')
@@ -42,6 +257,7 @@ const AddFooterModal = ({ open, onClose, onSuccess, footerConfig }) => {
   const logoInputRef = React.useRef(null)
   const [socialIconLoadingIndex, setSocialIconLoadingIndex] = useState(-1)
   const [fieldErrors, setFieldErrors] = useState({})
+  const [activeTab, setActiveTab] = useState(0)
 
   const resetForm = () => {
     setLogo('')
@@ -54,6 +270,7 @@ const AddFooterModal = ({ open, onClose, onSuccess, footerConfig }) => {
     setStatus('Đang sử dụng')
     setError('')
     setLoading(false)
+    setActiveTab(0)
   }
 
   const handleClose = () => {
@@ -212,176 +429,227 @@ const AddFooterModal = ({ open, onClose, onSuccess, footerConfig }) => {
   }
 
   return (
-    <Dialog open={open} onClose={handleClose} maxWidth='md' fullWidth sx={{ zIndex: 1402, maxHeight: '90vh', mt: 6 }}>
-      <DialogTitle>Thêm nội dung chân trang mới</DialogTitle>
-      <DialogContent sx={{ maxHeight: '70vh', overflowY: 'auto' }}>
-        {error && <Typography color='error' sx={{ mb: 2 }}>{error}</Typography>}
-        <Stack spacing={3}>
-          {/* Logo */}
-          <Box sx={{ p: 2, borderRadius: 2, bgcolor: '#f8fafc', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-            <Typography variant='subtitle1' sx={{ fontWeight: 700, mb: 1 }}>Logo</Typography>
-            <Card
-              sx={{
-                border: '2px dashed #d1d5db',
-                borderRadius: 2,
-                p: 2,
-                backgroundColor: '#f9fafb',
-                transition: 'all 0.2s ease',
-                '&:hover': {
-                  borderColor: '#3b82f6',
-                  backgroundColor: '#f0f9ff'
-                },
-                minWidth: 180,
-                minHeight: 140,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center'
-              }}
-            >
-              {logo || logoPreview ? (
-                <Box sx={{ position: 'relative', display: 'inline-block' }}>
-                  <img
-                    src={logoPreview || logo}
-                    alt='logo preview'
-                    style={{ width: 100, height: 100, objectFit: 'contain', borderRadius: 8, border: '1px solid #e5e7eb', background: '#fff' }}
-                  />
-                  <Tooltip title='Xóa logo'>
-                    <IconButton
-                      onClick={handleRemoveLogo}
-                      sx={{ position: 'absolute', top: -8, right: -8, backgroundColor: '#ef4444', color: 'white', '&:hover': { backgroundColor: '#dc2626' } }}
-                      size='small'
-                    >
-                      <DeleteIcon fontSize='small' />
-                    </IconButton>
-                  </Tooltip>
-                </Box>
-              ) : (
-                <Box
-                  sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', py: 3, cursor: 'pointer' }}
-                  onClick={() => logoInputRef.current?.click()}
+    <Dialog open={open} onClose={handleClose} maxWidth='lg' fullWidth sx={{ zIndex: 1402, maxHeight: '95vh', mt: 2 }}>
+      <DialogTitle>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          Thêm nội dung chân trang mới
+        </Box>
+      </DialogTitle>
+      
+      <Tabs 
+        value={activeTab} 
+        onChange={(e, newValue) => setActiveTab(newValue)}
+        sx={{ px: 3, borderBottom: 1, borderColor: 'divider' }}
+      >
+        <Tab 
+          icon={<EditIcon />} 
+          label="Chỉnh sửa" 
+          iconPosition="start"
+        />
+        <Tab 
+          icon={<VisibilityIcon />} 
+          label="Xem trước" 
+          iconPosition="start"
+        />
+      </Tabs>
+
+      <DialogContent sx={{ maxHeight: '75vh', overflowY: 'auto', p: 0 }}>
+        {error && (
+          <Box sx={{ p: 3, pb: 0 }}>
+            <Typography color='error'>{error}</Typography>
+          </Box>
+        )}
+
+        {activeTab === 0 && (
+          <Box sx={{ p: 3 }}>
+            <Stack spacing={3}>
+              {/* Logo */}
+              <Box sx={{ p: 2, borderRadius: 2, bgcolor: '#f8fafc', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                <Typography variant='subtitle1' sx={{ fontWeight: 700, mb: 1 }}>Logo</Typography>
+                <Card
+                  sx={{
+                    border: '2px dashed #d1d5db',
+                    borderRadius: 2,
+                    p: 2,
+                    backgroundColor: '#f9fafb',
+                    transition: 'all 0.2s ease',
+                    '&:hover': {
+                      borderColor: '#3b82f6',
+                      backgroundColor: '#f0f9ff'
+                    },
+                    minWidth: 180,
+                    minHeight: 140,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                  }}
                 >
-                  <CloudUploadIcon sx={{ fontSize: 48, color: '#9ca3af', mb: 2 }} />
-                  <Typography variant='body2' color='text.secondary' sx={{ mb: 1 }}>
-                    {logoUploading ? 'Đang tải lên...' : 'Nhấp để tải logo'}
-                  </Typography>
-                  <Typography variant='caption' color='text.secondary'>
-                    JPG, PNG, WebP (tối đa 5MB)
-                  </Typography>
-                  {logoUploading && (
-                    <CircularProgress size={24} sx={{ mt: 1 }} />
-                  )}
-                </Box>
-              )}
-              <input
-                ref={logoInputRef}
-                type='file'
-                accept='image/*'
-                onChange={handleLogoUpload}
-                style={{ display: 'none' }}
-              />
-            </Card>
-          </Box>
-
-          {/* Giới thiệu */}
-          <Box sx={{ p: 2, borderRadius: 2, bgcolor: '#f8fafc' }}>
-            <Typography variant='subtitle1' sx={{ fontWeight: 700, mb: 1 }}>Giới thiệu</Typography>
-            <Stack spacing={2}>
-              {about.map((a, idx) => (
-                <Box key={idx} sx={{ p: 2, borderRadius: 2, bgcolor: '#fff', boxShadow: '0 1px 4px #e0e7ef33' }}>
-                  <Stack spacing={1} direction='row' alignItems='center'>
-                    <TextField label='Số điện thoại' value={a.phone} onChange={e => handleAboutChange(idx, 'phone', e.target.value)} size='small' fullWidth error={!!fieldErrors[`about_phone_${idx}`]} helperText={fieldErrors[`about_phone_${idx}`]} />
-                    <TextField label='Email' value={a.email} onChange={e => handleAboutChange(idx, 'email', e.target.value)} size='small' fullWidth error={!!fieldErrors[`about_email_${idx}`]} helperText={fieldErrors[`about_email_${idx}`]} />
-                    {about.length > 1 && (
-                      <IconButton onClick={() => handleRemoveAbout(idx)}><RemoveIcon /></IconButton>
-                    )}
-                  </Stack>
-                </Box>
-              ))}
-            </Stack>
-            <Button startIcon={<AddIcon />} onClick={handleAddAbout} size='small' sx={{ mt: 2 }}>Thêm dòng giới thiệu</Button>
-          </Box>
-
-          {/* Menu */}
-          <Box sx={{ p: 2, borderRadius: 2, bgcolor: '#f8fafc' }}>
-            <Typography variant='subtitle1' sx={{ fontWeight: 700, mb: 1 }}>Menu</Typography>
-            <Stack spacing={2}>
-              {menuColumns.map((m, idx) => (
-                <Box key={idx} sx={{ p: 2, borderRadius: 2, bgcolor: '#fff', boxShadow: '0 1px 4px #e0e7ef33' }}>
-                  <Stack spacing={1}>
-                    <TextField label='Tiêu đề' value={m.title} onChange={e => handleMenuColumnChange(idx, 'title', e.target.value)} size='small' fullWidth error={!!fieldErrors[`menu_title_${idx}`]} helperText={fieldErrors[`menu_title_${idx}`]} />
-                    <TextField label='Phụ đề' value={m.subtitle} onChange={e => handleMenuColumnChange(idx, 'subtitle', e.target.value)} size='small' fullWidth />
-                    <TextField label='Text' value={m.text} onChange={e => handleMenuColumnChange(idx, 'text', e.target.value)} size='small' fullWidth />
-                    <TextField label='Link' value={m.link} onChange={e => handleMenuColumnChange(idx, 'link', e.target.value)} size='small' fullWidth error={!!fieldErrors[`menu_link_${idx}`]} helperText={fieldErrors[`menu_link_${idx}`]} />
-                    <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
-                      {menuColumns.length > 1 && (
-                        <IconButton onClick={() => handleRemoveMenuColumn(idx)}><RemoveIcon /></IconButton>
+                  {logo || logoPreview ? (
+                    <Box sx={{ position: 'relative', display: 'inline-block' }}>
+                      <img
+                        src={logoPreview || logo}
+                        alt='logo preview'
+                        style={{ width: 100, height: 100, objectFit: 'contain', borderRadius: 8, border: '1px solid #e5e7eb', background: '#fff' }}
+                      />
+                      <Tooltip title='Xóa logo'>
+                        <IconButton
+                          onClick={handleRemoveLogo}
+                          sx={{ position: 'absolute', top: -8, right: -8, backgroundColor: '#ef4444', color: 'white', '&:hover': { backgroundColor: '#dc2626' } }}
+                          size='small'
+                        >
+                          <DeleteIcon fontSize='small' />
+                        </IconButton>
+                      </Tooltip>
+                    </Box>
+                  ) : (
+                    <Box
+                      sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', py: 3, cursor: 'pointer' }}
+                      onClick={() => logoInputRef.current?.click()}
+                    >
+                      <CloudUploadIcon sx={{ fontSize: 48, color: '#9ca3af', mb: 2 }} />
+                      <Typography variant='body2' color='text.secondary' sx={{ mb: 1 }}>
+                        {logoUploading ? 'Đang tải lên...' : 'Nhấp để tải logo'}
+                      </Typography>
+                      <Typography variant='caption' color='text.secondary'>
+                        JPG, PNG, WebP (tối đa 5MB)
+                      </Typography>
+                      {logoUploading && (
+                        <CircularProgress size={24} sx={{ mt: 1 }} />
                       )}
                     </Box>
-                  </Stack>
-                </Box>
-              ))}
-            </Stack>
-            <Button startIcon={<AddIcon />} onClick={handleAddMenuColumn} size='small' sx={{ mt: 2 }}>Thêm menu</Button>
-          </Box>
+                  )}
+                  <input
+                    ref={logoInputRef}
+                    type='file'
+                    accept='image/*'
+                    onChange={handleLogoUpload}
+                    style={{ display: 'none' }}
+                  />
+                </Card>
+              </Box>
 
-          {/* Mạng xã hội */}
-          <Box sx={{ p: 2, borderRadius: 2, bgcolor: '#f8fafc' }}>
-            <Typography variant='subtitle1' sx={{ fontWeight: 700, mb: 1 }}>Mạng xã hội</Typography>
-            <Stack spacing={2}>
-              {socialLinks.map((s, idx) => (
-                <Box key={idx} sx={{ p: 2, borderRadius: 2, bgcolor: '#fff', boxShadow: '0 1px 4px #e0e7ef33' }}>
-                  <Stack spacing={1} direction='row' alignItems='center'>
-                    <Box>
-                      <input
-                        accept="image/*,.svg"
-                        style={{ display: 'none' }}
-                        id={`social-icon-uploader-${idx}`}
-                        type="file"
-                        onChange={(e) => handleSocialIconUpload(e, idx)}
-                      />
-                      <label htmlFor={`social-icon-uploader-${idx}`}>
-                        <Button component="span" variant="outlined" disabled={socialIconLoadingIndex === idx} sx={{ minWidth: 40, height: 40, p: 0, borderRadius: '50%' }}>
-                          {socialIconLoadingIndex === idx ? (
-                            <CircularProgress size={20} />
-                          ) : s.image ? (
-                            <img src={s.image} alt="icon" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }} />
-                          ) : (
-                            <AddPhotoAlternate />
-                          )}
-                        </Button>
-                      </label>
+              {/* Giới thiệu */}
+              <Box sx={{ p: 2, borderRadius: 2, bgcolor: '#f8fafc' }}>
+                <Typography variant='subtitle1' sx={{ fontWeight: 700, mb: 1 }}>Giới thiệu</Typography>
+                <Stack spacing={2}>
+                  {about.map((a, idx) => (
+                    <Box key={idx} sx={{ p: 2, borderRadius: 2, bgcolor: '#fff', boxShadow: '0 1px 4px #e0e7ef33' }}>
+                      <Stack spacing={1} direction='row' alignItems='center'>
+                        <TextField label='Số điện thoại' value={a.phone} onChange={e => handleAboutChange(idx, 'phone', e.target.value)} size='small' fullWidth error={!!fieldErrors[`about_phone_${idx}`]} helperText={fieldErrors[`about_phone_${idx}`]} />
+                        <TextField label='Email' value={a.email} onChange={e => handleAboutChange(idx, 'email', e.target.value)} size='small' fullWidth error={!!fieldErrors[`about_email_${idx}`]} helperText={fieldErrors[`about_email_${idx}`]} />
+                        {about.length > 1 && (
+                          <IconButton onClick={() => handleRemoveAbout(idx)}><RemoveIcon /></IconButton>
+                        )}
+                      </Stack>
                     </Box>
-                    <TextField label='Tên mạng xã hội' value={s.name} onChange={e => handleSocialLinkChange(idx, 'name', e.target.value)} size='small' sx={{ minWidth: 120 }} error={!!fieldErrors[`social_name_${idx}`]} helperText={fieldErrors[`social_name_${idx}`]} />
-                    <TextField label='Link' value={s.link} onChange={e => handleSocialLinkChange(idx, 'link', e.target.value)} size='small' fullWidth error={!!fieldErrors[`social_link_${idx}`]} helperText={fieldErrors[`social_link_${idx}`]} />
-                    {socialLinks.length > 1 && (
-                      <IconButton onClick={() => handleRemoveSocialLink(idx)}><RemoveIcon /></IconButton>
-                    )}
-                  </Stack>
-                </Box>
-              ))}
-            </Stack>
-            <Button startIcon={<AddIcon />} onClick={handleAddSocialLink} size='small' sx={{ mt: 2 }}>Thêm mạng xã hội</Button>
-          </Box>
+                  ))}
+                </Stack>
+                <Button startIcon={<AddIcon />} onClick={handleAddAbout} size='small' sx={{ mt: 2 }}>Thêm dòng giới thiệu</Button>
+              </Box>
 
-          {/* Địa chỉ cửa hàng */}
-          <Box sx={{ p: 2, borderRadius: 2, bgcolor: '#f8fafc' }}>
-            <Typography variant='subtitle1' sx={{ fontWeight: 700, mb: 1 }}>Hệ thống cửa hàng</Typography>
-            <Stack spacing={2}>
-              {stores.map((s, idx) => (
-                <Box key={idx} sx={{ p: 2, borderRadius: 2, bgcolor: '#fff', boxShadow: '0 1px 4px #e0e7ef33' }}>
-                  <Stack spacing={1} direction='row' alignItems='center'>
-                    <TextField label='Tên cửa hàng' value={s.name} onChange={e => handleStoreChange(idx, 'name', e.target.value)} size='small' fullWidth error={!!fieldErrors[`store_name_${idx}`]} helperText={fieldErrors[`store_name_${idx}`]} />
-                    <TextField label='Địa chỉ cửa hàng' value={s.address} onChange={e => handleStoreChange(idx, 'address', e.target.value)} size='small' fullWidth error={!!fieldErrors[`store_address_${idx}`]} helperText={fieldErrors[`store_address_${idx}`]} />
-                    {stores.length > 1 && (
-                      <IconButton onClick={() => handleRemoveStore(idx)}><RemoveIcon /></IconButton>
-                    )}
-                  </Stack>
-                </Box>
-              ))}
+              {/* Menu */}
+              <Box sx={{ p: 2, borderRadius: 2, bgcolor: '#f8fafc' }}>
+                <Typography variant='subtitle1' sx={{ fontWeight: 700, mb: 1 }}>Menu</Typography>
+                <Stack spacing={2}>
+                  {menuColumns.map((m, idx) => (
+                    <Box key={idx} sx={{ p: 2, borderRadius: 2, bgcolor: '#fff', boxShadow: '0 1px 4px #e0e7ef33' }}>
+                      <Stack spacing={1}>
+                        <TextField label='Tiêu đề' value={m.title} onChange={e => handleMenuColumnChange(idx, 'title', e.target.value)} size='small' fullWidth error={!!fieldErrors[`menu_title_${idx}`]} helperText={fieldErrors[`menu_title_${idx}`]} />
+                        <TextField label='Phụ đề' value={m.subtitle} onChange={e => handleMenuColumnChange(idx, 'subtitle', e.target.value)} size='small' fullWidth />
+                        <TextField label='Text' value={m.text} onChange={e => handleMenuColumnChange(idx, 'text', e.target.value)} size='small' fullWidth />
+                        <TextField label='Link' value={m.link} onChange={e => handleMenuColumnChange(idx, 'link', e.target.value)} size='small' fullWidth error={!!fieldErrors[`menu_link_${idx}`]} helperText={fieldErrors[`menu_link_${idx}`]} />
+                        <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+                          {menuColumns.length > 1 && (
+                            <IconButton onClick={() => handleRemoveMenuColumn(idx)}><RemoveIcon /></IconButton>
+                          )}
+                        </Box>
+                      </Stack>
+                    </Box>
+                  ))}
+                </Stack>
+                <Button startIcon={<AddIcon />} onClick={handleAddMenuColumn} size='small' sx={{ mt: 2 }}>Thêm menu</Button>
+              </Box>
+
+              {/* Mạng xã hội */}
+              <Box sx={{ p: 2, borderRadius: 2, bgcolor: '#f8fafc' }}>
+                <Typography variant='subtitle1' sx={{ fontWeight: 700, mb: 1 }}>Mạng xã hội</Typography>
+                <Stack spacing={2}>
+                  {socialLinks.map((s, idx) => (
+                    <Box key={idx} sx={{ p: 2, borderRadius: 2, bgcolor: '#fff', boxShadow: '0 1px 4px #e0e7ef33' }}>
+                      <Stack spacing={1} direction='row' alignItems='center'>
+                        <Box>
+                          <input
+                            accept="image/*,.svg"
+                            style={{ display: 'none' }}
+                            id={`social-icon-uploader-${idx}`}
+                            type="file"
+                            onChange={(e) => handleSocialIconUpload(e, idx)}
+                          />
+                          <label htmlFor={`social-icon-uploader-${idx}`}>
+                            <Button component="span" variant="outlined" disabled={socialIconLoadingIndex === idx} sx={{ minWidth: 40, height: 40, p: 0, borderRadius: '50%' }}>
+                              {socialIconLoadingIndex === idx ? (
+                                <CircularProgress size={20} />
+                              ) : s.image ? (
+                                <img src={s.image} alt="icon" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }} />
+                              ) : (
+                                <AddPhotoAlternate />
+                              )}
+                            </Button>
+                          </label>
+                        </Box>
+                        <TextField label='Tên mạng xã hội' value={s.name} onChange={e => handleSocialLinkChange(idx, 'name', e.target.value)} size='small' sx={{ minWidth: 120 }} error={!!fieldErrors[`social_name_${idx}`]} helperText={fieldErrors[`social_name_${idx}`]} />
+                        <TextField label='Link' value={s.link} onChange={e => handleSocialLinkChange(idx, 'link', e.target.value)} size='small' fullWidth error={!!fieldErrors[`social_link_${idx}`]} helperText={fieldErrors[`social_link_${idx}`]} />
+                        {socialLinks.length > 1 && (
+                          <IconButton onClick={() => handleRemoveSocialLink(idx)}><RemoveIcon /></IconButton>
+                        )}
+                      </Stack>
+                    </Box>
+                  ))}
+                </Stack>
+                <Button startIcon={<AddIcon />} onClick={handleAddSocialLink} size='small' sx={{ mt: 2 }}>Thêm mạng xã hội</Button>
+              </Box>
+
+              {/* Địa chỉ cửa hàng */}
+              <Box sx={{ p: 2, borderRadius: 2, bgcolor: '#f8fafc' }}>
+                <Typography variant='subtitle1' sx={{ fontWeight: 700, mb: 1 }}>Hệ thống cửa hàng</Typography>
+                <Stack spacing={2}>
+                  {stores.map((s, idx) => (
+                    <Box key={idx} sx={{ p: 2, borderRadius: 2, bgcolor: '#fff', boxShadow: '0 1px 4px #e0e7ef33' }}>
+                      <Stack spacing={1} direction='row' alignItems='center'>
+                        <TextField label='Tên cửa hàng' value={s.name} onChange={e => handleStoreChange(idx, 'name', e.target.value)} size='small' fullWidth error={!!fieldErrors[`store_name_${idx}`]} helperText={fieldErrors[`store_name_${idx}`]} />
+                        <TextField label='Địa chỉ cửa hàng' value={s.address} onChange={e => handleStoreChange(idx, 'address', e.target.value)} size='small' fullWidth error={!!fieldErrors[`store_address_${idx}`]} helperText={fieldErrors[`store_address_${idx}`]} />
+                        {stores.length > 1 && (
+                          <IconButton onClick={() => handleRemoveStore(idx)}><RemoveIcon /></IconButton>
+                        )}
+                      </Stack>
+                    </Box>
+                  ))}
+                </Stack>
+                <Button startIcon={<AddIcon />} onClick={handleAddStore} size='small' sx={{ mt: 2 }}>Thêm địa chỉ cửa hàng</Button>
+              </Box>
             </Stack>
-            <Button startIcon={<AddIcon />} onClick={handleAddStore} size='small' sx={{ mt: 2 }}>Thêm địa chỉ cửa hàng</Button>
           </Box>
-        </Stack>
+        )}
+
+        {activeTab === 1 && (
+          <Box sx={{ p: 3 }}>
+            <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
+              Xem trước Footer
+            </Typography>
+            <FooterPreview 
+              logo={logo || logoPreview}
+              about={about}
+              menuColumns={menuColumns}
+              socialLinks={socialLinks}
+              stores={stores}
+            />
+            <Box sx={{ mt: 2, p: 2, bgcolor: '#f8fafc', borderRadius: 2 }}>
+              <Typography variant="body2" color="text.secondary">
+                💡 <strong>Mẹo:</strong> Chuyển về tab "Chỉnh sửa" để thay đổi nội dung và xem kết quả ngay tại đây
+              </Typography>
+            </Box>
+          </Box>
+        )}
       </DialogContent>
       <DialogActions>
         <Button onClick={handleClose} disabled={loading}>Hủy</Button>

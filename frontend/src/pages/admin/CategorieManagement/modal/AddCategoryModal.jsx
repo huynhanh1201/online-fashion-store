@@ -42,7 +42,6 @@ const AddCategoryModal = ({
   open,
   onClose,
   onAdded,
-  categories = [],
   onSave
 }) => {
   const {
