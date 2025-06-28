@@ -22,6 +22,9 @@ Router.route('/').get(categoriesController.getCategoryList)
 // Lấy thông tin một Danh mục sản phẩm theo slug
 Router.route('/slug/:slug').get(categoriesController.getCategoryBySlug)
 
+// Lấy danh sách danh mục con của một danh mục cha
+Router.route('/:parentId/children').get(categoriesController.getChildCategories)
+
 // Lấy thông tin một Danh mục sản phẩm.
 Router.route('/:categoryId').get(
   categoriesValidation.verifyId,

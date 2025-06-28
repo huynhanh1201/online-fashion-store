@@ -196,11 +196,26 @@ const deleteCategory = async (categoryId) => {
   }
 }
 
+const getChildCategories = async (parentId) => {
+  // eslint-disable-next-line no-useless-catch
+  try {
+    const childCategories = await CategoryModel.find({
+      parent: parentId,
+      destroy: false
+    }).lean()
+
+    return childCategories
+  } catch (err) {
+    throw err
+  }
+}
+
 export const categoriesService = {
   createCategory,
   getCategoryList,
   getCategory,
   getCategoryBySlug,
   updateCategory,
-  deleteCategory
+  deleteCategory,
+  getChildCategories
 }

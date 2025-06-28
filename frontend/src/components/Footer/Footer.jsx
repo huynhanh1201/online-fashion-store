@@ -42,7 +42,13 @@ function Footer() {
 
   return (
     <Box
-      sx={{ bgcolor: '#002f6c', color: 'white', pt: 6, pb: 3, fontSize: 14 }}
+      sx={{ 
+        bgcolor: 'var(--primary-color)', 
+        color: 'white', 
+        pt: 6, 
+        pb: 3, 
+        fontSize: 14 
+      }}
     >
       <Container maxWidth='1450px'>
         <Box
@@ -81,7 +87,18 @@ function Footer() {
                 fullWidth
                 sx={{ bgcolor: 'white', borderRadius: '4px', '& input': { fontSize: 15 } }}
               />
-              <Button size='small' sx={{ bgcolor: '#1a3c7b', color: 'white', width: '100px' }} variant='contained'>
+              <Button 
+                size='small' 
+                sx={{ 
+                  bgcolor: 'var(--accent-color)', 
+                  color: 'white', 
+                  width: '100px',
+                  '&:hover': {
+                    bgcolor: 'var(--primary-color)'
+                  }
+                }} 
+                variant='contained'
+              >
                 ĐĂNG KÝ
               </Button>
             </Box>

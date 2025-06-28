@@ -4,7 +4,7 @@ a {
 }
 
 :root {
-    --bg-color: #001f5d;
+    --bg-color: var(--primary-color);
 }
 
 .admin-layout {

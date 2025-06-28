@@ -20,8 +20,8 @@ import Menu from './Navbar/Menu/Menu'
 import AuthButtons from './Navbar/AuthButtons/AuthButtons'
 
 const StyledAppBar = styled(AppBar)(({ theme }) => ({
-  background: 'linear-gradient(90deg, #ffffff 0%, #f8f9fa 100%)',
-  color: '#000',
+  background: 'linear-gradient(90deg, var(--background-color) 0%, var(--surface-color) 100%)',
+  color: 'var(--text-color)',
   top: 40,
   position: 'fixed',
   zIndex: 1301,

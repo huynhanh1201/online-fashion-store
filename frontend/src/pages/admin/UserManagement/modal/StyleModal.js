@@ -6,19 +6,19 @@ export const modalPaperProps = {
 }
 
 export const dialogTitleStyle = {
-  color: '#001f5d',
+  color: 'var(--primary-color)',
   fontWeight: 600,
   fontSize: '20px'
 }
 
 export const dialogButtonStyle = {
-  backgroundColor: '#001f5d',
+  backgroundColor: 'var(--primary-color)',
   color: 'white',
   '&:hover': {
-    backgroundColor: '#003377'
+    backgroundColor: 'var(--accent-color)'
   }
 }
 
 export const cancelButtonStyle = {
-  color: '#001f5d'
+  color: 'var(--primary-color)'
 }

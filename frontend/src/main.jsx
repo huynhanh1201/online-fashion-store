@@ -1,7 +1,5 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
-import CssBaseline from '@mui/material/CssBaseline'
-import { ThemeProvider } from '@mui/material/styles'
 import { Provider } from 'react-redux'
 import { BrowserRouter } from 'react-router-dom'
 import { ToastContainer } from 'react-toastify'
@@ -11,8 +9,11 @@ import { PersistGate } from 'redux-persist/integration/react'
 import { persistStore } from 'redux-persist'
 
 import App from './App.jsx'
-import theme from './theme.js'
+import CustomThemeProvider from './components/ThemeProvider'
 import { store } from '~/redux/store'
+
+// Import global theme styles
+import './assets/global-theme.css'
 
 // Cấu hình Redux-Persit
 const persistor = persistStore(store)
@@ -26,11 +27,10 @@ createRoot(document.getElementById('root')).render(
   <BrowserRouter basename='/'>
     <Provider store={store}>
       <PersistGate persistor={persistor}>
-        <ThemeProvider theme={theme}>
-          <CssBaseline />
+        <CustomThemeProvider>
           <App />
           <ToastContainer theme='colored' />
-        </ThemeProvider>
+        </CustomThemeProvider>
       </PersistGate>
     </Provider>
   </BrowserRouter>

@@ -75,11 +75,24 @@ const deleteCategory = async (req, res, next) => {
   }
 }
 
+const getChildCategories = async (req, res, next) => {
+  try {
+    const parentId = req.params.parentId
+
+    const result = await categoriesService.getChildCategories(parentId)
+
+    res.status(StatusCodes.OK).json(result)
+  } catch (err) {
+    next(err)
+  }
+}
+
 export const categoriesController = {
   createCategory,
   getCategoryList,
   getCategory,
   getCategoryBySlug,
   updateCategory,
-  deleteCategory
+  deleteCategory,
+  getChildCategories
 }

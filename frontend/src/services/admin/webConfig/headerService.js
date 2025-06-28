@@ -203,9 +203,10 @@ export const validateMenuContent = (content) => {
         if (!item.label?.trim()) {
           errors.push(`Menu item ${index + 1} thiếu label`)
         }
-        if (!item.url?.trim()) {
-          errors.push(`Menu item ${index + 1} thiếu URL`)
-        }
+        // URL is optional for main menu items (they can be just titles)
+        // if (!item.url?.trim()) {
+        //   errors.push(`Menu item ${index + 1} thiếu URL`)
+        // }
         if (item.children && !Array.isArray(item.children)) {
           errors.push(`Submenu của item ${index + 1} phải là một mảng`)
         }
@@ -233,9 +234,10 @@ export const validateMenuContent = (content) => {
         if (!item.label?.trim()) {
           errors.push(`Mobile menu item ${index + 1} thiếu label`)
         }
-        if (!item.url?.trim()) {
-          errors.push(`Mobile menu item ${index + 1} thiếu URL`)
-        }
+        // URL is optional for mobile menu items
+        // if (!item.url?.trim()) {
+        //   errors.push(`Mobile menu item ${index + 1} thiếu URL`)
+        // }
       })
     }
   }
@@ -249,9 +251,10 @@ export const validateMenuContent = (content) => {
         if (!item.label?.trim()) {
           errors.push(`Footer menu item ${index + 1} thiếu label`)
         }
-        if (!item.url?.trim()) {
-          errors.push(`Footer menu item ${index + 1} thiếu URL`)
-        }
+        // URL is optional for footer menu items
+        // if (!item.url?.trim()) {
+        //   errors.push(`Footer menu item ${index + 1} thiếu URL`)
+        // }
       })
     }
   }
@@ -262,138 +265,9 @@ export const validateMenuContent = (content) => {
 // Helper function to get default menu structure
 export const getDefaultMenuStructure = () => {
   return {
-    mainMenu: [
-      {
-        label: 'Trang chủ',
-        url: '/',
-        icon: 'home',
-        visible: true,
-        order: 1
-      },
-      {
-        label: 'Sản phẩm',
-        url: '/products',
-        icon: 'shopping-bag',
-        visible: true,
-        order: 2,
-        children: [
-          {
-            label: 'Tất cả sản phẩm',
-            url: '/products',
-            visible: true,
-            order: 1
-          },
-          {
-            label: 'Sản phẩm mới',
-            url: '/new-products',
-            visible: true,
-            order: 2
-          },
-          {
-            label: 'Sản phẩm bán chạy',
-            url: '/best-selling',
-            visible: true,
-            order: 3
-          },
-          {
-            label: 'Sản phẩm giảm giá',
-            url: '/discounted',
-            visible: true,
-            order: 4
-          }
-        ]
-      },
-      {
-        label: 'Danh mục',
-        url: '/categories',
-        icon: 'grid',
-        visible: true,
-        order: 3,
-        children: [
-          {
-            label: 'Thời trang nam',
-            url: '/category/men',
-            visible: true,
-            order: 1
-          },
-          {
-            label: 'Thời trang nữ',
-            url: '/category/women',
-            visible: true,
-            order: 2
-          },
-          {
-            label: 'Thời trang trẻ em',
-            url: '/category/kids',
-            visible: true,
-            order: 3
-          }
-        ]
-      },
-      {
-        label: 'Liên hệ',
-        url: '/contact',
-        icon: 'phone',
-        visible: true,
-        order: 4
-      }
-    ],
-    mobileMenu: [
-      {
-        label: 'Trang chủ',
-        url: '/',
-        icon: 'home',
-        visible: true,
-        order: 1
-      },
-      {
-        label: 'Sản phẩm',
-        url: '/products',
-        icon: 'shopping-bag',
-        visible: true,
-        order: 2
-      },
-      {
-        label: 'Giỏ hàng',
-        url: '/cart',
-        icon: 'shopping-cart',
-        visible: true,
-        order: 3
-      },
-      {
-        label: 'Tài khoản',
-        url: '/profile',
-        icon: 'user',
-        visible: true,
-        order: 4
-      }
-    ],
-    footerMenu: [
-      {
-        label: 'Về chúng tôi',
-        url: '/about',
-        visible: true,
-        order: 1
-      },
-      {
-        label: 'Chính sách',
-        url: '/policy',
-        visible: true,
-        order: 2
-      },
-      {
-        label: 'Điều khoản',
-        url: '/terms',
-        visible: true,
-        order: 3
-      },
-      {
-        label: 'Liên hệ',
-        url: '/contact',
-        visible: true,
-        order: 4
-      }
-    ],
+    mainMenu: [],
+    mobileMenu: [],
+    footerMenu: [],
     settings: {
       showSearch: true,
       showCart: true,
@@ -403,7 +277,7 @@ export const getDefaultMenuStructure = () => {
       megamenuSettings: {
         maxColumns: 4,
         columnWidth: 'auto',
-        showIcons: true,
+        showIcons: false,
         animationDuration: 350
       }
     }

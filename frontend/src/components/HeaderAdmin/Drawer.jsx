@@ -77,18 +77,18 @@ export default function AdminDrawer({
     '&.Mui-selected': {
       backgroundColor: 'transparent',
       '& .MuiListItemIcon-root': {
-        color: '#001f5d'
+        color: 'var(--primary-color)'
       },
       '& .MuiListItemText-primary': {
-        color: '#001f5d',
+        color: 'var(--primary-color)',
         fontWeight: 700
       }
     },
     '&.Mui-selected:hover': {
-      backgroundColor: '#bbdefb'
+      backgroundColor: 'var(--primary-color)20'
     },
     '&.MuiListItemButton-root:hover': {
-      backgroundColor: '#bbdefb'
+      backgroundColor: 'var(--primary-color)20'
     }
   }
 
@@ -170,6 +170,11 @@ export default function AdminDrawer({
             permission: 'user:use',
             label: 'dịch vụ nổi bậc',
             path: '/admin/service-highlight-management'
+          },
+          {
+            permission: 'user:use',
+            label: 'Quản lý Theme',
+            path: '/admin/theme-management'
           },
           {
             permission: 'user:use',
