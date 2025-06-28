@@ -28,7 +28,8 @@ import {
 import {
   getHeaderConfig,
   updateHeaderConfig,
-  validateHeaderContent
+  validateHeaderContent,
+  saveHeaderConfig
 } from '~/services/admin/webConfig/headerService.js'
 import { URI, CLOUD_FOLDER } from '~/utils/constants.js'
 import { optimizeCloudinaryUrl } from '~/utils/cloudinary.js'
@@ -85,9 +86,22 @@ const AddHeader = ({ open, onClose, onSuccess }) => {
       if (header?.content) {
         setForm(header.content)
         setLogoPreview(header.content.logo?.imageUrl || '')
+      } else {
+        // Initialize with default structure if no header config exists
+        setForm({
+          logo: { imageUrl: '', alt: '' },
+          topBanner: []
+        })
+        setLogoPreview('')
       }
     } catch (error) {
       setError(error.message)
+      // Initialize with default structure on error
+      setForm({
+        logo: { imageUrl: '', alt: '' },
+        topBanner: []
+      })
+      setLogoPreview('')
     } finally {
       setFetching(false)
     }
@@ -204,9 +218,9 @@ const AddHeader = ({ open, onClose, onSuccess }) => {
         return
       }
 
-      const result = await updateHeaderConfig(form)
+      const result = await saveHeaderConfig(form)
       if (result) {
-        setSuccess('Cập nhật cấu hình header thành công!')
+        setSuccess('Lưu cấu hình header thành công!')
         if (onSuccess) onSuccess(result)
         setTimeout(() => {
           onClose()
@@ -244,7 +258,7 @@ const AddHeader = ({ open, onClose, onSuccess }) => {
           color: '#1e293b'
         }}
       >
-        Cấu hình Header
+        Cấu hình Header Website
       </DialogTitle>
       
       <DialogContent 
@@ -422,12 +436,14 @@ const AddHeader = ({ open, onClose, onSuccess }) => {
 
                 {/* Logo Alt Text */}
                 <TextField
-                  label='Logo alt text *'
+                  label={form.logo.imageUrl ? 'Logo alt text *' : 'Logo alt text (tùy chọn)'}
                   value={form.logo.alt}
                   fullWidth
-                  required
+                  required={!!form.logo.imageUrl}
                   error={validationErrors.some(err => err.includes('Logo alt'))}
                   onChange={(e) => handleLogoAltChange(e.target.value)}
+                  disabled={!form.logo.imageUrl}
+                  helperText={!form.logo.imageUrl ? 'Vui lòng upload logo trước khi nhập alt text' : ''}
                   sx={{
                     '& .MuiOutlinedInput-root': {
                       borderRadius: 2,
@@ -619,7 +635,7 @@ const AddHeader = ({ open, onClose, onSuccess }) => {
             }
           }}
         >
-          {loading ? 'Đang lưu...' : 'Lưu'}
+          {loading ? 'Đang lưu...' : 'Lưu cấu hình'}
         </Button>
       </DialogActions>
     </Dialog>

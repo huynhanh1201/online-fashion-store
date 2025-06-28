@@ -491,24 +491,26 @@ const Menu = ({ headerRef }) => {
           sx={{
             position: 'absolute',
             top: '100%',
-            left: '50%',
+            left: '55%',
             transform: productMenuOpen
               ? 'translateX(-50%) scaleY(1)'
               : 'translateX(-50%) scaleY(0)',
             transformOrigin: 'top',
-            width: '95vw',
-            maxWidth: '2000px',
+            width: '90vw',
+            maxWidth: '90vw',
             borderRadius: '0 0 8px 8px',
             boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.1)',
             p: productMenuOpen ? 4 : 0,
-            zIndex: 1400,
+            zIndex: 1200,
             backgroundColor: 'white',
             display: 'flex',
             justifyContent: 'center',
             overflow: 'hidden',
             transition: 'transform 0.35s ease, padding 0.2s ease, opacity 0.35s ease',
             opacity: productMenuOpen ? 1 : 0,
-            pointerEvents: productMenuOpen ? 'auto' : 'none'
+            pointerEvents: productMenuOpen ? 'auto' : 'none',
+            mx: 'auto',
+            mt:1
           }}
           onMouseEnter={handleDrawerEnter}
           onMouseLeave={handleDrawerLeave}
@@ -521,10 +523,10 @@ const Menu = ({ headerRef }) => {
                 getMegaMenuColumns(categories).length}, 1fr)`,
               gap: 6,
               width: '100%',
-              maxWidth: 2000,
+              maxWidth: '95vw',
               opacity: productMenuOpen ? 1 : 0,
               transition: 'opacity 0.35s ease',
-              alignItems: 'center',
+
               justifyItems: 'center',
             }}
           >
