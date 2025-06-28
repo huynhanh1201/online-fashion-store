@@ -27,6 +27,21 @@ const ProductCard = ({ product, isFlashSale = false }) => {
     return name.length > 17 ? name.substring(0, 20) + '...' : name
   }
 
+  // Calculate price based on product export price and first variant's discount price
+  const calculateDisplayPrice = () => {
+    const originalPrice = product?.exportPrice || 0
+    const firstVariantDiscount = product?.firstVariantDiscountPrice || 0
+    const displayPrice = Math.max(0, originalPrice - firstVariantDiscount)
+    
+    return {
+      price: originalPrice,
+      discountPrice: displayPrice,
+      originalDiscountPrice: firstVariantDiscount
+    }
+  }
+
+  const priceInfo = calculateDisplayPrice()
+
   return (
     <Link
       to={`/productdetail/${product._id}`}
@@ -67,8 +82,8 @@ const ProductCard = ({ product, isFlashSale = false }) => {
             }}
             loading="lazy"
           />
-          {product.discount > 0 && (
-            <div style={styles.discountBadge}>-{product.discount}%</div>
+          {priceInfo.originalDiscountPrice > 0 && (
+            <div style={styles.discountBadge}>-{Math.round((priceInfo.originalDiscountPrice / priceInfo.price) * 100)}%</div>
           )}
         </div>
         <div style={styles.productInfo}>
@@ -85,6 +100,15 @@ const ProductCard = ({ product, isFlashSale = false }) => {
                   {product.exportPrice.toLocaleString('vi-VN')} ₫
                 </span>
                 <span style={styles.flashSaleBadge}>Flash Sale</span>
+              </>
+            ) : priceInfo.originalDiscountPrice > 0 ? (
+              <>
+                <span style={styles.currentPrice}>
+                  {priceInfo.discountPrice.toLocaleString()}₫
+                </span>
+                <span style={styles.originalPrice}>
+                  {priceInfo.price.toLocaleString()}₫
+                </span>
               </>
             ) : (
               <span style={styles.currentPrice}>
@@ -142,6 +166,18 @@ const styles = {
     height: '100%',
     objectFit: 'cover',
     transition: 'transform 0.3s ease'
+  },
+  discountBadge: {
+    position: 'absolute',
+    top: '10px',
+    right: '10px',
+    background: '#ff6b6b',
+    color: 'white',
+    padding: '4px 8px',
+    borderRadius: '4px',
+    fontSize: '12px',
+    fontWeight: 'bold',
+    zIndex: 10
   },
   overlay: {
     position: 'absolute',

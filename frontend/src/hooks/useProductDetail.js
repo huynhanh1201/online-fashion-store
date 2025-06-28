@@ -222,14 +222,15 @@ const useProductDetail = (productId) => {
       }
     }
     
+    // When no variant is selected, use product's default price minus first variant's discount price
     const originalPrice = product?.exportPrice || 0
-    const discountAmount = product?.discountPrice || 0
-    const displayPrice = Math.max(0, originalPrice - discountAmount)
+    const firstVariantDiscount = variants?.length > 0 ? (variants[0]?.discountPrice || 0) : 0
+    const displayPrice = Math.max(0, originalPrice - firstVariantDiscount)
     
     return {
       price: originalPrice,
       discountPrice: displayPrice,
-      originalDiscountPrice: discountAmount
+      originalDiscountPrice: firstVariantDiscount
     }
   }
 

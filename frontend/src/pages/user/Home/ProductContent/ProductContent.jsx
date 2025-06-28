@@ -3,9 +3,10 @@ import HeaderCategories from './HeaderCategories'
 import ProductSection from './ProductSection'
 import CollectionBanner from './CollectionBanner'
 import ComboSection from './ComboSection'
-import { getCategories } from '~/services/categoryService'
+import { getCategories, getChildCategories } from '~/services/categoryService'
 import { getProductsByCategory } from '~/services/productService'
 import { useNavigate } from 'react-router-dom'
+import { Box } from '@mui/material'
 
 const ProductContent = () => {
   const [categories, setCategories] = useState([])
@@ -15,6 +16,7 @@ const ProductContent = () => {
   const [loadingProducts, setLoadingProducts] = useState([])
   const [errorCategories, setErrorCategories] = useState(null)
   const [errorProducts, setErrorProducts] = useState([])
+  const [categoryHasProducts, setCategoryHasProducts] = useState({}) // Track which categories have products
   const navigate = useNavigate()
 
   // Chia categories thành các nhóm 3 (sections)
@@ -32,16 +34,42 @@ const ProductContent = () => {
         setErrorCategories(null)
         const response = await getCategories(1, 1000)
         const fetchedCategories = response.categories?.data || []
+        console.log('Fetched categories:', fetchedCategories)
+        
         if (!Array.isArray(fetchedCategories) || fetchedCategories.length === 0) {
           throw new Error('Không có danh mục nào được tải')
         }
-        setCategories(fetchedCategories)
+        
+        // Lọc ra chỉ danh mục con (có parent)
+        const childCategories = fetchedCategories.filter(cat => cat.parent !== null)
+        console.log('Child categories:', childCategories)
+        
+        // Kiểm tra từng danh mục con xem có sản phẩm không
+        const validChildCategories = []
+        for (const childCat of childCategories) {
+          try {
+            const response = await getProductsByCategory(childCat._id, 1, 1) // Chỉ lấy 1 sản phẩm để kiểm tra
+            if (response && response.products && response.products.length > 0) {
+              console.log(`Category ${childCat.name} has products`)
+              validChildCategories.push(childCat)
+            } else {
+              console.log(`Category ${childCat.name} has no products`)
+            }
+          } catch (err) {
+            console.error(`Error checking products for ${childCat.name}:`, err)
+          }
+        }
+        
+        console.log('Valid child categories (with products):', validChildCategories)
+        setCategories(validChildCategories)
+        
         // Khởi tạo state cho từng section
         const newSections = []
-        for (let i = 0; i < fetchedCategories.length; i += categoriesPerSection) {
-          const group = fetchedCategories.slice(i, i + categoriesPerSection)
+        for (let i = 0; i < validChildCategories.length; i += categoriesPerSection) {
+          const group = validChildCategories.slice(i, i + categoriesPerSection)
           newSections.push(group)
         }
+        console.log('Created sections:', newSections)
         setSectionActiveIds(newSections.map(group => group[0]?._id || null))
         setSectionProducts(newSections.map(() => []))
         setLoadingProducts(newSections.map(() => false))
@@ -70,15 +98,32 @@ const ProductContent = () => {
         arr[idx] = null
         return arr
       })
-      getProductsByCategory(categoryId, 1, 20)
-        .then(response => {
+      
+      // Load products for category
+      const loadProductsForCategory = async () => {
+        try {
+          console.log(`Loading products for category: ${categoryId}`)
+          
+          // Chỉ load sản phẩm từ danh mục hiện tại (đã là danh mục con có sản phẩm)
+          const response = await getProductsByCategory(categoryId, 1, 20)
+          const products = response && response.products ? response.products : []
+          
+          console.log(`Found ${products.length} products in category ${categoryId}`)
+          
           setSectionProducts(prev => {
             const arr = [...prev]
-            arr[idx] = response && response.products ? response.products : []
+            arr[idx] = products
             return arr
           })
-        })
-        .catch(err => {
+          
+          // Update categoryHasProducts state
+          setCategoryHasProducts(prev => ({
+            ...prev,
+            [categoryId]: products.length > 0
+          }))
+          
+        } catch (err) {
+          console.error(`Error in loadProductsForCategory for ${categoryId}:`, err)
           setErrorProducts(prev => {
             const arr = [...prev]
             arr[idx] = err.message || 'Lỗi khi tải sản phẩm'
@@ -89,14 +134,20 @@ const ProductContent = () => {
             arr[idx] = []
             return arr
           })
-        })
-        .finally(() => {
+          setCategoryHasProducts(prev => ({
+            ...prev,
+            [categoryId]: false
+          }))
+        } finally {
           setLoadingProducts(prev => {
             const arr = [...prev]
             arr[idx] = false
             return arr
           })
-        })
+        }
+      }
+      
+      loadProductsForCategory()
     })
     // eslint-disable-next-line
   }, [JSON.stringify(sectionActiveIds), sections.length])
@@ -123,11 +174,7 @@ const ProductContent = () => {
         const activeCategory = group.find(c => c._id === sectionActiveIds[idx]) || group[0] || {}
         const hasProducts = sectionProducts[idx] && sectionProducts[idx].length > 0;
         
-        // Ẩn cả section nếu không có sản phẩm
-        if (!hasProducts && !loadingProducts[idx]) {
-          return null;
-        }
-        
+        // Tất cả danh mục trong group đều là danh mục con có sản phẩm, nên luôn hiển thị
         return (
           <div key={idx} style={{ marginBottom: 40 }}>
             <HeaderCategories
@@ -136,7 +183,7 @@ const ProductContent = () => {
               onCategoryChange={categoryId => handleCategoryChange(idx, categoryId)}
             />
             <ProductSection
-              bannerImg={activeCategory.bannerImg || activeCategory.image || ''}
+              bannerImg={activeCategory.image || 'https://placehold.co/500x440?text=No+Category+Image'}
               bannerTitle={activeCategory.name || ''}
               bannerDesc={activeCategory.description || 'Bộ sưu tập hot'}
               products={sectionProducts[idx]}
@@ -144,22 +191,40 @@ const ProductContent = () => {
               error={errorProducts[idx]}
             />
             {hasProducts && (
-              <div style={{ display: 'flex', justifyContent: 'center', marginTop: 16 }}>
-                <button
-                  className='view-all-btn'
-                  onMouseEnter={(e) => {
-                    e.target.style.backgroundColor = '#1f2937'
-                    e.target.style.color = 'white'
-                  }}
-                  onMouseLeave={(e) => {
-                    e.target.style.backgroundColor = 'transparent'
-                    e.target.style.color = '#1f2937'
+              <Box
+                sx={{
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  mt: { xs: 4, sm: 5, md: 6 }
+                }}
+              >
+                <Box
+                  component="button"
+                  sx={{
+                    border: 1,
+                    borderColor: 'grey.800',
+                    color: 'grey.800',
+                    bgcolor: 'transparent',
+                    px: { xs: 2.5, sm: 3.5 },
+                    py: { xs: 1, sm: 1.25 },
+                    borderRadius: '50px',
+                    typography: 'body2',
+                    cursor: 'pointer',
+                    transition: 'all 0.3s ease',
+                    fontWeight: 500,
+                    '&:hover': {
+                      bgcolor: 'grey.800',
+                      color: 'common.white',
+                      transform: 'translateY(-1px)',
+                      boxShadow: (theme) => theme.shadows[4]
+                    }
                   }}
                   onClick={() => navigate(`/productbycategory/${activeCategory._id}`)}
                 >
                   Xem tất cả ›
-                </button>
-              </div>
+                </Box>
+              </Box>
             )}
           </div>
         )

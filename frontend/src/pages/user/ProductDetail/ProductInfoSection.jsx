@@ -16,7 +16,7 @@ import { optimizeCloudinaryUrl } from '~/utils/cloudinary'
 import SizeGuide from './SizeGuide/SizeGuide.jsx'
 
 const PriceTypography = styled(Typography)({
-  color: '#d32f2f',
+  color: 'var(--error-color)',
   fontWeight: 700
 })
 
@@ -31,14 +31,14 @@ const VariantBox = styled(Box)(({ selected }) => ({
   display: 'flex',
   alignItems: 'center',
   padding: '8px 12px',
-  backgroundColor: selected ? '#e3f2fd' : '#f9f9f9',
-  border: selected ? '1px solid #1A3C7B' : '1px solid #e0e0e0',
+  backgroundColor: selected ? 'var(--primary-color)20' : '#f9f9f9',
+  border: selected ? `1px solid var(--primary-color)` : '1px solid #e0e0e0',
   borderRadius: '8px',
   cursor: 'pointer',
   gap: 10,
   '&:hover': {
-    backgroundColor: selected ? '#e3f2fd' : '#f0f0f0',
-    borderColor: selected ? '#1A3C7B' : '#bdbdbd'
+    backgroundColor: selected ? 'var(--primary-color)20' : '#f0f0f0',
+    borderColor: selected ? 'var(--primary-color)' : '#bdbdbd'
   }
 }))
 
@@ -329,7 +329,15 @@ const ProductInfoSection = ({
               0)
           }
           onClick={() => handleAddToCart(product._id)}
-          sx={{ backgroundColor: '#1A3C7B', color: 'white', flex: 1, py: 1 }}
+          sx={{ 
+            backgroundColor: 'var(--primary-color)', 
+            color: 'white', 
+            flex: 1, 
+            py: 1,
+            '&:hover': {
+              backgroundColor: 'var(--accent-color)'
+            }
+          }}
           startIcon={
             isAdding ? <CircularProgress size={18} color='inherit' /> : null
           }
@@ -340,7 +348,16 @@ const ProductInfoSection = ({
         <Button
           variant='outlined'
           onClick={handleBuyNow}
-          sx={{ borderColor: '#1A3C7B', color: '#1A3C7B', flex: 1, py: 1 }}
+          sx={{ 
+            borderColor: 'var(--primary-color)', 
+            color: 'var(--primary-color)', 
+            flex: 1, 
+            py: 1,
+            '&:hover': {
+              backgroundColor: 'var(--primary-color)',
+              color: 'white'
+            }
+          }}
         >
           Mua ngay
         </Button>

@@ -18,7 +18,7 @@ import { useTheme } from '@mui/material/styles'
 import { ChevronLeft, ChevronRight } from '@mui/icons-material'
 
 const StyledButton = styled(Button)(({ theme, active }) => ({
-  color: '#000',
+  color: 'var(--text-color)',
   fontWeight: 450,
   padding: '8px 16px',
   borderRadius: '10px',
@@ -31,7 +31,7 @@ const StyledButton = styled(Button)(({ theme, active }) => ({
     left: 0,
     width: active ? '100%' : 0,
     height: '2px',
-    backgroundColor: '#1A3C7B',
+    backgroundColor: 'var(--primary-color)',
     transition: 'width 0.3s ease'
   },
   '&:hover::after': {
@@ -65,7 +65,8 @@ const Menu = ({ headerRef }) => {
   const [isCategoryMenuHovered, setIsCategoryMenuHovered] = useState(false)
   const [currentRow, setCurrentRow] = useState(0)
   const [prevRow, setPrevRow] = useState(0)
-  const [slideDirection, setSlideDirection] = useState('up')
+  const [slideDirection, setSlideDirection] = useState('left')
+  const [isInitialized, setIsInitialized] = useState(false)
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('md'))
   const timeoutRef = useRef(null)
@@ -93,6 +94,14 @@ const Menu = ({ headerRef }) => {
       }
     }
     fetchData()
+  }, [])
+
+  // Set initialized after component mounts to prevent initial animation
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsInitialized(true)
+    }, 100)
+    return () => clearTimeout(timer)
   }, [])
 
   useEffect(() => {
@@ -143,11 +152,11 @@ const Menu = ({ headerRef }) => {
 
   const navigateRow = (direction) => {
     if (direction === 'left' && canNavigateLeft) {
-      setSlideDirection('down')
+      setSlideDirection('right')
       setPrevRow(currentRow)
       setCurrentRow(prev => prev - 1)
     } else if (direction === 'right' && canNavigateRight) {
-      setSlideDirection('down')
+      setSlideDirection('left')
       setPrevRow(currentRow)
       setCurrentRow(prev => prev + 1)
     }
@@ -293,11 +302,11 @@ const Menu = ({ headerRef }) => {
         <Box sx={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', minWidth: 0, overflow: 'visible', width: '100%', maxWidth: '1400px' }}>
           <Slide
             direction={slideDirection}
-            in={true}
+            in={isInitialized}
             key={currentRow}
             mountOnEnter
             unmountOnExit
-            timeout={350}
+            timeout={isInitialized ? 350 : 0}
           >
             <Box
               sx={{

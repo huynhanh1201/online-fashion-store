@@ -153,17 +153,69 @@ const getProductList = async (reqQuery) => {
       sortField = sortMap[sort]
     }
 
+    // Use aggregation to include first variant's discount price
+    const aggregationPipeline = [
+      { $match: filter },
+      {
+        $lookup: {
+          from: 'variants',
+          let: { productId: '$_id' },
+          pipeline: [
+            {
+              $match: {
+                $expr: { $eq: ['$productId', '$$productId'] },
+                destroy: false
+              }
+            },
+            { $sort: { createdAt: 1 } }, // Get first variant
+            { $limit: 1 },
+            { $project: { discountPrice: 1 } }
+          ],
+          as: 'firstVariant'
+        }
+      },
+      {
+        $addFields: {
+          firstVariantDiscountPrice: {
+            $ifNull: [
+              { $arrayElemAt: ['$firstVariant.discountPrice', 0] },
+              0
+            ]
+          }
+        }
+      },
+      {
+        $lookup: {
+          from: 'categories',
+          localField: 'categoryId',
+          foreignField: '_id',
+          as: 'categoryId'
+        }
+      },
+      {
+        $unwind: {
+          path: '$categoryId',
+          preserveNullAndEmptyArrays: true
+        }
+      }
+    ]
+
+    // Only add sort stage if sortField is not empty
+    if (Object.keys(sortField).length > 0) {
+      aggregationPipeline.push({ $sort: sortField })
+    }
+
+    // Convert page and limit to numbers
+    const pageNum = Number(page)
+    const limitNum = Number(limit)
+
+    aggregationPipeline.push(
+      { $skip: (pageNum - 1) * limitNum },
+      { $limit: limitNum }
+    )
+
     const [products, total] = await Promise.all([
-      ProductModel.find(filter)
-        .collation({ locale: 'vi', strength: 1 })
-        .sort(sortField)
-        .populate({
-          path: 'categoryId',
-          select: 'name description slug _id'
-        })
-        .skip((page - 1) * limit)
-        .limit(limit)
-        .lean(),
+      ProductModel.aggregate(aggregationPipeline),
       ProductModel.countDocuments(filter)
     ])
 
@@ -258,10 +310,42 @@ const deleteProduct = async (productId) => {
 const getListProductOfCategory = async (categoryId) => {
   // eslint-disable-next-line no-useless-catch
   try {
-    const ListProduct = await ProductModel.find({
-      categoryId: categoryId,
-      destroy: false
-    }).lean()
+    const ListProduct = await ProductModel.aggregate([
+      {
+        $match: {
+          categoryId: new mongoose.Types.ObjectId(categoryId),
+          destroy: false
+        }
+      },
+      {
+        $lookup: {
+          from: 'variants',
+          let: { productId: '$_id' },
+          pipeline: [
+            {
+              $match: {
+                $expr: { $eq: ['$productId', '$$productId'] },
+                destroy: false
+              }
+            },
+            { $sort: { createdAt: 1 } }, // Get first variant
+            { $limit: 1 },
+            { $project: { discountPrice: 1 } }
+          ],
+          as: 'firstVariant'
+        }
+      },
+      {
+        $addFields: {
+          firstVariantDiscountPrice: {
+            $ifNull: [
+              { $arrayElemAt: ['$firstVariant.discountPrice', 0] },
+              0
+            ]
+          }
+        }
+      }
+    ])
 
     return ListProduct
   } catch (err) {

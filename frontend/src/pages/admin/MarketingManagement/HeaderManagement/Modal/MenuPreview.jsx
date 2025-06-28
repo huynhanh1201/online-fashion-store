@@ -13,7 +13,7 @@ const MenuPreview = ({ menuData }) => {
     .sort((a, b) => (a.order || 0) - (b.order || 0))
 
   return (
-    <Box sx={{ p: 2 }}>
+    <Box sx={{ p: 2, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
       <Box
         sx={{
           borderRadius: '0 0 16px 16px',
@@ -23,16 +23,26 @@ const MenuPreview = ({ menuData }) => {
           boxShadow: '0px 4px 10px rgba(0,0,0,0.10)',
           overflowX: 'auto',
           display: 'grid',
+          justifyContent: 'center',
+          alignItems: 'center',
           gridTemplateColumns: `repeat(${mainMenus.length || 1}, 1fr)`,
           gap: 6,
           width: '100%',
-          maxWidth: 2000,
+          maxWidth: 1400,
+          mx: 'auto'
         }}
       >
         {mainMenus.map((item, idx) => {
           const visibleChildren = (item.children || []).filter(child => child.visible)
           return (
-            <Box key={item.label + idx} sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+            <Box key={item.label + idx} sx={{ 
+              display: 'flex', 
+              flexDirection: 'column', 
+              gap: 1, 
+              justifyContent: 'center',
+              alignItems: 'center',
+              textAlign: 'center'
+            }}>
               {/* Tiêu đề cột */}
               <Typography
                 sx={{
@@ -40,7 +50,8 @@ const MenuPreview = ({ menuData }) => {
                   mb: 1.2,
                   textTransform: 'uppercase',
                   fontSize: '1.08rem',
-                  letterSpacing: 0.5
+                  letterSpacing: 0.5,
+                  textAlign: 'center'
                 }}
               >
                 {item.label || 'Chưa có tên'}
@@ -58,14 +69,14 @@ const MenuPreview = ({ menuData }) => {
                       minWidth: 0,
                       background: 'none',
                       boxShadow: 'none',
-                      textAlign: 'left',
+                      textAlign: 'center',
                       py: 0.5,
                       borderRadius: 1,
                       transition: 'all 0.2s',
                       '&:hover': {
                         color: '#1976d2',
                         background: 'none',
-                        transform: 'translateX(5px)'
+                        transform: 'translateY(-2px)'
                       }
                     }}
                   >
@@ -78,7 +89,8 @@ const MenuPreview = ({ menuData }) => {
                     color: 'text.secondary',
                     fontSize: '0.95rem',
                     fontStyle: 'italic',
-                    mt: 1
+                    mt: 1,
+                    textAlign: 'center'
                   }}
                 >
                   Chưa có danh mục
@@ -88,7 +100,7 @@ const MenuPreview = ({ menuData }) => {
           )
         })}
       </Box>
-      <Box sx={{ mt: 3, p: 2, backgroundColor: '#f3f4f6', borderRadius: 2 }}>
+      <Box sx={{ mt: 3, p: 2, backgroundColor: '#f3f4f6', borderRadius: 2, textAlign: 'center', maxWidth: 600 }}>
         <Typography variant="body2" color="text.secondary">
           <strong>Lưu ý:</strong> Đây là minh họa cấu trúc menu. Menu thực tế sẽ được hiển thị theo thiết kế của website.
         </Typography>

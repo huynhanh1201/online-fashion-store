@@ -62,6 +62,7 @@ import HeaderManagement from '~/pages/admin/MarketingManagement/HeaderManagement
 import FeaturedCategoryManagement from '~/pages/admin/MarketingManagement/FeaturedCategoryManagement/FeaturedCategoryManagement.jsx'
 import ServiceHighlightManagement from '~/pages/admin/MarketingManagement/ServiceHighlightManagement/ServiceHighlightManagement.jsx'
 import FooterManagement from './pages/admin/MarketingManagement/FooterManagement/FooterManagement'
+import ThemeManagement from './pages/admin/MarketingManagement/ThemeManagement/ThemeManagement'
 // Trang 404
 import NotFound from '~/pages/404/NotFound'
 // Hook
@@ -94,7 +95,7 @@ function App() {
         <Route path='/productdetail/:productId' element={<ProductDetail />} />
         <Route path='blog' element={<Blog />} />
         <Route path='/blog/:blogId' element={<BlogDetail />} />
-        <Route path='/danh-muc/:slug' element={<CategoryPage />} />
+        <Route path="/category/:slug" element={<CategoryPage />} />
 
         <Route
           path='productbycategory/:categoryId'
@@ -185,6 +186,7 @@ function App() {
             path='featured-category-management'
             element={<FeaturedCategoryManagement />}
           />
+          <Route path='theme-management' element={<ThemeManagement />} />
           <Route
             path='service-highlight-management'
             element={<ServiceHighlightManagement />}
