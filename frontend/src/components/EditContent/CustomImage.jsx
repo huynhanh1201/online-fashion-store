@@ -1,94 +1,175 @@
+// CustomImage.js
 import { Node, mergeAttributes } from '@tiptap/core'
-import {
-  NodeViewWrapper,
-  NodeViewContent,
-  ReactNodeViewRenderer
-} from '@tiptap/react'
-import { IconButton } from '@mui/material'
+import { NodeViewWrapper, ReactNodeViewRenderer } from '@tiptap/react'
+import React, { useRef } from 'react'
+import { Box, Stack, IconButton, Tooltip as MuiTooltip } from '@mui/material'
 import DeleteIcon from '@mui/icons-material/Delete'
 import EditIcon from '@mui/icons-material/Edit'
-import React from 'react'
+import FormatAlignLeftIcon from '@mui/icons-material/FormatAlignLeft'
+import FormatAlignCenterIcon from '@mui/icons-material/FormatAlignCenter'
+import FormatAlignRightIcon from '@mui/icons-material/FormatAlignRight'
 
+// --- ImageComponent ---
 const ImageComponent = ({ node, updateAttributes, deleteNode }) => {
-  const { src, alt, title } = node.attrs
+  const { src, alt, title, align = 'center' } = node.attrs
+  const fileInputRef = useRef(null)
+
+  const handleAlign = (value) => updateAttributes({ align: value })
+
+  const handleFileChange = (e) => {
+    const file = e.target.files?.[0]
+    if (file) {
+      const imageUrl = URL.createObjectURL(file)
+      updateAttributes({ src: imageUrl })
+    }
+  }
 
   return (
     <NodeViewWrapper
       as='div'
-      style={{ position: 'relative', display: 'inline-block' }}
+      data-align={align}
+      style={{ textAlign: align, display: 'block', margin: '1rem 0' }}
     >
-      <img
-        src={src}
-        alt={alt}
-        title={title}
-        style={{
-          maxWidth: '100%',
-          height: 'auto',
-          display: 'block',
-          borderRadius: 4
-        }}
-      />
-      <div
-        style={{
-          position: 'absolute',
-          top: 4,
-          right: 4,
-          display: 'flex',
-          gap: 4,
-          background: 'rgba(255, 255, 255, 0.8)',
-          borderRadius: 4,
-          padding: '2px'
+      <Box
+        sx={{
+          display: 'inline-block',
+          position: 'relative',
+          maxWidth: '700px',
+          maxHeight: '700px',
+          width: '100%'
         }}
       >
-        <IconButton size='small' onClick={() => deleteNode()}>
-          <DeleteIcon fontSize='small' />
-        </IconButton>
-        <IconButton size='small' onClick={() => alert('Edit chưa xử lý')}>
-          <EditIcon fontSize='small' />
-        </IconButton>
-      </div>
+        <img
+          src={src}
+          alt={alt}
+          title={title}
+          style={{
+            display: 'block',
+            maxWidth: '100%',
+            height: 'auto',
+            objectFit: 'contain',
+            borderRadius: 4,
+            margin: '0 auto'
+          }}
+        />
+
+        {/* Nút chỉnh sửa và xoá */}
+        <Box
+          sx={{
+            position: 'absolute',
+            top: 4,
+            right: 4,
+            display: 'flex',
+            gap: 1,
+            borderRadius: 1,
+            padding: '2px'
+          }}
+        >
+          <MuiTooltip title='Chọn ảnh khác'>
+            <IconButton
+              color='primary'
+              onClick={() => fileInputRef.current?.click()}
+              sx={{
+                backgroundColor: '#fff',
+                '&:hover': { backgroundColor: '#eee' }
+              }}
+            >
+              <EditIcon />
+            </IconButton>
+          </MuiTooltip>
+          <MuiTooltip title='Xoá ảnh'>
+            <IconButton
+              color='error'
+              onClick={() => deleteNode()}
+              sx={{
+                backgroundColor: '#fff',
+                '&:hover': { backgroundColor: '#eee' }
+              }}
+            >
+              <DeleteIcon />
+            </IconButton>
+          </MuiTooltip>
+        </Box>
+
+        {/* Nút căn lề */}
+        <Stack
+          direction='row'
+          spacing={1}
+          justifyContent='center'
+          alignItems='center'
+          sx={{ mt: 1 }}
+        >
+          {['left', 'center', 'right'].map((val) => (
+            <MuiTooltip key={val} title={`Căn ${val}`} arrow>
+              <IconButton
+                size='small'
+                onClick={() => handleAlign(val)}
+                color={align === val ? 'primary' : 'default'}
+              >
+                {
+                  {
+                    left: <FormatAlignLeftIcon fontSize='small' />,
+                    center: <FormatAlignCenterIcon fontSize='small' />,
+                    right: <FormatAlignRightIcon fontSize='small' />
+                  }[val]
+                }
+              </IconButton>
+            </MuiTooltip>
+          ))}
+        </Stack>
+
+        {/* Input ảnh ẩn */}
+        <input
+          type='file'
+          accept='image/*'
+          ref={fileInputRef}
+          style={{ display: 'none' }}
+          onChange={handleFileChange}
+        />
+      </Box>
     </NodeViewWrapper>
   )
 }
 
+// --- Extension CustomImage ---
 export const CustomImage = Node.create({
   name: 'image',
-  inline: false,
   group: 'block',
+  inline: false,
+  atom: true,
   draggable: true,
-  selectable: true,
-
+  selectable: false, // Make it non-selectable
   addAttributes() {
     return {
       src: { default: null },
       alt: { default: null },
       title: { default: null },
-      inline: { default: false }
+      align: {
+        default: 'center',
+        parseHTML: (element) => element.getAttribute('data-align') || 'center',
+        renderHTML: (attributes) => ({ 'data-align': attributes.align })
+      }
     }
   },
-
   parseHTML() {
     return [{ tag: 'img[src]' }]
   },
-
   renderHTML({ HTMLAttributes }) {
-    return ['img', mergeAttributes(HTMLAttributes)]
+    return [
+      'div',
+      mergeAttributes(HTMLAttributes, { class: 'custom-image-wrapper' }),
+      ['img', HTMLAttributes]
+    ]
   },
-
   addNodeView() {
     return ReactNodeViewRenderer(ImageComponent)
   },
-
   addCommands() {
     return {
       setImage:
         (attrs) =>
-        ({ commands }) => {
-          return commands.insertContent({
-            type: this.name,
-            attrs
-          })
-        }
+        ({ commands }) =>
+          commands.insertContent({ type: this.name, attrs })
     }
   }
 })

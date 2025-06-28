@@ -7,7 +7,7 @@ import ChartDashboard from '~/components/WarehouseStatistic/Card/ChartDashboard'
 import ProductColorDetail from '~/components/WarehouseStatistic/Card/ProductColorDetail'
 import { Typography, Box, Divider } from '@mui/material'
 import React from 'react'
-import useInventoryStatistics from '~/hooks/admin/Inventory/useStatistic.js'
+import useInventoryStatistics from '~/hooks/admin/useStatistic.js'
 import useBatches from '~/hooks/admin/Inventory/useBatches.js'
 import usePartner from '~/hooks/admin/Inventory/usePartner.js'
 import useVariants from '~/hooks/admin/Inventory/useVariants.js'
@@ -60,17 +60,6 @@ function WarehouseStatisticTab() {
       className='tab-content'
       style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}
     >
-      {/*<Box sx={styles.BoxCard}>*/}
-      {/*  <Typography*/}
-      {/*    variant='h5'*/}
-      {/*    gutterBottom*/}
-      {/*    fontWeight='700'*/}
-      {/*    sx={styles.header}*/}
-      {/*  >*/}
-      {/*    Sản phẩm & Biến thể*/}
-      {/*  </Typography>*/}
-      {/*  <VariantSummaryCard />*/}
-      {/*</Box>*/}
       <Box sx={styles.BoxCard}>
         <Typography
           variant='h5'
@@ -82,29 +71,6 @@ function WarehouseStatisticTab() {
         </Typography>
         <InventorySummaryCard data={statistics} loading={loading} />
       </Box>
-      {/*<Box sx={styles.BoxCard}>*/}
-      {/*  <Typography*/}
-      {/*    variant='h5'*/}
-      {/*    gutterBottom*/}
-      {/*    fontWeight='700'*/}
-      {/*    sx={styles.header}*/}
-      {/*  >*/}
-      {/*    Tình trạng theo kho*/}
-      {/*  </Typography>*/}
-      {/*  <StockStatus />*/}
-      {/*</Box>*/}
-      {/*<Box sx={styles.BoxCard}>*/}
-      {/*  <Typography*/}
-      {/*    variant='h5'*/}
-      {/*    gutterBottom*/}
-      {/*    fontWeight='700'*/}
-      {/*    sx={styles.header}*/}
-      {/*  >*/}
-      {/*    Tình trạng theo kho*/}
-      {/*  </Typography>*/}
-      {/*  <TopSellingSlowSellingCard />*/}
-      {/*</Box>*/}
-
       <Box sx={styles.BoxCard}>
         <Typography
           variant='h5'
@@ -141,17 +107,6 @@ function WarehouseStatisticTab() {
           fetchPartner={fetchPartners}
         />
       </Box>
-      {/*<Box sx={styles.BoxCard}>*/}
-      {/*  <Typography*/}
-      {/*    variant='h5'*/}
-      {/*    gutterBottom*/}
-      {/*    fontWeight='700'*/}
-      {/*    sx={styles.header}*/}
-      {/*  >*/}
-      {/*    Chi Tiết Sản Phẩm Theo Màu Sắc*/}
-      {/*  </Typography>*/}
-      {/*  <ProductColorDetail />*/}
-      {/*</Box>*/}
     </div>
   )
 }

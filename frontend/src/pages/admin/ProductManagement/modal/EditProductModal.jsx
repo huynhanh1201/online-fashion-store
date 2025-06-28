@@ -21,7 +21,7 @@ import AddCategoryModal from '~/pages/admin/CategorieManagement/modal/AddCategor
 import StyleAdmin from '~/assets/StyleAdmin.jsx'
 import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css'
 import ProductImages from '../component/ProductImageUploader.jsx'
-import ProductDescriptionEditor from '../component/ProductDescriptionEditor.jsx'
+import DescriptionEditor from '~/components/EditContent/DescriptionEditor.jsx'
 import { CloudinaryColor, CloudinaryProduct, URI } from '~/utils/constants'
 const uploadToCloudinary = async (file, folder = CloudinaryColor) => {
   const formData = new FormData()
@@ -71,7 +71,7 @@ const EditProductModal = ({ open, onClose, onSave, product }) => {
   )
   const { categories, fetchCategories, loading, update } = useCategories()
   const topLevelCategories = categories.filter(
-    (category) => category.parent === null
+    (category) => category.parent !== null
   )
   // Hàm định dạng số và bỏ định dạng
   const formatNumber = (value) => {
@@ -80,7 +80,14 @@ const EditProductModal = ({ open, onClose, onSave, product }) => {
   }
 
   const parseNumber = (formatted) => formatted.replace(/\./g, '')
-
+  const handleImageInsertFromEditor = (url) => {
+    // Chỉ thêm nếu ảnh chưa có trong imageUrls
+    setProductImagePreview((prev) => {
+      const trimmed = prev.map((u) => u.trim())
+      if (!trimmed.includes(url)) return [...trimmed.filter((u) => u), url, '']
+      return [...trimmed, '']
+    })
+  }
   // Load dữ liệu sản phẩm khi modal mở
   useEffect(() => {
     if (open && product) {
@@ -383,16 +390,18 @@ const EditProductModal = ({ open, onClose, onSave, product }) => {
           </Grid>
           {/*mô tả*/}
           <Grid item size={12}>
-            <ProductDescriptionEditor
+            <DescriptionEditor
               control={control}
+              name='description'
               setValue={setValue}
               initialHtml={product?.description || ''}
+              onImageInsert={handleImageInsertFromEditor}
             />
           </Grid>
           {/*Trạng thái sản phẩm*/}
           <Grid item size={12}>
             <Box>
-              <Typography variant='h6'>Kích thước đóng gói</Typography>
+              <Typography variant='h6'>Trạng thái sản phẩm</Typography>
               <Box sx={{ display: 'flex', gap: 1, mt: 1 }}>
                 {[
                   { label: 'Bản nháp', value: 'draft' },
