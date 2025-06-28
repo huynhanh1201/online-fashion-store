@@ -7,7 +7,6 @@ import {
 export const useInventoryStatistics = () => {
   const [statistics, setStatistics] = useState([])
   const [loading, setLoading] = useState(true)
-  // const [page, setPage] = useState(1)
 
   const fetchStatistics = async () => {
     setLoading(true)
@@ -40,4 +39,5 @@ export const useInventoryStatistics = () => {
     fetchProductsStatistics
   }
 }
+
 export default useInventoryStatistics
