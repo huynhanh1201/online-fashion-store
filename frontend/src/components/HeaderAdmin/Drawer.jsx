@@ -115,64 +115,64 @@ export default function AdminDrawer({
         icon: <PollIcon />
       },
       accountManagement: {
-        permissions: ['user:use'],
+        permissions: ['user:use', 'account:use', 'role:use'],
         label: 'Quản lý tài khoản',
         icon: <PaletteIcon />,
         children: [
           {
             permission: 'user:use',
-            label: 'Tài khoản  người dùng',
+            label: 'Tài khoản người dùng',
             path: '/admin/user-management'
           },
           {
-            permission: 'user:use',
+            permission: 'account:use',
             label: 'Tài khoản hệ thống',
             path: '/admin/account-management'
           },
           {
-            permission: 'user:use',
+            permission: 'role:use',
             label: 'Quản lý vai trò',
             path: '/admin/role-management'
           }
         ]
       },
       contentManagement: {
-        permissions: ['user:use'],
+        permissions: ['content:use', 'banner:use', 'flashSale:use', 'headerContent:use', 'footerContent:use', 'featuredCategory:use', 'service:use', 'blog:use'],
         label: 'Quản lý nội dung',
         icon: <LocalOfferIcon />,
         children: [
           {
-            permission: 'user:use',
+            permission: 'banner:use',
             label: 'Ảnh quảng cáo',
             path: '/admin/display-management'
           },
           {
-            permission: 'user:use',
+            permission: 'flashSale:use',
             label: 'Chương trình khuyến mãi',
             path: '/admin/flashsale-management'
           },
           {
-            permission: 'user:use',
+            permission: 'headerContent:use',
             label: 'Nội dung đầu trang',
             path: '/admin/header-management'
           },
           {
-            permission: 'user:use',
+            permission: 'footerContent:use',
             label: 'Nội dung cuối trang',
             path: '/admin/footer-management'
           },
           {
-            permission: 'user:use',
+            permission: 'featuredCategory:use',
             label: 'Danh mục nổi bật',
             path: '/admin/featured-category-management'
           },
           {
-            permission: 'user:use',
-            label: 'dịch vụ nổi bậc',
+            permission: 'service:use',
+            label: 'Dịch vụ nổi bật',
             path: '/admin/service-highlight-management'
           },
           {
-            permission: 'user:use',
+            permission: 'blog:use',
             label: 'Nội dung bài viết',
             path: '/admin/blog-management'
           }
