@@ -29,18 +29,17 @@ const EditUserModal = ({ open, onClose, user, onSave, roles }) => {
 
   useEffect(() => {
     if (open && user) {
+      const selectedRole = roles.find((r) => r.name === user.role)
       reset({
-        role: user.role || ''
+        role: selectedRole || null
       })
     }
-  }, [open, user, reset])
+  }, [open, user, roles, reset])
 
   const onSubmit = async (data) => {
-    await onSave({ role: data.role }, 'edit', user._id)
+    await onSave({ role: data.role?.name }, 'edit', user._id)
     onClose()
   }
-
-  const roleOptions = roles.map((role) => role.name)
 
   return (
     <Dialog
@@ -62,9 +61,12 @@ const EditUserModal = ({ open, onClose, user, onSave, roles }) => {
             rules={{ required: 'Vai trò là bắt buộc' }}
             render={({ field, fieldState }) => (
               <Autocomplete
-                options={roleOptions}
-                getOptionLabel={(option) => option}
-                value={field.value}
+                options={roles}
+                getOptionLabel={(option) => option?.label || ''}
+                isOptionEqualToValue={(option, value) =>
+                  option.name === value?.name
+                }
+                value={field.value || null}
                 onChange={(_, value) => field.onChange(value)}
                 renderInput={(params) => (
                   <TextField

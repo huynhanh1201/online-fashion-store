@@ -1,6 +1,6 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import OrderStatistic from './OrderStatistic.jsx'
-
+import useInventoryStatistics from '~/hooks/admin/useStatistic.js'
 const orderStatistics = {
   totalOrders: 150,
   totalDiscountAmount: 750000,
@@ -38,7 +38,11 @@ const orderStatistics = {
 }
 
 function OrderDashboard() {
-  return <OrderStatistic stats={orderStatistics} />
+  const { statistics, fetchOrdersStatistics } = useInventoryStatistics()
+  useEffect(() => {
+    fetchOrdersStatistics()
+  }, [])
+  return <OrderStatistic stats={statistics} />
 }
 
 export default OrderDashboard

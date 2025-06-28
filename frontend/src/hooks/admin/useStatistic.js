@@ -1,7 +1,8 @@
 import React, { useState } from 'react'
 import {
   getInventoryStatistics,
-  getProductsStatistics
+  getProductsStatistics,
+  getOrderStatistics
 } from '~/services/admin/StatisticService.js'
 
 export const useInventoryStatistics = () => {
@@ -32,11 +33,24 @@ export const useInventoryStatistics = () => {
     }
   }
 
+  const fetchOrdersStatistics = async () => {
+    setLoading(true)
+    try {
+      const data = await getOrderStatistics()
+      setStatistics(data)
+    } catch (error) {
+      console.error('Error fetching orders statistics:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
   return {
     statistics,
     loading,
     fetchStatistics,
-    fetchProductsStatistics
+    fetchProductsStatistics,
+    fetchOrdersStatistics
   }
 }
 

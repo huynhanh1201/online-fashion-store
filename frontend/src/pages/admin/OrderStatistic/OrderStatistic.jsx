@@ -13,14 +13,19 @@ ChartJS.register(ArcElement, Tooltip, Legend)
 
 const OrderStatistic = ({ stats = {} }) => {
   const {
-    totalOrders = 0,
-    totalDiscountAmount = 0,
-    totalShippingFee = 0,
-    totalCoupons = 0,
-    usedCoupons = 0,
-    fullyUsedCoupons = 0,
-    paymentMethodCounts = {},
-    orderStatusCounts = {}
+    orderStats: {
+      totalOrders = 0,
+      totalRevenue = 0,
+      totalShipping = 0,
+      totalDiscountAmount = 0
+    } = {},
+    couponStats: {
+      totalCoupons = 0,
+      totalCouponsUsage = 0,
+      totalUsedUpCoupons = 0
+    } = {},
+    paymentMethodStats = [],
+    statusOrdersStats = []
   } = stats
 
   const summaryItems = [
@@ -38,7 +43,7 @@ const OrderStatistic = ({ stats = {} }) => {
     },
     {
       label: 'Tổng phí vận chuyển',
-      value: totalShippingFee.toLocaleString('vi-VN') + '₫',
+      value: totalShipping.toLocaleString('vi-VN') + '₫',
       icon: <LocalShippingIcon color='warning' fontSize='large' />,
       color: '#FFB74D'
     }
@@ -53,33 +58,33 @@ const OrderStatistic = ({ stats = {} }) => {
     },
     {
       label: 'Số mã đã được sử dụng',
-      value: usedCoupons,
+      value: totalCouponsUsage,
       icon: <TaskIcon color='info' fontSize='large' />,
       color: '#60A5FA'
     },
     {
       label: 'Số mã đã sử dụng hết',
-      value: fullyUsedCoupons,
+      value: totalUsedUpCoupons,
       icon: <EventBusyIcon color='error' fontSize='large' />,
       color: '#EF4444'
     }
   ]
 
   const piePaymentChart = {
-    labels: Object.keys(paymentMethodCounts),
+    labels: paymentMethodStats.map((item) => item.paymentMethod),
     datasets: [
       {
-        data: Object.values(paymentMethodCounts),
+        data: paymentMethodStats.map((item) => item.count),
         backgroundColor: ['#34D399', '#60A5FA']
       }
     ]
   }
 
   const pieStatusChart = {
-    labels: Object.keys(orderStatusCounts),
+    labels: statusOrdersStats.map((item) => item.statusOrder),
     datasets: [
       {
-        data: Object.values(orderStatusCounts),
+        data: statusOrdersStats.map((item) => item.count),
         backgroundColor: [
           '#FBBF24',
           '#4ADE80',
