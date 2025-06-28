@@ -1,6 +1,9 @@
 import { InventoryModel } from '~/models/InventoryModel'
 import { InventoryLogModel } from '~/models/InventoryLogModel'
 import convertArrToMap from '~/utils/convertArrToMap'
+import { ProductModel } from '~/models/ProductModel'
+import { CategoryModel } from '~/models/CategoryModel'
+import { VariantModel } from '~/models/VariantModel'
 
 const getInventoryStatistics = async () => {
   // eslint-disable-next-line no-useless-catch
@@ -203,6 +206,74 @@ const getInventoryStatistics = async () => {
   }
 }
 
+const getProductStatistics = async () => {
+  // eslint-disable-next-line no-useless-catch
+  try {
+    const productsTotalPromise = ProductModel.countDocuments({ destroy: false })
+
+    const categoriesTotalPromise = CategoryModel.countDocuments({
+      destroy: false
+    })
+
+    const variantsTotalPromise = VariantModel.countDocuments({
+      destroy: false
+    })
+
+    const productCountByCategoryPromise = ProductModel.aggregate([
+      {
+        $match: { destroy: false, parent: null }
+      },
+      {
+        $group: {
+          _id: '$categoryId',
+          count: { $sum: 1 }
+        }
+      },
+      {
+        $lookup: {
+          from: 'categories',
+          localField: '_id',
+          foreignField: '_id',
+          as: 'category'
+        }
+      },
+      { $unwind: '$category' },
+      {
+        $project: {
+          _id: 0,
+          categoryId: '$_id',
+          categoryName: '$category.name',
+          count: 1
+        }
+      }
+    ])
+
+    const [
+      productsTotal,
+      categoriesTotal,
+      variantsTotal,
+      productCountByCategory
+    ] = await Promise.all([
+      productsTotalPromise,
+      categoriesTotalPromise,
+      variantsTotalPromise,
+      productCountByCategoryPromise
+    ])
+
+    const result = {
+      productsTotal,
+      categoriesTotal,
+      variantsTotal,
+      productCountByCategory
+    }
+
+    return result
+  } catch (err) {
+    throw err
+  }
+}
+
 export const statisticsService = {
-  getInventoryStatistics
+  getInventoryStatistics,
+  getProductStatistics
 }
