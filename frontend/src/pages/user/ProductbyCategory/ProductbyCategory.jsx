@@ -16,7 +16,8 @@ import { setCartItems } from '~/redux/cart/cartSlice'
 import ProductCard from '~/components/ProductCards/ProductCards'
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward'
 import { useParams } from 'react-router-dom'
-import { getCategoryById } from '~/services/categoryService'
+import { getCategoryById, getChildCategories } from '~/services/categoryService'
+import { optimizeCloudinaryUrl } from '~/utils/cloudinary.js'
 
 const ITEMS_PER_PAGE = 12
 
@@ -93,13 +94,26 @@ const ProductbyCategory = () => {
   const [sortMenuOpen, setSortMenuOpen] = useState(false)
   const [category, setCategory] = useState(null)
   const [loadingCategory, setLoadingCategory] = useState(true)
+  const [childCategories, setChildCategories] = useState([])
+  const [allCategoryIds, setAllCategoryIds] = useState([])
 
   useEffect(() => {
-    const fetchCategory = async () => {
+    const fetchCategoryAndChildren = async () => {
       try {
         setLoadingCategory(true)
+        
+        // Fetch parent category
         const response = await getCategoryById(categoryId)
         setCategory(response)
+        
+        // Fetch child categories
+        const children = await getChildCategories(categoryId)
+        setChildCategories(children)
+        
+        // Create array of all category IDs (parent + children)
+        const categoryIds = [categoryId, ...children.map(child => child._id)]
+        setAllCategoryIds(categoryIds)
+        
       } catch (error) {
         console.error('Error fetching category:', error)
       } finally {
@@ -108,7 +122,7 @@ const ProductbyCategory = () => {
     }
 
     if (categoryId) {
-      fetchCategory()
+      fetchCategoryAndChildren()
     }
   }, [categoryId])
 
@@ -121,11 +135,11 @@ const ProductbyCategory = () => {
 
     let sortedProducts = [...allProducts]
 
-    if (categoryId) {
-      // Lọc sản phẩm theo categoryId
+    if (allCategoryIds.length > 0) {
+      // Lọc sản phẩm theo tất cả categoryIds (parent + children)
       sortedProducts = sortedProducts.filter((product) => {
         const productCategoryId = product.categoryId?._id || product.categoryId
-        return productCategoryId === categoryId
+        return allCategoryIds.includes(productCategoryId)
       })
 
       // Sắp xếp sản phẩm
@@ -172,7 +186,7 @@ const ProductbyCategory = () => {
 
     setFilteredProducts(sortedProducts)
     setPage(1)
-  }, [allProducts, sortOption, categoryId, loadingProducts])
+  }, [allProducts, sortOption, allCategoryIds, loadingProducts])
 
   const handleAddToCart = async (product) => {
     if (isAdding[product._id]) return
@@ -241,8 +255,11 @@ const ProductbyCategory = () => {
         sx={{
           width: '100%',
           height: { xs: '200px', sm: '300px', md: '400px' },
-          backgroundImage:
-            'url(https://file.hstatic.net/1000360022/collection/ao-thun_cd23d8082c514c839615e1646371ba71.jpg)',
+          backgroundImage: category?.banner 
+            ? `url(${optimizeCloudinaryUrl(category.banner, { width: 1920, height: 400 })})`
+            : category?.image
+            ? `url(${optimizeCloudinaryUrl(category.image, { width: 1920, height: 400 })})`
+            : 'url(https://file.hstatic.net/1000360022/collection/ao-thun_cd23d8082c514c839615e1646371ba71.jpg)',
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           position: 'relative',

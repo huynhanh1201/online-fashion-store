@@ -116,7 +116,6 @@ const AddMenu = ({ open, onClose, onSuccess, initialData = null }) => {
     const newItem = {
       label: '',
       url: '',
-      icon: '',
       visible: true,
       order: menuData[type]?.length + 1 || 1
     }
@@ -125,6 +124,7 @@ const AddMenu = ({ open, onClose, onSuccess, initialData = null }) => {
       newItem.children = []
     }
 
+    // Add the new item to the list temporarily
     setMenuData(prev => ({
       ...prev,
       [type]: [...(prev[type] || []), newItem]
@@ -135,6 +135,36 @@ const AddMenu = ({ open, onClose, onSuccess, initialData = null }) => {
     setEditingType(type)
     setEditingIndex(menuData[type]?.length || 0)
     setEditingSubIndex(-1)
+  }
+
+  const handleCancelEdit = () => {
+    // If we're editing a newly added item that hasn't been saved properly, remove it
+    if (editingItem && (!editingItem.label.trim() || (editingSubIndex >= 0 && !editingItem.url.trim()))) {
+      setMenuData(prev => {
+        const newData = { ...prev }
+        
+        if (editingSubIndex >= 0) {
+          // Remove incomplete submenu item
+          newData[editingType][editingIndex].children.splice(editingSubIndex, 1)
+        } else {
+          // Remove incomplete main item
+          newData[editingType].splice(editingIndex, 1)
+          // Reorder remaining items
+          newData[editingType].forEach((item, idx) => {
+            item.order = idx + 1
+          })
+        }
+        
+        return newData
+      })
+    }
+
+    setEditingItem(null)
+    setEditingType('')
+    setEditingIndex(-1)
+    setEditingSubIndex(-1)
+    setError('')
+    setUrlType('manual')
   }
 
   const handleEditItem = (type, index, subIndex = -1) => {
@@ -156,7 +186,7 @@ const AddMenu = ({ open, onClose, onSuccess, initialData = null }) => {
     } else {
       // For submenu items, check if URL matches a category
       const matchingCategory = categories.find(cat => 
-        cat.link === item.url || `/categories/${cat._id}` === item.url
+        cat.link === item.url || `/category/${cat.slug}` === item.url
       )
       setUrlType(matchingCategory ? 'category' : 'manual')
     }
@@ -168,8 +198,9 @@ const AddMenu = ({ open, onClose, onSuccess, initialData = null }) => {
       return
     }
 
-    if (urlType === 'manual' && !editingItem.url.trim()) {
-      setError('URL không được để trống')
+    // URL is required only for submenu items
+    if (editingSubIndex >= 0 && urlType === 'manual' && !editingItem.url.trim()) {
+      setError('URL không được để trống cho submenu')
       return
     }
 
@@ -223,6 +254,7 @@ const AddMenu = ({ open, onClose, onSuccess, initialData = null }) => {
       order: (menuData[type][index].children?.length || 0) + 1
     }
 
+    // Add the new submenu item to the list temporarily
     setMenuData(prev => ({
       ...prev,
       [type]: prev[type].map((item, idx) => 
@@ -244,7 +276,7 @@ const AddMenu = ({ open, onClose, onSuccess, initialData = null }) => {
     if (category) {
       setEditingItem(prev => ({
         ...prev,
-        url: category.link || `/productbycategory/${category._id}`
+        url: category.link || `/category/${category.slug}`
         // Don't automatically set the label - let user customize the menu name
       }))
     }
@@ -310,7 +342,7 @@ const AddMenu = ({ open, onClose, onSuccess, initialData = null }) => {
               {item.label || 'Chưa có tên'}
             </Typography>
             <Typography variant="caption" color="text.secondary" sx={{ fontFamily: 'monospace' }}>
-              {item.url || 'Chưa có URL'}
+              {item.url || 'Tiêu đề menu (không có link)'}
             </Typography>
             <IconButton size="small" onClick={() => moveMenuItem(type, index, 'up')}><ExpandMoreIcon sx={{ transform: 'rotate(-90deg)' }} /></IconButton>
             <IconButton size="small" onClick={() => moveMenuItem(type, index, 'down')}><ExpandMoreIcon sx={{ transform: 'rotate(90deg)' }} /></IconButton>
@@ -379,7 +411,7 @@ const AddMenu = ({ open, onClose, onSuccess, initialData = null }) => {
         <>
           <Alert severity="info" sx={{ mb: 2 }}>
             Kéo/thả thứ tự bằng nút Lên/Xuống. Nhấn vào từng mục để chỉnh sửa, thêm submenu hoặc xóa. Submenu sẽ hiển thị lồng bên trong.<br/>
-            <b>Lưu ý:</b> Menu chỉ hỗ trợ 2 cấp (menu & submenu).
+            <b>Lưu ý:</b> Menu chỉ hỗ trợ 2 cấp (menu & submenu). Menu chính chỉ cần tên, URL chỉ cần thiết cho submenu.
           </Alert>
           {renderTreeMenu('mainMenu')}
         </>
@@ -468,7 +500,7 @@ const AddMenu = ({ open, onClose, onSuccess, initialData = null }) => {
       {/* Edit Item Modal */}
       <Dialog
         open={!!editingItem}
-        onClose={() => setEditingItem(null)}
+        onClose={handleCancelEdit}
         maxWidth="sm"
         fullWidth
         PaperProps={{
@@ -508,22 +540,24 @@ const AddMenu = ({ open, onClose, onSuccess, initialData = null }) => {
 
             {/* URL Input or Category Selection */}
             {urlType === 'manual' ? (
-              <TextField
-                label="URL"
-                value={editingItem?.url || ''}
-                onChange={(e) => setEditingItem(prev => ({ ...prev, url: e.target.value }))}
-                fullWidth
-                required={editingSubIndex >= 0}
-                placeholder="/example"
-                helperText={editingSubIndex >= 0 ? "Nhập URL hoặc chọn 'Chọn từ danh mục hiện có' ở trên" : "URL của menu item"}
-              />
+              editingSubIndex >= 0 ? (
+                <TextField
+                  label="URL"
+                  value={editingItem?.url || ''}
+                  onChange={(e) => setEditingItem(prev => ({ ...prev, url: e.target.value }))}
+                  fullWidth
+                  required
+                  placeholder="/category/example-slug"
+                  helperText="Nhập URL (ví dụ: /category/ten-danh-muc) hoặc chọn 'Chọn từ danh mục hiện có' ở trên"
+                />
+              ) : null
             ) : editingSubIndex >= 0 ? (
               <Autocomplete
                 options={categories}
                 getOptionLabel={(option) => option.name}
                 loading={categoriesLoading}
                 value={categories.find(cat => 
-                  cat.link === editingItem?.url || `/productbycategory/${cat._id}` === editingItem?.url
+                  cat.link === editingItem?.url || `/category/${cat.slug}` === editingItem?.url
                 ) || null}
                 onChange={(event, newValue) => handleCategorySelect(newValue)}
                 renderInput={(params) => (
@@ -550,7 +584,7 @@ const AddMenu = ({ open, onClose, onSuccess, initialData = null }) => {
                         {option.name}
                       </Typography>
                       <Typography variant="caption" color="text.secondary">
-                        {option.link || `/productbycategory/${option._id}`}
+                        {option.link || `/category/${option.slug}`}
                       </Typography>
                     </Stack>
                   </Box>
@@ -558,14 +592,6 @@ const AddMenu = ({ open, onClose, onSuccess, initialData = null }) => {
                 noOptionsText="Không tìm thấy danh mục nào"
               />
             ) : null}
-
-            <TextField
-              label="Icon (tùy chọn)"
-              value={editingItem?.icon || ''}
-              onChange={(e) => setEditingItem(prev => ({ ...prev, icon: e.target.value }))}
-              fullWidth
-              placeholder="home, shopping-bag, etc."
-            />
 
             <TextField
               label="Thứ tự hiển thị"
@@ -592,7 +618,7 @@ const AddMenu = ({ open, onClose, onSuccess, initialData = null }) => {
                 <Typography variant="body2">
                   <strong>Megamenu Column:</strong> Item này sẽ hiển thị như một cột trong megamenu khi hover vào menu cha.
                   {urlType === 'category' && (
-                    <><br /><strong>Lưu ý:</strong> Khi chọn danh mục, URL sẽ được tự động điền. Tên menu có thể tùy chỉnh theo ý muốn.</>
+                    <><br /><strong>Lưu ý:</strong> Khi chọn danh mục, URL sẽ được tự động điền theo định dạng /category/slug. Tên menu có thể tùy chỉnh theo ý muốn.</>
                   )}
                 </Typography>
               </Alert>
@@ -601,10 +627,7 @@ const AddMenu = ({ open, onClose, onSuccess, initialData = null }) => {
         </DialogContent>
 
         <DialogActions sx={{ p: 3, pt: 1 }}>
-          <Button onClick={() => {
-            setEditingItem(null)
-            setUrlType('manual')
-          }}>
+          <Button onClick={handleCancelEdit}>
             Hủy
           </Button>
           <Button

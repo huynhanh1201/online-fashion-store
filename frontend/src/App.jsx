@@ -93,7 +93,7 @@ function App() {
         <Route path='/productdetail/:productId' element={<ProductDetail />} />
         <Route path='blog' element={<Blog />} />
         <Route path='/blog/:blogId' element={<BlogDetail />} />
-        <Route path="/danh-muc/:slug" element={<CategoryPage />} />
+        <Route path="/category/:slug" element={<CategoryPage />} />
 
 
         <Route
