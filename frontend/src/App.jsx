@@ -24,6 +24,7 @@ import Blog from '~/pages/user/Blog/Blog'
 import ProductbyCategory from '~/pages/user/ProductbyCategory/ProductbyCategory'
 import NewProducts from '~/pages/user/NewProducts/NewProducts'
 import Policy from '~/pages/user/Policy/Policy'
+import CategoryPage from './pages/user/CategoryPage/CategoryPage'
 // Trang HeaderAdmin
 import AdminLayout from '~/layout/AdminLayout'
 import AdminHome from '~/pages/admin/Home/index'
@@ -91,6 +92,8 @@ function App() {
         <Route path='/productdetail/:productId' element={<ProductDetail />} />
         <Route path='blog' element={<Blog />} />
         <Route path='/blog/:blogId' element={<BlogDetail />} />
+        <Route path="/danh-muc/:slug" element={<CategoryPage />} />
+
 
         <Route
           path='productbycategory/:categoryId'

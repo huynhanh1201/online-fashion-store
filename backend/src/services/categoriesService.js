@@ -131,6 +131,27 @@ const getCategory = async (categoryId) => {
   }
 }
 
+const getCategoryBySlug = async (slug) => {
+  // eslint-disable-next-line no-useless-catch
+  try {
+    const result = await CategoryModel.findOne({ 
+      slug: slug,
+      destroy: false 
+    }).lean()
+
+    if (!result) {
+      throw new ApiError(
+        StatusCodes.NOT_FOUND,
+        'Không tìm thấy danh mục sản phẩm.'
+      )
+    }
+
+    return result
+  } catch (err) {
+    throw err
+  }
+}
+
 const updateCategory = async (categoryId, reqBody) => {
   // eslint-disable-next-line no-useless-catch
   try {
@@ -179,6 +200,7 @@ export const categoriesService = {
   createCategory,
   getCategoryList,
   getCategory,
+  getCategoryBySlug,
   updateCategory,
   deleteCategory
 }

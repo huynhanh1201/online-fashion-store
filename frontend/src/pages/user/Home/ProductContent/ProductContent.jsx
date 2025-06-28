@@ -122,6 +122,12 @@ const ProductContent = () => {
       {sections.map((group, idx) => {
         const activeCategory = group.find(c => c._id === sectionActiveIds[idx]) || group[0] || {}
         const hasProducts = sectionProducts[idx] && sectionProducts[idx].length > 0;
+        
+        // Ẩn cả section nếu không có sản phẩm
+        if (!hasProducts && !loadingProducts[idx]) {
+          return null;
+        }
+        
         return (
           <div key={idx} style={{ marginBottom: 40 }}>
             <HeaderCategories

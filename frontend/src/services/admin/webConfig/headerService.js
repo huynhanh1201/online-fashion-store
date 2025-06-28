@@ -54,6 +54,47 @@ export const updateHeaderConfig = async (content) => {
   }
 }
 
+export const createHeaderConfig = async (content) => {
+  try {
+    const payload = {
+      key: 'header',
+      title: 'Header Configuration',
+      description: 'Cấu hình header của website',
+      content,
+      status: 'active'
+    }
+    
+    const response = await AuthorizedAxiosInstance.post(
+      `${API_ROOT}/v1/website-configs`,
+      payload
+    )
+    return response.data
+  } catch (error) {
+    console.error('Lỗi khi tạo cấu hình header:', error)
+    throw new Error(
+      error.response?.data?.message || 
+      error.message ||
+      'Không thể tạo cấu hình header. Vui lòng thử lại.'
+    )
+  }
+}
+
+// Helper function to save or update header config
+export const saveHeaderConfig = async (content) => {
+  try {
+    const existingHeader = await getHeaderConfig()
+    
+    if (existingHeader) {
+      return await updateHeaderConfig(content)
+    } else {
+      return await createHeaderConfig(content)
+    }
+  } catch (error) {
+    console.error('Lỗi khi lưu cấu hình header:', error)
+    throw error
+  }
+}
+
 // Menu Management Functions
 export const getMenuConfig = async () => {
   try {
@@ -134,12 +175,9 @@ export const createMenuConfig = async (content) => {
 export const validateHeaderContent = (content) => {
   const errors = []
 
-  if (!content.logo?.imageUrl?.trim()) {
-    errors.push('Logo URL không được để trống')
-  }
-
-  if (!content.logo?.alt?.trim()) {
-    errors.push('Logo alt text không được để trống')
+  // Logo validation - optional for initial creation
+  if (content.logo?.imageUrl && !content.logo?.alt?.trim()) {
+    errors.push('Logo alt text không được để trống khi có logo')
   }
 
   // Validate banners
