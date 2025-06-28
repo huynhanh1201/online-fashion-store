@@ -109,7 +109,7 @@ export default function AdminDrawer({
   const menuConfig = useMemo(
     () => ({
       statistics: {
-        // permission: 'statistics:read',
+        permission: 'statistics:use',
         label: 'Thống kê',
         path: '/admin',
         icon: <PollIcon />
@@ -117,7 +117,7 @@ export default function AdminDrawer({
       accountManagement: {
         permissions: ['user:use', 'account:use', 'role:use'],
         label: 'Quản lý tài khoản',
-        icon: <PaletteIcon />,
+        icon: <PersonIcon />,
         children: [
           {
             permission: 'user:use',
@@ -184,7 +184,8 @@ export default function AdminDrawer({
           'category:use',
           'color:use',
           'size:use',
-          'review:use'
+          'review:use',
+          'variant:use'
         ],
         label: 'Quản lý sản phẩm',
         icon: <InventoryIcon />,
@@ -192,7 +193,7 @@ export default function AdminDrawer({
           {
             permission: 'category:use',
             label: 'Quản lý danh mục',
-            path: '/admin/categorie-management',
+            path: '/admin/category-management',
             icon: <CategoryIcon />
           },
           {
@@ -306,35 +307,20 @@ export default function AdminDrawer({
 
   // Kiểm tra xem user có quyền truy cập menu không (sync function)
   const canAccessMenu = (menuItem) => {
-    // Chỉ kiểm tra quyền cụ thể, không dựa vào admin:access
+    // Chỉ kiểm tra quyền use, không fallback sang quyền CRUD
 
     // Kiểm tra quyền đơn lẻ
     if (menuItem.permission) {
-      const resource = menuItem.permission.split(':')[0]
-      // Kiểm tra các quyền: read, create, update, delete
-      const relatedPermissions = [
-        `${resource}:read`,
-        `${resource}:create`,
-        `${resource}:update`,
-        `${resource}:delete`
-      ]
-      return hasAnyPermission(relatedPermissions)
+      // Chỉ kiểm tra chính xác quyền được chỉ định (use)
+      return hasPermission(menuItem.permission)
     }
 
     // Kiểm tra danh sách quyền
     if (menuItem.permissions) {
-      // Tạo danh sách tất cả quyền liên quan từ các resource
-      const allRelatedPermissions = []
-      menuItem.permissions.forEach((permission) => {
-        const resource = permission.split(':')[0]
-        allRelatedPermissions.push(
-          `${resource}:read`,
-          `${resource}:create`,
-          `${resource}:update`,
-          `${resource}:delete`
-        )
-      })
-      return hasAnyPermission(allRelatedPermissions)
+      // Kiểm tra từng quyền trong danh sách (các quyền use)
+      return menuItem.permissions.some(permission =>
+        hasPermission(permission)
+      )
     }
 
     return false
@@ -346,7 +332,7 @@ export default function AdminDrawer({
       if (!isInitialized) return []
       return children.filter((child) => canAccessMenu(child))
     }
-  }, [isInitialized, hasPermission, hasAnyPermission])
+  }, [isInitialized, canAccessMenu])
 
   const profileName = profile?.name || 'Không có dữ liệu'
 
@@ -447,7 +433,7 @@ export default function AdminDrawer({
                 onClick={toggleOrder}
                 sx={{ padding: '12px 24px' }}
               >
-                <ListItemIcon sx={{ minWidth: 35 }}>
+                <ListItemIcon sx={{ minWidth: 45 }}>
                   <ReceiptLongIcon />
                 </ListItemIcon>
               </ListItemButton>
