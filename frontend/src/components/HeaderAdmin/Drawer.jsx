@@ -109,7 +109,7 @@ export default function AdminDrawer({
   const menuConfig = useMemo(
     () => ({
       statistics: {
-        // permission: 'statistics:read',
+        permission: 'statistics:read',
         label: 'Thống kê',
         path: '/admin',
         icon: <PollIcon />
@@ -121,7 +121,7 @@ export default function AdminDrawer({
         children: [
           {
             permission: 'user:use',
-            label: 'Tài khoản  người dùng',
+            label: 'Tài khoản  khách hàng',
             path: '/admin/user-management'
           },
           {
@@ -195,6 +195,12 @@ export default function AdminDrawer({
         icon: <InventoryIcon />,
         children: [
           {
+            permission: 'product:use',
+            label: 'Thống kê sản phẩm',
+            path: '/admin/product-statistic',
+            icon: <CategoryIcon />
+          },
+          {
             permission: 'category:use',
             label: 'Quản lý danh mục',
             path: '/admin/categorie-management',
@@ -235,6 +241,12 @@ export default function AdminDrawer({
         label: 'Quản lý đơn hàng',
         icon: <ReceiptLongIcon />,
         children: [
+          {
+            permission: 'order:use',
+            label: 'Thống kê đơn hàng',
+            path: '/admin/order-statistic',
+            icon: <ReceiptLongIcon />
+          },
           {
             permission: 'order:use',
             label: 'Quản lý đơn hàng',

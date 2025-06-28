@@ -104,11 +104,16 @@ const EditCategoryModal = ({ open, onClose, category, onSave }) => {
       if (imageFile) {
         imageUrl = await uploadToCloudinary(imageFile)
       }
+      let bannerUrl = bannerPreview
+      if (bannerFile) {
+        bannerUrl = await uploadToCloudinary(bannerFile)
+      }
 
       const payload = {
         name: data.name.trim(),
         description: data.description?.trim() || '',
-        image: imageUrl
+        image: imageUrl,
+        banner: bannerUrl
       }
 
       if (parentCategory && parentCategory._id) {
