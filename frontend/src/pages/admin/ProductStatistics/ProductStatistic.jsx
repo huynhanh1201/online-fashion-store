@@ -38,11 +38,10 @@ const styles = {
 const ProductStatistics = ({ stats }) => {
   const [currentPage, setCurrentPage] = useState(0)
 
-  const totalPages = Math.ceil(
-    stats.productCountByCategory.length / ITEMS_PER_PAGE
-  )
+  const productCountByCategory = stats.productCountByCategory || []
+  const totalPages = Math.ceil(productCountByCategory.length / ITEMS_PER_PAGE)
 
-  const paginatedData = stats.productCountByCategory.slice(
+  const paginatedData = productCountByCategory.slice(
     currentPage * ITEMS_PER_PAGE,
     (currentPage + 1) * ITEMS_PER_PAGE
   )
@@ -115,7 +114,7 @@ const ProductStatistics = ({ stats }) => {
         </Typography>
         <Grid container spacing={2}>
           {summaryItems.map((item, index) => (
-            <Grid item xs={12} sm={6} md={4} key={index}>
+            <Grid item size={4} xs={12} sm={6} md={4} key={index}>
               <Box
                 sx={{
                   display: 'flex',
