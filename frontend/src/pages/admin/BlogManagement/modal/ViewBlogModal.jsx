@@ -444,7 +444,7 @@ const ViewBlogModal = ({ open, onClose, blog, isMobile }) => {
       open={open}
       onClose={onClose}
       fullWidth
-      maxWidth='xl'
+      maxWidth='xxl'
       fullScreen={isMobile}
       sx={{
         mt: '64px',

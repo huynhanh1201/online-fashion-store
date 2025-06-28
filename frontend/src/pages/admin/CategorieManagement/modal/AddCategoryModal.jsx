@@ -38,12 +38,7 @@ const uploadToCloudinary = async (file, folder = CloudinaryCategory) => {
   return data.secure_url
 }
 
-const AddCategoryModal = ({
-  open,
-  onClose,
-  onAdded,
-  onSave
-}) => {
+const AddCategoryModal = ({ open, onClose, onAdded, onSave }) => {
   const {
     register,
     handleSubmit,
