@@ -25,6 +25,18 @@ export const getCategoryById = async (categoryId) => {
   }
 }
 
+export const getCategoryBySlug = async (slug) => {
+  try {
+    const response = await AuthorizedAxiosInstance.get(
+      `${API_ROOT}/v1/categories/slug/${slug}`
+    )
+    return response.data
+  } catch (error) {
+    console.error('Lỗi khi lấy thông tin danh mục theo slug:', error)
+    return null
+  }
+}
+
 export const updateCategory = async (categoryId, updatedData) => {
   try {
     const response = await AuthorizedAxiosInstance.patch(
