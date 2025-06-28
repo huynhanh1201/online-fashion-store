@@ -32,11 +32,27 @@ const ProductsCardNew = ({ product, isFlashSale = false }) => {
     return diffDays <= 7;
   })();
 
+  // Calculate price based on product export price and first variant's discount price
+  const calculateDisplayPrice = () => {
+    const originalPrice = product?.exportPrice || 0
+    const firstVariantDiscount = product?.firstVariantDiscountPrice || 0
+    const displayPrice = Math.max(0, originalPrice - firstVariantDiscount)
+    
+    return {
+      price: originalPrice,
+      discountPrice: displayPrice,
+      originalDiscountPrice: firstVariantDiscount
+    }
+  }
+
   // Hàm xử lý tên sản phẩm
   const truncateProductName = (name) => {
     if (!name) return ''
     return name.length > 17 ? name.substring(0, 20) + '...' : name
   }
+
+  const priceInfo = calculateDisplayPrice()
+  const hasDiscount = priceInfo.originalDiscountPrice > 0
 
   return (
     <Link
@@ -80,8 +96,8 @@ const ProductsCardNew = ({ product, isFlashSale = false }) => {
             }}
             loading="lazy"
           />
-          {product.discount > 0 && (
-            <div style={styles.discountBadge}>-{product.discount}%</div>
+          {hasDiscount && (
+            <div style={styles.discountBadge}>-{Math.round((priceInfo.originalDiscountPrice / priceInfo.price) * 100)}%</div>
           )}
         </div>
         <div style={styles.productInfo}>
@@ -90,11 +106,11 @@ const ProductsCardNew = ({ product, isFlashSale = false }) => {
           </h3>
           <div style={styles.priceRow}>
             <span style={styles.currentPrice}>
-              {(product.exportPrice ?? 0).toLocaleString()}₫
+              {priceInfo.discountPrice.toLocaleString()}₫
             </span>
-            {product.originalPrice && (
+            {hasDiscount && (
               <span style={styles.originalPrice}>
-                {product.originalPrice.toLocaleString()}₫
+                {priceInfo.price.toLocaleString()}₫
               </span>
             )}
           </div>

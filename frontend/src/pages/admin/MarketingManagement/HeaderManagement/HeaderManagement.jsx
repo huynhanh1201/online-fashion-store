@@ -1237,7 +1237,7 @@ const HeaderManagement = () => {
         open={openMenuModal}
         onClose={() => setOpenMenuModal(false)}
         onSuccess={handleMenuModalSuccess}
-        initialData={menuData?.content}
+        initialData={menuData?.content || null}
       />
     </Box>
   )

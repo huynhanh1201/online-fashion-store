@@ -4,7 +4,7 @@ import { Box } from '@mui/material'
 import { getHeaderConfig } from '~/services/admin/webConfig/headerService'
 
 const TopBar = styled(Box)(({ theme }) => ({
-  backgroundColor: '#1A3C7B',
+  backgroundColor: 'var(--primary-color)',
   color: 'white',
   width: '100%',
   overflow: 'hidden',

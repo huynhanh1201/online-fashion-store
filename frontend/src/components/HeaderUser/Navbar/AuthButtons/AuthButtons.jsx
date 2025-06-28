@@ -8,18 +8,18 @@ import { getProfileUser } from '~/services/userService'
 import { toast } from 'react-toastify'
 
 const StyledButtonRegister = styled(Button)(({ theme }) => ({
-  color: '#000',
+  color: 'var(--text-color)',
   fontWeight: 500,
   borderRadius: '10px',
   minWidth: '120px',
   maxWidth: '120px',
-  border: '2px solid #1A3C7B',
+  border: '2px solid var(--primary-color)',
   padding: '8px 16px',
   textTransform: 'none',
   transition: 'all 0.3s ease',
-  backgroundColor: '#f5f5f5',
+  backgroundColor: 'var(--surface-color)',
   '&:hover': {
-    backgroundColor: '#e9ecef',
+    backgroundColor: 'var(--surface-color)',
     transform: 'translateY(-2px)'
   },
   [theme.breakpoints.down('md')]: {
@@ -39,11 +39,11 @@ const StyledButtonLogin = styled(Button)(({ theme }) => ({
   padding: '8px 16px',
   textTransform: 'none',
   transition: 'all 0.3s ease',
-  backgroundColor: '#1A3C7B',
+  backgroundColor: 'var(--primary-color)',
   '&:hover': {
-    backgroundColor: '#e9ecef',
+    backgroundColor: 'var(--accent-color)',
     transform: 'translateY(-2px)',
-    color: 'black'
+    color: 'white'
   },
   [theme.breakpoints.down('md')]: {
     minWidth: '100px',
@@ -53,7 +53,7 @@ const StyledButtonLogin = styled(Button)(({ theme }) => ({
   }
 }))
 const StyledTypography = styled(Typography)(({ theme }) => ({
-  color: '#000',
+  color: 'var(--text-color)',
   fontWeight: 400,
   padding: '8px 16px',
   cursor: 'pointer',

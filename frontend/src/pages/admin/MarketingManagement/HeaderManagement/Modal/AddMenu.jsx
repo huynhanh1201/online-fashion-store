@@ -66,8 +66,10 @@ const AddMenu = ({ open, onClose, onSuccess, initialData = null }) => {
   const [activeTab, setActiveTab] = useState(0) // 0: Editor, 1: Preview
 
   useEffect(() => {
-    if (initialData) {
+    if (initialData && initialData.mainMenu && initialData.mainMenu.length > 0) {
       setMenuData(initialData)
+    } else {
+      setMenuData(getDefaultMenuStructure())
     }
   }, [initialData])
 

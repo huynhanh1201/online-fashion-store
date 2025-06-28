@@ -93,11 +93,8 @@ const NewProducts = () => {
       setLoading(true)
       setError(null)
 
-      // Map sort option to API sort parameter
-      const sortMap = {
-        createdAtDesc: 'createdAt_desc',
-        priceAsc: 'price_asc',
-        priceDesc: 'price_desc',
+      // Map sort option to API sort parameter (chỉ cho backend sort)
+      const backendSortMap = {
         nameAsc: 'name_asc',
         nameDesc: 'name_desc'
       }
@@ -105,7 +102,7 @@ const NewProducts = () => {
       const params = {
         page,
         limit: ITEMS_PER_PAGE,
-        sort: sortMap[sortOption] || 'createdAt_desc'
+        sort: backendSortMap[sortOption] || ''
       }
 
       console.log('Fetching products with params:', params)
@@ -122,17 +119,24 @@ const NewProducts = () => {
         throw new Error('Dữ liệu sản phẩm không hợp lệ')
       }
 
-      setProducts(
-        (response.products || []).slice().sort(
-          (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
-        )
-      )
+      let sortedProducts = [...response.products]
+
+      // Client-side sorting cho giá và ngày tạo
+      if (sortOption === 'priceAsc') {
+        sortedProducts.sort((a, b) => (a.exportPrice || 0) - (b.exportPrice || 0))
+      } else if (sortOption === 'priceDesc') {
+        sortedProducts.sort((a, b) => (b.exportPrice || 0) - (a.exportPrice || 0))
+      } else if (sortOption === 'createdAtDesc') {
+        sortedProducts.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+      }
+
+      setProducts(sortedProducts)
       setTotalPages(response.totalPages)
     } catch (error) {
       console.error('Chi tiết lỗi:', error)
       setError(
         error.message ||
-          'Không thể tải danh sách sản phẩm. Vui lòng thử lại sau.'
+        'Không thể tải danh sách sản phẩm. Vui lòng thử lại sau.'
       )
       setProducts([])
       setTotalPages(1)
