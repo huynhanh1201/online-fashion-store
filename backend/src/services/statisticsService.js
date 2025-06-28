@@ -4,6 +4,8 @@ import convertArrToMap from '~/utils/convertArrToMap'
 import { ProductModel } from '~/models/ProductModel'
 import { CategoryModel } from '~/models/CategoryModel'
 import { VariantModel } from '~/models/VariantModel'
+import { OrderModel } from '~/models/OrderModel'
+import { CouponModel } from '~/models/CouponModel'
 
 const getInventoryStatistics = async () => {
   // eslint-disable-next-line no-useless-catch
@@ -273,7 +275,111 @@ const getProductStatistics = async () => {
   }
 }
 
+const getOrderStatistics = async () => {
+  // eslint-disable-next-line no-useless-catch
+  try {
+    const orderStatsPromise = OrderModel.aggregate([
+      {
+        $match: {
+          status: 'Delivered'
+        }
+      },
+
+      {
+        $group: {
+          _id: null,
+          totalOrders: { $sum: 1 },
+          totalRevenue: { $sum: '$total' },
+          totalShipping: { $sum: '$shippingFee' },
+          totalDiscountAmount: { $sum: '$discountAmount' }
+        }
+      },
+      {
+        $project: {
+          _id: 0
+        }
+      }
+    ])
+
+    const couponStatsPromise = CouponModel.aggregate([
+      {
+        $group: {
+          _id: null,
+          totalCoupons: { $sum: 1 },
+          totalCouponsUsage: { $sum: '$usedCount' },
+          totalUsedUpCoupons: {
+            $sum: {
+              $cond: [{ $eq: ['$usedCount', '$usageLimit'] }, 1, 0]
+            }
+          }
+        }
+      },
+      {
+        $project: {
+          _id: 0
+        }
+      }
+    ])
+
+    const paymentMethodStatsPromise = OrderModel.aggregate([
+      {
+        $match: {
+          status: 'Delivered'
+        }
+      },
+      {
+        $group: {
+          _id: '$paymentMethod',
+          count: { $sum: 1 }
+        }
+      },
+      {
+        $project: {
+          _id: 0,
+          paymentMethod: '$_id',
+          count: 1
+        }
+      }
+    ])
+
+    const statusOrdersStatsPromise = OrderModel.aggregate([
+      {
+        $group: {
+          _id: '$status',
+          count: { $sum: 1 }
+        }
+      },
+      {
+        $project: {
+          _id: 0,
+          statusOrder: '$_id',
+          count: 1
+        }
+      }
+    ])
+
+    const [orderStats, couponStats, paymentMethodStats, statusOrdersStats] =
+      await Promise.all([
+        orderStatsPromise,
+        couponStatsPromise,
+        paymentMethodStatsPromise,
+        statusOrdersStatsPromise
+      ])
+
+    const result = {
+      orderStats: orderStats[0] || {},
+      couponStats: couponStats[0] || {},
+      paymentMethodStats: paymentMethodStats,
+      statusOrdersStats: statusOrdersStats
+    }
+    return result
+  } catch (err) {
+    throw err
+  }
+}
+
 export const statisticsService = {
   getInventoryStatistics,
-  getProductStatistics
+  getProductStatistics,
+  getOrderStatistics
 }

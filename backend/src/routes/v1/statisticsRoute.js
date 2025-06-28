@@ -17,4 +17,10 @@ Router.route('/product').get(
   statisticsController.getProductStatistics
 )
 
+// Thống sản phẩm.
+Router.route('/order').get(
+  authMiddleware.isAuthorized,
+  statisticsController.getOrderStatistics
+)
+
 export const statisticsRoute = Router
