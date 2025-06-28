@@ -20,7 +20,8 @@ import {
   LinearProgress,
   Stack,
   Tooltip,
-  Snackbar
+  Snackbar,
+  CircularProgress
 } from '@mui/material'
 import {
   PhotoCamera,
@@ -101,6 +102,7 @@ const ReviewModal = ({
   const [images, setImages] = useState([])
   const [videos, setVideos] = useState([])
   const [uploading, setUploading] = useState(false)
+  const [submitting, setSubmitting] = useState(false) // State for submit loading
   const [contentValidation, setContentValidation] = useState({
     isValid: true,
     violations: [],
@@ -152,6 +154,7 @@ const ReviewModal = ({
       setVideos([])
       setContentValidation({ isValid: true, violations: [], warnings: [] })
       setUploading(false)
+      setSubmitting(false) // Reset submit loading
       setSnackbar({ open: false, message: '', severity: 'info' })
     }
   }, [open])
@@ -370,22 +373,29 @@ const ReviewModal = ({
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i]
   }
 
-  const handleSubmit = () => {
-    if (rating && comment.trim() && contentValidation.isValid) {
-      onSubmit({
-        productId,
-        userId,
-        rating,
-        comment: contentValidation.filteredText || comment,
-        orderId,
-        images: images.map((img) => img.url),
-        videos: videos.map((vid) => vid.url)
-      })
+  const handleSubmit = async () => {
+    if (rating && comment.trim() && contentValidation.isValid && !submitting) {
+      setSubmitting(true)
+      try {
+        await onSubmit({
+          productId,
+          userId,
+          rating,
+          comment: contentValidation.filteredText || comment,
+          orderId,
+          images: images.map((img) => img.url),
+          videos: videos.map((vid) => vid.url)
+        })
+      } catch (error) {
+        console.error('Error submitting review:', error)
+      } finally {
+        setSubmitting(false)
+      }
     }
   }
 
   const isSubmitDisabled =
-    !rating || !comment.trim() || !contentValidation.isValid || uploading
+    !rating || !comment.trim() || !contentValidation.isValid || uploading || submitting
 
   return (
     <Dialog
@@ -774,9 +784,10 @@ const ReviewModal = ({
           color='primary'
           variant='contained'
           disabled={isSubmitDisabled}
+          startIcon={submitting ? <CircularProgress size={16} /> : null}
           sx={{ textTransform: 'none', fontWeight: 600 }}
         >
-          {uploading ? 'Đang tải...' : 'Gửi đánh giá'}
+          {submitting ? 'Đang gửi...' : uploading ? 'Đang tải...' : 'Gửi đánh giá'}
         </Button>
       </DialogActions>
 

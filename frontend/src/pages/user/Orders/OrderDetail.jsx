@@ -29,7 +29,7 @@ import { useOrder } from '~/hooks/useOrder'
 import { useCart } from '~/hooks/useCarts'
 import ReviewModal from './modal/ReviewModal'
 import ViewReviewModal from './modal/ViewReviewModal'
-import { createReview, getUserReviews } from '~/services/reviewService'
+import { createReview, getUserReviews, getUserReviewForProduct } from '~/services/reviewService'
 import { useSelector, useDispatch } from 'react-redux'
 import { selectCurrentUser } from '~/redux/user/userSlice'
 import { setReorderVariantIds } from '~/redux/cart/cartSlice'
@@ -42,6 +42,103 @@ const statusLabels = {
   Delivered: ['Đã giao', 'success'],
   Cancelled: ['Đã hủy', 'error'],
   Failed: ['Thanh toán thất bại', 'error'],
+}
+
+// Review Button Component with fallback check
+const ReviewButtonComponent = ({
+  product,
+  reviewedProducts,
+  setReviewedProducts,
+  reviewsLoading,
+  isOrderCompleted,
+  currentUser,
+  setSelectedProduct,
+  setOpenReviewModal,
+  setOpenViewReviewModal,
+  checkProductReview
+}) => {
+  const [checking, setChecking] = useState(false)
+  const [isReviewed, setIsReviewed] = useState(reviewedProducts.has(product.productId))
+
+  useEffect(() => {
+    const wasReviewed = reviewedProducts.has(product.productId)
+    console.log(`Product ${product.productId} - reviewedProducts state:`, reviewedProducts, 'isReviewed:', wasReviewed)
+    setIsReviewed(wasReviewed)
+  }, [reviewedProducts, product.productId])
+
+  // Kiểm tra và xử lý click đánh giá
+  const handleReviewClick = async () => {
+    console.log('handleReviewClick: Started', { productId: product.productId, isReviewed, checking })
+    setSelectedProduct(product)
+
+    if (!isReviewed && !checking) {
+      setChecking(true)
+      console.log('handleReviewClick: Checking with server...')
+
+      // Double-check với server để đảm bảo chính xác
+      const hasReview = await checkProductReview(product.productId)
+      console.log('handleReviewClick: Server check result:', hasReview)
+
+      if (hasReview) {
+        // Nếu đã có đánh giá, cập nhật cả local và global state
+        console.log('handleReviewClick: Product already reviewed, updating state')
+        setIsReviewed(true)
+        setReviewedProducts(prev => new Set([...prev, product.productId]))
+        setOpenViewReviewModal(true)
+      } else {
+        // Nếu chưa có đánh giá, mở modal để đánh giá
+        console.log('handleReviewClick: Product not reviewed, opening review modal')
+        setOpenReviewModal(true)
+      }
+      setChecking(false)
+    } else if (isReviewed) {
+      // Nếu đã đánh giá, mở modal xem đánh giá
+      console.log('handleReviewClick: Product already reviewed, opening view modal')
+      setOpenViewReviewModal(true)
+    }
+  }
+
+  if (reviewsLoading || !isOrderCompleted || !currentUser) {
+    return reviewsLoading && isOrderCompleted && currentUser ? <CircularProgress size={20} /> : null
+  }
+
+  // Không ẩn nút, chỉ thay đổi text và hành vi
+
+  return (
+    <Button
+      variant={isReviewed ? "outlined" : "contained"}
+      size="medium"
+      disabled={checking}
+      sx={isReviewed ? {
+        borderRadius: 2,
+        textTransform: 'none',
+        fontWeight: 600,
+        color: 'success.main',
+        borderColor: 'success.main',
+        '&:hover': {
+          backgroundColor: 'success.50',
+          borderColor: 'success.main'
+        }
+      } : {
+        backgroundColor: '#1A3C7B',
+        color: '#fff',
+        borderRadius: 2,
+        textTransform: 'none',
+        fontWeight: 600,
+        '&:hover': {
+          backgroundColor: '#162f63',
+          boxShadow: '0 4px 12px rgba(26, 60, 123, 0.3)'
+        },
+      }}
+      onClick={(e) => {
+        e.stopPropagation()
+        handleReviewClick()
+      }}
+      startIcon={checking ? <CircularProgress size={16} /> : null}
+    >
+      {checking ? 'Kiểm tra...' : isReviewed ? 'Xem đánh giá' : 'Đánh giá'}
+    </Button>
+  )
 }
 
 // Confirmation Modal Component
@@ -154,25 +251,58 @@ const OrderDetail = () => {
   const [openCancelModal, setOpenCancelModal] = useState(false)
   const [cancelling, setCancelling] = useState(false)
   const [reorderLoading, setReorderLoading] = useState(false)
+  const [reviewsLoading, setReviewsLoading] = useState(true) // Loading state for reviews
+
+  // Function to check if a specific product has been reviewed for THIS ORDER
+  // Kiểm tra chính xác theo orderID để đảm bảo không duplicate review trong cùng 1 đơn hàng
+  const checkProductReview = async (productId) => {
+    if (!currentUser?._id || !orderId || !productId) {
+      console.log('checkProductReview: Missing required data', { userId: currentUser?._id, orderId, productId })
+      return false
+    }
+
+    try {
+      console.log('checkProductReview: Calling API for', { userId: currentUser._id, productId, orderId })
+      const reviews = await getUserReviewForProduct(currentUser._id, productId, orderId)
+      const hasReview = reviews && reviews.length > 0
+      console.log('checkProductReview: API response', { reviews, hasReview })
+      return hasReview
+    } catch (error) {
+      console.error('Error checking product review:', error)
+      return false
+    }
+  }
 
   useEffect(() => {
     const fetchUserReviews = async () => {
-      if (!currentUser?._id || !orderId) return
+      // Chỉ fetch khi có đầy đủ thông tin cần thiết
+      if (!currentUser?._id || !orderId || !order) {
+        setReviewsLoading(false)
+        return
+      }
+
+      setReviewsLoading(true)
       try {
         const reviews = await getUserReviews(currentUser._id)
 
         // Check which products in this order have been reviewed
+        // Filter theo chính xác orderID để tránh conflict với review từ order khác
         const reviewedProductsInOrder = reviews
           .filter((review) => review.orderId === orderId)
           .map((review) => review.productId)
         setReviewedProducts(new Set(reviewedProductsInOrder))
+
+        console.log('Reviewed products in this order:', reviewedProductsInOrder)
+        console.log('All reviews for user:', reviews)
       } catch (err) {
         console.error('Lỗi khi lấy đánh giá người dùng:', err)
         setReviewedProducts(new Set()) // Set empty set on error
+      } finally {
+        setReviewsLoading(false)
       }
     }
     fetchUserReviews()
-  }, [currentUser, orderId])
+  }, [currentUser, orderId, order]) // Thêm order vào dependencies
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'auto' })
   }, [])
@@ -257,21 +387,58 @@ const OrderDetail = () => {
   const handleSubmitReview = async (reviewData) => {
     try {
       const productId = selectedProduct?.productId
+
+      // Kiểm tra đầy đủ trước khi gửi đánh giá
+      if (!productId || !orderId || !currentUser?._id) {
+        console.error('Thiếu thông tin cần thiết để đánh giá.')
+        handleCloseModal()
+        return
+      }
+
+      // Double-check với server trước khi gửi đánh giá
+      const hasExistingReview = await checkProductReview(productId)
+      if (hasExistingReview) {
+        console.error('Sản phẩm này đã được đánh giá trong đơn hàng này.')
+        // Cập nhật state và đóng modal
+        setReviewedProducts(prev => new Set([...prev, productId]))
+        setSnackbarOpen(true)
+        handleCloseModal()
+        return
+      }
+
+      // Kiểm tra state local
       if (reviewedProducts.has(productId)) {
         console.error('Sản phẩm này đã được đánh giá.')
+        setSnackbarOpen(true)
+        handleCloseModal()
         return
       }
 
       // Gửi đánh giá với payload đầy đủ
-      await createReview(reviewData)
+      const result = await createReview(reviewData)
 
-      // Mark this specific product as reviewed
-      setReviewedProducts(prev => new Set([...prev, productId]))
-      handleCloseModal()
-      setSnackbarOpen(true)
+      if (result) {
+        // Mark this specific product as reviewed ngay lập tức
+        console.log('handleSubmitReview: Review submitted successfully, updating state for productId:', productId)
+        setReviewedProducts(prev => {
+          const newSet = new Set([...prev, productId])
+          console.log('handleSubmitReview: Updated reviewedProducts:', newSet)
+          return newSet
+        })
+        handleCloseModal()
+        setSnackbarOpen(true)
+      }
     } catch (error) {
       console.error('Lỗi gửi đánh giá:', error)
-      console.error('Error details:', error)
+      // Hiển thị lỗi cho user nếu cần
+      if (error?.message?.includes('đã được đánh giá') || error?.message?.includes('already reviewed')) {
+        // Nếu server báo đã được đánh giá, cập nhật state
+        const productId = selectedProduct?.productId
+        if (productId) {
+          setReviewedProducts(prev => new Set([...prev, productId]))
+        }
+      }
+      handleCloseModal()
     }
   }
 
@@ -524,56 +691,18 @@ const OrderDetail = () => {
 
                 {/* Action Buttons */}
                 <Box display="flex" justifyContent="flex-end" gap={2} mt={2}>
-                  {isOrderCompleted && currentUser && !reviewedProducts.has(product.productId) && (
-                    <Button
-                      variant="contained"
-                      size="medium"
-                      sx={{
-                        backgroundColor: '#1A3C7B',
-                        color: '#fff',
-                        borderRadius: 2,
-                        textTransform: 'none',
-                        fontWeight: 600,
-                        '&:hover': {
-                          backgroundColor: '#162f63',
-                          boxShadow: '0 4px 12px rgba(26, 60, 123, 0.3)'
-                        },
-                      }}
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        setSelectedProduct(product)
-                        setOpenReviewModal(true)
-                      }}
-                    >
-                      Đánh giá
-                    </Button>
-                  )}
-
-                  {isOrderCompleted && currentUser && reviewedProducts.has(product.productId) && (
-                    <Button
-                      variant="outlined"
-                      size="medium"
-                      sx={{
-                        borderRadius: 2,
-                        textTransform: 'none',
-                        fontWeight: 600,
-                        color: 'success.main',
-                        borderColor: 'success.main',
-                        '&:hover': {
-                          backgroundColor: 'success.50',
-                          borderColor: 'success.main'
-                        }
-                      }}
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        setSelectedProduct(product)
-                        setOpenViewReviewModal(true)
-                      }}
-                    >
-                      ✓ Xem đánh giá
-                    </Button>
-                  )}
-
+                  <ReviewButtonComponent
+                    product={product}
+                    reviewedProducts={reviewedProducts}
+                    setReviewedProducts={setReviewedProducts}
+                    reviewsLoading={reviewsLoading}
+                    isOrderCompleted={isOrderCompleted}
+                    currentUser={currentUser}
+                    setSelectedProduct={setSelectedProduct}
+                    setOpenReviewModal={setOpenReviewModal}
+                    setOpenViewReviewModal={setOpenViewReviewModal}
+                    checkProductReview={checkProductReview}
+                  />
                 </Box>
 
                 {index < uniqueProducts.length - 1 && <Divider sx={{ my: 3 }} />}

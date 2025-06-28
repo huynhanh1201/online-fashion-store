@@ -15,7 +15,7 @@ export const getReviews = async (productId) => {
     const response = await AuthorizedAxiosInstance.get(
       `${API_ROOT}/v1/reviews?productId=${productId}`
     )
-    return response.data
+    return response.data.data
   } catch (error) {
     throw error.response?.data || error.message || 'Không lấy được đánh giá'
   }
@@ -25,7 +25,7 @@ export const getUserReviews = async (userId) => {
     const response = await AuthorizedAxiosInstance.get(
       `${API_ROOT}/v1/reviews?userId=${userId}`
     )
-    return response.data
+    return response.data.data
   } catch (error) {
     throw error.response?.data || error.message || 'Không lấy được đánh giá người dùng'
   }
@@ -36,19 +36,9 @@ export const getUserReviewForProduct = async (userId, productId, orderId) => {
     const response = await AuthorizedAxiosInstance.get(
       `${API_ROOT}/v1/reviews?userId=${userId}&productId=${productId}&orderId=${orderId}`
     )
-    return response.data
+    return response.data.data
   } catch (error) {
     throw error.response?.data || error.message || 'Không lấy được đánh giá của sản phẩm'
   }
 }
 
-
-export const updateReview = async (reviewId, updatedData) => {
-  try {
-    const response = await AuthorizedAxiosInstance.patch(`${API_ROOT}/v1/reviews/${reviewId}`, updatedData)
-    return response.data
-  } catch (error) {
-    console.error('Lỗi cập nhật đánh giá:', error)
-    throw error
-  }
-}

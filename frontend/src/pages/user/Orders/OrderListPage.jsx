@@ -32,10 +32,12 @@ import {
   Replay,
   Visibility,
   Warning,
-  Sync
+  Sync,
+  RateReview
 } from '@mui/icons-material'
 import ScheduleIcon from '@mui/icons-material/Schedule';
 import { getOrders, getOrderItems } from '~/services/orderService'
+import { getVariantId } from '~/services/admin/Inventory/VariantService'
 import { useOrder } from '~/hooks/useOrder'
 import { useNavigate } from 'react-router-dom'
 import { useSelector, useDispatch } from 'react-redux'
@@ -43,6 +45,7 @@ import { selectCurrentUser } from '~/redux/user/userSlice'
 import { useCart } from '~/hooks/useCarts'
 import { optimizeCloudinaryUrl } from '~/utils/cloudinary'
 import { setReorderVariantIds } from '~/redux/cart/cartSlice'
+import { getUserReviews } from '~/services/reviewService'
 
 // Define status labels with icons and colors
 const statusLabels = {
@@ -224,7 +227,10 @@ const OrderRow = ({ order, onOrderUpdate, onOrderCancelled, onReorder, reorderLo
   const [loadingItems, setLoadingItems] = useState(true)
   const [openCancelModal, setOpenCancelModal] = useState(false)
   const [cancelling, setCancelling] = useState(false)
+  const [reviewedProducts, setReviewedProducts] = useState(new Set())
+  const [reviewsLoading, setReviewsLoading] = useState(true)
   const navigate = useNavigate()
+  const currentUser = useSelector(selectCurrentUser)
 
   const [label, color, icon] = statusLabels[order.status] || ['Không xác định', 'default', <Cancel key="unknown" />]
   const { cancelOrder } = useOrder()
@@ -255,6 +261,31 @@ const OrderRow = ({ order, onOrderUpdate, onOrderCancelled, onReorder, reorderLo
 
     fetchItems()
   }, [])
+
+  // Fetch reviews for delivered orders
+  useEffect(() => {
+    const fetchUserReviews = async () => {
+      if (!currentUser?._id || !order?._id || order.status !== 'Delivered') {
+        setReviewsLoading(false)
+        return
+      }
+
+      try {
+        const reviews = await getUserReviews(currentUser._id)
+        const reviewedProductsInOrder = reviews
+          .filter((review) => review.orderId === order._id)
+          .map((review) => review.productId)
+        setReviewedProducts(new Set(reviewedProductsInOrder))
+      } catch (err) {
+        console.error('Lỗi khi lấy đánh giá người dùng:', err)
+        setReviewedProducts(new Set())
+      } finally {
+        setReviewsLoading(false)
+      }
+    }
+
+    fetchUserReviews()
+  }, [currentUser, order._id, order.status])
 
   // Handle cancel order confirmation
   const handleCancelOrder = async () => {
@@ -475,6 +506,28 @@ const OrderRow = ({ order, onOrderUpdate, onOrderCancelled, onReorder, reorderLo
                 Xem chi tiết
               </Button>
 
+              {/* Nút Xem đánh giá cho đơn hàng đã giao có sản phẩm đã đánh giá */}
+              {order.status === 'Delivered' && !reviewsLoading && reviewedProducts.size > 0 && (
+                <Button
+                  startIcon={<RateReview />}
+                  onClick={() => navigate(`/order-detail/${order._id}#reviews`)}
+                  sx={{
+                    borderRadius: 2,
+                    textTransform: 'none',
+                    fontWeight: 600,
+                    color: 'success.main',
+                    borderColor: 'success.main',
+                    border: '1px solid',
+                    '&:hover': {
+                      backgroundColor: 'success.50',
+                      borderColor: 'success.main'
+                    }
+                  }}
+                >
+                  Xem đánh giá ({reviewedProducts.size})
+                </Button>
+              )}
+
               {(order.status === 'Delivered' || order.status === 'Failed' || order.status === 'Cancelled') && (
                 <Button
                   startIcon={reorderLoading ? <CircularProgress size={16} /> : <Replay />}
@@ -537,13 +590,16 @@ const OrderListPage = () => {
   const [hasMore, setHasMore] = useState(true)
   const [isInitialized, setIsInitialized] = useState(false)
   const [recentlyUpdatedOrderId, setRecentlyUpdatedOrderId] = useState(null) // Track recently updated order for highlighting
+
   const currentUser = useSelector(selectCurrentUser)
   const userId = currentUser?._id
   const navigate = useNavigate()
   const dispatch = useDispatch()
 
   // Chỉ gọi useCart khi thực sự cần thiết
-  const { addToCart, refresh: refreshCart } = useCart()
+  const { addToCart, refresh: refreshCart, cart } = useCart()
+
+
 
   const fetchOrders = async (page = 1, reset = true, status = selectedTab, isTabSwitch = false, sortBy = 'updatedAt') => {
     if (!userId) return
@@ -635,14 +691,12 @@ const OrderListPage = () => {
     }
   }
 
-  // Handle reorder - chỉ gọi useCart khi thực sự cần
+  // Handle reorder - logic đơn giản: nếu có trong giỏ thì bỏ qua, nếu hết hàng thì gửi quantity = 0
   const handleReorder = async (items, orderId) => {
     try {
       setReorderLoading(orderId)
 
-      let successCount = 0
-
-      // Lặp qua từng sản phẩm trong đơn hàng - luôn gửi quantity = 1
+      // Lặp qua từng sản phẩm trong đơn hàng
       for (let i = 0; i < items.length; i++) {
         const item = items[i]
         const variantId = typeof item.variantId === 'object' ? item.variantId._id : item.variantId
@@ -653,16 +707,63 @@ const OrderListPage = () => {
         }
 
         try {
-          // Đảm bảo quantity luôn là 1
-          const result = await addToCart({
-            variantId: variantId,
-            quantity: 1
+          // Kiểm tra số lượng tồn kho của variant trước
+          const variantInfo = await getVariantId(variantId)
+
+          if (!variantInfo) {
+            console.warn('Variant not found for ID:', variantId)
+            continue
+          }
+
+          // Kiểm tra số lượng tồn kho
+          const availableQuantity = variantInfo.quantity || 0
+
+          let quantityToAdd = 1 // Mặc định thêm 1
+
+          // Nếu hết hàng thì gửi quantity = 0 để hiển thị "hết hàng" trong cart
+          if (availableQuantity <= 0) {
+            quantityToAdd = 0
+            console.log(`Item ${item.name} is out of stock, adding with quantity = 0`)
+            // Thêm vào giỏ hàng với quantity = 0
+            await addToCart({
+              variantId: variantId,
+              quantity: quantityToAdd
+            })
+            continue
+          }
+
+          // Kiểm tra xem sản phẩm đã có trong giỏ hàng chưa
+          const currentCartItem = cart?.cartItems?.find(cartItem => {
+            const cartVariantId = typeof cartItem.variantId === 'object'
+              ? cartItem.variantId._id
+              : cartItem.variantId
+            return cartVariantId === variantId
           })
 
+          const currentQuantityInCart = currentCartItem?.quantity || 0
 
-          if (result) {
-            successCount++
+          // Nếu đã có trong giỏ hàng và đạt số lượng tối đa thì BỎ QUA
+          if (currentCartItem && currentQuantityInCart >= availableQuantity) {
+            console.log(`Item ${item.name} reached max quantity in cart (${currentQuantityInCart}/${availableQuantity}), skipping`)
+            continue
           }
+          // Nếu đã có trong giỏ hàng nhưng chưa đạt tối đa
+          else if (currentCartItem) {
+            // Tính toán số lượng có thể thêm
+            const canAdd = availableQuantity - currentQuantityInCart
+            quantityToAdd = Math.min(1, canAdd) // Chỉ thêm tối đa 1 hoặc số lượng còn lại
+            console.log(`Item ${item.name} already in cart (${currentQuantityInCart}), adding ${quantityToAdd} more`)
+          }
+          // Sản phẩm chưa có trong giỏ hàng
+          else {
+            console.log(`Adding new item ${item.name} to cart`)
+          }
+
+          // Thêm vào giỏ hàng
+          await addToCart({
+            variantId: variantId,
+            quantity: quantityToAdd
+          })
         } catch (error) {
           console.error(`Error adding item ${i + 1} to cart:`, error)
         }
@@ -673,23 +774,21 @@ const OrderListPage = () => {
         }
       }
 
-      if (successCount > 0) {
-        // Lưu danh sách variantId từ reorder vào Redux để cart tự động chọn
-        const reorderVariantIds = items
-          .map(item => typeof item.variantId === 'object' ? item.variantId._id : item.variantId)
-          .filter(id => id) // Lọc bỏ các id không hợp lệ
+      // Lưu danh sách variantId từ reorder vào Redux để cart tự động chọn
+      const reorderVariantIds = items
+        .map(item => typeof item.variantId === 'object' ? item.variantId._id : item.variantId)
+        .filter(id => id) // Lọc bỏ các id không hợp lệ
 
-        dispatch(setReorderVariantIds(reorderVariantIds))
+      dispatch(setReorderVariantIds(reorderVariantIds))
 
-        // Force refresh cart data before navigating
-        await refreshCart({ silent: true })
+      // Force refresh cart data before navigating
+      await refreshCart({ silent: true })
 
-        setTimeout(() => {
-          navigate('/cart')
-        }, 300) // Tăng thời gian chờ để đảm bảo cart đã refresh
-      } else {
-        console.error('No items were added to cart')
-      }
+      // Chuyển đến giỏ hàng luôn
+      setTimeout(() => {
+        navigate('/cart')
+      }, 300)
+
     } catch (err) {
       console.error('Lỗi khi mua lại:', err)
     } finally {

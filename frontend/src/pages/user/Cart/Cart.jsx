@@ -72,7 +72,16 @@ const Cart = () => {
   }, [])
 
   useEffect(() => {
-    if (cart?.cartItems) setCartItems(cart.cartItems)
+    if (cart?.cartItems) {
+      // Sắp xếp: sản phẩm còn hàng trước, hết hàng sau
+      const sortedItems = [...cart.cartItems].sort((a, b) => {
+        // Sản phẩm còn hàng (quantity > 0) có priority cao hơn
+        if (a.quantity > 0 && b.quantity === 0) return -1
+        if (a.quantity === 0 && b.quantity > 0) return 1
+        return 0 // Giữ nguyên thứ tự nếu cùng loại
+      })
+      setCartItems(sortedItems)
+    }
   }, [cart])
 
   // Tự động chọn các sản phẩm từ reorder
@@ -98,8 +107,9 @@ const Cart = () => {
           // Handle cả variant._id và variantId trực tiếp
           const variantId = item.variant?._id || item.variantId?._id || item.variantId
           const isMatch = reorderVariantIds.includes(variantId)
-          console.log(`Checking item ${item.name} with variantId ${variantId}: ${isMatch}`)
-          return isMatch
+          const hasStock = item.quantity > 0 // Chỉ chọn sản phẩm còn hàng
+          console.log(`Checking item ${item.name} with variantId ${variantId}: match=${isMatch}, hasStock=${hasStock}`)
+          return isMatch && hasStock
         })
         .map(item => ({
           variantId: item.variant?._id || item.variantId?._id || item.variantId,
@@ -143,15 +153,18 @@ const Cart = () => {
     fetchCoupons()
   }, [hasFetchedCoupons])
 
+  // Lọc ra các sản phẩm có thể chọn (không hết hàng)
+  const selectableItems = cartItems.filter(item => item.quantity > 0)
+
   const allSelected =
-    cartItems.length > 0 && selectedItems.length === cartItems.length
+    selectableItems.length > 0 && selectedItems.length === selectableItems.length
   const someSelected =
-    selectedItems.length > 0 && selectedItems.length < cartItems.length
+    selectedItems.length > 0 && selectedItems.length < selectableItems.length
 
   const handleSelectAll = () => {
     const newSelected = allSelected
       ? []
-      : cartItems.map((item) => ({
+      : selectableItems.map((item) => ({
         variantId: item.variant._id,
         quantity: item.quantity,
       }))
@@ -591,6 +604,9 @@ const Cart = () => {
                   const variant = item.variant
                   if (!variant) return null
 
+                  // Kiểm tra xem sản phẩm có hết hàng không (quantity = 0)
+                  const isOutOfStock = item.quantity === 0
+
                   return (
                     <React.Fragment key={item._id}>
                       <Box
@@ -600,6 +616,8 @@ const Cart = () => {
                           alignItems: 'center',
                           gap: { xs: 1.5, sm: 2 },
                           flexWrap: { xs: 'wrap', sm: 'nowrap' },
+                          opacity: isOutOfStock ? 0.6 : 1, // Làm mờ sản phẩm hết hàng
+                          backgroundColor: isOutOfStock ? '#f5f5f5' : 'transparent',
                         }}
                       >
                         {/* Checkbox */}
@@ -607,7 +625,8 @@ const Cart = () => {
                           checked={selectedItems.some((i) => i.variantId === variant._id)}
                           onChange={() => handleSelect(item)}
                           color="primary"
-                          sx={{ alignSelf: 'center' }} // thay vì 'flex-start' hoặc bỏ hẳn nếu dùng Box bọc
+                          disabled={isOutOfStock} // Disable checkbox khi hết hàng
+                          sx={{ alignSelf: 'center' }}
                         />
 
 
@@ -652,23 +671,41 @@ const Cart = () => {
                             gap: 1,
                           }}
                         >
-                          <Typography
-                            fontWeight={600}
-                            sx={{
-                              fontSize: {
-                                xs: '0.9rem',
-                                sm: '1rem',
-                                md: '1.1rem',
-                              },
-                              maxWidth: '100%',
-                              whiteSpace: 'nowrap',
-                              overflow: 'hidden',
-                              textOverflow: 'ellipsis',
-                            }}
-                            title={variant.name}
-                          >
-                            {capitalizeFirstLetter(variant.name)}
-                          </Typography>
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                            <Typography
+                              fontWeight={600}
+                              sx={{
+                                fontSize: {
+                                  xs: '0.8rem',
+                                  sm: '0.9rem',
+                                  md: '1rem',
+                                },
+                                maxWidth: '100%',
+                                whiteSpace: 'nowrap',
+                                overflow: 'hidden',
+                                textOverflow: 'ellipsis',
+                              }}
+                              title={variant.name}
+                            >
+                              {capitalizeFirstLetter(variant.name)}
+                            </Typography>
+                            {isOutOfStock && (
+                              <Chip
+                                size="small"
+                                label="Hết hàng"
+                                sx={{
+                                  fontSize: '0.75rem',
+                                  backgroundColor: '#ff5722',
+                                  color: 'white',
+                                  fontWeight: 600,
+                                  '& .MuiChip-label': {
+                                    px: 1,
+                                  },
+                                }}
+                              />
+                            )}
+                          </Box>
+
                           <Box display="flex" gap={1} flexWrap="wrap">
                             <Chip
                               size="small"
@@ -737,6 +774,7 @@ const Cart = () => {
                             gap: 1.5
                           }}
                         >
+                          {/* Quantity controls - chỉ hiện khi không hết hàng */}
                           <Box
                             display="flex"
                             alignItems="center"
