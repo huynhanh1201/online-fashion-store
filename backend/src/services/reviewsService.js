@@ -1,6 +1,8 @@
 import { ReviewModel } from '~/models/ReviewModel'
 import validatePagination from '~/utils/validatePagination'
 import getDateRange from '~/utils/getDateRange'
+import { ProductModel } from '~/models/ProductModel'
+import mongoose from 'mongoose'
 
 const createReview = async (reqBody) => {
   // eslint-disable-next-line no-useless-catch
@@ -22,6 +24,8 @@ const createReview = async (reqBody) => {
     }
 
     const reviews = await ReviewModel.create(newReview)
+
+    await updateProductRating(reqBody.productId)
 
     return reviews
   } catch (err) {
@@ -138,10 +142,32 @@ const deleteReview = async (reviewId) => {
       { new: true }
     )
 
+    await updateProductRating(reviewDeleted.productId)
+
     return reviewDeleted
   } catch (err) {
     throw err
   }
+}
+
+const updateProductRating = async (productId) => {
+  const stats = await ReviewModel.aggregate([
+    { $match: { productId: new mongoose.Types.ObjectId(productId) } },
+    {
+      $group: {
+        _id: '$productId',
+        avgRating: { $avg: '$rating' },
+        totalReviews: { $sum: 1 }
+      }
+    }
+  ])
+
+  const { avgRating = 0, totalReviews = 0 } = stats[0] || {}
+
+  await ProductModel.findByIdAndUpdate(productId, {
+    avgRating: Math.round(avgRating * 10) / 10, // làm tròn 1 chữ số
+    totalReviews
+  })
 }
 
 export const reviewsService = {

@@ -97,6 +97,12 @@ const productSchema = new Schema(
       type: String,
       enum: ['draft', 'active', 'inactive'], // Trạng thái sản phẩm
       default: 'draft' // Mặc định là 'draft'
+    },
+
+    avgRating: {
+      type: Number,
+      required: true,
+      min: 0
     }
   },
   {
