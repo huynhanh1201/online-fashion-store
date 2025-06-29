@@ -167,63 +167,69 @@ const CouponList = ({ onCouponSelect }) => {
         .coupon-card {
           flex: 0 0 auto;
           width: 270px;
-          background-color: #ffffff;
-          border: 1px solid #e5e7eb;
-          border-radius: 6px;
+          background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+          border: 2px solid var(--primary-color);
+          border-radius: 12px;
           overflow: hidden;
-          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-          transition: all 0.2s ease;
+          box-shadow: 0 2px 8px rgba(59, 130, 246, 0.1);
+          transition: all 0.3s ease;
           position: relative;
           cursor: pointer;
         }
 
         .coupon-card:hover {
-          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-          transform: translateY(-2px);
+          box-shadow: 0 8px 25px rgba(59, 130, 246, 0.2);
+          transform: translateY(-3px);
+          border-color: var(--accent-color);
         }
 
         .coupon-header {
-          padding: 12px 16px 8px 16px;
+          padding: 16px 20px 12px 20px;
           display: flex;
           justify-content: space-between;
           align-items: flex-start;
           flex-wrap: wrap;
           gap: 8px;
+          background: linear-gradient(135deg, var(--primary-color) 0%, var(--accent-color) 100%);
         }
 
         .voucher-label {
-          color: #475569;
-          font-size: 15px;
+          color: #ffffff;
+          font-size: 14px;
           font-weight: 700;
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
         }
 
         .condition-text {
-          font-size: 12px;
-          color: #64748b;
-          font-weight: 800;
+          font-size: 11px;
+          color: rgba(255, 255, 255, 0.9);
+          font-weight: 600;
           text-align: right;
           flex-shrink: 0;
         }
 
         .main-value-section {
-          padding: 0 7px 3px;
+          padding: 16px 20px 8px 20px;
+          background: #ffffff;
         }
 
         .main-text {
-          font-size: 27px;
-          font-weight: 700;
-          color: #1e40af;
-          margin-left: 12px;
+          font-size: 28px;
+          font-weight: 800;
+          color: var(--primary-color);
+          text-align: center;
+          text-shadow: 0 1px 2px rgba(59, 130, 246, 0.1);
         }
 
         .code-section {
-          padding: 12px 16px;
-          background-color: #f8fafc;
-          border-top: 1px solid #e5e7eb;
+          padding: 16px 20px;
+          background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+          border-top: 1px solid #e2e8f0;
           display: flex;
           align-items: center;
           justify-content: space-between;
-          gap: 8px;
+          gap: 12px;
         }
 
         .code-label {
@@ -233,69 +239,91 @@ const CouponList = ({ onCouponSelect }) => {
         }
 
         .code-text {
-          color: #1e40af;
-          font-weight: 600;
-          font-family: monospace;
+          color: var(--primary-color);
+          font-weight: 700;
+          font-family: 'Courier New', monospace;
+          font-size: 13px;
+          letter-spacing: 0.5px;
         }
 
         .copy-button {
-          background-color: #1a3c7b;
+          background: linear-gradient(135deg, var(--primary-color) 0%, var(--accent-color) 100%);
           color: #ffffff;
           border: none;
-          padding: 8px 15px;
-          border-radius: 6px;
-          font-size: 10px;
-          font-weight: 600;
+          padding: 10px 16px;
+          border-radius: 8px;
+          font-size: 11px;
+          font-weight: 700;
           cursor: pointer;
-          transition: all 0.2s ease;
-          min-width: 70px;
+          transition: all 0.3s ease;
+          min-width: 80px;
+          text-transform: uppercase;
+          letter-spacing: 0.3px;
+          box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
         }
 
         .copy-button:hover {
-          background-color: white;
-          color: #1a3c7b;
+          background: linear-gradient(135deg, var(--accent-color) 0%, var(--primary-color) 100%);
+          transform: translateY(-1px);
+          box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
         }
 
         .copy-button.copied {
-          background-color: #10b981;
+          background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+          box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+        }
+
+        .copy-button.copied:hover {
+          background: linear-gradient(135deg, #059669 0%, #047857 100%);
+          box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
         }
 
         .success-notification {
           position: absolute;
-          top: 5px;
+          top: 8px;
           left: 50%;
           transform: translateX(-50%);
-          background-color: #10b981;
+          background: linear-gradient(135deg, #10b981 0%, #059669 100%);
           color: #ffffff;
-          padding: 6px 12px;
-          border-radius: 6px;
+          padding: 8px 16px;
+          border-radius: 8px;
           font-size: 11px;
-          font-weight: 600;
+          font-weight: 700;
           white-space: nowrap;
           z-index: 10;
-          box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
-          animation: slideUp 0.3s ease-out;
+          box-shadow: 0 4px 16px rgba(16, 185, 129, 0.4);
+          animation: slideUp 0.4s ease-out;
+          text-transform: uppercase;
+          letter-spacing: 0.3px;
         }
 
         .scroll-btn {
-          background-color: #1e3a8a;
+          background: linear-gradient(135deg, var(--primary-color) 0%, var(--accent-color) 100%);
           color: white;
           border: none;
-          border-radius: 3px;
-          padding: 10px;
-          font-size: 14px;
+          border-radius: 8px;
+          padding: 12px 16px;
+          font-size: 16px;
           cursor: pointer;
+          transition: all 0.3s ease;
+          box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+          min-width: 44px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
         }
 
         .scroll-btn:hover {
-          background-color: #2563eb;
+          background: linear-gradient(135deg, var(--accent-color) 0%, var(--primary-color) 100%);
+          transform: translateY(-1px);
+          box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
         }
 
         .spinner {
           width: 48px;
           height: 48px;
           border: 3px solid #f3f4f6;
-          border-top: 3px solid #1d4ed8;
+          border-top: 3px solid var(--primary-color);
           border-radius: 50%;
           animation: spin 1s linear infinite;
         }
@@ -309,7 +337,7 @@ const CouponList = ({ onCouponSelect }) => {
         @keyframes slideUp {
           from {
             opacity: 0;
-            transform: translateX(-50%) translateY(10px);
+            transform: translateX(-50%) translateY(15px);
           }
           to {
             opacity: 1;
@@ -317,7 +345,44 @@ const CouponList = ({ onCouponSelect }) => {
           }
         }
 
+        /* Custom scrollbar for coupon grid */
+        .coupon-grid-scroll::-webkit-scrollbar {
+          height: 6px;
+        }
+
+        .coupon-grid-scroll::-webkit-scrollbar-track {
+          background: #f1f5f9;
+          border-radius: 3px;
+        }
+
+        .coupon-grid-scroll::-webkit-scrollbar-thumb {
+          background: linear-gradient(135deg, var(--primary-color) 0%, var(--accent-color) 100%);
+          border-radius: 3px;
+        }
+
+        .coupon-grid-scroll::-webkit-scrollbar-thumb:hover {
+          background: linear-gradient(135deg, var(--accent-color) 0%, var(--primary-color) 100%);
+        }
+
         @media (max-width: 768px) {
+          .coupon-card {
+            width: 240px;
+          }
+
+          .main-text {
+            font-size: 24px;
+          }
+
+          .coupon-header {
+            padding: 14px 16px 10px 16px;
+          }
+
+          .code-section {
+            padding: 14px 16px;
+          }
+        }
+
+        @media (max-width: 480px) {
           .coupon-card {
             width: 220px;
           }
@@ -325,20 +390,17 @@ const CouponList = ({ onCouponSelect }) => {
           .main-text {
             font-size: 22px;
           }
-        }
-
-        @media (max-width: 480px) {
-          .coupon-card {
-            width: 200px;
-          }
-
-          .main-text {
-            font-size: 20px;
-          }
 
           .scroll-btn {
-            padding: 8px;
-            font-size: 16px;
+            padding: 10px 12px;
+            font-size: 14px;
+            min-width: 40px;
+          }
+
+          .copy-button {
+            padding: 8px 12px;
+            font-size: 10px;
+            min-width: 70px;
           }
         }
       `}</style>

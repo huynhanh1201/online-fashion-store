@@ -374,8 +374,8 @@ const Cart = () => {
             maxWidth: 500,
           }}
         >
-          <ShoppingCart sx={{ fontSize: 60, color: '#1A3C7B', mb: 2, opacity: 0.7 }} />
-          <Typography variant="h5" sx={{ fontWeight: 600, color: '#1A3C7B' }}>
+          <ShoppingCart sx={{ fontSize: 60, color: 'var(--primary-color)', mb: 2, opacity: 0.7 }} />
+          <Typography variant="h5" sx={{ fontWeight: 600, color: 'var(--primary-color)' }}>
             Đang tải giỏ hàng...
           </Typography>
         </Box>
@@ -412,10 +412,10 @@ const Cart = () => {
           gap={2}
         >
           <Box display="flex" alignItems="center" gap={1.5}>
-            <ShoppingCart sx={{ fontSize: 28, color: '#1A3C7B' }} />
+            <ShoppingCart sx={{ fontSize: 28, color: 'var(--primary-color)' }} />
             <Typography
               variant="h5"
-              sx={{ fontWeight: 700, color: '#1A3C7B', letterSpacing: 0.5 }}
+              sx={{ fontWeight: 700, color: 'var(--primary-color)', letterSpacing: 0.5 }}
             >
               Giỏ hàng của bạn
             </Typography>
@@ -437,15 +437,15 @@ const Cart = () => {
             p: 1,
             mb: 1,
             borderRadius: 2,
-            border: '1px dashed #1A3C7B',
+            border: '1px dashed var(--primary-color)',
             backgroundColor: '#E3F2FD',
           }}
         >
           <Box display="flex" alignItems="center" gap={1.5} flexWrap="wrap">
-            <LocalOffer sx={{ color: '#1A3C7B', fontSize: 24 }} />
+            <LocalOffer sx={{ color: 'var(--primary-color)', fontSize: 24 }} />
             <Typography
-              variant="body1"
-              sx={{ color: '#1A3C7B', fontWeight: 500, flex: 1 }}
+              variant="body2"
+              sx={{ color: 'var(--primary-color)', fontWeight: 500, flex: 1 }}
             >
               {(() => {
                 if (applicableCoupon) {
@@ -555,7 +555,7 @@ const Cart = () => {
                   variant="contained"
                   onClick={() => navigate('/')}
                   startIcon={<ArrowForward />}
-                  sx={{ mt: 2, borderRadius: 6, px: 4, color: '#fff', backgroundColor: '#1A3C7B' }}
+                  sx={{ mt: 2, borderRadius: 6, px: 4, color: '#fff', backgroundColor: 'var(--primary-color)' }}
                 >
                   Tiếp tục mua sắm
                 </Button>
@@ -565,7 +565,7 @@ const Cart = () => {
                 <Box
                   sx={{
                     p: { xs: 2, sm: 3 },
-                    backgroundColor: '#f5f7fa',
+                    backgroundColor: 'var(--primary-color)10',
                     display: 'flex',
                     alignItems: 'center',
                     gap: 2,
@@ -893,7 +893,7 @@ const Cart = () => {
             <CardContent sx={{ p: { xs: 3, sm: 4 } }}>
               <Typography
                 variant="h6"
-                sx={{ fontWeight: 700, mb: 3, color: '#1A3C7B' }}
+                sx={{ fontWeight: 700, mb: 3, color: 'var(--primary-color)' }}
               >
                 Tóm tắt đơn hàng
               </Typography>
@@ -911,7 +911,7 @@ const Cart = () => {
                     <Typography
                       variant="body2"
                       sx={{
-                        color: '#4caf50',
+                        color: 'var(--success-color)',
                         fontSize: '0.85rem',
                         fontStyle: 'italic'
                       }}
@@ -922,7 +922,7 @@ const Cart = () => {
                       variant="body2"
                       sx={{
                         fontWeight: 600,
-                        color: '#4caf50',
+                        color: 'var(--success-color)',
                         fontSize: '0.85rem'
                       }}
                     >
@@ -943,7 +943,7 @@ const Cart = () => {
                   <Typography fontWeight={700}>Tổng cộng:</Typography>
                   <Typography
                     fontWeight={700}
-                    sx={{ color: '#1A3C7B' }}
+                    sx={{ color: 'var(--primary-color)' }}
                     fontSize="1.2rem"
                   >
                     {formatPrice(totalPrice - discountAmount)}
@@ -960,9 +960,9 @@ const Cart = () => {
                   py: 1.5,
                   borderRadius: 2,
                   fontWeight: 600,
-                  backgroundColor: '#1A3C7B',
+                  backgroundColor: 'var(--primary-color)',
                   '&:hover': {
-                    backgroundColor: '#0F2A5C',
+                    backgroundColor: 'var(--accent-color)',
                   },
                   '&:disabled': {
                     backgroundColor: '#ccc',

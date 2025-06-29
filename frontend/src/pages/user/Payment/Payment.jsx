@@ -120,17 +120,17 @@ const StyledTextField = styled(TextField)(({ theme }) => ({
   marginBottom: theme.spacing(3),
   '& .MuiOutlinedInput-root': {
     borderRadius: '12px',
-    backgroundColor: '#ffffff',
+    backgroundColor: 'var(--surface-color)',
     transition: 'all 0.3s ease',
     '& fieldset': {
       borderColor: '#e0e0e0',
       borderWidth: '2px',
     },
     '&:hover fieldset': {
-      borderColor: '#1A3C7B',
+      borderColor: 'var(--primary-color)',
     },
     '&.Mui-focused fieldset': {
-      borderColor: '#1A3C7B',
+      borderColor: 'var(--primary-color)',
       borderWidth: '2px',
       boxShadow: '0 0 0 4px rgba(26, 60, 123, 0.1)',
     }
@@ -138,7 +138,7 @@ const StyledTextField = styled(TextField)(({ theme }) => ({
   '& .MuiInputLabel-root': {
     color: '#666',
     '&.Mui-focused': {
-      color: '#1A3C7B',
+      color: 'var(--primary-color)',
     }
   }
 }))
@@ -158,10 +158,10 @@ const StyledButton = styled(Button)(({ theme }) => ({
 }))
 
 const PrimaryButton = styled(StyledButton)(() => ({
-  backgroundColor: '#1A3C7B',
+  backgroundColor: 'var(--primary-color)',
   color: '#ffffff',
   '&:hover': {
-    backgroundColor: '#2c5aa0',
+    backgroundColor: 'var(--accent-color)',
   },
   '&:disabled': {
     backgroundColor: '#cccccc',
@@ -170,16 +170,16 @@ const PrimaryButton = styled(StyledButton)(() => ({
 }))
 
 const ChangeAddressButton = styled(Typography)(({ theme }) => ({
-  color: '#1A3C7B',
+  color: 'var(--primary-color)',
   cursor: 'pointer',
   fontWeight: 600,
   fontSize: '0.95rem',
   padding: theme.spacing(1, 2),
   borderRadius: '8px',
-  border: '1px solid #1A3C7B',
+  border: '1px solid var(--primary-color)',
   transition: 'all 0.3s ease',
   '&:hover': {
-    backgroundColor: '#1A3C7B',
+    backgroundColor: 'var(--primary-color)',
     color: '#ffffff',
     transform: 'scale(1.05)',
   }
@@ -801,8 +801,8 @@ const Payment = () => {
                       control={
                         <Radio
                           sx={{
-                            color: '#1A3C7B',
-                            '&.Mui-checked': { color: '#1A3C7B' }
+                            color: 'var(--primary-color)',
+                            '&.Mui-checked': { color: 'var(--primary-color)' }
                           }}
                         />
                       }
@@ -833,7 +833,7 @@ const Payment = () => {
                                   label={`${shippingPrice.toLocaleString('vi-VN')} ₫`}
                                   color="primary"
                                   size="small"
-                                  sx={{ backgroundColor: '#1A3C7B' }}
+                                  sx={{ backgroundColor: 'var(--primary-color)' }}
                                 />
                               )}
                             </Typography>
@@ -862,8 +862,8 @@ const Payment = () => {
                       value="COD"
                       control={
                         <Radio sx={{
-                          color: '#1A3C7B',
-                          '&.Mui-checked': { color: '#1A3C7B' }
+                          color: 'var(--primary-color)',
+                          '&.Mui-checked': { color: 'var(--primary-color)' }
                         }} />
                       }
                       label={
@@ -898,8 +898,8 @@ const Payment = () => {
                       value="vnpay"
                       control={
                         <Radio sx={{
-                          color: '#1A3C7B',
-                          '&.Mui-checked': { color: '#1A3C7B' }
+                          color: 'var(--primary-color)',
+                          '&.Mui-checked': { color: 'var(--primary-color)' }
                         }} />
                       }
                       label={
@@ -966,10 +966,10 @@ const Payment = () => {
                           borderRadius: '4px',
                         },
                         '&::-webkit-scrollbar-thumb': {
-                          background: '#1A3C7B',
+                          background: 'var(--primary-color)',
                           borderRadius: '4px',
                           '&:hover': {
-                            background: '#2c5aa0',
+                            background: 'var(--accent-color)',
                           },
                         },
                       }}
@@ -1089,10 +1089,10 @@ const Payment = () => {
                           borderRadius: '4px',
                         },
                         '&::-webkit-scrollbar-thumb': {
-                          backgroundColor: '#1A3C7B',
+                          background: 'var(--primary-color)',
                           borderRadius: '4px',
                           '&:hover': {
-                            backgroundColor: '#2c5aa0',
+                            background: 'var(--accent-color)',
                           },
                         }
                       }}
@@ -1155,7 +1155,12 @@ const Payment = () => {
                       ) : shippingPrice === 0 ? (
                         'Miễn phí'
                       ) : (
-                        `${shippingPrice.toLocaleString('vi-VN')} ₫`
+                        <Chip
+                          label={`${shippingPrice.toLocaleString('vi-VN')} ₫`}
+                          color="primary"
+                          size="small"
+                          sx={{ backgroundColor: 'var(--primary-color)' }}
+                        />
                       )}
                     </Typography>
                   </PriceRow>

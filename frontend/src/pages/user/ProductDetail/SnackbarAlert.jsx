@@ -37,7 +37,7 @@ const SnackbarAlert = ({ open, onClose, severity, message, variantImage, product
             size="small"
             startIcon={<ShoppingCartIcon />}
             onClick={() => (window.location.href = '/cart')}
-            sx={{ ml: 2, backgroundColor: '#fff', color: '#1A3C7B' }}
+            sx={{ ml: 2, backgroundColor: 'var(--surface-color)', color: 'var(--primary-color)' }}
           >
             Xem giỏ hàng
           </Button>

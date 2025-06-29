@@ -27,17 +27,29 @@ const VoucherChip = styled(Chip)({
   cursor: 'pointer'
 })
 
+const StyledCard = styled(Box)(({ theme }) => ({
+  borderRadius: 8,
+  boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+  backgroundColor: 'var(--surface-color)',
+  border: '1px solid #e0e0e0',
+  transition: 'all 0.3s ease',
+  '&:hover': {
+    boxShadow: '0 4px 16px rgba(0,0,0,0.15)',
+    transform: 'translateY(-2px)'
+  }
+}))
+
 const VariantBox = styled(Box)(({ selected }) => ({
   display: 'flex',
   alignItems: 'center',
   padding: '8px 12px',
-  backgroundColor: selected ? 'var(--primary-color)20' : '#f9f9f9',
+  backgroundColor: selected ? 'var(--primary-color)20' : 'var(--surface-color)',
   border: selected ? '1px solid var(--primary-color)' : '1px solid #e0e0e0',
   borderRadius: '8px',
   cursor: 'pointer',
   gap: 10,
   '&:hover': {
-    backgroundColor: selected ? 'var(--primary-color)20' : '#f0f0f0',
+    backgroundColor: selected ? 'var(--primary-color)20' : 'var(--surface-color)',
     borderColor: selected ? 'var(--primary-color)' : '#bdbdbd'
   }
 }))
@@ -109,8 +121,8 @@ const ProductInfoSection = ({
               label={`Giảm ${Math.round((currentPrice.originalDiscountPrice / currentPrice.price) * 100)}%`}
               size='small'
               sx={{
-                backgroundColor: '#fef2f2',
-                color: '#dc2626',
+                backgroundColor: 'var(--error-color)10',
+                color: 'var(--error-color)',
                 fontWeight: 600,
                 border: '1px solid #fecaca',
                 fontSize: '0.75rem'

@@ -33,7 +33,7 @@ const styles = {
     left: 0,
     height: '2px',
     width: '100%',
-    backgroundColor: '#1A3C7B',
+    backgroundColor: 'var(--primary-color)',
     transformOrigin: 'left',
     transform: 'scaleX(0)',
     transitionProperty: 'transform',
@@ -77,7 +77,7 @@ const HeaderCategories = ({
   }
 
   return (
-    <div style={styles.container}>
+    <div className="no-select" style={styles.container}>
       {rows.map((row, rowIdx) => (
         <div
           key={rowIdx}

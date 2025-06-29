@@ -203,7 +203,7 @@ const EditProductModal = ({ open, onClose, onSave, product }) => {
             variant='contained'
             sx={{
               color: '#fff',
-              backgroundColor: '#001f5d',
+              backgroundColor: 'var(--primary-color)',
               textTransform: 'none'
             }}
           >
@@ -418,10 +418,10 @@ const EditProductModal = ({ open, onClose, onSave, product }) => {
                       clickable
                       sx={{
                         ...(isSelected && {
-                          backgroundColor: '#001f5d',
+                          backgroundColor: 'var(--primary-color)',
                           color: '#fff',
                           '&:hover': {
-                            backgroundColor: '#001f5d'
+                            backgroundColor: 'var(--primary-color)'
                           }
                         })
                       }}

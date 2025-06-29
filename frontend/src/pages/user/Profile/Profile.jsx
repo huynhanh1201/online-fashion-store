@@ -68,6 +68,11 @@ const Profile = () => {
     confirm: false
   })
   const [openForgotDialog, setOpenForgotDialog] = useState(false)
+  
+  // Thêm state để theo dõi giá trị gốc
+  const [originalName, setOriginalName] = useState('')
+  const [originalAvatarUrl, setOriginalAvatarUrl] = useState('')
+  
   const dispatch = useDispatch()
 
   const handleTabChange = (_, newValue) => setTab(newValue)
@@ -101,6 +106,13 @@ const Profile = () => {
   const handleOpenForgotDialog = () => setOpenForgotDialog(true)
   const handleCloseForgotDialog = () => setOpenForgotDialog(false)
 
+  // Kiểm tra xem có thay đổi nào không
+  const hasChanges = () => {
+    const nameChanged = name.trim() !== originalName.trim()
+    const avatarChanged = avatarFile !== null
+    return nameChanged || avatarChanged
+  }
+
   const validatePassword = (password) => {
     return (
       password.length >= 6 &&
@@ -113,6 +125,12 @@ const Profile = () => {
     const trimmedName = name.trim()
     if (!trimmedName || trimmedName.length < 3) {
       showSnackbar('Tên phải có ít nhất 3 ký tự!', 'error')
+      return
+    }
+
+    // Kiểm tra xem có thay đổi nào không
+    if (!hasChanges()) {
+      showSnackbar('Không có thay đổi nào để cập nhật!', 'warning')
       return
     }
 
@@ -135,6 +153,11 @@ const Profile = () => {
       setName(result.name)
       setAvatarPreview(result.avatarUrl || '')
       setAvatarFile(null)
+      
+      // Cập nhật giá trị gốc sau khi cập nhật thành công
+      setOriginalName(result.name || '')
+      setOriginalAvatarUrl(result.avatarUrl || '')
+      
       dispatch(updateUserAPI(result))
       showSnackbar('Cập nhật thành công!')
     } else {
@@ -208,6 +231,10 @@ const Profile = () => {
         setEmail(profileData.email || '')
         setAvatarPreview(profileData.avatarUrl || '')
 
+        // Lưu giá trị gốc
+        setOriginalName(profileData.name || '')
+        setOriginalAvatarUrl(profileData.avatarUrl || '')
+
         // Kiểm tra nếu không có dữ liệu cơ bản
         if (!profileData.name && !profileData.email) {
           throw new Error('Thông tin hồ sơ không đầy đủ')
@@ -223,6 +250,8 @@ const Profile = () => {
         setName('')
         setEmail('')
         setAvatarPreview('')
+        setOriginalName('')
+        setOriginalAvatarUrl('')
       } finally {
         setLoading(false)
       }
@@ -309,7 +338,7 @@ const Profile = () => {
                 variant='contained'
                 sx={{ mt: 3 }}
                 onClick={handleUpdate}
-                disabled={loading}
+                disabled={loading || !hasChanges()}
               >
                 {loading ? 'Đang cập nhật...' : 'Cập nhật'}
               </Button>

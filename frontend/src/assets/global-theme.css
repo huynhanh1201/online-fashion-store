@@ -1,5 +1,32 @@
 /* Global Theme Styles using CSS Variables */
 
+/* Enable text selection globally */
+* {
+  -webkit-user-select: text;
+  -moz-user-select: text;
+  -ms-user-select: text;
+  user-select: text;
+}
+
+/* Disable text selection only for specific elements that need it */
+.no-select,
+button,
+input,
+textarea,
+select,
+[role="button"],
+[role="tab"],
+[role="menuitem"],
+.nav-link,
+.logo,
+.menu-item,
+.header-element {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
 /* Button Styles */
 .btn-primary {
   background-color: var(--primary-color) !important;
@@ -275,13 +302,35 @@
   outline-color: var(--primary-color) !important;
 }
 
-/* Selection Styles */
+/* Selection Styles - Enhanced for better visibility */
 ::selection {
-  background-color: rgba(var(--primary-color), 0.3) !important;
+  background-color: rgba(var(--primary-color), 0.4) !important;
   color: var(--text-color) !important;
+  text-shadow: none !important;
 }
 
 ::-moz-selection {
-  background-color: rgba(var(--primary-color), 0.3) !important;
+  background-color: rgba(var(--primary-color), 0.4) !important;
   color: var(--text-color) !important;
+  text-shadow: none !important;
+}
+
+/* Ensure text content is selectable */
+p, h1, h2, h3, h4, h5, h6, span, div, td, th, li, a {
+  -webkit-user-select: text !important;
+  -moz-user-select: text !important;
+  -ms-user-select: text !important;
+  user-select: text !important;
+}
+
+/* Allow selection in content areas */
+.content-area,
+.text-content,
+.product-description,
+.blog-content,
+.article-content {
+  -webkit-user-select: text !important;
+  -moz-user-select: text !important;
+  -ms-user-select: text !important;
+  user-select: text !important;
 } 

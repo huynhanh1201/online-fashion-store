@@ -99,7 +99,7 @@ const EditRoleModal = ({ open, onClose, onSubmit, p, defaultValues }) => {
           onClick={handleSubmit(handleSave)}
           variant='contained'
           sx={{
-            backgroundColor: '#001f5d',
+            backgroundColor: 'var(--primary-color)',
             color: '#fff',
             textTransform: 'none'
           }}

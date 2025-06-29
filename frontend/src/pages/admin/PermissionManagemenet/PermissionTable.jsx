@@ -73,7 +73,7 @@ export default function PermissionTable({
                       sx={{
                         textTransform: 'none',
                         width: 100,
-                        backgroundColor: '#001f5d',
+                        backgroundColor: 'var(--primary-color)',
                         color: '#fff'
                       }}
                     >

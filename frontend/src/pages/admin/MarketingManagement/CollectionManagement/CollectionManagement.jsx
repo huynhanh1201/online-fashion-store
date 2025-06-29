@@ -1,70 +1,78 @@
 import React, { useState, useEffect } from 'react'
 import {
   Box,
-  Button,
   Typography,
+  Button,
+  Paper,
   Table,
   TableBody,
   TableCell,
   TableContainer,
   TableHead,
   TableRow,
-  Card,
-  CardContent,
-  Grid,
-  Stack,
   IconButton,
-  Tooltip,
-  useTheme,
-  alpha,
-  Alert,
-  CircularProgress,
-  Skeleton,
+  Chip,
   Dialog,
   DialogTitle,
   DialogContent,
   DialogActions,
-  DialogContentText
+  DialogContentText,
+  CircularProgress,
+  Alert,
+  Snackbar,
+  Card,
+  CardContent,
+  Grid,
+  Stack,
+  Tooltip,
+  useTheme,
+  alpha,
+  Skeleton
 } from '@mui/material'
 import {
   Add as AddIcon,
   Edit as EditIcon,
   Delete as DeleteIcon,
-  Category as CategoryIcon,
   Collections as CollectionsIcon,
   Refresh as RefreshIcon,
-  Warning as WarningIcon
+  Warning as WarningIcon,
+  Category as CategoryIcon,
+  Inventory as InventoryIcon
 } from '@mui/icons-material'
-import AddFeaturedCategory from './Modal/AddFeaturedCategory.jsx'
-import {
-  getFeaturedCategories,
-  deleteFeaturedCategory
-} from '~/services/admin/webConfig/featuredcategoryService.js'
+import { getCollections, deleteCollection } from '~/services/admin/webConfig/collectionService'
+import AddCollection from './Modal/AddCollection'
 import { optimizeCloudinaryUrl } from '~/utils/cloudinary.js'
-import usePermissions from '~/hooks/usePermissions.js'
 
-const FeaturedCategoryManagement = () => {
+const CollectionManagement = () => {
   const theme = useTheme()
-  const [openModal, setOpenModal] = useState(false)
-  const [editIndex, setEditIndex] = useState(null)
-  const [featuredCategories, setFeaturedCategories] = useState([])
+  const [collections, setCollections] = useState([])
   const [loading, setLoading] = useState(true)
   const [refreshing, setRefreshing] = useState(false)
   const [error, setError] = useState('')
-  const { hasPermission } = usePermissions()
-  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false)
-  const [deleteIndex, setDeleteIndex] = useState(null)
+  const [success, setSuccess] = useState('')
+  const [openAddModal, setOpenAddModal] = useState(false)
+  const [editingCollection, setEditingCollection] = useState(null)
+  const [deleteDialog, setDeleteDialog] = useState({
+    open: false,
+    collection: null,
+    index: null
+  })
   const [deleting, setDeleting] = useState(false)
 
-  // Fetch featured categories data
-  const fetchFeaturedCategories = async () => {
+  // Fetch collections on component mount
+  useEffect(() => {
+    fetchCollections()
+  }, [])
+
+  const fetchCollections = async () => {
     try {
+      setLoading(true)
       setError('')
-      const data = await getFeaturedCategories()
-      setFeaturedCategories(data || [])
+      const data = await getCollections()
+      setCollections(data)
     } catch (err) {
-      setError(err.message)
-      console.error('Error fetching featured categories:', err)
+      console.error('Error fetching collections:', err)
+      setError(err.message || 'Không thể tải danh sách collections')
     } finally {
       setLoading(false)
     }
@@ -73,76 +81,93 @@ const FeaturedCategoryManagement = () => {
   // Refresh data
   const handleRefresh = async () => {
     setRefreshing(true)
-    await fetchFeaturedCategories()
+    await fetchCollections()
     setRefreshing(false)
   }
 
-  // Handle success from modal
-  const handleModalSuccess = (result) => {
-    console.log('Featured category updated successfully:', result)
-    // Refresh data after successful update
-    fetchFeaturedCategories()
+  const handleAddCollection = () => {
+    setEditingCollection(null)
+    setOpenAddModal(true)
   }
 
-  // Handle edit
-  const handleEdit = (index) => {
-    setEditIndex(index)
-    setOpenModal(true)
+  const handleEditCollection = (collection, index) => {
+    setEditingCollection({ ...collection, index })
+    setOpenAddModal(true)
   }
 
-  // Handle delete
-  const handleDelete = (index) => {
-    setDeleteIndex(index)
-    setDeleteConfirmOpen(true)
+  const handleDeleteCollection = (collection, index) => {
+    setDeleteDialog({
+      open: true,
+      collection,
+      index
+    })
   }
 
-  // Handle delete confirmation
-  const handleDeleteConfirm = async () => {
-    if (deleteIndex === null) return
-
+  const confirmDelete = async () => {
     try {
       setDeleting(true)
-      await deleteFeaturedCategory(deleteIndex)
-      // Refresh data after successful delete
-      fetchFeaturedCategories()
-      setDeleteConfirmOpen(false)
-      setDeleteIndex(null)
-    } catch (error) {
-      setError(error.message)
-      console.error('Error deleting featured category:', error)
+      await deleteCollection(deleteDialog.index)
+      setSuccess('Xóa collection thành công!')
+      fetchCollections()
+    } catch (err) {
+      setError(err.message || 'Không thể xóa collection')
     } finally {
       setDeleting(false)
+      setDeleteDialog({ open: false, collection: null, index: null })
     }
   }
 
-  // Handle delete cancel
-  const handleDeleteCancel = () => {
-    setDeleteConfirmOpen(false)
-    setDeleteIndex(null)
+  const handleModalClose = () => {
+    setOpenAddModal(false)
+    setEditingCollection(null)
   }
 
-  // Handle add new
-  const handleAddNew = () => {
-    setEditIndex(null)
-    setOpenModal(true)
+  const handleModalSuccess = () => {
+    setSuccess(editingCollection ? 'Cập nhật collection thành công!' : 'Thêm collection thành công!')
+    fetchCollections()
+    handleModalClose()
   }
 
-  useEffect(() => {
-    fetchFeaturedCategories()
-  }, [])
+  const getStatusColor = (status) => {
+    switch (status) {
+      case 'active':
+        return 'success'
+      case 'inactive':
+        return 'error'
+      default:
+        return 'default'
+    }
+  }
+
+  const getStatusLabel = (status) => {
+    switch (status) {
+      case 'active':
+        return 'Hoạt động'
+      case 'inactive':
+        return 'Không hoạt động'
+      default:
+        return 'Không xác định'
+    }
+  }
 
   const summaryData = [
     {
-      title: 'Tổng danh mục',
-      value: loading ? <Skeleton width={40} /> : featuredCategories.length,
-      icon: <CategoryIcon />,
+      title: 'Tổng bộ sưu tập',
+      value: loading ? <Skeleton width={40} /> : collections.length,
+      icon: <CollectionsIcon />,
       color: '#1976d2'
     },
     {
-      title: 'Hình ảnh danh mục',
-      value: loading ? <Skeleton width={40} /> : featuredCategories.filter((cat) => cat.imageUrl).length,
-      icon: <CollectionsIcon />,
+      title: 'Sản phẩm trong bộ sưu tập',
+      value: loading ? <Skeleton width={40} /> : collections.reduce((total, col) => total + (col.products?.length || 0), 0),
+      icon: <InventoryIcon />,
       color: '#2e7d32'
+    },
+    {
+      title: 'Bộ sưu tập hoạt động',
+      value: loading ? <Skeleton width={40} /> : collections.filter(col => col.status === 'active').length,
+      icon: <CategoryIcon />,
+      color: '#ed6c02'
     }
   ]
 
@@ -160,6 +185,12 @@ const FeaturedCategoryManagement = () => {
       </TableCell>
       <TableCell>
         <Skeleton variant='circular' width={32} height={32} />
+      </TableCell>
+      <TableCell>
+        <Skeleton variant='circular' width={32} height={32} />
+      </TableCell>
+      <TableCell>
+        <Skeleton variant='rectangular' width={80} height={24} />
       </TableCell>
     </TableRow>
   )
@@ -179,11 +210,11 @@ const FeaturedCategoryManagement = () => {
             gap: 2
           }}
         >
-          <CategoryIcon sx={{ fontSize: 40, color: 'var(--primary-color)' }} />
-          Quản lý Danh mục Nổi bật
+          <CollectionsIcon sx={{ fontSize: 40, color: 'var(--primary-color)' }} />
+          Quản lý Bộ sưu tập
         </Typography>
         <Typography variant='body1' color='text.secondary'>
-          Cấu hình và quản lý các danh mục nổi bật hiển thị trên website
+          Cấu hình và quản lý các bộ sưu tập sản phẩm hiển thị trên website
         </Typography>
       </Box>
 
@@ -199,6 +230,13 @@ const FeaturedCategoryManagement = () => {
           }
         >
           {error}
+        </Alert>
+      )}
+
+      {/* Success Alert */}
+      {success && (
+        <Alert severity='success' sx={{ mb: 3 }} onClose={() => setSuccess('')}>
+          {success}
         </Alert>
       )}
 
@@ -258,31 +296,29 @@ const FeaturedCategoryManagement = () => {
 
       {/* Action Buttons */}
       <Box sx={{ mb: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        {hasPermission('featuredCategory:create') && (
-          <Button
-            variant='contained'
-            startIcon={<AddIcon />}
-            onClick={handleAddNew}
-            sx={{
-              px: 3,
-              py: 1.5,
-              borderRadius: 2,
-              textTransform: 'none',
-              fontSize: '1rem',
-              fontWeight: 600,
-              background: 'var(--primary-color)',
-              boxShadow: '0 4px 16px rgba(59, 130, 246, 0.3)',
-              '&:hover': {
-                background: 'var(--accent-color)',
-                boxShadow: '0 6px 20px rgba(59, 130, 246, 0.4)',
-                transform: 'translateY(-1px)'
-              }
-            }}
-          >
-            Thêm danh mục mới
-          </Button>
-
-        )}
+        <Button
+          variant='contained'
+          startIcon={<AddIcon />}
+          onClick={handleAddCollection}
+          sx={{
+            px: 3,
+            py: 1.5,
+            borderRadius: 2,
+            textTransform: 'none',
+            fontSize: '1rem',
+            fontWeight: 600,
+            background: 'var(--primary-color)',
+            boxShadow: '0 4px 16px rgba(59, 130, 246, 0.3)',
+            '&:hover': {
+              background: 'var(--accent-color)',
+              boxShadow: '0 6px 20px rgba(59, 130, 246, 0.4)',
+              transform: 'translateY(-1px)'
+            }
+          }}
+        >
+          Thêm bộ sưu tập mới
+        </Button>
+        
         <Button
           variant="outlined"
           startIcon={<RefreshIcon />}
@@ -298,7 +334,7 @@ const FeaturedCategoryManagement = () => {
         </Button>
       </Box>
 
-      {/* Table */}
+      {/* Collections Table */}
       <Card
         sx={{
           borderRadius: 3,
@@ -314,10 +350,16 @@ const FeaturedCategoryManagement = () => {
                   Hình ảnh
                 </TableCell>
                 <TableCell sx={{ fontWeight: 700, color: '#334155', py: 2 }}>
-                  Tên danh mục
+                  Tên bộ sưu tập
                 </TableCell>
                 <TableCell sx={{ fontWeight: 700, color: '#334155', py: 2 }}>
-                  Link
+                  Mô tả
+                </TableCell>
+                <TableCell sx={{ fontWeight: 700, color: '#334155', py: 2 }}>
+                  Số sản phẩm
+                </TableCell>
+                <TableCell sx={{ fontWeight: 700, color: '#334155', py: 2 }}>
+                  Trạng thái
                 </TableCell>
                 <TableCell sx={{ fontWeight: 700, color: '#334155', py: 2 }}>
                   Thao tác
@@ -330,9 +372,9 @@ const FeaturedCategoryManagement = () => {
                 Array.from({ length: 3 }).map((_, index) => (
                   <LoadingSkeleton key={index} />
                 ))
-              ) : featuredCategories.length > 0 ? (
+              ) : collections.length > 0 ? (
                 // Actual data
-                featuredCategories.map((item, index) => (
+                collections.map((collection, index) => (
                   <TableRow
                     key={index}
                     sx={{
@@ -350,19 +392,22 @@ const FeaturedCategoryManagement = () => {
                           gap: 1
                         }}
                       >
-                        {item.imageUrl ? (
+                        {collection.imageUrl ? (
                           <img
-                            src={optimizeCloudinaryUrl(item.imageUrl, {
+                            src={optimizeCloudinaryUrl(collection.imageUrl, {
                               width: 80,
                               height: 60
                             })}
-                            alt={item.name}
+                            alt={collection.name}
                             style={{
                               width: 80,
                               height: 60,
                               objectFit: 'cover',
                               borderRadius: 8,
                               border: '1px solid #e2e8f0'
+                            }}
+                            onError={(e) => {
+                              e.target.src = '/placeholder-image.jpg'
                             }}
                           />
                         ) : (
@@ -395,69 +440,68 @@ const FeaturedCategoryManagement = () => {
                         variant='body2'
                         sx={{ fontWeight: 600, color: '#1e293b' }}
                       >
-                        {item.name}
+                        {collection.name}
                       </Typography>
                     </TableCell>
                     <TableCell sx={{ py: 2 }}>
                       <Typography
                         variant='body2'
-                        sx={{
-                          fontFamily: 'monospace',
-                          color: '#3b82f6',
-                          fontWeight: 500,
-                          wordBreak: 'break-all',
-                          cursor: 'pointer',
-                          '&:hover': {
-                            textDecoration: 'underline'
-                          }
+                        color='text.secondary'
+                        sx={{ 
+                          maxWidth: 300,
+                          display: '-webkit-box',
+                          WebkitLineClamp: 2,
+                          WebkitBoxOrient: 'vertical',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis'
                         }}
-                        onClick={() => {
-                          if (item.link) {
-                            navigator.clipboard.writeText(item.link)
-                              .then(() => {
-                                // You could add a toast notification here
-                                console.log('Link copied to clipboard')
-                              })
-                              .catch(err => {
-                                console.error('Failed to copy link:', err)
-                              })
-                          }
-                        }}
-                        title="Click to copy link"
                       >
-                        {item.link || 'Chưa có link'}
+                        {collection.description}
                       </Typography>
                     </TableCell>
                     <TableCell sx={{ py: 2 }}>
+                      <Chip
+                        label={`${collection.products?.length || 0} sản phẩm`}
+                        size="small"
+                        color="primary"
+                        variant="outlined"
+                        sx={{ fontWeight: 600 }}
+                      />
+                    </TableCell>
+                    <TableCell sx={{ py: 2 }}>
+                      <Chip
+                        label={getStatusLabel(collection.status)}
+                        color={getStatusColor(collection.status)}
+                        size="small"
+                        sx={{ fontWeight: 600 }}
+                      />
+                    </TableCell>
+                    <TableCell sx={{ py: 2 }}>
                       <Stack direction='row' spacing={1}>
-                        {hasPermission('featuredCategory:update') && (
-                          <Tooltip title='Chỉnh sửa'>
-                            <IconButton
-                              size='small'
-                              sx={{
-                                color: '#3b82f6',
-                                '&:hover': { backgroundColor: '#dbeafe' }
-                              }}
-                              onClick={() => handleEdit(index)}
-                            >
-                              <EditIcon fontSize='small' />
-                            </IconButton>
-                          </Tooltip>
-                        )}
-                        {hasPermission('featuredCategory:delete') && (
-                          <Tooltip title='Xóa'>
-                            <IconButton
-                              size='small'
-                              sx={{
-                                color: '#ef4444',
-                                '&:hover': { backgroundColor: '#fee2e2' }
-                              }}
-                              onClick={() => handleDelete(index)}
-                            >
-                              <DeleteIcon fontSize='small' />
-                            </IconButton>
-                          </Tooltip>
-                        )}
+                        <Tooltip title='Chỉnh sửa'>
+                          <IconButton
+                            size='small'
+                            sx={{
+                              color: '#3b82f6',
+                              '&:hover': { backgroundColor: '#dbeafe' }
+                            }}
+                            onClick={() => handleEditCollection(collection, index)}
+                          >
+                            <EditIcon fontSize='small' />
+                          </IconButton>
+                        </Tooltip>
+                        <Tooltip title='Xóa'>
+                          <IconButton
+                            size='small'
+                            sx={{
+                              color: '#ef4444',
+                              '&:hover': { backgroundColor: '#fee2e2' }
+                            }}
+                            onClick={() => handleDeleteCollection(collection, index)}
+                          >
+                            <DeleteIcon fontSize='small' />
+                          </IconButton>
+                        </Tooltip>
                       </Stack>
                     </TableCell>
                   </TableRow>
@@ -465,7 +509,7 @@ const FeaturedCategoryManagement = () => {
               ) : (
                 // No data
                 <TableRow>
-                  <TableCell colSpan={4} sx={{ textAlign: 'center', py: 4 }}>
+                  <TableCell colSpan={6} sx={{ textAlign: 'center', py: 4 }}>
                     {/* SVG No data icon */}
                     <svg
                       width='64'
@@ -487,18 +531,16 @@ const FeaturedCategoryManagement = () => {
                       </g>
                     </svg>
                     <Typography variant='body1' color='text.secondary'>
-                      Chưa có danh mục nổi bật nào
+                      Chưa có bộ sưu tập nào
                     </Typography>
-                    {hasPermission('blog:create') && (
-                      <Button
-                        variant='outlined'
-                        startIcon={<AddIcon />}
-                        onClick={handleAddNew}
-                        sx={{ mt: 2 }}
-                      >
-                        Thêm danh mục đầu tiên
-                      </Button>
-                    )}
+                    <Button
+                      variant='outlined'
+                      startIcon={<AddIcon />}
+                      onClick={handleAddCollection}
+                      sx={{ mt: 2 }}
+                    >
+                      Thêm bộ sưu tập đầu tiên
+                    </Button>
                   </TableCell>
                 </TableRow>
               )}
@@ -507,18 +549,18 @@ const FeaturedCategoryManagement = () => {
         </TableContainer>
       </Card>
 
-      {/* Modal */}
-      <AddFeaturedCategory
-        open={openModal}
-        onClose={() => setOpenModal(false)}
+      {/* Add/Edit Collection Modal */}
+      <AddCollection
+        open={openAddModal}
+        onClose={handleModalClose}
         onSuccess={handleModalSuccess}
-        editIndex={editIndex}
+        editingCollection={editingCollection}
       />
 
       {/* Delete Confirmation Dialog */}
       <Dialog
-        open={deleteConfirmOpen}
-        onClose={handleDeleteCancel}
+        open={deleteDialog.open}
+        onClose={() => setDeleteDialog({ open: false, collection: null, index: null })}
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
         PaperProps={{
@@ -528,7 +570,7 @@ const FeaturedCategoryManagement = () => {
           }
         }}
       >
-        <DialogTitle
+        <DialogTitle 
           id="alert-dialog-title"
           sx={{
             display: 'flex',
@@ -539,29 +581,29 @@ const FeaturedCategoryManagement = () => {
           }}
         >
           <WarningIcon color="error" />
-          Xác nhận xóa danh mục
+          Xác nhận xóa bộ sưu tập
         </DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-dialog-description" sx={{ mb: 2 }}>
-            Bạn có chắc chắn muốn xóa danh mục này không?
+            Bạn có chắc chắn muốn xóa bộ sưu tập này không?
           </DialogContentText>
-          {deleteIndex !== null && featuredCategories[deleteIndex] && (
-            <Box sx={{
-              p: 2,
-              backgroundColor: '#fef2f2',
-              borderRadius: 2,
+          {deleteDialog.collection && (
+            <Box sx={{ 
+              p: 2, 
+              backgroundColor: '#fef2f2', 
+              borderRadius: 2, 
               border: '1px solid #fecaca',
               display: 'flex',
               alignItems: 'center',
               gap: 2
             }}>
-              {featuredCategories[deleteIndex].imageUrl && (
+              {deleteDialog.collection.imageUrl && (
                 <img
-                  src={optimizeCloudinaryUrl(featuredCategories[deleteIndex].imageUrl, {
+                  src={optimizeCloudinaryUrl(deleteDialog.collection.imageUrl, {
                     width: 60,
                     height: 45
                   })}
-                  alt={featuredCategories[deleteIndex].name}
+                  alt={deleteDialog.collection.name}
                   style={{
                     width: 60,
                     height: 45,
@@ -569,15 +611,24 @@ const FeaturedCategoryManagement = () => {
                     borderRadius: 6,
                     border: '1px solid #e2e8f0'
                   }}
+                  onError={(e) => {
+                    e.target.src = '/placeholder-image.jpg'
+                  }}
                 />
               )}
               <Box>
                 <Typography variant="body1" sx={{ fontWeight: 600, color: '#1e293b' }}>
-                  {featuredCategories[deleteIndex].name}
+                  {deleteDialog.collection.name}
                 </Typography>
-                <Typography variant="body2" color="text.secondary" sx={{ fontFamily: 'monospace' }}>
-                  {featuredCategories[deleteIndex].link || 'Chưa có link'}
+                <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                  {deleteDialog.collection.description}
                 </Typography>
+                <Chip
+                  label={`${deleteDialog.collection.products?.length || 0} sản phẩm`}
+                  size="small"
+                  color="primary"
+                  variant="outlined"
+                />
               </Box>
             </Box>
           )}
@@ -586,11 +637,11 @@ const FeaturedCategoryManagement = () => {
           </DialogContentText>
         </DialogContent>
         <DialogActions sx={{ p: 3, pt: 1 }}>
-          <Button
-            onClick={handleDeleteCancel}
+          <Button 
+            onClick={() => setDeleteDialog({ open: false, collection: null, index: null })}
             variant="outlined"
             disabled={deleting}
-            sx={{
+            sx={{ 
               borderRadius: 2,
               textTransform: 'none',
               fontWeight: 600
@@ -598,8 +649,8 @@ const FeaturedCategoryManagement = () => {
           >
             Hủy
           </Button>
-          <Button
-            onClick={handleDeleteConfirm}
+          <Button 
+            onClick={confirmDelete}
             variant="contained"
             disabled={deleting}
             startIcon={deleting ? <CircularProgress size={16} /> : <DeleteIcon />}
@@ -613,12 +664,24 @@ const FeaturedCategoryManagement = () => {
               }
             }}
           >
-            {deleting ? 'Đang xóa...' : 'Xóa danh mục'}
+            {deleting ? 'Đang xóa...' : 'Xóa bộ sưu tập'}
           </Button>
         </DialogActions>
       </Dialog>
+
+      {/* Success Snackbar */}
+      <Snackbar
+        open={!!success}
+        autoHideDuration={6000}
+        onClose={() => setSuccess('')}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+      >
+        <Alert onClose={() => setSuccess('')} severity="success" sx={{ width: '100%' }}>
+          {success}
+        </Alert>
+      </Snackbar>
     </Box>
   )
 }
 
-export default FeaturedCategoryManagement
+export default CollectionManagement

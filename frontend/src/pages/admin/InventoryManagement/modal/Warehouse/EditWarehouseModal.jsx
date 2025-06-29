@@ -428,7 +428,7 @@ const EditWarehouseModal = ({ open, onClose, warehouse, onSave }) => {
           <Button
             type='submit'
             sx={{
-              backgroundColor: '#001f5d',
+              backgroundColor: 'var(--primary-color)',
               color: '#fff',
               textTransform: 'none'
             }}

@@ -19,7 +19,12 @@ import {
   alpha,
   Alert,
   CircularProgress,
-  Skeleton
+  Skeleton,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  DialogContentText
 } from '@mui/material'
 import {
   Add as AddIcon,
@@ -27,7 +32,8 @@ import {
   Delete as DeleteIcon,
   Star as StarIcon,
   Image as ImageIcon,
-  Refresh as RefreshIcon
+  Refresh as RefreshIcon,
+  Warning as WarningIcon
 } from '@mui/icons-material'
 import AddServiceHighlight from './Modal/AddServiceHighlight.jsx'
 import {
@@ -46,6 +52,9 @@ const ServiceHighlightManagement = () => {
   const [refreshing, setRefreshing] = useState(false)
   const [error, setError] = useState('')
   const { hasPermission } = usePermissions()
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false)
+  const [deleteIndex, setDeleteIndex] = useState(null)
+  const [deleting, setDeleting] = useState(false)
 
   // Fetch service highlights data
   const fetchServiceHighlights = async () => {
@@ -82,17 +91,34 @@ const ServiceHighlightManagement = () => {
   }
 
   // Handle delete
-  const handleDelete = async (index) => {
-    if (window.confirm('Bạn có chắc chắn muốn xóa dịch vụ này?')) {
-      try {
-        await deleteServiceHighlight(index)
-        // Refresh data after successful delete
-        fetchServiceHighlights()
-      } catch (error) {
-        setError(error.message)
-        console.error('Error deleting service highlight:', error)
-      }
+  const handleDelete = (index) => {
+    setDeleteIndex(index)
+    setDeleteConfirmOpen(true)
+  }
+
+  // Handle delete confirmation
+  const handleDeleteConfirm = async () => {
+    if (deleteIndex === null) return
+
+    try {
+      setDeleting(true)
+      await deleteServiceHighlight(deleteIndex)
+      // Refresh data after successful delete
+      fetchServiceHighlights()
+      setDeleteConfirmOpen(false)
+      setDeleteIndex(null)
+    } catch (error) {
+      setError(error.message)
+      console.error('Error deleting service highlight:', error)
+    } finally {
+      setDeleting(false)
     }
+  }
+
+  // Handle delete cancel
+  const handleDeleteCancel = () => {
+    setDeleteConfirmOpen(false)
+    setDeleteIndex(null)
   }
 
   // Handle add new
@@ -153,7 +179,7 @@ const ServiceHighlightManagement = () => {
             gap: 2
           }}
         >
-          <StarIcon sx={{ fontSize: 40, color: '#1A3C7B' }} />
+          <StarIcon sx={{ fontSize: 40, color: 'var(--primary-color)' }} />
           Quản lý Dịch vụ Nổi bật
         </Typography>
         <Typography variant='body1' color='text.secondary'>
@@ -232,31 +258,34 @@ const ServiceHighlightManagement = () => {
 
       {/* Action Buttons */}
       <Box sx={{ mb: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        {hasPermission('service:create') && (
+        {
+          hasPermission('service:create') && (
 
-          <Button
-            variant='contained'
-            startIcon={<AddIcon />}
-            onClick={handleAddNew}
-            sx={{
-              px: 3,
-              py: 1.5,
-              borderRadius: 2,
-              textTransform: 'none',
-              fontSize: '1rem',
-              fontWeight: 600,
-              background: 'linear-gradient(135deg,rgb(17, 58, 122) 0%,rgb(11, 49, 156) 100%)',
-              boxShadow: '0 4px 16px rgba(59, 130, 246, 0.3)',
-              '&:hover': {
-                background: 'linear-gradient(135deg, #2563eb 0%, #1e40af 100%)',
-                boxShadow: '0 6px 20px rgba(59, 130, 246, 0.4)',
-                transform: 'translateY(-1px)'
-              }
-            }}
-          >
-            Thêm dịch vụ mới
-          </Button>
-        )}
+            <Button
+              variant='contained'
+              startIcon={<AddIcon />}
+              onClick={handleAddNew}
+              sx={{
+                px: 3,
+                py: 1.5,
+                borderRadius: 2,
+                textTransform: 'none',
+                fontSize: '1rem',
+                fontWeight: 600,
+                backgroundColor: 'var(--primary-color)',
+                color: '#fff',
+                boxShadow: '0 4px 16px rgba(59, 130, 246, 0.3)',
+                '&:hover': {
+                  backgroundColor: 'var(--accent-color)',
+                  boxShadow: '0 6px 20px rgba(59, 130, 246, 0.4)',
+                  transform: 'translateY(-1px)'
+                }
+              }}
+            >
+              Thêm dịch vụ mới
+            </Button>
+          )
+        }
         <Button
           variant="outlined"
           startIcon={<RefreshIcon />}
@@ -265,15 +294,17 @@ const ServiceHighlightManagement = () => {
           sx={{
             borderRadius: 2,
             textTransform: 'none',
-            fontWeight: 600
+            fontWeight: 600,
+            color: 'var(--primary-color)',
+            borderColor: 'var(--primary-color)'
           }}
         >
           {refreshing ? 'Đang tải...' : 'Làm mới'}
         </Button>
-      </Box>
+      </Box >
 
       {/* Table */}
-      <Card
+      < Card
         sx={{
           borderRadius: 3,
           boxShadow: '0 4px 24px rgba(0, 0, 0, 0.06)',
@@ -457,16 +488,119 @@ const ServiceHighlightManagement = () => {
             </TableBody>
           </Table>
         </TableContainer>
-      </Card>
+      </Card >
 
       {/* Modal */}
-      <AddServiceHighlight
+      < AddServiceHighlight
         open={openModal}
         onClose={() => setOpenModal(false)}
         onSuccess={handleModalSuccess}
         editIndex={editIndex}
       />
-    </Box>
+
+      {/* Delete Confirmation Dialog */}
+      < Dialog
+        open={deleteConfirmOpen}
+        onClose={handleDeleteCancel}
+        aria - labelledby="alert-dialog-title"
+      aria - describedby="alert-dialog-description"
+      PaperProps = {{
+        sx: {
+          borderRadius: 3,
+          minWidth: 400
+        }
+      }}
+      >
+      <DialogTitle
+        id="alert-dialog-title"
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: 1,
+          color: '#dc2626',
+          fontWeight: 600
+        }}
+      >
+        <WarningIcon color="error" />
+        Xác nhận xóa dịch vụ
+      </DialogTitle>
+      <DialogContent>
+        <DialogContentText id="alert-dialog-description" sx={{ mb: 2 }}>
+          Bạn có chắc chắn muốn xóa dịch vụ này không?
+        </DialogContentText>
+        {deleteIndex !== null && serviceHighlights[deleteIndex] && (
+          <Box sx={{
+            p: 2,
+            backgroundColor: '#fef2f2',
+            borderRadius: 2,
+            border: '1px solid #fecaca',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 2
+          }}>
+            {serviceHighlights[deleteIndex].imageUrl && (
+              <img
+                src={optimizeCloudinaryUrl(serviceHighlights[deleteIndex].imageUrl, {
+                  width: 60,
+                  height: 60
+                })}
+                alt={serviceHighlights[deleteIndex].title}
+                style={{
+                  width: 60,
+                  height: 60,
+                  objectFit: 'contain',
+                  borderRadius: 6,
+                  border: '1px solid #e2e8f0'
+                }}
+              />
+            )}
+            <Box sx={{ flex: 1 }}>
+              <Typography variant="body1" sx={{ fontWeight: 600, color: '#1e293b' }}>
+                {serviceHighlights[deleteIndex].title}
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                {serviceHighlights[deleteIndex].subtitle}
+              </Typography>
+            </Box>
+          </Box>
+        )}
+        <DialogContentText sx={{ mt: 2, color: '#dc2626', fontWeight: 500 }}>
+          ⚠️ Hành động này không thể hoàn tác!
+        </DialogContentText>
+      </DialogContent>
+      <DialogActions sx={{ p: 3, pt: 1 }}>
+        <Button
+          onClick={handleDeleteCancel}
+          variant="outlined"
+          disabled={deleting}
+          sx={{
+            borderRadius: 2,
+            textTransform: 'none',
+            fontWeight: 600
+          }}
+        >
+          Hủy
+        </Button>
+        <Button
+          onClick={handleDeleteConfirm}
+          variant="contained"
+          disabled={deleting}
+          startIcon={deleting ? <CircularProgress size={16} /> : <DeleteIcon />}
+          sx={{
+            borderRadius: 2,
+            textTransform: 'none',
+            fontWeight: 600,
+            backgroundColor: '#dc2626',
+            '&:hover': {
+              backgroundColor: '#b91c1c'
+            }
+          }}
+        >
+          {deleting ? 'Đang xóa...' : 'Xóa dịch vụ'}
+        </Button>
+      </DialogActions>
+    </Dialog >
+    </Box >
   )
 }
 

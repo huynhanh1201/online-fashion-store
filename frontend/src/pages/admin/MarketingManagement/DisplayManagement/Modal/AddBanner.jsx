@@ -223,7 +223,8 @@ const AddBanner = ({ open, onClose, onSuccess, initialData, bannerIndex }) => {
         '& .MuiDialog-paper': {
           borderRadius: 3,
           boxShadow: '0 4px 24px rgba(0, 0, 0, 0.06)',
-          border: '1px solid #e2e8f0'
+          border: '1px solid #e2e8f0',
+          maxHeight:'75vh',
         }
       }}
     >
@@ -269,11 +270,12 @@ const AddBanner = ({ open, onClose, onSuccess, initialData, bannerIndex }) => {
           </Alert>
         )}
 
-        {/* Upload/Preview Banner Image - chiếm toàn bộ chiều ngang */}
-        <Box sx={{ width: '100%', mb: 3 }}>
-          <Typography variant="subtitle1" sx={{ mb: 2, fontWeight: 600 }}>
+        {/* Image Upload Section - Full Width */}
+        <Box sx={{ mb: 2 }}>
+          <Typography variant="h6" sx={{ mb: 2, fontWeight: 600, color: '#1e293b' }}>
             Hình ảnh Banner
           </Typography>
+          
           {imagePreview ? (
             <Card 
               sx={{ 
@@ -290,8 +292,8 @@ const AddBanner = ({ open, onClose, onSuccess, initialData, bannerIndex }) => {
             >
               <CardMedia
                 component="img"
-                height="240"
-                image={optimizeCloudinaryUrl(imagePreview, { width: 900, height: 240 })}
+                height="300"
+                image={optimizeCloudinaryUrl(imagePreview, { width: 900, height: 300 })}
                 alt="Banner preview"
                 sx={{ objectFit: 'cover', width: '100%' }}
               />
@@ -322,10 +324,13 @@ const AddBanner = ({ open, onClose, onSuccess, initialData, bannerIndex }) => {
             <Box
               sx={{
                 width: '100%',
+                height: 200,
                 border: `2px dashed ${alpha(theme.palette.primary.main, 0.3)}`,
                 borderRadius: 2,
-                p: 3,
-                textAlign: 'center',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
                 backgroundColor: '#f8fafc',
                 cursor: 'pointer',
                 transition: 'all 0.3s ease',
@@ -336,22 +341,16 @@ const AddBanner = ({ open, onClose, onSuccess, initialData, bannerIndex }) => {
               }}
               onClick={() => imageInputRef.current?.click()}
             >
-              <CloudUploadIcon sx={{ fontSize: 48, color: '#3b82f6', mb: 1 }} />
-              <Typography variant="body2" sx={{ color: '#1e293b', fontWeight: 600 }}>
+              <CloudUploadIcon sx={{ fontSize: 48, color: '#3b82f6', mb: 2 }} />
+              <Typography variant="body1" sx={{ color: '#1e293b', fontWeight: 600, mb: 1 }}>
                 Click để upload ảnh banner
               </Typography>
-              <Typography variant="caption" color="text.secondary">
-                JPG, PNG, WebP (tối đa 5MB)
+              <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'center' }}>
+                JPG, PNG, WebP • Tối đa 5MB
               </Typography>
             </Box>
           )}
-          <input
-            ref={imageInputRef}
-            type="file"
-            accept="image/jpeg,image/png,image/webp"
-            hidden
-            onChange={handleImageUpload}
-          />
+          
           {uploadingImage && (
             <Stack direction="row" alignItems="center" spacing={1} sx={{ mt: 2 }}>
               <CircularProgress size={20} sx={{ color: '#3b82f6' }} />
@@ -360,131 +359,151 @@ const AddBanner = ({ open, onClose, onSuccess, initialData, bannerIndex }) => {
               </Typography>
             </Stack>
           )}
+          
+          <input
+            ref={imageInputRef}
+            type="file"
+            accept="image/jpeg,image/png,image/webp"
+            hidden
+            onChange={handleImageUpload}
+          />
         </Box>
 
-        {/* Form nhập */}
-        <Grid container spacing={3}>
-          <Grid item xs={12} md={6}>
-            <Grid container spacing={2}>
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  label='Tiêu đề *'
-                  value={form.title}
-                  onChange={(e) => handleChange('title', e.target.value)}
-                  fullWidth
-                  required
+        {/* Form Fields Section - Full Width */}
+        <Box>
+          <Typography variant="h6" sx={{ mb: 3, fontWeight: 600, color: '#1e293b' }}>
+            Thông tin Banner
+          </Typography>
+          
+          <Stack spacing={3}>
+            {/* Title */}
+            <TextField
+              label='Tiêu đề *'
+              value={form.title}
+              onChange={(e) => handleChange('title', e.target.value)}
+              fullWidth
+              required
+              placeholder="Nhập tiêu đề banner"
+              sx={{
+                '& .MuiOutlinedInput-root': {
+                  borderRadius: 2,
+                  backgroundColor: '#fff'
+                }
+              }}
+            />
+
+            {/* Subtitle */}
+            <TextField
+              label='Phụ đề'
+              value={form.subtitle}
+              onChange={(e) => handleChange('subtitle', e.target.value)}
+              fullWidth
+              placeholder="Nhập phụ đề (không bắt buộc)"
+              sx={{
+                '& .MuiOutlinedInput-root': {
+                  borderRadius: 2,
+                  backgroundColor: '#fff'
+                }
+              }}
+            />
+
+            {/* Link */}
+            <TextField
+              label='Link điều hướng *'
+              value={form.link}
+              onChange={(e) => handleChange('link', e.target.value)}
+              fullWidth
+              required
+              placeholder="/khuyen-mai/summer"
+              helperText="URL mà người dùng sẽ được chuyển đến khi click vào banner"
+              sx={{
+                '& .MuiOutlinedInput-root': {
+                  borderRadius: 2,
+                  backgroundColor: '#fff'
+                }
+              }}
+            />
+
+            {/* Position */}
+            <TextField
+              select
+              label='Vị trí hiển thị'
+              value={form.position}
+              onChange={(e) => handleChange('position', e.target.value)}
+              fullWidth
+              sx={{
+                '& .MuiOutlinedInput-root': {
+                  borderRadius: 2,
+                  backgroundColor: '#fff'
+                }
+              }}
+            >
+              <MenuItem value='hero'>Banner chính (Trang chủ)</MenuItem>
+              <MenuItem value='product'>Banner sản phẩm</MenuItem>
+              <MenuItem value='middle'>Banner giữa trang</MenuItem>
+              <MenuItem value='top'>Banner đầu trang</MenuItem>
+              <MenuItem value='bottom'>Banner cuối trang</MenuItem>
+            </TextField>
+
+            {/* Visibility */}
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={form.visible}
+                  onChange={(e) => handleChange('visible', e.target.checked)}
                   sx={{
-                    '& .MuiOutlinedInput-root': {
-                      borderRadius: 2,
-                      backgroundColor: '#fff'
+                    color: '#3b82f6',
+                    '&.Mui-checked': {
+                      color: '#3b82f6'
                     }
                   }}
                 />
+              }
+              label='Hiển thị banner'
+            />
+
+            {/* Date Range */}
+            <Box>
+              <Typography variant="subtitle2" sx={{ mb: 2, fontWeight: 600, color: '#374151' }}>
+                Thời gian hiển thị (không bắt buộc)
+              </Typography>
+              <Grid container spacing={2}>
+                <Grid item xs={12} sm={6}>
+                  <TextField
+                    type='date'
+                    label='Ngày bắt đầu'
+                    value={form.startDate}
+                    onChange={(e) => handleChange('startDate', e.target.value)}
+                    fullWidth
+                    InputLabelProps={{ shrink: true }}
+                    sx={{
+                      '& .MuiOutlinedInput-root': {
+                        borderRadius: 2,
+                        backgroundColor: '#fff'
+                      }
+                    }}
+                  />
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <TextField
+                    type='date'
+                    label='Ngày kết thúc'
+                    value={form.endDate}
+                    onChange={(e) => handleChange('endDate', e.target.value)}
+                    fullWidth
+                    InputLabelProps={{ shrink: true }}
+                    sx={{
+                      '& .MuiOutlinedInput-root': {
+                        borderRadius: 2,
+                        backgroundColor: '#fff'
+                      }
+                    }}
+                  />
+                </Grid>
               </Grid>
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  label='Phụ đề'
-                  value={form.subtitle}
-                  onChange={(e) => handleChange('subtitle', e.target.value)}
-                  fullWidth
-                  sx={{
-                    '& .MuiOutlinedInput-root': {
-                      borderRadius: 2,
-                      backgroundColor: '#fff'
-                    }
-                  }}
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  label='Link điều hướng *'
-                  value={form.link}
-                  onChange={(e) => handleChange('link', e.target.value)}
-                  fullWidth
-                  required
-                  placeholder="/khuyen-mai/summer"
-                  sx={{
-                    '& .MuiOutlinedInput-root': {
-                      borderRadius: 2,
-                      backgroundColor: '#fff'
-                    }
-                  }}
-                />
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  select
-                  label='Vị trí hiển thị'
-                  value={form.position}
-                  onChange={(e) => handleChange('position', e.target.value)}
-                  fullWidth
-                  sx={{
-                    '& .MuiOutlinedInput-root': {
-                      borderRadius: 2,
-                      backgroundColor: '#fff'
-                    }
-                  }}
-                >
-                  <MenuItem value='hero'>Ảnh chính ở trang chủ ( Banner )</MenuItem>
-                  <MenuItem value='product'>Ảnh trang sản phẩm ( Product )</MenuItem>
-                  <MenuItem value='middle'>Ảnh giữa trang ( Middle )</MenuItem>
-                  <MenuItem value='top'>Top (Đầu trang)</MenuItem>
-                  <MenuItem value='bottom'>Bottom (Cuối trang)</MenuItem>
-                </TextField>
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <FormControlLabel
-                  control={
-                    <Checkbox
-                      checked={form.visible}
-                      onChange={(e) => handleChange('visible', e.target.checked)}
-                      sx={{
-                        color: '#3b82f6',
-                        '&.Mui-checked': {
-                          color: '#3b82f6'
-                        }
-                      }}
-                    />
-                  }
-                  label='Hiển thị banner'
-                  sx={{ mt: 2 }}
-                />
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  type='date'
-                  label='Ngày bắt đầu'
-                  value={form.startDate}
-                  onChange={(e) => handleChange('startDate', e.target.value)}
-                  fullWidth
-                  InputLabelProps={{ shrink: true }}
-                  sx={{
-                    '& .MuiOutlinedInput-root': {
-                      borderRadius: 2,
-                      backgroundColor: '#fff'
-                    }
-                  }}
-                />
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  type='date'
-                  label='Ngày kết thúc'
-                  value={form.endDate}
-                  onChange={(e) => handleChange('endDate', e.target.value)}
-                  fullWidth
-                  InputLabelProps={{ shrink: true }}
-                  sx={{
-                    '& .MuiOutlinedInput-root': {
-                      borderRadius: 2,
-                      backgroundColor: '#fff'
-                    }
-                  }}
-                />
-              </Grid>
-            </Grid>
-          </Grid>
-        </Grid>
+            </Box>
+          </Stack>
+        </Box>
       </DialogContent>
 
       <DialogActions sx={{ p: 2, backgroundColor: '#f8fafc', borderTop: '1px solid #e2e8f0' }}>
@@ -517,12 +536,9 @@ const AddBanner = ({ open, onClose, onSuccess, initialData, bannerIndex }) => {
             fontSize: '1rem',
             px: 3,
             py: 1,
-            background: 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)',
-            boxShadow: '0 4px 16px rgba(59, 130, 246, 0.3)',
+            background: 'var(--primary-color)',
             '&:hover': {
-              background: 'linear-gradient(135deg, #2563eb 0%, #1e40af 100%)',
-              boxShadow: '0 6px 20px rgba(59, 130, 246, 0.4)',
-              transform: 'translateY(-1px)'
+              background: 'var(--accent-color)'
             },
             '&:disabled': {
               background: 'linear-gradient(135deg, #93c5fd 0%, #a5b4fc 100%)',

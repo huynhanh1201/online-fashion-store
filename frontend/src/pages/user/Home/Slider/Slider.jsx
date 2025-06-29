@@ -185,7 +185,7 @@ const Slider = () => {
               top: '50%',
               left: { xs: '5px', sm: '10px' },
               transform: 'translateY(-50%)',
-              backgroundColor: 'rgba(255, 255, 255, 0.6)',
+              backgroundColor: 'var(--surface-color)',
               '&:hover': { backgroundColor: 'rgba(255, 255, 255, 0.8)' },
               display: { xs: 'none', sm: 'flex' },
               padding: { xs: '4px', sm: '8px' }
@@ -201,7 +201,7 @@ const Slider = () => {
               top: '50%',
               right: { xs: '5px', sm: '10px' },
               transform: 'translateY(-50%)',
-              backgroundColor: 'rgba(255, 255, 255, 0.6)',
+              backgroundColor: 'var(--surface-color)',
               '&:hover': { backgroundColor: 'rgba(255, 255, 255, 0.8)' },
               display: { xs: 'none', sm: 'flex' },
               padding: { xs: '4px', sm: '8px' }

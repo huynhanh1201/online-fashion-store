@@ -110,7 +110,7 @@ const ViewUserModal = ({ open, onClose, user }) => {
                         sx={{
                           width: 130,
                           fontWeight: 800,
-                          backgroundColor: '#001f5d',
+                          backgroundColor: 'var(--primary-color)',
                           color: '#fff',
                           textTransform: 'uppercase'
                         }}

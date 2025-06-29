@@ -159,7 +159,7 @@ export default function AdminDrawer({
           },
           {
             permission: 'flashSale:use',
-            label: 'Chương trình khuyến mãi',
+            label: 'Khuyến mãi',
             path: '/admin/flashsale-management'
           },
           {
@@ -184,7 +184,7 @@ export default function AdminDrawer({
           },
           {
             permission: 'user:use',
-            label: 'Quản lý Theme',
+            label: 'Chủ đề',
             path: '/admin/theme-management'
           },
           {
