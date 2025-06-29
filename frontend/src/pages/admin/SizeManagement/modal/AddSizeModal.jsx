@@ -90,7 +90,7 @@ const AddSizeModal = ({ open, onClose, onAdded, onSave }) => {
             type='button'
             onClick={handleSubmit(onSubmit)}
             sx={{
-              backgroundColor: '#001f5d',
+              backgroundColor: 'var(--primary-color)',
               color: '#fff',
               textTransform: 'none'
             }}

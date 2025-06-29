@@ -92,7 +92,7 @@ const AddColorModal = ({ open, onClose, onAdded, onSave }) => {
             onClick={handleSubmit(onSubmit)}
             variant='contained'
             sx={{
-              backgroundColor: '#001f5d',
+              backgroundColor: 'var(--primary-color)',
               color: '#fff',
               textTransform: 'none'
             }}

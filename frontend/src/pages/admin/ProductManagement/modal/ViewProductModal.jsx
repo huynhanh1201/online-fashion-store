@@ -140,7 +140,8 @@ const ViewProductModal = ({
         sx: {
           mt: 8,
           maxHeight: '85vh',
-          minHeight: '85vh'
+          minHeight: '85vh',
+          backgroundColor: 'var(--surface-color)'
         },
         ...StyleAdmin.InputCustom
       }}
@@ -177,7 +178,7 @@ const ViewProductModal = ({
                       width: '300px',
                       height: '257px',
                       objectFit: 'contain',
-                      backgroundColor: '#f5f5f5',
+                      backgroundColor: 'var(--surface-color)',
                       borderRadius: 2,
                       border: '1px solid #ccc',
                       mb: 1,
@@ -327,6 +328,7 @@ const ViewProductModal = ({
               </Typography>
             ) : (
               <Box
+                className="content-selectable"
                 sx={{
                   width: '100%',
                   mt: 2,

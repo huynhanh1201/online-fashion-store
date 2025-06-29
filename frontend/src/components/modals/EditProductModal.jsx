@@ -71,7 +71,7 @@ export default function EditProductModal({ open, onClose, product, onSave }) {
             Hủy
           </Button>
           <Button
-            sx={{ backgroundColor: '#001f5d' }}
+            sx={{ backgroundColor: 'var(--primary-color)' }}
             variant='contained'
             onClick={handleSubmit}
           >

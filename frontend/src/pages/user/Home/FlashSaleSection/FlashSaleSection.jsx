@@ -118,7 +118,7 @@ const FlashSaleSection = () => {
   // ======= STYLES =======
   const styles = {
     flashSale: {
-      background: 'linear-gradient(135deg, #1e3c72 0%, #2a5298 100%)',
+      background: 'var(--primary-color)',
       borderRadius: '24px',
       padding: '32px',
       color: 'white',

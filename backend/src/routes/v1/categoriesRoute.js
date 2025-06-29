@@ -19,6 +19,9 @@ Router.route('/').post(
 // Danh sách Danh mục sản phẩm
 Router.route('/').get(categoriesController.getCategoryList)
 
+// Lấy danh sách danh mục có sản phẩm
+Router.route('/with-products').get(categoriesController.getCategoriesWithProducts)
+
 // Lấy thông tin một Danh mục sản phẩm theo slug
 Router.route('/slug/:slug').get(categoriesController.getCategoryBySlug)
 

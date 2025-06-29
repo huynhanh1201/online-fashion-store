@@ -201,10 +201,10 @@ const AddColorModal = ({ open, onClose, onAdded }) => {
                       clickable
                       sx={{
                         ...(isSelected && {
-                          backgroundColor: '#001f5d',
+                          backgroundColor: 'var(--primary-color)',
                           color: '#fff',
                           '&:hover': {
-                            backgroundColor: '#001f5d'
+                            backgroundColor: 'var(--primary-color)'
                           }
                         })
                       }}
@@ -228,7 +228,7 @@ const AddColorModal = ({ open, onClose, onAdded }) => {
         <Button
           variant='contained'
           sx={{
-            backgroundColor: '#001f5d',
+            backgroundColor: 'var(--primary-color)',
             color: '#fff',
             textTransform: 'none'
           }}

@@ -90,6 +90,7 @@ const HeaderUser = () => {
               <Typography
                 variant='h6'
                 noWrap
+                className="no-select"
                 sx={{
                   fontSize: { xs: '0.9rem', sm: '1.1rem', md: '1.25rem' },
                   cursor: 'pointer',
@@ -104,6 +105,7 @@ const HeaderUser = () => {
 
             {/* Center Section - Desktop Menu */}
             <Box
+              className="no-select"
               sx={{
                 display: { xs: 'none', md: 'flex' },
                 flexGrow: 1,
@@ -124,15 +126,16 @@ const HeaderUser = () => {
                 gap: { xs: 0.5, sm: 1, md: 1.5 },
                 justifyContent: 'flex-end',
                 flexShrink: 0,
-                minWidth: '330px',
+                minWidth: '270px',
                 maxWidth: { xs: '50%', sm: '40%', md: 'none' }
               }}
             >
               {/* Search Component - Hide on very small screens */}
               <Box
                 sx={{
-                  display: { xs: 'none', sm: 'block' },
-                  flexShrink: 1,
+                  display: { xs: 'none', sm: 'block', },
+                  mr:-2,
+                  mt:1
                 }}
               >
                 <Search />

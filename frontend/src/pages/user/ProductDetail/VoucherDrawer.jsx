@@ -6,7 +6,7 @@ const VoucherCard = styled(Card)(({ theme }) => ({
   borderRadius: 4,
   boxShadow: 6,
   padding: theme.spacing(2),
-  backgroundColor: '#fff',
+  backgroundColor: 'var(--surface-color)',
   border: '3px dashed #a6a6a6',
   height: 130,
   display: 'flex',
@@ -36,10 +36,7 @@ const VoucherDrawer = ({
         flexDirection: 'column'
       }}
     >
-      <Typography variant='h6' gutterBottom>
-        Danh sách mã giảm giá
-      </Typography>
-      <Box sx={{ flexGrow: 1, overflowY: 'auto', pr: 1, mt: 1 }}>
+      <Box sx={{ flexGrow: 1, overflowY: 'auto', pr: 1, mt: 8 }}>
         {coupons.map((coupon) => {
           const valueText =
             coupon.type === 'percent'
@@ -55,13 +52,17 @@ const VoucherDrawer = ({
                 <Typography variant='subtitle2' color='text.secondary'>
                   VOUCHER
                 </Typography>
-                <Typography variant='h6' fontWeight='bold' color='#1A3C7B'>
+                <Typography
+                  variant='h6'
+                  fontWeight='bold'
+                  color='var(--primary-color)'
+                >
                   {valueText}
                 </Typography>
                 <Tooltip title={coupon.code}>
                   <Typography
                     variant='body1'
-                    color='#1A3C7B'
+                    color='var(--primary-color)'
                     mt={0.5}
                     sx={{
                       maxWidth: '150px',
@@ -92,7 +93,11 @@ const VoucherDrawer = ({
                   <Button
                     variant='contained'
                     size='medium'
-                    sx={{ backgroundColor: '#1A3C7B', color: '#fff', mt: 2 }}
+                    sx={{
+                      backgroundColor: 'var(--primary-color)',
+                      color: '#fff',
+                      mt: 2
+                    }}
                     onClick={() => handleCopy(coupon.code)}
                     fullWidth
                   >

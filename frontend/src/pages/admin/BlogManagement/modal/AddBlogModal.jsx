@@ -326,7 +326,7 @@ const BlogModal = ({
             <Button
               type='submit'
               variant='contained'
-              sx={{ backgroundColor: '#001f5d', color: '#fff' }}
+              sx={{ backgroundColor: 'var(--primary-color)', color: '#fff' }}
             >
               {isEditMode ? 'Cập nhật bài viết' : 'Tạo bài viết'}
             </Button>

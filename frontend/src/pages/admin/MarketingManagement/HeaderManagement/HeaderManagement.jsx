@@ -48,7 +48,7 @@ import {
   DragIndicator as DragIcon
 } from '@mui/icons-material'
 import AddHeader from './Modal/AddHeader.jsx'
-import AddMenu from './Modal/AddMenu.jsx'
+import MegaMenuEditor from './Modal/MegaMenuEditor.jsx'
 import { 
   getHeaderConfig, 
   getMenuConfig, 
@@ -257,12 +257,12 @@ const HeaderManagement = () => {
           sx={{ 
             fontWeight: 600,
             backgroundColor: item.visible ? '#f0f9ff' : '#fef2f2',
-            borderColor: item.visible ? '#3b82f6' : '#ef4444',
-            color: item.visible ? '#1e40af' : '#dc2626'
+            borderColor: item.visible ? 'var(--primary-color)' : 'var(--error-color)',
+            color: item.visible ? 'var(--primary-color)' : 'var(--error-color)'
           }}
         />
         {!item.visible && (
-          <VisibilityOffIcon sx={{ color: '#ef4444', fontSize: 16 }} />
+          <VisibilityOffIcon sx={{ color: 'var(--error-color)', fontSize: 16 }} />
         )}
         {item.children && item.children.length > 0 && (
           <Badge badgeContent={item.children.length} color="primary" size="small">
@@ -302,7 +302,7 @@ const HeaderManagement = () => {
             gap: 2
           }}
         >
-          <ImageIcon sx={{ fontSize: 40, color: '#1A3C7B' }} />
+          <ImageIcon sx={{ fontSize: 40, color: 'var(--primary-color)' }} />
           Quản lý đầu trang
         </Typography>
         <Typography variant='body1' color='text.secondary'>
@@ -395,8 +395,8 @@ const HeaderManagement = () => {
           }}
         >
           <Tab label="Logo & Nội dung thông báo chạy" />
-          <Tab label="Quản lý Menu mở rộng" />
-          <Tab label="Quản lý Menu danh mục" />
+          <Tab label="Chỉnh sửa Menu mở rộng" />
+          <Tab label="Chỉnh sửa menu danh mục" />
         </Tabs>
       </Card>
 
@@ -423,13 +423,9 @@ const HeaderManagement = () => {
                 textTransform: 'none',
                 fontSize: '1rem',
                 fontWeight: 600,
-                background:
-                  'linear-gradient(135deg,rgb(17, 58, 122) 0%,rgb(11, 49, 156) 100%)',
-                boxShadow: '0 4px 16px rgba(59, 130, 246, 0.3)',
+                background: 'var(--primary-color)',
                 '&:hover': {
-                  background: 'linear-gradient(135deg, #2563eb 0%, #1e40af 100%)',
-                  boxShadow: '0 6px 20px rgba(59, 130, 246, 0.4)',
-                  transform: 'translateY(-1px)'
+                  background: 'var(--accent-color)'
                 }
               }}
             >
@@ -585,7 +581,7 @@ const HeaderManagement = () => {
                             <IconButton
                               size='small'
                               sx={{
-                                color: '#3b82f6',
+                                color: 'var(--primary-color)',
                                 '&:hover': { backgroundColor: '#dbeafe' }
                               }}
                               onClick={() => setOpenModal(true)}
@@ -662,13 +658,9 @@ const HeaderManagement = () => {
                 textTransform: 'none',
                 fontSize: '1rem',
                 fontWeight: 600,
-                background:
-                  'linear-gradient(135deg,rgb(17, 58, 122) 0%,rgb(11, 49, 156) 100%)',
-                boxShadow: '0 4px 16px rgba(59, 130, 246, 0.3)',
+                background: 'var(--primary-color)',
                 '&:hover': {
-                  background: 'linear-gradient(135deg, #2563eb 0%, #1e40af 100%)',
-                  boxShadow: '0 6px 20px rgba(59, 130, 246, 0.4)',
-                  transform: 'translateY(-1px)'
+                  background: 'var(--accent-color)'
                 }
               }}
             >
@@ -754,15 +746,15 @@ const HeaderManagement = () => {
                           </TableCell>
                           <TableCell sx={{ py: 2 }}>
                             <Stack direction="row" alignItems="center" spacing={1}>
-                              <MenuIcon sx={{ color: '#3b82f6', fontSize: 18 }} />
+                              <MenuIcon sx={{ color: 'var(--primary-color)', fontSize: 18 }} />
                               <Typography variant="body2" sx={{ fontWeight: 700, color: '#1e293b' }}>
                                 {item.label}
                               </Typography>
-                              {!item.visible && <VisibilityOffIcon sx={{ color: '#ef4444', fontSize: 16 }} />}
+                              {!item.visible && <VisibilityOffIcon sx={{ color: 'var(--error-color)', fontSize: 16 }} />}
                             </Stack>
                           </TableCell>
                           <TableCell sx={{ py: 2 }}>
-                            <Typography variant="body2" sx={{ fontFamily: 'monospace', color: '#3b82f6', fontWeight: 500 }}>
+                            <Typography variant="body2" sx={{ fontFamily: 'monospace', color: 'var(--primary-color)', fontWeight: 500 }}>
                               {item.url || '—'}
                             </Typography>
                           </TableCell>
@@ -793,11 +785,11 @@ const HeaderManagement = () => {
                                     <Typography variant="body2" sx={{ fontWeight: 500, color: '#334155' }}>
                                       {child.label}
                                     </Typography>
-                                    {!child.visible && <VisibilityOffIcon sx={{ color: '#ef4444', fontSize: 16 }} />}
+                                    {!child.visible && <VisibilityOffIcon sx={{ color: 'var(--error-color)', fontSize: 16 }} />}
                                   </Stack>
                                 </TableCell>
                                 <TableCell sx={{ py: 2 }}>
-                                  <Typography variant="body2" sx={{ fontFamily: 'monospace', color: '#3b82f6', fontWeight: 500 }}>
+                                  <Typography variant="body2" sx={{ fontFamily: 'monospace', color: 'var(--primary-color)', fontWeight: 500 }}>
                                     {child.url || '—'}
                                   </Typography>
                                 </TableCell>
@@ -992,7 +984,7 @@ const HeaderManagement = () => {
                                 onClick={() => handleToggleExpanded(parentCategory._id)}
                                 disabled={childCategories.length === 0}
                                 sx={{
-                                  color: '#3b82f6',
+                                  color: 'var(--primary-color)',
                                   '&:hover': { backgroundColor: '#3b82f620' },
                                   transform: isExpanded ? 'rotate(90deg)' : 'rotate(0deg)',
                                   transition: 'transform 0.2s ease'
@@ -1007,7 +999,7 @@ const HeaderManagement = () => {
                         </TableCell>
                         <TableCell sx={{ py: 2 }}>
                           <Stack direction="row" alignItems="center" spacing={1}>
-                              <DragIcon sx={{ color: '#3b82f6', fontSize: 16 }} />
+                              <DragIcon sx={{ color: 'var(--primary-color)', fontSize: 16 }} />
                             <Box>
                                 <Stack direction="row" alignItems="center" spacing={1}>
                               <Typography
@@ -1023,7 +1015,7 @@ const HeaderManagement = () => {
                                     label="Parent"
                                     size="small"
                                     sx={{
-                                      backgroundColor: '#3b82f6',
+                                      backgroundColor: 'var(--primary-color)',
                                       color: 'white',
                                       fontWeight: 600,
                                       fontSize: '0.7rem',
@@ -1036,8 +1028,8 @@ const HeaderManagement = () => {
                                       size="small"
                                       variant="outlined"
                                       sx={{
-                                        borderColor: '#3b82f6',
-                                        color: '#3b82f6',
+                                        borderColor: 'var(--primary-color)',
+                                        color: 'var(--primary-color)',
                                         fontWeight: 600,
                                         fontSize: '0.7rem',
                                         height: 20
@@ -1097,7 +1089,7 @@ const HeaderManagement = () => {
                             borderLeft: '4px solid #e2e8f0',
                             '&:hover': {
                               backgroundColor: '#e0e7ef',
-                              borderLeft: '4px solid #3b82f6'
+                              borderLeft: '4px solid var(--primary-color)'
                             },
                             '&:last-child td, &:last-child th': { border: 0 }
                           }}
@@ -1233,7 +1225,7 @@ const HeaderManagement = () => {
         onSuccess={handleModalSuccess}
       />
 
-      <AddMenu
+      <MegaMenuEditor
         open={openMenuModal}
         onClose={() => setOpenMenuModal(false)}
         onSuccess={handleMenuModalSuccess}

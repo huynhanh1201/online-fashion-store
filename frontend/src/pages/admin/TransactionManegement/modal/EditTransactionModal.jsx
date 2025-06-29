@@ -130,7 +130,7 @@ const EditTransactionModal = ({
         </Button>
         <Button
           sx={{
-            backgroundColor: '#001f5d',
+            backgroundColor: 'var(--primary-color)',
             color: '#fff',
             textTransform: 'none'
           }}

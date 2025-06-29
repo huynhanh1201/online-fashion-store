@@ -541,10 +541,10 @@ const EditVariantModal = ({
                         clickable
                         sx={{
                           ...(isSelected && {
-                            backgroundColor: '#001f5d',
+                            backgroundColor: 'var(--primary-color)',
                             color: '#fff',
                             '&:hover': {
-                              backgroundColor: '#001f5d'
+                              backgroundColor: 'var(--primary-color)'
                             }
                           })
                         }}
@@ -570,7 +570,7 @@ const EditVariantModal = ({
             type='submit'
             variant='contained'
             sx={{
-              backgroundColor: '#001f5d',
+              backgroundColor: 'var(--primary-color)',
               color: '#fff',
               textTransform: 'none'
             }}

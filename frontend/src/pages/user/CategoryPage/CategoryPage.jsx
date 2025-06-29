@@ -232,7 +232,7 @@ const CategoryPage = () => {
         justifyContent="center" 
         alignItems="center" 
         minHeight="80vh"
-        sx={{ backgroundColor: '#fafafa' }}
+        sx={{ backgroundColor: 'var(--surface-color)' }}
       >
         <CircularProgress size={60} thickness={3} />
       </Box>

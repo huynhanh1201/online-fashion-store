@@ -14,6 +14,7 @@ import { store } from '~/redux/store'
 
 // Import global theme styles
 import './assets/global-theme.css'
+import './assets/text-selection.css'
 
 // Cấu hình Redux-Persit
 const persistor = persistStore(store)

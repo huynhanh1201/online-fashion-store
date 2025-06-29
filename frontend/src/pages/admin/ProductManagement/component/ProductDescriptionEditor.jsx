@@ -207,7 +207,7 @@ export default function ProductDescriptionEditor({
               border: '1px solid #ccc',
               padding: '10px',
               borderRadius: '4px',
-              backgroundColor: '#fff'
+              backgroundColor: 'var(--surface-color)'
             }}
           />
           {selectedImageUrl && (

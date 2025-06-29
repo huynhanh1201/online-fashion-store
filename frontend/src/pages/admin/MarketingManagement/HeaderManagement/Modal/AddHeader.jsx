@@ -21,7 +21,7 @@ import {
   useTheme,
   alpha
 } from '@mui/material'
-import { 
+import {
   Delete as DeleteIcon,
   CloudUpload as CloudUploadIcon
 } from '@mui/icons-material'
@@ -67,7 +67,7 @@ const AddHeader = ({ open, onClose, onSuccess }) => {
   const [validationErrors, setValidationErrors] = useState([])
   const [uploadingLogo, setUploadingLogo] = useState(false)
   const [logoPreview, setLogoPreview] = useState('')
-  
+
   const logoInputRef = useRef(null)
 
   useEffect(() => {
@@ -169,7 +169,7 @@ const AddHeader = ({ open, onClose, onSuccess }) => {
 
       // Upload to Cloudinary
       const imageUrl = await uploadToCloudinary(file)
-      
+
       // Update form
       setForm((prev) => ({
         ...prev,
@@ -234,17 +234,16 @@ const AddHeader = ({ open, onClose, onSuccess }) => {
   }
 
   return (
-    <Dialog 
-      open={open} 
-      onClose={onClose} 
-      fullWidth 
+    <Dialog
+      open={open}
+      onClose={onClose}
+      fullWidth
       maxWidth='md'
       sx={{
         '& .MuiDialog-paper': {
           borderRadius: 3,
           boxShadow: '0 4px 24px rgba(0, 0, 0, 0.06)',
-          border: '1px solid #e2e8f0',
-          maxHeight: '90vh'
+          border: '1px solid #e2e8f0'
         }
       }}
     >
@@ -260,30 +259,30 @@ const AddHeader = ({ open, onClose, onSuccess }) => {
       >
         Cấu hình Header Website
       </DialogTitle>
-      
-      <DialogContent 
-        dividers 
-        sx={{ 
-          backgroundColor: '#f8fafc', 
+
+      <DialogContent
+        dividers
+        sx={{
+          backgroundColor: '#f8fafc',
           py: 2,
           maxHeight: 'calc(90vh - 140px)',
           overflowY: 'auto'
         }}
       >
         {fetching && (
-          <Stack alignItems="center" py={4}>
+          <Stack alignItems='center' py={4}>
             <CircularProgress size={40} sx={{ color: '#3b82f6' }} />
-            <Typography variant="body2" sx={{ mt: 2, color: '#1e293b' }}>
+            <Typography variant='body2' sx={{ mt: 2, color: '#1e293b' }}>
               Đang tải cấu hình...
             </Typography>
           </Stack>
         )}
 
         {error && (
-          <Alert 
-            severity="error" 
-            sx={{ 
-              mb: 3, 
+          <Alert
+            severity='error'
+            sx={{
+              mb: 3,
               borderRadius: 2,
               backgroundColor: alpha(theme.palette.error.main, 0.08),
               border: `1px solid ${alpha(theme.palette.error.main, 0.3)}`
@@ -294,10 +293,10 @@ const AddHeader = ({ open, onClose, onSuccess }) => {
         )}
 
         {success && (
-          <Alert 
-            severity="success" 
-            sx={{ 
-              mb: 3, 
+          <Alert
+            severity='success'
+            sx={{
+              mb: 3,
               borderRadius: 2,
               backgroundColor: alpha(theme.palette.success.main, 0.08),
               border: `1px solid ${alpha(theme.palette.success.main, 0.3)}`
@@ -308,16 +307,16 @@ const AddHeader = ({ open, onClose, onSuccess }) => {
         )}
 
         {validationErrors.length > 0 && (
-          <Alert 
-            severity="warning" 
-            sx={{ 
-              mb: 3, 
+          <Alert
+            severity='warning'
+            sx={{
+              mb: 3,
               borderRadius: 2,
               backgroundColor: alpha(theme.palette.warning.main, 0.08),
               border: `1px solid ${alpha(theme.palette.warning.main, 0.3)}`
             }}
           >
-            <Typography variant="body2" component="div">
+            <Typography variant='body2' component='div'>
               {validationErrors.map((err, index) => (
                 <div key={index}>• {err}</div>
               ))}
@@ -329,11 +328,11 @@ const AddHeader = ({ open, onClose, onSuccess }) => {
           <Stack spacing={2}>
             {/* Logo Section */}
             <Box>
-              <Typography 
-                variant="h6" 
-                sx={{ 
-                  mb: 1.5, 
-                  fontWeight: 600, 
+              <Typography
+                variant='h6'
+                sx={{
+                  mb: 1.5,
+                  fontWeight: 600,
                   color: '#1e293b',
                   display: 'flex',
                   alignItems: 'center',
@@ -344,15 +343,17 @@ const AddHeader = ({ open, onClose, onSuccess }) => {
                 <CloudUploadIcon sx={{ color: '#3b82f6', fontSize: 20 }} />
                 Logo
               </Typography>
-              
+
               <Stack spacing={1.5}>
                 {/* Logo Upload Area */}
                 <Box>
                   {logoPreview ? (
-                    <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1 }}>
-                      <Card 
-                        sx={{ 
-                          position: 'relative', 
+                    <Box
+                      sx={{ display: 'flex', alignItems: 'flex-start', gap: 1 }}
+                    >
+                      <Card
+                        sx={{
+                          position: 'relative',
                           maxWidth: 200,
                           borderRadius: 2,
                           border: '1px solid #e2e8f0',
@@ -364,28 +365,31 @@ const AddHeader = ({ open, onClose, onSuccess }) => {
                         }}
                       >
                         <CardMedia
-                          component="img"
-                          height="80"
-                          image={optimizeCloudinaryUrl(logoPreview, { width: 200, height: 80 })}
-                          alt="Logo preview"
+                          component='img'
+                          height='80'
+                          image={optimizeCloudinaryUrl(logoPreview, {
+                            width: 200,
+                            height: 80
+                          })}
+                          alt='Logo preview'
                           sx={{ objectFit: 'contain' }}
                         />
                       </Card>
-                      <Tooltip title="Xóa logo">
+                      <Tooltip title='Xóa logo'>
                         <IconButton
-                          size="small"
+                          size='small'
                           onClick={handleRemoveLogo}
                           sx={{
                             color: '#ef4444',
                             backgroundColor: '#fee2e2',
                             mt: 0.5,
-                            '&:hover': { 
+                            '&:hover': {
                               backgroundColor: '#fecaca',
                               color: '#dc2626'
                             }
                           }}
                         >
-                          <DeleteIcon fontSize="small" />
+                          <DeleteIcon fontSize='small' />
                         </IconButton>
                       </Tooltip>
                     </Box>
@@ -401,33 +405,46 @@ const AddHeader = ({ open, onClose, onSuccess }) => {
                         transition: 'all 0.3s ease',
                         '&:hover': {
                           borderColor: theme.palette.primary.main,
-                          backgroundColor: alpha(theme.palette.primary.main, 0.04)
+                          backgroundColor: alpha(
+                            theme.palette.primary.main,
+                            0.04
+                          )
                         }
                       }}
                       onClick={() => logoInputRef.current?.click()}
                     >
-                      <CloudUploadIcon sx={{ fontSize: 36, color: '#3b82f6', mb: 1 }} />
-                      <Typography variant="body2" sx={{ color: '#1e293b', fontWeight: 600 }}>
+                      <CloudUploadIcon
+                        sx={{ fontSize: 36, color: '#3b82f6', mb: 1 }}
+                      />
+                      <Typography
+                        variant='body2'
+                        sx={{ color: '#1e293b', fontWeight: 600 }}
+                      >
                         Click để upload logo
                       </Typography>
-                      <Typography variant="caption" color="text.secondary">
+                      <Typography variant='caption' color='text.secondary'>
                         JPG, PNG, WebP (tối đa 5MB)
                       </Typography>
                     </Box>
                   )}
-                  
+
                   <input
                     ref={logoInputRef}
-                    type="file"
-                    accept="image/jpeg,image/png,image/webp"
+                    type='file'
+                    accept='image/jpeg,image/png,image/webp'
                     hidden
                     onChange={handleLogoUpload}
                   />
-                  
+
                   {uploadingLogo && (
-                    <Stack direction="row" alignItems="center" spacing={1} sx={{ mt: 2 }}>
+                    <Stack
+                      direction='row'
+                      alignItems='center'
+                      spacing={1}
+                      sx={{ mt: 2 }}
+                    >
                       <CircularProgress size={20} sx={{ color: '#3b82f6' }} />
-                      <Typography variant="body2" sx={{ color: '#1e293b' }}>
+                      <Typography variant='body2' sx={{ color: '#1e293b' }}>
                         Đang upload...
                       </Typography>
                     </Stack>
@@ -436,14 +453,24 @@ const AddHeader = ({ open, onClose, onSuccess }) => {
 
                 {/* Logo Alt Text */}
                 <TextField
-                  label={form.logo.imageUrl ? 'Logo alt text *' : 'Logo alt text (tùy chọn)'}
+                  label={
+                    form.logo.imageUrl
+                      ? 'Logo alt text *'
+                      : 'Logo alt text (tùy chọn)'
+                  }
                   value={form.logo.alt}
                   fullWidth
                   required={!!form.logo.imageUrl}
-                  error={validationErrors.some(err => err.includes('Logo alt'))}
+                  error={validationErrors.some((err) =>
+                    err.includes('Logo alt')
+                  )}
                   onChange={(e) => handleLogoAltChange(e.target.value)}
                   disabled={!form.logo.imageUrl}
-                  helperText={!form.logo.imageUrl ? 'Vui lòng upload logo trước khi nhập alt text' : ''}
+                  helperText={
+                    !form.logo.imageUrl
+                      ? 'Vui lòng upload logo trước khi nhập alt text'
+                      : ''
+                  }
                   sx={{
                     '& .MuiOutlinedInput-root': {
                       borderRadius: 2,
@@ -453,14 +480,14 @@ const AddHeader = ({ open, onClose, onSuccess }) => {
                 />
               </Stack>
             </Box>
-            
+
             {/* Top Banners Section */}
             <Box>
-              <Typography 
-                variant="h6" 
-                sx={{ 
-                  mb: 1.5, 
-                  fontWeight: 600, 
+              <Typography
+                variant='h6'
+                sx={{
+                  mb: 1.5,
+                  fontWeight: 600,
                   color: '#1e293b',
                   display: 'flex',
                   alignItems: 'center',
@@ -471,7 +498,7 @@ const AddHeader = ({ open, onClose, onSuccess }) => {
                 <CloudUploadIcon sx={{ color: '#3b82f6', fontSize: 20 }} />
                 Top Banners
               </Typography>
-              
+
               <Box
                 sx={{
                   maxHeight: 200,
@@ -519,7 +546,11 @@ const AddHeader = ({ open, onClose, onSuccess }) => {
                             <Checkbox
                               checked={banner.visible}
                               onChange={(e) =>
-                                handleBannerChange(index, 'visible', e.target.checked)
+                                handleBannerChange(
+                                  index,
+                                  'visible',
+                                  e.target.checked
+                                )
                               }
                               sx={{
                                 color: '#3b82f6',
@@ -530,7 +561,10 @@ const AddHeader = ({ open, onClose, onSuccess }) => {
                             />
                           }
                           label={
-                            <Typography variant="body2" sx={{ color: '#1e293b', fontWeight: 500 }}>
+                            <Typography
+                              variant='body2'
+                              sx={{ color: '#1e293b', fontWeight: 500 }}
+                            >
                               Hiển thị Banner {index + 1}
                             </Typography>
                           }
@@ -539,7 +573,9 @@ const AddHeader = ({ open, onClose, onSuccess }) => {
                           label={`Nội dung Banner ${index + 1}`}
                           value={banner.text}
                           fullWidth
-                          error={validationErrors.some(err => err.includes(`Banner ${index + 1}`))}
+                          error={validationErrors.some((err) =>
+                            err.includes(`Banner ${index + 1}`)
+                          )}
                           onChange={(e) =>
                             handleBannerChange(index, 'text', e.target.value)
                           }
@@ -550,7 +586,7 @@ const AddHeader = ({ open, onClose, onSuccess }) => {
                             }
                           }}
                         />
-                        <Tooltip title="Xóa banner">
+                        <Tooltip title='Xóa banner'>
                           <IconButton
                             onClick={() => handleDeleteBanner(index)}
                             sx={{
@@ -566,9 +602,9 @@ const AddHeader = ({ open, onClose, onSuccess }) => {
                   ))}
                 </FormGroup>
               </Box>
-              <Button 
-                onClick={handleAddBanner} 
-                variant="outlined"
+              <Button
+                onClick={handleAddBanner}
+                variant='outlined'
                 startIcon={<CloudUploadIcon />}
                 sx={{
                   mt: 1,
@@ -591,8 +627,14 @@ const AddHeader = ({ open, onClose, onSuccess }) => {
           </Stack>
         )}
       </DialogContent>
-      
-      <DialogActions sx={{ p: 2, backgroundColor: '#f8fafc', borderTop: '1px solid #e2e8f0' }}>
+
+      <DialogActions
+        sx={{
+          p: 2,
+          backgroundColor: '#f8fafc',
+          borderTop: '1px solid #e2e8f0'
+        }}
+      >
         <Button
           onClick={onClose}
           disabled={loading}
@@ -610,7 +652,7 @@ const AddHeader = ({ open, onClose, onSuccess }) => {
         >
           Hủy
         </Button>
-        <Button 
+        <Button
           variant='contained'
           onClick={handleSave}
           disabled={loading || fetching || uploadingLogo}
@@ -622,10 +664,10 @@ const AddHeader = ({ open, onClose, onSuccess }) => {
             fontSize: '1rem',
             px: 3,
             py: 1,
-            background: 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)',
+            background: 'var(--primary-color)',
             boxShadow: '0 4px 16px rgba(59, 130, 246, 0.3)',
             '&:hover': {
-              background: 'linear-gradient(135deg, #2563eb 0%, #1e40af 100%)',
+              background: 'var(--accent-color)',
               boxShadow: '0 6px 20px rgba(59, 130, 246, 0.4)',
               transform: 'translateY(-1px)'
             },

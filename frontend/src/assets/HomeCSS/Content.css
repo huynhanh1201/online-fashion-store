@@ -118,6 +118,7 @@
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
     gap: 10px;
+    min-width: 250px;
     margin-bottom: 32px;
 }
 

@@ -198,9 +198,9 @@ const ProductImages = ({
           opacity: isUploading ? 0.6 : 1,
           pointerEvents: isUploading ? 'none' : 'auto', // Ngăn sự kiện click hoàn toàn
           '&:hover': {
-            borderColor: isUploading ? '#aaa' : '#1976d2',
-            color: isUploading ? '#888' : '#1976d2',
-            backgroundColor: isUploading ? 'transparent' : '#f5faff'
+            borderColor: isUploading ? '#aaa' : 'var(--primary-color)',
+            color: isUploading ? '#888' : 'var(--primary-color)',
+            backgroundColor: isUploading ? 'transparent' : 'var(--primary-color)10'
           }
         }}
       >

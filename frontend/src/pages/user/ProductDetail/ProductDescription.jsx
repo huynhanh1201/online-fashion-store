@@ -20,6 +20,7 @@ const ProductDescription = ({ description, productId }) => {
       <DialogContent dividers>
         {tabIndex === 0 && (
           <Box
+            className="content-selectable"
             sx={{
               width: '100%',
               '& img': {

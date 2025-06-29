@@ -80,7 +80,7 @@ const EditSizeModal = ({ open, onClose, size, onSave }) => {
           disabled={isSubmitting}
           startIcon={isSubmitting ? <CircularProgress size={20} /> : null}
           sx={{
-            backgroundColor: '#001f5d',
+            backgroundColor: 'var(--primary-color)',
             color: '#fff',
             textTransform: 'none'
           }}

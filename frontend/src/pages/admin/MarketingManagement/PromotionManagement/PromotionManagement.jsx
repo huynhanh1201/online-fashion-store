@@ -253,7 +253,7 @@ const PromotionManagement = () => {
             gap: 2
           }}
         >
-          <OfferIcon sx={{ fontSize: 40, color: '#1A3C7B' }} />
+          <OfferIcon sx={{ fontSize: 40, color: 'var(--primary-color)' }} />
           Quản lý Khuyến mãi & Mã giảm giá
         </Typography>
         <Typography variant='body1' color='text.secondary'>
@@ -343,10 +343,11 @@ const PromotionManagement = () => {
             textTransform: 'none',
             fontSize: '1rem',
             fontWeight: 600,
-            background: 'linear-gradient(135deg,rgb(17, 58, 122) 0%,rgb(11, 49, 156) 100%)',
+            backgroundColor: 'var(--primary-color)',
+            color: '#fff',
             boxShadow: '0 4px 16px rgba(59, 130, 246, 0.3)',
             '&:hover': {
-              background: 'linear-gradient(135deg, #2563eb 0%, #1e40af 100%)',
+              backgroundColor: 'var(--accent-color)',
               boxShadow: '0 6px 20px rgba(59, 130, 246, 0.4)',
               transform: 'translateY(-1px)'
             }
@@ -363,7 +364,9 @@ const PromotionManagement = () => {
           sx={{
             borderRadius: 2,
             textTransform: 'none',
-            fontWeight: 600
+            fontWeight: 600,
+            color: 'var(--primary-color)',
+            borderColor: 'var(--primary-color)'
           }}
         >
           {refreshing ? 'Đang tải...' : 'Làm mới'}

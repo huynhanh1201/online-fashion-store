@@ -17,6 +17,19 @@ export const getCategories = async (filter) => {
     return { categories: [], total: 0 }
   }
 }
+
+export const getCategoriesWithProducts = async () => {
+  try {
+    const response = await AuthorizedAxiosInstance.get(
+      `${API_ROOT}/v1/categories/with-products`
+    )
+    return response.data
+  } catch (error) {
+    console.error('Lỗi khi lấy danh sách danh mục có sản phẩm:', error)
+    return []
+  }
+}
+
 export const getCategoryById = async (categoryId) => {
   try {
     const response = await AuthorizedAxiosInstance.get(

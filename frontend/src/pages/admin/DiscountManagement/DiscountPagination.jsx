@@ -14,7 +14,7 @@ const DiscountPagination = ({ page, totalPages, onPageChange }) => {
         onChange={onPageChange}
         sx={{
           '& .Mui-selected': {
-            backgroundColor: '#001f5d !important',
+            backgroundColor: 'var(--primary-color) !important',
             color: '#fff',
             fontWeight: 'bold'
           }

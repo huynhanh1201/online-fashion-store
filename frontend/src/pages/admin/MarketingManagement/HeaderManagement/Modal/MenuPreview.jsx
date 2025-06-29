@@ -23,8 +23,6 @@ const MenuPreview = ({ menuData }) => {
           boxShadow: '0px 4px 10px rgba(0,0,0,0.10)',
           overflowX: 'auto',
           display: 'grid',
-          justifyContent: 'center',
-          alignItems: 'center',
           gridTemplateColumns: `repeat(${mainMenus.length || 1}, 1fr)`,
           gap: 6,
           width: '100%',
@@ -40,8 +38,6 @@ const MenuPreview = ({ menuData }) => {
               flexDirection: 'column', 
               gap: 1, 
               justifyContent: 'center',
-              alignItems: 'center',
-              textAlign: 'center'
             }}>
               {/* Tiêu đề cột */}
               <Typography

@@ -78,7 +78,7 @@ const FooterManagement = () => {
       {/* Header */}
       <Box sx={{ mb: 4 }}>
         <Typography variant='h4' sx={{ fontWeight: 700, color: '#1e293b', mb: 1, display: 'flex', alignItems: 'center', gap: 2 }}>
-          <ImageIcon sx={{ fontSize: 40, color: '#1A3C7B' }} />
+          <ImageIcon sx={{ fontSize: 40, color: 'var(--primary-color)' }} />
           Quản lý nội dung chân trang
         </Typography>
         <Typography variant='body1' color='text.secondary'>

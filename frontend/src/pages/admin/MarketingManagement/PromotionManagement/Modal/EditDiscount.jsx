@@ -305,7 +305,7 @@ const EditDiscountModal = ({ open, onClose, discount, onSave }) => {
             type='submit'
             variant='contained'
             sx={{
-              backgroundColor: '#001f5d',
+              backgroundColor: 'var(--primary-color)',
               color: '#fff',
               textTransform: 'none'
             }}
