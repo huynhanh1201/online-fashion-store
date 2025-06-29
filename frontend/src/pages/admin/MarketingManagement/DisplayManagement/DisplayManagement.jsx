@@ -48,6 +48,7 @@ import {
   updateBanner
 } from '~/services/admin/webConfig/bannerService.js'
 import { optimizeCloudinaryUrl } from '~/utils/cloudinary.js'
+import usePermissions from '~/hooks/usePermissions'
 
 const DisplayManagement = () => {
   const theme = useTheme()
@@ -59,6 +60,8 @@ const DisplayManagement = () => {
   const [openModal, setOpenModal] = useState(false)
   const [bannerToEdit, setBannerToEdit] = useState(null)
   const [bannerIndexToEdit, setBannerIndexToEdit] = useState(null)
+
+  const { hasPermission } = usePermissions()
 
   // Fetch banners data
   const fetchBanners = async () => {
@@ -325,33 +328,34 @@ const DisplayManagement = () => {
           alignItems: 'center'
         }}
       >
-        <Button
-          variant='contained'
-          startIcon={<AddIcon />}
-          onClick={() => {
-            setBannerToEdit(null)
-            setBannerIndexToEdit(null)
-            setOpenModal(true)
-          }}
-          sx={{
-            px: 3,
-            py: 1.5,
-            borderRadius: 2,
-            textTransform: 'none',
-            fontSize: '1rem',
-            fontWeight: 600,
-            background: 'var(--primary-color)',
-            boxShadow: '0 4px 16px rgba(59, 130, 246, 0.3)',
-            '&:hover': {
-              background: 'var(--accent-color)',
-              boxShadow: '0 6px 20px rgba(59, 130, 246, 0.4)',
-              transform: 'translateY(-1px)'
-            }
-          }}
-        >
-          Thêm ảnh quảng cáo mới
-        </Button>
-
+        {hasPermission('banner:create') && (
+          <Button
+            variant='contained'
+            startIcon={<AddIcon />}
+            onClick={() => {
+              setBannerToEdit(null)
+              setBannerIndexToEdit(null)
+              setOpenModal(true)
+            }}
+            sx={{
+              px: 3,
+              py: 1.5,
+              borderRadius: 2,
+              textTransform: 'none',
+              fontSize: '1rem',
+              fontWeight: 600,
+              background: 'var(--primary-color)',
+              boxShadow: '0 4px 16px rgba(59, 130, 246, 0.3)',
+              '&:hover': {
+                background: 'var(--accent-color)',
+                boxShadow: '0 6px 20px rgba(59, 130, 246, 0.4)',
+                transform: 'translateY(-1px)'
+              }
+            }}
+          >
+            Thêm ảnh quảng cáo mới
+          </Button>
+        )}
         <Button
           variant='outlined'
           startIcon={<RefreshIcon />}
@@ -413,9 +417,9 @@ const DisplayManagement = () => {
                             src={
                               banner.imageUrl
                                 ? optimizeCloudinaryUrl(banner.imageUrl, {
-                                    width: 60,
-                                    height: 40
-                                  })
+                                  width: 60,
+                                  height: 40
+                                })
                                 : undefined
                             }
                             sx={{
@@ -528,30 +532,34 @@ const DisplayManagement = () => {
 
                       <TableCell>
                         <Stack direction='row' spacing={1}>
-                          <Tooltip title='Chỉnh sửa'>
-                            <IconButton
-                              size='small'
-                              onClick={() => handleEditBanner(banner, index)}
-                              sx={{
-                                color: '#3b82f6',
-                                '&:hover': { backgroundColor: '#dbeafe' }
-                              }}
-                            >
-                              <EditIcon fontSize='small' />
-                            </IconButton>
-                          </Tooltip>
-                          <Tooltip title='Xóa'>
-                            <IconButton
-                              size='small'
-                              onClick={() => handleDeleteBanner(index)}
-                              sx={{
-                                color: '#ef4444',
-                                '&:hover': { backgroundColor: '#fee2e2' }
-                              }}
-                            >
-                              <DeleteIcon fontSize='small' />
-                            </IconButton>
-                          </Tooltip>
+                          {hasPermission('banner:update') && (
+                            <Tooltip title='Chỉnh sửa'>
+                              <IconButton
+                                size='small'
+                                onClick={() => handleEditBanner(banner, index)}
+                                sx={{
+                                  color: '#3b82f6',
+                                  '&:hover': { backgroundColor: '#dbeafe' }
+                                }}
+                              >
+                                <EditIcon fontSize='small' />
+                              </IconButton>
+                            </Tooltip>
+                          )}
+                          {hasPermission('blog:delete') && (
+                            <Tooltip title='Xóa'>
+                              <IconButton
+                                size='small'
+                                onClick={() => handleDeleteBanner(index)}
+                                sx={{
+                                  color: '#ef4444',
+                                  '&:hover': { backgroundColor: '#fee2e2' }
+                                }}
+                              >
+                                <DeleteIcon fontSize='small' />
+                              </IconButton>
+                            </Tooltip>
+                          )}
                         </Stack>
                       </TableCell>
                     </TableRow>
@@ -584,14 +592,16 @@ const DisplayManagement = () => {
                     <Typography variant='body1' color='text.secondary'>
                       Chưa có banner nào
                     </Typography>
-                    <Button
-                      variant='outlined'
-                      startIcon={<AddIcon />}
-                      onClick={() => setOpenModal(true)}
-                      sx={{ mt: 2 }}
-                    >
-                      Thêm banner đầu tiên
-                    </Button>
+                    {hasPermission('banner:create') && (
+                      <Button
+                        variant='outlined'
+                        startIcon={<AddIcon />}
+                        onClick={() => setOpenModal(true)}
+                        sx={{ mt: 2 }}
+                      >
+                        Thêm banner đầu tiên
+                      </Button>
+                    )}
                   </TableCell>
                 </TableRow>
               )}

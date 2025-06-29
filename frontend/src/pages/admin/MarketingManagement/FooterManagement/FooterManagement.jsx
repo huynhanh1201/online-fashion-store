@@ -28,6 +28,7 @@ import { getFooterConfig } from '~/services/admin/webConfig/footerService.js'
 import AddFooterModal from './Modal/AddFooterModal.jsx'
 import DeleteFooterModal from './Modal/DeleteFooterModal.jsx'
 import EditFooterModal from './Modal/EditFooterModal.jsx'
+import usePermissions from '~/hooks/usePermissions'
 
 const FooterManagement = () => {
   const [footerData, setFooterData] = useState(null)
@@ -36,6 +37,7 @@ const FooterManagement = () => {
   const [openAddModal, setOpenAddModal] = useState(false)
   const [openDeleteModal, setOpenDeleteModal] = useState(false)
   const [openEditModal, setOpenEditModal] = useState(false)
+  const { hasPermission } = usePermissions()
 
   const fetchData = useCallback(async () => {
     setLoading(true)
@@ -134,26 +136,30 @@ const FooterManagement = () => {
                     </TableCell>
                     <TableCell>
                       {existingFooter.socialLinks?.map((s, i) => (
-                         <Box key={i} sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>
-                           <Avatar src={s.image} sx={{ width: 24, height: 24 }} />
-                           <Typography variant="body2">{s.name}</Typography>
-                         </Box>
+                        <Box key={i} sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>
+                          <Avatar src={s.image} sx={{ width: 24, height: 24 }} />
+                          <Typography variant="body2">{s.name}</Typography>
+                        </Box>
                       ))}
                     </TableCell>
                     <TableCell>
                       <Chip label={existingFooter.status} color={existingFooter.status === 'Đang sử dụng' ? 'success' : 'default'} size="small" />
                     </TableCell>
                     <TableCell align="right">
-                      <Tooltip title="Chỉnh sửa">
-                        <IconButton onClick={handleOpenEditModal}>
-                          <EditIcon />
-                        </IconButton>
-                      </Tooltip>
-                      <Tooltip title="Xóa">
-                        <IconButton onClick={handleOpenDeleteModal} color="error">
-                          <DeleteIcon />
-                        </IconButton>
-                      </Tooltip>
+                      {hasPermission('footerContent:update') && (
+                        <Tooltip title="Chỉnh sửa">
+                          <IconButton onClick={handleOpenEditModal}>
+                            <EditIcon />
+                          </IconButton>
+                        </Tooltip>
+                      )}
+                      {hasPermission('footerContent:delete') && (
+                        <Tooltip title="Xóa">
+                          <IconButton onClick={handleOpenDeleteModal} color="error">
+                            <DeleteIcon />
+                          </IconButton>
+                        </Tooltip>
+                      )}
                     </TableCell>
                   </TableRow>
                 </TableBody>
@@ -166,9 +172,11 @@ const FooterManagement = () => {
               <Typography color="text.secondary" sx={{ mb: 3 }}>
                 Hãy tạo một cấu hình để hiển thị nội dung ở chân trang web của bạn.
               </Typography>
-              <Button variant="contained" startIcon={<AddIcon />} onClick={handleOpenAddModal}>
-                Tạo cấu hình chân trang
-              </Button>
+              {hasPermission('footerContent:create') && (
+                <Button variant="contained" startIcon={<AddIcon />} onClick={handleOpenAddModal}>
+                  Tạo cấu hình chân trang
+                </Button>
+              )}
             </Paper>
           )}
         </>
@@ -180,7 +188,7 @@ const FooterManagement = () => {
         onSuccess={handleSuccess}
         footerConfig={footerData}
       />
-      
+
       {existingFooter && (
         <>
           <DeleteFooterModal

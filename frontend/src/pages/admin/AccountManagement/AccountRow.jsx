@@ -11,6 +11,7 @@ import {
 import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye'
 import BorderColorIcon from '@mui/icons-material/BorderColor'
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever'
+import usePermissions from '~/hooks/usePermissions'
 
 const formatDateTime = (isoString) => {
   if (!isoString) return 'Không xác định'
@@ -52,6 +53,8 @@ export default function AccountRow({
   permissions = {},
   roles
 }) {
+  const { hasPermission } = usePermissions()
+
   return (
     <TableRow hover role='checkbox' tabIndex={-1}>
       {columns.map((column) => {
@@ -150,7 +153,8 @@ export default function AccountRow({
               sx={styles.cellPadding}
             >
               <Stack direction='row' sx={styles.groupIcon}>
-                {permissions.canView && (
+                {hasPermission('account:read') && (
+
                   <Tooltip title='Xem'>
                     <IconButton
                       onClick={() => handleOpenModal('view', user)}
@@ -160,7 +164,8 @@ export default function AccountRow({
                     </IconButton>
                   </Tooltip>
                 )}
-                {permissions.canEdit && (
+                {hasPermission('account:update') && (
+
                   <Tooltip title='Sửa'>
                     <IconButton
                       onClick={() => handleOpenModal('edit', user)}
@@ -170,7 +175,8 @@ export default function AccountRow({
                     </IconButton>
                   </Tooltip>
                 )}
-                {permissions.canDelete && (
+                {hasPermission('account:delete') && (
+
                   <Tooltip title='Xoá'>
                     <IconButton
                       onClick={() => handleOpenModal('delete', user)}

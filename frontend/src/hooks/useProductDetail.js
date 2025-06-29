@@ -214,19 +214,19 @@ const useProductDetail = (productId) => {
       const originalPrice = selectedVariant.exportPrice || 0
       const discountAmount = selectedVariant.discountPrice || 0
       const displayPrice = Math.max(0, originalPrice - discountAmount)
-      
+
       return {
         price: originalPrice,
         discountPrice: displayPrice,
         originalDiscountPrice: discountAmount
       }
     }
-    
+
     // When no variant is selected, use product's default price minus first variant's discount price
     const originalPrice = product?.exportPrice || 0
     const firstVariantDiscount = variants?.length > 0 ? (variants[0]?.discountPrice || 0) : 0
     const displayPrice = Math.max(0, originalPrice - firstVariantDiscount)
-    
+
     return {
       price: originalPrice,
       discountPrice: displayPrice,
@@ -350,7 +350,16 @@ const useProductDetail = (productId) => {
       setSnackbar({
         open: true,
         severity: 'warning',
-        message: 'Vui lòng chọn màu sắc và kích thước!'
+        message: 'Sản phẩm này hiện đang hết hàng!'
+      })
+      return
+    }
+
+    if (quantity > maxQuantity) {
+      setSnackbar({
+        open: true,
+        severity: 'warning',
+        message: `Số lượng mua không thể vượt quá ${maxQuantity} sản phẩm!`
       })
       return
     }

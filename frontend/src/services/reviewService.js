@@ -10,12 +10,16 @@ export const createReview = async (data, config = {}) => {
   }
 }
 
-export const getReviews = async (productId) => {
+export const getReviews = async (productId, page = 1, limit = 5) => {
   try {
     const response = await AuthorizedAxiosInstance.get(
-      `${API_ROOT}/v1/reviews?productId=${productId}`
+      `${API_ROOT}/v1/reviews?sort=newest&page=${page}&limit=${limit}&productId=${productId}`
     )
-    return response.data.data
+    // Trả về cả data và meta để xử lý pagination
+    return {
+      data: response.data.data,
+      meta: response.data.meta
+    }
   } catch (error) {
     throw error.response?.data || error.message || 'Không lấy được đánh giá'
   }

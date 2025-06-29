@@ -33,19 +33,22 @@ const BlogHome = () => {
 
   // Format dữ liệu từ API để phù hợp với UI
   const formatBlogData = (blogData) => {
+    const title = blogData.title || ''
+    const subtitle = blogData.excerpt || blogData.subtitle || ''
+    const content = blogData.content
+      ? blogData.content.replace(/<[^>]*>/g, '')
+      : blogData.excerpt || ''
+
     return {
       id: blogData._id || blogData.id,
-      title: blogData.title || '',
-      subtitle: blogData.excerpt || blogData.subtitle || '',
+      title: title.length > 60 ? title.substring(0, 60) + '...' : title,
+      subtitle: subtitle.length > 80 ? subtitle.substring(0, 80) + '...' : subtitle,
       category: blogData.category || 'Tip',
       image: blogData.coverImage || blogData.thumbnail || blogData.image || '',
       date: blogData.publishedAt
         ? new Date(blogData.publishedAt).toLocaleDateString('vi-VN')
         : new Date(blogData.createdAt).toLocaleDateString('vi-VN'),
-      description: blogData.content
-        ? // Remove HTML tags and limit to 150 characters
-          blogData.content.replace(/<[^>]*>/g, '').substring(0, 150) + '...'
-        : blogData.excerpt || ''
+      description: content.length > 120 ? content.substring(0, 120) + '...' : content
     }
   }
 
@@ -67,10 +70,10 @@ const BlogHome = () => {
           sx={{
             maxWidth: {
               xs: '100%',
-              sm: 'sm',
-              md: 'md',
-              lg: 'lg',
-              xl: 'xl'
+              sm: '640px',
+              md: '768px',
+              lg: '1200px',
+              xl: '1400px'
             },
             mx: 'auto'
           }}
@@ -226,8 +229,8 @@ const BlogHome = () => {
                         <Box
                           sx={{
                             position: 'absolute',
-                            top: 2,
-                            left: 2,
+                            top: 12,
+                            left: 12,
                             bgcolor: 'rgba(0, 0, 0, 0.8)',
                             color: 'common.white',
                             px: 1.5,
@@ -237,7 +240,7 @@ const BlogHome = () => {
                             fontWeight: 700,
                             textTransform: 'uppercase',
                             letterSpacing: '0.05em',
-                            backdropFilter: 'blur(4px)'
+                            backdropFilter: 'blur(4px)',
                           }}
                         >
                           {article.category}

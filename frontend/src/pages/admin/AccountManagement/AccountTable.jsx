@@ -18,6 +18,7 @@ import TablePaginationActions from '~/components/PaginationAdmin/TablePagination
 import TableNoneData from '~/components/TableAdmin/NoneData.jsx'
 import AddIcon from '@mui/icons-material/Add'
 import FilterAccount from '~/components/FilterAdmin/filterAccount.jsx' // nếu chưa có thì có thể tạo tương tự FilterColor
+import usePermissions from '~/hooks/usePermissions'
 
 const AccountTable = ({
   users,
@@ -54,6 +55,7 @@ const AccountTable = ({
       pl: '11px'
     }
   ]
+  const { hasPermission } = usePermissions()
 
   return (
     <Paper sx={{ border: '1px solid #ccc', width: '100%', overflow: 'hidden' }}>
@@ -81,21 +83,24 @@ const AccountTable = ({
                     <Typography variant='h6' fontWeight={800}>
                       Danh sách tài khoản hệ thống
                     </Typography>
-                    <Button
-                      startIcon={<AddIcon />}
-                      variant='contained'
-                      onClick={() => handleOpenModal('add')}
-                      sx={{
-                        textTransform: 'none',
-                        width: 100,
-                        display: 'flex',
-                        alignItems: 'center',
-                        backgroundColor: '#001f5d',
-                        color: '#fff'
-                      }}
-                    >
-                      Thêm
-                    </Button>
+                    {hasPermission('account:create') && (
+
+                      <Button
+                        startIcon={<AddIcon />}
+                        variant='contained'
+                        onClick={() => handleOpenModal('add')}
+                        sx={{
+                          textTransform: 'none',
+                          width: 100,
+                          display: 'flex',
+                          alignItems: 'center',
+                          backgroundColor: '#001f5d',
+                          color: '#fff'
+                        }}
+                      >
+                        Thêm
+                      </Button>
+                    )}
                   </Box>
                   <FilterAccount
                     onFilter={onFilters}

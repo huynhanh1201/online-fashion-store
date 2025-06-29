@@ -12,15 +12,25 @@ import {
   CircularProgress,
   Chip,
   Stack,
-  Divider
+  Divider,
+  Grid,
+  Card,
+  CardMedia,
+  Backdrop
 } from '@mui/material'
-import { Close as CloseIcon } from '@mui/icons-material'
+import {
+  Close as CloseIcon,
+  PlayArrow as PlayArrowIcon,
+  Videocam as VideocamIcon
+} from '@mui/icons-material'
 import { getUserReviewForProduct } from '~/services/reviewService'
 import { optimizeCloudinaryUrl } from '~/utils/cloudinary'
 
 const ViewReviewModal = ({ open, onClose, userId, productId, orderId, productName }) => {
   const [loading, setLoading] = useState(false)
   const [reviewData, setReviewData] = useState(null)
+  const [selectedImage, setSelectedImage] = useState(null)
+  const [lightboxOpen, setLightboxOpen] = useState(false)
 
   useEffect(() => {
     const fetchReview = async () => {
@@ -44,7 +54,19 @@ const ViewReviewModal = ({ open, onClose, userId, productId, orderId, productNam
 
   const handleClose = () => {
     setReviewData(null)
+    setSelectedImage(null)
+    setLightboxOpen(false)
     onClose()
+  }
+
+  const handleImageClick = (imageUrl) => {
+    setSelectedImage(imageUrl)
+    setLightboxOpen(true)
+  }
+
+  const handleCloseLightbox = () => {
+    setLightboxOpen(false)
+    setSelectedImage(null)
   }
 
   const formatDate = (dateString) => {
@@ -56,6 +78,14 @@ const ViewReviewModal = ({ open, onClose, userId, productId, orderId, productNam
       minute: '2-digit'
     })
   }
+
+  // const getVideoThumbnail = (videoUrl) => {
+  //   // Tạo thumbnail từ video URL (Cloudinary)
+  //   if (videoUrl.includes('cloudinary')) {
+  //     return videoUrl.replace('/video/upload/', '/video/upload/so_auto/')
+  //   }
+  //   return videoUrl
+  // }
 
   return (
     <Dialog
@@ -144,37 +174,100 @@ const ViewReviewModal = ({ open, onClose, userId, productId, orderId, productNam
               </Box>
             )}
 
-            {/* Hình ảnh đánh giá */}
-            {reviewData.images && reviewData.images.length > 0 && (
-              <Box>
-                <Typography variant="subtitle1" fontWeight="600" mb={2}>
-                  Hình ảnh ({reviewData.images.length}):
-                </Typography>
-                <Box display="flex" gap={2} flexWrap="wrap">
-                  {reviewData.images.map((image, index) => (
-                    <Avatar
-                      key={index}
-                      src={optimizeCloudinaryUrl(image)}
-                      alt={`Đánh giá ${index + 1}`}
-                      sx={{
-                        width: 100,
-                        height: 100,
-                        borderRadius: 2,
-                        border: '2px solid',
-                        borderColor: 'grey.200',
-                        cursor: 'pointer',
-                        '&:hover': {
-                          borderColor: '#1a3c7b',
-                          transform: 'scale(1.05)'
-                        },
-                        transition: 'all 0.2s ease'
-                      }}
-                      variant="rounded"
-                    />
-                  ))}
+            {/* Media đánh giá */}
+            {((reviewData.images && reviewData.images.length > 0) ||
+              (reviewData.videos && reviewData.videos.length > 0)) && (
+                <Box>
+                  <Typography variant="subtitle1" fontWeight="600" mb={2}>
+                    Ảnh & Video của bạn ({(reviewData.images?.length || 0) + (reviewData.videos?.length || 0)}):
+                  </Typography>
+                  <Grid container spacing={2}>
+                    {/* Hiển thị ảnh */}
+                    {reviewData.images?.map((image, index) => (
+                      <Grid item xs={6} sm={4} md={3} key={`image-${index}`}>
+                        <Card
+                          sx={{
+                            position: 'relative',
+                            cursor: 'pointer',
+                            '&:hover': {
+                              transform: 'scale(1.02)',
+                              boxShadow: 3
+                            },
+                            transition: 'all 0.2s ease'
+                          }}
+                          onClick={() => handleImageClick(image)}
+                        >
+                          <CardMedia
+                            component="img"
+                            width="180"
+                            height="120"
+                            image={optimizeCloudinaryUrl(image, {
+                              width: 180,
+                              height: 120
+                            })}
+                            alt={`Đánh giá ${index + 1}`}
+                            sx={{
+                              objectFit: 'cover',
+                              width: 180,
+                              height: 120
+                            }}
+                          />
+                        </Card>
+                      </Grid>
+                    ))}
+
+                    {/* Hiển thị video */}
+                    {reviewData.videos?.map((video, index) => (
+                      <Grid item xs={6} sm={4} md={3} key={`video-${index}`}>
+                        <Card
+                          sx={{
+                            position: 'relative',
+                            cursor: 'pointer',
+                            '&:hover': {
+                              transform: 'scale(1.02)',
+                              boxShadow: 3
+                            },
+                            transition: 'all 0.2s ease'
+                          }}
+                        >
+                          <CardMedia
+                            component="video"
+                            width="180"
+                            height="120"
+                            src={video}
+                            controls
+                            sx={{
+                              objectFit: 'cover',
+                              width: 180,
+                              height: 120
+                            }}
+                          />
+                          {/* Video overlay icon */}
+                          <Box
+                            sx={{
+                              position: 'absolute',
+                              top: 8,
+                              left: 8,
+                              backgroundColor: 'rgba(0,0,0,0.6)',
+                              borderRadius: 1,
+                              px: 1,
+                              py: 0.5,
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: 0.5
+                            }}
+                          >
+                            <VideocamIcon sx={{ fontSize: 16, color: 'white' }} />
+                            <Typography variant="caption" color="white">
+                              Video
+                            </Typography>
+                          </Box>
+                        </Card>
+                      </Grid>
+                    ))}
+                  </Grid>
                 </Box>
-              </Box>
-            )}
+              )}
 
             {/* Trạng thái đánh giá */}
             <Box display="flex" gap={1}>
@@ -229,6 +322,66 @@ const ViewReviewModal = ({ open, onClose, userId, productId, orderId, productNam
           Đóng
         </Button>
       </DialogActions>
+
+      {/* Image Lightbox */}
+      <Backdrop
+        sx={{
+          color: '#fff',
+          zIndex: (theme) => theme.zIndex.drawer + 2,
+          backgroundColor: 'rgba(0, 0, 0, 0.9)'
+        }}
+        open={lightboxOpen}
+        onClick={handleCloseLightbox}
+      >
+        <Box
+          sx={{
+            position: 'relative',
+            maxWidth: '90vw',
+            maxHeight: '90vh',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center'
+          }}
+        >
+          {selectedImage && (
+            <>
+              <img
+                src={optimizeCloudinaryUrl(selectedImage, {
+                  width: 1200,
+                  height: 800,
+                  quality: 'auto'
+                })}
+                alt="Xem ảnh lớn"
+                style={{
+                  maxWidth: '100%',
+                  maxHeight: '100%',
+                  objectFit: 'contain',
+                  borderRadius: 8
+                }}
+              />
+              {/* <Button
+                onClick={handleCloseLightbox}
+                sx={{
+                  position: 'absolute',
+                  top: -10,
+                  right: -10,
+                  minWidth: 'auto',
+                  width: 40,
+                  height: 40,
+                  borderRadius: '50%',
+                  backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                  color: 'black',
+                  '&:hover': {
+                    backgroundColor: 'rgba(255, 255, 255, 1)'
+                  }
+                }}
+              >
+                <CloseIcon />
+              </Button> */}
+            </>
+          )}
+        </Box>
+      </Backdrop>
     </Dialog>
   )
 }

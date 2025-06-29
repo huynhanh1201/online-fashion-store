@@ -40,7 +40,9 @@ const Blog = () => {
     window.addEventListener('resize', handleResize)
     return () => window.removeEventListener('resize', handleResize)
   }, [])
-
+  React.useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'auto' })
+  }, [])
   // Fetch blogs khi component mount
   React.useEffect(() => {
     fetchLatestBlogs(6) // Lấy 6 bài viết mới nhất
@@ -95,19 +97,22 @@ const Blog = () => {
 
   // Format dữ liệu từ API để phù hợp với UI
   const formatBlogData = (blogData) => {
+    const title = blogData.title || ''
+    const subtitle = blogData.excerpt || blogData.subtitle || ''
+    const content = blogData.content
+      ? blogData.content.replace(/<[^>]*>/g, '')
+      : blogData.excerpt || ''
+
     return {
       id: blogData._id || blogData.id,
-      title: blogData.title || '',
-      subtitle: blogData.excerpt || blogData.subtitle || '',
+      title: title.length > 60 ? title.substring(0, 60) + '...' : title,
+      subtitle: subtitle.length > 80 ? subtitle.substring(0, 80) + '...' : subtitle,
       category: blogData.category || 'Tip',
       image: blogData.coverImage || blogData.thumbnail || blogData.image || '',
       date: blogData.publishedAt
         ? new Date(blogData.publishedAt).toLocaleDateString('vi-VN')
         : new Date(blogData.createdAt).toLocaleDateString('vi-VN'),
-      description: blogData.content
-        ? // Remove HTML tags and limit to 150 characters
-        blogData.content.replace(/<[^>]*>/g, '').substring(0, 150) + '...'
-        : blogData.excerpt || ''
+      description: content.length > 120 ? content.substring(0, 120) + '...' : content
     }
   }
 

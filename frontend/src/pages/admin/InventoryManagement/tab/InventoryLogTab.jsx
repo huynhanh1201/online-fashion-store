@@ -31,6 +31,8 @@ import useWarehouses from '~/hooks/admin/Inventory/useWarehouses.js'
 import TablePaginationActions from '~/components/PaginationAdmin/TablePaginationActions.jsx'
 import TableNoneData from '~/components/TableAdmin/NoneData.jsx'
 import Tooltip from '@mui/material/Tooltip'
+import usePermissions from '~/hooks/usePermissions'
+
 const InventoryLogTab = () => {
   const { logs, fetchLogs, loadingLog, totalLogs } = useInventoryLog()
   const { variants, fetchVariants } = useVariants()
@@ -46,6 +48,8 @@ const InventoryLogTab = () => {
   }) // State cho kho
   const [openViewModal, setOpenViewModal] = useState(false) // State cho modal xem
   const [selectedLog, setSelectedLog] = useState(null) // State cho bản ghi được chọn
+  const { hasPermission } = usePermissions()
+
   useEffect(() => {
     fetchInventories()
     fetchVariants()
@@ -293,13 +297,15 @@ const InventoryLogTab = () => {
                     if (col.id === 'action') {
                       content = (
                         <Tooltip title='Xem'>
-                          <IconButton
-                            onClick={() => handleViewLog(row)}
-                            size='small'
-                            color='primary'
-                          >
-                            <RemoveRedEyeIcon color='primary' />
-                          </IconButton>
+                          {hasPermission('inventoryLog:read') && (
+                            <IconButton
+                              onClick={() => handleViewLog(row)}
+                              size='small'
+                              color='primary'
+                            >
+                              <RemoveRedEyeIcon color='primary' />
+                            </IconButton>
+                          )}
                         </Tooltip>
                       )
                     }

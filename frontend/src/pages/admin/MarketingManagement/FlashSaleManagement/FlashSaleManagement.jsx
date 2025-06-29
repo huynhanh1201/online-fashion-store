@@ -56,6 +56,8 @@ import {
 } from '~/services/admin/webConfig/flashsaleService'
 import { getProducts } from '~/services/productService'
 import { getProductVariants, restoreProductVariantsOriginalDiscountPrice } from '~/services/admin/variantService'
+import usePermissions from '~/hooks/usePermissions'
+
 
 const FlashSaleManagement = () => {
   const theme = useTheme()
@@ -77,6 +79,8 @@ const FlashSaleManagement = () => {
   const [restoringPrices, setRestoringPrices] = useState({})
   const [restoringAllPrices, setRestoringAllPrices] = useState(false)
 
+  const { hasPermission } = usePermissions()
+
   useEffect(() => {
     fetchCampaigns()
   }, [])
@@ -91,7 +95,7 @@ const FlashSaleManagement = () => {
         console.error('Lỗi khi tự động kiểm tra Flash Sale hết thời gian:', err)
       }
     }
-    
+
     checkExpiredFlashSales()
 
     // Kiểm tra định kỳ mỗi 5 phút
@@ -116,7 +120,7 @@ const FlashSaleManagement = () => {
           const enrichedProducts = await Promise.all(
             campaign.products.map(async (item) => {
               const prod = allProducts.find((p) => p._id === item.productId)
-              
+
               // Lấy thông tin variants để có originalDiscountPrice
               let originalDiscountPrice = null
               try {
@@ -129,7 +133,7 @@ const FlashSaleManagement = () => {
                 console.error('Lỗi khi lấy thông tin variants:', err)
                 originalDiscountPrice = 0
               }
-              
+
               return {
                 ...item,
                 productName: item.name || prod?.name || '---',
@@ -230,7 +234,7 @@ const FlashSaleManagement = () => {
       const results = await restoreFlashSaleCampaignPrices(campaign.id)
       const successCount = results.filter(r => r.success).length
       const failCount = results.filter(r => !r.success).length
-      
+
       if (successCount > 0) {
         setSuccess(`Đã khôi phục giá cho ${successCount} sản phẩm trong chiến dịch "${campaign.title}"`)
       }
@@ -337,7 +341,7 @@ const FlashSaleManagement = () => {
         ...campaign,
         endTime: new Date().toISOString()
       }
-      
+
       await updateFlashSaleCampaign(campaign.id, updatedCampaign)
       setSuccess('Đã kết thúc sớm chiến dịch Flash Sale thành công!')
       await fetchCampaigns()
@@ -367,19 +371,19 @@ const FlashSaleManagement = () => {
   const handleRestoreAllExpiredPrices = async () => {
     try {
       setRestoringAllPrices(true)
-      const expiredCampaigns = campaigns.filter(campaign => 
+      const expiredCampaigns = campaigns.filter(campaign =>
         new Date(campaign.endTime) < new Date() && campaign.status === 'active'
       )
-      
+
       if (expiredCampaigns.length === 0) {
         setWarning('Không có Flash Sale nào đã hết hạn cần khôi phục giá')
         return
       }
 
-      const restorePromises = expiredCampaigns.map(campaign => 
+      const restorePromises = expiredCampaigns.map(campaign =>
         restoreProductVariantsOriginalDiscountPrice(campaign.productId)
       )
-      
+
       await Promise.all(restorePromises)
       setSuccess(`Đã khôi phục giá về ban đầu cho ${expiredCampaigns.length} Flash Sale đã hết hạn`)
       // Refresh data
@@ -546,32 +550,34 @@ const FlashSaleManagement = () => {
         }}
       >
         <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
-          <Button
-            variant='contained'
-            startIcon={<AddIcon />}
-            onClick={() => {
-              setEditCampaignData(null)
-              setModal(true)
-            }}
-            sx={{
-              px: 3,
-              py: 1.5,
-              borderRadius: 2,
-              textTransform: 'none',
-              fontSize: '1rem',
-              fontWeight: 600,
-              background: 'var(--primary-color)',
-              boxShadow: '0 4px 16px rgba(59, 130, 246, 0.3)',
-              '&:hover': {
-                background: 'var(--accent-color)',
-                boxShadow: '0 6px 20px rgba(59, 130, 246, 0.6)',
-                transform: 'translateY(-1px)'
-              }
-            }}
-          >
-            Thêm chiến dịch mới
-          </Button>
-
+          {hasPermission('flashSale:create') && (
+            <Button
+              variant='contained'
+              startIcon={<AddIcon />}
+              onClick={() => {
+                setEditCampaignData(null)
+                setModal(true)
+              }}
+              sx={{
+                px: 3,
+                py: 1.5,
+                borderRadius: 2,
+                textTransform: 'none',
+                fontSize: '1rem',
+                fontWeight: 600,
+                background: 'var(--primary-color)',
+                boxShadow: '0 4px 16px rgba(59, 130, 246, 0.3)',
+                '&:hover': {
+                  background: 'var(--accent-color)',
+                  boxShadow: '0 6px 20px rgba(59, 130, 246, 0.6)',
+                  transform: 'translateY(-1px)'
+                }
+              }}
+            >
+              Thêm chiến dịch mới
+            </Button>
+          )
+          }
           <Button
             variant='outlined'
             color='warning'
@@ -592,7 +598,7 @@ const FlashSaleManagement = () => {
           >
             {restoringAllPrices ? 'Đang khôi phục...' : 'Khôi phục giá tất cả Flash Sale hết hạn'}
           </Button>
-        </Box>
+        </Box >
 
         <Button
           variant='outlined'
@@ -607,7 +613,7 @@ const FlashSaleManagement = () => {
         >
           {refreshing ? 'Đang tải...' : 'Làm mới'}
         </Button>
-      </Box>
+      </Box >
 
       <AddFlashSale
         open={openAddModal}
@@ -743,7 +749,7 @@ const FlashSaleManagement = () => {
                         color='primary'
                       />
                     </Tooltip>
-                    
+
                     {/* Nút khôi phục giá cho campaign hết thời gian */}
                     {campaign.status === 'expired' && (
                       <Tooltip title='Khôi phục giá về ban đầu'>
@@ -762,22 +768,24 @@ const FlashSaleManagement = () => {
                         </IconButton>
                       </Tooltip>
                     )}
-                    
-                    <Tooltip title='Chỉnh sửa chiến dịch'>
-                      <IconButton
-                        size='small'
-                        sx={{
-                          color: '#3b82f6',
-                          '&:hover': { backgroundColor: '#dbeafe' }
-                        }}
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          handleEditCampaign(campaign)
-                        }}
-                      >
-                        <EditIcon fontSize='small' />
-                      </IconButton>
-                    </Tooltip>
+                    {
+                      hasPermission('flashSale:update') && (
+                        <Tooltip title='Chỉnh sửa chiến dịch'>
+                          <IconButton
+                            size='small'
+                            sx={{
+                              color: '#3b82f6',
+                              '&:hover': { backgroundColor: '#dbeafe' }
+                            }}
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              handleEditCampaign(campaign)
+                            }}
+                          >
+                            <EditIcon fontSize='small' />
+                          </IconButton>
+                        </Tooltip>
+                      )}
                     {/* Nút kết thúc sớm chỉ hiển thị cho chiến dịch đang hoạt động */}
                     {(campaign.status === 'active' || campaign.status === 'upcoming') && (
                       <Tooltip title='Kết thúc sớm'>
@@ -797,7 +805,9 @@ const FlashSaleManagement = () => {
                       </Tooltip>
                     )}
                     {/* Nút xóa chỉ hiển thị cho chiến dịch đã kết thúc hoặc bị tắt */}
+
                     {(campaign.status === 'expired' || campaign.status === 'disabled') && (
+
                       <Tooltip title='Xóa chiến dịch'>
                         <IconButton
                           size='small'
@@ -813,16 +823,17 @@ const FlashSaleManagement = () => {
                           <DeleteIcon fontSize='small' />
                         </IconButton>
                       </Tooltip>
-                    )}
+                    )
+                    }
                     <Chip
                       label={getStatusLabel(campaign.status)}
                       color={getStatusColor(campaign.status)}
                       size='small'
                       sx={{ fontWeight: 600, borderRadius: 2 }}
                     />
-                  </Stack>
-                </Box>
-              </AccordionSummary>
+                  </Stack >
+                </Box >
+              </AccordionSummary >
               <AccordionDetails>
                 <Box sx={{ mb: 2 }}>
                   <Typography variant='body2' color='text.secondary'>
@@ -1005,7 +1016,7 @@ const FlashSaleManagement = () => {
                                 mt: 0.5
                               }}
                             >
-                              {item.originalDiscountPrice > 0 
+                              {item.originalDiscountPrice > 0
                                 ? 'So với giá gốc / So với giá ban đầu'
                                 : 'So với giá gốc'
                               }
@@ -1106,11 +1117,11 @@ const FlashSaleManagement = () => {
                   </Table>
                 </TableContainer>
               </AccordionDetails>
-            </Accordion>
+            </Accordion >
           ))
         )}
-      </Card>
-    </Box>
+      </Card >
+    </Box >
   )
 }
 

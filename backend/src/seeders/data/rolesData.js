@@ -8,59 +8,45 @@ export const roles = [
 
       // User
       'user:use',
-      'user:create',
       'user:read',
+      'user:create',
       'user:update',
       'user:delete',
 
       // Category
       'category:use',
-      'category:create',
       'category:read',
+      'category:create',
       'category:update',
       'category:delete',
 
       // Product
       'product:use',
-      'product:create',
       'product:read',
+      'product:create',
       'product:update',
       'product:delete',
 
       // Variant
       'variant:use',
-      'variant:create',
       'variant:read',
+      'variant:create',
       'variant:update',
       'variant:delete',
 
       // Color
       'color:use',
-      'color:create',
       'color:read',
+      'color:create',
       'color:update',
       'color:delete',
 
-      // Color Palette
-      'colorPalette:use',
-      'colorPalette:create',
-      'colorPalette:read',
-      'colorPalette:update',
-      'colorPalette:delete',
-
       // Size
       'size:use',
-      'size:create',
       'size:read',
+      'size:create',
       'size:update',
       'size:delete',
-
-      // Size Palette
-      'sizePalette:use',
-      'sizePalette:create',
-      'sizePalette:read',
-      'sizePalette:update',
-      'sizePalette:delete',
 
       // Order
       'order:use',
@@ -68,20 +54,23 @@ export const roles = [
       'order:update',
 
       // Payment Transaction
-      'paymentTransaction:use',
+      'payment:use',
       'payment:read',
       'payment:update',
 
       // Coupon
       'coupon:use',
-      'coupon:create',
       'coupon:read',
+      'coupon:create',
       'coupon:update',
       'coupon:delete',
 
       // Statistics
       'statistics:use',
-      'statistics:read',
+      'userStatistics:use',
+      'productStatistics:use',
+      'warehouseStatistics:use',
+      'orderStatistics:use',
 
       // Inventory
       'inventory:use',
@@ -99,8 +88,8 @@ export const roles = [
 
       // Warehouse
       'warehouse:use',
-      'warehouse:create',
       'warehouse:read',
+      'warehouse:create',
       'warehouse:update',
       'warehouse:delete',
 
@@ -111,8 +100,8 @@ export const roles = [
 
       // Partner
       'partner:use',
-      'partner:create',
       'partner:read',
+      'partner:create',
       'partner:update',
       'partner:delete',
 
@@ -123,25 +112,26 @@ export const roles = [
       'review:update',
       'review:delete',
 
+      // Role
+      'role:use',
+      'role:read',
+      'role:create',
+      'role:update',
+      'role:delete',
+
       // Blog
       'blog:use',
-      'blog:create',
       'blog:read',
+      'blog:create',
       'blog:update',
       'blog:delete',
 
       // Account
       'account:use',
-      'account:create',
       'account:read',
+      'account:create',
       'account:update',
       'account:delete',
-
-      // Role
-      'role:use',
-      'role:create',
-      'role:read',
-      'role:update',
 
       // Banner
       'banner:use',
@@ -151,6 +141,7 @@ export const roles = [
 
       // Content Management
       'content:use',
+      'content:read',
       'content:create',
       'content:update',
       'content:delete',
