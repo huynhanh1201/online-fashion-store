@@ -23,8 +23,7 @@ const styles = {
     flexDirection: 'column'
   }
 }
-
-const AccountStatistics = ({ statistics }) => {
+const AccountStatistics = ({ statistics, rolesData = [] }) => {
   const { summary, chartData } = statistics
 
   const summaryItems = [
@@ -126,6 +125,24 @@ const AccountStatistics = ({ statistics }) => {
         <Box mt={5} position='relative' sx={{ maxHeight: 500 }}>
           <Pie data={chartData} options={chartOptions} />
         </Box>
+      </Box>
+
+      <Box sx={styles.BoxCard}>
+        <Typography
+          variant='h5'
+          gutterBottom
+          fontWeight='700'
+          sx={styles.header}
+        >
+          Chi tiết vai trò
+        </Typography>
+        <ul>
+          {rolesData.map((role) => (
+            <li key={role._id}>
+              <strong>{role.label}</strong>: {role.permissions.join(', ')}
+            </li>
+          ))}
+        </ul>
       </Box>
     </div>
   )

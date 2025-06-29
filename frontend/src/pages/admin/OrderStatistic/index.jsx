@@ -3,11 +3,21 @@ import OrderStatistic from './OrderStatistic.jsx'
 import useInventoryStatistics from '~/hooks/admin/useStatistic.js'
 
 function OrderDashboard() {
-  const { orderStatistics, fetchOrdersStatistics } = useInventoryStatistics()
+  const {
+    orderStatistics,
+    financeStatistics,
+    fetchOrdersStatistics,
+    fetchFinanceStatistics
+  } = useInventoryStatistics()
+
   useEffect(() => {
     fetchOrdersStatistics()
+    fetchFinanceStatistics('2025')
   }, [])
-  return <OrderStatistic stats={orderStatistics} />
+  console.log(financeStatistics)
+  return (
+    <OrderStatistic stats={orderStatistics} financeStats={financeStatistics} />
+  )
 }
 
 export default OrderDashboard

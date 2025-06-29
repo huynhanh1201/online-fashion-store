@@ -2,7 +2,9 @@ import React, { useState } from 'react'
 import {
   getInventoryStatistics,
   getProductsStatistics,
-  getOrderStatistics
+  getOrderStatistics,
+  getAccountStatistics,
+  finaceStatistics
 } from '~/services/admin/StatisticService.js'
 
 export const useInventoryStatistics = () => {
@@ -12,6 +14,7 @@ export const useInventoryStatistics = () => {
   const [orderStatistics, setOrderStatistics] = useState([])
   const [productStatistics, setProductStatistics] = useState([])
   const [loading, setLoading] = useState(true)
+  const [financeStatistics, setFinanceStatistics] = useState([])
 
   const fetchStatistics = async () => {
     setLoading(true)
@@ -49,12 +52,37 @@ export const useInventoryStatistics = () => {
     }
   }
 
+  const fetchAccountStatistics = async () => {
+    setLoading(true)
+    try {
+      const data = await getAccountStatistics()
+      setAccountStatistics(data)
+    } catch (error) {
+      console.error('Error fetching account statistics:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
+  const fetchFinanceStatistics = async (year) => {
+    setLoading(true)
+    try {
+      const data = await finaceStatistics(year)
+      setFinanceStatistics(data)
+    } catch (error) {
+      console.error('Error fetching finance statistics:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
   return {
     statistics,
     loading,
     fetchStatistics,
     fetchProductsStatistics,
     fetchOrdersStatistics,
+    fetchFinanceStatistics,
+    fetchAccountStatistics,
     accountStatistics,
     setAccountStatistics,
     warehouseStatistics,
@@ -63,7 +91,9 @@ export const useInventoryStatistics = () => {
     setOrderStatistics,
     productStatistics,
     setProductStatistics,
-    setStatistics
+    setStatistics,
+    financeStatistics,
+    setFinanceStatistics
   }
 }
 
