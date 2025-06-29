@@ -5,25 +5,23 @@ import { getHeaderConfig } from '~/services/admin/webConfig/headerService'
 import { optimizeCloudinaryUrl } from '~/utils/cloudinary.js'
 
 const LogoButton = styled(Button)(({ theme }) => ({
-  fontSize: '28px',
   fontWeight: 700,
   color: '#03235e',
   textTransform: 'none',
   letterSpacing: '1px',
+  fontSize: '28px',
   [theme.breakpoints.down('sm')]: {
-    fontSize: '22px'
+    fontSize: '20px'
   }
 }))
 
 const LogoImage = styled('img')(({ theme }) => ({
-  height: '40px',
+  height: 'auto',
+  maxHeight: '40px',
   width: 'auto',
-  maxWidth: '200px',
+  maxWidth: '100%',
   objectFit: 'contain',
-  [theme.breakpoints.down('sm')]: {
-    height: '32px',
-    maxWidth: '150px'
-  }
+  display: 'block'
 }))
 
 const Logo = () => {
@@ -34,7 +32,6 @@ const Logo = () => {
     const fetchLogoData = async () => {
       try {
         const headerConfig = await getHeaderConfig()
-        
         if (headerConfig?.content?.logo) {
           setLogoData(headerConfig.content.logo)
         }
@@ -48,13 +45,23 @@ const Logo = () => {
     fetchLogoData()
   }, [])
 
-  // Nếu có logo image và đang hiển thị
   if (logoData?.imageUrl && logoData?.visible !== false) {
     return (
-      <Box component="a" href="/" sx={{ textDecoration: 'none' }}>
+      <Box
+        component='a'
+        href='/'
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          maxWidth: { xs: 120, sm: 200 },
+          height: 40,
+          textDecoration: 'none',
+          overflow: 'hidden'
+        }}
+      >
         <LogoImage
-          src={optimizeCloudinaryUrl(logoData.imageUrl, { 
-            width: 200, 
+          src={optimizeCloudinaryUrl(logoData.imageUrl, {
+            width: 200,
             height: 40,
             quality: 'auto',
             format: 'auto'
@@ -65,12 +72,7 @@ const Logo = () => {
     )
   }
 
-  // Fallback về text logo
-  return (
-    <LogoButton href='/'>
-      {logoData?.text || 'FASHIONSTORE™'}
-    </LogoButton>
-  )
+  return <LogoButton href='/'>{logoData?.text || 'FASHIONSTORE™'}</LogoButton>
 }
 
 export default Logo
