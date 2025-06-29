@@ -83,6 +83,24 @@ const fontFamilies = [
   { label: 'Roboto', value: 'Roboto, sans-serif' },
   { label: 'Comic Sans MS', value: '"Comic Sans MS", cursive' }
 ]
+const fontSizeOptions = [
+  { label: '8', value: '8px' },
+  { label: '9', value: '9px' },
+  { label: '10', value: '10px' },
+  { label: '11', value: '11px' },
+  { label: '12', value: '12px' },
+  { label: '14', value: '14px' },
+  { label: '16', value: '16px' },
+  { label: '18', value: '18px' },
+  { label: '20', value: '20px' },
+  { label: '22', value: '22px' },
+  { label: '24', value: '24px' },
+  { label: '26', value: '26px' },
+  { label: '28', value: '28px' },
+  { label: '36', value: '36px' },
+  { label: '48', value: '48px' },
+  { label: '72', value: '72px' }
+]
 
 export default function MenuBar({ editor }) {
   const getCurrentValue = () => {
@@ -170,7 +188,7 @@ export default function MenuBar({ editor }) {
       spacing={1}
       flexWrap='wrap'
       justifyContent='center'
-      sx={{ mb: 2, rowGap: 2, mt: 2 }}
+      sx={{ rowGap: 2, py: 2 }}
     >
       <Box display='flex' alignItems='center' gap={1}>
         {btn(() => editor.chain().focus().undo(), Undo, false, 'Undo')}
@@ -275,6 +293,40 @@ export default function MenuBar({ editor }) {
           {headingOptions.map((option) => (
             <MenuItem key={option.value} value={option.value}>
               {option.label}
+            </MenuItem>
+          ))}
+        </Select>
+        <Select
+          size='small'
+          value={editor.getAttributes('textStyle').fontSize || '16px'}
+          onChange={(e) =>
+            editor.chain().focus().setFontSize(e.target.value).run()
+          }
+          displayEmpty
+          MenuProps={{
+            PaperProps: {
+              sx: {
+                maxHeight: 300 // hoặc giá trị bạn muốn
+              }
+            }
+          }}
+          sx={{
+            width: 70,
+            color: '#000',
+            '& .MuiOutlinedInput-notchedOutline': {
+              borderColor: '#000'
+            },
+            '&:hover .MuiOutlinedInput-notchedOutline': {
+              borderColor: '#000'
+            },
+            '& .MuiSelect-icon': {
+              color: '#000'
+            }
+          }}
+        >
+          {fontSizeOptions.map((size) => (
+            <MenuItem key={size.value} value={size.value}>
+              {size.label}
             </MenuItem>
           ))}
         </Select>

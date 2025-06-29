@@ -55,6 +55,7 @@ import RoleManagement from '~/pages/admin/RoleManagement/index.jsx'
 import PermissionManagement from '~/pages/admin/PermissionManagemenet/index.jsx'
 import ProductDashboard from '~/pages/admin/ProductStatistics/index.jsx'
 import OrderDashboard from '~/pages/admin/OrderStatistic/index.jsx'
+import AccountDashboard from '~/pages/admin/AccountStatistic/index.jsx'
 // Quản lý nội dung
 import DisplayManagement from '~/pages/admin/MarketingManagement/DisplayManagement/DisplayManagement.jsx'
 import FlashSaleManagement from '~/pages/admin/MarketingManagement/FlashSaleManagement/FlashSaleManagement.jsx'
@@ -95,7 +96,7 @@ function App() {
         <Route path='/productdetail/:productId' element={<ProductDetail />} />
         <Route path='blog' element={<Blog />} />
         <Route path='/blog/:blogId' element={<BlogDetail />} />
-        <Route path="/category/:slug" element={<CategoryPage />} />
+        <Route path='/category/:slug' element={<CategoryPage />} />
 
         <Route
           path='productbycategory/:categoryId'
@@ -131,6 +132,7 @@ function App() {
           <Route index element={<AdminHome />} />
           <Route path='user-management' element={<UserManagement />} />
           <Route path='account-management' element={<AccountManagement />} />
+          <Route path='account-statistic' element={<AccountDashboard />} />
           <Route path='product-statistic' element={<ProductDashboard />} />
           <Route path='product-management' element={<ProductManagement />} />
           <Route

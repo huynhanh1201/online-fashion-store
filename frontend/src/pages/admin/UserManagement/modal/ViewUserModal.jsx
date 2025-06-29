@@ -41,7 +41,7 @@ const ViewUserModal = ({ open, onClose, user }) => {
       maxWidth='md'
       BackdropProps={{ sx: StyleAdmin.OverlayModal }}
     >
-      <DialogTitle>Thông tin người dùng</DialogTitle>
+      <DialogTitle>Thông tin khách hàng</DialogTitle>
       <Divider />
       <DialogContent sx={{ maxHeight: '69vh' }}>
         {user ? (
@@ -87,7 +87,7 @@ const ViewUserModal = ({ open, onClose, user }) => {
                 <TableBody>
                   <TableRow>
                     <TableCell sx={{ fontWeight: 'bold', width: '30%' }}>
-                      Tên người dùng
+                      Tên khách hàng
                     </TableCell>
                     <TableCell>{user.name || '—'}</TableCell>
                   </TableRow>
@@ -101,7 +101,11 @@ const ViewUserModal = ({ open, onClose, user }) => {
                     <TableCell sx={{ fontWeight: 'bold' }}>Vai trò</TableCell>
                     <TableCell>
                       <Chip
-                        label={user?.role?.toUpperCase() || 'Không có vai trò'}
+                        label={
+                          user?.role === 'customer'
+                            ? 'Khách hàng'
+                            : 'Không xác định'
+                        }
                         size='medium'
                         sx={{
                           width: 130,

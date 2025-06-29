@@ -69,7 +69,7 @@ const UserTable = ({
                   }}
                 >
                   <Typography variant='h6' sx={{ fontWeight: '800' }}>
-                    Danh sách người dùng
+                    Danh sách tài khoản khách hàng
                   </Typography>
                   <FilterUser
                     onFilter={onFilters}
@@ -115,6 +115,7 @@ const UserTable = ({
                   columns={columns}
                   handleOpenModal={handleOpenModal}
                   permissions={permissions}
+                  roles={roles}
                 />
               ))
             ) : (

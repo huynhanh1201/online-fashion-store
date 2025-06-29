@@ -38,7 +38,8 @@ function WarehouseStatisticTab() {
   const { partners, fetchPartners, createNewPartner } = usePartner()
   const { createNewWarehouseSlip } = useWarehouseSlips()
 
-  const { statistics, loading, fetchStatistics } = useInventoryStatistics()
+  const { warehouseStatistics, loading, fetchStatistics } =
+    useInventoryStatistics()
 
   React.useEffect(() => {
     fetchStatistics()
@@ -69,7 +70,7 @@ function WarehouseStatisticTab() {
         >
           Thống kê kho hàng
         </Typography>
-        <InventorySummaryCard data={statistics} loading={loading} />
+        <InventorySummaryCard data={warehouseStatistics} loading={loading} />
       </Box>
       <Box sx={styles.BoxCard}>
         <Typography
@@ -80,7 +81,7 @@ function WarehouseStatisticTab() {
         >
           Biến Động Tồn Kho Theo Thời Gian
         </Typography>
-        <ChartDashboard data={statistics} loading={loading} />
+        <ChartDashboard data={warehouseStatistics} loading={loading} />
       </Box>
       <Box sx={{ ...styles.BoxCard, pb: 0 }}>
         <Typography
@@ -92,7 +93,7 @@ function WarehouseStatisticTab() {
           Cảnh Báo Hết Hàng
         </Typography>
         <LowStockAlertCard
-          data={statistics}
+          data={warehouseStatistics}
           fetchStatistics={fetchStatistics}
           loading={loading}
           warehouses={warehouses}
