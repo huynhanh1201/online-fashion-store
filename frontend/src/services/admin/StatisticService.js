@@ -51,10 +51,9 @@ export const getAccountStatistics = async () => {
 
 export const finaceStatistics = async (year) => {
   try {
-    const response = await AuthorizedAxiosInstance.post(
+    const response = await AuthorizedAxiosInstance.get(
       `${API_ROOT}/v1/statistics/finance?year=${year}`
     )
-    console.log('Finance statistics response:', response.data)
     return response.data
   } catch (error) {
     console.error('Error fetching finance statistics:', error)

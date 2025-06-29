@@ -6,17 +6,18 @@ function OrderDashboard() {
   const {
     orderStatistics,
     financeStatistics,
-    fetchOrdersStatistics,
-    fetchFinanceStatistics
+    fetchFinanceStatistics,
+    fetchOrdersStatistics
   } = useInventoryStatistics()
-
   useEffect(() => {
     fetchOrdersStatistics()
     fetchFinanceStatistics('2025')
   }, [])
-  console.log(financeStatistics)
   return (
-    <OrderStatistic stats={orderStatistics} financeStats={financeStatistics} />
+    <OrderStatistic
+      stats={orderStatistics}
+      financeStatistics={financeStatistics}
+    />
   )
 }
 
