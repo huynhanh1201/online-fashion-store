@@ -125,7 +125,7 @@ export default function RoleRow({
                     </IconButton>
                   </Tooltip>
                 )}
-                {hasPermission('role:update') && (
+                {hasPermission('role:delete') && (
                   <Tooltip title='Xoá'>
                     <IconButton
                       onClick={() => handleOpenModal('delete', role)}

@@ -79,13 +79,13 @@ const ViewReviewModal = ({ open, onClose, userId, productId, orderId, productNam
     })
   }
 
-  const getVideoThumbnail = (videoUrl) => {
-    // Tạo thumbnail từ video URL (Cloudinary)
-    if (videoUrl.includes('cloudinary')) {
-      return videoUrl.replace('/video/upload/', '/video/upload/so_auto/')
-    }
-    return videoUrl
-  }
+  // const getVideoThumbnail = (videoUrl) => {
+  //   // Tạo thumbnail từ video URL (Cloudinary)
+  //   if (videoUrl.includes('cloudinary')) {
+  //     return videoUrl.replace('/video/upload/', '/video/upload/so_auto/')
+  //   }
+  //   return videoUrl
+  // }
 
   return (
     <Dialog

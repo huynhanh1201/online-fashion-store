@@ -31,20 +31,55 @@ const ProductReview = ({ productId }) => {
   const [reviews, setReviews] = useState([])
   const [selectedImage, setSelectedImage] = useState(null)
   const [selectedVideo, setSelectedVideo] = useState(null)
+  const [currentPage, setCurrentPage] = useState(1)
+  const [totalReviews, setTotalReviews] = useState(0)
+  const [totalPages, setTotalPages] = useState(1)
+  const [loading, setLoading] = useState(false)
 
   useEffect(() => {
     const fetchReviews = async () => {
       try {
-        const data = await getReviews(productId)
+        setLoading(true)
+        const response = await getReviews(productId, 1, 5) // page 1, limit 5
+
+        // response giờ có cấu trúc {data: [...], meta: {...}}
+        const reviewsData = response.data || []
+        const metaData = response.meta || {}
+
         // Chỉ hiển thị những đánh giá đã được phê duyệt
-        const approvedReviews = data.filter(review => review.moderationStatus === 'approved')
+        const approvedReviews = reviewsData.filter(review => review.moderationStatus === 'approved')
         setReviews(approvedReviews)
+        setTotalReviews(metaData.total || 0)
+        setTotalPages(metaData.totalPages || 1)
+        setCurrentPage(1)
       } catch (err) {
         console.error('Lỗi khi lấy đánh giá:', err)
+      } finally {
+        setLoading(false)
       }
     }
     if (productId) fetchReviews()
   }, [productId])
+
+  const loadMoreReviews = async () => {
+    if (loading || currentPage >= totalPages) return
+
+    try {
+      setLoading(true)
+      const nextPage = currentPage + 1
+      const response = await getReviews(productId, nextPage, 5)
+
+      const reviewsData = response.data || []
+      const approvedReviews = reviewsData.filter(review => review.moderationStatus === 'approved')
+
+      setReviews(prev => [...prev, ...approvedReviews])
+      setCurrentPage(nextPage)
+    } catch (err) {
+      console.error('Lỗi khi tải thêm đánh giá:', err)
+    } finally {
+      setLoading(false)
+    }
+  }
 
   const averageRating = reviews.length
     ? (reviews.reduce((acc, r) => acc + r.rating, 0) / reviews.length).toFixed(1)
@@ -75,7 +110,7 @@ const ProductReview = ({ productId }) => {
         </Typography>
         <Rating value={Number(averageRating)} precision={0.1} readOnly />
         <Typography variant='subtitle1' sx={{ color: '#1A3C7B' }}>
-          ({reviews.length} đánh giá)
+          ({totalReviews} đánh giá)
         </Typography>
       </Box>
 
@@ -107,9 +142,9 @@ const ProductReview = ({ productId }) => {
                   </Box>
                 }
                 secondary={
-                  <Box sx={{ mt: 1 }}>
+                  <React.Fragment>
                     <Rating value={review.rating} readOnly size='small' sx={{ color: '#faaf00', mb: 1 }} />
-                    <Typography variant='body2' color='text.primary' sx={{ mb: 1 }}>
+                    <Typography variant='body2' color='text.primary' sx={{ mb: 1 }} component="div">
                       {review.comment}
                     </Typography>
 
@@ -196,7 +231,7 @@ const ProductReview = ({ productId }) => {
                     <Typography variant='caption' color='text.secondary'>
                       {new Date(review.createdAt).toLocaleDateString('vi-VN')}
                     </Typography>
-                  </Box>
+                  </React.Fragment>
                 }
               />
             </ListItem>
@@ -205,6 +240,27 @@ const ProductReview = ({ productId }) => {
         ))}
 
       </List>
+
+      {/* Nút xem thêm */}
+      {currentPage < totalPages && (
+        <Box display="flex" justifyContent="center" mt={3} mb={2}>
+          <Button
+            variant="outlined"
+            onClick={loadMoreReviews}
+            disabled={loading}
+            sx={{
+              color: '#1A3C7B',
+              borderColor: '#1A3C7B',
+              '&:hover': {
+                borderColor: '#1A3C7B',
+                backgroundColor: 'rgba(26, 60, 123, 0.04)'
+              }
+            }}
+          >
+            {loading ? 'Đang tải...' : 'Xem thêm đánh giá'}
+          </Button>
+        </Box>
+      )}
 
       {/* Modal hiển thị ảnh phóng to */}
       <Dialog
