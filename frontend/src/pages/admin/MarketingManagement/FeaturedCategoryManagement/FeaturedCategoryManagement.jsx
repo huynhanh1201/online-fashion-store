@@ -19,7 +19,12 @@ import {
   alpha,
   Alert,
   CircularProgress,
-  Skeleton
+  Skeleton,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  DialogContentText
 } from '@mui/material'
 import {
   Add as AddIcon,
@@ -27,7 +32,8 @@ import {
   Delete as DeleteIcon,
   Category as CategoryIcon,
   Collections as CollectionsIcon,
-  Refresh as RefreshIcon
+  Refresh as RefreshIcon,
+  Warning as WarningIcon
 } from '@mui/icons-material'
 import AddFeaturedCategory from './Modal/AddFeaturedCategory.jsx'
 import { 
@@ -44,6 +50,9 @@ const FeaturedCategoryManagement = () => {
   const [loading, setLoading] = useState(true)
   const [refreshing, setRefreshing] = useState(false)
   const [error, setError] = useState('')
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false)
+  const [deleteIndex, setDeleteIndex] = useState(null)
+  const [deleting, setDeleting] = useState(false)
 
   // Fetch featured categories data
   const fetchFeaturedCategories = async () => {
@@ -80,17 +89,34 @@ const FeaturedCategoryManagement = () => {
   }
 
   // Handle delete
-  const handleDelete = async (index) => {
-    if (window.confirm('Bạn có chắc chắn muốn xóa danh mục này?')) {
-      try {
-        await deleteFeaturedCategory(index)
-        // Refresh data after successful delete
-        fetchFeaturedCategories()
-      } catch (error) {
-        setError(error.message)
-        console.error('Error deleting featured category:', error)
-      }
+  const handleDelete = (index) => {
+    setDeleteIndex(index)
+    setDeleteConfirmOpen(true)
+  }
+
+  // Handle delete confirmation
+  const handleDeleteConfirm = async () => {
+    if (deleteIndex === null) return
+
+    try {
+      setDeleting(true)
+      await deleteFeaturedCategory(deleteIndex)
+      // Refresh data after successful delete
+      fetchFeaturedCategories()
+      setDeleteConfirmOpen(false)
+      setDeleteIndex(null)
+    } catch (error) {
+      setError(error.message)
+      console.error('Error deleting featured category:', error)
+    } finally {
+      setDeleting(false)
     }
+  }
+
+  // Handle delete cancel
+  const handleDeleteCancel = () => {
+    setDeleteConfirmOpen(false)
+    setDeleteIndex(null)
   }
 
   // Handle add new
@@ -478,6 +504,109 @@ const FeaturedCategoryManagement = () => {
         onSuccess={handleModalSuccess}
         editIndex={editIndex}
       />
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog
+        open={deleteConfirmOpen}
+        onClose={handleDeleteCancel}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+        PaperProps={{
+          sx: {
+            borderRadius: 3,
+            minWidth: 400
+          }
+        }}
+      >
+        <DialogTitle 
+          id="alert-dialog-title"
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 1,
+            color: '#dc2626',
+            fontWeight: 600
+          }}
+        >
+          <WarningIcon color="error" />
+          Xác nhận xóa danh mục
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description" sx={{ mb: 2 }}>
+            Bạn có chắc chắn muốn xóa danh mục này không?
+          </DialogContentText>
+          {deleteIndex !== null && featuredCategories[deleteIndex] && (
+            <Box sx={{ 
+              p: 2, 
+              backgroundColor: '#fef2f2', 
+              borderRadius: 2, 
+              border: '1px solid #fecaca',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 2
+            }}>
+              {featuredCategories[deleteIndex].imageUrl && (
+                <img
+                  src={optimizeCloudinaryUrl(featuredCategories[deleteIndex].imageUrl, {
+                    width: 60,
+                    height: 45
+                  })}
+                  alt={featuredCategories[deleteIndex].name}
+                  style={{
+                    width: 60,
+                    height: 45,
+                    objectFit: 'cover',
+                    borderRadius: 6,
+                    border: '1px solid #e2e8f0'
+                  }}
+                />
+              )}
+              <Box>
+                <Typography variant="body1" sx={{ fontWeight: 600, color: '#1e293b' }}>
+                  {featuredCategories[deleteIndex].name}
+                </Typography>
+                <Typography variant="body2" color="text.secondary" sx={{ fontFamily: 'monospace' }}>
+                  {featuredCategories[deleteIndex].link || 'Chưa có link'}
+                </Typography>
+              </Box>
+            </Box>
+          )}
+          <DialogContentText sx={{ mt: 2, color: '#dc2626', fontWeight: 500 }}>
+            ⚠️ Hành động này không thể hoàn tác!
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions sx={{ p: 3, pt: 1 }}>
+          <Button 
+            onClick={handleDeleteCancel}
+            variant="outlined"
+            disabled={deleting}
+            sx={{ 
+              borderRadius: 2,
+              textTransform: 'none',
+              fontWeight: 600
+            }}
+          >
+            Hủy
+          </Button>
+          <Button 
+            onClick={handleDeleteConfirm}
+            variant="contained"
+            disabled={deleting}
+            startIcon={deleting ? <CircularProgress size={16} /> : <DeleteIcon />}
+            sx={{
+              borderRadius: 2,
+              textTransform: 'none',
+              fontWeight: 600,
+              backgroundColor: '#dc2626',
+              '&:hover': {
+                backgroundColor: '#b91c1c'
+              }
+            }}
+          >
+            {deleting ? 'Đang xóa...' : 'Xóa danh mục'}
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   )
 }

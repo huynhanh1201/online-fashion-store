@@ -35,7 +35,7 @@ const defaultStore = { name: '', address: '' }
 const FooterPreview = ({ logo, about, menuColumns, socialLinks, stores }) => {
   return (
     <Box sx={{ 
-      bgcolor: '#002f6c', 
+      bgcolor: 'var(--primary-color)', 
       color: 'white', 
       pt: 6, 
       pb: 3, 
@@ -44,6 +44,7 @@ const FooterPreview = ({ logo, about, menuColumns, socialLinks, stores }) => {
       minHeight: 400,
       fontFamily: 'Arial, sans-serif'
     }}>
+    
       <Box sx={{ maxWidth: '1450px', mx: 'auto', px: 2 }}>
         <Box
           sx={{
@@ -429,7 +430,7 @@ const AddFooterModal = ({ open, onClose, onSuccess, footerConfig }) => {
   }
 
   return (
-    <Dialog open={open} onClose={handleClose} maxWidth='lg' fullWidth sx={{ zIndex: 1402, maxHeight: '95vh', mt: 2 }}>
+    <Dialog open={open} onClose={handleClose} maxWidth='lg' fullWidth sx={{ zIndex: 15000, maxHeight: '75vh', mt:15 }}>
       <DialogTitle>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
           Thêm nội dung chân trang mới

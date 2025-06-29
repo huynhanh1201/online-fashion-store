@@ -54,7 +54,7 @@ import {
   getDefaultMenuStructure,
   validateMenuContent 
 } from '~/services/admin/webConfig/headerService.js'
-import { getCategories } from '~/services/admin/categoryService.js'
+import { getCategoriesWithProducts } from '~/services/admin/categoryService.js'
 import MenuPreview from './MenuPreview.jsx'
 
 const MegaMenuEditor = ({ open, onClose, onSuccess, initialData = null }) => {
@@ -99,8 +99,8 @@ const MegaMenuEditor = ({ open, onClose, onSuccess, initialData = null }) => {
   const fetchCategories = async () => {
     setCategoriesLoading(true)
     try {
-      const response = await getCategories({})
-      setCategories(response.categories || [])
+      const categories = await getCategoriesWithProducts()
+      setCategories(categories || [])
     } catch (error) {
       console.error('Error fetching categories:', error)
     } finally {
@@ -207,15 +207,11 @@ const MegaMenuEditor = ({ open, onClose, onSuccess, initialData = null }) => {
     setEditingIndex(index)
     setEditingSubIndex(subIndex)
     
-    // Reset URL type to manual for main menu items
-    if (subIndex < 0) {
-      setUrlType('manual')
+    // Set URL type to category for submenu items (no manual option)
+    if (subIndex >= 0) {
+      setUrlType('category')
     } else {
-      // For submenu items, check if URL matches a category
-      const matchingCategory = categories.find(cat => 
-        cat.link === item.url || `/category/${cat.slug}` === item.url
-      )
-      setUrlType(matchingCategory ? 'category' : 'manual')
+      setUrlType('manual')
     }
   }
 
@@ -225,9 +221,9 @@ const MegaMenuEditor = ({ open, onClose, onSuccess, initialData = null }) => {
       return
     }
 
-    // URL is required only for submenu items
-    if (editingSubIndex >= 0 && urlType === 'manual' && !editingItem.url.trim()) {
-      setError('URL không được để trống cho submenu')
+    // URL is required for submenu items and must be selected from categories
+    if (editingSubIndex >= 0 && !editingItem.url.trim()) {
+      setError('Vui lòng chọn danh mục có sản phẩm cho submenu')
       return
     }
 
@@ -250,7 +246,7 @@ const MegaMenuEditor = ({ open, onClose, onSuccess, initialData = null }) => {
     setEditingIndex(-1)
     setEditingSubIndex(-1)
     setError('')
-    setUrlType('manual')
+    setUrlType('category')
   }
 
   const handleDeleteItem = (type, index, subIndex = -1) => {
@@ -296,24 +292,16 @@ const MegaMenuEditor = ({ open, onClose, onSuccess, initialData = null }) => {
     setEditingType(type)
     setEditingIndex(index)
     setEditingSubIndex(menuData[type][index].children?.length || 0)
-    setUrlType('manual')
+    setUrlType('category')
   }
 
   const handleCategorySelect = (category) => {
     if (category) {
       setEditingItem(prev => ({
         ...prev,
-        url: category.link || `/category/${category.slug}`
+        url: `category/${category.slug}`
         // Don't automatically set the label - let user customize the menu name
       }))
-    }
-  }
-
-  const handleUrlTypeChange = (newType) => {
-    setUrlType(newType)
-    if (newType === 'category') {
-      // Clear URL when switching to category selection
-      setEditingItem(prev => ({ ...prev, url: '' }))
     }
   }
 
@@ -649,49 +637,22 @@ const MegaMenuEditor = ({ open, onClose, onSuccess, initialData = null }) => {
               required
             />
 
-            {/* URL Type Selection for Submenu Items */}
+            {/* Category Selection for Submenu Items */}
             {editingSubIndex >= 0 && (
-              <FormControl fullWidth>
-                <InputLabel>Loại URL</InputLabel>
-                <Select
-                  value={urlType}
-                  onChange={(e) => handleUrlTypeChange(e.target.value)}
-                  label="Loại URL"
-                >
-                  <MenuItem value="manual">Nhập URL thủ công</MenuItem>
-                  <MenuItem value="category">Chọn từ danh mục con hiện có</MenuItem>
-                </Select>
-              </FormControl>
-            )}
-
-            {/* URL Input or Category Selection */}
-            {urlType === 'manual' ? (
-              editingSubIndex >= 0 ? (
-                <TextField
-                  label="URL"
-                  value={editingItem?.url || ''}
-                  onChange={(e) => setEditingItem(prev => ({ ...prev, url: e.target.value }))}
-                  fullWidth
-                  required
-                  placeholder="/category/example-slug"
-                  helperText="Nhập URL (ví dụ: /category/ten-danh-muc) hoặc chọn 'Chọn từ danh mục con hiện có' ở trên"
-                />
-              ) : null
-            ) : editingSubIndex >= 0 ? (
               <Autocomplete
-                options={categories.filter(cat => cat.parent)}
-                getOptionLabel={(option) => option.name}
+                options={categories}
+                getOptionLabel={(option) => `${option.name} (${option.productCount} sản phẩm)`}
                 loading={categoriesLoading}
                 value={categories.find(cat => 
-                  cat.link === editingItem?.url || `/category/${cat.slug}` === editingItem?.url
+                  `category/${cat.slug}` === editingItem?.url
                 ) || null}
                 onChange={(event, newValue) => handleCategorySelect(newValue)}
                 renderInput={(params) => (
                   <TextField
                     {...params}
-                    label="Chọn danh mục con"
+                    label="Chọn danh mục có sản phẩm"
                     required
-                    helperText="Chọn danh mục con để tự động lấy URL. Tên menu có thể tùy chỉnh riêng."
+                    helperText="Chọn danh mục có sản phẩm để tự động lấy URL. Tên menu có thể tùy chỉnh riêng."
                     InputProps={{
                       ...params.InputProps,
                       endAdornment: (
@@ -710,7 +671,7 @@ const MegaMenuEditor = ({ open, onClose, onSuccess, initialData = null }) => {
                         {option.name}
                       </Typography>
                       <Typography variant="caption" color="text.secondary">
-                        {option.link || `/category/${option.slug}`}
+                        {option.productCount} sản phẩm • Link: category/{option.slug}
                       </Typography>
                       {option.parent && (
                         <Typography variant="caption" color="text.secondary" sx={{ fontStyle: 'italic' }}>
@@ -720,9 +681,9 @@ const MegaMenuEditor = ({ open, onClose, onSuccess, initialData = null }) => {
                     </Stack>
                   </Box>
                 )}
-                noOptionsText="Không tìm thấy danh mục con nào"
+                noOptionsText="Không tìm thấy danh mục có sản phẩm nào"
               />
-            ) : null}
+            )}
 
             <TextField
               label="Thứ tự hiển thị"
@@ -748,9 +709,7 @@ const MegaMenuEditor = ({ open, onClose, onSuccess, initialData = null }) => {
               <Alert severity="info" sx={{ mt: 1 }}>
                 <Typography variant="body2">
                   <strong>Megamenu Column:</strong> Item này sẽ hiển thị như một cột trong megamenu khi hover vào menu cha.
-                  {urlType === 'category' && (
-                    <><br /><strong>Lưu ý:</strong> Chỉ hiển thị danh mục con (có danh mục cha). Khi chọn danh mục, URL sẽ được tự động điền theo định dạng /category/slug. Tên menu có thể tùy chỉnh theo ý muốn.</>
-                  )}
+                  <br /><strong>Lưu ý:</strong> Chỉ hiển thị danh mục có sản phẩm. Khi chọn danh mục, URL sẽ được tự động điền theo định dạng category/slug. Tên menu có thể tùy chỉnh theo ý muốn.
                 </Typography>
               </Alert>
             )}

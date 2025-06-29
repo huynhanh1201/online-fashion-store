@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect, useRef, useCallback } from 'react'
 import {
   Dialog,
   DialogTitle,
@@ -64,6 +64,8 @@ const AddFlashSale = ({ open, onClose, onSave, initialData }) => {
   const [existingCampaigns, setExistingCampaigns] = useState([])
   const [productVariants, setProductVariants] = useState({})
   const [updatingVariants, setUpdatingVariants] = useState({})
+  const [debounceTimers, setDebounceTimers] = useState({})
+  const [pendingUpdates, setPendingUpdates] = useState({})
   const suggestionRefs = useRef({})
   const inputRefs = useRef({})
 
@@ -169,6 +171,15 @@ const AddFlashSale = ({ open, onClose, onSave, initialData }) => {
     return () => document.removeEventListener('click', handleClickOutside)
   }, [showSuggestions])
 
+  // Cleanup timers on unmount
+  useEffect(() => {
+    return () => {
+      Object.values(debounceTimers).forEach(timer => {
+        if (timer) clearTimeout(timer)
+      })
+    }
+  }, [debounceTimers])
+
   const handleChange = (field, value) => {
     setForm((prev) => ({ ...prev, [field]: value ?? '' }))
     clearMessages()
@@ -181,34 +192,57 @@ const AddFlashSale = ({ open, onClose, onSave, initialData }) => {
     clearMessages()
   }
 
-  // Xử lý thay đổi giá Flash Sale và cập nhật discountPrice cho biến thể
-  const handleFlashPriceChange = async (index, field, value) => {
+  // Xử lý thay đổi giá Flash Sale với debounce và tối ưu API calls
+  const handleFlashPriceChange = useCallback(async (index, field, value) => {
     const updated = [...form.products]
     updated[index][field] = value
     setForm((prev) => ({ ...prev, products: updated }))
     clearMessages()
 
-    // Cập nhật discountPrice cho tất cả biến thể của sản phẩm (cả edit và add mode)
     const product = updated[index]
+    
+    // Clear existing timer for this product
+    if (debounceTimers[product._id]) {
+      clearTimeout(debounceTimers[product._id])
+    }
+
+    // Validate input immediately
     if (product._id && value && !isNaN(value) && Number(value) > 0) {
       const flashSalePrice = Number(value)
-      if (flashSalePrice < product.originalPrice) {
-        setUpdatingVariants(prev => ({ ...prev, [product._id]: true }))
+      
+      if (flashSalePrice >= product.originalPrice) {
+        setWarning(`Giá Flash Sale phải thấp hơn giá gốc (${product.originalPrice.toLocaleString()} VND)`)
+        return
+      }
+
+      // Set pending update state
+      setPendingUpdates(prev => ({ ...prev, [product._id]: true }))
+
+      // Create new debounced timer
+      const timer = setTimeout(async () => {
         try {
+          setUpdatingVariants(prev => ({ ...prev, [product._id]: true }))
+          
           // Thay thế hoàn toàn discountPrice bằng giá Flash Sale
           await updateProductVariantsDiscountPrice(product._id, flashSalePrice)
+          
           setSuccess(`Đã cập nhật giá Flash Sale cho tất cả biến thể của sản phẩm "${product.productName}"`)
+          setPendingUpdates(prev => ({ ...prev, [product._id]: false }))
         } catch (err) {
           console.error('Lỗi khi cập nhật discountPrice:', err)
           setError(`Không thể cập nhật giá Flash Sale cho biến thể: ${err.message}`)
+          setPendingUpdates(prev => ({ ...prev, [product._id]: false }))
         } finally {
           setUpdatingVariants(prev => ({ ...prev, [product._id]: false }))
         }
-      } else {
-        setWarning(`Giá Flash Sale phải thấp hơn giá gốc (${product.originalPrice.toLocaleString()} VND)`)
-      }
+      }, 1000) // 1 second debounce
+
+      setDebounceTimers(prev => ({ ...prev, [product._id]: timer }))
+    } else {
+      // Clear pending update if input is invalid
+      setPendingUpdates(prev => ({ ...prev, [product._id]: false }))
     }
-  }
+  }, [form.products, debounceTimers])
 
   const handleAddProduct = () => {
     setForm((prev) => ({
@@ -512,7 +546,8 @@ const AddFlashSale = ({ open, onClose, onSave, initialData }) => {
         '& .MuiDialog-paper': {
           borderRadius: 3,
           boxShadow: '0 4px 24px rgba(0, 0, 0, 0.06)',
-          border: '1px solid #e2e8f0'
+          border: '1px solid #e2e8f0',
+          maxHeight:'75vh'
         }
       }}
     >
@@ -691,7 +726,7 @@ const AddFlashSale = ({ open, onClose, onSave, initialData }) => {
               }}
             >
               <Typography variant='body2'>
-                Khi nhập giá Flash Sale, hệ thống sẽ tự động cập nhật giá giảm (discountPrice) cho tất cả biến thể của sản phẩm đó.
+                Khi nhập giá Flash Sale, hệ thống sẽ tự động cập nhật giá giảm (discountPrice) cho tất cả biến thể của sản phẩm đó sau 1 giây ngừng nhập để tối ưu hiệu suất.
               </Typography>
             </Alert>
 
@@ -819,25 +854,39 @@ const AddFlashSale = ({ open, onClose, onSave, initialData }) => {
                           required
                           disabled={false}
                           inputProps={{ min: 0 }}
+                          InputProps={{
+                            endAdornment: (
+                              <InputAdornment position='end'>
+                                {pendingUpdates[product._id] && (
+                                  <Chip
+                                    label="Đang chờ..."
+                                    size="small"
+                                    sx={{
+                                      height: 20,
+                                      fontSize: '0.7rem',
+                                      backgroundColor: alpha(theme.palette.warning.main, 0.1),
+                                      color: theme.palette.warning.main
+                                    }}
+                                  />
+                                )}
+                                {updatingVariants[product._id] && (
+                                  <CircularProgress size={16} sx={{ color: '#3b82f6' }} />
+                                )}
+                              </InputAdornment>
+                            )
+                          }}
                           sx={{
                             '& .MuiOutlinedInput-root': {
                               borderRadius: 2,
-                              backgroundColor: '#fff'
+                              backgroundColor: pendingUpdates[product._id] 
+                                ? alpha(theme.palette.warning.main, 0.05)
+                                : '#fff',
+                              borderColor: pendingUpdates[product._id] 
+                                ? theme.palette.warning.main 
+                                : undefined
                             }
                           }}
                         />
-                        {updatingVariants[product._id] && (
-                          <CircularProgress
-                            size={20}
-                            sx={{
-                              position: 'absolute',
-                              right: 12,
-                              top: '50%',
-                              transform: 'translateY(-50%)',
-                              color: '#3b82f6'
-                            }}
-                          />
-                        )}
                       </Box>
                     </Grid>
                     <Grid item xs={12} sm={1}>
@@ -885,12 +934,19 @@ const AddFlashSale = ({ open, onClose, onSave, initialData }) => {
                         <span className="text-sm font-medium text-gray-700">
                           Biến thể sẽ được cập nhật ({productVariants[product._id].length} biến thể):
                         </span>
-                        {updatingVariants[product._id] && (
-                          <div className="flex items-center text-blue-600">
-                            <CircularProgress size={16} />
-                            <span className="ml-1 text-xs">Đang cập nhật...</span>
-                          </div>
-                        )}
+                        <div className="flex items-center gap-2">
+                          {pendingUpdates[product._id] && (
+                            <span className="text-xs text-orange-600 font-medium">
+                              Đang chờ cập nhật...
+                            </span>
+                          )}
+                          {updatingVariants[product._id] && (
+                            <div className="flex items-center text-blue-600">
+                              <CircularProgress size={16} />
+                              <span className="ml-1 text-xs">Đang cập nhật...</span>
+                            </div>
+                          )}
+                        </div>
                       </div>
                       <div className="space-y-1">
                         {productVariants[product._id].map((variant, vIndex) => (

@@ -1,6 +1,7 @@
 import { StatusCodes } from 'http-status-codes'
 
 import { CategoryModel } from '~/models/CategoryModel'
+import { ProductModel } from '~/models/ProductModel'
 import ApiError from '~/utils/ApiError'
 import { slugify } from '~/utils/formatters'
 import getDateRange from '~/utils/getDateRange'
@@ -210,6 +211,65 @@ const getChildCategories = async (parentId) => {
   }
 }
 
+const getCategoriesWithProducts = async () => {
+  // eslint-disable-next-line no-useless-catch
+  try {
+    const categoriesWithProducts = await CategoryModel.aggregate([
+      {
+        $match: {
+          destroy: false
+        }
+      },
+      {
+        $lookup: {
+          from: 'products',
+          localField: '_id',
+          foreignField: 'categoryId',
+          pipeline: [
+            {
+              $match: {
+                destroy: false
+              }
+            }
+          ],
+          as: 'products'
+        }
+      },
+      {
+        $addFields: {
+          productCount: { $size: '$products' }
+        }
+      },
+      {
+        $match: {
+          productCount: { $gt: 0 }
+        }
+      },
+      {
+        $project: {
+          _id: 1,
+          name: 1,
+          slug: 1,
+          description: 1,
+          image: 1,
+          banner: 1,
+          parent: 1,
+          productCount: 1,
+          createdAt: 1,
+          updatedAt: 1
+        }
+      },
+      {
+        $sort: { name: 1 }
+      }
+    ])
+
+    return categoriesWithProducts
+  } catch (err) {
+    throw err
+  }
+}
+
 export const categoriesService = {
   createCategory,
   getCategoryList,
@@ -217,5 +277,6 @@ export const categoriesService = {
   getCategoryBySlug,
   updateCategory,
   deleteCategory,
-  getChildCategories
+  getChildCategories,
+  getCategoriesWithProducts
 }

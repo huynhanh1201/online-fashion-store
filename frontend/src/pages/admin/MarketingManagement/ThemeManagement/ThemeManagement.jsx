@@ -40,9 +40,9 @@ import useTheme from '~/hooks/useTheme'
 const predefinedThemes = {
   modernBlue: {
     name: 'Modern Blue',
-    primary: '#2563eb',
-    secondary: '#64748b',
-    accent: '#1e40af',
+    primary: '#1A3C7B',
+    secondary: '#2360cf',
+    accent: '#093d9c',
     success: '#059669',
     warning: '#d97706',
     error: '#dc2626',

@@ -16,7 +16,8 @@ import {
   CardMedia,
   Tooltip,
   useTheme,
-  alpha
+  alpha,
+  Autocomplete
 } from '@mui/material'
 import { 
   Delete as DeleteIcon,
@@ -29,6 +30,7 @@ import {
   updateFeaturedCategory,
   validateFeaturedCategoryContent
 } from '~/services/admin/webConfig/featuredcategoryService.js'
+import { getCategoriesWithProducts } from '~/services/admin/categoryService.js'
 import { URI, CLOUD_FOLDER } from '~/utils/constants.js'
 import { optimizeCloudinaryUrl } from '~/utils/cloudinary.js'
 
@@ -66,11 +68,14 @@ const AddFeaturedCategory = ({ open, onClose, onSuccess, editIndex = null }) => 
   const [validationErrors, setValidationErrors] = useState([])
   const [uploadingImage, setUploadingImage] = useState(false)
   const [imagePreview, setImagePreview] = useState('')
+  const [categoriesWithProducts, setCategoriesWithProducts] = useState([])
+  const [loadingCategories, setLoadingCategories] = useState(false)
   
   const imageInputRef = useRef(null)
 
   useEffect(() => {
     if (open) {
+      fetchCategoriesWithProducts()
       if (editIndex !== null) {
         fetchFeaturedCategories()
       }
@@ -79,6 +84,19 @@ const AddFeaturedCategory = ({ open, onClose, onSuccess, editIndex = null }) => 
       setValidationErrors([])
     }
   }, [open, editIndex])
+
+  const fetchCategoriesWithProducts = async () => {
+    setLoadingCategories(true)
+    try {
+      const categories = await getCategoriesWithProducts()
+      setCategoriesWithProducts(categories)
+    } catch (error) {
+      console.error('Error fetching categories with products:', error)
+      setError('Không thể tải danh sách danh mục')
+    } finally {
+      setLoadingCategories(false)
+    }
+  }
 
   const fetchFeaturedCategories = async () => {
     setFetching(true)
@@ -206,6 +224,7 @@ const AddFeaturedCategory = ({ open, onClose, onSuccess, editIndex = null }) => 
   const handleClose = () => {
     setForm({ name: '', imageUrl: '', link: '' })
     setImagePreview('')
+    setCategoriesWithProducts([])
     setError('')
     setSuccess('')
     setValidationErrors([])
@@ -214,6 +233,16 @@ const AddFeaturedCategory = ({ open, onClose, onSuccess, editIndex = null }) => 
 
   const isEditMode = editIndex !== null
   const title = isEditMode ? 'Chỉnh sửa danh mục nổi bật' : 'Thêm danh mục nổi bật'
+
+  const handleCategorySelect = (event, selectedCategory) => {
+    if (selectedCategory) {
+      setForm(prev => ({
+        ...prev,
+        name: selectedCategory.name,
+        link: `category/${selectedCategory.slug}`
+      }))
+    }
+  }
 
   return (
     <Dialog 
@@ -280,13 +309,45 @@ const AddFeaturedCategory = ({ open, onClose, onSuccess, editIndex = null }) => 
             )}
 
             {/* Form Fields */}
+            <Autocomplete
+              options={categoriesWithProducts}
+              getOptionLabel={(option) => `${option.name} (${option.productCount} sản phẩm)`}
+              onChange={handleCategorySelect}
+              loading={loadingCategories}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label="Chọn danh mục"
+                  fullWidth
+                  required
+                  placeholder="Tìm kiếm danh mục có sản phẩm..."
+                  helperText="Chọn danh mục để tự động điền tên và link"
+                  sx={{
+                    '& .MuiOutlinedInput-root': {
+                      borderRadius: 2
+                    }
+                  }}
+                />
+              )}
+              renderOption={(props, option) => (
+                <Box component="li" {...props}>
+                  <Box>
+                    <Typography variant="body1">{option.name}</Typography>
+                    <Typography variant="caption" color="text.secondary">
+                      {option.productCount} sản phẩm • Link: category/{option.slug}
+                    </Typography>
+                  </Box>
+                </Box>
+              )}
+            />
+
             <TextField
               label="Tên danh mục"
               value={form.name}
               onChange={(e) => handleChange('name', e.target.value)}
               fullWidth
               required
-              placeholder="Nhập tên danh mục nổi bật"
+              placeholder="Tên sẽ được tự động điền khi chọn danh mục"
               sx={{
                 '& .MuiOutlinedInput-root': {
                   borderRadius: 2
@@ -299,7 +360,7 @@ const AddFeaturedCategory = ({ open, onClose, onSuccess, editIndex = null }) => 
               value={form.link}
               onChange={(e) => handleChange('link', e.target.value)}
               fullWidth
-              placeholder="Nhập link danh mục (ví dụ: /categories/ao-so-mi)"
+              placeholder="Link sẽ được tự động điền khi chọn danh mục"
               helperText="Link sẽ được sử dụng khi người dùng click vào danh mục"
               sx={{
                 '& .MuiOutlinedInput-root': {

@@ -87,6 +87,16 @@ const getChildCategories = async (req, res, next) => {
   }
 }
 
+const getCategoriesWithProducts = async (req, res, next) => {
+  try {
+    const result = await categoriesService.getCategoriesWithProducts()
+
+    res.status(StatusCodes.OK).json(result)
+  } catch (err) {
+    next(err)
+  }
+}
+
 export const categoriesController = {
   createCategory,
   getCategoryList,
@@ -94,5 +104,6 @@ export const categoriesController = {
   getCategoryBySlug,
   updateCategory,
   deleteCategory,
-  getChildCategories
+  getChildCategories,
+  getCategoriesWithProducts
 }
