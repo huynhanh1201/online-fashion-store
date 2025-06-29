@@ -499,107 +499,107 @@ const ServiceHighlightManagement = () => {
       />
 
       {/* Delete Confirmation Dialog */}
-      < Dialog
+      <Dialog
         open={deleteConfirmOpen}
         onClose={handleDeleteCancel}
-        aria - labelledby="alert-dialog-title"
-      aria - describedby="alert-dialog-description"
-      PaperProps = {{
-        sx: {
-          borderRadius: 3,
-          minWidth: 400
-        }
-      }}
-      >
-      <DialogTitle
-        id="alert-dialog-title"
-        sx={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: 1,
-          color: '#dc2626',
-          fontWeight: 600
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+        PaperProps={{
+          sx: {
+            borderRadius: 3,
+            minWidth: 400
+          }
         }}
       >
-        <WarningIcon color="error" />
-        Xác nhận xóa dịch vụ
-      </DialogTitle>
-      <DialogContent>
-        <DialogContentText id="alert-dialog-description" sx={{ mb: 2 }}>
-          Bạn có chắc chắn muốn xóa dịch vụ này không?
-        </DialogContentText>
-        {deleteIndex !== null && serviceHighlights[deleteIndex] && (
-          <Box sx={{
-            p: 2,
-            backgroundColor: '#fef2f2',
-            borderRadius: 2,
-            border: '1px solid #fecaca',
+        <DialogTitle
+          id="alert-dialog-title"
+          sx={{
             display: 'flex',
             alignItems: 'center',
-            gap: 2
-          }}>
-            {serviceHighlights[deleteIndex].imageUrl && (
-              <img
-                src={optimizeCloudinaryUrl(serviceHighlights[deleteIndex].imageUrl, {
-                  width: 60,
-                  height: 60
-                })}
-                alt={serviceHighlights[deleteIndex].title}
-                style={{
-                  width: 60,
-                  height: 60,
-                  objectFit: 'contain',
-                  borderRadius: 6,
-                  border: '1px solid #e2e8f0'
-                }}
-              />
-            )}
-            <Box sx={{ flex: 1 }}>
-              <Typography variant="body1" sx={{ fontWeight: 600, color: '#1e293b' }}>
-                {serviceHighlights[deleteIndex].title}
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                {serviceHighlights[deleteIndex].subtitle}
-              </Typography>
-            </Box>
-          </Box>
-        )}
-        <DialogContentText sx={{ mt: 2, color: '#dc2626', fontWeight: 500 }}>
-          ⚠️ Hành động này không thể hoàn tác!
-        </DialogContentText>
-      </DialogContent>
-      <DialogActions sx={{ p: 3, pt: 1 }}>
-        <Button
-          onClick={handleDeleteCancel}
-          variant="outlined"
-          disabled={deleting}
-          sx={{
-            borderRadius: 2,
-            textTransform: 'none',
+            gap: 1,
+            color: '#dc2626',
             fontWeight: 600
           }}
         >
-          Hủy
-        </Button>
-        <Button
-          onClick={handleDeleteConfirm}
-          variant="contained"
-          disabled={deleting}
-          startIcon={deleting ? <CircularProgress size={16} /> : <DeleteIcon />}
-          sx={{
-            borderRadius: 2,
-            textTransform: 'none',
-            fontWeight: 600,
-            backgroundColor: '#dc2626',
-            '&:hover': {
-              backgroundColor: '#b91c1c'
-            }
-          }}
-        >
-          {deleting ? 'Đang xóa...' : 'Xóa dịch vụ'}
-        </Button>
-      </DialogActions>
-    </Dialog >
+          <WarningIcon color="error" />
+          Xác nhận xóa dịch vụ
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description" sx={{ mb: 2 }}>
+            Bạn có chắc chắn muốn xóa dịch vụ này không?
+          </DialogContentText>
+          {deleteIndex !== null && serviceHighlights[deleteIndex] && (
+            <Box sx={{
+              p: 2,
+              backgroundColor: '#fef2f2',
+              borderRadius: 2,
+              border: '1px solid #fecaca',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 2
+            }}>
+              {serviceHighlights[deleteIndex].imageUrl && (
+                <img
+                  src={optimizeCloudinaryUrl(serviceHighlights[deleteIndex].imageUrl, {
+                    width: 60,
+                    height: 60
+                  })}
+                  alt={serviceHighlights[deleteIndex].title}
+                  style={{
+                    width: 60,
+                    height: 60,
+                    objectFit: 'contain',
+                    borderRadius: 6,
+                    border: '1px solid #e2e8f0'
+                  }}
+                />
+              )}
+              <Box sx={{ flex: 1 }}>
+                <Typography variant="body1" sx={{ fontWeight: 600, color: '#1e293b' }}>
+                  {serviceHighlights[deleteIndex].title}
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  {serviceHighlights[deleteIndex].subtitle}
+                </Typography>
+              </Box>
+            </Box>
+          )}
+          <DialogContentText sx={{ mt: 2, color: '#dc2626', fontWeight: 500 }}>
+            ⚠️ Hành động này không thể hoàn tác!
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions sx={{ p: 3, pt: 1 }}>
+          <Button
+            onClick={handleDeleteCancel}
+            variant="outlined"
+            disabled={deleting}
+            sx={{
+              borderRadius: 2,
+              textTransform: 'none',
+              fontWeight: 600
+            }}
+          >
+            Hủy
+          </Button>
+          <Button
+            onClick={handleDeleteConfirm}
+            variant="contained"
+            disabled={deleting}
+            startIcon={deleting ? <CircularProgress size={16} /> : <DeleteIcon />}
+            sx={{
+              borderRadius: 2,
+              textTransform: 'none',
+              fontWeight: 600,
+              backgroundColor: '#dc2626',
+              '&:hover': {
+                backgroundColor: '#b91c1c'
+              }
+            }}
+          >
+            {deleting ? 'Đang xóa...' : 'Xóa dịch vụ'}
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box >
   )
 }
