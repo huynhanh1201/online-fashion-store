@@ -48,7 +48,7 @@ import {
   DragIndicator as DragIcon
 } from '@mui/icons-material'
 import AddHeader from './Modal/AddHeader.jsx'
-import AddMenu from './Modal/AddMenu.jsx'
+import MegaMenuEditor from './Modal/MegaMenuEditor.jsx'
 import { 
   getHeaderConfig, 
   getMenuConfig, 
@@ -395,8 +395,8 @@ const HeaderManagement = () => {
           }}
         >
           <Tab label="Logo & Nội dung thông báo chạy" />
-          <Tab label="Quản lý Menu mở rộng" />
-          <Tab label="Quản lý Menu danh mục" />
+          <Tab label="Chỉnh sửa Menu mở rộng" />
+          <Tab label="Chỉnh sửa menu danh mục" />
         </Tabs>
       </Card>
 
@@ -1225,7 +1225,7 @@ const HeaderManagement = () => {
         onSuccess={handleModalSuccess}
       />
 
-      <AddMenu
+      <MegaMenuEditor
         open={openMenuModal}
         onClose={() => setOpenMenuModal(false)}
         onSuccess={handleMenuModalSuccess}

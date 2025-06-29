@@ -1,0 +1,92 @@
+/* Text Selection Management */
+
+/* Global text selection enable */
+* {
+  -webkit-user-select: text;
+  -moz-user-select: text;
+  -ms-user-select: text;
+  user-select: text;
+}
+
+/* Disable selection for specific UI elements */
+.no-select,
+button,
+input,
+textarea,
+select,
+[role="button"],
+[role="tab"],
+[role="menuitem"],
+.nav-link,
+.logo,
+.menu-item,
+.header-element,
+.navigation-element,
+.interactive-element {
+  -webkit-user-select: none !important;
+  -moz-user-select: none !important;
+  -ms-user-select: none !important;
+  user-select: none !important;
+}
+
+/* Force enable selection for content areas */
+.content-selectable,
+.text-content,
+.product-description,
+.blog-content,
+.article-content,
+.product-info,
+.product-details,
+.description-text,
+.body-text {
+  -webkit-user-select: text !important;
+  -moz-user-select: text !important;
+  -ms-user-select: text !important;
+  user-select: text !important;
+}
+
+/* Enhanced selection styles */
+::selection {
+  background-color: rgba(26, 60, 123, 0.4) !important;
+  color: #000000 !important;
+  text-shadow: none !important;
+}
+
+::-moz-selection {
+  background-color: rgba(26, 60, 123, 0.4) !important;
+  color: #000000 !important;
+  text-shadow: none !important;
+}
+
+/* Ensure table content is selectable */
+table td,
+table th,
+tbody td,
+tbody th {
+  -webkit-user-select: text !important;
+  -moz-user-select: text !important;
+  -ms-user-select: text !important;
+  user-select: text !important;
+}
+
+/* Ensure list content is selectable */
+ul li,
+ol li,
+dl dt,
+dl dd {
+  -webkit-user-select: text !important;
+  -moz-user-select: text !important;
+  -ms-user-select: text !important;
+  user-select: text !important;
+}
+
+/* Ensure paragraph and heading content is selectable */
+p,
+h1, h2, h3, h4, h5, h6,
+span,
+div:not(.no-select) {
+  -webkit-user-select: text !important;
+  -moz-user-select: text !important;
+  -ms-user-select: text !important;
+  user-select: text !important;
+} 

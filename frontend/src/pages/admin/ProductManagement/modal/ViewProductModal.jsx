@@ -328,6 +328,7 @@ const ViewProductModal = ({
               </Typography>
             ) : (
               <Box
+                className="content-selectable"
                 sx={{
                   width: '100%',
                   mt: 2,

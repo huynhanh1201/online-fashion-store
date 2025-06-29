@@ -375,6 +375,7 @@ const BlogDetail = () => {
 
             {/* EditContent */}
             <div
+              className="content-selectable"
               style={{
                 fontSize: '16px',
                 lineHeight: '1.7',

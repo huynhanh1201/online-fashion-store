@@ -29,6 +29,7 @@ export default function ViewDescriptionModal({ open, onClose, product }) {
         {' '}
         {/* Added overflowY for scrollable content */}
         <Box
+          className="content-selectable"
           sx={{
             width: '100%',
             '& img': {

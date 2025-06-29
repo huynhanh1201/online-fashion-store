@@ -265,7 +265,28 @@ export const validateMenuContent = (content) => {
 // Helper function to get default menu structure
 export const getDefaultMenuStructure = () => {
   return {
-    mainMenu: [],
+    mainMenu: [
+      {
+        label: 'Sản phẩm',
+        url: '/product',
+        visible: true,
+        order: 1,
+        children: [
+          {
+            label: 'Tất cả sản phẩm',
+            url: '/product',
+            visible: true,
+            order: 1
+          },
+          {
+            label: 'Sản phẩm mới',
+            url: '/productnews',
+            visible: true,
+            order: 2
+          }
+        ]
+      }
+    ],
     mobileMenu: [],
     footerMenu: [],
     settings: {
@@ -278,7 +299,9 @@ export const getDefaultMenuStructure = () => {
         maxColumns: 4,
         columnWidth: 'auto',
         showIcons: false,
-        animationDuration: 350
+        animationDuration: 350,
+        showCategoryImages: false,
+        enableHoverEffects: true
       }
     }
   }

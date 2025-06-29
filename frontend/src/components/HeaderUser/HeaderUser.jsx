@@ -90,6 +90,7 @@ const HeaderUser = () => {
               <Typography
                 variant='h6'
                 noWrap
+                className="no-select"
                 sx={{
                   fontSize: { xs: '0.9rem', sm: '1.1rem', md: '1.25rem' },
                   cursor: 'pointer',
@@ -104,6 +105,7 @@ const HeaderUser = () => {
 
             {/* Center Section - Desktop Menu */}
             <Box
+              className="no-select"
               sx={{
                 display: { xs: 'none', md: 'flex' },
                 flexGrow: 1,

@@ -77,7 +77,7 @@ const HeaderCategories = ({
   }
 
   return (
-    <div style={styles.container}>
+    <div className="no-select" style={styles.container}>
       {rows.map((row, rowIdx) => (
         <div
           key={rowIdx}

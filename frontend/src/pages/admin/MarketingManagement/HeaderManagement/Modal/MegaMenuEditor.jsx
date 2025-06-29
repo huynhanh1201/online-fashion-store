@@ -30,7 +30,10 @@ import {
   Autocomplete,
   Tabs,
   Tab,
-  Paper
+  Paper,
+  Grid,
+  Card,
+  CardContent
 } from '@mui/material'
 import {
   Close as CloseIcon,
@@ -42,7 +45,9 @@ import {
   Visibility as VisibilityIcon,
   VisibilityOff as VisibilityOffIcon,
   Preview as PreviewIcon,
-  Settings as SettingsIcon
+  Settings as SettingsIcon,
+  Category as CategoryIcon,
+  ViewColumn as ViewColumnIcon
 } from '@mui/icons-material'
 import { 
   saveMenuConfig, 
@@ -52,7 +57,7 @@ import {
 import { getCategories } from '~/services/admin/categoryService.js'
 import MenuPreview from './MenuPreview.jsx'
 
-const AddMenu = ({ open, onClose, onSuccess, initialData = null }) => {
+const MegaMenuEditor = ({ open, onClose, onSuccess, initialData = null }) => {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [menuData, setMenuData] = useState(getDefaultMenuStructure())
@@ -64,10 +69,21 @@ const AddMenu = ({ open, onClose, onSuccess, initialData = null }) => {
   const [categoriesLoading, setCategoriesLoading] = useState(false)
   const [urlType, setUrlType] = useState('manual') // 'manual' or 'category'
   const [activeTab, setActiveTab] = useState(0) // 0: Editor, 1: Preview
+  const [megamenuSettings, setMegamenuSettings] = useState({
+    maxColumns: 4,
+    columnWidth: 'auto',
+    showIcons: false,
+    animationDuration: 350,
+    showCategoryImages: false,
+    enableHoverEffects: true
+  })
 
   useEffect(() => {
     if (initialData && initialData.mainMenu && initialData.mainMenu.length > 0) {
       setMenuData(initialData)
+      if (initialData.settings?.megamenuSettings) {
+        setMegamenuSettings(initialData.settings.megamenuSettings)
+      }
     } else {
       setMenuData(getDefaultMenuStructure())
     }
@@ -104,8 +120,17 @@ const AddMenu = ({ open, onClose, onSuccess, initialData = null }) => {
         return
       }
 
-      await saveMenuConfig(menuData)
-      onSuccess(menuData)
+      // Cập nhật megamenu settings
+      const updatedMenuData = {
+        ...menuData,
+        settings: {
+          ...menuData.settings,
+          megamenuSettings
+        }
+      }
+
+      await saveMenuConfig(updatedMenuData)
+      onSuccess(updatedMenuData)
       onClose()
     } catch (err) {
       setError(err.message)
@@ -407,14 +432,113 @@ const AddMenu = ({ open, onClose, onSuccess, initialData = null }) => {
     </Box>
   )
 
+  // Render Megamenu Settings
+  const renderMegamenuSettings = () => (
+    <Card sx={{ mb: 3 }}>
+      <CardContent>
+        <Typography variant="h6" sx={{ mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
+          <ViewColumnIcon />
+          Cài đặt Megamenu
+        </Typography>
+        <Grid container spacing={3}>
+          <Grid item xs={12} sm={6}>
+            <FormControl fullWidth>
+              <InputLabel>Số cột tối đa</InputLabel>
+              <Select
+                value={megamenuSettings.maxColumns}
+                onChange={(e) => setMegamenuSettings(prev => ({ ...prev, maxColumns: e.target.value }))}
+                label="Số cột tối đa"
+              >
+                <MenuItem value={2}>2 cột</MenuItem>
+                <MenuItem value={3}>3 cột</MenuItem>
+                <MenuItem value={4}>4 cột</MenuItem>
+                <MenuItem value={5}>5 cột</MenuItem>
+                <MenuItem value={6}>6 cột</MenuItem>
+              </Select>
+            </FormControl>
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <FormControl fullWidth>
+              <InputLabel>Chiều rộng cột</InputLabel>
+              <Select
+                value={megamenuSettings.columnWidth}
+                onChange={(e) => setMegamenuSettings(prev => ({ ...prev, columnWidth: e.target.value }))}
+                label="Chiều rộng cột"
+              >
+                <MenuItem value="auto">Tự động</MenuItem>
+                <MenuItem value="200px">200px</MenuItem>
+                <MenuItem value="250px">250px</MenuItem>
+                <MenuItem value="300px">300px</MenuItem>
+              </Select>
+            </FormControl>
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <FormControlLabel
+              control={
+                <Switch
+                  checked={megamenuSettings.showIcons}
+                  onChange={(e) => setMegamenuSettings(prev => ({ ...prev, showIcons: e.target.checked }))}
+                />
+              }
+              label="Hiển thị icon"
+            />
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <FormControlLabel
+              control={
+                <Switch
+                  checked={megamenuSettings.showCategoryImages}
+                  onChange={(e) => setMegamenuSettings(prev => ({ ...prev, showCategoryImages: e.target.checked }))}
+                />
+              }
+              label="Hiển thị ảnh danh mục"
+            />
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <FormControlLabel
+              control={
+                <Switch
+                  checked={megamenuSettings.enableHoverEffects}
+                  onChange={(e) => setMegamenuSettings(prev => ({ ...prev, enableHoverEffects: e.target.checked }))}
+                />
+              }
+              label="Hiệu ứng hover"
+            />
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <TextField
+              label="Thời gian animation (ms)"
+              type="number"
+              value={megamenuSettings.animationDuration}
+              onChange={(e) => setMegamenuSettings(prev => ({ ...prev, animationDuration: parseInt(e.target.value) || 350 }))}
+              fullWidth
+              inputProps={{ min: 100, max: 1000, step: 50 }}
+            />
+          </Grid>
+        </Grid>
+      </CardContent>
+    </Card>
+  )
+
   const renderTabContent = () => {
     if (activeTab === 0) {
       return (
         <>
           <Alert severity="info" sx={{ mb: 2 }}>
-            Kéo/thả thứ tự bằng nút Lên/Xuống. Nhấn vào từng mục để chỉnh sửa, thêm submenu hoặc xóa. Submenu sẽ hiển thị lồng bên trong.<br/>
-            <b>Lưu ý:</b> Menu chỉ hỗ trợ 2 cấp (menu & submenu). Menu chính chỉ cần tên, URL chỉ cần thiết cho submenu.
+            <Typography variant="body2">
+              <strong>Megamenu Editor:</strong> Chỉnh sửa menu sẽ hiển thị khi hover vào "Sản phẩm". 
+              Menu chính sẽ trở thành tiêu đề cột, submenu sẽ hiển thị bên dưới.<br/>
+              <b>Lưu ý:</b> Menu "Sản phẩm" sẽ luôn hiển thị trong header. Các menu khác có thể có hoặc không có submenu.
+              Menu chính chỉ cần tên, URL chỉ cần thiết cho submenu.
+            </Typography>
           </Alert>
+          
+          {renderMegamenuSettings()}
+          
+          <Typography variant="h6" sx={{ mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
+            <CategoryIcon />
+            Quản lý Menu Items
+          </Typography>
           {renderTreeMenu('mainMenu')}
         </>
       )
@@ -437,7 +561,7 @@ const AddMenu = ({ open, onClose, onSuccess, initialData = null }) => {
         <DialogTitle sx={{ pb: 1 }}>
           <Stack direction="row" alignItems="center" justifyContent="space-between">
             <Typography variant="h5" sx={{ fontWeight: 700 }}>
-              {initialData ? 'Chỉnh sửa menu' : 'Tạo menu mới'}
+              {initialData ? 'Chỉnh sửa Megamenu' : 'Tạo Megamenu mới'}
             </Typography>
             <IconButton onClick={onClose}>
               <CloseIcon />
@@ -494,7 +618,7 @@ const AddMenu = ({ open, onClose, onSuccess, initialData = null }) => {
               }
             }}
           >
-            {loading ? 'Đang lưu...' : 'Lưu menu'}
+            {loading ? 'Đang lưu...' : 'Lưu Megamenu'}
           </Button>
         </DialogActions>
       </Dialog>
@@ -535,7 +659,7 @@ const AddMenu = ({ open, onClose, onSuccess, initialData = null }) => {
                   label="Loại URL"
                 >
                   <MenuItem value="manual">Nhập URL thủ công</MenuItem>
-                  <MenuItem value="category">Chọn từ danh mục hiện có</MenuItem>
+                  <MenuItem value="category">Chọn từ danh mục con hiện có</MenuItem>
                 </Select>
               </FormControl>
             )}
@@ -550,12 +674,12 @@ const AddMenu = ({ open, onClose, onSuccess, initialData = null }) => {
                   fullWidth
                   required
                   placeholder="/category/example-slug"
-                  helperText="Nhập URL (ví dụ: /category/ten-danh-muc) hoặc chọn 'Chọn từ danh mục hiện có' ở trên"
+                  helperText="Nhập URL (ví dụ: /category/ten-danh-muc) hoặc chọn 'Chọn từ danh mục con hiện có' ở trên"
                 />
               ) : null
             ) : editingSubIndex >= 0 ? (
               <Autocomplete
-                options={categories}
+                options={categories.filter(cat => cat.parent)}
                 getOptionLabel={(option) => option.name}
                 loading={categoriesLoading}
                 value={categories.find(cat => 
@@ -565,9 +689,9 @@ const AddMenu = ({ open, onClose, onSuccess, initialData = null }) => {
                 renderInput={(params) => (
                   <TextField
                     {...params}
-                    label="Chọn danh mục"
+                    label="Chọn danh mục con"
                     required
-                    helperText="Chọn danh mục để tự động lấy URL. Tên menu có thể tùy chỉnh riêng."
+                    helperText="Chọn danh mục con để tự động lấy URL. Tên menu có thể tùy chỉnh riêng."
                     InputProps={{
                       ...params.InputProps,
                       endAdornment: (
@@ -588,10 +712,15 @@ const AddMenu = ({ open, onClose, onSuccess, initialData = null }) => {
                       <Typography variant="caption" color="text.secondary">
                         {option.link || `/category/${option.slug}`}
                       </Typography>
+                      {option.parent && (
+                        <Typography variant="caption" color="text.secondary" sx={{ fontStyle: 'italic' }}>
+                          Danh mục con của: {option.parent.name}
+                        </Typography>
+                      )}
                     </Stack>
                   </Box>
                 )}
-                noOptionsText="Không tìm thấy danh mục nào"
+                noOptionsText="Không tìm thấy danh mục con nào"
               />
             ) : null}
 
@@ -620,7 +749,7 @@ const AddMenu = ({ open, onClose, onSuccess, initialData = null }) => {
                 <Typography variant="body2">
                   <strong>Megamenu Column:</strong> Item này sẽ hiển thị như một cột trong megamenu khi hover vào menu cha.
                   {urlType === 'category' && (
-                    <><br /><strong>Lưu ý:</strong> Khi chọn danh mục, URL sẽ được tự động điền theo định dạng /category/slug. Tên menu có thể tùy chỉnh theo ý muốn.</>
+                    <><br /><strong>Lưu ý:</strong> Chỉ hiển thị danh mục con (có danh mục cha). Khi chọn danh mục, URL sẽ được tự động điền theo định dạng /category/slug. Tên menu có thể tùy chỉnh theo ý muốn.</>
                   )}
                 </Typography>
               </Alert>
@@ -650,4 +779,4 @@ const AddMenu = ({ open, onClose, onSuccess, initialData = null }) => {
   )
 }
 
-export default AddMenu
+export default MegaMenuEditor
