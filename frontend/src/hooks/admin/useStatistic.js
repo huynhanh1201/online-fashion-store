@@ -2,18 +2,25 @@ import React, { useState } from 'react'
 import {
   getInventoryStatistics,
   getProductsStatistics,
-  getOrderStatistics
+  getOrderStatistics,
+  getAccountStatistics,
+  finaceStatistics
 } from '~/services/admin/StatisticService.js'
 
 export const useInventoryStatistics = () => {
   const [statistics, setStatistics] = useState([])
+  const [accountStatistics, setAccountStatistics] = useState([])
+  const [warehouseStatistics, setWarehouseStatistics] = useState([])
+  const [orderStatistics, setOrderStatistics] = useState([])
+  const [productStatistics, setProductStatistics] = useState([])
   const [loading, setLoading] = useState(true)
+  const [financeStatistics, setFinanceStatistics] = useState([])
 
   const fetchStatistics = async () => {
     setLoading(true)
     try {
       const data = await getInventoryStatistics()
-      setStatistics(data)
+      setWarehouseStatistics(data)
     } catch (error) {
       console.error('Error fetching inventory statistics:', error)
     } finally {
@@ -25,7 +32,7 @@ export const useInventoryStatistics = () => {
     setLoading(true)
     try {
       const data = await getProductsStatistics()
-      setStatistics(data)
+      setProductStatistics(data)
     } catch (error) {
       console.error('Error fetching products statistics:', error)
     } finally {
@@ -37,9 +44,32 @@ export const useInventoryStatistics = () => {
     setLoading(true)
     try {
       const data = await getOrderStatistics()
-      setStatistics(data)
+      setOrderStatistics(data)
     } catch (error) {
       console.error('Error fetching orders statistics:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const fetchAccountStatistics = async () => {
+    setLoading(true)
+    try {
+      const data = await getAccountStatistics()
+      setAccountStatistics(data)
+    } catch (error) {
+      console.error('Error fetching account statistics:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
+  const fetchFinanceStatistics = async (year) => {
+    setLoading(true)
+    try {
+      const data = await finaceStatistics(year)
+      setFinanceStatistics(data)
+    } catch (error) {
+      console.error('Error fetching finance statistics:', error)
     } finally {
       setLoading(false)
     }
@@ -50,7 +80,20 @@ export const useInventoryStatistics = () => {
     loading,
     fetchStatistics,
     fetchProductsStatistics,
-    fetchOrdersStatistics
+    fetchOrdersStatistics,
+    fetchFinanceStatistics,
+    fetchAccountStatistics,
+    accountStatistics,
+    setAccountStatistics,
+    warehouseStatistics,
+    setWarehouseStatistics,
+    orderStatistics,
+    setOrderStatistics,
+    productStatistics,
+    setProductStatistics,
+    setStatistics,
+    financeStatistics,
+    setFinanceStatistics
   }
 }
 

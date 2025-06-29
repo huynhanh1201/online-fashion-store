@@ -11,16 +11,28 @@ Router.route('/inventory').get(
   statisticsController.getInventoryStatistics
 )
 
-// Thống sản phẩm.
+// Thống kê sản phẩm.
 Router.route('/product').get(
   authMiddleware.isAuthorized,
   statisticsController.getProductStatistics
 )
 
-// Thống sản phẩm.
+// Thống kê đơn hàng.
 Router.route('/order').get(
   authMiddleware.isAuthorized,
   statisticsController.getOrderStatistics
+)
+
+// Thống kê tài chính.
+Router.route('/finance').get(
+  authMiddleware.isAuthorized,
+  statisticsController.getFinanceStatistics
+)
+
+// Thống kê tài khoản.
+Router.route('/user').get(
+  authMiddleware.isAuthorized,
+  statisticsController.getUserStatistics
 )
 
 export const statisticsRoute = Router

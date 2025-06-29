@@ -69,7 +69,7 @@ const AddAccountModal = ({ open, onClose, onSave, roles }) => {
         sx: StyleAdmin.OverlayModal
       }}
     >
-      <DialogTitle>Thêm tài khoản người dùng</DialogTitle>
+      <DialogTitle>Thêm tài khoản hệ thống</DialogTitle>
       <Divider sx={{ my: 0 }} />
       <DialogContent>
         <form id='add-user-form' onSubmit={handleSubmit(onSubmit)}>

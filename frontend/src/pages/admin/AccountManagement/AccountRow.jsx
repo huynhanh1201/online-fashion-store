@@ -49,7 +49,8 @@ export default function AccountRow({
   index,
   columns,
   handleOpenModal,
-  permissions = {}
+  permissions = {},
+  roles
 }) {
   return (
     <TableRow hover role='checkbox' tabIndex={-1}>
@@ -117,6 +118,10 @@ export default function AccountRow({
         }
 
         if (column.id === 'role') {
+          const roleLabel =
+            roles.find((r) => r.name === user?.role)?.label ||
+            'Không có vai trò'
+
           return (
             <TableCell
               key={column.id}
@@ -124,10 +129,10 @@ export default function AccountRow({
               sx={styles.cellPadding}
             >
               <Chip
-                label={user?.role.toUpperCase() || 'Không có vai trò'}
+                label={roleLabel.toUpperCase()}
                 size='large'
                 sx={{
-                  width: 130,
+                  maxWidth: 300,
                   fontWeight: 800,
                   backgroundColor: '#001f5d',
                   color: '#fff'

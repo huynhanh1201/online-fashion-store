@@ -19,7 +19,7 @@ import {
   alpha,
   Autocomplete
 } from '@mui/material'
-import { 
+import {
   Delete as DeleteIcon,
   CloudUpload as CloudUploadIcon,
   Close as CloseIcon
@@ -54,7 +54,12 @@ const uploadToCloudinary = async (file) => {
   return data.secure_url
 }
 
-const AddFeaturedCategory = ({ open, onClose, onSuccess, editIndex = null }) => {
+const AddFeaturedCategory = ({
+  open,
+  onClose,
+  onSuccess,
+  editIndex = null
+}) => {
   const theme = useTheme()
   const [form, setForm] = useState({
     name: '',
@@ -70,7 +75,7 @@ const AddFeaturedCategory = ({ open, onClose, onSuccess, editIndex = null }) => 
   const [imagePreview, setImagePreview] = useState('')
   const [categoriesWithProducts, setCategoriesWithProducts] = useState([])
   const [loadingCategories, setLoadingCategories] = useState(false)
-  
+
   const imageInputRef = useRef(null)
 
   useEffect(() => {
@@ -149,7 +154,7 @@ const AddFeaturedCategory = ({ open, onClose, onSuccess, editIndex = null }) => 
 
       // Upload to Cloudinary
       const imageUrl = await uploadToCloudinary(file)
-      
+
       // Update form
       setForm((prev) => ({
         ...prev,
@@ -206,14 +211,15 @@ const AddFeaturedCategory = ({ open, onClose, onSuccess, editIndex = null }) => 
         result = await addFeaturedCategory(form)
       }
 
-      setSuccess(editIndex !== null ? 'Cập nhật thành công!' : 'Thêm thành công!')
-      
+      setSuccess(
+        editIndex !== null ? 'Cập nhật thành công!' : 'Thêm thành công!'
+      )
+
       // Call success callback after a short delay
       setTimeout(() => {
         onSuccess(result)
         handleClose()
       }, 1000)
-
     } catch (error) {
       setError(error.message)
     } finally {
@@ -232,11 +238,13 @@ const AddFeaturedCategory = ({ open, onClose, onSuccess, editIndex = null }) => 
   }
 
   const isEditMode = editIndex !== null
-  const title = isEditMode ? 'Chỉnh sửa danh mục nổi bật' : 'Thêm danh mục nổi bật'
+  const title = isEditMode
+    ? 'Chỉnh sửa danh mục nổi bật'
+    : 'Thêm danh mục nổi bật'
 
   const handleCategorySelect = (event, selectedCategory) => {
     if (selectedCategory) {
-      setForm(prev => ({
+      setForm((prev) => ({
         ...prev,
         name: selectedCategory.name,
         link: `category/${selectedCategory.slug}`
@@ -245,28 +253,31 @@ const AddFeaturedCategory = ({ open, onClose, onSuccess, editIndex = null }) => 
   }
 
   return (
-    <Dialog 
-      open={open} 
+    <Dialog
+      open={open}
       onClose={handleClose}
-      maxWidth="md"
+      maxWidth='md'
       fullWidth
       PaperProps={{
         sx: {
           borderRadius: 3,
-          boxShadow: '0 20px 60px rgba(0, 0, 0, 0.1)'
+          boxShadow: '0 20px 60px rgba(0, 0, 0, 0.1)',
+          maxHeight: '75vh'
         }
       }}
     >
-      <DialogTitle sx={{ 
-        pb: 1,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between'
-      }}>
-        <Typography variant="h5" sx={{ fontWeight: 700, color: '#1e293b' }}>
+      <DialogTitle
+        sx={{
+          pb: 1,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between'
+        }}
+      >
+        <Typography variant='h5' sx={{ fontWeight: 700, color: '#1e293b' }}>
           {title}
         </Typography>
-        <IconButton onClick={handleClose} size="small">
+        <IconButton onClick={handleClose} size='small'>
           <CloseIcon />
         </IconButton>
       </DialogTitle>
@@ -280,28 +291,28 @@ const AddFeaturedCategory = ({ open, onClose, onSuccess, editIndex = null }) => 
           <Stack spacing={3}>
             {/* Error Alert */}
             {error && (
-              <Alert severity="error" onClose={() => setError('')}>
+              <Alert severity='error' onClose={() => setError('')}>
                 {error}
               </Alert>
             )}
 
             {/* Success Alert */}
             {success && (
-              <Alert severity="success" onClose={() => setSuccess('')}>
+              <Alert severity='success' onClose={() => setSuccess('')}>
                 {success}
               </Alert>
             )}
 
             {/* Validation Errors */}
             {validationErrors.length > 0 && (
-              <Alert severity="error">
-                <Typography variant="body2" sx={{ fontWeight: 600, mb: 1 }}>
+              <Alert severity='error'>
+                <Typography variant='body2' sx={{ fontWeight: 600, mb: 1 }}>
                   Vui lòng sửa các lỗi sau:
                 </Typography>
                 <ul style={{ margin: 0, paddingLeft: 20 }}>
                   {validationErrors.map((error, index) => (
                     <li key={index}>
-                      <Typography variant="body2">{error}</Typography>
+                      <Typography variant='body2'>{error}</Typography>
                     </li>
                   ))}
                 </ul>
@@ -311,17 +322,19 @@ const AddFeaturedCategory = ({ open, onClose, onSuccess, editIndex = null }) => 
             {/* Form Fields */}
             <Autocomplete
               options={categoriesWithProducts}
-              getOptionLabel={(option) => `${option.name} (${option.productCount} sản phẩm)`}
+              getOptionLabel={(option) =>
+                `${option.name} (${option.productCount} sản phẩm)`
+              }
               onChange={handleCategorySelect}
               loading={loadingCategories}
               renderInput={(params) => (
                 <TextField
                   {...params}
-                  label="Chọn danh mục"
+                  label='Chọn danh mục'
                   fullWidth
                   required
-                  placeholder="Tìm kiếm danh mục có sản phẩm..."
-                  helperText="Chọn danh mục để tự động điền tên và link"
+                  placeholder='Tìm kiếm danh mục có sản phẩm...'
+                  helperText='Chọn danh mục để tự động điền tên và link'
                   sx={{
                     '& .MuiOutlinedInput-root': {
                       borderRadius: 2
@@ -330,11 +343,12 @@ const AddFeaturedCategory = ({ open, onClose, onSuccess, editIndex = null }) => 
                 />
               )}
               renderOption={(props, option) => (
-                <Box component="li" {...props}>
+                <Box component='li' {...props}>
                   <Box>
-                    <Typography variant="body1">{option.name}</Typography>
-                    <Typography variant="caption" color="text.secondary">
-                      {option.productCount} sản phẩm • Link: category/{option.slug}
+                    <Typography variant='body1'>{option.name}</Typography>
+                    <Typography variant='caption' color='text.secondary'>
+                      {option.productCount} sản phẩm • Link: category/
+                      {option.slug}
                     </Typography>
                   </Box>
                 </Box>
@@ -342,12 +356,12 @@ const AddFeaturedCategory = ({ open, onClose, onSuccess, editIndex = null }) => 
             />
 
             <TextField
-              label="Tên danh mục"
+              label='Tên danh mục'
               value={form.name}
               onChange={(e) => handleChange('name', e.target.value)}
               fullWidth
               required
-              placeholder="Tên sẽ được tự động điền khi chọn danh mục"
+              placeholder='Tên sẽ được tự động điền khi chọn danh mục'
               sx={{
                 '& .MuiOutlinedInput-root': {
                   borderRadius: 2
@@ -356,12 +370,12 @@ const AddFeaturedCategory = ({ open, onClose, onSuccess, editIndex = null }) => 
             />
 
             <TextField
-              label="Link danh mục"
+              label='Link danh mục'
               value={form.link}
               onChange={(e) => handleChange('link', e.target.value)}
               fullWidth
-              placeholder="Link sẽ được tự động điền khi chọn danh mục"
-              helperText="Link sẽ được sử dụng khi người dùng click vào danh mục"
+              placeholder='Link sẽ được tự động điền khi chọn danh mục'
+              helperText='Link sẽ được sử dụng khi người dùng click vào danh mục'
               sx={{
                 '& .MuiOutlinedInput-root': {
                   borderRadius: 2
@@ -371,10 +385,13 @@ const AddFeaturedCategory = ({ open, onClose, onSuccess, editIndex = null }) => 
 
             {/* Image Upload Section */}
             <Box>
-              <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 2, color: '#374151' }}>
+              <Typography
+                variant='subtitle1'
+                sx={{ fontWeight: 600, mb: 2, color: '#374151' }}
+              >
                 Hình ảnh danh mục
               </Typography>
-              
+
               <Card
                 sx={{
                   border: '2px dashed #d1d5db',
@@ -392,8 +409,11 @@ const AddFeaturedCategory = ({ open, onClose, onSuccess, editIndex = null }) => 
                   <Box>
                     <Box sx={{ position: 'relative', display: 'inline-block' }}>
                       <img
-                        src={optimizeCloudinaryUrl(imagePreview, { width: 200, height: 150 })}
-                        alt="Preview"
+                        src={optimizeCloudinaryUrl(imagePreview, {
+                          width: 200,
+                          height: 150
+                        })}
+                        alt='Preview'
                         style={{
                           width: 200,
                           height: 150,
@@ -402,7 +422,7 @@ const AddFeaturedCategory = ({ open, onClose, onSuccess, editIndex = null }) => 
                           border: '1px solid #e5e7eb'
                         }}
                       />
-                      <Tooltip title="Xóa hình ảnh">
+                      <Tooltip title='Xóa hình ảnh'>
                         <IconButton
                           onClick={handleRemoveImage}
                           sx={{
@@ -415,13 +435,17 @@ const AddFeaturedCategory = ({ open, onClose, onSuccess, editIndex = null }) => 
                               backgroundColor: '#dc2626'
                             }
                           }}
-                          size="small"
+                          size='small'
                         >
-                          <DeleteIcon fontSize="small" />
+                          <DeleteIcon fontSize='small' />
                         </IconButton>
                       </Tooltip>
                     </Box>
-                    <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: 'block' }}>
+                    <Typography
+                      variant='caption'
+                      color='text.secondary'
+                      sx={{ mt: 1, display: 'block' }}
+                    >
                       Hình ảnh đã được tải lên
                     </Typography>
                   </Box>
@@ -436,11 +460,19 @@ const AddFeaturedCategory = ({ open, onClose, onSuccess, editIndex = null }) => 
                     }}
                     onClick={() => imageInputRef.current?.click()}
                   >
-                    <CloudUploadIcon sx={{ fontSize: 48, color: '#9ca3af', mb: 2 }} />
-                    <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-                      {uploadingImage ? 'Đang tải lên...' : 'Nhấp để tải hình ảnh'}
+                    <CloudUploadIcon
+                      sx={{ fontSize: 48, color: '#9ca3af', mb: 2 }}
+                    />
+                    <Typography
+                      variant='body2'
+                      color='text.secondary'
+                      sx={{ mb: 1 }}
+                    >
+                      {uploadingImage
+                        ? 'Đang tải lên...'
+                        : 'Nhấp để tải hình ảnh'}
                     </Typography>
-                    <Typography variant="caption" color="text.secondary">
+                    <Typography variant='caption' color='text.secondary'>
                       JPG, PNG, WebP (tối đa 5MB)
                     </Typography>
                     {uploadingImage && (
@@ -452,8 +484,8 @@ const AddFeaturedCategory = ({ open, onClose, onSuccess, editIndex = null }) => 
 
               <input
                 ref={imageInputRef}
-                type="file"
-                accept="image/*"
+                type='file'
+                accept='image/*'
                 onChange={handleImageUpload}
                 style={{ display: 'none' }}
               />
@@ -465,7 +497,7 @@ const AddFeaturedCategory = ({ open, onClose, onSuccess, editIndex = null }) => 
       <DialogActions sx={{ p: 3, pt: 1 }}>
         <Button
           onClick={handleClose}
-          variant="outlined"
+          variant='outlined'
           sx={{
             borderRadius: 2,
             textTransform: 'none',
@@ -476,7 +508,7 @@ const AddFeaturedCategory = ({ open, onClose, onSuccess, editIndex = null }) => 
         </Button>
         <Button
           onClick={handleSave}
-          variant="contained"
+          variant='contained'
           disabled={loading || uploadingImage}
           startIcon={loading ? <CircularProgress size={16} /> : null}
           sx={{
@@ -490,11 +522,11 @@ const AddFeaturedCategory = ({ open, onClose, onSuccess, editIndex = null }) => 
             }
           }}
         >
-          {loading ? 'Đang lưu...' : (isEditMode ? 'Cập nhật' : 'Thêm mới')}
+          {loading ? 'Đang lưu...' : isEditMode ? 'Cập nhật' : 'Thêm mới'}
         </Button>
       </DialogActions>
     </Dialog>
   )
 }
 
-export default AddFeaturedCategory 
+export default AddFeaturedCategory

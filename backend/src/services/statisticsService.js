@@ -6,6 +6,8 @@ import { CategoryModel } from '~/models/CategoryModel'
 import { VariantModel } from '~/models/VariantModel'
 import { OrderModel } from '~/models/OrderModel'
 import { CouponModel } from '~/models/CouponModel'
+import { UserModel } from '~/models/UserModel'
+import { OrderItemModel } from '~/models/OrderItemModel'
 
 const getInventoryStatistics = async () => {
   // eslint-disable-next-line no-useless-catch
@@ -378,8 +380,174 @@ const getOrderStatistics = async () => {
   }
 }
 
+const getFinanceStatistics = async (queryString) => {
+  // eslint-disable-next-line no-useless-catch
+  try {
+    const totalRevenuePromise = OrderModel.aggregate([
+      {
+        $match: {
+          status: 'Delivered'
+        }
+      },
+      {
+        $group: {
+          _id: null,
+          totalRevenue: { $sum: '$total' }
+        }
+      },
+      {
+        $project: {
+          _id: 0
+        }
+      }
+    ])
+
+    const totalCostPromise = OrderItemModel.aggregate([
+      // Join vào Order để lọc theo trạng thái
+      {
+        $lookup: {
+          from: 'orders',
+          localField: 'orderId',
+          foreignField: '_id',
+          as: 'order'
+        }
+      },
+      {
+        $unwind: '$order'
+      },
+      {
+        $match: {
+          'order.status': 'Delivered' // Lọc đúng đơn đã giao
+        }
+      },
+
+      // Join vào Variant để lấy importPrice
+      {
+        $lookup: {
+          from: 'variants',
+          localField: 'variantId',
+          foreignField: '_id',
+          as: 'variant'
+        }
+      },
+      {
+        $unwind: '$variant'
+      },
+
+      // Tính chi phí = quantity × importPrice
+      {
+        $addFields: {
+          itemCost: {
+            $multiply: ['$quantity', { $ifNull: ['$variant.importPrice', 0] }]
+          }
+        }
+      },
+
+      // Gom lại tổng vốn
+      {
+        $group: {
+          _id: null,
+          totalCost: { $sum: '$itemCost' }
+        }
+      },
+      {
+        $project: {
+          _id: 0,
+          totalCost: 1
+        }
+      }
+    ])
+
+    const startDate = new Date(queryString.year, 0, 1) // 0 = tháng 1
+    const endDate = new Date(queryString.year, 11, 31, 23, 59, 59, 999) // 11 = tháng 12
+
+    const monthlyStatsPromise = OrderModel.aggregate([
+      {
+        $match: {
+          status: 'Delivered',
+          createdAt: {
+            $gte: startDate,
+            $lte: endDate
+          }
+        }
+      },
+      {
+        $group: {
+          _id: { month: { $month: '$createdAt' } },
+          revenue: { $sum: '$total' }
+        }
+      },
+      {
+        $project: {
+          _id: 0,
+          month: '$_id.month',
+          revenue: 1
+        }
+      },
+      { $sort: { month: 1 } }
+    ])
+
+    const [totalRevenueRaw, totalCostRaw, monthlyStats] = await Promise.all([
+      totalRevenuePromise,
+      totalCostPromise,
+      monthlyStatsPromise
+    ])
+
+    const totalRevenue = totalRevenueRaw[0].totalRevenue || 0
+    const totalCost = totalCostRaw[0].totalCost || 0
+
+    const revenueChart = {
+      year: queryString.year,
+      monthlyStats
+    }
+
+    const result = {
+      totalRevenue: totalRevenue,
+      totalCost: totalCost,
+      totalProfit: totalRevenue - totalCost,
+      revenueChart
+    }
+
+    return result
+  } catch (err) {
+    throw err
+  }
+}
+
+const getUserStatistics = async () => {
+  // eslint-disable-next-line no-useless-catch
+  try {
+    const userStatsPromise = UserModel.aggregate([
+      {
+        $group: {
+          _id: '$role',
+          count: { $sum: 1 }
+        }
+      },
+      {
+        $project: {
+          _id: 0,
+          role: '$_id',
+          count: 1
+        }
+      }
+    ])
+
+    const [userStats] = await Promise.all([userStatsPromise])
+
+    const result = {
+      userStats: userStats
+    }
+    return result
+  } catch (err) {
+    throw err
+  }
+}
+
 export const statisticsService = {
   getInventoryStatistics,
   getProductStatistics,
-  getOrderStatistics
+  getOrderStatistics,
+  getUserStatistics,
+  getFinanceStatistics
 }

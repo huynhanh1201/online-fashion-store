@@ -3,6 +3,7 @@ import { extensions } from './editorExtensions'
 import { useEffect } from 'react'
 import MenuBar from './MenuBar' // Thanh công cụ bạn tự xây dựng
 import styled from '@emotion/styled'
+
 const StyledEditor = styled.div`
   .ProseMirror {
     min-height: 240px;
@@ -34,6 +35,21 @@ const StyledEditor = styled.div`
     border-radius: 4px;
   }
 `
+
+const StyledContainer = styled.div`
+  border: 1px solid #aaa;
+  position: relative;
+  overflow: auto;
+  max-height: 500px; /* Set a max height for the container */
+`
+
+const StyledMenuBar = styled.div`
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background-color: white; /* Ensure the background is solid */
+`
+
 export default function DescriptionEditor({
   control,
   name,
@@ -60,11 +76,13 @@ export default function DescriptionEditor({
   }, [editor, initialHtml])
 
   return (
-    <div style={{ border: '1px solid #aaa' }}>
-      <MenuBar editor={editor} onImageInsert={onImageInsert} />
+    <StyledContainer>
+      <StyledMenuBar>
+        <MenuBar editor={editor} onImageInsert={onImageInsert} />
+      </StyledMenuBar>
       <StyledEditor>
         <EditorContent editor={editor} />
       </StyledEditor>
-    </div>
+    </StyledContainer>
   )
 }

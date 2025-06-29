@@ -35,10 +35,10 @@ const DeleteUserModal = ({ open, onClose, user, onDelete }) => {
         sx: StyleAdmin.OverlayModal
       }}
     >
-      <DialogTitle>Xoá người dùng</DialogTitle>
+      <DialogTitle>Xoá khách hàng</DialogTitle>
       <Divider sx={{ my: 0 }} />
       <DialogContent>
-        Bạn có chắc chắn muốn xoá người dùng{' '}
+        Bạn có chắc chắn muốn xoá khách hàng{' '}
         <strong>{user?.name || user?.email || 'Không xác định'}</strong> không?
       </DialogContent>
       <Divider sx={{ my: 0 }} />

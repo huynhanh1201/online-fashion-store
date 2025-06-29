@@ -51,7 +51,7 @@ const EditUserModal = ({ open, onClose, user, onSave, roles }) => {
         sx: StyleAdmin.OverlayModal
       }}
     >
-      <DialogTitle>Cập nhật vai trò người dùng</DialogTitle>
+      <DialogTitle>Cập nhật vai trò khách hàng</DialogTitle>
       <Divider sx={{ my: 0 }} />
       <DialogContent>
         <form id='edit-user-form' onSubmit={handleSubmit(onSubmit)}>

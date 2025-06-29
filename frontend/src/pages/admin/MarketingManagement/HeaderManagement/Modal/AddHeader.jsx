@@ -243,8 +243,7 @@ const AddHeader = ({ open, onClose, onSuccess }) => {
         '& .MuiDialog-paper': {
           borderRadius: 3,
           boxShadow: '0 4px 24px rgba(0, 0, 0, 0.06)',
-          border: '1px solid #e2e8f0',
-          maxHeight: '90vh'
+          border: '1px solid #e2e8f0'
         }
       }}
     >

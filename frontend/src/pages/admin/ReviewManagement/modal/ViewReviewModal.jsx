@@ -17,6 +17,8 @@ import {
   TableRow,
   TableCell
 } from '@mui/material'
+import ArrowBackIcon from '@mui/icons-material/ArrowBack'
+import ArrowForwardIcon from '@mui/icons-material/ArrowForward'
 import ImageNotSupportedIcon from '@mui/icons-material/ImageNotSupported'
 import CloseIcon from '@mui/icons-material/Close'
 import StyleAdmin from '~/assets/StyleAdmin.jsx'
@@ -40,7 +42,6 @@ const ViewReviewModal = ({ open, onClose, review, onApprove }) => {
     type: '', // 'image' hoặc 'video'
     selectedIndex: 0
   })
-
   const handleApprove = (type) => {
     if (type === 'approved' && review && review._id) {
       onApprove(review._id, { moderationStatus: 'approved' })
@@ -332,6 +333,41 @@ const ViewReviewModal = ({ open, onClose, review, onApprove }) => {
                     }}
                   />
                 )}
+                <IconButton
+                  onClick={() =>
+                    setMediaPreview((prev) => ({
+                      ...prev,
+                      selectedIndex:
+                        (prev.selectedIndex - 1 + prev.items.length) %
+                        prev.items.length
+                    }))
+                  }
+                  sx={{
+                    position: 'absolute',
+                    left: 16,
+                    top: '50%',
+                    transform: 'translateY(-50%)'
+                  }}
+                >
+                  <ArrowBackIcon />
+                </IconButton>
+                <IconButton
+                  onClick={() =>
+                    setMediaPreview((prev) => ({
+                      ...prev,
+                      selectedIndex:
+                        (prev.selectedIndex + 1) % prev.items.length
+                    }))
+                  }
+                  sx={{
+                    position: 'absolute',
+                    right: 16,
+                    top: '50%',
+                    transform: 'translateY(-50%)'
+                  }}
+                >
+                  <ArrowForwardIcon />
+                </IconButton>
               </Box>
             )}
           </DialogContent>
