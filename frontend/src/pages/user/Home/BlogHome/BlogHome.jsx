@@ -33,31 +33,34 @@ const BlogHome = () => {
 
   // Format dữ liệu từ API để phù hợp với UI
   const formatBlogData = (blogData) => {
+    const title = blogData.title || ''
+    const subtitle = blogData.excerpt || blogData.subtitle || ''
+    const content = blogData.content
+      ? blogData.content.replace(/<[^>]*>/g, '')
+      : blogData.excerpt || ''
+
     return {
       id: blogData._id || blogData.id,
-      title: blogData.title || '',
-      subtitle: blogData.excerpt || blogData.subtitle || '',
+      title: title.length > 60 ? title.substring(0, 60) + '...' : title,
+      subtitle: subtitle.length > 80 ? subtitle.substring(0, 80) + '...' : subtitle,
       category: blogData.category || 'Tip',
       image: blogData.coverImage || blogData.thumbnail || blogData.image || '',
       date: blogData.publishedAt
         ? new Date(blogData.publishedAt).toLocaleDateString('vi-VN')
         : new Date(blogData.createdAt).toLocaleDateString('vi-VN'),
-      description: blogData.content
-        ? // Remove HTML tags and limit to 150 characters
-          blogData.content.replace(/<[^>]*>/g, '').substring(0, 150) + '...'
-        : blogData.excerpt || ''
+      description: content.length > 120 ? content.substring(0, 120) + '...' : content
     }
   }
 
   // Sử dụng dữ liệu từ API hoặc fallback và giới hạn 3 bài viết
-  const mainArticles = blogs.length > 0 ? blogs.slice(0, 3).map(formatBlogData) : []
+  const mainArticles =
+    blogs.length > 0 ? blogs.slice(0, 3).map(formatBlogData) : []
 
   return (
     <ErrorBoundary>
       <Box
         sx={{
           minHeight: '100vh',
-          backgroundColor: 'grey.50',
           py: { xs: 5, sm: 6, md: 8 },
           px: { xs: 2, sm: 3, md: 4 }
         }}
@@ -67,10 +70,10 @@ const BlogHome = () => {
           sx={{
             maxWidth: {
               xs: '100%',
-              sm: 'sm',
-              md: 'md',
-              lg: 'lg',
-              xl: 'xl'
+              sm: '640px',
+              md: '768px',
+              lg: '1200px',
+              xl: '1400px'
             },
             mx: 'auto'
           }}
@@ -83,7 +86,7 @@ const BlogHome = () => {
             }}
           >
             <Typography
-              variant="h2"
+              variant='h2'
               sx={{
                 fontSize: { xs: '1.875rem', sm: '2.25rem', md: '2.5rem' },
                 fontWeight: 700,
@@ -95,7 +98,7 @@ const BlogHome = () => {
               TIN THỜI TRANG
             </Typography>
             <Typography
-              variant="body1"
+              variant='body1'
               sx={{
                 fontSize: { xs: '0.875rem', sm: '1rem' },
                 color: 'grey.600'
@@ -117,7 +120,7 @@ const BlogHome = () => {
               }}
             >
               <Typography
-                variant="body1"
+                variant='body1'
                 sx={{
                   color: 'grey.500',
                   fontSize: { xs: '0.875rem', sm: '1rem' }
@@ -140,7 +143,7 @@ const BlogHome = () => {
               }}
             >
               <Typography
-                variant="body1"
+                variant='body1'
                 sx={{
                   color: 'error.main',
                   fontSize: { xs: '0.875rem', sm: '1rem' }
@@ -189,7 +192,7 @@ const BlogHome = () => {
                     onClick={() => navigate(`/blog/${article.id}`)}
                   >
                     <Box
-                      className="article-card"
+                      className='article-card'
                       sx={{
                         display: 'flex',
                         flexDirection: 'column',
@@ -210,8 +213,8 @@ const BlogHome = () => {
                         }}
                       >
                         <Box
-                          component="img"
-                          className="article-image"
+                          component='img'
+                          className='article-image'
                           src={optimizeCloudinaryUrl(article.image)}
                           alt={article.title}
                           sx={{
@@ -226,8 +229,8 @@ const BlogHome = () => {
                         <Box
                           sx={{
                             position: 'absolute',
-                            top: 2,
-                            left: 2,
+                            top: 12,
+                            left: 12,
                             bgcolor: 'rgba(0, 0, 0, 0.8)',
                             color: 'common.white',
                             px: 1.5,
@@ -237,7 +240,7 @@ const BlogHome = () => {
                             fontWeight: 700,
                             textTransform: 'uppercase',
                             letterSpacing: '0.05em',
-                            backdropFilter: 'blur(4px)'
+                            backdropFilter: 'blur(4px)',
                           }}
                         >
                           {article.category}
@@ -254,9 +257,13 @@ const BlogHome = () => {
                         }}
                       >
                         <Typography
-                          variant="h6"
+                          variant='h6'
                           sx={{
-                            fontSize: { xs: '1rem', sm: '1.125rem', md: '1.25rem' },
+                            fontSize: {
+                              xs: '1rem',
+                              sm: '1.125rem',
+                              md: '1.25rem'
+                            },
                             fontWeight: 700,
                             color: 'text.primary',
                             mb: 1.5,
@@ -272,7 +279,7 @@ const BlogHome = () => {
                         </Typography>
 
                         <Typography
-                          variant="body2"
+                          variant='body2'
                           sx={{
                             fontSize: { xs: '0.875rem', sm: '0.9375rem' },
                             color: 'text.secondary',
@@ -301,7 +308,7 @@ const BlogHome = () => {
                           }}
                         >
                           <Typography
-                            variant="caption"
+                            variant='caption'
                             sx={{
                               color: 'text.disabled',
                               fontWeight: 500
@@ -311,7 +318,7 @@ const BlogHome = () => {
                           </Typography>
 
                           <Typography
-                            variant="body2"
+                            variant='body2'
                             sx={{
                               color: 'primary.main',
                               fontWeight: 600,
@@ -345,7 +352,7 @@ const BlogHome = () => {
               }}
             >
               <Box
-                component="button"
+                component='button'
                 sx={{
                   border: 1,
                   borderColor: 'grey.800',
@@ -371,7 +378,6 @@ const BlogHome = () => {
               </Box>
             </Box>
           )}
-
         </Box>
       </Box>
     </ErrorBoundary>
