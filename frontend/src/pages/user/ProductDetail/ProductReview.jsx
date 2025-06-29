@@ -27,7 +27,7 @@ import {
 import { getReviews } from '~/services/reviewService'
 import { optimizeCloudinaryUrl } from '~/utils/cloudinary'
 
-const ProductReview = ({ productId }) => {
+const ProductReview = ({ productId, avgRating = 0 }) => {
   const [reviews, setReviews] = useState([])
   const [selectedImage, setSelectedImage] = useState(null)
   const [selectedVideo, setSelectedVideo] = useState(null)
@@ -81,9 +81,7 @@ const ProductReview = ({ productId }) => {
     }
   }
 
-  const averageRating = reviews.length
-    ? (reviews.reduce((acc, r) => acc + r.rating, 0) / reviews.length).toFixed(1)
-    : 0
+
 
   const handleImageClick = (imageUrl) => {
     setSelectedImage(imageUrl)
@@ -106,9 +104,9 @@ const ProductReview = ({ productId }) => {
 
       <Box display='flex' alignItems='center' gap={1} mb={2}>
         <Typography variant='subtitle1' sx={{ color: '#1A3C7B', fontWeight: 600, fontSize: '3.4rem' }}>
-          {averageRating}
+          {avgRating}
         </Typography>
-        <Rating value={Number(averageRating)} precision={0.1} readOnly />
+        <Rating value={Number(avgRating)} precision={0.1} readOnly />
         <Typography variant='subtitle1' sx={{ color: '#1A3C7B' }}>
           ({totalReviews} đánh giá)
         </Typography>

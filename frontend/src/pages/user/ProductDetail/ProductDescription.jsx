@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import { Box, DialogContent, DialogTitle, Tabs, Tab } from '@mui/material'
 import ProductReview from './ProductReview' // 👉 Import file đánh giá
 
-const ProductDescription = ({ description, productId }) => {
+const ProductDescription = ({ description, productId, product }) => {
   const [tabIndex, setTabIndex] = useState(0)
 
   const handleChange = (event, newValue) => {
@@ -64,7 +64,7 @@ const ProductDescription = ({ description, productId }) => {
           />
         )}
 
-        {tabIndex === 1 && <ProductReview productId={productId} />}
+        {tabIndex === 1 && <ProductReview productId={productId} avgRating={product?.avgRating || 0} />}
 
       </DialogContent>
     </Box>
