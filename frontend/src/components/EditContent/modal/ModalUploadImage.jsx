@@ -7,7 +7,8 @@ import {
   Button,
   IconButton,
   Box,
-  Typography
+  Typography,
+  CircularProgress
 } from '@mui/material'
 import CloseIcon from '@mui/icons-material/Close'
 import EditIcon from '@mui/icons-material/Edit'
@@ -19,6 +20,7 @@ export default function ModalUploadImage({ open, onClose, onUpload }) {
   const [inline, setInline] = useState(false)
   const [file, setFile] = useState(null)
   const [preview, setPreview] = useState(null)
+  const [loading, setLoading] = useState(false) // New loading state
   const fileInputRef = useRef()
 
   const handleFileChange = (e) => {
@@ -31,13 +33,18 @@ export default function ModalUploadImage({ open, onClose, onUpload }) {
 
   const handleUpload = async () => {
     if (file) {
-      // Upload the image to Cloudinary
-      const result = await uploadImageToCloudinary(file)
-      if (result.success) {
-        // Use the Cloudinary URL to insert the image
-        onUpload(result.url, inline)
-      } else {
-        console.error('Failed to upload image:', result.error)
+      setLoading(true) // Start loading
+      try {
+        const result = await uploadImageToCloudinary(file)
+        if (result.success) {
+          onUpload(result.url, inline)
+        } else {
+          console.error('Failed to upload image:', result.error)
+        }
+      } catch (error) {
+        console.error('Error during upload:', error)
+      } finally {
+        setLoading(false) // End loading
       }
     }
 
@@ -68,10 +75,12 @@ export default function ModalUploadImage({ open, onClose, onUpload }) {
           alignItems: 'center'
         }}
       >
-        Thêm ảnh review
-        <IconButton onClick={onClose}>
-          <CloseIcon />
-        </IconButton>
+        Thêm ảnh vào nội dung bài viết
+        <ToolTip title='Đóng'>
+          <IconButton onClick={onClose}>
+            <CloseIcon />
+          </IconButton>
+        </ToolTip>
       </DialogTitle>
 
       <DialogContent>
@@ -137,7 +146,7 @@ export default function ModalUploadImage({ open, onClose, onUpload }) {
             </>
           ) : (
             <Typography color='text.secondary'>
-              Click để chọn ảnh review
+              Chọn để thêm ảnh nội dung bài viết
             </Typography>
           )}
           <input
@@ -156,9 +165,12 @@ export default function ModalUploadImage({ open, onClose, onUpload }) {
           variant='contained'
           sx={{ backgroundColor: '#111', color: '#fff' }}
           onClick={handleUpload}
-          disabled={!file}
+          disabled={!file || loading} // Disable button when loading
+          startIcon={
+            loading ? <CircularProgress size={20} color='inherit' /> : null
+          } // Show spinner when loading
         >
-          Upload
+          {loading ? 'Đang thêm ảnh...' : 'Tải ảnh lên'}
         </Button>
       </DialogActions>
     </Dialog>

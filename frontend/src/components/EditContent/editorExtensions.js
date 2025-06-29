@@ -58,5 +58,5 @@ export const extensions = [
   TableCell,
   Iframe,
   Indent,
-  CharacterCount.configure({ limit: 10000 })
+  CharacterCount
 ]

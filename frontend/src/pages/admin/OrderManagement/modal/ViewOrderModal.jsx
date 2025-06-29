@@ -42,7 +42,7 @@ function ViewOrderModal({
     const nextStatus = getNextStatus(order.status)
     if (!nextStatus) return
     try {
-      await onUpdate(order._id, { status: nextStatus }) // bạn có thể gọi API tại đây
+      await onUpdate(order._id, { status: nextStatus })
     } catch (error) {
       console.error('Lỗi chuyển trạng thái:', error)
     }
@@ -85,6 +85,7 @@ function ViewOrderModal({
       histories.map((h) => h.status).filter((s) => s && s !== order.status)
     )
   )
+
   const style = {
     nonePadding: {
       py: 1.5

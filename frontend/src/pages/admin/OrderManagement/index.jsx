@@ -40,11 +40,16 @@ const OrderManagement = () => {
   const { users, fetchUsers } = useUsers()
 
   useEffect(() => {
-    fetchUsers()
-    fetchDiscounts()
+    fetchUsers().catch((error) => console.error('Error fetching users:', error))
+    fetchDiscounts().catch((error) =>
+      console.error('Error fetching discounts:', error)
+    )
   }, [])
+
   useEffect(() => {
-    fetchOrders(page, limit, filters)
+    fetchOrders(page, limit, filters).catch((error) =>
+      console.error('Error fetching orders:', error)
+    )
   }, [page, limit, filters])
 
   // Kiểm tra quyền truy cập order management
@@ -117,9 +122,18 @@ const OrderManagement = () => {
       console.error('Lỗi cập nhật đơn hàng:', error)
     }
   }
+  // In OrderManagement component
   const handleChangStatusOrder = async (orderId, data) => {
     try {
-      await updateOrderById(orderId, data)
+      const updatedOrder = await updateOrderById(orderId, data)
+      if (updatedOrder) {
+        // Update the selectedOrder with the new status
+        setSelectedOrder(updatedOrder)
+
+        // Fetch updated histories
+        const updatedHistories = await getOrderHistoriesByOrderId(orderId)
+        setHistories(updatedHistories)
+      }
     } catch (error) {
       console.error('Lỗi cập nhật đơn hàng:', error)
     }

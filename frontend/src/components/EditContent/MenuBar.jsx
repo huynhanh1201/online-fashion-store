@@ -188,7 +188,7 @@ export default function MenuBar({ editor }) {
       spacing={1}
       flexWrap='wrap'
       justifyContent='center'
-      sx={{ mb: 2, rowGap: 2, mt: 2 }}
+      sx={{ rowGap: 2, py: 2 }}
     >
       <Box display='flex' alignItems='center' gap={1}>
         {btn(() => editor.chain().focus().undo(), Undo, false, 'Undo')}

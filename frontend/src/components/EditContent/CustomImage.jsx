@@ -43,18 +43,17 @@ const ImageComponent = ({ node, updateAttributes, deleteNode }) => {
       data-align={align}
       style={{ textAlign: align, display: 'block', margin: '1rem 0' }}
     >
-      <Box
-        sx={{
-          display: 'inline-block',
-          position: 'relative',
-          maxWidth: '700px',
-          maxHeight: '700px',
-          width: '100%'
-        }}
-      >
-        {loading ? ( // Display loading indicator
-          <p>Đang tải ảnh...</p>
-        ) : (
+      {loading ? (
+        <p>Đang tải ảnh...</p>
+      ) : (
+        <Box
+          sx={{
+            display: 'inline-block',
+            position: 'relative',
+            maxWidth: '800px',
+            maxHeight: '700px'
+          }}
+        >
           <img
             src={src}
             alt={alt}
@@ -68,79 +67,80 @@ const ImageComponent = ({ node, updateAttributes, deleteNode }) => {
               margin: '0 auto'
             }}
           />
-        )}
-        {/* Nút chỉnh sửa và xoá */}
-        <Box
-          sx={{
-            position: 'absolute',
-            top: 4,
-            right: 4,
-            display: 'flex',
-            gap: 1,
-            borderRadius: 1,
-            padding: '2px'
-          }}
-        >
-          <MuiTooltip title='Chọn ảnh khác'>
-            <IconButton
-              color='primary'
-              onClick={() => fileInputRef.current?.click()}
-              sx={{
-                backgroundColor: '#fff',
-                '&:hover': { backgroundColor: '#eee' }
-              }}
-            >
-              <EditIcon />
-            </IconButton>
-          </MuiTooltip>
-          <MuiTooltip title='Xoá ảnh'>
-            <IconButton
-              color='error'
-              onClick={() => deleteNode()}
-              sx={{
-                backgroundColor: '#fff',
-                '&:hover': { backgroundColor: '#eee' }
-              }}
-            >
-              <DeleteIcon />
-            </IconButton>
-          </MuiTooltip>
-        </Box>
-        {/* Nút căn lề */}
-        <Stack
-          direction='row'
-          spacing={1}
-          justifyContent='center'
-          alignItems='center'
-          sx={{ mt: 1 }}
-        >
-          {['left', 'center', 'right'].map((val) => (
-            <MuiTooltip key={val} title={`Căn ${val}`} arrow>
+
+          {/* Nút chỉnh sửa và xoá */}
+          <Box
+            sx={{
+              position: 'absolute',
+              top: 4,
+              right: 4,
+              display: 'flex',
+              gap: 1,
+              borderRadius: 1,
+              padding: '2px'
+            }}
+          >
+            <MuiTooltip title='Chọn ảnh khác'>
               <IconButton
-                size='small'
-                onClick={() => handleAlign(val)}
-                color={align === val ? 'primary' : 'default'}
+                color='primary'
+                onClick={() => fileInputRef.current?.click()}
+                sx={{
+                  backgroundColor: '#fff',
+                  '&:hover': { backgroundColor: '#eee' }
+                }}
               >
-                {
-                  {
-                    left: <FormatAlignLeftIcon fontSize='small' />,
-                    center: <FormatAlignCenterIcon fontSize='small' />,
-                    right: <FormatAlignRightIcon fontSize='small' />
-                  }[val]
-                }
+                <EditIcon />
               </IconButton>
             </MuiTooltip>
-          ))}
-        </Stack>
-        {/* Input ảnh ẩn */}
-        <input
-          type='file'
-          accept='image/*'
-          ref={fileInputRef}
-          style={{ display: 'none' }}
-          onChange={handleFileChange}
-        />
-      </Box>
+            <MuiTooltip title='Xoá ảnh'>
+              <IconButton
+                color='error'
+                onClick={() => deleteNode()}
+                sx={{
+                  backgroundColor: '#fff',
+                  '&:hover': { backgroundColor: '#eee' }
+                }}
+              >
+                <DeleteIcon />
+              </IconButton>
+            </MuiTooltip>
+          </Box>
+          {/* Nút căn lề */}
+          <Stack
+            direction='row'
+            spacing={1}
+            justifyContent='center'
+            alignItems='center'
+            sx={{ mt: 1 }}
+          >
+            {['left', 'center', 'right'].map((val) => (
+              <MuiTooltip key={val} title={`Căn ${val}`} arrow>
+                <IconButton
+                  size='small'
+                  onClick={() => handleAlign(val)}
+                  color={align === val ? 'primary' : 'default'}
+                >
+                  {
+                    {
+                      left: <FormatAlignLeftIcon fontSize='small' />,
+                      center: <FormatAlignCenterIcon fontSize='small' />,
+                      right: <FormatAlignRightIcon fontSize='small' />
+                    }[val]
+                  }
+                </IconButton>
+              </MuiTooltip>
+            ))}
+          </Stack>
+          {/* Input ảnh ẩn */}
+          <input
+            type='file'
+            accept='image/*'
+            ref={fileInputRef}
+            style={{ display: 'none' }}
+            onChange={handleFileChange}
+          />
+        </Box>
+      )}
     </NodeViewWrapper>
   )
 }

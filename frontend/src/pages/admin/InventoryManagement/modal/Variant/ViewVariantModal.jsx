@@ -21,7 +21,7 @@ const ViewVariantModal = ({ open, onClose, variant }) => {
   if (!variant) return null
 
   const formatCurrency = (value) =>
-    value ? `${Number(value).toLocaleString('vi-VN')}đ` : 'N/A'
+    value ? `${Number(value).toLocaleString('vi-VN')}đ` : '0₫'
   const formatDate = (dateString) => {
     if (!dateString) return 'Không có thông tin'
     const date = new Date(dateString)
@@ -34,6 +34,9 @@ const ViewVariantModal = ({ open, onClose, variant }) => {
       second: '2-digit'
     })
   }
+  const price = variant?.discountPrice
+  const formattedPrice =
+    isNaN(price) || price === 'N/A' ? 0 : formatCurrency(price)
   const VariantName = variant?.name || 'Không có tên biến thể'
   const variantColorName = variant?.color?.name || 'Không có màu sắc'
   return (
@@ -153,9 +156,7 @@ const ViewVariantModal = ({ open, onClose, variant }) => {
                   <TableCell>
                     <strong>Giá giảm cho biến thể</strong>
                   </TableCell>
-                  <TableCell>
-                    {formatCurrency(variant?.discountPrice || 0)}
-                  </TableCell>
+                  <TableCell>{formattedPrice}</TableCell>
                 </TableRow>
                 <TableRow>
                   <TableCell>
