@@ -32,8 +32,19 @@ const getOrderStatistics = async (req, res, next) => {
   }
 }
 
+const getUserStatistics = async (req, res, next) => {
+  try {
+    const result = await statisticsService.getUserStatistics()
+
+    res.status(StatusCodes.OK).json(result)
+  } catch (err) {
+    next(err)
+  }
+}
+
 export const statisticsController = {
   getInventoryStatistics,
   getProductStatistics,
-  getOrderStatistics
+  getOrderStatistics,
+  getUserStatistics
 }

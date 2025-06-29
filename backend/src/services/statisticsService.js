@@ -6,6 +6,7 @@ import { CategoryModel } from '~/models/CategoryModel'
 import { VariantModel } from '~/models/VariantModel'
 import { OrderModel } from '~/models/OrderModel'
 import { CouponModel } from '~/models/CouponModel'
+import { UserModel } from '~/models/UserModel'
 
 const getInventoryStatistics = async () => {
   // eslint-disable-next-line no-useless-catch
@@ -378,8 +379,39 @@ const getOrderStatistics = async () => {
   }
 }
 
+const getUserStatistics = async () => {
+  // eslint-disable-next-line no-useless-catch
+  try {
+    const userStatsPromise = UserModel.aggregate([
+      {
+        $group: {
+          _id: '$role',
+          count: { $sum: 1 }
+        }
+      },
+      {
+        $project: {
+          _id: 0,
+          role: '$_id',
+          count: 1
+        }
+      }
+    ])
+
+    const [userStats] = await Promise.all([userStatsPromise])
+
+    const result = {
+      userStats: userStats
+    }
+    return result
+  } catch (err) {
+    throw err
+  }
+}
+
 export const statisticsService = {
   getInventoryStatistics,
   getProductStatistics,
-  getOrderStatistics
+  getOrderStatistics,
+  getUserStatistics
 }
