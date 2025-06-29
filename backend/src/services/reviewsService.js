@@ -152,7 +152,12 @@ const deleteReview = async (reviewId) => {
 
 const updateProductRating = async (productId) => {
   const stats = await ReviewModel.aggregate([
-    { $match: { productId: new mongoose.Types.ObjectId(productId) } },
+    {
+      $match: {
+        productId: new mongoose.Types.ObjectId(productId),
+        moderationStatus: 'approved'
+      }
+    },
     {
       $group: {
         _id: '$productId',
