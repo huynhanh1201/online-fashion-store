@@ -63,9 +63,6 @@ const AddFlashSale = ({ open, onClose, onSave, initialData }) => {
   const [allProducts, setAllProducts] = useState([])
   const [existingCampaigns, setExistingCampaigns] = useState([])
   const [productVariants, setProductVariants] = useState({})
-  const [updatingVariants, setUpdatingVariants] = useState({})
-  const [debounceTimers, setDebounceTimers] = useState({})
-  const [pendingUpdates, setPendingUpdates] = useState({})
   const suggestionRefs = useRef({})
   const inputRefs = useRef({})
 
@@ -135,7 +132,6 @@ const AddFlashSale = ({ open, onClose, onSave, initialData }) => {
     } else {
       // Reset biến thể khi đóng modal
       setProductVariants({})
-      setUpdatingVariants({})
     }
   }, [open, initialData])
 
@@ -171,15 +167,6 @@ const AddFlashSale = ({ open, onClose, onSave, initialData }) => {
     return () => document.removeEventListener('click', handleClickOutside)
   }, [showSuggestions])
 
-  // Cleanup timers on unmount
-  useEffect(() => {
-    return () => {
-      Object.values(debounceTimers).forEach(timer => {
-        if (timer) clearTimeout(timer)
-      })
-    }
-  }, [debounceTimers])
-
   const handleChange = (field, value) => {
     setForm((prev) => ({ ...prev, [field]: value ?? '' }))
     clearMessages()
@@ -201,11 +188,6 @@ const AddFlashSale = ({ open, onClose, onSave, initialData }) => {
 
     const product = updated[index]
     
-    // Clear existing timer for this product
-    if (debounceTimers[product._id]) {
-      clearTimeout(debounceTimers[product._id])
-    }
-
     // Validate input immediately
     if (product._id && value && !isNaN(value) && Number(value) > 0) {
       const flashSalePrice = Number(value)
@@ -214,35 +196,8 @@ const AddFlashSale = ({ open, onClose, onSave, initialData }) => {
         setWarning(`Giá Flash Sale phải thấp hơn giá gốc (${product.originalPrice.toLocaleString()} VND)`)
         return
       }
-
-      // Set pending update state
-      setPendingUpdates(prev => ({ ...prev, [product._id]: true }))
-
-      // Create new debounced timer
-      const timer = setTimeout(async () => {
-        try {
-          setUpdatingVariants(prev => ({ ...prev, [product._id]: true }))
-          
-          // Thay thế hoàn toàn discountPrice bằng giá Flash Sale
-          await updateProductVariantsDiscountPrice(product._id, flashSalePrice)
-          
-          setSuccess(`Đã cập nhật giá Flash Sale cho tất cả biến thể của sản phẩm "${product.productName}"`)
-          setPendingUpdates(prev => ({ ...prev, [product._id]: false }))
-        } catch (err) {
-          console.error('Lỗi khi cập nhật discountPrice:', err)
-          setError(`Không thể cập nhật giá Flash Sale cho biến thể: ${err.message}`)
-          setPendingUpdates(prev => ({ ...prev, [product._id]: false }))
-        } finally {
-          setUpdatingVariants(prev => ({ ...prev, [product._id]: false }))
-        }
-      }, 1000) // 1 second debounce
-
-      setDebounceTimers(prev => ({ ...prev, [product._id]: timer }))
-    } else {
-      // Clear pending update if input is invalid
-      setPendingUpdates(prev => ({ ...prev, [product._id]: false }))
     }
-  }, [form.products, debounceTimers])
+  }, [form.products])
 
   const handleAddProduct = () => {
     setForm((prev) => ({
@@ -512,6 +467,20 @@ const AddFlashSale = ({ open, onClose, onSave, initialData }) => {
         return
       }
 
+      // Cập nhật discountPrice cho tất cả biến thể của sản phẩm trước khi lưu flash sale
+      const updatePromises = cleanedForm.products.map(async (product) => {
+        try {
+          await updateProductVariantsDiscountPrice(product.productId, product.flashPrice)
+          console.log(`Đã cập nhật discountPrice cho sản phẩm ${product.productId} thành ${product.flashPrice}`)
+        } catch (err) {
+          console.error(`Lỗi khi cập nhật discountPrice cho sản phẩm ${product.productId}:`, err)
+          throw new Error(`Không thể cập nhật giá cho sản phẩm ${product.productId}: ${err.message}`)
+        }
+      })
+
+      // Chờ tất cả cập nhật discountPrice hoàn thành
+      await Promise.all(updatePromises)
+
       if (initialData) {
         await updateFlashSaleCampaign(cleanedForm.id, cleanedForm)
         setSuccess('Cập nhật chiến dịch Flash Sale thành công!')
@@ -726,7 +695,7 @@ const AddFlashSale = ({ open, onClose, onSave, initialData }) => {
               }}
             >
               <Typography variant='body2'>
-                Khi nhập giá Flash Sale, hệ thống sẽ tự động cập nhật giá giảm (discountPrice) cho tất cả biến thể của sản phẩm đó sau 1 giây ngừng nhập để tối ưu hiệu suất.
+                <strong>Lưu ý:</strong> Khi nhập giá Flash Sale, hệ thống sẽ chỉ cập nhật giá giảm (discountPrice) cho tất cả biến thể của sản phẩm khi bạn nhấn "Lưu". Điều này đảm bảo tính nhất quán và tránh cập nhật không cần thiết.
               </Typography>
             </Alert>
 
@@ -854,36 +823,10 @@ const AddFlashSale = ({ open, onClose, onSave, initialData }) => {
                           required
                           disabled={false}
                           inputProps={{ min: 0 }}
-                          InputProps={{
-                            endAdornment: (
-                              <InputAdornment position='end'>
-                                {pendingUpdates[product._id] && (
-                                  <Chip
-                                    label="Đang chờ..."
-                                    size="small"
-                                    sx={{
-                                      height: 20,
-                                      fontSize: '0.7rem',
-                                      backgroundColor: alpha(theme.palette.warning.main, 0.1),
-                                      color: theme.palette.warning.main
-                                    }}
-                                  />
-                                )}
-                                {updatingVariants[product._id] && (
-                                  <CircularProgress size={16} sx={{ color: '#3b82f6' }} />
-                                )}
-                              </InputAdornment>
-                            )
-                          }}
                           sx={{
                             '& .MuiOutlinedInput-root': {
                               borderRadius: 2,
-                              backgroundColor: pendingUpdates[product._id] 
-                                ? alpha(theme.palette.warning.main, 0.05)
-                                : '#fff',
-                              borderColor: pendingUpdates[product._id] 
-                                ? theme.palette.warning.main 
-                                : undefined
+                              backgroundColor: '#fff'
                             }
                           }}
                         />
@@ -932,21 +875,8 @@ const AddFlashSale = ({ open, onClose, onSave, initialData }) => {
                     <div className="mt-2 p-3 bg-gray-50 rounded-lg">
                       <div className="flex items-center justify-between mb-2">
                         <span className="text-sm font-medium text-gray-700">
-                          Biến thể sẽ được cập nhật ({productVariants[product._id].length} biến thể):
+                          Biến thể sẽ được cập nhật khi lưu ({productVariants[product._id].length} biến thể):
                         </span>
-                        <div className="flex items-center gap-2">
-                          {pendingUpdates[product._id] && (
-                            <span className="text-xs text-orange-600 font-medium">
-                              Đang chờ cập nhật...
-                            </span>
-                          )}
-                          {updatingVariants[product._id] && (
-                            <div className="flex items-center text-blue-600">
-                              <CircularProgress size={16} />
-                              <span className="ml-1 text-xs">Đang cập nhật...</span>
-                            </div>
-                          )}
-                        </div>
                       </div>
                       <div className="space-y-1">
                         {productVariants[product._id].map((variant, vIndex) => (
@@ -963,6 +893,7 @@ const AddFlashSale = ({ open, onClose, onSave, initialData }) => {
                       <div className="mt-2 text-xs text-gray-500">
                         <p>• Giá ban đầu: {product.originalPrice?.toLocaleString()} VND</p>
                         <p>• Giá Flash Sale sẽ thay thế hoàn toàn giá hiện tại</p>
+                        <p>• Khi lưu chiến dịch, tất cả biến thể sẽ được cập nhật giá Flash Sale</p>
                         <p>• Khi hết thời gian, giá sẽ trở về giá ban đầu</p>
                       </div>
                     </div>
@@ -1047,7 +978,7 @@ const AddFlashSale = ({ open, onClose, onSave, initialData }) => {
             }
           }}
         >
-          {loading ? 'Đang lưu...' : 'Lưu'}
+          {loading ? 'Đang lưu và cập nhật giá...' : 'Lưu'}
         </Button>
       </DialogActions>
 
