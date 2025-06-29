@@ -575,20 +575,25 @@ const ReviewModal = ({
             {/* Images */}
             {images.map((image) => (
               <Grid item xs={6} sm={4} md={3} key={image.id}>
-                <Card sx={{ position: 'relative' }}>
+                <Card sx={{ position: 'relative', width: 180 }}>
                   <CardMedia
                     component='img'
+                    width='180'
                     height='120'
                     image={
                       image.url
                         ? optimizeCloudinaryUrl(image.url, {
-                          width: 200,
+                          width: 180,
                           height: 120
                         })
                         : image.preview
                     }
                     alt={image.name}
-                    sx={{ objectFit: 'cover' }}
+                    sx={{
+                      objectFit: 'cover',
+                      width: 180,
+                      height: 120
+                    }}
                   />
                   <IconButton
                     size='small'
@@ -622,21 +627,25 @@ const ReviewModal = ({
             {/* Videos */}
             {videos.map((video) => (
               <Grid item xs={6} sm={4} md={3} key={video.id}>
-                <Card sx={{ position: 'relative' }}>
+                <Card sx={{ position: 'relative', width: 180 }}>
                   {video.url ? (
                     <CardMedia
                       component='img'
+                      width='180'
                       height='120'
                       image={getVideoThumbnail(video.url)}
                       alt={video.name}
                       sx={{
                         objectFit: 'cover',
-                        position: 'relative'
+                        position: 'relative',
+                        width: 180,
+                        height: 120
                       }}
                     />
                   ) : (
                     <Box
                       sx={{
+                        width: 180,
                         height: 120,
                         display: 'flex',
                         alignItems: 'center',
