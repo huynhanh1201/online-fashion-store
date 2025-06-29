@@ -138,7 +138,7 @@ export default function AdminDrawer({
       },
       contentManagement: {
         permissions: ['user:use'],
-        label: 'Quản lý nội dung',
+        label: 'Cấu hình CMS',
         icon: <LocalOfferIcon />,
         children: [
           {
@@ -148,7 +148,7 @@ export default function AdminDrawer({
           },
           {
             permission: 'user:use',
-            label: 'Chương trình khuyến mãi',
+            label: 'Khuyến mãi',
             path: '/admin/flashsale-management'
           },
           {
@@ -602,7 +602,7 @@ export default function AdminDrawer({
                   <ListItemIcon>
                     <LocalOfferIcon />
                   </ListItemIcon>
-                  <ListItemText primary='Quản lý nội dung' />
+                  <ListItemText primary='Cấu hình CMS' />
                   {openContent ? <ExpandLess /> : <ExpandMore />}
                 </ListItemButton>
               </ListItem>

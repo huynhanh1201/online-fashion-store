@@ -36,10 +36,7 @@ const VoucherDrawer = ({
         flexDirection: 'column'
       }}
     >
-      <Typography variant='h6' gutterBottom>
-        Danh sách mã giảm giá
-      </Typography>
-      <Box sx={{ flexGrow: 1, overflowY: 'auto', pr: 1, mt: 1 }}>
+      <Box sx={{ flexGrow: 1, overflowY: 'auto', pr: 1, mt: 8 }}>
         {coupons.map((coupon) => {
           const valueText =
             coupon.type === 'percent'
@@ -55,7 +52,11 @@ const VoucherDrawer = ({
                 <Typography variant='subtitle2' color='text.secondary'>
                   VOUCHER
                 </Typography>
-                <Typography variant='h6' fontWeight='bold' color='var(--primary-color)'>
+                <Typography
+                  variant='h6'
+                  fontWeight='bold'
+                  color='var(--primary-color)'
+                >
                   {valueText}
                 </Typography>
                 <Tooltip title={coupon.code}>
@@ -92,7 +93,11 @@ const VoucherDrawer = ({
                   <Button
                     variant='contained'
                     size='medium'
-                    sx={{ backgroundColor: 'var(--primary-color)', color: '#fff', mt: 2 }}
+                    sx={{
+                      backgroundColor: 'var(--primary-color)',
+                      color: '#fff',
+                      mt: 2
+                    }}
                     onClick={() => handleCopy(coupon.code)}
                     fullWidth
                   >
