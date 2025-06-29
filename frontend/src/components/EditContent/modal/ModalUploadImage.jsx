@@ -5,9 +5,6 @@ import {
   DialogContent,
   DialogActions,
   Button,
-  Checkbox,
-  FormControlLabel,
-  Stack,
   IconButton,
   Box,
   Typography
@@ -16,6 +13,8 @@ import CloseIcon from '@mui/icons-material/Close'
 import EditIcon from '@mui/icons-material/Edit'
 import DeleteIcon from '@mui/icons-material/Delete'
 import ToolTip from '@mui/material/Tooltip'
+import { uploadImageToCloudinary } from '~/utils/cloudinary' // Import the Cloudinary upload function
+
 export default function ModalUploadImage({ open, onClose, onUpload }) {
   const [inline, setInline] = useState(false)
   const [file, setFile] = useState(null)
@@ -30,12 +29,19 @@ export default function ModalUploadImage({ open, onClose, onUpload }) {
     }
   }
 
-  const handleUpload = () => {
+  const handleUpload = async () => {
     if (file) {
-      onUpload(file, inline)
+      // Upload the image to Cloudinary
+      const result = await uploadImageToCloudinary(file)
+      if (result.success) {
+        // Use the Cloudinary URL to insert the image
+        onUpload(result.url, inline)
+      } else {
+        console.error('Failed to upload image:', result.error)
+      }
     }
 
-    // Reset sau khi upload
+    // Reset after upload
     setFile(null)
     setPreview(null)
     setInline(false)
@@ -69,7 +75,6 @@ export default function ModalUploadImage({ open, onClose, onUpload }) {
       </DialogTitle>
 
       <DialogContent>
-        {/* Khung chọn ảnh */}
         <Box
           sx={{
             width: 500,
@@ -143,17 +148,6 @@ export default function ModalUploadImage({ open, onClose, onUpload }) {
             style={{ display: 'none' }}
           />
         </Box>
-
-        {/*<FormControlLabel*/}
-        {/*  control={*/}
-        {/*    <Checkbox*/}
-        {/*      checked={inline}*/}
-        {/*      onChange={(e) => setInline(e.target.checked)}*/}
-        {/*    />*/}
-        {/*  }*/}
-        {/*  label='Hiển thị ảnh trên dòng'*/}
-        {/*  sx={{ mt: 2 }}*/}
-        {/*/>*/}
       </DialogContent>
 
       <DialogActions sx={{ px: 3, pb: 3, pt: 0 }}>

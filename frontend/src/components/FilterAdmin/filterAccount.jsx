@@ -85,6 +85,7 @@ export default function FilterAccount({ onFilter, users, loading, roles }) {
     setDestroy(false)
     onFilter({})
   }
+  const filterRoles = roles.filter((role) => role.name !== 'customer')
 
   return (
     <Box display='flex' flexWrap='wrap' gap={2} mb={2} justifyContent='end'>
@@ -107,7 +108,7 @@ export default function FilterAccount({ onFilter, users, loading, roles }) {
           setRole(value)
           applyFilters(selectedFilter, startDate, endDate)
         }}
-        options={roles.map((role) => ({
+        options={filterRoles.map((role) => ({
           label: role.label,
           value: role._id
         }))}

@@ -121,7 +121,12 @@ export default function AdminDrawer({
         children: [
           {
             permission: 'user:use',
-            label: 'Tài khoản  khách hàng',
+            label: 'Thống kê tài khoản',
+            path: '/admin/account-statistic'
+          },
+          {
+            permission: 'user:use',
+            label: 'Tài khoản khách hàng',
             path: '/admin/user-management'
           },
           {
@@ -137,7 +142,16 @@ export default function AdminDrawer({
         ]
       },
       contentManagement: {
-        permissions: ['content:use', 'banner:use', 'flashSale:use', 'headerContent:use', 'footerContent:use', 'featuredCategory:use', 'service:use', 'blog:use'],
+        permissions: [
+          'content:use',
+          'banner:use',
+          'flashSale:use',
+          'headerContent:use',
+          'footerContent:use',
+          'featuredCategory:use',
+          'service:use',
+          'blog:use'
+        ],
         label: 'Quản lý nội dung',
         icon: <LocalOfferIcon />,
         children: [
@@ -204,7 +218,7 @@ export default function AdminDrawer({
           {
             permission: 'category:use',
             label: 'Quản lý danh mục',
-            path: '/admin/category-management',
+            path: '/admin/categorie-management',
             icon: <CategoryIcon />
           },
           {
@@ -335,7 +349,7 @@ export default function AdminDrawer({
     // Kiểm tra danh sách quyền
     if (menuItem.permissions) {
       // Kiểm tra từng quyền trong danh sách (các quyền use)
-      return menuItem.permissions.some(permission =>
+      return menuItem.permissions.some((permission) =>
         hasPermission(permission)
       )
     }

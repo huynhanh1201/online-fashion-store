@@ -28,6 +28,25 @@ const OrderStatistic = ({ stats = {} }) => {
     statusOrdersStats = []
   } = stats
 
+  const statusOrderMap = {
+    Pending: 'Đang chờ',
+    Processing: 'Đang xử lý',
+    Shipping: 'Đang vận chuyển',
+    Shipped: 'Đã gửi hàng',
+    Delivered: 'Đã giao',
+    Cancelled: 'Đã hủy',
+    Failed: 'Thất bại'
+  }
+  const colorOrder = [
+    { value: 'Pending', color: '#FBBF24' },
+    { value: 'Processing', color: '#60A5FA' },
+    { value: 'Shipping', color: '#3B82F6' },
+    { value: 'Shipped', color: '#10B981' },
+    { value: 'Delivered', color: '#22C55E' },
+    { value: 'Cancelled', color: '#EF4444' },
+    { value: 'Failed', color: '#B91C1C' }
+  ]
+
   const summaryItems = [
     {
       label: 'Tổng đơn hàng',
@@ -69,6 +88,9 @@ const OrderStatistic = ({ stats = {} }) => {
       color: '#EF4444'
     }
   ]
+  const statusColorMap = Object.fromEntries(
+    colorOrder.map(({ value, color }) => [value, color])
+  )
 
   const piePaymentChart = {
     labels: paymentMethodStats.map((item) => item.paymentMethod),
@@ -77,24 +99,49 @@ const OrderStatistic = ({ stats = {} }) => {
         data: paymentMethodStats.map((item) => item.count),
         backgroundColor: ['#34D399', '#60A5FA']
       }
-    ]
+    ],
+    options: {
+      plugins: {
+        tooltip: {
+          callbacks: {
+            label: (context) => {
+              // const label = context.label || ''
+              const value = context.raw || 0
+              return `Số lượng ${value}`
+              // return `${label}: Số lượng ${value}`
+            }
+          }
+        }
+      }
+    }
   }
 
   const pieStatusChart = {
-    labels: statusOrdersStats.map((item) => item.statusOrder),
+    labels: statusOrdersStats.map(
+      (item) => statusOrderMap[item.statusOrder] || item.statusOrder
+    ),
     datasets: [
       {
         data: statusOrdersStats.map((item) => item.count),
-        backgroundColor: [
-          '#FBBF24',
-          '#4ADE80',
-          '#60A5FA',
-          '#10B981',
-          '#EF4444',
-          '#9CA3AF'
-        ]
+        backgroundColor: statusOrdersStats.map(
+          (item) => statusColorMap[item.statusOrder] || '#9CA3AF'
+        )
       }
-    ]
+    ],
+    options: {
+      plugins: {
+        tooltip: {
+          callbacks: {
+            label: (context) => {
+              // const label = context.label || ''
+              const value = context.raw || 0
+              return `Số lượng ${value}`
+              // return `${label}: Số lượng ${value}`
+            }
+          }
+        }
+      }
+    }
   }
 
   return (
@@ -102,7 +149,14 @@ const OrderStatistic = ({ stats = {} }) => {
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
         {/* Tổng quan đơn hàng */}
         <div className='order-summary'>
-          <Box>
+          <Box
+            sx={{
+              border: '1px solid #e0e0e0',
+              borderRadius: 2,
+              p: 2,
+              boxShadow: 1
+            }}
+          >
             <Typography variant='h5' fontWeight='bold' mb={2}>
               Thống kê đơn hàng
             </Typography>
@@ -115,21 +169,27 @@ const OrderStatistic = ({ stats = {} }) => {
                       alignItems: 'center',
                       gap: 2,
                       p: 2,
+                      height: '150px',
                       borderLeft: `10px solid ${item.color}`,
                       backgroundColor: '#f5f5f5',
                       borderRadius: 2
                     }}
                   >
                     <Stack>
-                      <Typography variant='subtitle1' color='text.secondary'>
+                      <Typography
+                        variant='h5'
+                        color='text.secondary'
+                        sx={{ mb: 1 }}
+                      >
                         {item.label}
                       </Typography>
                       <Typography
                         variant='h6'
                         fontWeight='bold'
-                        sx={{ alignItems: 'center', display: 'flex', gap: 1 }}
+                        sx={{ display: 'flex', alignItems: 'center', gap: 1 }}
                       >
-                        {item.icon} {item.value}
+                        {item.icon}
+                        {item.value}
                       </Typography>
                     </Stack>
                   </Box>
@@ -141,7 +201,14 @@ const OrderStatistic = ({ stats = {} }) => {
 
         {/* Mã giảm giá */}
         <div className='coupon-summary'>
-          <Box>
+          <Box
+            sx={{
+              border: '1px solid #e0e0e0',
+              borderRadius: 2,
+              p: 2,
+              boxShadow: 1
+            }}
+          >
             <Typography variant='h5' fontWeight='bold' mb={1}>
               Thống kê mã giảm giá
             </Typography>
@@ -154,21 +221,27 @@ const OrderStatistic = ({ stats = {} }) => {
                       alignItems: 'center',
                       gap: 2,
                       p: 2,
+                      height: '150px',
                       borderLeft: `10px solid ${item.color}`,
                       backgroundColor: '#f5f5f5',
                       borderRadius: 2
                     }}
                   >
                     <Stack>
-                      <Typography variant='subtitle1' color='text.secondary'>
+                      <Typography
+                        variant='h5'
+                        color='text.secondary'
+                        sx={{ mb: 1 }}
+                      >
                         {item.label}
                       </Typography>
                       <Typography
                         variant='h6'
                         fontWeight='bold'
-                        sx={{ alignItems: 'center', display: 'flex', gap: 1 }}
+                        sx={{ display: 'flex', alignItems: 'center', gap: 1 }}
                       >
-                        {item.icon} {item.value}
+                        {item.icon}
+                        {item.value}
                       </Typography>
                     </Stack>
                   </Box>
@@ -183,19 +256,44 @@ const OrderStatistic = ({ stats = {} }) => {
           <Box>
             <Grid container spacing={2}>
               <Grid item size={6} xs={12} md={6}>
-                <Typography variant='h5' fontWeight='bold' mb={1}>
-                  Phương thức thanh toán
-                </Typography>
-                <Box sx={{ maxWidth: 500, margin: '0 auto' }}>
-                  <Pie data={piePaymentChart} />
+                <Box
+                  sx={{
+                    border: '1px solid #e0e0e0',
+                    borderRadius: 2,
+                    p: 2,
+                    boxShadow: 1
+                  }}
+                >
+                  <Typography variant='h5' fontWeight='bold' mb={1}>
+                    Phương thức thanh toán
+                  </Typography>
+                  <Box sx={{ maxWidth: 500, margin: '0 auto' }}>
+                    <Pie
+                      data={piePaymentChart}
+                      options={piePaymentChart.options}
+                    />
+                  </Box>
                 </Box>
               </Grid>
+
               <Grid item size={6} xs={12} md={6}>
-                <Typography variant='h5' fontWeight='bold' mb={1}>
-                  Trạng thái đơn hàng
-                </Typography>
-                <Box sx={{ maxWidth: 500, margin: '0 auto' }}>
-                  <Pie data={pieStatusChart} />
+                <Box
+                  sx={{
+                    border: '1px solid #e0e0e0',
+                    borderRadius: 2,
+                    p: 2,
+                    boxShadow: 1
+                  }}
+                >
+                  <Typography variant='h5' fontWeight='bold' mb={1}>
+                    Trạng thái đơn hàng
+                  </Typography>
+                  <Box sx={{ maxWidth: 500, margin: '0 auto' }}>
+                    <Pie
+                      data={pieStatusChart}
+                      options={pieStatusChart.options}
+                    />
+                  </Box>
                 </Box>
               </Grid>
             </Grid>

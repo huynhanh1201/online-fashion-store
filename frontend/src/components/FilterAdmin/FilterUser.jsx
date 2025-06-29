@@ -88,20 +88,6 @@ export default function FilterUser({ onFilter, users, loading, roles }) {
     <Box display='flex' flexWrap='wrap' gap={2} mb={2} justifyContent='end'>
       <FilterSelect value={sort} onChange={setSort} />
 
-      <FilterSelect
-        label='Vai trò'
-        value={role}
-        onChange={(value) => {
-          setRole(value)
-          applyFilters(selectedFilter, startDate, endDate)
-        }}
-        options={roles.map((role) => ({
-          label: role.label,
-          value: role._id
-        }))}
-        sx={{ width: 160 }}
-      />
-
       <FilterByTime
         label='Lọc theo ngày tạo'
         selectedFilter={selectedFilter}

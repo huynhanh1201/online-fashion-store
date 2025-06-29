@@ -7,13 +7,17 @@ import {
 
 export const useInventoryStatistics = () => {
   const [statistics, setStatistics] = useState([])
+  const [accountStatistics, setAccountStatistics] = useState([])
+  const [warehouseStatistics, setWarehouseStatistics] = useState([])
+  const [orderStatistics, setOrderStatistics] = useState([])
+  const [productStatistics, setProductStatistics] = useState([])
   const [loading, setLoading] = useState(true)
 
   const fetchStatistics = async () => {
     setLoading(true)
     try {
       const data = await getInventoryStatistics()
-      setStatistics(data)
+      setWarehouseStatistics(data)
     } catch (error) {
       console.error('Error fetching inventory statistics:', error)
     } finally {
@@ -25,7 +29,7 @@ export const useInventoryStatistics = () => {
     setLoading(true)
     try {
       const data = await getProductsStatistics()
-      setStatistics(data)
+      setProductStatistics(data)
     } catch (error) {
       console.error('Error fetching products statistics:', error)
     } finally {
@@ -37,7 +41,7 @@ export const useInventoryStatistics = () => {
     setLoading(true)
     try {
       const data = await getOrderStatistics()
-      setStatistics(data)
+      setOrderStatistics(data)
     } catch (error) {
       console.error('Error fetching orders statistics:', error)
     } finally {
@@ -50,7 +54,16 @@ export const useInventoryStatistics = () => {
     loading,
     fetchStatistics,
     fetchProductsStatistics,
-    fetchOrdersStatistics
+    fetchOrdersStatistics,
+    accountStatistics,
+    setAccountStatistics,
+    warehouseStatistics,
+    setWarehouseStatistics,
+    orderStatistics,
+    setOrderStatistics,
+    productStatistics,
+    setProductStatistics,
+    setStatistics
   }
 }
 
