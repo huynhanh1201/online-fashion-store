@@ -3,13 +3,14 @@ import React, { useEffect } from 'react'
 import useInventoryStatistics from '~/hooks/admin/useStatistic.js'
 
 function ProductDashboard() {
-  const { fetchProductsStatistics, statistics } = useInventoryStatistics()
+  const { fetchProductsStatistics, productStatistics } =
+    useInventoryStatistics()
 
   useEffect(() => {
     fetchProductsStatistics()
   }, [])
 
-  return <ProductStatistics stats={statistics} />
+  return <ProductStatistics stats={productStatistics} />
 }
 
 export default ProductDashboard

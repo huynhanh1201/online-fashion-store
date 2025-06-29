@@ -19,7 +19,7 @@ import ImageNotSupportedIcon from '@mui/icons-material/ImageNotSupported'
 import StyleAdmin from '~/assets/StyleAdmin.jsx'
 import { optimizeCloudinaryUrl } from '~/utils/cloudinary.js'
 
-const ViewAccountModal = ({ open, onClose, user }) => {
+const ViewAccountModal = ({ open, onClose, user, roles }) => {
   const formatDate = (dateString) => {
     if (!dateString) return 'Không có thông tin'
     const date = new Date(dateString)
@@ -101,10 +101,13 @@ const ViewAccountModal = ({ open, onClose, user }) => {
                     <TableCell sx={{ fontWeight: 'bold' }}>Vai trò</TableCell>
                     <TableCell>
                       <Chip
-                        label={user?.role?.toUpperCase() || 'Không có vai trò'}
+                        label={
+                          roles.find((r) => r.name === user?.role)?.label ||
+                          'Không có vai trò'
+                        }
                         size='medium'
                         sx={{
-                          width: 130,
+                          maxWidth: 300,
                           fontWeight: 800,
                           backgroundColor: '#001f5d',
                           color: '#fff',

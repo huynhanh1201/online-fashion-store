@@ -43,7 +43,7 @@ const AccountTable = ({
       align: 'left',
       maxWidth: 200
     },
-    { id: 'role', label: 'Vai trò', align: 'left', width: 180 },
+    { id: 'role', label: 'Vai trò', align: 'left', width: 250, maxWidth: 350 },
     { id: 'createdAt', label: 'Ngày tạo', align: 'left', minWidth: 100 },
     { id: 'updatedAt', label: 'Ngày cập nhật', align: 'left', minWidth: 100 },
     {
@@ -146,6 +146,7 @@ const AccountTable = ({
                   columns={columns}
                   handleOpenModal={handleOpenModal}
                   permissions={permissions}
+                  roles={roles}
                 />
               ))
             ) : (

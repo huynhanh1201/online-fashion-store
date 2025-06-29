@@ -58,7 +58,7 @@ const EditAccountModal = ({ open, onClose, user, onSave, roles }) => {
     onClose()
   }
 
-  const roleOptions = roles.map((role) => role.name)
+  // const roleOptions = roles.filter((role) => role.name !== 'customer')
 
   return (
     <Dialog
@@ -125,10 +125,21 @@ const EditAccountModal = ({ open, onClose, user, onSave, roles }) => {
             rules={{ required: 'Vai trò là bắt buộc' }}
             render={({ field, fieldState }) => (
               <Autocomplete
-                options={roleOptions}
-                getOptionLabel={(option) => option}
-                value={field.value}
-                onChange={(_, value) => field.onChange(value)}
+                options={roles}
+                // ✅ getOptionLabel phải trả về string an toàn
+                getOptionLabel={(option) =>
+                  typeof option === 'string'
+                    ? option
+                    : option?.label || option?.name || ''
+                }
+                // ✅ Chuyển từ name (field.value) sang object tương ứng
+                value={roles.find((r) => r.name === field.value) || null}
+                // ✅ Truyền ngược role.name khi chọn
+                onChange={(_, value) => field.onChange(value?.name || '')}
+                isOptionEqualToValue={(option, value) =>
+                  option.name ===
+                  (typeof value === 'string' ? value : value?.name)
+                }
                 renderInput={(params) => (
                   <TextField
                     {...params}

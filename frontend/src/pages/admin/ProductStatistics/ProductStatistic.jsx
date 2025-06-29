@@ -136,7 +136,7 @@ const ProductStatistics = ({ stats }) => {
                     {item.label}
                   </Typography>
                   <Typography
-                    variant='h5'
+                    variant='h6'
                     fontWeight='bold'
                     sx={{ display: 'flex', alignItems: 'center', gap: 1 }}
                   >

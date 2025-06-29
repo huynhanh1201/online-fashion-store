@@ -48,7 +48,7 @@ const AccountManagement = () => {
   React.useEffect(() => {
     fetchUsers(page, ROWS_PER_PAGE, filters)
   }, [page, ROWS_PER_PAGE, filters])
-
+  const filterUser = users.filter((user) => user?.role !== 'customer')
   const handleOpenModal = (type, user = null) => {
     setSelectedUser(user)
     setModalType(type)
@@ -86,7 +86,7 @@ const AccountManagement = () => {
   return (
     <RouteGuard requiredPermissions={['admin:access', 'account:use']}>
       <AccountTable
-        users={users}
+        users={filterUser}
         loading={Loading}
         handleOpenModal={handleOpenModal}
         onFilters={handleFilter}
@@ -114,6 +114,7 @@ const AccountManagement = () => {
             open
             onClose={handleCloseModal}
             user={selectedUser}
+            roles={roles}
           />
         )}
 

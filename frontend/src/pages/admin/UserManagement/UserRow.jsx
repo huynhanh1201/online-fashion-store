@@ -49,7 +49,8 @@ export default function UserRow({
   index,
   columns,
   handleOpenModal,
-  permissions = {}
+  permissions = {},
+  roles
 }) {
   return (
     <TableRow hover role='checkbox' tabIndex={-1}>
@@ -117,6 +118,12 @@ export default function UserRow({
         }
 
         if (column.id === 'role') {
+          const roleLabel =
+            user?.role === 'customer'
+              ? 'Khách hàng'
+              : roles.find((role) => role.value === user?.role)?.label ||
+                'Không xác định'
+
           return (
             <TableCell
               key={column.id}
@@ -124,7 +131,7 @@ export default function UserRow({
               sx={styles.cellPadding}
             >
               <Chip
-                label={user?.role.toUpperCase() || 'Không có vai trò'}
+                label={roleLabel.toUpperCase()}
                 size='large'
                 sx={{
                   width: 130,
@@ -155,16 +162,16 @@ export default function UserRow({
                     </IconButton>
                   </Tooltip>
                 )}
-                {permissions.canEdit && (
-                  <Tooltip title='Sửa'>
-                    <IconButton
-                      onClick={() => handleOpenModal('edit', user)}
-                      size='small'
-                    >
-                      <BorderColorIcon color='warning' />
-                    </IconButton>
-                  </Tooltip>
-                )}
+                {/*{permissions.canEdit && (*/}
+                {/*  <Tooltip title='Sửa'>*/}
+                {/*    <IconButton*/}
+                {/*      onClick={() => handleOpenModal('edit', user)}*/}
+                {/*      size='small'*/}
+                {/*    >*/}
+                {/*      <BorderColorIcon color='warning' />*/}
+                {/*    </IconButton>*/}
+                {/*  </Tooltip>*/}
+                {/*)}*/}
                 {permissions.canDelete && (
                   <Tooltip title='Xoá'>
                     <IconButton
