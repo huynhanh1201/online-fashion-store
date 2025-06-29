@@ -23,4 +23,10 @@ Router.route('/order').get(
   statisticsController.getOrderStatistics
 )
 
+// Thống tài khoản.
+Router.route('/user').get(
+  authMiddleware.isAuthorized,
+  statisticsController.getUserStatistics
+)
+
 export const statisticsRoute = Router
