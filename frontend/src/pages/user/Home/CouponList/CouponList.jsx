@@ -5,7 +5,13 @@ const CouponList = ({ onCouponSelect }) => {
   const [coupons, setCoupons] = useState([])
   const [loading, setLoading] = useState(true)
   const [copiedCode, setCopiedCode] = useState('')
+  const [showLeftArrow, setShowLeftArrow] = useState(false)
+  const [showRightArrow, setShowRightArrow] = useState(false)
   const scrollRef = useRef(null)
+  const containerRef = useRef(null)
+
+  // Số lượng coupon hiển thị tối đa trên màn hình
+  const maxVisibleCoupons = 6 // Có thể điều chỉnh theo thiết kế
 
   useEffect(() => {
     const fetchCoupons = async () => {
@@ -13,6 +19,11 @@ const CouponList = ({ onCouponSelect }) => {
         const { discounts } = await getDiscounts()
         const activeCoupons = discounts.filter(coupon => coupon.isActive === true)
         setCoupons(activeCoupons)
+        
+        // Kiểm tra xem có cần hiển thị arrow không
+        setTimeout(() => {
+          checkScrollArrows()
+        }, 100)
       } catch (error) {
         console.error('Failed to fetch coupons:', error)
       } finally {
@@ -21,6 +32,42 @@ const CouponList = ({ onCouponSelect }) => {
     }
 
     fetchCoupons()
+  }, [])
+
+  // Kiểm tra và cập nhật trạng thái hiển thị arrow
+  const checkScrollArrows = () => {
+    if (!scrollRef.current) return
+
+    const scrollElement = scrollRef.current
+    
+    // Kiểm tra nút left arrow - chỉ hiển thị khi có thể scroll về trái
+    setShowLeftArrow(scrollElement.scrollLeft > 10) // Thêm buffer 10px
+    
+    // Kiểm tra nút right arrow - chỉ hiển thị khi có thể scroll về phải
+    const maxScrollLeft = scrollElement.scrollWidth - scrollElement.clientWidth
+    setShowRightArrow(scrollElement.scrollLeft < maxScrollLeft - 10) // Thêm buffer 10px
+  }
+
+  // Thêm event listener để theo dõi scroll với debounce
+  useEffect(() => {
+    const scrollElement = scrollRef.current
+    if (scrollElement) {
+      let timeoutId
+      
+      const debouncedCheck = () => {
+        clearTimeout(timeoutId)
+        timeoutId = setTimeout(checkScrollArrows, 50)
+      }
+      
+      scrollElement.addEventListener('scroll', debouncedCheck)
+      window.addEventListener('resize', debouncedCheck)
+      
+      return () => {
+        scrollElement.removeEventListener('scroll', debouncedCheck)
+        window.removeEventListener('resize', debouncedCheck)
+        clearTimeout(timeoutId)
+      }
+    }
   }, [])
 
   const formatCurrencyShort = (value) => {
@@ -41,10 +88,12 @@ const CouponList = ({ onCouponSelect }) => {
 
   const scrollLeft = () => {
     scrollRef.current?.scrollBy({ left: -300, behavior: 'smooth' })
+    setTimeout(checkScrollArrows, 300) // Kiểm tra sau khi scroll hoàn thành
   }
 
   const scrollRight = () => {
     scrollRef.current?.scrollBy({ left: 300, behavior: 'smooth' })
+    setTimeout(checkScrollArrows, 300) // Kiểm tra sau khi scroll hoàn thành
   }
 
   if (loading) {
@@ -68,11 +117,13 @@ const CouponList = ({ onCouponSelect }) => {
 
   return (
     <div className='coupon-container'>
-      <div className='coupon-wrapper'>
+      <div className='coupon-wrapper' ref={containerRef}>
         <div className='coupon-scroll-wrapper'>
-          <button className='scroll-btn left' onClick={scrollLeft}>
-            ◀
-          </button>
+          {showLeftArrow && (
+            <button className='scroll-btn left' onClick={scrollLeft}>
+              ◀
+            </button>
+          )}
 
           <div className='coupon-grid-scroll' ref={scrollRef}>
             {coupons.map((coupon) => {
@@ -130,9 +181,11 @@ const CouponList = ({ onCouponSelect }) => {
             })}
           </div>
 
-          <button className='scroll-btn right' onClick={scrollRight}>
-            ▶
-          </button>
+          {showRightArrow && (
+            <button className='scroll-btn right' onClick={scrollRight}>
+              ▶
+            </button>
+          )}
         </div>
       </div>
 
@@ -311,12 +364,24 @@ const CouponList = ({ onCouponSelect }) => {
           display: flex;
           align-items: center;
           justify-content: center;
+          animation: fadeIn 0.3s ease-out;
         }
 
         .scroll-btn:hover {
           background: linear-gradient(135deg, var(--accent-color) 0%, var(--primary-color) 100%);
           transform: translateY(-1px);
           box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+        }
+
+        @keyframes fadeIn {
+          from {
+            opacity: 0;
+            transform: scale(0.8);
+          }
+          to {
+            opacity: 1;
+            transform: scale(1);
+          }
         }
 
         .spinner {

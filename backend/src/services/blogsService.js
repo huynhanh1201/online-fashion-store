@@ -19,6 +19,7 @@ const createBlog = async (reqBody, jwtDecoded) => {
       images: reqBody.images,
       tags: reqBody.tags,
       category: reqBody.category,
+      type: reqBody.type,
       brand: reqBody.brand,
       status: reqBody.status,
       meta: reqBody.meta,

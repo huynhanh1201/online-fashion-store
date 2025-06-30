@@ -187,7 +187,7 @@ const AddFlashSale = ({ open, onClose, onSave, initialData }) => {
     clearMessages()
 
     const product = updated[index]
-    
+
     // Validate input immediately
     if (product._id && value && !isNaN(value) && Number(value) > 0) {
       const flashSalePrice = Number(value)

@@ -140,6 +140,8 @@ const DisplayManagement = () => {
         return { bg: '#e1f5fe', color: '#0277bd' }
       case 'bottom':
         return { bg: '#e8f5e8', color: '#2e7d32' }
+      case 'login':
+        return { bg: '#fce4ec', color: '#c2185b' }
       default:
         return { bg: '#f5f5f5', color: '#757575' }
     }
@@ -157,6 +159,8 @@ const DisplayManagement = () => {
         return 'Top (Đầu)'
       case 'bottom':
         return 'Bottom (Cuối)'
+      case 'login':
+        return 'Trang đăng nhập'
       default:
         return position
     }

@@ -805,26 +805,6 @@ const FlashSaleManagement = () => {
                       </Tooltip>
                     )}
                     {/* Nút xóa chỉ hiển thị cho chiến dịch đã kết thúc hoặc bị tắt */}
-
-                    {(campaign.status === 'expired' || campaign.status === 'disabled') && (
-
-                      <Tooltip title='Xóa chiến dịch'>
-                        <IconButton
-                          size='small'
-                          sx={{
-                            color: '#ef4444',
-                            '&:hover': { backgroundColor: '#fee2e2' }
-                          }}
-                          onClick={(e) => {
-                            e.stopPropagation()
-                            handleDeleteCampaignClick(campaign)
-                          }}
-                        >
-                          <DeleteIcon fontSize='small' />
-                        </IconButton>
-                      </Tooltip>
-                    )
-                    }
                     <Chip
                       label={getStatusLabel(campaign.status)}
                       color={getStatusColor(campaign.status)}
