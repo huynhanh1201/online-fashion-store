@@ -28,7 +28,8 @@ const UserTable = ({
   onChangeRowsPerPage,
   total,
   roles,
-  permissions = {}
+  permissions = {},
+  filters
 }) => {
   const columns = [
     { id: 'index', label: 'STT', align: 'center', width: 50 },
@@ -116,6 +117,7 @@ const UserTable = ({
                   handleOpenModal={handleOpenModal}
                   permissions={permissions}
                   roles={roles}
+                  filters={filters}
                 />
               ))
             ) : (

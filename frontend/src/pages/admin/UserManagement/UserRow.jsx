@@ -11,7 +11,7 @@ import {
 import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye'
 import BorderColorIcon from '@mui/icons-material/BorderColor'
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever'
-
+import RestartAltIcon from '@mui/icons-material/RestartAlt'
 const formatDateTime = (isoString) => {
   if (!isoString) return 'Không xác định'
   const date = new Date(isoString)
@@ -50,7 +50,8 @@ export default function UserRow({
   columns,
   handleOpenModal,
   permissions = {},
-  roles
+  roles,
+  filters
 }) {
   return (
     <TableRow hover role='checkbox' tabIndex={-1}>
@@ -172,6 +173,16 @@ export default function UserRow({
                 {/*    </IconButton>*/}
                 {/*  </Tooltip>*/}
                 {/*)}*/}
+                {filters.destroy === 'true' && (
+                  <Tooltip title='Khôi phục'>
+                    <IconButton
+                      onClick={() => handleOpenModal('restore', user)}
+                      size='small'
+                    >
+                      <RestartAltIcon color='success' />
+                    </IconButton>
+                  </Tooltip>
+                )}
                 {permissions.canDelete && (
                   <Tooltip title='Xoá'>
                     <IconButton

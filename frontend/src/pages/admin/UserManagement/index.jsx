@@ -18,7 +18,8 @@ const UserManagement = () => {
   const [limit, setLimit] = React.useState(10)
   const [modalType, setModalType] = React.useState(null)
   const [filters, setFilters] = React.useState({
-    sort: 'newest'
+    sort: 'newest',
+    destroy: 'false'
   })
 
   const { users, totalPages, fetchUsers, Loading, removeUser, update } =
@@ -32,7 +33,9 @@ const UserManagement = () => {
   React.useEffect(() => {
     fetchUsers(page, limit, filters)
   }, [page, limit, filters])
+
   const filterUser = users.filter((user) => user?.role === 'customer')
+
   const handleOpenModal = (type, user) => {
     if (!user || !user._id) return
     setSelectedUser(user)
@@ -89,6 +92,7 @@ const UserManagement = () => {
           canView: hasPermission('user:read')
         }}
         roles={roles}
+        filters={filters}
       />
 
       <React.Suspense fallback={<></>}>
