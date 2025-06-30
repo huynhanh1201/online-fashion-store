@@ -170,17 +170,17 @@ const PolicyPage = () => {
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
-            justifyContent: 'center',
+            justifyContent: 'flex-start',
             width: '100%'
           }}
         >
           {currentPolicy ? (
-            <Box sx={{ width: '100%', maxWidth: 700 }}>
+            <Box sx={{ width: '100%', maxWidth: 900, textAlign: 'left' }}>
               <Typography
                 variant='h4'
                 fontWeight='bold'
                 gutterBottom
-                align='center'
+                align='left'
               >
                 {currentPolicy.title}
               </Typography>
@@ -190,7 +190,7 @@ const PolicyPage = () => {
                   variant='h6' 
                   color="text.secondary"
                   gutterBottom 
-                  sx={{ mt: 2, textAlign: 'center' }}
+                  sx={{ mt: 2, textAlign: 'left' }}
                 >
                   {currentPolicy.excerpt}
                 </Typography>
@@ -220,12 +220,12 @@ const PolicyPage = () => {
               />
             </Box>
           ) : (
-            <Box sx={{ width: '100%', maxWidth: 700, textAlign: 'center' }}>
+            <Box sx={{ width: '100%', maxWidth: 900, textAlign: 'left' }}>
               <Typography
                 variant='h4'
                 fontWeight='bold'
                 gutterBottom
-                align='center'
+                align='left'
               >
                 {tabLabels[tab]}
               </Typography>

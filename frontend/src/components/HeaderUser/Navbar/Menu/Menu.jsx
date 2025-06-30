@@ -548,7 +548,7 @@ const Menu = ({ headerRef }) => {
             zIndex: 1450,
             backgroundColor: 'white',
             display: 'flex',
-            justifyContent: 'center',
+            justifyContent: 'start',
             overflow: 'hidden',
             transition: `transform ${megamenuSettings.animationDuration}ms ease, padding 0.2s ease, opacity ${megamenuSettings.animationDuration}ms ease`,
             opacity: productMenuOpen ? 1 : 0,

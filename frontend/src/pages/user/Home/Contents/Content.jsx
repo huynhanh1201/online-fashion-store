@@ -277,7 +277,7 @@ const Content = () => {
         ))}
       </div>
       </div>
-       <Box sx={{width:'100vw'}}>
+       <Box sx={{width:'95vw'}}>
           <CouponList/>
         </Box>
       <div className='content-container'>
@@ -337,7 +337,7 @@ const Content = () => {
       {/* Flash Sale Section */}
       <FlashSaleSection products={products} loading={loading} error={error} />
     </div>
-    <Box sx={{width:'100vw'}}>
+    <Box sx={{width:'99vw', justifyContent:'center' , alignItems:'center'}}>
      
        <ProductHorizontalScroll products={[...products].slice(-12).reverse()} maxVisible={6} itemWidth={260} />
        {products.length > 0 && (
