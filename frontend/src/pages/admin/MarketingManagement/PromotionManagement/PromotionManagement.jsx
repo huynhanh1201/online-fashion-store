@@ -40,7 +40,10 @@ import {
   Visibility as VisibilityIcon,
   Refresh as RefreshIcon
 } from '@mui/icons-material'
-import { getDiscounts, deleteDiscount } from '~/services/admin/discountService.js'
+import {
+  getDiscounts,
+  deleteDiscount
+} from '~/services/admin/discountService.js'
 import AddDiscountModal from './Modal/AddDiscount.jsx'
 import ViewDiscountModal from './Modal/ViewDiscount.jsx'
 import EditDiscountModal from './Modal/EditDiscount.jsx'
@@ -51,7 +54,7 @@ const PromotionManagement = () => {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [refreshing, setRefreshing] = useState(false)
-  
+
   // Modal states
   const [openAddModal, setOpenAddModal] = useState(false)
   const [openViewModal, setOpenViewModal] = useState(false)
@@ -103,7 +106,7 @@ const PromotionManagement = () => {
     setOpenEditModal(true)
   }
 
-  // Handle modal success
+  // Handle Chart success
   const handleModalSuccess = (result) => {
     console.log('Voucher operation successful:', result)
     fetchVouchers()
@@ -111,7 +114,7 @@ const PromotionManagement = () => {
     setOpenEditModal(false)
   }
 
-  // Handle modal close
+  // Handle Chart close
   const handleCloseModal = () => {
     setOpenAddModal(false)
     setOpenViewModal(false)
@@ -199,7 +202,9 @@ const PromotionManagement = () => {
             const savings =
               v.discountType === 'fixed'
                 ? (v.discountAmount || 0) * (v.usageCount || 0)
-                : (v.minOrderValue || 0) * ((v.discountAmount || 0) / 100) * (v.usageCount || 0)
+                : (v.minOrderValue || 0) *
+                  ((v.discountAmount || 0) / 100) *
+                  (v.usageCount || 0)
             return sum + savings
           }, 0)
           .toLocaleString() + 'đ',
@@ -212,34 +217,41 @@ const PromotionManagement = () => {
   const LoadingSkeleton = () => (
     <TableRow>
       <TableCell>
-        <Skeleton variant="text" width="60%" />
-        <Skeleton variant="text" width="40%" />
+        <Skeleton variant='text' width='60%' />
+        <Skeleton variant='text' width='40%' />
       </TableCell>
       <TableCell>
-        <Skeleton variant="rectangular" width={80} height={24} />
+        <Skeleton variant='rectangular' width={80} height={24} />
       </TableCell>
       <TableCell>
-        <Skeleton variant="text" width="60%" />
+        <Skeleton variant='text' width='60%' />
       </TableCell>
       <TableCell>
-        <Skeleton variant="text" width="60%" />
-        <Skeleton variant="text" width="40%" />
+        <Skeleton variant='text' width='60%' />
+        <Skeleton variant='text' width='40%' />
       </TableCell>
       <TableCell>
-        <Skeleton variant="text" width="60%" />
-        <Skeleton variant="rectangular" width="100%" height={6} />
+        <Skeleton variant='text' width='60%' />
+        <Skeleton variant='rectangular' width='100%' height={6} />
       </TableCell>
       <TableCell>
-        <Skeleton variant="rectangular" width={80} height={24} />
+        <Skeleton variant='rectangular' width={80} height={24} />
       </TableCell>
       <TableCell>
-        <Skeleton variant="circular" width={32} height={32} />
+        <Skeleton variant='circular' width={32} height={32} />
       </TableCell>
     </TableRow>
   )
 
   return (
-    <Box sx={{ p: 3, backgroundColor: '#f8fafc',borderRadius: 3, minHeight: '100vh' }}>
+    <Box
+      sx={{
+        p: 3,
+        backgroundColor: '#f8fafc',
+        borderRadius: 3,
+        minHeight: '100vh'
+      }}
+    >
       {/* Header */}
       <Box sx={{ mb: 4 }}>
         <Typography
@@ -263,11 +275,11 @@ const PromotionManagement = () => {
 
       {/* Error Alert */}
       {error && (
-        <Alert 
-          severity="error" 
+        <Alert
+          severity='error'
           sx={{ mb: 3 }}
           action={
-            <Button color="inherit" size="small" onClick={handleRefresh}>
+            <Button color='inherit' size='small' onClick={handleRefresh}>
               Thử lại
             </Button>
           }
@@ -331,7 +343,14 @@ const PromotionManagement = () => {
       </Grid>
 
       {/* Action Buttons */}
-      <Box sx={{ mb: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+      <Box
+        sx={{
+          mb: 3,
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center'
+        }}
+      >
         <Button
           variant='contained'
           startIcon={<AddIcon />}
@@ -355,9 +374,9 @@ const PromotionManagement = () => {
         >
           Tạo mã giảm giá mới
         </Button>
-        
+
         <Button
-          variant="outlined"
+          variant='outlined'
           startIcon={<RefreshIcon />}
           onClick={handleRefresh}
           disabled={refreshing}
@@ -421,21 +440,30 @@ const PromotionManagement = () => {
                     voucher.usageCount || 0,
                     voucher.maxUsage || 0
                   )
-                  const discountColor = getDiscountTypeColor(voucher.discountType)
+                  const discountColor = getDiscountTypeColor(
+                    voucher.discountType
+                  )
 
                   return (
                     <TableRow
                       key={voucher._id || voucher.id}
                       sx={{
                         '&:hover': {
-                          backgroundColor: alpha(theme.palette.primary.main, 0.04)
+                          backgroundColor: alpha(
+                            theme.palette.primary.main,
+                            0.04
+                          )
                         },
                         '&:last-child td, &:last-child th': { border: 0 }
                       }}
                     >
                       <TableCell sx={{ py: 2 }}>
                         <Stack spacing={1}>
-                          <Stack direction='row' spacing={1} alignItems='center'>
+                          <Stack
+                            direction='row'
+                            spacing={1}
+                            alignItems='center'
+                          >
                             <Typography
                               variant='body1'
                               sx={{
@@ -500,7 +528,10 @@ const PromotionManagement = () => {
                             <Typography variant='body2' color='text.secondary'>
                               Đơn tối thiểu
                             </Typography>
-                            <Typography variant='body1' sx={{ fontWeight: 600 }}>
+                            <Typography
+                              variant='body1'
+                              sx={{ fontWeight: 600 }}
+                            >
                               {(voucher.minOrderValue || 0).toLocaleString()}đ
                             </Typography>
                           </Box>
@@ -509,7 +540,11 @@ const PromotionManagement = () => {
 
                       <TableCell sx={{ py: 2 }}>
                         <Stack spacing={0.5}>
-                          <Stack direction='row' spacing={1} alignItems='center'>
+                          <Stack
+                            direction='row'
+                            spacing={1}
+                            alignItems='center'
+                          >
                             <ScheduleIcon
                               sx={{ fontSize: 14, color: '#059669' }}
                             />
@@ -520,7 +555,11 @@ const PromotionManagement = () => {
                               Từ: {formatDate(voucher.startDate)}
                             </Typography>
                           </Stack>
-                          <Stack direction='row' spacing={1} alignItems='center'>
+                          <Stack
+                            direction='row'
+                            spacing={1}
+                            alignItems='center'
+                          >
                             <ScheduleIcon
                               sx={{ fontSize: 14, color: '#dc2626' }}
                             />
@@ -537,12 +576,22 @@ const PromotionManagement = () => {
                       <TableCell sx={{ py: 2 }}>
                         <Stack spacing={1}>
                           <Box
-                            sx={{ display: 'flex', alignItems: 'center', gap: 1 }}
+                            sx={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: 1
+                            }}
                           >
-                            <Typography variant='body2' sx={{ fontWeight: 600 }}>
+                            <Typography
+                              variant='body2'
+                              sx={{ fontWeight: 600 }}
+                            >
                               {(voucher.usageCount || 0).toLocaleString()}
                             </Typography>
-                            <Typography variant='caption' color='text.secondary'>
+                            <Typography
+                              variant='caption'
+                              color='text.secondary'
+                            >
                               / {(voucher.maxUsage || 0).toLocaleString()}
                             </Typography>
                           </Box>
@@ -572,8 +621,12 @@ const PromotionManagement = () => {
 
                       <TableCell sx={{ py: 2 }}>
                         <Chip
-                          label={getStatusText(voucher.isActive ? 'active' : 'inactive')}
-                          color={getStatusColor(voucher.isActive ? 'active' : 'inactive')}
+                          label={getStatusText(
+                            voucher.isActive ? 'active' : 'inactive'
+                          )}
+                          color={getStatusColor(
+                            voucher.isActive ? 'active' : 'inactive'
+                          )}
                           size='small'
                           sx={{
                             fontWeight: 600,
@@ -629,11 +682,11 @@ const PromotionManagement = () => {
                 // No data
                 <TableRow>
                   <TableCell colSpan={7} sx={{ textAlign: 'center', py: 4 }}>
-                    <Typography variant="body1" color="text.secondary">
+                    <Typography variant='body1' color='text.secondary'>
                       Chưa có voucher nào
                     </Typography>
                     <Button
-                      variant="outlined"
+                      variant='outlined'
                       startIcon={<AddIcon />}
                       onClick={() => setOpenAddModal(true)}
                       sx={{ mt: 2 }}

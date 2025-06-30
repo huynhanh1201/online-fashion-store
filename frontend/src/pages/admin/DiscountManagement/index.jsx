@@ -48,7 +48,7 @@ function DiscountManagement() {
   const handleOpenModal = (type, discount) => {
     if (!discount || !discount._id) return
 
-    // Kiểm tra quyền trước khi mở modal
+    // Kiểm tra quyền trước khi mở Chart
     if (type === 'edit' && !hasPermission('coupon:update')) return
     if (type === 'delete' && !hasPermission('coupon:delete')) return
     if (type === 'view' && !hasPermission('coupon:read')) return

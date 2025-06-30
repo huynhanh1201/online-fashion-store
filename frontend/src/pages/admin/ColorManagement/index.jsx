@@ -5,7 +5,7 @@ import useColors from '~/hooks/admin/useColor'
 import usePermissions from '~/hooks/usePermissions'
 import { PermissionWrapper, RouteGuard } from '~/components/PermissionGuard'
 
-// Lazy load các modal
+// Lazy load các Chart
 const AddColorModal = React.lazy(() => import('./modal/AddColorModal'))
 const ViewColorModal = React.lazy(() => import('./modal/ViewColorModal'))
 const EditColorModal = React.lazy(() => import('./modal/EditColorModal'))

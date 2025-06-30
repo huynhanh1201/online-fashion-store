@@ -215,6 +215,7 @@ const ProductTable = ({
       width: 200,
       align: 'start'
     },
+    { id: 'moreVariants', label: 'Biến thể', minWidth: 100, align: 'start' },
     { id: 'exportPrice', label: 'Giá bán', minWidth: 100, align: 'right' },
     {
       id: 'importPrice',

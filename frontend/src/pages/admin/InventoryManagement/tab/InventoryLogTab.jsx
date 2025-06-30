@@ -46,7 +46,7 @@ const InventoryLogTab = () => {
   const [filters, setFilters] = useState({
     sort: 'newest'
   }) // State cho kho
-  const [openViewModal, setOpenViewModal] = useState(false) // State cho modal xem
+  const [openViewModal, setOpenViewModal] = useState(false) // State cho Chart xem
   const [selectedLog, setSelectedLog] = useState(null) // State cho bản ghi được chọn
   const { hasPermission } = usePermissions()
 

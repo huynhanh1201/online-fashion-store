@@ -77,7 +77,7 @@ const FeaturedCategoryManagement = () => {
     setRefreshing(false)
   }
 
-  // Handle success from modal
+  // Handle success from Chart
   const handleModalSuccess = (result) => {
     console.log('Featured category updated successfully:', result)
     // Refresh data after successful update
@@ -140,7 +140,11 @@ const FeaturedCategoryManagement = () => {
     },
     {
       title: 'Hình ảnh danh mục',
-      value: loading ? <Skeleton width={40} /> : featuredCategories.filter((cat) => cat.imageUrl).length,
+      value: loading ? (
+        <Skeleton width={40} />
+      ) : (
+        featuredCategories.filter((cat) => cat.imageUrl).length
+      ),
       icon: <CollectionsIcon />,
       color: '#2e7d32'
     }
@@ -165,7 +169,14 @@ const FeaturedCategoryManagement = () => {
   )
 
   return (
-    <Box sx={{ p: 3, backgroundColor: '#f8fafc', borderRadius: 3, minHeight: '100vh' }}>
+    <Box
+      sx={{
+        p: 3,
+        backgroundColor: '#f8fafc',
+        borderRadius: 3,
+        minHeight: '100vh'
+      }}
+    >
       {/* Header */}
       <Box sx={{ mb: 4 }}>
         <Typography
@@ -257,7 +268,14 @@ const FeaturedCategoryManagement = () => {
       </Grid>
 
       {/* Action Buttons */}
-      <Box sx={{ mb: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+      <Box
+        sx={{
+          mb: 3,
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center'
+        }}
+      >
         {hasPermission('featuredCategory:create') && (
           <Button
             variant='contained'
@@ -281,10 +299,9 @@ const FeaturedCategoryManagement = () => {
           >
             Thêm danh mục mới
           </Button>
-
         )}
         <Button
-          variant="outlined"
+          variant='outlined'
           startIcon={<RefreshIcon />}
           onClick={handleRefresh}
           disabled={refreshing}
@@ -378,7 +395,9 @@ const FeaturedCategoryManagement = () => {
                               backgroundColor: '#f8fafc'
                             }}
                           >
-                            <CollectionsIcon sx={{ color: '#cbd5e1', fontSize: 24 }} />
+                            <CollectionsIcon
+                              sx={{ color: '#cbd5e1', fontSize: 24 }}
+                            />
                           </Box>
                         )}
                         <Typography
@@ -413,17 +432,18 @@ const FeaturedCategoryManagement = () => {
                         }}
                         onClick={() => {
                           if (item.link) {
-                            navigator.clipboard.writeText(item.link)
+                            navigator.clipboard
+                              .writeText(item.link)
                               .then(() => {
                                 // You could add a toast notification here
                                 console.log('Link copied to clipboard')
                               })
-                              .catch(err => {
+                              .catch((err) => {
                                 console.error('Failed to copy link:', err)
                               })
                           }
                         }}
-                        title="Click to copy link"
+                        title='Click to copy link'
                       >
                         {item.link || 'Chưa có link'}
                       </Typography>
@@ -475,8 +495,18 @@ const FeaturedCategoryManagement = () => {
                       style={{ marginBottom: 8 }}
                     >
                       <title>No data</title>
-                      <g transform='translate(0 1)' fill='none' fillRule='evenodd'>
-                        <ellipse fill='#f5f5f5' cx='32' cy='33' rx='32' ry='7'></ellipse>
+                      <g
+                        transform='translate(0 1)'
+                        fill='none'
+                        fillRule='evenodd'
+                      >
+                        <ellipse
+                          fill='#f5f5f5'
+                          cx='32'
+                          cy='33'
+                          rx='32'
+                          ry='7'
+                        ></ellipse>
                         <g fillRule='nonzero' stroke='#d9d9d9'>
                           <path d='M55 12.76L44.854 1.258C44.367.474 43.656 0 42.907 0H21.093c-.749 0-1.46.474-1.947 1.257L9 12.761V22h46v-9.24z'></path>
                           <path
@@ -519,8 +549,8 @@ const FeaturedCategoryManagement = () => {
       <Dialog
         open={deleteConfirmOpen}
         onClose={handleDeleteCancel}
-        aria-labelledby="alert-dialog-title"
-        aria-describedby="alert-dialog-description"
+        aria-labelledby='alert-dialog-title'
+        aria-describedby='alert-dialog-description'
         PaperProps={{
           sx: {
             borderRadius: 3,
@@ -529,7 +559,7 @@ const FeaturedCategoryManagement = () => {
         }}
       >
         <DialogTitle
-          id="alert-dialog-title"
+          id='alert-dialog-title'
           sx={{
             display: 'flex',
             alignItems: 'center',
@@ -538,29 +568,34 @@ const FeaturedCategoryManagement = () => {
             fontWeight: 600
           }}
         >
-          <WarningIcon color="error" />
+          <WarningIcon color='error' />
           Xác nhận xóa danh mục
         </DialogTitle>
         <DialogContent>
-          <DialogContentText id="alert-dialog-description" sx={{ mb: 2 }}>
+          <DialogContentText id='alert-dialog-description' sx={{ mb: 2 }}>
             Bạn có chắc chắn muốn xóa danh mục này không?
           </DialogContentText>
           {deleteIndex !== null && featuredCategories[deleteIndex] && (
-            <Box sx={{
-              p: 2,
-              backgroundColor: '#fef2f2',
-              borderRadius: 2,
-              border: '1px solid #fecaca',
-              display: 'flex',
-              alignItems: 'center',
-              gap: 2
-            }}>
+            <Box
+              sx={{
+                p: 2,
+                backgroundColor: '#fef2f2',
+                borderRadius: 2,
+                border: '1px solid #fecaca',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 2
+              }}
+            >
               {featuredCategories[deleteIndex].imageUrl && (
                 <img
-                  src={optimizeCloudinaryUrl(featuredCategories[deleteIndex].imageUrl, {
-                    width: 60,
-                    height: 45
-                  })}
+                  src={optimizeCloudinaryUrl(
+                    featuredCategories[deleteIndex].imageUrl,
+                    {
+                      width: 60,
+                      height: 45
+                    }
+                  )}
                   alt={featuredCategories[deleteIndex].name}
                   style={{
                     width: 60,
@@ -572,10 +607,17 @@ const FeaturedCategoryManagement = () => {
                 />
               )}
               <Box>
-                <Typography variant="body1" sx={{ fontWeight: 600, color: '#1e293b' }}>
+                <Typography
+                  variant='body1'
+                  sx={{ fontWeight: 600, color: '#1e293b' }}
+                >
                   {featuredCategories[deleteIndex].name}
                 </Typography>
-                <Typography variant="body2" color="text.secondary" sx={{ fontFamily: 'monospace' }}>
+                <Typography
+                  variant='body2'
+                  color='text.secondary'
+                  sx={{ fontFamily: 'monospace' }}
+                >
                   {featuredCategories[deleteIndex].link || 'Chưa có link'}
                 </Typography>
               </Box>
@@ -588,7 +630,7 @@ const FeaturedCategoryManagement = () => {
         <DialogActions sx={{ p: 3, pt: 1 }}>
           <Button
             onClick={handleDeleteCancel}
-            variant="outlined"
+            variant='outlined'
             disabled={deleting}
             sx={{
               borderRadius: 2,
@@ -600,9 +642,11 @@ const FeaturedCategoryManagement = () => {
           </Button>
           <Button
             onClick={handleDeleteConfirm}
-            variant="contained"
+            variant='contained'
             disabled={deleting}
-            startIcon={deleting ? <CircularProgress size={16} /> : <DeleteIcon />}
+            startIcon={
+              deleting ? <CircularProgress size={16} /> : <DeleteIcon />
+            }
             sx={{
               borderRadius: 2,
               textTransform: 'none',

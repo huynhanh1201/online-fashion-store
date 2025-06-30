@@ -23,6 +23,7 @@ import ImageNotSupportedIcon from '@mui/icons-material/ImageNotSupported'
 import CloseIcon from '@mui/icons-material/Close'
 import StyleAdmin from '~/assets/StyleAdmin.jsx'
 import StarIcon from '@mui/icons-material/Star'
+import PlayCircleFilledWhiteIcon from '@mui/icons-material/PlayCircleFilledWhite'
 import { optimizeCloudinaryUrl } from '~/utils/cloudinary.js'
 const formatDate = (date) => {
   if (!date) return 'Không xác định'
@@ -182,21 +183,24 @@ const ViewReviewModal = ({ open, onClose, review, onApprove }) => {
                           cursor: 'pointer',
                           border: '1px solid #ccc'
                         }}
-                        onClick={() => openMedia('image', img)}
+                        onClick={() => openMedia('image', img, idx)}
                       />
                     ))}
+
                     {/* Video */}
                     {review.videos?.map((video, idx) => (
                       <Box
                         key={`video-${idx}`}
-                        onClick={() => openMedia('video', video)}
+                        onClick={() => openMedia('video', video, idx)}
                         sx={{
                           width: 100,
                           height: 100,
                           position: 'relative',
                           cursor: 'pointer',
                           border: '1px solid #ccc',
-                          backgroundColor: 'var(--surface-color)'
+                          backgroundColor: 'var(--surface-color)',
+                          overflow: 'hidden',
+                          borderRadius: 1
                         }}
                       >
                         <video
@@ -206,6 +210,27 @@ const ViewReviewModal = ({ open, onClose, review, onApprove }) => {
                             width: '100%',
                             height: '100%',
                             objectFit: 'cover'
+                          }}
+                        />
+                        <Box
+                          sx={{
+                            position: 'absolute',
+                            top: 0,
+                            left: 0,
+                            width: '100%',
+                            height: '100%',
+                            backgroundColor: '#aaa',
+                            opacity: 0.3
+                          }}
+                        />
+                        <PlayCircleFilledWhiteIcon
+                          sx={{
+                            position: 'absolute',
+                            top: '50%',
+                            left: '50%',
+                            transform: 'translate(-50%, -50%)',
+                            fontSize: 40,
+                            color: '#ffffffcc'
                           }}
                         />
                       </Box>
@@ -316,8 +341,8 @@ const ViewReviewModal = ({ open, onClose, review, onApprove }) => {
                     loading='lazy'
                     sx={{
                       maxWidth: '100%',
-                      maxHeight: '90vh',
-                      objectFit: 'cover'
+                      maxHeight: '80vh',
+                      objectFit: 'contain'
                     }}
                   />
                 ) : (
@@ -328,8 +353,8 @@ const ViewReviewModal = ({ open, onClose, review, onApprove }) => {
                     preload='auto'
                     style={{
                       maxWidth: '100%',
-                      maxHeight: '90vh',
-                      objectFit: 'cover'
+                      maxHeight: '80vh',
+                      objectFit: 'contain'
                     }}
                   />
                 )}

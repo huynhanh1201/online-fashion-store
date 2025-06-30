@@ -26,7 +26,7 @@ const EditWarehouseModal = React.lazy(
   () => import('../modal/Warehouse/EditWarehouseModal')
 )
 import ViewWarehouseModal from '../modal/Warehouse/ViewWarehouseModal.jsx'
-import DeleteWarehouseModal from '../modal/Warehouse/DeleteWarehouseModal.jsx' // Thêm modal mới
+import DeleteWarehouseModal from '../modal/Warehouse/DeleteWarehouseModal.jsx' // Thêm Chart mới
 import Tooltip from '@mui/material/Tooltip'
 import FilterWarehouse from '~/components/FilterAdmin/FilterWarehouse.jsx'
 import useWarehouses from '~/hooks/admin/Inventory/useWarehouses.js'
@@ -75,8 +75,8 @@ const WarehousesTab = () => {
 
   const [openAddModal, setOpenAddModal] = useState(false)
   const [openEditModal, setOpenEditModal] = useState(false)
-  const [openViewModal, setOpenViewModal] = useState(false) // Thêm state cho View modal
-  const [openDeleteModal, setOpenDeleteModal] = useState(false) // Thêm state cho Delete modal
+  const [openViewModal, setOpenViewModal] = useState(false) // Thêm state cho View Chart
+  const [openDeleteModal, setOpenDeleteModal] = useState(false) // Thêm state cho Delete Chart
   const [selectedWarehouse, setSelectedWarehouse] = useState(null)
   const [page, setPage] = useState(1) // State cho trang hiện tại
   const [rowsPerPage, setRowsPerPage] = useState(10) // State cho số dòng mỗi trang
@@ -99,7 +99,7 @@ const WarehousesTab = () => {
 
   const handleViewWarehouse = (warehouse) => {
     setSelectedWarehouse(warehouse)
-    setOpenViewModal(true) // Mở View modal
+    setOpenViewModal(true) // Mở View Chart
   }
 
   const handleEditWarehouse = (warehouse) => {
@@ -114,7 +114,7 @@ const WarehousesTab = () => {
 
   const handleDeleteWarehouse = (warehouse) => {
     setSelectedWarehouse(warehouse)
-    setOpenDeleteModal(true) // Mở Delete modal
+    setOpenDeleteModal(true) // Mở Delete Chart
   }
 
   const handleCloseDeleteModal = () => {
@@ -533,16 +533,16 @@ const WarehousesTab = () => {
                               </IconButton>
                             </Tooltip>
                           )}
-                          {hasPermission('warehouse:delete') && (
-                            <Tooltip title='Ẩn'>
-                              <IconButton
-                                onClick={() => handleDeleteWarehouse(row)}
-                                size='small'
-                              >
-                                <VisibilityOffIcon color='error' />
-                              </IconButton>
-                            </Tooltip>
-                          )}
+                          {/*{hasPermission('warehouse:delete') && (*/}
+                          {/*  <Tooltip title='Ẩn'>*/}
+                          {/*    <IconButton*/}
+                          {/*      onClick={() => handleDeleteWarehouse(row)}*/}
+                          {/*      size='small'*/}
+                          {/*    >*/}
+                          {/*      <VisibilityOffIcon color='error' />*/}
+                          {/*    </IconButton>*/}
+                          {/*  </Tooltip>*/}
+                          {/*)}*/}
                         </Stack>
                       )
                     }

@@ -18,8 +18,8 @@ import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye'
 import BorderColorIcon from '@mui/icons-material/BorderColor'
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever'
 import AddVariantModal from '../modal/Variant/AddVariantModal.jsx'
-import ViewVariantModal from '../modal/Variant/ViewVariantModal.jsx' // Thêm modal mới
-import EditVariantModal from '../modal/Variant/EditVariantModal.jsx' // Thêm modal mới
+import ViewVariantModal from '../modal/Variant/ViewVariantModal.jsx' // Thêm Chart mới
+import EditVariantModal from '../modal/Variant/EditVariantModal.jsx' // Thêm Chart mới
 import DeleteVariantModal from '../modal/Variant/DeleteVariantModal.jsx'
 import AddIcon from '@mui/icons-material/Add'
 import FilterVariant from '~/components/FilterAdmin/FilterVariant.jsx'
@@ -34,7 +34,7 @@ import TableNoneData from '~/components/TableAdmin/NoneData.jsx'
 import Tooltip from '@mui/material/Tooltip'
 import usePermissions from '~/hooks/usePermissions'
 import { PermissionWrapper, RouteGuard } from '~/components/PermissionGuard'
-
+import { useLocation } from 'react-router-dom'
 const VariantsTab = () => {
   const { hasPermission } = usePermissions()
   const {
@@ -69,11 +69,22 @@ const VariantsTab = () => {
   const [openDeleteModal, setOpenDeleteModal] = useState(false)
   const [selectedVariant, setSelectedVariant] = useState(null)
   const [page, setPage] = useState(1)
-  const [filter, setFilter] = useState({
+  const location = useLocation()
+  const queryParams = new URLSearchParams(location.search)
+  const searchFromUrl = queryParams.get('productId') || ''
+  const [filter, setFilter] = React.useState({
     status: 'false',
-    sort: 'newest'
+    sort: 'newest',
+    ...(searchFromUrl ? { productId: searchFromUrl } : {})
   })
-
+  React.useEffect(() => {
+    if (searchFromUrl) {
+      // Xoá `search` khỏi URL sau khi đã đưa vào filters
+      const newParams = new URLSearchParams(location.productId)
+      newParams.delete('productId')
+      window.history.replaceState({}, '', `${location.pathname}?${newParams}`)
+    }
+  }, [])
   useEffect(() => {
     fetchProducts(1, 100000, { status: 'false' })
     fetchColors(1, 100000, { status: 'false' })
@@ -273,6 +284,7 @@ const VariantsTab = () => {
                       fetchVariants={fetchVariants}
                       colors={colors}
                       sizes={sizes}
+                      initialSearch={searchFromUrl}
                     />
                   </Box>
                 </TableCell>

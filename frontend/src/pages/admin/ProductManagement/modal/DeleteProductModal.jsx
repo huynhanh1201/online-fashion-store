@@ -22,7 +22,7 @@ const DeleteProductModal = ({ open, onClose, product, onDelete }) => {
       console.error('Xoá sản phẩm thất bại:', error)
     } finally {
       setIsDeleting(false) // Kết thúc trạng thái xoá
-      onClose() // Đóng modal sau khi xoá thành công hoặc thất bại
+      onClose() // Đóng Chart sau khi xoá thành công hoặc thất bại
     }
   }
 

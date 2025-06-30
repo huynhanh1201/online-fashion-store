@@ -144,6 +144,28 @@ const ProductRow = ({
             )
           }
 
+          if (id === 'moreVariants') {
+            return (
+              <TableCell
+                key={id}
+                align={align}
+                sx={{
+                  ...styles.cellPadding,
+                  cursor: 'pointer'
+                }}
+                onClick={() => {
+                  if (product._id) {
+                    navigate(
+                      `/admin/variant-management?productId=${encodeURIComponent(product._id)}`
+                    )
+                  }
+                }}
+              >
+                Xem các biến thể của sản phẩm
+              </TableCell>
+            )
+          }
+
           if (id === 'status') {
             return (
               <TableCell key={id} align={align} sx={styles.cellPadding}>

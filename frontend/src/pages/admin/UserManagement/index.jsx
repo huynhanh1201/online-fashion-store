@@ -6,7 +6,7 @@ import useRoles from '~/hooks/admin/useRoles.js'
 import usePermissions from '~/hooks/usePermissions'
 import { PermissionWrapper, RouteGuard } from '~/components/PermissionGuard'
 
-// Lazy load các modal
+// Lazy load các Chart
 const ViewUserModal = React.lazy(() => import('./modal/ViewUserModal'))
 const EditUserModal = React.lazy(() => import('./modal/EditUserModal'))
 const DeleteUserModal = React.lazy(() => import('./modal/DeleteUserModal'))

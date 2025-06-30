@@ -14,12 +14,13 @@ export default function FilterVariant({
   fetchVariants,
   loading,
   colors,
-  sizes
+  sizes,
+  initialSearch
 }) {
   const [keyword, setKeyword] = useState('')
   const [inputValue, setInputValue] = useState('')
 
-  const [productId, setProductId] = useState('')
+  const [productId, setProductId] = useState(initialSearch || '')
   const [colorName, setColorName] = useState('')
   const [sizeName, setSizeName] = useState('')
   const [overridePrice, setOverridePrice] = useState('')

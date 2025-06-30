@@ -131,24 +131,24 @@ const BatchesTab = () => {
     setOpenViewModal(true)
   }
 
-  // Mở modal sửa
+  // Mở Chart sửa
   const handleEditBatch = (batch) => {
     setSelectedBatch(batch)
     setOpenEditModal(true)
   }
 
-  // Đóng modal sửa, refresh danh sách
+  // Đóng Chart sửa, refresh danh sách
   const handleCloseEditModal = () => {
     setOpenEditModal(false)
   }
 
-  // Mở modal xoá
+  // Mở Chart xoá
   const handleDeleteBatch = (batch) => {
     setSelectedBatch(batch)
     setOpenDeleteModal(true)
   }
 
-  // Đóng modal xoá, refresh danh sách
+  // Đóng Chart xoá, refresh danh sách
   const handleCloseDeleteModal = () => {
     setOpenDeleteModal(false)
   }
@@ -327,16 +327,16 @@ const BatchesTab = () => {
                               </IconButton>
                             </Tooltip>
                           )}
-                          {hasPermission('batch:update') && (
-                            <Tooltip title='Xoá'>
-                              <IconButton
-                                onClick={() => handleDeleteBatch(row)}
-                                size='small'
-                              >
-                                <VisibilityOffIcon color='error' />
-                              </IconButton>
-                            </Tooltip>
-                          )}
+                          {/*{hasPermission('batch:update') && (*/}
+                          {/*  <Tooltip title='Xoá'>*/}
+                          {/*    <IconButton*/}
+                          {/*      onClick={() => handleDeleteBatch(row)}*/}
+                          {/*      size='small'*/}
+                          {/*    >*/}
+                          {/*      <VisibilityOffIcon color='error' />*/}
+                          {/*    </IconButton>*/}
+                          {/*  </Tooltip>*/}
+                          {/*)}*/}
                         </Stack>
                       )
                     }

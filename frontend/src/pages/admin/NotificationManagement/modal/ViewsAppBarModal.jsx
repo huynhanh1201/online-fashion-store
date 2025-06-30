@@ -31,7 +31,7 @@ const notifications = Array.from({ length: 50 }, (_, index) => ({
 
 const modalStyle = {
   position: 'absolute',
-  top: '67px',
+  top: '50px',
   right: '2%',
   width: 360,
   bgcolor: 'background.paper',

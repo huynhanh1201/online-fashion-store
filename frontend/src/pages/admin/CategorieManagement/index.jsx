@@ -5,7 +5,7 @@ import usePermissions from '~/hooks/usePermissions'
 import { PermissionWrapper, RouteGuard } from '~/components/PermissionGuard'
 import { useLocation } from 'react-router-dom'
 
-// Lazy load các modal
+// Lazy load các Chart
 const AddCategoryModal = React.lazy(() => import('./modal/AddCategoryModal'))
 const ViewCategoryModal = React.lazy(() => import('./modal/ViewCategoryModal'))
 const EditCategoryModal = React.lazy(() => import('./modal/EditCategoryModal'))

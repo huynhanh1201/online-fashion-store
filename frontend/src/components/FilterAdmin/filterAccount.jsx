@@ -110,7 +110,7 @@ export default function FilterAccount({ onFilter, users, loading, roles }) {
         }}
         options={filterRoles.map((role) => ({
           label: role.label,
-          value: role._id
+          value: role.name
         }))}
         sx={{ width: 160 }}
       />
