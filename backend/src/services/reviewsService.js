@@ -50,7 +50,11 @@ const getReviewList = async (queryString) => {
   // Xử lý thông tin Filter
   const filter = {}
 
-  if (destroy) filter.destroy = destroy
+  if (destroy === 'true' || destroy === 'false') {
+    destroy = JSON.parse(destroy)
+
+    filter.destroy = destroy
+  }
 
   if (userId) filter.userId = userId
 
@@ -180,9 +184,27 @@ const updateProductRating = async (productId) => {
   })
 }
 
+const restoreReview = async (reviewId) => {
+  // eslint-disable-next-line no-useless-catch
+  try {
+    const reviewDeleted = await ReviewModel.findOneAndUpdate(
+      { _id: reviewId },
+      { destroy: false },
+      { new: true }
+    )
+
+    await updateProductRating(reviewDeleted.productId)
+
+    return reviewDeleted
+  } catch (err) {
+    throw err
+  }
+}
+
 export const reviewsService = {
   createReview,
   getReviewList,
   updateReview,
-  deleteReview
+  deleteReview,
+  restoreReview
 }

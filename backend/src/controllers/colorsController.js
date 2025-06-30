@@ -63,10 +63,23 @@ const deleteColor = async (req, res, next) => {
   }
 }
 
+const restoreColor = async (req, res, next) => {
+  try {
+    const colorId = req.params.colorId
+
+    const result = await colorsService.restoreColor(colorId)
+
+    res.status(StatusCodes.OK).json(result)
+  } catch (err) {
+    next(err)
+  }
+}
+
 export const colorsController = {
   createColor,
   getColorList,
   getColor,
   updateColor,
-  deleteColor
+  deleteColor,
+  restoreColor
 }

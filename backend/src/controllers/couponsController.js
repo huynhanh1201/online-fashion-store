@@ -73,11 +73,24 @@ const deleteCoupon = async (req, res, next) => {
   }
 }
 
+const restoreCoupons = async (req, res, next) => {
+  try {
+    const couponId = req.params.couponId
+
+    const result = await couponsService.restoreCoupons(couponId)
+
+    res.status(StatusCodes.OK).json(result)
+  } catch (err) {
+    next(err)
+  }
+}
+
 export const couponsController = {
   createCoupon,
   validateCoupon,
   getCouponList,
   getCoupon,
   updateCoupon,
-  deleteCoupon
+  deleteCoupon,
+  restoreCoupons
 }

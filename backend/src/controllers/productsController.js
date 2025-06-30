@@ -86,6 +86,18 @@ const getVariantOfProduct = async (req, res, next) => {
   }
 }
 
+const restoreProduct = async (req, res, next) => {
+  try {
+    const productId = req.params.productId
+
+    const result = await productsService.restoreProduct(productId)
+
+    res.status(StatusCodes.OK).json(result)
+  } catch (err) {
+    next(err)
+  }
+}
+
 export const productsController = {
   createProduct,
   getProductList,
@@ -93,5 +105,6 @@ export const productsController = {
   updateProduct,
   deleteProduct,
   getListProductOfCategory,
-  getVariantOfProduct
+  getVariantOfProduct,
+  restoreProduct
 }

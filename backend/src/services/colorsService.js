@@ -37,7 +37,11 @@ const getColorList = async (queryString) => {
   // Xử lý thông tin Filter
   const filter = {}
 
-  if (destroy) filter.destroy = destroy
+  if (destroy === 'true' || destroy === 'false') {
+    destroy = JSON.parse(destroy)
+
+    filter.destroy = destroy
+  }
 
   if (status === 'true' || status === 'false') {
     status = JSON.parse(status)
@@ -136,10 +140,26 @@ const deleteColor = async (colorId) => {
   }
 }
 
+const restoreColor = async (colorId) => {
+  // eslint-disable-next-line no-useless-catch
+  try {
+    const colorDeleted = await ColorModel.findOneAndUpdate(
+      { _id: colorId },
+      { destroy: false },
+      { new: true }
+    )
+
+    return colorDeleted
+  } catch (err) {
+    throw err
+  }
+}
+
 export const colorsService = {
   createColor,
   getColorList,
   getColor,
   updateColor,
-  deleteColor
+  deleteColor,
+  restoreColor
 }
