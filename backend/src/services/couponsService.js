@@ -144,7 +144,7 @@ const deleteCoupon = async (couponId) => {
     const couponDeleted = await CouponModel.updateOne(
       { _id: couponId },
       {
-        isActive: false
+        destroy: true
       },
       {
         new: true,

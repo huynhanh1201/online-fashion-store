@@ -48,6 +48,10 @@ const CouponSchema = new Schema(
     isActive: {
       type: Boolean, // Mã đang bật/tắt
       default: true
+    },
+    destroy: {
+      type: Boolean, // Mã đang bật/tắt
+      default: false
     }
   },
   {
