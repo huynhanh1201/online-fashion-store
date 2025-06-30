@@ -5,12 +5,15 @@ import usePermissions from '~/hooks/usePermissions'
 import { PermissionWrapper, RouteGuard } from '~/components/PermissionGuard'
 import { useLocation } from 'react-router-dom'
 
-// Lazy load các modal
+// Lazy load các Chart
 const AddCategoryModal = React.lazy(() => import('./modal/AddCategoryModal'))
 const ViewCategoryModal = React.lazy(() => import('./modal/ViewCategoryModal'))
 const EditCategoryModal = React.lazy(() => import('./modal/EditCategoryModal'))
 const DeleteCategoryModal = React.lazy(
   () => import('./modal/DeleteCategoryModal')
+)
+const RestoreCategoryModal = React.lazy(
+  () => import('./modal/RestoreCategoryModal')
 )
 
 const CategoryManagement = () => {
@@ -23,7 +26,7 @@ const CategoryManagement = () => {
   const queryParams = new URLSearchParams(location.search)
   const searchFromUrl = queryParams.get('search') || ''
   const [filters, setFilters] = React.useState(() => ({
-    status: 'false',
+    destroy: 'false',
     sort: 'newest',
     ...(searchFromUrl ? { search: searchFromUrl } : {})
   }))
@@ -38,7 +41,8 @@ const CategoryManagement = () => {
     update,
     remove,
     setROWS_PER_PAGE,
-    ROWS_PER_PAGE
+    ROWS_PER_PAGE,
+    Restore
   } = useCategories()
   React.useEffect(() => {
     if (searchFromUrl) {
@@ -72,6 +76,8 @@ const CategoryManagement = () => {
         await update(id, data)
       } else if (type === 'delete') {
         await remove(data)
+      } else if (type === 'restore') {
+        await Restore(data)
       }
     } catch (error) {
       console.error('Lỗi:', error)
@@ -112,6 +118,7 @@ const CategoryManagement = () => {
           canView: hasPermission('category:read')
         }}
         initialSearch={searchFromUrl}
+        filters={filters}
       />
 
       <React.Suspense fallback={<></>}>
@@ -151,6 +158,14 @@ const CategoryManagement = () => {
             />
           )}
         </PermissionWrapper>
+        {modalType === 'restore' && selectedCategory && (
+          <RestoreCategoryModal
+            open
+            onClose={handleCloseModal}
+            category={selectedCategory}
+            onRestore={handleSave}
+          />
+        )}
       </React.Suspense>
 
       {/*<CategoryPagination*/}

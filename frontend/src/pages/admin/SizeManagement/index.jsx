@@ -6,7 +6,7 @@ import useSizes from '~/hooks/admin/useSize'
 import usePermissions from '~/hooks/usePermissions'
 import { PermissionWrapper, RouteGuard } from '~/components/PermissionGuard'
 
-// Lazy load các modal
+// Lazy load các Chart
 const AddSizeModal = React.lazy(() => import('./modal/AddSizeModal'))
 const ViewSizeModal = React.lazy(() => import('./modal/ViewSizeModal'))
 const EditSizeModal = React.lazy(() => import('./modal/EditSizeModal'))
@@ -15,7 +15,7 @@ const DeleteSizeModal = React.lazy(() => import('./modal/DeleteSizeModal'))
 const SizeManagement = () => {
   const [page, setPage] = React.useState(1)
   const [filters, setFilters] = React.useState({
-    status: 'false',
+    destroy: 'false',
     sort: 'newest'
   }) // Bộ lọc tìm kiếm
   const [selectedSize, setSelectedSize] = React.useState(null)
@@ -42,7 +42,7 @@ const SizeManagement = () => {
   const handleOpenModal = (type, size) => {
     if (!size || !size._id) return
 
-    // Kiểm tra quyền trước khi mở modal
+    // Kiểm tra quyền trước khi mở Chart
     if (type === 'edit' && !hasPermission('size:update')) return
     if (type === 'delete' && !hasPermission('size:delete')) return
     if (type === 'view' && !hasPermission('size:read')) return

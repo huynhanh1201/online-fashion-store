@@ -9,7 +9,7 @@ import { RouteGuard, PermissionWrapper } from '~/components/PermissionGuard'
 const ReviewManagement = () => {
   const [page, setPage] = useState(1)
   const [limit, setLimit] = useState(10)
-  const [filter, setFilter] = useState({})
+  const [filter, setFilter] = useState({ destroy: 'false' })
   const [selectedReview, setSelectedReview] = useState(null)
   const [modalType, setModalType] = useState(null)
   const { reviews, fetchReview, loading, remove, totalPages, update } =

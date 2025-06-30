@@ -120,6 +120,7 @@ import VisibilityIcon from '@mui/icons-material/Visibility'
 import StyleAdmin from '~/assets/StyleAdmin.jsx'
 import Tooltip from '@mui/material/Tooltip'
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff'
+import DeleteForeverIcon from '@mui/icons-material/DeleteForever'
 const formatDate = (iso) =>
   iso
     ? new Date(iso).toLocaleDateString('vi-VN', {
@@ -230,12 +231,12 @@ export default function DiscountRow({
                   </Tooltip>
                 )}
                 {permissions.canDelete && (
-                  <Tooltip title='Ẩn'>
+                  <Tooltip title='Xoá'>
                     <IconButton
                       onClick={() => onAction('delete', discount)}
                       size='small'
                     >
-                      <VisibilityOffIcon color='error' />
+                      <DeleteForeverIcon color='error' />
                     </IconButton>
                   </Tooltip>
                 )}

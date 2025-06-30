@@ -21,9 +21,9 @@
 // import VisibilityIcon from '@mui/icons-material/Visibility'
 // import EditIcon from '@mui/icons-material/Edit'
 // import DeleteIcon from '@mui/icons-material/Delete'
-// import ViewInventoryModal from '../modal/Inventory/ViewInventoryModal.jsx'
-// import EditInventoryModal from '../modal/Inventory/EditInventoryModal.jsx'
-// import DeleteInventoryModal from '../modal/Inventory/DeleteInventoryModal.jsx'
+// import ViewInventoryModal from '../Chart/Inventory/ViewInventoryModal.jsx'
+// import EditInventoryModal from '../Chart/Inventory/EditInventoryModal.jsx'
+// import DeleteInventoryModal from '../Chart/Inventory/DeleteInventoryModal.jsx'
 //
 // const InventoryTab = ({
 //   data,

@@ -14,6 +14,7 @@ export default function FilterUser({ onFilter, users, loading, roles }) {
   const [endDate, setEndDate] = useState(dayjs().format('YYYY-MM-DD'))
   const [role, setRole] = useState('')
   const [sort, setSort] = useState('newest')
+  const [destroy, setDestroy] = useState('false')
   const hasMounted = useRef(false)
 
   useEffect(() => {
@@ -25,7 +26,7 @@ export default function FilterUser({ onFilter, users, loading, roles }) {
     if (hasMounted.current) {
       applyFilters(selectedFilter, startDate, endDate)
     }
-  }, [keyword, sort, role])
+  }, [keyword, sort, role, destroy])
 
   const handleSearch = () => {
     setKeyword(inputValue)
@@ -53,7 +54,8 @@ export default function FilterUser({ onFilter, users, loading, roles }) {
     const filters = {
       search: keyword || undefined,
       sort: sort || undefined,
-      roleId: role || undefined
+      role: role || undefined,
+      destroy: destroy || undefined
     }
 
     if (selectedTime === 'custom') {
@@ -80,12 +82,22 @@ export default function FilterUser({ onFilter, users, loading, roles }) {
     setStartDate(dayjs().format('YYYY-MM-DD'))
     setEndDate(dayjs().format('YYYY-MM-DD'))
     setRole('')
-    setSort('')
-    onFilter({})
+    setDestroy('false')
+    setSort('newest')
+    onFilter({ sort: 'newest', destroy: 'false' })
   }
 
   return (
     <Box display='flex' flexWrap='wrap' gap={2} mb={2} justifyContent='end'>
+      <FilterSelect
+        value={destroy}
+        onChange={setDestroy}
+        label='Xoá'
+        options={[
+          { label: 'Chưa xoá', value: 'false' },
+          { label: 'Đã xóa', value: 'true' }
+        ]}
+      />
       <FilterSelect value={sort} onChange={setSort} />
 
       <FilterByTime

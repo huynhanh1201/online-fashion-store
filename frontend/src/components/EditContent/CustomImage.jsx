@@ -50,8 +50,8 @@ const ImageComponent = ({ node, updateAttributes, deleteNode }) => {
           sx={{
             display: 'inline-block',
             position: 'relative',
-            maxWidth: '800px',
-            maxHeight: '700px'
+            maxWidth: '100%',
+            maxHeight: '100%'
           }}
         >
           <img

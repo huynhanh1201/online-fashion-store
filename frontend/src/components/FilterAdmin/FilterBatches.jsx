@@ -167,16 +167,16 @@ export default function FilterBatches({
       {/*  setPriceMax={setImportPriceMax}*/}
       {/*  onApply={() => applyFilters()}*/}
       {/*/>*/}
-      <FilterSelect
-        label='Trạng thái'
-        value={destroy}
-        onChange={setDestroy}
-        options={[
-          { label: 'Tất cả', value: '' },
-          { label: 'Đang hoạt động', value: 'false' },
-          { label: 'Dừng hoạt động', value: 'true' }
-        ]}
-      />
+      {/*<FilterSelect*/}
+      {/*  label='Trạng thái'*/}
+      {/*  value={destroy}*/}
+      {/*  onChange={setDestroy}*/}
+      {/*  options={[*/}
+      {/*    { label: 'Tất cả', value: '' },*/}
+      {/*    { label: 'Đang hoạt động', value: 'false' },*/}
+      {/*    { label: 'Dừng hoạt động', value: 'true' }*/}
+      {/*  ]}*/}
+      {/*/>*/}
       <FilterSelect
         value={sort}
         onChange={setSort}

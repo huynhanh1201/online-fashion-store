@@ -4,8 +4,8 @@ import { Box } from '@mui/material'
 import OrderTable from './OrderTable'
 import OrderPagination from './OrderPagination'
 import ViewOrderModal from './modal/ViewOrderModal'
-import EditOrderModal from './modal/EditOrderModal' // import modal sửa
-import DeleteOrderModal from './modal/DeleteOrderModal' // import modal xoá
+import EditOrderModal from './modal/EditOrderModal' // import Chart sửa
+import DeleteOrderModal from './modal/DeleteOrderModal' // import Chart xoá
 import useOrder from '~/hooks/admin/useOrder'
 import useDiscounts from '~/hooks/admin/useDiscount'
 import useUsers from '~/hooks/admin/useUsers.js'
@@ -16,8 +16,8 @@ const OrderManagement = () => {
   const [limit, setLimit] = React.useState(10)
   const [filters, setFilters] = React.useState({ sort: 'newest' }) // nếu cần lọc thì thêm filters
   const [openViewModal, setOpenViewModal] = React.useState(false)
-  const [openEditModal, setOpenEditModal] = React.useState(false) // modal sửa
-  const [openDeleteModal, setOpenDeleteModal] = React.useState(false) // modal xoá
+  const [openEditModal, setOpenEditModal] = React.useState(false) // Chart sửa
+  const [openDeleteModal, setOpenDeleteModal] = React.useState(false) // Chart xoá
   const [selectedOrder, setSelectedOrder] = React.useState(null)
   const [histories, setHistories] = React.useState([])
   const [orderDetails, setOrderDetails] = React.useState([])
@@ -63,7 +63,7 @@ const OrderManagement = () => {
   //   )
   // }
 
-  // Mở modal xem
+  // Mở Chart xem
   const handleOpenModalView = async (order) => {
     if (!hasPermission('order:read')) return
     setSelectedOrder(order)
@@ -83,7 +83,7 @@ const OrderManagement = () => {
     setOrderDetails([])
   }
 
-  // Mở modal sửa
+  // Mở Chart sửa
   const handleOpenModalEdit = async (order) => {
     if (!hasPermission('order:update')) return
     setLoadingEdit(true)
@@ -99,7 +99,7 @@ const OrderManagement = () => {
     setLoadingEdit(false)
   }
 
-  // Mở modal xoá
+  // Mở Chart xoá
   const handleOpenModalDelete = (order) => {
     if (!hasPermission('order:delete')) return
     setSelectedOrder(order)
@@ -144,7 +144,7 @@ const OrderManagement = () => {
     try {
       if (!selectedOrder) return
       await remove(selectedOrder._id)
-      handleCloseModalDelete() // Đóng modal xoá
+      handleCloseModalDelete() // Đóng Chart xoá
     } catch (error) {
       console.error('Lỗi xoá đơn hàng:', error)
     }
@@ -166,8 +166,8 @@ const OrderManagement = () => {
         orders={orders}
         loading={loading}
         onView={handleOpenModalView}
-        onEdit={handleOpenModalEdit} // truyền sự kiện mở modal sửa
-        onDelete={handleOpenModalDelete} // truyền sự kiện mở modal xoá
+        onEdit={handleOpenModalEdit} // truyền sự kiện mở Chart sửa
+        onDelete={handleOpenModalDelete} // truyền sự kiện mở Chart xoá
         onFilter={handleFilter}
         fetchOrders={fetchOrders}
         coupons={discounts} // truyền danh sách mã giảm giá nếu cần

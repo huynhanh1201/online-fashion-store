@@ -35,7 +35,8 @@ import {
   getProductById,
   addProduct,
   deleteProduct,
-  updateProduct
+  updateProduct,
+  RestoreProduct
 } from '~/services/admin/productService'
 
 const useProducts = () => {
@@ -149,6 +150,20 @@ const useProducts = () => {
     }
   }
 
+  const restore = async (productId) => {
+    try {
+      const restoredProduct = await RestoreProduct(productId)
+      if (!restoredProduct) {
+        console.error('Không thể khôi phục sản phẩm')
+        return null
+      }
+      setProducts((prev) => prev.filter((p) => p._id !== productId))
+      setTotal((prev) => prev - 1)
+    } catch (error) {
+      console.error('Lỗi khi khôi phục sản phẩm:', error)
+    }
+  }
+
   const Save = (data) => {
     setProducts((prev) => prev.map((d) => (d._id === data._id ? data : d)))
   }
@@ -165,7 +180,8 @@ const useProducts = () => {
     deleteProductById,
     updateProductById,
     ROWS_PER_PAGE,
-    setROWS_PER_PAGE
+    setROWS_PER_PAGE,
+    restore
   }
 }
 

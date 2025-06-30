@@ -72,7 +72,7 @@ export default function AddWarehouseSlipModal({
     }
   }, [warehouses, newSlipData.warehouseId])
 
-  // Sửa lỗi: Đặt openAddWarehouse thành true để mở modal
+  // Sửa lỗi: Đặt openAddWarehouse thành true để mở Chart
   const handleOpenAddWarehouse = () => {
     setOpenAddWarehouse(true)
   }

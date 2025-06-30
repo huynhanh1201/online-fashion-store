@@ -5,6 +5,7 @@ import BorderColorIcon from '@mui/icons-material/BorderColor'
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever'
 import Tooltip from '@mui/material/Tooltip'
 import usePermissions from '~/hooks/usePermissions'
+import RestartAltIcon from '@mui/icons-material/RestartAlt'
 
 const formatDateTime = (isoString) => {
   if (!isoString) return 'Không xác định'
@@ -19,7 +20,7 @@ const formatDateTime = (isoString) => {
 const styles = {
   groupIcon: {
     display: 'flex',
-    justifyContent: 'center',
+    justifyContent: 'start',
     alignItems: 'center',
     gap: 1,
     width: '130px'
@@ -43,6 +44,7 @@ export default function RoleRow({
   index,
   columns,
   handleOpenModal,
+  filters
 }) {
   const { hasPermission } = usePermissions()
   return (
@@ -115,25 +117,38 @@ export default function RoleRow({
                     </IconButton>
                   </Tooltip>
                 )}
-                {hasPermission('role:update') && (
-                  <Tooltip title='Sửa'>
+                {filters.destroy === 'true' ? (
+                  <Tooltip title='Khôi phục'>
                     <IconButton
-                      onClick={() => handleOpenModal('edit', role)}
+                      onClick={() => handleOpenModal('restore', role)}
                       size='small'
                     >
-                      <BorderColorIcon color='warning' />
+                      <RestartAltIcon color='success' />
                     </IconButton>
                   </Tooltip>
-                )}
-                {hasPermission('role:delete') && (
-                  <Tooltip title='Xoá'>
-                    <IconButton
-                      onClick={() => handleOpenModal('delete', role)}
-                      size='small'
-                    >
-                      <DeleteForeverIcon color='error' />
-                    </IconButton>
-                  </Tooltip>
+                ) : (
+                  <>
+                    {hasPermission('role:update') && (
+                      <Tooltip title='Sửa'>
+                        <IconButton
+                          onClick={() => handleOpenModal('edit', role)}
+                          size='small'
+                        >
+                          <BorderColorIcon color='warning' />
+                        </IconButton>
+                      </Tooltip>
+                    )}
+                    {hasPermission('role:delete') && (
+                      <Tooltip title='Xoá'>
+                        <IconButton
+                          onClick={() => handleOpenModal('delete', role)}
+                          size='small'
+                        >
+                          <DeleteForeverIcon color='error' />
+                        </IconButton>
+                      </Tooltip>
+                    )}
+                  </>
                 )}
               </Stack>
             </TableCell>

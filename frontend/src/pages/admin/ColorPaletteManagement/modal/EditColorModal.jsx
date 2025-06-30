@@ -54,7 +54,7 @@ const EditColorModal = ({ open, onClose, color, onUpdated }) => {
   const [previewUrl, setPreviewUrl] = useState('')
   const fileInputRef = useRef()
 
-  // Load dữ liệu ban đầu khi mở modal
+  // Load dữ liệu ban đầu khi mở Chart
   useEffect(() => {
     if (color) {
       reset({

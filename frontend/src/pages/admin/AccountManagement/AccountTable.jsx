@@ -31,7 +31,8 @@ const AccountTable = ({
   onChangeRowsPerPage,
   total,
   roles,
-  permissions = {}
+  permissions = {},
+  filters
 }) => {
   const columns = [
     { id: 'index', label: 'STT', align: 'center', width: 50 },
@@ -84,7 +85,6 @@ const AccountTable = ({
                       Danh sách tài khoản hệ thống
                     </Typography>
                     {hasPermission('account:create') && (
-
                       <Button
                         startIcon={<AddIcon />}
                         variant='contained'
@@ -147,6 +147,7 @@ const AccountTable = ({
                   handleOpenModal={handleOpenModal}
                   permissions={permissions}
                   roles={roles}
+                  filters={filters}
                 />
               ))
             ) : (

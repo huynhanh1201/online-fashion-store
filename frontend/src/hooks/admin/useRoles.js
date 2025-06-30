@@ -90,7 +90,8 @@ import {
   getRoleById,
   addRole,
   deleteRole,
-  updateRole
+  updateRole,
+  restoreRole
 } from '~/services/admin/roleService'
 
 const useRoles = () => {
@@ -196,6 +197,20 @@ const useRoles = () => {
     }
   }
 
+  const restore = async (id) => {
+    try {
+      const restoredRole = await restoreRole(id)
+      if (!restoredRole) return null
+
+      setRoles((prev) => prev.filter((r) => r._id !== id))
+      setTotalPages((prev) => prev - 1)
+      return restoredRole
+    } catch (error) {
+      console.error('Error restoring role:', error)
+      return null
+    }
+  }
+
   const Save = (data) => {
     setRoles((prev) => prev.map((r) => (r._id === data._id ? data : r)))
   }
@@ -211,7 +226,8 @@ const useRoles = () => {
     remove,
     Save,
     setROWS_PER_PAGE,
-    ROWS_PER_PAGE
+    ROWS_PER_PAGE,
+    restore
   }
 }
 

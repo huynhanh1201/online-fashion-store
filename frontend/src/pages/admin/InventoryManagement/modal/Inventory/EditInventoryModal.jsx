@@ -1,4 +1,4 @@
-// modal/Inventory/EditInventoryModal.jsx
+// Chart/Inventory/EditInventoryModal.jsx
 import React, { useState, useEffect } from 'react'
 import {
   Dialog,

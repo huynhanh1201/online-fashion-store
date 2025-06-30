@@ -175,12 +175,11 @@ const orderOptions = [
   { value: 'Cancelled', label: 'Đã hủy' },
   { value: 'Failed', label: 'Thất bại' }
 ]
-
 const colorOrder = [
   { value: 'Pending', color: 'warning' },
   { value: 'Processing', color: 'info' },
   { value: 'Shipping', color: 'primary' },
-  { value: 'Shipped', color: 'success' },
+  { value: 'Shipped', color: 'warning' },
   { value: 'Delivered', color: 'success' },
   { value: 'Cancelled', color: 'error' },
   { value: 'Failed', color: 'error' }
@@ -270,13 +269,13 @@ const OrderRow = ({ order, index, columns, onView, onEdit, onDelete }) => {
                     </IconButton>
                   </Tooltip>
                 )}
-                {hasPermission('order:update') && (
-                  <Tooltip title='Sửa'>
-                    <IconButton onClick={() => onEdit(order)} size='small'>
-                      <BorderColorIcon color='warning' />
-                    </IconButton>
-                  </Tooltip>
-                )}
+                {/*{hasPermission('order:update') && (*/}
+                {/*  <Tooltip title='Sửa'>*/}
+                {/*    <IconButton onClick={() => onEdit(order)} size='small'>*/}
+                {/*      <BorderColorIcon color='warning' />*/}
+                {/*    </IconButton>*/}
+                {/*  </Tooltip>*/}
+                {/*)}*/}
               </Stack>
             )
             break

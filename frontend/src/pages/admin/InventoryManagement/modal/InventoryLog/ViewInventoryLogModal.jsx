@@ -1,4 +1,4 @@
-// modal/InventoryLog/ViewInventoryLogModal.jsx
+// Chart/InventoryLog/ViewInventoryLogModal.jsx
 import React from 'react'
 import {
   Dialog,

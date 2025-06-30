@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import OrderStatistic from './OrderStatistic.jsx'
 import useInventoryStatistics from '~/hooks/admin/useStatistic.js'
 
@@ -9,14 +9,24 @@ function OrderDashboard() {
     fetchFinanceStatistics,
     fetchOrdersStatistics
   } = useInventoryStatistics()
+
+  const currentYear = new Date().getFullYear()
+  const [year, setYear] = useState(currentYear.toString())
+
   useEffect(() => {
     fetchOrdersStatistics()
-    fetchFinanceStatistics('2025')
   }, [])
+
+  useEffect(() => {
+    fetchFinanceStatistics(year)
+  }, [year])
+
   return (
     <OrderStatistic
       stats={orderStatistics}
       financeStatistics={financeStatistics}
+      year={year}
+      setYear={setYear}
     />
   )
 }

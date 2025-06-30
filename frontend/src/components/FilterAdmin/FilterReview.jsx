@@ -13,6 +13,7 @@ export default function FilterReview({ onFilter, reviews = [], loading }) {
   const [endDate, setEndDate] = useState(dayjs().format('YYYY-MM-DD'))
   const [moderationStatus, setModerationStatus] = useState('')
   const [sort, setSort] = useState('newest')
+  const [destroy, setDestroy] = useState('false')
   const hasMounted = useRef(false)
 
   useEffect(() => {
@@ -24,7 +25,7 @@ export default function FilterReview({ onFilter, reviews = [], loading }) {
     if (hasMounted.current) {
       applyFilters(selectedFilter, startDate, endDate)
     }
-  }, [keyword, sort, moderationStatus])
+  }, [keyword, sort, moderationStatus, destroy])
 
   const handleSearch = () => {
     setKeyword(inputValue)
@@ -52,7 +53,8 @@ export default function FilterReview({ onFilter, reviews = [], loading }) {
     const filters = {
       search: keyword || undefined,
       sort: sort || undefined,
-      moderationStatus: moderationStatus || undefined
+      moderationStatus: moderationStatus || undefined,
+      destroy: destroy || undefined
     }
 
     if (selectedTime === 'custom') {
@@ -79,12 +81,31 @@ export default function FilterReview({ onFilter, reviews = [], loading }) {
     setStartDate(dayjs().format('YYYY-MM-DD'))
     setEndDate(dayjs().format('YYYY-MM-DD'))
     setModerationStatus('')
-    setSort('')
-    onFilter({})
+    setDestroy('false')
+    setSort('newest')
+    onFilter({ sort: 'newest', destroy: 'false' })
   }
-
+  const productOptions = [
+    ...new Map(
+      reviews
+        .filter((r) => r.productId?.name)
+        .map((r) => [r.productId._id, r.productId]) // loại trùng
+    ).values()
+  ].map((product) => ({
+    label: product.name,
+    value: product._id
+  }))
   return (
     <Box display='flex' flexWrap='wrap' gap={2} mb={2} justifyContent='end'>
+      <FilterSelect
+        value={destroy}
+        onChange={setDestroy}
+        label='Xoá'
+        options={[
+          { label: 'Chưa xoá', value: 'false' },
+          { label: 'Đã xóa', value: 'true' }
+        ]}
+      />
       <FilterSelect value={sort} onChange={setSort} />
 
       <FilterSelect
@@ -117,11 +138,11 @@ export default function FilterReview({ onFilter, reviews = [], loading }) {
 
       <Box sx={{ display: 'flex', gap: 2 }}>
         <SearchWithSuggestions
-          label='Tìm người dùng hoặc bình luận'
-          options={[]}
+          label='Tìm sản phẩm'
+          options={productOptions}
           loading={loading}
-          keyword={keyword}
-          inputValue={inputValue}
+          keyword={keyword} // sẽ là productId._id
+          inputValue={inputValue} // hiển thị productId.name
           setKeyword={setKeyword}
           setInputValue={setInputValue}
           onSearch={handleSearch}
