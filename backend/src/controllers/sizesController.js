@@ -63,10 +63,23 @@ const deleteSize = async (req, res, next) => {
   }
 }
 
+const restoreSize = async (req, res, next) => {
+  try {
+    const sizeId = req.params.sizeId
+
+    const result = await sizesService.restoreSize(sizeId)
+
+    res.status(StatusCodes.OK).json(result)
+  } catch (err) {
+    next(err)
+  }
+}
+
 export const sizesController = {
   createSize,
   getSizeList,
   getSize,
   updateSize,
-  deleteSize
+  deleteSize,
+  restoreSize
 }

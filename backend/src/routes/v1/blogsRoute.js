@@ -34,4 +34,10 @@ Router.route('/:blogId').delete(
   blogsController.deleteBlog
 )
 
+// Khôi phục đã xóa
+Router.route('/restore/:blogId').patch(
+  authMiddleware.isAuthorized,
+  blogsController.restoreBlog
+)
+
 export const blogsRoute = Router

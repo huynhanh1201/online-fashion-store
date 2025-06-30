@@ -102,7 +102,7 @@ const getProductList = async (reqQuery) => {
     // Xử lý filter
     const filter = {}
 
-    if (destroy) filter.destroy = destroy
+    if (destroy) filter.destroy = JSON.parse(destroy)
 
     if (status === 'true' || status === 'false') {
       status = JSON.parse(status)
@@ -364,6 +364,30 @@ const getVariantOfProduct = async (productId) => {
   }
 }
 
+const restoreProduct = async (productId) => {
+  // eslint-disable-next-line no-useless-catch
+  try {
+    // Xóa mềm khi không còn Variant
+    const productUpdated = await ProductModel.updateOne(
+      {
+        _id: productId
+      },
+      {
+        destroy: false
+      },
+      { new: true }
+    )
+
+    if (!productUpdated) {
+      throw new ApiError(StatusCodes.NOT_FOUND, 'Sản phẩm không tồn tại.')
+    }
+
+    return productUpdated
+  } catch (err) {
+    throw err
+  }
+}
+
 export const productsService = {
   createProduct,
   getProductList,
@@ -371,5 +395,6 @@ export const productsService = {
   updateProduct,
   deleteProduct,
   getListProductOfCategory,
-  getVariantOfProduct
+  getVariantOfProduct,
+  restoreProduct
 }

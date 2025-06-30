@@ -273,6 +273,30 @@ const getCategoriesWithProducts = async () => {
   }
 }
 
+const restoreCategory = async (categoryId) => {
+  // eslint-disable-next-line no-useless-catch
+  try {
+    const categoryUpdated = await CategoryModel.updateOne(
+      { _id: categoryId },
+      {
+        destroy: false
+      },
+      {
+        new: true
+      }
+    )
+    if (!categoryUpdated) {
+      throw new ApiError(
+        StatusCodes.NOT_FOUND,
+        'Danh mục sản phẩm không tồn tại.'
+      )
+    }
+    return categoryUpdated
+  } catch (err) {
+    throw err
+  }
+}
+
 export const categoriesService = {
   createCategory,
   getCategoryList,
@@ -281,5 +305,6 @@ export const categoriesService = {
   updateCategory,
   deleteCategory,
   getChildCategories,
-  getCategoriesWithProducts
+  getCategoriesWithProducts,
+  restoreCategory
 }

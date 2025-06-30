@@ -63,10 +63,23 @@ const deleteRole = async (req, res, next) => {
   }
 }
 
+const restoreRole = async (req, res, next) => {
+  try {
+    const roleId = req.params.roleId
+
+    const result = await rolesService.restoreRole(roleId)
+
+    res.status(StatusCodes.OK).json(result)
+  } catch (err) {
+    next(err)
+  }
+}
+
 export const rolesController = {
   createRole,
   getRoleList,
   getRole,
   updateRole,
-  deleteRole
+  deleteRole,
+  restoreRole
 }

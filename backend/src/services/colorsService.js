@@ -136,10 +136,26 @@ const deleteColor = async (colorId) => {
   }
 }
 
+const restoreColor = async (colorId) => {
+  // eslint-disable-next-line no-useless-catch
+  try {
+    const colorDeleted = await ColorModel.findOneAndUpdate(
+      { _id: colorId },
+      { destroy: false },
+      { new: true }
+    )
+
+    return colorDeleted
+  } catch (err) {
+    throw err
+  }
+}
+
 export const colorsService = {
   createColor,
   getColorList,
   getColor,
   updateColor,
-  deleteColor
+  deleteColor,
+  restoreColor
 }

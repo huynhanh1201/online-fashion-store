@@ -165,6 +165,30 @@ const deleteCoupon = async (couponId) => {
   }
 }
 
+const restoreCoupons = async (couponId) => {
+  // eslint-disable-next-line no-useless-catch
+  try {
+    const couponDeleted = await CouponModel.updateOne(
+      { _id: couponId },
+      {
+        destroy: false
+      },
+      {
+        new: true,
+        runValidators: true
+      }
+    )
+
+    if (!couponDeleted) {
+      throw new ApiError(StatusCodes.NOT_FOUND, 'Mã giảm giá không tồn tại.')
+    }
+
+    return couponDeleted
+  } catch (err) {
+    throw err
+  }
+}
+
 const validateCoupon = async (userId, reqBody) => {
   // eslint-disable-next-line no-useless-catch
   try {
@@ -213,5 +237,6 @@ export const couponsService = {
   getCouponList,
   getCoupon,
   updateCoupon,
-  deleteCoupon
+  deleteCoupon,
+  restoreCoupons
 }

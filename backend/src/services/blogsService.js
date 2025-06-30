@@ -155,10 +155,26 @@ const deleteBlog = async (blogId) => {
   }
 }
 
+const restoreBlog = async (blogId) => {
+  // eslint-disable-next-line no-useless-catch
+  try {
+    const blogDeleted = await BlogModel.findOneAndUpdate(
+      { _id: blogId },
+      { destroy: false },
+      { new: true }
+    )
+
+    return blogDeleted
+  } catch (err) {
+    throw err
+  }
+}
+
 export const blogsService = {
   createBlog,
   getBlogList,
   getBlog,
   updateBlog,
-  deleteBlog
+  deleteBlog,
+  restoreBlog
 }

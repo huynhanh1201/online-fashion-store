@@ -197,10 +197,30 @@ const deletePartner = async (partnerId) => {
   }
 }
 
+const restorePartner = async (partnerId) => {
+  // eslint-disable-next-line no-useless-catch
+  try {
+    const partnerDeleted = await PartnerModel.updateOne(
+      { _id: partnerId },
+      { destroy: false },
+      { new: true }
+    )
+
+    if (!partnerDeleted) {
+      throw new ApiError(StatusCodes.NOT_FOUND, 'Đối tác không tồn tại.')
+    }
+
+    return partnerDeleted
+  } catch (err) {
+    throw err
+  }
+}
+
 export const partnersService = {
   createPartner,
   getPartnerList,
   getPartner,
   updatePartner,
-  deletePartner
+  deletePartner,
+  restorePartner
 }

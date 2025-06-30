@@ -3,6 +3,7 @@ import express from 'express'
 import { colorsValidation } from '~/validations/colorsValidation'
 import { colorsController } from '~/controllers/colorsController'
 import { authMiddleware } from '~/middlewares/authMiddleware'
+import { usersController } from '~/controllers/usersController'
 
 const Router = express.Router()
 
@@ -39,6 +40,12 @@ Router.route('/:colorId').delete(
   authMiddleware.isAuthorized,
   colorsValidation.verifyId,
   colorsController.deleteColor
+)
+
+// Khôi phục đã xóa
+Router.route('/restore/:colorId').patch(
+  authMiddleware.isAuthorized,
+  colorsController.restoreColor
 )
 
 export const colorsRoute = Router

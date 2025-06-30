@@ -65,10 +65,23 @@ const deleteBlog = async (req, res, next) => {
   }
 }
 
+const restoreBlog = async (req, res, next) => {
+  try {
+    const blogId = req.params.blogId
+
+    const result = await blogsService.restoreBlog(blogId)
+
+    res.status(StatusCodes.OK).json(result)
+  } catch (err) {
+    next(err)
+  }
+}
+
 export const blogsController = {
   createBlog,
   getBlogList,
   getBlog,
   updateBlog,
-  deleteBlog
+  deleteBlog,
+  restoreBlog
 }

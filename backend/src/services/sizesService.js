@@ -136,10 +136,26 @@ const deleteSize = async (sizeId) => {
   }
 }
 
+const restoreSize = async (sizeId) => {
+  // eslint-disable-next-line no-useless-catch
+  try {
+    const sizeDeleted = await SizeModel.updateOne(
+      { _id: sizeId },
+      { destroy: false },
+      { new: true }
+    )
+
+    return sizeDeleted
+  } catch (err) {
+    throw err
+  }
+}
+
 export const sizesService = {
   createSize,
   getSizeList,
   getSize,
   updateSize,
-  deleteSize
+  deleteSize,
+  restoreSize
 }

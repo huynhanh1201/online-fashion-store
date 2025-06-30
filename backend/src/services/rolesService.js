@@ -144,10 +144,26 @@ const deleteRole = async (roleId) => {
   }
 }
 
+const restoreRole = async (roleId) => {
+  // eslint-disable-next-line no-useless-catch
+  try {
+    const roleDeleted = await RoleModel.findOneAndUpdate(
+      { _id: roleId },
+      { destroy: false },
+      { new: true }
+    )
+
+    return roleDeleted
+  } catch (err) {
+    throw err
+  }
+}
+
 export const rolesService = {
   createRole,
   getRoleList,
   getRole,
   updateRole,
-  deleteRole
+  deleteRole,
+  restoreRole
 }
