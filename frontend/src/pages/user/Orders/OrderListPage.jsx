@@ -318,7 +318,7 @@ const OrderRow = ({ order, onOrderUpdate, onOrderCancelled, onReorder, reorderLo
           ? '0 8px 30px rgba(26, 60, 123, 0.2)'
           : '0 4px 20px rgba(0,0,0,0.08)',
         border: isRecentlyUpdated
-          ? '2px solid #1a3c7b'
+          ? '2px solid var(--primary-color)'
           : '1px solid rgba(0,0,0,0.05)',
         backgroundColor: isRecentlyUpdated
           ? 'rgba(26, 60, 123, 0.02)'
@@ -340,7 +340,7 @@ const OrderRow = ({ order, onOrderUpdate, onOrderCancelled, onReorder, reorderLo
             <Typography
               variant="h6"
               fontWeight="600"
-              sx={{ color: '#1a3c7b' }}
+              sx={{ color: 'var(--primary-color)' }}
             >
               #{order.code}
             </Typography>
@@ -380,7 +380,7 @@ const OrderRow = ({ order, onOrderUpdate, onOrderCancelled, onReorder, reorderLo
                   transition: 'all 0.2s ease',
                   '&:hover': {
                     backgroundColor: 'grey.100',
-                    borderColor: '#1a3c7b',
+                    borderColor: 'var(--primary-color)',
                     transform: 'translateX(4px)'
                   }
                 }}
@@ -430,7 +430,7 @@ const OrderRow = ({ order, onOrderUpdate, onOrderCancelled, onReorder, reorderLo
                         <Typography
                           fontWeight={700}
                           fontSize="1.2rem"
-                          color="#1a3c7b"
+                          color="var(--primary-color)"
                         >
                           {(item.price - item.variantId.discountPrice)?.toLocaleString('vi-VN')}₫
                         </Typography>
@@ -451,7 +451,7 @@ const OrderRow = ({ order, onOrderUpdate, onOrderCancelled, onReorder, reorderLo
                       <Typography
                         fontWeight={700}
                         fontSize="1.2rem"
-                        color="#1a3c7b"
+                        color="var(--primary-color)"
                       >
                         {item.price?.toLocaleString('vi-VN')}₫
                       </Typography>
@@ -485,7 +485,7 @@ const OrderRow = ({ order, onOrderUpdate, onOrderCancelled, onReorder, reorderLo
               <Typography
                 variant="h5"
                 fontWeight="700"
-                sx={{ color: '#1a3c7b' }}
+                sx={{ color: 'var(--primary-color)' }}
               >
                 {order.total?.toLocaleString('vi-VN')}₫
               </Typography>
@@ -500,7 +500,7 @@ const OrderRow = ({ order, onOrderUpdate, onOrderCancelled, onReorder, reorderLo
                   borderRadius: 2,
                   textTransform: 'none',
                   fontWeight: 600,
-                  color: '#1a3c7b'
+                  color: 'var(--primary-color)'
                 }}
               >
                 Xem chi tiết
@@ -512,7 +512,7 @@ const OrderRow = ({ order, onOrderUpdate, onOrderCancelled, onReorder, reorderLo
                   onClick={() => onReorder && onReorder(items)}
                   disabled={reorderLoading}
                   sx={{
-                    color: '#1a3c7b',
+                    color: 'var(--primary-color)',
                     borderRadius: 2,
                     textTransform: 'none',
                     fontWeight: 600,
@@ -816,7 +816,7 @@ const OrderListPage = () => {
           fontWeight="700"
           sx={{
             mb: 1,
-            background: '#1a3c7b',
+            background: 'var(--primary-color)',
             backgroundClip: 'text',
             WebkitBackgroundClip: 'text',
             WebkitTextFillColor: 'transparent'
@@ -824,7 +824,7 @@ const OrderListPage = () => {
         >
           Đơn hàng của tôi
         </Typography>
-        <Typography variant="body1" color="#1a3c7b">
+        <Typography variant="body1" color="var(--primary-color)">
           Quản lý và theo dõi tình trạng đơn hàng của bạn
         </Typography>
       </Box>
@@ -853,7 +853,7 @@ const OrderListPage = () => {
               transition: 'all 0.2s ease',
               '&:hover': {
                 backgroundColor: 'rgba(26, 60, 123, 0.04)',
-                color: '#1a3c7b'
+                color: 'var(--primary-color)'
               }
             },
             '& .MuiTabs-indicator': {
@@ -953,10 +953,10 @@ const OrderListPage = () => {
                   px: 4,
                   py: 1.5,
                   border: '2px solid',
-                  borderColor: '#1a3c7b',
-                  color: '#1a3c7b',
+                  borderColor: 'var(--primary-color)',
+                  color: 'var(--primary-color)',
                   '&:hover': {
-                    backgroundColor: '#1a3c7b',
+                    backgroundColor: 'var(--primary-color)',
                     color: 'white',
                     transform: 'translateY(-2px)',
                     boxShadow: '0 4px 12px rgba(26, 60, 123, 0.3)'

@@ -13,7 +13,7 @@ export const createReview = async (data, config = {}) => {
 export const getReviews = async (productId, page = 1, limit = 5) => {
   try {
     const response = await AuthorizedAxiosInstance.get(
-      `${API_ROOT}/v1/reviews?sort=newest&page=${page}&limit=${limit}&productId=${productId}`
+      `${API_ROOT}/v1/reviews?sort=newest&page=${page}&limit=${limit}&productId=${productId}&moderationStatus=approved`
     )
     // Trả về cả data và meta để xử lý pagination
     return {

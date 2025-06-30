@@ -147,6 +147,7 @@ export default function AdminDrawer({
           'footerContent:use',
           'featuredCategory:use',
           'service:use',
+          'theme:use',
           'blog:use'
         ],
         label: 'Quản lý nội dung',
@@ -183,12 +184,12 @@ export default function AdminDrawer({
             path: '/admin/service-highlight-management'
           },
           {
-            permission: 'user:use',
+            permission: 'theme:use',
             label: 'Chủ đề',
             path: '/admin/theme-management'
           },
           {
-            permission: 'user:use',
+            permission: 'blog:use',
             label: 'Nội dung bài viết',
             path: '/admin/blog-management'
           }

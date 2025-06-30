@@ -122,20 +122,20 @@ const ReviewButtonComponent = ({
         borderRadius: 2,
         textTransform: 'none',
         fontWeight: 600,
-        color: 'success.main',
+        color: 'var(--accent-color)',
         borderColor: 'success.main',
         '&:hover': {
-          backgroundColor: 'success.50',
+          backgroundColor: 'var(--accent-color)',
           borderColor: 'success.main'
         }
       } : {
-        backgroundColor: '#1A3C7B',
+        backgroundColor: 'var(--primary-color)',
         color: '#fff',
         borderRadius: 2,
         textTransform: 'none',
         fontWeight: 600,
         '&:hover': {
-          backgroundColor: '#162f63',
+          backgroundColor: 'var(--accent-color)',
           boxShadow: '0 4px 12px rgba(26, 60, 123, 0.3)'
         },
       }}
@@ -611,7 +611,7 @@ const OrderDetail = () => {
             <Typography
               variant="h6"
               fontWeight="600"
-              sx={{ color: '#1a3c7b' }}
+              sx={{ color: 'var(--primary-color)' }}
             >
               #{order.code}
             </Typography>
@@ -641,7 +641,7 @@ const OrderDetail = () => {
               mb: 3
             }}
           >
-            <Typography variant="h6" fontWeight="600" color="#1a3c7b" gutterBottom>
+            <Typography variant="h6" fontWeight="600" color="var(--primary-color)" gutterBottom>
               Địa Chỉ Nhận Hàng
             </Typography>
             <Stack spacing={1}>
@@ -679,7 +679,7 @@ const OrderDetail = () => {
                         transition: 'all 0.2s ease',
                         '&:hover': {
                           backgroundColor: 'grey.100',
-                          borderColor: '#1a3c7b',
+                          borderColor: 'var(--primary-color)',
                           transform: 'translateX(4px)'
                         }
                       }}
@@ -730,7 +730,7 @@ const OrderDetail = () => {
                               <Typography
                                 fontWeight={700}
                                 fontSize="1.2rem"
-                                color="#1a3c7b"
+                                color="var(--primary-color)"
                               >
                                 {formatPrice((variant.price - variant.variantId.discountPrice))}
                               </Typography>
@@ -751,7 +751,7 @@ const OrderDetail = () => {
                             <Typography
                               fontWeight={700}
                               fontSize="1.2rem"
-                              color="#1a3c7b"
+                              color="var(--primary-color)"
                             >
                               {formatPrice(variant.price * variant.quantity)}
                             </Typography>
@@ -823,7 +823,7 @@ const OrderDetail = () => {
                 <Typography
                   variant="h5"
                   fontWeight="700"
-                  sx={{ color: '#1a3c7b' }}
+                  sx={{ color: 'var(--primary-color)' }}
                 >
                   {formatPrice(order.total)}
                 </Typography>
@@ -851,7 +851,7 @@ const OrderDetail = () => {
           <CardContent>
             <Box display="flex" justifyContent="space-between" alignItems="center">
               <Box>
-                <Typography variant="h6" fontWeight="600" color="#1a3c7b">
+                <Typography variant="h6" fontWeight="600" color="var(--primary-color)">
                   Hủy đơn hàng
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
@@ -888,7 +888,7 @@ const OrderDetail = () => {
           <CardContent>
             <Box display="flex" justifyContent="space-between" alignItems="center">
               <Box>
-                <Typography variant="h6" fontWeight="600" color="#1a3c7b">
+                <Typography variant="h6" fontWeight="600" color="var(--primary-color)">
                   Mua lại đơn hàng
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
@@ -901,13 +901,13 @@ const OrderDetail = () => {
                 disabled={reorderLoading}
                 onClick={handleReorder}
                 sx={{
-                  backgroundColor: '#1a3c7b',
+                  backgroundColor: 'var(--primary-color)',
                   borderRadius: 2,
                   textTransform: 'none',
                   fontWeight: 600,
                   opacity: reorderLoading ? 0.7 : 1,
                   '&:hover': {
-                    backgroundColor: '#162f63',
+                    backgroundColor: 'var(--accent-color)',
                   }
                 }}
               >

@@ -410,7 +410,7 @@ const ServiceHighlightManagement = () => {
                     </TableCell>
                     <TableCell sx={{ py: 2 }}>
                       <Stack direction='row' spacing={1}>
-                        {hasPermission('service:create') && (
+                        {hasPermission('service:update') && (
 
                           <Tooltip title='Chỉnh sửa'>
                             <IconButton

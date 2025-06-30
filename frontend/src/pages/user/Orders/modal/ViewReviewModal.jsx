@@ -101,7 +101,7 @@ const ViewReviewModal = ({ open, onClose, userId, productId, orderId, productNam
       }}
     >
       <DialogTitle sx={{ pb: 2, position: 'relative' }}>
-        <Typography variant="h6" fontWeight="600" color="#1a3c7b">
+        <Typography variant="h6" fontWeight="600" color="var(--primary-color)">
           Đánh giá của bạn
         </Typography>
         <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
@@ -141,7 +141,7 @@ const ViewReviewModal = ({ open, onClose, userId, productId, orderId, productNam
                     }
                   }}
                 />
-                <Typography variant="h6" fontWeight="600" color="#1a3c7b">
+                <Typography variant="h6" fontWeight="600" color="var(--primary-color)">
                   {reviewData.rating}/5
                 </Typography>
               </Box>
@@ -309,13 +309,13 @@ const ViewReviewModal = ({ open, onClose, userId, productId, orderId, productNam
           onClick={handleClose}
           variant="contained"
           sx={{
-            backgroundColor: '#1a3c7b',
+            backgroundColor: 'var(--primary-color)',
             borderRadius: 2,
             textTransform: 'none',
             fontWeight: 600,
             px: 3,
             '&:hover': {
-              backgroundColor: '#162f63'
+              backgroundColor: 'var(--accent-color)'
             }
           }}
         >

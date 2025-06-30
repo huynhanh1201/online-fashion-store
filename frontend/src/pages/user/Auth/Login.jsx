@@ -66,7 +66,7 @@ function Login() {
           error: 'Đăng nhập thất bại!'
         }
       )
-      localStorage.setItem('token', response.token) // Lưu token
+      localStorage.setItem('accessToken', response.token) // Lưu token
       // Gọi getProfile ngay sau đăng nhập
       try {
         const profileData = await getProfileUser()
@@ -74,7 +74,7 @@ function Login() {
       } catch (error) {
         toast.error(error.message || 'Lỗi tải thông tin người dùng')
         dispatch(logoutUserAPI(false))
-        localStorage.removeItem('token')
+        localStorage.removeItem('accessToken')
         navigate('/login')
         return
       }
