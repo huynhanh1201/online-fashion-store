@@ -24,7 +24,8 @@ const AccountManagement = () => {
   const [selectedUser, setSelectedUser] = React.useState(null)
   const [modalType, setModalType] = React.useState(null)
   const [filters, setFilters] = React.useState({
-    sort: 'newest'
+    sort: 'newest',
+    destroy: 'false'
   })
 
   const {
@@ -36,7 +37,8 @@ const AccountManagement = () => {
     update,
     add,
     ROWS_PER_PAGE,
-    setROWS_PER_PAGE
+    setROWS_PER_PAGE,
+    Restore
   } = useUsers()
 
   const { hasPermission } = usePermissions()
@@ -68,6 +70,8 @@ const AccountManagement = () => {
         await update(id, data)
       } else if (type === 'delete') {
         await removeUser(data)
+      } else if (type === 'restore') {
+        await Restore(data)
       }
     } catch (error) {
       console.error('Lỗi:', error)

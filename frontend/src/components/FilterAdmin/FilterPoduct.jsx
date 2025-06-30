@@ -208,8 +208,9 @@ export default function FilterProduct({
   const [category, setCategory] = useState(initialSearch || '')
   const [priceMin, setPriceMin] = useState('')
   const [priceMax, setPriceMax] = useState('')
-  const [status, setStatus] = useState('false')
+  const [status, setStatus] = useState('')
   const [sort, setSort] = useState('newest')
+  const [destroy, setDestroy] = useState('false')
   const [selectedFilter, setSelectedFilter] = useState('')
   const [startDate, setStartDate] = useState(dayjs().format('YYYY-MM-DD'))
   const [endDate, setEndDate] = useState(dayjs().format('YYYY-MM-DD'))
@@ -220,7 +221,7 @@ export default function FilterProduct({
     } else {
       hasMounted.current = true
     }
-  }, [keyword, status, category, sort, priceMin, priceMax])
+  }, [keyword, status, category, sort, priceMin, priceMax, destroy])
   useEffect(() => {
     fetchCategories()
   }, [])
@@ -253,6 +254,7 @@ export default function FilterProduct({
       categoryId: category || undefined,
       priceMin: priceMin ? parseInt(priceMin) : undefined,
       priceMax: priceMax ? parseInt(priceMax) : undefined,
+      destroy: destroy || undefined,
       status: status !== '' ? status : undefined,
       sort: sort || undefined
     }
@@ -285,16 +287,33 @@ export default function FilterProduct({
     setPriceMin('')
     setPriceMax('')
     setStatus('')
-    setSort('')
+    setSort('newest')
+    setDestroy('false')
     setSelectedFilter('')
     setStartDate(dayjs().format('YYYY-MM-DD'))
     setEndDate(dayjs().format('YYYY-MM-DD'))
-    onFilter({})
+    onFilter({ sort: 'newest', destroy: 'false' })
     // fetchProducts(1, 10)
   }
 
   return (
     <Box display='flex' flexWrap='wrap' gap={2} mb={2} justifyContent='end'>
+      <FilterSelect
+        value={destroy}
+        onChange={setDestroy}
+        label='Xoá'
+        options={[
+          { label: 'Chưa xoá', value: 'false' },
+          { label: 'Đã xóa', value: 'true' }
+        ]}
+      />
+      <FilterSelect
+        value={sort}
+        onChange={(value) => {
+          setSort(value)
+          applyFilters(selectedFilter, startDate, endDate)
+        }}
+      />
       <FilterSelect
         label='Chọn danh mục'
         value={category}
@@ -329,18 +348,11 @@ export default function FilterProduct({
         }}
         options={[
           { label: 'Tất cả', value: '' },
-          { label: 'Đang bán', value: false },
-          { label: 'Ngừng bán', value: true }
+          { label: 'Nháp', value: 'draft' },
+          { label: 'Hoạt động', value: 'active' },
+          { label: 'Ngừng bán', value: 'inactive' }
         ]}
         sx={{ minWidth: 160 }}
-      />
-
-      <FilterSelect
-        value={sort}
-        onChange={(value) => {
-          setSort(value)
-          applyFilters(selectedFilter, startDate, endDate)
-        }}
       />
 
       <FilterByTime

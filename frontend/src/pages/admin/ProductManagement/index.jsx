@@ -155,7 +155,7 @@ const ProductManagement = () => {
   const queryParams = new URLSearchParams(location.search)
   const searchFromUrl = queryParams.get('categoryId') || ''
   const [filters, setFilters] = React.useState({
-    status: 'false',
+    destroy: 'false',
     sort: 'newest',
     ...(searchFromUrl ? { categoryId: searchFromUrl } : {})
   })

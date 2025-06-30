@@ -81,7 +81,6 @@ const WarehousesTab = () => {
   const [page, setPage] = useState(1) // State cho trang hiện tại
   const [rowsPerPage, setRowsPerPage] = useState(10) // State cho số dòng mỗi trang
   const [filter, setFilter] = useState({
-    status: 'false',
     sort: 'newest'
   })
 

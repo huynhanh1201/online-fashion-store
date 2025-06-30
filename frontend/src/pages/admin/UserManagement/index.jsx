@@ -10,6 +10,7 @@ import { PermissionWrapper, RouteGuard } from '~/components/PermissionGuard'
 const ViewUserModal = React.lazy(() => import('./modal/ViewUserModal'))
 const EditUserModal = React.lazy(() => import('./modal/EditUserModal'))
 const DeleteUserModal = React.lazy(() => import('./modal/DeleteUserModal'))
+const RestoreUserModal = React.lazy(() => import('./modal/RestoreUserModal'))
 
 const UserManagement = () => {
   const { roles, fetchRoles } = useRoles()
@@ -22,8 +23,15 @@ const UserManagement = () => {
     destroy: 'false'
   })
 
-  const { users, totalPages, fetchUsers, Loading, removeUser, update } =
-    useUsers()
+  const {
+    users,
+    totalPages,
+    fetchUsers,
+    Loading,
+    removeUser,
+    update,
+    Restore
+  } = useUsers()
   const { hasPermission } = usePermissions()
 
   React.useEffect(() => {
@@ -55,6 +63,8 @@ const UserManagement = () => {
         await update(id, data)
       } else if (type === 'delete') {
         await removeUser(data)
+      } else if (type === 'restore') {
+        await Restore(data)
       }
     } catch (error) {
       console.error('Lỗi:', error)
@@ -122,6 +132,14 @@ const UserManagement = () => {
             />
           )}
         </PermissionWrapper>
+        {modalType === 'restore' && selectedUser && (
+          <RestoreUserModal
+            open
+            onClose={handleCloseModal}
+            user={selectedUser}
+            onRestore={handleSave}
+          />
+        )}
       </React.Suspense>
     </RouteGuard>
   )

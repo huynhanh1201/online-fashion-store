@@ -17,8 +17,8 @@ const DeleteRoleModal = React.lazy(() => import('./modal/DeleteRoleModal'))
 const RoleManagement = () => {
   const [page, setPage] = React.useState(1)
   const [filters, setFilters] = React.useState({
-    status: 'false',
-    sort: 'newest'
+    sort: 'newest',
+    destroy: 'false'
   })
   const [selectedRole, setSelectedRole] = React.useState(null)
   const [modalType, setModalType] = React.useState(null)
@@ -99,6 +99,7 @@ const RoleManagement = () => {
           canView: hasPermission('role:read')
         }}
         onFilter={handleFilter}
+        fetchRoles={fetchRoles}
       />
 
       <React.Suspense fallback={<></>}>

@@ -3,7 +3,9 @@ import {
   TextField,
   CircularProgress,
   InputAdornment,
-  IconButton
+  IconButton,
+  Box,
+  Typography
 } from '@mui/material'
 import ClearIcon from '@mui/icons-material/Clear'
 import SearchIcon from '@mui/icons-material/Search'
@@ -24,15 +26,31 @@ export default function SearchWithSuggestions({
   return (
     <Autocomplete
       sx={{
-        minWidth: 220,
         '& .MuiOutlinedInput-root': {
           height: 34,
           borderRadius: '4px',
-          fontSize: '0.8rem',
+          fontSize: '0.75rem',
           paddingRight: '6px !important'
         }
       }}
       PopperComponent={CustomPopper}
+      renderOption={(props, option) => (
+        <Box
+          component='li'
+          {...props}
+          sx={{
+            maxWidth: 400, // ✅ Giới hạn 400px
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap',
+            display: 'block' // ✅ Đảm bảo dùng block để text bị cắt
+          }}
+        >
+          <Typography noWrap>
+            {typeof option === 'string' ? option : option.label}
+          </Typography>
+        </Box>
+      )}
       freeSolo
       clearOnEscape
       options={options}
@@ -40,13 +58,28 @@ export default function SearchWithSuggestions({
       value={keyword}
       inputValue={inputValue}
       onInputChange={(e, newInputValue) => setInputValue(newInputValue)}
-      onChange={(e, newValue) => setInputValue(newValue || '')}
+      onChange={(e, newValue) => {
+        if (typeof newValue === 'string') {
+          setInputValue(newValue)
+          setKeyword('')
+        } else if (newValue && typeof newValue === 'object') {
+          setInputValue(newValue.label)
+          setKeyword(newValue.value)
+        } else {
+          setInputValue('')
+          setKeyword('')
+        }
+      }}
+      getOptionLabel={(option) =>
+        typeof option === 'string' ? option : option.label
+      }
       renderInput={(params) => (
         <TextField
           {...params}
           placeholder={label}
           size='small'
           sx={{
+            width: 220,
             pl: 0,
             '& .MuiInputBase-input::placeholder': {
               color: '#000',

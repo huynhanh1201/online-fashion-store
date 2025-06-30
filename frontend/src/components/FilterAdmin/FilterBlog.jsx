@@ -18,6 +18,7 @@ export default function FilterBlog({
   const [endDate, setEndDate] = useState(dayjs().format('YYYY-MM-DD'))
   const [status, setStatus] = useState('')
   const [sort, setSort] = useState('newest')
+  const [destroy, setDestroy] = useState('false')
   const hasMounted = useRef(false)
 
   useEffect(() => {
@@ -29,7 +30,7 @@ export default function FilterBlog({
     if (hasMounted.current) {
       applyFilters(selectedFilter, startDate, endDate)
     }
-  }, [keyword, sort, status])
+  }, [keyword, sort, status, destroy])
 
   const handleSearch = () => {
     setKeyword(inputValue)
@@ -57,7 +58,8 @@ export default function FilterBlog({
     const filters = {
       search: keyword || undefined,
       sort: sort || undefined,
-      status: status || undefined
+      status: status || undefined,
+      destroy: destroy || undefined
     }
 
     if (selectedTime === 'custom') {
@@ -84,12 +86,23 @@ export default function FilterBlog({
     setStartDate(dayjs().format('YYYY-MM-DD'))
     setEndDate(dayjs().format('YYYY-MM-DD'))
     setStatus('')
-    setSort('')
-    onFilter({})
+    setSort('newest')
+    setDestroy('false')
+    onFilter({ sort: 'newest', destroy: 'false' })
   }
 
   return (
     <Box display='flex' flexWrap='wrap' gap={2} mb={2} justifyContent='end'>
+      <FilterSelect
+        value={destroy}
+        onChange={setDestroy}
+        label='Xoá'
+        options={[
+          { label: 'Chưa xoá', value: 'false' },
+          { label: 'Đã xóa', value: 'true' }
+        ]}
+        sx={{ width: 180 }}
+      />
       <FilterSelect value={sort} onChange={setSort} />
 
       <FilterSelect

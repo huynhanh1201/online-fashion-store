@@ -154,7 +154,6 @@ export default function AccountRow({
             >
               <Stack direction='row' sx={styles.groupIcon}>
                 {hasPermission('account:read') && (
-
                   <Tooltip title='Xem'>
                     <IconButton
                       onClick={() => handleOpenModal('view', user)}
@@ -165,7 +164,6 @@ export default function AccountRow({
                   </Tooltip>
                 )}
                 {hasPermission('account:update') && (
-
                   <Tooltip title='Sửa'>
                     <IconButton
                       onClick={() => handleOpenModal('edit', user)}
@@ -176,7 +174,6 @@ export default function AccountRow({
                   </Tooltip>
                 )}
                 {hasPermission('account:delete') && (
-
                   <Tooltip title='Xoá'>
                     <IconButton
                       onClick={() => handleOpenModal('delete', user)}

@@ -1,7 +1,16 @@
 import Popper from '@mui/material/Popper'
+import { styled } from '@mui/material/styles'
+
+const StyledPopper = styled(Popper)(() => ({
+  zIndex: 1300,
+  '& .MuiAutocomplete-paper': {
+    width: 'auto',
+    maxWidth: 400
+  }
+}))
 
 const CustomPopper = (props) => (
-  <Popper
+  <StyledPopper
     {...props}
     placement='bottom-start'
     modifiers={[
@@ -12,11 +21,6 @@ const CustomPopper = (props) => (
         }
       }
     ]}
-    sx={{
-      minWidth: '300px', // 👈 chỉnh chiều rộng gợi ý ở đây
-      maxWidth: '500px', // nếu muốn giới hạn max
-      zIndex: 1300
-    }}
   />
 )
 

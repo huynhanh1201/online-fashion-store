@@ -30,7 +30,8 @@ const RoleTable = ({
   onChangeRowsPerPage,
   total,
   permissions = {},
-  onFilter
+  onFilter,
+  fetchRoles
 }) => {
   const columns = [
     { id: 'index', label: 'STT', align: 'center', width: 50 },
@@ -104,6 +105,7 @@ const RoleTable = ({
                     onFilter={onFilter}
                     roles={roles}
                     loading={loading}
+                    fetchRoles={fetchRoles}
                   />
                 </Box>
               </TableCell>

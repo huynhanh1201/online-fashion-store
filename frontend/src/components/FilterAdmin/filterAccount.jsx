@@ -14,7 +14,7 @@ export default function FilterAccount({ onFilter, users, loading, roles }) {
   const [endDate, setEndDate] = useState(dayjs().format('YYYY-MM-DD'))
   const [role, setRole] = useState('')
   const [sort, setSort] = useState('newest')
-  const [destroy, setDestroy] = useState(false)
+  const [destroy, setDestroy] = useState('false')
   const hasMounted = useRef(false)
   useEffect(() => {
     applyFilters(selectedFilter, startDate, endDate)
@@ -25,7 +25,7 @@ export default function FilterAccount({ onFilter, users, loading, roles }) {
     if (hasMounted.current) {
       applyFilters(selectedFilter, startDate, endDate)
     }
-  }, [keyword, sort, role])
+  }, [keyword, sort, role, destroy])
 
   const handleSearch = () => {
     setKeyword(inputValue)
@@ -53,7 +53,7 @@ export default function FilterAccount({ onFilter, users, loading, roles }) {
     const filters = {
       search: keyword || undefined,
       sort: sort || undefined,
-      roleId: role || undefined,
+      role: role || undefined,
       destroy: destroy || undefined
     }
 
@@ -81,9 +81,9 @@ export default function FilterAccount({ onFilter, users, loading, roles }) {
     setStartDate(dayjs().format('YYYY-MM-DD'))
     setEndDate(dayjs().format('YYYY-MM-DD'))
     setRole('')
-    setSort('')
-    setDestroy(false)
-    onFilter({})
+    setSort('newest')
+    setDestroy('false')
+    onFilter({ sort: 'newest', destroy: 'false' })
   }
   const filterRoles = roles.filter((role) => role.name !== 'customer')
 
@@ -92,10 +92,10 @@ export default function FilterAccount({ onFilter, users, loading, roles }) {
       <FilterSelect
         value={destroy}
         onChange={setDestroy}
-        label='Xóa'
+        label='Xoá'
         options={[
-          { label: 'Chưa xoá', value: false },
-          { label: 'Đã xóa', value: true }
+          { label: 'Chưa xoá', value: 'false' },
+          { label: 'Đã xóa', value: 'true' }
         ]}
       />
 

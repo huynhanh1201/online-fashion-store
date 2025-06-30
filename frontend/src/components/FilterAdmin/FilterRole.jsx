@@ -57,7 +57,7 @@ export default function FilterRole({
     const filters = {
       search: keyword || undefined,
       sort: sort || undefined,
-      status: status || undefined
+      destroy: status || undefined
     }
 
     if (selectedTime === 'custom') {
@@ -87,28 +87,29 @@ export default function FilterRole({
     setSelectedFilter('')
     setStartDate(dayjs().format('YYYY-MM-DD'))
     setEndDate(dayjs().format('YYYY-MM-DD'))
-    setStatus('')
-    setSort('')
-    onFilter({})
+    setStatus('false')
+    setSort('newest')
+    onFilter({ sort: 'newest', destroy: 'false' })
   }
 
   return (
     <Box display='flex' flexWrap='wrap' gap={2} mb={2} justifyContent='end'>
-      <FilterSelect value={sort} onChange={setSort} />
       <FilterSelect
-        label='Trạng thái vai trò'
+        label='Xoá'
         value={status}
         onChange={(value) => {
           setStatus(value)
           applyFilters(selectedFilter, startDate, endDate)
         }}
         options={[
-          { label: 'Tất cả', value: '' },
-          { label: 'Hoạt động', value: false },
-          { label: 'Không hoạt động', value: true }
+          { label: 'Chưa xoá', value: 'false' },
+          { label: 'Đã xóa', value: 'true' }
         ]}
         sx={{ width: 160 }}
       />
+
+      <FilterSelect value={sort} onChange={setSort} />
+
       <FilterByTime
         label='Lọc thời gian tạo'
         selectedFilter={selectedFilter}

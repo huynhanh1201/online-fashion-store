@@ -14,7 +14,7 @@ export default function FilterUser({ onFilter, users, loading, roles }) {
   const [endDate, setEndDate] = useState(dayjs().format('YYYY-MM-DD'))
   const [role, setRole] = useState('')
   const [sort, setSort] = useState('newest')
-  const [destroy, setDestroy] = useState(false)
+  const [destroy, setDestroy] = useState('false')
   const hasMounted = useRef(false)
 
   useEffect(() => {
@@ -92,7 +92,7 @@ export default function FilterUser({ onFilter, users, loading, roles }) {
       <FilterSelect
         value={destroy}
         onChange={setDestroy}
-        label='Xóa'
+        label='Xoá'
         options={[
           { label: 'Chưa xoá', value: 'false' },
           { label: 'Đã xóa', value: 'true' }

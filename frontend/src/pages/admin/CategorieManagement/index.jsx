@@ -23,7 +23,7 @@ const CategoryManagement = () => {
   const queryParams = new URLSearchParams(location.search)
   const searchFromUrl = queryParams.get('search') || ''
   const [filters, setFilters] = React.useState(() => ({
-    status: 'false',
+    destroy: 'false',
     sort: 'newest',
     ...(searchFromUrl ? { search: searchFromUrl } : {})
   }))

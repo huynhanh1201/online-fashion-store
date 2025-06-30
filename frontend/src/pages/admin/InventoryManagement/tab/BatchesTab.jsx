@@ -48,7 +48,6 @@ const BatchesTab = () => {
   const [page, setPage] = useState(1)
   const [rowsPerPage, setRowsPerPage] = useState(10)
   const [filter, setFilter] = useState({
-    status: 'false',
     sort: 'newest'
   })
   const enrichedBatches = batches.map((batch) => {

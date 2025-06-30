@@ -26,6 +26,7 @@ export default function FilterVariant({
   const [overridePrice, setOverridePrice] = useState('')
   const [destroy, setDestroy] = useState('false')
   const [sort, setSort] = useState('newest')
+  const [status, setStatus] = useState('')
   const [importPriceMin, setImportPriceMin] = useState('')
   const [importPriceMax, setImportPriceMax] = useState('')
   const [exportPriceMin, setExportPriceMin] = useState('')
@@ -41,7 +42,16 @@ export default function FilterVariant({
     } else {
       hasMounted.current = true
     }
-  }, [keyword, destroy, colorName, sizeName, productId, overridePrice, sort])
+  }, [
+    keyword,
+    destroy,
+    colorName,
+    sizeName,
+    productId,
+    overridePrice,
+    sort,
+    status
+  ])
   useEffect(() => {
     fetchProducts?.()
   }, [])
@@ -55,6 +65,7 @@ export default function FilterVariant({
       sizeName,
       overridePrice,
       destroy,
+      status,
       sort,
       importPriceRange: { min: importPriceMin, max: importPriceMax },
       exportPriceRange: { min: exportPriceMin, max: exportPriceMax },
@@ -79,7 +90,8 @@ export default function FilterVariant({
     colorId: c = colorName,
     sizeId: s = sizeName,
     overridePrice: op = overridePrice,
-    status: d = destroy,
+    status: d = status,
+    destroy: st = destroy,
     sort: so = sort,
     importPriceMin: ipMin = importPriceMin,
     importPriceMax: ipMax = importPriceMax,
@@ -96,6 +108,7 @@ export default function FilterVariant({
       sizeName: s || undefined,
       overridePrice: op !== '' ? op === 'true' : undefined,
       status: d !== '' ? d === 'true' : undefined,
+      destroy: st !== '' ? st === 'true' : undefined,
       sort: so || undefined,
       importPriceMin: ipMin || undefined,
       importPriceMax: ipMax || undefined,
@@ -131,8 +144,9 @@ export default function FilterVariant({
     setColorName('')
     setSizeName('')
     setOverridePrice('')
-    setDestroy('')
-    setSort('')
+    setDestroy('false')
+    setStatus('')
+    setSort('newest')
     setImportPriceMin('')
     setImportPriceMax('')
     setExportPriceMin('')
@@ -140,12 +154,22 @@ export default function FilterVariant({
     setSelectedFilter('')
     setStartDate(dayjs().format('YYYY-MM-DD'))
     setEndDate(dayjs().format('YYYY-MM-DD'))
-    onFilter({})
+    onFilter({ sort: 'newest', destroy: 'false' })
     // fetchVariants?.(1, 10)
   }
 
   return (
     <Box display='flex' flexWrap='wrap' gap={2} mb={2} justifyContent='end'>
+      <FilterSelect
+        value={destroy}
+        onChange={setDestroy}
+        label='Xoá'
+        options={[
+          { label: 'Chưa xoá', value: 'false' },
+          { label: 'Đã xóa', value: 'true' }
+        ]}
+      />
+      <FilterSelect value={sort} onChange={setSort} />
       <FilterSelect
         label='Sản phẩm'
         value={productId}
@@ -198,12 +222,13 @@ export default function FilterVariant({
 
       <FilterSelect
         label='Trạng thái'
-        value={destroy}
-        onChange={setDestroy}
+        value={status}
+        onChange={setStatus}
         options={[
           { label: 'Tất cả', value: '' },
-          { label: 'Đang hoạt động', value: 'false' },
-          { label: 'Dừng hoạt động', value: 'true' }
+          { label: 'Nháp', value: 'draft' },
+          { label: 'Hoạt động', value: 'active' },
+          { label: 'Ngừng bán', value: 'inactive' }
         ]}
       />
 
@@ -224,8 +249,6 @@ export default function FilterVariant({
       {/*  setPriceMax={setExportPriceMax}*/}
       {/*  onApply={() => applyFilters()}*/}
       {/*/>*/}
-
-      <FilterSelect value={sort} onChange={setSort} />
 
       <FilterByTime
         label='Ngày tạo biến thể'

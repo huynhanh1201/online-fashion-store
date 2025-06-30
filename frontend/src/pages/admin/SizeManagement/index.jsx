@@ -15,7 +15,7 @@ const DeleteSizeModal = React.lazy(() => import('./modal/DeleteSizeModal'))
 const SizeManagement = () => {
   const [page, setPage] = React.useState(1)
   const [filters, setFilters] = React.useState({
-    status: 'false',
+    destroy: 'false',
     sort: 'newest'
   }) // Bộ lọc tìm kiếm
   const [selectedSize, setSelectedSize] = React.useState(null)

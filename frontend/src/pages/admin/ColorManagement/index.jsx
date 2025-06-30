@@ -16,7 +16,7 @@ const ColorManagement = () => {
   const [selectedColor, setSelectedColor] = React.useState(null)
   const [modalType, setModalType] = React.useState(null)
   const [filters, setFilters] = React.useState({
-    status: 'false',
+    destroy: 'false',
     sort: 'newest'
   })
   const {

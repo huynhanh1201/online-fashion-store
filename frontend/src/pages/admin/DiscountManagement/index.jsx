@@ -24,7 +24,8 @@ function DiscountManagement() {
   const [page, setPage] = React.useState(1)
   const [filters, setFilters] = React.useState({
     status: 'true',
-    sort: 'newest'
+    sort: 'newest',
+    destroy: 'false'
   })
   const [selectedDiscount, setSelectedDiscount] = React.useState(null)
   const [modalType, setModalType] = React.useState(null)

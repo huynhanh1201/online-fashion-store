@@ -57,3 +57,15 @@ export const CreateUser = async (data) => {
     throw error
   }
 }
+
+export const RestoreUser = async (id) => {
+  try {
+    const response = await AuthorizedAxiosInstance.patch(
+      `${API_ROOT}/v1/users/restore/${id}`
+    )
+    return response.data
+  } catch (error) {
+    console.error('Lỗi khi khôi phục người dùng:', error)
+    throw error
+  }
+}

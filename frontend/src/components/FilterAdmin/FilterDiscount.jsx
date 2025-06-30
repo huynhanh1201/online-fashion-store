@@ -26,6 +26,7 @@ export default function FilterDiscount({
   const [usedCountMax, setUsedCountMax] = useState('')
   const [isActive, setIsActive] = useState('true') // true: Đang hoạt động, false: Ngừng hoạt động
   const [sort, setSort] = useState('newest')
+  const [destroy, setDestroy] = useState('false')
 
   const [validFromStart, setValidFromStart] = useState(
     dayjs().format('YYYY-MM-DD')
@@ -50,7 +51,7 @@ export default function FilterDiscount({
     } else {
       hasMounted.current = true
     }
-  }, [keyword, type, isActive, sort])
+  }, [keyword, type, isActive, sort, destroy])
 
   const handleSelectFilter = (filter) => {
     if (filter === createdFilter) {
@@ -82,13 +83,15 @@ export default function FilterDiscount({
     usedMin: usedMinVal = usedCountMin,
     usedMax: usedMaxVal = usedCountMax,
     status: active = isActive,
-    sort: s = sort
+    sort: s = sort,
+    destroy: d = destroy
   } = {}) => {
     const filters = {
       search: k || undefined,
       type: t || undefined,
       status: active !== '' ? active === 'true' : undefined,
       sort: s || undefined,
+      destroy: d || undefined,
 
       amountMin: am ? parseInt(am) : undefined,
       amountMax: ax ? parseInt(ax) : undefined,
@@ -156,6 +159,7 @@ export default function FilterDiscount({
     setUsedCountMax('')
     setIsActive('')
     setSort('')
+    setDestroy('false')
     setValidFromStart(dayjs().format('YYYY-MM-DD'))
     setValidFromEnd(dayjs().format('YYYY-MM-DD'))
     setValidUntilStart(dayjs().format('YYYY-MM-DD'))
@@ -165,12 +169,27 @@ export default function FilterDiscount({
     setValidFromFilter('')
     setValidUntilFilter('')
     setCreatedFilter('')
-    onFilter({})
+    onFilter({
+      status: 'true',
+      sort: 'newest',
+      destroy: 'false'
+    })
     // fetchDiscounts(1, 10)
   }
 
   return (
     <Box display='flex' flexWrap='wrap' gap={2} mb={2} justifyContent='end'>
+      <FilterSelect
+        label='Xoá'
+        value={destroy}
+        onChange={(value) => {
+          setDestroy(value)
+        }}
+        options={[
+          { label: 'Chưa xoá', value: 'false' },
+          { label: 'Đã xoá', value: 'true' }
+        ]}
+      />
       <FilterSelect
         label='Loại mã'
         value={type}

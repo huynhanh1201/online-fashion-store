@@ -73,7 +73,7 @@ const VariantsTab = () => {
   const queryParams = new URLSearchParams(location.search)
   const searchFromUrl = queryParams.get('productId') || ''
   const [filter, setFilter] = React.useState({
-    status: 'false',
+    destroy: 'false',
     sort: 'newest',
     ...(searchFromUrl ? { productId: searchFromUrl } : {})
   })
@@ -86,9 +86,9 @@ const VariantsTab = () => {
     }
   }, [])
   useEffect(() => {
-    fetchProducts(1, 100000, { status: 'false' })
-    fetchColors(1, 100000, { status: 'false' })
-    fetchSizes(1, 100000, { status: 'false' })
+    fetchProducts(1, 100000, { destroy: 'false' })
+    fetchColors(1, 100000, { destroy: 'false' })
+    fetchSizes(1, 100000, { destroy: 'false' })
   }, [])
   useEffect(() => {
     fetchVariants(page, ROWS_PER_PAGE, filter)
