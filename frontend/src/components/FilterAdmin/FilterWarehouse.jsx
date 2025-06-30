@@ -45,7 +45,7 @@ export default function FilterWarehouse({
         applyFilters()
       }
     }
-  }, [keyword, destroy, sort, selectedFilter])
+  }, [keyword, sort, selectedFilter])
 
   useEffect(() => {
     hasMounted.current = true
@@ -246,16 +246,16 @@ export default function FilterWarehouse({
       {/*  }*/}
       {/*/>*/}
 
-      <FilterSelect
-        label='Trạng thái'
-        value={destroy}
-        onChange={(val) => setDestroy(val)}
-        options={[
-          { label: 'Tất cả', value: '' },
-          { label: 'Đang hoạt động', value: 'false' },
-          { label: 'Ngừng hoạt động', value: 'true' }
-        ]}
-      />
+      {/*<FilterSelect*/}
+      {/*  label='Trạng thái'*/}
+      {/*  value={destroy}*/}
+      {/*  onChange={(val) => setDestroy(val)}*/}
+      {/*  options={[*/}
+      {/*    { label: 'Tất cả', value: '' },*/}
+      {/*    { label: 'Đang hoạt động', value: 'false' },*/}
+      {/*    { label: 'Ngừng hoạt động', value: 'true' }*/}
+      {/*  ]}*/}
+      {/*/>*/}
 
       <FilterSelect value={sort} onChange={setSort} />
 

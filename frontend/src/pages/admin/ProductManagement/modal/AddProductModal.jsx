@@ -99,7 +99,7 @@ const AddProductModal = ({ open, onClose, onSuccess }) => {
       name: newCategory.name
     })
 
-    setCategoryOpen(false) // Đóng modal
+    setCategoryOpen(false) // Đóng Chart
   }
   const topLevelCategories = categories.filter(
     (category) => category.parent !== null

@@ -1,4 +1,4 @@
-// modal/WarehouseSlip/ViewWarehouseSlipModal.jsx
+// Chart/WarehouseSlip/ViewWarehouseSlipModal.jsx
 import React from 'react'
 import {
   Dialog,

@@ -5,7 +5,7 @@ import useColors from '~/hooks/admin/useColor'
 import usePermissions from '~/hooks/usePermissions'
 import { PermissionWrapper, RouteGuard } from '~/components/PermissionGuard'
 
-// Lazy load các modal
+// Lazy load các Chart
 const AddColorModal = React.lazy(() => import('./modal/AddColorModal'))
 const ViewColorModal = React.lazy(() => import('./modal/ViewColorModal'))
 const EditColorModal = React.lazy(() => import('./modal/EditColorModal'))
@@ -16,7 +16,7 @@ const ColorManagement = () => {
   const [selectedColor, setSelectedColor] = React.useState(null)
   const [modalType, setModalType] = React.useState(null)
   const [filters, setFilters] = React.useState({
-    status: 'false',
+    destroy: 'false',
     sort: 'newest'
   })
   const {

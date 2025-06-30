@@ -212,8 +212,7 @@ const EditDiscountModal = ({ open, onClose, discount, onSave }) => {
                     sx={StyleAdmin.InputCustom}
                   />
                 }
-                disabled
-                label='Kích hoạt'
+                label='Hoạt động'
                 sx={{ mt: 1 }}
               />
             </Box>

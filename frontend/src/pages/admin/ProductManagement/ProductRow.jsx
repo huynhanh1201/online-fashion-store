@@ -8,10 +8,11 @@ import ProductImageModal from './modal/ProductImageModal'
 import { optimizeCloudinaryUrl } from '~/utils/cloudinary.js'
 import Tooltip from '@mui/material/Tooltip'
 import { useNavigate } from 'react-router-dom'
+import RestartAltIcon from '@mui/icons-material/RestartAlt'
 const styles = {
   groupIcon: {
     display: 'flex',
-    justifyContent: 'center',
+    justifyContent: 'start',
     alignItems: 'center',
     gap: 1,
     width: '130px'
@@ -35,7 +36,8 @@ const ProductRow = ({
   index,
   columns,
   onAction,
-  permissions = {}
+  permissions = {},
+  filters
 }) => {
   const [openImage, setOpenImage] = useState(false)
   const navigate = useNavigate()
@@ -144,6 +146,28 @@ const ProductRow = ({
             )
           }
 
+          if (id === 'moreVariants') {
+            return (
+              <TableCell
+                key={id}
+                align={align}
+                sx={{
+                  ...styles.cellPadding,
+                  cursor: 'pointer'
+                }}
+                onClick={() => {
+                  if (product._id) {
+                    navigate(
+                      `/admin/variant-management?productId=${encodeURIComponent(product._id)}`
+                    )
+                  }
+                }}
+              >
+                Xem các biến thể của sản phẩm
+              </TableCell>
+            )
+          }
+
           if (id === 'status') {
             return (
               <TableCell key={id} align={align} sx={styles.cellPadding}>
@@ -210,25 +234,38 @@ const ProductRow = ({
                       </IconButton>
                     </Tooltip>
                   )}
-                  {permissions.canEdit && (
-                    <Tooltip title='Sửa'>
+                  {filters.destroy === 'true' ? (
+                    <Tooltip title='Khôi phục'>
                       <IconButton
-                        onClick={() => onAction('edit', product)}
+                        onClick={() => onAction('restore', product)}
                         size='small'
                       >
-                        <BorderColorIcon color='warning' />
+                        <RestartAltIcon color='success' />
                       </IconButton>
                     </Tooltip>
-                  )}
-                  {permissions.canDelete && (
-                    <Tooltip title='Xoá'>
-                      <IconButton
-                        onClick={() => onAction('delete', product)}
-                        size='small'
-                      >
-                        <DeleteForeverIcon color='error' />
-                      </IconButton>
-                    </Tooltip>
+                  ) : (
+                    <>
+                      {permissions.canEdit && (
+                        <Tooltip title='Sửa'>
+                          <IconButton
+                            onClick={() => onAction('edit', product)}
+                            size='small'
+                          >
+                            <BorderColorIcon color='warning' />
+                          </IconButton>
+                        </Tooltip>
+                      )}
+                      {permissions.canDelete && (
+                        <Tooltip title='Xoá'>
+                          <IconButton
+                            onClick={() => onAction('delete', product)}
+                            size='small'
+                          >
+                            <DeleteForeverIcon color='error' />
+                          </IconButton>
+                        </Tooltip>
+                      )}
+                    </>
                   )}
                 </Stack>
               </TableCell>

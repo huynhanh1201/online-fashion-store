@@ -201,7 +201,8 @@ const ProductTable = ({
   onFilter,
   fetchProducts,
   permissions = {},
-  initialSearch
+  initialSearch,
+  filters
 }) => {
   const columns = [
     { id: 'index', label: 'STT', minWidth: 50, align: 'center' },
@@ -215,6 +216,7 @@ const ProductTable = ({
       width: 200,
       align: 'start'
     },
+    { id: 'moreVariants', label: 'Biến thể', minWidth: 100, align: 'start' },
     { id: 'exportPrice', label: 'Giá bán', minWidth: 100, align: 'right' },
     {
       id: 'importPrice',
@@ -323,6 +325,7 @@ const ProductTable = ({
                   columns={columns}
                   onAction={handleOpenModal}
                   permissions={permissions}
+                  filters={filters}
                 />
               ))
             ) : (

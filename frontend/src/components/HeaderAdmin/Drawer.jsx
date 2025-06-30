@@ -45,11 +45,7 @@ export default function AdminDrawer({
   onProfileOpen
 }) {
   const location = useLocation()
-  const {
-    hasPermission,
-    isLoading,
-    isInitialized,
-  } = usePermissions()
+  const { hasPermission, isLoading, isInitialized } = usePermissions()
   const [openProduct, setOpenProduct] = React.useState(false)
   const [openOrder, setOpenOrder] = React.useState(false)
   const [openInventory, setOpenInventory] = React.useState(false)
@@ -541,7 +537,16 @@ export default function AdminDrawer({
         />
         <Box>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <Typography fontWeight='bold' fontSize={14}>
+            <Typography
+              fontWeight='bold'
+              fontSize={14}
+              sx={{
+                maxWidth: 150, // hoặc width cố định tùy ý
+                overflow: 'hidden',
+                whiteSpace: 'nowrap',
+                textOverflow: 'ellipsis'
+              }}
+            >
               {profileName
                 ?.toLowerCase()
                 .split(' ')
@@ -550,7 +555,15 @@ export default function AdminDrawer({
             </Typography>
             <CheckCircleIcon sx={{ color: '#61b865' }} fontSize='small' />
           </Box>
-          <Typography variant='caption'>
+          <Typography
+            variant='caption'
+            sx={{
+              maxWidth: 150, // hoặc width cố định tùy ý
+              overflow: 'hidden',
+              whiteSpace: 'nowrap',
+              textOverflow: 'ellipsis'
+            }}
+          >
             {roleMap[profile?.role] || 'Không xác định'}
           </Typography>
         </Box>

@@ -88,7 +88,7 @@ const EditProductModal = ({ open, onClose, onSave, product }) => {
       return [...trimmed, '']
     })
   }
-  // Load dữ liệu sản phẩm khi modal mở
+  // Load dữ liệu sản phẩm khi Chart mở
   useEffect(() => {
     if (open && product) {
       fetchCategories(1, 100000)
@@ -124,7 +124,7 @@ const EditProductModal = ({ open, onClose, onSave, product }) => {
       name: newCategory.name
     })
 
-    setCategoryOpen(false) // Đóng modal
+    setCategoryOpen(false) // Đóng Chart
   }
   const onSubmit = async (data) => {
     try {

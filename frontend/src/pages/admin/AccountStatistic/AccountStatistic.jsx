@@ -23,7 +23,7 @@ const styles = {
     flexDirection: 'column'
   }
 }
-const AccountStatistics = ({ statistics, rolesData = [] }) => {
+const AccountStatistics = ({ statistics = [] }) => {
   const { summary, chartData } = statistics
 
   const summaryItems = [
@@ -84,7 +84,7 @@ const AccountStatistics = ({ statistics, rolesData = [] }) => {
                   alignItems: 'center',
                   gap: 2,
                   p: 2,
-                  height: '150px',
+                  height: '100px',
                   borderLeft: `10px solid ${item.color}`,
                   backgroundColor: '#f5f5f5',
                   borderRadius: 2
@@ -125,24 +125,6 @@ const AccountStatistics = ({ statistics, rolesData = [] }) => {
         <Box mt={5} position='relative' sx={{ maxHeight: 500 }}>
           <Pie data={chartData} options={chartOptions} />
         </Box>
-      </Box>
-
-      <Box sx={styles.BoxCard}>
-        <Typography
-          variant='h5'
-          gutterBottom
-          fontWeight='700'
-          sx={styles.header}
-        >
-          Chi tiết vai trò
-        </Typography>
-        <ul>
-          {rolesData.map((role) => (
-            <li key={role._id}>
-              <strong>{role.label}</strong>: {role.permissions.join(', ')}
-            </li>
-          ))}
-        </ul>
       </Box>
     </div>
   )

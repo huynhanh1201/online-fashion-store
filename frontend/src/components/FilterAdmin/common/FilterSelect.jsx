@@ -1,53 +1,3 @@
-// import React from 'react'
-// import { FormControl, InputLabel, MenuItem, Select } from '@mui/material'
-//
-// const defaultOptions = [
-//   { label: 'Tên A-Z', value: 'name_asc' },
-//   { label: 'Tên Z-A', value: 'name_desc' },
-//   { label: 'Mới nhất', value: 'newest' },
-//   { label: 'Cũ nhất', value: 'oldest' }
-// ]
-//
-// export default function FilterSelect({
-//   label = 'Sắp xếp',
-//   value,
-//   onChange,
-//   options = defaultOptions,
-//   sx
-// }) {
-//   return (
-//     <FormControl
-//       size='small'
-//       sx={{
-//         minWidth: 150,
-//         '& .MuiOutlinedInput-root': {
-//           borderRadius: '4px', // Bo tròn
-//           height: 34, // Chiều cao cố định
-//           fontSize: '0.8rem', // Cỡ chữ nhỏ lại
-//           paddingX: 1 // Padding ngang nhẹ
-//         },
-//         '& .MuiInputLabel-root': {
-//           fontSize: '0.75rem' // Nhỏ label luôn
-//         },
-//         ...sx
-//       }}
-//     >
-//       <InputLabel>{label}</InputLabel>
-//       <Select
-//         value={value}
-//         onChange={(e) => onChange(e.target.value)}
-//         label={label}
-//       >
-//         {options.map((item) => (
-//           <MenuItem key={item.value} value={item.value}>
-//             {item.label}
-//           </MenuItem>
-//         ))}
-//       </Select>
-//     </FormControl>
-//   )
-// }
-
 import React from 'react'
 import {
   FormControl,
@@ -78,6 +28,7 @@ export default function FilterSelect({
         minWidth: 150,
         maxWidth: 500, // Giới hạn chiều rộng tối đa
         position: 'relative', // Đặt position để có thể canh chỉnh nếu cần
+        fontSize: '0.75rem !important',
         '& .MuiOutlinedInput-root': {
           borderRadius: '4px',
           height: 34,
@@ -95,6 +46,26 @@ export default function FilterSelect({
         value={value}
         onChange={(e) => onChange(e.target.value)}
         label={label}
+        renderValue={(selected) => (
+          <Typography
+            sx={{
+              fontSize: '0.75rem', // ✅ Nhỏ như label
+              color: 'rgba(0, 0, 0, 0.6)', // ✅ Nhẹ màu giống label
+              fontWeight: 400,
+              whiteSpace: 'nowrap',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis'
+            }}
+          >
+            {options.find((opt) => opt.value === selected)?.label || ''}
+          </Typography>
+        )}
+        sx={{
+          '& .MuiSelect-select': {
+            display: 'flex',
+            alignItems: 'center'
+          }
+        }}
         MenuProps={{
           anchorOrigin: {
             vertical: 'bottom',
@@ -106,9 +77,9 @@ export default function FilterSelect({
           },
           PaperProps: {
             sx: {
-              maxWidth: 500, // Giới hạn chiều rộng dropdown
-              minWidth: '100px', // Bằng với FormControl
-              maxHeight: 500 // Giới hạn chiều cao dropdown
+              maxWidth: 500,
+              minWidth: '100px',
+              maxHeight: 500
             }
           }
         }}

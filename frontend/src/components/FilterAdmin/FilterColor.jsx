@@ -185,7 +185,7 @@ export default function FilterColor({
   const applyFilters = (selectedTime, fromDate, toDate) => {
     const filters = {
       search: keyword || undefined,
-      status: status !== '' ? status : undefined,
+      destroy: status !== '' ? status : undefined,
       sort: sort || undefined
     }
 
@@ -217,22 +217,23 @@ export default function FilterColor({
     setSelectedFilter('')
     setStartDate(dayjs().format('YYYY-MM-DD'))
     setEndDate(dayjs().format('YYYY-MM-DD'))
-    setStatus('')
-    setSort('')
-    onFilter({})
+    setStatus('false')
+    setSort('newest')
+    onFilter({ destroy: 'false', sort: 'newest' })
     // fetchColors(1, 10, {}) // Reset danh sách
   }
 
   return (
     <Box display='flex' flexWrap='wrap' gap={2} mb={2} justifyContent='end'>
       <FilterSelect
-        label='Trạng thái'
+        label='Xoá'
         value={status}
-        onChange={setStatus}
+        onChange={(value) => {
+          setStatus(value)
+        }}
         options={[
-          { label: 'Tất cả', value: '' },
-          { label: 'Hoạt động', value: false },
-          { label: 'Không hoạt động', value: true }
+          { label: 'Chưa xoá', value: 'false' },
+          { label: 'Đã xoá', value: 'true' }
         ]}
       />
 

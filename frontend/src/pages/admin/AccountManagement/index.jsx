@@ -6,7 +6,7 @@ import useRoles from '~/hooks/admin/useRoles.js'
 import usePermissions from '~/hooks/usePermissions'
 import { PermissionWrapper, RouteGuard } from '~/components/PermissionGuard'
 
-// Lazy load các modal
+// Lazy load các Chart
 const ViewAccountModal = React.lazy(
   () => import('./modal/ViewAccountModal.jsx')
 )
@@ -17,14 +17,17 @@ const DeleteAccountModal = React.lazy(
   () => import('./modal/DeleteAccountModal.jsx')
 )
 const AddAccountModal = React.lazy(() => import('./modal/AddAccountModal.jsx'))
-
+const RestoreAccountModal = React.lazy(
+  () => import('./modal/RestoreAccountModal.jsx')
+)
 const AccountManagement = () => {
   const { roles, fetchRoles } = useRoles()
   const [page, setPage] = React.useState(1)
   const [selectedUser, setSelectedUser] = React.useState(null)
   const [modalType, setModalType] = React.useState(null)
   const [filters, setFilters] = React.useState({
-    sort: 'newest'
+    sort: 'newest',
+    destroy: 'false'
   })
 
   const {
@@ -36,7 +39,8 @@ const AccountManagement = () => {
     update,
     add,
     ROWS_PER_PAGE,
-    setROWS_PER_PAGE
+    setROWS_PER_PAGE,
+    Restore
   } = useUsers()
 
   const { hasPermission } = usePermissions()
@@ -68,6 +72,8 @@ const AccountManagement = () => {
         await update(id, data)
       } else if (type === 'delete') {
         await removeUser(data)
+      } else if (type === 'restore') {
+        await Restore(data)
       }
     } catch (error) {
       console.error('Lỗi:', error)
@@ -106,6 +112,7 @@ const AccountManagement = () => {
           canView: hasPermission('user:read')
         }}
         roles={roles}
+        filters={filters}
       />
 
       <React.Suspense fallback={<></>}>
@@ -151,6 +158,14 @@ const AccountManagement = () => {
             />
           )}
         </PermissionWrapper>
+        {modalType === 'restore' && selectedUser && (
+          <RestoreAccountModal
+            open
+            onClose={handleCloseModal}
+            user={selectedUser}
+            onRestore={handleSave}
+          />
+        )}
       </React.Suspense>
     </RouteGuard>
   )

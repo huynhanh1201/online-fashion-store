@@ -1,34 +1,52 @@
-import React from 'react'
-import { Typography, Grid, Box, Stack } from '@mui/material'
+import React, { useState } from 'react'
+import {
+  Typography,
+  Grid,
+  Box,
+  Stack,
+  MenuItem,
+  Select,
+  FormControl,
+  InputLabel
+} from '@mui/material'
 import InventoryIcon from '@mui/icons-material/Inventory'
 import CategoryIcon from '@mui/icons-material/Category'
 import LayersIcon from '@mui/icons-material/Layers'
 import LocalShippingIcon from '@mui/icons-material/LocalShipping'
 import GroupIcon from '@mui/icons-material/Group'
 import ShowChartIcon from '@mui/icons-material/ShowChart'
-import { Bar, Pie } from 'react-chartjs-2'
+import AttachMoneyIcon from '@mui/icons-material/AttachMoney'
+import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet'
+import TrendingUpIcon from '@mui/icons-material/TrendingUp'
 import {
   Chart as ChartJS,
   BarElement,
   CategoryScale,
   LinearScale,
-  ArcElement,
+  PointElement,
+  LineElement,
   Tooltip,
   Legend
 } from 'chart.js'
+import { Bar, Line } from 'react-chartjs-2'
 
 ChartJS.register(
   BarElement,
   CategoryScale,
   LinearScale,
-  ArcElement,
+  PointElement,
+  LineElement,
   Tooltip,
   Legend
 )
 
-export default function SystemDashboard({ stats, loading }) {
-  const { accountStatistics, productStatistics, orderStatistics } = stats || {}
-
+export default function SystemDashboard({
+  financeStatistics,
+  accountStatistics,
+  productStatistics,
+  loading,
+  orderStatistics
+}) {
   const summaryItems = [
     {
       label: 'Tổng sản phẩm',
@@ -62,53 +80,32 @@ export default function SystemDashboard({ stats, loading }) {
     },
     {
       label: 'Tổng người dùng',
-      value: accountStatistics?.summary?.totalUsers || 0,
+      value: accountStatistics?.reduce((acc, curr) => acc + curr.count, 0) || 0,
       icon: <GroupIcon color='primary' fontSize='large' />,
       color: '#64B5F6'
+    },
+    {
+      label: 'Số tiền thu được từ đơn hàng',
+      value:
+        financeStatistics?.totalRevenue?.toLocaleString('vi-VN') + '₫' || '0₫',
+      icon: <AttachMoneyIcon color='success' fontSize='large' />,
+      color: '#4CAF50'
+    },
+    {
+      label: 'Tổng tiền vốn của các đơn hàng',
+      value:
+        financeStatistics?.totalCost?.toLocaleString('vi-VN') + '₫' || '0₫',
+      icon: <AccountBalanceWalletIcon color='warning' fontSize='large' />,
+      color: '#FF9800'
+    },
+    {
+      label: 'Lợi nhuận tổng các đơn hàng',
+      value:
+        financeStatistics?.totalProfit?.toLocaleString('vi-VN') + '₫' || '0₫',
+      icon: <TrendingUpIcon color='error' fontSize='large' />,
+      color: '#F44336'
     }
   ]
-
-  const barChartData = {
-    labels: summaryItems.map((item) => item.label),
-    datasets: [
-      {
-        label: 'Số lượng',
-        data: summaryItems.map((item) => item.value),
-        backgroundColor: summaryItems.map((item) => item.color)
-      }
-    ]
-  }
-
-  // Use the chartData directly from accountStatistics
-  const accountPieChartData = accountStatistics.chartData
-
-  const productOrderPieChartData = {
-    labels: [
-      'Tổng sản phẩm',
-      'Tổng danh mục',
-      'Tổng biến thể',
-      'Tổng đơn hàng',
-      'Tổng số lượt dùng mã giảm giá'
-    ],
-    datasets: [
-      {
-        data: [
-          productStatistics?.productsTotal || 0,
-          productStatistics?.categoriesTotal || 0,
-          productStatistics?.variantsTotal || 0,
-          orderStatistics?.orderStats?.totalOrders || 0,
-          orderStatistics?.couponStats?.totalCouponsUsage || 0
-        ],
-        backgroundColor: [
-          '#4FC3F7', // Xanh dương nhạt
-          '#81C784', // Xanh lá nhạt
-          '#FFD54F', // Vàng nhạt
-          '#BA68C8', // Tím nhạt
-          '#FF8A65' // Cam nhạt
-        ]
-      }
-    ]
-  }
 
   if (loading) {
     return (
@@ -148,6 +145,8 @@ export default function SystemDashboard({ stats, loading }) {
       <Typography variant='h5' mb={2} fontWeight='bold'>
         Thống kê tổng quan
       </Typography>
+
+      {/* Thống kê sản phẩm - đơn hàng - người dùng */}
       <Grid container spacing={2}>
         {summaryItems.map((item, index) => (
           <Grid item size={4} xs={12} sm={6} md={4} lg={3} key={index}>
@@ -157,7 +156,7 @@ export default function SystemDashboard({ stats, loading }) {
                 alignItems: 'center',
                 gap: 2,
                 p: 2,
-                height: '150px',
+                height: '100px',
                 borderLeft: `10px solid ${item.color}`,
                 backgroundColor: '#f5f5f5',
                 borderRadius: 2
@@ -168,7 +167,7 @@ export default function SystemDashboard({ stats, loading }) {
                   {item.label}
                 </Typography>
                 <Typography
-                  variant='h6'
+                  variant='h5'
                   fontWeight='bold'
                   sx={{ display: 'flex', alignItems: 'center', gap: 1 }}
                 >
@@ -179,33 +178,6 @@ export default function SystemDashboard({ stats, loading }) {
             </Box>
           </Grid>
         ))}
-      </Grid>
-      <Box mt={4}>
-        <Typography variant='h6' mb={2}>
-          Biểu đồ cột
-        </Typography>
-        <Bar data={barChartData} options={{ responsive: true }} />
-      </Box>
-      <Grid container spacing={2} mt={4}>
-        <Grid item size={6} xs={12} md={6}>
-          <Box sx={{ width: 500, height: 550 }}>
-            <Typography variant='h6' mb={2}>
-              Biểu đồ tròn - Tài khoản
-            </Typography>
-            <Pie data={accountPieChartData} options={{ responsive: true }} />
-          </Box>
-        </Grid>
-        <Grid item size={6} xs={12} md={6}>
-          <Box sx={{ width: 500, height: 550 }}>
-            <Typography variant='h6' mb={2}>
-              Biểu đồ tròn - Kho, Sản phẩm, Đơn hàng
-            </Typography>
-            <Pie
-              data={productOrderPieChartData}
-              options={{ responsive: true }}
-            />
-          </Box>
-        </Grid>
       </Grid>
     </Box>
   )

@@ -352,19 +352,19 @@ export default function FilterInventory({
         ]}
       />
 
-      <FilterSelect
-        label='Trạng thái'
-        value={destroy}
-        onChange={(val) => {
-          setDestroy(val)
-          applyFilters(selectedFilter, startDate, endDate)
-        }}
-        options={[
-          { label: 'Tất cả', value: '' },
-          { label: 'Đang hoạt động', value: false },
-          { label: 'Dừng hoạt động', value: true }
-        ]}
-      />
+      {/*<FilterSelect*/}
+      {/*  label='Trạng thái'*/}
+      {/*  value={destroy}*/}
+      {/*  onChange={(val) => {*/}
+      {/*    setDestroy(val)*/}
+      {/*    applyFilters(selectedFilter, startDate, endDate)*/}
+      {/*  }}*/}
+      {/*  options={[*/}
+      {/*    { label: 'Tất cả', value: '' },*/}
+      {/*    { label: 'Đang hoạt động', value: false },*/}
+      {/*    { label: 'Dừng hoạt động', value: true }*/}
+      {/*  ]}*/}
+      {/*/>*/}
 
       <FilterSelect
         label='Sắp xếp'

@@ -74,7 +74,7 @@ export default function FilterCategory({
   const applyFilters = (selectedTime, fromDate, toDate) => {
     const filters = {
       search: keyword || undefined,
-      status: status !== '' ? status : undefined,
+      destroy: status !== '' ? status : undefined,
       sort: sort || undefined
     }
 
@@ -107,25 +107,24 @@ export default function FilterCategory({
     setSelectedFilter('')
     setStartDate(dayjs().format('YYYY-MM-DD'))
     setEndDate(dayjs().format('YYYY-MM-DD'))
-    setStatus('')
-    setSort('')
-    onFilter({})
+    setStatus('false')
+    setSort('newest')
+    onFilter({ sort: 'newest', destroy: 'false' })
     // fetchCategories(1, 10, {}) // Reset lại danh sách categories
   }
 
   return (
     <Box display='flex' flexWrap='wrap' gap={2} mb={2} justifyContent='end'>
       <FilterSelect
-        label='Trạng thái danh mục'
+        label='Xoá'
         value={status}
         onChange={(value) => {
           setStatus(value)
           applyFilters(selectedFilter, startDate, endDate)
         }}
         options={[
-          { label: 'Tất cả', value: '' },
-          { label: 'Hoạt động', value: false },
-          { label: 'Không hoạt động', value: true }
+          { label: 'Chưa xoá', value: 'false' },
+          { label: 'Đã xoá', value: 'true' }
         ]}
         sx={{ width: 160 }}
       />

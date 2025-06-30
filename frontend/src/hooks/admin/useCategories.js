@@ -4,7 +4,8 @@ import {
   getCategoryById,
   addCategory,
   deleteCategory,
-  updateCategory
+  updateCategory,
+  RestoreCategory
 } from '~/services/admin/categoryService'
 
 const useCategories = () => {
@@ -118,6 +119,22 @@ const useCategories = () => {
     }
   }
 
+  const Restore = async (id) => {
+    try {
+      const restore = await RestoreCategory(id)
+      if (!restore) {
+        console.error('Failed to restore category')
+        return null
+      }
+      setCategories((prev) => prev.filter((cat) => cat._id !== id))
+      setTotalPages((prev) => prev - 1)
+      return true
+    } catch (err) {
+      console.error('Error restoring category:', err)
+      return false
+    }
+  }
+
   const Save = (data) => {
     setCategories((prev) => prev.map((d) => (d._id === data._id ? data : d)))
   }
@@ -133,7 +150,8 @@ const useCategories = () => {
     Save,
     add,
     remove,
-    update
+    update,
+    Restore
   }
 }
 

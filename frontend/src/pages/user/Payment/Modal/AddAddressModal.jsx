@@ -88,7 +88,7 @@ export default function AddAddressModal({
     }))
   }
 
-  // Reset form khi mở modal
+  // Reset form khi mở Chart
   useEffect(() => {
     if (open) {
       setFormData({
@@ -110,7 +110,7 @@ export default function AddAddressModal({
     }
   }, [open, addressToEdit])
 
-  // Gọi API tỉnh/thành khi modal mở
+  // Gọi API tỉnh/thành khi Chart mở
   useEffect(() => {
     if (!open) return
 
@@ -249,7 +249,9 @@ export default function AddAddressModal({
     const errors = {
       fullName:
         !formData.fullName.trim() || formData.fullName.trim().length < 3,
-      phone: !formData.phone.trim() || !/^(0[3|5|7|8|9])[0-9]{8}$/.test(formData.phone.trim()),
+      phone:
+        !formData.phone.trim() ||
+        !/^(0[3|5|7|8|9])[0-9]{8}$/.test(formData.phone.trim()),
       address: !formData.address.trim() || formData.address.trim().length < 5,
       city: !formData.city,
       district: !formData.district,
@@ -336,7 +338,6 @@ export default function AddAddressModal({
         >
           <CloseIcon />
         </IconButton>
-
       </DialogTitle>
       <Divider />
       <DialogContent dividers>
@@ -378,7 +379,9 @@ export default function AddAddressModal({
               onChange={handleChange('phone')}
               error={formErrors.phone}
               helperText={
-                formErrors.phone ? 'Số điện thoại phải đúng định dạng Việt Nam (VD: 0912345678)' : ''
+                formErrors.phone
+                  ? 'Số điện thoại phải đúng định dạng Việt Nam (VD: 0912345678)'
+                  : ''
               }
               disabled={viewOnly}
             />
@@ -469,7 +472,7 @@ export default function AddAddressModal({
               px: 3,
               py: 1,
               '&:hover': {
-                backgroundColor: '#f1f5f9',
+                backgroundColor: '#f1f5f9'
               }
             }}
           >
@@ -488,8 +491,8 @@ export default function AddAddressModal({
               boxShadow: '0 4px 15px rgba(26, 60, 123, 0.4)',
               '&:hover': {
                 background: '#153056',
-                boxShadow: '0 6px 20px rgba(26, 60, 123, 0.6)',
-              },
+                boxShadow: '0 6px 20px rgba(26, 60, 123, 0.6)'
+              }
             }}
           >
             {isEditMode ? 'Lưu' : 'Thêm'}

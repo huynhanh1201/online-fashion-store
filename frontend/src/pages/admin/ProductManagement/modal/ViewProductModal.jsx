@@ -99,20 +99,20 @@ const ViewProductModal = ({
   // const filteredSizes = sizePalette?.sizes ? uniqueSizes(sizePalette.sizes) : []
 
   // Tách ra mảng màu và kích thước
-  const filteredColors = Array.isArray(colorPalette?.colors)
-    ? colorPalette.colors
-    : []
-
-  const filteredSizes = Array.isArray(sizePalette?.sizes)
-    ? sizePalette.sizes
-    : []
-
-  // Lưu thêm metadata
-  const colorCreatedAt = colorPalette?.createdAt
-  const colorUpdatedAt = colorPalette?.updatedAt
-
-  const sizeCreatedAt = sizePalette?.createdAt
-  const sizeUpdatedAt = sizePalette?.updatedAt
+  // const filteredColors = Array.isArray(colorPalette?.colors)
+  //   ? colorPalette.colors
+  //   : []
+  //
+  // const filteredSizes = Array.isArray(sizePalette?.sizes)
+  //   ? sizePalette.sizes
+  //   : []
+  //
+  // // Lưu thêm metadata
+  // const colorCreatedAt = colorPalette?.createdAt
+  // const colorUpdatedAt = colorPalette?.updatedAt
+  //
+  // const sizeCreatedAt = sizePalette?.createdAt
+  // const sizeUpdatedAt = sizePalette?.updatedAt
 
   const productName = product?.name || 'Không có tên sản phẩm'
 
@@ -152,18 +152,18 @@ const ViewProductModal = ({
         sx={{ maxHeight: 'calc(85vh - 64px)', overflowY: 'auto' }}
       >
         <TabContext value={tabIndex}>
-          <Tabs
-            value={tabIndex}
-            onChange={handleTabChange}
-            indicatorColor='primary'
-            textColor='primary'
-            variant='scrollable'
-            scrollButtons='auto'
-          >
-            <Tab label='Thông tin sản phẩm' value='1' />
-            <Tab label='Màu sắc sản phẩm' value='2' />
-            <Tab label='Kích thước sản phẩm' value='3' />
-          </Tabs>
+          {/*<Tabs*/}
+          {/*  value={tabIndex}*/}
+          {/*  onChange={handleTabChange}*/}
+          {/*  indicatorColor='primary'*/}
+          {/*  textColor='primary'*/}
+          {/*  variant='scrollable'*/}
+          {/*  scrollButtons='auto'*/}
+          {/*>*/}
+          {/*  <Tab label='Thông tin sản phẩm' value='1' />*/}
+          {/*  <Tab label='Màu sắc sản phẩm' value='2' />*/}
+          {/*  <Tab label='Kích thước sản phẩm' value='3' />*/}
+          {/*</Tabs>*/}
 
           <TabPanel value='1'>
             <Grid container spacing={2}>
@@ -328,13 +328,13 @@ const ViewProductModal = ({
               </Typography>
             ) : (
               <Box
-                className="content-selectable"
+                className='content-selectable'
                 sx={{
                   width: '100%',
                   mt: 2,
                   '& img': {
-                    width: '873px !important',
-                    height: '873px !important',
+                    width: '100% !important',
+                    height: '700px !important',
                     display: 'block',
                     margin: '8px auto',
                     borderRadius: '6px',
@@ -375,286 +375,286 @@ const ViewProductModal = ({
             )}
           </TabPanel>
 
-          <TabPanel value='2'>
-            <Typography variant='h6' gutterBottom>
-              Danh sách màu sắc của sản phẩm:{' '}
-              <strong>
-                {productName
-                  .split(' ')
-                  .map(
-                    (word) =>
-                      word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
-                  )
-                  .join(' ') || 'Không có tên'}
-              </strong>
-            </Typography>
-            <Table size='small' sx={{ tableLayout: 'fixed', width: '100%' }}>
-              <TableHead>
-                <TableRow>
-                  <TableCell
-                    sx={{
-                      ...StyleAdmin.TableColumnSTT,
-                      fontWeight: 700,
-                      width: 54
-                    }}
-                  >
-                    STT
-                  </TableCell>
-                  <TableCell align='left' sx={{ fontWeight: 700, width: 100 }}>
-                    Ảnh
-                  </TableCell>
-                  <TableCell align='left' sx={{ fontWeight: 700 }}>
-                    Tên màu
-                  </TableCell>
-                  <TableCell align='left' sx={{ width: 200, fontWeight: 700 }}>
-                    Ngày tạo
-                  </TableCell>
-                  <TableCell align='left' sx={{ width: 200, fontWeight: 700 }}>
-                    Ngày cập nhật
-                  </TableCell>
-                  <TableCell align='left' sx={{ width: 150, fontWeight: 700 }}>
-                    Trạng thái
-                  </TableCell>
-                  <TableCell
-                    align='left'
-                    sx={{ width: 150, maxWidth: 150, fontWeight: 700 }}
-                  >
-                    Thao tác
-                  </TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {filteredColors.length === 0 ? (
-                  <TableNoneData
-                    col={6}
-                    message='Không có dữ liệu màu sắc của sản phẩm.'
-                  />
-                ) : (
-                  filteredColors.map((color, index) => (
-                    <TableRow key={color._id}>
-                      <TableCell sx={StyleAdmin.TableColumnSTT}>
-                        {index + 1}
-                      </TableCell>
-                      <TableCell
-                        sx={{
-                          ...styles.cellPadding,
-                          ...styles.cellPaddingColor,
-                          display: 'flex',
-                          alignItems: 'center',
-                          height: 53.5,
-                          minHeight: 53.5,
-                          maxHeight: 53.5
-                        }}
-                      >
-                        <Box
-                          component='img'
-                          src={optimizeCloudinaryUrl(color.image)}
-                          alt={color.name}
-                          sx={{
-                            width: 40,
-                            height: 40,
-                            objectFit: 'cover',
-                            borderRadius: '4px',
-                            border: '1px solid #ccc'
-                          }}
-                        />
-                      </TableCell>
-                      <TableCell
-                        sx={{
-                          textAlign: 'left',
-                          ...styles.cellPadding,
-                          ...styles.cellPaddingColor,
-                          maxWidth: 150,
-                          overflow: 'hidden',
-                          textOverflow: 'ellipsis',
-                          whiteSpace: 'nowrap'
-                        }}
-                      >
-                        {color?.name}
-                      </TableCell>
-                      <TableCell
-                        sx={{
-                          ...styles.cellPadding,
-                          ...styles.cellPaddingColor
-                        }}
-                      >
-                        {formatDate(colorCreatedAt)}
-                      </TableCell>
-                      <TableCell
-                        sx={{
-                          ...styles.cellPadding,
-                          ...styles.cellPaddingColor
-                        }}
-                      >
-                        {formatDate(colorUpdatedAt)}
-                      </TableCell>
-                      <TableCell
-                        sx={{
-                          ...styles.cellPadding,
-                          ...styles.cellPaddingColor
-                        }}
-                      >
-                        <Chip
-                          label={color.isActive ? 'Đang bán' : 'Ngừng bán'}
-                          color={color.destroy ? 'error' : 'success'}
-                          size='large'
-                          sx={{ width: '120px', fontWeight: '800' }}
-                        />
-                      </TableCell>
-                      <TableCell
-                        align='center'
-                        sx={{
-                          maxWidth: 150,
-                          ...styles.cellPadding,
-                          ...styles.cellPaddingColor
-                        }}
-                      >
-                        <Stack
-                          direction='row'
-                          spacing={1}
-                          sx={styles.groupIcon}
-                        >
-                          <Tooltip title='Xem'>
-                            <IconButton size='small'>
-                              <RemoveRedEyeIcon color='primary' />
-                            </IconButton>
-                          </Tooltip>
-                          <Tooltip title='Sửa'>
-                            <IconButton size='small'>
-                              <BorderColorIcon color='warning' />
-                            </IconButton>
-                          </Tooltip>
-                          <Tooltip title='Xoá'>
-                            <IconButton size='small'>
-                              <DeleteForeverIcon color='error' />
-                            </IconButton>
-                          </Tooltip>
-                        </Stack>
-                      </TableCell>
-                    </TableRow>
-                  ))
-                )}
-              </TableBody>
-            </Table>
-          </TabPanel>
+          {/*<TabPanel value='2'>*/}
+          {/*  <Typography variant='h6' gutterBottom>*/}
+          {/*    Danh sách màu sắc của sản phẩm:{' '}*/}
+          {/*    <strong>*/}
+          {/*      {productName*/}
+          {/*        .split(' ')*/}
+          {/*        .map(*/}
+          {/*          (word) =>*/}
+          {/*            word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()*/}
+          {/*        )*/}
+          {/*        .join(' ') || 'Không có tên'}*/}
+          {/*    </strong>*/}
+          {/*  </Typography>*/}
+          {/*  <Table size='small' sx={{ tableLayout: 'fixed', width: '100%' }}>*/}
+          {/*    <TableHead>*/}
+          {/*      <TableRow>*/}
+          {/*        <TableCell*/}
+          {/*          sx={{*/}
+          {/*            ...StyleAdmin.TableColumnSTT,*/}
+          {/*            fontWeight: 700,*/}
+          {/*            width: 54*/}
+          {/*          }}*/}
+          {/*        >*/}
+          {/*          STT*/}
+          {/*        </TableCell>*/}
+          {/*        <TableCell align='left' sx={{ fontWeight: 700, width: 100 }}>*/}
+          {/*          Ảnh*/}
+          {/*        </TableCell>*/}
+          {/*        <TableCell align='left' sx={{ fontWeight: 700 }}>*/}
+          {/*          Tên màu*/}
+          {/*        </TableCell>*/}
+          {/*        <TableCell align='left' sx={{ width: 200, fontWeight: 700 }}>*/}
+          {/*          Ngày tạo*/}
+          {/*        </TableCell>*/}
+          {/*        <TableCell align='left' sx={{ width: 200, fontWeight: 700 }}>*/}
+          {/*          Ngày cập nhật*/}
+          {/*        </TableCell>*/}
+          {/*        <TableCell align='left' sx={{ width: 150, fontWeight: 700 }}>*/}
+          {/*          Trạng thái*/}
+          {/*        </TableCell>*/}
+          {/*        <TableCell*/}
+          {/*          align='left'*/}
+          {/*          sx={{ width: 150, maxWidth: 150, fontWeight: 700 }}*/}
+          {/*        >*/}
+          {/*          Thao tác*/}
+          {/*        </TableCell>*/}
+          {/*      </TableRow>*/}
+          {/*    </TableHead>*/}
+          {/*    <TableBody>*/}
+          {/*      {filteredColors.length === 0 ? (*/}
+          {/*        <TableNoneData*/}
+          {/*          col={6}*/}
+          {/*          message='Không có dữ liệu màu sắc của sản phẩm.'*/}
+          {/*        />*/}
+          {/*      ) : (*/}
+          {/*        filteredColors.map((color, index) => (*/}
+          {/*          <TableRow key={color._id}>*/}
+          {/*            <TableCell sx={StyleAdmin.TableColumnSTT}>*/}
+          {/*              {index + 1}*/}
+          {/*            </TableCell>*/}
+          {/*            <TableCell*/}
+          {/*              sx={{*/}
+          {/*                ...styles.cellPadding,*/}
+          {/*                ...styles.cellPaddingColor,*/}
+          {/*                display: 'flex',*/}
+          {/*                alignItems: 'center',*/}
+          {/*                height: 53.5,*/}
+          {/*                minHeight: 53.5,*/}
+          {/*                maxHeight: 53.5*/}
+          {/*              }}*/}
+          {/*            >*/}
+          {/*              <Box*/}
+          {/*                component='img'*/}
+          {/*                src={optimizeCloudinaryUrl(color.image)}*/}
+          {/*                alt={color.name}*/}
+          {/*                sx={{*/}
+          {/*                  width: 40,*/}
+          {/*                  height: 40,*/}
+          {/*                  objectFit: 'cover',*/}
+          {/*                  borderRadius: '4px',*/}
+          {/*                  border: '1px solid #ccc'*/}
+          {/*                }}*/}
+          {/*              />*/}
+          {/*            </TableCell>*/}
+          {/*            <TableCell*/}
+          {/*              sx={{*/}
+          {/*                textAlign: 'left',*/}
+          {/*                ...styles.cellPadding,*/}
+          {/*                ...styles.cellPaddingColor,*/}
+          {/*                maxWidth: 150,*/}
+          {/*                overflow: 'hidden',*/}
+          {/*                textOverflow: 'ellipsis',*/}
+          {/*                whiteSpace: 'nowrap'*/}
+          {/*              }}*/}
+          {/*            >*/}
+          {/*              {color?.name}*/}
+          {/*            </TableCell>*/}
+          {/*            <TableCell*/}
+          {/*              sx={{*/}
+          {/*                ...styles.cellPadding,*/}
+          {/*                ...styles.cellPaddingColor*/}
+          {/*              }}*/}
+          {/*            >*/}
+          {/*              {formatDate(colorCreatedAt)}*/}
+          {/*            </TableCell>*/}
+          {/*            <TableCell*/}
+          {/*              sx={{*/}
+          {/*                ...styles.cellPadding,*/}
+          {/*                ...styles.cellPaddingColor*/}
+          {/*              }}*/}
+          {/*            >*/}
+          {/*              {formatDate(colorUpdatedAt)}*/}
+          {/*            </TableCell>*/}
+          {/*            <TableCell*/}
+          {/*              sx={{*/}
+          {/*                ...styles.cellPadding,*/}
+          {/*                ...styles.cellPaddingColor*/}
+          {/*              }}*/}
+          {/*            >*/}
+          {/*              <Chip*/}
+          {/*                label={color.isActive ? 'Đang bán' : 'Ngừng bán'}*/}
+          {/*                color={color.destroy ? 'error' : 'success'}*/}
+          {/*                size='large'*/}
+          {/*                sx={{ width: '120px', fontWeight: '800' }}*/}
+          {/*              />*/}
+          {/*            </TableCell>*/}
+          {/*            <TableCell*/}
+          {/*              align='center'*/}
+          {/*              sx={{*/}
+          {/*                maxWidth: 150,*/}
+          {/*                ...styles.cellPadding,*/}
+          {/*                ...styles.cellPaddingColor*/}
+          {/*              }}*/}
+          {/*            >*/}
+          {/*              <Stack*/}
+          {/*                direction='row'*/}
+          {/*                spacing={1}*/}
+          {/*                sx={styles.groupIcon}*/}
+          {/*              >*/}
+          {/*                <Tooltip title='Xem'>*/}
+          {/*                  <IconButton size='small'>*/}
+          {/*                    <RemoveRedEyeIcon color='primary' />*/}
+          {/*                  </IconButton>*/}
+          {/*                </Tooltip>*/}
+          {/*                <Tooltip title='Sửa'>*/}
+          {/*                  <IconButton size='small'>*/}
+          {/*                    <BorderColorIcon color='warning' />*/}
+          {/*                  </IconButton>*/}
+          {/*                </Tooltip>*/}
+          {/*                <Tooltip title='Xoá'>*/}
+          {/*                  <IconButton size='small'>*/}
+          {/*                    <DeleteForeverIcon color='error' />*/}
+          {/*                  </IconButton>*/}
+          {/*                </Tooltip>*/}
+          {/*              </Stack>*/}
+          {/*            </TableCell>*/}
+          {/*          </TableRow>*/}
+          {/*        ))*/}
+          {/*      )}*/}
+          {/*    </TableBody>*/}
+          {/*  </Table>*/}
+          {/*</TabPanel>*/}
 
-          <TabPanel value='3'>
-            <Typography variant='h6' gutterBottom>
-              Danh sách kích thước của sản phẩm:{' '}
-              <strong>
-                {productName
-                  .split(' ')
-                  .map(
-                    (word) =>
-                      word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
-                  )
-                  .join(' ') || 'Không có tên'}
-              </strong>
-            </Typography>
-            <Table size='small' sx={{ tableLayout: 'fixed', width: '100%' }}>
-              <TableHead>
-                <TableRow>
-                  <TableCell
-                    sx={{
-                      ...StyleAdmin.TableColumnSTT,
-                      fontWeight: 700,
-                      width: 54
-                    }}
-                  >
-                    STT
-                  </TableCell>
-                  <TableCell align='left' sx={{ fontWeight: 700 }}>
-                    Tên kích thước
-                  </TableCell>
-                  <TableCell align='left' sx={{ fontWeight: 700, width: 200 }}>
-                    Ngày tạo
-                  </TableCell>
-                  <TableCell align='left' sx={{ fontWeight: 700, width: 200 }}>
-                    Ngày cập nhật
-                  </TableCell>
-                  <TableCell align='left' sx={{ fontWeight: 700, width: 150 }}>
-                    Trạng thái
-                  </TableCell>
-                  <TableCell align='left' sx={{ fontWeight: 700, width: 150 }}>
-                    Thao tác
-                  </TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {filteredSizes.length === 0 ? (
-                  <TableNoneData
-                    col={5}
-                    message='Không có dữ liệu kích thước của sản phẩm.'
-                  />
-                ) : (
-                  filteredSizes.map((size, index) => (
-                    <TableRow key={size._id}>
-                      <TableCell sx={StyleAdmin.TableColumnSTT}>
-                        {index + 1}
-                      </TableCell>
-                      <TableCell
-                        sx={{
-                          textAlign: 'left',
-                          ...styles.cellPadding,
-                          maxWidth: 150,
-                          overflow: 'hidden',
-                          textOverflow: 'ellipsis',
-                          whiteSpace: 'nowrap'
-                        }}
-                      >
-                        {size?.name}
-                      </TableCell>
-                      <TableCell sx={styles.cellPadding}>
-                        {formatDate(sizeCreatedAt)}
-                      </TableCell>
-                      <TableCell sx={styles.cellPadding}>
-                        {formatDate(sizeUpdatedAt)}
-                      </TableCell>
-                      <TableCell
-                        sx={{
-                          ...styles.cellPadding,
-                          ...styles.cellPaddingColor
-                        }}
-                      >
-                        <Chip
-                          label={size?.isActive ? 'Đang bán' : 'Ngừng bán'}
-                          color={size?.destroy ? 'error' : 'success'}
-                          size='large'
-                          sx={{ width: '120px', fontWeight: '800' }}
-                        />
-                      </TableCell>
-                      <TableCell
-                        align='center'
-                        sx={{ maxWidth: 150, ...styles.cellPadding }}
-                      >
-                        <Stack
-                          direction='row'
-                          spacing={1}
-                          sx={styles.groupIcon}
-                        >
-                          <Tooltip title='Xem'>
-                            <IconButton size='small'>
-                              <RemoveRedEyeIcon color='primary' />
-                            </IconButton>
-                          </Tooltip>
-                          <Tooltip title='Sửa'>
-                            <IconButton size='small'>
-                              <BorderColorIcon color='warning' />
-                            </IconButton>
-                          </Tooltip>
-                          <Tooltip title='Xoá'>
-                            <IconButton size='small'>
-                              <DeleteForeverIcon color='error' />
-                            </IconButton>
-                          </Tooltip>
-                        </Stack>
-                      </TableCell>
-                    </TableRow>
-                  ))
-                )}
-              </TableBody>
-            </Table>
-          </TabPanel>
+          {/*<TabPanel value='3'>*/}
+          {/*  <Typography variant='h6' gutterBottom>*/}
+          {/*    Danh sách kích thước của sản phẩm:{' '}*/}
+          {/*    <strong>*/}
+          {/*      {productName*/}
+          {/*        .split(' ')*/}
+          {/*        .map(*/}
+          {/*          (word) =>*/}
+          {/*            word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()*/}
+          {/*        )*/}
+          {/*        .join(' ') || 'Không có tên'}*/}
+          {/*    </strong>*/}
+          {/*  </Typography>*/}
+          {/*  <Table size='small' sx={{ tableLayout: 'fixed', width: '100%' }}>*/}
+          {/*    <TableHead>*/}
+          {/*      <TableRow>*/}
+          {/*        <TableCell*/}
+          {/*          sx={{*/}
+          {/*            ...StyleAdmin.TableColumnSTT,*/}
+          {/*            fontWeight: 700,*/}
+          {/*            width: 54*/}
+          {/*          }}*/}
+          {/*        >*/}
+          {/*          STT*/}
+          {/*        </TableCell>*/}
+          {/*        <TableCell align='left' sx={{ fontWeight: 700 }}>*/}
+          {/*          Tên kích thước*/}
+          {/*        </TableCell>*/}
+          {/*        <TableCell align='left' sx={{ fontWeight: 700, width: 200 }}>*/}
+          {/*          Ngày tạo*/}
+          {/*        </TableCell>*/}
+          {/*        <TableCell align='left' sx={{ fontWeight: 700, width: 200 }}>*/}
+          {/*          Ngày cập nhật*/}
+          {/*        </TableCell>*/}
+          {/*        <TableCell align='left' sx={{ fontWeight: 700, width: 150 }}>*/}
+          {/*          Trạng thái*/}
+          {/*        </TableCell>*/}
+          {/*        <TableCell align='left' sx={{ fontWeight: 700, width: 150 }}>*/}
+          {/*          Thao tác*/}
+          {/*        </TableCell>*/}
+          {/*      </TableRow>*/}
+          {/*    </TableHead>*/}
+          {/*    <TableBody>*/}
+          {/*      {filteredSizes.length === 0 ? (*/}
+          {/*        <TableNoneData*/}
+          {/*          col={5}*/}
+          {/*          message='Không có dữ liệu kích thước của sản phẩm.'*/}
+          {/*        />*/}
+          {/*      ) : (*/}
+          {/*        filteredSizes.map((size, index) => (*/}
+          {/*          <TableRow key={size._id}>*/}
+          {/*            <TableCell sx={StyleAdmin.TableColumnSTT}>*/}
+          {/*              {index + 1}*/}
+          {/*            </TableCell>*/}
+          {/*            <TableCell*/}
+          {/*              sx={{*/}
+          {/*                textAlign: 'left',*/}
+          {/*                ...styles.cellPadding,*/}
+          {/*                maxWidth: 150,*/}
+          {/*                overflow: 'hidden',*/}
+          {/*                textOverflow: 'ellipsis',*/}
+          {/*                whiteSpace: 'nowrap'*/}
+          {/*              }}*/}
+          {/*            >*/}
+          {/*              {size?.name}*/}
+          {/*            </TableCell>*/}
+          {/*            <TableCell sx={styles.cellPadding}>*/}
+          {/*              {formatDate(sizeCreatedAt)}*/}
+          {/*            </TableCell>*/}
+          {/*            <TableCell sx={styles.cellPadding}>*/}
+          {/*              {formatDate(sizeUpdatedAt)}*/}
+          {/*            </TableCell>*/}
+          {/*            <TableCell*/}
+          {/*              sx={{*/}
+          {/*                ...styles.cellPadding,*/}
+          {/*                ...styles.cellPaddingColor*/}
+          {/*              }}*/}
+          {/*            >*/}
+          {/*              <Chip*/}
+          {/*                label={size?.isActive ? 'Đang bán' : 'Ngừng bán'}*/}
+          {/*                color={size?.destroy ? 'error' : 'success'}*/}
+          {/*                size='large'*/}
+          {/*                sx={{ width: '120px', fontWeight: '800' }}*/}
+          {/*              />*/}
+          {/*            </TableCell>*/}
+          {/*            <TableCell*/}
+          {/*              align='center'*/}
+          {/*              sx={{ maxWidth: 150, ...styles.cellPadding }}*/}
+          {/*            >*/}
+          {/*              <Stack*/}
+          {/*                direction='row'*/}
+          {/*                spacing={1}*/}
+          {/*                sx={styles.groupIcon}*/}
+          {/*              >*/}
+          {/*                <Tooltip title='Xem'>*/}
+          {/*                  <IconButton size='small'>*/}
+          {/*                    <RemoveRedEyeIcon color='primary' />*/}
+          {/*                  </IconButton>*/}
+          {/*                </Tooltip>*/}
+          {/*                <Tooltip title='Sửa'>*/}
+          {/*                  <IconButton size='small'>*/}
+          {/*                    <BorderColorIcon color='warning' />*/}
+          {/*                  </IconButton>*/}
+          {/*                </Tooltip>*/}
+          {/*                <Tooltip title='Xoá'>*/}
+          {/*                  <IconButton size='small'>*/}
+          {/*                    <DeleteForeverIcon color='error' />*/}
+          {/*                  </IconButton>*/}
+          {/*                </Tooltip>*/}
+          {/*              </Stack>*/}
+          {/*            </TableCell>*/}
+          {/*          </TableRow>*/}
+          {/*        ))*/}
+          {/*      )}*/}
+          {/*    </TableBody>*/}
+          {/*  </Table>*/}
+          {/*</TabPanel>*/}
         </TabContext>
       </DialogContent>
 

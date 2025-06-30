@@ -33,7 +33,7 @@ function ViewOrderModal({
   if (!order) return null
   const handleTabChange = (_, newValue) => setTab(newValue)
   const getNextStatus = (currentStatus) => {
-    const flow = ['Pending', 'Processing', 'Shipping', 'Shipped', 'Delivered']
+    const flow = ['Processing', 'Shipping', 'Shipped', 'Delivered']
     const index = flow.indexOf(currentStatus)
     return index >= 0 && index < flow.length - 1 ? flow[index + 1] : null
   }
@@ -52,7 +52,7 @@ function ViewOrderModal({
     const map = {
       Processing: { label: 'Đang xử lý', color: 'info' },
       Shipping: { label: 'Đang vận chuyển', color: 'primary' },
-      Shipped: { label: 'Đã gửi hàng', color: 'success' },
+      Shipped: { label: 'Đã gửi hàng', color: 'warning' },
       Delivered: { label: 'Đã giao', color: 'success' },
       Cancelled: { label: 'Đã hủy', color: 'error' },
       Failed: { label: 'Thất bại', color: 'error' }
@@ -79,19 +79,29 @@ function ViewOrderModal({
     }
     return map[status] || status
   }
-
   const previousStatuses = Array.from(
     new Set(
       histories.map((h) => h.status).filter((s) => s && s !== order.status)
     )
   )
 
+  // Add 'Processing' only if the current status is beyond 'Processing'
+  if (
+    order.status !== 'Processing' &&
+    order.status !== 'Cancelled' &&
+    order.status !== 'Failed'
+  ) {
+    previousStatuses.unshift('Processing')
+  }
+
   const style = {
     nonePadding: {
       py: 1.5
     },
     tableRow: {
-      minWidth: 200
+      minWidth: 400,
+      maxWidth: 400,
+      width: 400
     }
   }
 
@@ -269,7 +279,10 @@ function ViewOrderModal({
                           variant='contained'
                           size='large'
                           sx={{ width: '137px', fontWeight: '800' }}
-                          color='info'
+                          color={
+                            renderStatusChip(getNextStatus(order?.status)).props
+                              .color
+                          }
                           onClick={handleNextStatus}
                         />
                       </>
