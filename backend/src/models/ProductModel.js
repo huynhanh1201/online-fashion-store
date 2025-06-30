@@ -101,8 +101,8 @@ const productSchema = new Schema(
 
     avgRating: {
       type: Number,
-      required: true,
-      min: 0
+      min: 0,
+      default: 0
     }
   },
   {
