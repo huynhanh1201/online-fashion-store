@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { Box, Typography } from '@mui/material'
 import useBlog from '~/hooks/useBlog.js'
 import { optimizeCloudinaryUrl } from '~/utils/cloudinary'
 
@@ -13,7 +14,7 @@ class ErrorBoundary extends Component {
   render() {
     if (this.state.hasError) {
       return (
-        <div style={{ color: '#ef4444' }}>Đã xảy ra lỗi khi tải nội dung.</div>
+        <Box sx={{ color: '#ef4444' }}>Đã xảy ra lỗi khi tải nội dung.</Box>
       )
     }
     return this.props.children
@@ -22,9 +23,6 @@ class ErrorBoundary extends Component {
 
 const Blog = () => {
   const navigate = useNavigate()
-  const [windowWidth, setWindowWidth] = React.useState(
-    typeof window !== 'undefined' ? window.innerWidth : 1024
-  )
   const [currentPage, setCurrentPage] = React.useState(1)
   const [hasMoreBlogs, setHasMoreBlogs] = React.useState(true)
   const [loadingMore, setLoadingMore] = React.useState(false)
@@ -32,14 +30,6 @@ const Blog = () => {
   // Sử dụng hook blog
   const { blogs, loading, error, fetchLatestBlogs, fetchBlogsWithPagination, appendBlogs } = useBlog()
 
-  React.useEffect(() => {
-    const handleResize = () => {
-      setWindowWidth(window.innerWidth)
-    }
-
-    window.addEventListener('resize', handleResize)
-    return () => window.removeEventListener('resize', handleResize)
-  }, [])
   React.useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'auto' })
   }, [])
@@ -91,9 +81,7 @@ const Blog = () => {
     }
   }
 
-  const isMobile = windowWidth < 640
-  const isTablet = windowWidth >= 640 && windowWidth < 1024
-  const isDesktop = windowWidth >= 1024
+
 
   // Format dữ liệu từ API để phù hợp với UI
   const formatBlogData = (blogData) => {
@@ -121,285 +109,352 @@ const Blog = () => {
 
   return (
     <ErrorBoundary>
-      <div
-        style={{
-          fontFamily: 'Arial, sans-serif',
-          backgroundColor: '#f9fafb',
+      <Box
+        sx={{
           minHeight: '100vh',
-          padding: '24px 16px',
-          '@media (min-width: 640px)': {
-            padding: '32px 20px'
-          },
-          '@media (min-width: 1024px)': {
-            padding: '40px 20px'
-          }
+          py: { xs: 5, sm: 6, md: 8 },
+          px: { xs: 2, sm: 3, md: 4 }
         }}
       >
-        {/* Header */}
-        <div
-          style={{
-            textAlign: 'center',
-            marginBottom: isMobile ? '32px' : isTablet ? '40px' : '48px'
+        {/* Container với width responsive */}
+        <Box
+          sx={{
+            maxWidth: {
+              xs: '100%',
+              sm: '640px',
+              md: '768px',
+              lg: '1200px',
+              xl: '1400px'
+            },
+            mx: 'auto'
           }}
         >
-          <h1
-            style={{
-              fontSize: isMobile
-                ? '24px'
-                : isTablet
-                  ? '32px'
-                  : isDesktop
-                    ? '48px'
-                    : '40px',
-              fontWeight: 'bold',
-              color: '#1f2937',
-              letterSpacing: '2px',
-              margin: 0
+          {/* Header Section */}
+          <Box
+            sx={{
+              textAlign: 'center',
+              mb: { xs: 4, sm: 5, md: 6 }
             }}
           >
-            TIN THỜI TRANG
-          </h1>
-        </div>
-
-        {/* Loading State */}
-        {loading && (
-          <div
-            style={{
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'center',
-              minHeight: '200px',
-              fontSize: '16px',
-              color: '#6b7280'
-            }}
-          >
-            Đang tải bài viết...
-          </div>
-        )}
-
-        {/* Error State */}
-        {error && !loading && (
-          <div
-            style={{
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'center',
-              minHeight: '200px',
-              fontSize: '16px',
-              color: '#ef4444',
-              textAlign: 'center'
-            }}
-          >
-            {error}
-          </div>
-        )}
-
-        {/* Main Articles Grid */}
-        {!loading && (
-          <div
-            style={{
-              maxWidth: '1400px',
-              margin: '0 auto',
-              marginBottom: '48px'
-            }}
-          >
-            <div
-              style={{
-                display: 'grid',
-                gridTemplateColumns: isMobile
-                  ? '1fr'
-                  : isTablet
-                    ? 'repeat(2, 1fr)'
-                    : 'repeat(3, 1fr)',
-                gap: isMobile ? '16px' : '24px'
+            <Typography
+              variant='h2'
+              sx={{
+                fontSize: { xs: '1.875rem', sm: '2.25rem', md: '2.5rem' },
+                fontWeight: 700,
+                color: 'grey.900',
+                letterSpacing: '0.05em',
+                mb: 1
               }}
             >
-              {mainArticles.map((article) => (
-                <div
-                  key={article.id}
-                  style={{
-                    position: 'relative',
-                    cursor: 'pointer',
-                    transition: 'transform 0.3s ease'
-                  }}
-                  onClick={() => navigate(`/blog/${article.id}`)}
-                  onMouseEnter={(e) => {
-                    e.target.closest('.article-card').style.transform =
-                      'translateY(-8px)'
-                    e.target.closest('.article-card').style.boxShadow =
-                      '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)'
-                  }}
-                  onMouseLeave={(e) => {
-                    e.target.closest('.article-card').style.transform =
-                      'translateY(0)'
-                    e.target.closest('.article-card').style.boxShadow = 'none'
-                  }}
-                >
-                  <div
-                    className='article-card'
-                    style={{
-                      position: 'relative',
-                      overflow: 'hidden',
-                      borderRadius: '8px',
-                      height: isMobile ? '320px' : '384px',
-                      transition: 'transform 0.3s ease, box-shadow 0.3s ease'
+              TIN THỜI TRANG
+            </Typography>
+            <Typography
+              variant='body1'
+              sx={{
+                fontSize: { xs: '0.875rem', sm: '1rem' },
+                color: 'grey.600'
+              }}
+            >
+              Khám phá xu hướng thời trang mới nhất
+            </Typography>
+          </Box>
+
+          {/* Loading State */}
+          {loading && (
+            <Box
+              sx={{
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                minHeight: { xs: '150px', sm: '200px' },
+                textAlign: 'center'
+              }}
+            >
+              <Typography
+                variant='body1'
+                sx={{
+                  color: 'grey.500',
+                  fontSize: { xs: '0.875rem', sm: '1rem' }
+                }}
+              >
+                Đang tải bài viết...
+              </Typography>
+            </Box>
+          )}
+
+          {/* Error State */}
+          {error && !loading && (
+            <Box
+              sx={{
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                minHeight: { xs: '150px', sm: '200px' },
+                textAlign: 'center'
+              }}
+            >
+              <Typography
+                variant='body1'
+                sx={{
+                  color: 'error.main',
+                  fontSize: { xs: '0.875rem', sm: '1rem' }
+                }}
+              >
+                {error}
+              </Typography>
+            </Box>
+          )}
+
+          {/* Grid Layout - Vertical Cards */}
+          {!loading && mainArticles.length > 0 && (
+            <Box
+              sx={{
+                mb: { xs: 4, sm: 6, md: 8 }
+              }}
+            >
+              {/* Grid container */}
+              <Box
+                sx={{
+                  display: 'grid',
+                  gridTemplateColumns: {
+                    xs: '1fr',
+                    sm: 'repeat(2, 1fr)',
+                    md: 'repeat(3, 1fr)'
+                  },
+                  gap: { xs: 2.5, sm: 3, md: 4 }
+                }}
+              >
+                {mainArticles.map((article) => (
+                  <Box
+                    key={article.id}
+                    sx={{
+                      cursor: 'pointer',
+                      transition: 'all 0.3s ease',
+                      '&:hover': {
+                        transform: 'translateY(-8px)',
+                        '& .article-card': {
+                          boxShadow: (theme) => theme.shadows[8]
+                        },
+                        '& .article-image': {
+                          transform: 'scale(1.05)'
+                        }
+                      }
                     }}
+                    onClick={() => navigate(`/blog/${article.id}`)}
                   >
-                    <img
-                      src={optimizeCloudinaryUrl(article.image)}
-                      alt={article.title}
-                      style={{
-                        width: '100%',
-                        height: '100%',
-                        objectFit: 'cover'
-                      }}
-                    />
-
-                    {/* Category Tag */}
-                    <div
-                      style={{
-                        position: 'absolute',
-                        top: '16px',
-                        left: '16px',
-                        backgroundColor: 'rgba(0, 0, 0, 0.7)',
-                        color: 'white',
-                        padding: '4px 12px',
-                        borderRadius: '4px',
-                        fontSize: '12px',
-                        fontWeight: 'bold',
-                        textTransform: 'uppercase'
+                    <Box
+                      className='article-card'
+                      sx={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        bgcolor: 'background.paper',
+                        borderRadius: 2,
+                        overflow: 'hidden',
+                        transition: 'all 0.3s ease',
+                        boxShadow: (theme) => theme.shadows[2],
+                        height: '100%'
                       }}
                     >
-                      {article.category}
-                    </div>
+                      {/* Image Section */}
+                      <Box
+                        sx={{
+                          height: { xs: 200, sm: 220, md: 240 },
+                          position: 'relative',
+                          overflow: 'hidden'
+                        }}
+                      >
+                        <Box
+                          component='img'
+                          className='article-image'
+                          src={optimizeCloudinaryUrl(article.image)}
+                          alt={article.title}
+                          sx={{
+                            width: '100%',
+                            height: '100%',
+                            objectFit: 'cover',
+                            transition: 'transform 0.3s ease'
+                          }}
+                        />
 
-                    {/* Overlay EditContent */}
-                    <div
-                      style={{
-                        position: 'absolute',
-                        bottom: 0,
-                        left: 0,
-                        right: 0,
-                        background:
-                          'linear-gradient(to top, rgba(0,0,0,1), rgba(0,0,0,0.7), transparent)',
-                        color: 'white',
-                        padding: isMobile ? '12px' : isTablet ? '16px' : '24px',
-                        paddingTop: isMobile
-                          ? '32px'
-                          : isTablet
-                            ? '40px'
-                            : '48px'
-                      }}
-                    >
-                      <h3
-                        style={{
-                          fontSize: isMobile
-                            ? '14px'
-                            : isTablet
-                              ? '16px'
-                              : isDesktop
-                                ? '18px'
-                                : '20px',
-                          fontWeight: 'bold',
-                          marginBottom: isMobile ? '4px' : '8px',
-                          lineHeight: '1.2',
-                          margin: `0 0 ${isMobile ? '4px' : '8px'} 0`
-                        }}
-                      >
-                        {article.title}
-                      </h3>
-                      <p
-                        style={{
-                          fontSize: isMobile ? '12px' : '14px',
-                          opacity: 0.9,
-                          marginBottom: isMobile ? '8px' : '16px',
-                          margin: `0 0 ${isMobile ? '8px' : '16px'} 0`
-                        }}
-                      >
-                        {article.subtitle}
-                      </p>
-                      <div
-                        style={{
+                        {/* Category Tag */}
+                        <Box
+                          sx={{
+                            position: 'absolute',
+                            top: 12,
+                            left: 12,
+                            bgcolor: 'rgba(0, 0, 0, 0.8)',
+                            color: 'common.white',
+                            px: 1.5,
+                            py: 0.75,
+                            borderRadius: 2.5,
+                            typography: 'caption',
+                            fontWeight: 700,
+                            textTransform: 'uppercase',
+                            letterSpacing: '0.05em',
+                            backdropFilter: 'blur(4px)',
+                          }}
+                        >
+                          {article.category}
+                        </Box>
+                      </Box>
+
+                      {/* Content Section */}
+                      <Box
+                        sx={{
+                          p: { xs: 2.5, sm: 3 },
                           display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'space-between'
+                          flexDirection: 'column',
+                          flex: 1
                         }}
-                      ></div>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
+                      >
+                        <Typography
+                          variant='h6'
+                          sx={{
+                            fontSize: {
+                              xs: '1rem',
+                              sm: '1.125rem',
+                              md: '1.25rem'
+                            },
+                            fontWeight: 700,
+                            color: 'text.primary',
+                            mb: 1.5,
+                            lineHeight: 1.4,
+                            display: '-webkit-box',
+                            WebkitLineClamp: 2,
+                            WebkitBoxOrient: 'vertical',
+                            overflow: 'hidden',
+                            minHeight: { xs: 40, sm: 44, md: 48 }
+                          }}
+                        >
+                          {article.title}
+                        </Typography>
 
-        {/* Load More Button */}
-        {!loading && hasMoreBlogs && (
-          <div
-            style={{
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'center',
-              marginTop: '48px',
-              '@media (min-width: 640px)': {
-                marginTop: '64px'
-              }
-            }}
-          >
-            <button
-              onClick={loadMoreBlogs}
-              disabled={loadingMore}
-              style={{
-                border: '1px solid #1f2937',
-                color: loadingMore ? '#9ca3af' : '#1f2937',
-                backgroundColor: 'transparent',
-                padding: '8px 24px',
-                borderRadius: '9999px',
-                fontSize: '14px',
-                cursor: loadingMore ? 'not-allowed' : 'pointer',
-                transition: 'all 0.3s ease',
-                opacity: loadingMore ? 0.6 : 1,
-                '@media (min-width: 640px)': {
-                  padding: '12px 32px'
-                }
-              }}
-              onMouseEnter={(e) => {
-                if (!loadingMore) {
-                  e.target.style.backgroundColor = '#1f2937'
-                  e.target.style.color = 'white'
-                }
-              }}
-              onMouseLeave={(e) => {
-                if (!loadingMore) {
-                  e.target.style.backgroundColor = 'transparent'
-                  e.target.style.color = '#1f2937'
-                }
+                        <Typography
+                          variant='body2'
+                          sx={{
+                            fontSize: { xs: '0.875rem', sm: '0.9375rem' },
+                            color: 'text.secondary',
+                            mb: 2,
+                            lineHeight: 1.6,
+                            display: '-webkit-box',
+                            WebkitLineClamp: 3,
+                            WebkitBoxOrient: 'vertical',
+                            overflow: 'hidden',
+                            flex: 1
+                          }}
+                        >
+                          {article.subtitle}
+                        </Typography>
+
+                        {/* Footer */}
+                        <Box
+                          sx={{
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            alignItems: 'center',
+                            mt: 'auto',
+                            pt: 2,
+                            borderTop: 1,
+                            borderColor: 'divider'
+                          }}
+                        >
+                          <Typography
+                            variant='caption'
+                            sx={{
+                              color: 'text.disabled',
+                              fontWeight: 500
+                            }}
+                          >
+                            {article.date}
+                          </Typography>
+
+                          <Typography
+                            variant='body2'
+                            sx={{
+                              color: 'primary.main',
+                              fontWeight: 600,
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: 0.5,
+                              '&:hover': {
+                                color: 'primary.dark'
+                              }
+                            }}
+                          >
+                            Đọc thêm →
+                          </Typography>
+                        </Box>
+                      </Box>
+                    </Box>
+                  </Box>
+                ))}
+              </Box>
+            </Box>
+          )}
+
+          {/* Load More Button */}
+          {!loading && hasMoreBlogs && (
+            <Box
+              sx={{
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                mt: { xs: 4, sm: 5, md: 6 }
               }}
             >
-              {loadingMore ? 'Đang tải...' : 'Xem thêm ›'}
-            </button>
-          </div>
-        )}
+              <Box
+                component='button'
+                onClick={loadMoreBlogs}
+                disabled={loadingMore}
+                sx={{
+                  border: 1,
+                  borderColor: loadingMore ? 'grey.400' : 'grey.800',
+                  color: loadingMore ? 'grey.400' : 'grey.800',
+                  bgcolor: 'transparent',
+                  px: { xs: 2.5, sm: 3.5 },
+                  py: { xs: 1, sm: 1.25 },
+                  borderRadius: '50px',
+                  typography: 'body2',
+                  cursor: loadingMore ? 'not-allowed' : 'pointer',
+                  transition: 'all 0.3s ease',
+                  fontWeight: 500,
+                  opacity: loadingMore ? 0.6 : 1,
+                  '&:hover': !loadingMore && {
+                    bgcolor: 'grey.800',
+                    color: 'common.white',
+                    transform: 'translateY(-1px)',
+                    boxShadow: (theme) => theme.shadows[4]
+                  }
+                }}
+              >
+                {loadingMore ? 'Đang tải...' : 'Xem thêm ›'}
+              </Box>
+            </Box>
+          )}
 
-        {/* No More Blogs Message */}
-        {!loading && !hasMoreBlogs && blogs.length > 0 && (
-          <div
-            style={{
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'center',
-              marginTop: '48px',
-              fontSize: '14px',
-              color: '#6b7280',
-              '@media (min-width: 640px)': {
-                marginTop: '64px'
-              }
-            }}
-          >
-            Đã hiển thị tất cả bài viết
-          </div>
-        )}
-      </div>
+          {/* No More Blogs Message */}
+          {!loading && !hasMoreBlogs && blogs.length > 0 && (
+            <Box
+              sx={{
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                mt: { xs: 4, sm: 5, md: 6 }
+              }}
+            >
+              <Typography
+                variant='body2'
+                sx={{
+                  color: 'text.disabled',
+                  fontWeight: 500
+                }}
+              >
+                Đã hiển thị tất cả bài viết
+              </Typography>
+            </Box>
+          )}
+        </Box>
+      </Box>
     </ErrorBoundary>
   )
 }

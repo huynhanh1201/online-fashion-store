@@ -60,22 +60,20 @@ const BlogHome = () => {
     <ErrorBoundary>
       <Box
         sx={{
-          minHeight: '100vh',
-          py: { xs: 5, sm: 6, md: 8 },
-          px: { xs: 2, sm: 3, md: 4 }
+          fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+          width: '100%'
         }}
       >
-        {/* Container với width responsive */}
+        {/* Container với width và padding giống Content.jsx */}
         <Box
           sx={{
-            maxWidth: {
-              xs: '100%',
-              sm: '640px',
-              md: '768px',
-              lg: '1200px',
-              xl: '1400px'
-            },
-            mx: 'auto'
+            maxWidth: '1800px',
+            margin: '0 auto',
+            padding: {
+              xs: '24px 16px',
+              sm: '24px 16px',
+              md: '24px 16px'
+            }
           }}
         >
           {/* Header Section */}

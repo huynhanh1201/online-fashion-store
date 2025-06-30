@@ -827,14 +827,25 @@ const Payment = () => {
                               {shippingPriceLoading ? (
                                 <CircularProgress size={16} />
                               ) : shippingPrice === 0 ? (
-                                <Chip label="Miễn phí" color="success" size="small" />
+                                <Typography
+                                  component="span"
+                                  sx={{
+                                    color: 'green',
+                                    fontWeight: 600
+                                  }}
+                                >
+                                  Miễn phí
+                                </Typography>
                               ) : (
-                                <Chip
-                                  label={`${shippingPrice.toLocaleString('vi-VN')} ₫`}
-                                  color="primary"
-                                  size="small"
-                                  sx={{ backgroundColor: 'var(--primary-color)' }}
-                                />
+                                <Typography
+                                  component="span"
+                                  sx={{
+                                    color: 'var(--primary-color)',
+                                    fontWeight: 600
+                                  }}
+                                >
+                                  {`${shippingPrice.toLocaleString('vi-VN')} ₫`}
+                                </Typography>
                               )}
                             </Typography>
 
@@ -1117,7 +1128,7 @@ const Payment = () => {
                 <Box>
                   <PriceRow>
                     <Typography>Tạm tính:</Typography>
-                    <Typography fontWeight={600}>
+                    <Typography color='var(--primary-color)' fontWeight={600}>
                       {subTotal.toLocaleString('vi-VN')}₫
                     </Typography>
                   </PriceRow>
@@ -1153,14 +1164,25 @@ const Payment = () => {
                       {shippingPriceLoading ? (
                         <CircularProgress size={16} />
                       ) : shippingPrice === 0 ? (
-                        'Miễn phí'
+                        <Typography
+                          component="span"
+                          sx={{
+                            color: 'green',
+                            fontWeight: 600
+                          }}
+                        >
+                          Miễn phí
+                        </Typography>
                       ) : (
-                        <Chip
-                          label={`${shippingPrice.toLocaleString('vi-VN')} ₫`}
-                          color="primary"
-                          size="small"
-                          sx={{ backgroundColor: 'var(--primary-color)' }}
-                        />
+                        <Typography
+                          component="span"
+                          sx={{
+                            color: 'var(--primary-color)',
+                            fontWeight: 600
+                          }}
+                        >
+                          {`${shippingPrice.toLocaleString('vi-VN')} ₫`}
+                        </Typography>
                       )}
                     </Typography>
                   </PriceRow>
