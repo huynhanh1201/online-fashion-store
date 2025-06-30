@@ -37,10 +37,12 @@ const PolicyModal = ({
   onClose,
   onSave,
   policyData = null,
-  mode = 'add'
+  mode = 'add',
+  existingTypes = []
 }) => {
   const isEditMode = mode === 'edit' && policyData
   const [saving, setSaving] = useState(false)
+  const [typeError, setTypeError] = useState('')
   
   const {
     register,
@@ -79,28 +81,32 @@ const PolicyModal = ({
         status: 'active'
       })
     }
-  }, [isEditMode, policyData, reset])
+  }, [isEditMode, policyData, reset, open])
 
   const onSubmit = async (data) => {
     try {
       setSaving(true)
-      
+      setTypeError('')
       // Validate required fields
       if (!data.title.trim()) {
         toast.error('Vui lòng nhập tiêu đề chính sách')
         return
       }
-      
       if (!data.type) {
         toast.error('Vui lòng chọn loại chính sách')
         return
       }
-      
+      // Nếu ở chế độ thêm mới, kiểm tra loại đã tồn tại
+      if (!isEditMode && existingTypes.includes(data.type)) {
+        setTypeError('Loại chính sách này đã tồn tại, vui lòng chọn loại khác hoặc chỉnh sửa chính sách hiện có.')
+        toast.error('Loại chính sách này đã tồn tại, chỉ có thể chỉnh sửa!')
+        setSaving(false)
+        return
+      }
       if (!data.content.trim()) {
         toast.error('Vui lòng nhập nội dung chính sách')
         return
       }
-
       await onSave(data, isEditMode)
     } catch (error) {
       console.error('Lỗi khi lưu chính sách:', error)
@@ -168,7 +174,7 @@ const PolicyModal = ({
             />
 
             {/* Type */}
-            <FormControl fullWidth error={!!errors.type}>
+            <FormControl fullWidth error={!!errors.type || !!typeError}>
               <InputLabel>Loại chính sách</InputLabel>
               <Controller
                 name="type"
@@ -184,16 +190,20 @@ const PolicyModal = ({
                     }}
                   >
                     {POLICY_TYPES.map((type) => (
-                      <MenuItem key={type.value} value={type.value}>
+                      <MenuItem
+                        key={type.value}
+                        value={type.value}
+                        disabled={mode === 'add' && existingTypes.includes(type.value)}
+                      >
                         {type.label}
                       </MenuItem>
                     ))}
                   </Select>
                 )}
               />
-              {errors.type && (
+              {(errors.type || typeError) && (
                 <Typography variant="caption" color="error" sx={{ mt: 0.5, ml: 1.5 }}>
-                  {errors.type.message}
+                  {errors.type?.message || typeError}
                 </Typography>
               )}
             </FormControl>
@@ -249,6 +259,7 @@ const PolicyModal = ({
                 rules={{ required: 'Nội dung là bắt buộc' }}
                 render={({ field }) => (
                   <DescriptionEditor
+                    key={isEditMode ? policyData?._id : open ? 'add' : 'closed'}
                     control={control}
                     name="content"
                     setValue={setValue}

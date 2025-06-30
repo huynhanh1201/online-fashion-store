@@ -151,9 +151,6 @@ const CouponList = ({ onCouponSelect }) => {
 
               return (
                 <div key={coupon._id} className='coupon-card' style={{position:'relative'}}>
-                  {copiedCode === coupon.code && (
-                    <div className='success-notification'>Đã sao chép mã!</div>
-                  )}
                   <div className='coupon-left'>
                     <div className='voucher-label'>Mã giảm giá</div>
                     <div className='main-text'>{mainText}</div>
@@ -167,9 +164,9 @@ const CouponList = ({ onCouponSelect }) => {
                           e.stopPropagation()
                           handleCopy(coupon.code)
                         }}
-                        className={`copy-button ${copiedCode === coupon.code ? 'copied' : ''}`}
+                        className={`copy-button ${copiedCode === coupon.code ? 'copied' :''}`}
                       >
-                        {copiedCode === coupon.code ? '✓ Đã copy' : 'Sao chép'}
+                        {copiedCode === coupon.code ? '✓ Đã sao chép' : 'Sao chép'}
                       </button>
                     </div>
                   </div>
@@ -306,9 +303,9 @@ const CouponList = ({ onCouponSelect }) => {
           background: var(--primary-color);
           color: #fff;
           border: none;
-          padding: 8px 18px;
+          padding: 8px;
           border-radius: 6px;
-          font-size: 14px;
+          font-size: 12px;
           font-weight: 700;
           cursor: pointer;
           transition: background 0.2s;

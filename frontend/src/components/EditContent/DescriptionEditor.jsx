@@ -57,12 +57,9 @@ export default function DescriptionEditor({
   initialHtml,
   onImageInsert
 }) {
-  const generateEmptyLines = (count) =>
-    Array(count).fill('<p><br></p>').join('')
-
   const editor = useEditor({
     extensions,
-    content: initialHtml || generateEmptyLines(5),
+    content: initialHtml || '',
     onUpdate: ({ editor }) => {
       const html = editor.getHTML()
       setValue(name, html)
