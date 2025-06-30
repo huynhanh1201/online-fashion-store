@@ -4,15 +4,15 @@ const Sticker = ({
   text = '',
   color = 'white',
   background = 'linear-gradient(135deg,rgb(74, 131, 196) 0%, #1A3C7B 100%)',
-  top = 0,
+  top = 5,
   right = 0,
   left,
   bottom,
-  fontSize = '14px',
-  fontWeight = 600,
-  padding = '5px 15px 5px 10px',
+  fontSize = '17px',
+  fontWeight = 700,
+  padding = '8px 25px 8px 15px',
   borderRadius = 0,
-  boxShadow = '4px  4px 4px 10px rgba(0, 0, 0, 0.1)',
+  boxShadow = '0 2px 8px rgba(0, 0, 0, 0.15)',
   style = {},
   product,
   ...props
@@ -58,7 +58,7 @@ const Sticker = ({
     if (daysSinceCreation <= 7 && daysSinceCreation >= 0) {
       return {
         text: 'Mới',
-        background: 'linear-gradient(135deg, #4ecdc4 0%, #44a08d 100%)',
+        background: 'linear-gradient(135deg,rgb(45, 78, 128) 0%,rgb(44, 94, 187) 100%)',
         color: 'white'
       }
     }
@@ -67,7 +67,7 @@ const Sticker = ({
     if (soldCount > 100) {
       return {
         text: 'Hot',
-        background: 'linear-gradient(135deg, #ffa726 0%, #ff9800 100%)',
+        background: 'linear-gradient(135deg,rgb(233, 84, 26) 0%,rgb(255, 30, 0) 100%)',
         color: 'white'
       }
     }
@@ -100,6 +100,9 @@ const Sticker = ({
         textTransform: 'uppercase',
         fontFamily: 'inherit',
         clipPath: 'polygon(0 0, 100% 0, calc(100% - 10px) 50%, 100% 100%, 0 100%)',
+        letterSpacing: '0.5px',
+        minWidth: '80px',
+        textAlign: 'center',
         ...style
       }}
       {...props}
