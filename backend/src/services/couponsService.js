@@ -39,7 +39,8 @@ const getCouponList = async (queryString) => {
       filterTypeDate,
       startDate,
       endDate,
-      type
+      type,
+      destroy
     } = queryString
 
     // Kiểm tra dữ liệu đầu vào của limit và page
@@ -47,6 +48,8 @@ const getCouponList = async (queryString) => {
 
     // Xử lý thông tin Filter
     const filter = {}
+
+    if (destroy) filter.destroy = destroy
 
     if (type) filter.type = type.toLowerCase()
 

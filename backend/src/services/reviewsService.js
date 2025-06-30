@@ -41,13 +41,18 @@ const getReviewList = async (queryString) => {
     endDate,
     productId,
     moderationStatus,
-    userId
+    userId,
+    destroy
   } = queryString
 
   validatePagination(page, limit)
 
   // Xử lý thông tin Filter
   const filter = {}
+
+  if (destroy) filter.destroy = destroy
+
+  if (userId) filter.userId = userId
 
   if (productId) filter.productId = productId
 

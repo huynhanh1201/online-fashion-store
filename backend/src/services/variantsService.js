@@ -82,7 +82,8 @@ const getVariantList = async (queryString) => {
     endDate,
     productId,
     colorName,
-    sizeName
+    sizeName,
+    destroy
   } = queryString
 
   // Kiểm tra dữ liệu đầu vào của limit và page
@@ -90,6 +91,8 @@ const getVariantList = async (queryString) => {
 
   // Xử lý thông tin Filter
   const filter = {}
+
+  if (destroy) filter.destroy = destroy
 
   if (productId) filter.productId = productId
 
@@ -200,7 +203,10 @@ const updateVariant = async (variantId, reqBody) => {
 }
 
 // Cập nhật discountPrice cho tất cả biến thể của một sản phẩm
-const updateProductVariantsDiscountPrice = async (productId, flashSalePrice) => {
+const updateProductVariantsDiscountPrice = async (
+  productId,
+  flashSalePrice
+) => {
   // eslint-disable-next-line no-useless-catch
   try {
     // Kiểm tra sản phẩm có tồn tại không
@@ -218,14 +224,17 @@ const updateProductVariantsDiscountPrice = async (productId, flashSalePrice) => 
     // Cập nhật discountPrice và lưu giá ban đầu cho tất cả biến thể của sản phẩm
     const updatePromises = currentVariants.map(async (variant) => {
       // Nếu originalDiscountPrice chưa được set (lần đầu tạo Flash Sale)
-      if (variant.originalDiscountPrice === 0 || variant.originalDiscountPrice === undefined) {
+      if (
+        variant.originalDiscountPrice === 0 ||
+        variant.originalDiscountPrice === undefined
+      ) {
         return VariantModel.findByIdAndUpdate(
           variant._id,
-          { 
-            $set: { 
+          {
+            $set: {
               discountPrice: flashSalePrice, // Thay thế hoàn toàn bằng giá Flash Sale
               originalDiscountPrice: variant.discountPrice // Lưu giá ban đầu (ví dụ: 10.000)
-            } 
+            }
           },
           { new: true }
         )
@@ -270,10 +279,10 @@ const restoreProductVariantsOriginalDiscountPrice = async (productId) => {
     const updatePromises = currentVariants.map(async (variant) => {
       return VariantModel.findByIdAndUpdate(
         variant._id,
-        { 
-          $set: { 
+        {
+          $set: {
             discountPrice: variant.originalDiscountPrice || 0 // Sử dụng giá trị thực tế
-          } 
+          }
         },
         { new: true }
       )
