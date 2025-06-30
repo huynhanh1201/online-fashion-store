@@ -1,4 +1,4 @@
-/* eslint-disable no-console */
+
 import React, { useState, useEffect } from 'react'
 import {
   Box,
@@ -64,51 +64,45 @@ const Cart = () => {
   const reorderVariantIds = useSelector((state) => state.cart.reorderVariantIds || [])
   const [processingVariantId, setProcessingVariantId] = useState(null)
   const [hasAutoSelected, setHasAutoSelected] = useState(false)
+  const [outOfStockAlert, setOutOfStockAlert] = useState(false)
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'auto' })
-    // Reset hasAutoSelected khi vào trang cart
     setHasAutoSelected(false)
   }, [])
 
   useEffect(() => {
     if (cart?.cartItems) {
-      // Sắp xếp: sản phẩm còn hàng trước, hết hàng sau
       const sortedItems = [...cart.cartItems].sort((a, b) => {
-        // Sản phẩm còn hàng (quantity > 0) có priority cao hơn
         if (a.quantity > 0 && b.quantity === 0) return -1
         if (a.quantity === 0 && b.quantity > 0) return 1
-        return 0 // Giữ nguyên thứ tự nếu cùng loại
+        return 0
       })
       setCartItems(sortedItems)
+
+      const outOfStockItems = sortedItems.filter(item => item.quantity === 0)
+      if (outOfStockItems.length > 0) {
+        setOutOfStockAlert(true)
+        setSelectedItems(prev =>
+          prev.filter(selected =>
+            !outOfStockItems.some(outOfStock =>
+              outOfStock.variant?._id === selected.variantId ||
+              outOfStock.variantId?._id === selected.variantId ||
+              outOfStock.variantId === selected.variantId
+            )
+          )
+        )
+      }
     }
   }, [cart])
 
-  // Tự động chọn các sản phẩm từ reorder
   useEffect(() => {
-    console.log('Auto-select effect triggered:', {
-      cartItemsLength: cartItems.length,
-      reorderVariantIdsLength: reorderVariantIds.length,
-      hasAutoSelected,
-      reorderVariantIds,
-      cartItems: cartItems.map(item => ({
-        variantId: item.variant?._id || item.variantId?._id || item.variantId,
-        name: item.name,
-        rawVariant: item.variant,
-        rawVariantId: item.variantId
-      }))
-    })
-
     if (cartItems.length > 0 && reorderVariantIds.length > 0 && !hasAutoSelected) {
-      console.log('Auto-selecting reorder items:', reorderVariantIds)
-
       const reorderSelectedItems = cartItems
         .filter(item => {
-          // Handle cả variant._id và variantId trực tiếp
           const variantId = item.variant?._id || item.variantId?._id || item.variantId
           const isMatch = reorderVariantIds.includes(variantId)
-          const hasStock = item.quantity > 0 // Chỉ chọn sản phẩm còn hàng
-          console.log(`Checking item ${item.name} with variantId ${variantId}: match=${isMatch}, hasStock=${hasStock}`)
+          const hasStock = item.quantity > 0
           return isMatch && hasStock
         })
         .map(item => ({
@@ -116,18 +110,11 @@ const Cart = () => {
           quantity: item.quantity
         }))
 
-      console.log('Found reorder items to select:', reorderSelectedItems)
-
       if (reorderSelectedItems.length > 0) {
-        console.log('Auto-selected items:', reorderSelectedItems)
         setSelectedItems(reorderSelectedItems)
         dispatch(setSelectedItemsAction(reorderSelectedItems))
         setHasAutoSelected(true)
-
-        // Clear reorder variant IDs sau khi đã auto-select
         dispatch(clearReorderVariantIds())
-      } else {
-        console.log('No matching items found for auto-select')
       }
     }
   }, [cartItems, reorderVariantIds, hasAutoSelected, dispatch])
@@ -144,7 +131,7 @@ const Cart = () => {
           )
         }
       } catch (error) {
-        console.error('Lỗi lấy danh sách mã giảm giá:', error)
+        // Handle error silently
       } finally {
         setHasFetchedCoupons(true)
       }
@@ -241,7 +228,7 @@ const Cart = () => {
 
       dispatch(removeTempQuantity(variantId))
     } catch (err) {
-      console.error('Lỗi cập nhật số lượng:', err)
+      // Handle error silently
     } finally {
       setProcessingVariantId(null)
     }
@@ -259,17 +246,13 @@ const Cart = () => {
         )
       }
     } catch (error) {
-      console.error('Lỗi xoá sản phẩm:', error)
+      // Handle error silently
     }
   }
 
   const selectedCartItems = cartItems.filter((item) =>
     selectedItems.some((selected) => selected.variantId === item.variant._id),
   )
-
-  useEffect(() => {
-    dispatch(setSelectedItemsAction(selectedItems))
-  }, [selectedItems])
 
   // Helper function to get final price (exportPrice minus discountPrice)
   const getFinalPrice = (variant) => {
@@ -312,6 +295,8 @@ const Cart = () => {
     setSelectedItems([])
     setConfirmClearOpen(false)
   }
+
+
 
   const calculateDiscount = (coupon, total) => {
     if (!coupon || total < coupon.minOrderValue) return 0
@@ -510,6 +495,8 @@ const Cart = () => {
         </Paper>
       )}
 
+
+
       {/* Cart items */}
       <Box
         display="flex"
@@ -608,7 +595,8 @@ const Cart = () => {
                   if (!variant) return null
 
                   // Kiểm tra xem sản phẩm có hết hàng không (quantity = 0)
-                  const isOutOfStock = item.quantity === 0
+                  // Check cả item.quantity và variant.quantity để đảm bảo chính xác
+                  const isOutOfStock = item.quantity === 0 || (variant.quantity !== undefined && variant.quantity === 0)
 
                   return (
                     <React.Fragment key={item._id}>
@@ -1041,21 +1029,6 @@ const Cart = () => {
           </Button>
         </DialogActions>
       </Dialog>
-
-      <Snackbar
-        open={showMaxQuantityAlert}
-        autoHideDuration={2000}
-        onClose={() => setShowMaxQuantityAlert(false)}
-        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
-      >
-        <Alert
-          severity="warning"
-          variant="filled"
-          sx={{ width: '100%', boxShadow: 3 }}
-        >
-          Đã đạt số lượng tối đa của sản phẩm!
-        </Alert>
-      </Snackbar>
     </Container>
   )
 }

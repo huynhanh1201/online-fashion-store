@@ -147,7 +147,7 @@ const ProductsCardNew = ({ product, isFlashSale = false }) => {
               {renderStars(product.avgRating)}
               <span style={styles.ratingText}>({product.avgRating || 0})</span>
             </div>
-            <span style={styles.sold}>Đã bán {product.sold || '0'}</span>
+            {/* <span style={styles.sold}>Đã bán {product.sold || '0'}</span> */}
           </div>
         </div>
       </div>

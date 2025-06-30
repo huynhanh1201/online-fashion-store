@@ -146,7 +146,7 @@ const ThemeManagement = () => {
   const handleSaveTheme = () => {
     setSnackbar({
       open: true,
-      message: 'Theme đã được lưu thành công!',
+      message: 'Chủ đề đã được lưu thành công!',
       severity: 'success'
     })
   }
@@ -168,7 +168,7 @@ const ThemeManagement = () => {
         sx={{ mb: 3, fontWeight: 700, color: 'text.primary' }}
       >
         <Palette sx={{ mr: 1, verticalAlign: 'middle' }} />
-        Quản lý Theme & Màu sắc
+        Quản lý Chủ đề & Màu sắc
       </Typography>
 
       {/* Preview Mode Toggle */}
@@ -186,7 +186,7 @@ const ThemeManagement = () => {
                 Chế độ xem trước
               </Typography>
               <Typography variant='body2' color='text.secondary'>
-                Theme sẽ được áp dụng ngay lập tức khi bạn thay đổi màu sắc
+                Chủ đề sẽ được áp dụng ngay lập tức khi bạn thay đổi màu sắc
               </Typography>
             </Box>
             <Chip
@@ -209,7 +209,7 @@ const ThemeManagement = () => {
                 sx={{ mb: 2, display: 'flex', alignItems: 'center' }}
               >
                 <AutoAwesome sx={{ mr: 1 }} />
-                Theme có sẵn
+                Chủ đề có sẵn
               </Typography>
               <Grid container spacing={2}>
                 {Object.entries(predefinedThemes).map(([key, theme]) => (
@@ -342,7 +342,7 @@ const ThemeManagement = () => {
                     color: '#fff'
                   }}
                 >
-                  Lưu Theme
+                  Lưu chủ đề
                 </Button>
                 <Button
                   variant='outlined'
@@ -370,7 +370,7 @@ const ThemeManagement = () => {
                 sx={{ mb: 2, display: 'flex', alignItems: 'center' }}
               >
                 <ColorLens sx={{ mr: 1 }} />
-                Xem trước Theme
+                Xem trước chủ đề
               </Typography>
               <Paper sx={{ p: 3, background: currentTheme.background }}>
                 <Grid container spacing={2}>
@@ -450,7 +450,7 @@ const ThemeManagement = () => {
                         variant='body2'
                         sx={{ color: currentTheme.text }}
                       >
-                        Success
+                        Thành công
                       </Typography>
                     </Box>
                   </Grid>

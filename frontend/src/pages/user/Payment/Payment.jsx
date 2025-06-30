@@ -669,23 +669,41 @@ const Payment = () => {
       return
     }
 
-    const sanitizedCartItems = selectedCartItems.map(item => ({
-      variantId: item.variantId,
-      quantity: item.quantity,
-    }))
+    const sanitizedCartItems = selectedCartItems.map(item => {
+      // Debug log to see the structure
+      console.log('Item structure in sanitization:', item)
+
+      // Ensure variantId is properly extracted
+      const variantId = typeof item.variantId === 'object'
+        ? item.variantId._id || item.variantId.toString()
+        : item.variantId
+
+      console.log('Extracted variantId:', variantId, 'Type:', typeof variantId)
+
+      return {
+        variantId: variantId,
+        quantity: item.quantity,
+      }
+    })
 
     const orderData = {
       cartItems: sanitizedCartItems,
-      shippingAddressId: selectedAddress._id,
+      shippingAddressId: selectedAddress._id || selectedAddress.id,
       total: totalCart,
       paymentMethod,
       note: note.trim() || null,
-      couponCode: voucherApplied ? voucherInput : null,
-      couponId: voucherApplied ? couponId : null,
       shippingFee: shippingPrice || 0,
     }
 
+    // Only add coupon fields if voucher is applied and has valid values
+    if (voucherApplied && voucherInput && voucherInput.trim() !== '' && couponId) {
+      orderData.couponCode = voucherInput.trim().toUpperCase()
+      orderData.couponId = couponId
+    }
+
     console.log('orderData trước khi gửi:', orderData)
+    console.log('orderData.cartItems detail:', JSON.stringify(orderData.cartItems, null, 2))
+    console.log('selectedAddress:', selectedAddress)
 
     try {
       const result = await createOrder(orderData)
