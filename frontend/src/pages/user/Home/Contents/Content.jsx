@@ -5,7 +5,6 @@ import { getProducts } from '~/services/productService.js'
 import FlashSaleSection from '~/pages/user/Home/FlashSaleSection/FlashSaleSection.jsx'
 import CouponList from '~/pages/user/Home/CouponList/CouponList.jsx'
 import { Link } from 'react-router-dom'
-import ProductsCardNew from '~/pages/user/NewProducts/ProductsCardNew'
 import { getBanners } from '~/services/admin/webConfig/bannerService.js'
 import { getFeaturedCategories } from '~/services/admin/webConfig/featuredcategoryService.js'
 import { getServiceHighlights } from '~/services/admin/webConfig/highlightedService.js'
@@ -284,7 +283,7 @@ const Content = () => {
       {/* Stitch Products */}
       <div className='product-grid'>
         {[...products.slice(-5)].reverse().map((product) => (
-          <ProductsCardNew key={product._id || product.id} product={product} />
+          <ProductCard key={product._id || product.id} product={product} />
         ))}
       </div>
 
