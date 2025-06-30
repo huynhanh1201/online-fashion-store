@@ -93,13 +93,16 @@ const getProductList = async (reqQuery) => {
       status,
       filterTypeDate,
       startDate,
-      endDate
+      endDate,
+      destroy
     } = reqQuery
 
     validatePagination(page, limit)
 
     // Xử lý filter
     const filter = {}
+
+    if (destroy) filter.destroy = destroy
 
     if (status === 'true' || status === 'false') {
       status = JSON.parse(status)
@@ -177,10 +180,7 @@ const getProductList = async (reqQuery) => {
       {
         $addFields: {
           firstVariantDiscountPrice: {
-            $ifNull: [
-              { $arrayElemAt: ['$firstVariant.discountPrice', 0] },
-              0
-            ]
+            $ifNull: [{ $arrayElemAt: ['$firstVariant.discountPrice', 0] }, 0]
           }
         }
       },
@@ -338,10 +338,7 @@ const getListProductOfCategory = async (categoryId) => {
       {
         $addFields: {
           firstVariantDiscountPrice: {
-            $ifNull: [
-              { $arrayElemAt: ['$firstVariant.discountPrice', 0] },
-              0
-            ]
+            $ifNull: [{ $arrayElemAt: ['$firstVariant.discountPrice', 0] }, 0]
           }
         }
       }

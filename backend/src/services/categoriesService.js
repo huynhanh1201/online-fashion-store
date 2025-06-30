@@ -45,7 +45,8 @@ const getCategoryList = async (queryString) => {
     sort,
     filterTypeDate,
     startDate,
-    endDate
+    endDate,
+    destroy
   } = queryString
 
   // Kiểm tra dữ liệu đầu vào của limit và page
@@ -53,6 +54,8 @@ const getCategoryList = async (queryString) => {
 
   // Xử lý thông tin Filter
   const filter = {}
+
+  if (destroy) filter.destroy = destroy
 
   if (status === 'true' || status === 'false') {
     status = JSON.parse(status)
@@ -135,9 +138,9 @@ const getCategory = async (categoryId) => {
 const getCategoryBySlug = async (slug) => {
   // eslint-disable-next-line no-useless-catch
   try {
-    const result = await CategoryModel.findOne({ 
+    const result = await CategoryModel.findOne({
       slug: slug,
-      destroy: false 
+      destroy: false
     }).lean()
 
     if (!result) {

@@ -4,8 +4,10 @@ import { usersService } from '~/services/usersService'
 
 const getUserList = async (req, res, next) => {
   try {
+    const queryString = req.query
+
     // Lấy danh sách user từ tầng Service chuyển qua
-    const result = await usersService.getUserList()
+    const result = await usersService.getUserList(queryString)
 
     // Có kết quả thì trả về Client
     res.status(StatusCodes.OK).json(result)
