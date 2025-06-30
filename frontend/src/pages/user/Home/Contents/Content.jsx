@@ -20,6 +20,51 @@ const Content = () => {
   const [featuredCategoriesLoading, setFeaturedCategoriesLoading] = useState(true)
   const [serviceHighlights, setServiceHighlights] = useState([])
   const [serviceHighlightsLoading, setServiceHighlightsLoading] = useState(true)
+  const [screenSize, setScreenSize] = useState({
+    width: window.innerWidth,
+    height: window.innerHeight
+  })
+
+  // Responsive logic for determining number of products to show
+  const getResponsiveProductCount = () => {
+    const { width } = screenSize
+    
+    // Breakpoints based on CSS media queries
+    if (width <= 480) {
+      // Mobile: 1-2 cards per row, show 4 products (2 rows)
+      return 4
+    } else if (width <= 768) {
+      // Tablet: 2-3 cards per row, show 6 products (2 rows)
+      return 6
+    } else if (width <= 1200) {
+      // Small desktop: 3-4 cards per row, show 8 products (2 rows)
+      return 8
+    } else {
+      // Large desktop: 4+ cards per row, show 12 products (2 rows)
+      return 12
+    }
+  }
+
+  // Handle window resize with debounce
+  useEffect(() => {
+    let timeoutId
+    
+    const handleResize = () => {
+      clearTimeout(timeoutId)
+      timeoutId = setTimeout(() => {
+        setScreenSize({
+          width: window.innerWidth,
+          height: window.innerHeight
+        })
+      }, 100) // Debounce 100ms
+    }
+
+    window.addEventListener('resize', handleResize)
+    return () => {
+      window.removeEventListener('resize', handleResize)
+      clearTimeout(timeoutId)
+    }
+  }, [])
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -131,6 +176,9 @@ const Content = () => {
   const categories = featuredCategoriesLoading || featuredCategories.length === 0 
     ? fallbackCategories 
     : featuredCategories
+
+  // Get responsive product count
+  const responsiveProductCount = getResponsiveProductCount()
 
   return (
     <div className='content-container'>
@@ -280,9 +328,16 @@ const Content = () => {
         </div>
       )}
 
-      {/* Stitch Products */}
+      {/* Stitch Products - Responsive display */}
+      {/* 
+        Responsive logic:
+        - Mobile (≤480px): 4 products (2 rows of 2)
+        - Tablet (≤768px): 6 products (2 rows of 3) 
+        - Small desktop (≤1200px): 8 products (2 rows of 4)
+        - Large desktop (>1200px): 12 products (2 rows of 6)
+      */}
       <div className='product-grid'>
-        {[...products.slice(-5)].reverse().map((product) => (
+        {[...products.slice(-responsiveProductCount)].reverse().map((product) => (
           <ProductCard key={product._id || product.id} product={product} />
         ))}
       </div>

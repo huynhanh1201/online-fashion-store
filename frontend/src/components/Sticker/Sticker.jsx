@@ -21,12 +21,32 @@ const Sticker = ({
     if (!product) return null
 
     const now = new Date()
-    const createdAt = new Date(product.createdAt)
+    const createdAt = product.createdAt ? new Date(product.createdAt) : now
     const daysSinceCreation = Math.floor((now - createdAt) / (1000 * 60 * 60 * 24))
     const soldCount = product.soldCount || 0
-    const discount = product.discount || 0
+    
+    // Tính discount percentage từ firstVariantDiscountPrice
+    const originalPrice = product?.exportPrice || 0
+    const firstVariantDiscount = product?.firstVariantDiscountPrice || 0
+    
+    // Đảm bảo discount không vượt quá giá gốc
+    const actualDiscount = Math.min(firstVariantDiscount, originalPrice)
+    const discountPercentage = originalPrice > 0 ? Math.round((actualDiscount / originalPrice) * 100) : 0
 
-    if (discount >= 20) {
+    console.log('Sticker debug:', {
+      productId: product._id,
+      productName: product.name,
+      originalPrice,
+      firstVariantDiscount,
+      actualDiscount,
+      discountPercentage,
+      daysSinceCreation,
+      soldCount,
+      createdAt: product.createdAt
+    })
+
+    // Ưu tiên hiển thị "Giảm giá" nếu có discount >= 20%
+    if (discountPercentage >= 20 && actualDiscount > 0) {
       return {
         text: 'Giảm giá',
         background: 'linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%)',
@@ -34,7 +54,8 @@ const Sticker = ({
       }
     }
 
-    if (daysSinceCreation <= 7) {
+    // Nếu không có discount đủ lớn, kiểm tra sản phẩm mới
+    if (daysSinceCreation <= 7 && daysSinceCreation >= 0) {
       return {
         text: 'Mới',
         background: 'linear-gradient(135deg, #4ecdc4 0%, #44a08d 100%)',
@@ -42,6 +63,7 @@ const Sticker = ({
       }
     }
 
+    // Cuối cùng kiểm tra sản phẩm hot
     if (soldCount > 100) {
       return {
         text: 'Hot',

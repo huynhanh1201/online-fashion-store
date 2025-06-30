@@ -55,7 +55,7 @@ import {
   restoreFlashSaleCampaignPrices
 } from '~/services/admin/webConfig/flashsaleService'
 import { getProducts } from '~/services/productService'
-import { getProductVariants, restoreProductVariantsOriginalDiscountPrice } from '~/services/admin/variantService'
+import { getProductVariants, restoreProductVariantsOriginalDiscountPrice, updateProductVariantsDiscountPrice } from '~/services/admin/variantService'
 import usePermissions from '~/hooks/usePermissions'
 
 
@@ -78,6 +78,7 @@ const FlashSaleManagement = () => {
   const [warning, setWarning] = useState('')
   const [restoringPrices, setRestoringPrices] = useState({})
   const [restoringAllPrices, setRestoringAllPrices] = useState(false)
+  const [editingProduct, setEditingProduct] = useState(false)
 
   const { hasPermission } = usePermissions()
 
@@ -140,7 +141,10 @@ const FlashSaleManagement = () => {
                 image: prod?.image || [],
                 stock: prod?.stock,
                 campaignId: campaign.id,
-                originalDiscountPrice: originalDiscountPrice
+                originalDiscountPrice: originalDiscountPrice,
+                // Đảm bảo flashPrice được parse đúng
+                flashPrice: item.flashPrice ? Number(item.flashPrice) : null,
+                originalPrice: item.originalPrice ? Number(item.originalPrice) : null
               }
             })
           )
@@ -152,10 +156,11 @@ const FlashSaleManagement = () => {
         })
       )
 
+      console.log('Fetched campaigns:', enrichedCampaigns)
       setCampaigns(enrichedCampaigns)
     } catch (err) {
       setError('Không thể tải dữ liệu Flash Sale')
-      console.error(err)
+      console.error('Error fetching campaigns:', err)
     } finally {
       setLoading(false)
     }
@@ -258,20 +263,53 @@ const FlashSaleManagement = () => {
 
   const handleEditSave = async (updatedProduct) => {
     setEditModalOpen(false)
+    setEditingProduct(true)
     try {
+      // Đảm bảo dữ liệu được format đúng
+      const updateData = {
+        flashPrice: Number(updatedProduct.flashPrice)
+      }
+      
+      console.log('Updating product in campaign:', {
+        campaignId: selectedCampaignId,
+        productId: updatedProduct.productId,
+        updateData
+      })
+      
+      // Cập nhật giá thực tế trong database variants trước
+      await updateProductVariantsDiscountPrice(
+        updatedProduct.productId,
+        updatedProduct.flashPrice
+      )
+      
+      console.log('Database variants updated successfully')
+      
+      // Sau đó cập nhật trong website-configs
       await updateProductInFlashSaleCampaign(
         selectedCampaignId,
         updatedProduct.productId,
-        {
-          flashPrice: updatedProduct.flashPrice
-        }
+        updateData
       )
+      
+      console.log('Website config updated successfully')
+      
+      setSuccess(`Đã cập nhật giá Flash Sale thành công! Giá mới: ${Number(updatedProduct.flashPrice).toLocaleString()}đ`)
       await fetchCampaigns()
     } catch (err) {
-      setError('Không thể cập nhật sản phẩm Flash Sale')
+      console.error('Error updating flash sale product:', err)
+      let errorMessage = 'Không thể cập nhật sản phẩm Flash Sale'
+      
+      if (err.message) {
+        errorMessage += ': ' + err.message
+      } else if (err.response?.data?.message) {
+        errorMessage += ': ' + err.response.data.message
+      }
+      
+      setError(errorMessage)
     } finally {
       setSelectedProduct(null)
       setSelectedCampaignId(null)
+      setEditingProduct(false)
     }
   }
 
@@ -481,6 +519,15 @@ const FlashSaleManagement = () => {
           onClose={() => setWarning('')}
         >
           {warning}
+        </Alert>
+      )}
+
+      {editingProduct && (
+        <Alert
+          severity='info'
+          sx={{ mb: 3, borderRadius: 2 }}
+        >
+          Đang cập nhật giá Flash Sale và database...
         </Alert>
       )}
 
@@ -773,9 +820,11 @@ const FlashSaleManagement = () => {
                         <Tooltip title='Chỉnh sửa chiến dịch'>
                           <IconButton
                             size='small'
+                            disabled={editingProduct}
                             sx={{
                               color: '#3b82f6',
-                              '&:hover': { backgroundColor: '#dbeafe' }
+                              '&:hover': { backgroundColor: '#dbeafe' },
+                              '&:disabled': { opacity: 0.5 }
                             }}
                             onClick={(e) => {
                               e.stopPropagation()
@@ -1044,9 +1093,11 @@ const FlashSaleManagement = () => {
                               <Tooltip title='Chỉnh sửa'>
                                 <IconButton
                                   size='small'
+                                  disabled={editingProduct}
                                   sx={{
                                     color: '#3b82f6',
-                                    '&:hover': { backgroundColor: '#dbeafe' }
+                                    '&:hover': { backgroundColor: '#dbeafe' },
+                                    '&:disabled': { opacity: 0.5 }
                                   }}
                                   onClick={() =>
                                     handleEditClick(item, campaign.id)

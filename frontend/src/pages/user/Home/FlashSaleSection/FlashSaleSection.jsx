@@ -7,7 +7,61 @@ const FlashSaleSection = () => {
   const [campaigns, setCampaigns] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
+  const [expandedCampaigns, setExpandedCampaigns] = useState({})
+  const [screenSize, setScreenSize] = useState({
+    width: window.innerWidth,
+    height: window.innerHeight
+  })
   const intervalRefs = useRef({})
+
+  // Calculate initial products to show based on screen size
+  const getInitialProductCount = () => {
+    const { width } = screenSize
+    
+    // Calculate how many cards can fit in one row based on screen width
+    // Assuming each card is approximately 290px wide with 10px gap
+    const cardWidth = 290
+    const gap = 10
+    const containerPadding = 64 // 32px on each side
+    const availableWidth = width - containerPadding
+    
+    // Calculate cards per row
+    const cardsPerRow = Math.floor(availableWidth / (cardWidth + gap))
+    
+    // Return 2 rows worth of products (minimum 4, maximum 12)
+    const productCount = Math.max(4, Math.min(12, cardsPerRow * 2))
+    
+    return productCount
+  }
+
+  // Handle window resize with debounce
+  useEffect(() => {
+    let timeoutId
+    
+    const handleResize = () => {
+      clearTimeout(timeoutId)
+      timeoutId = setTimeout(() => {
+        setScreenSize({
+          width: window.innerWidth,
+          height: window.innerHeight
+        })
+      }, 100) // Debounce 100ms
+    }
+
+    window.addEventListener('resize', handleResize)
+    return () => {
+      window.removeEventListener('resize', handleResize)
+      clearTimeout(timeoutId)
+    }
+  }, [])
+
+  // Toggle expanded state for a campaign
+  const toggleExpanded = (campaignId) => {
+    setExpandedCampaigns(prev => ({
+      ...prev,
+      [campaignId]: !prev[campaignId]
+    }))
+  }
 
   // Countdown logic for each campaign
   useEffect(() => {
@@ -118,11 +172,15 @@ const FlashSaleSection = () => {
   // ======= STYLES =======
   const styles = {
     flashSale: {
-      background: 'var(--primary-color)',
+      background: `linear-gradient(135deg, var(--primary-color) 0%, var(--accent-color) 100%)`,
       borderRadius: '24px',
       padding: '32px',
       color: 'white',
-      marginBottom: '32px'
+      marginBottom: '32px',
+      boxShadow: '0 8px 32px rgba(0, 0, 0, 0.15)',
+      border: '1px solid rgba(255, 255, 255, 0.1)',
+      position: 'relative',
+      overflow: 'hidden'
     },
     flashSaleHeader: {
       display: 'flex',
@@ -130,46 +188,63 @@ const FlashSaleSection = () => {
       justifyContent: 'space-between',
       marginBottom: '24px',
       flexWrap: 'wrap',
-      gap: '16px'
+      gap: '16px',
+      position: 'relative',
+      zIndex: 2
     },
     flashSaleTitle: {
       display: 'flex',
       alignItems: 'center',
       gap: '16px',
-      fontSize: '24px',
-      fontWeight: 'bold'
+      fontSize: '28px',
+      fontWeight: '800',
+      textShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+      color: 'white'
     },
     countdown: {
       display: 'flex',
       gap: '8px',
       alignItems: 'center',
-      fontSize: '20px',
-      fontWeight: 'bold',
-      background: '#f44336',
-      padding: '8px 20px',
-      borderRadius: '12px',
-      letterSpacing: '2px',
-      minWidth: '120px',
-      justifyContent: 'center'
+      fontSize: '18px',
+      fontWeight: '700',
+      background: `linear-gradient(135deg, var(--error-color) 0%, #d32f2f 100%)`,
+      padding: '12px 24px',
+      borderRadius: '16px',
+      letterSpacing: '1px',
+      minWidth: '140px',
+      justifyContent: 'center',
+      boxShadow: '0 4px 16px rgba(220, 38, 38, 0.3)',
+      border: '1px solid rgba(255, 255, 255, 0.2)',
+      color: 'white'
     },
     flashSaleCard: {
-      borderRadius: '5px',
-      width: '100%'
+      borderRadius: '12px',
+      width: '100%',
+      overflow: 'hidden',
+      position: 'relative',
+      zIndex: 2
     },
-    viewAllButton: {
-      border: '1px solid #1f2937',
-      color: '#1f2937',
-      backgroundColor: 'transparent',
-      padding: '8px 24px',
-      borderRadius: '9999px',
-      fontSize: '14px',
+    viewMoreContainer: {
+      display: 'flex',
+      justifyContent: 'center',
+      marginTop: '16px',
+      gridColumn: '1 / -1' // Span full width in grid
+    },
+    viewMoreButton: {
+      background: 'rgba(255, 255, 255, 0.1)',
+      border: '2px solid rgba(255, 255, 255, 0.3)',
+      color: 'white',
+      fontSize: '16px',
+      fontWeight: '600',
+      padding: '12px 32px',
+      borderRadius: '50px',
       cursor: 'pointer',
       transition: 'all 0.3s ease',
-      display: 'block',
-      margin: '0 auto',
-      '@media (min-width: 640px)': {
-        padding: '12px 32px'
-      }
+      fontFamily: 'inherit',
+      letterSpacing: '0.5px',
+      boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
+      position: 'relative',
+      zIndex: 2
     }
   }
 
@@ -178,17 +253,26 @@ const FlashSaleSection = () => {
       {campaigns
         .filter(campaign => campaign.status !== 'expired' && campaign.products.length > 0)
         .map((campaign) => (
-        <section key={campaign.id} style={styles.flashSale}>
-          <div style={styles.flashSaleHeader}>
-            <h2 style={styles.flashSaleTitle}>
+        <section key={campaign.id} style={styles.flashSale} className="flash-sale-section">
+          <div style={styles.flashSaleHeader} className="flash-sale-header">
+            <h2 style={styles.flashSaleTitle} className="flash-sale-title">
               ⚡ {campaign.title}
               {campaign.status === 'upcoming' && (
-                <span style={{ fontSize: '14px', opacity: 0.8, marginLeft: '8px' }}>
-                  (Sắp diễn ra)
+                <span style={{ 
+                  fontSize: '14px', 
+                  opacity: 0.9, 
+                  marginLeft: '12px',
+                  background: 'rgba(255, 255, 255, 0.2)',
+                  padding: '4px 12px',
+                  borderRadius: '20px',
+                  fontWeight: '600',
+                  border: '1px solid rgba(255, 255, 255, 0.3)'
+                }} className="upcoming-badge">
+                  🔜 Sắp diễn ra
                 </span>
               )}
             </h2>
-            <div style={styles.countdown}>
+            <div style={styles.countdown} className="flash-sale-countdown">
               {campaign.status === 'upcoming' 
                 ? 'Sắp diễn ra' 
                 : campaign.countdown || 'Đang tải...'
@@ -197,35 +281,161 @@ const FlashSaleSection = () => {
           </div>
 
           <div className='product-grid'>
-            {campaign.products.slice(0, 5).map((product) => (
-              <div key={product._id} style={styles.flashSaleCard}>
-                <ProductCard 
-                  product={{
-                    ...product,
-                    // Đảm bảo giá hiển thị đúng
-                    exportPrice: product.exportPrice, // Giá gốc
-                    flashPrice: product.flashPrice, // Giá Flash Sale (đã tính toán)
-                    originalFlashPrice: product.originalFlashPrice // Giá giảm gốc
-                  }} 
-                  isFlashSale={true} 
-                />
-              </div>
-            ))}
+            {(() => {
+              const initialCount = getInitialProductCount()
+              const isExpanded = expandedCampaigns[campaign.id]
+              const productsToShow = isExpanded 
+                ? campaign.products 
+                : campaign.products.slice(0, initialCount)
+              const hasMoreProducts = campaign.products.length > initialCount
+
+              return (
+                <>
+                  {productsToShow.map((product) => (
+                    <div key={product._id} style={styles.flashSaleCard} className="flash-sale-card">
+                      <ProductCard 
+                        product={{
+                          ...product,
+                          // Đảm bảo giá hiển thị đúng
+                          exportPrice: product.exportPrice, // Giá gốc
+                          flashPrice: product.flashPrice, // Giá Flash Sale (đã tính toán)
+                          originalFlashPrice: product.originalFlashPrice // Giá giảm gốc
+                        }} 
+                        isFlashSale={true} 
+                      />
+                    </div>
+                  ))}
+                  
+                  {/* Show "Xem thêm" button if there are more products */}
+                  {hasMoreProducts && !isExpanded && (
+                    <div style={styles.viewMoreContainer} className="view-more-container">
+                      <button 
+                        style={styles.viewMoreButton}
+                        className="view-more-button"
+                        onClick={() => toggleExpanded(campaign.id)}
+                        onMouseEnter={(e) => {
+                          e.target.style.backgroundColor = 'rgba(255, 255, 255, 0.15)'
+                          e.target.style.transform = 'translateY(-2px)'
+                          e.target.style.boxShadow = '0 6px 20px rgba(0, 0, 0, 0.2)'
+                        }}
+                        onMouseLeave={(e) => {
+                          e.target.style.backgroundColor = 'rgba(255, 255, 255, 0.1)'
+                          e.target.style.transform = 'translateY(0)'
+                          e.target.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.1)'
+                        }}
+                      >
+                        Xem thêm {campaign.products.length - initialCount} sản phẩm ›
+                      </button>
+                    </div>
+                  )}
+                  
+                  {/* Show "Thu gọn" button if expanded */}
+                  {hasMoreProducts && isExpanded && (
+                    <div style={styles.viewMoreContainer} className="view-more-container">
+                      <button 
+                        style={styles.viewMoreButton}
+                        className="view-more-button"
+                        onClick={() => toggleExpanded(campaign.id)}
+                        onMouseEnter={(e) => {
+                          e.target.style.backgroundColor = 'rgba(255, 255, 255, 0.15)'
+                          e.target.style.transform = 'translateY(-2px)'
+                          e.target.style.boxShadow = '0 6px 20px rgba(0, 0, 0, 0.2)'
+                        }}
+                        onMouseLeave={(e) => {
+                          e.target.style.backgroundColor = 'rgba(255, 255, 255, 0.1)'
+                          e.target.style.transform = 'translateY(0)'
+                          e.target.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.1)'
+                        }}
+                      >
+                        Thu gọn ›
+                      </button>
+                    </div>
+                  )}
+                </>
+              )
+            })()}
           </div>
 
-          <button 
-            style={styles.viewAllButton}
-            onMouseEnter={(e) => {
-              e.target.style.backgroundColor = '#1f2937'
-              e.target.style.color = 'white'
-            }}
-            onMouseLeave={(e) => {
-              e.target.style.backgroundColor = 'transparent'
-              e.target.style.color = '#1f2937'
-            }}
-          >
-            Xem tất cả ›
-          </button>
+          {/* CSS for responsive design and theme integration */}
+          <style jsx>{`
+            .flash-sale-section {
+              background: linear-gradient(135deg, var(--primary-color) 0%, var(--accent-color) 100%) !important;
+              box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15) !important;
+              border: 1px solid rgba(255, 255, 255, 0.1) !important;
+              
+              @media (max-width: 768px) {
+                padding: 24px 20px !important;
+                border-radius: 16px !important;
+                margin-bottom: 24px !important;
+              }
+            }
+            
+            .flash-sale-header {
+              @media (max-width: 768px) {
+                flex-direction: column !important;
+                align-items: flex-start !important;
+                gap: 12px !important;
+              }
+            }
+            
+            .flash-sale-title {
+              color: white !important;
+              text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+              
+              @media (max-width: 768px) {
+                font-size: 24px !important;
+                flex-wrap: wrap !important;
+              }
+            }
+            
+            .flash-sale-countdown {
+              background: linear-gradient(135deg, var(--error-color) 0%, #d32f2f 100%) !important;
+              box-shadow: 0 4px 16px rgba(220, 38, 38, 0.3) !important;
+              border: 1px solid rgba(255, 255, 255, 0.2) !important;
+              color: white !important;
+              
+              @media (max-width: 768px) {
+                font-size: 16px !important;
+                padding: 10px 20px !important;
+                min-width: 120px !important;
+              }
+            }
+            
+            .upcoming-badge {
+              background: rgba(255, 255, 255, 0.2) !important;
+              border: 1px solid rgba(255, 255, 255, 0.3) !important;
+              color: white !important;
+            }
+            
+            .view-more-container {
+              grid-column: 1 / -1 !important;
+              display: flex !important;
+              justify-content: center !important;
+              margin-top: 16px !important;
+            }
+            
+            .view-more-button {
+              background: rgba(255, 255, 255, 0.1) !important;
+              border: 2px solid rgba(255, 255, 255, 0.3) !important;
+              color: white !important;
+              font-family: inherit !important;
+              transition: all 0.3s ease !important;
+              box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+              
+              @media (max-width: 768px) {
+                padding: 10px 24px !important;
+                font-size: 14px !important;
+                border-radius: 40px !important;
+              }
+            }
+            
+            .view-more-button:hover {
+              background: rgba(255, 255, 255, 0.15) !important;
+              border-color: rgba(255, 255, 255, 0.5) !important;
+              transform: translateY(-2px) !important;
+              box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2) !important;
+            }
+          `}</style>
         </section>
       ))}
     </>
