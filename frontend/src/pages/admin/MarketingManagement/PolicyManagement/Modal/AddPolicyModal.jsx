@@ -123,7 +123,7 @@ const PolicyModal = ({
       PaperProps={{
         sx: {
           borderRadius: 2,
-          minHeight: '80vh'
+          maxHeight: '80vh'
         }
       }}
     >
