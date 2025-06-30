@@ -464,7 +464,7 @@ const ReviewModal = ({
           <Typography
             variant='h6'
             fontWeight='600'
-            color='#1a3c7b'
+            color='var(--primary-color)'
             gutterBottom
           >
             Chất lượng sản phẩm
@@ -485,7 +485,7 @@ const ReviewModal = ({
           <Typography
             variant='h6'
             fontWeight='600'
-            color='#1a3c7b'
+            color='var(--primary-color)'
             gutterBottom
           >
             Nhận xét của bạn
@@ -510,7 +510,7 @@ const ReviewModal = ({
           <Typography
             variant='h6'
             fontWeight='600'
-            color='#1a3c7b'
+            color='var(--primary-color)'
             gutterBottom
           >
             Thêm ảnh và video (không bắt buộc)

@@ -80,7 +80,7 @@ const CouponItem = ({ coupon, onCopy, copiedCode, formatCurrencyShort, disabled 
         <Typography
           variant="subtitle1"
           fontWeight="bold"
-          color="#1A3C7B"
+          color="var(--primary-color)"
           sx={{ fontSize: { xs: '0.9rem', sm: '1rem' } }}
         >
           {valueText}
@@ -88,7 +88,7 @@ const CouponItem = ({ coupon, onCopy, copiedCode, formatCurrencyShort, disabled 
         <Tooltip title={code}>
           <Typography
             variant="body2"
-            color="#1A3C7B"
+            color="var(--primary-color)"
             mt={0.5}
             sx={{
               fontSize: { xs: '0.75rem', sm: '0.8rem' },
@@ -127,16 +127,16 @@ const CouponItem = ({ coupon, onCopy, copiedCode, formatCurrencyShort, disabled 
             variant="outlined"
             size="small"
             sx={{
-              backgroundColor: '#1A3C7B',
+              backgroundColor: 'var(--primary-color)',
               color: '#fff',
               mt: 1,
               fontSize: { xs: '0.7rem', sm: '0.8rem' },
               padding: { xs: '4px 8px', sm: '6px 12px' },
               minWidth: 80,
-              borderColor: '#1A3C7B',
+              borderColor: 'var(--primary-color)',
               '&:hover': {
-                backgroundColor: '#3f51b5',
-                borderColor: '#3f51b5',
+                backgroundColor: 'var(--accent-color)',
+                borderColor: 'var(--primary-color)',
               },
               '&.Mui-disabled': {
                 backgroundColor: '#ccc',

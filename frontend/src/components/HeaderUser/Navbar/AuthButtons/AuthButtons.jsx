@@ -69,7 +69,7 @@ const AuthButtons = () => {
   const navigate = useNavigate()
   const currentUser = useSelector(selectCurrentUser)
   const [tokenUpdated, setTokenUpdated] = useState(
-    localStorage.getItem('token')
+    localStorage.getItem('accessToken')
   )
   const [anchorEl, setAnchorEl] = useState(null)
   const open = Boolean(anchorEl)
@@ -90,12 +90,12 @@ const AuthButtons = () => {
       } catch (error) {
         toast.error(error.message || 'Lỗi tải thông tin người dùng')
         dispatch(logoutUserAPI(false))
-        localStorage.removeItem('token')
+        localStorage.removeItem('accessToken')
         setTokenUpdated(null)
       }
     }
 
-    const token = localStorage.getItem('token')
+    const token = localStorage.getItem('accessToken')
     if (token) {
       setTokenUpdated(token)
       fetchProfile()

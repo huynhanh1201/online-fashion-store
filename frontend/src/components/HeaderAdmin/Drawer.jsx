@@ -113,7 +113,7 @@ export default function AdminDrawer({
         icon: <PersonIcon />,
         children: [
           {
-            permission: 'user:use',
+            permission: 'userStatistics:use',
             label: 'Thống kê tài khoản',
             path: '/admin/account-statistic'
           },
@@ -143,6 +143,7 @@ export default function AdminDrawer({
           'footerContent:use',
           'featuredCategory:use',
           'service:use',
+          'theme:use',
           'blog:use'
         ],
         label: 'Quản lý nội dung',
@@ -179,13 +180,13 @@ export default function AdminDrawer({
             path: '/admin/service-highlight-management'
           },
           {
-            permission: 'user:use',
+            permission: 'theme:use',
             label: 'Chủ đề',
             path: '/admin/theme-management'
           },
           {
-            permission: 'user:use',
-            label: 'Quản lý nội dung',
+            permission: 'blog:use',
+            label: 'Nội dung bài viết',
             path: '/admin/blog-management'
           },
           {

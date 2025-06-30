@@ -41,7 +41,7 @@ const HeaderAction = () => {
   }, 0)
 
   const [tokenUpdated, setTokenUpdated] = useState(
-    localStorage.getItem('token')
+    localStorage.getItem('accessToken')
   ) // Theo dõi token
 
   // Hàm cắt tên user nếu vượt quá 15 ký tự
@@ -51,7 +51,7 @@ const HeaderAction = () => {
   }
 
   useEffect(() => {
-    const token = localStorage.getItem('token')
+    const token = localStorage.getItem('accessToken')
 
     const fetchProfile = async () => {
       try {
@@ -67,7 +67,7 @@ const HeaderAction = () => {
       } catch (error) {
         toast.error(error.message || 'Lỗi tải thông tin người dùng')
         dispatch(logoutUserAPI(false))
-        localStorage.removeItem('token')
+        localStorage.removeItem('accessToken')
         setTokenUpdated(null)
       }
     }
@@ -88,7 +88,7 @@ const HeaderAction = () => {
 
   const handleLogout = async () => {
     dispatch(logoutUserAPI())
-    localStorage.removeItem('token')
+    localStorage.removeItem('accessToken')
     setTokenUpdated(null)
     handleClose()
     navigate('/login')

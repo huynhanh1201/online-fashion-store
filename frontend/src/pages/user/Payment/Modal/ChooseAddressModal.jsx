@@ -99,8 +99,8 @@ export const ChooseAddressModal = ({
           sx={{
             m: 0,
             p: 3,
-
-            color: '#1A3C7B',
+            
+            color: 'var(--primary-color)',
             position: 'relative',
             display: 'flex',
             alignItems: 'center',
@@ -203,7 +203,7 @@ export const ChooseAddressModal = ({
                       transition: 'all 0.3s ease',
                       cursor: 'pointer',
                       '&:hover': {
-                        borderColor: '#1A3C7B',
+                        borderColor: 'var(--primary-color)',
                         boxShadow: '0 4px 12px rgba(102, 126, 234, 0.15)',
                         transform: 'translateY(-2px)'
                       },
@@ -218,24 +218,17 @@ export const ChooseAddressModal = ({
                           checked={selectedId === addr._id}
                           value={addr._id}
                           sx={{
-                            color: '#1A3C7B',
+                            color: 'var(--primary-color)',
                             '&.Mui-checked': {
-                              color: '#1A3C7B'
+                              color: 'var(--primary-color)',
                             },
                             mt: -0.5
                           }}
                         />
 
                         <Box sx={{ flexGrow: 1 }}>
-                          <Box
-                            display='flex'
-                            alignItems='center'
-                            gap={1}
-                            mb={1}
-                          >
-                            <PersonIcon
-                              sx={{ fontSize: 18, color: '#1A3C7B' }}
-                            />
+                          <Box display="flex" alignItems="center" gap={1} mb={1}>
+                            <PersonIcon sx={{ fontSize: 18, color: 'var(--primary-color)' }} />
                             <Typography
                               variant='subtitle1'
                               fontWeight={600}
@@ -323,15 +316,15 @@ export const ChooseAddressModal = ({
                 startIcon={<AddIcon />}
                 onClick={handleAddNew}
                 sx={{
-                  borderColor: '#1A3C7B',
-                  color: '#1A3C7B',
+                  borderColor: 'var(--primary-color)',
+                  color: 'var(--primary-color)',
                   borderRadius: 2,
                   py: 1.5,
                   textTransform: 'none',
                   fontWeight: 600,
                   borderWidth: 2,
                   '&:hover': {
-                    borderColor: '#1A3C7B',
+                    borderColor: 'var(--primary-color)',
                     backgroundColor: 'rgba(102, 126, 234, 0.05)',
                     borderWidth: 2
                   }
@@ -364,7 +357,7 @@ export const ChooseAddressModal = ({
             onClick={() => onConfirm(selectedId)}
             disabled={!selectedId}
             sx={{
-              background: selectedId ? '#1A3C7B' : undefined,
+              background: selectedId ? 'var(--primary-color)' : undefined,
               borderRadius: 2,
               px: 4,
               py: 1,

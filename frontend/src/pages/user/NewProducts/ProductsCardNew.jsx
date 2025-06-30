@@ -8,7 +8,7 @@ const Link = ({ to, children, ...props }) => (
   </a>
 )
 
-const ProductCard = ({ product, isFlashSale = false }) => {
+const ProductsCardNew = ({ product, isFlashSale = false }) => {
   if (!product || !product.image) {
     return <div style={styles.productCard}>No image available</div>
   }
@@ -21,6 +21,29 @@ const ProductCard = ({ product, isFlashSale = false }) => {
 
   const quantity = Number(product.quantity) || 0
   const inStock = quantity > 0
+
+  // Kiểm tra sản phẩm mới trong 7 ngày
+  const isNewProduct = (() => {
+    if (!product.createdAt) return false;
+    const created = new Date(product.createdAt);
+    const now = new Date();
+    const diffMs = now - created;
+    const diffDays = diffMs / (1000 * 60 * 60 * 24);
+    return diffDays <= 7;
+  })();
+
+  // Calculate price based on product export price and first variant's discount price
+  const calculateDisplayPrice = () => {
+    const originalPrice = product?.exportPrice || 0
+    const firstVariantDiscount = product?.firstVariantDiscountPrice || 0
+    const displayPrice = Math.max(0, originalPrice - firstVariantDiscount)
+
+    return {
+      price: originalPrice,
+      discountPrice: displayPrice,
+      originalDiscountPrice: firstVariantDiscount
+    }
+  }
 
   // Hàm xử lý tên sản phẩm
   const truncateProductName = (name) => {
@@ -56,20 +79,8 @@ const ProductCard = ({ product, isFlashSale = false }) => {
     return stars
   }
 
-  // Calculate price based on product export price and first variant's discount price
-  const calculateDisplayPrice = () => {
-    const originalPrice = product?.exportPrice || 0
-    const firstVariantDiscount = product?.firstVariantDiscountPrice || 0
-    const displayPrice = Math.max(0, originalPrice - firstVariantDiscount)
-
-    return {
-      price: originalPrice,
-      discountPrice: displayPrice,
-      originalDiscountPrice: firstVariantDiscount
-    }
-  }
-
   const priceInfo = calculateDisplayPrice()
+  const hasDiscount = priceInfo.originalDiscountPrice > 0
 
   return (
     <Link
@@ -84,16 +95,8 @@ const ProductCard = ({ product, isFlashSale = false }) => {
           ...(isFlashSale ? styles.flashSaleCard : {})
         }}
       >
-        {/* Sticker component */}
-        <Sticker 
-          product={product}
-          top={10}
-          right={10}
-          fontSize="12px"
-          fontWeight={700}
-          padding="4px 12px 4px 8px"
-        />
-        
+        {/* Hàng mới badge */}
+        {isNewProduct && <Sticker text="Hàng mới" />}
         <div style={styles.productImage}>
           {/* Ảnh chính */}
           <img
@@ -121,35 +124,21 @@ const ProductCard = ({ product, isFlashSale = false }) => {
             }}
             loading="lazy"
           />
+          {hasDiscount && (
+            <div style={styles.discountBadge}>-{Math.round((priceInfo.originalDiscountPrice / priceInfo.price) * 100)}%</div>
+          )}
         </div>
         <div style={styles.productInfo}>
           <h3 style={styles.productName} title={product.name}>
             {truncateProductName(product.name)}
           </h3>
           <div style={styles.priceRow}>
-            {isFlashSale && product.flashPrice ? (
-              <>
-                <span style={styles.flashSalePrice}>
-                  {product.flashPrice.toLocaleString('vi-VN')} ₫
-                </span>
-                <span style={styles.originalPrice}>
-                  {product.exportPrice.toLocaleString('vi-VN')} ₫
-                </span>
-                <span style={styles.flashSaleBadge}>Flash Sale</span>
-              </>
-            ) : priceInfo.originalDiscountPrice > 0 ? (
-              <>
-                <span style={styles.currentPrice}>
-                  {priceInfo.discountPrice.toLocaleString()}₫
-                </span>
-                <span style={styles.originalPrice}>
-                  {priceInfo.price.toLocaleString()}₫
-                </span>
-                <span style={styles.discountBadge}>-{Math.round((priceInfo.originalDiscountPrice / priceInfo.price) * 100)}%</span>
-              </>
-            ) : (
-              <span style={styles.currentPrice}>
-                {(product.exportPrice ?? 0).toLocaleString('vi-VN')} ₫
+            <span style={styles.currentPrice}>
+              {priceInfo.discountPrice.toLocaleString('vi-VN')} ₫
+            </span>
+            {hasDiscount && (
+              <span style={styles.originalPrice}>
+                {priceInfo.price.toLocaleString('vi-VN')} ₫
               </span>
             )}
           </div>
@@ -184,6 +173,7 @@ const styles = {
     display: 'flex',
     flexDirection: 'column',
     position: 'relative',
+    padding: '5px 5px',
     boxShadow: '0px 0px 4px 2px #dbdbdb80'
   },
   flashSaleCard: {
@@ -195,23 +185,13 @@ const styles = {
     width: '100%',
     height: '400px',
     overflow: 'hidden',
-    border: '4px solid white',
-    borderRadius: '6px'
+    border: '8px solid white'
   },
   productImg: {
     width: '100%',
     height: '100%',
     objectFit: 'cover',
     transition: 'transform 0.3s ease'
-  },
-  discountBadge: {
-    background: '#ff6b6b',
-    color: 'white',
-    padding: '2px 6px',
-    borderRadius: '4px',
-    fontSize: '12px',
-    fontWeight: 'bold',
-    marginLeft: '4px'
   },
   overlay: {
     position: 'absolute',
@@ -308,24 +288,18 @@ const styles = {
     color: '#888',
     fontWeight: '500'
   },
-  flashSalePrice: {
-    fontSize: '22px',
-    fontWeight: '900',
-    color: '#e53935',
-    marginRight: '8px',
-  },
-  flashSaleBadge: {
-    background: 'linear-gradient(90deg, #ff9800 0%, #ff3d00 100%)',
+  discountBadge: {
+    position: 'absolute',
+    top: 10,
+    left: 10,
+    zIndex: 10,
     color: 'white',
-    fontWeight: 'bold',
+    background: '#ff6b6b',
+    padding: '2px 5px',
+    borderRadius: '4px',
     fontSize: '12px',
-    borderRadius: '6px',
-    padding: '2px 8px',
-    marginLeft: '8px',
-    letterSpacing: '1px',
-    textTransform: 'uppercase',
-    boxShadow: '0 2px 8px rgba(255,61,0,0.15)'
-  },
+    fontWeight: '500'
+  }
 }
 
-export default ProductCard
+export default ProductsCardNew

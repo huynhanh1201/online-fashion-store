@@ -46,9 +46,8 @@ const ProductReview = ({ productId, avgRating = 0 }) => {
         const reviewsData = response.data || []
         const metaData = response.meta || {}
 
-        // Chỉ hiển thị những đánh giá đã được phê duyệt
-        const approvedReviews = reviewsData.filter(review => review.moderationStatus === 'approved')
-        setReviews(approvedReviews)
+        // API đã filter những review đã được duyệt (moderationStatus=approved)
+        setReviews(reviewsData)
         setTotalReviews(metaData.total || 0)
         setTotalPages(metaData.totalPages || 1)
         setCurrentPage(1)
@@ -70,9 +69,9 @@ const ProductReview = ({ productId, avgRating = 0 }) => {
       const response = await getReviews(productId, nextPage, 5)
 
       const reviewsData = response.data || []
-      const approvedReviews = reviewsData.filter(review => review.moderationStatus === 'approved')
+      // API đã filter những review đã được duyệt (moderationStatus=approved)
 
-      setReviews(prev => [...prev, ...approvedReviews])
+      setReviews(prev => [...prev, ...reviewsData])
       setCurrentPage(nextPage)
     } catch (err) {
       console.error('Lỗi khi tải thêm đánh giá:', err)

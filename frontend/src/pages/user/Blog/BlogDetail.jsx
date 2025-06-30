@@ -79,31 +79,81 @@ const TableOfContents = ({ headings, isMobile }) => {
   const theme = useTheme()
 
   React.useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        // Find the entry that is intersecting and closest to the top
-        const intersectingEntries = entries.filter(entry => entry.isIntersecting)
-        if (intersectingEntries.length > 0) {
-          // Sort by intersection ratio and distance from top
-          const sortedEntries = intersectingEntries.sort((a, b) => {
-            return a.boundingClientRect.top - b.boundingClientRect.top
-          })
-          setActiveId(sortedEntries[0].target.id)
+    const updateActiveHeading = () => {
+      if (headings.length === 0) return
+
+      const scrollTop = window.pageYOffset || document.documentElement.scrollTop
+      const offsetTop = 160 // Account for fixed header + some buffer
+
+      // Get all heading elements with their positions
+      const headingElements = headings.map(heading => {
+        const element = document.getElementById(heading.id)
+        if (!element) return null
+
+        const rect = element.getBoundingClientRect()
+        const absoluteTop = rect.top + scrollTop
+
+        return {
+          id: heading.id,
+          element,
+          top: absoluteTop,
+          isVisible: rect.top <= offsetTop
         }
-      },
-      {
-        rootMargin: '-140px 0px -60% 0px', // Adjusted for sticky header
-        threshold: [0, 0.1, 0.5, 1]
+      }).filter(Boolean)
+
+      if (headingElements.length === 0) return
+
+      // Sort by document position (top to bottom)
+      headingElements.sort((a, b) => a.top - b.top)
+
+      // Find the active heading
+      let activeHeading = headingElements[0]
+
+      // Look for the last heading that has passed the offset point
+      for (let i = headingElements.length - 1; i >= 0; i--) {
+        const heading = headingElements[i]
+        if (heading.top <= scrollTop + offsetTop) {
+          activeHeading = heading
+          break
+        }
       }
-    )
 
-    headings.forEach((heading) => {
-      const element = document.getElementById(heading.id)
-      if (element) observer.observe(element)
-    })
+      // Special case: if we're at the very top of the document
+      if (scrollTop < 100) {
+        activeHeading = headingElements[0]
+      }
 
-    return () => observer.disconnect()
-  }, [headings])
+      // Special case: if we're near the bottom of the document
+      const documentHeight = document.documentElement.scrollHeight
+      const windowHeight = window.innerHeight
+      if (scrollTop + windowHeight >= documentHeight - 100) {
+        activeHeading = headingElements[headingElements.length - 1]
+      }
+
+      if (activeHeading && activeHeading.id !== activeId) {
+        setActiveId(activeHeading.id)
+      }
+    }
+
+    // Initial update
+    updateActiveHeading()
+
+    // Throttled scroll listener for better performance
+    let timeoutId = null
+    const throttledScrollHandler = () => {
+      if (timeoutId) clearTimeout(timeoutId)
+      timeoutId = setTimeout(updateActiveHeading, 50)
+    }
+
+    window.addEventListener('scroll', throttledScrollHandler, { passive: true })
+    window.addEventListener('resize', updateActiveHeading, { passive: true })
+
+    return () => {
+      if (timeoutId) clearTimeout(timeoutId)
+      window.removeEventListener('scroll', throttledScrollHandler)
+      window.removeEventListener('resize', updateActiveHeading)
+    }
+  }, [headings, activeId])
 
   const scrollToHeading = (id) => {
     const element = document.getElementById(id)

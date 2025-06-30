@@ -25,6 +25,8 @@ import StyleAdmin from '~/assets/StyleAdmin.jsx'
 import StarIcon from '@mui/icons-material/Star'
 import PlayCircleFilledWhiteIcon from '@mui/icons-material/PlayCircleFilledWhite'
 import { optimizeCloudinaryUrl } from '~/utils/cloudinary.js'
+import usePermissions from '~/hooks/usePermissions'
+
 const formatDate = (date) => {
   if (!date) return 'Không xác định'
   return new Date(date).toLocaleString('vi-VN', {
@@ -64,6 +66,7 @@ const ViewReviewModal = ({ open, onClose, review, onApprove }) => {
   const closeMedia = () => {
     setMediaPreview({ open: false, type: '', items: [], selectedIndex: 0 })
   }
+  const { hasPermission } = usePermissions()
 
   return (
     <>
@@ -257,7 +260,7 @@ const ViewReviewModal = ({ open, onClose, review, onApprove }) => {
 
         <Divider />
         <DialogActions sx={{ padding: '16px 24px' }}>
-          {review?.moderationStatus === 'pending' && (
+          {review?.moderationStatus === 'pending' && hasPermission('review:update') && (
             <Box>
               <Button
                 onClick={() => handleApprove('approved')}
@@ -282,10 +285,11 @@ const ViewReviewModal = ({ open, onClose, review, onApprove }) => {
                   width: 120
                 }}
               >
-                không duyệt
+                Không duyệt
               </Button>
             </Box>
           )}
+
         </DialogActions>
       </Dialog>
 

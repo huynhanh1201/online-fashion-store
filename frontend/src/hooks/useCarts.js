@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useMemo } from 'react'
 import {
   getCart,
   addToCart,
@@ -13,24 +13,40 @@ export const useCart = () => {
   const [loading, setLoading] = useState(true)
   const dispatch = useDispatch()
   const cart = useSelector(state => state.cart)
+  
+  // Memoize isLoggedIn để tránh re-render không cần thiết
+  const isLoggedIn = useMemo(() => {
+    return !!localStorage.getItem('accessToken')
+  }, [])
 
   const fetchCart = async (options = {}) => {
-    const token = localStorage.getItem('token')
+    const token = localStorage.getItem('accessToken')
     if (!token) {
       setLoading(false)
+      // Reset cart khi không có token
+      dispatch(setCartItems([]))
       return
     }
 
     if (!options?.silent) setLoading(true)
     try {
       const response = await getCart()
-      const normalizedItems = (response?.cartItems || []).map(item => ({
-        ...item,
-        variant: typeof item.variantId === 'object' ? item.variantId : { _id: item.variantId }
-      }))
-      dispatch(setCartItems(normalizedItems))
+      if (response && response.cartItems) {
+        const normalizedItems = (response.cartItems || []).map(item => ({
+          ...item,
+          variant: typeof item.variantId === 'object' ? item.variantId : { _id: item.variantId }
+        }))
+        dispatch(setCartItems(normalizedItems))
+      } else {
+        // Nếu response không hợp lệ, reset cart
+        dispatch(setCartItems([]))
+      }
     } catch (error) {
       console.error('Failed to fetch cart:', error)
+      // Nếu là lỗi 401 hoặc 403 (unauthorized), reset cart
+      if (error?.response?.status === 401 || error?.response?.status === 403) {
+        dispatch(setCartItems([]))
+      }
     } finally {
       setLoading(false)
     }
@@ -165,7 +181,7 @@ export const useCart = () => {
   })
 
   useEffect(() => {
-    const token = localStorage.getItem('token')
+    const token = localStorage.getItem('accessToken')
     if (token) {
       fetchCart()
     }

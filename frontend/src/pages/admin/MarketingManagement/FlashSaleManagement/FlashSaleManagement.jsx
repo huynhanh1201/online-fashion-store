@@ -269,42 +269,42 @@ const FlashSaleManagement = () => {
       const updateData = {
         flashPrice: Number(updatedProduct.flashPrice)
       }
-      
+
       console.log('Updating product in campaign:', {
         campaignId: selectedCampaignId,
         productId: updatedProduct.productId,
         updateData
       })
-      
+
       // Cập nhật giá thực tế trong database variants trước
       await updateProductVariantsDiscountPrice(
         updatedProduct.productId,
         updatedProduct.flashPrice
       )
-      
+
       console.log('Database variants updated successfully')
-      
+
       // Sau đó cập nhật trong website-configs
       await updateProductInFlashSaleCampaign(
         selectedCampaignId,
         updatedProduct.productId,
         updateData
       )
-      
+
       console.log('Website config updated successfully')
-      
+
       setSuccess(`Đã cập nhật giá Flash Sale thành công! Giá mới: ${Number(updatedProduct.flashPrice).toLocaleString()}đ`)
       await fetchCampaigns()
     } catch (err) {
       console.error('Error updating flash sale product:', err)
       let errorMessage = 'Không thể cập nhật sản phẩm Flash Sale'
-      
+
       if (err.message) {
         errorMessage += ': ' + err.message
       } else if (err.response?.data?.message) {
         errorMessage += ': ' + err.response.data.message
       }
-      
+
       setError(errorMessage)
     } finally {
       setSelectedProduct(null)
@@ -854,6 +854,26 @@ const FlashSaleManagement = () => {
                       </Tooltip>
                     )}
                     {/* Nút xóa chỉ hiển thị cho chiến dịch đã kết thúc hoặc bị tắt */}
+
+                    {hasPermission('flashSale:delete') && (campaign.status === 'expired' || campaign.status === 'disabled') && (
+
+                      <Tooltip title='Xóa chiến dịch'>
+                        <IconButton
+                          size='small'
+                          sx={{
+                            color: '#ef4444',
+                            '&:hover': { backgroundColor: '#fee2e2' }
+                          }}
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            handleDeleteCampaignClick(campaign)
+                          }}
+                        >
+                          <DeleteIcon fontSize='small' />
+                        </IconButton>
+                      </Tooltip>
+                    )
+                    }
                     <Chip
                       label={getStatusLabel(campaign.status)}
                       color={getStatusColor(campaign.status)}
@@ -1090,22 +1110,25 @@ const FlashSaleManagement = () => {
                                   </IconButton>
                                 </Tooltip>
                               )}
-                              <Tooltip title='Chỉnh sửa'>
-                                <IconButton
-                                  size='small'
-                                  disabled={editingProduct}
-                                  sx={{
-                                    color: '#3b82f6',
-                                    '&:hover': { backgroundColor: '#dbeafe' },
-                                    '&:disabled': { opacity: 0.5 }
-                                  }}
-                                  onClick={() =>
-                                    handleEditClick(item, campaign.id)
-                                  }
-                                >
-                                  <EditIcon fontSize='small' />
-                                </IconButton>
-                              </Tooltip>
+                              {hasPermission('flashSale:update') && (
+
+                                <Tooltip title='Chỉnh sửa'>
+                                  <IconButton
+                                    size='small'
+                                    disabled={editingProduct}
+                                    sx={{
+                                      color: '#3b82f6',
+                                      '&:hover': { backgroundColor: '#dbeafe' },
+                                      '&:disabled': { opacity: 0.5 }
+                                    }}
+                                    onClick={() =>
+                                      handleEditClick(item, campaign.id)
+                                    }
+                                  >
+                                    <EditIcon fontSize='small' />
+                                  </IconButton>
+                                </Tooltip>
+                              )}
                               {/* Nút kết thúc sớm chỉ hiển thị cho sản phẩm trong chiến dịch đang hoạt động */}
                               {(campaign.status === 'active' || campaign.status === 'upcoming') && (
                                 <Tooltip title='Kết thúc sớm sản phẩm này'>
@@ -1124,7 +1147,7 @@ const FlashSaleManagement = () => {
                                 </Tooltip>
                               )}
                               {/* Nút xóa chỉ hiển thị cho sản phẩm trong chiến dịch đã kết thúc hoặc bị tắt */}
-                              {(campaign.status === 'expired' || campaign.status === 'disabled') && (
+                              {hasPermission('flashSale:deldete') && (campaign.status === 'expired' || campaign.status === 'disabled') && (
                                 <Tooltip title='Xóa'>
                                   <IconButton
                                     size='small'

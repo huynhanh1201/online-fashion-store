@@ -316,16 +316,9 @@ export default function AddAddressModal({
   return (
     <Dialog open={open} onClose={onClose} maxWidth='sm' fullWidth>
       <DialogTitle sx={{ m: 0, p: 2 }}>
-        <Box
-          sx={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 1,
-            color: '#1A3C7B'
-          }}
-        >
-          <LocationOnIcon sx={{ color: '#1A3C7B' }} />
-          <Typography variant='h6'>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, color: 'var(--primary-color)' }}>
+          <LocationOnIcon sx={{ color: 'var(--primary-color)' }} />
+          <Typography variant="h6">
             {viewOnly
               ? 'Xem địa chỉ'
               : isEditMode
@@ -489,7 +482,7 @@ export default function AddAddressModal({
             onClick={handleSubmit}
             variant='contained'
             sx={{
-              background: '#1A3C7B',
+              background: 'var(--primary-color)',
               borderRadius: 2,
               px: 4,
               py: 1,

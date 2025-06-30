@@ -62,18 +62,18 @@ const OrderFailed = () => {
           <Button variant="contained"
             onClick={handleGoHome}
             sx={{
-              backgroundColor: '#1A3C7B',
+              backgroundColor: 'var(--primary-color)',
               '&:hover': {
-                backgroundColor: '#162f61',
+                backgroundColor: 'var(--accent-color)',
               }
             }}
           >
             Quay về trang chủ
           </Button>
           <Button variant="contained" sx={{
-            backgroundColor: '#1A3C7B',
+            backgroundColor: 'var(--primary-color)',
             '&:hover': {
-              backgroundColor: '#162f61',
+              backgroundColor: 'var(--accent-color)',
             }
           }}
             onClick={handleGoCart}>

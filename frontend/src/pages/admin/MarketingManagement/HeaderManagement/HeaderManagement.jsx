@@ -60,6 +60,7 @@ import {
   updateCategory
 } from '~/services/admin/categoryService.js'
 import { optimizeCloudinaryUrl } from '~/utils/cloudinary.js'
+import usePermissions from '~/hooks/usePermissions'
 
 const HeaderManagement = () => {
   const theme = useTheme()
@@ -73,6 +74,7 @@ const HeaderManagement = () => {
   const [refreshing, setRefreshing] = useState(false)
   const [activeTab, setActiveTab] = useState(0)
   const [expandedCategories, setExpandedCategories] = useState(new Set())
+  const { hasPermission } = usePermissions()
 
   // Fetch header data
   const fetchHeaderData = async () => {
@@ -427,26 +429,28 @@ const HeaderManagement = () => {
               alignItems: 'center'
             }}
           >
-            <Button
-              variant='contained'
-              startIcon={<AddIcon />}
-              onClick={() => setOpenModal(true)}
-              sx={{
-                px: 3,
-                py: 1.5,
-                borderRadius: 2,
-                textTransform: 'none',
-                fontSize: '1rem',
-                fontWeight: 600,
-                background: 'var(--primary-color)',
-                '&:hover': {
-                  background: 'var(--accent-color)'
-                }
-              }}
-            >
-              {headerData ? 'Chỉnh sửa nội dung' : 'Tạo nội dung mới'}
-            </Button>
+            {hasPermission('headerContent:create') && (
 
+              <Button
+                variant='contained'
+                startIcon={<AddIcon />}
+                onClick={() => setOpenModal(true)}
+                sx={{
+                  px: 3,
+                  py: 1.5,
+                  borderRadius: 2,
+                  textTransform: 'none',
+                  fontSize: '1rem',
+                  fontWeight: 600,
+                  background: 'var(--primary-color)',
+                  '&:hover': {
+                    background: 'var(--accent-color)'
+                  }
+                }}
+              >
+                {headerData ? 'Chỉnh sửa nội dung' : 'Tạo nội dung mới'}
+              </Button>
+            )}
             <Button
               variant='outlined'
               startIcon={<RefreshIcon />}
@@ -603,22 +607,25 @@ const HeaderManagement = () => {
                           }}
                         />
                       </TableCell>
-                      <TableCell sx={{ py: 2 }}>
-                        <Stack direction='row' spacing={1}>
-                          <Tooltip title='Chỉnh sửa'>
-                            <IconButton
-                              size='small'
-                              sx={{
-                                color: 'var(--primary-color)',
-                                '&:hover': { backgroundColor: '#dbeafe' }
-                              }}
-                              onClick={() => setOpenModal(true)}
-                            >
-                              <EditIcon fontSize='small' />
-                            </IconButton>
-                          </Tooltip>
-                        </Stack>
-                      </TableCell>
+                      {hasPermission('headerContent:update') && (
+
+                        <TableCell sx={{ py: 2 }}>
+                          <Stack direction='row' spacing={1}>
+                            <Tooltip title='Chỉnh sửa'>
+                              <IconButton
+                                size='small'
+                                sx={{
+                                  color: 'var(--primary-color)',
+                                  '&:hover': { backgroundColor: '#dbeafe' }
+                                }}
+                                onClick={() => setOpenModal(true)}
+                              >
+                                <EditIcon fontSize='small' />
+                              </IconButton>
+                            </Tooltip>
+                          </Stack>
+                        </TableCell>
+                      )}
                     </TableRow>
                   ) : (
                     // No data
@@ -660,14 +667,17 @@ const HeaderManagement = () => {
                         <Typography variant='body1' color='text.secondary'>
                           Chưa có cấu hình header nào
                         </Typography>
-                        <Button
-                          variant='outlined'
-                          startIcon={<AddIcon />}
-                          onClick={() => setOpenModal(true)}
-                          sx={{ mt: 2 }}
-                        >
-                          Tạo cấu hình đầu tiên
-                        </Button>
+
+                        {hasPermission('headerContent:create') && (
+                          <Button
+                            variant='outlined'
+                            startIcon={<AddIcon />}
+                            onClick={() => setOpenModal(true)}
+                            sx={{ mt: 2 }}
+                          >
+                            Tạo cấu hình đầu tiên
+                          </Button>
+                        )}
                       </TableCell>
                     </TableRow>
                   )}
@@ -689,25 +699,28 @@ const HeaderManagement = () => {
               alignItems: 'center'
             }}
           >
-            <Button
-              variant='contained'
-              onClick={() => setOpenMenuModal(true)}
-              sx={{
-                px: 3,
-                py: 1.5,
-                borderRadius: 2,
-                textTransform: 'none',
-                fontSize: '1rem',
-                fontWeight: 600,
-                background: 'var(--primary-color)',
-                '&:hover': {
-                  background: 'var(--accent-color)'
-                }
-              }}
-            >
-              {menuData ? 'Chỉnh sửa menu' : 'Tạo menu mới'}
-            </Button>
 
+            {hasPermission('headerContent:create') && (
+
+              <Button
+                variant='contained'
+                onClick={() => setOpenMenuModal(true)}
+                sx={{
+                  px: 3,
+                  py: 1.5,
+                  borderRadius: 2,
+                  textTransform: 'none',
+                  fontSize: '1rem',
+                  fontWeight: 600,
+                  background: 'var(--primary-color)',
+                  '&:hover': {
+                    background: 'var(--accent-color)'
+                  }
+                }}
+              >
+                {menuData ? 'Chỉnh sửa menu' : 'Tạo menu mới'}
+              </Button>
+            )}
             <Button
               variant='outlined'
               startIcon={<RefreshIcon />}
@@ -952,14 +965,18 @@ const HeaderManagement = () => {
                           <Typography variant='body1' color='text.secondary'>
                             Chưa có menu items nào
                           </Typography>
-                          <Button
-                            variant='outlined'
-                            startIcon={<AddIcon />}
-                            onClick={() => setOpenMenuModal(true)}
-                            sx={{ mt: 2 }}
-                          >
-                            Tạo menu đầu tiên
-                          </Button>
+                          {hasPermission('headerContent:create') && (
+
+                            <Button
+                              variant="outlined"
+                              startIcon={<AddIcon />}
+                              onClick={() => setOpenMenuModal(true)}
+                              sx={{ mt: 2 }}
+                            >
+                              Tạo menu đầu tiên
+                            </Button>
+
+                          )}
                         </TableCell>
                       </TableRow>
                     )
@@ -1002,14 +1019,17 @@ const HeaderManagement = () => {
                         <Typography variant='body1' color='text.secondary'>
                           Chưa có cấu hình menu nào
                         </Typography>
-                        <Button
-                          variant='outlined'
-                          startIcon={<AddIcon />}
-                          onClick={() => setOpenMenuModal(true)}
-                          sx={{ mt: 2 }}
-                        >
-                          Tạo cấu hình menu đầu tiên
-                        </Button>
+                        {hasPermission('headerContent:create') && (
+
+                          <Button
+                            variant="outlined"
+                            startIcon={<AddIcon />}
+                            onClick={() => setOpenMenuModal(true)}
+                            sx={{ mt: 2 }}
+                          >
+                            Tạo cấu hình menu đầu tiên
+                          </Button>
+                        )}
                       </TableCell>
                     </TableRow>
                   )}
@@ -1436,17 +1456,19 @@ const HeaderManagement = () => {
                         <Typography variant='body1' color='text.secondary'>
                           Chưa có danh mục nào
                         </Typography>
-                        <Button
-                          variant='outlined'
-                          startIcon={<AddIcon />}
-                          onClick={() => {
-                            // TODO: Open category editor Chart
-                            console.log('Create new category')
-                          }}
-                          sx={{ mt: 2 }}
-                        >
-                          Tạo danh mục đầu tiên
-                        </Button>
+                        {hasPermission('headerContent:create') && (
+                          <Button
+                            variant="outlined"
+                            startIcon={<AddIcon />}
+                            onClick={() => {
+                              // TODO: Open category editor modal
+                              console.log('Create new category')
+                            }}
+                            sx={{ mt: 2 }}
+                          >
+                            Tạo danh mục đầu tiên
+                          </Button>
+                        )}
                       </TableCell>
                     </TableRow>
                   )}

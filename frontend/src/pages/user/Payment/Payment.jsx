@@ -49,7 +49,7 @@ const SectionTitle = styled(Typography)(({ theme }) => ({
   fontWeight: 700,
   fontSize: '1.4rem',
   marginBottom: theme.spacing(3),
-  color: '#1A3C7B',
+  color: 'var(--primary-color)',
   position: 'relative',
   paddingLeft: theme.spacing(2),
   '&::before': {
@@ -60,7 +60,7 @@ const SectionTitle = styled(Typography)(({ theme }) => ({
     transform: 'translateY(-50%)',
     width: '4px',
     height: '24px',
-    backgroundColor: '#1A3C7B',
+    backgroundColor: 'var(--primary-color)',
     borderRadius: '2px',
   }
 }))
@@ -85,7 +85,7 @@ const AddressCard = styled(Paper)(({ theme }) => ({
   marginBottom: theme.spacing(3),
   transition: 'all 0.3s ease',
   '&:hover': {
-    borderColor: '#1A3C7B',
+    borderColor: 'var(--primary-color)',
     boxShadow: '0 4px 20px rgba(26, 60, 123, 0.1)',
   }
 }))
@@ -93,7 +93,7 @@ const AddressCard = styled(Paper)(({ theme }) => ({
 const PaymentMethodCard = styled(Paper)(({ selected, theme }) => ({
   padding: theme.spacing(2.5),
   borderRadius: '12px',
-  border: `2px solid ${selected ? '#1A3C7B' : '#e0e0e0'}`,
+  border: `2px solid ${selected ? 'var(--primary-color)' : '#e0e0e0'}`,
   marginBottom: theme.spacing(2),
   transition: 'all 0.3s ease',
   background: selected
@@ -101,7 +101,7 @@ const PaymentMethodCard = styled(Paper)(({ selected, theme }) => ({
     : '#ffffff',
   cursor: 'pointer',
   '&:hover': {
-    borderColor: '#1A3C7B',
+    borderColor: 'var(--primary-color)',
     boxShadow: '0 4px 16px rgba(26, 60, 123, 0.1)',
     transform: 'translateY(-1px)',
   }
@@ -110,7 +110,7 @@ const PaymentMethodCard = styled(Paper)(({ selected, theme }) => ({
 const ShippingCard = styled(Paper)(({ theme }) => ({
   padding: theme.spacing(2.5),
   borderRadius: '12px',
-  border: '2px solid #1A3C7B',
+  border: '2px solid var(--primary-color)',
   marginBottom: theme.spacing(2),
   background: 'linear-gradient(135deg, #e8f5e8 0%, #f0f8ff 100%)',
   boxShadow: '0 4px 16px rgba(26, 60, 123, 0.1)',
@@ -195,7 +195,7 @@ const ProductTable = styled('table')(({ theme }) => ({
       padding: theme.spacing(2),
       fontSize: '1rem',
       fontWeight: 600,
-      color: '#1A3C7B',
+      color: 'var(--primary-color)',
       border: 'none',
       '&:first-of-type': {
         borderTopLeftRadius: '8px',
@@ -246,7 +246,7 @@ const PriceRow = styled(Box)(({ theme, isTotal }) => ({
   padding: theme.spacing(1.5, 0),
   fontSize: isTotal ? '1.2rem' : '1rem',
   fontWeight: isTotal ? 700 : 400,
-  color: isTotal ? '#1A3C7B' : '#333',
+  color: isTotal ? 'var(--primary-color)' : '#333',
   borderBottom: isTotal ? 'none' : '1px solid #f0f0f0',
 }))
 
@@ -305,7 +305,7 @@ const ProductItem = ({ name, variant, quantity, image, color, size, getFinalPric
             }}
           />
           <Box>
-            <Typography fontWeight={600} sx={{ mb: 0.5, '&:hover': { color: '#1A3C7B' } }}>
+            <Typography fontWeight={600} sx={{ mb: 0.5, '&:hover': { color: 'var(--primary-color)' } }}>
               {truncatedName}
             </Typography>
             <Box sx={{ display: 'flex', gap: 1, mb: 1 }}>
@@ -332,7 +332,7 @@ const ProductItem = ({ name, variant, quantity, image, color, size, getFinalPric
       </td>
       <td style={{ textAlign: 'right' }}>
         <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 0.5 }}>
-          <Typography fontWeight={600} color="#1A3C7B" sx={{ fontSize: '1rem' }}>
+          <Typography fontWeight={600} color="var(--primary-color)" sx={{ fontSize: '1rem' }}>
             {(finalPrice * quantity).toLocaleString('vi-VN')} ₫
           </Typography>
           {hasDiscount && (
@@ -669,23 +669,41 @@ const Payment = () => {
       return
     }
 
-    const sanitizedCartItems = selectedCartItems.map(item => ({
-      variantId: item.variantId,
-      quantity: item.quantity,
-    }))
+    const sanitizedCartItems = selectedCartItems.map(item => {
+      // Debug log to see the structure
+      console.log('Item structure in sanitization:', item)
+
+      // Ensure variantId is properly extracted
+      const variantId = typeof item.variantId === 'object'
+        ? item.variantId._id || item.variantId.toString()
+        : item.variantId
+
+      console.log('Extracted variantId:', variantId, 'Type:', typeof variantId)
+
+      return {
+        variantId: variantId,
+        quantity: item.quantity,
+      }
+    })
 
     const orderData = {
       cartItems: sanitizedCartItems,
-      shippingAddressId: selectedAddress._id,
+      shippingAddressId: selectedAddress._id || selectedAddress.id,
       total: totalCart,
       paymentMethod,
       note: note.trim() || null,
-      couponCode: voucherApplied ? voucherInput : null,
-      couponId: voucherApplied ? couponId : null,
       shippingFee: shippingPrice || 0,
     }
 
+    // Only add coupon fields if voucher is applied and has valid values
+    if (voucherApplied && voucherInput && voucherInput.trim() !== '' && couponId) {
+      orderData.couponCode = voucherInput.trim().toUpperCase()
+      orderData.couponId = couponId
+    }
+
     console.log('orderData trước khi gửi:', orderData)
+    console.log('orderData.cartItems detail:', JSON.stringify(orderData.cartItems, null, 2))
+    console.log('selectedAddress:', selectedAddress)
 
     try {
       const result = await createOrder(orderData)
@@ -720,7 +738,7 @@ const Payment = () => {
           alignItems: 'center',
           minHeight: '60vh'
         }}>
-          <CircularProgress size={60} sx={{ color: '#1A3C7B' }} />
+          <CircularProgress size={60} sx={{ color: 'var(--primary-color)' }} />
         </Box>
       ) : (
         <Box
@@ -745,7 +763,7 @@ const Payment = () => {
                           variant="h6"
                           sx={{
                             fontWeight: 700,
-                            color: '#1A3C7B',
+                            color: 'var(--primary-color)',
                             mb: 1
                           }}
                         >
@@ -827,14 +845,25 @@ const Payment = () => {
                               {shippingPriceLoading ? (
                                 <CircularProgress size={16} />
                               ) : shippingPrice === 0 ? (
-                                <Chip label="Miễn phí" color="success" size="small" />
+                                <Typography
+                                  component="span"
+                                  sx={{
+                                    color: 'green',
+                                    fontWeight: 600
+                                  }}
+                                >
+                                  Miễn phí
+                                </Typography>
                               ) : (
-                                <Chip
-                                  label={`${shippingPrice.toLocaleString('vi-VN')} ₫`}
-                                  color="primary"
-                                  size="small"
-                                  sx={{ backgroundColor: 'var(--primary-color)' }}
-                                />
+                                <Typography
+                                  component="span"
+                                  sx={{
+                                    color: 'var(--primary-color)',
+                                    fontWeight: 600
+                                  }}
+                                >
+                                  {`${shippingPrice.toLocaleString('vi-VN')} ₫`}
+                                </Typography>
                               )}
                             </Typography>
 
@@ -945,7 +974,7 @@ const Payment = () => {
                     borderRadius: 2,
                     mb: 3
                   }}>
-                    <Typography color="text.secondary" sx={{ fontSize: '1.1rem' }}>
+                    <Typography color="var(--primary-color)" sx={{ fontSize: '1.1rem' }}>
                       Giỏ hàng trống
                     </Typography>
                   </Box>
@@ -1117,7 +1146,7 @@ const Payment = () => {
                 <Box>
                   <PriceRow>
                     <Typography>Tạm tính:</Typography>
-                    <Typography fontWeight={600}>
+                    <Typography color='var(--primary-color)' fontWeight={600}>
                       {subTotal.toLocaleString('vi-VN')}₫
                     </Typography>
                   </PriceRow>
@@ -1153,14 +1182,25 @@ const Payment = () => {
                       {shippingPriceLoading ? (
                         <CircularProgress size={16} />
                       ) : shippingPrice === 0 ? (
-                        'Miễn phí'
+                        <Typography
+                          component="span"
+                          sx={{
+                            color: 'green',
+                            fontWeight: 600
+                          }}
+                        >
+                          Miễn phí
+                        </Typography>
                       ) : (
-                        <Chip
-                          label={`${shippingPrice.toLocaleString('vi-VN')} ₫`}
-                          color="primary"
-                          size="small"
-                          sx={{ backgroundColor: 'var(--primary-color)' }}
-                        />
+                        <Typography
+                          component="span"
+                          sx={{
+                            color: 'var(--primary-color)',
+                            fontWeight: 600
+                          }}
+                        >
+                          {`${shippingPrice.toLocaleString('vi-VN')} ₫`}
+                        </Typography>
                       )}
                     </Typography>
                   </PriceRow>
@@ -1248,7 +1288,7 @@ const Payment = () => {
       >
         <DialogTitle sx={{
           textAlign: 'center',
-          color: '#1A3C7B',
+          color: 'var(--primary-color)',
           fontWeight: 700,
           fontSize: '1.3rem'
         }}>
@@ -1273,7 +1313,7 @@ const Payment = () => {
             sx={{
               borderRadius: 2,
               px: 3,
-              borderColor: '#ccc',
+              borderColor: 'var(--primary-color)',
               color: '#666'
             }}
           >
@@ -1287,7 +1327,7 @@ const Payment = () => {
             sx={{
               borderRadius: 2,
               px: 3,
-              backgroundColor: '#1A3C7B',
+              backgroundColor: 'var(--primary-color)',
               color: 'white'
             }}
           >

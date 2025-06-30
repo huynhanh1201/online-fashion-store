@@ -151,7 +151,7 @@ const ProductInfoSection = ({
           <Box>
             {coupons.slice(0, 3).map((coupon) => (
               <Typography key={coupon.code} variant='body2' sx={{ mb: 0.25 }}>
-                👉 Nhập mã <b>{coupon.code}</b> GIẢM{' '}
+                - Nhập mã <b>{coupon.code}</b> để được giảm{' '}
                 {coupon.type === 'percent'
                   ? `${coupon.amount}%${coupon.maxDiscount ? ` tối đa ${coupon.maxDiscount.toLocaleString('vi-VN')} ₫` : ''}`
                   : `${coupon.amount.toLocaleString('vi-VN')} ₫`}

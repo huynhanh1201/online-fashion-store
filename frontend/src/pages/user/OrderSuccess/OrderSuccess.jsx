@@ -67,9 +67,9 @@ const OrderSuccess = () => {
             variant="contained"
             onClick={handleGoHome}
             sx={{
-              backgroundColor: '#1A3C7B',
+              backgroundColor: 'var(--primary-color)',
               '&:hover': {
-                backgroundColor: '#162f61',
+                backgroundColor: 'var(--accent-color)',
               }
             }}
           >
@@ -78,9 +78,9 @@ const OrderSuccess = () => {
           <Button
             variant="contained"
             sx={{
-              backgroundColor: '#1A3C7B',
+              backgroundColor: 'var(--primary-color)',
               '&:hover': {
-                backgroundColor: '#162f61',
+                backgroundColor: 'var(--accent-color)',
               }
             }}
             onClick={handleGoOrders}
