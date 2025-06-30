@@ -84,7 +84,15 @@ export const getProductById = async (productId) => {
     const response = await AuthorizedAxiosInstance.get(
       `${API_ROOT}/v1/products/${productId}`
     )
-    return response.data
+    
+    const product = response.data || {}
+    
+    // Filter sản phẩm ở client-side: chỉ lấy status = active và destroy = false
+    if (product.status !== 'active' || product.destroy === true) {
+      return null
+    }
+    
+    return product
   } catch (error) {
     console.error(`Lỗi khi lấy thông tin sản phẩm ${productId}:`, error)
     return null

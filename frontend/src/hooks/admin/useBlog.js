@@ -29,7 +29,11 @@ const useBlog = () => {
       }
       const query = buildQuery(filters)
       const response = await getBlogs(query)
-      setBlogs(response.blogs)
+      
+      // Filter out policies (blogs with type='policy')
+      const filteredBlogs = response.blogs.filter(blog => blog.type !== 'policy')
+      
+      setBlogs(filteredBlogs)
       setTotalPages(response.total)
     } catch (error) {
       console.error('Error fetching blogs:', error)
@@ -45,24 +49,28 @@ const useBlog = () => {
         return null
       }
 
-      setBlogs((prev) => {
-        const sort = filters?.sort
-        let updated = [...prev]
+      // Chỉ thêm vào state nếu không phải là policy
+      if (newBlog.type !== 'policy') {
+        setBlogs((prev) => {
+          const sort = filters?.sort
+          let updated = [...prev]
 
-        if (sort === 'newest') {
-          updated = [newBlog, ...prev].slice(0, ROWS_PER_PAGE)
-        } else if (sort === 'oldest') {
-          if (prev.length < ROWS_PER_PAGE) {
-            updated = [...prev, newBlog]
+          if (sort === 'newest') {
+            updated = [newBlog, ...prev].slice(0, ROWS_PER_PAGE)
+          } else if (sort === 'oldest') {
+            if (prev.length < ROWS_PER_PAGE) {
+              updated = [...prev, newBlog]
+            }
+          } else {
+            updated = [newBlog, ...prev].slice(0, ROWS_PER_PAGE)
           }
-        } else {
-          updated = [newBlog, ...prev].slice(0, ROWS_PER_PAGE)
-        }
 
-        return updated
-      })
+          return updated
+        })
 
-      setTotalPages((prev) => prev + 1)
+        setTotalPages((prev) => prev + 1)
+      }
+      
       return newBlog
     } catch (err) {
       console.error('Lỗi khi thêm blog:', err)
@@ -77,7 +85,15 @@ const useBlog = () => {
         console.error('Cập nhật blog thất bại')
         return null
       }
-      setBlogs((prev) => prev.map((b) => (b._id === updated._id ? updated : b)))
+      
+      // Nếu blog được cập nhật thành policy, loại khỏi danh sách
+      if (updated.type === 'policy') {
+        setBlogs((prev) => prev.filter((b) => b._id !== updated._id))
+        setTotalPages((prev) => Math.max(1, prev - 1))
+      } else {
+        setBlogs((prev) => prev.map((b) => (b._id === updated._id ? updated : b)))
+      }
+      
       return updated
     } catch (err) {
       console.error('Lỗi khi cập nhật blog:', err)

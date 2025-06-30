@@ -37,7 +37,7 @@ import {
 } from '@mui/icons-material'
 import ScheduleIcon from '@mui/icons-material/Schedule';
 import { getOrders, getOrderItems } from '~/services/orderService'
-import { getVariantId } from '~/services/admin/Inventory/VariantService'
+import { getVariantById } from '~/services/variantService'
 import { useOrder } from '~/hooks/useOrder'
 import { useNavigate } from 'react-router-dom'
 import { useSelector, useDispatch } from 'react-redux'
@@ -686,7 +686,7 @@ const OrderListPage = () => {
 
         try {
           // Kiểm tra số lượng tồn kho của variant trước
-          const variantInfo = await getVariantId(variantId)
+          const variantInfo = await getVariantById(variantId)
 
           if (!variantInfo) {
             console.warn('Variant not found for ID:', variantId)

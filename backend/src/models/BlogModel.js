@@ -57,6 +57,11 @@ const blogSchema = new Schema(
       default: null,
       trim: true
     },
+    type: {
+      type: String,
+      enum: ['blog', 'policy'],
+      default: 'blog'
+    },
     brand: {
       type: String,
       default: null,
@@ -68,7 +73,7 @@ const blogSchema = new Schema(
     },
     status: {
       type: String,
-      enum: ['draft', 'published', 'archived'],
+      enum: ['draft', 'published', 'archived', 'active'],
       default: 'draft'
     },
     meta: {

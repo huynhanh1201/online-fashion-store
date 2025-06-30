@@ -7,15 +7,20 @@ import { API_ROOT } from '~/utils/constants.js'
 export const getProducts = async (params = {}) => {
   try {
     const { page = 1, limit = 1000, sort = '' } = params
-    const url = `${API_ROOT}/v1/products?page=${page}&limit=${limit}${sort ? `&sort=${sort}` : ''}&status=false`
+    const url = `${API_ROOT}/v1/products?page=${page}&limit=${limit}${sort ? `&sort=${sort}` : ''}`
 
     const response = await AuthorizedAxiosInstance.get(url)
 
     // Xử lý response là mảng trực tiếp hoặc object
-    const products = response.data.data || response.data.products || []
-    const total = response.data.meta?.total || products.length
-    const totalPages = response.data.meta?.totalPages || Math.ceil(total / limit)
+    let products = response.data.data || response.data.products || []
     
+    // Filter sản phẩm ở client-side: chỉ lấy status = active và destroy = false
+    products = products.filter(product => 
+      product.status === 'active' && product.destroy === false
+    )
+    
+    const total = products.length
+    const totalPages = Math.ceil(total / limit)
 
     return {
       products,
@@ -46,12 +51,16 @@ export const getProductsByCategory = async (
     )
 
     // Xử lý response là mảng trực tiếp hoặc object
-    const products = Array.isArray(response.data)
+    let products = Array.isArray(response.data)
       ? response.data
       : response.data.products || response.data || []
-    const total = Array.isArray(response.data)
-      ? response.data.length
-      : response.data.total || response.data.totalCount || 0
+    
+    // Filter sản phẩm ở client-side: chỉ lấy status = active và destroy = false
+    products = products.filter(product => 
+      product.status === 'active' && product.destroy === false
+    )
+    
+    const total = products.length
     return {
       products,
       total
@@ -70,7 +79,15 @@ export const getProductById = async (productId) => {
     const response = await AuthorizedAxiosInstance.get(
       `${API_ROOT}/v1/products/${productId}`
     )
-    return response.data || {}
+    
+    const product = response.data || {}
+    
+    // Filter sản phẩm ở client-side: chỉ lấy status = active và destroy = false
+    if (product.status !== 'active' || product.destroy === true) {
+      return {}
+    }
+    
+    return product
   } catch (error) {
     console.error('Lỗi khi lấy sản phẩm:', error.response?.data || error)
     return {}

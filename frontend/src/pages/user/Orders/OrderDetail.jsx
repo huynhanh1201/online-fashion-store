@@ -19,7 +19,7 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
-  DialogContentText
+  DialogContentText,
 } from '@mui/material'
 import { useParams, useNavigate } from 'react-router-dom'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack'
@@ -29,12 +29,8 @@ import { useOrder } from '~/hooks/useOrder'
 import { useCart } from '~/hooks/useCarts'
 import ReviewModal from './modal/ReviewModal'
 import ViewReviewModal from './modal/ViewReviewModal'
-import {
-  createReview,
-  getUserReviews,
-  getUserReviewForProduct
-} from '~/services/reviewService'
-import { getVariantId } from '~/services/admin/Inventory/VariantService'
+import { createReview, getUserReviews, getUserReviewForProduct } from '~/services/reviewService'
+import { getVariantById } from '~/services/variantService'
 import { useSelector, useDispatch } from 'react-redux'
 import { selectCurrentUser } from '~/redux/user/userSlice'
 import { setReorderVariantIds } from '~/redux/cart/cartSlice'
@@ -46,7 +42,7 @@ const statusLabels = {
   Shipping: ['Đang giao hàng', 'primary'],
   Delivered: ['Đã giao', 'success'],
   Cancelled: ['Đã hủy', 'error'],
-  Failed: ['Thanh toán thất bại', 'error']
+  Failed: ['Thanh toán thất bại', 'error'],
 }
 
 // Review Button Component with fallback check
@@ -87,99 +83,69 @@ const ReviewButtonComponent = ({
 
     if (!isReviewed && !checking && isReviewed !== null) {
       setChecking(true)
-      console.log(
-        'handleReviewClick: Checking with server for orderId and productId...'
-      )
+      console.log('handleReviewClick: Checking with server for orderId and productId...')
 
       // Double-check với server để đảm bảo chính xác theo orderId cụ thể
       const hasReview = await checkProductReview(productIdString)
-      console.log(
-        'handleReviewClick: Server check result for this order:',
-        hasReview
-      )
+      console.log('handleReviewClick: Server check result for this order:', hasReview)
 
       if (hasReview) {
-        // Nếu đã có đánh giá cho đơn hàng này, cập nhật state và hiển thị Chart xem đánh giá
-        console.log(
-          'handleReviewClick: Product already reviewed for this order, updating state'
-        )
+        // Nếu đã có đánh giá cho đơn hàng này, cập nhật state và hiển thị modal xem đánh giá
+        console.log('handleReviewClick: Product already reviewed for this order, updating state')
         setIsReviewed(true)
-        setReviewedProducts((prev) => new Set([...prev, productIdString]))
+        setReviewedProducts(prev => new Set([...prev, productIdString]))
         setOpenViewReviewModal(true)
       } else {
-        // Nếu chưa có đánh giá cho đơn hàng này, mở Chart để đánh giá
-        console.log(
-          'handleReviewClick: Product not reviewed for this order, opening review Chart'
-        )
+        // Nếu chưa có đánh giá cho đơn hàng này, mở modal để đánh giá
+        console.log('handleReviewClick: Product not reviewed for this order, opening review modal')
         setOpenReviewModal(true)
       }
       setChecking(false)
     } else if (isReviewed) {
-      // Nếu đã đánh giá, mở Chart xem đánh giá
-      console.log(
-        'handleReviewClick: Product already reviewed for this order, opening view Chart'
-      )
+      // Nếu đã đánh giá, mở modal xem đánh giá
+      console.log('handleReviewClick: Product already reviewed for this order, opening view modal')
       setOpenViewReviewModal(true)
     }
   }
 
   // Hiển thị loading khi đang fetch hoặc chưa xác định trạng thái
-  if (
-    reviewsLoading ||
-    !isOrderCompleted ||
-    !currentUser ||
-    isReviewed === null
-  ) {
-    return (reviewsLoading || isReviewed === null) &&
-      isOrderCompleted &&
-      currentUser ? (
-      <CircularProgress size={20} />
-    ) : null
+  if (reviewsLoading || !isOrderCompleted || !currentUser || isReviewed === null) {
+    return (reviewsLoading || isReviewed === null) && isOrderCompleted && currentUser ? <CircularProgress size={20} /> : null
   }
 
   return (
     <Button
-      variant={isReviewed ? 'outlined' : 'contained'}
-      size='medium'
+      variant={isReviewed ? "outlined" : "contained"}
+      size="medium"
       disabled={checking || isReviewed === null}
-      sx={
-        isReviewed
-          ? {
-              borderRadius: 2,
-              textTransform: 'none',
-              fontWeight: 600,
-              color: 'success.main',
-              borderColor: 'success.main',
-              '&:hover': {
-                backgroundColor: 'success.50',
-                borderColor: 'success.main'
-              }
-            }
-          : {
-              backgroundColor: '#1A3C7B',
-              color: '#fff',
-              borderRadius: 2,
-              textTransform: 'none',
-              fontWeight: 600,
-              '&:hover': {
-                backgroundColor: '#162f63',
-                boxShadow: '0 4px 12px rgba(26, 60, 123, 0.3)'
-              }
-            }
-      }
+      sx={isReviewed ? {
+        borderRadius: 2,
+        textTransform: 'none',
+        fontWeight: 600,
+        color: 'success.main',
+        borderColor: 'success.main',
+        '&:hover': {
+          backgroundColor: 'success.50',
+          borderColor: 'success.main'
+        }
+      } : {
+        backgroundColor: '#1A3C7B',
+        color: '#fff',
+        borderRadius: 2,
+        textTransform: 'none',
+        fontWeight: 600,
+        '&:hover': {
+          backgroundColor: '#162f63',
+          boxShadow: '0 4px 12px rgba(26, 60, 123, 0.3)'
+        },
+      }}
       onClick={(e) => {
         e.stopPropagation()
         handleReviewClick()
       }}
       startIcon={checking ? <CircularProgress size={16} /> : null}
     >
-      {checking
-        ? 'Kiểm tra...'
-        : isReviewed === null
-          ? 'Đang tải...'
-          : isReviewed
-            ? 'Xem đánh giá'
-            : 'Đánh giá'}
+      {checking ? 'Kiểm tra...' : isReviewed === null ? 'Đang tải...' : isReviewed ? 'Xem đánh giá' : 'Đánh giá'}
     </Button>
   )
 }
@@ -190,7 +156,7 @@ const CancelOrderModal = ({ open, onClose, onConfirm, order, loading }) => {
     <Dialog
       open={open}
       onClose={onClose}
-      maxWidth='sm'
+      maxWidth="sm"
       fullWidth
       PaperProps={{
         sx: {
@@ -200,7 +166,7 @@ const CancelOrderModal = ({ open, onClose, onConfirm, order, loading }) => {
       }}
     >
       <DialogTitle sx={{ pb: 1 }}>
-        <Box display='flex' alignItems='center' gap={2}>
+        <Box display="flex" alignItems="center" gap={2}>
           <Box
             sx={{
               p: 1.5,
@@ -214,10 +180,10 @@ const CancelOrderModal = ({ open, onClose, onConfirm, order, loading }) => {
             <Warning sx={{ color: 'error.main', fontSize: 28 }} />
           </Box>
           <Box>
-            <Typography variant='h6' fontWeight='600' color='text.primary'>
+            <Typography variant="h6" fontWeight="600" color="text.primary">
               Xác nhận hủy đơn hàng
             </Typography>
-            <Typography variant='body2' color='text.secondary'>
+            <Typography variant="body2" color="text.secondary">
               Đơn hàng #{order?.code}
             </Typography>
           </Box>
@@ -229,7 +195,7 @@ const CancelOrderModal = ({ open, onClose, onConfirm, order, loading }) => {
           Bạn có chắc chắn muốn hủy đơn hàng này không?
           <br />
           <Typography
-            component='span'
+            component="span"
             sx={{
               fontWeight: 600,
               color: 'error.main',
@@ -245,7 +211,7 @@ const CancelOrderModal = ({ open, onClose, onConfirm, order, loading }) => {
       <DialogActions sx={{ p: 3, pt: 1 }}>
         <Button
           onClick={onClose}
-          variant='outlined'
+          variant="outlined"
           disabled={loading}
           sx={{
             borderRadius: 2,
@@ -258,8 +224,8 @@ const CancelOrderModal = ({ open, onClose, onConfirm, order, loading }) => {
         </Button>
         <Button
           onClick={onConfirm}
-          variant='contained'
-          color='error'
+          variant="contained"
+          color="error"
           disabled={loading}
           startIcon={loading ? <CircularProgress size={16} /> : <Cancel />}
           sx={{
@@ -289,7 +255,7 @@ const OrderDetail = () => {
   const [snackbarOpen, setSnackbarOpen] = useState(false)
   const [openReviewModal, setOpenReviewModal] = useState(false)
   const [openViewReviewModal, setOpenViewReviewModal] = useState(false)
-  const [reviewedProducts, setReviewedProducts] = useState(new Set()) // Track which products are reviewed
+  const [reviewedProducts, setReviewedProducts] = useState(new Set())     // Track which products are reviewed
   const [selectedProduct, setSelectedProduct] = useState(null)
   const [openCancelModal, setOpenCancelModal] = useState(false)
   const [cancelling, setCancelling] = useState(false)
@@ -300,42 +266,23 @@ const OrderDetail = () => {
   // Kiểm tra chính xác theo orderID để đảm bảo không duplicate review trong cùng 1 đơn hàng
   const checkProductReview = async (productId) => {
     if (!currentUser?._id || !orderId || !productId) {
-      console.log('checkProductReview: Missing required data', {
-        userId: currentUser?._id,
-        orderId,
-        productId
-      })
+      console.log('checkProductReview: Missing required data', { userId: currentUser?._id, orderId, productId })
       return false
     }
 
     try {
-      console.log('checkProductReview: Calling API for', {
-        userId: currentUser._id,
-        productId,
-        orderId
-      })
-      const reviews = await getUserReviewForProduct(
-        currentUser._id,
-        productId,
-        orderId
-      )
+      console.log('checkProductReview: Calling API for', { userId: currentUser._id, productId, orderId })
+      const reviews = await getUserReviewForProduct(currentUser._id, productId, orderId)
 
       // Kiểm tra chính xác orderId trong từng review để đảm bảo chính xác
-      const hasReviewForThisOrder =
-        reviews &&
-        reviews.some((review) => {
-          const reviewOrderId = review.orderId?.toString() || review.orderId
-          // Lấy productId từ object hoặc string
-          const reviewProductId =
-            review.productId?._id || review.productId?.id || review.productId
-          const currentOrderId = orderId?.toString() || orderId
-          const currentProductId = productId?.toString() || productId
-          return (
-            reviewOrderId === currentOrderId &&
-            (reviewProductId?.toString() || reviewProductId) ===
-              currentProductId
-          )
-        })
+      const hasReviewForThisOrder = reviews && reviews.some(review => {
+        const reviewOrderId = review.orderId?.toString() || review.orderId
+        // Lấy productId từ object hoặc string
+        const reviewProductId = review.productId?._id || review.productId?.id || review.productId
+        const currentOrderId = orderId?.toString() || orderId
+        const currentProductId = productId?.toString() || productId
+        return reviewOrderId === currentOrderId && (reviewProductId?.toString() || reviewProductId) === currentProductId
+      })
 
       console.log('checkProductReview: API response', {
         reviews,
@@ -373,17 +320,13 @@ const OrderDetail = () => {
           })
           .map((review) => {
             // Lấy productId từ object hoặc string
-            const productId =
-              review.productId?._id || review.productId?.id || review.productId
+            const productId = review.productId?._id || review.productId?.id || review.productId
             return productId?.toString() || productId
           })
 
         setReviewedProducts(new Set(reviewedProductsInOrder))
 
-        console.log(
-          `Order ${orderId}: Found ${reviewedProductsInOrder.length} reviewed products:`,
-          reviewedProductsInOrder
-        )
+        console.log(`Order ${orderId}: Found ${reviewedProductsInOrder.length} reviewed products:`, reviewedProductsInOrder)
       } catch (err) {
         console.error('Lỗi khi lấy đánh giá người dùng:', err)
         setReviewedProducts(new Set()) // Set empty set on error
@@ -398,29 +341,17 @@ const OrderDetail = () => {
   }, [])
 
   if (loading) return <CircularProgress />
-  if (error)
-    return (
-      <Typography color='error'>
-        Lỗi: {error.message || 'Có lỗi xảy ra'}
-      </Typography>
-    )
+  if (error) return <Typography color="error">Lỗi: {error.message || 'Có lỗi xảy ra'}</Typography>
   if (!order) return <Typography>Không tìm thấy đơn hàng</Typography>
 
-  const [label, color] = statusLabels[order.status] || [
-    'Không xác định',
-    'default'
-  ]
+  const [label, color] = statusLabels[order.status] || ['Không xác định', 'default']
   const totalProductsPrice = items.reduce((sum, item) => {
-    const actualPrice =
-      item.variantId?.discountPrice > 0
-        ? item.price - item.variantId.discountPrice
-        : item.price
+    const actualPrice = item.variantId?.discountPrice > 0
+      ? item.price - item.variantId.discountPrice
+      : item.price
     return sum + actualPrice * item.quantity
   }, 0)
-  const formatPrice = (val) =>
-    typeof val === 'number'
-      ? val.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })
-      : '0 ₫'
+  const formatPrice = (val) => (typeof val === 'number' ? val.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' }) : '0 ₫')
 
   // Helper functions for formatting color and size
   const capitalizeFirstLetter = (str) => {
@@ -444,25 +375,22 @@ const OrderDetail = () => {
         productName: item.productId?.name || 'Không xác định',
         variants: [],
         totalQuantity: 0,
-        totalPrice: 0
+        totalPrice: 0,
       }
     }
 
     groups[productId].variants.push(item)
     groups[productId].totalQuantity += item.quantity
-    const actualPrice =
-      item.variantId?.discountPrice > 0
-        ? item.price - item.variantId.discountPrice
-        : item.price
+    const actualPrice = item.variantId?.discountPrice > 0
+      ? item.price - item.variantId.discountPrice
+      : item.price
     groups[productId].totalPrice += actualPrice * item.quantity
     return groups
   }, {})
 
   const uniqueProducts = Object.values(productGroups)
   const isOrderCompleted = order.status === 'Delivered'
-  const isOrderCancellable =
-    ['Pending', 'Processing'].includes(order.status) &&
-    order.paymentStatus !== 'paid'
+  const isOrderCancellable = ['Pending', 'Processing'].includes(order.status) && order.paymentStatus !== 'paid'
 
   const handleCancelOrder = async () => {
     setCancelling(true)
@@ -491,8 +419,7 @@ const OrderDetail = () => {
 
   const handleSubmitReview = async (reviewData) => {
     try {
-      const productId =
-        selectedProduct?.productId?.toString() || selectedProduct?.productId
+      const productId = selectedProduct?.productId?.toString() || selectedProduct?.productId
 
       // Kiểm tra đầy đủ trước khi gửi đánh giá
       if (!productId || !orderId || !currentUser?._id) {
@@ -504,11 +431,9 @@ const OrderDetail = () => {
       // Double-check với server trước khi gửi đánh giá theo orderId cụ thể
       const hasExistingReview = await checkProductReview(productId)
       if (hasExistingReview) {
-        console.error(
-          `Sản phẩm ${productId} đã được đánh giá trong đơn hàng ${orderId}.`
-        )
-        // Cập nhật state và đóng Chart
-        setReviewedProducts((prev) => new Set([...prev, productId]))
+        console.error(`Sản phẩm ${productId} đã được đánh giá trong đơn hàng ${orderId}.`)
+        // Cập nhật state và đóng modal
+        setReviewedProducts(prev => new Set([...prev, productId]))
         setSnackbarOpen(true)
         handleCloseModal()
         return
@@ -527,11 +452,8 @@ const OrderDetail = () => {
 
       if (result) {
         // Mark this specific product as reviewed ngay lập tức
-        console.log(
-          'handleSubmitReview: Review submitted successfully, updating state for productId:',
-          productId
-        )
-        setReviewedProducts((prev) => {
+        console.log('handleSubmitReview: Review submitted successfully, updating state for productId:', productId)
+        setReviewedProducts(prev => {
           const newSet = new Set([...prev, productId])
           console.log('handleSubmitReview: Updated reviewedProducts:', newSet)
           return newSet
@@ -542,14 +464,11 @@ const OrderDetail = () => {
     } catch (error) {
       console.error('Lỗi gửi đánh giá:', error)
       // Hiển thị lỗi cho user nếu cần
-      if (
-        error?.message?.includes('đã được đánh giá') ||
-        error?.message?.includes('already reviewed')
-      ) {
+      if (error?.message?.includes('đã được đánh giá') || error?.message?.includes('already reviewed')) {
         // Nếu server báo đã được đánh giá, cập nhật state
         const productId = selectedProduct?.productId
         if (productId) {
-          setReviewedProducts((prev) => new Set([...prev, productId]))
+          setReviewedProducts(prev => new Set([...prev, productId]))
         }
       }
       handleCloseModal()
@@ -564,10 +483,7 @@ const OrderDetail = () => {
       // Lặp qua từng sản phẩm trong đơn hàng
       for (let i = 0; i < items.length; i++) {
         const item = items[i]
-        const variantId =
-          typeof item.variantId === 'object'
-            ? item.variantId._id
-            : item.variantId
+        const variantId = typeof item.variantId === 'object' ? item.variantId._id : item.variantId
 
         if (!variantId) {
           console.warn('Variant ID not found for item:', item)
@@ -591,9 +507,7 @@ const OrderDetail = () => {
           // Nếu hết hàng thì gửi quantity = 0 để hiển thị "hết hàng" trong cart
           if (availableQuantity <= 0) {
             quantityToAdd = 0
-            console.log(
-              `Item ${item.productId?.name || item.name} is out of stock, adding with quantity = 0`
-            )
+            console.log(`Item ${item.productId?.name || item.name} is out of stock, adding with quantity = 0`)
             // Thêm vào giỏ hàng với quantity = 0
             await addToCart({
               variantId: variantId,
@@ -603,11 +517,10 @@ const OrderDetail = () => {
           }
 
           // Kiểm tra xem sản phẩm đã có trong giỏ hàng chưa
-          const currentCartItem = cart?.cartItems?.find((cartItem) => {
-            const cartVariantId =
-              typeof cartItem.variantId === 'object'
-                ? cartItem.variantId._id
-                : cartItem.variantId
+          const currentCartItem = cart?.cartItems?.find(cartItem => {
+            const cartVariantId = typeof cartItem.variantId === 'object'
+              ? cartItem.variantId._id
+              : cartItem.variantId
             return cartVariantId === variantId
           })
 
@@ -615,9 +528,7 @@ const OrderDetail = () => {
 
           // Nếu đã có trong giỏ hàng và đạt số lượng tối đa thì BỎ QUA
           if (currentCartItem && currentQuantityInCart >= availableQuantity) {
-            console.log(
-              `Item ${item.productId?.name || item.name} reached max quantity in cart (${currentQuantityInCart}/${availableQuantity}), skipping`
-            )
+            console.log(`Item ${item.productId?.name || item.name} reached max quantity in cart (${currentQuantityInCart}/${availableQuantity}), skipping`)
             continue
           }
           // Nếu đã có trong giỏ hàng nhưng chưa đạt tối đa
@@ -625,15 +536,11 @@ const OrderDetail = () => {
             // Tính toán số lượng có thể thêm
             const canAdd = availableQuantity - currentQuantityInCart
             quantityToAdd = Math.min(1, canAdd) // Chỉ thêm tối đa 1 hoặc số lượng còn lại
-            console.log(
-              `Item ${item.productId?.name || item.name} already in cart (${currentQuantityInCart}), adding ${quantityToAdd} more`
-            )
+            console.log(`Item ${item.productId?.name || item.name} already in cart (${currentQuantityInCart}), adding ${quantityToAdd} more`)
           }
           // Sản phẩm chưa có trong giỏ hàng
           else {
-            console.log(
-              `Adding new item ${item.productId?.name || item.name} to cart`
-            )
+            console.log(`Adding new item ${item.productId?.name || item.name} to cart`)
           }
 
           // Thêm vào giỏ hàng
@@ -647,18 +554,14 @@ const OrderDetail = () => {
 
         // Add small delay between requests to avoid overwhelming the server
         if (i < items.length - 1) {
-          await new Promise((resolve) => setTimeout(resolve, 200))
+          await new Promise(resolve => setTimeout(resolve, 200))
         }
       }
 
       // Lưu danh sách variantId từ reorder vào Redux để cart tự động chọn
       const reorderVariantIds = items
-        .map((item) =>
-          typeof item.variantId === 'object'
-            ? item.variantId._id
-            : item.variantId
-        )
-        .filter((id) => id) // Lọc bỏ các id không hợp lệ
+        .map(item => typeof item.variantId === 'object' ? item.variantId._id : item.variantId)
+        .filter(id => id) // Lọc bỏ các id không hợp lệ
 
       dispatch(setReorderVariantIds(reorderVariantIds))
 
@@ -669,6 +572,7 @@ const OrderDetail = () => {
       setTimeout(() => {
         navigate('/cart')
       }, 300)
+
     } catch (err) {
       console.error('Lỗi khi mua lại:', err)
     } finally {
@@ -682,20 +586,20 @@ const OrderDetail = () => {
   }
 
   return (
-    <Box maxWidth='lg' mx='auto' p={3} sx={{ minHeight: '70vh' }}>
+    <Box maxWidth="lg" mx="auto" p={3} sx={{ minHeight: '70vh' }}>
       <Card
         sx={{
           borderRadius: 3,
           boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
-          border: '1px solid rgba(0,0,0,0.05)'
+          border: '1px solid rgba(0,0,0,0.05)',
         }}
       >
         <CardContent sx={{ p: 3 }}>
           {/* Header - similar to OrderListPage */}
-          <Box display='flex' alignItems='center' mb={3}>
+          <Box display="flex" alignItems="center" mb={3}>
             <IconButton
               onClick={() => navigate(-1)}
-              aria-label='Quay lại'
+              aria-label="Quay lại"
               sx={{
                 mr: 2,
                 backgroundColor: 'grey.100',
@@ -704,10 +608,14 @@ const OrderDetail = () => {
             >
               <ArrowBackIcon />
             </IconButton>
-            <Typography variant='h6' fontWeight='600' sx={{ color: '#1a3c7b' }}>
+            <Typography
+              variant="h6"
+              fontWeight="600"
+              sx={{ color: '#1a3c7b' }}
+            >
               #{order.code}
             </Typography>
-            <Typography variant='body2' color='text.secondary' ml={2}>
+            <Typography variant="body2" color="text.secondary" ml={2}>
               {new Date(order.createdAt).toLocaleDateString('vi-VN')}
             </Typography>
             <Chip
@@ -733,27 +641,21 @@ const OrderDetail = () => {
               mb: 3
             }}
           >
-            <Typography
-              variant='h6'
-              fontWeight='600'
-              color='#1a3c7b'
-              gutterBottom
-            >
+            <Typography variant="h6" fontWeight="600" color="#1a3c7b" gutterBottom>
               Địa Chỉ Nhận Hàng
             </Typography>
             <Stack spacing={1}>
-              <Typography fontWeight='600' fontSize='1.1rem'>
+              <Typography fontWeight="600" fontSize="1.1rem">
                 {order.shippingAddress?.fullName}
               </Typography>
-              <Typography color='text.secondary'>
+              <Typography color="text.secondary">
                 (+84) {order.shippingAddress?.phone}
               </Typography>
-              <Typography color='text.secondary'>
-                {order.shippingAddress?.address}, {order.shippingAddress?.ward},{' '}
-                {order.shippingAddress?.district}, {order.shippingAddress?.city}
+              <Typography color="text.secondary">
+                {order.shippingAddress?.address}, {order.shippingAddress?.ward}, {order.shippingAddress?.district}, {order.shippingAddress?.city}
               </Typography>
               {order.note && (
-                <Typography color='text.secondary' fontStyle='italic'>
+                <Typography color="text.secondary" fontStyle="italic">
                   Ghi chú: {order.note}
                 </Typography>
               )}
@@ -770,8 +672,7 @@ const OrderDetail = () => {
                       sx={{
                         p: 2,
                         borderRadius: 2,
-                        backgroundColor:
-                          variantIndex % 2 === 0 ? 'transparent' : 'grey.50',
+                        backgroundColor: variantIndex % 2 === 0 ? 'transparent' : 'grey.50',
                         border: '1px solid',
                         borderColor: 'grey.200',
                         cursor: 'pointer',
@@ -784,17 +685,10 @@ const OrderDetail = () => {
                       }}
                       onClick={() => handleProductClick(product.productId)}
                     >
-                      <Box
-                        display='flex'
-                        justifyContent='space-between'
-                        alignItems='center'
-                      >
-                        <Box display='flex' alignItems='center' gap={2}>
+                      <Box display="flex" justifyContent="space-between" alignItems="center">
+                        <Box display="flex" alignItems="center" gap={2}>
                           <Avatar
-                            src={
-                              optimizeCloudinaryUrl(variant?.color?.image) ||
-                              '/images/default.jpg'
-                            }
+                            src={optimizeCloudinaryUrl(variant?.color?.image) || '/images/default.jpg'}
                             alt={variant.name}
                             sx={{
                               width: 80,
@@ -803,56 +697,46 @@ const OrderDetail = () => {
                               border: '2px solid white',
                               boxShadow: '0 4px 8px rgba(0,0,0,0.1)'
                             }}
-                            variant='rounded'
+                            variant="rounded"
                           />
                           <Box>
                             <Typography
                               fontWeight={600}
-                              fontSize='1.1rem'
+                              fontSize="1.1rem"
                               sx={{ mb: 0.5 }}
                             >
                               {product.productName}
                             </Typography>
 
                             <Typography
-                              variant='body2'
-                              color='text.secondary'
+                              variant="body2"
+                              color="text.secondary"
                               sx={{ mb: 0.5 }}
                             >
-                              Phân loại hàng:{' '}
-                              {capitalizeFirstLetter(variant.color?.name)},{' '}
-                              {formatSize(variant.size)}
+                              Phân loại hàng: {capitalizeFirstLetter(variant.color?.name)}, {formatSize(variant.size)}
                             </Typography>
                             <Chip
                               label={`Số lượng: ${variant.quantity}`}
-                              size='small'
-                              variant='outlined'
+                              size="small"
+                              variant="outlined"
                               sx={{ fontSize: '0.7rem', height: 20 }}
                             />
                           </Box>
                         </Box>
 
-                        <Box textAlign='right'>
+                        <Box textAlign="right">
                           {variant.variantId?.discountPrice > 0 ? (
-                            <Box
-                              display='flex'
-                              flexDirection='column'
-                              alignItems='flex-end'
-                              gap={0.5}
-                            >
+                            <Box display="flex" flexDirection="column" alignItems="flex-end" gap={0.5}>
                               <Typography
                                 fontWeight={700}
-                                fontSize='1.2rem'
-                                color='#1a3c7b'
+                                fontSize="1.2rem"
+                                color="#1a3c7b"
                               >
-                                {formatPrice(
-                                  variant.price -
-                                    variant.variantId.discountPrice
-                                )}
+                                {formatPrice((variant.price - variant.variantId.discountPrice))}
                               </Typography>
-                              <Box display='flex' alignItems='center' gap={1}>
+                              <Box display="flex" alignItems="center" gap={1}>
                                 <Typography
-                                  variant='body2'
+                                  variant="body2"
                                   sx={{
                                     textDecoration: 'line-through',
                                     color: 'text.secondary',
@@ -866,8 +750,8 @@ const OrderDetail = () => {
                           ) : (
                             <Typography
                               fontWeight={700}
-                              fontSize='1.2rem'
-                              color='#1a3c7b'
+                              fontSize="1.2rem"
+                              color="#1a3c7b"
                             >
                               {formatPrice(variant.price * variant.quantity)}
                             </Typography>
@@ -882,7 +766,7 @@ const OrderDetail = () => {
                 ))}
 
                 {/* Action Buttons */}
-                <Box display='flex' justifyContent='flex-end' gap={2} mt={2}>
+                <Box display="flex" justifyContent="flex-end" gap={2} mt={2}>
                   <ReviewButtonComponent
                     product={product}
                     reviewedProducts={reviewedProducts}
@@ -897,9 +781,7 @@ const OrderDetail = () => {
                   />
                 </Box>
 
-                {index < uniqueProducts.length - 1 && (
-                  <Divider sx={{ my: 3 }} />
-                )}
+                {index < uniqueProducts.length - 1 && <Divider sx={{ my: 3 }} />}
               </Box>
             ))}
           </Stack>
@@ -911,60 +793,45 @@ const OrderDetail = () => {
             sx={{
               p: 2,
               borderRadius: 2,
-              backgroundColor: 'primary.50'
+              backgroundColor: 'primary.50',
             }}
           >
-            <Typography variant='h6' fontWeight='600' mb={2}>
+            <Typography variant="h6" fontWeight="600" mb={2}>
               Tóm tắt đơn hàng
             </Typography>
 
             <Stack spacing={1.5}>
-              <Box display='flex' justifyContent='space-between'>
+              <Box display="flex" justifyContent="space-between">
                 <Typography>Tổng tiền hàng:</Typography>
-                <Typography fontWeight={600}>
-                  {formatPrice(totalProductsPrice)}
-                </Typography>
+                <Typography fontWeight={600}>{formatPrice(totalProductsPrice)}</Typography>
               </Box>
-              <Box display='flex' justifyContent='space-between'>
+              <Box display="flex" justifyContent="space-between">
                 <Typography>Phí vận chuyển:</Typography>
-                <Typography fontWeight={600}>
-                  {formatPrice(order.shippingFee || 0)}
-                </Typography>
+                <Typography fontWeight={600}>{formatPrice(order.shippingFee || 0)}</Typography>
               </Box>
-              <Box display='flex' justifyContent='space-between'>
+              <Box display="flex" justifyContent="space-between">
                 <Typography>Giảm giá:</Typography>
-                <Typography
-                  fontWeight={600}
-                  color={order.couponId ? 'error' : 'inherit'}
-                >
+                <Typography fontWeight={600} color={order.couponId ? 'error' : 'inherit'}>
                   {formatPrice(order.discountAmount || 0)}
                 </Typography>
               </Box>
               <Divider />
-              <Box
-                display='flex'
-                justifyContent='space-between'
-                alignItems='center'
-              >
-                <Typography variant='h6' fontWeight='600'>
+              <Box display="flex" justifyContent="space-between" alignItems="center">
+                <Typography variant="h6" fontWeight="600">
                   Tổng cộng:
                 </Typography>
                 <Typography
-                  variant='h5'
-                  fontWeight='700'
+                  variant="h5"
+                  fontWeight="700"
                   sx={{ color: '#1a3c7b' }}
                 >
                   {formatPrice(order.total)}
                 </Typography>
               </Box>
-              <Box display='flex' justifyContent='space-between' mt={1}>
-                <Typography fontWeight='600'>
-                  Phương thức thanh toán:
-                </Typography>
+              <Box display="flex" justifyContent="space-between" mt={1}>
+                <Typography fontWeight="600">Phương thức thanh toán:</Typography>
                 <Typography fontWeight={600}>
-                  {order.paymentMethod?.toLowerCase() === 'cod'
-                    ? 'Thanh toán khi nhận hàng (COD)'
-                    : 'VNPay'}
+                  {order.paymentMethod?.toLowerCase() === 'cod' ? 'Thanh toán khi nhận hàng (COD)' : 'VNPay'}
                 </Typography>
               </Box>
             </Stack>
@@ -974,32 +841,26 @@ const OrderDetail = () => {
 
       {/* Cancel Order Button */}
       {isOrderCancellable && (
-        <Card
-          sx={{
-            mt: 2,
-            px: 3,
-            borderRadius: 3,
-            boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
-            border: '1px solid rgba(255, 152, 0, 0.2)'
-          }}
-        >
+        <Card sx={{
+          mt: 2,
+          px: 3,
+          borderRadius: 3,
+          boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
+          border: '1px solid rgba(255, 152, 0, 0.2)'
+        }}>
           <CardContent>
-            <Box
-              display='flex'
-              justifyContent='space-between'
-              alignItems='center'
-            >
+            <Box display="flex" justifyContent="space-between" alignItems="center">
               <Box>
-                <Typography variant='h6' fontWeight='600' color='#1a3c7b'>
+                <Typography variant="h6" fontWeight="600" color="#1a3c7b">
                   Hủy đơn hàng
                 </Typography>
-                <Typography variant='body2' color='text.secondary'>
+                <Typography variant="body2" color="text.secondary">
                   Bạn có thể hủy đơn hàng này vì chưa thanh toán
                 </Typography>
               </Box>
               <Button
-                variant='outlined'
-                color='error'
+                variant="outlined"
+                color="error"
                 startIcon={<Cancel />}
                 sx={{
                   borderRadius: 2,
@@ -1016,37 +877,27 @@ const OrderDetail = () => {
       )}
 
       {/* Reorder Button - for completed, failed, or cancelled orders */}
-      {(order?.status === 'Delivered' ||
-        order?.status === 'Failed' ||
-        order?.status === 'Cancelled') && (
-        <Card
-          sx={{
-            mt: 2,
-            px: 3,
-            borderRadius: 3,
-            boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
-            border: '1px solid rgba(26, 60, 123, 0.2)'
-          }}
-        >
+      {(order?.status === 'Delivered' || order?.status === 'Failed' || order?.status === 'Cancelled') && (
+        <Card sx={{
+          mt: 2,
+          px: 3,
+          borderRadius: 3,
+          boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
+          border: '1px solid rgba(26, 60, 123, 0.2)'
+        }}>
           <CardContent>
-            <Box
-              display='flex'
-              justifyContent='space-between'
-              alignItems='center'
-            >
+            <Box display="flex" justifyContent="space-between" alignItems="center">
               <Box>
-                <Typography variant='h6' fontWeight='600' color='#1a3c7b'>
+                <Typography variant="h6" fontWeight="600" color="#1a3c7b">
                   Mua lại đơn hàng
                 </Typography>
-                <Typography variant='body2' color='text.secondary'>
+                <Typography variant="body2" color="text.secondary">
                   Thêm tất cả sản phẩm từ đơn hàng này vào giỏ hàng
                 </Typography>
               </Box>
               <Button
-                variant='contained'
-                startIcon={
-                  reorderLoading ? <CircularProgress size={16} /> : <Replay />
-                }
+                variant="contained"
+                startIcon={reorderLoading ? <CircularProgress size={16} /> : <Replay />}
                 disabled={reorderLoading}
                 onClick={handleReorder}
                 sx={{
@@ -1056,7 +907,7 @@ const OrderDetail = () => {
                   fontWeight: 600,
                   opacity: reorderLoading ? 0.7 : 1,
                   '&:hover': {
-                    backgroundColor: '#162f63'
+                    backgroundColor: '#162f63',
                   }
                 }}
               >
@@ -1076,7 +927,7 @@ const OrderDetail = () => {
       >
         <Alert
           onClose={() => setSnackbarOpen(false)}
-          severity='success'
+          severity="success"
           sx={{
             width: '100%',
             borderRadius: 2,
@@ -1119,4 +970,4 @@ const OrderDetail = () => {
   )
 }
 
-export default OrderDetail
+export default OrderDetail    

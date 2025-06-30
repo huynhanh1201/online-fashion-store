@@ -162,10 +162,6 @@ const AddBanner = ({ open, onClose, onSuccess, initialData, bannerIndex }) => {
       errors.push('Tiêu đề không được để trống')
     }
 
-    if (!form.link?.trim()) {
-      errors.push('Link điều hướng không được để trống')
-    }
-
     // Validate dates if both are provided
     if (form.startDate && form.endDate) {
       if (new Date(form.startDate) > new Date(form.endDate)) {
@@ -409,13 +405,12 @@ const AddBanner = ({ open, onClose, onSuccess, initialData, bannerIndex }) => {
 
             {/* Link */}
             <TextField
-              label='Link điều hướng *'
+              label='Link điều hướng'
               value={form.link}
               onChange={(e) => handleChange('link', e.target.value)}
               fullWidth
-              required
               placeholder="/khuyen-mai/summer"
-              helperText="URL mà người dùng sẽ được chuyển đến khi click vào banner"
+              helperText="URL mà người dùng sẽ được chuyển đến khi click vào banner (không bắt buộc)"
               sx={{
                 '& .MuiOutlinedInput-root': {
                   borderRadius: 2,
@@ -443,6 +438,7 @@ const AddBanner = ({ open, onClose, onSuccess, initialData, bannerIndex }) => {
               <MenuItem value='middle'>Banner giữa trang</MenuItem>
               <MenuItem value='top'>Banner đầu trang</MenuItem>
               <MenuItem value='bottom'>Banner cuối trang</MenuItem>
+              <MenuItem value='login'>Banner đăng nhập và đăng ký</MenuItem>
             </TextField>
 
             {/* Visibility */}

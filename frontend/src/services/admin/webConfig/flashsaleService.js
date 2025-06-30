@@ -270,6 +270,12 @@ export const updateProductInFlashSaleCampaign = async (
   updatedData
 ) => {
   try {
+    console.log('updateProductInFlashSaleCampaign called with:', {
+      campaignId,
+      productId,
+      updatedData
+    })
+
     const currentConfig = await getFlashSaleConfig()
     const currentCampaigns = currentConfig.campaigns || []
 
@@ -277,6 +283,17 @@ export const updateProductInFlashSaleCampaign = async (
     if (campaignIndex === -1) {
       throw new Error('Không tìm thấy campaign Flash Sale')
     }
+
+    const productIndex = currentCampaigns[campaignIndex].products.findIndex(
+      (product) => product.productId === productId
+    )
+    
+    if (productIndex === -1) {
+      throw new Error('Không tìm thấy sản phẩm trong campaign')
+    }
+
+    console.log('Found product at index:', productIndex)
+    console.log('Current product data:', currentCampaigns[campaignIndex].products[productIndex])
 
     const updatedProducts = currentCampaigns[campaignIndex].products.map(
       (product) =>
@@ -286,6 +303,8 @@ export const updateProductInFlashSaleCampaign = async (
     )
 
     currentCampaigns[campaignIndex].products = updatedProducts
+
+    console.log('Updated product data:', updatedProducts.find(p => p.productId === productId))
 
     const payload = {
       key: 'flashSale',
@@ -305,10 +324,14 @@ export const updateProductInFlashSaleCampaign = async (
       (item) => item.key === 'flashSale'
     )
 
+    console.log('Updating flash sale config with ID:', flashSaleConfig._id)
+
     const updateResponse = await AuthorizedAxiosInstance.patch(
       `${API_ROOT}/v1/website-configs/${flashSaleConfig._id}`,
       payload
     )
+
+    console.log('Update response:', updateResponse.data)
 
     return updatedProducts.find((p) => p.productId === productId)
   } catch (error) {

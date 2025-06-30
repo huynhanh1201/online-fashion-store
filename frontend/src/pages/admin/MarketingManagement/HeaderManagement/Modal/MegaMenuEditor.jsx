@@ -687,7 +687,7 @@ const MegaMenuEditor = ({ open, onClose, onSuccess, initialData = null }) => {
         maxWidth='lg'
         fullWidth
         PaperProps={{
-          sx: { borderRadius: 3, height: '90vh' }
+          sx: { borderRadius: 3, height: '85vh' }
         }}
       >
         <DialogTitle sx={{ pb: 1 }}>

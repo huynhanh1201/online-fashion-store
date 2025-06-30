@@ -4,12 +4,13 @@ import ProductCard from '~/components/ProductCards/ProductCards'
 import { getProducts } from '~/services/productService.js'
 import FlashSaleSection from '~/pages/user/Home/FlashSaleSection/FlashSaleSection.jsx'
 import CouponList from '~/pages/user/Home/CouponList/CouponList.jsx'
+import { Box } from '@mui/material';
 import { Link } from 'react-router-dom'
-import ProductsCardNew from '~/pages/user/NewProducts/ProductsCardNew'
 import { getBanners } from '~/services/admin/webConfig/bannerService.js'
 import { getFeaturedCategories } from '~/services/admin/webConfig/featuredcategoryService.js'
 import { getServiceHighlights } from '~/services/admin/webConfig/highlightedService.js'
 import { optimizeCloudinaryUrl } from '~/utils/cloudinary.js'
+import ProductHorizontalScroll from '~/components/ProductCards/ProductHorizontalScroll'
 
 const Content = () => {
   const [products, setProducts] = useState([])
@@ -21,6 +22,51 @@ const Content = () => {
   const [featuredCategoriesLoading, setFeaturedCategoriesLoading] = useState(true)
   const [serviceHighlights, setServiceHighlights] = useState([])
   const [serviceHighlightsLoading, setServiceHighlightsLoading] = useState(true)
+  const [screenSize, setScreenSize] = useState({
+    width: window.innerWidth,
+    height: window.innerHeight
+  })
+
+  // Responsive logic for determining number of products to show
+  const getResponsiveProductCount = () => {
+    const { width } = screenSize
+    
+    // Breakpoints based on CSS media queries
+    if (width <= 480) {
+      // Mobile: 1-2 cards per row, show 4 products (2 rows)
+      return 4
+    } else if (width <= 768) {
+      // Tablet: 2-3 cards per row, show 6 products (2 rows)
+      return 6
+    } else if (width <= 1200) {
+      // Small desktop: 3-4 cards per row, show 8 products (2 rows)
+      return 8
+    } else {
+      // Large desktop: 4+ cards per row, show 12 products (2 rows)
+      return 12
+    }
+  }
+
+  // Handle window resize with debounce
+  useEffect(() => {
+    let timeoutId
+    
+    const handleResize = () => {
+      clearTimeout(timeoutId)
+      timeoutId = setTimeout(() => {
+        setScreenSize({
+          width: window.innerWidth,
+          height: window.innerHeight
+        })
+      }, 100) // Debounce 100ms
+    }
+
+    window.addEventListener('resize', handleResize)
+    return () => {
+      window.removeEventListener('resize', handleResize)
+      clearTimeout(timeoutId)
+    }
+  }, [])
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -133,7 +179,11 @@ const Content = () => {
     ? fallbackCategories 
     : featuredCategories
 
+  // Get responsive product count
+  const responsiveProductCount = getResponsiveProductCount()
+
   return (
+    <>
     <div className='content-container'>
       {/* Features Section - Only show if there's data */}
       {!serviceHighlightsLoading && serviceHighlights.length > 0 && (
@@ -226,8 +276,11 @@ const Content = () => {
           </a>
         ))}
       </div>
-      <CouponList />
-      
+      </div>
+       <Box sx={{width:'100vw'}}>
+          <CouponList/>
+        </Box>
+      <div className='content-container'>
       {/* Middle Banners Section */}
       {!bannerLoading && middleBanners.length > 0 && (
         <div className='middle-banners-section'>
@@ -281,24 +334,21 @@ const Content = () => {
         </div>
       )}
 
-      {/* Stitch Products */}
-      <div className='product-grid'>
-        {[...products.slice(-5)].reverse().map((product) => (
-          <ProductsCardNew key={product._id || product.id} product={product} />
-        ))}
-      </div>
-
-      {products.length > 0 && (
+      {/* Flash Sale Section */}
+      <FlashSaleSection products={products} loading={loading} error={error} />
+    </div>
+    <Box sx={{width:'100vw'}}>
+     
+       <ProductHorizontalScroll products={[...products].slice(-12).reverse()} maxVisible={6} itemWidth={260} />
+       {products.length > 0 && (
         <div style={{ textAlign: 'center', marginBottom: '32px' }}>
           <Link to='/productnews'>
             <button className='cta-button'>Xem tất cả ›</button>
           </Link>
         </div>
       )}
-
-      {/* Flash Sale Section */}
-      <FlashSaleSection products={products} loading={loading} error={error} />
-    </div>
+    </Box>
+    </>
   )
 }
 

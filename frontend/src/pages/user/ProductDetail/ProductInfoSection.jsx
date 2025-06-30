@@ -218,7 +218,10 @@ const ProductInfoSection = ({
                   <VariantImage
                     src={optimizeCloudinaryUrl(color.image) || '/default.jpg'}
                     alt={color.name}
-                    onError={(e) => (e.target.src = '/default.jpg')}
+                    onError={(e) => {
+                      e.target.onerror = null // Ngăn chặn gọi lại onError
+                      e.target.src = '/default.jpg'
+                    }}
                     style={{
                       width: '47px',
                       height: '47px',

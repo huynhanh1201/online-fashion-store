@@ -119,7 +119,7 @@ const ThemeCard = styled(Card)(({ selected, theme }) => ({
 
 const ThemeManagement = () => {
   const { currentTheme, updateTheme, resetTheme } = useTheme()
-  const [selectedPreset, setSelectedPreset] = useState('modernBlue')
+  const [selectedPreset, setSelectedPreset] = useState(null)
   const [previewMode, setPreviewMode] = useState(false)
   const [showAdvanced, setShowAdvanced] = useState(false)
   const [snackbar, setSnackbar] = useState({
@@ -127,6 +127,23 @@ const ThemeManagement = () => {
     message: '',
     severity: 'success'
   })
+
+  // Sync selected preset with current theme on load or when theme changes
+  useEffect(() => {
+    const matchingPresetKey = Object.entries(predefinedThemes).find(
+      ([key, preset]) =>
+        preset.primary === currentTheme.primary &&
+        preset.secondary === currentTheme.secondary &&
+        preset.accent === currentTheme.accent
+    )?.[0]
+
+    if (matchingPresetKey) {
+      setSelectedPreset(matchingPresetKey)
+    } else {
+      setSelectedPreset(null) // It's a custom theme
+    }
+  }, [currentTheme])
+
 
   const handlePresetSelect = (presetKey) => {
     const preset = predefinedThemes[presetKey]
@@ -141,6 +158,7 @@ const ThemeManagement = () => {
 
   const handleColorChange = (colorKey, value) => {
     updateTheme({ [colorKey]: value })
+    setSelectedPreset(null) // Deselect preset on custom change
   }
 
   const handleSaveTheme = () => {
@@ -153,7 +171,7 @@ const ThemeManagement = () => {
 
   const handleResetTheme = () => {
     resetTheme()
-    setSelectedPreset('modernBlue')
+    // handlePresetSelect('modernBlue'); // Let useEffect handle selection
     setSnackbar({
       open: true,
       message: 'Theme đã được reset về mặc định!',

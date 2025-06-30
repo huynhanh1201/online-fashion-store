@@ -187,6 +187,11 @@ export default function AdminDrawer({
             permission: 'user:use',
             label: 'Quản lý nội dung',
             path: '/admin/blog-management'
+          },
+          {
+            permission: 'blog:use',
+            label: 'Chính sách website',
+            path: '/admin/policy-management'
           }
         ]
       },

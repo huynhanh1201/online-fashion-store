@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
 import {
@@ -30,6 +30,8 @@ import { getProfileUser } from '~/services/userService'
 import { logoutUserAPI } from '~/redux/user/userSlice'
 import CheckCircleOutline from '@mui/icons-material/CheckCircleOutline'
 import InfoOutlined from '@mui/icons-material/InfoOutlined'
+import { getUserBanners } from '~/services/bannerService'
+import { optimizeCloudinaryUrl } from '~/utils/cloudinary'
 const SocialButton = styled(Button)({
   padding: '8px',
   borderRadius: '50%',
@@ -55,6 +57,27 @@ function Login() {
   const [searchParams] = useSearchParams()
   const registeredEmail = searchParams.get('rigisteredEmail')
   const verifiedEmail = searchParams.get('verifiedEmail')
+  const [backgroundBanner, setBackgroundBanner] = useState(null)
+  const [loadingBanner, setLoadingBanner] = useState(true)
+
+  // Lấy banner cho background
+  useEffect(() => {
+    const fetchBanner = async () => {
+      try {
+        setLoadingBanner(true)
+        const banners = await getUserBanners()
+        // Tìm banner cho vị trí login
+        const loginBanner = banners.find(banner => banner.position === 'login')
+        setBackgroundBanner(loginBanner)
+      } catch (error) {
+        console.error('Lỗi khi lấy banner:', error)
+      } finally {
+        setLoadingBanner(false)
+      }
+    }
+
+    fetchBanner()
+  }, [])
 
   const submitLogIn = async (data) => {
     try {
@@ -92,8 +115,9 @@ function Login() {
         minHeight: '100vh',
         alignItems: 'center',
         justifyContent: 'center',
-        backgroundImage:
-          'url("https://png.pngtree.com/background/20230426/original/pngtree-an-image-of-a-clothing-store-picture-image_2490513.jpg")',
+        backgroundImage: backgroundBanner?.imageUrl 
+          ? `url("${optimizeCloudinaryUrl(backgroundBanner.imageUrl, { width: 1920, height: 1080 })}")`
+          : 'url("https://png.pngtree.com/background/20230426/original/pngtree-an-image-of-a-clothing-store-picture-image_2490513.jpg")',
         backgroundRepeat: 'no-repeat',
         backgroundSize: 'cover',
         backgroundPosition: 'center',
@@ -101,24 +125,32 @@ function Login() {
         p: 2
       }}
     >
-      {/*<Button*/}
-      {/*  variant='contained'*/}
-      {/*  color='secondary'*/}
-      {/*  onClick={() => navigate('/')}*/}
-      {/*  sx={{*/}
-      {/*    position: 'absolute',*/}
-      {/*    top: 16,*/}
-      {/*    left: 16,*/}
-      {/*    zIndex: 10,*/}
-      {/*    borderRadius: 2,*/}
-      {/*    textTransform: 'none',*/}
-      {/*    fontWeight: 500,*/}
-      {/*    px: 2*/}
-      {/*  }}*/}
-      {/*  startIcon={<ArrowBack />}*/}
-      {/*>*/}
-      {/*  Trang chủ*/}
-      {/*</Button>*/}
+      <Button
+        variant='contained'
+        color='secondary'
+        onClick={() => navigate('/')}
+        sx={{
+          position: 'absolute',
+          top: 16,
+          left: 16,
+          zIndex: 10,
+          borderRadius: 2,
+          textTransform: 'none',
+          fontWeight: 500,
+          px: 2,
+          backgroundColor: 'rgba(255, 255, 255, 0.1)',
+          backdropFilter: 'blur(8px)',
+          border: '1px solid rgba(255, 255, 255, 0.15)',
+          color: 'white',
+          '&:hover': {
+            backgroundColor: 'rgba(255, 255, 255, 0.2)',
+            border: '1px solid rgba(255, 255, 255, 0.3)'
+          }
+        }}
+        startIcon={<ArrowBack />}
+      >
+        Trang chủ
+      </Button>
 
       <form onSubmit={handleSubmit(submitLogIn)}>
         <Zoom in={true} style={{ transitionDelay: '200ms' }}>
