@@ -25,8 +25,6 @@ const createReview = async (reqBody) => {
 
     const reviews = await ReviewModel.create(newReview)
 
-    await updateProductRating(reqBody.productId)
-
     return reviews
   } catch (err) {
     throw err
@@ -43,13 +41,18 @@ const getReviewList = async (queryString) => {
     endDate,
     productId,
     moderationStatus,
-    userId
+    userId,
+    destroy
   } = queryString
 
   validatePagination(page, limit)
 
   // Xử lý thông tin Filter
   const filter = {}
+
+  if (destroy) filter.destroy = destroy
+
+  if (userId) filter.userId = userId
 
   if (productId) filter.productId = productId
 
@@ -126,6 +129,8 @@ const updateReview = async (reviewId, reqBody, jwtDecoded) => {
         { path: 'productId', select: 'name' }
       ])
       .lean()
+
+    await updateProductRating(updatedReview.productId._id)
 
     return updatedReview
   } catch (err) {

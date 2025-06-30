@@ -31,7 +31,8 @@ const getRoleList = async (queryString) => {
     sort,
     filterTypeDate,
     startDate,
-    endDate
+    endDate,
+    destroy
   } = queryString
 
   // Kiểm tra dữ liệu đầu vào của limit và page
@@ -39,6 +40,8 @@ const getRoleList = async (queryString) => {
 
   // Xử lý thông tin Filter
   const filter = {}
+
+  if (destroy) filter.destroy = destroy
 
   if (roleName) {
     filter.name = roleName

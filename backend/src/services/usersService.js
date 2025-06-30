@@ -5,19 +5,84 @@ import ApiError from '~/utils/ApiError'
 import { pickUser } from '~/utils/formatters'
 import { ROLE } from '~/utils/constants'
 import { password } from '~/utils/password'
+import validatePagination from '~/utils/validatePagination'
+import getDateRange from '~/utils/getDateRange'
+import { CategoryModel } from '~/models/CategoryModel'
 
-const getUserList = async () => {
+const getUserList = async (queryString) => {
   // eslint-disable-next-line no-useless-catch
   try {
-    const result = await UserModel.find({}).lean()
-    const userList = []
+    let {
+      page = 1,
+      limit = 10,
+      search,
+      sort,
+      filterTypeDate,
+      startDate,
+      endDate,
+      role,
+      destroy
+    } = queryString
 
-    for (let i = 0; i < result.length; i++) {
-      const user = pickUser(result[i])
-      userList.push(user)
+    // Kiểm tra dữ liệu đầu vào của limit và page
+    validatePagination(page, limit)
+
+    // Xử lý thông tin Filter
+    const filter = {}
+
+    if (role) filter.role = role
+
+    if (destroy) filter.destroy = destroy
+
+    if (search) {
+      filter.name = { $regex: search, $options: 'i' }
     }
 
-    return userList
+    const dateRange = getDateRange(filterTypeDate, startDate, endDate)
+
+    if (dateRange.startDate && dateRange.endDate) {
+      filter['createdAt'] = {
+        $gte: new Date(dateRange.startDate),
+        $lte: new Date(dateRange.endDate)
+      }
+    }
+
+    const sortMap = {
+      name_asc: { name: 1 },
+      name_desc: { name: -1 },
+      newest: { createdAt: -1 },
+      oldest: { createdAt: 1 }
+    }
+
+    let sortField = {}
+
+    if (sort) {
+      sortField = sortMap[sort]
+    }
+
+    const [users, total] = await Promise.all([
+      UserModel.find(filter)
+        .collation({ locale: 'vi', strength: 1 })
+        .sort(sortField)
+        .skip((page - 1) * limit)
+        .limit(limit)
+        .select('-password -verifyToken')
+        .lean(),
+
+      UserModel.countDocuments(filter)
+    ])
+
+    const result = {
+      data: users,
+      meta: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit)
+      }
+    }
+
+    return result
   } catch (err) {
     throw err
   }
