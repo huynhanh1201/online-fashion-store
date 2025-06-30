@@ -25,8 +25,6 @@ const createReview = async (reqBody) => {
 
     const reviews = await ReviewModel.create(newReview)
 
-    await updateProductRating(reqBody.productId)
-
     return reviews
   } catch (err) {
     throw err
@@ -126,6 +124,8 @@ const updateReview = async (reviewId, reqBody, jwtDecoded) => {
         { path: 'productId', select: 'name' }
       ])
       .lean()
+
+    await updateProductRating(updatedReview.productId._id)
 
     return updatedReview
   } catch (err) {
