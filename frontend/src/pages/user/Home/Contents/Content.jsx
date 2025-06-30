@@ -4,6 +4,7 @@ import ProductCard from '~/components/ProductCards/ProductCards'
 import { getProducts } from '~/services/productService.js'
 import FlashSaleSection from '~/pages/user/Home/FlashSaleSection/FlashSaleSection.jsx'
 import CouponList from '~/pages/user/Home/CouponList/CouponList.jsx'
+import { Box } from '@mui/material';
 import { Link } from 'react-router-dom'
 import { getBanners } from '~/services/admin/webConfig/bannerService.js'
 import { getFeaturedCategories } from '~/services/admin/webConfig/featuredcategoryService.js'
@@ -182,6 +183,7 @@ const Content = () => {
   const responsiveProductCount = getResponsiveProductCount()
 
   return (
+    <>
     <div className='content-container'>
       {/* Features Section - Only show if there's data */}
       {!serviceHighlightsLoading && serviceHighlights.length > 0 && (
@@ -274,8 +276,11 @@ const Content = () => {
           </a>
         ))}
       </div>
-      <CouponList />
-      
+      </div>
+       <Box sx={{width:'100vw'}}>
+          <CouponList/>
+        </Box>
+      <div className='content-container'>
       {/* Middle Banners Section */}
       {!bannerLoading && middleBanners.length > 0 && (
         <div className='middle-banners-section'>
@@ -329,20 +334,21 @@ const Content = () => {
         </div>
       )}
 
-      {/* Stitch Products - Horizontal Scroll */}
-      <ProductHorizontalScroll products={[...products].slice(-12).reverse()} maxVisible={6} itemWidth={260} />
-
-      {products.length > 0 && (
+      {/* Flash Sale Section */}
+      <FlashSaleSection products={products} loading={loading} error={error} />
+    </div>
+    <Box sx={{width:'100vw'}}>
+     
+       <ProductHorizontalScroll products={[...products].slice(-12).reverse()} maxVisible={6} itemWidth={260} />
+       {products.length > 0 && (
         <div style={{ textAlign: 'center', marginBottom: '32px' }}>
           <Link to='/productnews'>
             <button className='cta-button'>Xem tất cả ›</button>
           </Link>
         </div>
       )}
-
-      {/* Flash Sale Section */}
-      <FlashSaleSection products={products} loading={loading} error={error} />
-    </div>
+    </Box>
+    </>
   )
 }
 

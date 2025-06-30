@@ -164,7 +164,7 @@ const ProductContent = () => {
   }
 
   return (
-    <div className='container' style={{ maxWidth: '1780px', margin: '0 auto' }}>
+    <div className='container' style={{ maxWidth: '95vw', margin: '0 auto' }}>
       {sections.map((group, idx) => {
         const activeCategory = group.find(c => c._id === sectionActiveIds[idx]) || group[0] || {}
         const hasProducts = sectionProducts[idx] && sectionProducts[idx].length > 0;
