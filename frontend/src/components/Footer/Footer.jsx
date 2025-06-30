@@ -111,6 +111,9 @@ function Footer() {
                 CHÍNH SÁCH WEBSITE
               </Typography>
               <Stack spacing={0.5}>
+                <Typography component='a' href='/policy' sx={{ color: 'inherit', textDecoration: 'none', cursor: 'pointer', '&:hover': { textDecoration: 'underline' } }}>
+                  Chính sách
+                </Typography>
                 {footer.menuColumns.map((col, idx) => (
                   <Typography key={idx} component='a' href={col.link || '#'} sx={{ color: 'inherit', textDecoration: 'none', cursor: 'pointer', '&:hover': { textDecoration: 'underline' } }}>
                     {col.title}

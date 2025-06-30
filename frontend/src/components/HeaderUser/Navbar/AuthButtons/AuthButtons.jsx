@@ -34,9 +34,10 @@ const StyledButtonLogin = styled(Button)(({ theme }) => ({
   color: 'white',
   fontWeight: 500,
   borderRadius: '10px',
-  minWidth: '120px',
+  minWidth: '110px',
   maxWidth: '120px',
-  padding: '8px 16px',
+  marginLeft:'10px',
+  padding: '8px',
   textTransform: 'none',
   transition: 'all 0.3s ease',
   backgroundColor: 'var(--primary-color)',
@@ -111,9 +112,6 @@ const AuthButtons = () => {
     <div style={{ display: 'flex', gap: '8px' }}>
       {!currentUser ? (
         <>
-          <StyledButtonRegister component={Link} to='/register'>
-            Đăng ký
-          </StyledButtonRegister>
           <StyledButtonLogin component={Link} to='/login'>
             Đăng nhập
           </StyledButtonLogin>

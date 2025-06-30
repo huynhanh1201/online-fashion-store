@@ -26,10 +26,11 @@ const blog = async (req, res, next) => {
     tags: Joi.array().items(Joi.string()).default([]),
 
     category: Joi.string().allow(null, '').trim().default(null),
+    type: Joi.string().valid('blog', 'policy').default('blog'),
     brand: Joi.string().allow(null, '').trim().default(null),
 
     status: Joi.string()
-      .valid('draft', 'published', 'archived')
+      .valid('draft', 'published', 'archived', 'active')
       .default('draft'),
 
     meta: Joi.object({

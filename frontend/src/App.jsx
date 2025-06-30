@@ -64,6 +64,7 @@ import FeaturedCategoryManagement from '~/pages/admin/MarketingManagement/Featur
 import ServiceHighlightManagement from '~/pages/admin/MarketingManagement/ServiceHighlightManagement/ServiceHighlightManagement.jsx'
 import FooterManagement from './pages/admin/MarketingManagement/FooterManagement/FooterManagement'
 import ThemeManagement from './pages/admin/MarketingManagement/ThemeManagement/ThemeManagement'
+import PolicyManagement from './pages/admin/MarketingManagement/PolicyManagement/PolicyManagement'
 // Trang 404
 import NotFound from '~/pages/404/NotFound'
 // Hook
@@ -196,6 +197,7 @@ function App() {
           <Route path='footer-management' element={<FooterManagement />} />
           <Route path='blog-management' element={<BlogManagement />} />
           <Route path='role-management' element={<RoleManagement />} />
+          <Route path='policy-management' element={<PolicyManagement />} />
           <Route
             path='permission-management'
             element={<PermissionManagement />}
