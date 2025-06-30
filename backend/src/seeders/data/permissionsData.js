@@ -44,14 +44,17 @@ export const permissions = [
   { key: 'role:delete', label: 'Xóa vai trò', group: 'Vai trò' },
 
 
+  { key: 'policy:use', label: 'Sử dụng trang chính sách', group: 'Chính sách' },
+  { key: 'policy:read', label: 'Xem chính sách', group: 'Chính sách' },
+  { key: 'policy:create', label: 'Tạo chính sách', group: 'Chính sách' },
+  { key: 'policy:update', label: 'Sửa chính sách', group: 'Chính sách' },
+  { key: 'policy:delete', label: 'Xóa chính sách', group: 'Chính sách' },
 
   { key: 'blog:use', label: 'Sử dụng trang bài viết', group: 'Bài viết' },
   { key: 'blog:read', label: 'Xem bài viết', group: 'Bài viết' },
   { key: 'blog:create', label: 'Tạo bài viết', group: 'Bài viết' },
   { key: 'blog:update', label: 'Sửa bài viết', group: 'Bài viết' },
   { key: 'blog:delete', label: 'Xóa bài viết', group: 'Bài viết' },
-
-
 
   { key: 'banner:use', label: 'Sử dụng trang quảng cáo', group: 'Ảnh quảng cáo' },
   { key: 'banner:create', label: 'Tạo quảng cáo', group: 'Ảnh quảng cáo' },

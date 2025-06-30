@@ -117,7 +117,7 @@ export default function AdminDrawer({
         icon: <PersonIcon />,
         children: [
           {
-            permission: 'user:use',
+            permission: 'userStatistics:use',
             label: 'Thống kê tài khoản',
             path: '/admin/account-statistic'
           },
