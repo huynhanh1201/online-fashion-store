@@ -61,7 +61,11 @@ const getBlogList = async (queryString) => {
   // Xử lý thông tin Filter
   const filter = {}
 
-  if (destroy) filter.destroy = destroy
+  if (destroy === 'true' || destroy === 'false') {
+    destroy = JSON.parse(destroy)
+
+    filter.destroy = destroy
+  }
 
   if (status) filter.status = status
 
@@ -156,10 +160,26 @@ const deleteBlog = async (blogId) => {
   }
 }
 
+const restoreBlog = async (blogId) => {
+  // eslint-disable-next-line no-useless-catch
+  try {
+    const blogDeleted = await BlogModel.findOneAndUpdate(
+      { _id: blogId },
+      { destroy: false },
+      { new: true }
+    )
+
+    return blogDeleted
+  } catch (err) {
+    throw err
+  }
+}
+
 export const blogsService = {
   createBlog,
   getBlogList,
   getBlog,
   updateBlog,
-  deleteBlog
+  deleteBlog,
+  restoreBlog
 }

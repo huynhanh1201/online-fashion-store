@@ -3,6 +3,7 @@ import express from 'express'
 import { partnersValidation } from '~/validations/partnersValidation'
 import { partnersController } from '~/controllers/partnersController'
 import { authMiddleware } from '~/middlewares/authMiddleware'
+import { usersController } from '~/controllers/usersController'
 
 const Router = express.Router()
 
@@ -39,6 +40,12 @@ Router.route('/:partnerId').delete(
   authMiddleware.isAuthorized,
   partnersValidation.verifyId,
   partnersController.deletePartner
+)
+
+// Khôi phục đã xóa
+Router.route('/restore/:partnerId').patch(
+  authMiddleware.isAuthorized,
+  partnersController.restorePartner
 )
 
 export const partnersRoute = Router

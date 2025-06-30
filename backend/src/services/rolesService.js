@@ -41,7 +41,11 @@ const getRoleList = async (queryString) => {
   // Xử lý thông tin Filter
   const filter = {}
 
-  if (destroy) filter.destroy = destroy
+  if (destroy === 'true' || destroy === 'false') {
+    destroy = JSON.parse(destroy)
+
+    filter.destroy = destroy
+  }
 
   if (roleName) {
     filter.name = roleName
@@ -144,10 +148,26 @@ const deleteRole = async (roleId) => {
   }
 }
 
+const restoreRole = async (roleId) => {
+  // eslint-disable-next-line no-useless-catch
+  try {
+    const roleDeleted = await RoleModel.findOneAndUpdate(
+      { _id: roleId },
+      { destroy: false },
+      { new: true }
+    )
+
+    return roleDeleted
+  } catch (err) {
+    throw err
+  }
+}
+
 export const rolesService = {
   createRole,
   getRoleList,
   getRole,
   updateRole,
-  deleteRole
+  deleteRole,
+  restoreRole
 }

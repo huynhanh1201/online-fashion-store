@@ -50,4 +50,10 @@ Router.route('/:userId').delete(
   usersController.deleteUser
 )
 
+// Khôi phục đã xóa
+Router.route('/restore/:userId').patch(
+  authMiddleware.isAuthorized,
+  usersController.restoreUser
+)
+
 export const usersRoute = Router

@@ -3,6 +3,7 @@ import express from 'express'
 import { sizesValidation } from '~/validations/sizesValidation'
 import { sizesController } from '~/controllers/sizesController'
 import { authMiddleware } from '~/middlewares/authMiddleware'
+import { usersController } from '~/controllers/usersController'
 
 const Router = express.Router()
 
@@ -36,6 +37,12 @@ Router.route('/:sizeId').delete(
   authMiddleware.isAuthorized,
   sizesValidation.verifyId,
   sizesController.deleteSize
+)
+
+// Khôi phục đã xóa
+Router.route('/restore/:sizeId').patch(
+  authMiddleware.isAuthorized,
+  sizesController.restoreSize
 )
 
 export const sizesRoute = Router

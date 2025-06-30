@@ -3,6 +3,7 @@ import express from 'express'
 import { reviewsValidation } from '~/validations/reviewsValidation'
 import { reviewsController } from '~/controllers/reviewsController'
 import { authMiddleware } from '~/middlewares/authMiddleware'
+import { usersController } from '~/controllers/usersController'
 
 const Router = express.Router()
 
@@ -29,6 +30,12 @@ Router.route('/:reviewId').delete(
   authMiddleware.isAuthorized,
   reviewsValidation.verifyId,
   reviewsController.deleteReview
+)
+
+// Khôi phục đã xóa
+Router.route('/restore/:reviewId').patch(
+  authMiddleware.isAuthorized,
+  reviewsController.restoreReview
 )
 
 export const reviewsRoute = Router

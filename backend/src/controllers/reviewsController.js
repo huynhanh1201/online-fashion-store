@@ -56,9 +56,22 @@ const deleteReview = async (req, res, next) => {
   }
 }
 
+const restoreReview = async (req, res, next) => {
+  try {
+    const reviewId = req.params.reviewId
+
+    const result = await reviewsService.restoreReview(reviewId)
+
+    res.status(StatusCodes.OK).json(result)
+  } catch (err) {
+    next(err)
+  }
+}
+
 export const reviewsController = {
   createReview,
   getReviewList,
   updateReview,
-  deleteReview
+  deleteReview,
+  restoreReview
 }

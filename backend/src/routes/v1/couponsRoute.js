@@ -3,6 +3,7 @@ import express from 'express'
 import { couponsValidation } from '~/validations/couponsValidation'
 import { couponsController } from '~/controllers/couponsController'
 import { authMiddleware } from '~/middlewares/authMiddleware'
+import { usersController } from '~/controllers/usersController'
 
 const Router = express.Router()
 
@@ -42,6 +43,12 @@ Router.route('/:couponId').delete(
   authMiddleware.isAuthorized,
   couponsValidation.verifyId,
   couponsController.deleteCoupon
+)
+
+// Khôi phục đã xóa
+Router.route('/restore/:couponId').patch(
+  authMiddleware.isAuthorized,
+  couponsController.restoreCoupons
 )
 
 export const couponsRoute = Router

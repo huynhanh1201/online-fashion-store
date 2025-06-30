@@ -3,6 +3,7 @@ import express from 'express'
 import { productsValidation } from '~/validations/productsValidation'
 import { productsController } from '~/controllers/productsController'
 import { authMiddleware } from '~/middlewares/authMiddleware'
+import { usersController } from '~/controllers/usersController'
 
 const Router = express.Router()
 
@@ -46,6 +47,12 @@ Router.route('/:productId').delete(
 // Lấy danh sách sản phẩm theo Danh mục
 Router.route('/category/:categoryId').get(
   productsController.getListProductOfCategory
+)
+
+// Khôi phục đã xóa
+Router.route('/restore/:productId').patch(
+  authMiddleware.isAuthorized,
+  productsController.restoreProduct
 )
 
 export const productsRoute = Router
