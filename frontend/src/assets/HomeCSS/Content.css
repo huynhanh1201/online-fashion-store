@@ -117,7 +117,7 @@
 .product-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
-    gap: 10px;
+    gap: 5px;
     min-width: 250px;
     margin-bottom: 32px;
 }
@@ -322,7 +322,7 @@
     
     .features-grid {
         flex-direction: column;
-        gap: 16px;
+        gap: 10px;
     }
     
     .feature-card {
@@ -332,7 +332,7 @@
     
     .product-grid {
         grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-        gap: 12px;
+        gap: 5px;
     }
     
     .stitch-banner {

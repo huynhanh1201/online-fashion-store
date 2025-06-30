@@ -9,6 +9,7 @@ import { getBanners } from '~/services/admin/webConfig/bannerService.js'
 import { getFeaturedCategories } from '~/services/admin/webConfig/featuredcategoryService.js'
 import { getServiceHighlights } from '~/services/admin/webConfig/highlightedService.js'
 import { optimizeCloudinaryUrl } from '~/utils/cloudinary.js'
+import ProductHorizontalScroll from '~/components/ProductCards/ProductHorizontalScroll'
 
 const Content = () => {
   const [products, setProducts] = useState([])
@@ -328,19 +329,8 @@ const Content = () => {
         </div>
       )}
 
-      {/* Stitch Products - Responsive display */}
-      {/* 
-        Responsive logic:
-        - Mobile (≤480px): 4 products (2 rows of 2)
-        - Tablet (≤768px): 6 products (2 rows of 3) 
-        - Small desktop (≤1200px): 8 products (2 rows of 4)
-        - Large desktop (>1200px): 12 products (2 rows of 6)
-      */}
-      <div className='product-grid'>
-        {[...products.slice(-responsiveProductCount)].reverse().map((product) => (
-          <ProductCard key={product._id || product.id} product={product} />
-        ))}
-      </div>
+      {/* Stitch Products - Horizontal Scroll */}
+      <ProductHorizontalScroll products={[...products].slice(-12).reverse()} maxVisible={6} itemWidth={260} />
 
       {products.length > 0 && (
         <div style={{ textAlign: 'center', marginBottom: '32px' }}>

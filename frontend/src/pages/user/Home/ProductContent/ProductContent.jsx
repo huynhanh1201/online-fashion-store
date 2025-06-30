@@ -34,11 +34,6 @@ const ProductContent = () => {
         setErrorCategories(null)
         const response = await getCategories(1, 1000)
         const fetchedCategories = response.categories?.data || []
-        console.log('Fetched categories:', fetchedCategories)
-        
-        if (!Array.isArray(fetchedCategories) || fetchedCategories.length === 0) {
-          throw new Error('Không có danh mục nào được tải')
-        }
         
         // Lọc ra chỉ danh mục con (có parent)
         const childCategories = fetchedCategories.filter(cat => cat.parent !== null)

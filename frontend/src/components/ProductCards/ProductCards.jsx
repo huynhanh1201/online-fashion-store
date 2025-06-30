@@ -156,7 +156,6 @@ const styles = {
     display: 'flex',
     flexDirection: 'column',
     position: 'relative',
-    padding: '5px 5px',
     boxShadow: '0px 0px 4px 2px #dbdbdb80'
   },
   flashSaleCard: {
@@ -168,7 +167,8 @@ const styles = {
     width: '100%',
     height: '400px',
     overflow: 'hidden',
-    border: '8px solid white'
+    border: '4px solid white',
+    borderRadius: '6px'
   },
   productImg: {
     width: '100%',

@@ -16,59 +16,61 @@ const CouponList = ({ onCouponSelect }) => {
   useEffect(() => {
     const fetchCoupons = async () => {
       try {
+        setLoading(true)
         const { discounts } = await getDiscounts()
         const activeCoupons = discounts.filter(coupon => coupon.isActive === true)
         setCoupons(activeCoupons)
-        
-        // Kiểm tra xem có cần hiển thị arrow không
-        setTimeout(() => {
-          checkScrollArrows()
-        }, 100)
       } catch (error) {
         console.error('Failed to fetch coupons:', error)
       } finally {
         setLoading(false)
       }
     }
-
     fetchCoupons()
   }, [])
 
   // Kiểm tra và cập nhật trạng thái hiển thị arrow
   const checkScrollArrows = () => {
-    if (!scrollRef.current) return
-
     const scrollElement = scrollRef.current
-    
-    // Kiểm tra nút left arrow - chỉ hiển thị khi có thể scroll về trái
-    setShowLeftArrow(scrollElement.scrollLeft > 10) // Thêm buffer 10px
-    
-    // Kiểm tra nút right arrow - chỉ hiển thị khi có thể scroll về phải
+    if (!scrollElement) return
+
+    const isScrollable = scrollElement.scrollWidth > scrollElement.clientWidth
+    if (!isScrollable) {
+      setShowLeftArrow(false)
+      setShowRightArrow(false)
+      return
+    }
+
+    setShowLeftArrow(scrollElement.scrollLeft > 10)
     const maxScrollLeft = scrollElement.scrollWidth - scrollElement.clientWidth
-    setShowRightArrow(scrollElement.scrollLeft < maxScrollLeft - 10) // Thêm buffer 10px
+    setShowRightArrow(scrollElement.scrollLeft < maxScrollLeft - 10)
   }
 
-  // Thêm event listener để theo dõi scroll với debounce
+  // Effect để kiểm tra arrow khi coupon được tải hoặc khi resize
   useEffect(() => {
+    // Chờ DOM update sau khi loading xong
+    if (loading) return
+
+    const timer = setTimeout(() => {
+      checkScrollArrows()
+    }, 150)
+
+    const debouncedCheck = () => checkScrollArrows()
+
+    window.addEventListener('resize', debouncedCheck)
     const scrollElement = scrollRef.current
     if (scrollElement) {
-      let timeoutId
-      
-      const debouncedCheck = () => {
-        clearTimeout(timeoutId)
-        timeoutId = setTimeout(checkScrollArrows, 50)
-      }
-      
       scrollElement.addEventListener('scroll', debouncedCheck)
-      window.addEventListener('resize', debouncedCheck)
-      
-      return () => {
+    }
+
+    return () => {
+      clearTimeout(timer)
+      window.removeEventListener('resize', debouncedCheck)
+      if (scrollElement) {
         scrollElement.removeEventListener('scroll', debouncedCheck)
-        window.removeEventListener('resize', debouncedCheck)
-        clearTimeout(timeoutId)
       }
     }
-  }, [])
+  }, [coupons, loading]) // Chạy lại khi coupon được tải
 
   const formatCurrencyShort = (value) => {
     if (value >= 1_000_000) return `${Math.floor(value / 1_000_000)}Tr`
@@ -88,12 +90,10 @@ const CouponList = ({ onCouponSelect }) => {
 
   const scrollLeft = () => {
     scrollRef.current?.scrollBy({ left: -360, behavior: 'smooth' })
-    setTimeout(checkScrollArrows, 350) // Kiểm tra sau khi scroll hoàn thành
   }
 
   const scrollRight = () => {
     scrollRef.current?.scrollBy({ left: 360, behavior: 'smooth' })
-    setTimeout(checkScrollArrows, 350) // Kiểm tra sau khi scroll hoàn thành
   }
 
   if (loading) {
@@ -210,8 +210,16 @@ const CouponList = ({ onCouponSelect }) => {
           overflow-x: auto;
           scroll-behavior: smooth;
           gap: 16px;
-          padding: 10px 0;
+          padding: 10px 16px;
           flex: 1;
+          /* Hide scrollbar */
+          scrollbar-width: none; /* Firefox */
+          -ms-overflow-style: none; /* IE and Edge */
+        }
+
+        /* Hide scrollbar for Webkit browsers */
+        .coupon-grid-scroll::-webkit-scrollbar {
+          display: none;
         }
 
         .coupon-card {
@@ -354,9 +362,10 @@ const CouponList = ({ onCouponSelect }) => {
         }
         .scroll-btn:disabled,
         .scroll-btn.disabled {
-          opacity: 0.4;
+          opacity: 0;
           cursor: default;
           pointer-events: none;
+          transition: opacity 0.3s;
         }
         .scroll-btn:hover:not(:disabled) {
           background: rgba(255,255,255,0.95);
@@ -395,21 +404,7 @@ const CouponList = ({ onCouponSelect }) => {
             transform: translateX(-50%) translateY(0);
           }
         }
-        /* Custom scrollbar for coupon grid */
-        .coupon-grid-scroll::-webkit-scrollbar {
-          height: 6px;
-        }
-        .coupon-grid-scroll::-webkit-scrollbar-track {
-          background: #f1f5f9;
-          border-radius: 3px;
-        }
-        .coupon-grid-scroll::-webkit-scrollbar-thumb {
-          background: linear-gradient(135deg, var(--primary-color) 0%, var(--accent-color) 100%);
-          border-radius: 3px;
-        }
-        .coupon-grid-scroll::-webkit-scrollbar-thumb:hover {
-          background: linear-gradient(135deg, var(--accent-color) 0%, var(--primary-color) 100%);
-        }
+        
         @media (max-width: 600px) {
           .coupon-card {
             width: 340px;
