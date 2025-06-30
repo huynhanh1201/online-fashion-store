@@ -20,7 +20,9 @@ Router.route('/').post(
 Router.route('/').get(categoriesController.getCategoryList)
 
 // Lấy danh sách danh mục có sản phẩm
-Router.route('/with-products').get(categoriesController.getCategoriesWithProducts)
+Router.route('/with-products').get(
+  categoriesController.getCategoriesWithProducts
+)
 
 // Lấy thông tin một Danh mục sản phẩm theo slug
 Router.route('/slug/:slug').get(categoriesController.getCategoryBySlug)
@@ -47,6 +49,12 @@ Router.route('/:categoryId').delete(
   authMiddleware.isAuthorized,
   categoriesValidation.verifyId,
   categoriesController.deleteCategory
+)
+
+// Khôi phục đã xóa
+Router.route('/restore/:categoryId').patch(
+  authMiddleware.isAuthorized,
+  categoriesController.restoreCategory
 )
 
 export const categoriesRoute = Router

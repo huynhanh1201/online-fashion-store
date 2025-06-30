@@ -38,4 +38,10 @@ Router.route('/:roleId').delete(
   rolesController.deleteRole
 )
 
+// Khôi phục đã xóa
+Router.route('/restore/:roleId').patch(
+  authMiddleware.isAuthorized,
+  rolesController.restoreRole
+)
+
 export const rolesRoute = Router

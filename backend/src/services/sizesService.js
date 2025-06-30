@@ -37,7 +37,11 @@ const getSizeList = async (queryString) => {
   // Xử lý thông tin Filter
   const filter = {}
 
-  if (destroy) filter.destroy = destroy
+  if (destroy === 'true' || destroy === 'false') {
+    destroy = JSON.parse(destroy)
+
+    filter.destroy = destroy
+  }
 
   if (status === 'true' || status === 'false') {
     status = JSON.parse(status)
@@ -136,10 +140,26 @@ const deleteSize = async (sizeId) => {
   }
 }
 
+const restoreSize = async (sizeId) => {
+  // eslint-disable-next-line no-useless-catch
+  try {
+    const sizeDeleted = await SizeModel.updateOne(
+      { _id: sizeId },
+      { destroy: false },
+      { new: true }
+    )
+
+    return sizeDeleted
+  } catch (err) {
+    throw err
+  }
+}
+
 export const sizesService = {
   createSize,
   getSizeList,
   getSize,
   updateSize,
-  deleteSize
+  deleteSize,
+  restoreSize
 }

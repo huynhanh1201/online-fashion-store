@@ -88,6 +88,18 @@ const updatePasswordProfile = async (req, res, next) => {
   }
 }
 
+const restoreUser = async (req, res, next) => {
+  try {
+    const userId = req.params.userId
+
+    const result = await usersService.restoreUser(userId)
+
+    res.status(StatusCodes.OK).json(result)
+  } catch (err) {
+    next(err)
+  }
+}
+
 export const usersController = {
   getUserList,
   getUser,
@@ -95,5 +107,6 @@ export const usersController = {
   deleteUser,
   getProfile,
   updateProfile,
-  updatePasswordProfile
+  updatePasswordProfile,
+  restoreUser
 }

@@ -49,7 +49,11 @@ const getCouponList = async (queryString) => {
     // Xử lý thông tin Filter
     const filter = {}
 
-    if (destroy) filter.destroy = destroy
+    if (destroy === 'true' || destroy === 'false') {
+      destroy = JSON.parse(destroy)
+
+      filter.destroy = destroy
+    }
 
     if (type) filter.type = type.toLowerCase()
 
@@ -165,6 +169,30 @@ const deleteCoupon = async (couponId) => {
   }
 }
 
+const restoreCoupons = async (couponId) => {
+  // eslint-disable-next-line no-useless-catch
+  try {
+    const couponDeleted = await CouponModel.updateOne(
+      { _id: couponId },
+      {
+        destroy: false
+      },
+      {
+        new: true,
+        runValidators: true
+      }
+    )
+
+    if (!couponDeleted) {
+      throw new ApiError(StatusCodes.NOT_FOUND, 'Mã giảm giá không tồn tại.')
+    }
+
+    return couponDeleted
+  } catch (err) {
+    throw err
+  }
+}
+
 const validateCoupon = async (userId, reqBody) => {
   // eslint-disable-next-line no-useless-catch
   try {
@@ -213,5 +241,6 @@ export const couponsService = {
   getCouponList,
   getCoupon,
   updateCoupon,
-  deleteCoupon
+  deleteCoupon,
+  restoreCoupons
 }

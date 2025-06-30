@@ -63,10 +63,23 @@ const deletePartner = async (req, res, next) => {
   }
 }
 
+const restorePartner = async (req, res, next) => {
+  try {
+    const partnerId = req.params.partnerId
+
+    const result = await partnersService.restorePartner(partnerId)
+
+    res.status(StatusCodes.OK).json(result)
+  } catch (err) {
+    next(err)
+  }
+}
+
 export const partnersController = {
   createPartner,
   getPartnerList,
   getPartner,
   updatePartner,
-  deletePartner
+  deletePartner,
+  restorePartner
 }

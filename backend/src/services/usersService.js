@@ -32,7 +32,11 @@ const getUserList = async (queryString) => {
 
     if (role) filter.role = role
 
-    if (destroy) filter.destroy = destroy
+    if (destroy === 'true' || destroy === 'false') {
+      destroy = JSON.parse(destroy)
+
+      filter.destroy = destroy
+    }
 
     if (search) {
       filter.name = { $regex: search, $options: 'i' }
@@ -211,6 +215,26 @@ const updatePasswordProfile = async (userId, reqBody) => {
   }
 }
 
+const restoreUser = async (userId) => {
+  // eslint-disable-next-line no-useless-catch
+  try {
+    const user = await UserModel.updateOne(
+      { _id: userId },
+      {
+        destroy: false
+      }
+    )
+
+    if (!user) {
+      throw new ApiError(StatusCodes.NOT_FOUND, 'Tài khoản không tồn tại.')
+    }
+
+    return user
+  } catch (err) {
+    throw err
+  }
+}
+
 export const usersService = {
   getUserList,
   getUser,
@@ -218,5 +242,6 @@ export const usersService = {
   deleteUser,
   getProfile,
   updateProfile,
-  updatePasswordProfile
+  updatePasswordProfile,
+  restoreUser
 }
