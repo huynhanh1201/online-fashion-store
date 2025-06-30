@@ -27,7 +27,8 @@ const getColorList = async (queryString) => {
     sort,
     filterTypeDate,
     startDate,
-    endDate
+    endDate,
+    destroy
   } = queryString
 
   // Kiểm tra dữ liệu đầu vào của limit và page
@@ -35,6 +36,8 @@ const getColorList = async (queryString) => {
 
   // Xử lý thông tin Filter
   const filter = {}
+
+  if (destroy) filter.destroy = destroy
 
   if (status === 'true' || status === 'false') {
     status = JSON.parse(status)
