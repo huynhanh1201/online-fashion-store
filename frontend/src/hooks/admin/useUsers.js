@@ -110,9 +110,8 @@ export default function useUsers() {
         console.error('Khôi phục người dùng thất bại')
         return null
       }
-      setUsers((prev) =>
-        prev.map((u) => (u._id === id ? { ...u, destroy: false } : u))
-      )
+      setUsers((prev) => prev.filter((u) => u._id !== id))
+      setTotalPages((prev) => Math.max(1, prev - 1))
       return true
     } catch (err) {
       console.error('Lỗi khi khôi phục người dùng:', err)

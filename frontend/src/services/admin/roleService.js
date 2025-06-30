@@ -67,3 +67,15 @@ export const deleteRole = async (roleId) => {
     return null
   }
 }
+
+export const restoreRole = async (roleId) => {
+  try {
+    const response = await AuthorizedAxiosInstance.patch(
+      `${API_ROOT}/v1/roles/restore/${roleId}`
+    )
+    return response.data
+  } catch (error) {
+    console.error('Lỗi khi khôi phục vai trò:', error)
+    return null
+  }
+}

@@ -166,14 +166,14 @@ const VariantsTab = () => {
     { id: 'color', label: 'Màu sắc', minWidth: 150 },
     { id: 'size.name', label: 'Kích thước', minWidth: 150 },
     { id: 'quantity', label: 'Số lượng', minWidth: 100, align: 'right' },
-    {
-      id: 'importPrice',
-      label: 'Giá nhập',
-      minWidth: 150,
-      maxWidth: 150,
-      align: 'right',
-      format: (value) => `${value.toLocaleString('vi-VN')}đ`
-    },
+    // {
+    //   id: 'importPrice',
+    //   label: 'Giá nhập',
+    //   minWidth: 150,
+    //   maxWidth: 150,
+    //   align: 'right',
+    //   format: (value) => `${value.toLocaleString('vi-VN')}đ`
+    // },
     {
       id: 'exportPrice',
       label: 'Giá bán',
@@ -197,13 +197,13 @@ const VariantsTab = () => {
     //   minWidth: 150,
     //   align: 'start'
     // },
-    {
-      id: 'createdAt',
-      label: 'Ngày tạo',
-      minWidth: 150,
-      align: 'start',
-      format: (value) => new Date(value).toLocaleDateString('vi-VN')
-    },
+    // {
+    //   id: 'createdAt',
+    //   label: 'Ngày tạo',
+    //   minWidth: 150,
+    //   align: 'start',
+    //   format: (value) => new Date(value).toLocaleDateString('vi-VN')
+    // },
     { id: 'action', label: 'Hành động', minWidth: 150, align: 'start' }
   ]
 

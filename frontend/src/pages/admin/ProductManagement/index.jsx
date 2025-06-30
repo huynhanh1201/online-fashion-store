@@ -143,6 +143,9 @@ const DeleteProductModal = React.lazy(
 )
 const ViewProductModal = React.lazy(() => import('./modal/ViewProductModal'))
 const ViewDesc = React.lazy(() => import('./modal/ViewDescriptionModal.jsx'))
+const RestoreProductModal = React.lazy(
+  () => import('./modal/RestoreProductModal.jsx')
+)
 import ViewDescriptionModal from '~/pages/admin/ProductManagement/modal/ViewDescriptionModal.jsx'
 import useColorPalettes from '~/hooks/admin/useColorPalettes.js'
 import useSizePalettes from '~/hooks/admin/useSizePalettes.js'
@@ -170,7 +173,8 @@ const ProductManagement = () => {
     deleteProductById,
     createNewProduct,
     ROWS_PER_PAGE,
-    setROWS_PER_PAGE
+    setROWS_PER_PAGE,
+    restore
   } = useProducts()
   React.useEffect(() => {
     if (searchFromUrl) {
@@ -225,6 +229,8 @@ const ProductManagement = () => {
         await updateProductById(id, data)
       } else if (type === 'delete') {
         await deleteProductById(data)
+      } else if (type === 'restore') {
+        await restore(data)
       }
     } catch (error) {
       console.error('Lỗi:', error)
@@ -275,6 +281,7 @@ const ProductManagement = () => {
           canView: hasPermission('product:read')
         }}
         initialSearch={searchFromUrl}
+        filters={filters}
       />
 
       <React.Suspense fallback={<></>}>
@@ -325,6 +332,14 @@ const ProductManagement = () => {
             open
             onClose={handleCloseModal}
             product={selectedProduct}
+          />
+        )}
+        {modalType === 'restore' && selectedProduct && (
+          <RestoreProductModal
+            open
+            onClose={handleCloseModal}
+            product={selectedProduct}
+            onRestore={handleSave}
           />
         )}
       </React.Suspense>

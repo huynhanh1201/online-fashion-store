@@ -12,6 +12,9 @@ const EditCategoryModal = React.lazy(() => import('./modal/EditCategoryModal'))
 const DeleteCategoryModal = React.lazy(
   () => import('./modal/DeleteCategoryModal')
 )
+const RestoreCategoryModal = React.lazy(
+  () => import('./modal/RestoreCategoryModal')
+)
 
 const CategoryManagement = () => {
   const [page, setPage] = React.useState(1)
@@ -38,7 +41,8 @@ const CategoryManagement = () => {
     update,
     remove,
     setROWS_PER_PAGE,
-    ROWS_PER_PAGE
+    ROWS_PER_PAGE,
+    Restore
   } = useCategories()
   React.useEffect(() => {
     if (searchFromUrl) {
@@ -72,6 +76,8 @@ const CategoryManagement = () => {
         await update(id, data)
       } else if (type === 'delete') {
         await remove(data)
+      } else if (type === 'restore') {
+        await Restore(data)
       }
     } catch (error) {
       console.error('Lỗi:', error)
@@ -112,6 +118,7 @@ const CategoryManagement = () => {
           canView: hasPermission('category:read')
         }}
         initialSearch={searchFromUrl}
+        filters={filters}
       />
 
       <React.Suspense fallback={<></>}>
@@ -151,6 +158,14 @@ const CategoryManagement = () => {
             />
           )}
         </PermissionWrapper>
+        {modalType === 'restore' && selectedCategory && (
+          <RestoreCategoryModal
+            open
+            onClose={handleCloseModal}
+            category={selectedCategory}
+            onRestore={handleSave}
+          />
+        )}
       </React.Suspense>
 
       {/*<CategoryPagination*/}

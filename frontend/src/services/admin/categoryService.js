@@ -78,3 +78,15 @@ export const addCategory = async (data) => {
     return null // Nếu có lỗi, trả về null
   }
 }
+
+export const RestoreCategory = async (categoryId) => {
+  try {
+    const response = await AuthorizedAxiosInstance.patch(
+      `${API_ROOT}/v1/categories/restore/${categoryId}`
+    )
+    return response.data
+  } catch (error) {
+    console.error('Lỗi khi khôi phục danh mục:', error)
+    return null
+  }
+}

@@ -31,7 +31,8 @@ const RoleTable = ({
   total,
   permissions = {},
   onFilter,
-  fetchRoles
+  fetchRoles,
+  filters
 }) => {
   const columns = [
     { id: 'index', label: 'STT', align: 'center', width: 50 },
@@ -148,6 +149,7 @@ const RoleTable = ({
                   columns={columns}
                   handleOpenModal={handleOpenModal}
                   permissions={permissions}
+                  filters={filters}
                 />
               ))
             ) : (

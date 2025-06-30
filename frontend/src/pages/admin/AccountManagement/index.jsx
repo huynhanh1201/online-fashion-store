@@ -17,7 +17,9 @@ const DeleteAccountModal = React.lazy(
   () => import('./modal/DeleteAccountModal.jsx')
 )
 const AddAccountModal = React.lazy(() => import('./modal/AddAccountModal.jsx'))
-
+const RestoreAccountModal = React.lazy(
+  () => import('./modal/RestoreAccountModal.jsx')
+)
 const AccountManagement = () => {
   const { roles, fetchRoles } = useRoles()
   const [page, setPage] = React.useState(1)
@@ -110,6 +112,7 @@ const AccountManagement = () => {
           canView: hasPermission('user:read')
         }}
         roles={roles}
+        filters={filters}
       />
 
       <React.Suspense fallback={<></>}>
@@ -155,6 +158,14 @@ const AccountManagement = () => {
             />
           )}
         </PermissionWrapper>
+        {modalType === 'restore' && selectedUser && (
+          <RestoreAccountModal
+            open
+            onClose={handleCloseModal}
+            user={selectedUser}
+            onRestore={handleSave}
+          />
+        )}
       </React.Suspense>
     </RouteGuard>
   )

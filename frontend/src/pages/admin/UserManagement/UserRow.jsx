@@ -173,7 +173,7 @@ export default function UserRow({
                 {/*    </IconButton>*/}
                 {/*  </Tooltip>*/}
                 {/*)}*/}
-                {filters.destroy === 'true' && (
+                {filters.destroy === 'true' ? (
                   <Tooltip title='Khôi phục'>
                     <IconButton
                       onClick={() => handleOpenModal('restore', user)}
@@ -182,16 +182,17 @@ export default function UserRow({
                       <RestartAltIcon color='success' />
                     </IconButton>
                   </Tooltip>
-                )}
-                {permissions.canDelete && (
-                  <Tooltip title='Xoá'>
-                    <IconButton
-                      onClick={() => handleOpenModal('delete', user)}
-                      size='small'
-                    >
-                      <DeleteForeverIcon color='error' />
-                    </IconButton>
-                  </Tooltip>
+                ) : (
+                  permissions.canDelete && (
+                    <Tooltip title='Xoá'>
+                      <IconButton
+                        onClick={() => handleOpenModal('delete', user)}
+                        size='small'
+                      >
+                        <DeleteForeverIcon color='error' />
+                      </IconButton>
+                    </Tooltip>
+                  )
                 )}
               </Stack>
             </TableCell>

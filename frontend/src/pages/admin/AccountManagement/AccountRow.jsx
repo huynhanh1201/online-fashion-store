@@ -12,6 +12,7 @@ import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye'
 import BorderColorIcon from '@mui/icons-material/BorderColor'
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever'
 import usePermissions from '~/hooks/usePermissions'
+import RestartAltIcon from '@mui/icons-material/RestartAlt'
 
 const formatDateTime = (isoString) => {
   if (!isoString) return 'Không xác định'
@@ -51,7 +52,8 @@ export default function AccountRow({
   columns,
   handleOpenModal,
   permissions = {},
-  roles
+  roles,
+  filters
 }) {
   const { hasPermission } = usePermissions()
 
@@ -163,25 +165,38 @@ export default function AccountRow({
                     </IconButton>
                   </Tooltip>
                 )}
-                {hasPermission('account:update') && (
-                  <Tooltip title='Sửa'>
+                {filters.destroy === 'true' ? (
+                  <Tooltip title='Khôi phục'>
                     <IconButton
-                      onClick={() => handleOpenModal('edit', user)}
+                      onClick={() => handleOpenModal('restore', user)}
                       size='small'
                     >
-                      <BorderColorIcon color='warning' />
+                      <RestartAltIcon color='success' />
                     </IconButton>
                   </Tooltip>
-                )}
-                {hasPermission('account:delete') && (
-                  <Tooltip title='Xoá'>
-                    <IconButton
-                      onClick={() => handleOpenModal('delete', user)}
-                      size='small'
-                    >
-                      <DeleteForeverIcon color='error' />
-                    </IconButton>
-                  </Tooltip>
+                ) : (
+                  <>
+                    {hasPermission('account:update') && (
+                      <Tooltip title='Sửa'>
+                        <IconButton
+                          onClick={() => handleOpenModal('edit', user)}
+                          size='small'
+                        >
+                          <BorderColorIcon color='warning' />
+                        </IconButton>
+                      </Tooltip>
+                    )}
+                    {hasPermission('account:delete') && (
+                      <Tooltip title='Xoá'>
+                        <IconButton
+                          onClick={() => handleOpenModal('delete', user)}
+                          size='small'
+                        >
+                          <DeleteForeverIcon color='error' />
+                        </IconButton>
+                      </Tooltip>
+                    )}
+                  </>
                 )}
               </Stack>
             </TableCell>
