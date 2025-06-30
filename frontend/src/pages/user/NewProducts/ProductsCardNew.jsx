@@ -37,7 +37,7 @@ const ProductsCardNew = ({ product, isFlashSale = false }) => {
     const originalPrice = product?.exportPrice || 0
     const firstVariantDiscount = product?.firstVariantDiscountPrice || 0
     const displayPrice = Math.max(0, originalPrice - firstVariantDiscount)
-    
+
     return {
       price: originalPrice,
       discountPrice: displayPrice,
@@ -49,6 +49,34 @@ const ProductsCardNew = ({ product, isFlashSale = false }) => {
   const truncateProductName = (name) => {
     if (!name) return ''
     return name.length > 17 ? name.substring(0, 20) + '...' : name
+  }
+
+  // Hàm render 5 sao rating
+  const renderStars = (rating) => {
+    const stars = []
+    const fullStars = Math.floor(rating || 0)
+    const hasHalfStar = (rating || 0) % 1 >= 0.5
+
+    for (let i = 1; i <= 5; i++) {
+      if (i <= fullStars) {
+        // Sao đầy
+        stars.push(
+          <span key={i} style={styles.starFilled}>★</span>
+        )
+      } else if (i === fullStars + 1 && hasHalfStar) {
+        // Sao nửa (hiển thị như sao đầy cho đơn giản)
+        stars.push(
+          <span key={i} style={styles.starFilled}>★</span>
+        )
+      } else {
+        // Sao rỗng
+        stars.push(
+          <span key={i} style={styles.starEmpty}>★</span>
+        )
+      }
+    }
+
+    return stars
   }
 
   const priceInfo = calculateDisplayPrice()
@@ -116,8 +144,8 @@ const ProductsCardNew = ({ product, isFlashSale = false }) => {
           </div>
           <div style={styles.productMeta}>
             <div style={styles.rating}>
-              <span style={styles.star}>★</span>
-              <span>{product.rating}</span>
+              {renderStars(product.avgRating)}
+              <span style={styles.ratingText}>({product.avgRating || 0})</span>
             </div>
             <span style={styles.sold}>Đã bán {product.sold || '0'}</span>
           </div>
@@ -239,6 +267,21 @@ const styles = {
   star: {
     color: '#ffd700',
     fontSize: '16px'
+  },
+  starFilled: {
+    color: '#ffd700',
+    fontSize: '14px',
+    marginRight: '1px'
+  },
+  starEmpty: {
+    color: '#ddd',
+    fontSize: '14px',
+    marginRight: '1px'
+  },
+  ratingText: {
+    fontSize: '12px',
+    color: '#666',
+    marginLeft: '4px'
   },
   sold: {
     fontSize: '13px',
