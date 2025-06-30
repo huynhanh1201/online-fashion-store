@@ -108,7 +108,7 @@ export default function AdminDrawer({
         icon: <PollIcon />
       },
       accountManagement: {
-        permissions: ['user:use', 'account:use', 'role:use'],
+        permissions: ['userStatistics:use', 'user:use', 'account:use', 'role:use'],
         label: 'Quản lý tài khoản',
         icon: <PersonIcon />,
         children: [
@@ -118,12 +118,12 @@ export default function AdminDrawer({
             path: '/admin/account-statistic'
           },
           {
-            permission: 'user:use',
+            permission: 'role:use',
             label: 'Tài khoản khách hàng',
             path: '/admin/user-management'
           },
           {
-            permission: 'account:use',
+            permission: 'role:use',
             label: 'Tài khoản hệ thống',
             path: '/admin/account-management'
           },
@@ -190,7 +190,7 @@ export default function AdminDrawer({
             path: '/admin/blog-management'
           },
           {
-            permission: 'blog:use',
+            permission: 'policy:use',
             label: 'Chính sách website',
             path: '/admin/policy-management'
           }

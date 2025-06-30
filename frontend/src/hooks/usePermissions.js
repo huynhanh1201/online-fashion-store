@@ -76,8 +76,14 @@ const usePermissions = () => {
   }, [permissions])
 
   const canAccessAdmin = useCallback(() => {
-    // Fallback: nếu không có quyền admin:access, kiểm tra role
+    // Kiểm tra quyền admin:access từ API trước
     const hasAdminPermission = hasPermission('admin:access')
+
+    // Fallback: nếu không có quyền admin:access từ API, kiểm tra role
+    if (!hasAdminPermission) {
+      const isAdminRole = ['owner', 'technical_admin', 'staff'].includes(currentUser?.role)
+      return isAdminRole
+    }
 
     return hasAdminPermission
   }, [hasPermission, currentUser?.role])

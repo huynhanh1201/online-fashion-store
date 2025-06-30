@@ -174,7 +174,19 @@ export const roles = [
       'service:use',
       'service:create',
       'service:update',
-      'service:delete'
+      'service:delete',
+
+      // Theme
+      'theme:use',
+      'theme:create',
+      'theme:update',
+      'theme:delete',
+
+      // Policy
+      'policy:use',
+      'policy:create',
+      'policy:update',
+      'policy:delete'
     ]
   },
   {

@@ -122,15 +122,13 @@ const CategoryManagement = () => {
       />
 
       <React.Suspense fallback={<></>}>
-        <PermissionWrapper requiredPermissions={['category:create']}>
-          {modalType === 'add' && (
-            <AddCategoryModal
-              open
-              onClose={handleCloseModal}
-              onAdded={handleSave}
-            />
-          )}
-        </PermissionWrapper>
+        {modalType === 'add' && (
+          <AddCategoryModal
+            open
+            onClose={handleCloseModal}
+            onAdded={handleSave}
+          />
+        )}
         {modalType === 'view' && selectedCategory && (
           <ViewCategoryModal
             open
@@ -138,26 +136,22 @@ const CategoryManagement = () => {
             category={selectedCategory}
           />
         )}
-        <PermissionWrapper requiredPermissions={['category:update']}>
-          {modalType === 'edit' && selectedCategory && (
-            <EditCategoryModal
-              open
-              onClose={handleCloseModal}
-              category={selectedCategory}
-              onSave={handleSave}
-            />
-          )}
-        </PermissionWrapper>
-        <PermissionWrapper requiredPermissions={['category:delete']}>
-          {modalType === 'delete' && selectedCategory && (
-            <DeleteCategoryModal
-              open
-              onClose={handleCloseModal}
-              category={selectedCategory}
-              onDelete={handleSave}
-            />
-          )}
-        </PermissionWrapper>
+        {modalType === 'edit' && selectedCategory && (
+          <EditCategoryModal
+            open
+            onClose={handleCloseModal}
+            category={selectedCategory}
+            onSave={handleSave}
+          />
+        )}
+        {modalType === 'delete' && selectedCategory && (
+          <DeleteCategoryModal
+            open
+            onClose={handleCloseModal}
+            category={selectedCategory}
+            onDelete={handleSave}
+          />
+        )}
         {modalType === 'restore' && selectedCategory && (
           <RestoreCategoryModal
             open
