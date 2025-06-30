@@ -8,7 +8,7 @@ export const getUsers = async (filter) => {
     const response = await AuthorizedAxiosInstance.get(
       `${API_ROOT}/v1/users?${queryString}`
     )
-    return { users: response.data, total: response.data.length }
+    return { users: response.data.data, total: response.data.meta.total }
   } catch (error) {
     console.error('Lỗi khi lấy danh sách người dùng:', error)
     return { users: [], total: 0 }

@@ -8,7 +8,7 @@ import {
 import ClearIcon from '@mui/icons-material/Clear'
 import SearchIcon from '@mui/icons-material/Search'
 import Autocomplete from '@mui/material/Autocomplete'
-
+import CustomPopper from '~/components/FilterAdmin/common/CustomPopper'
 export default function SearchWithSuggestions({
   label = 'Tìm kiếm tên',
   options = [],
@@ -32,6 +32,7 @@ export default function SearchWithSuggestions({
           paddingRight: '6px !important'
         }
       }}
+      PopperComponent={CustomPopper}
       freeSolo
       clearOnEscape
       options={options}

@@ -23,7 +23,6 @@ const UserManagement = () => {
 
   const { users, totalPages, fetchUsers, Loading, removeUser, update } =
     useUsers()
-
   const { hasPermission } = usePermissions()
 
   React.useEffect(() => {

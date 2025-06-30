@@ -242,7 +242,6 @@ const BlogModal = ({
         keywords: Array(data.metaTitle || data.title)
       }
     }
-    console.log('Dữ liệu gửi:', data)
     onSave(blogPayload, isEditMode)
     handleClose()
   }

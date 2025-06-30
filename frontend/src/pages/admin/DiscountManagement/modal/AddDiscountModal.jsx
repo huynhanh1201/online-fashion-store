@@ -178,7 +178,7 @@ const AddDiscountModal = ({ open, onClose, onAdded }) => {
 
               <FormControlLabel
                 control={<Checkbox defaultChecked {...register('isActive')} />}
-                label='Kích hoạt'
+                label='Hoạt động'
                 sx={{ mt: 1 }}
               />
             </Box>
