@@ -104,6 +104,12 @@ const getProductList = async (reqQuery) => {
 
     if (destroy) filter.destroy = JSON.parse(destroy)
 
+    if (destroy === 'true' || destroy === 'false') {
+      destroy = JSON.parse(destroy)
+
+      filter.destroy = destroy
+    }
+
     if (status === 'true' || status === 'false') {
       status = JSON.parse(status)
 

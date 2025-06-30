@@ -32,7 +32,11 @@ const getUserList = async (queryString) => {
 
     if (role) filter.role = role
 
-    if (destroy) filter.destroy = destroy
+    if (destroy === 'true' || destroy === 'false') {
+      destroy = JSON.parse(destroy)
+
+      filter.destroy = destroy
+    }
 
     if (search) {
       filter.name = { $regex: search, $options: 'i' }
