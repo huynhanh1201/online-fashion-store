@@ -1,5 +1,6 @@
 import React from 'react'
 import { optimizeCloudinaryUrl } from '~/utils/cloudinary'
+import Sticker from '~/components/Sticker/Sticker'
 
 const Link = ({ to, children, ...props }) => (
   <a href={to} {...props}>
@@ -55,6 +56,16 @@ const ProductCard = ({ product, isFlashSale = false }) => {
           ...(isFlashSale ? styles.flashSaleCard : {})
         }}
       >
+        {/* Sticker component */}
+        <Sticker 
+          product={product}
+          top={10}
+          right={10}
+          fontSize="12px"
+          fontWeight={700}
+          padding="4px 12px 4px 8px"
+        />
+        
         <div style={styles.productImage}>
           {/* Ảnh chính */}
           <img
@@ -82,9 +93,6 @@ const ProductCard = ({ product, isFlashSale = false }) => {
             }}
             loading="lazy"
           />
-          {priceInfo.originalDiscountPrice > 0 && (
-            <div style={styles.discountBadge}>-{Math.round((priceInfo.originalDiscountPrice / priceInfo.price) * 100)}%</div>
-          )}
         </div>
         <div style={styles.productInfo}>
           <h3 style={styles.productName} title={product.name}>
@@ -109,6 +117,7 @@ const ProductCard = ({ product, isFlashSale = false }) => {
                 <span style={styles.originalPrice}>
                   {priceInfo.price.toLocaleString()}₫
                 </span>
+                <span style={styles.discountBadge}>-{Math.round((priceInfo.originalDiscountPrice / priceInfo.price) * 100)}%</span>
               </>
             ) : (
               <span style={styles.currentPrice}>
@@ -147,7 +156,6 @@ const styles = {
     display: 'flex',
     flexDirection: 'column',
     position: 'relative',
-    padding: '5px 5px',
     boxShadow: '0px 0px 4px 2px #dbdbdb80'
   },
   flashSaleCard: {
@@ -159,7 +167,8 @@ const styles = {
     width: '100%',
     height: '400px',
     overflow: 'hidden',
-    border: '8px solid white'
+    border: '4px solid white',
+    borderRadius: '6px'
   },
   productImg: {
     width: '100%',
@@ -168,16 +177,13 @@ const styles = {
     transition: 'transform 0.3s ease'
   },
   discountBadge: {
-    position: 'absolute',
-    top: '10px',
-    right: '10px',
     background: '#ff6b6b',
     color: 'white',
-    padding: '4px 8px',
+    padding: '2px 6px',
     borderRadius: '4px',
     fontSize: '12px',
     fontWeight: 'bold',
-    zIndex: 10
+    marginLeft: '4px'
   },
   overlay: {
     position: 'absolute',

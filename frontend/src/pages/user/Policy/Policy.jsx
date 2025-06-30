@@ -1,12 +1,15 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import {
   Box,
   Typography,
   Tabs,
   Tab,
   Divider,
-  useMediaQuery
+  useMediaQuery,
+  CircularProgress,
+  Alert
 } from '@mui/material'
+import { getAllPolicies } from '~/services/policyService'
 
 const tabLabels = [
   'Chính sách bảo mật',
@@ -15,18 +18,96 @@ const tabLabels = [
   'Chính sách đổi trả và bảo hành'
 ]
 
+const policyTypes = [
+  'privacy_policy',
+  'member_policy', 
+  'shipping_policy',
+  'return_policy'
+]
+
 const PolicyPage = () => {
   const [tab, setTab] = useState(0)
+  const [policies, setPolicies] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
   const isMobile = useMediaQuery('(max-width:900px)')
 
   const handleTabChange = (event, newValue) => setTab(newValue)
+
+  // Load policies khi component mount
+  useEffect(() => {
+    const fetchPolicies = async () => {
+      try {
+        setLoading(true)
+        const policiesData = await getAllPolicies()
+        
+        // Filter policies theo type và chỉ lấy active, non-destroyed
+        const filteredPolicies = policiesData.filter(policy => 
+          policy.destroy === false && 
+          policy.status === 'active' &&
+          policyTypes.includes(policy.category)
+        )
+        
+        setPolicies(filteredPolicies)
+      } catch (error) {
+        console.error('Lỗi khi tải chính sách:', error)
+        setError('Không thể tải thông tin chính sách. Vui lòng thử lại sau.')
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchPolicies()
+  }, [])
+
+  // Tìm policy theo tab hiện tại
+  const getCurrentPolicy = () => {
+    const currentType = policyTypes[tab]
+    return policies.find(policy => policy.category === currentType)
+  }
+
+  const currentPolicy = getCurrentPolicy()
+
+  if (loading) {
+    return (
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          minHeight: '400px',
+          px: { xs: 1, sm: 2, md: 4 },
+          py: { xs: 2, md: 6 }
+        }}
+      >
+        <CircularProgress />
+      </Box>
+    )
+  }
+
+  if (error) {
+    return (
+      <Box
+        sx={{
+          px: { xs: 1, sm: 2, md: 4 },
+          py: { xs: 2, md: 6 },
+          maxWidth: '1200px',
+          mx: 'auto'
+        }}
+      >
+        <Alert severity="error" sx={{ mb: 2 }}>
+          {error}
+        </Alert>
+      </Box>
+    )
+  }
 
   return (
     <Box
       sx={{
         px: { xs: 1, sm: 2, md: 4 },
         py: { xs: 2, md: 6 },
-        maxWidth: '1200px',
+        maxWidth: '1400px',
         mx: 'auto'
       }}
     >
@@ -82,7 +163,7 @@ const PolicyPage = () => {
           </Tabs>
         </Box>
 
-        {/* Main EditContent */}
+        {/* Main Content */}
         <Box
           sx={{
             flex: 1,
@@ -93,7 +174,7 @@ const PolicyPage = () => {
             width: '100%'
           }}
         >
-          {tab === 0 && (
+          {currentPolicy ? (
             <Box sx={{ width: '100%', maxWidth: 700 }}>
               <Typography
                 variant='h4'
@@ -101,110 +182,59 @@ const PolicyPage = () => {
                 gutterBottom
                 align='center'
               >
-                Chính sách bảo mật
+                {currentPolicy.title}
               </Typography>
-              <Typography variant='h6' gutterBottom sx={{ mt: 3 }}>
-                Chính sách bảo mật thông tin cá nhân
-              </Typography>
-              <Typography paragraph>
-                Khi bạn liên hệ mua sắm trên website, chúng tôi thu thập các
-                thông tin như tên, email, địa chỉ, số điện thoại. Mục đích là để
-                hỗ trợ và xác nhận đơn hàng.
-              </Typography>
-              <Typography variant='h6' gutterBottom sx={{ mt: 3 }}>
-                Mục đích thu thập
-              </Typography>
-              <Typography paragraph>
-                Việc thu thập thông tin nhằm mục đích:
-                <ul>
-                  <li>Gửi thông tin chương trình khuyến mãi</li>
-                  <li>Giao hàng, xác nhận đơn hàng</li>
-                  <li>Liên hệ hỗ trợ khi cần thiết</li>
-                </ul>
-              </Typography>
-              <Typography variant='h6' gutterBottom sx={{ mt: 3 }}>
-                Phạm vi sử dụng
-              </Typography>
-              <Typography paragraph>
-                Thông tin thu thập chỉ được sử dụng trong phạm vi nội bộ
-                website, không chia sẻ với bên thứ ba nếu không có sự đồng ý của
-                khách hàng.
-              </Typography>
-              <Typography variant='h6' gutterBottom sx={{ mt: 3 }}>
-                Thời gian lưu trữ
-              </Typography>
-              <Typography paragraph>
-                Dữ liệu cá nhân được lưu trữ cho đến khi khách hàng yêu cầu hủy
-                bỏ.
-              </Typography>
-              <Typography variant='h6' gutterBottom sx={{ mt: 3 }}>
-                Địa chỉ thu thập và quản lý thông tin
-              </Typography>
-              <Typography paragraph>
-                Công ty TNHH ABC
-                <br />
-                123 Nguyễn Văn Linh, Quận 7, TP. HCM
-                <br />
-                Email: support@tenmiencuaban.com
-              </Typography>
-              <Typography variant='h6' gutterBottom sx={{ mt: 3 }}>
-                Bảo mật thông tin
-              </Typography>
-              <Typography paragraph>
-                Thông tin cá nhân của khách hàng được bảo mật tuyệt đối. Mọi
-                giao dịch được mã hóa và bảo vệ qua giao thức SSL.
-              </Typography>
-              <Typography variant='h6' gutterBottom sx={{ mt: 3 }}>
-                Cam kết
-              </Typography>
-              <Typography paragraph>
-                Chúng tôi cam kết sử dụng thông tin đúng mục đích, đúng phạm vi
-                và bảo vệ thông tin một cách tối đa.
-              </Typography>
+              
+              {currentPolicy.excerpt && (
+                <Typography 
+                  variant='h6' 
+                  color="text.secondary"
+                  gutterBottom 
+                  sx={{ mt: 2, textAlign: 'center' }}
+                >
+                  {currentPolicy.excerpt}
+                </Typography>
+              )}
+              
+              <Box 
+                sx={{ 
+                  mt: 4,
+                  '& h1, & h2, & h3, & h4, & h5, & h6': {
+                    fontWeight: 600,
+                    mt: 3,
+                    mb: 1
+                  },
+                  '& p': {
+                    mb: 2,
+                    lineHeight: 1.6
+                  },
+                  '& ul, & ol': {
+                    mb: 2,
+                    pl: 3
+                  },
+                  '& li': {
+                    mb: 1
+                  }
+                }}
+                dangerouslySetInnerHTML={{ __html: currentPolicy.content }}
+              />
             </Box>
-          )}
-          {tab === 1 && (
-            <Box sx={{ width: '100%', maxWidth: 700 }}>
+          ) : (
+            <Box sx={{ width: '100%', maxWidth: 700, textAlign: 'center' }}>
               <Typography
                 variant='h4'
                 fontWeight='bold'
                 gutterBottom
                 align='center'
               >
-                Chính sách member
+                {tabLabels[tab]}
               </Typography>
-              <Typography paragraph sx={{ mt: 3 }}>
-                Nội dung chính sách member sẽ được cập nhật sau.
-              </Typography>
-            </Box>
-          )}
-          {tab === 2 && (
-            <Box sx={{ width: '100%', maxWidth: 700 }}>
-              <Typography
-                variant='h4'
-                fontWeight='bold'
-                gutterBottom
-                align='center'
+              <Typography 
+                variant='h6' 
+                color="text.secondary"
+                sx={{ mt: 3 }}
               >
-                Chính sách giao hàng
-              </Typography>
-              <Typography paragraph sx={{ mt: 3 }}>
-                Nội dung chính sách giao hàng sẽ được cập nhật sau.
-              </Typography>
-            </Box>
-          )}
-          {tab === 3 && (
-            <Box sx={{ width: '100%', maxWidth: 700 }}>
-              <Typography
-                variant='h4'
-                fontWeight='bold'
-                gutterBottom
-                align='center'
-              >
-                Chính sách đổi trả và bảo hành
-              </Typography>
-              <Typography paragraph sx={{ mt: 3 }}>
-                Nội dung chính sách đổi trả và bảo hành sẽ được cập nhật sau.
+                Nội dung chính sách này đang được cập nhật. Vui lòng quay lại sau.
               </Typography>
             </Box>
           )}

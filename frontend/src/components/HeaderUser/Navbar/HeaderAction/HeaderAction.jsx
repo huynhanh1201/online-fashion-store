@@ -44,6 +44,12 @@ const HeaderAction = () => {
     localStorage.getItem('token')
   ) // Theo dõi token
 
+  // Hàm cắt tên user nếu vượt quá 15 ký tự
+  const truncateUserName = (name) => {
+    if (!name) return ''
+    return name.length > 15 ? name.substring(0, 15) + '...' : name
+  }
+
   useEffect(() => {
     const token = localStorage.getItem('token')
 
@@ -195,7 +201,7 @@ const HeaderAction = () => {
                     gap: 0.5
                   }}
                 >
-                  {currentUser.name}
+                  {truncateUserName(currentUser.name)}
                   <CheckCircleIcon
                     sx={{
                       fontSize: '1.1rem',

@@ -430,7 +430,7 @@ const AddFooterModal = ({ open, onClose, onSuccess, footerConfig }) => {
   }
 
   return (
-    <Dialog open={open} onClose={handleClose} maxWidth='lg' fullWidth sx={{ zIndex: 15000, maxHeight: '75vh', mt:15 }}>
+    <Dialog open={open} onClose={handleClose} maxWidth='lg' fullWidth sx={{ zIndex: 15000, maxHeight: '90vh', mt:5 }}>
       <DialogTitle>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
           Thêm nội dung chân trang mới

@@ -71,6 +71,41 @@ const styles = {
   }
 }
 
+const ProductGrid = ({ children }) => {
+  const gridStyles = {
+    display: 'grid',
+    gap: '20px',
+    gridTemplateColumns: 'repeat(4, 1fr)'
+  }
+
+  const mediaStyles = `
+    @media (max-width: 1200px) {
+      .product-grid-dynamic {
+        grid-template-columns: repeat(3, 1fr) !important;
+      }
+    }
+    @media (max-width: 900px) {
+      .product-grid-dynamic {
+        grid-template-columns: repeat(2, 1fr) !important;
+      }
+    }
+    @media (max-width: 600px) {
+      .product-grid-dynamic {
+        grid-template-columns: repeat(1, 1fr) !important;
+      }
+    }
+  `
+
+  return (
+    <>
+      <style>{mediaStyles}</style>
+      <div className='product-grid-dynamic' style={gridStyles}>
+        {children}
+      </div>
+    </>
+  )
+}
+
 const ProductSection = ({
   bannerImg,
   bannerTitle,
@@ -90,7 +125,6 @@ const ProductSection = ({
   return (
     <div style={styles.section}>
       <div
- 
         style={{
           display: 'grid',
           gridTemplateColumns: isMobile ? '1fr' : '290px 1fr',
@@ -147,7 +181,7 @@ const ProductSection = ({
 
         {/* Products */}
         {!loading && !error && products && products.length > 0 ? (
-          <div className="product-grid" style={{marginTop:'30px'}}>
+          <ProductGrid>
             {products.slice(0, 4).map((product) => {
               // Xử lý ảnh sản phẩm
               let productImage =
@@ -167,7 +201,7 @@ const ProductSection = ({
                 </div>
               )
             })}
-          </div>
+          </ProductGrid>
         ) : !loading && !error ? (
           <div style={{ textAlign: 'center', color: '#666', fontSize: '16px' }}>
             <Typography>Không có sản phẩm để hiển thị</Typography>

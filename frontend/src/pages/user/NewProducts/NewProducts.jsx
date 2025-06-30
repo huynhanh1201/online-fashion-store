@@ -19,7 +19,6 @@ import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward'
 import NavigateNextIcon from '@mui/icons-material/NavigateNext'
 import HomeIcon from '@mui/icons-material/Home'
 import { getProducts } from '~/services/productService'
-import ProductsCardNew from './ProductsCardNew'
 
 const ITEMS_PER_PAGE = 15
 
@@ -120,6 +119,15 @@ const NewProducts = () => {
       }
 
       let sortedProducts = [...response.products]
+
+      // Lọc sản phẩm tạo trong 7 ngày gần nhất
+      const now = new Date()
+      const sevenDaysAgo = new Date(now)
+      sevenDaysAgo.setDate(now.getDate() - 7)
+      sortedProducts = sortedProducts.filter(p => {
+        const createdAt = new Date(p.createdAt)
+        return createdAt >= sevenDaysAgo && createdAt <= now
+      })
 
       // Client-side sorting cho giá và ngày tạo
       if (sortOption === 'priceAsc') {
@@ -355,7 +363,7 @@ const NewProducts = () => {
               <div className='product-grid'>
                 {products.map((product) => (
                   <div key={product._id}>
-                    <ProductsCardNew
+                    <ProductCard
                       product={product}
                       handleAddToCart={handleAddToCart}
                       isAdding={!!isAdding[product._id]}

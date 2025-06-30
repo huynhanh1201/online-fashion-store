@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
 import {
@@ -20,6 +20,8 @@ import VisibilityOff from '@mui/icons-material/VisibilityOff'
 
 import { registerUserAPI } from '~/apis'
 import { toast } from 'react-toastify'
+import { getUserBanners } from '~/services/bannerService'
+import { optimizeCloudinaryUrl } from '~/utils/cloudinary'
 
 function Register() {
   const {
@@ -32,10 +34,31 @@ function Register() {
   const navigate = useNavigate()
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+  const [backgroundBanner, setBackgroundBanner] = useState(null)
+  const [loadingBanner, setLoadingBanner] = useState(true)
 
   const toggleShowPassword = () => setShowPassword((prev) => !prev)
   const toggleShowConfirmPassword = () =>
     setShowConfirmPassword((prev) => !prev)
+
+  // Lấy banner cho background
+  useEffect(() => {
+    const fetchBanner = async () => {
+      try {
+        setLoadingBanner(true)
+        const banners = await getUserBanners()
+        // Tìm banner cho vị trí login
+        const loginBanner = banners.find(banner => banner.position === 'login')
+        setBackgroundBanner(loginBanner)
+      } catch (error) {
+        console.error('Lỗi khi lấy banner:', error)
+      } finally {
+        setLoadingBanner(false)
+      }
+    }
+
+    fetchBanner()
+  }, [])
 
   const submitRegister = async (data) => {
     toast
@@ -55,8 +78,9 @@ function Register() {
         minHeight: '100vh',
         alignItems: 'center',
         justifyContent: 'center',
-        backgroundImage:
-          'url("https://png.pngtree.com/background/20230426/original/pngtree-an-image-of-a-clothing-store-picture-image_2490513.jpg")',
+        backgroundImage: backgroundBanner?.imageUrl 
+          ? `url("${optimizeCloudinaryUrl(backgroundBanner.imageUrl, { width: 1920, height: 1080 })}")`
+          : 'url("https://png.pngtree.com/background/20230426/original/pngtree-an-image-of-a-clothing-store-picture-image_2490513.jpg")',
         backgroundRepeat: 'no-repeat',
         backgroundSize: 'cover',
         backgroundPosition: 'center',
@@ -65,24 +89,32 @@ function Register() {
         position: 'relative'
       }}
     >
-      {/*<Button*/}
-      {/*  variant='contained'*/}
-      {/*  color='secondary'*/}
-      {/*  onClick={() => navigate('/')}*/}
-      {/*  sx={{*/}
-      {/*    position: 'absolute',*/}
-      {/*    top: 16,*/}
-      {/*    left: 16,*/}
-      {/*    zIndex: 10,*/}
-      {/*    borderRadius: 2,*/}
-      {/*    textTransform: 'none',*/}
-      {/*    fontWeight: 500,*/}
-      {/*    px: 2*/}
-      {/*  }}*/}
-      {/*  startIcon={<ArrowBack />}*/}
-      {/*>*/}
-      {/*  Trang chủ*/}
-      {/*</Button>*/}
+      <Button
+        variant='contained'
+        color='secondary'
+        onClick={() => navigate('/')}
+        sx={{
+          position: 'absolute',
+          top: 16,
+          left: 16,
+          zIndex: 10,
+          borderRadius: 2,
+          textTransform: 'none',
+          fontWeight: 500,
+          px: 2,
+          backgroundColor: 'rgba(255, 255, 255, 0.1)',
+          backdropFilter: 'blur(8px)',
+          border: '1px solid rgba(255, 255, 255, 0.15)',
+          color: 'white',
+          '&:hover': {
+            backgroundColor: 'rgba(255, 255, 255, 0.2)',
+            border: '1px solid rgba(255, 255, 255, 0.3)'
+          }
+        }}
+        startIcon={<ArrowBack />}
+      >
+        Trang chủ
+      </Button>
 
       <form onSubmit={handleSubmit(submitRegister)}>
         <Zoom in={true} style={{ transitionDelay: '200ms' }}>

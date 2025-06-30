@@ -30,7 +30,7 @@ import { useCart } from '~/hooks/useCarts'
 import ReviewModal from './modal/ReviewModal'
 import ViewReviewModal from './modal/ViewReviewModal'
 import { createReview, getUserReviews, getUserReviewForProduct } from '~/services/reviewService'
-import { getVariantId } from '~/services/admin/Inventory/VariantService'
+import { getVariantById } from '~/services/variantService'
 import { useSelector, useDispatch } from 'react-redux'
 import { selectCurrentUser } from '~/redux/user/userSlice'
 import { setReorderVariantIds } from '~/redux/cart/cartSlice'
@@ -492,7 +492,7 @@ const OrderDetail = () => {
 
         try {
           // Kiểm tra số lượng tồn kho của variant trước
-          const variantInfo = await getVariantId(variantId)
+          const variantInfo = await getVariantById(variantId)
 
           if (!variantInfo) {
             console.warn('Variant not found for ID:', variantId)
