@@ -13,12 +13,12 @@ const AddRoleModal = React.lazy(() => import('./modal/AddRoleModal'))
 const ViewRoleModal = React.lazy(() => import('./modal/ViewRoleModal'))
 const EditRoleModal = React.lazy(() => import('./modal/EditRoleModal'))
 const DeleteRoleModal = React.lazy(() => import('./modal/DeleteRoleModal'))
-
+const RestoreRoleModal = React.lazy(() => import('./modal/RestoreRoleModal'))
 const RoleManagement = () => {
   const [page, setPage] = React.useState(1)
   const [filters, setFilters] = React.useState({
-    status: 'false',
-    sort: 'newest'
+    sort: 'newest',
+    destroy: 'false'
   })
   const [selectedRole, setSelectedRole] = React.useState(null)
   const [modalType, setModalType] = React.useState(null)
@@ -32,7 +32,8 @@ const RoleManagement = () => {
     update,
     remove,
     ROWS_PER_PAGE,
-    setROWS_PER_PAGE
+    setROWS_PER_PAGE,
+    restore
   } = useRoles()
 
   const { hasPermission } = usePermissions()
@@ -64,6 +65,8 @@ const RoleManagement = () => {
         await update(id, data)
       } else if (type === 'delete') {
         await remove(data)
+      } else if (type === 'restore') {
+        await restore(data)
       }
     } catch (err) {
       console.error('Lỗi:', err)
@@ -99,6 +102,8 @@ const RoleManagement = () => {
           canView: hasPermission('role:read')
         }}
         onFilter={handleFilter}
+        fetchRoles={fetchRoles}
+        filters={filters}
       />
 
       <React.Suspense fallback={<></>}>
@@ -132,6 +137,14 @@ const RoleManagement = () => {
 
         {modalType === 'delete' && selectedRole && (
           <DeleteRoleModal
+            open
+            onClose={handleCloseModal}
+            role={selectedRole}
+            onSubmit={handleSave}
+          />
+        )}
+        {modalType === 'restore' && selectedRole && (
+          <RestoreRoleModal
             open
             onClose={handleCloseModal}
             role={selectedRole}

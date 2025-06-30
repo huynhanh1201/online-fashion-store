@@ -84,3 +84,15 @@ export const addProduct = async (data) => {
     return null
   }
 }
+
+export const RestoreProduct = async (id) => {
+  try {
+    const response = await AuthorizedAxiosInstance.patch(
+      `${API_ROOT}/v1/products/restore/${id}`
+    )
+    return response.data
+  } catch (error) {
+    console.error('Lỗi khi khôi phục sản phẩm:', error)
+    return null
+  }
+}

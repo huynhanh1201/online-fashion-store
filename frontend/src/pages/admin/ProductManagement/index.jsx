@@ -13,12 +13,12 @@
 //
 // import { updateProduct, deleteProduct } from '~/services/admin/productService'
 //
-// const AddProductModal = React.lazy(() => import('./modal/AddProductModal'))
-// const EditProductModal = React.lazy(() => import('./modal/EditProductModal'))
+// const AddProductModal = React.lazy(() => import('./Chart/AddProductModal'))
+// const EditProductModal = React.lazy(() => import('./Chart/EditProductModal'))
 // const DeleteProductModal = React.lazy(
-//   () => import('./modal/DeleteProductModal')
+//   () => import('./Chart/DeleteProductModal')
 // )
-// const ViewProductModal = React.lazy(() => import('./modal/ViewProductModal'))
+// const ViewProductModal = React.lazy(() => import('./Chart/ViewProductModal'))
 //
 // const ProductManagement = () => {
 //   const [page, setPage] = React.useState(1)
@@ -143,6 +143,9 @@ const DeleteProductModal = React.lazy(
 )
 const ViewProductModal = React.lazy(() => import('./modal/ViewProductModal'))
 const ViewDesc = React.lazy(() => import('./modal/ViewDescriptionModal.jsx'))
+const RestoreProductModal = React.lazy(
+  () => import('./modal/RestoreProductModal.jsx')
+)
 import ViewDescriptionModal from '~/pages/admin/ProductManagement/modal/ViewDescriptionModal.jsx'
 import useColorPalettes from '~/hooks/admin/useColorPalettes.js'
 import useSizePalettes from '~/hooks/admin/useSizePalettes.js'
@@ -155,7 +158,7 @@ const ProductManagement = () => {
   const queryParams = new URLSearchParams(location.search)
   const searchFromUrl = queryParams.get('categoryId') || ''
   const [filters, setFilters] = React.useState({
-    status: 'false',
+    destroy: 'false',
     sort: 'newest',
     ...(searchFromUrl ? { categoryId: searchFromUrl } : {})
   })
@@ -170,7 +173,8 @@ const ProductManagement = () => {
     deleteProductById,
     createNewProduct,
     ROWS_PER_PAGE,
-    setROWS_PER_PAGE
+    setROWS_PER_PAGE,
+    restore
   } = useProducts()
   React.useEffect(() => {
     if (searchFromUrl) {
@@ -181,8 +185,7 @@ const ProductManagement = () => {
     }
   }, [])
   // Lấy trực tiếp user từ localStorage kh phải qua state, và xác thực xem có thuộc nằm trong phạm vi của permission hay không
-  const { hasPermission } = usePermissions()
-  console.log('hasPermission', hasPermission('product:create')) // true (admin:access và product):read)
+  const { hasPermission } = usePermissions() // true (admin:access và product):read)
   // const [showAdvancedFilter, setShowAdvancedFilter] = React.useState(false)
 
   const [colorPalette, setColorPalette] = React.useState(null)
@@ -205,7 +208,7 @@ const ProductManagement = () => {
         const colorPalette = await getColorPaletteId(product._id)
         const sizePalette = await getSizePaletteId(product._id)
 
-        // Bạn có thể lưu dữ liệu này vào state nếu cần dùng ở modal
+        // Bạn có thể lưu dữ liệu này vào state nếu cần dùng ở Chart
         setColorPalette(colorPalette || [])
         setSizePalette(sizePalette || [])
       } catch (error) {
@@ -226,6 +229,8 @@ const ProductManagement = () => {
         await updateProductById(id, data)
       } else if (type === 'delete') {
         await deleteProductById(data)
+      } else if (type === 'restore') {
+        await restore(data)
       }
     } catch (error) {
       console.error('Lỗi:', error)
@@ -276,6 +281,7 @@ const ProductManagement = () => {
           canView: hasPermission('product:read')
         }}
         initialSearch={searchFromUrl}
+        filters={filters}
       />
 
       <React.Suspense fallback={<></>}>
@@ -326,6 +332,14 @@ const ProductManagement = () => {
             open
             onClose={handleCloseModal}
             product={selectedProduct}
+          />
+        )}
+        {modalType === 'restore' && selectedProduct && (
+          <RestoreProductModal
+            open
+            onClose={handleCloseModal}
+            product={selectedProduct}
+            onRestore={handleSave}
           />
         )}
       </React.Suspense>

@@ -27,25 +27,25 @@ export default function InventorySummaryCard({ data, loading }) {
     {
       label: 'Tổng số lượng tồn',
       value: `${Number(totalStock).toLocaleString('vi-VN')}`,
-      icon: <InventoryIcon color='primary' fontSize='lagre' />,
+      icon: <InventoryIcon color='primary' fontSize='large' />,
       color: '#4FC3F7'
     },
     {
       label: 'Tổng giá trị tồn kho',
       value: `${Number(totalValue).toLocaleString('vi-VN')}đ`,
-      icon: <MonetizationOnIcon color='success' fontSize='lagre' />,
+      icon: <MonetizationOnIcon color='success' fontSize='large' />,
       color: '#81C784'
     },
     {
       label: 'Tổng lợi nhuận ước tính',
       value: `${Number(estimatedProfit).toLocaleString('vi-VN')}đ`,
-      icon: <AttachMoneyIcon color='warning' fontSize='lagre' />,
+      icon: <AttachMoneyIcon color='warning' fontSize='large' />,
       color: '#FFB74D'
     },
     {
       label: 'Biến thể sắp hết hàng',
       value: `${Number(lowStockCount).toLocaleString('vi-VN')}`,
-      icon: <WarningIcon color='error' fontSize='lagre' />,
+      icon: <WarningIcon color='error' fontSize='large' />,
       color: '#E57373'
     }
   ]
@@ -86,7 +86,7 @@ export default function InventorySummaryCard({ data, loading }) {
               alignItems: 'center',
               gap: 2,
               p: 2,
-              height: '150px',
+              height: '100px',
               borderLeft: `10px solid ${item.color}`,
               backgroundColor: '#f5f5f5',
               borderRadius: 2

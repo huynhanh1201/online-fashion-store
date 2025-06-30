@@ -40,7 +40,7 @@ export default function FilterPartner({
     const filters = {
       search: keyword || undefined,
       type: type || undefined,
-      status: destroy !== '' ? destroy === 'true' : undefined,
+      destroy: destroy !== '' ? destroy === 'true' : undefined,
       sort: sort || undefined
     }
 
@@ -65,17 +65,30 @@ export default function FilterPartner({
     setKeyword('')
     setInputValue('')
     setType('')
-    setDestroy('')
-    setSort('')
+    setDestroy('false')
+    setSort('newest')
     setSelectedFilter('')
     setStartDate(dayjs().format('YYYY-MM-DD'))
     setEndDate(dayjs().format('YYYY-MM-DD'))
-    onFilter({})
+    onFilter({
+      destroy: 'false',
+      sort: 'newest'
+    })
     // fetchPartners(1, 10)
   }
 
   return (
     <Box display='flex' flexWrap='wrap' gap={2} mb={2} justifyContent='end'>
+      <FilterSelect
+        label='Trạng thái'
+        value={destroy}
+        onChange={setDestroy}
+        options={[
+          { label: 'Chưa xoá', value: 'false' },
+          { label: 'Đã xóa', value: 'true' }
+        ]}
+      />
+      <FilterSelect value={sort} onChange={setSort} />
       <FilterSelect
         label='Kiểu đối tác'
         value={type}
@@ -88,17 +101,6 @@ export default function FilterPartner({
         ]}
       />
 
-      <FilterSelect
-        label='Trạng thái'
-        value={destroy}
-        onChange={setDestroy}
-        options={[
-          { label: 'Tất cả', value: '' },
-          { label: 'Đang hoạt động', value: 'false' },
-          { label: 'Dừng hoạt động', value: 'true' }
-        ]}
-      />
-      <FilterSelect value={sort} onChange={setSort} />
       <FilterByTime
         label='Ngày tạo đối tác '
         selectedFilter={selectedFilter}

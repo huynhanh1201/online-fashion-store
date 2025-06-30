@@ -22,7 +22,8 @@ export default function BlogManagementPage() {
   const [selectedBlog, setSelectedBlog] = useState(null)
   const [page, setPage] = React.useState(1)
   const [filters, setFilters] = React.useState({
-    sort: 'newest'
+    sort: 'newest',
+    destroy: 'false'
   })
   // Fetch blogs từ API
   const {

@@ -47,7 +47,7 @@ const WarehouseSlipsTab = () => {
   const { partners, fetchPartners, createNewPartner } = usePartner()
 
   const [openModal, setOpenModal] = useState(false)
-  const [openViewModal, setOpenViewModal] = useState(false) // State cho View modal
+  const [openViewModal, setOpenViewModal] = useState(false) // State cho View Chart
   const [selectedSlip, setSelectedSlip] = useState(null) // State cho phiếu được chọn
   const [modalType, setModalType] = useState('input')
   const [page, setPage] = useState(1)

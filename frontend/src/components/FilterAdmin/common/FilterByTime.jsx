@@ -61,7 +61,7 @@ const FilterByTime = ({
           justifyContent: 'space-between',
           minWidth: 150,
           height: 34,
-          fontSize: '0.8rem',
+          fontSize: '0.75rem',
           color: '#00000099',
           fontWeight: 400,
           borderRadius: '4px',

@@ -242,7 +242,6 @@ const BlogModal = ({
         keywords: Array(data.metaTitle || data.title)
       }
     }
-    console.log('Dữ liệu gửi:', data)
     onSave(blogPayload, isEditMode)
     handleClose()
   }
@@ -257,7 +256,7 @@ const BlogModal = ({
   // Ở trong component BlogModal
   const statusOptions = [
     { value: 'draft', label: 'Bản nháp', color: '#ff9800' },
-    { value: 'published', label: 'Đã xuất bản', color: '#4caf50' },
+    { value: 'published', label: 'Xuất bản', color: '#4caf50' },
     { value: 'archived', label: 'Lưu trữ', color: '#9e9e9e' }
   ]
 

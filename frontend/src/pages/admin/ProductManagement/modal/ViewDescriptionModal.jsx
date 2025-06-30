@@ -29,11 +29,11 @@ export default function ViewDescriptionModal({ open, onClose, product }) {
         {' '}
         {/* Added overflowY for scrollable content */}
         <Box
-          className="content-selectable"
+          className='content-selectable'
           sx={{
             width: '100%',
             '& img': {
-              maxWidth: '100%', // Ensure images fit within the modal
+              maxWidth: '100%', // Ensure images fit within the Chart
               height: 'auto',
               display: 'block',
               margin: '8px auto',

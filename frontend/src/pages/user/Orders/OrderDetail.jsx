@@ -492,7 +492,7 @@ const OrderDetail = () => {
 
         try {
           // Kiểm tra số lượng tồn kho của variant trước
-          const variantInfo = await getVariantById(variantId)
+          const variantInfo = await getVariantId(variantId)
 
           if (!variantInfo) {
             console.warn('Variant not found for ID:', variantId)

@@ -52,7 +52,7 @@ const ProductStatistics = ({ stats }) => {
       {
         label: 'Số lượng sản phẩm',
         data: paginatedData.map((item) => item.count),
-        backgroundColor: 'var(--primary-color)'
+        backgroundColor: '#2563eb'
       }
     ]
   }
@@ -121,7 +121,7 @@ const ProductStatistics = ({ stats }) => {
                   alignItems: 'center',
                   gap: 2,
                   p: 2,
-                  height: '150px',
+                  height: '100px',
                   borderLeft: `10px solid ${item.color}`,
                   backgroundColor: 'var(--surface-color)',
                   borderRadius: 2
@@ -136,7 +136,7 @@ const ProductStatistics = ({ stats }) => {
                     {item.label}
                   </Typography>
                   <Typography
-                    variant='h6'
+                    variant='h5'
                     fontWeight='bold'
                     sx={{ display: 'flex', alignItems: 'center', gap: 1 }}
                   >

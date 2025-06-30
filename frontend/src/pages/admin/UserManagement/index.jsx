@@ -6,10 +6,11 @@ import useRoles from '~/hooks/admin/useRoles.js'
 import usePermissions from '~/hooks/usePermissions'
 import { PermissionWrapper, RouteGuard } from '~/components/PermissionGuard'
 
-// Lazy load các modal
+// Lazy load các Chart
 const ViewUserModal = React.lazy(() => import('./modal/ViewUserModal'))
 const EditUserModal = React.lazy(() => import('./modal/EditUserModal'))
 const DeleteUserModal = React.lazy(() => import('./modal/DeleteUserModal'))
+const RestoreUserModal = React.lazy(() => import('./modal/RestoreUserModal'))
 
 const UserManagement = () => {
   const { roles, fetchRoles } = useRoles()
@@ -18,12 +19,19 @@ const UserManagement = () => {
   const [limit, setLimit] = React.useState(10)
   const [modalType, setModalType] = React.useState(null)
   const [filters, setFilters] = React.useState({
-    sort: 'newest'
+    sort: 'newest',
+    destroy: 'false'
   })
 
-  const { users, totalPages, fetchUsers, Loading, removeUser, update } =
-    useUsers()
-
+  const {
+    users,
+    totalPages,
+    fetchUsers,
+    Loading,
+    removeUser,
+    update,
+    Restore
+  } = useUsers()
   const { hasPermission } = usePermissions()
 
   React.useEffect(() => {
@@ -33,7 +41,9 @@ const UserManagement = () => {
   React.useEffect(() => {
     fetchUsers(page, limit, filters)
   }, [page, limit, filters])
+
   const filterUser = users.filter((user) => user?.role === 'customer')
+
   const handleOpenModal = (type, user) => {
     if (!user || !user._id) return
     setSelectedUser(user)
@@ -53,6 +63,8 @@ const UserManagement = () => {
         await update(id, data)
       } else if (type === 'delete') {
         await removeUser(data)
+      } else if (type === 'restore') {
+        await Restore(data)
       }
     } catch (error) {
       console.error('Lỗi:', error)
@@ -90,6 +102,7 @@ const UserManagement = () => {
           canView: hasPermission('user:read')
         }}
         roles={roles}
+        filters={filters}
       />
 
       <React.Suspense fallback={<></>}>
@@ -119,6 +132,14 @@ const UserManagement = () => {
             />
           )}
         </PermissionWrapper>
+        {modalType === 'restore' && selectedUser && (
+          <RestoreUserModal
+            open
+            onClose={handleCloseModal}
+            user={selectedUser}
+            onRestore={handleSave}
+          />
+        )}
       </React.Suspense>
     </RouteGuard>
   )

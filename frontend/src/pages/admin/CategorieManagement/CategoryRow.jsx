@@ -8,6 +8,7 @@ import ImageNotSupportedIcon from '@mui/icons-material/ImageNotSupported'
 import { optimizeCloudinaryUrl } from '~/utils/cloudinary.js'
 import Tooltip from '@mui/material/Tooltip'
 import { useNavigate } from 'react-router-dom'
+import RestartAltIcon from '@mui/icons-material/RestartAlt'
 const styles = {
   groupIcon: {
     display: 'flex',
@@ -35,7 +36,8 @@ export default function CategoryRow({
   index,
   columns,
   handleOpenModal,
-  permissions = {}
+  permissions = {},
+  filters
 }) {
   const navigate = useNavigate()
   return (
@@ -182,27 +184,41 @@ export default function CategoryRow({
                     </IconButton>
                   </Tooltip>
                 )}
-                {permissions.canEdit && (
-                  <Tooltip title='Sửa'>
+
+                {filters.destroy === 'true' ? (
+                  <Tooltip title='Khôi phục'>
                     <IconButton
-                      onClick={() => handleOpenModal('edit', category)}
+                      onClick={() => handleOpenModal('restore', category)}
                       size='small'
-                      color='info'
                     >
-                      <BorderColorIcon color='warning' />
+                      <RestartAltIcon color='success' />
                     </IconButton>
                   </Tooltip>
-                )}
-                {permissions.canDelete && (
-                  <Tooltip title='Xoá'>
-                    <IconButton
-                      onClick={() => handleOpenModal('delete', category)}
-                      size='small'
-                      color='error'
-                    >
-                      <DeleteForeverIcon color='error' />
-                    </IconButton>
-                  </Tooltip>
+                ) : (
+                  <>
+                    {permissions.canEdit && (
+                      <Tooltip title='Chỉnh sửa'>
+                        <IconButton
+                          onClick={() => handleOpenModal('edit', category)}
+                          size='small'
+                        >
+                          <BorderColorIcon color='warning' />
+                        </IconButton>
+                      </Tooltip>
+                    )}
+
+                    {permissions.canDelete && (
+                      <Tooltip title='Xoá'>
+                        <IconButton
+                          onClick={() => handleOpenModal('delete', category)}
+                          size='small'
+                          color='error'
+                        >
+                          <DeleteForeverIcon color='error' />
+                        </IconButton>
+                      </Tooltip>
+                    )}
+                  </>
                 )}
               </Stack>
             </TableCell>

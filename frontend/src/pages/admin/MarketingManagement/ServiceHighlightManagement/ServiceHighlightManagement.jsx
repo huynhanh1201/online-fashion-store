@@ -77,7 +77,7 @@ const ServiceHighlightManagement = () => {
     setRefreshing(false)
   }
 
-  // Handle success from modal
+  // Handle success from Chart
   const handleModalSuccess = (result) => {
     console.log('Service highlight updated successfully:', result)
     // Refresh data after successful update
@@ -140,7 +140,11 @@ const ServiceHighlightManagement = () => {
     },
     {
       title: 'Hình ảnh dịch vụ',
-      value: loading ? <Skeleton width={40} /> : serviceHighlights.filter((service) => service.imageUrl).length,
+      value: loading ? (
+        <Skeleton width={40} />
+      ) : (
+        serviceHighlights.filter((service) => service.imageUrl).length
+      ),
       icon: <ImageIcon />,
       color: '#2e7d32'
     }
@@ -165,7 +169,14 @@ const ServiceHighlightManagement = () => {
   )
 
   return (
-    <Box sx={{ p: 3, backgroundColor: '#f8fafc', borderRadius: 3, minHeight: '100vh' }}>
+    <Box
+      sx={{
+        p: 3,
+        backgroundColor: '#f8fafc',
+        borderRadius: 3,
+        minHeight: '100vh'
+      }}
+    >
       {/* Header */}
       <Box sx={{ mb: 4 }}>
         <Typography
@@ -257,37 +268,41 @@ const ServiceHighlightManagement = () => {
       </Grid>
 
       {/* Action Buttons */}
-      <Box sx={{ mb: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        {
-          hasPermission('service:create') && (
-
-            <Button
-              variant='contained'
-              startIcon={<AddIcon />}
-              onClick={handleAddNew}
-              sx={{
-                px: 3,
-                py: 1.5,
-                borderRadius: 2,
-                textTransform: 'none',
-                fontSize: '1rem',
-                fontWeight: 600,
-                backgroundColor: 'var(--primary-color)',
-                color: '#fff',
-                boxShadow: '0 4px 16px rgba(59, 130, 246, 0.3)',
-                '&:hover': {
-                  backgroundColor: 'var(--accent-color)',
-                  boxShadow: '0 6px 20px rgba(59, 130, 246, 0.4)',
-                  transform: 'translateY(-1px)'
-                }
-              }}
-            >
-              Thêm dịch vụ mới
-            </Button>
-          )
-        }
+      <Box
+        sx={{
+          mb: 3,
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center'
+        }}
+      >
+        {hasPermission('service:create') && (
+          <Button
+            variant='contained'
+            startIcon={<AddIcon />}
+            onClick={handleAddNew}
+            sx={{
+              px: 3,
+              py: 1.5,
+              borderRadius: 2,
+              textTransform: 'none',
+              fontSize: '1rem',
+              fontWeight: 600,
+              backgroundColor: 'var(--primary-color)',
+              color: '#fff',
+              boxShadow: '0 4px 16px rgba(59, 130, 246, 0.3)',
+              '&:hover': {
+                backgroundColor: 'var(--accent-color)',
+                boxShadow: '0 6px 20px rgba(59, 130, 246, 0.4)',
+                transform: 'translateY(-1px)'
+              }
+            }}
+          >
+            Thêm dịch vụ mới
+          </Button>
+        )}
         <Button
-          variant="outlined"
+          variant='outlined'
           startIcon={<RefreshIcon />}
           onClick={handleRefresh}
           disabled={refreshing}
@@ -301,10 +316,10 @@ const ServiceHighlightManagement = () => {
         >
           {refreshing ? 'Đang tải...' : 'Làm mới'}
         </Button>
-      </Box >
+      </Box>
 
       {/* Table */}
-      < Card
+      <Card
         sx={{
           borderRadius: 3,
           boxShadow: '0 4px 24px rgba(0, 0, 0, 0.06)',
@@ -383,7 +398,9 @@ const ServiceHighlightManagement = () => {
                               backgroundColor: '#f8fafc'
                             }}
                           >
-                            <ImageIcon sx={{ color: '#cbd5e1', fontSize: 24 }} />
+                            <ImageIcon
+                              sx={{ color: '#cbd5e1', fontSize: 24 }}
+                            />
                           </Box>
                         )}
                         <Typography
@@ -411,7 +428,6 @@ const ServiceHighlightManagement = () => {
                     <TableCell sx={{ py: 2 }}>
                       <Stack direction='row' spacing={1}>
                         {hasPermission('service:create') && (
-
                           <Tooltip title='Chỉnh sửa'>
                             <IconButton
                               size='small'
@@ -426,7 +442,6 @@ const ServiceHighlightManagement = () => {
                           </Tooltip>
                         )}
                         {hasPermission('service:delete') && (
-
                           <Tooltip title='Xóa'>
                             <IconButton
                               size='small'
@@ -457,8 +472,18 @@ const ServiceHighlightManagement = () => {
                       style={{ marginBottom: 8 }}
                     >
                       <title>No data</title>
-                      <g transform='translate(0 1)' fill='none' fillRule='evenodd'>
-                        <ellipse fill='#f5f5f5' cx='32' cy='33' rx='32' ry='7'></ellipse>
+                      <g
+                        transform='translate(0 1)'
+                        fill='none'
+                        fillRule='evenodd'
+                      >
+                        <ellipse
+                          fill='#f5f5f5'
+                          cx='32'
+                          cy='33'
+                          rx='32'
+                          ry='7'
+                        ></ellipse>
                         <g fillRule='nonzero' stroke='#d9d9d9'>
                           <path d='M55 12.76L44.854 1.258C44.367.474 43.656 0 42.907 0H21.093c-.749 0-1.46.474-1.947 1.257L9 12.761V22h46v-9.24z'></path>
                           <path
@@ -472,7 +497,6 @@ const ServiceHighlightManagement = () => {
                       Chưa có dịch vụ nổi bật nào
                     </Typography>
                     {hasPermission('service:create') && (
-
                       <Button
                         variant='outlined'
                         startIcon={<AddIcon />}
@@ -488,10 +512,10 @@ const ServiceHighlightManagement = () => {
             </TableBody>
           </Table>
         </TableContainer>
-      </Card >
+      </Card>
 
       {/* Modal */}
-      < AddServiceHighlight
+      <AddServiceHighlight
         open={openModal}
         onClose={() => setOpenModal(false)}
         onSuccess={handleModalSuccess}
@@ -502,8 +526,8 @@ const ServiceHighlightManagement = () => {
       <Dialog
         open={deleteConfirmOpen}
         onClose={handleDeleteCancel}
-        aria-labelledby="alert-dialog-title"
-        aria-describedby="alert-dialog-description"
+        aria-labelledby='alert-dialog-title'
+        aria-describedby='alert-dialog-description'
         PaperProps={{
           sx: {
             borderRadius: 3,
@@ -512,7 +536,7 @@ const ServiceHighlightManagement = () => {
         }}
       >
         <DialogTitle
-          id="alert-dialog-title"
+          id='alert-dialog-title'
           sx={{
             display: 'flex',
             alignItems: 'center',
@@ -521,29 +545,34 @@ const ServiceHighlightManagement = () => {
             fontWeight: 600
           }}
         >
-          <WarningIcon color="error" />
+          <WarningIcon color='error' />
           Xác nhận xóa dịch vụ
         </DialogTitle>
         <DialogContent>
-          <DialogContentText id="alert-dialog-description" sx={{ mb: 2 }}>
+          <DialogContentText id='alert-dialog-description' sx={{ mb: 2 }}>
             Bạn có chắc chắn muốn xóa dịch vụ này không?
           </DialogContentText>
           {deleteIndex !== null && serviceHighlights[deleteIndex] && (
-            <Box sx={{
-              p: 2,
-              backgroundColor: '#fef2f2',
-              borderRadius: 2,
-              border: '1px solid #fecaca',
-              display: 'flex',
-              alignItems: 'center',
-              gap: 2
-            }}>
+            <Box
+              sx={{
+                p: 2,
+                backgroundColor: '#fef2f2',
+                borderRadius: 2,
+                border: '1px solid #fecaca',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 2
+              }}
+            >
               {serviceHighlights[deleteIndex].imageUrl && (
                 <img
-                  src={optimizeCloudinaryUrl(serviceHighlights[deleteIndex].imageUrl, {
-                    width: 60,
-                    height: 60
-                  })}
+                  src={optimizeCloudinaryUrl(
+                    serviceHighlights[deleteIndex].imageUrl,
+                    {
+                      width: 60,
+                      height: 60
+                    }
+                  )}
                   alt={serviceHighlights[deleteIndex].title}
                   style={{
                     width: 60,
@@ -555,10 +584,13 @@ const ServiceHighlightManagement = () => {
                 />
               )}
               <Box sx={{ flex: 1 }}>
-                <Typography variant="body1" sx={{ fontWeight: 600, color: '#1e293b' }}>
+                <Typography
+                  variant='body1'
+                  sx={{ fontWeight: 600, color: '#1e293b' }}
+                >
                   {serviceHighlights[deleteIndex].title}
                 </Typography>
-                <Typography variant="body2" color="text.secondary">
+                <Typography variant='body2' color='text.secondary'>
                   {serviceHighlights[deleteIndex].subtitle}
                 </Typography>
               </Box>
@@ -571,7 +603,7 @@ const ServiceHighlightManagement = () => {
         <DialogActions sx={{ p: 3, pt: 1 }}>
           <Button
             onClick={handleDeleteCancel}
-            variant="outlined"
+            variant='outlined'
             disabled={deleting}
             sx={{
               borderRadius: 2,
@@ -583,9 +615,11 @@ const ServiceHighlightManagement = () => {
           </Button>
           <Button
             onClick={handleDeleteConfirm}
-            variant="contained"
+            variant='contained'
             disabled={deleting}
-            startIcon={deleting ? <CircularProgress size={16} /> : <DeleteIcon />}
+            startIcon={
+              deleting ? <CircularProgress size={16} /> : <DeleteIcon />
+            }
             sx={{
               borderRadius: 2,
               textTransform: 'none',
@@ -600,7 +634,7 @@ const ServiceHighlightManagement = () => {
           </Button>
         </DialogActions>
       </Dialog>
-    </Box >
+    </Box>
   )
 }
 

@@ -3,7 +3,8 @@ import {
   getUsers,
   deleteUser,
   updateUser,
-  CreateUser
+  CreateUser,
+  RestoreUser
 } from '~/services/admin/userService'
 
 export default function useUsers() {
@@ -102,6 +103,21 @@ export default function useUsers() {
       return false
     }
   }
+  const Restore = async (id) => {
+    try {
+      const result = await RestoreUser(id)
+      if (!result) {
+        console.error('Khôi phục người dùng thất bại')
+        return null
+      }
+      setUsers((prev) => prev.filter((u) => u._id !== id))
+      setTotalPages((prev) => Math.max(1, prev - 1))
+      return true
+    } catch (err) {
+      console.error('Lỗi khi khôi phục người dùng:', err)
+      return false
+    }
+  }
 
   return {
     users,
@@ -112,6 +128,7 @@ export default function useUsers() {
     update,
     add,
     ROWS_PER_PAGE,
-    setROWS_PER_PAGE
+    setROWS_PER_PAGE,
+    Restore
   }
 }

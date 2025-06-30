@@ -89,7 +89,7 @@ const PartnersTab = () => {
   const [selectedPartner, setSelectedPartner] = useState(null)
   const [page, setPage] = useState(1)
   const [filter, setFilter] = useState({
-    status: 'false',
+    destroy: 'false',
     sort: 'newest'
   })
 

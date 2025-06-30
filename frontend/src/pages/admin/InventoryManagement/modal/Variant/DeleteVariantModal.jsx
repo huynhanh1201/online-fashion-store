@@ -1,4 +1,4 @@
-// modal/Variant/DeleteVariantModal.jsx
+// Chart/Variant/DeleteVariantModal.jsx
 import React from 'react'
 import {
   Dialog,

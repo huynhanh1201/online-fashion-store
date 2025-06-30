@@ -84,7 +84,7 @@ const DisplayManagement = () => {
     setRefreshing(false)
   }
 
-  // Handle success from modal
+  // Handle success from Chart
   const handleModalSuccess = (result) => {
     console.log('Banner updated successfully:', result)
     fetchBanners()
@@ -421,9 +421,9 @@ const DisplayManagement = () => {
                             src={
                               banner.imageUrl
                                 ? optimizeCloudinaryUrl(banner.imageUrl, {
-                                  width: 60,
-                                  height: 40
-                                })
+                                    width: 60,
+                                    height: 40
+                                  })
                                 : undefined
                             }
                             sx={{
@@ -582,8 +582,18 @@ const DisplayManagement = () => {
                       style={{ marginBottom: 8 }}
                     >
                       <title>No data</title>
-                      <g transform='translate(0 1)' fill='none' fillRule='evenodd'>
-                        <ellipse fill='#f5f5f5' cx='32' cy='33' rx='32' ry='7'></ellipse>
+                      <g
+                        transform='translate(0 1)'
+                        fill='none'
+                        fillRule='evenodd'
+                      >
+                        <ellipse
+                          fill='#f5f5f5'
+                          cx='32'
+                          cy='33'
+                          rx='32'
+                          ry='7'
+                        ></ellipse>
                         <g fillRule='nonzero' stroke='#d9d9d9'>
                           <path d='M55 12.76L44.854 1.258C44.367.474 43.656 0 42.907 0H21.093c-.749 0-1.46.474-1.947 1.257L9 12.761V22h46v-9.24z'></path>
                           <path

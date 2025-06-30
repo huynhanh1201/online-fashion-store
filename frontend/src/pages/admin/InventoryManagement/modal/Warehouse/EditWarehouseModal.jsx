@@ -1,4 +1,4 @@
-// modal/Warehouse/EditWarehouseModal.jsx
+// Chart/Warehouse/EditWarehouseModal.jsx
 import React, { useEffect, useState } from 'react'
 import {
   Dialog,

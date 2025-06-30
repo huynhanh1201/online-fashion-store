@@ -6,7 +6,7 @@ import styled from '@emotion/styled'
 
 const StyledEditor = styled.div`
   .ProseMirror {
-    min-height: 240px;
+    min-height: 300px;
     padding: 20px;
     font-size: 16px;
     line-height: 1.5;
@@ -62,7 +62,7 @@ export default function DescriptionEditor({
 
   const editor = useEditor({
     extensions,
-    content: initialHtml || generateEmptyLines(10),
+    content: initialHtml || generateEmptyLines(5),
     onUpdate: ({ editor }) => {
       const html = editor.getHTML()
       setValue(name, html)
