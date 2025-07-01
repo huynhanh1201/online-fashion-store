@@ -493,8 +493,8 @@ const getFinanceStatistics = async (queryString) => {
       monthlyStatsPromise
     ])
 
-    const totalRevenue = totalRevenueRaw[0].totalRevenue || 0
-    const totalCost = totalCostRaw[0].totalCost || 0
+    const totalRevenue = totalRevenueRaw[0]?.totalRevenue || 0
+    const totalCost = totalCostRaw[0]?.totalCost || 0
 
     const revenueChart = {
       year: queryString.year,
