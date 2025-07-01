@@ -7,7 +7,8 @@ import {
   Typography,
   CircularProgress,
   styled,
-  Pagination
+  Pagination,
+  PaginationItem
 } from '@mui/material'
 import { addToCart, getCart } from '~/services/cartService'
 import useProducts from '~/hooks/useProducts'
@@ -237,6 +238,8 @@ const ProductbyCategory = () => {
     page * ITEMS_PER_PAGE
   )
 
+  const totalPages = Math.ceil(filteredProducts.length / ITEMS_PER_PAGE) || 1;
+
   React.useEffect(() => {
     if (!sortMenuOpen) return
     const handleClick = (e) => {
@@ -394,51 +397,38 @@ const ProductbyCategory = () => {
                 ))}
               </div>
 
-              <Box
-                sx={{ display: 'flex', justifyContent: 'center', mt: 4, mb: 2 }}
-              >
-                <Pagination
-                  count={Math.ceil(filteredProducts.length / ITEMS_PER_PAGE)}
-                  page={page}
-                  onChange={handlePageChange}
-                  color='primary'
-                  size='small'
-                  boundaryCount={1}
-                  siblingCount={1}
-                  shape='rounded'
-                  sx={{
-                    '& .MuiPagination-ul': {
-                      justifyContent: 'center',
-                      gap: '8px',
-                      padding: '8px 0',
-                    },
-                    mt: 3,
-                    mb: 2,
-                    '& .MuiPaginationItem-root': {
-                      borderRadius: '6px',
-                      border: '1.5px solid #e0e0e0',
-                      fontWeight: 500,
-                      fontSize: '1rem',
-                      minWidth: 44,
-                      minHeight: 44,
-                      color: '#757575',
-                      background: '#fff',
-                      boxShadow: 'none',
-                      transition: 'all 0.2s',
-                      '&:hover': {
-                        borderColor: '#000',
-                        background: '#fafafa',
-                        color: '#111',
-                      },
-                      '&.Mui-selected': {
-                        background: '#111',
-                        color: '#fff',
-                        borderColor: '#111',
-                      },
-                    },
-                  }}
-                />
-              </Box>
+              <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4, mb: 2 , alignItems: 'center'}}>
+              <Pagination
+                count={totalPages}
+                page={page}
+                onChange={handlePageChange}
+                boundaryCount={1}
+                siblingCount={1}
+                shape="rounded"
+                size="small"
+                color="primary"
+                renderItem={(item) => {
+                  if (item.type === 'start-ellipsis' || item.type === 'end-ellipsis') {
+                    return (
+                      <span
+                        style={{
+                          padding: '8px 12px',
+                          fontWeight: 'bold',
+                          color: '#999',
+                          fontSize: '1rem',
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                        }}
+                      >
+                        ...
+                      </span>
+                    )
+                  }
+                  return <PaginationItem {...item} />
+                }}
+              />
+            </Box>
             </>
           )}
         </Box>

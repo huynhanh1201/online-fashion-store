@@ -438,7 +438,7 @@ const Menu = ({ headerRef }) => {
                             childCategories.map((child) => (
                               <Button
                                 key={child._id}
-                                href={`/productbycategory/${child._id}`}
+                                href={`/${child._id}`}
                                 sx={{
                                   justifyContent: 'flex-start',
                                   textAlign: 'left',
@@ -624,11 +624,12 @@ const Menu = ({ headerRef }) => {
                               justifyContent: 'start',
                               textAlign: 'left',
                               color: '#222',
-                              fontWeight: 600,
+                              fontWeight: 400,
                               fontSize: '1.05rem',
                               px: 0,
                               minWidth: 0,
                               background: 'none',
+                              textTransform: 'none !important',
                               boxShadow: 'none',
                               '&:hover': {
                                 color: '#1976d2',
@@ -710,7 +711,7 @@ const Menu = ({ headerRef }) => {
                         color: '#222',
                         fontWeight: 400,
                         fontSize: '16px',
-                        textTransform: 'none',
+                        textTransform: 'none !important',
                         px: 0,
                         minWidth: 0,
                         background: 'none',
