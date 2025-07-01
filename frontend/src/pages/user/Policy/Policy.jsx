@@ -112,7 +112,8 @@ const PolicyPage = () => {
         px: { xs: 1, sm: 2, md: 4 },
         py: { xs: 2, md: 6 },
         maxWidth: '1400px',
-        mx: 'auto'
+        mx: 'auto',
+        minHeight: '100vh'
       }}
     >
       <Box
@@ -120,12 +121,20 @@ const PolicyPage = () => {
           display: 'flex',
           flexDirection: isMobile ? 'column' : 'row',
           alignItems: isMobile ? 'stretch' : 'flex-start',
-          justifyContent: 'center',
-          gap: 4
+          justifyContent: 'flex-start',
+          gap: 4,
+          minHeight: 'calc(100vh - 200px)'
         }}
       >
         {/* Tabs Sidebar */}
-        <Box sx={{ minWidth: isMobile ? '100%' : 260, mb: isMobile ? 2 : 0 }}>
+        <Box 
+          sx={{ 
+            minWidth: isMobile ? '100%' : 260, 
+            maxWidth: isMobile ? '100%' : 260,
+            mb: isMobile ? 2 : 0,
+            flexShrink: 0
+          }}
+        >
           <Typography
             variant='h6'
             fontWeight='bold'
@@ -146,6 +155,8 @@ const PolicyPage = () => {
               borderBottom: isMobile ? 1 : 0,
               borderColor: 'divider',
               minHeight: 48,
+              maxHeight: isMobile ? 'auto' : 'calc(100vh - 300px)',
+              overflowY: isMobile ? 'visible' : 'auto',
               '& .MuiTab-root': {
                 textTransform: 'none',
                 fontWeight: 500,
@@ -153,7 +164,10 @@ const PolicyPage = () => {
                 alignItems: 'flex-start',
                 px: 2,
                 py: 1.5,
-                minHeight: 48
+                minHeight: 48,
+                whiteSpace: 'nowrap',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis'
               },
               '& .Mui-selected': {
                 color: 'primary.main',
@@ -173,18 +187,31 @@ const PolicyPage = () => {
             flex: 1,
             display: 'flex',
             flexDirection: 'column',
-            alignItems: 'center',
+            alignItems: 'flex-start',
             justifyContent: 'flex-start',
-            width: '100%'
+            width: '100%',
+            minWidth: 0, // Prevent flex item from overflowing
+            overflow: 'hidden'
           }}
         >
           {currentPolicy ? (
-            <Box sx={{ width: '100%', maxWidth: 900, textAlign: 'left' }}>
+            <Box 
+              sx={{ 
+                width: '100%', 
+                maxWidth: '100%',
+                textAlign: 'left',
+                overflow: 'hidden'
+              }}
+            >
               <Typography
                 variant='h4'
                 fontWeight='bold'
                 gutterBottom
                 align='left'
+                sx={{
+                  wordBreak: 'break-word',
+                  overflowWrap: 'break-word'
+                }}
               >
                 {currentPolicy.title}
               </Typography>
@@ -194,7 +221,12 @@ const PolicyPage = () => {
                   variant='h6' 
                   color="text.secondary"
                   gutterBottom 
-                  sx={{ mt: 2, textAlign: 'left' }}
+                  sx={{ 
+                    mt: 2, 
+                    textAlign: 'left',
+                    wordBreak: 'break-word',
+                    overflowWrap: 'break-word'
+                  }}
                 >
                   {currentPolicy.excerpt}
                 </Typography>
@@ -203,21 +235,31 @@ const PolicyPage = () => {
               <Box 
                 sx={{ 
                   mt: 4,
+                  width: '100%',
+                  overflow: 'hidden',
                   '& h1, & h2, & h3, & h4, & h5, & h6': {
                     fontWeight: 600,
                     mt: 3,
-                    mb: 1
+                    mb: 1,
+                    wordBreak: 'break-word',
+                    overflowWrap: 'break-word'
                   },
                   '& p': {
                     mb: 2,
-                    lineHeight: 1.6
+                    lineHeight: 1.6,
+                    wordBreak: 'break-word',
+                    overflowWrap: 'break-word'
                   },
                   '& ul, & ol': {
                     mb: 2,
-                    pl: 3
+                    pl: 3,
+                    wordBreak: 'break-word',
+                    overflowWrap: 'break-word'
                   },
                   '& li': {
-                    mb: 1
+                    mb: 1,
+                    wordBreak: 'break-word',
+                    overflowWrap: 'break-word'
                   },
                   '& img': {
                     maxWidth: '100%',
@@ -226,25 +268,54 @@ const PolicyPage = () => {
                     display: 'block',
                     margin: '16px auto',
                     boxShadow: '0 2px 8px rgba(0,0,0,0.06)'
+                  },
+                  '& table': {
+                    maxWidth: '100%',
+                    overflowX: 'auto',
+                    display: 'block'
+                  },
+                  '& pre, & code': {
+                    maxWidth: '100%',
+                    overflowX: 'auto',
+                    whiteSpace: 'pre-wrap',
+                    wordBreak: 'break-word'
+                  },
+                  '& a': {
+                    wordBreak: 'break-all'
                   }
                 }}
                 dangerouslySetInnerHTML={{ __html: currentPolicy.content }}
               />
             </Box>
           ) : (
-            <Box sx={{ width: '100%', maxWidth: 900, textAlign: 'left' }}>
+            <Box 
+              sx={{ 
+                width: '100%', 
+                maxWidth: '100%',
+                textAlign: 'left',
+                overflow: 'hidden'
+              }}
+            >
               <Typography
                 variant='h4'
                 fontWeight='bold'
                 gutterBottom
                 align='left'
+                sx={{
+                  wordBreak: 'break-word',
+                  overflowWrap: 'break-word'
+                }}
               >
                 {tabLabels[tab]}
               </Typography>
               <Typography 
                 variant='h6' 
                 color="text.secondary"
-                sx={{ mt: 3 }}
+                sx={{ 
+                  mt: 3,
+                  wordBreak: 'break-word',
+                  overflowWrap: 'break-word'
+                }}
               >
                 Nội dung chính sách này đang được cập nhật. Vui lòng quay lại sau.
               </Typography>

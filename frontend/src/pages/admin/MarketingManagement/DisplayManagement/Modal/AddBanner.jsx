@@ -436,8 +436,6 @@ const AddBanner = ({ open, onClose, onSuccess, initialData, bannerIndex }) => {
               <MenuItem value='hero'>Banner chính (Trang chủ)</MenuItem>
               <MenuItem value='product'>Banner sản phẩm</MenuItem>
               <MenuItem value='middle'>Banner giữa trang</MenuItem>
-              <MenuItem value='top'>Banner đầu trang</MenuItem>
-              <MenuItem value='bottom'>Banner cuối trang</MenuItem>
               <MenuItem value='login'>Banner đăng nhập và đăng ký</MenuItem>
             </TextField>
 

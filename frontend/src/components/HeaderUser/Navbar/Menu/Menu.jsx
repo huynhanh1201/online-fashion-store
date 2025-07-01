@@ -356,8 +356,8 @@ const Menu = ({ headerRef }) => {
                   {item.isNew ? (
                     <Badge
                       badgeContent={
-                        <span style={{ fontSize: '12px', fontWeight: 700, color: 'red' }}>
-                          mới
+                        <span style={{ fontSize: '10px', fontWeight: 700, color: 'red' }}>
+                          MỚI
                         </span>
                       }
                       color='default'
@@ -380,7 +380,7 @@ const Menu = ({ headerRef }) => {
                   ) : (
                     <StyledButton
                       href={item.url}
-                      active={item.hasMegaMenu && (productMenuOpen || isDrawerHovered)}
+                      active={item.hasMegaMenu && (productMenuOpen || isDrawerHovered) ? true : undefined}
                       ref={item.hasMegaMenu ? productButtonRef : null}
                       onMouseEnter={item.hasMegaMenu ? handleProductEnter : undefined}
                       onMouseLeave={item.hasMegaMenu ? handleProductLeave : undefined}
@@ -438,7 +438,7 @@ const Menu = ({ headerRef }) => {
                             childCategories.map((child) => (
                               <Button
                                 key={child._id}
-                                href={`/productbycategory/${child._id}`}
+                                href={`/${child._id}`}
                                 sx={{
                                   justifyContent: 'flex-start',
                                   textAlign: 'left',
@@ -465,6 +465,7 @@ const Menu = ({ headerRef }) => {
                             ))
                           ) : (
                             <Typography
+                              component="div"
                               sx={{
                                 color: 'text.secondary',
                                 fontSize: '0.95rem',
@@ -568,7 +569,8 @@ const Menu = ({ headerRef }) => {
               maxWidth: '95vw',
               opacity: productMenuOpen ? 1 : 0,
               transition: `opacity ${megamenuSettings.animationDuration}ms ease`,
-              justifyItems: 'center',
+              justifyItems: 'start',
+              justifyContent: 'start',
             }}
           >
             {menuConfig?.mainMenu && menuConfig.mainMenu.length > 0 ? (
@@ -588,6 +590,7 @@ const Menu = ({ headerRef }) => {
                     }}
                   >
                     <Typography
+                      component="div"
                       sx={{
                         fontWeight: 'bold',
                         mb: 1.2,
@@ -618,14 +621,15 @@ const Menu = ({ headerRef }) => {
                             key={child.label + i}
                             href={child.url}
                             sx={{
-                              justifyContent: 'center',
-                              textAlign: 'center',
+                              justifyContent: 'start',
+                              textAlign: 'left',
                               color: '#222',
                               fontWeight: 400,
-                              fontSize: '1rem',
+                              fontSize: '1.05rem',
                               px: 0,
                               minWidth: 0,
                               background: 'none',
+                              textTransform: 'none !important',
                               boxShadow: 'none',
                               '&:hover': {
                                 color: '#1976d2',
@@ -643,6 +647,7 @@ const Menu = ({ headerRef }) => {
                         ))
                     ) : (
                       <Typography
+                        component="div"
                         sx={{
                           color: 'text.secondary',
                           fontSize: '0.95rem',
@@ -672,32 +677,41 @@ const Menu = ({ headerRef }) => {
                     display: 'flex', 
                     flexDirection: 'column', 
                     gap: 1, 
-                    alignItems: 'center', 
-                    textAlign: 'center',
+                    textAlign: 'start',
                     width: megamenuSettings.columnWidth === 'auto' ? 'auto' : megamenuSettings.columnWidth
                   }}
                 >
                   <Typography
+                    component="div"
                     sx={{
                       fontWeight: 'bold',
                       mb: 1.2,
                       textTransform: 'uppercase',
                       fontSize: '1.08rem',
-                      textAlign: 'center'
+                      textAlign: 'left'
                     }}
                   >
                     {item.label}
+                    <Box
+                        sx={{
+                         height: '4px',
+                         bgcolor: 'var(--primary-color)',
+                         margin: '0 auto',
+                          mb: 1.2
+                          }}
+                          />
                   </Typography>
                   {item.children.map((child, i) => (
                     <Button
                       key={child.label + i}
                       href={child.url}
                       sx={{
-                        justifyContent: 'center',
-                        textAlign: 'center',
+                        justifyContent: 'start',
+                        textAlign: 'left',
                         color: '#222',
                         fontWeight: 400,
-                        fontSize: '1rem',
+                        fontSize: '16px',
+                        textTransform: 'none !important',
                         px: 0,
                         minWidth: 0,
                         background: 'none',
