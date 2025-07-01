@@ -417,7 +417,6 @@ export const roles = [
       // Banner - xem quảng cáo
       'banner:read',
 
-
       // Flash Sale - xem chương trình khuyến mãi
       'flashSale:read',
 

@@ -55,7 +55,7 @@ const statusLabels = {
   Shipping: ['Đang giao hàng', 'primary', <LocalShipping key="shipping" />],
   Delivered: ['Đã giao', 'success', <CheckCircle key="delivered" />],
   Cancelled: ['Đã hủy', 'error', <Cancel key="cancelled" />],
-  Failed: ['Thanh toán thất bại', 'error', <Cancel key="failed" />]
+  Failed: ['Thất bại', 'error', <Cancel key="failed" />]
 }
 
 // Skeleton Loading Component
@@ -781,7 +781,7 @@ const OrderListPage = () => {
 
   if (loading) {
     return (
-      <Container maxWidth="lg" sx={{ py: 4 }}>
+      <Container maxWidth="xl" sx={{ py: 4 }}>
         <Box display="flex" flexDirection="column" alignItems="center" gap={2}>
           <CircularProgress size={50} />
           <Typography variant="h6" color="text.secondary">
@@ -793,7 +793,7 @@ const OrderListPage = () => {
   }
 
   return (
-    <Container maxWidth="lg" sx={{
+    <Container maxWidth="xl" sx={{
       py: 4,
       minHeight: '70vh',
       // Thêm CSS animation cho skeleton
@@ -835,21 +835,27 @@ const OrderListPage = () => {
         sx={{
           borderRadius: 3,
           mb: 4,
-          overflow: 'hidden'
+          overflow: 'hidden',
         }}
       >
         <Tabs
           value={selectedTab}
           onChange={handleTabChange}
-          variant="scrollable"
-          scrollButtons="auto"
+          variant="fullWidth"
           sx={{
+            '& .MuiTabs-flexContainer': {
+              display: 'flex',
+              justifyContent: 'space-between',
+            },
             '& .MuiTab-root': {
               textTransform: 'none',
               fontWeight: 600,
-              fontSize: '1rem',
-              minHeight: 60,
-              px: 3,
+              fontSize: { xs: '0.6rem', sm: '0.75rem', md: '0.9rem', lg: '1rem' },
+              minHeight: { xs: 48, sm: 56, md: 60 },
+              px: { xs: 0.5, sm: 1, md: 2, lg: 3 },
+              minWidth: 0,
+              flex: 1,
+              maxWidth: 'none',
               transition: 'all 0.2s ease',
               '&:hover': {
                 backgroundColor: 'rgba(26, 60, 123, 0.04)',
@@ -869,9 +875,36 @@ const OrderListPage = () => {
               <Tab
                 key={status}
                 label={
-                  <Box display="flex" alignItems="center" gap={1}>
-                    {icon}
-                    {label}
+                  <Box
+                    display="flex"
+                    alignItems="center"
+                    justifyContent="center"
+                    gap={{ xs: 0.25, sm: 0.5, md: 0.75, lg: 1 }}
+                    flexDirection={{ xs: 'column', sm: 'column', md: 'row' }}
+                    sx={{
+                      width: '100%',
+                      height: '100%',
+                    }}
+                  >
+                    <Box
+                      sx={{
+                        fontSize: { xs: '0.875rem', sm: '1rem', md: '1.125rem' },
+                        lineHeight: 1,
+                      }}
+                    >
+                      {icon}
+                    </Box>
+                    <Typography
+                      component="span"
+                      sx={{
+                        fontSize: 'inherit',
+                        lineHeight: 1.1,
+                        textAlign: 'center',
+                        fontWeight: 'inherit',
+                      }}
+                    >
+                      {label}
+                    </Typography>
                   </Box>
                 }
                 value={status}

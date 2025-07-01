@@ -587,7 +587,7 @@ const OrderDetail = () => {
   }
 
   return (
-    <Box maxWidth="lg" mx="auto" p={3} sx={{ minHeight: '70vh' }}>
+    <Box maxWidth="xl" mx="auto" p={3} sx={{ minHeight: '70vh' }}>
       <Card
         sx={{
           borderRadius: 3,
@@ -656,7 +656,21 @@ const OrderDetail = () => {
                 {order.shippingAddress?.address}, {order.shippingAddress?.ward}, {order.shippingAddress?.district}, {order.shippingAddress?.city}
               </Typography>
               {order.note && (
-                <Typography color="text.secondary" fontStyle="italic">
+                <Typography
+                  color="text.secondary"
+                  fontStyle="italic"
+                  sx={{
+                    wordBreak: 'break-word',
+                    wordWrap: 'break-word',
+                    whiteSpace: 'pre-wrap',
+                    maxWidth: '100%',
+                    overflow: 'hidden',
+                    display: '-webkit-box',
+                    WebkitLineClamp: 3,
+                    WebkitBoxOrient: 'vertical',
+                    lineHeight: 1.5
+                  }}
+                >
                   Ghi chú: {order.note}
                 </Typography>
               )}
