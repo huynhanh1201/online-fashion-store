@@ -150,12 +150,6 @@ export const roles = [
       'banner:update',
       'banner:delete',
 
-      // Content Management
-      'content:use',
-      'content:read',
-      'content:create',
-      'content:update',
-      'content:delete',
 
       // Flash Sale
       'flashSale:use',
@@ -359,21 +353,24 @@ export const roles = [
       // Product  - để duyệt sản phẩm
       'product:read',
 
+      // Category - để duyệt danh mục sản phẩm
+      'category:read',
+
       // Variant - để xem các biến thể của sản phẩm
       'variant:read',
 
       // Color Palette - để chọn lựa
-      'colorPalette:read',
+      'color:read',
 
       // Size Palette - để chọn lựa
-      'sizePalette:read',
+      'size:read',
 
       // Order - tạo đơn và xem đơn hàng cá nhân
       'order:read', // có thể cần filter theo userId ở backend
       'order:create',
 
-      // Payment Transaction - theo dõi trạng thái thanh toán
-      'paymentTransaction:read',
+      // Payment - theo dõi trạng thái thanh toán
+      'payment:read',
 
       // Coupon - áp dụng mã
       'coupon:read',
@@ -402,8 +399,6 @@ export const roles = [
       // Banner - xem quảng cáo
       'banner:read',
 
-      // Content Management - xem nội dung trang web
-      'content:read',
 
       // Flash Sale - xem chương trình khuyến mãi
       'flashSale:read',
@@ -418,7 +413,19 @@ export const roles = [
       'featuredCategory:read',
 
       // Service - xem dịch vụ nổi bật
-      'service:read'
+      'service:read',
+
+      // Blog - xem bài viết
+      'blog:read', // khách hàng có thể xem blog
+
+      // policy - xem chính sách
+      'policy:read', // nếu muốn khách hàng có thể xem chính sách
+
+      // service
+      'service:read', // nếu muốn khách hàng có thể xem dịch vụ
+
+      // Danh mục nổi bật
+      'featuredCategory:read' // khách hàng có thể xem danh mục nổi
     ]
   }
 ]

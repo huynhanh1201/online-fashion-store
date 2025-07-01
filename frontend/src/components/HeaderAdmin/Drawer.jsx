@@ -136,7 +136,6 @@ export default function AdminDrawer({
       },
       contentManagement: {
         permissions: [
-          'content:use',
           'banner:use',
           'flashSale:use',
           'headerContent:use',

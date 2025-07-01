@@ -103,19 +103,10 @@ export const permissions = [
     group: 'Ảnh quảng cáo'
   },
   { key: 'banner:create', label: 'Tạo quảng cáo', group: 'Ảnh quảng cáo' },
+  { key: 'banner:read', label: 'Xem quảng cáo', group: 'Ảnh quảng cáo' },
   { key: 'banner:update', label: 'Cập nhật quảng cáo', group: 'Ảnh quảng cáo' },
   { key: 'banner:delete', label: 'Xóa quảng cáo', group: 'Ảnh quảng cáo' },
 
-  // Content Management
-  {
-    key: 'content:use',
-    label: 'Sử dụng trang quản lý nội dung',
-    group: 'Nội dung'
-  },
-  { key: 'content:read', label: 'Xem nội dung', group: 'Nội dung' },
-  { key: 'content:create', label: 'Tạo nội dung', group: 'Nội dung' },
-  { key: 'content:update', label: 'Cập nhật nội dung', group: 'Nội dung' },
-  { key: 'content:delete', label: 'Xóa nội dung', group: 'Nội dung' },
 
   // Flash Sale
   {
@@ -124,6 +115,7 @@ export const permissions = [
     group: 'Khuyến mãi'
   },
   { key: 'flashSale:create', label: 'Tạo khuyến mãi', group: 'Khuyến mãi' },
+  { key: 'flashSale:read', label: 'Xem khuyến mãi', group: 'Khuyến mãi' },
   {
     key: 'flashSale:update',
     label: 'Cập nhật khuyến mãi',
@@ -135,6 +127,11 @@ export const permissions = [
   {
     key: 'headerContent:use',
     label: 'Sử dụng trang nội dung đầu trang',
+    group: 'Nội dung đầu trang'
+  },
+  {
+    key: 'headerContent:read',
+    label: 'Xem nội dung đầu trang',
     group: 'Nội dung đầu trang'
   },
   {
@@ -157,6 +154,11 @@ export const permissions = [
   {
     key: 'footerContent:use',
     label: 'Sử dụng trang nội dung cuối trang',
+    group: 'Nội dung cuối trang'
+  },
+  {
+    key: 'footerContent:read',
+    label: 'Xem nội dung cuối trang',
     group: 'Nội dung cuối trang'
   },
   {
@@ -187,6 +189,11 @@ export const permissions = [
     group: 'Danh mục nổi bật'
   },
   {
+    key: 'featuredCategory:read',
+    label: 'Xem danh mục nổi bật',
+    group: 'Danh mục nổi bật'
+  },
+  {
     key: 'featuredCategory:update',
     label: 'Cập nhật danh mục nổi bật',
     group: 'Danh mục nổi bật'
@@ -204,6 +211,7 @@ export const permissions = [
     group: 'Dịch vụ'
   },
   { key: 'service:create', label: 'Tạo dịch vụ', group: 'Dịch vụ' },
+  { key: 'service:read', label: 'Xem dịch vụ', group: 'Dịch vụ' },
   { key: 'service:update', label: 'Cập nhật dịch vụ', group: 'Dịch vụ' },
   { key: 'service:delete', label: 'Xóa dịch vụ', group: 'Dịch vụ' },
 
