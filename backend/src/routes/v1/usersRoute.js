@@ -3,6 +3,7 @@ import express from 'express'
 import { usersValidation } from '~/validations/usersValidation'
 import { usersController } from '~/controllers/usersController'
 import { authMiddleware } from '~/middlewares/authMiddleware'
+import { rbacMiddleware } from '~/middlewares/rbacMiddleware'
 
 const Router = express.Router()
 

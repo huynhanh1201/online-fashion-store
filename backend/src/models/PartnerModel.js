@@ -65,4 +65,4 @@ partnerSchema.plugin(refIntegrityPlugin, {
 })
 
 // Tạo Model
-export const PartnerModel = model('PartnerManagement', partnerSchema)
+export const PartnerModel = model('Partner', partnerSchema)
