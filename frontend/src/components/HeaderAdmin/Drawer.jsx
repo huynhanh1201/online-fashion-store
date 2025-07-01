@@ -444,6 +444,19 @@ export default function AdminDrawer({
               </ListItemButton>
             </ListItem>
           )}
+          {canAccessMenu(menuConfig.contentManagement) && (
+            <ListItem disablePadding sx={{ height: 48 }}>
+              <ListItemButton
+                onClick={toggleProduct}
+                sx={{ padding: '12px 24px' }}
+              >
+                <ListItemIcon sx={{ minWidth: 45 }}>
+                  <LocalOfferIcon />
+                </ListItemIcon>
+              </ListItemButton>
+            </ListItem>
+          )}
+
           {canAccessMenu(menuConfig.productManagement) && (
             <ListItem disablePadding sx={{ height: 48 }}>
               <ListItemButton

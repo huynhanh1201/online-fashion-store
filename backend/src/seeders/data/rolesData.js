@@ -147,6 +147,7 @@ export const roles = [
       // Banner
       'banner:use',
       'banner:create',
+      'banner:read',
       'banner:update',
       'banner:delete',
 
@@ -154,29 +155,34 @@ export const roles = [
       // Flash Sale
       'flashSale:use',
       'flashSale:create',
+      'flashSale:read',
       'flashSale:update',
       'flashSale:delete',
 
       // Header Content
       'headerContent:use',
+      'headerContent:read',
       'headerContent:create',
       'headerContent:update',
       'headerContent:delete',
 
       // Footer Content
       'footerContent:use',
+      'footerContent:read',
       'footerContent:create',
       'footerContent:update',
       'footerContent:delete',
 
       // Featured Category
       'featuredCategory:use',
+      'featuredCategory:read',
       'featuredCategory:create',
       'featuredCategory:update',
       'featuredCategory:delete',
 
       // Service
       'service:use',
+      'service:read',
       'service:create',
       'service:update',
       'service:delete',
@@ -188,8 +194,21 @@ export const roles = [
       // Policy
       'policy:use',
       'policy:create',
+      'policy:read',
       'policy:update',
-      'policy:delete'
+      'policy:delete',
+
+      //Shipping Addresses
+      'shippingAddress:read',
+      'shippingAddress:create',
+      'shippingAddress:update',
+      'shippingAddress:delete',
+
+      // Cart
+      'cart:create',
+      'cart:read',
+      'cart:update',
+      'cart:delete',
     ]
   },
   {
@@ -387,7 +406,6 @@ export const roles = [
       // Review - khách hàng có thể tạo và quản lý đánh giá của mình
       'review:create',
       'review:read',
-      'review:update',
       'review:delete',
 
       // Cart - quản lý giỏ hàng
