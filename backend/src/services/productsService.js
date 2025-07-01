@@ -275,6 +275,11 @@ const updateProduct = async (productId, reqBody) => {
         runValidators: true
       }
     )
+      .populate({
+        path: 'categoryId',
+        select: 'name description slug _id'
+      })
+      .lean()
 
     if (updatedProduct) {
       await VariantModel.findOneAndUpdate(
