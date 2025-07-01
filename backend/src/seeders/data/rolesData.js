@@ -12,6 +12,7 @@ export const roles = [
       'user:create',
       'user:update',
       'user:delete',
+      'user:restore',
 
       // Category
       'category:use',
@@ -19,6 +20,7 @@ export const roles = [
       'category:create',
       'category:update',
       'category:delete',
+      'category:restore',
 
       // Product
       'product:use',
@@ -26,6 +28,7 @@ export const roles = [
       'product:create',
       'product:update',
       'product:delete',
+      'product:restore',
 
       // Variant
       'variant:use',
@@ -33,6 +36,7 @@ export const roles = [
       'variant:create',
       'variant:update',
       'variant:delete',
+      'variant:restore',
 
       // Color
       'color:use',
@@ -40,6 +44,7 @@ export const roles = [
       'color:create',
       'color:update',
       'color:delete',
+      'color:restore',
 
       // Size
       'size:use',
@@ -47,6 +52,7 @@ export const roles = [
       'size:create',
       'size:update',
       'size:delete',
+      'size:restore',
 
       // Order
       'order:use',
@@ -64,6 +70,7 @@ export const roles = [
       'coupon:create',
       'coupon:update',
       'coupon:delete',
+      'coupon:restore',
 
       // Statistics
       'statistics:use',
@@ -104,6 +111,7 @@ export const roles = [
       'partner:create',
       'partner:update',
       'partner:delete',
+      'partner:restore',
 
       // Review
       'review:use',
@@ -111,6 +119,7 @@ export const roles = [
       'review:read',
       'review:update',
       'review:delete',
+      'review:restore',
 
       // Role
       'role:use',
@@ -118,6 +127,7 @@ export const roles = [
       'role:create',
       'role:update',
       'role:delete',
+      'role:restore',
 
       // Blog
       'blog:use',
@@ -125,6 +135,7 @@ export const roles = [
       'blog:create',
       'blog:update',
       'blog:delete',
+      'blog:restore',
 
       // Account
       'account:use',
@@ -136,45 +147,68 @@ export const roles = [
       // Banner
       'banner:use',
       'banner:create',
+      'banner:read',
       'banner:update',
       'banner:delete',
 
-      // Content Management
-      'content:use',
-      'content:read',
-      'content:create',
-      'content:update',
-      'content:delete',
 
       // Flash Sale
       'flashSale:use',
       'flashSale:create',
+      'flashSale:read',
       'flashSale:update',
       'flashSale:delete',
 
       // Header Content
       'headerContent:use',
+      'headerContent:read',
       'headerContent:create',
       'headerContent:update',
       'headerContent:delete',
 
       // Footer Content
       'footerContent:use',
+      'footerContent:read',
       'footerContent:create',
       'footerContent:update',
       'footerContent:delete',
 
       // Featured Category
       'featuredCategory:use',
+      'featuredCategory:read',
       'featuredCategory:create',
       'featuredCategory:update',
       'featuredCategory:delete',
 
       // Service
       'service:use',
+      'service:read',
       'service:create',
       'service:update',
-      'service:delete'
+      'service:delete',
+
+      // Theme
+      'theme:use',
+      'theme:update',
+
+      // Policy
+      'policy:use',
+      'policy:create',
+      'policy:read',
+      'policy:update',
+      'policy:delete',
+
+      //Shipping Addresses
+      'shippingAddress:read',
+      'shippingAddress:create',
+      'shippingAddress:update',
+      'shippingAddress:delete',
+
+      // Cart
+      'cart:create',
+      'cart:read',
+      'cart:update',
+      'cart:delete',
     ]
   },
   {
@@ -194,6 +228,10 @@ export const roles = [
       // Role
       'role:use',
       'role:read',
+      'role:create',
+      'role:update',
+      'role:delete',
+      'role:restore',
 
       // Category
       'category:use',
@@ -328,72 +366,84 @@ export const roles = [
     label: 'Khách hàng',
     permissions: [
       // User - xem và cập nhật tài khoản của chính họ
-      // 'user:read',
-      // 'user:update',
+      'user:read',
+      'user:update',
 
-      // // Product  - để duyệt sản phẩm
-      // 'product:read',
+      // Product  - để duyệt sản phẩm
+      'product:read',
 
-      // // Variant - để xem các biến thể của sản phẩm
-      // 'variant:read',
+      // Category - để duyệt danh mục sản phẩm
+      'category:read',
 
-      // // Color Palette - để chọn lựa
-      // 'colorPalette:read',
+      // Variant - để xem các biến thể của sản phẩm
+      'variant:read',
 
-      // // Size Palette - để chọn lựa
-      // 'sizePalette:read',
+      // Color Palette - để chọn lựa
+      'color:read',
 
-      // // Order - tạo đơn và xem đơn hàng cá nhân
-      // 'order:read', // có thể cần filter theo userId ở backend
-      // 'order:create',
+      // Size Palette - để chọn lựa
+      'size:read',
 
-      // // Payment Transaction - theo dõi trạng thái thanh toán
-      // 'paymentTransaction:read',
+      // Order - tạo đơn và xem đơn hàng cá nhân
+      'order:read', // có thể cần filter theo userId ở backend
+      'order:create',
 
-      // // Coupon - áp dụng mã
-      // 'coupon:read',
+      // Payment - theo dõi trạng thái thanh toán
+      'payment:read',
 
-      // // Inventory - (nếu muốn show "còn hàng / hết hàng")
-      // 'inventory:read',
+      // Coupon - áp dụng mã
+      'coupon:read',
 
-      // //Shipping Addresses
-      // 'shippingAddress:read',
-      // 'shippingAddress:create',
-      // 'shippingAddress:update',
-      // 'shippingAddress:delete',
+      // Inventory - (nếu muốn show "còn hàng / hết hàng")
+      'inventory:read',
 
-      // // Review - khách hàng có thể tạo và quản lý đánh giá của mình
-      // 'review:create',
-      // 'review:read',
-      // 'review:update',
-      // 'review:delete',
+      //Shipping Addresses
+      'shippingAddress:read',
+      'shippingAddress:create',
+      'shippingAddress:update',
+      'shippingAddress:delete',
 
-      // // Cart - quản lý giỏ hàng
-      // 'cart:create',
-      // 'cart:read',
-      // 'cart:update',
-      // 'cart:delete',
+      // Review - khách hàng có thể tạo và quản lý đánh giá của mình
+      'review:create',
+      'review:read',
+      'review:delete',
 
-      // // Banner - xem quảng cáo
-      // 'banner:read',
+      // Cart - quản lý giỏ hàng
+      'cart:create',
+      'cart:read',
+      'cart:update',
+      'cart:delete',
 
-      // // Content Management - xem nội dung trang web
-      // 'content:read',
+      // Banner - xem quảng cáo
+      'banner:read',
 
-      // // Flash Sale - xem chương trình khuyến mãi
-      // 'flashSale:read',
 
-      // // Header Content - xem nội dung đầu trang
-      // 'headerContent:read',
+      // Flash Sale - xem chương trình khuyến mãi
+      'flashSale:read',
 
-      // // Footer Content - xem nội dung cuối trang
-      // 'footerContent:read',
+      // Header Content - xem nội dung đầu trang
+      'headerContent:read',
 
-      // // Featured Category - xem danh mục nổi bật
-      // 'featuredCategory:read',
+      // Footer Content - xem nội dung cuối trang
+      'footerContent:read',
 
-      // // Service - xem dịch vụ nổi bật
-      // 'service:read'
+      // Featured Category - xem danh mục nổi bật
+      'featuredCategory:read',
+
+      // Service - xem dịch vụ nổi bật
+      'service:read',
+
+      // Blog - xem bài viết
+      'blog:read', // khách hàng có thể xem blog
+
+      // policy - xem chính sách
+      'policy:read', // nếu muốn khách hàng có thể xem chính sách
+
+      // service
+      'service:read', // nếu muốn khách hàng có thể xem dịch vụ
+
+      // Danh mục nổi bật
+      'featuredCategory:read' // khách hàng có thể xem danh mục nổi
     ]
   }
 ]

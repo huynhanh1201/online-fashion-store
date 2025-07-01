@@ -18,7 +18,6 @@ Router.route('/').post(
 // Danh sách Đơn hàng
 Router.route('/').get(
   authMiddleware.isAuthorized,
-  rbacMiddleware.isValidPermission(['order:use']),
   authMiddleware.isAuthorized,
   ordersController.getOrderList
 )
@@ -34,7 +33,6 @@ Router.route('/:orderId').get(
 // Cập nhật thông tin Đơn hàng
 Router.route('/:orderId').patch(
   authMiddleware.isAuthorized,
-  rbacMiddleware.isValidPermission(['order:update']),
   ordersValidation.verifyId,
   ordersValidation.updateOrder,
   ordersController.updateOrder

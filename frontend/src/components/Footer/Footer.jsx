@@ -131,9 +131,6 @@ function Footer() {
               HỖ TRỢ KHÁCH HÀNG
             </Typography>
             <Stack spacing={0.5}>
-              <Typography component='a' href='/policy' sx={{ color: 'inherit', textDecoration: 'none', cursor: 'pointer', '&:hover': { textDecoration: 'underline' } }}>
-                Chính sách
-              </Typography>
               {policies.map((policy) => (
                 <Typography
                   key={policy._id}
