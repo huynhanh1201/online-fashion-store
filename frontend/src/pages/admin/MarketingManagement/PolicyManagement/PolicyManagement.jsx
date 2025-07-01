@@ -190,6 +190,9 @@ export default function PolicyManagement() {
   const totalPolicies = policies.length
   const activePolicies = policies.filter(p => p.status === 'active').length
 
+  // Lấy danh sách loại chính sách đã có
+  const existingTypes = policies.map(p => p.category)
+
   // Loading skeleton
   const LoadingSkeleton = () => (
     <TableRow>
@@ -457,6 +460,7 @@ export default function PolicyManagement() {
         onSave={handlePolicySave}
         policyData={selectedPolicy}
         mode={modalMode}
+        existingTypes={existingTypes}
       />
       {/* Modal Xem chi tiết */}
       <ViewPolicyModal

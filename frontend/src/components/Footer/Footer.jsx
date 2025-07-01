@@ -18,10 +18,12 @@ import LocationOnIcon from '@mui/icons-material/LocationOn'
 import SearchIcon from '@mui/icons-material/Search'
 import LinkIcon from '@mui/icons-material/Link'
 import { getFooterConfig } from '~/services/admin/webConfig/footerService.js'
+import { getAllPolicies } from '~/services/policyService.js'
 
 function Footer() {
   const [footer, setFooter] = useState(null)
   const [loading, setLoading] = useState(true)
+  const [policies, setPolicies] = useState([])
 
   useEffect(() => {
     const fetchFooter = async () => {
@@ -36,6 +38,21 @@ function Footer() {
       }
     }
     fetchFooter()
+  }, [])
+
+  useEffect(() => {
+    const fetchPolicies = async () => {
+      try {
+        const all = await getAllPolicies()
+        // Chỉ lấy active, không destroy
+        setPolicies(
+          all.filter(p => p.status === 'active' && p.destroy === false)
+        )
+      } catch {
+        setPolicies([])
+      }
+    }
+    fetchPolicies()
   }, [])
 
   if (loading) return null
@@ -67,17 +84,21 @@ function Footer() {
           <Box sx={{ flex: 1, minWidth: 220 }}>
             {footer?.logo && (
               <Box sx={{ mb: 1 }}>
-                <img src={footer.logo} alt='logo' style={{ width: 120, height: 'auto', borderRadius: 8, background: '#fff', padding: 4 }} />
+                <img src={footer.logo} alt='logo' style={{ maxWidth: '200px', width:'100%',maxHeight:'100px', height: '100%', borderRadius: 8, background: '#fff', padding: 4, objectFit:'cover' }} />
               </Box>
             )}
-            <Typography variant='h6' sx={{ fontWeight: 700, mb: 1 }}>
-              {footer?.about?.[0]?.phone ? `Hotline: ${footer.about[0].phone}` : 'FASHIONSTORE'}
-            </Typography>
-            {footer?.about?.[0]?.email && (
-              <Typography variant='body2' sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                <EmailIcon sx={{ fontSize: 16, mr: 1 }} /> {footer.about[0].email}
+            {/* Show all phone numbers */}
+            {footer?.about?.filter(a => a.phone).map((a, idx) => (
+              <Typography key={`phone-${idx}`} variant='body2' sx={{ display: 'flex', alignItems: 'center', mb: 1, fontWeight: 700 }}>
+                <PhoneIcon sx={{ fontSize: 16, mr: 1 }} /> {a.phone}
               </Typography>
-            )}
+            ))}
+            {/* Show all emails */}
+            {footer?.about?.filter(a => a.email).map((a, idx) => (
+              <Typography key={`email-${idx}`} variant='body2' sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+                <EmailIcon sx={{ fontSize: 16, mr: 1 }} /> {a.email}
+              </Typography>
+            ))}
             <Typography sx={{ mb: 1, fontWeight: 500 }}>ĐĂNG KÝ NHẬN TIN</Typography>
             <Typography variant='caption'>Hãy là người đầu tiên nhận khuyến mãi lớn!</Typography>
             <Box sx={{ mt: 1, display: 'flex', gap: 1 }}>
@@ -105,23 +126,26 @@ function Footer() {
           </Box>
 
           {/* Cột 2: Chính sách + Hỗ trợ */}
-          {footer?.menuColumns?.length > 0 && (
-            <Box sx={{ flex: 1, minWidth: 180 }}>
-              <Typography variant='subtitle1' sx={{ fontWeight: 600, mb: 1 }}>
-                CHÍNH SÁCH WEBSITE
+          <Box sx={{ flex: 1, minWidth: 180 }}>
+            <Typography variant='subtitle1' sx={{ fontWeight: 600, mb: 1 }}>
+              HỖ TRỢ KHÁCH HÀNG
+            </Typography>
+            <Stack spacing={0.5}>
+              <Typography component='a' href='/policy' sx={{ color: 'inherit', textDecoration: 'none', cursor: 'pointer', '&:hover': { textDecoration: 'underline' } }}>
+                Chính sách
               </Typography>
-              <Stack spacing={0.5}>
-                <Typography component='a' href='/policy' sx={{ color: 'inherit', textDecoration: 'none', cursor: 'pointer', '&:hover': { textDecoration: 'underline' } }}>
-                  Chính sách
+              {policies.map((policy) => (
+                <Typography
+                  key={policy._id}
+                  component='a'
+                  href={`/policy#${policy.category}`}
+                  sx={{ color: 'inherit', textDecoration: 'none', cursor: 'pointer', '&:hover': { textDecoration: 'underline' } }}
+                >
+                  {policy.title}
                 </Typography>
-                {footer.menuColumns.map((col, idx) => (
-                  <Typography key={idx} component='a' href={col.link || '#'} sx={{ color: 'inherit', textDecoration: 'none', cursor: 'pointer', '&:hover': { textDecoration: 'underline' } }}>
-                    {col.title}
-                  </Typography>
-                ))}
-              </Stack>
-            </Box>
-          )}
+              ))}
+            </Stack>
+          </Box>
 
           {/* Cột 3: Danh sách cửa hàng */}
           {footer?.stores?.length > 0 && (
@@ -149,6 +173,11 @@ function Footer() {
               <Typography variant='subtitle1' sx={{ fontWeight: 600, mb: 1 }}>
                 KẾT NỐI VỚI CHÚNG TÔI
               </Typography>
+              {footer?.fanpageImage && (
+                <Box sx={{ mb: 2, display: 'flex', justifyContent: 'start' }}>
+                  <img src={footer.fanpageImage} alt='fanpage' style={{ width: 300, height: 'auto', borderRadius: 8, background: '#fff', padding: 4 }} />
+                </Box>
+              )}
               <Stack spacing={1}>
                 {footer?.socialLinks?.map((s, idx) => (
                   <Box

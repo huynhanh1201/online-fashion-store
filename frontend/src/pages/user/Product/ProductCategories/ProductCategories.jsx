@@ -22,7 +22,7 @@ const ProductCategories = () => {
       const categoryData = response.categories || []
       
       // Filter out categories that are marked as destroyed (hidden)
-      const activeCategories = categoryData.filter(category => category.destroy === false)
+      const activeCategories = categoryData.filter(category => category.destroy === false && (!category.parent || category.parent === null))
       
       setCategories(activeCategories)
     } catch (err) {

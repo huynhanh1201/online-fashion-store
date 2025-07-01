@@ -337,17 +337,30 @@ const Content = () => {
       {/* Flash Sale Section */}
       <FlashSaleSection products={products} loading={loading} error={error} />
     </div>
-    <Box sx={{width:'99vw', justifyContent:'center' , alignItems:'center'}}>
-     
-       <ProductHorizontalScroll products={[...products].slice(-12).reverse()} maxVisible={6} itemWidth={260} />
-       {products.length > 0 && (
-        <div style={{ textAlign: 'center', marginBottom: '32px' }}>
-          <Link to='/productnews'>
-            <button className='cta-button'>Xem tất cả ›</button>
-          </Link>
-        </div>
-      )}
-    </Box>
+    <Box
+  sx={{
+    width: '99vw',
+    display: 'flex',
+    flexDirection: 'column', // Sắp xếp dọc
+    justifyContent: 'center',
+    alignItems: 'center',
+    pl:1.3
+  }}
+>
+  <ProductHorizontalScroll
+    products={[...products].slice(-12).reverse()}
+    maxVisible={6}
+    itemWidth={260}
+  />
+  {products.length > 0 && (
+    <div style={{ textAlign: 'center', marginBottom: '32px' }}>
+      <Link to='/productnews'>
+        <button className='cta-button'>Xem tất cả ›</button>
+      </Link>
+    </div>
+  )}
+</Box>
+
     </>
   )
 }
