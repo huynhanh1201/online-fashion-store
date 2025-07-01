@@ -356,8 +356,8 @@ const Menu = ({ headerRef }) => {
                   {item.isNew ? (
                     <Badge
                       badgeContent={
-                        <span style={{ fontSize: '12px', fontWeight: 700, color: 'red' }}>
-                          mới
+                        <span style={{ fontSize: '10px', fontWeight: 700, color: 'red' }}>
+                          MỚI
                         </span>
                       }
                       color='default'
@@ -568,7 +568,8 @@ const Menu = ({ headerRef }) => {
               maxWidth: '95vw',
               opacity: productMenuOpen ? 1 : 0,
               transition: `opacity ${megamenuSettings.animationDuration}ms ease`,
-              justifyItems: 'center',
+              justifyItems: 'start',
+              justifyContent: 'start',
             }}
           >
             {menuConfig?.mainMenu && menuConfig.mainMenu.length > 0 ? (
@@ -618,8 +619,8 @@ const Menu = ({ headerRef }) => {
                             key={child.label + i}
                             href={child.url}
                             sx={{
-                              justifyContent: 'center',
-                              textAlign: 'center',
+                              justifyContent: 'start',
+                              textAlign: 'left',
                               color: '#222',
                               fontWeight: 400,
                               fontSize: '1rem',
@@ -672,8 +673,7 @@ const Menu = ({ headerRef }) => {
                     display: 'flex', 
                     flexDirection: 'column', 
                     gap: 1, 
-                    alignItems: 'center', 
-                    textAlign: 'center',
+                    textAlign: 'start',
                     width: megamenuSettings.columnWidth === 'auto' ? 'auto' : megamenuSettings.columnWidth
                   }}
                 >
@@ -683,21 +683,30 @@ const Menu = ({ headerRef }) => {
                       mb: 1.2,
                       textTransform: 'uppercase',
                       fontSize: '1.08rem',
-                      textAlign: 'center'
+                      textAlign: 'left'
                     }}
                   >
                     {item.label}
+                    <Box
+                        sx={{
+                         height: '4px',
+                         bgcolor: 'var(--primary-color)',
+                         margin: '0 auto',
+                          mb: 1.2
+                          }}
+                          />
                   </Typography>
                   {item.children.map((child, i) => (
                     <Button
                       key={child.label + i}
                       href={child.url}
                       sx={{
-                        justifyContent: 'center',
-                        textAlign: 'center',
+                        justifyContent: 'start',
+                        textAlign: 'left',
                         color: '#222',
-                        fontWeight: 400,
-                        fontSize: '1rem',
+                        fontWeight: 300,
+                        fontSize: '16px',
+                        textTransform: 'none',
                         px: 0,
                         minWidth: 0,
                         background: 'none',
