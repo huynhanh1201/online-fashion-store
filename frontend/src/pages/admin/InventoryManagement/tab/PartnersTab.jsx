@@ -96,7 +96,6 @@ const PartnersTab = () => {
     destroy: 'false',
     sort: 'newest'
   })
-
   useEffect(() => {
     fetchPartners(page, ROWS_PER_PAGE, filter)
   }, [page, ROWS_PER_PAGE, filter])
@@ -155,7 +154,6 @@ const PartnersTab = () => {
     setPage(1)
     setROWS_PER_PAGE(newLimit)
   }
-  console.log(filter.destroy)
   const handleSave = async (partner, type, partnerId) => {
     if (type === 'add') {
       await createNewPartner(partner, filter)
@@ -222,18 +220,23 @@ const PartnersTab = () => {
       <Table size='small'>
         <TableHead>
           <TableRow>
-            <TableCell colSpan={partnerColumns.length} sx={{ py: 2 }}>
+            <TableCell
+              colSpan={partnerColumns.length}
+              sx={{ py: 2, background: '#fff' }}
+            >
               <Box
                 display='flex'
                 justifyContent='space-between'
                 alignItems='center'
+                sx={{ background: '#fff', borderColor: '#fff' }}
               >
                 <Box
                   sx={{
                     display: 'flex',
                     justifyContent: 'space-between',
                     alignItems: 'start',
-                    flex: 1
+                    flex: 1,
+                    background: '#fff'
                   }}
                 >
                   <Box
@@ -258,7 +261,7 @@ const PartnersTab = () => {
                           width: 100,
                           display: 'flex',
                           alignItems: 'center',
-                          backgroundColor: '#001f5d',
+                          backgroundColor: 'var(--primary-color)',
                           color: '#fff'
                         }}
                       >
@@ -285,6 +288,7 @@ const PartnersTab = () => {
                   minWidth: col.minWidth,
                   height: 57,
                   width: col.width,
+                  background: '#fff !important',
                   ...(col.maxWidth && { maxWidth: col.maxWidth }),
                   ...(col.id === 'action' && {
                     width: '130px',
@@ -376,7 +380,7 @@ const PartnersTab = () => {
                             </IconButton>
                           </Tooltip>
                         )}
-                        {filter.destroy ? (
+                        {String(filter.destroy) === 'true' ? (
                           hasPermission('partner:restore') && (
                             <Tooltip title='Khôi phục'>
                               <IconButton
@@ -420,12 +424,14 @@ const PartnersTab = () => {
                       key={col.id}
                       align={col.align || 'left'}
                       sx={{
+                        background: '#fff',
                         py: 0,
                         px: 1,
                         height: 55,
                         whiteSpace: 'nowrap',
                         overflow: 'hidden',
                         textOverflow: 'ellipsis',
+
                         ...(col.maxWidth && { maxWidth: col.maxWidth })
                       }}
                       title={typeof content === 'string' ? content : undefined}
@@ -440,6 +446,7 @@ const PartnersTab = () => {
         </TableBody>
       </Table>
       <TablePagination
+        sx={{ background: '#fff' }}
         rowsPerPageOptions={[10, 25, 100]}
         component='div'
         count={totalPartner || 0}

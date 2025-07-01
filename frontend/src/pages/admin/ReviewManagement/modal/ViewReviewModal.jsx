@@ -74,7 +74,7 @@ const ViewReviewModal = ({ open, onClose, review, onApprove }) => {
         open={open}
         onClose={onClose}
         fullWidth
-        maxWidth='md'
+        maxWidth='xl'
         BackdropProps={{ sx: StyleAdmin.OverlayModal }}
       >
         <Box>
@@ -89,7 +89,7 @@ const ViewReviewModal = ({ open, onClose, review, onApprove }) => {
           </Button>
         </Box>
         <Divider />
-        <DialogContent sx={{ maxHeight: '65vh' }}>
+        <DialogContent sx={{ maxHeight: '95vh' }}>
           {review ? (
             <>
               {/* Table chứa các thông tin chính */}
@@ -260,36 +260,36 @@ const ViewReviewModal = ({ open, onClose, review, onApprove }) => {
 
         <Divider />
         <DialogActions sx={{ padding: '16px 24px' }}>
-          {review?.moderationStatus === 'pending' && hasPermission('review:update') && (
-            <Box>
-              <Button
-                onClick={() => handleApprove('approved')}
-                color='primary'
-                variant='contained'
-                sx={{
-                  backgroundColor: 'var(--primary-color)',
-                  color: '#fff',
-                  textTransform: 'none',
-                  mr: 1,
-                  width: 120
-                }}
-              >
-                Duyệt
-              </Button>
-              <Button
-                onClick={handleApprove}
-                color='error'
-                variant='contained'
-                sx={{
-                  textTransform: 'none',
-                  width: 120
-                }}
-              >
-                Không duyệt
-              </Button>
-            </Box>
-          )}
-
+          {review?.moderationStatus === 'pending' &&
+            hasPermission('review:update') && (
+              <Box>
+                <Button
+                  onClick={() => handleApprove('approved')}
+                  color='primary'
+                  variant='contained'
+                  sx={{
+                    backgroundColor: 'var(--primary-color)',
+                    color: '#fff',
+                    textTransform: 'none',
+                    mr: 1,
+                    width: 120
+                  }}
+                >
+                  Duyệt
+                </Button>
+                <Button
+                  onClick={handleApprove}
+                  color='error'
+                  variant='contained'
+                  sx={{
+                    textTransform: 'none',
+                    width: 120
+                  }}
+                >
+                  Không duyệt
+                </Button>
+              </Box>
+            )}
         </DialogActions>
       </Dialog>
 

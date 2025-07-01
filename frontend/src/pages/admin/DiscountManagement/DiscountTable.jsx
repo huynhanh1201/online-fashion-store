@@ -92,7 +92,7 @@ const DiscountTable = ({
                           width: 100,
                           display: 'flex',
                           alignItems: 'center',
-                          backgroundColor: '#001f5d',
+                          backgroundColor: 'var(--primary-color)',
                           color: '#fff'
                         }}
                       >
@@ -161,6 +161,7 @@ const DiscountTable = ({
       </TableContainer>
 
       <TablePagination
+        sx={{ background: '#fff' }}
         rowsPerPageOptions={[10, 25, 100]}
         component='div'
         count={total || 0}

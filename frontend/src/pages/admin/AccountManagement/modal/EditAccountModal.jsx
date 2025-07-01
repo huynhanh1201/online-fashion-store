@@ -58,7 +58,12 @@ const EditAccountModal = ({ open, onClose, user, onSave, roles }) => {
     onClose()
   }
 
-  // const roleOptions = roles.filter((role) => role.name !== 'customer')
+  const roleOptions = roles
+    .filter((role) => role.name !== 'customer')
+    .map((role) => ({
+      name: role.name,
+      label: role.label || role.name
+    }))
 
   return (
     <Dialog
@@ -77,7 +82,20 @@ const EditAccountModal = ({ open, onClose, user, onSave, roles }) => {
           <Controller
             name='name'
             control={control}
-            rules={{ required: 'Tên là bắt buộc' }}
+            rules={{
+              required: 'Họ và tên là bắt buộc',
+              minLength: {
+                value: 3,
+                message: 'Họ và tên phải có ít nhất 3 ký tự'
+              },
+              maxLength: {
+                value: 50,
+                message: 'Họ và tên không vượt quá 50 ký tự'
+              },
+              validate: (value) =>
+                value.trim() === value ||
+                'Họ và tên không được có khoảng trắng ở đầu hoặc cuối'
+            }}
             render={({ field, fieldState }) => (
               <TextField
                 {...field}
@@ -94,6 +112,17 @@ const EditAccountModal = ({ open, onClose, user, onSave, roles }) => {
           <Controller
             name='password'
             control={control}
+            rules={{
+              validate: (value) => {
+                if (!value?.trim()) return true
+                const regex =
+                  /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,128}$/
+                return (
+                  regex.test(value) ||
+                  'Mật khẩu phải từ 8–128 ký tự, có ít nhất 1 chữ hoa, 1 chữ thường, 1 số và 1 ký tự đặc biệt'
+                )
+              }
+            }}
             render={({ field, fieldState }) => (
               <TextField
                 {...field}
@@ -122,24 +151,18 @@ const EditAccountModal = ({ open, onClose, user, onSave, roles }) => {
           <Controller
             name='role'
             control={control}
-            rules={{ required: 'Vai trò là bắt buộc' }}
+            rules={{
+              required: 'Vai trò là bắt buộc, vui lòng chọn 1 vai trò phù hợp'
+            }}
             render={({ field, fieldState }) => (
               <Autocomplete
-                options={roles}
-                // ✅ getOptionLabel phải trả về string an toàn
-                getOptionLabel={(option) =>
-                  typeof option === 'string'
-                    ? option
-                    : option?.label || option?.name || ''
-                }
-                // ✅ Chuyển từ name (field.value) sang object tương ứng
-                value={roles.find((r) => r.name === field.value) || null}
-                // ✅ Truyền ngược role.name khi chọn
-                onChange={(_, value) => field.onChange(value?.name || '')}
+                options={roleOptions}
+                getOptionLabel={(option) => option.label}
                 isOptionEqualToValue={(option, value) =>
-                  option.name ===
-                  (typeof value === 'string' ? value : value?.name)
+                  option.name === value?.name
                 }
+                value={roleOptions.find((r) => r.name === field.value) || null}
+                onChange={(_, selected) => field.onChange(selected?.name || '')}
                 renderInput={(params) => (
                   <TextField
                     {...params}

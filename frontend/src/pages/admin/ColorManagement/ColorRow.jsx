@@ -33,7 +33,8 @@ const styles = {
     whiteSpace: 'nowrap',
     overflow: 'hidden',
     textOverflow: 'ellipsis',
-    verticalAlign: 'middle'
+    verticalAlign: 'middle',
+    background: '#fff'
   }
 }
 

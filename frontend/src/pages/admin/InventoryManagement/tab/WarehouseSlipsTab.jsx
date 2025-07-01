@@ -269,7 +269,7 @@ const WarehouseSlipsTab = () => {
                                 flex: 1,
                                 display: 'flex',
                                 alignItems: 'center',
-                                backgroundColor: '#001f5d',
+                                backgroundColor: 'var(--primary-color)',
                                 color: '#fff'
                               }}
                             >
@@ -277,7 +277,7 @@ const WarehouseSlipsTab = () => {
                             </Button>
                             <Button
                               variant='contained'
-                              color='secondary'
+                              color='error'
                               onClick={() => handleOpenModal('output')}
                               sx={{
                                 textTransform: 'none',
@@ -411,8 +411,13 @@ const WarehouseSlipsTab = () => {
                         <Chip
                           label={row.type === 'Nhập' ? 'Nhập' : 'Xuất'}
                           size='large'
-                          sx={{ width: 120, fontWeight: 800 }}
                           color={row.type === 'Nhập' ? 'success' : 'error'}
+                          sx={{
+                            width: 120,
+                            fontWeight: 800,
+                            backgroundColor:
+                              row.type === 'Nhập' && 'var(--primary-color)'
+                          }}
                         />
                       )
                     }

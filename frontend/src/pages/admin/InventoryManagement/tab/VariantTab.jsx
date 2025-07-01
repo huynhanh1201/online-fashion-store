@@ -285,7 +285,7 @@ const VariantsTab = () => {
                             width: 100,
                             display: 'flex',
                             alignItems: 'center',
-                            backgroundColor: '#001f5d',
+                            backgroundColor: 'var(--primary-color)',
                             color: '#fff'
                           }}
                         >
@@ -416,7 +416,7 @@ const VariantsTab = () => {
                                 </IconButton>
                               </Tooltip>
                             )}
-                            {filter.destroy === 'true' ? (
+                            {String(filter.destroy) === 'true' ? (
                               hasPermission('variant:restore') && (
                                 <Tooltip title='Khôi phục'>
                                   <IconButton
@@ -472,6 +472,7 @@ const VariantsTab = () => {
                             overflow: 'hidden',
                             textOverflow: 'ellipsis',
                             verticalAlign: 'middle',
+                            background: '#fff',
                             ...(id === 'sku' || id === 'name'
                               ? { maxWidth: 150 } // Ẩn tràn nếu mã hoặc tên dài
                               : {}),
@@ -489,6 +490,7 @@ const VariantsTab = () => {
           </Table>
         </TableContainer>
         <TablePagination
+          sx={{ background: '#fff' }}
           rowsPerPageOptions={[10, 25, 100]}
           component='div'
           count={totalVariant || 0}

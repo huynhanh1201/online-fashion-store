@@ -102,7 +102,7 @@ const BlogModal = ({
     defaultValues: {
       title: '',
       excerpt: '',
-      content: blogData?.content || '',
+      content: '',
       coverImage: '',
       images: [],
       tags: [],
@@ -112,7 +112,8 @@ const BlogModal = ({
       metaTitle: '',
       metaDescription: '',
       metaKeywords: []
-    }
+    },
+    mode: 'onBlur'
   })
 
   const [imageUrls, setImageUrls] = useState([''])
@@ -274,11 +275,10 @@ const BlogModal = ({
       maxWidth={isMobile ? 'sm' : 'xxl'}
       fullScreen={isMobile}
       sx={{
-        mt: '64px',
         '& .MuiDialog-container': { alignItems: 'end' },
         '& .MuiDialog-paper': {
-          maxHeight: '100%',
-          height: '100%',
+          maxHeight: '95%',
+          height: '95%',
           mt: 0,
           mb: 2.4
         }
@@ -389,7 +389,14 @@ const BlogModal = ({
                     fullWidth
                     variant='outlined'
                     {...register('title', {
-                      required: 'Vui lòng nhập tiêu đề'
+                      required: 'Tiêu đề là bắt buộc',
+                      maxLength: {
+                        value: 255,
+                        message: 'Tiêu đề không được vượt quá 255 ký tự'
+                      },
+                      validate: (value) =>
+                        value.trim() === value ||
+                        'Tiêu đề không được có khoảng trắng đầu/cuối'
                     })}
                     error={!!errors.title}
                     helperText={errors.title?.message}
@@ -450,7 +457,12 @@ const BlogModal = ({
                 multiline
                 rows={isMobile ? 2 : 3}
                 variant='outlined'
-                {...register('excerpt')}
+                {...register('excerpt', {
+                  validate: (value) =>
+                    value === '' ||
+                    value.trim() === value ||
+                    'Mô tả không được có khoảng trắng đầu/cuối'
+                })}
                 helperText='Đoạn mô tả ngắn hiển thị trong danh sách bài viết'
                 sx={{
                   ...getInputStyles(theme),
@@ -856,6 +868,7 @@ const BlogModal = ({
                   setValue={setValue}
                   initialHtml={blogData?.content || ''}
                   onImageInsert={handleImageInsertFromEditor}
+                  isEditMode={isEditMode}
                 />
               </Box>
             </Paper>

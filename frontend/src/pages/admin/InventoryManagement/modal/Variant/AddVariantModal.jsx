@@ -347,7 +347,6 @@ const AddVariantModal = ({
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              cursor: 'pointer',
               overflow: 'hidden'
             }}
             onClick={() => !colorImage && fileInputRef.current?.click()}
@@ -383,7 +382,7 @@ const AddVariantModal = ({
                       top: 4,
                       right: 40,
                       backgroundColor: 'rgba(255,255,255,0.8)',
-                      borderRadius: 1
+                      borderRadius: '50%'
                     }}
                   >
                     <Tooltip title='Sửa'>
@@ -404,7 +403,7 @@ const AddVariantModal = ({
                       top: 4,
                       right: 4,
                       backgroundColor: 'rgba(255,255,255,0.8)',
-                      borderRadius: 1
+                      borderRadius: '50%'
                     }}
                   >
                     <Tooltip title='Xoá'>

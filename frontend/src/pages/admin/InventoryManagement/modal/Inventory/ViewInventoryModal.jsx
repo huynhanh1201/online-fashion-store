@@ -27,7 +27,7 @@ const ViewInventoryModal = ({ open, onClose, inventory }) => {
         sx: StyleAdmin.OverlayModal
       }}
     >
-      <DialogTitle sx={{ fontWeight: 'bold', pl: 5 }}>
+      <DialogTitle sx={{ fontWeight: 'bold', pl: 3 }}>
         Thông tin tồn kho
       </DialogTitle>
       <Divider />

@@ -30,6 +30,8 @@ const DeleteVariantModal = ({ open, onClose, variant, deleteVariant }) => {
     <Dialog
       open={open}
       onClose={onClose}
+      maxWidth='md'
+      fullWidth
       sx={{ padding: '16px 24px' }}
       BackdropProps={{
         sx: StyleAdmin.OverlayModal

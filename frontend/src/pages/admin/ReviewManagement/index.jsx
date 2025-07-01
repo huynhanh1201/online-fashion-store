@@ -33,7 +33,7 @@ const ReviewManagement = () => {
 
   const handleSave = async (id, data) => {
     if (modalType === 'delete') await remove(id)
-    else if (modalType === 'update') await update(id, data)
+    else if (modalType === 'view') await update(id, data)
     else if (modalType === 'restore') await restore(id)
     handleCloseModal()
   }
