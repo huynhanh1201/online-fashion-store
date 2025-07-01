@@ -582,8 +582,8 @@ const Menu = ({ headerRef }) => {
                       display: 'flex', 
                       flexDirection: 'column', 
                       gap: 1, 
-                      alignItems: 'center', 
-                      textAlign: 'center',
+                      alignItems: 'start', 
+                      textAlign: 'start',
                       width: megamenuSettings.columnWidth === 'auto' ? 'auto' : megamenuSettings.columnWidth
                     }}
                   >
@@ -593,13 +593,21 @@ const Menu = ({ headerRef }) => {
                         mb: 1.2,
                         textTransform: 'uppercase',
                         fontSize: '1.08rem',
-                        textAlign: 'center'
+                        textAlign: 'left'
                       }}
                     >
                       {megamenuSettings.showIcons && item.icon && (
                         <span style={{ marginRight: '8px' }}>{item.icon}</span>
                       )}
                       {item.label}
+                      <Box
+                        sx={{
+                         height: '4px',
+                         bgcolor: 'var(--primary-color)',
+                         margin: '0 auto',
+                          mb: 1.2
+                          }}
+                          />
                     </Typography>
                     {item.children && item.children.length > 0 ? (
                       item.children

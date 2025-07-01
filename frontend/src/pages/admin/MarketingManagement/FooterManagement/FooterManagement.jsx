@@ -27,7 +27,6 @@ import {
 import { getFooterConfig } from '~/services/admin/webConfig/footerService.js'
 import AddFooterModal from './Modal/AddFooterModal.jsx'
 import DeleteFooterModal from './Modal/DeleteFooterModal.jsx'
-import EditFooterModal from './Modal/EditFooterModal.jsx'
 import usePermissions from '~/hooks/usePermissions'
 
 const FooterManagement = () => {
@@ -107,7 +106,6 @@ const FooterManagement = () => {
                   <TableRow sx={{ backgroundColor: '#f8fafc' }}>
                     <TableCell>Logo</TableCell>
                     <TableCell>Giới thiệu</TableCell>
-                    <TableCell>Menu</TableCell>
                     <TableCell>Cửa hàng</TableCell>
                     <TableCell>Mạng xã hội</TableCell>
                     <TableCell>Trạng thái</TableCell>
@@ -122,11 +120,6 @@ const FooterManagement = () => {
                     <TableCell>
                       {existingFooter.about?.map((a, i) => (
                         <Typography key={i} variant="body2" noWrap>ĐT: {a.phone} - Email: {a.email}</Typography>
-                      ))}
-                    </TableCell>
-                    <TableCell>
-                      {existingFooter.menuColumns?.map((m, i) => (
-                        <Typography key={i} variant="body2" noWrap>{m.title}: {m.link}</Typography>
                       ))}
                     </TableCell>
                     <TableCell>
@@ -187,6 +180,7 @@ const FooterManagement = () => {
         onClose={handleCloseAddModal}
         onSuccess={handleSuccess}
         footerConfig={footerData}
+        mode="add"
       />
 
       {existingFooter && (
@@ -196,10 +190,12 @@ const FooterManagement = () => {
             onClose={handleCloseDeleteModal}
             onSuccess={handleSuccess}
           />
-          <EditFooterModal
+          <AddFooterModal
             open={openEditModal}
             onClose={handleCloseEditModal}
             onSuccess={handleSuccess}
+            footerConfig={footerData}
+            mode="edit"
             initialData={existingFooter}
             footerIndex={0}
           />

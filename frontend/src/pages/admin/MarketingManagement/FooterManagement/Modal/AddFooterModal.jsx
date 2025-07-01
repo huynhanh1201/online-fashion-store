@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import {
   Dialog,
   DialogTitle,
@@ -27,12 +27,12 @@ import { uploadImageToCloudinary } from '~/utils/cloudinary.js'
 import { CLOUD_FOLDER } from '~/utils/constants.js'
 
 const defaultAbout = { phone: '', email: '' }
-const defaultMenuColumn = { title: '', subtitle: '', text: '', items: [], link: '' }
 const defaultSocialLink = { name: '', image: '', link: '' }
 const defaultStore = { name: '', address: '' }
+const defaultFanpageImage = '';
 
 // Preview Component
-const FooterPreview = ({ logo, about, menuColumns, socialLinks, stores }) => {
+const FooterPreview = ({ logo, about, socialLinks, stores, fanpageImage }) => {
   return (
     <Box sx={{ 
       bgcolor: 'var(--primary-color)', 
@@ -117,30 +117,6 @@ const FooterPreview = ({ logo, about, menuColumns, socialLinks, stores }) => {
             </Box>
           </Box>
 
-          {/* Cột 2: Chính sách + Hỗ trợ */}
-          {menuColumns?.length > 0 && (
-            <Box sx={{ flex: 1, minWidth: 180 }}>
-              <Typography variant='subtitle1' sx={{ fontWeight: 600, mb: 1 }}>
-                CHÍNH SÁCH WEBSITE
-              </Typography>
-              <Stack spacing={0.5}>
-                {menuColumns.map((col, idx) => (
-                  <Typography 
-                    key={idx} 
-                    sx={{ 
-                      color: 'inherit', 
-                      textDecoration: 'none', 
-                      cursor: 'pointer', 
-                      '&:hover': { textDecoration: 'underline' } 
-                    }}
-                  >
-                    {col.title}
-                  </Typography>
-                ))}
-              </Stack>
-            </Box>
-          )}
-
           {/* Cột 3: Danh sách cửa hàng */}
           {stores?.length > 0 && (
             <Box sx={{ flex: 1.2, minWidth: 200 }}>
@@ -162,11 +138,16 @@ const FooterPreview = ({ logo, about, menuColumns, socialLinks, stores }) => {
           )}
 
           {/* Cột 4: Kết nối */}
-          {socialLinks?.length > 0 && (
+          {(socialLinks?.length > 0 || fanpageImage) && (
             <Box sx={{ flex: 1, minWidth: 180 }}>
               <Typography variant='subtitle1' sx={{ fontWeight: 600, mb: 1 }}>
                 KẾT NỐI VỚI CHÚNG TÔI
               </Typography>
+              {fanpageImage && (
+                <Box sx={{ mb: 2, display: 'flex', justifyContent: 'start' }}>
+                  <img src={fanpageImage} alt='fanpage' style={{ width: 300, height: 'auto', borderRadius: 8, background: '#fff', padding: 4 }} />
+                </Box>
+              )}
               <Stack spacing={1}>
                 {socialLinks.map((s, idx) => (
                   <Box
@@ -224,7 +205,6 @@ const FooterPreview = ({ logo, about, menuColumns, socialLinks, stores }) => {
 
       {/* Empty State */}
       {!logo && (!about || about.every(a => !a.phone && !a.email)) && 
-       (!menuColumns || menuColumns.every(m => !m.title)) && 
        (!stores || stores.every(s => !s.name && !s.address)) && 
        (!socialLinks || socialLinks.every(s => !s.name && !s.image)) && (
         <Box sx={{ 
@@ -244,12 +224,15 @@ const FooterPreview = ({ logo, about, menuColumns, socialLinks, stores }) => {
   )
 }
 
-const AddFooterModal = ({ open, onClose, onSuccess, footerConfig }) => {
+const AddFooterModal = ({ open, onClose, onSuccess, footerConfig, mode = 'add', initialData = null, footerIndex = null }) => {
   const [logo, setLogo] = useState('')
+  const [fanpageImage, setFanpageImage] = useState(defaultFanpageImage)
+  const [fanpageImagePreview, setFanpageImagePreview] = useState('')
+  const [fanpageImageUploading, setFanpageImageUploading] = useState(false)
+  const fanpageImageInputRef = React.useRef(null)
   const [logoUploading, setLogoUploading] = useState(false)
   const [logoPreview, setLogoPreview] = useState('')
   const [about, setAbout] = useState([defaultAbout])
-  const [menuColumns, setMenuColumns] = useState([defaultMenuColumn])
   const [socialLinks, setSocialLinks] = useState([defaultSocialLink])
   const [status, setStatus] = useState('Đang sử dụng')
   const [loading, setLoading] = useState(false)
@@ -260,12 +243,29 @@ const AddFooterModal = ({ open, onClose, onSuccess, footerConfig }) => {
   const [fieldErrors, setFieldErrors] = useState({})
   const [activeTab, setActiveTab] = useState(0)
 
+  useEffect(() => {
+    if (mode === 'edit' && initialData) {
+      setLogo(initialData.logo || '')
+      setLogoPreview(initialData.logo || '')
+      setFanpageImage(initialData.fanpageImage || '')
+      setFanpageImagePreview(initialData.fanpageImage || '')
+      setAbout(initialData.about?.length ? initialData.about : [defaultAbout])
+      setSocialLinks(initialData.socialLinks?.length ? initialData.socialLinks : [defaultSocialLink])
+      setStores(initialData.stores?.length ? initialData.stores : [defaultStore])
+      setStatus(initialData.status || 'Đang sử dụng')
+    } else if (mode === 'add') {
+      resetForm()
+    }
+  }, [mode, initialData, open])
+
   const resetForm = () => {
     setLogo('')
     setLogoPreview('')
     setLogoUploading(false)
+    setFanpageImage('')
+    setFanpageImagePreview('')
+    setFanpageImageUploading(false)
     setAbout([defaultAbout])
-    setMenuColumns([defaultMenuColumn])
     setSocialLinks([defaultSocialLink])
     setStores([defaultStore])
     setStatus('Đang sử dụng')
@@ -283,12 +283,6 @@ const AddFooterModal = ({ open, onClose, onSuccess, footerConfig }) => {
   const handleRemoveAbout = (idx) => setAbout(about.filter((_, i) => i !== idx))
   const handleAboutChange = (idx, field, value) => {
     setAbout(about.map((a, i) => (i === idx ? { ...a, [field]: value } : a)))
-  }
-
-  const handleAddMenuColumn = () => setMenuColumns([...menuColumns, defaultMenuColumn])
-  const handleRemoveMenuColumn = (idx) => setMenuColumns(menuColumns.filter((_, i) => i !== idx))
-  const handleMenuColumnChange = (idx, field, value) => {
-    setMenuColumns(menuColumns.map((m, i) => (i === idx ? { ...m, [field]: value } : m)))
   }
 
   const handleAddSocialLink = () => setSocialLinks([...socialLinks, { ...defaultSocialLink, id: `temp-${Date.now()}` }])
@@ -364,6 +358,30 @@ const AddFooterModal = ({ open, onClose, onSuccess, footerConfig }) => {
     event.target.value = ''
   }
 
+  const handleFanpageImageUpload = async (event) => {
+    const file = event.target.files?.[0]
+    if (!file) return
+    setFanpageImageUploading(true)
+    setError('')
+    try {
+      const preview = URL.createObjectURL(file)
+      setFanpageImagePreview(preview)
+      const res = await uploadImageToCloudinary(file, CLOUD_FOLDER)
+      if (res.success) setFanpageImage(res.url)
+      else setError('Upload failed')
+    } catch (e) {
+      setError('Upload error')
+    } finally {
+      setFanpageImageUploading(false)
+    }
+    event.target.value = ''
+  }
+
+  const handleRemoveFanpageImage = () => {
+    setFanpageImage('')
+    setFanpageImagePreview('')
+  }
+
   function validate() {
     const errors = {}
     // Logo
@@ -373,11 +391,6 @@ const AddFooterModal = ({ open, onClose, onSuccess, footerConfig }) => {
       if (!a.phone) errors[`about_phone_${i}`] = 'Số điện thoại không được để trống.'
       if (!a.email) errors[`about_email_${i}`] = 'Email không được để trống.'
       else if (!/^\S+@\S+\.\S+$/.test(a.email)) errors[`about_email_${i}`] = 'Email không hợp lệ.'
-    })
-    // Menu
-    menuColumns.forEach((m, i) => {
-      if (!m.title) errors[`menu_title_${i}`] = 'Tiêu đề menu không được để trống.'
-      if (!m.link) errors[`menu_link_${i}`] = 'Link menu không được để trống.'
     })
     // Store
     stores.forEach((s, i) => {
@@ -406,19 +419,40 @@ const AddFooterModal = ({ open, onClose, onSuccess, footerConfig }) => {
       return
     }
     try {
-      const newEntry = {
-        id: `footer_${Date.now()}`,
-        logo,
-        about,
-        menuColumns,
-        stores,
-        socialLinks,
-        status
-      }
-      if (footerConfig?._id) {
-        await updateFooterConfig([newEntry])
+      if (mode === 'edit') {
+        const currentConfig = await getFooterConfig()
+        if (!currentConfig) {
+          setError('Không tìm thấy cấu hình footer hiện tại để cập nhật.')
+          setLoading(false)
+          return
+        }
+        const newContent = [...(currentConfig.content || [])]
+        const updatedEntry = {
+          ...initialData,
+          logo,
+          fanpageImage,
+          about,
+          stores,
+          socialLinks,
+          status
+        }
+        newContent[footerIndex] = updatedEntry
+        await updateFooterConfig(newContent)
       } else {
-        await createFooterConfig([newEntry])
+        const newEntry = {
+          id: `footer_${Date.now()}`,
+          logo,
+          fanpageImage,
+          about,
+          stores,
+          socialLinks,
+          status
+        }
+        if (footerConfig?._id) {
+          await updateFooterConfig([newEntry])
+        } else {
+          await createFooterConfig([newEntry])
+        }
       }
       if (onSuccess) onSuccess()
       handleClose()
@@ -460,29 +494,25 @@ const AddFooterModal = ({ open, onClose, onSuccess, footerConfig }) => {
             <Typography color='error'>{error}</Typography>
           </Box>
         )}
-
         {activeTab === 0 && (
-          <Box sx={{ p: 3 }}>
-            <Stack spacing={3}>
+          <Box sx={{ p: { xs: 1, md: 4 } }}>
+            {/* Section: Logo & Fanpage */}
+            <Typography variant='h6' sx={{ fontWeight: 700, mb: 2 }}>Logo & Ảnh Fanpage</Typography>
+            <Stack direction={{ xs: 'column', md: 'row' }} spacing={3} alignItems='flex-start' mb={3}>
               {/* Logo */}
-              <Box sx={{ p: 2, borderRadius: 2, bgcolor: '#f8fafc', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                <Typography variant='subtitle1' sx={{ fontWeight: 700, mb: 1 }}>Logo</Typography>
+              <Box flex={1}>
+                <Typography variant='subtitle1' sx={{ fontWeight: 600, mb: 1 }}>Logo</Typography>
                 <Card
                   sx={{
                     border: '2px dashed #d1d5db',
                     borderRadius: 2,
                     p: 2,
                     backgroundColor: '#f9fafb',
-                    transition: 'all 0.2s ease',
-                    '&:hover': {
-                      borderColor: '#3b82f6',
-                      backgroundColor: '#f0f9ff'
-                    },
                     minWidth: 180,
                     minHeight: 140,
                     display: 'flex',
                     alignItems: 'center',
-                    justifyContent: 'center'
+                    justifyContent: 'center',
                   }}
                 >
                   {logo || logoPreview ? (
@@ -494,7 +524,7 @@ const AddFooterModal = ({ open, onClose, onSuccess, footerConfig }) => {
                       />
                       <Tooltip title='Xóa logo'>
                         <IconButton
-                          onClick={handleRemoveLogo}
+                          onClick={() => { setLogo(''); setLogoPreview('') }}
                           sx={{ position: 'absolute', top: -8, right: -8, backgroundColor: '#ef4444', color: 'white', '&:hover': { backgroundColor: '#dc2626' } }}
                           size='small'
                         >
@@ -528,107 +558,137 @@ const AddFooterModal = ({ open, onClose, onSuccess, footerConfig }) => {
                   />
                 </Card>
               </Box>
-
-              {/* Giới thiệu */}
-              <Box sx={{ p: 2, borderRadius: 2, bgcolor: '#f8fafc' }}>
-                <Typography variant='subtitle1' sx={{ fontWeight: 700, mb: 1 }}>Giới thiệu</Typography>
-                <Stack spacing={2}>
-                  {about.map((a, idx) => (
-                    <Box key={idx} sx={{ p: 2, borderRadius: 2, bgcolor: '#fff', boxShadow: '0 1px 4px #e0e7ef33' }}>
-                      <Stack spacing={1} direction='row' alignItems='center'>
-                        <TextField label='Số điện thoại' value={a.phone} onChange={e => handleAboutChange(idx, 'phone', e.target.value)} size='small' fullWidth error={!!fieldErrors[`about_phone_${idx}`]} helperText={fieldErrors[`about_phone_${idx}`]} />
-                        <TextField label='Email' value={a.email} onChange={e => handleAboutChange(idx, 'email', e.target.value)} size='small' fullWidth error={!!fieldErrors[`about_email_${idx}`]} helperText={fieldErrors[`about_email_${idx}`]} />
-                        {about.length > 1 && (
-                          <IconButton onClick={() => handleRemoveAbout(idx)}><RemoveIcon /></IconButton>
-                        )}
-                      </Stack>
+              {/* Fanpage Image */}
+              <Box flex={1}>
+                <Typography variant='subtitle1' sx={{ fontWeight: 600, mb: 1 }}>Ảnh Fanpage</Typography>
+                <Card
+                  sx={{
+                    border: '2px dashed #d1d5db',
+                    borderRadius: 2,
+                    p: 2,
+                    backgroundColor: '#f9fafb',
+                    minWidth: 180,
+                    minHeight: 140,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}
+                >
+                  {fanpageImage || fanpageImagePreview ? (
+                    <Box sx={{ position: 'relative', display: 'inline-block' }}>
+                      <img
+                        src={fanpageImagePreview || fanpageImage}
+                        alt='fanpage preview'
+                        style={{ width: 120, height: 120, objectFit: 'contain', borderRadius: 8, border: '1px solid #e5e7eb', background: '#fff' }}
+                      />
+                      <Tooltip title='Xóa ảnh fanpage'>
+                        <IconButton
+                          onClick={handleRemoveFanpageImage}
+                          sx={{ position: 'absolute', top: -8, right: -8, backgroundColor: '#ef4444', color: 'white', '&:hover': { backgroundColor: '#dc2626' } }}
+                          size='small'
+                        >
+                          <DeleteIcon fontSize='small' />
+                        </IconButton>
+                      </Tooltip>
                     </Box>
-                  ))}
-                </Stack>
-                <Button startIcon={<AddIcon />} onClick={handleAddAbout} size='small' sx={{ mt: 2 }}>Thêm dòng giới thiệu</Button>
-              </Box>
-
-              {/* Menu */}
-              <Box sx={{ p: 2, borderRadius: 2, bgcolor: '#f8fafc' }}>
-                <Typography variant='subtitle1' sx={{ fontWeight: 700, mb: 1 }}>Menu</Typography>
-                <Stack spacing={2}>
-                  {menuColumns.map((m, idx) => (
-                    <Box key={idx} sx={{ p: 2, borderRadius: 2, bgcolor: '#fff', boxShadow: '0 1px 4px #e0e7ef33' }}>
-                      <Stack spacing={1}>
-                        <TextField label='Tiêu đề' value={m.title} onChange={e => handleMenuColumnChange(idx, 'title', e.target.value)} size='small' fullWidth error={!!fieldErrors[`menu_title_${idx}`]} helperText={fieldErrors[`menu_title_${idx}`]} />
-                        <TextField label='Phụ đề' value={m.subtitle} onChange={e => handleMenuColumnChange(idx, 'subtitle', e.target.value)} size='small' fullWidth />
-                        <TextField label='Text' value={m.text} onChange={e => handleMenuColumnChange(idx, 'text', e.target.value)} size='small' fullWidth />
-                        <TextField label='Link' value={m.link} onChange={e => handleMenuColumnChange(idx, 'link', e.target.value)} size='small' fullWidth error={!!fieldErrors[`menu_link_${idx}`]} helperText={fieldErrors[`menu_link_${idx}`]} />
-                        <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
-                          {menuColumns.length > 1 && (
-                            <IconButton onClick={() => handleRemoveMenuColumn(idx)}><RemoveIcon /></IconButton>
-                          )}
-                        </Box>
-                      </Stack>
+                  ) : (
+                    <Box
+                      sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', py: 3, cursor: 'pointer' }}
+                      onClick={() => fanpageImageInputRef.current?.click()}
+                    >
+                      <CloudUploadIcon sx={{ fontSize: 48, color: '#9ca3af', mb: 2 }} />
+                      <Typography variant='body2' color='text.secondary' sx={{ mb: 1 }}>
+                        {fanpageImageUploading ? 'Đang tải lên...' : 'Nhấp để tải ảnh fanpage'}
+                      </Typography>
+                      <Typography variant='caption' color='text.secondary'>
+                        JPG, PNG, WebP (tối đa 5MB)
+                      </Typography>
+                      {fanpageImageUploading && (
+                        <CircularProgress size={24} sx={{ mt: 1 }} />
+                      )}
                     </Box>
-                  ))}
-                </Stack>
-                <Button startIcon={<AddIcon />} onClick={handleAddMenuColumn} size='small' sx={{ mt: 2 }}>Thêm menu</Button>
-              </Box>
-
-              {/* Mạng xã hội */}
-              <Box sx={{ p: 2, borderRadius: 2, bgcolor: '#f8fafc' }}>
-                <Typography variant='subtitle1' sx={{ fontWeight: 700, mb: 1 }}>Mạng xã hội</Typography>
-                <Stack spacing={2}>
-                  {socialLinks.map((s, idx) => (
-                    <Box key={idx} sx={{ p: 2, borderRadius: 2, bgcolor: '#fff', boxShadow: '0 1px 4px #e0e7ef33' }}>
-                      <Stack spacing={1} direction='row' alignItems='center'>
-                        <Box>
-                          <input
-                            accept="image/*,.svg"
-                            style={{ display: 'none' }}
-                            id={`social-icon-uploader-${idx}`}
-                            type="file"
-                            onChange={(e) => handleSocialIconUpload(e, idx)}
-                          />
-                          <label htmlFor={`social-icon-uploader-${idx}`}>
-                            <Button component="span" variant="outlined" disabled={socialIconLoadingIndex === idx} sx={{ minWidth: 40, height: 40, p: 0, borderRadius: '50%' }}>
-                              {socialIconLoadingIndex === idx ? (
-                                <CircularProgress size={20} />
-                              ) : s.image ? (
-                                <img src={s.image} alt="icon" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }} />
-                              ) : (
-                                <AddPhotoAlternate />
-                              )}
-                            </Button>
-                          </label>
-                        </Box>
-                        <TextField label='Tên mạng xã hội' value={s.name} onChange={e => handleSocialLinkChange(idx, 'name', e.target.value)} size='small' sx={{ minWidth: 120 }} error={!!fieldErrors[`social_name_${idx}`]} helperText={fieldErrors[`social_name_${idx}`]} />
-                        <TextField label='Link' value={s.link} onChange={e => handleSocialLinkChange(idx, 'link', e.target.value)} size='small' fullWidth error={!!fieldErrors[`social_link_${idx}`]} helperText={fieldErrors[`social_link_${idx}`]} />
-                        {socialLinks.length > 1 && (
-                          <IconButton onClick={() => handleRemoveSocialLink(idx)}><RemoveIcon /></IconButton>
-                        )}
-                      </Stack>
-                    </Box>
-                  ))}
-                </Stack>
-                <Button startIcon={<AddIcon />} onClick={handleAddSocialLink} size='small' sx={{ mt: 2 }}>Thêm mạng xã hội</Button>
-              </Box>
-
-              {/* Địa chỉ cửa hàng */}
-              <Box sx={{ p: 2, borderRadius: 2, bgcolor: '#f8fafc' }}>
-                <Typography variant='subtitle1' sx={{ fontWeight: 700, mb: 1 }}>Hệ thống cửa hàng</Typography>
-                <Stack spacing={2}>
-                  {stores.map((s, idx) => (
-                    <Box key={idx} sx={{ p: 2, borderRadius: 2, bgcolor: '#fff', boxShadow: '0 1px 4px #e0e7ef33' }}>
-                      <Stack spacing={1} direction='row' alignItems='center'>
-                        <TextField label='Tên cửa hàng' value={s.name} onChange={e => handleStoreChange(idx, 'name', e.target.value)} size='small' fullWidth error={!!fieldErrors[`store_name_${idx}`]} helperText={fieldErrors[`store_name_${idx}`]} />
-                        <TextField label='Địa chỉ cửa hàng' value={s.address} onChange={e => handleStoreChange(idx, 'address', e.target.value)} size='small' fullWidth error={!!fieldErrors[`store_address_${idx}`]} helperText={fieldErrors[`store_address_${idx}`]} />
-                        {stores.length > 1 && (
-                          <IconButton onClick={() => handleRemoveStore(idx)}><RemoveIcon /></IconButton>
-                        )}
-                      </Stack>
-                    </Box>
-                  ))}
-                </Stack>
-                <Button startIcon={<AddIcon />} onClick={handleAddStore} size='small' sx={{ mt: 2 }}>Thêm địa chỉ cửa hàng</Button>
+                  )}
+                  <input
+                    ref={fanpageImageInputRef}
+                    type='file'
+                    accept='image/*'
+                    onChange={handleFanpageImageUpload}
+                    style={{ display: 'none' }}
+                  />
+                </Card>
               </Box>
             </Stack>
+            <Divider sx={{ my: 4 }} />
+            {/* Section: About */}
+            <Typography variant='h6' sx={{ fontWeight: 700, mb: 2 }}>Giới thiệu</Typography>
+            <Stack spacing={2} mb={3}>
+              {about.map((a, idx) => (
+                <Box key={idx} sx={{ p: 2, borderRadius: 2, bgcolor: '#fff', boxShadow: '0 1px 4px #e0e7ef33' }}>
+                  <Stack spacing={1} direction={{ xs: 'column', md: 'row' }} alignItems='center'>
+                    <TextField label='Số điện thoại' value={a.phone} onChange={e => handleAboutChange(idx, 'phone', e.target.value)} size='small' fullWidth error={!!fieldErrors[`about_phone_${idx}`]} helperText={fieldErrors[`about_phone_${idx}`]} />
+                    <TextField label='Email' value={a.email} onChange={e => handleAboutChange(idx, 'email', e.target.value)} size='small' fullWidth error={!!fieldErrors[`about_email_${idx}`]} helperText={fieldErrors[`about_email_${idx}`]} />
+                    {about.length > 1 && (
+                      <IconButton onClick={() => handleRemoveAbout(idx)}><RemoveIcon /></IconButton>
+                    )}
+                  </Stack>
+                </Box>
+              ))}
+            </Stack>
+            <Button startIcon={<AddIcon />} onClick={handleAddAbout} size='small' sx={{ mt: 1, mb: 3, width: { xs: '100%', md: 'auto' } }}>Thêm dòng giới thiệu</Button>
+            <Divider sx={{ my: 4 }} />
+            {/* Section: Social Links */}
+            <Typography variant='h6' sx={{ fontWeight: 700, mb: 2 }}>Mạng xã hội</Typography>
+            <Stack spacing={2} mb={3}>
+              {socialLinks.map((s, idx) => (
+                <Box key={idx} sx={{ p: 2, borderRadius: 2, bgcolor: '#fff', boxShadow: '0 1px 4px #e0e7ef33' }}>
+                  <Stack spacing={1} direction={{ xs: 'column', md: 'row' }} alignItems='center'>
+                    <Box>
+                      <input
+                        accept="image/*,.svg"
+                        style={{ display: 'none' }}
+                        id={`social-icon-uploader-${idx}`}
+                        type="file"
+                        onChange={(e) => handleSocialIconUpload(e, idx)}
+                      />
+                      <label htmlFor={`social-icon-uploader-${idx}`}>
+                        <Button component="span" variant="outlined" disabled={socialIconLoadingIndex === idx} sx={{ minWidth: 40, height: 40, p: 0, borderRadius: '50%' }}>
+                          {socialIconLoadingIndex === idx ? (
+                            <CircularProgress size={20} />
+                          ) : s.image ? (
+                            <img src={s.image} alt="icon" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }} />
+                          ) : (
+                            <AddPhotoAlternate />
+                          )}
+                        </Button>
+                      </label>
+                    </Box>
+                    <TextField label='Tên mạng xã hội' value={s.name} onChange={e => handleSocialLinkChange(idx, 'name', e.target.value)} size='small' sx={{ minWidth: 120 }} error={!!fieldErrors[`social_name_${idx}`]} helperText={fieldErrors[`social_name_${idx}`]} fullWidth />
+                    <TextField label='Link' value={s.link} onChange={e => handleSocialLinkChange(idx, 'link', e.target.value)} size='small' fullWidth error={!!fieldErrors[`social_link_${idx}`]} helperText={fieldErrors[`social_link_${idx}`]} />
+                    {socialLinks.length > 1 && (
+                      <IconButton onClick={() => handleRemoveSocialLink(idx)}><RemoveIcon /></IconButton>
+                    )}
+                  </Stack>
+                </Box>
+              ))}
+            </Stack>
+            <Button startIcon={<AddIcon />} onClick={handleAddSocialLink} size='small' sx={{ mt: 1, mb: 3, width: { xs: '100%', md: 'auto' } }}>Thêm mạng xã hội</Button>
+            <Divider sx={{ my: 4 }} />
+            {/* Section: Stores */}
+            <Typography variant='h6' sx={{ fontWeight: 700, mb: 2 }}>Hệ thống cửa hàng</Typography>
+            <Stack spacing={2} mb={3}>
+              {stores.map((s, idx) => (
+                <Box key={idx} sx={{ p: 2, borderRadius: 2, bgcolor: '#fff', boxShadow: '0 1px 4px #e0e7ef33' }}>
+                  <Stack spacing={1} direction={{ xs: 'column', md: 'row' }} alignItems='center'>
+                    <TextField label='Tên cửa hàng' value={s.name} onChange={e => handleStoreChange(idx, 'name', e.target.value)} size='small' fullWidth error={!!fieldErrors[`store_name_${idx}`]} helperText={fieldErrors[`store_name_${idx}`]} />
+                    <TextField label='Địa chỉ cửa hàng' value={s.address} onChange={e => handleStoreChange(idx, 'address', e.target.value)} size='small' fullWidth error={!!fieldErrors[`store_address_${idx}`]} helperText={fieldErrors[`store_address_${idx}`]} />
+                    {stores.length > 1 && (
+                      <IconButton onClick={() => handleRemoveStore(idx)}><RemoveIcon /></IconButton>
+                    )}
+                  </Stack>
+                </Box>
+              ))}
+            </Stack>
+            <Button startIcon={<AddIcon />} onClick={handleAddStore} size='small' sx={{ mt: 1, mb: 3, width: { xs: '100%', md: 'auto' } }}>Thêm địa chỉ cửa hàng</Button>
           </Box>
         )}
 
@@ -640,9 +700,9 @@ const AddFooterModal = ({ open, onClose, onSuccess, footerConfig }) => {
             <FooterPreview 
               logo={logo || logoPreview}
               about={about}
-              menuColumns={menuColumns}
               socialLinks={socialLinks}
               stores={stores}
+              fanpageImage={fanpageImage}
             />
             <Box sx={{ mt: 2, p: 2, bgcolor: '#f8fafc', borderRadius: 2 }}>
               <Typography variant="body2" color="text.secondary">
