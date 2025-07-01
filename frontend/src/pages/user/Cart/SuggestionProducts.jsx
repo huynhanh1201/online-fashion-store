@@ -3,7 +3,7 @@ import ProductCard from '~/components/ProductCards/ProductCards'
 import { getProducts } from '~/services/productService'
 import '~/assets/HomeCSS/Content.css'
 
-export default function SuggestionProducts({ limit = 8 }) {
+export default function SuggestionProducts({ limit = 5 }) {
   const [suggestedProducts, setSuggestedProducts] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)

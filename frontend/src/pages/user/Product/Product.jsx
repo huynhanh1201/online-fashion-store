@@ -10,7 +10,8 @@ import {
   Pagination,
   Breadcrumbs,
   Link,
-  Skeleton
+  Skeleton,
+  PaginationItem
 } from '@mui/material'
 import { addToCart, getCart } from '~/services/cartService'
 import { useDispatch } from 'react-redux'
@@ -144,8 +145,8 @@ const Product = () => {
       }
 
       const params = {
-        page,
-        limit: ITEMS_PER_PAGE,
+        page: Number(page),
+        limit: Number(ITEMS_PER_PAGE),
         sort: backendSortMap[sortOption] || ''
       }
       console.log('Fetching products with params:', params)
@@ -153,16 +154,17 @@ const Product = () => {
       const response = await getProducts(params)
       console.log('API Response:', response)
 
-      if (!response) {
-        throw new Error('Không nhận được phản hồi từ server')
-      }
+      // Lấy đúng trường dữ liệu từ response (theo log thực tế)
+      const products = response.products || []
+      const totalProducts = response.total || products.length
+      const totalPages = Math.ceil(totalProducts / ITEMS_PER_PAGE) || 1
 
-      if (!Array.isArray(response.products)) {
-        console.error('Products không phải là array:', response.products)
+      if (!Array.isArray(products)) {
+        console.error('Products không phải là array:', products)
         throw new Error('Dữ liệu sản phẩm không hợp lệ')
       }
 
-      let sortedProducts = [...response.products]
+      let sortedProducts = [...products]
 
       // Client-side sorting cho giá
       if (sortOption === 'priceAsc') {
@@ -172,7 +174,7 @@ const Product = () => {
       }
 
       setProducts(sortedProducts)
-      setTotalPages(response.totalPages)
+      setTotalPages(totalPages)
     } catch (error) {
       console.error('Chi tiết lỗi:', error)
       setError(
@@ -457,99 +459,75 @@ const Product = () => {
           </Box>
         </Box>
 
-        <Box sx={{ flexGrow: 1 }}>
-          {loading ? (
-            <Box sx={{ textAlign: 'center', mt: 10 }}>
-              <CircularProgress />
-              <Typography>Đang tải sản phẩm...</Typography>
-            </Box>
-          ) : error ? (
-            <Box sx={{ textAlign: 'center', mt: 10 }}>
-              <Typography color='error' gutterBottom>
-                {error}
-              </Typography>
-              <Typography
-                color='primary'
-                sx={{ cursor: 'pointer', textDecoration: 'underline' }}
-                onClick={() => fetchProducts()}
-              >
-                Thử lại
-              </Typography>
-            </Box>
-          ) : products.length === 0 ? (
-            <Typography sx={{ textAlign: 'center', mt: 10 }}>
-              Không có sản phẩm nào.
+        {loading ? (
+          <Box sx={{ textAlign: 'center', mt: 10 }}>
+            <CircularProgress />
+            <Typography>Đang tải sản phẩm...</Typography>
+          </Box>
+        ) : error ? (
+          <Box sx={{ textAlign: 'center', mt: 10 }}>
+            <Typography color='error' gutterBottom>
+              {error}
             </Typography>
-          ) : (
-            <>
-              <div className='product-grid'>
-                {products.map((product) => (
-                  <div key={product._id}>
-                    <ProductCard
-                      product={product}
-                      handleAddToCart={handleAddToCart}
-                      isAdding={!!isAdding[product._id]}
-                    />
-                  </div>
-                ))}
-              </div>
-
-              <Box
-                sx={{ display: 'flex', justifyContent: 'center', mt: 4, mb: 4 }}
-              >
-                <Pagination
-                  count={totalPages}
-                  page={page}
-                  onChange={handlePageChange}
-                  color='primary'
-                  size='small'
-                  boundaryCount={0}
-                  siblingCount={2}
-                  shape='rounded'
-                  sx={{
-                    '& .MuiPagination-ul': {
-                      justifyContent: 'center',
-                      gap: '8px',
-                      padding: '8px 0',
-                    },
-                    mt: 3,
-                    mb: 2,
-                    '& .MuiPaginationItem-root': {
-                      borderRadius: '6px',
-                      border: '1.5px solid #e0e0e0',
-                      fontWeight: 500,
-                      fontSize: '1rem',
-                      minWidth: 44,
-                      minHeight: 44,
-                      color: '#757575',
-                      background: '#fff',
-                      boxShadow: 'none',
-                      transition: 'all 0.2s',
-                      '&:hover': {
-                        borderColor: '#000',
-                        background: '#fafafa',
-                        color: '#111',
-                      },
-                      '&.Mui-selected': {
-                        background: '#111',
-                        color: '#fff',
-                        borderColor: '#111',
-                      },
-                    },
-                    '& .MuiPaginationItem-ellipsis': {
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      fontSize: '1.2rem',
-                      paddingTop: 0,
-                    },
-                  }}
-                />
-              </Box>
-            </>
-          )}
-        </Box>
-
+            <Typography
+              color='primary'
+              sx={{ cursor: 'pointer', textDecoration: 'underline' }}
+              onClick={() => fetchProducts()}
+            >
+              Thử lại
+            </Typography>
+          </Box>
+        ) : products.length === 0 ? (
+          <Typography sx={{ textAlign: 'center', mt: 10 }}>
+            Không có sản phẩm nào.
+          </Typography>
+        ) : (
+          <>
+            <div className='product-grid'>
+              {products.map((product) => (
+                <div key={product._id}>
+                  <ProductCard
+                    product={product}
+                    handleAddToCart={handleAddToCart}
+                    isAdding={!!isAdding[product._id]}
+                  />
+                </div>
+              ))}
+            </div>
+            <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4, mb: 2 , alignItems: 'center'}}>
+              <Pagination
+                count={totalPages}
+                page={page}
+                onChange={handlePageChange}
+                boundaryCount={1}
+                siblingCount={1}
+                shape="rounded"
+                size="small"
+                color="primary"
+                renderItem={(item) => {
+                  if (item.type === 'start-ellipsis' || item.type === 'end-ellipsis') {
+                    return (
+                      <span
+                        style={{
+                          padding: '8px 12px',
+                          fontWeight: 'bold',
+                          color: '#999',
+                          fontSize: '1rem',
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                        }}
+                      >
+                        ...
+                      </span>
+                    )
+                  }
+                  return <PaginationItem {...item} />
+                }}
+              />
+            </Box>
+          </>
+        )}
         {snackbar && (
           <Snackbar
             open

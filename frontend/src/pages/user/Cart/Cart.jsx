@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react'
 import {
   Box,
@@ -23,6 +22,8 @@ import {
   CardContent,
   Grid,
   Tooltip,
+  Breadcrumbs,
+  Link,
 } from '@mui/material'
 import {
   Delete,
@@ -33,6 +34,7 @@ import {
   LocalOffer,
   Payment,
   ArrowForward,
+  NavigateNext,
 } from '@mui/icons-material'
 import { useCart } from '~/hooks/useCarts'
 import { useNavigate } from 'react-router-dom'
@@ -459,6 +461,65 @@ const Cart = () => {
         px: { xs: 2, sm: 3, md: 4 },
       }}
     >
+      {/* Breadcrumb */}
+      <Box
+        sx={{
+          bottom: { xs: '20px', sm: '30px', md: '40px' },
+          left: { xs: '20px', sm: '30px', md: '40px' },
+          right: { xs: '20px', sm: '30px', md: '40px' },
+          padding: '12px',
+          maxWidth: '1800px',
+          margin: '0 auto',
+          mb: 2
+        }}
+      >
+        <Breadcrumbs
+          separator={<NavigateNext fontSize='small' />}
+          aria-label='breadcrumb'
+        >
+          <Link
+            underline='hover'
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              color: '#007bff',
+              textDecoration: 'none',
+              '&:hover': {
+                color: 'primary.main'
+              }
+            }}
+            href='/'
+          >
+            Trang chủ
+          </Link>
+          <Link
+            underline='hover'
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              color: '#007bff',
+              textDecoration: 'none',
+              '&:hover': {
+                color: 'primary.main'
+              }
+            }}
+            href={`/products`}
+          >
+            Sản phẩm
+          </Link>
+          <Typography
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              color: 'text.primary',
+              fontWeight: 500
+            }}
+          >
+            Giỏ hàng
+          </Typography>
+        </Breadcrumbs>
+      </Box>
+
       {/* Header */}
       <Paper
         elevation={0}

@@ -235,16 +235,25 @@ const MegaMenuEditor = ({ open, onClose, onSuccess, initialData = null }) => {
       return
     }
 
+    // Normalize label: capitalize only the first letter of the whole string, rest lowercase
+    const normalizeLabel = (label) =>
+      label.charAt(0).toUpperCase() + label.slice(1).toLowerCase();
+
+    const normalizedItem = {
+      ...editingItem,
+      label: normalizeLabel(editingItem.label)
+    };
+
     setMenuData((prev) => {
       const newData = { ...prev }
 
       if (editingSubIndex >= 0) {
         // Editing submenu item
         newData[editingType][editingIndex].children[editingSubIndex] =
-          editingItem
+          normalizedItem
       } else {
         // Editing main item
-        newData[editingType][editingIndex] = editingItem
+        newData[editingType][editingIndex] = normalizedItem
       }
 
       return newData
