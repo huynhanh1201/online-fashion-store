@@ -109,7 +109,7 @@ const ViewAccountModal = ({ open, onClose, user, roles }) => {
                         sx={{
                           maxWidth: 300,
                           fontWeight: 800,
-                          backgroundColor: '#001f5d',
+                          backgroundColor: 'var(--primary-color)',
                           color: '#fff',
                           textTransform: 'uppercase'
                         }}

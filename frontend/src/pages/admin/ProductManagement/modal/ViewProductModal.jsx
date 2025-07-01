@@ -134,23 +134,19 @@ const ViewProductModal = ({
     <Dialog
       open={open}
       onClose={onClose}
-      maxWidth='xl'
+      maxWidth='xxl'
       fullWidth
       PaperProps={{
         sx: {
-          mt: 8,
-          maxHeight: '85vh',
-          minHeight: '85vh',
+          maxHeight: '95vh',
+          minHeight: '95vh',
           backgroundColor: 'var(--surface-color)'
         },
         ...StyleAdmin.InputCustom
       }}
     >
       <DialogTitle>Thông tin sản phẩm</DialogTitle>
-      <DialogContent
-        dividers
-        sx={{ maxHeight: 'calc(85vh - 64px)', overflowY: 'auto' }}
-      >
+      <DialogContent dividers sx={{ overflowY: 'auto' }}>
         <TabContext value={tabIndex}>
           {/*<Tabs*/}
           {/*  value={tabIndex}*/}
@@ -175,9 +171,9 @@ const ViewProductModal = ({
                     src={optimizeCloudinaryUrl(selectedImage)}
                     alt='Ảnh sản phẩm'
                     sx={{
-                      width: '300px',
-                      height: '257px',
-                      objectFit: 'contain',
+                      width: '400px',
+                      height: '300px',
+                      objectFit: 'cover',
                       backgroundColor: 'var(--surface-color)',
                       borderRadius: 2,
                       border: '1px solid #ccc',
@@ -218,27 +214,33 @@ const ViewProductModal = ({
               </Grid>
 
               {/* Cột thông tin */}
-              <Grid item size={12} md={7} width='calc(98% - 350px)'>
+              <Grid item size={12} md={7} width='calc(98% - 400px)'>
                 <Box sx={{ width: '100%' }}>
                   <Table size='small' sx={{ width: '100%' }}>
                     <TableBody>
-                      <TableRow>
+                      <TableRow sx={{ height: 50 }}>
                         <TableCell
                           variant='head'
-                          sx={{ fontWeight: 500, width: 100 }}
+                          sx={{ fontWeight: 500, width: 100, fontSize: '16px' }}
                         >
                           Mã sản phẩm
                         </TableCell>
-                        <TableCell>{product.productCode}</TableCell>
+                        <TableCell sx={{ fontSize: '16px' }}>
+                          {product.productCode}
+                        </TableCell>
                       </TableRow>
-                      <TableRow>
+                      <TableRow sx={{ height: 50 }}>
                         <TableCell
                           variant='head'
-                          sx={{ fontWeight: 500, width: '25%' }}
+                          sx={{
+                            fontWeight: 500,
+                            width: '25%',
+                            fontSize: '16px'
+                          }}
                         >
                           Tên sản phẩm
                         </TableCell>
-                        <TableCell>
+                        <TableCell sx={{ fontSize: '16px' }}>
                           {productName
                             .split(' ')
                             .map(
@@ -249,19 +251,19 @@ const ViewProductModal = ({
                             .join(' ') || 'Không có tên'}
                         </TableCell>
                       </TableRow>
-                      <TableRow>
+                      <TableRow sx={{ height: 50 }}>
                         <TableCell variant='head' sx={{ fontWeight: 500 }}>
                           Giá
                         </TableCell>
-                        <TableCell>
+                        <TableCell sx={{ fontSize: '16px' }}>
                           {product.exportPrice?.toLocaleString('vi-VN')}đ
                         </TableCell>
                       </TableRow>
-                      <TableRow>
+                      <TableRow sx={{ height: 50 }}>
                         <TableCell variant='head' sx={{ fontWeight: 500 }}>
                           Danh mục
                         </TableCell>
-                        <TableCell>
+                        <TableCell sx={{ fontSize: '16px' }}>
                           {categoryName
                             .split(' ')
                             .map(
@@ -272,45 +274,68 @@ const ViewProductModal = ({
                             .join(' ')}
                         </TableCell>
                       </TableRow>
-                      <TableRow>
+                      <TableRow sx={{ height: 50 }}>
                         <TableCell
                           variant='head'
-                          sx={{ fontWeight: 500, minWidth: 300 }}
+                          sx={{
+                            fontWeight: 500,
+                            minWidth: 340,
+                            fontSize: '16px'
+                          }}
                         >
                           Kích thước đóng gói(DxRxC, Trọng lượng)
                         </TableCell>
-                        <TableCell>
+                        <TableCell sx={{ fontSize: '16px' }}>
                           {product?.packageSize?.width} x{' '}
                           {product?.packageSize?.height} x{' '}
                           {product?.packageSize?.length} cm,{' '}
                           {product?.packageSize?.weight} gram
                         </TableCell>
                       </TableRow>
-                      <TableRow>
-                        <TableCell variant='head' sx={{ fontWeight: 500 }}>
+                      <TableRow sx={{ height: 50 }}>
+                        <TableCell
+                          variant='head'
+                          sx={{ fontWeight: 500, fontSize: '16px' }}
+                        >
                           Trạng thái
                         </TableCell>
                         <TableCell>
                           <Chip
-                            label={product.destroy ? 'Ngừng bán' : 'Đang bán'}
-                            color={product.destroy ? 'error' : 'success'}
+                            label={
+                              product?.status === 'draft'
+                                ? 'Bản nháp'
+                                : product?.status === 'active'
+                                  ? 'Hoạt động'
+                                  : 'Không hoạt dộng'
+                            }
+                            color='primary'
                             size='large'
-                            sx={{ width: '120px', fontWeight: '800' }}
+                            sx={{ width: '127px', fontWeight: '800' }}
                           />
                         </TableCell>
                       </TableRow>
-                      <TableRow>
-                        <TableCell variant='head' sx={{ fontWeight: 500 }}>
+                      <TableRow sx={{ height: 50 }}>
+                        <TableCell
+                          variant='head'
+                          sx={{ fontWeight: 500, fontSize: '16px' }}
+                        >
                           Ngày tạo
                         </TableCell>
-                        <TableCell>{formatDate(product.createdAt)}</TableCell>
+                        <TableCell sx={{ fontSize: '16px' }}>
+                          {formatDate(product.createdAt)}
+                        </TableCell>
                       </TableRow>
 
-                      <TableRow>
-                        <TableCell variant='head' sx={{ fontWeight: 500 }}>
+                      <TableRow sx={{ height: 50 }}>
+                        <TableCell
+                          variant='head'
+                          sx={{ fontWeight: 500, fontSize: '16px' }}
+                        >
                           Ngày cập nhật
                         </TableCell>
-                        <TableCell>{formatDate(product.updatedAt)}</TableCell>
+                        <TableCell sx={{ fontSize: '16px' }}>
+                          {formatDate(product.updatedAt)}
+                        </TableCell>
                       </TableRow>
                     </TableBody>
                   </Table>

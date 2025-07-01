@@ -27,7 +27,8 @@ const styles = {
     whiteSpace: 'nowrap',
     overflow: 'hidden',
     textOverflow: 'ellipsis',
-    verticalAlign: 'middle'
+    verticalAlign: 'middle',
+    background: '#fff '
   }
 }
 
@@ -186,14 +187,16 @@ export default function CategoryRow({
                 )}
 
                 {filters.destroy === 'true' ? (
-                  <Tooltip title='Khôi phục'>
-                    <IconButton
-                      onClick={() => handleOpenModal('restore', category)}
-                      size='small'
-                    >
-                      <RestartAltIcon color='success' />
-                    </IconButton>
-                  </Tooltip>
+                  permissions.canRestore && (
+                    <Tooltip title='Khôi phục'>
+                      <IconButton
+                        onClick={() => handleOpenModal('restore', category)}
+                        size='small'
+                      >
+                        <RestartAltIcon color='success' />
+                      </IconButton>
+                    </Tooltip>
+                  )
                 ) : (
                   <>
                     {permissions.canEdit && (

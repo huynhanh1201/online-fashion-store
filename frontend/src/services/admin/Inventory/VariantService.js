@@ -80,3 +80,15 @@ export const deleteVariant = async (id) => {
     return null
   }
 }
+
+export const restoreVariant = async (id) => {
+  try {
+    const response = await AuthorizedAxiosInstance.patch(
+      `${API_ROOT}/v1/variants/restore/${id}`
+    )
+    return response.data
+  } catch (error) {
+    console.error('Lỗi khi khôi phục biến thể:', error)
+    return null
+  }
+}

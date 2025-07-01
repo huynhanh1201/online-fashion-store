@@ -72,3 +72,14 @@ export const deleteDiscount = async (couponId) => {
     return null
   }
 }
+export const restoreDiscount = async (couponId) => {
+  try {
+    const response = await AuthorizedAxiosInstance.patch(
+      `${API_ROOT}/v1/coupons/restore/${couponId}`
+    )
+    return response.data
+  } catch (error) {
+    console.error('Lỗi khi khôi phục mã giảm:', error)
+    return null
+  }
+}

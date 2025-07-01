@@ -161,7 +161,9 @@ const OrderStatistic = ({ stats = {}, financeStatistics, year, setYear }) => {
   )
 
   const piePaymentChart = {
-    labels: paymentMethodStats.map((item) => item.paymentMethod),
+    labels: paymentMethodStats.map((item) =>
+      item.paymentMethod === 'vnpay' ? 'VNPay' : item.paymentMethod
+    ),
     datasets: [
       {
         data: paymentMethodStats.map((item) => item.count),

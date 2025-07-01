@@ -20,6 +20,7 @@ import AddPartnerModal from '../modal/Partner/AddPartnerModal.jsx'
 import EditPartnerModal from '../modal/Partner/EditPartnerModal.jsx'
 import ViewPartnerModal from '../modal/Partner/ViewPartnerModal.jsx'
 import DeletePartnerModal from '../modal/Partner/DeletePartnerModal.jsx'
+import RestorePartnerModal from '../modal/Partner/RestorePartnerModal.jsx'
 import AddIcon from '@mui/icons-material/Add'
 import FilterPartner from '~/components/FilterAdmin/FilterPartner.jsx'
 import usePartner from '~/hooks/admin/Inventory/usePartner.js'
@@ -28,6 +29,7 @@ import TableNoneData from '~/components/TableAdmin/NoneData.jsx'
 import { Stack } from '@mui/system'
 import Tooltip from '@mui/material/Tooltip'
 import usePermissions from '~/hooks/usePermissions'
+import RestartAltIcon from '@mui/icons-material/RestartAlt'
 const PartnersTab = () => {
   const { hasPermission } = usePermissions()
   const {
@@ -40,7 +42,8 @@ const PartnersTab = () => {
     totalPartner,
     Save,
     ROWS_PER_PAGE,
-    setROWS_PER_PAGE
+    setROWS_PER_PAGE,
+    restore
   } = usePartner()
   const getPartnerTypeLabel = (type) => {
     switch (type) {
@@ -86,6 +89,7 @@ const PartnersTab = () => {
   const [openEditDialog, setOpenEditDialog] = useState(false)
   const [openViewDialog, setOpenViewDialog] = useState(false)
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false)
+  const [openRestoreDialog, setOpenRestoreDialog] = useState(false)
   const [selectedPartner, setSelectedPartner] = useState(null)
   const [page, setPage] = useState(1)
   const [filter, setFilter] = useState({
@@ -136,13 +140,22 @@ const PartnersTab = () => {
   const handleCloseDeleteDialog = () => {
     setOpenDeleteDialog(false)
   }
+
+  const handleRestorePartner = (partner) => {
+    setSelectedPartner(partner)
+    setOpenRestoreDialog(true)
+  }
+  const handleCloseRestoreDialog = () => {
+    setOpenRestoreDialog(false)
+  }
+
   const handleChangePage = (event, value) => setPage(value)
 
   const onChangeRowsPerPage = (newLimit) => {
     setPage(1)
     setROWS_PER_PAGE(newLimit)
   }
-
+  console.log(filter.destroy)
   const handleSave = async (partner, type, partnerId) => {
     if (type === 'add') {
       await createNewPartner(partner, filter)
@@ -150,9 +163,10 @@ const PartnersTab = () => {
       await updateExistingPartner(partnerId, partner)
     } else if (type === 'delete') {
       await removePartner(partner)
+    } else if (type === 'restore') {
+      await restore(partner)
     }
   }
-
   const partnerColumns = [
     {
       id: 'index',
@@ -362,25 +376,40 @@ const PartnersTab = () => {
                             </IconButton>
                           </Tooltip>
                         )}
-                        {hasPermission('partner:update') && (
-                          <Tooltip title='Sửa'>
-                            <IconButton
-                              onClick={() => handleEditPartner(row)}
-                              size='small'
-                            >
-                              <BorderColorIcon color='warning' />
-                            </IconButton>
-                          </Tooltip>
-                        )}
-                        {hasPermission('partner:delete') && (
-                          <Tooltip title='Xoá'>
-                            <IconButton
-                              onClick={() => handleDeletePartner(row)}
-                              size='small'
-                            >
-                              <DeleteForeverIcon color='error' />
-                            </IconButton>
-                          </Tooltip>
+                        {filter.destroy ? (
+                          hasPermission('partner:restore') && (
+                            <Tooltip title='Khôi phục'>
+                              <IconButton
+                                onClick={() => handleRestorePartner(row)}
+                                size='small'
+                              >
+                                <RestartAltIcon color='success' />
+                              </IconButton>
+                            </Tooltip>
+                          )
+                        ) : (
+                          <>
+                            {hasPermission('partner:update') && (
+                              <Tooltip title='Sửa'>
+                                <IconButton
+                                  onClick={() => handleEditPartner(row)}
+                                  size='small'
+                                >
+                                  <BorderColorIcon color='warning' />
+                                </IconButton>
+                              </Tooltip>
+                            )}
+                            {hasPermission('partner:delete') && (
+                              <Tooltip title='Xoá'>
+                                <IconButton
+                                  onClick={() => handleDeletePartner(row)}
+                                  size='small'
+                                >
+                                  <DeleteForeverIcon color='error' />
+                                </IconButton>
+                              </Tooltip>
+                            )}
+                          </>
                         )}
                       </Stack>
                     )
@@ -453,6 +482,12 @@ const PartnersTab = () => {
         onClose={handleCloseDeleteDialog}
         partner={selectedPartner}
         deletePartner={handleSave}
+      />
+      <RestorePartnerModal
+        open={openRestoreDialog}
+        onClose={handleCloseRestoreDialog}
+        partner={selectedPartner}
+        restorePartner={handleSave}
       />
     </Paper>
   )

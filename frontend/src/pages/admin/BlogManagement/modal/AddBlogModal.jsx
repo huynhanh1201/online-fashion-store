@@ -277,8 +277,8 @@ const BlogModal = ({
         mt: '64px',
         '& .MuiDialog-container': { alignItems: 'end' },
         '& .MuiDialog-paper': {
-          maxHeight: '96%',
-          height: '96%',
+          maxHeight: '100%',
+          height: '100%',
           mt: 0,
           mb: 2.4
         }
@@ -445,7 +445,7 @@ const BlogModal = ({
 
               {/* Excerpt */}
               <TextField
-                label='Mô tả ngắn (Excerpt)'
+                label='Mô tả ngắn'
                 fullWidth
                 multiline
                 rows={isMobile ? 2 : 3}
@@ -578,7 +578,7 @@ const BlogModal = ({
                       }}
                     >
                       <TagIcon sx={{ color: '#0052cc', fontSize: 20 }} />
-                      Tags
+                      Thẻ
                     </Typography>
 
                     <Controller
@@ -621,8 +621,8 @@ const BlogModal = ({
                           renderInput={(params) => (
                             <TextField
                               {...params}
-                              label='Tags'
-                              placeholder='Nhập tag và nhấn Enter'
+                              label='Thẻ'
+                              placeholder='Nhập tên thể và nhấn Enter'
                               helperText='VD: thời trang, xu hướng'
                               variant='outlined'
                               sx={getInputStyles()}

@@ -29,7 +29,8 @@ const ColorTable = ({
   onPageChange,
   onChangeRowsPerPage,
   total,
-  permissions = {}
+  permissions = {},
+  filters
 }) => {
   const columns = [
     { id: 'index', label: 'STT', align: 'center', width: 50 },
@@ -142,6 +143,7 @@ const ColorTable = ({
                   columns={columns}
                   handleOpenModal={handleOpenModal}
                   permissions={permissions}
+                  filters={filters}
                 />
               ))
             ) : (

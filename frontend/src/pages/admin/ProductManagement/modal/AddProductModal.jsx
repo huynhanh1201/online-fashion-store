@@ -101,10 +101,20 @@ const AddProductModal = ({ open, onClose, onSuccess }) => {
 
     setCategoryOpen(false) // Đóng Chart
   }
-  const topLevelCategories = categories.filter(
-    (category) => category.parent !== null
-  )
+  function getSelectableCategories(categories) {
+    // const parentIds = categories
+    //   .filter((cat) => cat.parent && typeof cat.parent === 'object')
+    //   .map((cat) => cat.parent._id)
 
+    return categories.filter((cat) => {
+      const isChild = !!cat.parent
+      const isNotParent = !categories.some(
+        (other) => other.parent && other.parent._id === cat._id
+      )
+      return isChild || isNotParent
+    })
+  }
+  const selectableCategories = getSelectableCategories(categories)
   const handleImageInsertFromEditor = (url) => {
     // Chỉ thêm nếu ảnh chưa có trong imageUrls
     setProductImagePreview((prev) => {
@@ -162,14 +172,14 @@ const AddProductModal = ({ open, onClose, onSuccess }) => {
     <Dialog
       open={open}
       onClose={onClose}
-      maxWidth='xl'
+      maxWidth='xxl'
       fullWidth
       PaperProps={{
         sx: {
           display: 'flex',
           flexDirection: 'column',
           marginTop: '50px',
-          maxHeight: '85vh' // đảm bảo không vượt quá
+          maxHeight: '95vh' // đảm bảo không vượt quá
         }
       }}
     >
@@ -270,16 +280,17 @@ const AddProductModal = ({ open, onClose, onSuccess }) => {
                     renderValue={(selected) => selected?.name || ''}
                     disabled={loading}
                   >
-                    {topLevelCategories
-                      ?.filter((c) => !c.destroy)
-                      .map((cat) => {
-                        const option = { id: cat._id, name: cat.name }
-                        return (
-                          <MenuItem key={cat._id} value={option}>
-                            {cat.name}
-                          </MenuItem>
-                        )
-                      })}
+                    {selectableCategories
+                      .filter((c) => !c.destroy)
+                      .map((cat) => (
+                        <MenuItem
+                          key={cat._id}
+                          value={{ id: cat._id, name: cat.name }}
+                        >
+                          {cat.name}
+                        </MenuItem>
+                      ))}
+
                     <MenuItem onClick={() => setCategoryOpen(true)}>
                       Thêm danh mục mới
                     </MenuItem>

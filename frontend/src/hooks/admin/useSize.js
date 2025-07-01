@@ -4,7 +4,8 @@ import {
   addSize,
   getSizeById,
   updateSize,
-  deleteSize
+  deleteSize,
+  restoreSize
 } from '~/services/admin/sizeService'
 
 const useSizes = () => {
@@ -103,6 +104,23 @@ const useSizes = () => {
       return false
     }
   }
+
+  const restore = async (id) => {
+    try {
+      const restored = await restoreSize(id)
+      if (!restored) {
+        console.error('Không thể khôi phục kích thước')
+        return null
+      }
+      setSizes((prev) => prev.filter((d) => d._id !== id))
+      setTotalPages((prev) => prev - 1)
+      return restored
+    } catch (err) {
+      console.error('Error restoring size:', err)
+      return null
+    }
+  }
+
   const fetchSizeById = async (id) => {
     try {
       const size = await getSizeById(id)
@@ -127,7 +145,8 @@ const useSizes = () => {
     update,
     remove,
     ROWS_PER_PAGE,
-    setROWS_PER_PAGE
+    setROWS_PER_PAGE,
+    restore
   }
 }
 

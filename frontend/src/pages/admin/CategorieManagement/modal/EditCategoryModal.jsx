@@ -165,7 +165,7 @@ const EditCategoryModal = ({ open, onClose, category, onSave }) => {
                   backgroundColor: '#fafafa',
                   cursor: 'pointer',
                   width: 350,
-                  height: 355
+                  height: 331
                 }}
                 onClick={() => !previewUrl && fileInputRef.current.click()}
               >
@@ -231,7 +231,7 @@ const EditCategoryModal = ({ open, onClose, category, onSave }) => {
             </Box>
             <Box sx={{ display: 'flex', flexDirection: 'column' }}>
               <Typography variant='subtitle2' fontWeight='bold' mb={1}>
-                Ảnh quan quảng cáo
+                Ảnh quảng cáo
               </Typography>
               {/* Ảnh banner */}
               <Box
@@ -246,7 +246,7 @@ const EditCategoryModal = ({ open, onClose, category, onSave }) => {
                   backgroundColor: '#fafafa',
                   cursor: 'pointer',
                   width: 350,
-                  height: 355
+                  height: 331
                 }}
                 onClick={() => !bannerPreview && bannerInputRef.current.click()}
               >

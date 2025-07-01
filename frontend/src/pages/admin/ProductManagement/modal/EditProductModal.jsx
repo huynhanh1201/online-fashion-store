@@ -70,9 +70,20 @@ const EditProductModal = ({ open, onClose, onSave, product }) => {
     product.imageUrls || []
   )
   const { categories, fetchCategories, loading, update } = useCategories()
-  const topLevelCategories = categories.filter(
-    (category) => category.parent !== null
-  )
+  function getSelectableCategories(categories) {
+    // const parentIds = categories
+    //   .filter((cat) => cat.parent && typeof cat.parent === 'object')
+    //   .map((cat) => cat.parent._id)
+
+    return categories.filter((cat) => {
+      const isChild = !!cat.parent
+      const isNotParent = !categories.some(
+        (other) => other.parent && other.parent._id === cat._id
+      )
+      return isChild || isNotParent
+    })
+  }
+  const selectableCategories = getSelectableCategories(categories)
   // Hàm định dạng số và bỏ định dạng
   const formatNumber = (value) => {
     const number = value?.toString().replace(/\D/g, '') || ''
@@ -165,14 +176,14 @@ const EditProductModal = ({ open, onClose, onSave, product }) => {
     <Dialog
       open={open}
       onClose={onClose}
-      maxWidth='xl'
+      maxWidth='xxl'
       fullWidth
       PaperProps={{
         sx: {
           display: 'flex',
           flexDirection: 'column',
           marginTop: '50px',
-          maxHeight: '85vh' // đảm bảo không vượt quá
+          maxHeight: '95vh' // đảm bảo không vượt quá
         }
       }}
     >
@@ -259,7 +270,7 @@ const EditProductModal = ({ open, onClose, onSave, product }) => {
                       PaperProps: { sx: StyleAdmin.FormSelect.SelectMenu }
                     }}
                   >
-                    {topLevelCategories
+                    {selectableCategories
                       ?.filter((c) => !c.destroy)
                       .map((cat) => (
                         <MenuItem key={cat._id} value={cat._id}>

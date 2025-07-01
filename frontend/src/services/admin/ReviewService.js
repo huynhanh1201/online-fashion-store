@@ -40,3 +40,15 @@ export const deleteReview = async (id) => {
     throw error
   }
 }
+
+export const restoreReview = async (id) => {
+  try {
+    const response = await AuthorizedAxiosInstance.patch(
+      `${API_ROOT}/v1/reviews/restore/${id}`
+    )
+    return response.data
+  } catch (error) {
+    console.error('Lỗi khi khôi phục đánh giá:', error)
+    throw error
+  }
+}

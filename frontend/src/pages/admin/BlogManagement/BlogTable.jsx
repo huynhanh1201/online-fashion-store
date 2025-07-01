@@ -41,7 +41,9 @@ const BlogTable = ({
   rowsPerPage,
   total,
   onFilter,
-  loading
+  loading,
+  filters,
+  onRestore
 }) => {
   const columns = [
     { id: 'index', label: 'STT', align: 'center', width: 50 },
@@ -64,7 +66,8 @@ const BlogTable = ({
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
-          borderBottom: '1px solid #e0e0e0'
+          borderBottom: '1px solid #e0e0e0',
+          backgroundColor: '#fff'
         }}
       >
         <Box
@@ -88,7 +91,7 @@ const BlogTable = ({
                 width: 100,
                 display: 'flex',
                 alignItems: 'center',
-                backgroundColor: '#001f5d',
+                backgroundColor: 'var(--primary-color)',
                 color: '#fff'
               }}
             >
@@ -140,6 +143,8 @@ const BlogTable = ({
                   onEdit={onEdit}
                   onDelete={onDelete}
                   onView={onView}
+                  onRestore={onRestore}
+                  filters={filters}
                 />
               ))
             ) : (
@@ -153,6 +158,7 @@ const BlogTable = ({
       </TableContainer>
 
       <TablePagination
+        sx={{ background: '#fff' }}
         rowsPerPageOptions={[10, 25, 100]}
         component='div'
         count={total || 0}

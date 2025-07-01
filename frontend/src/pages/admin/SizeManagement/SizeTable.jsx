@@ -191,7 +191,8 @@ const SizeTable = ({
   onPageChange,
   onFilters,
   fetchSizes,
-  permissions = {}
+  permissions = {},
+  filters
 }) => {
   const columns = [
     { id: 'index', label: 'STT', minWidth: 50, align: 'center' },
@@ -290,6 +291,7 @@ const SizeTable = ({
                   columns={columns}
                   handleOpenModal={handleOpenModal}
                   permissions={permissions}
+                  filters={filters}
                 />
               ))
             ) : (

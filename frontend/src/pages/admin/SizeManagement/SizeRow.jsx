@@ -81,6 +81,7 @@ import BorderColorIcon from '@mui/icons-material/BorderColor'
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever'
 import Chip from '@mui/material/Chip'
 import Tooltip from '@mui/material/Tooltip'
+import RestartAltIcon from '@mui/icons-material/RestartAlt'
 const formatDateTime = (isoString) => {
   if (!isoString) return '—'
   const date = new Date(isoString)
@@ -113,7 +114,14 @@ const styles = {
   }
 }
 
-export default function SizeRow({ size, index, columns, handleOpenModal, permissions = {} }) {
+export default function SizeRow({
+  size,
+  index,
+  columns,
+  handleOpenModal,
+  permissions = {},
+  filters
+}) {
   return (
     <TableRow hover>
       {columns.map(({ id, align }) => {
@@ -147,25 +155,40 @@ export default function SizeRow({ size, index, columns, handleOpenModal, permiss
                   </IconButton>
                 </Tooltip>
               )}
-              {permissions.canEdit && (
-                <Tooltip title='Sửa'>
-                  <IconButton
-                    onClick={() => handleOpenModal('edit', size)}
-                    size='small'
-                  >
-                    <BorderColorIcon color='warning' />
-                  </IconButton>
-                </Tooltip>
-              )}
-              {permissions.canDelete && (
-                <Tooltip title='Xoá'>
-                  <IconButton
-                    onClick={() => handleOpenModal('delete', size)}
-                    size='small'
-                  >
-                    <DeleteForeverIcon color='error' />
-                  </IconButton>
-                </Tooltip>
+              {filters.destroy === 'true' ? (
+                permissions.canRestore && (
+                  <Tooltip title='Khôi phục'>
+                    <IconButton
+                      onClick={() => handleOpenModal('restore', size)}
+                      size='small'
+                    >
+                      <RestartAltIcon color='success' />
+                    </IconButton>
+                  </Tooltip>
+                )
+              ) : (
+                <>
+                  {permissions.canEdit && (
+                    <Tooltip title='Sửa'>
+                      <IconButton
+                        onClick={() => handleOpenModal('edit', size)}
+                        size='small'
+                      >
+                        <BorderColorIcon color='warning' />
+                      </IconButton>
+                    </Tooltip>
+                  )}
+                  {permissions.canDelete && (
+                    <Tooltip title='Xoá'>
+                      <IconButton
+                        onClick={() => handleOpenModal('delete', size)}
+                        size='small'
+                      >
+                        <DeleteForeverIcon color='error' />
+                      </IconButton>
+                    </Tooltip>
+                  )}
+                </>
               )}
             </Stack>
           )
