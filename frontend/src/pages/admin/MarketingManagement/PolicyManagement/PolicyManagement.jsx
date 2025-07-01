@@ -39,6 +39,7 @@ import { getPolicies, createPolicy, updatePolicy, deletePolicy } from '~/service
 import PolicyModal from './Modal/AddPolicyModal'
 import ViewPolicyModal from './Modal/ViewPolicyModal'
 import DeletePolicyModal from './Modal/DeletePolicyModal'
+import usePermissions from '~/hooks/usePermissions'
 
 const POLICY_LABELS = {
   privacy_policy: 'Chính sách bảo mật',
@@ -69,6 +70,7 @@ export default function PolicyManagement() {
   const [openView, setOpenView] = useState(false)
   const [openDelete, setOpenDelete] = useState(false)
   const [deleting, setDeleting] = useState(false)
+  const { hasPermission } = usePermissions()
 
   // Load policies khi component mount
   useEffect(() => {
@@ -81,7 +83,7 @@ export default function PolicyManagement() {
       setLoading(true)
       const response = await getPolicies({ page: 1, limit: 100 })
       // Filter policies: chỉ lấy destroy = false và status = active
-      const filteredPolicies = response.policies.filter(policy => 
+      const filteredPolicies = response.policies.filter(policy =>
         policy.destroy === false && policy.status === 'active'
       )
       setPolicies(filteredPolicies)
@@ -289,28 +291,31 @@ export default function PolicyManagement() {
 
       {/* Action Buttons */}
       <Box sx={{ mb: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <Button
-          variant='contained'
-          startIcon={<AddIcon />}
-          onClick={handleAdd}
-          sx={{
-            px: 3,
-            py: 1.5,
-            borderRadius: 2,
-            textTransform: 'none',
-            fontSize: '1rem',
-            fontWeight: 600,
-            background: 'var(--primary-color)',
-            boxShadow: '0 4px 16px rgba(59, 130, 246, 0.3)',
-            '&:hover': {
-              background: 'var(--accent-color)',
-              boxShadow: '0 6px 20px rgba(59, 130, 246, 0.4)',
-              transform: 'translateY(-1px)'
-            }
-          }}
-        >
-          Thêm chính sách
-        </Button>
+        {hasPermission('policy:create') && (
+
+          <Button
+            variant='contained'
+            startIcon={<AddIcon />}
+            onClick={handleAdd}
+            sx={{
+              px: 3,
+              py: 1.5,
+              borderRadius: 2,
+              textTransform: 'none',
+              fontSize: '1rem',
+              fontWeight: 600,
+              background: 'var(--primary-color)',
+              boxShadow: '0 4px 16px rgba(59, 130, 246, 0.3)',
+              '&:hover': {
+                background: 'var(--accent-color)',
+                boxShadow: '0 6px 20px rgba(59, 130, 246, 0.4)',
+                transform: 'translateY(-1px)'
+              }
+            }}
+          >
+            Thêm chính sách
+          </Button>
+        )}
         <Button
           variant="outlined"
           startIcon={<RefreshIcon />}
@@ -389,21 +394,27 @@ export default function PolicyManagement() {
                     </TableCell>
                     <TableCell sx={{ py: 2 }}>
                       <Stack direction='row' spacing={1}>
-                        <Tooltip title='Xem chi tiết'>
-                          <IconButton size='small' onClick={() => handleView(policy)}>
-                            <VisibilityIcon fontSize='small' />
-                          </IconButton>
-                        </Tooltip>
-                        <Tooltip title='Chỉnh sửa'>
-                          <IconButton size='small' onClick={() => handleEdit(policy)}>
-                            <EditIcon fontSize='small' />
-                          </IconButton>
-                        </Tooltip>
-                        <Tooltip title='Xóa'>
-                          <IconButton size='small' color='error' onClick={() => handleDeleteClick(policy)}>
-                            <DeleteIcon fontSize='small' />
-                          </IconButton>
-                        </Tooltip>
+                        {hasPermission('policy:read') && (
+                          <Tooltip title='Xem chi tiết'>
+                            <IconButton size='small' onClick={() => handleView(policy)}>
+                              <VisibilityIcon fontSize='small' />
+                            </IconButton>
+                          </Tooltip>
+                        )}
+                        {hasPermission('policy:update') && (
+                          <Tooltip title='Chỉnh sửa'>
+                            <IconButton size='small' onClick={() => handleEdit(policy)}>
+                              <EditIcon fontSize='small' />
+                            </IconButton>
+                          </Tooltip>
+                        )}
+                        {hasPermission('policy:delete') && (
+                          <Tooltip title='Xóa'>
+                            <IconButton size='small' color='error' onClick={() => handleDeleteClick(policy)}>
+                              <DeleteIcon fontSize='small' />
+                            </IconButton>
+                          </Tooltip>
+                        )}
                       </Stack>
                     </TableCell>
                   </TableRow>

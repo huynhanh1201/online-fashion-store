@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { Box, Typography } from '@mui/material'
 import useBlog from '~/hooks/useBlog.js'
 import { optimizeCloudinaryUrl } from '~/utils/cloudinary'
+
 class ErrorBoundary extends Component {
   state = { hasError: false }
 
@@ -67,7 +68,8 @@ const BlogHome = () => {
         {/* Container với width và padding giống Content.jsx */}
         <Box
           sx={{
-            maxWidth: '1800px',
+            width: '100%',
+            maxWidth: '96vw',
             margin: '0 auto',
             padding: {
               xs: '24px 16px',
@@ -176,7 +178,7 @@ const BlogHome = () => {
                       {/* Image Section */}
                       <Box
                         sx={{
-                          height: { xs: 200, sm: 220, md: 240 },
+                          height: { xs: 320, sm: 380, md: 420 }, // Increased height for taller images
                           position: 'relative',
                           overflow: 'hidden'
                         }}
@@ -238,10 +240,10 @@ const BlogHome = () => {
                             mb: 1.5,
                             lineHeight: 1.4,
                             display: '-webkit-box',
-                            WebkitLineClamp: 2,
+                            WebkitLineClamp: 3,
                             WebkitBoxOrient: 'vertical',
                             overflow: 'hidden',
-                            minHeight: { xs: 40, sm: 44, md: 48 }
+                            minHeight: { xs: 60, sm: 66, md: 72 }
                           }}
                         >
                           {article.title}
@@ -255,7 +257,7 @@ const BlogHome = () => {
                             mb: 2,
                             lineHeight: 1.6,
                             display: '-webkit-box',
-                            WebkitLineClamp: 3,
+                            WebkitLineClamp: 4,
                             WebkitBoxOrient: 'vertical',
                             overflow: 'hidden',
                             flex: 1

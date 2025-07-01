@@ -180,8 +180,6 @@ const TableOfContents = ({ headings, isMobile }) => {
       sx={{
         bgcolor: 'background.paper',
         borderRadius: 1,
-        border: '1px solid',
-        borderColor: 'grey.200',
         boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
         height: 'fit-content',
         maxHeight: { xs: 'auto', md: '100%' },
@@ -348,7 +346,12 @@ const BlogDetail = () => {
     return (
       <ErrorBoundary>
         <Box sx={{ bgcolor: 'grey.50', minHeight: '100vh' }}>
-          <Container maxWidth="lg" sx={{ py: { xs: 2, md: 3 } }}>
+          <Box sx={{ 
+            width: '100%', 
+            maxWidth: '96vw', 
+            margin: '0 auto',
+            padding: { xs: '24px 16px', sm: '24px 16px', md: '24px 16px' }
+          }}>
             {/* Back Button Skeleton */}
             <Box sx={{ mb: { xs: 2, md: 3 } }}>
               <Skeleton variant="rectangular" width={120} height={36} sx={{ borderRadius: 1 }} />
@@ -365,7 +368,7 @@ const BlogDetail = () => {
                   <Skeleton
                     variant="rectangular"
                     width="100%"
-                    height={{ xs: 200, md: 300 }}
+                    height={{ xs: 320, sm: 380, md: 420 }}
                   />
                   <CardContent>
                     <Skeleton variant="text" width={80} height={20} sx={{ mb: 2 }} />
@@ -383,7 +386,7 @@ const BlogDetail = () => {
 
               {/* TOC Skeleton - Desktop */}
               {!isMobile && (
-                <Box sx={{ width: 320, flexShrink: 0 }}>
+                <Box sx={{ width: 380, flexShrink: 0 }}>
                   <Box sx={{ bgcolor: 'background.paper', borderRadius: 1 }}>
                     <Skeleton variant="text" width={80} height={20} sx={{ m: 2, mb: 1 }} />
                     {[...Array(5)].map((_, index) => (
@@ -393,7 +396,7 @@ const BlogDetail = () => {
                 </Box>
               )}
             </Box>
-          </Container>
+          </Box>
         </Box>
       </ErrorBoundary>
     )
@@ -430,7 +433,12 @@ const BlogDetail = () => {
   return (
     <ErrorBoundary>
       <Box sx={{ bgcolor: 'grey.50', minHeight: '100vh' }}>
-        <Container maxWidth="xl" sx={{ py: { xs: 2, md: 3 } }}>
+        <Box sx={{ 
+          width: '100%', 
+          maxWidth: '96vw', 
+          margin: '0 auto',
+          padding: { xs: '24px 16px', sm: '24px 16px', md: '24px 16px' }
+        }}>
           {/* Back Button */}
           <Box sx={{ mb: { xs: 2, md: 3 } }}>
             <Button
@@ -495,7 +503,7 @@ const BlogDetail = () => {
                     )}
                     <CardMedia
                       component="img"
-                      height={{ xs: 200, md: 300 }}
+                      height={{ xs: 320, sm: 380, md: 420 }}
                       image={optimizeCloudinaryUrl(currentBlog.coverImage || currentBlog.thumbnail || currentBlog.image)}
                       alt={currentBlog.title}
                       sx={{
@@ -512,7 +520,7 @@ const BlogDetail = () => {
                 )}
 
               {/* Article Header */}
-              <CardContent sx={{ p: 0, my: 2 }}>
+              <CardContent sx={{ p: 0, my: 3 }}>
                 {/* Category */}
                 <Chip
                   label={currentBlog.category}
@@ -598,23 +606,23 @@ const BlogDetail = () => {
                     overflowWrap: 'break-word',
                     maxWidth: '100%',
                     '& img': {
+                      width: '100% !important',
                       maxWidth: '100% !important',
-                      height: '400px !important',
+                      height: 'auto !important',
                       display: 'block',
-                      margin: '1rem auto',
-                      objectFit: 'cover',
-                      borderRadius: '8px',
-                      boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
+                      margin: '1rem 0',
+                      objectFit: 'contain',
+                      border: 'none'
                     },
-                    '& p': { mb: 2 },
+                    '& p': { mb: 3 },
                     '& h1, & h2, & h3, & h4, & h5, & h6': {
-                      mt: 3,
-                      mb: 2,
+                      mt: 4,
+                      mb: 3,
                       wordWrap: 'break-word',
                       fontSize: { xs: '1.1rem', md: '1.2rem' }
                     },
-                    '& ul, & ol': { mb: 2, ml: 2 },
-                    '& li': { mb: 0.5 },
+                    '& ul, & ol': { mb: 3, ml: 2 },
+                    '& li': { mb: 1 },
                     '& blockquote': {
                       borderLeft: 4,
                       borderColor: 'primary.main',
@@ -673,10 +681,10 @@ const BlogDetail = () => {
             {headings.length > 0 && (
               <Box
                 sx={{
-                  flex: { xs: '1 1 auto', lg: '0 0 320px' },
-                  width: { xs: '100%', lg: '320px' },
-                  maxWidth: { lg: '320px' },
-                  minWidth: { lg: '320px' },
+                  flex: { xs: '1 1 auto', lg: '0 0 380px' },
+                  width: { xs: '100%', lg: '380px' },
+                  maxWidth: { lg: '380px' },
+                  minWidth: { lg: '380px' },
                   order: { xs: -1, lg: 1 },
                   position: { lg: 'sticky' },
                   top: { lg: '120px' },
@@ -689,7 +697,7 @@ const BlogDetail = () => {
               </Box>
             )}
           </Box>
-        </Container>
+        </Box>
       </Box>
     </ErrorBoundary>
   )

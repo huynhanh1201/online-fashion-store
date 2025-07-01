@@ -373,10 +373,15 @@ export default function AddAddressModal({
               disabled={viewOnly}
             />
             <TextField
-              label='Số điện thoại'
+              label="Số điện thoại"
               fullWidth
               value={formData.phone}
-              onChange={handleChange('phone')}
+              onChange={e => {
+                const onlyDigits = e.target.value.replace(/\D/g, '') // xóa tất cả ký tự không phải số
+                if (onlyDigits.length <= 11) {
+                  handleChange('phone')({ target: { value: onlyDigits } })
+                }
+              }}
               error={formErrors.phone}
               helperText={
                 formErrors.phone
@@ -385,6 +390,7 @@ export default function AddAddressModal({
               }
               disabled={viewOnly}
             />
+
             <Autocomplete
               options={provinces}
               getOptionLabel={(option) => option.name}

@@ -67,11 +67,35 @@ const Cart = () => {
   const [processingVariantId, setProcessingVariantId] = useState(null)
   const [hasAutoSelected, setHasAutoSelected] = useState(false)
   const [outOfStockAlert, setOutOfStockAlert] = useState(false)
+  const [outOfStockMessage, setOutOfStockMessage] = useState('')
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'auto' })
     setHasAutoSelected(false)
   }, [])
+
+  // Revalidate selected items when cart data changes to handle race conditions
+  useEffect(() => {
+    if (selectedItems.length > 0 && cartItems.length > 0) {
+      const validSelectedItems = selectedItems.filter(selected => {
+        const item = cartItems.find(cartItem =>
+          (cartItem.variant?._id || cartItem.variantId?._id || cartItem.variantId) === selected.variantId
+        )
+        return item && item.quantity > 0 && (item.variant?.quantity === undefined || item.variant.quantity > 0)
+      })
+
+      // If any selected items are now invalid, update the selection
+      if (validSelectedItems.length < selectedItems.length) {
+        setSelectedItems(validSelectedItems)
+        dispatch(setSelectedItemsAction(validSelectedItems))
+
+        if (validSelectedItems.length < selectedItems.length) {
+          setOutOfStockMessage('Một số sản phẩm đã chọn hiện đã hết hàng và đã được bỏ chọn')
+          setOutOfStockAlert(true)
+        }
+      }
+    }
+  }, [cartItems, selectedItems, dispatch])
 
   useEffect(() => {
     if (cart?.cartItems) {
@@ -84,19 +108,22 @@ const Cart = () => {
 
       const outOfStockItems = sortedItems.filter(item => item.quantity === 0)
       if (outOfStockItems.length > 0) {
+        setOutOfStockMessage('Một số sản phẩm trong giỏ hàng đã hết hàng và không thể chọn để thanh toán')
         setOutOfStockAlert(true)
-        setSelectedItems(prev =>
-          prev.filter(selected =>
+        setSelectedItems(prev => {
+          const filteredItems = prev.filter(selected =>
             !outOfStockItems.some(outOfStock =>
               outOfStock.variant?._id === selected.variantId ||
               outOfStock.variantId?._id === selected.variantId ||
               outOfStock.variantId === selected.variantId
             )
           )
-        )
+          dispatch(setSelectedItemsAction(filteredItems))
+          return filteredItems
+        })
       }
     }
-  }, [cart])
+  }, [cart, dispatch])
 
   useEffect(() => {
     if (cartItems.length > 0 && reorderVariantIds.length > 0 && !hasAutoSelected) {
@@ -145,16 +172,23 @@ const Cart = () => {
   // Lọc ra các sản phẩm có thể chọn (không hết hàng)
   const selectableItems = cartItems.filter(item => item.quantity > 0)
 
+  // Tính toán các sản phẩm có thể chọn đã được chọn
+  const selectedSelectableItems = selectedItems.filter(selected =>
+    selectableItems.some(item =>
+      (item.variant?._id || item.variantId?._id || item.variantId) === selected.variantId
+    )
+  )
+
   const allSelected =
-    selectableItems.length > 0 && selectedItems.length === selectableItems.length
+    selectableItems.length > 0 && selectedSelectableItems.length === selectableItems.length
   const someSelected =
-    selectedItems.length > 0 && selectedItems.length < selectableItems.length
+    selectedSelectableItems.length > 0 && selectedSelectableItems.length < selectableItems.length
 
   const handleSelectAll = () => {
     const newSelected = allSelected
       ? []
       : selectableItems.map((item) => ({
-        variantId: item.variant._id,
+        variantId: item.variant?._id || item.variantId?._id || item.variantId,
         quantity: item.quantity,
       }))
 
@@ -163,8 +197,19 @@ const Cart = () => {
   }
 
   const handleSelect = (item) => {
-    const variantId = item.variant._id
+    const variantId = item.variant?._id || item.variantId?._id || item.variantId
+    const variant = item.variant
     const exists = selectedItems.some((i) => i.variantId === variantId)
+
+    // Kiểm tra tình trạng hết hàng trước khi cho phép select
+    const isOutOfStock = item.quantity === 0 || (variant?.quantity !== undefined && variant.quantity === 0)
+
+    // Nếu sản phẩm hết hàng và đang cố gắng select (không phải unselect), thì không cho phép
+    if (!exists && isOutOfStock) {
+      setOutOfStockMessage('Sản phẩm này đã hết hàng và không thể chọn')
+      setOutOfStockAlert(true)
+      return
+    }
 
     const newSelected = exists
       ? selectedItems.filter((i) => i.variantId !== variantId)
@@ -296,6 +341,42 @@ const Cart = () => {
     setCartItems([])
     setSelectedItems([])
     setConfirmClearOpen(false)
+  }
+
+  // Validation trước khi thanh toán để đảm bảo không có sản phẩm hết hàng
+  const handleCheckout = () => {
+    // Kiểm tra xem có sản phẩm đã chọn nào hết hàng không
+    const selectedCartItems = cartItems.filter((item) =>
+      selectedItems.some((selected) =>
+        (item.variant?._id || item.variantId?._id || item.variantId) === selected.variantId
+      )
+    )
+
+    const hasOutOfStockSelected = selectedCartItems.some(item =>
+      item.quantity === 0 || (item.variant?.quantity !== undefined && item.variant.quantity === 0)
+    )
+
+    if (hasOutOfStockSelected) {
+      // Tự động loại bỏ các sản phẩm hết hàng khỏi danh sách đã chọn
+      const validSelectedItems = selectedItems.filter(selected => {
+        const item = cartItems.find(cartItem =>
+          (cartItem.variant?._id || cartItem.variantId?._id || cartItem.variantId) === selected.variantId
+        )
+        return item && item.quantity > 0 && (item.variant?.quantity === undefined || item.variant.quantity > 0)
+      })
+
+      setSelectedItems(validSelectedItems)
+      dispatch(setSelectedItemsAction(validSelectedItems))
+      setOutOfStockMessage('Đã loại bỏ các sản phẩm hết hàng khỏi danh sách thanh toán')
+      setOutOfStockAlert(true)
+
+      // Nếu sau khi loại bỏ không còn sản phẩm nào, không cho phép thanh toán
+      if (validSelectedItems.length === 0) {
+        return
+      }
+    }
+
+    navigate('/payment')
   }
 
 
@@ -1019,9 +1100,7 @@ const Cart = () => {
                   },
                 }}
                 disabled={selectedItems.length === 0}
-                onClick={() => {
-                  navigate('/payment')
-                }}
+                onClick={handleCheckout}
               >
                 Thanh toán ngay
               </Button>
@@ -1090,6 +1169,22 @@ const Cart = () => {
           </Button>
         </DialogActions>
       </Dialog>
+
+      {/* Snackbar for out of stock alert */}
+      <Snackbar
+        open={outOfStockAlert}
+        autoHideDuration={6000}
+        onClose={() => setOutOfStockAlert(false)}
+        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+      >
+        <Alert
+          severity="warning"
+          onClose={() => setOutOfStockAlert(false)}
+          sx={{ borderRadius: 2 }}
+        >
+          {outOfStockMessage}
+        </Alert>
+      </Snackbar>
     </Container>
   )
 }

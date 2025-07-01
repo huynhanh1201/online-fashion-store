@@ -701,10 +701,6 @@ const Payment = () => {
       orderData.couponId = couponId
     }
 
-    console.log('orderData trước khi gửi:', orderData)
-    console.log('orderData.cartItems detail:', JSON.stringify(orderData.cartItems, null, 2))
-    console.log('selectedAddress:', selectedAddress)
-
     try {
       const result = await createOrder(orderData)
       console.log('createOrder response:', result)
@@ -804,6 +800,8 @@ const Payment = () => {
                   rows={3}
                   multiline
                   placeholder="Nhập ghi chú cho đơn hàng của bạn..."
+                  helperText={`${note.length}/500 ký tự`}
+                  inputProps={{ maxLength: 500 }}
                 />
               </CardContent>
             </StyledCard>
@@ -995,7 +993,7 @@ const Payment = () => {
                           borderRadius: '4px',
                         },
                         '&::-webkit-scrollbar-thumb': {
-                          background: 'var(--primary-color)',
+                          backgroundColor: 'var(--primary-color) !important',
                           borderRadius: '4px',
                           '&:hover': {
                             background: 'var(--accent-color)',
@@ -1049,7 +1047,8 @@ const Payment = () => {
                     label="Nhập mã giảm giá"
                     value={voucherInput}
                     onChange={e => {
-                      const value = e.target.value.toUpperCase().slice(0, 10)
+                      let value = e.target.value.toUpperCase().slice(0, 20)
+                      value = value.replace(/[^A-Z0-9]/g, '')
                       setVoucherInput(value)
                       setVoucherApplied(false)
                     }}
@@ -1057,6 +1056,7 @@ const Payment = () => {
                     disabled={voucherLoading}
                     sx={{ mb: 2 }}
                   />
+
                   <PrimaryButton
                     fullWidth
                     onClick={handleApplyVoucherClick}
@@ -1290,7 +1290,7 @@ const Payment = () => {
           textAlign: 'center',
           color: 'var(--primary-color)',
           fontWeight: 700,
-          fontSize: '1.3rem'
+          fontSize: '1.3rem',
         }}>
           Xác nhận đặt hàng
         </DialogTitle>
@@ -1306,7 +1306,7 @@ const Payment = () => {
           </Typography>
 
         </DialogContent>
-        <DialogActions sx={{ justifyContent: 'flex-end', gap: 1, pb: 3 }}>
+        <DialogActions sx={{ justifyContent: 'flex-end', pb: 2, px: 3 }}>
           <Button
             onClick={() => setConfirmOpen(false)}
             variant="outlined"
@@ -1328,7 +1328,7 @@ const Payment = () => {
               borderRadius: 2,
               px: 3,
               backgroundColor: 'var(--primary-color)',
-              color: 'white'
+              color: 'white',
             }}
           >
             Xác nhận đặt hàng

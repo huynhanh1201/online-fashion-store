@@ -19,6 +19,7 @@ import FilterCategory from '~/components/FilterAdmin/FilterCategory.jsx'
 import TablePaginationActions from '~/components/PaginationAdmin/TablePaginationActions.jsx'
 import TableNoneData from '~/components/TableAdmin/NoneData.jsx'
 import Stack from '@mui/material/Stack'
+import usePermissions from '~/hooks/usePermissions'
 
 const CategoryTable = ({
   categories,
@@ -32,7 +33,7 @@ const CategoryTable = ({
   total,
   onPageChange,
   onChangeRowsPerPage,
-  permissions = {},
+  permissions,
   initialSearch,
   filters
 }) => {
@@ -64,6 +65,7 @@ const CategoryTable = ({
       maxWidth: 150
     }
   ]
+  const { hasPermission } = usePermissions()
 
   return (
     <Paper sx={{ border: '1px solid #ccc', width: '100%', overflow: 'hidden' }}>
@@ -92,7 +94,7 @@ const CategoryTable = ({
                     </Typography>
 
                     <Stack direction='row' spacing={1}>
-                      {permissions.canCreate && (
+                      {hasPermission('category:create') && (
                         <Button
                           onClick={addCategory}
                           startIcon={<AddIcon />}
