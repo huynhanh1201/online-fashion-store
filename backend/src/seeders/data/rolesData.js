@@ -12,6 +12,7 @@ export const roles = [
       'user:create',
       'user:update',
       'user:delete',
+      'user:restore',
 
       // Category
       'category:use',
@@ -19,6 +20,7 @@ export const roles = [
       'category:create',
       'category:update',
       'category:delete',
+      'category:restore',
 
       // Product
       'product:use',
@@ -26,6 +28,7 @@ export const roles = [
       'product:create',
       'product:update',
       'product:delete',
+      'product:restore',
 
       // Variant
       'variant:use',
@@ -33,6 +36,7 @@ export const roles = [
       'variant:create',
       'variant:update',
       'variant:delete',
+      'variant:restore',
 
       // Color
       'color:use',
@@ -40,6 +44,7 @@ export const roles = [
       'color:create',
       'color:update',
       'color:delete',
+      'color:restore',
 
       // Size
       'size:use',
@@ -47,6 +52,7 @@ export const roles = [
       'size:create',
       'size:update',
       'size:delete',
+      'size:restore',
 
       // Order
       'order:use',
@@ -64,6 +70,7 @@ export const roles = [
       'coupon:create',
       'coupon:update',
       'coupon:delete',
+      'coupon:restore',
 
       // Statistics
       'statistics:use',
@@ -104,6 +111,7 @@ export const roles = [
       'partner:create',
       'partner:update',
       'partner:delete',
+      'partner:restore',
 
       // Review
       'review:use',
@@ -111,6 +119,7 @@ export const roles = [
       'review:read',
       'review:update',
       'review:delete',
+      'review:restore',
 
       // Role
       'role:use',
@@ -118,6 +127,7 @@ export const roles = [
       'role:create',
       'role:update',
       'role:delete',
+      'role:restore',
 
       // Blog
       'blog:use',
@@ -125,6 +135,7 @@ export const roles = [
       'blog:create',
       'blog:update',
       'blog:delete',
+      'blog:restore',
 
       // Account
       'account:use',
@@ -178,9 +189,7 @@ export const roles = [
 
       // Theme
       'theme:use',
-      'theme:create',
       'theme:update',
-      'theme:delete',
 
       // Policy
       'policy:use',
@@ -206,6 +215,10 @@ export const roles = [
       // Role
       'role:use',
       'role:read',
+      'role:create',
+      'role:update',
+      'role:delete',
+      'role:restore',
 
       // Category
       'category:use',

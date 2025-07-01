@@ -28,6 +28,7 @@ export const permissions = [
   { key: 'user:read', label: 'Xem tài khoản khách hàng', group: 'Tài khoản khách hàng' },
   { key: 'user:create', label: 'Tạo tài khoản khách hàng', group: 'Tài khoản khách hàng' },
   { key: 'user:delete', label: 'Xóa tài khoản khách hàng', group: 'Tài khoản khách hàng' },
+  { key: 'user:restore', label: 'Khôi phục tài khoản khách hàng', group: 'Tài khoản khách hàng' },
 
   // Account
   { key: 'account:use', label: 'Sử dụng trang tài khoản hệ thống', group: 'Tài khoản hệ thống' },
@@ -42,6 +43,7 @@ export const permissions = [
   { key: 'role:create', label: 'Tạo vai trò', group: 'Vai trò' },
   { key: 'role:update', label: 'Sửa vai trò', group: 'Vai trò' },
   { key: 'role:delete', label: 'Xóa vai trò', group: 'Vai trò' },
+  { key: 'role:restore', label: 'Khôi phục vai trò', group: 'Vai trò' },
 
 
   { key: 'policy:use', label: 'Sử dụng trang chính sách', group: 'Chính sách' },
@@ -55,6 +57,7 @@ export const permissions = [
   { key: 'blog:create', label: 'Tạo bài viết', group: 'Bài viết' },
   { key: 'blog:update', label: 'Sửa bài viết', group: 'Bài viết' },
   { key: 'blog:delete', label: 'Xóa bài viết', group: 'Bài viết' },
+  { key: 'blog:restore', label: 'Khôi phục bài viết', group: 'Bài viết' },
 
   { key: 'banner:use', label: 'Sử dụng trang quảng cáo', group: 'Ảnh quảng cáo' },
   { key: 'banner:create', label: 'Tạo quảng cáo', group: 'Ảnh quảng cáo' },
@@ -112,6 +115,7 @@ export const permissions = [
   { key: 'category:create', label: 'Tạo danh mục sản phẩm', group: 'Danh mục' },
   { key: 'category:update', label: 'Sửa danh mục sản phẩm', group: 'Danh mục' },
   { key: 'category:delete', label: 'Xóa danh mục sản phẩm', group: 'Danh mục' },
+  { key: 'category:restore', label: 'Khôi phục danh mục sản phẩm', group: 'Danh mục' },
 
   // Product
   { key: 'product:use', label: 'Sử dụng trang sản phẩm', group: 'Sản phẩm' },
@@ -119,6 +123,7 @@ export const permissions = [
   { key: 'product:create', label: 'Tạo sản phẩm', group: 'Sản phẩm' },
   { key: 'product:update', label: 'Sửa sản phẩm', group: 'Sản phẩm' },
   { key: 'product:delete', label: 'Xóa sản phẩm', group: 'Sản phẩm' },
+  { key: 'product:restore', label: 'Khôi phục sản phẩm', group: 'Sản phẩm' },
 
   // Variant
   {
@@ -130,6 +135,7 @@ export const permissions = [
   { key: 'variant:create', label: 'Tạo biến thể', group: 'Biến thể sản phẩm' },
   { key: 'variant:update', label: 'Sửa biến thể', group: 'Biến thể sản phẩm' },
   { key: 'variant:delete', label: 'Xóa biến thể', group: 'Biến thể sản phẩm' },
+  { key: 'variant:restore', label: 'Khôi phục biến thể', group: 'Biến thể sản phẩm' },
 
   // Color
   {
@@ -141,6 +147,7 @@ export const permissions = [
   { key: 'color:create', label: 'Tạo màu', group: 'Màu sắc' },
   { key: 'color:update', label: 'Sửa màu', group: 'Màu sắc' },
   { key: 'color:delete', label: 'Xóa màu', group: 'Màu sắc' },
+  { key: 'color:restore', label: 'Khôi phục màu', group: 'Màu sắc' },
 
   // Color Palette
   // {
@@ -179,6 +186,7 @@ export const permissions = [
   { key: 'size:create', label: 'Tạo kích cỡ', group: 'Kích thước' },
   { key: 'size:update', label: 'Sửa kích cỡ', group: 'Kích thước' },
   { key: 'size:delete', label: 'Xóa kích cỡ', group: 'Kích thước' },
+  { key: 'size:restore', label: 'Khôi phục kích cỡ', group: 'Kích thước' },
 
   // Size Palette
   // {
@@ -212,6 +220,15 @@ export const permissions = [
   { key: 'order:read', label: 'Xem đơn hàng', group: 'Đơn hàng' },
   { key: 'order:update', label: 'Cập nhật đơn hàng', group: 'Đơn hàng' },
 
+
+  // Review
+  { key: 'review:use', label: 'Sử dụng trang đánh giá', group: 'Đánh giá' },
+  { key: 'review:create', label: 'Tạo đánh giá', group: 'Đánh giá' },
+  { key: 'review:read', label: 'Xem đánh giá', group: 'Đánh giá' },
+  { key: 'review:update', label: 'Sửa đánh giá', group: 'Đánh giá' },
+  { key: 'review:delete', label: 'Xóa đánh giá', group: 'Đánh giá' },
+  { key: 'review:restore', label: 'Khôi phục đánh giá', group: 'Đánh giá' },
+
   // Payment Transaction
   {
     key: 'payment:use',
@@ -239,7 +256,7 @@ export const permissions = [
   { key: 'coupon:create', label: 'Tạo mã giảm giá', group: 'Mã giảm giá' },
   { key: 'coupon:update', label: 'Sửa mã giảm giá', group: 'Mã giảm giá' },
   { key: 'coupon:delete', label: 'Xóa mã giảm giá', group: 'Mã giảm giá' },
-
+  { key: 'coupon:restore', label: 'Khôi phục mã giảm giá', group: 'Mã giảm giá' },
 
 
   // Inventory
@@ -282,6 +299,7 @@ export const permissions = [
   { key: 'partner:create', label: 'Tạo đối tác', group: 'Đối tác' },
   { key: 'partner:update', label: 'Sửa đối tác', group: 'Đối tác' },
   { key: 'partner:delete', label: 'Xóa đối tác', group: 'Đối tác' },
+  { key: 'partner:restore', label: 'Khôi phục đối tác', group: 'Đối tác' },
 
   // // Shipping Address
   // {
@@ -305,12 +323,6 @@ export const permissions = [
   //   group: 'Địa chỉ giao hàng'
   // },
 
-  // Review
-  { key: 'review:use', label: 'Sử dụng trang đánh giá', group: 'Đánh giá' },
-  { key: 'review:create', label: 'Tạo đánh giá', group: 'Đánh giá' },
-  { key: 'review:read', label: 'Xem đánh giá', group: 'Đánh giá' },
-  { key: 'review:update', label: 'Sửa đánh giá', group: 'Đánh giá' },
-  { key: 'review:delete', label: 'Xóa đánh giá', group: 'Đánh giá' },
 
   // Cart
   // { key: 'cart:create', label: 'Tạo giỏ hàng', group: 'Giỏ hàng' },

@@ -115,20 +115,23 @@ const CategoryManagement = () => {
           canCreate: hasPermission('category:create'),
           canEdit: hasPermission('category:update'),
           canDelete: hasPermission('category:delete'),
-          canView: hasPermission('category:read')
+          canView: hasPermission('category:read'),
+          canRestore: hasPermission('category:restore')
         }}
         initialSearch={searchFromUrl}
         filters={filters}
       />
 
       <React.Suspense fallback={<></>}>
-        {modalType === 'add' && (
-          <AddCategoryModal
-            open
-            onClose={handleCloseModal}
-            onAdded={handleSave}
-          />
-        )}
+        <PermissionWrapper requiredPermissions={['category:create']}>
+          {modalType === 'add' && (
+            <AddCategoryModal
+              open
+              onClose={handleCloseModal}
+              onAdded={handleSave}
+            />
+          )}
+        </PermissionWrapper>
         {modalType === 'view' && selectedCategory && (
           <ViewCategoryModal
             open
@@ -136,30 +139,36 @@ const CategoryManagement = () => {
             category={selectedCategory}
           />
         )}
-        {modalType === 'edit' && selectedCategory && (
-          <EditCategoryModal
-            open
-            onClose={handleCloseModal}
-            category={selectedCategory}
-            onSave={handleSave}
-          />
-        )}
-        {modalType === 'delete' && selectedCategory && (
-          <DeleteCategoryModal
-            open
-            onClose={handleCloseModal}
-            category={selectedCategory}
-            onDelete={handleSave}
-          />
-        )}
-        {modalType === 'restore' && selectedCategory && (
-          <RestoreCategoryModal
-            open
-            onClose={handleCloseModal}
-            category={selectedCategory}
-            onRestore={handleSave}
-          />
-        )}
+        <PermissionWrapper requiredPermissions={['category:update']}>
+          {modalType === 'edit' && selectedCategory && (
+            <EditCategoryModal
+              open
+              onClose={handleCloseModal}
+              category={selectedCategory}
+              onSave={handleSave}
+            />
+          )}
+        </PermissionWrapper>
+        <PermissionWrapper requiredPermissions={['category:delete']}>
+          {modalType === 'delete' && selectedCategory && (
+            <DeleteCategoryModal
+              open
+              onClose={handleCloseModal}
+              category={selectedCategory}
+              onDelete={handleSave}
+            />
+          )}
+        </PermissionWrapper>
+        <PermissionWrapper requiredPermissions={['category:restore']}>
+          {modalType === 'restore' && selectedCategory && (
+            <RestoreCategoryModal
+              open
+              onClose={handleCloseModal}
+              category={selectedCategory}
+              onRestore={handleSave}
+            />
+          )}
+        </PermissionWrapper>
       </React.Suspense>
 
       {/*<CategoryPagination*/}

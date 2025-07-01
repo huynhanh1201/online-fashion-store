@@ -71,11 +71,34 @@ import NotFound from '~/pages/404/NotFound'
 import { useAutoClearTempCart } from '~/hooks/useAutoClearTempCart'
 import OrderDetail from '~/pages/user/Orders/OrderDetail'
 import { BlogDetail } from '~/pages/user/Blog'
+import usePermissions from '~/hooks/usePermissions'
 
 // Giải pháp Clean Code trong việc xác định các route nào cần đăng nhập tài khoản xong thì mới được truy cập
 const ProtectedRoute = ({ user }) => {
   if (!user) {
     return <Navigate to='/login' replace={true} />
+  }
+
+  return <Outlet />
+}
+
+// Protected route cho Admin - ngăn customer truy cập
+const AdminProtectedRoute = ({ user }) => {
+  const { canAccessAdmin, isInitialized } = usePermissions()
+
+  // Nếu chưa đăng nhập, redirect về login
+  if (!user) {
+    return <Navigate to='/login' replace={true} />
+  }
+
+  // Đợi permission được tải
+  if (!isInitialized) {
+    return <div>Đang tải...</div>
+  }
+
+  // Nếu là customer hoặc không có quyền admin, redirect về trang chủ
+  if (user.role === 'customer' || !canAccessAdmin()) {
+    return <Navigate to='/' replace={true} />
   }
 
   return <Outlet />
@@ -128,7 +151,7 @@ function App() {
 
       {/*Admin*/}
 
-      <Route element={<ProtectedRoute user={currentUser} />}>
+      <Route element={<AdminProtectedRoute user={currentUser} />}>
         <Route path='/admin' element={<AdminLayout />}>
           <Route index element={<AdminHome />} />
           <Route path='user-management' element={<UserManagement />} />

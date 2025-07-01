@@ -35,7 +35,7 @@ const CategoryTable = ({
   total,
   onPageChange,
   onChangeRowsPerPage,
-
+  permissions,
   initialSearch,
   filters
 }) => {
@@ -161,6 +161,7 @@ const CategoryTable = ({
                   index={page * rowsPerPage + idx + 1}
                   columns={columns}
                   handleOpenModal={handleOpenModal}
+                  permissions={permissions}
                   filters={filters}
                 />
               ))

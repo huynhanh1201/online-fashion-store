@@ -21,13 +21,13 @@ const RouteGuard = ({
   if (requiredPermissions.length > 0) {
     // Trước tiên kiểm tra hasAllPermissions
     const hasRequiredPermissions = hasAllPermissions(requiredPermissions)
-    
+
     if (!hasRequiredPermissions) {
       // Fallback: nếu là admin role và không có permissions từ API, cho phép truy cập
       if (isAdminRole && hasNoPermissions) {
         return children
       }
-      
+
       // Fallback đặc biệt cho admin:access
       if (requiredPermissions.includes('admin:access') && canAccessAdmin()) {
         // Nếu có quyền admin access, kiểm tra các quyền khác
@@ -40,7 +40,7 @@ const RouteGuard = ({
           return children
         }
       }
-      
+
       return <Navigate to={fallbackPath} replace />
     }
   }
