@@ -102,19 +102,13 @@ const getProductList = async (reqQuery) => {
     // Xử lý filter
     const filter = {}
 
-    if (destroy) filter.destroy = JSON.parse(destroy)
-
     if (destroy === 'true' || destroy === 'false') {
       destroy = JSON.parse(destroy)
 
       filter.destroy = destroy
     }
 
-    if (status === 'true' || status === 'false') {
-      status = JSON.parse(status)
-
-      filter.destroy = status
-    }
+    if (status) filter.status = status
 
     if (search) {
       filter.name = { $regex: search, $options: 'i' }
