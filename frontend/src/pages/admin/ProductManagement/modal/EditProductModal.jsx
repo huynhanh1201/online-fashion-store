@@ -240,7 +240,12 @@ const EditProductModal = ({ open, onClose, onSave, product }) => {
               }}
               render={({ field }) => (
                 <TextField
-                  label='Tên sản phẩm'
+                  label={
+                    <>
+                      Tên sản phẩm <span style={{ color: 'red' }}>*</span> (bắt
+                      buộc)
+                    </>
+                  }
                   fullWidth
                   error={!!errors?.name}
                   helperText={'Không thể sửa tên vì sản phẩm đã có liên kết'}
@@ -263,7 +268,9 @@ const EditProductModal = ({ open, onClose, onSave, product }) => {
           {/*Danh mục*/}
           <Grid item size={6}>
             <FormControl fullWidth margin='normal' error={!!errors.categoryId}>
-              <InputLabel>Danh mục</InputLabel>
+              <InputLabel>
+                Danh mục <span style={{ color: 'red' }}>*</span> (bắt buộc)
+              </InputLabel>
               <Controller
                 name='categoryId'
                 control={control}

@@ -35,7 +35,7 @@ const EditDiscountModal = ({ open, onClose, discount, onSave }) => {
     reset,
     // setValue,
     setError,
-    formState: { isSubmitting }
+    formState: { isSubmitting, errors }
   } = useForm({
     defaultValues: {
       code: '',
@@ -135,10 +135,23 @@ const EditDiscountModal = ({ open, onClose, discount, onSave }) => {
                 label='Mã giảm giá'
                 fullWidth
                 margin='normal'
-                {...register('code', { required: true })}
+                {...register('code', {
+                  required: 'Mã giảm giá là bắt buộc',
+                  minLength: { value: 3, message: 'Ít nhất 3 ký tự' },
+                  maxLength: { value: 20, message: 'Không quá 20 ký tự' },
+                  pattern: {
+                    value: /^[a-zA-Z0-9]+$/,
+                    message: 'Chỉ được chứa chữ và số'
+                  },
+                  validate: (value) =>
+                    value.trim() === value ||
+                    'Không được có khoảng trắng đầu/cuối'
+                })}
+                error={!!errors.code}
+                helperText={errors.code?.message}
                 sx={StyleAdmin.InputCustom}
-                disabled
               />
+
               <Controller
                 name='type'
                 control={control}
@@ -284,14 +297,33 @@ const EditDiscountModal = ({ open, onClose, discount, onSave }) => {
                 {...register('validFrom')}
                 sx={StyleAdmin.InputCustom}
               />
-              <TextField
-                label='Hiệu lực đến'
-                type='datetime-local'
-                fullWidth
-                margin='normal'
-                InputLabelProps={{ shrink: true }}
-                {...register('validUntil')}
-                sx={StyleAdmin.InputCustom}
+              <Controller
+                name='validUntil'
+                control={control}
+                rules={{
+                  required: 'Vui lòng chọn ngày kết thúc',
+                  validate: (value) => {
+                    const from = new Date(watch('validFrom'))
+                    const to = new Date(value)
+                    if (!value) return 'Vui lòng chọn ngày kết thúc'
+                    if (isNaN(from.getTime()) || isNaN(to.getTime()))
+                      return true // tránh lỗi khi from chưa chọn
+                    return to > from || 'Ngày kết thúc phải sau ngày bắt đầu'
+                  }
+                }}
+                render={({ field, fieldState }) => (
+                  <TextField
+                    {...field}
+                    type='datetime-local'
+                    label='Hiệu lực đến'
+                    fullWidth
+                    margin='normal'
+                    InputLabelProps={{ shrink: true }}
+                    error={!!fieldState.error}
+                    helperText={fieldState.error?.message}
+                    sx={StyleAdmin.InputCustom}
+                  />
+                )}
               />
             </Box>
           </Box>

@@ -75,35 +75,32 @@ const EditBatchModal = ({
                 InputLabelProps={{ shrink: true }}
                 {...register('manufactureDate')}
                 defaultValue=''
+                error={!!errors.manufactureDate}
+                helperText={errors.manufactureDate?.message}
               />
             </Grid>
-
-            {/*<Grid item size={12}>*/}
-            {/*  <TextField*/}
-            {/*    label='Hạn sử dụng'*/}
-            {/*    type='date'*/}
-            {/*    fullWidth*/}
-            {/*    InputLabelProps={{ shrink: true }}*/}
-            {/*    {...register('expiry')}*/}
-            {/*    defaultValue=''*/}
-            {/*  />*/}
-            {/*</Grid>*/}
 
             <Grid item size={12}>
               <Controller
                 name='importPrice'
                 control={control}
                 rules={{
-                  required: 'Vui lòng nhập giá nhập',
-                  validate: (val) =>
-                    Number(val) < 0 ? 'Giá nhập không hợp lệ' : true
+                  validate: (val) => {
+                    if (val === null || val === '' || val === undefined)
+                      return true
+                    return Number(val) >= 0 || 'Giá nhập không được âm'
+                  }
                 }}
                 render={({ field }) => (
                   <TextField
                     label='Giá nhập (đ)'
                     type='text'
                     fullWidth
-                    value={formatCurrency(field.value)}
+                    value={
+                      field.value === 0
+                        ? '0'
+                        : formatCurrency(field.value || '')
+                    }
                     onChange={(e) =>
                       field.onChange(parseCurrency(e.target.value))
                     }

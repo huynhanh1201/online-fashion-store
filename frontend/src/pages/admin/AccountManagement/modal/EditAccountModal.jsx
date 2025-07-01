@@ -99,7 +99,12 @@ const EditAccountModal = ({ open, onClose, user, onSave, roles }) => {
             render={({ field, fieldState }) => (
               <TextField
                 {...field}
-                label='Tên tài khoản'
+                label={
+                  <>
+                    Tên tài khoản <span style={{ color: 'red' }}>*</span> (bắt
+                    buộc)
+                  </>
+                }
                 fullWidth
                 margin='normal'
                 error={!!fieldState.error}
@@ -166,7 +171,12 @@ const EditAccountModal = ({ open, onClose, user, onSave, roles }) => {
                 renderInput={(params) => (
                   <TextField
                     {...params}
-                    label='Vai trò'
+                    label={
+                      <>
+                        Vai trò <span style={{ color: 'red' }}>*</span> (bắt
+                        buộc)
+                      </>
+                    }
                     margin='normal'
                     error={!!fieldState.error}
                     helperText={fieldState.error?.message}

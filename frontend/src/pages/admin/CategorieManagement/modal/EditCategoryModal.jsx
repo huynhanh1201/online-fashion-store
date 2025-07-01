@@ -320,7 +320,12 @@ const EditCategoryModal = ({ open, onClose, category, onSave }) => {
             {/* Thông tin bên phải */}
             <Box flex={1} mt={1.6}>
               <TextField
-                label='Tên danh mục'
+                label={
+                  <>
+                    Tên danh mục <span style={{ color: 'red' }}>*</span> (bắt
+                    buộc)
+                  </>
+                }
                 fullWidth
                 margin='normal'
                 {...register('name', {

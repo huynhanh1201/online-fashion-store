@@ -262,6 +262,10 @@ const AddVariantModal = ({
           weight: Number(packageSize.weight) || 0
         }
       : productPackageSize
+    if (!data.colorImage) {
+      toast.error('Vui lòng thêm ảnh cho biến thể')
+      return
+    }
 
     try {
       await addColorPalette(productId, { name: color, image: colorImage })
@@ -436,7 +440,12 @@ const AddVariantModal = ({
               <Controller
                 name='productId'
                 control={control}
-                rules={{ required: 'Vui lòng chọn sản phẩm' }}
+                rules={{
+                  required: 'Vui lòng chọn sản phẩm',
+                  validate: (value) =>
+                    /^[0-9a-fA-F]{24}$/.test(value) ||
+                    'ID sản phẩm không hợp lệ'
+                }}
                 render={({ field }) => (
                   <Select
                     {...field}

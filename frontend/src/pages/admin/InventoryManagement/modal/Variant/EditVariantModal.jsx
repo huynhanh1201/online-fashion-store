@@ -22,7 +22,6 @@ import EditIcon from '@mui/icons-material/Edit'
 import DeleteIcon from '@mui/icons-material/Delete'
 import AddPhotoAlternateIcon from '@mui/icons-material/AddPhotoAlternate'
 import StyleAdmin from '~/assets/StyleAdmin.jsx'
-
 import { URI, CloudinaryColor } from '~/utils/constants'
 
 const uploadToCloudinary = async (file, folder = CloudinaryColor) => {
@@ -134,7 +133,10 @@ const EditVariantModal = ({
             }
           : variant.packageSize
       }
-
+      if (!updatedVariant.color.image) {
+        toast.error('Vui lòng thêm ảnh cho biến thể')
+        return
+      }
       await onUpdateVariant(updatedVariant, 'edit', variant._id)
       toast.success('Cập nhật biến thể thành công')
       onClose()

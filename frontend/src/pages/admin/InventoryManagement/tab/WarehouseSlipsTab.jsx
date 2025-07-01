@@ -460,6 +460,7 @@ const WarehouseSlipsTab = () => {
                           whiteSpace: 'nowrap',
                           overflow: 'hidden',
                           textOverflow: 'ellipsis',
+                          background: '#fff',
                           ...(col.maxWidth && { maxWidth: col.maxWidth }),
                           ...(col.id === 'itemCount' && { pr: col.pr })
                         }}
@@ -478,6 +479,7 @@ const WarehouseSlipsTab = () => {
         </Table>
       </TableContainer>
       <TablePagination
+        sx={{ background: '#fff' }}
         rowsPerPageOptions={[10, 25, 100]}
         component='div'
         count={totalPageSlip || 0}

@@ -385,7 +385,12 @@ const BlogModal = ({
               >
                 <Box sx={{ flex: isMobile ? '1' : '2' }}>
                   <TextField
-                    label='Tiêu đề bài viết *'
+                    label={
+                      <>
+                        Tiêu đề bài viết <span style={{ color: 'red' }}>*</span>{' '}
+                        (bắt buộc)
+                      </>
+                    }
                     fullWidth
                     variant='outlined'
                     {...register('title', {
@@ -463,7 +468,8 @@ const BlogModal = ({
                     value.trim() === value ||
                     'Mô tả không được có khoảng trắng đầu/cuối'
                 })}
-                helperText='Đoạn mô tả ngắn hiển thị trong danh sách bài viết'
+                error={!!errors.excerpt}
+                helperText={errors.excerpt?.message}
                 sx={{
                   ...getInputStyles(theme),
                   '& .MuiOutlinedInput-root': {
@@ -851,7 +857,8 @@ const BlogModal = ({
                 }}
               >
                 <ArticleIcon sx={{ color: '#0052cc', fontSize: 20 }} />
-                Nội dung bài viết
+                Nội dung bài viết <span style={{ color: 'red' }}>*</span> (bắt
+                buộc)
               </Typography>
 
               <Box

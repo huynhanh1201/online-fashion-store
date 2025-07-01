@@ -208,7 +208,6 @@ export default function AddWarehouseSlipModal({
         maxWidth='xl'
         fullWidth
         sx={{
-          mt: '64px',
           '& .MuiDialog-container': { alignItems: 'end' },
           '& .MuiDialog-paper': {
             maxHeight: '96%',

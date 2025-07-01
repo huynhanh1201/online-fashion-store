@@ -365,7 +365,11 @@ const AddRoleModal = ({ open, onClose, onSubmit, p }) => {
               {...field}
               fullWidth
               margin='normal'
-              label='Tên vai trò'
+              label={
+                <>
+                  Tên vai trò <span style={{ color: 'red' }}>*</span> (bắt buộc)
+                </>
+              }
               error={!!errors.name}
               helperText={errors.name?.message}
             />
@@ -386,7 +390,12 @@ const AddRoleModal = ({ open, onClose, onSubmit, p }) => {
               {...field}
               fullWidth
               margin='normal'
-              label='Tên hiển thị'
+              label={
+                <>
+                  Tên hiển thị <span style={{ color: 'red' }}>*</span> (bắt
+                  buộc)
+                </>
+              }
               error={!!errors.label}
               helperText={errors.label?.message}
             />

@@ -239,7 +239,12 @@ const AddProductModal = ({ open, onClose, onSuccess }) => {
               }}
               render={({ field }) => (
                 <TextField
-                  label='Tên sản phẩm'
+                  label={
+                    <>
+                      Tên sản phẩm <span style={{ color: 'red' }}>*</span> (bắt
+                      buộc)
+                    </>
+                  }
                   fullWidth
                   error={!!errors.name}
                   helperText={errors.name?.message}
@@ -261,7 +266,9 @@ const AddProductModal = ({ open, onClose, onSuccess }) => {
           {/*Danh mục*/}
           <Grid item size={6}>
             <FormControl fullWidth margin='normal' error={!!errors.categoryId}>
-              <InputLabel>Danh mục</InputLabel>
+              <InputLabel>
+                Danh mục <span style={{ color: 'red' }}>*</span> (bắt buộc)
+              </InputLabel>
               <Controller
                 name='categoryId'
                 control={control}
@@ -318,7 +325,12 @@ const AddProductModal = ({ open, onClose, onSuccess }) => {
               control={control}
               render={({ field }) => (
                 <TextField
-                  label='Giá nhập (đ)'
+                  label={
+                    <>
+                      Giá nhập (đ) <span style={{ color: 'red' }}>*</span> (bắt
+                      buộc)
+                    </>
+                  }
                   fullWidth
                   type='text'
                   value={formatNumber(field.value || '')}
@@ -343,7 +355,12 @@ const AddProductModal = ({ open, onClose, onSuccess }) => {
               }}
               render={({ field }) => (
                 <TextField
-                  label='Giá bán (đ)'
+                  label={
+                    <>
+                      Giá bán (đ) <span style={{ color: 'red' }}>*</span> (bắt
+                      buộc)
+                    </>
+                  }
                   fullWidth
                   type='text'
                   value={formatNumber(field.value || '')}
@@ -373,7 +390,12 @@ const AddProductModal = ({ open, onClose, onSuccess }) => {
                   }}
                   render={({ field }) => (
                     <TextField
-                      label='Chiều dài gói hàng (cm)'
+                      label={
+                        <>
+                          Chiều dài gói hàng (cm){' '}
+                          <span style={{ color: 'red' }}>*</span> (bắt buộc)
+                        </>
+                      }
                       type='number'
                       fullWidth
                       inputProps={{ min: 0, step: '0.01' }}
@@ -397,7 +419,12 @@ const AddProductModal = ({ open, onClose, onSuccess }) => {
                   }}
                   render={({ field }) => (
                     <TextField
-                      label='Chiều rộng gói hàng (cm)'
+                      label={
+                        <>
+                          Chiều rộng gói hàng (cm){' '}
+                          <span style={{ color: 'red' }}>*</span> (bắt buộc)
+                        </>
+                      }
                       type='number'
                       fullWidth
                       inputProps={{ min: 0, step: '0.01' }}
@@ -421,7 +448,12 @@ const AddProductModal = ({ open, onClose, onSuccess }) => {
                   }}
                   render={({ field }) => (
                     <TextField
-                      label='Chiều cao gói hàng (cm)'
+                      label={
+                        <>
+                          Chiều cao gói hàng (cm){' '}
+                          <span style={{ color: 'red' }}>*</span> (bắt buộc)
+                        </>
+                      }
                       type='number'
                       fullWidth
                       inputProps={{ min: 0, step: '0.01' }}
@@ -445,7 +477,12 @@ const AddProductModal = ({ open, onClose, onSuccess }) => {
                   }}
                   render={({ field }) => (
                     <TextField
-                      label='Trọng lượng gói hàng (gram)'
+                      label={
+                        <>
+                          Trọng lượng gói hàng (cm){' '}
+                          <span style={{ color: 'red' }}>*</span> (bắt buộc)
+                        </>
+                      }
                       type='number'
                       fullWidth
                       inputProps={{ min: 0, step: '0.01' }}

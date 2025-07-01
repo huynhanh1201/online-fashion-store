@@ -55,7 +55,20 @@ const EditSizeModal = ({ open, onClose, size, onSave }) => {
             label='Tên kích thước'
             fullWidth
             margin='normal'
-            {...register('name', { required: 'Tên kích thước là bắt buộc' })}
+            {...register('name', {
+              required: 'Tên kích thước là bắt buộc',
+              minLength: {
+                value: 1,
+                message: 'Tên kích thước phải có ít nhất 1 ký tự'
+              },
+              maxLength: {
+                value: 50,
+                message: 'Tên kích thước không vượt quá 50 ký tự'
+              },
+              validate: (value) =>
+                value.trim() === value ||
+                'Tên kích thước không được có khoảng trắng đầu/cuối'
+            })}
             error={!!errors.name}
             helperText={errors.name?.message}
             sx={StyleAdmin.InputCustom}

@@ -70,6 +70,7 @@ const VariantsTab = () => {
   const [openViewModal, setOpenViewModal] = useState(false)
   const [openEditModal, setOpenEditModal] = useState(false)
   const [openDeleteModal, setOpenDeleteModal] = useState(false)
+  const [openRestoreModal, setOpenRestoreModal] = useState(false)
   const [selectedVariant, setSelectedVariant] = useState(null)
   const [page, setPage] = useState(1)
   const location = useLocation()
@@ -117,7 +118,7 @@ const VariantsTab = () => {
   const handleRestoreVariant = (variant) => {
     if (hasPermission('variant:restore')) {
       setSelectedVariant(variant)
-      setOpenViewModal(true)
+      setOpenRestoreModal(true)
     }
   }
 
@@ -152,7 +153,7 @@ const VariantsTab = () => {
     // fetchVariants(page, rowsPerPage, filter)
   }
   const handleCloseRestoreModal = () => {
-    setOpenViewModal(false)
+    setOpenRestoreModal(false)
     setSelectedVariant(null)
     // fetchVariants(page, rowsPerPage, filter)
   }
@@ -558,7 +559,7 @@ const VariantsTab = () => {
 
         <PermissionWrapper requiredPermissions={['variant:restore']}>
           <RestoreVariantModal
-            open={handleRestoreVariant}
+            open={openRestoreModal}
             onClose={handleCloseRestoreModal}
             variant={selectedVariant}
             restoreVariant={handleSave}
