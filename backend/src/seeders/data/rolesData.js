@@ -436,13 +436,6 @@ export const roles = [
       'blog:read', // khách hàng có thể xem blog
 
       // policy - xem chính sách
-      'policy:read', // nếu muốn khách hàng có thể xem chính sách
 
       // service
       'service:read', // nếu muốn khách hàng có thể xem dịch vụ
-
-      // Danh mục nổi bật
-      'featuredCategory:read' // khách hàng có thể xem danh mục nổi
-    ]
-  }
-]
