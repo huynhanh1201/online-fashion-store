@@ -76,35 +76,6 @@ const BlogHome = () => {
             }
           }}
         >
-          {/* Header Section */}
-          <Box
-            sx={{
-              textAlign: 'center',
-              mb: { xs: 4, sm: 5, md: 6 }
-            }}
-          >
-            <Typography
-              variant='h2'
-              sx={{
-                fontSize: { xs: '1.875rem', sm: '2.25rem', md: '2.5rem' },
-                fontWeight: 700,
-                color: 'grey.900',
-                letterSpacing: '0.05em',
-                mb: 1
-              }}
-            >
-              TIN THỜI TRANG
-            </Typography>
-            <Typography
-              variant='body1'
-              sx={{
-                fontSize: { xs: '0.875rem', sm: '1rem' },
-                color: 'grey.600'
-              }}
-            >
-              Cập nhật xu hướng thời trang mới nhất
-            </Typography>
-          </Box>
 
           {/* Loading State */}
           {loading && (
