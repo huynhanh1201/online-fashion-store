@@ -598,13 +598,13 @@ const BlogDetail = () => {
                     overflowWrap: 'break-word',
                     maxWidth: '100%',
                     '& img': {
+                      width: '100% !important',
                       maxWidth: '100% !important',
-                      height: '400px !important',
+                      height: 'auto !important',
                       display: 'block',
-                      margin: '1rem auto',
-                      objectFit: 'cover',
-                      borderRadius: '8px',
-                      boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
+                      margin: '1rem 0',
+                      objectFit: 'contain',
+                      border: 'none'
                     },
                     '& p': { mb: 2 },
                     '& h1, & h2, & h3, & h4, & h5, & h6': {

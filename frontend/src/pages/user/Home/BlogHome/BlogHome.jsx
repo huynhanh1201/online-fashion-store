@@ -67,7 +67,8 @@ const BlogHome = () => {
         {/* Container với width và padding giống Content.jsx */}
         <Box
           sx={{
-            maxWidth: '1800px',
+            width: '100%',
+            maxWidth: '96vw',
             margin: '0 auto',
             padding: {
               xs: '24px 16px',

@@ -301,37 +301,34 @@ export const permissions = [
   { key: 'partner:delete', label: 'Xóa đối tác', group: 'Đối tác' },
   { key: 'partner:restore', label: 'Khôi phục đối tác', group: 'Đối tác' },
 
-  // // Shipping Address
-  // {
-  //   key: 'shippingAddress:read',
-  //   label: 'Xem địa chỉ giao hàng',
-  //   group: 'Địa chỉ giao hàng'
-  // },
-  // {
-  //   key: 'shippingAddress:create',
-  //   label: 'Tạo địa chỉ giao hàng',
-  //   group: 'Địa chỉ giao hàng'
-  // },
-  // {
-  //   key: 'shippingAddress:update',
-  //   label: 'Sửa địa chỉ giao hàng',
-  //   group: 'Địa chỉ giao hàng'
-  // },
-  // {
-  //   key: 'shippingAddress:delete',
-  //   label: 'Xóa địa chỉ giao hàng',
-  //   group: 'Địa chỉ giao hàng'
-  // },
+  // Shipping Address
+  {
+    key: 'shippingAddress:read',
+    label: 'Xem địa chỉ giao hàng',
+    group: 'Địa chỉ giao hàng'
+  },
+  {
+    key: 'shippingAddress:create',
+    label: 'Tạo địa chỉ giao hàng',
+    group: 'Địa chỉ giao hàng'
+  },
+  {
+    key: 'shippingAddress:update',
+    label: 'Sửa địa chỉ giao hàng',
+    group: 'Địa chỉ giao hàng'
+  },
+  {
+    key: 'shippingAddress:delete',
+    label: 'Xóa địa chỉ giao hàng',
+    group: 'Địa chỉ giao hàng'
+  },
 
 
   // Cart
-  // { key: 'cart:create', label: 'Tạo giỏ hàng', group: 'Giỏ hàng' },
-  // { key: 'cart:read', label: 'Xem giỏ hàng', group: 'Giỏ hàng' },
-  // { key: 'cart:update', label: 'Cập nhật giỏ hàng', group: 'Giỏ hàng' },
-  // { key: 'cart:delete', label: 'Xóa giỏ hàng', group: 'Giỏ hàng' },
-
-
-  // Blog
+  { key: 'cart:create', label: 'Tạo giỏ hàng', group: 'Giỏ hàng' },
+  { key: 'cart:read', label: 'Xem giỏ hàng', group: 'Giỏ hàng' },
+  { key: 'cart:update', label: 'Cập nhật giỏ hàng', group: 'Giỏ hàng' },
+  { key: 'cart:delete', label: 'Xóa giỏ hàng', group: 'Giỏ hàng' },
 
 
 ]
