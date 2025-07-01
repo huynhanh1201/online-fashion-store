@@ -306,86 +306,99 @@ const Product = () => {
         sx={{
           width: '100%',
           maxWidth: '1800px',
-          height: { xs: '200px', sm: '300px', md: '400px' },
+          height: { xs: 'auto', md: 400 },
           position: 'relative',
           mb: 4,
           margin: '0 auto',
-          px: { xs: 2, sm: 3, md: 4 }
+          px: { xs: 2, sm: 3, md: 4 },
+          display: 'flex',
+          flexDirection: { xs: 'column', md: 'row' },
+          alignItems: 'stretch',
+          gap: 3
         }}
       >
-        {bannerLoading ? (
-          <Skeleton
-            variant="rectangular"
-            width="100%"
-            height="100%"
-            sx={{ borderRadius: 0 }}
-          />
-        ) : productBanner ? (
-          productBanner.link ? (
-            <Box
-              component="a"
-              href={productBanner.link}
-              target="_blank"
-              rel="noopener noreferrer"
-              sx={{
-                display: 'block',
-                width: '100%',
-                height: '100%',
-                textDecoration: 'none',
-                cursor: 'pointer'
-              }}
-            >
-              <Box
-                sx={{
-                  width: '100%',
-                  height: '100%',
-                  backgroundImage: `url(${optimizeCloudinaryUrl(productBanner.imageUrl, {
-                    width: 1800,
-                    height: 400,
-                    quality: 'auto',
-                    format: 'auto'
-                  })})`,
-                  backgroundSize: 'cover',
-                  backgroundPosition: 'center',
-                  borderRadius: '8px',
-                  transition: 'transform 0.3s ease',
-                  '&:hover': {
-                    transform: 'scale(1.02)'
-                  }
-                }}
-              />
-            </Box>
-          ) : (
-            <Box
-              sx={{
-                width: '100%',
-                height: '100%',
-                backgroundImage: `url(${optimizeCloudinaryUrl(productBanner.imageUrl, {
+        {/* Banner Image */}
+        <Box
+          sx={{
+            flex: 1,
+            minHeight: { xs: 180, md: 400 },
+            backgroundImage: bannerLoading
+              ? 'none'
+              : productBanner
+              ? `url(${optimizeCloudinaryUrl(productBanner.imageUrl, {
                   width: 1800,
                   height: 400,
                   quality: 'auto',
                   format: 'auto'
-                })})`,
-                backgroundSize: 'cover',
-                backgroundPosition: 'center',
-                borderRadius: '8px'
-              }}
+                })})`
+              : 'url(https://www.rcuw.org/wp-content/themes/champion/images/SM-placeholder.png)',
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            borderRadius: '8px',
+            boxShadow: 2,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            position: 'relative',
+            overflow: 'hidden'
+          }}
+        >
+          {bannerLoading && (
+            <Skeleton
+              variant="rectangular"
+              width="100%"
+              height="100%"
+              sx={{ borderRadius: 0 }}
             />
-          )
-        ) : (
-          // Fallback banner when no product banner found
-          <Box
+          )}
+        </Box>
+
+        {/* Title & Description */}
+        <Box
+          sx={{
+            flex: 1,
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center',
+            alignItems: { xs: 'center', md: 'flex-start' },
+            p: { xs: 2, md: 4 },
+            minHeight: { xs: 180, md: 400 }
+          }}
+        >
+          <Typography
+            variant="h2"
+            fontWeight={800}
             sx={{
-              width: '100%',
-              height: '100%',
-              backgroundImage:
-                'url(https://file.hstatic.net/1000360022/collection/tat_ca_san_pham_3682cf864f2d4433a1f0bdfb4ffe24de.jpg)',
-              backgroundSize: 'cover',
-              backgroundPosition: 'center',
-              borderRadius: '8px'
+              fontSize: { xs: '2rem', sm: '2.5rem', md: '3.5rem' },
+              mb: 2,
+              background: 'linear-gradient(90deg, #1A3C7B 0%, #1976d2 100%)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              backgroundClip: 'text',
+              textShadow: '2px 2px 8px rgba(26,60,123,0.08)',
+              letterSpacing: '-1px',
+              lineHeight: 1.1,
+              textAlign: { xs: 'center', md: 'left' }
             }}
-          />
-        )}
+          >
+            Tất cả sản phẩm
+          </Typography>
+          {productBanner?.description && (
+            <Typography
+              variant="h6"
+              sx={{
+                color: 'text.secondary',
+                fontWeight: 400,
+                fontSize: { xs: '1rem', md: '1.2rem' },
+                lineHeight: 1.6,
+                textAlign: { xs: 'center', md: 'left' },
+                maxWidth: 600
+              }}
+            >
+              {productBanner.description}
+            </Typography>
+          )}
+        </Box>
       </Box>
 
       <ProductCategories />
