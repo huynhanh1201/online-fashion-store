@@ -111,22 +111,22 @@ const Blog = () => {
     <ErrorBoundary>
       <Box
         sx={{
-          minHeight: '100vh',
-          py: { xs: 5, sm: 6, md: 8 },
-          px: { xs: 2, sm: 3, md: 4 }
+          fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+          width: '100%',
+          minHeight: '100vh'
         }}
       >
-        {/* Container với width responsive */}
+        {/* Container với width và padding giống BlogHome.jsx */}
         <Box
           sx={{
-            maxWidth: {
-              xs: '100%',
-              sm: '640px',
-              md: '768px',
-              lg: '1200px',
-              xl: '1400px'
-            },
-            mx: 'auto'
+            width: '100%',
+            maxWidth: '96vw',
+            margin: '0 auto',
+            padding: {
+              xs: '40px 16px 24px',
+              sm: '48px 16px 24px',
+              md: '64px 16px 24px'
+            }
           }}
         >
           {/* Header Section */}
@@ -258,7 +258,7 @@ const Blog = () => {
                       {/* Image Section */}
                       <Box
                         sx={{
-                          height: { xs: 200, sm: 220, md: 240 },
+                          height: { xs: 320, sm: 380, md: 420 }, // Increased height for taller images
                           position: 'relative',
                           overflow: 'hidden'
                         }}
@@ -320,10 +320,10 @@ const Blog = () => {
                             mb: 1.5,
                             lineHeight: 1.4,
                             display: '-webkit-box',
-                            WebkitLineClamp: 2,
+                            WebkitLineClamp: 3,
                             WebkitBoxOrient: 'vertical',
                             overflow: 'hidden',
-                            minHeight: { xs: 40, sm: 44, md: 48 }
+                            minHeight: { xs: 60, sm: 66, md: 72 }
                           }}
                         >
                           {article.title}
@@ -337,7 +337,7 @@ const Blog = () => {
                             mb: 2,
                             lineHeight: 1.6,
                             display: '-webkit-box',
-                            WebkitLineClamp: 3,
+                            WebkitLineClamp: 4,
                             WebkitBoxOrient: 'vertical',
                             overflow: 'hidden',
                             flex: 1
