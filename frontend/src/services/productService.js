@@ -11,16 +11,10 @@ export const getProducts = async (params = {}) => {
 
     const response = await AuthorizedAxiosInstance.get(url)
 
-    // Xử lý response là mảng trực tiếp hoặc object
-    let products = response.data.data || response.data.products || []
-    
-    // Filter sản phẩm ở client-side: chỉ lấy status = active và destroy = false
-    products = products.filter(product => 
-      product.status === 'active' && product.destroy === false
-    )
-    
-    const total = products.length
-    const totalPages = Math.ceil(total / limit)
+    // Lấy đúng trường từ backend
+    const products = response.data.data || []
+    const total = response.data.meta?.total || 0
+    const totalPages = response.data.meta?.totalPages || 1
 
     return {
       products,
