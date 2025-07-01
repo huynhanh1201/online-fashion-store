@@ -3,12 +3,14 @@ import express from 'express'
 import { ordersValidation } from '~/validations/ordersValidation'
 import { ordersController } from '~/controllers/ordersController'
 import { authMiddleware } from '~/middlewares/authMiddleware'
+import { rbacMiddleware } from '~/middlewares/rbacMiddleware'
 
 const Router = express.Router()
 
 // Tạo Đơn hàng mới
 Router.route('/').post(
   authMiddleware.isAuthorized,
+  rbacMiddleware.isValidPermission(['order:create']),
   ordersValidation.order,
   ordersController.createOrder
 )
@@ -16,6 +18,7 @@ Router.route('/').post(
 // Danh sách Đơn hàng
 Router.route('/').get(
   authMiddleware.isAuthorized,
+  rbacMiddleware.isValidPermission(['order:use']),
   authMiddleware.isAuthorized,
   ordersController.getOrderList
 )
@@ -23,6 +26,7 @@ Router.route('/').get(
 // Lấy thông tin một Đơn hàng.
 Router.route('/:orderId').get(
   authMiddleware.isAuthorized,
+  rbacMiddleware.isValidPermission(['order:read']),
   ordersValidation.verifyId,
   ordersController.getOrder
 )
@@ -30,6 +34,7 @@ Router.route('/:orderId').get(
 // Cập nhật thông tin Đơn hàng
 Router.route('/:orderId').patch(
   authMiddleware.isAuthorized,
+  rbacMiddleware.isValidPermission(['order:update']),
   ordersValidation.verifyId,
   ordersValidation.updateOrder,
   ordersController.updateOrder

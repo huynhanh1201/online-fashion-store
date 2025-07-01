@@ -3,6 +3,7 @@ import express from 'express'
 import { inventoryLogsValidation } from '~/validations/inventoryLogsValidation'
 import { inventoryLogsController } from '~/controllers/inventoryLogsController'
 import { authMiddleware } from '~/middlewares/authMiddleware'
+import { rbacMiddleware } from '~/middlewares/rbacMiddleware'
 
 const Router = express.Router()
 
@@ -16,12 +17,14 @@ Router.route('/').post(
 // Danh sách Màu sắc sản phẩm
 Router.route('/').get(
   authMiddleware.isAuthorized,
+  rbacMiddleware.isValidPermission(['inventoryLog:use']),
   inventoryLogsController.getInventoryLogList
 )
 
 // Lấy thông tin một Màu sắc sản phẩm.
 Router.route('/:inventoryLogId').get(
   authMiddleware.isAuthorized,
+  rbacMiddleware.isValidPermission(['inventoryLog:read']),
   inventoryLogsValidation.verifyId,
   inventoryLogsController.getInventoryLog
 )

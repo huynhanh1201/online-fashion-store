@@ -11,7 +11,7 @@ const Router = express.Router()
 // Tạo Danh mục sản phẩm mới
 Router.route('/').post(
   authMiddleware.isAuthorized,
-  // rbacMiddleware.isValidPermission(['category:create']),
+  rbacMiddleware.isValidPermission(['category:create']),
   categoriesValidation.category,
   categoriesController.createCategory
 )
@@ -39,6 +39,7 @@ Router.route('/:categoryId').get(
 // Cập nhật thông tin Danh mục sản phẩm
 Router.route('/:categoryId').patch(
   authMiddleware.isAuthorized,
+  rbacMiddleware.isValidPermission(['category:update']),
   categoriesValidation.verifyId,
   categoriesValidation.categoryUpdate,
   categoriesController.updateCategory
@@ -47,6 +48,7 @@ Router.route('/:categoryId').patch(
 // Xoá Danh mục sản phẩm (Xóa mềm)
 Router.route('/:categoryId').delete(
   authMiddleware.isAuthorized,
+  rbacMiddleware.isValidPermission(['category:delete']),
   categoriesValidation.verifyId,
   categoriesController.deleteCategory
 )
@@ -54,6 +56,7 @@ Router.route('/:categoryId').delete(
 // Khôi phục đã xóa
 Router.route('/restore/:categoryId').patch(
   authMiddleware.isAuthorized,
+  rbacMiddleware.isValidPermission(['category:update']),
   categoriesController.restoreCategory
 )
 

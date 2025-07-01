@@ -4,12 +4,14 @@ import { colorsValidation } from '~/validations/colorsValidation'
 import { colorsController } from '~/controllers/colorsController'
 import { authMiddleware } from '~/middlewares/authMiddleware'
 import { usersController } from '~/controllers/usersController'
+import { rbacMiddleware } from '~/middlewares/rbacMiddleware'
 
 const Router = express.Router()
 
 // Tạo Màu sắc sản phẩm mới
 Router.route('/').post(
   authMiddleware.isAuthorized,
+  rbacMiddleware.isValidPermission(['color:create']),
   colorsValidation.color,
   colorsController.createColor
 )
@@ -17,12 +19,14 @@ Router.route('/').post(
 // Danh sách Màu sắc sản phẩm
 Router.route('/').get(
   authMiddleware.isAuthorized,
+  rbacMiddleware.isValidPermission(['color:use']),
   colorsController.getColorList
 )
 
 // Lấy thông tin một Màu sắc sản phẩm.
 Router.route('/:colorId').get(
   authMiddleware.isAuthorized,
+  rbacMiddleware.isValidPermission(['color:read']),
   colorsValidation.verifyId,
   colorsController.getColor
 )
@@ -30,6 +34,7 @@ Router.route('/:colorId').get(
 // Cập nhật thông tin Màu sắc sản phẩm
 Router.route('/:colorId').patch(
   authMiddleware.isAuthorized,
+  rbacMiddleware.isValidPermission(['color:update']),
   colorsValidation.verifyId,
   colorsValidation.color,
   colorsController.updateColor
@@ -38,6 +43,7 @@ Router.route('/:colorId').patch(
 // Xoá Màu sắc sản phẩm (Xóa mềm)
 Router.route('/:colorId').delete(
   authMiddleware.isAuthorized,
+  rbacMiddleware.isValidPermission(['color:delete']),
   colorsValidation.verifyId,
   colorsController.deleteColor
 )
@@ -45,6 +51,7 @@ Router.route('/:colorId').delete(
 // Khôi phục đã xóa
 Router.route('/restore/:colorId').patch(
   authMiddleware.isAuthorized,
+  rbacMiddleware.isValidPermission(['color:update']),
   colorsController.restoreColor
 )
 
