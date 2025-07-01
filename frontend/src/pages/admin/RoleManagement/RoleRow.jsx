@@ -35,7 +35,8 @@ const styles = {
     whiteSpace: 'nowrap',
     overflow: 'hidden',
     textOverflow: 'ellipsis',
-    verticalAlign: 'middle'
+    verticalAlign: 'middle',
+    background: '#fff'
   }
 }
 
@@ -118,14 +119,16 @@ export default function RoleRow({
                   </Tooltip>
                 )}
                 {filters.destroy === 'true' ? (
-                  <Tooltip title='Khôi phục'>
-                    <IconButton
-                      onClick={() => handleOpenModal('restore', role)}
-                      size='small'
-                    >
-                      <RestartAltIcon color='success' />
-                    </IconButton>
-                  </Tooltip>
+                  hasPermission('role:restore') && (
+                    <Tooltip title='Khôi phục'>
+                      <IconButton
+                        onClick={() => handleOpenModal('restore', role)}
+                        size='small'
+                      >
+                        <RestartAltIcon color='success' />
+                      </IconButton>
+                    </Tooltip>
+                  )
                 ) : (
                   <>
                     {hasPermission('role:update') && (

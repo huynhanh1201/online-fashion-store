@@ -44,11 +44,10 @@ const ViewBlogModal = ({ open, onClose, blog, isMobile }) => {
       maxWidth='xxl'
       fullScreen={isMobile}
       sx={{
-        mt: '64px',
         '& .MuiDialog-container': { alignItems: 'end' },
         '& .MuiDialog-paper': {
-          maxHeight: '96%',
-          height: '96%',
+          maxHeight: '95%',
+          height: '95%',
           mt: 0,
           mb: 2.4
         }
@@ -237,7 +236,7 @@ const ViewBlogModal = ({ open, onClose, blog, isMobile }) => {
             Nội dung bài viết
           </Typography>
           <Box
-            className="content-selectable"
+            className='content-selectable'
             sx={{
               '& img': { maxWidth: '100%', height: 'auto' },
               '& p': { marginBottom: 1 }

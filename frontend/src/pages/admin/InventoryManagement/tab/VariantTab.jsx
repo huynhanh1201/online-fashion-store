@@ -21,6 +21,7 @@ import AddVariantModal from '../modal/Variant/AddVariantModal.jsx'
 import ViewVariantModal from '../modal/Variant/ViewVariantModal.jsx' // Thêm Chart mới
 import EditVariantModal from '../modal/Variant/EditVariantModal.jsx' // Thêm Chart mới
 import DeleteVariantModal from '../modal/Variant/DeleteVariantModal.jsx'
+import RestoreVariantModal from '../modal/Variant/RestoreVariantModal.jsx' // Thêm Chart mới
 import AddIcon from '@mui/icons-material/Add'
 import FilterVariant from '~/components/FilterAdmin/FilterVariant.jsx'
 import useVariants from '~/hooks/admin/Inventory/useVariants.js'
@@ -35,6 +36,7 @@ import Tooltip from '@mui/material/Tooltip'
 import usePermissions from '~/hooks/usePermissions'
 import { PermissionWrapper, RouteGuard } from '~/components/PermissionGuard'
 import { useLocation } from 'react-router-dom'
+import RestartAltIcon from '@mui/icons-material/RestartAlt'
 const VariantsTab = () => {
   const { hasPermission } = usePermissions()
   const {
@@ -47,7 +49,8 @@ const VariantsTab = () => {
     totalVariant,
     Save,
     ROWS_PER_PAGE,
-    setROWS_PER_PAGE
+    setROWS_PER_PAGE,
+    restore
   } = useVariants()
   const { products, fetchProducts } = useProducts()
   const { colors, fetchColors } = useColors()
@@ -67,6 +70,7 @@ const VariantsTab = () => {
   const [openViewModal, setOpenViewModal] = useState(false)
   const [openEditModal, setOpenEditModal] = useState(false)
   const [openDeleteModal, setOpenDeleteModal] = useState(false)
+  const [openRestoreModal, setOpenRestoreModal] = useState(false)
   const [selectedVariant, setSelectedVariant] = useState(null)
   const [page, setPage] = useState(1)
   const location = useLocation()
@@ -111,6 +115,13 @@ const VariantsTab = () => {
     }
   }
 
+  const handleRestoreVariant = (variant) => {
+    if (hasPermission('variant:restore')) {
+      setSelectedVariant(variant)
+      setOpenRestoreModal(true)
+    }
+  }
+
   const handleEditVariant = (variant) => {
     if (hasPermission('variant:update')) {
       setSelectedVariant(variant)
@@ -141,6 +152,11 @@ const VariantsTab = () => {
     setSelectedVariant(null)
     // fetchVariants(page, rowsPerPage, filter)
   }
+  const handleCloseRestoreModal = () => {
+    setOpenRestoreModal(false)
+    setSelectedVariant(null)
+    // fetchVariants(page, rowsPerPage, filter)
+  }
 
   const handleSave = async (variant, type, variantId) => {
     if (type === 'add') {
@@ -149,6 +165,8 @@ const VariantsTab = () => {
       await updateVariantById(variantId, variant)
     } else if (type === 'delete') {
       await deleteVariantById(variant)
+    } else if (type === 'restore') {
+      await restore(variant)
     }
   }
 
@@ -268,7 +286,7 @@ const VariantsTab = () => {
                             width: 100,
                             display: 'flex',
                             alignItems: 'center',
-                            backgroundColor: '#001f5d',
+                            backgroundColor: 'var(--primary-color)',
                             color: '#fff'
                           }}
                         >
@@ -399,25 +417,40 @@ const VariantsTab = () => {
                                 </IconButton>
                               </Tooltip>
                             )}
-                            {hasPermission('variant:update') && (
-                              <Tooltip title='Sửa'>
-                                <IconButton
-                                  onClick={() => handleEditVariant(row)}
-                                  size='small'
-                                >
-                                  <BorderColorIcon color='warning' />
-                                </IconButton>
-                              </Tooltip>
-                            )}
-                            {hasPermission('variant:delete') && (
-                              <Tooltip title='Xoá'>
-                                <IconButton
-                                  onClick={() => handleDeleteVariant(row)}
-                                  size='small'
-                                >
-                                  <DeleteForeverIcon color='error' />
-                                </IconButton>
-                              </Tooltip>
+                            {String(filter.destroy) === 'true' ? (
+                              hasPermission('variant:restore') && (
+                                <Tooltip title='Khôi phục'>
+                                  <IconButton
+                                    onClick={() => handleRestoreVariant(row)}
+                                    size='small'
+                                  >
+                                    <RestartAltIcon color='success' />
+                                  </IconButton>
+                                </Tooltip>
+                              )
+                            ) : (
+                              <>
+                                {hasPermission('variant:update') && (
+                                  <Tooltip title='Sửa'>
+                                    <IconButton
+                                      onClick={() => handleEditVariant(row)}
+                                      size='small'
+                                    >
+                                      <BorderColorIcon color='warning' />
+                                    </IconButton>
+                                  </Tooltip>
+                                )}
+                                {hasPermission('variant:delete') && (
+                                  <Tooltip title='Xoá'>
+                                    <IconButton
+                                      onClick={() => handleDeleteVariant(row)}
+                                      size='small'
+                                    >
+                                      <DeleteForeverIcon color='error' />
+                                    </IconButton>
+                                  </Tooltip>
+                                )}
+                              </>
                             )}
                           </Stack>
                         )
@@ -440,6 +473,7 @@ const VariantsTab = () => {
                             overflow: 'hidden',
                             textOverflow: 'ellipsis',
                             verticalAlign: 'middle',
+                            background: '#fff',
                             ...(id === 'sku' || id === 'name'
                               ? { maxWidth: 150 } // Ẩn tràn nếu mã hoặc tên dài
                               : {}),
@@ -457,6 +491,7 @@ const VariantsTab = () => {
           </Table>
         </TableContainer>
         <TablePagination
+          sx={{ background: '#fff' }}
           rowsPerPageOptions={[10, 25, 100]}
           component='div'
           count={totalVariant || 0}
@@ -519,6 +554,15 @@ const VariantsTab = () => {
             onClose={handleCloseDeleteModal}
             variant={selectedVariant}
             deleteVariant={handleSave}
+          />
+        </PermissionWrapper>
+
+        <PermissionWrapper requiredPermissions={['variant:restore']}>
+          <RestoreVariantModal
+            open={openRestoreModal}
+            onClose={handleCloseRestoreModal}
+            variant={selectedVariant}
+            restoreVariant={handleSave}
           />
         </PermissionWrapper>
       </Paper>

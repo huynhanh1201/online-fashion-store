@@ -23,6 +23,7 @@ import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css'
 import ProductImages from '../component/ProductImageUploader.jsx'
 import DescriptionEditor from '~/components/EditContent/DescriptionEditor.jsx'
 import { CloudinaryColor, CloudinaryProduct, URI } from '~/utils/constants'
+import { toast } from 'react-toastify'
 const uploadToCloudinary = async (file, folder = CloudinaryColor) => {
   const formData = new FormData()
   formData.append('file', file)
@@ -70,9 +71,20 @@ const EditProductModal = ({ open, onClose, onSave, product }) => {
     product.imageUrls || []
   )
   const { categories, fetchCategories, loading, update } = useCategories()
-  const topLevelCategories = categories.filter(
-    (category) => category.parent !== null
-  )
+  function getSelectableCategories(categories) {
+    // const parentIds = categories
+    //   .filter((cat) => cat.parent && typeof cat.parent === 'object')
+    //   .map((cat) => cat.parent._id)
+
+    return categories.filter((cat) => {
+      const isChild = !!cat.parent
+      const isNotParent = !categories.some(
+        (other) => other.parent && other.parent._id === cat._id
+      )
+      return isChild || isNotParent
+    })
+  }
+  const selectableCategories = getSelectableCategories(categories)
   // Hàm định dạng số và bỏ định dạng
   const formatNumber = (value) => {
     const number = value?.toString().replace(/\D/g, '') || ''
@@ -129,7 +141,7 @@ const EditProductModal = ({ open, onClose, onSave, product }) => {
   const onSubmit = async (data) => {
     try {
       if (productImages.length === 0) {
-        alert('Vui lòng thêm ít nhất một ảnh sản phẩm')
+        toast.error('Vui lòng tải lên ít nhất một ảnh sản phẩm')
         return
       }
 
@@ -165,14 +177,14 @@ const EditProductModal = ({ open, onClose, onSave, product }) => {
     <Dialog
       open={open}
       onClose={onClose}
-      maxWidth='xl'
+      maxWidth='xxl'
       fullWidth
       PaperProps={{
         sx: {
           display: 'flex',
           flexDirection: 'column',
           marginTop: '50px',
-          maxHeight: '85vh' // đảm bảo không vượt quá
+          maxHeight: '95vh' // đảm bảo không vượt quá
         }
       }}
     >
@@ -218,10 +230,22 @@ const EditProductModal = ({ open, onClose, onSave, product }) => {
             <Controller
               name='name'
               control={control}
-              rules={{ required: 'Tên sản phẩm không được bỏ trống' }}
+              rules={{
+                required: 'Tên sản phẩm không được bỏ trống',
+                minLength: { value: 1, message: 'Tên quá ngắn' },
+                maxLength: { value: 100, message: 'Tên không quá 100 ký tự' },
+                validate: (value) =>
+                  value.trim() === value ||
+                  'Tên không được có khoảng trắng đầu/cuối'
+              }}
               render={({ field }) => (
                 <TextField
-                  label='Tên sản phẩm'
+                  label={
+                    <>
+                      Tên sản phẩm <span style={{ color: 'red' }}>*</span> (bắt
+                      buộc)
+                    </>
+                  }
                   fullWidth
                   error={!!errors?.name}
                   helperText={'Không thể sửa tên vì sản phẩm đã có liên kết'}
@@ -244,7 +268,9 @@ const EditProductModal = ({ open, onClose, onSave, product }) => {
           {/*Danh mục*/}
           <Grid item size={6}>
             <FormControl fullWidth margin='normal' error={!!errors.categoryId}>
-              <InputLabel>Danh mục</InputLabel>
+              <InputLabel>
+                Danh mục <span style={{ color: 'red' }}>*</span> (bắt buộc)
+              </InputLabel>
               <Controller
                 name='categoryId'
                 control={control}
@@ -259,7 +285,7 @@ const EditProductModal = ({ open, onClose, onSave, product }) => {
                       PaperProps: { sx: StyleAdmin.FormSelect.SelectMenu }
                     }}
                   >
-                    {topLevelCategories
+                    {selectableCategories
                       ?.filter((c) => !c.destroy)
                       .map((cat) => (
                         <MenuItem key={cat._id} value={cat._id}>
@@ -282,6 +308,10 @@ const EditProductModal = ({ open, onClose, onSave, product }) => {
             <Controller
               name='importPrice'
               control={control}
+              rules={{
+                required: 'Giá nhập là bắt buộc',
+                min: { value: 0, message: 'Giá nhập không được âm' }
+              }}
               render={({ field }) => (
                 <TextField
                   label='Giá nhập (đ)'
@@ -292,6 +322,8 @@ const EditProductModal = ({ open, onClose, onSave, product }) => {
                     const rawValue = parseNumber(e.target.value)
                     field.onChange(rawValue)
                   }}
+                  error={!!errors.price}
+                  helperText={errors.price?.message}
                 />
               )}
             />
@@ -301,7 +333,10 @@ const EditProductModal = ({ open, onClose, onSave, product }) => {
             <Controller
               name='price'
               control={control}
-              rules={{ required: 'Giá bán không được bỏ trống' }}
+              rules={{
+                required: 'Giá bán là bắt buộc',
+                min: { value: 0, message: 'Giá bán không được âm' }
+              }}
               render={({ field }) => (
                 <TextField
                   label='Giá bán (đ)'
@@ -319,68 +354,99 @@ const EditProductModal = ({ open, onClose, onSave, product }) => {
             />
           </Grid>
           {/* Kích thước gói hàng */}
+          <Typography variant='h6'>Kích thước đóng gói</Typography>
           <Grid item size={12}>
-            <Typography variant='h6'>Kích thước đóng gói</Typography>
             <Grid container spacing={2} sx={{ mt: 1 }}>
               {/* Chiều dài */}
               <Grid item size={3} xs={6} sm={3}>
                 <Controller
                   name='packageSize.length'
                   control={control}
+                  rules={{
+                    required: 'Chiều dài là bắt buộc',
+                    min: { value: 0.01, message: 'Chiều dài phải lớn hơn 0' },
+                    setValueAs: (v) => parseFloat(v) || 0
+                  }}
                   render={({ field }) => (
                     <TextField
                       label='Chiều dài gói hàng (cm)'
                       type='number'
                       fullWidth
-                      inputProps={{ min: 0 }}
+                      inputProps={{ min: 0, step: '0.01' }}
+                      error={!!errors?.packageSize?.length}
+                      helperText={errors?.packageSize?.length?.message}
                       {...field}
                     />
                   )}
                 />
               </Grid>
+
               {/* Chiều rộng */}
               <Grid item size={3} xs={6} sm={3}>
                 <Controller
                   name='packageSize.width'
                   control={control}
+                  rules={{
+                    required: 'Chiều rộng là bắt buộc',
+                    min: { value: 0.01, message: 'Chiều rộng phải lớn hơn 0' },
+                    setValueAs: (v) => parseFloat(v) || 0
+                  }}
                   render={({ field }) => (
                     <TextField
                       label='Chiều rộng gói hàng (cm)'
                       type='number'
                       fullWidth
-                      inputProps={{ min: 0 }}
+                      inputProps={{ min: 0, step: '0.01' }}
+                      error={!!errors?.packageSize?.width}
+                      helperText={errors?.packageSize?.width?.message}
                       {...field}
                     />
                   )}
                 />
               </Grid>
+
               {/* Chiều cao */}
               <Grid item size={3} xs={6} sm={3}>
                 <Controller
                   name='packageSize.height'
                   control={control}
+                  rules={{
+                    required: 'Chiều cao là bắt buộc',
+                    min: { value: 0.01, message: 'Chiều cao phải lớn hơn 0' },
+                    setValueAs: (v) => parseFloat(v) || 0
+                  }}
                   render={({ field }) => (
                     <TextField
                       label='Chiều cao gói hàng (cm)'
                       type='number'
                       fullWidth
-                      inputProps={{ min: 0 }}
+                      inputProps={{ min: 0, step: '0.01' }}
+                      error={!!errors?.packageSize?.height}
+                      helperText={errors?.packageSize?.height?.message}
                       {...field}
                     />
                   )}
                 />
               </Grid>
-              {/* Khối lượng */}
+
+              {/* Trọng lượng */}
               <Grid item size={3} xs={6} sm={3}>
                 <Controller
                   name='packageSize.weight'
                   control={control}
+                  rules={{
+                    required: 'Trọng lượng là bắt buộc',
+                    min: { value: 0.01, message: 'Trọng lượng phải lớn hơn 0' },
+                    setValueAs: (v) => parseFloat(v) || 0
+                  }}
                   render={({ field }) => (
                     <TextField
                       label='Trọng lượng gói hàng (gram)'
                       type='number'
                       fullWidth
                       inputProps={{ min: 0, step: '0.01' }}
+                      error={!!errors?.packageSize?.weight}
+                      helperText={errors?.packageSize?.weight?.message}
                       {...field}
                     />
                   )}

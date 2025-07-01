@@ -1,4 +1,3 @@
-// Chart/Variant/DeleteVariantModal.jsx
 import React from 'react'
 import {
   Dialog,
@@ -12,16 +11,15 @@ import {
 import { toast } from 'react-toastify'
 import StyleAdmin from '~/assets/StyleAdmin.jsx'
 
-const DeleteVariantModal = ({ open, onClose, variant, deleteVariant }) => {
-  const handleDelete = async () => {
+const RestoreVariantModal = ({ open, onClose, variant, restoreVariant }) => {
+  const handleRestore = async () => {
     try {
-      await deleteVariant(variant._id, 'delete')
+      await restoreVariant(variant._id, 'restore')
       onClose()
-      toast.success('Xóa biến thể thành công')
-      onClose()
+      toast.success('Khôi phục biến thể thành công')
     } catch (error) {
       toast.error(
-        `Xóa biến thể thất bại: ${error?.message || 'Đã xảy ra lỗi không xác định'}`
+        `Khôi phục biến thể thất bại: ${error?.message || 'Đã xảy ra lỗi không xác định'}`
       )
     }
   }
@@ -30,18 +28,16 @@ const DeleteVariantModal = ({ open, onClose, variant, deleteVariant }) => {
     <Dialog
       open={open}
       onClose={onClose}
-      maxWidth='md'
-      fullWidth
       sx={{ padding: '16px 24px' }}
       BackdropProps={{
         sx: StyleAdmin.OverlayModal
       }}
     >
-      <DialogTitle>Xóa biến thể</DialogTitle>
+      <DialogTitle>Khôi phục biến thể</DialogTitle>
       <Divider />
       <DialogContent>
         <Typography>
-          Bạn có chắc muốn xóa biến thể
+          Bạn có chắc muốn khôi phục biến thể
           <strong> {variant?.name || 'N/A'}</strong> không?
         </Typography>
       </DialogContent>
@@ -55,16 +51,16 @@ const DeleteVariantModal = ({ open, onClose, variant, deleteVariant }) => {
           Hủy
         </Button>
         <Button
-          onClick={handleDelete}
-          color='error'
+          onClick={handleRestore}
+          color='primary'
           variant='contained'
           sx={{ textTransform: 'none' }}
         >
-          Xóa
+          Khôi phục
         </Button>
       </DialogActions>
     </Dialog>
   )
 }
 
-export default DeleteVariantModal
+export default RestoreVariantModal

@@ -2,7 +2,8 @@ import React from 'react'
 import {
   updateReview,
   deleteReview,
-  getReviews
+  getReviews,
+  restoreReview
 } from '~/services/admin/ReviewService.js'
 
 const useReviews = () => {
@@ -61,8 +62,23 @@ const useReviews = () => {
         throw new Error('Failed to delete review')
       }
       setReviews((prev) => prev.filter((review) => review._id !== id))
+      setTotalPages((prev) => prev - 1)
     } catch (error) {
       console.error('Error deleting review:', error)
+      throw error
+    }
+  }
+
+  const restore = async (id) => {
+    try {
+      const restoredReview = await restoreReview(id)
+      if (!restoredReview) {
+        throw new Error('Failed to restore review')
+      }
+      setReviews((prev) => prev.filter((review) => review._id !== id))
+      setTotalPages((prev) => prev - 1)
+    } catch (error) {
+      console.error('Error restoring review:', error)
       throw error
     }
   }
@@ -73,7 +89,8 @@ const useReviews = () => {
     fetchReview,
     update,
     remove,
-    loading
+    loading,
+    restore
   }
 }
 

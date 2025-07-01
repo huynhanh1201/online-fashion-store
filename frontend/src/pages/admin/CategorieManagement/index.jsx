@@ -115,7 +115,8 @@ const CategoryManagement = () => {
           canCreate: hasPermission('category:create'),
           canEdit: hasPermission('category:update'),
           canDelete: hasPermission('category:delete'),
-          canView: hasPermission('category:read')
+          canView: hasPermission('category:read'),
+          canRestore: hasPermission('category:restore')
         }}
         initialSearch={searchFromUrl}
         filters={filters}
@@ -158,21 +159,17 @@ const CategoryManagement = () => {
             />
           )}
         </PermissionWrapper>
-        {modalType === 'restore' && selectedCategory && (
-          <RestoreCategoryModal
-            open
-            onClose={handleCloseModal}
-            category={selectedCategory}
-            onRestore={handleSave}
-          />
-        )}
+        <PermissionWrapper requiredPermissions={['category:restore']}>
+          {modalType === 'restore' && selectedCategory && (
+            <RestoreCategoryModal
+              open
+              onClose={handleCloseModal}
+              category={selectedCategory}
+              onRestore={handleSave}
+            />
+          )}
+        </PermissionWrapper>
       </React.Suspense>
-
-      {/*<CategoryPagination*/}
-      {/*  page={page}*/}
-      {/*  totalPages={totalPages}*/}
-      {/*  onPageChange={handleChangePage}*/}
-      {/*/>*/}
     </RouteGuard>
   )
 }

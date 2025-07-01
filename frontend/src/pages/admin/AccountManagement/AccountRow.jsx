@@ -42,7 +42,8 @@ const styles = {
     whiteSpace: 'nowrap',
     overflow: 'hidden',
     textOverflow: 'ellipsis',
-    verticalAlign: 'middle'
+    verticalAlign: 'middle',
+    background: '#fff'
   }
 }
 
@@ -139,7 +140,7 @@ export default function AccountRow({
                 sx={{
                   maxWidth: 300,
                   fontWeight: 800,
-                  backgroundColor: '#001f5d',
+                  backgroundColor: 'var(--primary-color)',
                   color: '#fff'
                 }}
               />
@@ -166,14 +167,16 @@ export default function AccountRow({
                   </Tooltip>
                 )}
                 {filters.destroy === 'true' ? (
-                  <Tooltip title='Khôi phục'>
-                    <IconButton
-                      onClick={() => handleOpenModal('restore', user)}
-                      size='small'
-                    >
-                      <RestartAltIcon color='success' />
-                    </IconButton>
-                  </Tooltip>
+                  hasPermission('account:restore') && (
+                    <Tooltip title='Khôi phục'>
+                      <IconButton
+                        onClick={() => handleOpenModal('restore', user)}
+                        size='small'
+                      >
+                        <RestartAltIcon color='success' />
+                      </IconButton>
+                    </Tooltip>
+                  )
                 ) : (
                   <>
                     {hasPermission('account:update') && (

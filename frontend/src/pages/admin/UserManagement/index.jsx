@@ -99,7 +99,8 @@ const UserManagement = () => {
         permissions={{
           canEdit: hasPermission('user:update'),
           canDelete: hasPermission('user:delete'),
-          canView: hasPermission('user:read')
+          canView: hasPermission('user:read'),
+          canRestore: hasPermission('user:restore')
         }}
         roles={roles}
         filters={filters}
@@ -132,14 +133,16 @@ const UserManagement = () => {
             />
           )}
         </PermissionWrapper>
-        {modalType === 'restore' && selectedUser && (
-          <RestoreUserModal
-            open
-            onClose={handleCloseModal}
-            user={selectedUser}
-            onRestore={handleSave}
-          />
-        )}
+        <PermissionWrapper requiredPermissions={['user:restore']}>
+          {modalType === 'restore' && selectedUser && (
+            <RestoreUserModal
+              open
+              onClose={handleCloseModal}
+              user={selectedUser}
+              onRestore={handleSave}
+            />
+          )}
+        </PermissionWrapper>
       </React.Suspense>
     </RouteGuard>
   )

@@ -15,32 +15,6 @@ import WarningIcon from '@mui/icons-material/Warning'
 const DeleteBlogModal = ({ open, onClose, onConfirm, blog }) => {
   if (!blog) return null
 
-  const getStatusColor = (status) => {
-    switch (status) {
-      case 'published':
-        return 'success'
-      case 'draft':
-        return 'warning'
-      case 'archived':
-        return 'default'
-      default:
-        return 'default'
-    }
-  }
-
-  const getStatusLabel = (status) => {
-    switch (status) {
-      case 'published':
-        return 'Đã xuất bản'
-      case 'draft':
-        return 'Bản nháp'
-      case 'archived':
-        return 'Lưu trữ'
-      default:
-        return status
-    }
-  }
-
   return (
     <Dialog open={open} onClose={onClose} maxWidth='sm' fullWidth>
       <DialogTitle sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>

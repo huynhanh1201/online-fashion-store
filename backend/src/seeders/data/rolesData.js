@@ -151,7 +151,6 @@ export const roles = [
       'banner:update',
       'banner:delete',
 
-
       // Flash Sale
       'flashSale:use',
       'flashSale:create',
@@ -208,7 +207,7 @@ export const roles = [
       'cart:create',
       'cart:read',
       'cart:update',
-      'cart:delete',
+      'cart:delete'
     ]
   },
   {
@@ -416,7 +415,6 @@ export const roles = [
 
       // Banner - xem quảng cáo
       'banner:read',
-
 
       // Flash Sale - xem chương trình khuyến mãi
       'flashSale:read',

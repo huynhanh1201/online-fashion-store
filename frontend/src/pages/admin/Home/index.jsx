@@ -41,12 +41,6 @@ const AdminHome = () => {
         orderStatistics={orderStatistics}
         financeStatistics={financeStatistics}
       />
-
-      <ProfitChartByMonth
-        year={year}
-        setYear={setYear}
-        chartData={financeStatistics?.revenueChart}
-      />
     </>
   )
 }

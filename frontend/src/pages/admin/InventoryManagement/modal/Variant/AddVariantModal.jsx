@@ -262,6 +262,10 @@ const AddVariantModal = ({
           weight: Number(packageSize.weight) || 0
         }
       : productPackageSize
+    if (!data.colorImage) {
+      toast.error('Vui lòng thêm ảnh cho biến thể')
+      return
+    }
 
     try {
       await addColorPalette(productId, { name: color, image: colorImage })
@@ -347,7 +351,6 @@ const AddVariantModal = ({
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              cursor: 'pointer',
               overflow: 'hidden'
             }}
             onClick={() => !colorImage && fileInputRef.current?.click()}
@@ -383,7 +386,7 @@ const AddVariantModal = ({
                       top: 4,
                       right: 40,
                       backgroundColor: 'rgba(255,255,255,0.8)',
-                      borderRadius: 1
+                      borderRadius: '50%'
                     }}
                   >
                     <Tooltip title='Sửa'>
@@ -404,7 +407,7 @@ const AddVariantModal = ({
                       top: 4,
                       right: 4,
                       backgroundColor: 'rgba(255,255,255,0.8)',
-                      borderRadius: 1
+                      borderRadius: '50%'
                     }}
                   >
                     <Tooltip title='Xoá'>
@@ -437,7 +440,12 @@ const AddVariantModal = ({
               <Controller
                 name='productId'
                 control={control}
-                rules={{ required: 'Vui lòng chọn sản phẩm' }}
+                rules={{
+                  required: 'Vui lòng chọn sản phẩm',
+                  validate: (value) =>
+                    /^[0-9a-fA-F]{24}$/.test(value) ||
+                    'ID sản phẩm không hợp lệ'
+                }}
                 render={({ field }) => (
                   <Select
                     {...field}

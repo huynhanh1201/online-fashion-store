@@ -63,3 +63,15 @@ export const deletePartner = async (id) => {
     return null
   }
 }
+
+export const restorePartner = async (id) => {
+  try {
+    const response = await AuthorizedAxiosInstance.patch(
+      `${API_ROOT}/v1/partners/restore/${id}`
+    )
+    return response.data
+  } catch (error) {
+    console.error('Error reactivating partner:', error)
+    return null
+  }
+}

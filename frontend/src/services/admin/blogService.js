@@ -100,3 +100,15 @@ export const uploadBlogImage = async (imageFile) => {
     throw error
   }
 }
+
+export const RestoreBlog = async (blogId) => {
+  try {
+    const response = await AuthorizedAxiosInstance.patch(
+      `${API_ROOT}/v1/blogs/restore/${blogId}`
+    )
+    return response.data
+  } catch (error) {
+    console.error('Lỗi khi khôi phục blog:', error)
+    throw error
+  }
+}

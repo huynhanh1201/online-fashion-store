@@ -59,7 +59,7 @@ const ViewCategoryModal = ({ open, onClose, category }) => {
                 sx={{
                   backgroundColor: '#fafafa',
                   width: 350,
-                  height: 345
+                  height: 331
                 }}
               >
                 {category.image ? (
@@ -98,7 +98,7 @@ const ViewCategoryModal = ({ open, onClose, category }) => {
                 sx={{
                   backgroundColor: '#fafafa',
                   width: 350,
-                  height: 345
+                  height: 331
                 }}
               >
                 {category.banner ? (
@@ -124,7 +124,7 @@ const ViewCategoryModal = ({ open, onClose, category }) => {
             </Box>
 
             {/* Thông tin bên phải */}
-            <Box flex={1}>
+            <Box flex={1} mt={1}>
               <Box mb={2}>
                 <Typography variant='subtitle2' fontWeight='bold'>
                   Tên danh mục

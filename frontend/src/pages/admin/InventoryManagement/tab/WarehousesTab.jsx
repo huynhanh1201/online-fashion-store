@@ -151,11 +151,14 @@ const WarehousesTab = () => {
       <Paper
         sx={{ border: '1px solid #ccc', width: '100%', overflow: 'hidden' }}
       >
-        <TableContainer>
+        <TableContainer sx={{ backgroundColor: '#fff' }}>
           <Table stickyHeader aria-label='warehouses table'>
             <TableHead>
               <TableRow>
-                <TableCell colSpan={warehouseColumns.length}>
+                <TableCell
+                  colSpan={warehouseColumns.length}
+                  sx={{ backgroundColor: '#fff' }}
+                >
                   <Box
                     sx={{
                       display: 'flex',
@@ -237,7 +240,7 @@ const WarehousesTab = () => {
                 />
               ) : (
                 warehouses.map((row, index) => (
-                  <TableRow hover key={index}>
+                  <TableRow hover key={index} sx={{ backgroundColor: '#fff' }}>
                     {warehouseColumns.map((col) => {
                       const rawValue = row[col.id]
                       let content = rawValue ?? '—'
@@ -325,6 +328,7 @@ const WarehousesTab = () => {
                             whiteSpace: 'nowrap',
                             overflow: 'hidden',
                             textOverflow: 'ellipsis',
+                            backgroundColor: '#fff',
                             ...(col.maxWidth && { maxWidth: col.maxWidth })
                           }}
                           title={
@@ -343,6 +347,7 @@ const WarehousesTab = () => {
         </TableContainer>
 
         <TablePagination
+          sx={{ background: '#fff' }}
           rowsPerPageOptions={[10, 25, 100]}
           component='div'
           count={totalWarehouse || 0}
@@ -557,6 +562,7 @@ const WarehousesTab = () => {
                           whiteSpace: 'nowrap',
                           overflow: 'hidden',
                           textOverflow: 'ellipsis',
+                          backgroundColor: '#fff',
                           ...(col.maxWidth && { maxWidth: col.maxWidth })
                         }}
                         title={
@@ -575,6 +581,7 @@ const WarehousesTab = () => {
       </TableContainer>
 
       <TablePagination
+        sx={{ background: '#fff' }}
         rowsPerPageOptions={[10, 25, 100]}
         component='div'
         count={totalWarehouse || 0}

@@ -165,7 +165,7 @@ const EditCategoryModal = ({ open, onClose, category, onSave }) => {
                   backgroundColor: '#fafafa',
                   cursor: 'pointer',
                   width: 350,
-                  height: 355
+                  height: 331
                 }}
                 onClick={() => !previewUrl && fileInputRef.current.click()}
               >
@@ -231,7 +231,7 @@ const EditCategoryModal = ({ open, onClose, category, onSave }) => {
             </Box>
             <Box sx={{ display: 'flex', flexDirection: 'column' }}>
               <Typography variant='subtitle2' fontWeight='bold' mb={1}>
-                Ảnh quan quảng cáo
+                Ảnh quảng cáo
               </Typography>
               {/* Ảnh banner */}
               <Box
@@ -246,7 +246,7 @@ const EditCategoryModal = ({ open, onClose, category, onSave }) => {
                   backgroundColor: '#fafafa',
                   cursor: 'pointer',
                   width: 350,
-                  height: 355
+                  height: 331
                 }}
                 onClick={() => !bannerPreview && bannerInputRef.current.click()}
               >
@@ -320,11 +320,30 @@ const EditCategoryModal = ({ open, onClose, category, onSave }) => {
             {/* Thông tin bên phải */}
             <Box flex={1} mt={1.6}>
               <TextField
-                label='Tên danh mục'
+                label={
+                  <>
+                    Tên danh mục <span style={{ color: 'red' }}>*</span> (bắt
+                    buộc)
+                  </>
+                }
                 fullWidth
                 margin='normal'
-                {...register('name', { required: 'Tên danh mục là bắt buộc' })}
+                {...register('name', {
+                  required: 'Tên danh mục là bắt buộc',
+                  minLength: {
+                    value: 1,
+                    message: 'Tên danh mục không được để trống'
+                  },
+                  maxLength: {
+                    value: 50,
+                    message: 'Tên danh mục không vượt quá 50 ký tự'
+                  },
+                  validate: (value) =>
+                    value.trim() === value ||
+                    'Tên danh mục không được có khoảng trắng đầu/cuối'
+                })}
                 error={!!errors.name}
+                helperText={errors.name?.message}
               />
               <Autocomplete
                 options={filteredCategories.filter(
@@ -355,7 +374,16 @@ const EditCategoryModal = ({ open, onClose, category, onSave }) => {
                 margin='normal'
                 multiline
                 rows={6}
-                {...register('description')}
+                {...register('description', {
+                  maxLength: {
+                    value: 500,
+                    message: 'Mô tả không vượt quá 500 ký tự'
+                  },
+                  validate: (value) =>
+                    !value ||
+                    value.trim() === value ||
+                    'Mô tả không được có khoảng trắng đầu/cuối'
+                })}
               />
             </Box>
           </Box>

@@ -44,10 +44,26 @@ export const permissions = [
     label: 'Sử dụng trang tài khoản khách hàng',
     group: 'Tài khoản khách hàng'
   },
-  { key: 'user:read', label: 'Xem tài khoản khách hàng', group: 'Tài khoản khách hàng' },
-  { key: 'user:create', label: 'Tạo tài khoản khách hàng', group: 'Tài khoản khách hàng' },
-  { key: 'user:delete', label: 'Xóa tài khoản khách hàng', group: 'Tài khoản khách hàng' },
-  { key: 'user:restore', label: 'Khôi phục tài khoản khách hàng', group: 'Tài khoản khách hàng' },
+  {
+    key: 'user:read',
+    label: 'Xem tài khoản khách hàng',
+    group: 'Tài khoản khách hàng'
+  },
+  {
+    key: 'user:create',
+    label: 'Tạo tài khoản khách hàng',
+    group: 'Tài khoản khách hàng'
+  },
+  {
+    key: 'user:delete',
+    label: 'Xóa tài khoản khách hàng',
+    group: 'Tài khoản khách hàng'
+  },
+  {
+    key: 'user:restore',
+    label: 'Khôi phục tài khoản khách hàng',
+    group: 'Tài khoản khách hàng'
+  },
 
   // Account (Chưa xử lý)
   {
@@ -238,7 +254,11 @@ export const permissions = [
   { key: 'category:create', label: 'Tạo danh mục sản phẩm', group: 'Danh mục' },
   { key: 'category:update', label: 'Sửa danh mục sản phẩm', group: 'Danh mục' },
   { key: 'category:delete', label: 'Xóa danh mục sản phẩm', group: 'Danh mục' },
-  { key: 'category:restore', label: 'Khôi phục danh mục sản phẩm', group: 'Danh mục' },
+  {
+    key: 'category:restore',
+    label: 'Khôi phục danh mục sản phẩm',
+    group: 'Danh mục'
+  },
 
   // Product
   { key: 'product:use', label: 'Sử dụng trang sản phẩm', group: 'Sản phẩm' },
@@ -258,7 +278,11 @@ export const permissions = [
   { key: 'variant:create', label: 'Tạo biến thể', group: 'Biến thể sản phẩm' },
   { key: 'variant:update', label: 'Sửa biến thể', group: 'Biến thể sản phẩm' },
   { key: 'variant:delete', label: 'Xóa biến thể', group: 'Biến thể sản phẩm' },
-  { key: 'variant:restore', label: 'Khôi phục biến thể', group: 'Biến thể sản phẩm' },
+  {
+    key: 'variant:restore',
+    label: 'Khôi phục biến thể',
+    group: 'Biến thể sản phẩm'
+  },
 
   // Color
   {
@@ -345,7 +369,6 @@ export const permissions = [
   // Bổ sung thêm:
   { key: 'order:create', label: 'Tạo đơn hàng', group: 'Đơn hàng' },
 
-
   // Review
   { key: 'review:use', label: 'Sử dụng trang đánh giá', group: 'Đánh giá' },
   { key: 'review:create', label: 'Tạo đánh giá', group: 'Đánh giá' },
@@ -382,8 +405,11 @@ export const permissions = [
   { key: 'coupon:create', label: 'Tạo mã giảm giá', group: 'Mã giảm giá' },
   { key: 'coupon:update', label: 'Sửa mã giảm giá', group: 'Mã giảm giá' },
   { key: 'coupon:delete', label: 'Xóa mã giảm giá', group: 'Mã giảm giá' },
-  { key: 'coupon:restore', label: 'Khôi phục mã giảm giá', group: 'Mã giảm giá' },
-
+  {
+    key: 'coupon:restore',
+    label: 'Khôi phục mã giảm giá',
+    group: 'Mã giảm giá'
+  },
 
   // Inventory
   { key: 'inventory:use', label: 'Sử dụng trang tồn kho', group: 'Kho hàng' },
@@ -449,12 +475,9 @@ export const permissions = [
     group: 'Địa chỉ giao hàng'
   },
 
-
   // Cart
   { key: 'cart:create', label: 'Tạo giỏ hàng', group: 'Giỏ hàng' },
   { key: 'cart:read', label: 'Xem giỏ hàng', group: 'Giỏ hàng' },
   { key: 'cart:update', label: 'Cập nhật giỏ hàng', group: 'Giỏ hàng' },
-  { key: 'cart:delete', label: 'Xóa giỏ hàng', group: 'Giỏ hàng' },
-
-
+  { key: 'cart:delete', label: 'Xóa giỏ hàng', group: 'Giỏ hàng' }
 ]

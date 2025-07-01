@@ -63,28 +63,48 @@ const usePermissions = () => {
   }, [currentUser?.role, getUserPermissions])
 
   // Sync functions để sử dụng trong render
-  const hasPermission = useCallback((permission) => {
-    return permissions.includes(permission)
-  }, [permissions])
+  const hasPermission = useCallback(
+    (permission) => {
+      return permissions.includes(permission)
+    },
+    [permissions]
+  )
 
-  const hasAnyPermission = useCallback((permissionsToCheck) => {
-    return permissionsToCheck.some(p => permissions.includes(p))
-  }, [permissions])
+  const hasAnyPermission = useCallback(
+    (permissionsToCheck) => {
+      return permissionsToCheck.some((p) => permissions.includes(p))
+    },
+    [permissions]
+  )
 
-  const hasAllPermissions = useCallback((permissionsToCheck) => {
-    return permissionsToCheck.every(p => permissions.includes(p))
-  }, [permissions])
+  const hasAllPermissions = useCallback(
+    (permissionsToCheck) => {
+      return permissionsToCheck.every((p) => permissions.includes(p))
+    },
+    [permissions]
+  )
 
   const canAccessAdmin = useCallback(() => {
-    // Fallback: nếu không có quyền admin:access, kiểm tra role
+    // Kiểm tra quyền admin:access từ API trước
     const hasAdminPermission = hasPermission('admin:access')
+
+    // Fallback: nếu không có quyền admin:access từ API, kiểm tra role
+    if (!hasAdminPermission) {
+      const isAdminRole = ['owner', 'technical_admin', 'staff'].includes(
+        currentUser?.role
+      )
+      return isAdminRole
+    }
 
     return hasAdminPermission
   }, [hasPermission, currentUser?.role])
 
-  const isRole = useCallback((role) => {
-    return currentUser?.role === role
-  }, [currentUser?.role])
+  const isRole = useCallback(
+    (role) => {
+      return currentUser?.role === role
+    },
+    [currentUser?.role]
+  )
 
   // Async versions (giữ lại để backward compatibility)
   const hasPermissionAsync = async (permission) => {
@@ -94,12 +114,12 @@ const usePermissions = () => {
 
   const hasAnyPermissionAsync = async (permissionsToCheck) => {
     const userPermissions = await getUserPermissions()
-    return permissionsToCheck.some(p => userPermissions.includes(p))
+    return permissionsToCheck.some((p) => userPermissions.includes(p))
   }
 
   const hasAllPermissionsAsync = async (permissionsToCheck) => {
     const userPermissions = await getUserPermissions()
-    return permissionsToCheck.every(p => userPermissions.includes(p))
+    return permissionsToCheck.every((p) => userPermissions.includes(p))
   }
 
   const canAccessAdminAsync = async () => hasPermissionAsync('admin:access')

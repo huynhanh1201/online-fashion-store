@@ -27,7 +27,7 @@ import ProductImages from '../component/ProductImageUploader'
 import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css'
 import 'draft-js/dist/Draft.css'
 import { CloudinaryColor, CloudinaryProduct, URI } from '~/utils/constants'
-import ProductDescriptionEditor from '../component/ProductDescriptionEditor.jsx'
+import { toast } from 'react-toastify'
 import DescriptionEditor from '~/components/EditContent/DescriptionEditor.jsx'
 const uploadToCloudinary = async (file, folder = CloudinaryColor) => {
   const formData = new FormData()
@@ -101,10 +101,20 @@ const AddProductModal = ({ open, onClose, onSuccess }) => {
 
     setCategoryOpen(false) // Đóng Chart
   }
-  const topLevelCategories = categories.filter(
-    (category) => category.parent !== null
-  )
+  function getSelectableCategories(categories) {
+    // const parentIds = categories
+    //   .filter((cat) => cat.parent && typeof cat.parent === 'object')
+    //   .map((cat) => cat.parent._id)
 
+    return categories.filter((cat) => {
+      const isChild = !!cat.parent
+      const isNotParent = !categories.some(
+        (other) => other.parent && other.parent._id === cat._id
+      )
+      return isChild || isNotParent
+    })
+  }
+  const selectableCategories = getSelectableCategories(categories)
   const handleImageInsertFromEditor = (url) => {
     // Chỉ thêm nếu ảnh chưa có trong imageUrls
     setProductImagePreview((prev) => {
@@ -117,7 +127,7 @@ const AddProductModal = ({ open, onClose, onSuccess }) => {
   const onSubmit = async (data) => {
     try {
       if (productImages.length === 0) {
-        console.log('Vui lòng thêm ít nhất một ảnh sản phẩm')
+        toast.error('Vui lòng tải lên ít nhất một ảnh sản phẩm')
         return
       }
 
@@ -136,8 +146,6 @@ const AddProductModal = ({ open, onClose, onSuccess }) => {
         },
         status: data.status || 'draft'
       }
-
-      console.log('finalProduct:', finalProduct)
 
       await onSuccess(finalProduct, 'add')
 
@@ -162,14 +170,14 @@ const AddProductModal = ({ open, onClose, onSuccess }) => {
     <Dialog
       open={open}
       onClose={onClose}
-      maxWidth='xl'
+      maxWidth='xxl'
       fullWidth
       PaperProps={{
         sx: {
           display: 'flex',
           flexDirection: 'column',
           marginTop: '50px',
-          maxHeight: '85vh' // đảm bảo không vượt quá
+          maxHeight: '95vh' // đảm bảo không vượt quá
         }
       }}
     >
@@ -221,10 +229,22 @@ const AddProductModal = ({ open, onClose, onSuccess }) => {
             <Controller
               name='name'
               control={control}
-              rules={{ required: 'Tên sản phẩm không được bỏ trống' }}
+              rules={{
+                required: 'Tên sản phẩm không được bỏ trống',
+                minLength: { value: 1, message: 'Tên quá ngắn' },
+                maxLength: { value: 100, message: 'Tên không quá 100 ký tự' },
+                validate: (value) =>
+                  value.trim() === value ||
+                  'Tên không được có khoảng trắng đầu/cuối'
+              }}
               render={({ field }) => (
                 <TextField
-                  label='Tên sản phẩm'
+                  label={
+                    <>
+                      Tên sản phẩm <span style={{ color: 'red' }}>*</span> (bắt
+                      buộc)
+                    </>
+                  }
                   fullWidth
                   error={!!errors.name}
                   helperText={errors.name?.message}
@@ -246,7 +266,9 @@ const AddProductModal = ({ open, onClose, onSuccess }) => {
           {/*Danh mục*/}
           <Grid item size={6}>
             <FormControl fullWidth margin='normal' error={!!errors.categoryId}>
-              <InputLabel>Danh mục</InputLabel>
+              <InputLabel>
+                Danh mục <span style={{ color: 'red' }}>*</span> (bắt buộc)
+              </InputLabel>
               <Controller
                 name='categoryId'
                 control={control}
@@ -270,16 +292,17 @@ const AddProductModal = ({ open, onClose, onSuccess }) => {
                     renderValue={(selected) => selected?.name || ''}
                     disabled={loading}
                   >
-                    {topLevelCategories
-                      ?.filter((c) => !c.destroy)
-                      .map((cat) => {
-                        const option = { id: cat._id, name: cat.name }
-                        return (
-                          <MenuItem key={cat._id} value={option}>
-                            {cat.name}
-                          </MenuItem>
-                        )
-                      })}
+                    {selectableCategories
+                      .filter((c) => !c.destroy)
+                      .map((cat) => (
+                        <MenuItem
+                          key={cat._id}
+                          value={{ id: cat._id, name: cat.name }}
+                        >
+                          {cat.name}
+                        </MenuItem>
+                      ))}
+
                     <MenuItem onClick={() => setCategoryOpen(true)}>
                       Thêm danh mục mới
                     </MenuItem>
@@ -295,10 +318,19 @@ const AddProductModal = ({ open, onClose, onSuccess }) => {
           <Grid item size={3} style={{ marginTop: '16px' }}>
             <Controller
               name='importPrice'
+              rules={{
+                required: 'Giá nhập là bắt buộc',
+                min: { value: 0, message: 'Giá nhập không được âm' }
+              }}
               control={control}
               render={({ field }) => (
                 <TextField
-                  label='Giá nhập (đ)'
+                  label={
+                    <>
+                      Giá nhập (đ) <span style={{ color: 'red' }}>*</span> (bắt
+                      buộc)
+                    </>
+                  }
                   fullWidth
                   type='text'
                   value={formatNumber(field.value || '')}
@@ -306,6 +338,8 @@ const AddProductModal = ({ open, onClose, onSuccess }) => {
                     const rawValue = parseNumber(e.target.value)
                     field.onChange(rawValue)
                   }}
+                  error={!!errors.price}
+                  helperText={errors.price?.message}
                 />
               )}
             />
@@ -315,10 +349,18 @@ const AddProductModal = ({ open, onClose, onSuccess }) => {
             <Controller
               name='price'
               control={control}
-              rules={{ required: 'Giá bán không được bỏ trống' }}
+              rules={{
+                required: 'Giá bán là bắt buộc',
+                min: { value: 0, message: 'Giá bán không được âm' }
+              }}
               render={({ field }) => (
                 <TextField
-                  label='Giá bán (đ)'
+                  label={
+                    <>
+                      Giá bán (đ) <span style={{ color: 'red' }}>*</span> (bắt
+                      buộc)
+                    </>
+                  }
                   fullWidth
                   type='text'
                   value={formatNumber(field.value || '')}
@@ -341,60 +383,111 @@ const AddProductModal = ({ open, onClose, onSuccess }) => {
                 <Controller
                   name='packageSize.length'
                   control={control}
+                  rules={{
+                    required: 'Chiều dài là bắt buộc',
+                    min: { value: 0.01, message: 'Chiều dài phải lớn hơn 0' },
+                    setValueAs: (v) => parseFloat(v) || 0
+                  }}
                   render={({ field }) => (
                     <TextField
-                      label='Chiều dài gói hàng (cm)'
+                      label={
+                        <>
+                          Chiều dài gói hàng (cm){' '}
+                          <span style={{ color: 'red' }}>*</span> (bắt buộc)
+                        </>
+                      }
                       type='number'
                       fullWidth
-                      inputProps={{ min: 0 }}
+                      inputProps={{ min: 0, step: '0.01' }}
+                      error={!!errors?.packageSize?.length}
+                      helperText={errors?.packageSize?.length?.message}
                       {...field}
                     />
                   )}
                 />
               </Grid>
+
               {/* Chiều rộng */}
               <Grid item size={3} xs={6} sm={3}>
                 <Controller
                   name='packageSize.width'
                   control={control}
+                  rules={{
+                    required: 'Chiều rộng là bắt buộc',
+                    min: { value: 0.01, message: 'Chiều rộng phải lớn hơn 0' },
+                    setValueAs: (v) => parseFloat(v) || 0
+                  }}
                   render={({ field }) => (
                     <TextField
-                      label='Chiều rộng gói hàng (cm)'
+                      label={
+                        <>
+                          Chiều rộng gói hàng (cm){' '}
+                          <span style={{ color: 'red' }}>*</span> (bắt buộc)
+                        </>
+                      }
                       type='number'
                       fullWidth
-                      inputProps={{ min: 0 }}
+                      inputProps={{ min: 0, step: '0.01' }}
+                      error={!!errors?.packageSize?.width}
+                      helperText={errors?.packageSize?.width?.message}
                       {...field}
                     />
                   )}
                 />
               </Grid>
+
               {/* Chiều cao */}
               <Grid item size={3} xs={6} sm={3}>
                 <Controller
                   name='packageSize.height'
                   control={control}
+                  rules={{
+                    required: 'Chiều cao là bắt buộc',
+                    min: { value: 0.01, message: 'Chiều cao phải lớn hơn 0' },
+                    setValueAs: (v) => parseFloat(v) || 0
+                  }}
                   render={({ field }) => (
                     <TextField
-                      label='Chiều cao gói hàng (cm)'
+                      label={
+                        <>
+                          Chiều cao gói hàng (cm){' '}
+                          <span style={{ color: 'red' }}>*</span> (bắt buộc)
+                        </>
+                      }
                       type='number'
                       fullWidth
-                      inputProps={{ min: 0 }}
+                      inputProps={{ min: 0, step: '0.01' }}
+                      error={!!errors?.packageSize?.height}
+                      helperText={errors?.packageSize?.height?.message}
                       {...field}
                     />
                   )}
                 />
               </Grid>
-              {/* Khối lượng */}
+
+              {/* Trọng lượng */}
               <Grid item size={3} xs={6} sm={3}>
                 <Controller
                   name='packageSize.weight'
                   control={control}
+                  rules={{
+                    required: 'Trọng lượng là bắt buộc',
+                    min: { value: 0.01, message: 'Trọng lượng phải lớn hơn 0' },
+                    setValueAs: (v) => parseFloat(v) || 0
+                  }}
                   render={({ field }) => (
                     <TextField
-                      label='Trọng lượng gói hàng (gram)'
+                      label={
+                        <>
+                          Trọng lượng gói hàng (cm){' '}
+                          <span style={{ color: 'red' }}>*</span> (bắt buộc)
+                        </>
+                      }
                       type='number'
                       fullWidth
                       inputProps={{ min: 0, step: '0.01' }}
+                      error={!!errors?.packageSize?.weight}
+                      helperText={errors?.packageSize?.weight?.message}
                       {...field}
                     />
                   )}
@@ -402,6 +495,7 @@ const AddProductModal = ({ open, onClose, onSuccess }) => {
               </Grid>
             </Grid>
           </Grid>
+
           {/*Mô tả*/}
           <Grid item size={12}>
             <DescriptionEditor
@@ -410,6 +504,12 @@ const AddProductModal = ({ open, onClose, onSuccess }) => {
               setValue={setValue}
               initialHtml={''}
               onImageInsert={handleImageInsertFromEditor}
+              rules={{
+                validate: (value) =>
+                  !value ||
+                  value.trim() === value ||
+                  'Mô tả không được có khoảng trắng đầu/cuối'
+              }}
             />
           </Grid>
           {/*Trạng thái sản phẩm*/}

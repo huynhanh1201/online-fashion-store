@@ -13,7 +13,7 @@ import {
 import { useForm } from 'react-hook-form'
 import ClearIcon from '@mui/icons-material/Clear'
 import axios from 'axios'
-
+import { toast } from 'react-toastify'
 import { GHN_TOKEN_API } from '~/utils/constants'
 
 const AddWarehouseModal = ({ open, onClose, onSave, Add }) => {
@@ -99,7 +99,17 @@ const AddWarehouseModal = ({ open, onClose, onSave, Add }) => {
   const onSubmit = async (data) => {
     try {
       if (!selectedProvince || !selectedDistrict || !selectedWard) {
-        alert('Vui lòng chọn đầy đủ Tỉnh/TP, Quận/Huyện, Phường/Xã')
+        toast.error('Vui lòng chọn đầy đủ thông tin địa chỉ.')
+        return
+      }
+
+      // Kiểm tra ID có hợp lệ
+      if (
+        !selectedProvince.ProvinceID ||
+        !selectedDistrict.DistrictID ||
+        !selectedWard.WardCode
+      ) {
+        toast.error('Mã địa chỉ không hợp lệ. Vui lòng chọn lại.')
         return
       }
       const payload = {

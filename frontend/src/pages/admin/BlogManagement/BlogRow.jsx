@@ -13,8 +13,7 @@ import BorderColorIcon from '@mui/icons-material/BorderColor'
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever'
 import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye'
 import usePermissions from '~/hooks/usePermissions'
-
-
+import RestartAltIcon from '@mui/icons-material/RestartAlt'
 const styles = {
   groupIcon: {
     display: 'flex',
@@ -33,11 +32,20 @@ const styles = {
     whiteSpace: 'nowrap',
     overflow: 'hidden',
     textOverflow: 'ellipsis',
-    verticalAlign: 'middle'
+    verticalAlign: 'middle',
+    background: '#fff !important'
   }
 }
 
-const BlogRow = ({ blog, onEdit, onDelete, onView, index }) => {
+const BlogRow = ({
+  blog,
+  onEdit,
+  onDelete,
+  onView,
+  onRestore,
+  filters,
+  index
+}) => {
   const formatDate = (dateStr) =>
     new Date(dateStr).toLocaleDateString('vi-VN', {
       day: '2-digit',
@@ -110,19 +118,31 @@ const BlogRow = ({ blog, onEdit, onDelete, onView, index }) => {
               </IconButton>
             </Tooltip>
           )}
-          {hasPermission('blog:update') && (
-            <Tooltip title='Sửa'>
-              <IconButton size='small' onClick={() => onEdit(blog)}>
-                <BorderColorIcon color='warning' />
-              </IconButton>
-            </Tooltip>
-          )}
-          {hasPermission('blog:delete') && (
-            <Tooltip title='Xoá'>
-              <IconButton size='small' onClick={() => onDelete(blog)}>
-                <DeleteForeverIcon color='error' />
-              </IconButton>
-            </Tooltip>
+          {filters.destroy === 'true' ? (
+            hasPermission('blog:restore') && (
+              <Tooltip title='Khôi phục'>
+                <IconButton size='small' onClick={() => onRestore(blog)}>
+                  <RestartAltIcon color='success' />
+                </IconButton>
+              </Tooltip>
+            )
+          ) : (
+            <>
+              {hasPermission('blog:update') && (
+                <Tooltip title='Sửa'>
+                  <IconButton size='small' onClick={() => onEdit(blog)}>
+                    <BorderColorIcon color='warning' />
+                  </IconButton>
+                </Tooltip>
+              )}
+              {hasPermission('blog:delete') && (
+                <Tooltip title='Xoá'>
+                  <IconButton size='small' onClick={() => onDelete(blog)}>
+                    <DeleteForeverIcon color='error' />
+                  </IconButton>
+                </Tooltip>
+              )}
+            </>
           )}
         </Stack>
       </TableCell>
