@@ -380,7 +380,7 @@ const Menu = ({ headerRef }) => {
                   ) : (
                     <StyledButton
                       href={item.url}
-                      active={item.hasMegaMenu && (productMenuOpen || isDrawerHovered)}
+                      active={item.hasMegaMenu && (productMenuOpen || isDrawerHovered) ? true : undefined}
                       ref={item.hasMegaMenu ? productButtonRef : null}
                       onMouseEnter={item.hasMegaMenu ? handleProductEnter : undefined}
                       onMouseLeave={item.hasMegaMenu ? handleProductLeave : undefined}
@@ -465,6 +465,7 @@ const Menu = ({ headerRef }) => {
                             ))
                           ) : (
                             <Typography
+                              component="div"
                               sx={{
                                 color: 'text.secondary',
                                 fontSize: '0.95rem',
@@ -589,6 +590,7 @@ const Menu = ({ headerRef }) => {
                     }}
                   >
                     <Typography
+                      component="div"
                       sx={{
                         fontWeight: 'bold',
                         mb: 1.2,
@@ -644,6 +646,7 @@ const Menu = ({ headerRef }) => {
                         ))
                     ) : (
                       <Typography
+                        component="div"
                         sx={{
                           color: 'text.secondary',
                           fontSize: '0.95rem',
@@ -678,6 +681,7 @@ const Menu = ({ headerRef }) => {
                   }}
                 >
                   <Typography
+                    component="div"
                     sx={{
                       fontWeight: 'bold',
                       mb: 1.2,
