@@ -145,7 +145,7 @@ const Content = () => {
       discount: '50%',
       gradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
       imageUrl:
-        '//file.hstatic.net/1000360022/file/tuj_b955c48e5d86485da0b3f956170a82e5_grande.jpg',
+        'https://www.rcuw.org/wp-content/themes/champion/images/SM-placeholder.png',
       link: '/categories/ao-so-mi'
     },
     {
@@ -153,7 +153,7 @@ const Content = () => {
       discount: '30%',
       gradient: 'linear-gradient(135deg, #5f72bd 0%, #9b23ea 100%)',
       imageUrl:
-        '//file.hstatic.net/1000360022/file/denim_4d32d2b2d0a246778670c27e4f1a0043_grande.jpg',
+        'https://www.rcuw.org/wp-content/themes/champion/images/SM-placeholder.png',
       link: '/categories/ao-so-mi'
     },
     {
@@ -161,7 +161,7 @@ const Content = () => {
       discount: '40%',
       gradient: 'linear-gradient(135deg, #2196F3 0%, #21CBF3 100%)',
       imageUrl:
-        '//file.hstatic.net/1000360022/file/hang_ngay_15b34a1891bb486c856e1562740c9ddd_grande.jpg',
+        'https://www.rcuw.org/wp-content/themes/champion/images/SM-placeholder.png',
       link: '/categories/ao-so-mi'
     },
     {
@@ -169,7 +169,7 @@ const Content = () => {
       discount: '25%',
       gradient: 'linear-gradient(135deg, #64b5f6 0%, #1976d2 100%)',
       imageUrl:
-        '//file.hstatic.net/1000360022/file/di_lam_7d49a1d48da348599c3047dd2cb92754_grande.jpg',
+        'https://www.rcuw.org/wp-content/themes/champion/images/SM-placeholder.png',
       link: '/categories/ao-so-mi'
     }
   ]

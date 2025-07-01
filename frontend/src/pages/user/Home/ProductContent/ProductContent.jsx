@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import HeaderCategories from './HeaderCategories'
 import ProductSection from './ProductSection'
-import CollectionBanner from './CollectionBanner'
-import ComboSection from './ComboSection'
 import { getCategories, getChildCategories } from '~/services/categoryService'
 import { getProductsByCategory } from '~/services/productService'
 import { useNavigate } from 'react-router-dom'
@@ -224,8 +222,6 @@ const ProductContent = () => {
           </div>
         )
       })}
-      <CollectionBanner />
-      <ComboSection />
     </div>
   )
 }

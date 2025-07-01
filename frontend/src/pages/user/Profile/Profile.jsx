@@ -45,6 +45,17 @@ const uploadToCloudinary = async (file) => {
   return data.secure_url
 }
 
+function validatePassword(pw) {
+  return (
+    pw.length >= 8 &&
+    pw.length <= 128 &&
+    /[a-z]/.test(pw) &&
+    /[A-Z]/.test(pw) &&
+    /[0-9]/.test(pw) &&
+    /[^A-Za-z0-9]/.test(pw)
+  );
+}
+
 const Profile = () => {
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('md'))
@@ -113,14 +124,6 @@ const Profile = () => {
     return nameChanged || avatarChanged
   }
 
-  const validatePassword = (password) => {
-    return (
-      password.length >= 6 &&
-      /[A-Z]/.test(password) &&
-      /[^a-zA-Z0-9]/.test(password)
-    )
-  }
-
   const handleUpdate = async () => {
     const trimmedName = name.trim()
     if (!trimmedName || trimmedName.length < 3) {
@@ -176,16 +179,13 @@ const Profile = () => {
       return
     }
 
-    if (newPassword !== confirmNewPassword) {
-      showSnackbar('Mật khẩu xác nhận không khớp', 'error')
+    if (!validatePassword(newPassword)) {
+      showSnackbar('Mật khẩu mới phải có tối thiểu 8 ký tự, gồm chữ thường, chữ hoa, số và ký tự đặc biệt.', 'error')
       return
     }
 
-    if (!validatePassword(newPassword)) {
-      showSnackbar(
-        'Mật khẩu mới phải ≥ 6 ký tự, có 1 chữ in hoa, 1 ký tự đặc biệt',
-        'error'
-      )
+    if (newPassword !== confirmNewPassword) {
+      showSnackbar('Xác nhận mật khẩu không khớp.', 'error')
       return
     }
 
@@ -418,7 +418,7 @@ const Profile = () => {
               }}
               helperText={
                 field === 'new'
-                  ? '≥6 ký tự, 1 chữ in hoa, 1 ký tự đặc biệt'
+                  ? '≥8 ký tự, 1 chữ thường, 1 chữ in hoa, 1 số, 1 ký tự đặc biệt'
                   : ''
               }
             />
