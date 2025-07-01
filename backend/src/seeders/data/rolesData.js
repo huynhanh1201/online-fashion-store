@@ -353,72 +353,72 @@ export const roles = [
     label: 'Khách hàng',
     permissions: [
       // User - xem và cập nhật tài khoản của chính họ
-      // 'user:read',
-      // 'user:update',
+      'user:read',
+      'user:update',
 
-      // // Product  - để duyệt sản phẩm
-      // 'product:read',
+      // Product  - để duyệt sản phẩm
+      'product:read',
 
-      // // Variant - để xem các biến thể của sản phẩm
-      // 'variant:read',
+      // Variant - để xem các biến thể của sản phẩm
+      'variant:read',
 
-      // // Color Palette - để chọn lựa
-      // 'colorPalette:read',
+      // Color Palette - để chọn lựa
+      'colorPalette:read',
 
-      // // Size Palette - để chọn lựa
-      // 'sizePalette:read',
+      // Size Palette - để chọn lựa
+      'sizePalette:read',
 
-      // // Order - tạo đơn và xem đơn hàng cá nhân
-      // 'order:read', // có thể cần filter theo userId ở backend
-      // 'order:create',
+      // Order - tạo đơn và xem đơn hàng cá nhân
+      'order:read', // có thể cần filter theo userId ở backend
+      'order:create',
 
-      // // Payment Transaction - theo dõi trạng thái thanh toán
-      // 'paymentTransaction:read',
+      // Payment Transaction - theo dõi trạng thái thanh toán
+      'paymentTransaction:read',
 
-      // // Coupon - áp dụng mã
-      // 'coupon:read',
+      // Coupon - áp dụng mã
+      'coupon:read',
 
-      // // Inventory - (nếu muốn show "còn hàng / hết hàng")
-      // 'inventory:read',
+      // Inventory - (nếu muốn show "còn hàng / hết hàng")
+      'inventory:read',
 
-      // //Shipping Addresses
-      // 'shippingAddress:read',
-      // 'shippingAddress:create',
-      // 'shippingAddress:update',
-      // 'shippingAddress:delete',
+      //Shipping Addresses
+      'shippingAddress:read',
+      'shippingAddress:create',
+      'shippingAddress:update',
+      'shippingAddress:delete',
 
-      // // Review - khách hàng có thể tạo và quản lý đánh giá của mình
-      // 'review:create',
-      // 'review:read',
-      // 'review:update',
-      // 'review:delete',
+      // Review - khách hàng có thể tạo và quản lý đánh giá của mình
+      'review:create',
+      'review:read',
+      'review:update',
+      'review:delete',
 
-      // // Cart - quản lý giỏ hàng
-      // 'cart:create',
-      // 'cart:read',
-      // 'cart:update',
-      // 'cart:delete',
+      // Cart - quản lý giỏ hàng
+      'cart:create',
+      'cart:read',
+      'cart:update',
+      'cart:delete',
 
-      // // Banner - xem quảng cáo
-      // 'banner:read',
+      // Banner - xem quảng cáo
+      'banner:read',
 
-      // // Content Management - xem nội dung trang web
-      // 'content:read',
+      // Content Management - xem nội dung trang web
+      'content:read',
 
-      // // Flash Sale - xem chương trình khuyến mãi
-      // 'flashSale:read',
+      // Flash Sale - xem chương trình khuyến mãi
+      'flashSale:read',
 
-      // // Header Content - xem nội dung đầu trang
-      // 'headerContent:read',
+      // Header Content - xem nội dung đầu trang
+      'headerContent:read',
 
-      // // Footer Content - xem nội dung cuối trang
-      // 'footerContent:read',
+      // Footer Content - xem nội dung cuối trang
+      'footerContent:read',
 
-      // // Featured Category - xem danh mục nổi bật
-      // 'featuredCategory:read',
+      // Featured Category - xem danh mục nổi bật
+      'featuredCategory:read',
 
-      // // Service - xem dịch vụ nổi bật
-      // 'service:read'
+      // Service - xem dịch vụ nổi bật
+      'service:read'
     ]
   }
 ]

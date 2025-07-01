@@ -115,16 +115,17 @@ const ReviewButtonComponent = ({
 
   return (
     <Button
-      variant={isReviewed ? "outlined" : "contained"}
+      variant={isReviewed ? 'outlined' : 'contained'}
       size="medium"
       disabled={checking || isReviewed === null}
       sx={isReviewed ? {
         borderRadius: 2,
         textTransform: 'none',
         fontWeight: 600,
-        color: 'var(--accent-color)',
+        color: 'var(--primary-color)',
         borderColor: 'success.main',
         '&:hover': {
+          color: '#fff',
           backgroundColor: 'var(--accent-color)',
           borderColor: 'success.main'
         }
@@ -475,7 +476,7 @@ const OrderDetail = () => {
     }
   }
 
-  // Handle reorder - logic đơn giản: nếu có trong giỏ thì bỏ qua, nếu hết hàng thì gửi quantity = 0
+  // Handle reorder - logic đồng bộ với OrderListPage: nếu có trong giỏ thì bỏ qua, nếu hết hàng thì gửi quantity = 0
   const handleReorder = async () => {
     try {
       setReorderLoading(true)
@@ -492,7 +493,7 @@ const OrderDetail = () => {
 
         try {
           // Kiểm tra số lượng tồn kho của variant trước
-          const variantInfo = await getVariantId(variantId)
+          const variantInfo = await getVariantById(variantId)
 
           if (!variantInfo) {
             console.warn('Variant not found for ID:', variantId)
@@ -896,19 +897,16 @@ const OrderDetail = () => {
                 </Typography>
               </Box>
               <Button
-                variant="contained"
                 startIcon={reorderLoading ? <CircularProgress size={16} /> : <Replay />}
                 disabled={reorderLoading}
                 onClick={handleReorder}
                 sx={{
-                  backgroundColor: 'var(--primary-color)',
+                  color: 'var(--primary-color)',
                   borderRadius: 2,
                   textTransform: 'none',
                   fontWeight: 600,
-                  opacity: reorderLoading ? 0.7 : 1,
-                  '&:hover': {
-                    backgroundColor: 'var(--accent-color)',
-                  }
+                  boxShadow: '0 4px 12px rgba(25, 118, 210, 0.3)',
+                  opacity: reorderLoading ? 0.7 : 1
                 }}
               >
                 {reorderLoading ? 'Đang thêm vào giỏ...' : 'Mua lại'}

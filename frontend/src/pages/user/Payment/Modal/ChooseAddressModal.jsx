@@ -194,7 +194,7 @@ export const ChooseAddressModal = ({
                 onChange={(e) => setSelectedId(e.target.value)}
                 sx={{ gap: 2 }}
               >
-                {addresses.map((addr, index) => (
+                {addresses.map((addr) => (
                   <Card
                     key={addr._id}
                     sx={{
@@ -236,7 +236,7 @@ export const ChooseAddressModal = ({
                             >
                               {addr.fullName}
                             </Typography>
-                            {index === 0 && (
+                            {/* {index === 0 && (
                               <Chip
                                 label='Mặc định'
                                 size='small'
@@ -247,7 +247,7 @@ export const ChooseAddressModal = ({
                                   fontSize: '0.75rem'
                                 }}
                               />
-                            )}
+                            )} */}
                           </Box>
 
                           <Box

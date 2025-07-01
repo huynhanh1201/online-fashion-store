@@ -995,7 +995,7 @@ const Payment = () => {
                           borderRadius: '4px',
                         },
                         '&::-webkit-scrollbar-thumb': {
-                          background: 'var(--primary-color)',
+                          backgroundColor: 'var(--primary-color) !important',
                           borderRadius: '4px',
                           '&:hover': {
                             background: 'var(--accent-color)',
@@ -1290,7 +1290,7 @@ const Payment = () => {
           textAlign: 'center',
           color: 'var(--primary-color)',
           fontWeight: 700,
-          fontSize: '1.3rem'
+          fontSize: '1.3rem',
         }}>
           Xác nhận đặt hàng
         </DialogTitle>
@@ -1306,7 +1306,7 @@ const Payment = () => {
           </Typography>
 
         </DialogContent>
-        <DialogActions sx={{ justifyContent: 'flex-end', gap: 1, pb: 3 }}>
+        <DialogActions sx={{ justifyContent: 'flex-end', pb: 2, px: 3 }}>
           <Button
             onClick={() => setConfirmOpen(false)}
             variant="outlined"
@@ -1328,7 +1328,7 @@ const Payment = () => {
               borderRadius: 2,
               px: 3,
               backgroundColor: 'var(--primary-color)',
-              color: 'white'
+              color: 'white',
             }}
           >
             Xác nhận đặt hàng
