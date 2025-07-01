@@ -14,6 +14,15 @@ const ProductHorizontalScroll = ({ products = [], defaultCardsPerRow = 5, gap = 
     return () => window.removeEventListener('resize', handleResize)
   }, [])
 
+  // Lọc sản phẩm mới trong 7 ngày gần nhất
+  const now = new Date();
+  const sevenDaysAgo = new Date(now);
+  sevenDaysAgo.setDate(now.getDate() - 7);
+  const newProducts = products.filter(product => {
+    const createdAt = new Date(product.createdAt);
+    return createdAt >= sevenDaysAgo && createdAt <= now;
+  });
+
   // Xác định số card trên mỗi hàng dựa vào chiều rộng màn hình
   const getCardsPerRow = () => {
     if (windowWidth > 900) {
@@ -29,14 +38,13 @@ const ProductHorizontalScroll = ({ products = [], defaultCardsPerRow = 5, gap = 
 
   // Xử lý khi resize làm index bị lỗi
   useEffect(() => {
-    if (startIdx + cardsPerRow > products.length) {
-      setStartIdx(Math.max(0, products.length - cardsPerRow))
+    if (startIdx + cardsPerRow > newProducts.length) {
+      setStartIdx(Math.max(0, newProducts.length - cardsPerRow))
     }
-  }, [windowWidth, products.length, cardsPerRow, startIdx])
-
+  }, [windowWidth, newProducts.length, cardsPerRow, startIdx])
 
   const handleNext = () => {
-    if (startIdx + cardsPerRow < products.length) {
+    if (startIdx + cardsPerRow < newProducts.length) {
       setStartIdx(startIdx + 1)
     }
   }
@@ -46,7 +54,7 @@ const ProductHorizontalScroll = ({ products = [], defaultCardsPerRow = 5, gap = 
     }
   }
 
-  const visibleProducts = products.slice(startIdx, startIdx + cardsPerRow)
+  const visibleProducts = newProducts.slice(startIdx, startIdx + cardsPerRow)
 
   return (
     <div className='slide-container'>
