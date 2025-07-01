@@ -189,9 +189,9 @@ function Register() {
                   required: 'Vui lòng nhập mật khẩu.',
                   pattern: {
                     value:
-                      /^(?=.*[A-Z])(?=.*[!@#$%^&*()_+{}\[\]:;<>,.?~\\/-])[A-Za-z\d!@#$%^&*()_+{}\[\]:;<>,.?~\\/-]{6,}$/,
+                      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,128}$/,
                     message:
-                      'Mật khẩu phải có ít nhất 6 ký tự, bao gồm 1 chữ in hoa và 1 ký tự đặc biệt.'
+                      'Mật khẩu phải có 8-128 ký tự, gồm chữ thường, chữ in hoa, số và ký tự đặc biệt.'
                   }
                 })}
                 InputProps={{
@@ -203,6 +203,7 @@ function Register() {
                     </InputAdornment>
                   )
                 }}
+                helperText='≥8 ký tự, 1 chữ thường, 1 chữ in hoa, 1 số, 1 ký tự đặc biệt'
               />
               {errors.password && (
                 <Alert severity='error' sx={{ mt: 1 }}>

@@ -1,10 +1,6 @@
 import React from 'react'
 
 import useDiscounts from '~/hooks/admin/useDiscount'
-import {
-  updateDiscount,
-  deleteDiscount
-} from '~/services/admin/discountService'
 import usePermissions from '~/hooks/usePermissions'
 import { RouteGuard, PermissionWrapper } from '~/components/PermissionGuard'
 
@@ -14,6 +10,9 @@ const ViewDiscountModal = React.lazy(() => import('./modal/ViewDiscountModal'))
 const EditDiscountModal = React.lazy(() => import('./modal/EditDiscountModal'))
 const DeleteDiscountModal = React.lazy(
   () => import('./modal/DeleteDiscountModal')
+)
+const RestoreDiscountModal = React.lazy(
+  () => import('./modal/RestoreDiscountModal')
 )
 
 const DiscountTable = React.lazy(() => import('./DiscountTable'))
@@ -39,7 +38,8 @@ function DiscountManagement() {
     remove,
     update,
     setROWS_PER_PAGE,
-    ROWS_PER_PAGE
+    ROWS_PER_PAGE,
+    restore
   } = useDiscounts()
 
   React.useEffect(() => {
@@ -65,39 +65,6 @@ function DiscountManagement() {
 
   const handleChangePage = (event, value) => setPage(value)
 
-  // const handleSaveDiscount = async (discountId, updatedData) => {
-  //   try {
-  //     const response = await updateDiscount(discountId, updatedData)
-  //     if (response) {
-  //       const updatedDiscount = await fetchDiscountById(discountId)
-  //       if (updatedDiscount) {
-  //         saveDiscount(updatedDiscount)
-  //       }
-  //     } else {
-  //       console.log('Cập nhật không thành công')
-  //     }
-  //   } catch (error) {
-  //     console.error('Lỗi:', error)
-  //   }
-  // }
-  //
-  // const handleDeleteDiscount = async (discountId) => {
-  //   try {
-  //     const response = await deleteDiscount(discountId)
-  //     if (response) {
-  //       fetchDiscounts(page, limit, filters)
-  //       // const deletedDiscount = await fetchDiscountById(discountId)
-  //       // if (deletedDiscount) {
-  //       //   saveDiscount(deletedDiscount)
-  //       // }
-  //     } else {
-  //       console.log('Xóa không thành công')
-  //     }
-  //   } catch (error) {
-  //     console.error('Lỗi:', error)
-  //   }
-  // }
-
   const handleSave = async (data, type, id) => {
     try {
       if (type === 'add') {
@@ -106,27 +73,14 @@ function DiscountManagement() {
         await update(id, data)
       } else if (type === 'delete') {
         await remove(data)
+      } else if (type === 'restore') {
+        await restore(data)
       }
     } catch (error) {
       console.error('Lỗi:', error)
     }
   }
 
-  // const handleDeleteColor = async (colorId) => {
-  //   try {
-  //     const result = await deleteColor(colorId)
-  //     if (result) {
-  //       const deletedColor = await getColorId(colorId)
-  //       if (deletedColor) {
-  //         saveColor(deletedColor)
-  //       }
-  //     } else {
-  //       console.log('Xoá không thành công')
-  //     }
-  //   } catch (error) {
-  //     console.error('Lỗi:', error)
-  //   }
-  // }
   const isEqual = (obj1, obj2) => JSON.stringify(obj1) === JSON.stringify(obj2)
 
   const handleFilter = (newFilters) => {
@@ -161,8 +115,10 @@ function DiscountManagement() {
           canCreate: hasPermission('coupon:create'),
           canEdit: hasPermission('coupon:update'),
           canDelete: hasPermission('coupon:delete'),
-          canView: hasPermission('coupon:read')
+          canView: hasPermission('coupon:read'),
+          canRestore: hasPermission('coupon:restore')
         }}
+        filters={filters}
       />
 
       <PermissionWrapper requiredPermissions={['coupon:create']}>
@@ -207,11 +163,16 @@ function DiscountManagement() {
         )}
       </PermissionWrapper>
 
-      {/*<DiscountPagination*/}
-      {/*  page={page}*/}
-      {/*  totalPages={totalPages}*/}
-      {/*  onPageChange={handleChangePage}*/}
-      {/*/>*/}
+      <PermissionWrapper requiredPermissions={['coupon:restore']}>
+        {modalType === 'restore' && selectedDiscount && (
+          <RestoreDiscountModal
+            open
+            onClose={handleCloseModal}
+            discount={selectedDiscount}
+            onRestore={restore}
+          />
+        )}
+      </PermissionWrapper>
     </RouteGuard>
   )
 }

@@ -67,3 +67,15 @@ export const deleteSize = async (sizeId) => {
     return null
   }
 }
+
+export const restoreSize = async (sizeId) => {
+  try {
+    const response = await AuthorizedAxiosInstance.patch(
+      `${API_ROOT}/v1/colors/restore/${sizeId}`
+    )
+    return response.data
+  } catch (error) {
+    console.error('Lỗi khi khôi phục kích thước:', error)
+    return null
+  }
+}

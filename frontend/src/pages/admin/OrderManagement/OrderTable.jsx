@@ -292,6 +292,7 @@ const OrderTable = ({
         </Table>
       </TableContainer>
       <TablePagination
+        sx={{ background: '#fff' }}
         rowsPerPageOptions={[10, 25, 100]}
         component='div'
         count={total || 0}

@@ -28,12 +28,8 @@ const ViewWarehouseSlipModal = ({ open, onClose, slip }) => {
       maxWidth='md'
       fullWidth
       sx={{
-        mt: '64px',
-        '& .MuiDialog-container': { alignItems: 'end' },
         '& .MuiDialog-paper': {
-          maxHeight: '96%',
-          height: '96%',
-          mt: 0,
+          maxHeight: '95%',
           mb: 2.4
         }
       }}
@@ -65,7 +61,12 @@ const ViewWarehouseSlipModal = ({ open, onClose, slip }) => {
                   label={slip.type}
                   color={slip.type === 'Nhập' ? 'success' : 'error'}
                   size='large'
-                  sx={{ width: '120px', fontWeight: '800' }}
+                  sx={{
+                    width: '120px',
+                    fontWeight: '800',
+                    backgroundColor:
+                      slip.type === 'Nhập' && 'var(--primary-color)'
+                  }}
                 />
               </TableCell>
             </TableRow>

@@ -102,7 +102,7 @@ const BlogModal = ({
     defaultValues: {
       title: '',
       excerpt: '',
-      content: blogData?.content || '',
+      content: '',
       coverImage: '',
       images: [],
       tags: [],
@@ -112,7 +112,8 @@ const BlogModal = ({
       metaTitle: '',
       metaDescription: '',
       metaKeywords: []
-    }
+    },
+    mode: 'onBlur'
   })
 
   const [imageUrls, setImageUrls] = useState([''])
@@ -274,11 +275,10 @@ const BlogModal = ({
       maxWidth={isMobile ? 'sm' : 'xxl'}
       fullScreen={isMobile}
       sx={{
-        mt: '64px',
         '& .MuiDialog-container': { alignItems: 'end' },
         '& .MuiDialog-paper': {
-          maxHeight: '96%',
-          height: '96%',
+          maxHeight: '95%',
+          height: '95%',
           mt: 0,
           mb: 2.4
         }
@@ -385,11 +385,23 @@ const BlogModal = ({
               >
                 <Box sx={{ flex: isMobile ? '1' : '2' }}>
                   <TextField
-                    label='Tiêu đề bài viết *'
+                    label={
+                      <>
+                        Tiêu đề bài viết <span style={{ color: 'red' }}>*</span>{' '}
+                        (bắt buộc)
+                      </>
+                    }
                     fullWidth
                     variant='outlined'
                     {...register('title', {
-                      required: 'Vui lòng nhập tiêu đề'
+                      required: 'Tiêu đề là bắt buộc',
+                      maxLength: {
+                        value: 255,
+                        message: 'Tiêu đề không được vượt quá 255 ký tự'
+                      },
+                      validate: (value) =>
+                        value.trim() === value ||
+                        'Tiêu đề không được có khoảng trắng đầu/cuối'
                     })}
                     error={!!errors.title}
                     helperText={errors.title?.message}
@@ -445,13 +457,19 @@ const BlogModal = ({
 
               {/* Excerpt */}
               <TextField
-                label='Mô tả ngắn (Excerpt)'
+                label='Mô tả ngắn'
                 fullWidth
                 multiline
                 rows={isMobile ? 2 : 3}
                 variant='outlined'
-                {...register('excerpt')}
-                helperText='Đoạn mô tả ngắn hiển thị trong danh sách bài viết'
+                {...register('excerpt', {
+                  validate: (value) =>
+                    value === '' ||
+                    value.trim() === value ||
+                    'Mô tả không được có khoảng trắng đầu/cuối'
+                })}
+                error={!!errors.excerpt}
+                helperText={errors.excerpt?.message}
                 sx={{
                   ...getInputStyles(theme),
                   '& .MuiOutlinedInput-root': {
@@ -578,7 +596,7 @@ const BlogModal = ({
                       }}
                     >
                       <TagIcon sx={{ color: '#0052cc', fontSize: 20 }} />
-                      Tags
+                      Thẻ
                     </Typography>
 
                     <Controller
@@ -621,8 +639,8 @@ const BlogModal = ({
                           renderInput={(params) => (
                             <TextField
                               {...params}
-                              label='Tags'
-                              placeholder='Nhập tag và nhấn Enter'
+                              label='Thẻ'
+                              placeholder='Nhập tên thể và nhấn Enter'
                               helperText='VD: thời trang, xu hướng'
                               variant='outlined'
                               sx={getInputStyles()}
@@ -839,7 +857,8 @@ const BlogModal = ({
                 }}
               >
                 <ArticleIcon sx={{ color: '#0052cc', fontSize: 20 }} />
-                Nội dung bài viết
+                Nội dung bài viết <span style={{ color: 'red' }}>*</span> (bắt
+                buộc)
               </Typography>
 
               <Box
@@ -856,6 +875,7 @@ const BlogModal = ({
                   setValue={setValue}
                   initialHtml={blogData?.content || ''}
                   onImageInsert={handleImageInsertFromEditor}
+                  isEditMode={isEditMode}
                 />
               </Box>
             </Paper>

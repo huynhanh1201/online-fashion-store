@@ -27,7 +27,8 @@ const ReviewTable = ({
   onChangeRowsPerPage,
   onPageChange,
   page,
-  rowsPerPage
+  rowsPerPage,
+  filter
 }) => {
   const columns = [
     { id: 'index', label: 'STT', align: 'center', width: 50 },
@@ -118,6 +119,7 @@ const ReviewTable = ({
                   columns={columns}
                   handleOpenModal={handleOpenModal}
                   permissions={permissions}
+                  filter={filter}
                 />
               ))
             ) : (
@@ -130,6 +132,7 @@ const ReviewTable = ({
         </Table>
       </TableContainer>
       <TablePagination
+        sx={{ background: '#fff' }}
         rowsPerPageOptions={[10, 25, 100]}
         component='div'
         count={total || 0}

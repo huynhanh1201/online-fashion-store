@@ -18,8 +18,6 @@ import AddIcon from '@mui/icons-material/Add'
 import FilterCategory from '~/components/FilterAdmin/FilterCategory.jsx'
 import TablePaginationActions from '~/components/PaginationAdmin/TablePaginationActions.jsx'
 import TableNoneData from '~/components/TableAdmin/NoneData.jsx'
-import DeleteIcon from '@mui/icons-material/Delete'
-import IconButton from '@mui/material/IconButton'
 import Stack from '@mui/material/Stack'
 import usePermissions from '~/hooks/usePermissions'
 
@@ -105,7 +103,7 @@ const CategoryTable = ({
                             width: 100,
                             display: 'flex',
                             alignItems: 'center',
-                            backgroundColor: '#001f5d',
+                            backgroundColor: 'var(--primary-color)',
                             color: '#fff'
                           }}
                         >
@@ -175,6 +173,7 @@ const CategoryTable = ({
         </Table>
       </TableContainer>
       <TablePagination
+        sx={{ background: '#fff' }}
         rowsPerPageOptions={[10, 25, 100]}
         component='div'
         count={total || 0}

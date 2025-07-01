@@ -3,7 +3,8 @@ import {
   getBlogs,
   updateBlog,
   deleteBlog,
-  createBlog
+  createBlog,
+  RestoreBlog
 } from '~/services/admin/blogService.js'
 
 const useBlog = () => {
@@ -29,10 +30,12 @@ const useBlog = () => {
       }
       const query = buildQuery(filters)
       const response = await getBlogs(query)
-      
+
       // Filter out policies (blogs with type='policy')
-      const filteredBlogs = response.blogs.filter(blog => blog.type !== 'policy')
-      
+      const filteredBlogs = response.blogs.filter(
+        (blog) => blog.type !== 'policy'
+      )
+
       setBlogs(filteredBlogs)
       setTotalPages(response.total)
     } catch (error) {
@@ -70,7 +73,7 @@ const useBlog = () => {
 
         setTotalPages((prev) => prev + 1)
       }
-      
+
       return newBlog
     } catch (err) {
       console.error('Lỗi khi thêm blog:', err)
@@ -85,15 +88,17 @@ const useBlog = () => {
         console.error('Cập nhật blog thất bại')
         return null
       }
-      
+
       // Nếu blog được cập nhật thành policy, loại khỏi danh sách
       if (updated.type === 'policy') {
         setBlogs((prev) => prev.filter((b) => b._id !== updated._id))
         setTotalPages((prev) => Math.max(1, prev - 1))
       } else {
-        setBlogs((prev) => prev.map((b) => (b._id === updated._id ? updated : b)))
+        setBlogs((prev) =>
+          prev.map((b) => (b._id === updated._id ? updated : b))
+        )
       }
-      
+
       return updated
     } catch (err) {
       console.error('Lỗi khi cập nhật blog:', err)
@@ -116,6 +121,23 @@ const useBlog = () => {
       return false
     }
   }
+
+  const restore = async (id) => {
+    try {
+      const restored = await RestoreBlog(id)
+      if (!restored) {
+        console.error('Khôi phục blog thất bại')
+        return null
+      }
+      setBlogs((prev) => prev.filter((b) => b._id !== id))
+      setTotalPages((prev) => Math.max(1, prev - 1))
+      return restored
+    } catch (err) {
+      console.error('Lỗi khi khôi phục blog:', err)
+      return null
+    }
+  }
+
   return {
     ROWS_PER_PAGE,
     setROWS_PER_PAGE,
@@ -125,7 +147,8 @@ const useBlog = () => {
     fetchBlogs,
     addBlog,
     removeBlog,
-    updateBlogById
+    updateBlogById,
+    restore
   }
 }
 

@@ -111,13 +111,27 @@ const EditRoleModal = ({ open, onClose, onSubmit, p, defaultValues }) => {
         <Controller
           name='name'
           control={control}
-          rules={{ required: 'Không được bỏ trống tên vai trò' }}
+          rules={{
+            required: 'Không được bỏ trống tên vai trò',
+            pattern: {
+              value: /^[a-zA-Z0-9_]+$/,
+              message: 'Tên chỉ chứa chữ cái, số và dấu gạch dưới'
+            },
+            maxLength: {
+              value: 50,
+              message: 'Tên vai trò không được quá 50 ký tự'
+            }
+          }}
           render={({ field }) => (
             <TextField
               {...field}
               fullWidth
               margin='normal'
-              label='Tên vai trò'
+              label={
+                <>
+                  Tên vai trò <span style={{ color: 'red' }}>*</span> (bắt buộc)
+                </>
+              }
               error={!!errors.name}
               helperText={errors.name?.message}
             />
@@ -126,13 +140,24 @@ const EditRoleModal = ({ open, onClose, onSubmit, p, defaultValues }) => {
         <Controller
           name='label'
           control={control}
-          rules={{ required: 'Không được bỏ trống tên hiển thị' }}
+          rules={{
+            required: 'Không được bỏ trống tên hiển thị',
+            maxLength: {
+              value: 100,
+              message: 'Tên hiển thị không được quá 100 ký tự'
+            }
+          }}
           render={({ field }) => (
             <TextField
               {...field}
               fullWidth
               margin='normal'
-              label='Tên hiển thị'
+              label={
+                <>
+                  Tên hiển thị <span style={{ color: 'red' }}>*</span> (bắt
+                  buộc)
+                </>
+              }
               error={!!errors.label}
               helperText={errors.label?.message}
             />

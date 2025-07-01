@@ -113,11 +113,10 @@ function ViewOrderModal({
       fullWidth
       PaperProps={{
         sx: {
-          height: '88vh',
-          maxHeight: '88vh',
+          height: '95vh',
+          maxHeight: '95vh',
           display: 'flex',
-          flexDirection: 'column',
-          mt: '87px'
+          flexDirection: 'column'
         }
       }}
       BackdropProps={{ sx: styleAdmin.OverlayModal }}
@@ -125,7 +124,7 @@ function ViewOrderModal({
       <Box>
         <DialogTitle sx={{ py: 1, pl: 3 }}>Thông tin đơn hàng</DialogTitle>
 
-        <DialogActions sx={{ p: 0, justifyContent: 'start', pb: 1, pl: 3 }}>
+        <DialogActions sx={{ p: 0, justifyContent: 'start', pb: 2, pl: 3 }}>
           <Button
             variant='outlined'
             color='error'

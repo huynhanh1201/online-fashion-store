@@ -170,12 +170,6 @@ const CategoryManagement = () => {
           )}
         </PermissionWrapper>
       </React.Suspense>
-
-      {/*<CategoryPagination*/}
-      {/*  page={page}*/}
-      {/*  totalPages={totalPages}*/}
-      {/*  onPageChange={handleChangePage}*/}
-      {/*/>*/}
     </RouteGuard>
   )
 }

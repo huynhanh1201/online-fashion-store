@@ -1,8 +1,9 @@
 import { useEditor, EditorContent } from '@tiptap/react'
-import { extensions } from './editorExtensions'
 import { useEffect } from 'react'
-import MenuBar from './MenuBar' // Thanh công cụ bạn tự xây dựng
+import { Controller } from 'react-hook-form'
 import styled from '@emotion/styled'
+import { extensions } from './editorExtensions'
+import MenuBar from './MenuBar'
 
 const StyledEditor = styled.div`
   .ProseMirror {
@@ -24,7 +25,7 @@ const StyledEditor = styled.div`
     display: block;
     margin: 16px 0;
     max-width: 100%;
-    pointer-events: none; /* Disable pointer events */
+    pointer-events: none;
     height: auto;
   }
   .custom-image-wrapper img {
@@ -40,14 +41,14 @@ const StyledContainer = styled.div`
   border: 1px solid #aaa;
   position: relative;
   overflow: auto;
-  max-height: 500px; /* Set a max height for the container */
+  max-height: 500px;
 `
 
 const StyledMenuBar = styled.div`
   position: sticky;
   top: 0;
   z-index: 10;
-  background-color: white; /* Ensure the background is solid */
+  background-color: white;
 `
 
 export default function DescriptionEditor({
@@ -55,14 +56,16 @@ export default function DescriptionEditor({
   name,
   setValue,
   initialHtml,
-  onImageInsert
+  onImageInsert,
+  isEditMode = false,
+  rules = {}
 }) {
   const editor = useEditor({
     extensions,
     content: initialHtml || '',
     onUpdate: ({ editor }) => {
       const html = editor.getHTML()
-      setValue(name, html)
+      setValue(name, html, { shouldValidate: true }) // <- ensure validation re-check
     }
   })
 
@@ -77,8 +80,33 @@ export default function DescriptionEditor({
       <StyledMenuBar>
         <MenuBar editor={editor} onImageInsert={onImageInsert} />
       </StyledMenuBar>
+
       <StyledEditor>
-        <EditorContent editor={editor} />
+        <Controller
+          name={name}
+          control={control}
+          rules={{
+            ...(isEditMode
+              ? {} // chế độ sửa → không cần required
+              : {
+                  required: 'Nội dung không được để trống',
+                  validate: (value) =>
+                    value?.replace(/<[^>]*>?/gm, '').trim() !== '' ||
+                    'Nội dung không được để trống'
+                }),
+            ...rules
+          }}
+          render={({ fieldState }) => (
+            <>
+              <EditorContent editor={editor} />
+              {fieldState.error && (
+                <div style={{ color: 'red', marginTop: 4, fontSize: 13 }}>
+                  {fieldState.error.message}
+                </div>
+              )}
+            </>
+          )}
+        />
       </StyledEditor>
     </StyledContainer>
   )

@@ -31,8 +31,13 @@ const RouteGuard = ({
       // Fallback đặc biệt cho admin:access
       if (requiredPermissions.includes('admin:access') && canAccessAdmin()) {
         // Nếu có quyền admin access, kiểm tra các quyền khác
-        const otherPermissions = requiredPermissions.filter(p => p !== 'admin:access')
-        if (otherPermissions.length === 0 || hasAllPermissions(otherPermissions)) {
+        const otherPermissions = requiredPermissions.filter(
+          (p) => p !== 'admin:access'
+        )
+        if (
+          otherPermissions.length === 0 ||
+          hasAllPermissions(otherPermissions)
+        ) {
           return children
         }
         // Nếu không có permissions khác từ API nhưng là admin role, cho phép

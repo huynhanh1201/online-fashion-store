@@ -19,25 +19,6 @@ const ProductImages = ({
   const editImageIndexRef = useRef(null)
   const [isUploading, setIsUploading] = useState(false)
 
-  // const handleFileChange = async (e) => {
-  //   const files = Array.from(e.target.files || [])
-  //   const remainingSlots = maxImages - productImages.length
-  //   if (files.length > remainingSlots) {
-  //     alert(`Bạn chỉ có thể thêm tối đa ${remainingSlots} ảnh nữa.`)
-  //     return
-  //   }
-  //   try {
-  //     const uploadedUrls = await Promise.all(
-  //       files.map((file) => onUpload(file))
-  //     )
-  //     setProductImages((prev) => [...prev, ...uploadedUrls])
-  //     setProductImagePreview((prev) => [...prev, ...uploadedUrls])
-  //   } catch {
-  //     alert('Lỗi khi upload ảnh.')
-  //   }
-  //   if (productImageInputRef.current) productImageInputRef.current.value = ''
-  // }
-
   const handleFileChange = async (e) => {
     const files = Array.from(e.target.files || [])
     const remainingSlots = maxImages - productImages.length
@@ -200,7 +181,9 @@ const ProductImages = ({
           '&:hover': {
             borderColor: isUploading ? '#aaa' : 'var(--primary-color)',
             color: isUploading ? '#888' : 'var(--primary-color)',
-            backgroundColor: isUploading ? 'transparent' : 'var(--primary-color)10'
+            backgroundColor: isUploading
+              ? 'transparent'
+              : 'var(--primary-color)10'
           }
         }}
       >
@@ -224,7 +207,7 @@ const ProductImages = ({
   return (
     <Box>
       <Typography variant='h6' mb={2}>
-        Ảnh sản phẩm
+        Ảnh sản phẩm <span style={{ color: 'red' }}>*</span> (bắt buộc)
       </Typography>
       <Box sx={{ maxHeight: 320, overflowY: 'auto', pr: 1 }}>
         <Grid container spacing={2}>

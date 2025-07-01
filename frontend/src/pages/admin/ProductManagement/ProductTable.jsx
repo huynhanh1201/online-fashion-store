@@ -338,6 +338,7 @@ const ProductTable = ({
         </Table>
       </TableContainer>
       <TablePagination
+        sx={{ backgroundColor: '#fff' }}
         rowsPerPageOptions={[10, 25, 100]}
         component='div'
         count={total || 0}

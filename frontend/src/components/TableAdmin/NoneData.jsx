@@ -4,7 +4,7 @@ import React from 'react'
 const TableNoneData = ({ col, message = 'Không có dữ liệu.' }) => {
   return (
     <TableRow>
-      <TableCell colSpan={col} align='center'>
+      <TableCell colSpan={col} align='center' sx={{ background: '#fff' }}>
         <Box display='flex' flexDirection='column' alignItems='center' py={4}>
           <svg
             width='64'

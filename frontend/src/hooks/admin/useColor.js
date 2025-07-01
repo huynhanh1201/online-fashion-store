@@ -4,7 +4,8 @@ import {
   addColor,
   getColorById,
   deleteColor,
-  updateColor
+  updateColor,
+  restoreColor
 } from '~/services/admin/ColorService'
 
 const useColors = () => {
@@ -103,6 +104,23 @@ const useColors = () => {
       return false
     }
   }
+
+  const restore = async (id) => {
+    try {
+      const restored = await restoreColor(id)
+      if (!restored) {
+        console.error('Không thể khôi phục màu')
+        return null
+      }
+      setColors((prev) => prev.filter((d) => d._id !== id))
+      setTotalPages((prev) => prev - 1)
+      return restored
+    } catch (err) {
+      console.error('Error restoring color:', err)
+      return null
+    }
+  }
+
   const getColorId = async (id) => {
     try {
       const color = await getColorById(id)
@@ -127,7 +145,8 @@ const useColors = () => {
     getColorId,
     saveColor,
     update,
-    remove
+    remove,
+    restore
   }
 }
 

@@ -113,7 +113,7 @@ const Slider = () => {
       >
         <Box
           component="img"
-          src="https://file.hstatic.net/1000360022/file/banner_trang_ch__pc__2048x813px__c3710b6015564c6d8cdac098c4a482d2.jpg"
+          src="https://www.rcuw.org/wp-content/themes/champion/images/SM-placeholder.png"
           alt="default-banner"
           sx={{
             width: '100%',

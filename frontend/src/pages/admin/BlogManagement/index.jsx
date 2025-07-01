@@ -1,24 +1,17 @@
 import React, { useState, useEffect } from 'react'
-import {
-  Typography,
-  Button,
-  Paper,
-  CircularProgress,
-  Alert,
-  Box
-} from '@mui/material'
-import AddIcon from '@mui/icons-material/Add'
 import { toast } from 'react-toastify'
 import BlogTable from './BlogTable'
 import BlogModal from './modal/AddBlogModal'
 import ViewBlogModal from './modal/ViewBlogModal'
 import DeleteBlogModal from './modal/DeleteBlogModal'
+import RestoreBlogModal from './modal/RestoreBlogModal'
 import useBlog from '~/hooks/admin/useBlog'
 export default function BlogManagementPage() {
   const [openBlogModal, setOpenBlogModal] = useState(false)
   const [blogModalMode, setBlogModalMode] = useState('add') // 'add' hoặc 'edit'
   const [openView, setOpenView] = useState(false)
   const [openDelete, setOpenDelete] = useState(false)
+  const [openRestore, setOpenRestore] = useState(false)
   const [selectedBlog, setSelectedBlog] = useState(null)
   const [page, setPage] = React.useState(1)
   const [filters, setFilters] = React.useState({
@@ -35,7 +28,8 @@ export default function BlogManagementPage() {
     updateBlogById,
     addBlog,
     ROWS_PER_PAGE,
-    setROWS_PER_PAGE
+    setROWS_PER_PAGE,
+    restore
   } = useBlog()
   // Load blogs khi component mount
   useEffect(() => {
@@ -76,6 +70,18 @@ export default function BlogManagementPage() {
     }
   }
 
+  const handleRestore = async () => {
+    try {
+      await restore(selectedBlog._id)
+      toast.success('Khôi phục blog thành công!')
+      setOpenRestore(false)
+      setSelectedBlog(null)
+    } catch (error) {
+      console.error('Lỗi khi khôi phục blog:', error)
+      toast.error('Không thể khôi phục blog. Vui lòng thử lại.')
+    }
+  }
+
   const handleChangePage = (event, value) => setPage(value)
   const isEqual = (obj1, obj2) => JSON.stringify(obj1) === JSON.stringify(obj2)
 
@@ -109,6 +115,10 @@ export default function BlogManagementPage() {
           setSelectedBlog(blog)
           setOpenDelete(true)
         }}
+        onRestore={(blog) => {
+          setSelectedBlog(blog)
+          setOpenRestore(true)
+        }}
         onFilter={handleFilter}
         page={page - 1}
         rowsPerPage={ROWS_PER_PAGE}
@@ -119,6 +129,7 @@ export default function BlogManagementPage() {
           setROWS_PER_PAGE(newLimit)
         }}
         loading={loading}
+        filters={filters}
       />
 
       <BlogModal
@@ -148,6 +159,15 @@ export default function BlogManagementPage() {
           setSelectedBlog(null)
         }}
         onConfirm={handleDelete}
+      />
+      <RestoreBlogModal
+        open={openRestore}
+        blog={selectedBlog}
+        onClose={() => {
+          setOpenRestore(false)
+          setSelectedBlog(null)
+        }}
+        onConfirm={handleRestore}
       />
     </>
   )
