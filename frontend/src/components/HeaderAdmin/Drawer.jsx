@@ -646,6 +646,11 @@ export default function AdminDrawer({
                       selected={isActive(item.path)}
                       sx={{ pl: 2, ...activeButtonStyle }}
                     >
+                      {item.icon && (
+                        <ListItemIcon sx={{ minWidth: 36 }}>
+                          {item.icon}
+                        </ListItemIcon>
+                      )}
                       <ListItemText primary={item.label} sx={{ ml: 7 }} />
                     </ListItemButton>
                   ))}

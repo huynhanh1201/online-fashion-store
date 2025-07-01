@@ -12,17 +12,21 @@ import {
 import { getAllPolicies } from '~/services/policyService'
 
 const tabLabels = [
+  'Điều khoản sử dụng',
   'Chính sách bảo mật',
   'Chính sách member',
-  'Chính sách giao hàng',
-  'Chính sách đổi trả và bảo hành'
+  'Chính sách đổi trả',
+  'Chính sách vận chuyển',
+  'Chính sách bảo hành'
 ]
 
 const policyTypes = [
+  'terms_of_service',
   'privacy_policy',
-  'member_policy', 
+  'member_policy',
+  'return_policy',
   'shipping_policy',
-  'return_policy'
+  'warranty_policy'
 ]
 
 const PolicyPage = () => {
@@ -214,6 +218,14 @@ const PolicyPage = () => {
                   },
                   '& li': {
                     mb: 1
+                  },
+                  '& img': {
+                    maxWidth: '100%',
+                    height: 'auto',
+                    borderRadius: 2,
+                    display: 'block',
+                    margin: '16px auto',
+                    boxShadow: '0 2px 8px rgba(0,0,0,0.06)'
                   }
                 }}
                 dangerouslySetInnerHTML={{ __html: currentPolicy.content }}
