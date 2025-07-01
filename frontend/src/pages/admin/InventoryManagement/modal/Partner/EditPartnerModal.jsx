@@ -45,16 +45,6 @@ export default function EditPartnerModal({
   const onSubmit = (data) => {
     const { type, phone, email } = data
 
-    if (type === 'customer' && !phone) {
-      toast.error('Khách hàng cần có số điện thoại!')
-      return
-    }
-
-    if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      toast.error('Email không đúng định dạng!')
-      return
-    }
-
     const formattedData = {
       name: data.name.trim(),
       type,
@@ -86,10 +76,17 @@ export default function EditPartnerModal({
                 fullWidth
                 {...register('name', {
                   required: 'Tên không được bỏ trống',
+                  minLength: {
+                    value: 2,
+                    message: 'Tên phải có ít nhất 2 ký tự'
+                  },
                   maxLength: {
                     value: 100,
                     message: 'Tên không được vượt quá 100 ký tự'
-                  }
+                  },
+                  validate: (value) =>
+                    value.trim() === value ||
+                    'Tên không được có khoảng trắng ở đầu hoặc cuối'
                 })}
                 error={!!errors.name}
                 helperText={errors.name?.message}
@@ -123,11 +120,15 @@ export default function EditPartnerModal({
                 label='Số điện thoại'
                 fullWidth
                 {...register('phone', {
+                  required: 'Số điện thoại là bắt buộc',
                   pattern: {
                     value:
                       /^(?:\+84|0)(?:3[2-9]|5[2689]|7[06-9]|8[1-689]|9[0-9])\d{7}$/,
                     message: 'Số điện thoại không hợp lệ'
-                  }
+                  },
+                  validate: (value) =>
+                    value.trim() === value ||
+                    'Số điện thoại không được có khoảng trắng ở đầu hoặc cuối'
                 })}
                 error={!!errors.phone}
                 helperText={errors.phone?.message}
@@ -139,10 +140,14 @@ export default function EditPartnerModal({
                 type='email'
                 fullWidth
                 {...register('email', {
+                  required: 'Email là bắt buộc',
                   pattern: {
                     value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
                     message: 'Email không đúng định dạng'
-                  }
+                  },
+                  validate: (value) =>
+                    value.trim() === value ||
+                    'Email không được có khoảng trắng ở đầu hoặc cuối'
                 })}
                 error={!!errors.email}
                 helperText={errors.email?.message}

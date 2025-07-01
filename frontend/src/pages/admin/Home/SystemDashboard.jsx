@@ -47,6 +47,8 @@ export default function SystemDashboard({
   loading,
   orderStatistics
 }) {
+  const currentYear = new Date().getFullYear()
+  const [selectedYear, setSelectedYear] = useState(currentYear.toString())
   const summaryItems = [
     {
       label: 'Tổng sản phẩm',
@@ -106,6 +108,27 @@ export default function SystemDashboard({
       color: '#F44336'
     }
   ]
+  const monthlyLabels = Array.from({ length: 12 }, (_, i) => `Tháng ${i + 1}`)
+  const monthlyStats = financeStatistics?.revenueChart?.monthlyStats || []
+
+  const revenueData = monthlyLabels.map((_, i) => {
+    const stat = monthlyStats.find((m) => Number(m.month) === i + 1)
+    return stat?.revenue || 0
+  })
+
+  const lineProfitChart = {
+    labels: monthlyLabels,
+    datasets: [
+      {
+        label: `Tổng lợi nhuận theo tháng (${selectedYear})`,
+        data: revenueData,
+        borderColor: '#4CAF50',
+        backgroundColor: 'rgba(76, 175, 80, 0.2)',
+        fill: true,
+        tension: 0.4
+      }
+    ]
+  }
 
   if (loading) {
     return (
@@ -179,6 +202,52 @@ export default function SystemDashboard({
           </Grid>
         ))}
       </Grid>
+      {/* Biểu đồ lợi nhuận theo tháng */}
+      <Box
+        sx={{
+          border: '1px solid #e0e0e0',
+          borderRadius: 2,
+          p: 2,
+          boxShadow: 1,
+          mt: 4
+        }}
+      >
+        <Stack
+          direction='row'
+          justifyContent='space-between'
+          alignItems='center'
+          mb={2}
+        >
+          <Typography variant='h5' fontWeight='bold'>
+            Lợi nhuận theo tháng
+          </Typography>
+          <Select
+            size='small'
+            value={selectedYear}
+            onChange={(e) => setSelectedYear(e.target.value)}
+          >
+            {Array.from({ length: new Date().getFullYear() - 2025 + 1 }).map(
+              (_, i) => {
+                const yearOption = 2025 + i
+                return (
+                  <MenuItem key={yearOption} value={yearOption.toString()}>
+                    {yearOption}
+                  </MenuItem>
+                )
+              }
+            )}
+          </Select>
+        </Stack>
+        <Box sx={{ height: 500 }}>
+          <Line
+            data={lineProfitChart}
+            options={{
+              responsive: true,
+              maintainAspectRatio: false
+            }}
+          />
+        </Box>
+      </Box>
     </Box>
   )
 }

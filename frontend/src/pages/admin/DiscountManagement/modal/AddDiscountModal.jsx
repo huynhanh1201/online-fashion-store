@@ -28,7 +28,7 @@ const AddDiscountModal = ({ open, onClose, onAdded }) => {
     reset,
     setValue,
     control,
-    formState: { isSubmitting }
+    formState: { isSubmitting, errors }
   } = useForm({
     defaultValues: {
       type: 'fixed',
@@ -116,7 +116,20 @@ const AddDiscountModal = ({ open, onClose, onAdded }) => {
                 label='Mã giảm giá'
                 fullWidth
                 margin='normal'
-                {...register('code', { required: true })}
+                {...register('code', {
+                  required: 'Mã giảm giá là bắt buộc',
+                  minLength: { value: 3, message: 'Ít nhất 3 ký tự' },
+                  maxLength: { value: 20, message: 'Không quá 20 ký tự' },
+                  pattern: {
+                    value: /^[a-zA-Z0-9]+$/,
+                    message: 'Chỉ được chứa chữ và số'
+                  },
+                  validate: (value) =>
+                    value.trim() === value ||
+                    'Không được có khoảng trắng đầu/cuối'
+                })}
+                error={!!errors.code}
+                helperText={errors.code?.message}
                 sx={StyleAdmin.InputCustom}
               />
 
@@ -126,7 +139,12 @@ const AddDiscountModal = ({ open, onClose, onAdded }) => {
                   labelId='type-label'
                   label='Loại giảm giá'
                   value={type}
-                  {...register('type', { required: true })}
+                  {...register('type', {
+                    required: 'Vui lòng chọn loại giảm giá',
+                    validate: (value) =>
+                      ['fixed', 'percent'].includes(value) ||
+                      'Loại giảm giá không hợp lệ'
+                  })}
                   MenuProps={{
                     PaperProps: {
                       sx: StyleAdmin.FormSelect.SelectMenu
@@ -247,23 +265,53 @@ const AddDiscountModal = ({ open, onClose, onAdded }) => {
                 )}
               />
 
-              <TextField
-                label='Hiệu lực từ'
-                type='datetime-local'
-                fullWidth
-                margin='normal'
-                InputLabelProps={{ shrink: true }}
-                {...register('validFrom')}
-                sx={StyleAdmin.InputCustom}
+              <Controller
+                name='validFrom'
+                control={control}
+                rules={{
+                  required: 'Vui lòng chọn ngày bắt đầu'
+                }}
+                render={({ field, fieldState }) => (
+                  <TextField
+                    {...field}
+                    type='datetime-local'
+                    label='Hiệu lực từ'
+                    fullWidth
+                    margin='normal'
+                    InputLabelProps={{ shrink: true }}
+                    error={!!fieldState.error}
+                    helperText={fieldState.error?.message}
+                    sx={StyleAdmin.InputCustom}
+                  />
+                )}
               />
-              <TextField
-                label='Hiệu lực đến'
-                type='datetime-local'
-                fullWidth
-                margin='normal'
-                InputLabelProps={{ shrink: true }}
-                {...register('validUntil')}
-                sx={StyleAdmin.InputCustom}
+              <Controller
+                name='validUntil'
+                control={control}
+                rules={{
+                  required: 'Vui lòng chọn ngày kết thúc',
+                  validate: (value) => {
+                    const from = new Date(watch('validFrom'))
+                    const to = new Date(value)
+                    if (!value) return 'Vui lòng chọn ngày kết thúc'
+                    if (isNaN(from.getTime()) || isNaN(to.getTime()))
+                      return true // tránh lỗi khi from chưa chọn
+                    return to > from || 'Ngày kết thúc phải sau ngày bắt đầu'
+                  }
+                }}
+                render={({ field, fieldState }) => (
+                  <TextField
+                    {...field}
+                    type='datetime-local'
+                    label='Hiệu lực đến'
+                    fullWidth
+                    margin='normal'
+                    InputLabelProps={{ shrink: true }}
+                    error={!!fieldState.error}
+                    helperText={fieldState.error?.message}
+                    sx={StyleAdmin.InputCustom}
+                  />
+                )}
               />
             </Box>
           </Box>

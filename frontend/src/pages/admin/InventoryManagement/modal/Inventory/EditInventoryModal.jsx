@@ -86,7 +86,7 @@ const EditInventoryModal = ({
           label='Ngưỡng cảnh báo'
           name='minQuantity'
           type='number'
-          value={formData.minQuantity === 0 ? '' : formData.minQuantity}
+          value={formData.minQuantity === 0 ? 0 : formData.minQuantity}
           onChange={handleChange}
           fullWidth
         />

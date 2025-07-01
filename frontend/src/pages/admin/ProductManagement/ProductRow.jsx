@@ -27,7 +27,8 @@ const styles = {
     whiteSpace: 'nowrap',
     overflow: 'hidden',
     textOverflow: 'ellipsis',
-    verticalAlign: 'middle'
+    verticalAlign: 'middle',
+    background: '#fff'
   }
 }
 
@@ -235,14 +236,16 @@ const ProductRow = ({
                     </Tooltip>
                   )}
                   {filters.destroy === 'true' ? (
-                    <Tooltip title='Khôi phục'>
-                      <IconButton
-                        onClick={() => onAction('restore', product)}
-                        size='small'
-                      >
-                        <RestartAltIcon color='success' />
-                      </IconButton>
-                    </Tooltip>
+                    permissions.canRestore && (
+                      <Tooltip title='Khôi phục'>
+                        <IconButton
+                          onClick={() => onAction('restore', product)}
+                          size='small'
+                        >
+                          <RestartAltIcon color='success' />
+                        </IconButton>
+                      </Tooltip>
+                    )
                   ) : (
                     <>
                       {permissions.canEdit && (

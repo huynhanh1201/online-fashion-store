@@ -115,6 +115,22 @@ const useDiscounts = () => {
     }
   }
 
+  const restore = async (id) => {
+    try {
+      const restored = await updateDiscount(id, { isDeleted: false })
+      if (!restored) {
+        console.error('Không thể khôi phục giảm giá')
+        return null
+      }
+      setDiscounts((prev) => prev.filter((d) => d._id !== id))
+      setTotalPages((prev) => prev - 1)
+      return restored
+    } catch (err) {
+      console.error('Error restoring discount:', err)
+      return null
+    }
+  }
+
   const saveDiscount = (data) => {
     setDiscounts((prev) => prev.map((d) => (d._id === data._id ? data : d)))
   }
@@ -127,7 +143,10 @@ const useDiscounts = () => {
     saveDiscount,
     add,
     update,
-    remove
+    remove,
+    restore,
+    ROWS_PER_PAGE,
+    setROWS_PER_PAGE
   }
 }
 

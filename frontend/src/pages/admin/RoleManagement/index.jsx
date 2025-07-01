@@ -99,7 +99,8 @@ const RoleManagement = () => {
           canCreate: hasPermission('role:create'),
           canEdit: hasPermission('role:update'),
           canDelete: hasPermission('role:delete'),
-          canView: hasPermission('role:read')
+          canView: hasPermission('role:read'),
+          canRestore: hasPermission('role:restore')
         }}
         onFilter={handleFilter}
         fetchRoles={fetchRoles}

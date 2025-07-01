@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react'
 import ReviewTable from './ReviewTable'
 import useReviews from '~/hooks/admin/useReview'
-import ViewReviewModal from './modal/ViewReviewModal'
-import DeleteReviewModal from './modal/DeleteReviewModal'
+import ViewReviewModal from '~/pages/admin/ReviewManagement/modal/ViewReviewModal'
+import DeleteReviewModal from '~/pages/admin/ReviewManagement/modal/DeleteReviewModal'
+import RestoreReviewModal from '~/pages/admin/ReviewManagement/modal/RestoreReviewModal.jsx'
 import usePermissions from '~/hooks/usePermissions'
 import { RouteGuard, PermissionWrapper } from '~/components/PermissionGuard'
 
@@ -12,7 +13,7 @@ const ReviewManagement = () => {
   const [filter, setFilter] = useState({ destroy: 'false' })
   const [selectedReview, setSelectedReview] = useState(null)
   const [modalType, setModalType] = useState(null)
-  const { reviews, fetchReview, loading, remove, totalPages, update } =
+  const { reviews, fetchReview, loading, remove, totalPages, update, restore } =
     useReviews()
   const { hasPermission } = usePermissions()
 
@@ -32,7 +33,8 @@ const ReviewManagement = () => {
 
   const handleSave = async (id, data) => {
     if (modalType === 'delete') await remove(id)
-    else await update(id, data)
+    else if (modalType === 'view') await update(id, data)
+    else if (modalType === 'restore') await restore(id)
     handleCloseModal()
   }
 
@@ -61,9 +63,11 @@ const ReviewManagement = () => {
         handleOpenModal={handleOpenModal}
         permissions={{
           canView: hasPermission('review:read'),
-          canDelete: hasPermission('review:delete')
+          canDelete: hasPermission('review:delete'),
+          canRestore: hasPermission('review:restore')
         }}
         onFilter={handleFilter}
+        filter={filter}
       />
 
       <React.Suspense fallback={null}>
@@ -81,6 +85,14 @@ const ReviewManagement = () => {
             onClose={handleCloseModal}
             review={selectedReview}
             onDelete={handleSave}
+          />
+        )}
+        {modalType === 'restore' && selectedReview && (
+          <RestoreReviewModal
+            open
+            onClose={handleCloseModal}
+            review={selectedReview}
+            onRestore={handleSave}
           />
         )}
       </React.Suspense>

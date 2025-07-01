@@ -113,76 +113,81 @@ const ViewRoleModal = ({ open, onClose, p, role }) => {
           <Typography variant='subtitle1' fontWeight={600} mb={2}>
             Phân quyền
           </Typography>
-
-          <Grid container spacing={2}>
-            <Grid item size={4} xs={12} md={4}>
-              <Paper
-                variant='outlined'
-                sx={{ p: 1, maxHeight: 400, overflowY: 'auto' }}
-              >
-                {p
-                  .filter((groupItem) =>
-                    groupItem.permissions.some((perm) =>
-                      selectedPermissions.includes(perm.key)
+          {selectedPermissions.length === 0 ? (
+            <Typography color='#000'>Không có dữ liệu phân quyền</Typography>
+          ) : (
+            <Grid container spacing={2}>
+              <Grid item size={4} xs={12} md={4}>
+                <Paper
+                  variant='outlined'
+                  sx={{ p: 1, maxHeight: 400, overflowY: 'auto' }}
+                >
+                  {p
+                    .filter((groupItem) =>
+                      groupItem.permissions.some((perm) =>
+                        selectedPermissions.includes(perm.key)
+                      )
                     )
-                  )
-                  .map((groupItem, idx) => {
-                    const groupSelectedCount = groupItem.permissions.filter(
-                      (perm) => selectedPermissions.includes(perm.key)
-                    ).length
-                    console.log('groupItem', groupItem)
-                    return (
-                      <Box
-                        key={groupItem.group}
-                        sx={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'space-between',
-                          cursor: 'pointer',
-                          p: 1,
-                          borderBottom: '1px solid #eee',
-                          backgroundColor:
-                            idx === selectedGroupIndex
-                              ? '#f5f5f5'
-                              : 'transparent'
-                        }}
-                        onClick={() => setSelectedGroupName(groupItem.group)}
-                      >
-                        <Typography fontWeight={500}>
-                          {groupItem.group}
-                        </Typography>
-                        <Chip
-                          size='small'
-                          label={`${groupSelectedCount}/${groupItem.permissions.length}`}
-                          color={groupSelectedCount > 0 ? 'primary' : 'default'}
-                          sx={{ ml: 1 }}
+                    .map((groupItem, idx) => {
+                      const groupSelectedCount = groupItem.permissions.filter(
+                        (perm) => selectedPermissions.includes(perm.key)
+                      ).length
+                      console.log('groupItem', groupItem)
+                      return (
+                        <Box
+                          key={groupItem.group}
+                          sx={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'space-between',
+                            cursor: 'pointer',
+                            p: 1,
+                            borderBottom: '1px solid #eee',
+                            backgroundColor:
+                              idx === selectedGroupIndex
+                                ? '#f5f5f5'
+                                : 'transparent'
+                          }}
+                          onClick={() => setSelectedGroupName(groupItem.group)}
+                        >
+                          <Typography fontWeight={500}>
+                            {groupItem.group}
+                          </Typography>
+                          <Chip
+                            size='small'
+                            label={`${groupSelectedCount}/${groupItem.permissions.length}`}
+                            color={
+                              groupSelectedCount > 0 ? 'primary' : 'default'
+                            }
+                            sx={{ ml: 1 }}
+                          />
+                        </Box>
+                      )
+                    })}
+                </Paper>
+              </Grid>
+
+              <Grid item size={8} xs={12} md={8}>
+                <Paper variant='outlined' sx={{ p: 2 }}>
+                  <Typography fontWeight={600} mb={1}>
+                    {selectedGroup?.group || '---'}
+                  </Typography>
+
+                  <Box display='flex' flexDirection='column' gap={1}>
+                    {selectedGroup?.permissions
+                      .filter((perm) => selectedPermissions.includes(perm.key))
+                      .map((perm) => (
+                        <FormControlLabel
+                          key={perm.key}
+                          control={<Checkbox checked />}
+                          label={perm.label}
                         />
-                      </Box>
-                    )
-                  })}
-              </Paper>
+                      ))}
+                  </Box>
+                </Paper>
+              </Grid>
             </Grid>
-
-            <Grid item size={8} xs={12} md={8}>
-              <Paper variant='outlined' sx={{ p: 2 }}>
-                <Typography fontWeight={600} mb={1}>
-                  {selectedGroup?.group || '---'}
-                </Typography>
-
-                <Box display='flex' flexDirection='column' gap={1}>
-                  {selectedGroup?.permissions
-                    .filter((perm) => selectedPermissions.includes(perm.key))
-                    .map((perm) => (
-                      <FormControlLabel
-                        key={perm.key}
-                        control={<Checkbox checked />}
-                        label={perm.label}
-                      />
-                    ))}
-                </Box>
-              </Paper>
-            </Grid>
-          </Grid>
+          )}
         </Box>
       </DialogContent>
     </Dialog>

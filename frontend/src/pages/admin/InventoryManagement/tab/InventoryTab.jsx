@@ -754,6 +754,7 @@ const InventoryTab = () => {
                           whiteSpace: 'nowrap',
                           overflow: 'hidden',
                           textOverflow: 'ellipsis',
+                          background: '#fff',
                           ...(col.maxWidth && { maxWidth: col.maxWidth }),
                           pr: col.pr
                         }}
@@ -772,6 +773,7 @@ const InventoryTab = () => {
         </Table>
       </TableContainer>
       <TablePagination
+        sx={{ background: '#fff' }}
         rowsPerPageOptions={[10, 25, 100]}
         component='div'
         count={totalPageInventory || 0}

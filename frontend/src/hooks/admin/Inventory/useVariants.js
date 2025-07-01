@@ -4,7 +4,8 @@ import {
   createVariant,
   updateVariant,
   deleteVariant,
-  getVariantId
+  getVariantId,
+  restoreVariant
 } from '~/services/admin/Inventory/VariantService'
 
 const useVariants = () => {
@@ -112,6 +113,25 @@ const useVariants = () => {
       throw error // Ném lỗi để xử lý bên ngoài nếu cần
     }
   }
+
+  const restore = async (id) => {
+    try {
+      const result = await restoreVariant(id)
+      if (result) {
+        setVariants((prev) =>
+          prev.filter((variant) => String(variant._id) !== String(id))
+        )
+        setTotalPages((prev) => prev - 1)
+        return result
+      } else {
+        throw new Error('Không thể khôi phục biến thể')
+      }
+    } catch (error) {
+      console.error('Lỗi khi khôi phục biến thể:', error)
+      throw error // Ném lỗi để xử lý bên ngoài nếu cần
+    }
+  }
+
   const fetchVariantId = async (id) => {
     const result = await getVariantId(id)
     return result
@@ -139,7 +159,8 @@ const useVariants = () => {
     Save,
     fetchVariantId,
     ROWS_PER_PAGE,
-    setROWS_PER_PAGE
+    setROWS_PER_PAGE,
+    restore
   }
 }
 

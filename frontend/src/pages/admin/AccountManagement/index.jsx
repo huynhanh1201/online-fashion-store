@@ -158,14 +158,16 @@ const AccountManagement = () => {
             />
           )}
         </PermissionWrapper>
-        {modalType === 'restore' && selectedUser && (
-          <RestoreAccountModal
-            open
-            onClose={handleCloseModal}
-            user={selectedUser}
-            onRestore={handleSave}
-          />
-        )}
+        <PermissionWrapper requiredPermissions={['user:restore']}>
+          {modalType === 'restore' && selectedUser && (
+            <RestoreAccountModal
+              open
+              onClose={handleCloseModal}
+              user={selectedUser}
+              onRestore={handleSave}
+            />
+          )}
+        </PermissionWrapper>
       </React.Suspense>
     </RouteGuard>
   )

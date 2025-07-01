@@ -68,7 +68,14 @@ const AddSizeModal = ({ open, onClose, onAdded, onSave }) => {
               minLength: {
                 value: 1,
                 message: 'Tên kích thước phải có ít nhất 1 ký tự'
-              }
+              },
+              maxLength: {
+                value: 50,
+                message: 'Tên kích thước không vượt quá 50 ký tự'
+              },
+              validate: (value) =>
+                value.trim() === value ||
+                'Tên kích thước không được có khoảng trắng đầu/cuối'
             })}
             error={!!errors.name}
             helperText={errors.name?.message}

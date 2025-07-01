@@ -36,7 +36,10 @@ const DeleteReviewModal = ({ open, onClose, review, onDelete }) => {
       <Divider />
       <DialogContent>
         Bạn có chắc chắn muốn xoá đánh giá của sản phẩm{' '}
-        <strong>{review?.productId || 'Không rõ'}</strong> không?
+        <strong>
+          {review?.productId?.name || review?.productId?._id || 'Không rõ'}
+        </strong>{' '}
+        không?
       </DialogContent>
       <Divider />
       <DialogActions sx={{ padding: '16px 24px' }}>

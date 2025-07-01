@@ -11,7 +11,7 @@ const AddSizeModal = React.lazy(() => import('./modal/AddSizeModal'))
 const ViewSizeModal = React.lazy(() => import('./modal/ViewSizeModal'))
 const EditSizeModal = React.lazy(() => import('./modal/EditSizeModal'))
 const DeleteSizeModal = React.lazy(() => import('./modal/DeleteSizeModal'))
-
+const RestoreSizeModal = React.lazy(() => import('./modal/RestoreSizeModal'))
 const SizeManagement = () => {
   const [page, setPage] = React.useState(1)
   const [filters, setFilters] = React.useState({
@@ -31,7 +31,8 @@ const SizeManagement = () => {
     update,
     createNewSize,
     ROWS_PER_PAGE,
-    setROWS_PER_PAGE
+    setROWS_PER_PAGE,
+    restore
   } = useSizes()
   const { hasPermission } = usePermissions()
 
@@ -66,6 +67,8 @@ const SizeManagement = () => {
         await update(id, data)
       } else if (type === 'delete') {
         await remove(data)
+      } else if (type === 'restore') {
+        await restore(data)
       }
     } catch (error) {
       console.error('Lỗi:', error)
@@ -106,8 +109,10 @@ const SizeManagement = () => {
           canCreate: hasPermission('size:create'),
           canEdit: hasPermission('size:update'),
           canDelete: hasPermission('size:delete'),
-          canView: hasPermission('size:read')
+          canView: hasPermission('size:read'),
+          canRestore: hasPermission('size:restore')
         }}
+        filters={filters}
       />
 
       <React.Suspense fallback={<></>}>
@@ -146,13 +151,17 @@ const SizeManagement = () => {
             />
           )}
         </PermissionWrapper>
+        <PermissionWrapper requiredPermissions={['size:restore']}>
+          {modalType === 'restore' && selectedSize && (
+            <RestoreSizeModal
+              open
+              onClose={handleCloseModal}
+              size={selectedSize}
+              onRestored={handleSave}
+            />
+          )}
+        </PermissionWrapper>
       </React.Suspense>
-
-      {/*<SizePagination
-        page={page}
-        totalPages={totalPages}
-        onPageChange={handleChangePage}
-      />*/}
     </RouteGuard>
   )
 }

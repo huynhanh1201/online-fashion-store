@@ -57,7 +57,12 @@ const AddAccountModal = ({ open, onClose, onSave, roles }) => {
     onClose()
   }
 
-  const roleOptions = roles.map((role) => role.name)
+  const roleOptions = roles
+    .filter((role) => role.name !== 'customer')
+    .map((role) => ({
+      name: role.name,
+      label: role.label || role.name
+    }))
 
   return (
     <Dialog
@@ -76,11 +81,28 @@ const AddAccountModal = ({ open, onClose, onSave, roles }) => {
           <Controller
             name='name'
             control={control}
-            rules={{ required: 'Tên là bắt buộc' }}
+            rules={{
+              required: 'Họ và tên là bắt buộc',
+              minLength: {
+                value: 3,
+                message: 'Họ và tên phải có ít nhất 3 ký tự'
+              },
+              maxLength: {
+                value: 50,
+                message: 'Họ và tên không vượt quá 50 ký tự'
+              },
+              validate: (value) =>
+                value.trim() === value ||
+                'Họ và tên không được có khoảng trắng ở đầu hoặc cuối'
+            }}
             render={({ field, fieldState }) => (
               <TextField
                 {...field}
-                label='Họ và tên'
+                label={
+                  <>
+                    Tên <span style={{ color: 'red' }}>*</span> (bắt buộc)
+                  </>
+                }
                 fullWidth
                 margin='normal'
                 error={!!fieldState.error}
@@ -96,14 +118,25 @@ const AddAccountModal = ({ open, onClose, onSave, roles }) => {
             rules={{
               required: 'Email là bắt buộc',
               pattern: {
-                value: /^\S+@\S+$/i,
-                message: 'Email không hợp lệ'
-              }
+                value: /^\S+@\S+\.\S+$/,
+                message: 'Email không đúng định dạng (ví dụ: ten@domain.com)'
+              },
+              maxLength: {
+                value: 100,
+                message: 'Email không vượt quá 100 ký tự'
+              },
+              validate: (value) =>
+                value.trim() === value ||
+                'Email không được có khoảng trắng ở đầu hoặc cuối'
             }}
             render={({ field, fieldState }) => (
               <TextField
                 {...field}
-                label='Email'
+                label={
+                  <>
+                    Email <span style={{ color: 'red' }}>*</span> (bắt buộc)
+                  </>
+                }
                 fullWidth
                 margin='normal'
                 error={!!fieldState.error}
@@ -116,12 +149,26 @@ const AddAccountModal = ({ open, onClose, onSave, roles }) => {
           <Controller
             name='password'
             control={control}
-            rules={{ required: 'Mật khẩu là bắt buộc' }}
+            rules={{
+              required: 'Mật khẩu là bắt buộc',
+              validate: (value) => {
+                const regex =
+                  /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,128}$/
+                return (
+                  regex.test(value) ||
+                  'Mật khẩu phải từ 8–128 ký tự, có ít nhất 1 chữ hoa, 1 chữ thường, 1 số và 1 ký tự đặc biệt'
+                )
+              }
+            }}
             render={({ field, fieldState }) => (
               <TextField
                 {...field}
                 type={showPassword ? 'text' : 'password'}
-                label='Mật khẩu'
+                label={
+                  <>
+                    Mật khẩu <span style={{ color: 'red' }}>*</span> (bắt buộc)
+                  </>
+                }
                 fullWidth
                 margin='normal'
                 error={!!fieldState.error}
@@ -145,13 +192,20 @@ const AddAccountModal = ({ open, onClose, onSave, roles }) => {
             control={control}
             rules={{
               required: 'Xác nhận mật khẩu là bắt buộc',
-              validate: (value) => value === password || 'Mật khẩu không khớp'
+              validate: (value) =>
+                value === password ||
+                'Xác nhận mật khẩu không khớp với mật khẩu đã nhập'
             }}
             render={({ field, fieldState }) => (
               <TextField
                 {...field}
                 type={showConfirmPassword ? 'text' : 'password'}
-                label='Xác nhận mật khẩu'
+                label={
+                  <>
+                    Xác nhận mật khẩu <span style={{ color: 'red' }}>*</span>{' '}
+                    (bắt buộc)
+                  </>
+                }
                 fullWidth
                 margin='normal'
                 error={!!fieldState.error}
@@ -180,17 +234,27 @@ const AddAccountModal = ({ open, onClose, onSave, roles }) => {
           <Controller
             name='role'
             control={control}
-            rules={{ required: 'Vai trò là bắt buộc' }}
+            rules={{
+              required: 'Vai trò là bắt buộc, vui lòng chọn 1 vai trò phù hợp'
+            }}
             render={({ field, fieldState }) => (
               <Autocomplete
                 options={roleOptions}
-                getOptionLabel={(option) => option}
-                value={field.value}
-                onChange={(_, value) => field.onChange(value)}
+                getOptionLabel={(option) => option.label}
+                isOptionEqualToValue={(option, value) =>
+                  option.name === value?.name
+                }
+                value={roleOptions.find((r) => r.name === field.value) || null}
+                onChange={(_, selected) => field.onChange(selected?.name || '')}
                 renderInput={(params) => (
                   <TextField
                     {...params}
-                    label='Vai trò'
+                    label={
+                      <>
+                        Vai trò <span style={{ color: 'red' }}>*</span> (bắt
+                        buộc)
+                      </>
+                    }
                     margin='normal'
                     error={!!fieldState.error}
                     helperText={fieldState.error?.message}

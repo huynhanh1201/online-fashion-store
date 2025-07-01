@@ -278,7 +278,8 @@ const ProductManagement = () => {
           canCreate: hasPermission('product:create'),
           canEdit: hasPermission('product:update'),
           canDelete: hasPermission('product:delete'),
-          canView: hasPermission('product:read')
+          canView: hasPermission('product:read'),
+          canRestore: hasPermission('product:restore')
         }}
         initialSearch={searchFromUrl}
         filters={filters}
@@ -334,14 +335,16 @@ const ProductManagement = () => {
             product={selectedProduct}
           />
         )}
-        {modalType === 'restore' && selectedProduct && (
-          <RestoreProductModal
-            open
-            onClose={handleCloseModal}
-            product={selectedProduct}
-            onRestore={handleSave}
-          />
-        )}
+        <PermissionWrapper requiredPermissions={['product:restore']}>
+          {modalType === 'restore' && selectedProduct && (
+            <RestoreProductModal
+              open
+              onClose={handleCloseModal}
+              product={selectedProduct}
+              onRestore={handleSave}
+            />
+          )}
+        </PermissionWrapper>
       </React.Suspense>
     </RouteGuard>
   )

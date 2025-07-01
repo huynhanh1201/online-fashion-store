@@ -67,3 +67,15 @@ export const addColor = async (data) => {
     return null
   }
 }
+
+export const restoreColor = async (colorId) => {
+  try {
+    const response = await AuthorizedAxiosInstance.put(
+      `${API_ROOT}/v1/sizes/restore/${colorId}`
+    )
+    return response.data
+  } catch (error) {
+    console.error('Lỗi khi khôi phục màu:', error)
+    return null
+  }
+}

@@ -55,7 +55,20 @@ const EditColorModal = ({ open, onClose, color, onSave }) => {
             label='Tên màu'
             fullWidth
             margin='normal'
-            {...register('name', { required: 'Tên màu là bắt buộc' })}
+            {...register('name', {
+              required: 'Tên màu là bắt buộc',
+              minLength: {
+                value: 1,
+                message: 'Tên màu phải có ít nhất 1 ký tự'
+              },
+              maxLength: {
+                value: 50,
+                message: 'Tên màu không vượt quá 50 ký tự'
+              },
+              validate: (value) =>
+                value.trim() === value ||
+                'Tên màu không được có khoảng trắng đầu/cuối'
+            })}
             error={!!errors.name}
             helperText={errors.name?.message}
             sx={StyleAdmin.InputCustom}

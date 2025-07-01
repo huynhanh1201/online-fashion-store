@@ -17,21 +17,37 @@ const RouteGuard = ({
   )
   const hasNoPermissions = permissions.length === 0
 
-  // Nếu cần quyền admin access
-  if (requiredPermissions.includes('admin:access') && !canAccessAdmin()) {
-    return <Navigate to={fallbackPath} replace />
-  }
+  // Kiểm tra tất cả permissions cần thiết
+  if (requiredPermissions.length > 0) {
+    // Trước tiên kiểm tra hasAllPermissions
+    const hasRequiredPermissions = hasAllPermissions(requiredPermissions)
 
-  // Nếu cần các quyền khác
-  if (
-    requiredPermissions.length > 0 &&
-    !hasAllPermissions(requiredPermissions)
-  ) {
-    // Fallback: nếu là admin role và không có permissions từ API, cho phép truy cập
-    if (isAdminRole && hasNoPermissions) {
-      return children
+    if (!hasRequiredPermissions) {
+      // Fallback: nếu là admin role và không có permissions từ API, cho phép truy cập
+      if (isAdminRole && hasNoPermissions) {
+        return children
+      }
+
+      // Fallback đặc biệt cho admin:access
+      if (requiredPermissions.includes('admin:access') && canAccessAdmin()) {
+        // Nếu có quyền admin access, kiểm tra các quyền khác
+        const otherPermissions = requiredPermissions.filter(
+          (p) => p !== 'admin:access'
+        )
+        if (
+          otherPermissions.length === 0 ||
+          hasAllPermissions(otherPermissions)
+        ) {
+          return children
+        }
+        // Nếu không có permissions khác từ API nhưng là admin role, cho phép
+        if (isAdminRole && hasNoPermissions) {
+          return children
+        }
+      }
+
+      return <Navigate to={fallbackPath} replace />
     }
-    return <Navigate to={fallbackPath} replace />
   }
 
   return children

@@ -67,9 +67,16 @@ const AddColorModal = ({ open, onClose, onAdded, onSave }) => {
             {...register('name', {
               required: 'Tên màu là bắt buộc',
               minLength: {
-                value: 2,
-                message: 'Tên màu phải có ít nhất 2 ký tự'
-              }
+                value: 1,
+                message: 'Tên màu phải có ít nhất 1 ký tự'
+              },
+              maxLength: {
+                value: 50,
+                message: 'Tên màu không vượt quá 50 ký tự'
+              },
+              validate: (value) =>
+                value.trim() === value ||
+                'Tên màu không được có khoảng trắng đầu/cuối'
             })}
             error={!!errors.name}
             helperText={errors.name?.message}

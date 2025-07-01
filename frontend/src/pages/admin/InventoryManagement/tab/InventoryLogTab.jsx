@@ -271,7 +271,12 @@ const InventoryLogTab = () => {
                         <Chip
                           label={rawValue}
                           size='large'
-                          sx={{ width: 120, fontWeight: 800 }}
+                          sx={{
+                            width: 120,
+                            fontWeight: 800,
+                            backgroundColor:
+                              row.type === 'in' && 'var(--primary-color)'
+                          }}
                           color={row.type === 'in' ? 'success' : 'error'}
                         />
                       )
@@ -322,6 +327,7 @@ const InventoryLogTab = () => {
                           whiteSpace: 'nowrap',
                           overflow: 'hidden',
                           textOverflow: 'ellipsis',
+                          background: '#fff',
                           ...(col.maxWidth && { maxWidth: col.maxWidth })
                         }}
                         title={
@@ -339,6 +345,7 @@ const InventoryLogTab = () => {
         </Table>
       </TableContainer>
       <TablePagination
+        sx={{ background: '#fff' }}
         rowsPerPageOptions={[10, 25, 100]}
         component='div'
         count={totalLogs || 0}

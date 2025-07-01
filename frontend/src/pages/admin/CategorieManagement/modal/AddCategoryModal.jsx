@@ -320,10 +320,28 @@ const AddCategoryModal = ({ open, onClose, onAdded, onSave }) => {
             {/* Vùng nhập liệu */}
             <Box flex={1} mt={1.6}>
               <TextField
-                label='Tên danh mục'
+                label={
+                  <>
+                    Tên danh mục <span style={{ color: 'red' }}>*</span> (bắt
+                    buộc)
+                  </>
+                }
                 fullWidth
                 margin='normal'
-                {...register('name', { required: 'Tên danh mục là bắt buộc' })}
+                {...register('name', {
+                  required: 'Tên danh mục là bắt buộc',
+                  minLength: {
+                    value: 1,
+                    message: 'Tên danh mục không được để trống'
+                  },
+                  maxLength: {
+                    value: 50,
+                    message: 'Tên danh mục không vượt quá 50 ký tự'
+                  },
+                  validate: (value) =>
+                    value.trim() === value ||
+                    'Tên danh mục không được có khoảng trắng đầu/cuối'
+                })}
                 error={!!errors.name}
                 helperText={errors.name?.message}
               />
@@ -356,7 +374,16 @@ const AddCategoryModal = ({ open, onClose, onAdded, onSave }) => {
                 margin='normal'
                 multiline
                 rows={6}
-                {...register('description')}
+                {...register('description', {
+                  maxLength: {
+                    value: 500,
+                    message: 'Mô tả không vượt quá 500 ký tự'
+                  },
+                  validate: (value) =>
+                    !value ||
+                    value.trim() === value ||
+                    'Mô tả không được có khoảng trắng đầu/cuối'
+                })}
               />
             </Box>
           </Box>

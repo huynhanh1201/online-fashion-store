@@ -4,7 +4,8 @@ import {
   createPartner,
   deletePartner,
   updatePartner,
-  getPartnerById
+  getPartnerById,
+  restorePartner
 } from '~/services/admin/Inventory/PartnerService.js'
 
 const usePartner = () => {
@@ -115,6 +116,21 @@ const usePartner = () => {
       return false
     }
   }
+  const restore = async (id) => {
+    try {
+      const restoredPartner = await restorePartner(id)
+      if (!restoredPartner) {
+        console.error('Không thể khôi phục đối tác')
+        return null
+      }
+      setPartners((prev) => prev.filter((partner) => partner._id !== id))
+      setTotal((prev) => prev - 1)
+      return restoredPartner
+    } catch (error) {
+      console.error('Error restoring partner:', error)
+      return null
+    }
+  }
 
   const Save = (data) => {
     setPartners((prev) => prev.map((d) => (d._id === data._id ? data : d)))
@@ -131,7 +147,8 @@ const usePartner = () => {
     removePartner,
     Save,
     ROWS_PER_PAGE,
-    setROWS_PER_PAGE
+    setROWS_PER_PAGE,
+    restore
   }
 }
 

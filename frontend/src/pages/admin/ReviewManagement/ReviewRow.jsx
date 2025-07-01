@@ -9,6 +9,8 @@ import {
 } from '@mui/material'
 import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye'
 import DeleteIcon from '@mui/icons-material/Delete'
+import RestartAltIcon from '@mui/icons-material/RestartAlt'
+import DeleteForeverIcon from '@mui/icons-material/DeleteForever'
 
 const formatDate = (isoString) => {
   if (!isoString) return 'Không xác định'
@@ -24,7 +26,8 @@ const ReviewRow = ({
   index,
   columns,
   handleOpenModal,
-  permissions = {}
+  permissions = {},
+  filter
 }) => {
   const styles = {
     groupIcon: {
@@ -44,7 +47,8 @@ const ReviewRow = ({
       whiteSpace: 'nowrap',
       overflow: 'hidden',
       textOverflow: 'ellipsis',
-      verticalAlign: 'middle'
+      verticalAlign: 'middle',
+      background: '#fff'
     }
   }
   return (
@@ -99,16 +103,28 @@ const ReviewRow = ({
                     </IconButton>
                   </Tooltip>
                 )}
-                {permissions.canDelete && (
-                  <Tooltip title='Xoá'>
-                    <IconButton
-                      sx={{ ml: '0 !important' }}
-                      onClick={() => handleOpenModal('delete', review)}
-                    >
-                      <DeleteIcon color='error' />
-                    </IconButton>
-                  </Tooltip>
-                )}
+                {filter.destroy === 'true'
+                  ? permissions.canRestore && (
+                      <Tooltip title='Khôi phục'>
+                        <IconButton
+                          onClick={() => handleOpenModal('restore', review)}
+                          size='small'
+                          sx={{ ml: '0 !important' }}
+                        >
+                          <RestartAltIcon color='success' />
+                        </IconButton>
+                      </Tooltip>
+                    )
+                  : permissions.canDelete && (
+                      <Tooltip title='Xoá'>
+                        <IconButton
+                          sx={{ ml: '0 !important' }}
+                          onClick={() => handleOpenModal('delete', review)}
+                        >
+                          <DeleteIcon color='error' />
+                        </IconButton>
+                      </Tooltip>
+                    )}
               </Stack>
             </TableCell>
           )

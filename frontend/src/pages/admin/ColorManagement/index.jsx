@@ -10,7 +10,7 @@ const AddColorModal = React.lazy(() => import('./modal/AddColorModal'))
 const ViewColorModal = React.lazy(() => import('./modal/ViewColorModal'))
 const EditColorModal = React.lazy(() => import('./modal/EditColorModal'))
 const DeleteColorModal = React.lazy(() => import('./modal/DeleteColorModal'))
-
+const RestoreColorModal = React.lazy(() => import('./modal/RestoreColorModal'))
 const ColorManagement = () => {
   const [page, setPage] = React.useState(1)
   const [selectedColor, setSelectedColor] = React.useState(null)
@@ -28,7 +28,8 @@ const ColorManagement = () => {
     update,
     createNewColor,
     ROWS_PER_PAGE,
-    setROWS_PER_PAGE
+    setROWS_PER_PAGE,
+    restore
   } = useColors()
   const { hasPermission } = usePermissions()
 
@@ -57,6 +58,8 @@ const ColorManagement = () => {
         await update(id, data)
       } else if (type === 'delete') {
         await remove(data)
+      } else if (type === 'restore') {
+        await restore(data)
       }
     } catch (error) {
       console.error('Lỗi:', error)
@@ -92,8 +95,10 @@ const ColorManagement = () => {
           canCreate: hasPermission('color:create'),
           canEdit: hasPermission('color:update'),
           canDelete: hasPermission('color:delete'),
-          canView: hasPermission('color:read')
+          canView: hasPermission('color:read'),
+          canRestore: hasPermission('color:restore')
         }}
+        filters={filters}
       />
 
       <React.Suspense fallback={<></>}>
@@ -136,13 +141,17 @@ const ColorManagement = () => {
             />
           )}
         </PermissionWrapper>
+        <PermissionWrapper requiredPermissions={['color:restore']}>
+          {modalType === 'restore' && selectedColor && (
+            <RestoreColorModal
+              open
+              onClose={handleCloseModal}
+              color={selectedColor}
+              onRestore={handleSave}
+            />
+          )}
+        </PermissionWrapper>
       </React.Suspense>
-
-      {/*<ColorPagination*/}
-      {/*  page={page}*/}
-      {/*  totalPages={totalPages}*/}
-      {/*  onPageChange={handleChangePage}*/}
-      {/*/>*/}
     </RouteGuard>
   )
 }

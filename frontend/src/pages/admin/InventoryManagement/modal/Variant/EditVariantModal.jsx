@@ -22,7 +22,6 @@ import EditIcon from '@mui/icons-material/Edit'
 import DeleteIcon from '@mui/icons-material/Delete'
 import AddPhotoAlternateIcon from '@mui/icons-material/AddPhotoAlternate'
 import StyleAdmin from '~/assets/StyleAdmin.jsx'
-
 import { URI, CloudinaryColor } from '~/utils/constants'
 
 const uploadToCloudinary = async (file, folder = CloudinaryColor) => {
@@ -134,7 +133,10 @@ const EditVariantModal = ({
             }
           : variant.packageSize
       }
-
+      if (!updatedVariant.color.image) {
+        toast.error('Vui lòng thêm ảnh cho biến thể')
+        return
+      }
       await onUpdateVariant(updatedVariant, 'edit', variant._id)
       toast.success('Cập nhật biến thể thành công')
       onClose()
@@ -173,7 +175,6 @@ const EditVariantModal = ({
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              cursor: 'pointer',
               overflow: 'hidden'
             }}
             onClick={() => !colorImage && fileInputRef.current?.click()}
@@ -207,7 +208,7 @@ const EditVariantModal = ({
                       top: 4,
                       right: 40,
                       backgroundColor: 'rgba(255,255,255,0.8)',
-                      borderRadius: 1
+                      borderRadius: '50%'
                     }}
                   >
                     <Tooltip title='Sửa'>
@@ -228,7 +229,7 @@ const EditVariantModal = ({
                       top: 4,
                       right: 4,
                       backgroundColor: 'rgba(255,255,255,0.8)',
-                      borderRadius: 1
+                      borderRadius: '50%'
                     }}
                   >
                     <Tooltip title='Xoá'>
