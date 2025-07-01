@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { Box, Typography } from '@mui/material'
 import useBlog from '~/hooks/useBlog.js'
 import { optimizeCloudinaryUrl } from '~/utils/cloudinary'
+
 class ErrorBoundary extends Component {
   state = { hasError: false }
 
@@ -206,7 +207,7 @@ const BlogHome = () => {
                       {/* Image Section */}
                       <Box
                         sx={{
-                          height: { xs: 200, sm: 220, md: 240 },
+                          height: { xs: 260, sm: 300, md: 340 }, // Increased height for taller images
                           position: 'relative',
                           overflow: 'hidden'
                         }}
