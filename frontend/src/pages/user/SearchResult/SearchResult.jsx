@@ -12,7 +12,8 @@ import {
   styled,
   Pagination,
   Breadcrumbs,
-  Link
+  Link,
+  PaginationItem
 } from '@mui/material'
 import { useDispatch } from 'react-redux'
 import { setCartItems } from '~/redux/cart/cartSlice'
@@ -222,6 +223,8 @@ export default function SearchResults() {
     page * ITEMS_PER_PAGE
   )
 
+  const totalPages = Math.ceil(filteredProducts.length / ITEMS_PER_PAGE) || 1;
+
   const handleAddToCart = async (product) => {
     if (isAdding[product._id]) return
     setIsAdding((prev) => ({ ...prev, [product._id]: true }))
@@ -419,48 +422,35 @@ export default function SearchResults() {
               ))}
             </div>
 
-            <Box
-              sx={{ display: 'flex', justifyContent: 'center', mt: 4, mb: 2 }}
-            >
+            <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4, mb: 2 , alignItems: 'center'}}>
               <Pagination
-                count={Math.ceil(filteredProducts.length / ITEMS_PER_PAGE)}
+                count={totalPages}
                 page={page}
                 onChange={handlePageChange}
-                color='primary'
-                size='small'
                 boundaryCount={1}
                 siblingCount={1}
-                shape='rounded'
-                sx={{
-                  '& .MuiPagination-ul': {
-                    justifyContent: 'center',
-                    gap: '8px',
-                    padding: '8px 0',
-                  },
-                  mt: 3,
-                  mb: 2,
-                  '& .MuiPaginationItem-root': {
-                    borderRadius: '6px',
-                    border: '1.5px solid #e0e0e0',
-                    fontWeight: 500,
-                    fontSize: '1rem',
-                    minWidth: 44,
-                    minHeight: 44,
-                    color: '#757575',
-                    background: '#fff',
-                    boxShadow: 'none',
-                    transition: 'all 0.2s',
-                    '&:hover': {
-                      borderColor: '#000',
-                      background: '#fafafa',
-                      color: '#111',
-                    },
-                    '&.Mui-selected': {
-                      background: '#111',
-                      color: '#fff',
-                      borderColor: '#111',
-                    },
-                  },
+                shape="rounded"
+                size="small"
+                color="primary"
+                renderItem={(item) => {
+                  if (item.type === 'start-ellipsis' || item.type === 'end-ellipsis') {
+                    return (
+                      <span
+                        style={{
+                          padding: '8px 12px',
+                          fontWeight: 'bold',
+                          color: '#999',
+                          fontSize: '1rem',
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                        }}
+                      >
+                        ...
+                      </span>
+                    )
+                  }
+                  return <PaginationItem {...item} />
                 }}
               />
             </Box>

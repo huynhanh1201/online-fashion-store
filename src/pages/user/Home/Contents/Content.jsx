@@ -1,1 +1,0 @@
-import ProductCard from '~/components/ProductCards/ProductCards' 

@@ -33,18 +33,6 @@ const Sticker = ({
     const actualDiscount = Math.min(firstVariantDiscount, originalPrice)
     const discountPercentage = originalPrice > 0 ? Math.round((actualDiscount / originalPrice) * 100) : 0
 
-    console.log('Sticker debug:', {
-      productId: product._id,
-      productName: product.name,
-      originalPrice,
-      firstVariantDiscount,
-      actualDiscount,
-      discountPercentage,
-      daysSinceCreation,
-      soldCount,
-      createdAt: product.createdAt
-    })
-
     // Ưu tiên hiển thị "Giảm giá" nếu có discount >= 20%
     if (discountPercentage >= 20 && actualDiscount > 0) {
       return {
