@@ -3,12 +3,14 @@ import express from 'express'
 import { variantsValidation } from '~/validations/variantsValidation'
 import { variantsController } from '~/controllers/variantsController'
 import { authMiddleware } from '~/middlewares/authMiddleware'
+import { rbacMiddleware } from '~/middlewares/rbacMiddleware'
 
 const Router = express.Router()
 
 // Tạo Màu sắc sản phẩm mới
 Router.route('/').post(
   authMiddleware.isAuthorized,
+  rbacMiddleware.isValidPermission(['variant:create']),
   variantsValidation.variant,
   variantsController.createVariant
 )
@@ -25,6 +27,7 @@ Router.route('/:variantId').get(
 // Cập nhật thông tin Màu sắc sản phẩm
 Router.route('/:variantId').patch(
   authMiddleware.isAuthorized,
+  rbacMiddleware.isValidPermission(['variant:update']),
   variantsValidation.verifyId,
   variantsValidation.variantUpdate,
   variantsController.updateVariant
@@ -33,6 +36,7 @@ Router.route('/:variantId').patch(
 // Xoá Màu sắc sản phẩm (Xóa mềm)
 Router.route('/:variantId').delete(
   authMiddleware.isAuthorized,
+  rbacMiddleware.isValidPermission(['variant:delete']),
   variantsValidation.verifyId,
   variantsController.deleteVariant
 )

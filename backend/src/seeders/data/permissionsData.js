@@ -38,7 +38,7 @@ export const permissions = [
     group: 'Thống kê'
   },
 
-  // User
+  // User (Chưa xử lý)
   {
     key: 'user:use',
     label: 'Sử dụng trang tài khoản khách hàng',
@@ -49,7 +49,7 @@ export const permissions = [
   { key: 'user:delete', label: 'Xóa tài khoản khách hàng', group: 'Tài khoản khách hàng' },
   { key: 'user:restore', label: 'Khôi phục tài khoản khách hàng', group: 'Tài khoản khách hàng' },
 
-  // Account
+  // Account (Chưa xử lý)
   {
     key: 'account:use',
     label: 'Sử dụng trang tài khoản hệ thống',
@@ -84,12 +84,14 @@ export const permissions = [
   { key: 'role:delete', label: 'Xóa vai trò', group: 'Vai trò' },
   { key: 'role:restore', label: 'Khôi phục vai trò', group: 'Vai trò' },
 
+  // Policy (Chưa xử lý)
   { key: 'policy:use', label: 'Sử dụng trang chính sách', group: 'Chính sách' },
   { key: 'policy:read', label: 'Xem chính sách', group: 'Chính sách' },
   { key: 'policy:create', label: 'Tạo chính sách', group: 'Chính sách' },
   { key: 'policy:update', label: 'Sửa chính sách', group: 'Chính sách' },
   { key: 'policy:delete', label: 'Xóa chính sách', group: 'Chính sách' },
 
+  // Blog
   { key: 'blog:use', label: 'Sử dụng trang bài viết', group: 'Bài viết' },
   { key: 'blog:read', label: 'Xem bài viết', group: 'Bài viết' },
   { key: 'blog:create', label: 'Tạo bài viết', group: 'Bài viết' },
@@ -97,6 +99,7 @@ export const permissions = [
   { key: 'blog:delete', label: 'Xóa bài viết', group: 'Bài viết' },
   { key: 'blog:restore', label: 'Khôi phục bài viết', group: 'Bài viết' },
 
+  // Banner (Chưa xử lý)
   {
     key: 'banner:use',
     label: 'Sử dụng trang quảng cáo',
@@ -107,8 +110,7 @@ export const permissions = [
   { key: 'banner:update', label: 'Cập nhật quảng cáo', group: 'Ảnh quảng cáo' },
   { key: 'banner:delete', label: 'Xóa quảng cáo', group: 'Ảnh quảng cáo' },
 
-
-  // Flash Sale
+  // Flash Sale (Chưa xử lý)
   {
     key: 'flashSale:use',
     label: 'Sử dụng trang khuyến mãi',
@@ -123,7 +125,7 @@ export const permissions = [
   },
   { key: 'flashSale:delete', label: 'Xóa khuyến mãi', group: 'Khuyến mãi' },
 
-  // Header Content
+  // Header Content (Chưa xử lý)
   {
     key: 'headerContent:use',
     label: 'Sử dụng trang nội dung đầu trang',
@@ -150,7 +152,7 @@ export const permissions = [
     group: 'Nội dung đầu trang'
   },
 
-  // Footer Content
+  // Footer Content (Chưa xử lý)
   {
     key: 'footerContent:use',
     label: 'Sử dụng trang nội dung cuối trang',
@@ -177,7 +179,7 @@ export const permissions = [
     group: 'Nội dung cuối trang'
   },
 
-  // Featured Category
+  // Featured Category (Chưa xử lý)
   {
     key: 'featuredCategory:use',
     label: 'Sử dụng trang danh mục nổi bật',
@@ -204,7 +206,7 @@ export const permissions = [
     group: 'Danh mục nổi bật'
   },
 
-  // Service
+  // Service (Chưa xử lý)
   {
     key: 'service:use',
     label: 'Sử dụng trang dịch vụ nổi bật',
@@ -340,6 +342,8 @@ export const permissions = [
   { key: 'order:use', label: 'Sử dụng trang đơn hàng', group: 'Đơn hàng' },
   { key: 'order:read', label: 'Xem đơn hàng', group: 'Đơn hàng' },
   { key: 'order:update', label: 'Cập nhật đơn hàng', group: 'Đơn hàng' },
+  // Bổ sung thêm:
+  { key: 'order:create', label: 'Tạo đơn hàng', group: 'Đơn hàng' },
 
 
   // Review
@@ -361,6 +365,7 @@ export const permissions = [
     label: 'Xem giao dịch thanh toán',
     group: 'Thanh toán'
   },
+  // Thừa
   {
     key: 'payment:update',
     label: 'Cập nhật giao dịch thanh toán',
