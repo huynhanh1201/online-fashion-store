@@ -137,7 +137,8 @@ const Menu = ({ headerRef }) => {
             .map(item => ({ label: item.label, url: item.url }))
         : []),
       // Thêm các danh mục parent thực sự có children có sản phẩm
-      ...parentCategories.map(cat => ({ label: cat.name, url: `/productbycategory/${cat._id}`, category: cat }))
+      ...parentCategories.map(cat => ({ label: cat.name, url: `/productbycategory/${cat._id}`, category: cat })),
+      { label: 'Tin thời trang', url: '/blog' }
     ]
     
     const rows = []
