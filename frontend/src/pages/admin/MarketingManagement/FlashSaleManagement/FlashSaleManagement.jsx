@@ -168,6 +168,16 @@ const FlashSaleManagement = () => {
 
   const formatTime = (isoString) => new Date(isoString).toLocaleString('vi-VN')
 
+  // Lấy trạng thái thực tế của campaign (ưu tiên forceExpired)
+  const getCampaignStatus = (campaign) => {
+    if (campaign.forceExpired) return 'expired'
+    const now = new Date()
+    if (!campaign.enabled) return 'disabled'
+    if (new Date(campaign.startTime) > now) return 'upcoming'
+    if (new Date(campaign.endTime) < now) return 'expired'
+    return 'active'
+  }
+
   const getStatusColor = (status) => {
     switch (status) {
       case 'upcoming':
@@ -374,10 +384,11 @@ const FlashSaleManagement = () => {
 
   const handleEndCampaignEarly = async (campaign) => {
     try {
-      // Cập nhật thời gian kết thúc thành thời gian hiện tại
+      // Cập nhật thời gian kết thúc thành thời gian hiện tại và đánh dấu forceExpired
       const updatedCampaign = {
         ...campaign,
-        endTime: new Date().toISOString()
+        endTime: new Date().toISOString(),
+        forceExpired: true // Đánh dấu kết thúc sớm
       }
 
       await updateFlashSaleCampaign(campaign.id, updatedCampaign)
@@ -785,20 +796,8 @@ const FlashSaleManagement = () => {
                     {campaign.title} (ID: {campaign.id})
                   </Typography>
                   <Stack direction='row' spacing={1} alignItems='center'>
-                    <Tooltip
-                      title={
-                        campaign.enabled ? 'Tắt chiến dịch' : 'Bật chiến dịch'
-                      }
-                    >
-                      <Switch
-                        checked={campaign.enabled}
-                        onChange={() => handleToggleCampaign(campaign)}
-                        color='primary'
-                      />
-                    </Tooltip>
-
                     {/* Nút khôi phục giá cho campaign hết thời gian */}
-                    {campaign.status === 'expired' && (
+                    {(getCampaignStatus(campaign) === 'expired' || (new Date(campaign.endTime) < new Date() && campaign.enabled)) && (
                       <Tooltip title='Khôi phục giá về ban đầu'>
                         <IconButton
                           size='small'
@@ -836,7 +835,7 @@ const FlashSaleManagement = () => {
                         </Tooltip>
                       )}
                     {/* Nút kết thúc sớm chỉ hiển thị cho chiến dịch đang hoạt động */}
-                    {(campaign.status === 'active' || campaign.status === 'upcoming') && (
+                    {(getCampaignStatus(campaign) === 'active' || getCampaignStatus(campaign) === 'upcoming') && (
                       <Tooltip title='Kết thúc sớm'>
                         <IconButton
                           size='small'
@@ -854,9 +853,7 @@ const FlashSaleManagement = () => {
                       </Tooltip>
                     )}
                     {/* Nút xóa chỉ hiển thị cho chiến dịch đã kết thúc hoặc bị tắt */}
-
-                    {hasPermission('flashSale:delete') && (campaign.status === 'expired' || campaign.status === 'disabled') && (
-
+                    {hasPermission('flashSale:delete') && (getCampaignStatus(campaign) === 'expired' || getCampaignStatus(campaign) === 'disabled') && !campaign.forceExpired && (
                       <Tooltip title='Xóa chiến dịch'>
                         <IconButton
                           size='small'
@@ -872,11 +869,10 @@ const FlashSaleManagement = () => {
                           <DeleteIcon fontSize='small' />
                         </IconButton>
                       </Tooltip>
-                    )
-                    }
+                    )}
                     <Chip
-                      label={getStatusLabel(campaign.status)}
-                      color={getStatusColor(campaign.status)}
+                      label={getStatusLabel(getCampaignStatus(campaign))}
+                      color={getStatusColor(getCampaignStatus(campaign))}
                       size='small'
                       sx={{ fontWeight: 600, borderRadius: 2 }}
                     />
@@ -1093,7 +1089,7 @@ const FlashSaleManagement = () => {
                           <TableCell sx={{ py: 2 }}>
                             <Stack direction='row' spacing={1}>
                               {/* Nút khôi phục giá cho sản phẩm trong Flash Sale hết thời gian */}
-                              {campaign.status === 'expired' && (
+                              {(getCampaignStatus(campaign) === 'expired' || (new Date(campaign.endTime) < new Date() && campaign.enabled)) && (
                                 <Tooltip title='Khôi phục giá về ban đầu'>
                                   <IconButton
                                     size='small'
@@ -1130,7 +1126,7 @@ const FlashSaleManagement = () => {
                                 </Tooltip>
                               )}
                               {/* Nút kết thúc sớm chỉ hiển thị cho sản phẩm trong chiến dịch đang hoạt động */}
-                              {(campaign.status === 'active' || campaign.status === 'upcoming') && (
+                              {(getCampaignStatus(campaign) === 'active' || getCampaignStatus(campaign) === 'upcoming') && (
                                 <Tooltip title='Kết thúc sớm sản phẩm này'>
                                   <IconButton
                                     size='small'
@@ -1147,7 +1143,7 @@ const FlashSaleManagement = () => {
                                 </Tooltip>
                               )}
                               {/* Nút xóa chỉ hiển thị cho sản phẩm trong chiến dịch đã kết thúc hoặc bị tắt */}
-                              {hasPermission('flashSale:deldete') && (campaign.status === 'expired' || campaign.status === 'disabled') && (
+                              {hasPermission('flashSale:deldete') && (getCampaignStatus(campaign) === 'expired' || getCampaignStatus(campaign) === 'disabled') && !campaign.forceExpired && (
                                 <Tooltip title='Xóa'>
                                   <IconButton
                                     size='small'
