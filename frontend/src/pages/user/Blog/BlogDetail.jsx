@@ -15,9 +15,11 @@ import {
   Chip,
   Skeleton,
   useTheme,
-  useMediaQuery
+  useMediaQuery,
+  Breadcrumbs,
+  Link
 } from '@mui/material'
-import { ArrowBack } from '@mui/icons-material'
+import { ArrowBack, NavigateNext } from '@mui/icons-material'
 import useBlog from '~/hooks/useBlog.js'
 import { optimizeCloudinaryUrl } from '~/utils/cloudinary'
 
@@ -219,22 +221,33 @@ const TableOfContents = ({ headings, isMobile }) => {
             <ListItemButton
               onClick={() => scrollToHeading(heading.id)}
               selected={activeId === heading.id}
+              disableRipple
               sx={{
                 borderRadius: 1,
                 minHeight: 'auto',
                 transition: 'all 0.2s ease',
                 py: 0.5,
                 px: 1,
+                backgroundColor: 'transparent',
                 '&.Mui-selected': {
-                  backgroundColor: theme.palette.primary.light,
+                  backgroundColor: 'transparent',
                   color: theme.palette.primary.main,
                   '&:hover': {
-                    backgroundColor: theme.primary,
+                    backgroundColor: 'transparent'
                   }
                 },
                 '&:hover': {
-                  backgroundColor: theme.palette.action.hover,
-                  transform: 'translateX(2px)'
+                  transform: 'translateX(2px)',
+                  backgroundColor: 'transparent'
+                },
+                '&:focus': {
+                  backgroundColor: 'transparent'
+                },
+                '&:active': {
+                  backgroundColor: 'transparent'
+                },
+                '&.Mui-focusVisible': {
+                  backgroundColor: 'transparent'
                 }
               }}
             >
@@ -310,6 +323,7 @@ const BlogDetail = () => {
   const [imageLoaded, setImageLoaded] = React.useState(false)
   const [headings, setHeadings] = React.useState([])
   const [processedContent, setProcessedContent] = React.useState('')
+  const featuredImageRef = React.useRef(null)
 
   React.useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'auto' })
@@ -346,9 +360,9 @@ const BlogDetail = () => {
     return (
       <ErrorBoundary>
         <Box sx={{ bgcolor: 'grey.50', minHeight: '100vh' }}>
-          <Box sx={{ 
-            width: '100%', 
-            maxWidth: '96vw', 
+          <Box sx={{
+            width: '100%',
+            maxWidth: '96vw',
             margin: '0 auto',
             padding: { xs: '24px 16px', sm: '24px 16px', md: '24px 16px' }
           }}>
@@ -368,7 +382,7 @@ const BlogDetail = () => {
                   <Skeleton
                     variant="rectangular"
                     width="100%"
-                    height={{ xs: 320, sm: 380, md: 420 }}
+                    height={{ xs: 360, sm: 420, md: 480 }}
                   />
                   <CardContent>
                     <Skeleton variant="text" width={80} height={20} sx={{ mb: 2 }} />
@@ -383,18 +397,6 @@ const BlogDetail = () => {
                   </CardContent>
                 </Card>
               </Box>
-
-              {/* TOC Skeleton - Desktop */}
-              {!isMobile && (
-                <Box sx={{ width: 380, flexShrink: 0 }}>
-                  <Box sx={{ bgcolor: 'background.paper', borderRadius: 1 }}>
-                    <Skeleton variant="text" width={80} height={20} sx={{ m: 2, mb: 1 }} />
-                    {[...Array(5)].map((_, index) => (
-                      <Skeleton key={index} variant="text" width="90%" height={16} sx={{ mx: 2, mb: 1 }} />
-                    ))}
-                  </Box>
-                </Box>
-              )}
             </Box>
           </Box>
         </Box>
@@ -433,14 +435,14 @@ const BlogDetail = () => {
   return (
     <ErrorBoundary>
       <Box sx={{ bgcolor: 'grey.50', minHeight: '100vh' }}>
-        <Box sx={{ 
-          width: '100%', 
-          maxWidth: '96vw', 
+        <Box sx={{
+          width: '100%',
+          maxWidth: '96vw',
           margin: '0 auto',
           padding: { xs: '24px 16px', sm: '24px 16px', md: '24px 16px' }
         }}>
           {/* Back Button */}
-          <Box sx={{ mb: { xs: 2, md: 3 } }}>
+          {/* <Box sx={{ mb: { xs: 2, md: 1 } }}>
             <Button
               variant="outlined"
               startIcon={<ArrowBack />}
@@ -457,8 +459,63 @@ const BlogDetail = () => {
             >
               Quay lại
             </Button>
+          </Box> */}
+          <Box
+            sx={{
+              bottom: { xs: '20px', sm: '30px', md: '40px' },
+              left: { xs: '20px', sm: '30px', md: '40px' },
+              right: { xs: '20px', sm: '30px', md: '40px' },
+              maxWidth: '1800px',
+              margin: '0 auto',
+              mb: 2
+            }}
+          >
+            <Breadcrumbs
+              separator={<NavigateNext fontSize='small' />}
+              aria-label='breadcrumb'
+            >
+              <Link
+                underline='hover'
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  color: '#007bff',
+                  textDecoration: 'none',
+                  '&:hover': {
+                    color: 'primary.main'
+                  }
+                }}
+                href='/'
+              >
+                Trang chủ
+              </Link>
+              <Link
+                underline='hover'
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  color: '#007bff',
+                  textDecoration: 'none',
+                  '&:hover': {
+                    color: 'primary.main'
+                  }
+                }}
+                href={`/blog`}
+              >
+                Bài viết
+              </Link>
+              <Typography
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  color: 'text.primary',
+                  fontWeight: 500
+                }}
+              >
+                Tin thời trang
+              </Typography>
+            </Breadcrumbs>
           </Box>
-
           {/* Main Content Container */}
           <Box
             sx={{
@@ -470,17 +527,93 @@ const BlogDetail = () => {
           >
             {/* Article Content */}
             <Box sx={{
-              flex: 1,
+              flex: headings.length > 0 ? { xs: 1, lg: '0 0 65%' } : 1,
+              width: headings.length > 0 ? { xs: '100%', lg: '65%' } : '100%',
               minWidth: 0,
               bgcolor: 'background.paper',
               borderRadius: 1,
-              overflow: 'hidden'
+              overflow: 'hidden',
             }}>
+              {/* Article Header */}
+              <CardContent sx={{ p: 0, mb: 3, mt: 0 }}>
+                {/* Category */}
+
+
+                {/* Title */}
+                <Typography
+                  variant="h4"
+                  component="h1"
+                  sx={{
+                    fontSize: { xs: '1.5rem', md: '2rem' },
+                    fontWeight: 700,
+                    mb: 1,
+                    lineHeight: 1.2,
+                    wordBreak: 'break-word',
+                    textAlign: 'justify'
+                  }}
+                >
+                  {currentBlog.title}
+                </Typography>
+                <Chip
+                  label={currentBlog.category}
+                  size="small"
+                  sx={{
+                    mb: 2,
+                    bgcolor: 'primary.main',
+                    color: 'white',
+                    fontWeight: 600,
+                    fontSize: '0.75rem'
+                  }}
+                />
+                {/* Subtitle */}
+                {(currentBlog.excerpt ||
+                  currentBlog.subtitle ||
+                  currentBlog.summary) && (
+                    <Typography
+                      variant="h6"
+                      component="h2"
+                      color="text.secondary"
+                      sx={{
+                        fontSize: { xs: '1rem', md: '1.125rem' },
+                        fontWeight: 400,
+                        mb: 2,
+                        lineHeight: 1.5,
+                        textAlign: 'justify'
+                      }}
+                    >
+                      {currentBlog.excerpt ||
+                        currentBlog.subtitle ||
+                        currentBlog.summary}
+                    </Typography>
+                  )}
+
+                {/* Meta Info */}
+                <Box
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    flexWrap: 'wrap',
+                  }}
+                >
+                  <Typography variant="body2" color="text.secondary">
+                    <Box component="span" sx={{ fontWeight: 600 }}>
+                      {currentBlog.author?.name || 'Không rõ'}
+                    </Box>
+                    <Box component="span" sx={{ mx: 1 }}>•</Box>
+                    <Box component="span">
+                      {currentBlog.publishedAt
+                        ? new Date(currentBlog.publishedAt).toLocaleDateString('vi-VN')
+                        : new Date(currentBlog.createdAt).toLocaleDateString('vi-VN')}
+                    </Box>
+                  </Typography>
+                </Box>
+              </CardContent>
+
               {/* Featured Image */}
               {(currentBlog.coverImage ||
                 currentBlog.thumbnail ||
                 currentBlog.image) && (
-                  <Box sx={{ position: 'relative' }}>
+                  <Box ref={featuredImageRef} sx={{ position: 'relative', mb: 3 }}>
                     {!imageLoaded && (
                       <Box
                         sx={{
@@ -503,7 +636,7 @@ const BlogDetail = () => {
                     )}
                     <CardMedia
                       component="img"
-                      height={{ xs: 320, sm: 380, md: 420 }}
+                      height={{ xs: 360, sm: 420, md: 480 }}
                       image={optimizeCloudinaryUrl(currentBlog.coverImage || currentBlog.thumbnail || currentBlog.image)}
                       alt={currentBlog.title}
                       sx={{
@@ -511,7 +644,8 @@ const BlogDetail = () => {
                         opacity: imageLoaded ? 1 : 0,
                         transition: 'opacity 0.3s ease',
                         width: '100%',
-                        height: '400px'
+                        height: { xs: '360px', sm: '420px', md: '480px' },
+                        borderRadius: 0
                       }}
                       onLoad={() => setImageLoaded(true)}
                       onError={() => setImageLoaded(true)}
@@ -519,82 +653,8 @@ const BlogDetail = () => {
                   </Box>
                 )}
 
-              {/* Article Header */}
-              <CardContent sx={{ p: 0, my: 3 }}>
-                {/* Category */}
-                <Chip
-                  label={currentBlog.category}
-                  size="small"
-                  sx={{
-                    mb: 2,
-                    bgcolor: 'primary.main',
-                    color: 'white',
-                    fontWeight: 600,
-                    fontSize: '0.75rem'
-                  }}
-                />
-
-                {/* Title */}
-                <Typography
-                  variant="h4"
-                  component="h1"
-                  sx={{
-                    fontSize: { xs: '1.5rem', md: '2rem' },
-                    fontWeight: 700,
-                    mb: 1,
-                    lineHeight: 1.2,
-                    wordBreak: 'break-word'
-                  }}
-                >
-                  {currentBlog.title}
-                </Typography>
-
-                {/* Subtitle */}
-                {(currentBlog.excerpt ||
-                  currentBlog.subtitle ||
-                  currentBlog.summary) && (
-                    <Typography
-                      variant="h6"
-                      component="h2"
-                      color="text.secondary"
-                      sx={{
-                        fontSize: { xs: '1rem', md: '1.125rem' },
-                        fontWeight: 400,
-                        mb: 2,
-                        lineHeight: 1.5
-                      }}
-                    >
-                      {currentBlog.excerpt ||
-                        currentBlog.subtitle ||
-                        currentBlog.summary}
-                    </Typography>
-                  )}
-
-                {/* Meta Info */}
-                <Box
-                  sx={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    flexWrap: 'wrap',
-                    gap: 1,
-                    borderBottom: 1,
-                    borderColor: 'divider',
-                    mb: 3,
-                    pb: 2
-                  }}
-                >
-                  <Typography variant="body2" color="text.secondary">
-                    <Box component="span" sx={{ fontWeight: 600 }}>
-                      {currentBlog.author?.name || 'Không rõ'}
-                    </Box>
-                    <Box component="span" sx={{ mx: 1 }}>•</Box>
-                    <Box component="span">
-                      {currentBlog.publishedAt
-                        ? new Date(currentBlog.publishedAt).toLocaleDateString('vi-VN')
-                        : new Date(currentBlog.createdAt).toLocaleDateString('vi-VN')}
-                    </Box>
-                  </Typography>
-                </Box>
+              {/* Article Content Container */}
+              <CardContent sx={{ p: 0 }}>
 
                 {/* Content */}
                 <Box
@@ -609,9 +669,10 @@ const BlogDetail = () => {
                       width: '100% !important',
                       maxWidth: '100% !important',
                       height: 'auto !important',
+                      maxHeight: { xs: '400px', sm: '450px', md: '550px' },
                       display: 'block',
                       margin: '1rem 0',
-                      objectFit: 'contain',
+                      objectFit: 'cover',
                       border: 'none'
                     },
                     '& p': { mb: 3 },
@@ -681,16 +742,19 @@ const BlogDetail = () => {
             {headings.length > 0 && (
               <Box
                 sx={{
-                  flex: { xs: '1 1 auto', lg: '0 0 380px' },
-                  width: { xs: '100%', lg: '380px' },
-                  maxWidth: { lg: '380px' },
-                  minWidth: { lg: '380px' },
+                  flex: { xs: '1 1 auto', lg: '0 0 35%' },
+                  width: { xs: '100%', lg: '35%' },
                   order: { xs: -1, lg: 1 },
                   position: { lg: 'sticky' },
                   top: { lg: '120px' },
                   alignSelf: { lg: 'flex-start' },
                   height: { lg: 'fit-content' },
-                  maxHeight: { lg: 'calc(100vh - 140px)' }
+                  maxHeight: { lg: 'calc(100vh - 140px)' },
+                  // Align TOC with title section
+                  mt: {
+                    xs: 0,
+                    lg: 0 // Start TOC at the same level as the title
+                  }
                 }}
               >
                 <TableOfContents headings={headings} isMobile={isMobile} />

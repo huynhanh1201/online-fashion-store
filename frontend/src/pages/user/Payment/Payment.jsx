@@ -30,7 +30,7 @@ import useCoupon from '~/hooks/useCoupon'
 import { useCart } from '~/hooks/useCarts'
 import { useOrder } from '~/hooks/useOrder'
 import { useSelector, useDispatch } from 'react-redux'
-import { clearTempCart } from '~/redux/cart/cartSlice'
+import { clearTempCart, clearAppliedCoupon } from '~/redux/cart/cartSlice'
 import { useLocation, useNavigate } from 'react-router-dom'
 import CouponItem from '~/components/Coupon/CouponItem'
 import { getDiscounts } from '~/services/discountService'
@@ -378,6 +378,8 @@ const Payment = () => {
   const cartCartItems = useSelector(state => state.cart.cartItems)
   const tempCart = useSelector(state => state.cart.tempCart)
   const isBuyNow = useSelector(state => state.cart.isBuyNow)
+  const appliedCoupon = useSelector(state => state.cart.appliedCoupon)
+  const appliedDiscount = useSelector(state => state.cart.appliedDiscount)
   const dispatch = useDispatch()
   const location = useLocation()
   const navigate = useNavigate()
@@ -515,6 +517,41 @@ const Payment = () => {
     }
     fetchCoupons()
   }, [subTotal])
+
+  // Tự động áp dụng mã giảm giá từ Cart
+  useEffect(() => {
+    if (appliedCoupon && appliedDiscount > 0 && !voucherApplied && !discount) {
+      const autoApplyCoupon = async () => {
+        try {
+          setVoucherInput(appliedCoupon.code)
+          const response = await handleApplyVoucher(appliedCoupon.code, subTotal)
+          if (response?.valid) {
+            setVoucherApplied(true)
+            setSnackbar({
+              open: true,
+              severity: 'success',
+              message: `Đã tự động áp dụng mã giảm giá: ${appliedCoupon.code}`
+            })
+          }
+        } catch (error) {
+          console.error('Lỗi khi tự động áp dụng mã giảm giá:', error)
+        }
+      }
+
+      // Delay để đảm bảo component đã render hoàn toàn
+      const timer = setTimeout(autoApplyCoupon, 500)
+      return () => clearTimeout(timer)
+    }
+  }, [appliedCoupon, appliedDiscount, voucherApplied, discount, subTotal, handleApplyVoucher])
+
+  // Cleanup applied coupon khi rời khỏi trang
+  useEffect(() => {
+    return () => {
+      if (appliedCoupon) {
+        dispatch(clearAppliedCoupon())
+      }
+    }
+  }, [appliedCoupon, dispatch])
 
   const formatCurrencyShort = (value) => {
     if (typeof value !== 'number') return '0'
@@ -1065,7 +1102,7 @@ const Payment = () => {
                     {voucherLoading ? 'Đang áp dụng...' : voucherApplied ? 'Đã áp dụng' : 'Áp dụng mã'}
                   </PrimaryButton>
 
-                  {discountMessage && (
+                  {/* {discountMessage && (
                     <Typography
                       variant="body2"
                       color={discount > 0 ? 'success.main' : 'error'}
@@ -1073,7 +1110,7 @@ const Payment = () => {
                     >
                       {discountMessage}
                     </Typography>
-                  )}
+                  )} */}
                 </Box>
 
                 {/* Danh sách coupon */}

@@ -44,6 +44,8 @@ import {
   setTempQuantity,
   removeTempQuantity,
   clearReorderVariantIds,
+  setAppliedCoupon,
+  clearAppliedCoupon,
 } from '~/redux/cart/cartSlice'
 import { optimizeCloudinaryUrl } from '~/utils/cloudinary'
 import { getDiscounts } from '~/services/discountService'
@@ -376,9 +378,21 @@ const Cart = () => {
       }
     }
 
+    // Lưu thông tin mã giảm giá được áp dụng vào Redux store
+    const applicableCoupon = getApplicableCoupon()
+    if (applicableCoupon) {
+      const discountAmount = calculateDiscount(applicableCoupon, totalPrice)
+      dispatch(setAppliedCoupon({
+        coupon: applicableCoupon,
+        discount: discountAmount
+      }))
+    } else {
+      // Xóa mã giảm giá cũ nếu không có mã nào áp dụng được
+      dispatch(clearAppliedCoupon())
+    }
+
     navigate('/payment')
   }
-
 
 
   const calculateDiscount = (coupon, total) => {
@@ -503,7 +517,7 @@ const Cart = () => {
                 color: 'primary.main'
               }
             }}
-            href={`/products`}
+            href={`/product`}
           >
             Sản phẩm
           </Link>

@@ -8,7 +8,9 @@ const cartSlice = createSlice({
     tempCart: null,
     isBuyNow: false,
     tempQuantities: {},
-    reorderVariantIds: [] // Lưu các variantId được thêm từ reorder
+    reorderVariantIds: [], // Lưu các variantId được thêm từ reorder
+    appliedCoupon: null, // Lưu mã giảm giá được áp dụng từ Cart
+    appliedDiscount: 0 // Lưu số tiền giảm giá
   },
   reducers: {
     setCartItems(state, action) {
@@ -47,6 +49,14 @@ const cartSlice = createSlice({
     },
     clearReorderVariantIds: (state) => {
       state.reorderVariantIds = []
+    },
+    setAppliedCoupon: (state, action) => {
+      state.appliedCoupon = action.payload.coupon
+      state.appliedDiscount = action.payload.discount
+    },
+    clearAppliedCoupon: (state) => {
+      state.appliedCoupon = null
+      state.appliedDiscount = 0
     }
   }
 })
@@ -61,7 +71,9 @@ export const {
   removeTempQuantity,
   clearAllTempQuantities,
   setReorderVariantIds,
-  clearReorderVariantIds
+  clearReorderVariantIds,
+  setAppliedCoupon,
+  clearAppliedCoupon
 } = cartSlice.actions
 
 export default cartSlice.reducer
