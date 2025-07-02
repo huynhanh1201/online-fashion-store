@@ -481,7 +481,6 @@ const Cart = () => {
           bottom: { xs: '20px', sm: '30px', md: '40px' },
           left: { xs: '20px', sm: '30px', md: '40px' },
           right: { xs: '20px', sm: '30px', md: '40px' },
-          padding: '12px',
           maxWidth: '1800px',
           margin: '0 auto',
           mb: 2
