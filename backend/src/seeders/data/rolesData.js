@@ -56,6 +56,7 @@ export const roles = [
 
       // Order
       'order:use',
+      'order:create',
       'order:read',
       'order:update',
 
