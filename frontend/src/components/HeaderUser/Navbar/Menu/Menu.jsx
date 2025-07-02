@@ -118,8 +118,12 @@ const Menu = ({ headerRef }) => {
   }, [])
 
   const getMenuRows = () => {
-    // Lọc ra các danh mục parent (không có parent hoặc parent = null)
-    const parentCategories = categories.filter(cat => !cat.destroy && !cat.parent)
+    // Lấy tất cả danh mục con có sản phẩm
+    const childCategoriesWithProduct = categories.filter(cat => cat.parent && !cat.destroy)
+    // Lấy danh sách parentId từ các danh mục con có sản phẩm
+    const parentIds = [...new Set(childCategoriesWithProduct.map(cat => typeof cat.parent === 'object' ? cat.parent._id : cat.parent))]
+    // Lấy các danh mục parent thực sự có children có sản phẩm
+    const parentCategories = categories.filter(cat => parentIds.includes(cat._id) && !cat.destroy)
     
     const allItems = [
       // Luôn hiển thị "Sản phẩm" và "Hàng mới"
@@ -132,7 +136,7 @@ const Menu = ({ headerRef }) => {
             .sort((a, b) => (a.order || 0) - (b.order || 0))
             .map(item => ({ label: item.label, url: item.url }))
         : []),
-      // Thêm các danh mục parent
+      // Thêm các danh mục parent thực sự có children có sản phẩm
       ...parentCategories.map(cat => ({ label: cat.name, url: `/productbycategory/${cat._id}`, category: cat }))
     ]
     
@@ -438,7 +442,7 @@ const Menu = ({ headerRef }) => {
                             childCategories.map((child) => (
                               <Button
                                 key={child._id}
-                                href={`/${child._id}`}
+                                href={`/category/${child.slug}`}
                                 sx={{
                                   justifyContent: 'flex-start',
                                   textAlign: 'left',

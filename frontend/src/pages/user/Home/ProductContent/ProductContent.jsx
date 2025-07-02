@@ -33,33 +33,29 @@ const ProductContent = () => {
         const response = await getCategories(1, 1000)
         const fetchedCategories = response.categories?.data || []
         
-        // Lọc ra chỉ danh mục con (có parent)
-        const childCategories = fetchedCategories.filter(cat => cat.parent !== null)
-        console.log('Child categories:', childCategories)
-        
-        // Kiểm tra từng danh mục con xem có sản phẩm không
-        const validChildCategories = []
-        for (const childCat of childCategories) {
+        // Kiểm tra tất cả danh mục (cả parent=null và parent!=null) xem có sản phẩm không
+        const validCategories = []
+        for (const cat of fetchedCategories) {
           try {
-            const response = await getProductsByCategory(childCat._id, 1, 1) // Chỉ lấy 1 sản phẩm để kiểm tra
+            const response = await getProductsByCategory(cat._id, 1, 1) // Chỉ lấy 1 sản phẩm để kiểm tra
             if (response && response.products && response.products.length > 0) {
-              console.log(`Category ${childCat.name} has products`)
-              validChildCategories.push(childCat)
+              console.log(`Category ${cat.name} has products`)
+              validCategories.push(cat)
             } else {
-              console.log(`Category ${childCat.name} has no products`)
+              console.log(`Category ${cat.name} has no products`)
             }
           } catch (err) {
-            console.error(`Error checking products for ${childCat.name}:`, err)
+            console.error(`Error checking products for ${cat.name}:`, err)
           }
         }
         
-        console.log('Valid child categories (with products):', validChildCategories)
-        setCategories(validChildCategories)
+        console.log('Valid categories (with products):', validCategories)
+        setCategories(validCategories)
         
         // Khởi tạo state cho từng section
         const newSections = []
-        for (let i = 0; i < validChildCategories.length; i += categoriesPerSection) {
-          const group = validChildCategories.slice(i, i + categoriesPerSection)
+        for (let i = 0; i < validCategories.length; i += categoriesPerSection) {
+          const group = validCategories.slice(i, i + categoriesPerSection)
           newSections.push(group)
         }
         console.log('Created sections:', newSections)
