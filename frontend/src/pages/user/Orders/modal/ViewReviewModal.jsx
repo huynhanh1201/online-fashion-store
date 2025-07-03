@@ -277,7 +277,7 @@ const ViewReviewModal = ({ open, onClose, userId, productId, orderId, productNam
                 size="small"
                 sx={{ fontWeight: 600 }}
               />
-              {reviewData.moderationStatus && (
+              {/* {reviewData.moderationStatus && (
                 <Chip
                   label={
                     reviewData.moderationStatus === 'approved' ? 'Đã duyệt' :
@@ -292,7 +292,7 @@ const ViewReviewModal = ({ open, onClose, userId, productId, orderId, productNam
                   size="small"
                   variant="outlined"
                 />
-              )}
+              )} */}
             </Box>
           </Stack>
         ) : (
