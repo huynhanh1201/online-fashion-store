@@ -2,6 +2,7 @@ import React, { useEffect } from 'react'
 import AccountStatistics from './AccountStatistic'
 import useInventoryStatistics from '~/hooks/admin/useStatistic.js'
 import useRoles from '~/hooks/admin/useRoles.js'
+import { RouteGuard } from '~/components/PermissionGuard'
 
 function AccountDashboard() {
   const { accountStatistics, fetchAccountStatistics } = useInventoryStatistics()
@@ -48,7 +49,11 @@ function AccountDashboard() {
     }
   }
 
-  return <AccountStatistics statistics={statistics} />
+  return (
+    <RouteGuard requiredPermissions={['admin:access', 'userStatistics:use']}>
+      <AccountStatistics statistics={statistics} />
+    </RouteGuard>
+  )
 }
 
 export default AccountDashboard

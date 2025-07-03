@@ -10,6 +10,7 @@ import useOrder from '~/hooks/admin/useOrder'
 import useDiscounts from '~/hooks/admin/useDiscount'
 import useUsers from '~/hooks/admin/useUsers.js'
 import usePermissions from '~/hooks/usePermissions'
+import { RouteGuard } from '~/components/PermissionGuard'
 const OrderManagement = () => {
   const { hasPermission } = usePermissions()
   const [page, setPage] = React.useState(1)
@@ -161,7 +162,7 @@ const OrderManagement = () => {
     }
   }
   return (
-    <>
+    <RouteGuard requiredPermissions={['admin:access', 'order:use']}>
       <OrderTable
         orders={orders}
         loading={loading}
@@ -212,7 +213,7 @@ const OrderManagement = () => {
         onConfirm={handleDeleteOrder}
         loading={loadingDelete}
       />
-    </>
+    </RouteGuard>
   )
 }
 

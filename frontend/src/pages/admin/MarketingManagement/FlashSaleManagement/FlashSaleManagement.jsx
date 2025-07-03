@@ -57,6 +57,7 @@ import {
 import { getProducts } from '~/services/productService'
 import { getProductVariants, restoreProductVariantsOriginalDiscountPrice, updateProductVariantsDiscountPrice } from '~/services/admin/variantService'
 import usePermissions from '~/hooks/usePermissions'
+import { RouteGuard } from '~/components/PermissionGuard'
 
 
 const FlashSaleManagement = () => {
@@ -462,720 +463,722 @@ const FlashSaleManagement = () => {
   ]
 
   return (
-    <Box
-      sx={{
-        p: 3,
-        backgroundColor: '#f8fafc',
-        borderRadius: 3,
-        minHeight: '100vh'
-      }}
-    >
-      {/* Header */}
-      <Box sx={{ mb: 4 }}>
-        <Typography
-          variant='h4'
+    <RouteGuard requiredPermissions={['admin:access', 'flashsale:use']}>
+      <Box
+        sx={{
+          p: 3,
+          backgroundColor: '#f8fafc',
+          borderRadius: 3,
+          minHeight: '100vh'
+        }}
+      >
+        {/* Header */}
+        <Box sx={{ mb: 4 }}>
+          <Typography
+            variant='h4'
+            sx={{
+              fontWeight: 700,
+              color: '#1e293b',
+              mb: 1,
+              display: 'flex',
+              alignItems: 'center',
+              gap: 2
+            }}
+          >
+            <OfferIcon sx={{ fontSize: 40, color: 'var(--primary-color)' }} />
+            Quản lý chương trình khuyến mãi
+          </Typography>
+          <Typography variant='body1' color='text.secondary'>
+            Quản lý và theo dõi các chiến dịch khuyên mãi
+          </Typography>
+        </Box>
+
+        {/* Notifications */}
+        {error && (
+          <Alert
+            severity='error'
+            sx={{ mb: 3, borderRadius: 2 }}
+            onClose={() => setError('')}
+          >
+            {error}
+          </Alert>
+        )}
+
+        {success && (
+          <Alert
+            severity='success'
+            sx={{ mb: 3, borderRadius: 2 }}
+            onClose={() => setSuccess('')}
+          >
+            {success}
+          </Alert>
+        )}
+
+        {warning && (
+          <Alert
+            severity='warning'
+            sx={{ mb: 3, borderRadius: 2 }}
+            onClose={() => setWarning('')}
+          >
+            {warning}
+          </Alert>
+        )}
+
+        {editingProduct && (
+          <Alert
+            severity='info'
+            sx={{ mb: 3, borderRadius: 2 }}
+          >
+            Đang cập nhật giá Flash Sale và database...
+          </Alert>
+        )}
+
+        {/* Summary Cards */}
+        <Grid container spacing={3} sx={{ mb: 4 }}>
+          {summaryData.map((item, index) => (
+            <Grid item xs={12} sm={6} md={3} key={index}>
+              <Card
+                sx={{
+                  background: `linear-gradient(135deg, ${item.color}15 0%, ${item.color}25 100%)`,
+                  border: `1px solid ${item.color}30`,
+                  borderRadius: 3,
+                  transition: 'all 0.3s ease',
+                  '&:hover': {
+                    transform: 'translateY(-4px)',
+                    boxShadow: `0 8px 32px ${item.color}30`
+                  }
+                }}
+              >
+                <CardContent>
+                  <Stack
+                    direction='row'
+                    alignItems='center'
+                    justifyContent='space-between'
+                  >
+                    <Box>
+                      <Typography
+                        variant='h4'
+                        sx={{ fontWeight: 700, color: item.color }}
+                      >
+                        {item.value}
+                      </Typography>
+                      <Typography
+                        variant='body2'
+                        color='text.secondary'
+                        sx={{ mt: 0.5 }}
+                      >
+                        {item.title}
+                      </Typography>
+                    </Box>
+                    <Box
+                      sx={{
+                        p: 1.5,
+                        borderRadius: 2,
+                        backgroundColor: `${item.color}20`,
+                        color: item.color
+                      }}
+                    >
+                      {item.icon}
+                    </Box>
+                  </Stack>
+                </CardContent>
+              </Card>
+            </Grid>
+          ))}
+        </Grid>
+
+        {/* Action Buttons */}
+        <Box
           sx={{
-            fontWeight: 700,
-            color: '#1e293b',
-            mb: 1,
+            mb: 3,
             display: 'flex',
+            justifyContent: 'space-between',
             alignItems: 'center',
+            flexWrap: 'wrap',
             gap: 2
           }}
         >
-          <OfferIcon sx={{ fontSize: 40, color: 'var(--primary-color)' }} />
-          Quản lý chương trình khuyến mãi
-        </Typography>
-        <Typography variant='body1' color='text.secondary'>
-          Quản lý và theo dõi các chiến dịch khuyên mãi
-        </Typography>
-      </Box>
-
-      {/* Notifications */}
-      {error && (
-        <Alert
-          severity='error'
-          sx={{ mb: 3, borderRadius: 2 }}
-          onClose={() => setError('')}
-        >
-          {error}
-        </Alert>
-      )}
-
-      {success && (
-        <Alert
-          severity='success'
-          sx={{ mb: 3, borderRadius: 2 }}
-          onClose={() => setSuccess('')}
-        >
-          {success}
-        </Alert>
-      )}
-
-      {warning && (
-        <Alert
-          severity='warning'
-          sx={{ mb: 3, borderRadius: 2 }}
-          onClose={() => setWarning('')}
-        >
-          {warning}
-        </Alert>
-      )}
-
-      {editingProduct && (
-        <Alert
-          severity='info'
-          sx={{ mb: 3, borderRadius: 2 }}
-        >
-          Đang cập nhật giá Flash Sale và database...
-        </Alert>
-      )}
-
-      {/* Summary Cards */}
-      <Grid container spacing={3} sx={{ mb: 4 }}>
-        {summaryData.map((item, index) => (
-          <Grid item xs={12} sm={6} md={3} key={index}>
-            <Card
-              sx={{
-                background: `linear-gradient(135deg, ${item.color}15 0%, ${item.color}25 100%)`,
-                border: `1px solid ${item.color}30`,
-                borderRadius: 3,
-                transition: 'all 0.3s ease',
-                '&:hover': {
-                  transform: 'translateY(-4px)',
-                  boxShadow: `0 8px 32px ${item.color}30`
-                }
-              }}
-            >
-              <CardContent>
-                <Stack
-                  direction='row'
-                  alignItems='center'
-                  justifyContent='space-between'
-                >
-                  <Box>
-                    <Typography
-                      variant='h4'
-                      sx={{ fontWeight: 700, color: item.color }}
-                    >
-                      {item.value}
-                    </Typography>
-                    <Typography
-                      variant='body2'
-                      color='text.secondary'
-                      sx={{ mt: 0.5 }}
-                    >
-                      {item.title}
-                    </Typography>
-                  </Box>
-                  <Box
-                    sx={{
-                      p: 1.5,
-                      borderRadius: 2,
-                      backgroundColor: `${item.color}20`,
-                      color: item.color
-                    }}
-                  >
-                    {item.icon}
-                  </Box>
-                </Stack>
-              </CardContent>
-            </Card>
-          </Grid>
-        ))}
-      </Grid>
-
-      {/* Action Buttons */}
-      <Box
-        sx={{
-          mb: 3,
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          flexWrap: 'wrap',
-          gap: 2
-        }}
-      >
-        <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
-          {hasPermission('flashSale:create') && (
+          <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
+            {hasPermission('flashSale:create') && (
+              <Button
+                variant='contained'
+                startIcon={<AddIcon />}
+                onClick={() => {
+                  setEditCampaignData(null)
+                  setModal(true)
+                }}
+                sx={{
+                  px: 3,
+                  py: 1.5,
+                  borderRadius: 2,
+                  textTransform: 'none',
+                  fontSize: '1rem',
+                  fontWeight: 600,
+                  background: 'var(--primary-color)',
+                  boxShadow: '0 4px 16px rgba(59, 130, 246, 0.3)',
+                  '&:hover': {
+                    background: 'var(--accent-color)',
+                    boxShadow: '0 6px 20px rgba(59, 130, 246, 0.6)',
+                    transform: 'translateY(-1px)'
+                  }
+                }}
+              >
+                Thêm chiến dịch mới
+              </Button>
+            )
+            }
             <Button
-              variant='contained'
-              startIcon={<AddIcon />}
-              onClick={() => {
-                setEditCampaignData(null)
-                setModal(true)
-              }}
+              variant='outlined'
+              color='warning'
+              startIcon={<RefreshIcon />}
+              onClick={handleRestoreAllExpiredPrices}
+              disabled={restoringAllPrices}
               sx={{
-                px: 3,
-                py: 1.5,
                 borderRadius: 2,
                 textTransform: 'none',
-                fontSize: '1rem',
                 fontWeight: 600,
-                background: 'var(--primary-color)',
-                boxShadow: '0 4px 16px rgba(59, 130, 246, 0.3)',
+                borderColor: 'var(--warning-color)',
+                color: 'var(--warning-color)',
                 '&:hover': {
-                  background: 'var(--accent-color)',
-                  boxShadow: '0 6px 20px rgba(59, 130, 246, 0.6)',
-                  transform: 'translateY(-1px)'
+                  borderColor: 'var(--warning-hover-color)',
+                  backgroundColor: 'var(--warning-light-color)'
                 }
               }}
             >
-              Thêm chiến dịch mới
+              {restoringAllPrices ? 'Đang khôi phục...' : 'Khôi phục giá tất cả Flash Sale hết hạn'}
             </Button>
-          )
-          }
+          </Box >
+
           <Button
             variant='outlined'
-            color='warning'
             startIcon={<RefreshIcon />}
-            onClick={handleRestoreAllExpiredPrices}
-            disabled={restoringAllPrices}
-            sx={{
-              borderRadius: 2,
-              textTransform: 'none',
-              fontWeight: 600,
-              borderColor: 'var(--warning-color)',
-              color: 'var(--warning-color)',
-              '&:hover': {
-                borderColor: 'var(--warning-hover-color)',
-                backgroundColor: 'var(--warning-light-color)'
-              }
-            }}
-          >
-            {restoringAllPrices ? 'Đang khôi phục...' : 'Khôi phục giá tất cả Flash Sale hết hạn'}
-          </Button>
-        </Box >
-
-        <Button
-          variant='outlined'
-          startIcon={<RefreshIcon />}
-          onClick={handleRefresh}
-          disabled={refreshing}
-          sx={{
-            borderRadius: 2,
-            textTransform: 'none',
-            fontWeight: 600
-          }}
-        >
-          {refreshing ? 'Đang tải...' : 'Làm mới'}
-        </Button>
-      </Box >
-
-      <AddFlashSale
-        open={openAddModal}
-        onClose={() => setModal(false)}
-        onSave={handleAddFlashSale}
-        initialData={editCampaignData}
-      />
-
-      {/* Edit Modal */}
-      <EditFlashSaleModal
-        open={editModalOpen}
-        onClose={() => setEditModalOpen(false)}
-        product={selectedProduct}
-        onSave={handleEditSave}
-      />
-      {/* Delete Product Modal */}
-      <DeleteFlashSaleModal
-        open={deleteModal}
-        onClose={() => setDeleteModalOpen(false)}
-        product={selectedProduct}
-        onDelete={handleDeleteConfirm}
-      />
-      {/* Delete Campaign Modal */}
-      <Dialog
-        open={deleteCampaignModalOpen}
-        onClose={() => setDeleteModal(false)}
-        maxWidth='sm'
-        fullWidth
-      >
-        <DialogTitle
-          sx={{
-            backgroundColor: '#f8fafc',
-            borderBottom: '1px solid #e2e8f0',
-            py: 2,
-            fontWeight: 700,
-            color: '#1e293b'
-          }}
-        >
-          Xác nhận xóa chiến dịch
-        </DialogTitle>
-        <DialogContent sx={{ py: 3 }}>
-          <Typography variant='body1'>
-            Bạn có chắc chắn muốn xóa chiến dịch{' '}
-            <strong>{deleteCampaign?.title}</strong> (ID: {deleteCampaign?.id})?
-            Hành động này không thể hoàn tác.
-          </Typography>
-        </DialogContent>
-        <DialogActions
-          sx={{
-            p: 2,
-            backgroundColor: '#f8fafc',
-            borderTop: '1px solid #e2e8f0'
-          }}
-        >
-          <Button
-            onClick={() => setDeleteModal(false)}
-            sx={{
-              borderRadius: 2,
-              textTransform: 'none',
-              fontWeight: 600,
-              color: '#64748b'
-            }}
-          >
-            Hủy
-          </Button>
-          <Button
-            variant='contained'
-            color='error'
-            onClick={handleDeleteCampaignConfirm}
+            onClick={handleRefresh}
+            disabled={refreshing}
             sx={{
               borderRadius: 2,
               textTransform: 'none',
               fontWeight: 600
             }}
           >
-            Xóa
+            {refreshing ? 'Đang tải...' : 'Làm mới'}
           </Button>
-        </DialogActions>
-      </Dialog>
+        </Box >
 
-      {/* Campaign List */}
-      <Card
-        sx={{
-          borderRadius: 3,
-          boxShadow: '0 4px 24px rgba(0,0,0,0.06)',
-          border: '1px solid #e2e8f0'
-        }}
-      >
-        {loading ? (
-          <Box sx={{ p: 4, textAlign: 'center' }}>
-            Đang tải dữ liệu Flash Sale...
-          </Box>
-        ) : error ? (
-          <Box sx={{ p: 4, textAlign: 'center', color: 'red' }}>{error}</Box>
-        ) : campaigns.length === 0 ? (
-          <Box sx={{ p: 4, textAlign: 'center' }}>
-            <Typography variant='body1' color='text.secondary'>
-              Chưa có chiến dịch Flash Sale nào.
+        <AddFlashSale
+          open={openAddModal}
+          onClose={() => setModal(false)}
+          onSave={handleAddFlashSale}
+          initialData={editCampaignData}
+        />
+
+        {/* Edit Modal */}
+        <EditFlashSaleModal
+          open={editModalOpen}
+          onClose={() => setEditModalOpen(false)}
+          product={selectedProduct}
+          onSave={handleEditSave}
+        />
+        {/* Delete Product Modal */}
+        <DeleteFlashSaleModal
+          open={deleteModal}
+          onClose={() => setDeleteModalOpen(false)}
+          product={selectedProduct}
+          onDelete={handleDeleteConfirm}
+        />
+        {/* Delete Campaign Modal */}
+        <Dialog
+          open={deleteCampaignModalOpen}
+          onClose={() => setDeleteModal(false)}
+          maxWidth='sm'
+          fullWidth
+        >
+          <DialogTitle
+            sx={{
+              backgroundColor: '#f8fafc',
+              borderBottom: '1px solid #e2e8f0',
+              py: 2,
+              fontWeight: 700,
+              color: '#1e293b'
+            }}
+          >
+            Xác nhận xóa chiến dịch
+          </DialogTitle>
+          <DialogContent sx={{ py: 3 }}>
+            <Typography variant='body1'>
+              Bạn có chắc chắn muốn xóa chiến dịch{' '}
+              <strong>{deleteCampaign?.title}</strong> (ID: {deleteCampaign?.id})?
+              Hành động này không thể hoàn tác.
             </Typography>
-          </Box>
-        ) : (
-          campaigns.map((campaign) => (
-            <Accordion key={campaign.id}>
-              <AccordionSummary
-                expandIcon={<ExpandMoreIcon />}
-                sx={{
-                  backgroundColor: '#f8f6fc',
-                  '&:hover': {
-                    backgroundColor: alpha(theme.palette.primary.main, 0.04)
-                  }
-                }}
-              >
-                <Box
+          </DialogContent>
+          <DialogActions
+            sx={{
+              p: 2,
+              backgroundColor: '#f8fafc',
+              borderTop: '1px solid #e2e8f0'
+            }}
+          >
+            <Button
+              onClick={() => setDeleteModal(false)}
+              sx={{
+                borderRadius: 2,
+                textTransform: 'none',
+                fontWeight: 600,
+                color: '#64748b'
+              }}
+            >
+              Hủy
+            </Button>
+            <Button
+              variant='contained'
+              color='error'
+              onClick={handleDeleteCampaignConfirm}
+              sx={{
+                borderRadius: 2,
+                textTransform: 'none',
+                fontWeight: 600
+              }}
+            >
+              Xóa
+            </Button>
+          </DialogActions>
+        </Dialog>
+
+        {/* Campaign List */}
+        <Card
+          sx={{
+            borderRadius: 3,
+            boxShadow: '0 4px 24px rgba(0,0,0,0.06)',
+            border: '1px solid #e2e8f0'
+          }}
+        >
+          {loading ? (
+            <Box sx={{ p: 4, textAlign: 'center' }}>
+              Đang tải dữ liệu Flash Sale...
+            </Box>
+          ) : error ? (
+            <Box sx={{ p: 4, textAlign: 'center', color: 'red' }}>{error}</Box>
+          ) : campaigns.length === 0 ? (
+            <Box sx={{ p: 4, textAlign: 'center' }}>
+              <Typography variant='body1' color='text.secondary'>
+                Chưa có chiến dịch Flash Sale nào.
+              </Typography>
+            </Box>
+          ) : (
+            campaigns.map((campaign) => (
+              <Accordion key={campaign.id}>
+                <AccordionSummary
+                  expandIcon={<ExpandMoreIcon />}
                   sx={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 2,
-                    width: '100%'
+                    backgroundColor: '#f8f6fc',
+                    '&:hover': {
+                      backgroundColor: alpha(theme.palette.primary.main, 0.04)
+                    }
                   }}
                 >
-                  <Typography variant='h6' sx={{ fontWeight: 600, flex: 1 }}>
-                    {campaign.title} (ID: {campaign.id})
-                  </Typography>
-                  <Stack direction='row' spacing={1} alignItems='center'>
-                    <Tooltip
-                      title={
-                        campaign.enabled ? 'Tắt chiến dịch' : 'Bật chiến dịch'
-                      }
-                    >
-                      <Switch
-                        checked={campaign.enabled}
-                        onChange={() => handleToggleCampaign(campaign)}
-                        color='primary'
-                      />
-                    </Tooltip>
-
-                    {/* Nút khôi phục giá cho campaign hết thời gian */}
-                    {campaign.status === 'expired' && (
-                      <Tooltip title='Khôi phục giá về ban đầu'>
-                        <IconButton
-                          size='small'
-                          sx={{
-                            color: '#ed6c02',
-                            '&:hover': { backgroundColor: '#fff3e0' }
-                          }}
-                          onClick={(e) => {
-                            e.stopPropagation()
-                            handleRestoreCampaignPrices(campaign)
-                          }}
-                        >
-                          <RefreshIcon fontSize='small' />
-                        </IconButton>
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 2,
+                      width: '100%'
+                    }}
+                  >
+                    <Typography variant='h6' sx={{ fontWeight: 600, flex: 1 }}>
+                      {campaign.title} (ID: {campaign.id})
+                    </Typography>
+                    <Stack direction='row' spacing={1} alignItems='center'>
+                      <Tooltip
+                        title={
+                          campaign.enabled ? 'Tắt chiến dịch' : 'Bật chiến dịch'
+                        }
+                      >
+                        <Switch
+                          checked={campaign.enabled}
+                          onChange={() => handleToggleCampaign(campaign)}
+                          color='primary'
+                        />
                       </Tooltip>
-                    )}
-                    {
-                      hasPermission('flashSale:update') && (
-                        <Tooltip title='Chỉnh sửa chiến dịch'>
+
+                      {/* Nút khôi phục giá cho campaign hết thời gian */}
+                      {campaign.status === 'expired' && (
+                        <Tooltip title='Khôi phục giá về ban đầu'>
                           <IconButton
                             size='small'
-                            disabled={editingProduct}
                             sx={{
-                              color: '#3b82f6',
-                              '&:hover': { backgroundColor: '#dbeafe' },
-                              '&:disabled': { opacity: 0.5 }
+                              color: '#ed6c02',
+                              '&:hover': { backgroundColor: '#fff3e0' }
                             }}
                             onClick={(e) => {
                               e.stopPropagation()
-                              handleEditCampaign(campaign)
+                              handleRestoreCampaignPrices(campaign)
                             }}
                           >
-                            <EditIcon fontSize='small' />
+                            <RefreshIcon fontSize='small' />
                           </IconButton>
                         </Tooltip>
                       )}
-                    {/* Nút kết thúc sớm chỉ hiển thị cho chiến dịch đang hoạt động */}
-                    {(campaign.status === 'active' || campaign.status === 'upcoming') && (
-                      <Tooltip title='Kết thúc sớm'>
-                        <IconButton
-                          size='small'
-                          sx={{
-                            color: '#f59e0b',
-                            '&:hover': { backgroundColor: '#fef3c7' }
-                          }}
-                          onClick={(e) => {
-                            e.stopPropagation()
-                            handleEndCampaignEarly(campaign)
-                          }}
-                        >
-                          <StopIcon fontSize='small' />
-                        </IconButton>
-                      </Tooltip>
-                    )}
-                    {/* Nút xóa chỉ hiển thị cho chiến dịch đã kết thúc hoặc bị tắt */}
-
-                    {hasPermission('flashSale:delete') && (campaign.status === 'expired' || campaign.status === 'disabled') && (
-
-                      <Tooltip title='Xóa chiến dịch'>
-                        <IconButton
-                          size='small'
-                          sx={{
-                            color: '#ef4444',
-                            '&:hover': { backgroundColor: '#fee2e2' }
-                          }}
-                          onClick={(e) => {
-                            e.stopPropagation()
-                            handleDeleteCampaignClick(campaign)
-                          }}
-                        >
-                          <DeleteIcon fontSize='small' />
-                        </IconButton>
-                      </Tooltip>
-                    )
-                    }
-                    <Chip
-                      label={getStatusLabel(campaign.status)}
-                      color={getStatusColor(campaign.status)}
-                      size='small'
-                      sx={{ fontWeight: 600, borderRadius: 2 }}
-                    />
-                  </Stack >
-                </Box >
-              </AccordionSummary >
-              <AccordionDetails>
-                <Box sx={{ mb: 2 }}>
-                  <Typography variant='body2' color='text.secondary'>
-                    Bắt đầu:{' '}
-                    {campaign.startTime
-                      ? formatTime(campaign.startTime)
-                      : '---'}
-                  </Typography>
-                  <Typography variant='body2' color='text.secondary'>
-                    Kết thúc:{' '}
-                    {campaign.endTime ? formatTime(campaign.endTime) : '---'}
-                  </Typography>
-                </Box>
-                <TableContainer component={Paper}>
-                  <Table>
-                    <TableHead>
-                      <TableRow sx={{ backgroundColor: '#f8fafc' }}>
-                        <TableCell
-                          sx={{ fontWeight: 700, color: '#334155', py: 2 }}
-                        >
-                          Sản phẩm
-                        </TableCell>
-                        <TableCell
-                          sx={{ fontWeight: 700, color: '#334155', py: 2 }}
-                        >
-                          Giá gốc
-                        </TableCell>
-                        <TableCell
-                          sx={{ fontWeight: 700, color: '#334155', py: 2 }}
-                        >
-                          Giá giảm ban đầu
-                        </TableCell>
-                        <TableCell
-                          sx={{ fontWeight: 700, color: '#334155', py: 2 }}
-                        >
-                          Giá giảm hiện tại
-                        </TableCell>
-                        <TableCell
-                          sx={{ fontWeight: 700, color: '#334155', py: 2 }}
-                        >
-                          Giảm giá
-                        </TableCell>
-                        <TableCell
-                          sx={{ fontWeight: 700, color: '#334155', py: 2 }}
-                        >
-                          Số lượng
-                        </TableCell>
-                        <TableCell
-                          sx={{ fontWeight: 700, color: '#334155', py: 2 }}
-                        >
-                          Thao tác
-                        </TableCell>
-                      </TableRow>
-                    </TableHead>
-                    <TableBody>
-                      {campaign.products.map((item, index) => (
-                        <TableRow
-                          key={item.productId || index}
-                          sx={{
-                            '&:hover': {
-                              backgroundColor: alpha(
-                                theme.palette.primary.main,
-                                0.04
-                              )
-                            },
-                            '&:last-child td, &:last-child th': { border: 0 }
-                          }}
-                        >
-                          <TableCell sx={{ py: 2 }}>
-                            <Typography
-                              variant='body1'
-                              sx={{ fontWeight: 600, color: '#1e293b' }}
-                            >
-                              {item.productName}
-                            </Typography>
-                            <Typography
-                              variant='caption'
-                              color='text.secondary'
-                            >
-                              ID: {item.productId}
-                            </Typography>
-                          </TableCell>
-                          <TableCell sx={{ py: 2 }}>
-                            <Typography
-                              variant='body1'
+                      {
+                        hasPermission('flashSale:update') && (
+                          <Tooltip title='Chỉnh sửa chiến dịch'>
+                            <IconButton
+                              size='small'
+                              disabled={editingProduct}
                               sx={{
-                                color: '#64748b',
-                                textDecoration: 'line-through'
+                                color: '#3b82f6',
+                                '&:hover': { backgroundColor: '#dbeafe' },
+                                '&:disabled': { opacity: 0.5 }
+                              }}
+                              onClick={(e) => {
+                                e.stopPropagation()
+                                handleEditCampaign(campaign)
                               }}
                             >
-                              {item.originalPrice != null
-                                ? Number(item.originalPrice).toLocaleString()
-                                : '---'}
-                              đ
-                            </Typography>
+                              <EditIcon fontSize='small' />
+                            </IconButton>
+                          </Tooltip>
+                        )}
+                      {/* Nút kết thúc sớm chỉ hiển thị cho chiến dịch đang hoạt động */}
+                      {(campaign.status === 'active' || campaign.status === 'upcoming') && (
+                        <Tooltip title='Kết thúc sớm'>
+                          <IconButton
+                            size='small'
+                            sx={{
+                              color: '#f59e0b',
+                              '&:hover': { backgroundColor: '#fef3c7' }
+                            }}
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              handleEndCampaignEarly(campaign)
+                            }}
+                          >
+                            <StopIcon fontSize='small' />
+                          </IconButton>
+                        </Tooltip>
+                      )}
+                      {/* Nút xóa chỉ hiển thị cho chiến dịch đã kết thúc hoặc bị tắt */}
+
+                      {hasPermission('flashSale:delete') && (campaign.status === 'expired' || campaign.status === 'disabled') && (
+
+                        <Tooltip title='Xóa chiến dịch'>
+                          <IconButton
+                            size='small'
+                            sx={{
+                              color: '#ef4444',
+                              '&:hover': { backgroundColor: '#fee2e2' }
+                            }}
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              handleDeleteCampaignClick(campaign)
+                            }}
+                          >
+                            <DeleteIcon fontSize='small' />
+                          </IconButton>
+                        </Tooltip>
+                      )
+                      }
+                      <Chip
+                        label={getStatusLabel(campaign.status)}
+                        color={getStatusColor(campaign.status)}
+                        size='small'
+                        sx={{ fontWeight: 600, borderRadius: 2 }}
+                      />
+                    </Stack >
+                  </Box >
+                </AccordionSummary >
+                <AccordionDetails>
+                  <Box sx={{ mb: 2 }}>
+                    <Typography variant='body2' color='text.secondary'>
+                      Bắt đầu:{' '}
+                      {campaign.startTime
+                        ? formatTime(campaign.startTime)
+                        : '---'}
+                    </Typography>
+                    <Typography variant='body2' color='text.secondary'>
+                      Kết thúc:{' '}
+                      {campaign.endTime ? formatTime(campaign.endTime) : '---'}
+                    </Typography>
+                  </Box>
+                  <TableContainer component={Paper}>
+                    <Table>
+                      <TableHead>
+                        <TableRow sx={{ backgroundColor: '#f8fafc' }}>
+                          <TableCell
+                            sx={{ fontWeight: 700, color: '#334155', py: 2 }}
+                          >
+                            Sản phẩm
                           </TableCell>
-                          <TableCell sx={{ py: 2 }}>
-                            <Typography
-                              variant='body1'
-                              sx={{
-                                fontWeight: 600,
-                                color: '#059669',
-                                fontSize: '1rem'
-                              }}
-                            >
-                              {item.originalDiscountPrice != null && item.originalDiscountPrice > 0
-                                ? Number(item.originalDiscountPrice).toLocaleString()
-                                : 'Chưa có'}
-                              {item.originalDiscountPrice > 0 && ' đ'}
-                            </Typography>
-                            {item.originalDiscountPrice > 0 && (
+                          <TableCell
+                            sx={{ fontWeight: 700, color: '#334155', py: 2 }}
+                          >
+                            Giá gốc
+                          </TableCell>
+                          <TableCell
+                            sx={{ fontWeight: 700, color: '#334155', py: 2 }}
+                          >
+                            Giá giảm ban đầu
+                          </TableCell>
+                          <TableCell
+                            sx={{ fontWeight: 700, color: '#334155', py: 2 }}
+                          >
+                            Giá giảm hiện tại
+                          </TableCell>
+                          <TableCell
+                            sx={{ fontWeight: 700, color: '#334155', py: 2 }}
+                          >
+                            Giảm giá
+                          </TableCell>
+                          <TableCell
+                            sx={{ fontWeight: 700, color: '#334155', py: 2 }}
+                          >
+                            Số lượng
+                          </TableCell>
+                          <TableCell
+                            sx={{ fontWeight: 700, color: '#334155', py: 2 }}
+                          >
+                            Thao tác
+                          </TableCell>
+                        </TableRow>
+                      </TableHead>
+                      <TableBody>
+                        {campaign.products.map((item, index) => (
+                          <TableRow
+                            key={item.productId || index}
+                            sx={{
+                              '&:hover': {
+                                backgroundColor: alpha(
+                                  theme.palette.primary.main,
+                                  0.04
+                                )
+                              },
+                              '&:last-child td, &:last-child th': { border: 0 }
+                            }}
+                          >
+                            <TableCell sx={{ py: 2 }}>
+                              <Typography
+                                variant='body1'
+                                sx={{ fontWeight: 600, color: '#1e293b' }}
+                              >
+                                {item.productName}
+                              </Typography>
+                              <Typography
+                                variant='caption'
+                                color='text.secondary'
+                              >
+                                ID: {item.productId}
+                              </Typography>
+                            </TableCell>
+                            <TableCell sx={{ py: 2 }}>
+                              <Typography
+                                variant='body1'
+                                sx={{
+                                  color: '#64748b',
+                                  textDecoration: 'line-through'
+                                }}
+                              >
+                                {item.originalPrice != null
+                                  ? Number(item.originalPrice).toLocaleString()
+                                  : '---'}
+                                đ
+                              </Typography>
+                            </TableCell>
+                            <TableCell sx={{ py: 2 }}>
+                              <Typography
+                                variant='body1'
+                                sx={{
+                                  fontWeight: 600,
+                                  color: '#059669',
+                                  fontSize: '1rem'
+                                }}
+                              >
+                                {item.originalDiscountPrice != null && item.originalDiscountPrice > 0
+                                  ? Number(item.originalDiscountPrice).toLocaleString()
+                                  : 'Chưa có'}
+                                {item.originalDiscountPrice > 0 && ' đ'}
+                              </Typography>
+                              {item.originalDiscountPrice > 0 && (
+                                <Typography
+                                  variant='caption'
+                                  sx={{
+                                    color: '#6b7280',
+                                    fontStyle: 'italic'
+                                  }}
+                                >
+                                  Giá giảm trước
+                                </Typography>
+                              )}
+                            </TableCell>
+                            <TableCell sx={{ py: 2 }}>
+                              <Typography
+                                variant='body1'
+                                sx={{
+                                  fontWeight: 700,
+                                  color: '#dc2626',
+                                  fontSize: '1.1rem'
+                                }}
+                              >
+                                {item.flashPrice != null
+                                  ? Number(item.flashPrice).toLocaleString()
+                                  : '---'}
+                                đ
+                              </Typography>
+                              <Typography
+                                variant='caption'
+                                sx={{
+                                  color: '#dc2626',
+                                  fontWeight: 600
+                                }}
+                              >
+                                Giá giảm sau
+                              </Typography>
+                            </TableCell>
+                            <TableCell sx={{ py: 2 }}>
+                              <Stack spacing={0.5}>
+                                {/* Giảm giá so với giá gốc */}
+                                <Chip
+                                  label={`-${calculateDiscount(item.originalPrice, item.flashPrice)}%`}
+                                  size='small'
+                                  sx={{
+                                    backgroundColor: '#fef2f2',
+                                    color: '#dc2626',
+                                    fontWeight: 600,
+                                    border: '1px solid #fecaca'
+                                  }}
+                                />
+                                {/* Giảm giá so với giá ban đầu (nếu có) */}
+                                {item.originalDiscountPrice > 0 && (
+                                  <Chip
+                                    label={`-${calculateDiscount(item.originalDiscountPrice, item.flashPrice)}%`}
+                                    size='small'
+                                    sx={{
+                                      backgroundColor: '#f0fdf4',
+                                      color: '#059669',
+                                      fontWeight: 600,
+                                      border: '1px solid #bbf7d0',
+                                      fontSize: '0.7rem'
+                                    }}
+                                  />
+                                )}
+                              </Stack>
                               <Typography
                                 variant='caption'
                                 sx={{
                                   color: '#6b7280',
-                                  fontStyle: 'italic'
+                                  display: 'block',
+                                  mt: 0.5
                                 }}
                               >
-                                Giá giảm trước
+                                {item.originalDiscountPrice > 0
+                                  ? 'So với giá gốc / So với giá ban đầu'
+                                  : 'So với giá gốc'
+                                }
                               </Typography>
-                            )}
-                          </TableCell>
-                          <TableCell sx={{ py: 2 }}>
-                            <Typography
-                              variant='body1'
-                              sx={{
-                                fontWeight: 700,
-                                color: '#dc2626',
-                                fontSize: '1.1rem'
-                              }}
-                            >
-                              {item.flashPrice != null
-                                ? Number(item.flashPrice).toLocaleString()
-                                : '---'}
-                              đ
-                            </Typography>
-                            <Typography
-                              variant='caption'
-                              sx={{
-                                color: '#dc2626',
-                                fontWeight: 600
-                              }}
-                            >
-                              Giá giảm sau
-                            </Typography>
-                          </TableCell>
-                          <TableCell sx={{ py: 2 }}>
-                            <Stack spacing={0.5}>
-                              {/* Giảm giá so với giá gốc */}
-                              <Chip
-                                label={`-${calculateDiscount(item.originalPrice, item.flashPrice)}%`}
-                                size='small'
+                            </TableCell>
+                            <TableCell sx={{ py: 2 }}>
+                              <Box
                                 sx={{
-                                  backgroundColor: '#fef2f2',
-                                  color: '#dc2626',
-                                  fontWeight: 600,
-                                  border: '1px solid #fecaca'
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  gap: 1
                                 }}
-                              />
-                              {/* Giảm giá so với giá ban đầu (nếu có) */}
-                              {item.originalDiscountPrice > 0 && (
-                                <Chip
-                                  label={`-${calculateDiscount(item.originalDiscountPrice, item.flashPrice)}%`}
-                                  size='small'
-                                  sx={{
-                                    backgroundColor: '#f0fdf4',
-                                    color: '#059669',
-                                    fontWeight: 600,
-                                    border: '1px solid #bbf7d0',
-                                    fontSize: '0.7rem'
-                                  }}
-                                />
-                              )}
-                            </Stack>
-                            <Typography
-                              variant='caption'
-                              sx={{
-                                color: '#6b7280',
-                                display: 'block',
-                                mt: 0.5
-                              }}
-                            >
-                              {item.originalDiscountPrice > 0
-                                ? 'So với giá gốc / So với giá ban đầu'
-                                : 'So với giá gốc'
-                              }
-                            </Typography>
-                          </TableCell>
-                          <TableCell sx={{ py: 2 }}>
-                            <Box
-                              sx={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: 1
-                              }}
-                            >
-                              <InventoryIcon
-                                sx={{ fontSize: 16, color: '#6b7280' }}
-                              />
-                              <Typography
-                                variant='body2'
-                                sx={{ fontWeight: 600 }}
                               >
-                                {item.stock != null ? item.stock : 0}
-                              </Typography>
-                            </Box>
-                          </TableCell>
-                          <TableCell sx={{ py: 2 }}>
-                            <Stack direction='row' spacing={1}>
-                              {/* Nút khôi phục giá cho sản phẩm trong Flash Sale hết thời gian */}
-                              {campaign.status === 'expired' && (
-                                <Tooltip title='Khôi phục giá về ban đầu'>
-                                  <IconButton
-                                    size='small'
-                                    sx={{
-                                      color: '#ed6c02',
-                                      '&:hover': { backgroundColor: '#fff3e0' }
-                                    }}
-                                    onClick={() =>
-                                      handleRestorePricesForCampaign(campaign.id, item.productId)
-                                    }
-                                    disabled={restoringPrices[campaign.id]}
-                                  >
-                                    <RefreshIcon fontSize='small' />
-                                  </IconButton>
-                                </Tooltip>
-                              )}
-                              {hasPermission('flashSale:update') && (
+                                <InventoryIcon
+                                  sx={{ fontSize: 16, color: '#6b7280' }}
+                                />
+                                <Typography
+                                  variant='body2'
+                                  sx={{ fontWeight: 600 }}
+                                >
+                                  {item.stock != null ? item.stock : 0}
+                                </Typography>
+                              </Box>
+                            </TableCell>
+                            <TableCell sx={{ py: 2 }}>
+                              <Stack direction='row' spacing={1}>
+                                {/* Nút khôi phục giá cho sản phẩm trong Flash Sale hết thời gian */}
+                                {campaign.status === 'expired' && (
+                                  <Tooltip title='Khôi phục giá về ban đầu'>
+                                    <IconButton
+                                      size='small'
+                                      sx={{
+                                        color: '#ed6c02',
+                                        '&:hover': { backgroundColor: '#fff3e0' }
+                                      }}
+                                      onClick={() =>
+                                        handleRestorePricesForCampaign(campaign.id, item.productId)
+                                      }
+                                      disabled={restoringPrices[campaign.id]}
+                                    >
+                                      <RefreshIcon fontSize='small' />
+                                    </IconButton>
+                                  </Tooltip>
+                                )}
+                                {hasPermission('flashSale:update') && (
 
-                                <Tooltip title='Chỉnh sửa'>
-                                  <IconButton
-                                    size='small'
-                                    disabled={editingProduct}
-                                    sx={{
-                                      color: '#3b82f6',
-                                      '&:hover': { backgroundColor: '#dbeafe' },
-                                      '&:disabled': { opacity: 0.5 }
-                                    }}
-                                    onClick={() =>
-                                      handleEditClick(item, campaign.id)
-                                    }
-                                  >
-                                    <EditIcon fontSize='small' />
-                                  </IconButton>
-                                </Tooltip>
-                              )}
-                              {/* Nút kết thúc sớm chỉ hiển thị cho sản phẩm trong chiến dịch đang hoạt động */}
-                              {(campaign.status === 'active' || campaign.status === 'upcoming') && (
-                                <Tooltip title='Kết thúc sớm sản phẩm này'>
-                                  <IconButton
-                                    size='small'
-                                    sx={{
-                                      color: '#f59e0b',
-                                      '&:hover': { backgroundColor: '#fef3c7' }
-                                    }}
-                                    onClick={() =>
-                                      handleEndCampaignEarly(campaign)
-                                    }
-                                  >
-                                    <StopIcon fontSize='small' />
-                                  </IconButton>
-                                </Tooltip>
-                              )}
-                              {/* Nút xóa chỉ hiển thị cho sản phẩm trong chiến dịch đã kết thúc hoặc bị tắt */}
-                              {hasPermission('flashSale:deldete') && (campaign.status === 'expired' || campaign.status === 'disabled') && (
-                                <Tooltip title='Xóa'>
-                                  <IconButton
-                                    size='small'
-                                    sx={{
-                                      color: '#ef4444',
-                                      '&:hover': { backgroundColor: '#fee2e2' }
-                                    }}
-                                    onClick={() =>
-                                      handleDeleteClick(item, campaign.id)
-                                    }
-                                  >
-                                    <DeleteIcon fontSize='small' />
-                                  </IconButton>
-                                </Tooltip>
-                              )}
-                            </Stack>
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </TableContainer>
-              </AccordionDetails>
-            </Accordion >
-          ))
-        )}
-      </Card >
-    </Box >
+                                  <Tooltip title='Chỉnh sửa'>
+                                    <IconButton
+                                      size='small'
+                                      disabled={editingProduct}
+                                      sx={{
+                                        color: '#3b82f6',
+                                        '&:hover': { backgroundColor: '#dbeafe' },
+                                        '&:disabled': { opacity: 0.5 }
+                                      }}
+                                      onClick={() =>
+                                        handleEditClick(item, campaign.id)
+                                      }
+                                    >
+                                      <EditIcon fontSize='small' />
+                                    </IconButton>
+                                  </Tooltip>
+                                )}
+                                {/* Nút kết thúc sớm chỉ hiển thị cho sản phẩm trong chiến dịch đang hoạt động */}
+                                {(campaign.status === 'active' || campaign.status === 'upcoming') && (
+                                  <Tooltip title='Kết thúc sớm sản phẩm này'>
+                                    <IconButton
+                                      size='small'
+                                      sx={{
+                                        color: '#f59e0b',
+                                        '&:hover': { backgroundColor: '#fef3c7' }
+                                      }}
+                                      onClick={() =>
+                                        handleEndCampaignEarly(campaign)
+                                      }
+                                    >
+                                      <StopIcon fontSize='small' />
+                                    </IconButton>
+                                  </Tooltip>
+                                )}
+                                {/* Nút xóa chỉ hiển thị cho sản phẩm trong chiến dịch đã kết thúc hoặc bị tắt */}
+                                {hasPermission('flashSale:deldete') && (campaign.status === 'expired' || campaign.status === 'disabled') && (
+                                  <Tooltip title='Xóa'>
+                                    <IconButton
+                                      size='small'
+                                      sx={{
+                                        color: '#ef4444',
+                                        '&:hover': { backgroundColor: '#fee2e2' }
+                                      }}
+                                      onClick={() =>
+                                        handleDeleteClick(item, campaign.id)
+                                      }
+                                    >
+                                      <DeleteIcon fontSize='small' />
+                                    </IconButton>
+                                  </Tooltip>
+                                )}
+                              </Stack>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </TableContainer>
+                </AccordionDetails>
+              </Accordion >
+            ))
+          )}
+        </Card>
+      </Box>
+    </RouteGuard>
   )
 }
 

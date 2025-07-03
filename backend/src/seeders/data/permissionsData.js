@@ -399,7 +399,7 @@ export const permissions = [
   {
     key: 'coupon:use',
     label: 'Sử dụng trang mã giảm giá',
-    group: 'Khuyến mãi'
+    group: 'Mã giảm giá'
   },
   { key: 'coupon:read', label: 'Xem mã giảm giá', group: 'Mã giảm giá' },
   { key: 'coupon:create', label: 'Tạo mã giảm giá', group: 'Mã giảm giá' },

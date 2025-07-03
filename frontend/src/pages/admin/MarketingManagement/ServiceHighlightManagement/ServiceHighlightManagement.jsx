@@ -42,6 +42,7 @@ import {
 } from '~/services/admin/webConfig/highlightedService.js'
 import { optimizeCloudinaryUrl } from '~/utils/cloudinary.js'
 import usePermissions from '~/hooks/usePermissions'
+import { RouteGuard } from '~/components/PermissionGuard'
 
 const ServiceHighlightManagement = () => {
   const theme = useTheme()
@@ -169,8 +170,9 @@ const ServiceHighlightManagement = () => {
   )
 
   return (
-    <Box
-      sx={{
+    <RouteGuard requiredPermissions={['admin:access', 'service:use']}>
+      <Box
+        sx={{
         p: 3,
         backgroundColor: '#f8fafc',
         borderRadius: 3,
@@ -635,7 +637,8 @@ const ServiceHighlightManagement = () => {
           </Button>
         </DialogActions>
       </Dialog>
-    </Box>
+      </Box>
+    </RouteGuard>
   )
 }
 

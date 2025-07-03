@@ -118,12 +118,12 @@ export default function AdminDrawer({
             path: '/admin/account-statistic'
           },
           {
-            permission: 'role:use',
+            permission: 'user:use',
             label: 'Tài khoản khách hàng',
             path: '/admin/user-management'
           },
           {
-            permission: 'role:use',
+            permission: 'account:use',
             label: 'Tài khoản hệ thống',
             path: '/admin/account-management'
           },

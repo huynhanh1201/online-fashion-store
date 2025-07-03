@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import useInventoryStatistics from '~/hooks/admin/useStatistic.js'
 import SystemDashboard from '~/pages/admin/Home/SystemDashboard.jsx'
 import ProfitChartByMonth from '~/pages/admin/Home/Chart/ProfitChartByMonth.jsx'
+import { RouteGuard } from '~/components/PermissionGuard'
 
 const AdminHome = () => {
   const currentYear = new Date().getFullYear()
@@ -32,7 +33,7 @@ const AdminHome = () => {
     fetchFinanceStatistics(year)
   }, [year])
   return (
-    <>
+    <RouteGuard requiredPermissions={['admin:access', 'statistics:use']}>
       <SystemDashboard
         loading={loading}
         accountStatistics={accountStatistics}
@@ -41,7 +42,7 @@ const AdminHome = () => {
         orderStatistics={orderStatistics}
         financeStatistics={financeStatistics}
       />
-    </>
+    </RouteGuard>
   )
 }
 
