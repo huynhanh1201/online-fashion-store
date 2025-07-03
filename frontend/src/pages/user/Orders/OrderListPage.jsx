@@ -781,7 +781,7 @@ const OrderListPage = () => {
 
   if (loading) {
     return (
-      <Container maxWidth="xl" sx={{ py: 4 }}>
+      <Container maxWidth={false} sx={{ width: '96vw', maxWidth: '1800px', margin: '0 auto', py: 4 }}>
         <Box display="flex" flexDirection="column" alignItems="center" gap={2}>
           <CircularProgress size={50} />
           <Typography variant="h6" color="text.secondary">
@@ -793,7 +793,10 @@ const OrderListPage = () => {
   }
 
   return (
-    <Container maxWidth="xl" sx={{
+    <Container maxWidth={false} sx={{
+      width: '96vw',
+      maxWidth: '1800px',
+      margin: '0 auto',
       py: 4,
       minHeight: '70vh',
       // Thêm CSS animation cho skeleton

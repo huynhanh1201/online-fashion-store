@@ -40,6 +40,9 @@ import { API_ROOT } from '~/utils/constants.js'
 
 // Styled Components
 const StyledContainer = styled(Container)(({ theme }) => ({
+  width: '96vw',
+  maxWidth: '1800px',
+  margin: '0 auto',
   minHeight: '100vh',
   paddingTop: theme.spacing(4),
   paddingBottom: theme.spacing(4),
@@ -763,7 +766,7 @@ const Payment = () => {
   }
 
   return (
-    <StyledContainer maxWidth="xl">
+    <StyledContainer maxWidth={false}>
       {cartLoading ? (
         <Box sx={{
           display: 'flex',

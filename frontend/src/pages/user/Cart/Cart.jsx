@@ -437,8 +437,11 @@ const Cart = () => {
   if (loading) {
     return (
       <Container
-        maxWidth="xl"
+        maxWidth={false}
         sx={{
+          width: '96vw',
+          maxWidth: '1800px',
+          margin: '0 auto',
           height: '70vh',
           display: 'flex',
           justifyContent: 'center',
@@ -467,8 +470,11 @@ const Cart = () => {
 
   return (
     <Container
-      maxWidth="xl"
+      maxWidth={false}
       sx={{
+        width: '96vw',
+        maxWidth: '1800px',
+        margin: '0 auto',
         minHeight: '70vh',
         mt: { xs: 10, md: 16 },
         mb: { xs: 3, md: 5 },

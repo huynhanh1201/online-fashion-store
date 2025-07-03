@@ -587,7 +587,7 @@ const OrderDetail = () => {
   }
 
   return (
-    <Box maxWidth="xl" mx="auto" p={3} sx={{ minHeight: '70vh' }}>
+    <Box sx={{ width: '96vw', maxWidth: '1800px', margin: '0 auto', p: 3, minHeight: '70vh' }}>
       <Card
         sx={{
           borderRadius: 3,

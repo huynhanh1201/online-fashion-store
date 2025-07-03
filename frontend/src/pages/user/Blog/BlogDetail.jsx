@@ -382,7 +382,7 @@ const BlogDetail = () => {
                   <Skeleton
                     variant="rectangular"
                     width="100%"
-                    height={{ xs: 360, sm: 420, md: 480 }}
+                    height={{ xs: 480, sm: 600, md: 750 }}
                   />
                   <CardContent>
                     <Skeleton variant="text" width={80} height={20} sx={{ mb: 2 }} />
@@ -636,7 +636,7 @@ const BlogDetail = () => {
                     )}
                     <CardMedia
                       component="img"
-                      height={{ xs: 360, sm: 420, md: 480 }}
+                      height={{ xs: 480, sm: 600, md: 750 }}
                       image={optimizeCloudinaryUrl(currentBlog.coverImage || currentBlog.thumbnail || currentBlog.image)}
                       alt={currentBlog.title}
                       sx={{
@@ -644,7 +644,7 @@ const BlogDetail = () => {
                         opacity: imageLoaded ? 1 : 0,
                         transition: 'opacity 0.3s ease',
                         width: '100%',
-                        height: { xs: '360px', sm: '420px', md: '480px' },
+                        height: { xs: '480px', sm: '600px', md: '750px' },
                         borderRadius: 0
                       }}
                       onLoad={() => setImageLoaded(true)}
@@ -669,7 +669,7 @@ const BlogDetail = () => {
                       width: '100% !important',
                       maxWidth: '100% !important',
                       height: 'auto !important',
-                      maxHeight: { xs: '400px', sm: '450px', md: '550px' },
+                      maxHeight: { xs: '540px', sm: '650px', md: '800px' },
                       display: 'block',
                       margin: '1rem 0',
                       objectFit: 'cover',
