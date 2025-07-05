@@ -1,6 +1,7 @@
 import ProductCard from '~/components/ProductCards/ProductCards.jsx'
 import React, { useState, useEffect } from 'react'
 import { CircularProgress, Typography } from '@mui/material'
+import { Link } from 'react-router-dom'
 
 const styles = {
   section: {
@@ -133,36 +134,71 @@ const ProductSection = ({
         }}
       >
         {/* Banner cho category hiện tại */}
-        <div style={{ ...styles.banner, height: isMobile ? 220 : 523 }}>
-          <img
-            src={
-              bannerImg
-                ? bannerImg
-                : 'https://placehold.co/500x440?text=No+Category+Image'
-            }
-            alt={bannerTitle || 'Banner'}
-            style={{ ...styles.bannerImg, height: isMobile ? 220 : '100%' }}
-            onError={(e) => {
-              console.error('Banner image failed to load:', e.target.src)
-              e.target.src =
-                'https://placehold.co/500x440?text=Image+Error'
-            }}
-          />
-          <div style={{
-            ...styles.bannerText,
-            top: isMobile ? 40 : 150,
-            left: isMobile ? 20 : 70,
-          }}>
-            <h2 style={{
-              ...styles.bannerTitle,
-              fontSize: isMobile ? 24 : 50,
-              marginBottom: isMobile ? 4 : 8
+        {products && products[0]?.categoryId ? (
+          <Link to={`/productbycategory/${products[0].categoryId}`} style={{ textDecoration: 'none' }}>
+            <div style={{ ...styles.banner, height: isMobile ? 220 : 523, cursor: 'pointer' }}>
+              <img
+                src={
+                  bannerImg
+                    ? bannerImg
+                    : 'https://placehold.co/500x440?text=No+Category+Image'
+                }
+                alt={bannerTitle || 'Banner'}
+                style={{ ...styles.bannerImg, height: isMobile ? 220 : '100%' }}
+                onError={(e) => {
+                  console.error('Banner image failed to load:', e.target.src)
+                  e.target.src =
+                    'https://placehold.co/500x440?text=Image+Error'
+                }}
+              />
+              <div style={{
+                ...styles.bannerText,
+                top: isMobile ? 40 : 150,
+                left: isMobile ? 20 : 70,
+              }}>
+                <h2 style={{
+                  ...styles.bannerTitle,
+                  fontSize: isMobile ? 24 : 50,
+                  marginBottom: isMobile ? 4 : 8
+                }}>
+                  {bannerTitle || 'Danh mục sản phẩm'}
+                </h2>
+                {bannerDesc && <p style={{ ...styles.bannerDesc, fontSize: isMobile ? 12 : 14 }}>{bannerDesc}</p>}
+              </div>
+            </div>
+          </Link>
+        ) : (
+          <div style={{ ...styles.banner, height: isMobile ? 220 : 523 }}>
+            <img
+              src={
+                bannerImg
+                  ? bannerImg
+                  : 'https://placehold.co/500x440?text=No+Category+Image'
+              }
+              alt={bannerTitle || 'Banner'}
+              style={{ ...styles.bannerImg, height: isMobile ? 220 : '100%' }}
+              onError={(e) => {
+                console.error('Banner image failed to load:', e.target.src)
+                e.target.src =
+                  'https://placehold.co/500x440?text=Image+Error'
+              }}
+            />
+            <div style={{
+              ...styles.bannerText,
+              top: isMobile ? 40 : 150,
+              left: isMobile ? 20 : 70,
             }}>
-              {bannerTitle || 'Danh mục sản phẩm'}
-            </h2>
-            {bannerDesc && <p style={{ ...styles.bannerDesc, fontSize: isMobile ? 12 : 14 }}>{bannerDesc}</p>}
+              <h2 style={{
+                ...styles.bannerTitle,
+                fontSize: isMobile ? 24 : 50,
+                marginBottom: isMobile ? 4 : 8
+              }}>
+                {bannerTitle || 'Danh mục sản phẩm'}
+              </h2>
+              {bannerDesc && <p style={{ ...styles.bannerDesc, fontSize: isMobile ? 12 : 14 }}>{bannerDesc}</p>}
+            </div>
           </div>
-        </div>
+        )}
 
         {/* Loading State */}
         {loading && (
