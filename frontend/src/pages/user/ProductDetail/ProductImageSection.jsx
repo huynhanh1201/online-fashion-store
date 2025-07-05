@@ -19,7 +19,7 @@ const ProductImage = styled('img')(() => ({
 const EnlargedImage = styled('img')(() => ({
   width: 'min(90vw, 700px)',
   height: 'min(90vh, 600px)',
-  objectFit: 'contain',
+  objectFit: 'cover',
   borderRadius: '8px',
   boxShadow: '0 8px 32px rgba(0, 0, 0, 0.2)'
 }))
