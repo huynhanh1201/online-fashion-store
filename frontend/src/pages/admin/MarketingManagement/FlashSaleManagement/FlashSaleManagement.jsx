@@ -548,48 +548,41 @@ const FlashSaleManagement = () => {
           <Grid item xs={12} sm={6} md={3} key={index}>
             <Card
               sx={{
-                background: `linear-gradient(135deg, ${item.color}15 0%, ${item.color}25 100%)`,
-                border: `1px solid ${item.color}30`,
-                borderRadius: 3,
-                transition: 'all 0.3s ease',
-                '&:hover': {
-                  transform: 'translateY(-4px)',
-                  boxShadow: `0 8px 32px ${item.color}30`
-                }
+                display: 'flex',
+                alignItems: 'center',
+                borderRadius: 2,
+                boxShadow: 'none',
+                border: 'none',
+                background: '#fafbfc',
+                minHeight: 90,
+                position: 'relative',
               }}
             >
-              <CardContent>
-                <Stack
-                  direction='row'
-                  alignItems='center'
-                  justifyContent='space-between'
-                >
-                  <Box>
-                    <Typography
-                      variant='h4'
-                      sx={{ fontWeight: 700, color: item.color }}
-                    >
-                      {item.value}
-                    </Typography>
-                    <Typography
-                      variant='body2'
-                      color='text.secondary'
-                      sx={{ mt: 0.5 }}
-                    >
-                      {item.title}
-                    </Typography>
-                  </Box>
-                  <Box
-                    sx={{
-                      p: 1.5,
-                      borderRadius: 2,
-                      backgroundColor: `${item.color}20`,
-                      color: item.color
-                    }}
-                  >
+              {/* Thanh màu bên trái */}
+              <Box
+                sx={{
+                  width: 8,
+                  height: '100%',
+                  borderRadius: '8px 0 0 8px',
+                  background: item.color || '#22c55e',
+                  position: 'absolute',
+                  left: 0,
+                  top: 0,
+                  bottom: 0,
+                }}
+              />
+              <CardContent sx={{ pl: 4, py: 2, width: '100%' }}>
+                <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
+                  {item.title}
+                </Typography>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <Box sx={{ color: item.color || '#22c55e', fontSize: 28, fontWeight: 700 }}>
                     {item.icon}
                   </Box>
-                </Stack>
+                  <Typography variant="h5" sx={{ fontWeight: 700, ml: 1 }}>
+                    {loading ? '...' : item.value}
+                  </Typography>
+                </Box>
               </CardContent>
             </Card>
           </Grid>
@@ -924,11 +917,6 @@ const FlashSaleManagement = () => {
                         <TableCell
                           sx={{ fontWeight: 700, color: '#334155', py: 2 }}
                         >
-                          Số lượng
-                        </TableCell>
-                        <TableCell
-                          sx={{ fontWeight: 700, color: '#334155', py: 2 }}
-                        >
                           Thao tác
                         </TableCell>
                       </TableRow>
@@ -1066,25 +1054,6 @@ const FlashSaleManagement = () => {
                                 : 'So với giá gốc'
                               }
                             </Typography>
-                          </TableCell>
-                          <TableCell sx={{ py: 2 }}>
-                            <Box
-                              sx={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: 1
-                              }}
-                            >
-                              <InventoryIcon
-                                sx={{ fontSize: 16, color: '#6b7280' }}
-                              />
-                              <Typography
-                                variant='body2'
-                                sx={{ fontWeight: 600 }}
-                              >
-                                {item.stock != null ? item.stock : 0}
-                              </Typography>
-                            </Box>
                           </TableCell>
                           <TableCell sx={{ py: 2 }}>
                             <Stack direction='row' spacing={1}>
