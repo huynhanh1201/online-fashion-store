@@ -174,7 +174,7 @@ const ProductContent = () => {
             <ProductSection
               bannerImg={activeCategory.image || 'https://placehold.co/500x440?text=No+Category+Image'}
               bannerTitle={activeCategory.name || ''}
-              bannerDesc={activeCategory.description || 'Bộ sưu tập hot'}
+              bannerDesc={activeCategory.description || ' '}
               products={sectionProducts[idx]}
               loading={loadingProducts[idx]}
               error={errorProducts[idx]}
