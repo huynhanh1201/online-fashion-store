@@ -39,8 +39,20 @@ const ViewReviewModal = ({ open, onClose, userId, productId, orderId, productNam
       setLoading(true)
       try {
         const response = await getUserReviewForProduct(userId, productId, orderId)
+        console.log('Response from getUserReviewForProduct:', response, 'for orderId:', orderId)
+
         if (response && response.length > 0) {
-          setReviewData(response[0]) // Lấy review đầu tiên
+          // Tìm review chính xác theo orderId thay vì lấy review đầu tiên
+          const reviewForOrder = response.find(review => review.orderId === orderId)
+          if (reviewForOrder) {
+            console.log('Found review for orderId:', orderId, reviewForOrder)
+            setReviewData(reviewForOrder)
+          } else {
+            // Nếu không tìm thấy review của đơn hàng này, có thể lấy review đầu tiên
+            // nhưng log cảnh báo để debug
+            console.warn('Không tìm thấy review cho orderId:', orderId, 'Available reviews:', response.map(r => ({ id: r.id, orderId: r.orderId })))
+            setReviewData(response[0])
+          }
         }
       } catch (error) {
         console.error('Lỗi khi lấy đánh giá:', error)
