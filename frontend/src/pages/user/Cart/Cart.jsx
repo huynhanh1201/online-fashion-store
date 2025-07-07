@@ -608,7 +608,6 @@ const Cart = () => {
             p: 1,
             borderRadius: 2,
             border: '1px dashed var(--primary-color)',
-            backgroundColor: 'white',
           }}
         >
           <Box display="flex" alignItems="center" gap={1.5} flexWrap="wrap">
