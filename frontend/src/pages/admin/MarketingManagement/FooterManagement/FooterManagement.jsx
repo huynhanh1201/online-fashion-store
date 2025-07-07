@@ -76,7 +76,7 @@ const FooterManagement = () => {
   const existingFooter = footerData?.content?.[0]
 
   return (
-    <RouteGuard requiredPermissions={['admin:access', 'footer:use']}>
+    <RouteGuard requiredPermissions={['admin:access', 'footerContent:use']}>
       <Box sx={{ p: 3, backgroundColor: '#f8fafc', borderRadius: 3, minHeight: '100vh' }}>
         {/* Header */}
         <Box sx={{ mb: 4 }}>

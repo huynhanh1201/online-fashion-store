@@ -125,18 +125,18 @@ const StyledTextField = styled(TextField)(({ theme }) => ({
     borderRadius: '12px',
     backgroundColor: 'var(--surface-color)',
     transition: 'all 0.3s ease',
-    '& fieldset': {
-      borderColor: '#e0e0e0',
-      borderWidth: '2px',
-    },
-    '&:hover fieldset': {
-      borderColor: 'var(--primary-color)',
-    },
-    '&.Mui-focused fieldset': {
-      borderColor: 'var(--primary-color)',
-      borderWidth: '2px',
-      boxShadow: '0 0 0 4px rgba(26, 60, 123, 0.1)',
-    }
+    // '& fieldset': {
+    //   // borderColor: '#e0e0e0',
+    //   borderWidth: '2px',
+    // },
+    // '&:hover fieldset': {
+    //   borderColor: 'var(--primary-color)',
+    // },
+    // '&.Mui-focused fieldset': {
+    //   borderColor: 'var(--primary-color)',
+    //   borderWidth: '2px',
+    //   boxShadow: '0 0 0 4px rgba(26, 60, 123, 0.1)',
+    // }
   },
   '& .MuiInputLabel-root': {
     color: '#666',
@@ -275,7 +275,8 @@ const ProductItem = ({ name, variant, quantity, image, color, size, getFinalPric
     )
   }
 
-  const truncatedName = name.length > 20 ? name.slice(0, 20) + '...' : name
+  const capitalizedName = capitalizeFirstLetter(name)
+  const truncatedName = capitalizedName.length > 20 ? capitalizedName.slice(0, 20) + '...' : capitalizedName
   const finalPrice = getFinalPrice(variant)
   const exportPrice = variant.exportPrice || 0
   const discountPrice = variant.discountPrice || 0
@@ -1301,6 +1302,7 @@ const Payment = () => {
         autoHideDuration={4000}
         onClose={() => setSnackbar(prev => ({ ...prev, open: false }))}
         anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+        sx={{ mt: 12 }}
       >
         <Alert
           onClose={() => setSnackbar(prev => ({ ...prev, open: false }))}

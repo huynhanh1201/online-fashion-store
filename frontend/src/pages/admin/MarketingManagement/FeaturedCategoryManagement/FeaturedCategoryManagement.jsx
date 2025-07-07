@@ -170,7 +170,7 @@ const FeaturedCategoryManagement = () => {
   )
 
   return (
-    <RouteGuard requiredPermissions={['admin:access', 'featured:use']}>
+    <RouteGuard requiredPermissions={['admin:access', 'featuredCategory:use']}>
       <Box
         sx={{
           p: 3,

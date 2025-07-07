@@ -77,9 +77,9 @@ const PaymentVnpay = () => {
             variant="contained"
             onClick={handleGoHome}
             sx={{
-              backgroundColor: '#1A3C7B',
+              backgroundColor: 'var(--primary-color)',
               '&:hover': {
-                backgroundColor: '#162f61',
+                backgroundColor: 'var(--accent-color)',
               }
             }}
           >
@@ -88,9 +88,9 @@ const PaymentVnpay = () => {
 
           <Button variant="contained"
             sx={{
-              backgroundColor: '#1A3C7B',
+              backgroundColor: 'var(--primary-color)',
               '&:hover': {
-                backgroundColor: '#162f61',
+                backgroundColor: 'var(--accent-color)',
               }
             }} onClick={handleGoOrders}>
             Đơn mua của bạn

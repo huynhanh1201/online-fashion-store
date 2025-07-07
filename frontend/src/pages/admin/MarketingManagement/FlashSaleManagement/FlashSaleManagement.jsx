@@ -463,7 +463,7 @@ const FlashSaleManagement = () => {
   ]
 
   return (
-    <RouteGuard requiredPermissions={['admin:access', 'flashsale:use']}>
+    <RouteGuard requiredPermissions={['admin:access', 'flashSale:use']}>
       <Box
         sx={{
           p: 3,

@@ -299,7 +299,7 @@ const HeaderManagement = () => {
   )
 
   return (
-    <RouteGuard requiredPermissions={['admin:access', 'header:use']}>
+    <RouteGuard requiredPermissions={['admin:access', 'headerContent:use']}>
       <Box
         sx={{
           p: 3,

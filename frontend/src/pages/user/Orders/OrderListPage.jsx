@@ -404,9 +404,16 @@ const OrderRow = ({ order, onOrderUpdate, onOrderCancelled, onReorder, reorderLo
                       <Typography
                         fontWeight={600}
                         fontSize="1.1rem"
-                        sx={{ mb: 0.5 }}
+                        sx={{
+                          mb: 0.5,
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                          whiteSpace: 'nowrap',
+                          maxWidth: { xs: '150px', sm: '200px', md: '250px' }
+                        }}
+                        title={capitalizeFirstLetter(item.name)}
                       >
-                        {item.name}
+                        {capitalizeFirstLetter(item.name)}
                       </Typography>
                       <Typography
                         variant="body2"

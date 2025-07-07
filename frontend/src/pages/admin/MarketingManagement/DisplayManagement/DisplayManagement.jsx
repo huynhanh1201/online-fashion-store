@@ -229,7 +229,7 @@ const DisplayManagement = () => {
   )
 
   return (
-    <RouteGuard requiredPermissions={['admin:access', 'display:use']}>
+    <RouteGuard requiredPermissions={['admin:access', 'banner:use']}>
       <Box
         sx={{
           p: 3,

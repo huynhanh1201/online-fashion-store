@@ -102,7 +102,7 @@ export default function AdminDrawer({
   const menuConfig = useMemo(
     () => ({
       statistics: {
-        permission: 'statistics:use',
+        permission: 'admin:use',
         label: 'Thống kê',
         path: '/admin',
         icon: <PollIcon />
@@ -293,7 +293,7 @@ export default function AdminDrawer({
         icon: <WarehouseIcon />,
         children: [
           {
-            permission: 'statistics:use',
+            permission: 'warehouseStatistics:use',
             label: 'Thống kê kho',
             path: '/admin/warehouse-statistic-management',
             icon: <ReceiptLongIcon />

@@ -36,6 +36,7 @@ import {
 import { styled } from '@mui/material/styles'
 import useTheme from '~/hooks/useTheme'
 import { RouteGuard } from '~/components/PermissionGuard'
+import usePermissions from '~/hooks/usePermissions'
 
 // Predefined color schemes
 const predefinedThemes = {
@@ -128,6 +129,7 @@ const ThemeManagement = () => {
     message: '',
     severity: 'success'
   })
+  const { hasPermission } = usePermissions()
 
   // Sync selected preset with current theme on load or when theme changes
   useEffect(() => {
@@ -341,46 +343,49 @@ const ThemeManagement = () => {
           </Grid>
 
           {/* Action Buttons */}
-          <Grid item xs={12}>
-            <Card>
-              <CardContent>
-                <Typography
-                  variant='h6'
-                  sx={{ mb: 2, display: 'flex', alignItems: 'center' }}
-                >
-                  <Settings sx={{ mr: 1 }} />
-                  Thao tác
-                </Typography>
-                <Stack direction='row' spacing={2} flexWrap='wrap' useFlexGap>
-                  <Button
-                    variant='contained'
-                    startIcon={<Save />}
-                    onClick={handleSaveTheme}
-                    sx={{
-                      minWidth: 120,
-                      backgroundColor: 'var(--primary-color)',
-                      color: '#fff'
-                    }}
+          {hasPermission('theme:update') && (
+            <Grid item xs={12}>
+              <Card>
+                <CardContent>
+                  <Typography
+                    variant='h6'
+                    sx={{ mb: 2, display: 'flex', alignItems: 'center' }}
                   >
-                    Lưu chủ đề
-                  </Button>
-                  <Button
-                    variant='outlined'
-                    startIcon={<Refresh />}
-                    onClick={handleResetTheme}
-                    sx={{
-                      minWidth: 120,
-                      color: 'var(--primary-color)',
-                      borderColor: 'var(--primary-color)'
-                    }}
-                  >
-                    Reset
-                  </Button>
-                </Stack>
-              </CardContent>
-            </Card>
-          </Grid>
+                    <Settings sx={{ mr: 1 }} />
+                    Thao tác
+                  </Typography>
+                  <Stack direction='row' spacing={2} flexWrap='wrap' useFlexGap>
 
+                    <Button
+                      variant='contained'
+                      startIcon={<Save />}
+                      onClick={handleSaveTheme}
+                      sx={{
+                        minWidth: 120,
+                        backgroundColor: 'var(--primary-color)',
+                        color: '#fff'
+                      }}
+                    >
+                      Lưu chủ đề
+                    </Button>
+
+                    <Button
+                      variant='outlined'
+                      startIcon={<Refresh />}
+                      onClick={handleResetTheme}
+                      sx={{
+                        minWidth: 120,
+                        color: 'var(--primary-color)',
+                        borderColor: 'var(--primary-color)'
+                      }}
+                    >
+                      Khôi phục
+                    </Button>
+                  </Stack>
+                </CardContent>
+              </Card>
+            </Grid>
+          )}
           {/* Theme Preview */}
           <Grid item xs={12}>
             <Card>
@@ -470,7 +475,7 @@ const ThemeManagement = () => {
                           variant='body2'
                           sx={{ color: currentTheme.text }}
                         >
-                          Thành công
+                          Success
                         </Typography>
                       </Box>
                     </Grid>

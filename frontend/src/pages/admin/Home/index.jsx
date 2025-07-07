@@ -33,7 +33,7 @@ const AdminHome = () => {
     fetchFinanceStatistics(year)
   }, [year])
   return (
-    <RouteGuard requiredPermissions={['admin:access', 'statistics:use']}>
+    <RouteGuard requiredPermissions={['admin:access']}>
       <SystemDashboard
         loading={loading}
         accountStatistics={accountStatistics}
