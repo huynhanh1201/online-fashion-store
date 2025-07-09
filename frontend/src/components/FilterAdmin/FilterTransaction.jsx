@@ -5,13 +5,8 @@ import dayjs from 'dayjs'
 import FilterSelect from '~/components/FilterAdmin/common/FilterSelect'
 import FilterByTime from '~/components/FilterAdmin/common/FilterByTime'
 import SearchWithSuggestions from '~/components/FilterAdmin/common/SearchWithSuggestions'
-
-export default function FilterTransaction({
-  onFilter,
-  transactions = [],
-  fetchTransactions,
-  loading
-}) {
+import useTransactions from '~/hooks/admin/useTransactions.js'
+export default function FilterTransaction({ onFilter, loading }) {
   const [keyword, setKeyword] = useState('')
   const [inputValue, setInputValue] = useState('')
   const [orderId, setOrderId] = useState('')
@@ -30,6 +25,11 @@ export default function FilterTransaction({
   const [paidFrom, setPaidFrom] = useState(dayjs().format('YYYY-MM-DD'))
   const [paidTo, setPaidTo] = useState(dayjs().format('YYYY-MM-DD'))
   const hasMounted = useRef(false)
+  const { transactions, fetchTransactions } = useTransactions()
+  useEffect(() => {
+    fetchTransactions(1, 100000, { destroy: destroy, sort: sort })
+  }, [destroy, sort])
+
   useEffect(() => {
     if (hasMounted.current) {
       applyFilters(selectedFilter, startDate, endDate)
@@ -97,15 +97,15 @@ export default function FilterTransaction({
     setOrderId('')
     setMethod('')
     setStatus('')
-    setDestroy('')
-    setSort('')
+    setDestroy('false')
+    setSort('newest')
     setSelectedFilter('')
     setPaidFilter('')
     setStartDate(dayjs().format('YYYY-MM-DD'))
     setEndDate(dayjs().format('YYYY-MM-DD'))
     setPaidFrom(dayjs().format('YYYY-MM-DD'))
     setPaidTo(dayjs().format('YYYY-MM-DD'))
-    onFilter({})
+    onFilter({ sort: 'newest', destroy: 'false' })
     // fetchTransactions(1, 10)
   }
 
@@ -139,15 +139,14 @@ export default function FilterTransaction({
         ]}
       />
       <FilterSelect
-        label='Trạng thái xoá'
+        label='Xoá'
         value={destroy}
         onChange={(val) => {
           setDestroy(val)
         }}
         options={[
-          { label: 'Tất cả', value: '' },
-          { label: 'Chưa xoá', value: false },
-          { label: 'Đã xoá', value: true }
+          { label: 'Chưa xoá', value: 'false' },
+          { label: 'Đã xoá', value: 'true' }
         ]}
       />
       <FilterSelect

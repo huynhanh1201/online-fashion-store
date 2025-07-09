@@ -171,7 +171,7 @@ const ColorTable = ({
         }}
         labelRowsPerPage='Số dòng mỗi trang'
         labelDisplayedRows={({ from, to, count }) => {
-          const totalPages = Math.ceil(count / rowsPerPage)
+          const totalPages = Math.max(1, Math.ceil(count / rowsPerPage))
           return `${from}–${to} trên ${count} | Trang ${page + 1} / ${totalPages}`
         }}
         ActionsComponent={TablePaginationActions}

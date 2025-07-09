@@ -71,7 +71,13 @@ const BlogRow = ({
       <TableCell
         align='left'
         title={blog.title}
-        sx={{ whiteSpace: 'nowrap', maxWidth: 300, ...styles.cellPadding }}
+        onClick={hasPermission('blog:read') ? () => onView(blog) : null}
+        sx={{
+          whiteSpace: 'nowrap',
+          maxWidth: 300,
+          ...styles.cellPadding,
+          cursor: hasPermission('blog:read') ? 'pointer' : 'default'
+        }}
       >
         {blog.title || 'Không có tiêu đề'}
       </TableCell>

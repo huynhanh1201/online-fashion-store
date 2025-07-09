@@ -5,13 +5,11 @@ import dayjs from 'dayjs'
 import FilterSelect from '~/components/FilterAdmin/common/FilterSelect'
 import FilterByTime from '~/components/FilterAdmin/common/FilterByTime'
 import SearchWithSuggestions from '~/components/FilterAdmin/common/SearchWithSuggestions'
-
+import useVariants from '~/hooks/admin/Inventory/useVariants.js'
 export default function FilterVariant({
   onFilter,
   products = [],
   fetchProducts,
-  variants = [],
-  fetchVariants,
   loading,
   colors,
   sizes,
@@ -36,6 +34,7 @@ export default function FilterVariant({
   const [startDate, setStartDate] = useState(dayjs().format('YYYY-MM-DD'))
   const [endDate, setEndDate] = useState(dayjs().format('YYYY-MM-DD'))
   const hasMounted = useRef(false)
+  const { variants, fetchVariants } = useVariants()
   useEffect(() => {
     if (hasMounted.current) {
       applyFilters()
@@ -53,8 +52,9 @@ export default function FilterVariant({
     status
   ])
   useEffect(() => {
-    fetchProducts?.()
-  }, [])
+    fetchProducts?.(1, 100000)
+    fetchVariants(1, 100000, { destroy: destroy, sort: sort })
+  }, [destroy, sort])
 
   const handleSearch = () => {
     setKeyword(inputValue)
@@ -264,7 +264,7 @@ export default function FilterVariant({
       <Box sx={{ display: 'flex', gap: 2 }}>
         <SearchWithSuggestions
           label='Tên biến thể'
-          options={variants.map((v) => v.name)}
+          options={[...new Set(variants.map((v) => v.name))]}
           loading={loading}
           keyword={keyword}
           inputValue={inputValue}

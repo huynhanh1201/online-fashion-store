@@ -30,6 +30,7 @@ const ReviewTable = ({
   rowsPerPage,
   filter
 }) => {
+  console.log(total)
   const columns = [
     { id: 'index', label: 'STT', align: 'center', width: 50 },
     { id: 'product', label: 'Sản phẩm', align: 'left', minWidth: 200 },
@@ -147,7 +148,7 @@ const ReviewTable = ({
         }}
         labelRowsPerPage='Số dòng mỗi trang'
         labelDisplayedRows={({ from, to, count }) => {
-          const totalPages = Math.ceil(count / rowsPerPage)
+          const totalPages = Math.max(1, Math.ceil(count / rowsPerPage))
           return `${from}–${to} trên ${count} | Trang ${page + 1} / ${totalPages}`
         }}
         ActionsComponent={TablePaginationActions}

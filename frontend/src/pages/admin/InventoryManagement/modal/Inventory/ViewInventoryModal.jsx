@@ -120,7 +120,7 @@ const ViewInventoryModal = ({ open, onClose, inventory }) => {
                   </TableCell>
                   <TableCell>
                     {inventory.importPrice
-                      ? `${Number(inventory.importPrice).toLocaleString('vi-VN')}đ`
+                      ? `${Number(inventory.importPrice).toLocaleString('vi-VN')}₫`
                       : 'N/A'}
                   </TableCell>
                 </TableRow>
@@ -130,7 +130,7 @@ const ViewInventoryModal = ({ open, onClose, inventory }) => {
                   </TableCell>
                   <TableCell>
                     {inventory.exportPrice
-                      ? `${Number(inventory.exportPrice).toLocaleString('vi-VN')}đ`
+                      ? `${Number(inventory.exportPrice).toLocaleString('vi-VN')}₫`
                       : 'N/A'}
                   </TableCell>
                 </TableRow>

@@ -52,7 +52,11 @@ const EditColorModal = ({ open, onClose, color, onSave }) => {
       <DialogContent>
         <form id='edit-color-form' onSubmit={handleSubmit(onSubmit)}>
           <TextField
-            label='Tên màu'
+            label={
+              <>
+                Tên màu <span style={{ color: 'red' }}>*</span>
+              </>
+            }
             fullWidth
             margin='normal'
             {...register('name', {

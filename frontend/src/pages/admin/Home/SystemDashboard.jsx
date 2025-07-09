@@ -186,7 +186,7 @@ export default function SystemDashboard({
               }}
             >
               <Stack>
-                <Typography variant='subtitle1' color='text.secondary'>
+                <Typography variant='h6' color='text.secondary'>
                   {item.label}
                 </Typography>
                 <Typography

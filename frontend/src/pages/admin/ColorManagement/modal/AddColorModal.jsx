@@ -61,7 +61,11 @@ const AddColorModal = ({ open, onClose, onAdded, onSave }) => {
       >
         <DialogContent>
           <TextField
-            label='Tên màu'
+            label={
+              <>
+                Tên màu <span style={{ color: 'red' }}>*</span>
+              </>
+            }
             fullWidth
             margin='normal'
             {...register('name', {

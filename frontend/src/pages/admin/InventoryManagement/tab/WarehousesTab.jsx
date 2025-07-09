@@ -364,7 +364,7 @@ const WarehousesTab = () => {
           }}
           labelRowsPerPage='Số dòng mỗi trang'
           labelDisplayedRows={({ from, to, count }) => {
-            const totalPages = Math.ceil(count / rowsPerPage)
+            const totalPages = Math.max(1, Math.ceil(count / rowsPerPage))
             return `${from}–${to} trên ${count} | Trang ${page} / ${totalPages}`
           }}
           ActionsComponent={TablePaginationActions}
@@ -555,6 +555,12 @@ const WarehousesTab = () => {
                       <TableCell
                         key={col.id}
                         align={col.align || 'left'}
+                        onClick={
+                          (col.id === 'code' ||
+                            (col.id === 'name' &&
+                              hasPermission('warehouse:read'))) &&
+                          (() => handleViewWarehouse(row))
+                        }
                         sx={{
                           py: 0,
                           px: 1,
@@ -563,7 +569,12 @@ const WarehousesTab = () => {
                           overflow: 'hidden',
                           textOverflow: 'ellipsis',
                           backgroundColor: '#fff',
-                          ...(col.maxWidth && { maxWidth: col.maxWidth })
+                          ...(col.maxWidth && { maxWidth: col.maxWidth }),
+                          ...((col.id === 'code' ||
+                            (col.id === 'name' &&
+                              hasPermission('warehouse:read'))) && {
+                            cursor: 'pointer'
+                          })
                         }}
                         title={
                           typeof content === 'string' ? content : undefined
@@ -596,7 +607,7 @@ const WarehousesTab = () => {
         }}
         labelRowsPerPage='Số dòng mỗi trang'
         labelDisplayedRows={({ from, to, count }) => {
-          const totalPages = Math.ceil(count / rowsPerPage)
+          const totalPages = Math.max(1, Math.ceil(count / rowsPerPage))
           return `${from}–${to} trên ${count} | Trang ${page} / ${totalPages}`
         }}
         ActionsComponent={TablePaginationActions}

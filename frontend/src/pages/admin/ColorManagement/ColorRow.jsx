@@ -66,10 +66,16 @@ export default function ColorRow({
               key={column.id}
               align={column.align}
               title={formattedName}
+              onClick={
+                permissions.canView
+                  ? () => handleOpenModal('view', color)
+                  : null
+              }
               sx={{
                 ...styles.cellPadding,
                 maxWidth: 200,
-                display: 'table-cell'
+                display: 'table-cell',
+                cursor: permissions.canView ? 'pointer' : 'default'
               }}
             >
               {formattedName}
