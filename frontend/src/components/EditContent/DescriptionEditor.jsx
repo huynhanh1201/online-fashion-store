@@ -4,7 +4,7 @@ import { Controller } from 'react-hook-form'
 import styled from '@emotion/styled'
 import { extensions } from './editorExtensions'
 import MenuBar from './MenuBar'
-
+import { useController } from 'react-hook-form'
 const StyledEditor = styled.div`
   .ProseMirror {
     min-height: 300px;
@@ -38,7 +38,7 @@ const StyledEditor = styled.div`
 `
 
 const StyledContainer = styled.div`
-  border: 1px solid #aaa;
+  border: 1px solid ${({ hasError }) => (hasError ? '#f00' : '#aaa')};
   position: relative;
   overflow: auto;
   max-height: 500px;
@@ -65,9 +65,13 @@ export default function DescriptionEditor({
     content: initialHtml || '',
     onUpdate: ({ editor }) => {
       const html = editor.getHTML()
-      setValue(name, html, { shouldValidate: true }) // <- ensure validation re-check
+      setValue(name, html, { shouldValidate: true })
     }
   })
+
+  const {
+    fieldState: { error }
+  } = useController({ name, control })
 
   useEffect(() => {
     if (editor && initialHtml) {
@@ -76,7 +80,7 @@ export default function DescriptionEditor({
   }, [editor, initialHtml])
 
   return (
-    <StyledContainer>
+    <StyledContainer hasError={!!error}>
       <StyledMenuBar>
         <MenuBar editor={editor} onImageInsert={onImageInsert} />
       </StyledMenuBar>
@@ -87,7 +91,7 @@ export default function DescriptionEditor({
           control={control}
           rules={{
             ...(isEditMode
-              ? {} // chế độ sửa → không cần required
+              ? {}
               : {
                   required: 'Nội dung không được để trống',
                   validate: (value) =>

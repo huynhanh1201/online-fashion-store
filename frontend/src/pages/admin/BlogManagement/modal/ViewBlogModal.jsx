@@ -41,7 +41,7 @@ const ViewBlogModal = ({ open, onClose, blog, isMobile }) => {
       open={open}
       onClose={onClose}
       fullWidth
-      maxWidth='xxl'
+      maxWidth='lg'
       fullScreen={isMobile}
       sx={{
         '& .MuiDialog-container': { alignItems: 'end' },
@@ -238,7 +238,6 @@ const ViewBlogModal = ({ open, onClose, blog, isMobile }) => {
           <Box
             className='content-selectable'
             sx={{
-              '& img': { maxWidth: '100%', height: 'auto' },
               '& p': { marginBottom: 1 }
             }}
             dangerouslySetInnerHTML={{

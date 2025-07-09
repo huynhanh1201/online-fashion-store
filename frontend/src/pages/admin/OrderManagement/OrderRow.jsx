@@ -229,7 +229,7 @@ const OrderRow = ({ order, index, columns, onView, onEdit, onDelete }) => {
                     ?.color || 'primary'
                 }
                 size='large'
-                sx={{ width: '120px', fontWeight: '800' }}
+                sx={{ width: '137px', fontWeight: '800' }}
               />
             )
             break
@@ -253,7 +253,7 @@ const OrderRow = ({ order, index, columns, onView, onEdit, onDelete }) => {
                       : 'warning'
                 }
                 size='large'
-                sx={{ width: '120px', fontWeight: '800' }}
+                sx={{ width: '137px', fontWeight: '800' }}
               />
             )
             break
@@ -285,7 +285,21 @@ const OrderRow = ({ order, index, columns, onView, onEdit, onDelete }) => {
         }
 
         return (
-          <TableCell key={id} align={align || 'left'} sx={styles.cellPadding}>
+          <TableCell
+            key={id}
+            align={align || 'left'}
+            onClick={
+              id === '_id' && hasPermission('order:read')
+                ? () => onView(order)
+                : null
+            }
+            sx={{
+              ...styles.cellPadding,
+              ...(id === '_id' && hasPermission('order:read')
+                ? { cursor: 'pointer' }
+                : {})
+            }}
+          >
             {value}
           </TableCell>
         )

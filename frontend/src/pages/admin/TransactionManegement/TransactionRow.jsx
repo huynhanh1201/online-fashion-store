@@ -57,7 +57,16 @@ const TransactionRow = ({ transaction, index, onView, onEdit, onDelete }) => {
       <TableCell sx={{ ...styles.cell, ...StyleAdmin.TableColumnSTT }}>
         {index + 1}
       </TableCell>
-      <TableCell sx={styles.cell} title={transaction?.orderId?.code}>
+      <TableCell
+        sx={{
+          ...styles.cell,
+          cursor: hasPermission('payment:read') ? 'pointer' : ''
+        }}
+        title={transaction?.orderId?.code}
+        onClick={
+          hasPermission('payment:read') ? () => onView(transaction) : null
+        }
+      >
         {transaction?.orderCode || '—'}
       </TableCell>
       <TableCell sx={styles.cell} title={transaction.transactionId}>
@@ -69,7 +78,7 @@ const TransactionRow = ({ transaction, index, onView, onEdit, onDelete }) => {
 
       <TableCell sx={{ ...styles.cell, pr: 10 }} align='right'>
         {transaction?.orderId?.total != null
-          ? `${transaction.orderId.total.toLocaleString('vi-VN')}đ`
+          ? `${transaction.orderId.total.toLocaleString('vi-VN')}₫`
           : '—'}
       </TableCell>
       <TableCell sx={styles.cell}>

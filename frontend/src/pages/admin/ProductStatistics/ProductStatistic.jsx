@@ -52,7 +52,8 @@ const ProductStatistics = ({ stats }) => {
       {
         label: 'Số lượng sản phẩm',
         data: paginatedData.map((item) => item.count),
-        backgroundColor: '#2563eb'
+        backgroundColor: '#2563eb',
+        maxBarThickness: 100
       }
     ]
   }

@@ -474,7 +474,7 @@ const InventoryTab = () => {
       label: 'Giá nhập',
       minWidth: 150,
       align: 'right',
-      format: (val) => `${val?.toLocaleString('vi-VN')}đ`
+      format: (val) => `${val?.toLocaleString('vi-VN')}₫`
     },
     {
       id: 'exportPrice',
@@ -482,7 +482,7 @@ const InventoryTab = () => {
       minWidth: 206,
       align: 'right',
       pr: 7,
-      format: (val) => `${val?.toLocaleString('vi-VN')}đ`
+      format: (val) => `${val?.toLocaleString('vi-VN')}₫`
     },
     {
       id: 'status',
@@ -747,6 +747,14 @@ const InventoryTab = () => {
                       <TableCell
                         key={col.id}
                         align={col.align || 'left'}
+                        onClick={
+                          (col.id === 'warehouse' ||
+                            col.id === 'variantName' ||
+                            col.id === 'sku') &&
+                          hasPermission('inventory:read')
+                            ? () => handleViewInventory(row)
+                            : undefined
+                        }
                         sx={{
                           py: 0,
                           px: 1,
@@ -756,7 +764,13 @@ const InventoryTab = () => {
                           textOverflow: 'ellipsis',
                           background: '#fff',
                           ...(col.maxWidth && { maxWidth: col.maxWidth }),
-                          pr: col.pr
+                          pr: col.pr,
+                          ...((col.id === 'warehouse' ||
+                            col.id === 'variantName' ||
+                            col.id === 'sku') &&
+                            hasPermission('inventory:read') && {
+                              cursor: 'pointer'
+                            })
                         }}
                         title={
                           typeof content === 'string' ? content : undefined
@@ -788,7 +802,7 @@ const InventoryTab = () => {
         }}
         labelRowsPerPage='Số dòng mỗi trang'
         labelDisplayedRows={({ from, to, count }) => {
-          const totalPages = Math.ceil(count / rowsPerPage)
+          const totalPages = Math.max(1, Math.ceil(count / rowsPerPage))
           return `${from}–${to} trên ${count} | Trang ${page} / ${totalPages}`
         }}
         ActionsComponent={TablePaginationActions}

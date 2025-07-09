@@ -20,15 +20,17 @@ import TableBody from '@mui/material/TableBody'
 import dayjs from 'dayjs'
 import styleAdmin from '~/assets/StyleAdmin.jsx'
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward'
-
+import usePermissions from '~/hooks/usePermissions'
 function ViewOrderModal({
   open,
   onClose,
   order,
   histories = [],
   orderDetails = [],
-  onUpdate
+  onUpdate,
+  roles
 }) {
+  const { hasPermission } = usePermissions()
   const [tab, setTab] = useState(0)
   if (!order) return null
   const handleTabChange = (_, newValue) => setTab(newValue)
@@ -63,7 +65,7 @@ function ViewOrderModal({
         label={config.label}
         color={config.color}
         size='large'
-        sx={{ width: '137px', fontWeight: 'bold' }}
+        sx={{ width: '140px', fontWeight: 'bold' }}
       />
     )
   }
@@ -142,10 +144,10 @@ function ViewOrderModal({
           onChange={handleTabChange}
           sx={{
             mb: 2,
-            borderBottom: '1px solid #001f5d',
+            borderBottom: '1px solid var(--primary-color)',
             '& .MuiTab-root': { color: '#000', textTransform: 'none' },
             '& .Mui-selected': {
-              color: '#001f5d !important',
+              color: 'var(--primary-color) !important',
               fontWeight: '900'
             },
             '& .MuiTabs-indicator': { backgroundColor: 'var(--primary-color)' }
@@ -261,30 +263,41 @@ function ViewOrderModal({
                         )}
                       </React.Fragment>
                     ))}
-                    {previousStatuses.length > 0 && <ArrowForwardIcon />}
-                    <Chip
-                      label={renderStatusLabel(order.status)}
-                      color={renderStatusChip(order.status).props.color}
-                      size='large'
-                      sx={{ width: '137px', fontWeight: '800' }}
-                    />
-                    {getNextStatus(order.status) && (
+                    {hasPermission('order:update') ? (
                       <>
-                        <ArrowForwardIcon />
+                        {previousStatuses.length > 0 && <ArrowForwardIcon />}
                         <Chip
-                          label={renderStatusLabel(
-                            getNextStatus(order?.status)
-                          )}
-                          variant='contained'
+                          label={renderStatusLabel(order.status)}
+                          color={renderStatusChip(order.status).props.color}
                           size='large'
                           sx={{ width: '137px', fontWeight: '800' }}
-                          color={
-                            renderStatusChip(getNextStatus(order?.status)).props
-                              .color
-                          }
-                          onClick={handleNextStatus}
                         />
+                        {getNextStatus(order.status) && (
+                          <>
+                            <ArrowForwardIcon />
+                            <Chip
+                              label={renderStatusLabel(
+                                getNextStatus(order?.status)
+                              )}
+                              variant='contained'
+                              size='large'
+                              sx={{ width: '137px', fontWeight: '800' }}
+                              color={
+                                renderStatusChip(getNextStatus(order?.status))
+                                  .props.color
+                              }
+                              onClick={handleNextStatus}
+                            />
+                          </>
+                        )}
                       </>
+                    ) : (
+                      <Chip
+                        label={renderStatusLabel(order.status)}
+                        color={renderStatusChip(order.status).props.color}
+                        size='large'
+                        sx={{ width: '137px', fontWeight: '800' }}
+                      />
                     )}
                   </Stack>
                 </TableCell>
@@ -310,7 +323,7 @@ function ViewOrderModal({
                 </TableCell>
                 <TableCell sx={style.nonePadding}>
                   {order.discountAmount > 0
-                    ? `- ${order.discountAmount.toLocaleString()}đ`
+                    ? `- ${order.discountAmount.toLocaleString()}₫`
                     : 'Không có'}
                 </TableCell>
               </TableRow>
@@ -320,7 +333,7 @@ function ViewOrderModal({
                   <strong>Tổng tiền</strong>
                 </TableCell>
                 <TableCell sx={style.nonePadding}>
-                  {order.total.toLocaleString('vi-VN')}đ
+                  {order.total.toLocaleString('vi-VN')}₫
                 </TableCell>
               </TableRow>
 
@@ -359,38 +372,42 @@ function ViewOrderModal({
             {histories.length === 0 ? (
               <Typography>Không có lịch sử cập nhật.</Typography>
             ) : (
-              histories.map((h) => (
-                <Box key={h._id} mb={2} p={1} border={1} borderRadius={2}>
-                  <Typography>
-                    <Box display='flex' alignItems='center' gap={1}>
-                      <strong>Trạng thái:</strong>
-                      {renderStatusChip(h.status)}
-                    </Box>
-                  </Typography>
-                  <Typography>
-                    <strong>Ghi chú:</strong> {h.note || 'Không có'}
-                  </Typography>
-                  <Typography>
-                    <strong>Người cập nhật:</strong>{' '}
-                    {h.updatedBy.name
-                      .split(' ')
-                      .map(
-                        (word) =>
-                          word.charAt(0).toUpperCase() +
-                          word.slice(1).toLowerCase()
-                      )
-                      .join(' ') || ''}
-                  </Typography>
-                  <Typography>
-                    <strong>Quyền: </strong>{' '}
-                    {h.updatedBy.role === 'admin' ? 'QUẢN TRỊ' : 'KHÁCH HÀNG'}
-                  </Typography>
-                  <Typography>
-                    <strong>Thời gian:</strong>{' '}
-                    {dayjs(h.updatedAt).format(' HH:mm DD/MM/YYYY')}
-                  </Typography>
-                </Box>
-              ))
+              histories.map((h) => {
+                const roleMap =
+                  roles.find((r) => r.name === h?.updatedBy?.role)?.label ||
+                  'Không có vai trò'
+                return (
+                  <Box key={h._id} mb={2} p={1} border={1} borderRadius={2}>
+                    <Typography>
+                      <Box display='flex' alignItems='center' gap={1}>
+                        <strong>Trạng thái:</strong>
+                        {renderStatusChip(h.status)}
+                      </Box>
+                    </Typography>
+                    <Typography>
+                      <strong>Ghi chú:</strong> {h.note || 'Không có'}
+                    </Typography>
+                    <Typography>
+                      <strong>Người cập nhật:</strong>{' '}
+                      {h.updatedBy.name
+                        .split(' ')
+                        .map(
+                          (word) =>
+                            word.charAt(0).toUpperCase() +
+                            word.slice(1).toLowerCase()
+                        )
+                        .join(' ') || ''}
+                    </Typography>
+                    <Typography>
+                      <strong>Quyền: </strong> {roleMap.toUpperCase()}
+                    </Typography>
+                    <Typography>
+                      <strong>Thời gian:</strong>{' '}
+                      {dayjs(h.updatedAt).format(' HH:mm DD/MM/YYYY')}
+                    </Typography>
+                  </Box>
+                )
+              })
             )}
           </Box>
         )}
@@ -434,10 +451,10 @@ function ViewOrderModal({
                           {item.quantity.toLocaleString('vi-VN')}
                         </TableCell>
                         <TableCell align='right'>
-                          {itemPrice.toLocaleString('vi-VN')}đ
+                          {itemPrice.toLocaleString('vi-VN')}₫
                         </TableCell>
                         <TableCell align='right'>
-                          {item.subtotal.toLocaleString('vi-VN')}đ
+                          {item.subtotal.toLocaleString('vi-VN')}₫
                         </TableCell>
                       </TableRow>
                     )

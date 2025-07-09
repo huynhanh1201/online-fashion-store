@@ -70,8 +70,8 @@ const ViewBatchModal = ({ open, onClose, batch }) => {
               </TableCell>
               <TableCell>
                 {batch.importPrice
-                  ? `${Number(batch.importPrice).toLocaleString('vi-VN')}đ`
-                  : 'N/A'}
+                  ? `${Number(batch.importPrice).toLocaleString('vi-VN')}₫`
+                  : '0₫'}
               </TableCell>
             </TableRow>
             <TableRow>

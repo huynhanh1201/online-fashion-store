@@ -16,10 +16,10 @@ const UserManagement = () => {
   const { roles, fetchRoles } = useRoles()
   const [page, setPage] = React.useState(1)
   const [selectedUser, setSelectedUser] = React.useState(null)
-  const [limit, setLimit] = React.useState(10)
   const [modalType, setModalType] = React.useState(null)
   const [filters, setFilters] = React.useState({
     sort: 'newest',
+    role: 'customer',
     destroy: 'false'
   })
 
@@ -30,7 +30,9 @@ const UserManagement = () => {
     Loading,
     removeUser,
     update,
-    Restore
+    Restore,
+    ROWS_PER_PAGE,
+    setROWS_PER_PAGE
   } = useUsers()
   const { hasPermission } = usePermissions()
 
@@ -39,10 +41,8 @@ const UserManagement = () => {
   }, [])
 
   React.useEffect(() => {
-    fetchUsers(page, limit, filters)
-  }, [page, limit, filters])
-
-  const filterUser = users.filter((user) => user?.role === 'customer')
+    fetchUsers(page, ROWS_PER_PAGE, filters)
+  }, [page, ROWS_PER_PAGE, filters])
 
   const handleOpenModal = (type, user) => {
     if (!user || !user._id) return
@@ -83,18 +83,18 @@ const UserManagement = () => {
   return (
     <RouteGuard requiredPermissions={['admin:access', 'user:use']}>
       <UserTable
-        users={filterUser}
+        users={users}
         loading={Loading}
         handleOpenModal={handleOpenModal}
         onFilters={handleFilter}
         fetchUsers={fetchUsers}
         page={page - 1}
-        rowsPerPage={limit}
+        rowsPerPage={ROWS_PER_PAGE}
         total={totalPages}
         onPageChange={handleChangePage}
         onChangeRowsPerPage={(newLimit) => {
           setPage(1)
-          setLimit(newLimit)
+          setROWS_PER_PAGE(newLimit)
         }}
         permissions={{
           canEdit: hasPermission('user:update'),

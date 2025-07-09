@@ -101,7 +101,6 @@ export default function FilterBlog({
           { label: 'Chưa xoá', value: 'false' },
           { label: 'Đã xóa', value: 'true' }
         ]}
-        sx={{ width: 180 }}
       />
       <FilterSelect value={sort} onChange={setSort} />
 
@@ -121,28 +120,27 @@ export default function FilterBlog({
         sx={{ width: 160 }}
       />
 
-      <FilterByTime
-        label='Lọc thời gian đăng'
-        selectedFilter={selectedFilter}
-        setSelectedFilter={setSelectedFilter}
-        onSelectFilter={handleSelectFilter}
-        onApply={handleApplyTime}
-        startDate={startDate}
-        setStartDate={setStartDate}
-        endDate={endDate}
-        setEndDate={setEndDate}
-      />
-
       <Box sx={{ display: 'flex', gap: 2 }}>
-        <SearchWithSuggestions
-          label='Tiêu đề bài viết'
-          options={blogs.map((b) => b.title)}
-          loading={loading}
-          keyword={keyword}
-          inputValue={inputValue}
-          setKeyword={setKeyword}
-          setInputValue={setInputValue}
-          onSearch={handleSearch}
+        {/*<SearchWithSuggestions*/}
+        {/*  label='Tiêu đề bài viết'*/}
+        {/*  options={blogs.map((b) => b.title)}*/}
+        {/*  loading={loading}*/}
+        {/*  keyword={keyword}*/}
+        {/*  inputValue={inputValue}*/}
+        {/*  setKeyword={setKeyword}*/}
+        {/*  setInputValue={setInputValue}*/}
+        {/*  onSearch={handleSearch}*/}
+        {/*/>*/}
+        <FilterByTime
+          label='Lọc thời gian đăng'
+          selectedFilter={selectedFilter}
+          setSelectedFilter={setSelectedFilter}
+          onSelectFilter={handleSelectFilter}
+          onApply={handleApplyTime}
+          startDate={startDate}
+          setStartDate={setStartDate}
+          endDate={endDate}
+          setEndDate={setEndDate}
         />
         <Button
           variant='outlined'

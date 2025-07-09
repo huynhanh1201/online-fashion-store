@@ -57,9 +57,26 @@ const ReviewRow = ({
         let value = ''
         if (column.id === 'index') value = index
         else if (column.id === 'user') value = review?.userId?.name
-        else if (column.id === 'product')
-          value = review?.productId?.name || 'không có dữ liệu'
-        else if (column.id === 'comment') value = review.comment
+        else if (column.id === 'product') {
+          value = review?.productId?.name || 'không có tên sản phẩm'
+          return (
+            <TableCell
+              key={column.id}
+              align={column.align}
+              onClick={
+                permissions.canView
+                  ? () => handleOpenModal('view', review)
+                  : null
+              }
+              sx={{
+                ...styles.cellPadding,
+                cursor: permissions.canView ? 'pointer' : 'default'
+              }}
+            >
+              {value}
+            </TableCell>
+          )
+        } else if (column.id === 'comment') value = review.comment
         else if (column.id === 'rating') value = review.rating
         else if (column.id === 'moderationStatus') {
           return (

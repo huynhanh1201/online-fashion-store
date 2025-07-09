@@ -58,7 +58,6 @@ export default function CategoryRow({
                 minHeight: 55,
                 maxHeight: 55
               }}
-              onClick={() => handleOpenModal('view', category)}
             >
               {category.image ? (
                 <img
@@ -73,7 +72,15 @@ export default function CategoryRow({
                   }}
                 />
               ) : (
-                <IconButton sx={{ width: 40, height: 40, p: '0 !important' }}>
+                <IconButton
+                  sx={{
+                    width: 40,
+                    height: 40,
+                    p: '0 !important',
+                    cursor: 'default',
+                    pointerEvents: 'none'
+                  }}
+                >
                   <ImageNotSupportedIcon
                     sx={{ width: 40, height: 40, p: '0 !important' }}
                   />
@@ -100,10 +107,16 @@ export default function CategoryRow({
               key={column.id}
               align={column.align}
               title={category[column.id]}
+              onClick={
+                permissions.canView
+                  ? () => handleOpenModal('view', category)
+                  : null
+              }
               sx={{
                 ...styles.cellPadding,
                 maxWidth: 200,
-                display: 'table-cell'
+                display: 'table-cell',
+                cursor: permissions.canView ? 'pointer' : 'default'
               }}
             >
               {category[column.id] ||

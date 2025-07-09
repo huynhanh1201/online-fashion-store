@@ -52,7 +52,11 @@ const EditSizeModal = ({ open, onClose, size, onSave }) => {
       <DialogContent>
         <form id='edit-size-form' onSubmit={handleSubmit(onSubmit)}>
           <TextField
-            label='Tên kích thước'
+            label={
+              <>
+                Tên kích thước <span style={{ color: 'red' }}>*</span>
+              </>
+            }
             fullWidth
             margin='normal'
             {...register('name', {

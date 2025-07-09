@@ -387,8 +387,7 @@ const BlogModal = ({
                   <TextField
                     label={
                       <>
-                        Tiêu đề bài viết <span style={{ color: 'red' }}>*</span>{' '}
-                        (bắt buộc)
+                        Tiêu đề bài viết <span style={{ color: 'red' }}>*</span>
                       </>
                     }
                     fullWidth
@@ -857,8 +856,7 @@ const BlogModal = ({
                 }}
               >
                 <ArticleIcon sx={{ color: '#0052cc', fontSize: 20 }} />
-                Nội dung bài viết <span style={{ color: 'red' }}>*</span> (bắt
-                buộc)
+                Nội dung bài viết <span style={{ color: 'red' }}>*</span>
               </Typography>
 
               <Box

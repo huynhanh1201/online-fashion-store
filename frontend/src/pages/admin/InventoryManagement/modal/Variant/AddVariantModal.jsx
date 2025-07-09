@@ -436,7 +436,9 @@ const AddVariantModal = ({
           >
             {/* Sản phẩm */}
             <FormControl fullWidth error={!!errors.productId}>
-              <InputLabel>Sản phẩm</InputLabel>
+              <InputLabel>
+                Sản phẩm <span style={{ color: 'red' }}>* </span>
+              </InputLabel>
               <Controller
                 name='productId'
                 control={control}
@@ -449,7 +451,12 @@ const AddVariantModal = ({
                 render={({ field }) => (
                   <Select
                     {...field}
-                    label='Sản phẩm'
+                    label={
+                      <>
+                        Sản phẩm
+                        <span style={{ color: 'red' }}>* </span>
+                      </>
+                    }
                     MenuProps={{
                       PaperProps: {
                         sx: {
@@ -490,7 +497,7 @@ const AddVariantModal = ({
                 <InputLabel
                   sx={{ color: !productId ? '#00000061' : 'inherit' }}
                 >
-                  Màu sắc
+                  Màu sắc <span style={{ color: 'red' }}>*</span>
                 </InputLabel>
                 <Controller
                   disabled={!productId}
@@ -514,7 +521,11 @@ const AddVariantModal = ({
                   render={({ field }) => (
                     <Select
                       {...field}
-                      label='Màu sắc'
+                      label={
+                        <>
+                          Màu sắc <span style={{ color: 'red' }}>*</span>
+                        </>
+                      }
                       MenuProps={{
                         PaperProps: {
                           sx: {
@@ -564,7 +575,7 @@ const AddVariantModal = ({
                 <InputLabel
                   sx={{ color: !productId ? '#00000061' : 'inherit' }}
                 >
-                  Kích thước
+                  Kích thước <span style={{ color: 'red' }}>*</span>
                 </InputLabel>
                 <Controller
                   disabled={!productId}
@@ -588,7 +599,11 @@ const AddVariantModal = ({
                   render={({ field }) => (
                     <Select
                       {...field}
-                      label='Kích thước'
+                      label={
+                        <>
+                          Kích thước <span style={{ color: 'red' }}>*</span>
+                        </>
+                      }
                       MenuProps={{
                         PaperProps: {
                           sx: {

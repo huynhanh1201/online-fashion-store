@@ -241,8 +241,7 @@ const AddProductModal = ({ open, onClose, onSuccess }) => {
                 <TextField
                   label={
                     <>
-                      Tên sản phẩm <span style={{ color: 'red' }}>*</span> (bắt
-                      buộc)
+                      Tên sản phẩm <span style={{ color: 'red' }}>*</span>
                     </>
                   }
                   fullWidth
@@ -267,7 +266,7 @@ const AddProductModal = ({ open, onClose, onSuccess }) => {
           <Grid item size={6}>
             <FormControl fullWidth margin='normal' error={!!errors.categoryId}>
               <InputLabel>
-                Danh mục <span style={{ color: 'red' }}>*</span> (bắt buộc)
+                Danh mục <span style={{ color: 'red' }}>*</span>
               </InputLabel>
               <Controller
                 name='categoryId'
@@ -327,8 +326,7 @@ const AddProductModal = ({ open, onClose, onSuccess }) => {
                 <TextField
                   label={
                     <>
-                      Giá nhập (đ) <span style={{ color: 'red' }}>*</span> (bắt
-                      buộc)
+                      Giá nhập (đ) <span style={{ color: 'red' }}>*</span>
                     </>
                   }
                   fullWidth
@@ -357,8 +355,7 @@ const AddProductModal = ({ open, onClose, onSuccess }) => {
                 <TextField
                   label={
                     <>
-                      Giá bán (đ) <span style={{ color: 'red' }}>*</span> (bắt
-                      buộc)
+                      Giá bán (đ) <span style={{ color: 'red' }}>*</span>
                     </>
                   }
                   fullWidth
@@ -377,7 +374,7 @@ const AddProductModal = ({ open, onClose, onSuccess }) => {
           {/*kích thước đóng gói*/}
           <Typography variant='h6'>Kích thước đóng gói</Typography>
           <Grid item size={12}>
-            <Grid container spacing={2} sx={{ mt: 1 }}>
+            <Grid container spacing={2}>
               {/* Chiều dài */}
               <Grid item size={3} xs={6} sm={3}>
                 <Controller
@@ -393,7 +390,7 @@ const AddProductModal = ({ open, onClose, onSuccess }) => {
                       label={
                         <>
                           Chiều dài gói hàng (cm){' '}
-                          <span style={{ color: 'red' }}>*</span> (bắt buộc)
+                          <span style={{ color: 'red' }}>*</span>
                         </>
                       }
                       type='number'
@@ -422,7 +419,7 @@ const AddProductModal = ({ open, onClose, onSuccess }) => {
                       label={
                         <>
                           Chiều rộng gói hàng (cm){' '}
-                          <span style={{ color: 'red' }}>*</span> (bắt buộc)
+                          <span style={{ color: 'red' }}>*</span>
                         </>
                       }
                       type='number'
@@ -451,7 +448,7 @@ const AddProductModal = ({ open, onClose, onSuccess }) => {
                       label={
                         <>
                           Chiều cao gói hàng (cm){' '}
-                          <span style={{ color: 'red' }}>*</span> (bắt buộc)
+                          <span style={{ color: 'red' }}>*</span>
                         </>
                       }
                       type='number'
@@ -480,7 +477,7 @@ const AddProductModal = ({ open, onClose, onSuccess }) => {
                       label={
                         <>
                           Trọng lượng gói hàng (cm){' '}
-                          <span style={{ color: 'red' }}>*</span> (bắt buộc)
+                          <span style={{ color: 'red' }}>*</span>
                         </>
                       }
                       type='number'
@@ -497,6 +494,9 @@ const AddProductModal = ({ open, onClose, onSuccess }) => {
           </Grid>
 
           {/*Mô tả*/}
+          <Typography variant='h6'>
+            Mô tả sản phẩm <span style={{ color: 'red' }}>*</span>
+          </Typography>
           <Grid item size={12}>
             <DescriptionEditor
               control={control}

@@ -5,13 +5,8 @@ import FilterByTime from '~/components/FilterAdmin/common/FilterByTime'
 import SearchWithSuggestions from '~/components/FilterAdmin/common/SearchWithSuggestions'
 import FilterSelect from '~/components/FilterAdmin/common/FilterSelect'
 import dayjs from 'dayjs'
-
-export default function FilterWarehouse({
-  onFilter,
-  loading,
-  warehouses = [],
-  fetchWarehouses
-}) {
+import useWarehouses from '~/hooks/admin/Inventory/useWarehouses.js'
+export default function FilterWarehouse({ onFilter, loading }) {
   const [inputValue, setInputValue] = useState('')
   const [keyword, setKeyword] = useState('')
   const [provinceName, setProvinceName] = useState('')
@@ -38,6 +33,10 @@ export default function FilterWarehouse({
   //     .catch((err) => console.error('Lỗi load tỉnh/thành: ', err))
   // }, [])
   const hasMounted = useRef(false)
+  const { warehouses, fetchWarehouses } = useWarehouses()
+  useEffect(() => {
+    fetchWarehouses(1, 100000, { destroy: destroy, sort: sort })
+  }, [destroy, sort])
 
   useEffect(() => {
     if (hasMounted.current) {
@@ -183,8 +182,8 @@ export default function FilterWarehouse({
     setProvinceName('')
     setDistrictName('')
     setWardName('')
-    setDestroy('')
-    setSort('')
+    setDestroy('false')
+    setSort('newest')
     // setSelectedProvince('')
     // setSelectedDistrict('')
     // setSelectedWard('')
@@ -193,7 +192,7 @@ export default function FilterWarehouse({
     setSelectedFilter('')
     setStartDate(dayjs().format('YYYY-MM-DD'))
     setEndDate(dayjs().format('YYYY-MM-DD'))
-    onFilter({})
+    onFilter({ destroy: 'false', sort: 'newest' })
     // fetchWarehouses(1, 10)
   }
 

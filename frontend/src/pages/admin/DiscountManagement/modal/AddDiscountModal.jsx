@@ -113,7 +113,11 @@ const AddDiscountModal = ({ open, onClose, onAdded }) => {
             {/* Cột trái */}
             <Box flex={1}>
               <TextField
-                label='Mã giảm giá'
+                label={
+                  <>
+                    Mã giảm giá <span style={{ color: 'red' }}>*</span>
+                  </>
+                }
                 fullWidth
                 margin='normal'
                 {...register('code', {
@@ -177,7 +181,12 @@ const AddDiscountModal = ({ open, onClose, onAdded }) => {
                 }) => (
                   <TextField
                     label={
-                      type === 'fixed' ? 'Giá trị giảm (đ)' : 'Giá trị giảm (%)'
+                      <>
+                        {type === 'fixed'
+                          ? 'Giá trị giảm (đ)'
+                          : 'Giá trị giảm (%)'}{' '}
+                        <span style={{ color: 'red' }}>*</span>
+                      </>
                     }
                     type='text'
                     fullWidth
@@ -218,7 +227,12 @@ const AddDiscountModal = ({ open, onClose, onAdded }) => {
                   fieldState: { error }
                 }) => (
                   <TextField
-                    label='Giá trị đơn hàng tối thiểu (đ)'
+                    label={
+                      <>
+                        Giá trị đơn hàng tối thiểu (đ){' '}
+                        <span style={{ color: 'red' }}>*</span>
+                      </>
+                    }
                     type='text'
                     fullWidth
                     margin='normal'
@@ -249,7 +263,12 @@ const AddDiscountModal = ({ open, onClose, onAdded }) => {
                   fieldState: { error }
                 }) => (
                   <TextField
-                    label='Số lượt sử dụng tối đa'
+                    label={
+                      <>
+                        Số lượt sử dụng tối đa{' '}
+                        <span style={{ color: 'red' }}>*</span>
+                      </>
+                    }
                     type='text'
                     fullWidth
                     margin='normal'
@@ -275,7 +294,11 @@ const AddDiscountModal = ({ open, onClose, onAdded }) => {
                   <TextField
                     {...field}
                     type='datetime-local'
-                    label='Hiệu lực từ'
+                    label={
+                      <>
+                        Ngày bắt đầu <span style={{ color: 'red' }}>*</span>
+                      </>
+                    }
                     fullWidth
                     margin='normal'
                     InputLabelProps={{ shrink: true }}
@@ -303,7 +326,11 @@ const AddDiscountModal = ({ open, onClose, onAdded }) => {
                   <TextField
                     {...field}
                     type='datetime-local'
-                    label='Hiệu lực đến'
+                    label={
+                      <>
+                        Ngày kết thúc <span style={{ color: 'red' }}>*</span>
+                      </>
+                    }
                     fullWidth
                     margin='normal'
                     InputLabelProps={{ shrink: true }}

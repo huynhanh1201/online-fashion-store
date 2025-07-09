@@ -3,17 +3,11 @@ import { Box, Button } from '@mui/material'
 import dayjs from 'dayjs'
 import FilterSelect from '~/components/FilterAdmin/common/FilterSelect'
 import FilterByTime from '~/components/FilterAdmin/common/FilterByTime'
-import FilterByPrice from '~/components/FilterAdmin/common/FilterByPrice'
 import SearchWithSuggestions from '~/components/FilterAdmin/common/SearchWithSuggestions'
-
-export default function FilterBatches({
-  onFilter,
-  batches = [],
-  variants = [],
-  warehouses = [],
-  loading,
-  fetchData
-}) {
+import useVariants from '~/hooks/admin/Inventory/useVariants.js'
+import useWarehouses from '~/hooks/admin/Inventory/useWarehouses.js'
+import useBatches from '~/hooks/admin/Inventory/useBatches.js'
+export default function FilterBatches({ onFilter, loading }) {
   const [keyword, setKeyword] = useState('')
   const [inputValue, setInputValue] = useState('')
   const [variantId, setVariantId] = useState('')
@@ -28,6 +22,16 @@ export default function FilterBatches({
   const [importPriceMin, setImportPriceMin] = useState('')
   const [importPriceMax, setImportPriceMax] = useState('')
   const hasMounted = useRef(false)
+  const { variants, fetchVariants } = useVariants()
+  const { warehouses, fetchWarehouses } = useWarehouses()
+  const { batches, fetchBatches } = useBatches()
+
+  useEffect(() => {
+    fetchVariants(1, 100000, { destroy: destroy, sort: sort })
+    fetchWarehouses(1, 100000, { destroy: destroy, sort: sort })
+    fetchBatches(1, 100000, { destroy: destroy, sort: sort })
+  }, [])
+
   useEffect(() => {
     if (hasMounted.current) {
       applyFilters()
@@ -121,15 +125,17 @@ export default function FilterBatches({
     setQuantityMax('')
     setImportPriceMin('')
     setImportPriceMax('')
-    setDestroy('')
-    setSort('')
+    setDestroy('false')
+    setSort('newest')
     setSelectedFilter('')
     setStartDate(dayjs().format('YYYY-MM-DD'))
     setEndDate(dayjs().format('YYYY-MM-DD'))
-    onFilter({})
+    onFilter({ sort: 'newest' })
     // fetchData?.()
   }
-
+  const uniqueVariants = variants.filter(
+    (v, index, self) => self.findIndex((x) => x.name === v.name) === index
+  )
   return (
     <Box display='flex' flexWrap='wrap' gap={2} mb={2} justifyContent='end'>
       <FilterSelect
@@ -138,7 +144,10 @@ export default function FilterBatches({
         onChange={setVariantId}
         options={[
           { label: 'Tất cả', value: '' },
-          ...variants.map((v) => ({ label: v.name, value: v._id }))
+          ...uniqueVariants.map((v) => ({
+            label: v.name,
+            value: v._id
+          }))
         ]}
       />
       <FilterSelect

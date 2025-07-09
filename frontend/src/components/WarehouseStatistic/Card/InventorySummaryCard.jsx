@@ -32,13 +32,13 @@ export default function InventorySummaryCard({ data, loading }) {
     },
     {
       label: 'Tổng giá trị tồn kho',
-      value: `${Number(totalValue).toLocaleString('vi-VN')}đ`,
+      value: `${Number(totalValue).toLocaleString('vi-VN')}₫`,
       icon: <MonetizationOnIcon color='success' fontSize='large' />,
       color: '#81C784'
     },
     {
       label: 'Tổng lợi nhuận ước tính',
-      value: `${Number(estimatedProfit).toLocaleString('vi-VN')}đ`,
+      value: `${Number(estimatedProfit).toLocaleString('vi-VN')}₫`,
       icon: <AttachMoneyIcon color='warning' fontSize='large' />,
       color: '#FFB74D'
     },
@@ -93,7 +93,7 @@ export default function InventorySummaryCard({ data, loading }) {
             }}
           >
             <Stack>
-              <Typography variant='h5' color='text.secondary' sx={{ mb: 1 }}>
+              <Typography variant='h6' color='text.secondary' sx={{ mb: 1 }}>
                 {item.label}
               </Typography>
               <Typography

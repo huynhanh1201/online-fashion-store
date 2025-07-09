@@ -9,7 +9,7 @@ export const getPartners = async (filters = {}) => {
     )
     return {
       partners: response.data.data || [],
-      total: response.data.meta.total || 0
+      total: response.data.meta.total
     }
   } catch (error) {
     console.error('Error fetching partners:', error)

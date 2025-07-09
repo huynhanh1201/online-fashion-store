@@ -9,7 +9,7 @@ import {
 
 export default function useUsers() {
   const [users, setUsers] = useState([])
-  const [totalPages, setTotalPages] = useState(1)
+  const [totalPages, setTotalPages] = useState(0)
   const [Loading, setLoading] = useState(false)
   const [ROWS_PER_PAGE, setROWS_PER_PAGE] = useState(10)
 
@@ -32,7 +32,7 @@ export default function useUsers() {
       const query = buildQuery(filters)
       const { users, total } = await getUsers(query)
       setUsers(users)
-      setTotalPages(Math.max(1, Math.ceil(total / limit)))
+      setTotalPages(total)
     } catch (err) {
       console.error(err)
     }

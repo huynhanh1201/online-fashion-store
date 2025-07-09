@@ -227,14 +227,9 @@ import dayjs from 'dayjs'
 import FilterSelect from '~/components/FilterAdmin/common/FilterSelect'
 import FilterByTime from '~/components/FilterAdmin/common/FilterByTime'
 import SearchWithSuggestions from '~/components/FilterAdmin/common/SearchWithSuggestions'
-
-export default function FilterInventory({
-  onFilter,
-  warehouses = [],
-  loading,
-  variants = [],
-  fetchInventories
-}) {
+import useWarehouses from '~/hooks/admin/Inventory/useWarehouses.js'
+import useVariants from '~/hooks/admin/Inventory/useVariants.js'
+export default function FilterInventory({ onFilter, loading }) {
   const [keyword, setKeyword] = useState('')
   const [inputValue, setInputValue] = useState('')
   const [warehouseId, setWarehouseId] = useState('')
@@ -245,6 +240,15 @@ export default function FilterInventory({
   const [startDate, setStartDate] = useState(dayjs().format('YYYY-MM-DD'))
   const [endDate, setEndDate] = useState(dayjs().format('YYYY-MM-DD'))
   const hasMounted = useRef(false)
+
+  const { warehouses, fetchWarehouses } = useWarehouses()
+  const { variants, fetchVariants } = useVariants()
+
+  useEffect(() => {
+    // fetchVariants(1, 100000)
+    fetchWarehouses(1, 100000, { destroy: destroy, sort: sort })
+  }, [destroy, sort])
+
   useEffect(() => {
     if (hasMounted.current) {
       applyFilters(selectedFilter, startDate, endDate)
@@ -311,14 +315,19 @@ export default function FilterInventory({
     setWarehouseId('')
     setStatus('')
     setDestroy('')
-    setSort('')
+    setSort('newest')
     setSelectedFilter('')
     setStartDate(dayjs().format('YYYY-MM-DD'))
     setEndDate(dayjs().format('YYYY-MM-DD'))
-    onFilter({})
+    onFilter({ sort: 'newest' })
     // fetchInventories(1, 10)
   }
-
+  const uniqueWarehouses = warehouses.filter(
+    (wh, index, self) => self.findIndex((x) => x.name === wh.name) === index
+  )
+  // const uniqueVariants = variants.filter(
+  //   (v, i, self) => self.findIndex((x) => x.name === v.name) === i
+  // )
   return (
     <Box display='flex' flexWrap='wrap' gap={2} mb={2} justifyContent='end'>
       <FilterSelect
@@ -330,9 +339,9 @@ export default function FilterInventory({
         }}
         options={[
           { label: 'Tất cả', value: '' },
-          ...warehouses.map((wh) => ({
-            label: wh.warehouseId?.name,
-            value: wh.warehouseId?._id
+          ...uniqueWarehouses.map((wh) => ({
+            label: wh.name,
+            value: wh._id
           }))
         ]}
       />
@@ -379,29 +388,28 @@ export default function FilterInventory({
         ]}
       />
 
-      <FilterByTime
-        label='Ngày tạo'
-        selectedFilter={selectedFilter}
-        setSelectedFilter={setSelectedFilter}
-        onSelectFilter={handleSelectFilter}
-        onApply={handleApplyTime}
-        startDate={startDate}
-        setStartDate={setStartDate}
-        endDate={endDate}
-        setEndDate={setEndDate}
-      />
-
       <Box sx={{ display: 'flex', gap: 2 }}>
-        <SearchWithSuggestions
-          label='Biến thể sản phẩm'
-          options={variants.map((v) => v.name)}
-          keyword={keyword}
-          inputValue={inputValue}
-          setKeyword={setKeyword}
-          setInputValue={setInputValue}
-          onSearch={handleSearch}
-          loading={loading}
+        <FilterByTime
+          label='Ngày tạo'
+          selectedFilter={selectedFilter}
+          setSelectedFilter={setSelectedFilter}
+          onSelectFilter={handleSelectFilter}
+          onApply={handleApplyTime}
+          startDate={startDate}
+          setStartDate={setStartDate}
+          endDate={endDate}
+          setEndDate={setEndDate}
         />
+        {/*<SearchWithSuggestions*/}
+        {/*  label='Biến thể sản phẩm'*/}
+        {/*  options={uniqueVariants.map((v) => v.name)}*/}
+        {/*  keyword={keyword}*/}
+        {/*  inputValue={inputValue}*/}
+        {/*  setKeyword={setKeyword}*/}
+        {/*  setInputValue={setInputValue}*/}
+        {/*  onSearch={handleSearch}*/}
+        {/*  loading={loading}*/}
+        {/*/>*/}
 
         <Button
           variant='outlined'

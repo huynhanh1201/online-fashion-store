@@ -87,7 +87,7 @@ const BatchesTab = () => {
       maxWidth: 150,
       align: 'right',
       pr: 6,
-      format: (value) => `${value.toLocaleString('vi-VN')}đ`
+      format: (value) => `${value.toLocaleString('vi-VN')}₫`
     },
     // {
     //   id: 'destroy',
@@ -344,6 +344,11 @@ const BatchesTab = () => {
                       <TableCell
                         key={col.id}
                         align={col.align || 'left'}
+                        onClick={
+                          col.id === 'batchCode' && hasPermission('batch:read')
+                            ? () => handleViewBatch(row)
+                            : undefined
+                        }
                         sx={{
                           py: 0,
                           px: 1,
@@ -353,7 +358,11 @@ const BatchesTab = () => {
                           overflow: 'hidden',
                           textOverflow: 'ellipsis',
                           background: '#fff',
-                          ...(col.maxWidth && { maxWidth: col.maxWidth })
+                          ...(col.maxWidth && { maxWidth: col.maxWidth }),
+                          ...(col.id === 'batchCode' &&
+                            hasPermission('batch:read') && {
+                              cursor: 'pointer'
+                            })
                         }}
                         title={
                           typeof content === 'string' ? content : undefined
@@ -385,7 +394,7 @@ const BatchesTab = () => {
         }}
         labelRowsPerPage='Số dòng mỗi trang'
         labelDisplayedRows={({ from, to, count }) => {
-          const totalPages = Math.ceil(count / rowsPerPage)
+          const totalPages = Math.max(1, Math.ceil(count / rowsPerPage))
           return `${from}–${to} trên ${count} | Trang ${page} / ${totalPages}`
         }}
         ActionsComponent={TablePaginationActions}

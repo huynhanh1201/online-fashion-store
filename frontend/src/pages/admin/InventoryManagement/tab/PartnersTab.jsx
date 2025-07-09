@@ -423,6 +423,11 @@ const PartnersTab = () => {
                     <TableCell
                       key={col.id}
                       align={col.align || 'left'}
+                      onClick={
+                        col.id === 'code' && hasPermission('partner:read')
+                          ? () => handleViewPartner(row)
+                          : undefined
+                      }
                       sx={{
                         background: '#fff',
                         py: 0,
@@ -431,8 +436,11 @@ const PartnersTab = () => {
                         whiteSpace: 'nowrap',
                         overflow: 'hidden',
                         textOverflow: 'ellipsis',
-
-                        ...(col.maxWidth && { maxWidth: col.maxWidth })
+                        ...(col.maxWidth && { maxWidth: col.maxWidth }),
+                        ...(col.id === 'code' &&
+                          hasPermission('partner:read') && {
+                            cursor: 'pointer'
+                          })
                       }}
                       title={typeof content === 'string' ? content : undefined}
                     >
@@ -461,7 +469,7 @@ const PartnersTab = () => {
         }}
         labelRowsPerPage='Số dòng mỗi trang'
         labelDisplayedRows={({ from, to, count }) => {
-          const totalPages = Math.ceil(count / ROWS_PER_PAGE)
+          const totalPages = Math.max(1, Math.ceil(count / ROWS_PER_PAGE))
           return `${from}–${to} trên ${count} | Trang ${page} / ${totalPages}`
         }}
         ActionsComponent={TablePaginationActions}

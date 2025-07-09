@@ -256,17 +256,15 @@ import { Box, Button } from '@mui/material'
 import dayjs from 'dayjs'
 import FilterSelect from '~/components/FilterAdmin/common/FilterSelect'
 import FilterByTime from '~/components/FilterAdmin/common/FilterByTime'
-import FilterByPrice from '~/components/FilterAdmin/common/FilterByPrice'
 import SearchWithSuggestions from '~/components/FilterAdmin/common/SearchWithSuggestions'
-
+import useInventoryLogs from '~/hooks/admin/Inventory/useInventoryLogs.js'
 export default function FilterInventoryLog({
   onFilter,
   // inventories = [],
   // warehouses = [],
   // batches = [],
   // users = [],
-  loading,
-  inventoryLog = []
+  loading
 }) {
   const [keyword, setKeyword] = useState('')
   const [inputValue, setInputValue] = useState('')
@@ -286,6 +284,11 @@ export default function FilterInventoryLog({
   const [startDate, setStartDate] = useState(dayjs().format('YYYY-MM-DD'))
   const [endDate, setEndDate] = useState(dayjs().format('YYYY-MM-DD'))
   const hasMounted = useRef(false)
+  const { logs, fetchLogs } = useInventoryLogs()
+  useEffect(() => {
+    fetchLogs(1, 100000, { sort: sort })
+  }, [])
+
   useEffect(() => {
     if (hasMounted.current) {
       applyFilters(selectedFilter, startDate, endDate)
@@ -357,7 +360,7 @@ export default function FilterInventoryLog({
     setWarehouseId('')
     setBatchId('')
     setType('')
-    setSort('')
+    setSort('newest')
     setAmountMin('')
     setAmountMax('')
     setImportPriceMin('')
@@ -368,10 +371,10 @@ export default function FilterInventoryLog({
     setSelectedFilter('')
     setStartDate(dayjs().format('YYYY-MM-DD'))
     setEndDate(dayjs().format('YYYY-MM-DD'))
-    onFilter({})
+    onFilter({ sort: 'newest' })
   }
 
-  const sourceOptions = inventoryLog.map((item) => ({
+  const sourceOptions = logs.map((item) => ({
     label: item.source,
     value: item._id
   }))

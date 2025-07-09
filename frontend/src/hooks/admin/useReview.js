@@ -10,7 +10,6 @@ const useReviews = () => {
   const [reviews, setReviews] = React.useState([])
   const [totalPages, setTotalPages] = React.useState(0)
   const [loading, setLoading] = React.useState(false)
-
   const fetchReview = async (page = 1, limit = 10, filter = {}) => {
     setLoading(true)
     const buildQuery = (input) => {

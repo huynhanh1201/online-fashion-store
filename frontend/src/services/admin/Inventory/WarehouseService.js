@@ -9,7 +9,7 @@ export const getWarehouses = async (filters) => {
     )
     return {
       warehouses: response.data.data || [],
-      total: response.data.meta.total || 0
+      total: response.data.meta.total
     }
   } catch (error) {
     console.error('Lỗi khi lấy danh sách kho:', error)

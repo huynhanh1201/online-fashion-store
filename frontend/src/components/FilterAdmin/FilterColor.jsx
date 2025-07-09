@@ -137,13 +137,8 @@ import dayjs from 'dayjs'
 import FilterByTime from '~/components/FilterAdmin/common/FilterByTime.jsx'
 import SearchWithSuggestions from '~/components/FilterAdmin/common/SearchWithSuggestions.jsx'
 import FilterSelect from '~/components/FilterAdmin/common/FilterSelect.jsx'
-
-export default function FilterColor({
-  onFilter,
-  colors,
-  fetchColors,
-  loading
-}) {
+import useColor from '~/hooks/admin/useColor.js'
+export default function FilterColor({ onFilter, loading }) {
   const [keyword, setKeyword] = useState('')
   const [inputValue, setInputValue] = useState('')
   const [selectedFilter, setSelectedFilter] = useState('')
@@ -152,6 +147,12 @@ export default function FilterColor({
   const [status, setStatus] = useState('false')
   const [sort, setSort] = useState('newest')
   const hasMounted = useRef(false)
+  const { colors, fetchColors } = useColor()
+
+  useEffect(() => {
+    fetchColors(1, 100000, { destroy: status, sort: sort })
+  }, [sort, status])
+
   useEffect(() => {
     if (hasMounted.current) {
       applyFilters(selectedFilter, startDate, endDate)

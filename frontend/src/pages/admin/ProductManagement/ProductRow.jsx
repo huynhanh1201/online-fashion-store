@@ -86,6 +86,25 @@ const ProductRow = ({
               </TableCell>
             )
           }
+          if (id === 'productCode') {
+            return (
+              <TableCell
+                key={id}
+                align={align}
+                onClick={
+                  permissions.canView ? () => onAction('view', product) : null
+                }
+                sx={{
+                  ...styles.cellPadding,
+                  maxWidth: 200,
+                  display: 'table-cell',
+                  cursor: permissions.canView ? 'pointer' : 'default'
+                }}
+              >
+                {product.productCode || 'Không có mã sản phẩm'}
+              </TableCell>
+            )
+          }
 
           if (id === 'name') {
             if (id === 'name') {
@@ -102,10 +121,14 @@ const ProductRow = ({
               <TableCell
                 key={id}
                 align={align}
+                onClick={
+                  permissions.canView ? () => onAction('view', product) : null
+                }
                 sx={{
                   ...styles.cellPadding,
                   maxWidth: 200,
-                  display: 'table-cell'
+                  display: 'table-cell',
+                  cursor: permissions.canView ? 'pointer' : 'default'
                 }}
               >
                 {product.name ||
@@ -126,6 +149,7 @@ const ProductRow = ({
               <TableCell
                 key={id}
                 align={align}
+                title={'Xem danh mục'}
                 sx={{
                   ...styles.cellPadding,
                   cursor: product.categoryId ? 'pointer' : 'default',
@@ -208,7 +232,7 @@ const ProductRow = ({
                 align={align}
                 sx={{ ...styles.cellPadding, pr: 7 }}
               >
-                {product.importPrice?.toLocaleString('vi-VN') + 'đ'}
+                {product.importPrice?.toLocaleString('vi-VN') + '₫'}
               </TableCell>
             )
           }
@@ -216,7 +240,7 @@ const ProductRow = ({
           if (id === 'exportPrice') {
             return (
               <TableCell key={id} align={align} sx={styles.cellPadding}>
-                {product.exportPrice?.toLocaleString('vi-VN') + 'đ'}
+                {product.exportPrice?.toLocaleString('vi-VN') + '₫'}
               </TableCell>
             )
           }

@@ -70,7 +70,7 @@ const ViewDiscountModal = ({ open, onClose, discount }) => {
               </TableCell>
               <TableCell>
                 {discount.type === 'fixed'
-                  ? `${discount.amount?.toLocaleString('vi-VN') ?? '—'}đ`
+                  ? `${discount.amount?.toLocaleString('vi-VN') ?? '—'}₫`
                   : `${discount.amount ?? '—'}%`}
               </TableCell>
             </TableRow>
@@ -96,7 +96,7 @@ const ViewDiscountModal = ({ open, onClose, discount }) => {
                 <strong>Giá trị đơn hàng tối thiểu</strong>
               </TableCell>
               <TableCell>
-                {discount.minOrderValue.toLocaleString('vi-VN')}đ
+                {discount.minOrderValue.toLocaleString('vi-VN')}₫
               </TableCell>
             </TableRow>
 

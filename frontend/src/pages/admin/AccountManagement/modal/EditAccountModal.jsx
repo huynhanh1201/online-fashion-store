@@ -101,8 +101,7 @@ const EditAccountModal = ({ open, onClose, user, onSave, roles }) => {
                 {...field}
                 label={
                   <>
-                    Tên tài khoản <span style={{ color: 'red' }}>*</span> (bắt
-                    buộc)
+                    Tên tài khoản <span style={{ color: 'red' }}>*</span>
                   </>
                 }
                 fullWidth
@@ -173,14 +172,23 @@ const EditAccountModal = ({ open, onClose, user, onSave, roles }) => {
                     {...params}
                     label={
                       <>
-                        Vai trò <span style={{ color: 'red' }}>*</span> (bắt
-                        buộc)
+                        Vai trò <span style={{ color: 'red' }}>*</span>
                       </>
                     }
                     margin='normal'
                     error={!!fieldState.error}
                     helperText={fieldState.error?.message}
                     sx={StyleAdmin.InputCustom}
+                    onFocus={(event) => {
+                      // Hủy hành vi select toàn bộ khi focus
+                      const input = event.target
+                      requestAnimationFrame(() => {
+                        input.setSelectionRange?.(
+                          input.value.length,
+                          input.value.length
+                        )
+                      })
+                    }}
                   />
                 )}
               />

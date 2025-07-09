@@ -58,13 +58,40 @@ export default function RoleRow({
               key={column.id}
               align={column.align}
               title={originalName}
+              onClick={
+                hasPermission('role:read')
+                  ? () => handleOpenModal('view', role)
+                  : null
+              }
               sx={{
                 ...styles.cellPadding,
                 maxWidth: 200,
-                display: 'table-cell'
+                display: 'table-cell',
+                cursor: hasPermission('role:read') ? 'pointer' : 'default'
               }}
             >
               {originalName}
+            </TableCell>
+          )
+        }
+        if (column.id === 'label') {
+          return (
+            <TableCell
+              key={column.id}
+              align={column.align}
+              title={role?.label || 'Không có tên vai trò'}
+              onClick={
+                hasPermission('role:read')
+                  ? () => handleOpenModal('view', role)
+                  : null
+              }
+              sx={{
+                ...styles.cellPadding,
+                pr: column.pr,
+                cursor: hasPermission('role:read') ? 'pointer' : 'default'
+              }}
+            >
+              {role?.label || 'Không có tên vai trò'}
             </TableCell>
           )
         }
@@ -74,7 +101,17 @@ export default function RoleRow({
             <TableCell
               key={column.id}
               align={column.align}
-              sx={{ ...styles.cellPadding, pr: column.pr }}
+              title={`Số lượng quyền: ${role.permissions?.length || 0}`}
+              onClick={
+                hasPermission('role:read')
+                  ? () => handleOpenModal('view', role)
+                  : null
+              }
+              sx={{
+                ...styles.cellPadding,
+                pr: column.pr,
+                cursor: hasPermission('role:read') ? 'pointer' : 'default'
+              }}
             >
               {role.permissions?.length || 0}
             </TableCell>

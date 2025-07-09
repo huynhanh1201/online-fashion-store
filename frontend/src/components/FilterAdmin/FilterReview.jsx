@@ -138,7 +138,7 @@ export default function FilterReview({ onFilter, reviews = [], loading }) {
 
       <Box sx={{ display: 'flex', gap: 2 }}>
         <SearchWithSuggestions
-          label='Tìm sản phẩm'
+          label='Tìm đánh giá của sản phẩm'
           options={productOptions}
           loading={loading}
           keyword={keyword} // sẽ là productId._id

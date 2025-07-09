@@ -41,31 +41,31 @@ export default function AdminAppBar({
         </Typography>
 
         <Box sx={{ flexGrow: 1 }} />
-        <Box
-          sx={{
-            cursor: 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            width: 40,
-            height: 40
-          }}
-        >
-          <IconButton
-            size='large'
-            aria-label='show notifications'
-            color='inherit'
-            onClick={modalOpen ? handleModalClose : handleModalOpen}
-          >
-            <Badge
-              // badgeContent={notifications.filter((n) => !n.read).length}
-              badgeContent={10}
-              color='error'
-            >
-              <NotificationsIcon />
-            </Badge>
-          </IconButton>
-        </Box>
+        {/*<Box*/}
+        {/*  sx={{*/}
+        {/*    cursor: 'pointer',*/}
+        {/*    display: 'flex',*/}
+        {/*    alignItems: 'center',*/}
+        {/*    justifyContent: 'center',*/}
+        {/*    width: 40,*/}
+        {/*    height: 40*/}
+        {/*  }}*/}
+        {/*>*/}
+        {/*  <IconButton*/}
+        {/*    size='large'*/}
+        {/*    aria-label='show notifications'*/}
+        {/*    color='inherit'*/}
+        {/*    onClick={modalOpen ? handleModalClose : handleModalOpen}*/}
+        {/*  >*/}
+        {/*    <Badge*/}
+        {/*      // badgeContent={notifications.filter((n) => !n.read).length}*/}
+        {/*      badgeContent={10}*/}
+        {/*      color='error'*/}
+        {/*    >*/}
+        {/*      <NotificationsIcon />*/}
+        {/*    </Badge>*/}
+        {/*  </IconButton>*/}
+        {/*</Box>*/}
         {/* Mobile icon fallback */}
         <Box sx={{ display: { xs: 'flex', md: 'none' } }}>
           <IconButton

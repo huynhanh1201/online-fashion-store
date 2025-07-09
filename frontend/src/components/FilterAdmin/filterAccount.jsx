@@ -5,8 +5,9 @@ import dayjs from 'dayjs'
 import FilterByTime from '~/components/FilterAdmin/common/FilterByTime.jsx'
 import FilterSelect from '~/components/FilterAdmin/common/FilterSelect.jsx'
 import SearchWithSuggestions from '~/components/FilterAdmin/common/SearchWithSuggestions.jsx'
+import useUsers from '~/hooks/admin/useUsers.js'
 
-export default function FilterAccount({ onFilter, users, loading, roles }) {
+export default function FilterAccount({ onFilter, loading, roles }) {
   const [keyword, setKeyword] = useState('')
   const [inputValue, setInputValue] = useState('')
   const [selectedFilter, setSelectedFilter] = useState('')
@@ -16,6 +17,14 @@ export default function FilterAccount({ onFilter, users, loading, roles }) {
   const [sort, setSort] = useState('newest')
   const [destroy, setDestroy] = useState('false')
   const hasMounted = useRef(false)
+  const { users, fetchUsers } = useUsers()
+
+  useEffect(() => {
+    fetchUsers(1, 100000, { destroy: destroy, sort: sort })
+  }, [destroy, sort])
+
+  const filterUser = users.filter((user) => user?.role !== 'customer')
+
   useEffect(() => {
     applyFilters(selectedFilter, startDate, endDate)
     hasMounted.current = true
@@ -129,8 +138,8 @@ export default function FilterAccount({ onFilter, users, loading, roles }) {
 
       <Box sx={{ display: 'flex', gap: 2 }}>
         <SearchWithSuggestions
-          label='Tên hoặc email'
-          options={users.map((u) => u.name || u.email)}
+          label='Tên tài khoản'
+          options={filterUser.map((u) => u.name || u.email)}
           loading={loading}
           keyword={keyword}
           inputValue={inputValue}

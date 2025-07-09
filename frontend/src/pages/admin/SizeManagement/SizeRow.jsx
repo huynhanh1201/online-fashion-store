@@ -1,79 +1,3 @@
-// import React from 'react'
-// import { Stack, IconButton, TableCell, TableRow } from '@mui/material'
-// import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye'
-// import BorderColorIcon from '@mui/icons-material/BorderColor'
-// import DeleteForeverIcon from '@mui/icons-material/DeleteForever'
-//
-// const formatDateTime = (isoString) => {
-//   const date = new Date(isoString)
-//   return date.toLocaleString('vi-VN', {
-//     day: '2-digit',
-//     month: '2-digit',
-//     year: 'numeric'
-//   })
-// }
-//
-// const styles = {
-//   groupIcon: {
-//     display: 'flex',
-//     justifyContent: 'space-between',
-//     alignItems: 'center',
-//     width: '100%'
-//   }
-// }
-//
-// export default function SizeRow({ size, idx, handleOpenModal }) {
-//   return (
-//     <TableRow>
-//       <TableCell sx={{ textAlign: 'center' }}>{idx + 1}</TableCell>
-//       <TableCell
-//         sx={{
-//           maxWidth: 200,
-//           overflow: 'hidden',
-//           textOverflow: 'ellipsis',
-//           whiteSpace: 'nowrap'
-//         }}
-//       >
-//         {size.name}
-//       </TableCell>
-//       <TableCell>{formatDateTime(size.createdAt)}</TableCell>
-//       <TableCell>{formatDateTime(size.updatedAt)}</TableCell>
-//       <TableCell
-//         sx={{
-//           width: '130px',
-//           maxWidth: '130px',
-//           padding: '0px',
-//           textAlign: 'center'
-//         }}
-//       >
-//         <Stack direction='row' sx={styles.groupIcon}>
-//           <IconButton
-//             onClick={() => handleOpenModal('view', size)}
-//             size='small'
-//             color='primary'
-//           >
-//             <RemoveRedEyeIcon color='primary' />
-//           </IconButton>
-//           <IconButton
-//             onClick={() => handleOpenModal('edit', size)}
-//             size='small'
-//             color='info'
-//           >
-//             <BorderColorIcon color='warning' />
-//           </IconButton>
-//           <IconButton
-//             onClick={() => handleOpenModal('delete', size)}
-//             size='small'
-//             color='error'
-//           >
-//             <DeleteForeverIcon color='error' />
-//           </IconButton>
-//         </Stack>
-//       </TableCell>
-//     </TableRow>
-//   )
-// }
-
 import React from 'react'
 import { Stack, IconButton, TableCell, TableRow } from '@mui/material'
 import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye'
@@ -201,8 +125,18 @@ export default function SizeRow({
           <TableCell
             key={id}
             align={align || 'left'}
+            onClick={
+              id === 'name' && permissions.canView
+                ? () => handleOpenModal('view', size)
+                : undefined
+            }
             title={typeof content === 'string' ? content : undefined}
-            sx={styles.cell}
+            sx={{
+              ...styles.cell,
+              ...(id === 'name' && permissions.canView
+                ? { cursor: 'pointer' }
+                : {})
+            }}
           >
             {content}
           </TableCell>

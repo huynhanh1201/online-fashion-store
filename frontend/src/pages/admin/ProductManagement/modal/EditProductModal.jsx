@@ -242,8 +242,7 @@ const EditProductModal = ({ open, onClose, onSave, product }) => {
                 <TextField
                   label={
                     <>
-                      Tên sản phẩm <span style={{ color: 'red' }}>*</span> (bắt
-                      buộc)
+                      Tên sản phẩm <span style={{ color: 'red' }}>*</span>
                     </>
                   }
                   fullWidth
@@ -269,7 +268,7 @@ const EditProductModal = ({ open, onClose, onSave, product }) => {
           <Grid item size={6}>
             <FormControl fullWidth margin='normal' error={!!errors.categoryId}>
               <InputLabel>
-                Danh mục <span style={{ color: 'red' }}>*</span> (bắt buộc)
+                Danh mục <span style={{ color: 'red' }}>*</span>
               </InputLabel>
               <Controller
                 name='categoryId'
@@ -314,7 +313,11 @@ const EditProductModal = ({ open, onClose, onSave, product }) => {
               }}
               render={({ field }) => (
                 <TextField
-                  label='Giá nhập (đ)'
+                  label={
+                    <>
+                      Giá nhập (đ) <span style={{ color: 'red' }}>*</span>
+                    </>
+                  }
                   fullWidth
                   type='text'
                   value={formatNumber(field.value || '')}
@@ -339,7 +342,11 @@ const EditProductModal = ({ open, onClose, onSave, product }) => {
               }}
               render={({ field }) => (
                 <TextField
-                  label='Giá bán (đ)'
+                  label={
+                    <>
+                      Giá bán (đ) <span style={{ color: 'red' }}>*</span>
+                    </>
+                  }
                   fullWidth
                   type='text'
                   value={formatNumber(field.value || '')}
@@ -356,7 +363,7 @@ const EditProductModal = ({ open, onClose, onSave, product }) => {
           {/* Kích thước gói hàng */}
           <Typography variant='h6'>Kích thước đóng gói</Typography>
           <Grid item size={12}>
-            <Grid container spacing={2} sx={{ mt: 1 }}>
+            <Grid container spacing={2}>
               {/* Chiều dài */}
               <Grid item size={3} xs={6} sm={3}>
                 <Controller
@@ -369,7 +376,12 @@ const EditProductModal = ({ open, onClose, onSave, product }) => {
                   }}
                   render={({ field }) => (
                     <TextField
-                      label='Chiều dài gói hàng (cm)'
+                      label={
+                        <>
+                          Chiều dài gói hàng (cm){' '}
+                          <span style={{ color: 'red' }}>*</span>
+                        </>
+                      }
                       type='number'
                       fullWidth
                       inputProps={{ min: 0, step: '0.01' }}
@@ -393,7 +405,12 @@ const EditProductModal = ({ open, onClose, onSave, product }) => {
                   }}
                   render={({ field }) => (
                     <TextField
-                      label='Chiều rộng gói hàng (cm)'
+                      label={
+                        <>
+                          Chiều rộng gói hàng (cm){' '}
+                          <span style={{ color: 'red' }}>*</span>
+                        </>
+                      }
                       type='number'
                       fullWidth
                       inputProps={{ min: 0, step: '0.01' }}
@@ -417,7 +434,12 @@ const EditProductModal = ({ open, onClose, onSave, product }) => {
                   }}
                   render={({ field }) => (
                     <TextField
-                      label='Chiều cao gói hàng (cm)'
+                      label={
+                        <>
+                          Chiều cao gói hàng (cm){' '}
+                          <span style={{ color: 'red' }}>*</span>
+                        </>
+                      }
                       type='number'
                       fullWidth
                       inputProps={{ min: 0, step: '0.01' }}
@@ -441,7 +463,12 @@ const EditProductModal = ({ open, onClose, onSave, product }) => {
                   }}
                   render={({ field }) => (
                     <TextField
-                      label='Trọng lượng gói hàng (gram)'
+                      label={
+                        <>
+                          Trọng lượng gói hàng (gram){' '}
+                          <span style={{ color: 'red' }}>*</span>
+                        </>
+                      }
                       type='number'
                       fullWidth
                       inputProps={{ min: 0, step: '0.01' }}
@@ -455,6 +482,9 @@ const EditProductModal = ({ open, onClose, onSave, product }) => {
             </Grid>
           </Grid>
           {/*mô tả*/}
+          <Typography variant='h6'>
+            Mô tả sản phẩm <span style={{ color: 'red' }}>*</span>
+          </Typography>
           <Grid item size={12}>
             <DescriptionEditor
               control={control}

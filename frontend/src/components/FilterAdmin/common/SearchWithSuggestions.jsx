@@ -55,7 +55,11 @@ export default function SearchWithSuggestions({
       clearOnEscape
       options={options}
       loading={loading}
-      value={keyword}
+      value={
+        typeof keyword === 'string'
+          ? options.find((opt) => opt.value === keyword) || null
+          : null
+      }
       inputValue={inputValue}
       onInputChange={(e, newInputValue) => setInputValue(newInputValue)}
       onChange={(e, newValue) => {

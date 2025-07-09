@@ -33,7 +33,7 @@ const useInventorys = () => {
       const query = buildQuery(filters)
       const inventory = await getInventories(query)
       setInventories(inventory.inventories || [])
-      setTotalPages(inventory.total || 1)
+      setTotalPages(inventory.total)
       setLoading(false)
     } catch (error) {
       console.error('Error fetching inventories:', error)

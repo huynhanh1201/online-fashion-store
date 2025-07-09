@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react'
+import React, { useMemo, useEffect } from 'react'
 import {
   Avatar,
   Box,
@@ -36,7 +36,7 @@ import { optimizeCloudinaryUrl } from '~/utils/cloudinary.js'
 import { useDispatch } from 'react-redux'
 import { logoutUserAPI } from '~/redux/user/userSlice'
 import usePermissions from '~/hooks/usePermissions'
-
+import useRoles from '~/hooks/admin/useRoles.js'
 export default function AdminDrawer({
   open,
   profile,
@@ -46,6 +46,7 @@ export default function AdminDrawer({
 }) {
   const location = useLocation()
   const { hasPermission, isLoading, isInitialized } = usePermissions()
+  const { roles, fetchRoles } = useRoles()
   const [openProduct, setOpenProduct] = React.useState(false)
   const [openOrder, setOpenOrder] = React.useState(false)
   const [openInventory, setOpenInventory] = React.useState(false)
@@ -65,6 +66,13 @@ export default function AdminDrawer({
       : currentPath
     return current === normalizedPath
   }
+
+  useEffect(() => {
+    fetchRoles()
+  }, [])
+
+  const roleMap =
+    roles.find((r) => r.name === profile?.role)?.label || 'Không có vai trò'
 
   const activeButtonStyle = {
     '&.Mui-selected': {
@@ -91,24 +99,22 @@ export default function AdminDrawer({
     onClose()
   }
 
-  const roleMap = {
-    technical_admin: 'Kỹ thuật viên hệ thống',
-    owner: 'Chủ cửa hàng',
-    staff: 'Nhân viên quản lý',
-    customer: 'Khách hàng'
-  }
-
   // Cấu hình menu với quyền tương ứng
   const menuConfig = useMemo(
     () => ({
       statistics: {
-        permission: 'statistics:use',
-        label: 'Thống kê',
+        permission: 'admin:access',
+        label: 'Bảng điều khiển',
         path: '/admin',
         icon: <PollIcon />
       },
       accountManagement: {
-        permissions: ['userStatistics:use', 'user:use', 'account:use', 'role:use'],
+        permissions: [
+          'userStatistics:use',
+          'user:use',
+          'account:use',
+          'role:use'
+        ],
         label: 'Quản lý tài khoản',
         icon: <PersonIcon />,
         children: [
@@ -267,16 +273,16 @@ export default function AdminDrawer({
             icon: <ReceiptLongIcon />
           },
           {
-            permission: 'coupon:use',
-            label: 'Quản lý mã giảm giá',
-            path: '/admin/discount-management',
-            icon: <LocalOfferIcon />
-          },
-          {
             permission: 'payment:use',
             label: 'Quản lý giao dịch',
             path: '/admin/transaction-management',
             icon: <PaymentIcon />
+          },
+          {
+            permission: 'coupon:use',
+            label: 'Quản lý mã giảm giá',
+            path: '/admin/discount-management',
+            icon: <LocalOfferIcon />
           }
         ]
       },
@@ -293,7 +299,7 @@ export default function AdminDrawer({
         icon: <WarehouseIcon />,
         children: [
           {
-            permission: 'statistics:use',
+            permission: 'warehouseStatistics:use',
             label: 'Thống kê kho',
             path: '/admin/warehouse-statistic-management',
             icon: <ReceiptLongIcon />
@@ -576,7 +582,7 @@ export default function AdminDrawer({
               textOverflow: 'ellipsis'
             }}
           >
-            {roleMap[profile?.role] || 'Không xác định'}
+            {roleMap}
           </Typography>
         </Box>
       </Box>
@@ -601,7 +607,7 @@ export default function AdminDrawer({
                 <ListItemIcon>
                   <PollIcon />
                 </ListItemIcon>
-                <ListItemText primary='Thống kê' />
+                <ListItemText primary='Bảng điều khiển' />
               </ListItemButton>
             </ListItem>
           )}
