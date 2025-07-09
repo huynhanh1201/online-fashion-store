@@ -301,7 +301,6 @@ const CategoryPage = () => {
             left: 0,
             right: 0,
             bottom: 0,
-            backgroundColor: 'rgba(0, 0, 0, 0.3)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -310,19 +309,6 @@ const CategoryPage = () => {
             px: 3,
           }}
         >
-          <Typography
-            variant='h2'
-            sx={{
-              color: 'white',
-              fontSize: { xs: '2rem', sm: '3rem', md: '4rem' },
-              fontWeight: 'bold',
-              textShadow: '2px 2px 4px rgba(0,0,0,0.5)',
-              mb: 2,
-            }}
-          >
-            {category.name}
-          </Typography>
-          
           {category.description && (
             <Typography
               variant="h6"
@@ -339,6 +325,22 @@ const CategoryPage = () => {
             </Typography>
           )}
         </Box>
+      </Box>
+      {/* Title dưới banner */}
+      <Box sx={{ textAlign: 'center', mt: -3, mb: 4 }}>
+        <Typography
+          variant='h2'
+          sx={{
+            color: 'var(--text-color)',
+            fontSize: { xs: '2rem', sm: '3rem', md: '4rem' },
+            fontWeight: 'bold',
+            textShadow: '2px 2px 4px rgba(0,0,0,0.05)',
+            mb: 2,
+            lineHeight: 1.1
+          }}
+        >
+          {category.name}
+        </Typography>
       </Box>
 
       {/* Products Section */}

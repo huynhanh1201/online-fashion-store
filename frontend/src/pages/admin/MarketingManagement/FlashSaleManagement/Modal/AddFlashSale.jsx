@@ -66,6 +66,9 @@ const AddFlashSale = ({ open, onClose, onSave, initialData }) => {
   const suggestionRefs = useRef({})
   const inputRefs = useRef({})
 
+  // Xác định chế độ chỉnh sửa
+  const isEditMode = !!initialData;
+
   // Khởi tạo form khi dialog mở, tự động tạo ID nếu là mới
   useEffect(() => {
     if (open) {
@@ -634,18 +637,19 @@ const AddFlashSale = ({ open, onClose, onSave, initialData }) => {
             <Grid item xs={12} sm={6}>
               <TextField
                 fullWidth
-                type='datetime-local'
                 label='Thời gian bắt đầu *'
+                type='datetime-local'
                 value={form.startTime}
-                onChange={(e) => handleChange('startTime', e.target.value)}
+                onChange={e => handleChange('startTime', e.target.value)}
                 InputLabelProps={{ shrink: true }}
                 required
                 sx={{
                   '& .MuiOutlinedInput-root': {
                     borderRadius: 2,
-                    backgroundColor: '#fff'
+                    backgroundColor: isEditMode ? '#f8fafc' : '#fff'
                   }
                 }}
+                disabled={isEditMode}
               />
             </Grid>
             <Grid item xs={12} sm={6}>
@@ -695,7 +699,7 @@ const AddFlashSale = ({ open, onClose, onSave, initialData }) => {
               }}
             >
               <Typography variant='body2'>
-                <strong>Lưu ý:</strong> Khi nhập giá Flash Sale, hệ thống sẽ chỉ cập nhật giá giảm (discountPrice) cho tất cả biến thể của sản phẩm khi bạn nhấn "Lưu". Điều này đảm bảo tính nhất quán và tránh cập nhật không cần thiết.
+                <strong>Lưu ý:</strong> Khi lưu chương trình sẽ cập nhật lại giá giảm cho sản phẩm. Hãy cân nhắc thêm đúng thời điểm.
               </Typography>
             </Alert>
 
@@ -728,7 +732,7 @@ const AddFlashSale = ({ open, onClose, onSave, initialData }) => {
                     p: 2,
                     borderRadius: 2,
                     border: '1px solid #e2e8f0',
-                    backgroundColor: product.isDisabled ? '#f1f5f9' : '#fff',
+                    backgroundColor: isEditMode && product.isDisabled ? '#f1f5f9' : '#fff',
                     transition: 'all 0.3s ease',
                     '&:hover': {
                       boxShadow: `0 4px 16px ${alpha(theme.palette.primary.main, 0.2)}`
@@ -764,7 +768,7 @@ const AddFlashSale = ({ open, onClose, onSave, initialData }) => {
                             }
                           }}
                           required
-                          disabled={product.isDisabled}
+                          disabled={isEditMode && product.isDisabled}
                           InputProps={{
                             endAdornment: (
                               <InputAdornment position='end'>
@@ -782,7 +786,7 @@ const AddFlashSale = ({ open, onClose, onSave, initialData }) => {
                           sx={{
                             '& .MuiOutlinedInput-root': {
                               borderRadius: 2,
-                              backgroundColor: product.isDisabled
+                              backgroundColor: isEditMode && product.isDisabled
                                 ? '#e2e8f0'
                                 : '#fff'
                             }
@@ -798,12 +802,12 @@ const AddFlashSale = ({ open, onClose, onSave, initialData }) => {
                         value={product.originalPrice ?? ''}
                         InputProps={{ readOnly: true }}
                         required
-                        disabled={product.isDisabled}
+                        disabled={isEditMode && product.isDisabled}
                         inputProps={{ min: 0 }}
                         sx={{
                           '& .MuiOutlinedInput-root': {
                             borderRadius: 2,
-                            backgroundColor: product.isDisabled
+                            backgroundColor: isEditMode && product.isDisabled
                               ? '#e2e8f0'
                               : '#fff'
                           }
@@ -821,12 +825,12 @@ const AddFlashSale = ({ open, onClose, onSave, initialData }) => {
                             handleFlashPriceChange(index, 'flashPrice', e.target.value)
                           }
                           required
-                          disabled={false}
+                          disabled={isEditMode && product.isDisabled}
                           inputProps={{ min: 0 }}
                           sx={{
                             '& .MuiOutlinedInput-root': {
                               borderRadius: 2,
-                              backgroundColor: '#fff'
+                              backgroundColor: isEditMode && product.isDisabled ? '#e2e8f0' : '#fff'
                             }
                           }}
                         />
@@ -861,7 +865,8 @@ const AddFlashSale = ({ open, onClose, onSave, initialData }) => {
                           onClick={() => handleRemoveProduct(index)}
                           sx={{
                             color: '#ef4444',
-                            '&:hover': { backgroundColor: '#fee2e2' }
+                            '&:hover': { backgroundColor: '#fee2e2' },
+                            display: isEditMode && product.isDisabled ? 'none' : 'inline-flex'
                           }}
                         >
                           <DeleteIcon />

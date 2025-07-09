@@ -269,34 +269,25 @@ const ProductbyCategory = () => {
           mb: 4
         }}
       >
-        <Box
+      </Box>
+
+      {/* Title dưới banner */}
+      <Box sx={{ textAlign: 'center', mt: -3, mb: 4 }}>
+        <Typography
+          variant='h2'
           sx={{
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            backgroundColor: 'rgba(0, 0, 0, 0.3)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center'
+            color: 'var(--text-color)',
+            fontSize: { xs: '2rem', sm: '3rem', md: '4rem' },
+            fontWeight: 'bold',
+            textShadow: '2px 2px 4px rgba(0,0,0,0.05)',
+            mb: 2,
+            lineHeight: 1.1
           }}
         >
-          <Typography
-            variant='h2'
-            sx={{
-              color: 'white',
-              textAlign: 'center',
-              fontSize: { xs: '2rem', sm: '3rem', md: '4rem' },
-              fontWeight: 'bold',
-              textShadow: '2px 2px 4px rgba(0,0,0,0.5)'
-            }}
-          >
-            {loadingCategory
-              ? 'Đang tải...'
-              : category?.name || 'Danh mục sản phẩm'}
-          </Typography>
-        </Box>
+          {loadingCategory
+            ? 'Đang tải...'
+            : category?.name || 'Danh mục sản phẩm'}
+        </Typography>
       </Box>
 
       <Box sx={{ p: 2, maxWidth: '1800px', mx: 'auto' }}>

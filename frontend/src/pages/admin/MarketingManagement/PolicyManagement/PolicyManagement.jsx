@@ -245,48 +245,59 @@ export default function PolicyManagement() {
 
       {/* Summary Cards */}
       <Grid container spacing={3} sx={{ mb: 4 }}>
-        <Grid item xs={12} sm={6} md={4}>
-          <Card
-            sx={{
-              background: 'linear-gradient(135deg, #1976d215 0%, #1976d225 100%)',
-              border: '1px solid #1976d230',
-              borderRadius: 3
-            }}
-          >
-            <CardContent>
-              <Stack direction='row' alignItems='center' justifyContent='space-between'>
-                <Box>
-                  <Typography variant='h4' sx={{ fontWeight: 700, color: '#1976d2' }}>{totalPolicies}</Typography>
-                  <Typography variant='body2' color='text.secondary' sx={{ mt: 0.5 }}>Tổng chính sách</Typography>
+        {[{
+          title: 'Tổng chính sách',
+          value: totalPolicies,
+          icon: <GavelIcon />,
+          color: '#1976d2'
+        }, {
+          title: 'Đang hoạt động',
+          value: activePolicies,
+          icon: <GavelIcon />,
+          color: '#2e7d32'
+        }].map((item, index) => (
+          <Grid item xs={12} sm={6} md={4} key={index}>
+            <Card
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                borderRadius: 2,
+                boxShadow: 'none',
+                border: 'none',
+                background: '#fafbfc',
+                minHeight: 90,
+                position: 'relative',
+              }}
+            >
+              {/* Thanh màu bên trái */}
+              <Box
+                sx={{
+                  width: 8,
+                  height: '100%',
+                  borderRadius: '8px 0 0 8px',
+                  background: item.color || '#22c55e',
+                  position: 'absolute',
+                  left: 0,
+                  top: 0,
+                  bottom: 0,
+                }}
+              />
+              <CardContent sx={{ pl: 4, py: 2, width: '100%' }}>
+                <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
+                  {item.title}
+                </Typography>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <Box sx={{ color: item.color || '#22c55e', fontSize: 28, fontWeight: 700 }}>
+                    {item.icon}
+                  </Box>
+                  <Typography variant="h5" sx={{ fontWeight: 700, ml: 1 }}>
+                    {item.value}
+                  </Typography>
                 </Box>
-                <Box sx={{ p: 1.5, borderRadius: 2, backgroundColor: '#1976d220', color: '#1976d2' }}>
-                  <GavelIcon />
-                </Box>
-              </Stack>
-            </CardContent>
-          </Card>
-        </Grid>
-        <Grid item xs={12} sm={6} md={4}>
-          <Card
-            sx={{
-              background: 'linear-gradient(135deg, #2e7d3215 0%, #2e7d3225 100%)',
-              border: '1px solid #2e7d3230',
-              borderRadius: 3
-            }}
-          >
-            <CardContent>
-              <Stack direction='row' alignItems='center' justifyContent='space-between'>
-                <Box>
-                  <Typography variant='h4' sx={{ fontWeight: 700, color: '#2e7d32' }}>{activePolicies}</Typography>
-                  <Typography variant='body2' color='text.secondary' sx={{ mt: 0.5 }}>Đang hoạt động</Typography>
-                </Box>
-                <Box sx={{ p: 1.5, borderRadius: 2, backgroundColor: '#2e7d3220', color: '#2e7d32' }}>
-                  <GavelIcon />
-                </Box>
-              </Stack>
-            </CardContent>
-          </Card>
-        </Grid>
+              </CardContent>
+            </Card>
+          </Grid>
+        ))}
       </Grid>
 
       {/* Action Buttons */}

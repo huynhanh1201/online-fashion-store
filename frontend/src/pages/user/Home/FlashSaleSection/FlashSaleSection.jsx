@@ -251,7 +251,7 @@ const FlashSaleSection = () => {
   return (
     <>
       {campaigns
-        .filter(campaign => campaign.status !== 'expired' && campaign.products.length > 0)
+        .filter(campaign => campaign.status === 'active' && campaign.products.length > 0)
         .map((campaign) => (
         <section key={campaign.id} style={styles.flashSale} className="flash-sale-section">
           <div style={styles.flashSaleHeader} className="flash-sale-header">
