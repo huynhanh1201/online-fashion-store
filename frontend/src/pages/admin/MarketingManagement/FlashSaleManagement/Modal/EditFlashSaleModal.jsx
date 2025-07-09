@@ -91,6 +91,9 @@ const EditFlashSaleModal = ({ open, onClose, product, onSave }) => {
     }
   }
 
+  // Kiểm tra nếu đang trong thời gian diễn ra flash sale
+  const isActive = product && product.campaignStartTime && product.campaignEndTime && (new Date(product.campaignStartTime) <= new Date()) && (new Date(product.campaignEndTime) >= new Date());
+
   return (
     <Dialog
       open={open}
@@ -187,9 +190,10 @@ const EditFlashSaleModal = ({ open, onClose, product, onSave }) => {
             sx={{
               '& .MuiOutlinedInput-root': {
                 borderRadius: 2,
-                backgroundColor: '#fff'
+                backgroundColor: isActive ? '#f1f5f9' : '#fff'
               }
             }}
+            disabled={isActive}
           />
           {form.flashPrice && product?.originalPrice && (
             <Box sx={{ 
