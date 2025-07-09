@@ -205,6 +205,29 @@ const Blog = () => {
             </Box>
           )}
 
+          {/* No Blogs State */}
+          {!loading && !error && mainArticles.length === 0 && (
+            <Box
+              sx={{
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                minHeight: { xs: '150px', sm: '200px' },
+                textAlign: 'center'
+              }}
+            >
+              <Typography
+                variant='body1'
+                sx={{
+                  color: 'grey.600',
+                  fontSize: { xs: '0.875rem', sm: '1rem' }
+                }}
+              >
+                Quản trị viên chưa cập nhật bài viết
+              </Typography>
+            </Box>
+          )}
+
           {/* Grid Layout - Vertical Cards */}
           {!loading && mainArticles.length > 0 && (
             <Box
@@ -393,7 +416,7 @@ const Blog = () => {
           )}
 
           {/* Load More Button */}
-          {!loading && hasMoreBlogs && (
+          {!loading && hasMoreBlogs && mainArticles.length > 0 && (
             <Box
               sx={{
                 display: 'flex',
@@ -433,7 +456,7 @@ const Blog = () => {
           )}
 
           {/* No More Blogs Message */}
-          {!loading && !hasMoreBlogs && blogs.length > 0 && (
+          {!loading && !hasMoreBlogs && mainArticles.length > 0 && (
             <Box
               sx={{
                 display: 'flex',

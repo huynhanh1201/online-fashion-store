@@ -545,7 +545,7 @@ const DisplayManagement = () => {
                                 </IconButton>
                               </Tooltip>
                             )}
-                            {hasPermission('blog:delete') && (
+                            {hasPermission('banner:delete') && (
                               <Tooltip title='Xóa'>
                                 <IconButton
                                   size='small'

@@ -57,6 +57,11 @@ const BlogHome = () => {
   const mainArticles =
     blogs.length > 0 ? blogs.slice(0, 3).map(formatBlogData) : []
 
+  // Nếu không có blog nào và không đang loading thì không hiển thị gì
+  if (!loading && !error && mainArticles.length === 0) {
+    return null
+  }
+
   return (
     <ErrorBoundary>
       <Box
