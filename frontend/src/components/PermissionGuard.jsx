@@ -6,7 +6,7 @@ import usePermissions from '~/hooks/usePermissions'
 const RouteGuard = ({
   children,
   requiredPermissions = [],
-  fallbackPath = '/login'
+  fallbackPath = '/404'
 }) => {
   const { hasAllPermissions, canAccessAdmin, currentUser, permissions } =
     usePermissions()

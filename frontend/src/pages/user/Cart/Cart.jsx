@@ -44,6 +44,8 @@ import {
   setTempQuantity,
   removeTempQuantity,
   clearReorderVariantIds,
+  setAppliedCoupon,
+  clearAppliedCoupon,
 } from '~/redux/cart/cartSlice'
 import { optimizeCloudinaryUrl } from '~/utils/cloudinary'
 import { getDiscounts } from '~/services/discountService'
@@ -243,11 +245,25 @@ const Cart = () => {
 
     dispatch(setTempQuantity({ variantId, quantity: newQty }))
 
-    setSelectedItems((prev) =>
-      prev.map((i) =>
-        i.variantId === variantId ? { ...i, quantity: newQty } : i,
-      ),
-    )
+    // Tự động select sản phẩm khi tăng giảm số lượng
+    setSelectedItems((prev) => {
+      const existingItem = prev.find((i) => i.variantId === variantId)
+
+      let newSelectedItems
+      if (existingItem) {
+        // Nếu đã được chọn, chỉ cập nhật số lượng
+        newSelectedItems = prev.map((i) =>
+          i.variantId === variantId ? { ...i, quantity: newQty } : i,
+        )
+      } else {
+        // Nếu chưa được chọn, thêm vào danh sách đã chọn
+        newSelectedItems = [...prev, { variantId, quantity: newQty }]
+      }
+
+      // Cập nhật Redux store
+      dispatch(setSelectedItemsAction(newSelectedItems))
+      return newSelectedItems
+    })
   }
 
   const handleMouseLeave = async (variantId) => {
@@ -267,11 +283,14 @@ const Cart = () => {
         ),
       )
 
-      setSelectedItems((prev) =>
-        prev.map((i) =>
+      setSelectedItems((prev) => {
+        const newSelectedItems = prev.map((i) =>
           i.variantId === variantId ? { ...i, quantity: tempQty } : i,
-        ),
-      )
+        )
+        // Cập nhật Redux store
+        dispatch(setSelectedItemsAction(newSelectedItems))
+        return newSelectedItems
+      })
 
       dispatch(removeTempQuantity(variantId))
     } catch (err) {
@@ -376,9 +395,21 @@ const Cart = () => {
       }
     }
 
+    // Lưu thông tin mã giảm giá được áp dụng vào Redux store
+    const applicableCoupon = getApplicableCoupon()
+    if (applicableCoupon) {
+      const discountAmount = calculateDiscount(applicableCoupon, totalPrice)
+      dispatch(setAppliedCoupon({
+        coupon: applicableCoupon,
+        discount: discountAmount
+      }))
+    } else {
+      // Xóa mã giảm giá cũ nếu không có mã nào áp dụng được
+      dispatch(clearAppliedCoupon())
+    }
+
     navigate('/payment')
   }
-
 
 
   const calculateDiscount = (coupon, total) => {
@@ -423,8 +454,11 @@ const Cart = () => {
   if (loading) {
     return (
       <Container
-        maxWidth="xl"
+        maxWidth={false}
         sx={{
+          width: '96vw',
+          maxWidth: '1800px',
+          margin: '0 auto',
           height: '70vh',
           display: 'flex',
           justifyContent: 'center',
@@ -453,8 +487,11 @@ const Cart = () => {
 
   return (
     <Container
-      maxWidth="xl"
+      maxWidth={false}
       sx={{
+        width: '96vw',
+        maxWidth: '1800px',
+        margin: '0 auto',
         minHeight: '70vh',
         mt: { xs: 10, md: 16 },
         mb: { xs: 3, md: 5 },
@@ -467,7 +504,6 @@ const Cart = () => {
           bottom: { xs: '20px', sm: '30px', md: '40px' },
           left: { xs: '20px', sm: '30px', md: '40px' },
           right: { xs: '20px', sm: '30px', md: '40px' },
-          padding: '12px',
           maxWidth: '1800px',
           margin: '0 auto',
           mb: 2
@@ -503,7 +539,7 @@ const Cart = () => {
                 color: 'primary.main'
               }
             }}
-            href={`/products`}
+            href={`/product`}
           >
             Sản phẩm
           </Link>
@@ -557,15 +593,21 @@ const Cart = () => {
       </Paper>
 
       {/* Coupon notification */}
-      {coupons.length > 0 && selectedItems.length > 0 && (
+      <Box
+        sx={{
+          maxHeight: coupons.length > 0 && selectedItems.length > 0 ? '200px' : 0,
+          overflow: 'hidden',
+          transition: 'all 0.3s ease-in-out',
+          opacity: coupons.length > 0 && selectedItems.length > 0 ? 1 : 0,
+          mb: coupons.length > 0 && selectedItems.length > 0 ? 1 : 0,
+        }}
+      >
         <Paper
           elevation={0}
           sx={{
             p: 1,
-            mb: 1,
             borderRadius: 2,
             border: '1px dashed var(--primary-color)',
-            backgroundColor: '#E3F2FD',
           }}
         >
           <Box display="flex" alignItems="center" gap={1.5} flexWrap="wrap">
@@ -594,17 +636,17 @@ const Cart = () => {
                         để nhận mã giảm
                         <Box component="span" sx={{ fontWeight: 600, mx: 0.5 }}>
                           {nextDiscountText}
-                        </Box>{' '}
+                        </Box>{''}
                         🎉!
                       </>
                     )
                   }
                   return (
                     <>
-                      Đơn hàng của bạn đã đạt mức giảm cao nhất:{' '}
+                      Đơn hàng của bạn đã đạt mức giảm cao nhất:{''}
                       <Box component="span" sx={{ fontWeight: 600, mx: 0.5 }}>
                         {formatPrice(discountAmount)}
-                      </Box>{' '}
+                      </Box>{''}
                       🎉
                     </>
                   )
@@ -624,7 +666,7 @@ const Cart = () => {
                       để nhận mã giảm
                       <Box component="span" sx={{ fontWeight: 600, mx: 0.5 }}>
                         {discountText}
-                      </Box>{' '}
+                      </Box>
                       !
                     </>
                   )
@@ -632,10 +674,9 @@ const Cart = () => {
                 return null
               })()}
             </Typography>
-
           </Box>
         </Paper>
-      )}
+      </Box>
 
 
 
@@ -693,7 +734,8 @@ const Cart = () => {
               <>
                 <Box
                   sx={{
-                    p: { xs: 2, sm: 3 },
+                    bgcolor: '#fff',
+                    p: { xs: 2, sm: 2 },
                     backgroundColor: 'var(--primary-color)10',
                     display: 'flex',
                     alignItems: 'center',
@@ -705,11 +747,10 @@ const Cart = () => {
                     checked={allSelected}
                     onChange={handleSelectAll}
                     color="primary"
-                    sx={{ p: 1 }}
+                    sx={{ p: 1, alignSelf: 'center' }}
                   />
                   <Typography
                     sx={{
-                      ml: 1,
                       fontWeight: 600,
                       fontSize: { xs: '0.9rem', sm: '1rem' },
                     }}
@@ -747,7 +788,7 @@ const Cart = () => {
                           p: { xs: 2, sm: 2 },
                           display: 'flex',
                           alignItems: 'center',
-                          gap: { xs: 1.5, sm: 2 },
+                          gap: 2,
                           flexWrap: { xs: 'wrap', sm: 'nowrap' },
                           opacity: isOutOfStock ? 0.6 : 1, // Làm mờ sản phẩm hết hàng
                           backgroundColor: isOutOfStock ? '#f5f5f5' : 'transparent',
@@ -759,7 +800,7 @@ const Cart = () => {
                           onChange={() => handleSelect(item)}
                           color="primary"
                           disabled={isOutOfStock} // Disable checkbox khi hết hàng
-                          sx={{ alignSelf: 'center' }}
+                          sx={{ p: 1, alignSelf: 'center' }}
                         />
 
 
@@ -813,7 +854,7 @@ const Cart = () => {
                                   sm: '0.9rem',
                                   md: '1rem',
                                 },
-                                maxWidth: '100%',
+                                maxWidth: { xs: '150px', sm: '200px', md: '250px' },
                                 whiteSpace: 'nowrap',
                                 overflow: 'hidden',
                                 textOverflow: 'ellipsis',
@@ -1020,7 +1061,7 @@ const Cart = () => {
               },
             }}
           >
-            <CardContent sx={{ p: { xs: 3, sm: 4 } }}>
+            <CardContent sx={{ bgcolor: '#fff', p: { xs: 3, sm: 4 } }}>
               <Typography
                 variant="h6"
                 sx={{ fontWeight: 700, mb: 3, color: 'var(--primary-color)' }}

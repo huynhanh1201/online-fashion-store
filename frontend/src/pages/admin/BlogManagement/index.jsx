@@ -6,6 +6,7 @@ import ViewBlogModal from './modal/ViewBlogModal'
 import DeleteBlogModal from './modal/DeleteBlogModal'
 import RestoreBlogModal from './modal/RestoreBlogModal'
 import useBlog from '~/hooks/admin/useBlog'
+import { RouteGuard } from '~/components/PermissionGuard'
 export default function BlogManagementPage() {
   const [openBlogModal, setOpenBlogModal] = useState(false)
   const [blogModalMode, setBlogModalMode] = useState('add') // 'add' hoặc 'edit'
@@ -94,7 +95,7 @@ export default function BlogManagementPage() {
   // Function để tạo dữ liệu mẫu
 
   return (
-    <>
+    <RouteGuard requiredPermissions={['admin:access', 'blog:use']}>
       <BlogTable
         blogs={blogs}
         onAdd={() => {
@@ -169,6 +170,6 @@ export default function BlogManagementPage() {
         }}
         onConfirm={handleRestore}
       />
-    </>
+    </RouteGuard>
   )
 }

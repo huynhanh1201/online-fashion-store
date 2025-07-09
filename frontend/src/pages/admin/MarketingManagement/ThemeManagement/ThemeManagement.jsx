@@ -35,6 +35,8 @@ import {
 } from '@mui/icons-material'
 import { styled } from '@mui/material/styles'
 import useTheme from '~/hooks/useTheme'
+import { RouteGuard } from '~/components/PermissionGuard'
+import usePermissions from '~/hooks/usePermissions'
 
 // Predefined color schemes
 const predefinedThemes = {
@@ -127,6 +129,7 @@ const ThemeManagement = () => {
     message: '',
     severity: 'success'
   })
+  const { hasPermission } = usePermissions()
 
   // Sync selected preset with current theme on load or when theme changes
   useEffect(() => {
@@ -180,320 +183,325 @@ const ThemeManagement = () => {
   }
 
   return (
-    <Box sx={{ p: 3, maxWidth: 1200 }}>
-      <Typography
-        variant='h4'
-        sx={{ mb: 3, fontWeight: 700, color: 'text.primary' }}
-      >
-        <Palette sx={{ mr: 1, verticalAlign: 'middle' }} />
-        Quản lý Chủ đề & Màu sắc
-      </Typography>
-
-      {/* Preview Mode Toggle */}
-      <Card sx={{ mb: 3 }}>
-        <CardContent>
-          <Box
-            sx={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between'
-            }}
-          >
-            <Box>
-              <Typography variant='h6' sx={{ mb: 1 }}>
-                Chế độ xem trước
-              </Typography>
-              <Typography variant='body2' color='text.secondary'>
-                Chủ đề sẽ được áp dụng ngay lập tức khi bạn thay đổi màu sắc
-              </Typography>
-            </Box>
-            <Chip
-              label='Đang hoạt động'
-              color='success'
-              variant='filled'
-              icon={<Visibility />}
-            />
-          </Box>
-        </CardContent>
-      </Card>
-
-      <Grid container spacing={3}>
-        {/* Predefined Themes */}
-        <Grid item xs={12} md={6}>
-          <Card>
-            <CardContent>
-              <Typography
-                variant='h6'
-                sx={{ mb: 2, display: 'flex', alignItems: 'center' }}
-              >
-                <AutoAwesome sx={{ mr: 1 }} />
-                Chủ đề có sẵn
-              </Typography>
-              <Grid container spacing={2}>
-                {Object.entries(predefinedThemes).map(([key, theme]) => (
-                  <Grid item xs={12} sm={6} key={key}>
-                    <ThemeCard
-                      selected={selectedPreset === key}
-                      onClick={() => handlePresetSelect(key)}
-                    >
-                      <CardContent sx={{ p: 2 }}>
-                        <Typography
-                          variant='subtitle2'
-                          sx={{ mb: 1, fontWeight: 600 }}
-                        >
-                          {theme.name}
-                        </Typography>
-                        <Box sx={{ display: 'flex', gap: 1, mb: 1 }}>
-                          <ColorPreview color={theme.primary} />
-                          <ColorPreview color={theme.secondary} />
-                          <ColorPreview color={theme.accent} />
-                        </Box>
-                        <Chip
-                          label={selectedPreset === key ? 'Đang chọn' : 'Chọn'}
-                          size='small'
-                          color={selectedPreset === key ? 'primary' : 'default'}
-                          variant={
-                            selectedPreset === key ? 'filled' : 'outlined'
-                          }
-                        />
-                      </CardContent>
-                    </ThemeCard>
-                  </Grid>
-                ))}
-              </Grid>
-            </CardContent>
-          </Card>
-        </Grid>
-
-        {/* Custom Color Editor */}
-        <Grid item xs={12} md={6}>
-          <Card>
-            <CardContent>
-              <Typography
-                variant='h6'
-                sx={{ mb: 2, display: 'flex', alignItems: 'center' }}
-              >
-                <Brush sx={{ mr: 1 }} />
-                Tùy chỉnh màu sắc
-              </Typography>
-
-              <Accordion
-                expanded={showAdvanced}
-                onChange={() => setShowAdvanced(!showAdvanced)}
-              >
-                <AccordionSummary expandIcon={<ExpandMore />}>
-                  <Typography variant='subtitle2'>Màu sắc nâng cao</Typography>
-                </AccordionSummary>
-                <AccordionDetails>
-                  <Grid container spacing={2}>
-                    {Object.entries(currentTheme).map(([key, value]) => (
-                      <Grid item xs={12} sm={6} key={key}>
-                        <Box
-                          sx={{ display: 'flex', alignItems: 'center', gap: 1 }}
-                        >
-                          <ColorPreview color={value} />
-                          <TextField
-                            label={key.charAt(0).toUpperCase() + key.slice(1)}
-                            value={value}
-                            onChange={(e) =>
-                              handleColorChange(key, e.target.value)
-                            }
-                            size='small'
-                            fullWidth
-                          />
-                        </Box>
-                      </Grid>
-                    ))}
-                  </Grid>
-                </AccordionDetails>
-              </Accordion>
-
-              <Divider sx={{ my: 2 }} />
-
-              {/* Basic Colors */}
-              <Typography variant='subtitle2' sx={{ mb: 2 }}>
-                Màu sắc cơ bản
-              </Typography>
-              <Grid container spacing={2}>
-                {['primary', 'secondary', 'accent'].map((colorKey) => (
-                  <Grid item xs={12} sm={4} key={colorKey}>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                      <ColorPreview color={currentTheme[colorKey]} />
-                      <TextField
-                        label={
-                          colorKey.charAt(0).toUpperCase() + colorKey.slice(1)
-                        }
-                        value={currentTheme[colorKey]}
-                        onChange={(e) =>
-                          handleColorChange(colorKey, e.target.value)
-                        }
-                        size='small'
-                        fullWidth
-                      />
-                    </Box>
-                  </Grid>
-                ))}
-              </Grid>
-            </CardContent>
-          </Card>
-        </Grid>
-
-        {/* Action Buttons */}
-        <Grid item xs={12}>
-          <Card>
-            <CardContent>
-              <Typography
-                variant='h6'
-                sx={{ mb: 2, display: 'flex', alignItems: 'center' }}
-              >
-                <Settings sx={{ mr: 1 }} />
-                Thao tác
-              </Typography>
-              <Stack direction='row' spacing={2} flexWrap='wrap' useFlexGap>
-                <Button
-                  variant='contained'
-                  startIcon={<Save />}
-                  onClick={handleSaveTheme}
-                  sx={{
-                    minWidth: 120,
-                    backgroundColor: 'var(--primary-color)',
-                    color: '#fff'
-                  }}
-                >
-                  Lưu chủ đề
-                </Button>
-                <Button
-                  variant='outlined'
-                  startIcon={<Refresh />}
-                  onClick={handleResetTheme}
-                  sx={{
-                    minWidth: 120,
-                    color: 'var(--primary-color)',
-                    borderColor: 'var(--primary-color)'
-                  }}
-                >
-                  Reset
-                </Button>
-              </Stack>
-            </CardContent>
-          </Card>
-        </Grid>
-
-        {/* Theme Preview */}
-        <Grid item xs={12}>
-          <Card>
-            <CardContent>
-              <Typography
-                variant='h6'
-                sx={{ mb: 2, display: 'flex', alignItems: 'center' }}
-              >
-                <ColorLens sx={{ mr: 1 }} />
-                Xem trước chủ đề
-              </Typography>
-              <Paper sx={{ p: 3, background: currentTheme.background }}>
-                <Grid container spacing={2}>
-                  <Grid item xs={12} sm={6} md={3}>
-                    <Box sx={{ textAlign: 'center' }}>
-                      <Box
-                        sx={{
-                          width: 60,
-                          height: 60,
-                          borderRadius: 2,
-                          backgroundColor: currentTheme.primary,
-                          mx: 'auto',
-                          mb: 1
-                        }}
-                      />
-                      <Typography
-                        variant='body2'
-                        sx={{ color: currentTheme.text }}
-                      >
-                        Primary
-                      </Typography>
-                    </Box>
-                  </Grid>
-                  <Grid item xs={12} sm={6} md={3}>
-                    <Box sx={{ textAlign: 'center' }}>
-                      <Box
-                        sx={{
-                          width: 60,
-                          height: 60,
-                          borderRadius: 2,
-                          backgroundColor: currentTheme.secondary,
-                          mx: 'auto',
-                          mb: 1
-                        }}
-                      />
-                      <Typography
-                        variant='body2'
-                        sx={{ color: currentTheme.text }}
-                      >
-                        Secondary
-                      </Typography>
-                    </Box>
-                  </Grid>
-                  <Grid item xs={12} sm={6} md={3}>
-                    <Box sx={{ textAlign: 'center' }}>
-                      <Box
-                        sx={{
-                          width: 60,
-                          height: 60,
-                          borderRadius: 2,
-                          backgroundColor: currentTheme.accent,
-                          mx: 'auto',
-                          mb: 1
-                        }}
-                      />
-                      <Typography
-                        variant='body2'
-                        sx={{ color: currentTheme.text }}
-                      >
-                        Accent
-                      </Typography>
-                    </Box>
-                  </Grid>
-                  <Grid item xs={12} sm={6} md={3}>
-                    <Box sx={{ textAlign: 'center' }}>
-                      <Box
-                        sx={{
-                          width: 60,
-                          height: 60,
-                          borderRadius: 2,
-                          backgroundColor: currentTheme.success,
-                          mx: 'auto',
-                          mb: 1
-                        }}
-                      />
-                      <Typography
-                        variant='body2'
-                        sx={{ color: currentTheme.text }}
-                      >
-                        Thành công
-                      </Typography>
-                    </Box>
-                  </Grid>
-                </Grid>
-              </Paper>
-            </CardContent>
-          </Card>
-        </Grid>
-      </Grid>
-
-      <Snackbar
-        open={snackbar.open}
-        autoHideDuration={3000}
-        onClose={() => setSnackbar({ ...snackbar, open: false })}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-      >
-        <Alert
-          onClose={() => setSnackbar({ ...snackbar, open: false })}
-          severity={snackbar.severity}
-          sx={{ width: '100%' }}
+    <RouteGuard requiredPermissions={['admin:access', 'theme:use']}>
+      <Box sx={{ p: 3, maxWidth: 1200 }}>
+        <Typography
+          variant='h4'
+          sx={{ mb: 3, fontWeight: 700, color: 'text.primary' }}
         >
-          {snackbar.message}
-        </Alert>
-      </Snackbar>
-    </Box>
+          <Palette sx={{ mr: 1, verticalAlign: 'middle' }} />
+          Quản lý Chủ đề & Màu sắc
+        </Typography>
+
+        {/* Preview Mode Toggle */}
+        <Card sx={{ mb: 3 }}>
+          <CardContent>
+            <Box
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between'
+              }}
+            >
+              <Box>
+                <Typography variant='h6' sx={{ mb: 1 }}>
+                  Chế độ xem trước
+                </Typography>
+                <Typography variant='body2' color='text.secondary'>
+                  Chủ đề sẽ được áp dụng ngay lập tức khi bạn thay đổi màu sắc
+                </Typography>
+              </Box>
+              <Chip
+                label='Đang hoạt động'
+                color='success'
+                variant='filled'
+                icon={<Visibility />}
+              />
+            </Box>
+          </CardContent>
+        </Card>
+
+        <Grid container spacing={3}>
+          {/* Predefined Themes */}
+          <Grid item xs={12} md={6}>
+            <Card>
+              <CardContent>
+                <Typography
+                  variant='h6'
+                  sx={{ mb: 2, display: 'flex', alignItems: 'center' }}
+                >
+                  <AutoAwesome sx={{ mr: 1 }} />
+                  Chủ đề có sẵn
+                </Typography>
+                <Grid container spacing={2}>
+                  {Object.entries(predefinedThemes).map(([key, theme]) => (
+                    <Grid item xs={12} sm={6} key={key}>
+                      <ThemeCard
+                        selected={selectedPreset === key}
+                        onClick={() => handlePresetSelect(key)}
+                      >
+                        <CardContent sx={{ p: 2 }}>
+                          <Typography
+                            variant='subtitle2'
+                            sx={{ mb: 1, fontWeight: 600 }}
+                          >
+                            {theme.name}
+                          </Typography>
+                          <Box sx={{ display: 'flex', gap: 1, mb: 1 }}>
+                            <ColorPreview color={theme.primary} />
+                            <ColorPreview color={theme.secondary} />
+                            <ColorPreview color={theme.accent} />
+                          </Box>
+                          <Chip
+                            label={selectedPreset === key ? 'Đang chọn' : 'Chọn'}
+                            size='small'
+                            color={selectedPreset === key ? 'primary' : 'default'}
+                            variant={
+                              selectedPreset === key ? 'filled' : 'outlined'
+                            }
+                          />
+                        </CardContent>
+                      </ThemeCard>
+                    </Grid>
+                  ))}
+                </Grid>
+              </CardContent>
+            </Card>
+          </Grid>
+
+          {/* Custom Color Editor */}
+          <Grid item xs={12} md={6}>
+            <Card>
+              <CardContent>
+                <Typography
+                  variant='h6'
+                  sx={{ mb: 2, display: 'flex', alignItems: 'center' }}
+                >
+                  <Brush sx={{ mr: 1 }} />
+                  Tùy chỉnh màu sắc
+                </Typography>
+
+                <Accordion
+                  expanded={showAdvanced}
+                  onChange={() => setShowAdvanced(!showAdvanced)}
+                >
+                  <AccordionSummary expandIcon={<ExpandMore />}>
+                    <Typography variant='subtitle2'>Màu sắc nâng cao</Typography>
+                  </AccordionSummary>
+                  <AccordionDetails>
+                    <Grid container spacing={2}>
+                      {Object.entries(currentTheme).map(([key, value]) => (
+                        <Grid item xs={12} sm={6} key={key}>
+                          <Box
+                            sx={{ display: 'flex', alignItems: 'center', gap: 1 }}
+                          >
+                            <ColorPreview color={value} />
+                            <TextField
+                              label={key.charAt(0).toUpperCase() + key.slice(1)}
+                              value={value}
+                              onChange={(e) =>
+                                handleColorChange(key, e.target.value)
+                              }
+                              size='small'
+                              fullWidth
+                            />
+                          </Box>
+                        </Grid>
+                      ))}
+                    </Grid>
+                  </AccordionDetails>
+                </Accordion>
+
+                <Divider sx={{ my: 2 }} />
+
+                {/* Basic Colors */}
+                <Typography variant='subtitle2' sx={{ mb: 2 }}>
+                  Màu sắc cơ bản
+                </Typography>
+                <Grid container spacing={2}>
+                  {['primary', 'secondary', 'accent'].map((colorKey) => (
+                    <Grid item xs={12} sm={4} key={colorKey}>
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                        <ColorPreview color={currentTheme[colorKey]} />
+                        <TextField
+                          label={
+                            colorKey.charAt(0).toUpperCase() + colorKey.slice(1)
+                          }
+                          value={currentTheme[colorKey]}
+                          onChange={(e) =>
+                            handleColorChange(colorKey, e.target.value)
+                          }
+                          size='small'
+                          fullWidth
+                        />
+                      </Box>
+                    </Grid>
+                  ))}
+                </Grid>
+              </CardContent>
+            </Card>
+          </Grid>
+
+          {/* Action Buttons */}
+          {hasPermission('theme:update') && (
+            <Grid item xs={12}>
+              <Card>
+                <CardContent>
+                  <Typography
+                    variant='h6'
+                    sx={{ mb: 2, display: 'flex', alignItems: 'center' }}
+                  >
+                    <Settings sx={{ mr: 1 }} />
+                    Thao tác
+                  </Typography>
+                  <Stack direction='row' spacing={2} flexWrap='wrap' useFlexGap>
+
+                    <Button
+                      variant='contained'
+                      startIcon={<Save />}
+                      onClick={handleSaveTheme}
+                      sx={{
+                        minWidth: 120,
+                        backgroundColor: 'var(--primary-color)',
+                        color: '#fff'
+                      }}
+                    >
+                      Lưu chủ đề
+                    </Button>
+
+                    <Button
+                      variant='outlined'
+                      startIcon={<Refresh />}
+                      onClick={handleResetTheme}
+                      sx={{
+                        minWidth: 120,
+                        color: 'var(--primary-color)',
+                        borderColor: 'var(--primary-color)'
+                      }}
+                    >
+                      Khôi phục
+                    </Button>
+                  </Stack>
+                </CardContent>
+              </Card>
+            </Grid>
+          )}
+          {/* Theme Preview */}
+          <Grid item xs={12}>
+            <Card>
+              <CardContent>
+                <Typography
+                  variant='h6'
+                  sx={{ mb: 2, display: 'flex', alignItems: 'center' }}
+                >
+                  <ColorLens sx={{ mr: 1 }} />
+                  Xem trước chủ đề
+                </Typography>
+                <Paper sx={{ p: 3, background: currentTheme.background }}>
+                  <Grid container spacing={2}>
+                    <Grid item xs={12} sm={6} md={3}>
+                      <Box sx={{ textAlign: 'center' }}>
+                        <Box
+                          sx={{
+                            width: 60,
+                            height: 60,
+                            borderRadius: 2,
+                            backgroundColor: currentTheme.primary,
+                            mx: 'auto',
+                            mb: 1
+                          }}
+                        />
+                        <Typography
+                          variant='body2'
+                          sx={{ color: currentTheme.text }}
+                        >
+                          Primary
+                        </Typography>
+                      </Box>
+                    </Grid>
+                    <Grid item xs={12} sm={6} md={3}>
+                      <Box sx={{ textAlign: 'center' }}>
+                        <Box
+                          sx={{
+                            width: 60,
+                            height: 60,
+                            borderRadius: 2,
+                            backgroundColor: currentTheme.secondary,
+                            mx: 'auto',
+                            mb: 1
+                          }}
+                        />
+                        <Typography
+                          variant='body2'
+                          sx={{ color: currentTheme.text }}
+                        >
+                          Secondary
+                        </Typography>
+                      </Box>
+                    </Grid>
+                    <Grid item xs={12} sm={6} md={3}>
+                      <Box sx={{ textAlign: 'center' }}>
+                        <Box
+                          sx={{
+                            width: 60,
+                            height: 60,
+                            borderRadius: 2,
+                            backgroundColor: currentTheme.accent,
+                            mx: 'auto',
+                            mb: 1
+                          }}
+                        />
+                        <Typography
+                          variant='body2'
+                          sx={{ color: currentTheme.text }}
+                        >
+                          Accent
+                        </Typography>
+                      </Box>
+                    </Grid>
+                    <Grid item xs={12} sm={6} md={3}>
+                      <Box sx={{ textAlign: 'center' }}>
+                        <Box
+                          sx={{
+                            width: 60,
+                            height: 60,
+                            borderRadius: 2,
+                            backgroundColor: currentTheme.success,
+                            mx: 'auto',
+                            mb: 1
+                          }}
+                        />
+                        <Typography
+                          variant='body2'
+                          sx={{ color: currentTheme.text }}
+                        >
+                          Success
+                        </Typography>
+                      </Box>
+                    </Grid>
+                  </Grid>
+                </Paper>
+              </CardContent>
+            </Card>
+          </Grid>
+        </Grid>
+
+        <Snackbar
+          open={snackbar.open}
+          autoHideDuration={3000}
+          onClose={() => setSnackbar({ ...snackbar, open: false })}
+          anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+        >
+          <Alert
+            onClose={() => setSnackbar({ ...snackbar, open: false })}
+            severity={snackbar.severity}
+            sx={{ width: '100%' }}
+          >
+            {snackbar.message}
+          </Alert>
+        </Snackbar>
+      </Box>
+    </RouteGuard>
   )
 }
 

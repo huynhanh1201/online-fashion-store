@@ -587,7 +587,7 @@ const OrderDetail = () => {
   }
 
   return (
-    <Box maxWidth="xl" mx="auto" p={3} sx={{ minHeight: '70vh' }}>
+    <Box sx={{ width: '96vw', maxWidth: '1800px', margin: '0 auto', p: 3, minHeight: '70vh' }}>
       <Card
         sx={{
           borderRadius: 3,
@@ -601,11 +601,6 @@ const OrderDetail = () => {
             <IconButton
               onClick={() => navigate(-1)}
               aria-label="Quay lại"
-              sx={{
-                mr: 2,
-                backgroundColor: 'grey.100',
-                '&:hover': { backgroundColor: 'grey.200' }
-              }}
             >
               <ArrowBackIcon />
             </IconButton>
@@ -687,13 +682,13 @@ const OrderDetail = () => {
                       sx={{
                         p: 2,
                         borderRadius: 2,
-                        backgroundColor: variantIndex % 2 === 0 ? 'transparent' : 'grey.50',
+                        backgroundColor: 'grey.50',
                         border: '1px solid',
                         borderColor: 'grey.200',
                         cursor: 'pointer',
                         transition: 'all 0.2s ease',
                         '&:hover': {
-                          backgroundColor: 'grey.100',
+                          backgroundColor: 'grey.50',
                           borderColor: 'var(--primary-color)',
                           transform: 'translateX(4px)'
                         }
@@ -718,7 +713,14 @@ const OrderDetail = () => {
                             <Typography
                               fontWeight={600}
                               fontSize="1.1rem"
-                              sx={{ mb: 0.5 }}
+                              sx={{
+                                mb: 0.5,
+                                overflow: 'hidden',
+                                textOverflow: 'ellipsis',
+                                whiteSpace: 'nowrap',
+                                maxWidth: { xs: '150px', sm: '200px', md: '250px' }
+                              }}
+                              title={product.productName}
                             >
                               {product.productName}
                             </Typography>
@@ -936,6 +938,7 @@ const OrderDetail = () => {
         autoHideDuration={4000}
         onClose={() => setSnackbarOpen(false)}
         anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+        sx={{ mt: 12 }}
       >
         <Alert
           onClose={() => setSnackbarOpen(false)}
@@ -982,4 +985,4 @@ const OrderDetail = () => {
   )
 }
 
-export default OrderDetail    
+export default OrderDetail

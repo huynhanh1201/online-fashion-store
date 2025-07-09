@@ -56,6 +56,7 @@ export const roles = [
 
       // Order
       'order:use',
+      'order:create',
       'order:read',
       'order:update',
 
@@ -334,6 +335,10 @@ export const roles = [
       'blog:use',
       'blog:read',
 
+      // Policy
+      'policy:use',
+      'policy:read',
+
       'admin:access'
     ]
   },
@@ -342,22 +347,41 @@ export const roles = [
     label: 'Nhân viên quản lý',
     permissions: [
       // Order
+      'order:use',
       'order:read',
       'order:update',
 
       // Inventory
+      'inventory:use',
       'inventory:read',
       'inventory:update',
 
-      // Warehose Slip
+      // Warehouse Slip
+      'warehouseSlip:use',
       'warehouseSlip:create',
       'warehouseSlip:read',
 
       // Inventory Log
+      'inventoryLog:use',
       'inventoryLog:read',
 
-      // statistics
-      'statistics:read'
+      // Warehouse
+      'warehouse:use',
+      'warehouse:read',
+      'warehouse:create',
+      'warehouse:update',
+      'warehouse:delete',
+
+      // Payment
+      'payment:use',
+      'payment:read',
+      'payment:update',
+
+      // Statistics
+      'warehouseStatistics:read',
+
+      // Admin access
+      'admin:access'
     ]
   },
   {
@@ -435,13 +459,7 @@ export const roles = [
       'blog:read', // khách hàng có thể xem blog
 
       // policy - xem chính sách
-      'policy:read', // nếu muốn khách hàng có thể xem chính sách
-
-      // service
-      'service:read', // nếu muốn khách hàng có thể xem dịch vụ
-
-      // Danh mục nổi bật
-      'featuredCategory:read' // khách hàng có thể xem danh mục nổi
+      'policy:read' // nếu muốn khách hàng có thể xem chính sách
     ]
   }
 ]

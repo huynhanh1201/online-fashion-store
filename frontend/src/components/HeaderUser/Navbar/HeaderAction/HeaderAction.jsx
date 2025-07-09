@@ -21,6 +21,7 @@ import { getProfileUser } from '~/services/userService'
 import { toast } from 'react-toastify'
 import { useCart } from '~/hooks/useCarts'
 import { optimizeCloudinaryUrl } from '~/utils/cloudinary'
+import usePermissions from '~/hooks/usePermissions'
 
 const HeaderAction = () => {
   const [anchorEl, setAnchorEl] = useState(null)
@@ -29,6 +30,8 @@ const HeaderAction = () => {
   const navigate = useNavigate()
   const currentUser = useSelector(selectCurrentUser)
   const menuRef = useRef(null) // Reference to the menu element
+
+  const { hasPermission } = usePermissions()
 
   // Lấy giỏ hàng từ Redux store
   const cartItems = useSelector((state) => state.cart.cartItems)
@@ -228,6 +231,26 @@ const HeaderAction = () => {
               >
                 Trang cá nhân
               </Button>
+              {hasPermission('admin:access') && (
+
+                <Button
+                  onClick={handleClose}
+                  component={Link}
+                  to='/admin'
+                  sx={{
+                    fontWeight: '300',
+                    padding: '12px 16px',
+                    justifyContent: 'flex-start',
+                    textTransform: 'none',
+                    color: 'text.primary',
+                    '&:hover': {
+                      backgroundColor: 'rgba(0, 0, 0, 0.04)'
+                    }
+                  }}
+                >
+                  Trang quản trị
+                </Button>
+              )}
               <Box sx={{ width: '100%', padding: '5px' }}>
                 <hr
                   style={{

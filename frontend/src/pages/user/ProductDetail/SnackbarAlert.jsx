@@ -25,7 +25,16 @@ const SnackbarAlert = ({ open, onClose, severity, message, variantImage, product
             onError={e => (e.target.src = '/default.jpg')}
           />
           <Box>
-            <Typography variant="body2" fontWeight={600}>
+            <Typography
+              variant="body2"
+              fontWeight={600}
+              sx={{
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
+                maxWidth: '200px'
+              }}
+            >
               {productName}
             </Typography>
             <Typography variant="caption">

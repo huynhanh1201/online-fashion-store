@@ -4,6 +4,9 @@ import EmojiEmotionsIcon from '@mui/icons-material/EmojiEmotions'
 import WavingHandIcon from '@mui/icons-material/WavingHand'
 import useInventoryStatistics from '~/hooks/admin/useStatistic.js'
 import SystemDashboard from '~/pages/admin/Home/SystemDashboard.jsx'
+import ProfitChartByMonth from '~/pages/admin/Home/Chart/ProfitChartByMonth.jsx'
+import { RouteGuard } from '~/components/PermissionGuard'
+
 import usePermissions from '~/hooks/usePermissions'
 const AdminHome = () => {
   const currentYear = new Date().getFullYear()
@@ -58,7 +61,7 @@ const AdminHome = () => {
     )
   }
   return (
-    <>
+    <RouteGuard requiredPermissions={['admin:access']}>
       <SystemDashboard
         loading={loading}
         accountStatistics={accountStatistics}
@@ -67,7 +70,7 @@ const AdminHome = () => {
         orderStatistics={orderStatistics}
         financeStatistics={financeStatistics}
       />
-    </>
+    </RouteGuard>
   )
 }
 
