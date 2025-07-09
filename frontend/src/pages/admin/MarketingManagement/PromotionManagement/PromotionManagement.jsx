@@ -47,6 +47,7 @@ import {
 import AddDiscountModal from './Modal/AddDiscount.jsx'
 import ViewDiscountModal from './Modal/ViewDiscount.jsx'
 import EditDiscountModal from './Modal/EditDiscount.jsx'
+import { RouteGuard } from '~/components/PermissionGuard'
 
 const PromotionManagement = () => {
   const theme = useTheme()
@@ -244,8 +245,9 @@ const PromotionManagement = () => {
   )
 
   return (
-    <Box
-      sx={{
+    <RouteGuard requiredPermissions={['admin:access', 'promotion:use']}>
+      <Box
+        sx={{
         p: 3,
         backgroundColor: '#f8fafc',
         borderRadius: 3,
@@ -720,7 +722,8 @@ const PromotionManagement = () => {
         onSave={handleModalSuccess}
         discount={selectedDiscount}
       />
-    </Box>
+      </Box>
+    </RouteGuard>
   )
 }
 

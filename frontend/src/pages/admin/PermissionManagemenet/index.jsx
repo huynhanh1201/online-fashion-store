@@ -8,6 +8,7 @@ import EditPermissionModal from './modal/EditPermissionModal'
 import ViewPermissionModal from './modal/ViewPermissionModal'
 import DeletePermissionModal from './modal/DeletePermissionModal'
 import usePermissions from '~/hooks/admin/usePermission.js'
+import { RouteGuard } from '~/components/PermissionGuard'
 
 export default function PermissionManagementPage() {
   const {
@@ -47,7 +48,7 @@ export default function PermissionManagementPage() {
   }
   const handleChangePage = (event, value) => setPage(value)
   return (
-    <>
+    <RouteGuard requiredPermissions={['admin:access', 'permission:use']}>
       <PermissionTable
         data={permissions}
         onEdit={(perm) => {
@@ -98,6 +99,6 @@ export default function PermissionManagementPage() {
         onClose={() => setOpenDelete(false)}
         onConfirm={handleDelete}
       />
-    </>
+    </RouteGuard>
   )
 }

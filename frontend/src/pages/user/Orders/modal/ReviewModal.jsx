@@ -754,6 +754,7 @@ const ReviewModal = ({
         autoHideDuration={4000}
         onClose={handleCloseSnackbar}
         anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+        sx={{ mt: 12 }}
       >
         <Alert
           onClose={handleCloseSnackbar}

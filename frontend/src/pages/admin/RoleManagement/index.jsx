@@ -81,7 +81,7 @@ const RoleManagement = () => {
     }
   }
   return (
-    <>
+    <RouteGuard requiredPermissions={['admin:access', 'role:use']}>
       <RoleTable
         roles={roles}
         loading={loading}
@@ -153,7 +153,7 @@ const RoleManagement = () => {
           />
         )}
       </React.Suspense>
-    </>
+    </RouteGuard>
   )
 }
 

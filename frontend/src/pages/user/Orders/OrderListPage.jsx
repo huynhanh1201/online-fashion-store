@@ -404,9 +404,16 @@ const OrderRow = ({ order, onOrderUpdate, onOrderCancelled, onReorder, reorderLo
                       <Typography
                         fontWeight={600}
                         fontSize="1.1rem"
-                        sx={{ mb: 0.5 }}
+                        sx={{
+                          mb: 0.5,
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                          whiteSpace: 'nowrap',
+                          maxWidth: { xs: '150px', sm: '200px', md: '250px' }
+                        }}
+                        title={capitalizeFirstLetter(item.name)}
                       >
-                        {item.name}
+                        {capitalizeFirstLetter(item.name)}
                       </Typography>
                       <Typography
                         variant="body2"
@@ -781,7 +788,7 @@ const OrderListPage = () => {
 
   if (loading) {
     return (
-      <Container maxWidth="xl" sx={{ py: 4 }}>
+      <Container maxWidth={false} sx={{ width: '96vw', maxWidth: '1800px', margin: '0 auto', py: 4 }}>
         <Box display="flex" flexDirection="column" alignItems="center" gap={2}>
           <CircularProgress size={50} />
           <Typography variant="h6" color="text.secondary">
@@ -793,7 +800,10 @@ const OrderListPage = () => {
   }
 
   return (
-    <Container maxWidth="xl" sx={{
+    <Container maxWidth={false} sx={{
+      width: '96vw',
+      maxWidth: '1800px',
+      margin: '0 auto',
       py: 4,
       minHeight: '70vh',
       // Thêm CSS animation cho skeleton

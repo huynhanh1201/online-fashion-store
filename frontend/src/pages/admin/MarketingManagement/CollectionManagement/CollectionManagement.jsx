@@ -42,6 +42,7 @@ import {
 import { getCollections, deleteCollection } from '~/services/admin/webConfig/collectionService'
 import AddCollection from './Modal/AddCollection'
 import { optimizeCloudinaryUrl } from '~/utils/cloudinary.js'
+import { RouteGuard } from '~/components/PermissionGuard'
 
 const CollectionManagement = () => {
   const theme = useTheme()
@@ -196,7 +197,8 @@ const CollectionManagement = () => {
   )
 
   return (
-    <Box sx={{ p: 3, backgroundColor: '#f8fafc', borderRadius: 3, minHeight: '100vh' }}>
+    <RouteGuard requiredPermissions={['admin:access', 'collection:use']}>
+      <Box sx={{ p: 3, backgroundColor: '#f8fafc', borderRadius: 3, minHeight: '100vh' }}>
       {/* Header */}
       <Box sx={{ mb: 4 }}>
         <Typography
@@ -680,7 +682,8 @@ const CollectionManagement = () => {
           {success}
         </Alert>
       </Snackbar>
-    </Box>
+      </Box>
+    </RouteGuard>
   )
 }
 

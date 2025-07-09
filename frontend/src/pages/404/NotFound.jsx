@@ -30,9 +30,9 @@ const NotFound = () => {
       {/* Text EditContent */}
       <Box>
         <Typography variant='h3' fontWeight='bold' gutterBottom>
-          OOPS! PAGE
+          ÔI KHÔNG! TRANG
           <br />
-          NOT FOUND.
+          KHÔNG ĐƯỢC TÌM THẤY.
         </Typography>
         <Typography
           variant='body1'

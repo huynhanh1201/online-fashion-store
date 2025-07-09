@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import OrderStatistic from './OrderStatistic.jsx'
 import useInventoryStatistics from '~/hooks/admin/useStatistic.js'
+import { RouteGuard } from '~/components/PermissionGuard'
 
 function OrderDashboard() {
   const {
@@ -22,12 +23,14 @@ function OrderDashboard() {
   }, [year])
 
   return (
-    <OrderStatistic
-      stats={orderStatistics}
-      financeStatistics={financeStatistics}
-      year={year}
-      setYear={setYear}
-    />
+    <RouteGuard requiredPermissions={['admin:access', 'orderStatistics:use']}>
+      <OrderStatistic
+        stats={orderStatistics}
+        financeStatistics={financeStatistics}
+        year={year}
+        setYear={setYear}
+      />
+    </RouteGuard>
   )
 }
 
