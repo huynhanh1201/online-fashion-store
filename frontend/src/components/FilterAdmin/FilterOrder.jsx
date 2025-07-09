@@ -120,10 +120,10 @@ export default function FilterOrder({
     setPaymentStatus('')
     setSelectedFilter('')
     setUserInput('')
-    setSort('')
+    setSort('newest')
     setStartDate(dayjs().format('YYYY-MM-DD'))
     setEndDate(dayjs().format('YYYY-MM-DD'))
-    onFilter({})
+    onFilter({ sort: 'newest' })
     // fetchOrders()
   }
 
@@ -207,27 +207,27 @@ export default function FilterOrder({
           { label: 'Cũ nhất', value: 'oldest' }
         ]}
       />
-      <FilterByTime
-        label='Thời gian đặt hàng'
-        selectedFilter={selectedFilter}
-        setSelectedFilter={setSelectedFilter}
-        startDate={startDate}
-        setStartDate={setStartDate}
-        endDate={endDate}
-        setEndDate={setEndDate}
-        onApply={handleApplyTimeFilter}
-      />
       <Box sx={{ display: 'flex', gap: 2 }}>
-        <SearchWithSuggestions
-          label='Tên người đặt'
-          options={users.map((u) => u.name)} // có thể truyền users.map(u => u.name) nếu muốn
-          keyword={keyword}
-          inputValue={inputValue}
-          setKeyword={setKeyword}
-          setInputValue={setInputValue}
-          onSearch={handleSearch}
-          loading={loading}
+        <FilterByTime
+          label='Thời gian đặt hàng'
+          selectedFilter={selectedFilter}
+          setSelectedFilter={setSelectedFilter}
+          startDate={startDate}
+          setStartDate={setStartDate}
+          endDate={endDate}
+          setEndDate={setEndDate}
+          onApply={handleApplyTimeFilter}
         />
+        {/*<SearchWithSuggestions*/}
+        {/*  label='Tên người đặt'*/}
+        {/*  options={users.map((u) => u.name)} // có thể truyền users.map(u => u.name) nếu muốn*/}
+        {/*  keyword={keyword}*/}
+        {/*  inputValue={inputValue}*/}
+        {/*  setKeyword={setKeyword}*/}
+        {/*  setInputValue={setInputValue}*/}
+        {/*  onSearch={handleSearch}*/}
+        {/*  loading={loading}*/}
+        {/*/>*/}
         <Button
           variant='outlined'
           size='small'

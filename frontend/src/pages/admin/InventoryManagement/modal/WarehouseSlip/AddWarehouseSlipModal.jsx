@@ -274,7 +274,11 @@ export default function AddWarehouseSlipModal({
                 <Grid item size={4} sm={6} md={4}>
                   <DatePicker
                     sx={{ width: '100%' }}
-                    label='Ngày nhập'
+                    label={
+                      <>
+                        Ngày tạo phiếu <span style={{ color: 'red' }}>*</span>
+                      </>
+                    }
                     value={newSlipData.date || null}
                     onChange={handleDateChange}
                     slotProps={{ textField: { fullWidth: true } }} // Cập nhật để tương thích với MUI v6
@@ -282,10 +286,19 @@ export default function AddWarehouseSlipModal({
                 </Grid>
                 <Grid item size={4} sm={6} md={4}>
                   <FormControl fullWidth>
-                    <InputLabel>Kho nhập hàng</InputLabel>
+                    <InputLabel id='warehouse-label'>
+                      Kho {type === 'input' ? 'nhập' : 'xuất'} hàng{' '}
+                      <span style={{ color: 'red' }}>*</span>
+                    </InputLabel>
                     {warehouses.length > 0 ? (
                       <Select
-                        label='Kho nhập hàng'
+                        labelid='warehouse-label'
+                        label={
+                          <>
+                            Kho {type === 'input' ? 'nhập' : 'xuất'} hàng{' '}
+                            <span style={{ color: 'red' }}>*</span>
+                          </>
+                        }
                         value={newSlipData.warehouseId || ''}
                         onChange={handleChange('warehouseId')}
                       >
@@ -297,7 +310,7 @@ export default function AddWarehouseSlipModal({
                       </Select>
                     ) : (
                       <Select
-                        label='Kho nhập hàng'
+                        label='Kho hàng'
                         value=''
                         onChange={handleChange('warehouseId')}
                       >
@@ -310,9 +323,16 @@ export default function AddWarehouseSlipModal({
                 </Grid>
                 <Grid item size={4} sm={6} md={4}>
                   <FormControl fullWidth>
-                    <InputLabel>Nhà cung cấp</InputLabel>
+                    <InputLabel id='partner-label'>
+                      Nhà cung cấp <span style={{ color: 'red' }}>*</span>
+                    </InputLabel>
                     <Select
-                      label={'Nhà cung cấp'}
+                      labelId='partner-label'
+                      label={
+                        <>
+                          Nhà cung cấp <span style={{ color: 'red' }}>*</span>
+                        </>
+                      }
                       value={newSlipData.partnerId || ''}
                       onChange={handleChange('partnerId')}
                     >
@@ -449,11 +469,10 @@ export default function AddWarehouseSlipModal({
           sx={{ px: 3, py: 2, borderTop: '1px solid #e0e0e0' }}
         >
           <Button
-            variant='contained'
+            variant='outlined'
             onClick={handleAddRow}
             sx={{
-              backgroundColor: 'var(--primary-color)',
-              color: '#fff',
+              color: 'var(--primary-color)',
               textTransform: 'none'
             }}
           >

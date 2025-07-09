@@ -99,10 +99,16 @@ export default function AccountRow({
               key={column.id}
               align={column.align}
               title={formattedName}
+              onClick={() => {
+                hasPermission('account:read')
+                  ? handleOpenModal('view', user)
+                  : null
+              }}
               sx={{
                 ...styles.cellPadding,
                 maxWidth: 300,
-                display: 'table-cell'
+                display: 'table-cell',
+                cursor: hasPermission('account:read') ? 'pointer' : 'default'
               }}
             >
               {formattedName}

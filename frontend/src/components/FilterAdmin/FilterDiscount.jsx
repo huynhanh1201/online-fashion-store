@@ -2,16 +2,10 @@ import React, { useEffect, useState, useRef } from 'react'
 import { Box, Button } from '@mui/material'
 import dayjs from 'dayjs'
 import FilterSelect from '~/components/FilterAdmin/common/FilterSelect'
-import FilterByPrice from '~/components/FilterAdmin/common/FilterByPrice'
 import FilterByTime from '~/components/FilterAdmin/common/FilterByTime'
 import SearchWithSuggestions from '~/components/FilterAdmin/common/SearchWithSuggestions'
-
-export default function FilterDiscount({
-  onFilter,
-  discounts,
-  loading,
-  fetchDiscounts
-}) {
+import useDiscounts from '~/hooks/admin/useDiscount.js'
+export default function FilterDiscount({ onFilter, loading }) {
   const [keyword, setKeyword] = useState('')
   const [inputValue, setInputValue] = useState('')
 
@@ -45,6 +39,12 @@ export default function FilterDiscount({
   const [validUntilFilter, setValidUntilFilter] = useState('')
   const [createdFilter, setCreatedFilter] = useState('')
   const hasMounted = useRef(false)
+  const { discounts, fetchDiscounts } = useDiscounts()
+
+  useEffect(() => {
+    fetchDiscounts(1, 100000, { destroy: destroy, sort: sort })
+  }, [sort, destroy])
+
   useEffect(() => {
     if (hasMounted.current) {
       applyFilters()
@@ -157,8 +157,8 @@ export default function FilterDiscount({
     setUsageMax('')
     setUsedCountMin('')
     setUsedCountMax('')
-    setIsActive('')
-    setSort('')
+    setIsActive('true')
+    setSort('newest')
     setDestroy('false')
     setValidFromStart(dayjs().format('YYYY-MM-DD'))
     setValidFromEnd(dayjs().format('YYYY-MM-DD'))

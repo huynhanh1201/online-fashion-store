@@ -100,7 +100,7 @@ const InventoryLogTab = () => {
       label: 'Giá nhập',
       minWidth: 150,
       align: 'right',
-      format: (value) => `${value.toLocaleString('vi-VN')}đ`
+      format: (value) => `${value.toLocaleString('vi-VN')}₫`
     },
     {
       id: 'exportPrice',
@@ -108,7 +108,7 @@ const InventoryLogTab = () => {
       minWidth: 230,
       align: 'right',
       pr: 10,
-      format: (value) => `${value.toLocaleString('vi-VN')}đ`
+      format: (value) => `${value.toLocaleString('vi-VN')}₫`
     },
     { id: 'createdAtFormatted', label: 'Ngày thực hiện', minWidth: 100 },
     { id: 'action', label: 'Hành động', minWidth: 130, align: 'start' }
@@ -319,6 +319,12 @@ const InventoryLogTab = () => {
                       <TableCell
                         key={col.id}
                         align={col.align || 'left'}
+                        onClick={
+                          (col.id === 'variantName' ||
+                            (col.id === 'warehouse' &&
+                              hasPermission('inventoryLog:read'))) &&
+                          (() => handleViewLog(row))
+                        }
                         sx={{
                           py: 0,
                           px: 1,
@@ -328,7 +334,12 @@ const InventoryLogTab = () => {
                           overflow: 'hidden',
                           textOverflow: 'ellipsis',
                           background: '#fff',
-                          ...(col.maxWidth && { maxWidth: col.maxWidth })
+                          ...(col.maxWidth && { maxWidth: col.maxWidth }),
+                          ...((col.id === 'variantName' ||
+                            (col.id === 'warehouse' &&
+                              hasPermission('inventoryLog:read'))) && {
+                            cursor: 'pointer'
+                          })
                         }}
                         title={
                           typeof content === 'string' ? content : undefined
@@ -360,7 +371,7 @@ const InventoryLogTab = () => {
         }}
         labelRowsPerPage='Số dòng mỗi trang'
         labelDisplayedRows={({ from, to, count }) => {
-          const totalPages = Math.ceil(count / rowsPerPage)
+          const totalPages = Math.max(1, Math.ceil(count / rowsPerPage))
           return `${from}–${to} trên ${count} | Trang ${page} / ${totalPages}`
         }}
         ActionsComponent={TablePaginationActions}

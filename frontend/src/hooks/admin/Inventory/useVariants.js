@@ -30,9 +30,9 @@ const useVariants = () => {
     }
     try {
       const query = buildQuery(filters)
-      const { variants = [], total = 0 } = await getVariants(query)
+      const { variants = [], total } = await getVariants(query)
       setVariants(variants)
-      setTotalPages(total || 1)
+      setTotalPages(total)
     } catch (err) {
       setVariants([])
       setTotalPages(1)

@@ -46,7 +46,7 @@ const AccountManagement = () => {
   const { hasPermission } = usePermissions()
 
   React.useEffect(() => {
-    fetchRoles(1, 10000)
+    fetchRoles(1, 10000, { destroy: 'false' })
   }, [])
 
   React.useEffect(() => {

@@ -254,7 +254,7 @@ const WarehouseSlipsTab = () => {
                           display: 'flex',
                           justifyContent: 'space-between',
                           alignItems: 'start',
-                          minWidth: 250,
+                          minWidth: 200,
                           gap: 1
                         }}
                       >
@@ -453,6 +453,12 @@ const WarehouseSlipsTab = () => {
                       <TableCell
                         key={col.id}
                         align={col.align || 'left'}
+                        onClick={
+                          col.id === 'slipId' &&
+                          hasPermission('warehouseSlip:read')
+                            ? () => handleViewSlip(row)
+                            : undefined
+                        }
                         sx={{
                           py: 0,
                           px: 1,
@@ -462,7 +468,11 @@ const WarehouseSlipsTab = () => {
                           textOverflow: 'ellipsis',
                           background: '#fff',
                           ...(col.maxWidth && { maxWidth: col.maxWidth }),
-                          ...(col.id === 'itemCount' && { pr: col.pr })
+                          ...(col.id === 'itemCount' && { pr: col.pr }),
+                          ...(col.id === 'slipId' &&
+                            hasPermission('warehouseSlip:read') && {
+                              cursor: 'pointer'
+                            })
                         }}
                         title={
                           typeof content === 'string' ? content : undefined
@@ -494,7 +504,7 @@ const WarehouseSlipsTab = () => {
         }}
         labelRowsPerPage='Số dòng mỗi trang'
         labelDisplayedRows={({ from, to, count }) => {
-          const totalPages = Math.ceil(count / ROWS_PER_PAGE)
+          const totalPages = Math.max(1, Math.ceil(count / ROWS_PER_PAGE))
           return `${from}–${to} trên ${count} | Trang ${page} / ${totalPages}`
         }}
         ActionsComponent={TablePaginationActions}

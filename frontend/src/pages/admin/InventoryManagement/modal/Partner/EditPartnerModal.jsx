@@ -72,7 +72,11 @@ export default function EditPartnerModal({
           <Grid container spacing={2}>
             <Grid item size={12} xs={12}>
               <TextField
-                label='Tên đối tác'
+                label={
+                  <>
+                    Tên đối tác <span style={{ color: 'red' }}>*</span>
+                  </>
+                }
                 fullWidth
                 {...register('name', {
                   required: 'Tên không được bỏ trống',
@@ -100,7 +104,11 @@ export default function EditPartnerModal({
                 render={({ field }) => (
                   <TextField
                     select
-                    label='Kiểu đối tác'
+                    label={
+                      <>
+                        Kiểu đối tác <span style={{ color: 'red' }}>*</span>
+                      </>
+                    }
                     fullWidth
                     {...field}
                     error={!!errors.type}
@@ -117,7 +125,11 @@ export default function EditPartnerModal({
             </Grid>
             <Grid item size={12} xs={12} sm={6}>
               <TextField
-                label='Số điện thoại'
+                label={
+                  <>
+                    Số điện thoại <span style={{ color: 'red' }}>*</span>
+                  </>
+                }
                 fullWidth
                 {...register('phone', {
                   required: 'Số điện thoại là bắt buộc',
@@ -136,7 +148,11 @@ export default function EditPartnerModal({
             </Grid>
             <Grid item size={12} xs={12} sm={6}>
               <TextField
-                label='Email'
+                label={
+                  <>
+                    Email <span style={{ color: 'red' }}>*</span>
+                  </>
+                }
                 type='email'
                 fullWidth
                 {...register('email', {

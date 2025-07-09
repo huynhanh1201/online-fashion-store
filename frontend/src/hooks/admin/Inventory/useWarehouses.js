@@ -31,7 +31,7 @@ const useWarehouses = () => {
       const query = buildQuery(filters)
       const response = await getWarehouses(query)
       setWarehouses(response.warehouses || [])
-      setTotalPages(response.total || 1)
+      setTotalPages(response.total)
       setLoading(false)
     } catch (error) {
       console.error('Error fetching warehouses:', error)

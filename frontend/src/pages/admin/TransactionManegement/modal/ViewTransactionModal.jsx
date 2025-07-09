@@ -104,7 +104,7 @@ const ViewTransactionModal = ({ open, onClose, transaction }) => {
                 <TableCell sx={{ fontWeight: 'bold' }}>Số tiền</TableCell>
                 <TableCell>
                   {transaction.orderId?.total
-                    ? `${transaction.orderId.total.toLocaleString('vi-VN')}đ`
+                    ? `${transaction.orderId.total.toLocaleString('vi-VN')}₫`
                     : 'Không có thông tin'}
                 </TableCell>
               </TableRow>

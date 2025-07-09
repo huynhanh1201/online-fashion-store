@@ -5,17 +5,24 @@ import dayjs from 'dayjs'
 import FilterByTime from '~/components/FilterAdmin/common/FilterByTime.jsx'
 import FilterSelect from '~/components/FilterAdmin/common/FilterSelect.jsx'
 import SearchWithSuggestions from '~/components/FilterAdmin/common/SearchWithSuggestions.jsx'
-
-export default function FilterUser({ onFilter, users, loading, roles }) {
+import useUsers from '~/hooks/admin/useUsers.js'
+export default function FilterUser({ onFilter, loading, roles }) {
   const [keyword, setKeyword] = useState('')
   const [inputValue, setInputValue] = useState('')
   const [selectedFilter, setSelectedFilter] = useState('')
   const [startDate, setStartDate] = useState(dayjs().format('YYYY-MM-DD'))
   const [endDate, setEndDate] = useState(dayjs().format('YYYY-MM-DD'))
-  const [role, setRole] = useState('')
+  const [role, setRole] = useState('customer')
   const [sort, setSort] = useState('newest')
   const [destroy, setDestroy] = useState('false')
   const hasMounted = useRef(false)
+  const { users, fetchUsers } = useUsers()
+
+  useEffect(() => {
+    fetchUsers(1, 100000, { destroy: destroy, sort: sort })
+  }, [destroy, sort])
+
+  const filterUser = users.filter((user) => user?.role === 'customer')
 
   useEffect(() => {
     applyFilters(selectedFilter, startDate, endDate)
@@ -81,10 +88,10 @@ export default function FilterUser({ onFilter, users, loading, roles }) {
     setSelectedFilter('')
     setStartDate(dayjs().format('YYYY-MM-DD'))
     setEndDate(dayjs().format('YYYY-MM-DD'))
-    setRole('')
+    setRole('customer')
     setDestroy('false')
     setSort('newest')
-    onFilter({ sort: 'newest', destroy: 'false' })
+    onFilter({ sort: 'newest', role: 'customer', destroy: 'false' })
   }
 
   return (
@@ -114,8 +121,8 @@ export default function FilterUser({ onFilter, users, loading, roles }) {
 
       <Box sx={{ display: 'flex', gap: 2 }}>
         <SearchWithSuggestions
-          label='Tên hoặc email'
-          options={users.map((u) => u.name || u.email)}
+          label='Tên khách hàng'
+          options={filterUser.map((u) => u.name || u.email)}
           loading={loading}
           keyword={keyword}
           inputValue={inputValue}

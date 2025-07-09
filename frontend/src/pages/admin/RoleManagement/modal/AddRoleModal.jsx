@@ -367,7 +367,7 @@ const AddRoleModal = ({ open, onClose, onSubmit, p }) => {
               margin='normal'
               label={
                 <>
-                  Tên vai trò <span style={{ color: 'red' }}>*</span> (bắt buộc)
+                  Tên vai trò <span style={{ color: 'red' }}>*</span>
                 </>
               }
               error={!!errors.name}
@@ -392,8 +392,7 @@ const AddRoleModal = ({ open, onClose, onSubmit, p }) => {
               margin='normal'
               label={
                 <>
-                  Tên hiển thị <span style={{ color: 'red' }}>*</span> (bắt
-                  buộc)
+                  Tên hiển thị <span style={{ color: 'red' }}>*</span>
                 </>
               }
               error={!!errors.label}

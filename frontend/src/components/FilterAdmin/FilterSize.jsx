@@ -4,13 +4,8 @@ import dayjs from 'dayjs'
 import FilterByTime from '~/components/FilterAdmin/common/FilterByTime.jsx'
 import SearchWithSuggestions from '~/components/FilterAdmin/common/SearchWithSuggestions.jsx'
 import FilterSelect from '~/components/FilterAdmin/common/FilterSelect.jsx'
-
-export default function FilterSize({
-  onFilter,
-  sizes = [],
-  fetchSizes,
-  loading
-}) {
+import useSizes from '~/hooks/admin/useSize.js'
+export default function FilterSize({ onFilter, loading }) {
   const [keyword, setKeyword] = useState('')
   const [inputValue, setInputValue] = useState('')
   const [selectedFilter, setSelectedFilter] = useState('')
@@ -19,6 +14,12 @@ export default function FilterSize({
   const [status, setStatus] = useState('false')
   const [sort, setSort] = useState('newest')
   const hasMounted = useRef(false)
+  const { sizes, fetchSizes } = useSizes()
+
+  useEffect(() => {
+    fetchSizes(1, 100000, { destroy: status, sort: sort })
+  }, [sort, status])
+
   useEffect(() => {
     if (hasMounted.current) {
       applyFilters(selectedFilter, startDate, endDate)

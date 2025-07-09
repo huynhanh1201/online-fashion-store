@@ -11,7 +11,6 @@ import {
   IconButton
 } from '@mui/material'
 import { useForm } from 'react-hook-form'
-import ClearIcon from '@mui/icons-material/Clear'
 import axios from 'axios'
 import { toast } from 'react-toastify'
 import { GHN_TOKEN_API } from '~/utils/constants'
@@ -160,7 +159,11 @@ const AddWarehouseModal = ({ open, onClose, onSave, Add }) => {
           <Grid container spacing={2}>
             <Grid item size={12} xs={12}>
               <TextField
-                label='Tên kho hàng'
+                label={
+                  <>
+                    Tên kho <span style={{ color: 'red' }}>*</span>
+                  </>
+                }
                 fullWidth
                 {...register('name', { required: 'Vui lòng nhập tên kho' })}
                 error={!!errors.name}
@@ -169,7 +172,12 @@ const AddWarehouseModal = ({ open, onClose, onSave, Add }) => {
             </Grid>
             <Grid item size={12} xs={12}>
               <TextField
-                label='Địa chỉ (số nhà, tên đường)'
+                label={
+                  <>
+                    Địa chỉ (số nhà, tên đường){' '}
+                    <span style={{ color: 'red' }}>*</span>
+                  </>
+                }
                 fullWidth
                 {...register('address', { required: 'Vui lòng nhập địa chỉ' })}
                 error={!!errors.address}
@@ -184,7 +192,14 @@ const AddWarehouseModal = ({ open, onClose, onSave, Add }) => {
                 value={selectedProvince}
                 onChange={handleProvinceChange}
                 renderInput={(params) => (
-                  <TextField {...params} label='Tỉnh / Thành phố' />
+                  <TextField
+                    {...params}
+                    label={
+                      <>
+                        Tỉnh / Thành phố <span style={{ color: 'red' }}>*</span>
+                      </>
+                    }
+                  />
                 )}
               />
             </Grid>
@@ -197,7 +212,14 @@ const AddWarehouseModal = ({ open, onClose, onSave, Add }) => {
                 onChange={handleDistrictChange}
                 disabled={!selectedProvince}
                 renderInput={(params) => (
-                  <TextField {...params} label='Quận / Huyện' />
+                  <TextField
+                    {...params}
+                    label={
+                      <>
+                        Quận / Huyện <span style={{ color: 'red' }}>*</span>
+                      </>
+                    }
+                  />
                 )}
               />
             </Grid>
@@ -210,13 +232,20 @@ const AddWarehouseModal = ({ open, onClose, onSave, Add }) => {
                 onChange={handleWardChange}
                 disabled={!selectedDistrict}
                 renderInput={(params) => (
-                  <TextField {...params} label='Phường / Xã' />
+                  <TextField
+                    {...params}
+                    label={
+                      <>
+                        Phường / Xã <span style={{ color: 'red' }}>*</span>
+                      </>
+                    }
+                  />
                 )}
               />
             </Grid>
           </Grid>
         </DialogContent>
-        <DialogActions>
+        <DialogActions sx={{ p: '16px 24px' }}>
           <Button onClick={handleCancel} color='error' variant='outlined'>
             Huỷ
           </Button>

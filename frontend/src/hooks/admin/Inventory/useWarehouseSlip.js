@@ -31,7 +31,7 @@ const useWarehouseSlips = () => {
       const query = buildQuery(filters)
       const response = await getWarehouseSlips(query)
       setWarehouseSlips(response.warehouseSlips || [])
-      setTotalPages(response.total || 1)
+      setTotalPages(response.total)
       setLoading(false)
     } catch (error) {
       console.error('Error fetching warehouse slips:', error)

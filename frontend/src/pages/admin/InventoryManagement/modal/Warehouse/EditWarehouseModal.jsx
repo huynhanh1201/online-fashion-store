@@ -255,7 +255,11 @@ const EditWarehouseModal = ({ open, onClose, warehouse, onSave }) => {
             <Grid container spacing={2}>
               <Grid item size={12} sm={6}>
                 <TextField
-                  label='Tên kho hàng'
+                  label={
+                    <>
+                      Tên kho hàng <span style={{ color: 'red' }}>*</span>
+                    </>
+                  }
                   fullWidth
                   {...register('name', { required: 'Vui lòng nhập tên kho' })}
                   error={!!errors.name}
@@ -264,7 +268,12 @@ const EditWarehouseModal = ({ open, onClose, warehouse, onSave }) => {
               </Grid>
               <Grid item size={12}>
                 <TextField
-                  label='Địa chỉ (số nhà, tên đường)'
+                  label={
+                    <>
+                      Địa chỉ (số nhà, tên đường){' '}
+                      <span style={{ color: 'red' }}>*</span>
+                    </>
+                  }
                   fullWidth
                   {...register('address', {
                     required: 'Vui lòng nhập địa chỉ'
@@ -286,7 +295,12 @@ const EditWarehouseModal = ({ open, onClose, warehouse, onSave }) => {
                   renderInput={(params) => (
                     <TextField
                       {...params}
-                      label='Tỉnh / Thành phố'
+                      label={
+                        <>
+                          Tỉnh / Thành phố{' '}
+                          <span style={{ color: 'red' }}>*</span>
+                        </>
+                      }
                       InputProps={{
                         ...params.InputProps,
                         endAdornment: (
@@ -335,7 +349,11 @@ const EditWarehouseModal = ({ open, onClose, warehouse, onSave }) => {
                   renderInput={(params) => (
                     <TextField
                       {...params}
-                      label='Quận / Huyện'
+                      label={
+                        <>
+                          Quận / Huyện <span style={{ color: 'red' }}>*</span>
+                        </>
+                      }
                       InputProps={{
                         ...params.InputProps,
                         endAdornment: (
@@ -382,7 +400,11 @@ const EditWarehouseModal = ({ open, onClose, warehouse, onSave }) => {
                   renderInput={(params) => (
                     <TextField
                       {...params}
-                      label='Phường / Xã'
+                      label={
+                        <>
+                          Phường / Xã <span style={{ color: 'red' }}>*</span>
+                        </>
+                      }
                       InputProps={{
                         ...params.InputProps,
                         endAdornment: (
@@ -416,7 +438,7 @@ const EditWarehouseModal = ({ open, onClose, warehouse, onSave }) => {
             </Grid>
           )}
         </DialogContent>
-        <DialogActions>
+        <DialogActions sx={{ p: '16px 24px' }}>
           <Button
             onClick={handleCancel}
             sx={{ textTransform: 'none' }}
