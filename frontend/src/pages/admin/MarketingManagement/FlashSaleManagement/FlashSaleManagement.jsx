@@ -169,6 +169,16 @@ const FlashSaleManagement = () => {
 
   const formatTime = (isoString) => new Date(isoString).toLocaleString('vi-VN')
 
+  // Lấy trạng thái thực tế của campaign (ưu tiên forceExpired)
+  const getCampaignStatus = (campaign) => {
+    if (campaign.forceExpired) return 'expired'
+    const now = new Date()
+    if (!campaign.enabled) return 'disabled'
+    if (new Date(campaign.startTime) > now) return 'upcoming'
+    if (new Date(campaign.endTime) < now) return 'expired'
+    return 'active'
+  }
+
   const getStatusColor = (status) => {
     switch (status) {
       case 'upcoming':
@@ -375,10 +385,11 @@ const FlashSaleManagement = () => {
 
   const handleEndCampaignEarly = async (campaign) => {
     try {
-      // Cập nhật thời gian kết thúc thành thời gian hiện tại
+      // Cập nhật thời gian kết thúc thành thời gian hiện tại và đánh dấu forceExpired
       const updatedCampaign = {
         ...campaign,
-        endTime: new Date().toISOString()
+        endTime: new Date().toISOString(),
+        forceExpired: true // Đánh dấu kết thúc sớm
       }
 
       await updateFlashSaleCampaign(campaign.id, updatedCampaign)
@@ -539,48 +550,41 @@ const FlashSaleManagement = () => {
             <Grid item xs={12} sm={6} md={3} key={index}>
               <Card
                 sx={{
-                  background: `linear-gradient(135deg, ${item.color}15 0%, ${item.color}25 100%)`,
-                  border: `1px solid ${item.color}30`,
-                  borderRadius: 3,
-                  transition: 'all 0.3s ease',
-                  '&:hover': {
-                    transform: 'translateY(-4px)',
-                    boxShadow: `0 8px 32px ${item.color}30`
-                  }
+                  display: 'flex',
+                  alignItems: 'center',
+                  borderRadius: 2,
+                  boxShadow: 'none',
+                  border: 'none',
+                  background: '#fafbfc',
+                  minHeight: 90,
+                  position: 'relative',
                 }}
               >
-                <CardContent>
-                  <Stack
-                    direction='row'
-                    alignItems='center'
-                    justifyContent='space-between'
-                  >
-                    <Box>
-                      <Typography
-                        variant='h4'
-                        sx={{ fontWeight: 700, color: item.color }}
-                      >
-                        {item.value}
-                      </Typography>
-                      <Typography
-                        variant='body2'
-                        color='text.secondary'
-                        sx={{ mt: 0.5 }}
-                      >
-                        {item.title}
-                      </Typography>
-                    </Box>
-                    <Box
-                      sx={{
-                        p: 1.5,
-                        borderRadius: 2,
-                        backgroundColor: `${item.color}20`,
-                        color: item.color
-                      }}
-                    >
+                {/* Thanh màu bên trái */}
+                <Box
+                  sx={{
+                    width: 8,
+                    height: '100%',
+                    borderRadius: '8px 0 0 8px',
+                    background: item.color || '#22c55e',
+                    position: 'absolute',
+                    left: 0,
+                    top: 0,
+                    bottom: 0,
+                  }}
+                />
+                <CardContent sx={{ pl: 4, py: 2, width: '100%' }}>
+                  <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
+                    {item.title}
+                  </Typography>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <Box sx={{ color: item.color || '#22c55e', fontSize: 28, fontWeight: 700 }}>
                       {item.icon}
                     </Box>
-                  </Stack>
+                    <Typography variant="h5" sx={{ fontWeight: 700, ml: 1 }}>
+                      {loading ? '...' : item.value}
+                    </Typography>
+                  </Box>
                 </CardContent>
               </Card>
             </Grid>
@@ -787,20 +791,8 @@ const FlashSaleManagement = () => {
                       {campaign.title} (ID: {campaign.id})
                     </Typography>
                     <Stack direction='row' spacing={1} alignItems='center'>
-                      <Tooltip
-                        title={
-                          campaign.enabled ? 'Tắt chiến dịch' : 'Bật chiến dịch'
-                        }
-                      >
-                        <Switch
-                          checked={campaign.enabled}
-                          onChange={() => handleToggleCampaign(campaign)}
-                          color='primary'
-                        />
-                      </Tooltip>
-
                       {/* Nút khôi phục giá cho campaign hết thời gian */}
-                      {campaign.status === 'expired' && (
+                      {(getCampaignStatus(campaign) === 'expired' || (new Date(campaign.endTime) < new Date() && campaign.enabled)) && (
                         <Tooltip title='Khôi phục giá về ban đầu'>
                           <IconButton
                             size='small'
@@ -838,7 +830,7 @@ const FlashSaleManagement = () => {
                           </Tooltip>
                         )}
                       {/* Nút kết thúc sớm chỉ hiển thị cho chiến dịch đang hoạt động */}
-                      {(campaign.status === 'active' || campaign.status === 'upcoming') && (
+                      {(getCampaignStatus(campaign) === 'active' || getCampaignStatus(campaign) === 'upcoming') && (
                         <Tooltip title='Kết thúc sớm'>
                           <IconButton
                             size='small'
@@ -856,9 +848,7 @@ const FlashSaleManagement = () => {
                         </Tooltip>
                       )}
                       {/* Nút xóa chỉ hiển thị cho chiến dịch đã kết thúc hoặc bị tắt */}
-
-                      {hasPermission('flashSale:delete') && (campaign.status === 'expired' || campaign.status === 'disabled') && (
-
+                      {hasPermission('flashSale:delete') && (getCampaignStatus(campaign) === 'expired' || getCampaignStatus(campaign) === 'disabled') && !campaign.forceExpired && (
                         <Tooltip title='Xóa chiến dịch'>
                           <IconButton
                             size='small'
@@ -874,11 +864,10 @@ const FlashSaleManagement = () => {
                             <DeleteIcon fontSize='small' />
                           </IconButton>
                         </Tooltip>
-                      )
-                      }
+                      )}
                       <Chip
-                        label={getStatusLabel(campaign.status)}
-                        color={getStatusColor(campaign.status)}
+                        label={getStatusLabel(getCampaignStatus(campaign))}
+                        color={getStatusColor(getCampaignStatus(campaign))}
                         size='small'
                         sx={{ fontWeight: 600, borderRadius: 2 }}
                       />
@@ -926,11 +915,6 @@ const FlashSaleManagement = () => {
                             sx={{ fontWeight: 700, color: '#334155', py: 2 }}
                           >
                             Giảm giá
-                          </TableCell>
-                          <TableCell
-                            sx={{ fontWeight: 700, color: '#334155', py: 2 }}
-                          >
-                            Số lượng
                           </TableCell>
                           <TableCell
                             sx={{ fontWeight: 700, color: '#334155', py: 2 }}
@@ -1074,28 +1058,9 @@ const FlashSaleManagement = () => {
                               </Typography>
                             </TableCell>
                             <TableCell sx={{ py: 2 }}>
-                              <Box
-                                sx={{
-                                  display: 'flex',
-                                  alignItems: 'center',
-                                  gap: 1
-                                }}
-                              >
-                                <InventoryIcon
-                                  sx={{ fontSize: 16, color: '#6b7280' }}
-                                />
-                                <Typography
-                                  variant='body2'
-                                  sx={{ fontWeight: 600 }}
-                                >
-                                  {item.stock != null ? item.stock : 0}
-                                </Typography>
-                              </Box>
-                            </TableCell>
-                            <TableCell sx={{ py: 2 }}>
                               <Stack direction='row' spacing={1}>
                                 {/* Nút khôi phục giá cho sản phẩm trong Flash Sale hết thời gian */}
-                                {campaign.status === 'expired' && (
+                                {(getCampaignStatus(campaign) === 'expired' || (new Date(campaign.endTime) < new Date() && campaign.enabled)) && (
                                   <Tooltip title='Khôi phục giá về ban đầu'>
                                     <IconButton
                                       size='small'
@@ -1132,7 +1097,7 @@ const FlashSaleManagement = () => {
                                   </Tooltip>
                                 )}
                                 {/* Nút kết thúc sớm chỉ hiển thị cho sản phẩm trong chiến dịch đang hoạt động */}
-                                {(campaign.status === 'active' || campaign.status === 'upcoming') && (
+                                {(getCampaignStatus(campaign) === 'active' || getCampaignStatus(campaign) === 'upcoming') && (
                                   <Tooltip title='Kết thúc sớm sản phẩm này'>
                                     <IconButton
                                       size='small'
@@ -1149,7 +1114,7 @@ const FlashSaleManagement = () => {
                                   </Tooltip>
                                 )}
                                 {/* Nút xóa chỉ hiển thị cho sản phẩm trong chiến dịch đã kết thúc hoặc bị tắt */}
-                                {hasPermission('flashSale:deldete') && (campaign.status === 'expired' || campaign.status === 'disabled') && (
+                                {hasPermission('flashSale:deldete') && (getCampaignStatus(campaign) === 'expired' || getCampaignStatus(campaign) === 'disabled') && !campaign.forceExpired && (
                                   <Tooltip title='Xóa'>
                                     <IconButton
                                       size='small'
@@ -1176,9 +1141,9 @@ const FlashSaleManagement = () => {
               </Accordion >
             ))
           )}
-        </Card>
-      </Box>
-    </RouteGuard>
+        </Card >
+      </Box >
+    </RouteGuard >
   )
 }
 

@@ -360,7 +360,7 @@ const Product = () => {
             display: 'flex',
             flexDirection: 'column',
             justifyContent: 'center',
-            alignItems: { xs: 'center', md: 'flex-start' },
+            alignItems: { xs: 'center'},
             p: { xs: 2, md: 4 },
             minHeight: { xs: 180, md: 400 }
           }}
@@ -376,16 +376,17 @@ const Product = () => {
               WebkitTextFillColor: 'transparent',
               backgroundClip: 'text',
               textShadow: '2px 2px 8px rgba(26,60,123,0.08)',
+              justifyContent: 'center',
               letterSpacing: '-1px',
               lineHeight: 1.1,
               textAlign: { xs: 'center', md: 'left' }
             }}
           >
-            Tất cả sản phẩm
+            {productBanner?.title || 'Tất cả sản phẩm'}
           </Typography>
           {productBanner?.description && (
             <Typography
-              variant="h6"
+              variant="h5"
               sx={{
                 color: 'text.secondary',
                 fontWeight: 400,

@@ -15,7 +15,10 @@ import {
   TableHead,
   TableBody,
   TableRow,
-  TableCell
+  TableCell,
+  Grid,
+  Card,
+  CardContent
 } from '@mui/material'
 import {
   Add as AddIcon,
@@ -88,6 +91,51 @@ const FooterManagement = () => {
             Cấu hình và quản lý nội dung chân trang cho website. Chỉ có thể tồn tại một cấu hình duy nhất.
           </Typography>
         </Box>
+
+        {/* Summary Card */}
+        <Grid container spacing={3} sx={{ mb: 4 }}>
+          <Grid item xs={12} sm={6} md={3}>
+            <Card
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                borderRadius: 2,
+                boxShadow: 'none',
+                border: 'none',
+                background: '#fafbfc',
+                minHeight: 90,
+                position: 'relative',
+              }}
+            >
+              {/* Thanh màu bên trái */}
+              <Box
+                sx={{
+                  width: 8,
+                  height: '100%',
+                  borderRadius: '8px 0 0 8px',
+                  background: '#22c55e',
+                  position: 'absolute',
+                  left: 0,
+                  top: 0,
+                  bottom: 0,
+                }}
+              />
+              <CardContent sx={{ pl: 4, py: 2, width: '100%' }}>
+                <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
+                  Số cấu hình chân trang
+                </Typography>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <Box sx={{ color: '#22c55e', fontSize: 28, fontWeight: 700 }}>
+                    <ImageIcon />
+                  </Box>
+                  <Typography variant="h5" sx={{ fontWeight: 700, ml: 1 }}>
+                    {loading ? <CircularProgress size={20} /> : (footerData?.content?.length || 0)}
+                  </Typography>
+                </Box>
+              </CardContent>
+            </Card>
+          </Grid>
+        </Grid>
 
         {loading && (
           <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '50vh' }}>
