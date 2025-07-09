@@ -70,10 +70,18 @@ const Cart = () => {
   const [hasAutoSelected, setHasAutoSelected] = useState(false)
   const [outOfStockAlert, setOutOfStockAlert] = useState(false)
   const [outOfStockMessage, setOutOfStockMessage] = useState('')
+  const [updateTimers, setUpdateTimers] = useState({}) // For debouncing quantity updates
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'auto' })
     setHasAutoSelected(false)
+
+    // Cleanup timers on unmount
+    return () => {
+      Object.values(updateTimers).forEach(timer => {
+        if (timer) clearTimeout(timer)
+      })
+    }
   }, [])
 
   // Revalidate selected items when cart data changes to handle race conditions
@@ -227,6 +235,9 @@ const Cart = () => {
       : '0₫'
 
   const handleMouseDown = (variantId, delta) => {
+    // Prevent multiple operations on same variant
+    if (processingVariantId === variantId) return
+
     const item = cartItems.find((i) => i.variant._id === variantId)
     if (!item) return
 
@@ -272,32 +283,53 @@ const Cart = () => {
 
     if (!item || tempQty === undefined || tempQty === item.quantity) return
 
-    try {
-      setProcessingVariantId(variantId)
-      const delta = tempQty - item.quantity
-      await updateItem(variantId, { quantity: delta })
-
-      setCartItems((prev) =>
-        prev.map((i) =>
-          i.variant._id === variantId ? { ...i, quantity: tempQty } : i,
-        ),
-      )
-
-      setSelectedItems((prev) => {
-        const newSelectedItems = prev.map((i) =>
-          i.variantId === variantId ? { ...i, quantity: tempQty } : i,
-        )
-        // Cập nhật Redux store
-        dispatch(setSelectedItemsAction(newSelectedItems))
-        return newSelectedItems
-      })
-
-      dispatch(removeTempQuantity(variantId))
-    } catch (err) {
-      // Handle error silently
-    } finally {
-      setProcessingVariantId(null)
+    // Clear existing timer for this variant
+    if (updateTimers[variantId]) {
+      clearTimeout(updateTimers[variantId])
     }
+
+    // Debounce the update
+    const timer = setTimeout(async () => {
+      try {
+        setProcessingVariantId(variantId)
+        const delta = tempQty - item.quantity
+        await updateItem(variantId, { quantity: delta })
+
+        setCartItems((prev) =>
+          prev.map((i) =>
+            i.variant._id === variantId ? { ...i, quantity: tempQty } : i,
+          ),
+        )
+
+        setSelectedItems((prev) => {
+          const newSelectedItems = prev.map((i) =>
+            i.variantId === variantId ? { ...i, quantity: tempQty } : i,
+          )
+          // Cập nhật Redux store
+          dispatch(setSelectedItemsAction(newSelectedItems))
+          return newSelectedItems
+        })
+
+        dispatch(removeTempQuantity(variantId))
+      } catch (err) {
+        console.error('Error updating quantity:', err)
+        // Show error message to user
+        setOutOfStockMessage('Không thể cập nhật số lượng sản phẩm')
+        setOutOfStockAlert(true)
+      } finally {
+        setProcessingVariantId(null)
+        setUpdateTimers(prev => {
+          const newTimers = { ...prev }
+          delete newTimers[variantId]
+          return newTimers
+        })
+      }
+    }, 500)
+
+    setUpdateTimers(prev => ({
+      ...prev,
+      [variantId]: timer
+    }))
   }
 
   const handleRemove = async ({ variantId }) => {
@@ -364,12 +396,26 @@ const Cart = () => {
 
   // Validation trước khi thanh toán để đảm bảo không có sản phẩm hết hàng
   const handleCheckout = () => {
+    // Kiểm tra có sản phẩm được chọn không
+    if (selectedItems.length === 0) {
+      setOutOfStockMessage('Vui lòng chọn ít nhất một sản phẩm để thanh toán')
+      setOutOfStockAlert(true)
+      return
+    }
+
     // Kiểm tra xem có sản phẩm đã chọn nào hết hàng không
     const selectedCartItems = cartItems.filter((item) =>
       selectedItems.some((selected) =>
         (item.variant?._id || item.variantId?._id || item.variantId) === selected.variantId
       )
     )
+
+    // Kiểm tra sản phẩm đã chọn có tồn tại trong giỏ hàng không
+    if (selectedCartItems.length === 0) {
+      setOutOfStockMessage('Không tìm thấy sản phẩm đã chọn trong giỏ hàng')
+      setOutOfStockAlert(true)
+      return
+    }
 
     const hasOutOfStockSelected = selectedCartItems.some(item =>
       item.quantity === 0 || (item.variant?.quantity !== undefined && item.variant.quantity === 0)
@@ -391,8 +437,17 @@ const Cart = () => {
 
       // Nếu sau khi loại bỏ không còn sản phẩm nào, không cho phép thanh toán
       if (validSelectedItems.length === 0) {
+        setOutOfStockMessage('Tất cả sản phẩm đã chọn đều hết hàng')
+        setOutOfStockAlert(true)
         return
       }
+    }
+
+    // Kiểm tra tổng tiền
+    if (totalPrice <= 0) {
+      setOutOfStockMessage('Tổng tiền phải lớn hơn 0')
+      setOutOfStockAlert(true)
+      return
     }
 
     // Lưu thông tin mã giảm giá được áp dụng vào Redux store

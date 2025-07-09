@@ -66,7 +66,6 @@ const ReviewButtonComponent = ({
     if (!reviewsLoading) {
       const productIdString = product.productId?.toString() || product.productId
       const wasReviewed = reviewedProducts.has(productIdString)
-      console.log(`Product ${productIdString} - isReviewed:`, wasReviewed)
       setIsReviewed(wasReviewed)
     }
   }, [reviewedProducts, product.productId, reviewsLoading])
@@ -74,36 +73,26 @@ const ReviewButtonComponent = ({
   // Kiểm tra và xử lý click đánh giá
   const handleReviewClick = async () => {
     const productIdString = product.productId?.toString() || product.productId
-    console.log('handleReviewClick: Started', {
-      productId: productIdString,
-      isReviewed,
-      checking
-    })
     setSelectedProduct(product)
 
     if (!isReviewed && !checking && isReviewed !== null) {
       setChecking(true)
-      console.log('handleReviewClick: Checking with server for orderId and productId...')
 
       // Double-check với server để đảm bảo chính xác theo orderId cụ thể
       const hasReview = await checkProductReview(productIdString)
-      console.log('handleReviewClick: Server check result for this order:', hasReview)
 
       if (hasReview) {
         // Nếu đã có đánh giá cho đơn hàng này, cập nhật state và hiển thị modal xem đánh giá
-        console.log('handleReviewClick: Product already reviewed for this order, updating state')
         setIsReviewed(true)
         setReviewedProducts(prev => new Set([...prev, productIdString]))
         setOpenViewReviewModal(true)
       } else {
         // Nếu chưa có đánh giá cho đơn hàng này, mở modal để đánh giá
-        console.log('handleReviewClick: Product not reviewed for this order, opening review modal')
         setOpenReviewModal(true)
       }
       setChecking(false)
     } else if (isReviewed) {
       // Nếu đã đánh giá, mở modal xem đánh giá
-      console.log('handleReviewClick: Product already reviewed for this order, opening view modal')
       setOpenViewReviewModal(true)
     }
   }
@@ -267,12 +256,10 @@ const OrderDetail = () => {
   // Kiểm tra chính xác theo orderID để đảm bảo không duplicate review trong cùng 1 đơn hàng
   const checkProductReview = async (productId) => {
     if (!currentUser?._id || !orderId || !productId) {
-      console.log('checkProductReview: Missing required data', { userId: currentUser?._id, orderId, productId })
       return false
     }
 
     try {
-      console.log('checkProductReview: Calling API for', { userId: currentUser._id, productId, orderId })
       const reviews = await getUserReviewForProduct(currentUser._id, productId, orderId)
 
       // Kiểm tra chính xác orderId trong từng review để đảm bảo chính xác
@@ -285,12 +272,6 @@ const OrderDetail = () => {
         return reviewOrderId === currentOrderId && (reviewProductId?.toString() || reviewProductId) === currentProductId
       })
 
-      console.log('checkProductReview: API response', {
-        reviews,
-        hasReviewForThisOrder,
-        orderId,
-        productId
-      })
       return hasReviewForThisOrder
     } catch (error) {
       console.error('Error checking product review:', error)
@@ -326,8 +307,6 @@ const OrderDetail = () => {
           })
 
         setReviewedProducts(new Set(reviewedProductsInOrder))
-
-        console.log(`Order ${orderId}: Found ${reviewedProductsInOrder.length} reviewed products:`, reviewedProductsInOrder)
       } catch (err) {
         console.error('Lỗi khi lấy đánh giá người dùng:', err)
         setReviewedProducts(new Set()) // Set empty set on error

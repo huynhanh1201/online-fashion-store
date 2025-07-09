@@ -365,6 +365,7 @@ const Payment = () => {
   const [note, setNote] = useState('')
   const [voucherInput, setVoucherInput] = useState('')
   const [voucherApplied, setVoucherApplied] = useState(false)
+  const [hasTriedAutoApply, setHasTriedAutoApply] = useState(false)
   const [snackbar, setSnackbar] = useState({
     open: false,
     severity: 'info',
@@ -463,7 +464,6 @@ const Payment = () => {
       const response = await AuthorizedAxiosInstance.post(`${API_ROOT}/v1/deliveries/calculate-fee`, payload)
 
       const data = response.data  // Axios tự parse JSON
-      console.log('fetchShippingPrice response:', data)
 
       const fee = data?.totalFeeShipping
       if (typeof fee !== 'number' || fee <= 0) {
@@ -494,7 +494,6 @@ const Payment = () => {
     const fetchCoupons = async () => {
       try {
         const response = await getDiscounts()
-        console.log('Dữ liệu từ getDiscounts trong Payment:', response)
         const { discounts } = response
         if (!Array.isArray(discounts)) {
           throw new Error('Dữ liệu coupon không hợp lệ')
@@ -524,9 +523,16 @@ const Payment = () => {
 
   // Tự động áp dụng mã giảm giá từ Cart
   useEffect(() => {
-    if (appliedCoupon && appliedDiscount > 0 && !voucherApplied && !discount) {
+    if (appliedCoupon &&
+      appliedDiscount > 0 &&
+      !voucherApplied &&
+      !discount &&
+      !hasTriedAutoApply &&
+      subTotal > 0) {
+
       const autoApplyCoupon = async () => {
         try {
+          setHasTriedAutoApply(true) // Prevent retry
           setVoucherInput(appliedCoupon.code)
           const response = await handleApplyVoucher(appliedCoupon.code, subTotal)
           if (response?.valid) {
@@ -539,6 +545,11 @@ const Payment = () => {
           }
         } catch (error) {
           console.error('Lỗi khi tự động áp dụng mã giảm giá:', error)
+          setSnackbar({
+            open: true,
+            severity: 'error',
+            message: 'Không thể áp dụng mã giảm giá tự động'
+          })
         }
       }
 
@@ -546,7 +557,12 @@ const Payment = () => {
       const timer = setTimeout(autoApplyCoupon, 500)
       return () => clearTimeout(timer)
     }
-  }, [appliedCoupon, appliedDiscount, voucherApplied, discount, subTotal, handleApplyVoucher])
+  }, [appliedCoupon, appliedDiscount, voucherApplied, discount, subTotal, hasTriedAutoApply, handleApplyVoucher])
+
+  // Reset auto-apply flag khi coupon thay đổi
+  useEffect(() => {
+    setHasTriedAutoApply(false)
+  }, [appliedCoupon?.code])
 
   // Cleanup applied coupon khi rời khỏi trang
   useEffect(() => {
@@ -711,15 +727,10 @@ const Payment = () => {
     }
 
     const sanitizedCartItems = selectedCartItems.map(item => {
-      // Debug log to see the structure
-      console.log('Item structure in sanitization:', item)
-
       // Ensure variantId is properly extracted
       const variantId = typeof item.variantId === 'object'
         ? item.variantId._id || item.variantId.toString()
         : item.variantId
-
-      console.log('Extracted variantId:', variantId, 'Type:', typeof variantId)
 
       return {
         variantId: variantId,
@@ -744,7 +755,6 @@ const Payment = () => {
 
     try {
       const result = await createOrder(orderData)
-      console.log('createOrder response:', result)
       setSnackbar({
         open: true,
         severity: 'success',

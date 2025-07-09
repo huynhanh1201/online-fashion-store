@@ -229,6 +229,7 @@ const OrderRow = ({ order, onOrderUpdate, onOrderCancelled, onReorder, reorderLo
   const [cancelling, setCancelling] = useState(false)
   const [reviewedProducts, setReviewedProducts] = useState(new Set())
   const [reviewsLoading, setReviewsLoading] = useState(true)
+  const [itemsError, setItemsError] = useState(null)
   const navigate = useNavigate()
   const currentUser = useSelector(selectCurrentUser)
 
@@ -250,10 +251,13 @@ const OrderRow = ({ order, onOrderUpdate, onOrderCancelled, onReorder, reorderLo
   useEffect(() => {
     const fetchItems = async () => {
       try {
+        setItemsError(null)
         const res = await getOrderItems(order._id)
-        setItems(res)
+        setItems(res || [])
       } catch (err) {
         console.error('Lỗi khi lấy sản phẩm:', err)
+        setItemsError(err.message || 'Không thể tải thông tin sản phẩm')
+        setItems([])
       } finally {
         setLoadingItems(false)
       }
@@ -432,37 +436,44 @@ const OrderRow = ({ order, onOrderUpdate, onOrderCancelled, onReorder, reorderLo
                   </Box>
 
                   <Box textAlign="right">
-                    {item.variantId?.discountPrice > 0 ? (
-                      <Box display="flex" flexDirection="column" alignItems="flex-end" gap={0.5}>
+                    {(() => {
+                      const price = item.price || 0
+                      const discountPrice = item.variantId?.discountPrice || 0
+                      const hasDiscount = discountPrice > 0
+                      const finalPrice = hasDiscount ? Math.max(price - discountPrice, 0) : price
+                      
+                      return hasDiscount ? (
+                        <Box display="flex" flexDirection="column" alignItems="flex-end" gap={0.5}>
+                          <Typography
+                            fontWeight={700}
+                            fontSize="1.2rem"
+                            color="var(--primary-color)"
+                          >
+                            {finalPrice.toLocaleString('vi-VN')}₫
+                          </Typography>
+                          <Box display="flex" alignItems="center" gap={1}>
+                            <Typography
+                              variant="body2"
+                              sx={{
+                                textDecoration: 'line-through',
+                                color: 'text.secondary',
+                                fontSize: '0.9rem'
+                              }}
+                            >
+                              {price.toLocaleString('vi-VN')}₫
+                            </Typography>
+                          </Box>
+                        </Box>
+                      ) : (
                         <Typography
                           fontWeight={700}
                           fontSize="1.2rem"
                           color="var(--primary-color)"
                         >
-                          {(item.price - item.variantId.discountPrice)?.toLocaleString('vi-VN')}₫
+                          {finalPrice.toLocaleString('vi-VN')}₫
                         </Typography>
-                        <Box display="flex" alignItems="center" gap={1}>
-                          <Typography
-                            variant="body2"
-                            sx={{
-                              textDecoration: 'line-through',
-                              color: 'text.secondary',
-                              fontSize: '0.9rem'
-                            }}
-                          >
-                            {item.price?.toLocaleString('vi-VN')}₫
-                          </Typography>
-                        </Box>
-                      </Box>
-                    ) : (
-                      <Typography
-                        fontWeight={700}
-                        fontSize="1.2rem"
-                        color="var(--primary-color)"
-                      >
-                        {item.price?.toLocaleString('vi-VN')}₫
-                      </Typography>
-                    )}
+                      )
+                    })()}
                   </Box>
                 </Box>
               </Box>

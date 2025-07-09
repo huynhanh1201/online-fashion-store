@@ -10,7 +10,6 @@ export const getShippingAddresses = async () => {
     const response = await AuthorizedAxiosInstance.get(
       `${API_ROOT}/v1/shipping-addresses`
     )
-    console.log('API getShippingAddresses response:', response.data)
     return {
       addresses: response.data.addresses || response.data || [],
       total: response.data.total || response.data.length || 0
