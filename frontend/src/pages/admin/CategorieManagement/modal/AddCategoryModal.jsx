@@ -322,8 +322,7 @@ const AddCategoryModal = ({ open, onClose, onAdded, onSave }) => {
               <TextField
                 label={
                   <>
-                    Tên danh mục <span style={{ color: 'red' }}>*</span> (bắt
-                    buộc)
+                    Tên danh mục <span style={{ color: 'red' }}>*</span>
                   </>
                 }
                 fullWidth

@@ -15,14 +15,8 @@ import FilterByTime from '~/components/FilterAdmin/common/FilterByTime.jsx'
 import SearchWithSuggestions from '~/components/FilterAdmin/common/SearchWithSuggestions.jsx'
 import FilterSelect from '~/components/FilterAdmin/common/FilterSelect.jsx'
 import dayjs from 'dayjs'
-
-export default function FilterCategory({
-  onFilter,
-  categories,
-  fetchCategories,
-  loading,
-  initialSearch
-}) {
+import useCategories from '~/hooks/admin/useCategories.js'
+export default function FilterCategory({ onFilter, loading, initialSearch }) {
   const [keyword, setKeyword] = useState(initialSearch)
   const [inputValue, setInputValue] = useState(initialSearch)
   const [selectedFilter, setSelectedFilter] = useState('')
@@ -31,6 +25,9 @@ export default function FilterCategory({
   const [status, setStatus] = useState('false') // false: Hoạt động, true: Không hoạt động
   const [sort, setSort] = useState('newest')
   const hasMounted = useRef(false)
+
+  const { categories, fetchCategories } = useCategories()
+
   // useEffect(() => {
   //   if (hasMounted.current) {
   //     applyFilters(selectedFilter, startDate, endDate)
@@ -38,6 +35,11 @@ export default function FilterCategory({
   //     hasMounted.current = true
   //   }
   // }, [keyword, status, sort])
+
+  useEffect(() => {
+    fetchCategories(1, 100000, { destroy: status, sort: sort })
+  }, [status, sort])
+
   useEffect(() => {
     // Gọi lọc ngay sau khi mount nếu có `search` từ URL
     applyFilters(selectedFilter, startDate, endDate)

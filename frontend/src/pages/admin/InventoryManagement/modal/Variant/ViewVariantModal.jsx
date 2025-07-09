@@ -21,7 +21,7 @@ const ViewVariantModal = ({ open, onClose, variant }) => {
   if (!variant) return null
 
   const formatCurrency = (value) =>
-    value ? `${Number(value).toLocaleString('vi-VN')}đ` : '0₫'
+    value ? `${Number(value).toLocaleString('vi-VN')}₫` : '0₫'
   const formatDate = (dateString) => {
     if (!dateString) return 'Không có thông tin'
     const date = new Date(dateString)

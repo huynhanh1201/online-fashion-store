@@ -95,10 +95,14 @@ export default function UserRow({
               key={column.id}
               align={column.align}
               title={formattedName}
+              onClick={
+                permissions.canView ? () => handleOpenModal('view', user) : null
+              }
               sx={{
                 ...styles.cellPadding,
                 maxWidth: 300,
-                display: 'table-cell'
+                display: 'table-cell',
+                cursor: permissions.canView ? 'pointer' : 'default'
               }}
             >
               {formattedName}

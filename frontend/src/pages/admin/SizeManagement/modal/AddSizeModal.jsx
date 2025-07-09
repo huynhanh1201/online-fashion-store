@@ -60,7 +60,11 @@ const AddSizeModal = ({ open, onClose, onAdded, onSave }) => {
       >
         <DialogContent>
           <TextField
-            label='Tên kích thước'
+            label={
+              <>
+                Tên kích thước <span style={{ color: 'red' }}>*</span>
+              </>
+            }
             fullWidth
             margin='normal'
             {...register('name', {

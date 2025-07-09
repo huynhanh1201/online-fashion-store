@@ -194,13 +194,12 @@ import FilterByPrice from '~/components/FilterAdmin/common/FilterByPrice'
 import SearchWithSuggestions from '~/components/FilterAdmin/common/SearchWithSuggestions'
 import FilterSelect from '~/components/FilterAdmin/common/FilterSelect.jsx'
 import dayjs from 'dayjs'
-
+import useProducts from '~/hooks/admin/useProducts.js'
 export default function FilterProduct({
   onFilter,
   categories,
   fetchCategories,
   loading,
-  products,
   initialSearch
 }) {
   const [keyword, setKeyword] = useState('')
@@ -215,6 +214,7 @@ export default function FilterProduct({
   const [startDate, setStartDate] = useState(dayjs().format('YYYY-MM-DD'))
   const [endDate, setEndDate] = useState(dayjs().format('YYYY-MM-DD'))
   const hasMounted = useRef(false)
+  const { products, fetchProducts } = useProducts()
   useEffect(() => {
     if (hasMounted.current) {
       applyFilters(selectedFilter, startDate, endDate)
@@ -223,8 +223,9 @@ export default function FilterProduct({
     }
   }, [keyword, status, category, sort, priceMin, priceMax, destroy])
   useEffect(() => {
-    fetchCategories()
-  }, [])
+    fetchCategories(1, 100000, { destroy: destroy, sort: sort })
+    fetchProducts(1, 100000, { destroy: destroy, sort: sort })
+  }, [destroy, sort])
 
   const handleSearch = () => {
     setKeyword(inputValue)
@@ -293,7 +294,6 @@ export default function FilterProduct({
     setStartDate(dayjs().format('YYYY-MM-DD'))
     setEndDate(dayjs().format('YYYY-MM-DD'))
     onFilter({ sort: 'newest', destroy: 'false' })
-    // fetchProducts(1, 10)
   }
 
   return (

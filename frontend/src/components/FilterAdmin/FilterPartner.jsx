@@ -4,12 +4,8 @@ import dayjs from 'dayjs'
 import FilterSelect from '~/components/FilterAdmin/common/FilterSelect'
 import FilterByTime from '~/components/FilterAdmin/common/FilterByTime'
 import SearchWithSuggestions from '~/components/FilterAdmin/common/SearchWithSuggestions'
-export default function FilterPartner({
-  onFilter,
-  partners = [],
-  loading,
-  fetchPartners
-}) {
+import usePartners from '~/hooks/admin/Inventory/usePartner.js'
+export default function FilterPartner({ onFilter, loading }) {
   const [keyword, setKeyword] = useState('')
   const [inputValue, setInputValue] = useState('')
   const [type, setType] = useState('')
@@ -19,6 +15,10 @@ export default function FilterPartner({
   const [startDate, setStartDate] = useState(dayjs().format('YYYY-MM-DD'))
   const [endDate, setEndDate] = useState(dayjs().format('YYYY-MM-DD'))
   const hasMounted = useRef(false)
+  const { partners, fetchPartners } = usePartners()
+  useEffect(() => {
+    fetchPartners(1, 100000, { destroy: destroy, sort: sort })
+  }, [destroy, sort])
   useEffect(() => {
     if (hasMounted.current) {
       applyFilters(selectedFilter, startDate, endDate)
@@ -80,7 +80,7 @@ export default function FilterPartner({
   return (
     <Box display='flex' flexWrap='wrap' gap={2} mb={2} justifyContent='end'>
       <FilterSelect
-        label='Trạng thái'
+        label='Xoá'
         value={destroy}
         onChange={setDestroy}
         options={[
@@ -111,27 +111,28 @@ export default function FilterPartner({
         setEndDate={setEndDate}
         onApply={handleApplyTimeFilter}
       />
+      <Box sx={{ display: 'flex', gap: 2 }}>
+        <SearchWithSuggestions
+          label='Tên đối tác'
+          options={partners.map((p) => p.name)}
+          loading={loading}
+          keyword={keyword}
+          inputValue={inputValue}
+          setKeyword={setKeyword}
+          setInputValue={setInputValue}
+          onSearch={handleSearch}
+        />
 
-      <SearchWithSuggestions
-        label='Tên đối tác'
-        options={partners.map((p) => p.name)}
-        loading={loading}
-        keyword={keyword}
-        inputValue={inputValue}
-        setKeyword={setKeyword}
-        setInputValue={setInputValue}
-        onSearch={handleSearch}
-      />
-
-      <Button
-        variant='outlined'
-        size='small'
-        color='error'
-        onClick={handleReset}
-        sx={{ textTransform: 'none' }}
-      >
-        Làm mới
-      </Button>
+        <Button
+          variant='outlined'
+          size='small'
+          color='error'
+          onClick={handleReset}
+          sx={{ textTransform: 'none' }}
+        >
+          Làm mới
+        </Button>
+      </Box>
     </Box>
   )
 }

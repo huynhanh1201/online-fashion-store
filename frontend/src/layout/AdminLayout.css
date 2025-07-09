@@ -62,7 +62,8 @@ a {
     /*z-index: 9999;*/
 }
 .admin-layout.open .main-content {
-    margin-left: 260px;
+    margin-left: 270px;
+    overflow-x: hidden;
     /*transition: margin 0.2s ease;*/
 }
 /* Drawer paper */

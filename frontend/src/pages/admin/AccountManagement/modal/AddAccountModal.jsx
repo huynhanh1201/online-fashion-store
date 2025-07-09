@@ -100,7 +100,7 @@ const AddAccountModal = ({ open, onClose, onSave, roles }) => {
                 {...field}
                 label={
                   <>
-                    Tên <span style={{ color: 'red' }}>*</span> (bắt buộc)
+                    Tên <span style={{ color: 'red' }}>*</span>
                   </>
                 }
                 fullWidth
@@ -134,7 +134,7 @@ const AddAccountModal = ({ open, onClose, onSave, roles }) => {
                 {...field}
                 label={
                   <>
-                    Email <span style={{ color: 'red' }}>*</span> (bắt buộc)
+                    Email <span style={{ color: 'red' }}>*</span>
                   </>
                 }
                 fullWidth
@@ -166,7 +166,7 @@ const AddAccountModal = ({ open, onClose, onSave, roles }) => {
                 type={showPassword ? 'text' : 'password'}
                 label={
                   <>
-                    Mật khẩu <span style={{ color: 'red' }}>*</span> (bắt buộc)
+                    Mật khẩu <span style={{ color: 'red' }}>*</span>
                   </>
                 }
                 fullWidth
@@ -202,8 +202,7 @@ const AddAccountModal = ({ open, onClose, onSave, roles }) => {
                 type={showConfirmPassword ? 'text' : 'password'}
                 label={
                   <>
-                    Xác nhận mật khẩu <span style={{ color: 'red' }}>*</span>{' '}
-                    (bắt buộc)
+                    Xác nhận mật khẩu <span style={{ color: 'red' }}>*</span>
                   </>
                 }
                 fullWidth
@@ -251,8 +250,7 @@ const AddAccountModal = ({ open, onClose, onSave, roles }) => {
                     {...params}
                     label={
                       <>
-                        Vai trò <span style={{ color: 'red' }}>*</span> (bắt
-                        buộc)
+                        Vai trò <span style={{ color: 'red' }}>*</span>
                       </>
                     }
                     margin='normal'

@@ -4,15 +4,8 @@ import dayjs from 'dayjs'
 import FilterSelect from '~/components/FilterAdmin/common/FilterSelect'
 import FilterByTime from '~/components/FilterAdmin/common/FilterByTime'
 import SearchWithSuggestions from '~/components/FilterAdmin/common/SearchWithSuggestions'
-
-export default function FilterWarehouseSlip({
-  onFilter,
-  slips = [],
-  warehouses = [],
-  users = [],
-  loading,
-  fetchData
-}) {
+import useWarehouseSlip from '~/hooks/admin/Inventory/useWarehouseSlip.js'
+export default function FilterWarehouseSlip({ onFilter, loading, warehouses }) {
   const [code, setCode] = useState('')
   const [inputValue, setInputValue] = useState('')
   const [warehouseId, setWarehouseId] = useState('')
@@ -24,6 +17,12 @@ export default function FilterWarehouseSlip({
   const [startDate, setStartDate] = useState(dayjs().format('YYYY-MM-DD'))
   const [endDate, setEndDate] = useState(dayjs().format('YYYY-MM-DD'))
   const hasMounted = useRef(false)
+  const { warehouseSlips, fetchWarehouseSlips } = useWarehouseSlip()
+
+  useEffect(() => {
+    fetchWarehouseSlips(1, 100000)
+  }, [])
+
   useEffect(() => {
     if (hasMounted.current) {
       applyFilters()
@@ -171,7 +170,7 @@ export default function FilterWarehouseSlip({
       <Box sx={{ display: 'flex', gap: 2 }}>
         <SearchWithSuggestions
           label='Mã phiếu'
-          options={slips.map((s) => s.slipId)}
+          options={warehouseSlips.map((s) => s.slipId)}
           keyword={code}
           inputValue={inputValue}
           setKeyword={setCode}

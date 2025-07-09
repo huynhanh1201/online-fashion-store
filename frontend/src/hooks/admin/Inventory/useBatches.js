@@ -31,7 +31,7 @@ const useBatches = () => {
       const query = buildQuery(filters)
       const response = await getBatches(query)
       setBatches(response.batches || [])
-      setTotalPages(response.total || 1)
+      setTotalPages(response.total)
       setLoading(false)
     } catch (error) {
       console.error('Error fetching batches:', error)

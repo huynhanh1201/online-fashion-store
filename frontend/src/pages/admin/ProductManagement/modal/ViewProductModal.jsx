@@ -256,7 +256,7 @@ const ViewProductModal = ({
                           Giá
                         </TableCell>
                         <TableCell sx={{ fontSize: '16px' }}>
-                          {product.exportPrice?.toLocaleString('vi-VN')}đ
+                          {product.exportPrice?.toLocaleString('vi-VN')}₫
                         </TableCell>
                       </TableRow>
                       <TableRow sx={{ height: 50 }}>

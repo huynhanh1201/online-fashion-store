@@ -207,7 +207,7 @@ const ProductImages = ({
   return (
     <Box>
       <Typography variant='h6' mb={2}>
-        Ảnh sản phẩm <span style={{ color: 'red' }}>*</span> (bắt buộc)
+        Ảnh sản phẩm <span style={{ color: 'red' }}>*</span>
       </Typography>
       <Box sx={{ maxHeight: 320, overflowY: 'auto', pr: 1 }}>
         <Grid container spacing={2}>

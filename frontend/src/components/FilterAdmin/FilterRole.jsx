@@ -4,13 +4,8 @@ import FilterByTime from '~/components/FilterAdmin/common/FilterByTime.jsx'
 import SearchWithSuggestions from '~/components/FilterAdmin/common/SearchWithSuggestions.jsx'
 import FilterSelect from '~/components/FilterAdmin/common/FilterSelect.jsx'
 import dayjs from 'dayjs'
-
-export default function FilterRole({
-  onFilter,
-  roles,
-  loading,
-  initialSearch
-}) {
+import useRoles from '~/hooks/admin/useRoles.js'
+export default function FilterRole({ onFilter, loading, initialSearch }) {
   const [keyword, setKeyword] = useState(initialSearch || '')
   const [inputValue, setInputValue] = useState(initialSearch || '')
   const [selectedFilter, setSelectedFilter] = useState('')
@@ -19,6 +14,11 @@ export default function FilterRole({
   const [status, setStatus] = useState('false')
   const [sort, setSort] = useState('newest')
   const hasMounted = useRef(false)
+  const { roles, fetchRoles } = useRoles()
+
+  useEffect(() => {
+    fetchRoles(1, 100000, { destroy: status, sort: sort })
+  }, [sort, status])
 
   useEffect(() => {
     applyFilters(selectedFilter, startDate, endDate)
@@ -55,7 +55,7 @@ export default function FilterRole({
 
   const applyFilters = (selectedTime, fromDate, toDate) => {
     const filters = {
-      search: keyword || undefined,
+      roleName: keyword || undefined,
       sort: sort || undefined,
       destroy: status || undefined
     }
@@ -105,7 +105,6 @@ export default function FilterRole({
           { label: 'Chưa xoá', value: 'false' },
           { label: 'Đã xóa', value: 'true' }
         ]}
-        sx={{ width: 160 }}
       />
 
       <FilterSelect value={sort} onChange={setSort} />
@@ -125,7 +124,10 @@ export default function FilterRole({
       <Box sx={{ display: 'flex', gap: 2 }}>
         <SearchWithSuggestions
           label='Tên vai trò'
-          options={roles.map((role) => role.name)}
+          options={roles.map((role) => ({
+            label: role.label,
+            value: role.name
+          }))}
           loading={loading}
           keyword={keyword}
           inputValue={inputValue}
@@ -133,6 +135,7 @@ export default function FilterRole({
           setInputValue={setInputValue}
           onSearch={handleSearch}
         />
+
         <Button
           variant='outlined'
           size='small'

@@ -11,6 +11,7 @@ import useDiscounts from '~/hooks/admin/useDiscount'
 import useUsers from '~/hooks/admin/useUsers.js'
 import usePermissions from '~/hooks/usePermissions'
 import { RouteGuard } from '~/components/PermissionGuard'
+import useRoles from '~/hooks/admin/useRoles.js'
 const OrderManagement = () => {
   const { hasPermission } = usePermissions()
   const [page, setPage] = React.useState(1)
@@ -39,12 +40,13 @@ const OrderManagement = () => {
 
   const { discounts, fetchDiscounts } = useDiscounts() // lấy danh sách mã giảm giá nếu cần
   const { users, fetchUsers } = useUsers()
-
+  const { roles, fetchRoles } = useRoles()
   useEffect(() => {
     fetchUsers().catch((error) => console.error('Error fetching users:', error))
     fetchDiscounts().catch((error) =>
       console.error('Error fetching discounts:', error)
     )
+    fetchRoles()
   }, [])
 
   useEffect(() => {
@@ -196,6 +198,7 @@ const OrderManagement = () => {
         histories={histories}
         orderDetails={orderDetails}
         onUpdate={handleChangStatusOrder}
+        roles={roles}
       />
 
       <EditOrderModal

@@ -322,8 +322,7 @@ const EditCategoryModal = ({ open, onClose, category, onSave }) => {
               <TextField
                 label={
                   <>
-                    Tên danh mục <span style={{ color: 'red' }}>*</span> (bắt
-                    buộc)
+                    Tên danh mục <span style={{ color: 'red' }}>*</span>
                   </>
                 }
                 fullWidth
@@ -365,6 +364,16 @@ const EditCategoryModal = ({ open, onClose, category, onSave }) => {
                     }}
                     label='Danh mục cha (không bắt buộc)'
                     margin='normal'
+                    onFocus={(event) => {
+                      // Hủy hành vi select toàn bộ khi focus
+                      const input = event.target
+                      requestAnimationFrame(() => {
+                        input.setSelectionRange?.(
+                          input.value.length,
+                          input.value.length
+                        )
+                      })
+                    }}
                   />
                 )}
               />

@@ -198,7 +198,7 @@ const VariantsTab = () => {
       minWidth: 150,
       maxWidth: 150,
       align: 'right',
-      format: (value) => `${value.toLocaleString('vi-VN')}đ`
+      format: (value) => `${value.toLocaleString('vi-VN')}₫`
     },
     {
       id: 'discountPrice',
@@ -207,7 +207,7 @@ const VariantsTab = () => {
       maxWidth: 230,
       align: 'right',
       pr: 4,
-      format: (value) => `${value.toLocaleString('vi-VN')}đ`
+      format: (value) => `${value.toLocaleString('vi-VN')}₫`
     },
     // {
     //   id: 'destroy',
@@ -463,6 +463,12 @@ const VariantsTab = () => {
                           title={
                             typeof content === 'string' ? content : undefined
                           }
+                          onClick={
+                            id === 'sku' ||
+                            (id === 'name' && hasPermission('variant:read'))
+                              ? () => handleViewVariant(row)
+                              : undefined
+                          }
                           sx={{
                             height: 55,
                             minHeight: 55,
@@ -477,7 +483,12 @@ const VariantsTab = () => {
                             ...(id === 'sku' || id === 'name'
                               ? { maxWidth: 150 } // Ẩn tràn nếu mã hoặc tên dài
                               : {}),
-                            ...(id === 'discountPrice' && { pr: column.pr })
+                            ...(id === 'discountPrice' && { pr: column.pr }),
+                            ...(id === 'sku' ||
+                              (id === 'name' &&
+                                hasPermission('variant:read') && {
+                                  cursor: 'pointer'
+                                }))
                           }}
                         >
                           {content}
@@ -508,7 +519,7 @@ const VariantsTab = () => {
           }}
           labelRowsPerPage='Số dòng mỗi trang'
           labelDisplayedRows={({ from, to, count }) => {
-            const totalPages = Math.ceil(count / ROWS_PER_PAGE)
+            const totalPages = Math.max(1, Math.ceil(count / ROWS_PER_PAGE))
             return `${from}–${to} trên ${count} | Trang ${page} / ${totalPages}`
           }}
           ActionsComponent={TablePaginationActions}

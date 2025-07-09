@@ -66,11 +66,11 @@ export default function DiscountRow({
           case 'amount':
             content =
               discount.type === 'fixed'
-                ? `${discount.amount?.toLocaleString('vi-VN')}đ`
+                ? `${discount.amount?.toLocaleString('vi-VN')}₫`
                 : `${discount.amount}%`
             break
           case 'minOrderValue':
-            content = `${discount.minOrderValue?.toLocaleString('vi-VN')}đ`
+            content = `${discount.minOrderValue?.toLocaleString('vi-VN')}₫`
             break
           case 'usageLimit':
             content = discount.usageLimit
@@ -153,10 +153,18 @@ export default function DiscountRow({
           <TableCell
             key={id}
             align={align || 'left'}
+            onClick={
+              id === 'code' && permissions.canView
+                ? () => onAction('view', discount)
+                : null
+            }
             sx={{
               ...styles.cell,
               ...(id === 'index' && StyleAdmin.TableColumnSTT),
-              ...(id === 'remaining' && { paddingRight: '72px' })
+              ...(id === 'remaining' && { paddingRight: '72px' }),
+              ...(id === 'code' && permissions.canView
+                ? { cursor: 'pointer' }
+                : {})
             }}
             title={typeof content === 'string' ? content : undefined}
           >

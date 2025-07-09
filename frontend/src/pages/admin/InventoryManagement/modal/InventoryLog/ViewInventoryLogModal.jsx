@@ -97,8 +97,8 @@ const ViewInventoryLogModal = ({ open, onClose, log }) => {
               </TableCell>
               <TableCell>
                 {log.importPrice
-                  ? `${Number(log.importPrice).toLocaleString('vi-VN')}đ`
-                  : 'N/A'}
+                  ? `${Number(log.importPrice).toLocaleString('vi-VN')}₫`
+                  : '0₫'}
               </TableCell>
             </TableRow>
             <TableRow>
@@ -107,8 +107,8 @@ const ViewInventoryLogModal = ({ open, onClose, log }) => {
               </TableCell>
               <TableCell>
                 {log.exportPrice
-                  ? `${Number(log.exportPrice).toLocaleString('vi-VN')}đ`
-                  : 'N/A'}
+                  ? `${Number(log.exportPrice).toLocaleString('vi-VN')}₫`
+                  : '0₫'}
               </TableCell>
             </TableRow>
             <TableRow>
