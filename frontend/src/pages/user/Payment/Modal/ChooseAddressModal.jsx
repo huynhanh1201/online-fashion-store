@@ -34,7 +34,8 @@ export const ChooseAddressModal = ({
   open,
   onClose,
   onConfirm,
-  onUpdateAddresses
+  onUpdateAddresses,
+  showSnackbar
 }) => {
   const { addresses, loading, fetchAddresses } = useAddress()
 
@@ -99,7 +100,7 @@ export const ChooseAddressModal = ({
           sx={{
             m: 0,
             p: 3,
-            
+
             color: 'var(--primary-color)',
             position: 'relative',
             display: 'flex',
@@ -388,6 +389,7 @@ export const ChooseAddressModal = ({
         onClose={() => setIsFormOpen(false)}
         onSuccess={handleSuccess}
         addressToEdit={editingAddress}
+        showSnackbar={showSnackbar}
       />
     </>
   )

@@ -395,6 +395,15 @@ const Payment = () => {
   const [shippingPrice, setShippingPrice] = useState(0)
   const [shippingPriceLoading, setShippingPriceLoading] = useState(false)
 
+  // Hàm helper để hiển thị snackbar
+  const showSnackbar = (message, severity = 'info') => {
+    setSnackbar({
+      open: true,
+      severity: severity,
+      message: message
+    })
+  }
+
   // Helper function to get final price (exportPrice minus discountPrice)
   const getFinalPrice = (variant) => {
     const basePrice = variant.exportPrice || 0
@@ -1304,6 +1313,7 @@ const Payment = () => {
         onClose={handleCloseAddressModal}
         onConfirm={handleAddressConfirm}
         onUpdateAddresses={handleAddressListUpdated}
+        showSnackbar={showSnackbar}
       />
 
       {/* Snackbar thông báo */}

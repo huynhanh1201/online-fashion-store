@@ -380,6 +380,14 @@ export const roles = [
       // Statistics
       'warehouseStatistics:read',
 
+      // Batch
+      'batch:use',
+      'batch:read',
+      'batch:update',
+
+      // Partner
+      'partner:create',
+
       // Admin access
       'admin:access'
     ]
