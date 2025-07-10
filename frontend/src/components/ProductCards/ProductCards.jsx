@@ -130,26 +130,26 @@ const ProductCard = ({ product, isFlashSale = false }) => {
             {isFlashSale && product.flashPrice ? (
               <>
                 <span style={styles.flashSalePrice}>
-                  {product.flashPrice.toLocaleString('vi-VN')} ₫
+                  {product.flashPrice.toLocaleString('vi-VN')}₫
                 </span>
                 <span style={styles.originalPrice}>
-                  {product.exportPrice.toLocaleString('vi-VN')} ₫
+                  {product.exportPrice.toLocaleString('vi-VN')}₫
                 </span>
                 <span style={styles.flashSaleBadge}>Flash Sale</span>
               </>
             ) : priceInfo.originalDiscountPrice > 0 ? (
               <>
                 <span style={styles.currentPrice}>
-                  {priceInfo.discountPrice.toLocaleString()} ₫
+                  {priceInfo.discountPrice.toLocaleString()}₫
                 </span>
                 <span style={styles.originalPrice}>
-                  {priceInfo.price.toLocaleString()} ₫
+                  {priceInfo.price.toLocaleString()}₫
                 </span>
                 <span style={styles.discountBadge}>-{Math.round((priceInfo.originalDiscountPrice / priceInfo.price) * 100)}%</span>
               </>
             ) : (
               <span style={styles.currentPrice}>
-                {(product.exportPrice ?? 0).toLocaleString('vi-VN')} ₫
+                {(product.exportPrice ?? 0).toLocaleString('vi-VN')}₫
               </span>
             )}
           </div>

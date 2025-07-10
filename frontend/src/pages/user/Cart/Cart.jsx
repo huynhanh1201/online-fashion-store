@@ -231,7 +231,7 @@ const Cart = () => {
 
   const formatPrice = (val) =>
     typeof val === 'number'
-      ? val.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })
+      ? val.toLocaleString('vi-VN') + '₫'
       : '0₫'
 
   const handleMouseDown = (variantId, delta) => {

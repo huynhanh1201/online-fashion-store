@@ -105,7 +105,7 @@ const ProductInfoSection = ({
         {currentPrice?.originalDiscountPrice > 0 ? (
           <>
             <PriceTypography variant='h5' sx={{ fontSize: 22 }}>
-              {currentPrice.discountPrice.toLocaleString('vi-VN')} ₫
+              {currentPrice.discountPrice.toLocaleString('vi-VN')}₫
             </PriceTypography>
             <Typography
               variant='h5'
@@ -115,7 +115,7 @@ const ProductInfoSection = ({
                 fontSize: 20
               }}
             >
-              {currentPrice.price.toLocaleString('vi-VN')} ₫
+              {currentPrice.price.toLocaleString('vi-VN')}₫
             </Typography>
             <Chip
               label={`Giảm ${Math.round((currentPrice.originalDiscountPrice / currentPrice.price) * 100)}%`}
@@ -132,7 +132,7 @@ const ProductInfoSection = ({
         ) : (
           <PriceTypography variant='h5' sx={{ fontSize: 22 }}>
             {typeof currentPrice?.price === 'number'
-              ? currentPrice.price.toLocaleString('vi-VN') + ' ₫'
+              ? currentPrice.price.toLocaleString('vi-VN') + '₫'
               : 'Liên hệ'}
           </PriceTypography>
         )}
@@ -153,8 +153,8 @@ const ProductInfoSection = ({
               <Typography key={coupon.code} variant='body2' sx={{ mb: 0.25 }}>
                 - Nhập mã <b>{coupon.code}</b> để được giảm{' '}
                 {coupon.type === 'percent'
-                  ? `${coupon.amount}%${coupon.maxDiscount ? ` tối đa ${coupon.maxDiscount.toLocaleString('vi-VN')} ₫` : ''}`
-                  : `${coupon.amount.toLocaleString('vi-VN')} ₫`}
+                  ? `${coupon.amount}%${coupon.maxDiscount ? ` tối đa ${coupon.maxDiscount.toLocaleString('vi-VN')}₫` : ''}`
+                  : `${coupon.amount.toLocaleString('vi-VN')}₫`}
               </Typography>
             ))}
           </Box>
@@ -173,7 +173,7 @@ const ProductInfoSection = ({
           {coupons.slice(0, 3).map((coupon) => (
             <VoucherChip
               key={coupon.code}
-              label={`VOUCHER ${coupon.type === 'percent' ? `${coupon.amount}%` : `${coupon.amount.toLocaleString('vi-VN')} ₫`}`}
+              label={`VOUCHER ${coupon.type === 'percent' ? `${coupon.amount}%` : `${coupon.amount.toLocaleString('vi-VN')}₫`}`}
               onClick={() => setOpenVoucherDrawer(true)}
               sx={{ mr: 0.5, mb: 0.5 }}
             />
@@ -344,10 +344,10 @@ const ProductInfoSection = ({
               0)
           }
           onClick={() => handleAddToCart(product._id)}
-          sx={{ 
-            backgroundColor: 'var(--primary-color)', 
-            color: 'white', 
-            flex: 1, 
+          sx={{
+            backgroundColor: 'var(--primary-color)',
+            color: 'white',
+            flex: 1,
             py: 1,
             '&:hover': {
               backgroundColor: 'var(--accent-color)'
@@ -363,10 +363,10 @@ const ProductInfoSection = ({
         <Button
           variant='outlined'
           onClick={handleBuyNow}
-          sx={{ 
-            borderColor: 'var(--primary-color)', 
-            color: 'var(--primary-color)', 
-            flex: 1, 
+          sx={{
+            borderColor: 'var(--primary-color)',
+            color: 'var(--primary-color)',
+            flex: 1,
             py: 1,
             '&:hover': {
               backgroundColor: 'var(--primary-color)',

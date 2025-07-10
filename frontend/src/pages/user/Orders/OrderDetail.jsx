@@ -331,7 +331,7 @@ const OrderDetail = () => {
       : item.price
     return sum + actualPrice * item.quantity
   }, 0)
-  const formatPrice = (val) => (typeof val === 'number' ? val.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' }) : '0 ₫')
+  const formatPrice = (val) => (typeof val === 'number' ? val.toLocaleString('vi-VN') + '₫' : '0₫')
 
   // Helper functions for formatting color and size
   const capitalizeFirstLetter = (str) => {
