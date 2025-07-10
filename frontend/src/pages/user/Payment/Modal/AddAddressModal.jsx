@@ -72,12 +72,15 @@ export default function AddAddressModal({
 
       // Kiểm tra trùng lặp dựa trên các thông tin chính
       const isDuplicate = addressesToCheck.some(addr => {
-        const isSameFullName = addr.fullName.toLowerCase().trim() === addressData.fullName.toLowerCase().trim()
-        const isSamePhone = addr.phone.trim() === addressData.phone.trim()
-        const isSameAddress = addr.address.toLowerCase().trim() === addressData.address.toLowerCase().trim()
-        const isSameWard = addr.ward.toLowerCase().trim() === addressData.ward.toLowerCase().trim()
-        const isSameDistrict = addr.district.toLowerCase().trim() === addressData.district.toLowerCase().trim()
-        const isSameCity = addr.city.toLowerCase().trim() === addressData.city.toLowerCase().trim()
+        // Kiểm tra null/undefined trước khi so sánh
+        if (!addr || !addressData) return false
+        
+        const isSameFullName = (addr.fullName || '').toLowerCase().trim() === (addressData.fullName || '').toLowerCase().trim()
+        const isSamePhone = (addr.phone || '').trim() === (addressData.phone || '').trim()
+        const isSameAddress = (addr.address || '').toLowerCase().trim() === (addressData.address || '').toLowerCase().trim()
+        const isSameWard = (addr.ward || '').toLowerCase().trim() === (addressData.ward || '').toLowerCase().trim()
+        const isSameDistrict = (addr.district || '').toLowerCase().trim() === (addressData.district || '').toLowerCase().trim()
+        const isSameCity = (addr.city || '').toLowerCase().trim() === (addressData.city || '').toLowerCase().trim()
 
         // Địa chỉ được coi là trùng lặp nếu:
         // 1. Cùng tên, cùng số điện thoại, và cùng địa chỉ chi tiết + phường/xã + quận/huyện + tỉnh/thành
@@ -126,7 +129,7 @@ export default function AddAddressModal({
     }))
   }
 
-  // Reset form khi mở Chart
+  // Reset form khi mở Modal
   useEffect(() => {
     if (open) {
       setFormData({
@@ -149,7 +152,7 @@ export default function AddAddressModal({
     }
   }, [open, addressToEdit])
 
-  // Gọi API tỉnh/thành khi Chart mở
+  // Gọi API tỉnh/thành khi Modal mở
   useEffect(() => {
     if (!open) return
 

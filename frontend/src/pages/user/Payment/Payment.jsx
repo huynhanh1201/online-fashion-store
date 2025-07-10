@@ -348,7 +348,7 @@ const ProductItem = ({ name, variant, quantity, image, color, size, getFinalPric
                   textDecoration: 'line-through',
                 }}
               >
-                {(exportPrice * quantity).toLocaleString('vi-VN')}₫
+                {(exportPrice * quantity).toLocaleString('vi-VN')} ₫
               </Typography>
             </Box>
           )}
@@ -418,6 +418,9 @@ const Payment = () => {
     .filter(item => {
       if (isBuyNow) return true
       return selectedItems.some(selected => {
+        // Kiểm tra null/undefined trước khi xử lý
+        if (!item?.variantId || !selected?.variantId) return false
+
         const itemVariantId = String(item.variantId?._id || item.variantId)
         const selectedVariantId = String(selected.variantId)
         return (
@@ -472,11 +475,16 @@ const Payment = () => {
 
       const response = await AuthorizedAxiosInstance.post(`${API_ROOT}/v1/deliveries/calculate-fee`, payload)
 
-      const data = response.data  // Axios tự parse JSON
+      const data = response?.data  // Axios tự parse JSON
 
-      const fee = data?.totalFeeShipping
-      if (typeof fee !== 'number' || fee <= 0) {
-        throw new Error('Phí vận chuyển không hợp lệ hoặc bằng 0')
+      // Kiểm tra response structure an toàn hơn
+      if (!data || typeof data !== 'object') {
+        throw new Error('Dữ liệu phí vận chuyển không hợp lệ')
+      }
+
+      const fee = data.totalFeeShipping
+      if (typeof fee !== 'number' || fee < 0) {
+        throw new Error('Phí vận chuyển không hợp lệ')
       }
 
       setShippingPrice(fee)
@@ -735,17 +743,33 @@ const Payment = () => {
       return
     }
 
-    const sanitizedCartItems = selectedCartItems.map(item => {
-      // Ensure variantId is properly extracted
-      const variantId = typeof item.variantId === 'object'
-        ? item.variantId._id || item.variantId.toString()
-        : item.variantId
+    let sanitizedCartItems
+    try {
+      sanitizedCartItems = selectedCartItems.map(item => {
+        // Ensure variantId is properly extracted with safety checks
+        let variantId = item.variantId
+        if (typeof variantId === 'object') {
+          variantId = variantId?._id || variantId?.toString?.() || ''
+        }
 
-      return {
-        variantId: variantId,
-        quantity: item.quantity,
-      }
-    })
+        // Kiểm tra variantId hợp lệ
+        if (!variantId || variantId === '') {
+          throw new Error(`Variant ID không hợp lệ cho sản phẩm: ${item.name || 'Không tên'}`)
+        }
+
+        return {
+          variantId: String(variantId),
+          quantity: Math.max(1, parseInt(item.quantity) || 1), // Đảm bảo quantity >= 1
+        }
+      })
+    } catch (error) {
+      setSnackbar({
+        open: true,
+        severity: 'error',
+        message: `Lỗi xử lý dữ liệu: ${error.message}`,
+      })
+      return
+    }
 
     const orderData = {
       cartItems: sanitizedCartItems,
@@ -1071,11 +1095,24 @@ const Payment = () => {
                         </thead>
                         <tbody>
                           {selectedCartItems.map((item, index) => {
-                            const variant = cartItems.find(cartItem =>
+                            const cartItem = cartItems.find(cartItem =>
                               String(cartItem.variantId?._id || cartItem.variantId) === item.variantId &&
                               cartItem.color === item.color &&
                               cartItem.size === item.size
-                            )?.variantId || {}
+                            )
+                            const variant = cartItem?.variantId || {}
+
+                            // Kiểm tra dữ liệu hợp lệ trước khi render
+                            if (!variant || !item) {
+                              return (
+                                <tr key={index}>
+                                  <td colSpan={3} style={{ color: 'red', padding: 16, textAlign: 'center' }}>
+                                    <Typography color="error">Dữ liệu sản phẩm không hợp lệ</Typography>
+                                  </td>
+                                </tr>
+                              )
+                            }
+
                             return (
                               <ProductItem
                                 key={index}
@@ -1083,8 +1120,8 @@ const Payment = () => {
                                 variant={variant}
                                 quantity={item.quantity || 1}
                                 image={variant.color?.image}
-                                color={variant.color?.name}
-                                size={variant.size?.name}
+                                color={variant.color?.name || item.color}
+                                size={variant.size?.name || item.size}
                                 getFinalPrice={getFinalPrice}
                                 productId={variant.product || variant.productId}
                                 navigate={navigate}
@@ -1207,7 +1244,7 @@ const Payment = () => {
                   <PriceRow>
                     <Typography>Tạm tính:</Typography>
                     <Typography color='var(--primary-color)' fontWeight={600}>
-                      {subTotal.toLocaleString('vi-VN')}₫
+                      {subTotal.toLocaleString('vi-VN')} ₫
                     </Typography>
                   </PriceRow>
 

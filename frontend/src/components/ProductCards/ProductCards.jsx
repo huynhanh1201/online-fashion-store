@@ -140,10 +140,10 @@ const ProductCard = ({ product, isFlashSale = false }) => {
             ) : priceInfo.originalDiscountPrice > 0 ? (
               <>
                 <span style={styles.currentPrice}>
-                  {priceInfo.discountPrice.toLocaleString()}₫
+                  {priceInfo.discountPrice.toLocaleString()} ₫
                 </span>
                 <span style={styles.originalPrice}>
-                  {priceInfo.price.toLocaleString()}₫
+                  {priceInfo.price.toLocaleString()} ₫
                 </span>
                 <span style={styles.discountBadge}>-{Math.round((priceInfo.originalDiscountPrice / priceInfo.price) * 100)}%</span>
               </>

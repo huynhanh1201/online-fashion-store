@@ -43,7 +43,7 @@ export const ChooseAddressModal = ({
   const [isFormOpen, setIsFormOpen] = useState(false)
   const [editingAddress, setEditingAddress] = useState(null)
 
-  // Khi Chart mở thì force fetch dữ liệu mới nhất
+  // Khi Modal mở thì force fetch dữ liệu mới nhất
   // useEffect(() => {
   //   if (open) {
   //     fetchAddresses(true)
@@ -199,7 +199,7 @@ export const ChooseAddressModal = ({
                   <Card
                     key={addr._id}
                     sx={{
-                      border: selectedId === addr._id,
+                      border: selectedId === addr._id ? '2px solid var(--primary-color)' : '1px solid #e0e0e0',
                       borderRadius: 2,
                       transition: 'all 0.3s ease',
                       cursor: 'pointer',
