@@ -325,12 +325,9 @@ const OrderDetail = () => {
   if (!order) return <Typography>Không tìm thấy đơn hàng</Typography>
 
   const [label, color] = statusLabels[order.status] || ['Không xác định', 'default']
-  const totalProductsPrice = items.reduce((sum, item) => {
-    const actualPrice = item.variantId?.discountPrice > 0
-      ? item.price - item.variantId.discountPrice
-      : item.price
-    return sum + actualPrice * item.quantity
-  }, 0)
+  // Tính tổng tiền hàng chính xác từ order.total
+  // Đây là cách duy nhất để có giá thực tế đã trả, tránh sử dụng discount hiện tại
+  const totalProductsPrice = order.total - (order.shippingFee || 0) + (order.discountAmount || 0)
   const formatPrice = (val) => (typeof val === 'number' ? val.toLocaleString('vi-VN') + '₫' : '0₫')
 
   // Helper functions for formatting color and size
@@ -342,6 +339,20 @@ const OrderDetail = () => {
   const formatSize = (str) => {
     if (!str) return ''
     return str.toUpperCase()
+  }
+
+  // Tính giá thực tế của từng variant dựa trên tỷ lệ
+  const getActualVariantPrice = (variant) => {
+    // Tính tổng subtotal gốc của tất cả items
+    const totalOriginalSubtotal = items.reduce((sum, item) => sum + (item.subtotal || 0), 0)
+
+    // Nếu tổng subtotal gốc = 0, trả về 0 để tránh chia cho 0
+    if (totalOriginalSubtotal === 0) return 0
+
+    // Tính giá thực tế dựa trên tỷ lệ
+    const actualPrice = ((variant.subtotal || 0) / totalOriginalSubtotal) * totalProductsPrice
+
+    return Math.round(actualPrice)
   }
 
   // Group items by product ID to handle variants
@@ -361,10 +372,9 @@ const OrderDetail = () => {
 
     groups[productId].variants.push(item)
     groups[productId].totalQuantity += item.quantity
-    const actualPrice = item.variantId?.discountPrice > 0
-      ? item.price - item.variantId.discountPrice
-      : item.price
-    groups[productId].totalPrice += actualPrice * item.quantity
+    // Tính giá thực tế dựa trên tỷ lệ từ order.total
+    const actualVariantPrice = getActualVariantPrice(item)
+    groups[productId].totalPrice += actualVariantPrice
     return groups
   }, {})
 
@@ -721,37 +731,14 @@ const OrderDetail = () => {
                         </Box>
 
                         <Box textAlign="right">
-                          {variant.variantId?.discountPrice > 0 ? (
-                            <Box display="flex" flexDirection="column" alignItems="flex-end" gap={0.5}>
-                              <Typography
-                                fontWeight={700}
-                                fontSize="1.2rem"
-                                color="var(--primary-color)"
-                              >
-                                {formatPrice((variant.price - variant.variantId.discountPrice))}
-                              </Typography>
-                              <Box display="flex" alignItems="center" gap={1}>
-                                <Typography
-                                  variant="body2"
-                                  sx={{
-                                    textDecoration: 'line-through',
-                                    color: 'text.secondary',
-                                    fontSize: '0.9rem'
-                                  }}
-                                >
-                                  {formatPrice(variant.price)}
-                                </Typography>
-                              </Box>
-                            </Box>
-                          ) : (
-                            <Typography
-                              fontWeight={700}
-                              fontSize="1.2rem"
-                              color="var(--primary-color)"
-                            >
-                              {formatPrice(variant.price * variant.quantity)}
-                            </Typography>
-                          )}
+                          {/* Hiển thị giá thực tế đã trả dựa trên tỷ lệ từ order.total */}
+                          <Typography
+                            fontWeight={700}
+                            fontSize="1.2rem"
+                            color="var(--primary-color)"
+                          >
+                            {formatPrice(getActualVariantPrice(variant))}
+                          </Typography>
                         </Box>
                       </Box>
                     </Box>

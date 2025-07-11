@@ -247,6 +247,25 @@ const OrderRow = ({ order, onOrderUpdate, onOrderCancelled, onReorder, reorderLo
     return str.toUpperCase()
   }
 
+  // Tính giá thực tế của từng variant dựa trên tỷ lệ từ order.total
+  const getActualItemPrice = (item) => {
+    if (!order?.total || !items?.length) return item.subtotal || 0
+
+    // Tính tổng subtotal gốc của tất cả items
+    const totalOriginalSubtotal = items.reduce((sum, orderItem) => sum + (orderItem.subtotal || 0), 0)
+
+    // Nếu tổng subtotal gốc = 0, trả về subtotal gốc
+    if (totalOriginalSubtotal === 0) return item.subtotal || 0
+
+    // Tính tổng tiền hàng thực tế từ order.total
+    const totalProductsPrice = order.total - (order.shippingFee || 0) + (order.discountAmount || 0)
+
+    // Tính giá thực tế dựa trên tỷ lệ
+    const actualPrice = ((item.subtotal || 0) / totalOriginalSubtotal) * totalProductsPrice
+
+    return Math.round(actualPrice)
+  }
+
 
   useEffect(() => {
     const fetchItems = async () => {
@@ -436,44 +455,14 @@ const OrderRow = ({ order, onOrderUpdate, onOrderCancelled, onReorder, reorderLo
                   </Box>
 
                   <Box textAlign="right">
-                    {(() => {
-                      const price = item.price || 0
-                      const discountPrice = item.variantId?.discountPrice || 0
-                      const hasDiscount = discountPrice > 0
-                      const finalPrice = hasDiscount ? Math.max(price - discountPrice, 0) : price
-                      
-                      return hasDiscount ? (
-                        <Box display="flex" flexDirection="column" alignItems="flex-end" gap={0.5}>
-                          <Typography
-                            fontWeight={700}
-                            fontSize="1.2rem"
-                            color="var(--primary-color)"
-                          >
-                            {finalPrice.toLocaleString('vi-VN')}₫
-                          </Typography>
-                          <Box display="flex" alignItems="center" gap={1}>
-                            <Typography
-                              variant="body2"
-                              sx={{
-                                textDecoration: 'line-through',
-                                color: 'text.secondary',
-                                fontSize: '0.9rem'
-                              }}
-                            >
-                              {price.toLocaleString('vi-VN')}₫
-                            </Typography>
-                          </Box>
-                        </Box>
-                      ) : (
-                        <Typography
-                          fontWeight={700}
-                          fontSize="1.2rem"
-                          color="var(--primary-color)"
-                        >
-                          {finalPrice.toLocaleString('vi-VN')}₫
-                        </Typography>
-                      )
-                    })()}
+                    {/* Hiển thị giá thực tế đã trả dựa trên tỷ lệ từ order.total */}
+                    <Typography
+                      fontWeight={700}
+                      fontSize="1.2rem"
+                      color="var(--primary-color)"
+                    >
+                      {getActualItemPrice(item).toLocaleString('vi-VN')}₫
+                    </Typography>
                   </Box>
                 </Box>
               </Box>
