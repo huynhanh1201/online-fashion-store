@@ -24,7 +24,7 @@ import ProductCategories from './ProductCategories/ProductCategories'
 import { getBanners } from '~/services/admin/webConfig/bannerService.js'
 import { optimizeCloudinaryUrl } from '~/utils/cloudinary.js'
 
-const ITEMS_PER_PAGE = 15
+const ITEMS_PER_PAGE = 1
 
 // Custom styled button to mimic the dropdown in the image
 const SortDropdownButton = styled('button')(({ }) => ({
