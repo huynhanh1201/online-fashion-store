@@ -244,8 +244,8 @@ const ServiceHighlightManagement = () => {
                     bottom: 0,
                   }}
                 />
-                <CardContent sx={{ pl: 4, py: 2, width: '100%' }}>
-                  <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
+                <CardContent sx={{ pl: 4, py: 2, width: '20vw', backgroundColor: '#f5f5f5' }}>
+                  <Typography variant="body1" color="text.secondary" sx={{ mb: 0.5,fontWeight: 'bold' , fontSize: '20px'}}>
                     {item.title}
                   </Typography>
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
@@ -253,7 +253,7 @@ const ServiceHighlightManagement = () => {
                       {item.icon}
                     </Box>
                     <Typography variant="h5" sx={{ fontWeight: 700, ml: 1 }}>
-                      {item.value}
+                      {loading ? <Skeleton width={40} /> : item.value}
                     </Typography>
                   </Box>
                 </CardContent>

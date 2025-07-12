@@ -262,7 +262,7 @@ const AddFeaturedCategory = ({
         sx: {
           borderRadius: 3,
           boxShadow: '0 20px 60px rgba(0, 0, 0, 0.1)',
-          maxHeight: '75vh'
+          maxHeight: '90vh'
         }
       }}
     >

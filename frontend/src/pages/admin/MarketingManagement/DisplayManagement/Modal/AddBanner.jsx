@@ -220,7 +220,7 @@ const AddBanner = ({ open, onClose, onSuccess, initialData, bannerIndex }) => {
           borderRadius: 3,
           boxShadow: '0 4px 24px rgba(0, 0, 0, 0.06)',
           border: '1px solid #e2e8f0',
-          maxHeight:'75vh',
+          maxHeight:'90vh',
         }
       }}
     >

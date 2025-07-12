@@ -27,7 +27,8 @@ import {
   DialogContent,
   DialogActions,
   Tooltip,
-  Alert
+  Alert,
+  Skeleton
 } from '@mui/material'
 import {
   Add as AddIcon,
@@ -158,7 +159,14 @@ const FlashSaleManagement = () => {
       )
 
       console.log('Fetched campaigns:', enrichedCampaigns)
-      setCampaigns(enrichedCampaigns)
+      // Sắp xếp campaigns theo thứ tự mới nhất lên đầu (dựa trên thời gian tạo hoặc startTime)
+      const sortedCampaigns = enrichedCampaigns.sort((a, b) => {
+        // Ưu tiên sắp xếp theo thời gian bắt đầu, mới nhất lên đầu
+        const dateA = new Date(a.startTime)
+        const dateB = new Date(b.startTime)
+        return dateB - dateA
+      })
+      setCampaigns(sortedCampaigns)
     } catch (err) {
       setError('Không thể tải dữ liệu Flash Sale')
       console.error('Error fetching campaigns:', err)
@@ -573,8 +581,8 @@ const FlashSaleManagement = () => {
                     bottom: 0,
                   }}
                 />
-                <CardContent sx={{ pl: 4, py: 2, width: '100%' }}>
-                  <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
+                <CardContent sx={{ pl: 4, py: 2, width: '15vw', backgroundColor: '#f5f5f5' }}>
+                  <Typography variant="body1" color="text.secondary" sx={{ mb: 0.5,fontWeight: 'bold' , fontSize: '20px'}}>
                     {item.title}
                   </Typography>
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
@@ -582,7 +590,7 @@ const FlashSaleManagement = () => {
                       {item.icon}
                     </Box>
                     <Typography variant="h5" sx={{ fontWeight: 700, ml: 1 }}>
-                      {loading ? '...' : item.value}
+                      {loading ? <Skeleton width={40} /> : item.value}
                     </Typography>
                   </Box>
                 </CardContent>
@@ -1096,23 +1104,7 @@ const FlashSaleManagement = () => {
                                     </IconButton>
                                   </Tooltip>
                                 )}
-                                {/* Nút kết thúc sớm chỉ hiển thị cho sản phẩm trong chiến dịch đang hoạt động */}
-                                {(getCampaignStatus(campaign) === 'active' || getCampaignStatus(campaign) === 'upcoming') && (
-                                  <Tooltip title='Kết thúc sớm sản phẩm này'>
-                                    <IconButton
-                                      size='small'
-                                      sx={{
-                                        color: '#f59e0b',
-                                        '&:hover': { backgroundColor: '#fef3c7' }
-                                      }}
-                                      onClick={() =>
-                                        handleEndCampaignEarly(campaign)
-                                      }
-                                    >
-                                      <StopIcon fontSize='small' />
-                                    </IconButton>
-                                  </Tooltip>
-                                )}
+
                                 {/* Nút xóa chỉ hiển thị cho sản phẩm trong chiến dịch đã kết thúc hoặc bị tắt */}
                                 {hasPermission('flashSale:deldete') && (getCampaignStatus(campaign) === 'expired' || getCampaignStatus(campaign) === 'disabled') && !campaign.forceExpired && (
                                   <Tooltip title='Xóa'>
