@@ -256,7 +256,7 @@ const FlashSaleSection = () => {
         <section key={campaign.id} style={styles.flashSale} className="flash-sale-section">
           <div style={styles.flashSaleHeader} className="flash-sale-header">
             <h2 style={styles.flashSaleTitle} className="flash-sale-title">
-              ⚡ {campaign.title}
+              {campaign.title}
               {campaign.status === 'upcoming' && (
                 <span style={{ 
                   fontSize: '14px', 

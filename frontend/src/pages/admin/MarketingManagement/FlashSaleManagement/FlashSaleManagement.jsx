@@ -64,6 +64,13 @@ import { RouteGuard } from '~/components/PermissionGuard'
 const FlashSaleManagement = () => {
   const theme = useTheme()
 
+  // Logic trạng thái Flash Sale:
+  // 1. forceExpired = true → 'expired' (ưu tiên cao nhất)
+  // 2. enabled = false → 'disabled'
+  // 3. startTime > now → 'upcoming'
+  // 4. endTime < now → 'expired'
+  // 5. startTime <= now <= endTime → 'active'
+
   const [campaigns, setCampaigns] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
@@ -179,11 +186,31 @@ const FlashSaleManagement = () => {
 
   // Lấy trạng thái thực tế của campaign (ưu tiên forceExpired)
   const getCampaignStatus = (campaign) => {
-    if (campaign.forceExpired) return 'expired'
+    // Nếu campaign bị force expired, luôn trả về expired
+    if (campaign.forceExpired) {
+      return 'expired'
+    }
+    
     const now = new Date()
-    if (!campaign.enabled) return 'disabled'
-    if (new Date(campaign.startTime) > now) return 'upcoming'
-    if (new Date(campaign.endTime) < now) return 'expired'
+    const startTime = new Date(campaign.startTime)
+    const endTime = new Date(campaign.endTime)
+    
+    // Nếu campaign bị tắt, trả về disabled
+    if (!campaign.enabled) {
+      return 'disabled'
+    }
+    
+    // Nếu chưa đến thời gian bắt đầu
+    if (startTime > now) {
+      return 'upcoming'
+    }
+    
+    // Nếu đã qua thời gian kết thúc
+    if (endTime < now) {
+      return 'expired'
+    }
+    
+    // Nếu đang trong khoảng thời gian hoạt động
     return 'active'
   }
 
@@ -215,6 +242,27 @@ const FlashSaleManagement = () => {
       default:
         return 'Không xác định'
     }
+  }
+
+  // Function để debug status của campaign
+  const debugCampaignStatus = (campaign) => {
+    const status = getCampaignStatus(campaign)
+    const now = new Date()
+    const startTime = new Date(campaign.startTime)
+    const endTime = new Date(campaign.endTime)
+    
+    console.log(`Campaign ${campaign.id} (${campaign.title}) status debug:`, {
+      status,
+      forceExpired: campaign.forceExpired,
+      enabled: campaign.enabled,
+      now: now.toISOString(),
+      startTime: startTime.toISOString(),
+      endTime: endTime.toISOString(),
+      isStartTimePassed: startTime <= now,
+      isEndTimePassed: endTime < now
+    })
+    
+    return status
   }
 
   const calculateDiscount = (originalPrice, flashPrice) => {
@@ -430,7 +478,7 @@ const FlashSaleManagement = () => {
     try {
       setRestoringAllPrices(true)
       const expiredCampaigns = campaigns.filter(campaign =>
-        new Date(campaign.endTime) < new Date() && campaign.status === 'active'
+        new Date(campaign.endTime) < new Date() && getCampaignStatus(campaign) === 'active'
       )
 
       if (expiredCampaigns.length === 0) {
@@ -463,13 +511,13 @@ const FlashSaleManagement = () => {
     },
     {
       title: 'Đang hoạt động',
-      value: campaigns.filter((item) => item.status === 'active').length,
+      value: campaigns.filter((campaign) => getCampaignStatus(campaign) === 'active').length,
       icon: <TrendingUpIcon />,
       color: '#2e7d32'
     },
     {
       title: 'Sắp diễn ra',
-      value: campaigns.filter((item) => item.status === 'upcoming').length,
+      value: campaigns.filter((campaign) => getCampaignStatus(campaign) === 'upcoming').length,
       icon: <ScheduleIcon />,
       color: '#ed6c02'
     },
@@ -799,8 +847,13 @@ const FlashSaleManagement = () => {
                       {campaign.title} (ID: {campaign.id})
                     </Typography>
                     <Stack direction='row' spacing={1} alignItems='center'>
+                      {/* Logic hiển thị nút theo trạng thái:
+                          - expired: hiển thị nút khôi phục giá và xóa
+                          - active/upcoming: hiển thị nút sửa và kết thúc sớm
+                          - disabled: hiển thị nút xóa
+                      */}
                       {/* Nút khôi phục giá cho campaign hết thời gian */}
-                      {(getCampaignStatus(campaign) === 'expired' || (new Date(campaign.endTime) < new Date() && campaign.enabled)) && (
+                      {getCampaignStatus(campaign) === 'expired' && (
                         <Tooltip title='Khôi phục giá về ban đầu'>
                           <IconButton
                             size='small'
@@ -817,26 +870,26 @@ const FlashSaleManagement = () => {
                           </IconButton>
                         </Tooltip>
                       )}
-                      {
-                        hasPermission('flashSale:update') && (
-                          <Tooltip title='Chỉnh sửa chiến dịch'>
-                            <IconButton
-                              size='small'
-                              disabled={editingProduct}
-                              sx={{
-                                color: '#3b82f6',
-                                '&:hover': { backgroundColor: '#dbeafe' },
-                                '&:disabled': { opacity: 0.5 }
-                              }}
-                              onClick={(e) => {
-                                e.stopPropagation()
-                                handleEditCampaign(campaign)
-                              }}
-                            >
-                              <EditIcon fontSize='small' />
-                            </IconButton>
-                          </Tooltip>
-                        )}
+                      {/* Nút sửa chỉ hiển thị cho chiến dịch chưa kết thúc */}
+                      {hasPermission('flashSale:update') && getCampaignStatus(campaign) !== 'expired' && (
+                        <Tooltip title='Chỉnh sửa chiến dịch'>
+                          <IconButton
+                            size='small'
+                            disabled={editingProduct}
+                            sx={{
+                              color: '#3b82f6',
+                              '&:hover': { backgroundColor: '#dbeafe' },
+                              '&:disabled': { opacity: 0.5 }
+                            }}
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              handleEditCampaign(campaign)
+                            }}
+                          >
+                            <EditIcon fontSize='small' />
+                          </IconButton>
+                        </Tooltip>
+                      )}
                       {/* Nút kết thúc sớm chỉ hiển thị cho chiến dịch đang hoạt động */}
                       {(getCampaignStatus(campaign) === 'active' || getCampaignStatus(campaign) === 'upcoming') && (
                         <Tooltip title='Kết thúc sớm'>
@@ -878,6 +931,7 @@ const FlashSaleManagement = () => {
                         color={getStatusColor(getCampaignStatus(campaign))}
                         size='small'
                         sx={{ fontWeight: 600, borderRadius: 2 }}
+                        onClick={() => debugCampaignStatus(campaign)} // Click để debug
                       />
                     </Stack >
                   </Box >
@@ -1067,8 +1121,12 @@ const FlashSaleManagement = () => {
                             </TableCell>
                             <TableCell sx={{ py: 2 }}>
                               <Stack direction='row' spacing={1}>
+                                {/* Logic hiển thị nút sản phẩm theo trạng thái campaign:
+                                    - expired: hiển thị nút khôi phục giá và xóa
+                                    - active/upcoming/disabled: hiển thị nút sửa
+                                */}
                                 {/* Nút khôi phục giá cho sản phẩm trong Flash Sale hết thời gian */}
-                                {(getCampaignStatus(campaign) === 'expired' || (new Date(campaign.endTime) < new Date() && campaign.enabled)) && (
+                                {getCampaignStatus(campaign) === 'expired' && (
                                   <Tooltip title='Khôi phục giá về ban đầu'>
                                     <IconButton
                                       size='small'
@@ -1085,8 +1143,8 @@ const FlashSaleManagement = () => {
                                     </IconButton>
                                   </Tooltip>
                                 )}
-                                {hasPermission('flashSale:update') && (
-
+                                {/* Nút sửa sản phẩm chỉ hiển thị cho chiến dịch chưa kết thúc */}
+                                {hasPermission('flashSale:update') && getCampaignStatus(campaign) !== 'expired' && (
                                   <Tooltip title='Chỉnh sửa'>
                                     <IconButton
                                       size='small'
@@ -1106,7 +1164,7 @@ const FlashSaleManagement = () => {
                                 )}
 
                                 {/* Nút xóa chỉ hiển thị cho sản phẩm trong chiến dịch đã kết thúc hoặc bị tắt */}
-                                {hasPermission('flashSale:deldete') && (getCampaignStatus(campaign) === 'expired' || getCampaignStatus(campaign) === 'disabled') && !campaign.forceExpired && (
+                                {hasPermission('flashSale:delete') && (getCampaignStatus(campaign) === 'expired' || getCampaignStatus(campaign) === 'disabled') && !campaign.forceExpired && (
                                   <Tooltip title='Xóa'>
                                     <IconButton
                                       size='small'
