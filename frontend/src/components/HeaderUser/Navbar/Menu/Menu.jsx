@@ -385,7 +385,12 @@ const Menu = ({ headerRef }) => {
                   ) : (
                     <StyledButton
                       href={item.url}
-                      active={item.hasMegaMenu && (productMenuOpen || isDrawerHovered) ? true : undefined}
+                      active={
+                        (item.hasMegaMenu && (productMenuOpen || isDrawerHovered)) ||
+                        (item.category && hoveredCategory?._id === item.category._id)
+                          ? true
+                          : undefined
+                      }
                       ref={item.hasMegaMenu ? productButtonRef : null}
                       onMouseEnter={item.hasMegaMenu ? handleProductEnter : undefined}
                       onMouseLeave={item.hasMegaMenu ? handleProductLeave : undefined}
@@ -394,7 +399,7 @@ const Menu = ({ headerRef }) => {
                     </StyledButton>
                   )}
                   {/* Submenu cho category */}
-                  {item.category && hoveredCategory?._id === item.category._id && (
+                  {item.category && (
                     <Box
                       onMouseEnter={handleCategoryMenuEnter}
                       onMouseLeave={handleCategoryMenuLeave}
@@ -402,20 +407,20 @@ const Menu = ({ headerRef }) => {
                         position: 'absolute',
                         top: '100%',
                         left: '50%',
-                        transform: 'translateX(-50%)',
+                        marginTop: '15px',
+                        transform: hoveredCategory?._id === item.category._id
+                          ? 'translateX(-50%) translateY(0) scaleY(1)'
+                          : 'translateX(-50%) translateY(-10px) scaleY(0.95)',
+                        opacity: hoveredCategory?._id === item.category._id ? 1 : 0,
+                        pointerEvents: hoveredCategory?._id === item.category._id ? 'auto' : 'none',
                         bgcolor: 'white',
                         boxShadow: '0px 8px 32px rgba(0, 0, 0, 0.12)',
                         minWidth: 200,
                         maxWidth: '95vw',
-                        zIndex: 1500, // Z-index cao hơn AppBar và Topbar
-                        borderRadius: '0 0 8px 8px',
+                        zIndex: 1500,
                         border: '1px solid #e2e8f0',
-                        animation: 'slideDown 0.2s ease-out',
-                        '@keyframes slideDown': {
-                          '0%': { opacity: 0, transform: 'translateX(-50%) translateY(-10px) scaleY(0.95)' },
-                          '100%': { opacity: 1, transform: 'translateX(-50%) translateY(0) scaleY(1)' }
-                        },
-                        // Đảm bảo submenu không bị overflow của parent
+                        transition: 'opacity 0.3s ease, transform 0.3s ease',
+                        transformOrigin: 'top center',
                         '&::before': {
                           content: '""',
                           position: 'absolute',
@@ -432,8 +437,6 @@ const Menu = ({ headerRef }) => {
                         sx={{
                           display: 'flex',
                           flexDirection: 'column',
-                          gap: 1,
-                          p: 2
                         }}
                       >
                         {(() => {
@@ -461,7 +464,6 @@ const Menu = ({ headerRef }) => {
                                   '&:hover': {
                                     color: '#1976d2',
                                     background: '#f8fafc',
-                                    transform: 'translateX(5px)'
                                   }
                                 }}
                               >
