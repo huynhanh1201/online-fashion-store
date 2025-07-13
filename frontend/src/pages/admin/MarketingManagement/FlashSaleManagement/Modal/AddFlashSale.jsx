@@ -821,7 +821,7 @@ const AddFlashSale = ({ open, onClose, onSave, initialData }) => {
                         InputProps={{ readOnly: true }}
                         required
                         disabled={isEditMode && product.isDisabled}
-                        inputProps={{ 
+                        inputProps={{
                           min: 0,
                           style: { textAlign: 'right' }
                         }}
@@ -846,7 +846,7 @@ const AddFlashSale = ({ open, onClose, onSave, initialData }) => {
                           }
                           required
                           disabled={isEditMode && product.isDisabled}
-                          inputProps={{ 
+                          inputProps={{
                             min: 0,
                             style: { textAlign: 'right' }
                           }}
