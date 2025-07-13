@@ -12,6 +12,7 @@ import {
   Chat
 } from '@mui/icons-material'
 
+
 const Contact = () => {
   const [showIcon, setShowIcon] = useState(true)
   const [showSubIcons, setShowSubIcons] = useState(false)
@@ -72,12 +73,18 @@ const Contact = () => {
       delay: 0
     },
     {
-      icon: <WhatsApp />,
+      icon: (
+        <img
+          src="https://hidosport.vn/wp-content/uploads/2023/09/zalo-icon.png"
+          alt="Zalo"
+          style={{ width: 40, height: 40}}
+        />
+      ),
       title: 'Zalo',
-      color: '#25D366',
       action: 'https://zalo.me/0346896599',
       delay: 200
     },
+    
     {
       icon: <Chat />,
       title: 'Messenger',
