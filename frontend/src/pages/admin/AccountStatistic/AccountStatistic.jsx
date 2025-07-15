@@ -113,7 +113,7 @@ const AccountStatistics = ({ statistics = [] }) => {
         </Grid>
       </Box>
 
-      <Box sx={styles.BoxCard}>
+      <Box sx={{ ...styles.BoxCard }}>
         <Typography
           variant='h5'
           gutterBottom
@@ -122,8 +122,19 @@ const AccountStatistics = ({ statistics = [] }) => {
         >
           Phân bố tài khoản theo vai trò
         </Typography>
-        <Box mt={5} position='relative' sx={{ maxHeight: 500 }}>
-          <Pie data={chartData} options={chartOptions} />
+        <Box
+          mt={5}
+          sx={{
+            maxHeight: 450
+          }}
+        >
+          {chartData?.datasets?.[0]?.data?.some((val) => val > 0) ? (
+            <Pie data={chartData} options={chartOptions} />
+          ) : (
+            <Typography variant='h6' color='text.secondary'>
+              Không có dữ liệu
+            </Typography>
+          )}
         </Box>
       </Box>
     </div>

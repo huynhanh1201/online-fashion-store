@@ -70,7 +70,7 @@ export const addColor = async (data) => {
 
 export const restoreColor = async (colorId) => {
   try {
-    const response = await AuthorizedAxiosInstance.put(
+    const response = await AuthorizedAxiosInstance.patch(
       `${API_ROOT}/v1/sizes/restore/${colorId}`
     )
     return response.data

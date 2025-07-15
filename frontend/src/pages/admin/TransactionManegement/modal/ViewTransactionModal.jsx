@@ -44,11 +44,11 @@ const ViewTransactionModal = ({ open, onClose, transaction }) => {
       open={open}
       onClose={onClose}
       fullWidth
-      maxWidth='md'
+      maxWidth='lg'
       PaperProps={{
         sx: {
-          height: '63vh',
-          maxHeight: '63vh',
+          minHeight: '63vh',
+          maxHeight: '90vh',
           display: 'flex',
           flexDirection: 'column'
         }
@@ -59,7 +59,7 @@ const ViewTransactionModal = ({ open, onClose, transaction }) => {
     >
       <DialogTitle>Xem thông tin giao dịch</DialogTitle>
       <Divider />
-      <DialogContent sx={{ overflowY: 'auto', py: 0, maxHeight: 435 }}>
+      <DialogContent sx={{ overflowY: 'auto', py: 0 }}>
         {transaction ? (
           <Table>
             <TableBody>

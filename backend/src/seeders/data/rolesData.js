@@ -144,6 +144,7 @@ export const roles = [
       'account:create',
       'account:update',
       'account:delete',
+      'account:restore',
 
       // Banner
       'banner:use',

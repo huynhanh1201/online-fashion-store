@@ -5,7 +5,7 @@ import FilterSelect from '~/components/FilterAdmin/common/FilterSelect'
 import FilterByTime from '~/components/FilterAdmin/common/FilterByTime'
 import SearchWithSuggestions from '~/components/FilterAdmin/common/SearchWithSuggestions'
 import useWarehouseSlip from '~/hooks/admin/Inventory/useWarehouseSlip.js'
-export default function FilterWarehouseSlip({ onFilter, loading, warehouses }) {
+export default function FilterWarehouseSlip({ onFilter, loading }) {
   const [code, setCode] = useState('')
   const [inputValue, setInputValue] = useState('')
   const [warehouseId, setWarehouseId] = useState('')
@@ -108,15 +108,15 @@ export default function FilterWarehouseSlip({ onFilter, loading, warehouses }) {
 
   return (
     <Box display='flex' flexWrap='wrap' gap={2} mb={2} justifyContent='end'>
-      <FilterSelect
-        label='Kho'
-        value={warehouseId}
-        onChange={setWarehouseId}
-        options={[
-          { label: 'Tất cả', value: '' },
-          ...warehouses.map((w) => ({ label: w.name, value: w._id }))
-        ]}
-      />
+      {/*<FilterSelect*/}
+      {/*  label='Kho'*/}
+      {/*  value={warehouseId}*/}
+      {/*  onChange={setWarehouseId}*/}
+      {/*  options={[*/}
+      {/*    { label: 'Tất cả', value: '' },*/}
+      {/*    ...warehouses.map((w) => ({ label: w.name, value: w._id }))*/}
+      {/*  ]}*/}
+      {/*/>*/}
       <FilterSelect
         label='Loại phiếu'
         value={type}

@@ -14,7 +14,9 @@ export const getAllTransactions = async (filter) => {
     }
   } catch (error) {
     console.error('Lỗi khi lấy danh sách giao dịch:', error)
-    return []
+    return {
+      transactions: []
+    }
   }
 }
 

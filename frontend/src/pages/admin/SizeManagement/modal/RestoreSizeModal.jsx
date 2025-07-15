@@ -9,13 +9,14 @@ import Divider from '@mui/material/Divider'
 
 import StyleAdmin from '~/assets/StyleAdmin.jsx'
 
-const RestoreSizeModal = ({ open, onClose, size, onRestore }) => {
+const RestoreSizeModal = ({ open, onClose, size, onRestored }) => {
   const [isRestoring, setIsRestoring] = useState(false)
 
   const handleRestore = async () => {
     setIsRestoring(true)
+    console.log('Khôi phục kích thước:', size._id)
     try {
-      await onRestore(size._id, 'restore')
+      await onRestored(size._id, 'restore')
       onClose()
     } catch (error) {
       console.error('Khôi phục kích thước thất bại:', error)

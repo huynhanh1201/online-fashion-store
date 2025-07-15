@@ -45,7 +45,7 @@ const ViewWarehouseSlipModal = ({ open, onClose, slip }) => {
         <Table>
           <TableBody>
             <TableRow>
-              <TableCell>
+              <TableCell sx={{ minWidth: 200 }}>
                 <strong>
                   Mã phiếu {slip.type === 'Nhập' ? 'nhập' : 'xuất'} kho
                 </strong>

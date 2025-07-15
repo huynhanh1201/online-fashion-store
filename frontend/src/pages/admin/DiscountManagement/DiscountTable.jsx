@@ -122,7 +122,7 @@ const DiscountTable = ({
                     ...(column.id === 'action' && {
                       width: '130px',
                       maxWidth: '130px',
-                      paddingLeft: '20px'
+                      paddingLeft: '12px'
                     })
                   }}
                 >

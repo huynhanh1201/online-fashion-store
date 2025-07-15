@@ -15,7 +15,6 @@ const DeleteInventoryModal = ({ open, onClose, inventory, onSave }) => {
   const handleDelete = async () => {
     try {
       await onSave(inventory._id, 'delete')
-      toast.success('Xóa tồn kho thành công')
       onClose()
     } catch {
       toast.error('Xóa tồn kho thất bại')

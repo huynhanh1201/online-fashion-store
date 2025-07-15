@@ -330,21 +330,21 @@ export default function FilterInventory({ onFilter, loading }) {
   // )
   return (
     <Box display='flex' flexWrap='wrap' gap={2} mb={2} justifyContent='end'>
-      <FilterSelect
-        label='Kho hàng'
-        value={warehouseId}
-        onChange={(val) => {
-          setWarehouseId(val)
-          applyFilters(selectedFilter, startDate, endDate)
-        }}
-        options={[
-          { label: 'Tất cả', value: '' },
-          ...uniqueWarehouses.map((wh) => ({
-            label: wh.name,
-            value: wh._id
-          }))
-        ]}
-      />
+      {/*<FilterSelect*/}
+      {/*  label='Kho hàng'*/}
+      {/*  value={warehouseId}*/}
+      {/*  onChange={(val) => {*/}
+      {/*    setWarehouseId(val)*/}
+      {/*    applyFilters(selectedFilter, startDate, endDate)*/}
+      {/*  }}*/}
+      {/*  options={[*/}
+      {/*    { label: 'Tất cả', value: '' },*/}
+      {/*    ...uniqueWarehouses.map((wh) => ({*/}
+      {/*      label: wh.name,*/}
+      {/*      value: wh._id*/}
+      {/*    }))*/}
+      {/*  ]}*/}
+      {/*/>*/}
 
       <FilterSelect
         label='Trạng thái kho'

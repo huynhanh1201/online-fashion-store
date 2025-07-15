@@ -55,7 +55,7 @@ export default function FilterRole({ onFilter, loading, initialSearch }) {
 
   const applyFilters = (selectedTime, fromDate, toDate) => {
     const filters = {
-      roleName: keyword || undefined,
+      search: keyword || undefined,
       sort: sort || undefined,
       destroy: status || undefined
     }
@@ -126,7 +126,7 @@ export default function FilterRole({ onFilter, loading, initialSearch }) {
           label='Tên vai trò'
           options={roles.map((role) => ({
             label: role.label,
-            value: role.name
+            value: role.label
           }))}
           loading={loading}
           keyword={keyword}

@@ -15,14 +15,11 @@ import {
 } from '@mui/material'
 import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye'
 import BorderColorIcon from '@mui/icons-material/BorderColor'
-import VisibilityOffIcon from '@mui/icons-material/VisibilityOff'
 import EditBatchModal from '../modal/Batch/EditBatchModal.jsx'
 import ViewBatchModal from '../modal/Batch/ViewBatchModal.jsx'
 import DeleteBatchModal from '../modal/Batch/DeleteBatchModal.jsx'
 import FilterBatches from '~/components/FilterAdmin/FilterBatches.jsx'
 import useBatches from '~/hooks/admin/Inventory/useBatches.js'
-import useVariants from '~/hooks/admin/Inventory/useVariants.js'
-import useWarehouses from '~/hooks/admin/Inventory/useWarehouses.js'
 import TablePaginationActions from '~/components/PaginationAdmin/TablePaginationActions.jsx'
 import Chip from '@mui/material/Chip'
 import TableNoneData from '~/components/TableAdmin/NoneData.jsx'
@@ -39,11 +36,8 @@ const BatchesTab = () => {
     deleteBatchById,
     loadingBatch,
     totalPageBatch,
-    Save,
-    fetchBatchId
+    Save
   } = useBatches()
-  const { variants, fetchVariants } = useVariants()
-  const { warehouses, fetchWarehouses } = useWarehouses()
 
   const [page, setPage] = useState(1)
   const [rowsPerPage, setRowsPerPage] = useState(10)
@@ -109,11 +103,6 @@ const BatchesTab = () => {
 
     { id: 'action', label: 'Hành động', minWidth: 150, align: 'start' }
   ]
-
-  useEffect(() => {
-    fetchVariants()
-    fetchWarehouses()
-  }, [])
 
   useEffect(() => {
     fetchBatches(page, rowsPerPage, filter)
@@ -209,12 +198,8 @@ const BatchesTab = () => {
                     </Typography>
                   </Box>
                   <FilterBatches
-                    variants={variants}
-                    warehouses={warehouses}
                     onFilter={handleFilter}
                     loading={loadingBatch}
-                    batches={batches}
-                    fetchData={fetchBatches}
                   />
                 </Box>
               </TableCell>
@@ -404,7 +389,6 @@ const BatchesTab = () => {
         onClose={handleCloseEditModal}
         batch={selectedBatch}
         onSave={handleSave}
-        variants={variants}
         parseCurrency={parseCurrency}
         formatCurrency={formatCurrency}
       />

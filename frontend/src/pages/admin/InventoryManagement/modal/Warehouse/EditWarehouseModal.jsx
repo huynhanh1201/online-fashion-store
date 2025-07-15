@@ -208,7 +208,6 @@ const EditWarehouseModal = ({ open, onClose, warehouse, onSave }) => {
 
     try {
       await onSave(payload, 'edit', warehouse._id)
-      toast.success('Cập nhật kho hàng thành công')
       reset()
       setSelectedProvince(null)
       setSelectedDistrict(null)

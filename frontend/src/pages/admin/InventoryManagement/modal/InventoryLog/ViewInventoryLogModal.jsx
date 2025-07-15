@@ -20,7 +20,7 @@ const ViewInventoryLogModal = ({ open, onClose, log }) => {
   if (!log) return null
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth='sm' fullWidth>
+    <Dialog open={open} onClose={onClose} maxWidth='md' fullWidth>
       <DialogTitle>
         Thông tin lịch sử phiếu {log.type === 'in' ? 'nhập' : 'xuất'} kho
       </DialogTitle>
@@ -29,7 +29,7 @@ const ViewInventoryLogModal = ({ open, onClose, log }) => {
         <Table>
           <TableBody>
             <TableRow>
-              <TableCell>
+              <TableCell sx={{ minWidth: 200 }}>
                 <strong>
                   Mã phiếu {log.type === 'in' ? 'nhập' : 'xuất'} kho
                 </strong>
@@ -37,7 +37,7 @@ const ViewInventoryLogModal = ({ open, onClose, log }) => {
               <TableCell>{log.source || 'N/A'}</TableCell>
             </TableRow>
             <TableRow>
-              <TableCell>
+              <TableCell sx={{ minWidth: 200 }}>
                 <strong>Tên sản phẩm</strong>
               </TableCell>
               <TableCell>
@@ -51,7 +51,7 @@ const ViewInventoryLogModal = ({ open, onClose, log }) => {
               </TableCell>
             </TableRow>
             <TableRow>
-              <TableCell>
+              <TableCell sx={{ minWidth: 200 }}>
                 <strong>Kho hàng</strong>
               </TableCell>
               <TableCell>
@@ -65,7 +65,7 @@ const ViewInventoryLogModal = ({ open, onClose, log }) => {
               </TableCell>
             </TableRow>
             <TableRow>
-              <TableCell>
+              <TableCell sx={{ minWidth: 200 }}>
                 <strong>Loại phiếu</strong>
               </TableCell>
               <TableCell>
@@ -82,7 +82,7 @@ const ViewInventoryLogModal = ({ open, onClose, log }) => {
               </TableCell>
             </TableRow>
             <TableRow>
-              <TableCell>
+              <TableCell sx={{ minWidth: 200 }}>
                 <strong>Số lượng</strong>
               </TableCell>
               <TableCell>
@@ -92,7 +92,7 @@ const ViewInventoryLogModal = ({ open, onClose, log }) => {
               </TableCell>
             </TableRow>
             <TableRow>
-              <TableCell>
+              <TableCell sx={{ minWidth: 200 }}>
                 <strong>Giá nhập</strong>
               </TableCell>
               <TableCell>
@@ -102,7 +102,7 @@ const ViewInventoryLogModal = ({ open, onClose, log }) => {
               </TableCell>
             </TableRow>
             <TableRow>
-              <TableCell>
+              <TableCell sx={{ minWidth: 200 }}>
                 <strong>Giá xuất</strong>
               </TableCell>
               <TableCell>
@@ -113,12 +113,12 @@ const ViewInventoryLogModal = ({ open, onClose, log }) => {
             </TableRow>
             <TableRow>
               <TableCell>
-                <strong>Ghi chú</strong>
+                <strong sx={{ minWidth: 200 }}>Ghi chú</strong>
               </TableCell>
               <TableCell>{log.note || 'Không có'}</TableCell>
             </TableRow>
             <TableRow>
-              <TableCell>
+              <TableCell sx={{ minWidth: 200 }}>
                 <strong>Người thực hiện</strong>
               </TableCell>
               <TableCell>
@@ -132,7 +132,7 @@ const ViewInventoryLogModal = ({ open, onClose, log }) => {
               </TableCell>
             </TableRow>
             <TableRow>
-              <TableCell sx={{ borderBottom: 0 }}>
+              <TableCell sx={{ borderBottom: 0, minWidth: 200 }}>
                 <strong>Ngày tạo phiếu</strong>
               </TableCell>
               <TableCell sx={{ borderBottom: 0 }}>

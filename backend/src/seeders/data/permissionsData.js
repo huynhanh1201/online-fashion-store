@@ -91,6 +91,11 @@ export const permissions = [
     label: 'Xóa tài khoản hệ thống',
     group: 'Tài khoản hệ thống'
   },
+  {
+    key: 'account:restore',
+    label: 'Khôi phục tài khoản hệ thống',
+    group: 'Tài khoản hệ thống'
+  },
 
   // Role
   { key: 'role:use', label: 'Sử dụng trang vai trò', group: 'Vai trò' },

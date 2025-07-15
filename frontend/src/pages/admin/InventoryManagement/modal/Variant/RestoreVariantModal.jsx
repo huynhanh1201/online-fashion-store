@@ -16,7 +16,6 @@ const RestoreVariantModal = ({ open, onClose, variant, restoreVariant }) => {
     try {
       await restoreVariant(variant._id, 'restore')
       onClose()
-      toast.success('Khôi phục biến thể thành công')
     } catch (error) {
       toast.error(
         `Khôi phục biến thể thất bại: ${error?.message || 'Đã xảy ra lỗi không xác định'}`
@@ -29,6 +28,8 @@ const RestoreVariantModal = ({ open, onClose, variant, restoreVariant }) => {
       open={open}
       onClose={onClose}
       sx={{ padding: '16px 24px' }}
+      maxWidth='sm'
+      fullWidth
       BackdropProps={{
         sx: StyleAdmin.OverlayModal
       }}

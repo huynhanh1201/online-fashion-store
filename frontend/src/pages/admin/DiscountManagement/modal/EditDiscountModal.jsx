@@ -1,6 +1,9 @@
 import React from 'react'
 import { useForm, Controller } from 'react-hook-form'
-
+import { DatePicker } from '@mui/x-date-pickers/DatePicker'
+import { LocalizationProvider } from '@mui/x-date-pickers'
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns'
+import customVi from '~/components/DateInput/CustomVi.jsx'
 import Dialog from '@mui/material/Dialog'
 import DialogTitle from '@mui/material/DialogTitle'
 import DialogContent from '@mui/material/DialogContent'
@@ -48,7 +51,7 @@ const EditDiscountModal = ({ open, onClose, discount, onSave }) => {
       isActive: false
     }
   })
-
+  const formatDateInput = (iso) => (iso ? new Date(iso) : null)
   const type = watch('type', 'fixed')
   // const code = watch('code')
 
@@ -137,6 +140,7 @@ const EditDiscountModal = ({ open, onClose, discount, onSave }) => {
                     Mã giảm giá <span style={{ color: 'red' }}>*</span>
                   </>
                 }
+                disabled
                 fullWidth
                 margin='normal'
                 {...register('code', {
@@ -161,28 +165,27 @@ const EditDiscountModal = ({ open, onClose, discount, onSave }) => {
                 control={control}
                 rules={{ required: 'Vui lòng chọn loại giảm giá' }}
                 render={({ field, fieldState: { error } }) => (
-                  <FormControl
+                  <TextField
+                    select
+                    disabled
                     fullWidth
                     margin='normal'
+                    label='Loại giảm giá'
                     error={!!error}
+                    helperText={error?.message}
+                    {...field}
                     sx={StyleAdmin.FormSelect}
-                  >
-                    <InputLabel id='type-label'>Loại giảm giá</InputLabel>
-                    <Select
-                      disabled
-                      labelId='type-label'
-                      label='Loại giảm giá'
-                      {...field}
-                      MenuProps={{
+                    SelectProps={{
+                      MenuProps: {
                         PaperProps: {
                           sx: StyleAdmin.FormSelect.SelectMenu
                         }
-                      }}
-                    >
-                      <MenuItem value='fixed'>Giảm theo số tiền</MenuItem>
-                      <MenuItem value='percent'>Giảm theo phần trăm</MenuItem>
-                    </Select>
-                  </FormControl>
+                      }
+                    }}
+                  >
+                    <MenuItem value='fixed'>Giảm theo số tiền</MenuItem>
+                    <MenuItem value='percent'>Giảm theo phần trăm</MenuItem>
+                  </TextField>
                 )}
               />
 
@@ -274,85 +277,72 @@ const EditDiscountModal = ({ open, onClose, discount, onSave }) => {
                 )}
               />
 
-              <Controller
-                name='usageLimit'
-                control={control}
-                rules={{
-                  required: 'Vui lòng nhập số lượt sử dụng',
-                  validate: (value) =>
-                    parseInt(value) >= 1 ||
-                    'Số lượt sử dụng phải lớn hơn hoặc bằng 1'
-                }}
-                render={({
-                  field: { onChange, value },
-                  fieldState: { error }
-                }) => (
-                  <TextField
-                    label='Số lượt sử dụng tối đa'
-                    label={
-                      <>
-                        Số lượt sử dụng tối đa{' '}
-                        <span style={{ color: 'red' }}>*</span>
-                      </>
-                    }
-                    fullWidth
-                    margin='normal'
-                    value={formatNumber(value)}
-                    onChange={(e) => onChange(parseNumber(e.target.value))}
-                    error={!!error}
-                    helperText={error?.message}
-                    InputProps={{ inputMode: 'numeric' }}
-                    sx={StyleAdmin.InputCustom}
-                  />
-                )}
-              />
+              <LocalizationProvider
+                dateAdapter={AdapterDateFns}
+                adapterLocale={customVi}
+              >
+                <Controller
+                  name='validFrom'
+                  control={control}
+                  render={({ field }) => (
+                    <DatePicker
+                      label={
+                        <>
+                          Ngày bắt đầu <span style={{ color: 'red' }}>*</span>
+                        </>
+                      }
+                      value={formatDateInput(field.value)}
+                      onChange={() => {}} // không cho chỉnh
+                      disabled
+                      format='dd/MM/yyyy'
+                      slotProps={{
+                        textField: {
+                          fullWidth: true,
+                          margin: 'normal',
+                          sx: StyleAdmin.InputCustom
+                        }
+                      }}
+                    />
+                  )}
+                />
 
-              <TextField
-                disabled
-                label={
-                  <>
-                    Ngày bắt đầu <span style={{ color: 'red' }}>*</span>
-                  </>
-                }
-                type='datetime-local'
-                fullWidth
-                margin='normal'
-                InputLabelProps={{ shrink: true }}
-                {...register('validFrom')}
-                sx={StyleAdmin.InputCustom}
-              />
-              <Controller
-                name='validUntil'
-                control={control}
-                rules={{
-                  required: 'Vui lòng chọn ngày kết thúc',
-                  validate: (value) => {
-                    const from = new Date(watch('validFrom'))
-                    const to = new Date(value)
-                    if (!value) return 'Vui lòng chọn ngày kết thúc'
-                    if (isNaN(from.getTime()) || isNaN(to.getTime()))
-                      return true // tránh lỗi khi from chưa chọn
-                    return to > from || 'Ngày kết thúc phải sau ngày bắt đầu'
-                  }
-                }}
-                render={({ field, fieldState }) => (
-                  <TextField
-                    {...field}
-                    type='datetime-local'
-                    label={
-                      <>
-                        Ngày kết thúc <span style={{ color: 'red' }}>*</span>
-                      </>
+                <Controller
+                  name='validUntil'
+                  control={control}
+                  rules={{
+                    required: 'Vui lòng chọn ngày kết thúc',
+                    validate: (value) => {
+                      const from = new Date(watch('validFrom'))
+                      const to = new Date(value)
+                      if (!value) return 'Vui lòng chọn ngày kết thúc'
+                      if (isNaN(from.getTime()) || isNaN(to.getTime()))
+                        return true
+                      return to > from || 'Ngày kết thúc phải sau ngày bắt đầu'
                     }
-                    fullWidth
-                    margin='normal'
-                    InputLabelProps={{ shrink: true }}
-                    error={!!fieldState.error}
-                    helperText={fieldState.error?.message}
-                    sx={StyleAdmin.InputCustom}
-                  />
-                )}
-              />
+                  }}
+                  render={({ field, fieldState }) => (
+                    <DatePicker
+                      label={
+                        <>
+                          Ngày kết thúc <span style={{ color: 'red' }}>*</span>
+                        </>
+                      }
+                      value={formatDateInput(field.value)}
+                      onChange={field.onChange}
+                      format='dd/MM/yyyy'
+                      slotProps={{
+                        textField: {
+                          fullWidth: true,
+                          margin: 'normal',
+                          error: !!fieldState.error,
+                          helperText: fieldState.error?.message,
+                          sx: StyleAdmin.InputCustom
+                        }
+                      }}
+                    />
+                  )}
+                />
+              </LocalizationProvider>
             </Box>
           </Box>
         </DialogContent>

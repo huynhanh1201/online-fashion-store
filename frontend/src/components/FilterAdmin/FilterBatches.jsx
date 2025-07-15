@@ -23,12 +23,10 @@ export default function FilterBatches({ onFilter, loading }) {
   const [importPriceMax, setImportPriceMax] = useState('')
   const hasMounted = useRef(false)
   const { variants, fetchVariants } = useVariants()
-  const { warehouses, fetchWarehouses } = useWarehouses()
   const { batches, fetchBatches } = useBatches()
 
   useEffect(() => {
     fetchVariants(1, 100000, { destroy: destroy, sort: sort })
-    fetchWarehouses(1, 100000, { destroy: destroy, sort: sort })
     fetchBatches(1, 100000, { destroy: destroy, sort: sort })
   }, [])
 
@@ -150,15 +148,15 @@ export default function FilterBatches({ onFilter, loading }) {
           }))
         ]}
       />
-      <FilterSelect
-        label='Kho'
-        value={warehouseId}
-        onChange={setWarehouseId}
-        options={[
-          { label: 'Tất cả', value: '' },
-          ...warehouses.map((w) => ({ label: w.name, value: w._id }))
-        ]}
-      />
+      {/*<FilterSelect*/}
+      {/*  label='Kho'*/}
+      {/*  value={warehouseId}*/}
+      {/*  onChange={setWarehouseId}*/}
+      {/*  options={[*/}
+      {/*    { label: 'Tất cả', value: '' },*/}
+      {/*    ...warehouses.map((w) => ({ label: w.name, value: w._id }))*/}
+      {/*  ]}*/}
+      {/*/>*/}
       {/*<FilterByPrice*/}
       {/*  label='Số lượng'*/}
       {/*  priceMin={quantityMin}*/}

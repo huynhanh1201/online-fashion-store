@@ -17,7 +17,6 @@ const DeleteVariantModal = ({ open, onClose, variant, deleteVariant }) => {
     try {
       await deleteVariant(variant._id, 'delete')
       onClose()
-      toast.success('Xóa biến thể thành công')
       onClose()
     } catch (error) {
       toast.error(
@@ -30,7 +29,7 @@ const DeleteVariantModal = ({ open, onClose, variant, deleteVariant }) => {
     <Dialog
       open={open}
       onClose={onClose}
-      maxWidth='md'
+      maxWidth='sm'
       fullWidth
       sx={{ padding: '16px 24px' }}
       BackdropProps={{
