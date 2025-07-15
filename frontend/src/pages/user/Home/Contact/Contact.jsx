@@ -66,9 +66,15 @@ const Contact = () => {
 
   const subIcons = [
     {
-      icon: <Phone />,
+      icon: (
+        <img
+          src="https://cdn.iconscout.com/icon/free/png-512/free-phone-icon-download-in-svg-png-gif-file-formats--call-logo-app-for-ios-store-apps-apple-watch-pack-user-interface-icons-1100768.png?f=webp&w=256"
+          alt="Zalo"
+          style={{ width: 40, height: 40}}
+        />
+      ),
       title: 'Liên hệ : 0346896599',
-      color: '#4CAF50',
+      color: 'white',
       action: 'tel:0346896599',
       delay: 0
     },
@@ -86,9 +92,15 @@ const Contact = () => {
     },
     
     {
-      icon: <Chat />,
+      icon: (
+        <img
+          src="https://1000logos.net/wp-content/uploads/2021/11/Messenger-Logo.png"
+          alt="Zalo"
+          style={{ width: 80, height: 40}}
+        />
+      ),
       title: 'Messenger',
-      color: '#1877F2',
+      color: 'white',
       action: 'https://m.me/onl.fashion.store',
       delay: 300
     }
