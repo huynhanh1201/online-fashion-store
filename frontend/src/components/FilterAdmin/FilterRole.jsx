@@ -29,11 +29,10 @@ export default function FilterRole({ onFilter, loading, initialSearch }) {
     if (hasMounted.current) {
       applyFilters(selectedFilter, startDate, endDate)
     }
-  }, [sort, status])
+  }, [keyword, sort, status])
 
   const handleSearch = () => {
     setKeyword(inputValue)
-    applyFilters()
   }
 
   const handleSelectFilter = (filter) => {
@@ -127,7 +126,7 @@ export default function FilterRole({ onFilter, loading, initialSearch }) {
           label='Tên vai trò'
           options={roles.map((role) => ({
             label: role.label,
-            value: role.name
+            value: role.label
           }))}
           loading={loading}
           keyword={keyword}

@@ -164,7 +164,8 @@ const updateProductRating = async (productId) => {
     {
       $match: {
         productId: new mongoose.Types.ObjectId(productId),
-        moderationStatus: 'approved'
+        moderationStatus: 'approved',
+        destroy: false
       }
     },
     {
