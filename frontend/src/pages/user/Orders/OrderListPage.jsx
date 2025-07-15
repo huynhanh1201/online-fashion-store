@@ -21,6 +21,8 @@ import {
   DialogActions,
   DialogContentText,
   Skeleton,
+  Breadcrumbs,
+  Link
 } from '@mui/material'
 import {
   KeyboardArrowDown,
@@ -33,7 +35,8 @@ import {
   Visibility,
   Warning,
   Sync,
-  RateReview
+  RateReview,
+  NavigateNext
 } from '@mui/icons-material'
 import ScheduleIcon from '@mui/icons-material/Schedule';
 import { getOrders, getOrderItems } from '~/services/orderService'
@@ -819,6 +822,48 @@ const OrderListPage = () => {
         },
       }
     }}>
+      {/* Breadcrumb */}
+      <Box
+        sx={{
+          bottom: { xs: '20px', sm: '30px', md: '40px' },
+          left: { xs: '20px', sm: '30px', md: '40px' },
+          right: { xs: '20px', sm: '30px', md: '40px' },
+          maxWidth: '1800px',
+          margin: '0 auto',
+          mb: 2
+        }}
+      >
+        <Breadcrumbs
+          separator={<NavigateNext fontSize='small' />}
+          aria-label='breadcrumb'
+        >
+          <Link
+            underline='hover'
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              color: '#007bff',
+              textDecoration: 'none',
+              '&:hover': {
+                color: 'primary.main'
+              }
+            }}
+            href='/'
+          >
+            Trang chủ
+          </Link>
+          <Typography
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              color: 'text.primary',
+              fontWeight: 500
+            }}
+          >
+           Đơn hàng
+          </Typography>
+        </Breadcrumbs>
+      </Box>
       {/* Header */}
       <Box mb={4}>
         <Typography

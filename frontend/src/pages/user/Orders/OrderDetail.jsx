@@ -20,10 +20,12 @@ import {
   DialogContent,
   DialogActions,
   DialogContentText,
+  Breadcrumbs,
+  Link
 } from '@mui/material'
 import { useParams, useNavigate } from 'react-router-dom'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack'
-import { Cancel, Warning, Replay } from '@mui/icons-material'
+import { Cancel, Warning, Replay, NavigateNext } from '@mui/icons-material'
 import { useOrderDetail } from '~/hooks/useOrderDetail'
 import { useOrder } from '~/hooks/useOrder'
 import { useCart } from '~/hooks/useCarts'
@@ -577,6 +579,63 @@ const OrderDetail = () => {
 
   return (
     <Box sx={{ width: '96vw', maxWidth: '1800px', margin: '0 auto', p: 3, minHeight: '70vh' }}>
+      {/* Breadcrumb */}
+      <Box
+        sx={{
+          bottom: { xs: '20px', sm: '30px', md: '40px' },
+          left: { xs: '20px', sm: '30px', md: '40px' },
+          right: { xs: '20px', sm: '30px', md: '40px' },
+          maxWidth: '1800px',
+          margin: '0 auto',
+          mb: 2
+        }}
+      >
+        <Breadcrumbs
+          separator={<NavigateNext fontSize='small' />}
+          aria-label='breadcrumb'
+        >
+          <Link
+            underline='hover'
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              color: '#007bff',
+              textDecoration: 'none',
+              '&:hover': {
+                color: 'primary.main'
+              }
+            }}
+            href='/'
+          >
+            Trang chủ
+          </Link>
+          <Link
+            underline='hover'
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              color: '#007bff',
+              textDecoration: 'none',
+              '&:hover': {
+                color: 'primary.main'
+              }
+            }}
+            href={`/orders`}
+          >
+            Đơn hàng
+          </Link>
+          <Typography
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              color: 'text.primary',
+              fontWeight: 500
+            }}
+          >
+            Chi tiết đơn hàng
+          </Typography>
+        </Breadcrumbs>
+      </Box>
       <Card
         sx={{
           borderRadius: 3,
