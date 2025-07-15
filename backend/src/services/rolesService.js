@@ -58,7 +58,7 @@ const getRoleList = async (queryString) => {
   }
 
   if (search) {
-    filter.name = { $regex: search, $options: 'i' }
+    filter.label = { $regex: search, $options: 'i' }
   }
 
   const dateRange = getDateRange(filterTypeDate, startDate, endDate)
