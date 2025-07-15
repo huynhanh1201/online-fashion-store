@@ -16,7 +16,6 @@ const RestoreVariantModal = ({ open, onClose, variant, restoreVariant }) => {
     try {
       await restoreVariant(variant._id, 'restore')
       onClose()
-      toast.success('Khôi phục biến thể thành công')
     } catch (error) {
       toast.error(
         `Khôi phục biến thể thất bại: ${error?.message || 'Đã xảy ra lỗi không xác định'}`

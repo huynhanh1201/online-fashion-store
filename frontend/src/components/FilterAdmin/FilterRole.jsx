@@ -56,7 +56,7 @@ export default function FilterRole({ onFilter, loading, initialSearch }) {
 
   const applyFilters = (selectedTime, fromDate, toDate) => {
     const filters = {
-      roleName: keyword || undefined,
+      search: keyword || undefined,
       sort: sort || undefined,
       destroy: status || undefined
     }
