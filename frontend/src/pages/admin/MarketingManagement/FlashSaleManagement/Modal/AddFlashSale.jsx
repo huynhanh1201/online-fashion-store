@@ -182,18 +182,36 @@ const AddFlashSale = ({ open, onClose, onSave, initialData }) => {
     clearMessages()
   }
 
+  // Format number with thousand separators
+  const formatNumber = (value) => {
+    if (!value) return ''
+    // Remove all non-digit characters
+    const numericValue = value.toString().replace(/\D/g, '')
+    // Format with thousand separators
+    return numericValue.replace(/\B(?=(\d{3})+(?!\d))/g, '.')
+  }
+
+  // Parse formatted number back to numeric value
+  const parseFormattedNumber = (formattedValue) => {
+    if (!formattedValue) return ''
+    // Remove all non-digit characters and convert to number
+    return formattedValue.toString().replace(/\D/g, '')
+  }
+
   // Xử lý thay đổi giá Flash Sale với debounce và tối ưu API calls
   const handleFlashPriceChange = useCallback(async (index, field, value) => {
     const updated = [...form.products]
-    updated[index][field] = value
+    // Store the raw numeric value for calculations
+    const numericValue = parseFormattedNumber(value)
+    updated[index][field] = numericValue
     setForm((prev) => ({ ...prev, products: updated }))
     clearMessages()
 
     const product = updated[index]
 
     // Validate input immediately
-    if (product._id && value && !isNaN(value) && Number(value) > 0) {
-      const flashSalePrice = Number(value)
+    if (product._id && numericValue && !isNaN(numericValue) && Number(numericValue) > 0) {
+      const flashSalePrice = Number(numericValue)
       
       if (flashSalePrice >= product.originalPrice) {
         setWarning(`Giá Flash Sale phải thấp hơn giá gốc (${product.originalPrice.toLocaleString()} VND)`)
@@ -424,7 +442,7 @@ const AddFlashSale = ({ open, onClose, onSave, initialData }) => {
       if (
         product.originalPrice &&
         product.flashPrice &&
-        parseFloat(product.flashPrice) >= parseFloat(product.originalPrice)
+        Number(product.flashPrice) >= Number(product.originalPrice)
       ) {
         errors.push(
           `Giá Flash Sale của sản phẩm ${index + 1} phải thấp hơn giá gốc`
@@ -519,7 +537,8 @@ const AddFlashSale = ({ open, onClose, onSave, initialData }) => {
           borderRadius: 3,
           boxShadow: '0 4px 24px rgba(0, 0, 0, 0.06)',
           border: '1px solid #e2e8f0',
-          maxHeight:'75vh'
+          maxHeight:'90vh',
+          maxWidth:'70vw'
         }
       }}
     >
@@ -798,12 +817,14 @@ const AddFlashSale = ({ open, onClose, onSave, initialData }) => {
                       <TextField
                         fullWidth
                         label='Giá gốc *'
-                        type='number'
-                        value={product.originalPrice ?? ''}
+                        value={product.originalPrice ? formatNumber(product.originalPrice) : ''}
                         InputProps={{ readOnly: true }}
                         required
                         disabled={isEditMode && product.isDisabled}
-                        inputProps={{ min: 0 }}
+                        inputProps={{
+                          min: 0,
+                          style: { textAlign: 'right' }
+                        }}
                         sx={{
                           '& .MuiOutlinedInput-root': {
                             borderRadius: 2,
@@ -819,14 +840,16 @@ const AddFlashSale = ({ open, onClose, onSave, initialData }) => {
                         <TextField
                           fullWidth
                           label='Giá giảm *'
-                          type='number'
-                          value={product.flashPrice}
+                          value={formatNumber(product.flashPrice)}
                           onChange={(e) =>
                             handleFlashPriceChange(index, 'flashPrice', e.target.value)
                           }
                           required
                           disabled={isEditMode && product.isDisabled}
-                          inputProps={{ min: 0 }}
+                          inputProps={{
+                            min: 0,
+                            style: { textAlign: 'right' }
+                          }}
                           sx={{
                             '& .MuiOutlinedInput-root': {
                               borderRadius: 2,

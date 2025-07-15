@@ -62,8 +62,11 @@ const SortMenuItem = styled('div')(({ theme }) => ({
   cursor: 'pointer',
   color: '#222',
   background: '#fff',
+  transition: 'background 0.2s, color 0.2s, font-weight 0.2s',
   '&:hover': {
-    background: '#f5f5f5'
+    background: '#e3e6f0',
+    color: '#1976d2',
+    fontWeight: 600
   }
 }))
 

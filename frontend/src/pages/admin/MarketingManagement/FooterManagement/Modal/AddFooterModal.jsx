@@ -464,7 +464,7 @@ const AddFooterModal = ({ open, onClose, onSuccess, footerConfig, mode = 'add', 
   }
 
   return (
-    <Dialog open={open} onClose={handleClose} maxWidth='lg' fullWidth sx={{ zIndex: 15000, maxHeight: '90vh', mt:5 }}>
+    <Dialog open={open} onClose={handleClose} maxWidth='lg' fullWidth sx={{ zIndex: 15000, maxHeight: '95vh', mt:5 }}>
       <DialogTitle>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
           Thêm nội dung chân trang mới
@@ -488,7 +488,7 @@ const AddFooterModal = ({ open, onClose, onSuccess, footerConfig, mode = 'add', 
         />
       </Tabs>
 
-      <DialogContent sx={{ maxHeight: '75vh', overflowY: 'auto', p: 0 }}>
+      <DialogContent sx={{ maxHeight: '95vh', overflowY: 'auto', p: 0 }}>
         {error && (
           <Box sx={{ p: 3, pb: 0 }}>
             <Typography color='error'>{error}</Typography>

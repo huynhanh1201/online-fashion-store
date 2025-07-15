@@ -187,7 +187,7 @@ const MobileDrawer = ({ open, onClose }) => {
           display: 'flex',
           flexDirection: 'column',
           gap: 2,
-          mt: 10
+          mt: 12
         }}
       >
         <Typography variant='h6' sx={{ fontWeight: 900 }}>

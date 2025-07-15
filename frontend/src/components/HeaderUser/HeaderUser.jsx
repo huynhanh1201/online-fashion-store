@@ -29,10 +29,10 @@ const StyledAppBar = styled(AppBar)(({ theme }) => ({
   borderBottom: '1px solid rgba(0,0,0,0.05)',
   transition: 'top 0.3s ease',
   [theme.breakpoints.down('md')]: {
-    top: 30
+    top: 40
   },
   [theme.breakpoints.down('sm')]: {
-    top: 30
+    top: 40
   }
 }))
 

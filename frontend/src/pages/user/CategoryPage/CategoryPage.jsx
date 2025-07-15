@@ -327,7 +327,7 @@ const CategoryPage = () => {
         </Box>
       </Box>
       {/* Title dưới banner */}
-      <Box sx={{ textAlign: 'center', mt: -3, mb: 4 }}>
+      <Box sx={{ textAlign: 'center', mt: 3, mb: 3 }}>
         <Typography
           variant='h2'
           sx={{
