@@ -138,17 +138,17 @@ export default function FilterTransaction({ onFilter, loading }) {
           { label: 'Thất bại', value: 'Failed' }
         ]}
       />
-      <FilterSelect
-        label='Xoá'
-        value={destroy}
-        onChange={(val) => {
-          setDestroy(val)
-        }}
-        options={[
-          { label: 'Chưa xoá', value: 'false' },
-          { label: 'Đã xoá', value: 'true' }
-        ]}
-      />
+      {/*<FilterSelect*/}
+      {/*  label='Xoá'*/}
+      {/*  value={destroy}*/}
+      {/*  onChange={(val) => {*/}
+      {/*    setDestroy(val)*/}
+      {/*  }}*/}
+      {/*  options={[*/}
+      {/*    { label: 'Chưa xoá', value: 'false' },*/}
+      {/*    { label: 'Đã xoá', value: 'true' }*/}
+      {/*  ]}*/}
+      {/*/>*/}
       <FilterSelect
         value={sort}
         onChange={setSort}

@@ -37,6 +37,9 @@ import { useDispatch } from 'react-redux'
 import { logoutUserAPI } from '~/redux/user/userSlice'
 import usePermissions from '~/hooks/usePermissions'
 import useRoles from '~/hooks/admin/useRoles.js'
+import LogoutButton from '~/components/modals/Logout.jsx'
+import logo from '~/assets/img/logo.jpg'
+import logoSmall from '~/assets/img/logo-mini.png'
 export default function AdminDrawer({
   open,
   profile,
@@ -415,11 +418,26 @@ export default function AdminDrawer({
       >
         <Box
           onClick={onClose}
-          sx={{ display: 'flex', alignItems: 'center', p: 2 }}
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            px: 2,
+            py: 0.4,
+            cursor: 'pointer',
+            userSelect: 'none'
+          }}
         >
-          <Typography fontWeight='bold' fontSize={18}>
-            LOGO
-          </Typography>
+          <img
+            src={logoSmall}
+            alt={'logo'}
+            style={{
+              width: '100%',
+              height: 56,
+              objectFit: 'contain',
+              pointerEvents: 'none',
+              userSelect: 'none'
+            }}
+          />
         </Box>
 
         <Divider sx={{ my: 0 }} />
@@ -536,11 +554,26 @@ export default function AdminDrawer({
     >
       <Box
         onClick={onClose}
-        sx={{ display: 'flex', alignItems: 'center', p: 2 }}
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          px: 2,
+          pt: 0.7,
+          cursor: 'pointer',
+          userSelect: 'none'
+        }}
       >
-        <Typography fontWeight='bold' fontSize={18}>
-          LOGO
-        </Typography>
+        <img
+          src={logo}
+          alt={'logo'}
+          style={{
+            width: '100%',
+            height: 56,
+            objectFit: 'contain',
+            pointerEvents: 'none',
+            userSelect: 'none'
+          }}
+        />
       </Box>
 
       <Divider sx={{ my: 0 }} />
@@ -774,18 +807,7 @@ export default function AdminDrawer({
         </List>
       </Box>
       <Divider sx={{ my: 0 }} />
-      <Box sx={{ p: 0, textAlign: 'center' }}>
-        <List sx={{ flexGrow: 1, p: 0 }}>
-          <ListItem disablePadding onClick={handleLogout}>
-            <ListItemButton sx={{ ...activeButtonStyle }}>
-              <ListItemIcon>
-                <ExitToAppIcon color='error' />
-              </ListItemIcon>
-              <ListItemText sx={{ color: '#f00' }} primary='Đăng xuất' />
-            </ListItemButton>
-          </ListItem>
-        </List>
-      </Box>
+      <LogoutButton handleLogout={handleLogout} />
     </Box>
   )
 }

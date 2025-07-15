@@ -28,7 +28,7 @@ const EditWarehouseModal = React.lazy(
 import ViewWarehouseModal from '../modal/Warehouse/ViewWarehouseModal.jsx'
 import DeleteWarehouseModal from '../modal/Warehouse/DeleteWarehouseModal.jsx' // Thêm Chart mới
 import Tooltip from '@mui/material/Tooltip'
-import FilterWarehouse from '~/components/FilterAdmin/FilterWarehouse.jsx'
+// import FilterWarehouse from '~/components/FilterAdmin/FilterWarehouse.jsx'
 import useWarehouses from '~/hooks/admin/Inventory/useWarehouses.js'
 import TablePaginationActions from '~/components/PaginationAdmin/TablePaginationActions.jsx'
 import Chip from '@mui/material/Chip'
@@ -52,8 +52,8 @@ const WarehousesTab = () => {
   )
 
   // Điều kiện: Chỉ cho phép bấm nút nếu activeWarehouses.length <= 1 và có quyền tạo
-  const isAddDisabled =
-    activeWarehouses.length >= 1 || !hasPermission('warehouse:create')
+  const shouldShowAddButton =
+    activeWarehouses.length === 0 && hasPermission('warehouse:create')
   const warehouseColumns = [
     {
       id: 'index',
@@ -80,13 +80,10 @@ const WarehousesTab = () => {
   const [selectedWarehouse, setSelectedWarehouse] = useState(null)
   const [page, setPage] = useState(1) // State cho trang hiện tại
   const [rowsPerPage, setRowsPerPage] = useState(10) // State cho số dòng mỗi trang
-  const [filter, setFilter] = useState({
-    sort: 'newest'
-  })
 
   useEffect(() => {
-    fetchWarehouses(page, rowsPerPage, filter)
-  }, [page, rowsPerPage, filter])
+    fetchWarehouses(page, rowsPerPage)
+  }, [page, rowsPerPage])
 
   const handleAddWarehouse = () => {
     setOpenAddModal(true)
@@ -123,7 +120,7 @@ const WarehousesTab = () => {
 
   const handleSave = async (warehouse, type, warehouseId) => {
     if (type === 'add') {
-      await createNewWarehouse(warehouse, filter)
+      await createNewWarehouse(warehouse)
     } else if (type === 'edit') {
       await updateWarehouseById(warehouseId, warehouse)
     } else if (type === 'delete') {
@@ -131,14 +128,12 @@ const WarehousesTab = () => {
     }
   }
 
-  const isEqual = (obj1, obj2) => JSON.stringify(obj1) === JSON.stringify(obj2)
-
-  const handleFilter = (newFilters) => {
-    if (!isEqual(filter, newFilters)) {
-      setPage(1)
-      setFilter(newFilters)
-    }
-  }
+  // const handleFilter = (newFilters) => {
+  //   if (!isEqual(filter, newFilters)) {
+  //     setPage(1)
+  //     setFilter(newFilters)
+  //   }
+  // }
   const handleChangePage = (event, value) => setPage(value)
 
   const onChangeRowsPerPage = (newLimit) => {
@@ -146,7 +141,7 @@ const WarehousesTab = () => {
     setRowsPerPage(newLimit)
   }
 
-  if (!activeWarehouses)
+  if (shouldShowAddButton)
     return (
       <Paper
         sx={{ border: '1px solid #ccc', width: '100%', overflow: 'hidden' }}
@@ -195,12 +190,12 @@ const WarehousesTab = () => {
                         Thêm
                       </Button>
                     </Box>
-                    <FilterWarehouse
-                      loading={loadingWarehouse}
-                      onFilter={handleFilter}
-                      warehouses={warehouses}
-                      fetchWarehouses={fetchWarehouses}
-                    />
+                    {/*<FilterWarehouse*/}
+                    {/*  loading={loadingWarehouse}*/}
+                    {/*  onFilter={handleFilter}*/}
+                    {/*  warehouses={warehouses}*/}
+                    {/*  fetchWarehouses={fetchWarehouses}*/}
+                    {/*/>*/}
                   </Box>
                 </TableCell>
               </TableRow>
@@ -377,7 +372,7 @@ const WarehousesTab = () => {
         />
 
         <Suspense fallback={<div>Loading...</div>}>
-          {openAddModal && !isAddDisabled && (
+          {openAddModal && shouldShowAddButton && (
             <AddWarehouseModal
               open={openAddModal}
               onClose={handleCloseAddModal}
@@ -430,12 +425,12 @@ const WarehousesTab = () => {
                       Danh Sách Kho Hàng
                     </Typography>
                   </Box>
-                  <FilterWarehouse
-                    loading={loadingWarehouse}
-                    onFilter={handleFilter}
-                    warehouses={warehouses}
-                    fetchWarehouses={fetchWarehouses}
-                  />
+                  {/*<FilterWarehouse*/}
+                  {/*  loading={loadingWarehouse}*/}
+                  {/*  onFilter={handleFilter}*/}
+                  {/*  warehouses={warehouses}*/}
+                  {/*  fetchWarehouses={fetchWarehouses}*/}
+                  {/*/>*/}
                 </Box>
               </TableCell>
             </TableRow>
@@ -620,7 +615,7 @@ const WarehousesTab = () => {
       />
 
       <Suspense fallback={<div>Loading...</div>}>
-        {openAddModal && !isAddDisabled && (
+        {openAddModal && shouldShowAddButton && (
           <AddWarehouseModal
             open={openAddModal}
             onClose={handleCloseAddModal}

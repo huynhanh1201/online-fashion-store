@@ -52,7 +52,7 @@ const ProductImageModal = ({ open, onClose, imageSrc, productName }) => {
           style={{
             width: '100%',
             height: '500px',
-            objectFit: 'cover'
+            objectFit: 'contain'
           }}
         />
       </DialogContent>

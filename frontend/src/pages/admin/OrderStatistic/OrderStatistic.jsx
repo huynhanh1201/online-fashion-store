@@ -213,6 +213,8 @@ const OrderStatistic = ({ stats = {}, financeStatistics, year, setYear }) => {
       }
     }
   }
+  const hasChartData = (chartData) =>
+    chartData?.datasets?.[0]?.data?.some((value) => value > 0)
   return (
     <div className='order-statistic-wrapper'>
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
@@ -436,11 +438,26 @@ const OrderStatistic = ({ stats = {}, financeStatistics, year, setYear }) => {
                   <Typography variant='h5' fontWeight='bold' mb={1}>
                     Phương thức thanh toán
                   </Typography>
-                  <Box sx={{ maxWidth: 500, margin: '0 auto' }}>
-                    <Pie
-                      data={piePaymentChart}
-                      options={piePaymentChart.options}
-                    />
+                  <Box
+                    sx={{
+                      maxWidth: 500,
+                      margin: '0 auto',
+                      height: 400,
+                      display: 'flex',
+                      justifyContent: 'center',
+                      alignItems: 'center'
+                    }}
+                  >
+                    {hasChartData(piePaymentChart) ? (
+                      <Pie
+                        data={piePaymentChart}
+                        options={piePaymentChart.options}
+                      />
+                    ) : (
+                      <Typography variant='h6' color='text.secondary'>
+                        Không có dữ liệu
+                      </Typography>
+                    )}
                   </Box>
                 </Box>
               </Grid>
@@ -457,11 +474,26 @@ const OrderStatistic = ({ stats = {}, financeStatistics, year, setYear }) => {
                   <Typography variant='h5' fontWeight='bold' mb={1}>
                     Trạng thái đơn hàng
                   </Typography>
-                  <Box sx={{ maxWidth: 500, margin: '0 auto' }}>
-                    <Pie
-                      data={pieStatusChart}
-                      options={pieStatusChart.options}
-                    />
+                  <Box
+                    sx={{
+                      maxWidth: 500,
+                      margin: '0 auto',
+                      height: 400,
+                      display: 'flex',
+                      justifyContent: 'center',
+                      alignItems: 'center'
+                    }}
+                  >
+                    {hasChartData(pieStatusChart) ? (
+                      <Pie
+                        data={pieStatusChart}
+                        options={pieStatusChart.options}
+                      />
+                    ) : (
+                      <Typography variant='h6' color='text.secondary'>
+                        Không có dữ liệu
+                      </Typography>
+                    )}
                   </Box>
                 </Box>
               </Grid>

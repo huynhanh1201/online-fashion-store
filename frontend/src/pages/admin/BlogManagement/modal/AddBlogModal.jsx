@@ -204,7 +204,6 @@ const BlogModal = ({
     try {
       const imageUrl = await uploadToCloudinary(file, 'blog_covers')
       setValue('coverImage', imageUrl)
-      toast.success('Upload ảnh bìa thành công!')
     } catch (error) {
       toast.error('Có lỗi xảy ra khi upload ảnh: ' + error.message)
     } finally {
@@ -272,7 +271,7 @@ const BlogModal = ({
       open={open}
       onClose={handleClose}
       fullWidth
-      maxWidth={isMobile ? 'sm' : 'xxl'}
+      maxWidth={isMobile ? 'sm' : 'lg'}
       fullScreen={isMobile}
       sx={{
         '& .MuiDialog-container': { alignItems: 'end' },

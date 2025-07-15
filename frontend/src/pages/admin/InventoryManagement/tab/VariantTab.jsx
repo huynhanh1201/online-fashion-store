@@ -180,10 +180,15 @@ const VariantsTab = () => {
       align: 'center'
     },
     { id: 'sku', label: 'Mã biến thể', minWidth: 100 },
-    { id: 'name', label: 'Tên sản phẩm', minWidth: 250 },
+    { id: 'name', label: 'Tên biến thể', minWidth: 250 },
     { id: 'color', label: 'Màu sắc', minWidth: 150 },
     { id: 'size.name', label: 'Kích thước', minWidth: 150 },
-    { id: 'quantity', label: 'Số lượng', minWidth: 100, align: 'right' },
+    {
+      id: 'quantity',
+      label: 'Trạng thái trong kho',
+      minWidth: 100,
+      align: 'right'
+    },
     // {
     //   id: 'importPrice',
     //   label: 'Giá nhập',
@@ -321,7 +326,7 @@ const VariantsTab = () => {
                       ...(column.id === 'action' && {
                         width: '130px',
                         maxWidth: '130px',
-                        paddingLeft: '20px'
+                        paddingLeft: '12px'
                       })
                     }}
                   >
@@ -405,7 +410,7 @@ const VariantsTab = () => {
                           <Stack
                             direction='row'
                             spacing={1}
-                            justifyContent='center'
+                            justifyContent='start'
                           >
                             {hasPermission('variant:read') && (
                               <Tooltip title='Xem'>
@@ -481,7 +486,7 @@ const VariantsTab = () => {
                             verticalAlign: 'middle',
                             background: '#fff',
                             ...(id === 'sku' || id === 'name'
-                              ? { maxWidth: 150 } // Ẩn tràn nếu mã hoặc tên dài
+                              ? { maxWidth: 150, cursor: 'pointer' } // Ẩn tràn nếu mã hoặc tên dài
                               : {}),
                             ...(id === 'discountPrice' && { pr: column.pr }),
                             ...(id === 'sku' ||

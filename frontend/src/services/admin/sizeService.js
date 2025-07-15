@@ -71,7 +71,7 @@ export const deleteSize = async (sizeId) => {
 export const restoreSize = async (sizeId) => {
   try {
     const response = await AuthorizedAxiosInstance.patch(
-      `${API_ROOT}/v1/colors/restore/${sizeId}`
+      `${API_ROOT}/v1/sizes/restore/${sizeId}`
     )
     return response.data
   } catch (error) {

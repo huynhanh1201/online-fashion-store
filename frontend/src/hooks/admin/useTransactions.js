@@ -43,22 +43,46 @@ const useTransactions = () => {
     return await getTransactionById(transactionId)
   }
 
-  const updateTransaction = async (transactionId, data) => {
+  const updateTransaction = async (transactionId, newData) => {
     try {
-      const updatedTransaction = await updateTransactionById(
-        transactionId,
-        data
+      const oldTransaction = transactions.find(
+        (transaction) => transaction._id === transactionId
       )
-      if (updatedTransaction) {
-        setTransactions((prev) =>
-          prev.map((transaction) =>
-            transaction._id === transactionId ? updatedTransaction : transaction
-          )
+      if (!oldTransaction) return null
+
+      const noteChanged = newData.note !== oldTransaction.note
+      const statusChanged = newData.status !== oldTransaction.status
+
+      // Nếu không có gì thay đổi thì bỏ qua
+      if (!noteChanged && !statusChanged) {
+        console.log('Không có thay đổi, bỏ qua cập nhật.')
+        return oldTransaction
+      }
+
+      // Luôn gửi cả 2 nếu có 1 thay đổi
+      const changedData = {
+        note: newData.note,
+        status: newData.status
+      }
+
+      // Gửi request cập nhật
+      await updateTransactionById(transactionId, changedData)
+
+      // Cập nhật lại trong state
+      setTransactions((prev) =>
+        prev.map((transaction) =>
+          transaction._id === transactionId
+            ? {
+                ...transaction,
+                ...changedData
+              }
+            : transaction
         )
-        return updatedTransaction
-      } else {
-        console.error('Cập nhật giao dịch thất bại')
-        return null
+      )
+
+      return {
+        ...oldTransaction,
+        ...changedData
       }
     } catch (error) {
       console.error('Lỗi khi cập nhật giao dịch:', error)

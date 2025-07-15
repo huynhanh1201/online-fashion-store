@@ -107,7 +107,7 @@ export default function FilterVariant({
       colorName: c || undefined,
       sizeName: s || undefined,
       overridePrice: op !== '' ? op === 'true' : undefined,
-      status: d !== '' ? d === 'true' : undefined,
+      status: d || undefined,
       destroy: st !== '' ? st === 'true' : undefined,
       sort: so || undefined,
       importPriceMin: ipMin || undefined,
@@ -220,17 +220,17 @@ export default function FilterVariant({
       {/*  ]}*/}
       {/*/>*/}
 
-      <FilterSelect
-        label='Trạng thái'
-        value={status}
-        onChange={setStatus}
-        options={[
-          { label: 'Tất cả', value: '' },
-          { label: 'Nháp', value: 'draft' },
-          { label: 'Hoạt động', value: 'active' },
-          { label: 'Ngừng bán', value: 'inactive' }
-        ]}
-      />
+      {/*<FilterSelect*/}
+      {/*  label='Trạng thái'*/}
+      {/*  value={status}*/}
+      {/*  onChange={setStatus}*/}
+      {/*  options={[*/}
+      {/*    { label: 'Tất cả', value: '' },*/}
+      {/*    { label: 'Nháp', value: 'draft' },*/}
+      {/*    { label: 'Hoạt động', value: 'active' },*/}
+      {/*    { label: 'Ngừng bán', value: 'inactive' }*/}
+      {/*  ]}*/}
+      {/*/>*/}
 
       {/*<FilterByPrice*/}
       {/*  label='Giá vốn'*/}

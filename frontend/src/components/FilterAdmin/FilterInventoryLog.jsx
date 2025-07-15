@@ -258,14 +258,7 @@ import FilterSelect from '~/components/FilterAdmin/common/FilterSelect'
 import FilterByTime from '~/components/FilterAdmin/common/FilterByTime'
 import SearchWithSuggestions from '~/components/FilterAdmin/common/SearchWithSuggestions'
 import useInventoryLogs from '~/hooks/admin/Inventory/useInventoryLogs.js'
-export default function FilterInventoryLog({
-  onFilter,
-  // inventories = [],
-  // warehouses = [],
-  // batches = [],
-  // users = [],
-  loading
-}) {
+export default function FilterInventoryLog({ onFilter, loading }) {
   const [keyword, setKeyword] = useState('')
   const [inputValue, setInputValue] = useState('')
   const [inventoryId, setInventoryId] = useState('')
@@ -286,7 +279,7 @@ export default function FilterInventoryLog({
   const hasMounted = useRef(false)
   const { logs, fetchLogs } = useInventoryLogs()
   useEffect(() => {
-    fetchLogs(1, 100000, { sort: sort })
+    fetchLogs(1, 100000)
   }, [])
 
   useEffect(() => {

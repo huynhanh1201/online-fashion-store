@@ -1,6 +1,9 @@
 import React, { useEffect } from 'react'
 import { useForm, Controller } from 'react-hook-form'
-
+import { DatePicker } from '@mui/x-date-pickers/DatePicker'
+import { LocalizationProvider } from '@mui/x-date-pickers'
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns'
+import customVi from '~/components/DateInput/CustomVi.jsx'
 import {
   Dialog,
   DialogTitle,
@@ -69,7 +72,6 @@ const AddDiscountModal = ({ open, onClose, onAdded }) => {
         toast.error('Vui lòng nhập giá trị giảm!')
         return
       }
-      toast.success('Thêm mã giảm giá thành công!')
       reset()
       onClose()
     } catch (error) {
@@ -284,62 +286,76 @@ const AddDiscountModal = ({ open, onClose, onAdded }) => {
                 )}
               />
 
-              <Controller
-                name='validFrom'
-                control={control}
-                rules={{
-                  required: 'Vui lòng chọn ngày bắt đầu'
-                }}
-                render={({ field, fieldState }) => (
-                  <TextField
-                    {...field}
-                    type='datetime-local'
-                    label={
-                      <>
-                        Ngày bắt đầu <span style={{ color: 'red' }}>*</span>
-                      </>
+              <LocalizationProvider
+                dateAdapter={AdapterDateFns}
+                adapterLocale={customVi}
+              >
+                <Controller
+                  name='validFrom'
+                  control={control}
+                  rules={{
+                    required: 'Vui lòng chọn ngày bắt đầu'
+                  }}
+                  render={({ field, fieldState }) => (
+                    <DatePicker
+                      label={
+                        <>
+                          Ngày bắt đầu <span style={{ color: 'red' }}>*</span>
+                        </>
+                      }
+                      value={field.value || null}
+                      onChange={field.onChange}
+                      format='dd/MM/yyyy'
+                      slotProps={{
+                        textField: {
+                          fullWidth: true,
+                          margin: 'normal',
+                          error: !!fieldState.error,
+                          helperText: fieldState.error?.message,
+                          sx: StyleAdmin.InputCustom
+                        }
+                      }}
+                    />
+                  )}
+                />
+
+                <Controller
+                  name='validUntil'
+                  control={control}
+                  rules={{
+                    required: 'Vui lòng chọn ngày kết thúc',
+                    validate: (value) => {
+                      const from = new Date(watch('validFrom'))
+                      const to = new Date(value)
+                      if (!value) return 'Vui lòng chọn ngày kết thúc'
+                      if (isNaN(from.getTime()) || isNaN(to.getTime()))
+                        return true
+                      return to > from || 'Ngày kết thúc phải sau ngày bắt đầu'
                     }
-                    fullWidth
-                    margin='normal'
-                    InputLabelProps={{ shrink: true }}
-                    error={!!fieldState.error}
-                    helperText={fieldState.error?.message}
-                    sx={StyleAdmin.InputCustom}
-                  />
-                )}
-              />
-              <Controller
-                name='validUntil'
-                control={control}
-                rules={{
-                  required: 'Vui lòng chọn ngày kết thúc',
-                  validate: (value) => {
-                    const from = new Date(watch('validFrom'))
-                    const to = new Date(value)
-                    if (!value) return 'Vui lòng chọn ngày kết thúc'
-                    if (isNaN(from.getTime()) || isNaN(to.getTime()))
-                      return true // tránh lỗi khi from chưa chọn
-                    return to > from || 'Ngày kết thúc phải sau ngày bắt đầu'
-                  }
-                }}
-                render={({ field, fieldState }) => (
-                  <TextField
-                    {...field}
-                    type='datetime-local'
-                    label={
-                      <>
-                        Ngày kết thúc <span style={{ color: 'red' }}>*</span>
-                      </>
-                    }
-                    fullWidth
-                    margin='normal'
-                    InputLabelProps={{ shrink: true }}
-                    error={!!fieldState.error}
-                    helperText={fieldState.error?.message}
-                    sx={StyleAdmin.InputCustom}
-                  />
-                )}
-              />
+                  }}
+                  render={({ field, fieldState }) => (
+                    <DatePicker
+                      label={
+                        <>
+                          Ngày kết thúc <span style={{ color: 'red' }}>*</span>
+                        </>
+                      }
+                      value={field.value || null}
+                      onChange={field.onChange}
+                      format='dd/MM/yyyy'
+                      slotProps={{
+                        textField: {
+                          fullWidth: true,
+                          margin: 'normal',
+                          error: !!fieldState.error,
+                          helperText: fieldState.error?.message,
+                          sx: StyleAdmin.InputCustom
+                        }
+                      }}
+                    />
+                  )}
+                />
+              </LocalizationProvider>
             </Box>
           </Box>
         </DialogContent>

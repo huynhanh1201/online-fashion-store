@@ -79,7 +79,7 @@ const TransactionRow = ({ transaction, index, onView, onEdit, onDelete }) => {
       <TableCell sx={{ ...styles.cell, pr: 10 }} align='right'>
         {transaction?.orderId?.total != null
           ? `${transaction.orderId.total.toLocaleString('vi-VN')}₫`
-          : '—'}
+          : '0₫'}
       </TableCell>
       <TableCell sx={styles.cell}>
         {formatDate(transaction.createdAt)}
