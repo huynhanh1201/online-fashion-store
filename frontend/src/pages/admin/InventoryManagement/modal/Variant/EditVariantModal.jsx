@@ -170,7 +170,7 @@ const EditVariantModal = ({
               width: 403,
               height: 530,
               border: '1px dashed #ccc',
-              backgroundColor: '#f9f9f9',
+              backgroundColor: '#ccc',
               borderRadius: 2,
               display: 'flex',
               alignItems: 'center',

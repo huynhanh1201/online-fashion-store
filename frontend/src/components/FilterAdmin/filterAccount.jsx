@@ -117,10 +117,13 @@ export default function FilterAccount({ onFilter, loading, roles }) {
           setRole(value)
           applyFilters(selectedFilter, startDate, endDate)
         }}
-        options={filterRoles.map((role) => ({
-          label: role.label,
-          value: role.name
-        }))}
+        options={[
+          { label: 'Tất cả', value: '' }, // Tuỳ chọn tất cả
+          ...filterRoles.map((role) => ({
+            label: role.label,
+            value: role.name
+          }))
+        ]}
         sx={{ width: 160 }}
       />
 

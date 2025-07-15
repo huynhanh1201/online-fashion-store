@@ -238,7 +238,8 @@ const ViewBlogModal = ({ open, onClose, blog, isMobile }) => {
           <Box
             className='content-selectable'
             sx={{
-              '& p': { marginBottom: 1 }
+              '& p': { marginBottom: 1 },
+              '& img': { maxWidth: '100%', height: 'auto' }
             }}
             dangerouslySetInnerHTML={{
               __html: blog?.content || '<p>Không có nội dung</p>'

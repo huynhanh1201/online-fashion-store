@@ -197,7 +197,6 @@ const AddVariantModal = ({
     try {
       const url = await uploadToCloudinary(file, 'color_upload')
       setValue('colorImage', url)
-      toast.success('Upload ảnh thành công')
     } catch {
       toast.error('Lỗi khi upload ảnh')
     }
@@ -209,7 +208,6 @@ const AddVariantModal = ({
       if (newColor?.name) {
         setValue('color', newColor.name) // ✅ gán tên màu mới vào field 'color'
       }
-      toast.success('Thêm màu thành công')
     } catch (error) {
       console.error('Lỗi khi thêm màu:', error)
       toast.error('Lỗi khi thêm màu')
@@ -222,7 +220,6 @@ const AddVariantModal = ({
       if (newSize?.name) {
         setValue('size', newSize.name) // ✅ gán tên size mới vào field 'size'
       }
-      toast.success('Thêm kích thước thành công')
     } catch (error) {
       console.error('Lỗi khi thêm kích thước:', error)
       toast.error('Lỗi khi thêm kích thước')
@@ -285,7 +282,6 @@ const AddVariantModal = ({
       }
 
       await addVariant(finalVariant, 'add')
-      toast.success('Thêm biến thể thành công')
       handleClose()
     } catch (err) {
       console.error(err)
@@ -346,7 +342,7 @@ const AddVariantModal = ({
               minWidth: 403,
               minHeight: 403,
               border: '1px dashed #ccc',
-              backgroundColor: '#f9f9f9',
+              backgroundColor: '#ccc',
               borderRadius: 2,
               display: 'flex',
               alignItems: 'center',

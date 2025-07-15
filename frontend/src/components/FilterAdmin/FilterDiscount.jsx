@@ -53,91 +53,59 @@ export default function FilterDiscount({ onFilter, loading }) {
     }
   }, [keyword, type, isActive, sort, destroy])
 
-  const handleSelectFilter = (filter) => {
-    if (filter === createdFilter) {
-      setCreatedFilter('')
-      setCreatedStart(dayjs().format('YYYY-MM-DD'))
-      setCreatedEnd(dayjs().format('YYYY-MM-DD'))
-      applyFilters('', '', '')
-    } else {
-      setCreatedFilter(filter)
-      if (filter !== 'custom') {
-        applyFilters(filter, createdStart, createdEnd)
-      }
-    }
-  }
-
-  const handleApplyTime = (filterType) => {
-    applyFilters(filterType, createdStart, createdEnd)
-  }
-
-  const applyFilters = ({
-    search: k = keyword,
-    type: t = type,
-    amountMin: am = amountMin,
-    amountMax: ax = amountMax,
-    minOrderMin: moMin = minOrderMin,
-    minOrderMax: moMax = minOrderMax,
-    usageMin: um = usageMin,
-    usageMax: ux = usageMax,
-    usedMin: usedMinVal = usedCountMin,
-    usedMax: usedMaxVal = usedCountMax,
-    status: active = isActive,
-    sort: s = sort,
-    destroy: d = destroy
-  } = {}) => {
+  const applyFilters = (
+    selectedTime = createdFilter,
+    fromDate = createdStart,
+    toDate = createdEnd
+  ) => {
     const filters = {
-      search: k || undefined,
-      type: t || undefined,
-      status: active !== '' ? active === 'true' : undefined,
-      sort: s || undefined,
-      destroy: d || undefined,
+      search: keyword || undefined,
+      type: type || undefined,
+      status: isActive !== '' ? isActive === 'true' : undefined,
+      sort: sort || undefined,
+      destroy: destroy || undefined,
 
-      amountMin: am ? parseInt(am) : undefined,
-      amountMax: ax ? parseInt(ax) : undefined,
+      amountMin: amountMin ? parseInt(amountMin) : undefined,
+      amountMax: amountMax ? parseInt(amountMax) : undefined,
 
-      minOrderMin: moMin ? parseInt(moMin) : undefined,
-      minOrderMax: moMax ? parseInt(moMax) : undefined,
+      minOrderMin: minOrderMin ? parseInt(minOrderMin) : undefined,
+      minOrderMax: minOrderMax ? parseInt(minOrderMax) : undefined,
 
-      usageLimitMin: um ? parseInt(um) : undefined,
-      usageLimitMax: ux ? parseInt(ux) : undefined,
+      usageLimitMin: usageMin ? parseInt(usageMin) : undefined,
+      usageLimitMax: usageMax ? parseInt(usageMax) : undefined,
 
-      usedCountMin: usedMinVal ? parseInt(usedMinVal) : undefined,
-      usedCountMax: usedMaxVal ? parseInt(usedMaxVal) : undefined
+      usedCountMin: usedCountMin ? parseInt(usedCountMin) : undefined,
+      usedCountMax: usedCountMax ? parseInt(usedCountMax) : undefined
     }
 
-    // Thêm bộ lọc thời gian nếu là custom
+    if (selectedTime === 'custom') {
+      filters.filterTypeDate = 'custom'
+      filters.startDate = fromDate
+      filters.endDate = toDate
+    } else if (selectedTime) {
+      filters.filterTypeDate = selectedTime
+    }
+
+    // Giữ lại logic validFrom/validUntil nếu cần
     if (validFromFilter === 'custom') {
       filters.validFromQuick = validFromFilter
-      filters.validFromFrom = validFromStart || undefined
-      filters.validFromTo = validFromEnd || undefined
+      filters.validFromFrom = validFromStart
+      filters.validFromTo = validFromEnd
     } else if (validFromFilter) {
       filters.validFromQuick = validFromFilter
     }
 
     if (validUntilFilter === 'custom') {
       filters.validUntilQuick = validUntilFilter
-      filters.validUntilFrom = validUntilStart || undefined
-      filters.validUntilTo = validUntilEnd || undefined
+      filters.validUntilFrom = validUntilStart
+      filters.validUntilTo = validUntilEnd
     } else if (validUntilFilter) {
       filters.validUntilQuick = validUntilFilter
     }
 
-    if (createdFilter === 'custom') {
-      filters.filterTypeDate = createdFilter
-      filters.startDate = createdStart || undefined
-      filters.endDate = createdEnd || undefined
-    } else if (createdFilter) {
-      filters.filterTypeDate = createdFilter
-    }
-
-    // Xoá field rỗng/null/undefined
+    // Xoá field rỗng
     Object.keys(filters).forEach((key) => {
-      if (
-        filters[key] === undefined ||
-        filters[key] === null ||
-        filters[key] === ''
-      ) {
+      if (!filters[key] && filters[key] !== false) {
         delete filters[key]
       }
     })
@@ -270,14 +238,15 @@ export default function FilterDiscount({ onFilter, loading }) {
         label='Lọc thời gian tạo'
         selectedFilter={createdFilter}
         setSelectedFilter={setCreatedFilter}
-        onSelectFilter={handleSelectFilter}
-        onApply={handleApplyTime}
         startDate={createdStart}
         setStartDate={setCreatedStart}
         endDate={createdEnd}
         setEndDate={setCreatedEnd}
+        onApply={(selected) => {
+          setCreatedFilter(selected)
+          applyFilters(selected, createdStart, createdEnd)
+        }}
       />
-
       <Box display='flex' gap={2}>
         <SearchWithSuggestions
           label='Mã giảm giá'
@@ -287,7 +256,6 @@ export default function FilterDiscount({ onFilter, loading }) {
           setInputValue={setInputValue}
           onSearch={() => {
             setKeyword(inputValue)
-            applyFilters()
           }}
           options={discounts.map((d) => d.code)}
           loading={loading}

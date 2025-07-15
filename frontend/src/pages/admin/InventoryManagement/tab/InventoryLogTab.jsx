@@ -22,12 +22,7 @@ import {
 import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye'
 import ViewInventoryLogModal from '../modal/InventoryLog/ViewInventoryLogModal'
 import FilterInventoryLog from '~/components/FilterAdmin/FilterInventoryLog.jsx'
-import useUsers from '~/hooks/admin/useUsers.js'
-import useBatches from '~/hooks/admin/Inventory/useBatches.js'
 import useInventoryLog from '~/hooks/admin/Inventory/useInventoryLogs.js'
-import useVariants from '~/hooks/admin/Inventory/useVariants.js'
-import useInventory from '~/hooks/admin/Inventory/useInventorys.js'
-import useWarehouses from '~/hooks/admin/Inventory/useWarehouses.js'
 import TablePaginationActions from '~/components/PaginationAdmin/TablePaginationActions.jsx'
 import TableNoneData from '~/components/TableAdmin/NoneData.jsx'
 import Tooltip from '@mui/material/Tooltip'
@@ -35,11 +30,6 @@ import usePermissions from '~/hooks/usePermissions'
 
 const InventoryLogTab = () => {
   const { logs, fetchLogs, loadingLog, totalLogs } = useInventoryLog()
-  const { variants, fetchVariants } = useVariants()
-  const { warehouses, fetchWarehouses } = useWarehouses()
-  const { batches, fetchBatches } = useBatches()
-  const { users, fetchUsers } = useUsers()
-  const { inventories, fetchInventories } = useInventory()
 
   const [page, setPage] = useState(1) // State cho trang hiện tại
   const [rowsPerPage, setRowsPerPage] = useState(10) // State cho số dòng mỗi trang
@@ -50,13 +40,6 @@ const InventoryLogTab = () => {
   const [selectedLog, setSelectedLog] = useState(null) // State cho bản ghi được chọn
   const { hasPermission } = usePermissions()
 
-  useEffect(() => {
-    fetchInventories()
-    fetchVariants()
-    fetchBatches()
-    fetchUsers()
-    fetchWarehouses()
-  }, [])
   useEffect(() => {
     fetchLogs(page, rowsPerPage, filters)
   }, [page, rowsPerPage, filters])
@@ -157,13 +140,8 @@ const InventoryLogTab = () => {
                     </Typography>
                   </Box>
                   <FilterInventoryLog
-                    warehouses={warehouses}
                     onFilter={handleFilter}
                     loading={loadingLog}
-                    batches={batches}
-                    inventories={inventories}
-                    users={users}
-                    inventoryLog={logs || []}
                   />
                 </Box>
               </TableCell>
@@ -237,12 +215,6 @@ const InventoryLogTab = () => {
                           row.inventoryId?.warehouseId?.name
                         )
                         break
-
-                      case 'batchName': {
-                        const batch = batches.find((b) => b._id === row.batchId)
-                        rawValue = capitalizeWords(batch?.batchCode)
-                        break
-                      }
 
                       case 'typeLabel':
                         rawValue = row.type === 'in' ? 'Nhập' : 'Xuất'
@@ -381,8 +353,6 @@ const InventoryLogTab = () => {
         open={openViewModal}
         onClose={() => setOpenViewModal(false)}
         log={selectedLog}
-        variants={variants}
-        warehouses={warehouses}
       />
     </Paper>
   )

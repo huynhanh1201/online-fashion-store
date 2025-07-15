@@ -76,6 +76,14 @@ const ViewBatchModal = ({ open, onClose, batch }) => {
             </TableRow>
             <TableRow>
               <TableCell>
+                <strong>Ngày sản xuất</strong>
+              </TableCell>
+              <TableCell>
+                {formatDate(batch.manufactureDate) || 'Không có thông tin'}
+              </TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell>
                 <strong>Ngày tạo</strong>
               </TableCell>
               <TableCell>{formatDate(batch.createdAt)}</TableCell>

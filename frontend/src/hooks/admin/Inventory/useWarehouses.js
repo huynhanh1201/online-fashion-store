@@ -42,7 +42,7 @@ const useWarehouses = () => {
     }
   }
 
-  const createNewWarehouse = async (data, filters = {}) => {
+  const createNewWarehouse = async (data) => {
     try {
       const result = await createWarehouse(data)
       if (!result) {
@@ -50,19 +50,9 @@ const useWarehouses = () => {
       }
 
       setWarehouses((prev) => {
-        const sort = filters?.sort
         let updated = [...prev]
 
-        if (sort === 'newest') {
-          updated = [result, ...prev].slice(0, 10)
-        } else if (sort === 'oldest') {
-          if (prev.length < 10) {
-            updated = [...prev, result]
-          }
-          // Nếu đã đủ 10 phần tử thì không thêm
-        } else {
-          updated = [result, ...prev].slice(0, 10) // Mặc định giống newest
-        }
+        updated = [result, ...prev].slice(0, 10)
 
         return updated
       })

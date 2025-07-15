@@ -258,14 +258,15 @@ function ViewOrderModal({
                           sx={{ width: '137px', fontWeight: '800' }}
                           variant='contained'
                         />
+
                         {index < previousStatuses.length - 1 && (
                           <ArrowForwardIcon />
                         )}
                       </React.Fragment>
                     ))}
+                    {previousStatuses.length > 0 && <ArrowForwardIcon />}
                     {hasPermission('order:update') ? (
                       <>
-                        {previousStatuses.length > 0 && <ArrowForwardIcon />}
                         <Chip
                           label={renderStatusLabel(order.status)}
                           color={renderStatusChip(order.status).props.color}
@@ -383,9 +384,6 @@ function ViewOrderModal({
                         <strong>Trạng thái:</strong>
                         {renderStatusChip(h.status)}
                       </Box>
-                    </Typography>
-                    <Typography>
-                      <strong>Ghi chú:</strong> {h.note || 'Không có'}
                     </Typography>
                     <Typography>
                       <strong>Người cập nhật:</strong>{' '}

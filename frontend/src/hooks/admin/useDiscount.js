@@ -4,7 +4,8 @@ import {
   getDiscountById,
   updateDiscount,
   addDiscount,
-  deleteDiscount
+  deleteDiscount,
+  restoreDiscount
 } from '~/services/admin/discountService'
 
 const useDiscounts = () => {
@@ -117,7 +118,7 @@ const useDiscounts = () => {
 
   const restore = async (id) => {
     try {
-      const restored = await updateDiscount(id, { isDeleted: false })
+      const restored = await restoreDiscount(id, { isDeleted: false })
       if (!restored) {
         console.error('Không thể khôi phục giảm giá')
         return null

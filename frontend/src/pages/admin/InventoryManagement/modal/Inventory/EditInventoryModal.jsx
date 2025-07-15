@@ -61,7 +61,6 @@ const EditInventoryModal = ({
 
     try {
       await onSave(payload, 'edit', inventory._id)
-      toast.success('Cập nhật tồn kho thành công')
       onClose()
     } catch {
       toast.error('Cập nhật tồn kho thất bại')
