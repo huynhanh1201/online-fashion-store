@@ -29,6 +29,8 @@ const RestoreVariantModal = ({ open, onClose, variant, restoreVariant }) => {
       open={open}
       onClose={onClose}
       sx={{ padding: '16px 24px' }}
+      maxWidth='sm'
+      fullWidth
       BackdropProps={{
         sx: StyleAdmin.OverlayModal
       }}

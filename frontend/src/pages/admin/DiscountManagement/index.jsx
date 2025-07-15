@@ -45,7 +45,6 @@ function DiscountManagement() {
   React.useEffect(() => {
     fetchDiscounts(page, ROWS_PER_PAGE, filters)
   }, [page, ROWS_PER_PAGE, filters])
-
   const handleOpenModal = (type, discount) => {
     if (!discount || !discount._id) return
 

@@ -56,17 +56,49 @@ const useBatches = () => {
     }
   }
 
-  const updateBatchById = async (id, data) => {
+  const updateBatchById = async (id, newData) => {
     try {
-      const updatedBatch = await updateBatch(id, data)
+      const oldBatch = batches.find((batch) => batch._id === id)
+      if (!oldBatch) return null
+
+      const importPriceChanged = newData.importPrice !== oldBatch.importPrice
+      const manufactureDateChanged =
+        new Date(newData.manufactureDate).toISOString() !==
+        new Date(oldBatch.manufactureDate).toISOString()
+
+      // Nếu không có gì thay đổi thì bỏ qua
+      if (!importPriceChanged && !manufactureDateChanged) {
+        console.log('Không có thay đổi, bỏ qua cập nhật.')
+        return oldBatch
+      }
+
+      // Nếu có 1 trong 2 thay đổi thì gửi cả 2
+      const changedData = {
+        importPrice: newData.importPrice,
+        manufactureDate: newData.manufactureDate
+      }
+
+      // Gửi dữ liệu đã thay đổi lên server
+      await updateBatch(id, changedData)
+
+      // Cập nhật lại trong state
       setBatches((prev) =>
         prev.map((batch) =>
-          batch._id === updatedBatch._id ? updatedBatch : batch
+          batch._id === id
+            ? {
+                ...batch,
+                ...changedData
+              }
+            : batch
         )
       )
-      return updatedBatch
+
+      return {
+        ...oldBatch,
+        ...changedData
+      }
     } catch (error) {
-      console.error('Error updating batch:', error)
+      console.error('Lỗi khi cập nhật batch:', error)
       return null
     }
   }

@@ -59,19 +59,20 @@ const AdminHome = () => {
         </Typography>
       </Box>
     )
+  } else {
+    return (
+      <RouteGuard requiredPermissions={['admin:access']}>
+        <SystemDashboard
+          loading={loading}
+          accountStatistics={accountStatistics}
+          warehouseStatistics={warehouseStatistics}
+          productStatistics={productStatistics}
+          orderStatistics={orderStatistics}
+          financeStatistics={financeStatistics}
+        />
+      </RouteGuard>
+    )
   }
-  return (
-    <RouteGuard requiredPermissions={['admin:access']}>
-      <SystemDashboard
-        loading={loading}
-        accountStatistics={accountStatistics}
-        warehouseStatistics={warehouseStatistics}
-        productStatistics={productStatistics}
-        orderStatistics={orderStatistics}
-        financeStatistics={financeStatistics}
-      />
-    </RouteGuard>
-  )
 }
 
 export default AdminHome

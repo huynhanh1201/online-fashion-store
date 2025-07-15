@@ -41,7 +41,7 @@ const StyledContainer = styled.div`
   border: 1px solid ${({ hasError }) => (hasError ? '#f00' : '#aaa')};
   position: relative;
   overflow: auto;
-  max-height: 500px;
+  max-height: 600px;
 `
 
 const StyledMenuBar = styled.div`
@@ -49,6 +49,7 @@ const StyledMenuBar = styled.div`
   top: 0;
   z-index: 10;
   background-color: white;
+  border-bottom: 1px solid #ccc;
 `
 
 export default function DescriptionEditor({

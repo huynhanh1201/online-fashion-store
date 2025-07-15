@@ -62,7 +62,6 @@ export default function BlogManagementPage() {
   const handleDelete = async () => {
     try {
       await removeBlog(selectedBlog._id)
-      toast.success('Xóa blog thành công!')
       setOpenDelete(false)
       setSelectedBlog(null)
     } catch (error) {
@@ -74,7 +73,6 @@ export default function BlogManagementPage() {
   const handleRestore = async () => {
     try {
       await restore(selectedBlog._id)
-      toast.success('Khôi phục blog thành công!')
       setOpenRestore(false)
       setSelectedBlog(null)
     } catch (error) {

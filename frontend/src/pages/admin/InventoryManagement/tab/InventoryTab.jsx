@@ -565,10 +565,7 @@ const InventoryTab = () => {
         <Table stickyHeader aria-label='inventory table'>
           <TableHead>
             <TableRow>
-              <TableCell
-                colSpan={inventoryColumns.length}
-                sx={{ borderBottom: 'none' }}
-              >
+              <TableCell colSpan={inventoryColumns.length}>
                 <Box
                   sx={{
                     display: 'flex',

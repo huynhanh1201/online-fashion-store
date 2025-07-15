@@ -55,9 +55,6 @@ const WarehouseSlipsTab = () => {
     sort: 'newest'
   })
   useEffect(() => {
-    fetchWarehouses(1, 10, { status: false })
-  }, [])
-  useEffect(() => {
     fetchWarehouseSlips(page, ROWS_PER_PAGE, filter)
   }, [page, ROWS_PER_PAGE, filter])
 
@@ -269,7 +266,7 @@ const WarehouseSlipsTab = () => {
                                 flex: 1,
                                 display: 'flex',
                                 alignItems: 'center',
-                                backgroundColor: 'var(--primary-color)',
+                                backgroundColor: '#093FB4', //093FB4
                                 color: '#fff'
                               }}
                             >
@@ -306,9 +303,6 @@ const WarehouseSlipsTab = () => {
                     </Box>
                   </Box>
                   <FilterWarehouseSlip
-                    warehouses={warehouses}
-                    slips={warehouseSlips}
-                    fetchData={fetchWarehouseSlips}
                     onFilter={handleFilter}
                     loading={loadingSlip}
                   />

@@ -29,6 +29,7 @@ import {
 } from '@mui/material'
 import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers'
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns'
+import customVi from '~/components/DateInput/CustomVi.jsx'
 import DeleteIcon from '@mui/icons-material/Delete'
 import Search from '~/components/SearchAdmin/Search.jsx'
 import AddPartnerModal from '~/pages/admin/InventoryManagement/modal/Partner/AddPartnerModal.jsx'
@@ -201,7 +202,7 @@ export default function AddWarehouseSlipModal({
   }
 
   return (
-    <LocalizationProvider dateAdapter={AdapterDateFns}>
+    <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={customVi}>
       <Dialog
         open={open}
         onClose={onClose}
@@ -281,7 +282,13 @@ export default function AddWarehouseSlipModal({
                     }
                     value={newSlipData.date || null}
                     onChange={handleDateChange}
-                    slotProps={{ textField: { fullWidth: true } }} // Cập nhật để tương thích với MUI v6
+                    format='dd/MM/yyyy'
+                    slotProps={{
+                      textField: {
+                        fullWidth: true,
+                        placeholder: 'Chọn ngày tạo phiếu'
+                      }
+                    }}
                   />
                 </Grid>
                 <Grid item size={4} sm={6} md={4}>

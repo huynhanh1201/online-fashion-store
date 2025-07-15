@@ -20,10 +20,7 @@ const ViewDiscountModal = ({ open, onClose, discount }) => {
     return date.toLocaleString('vi-VN', {
       day: '2-digit',
       month: '2-digit',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-      second: '2-digit'
+      year: 'numeric'
     })
   }
   if (!discount) return null
@@ -105,7 +102,7 @@ const ViewDiscountModal = ({ open, onClose, discount }) => {
                 <strong>Số lượt sử dụng tối đa</strong>
               </TableCell>
               <TableCell>
-                {discount.usageLimit.toLocaleString('vi-VN') ?? '—'}
+                {discount.usageLimit.toLocaleString('vi-VN') ?? '0'}
               </TableCell>
             </TableRow>
 
@@ -116,7 +113,7 @@ const ViewDiscountModal = ({ open, onClose, discount }) => {
               <TableCell>
                 {discount.usageLimit != null && discount.usedCount != null
                   ? discount.usageLimit - discount.usedCount
-                  : '—'}
+                  : '0'}
               </TableCell>
             </TableRow>
 
@@ -124,14 +121,14 @@ const ViewDiscountModal = ({ open, onClose, discount }) => {
               <TableCell>
                 <strong>Hiệu lực từ</strong>
               </TableCell>
-              <TableCell>{formatDate(discount.createdAt)}</TableCell>
+              <TableCell>{formatDate(discount.validFrom)}</TableCell>
             </TableRow>
 
             <TableRow>
               <TableCell>
                 <strong>Hiệu lực đến</strong>
               </TableCell>
-              <TableCell>{formatDate(discount.updatedAt)}</TableCell>
+              <TableCell>{formatDate(discount.validUntil)}</TableCell>
             </TableRow>
           </TableBody>
         </Table>

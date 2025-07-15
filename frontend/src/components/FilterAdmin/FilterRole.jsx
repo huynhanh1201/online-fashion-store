@@ -29,10 +29,11 @@ export default function FilterRole({ onFilter, loading, initialSearch }) {
     if (hasMounted.current) {
       applyFilters(selectedFilter, startDate, endDate)
     }
-  }, [keyword, sort, status])
+  }, [sort, status])
 
   const handleSearch = () => {
     setKeyword(inputValue)
+    applyFilters()
   }
 
   const handleSelectFilter = (filter) => {

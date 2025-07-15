@@ -105,8 +105,8 @@ const BlogRow = ({
             blog.status === 'published'
               ? 'success'
               : blog.status === 'draft'
-                ? 'default'
-                : 'warning'
+                ? 'warning'
+                : 'default'
           }
         />
       </TableCell>

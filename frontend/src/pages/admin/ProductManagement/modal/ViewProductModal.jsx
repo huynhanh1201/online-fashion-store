@@ -54,13 +54,7 @@ const styles = {
   }
 }
 
-const ViewProductModal = ({
-  open,
-  onClose,
-  product,
-  colorPalette,
-  sizePalette
-}) => {
+const ViewProductModal = ({ open, onClose, product }) => {
   const imageList = Array.isArray(product?.image) ? product.image : []
   const [selectedImage, setSelectedImage] = useState(imageList[0] || '')
   const [tabIndex, setTabIndex] = useState('1')
@@ -145,7 +139,17 @@ const ViewProductModal = ({
         ...StyleAdmin.InputCustom
       }}
     >
-      <DialogTitle>Thông tin sản phẩm</DialogTitle>
+      <DialogTitle sx={{ pb: 1 }}>Thông tin sản phẩm</DialogTitle>
+      <DialogActions sx={{ justifyContent: 'start', pt: 0, pl: 3, pb: 2 }}>
+        <Button
+          color='error'
+          variant='outlined'
+          onClick={onClose}
+          sx={{ textTransform: 'none' }}
+        >
+          Đóng
+        </Button>
+      </DialogActions>
       <DialogContent dividers sx={{ overflowY: 'auto' }}>
         <TabContext value={tabIndex}>
           {/*<Tabs*/}
@@ -172,9 +176,9 @@ const ViewProductModal = ({
                     alt='Ảnh sản phẩm'
                     sx={{
                       width: '400px',
-                      height: '300px',
-                      objectFit: 'cover',
-                      backgroundColor: 'var(--surface-color)',
+                      height: '340px',
+                      objectFit: 'contain',
+                      backgroundColor: '#ccc',
                       borderRadius: 2,
                       border: '1px solid #ccc',
                       mb: 1,
@@ -186,7 +190,7 @@ const ViewProductModal = ({
                 )}
 
                 {/* Thumbnail ảnh nhỏ với thanh cuộn ngang */}
-                <Box sx={{ maxWidth: '300px', overflowX: 'auto' }}>
+                <Box sx={{ maxWidth: '400px', overflowX: 'auto' }}>
                   <Box sx={{ display: 'flex', gap: 1, flexWrap: 'nowrap' }}>
                     {imageList.map((img, index) => (
                       <Box
@@ -359,7 +363,7 @@ const ViewProductModal = ({
                   mt: 2,
                   '& img': {
                     width: '100% !important',
-                    height: '700px !important',
+                    height: '100% !important',
                     display: 'block',
                     margin: '8px auto',
                     borderRadius: '6px',
@@ -682,17 +686,6 @@ const ViewProductModal = ({
           {/*</TabPanel>*/}
         </TabContext>
       </DialogContent>
-
-      <DialogActions sx={{ padding: '16px 24px' }}>
-        <Button
-          color='error'
-          variant='outlined'
-          onClick={onClose}
-          sx={{ textTransform: 'none' }}
-        >
-          Đóng
-        </Button>
-      </DialogActions>
     </Dialog>
   )
 }
