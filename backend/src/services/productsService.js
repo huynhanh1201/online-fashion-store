@@ -131,8 +131,11 @@ const getProductList = async (reqQuery) => {
 
     if (search) filter.name = { $regex: search, $options: 'i' }
 
-    if (categoryId && mongoose.Types.ObjectId.isValid(categoryId))
-      filter.categoryId = categoryId
+    if (categoryId) {
+      filter.categoryId = new mongoose.Types.ObjectId(categoryId)
+    }
+
+    console.log(filter)
 
     const dateRange = getDateRange(filterTypeDate, startDate, endDate)
 

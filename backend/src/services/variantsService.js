@@ -322,6 +322,30 @@ const deleteVariant = async (variantId) => {
   }
 }
 
+const restoreVariant = async (variantId) => {
+  // eslint-disable-next-line no-useless-catch
+  try {
+    // Xóa mềm khi không còn Variant
+    const variantUpdated = await VariantModel.updateOne(
+      {
+        _id: variantId
+      },
+      {
+        destroy: false
+      },
+      { new: true }
+    )
+
+    if (!variantUpdated) {
+      throw new ApiError(StatusCodes.NOT_FOUND, 'Biến thể không tồn tại.')
+    }
+
+    return variantUpdated
+  } catch (err) {
+    throw err
+  }
+}
+
 export const variantsService = {
   createVariant,
   getVariantList,
@@ -329,5 +353,6 @@ export const variantsService = {
   updateVariant,
   updateProductVariantsDiscountPrice,
   restoreProductVariantsOriginalDiscountPrice,
-  deleteVariant
+  deleteVariant,
+  restoreVariant
 }

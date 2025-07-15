@@ -53,4 +53,11 @@ Router.route('/product/:productId/restore-discount-price').patch(
   variantsController.restoreProductVariantsOriginalDiscountPrice
 )
 
+// Khôi phục đã xóa
+Router.route('/restore/:variantId').patch(
+  authMiddleware.isAuthorized,
+  rbacMiddleware.isValidPermission(['variant:update']),
+  variantsController.restoreVariant
+)
+
 export const variantsRoute = Router
