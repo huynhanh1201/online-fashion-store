@@ -26,7 +26,7 @@ const SearchWrapper = styled(Box)({
   display: 'flex',
   alignItems: 'center',
   width: 'fit-content',
-  '@media (max-width: 760px)': {
+  '@media (max-width: 1000px)': {
     display: 'none'
   }
 })
@@ -49,7 +49,7 @@ const AnimatedInput = styled(InputBase)(({ visible }) => ({
   border: '1px solid #e0e0e0',
   boxShadow: '0 2px 4px rgba(0,0,0,0.05)',
   pointerEvents: visible ? 'auto' : 'none',
-  zIndex: 10,
+  zIndex: 2000, // Tăng zIndex để input search nổi trên arrow
   '&:hover': {
     borderColor: '#1976d2',
     boxShadow: '0 2px 8px rgba(0,0,0,0.1)'

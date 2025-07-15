@@ -6,12 +6,27 @@ import { API_ROOT } from '~/utils/constants.js'
 // Lấy danh sách sản phẩm (phân trang)
 export const getProducts = async (params = {}) => {
   try {
-    const { page = 1, limit = 1000, sort = '' } = params
-    const url = `${API_ROOT}/v1/products?page=${page}&limit=${limit}${sort ? `&sort=${sort}` : ''}`
+    const {
+      page = 1,
+      limit = 1000,
+      sort = '',
+      filters = {} // thêm filters nếu cần mở rộng sau này
+    } = params
+
+    // Tạo query string cho lọc
+    const queryParams = new URLSearchParams({
+      page,
+      limit,
+      ...(sort && { sort }),
+      destroy: false,
+      status: 'active',
+      ...filters // cho phép mở rộng lọc thêm nếu cần
+    })
+
+    const url = `${API_ROOT}/v1/products?${queryParams.toString()}`
 
     const response = await AuthorizedAxiosInstance.get(url)
 
-    // Lấy đúng trường từ backend
     const products = response.data.data || []
     const total = response.data.meta?.total || 0
     const totalPages = response.data.meta?.totalPages || 1
@@ -26,6 +41,7 @@ export const getProducts = async (params = {}) => {
     return { products: [], total: 0, totalPages: 1 }
   }
 }
+
 
 // Lấy danh sách sản phẩm theo danh mục
 export const getProductsByCategory = async (

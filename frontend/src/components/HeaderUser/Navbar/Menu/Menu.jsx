@@ -68,7 +68,7 @@ const Menu = ({ headerRef }) => {
   const [slideDirection, setSlideDirection] = useState('left')
   const [isInitialized, setIsInitialized] = useState(false)
   const theme = useTheme()
-  const isMobile = useMediaQuery(theme.breakpoints.down('md'))
+  const isMobile = useMediaQuery(theme.breakpoints.down('lg'))
   const timeoutRef = useRef(null)
   const categoryTimeoutRef = useRef(null)
   const menuRef = useRef(null)
@@ -109,7 +109,7 @@ const Menu = ({ headerRef }) => {
       const width = menuContainerRef.current?.offsetWidth || window.innerWidth
       if (width > 1600) setItemsPerRow(7)
       else if (width > 1100) setItemsPerRow(5)
-      else if (width > 700) setItemsPerRow(3)
+      else if (width > 700) setItemsPerRow(4)
       else setItemsPerRow(3)
     }
     updateItemsPerRow()
@@ -124,6 +124,8 @@ const Menu = ({ headerRef }) => {
     const parentIds = [...new Set(childCategoriesWithProduct.map(cat => typeof cat.parent === 'object' ? cat.parent._id : cat.parent))]
     // Lấy các danh mục parent thực sự có children có sản phẩm
     const parentCategories = categories.filter(cat => parentIds.includes(cat._id) && !cat.destroy)
+    // Lấy các danh mục gốc (không có parent) nhưng có sản phẩm
+    const rootCategoriesWithProducts = categories.filter(cat => !cat.parent && !cat.destroy && Array.isArray(cat.products) && cat.products.length > 0)
     
     const allItems = [
       // Luôn hiển thị "Sản phẩm" và "Hàng mới"
@@ -138,6 +140,8 @@ const Menu = ({ headerRef }) => {
         : []),
       // Thêm các danh mục parent thực sự có children có sản phẩm
       ...parentCategories.map(cat => ({ label: cat.name, url: `/productbycategory/${cat._id}`, category: cat })),
+      // Thêm các danh mục gốc có sản phẩm
+      ...rootCategoriesWithProducts.map(cat => ({ label: cat.name, url: `/productbycategory/${cat._id}`, category: cat })),
       { label: 'Tin thời trang', url: '/blog' }
     ]
     
@@ -385,7 +389,12 @@ const Menu = ({ headerRef }) => {
                   ) : (
                     <StyledButton
                       href={item.url}
-                      active={item.hasMegaMenu && (productMenuOpen || isDrawerHovered) ? true : undefined}
+                      active={
+                        (item.hasMegaMenu && (productMenuOpen || isDrawerHovered)) ||
+                        (item.category && hoveredCategory?._id === item.category._id)
+                          ? true
+                          : undefined
+                      }
                       ref={item.hasMegaMenu ? productButtonRef : null}
                       onMouseEnter={item.hasMegaMenu ? handleProductEnter : undefined}
                       onMouseLeave={item.hasMegaMenu ? handleProductLeave : undefined}
@@ -394,7 +403,7 @@ const Menu = ({ headerRef }) => {
                     </StyledButton>
                   )}
                   {/* Submenu cho category */}
-                  {item.category && hoveredCategory?._id === item.category._id && (
+                  {item.category && (
                     <Box
                       onMouseEnter={handleCategoryMenuEnter}
                       onMouseLeave={handleCategoryMenuLeave}
@@ -402,20 +411,20 @@ const Menu = ({ headerRef }) => {
                         position: 'absolute',
                         top: '100%',
                         left: '50%',
-                        transform: 'translateX(-50%)',
+                        marginTop: '15px',
+                        transform: hoveredCategory?._id === item.category._id
+                          ? 'translateX(-50%) translateY(0) scaleY(1)'
+                          : 'translateX(-50%) translateY(-10px) scaleY(0.95)',
+                        opacity: hoveredCategory?._id === item.category._id ? 1 : 0,
+                        pointerEvents: hoveredCategory?._id === item.category._id ? 'auto' : 'none',
                         bgcolor: 'white',
                         boxShadow: '0px 8px 32px rgba(0, 0, 0, 0.12)',
                         minWidth: 200,
                         maxWidth: '95vw',
-                        zIndex: 1500, // Z-index cao hơn AppBar và Topbar
-                        borderRadius: '0 0 8px 8px',
+                        zIndex: 1500,
                         border: '1px solid #e2e8f0',
-                        animation: 'slideDown 0.2s ease-out',
-                        '@keyframes slideDown': {
-                          '0%': { opacity: 0, transform: 'translateX(-50%) translateY(-10px) scaleY(0.95)' },
-                          '100%': { opacity: 1, transform: 'translateX(-50%) translateY(0) scaleY(1)' }
-                        },
-                        // Đảm bảo submenu không bị overflow của parent
+                        transition: 'opacity 0.3s ease, transform 0.3s ease',
+                        transformOrigin: 'top center',
                         '&::before': {
                           content: '""',
                           position: 'absolute',
@@ -432,8 +441,6 @@ const Menu = ({ headerRef }) => {
                         sx={{
                           display: 'flex',
                           flexDirection: 'column',
-                          gap: 1,
-                          p: 2
                         }}
                       >
                         {(() => {
@@ -461,7 +468,6 @@ const Menu = ({ headerRef }) => {
                                   '&:hover': {
                                     color: '#1976d2',
                                     background: '#f8fafc',
-                                    transform: 'translateX(5px)'
                                   }
                                 }}
                               >
@@ -501,6 +507,7 @@ const Menu = ({ headerRef }) => {
                 minWidth: 8,
                 width: 20,
                 height: 20,
+                zIndex: 900, // Giảm zIndex để search input đè lên arrow
                 borderRadius: '6px 0 0 6px',
                 background: 'transparent',
                 boxShadow: 'none',
@@ -519,6 +526,7 @@ const Menu = ({ headerRef }) => {
                 minWidth: 8,
                 width: 20,
                 height: 20,
+                zIndex: 900, // Giảm zIndex để search input đè lên arrow
                 borderRadius: '0 6px 6px 0',
                 background: 'transparent',
                 boxShadow: 'none',

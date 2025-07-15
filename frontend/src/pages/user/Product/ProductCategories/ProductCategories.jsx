@@ -96,7 +96,7 @@ const ProductCategories = () => {
               src={
                 category.image 
                   ? optimizeCloudinaryUrl(category.image, { width: 100, height: 100 })
-                  : 'https://via.placeholder.com/100x100?text=No+Image'
+                  : 'https://www.rcuw.org/wp-content/themes/champion/images/SM-placeholder.png'
               }
               alt={`Nhóm ${category.name}`}
               sx={{
