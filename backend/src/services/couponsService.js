@@ -172,6 +172,7 @@ const deleteCoupon = async (couponId) => {
 const restoreCoupons = async (couponId) => {
   // eslint-disable-next-line no-useless-catch
   try {
+    console.log()
     const couponDeleted = await CouponModel.updateOne(
       { _id: couponId },
       {

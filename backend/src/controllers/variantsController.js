@@ -2,6 +2,7 @@ import { StatusCodes } from 'http-status-codes'
 
 import { variantsService } from '~/services/variantsService'
 import { ApiError } from '~/utils/ApiError'
+import { productsService } from '~/services/productsService'
 
 const createVariant = async (req, res, next) => {
   try {
@@ -95,6 +96,18 @@ const deleteVariant = async (req, res, next) => {
   }
 }
 
+const restoreVariant = async (req, res, next) => {
+  try {
+    const variantId = req.params.variantId
+
+    const result = await variantsService.restoreVariant(variantId)
+
+    res.status(StatusCodes.OK).json(result)
+  } catch (err) {
+    next(err)
+  }
+}
+
 export const variantsController = {
   createVariant,
   getVariantList,
@@ -102,5 +115,6 @@ export const variantsController = {
   updateVariant,
   updateProductVariantsDiscountPrice,
   restoreProductVariantsOriginalDiscountPrice,
-  deleteVariant
+  deleteVariant,
+  restoreVariant
 }
