@@ -124,6 +124,8 @@ const Menu = ({ headerRef }) => {
     const parentIds = [...new Set(childCategoriesWithProduct.map(cat => typeof cat.parent === 'object' ? cat.parent._id : cat.parent))]
     // Lấy các danh mục parent thực sự có children có sản phẩm
     const parentCategories = categories.filter(cat => parentIds.includes(cat._id) && !cat.destroy)
+    // Lấy các danh mục gốc (không có parent) nhưng có sản phẩm
+    const rootCategoriesWithProducts = categories.filter(cat => !cat.parent && !cat.destroy && Array.isArray(cat.products) && cat.products.length > 0)
     
     const allItems = [
       // Luôn hiển thị "Sản phẩm" và "Hàng mới"
@@ -138,6 +140,8 @@ const Menu = ({ headerRef }) => {
         : []),
       // Thêm các danh mục parent thực sự có children có sản phẩm
       ...parentCategories.map(cat => ({ label: cat.name, url: `/productbycategory/${cat._id}`, category: cat })),
+      // Thêm các danh mục gốc có sản phẩm
+      ...rootCategoriesWithProducts.map(cat => ({ label: cat.name, url: `/productbycategory/${cat._id}`, category: cat })),
       { label: 'Tin thời trang', url: '/blog' }
     ]
     
