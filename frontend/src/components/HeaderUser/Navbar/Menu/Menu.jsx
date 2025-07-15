@@ -68,7 +68,7 @@ const Menu = ({ headerRef }) => {
   const [slideDirection, setSlideDirection] = useState('left')
   const [isInitialized, setIsInitialized] = useState(false)
   const theme = useTheme()
-  const isMobile = useMediaQuery(theme.breakpoints.down('md'))
+  const isMobile = useMediaQuery(theme.breakpoints.down('lg'))
   const timeoutRef = useRef(null)
   const categoryTimeoutRef = useRef(null)
   const menuRef = useRef(null)
@@ -109,7 +109,7 @@ const Menu = ({ headerRef }) => {
       const width = menuContainerRef.current?.offsetWidth || window.innerWidth
       if (width > 1600) setItemsPerRow(7)
       else if (width > 1100) setItemsPerRow(5)
-      else if (width > 700) setItemsPerRow(3)
+      else if (width > 700) setItemsPerRow(4)
       else setItemsPerRow(3)
     }
     updateItemsPerRow()
@@ -503,6 +503,7 @@ const Menu = ({ headerRef }) => {
                 minWidth: 8,
                 width: 20,
                 height: 20,
+                zIndex: 900, // Giảm zIndex để search input đè lên arrow
                 borderRadius: '6px 0 0 6px',
                 background: 'transparent',
                 boxShadow: 'none',
@@ -521,6 +522,7 @@ const Menu = ({ headerRef }) => {
                 minWidth: 8,
                 width: 20,
                 height: 20,
+                zIndex: 900, // Giảm zIndex để search input đè lên arrow
                 borderRadius: '0 6px 6px 0',
                 background: 'transparent',
                 boxShadow: 'none',
