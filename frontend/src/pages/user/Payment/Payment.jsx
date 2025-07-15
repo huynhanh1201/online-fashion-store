@@ -337,7 +337,7 @@ const ProductItem = ({ name, variant, quantity, image, color, size, getFinalPric
       <td style={{ textAlign: 'right' }}>
         <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 0.5 }}>
           <Typography fontWeight={600} color="var(--primary-color)" sx={{ fontSize: '1rem' }}>
-            {(finalPrice * quantity).toLocaleString('vi-VN')} ₫
+            {(finalPrice * quantity).toLocaleString('vi-VN')}₫
           </Typography>
           {hasDiscount && (
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, flexWrap: 'wrap', justifyContent: 'flex-end' }}>
@@ -365,6 +365,7 @@ const Payment = () => {
   const [note, setNote] = useState('')
   const [voucherInput, setVoucherInput] = useState('')
   const [voucherApplied, setVoucherApplied] = useState(false)
+  const [hasTriedAutoApply, setHasTriedAutoApply] = useState(false)
   const [snackbar, setSnackbar] = useState({
     open: false,
     severity: 'info',
@@ -394,6 +395,15 @@ const Payment = () => {
   const [shippingPrice, setShippingPrice] = useState(0)
   const [shippingPriceLoading, setShippingPriceLoading] = useState(false)
 
+  // Hàm helper để hiển thị snackbar
+  const showSnackbar = (message, severity = 'info') => {
+    setSnackbar({
+      open: true,
+      severity: severity,
+      message: message
+    })
+  }
+
   // Helper function to get final price (exportPrice minus discountPrice)
   const getFinalPrice = (variant) => {
     const basePrice = variant.exportPrice || 0
@@ -408,6 +418,9 @@ const Payment = () => {
     .filter(item => {
       if (isBuyNow) return true
       return selectedItems.some(selected => {
+        // Kiểm tra null/undefined trước khi xử lý
+        if (!item?.variantId || !selected?.variantId) return false
+
         const itemVariantId = String(item.variantId?._id || item.variantId)
         const selectedVariantId = String(selected.variantId)
         return (
@@ -462,12 +475,16 @@ const Payment = () => {
 
       const response = await AuthorizedAxiosInstance.post(`${API_ROOT}/v1/deliveries/calculate-fee`, payload)
 
-      const data = response.data  // Axios tự parse JSON
-      console.log('fetchShippingPrice response:', data)
+      const data = response?.data  // Axios tự parse JSON
 
-      const fee = data?.totalFeeShipping
-      if (typeof fee !== 'number' || fee <= 0) {
-        throw new Error('Phí vận chuyển không hợp lệ hoặc bằng 0')
+      // Kiểm tra response structure an toàn hơn
+      if (!data || typeof data !== 'object') {
+        throw new Error('Dữ liệu phí vận chuyển không hợp lệ')
+      }
+
+      const fee = data.totalFeeShipping
+      if (typeof fee !== 'number' || fee < 0) {
+        throw new Error('Phí vận chuyển không hợp lệ')
       }
 
       setShippingPrice(fee)
@@ -494,7 +511,6 @@ const Payment = () => {
     const fetchCoupons = async () => {
       try {
         const response = await getDiscounts()
-        console.log('Dữ liệu từ getDiscounts trong Payment:', response)
         const { discounts } = response
         if (!Array.isArray(discounts)) {
           throw new Error('Dữ liệu coupon không hợp lệ')
@@ -524,9 +540,16 @@ const Payment = () => {
 
   // Tự động áp dụng mã giảm giá từ Cart
   useEffect(() => {
-    if (appliedCoupon && appliedDiscount > 0 && !voucherApplied && !discount) {
+    if (appliedCoupon &&
+      appliedDiscount > 0 &&
+      !voucherApplied &&
+      !discount &&
+      !hasTriedAutoApply &&
+      subTotal > 0) {
+
       const autoApplyCoupon = async () => {
         try {
+          setHasTriedAutoApply(true) // Prevent retry
           setVoucherInput(appliedCoupon.code)
           const response = await handleApplyVoucher(appliedCoupon.code, subTotal)
           if (response?.valid) {
@@ -539,6 +562,11 @@ const Payment = () => {
           }
         } catch (error) {
           console.error('Lỗi khi tự động áp dụng mã giảm giá:', error)
+          setSnackbar({
+            open: true,
+            severity: 'error',
+            message: 'Không thể áp dụng mã giảm giá tự động'
+          })
         }
       }
 
@@ -546,7 +574,12 @@ const Payment = () => {
       const timer = setTimeout(autoApplyCoupon, 500)
       return () => clearTimeout(timer)
     }
-  }, [appliedCoupon, appliedDiscount, voucherApplied, discount, subTotal, handleApplyVoucher])
+  }, [appliedCoupon, appliedDiscount, voucherApplied, discount, subTotal, hasTriedAutoApply, handleApplyVoucher])
+
+  // Reset auto-apply flag khi coupon thay đổi
+  useEffect(() => {
+    setHasTriedAutoApply(false)
+  }, [appliedCoupon?.code])
 
   // Cleanup applied coupon khi rời khỏi trang
   useEffect(() => {
@@ -710,22 +743,33 @@ const Payment = () => {
       return
     }
 
-    const sanitizedCartItems = selectedCartItems.map(item => {
-      // Debug log to see the structure
-      console.log('Item structure in sanitization:', item)
+    let sanitizedCartItems
+    try {
+      sanitizedCartItems = selectedCartItems.map(item => {
+        // Ensure variantId is properly extracted with safety checks
+        let variantId = item.variantId
+        if (typeof variantId === 'object') {
+          variantId = variantId?._id || variantId?.toString?.() || ''
+        }
 
-      // Ensure variantId is properly extracted
-      const variantId = typeof item.variantId === 'object'
-        ? item.variantId._id || item.variantId.toString()
-        : item.variantId
+        // Kiểm tra variantId hợp lệ
+        if (!variantId || variantId === '') {
+          throw new Error(`Variant ID không hợp lệ cho sản phẩm: ${item.name || 'Không tên'}`)
+        }
 
-      console.log('Extracted variantId:', variantId, 'Type:', typeof variantId)
-
-      return {
-        variantId: variantId,
-        quantity: item.quantity,
-      }
-    })
+        return {
+          variantId: String(variantId),
+          quantity: Math.max(1, parseInt(item.quantity) || 1), // Đảm bảo quantity >= 1
+        }
+      })
+    } catch (error) {
+      setSnackbar({
+        open: true,
+        severity: 'error',
+        message: `Lỗi xử lý dữ liệu: ${error.message}`,
+      })
+      return
+    }
 
     const orderData = {
       cartItems: sanitizedCartItems,
@@ -744,7 +788,6 @@ const Payment = () => {
 
     try {
       const result = await createOrder(orderData)
-      console.log('createOrder response:', result)
       setSnackbar({
         open: true,
         severity: 'success',
@@ -901,7 +944,7 @@ const Payment = () => {
                                     fontWeight: 600
                                   }}
                                 >
-                                  {`${shippingPrice.toLocaleString('vi-VN')} ₫`}
+                                  {`${shippingPrice.toLocaleString('vi-VN')}₫`}
                                 </Typography>
                               )}
                             </Typography>
@@ -1052,11 +1095,24 @@ const Payment = () => {
                         </thead>
                         <tbody>
                           {selectedCartItems.map((item, index) => {
-                            const variant = cartItems.find(cartItem =>
+                            const cartItem = cartItems.find(cartItem =>
                               String(cartItem.variantId?._id || cartItem.variantId) === item.variantId &&
                               cartItem.color === item.color &&
                               cartItem.size === item.size
-                            )?.variantId || {}
+                            )
+                            const variant = cartItem?.variantId || {}
+
+                            // Kiểm tra dữ liệu hợp lệ trước khi render
+                            if (!variant || !item) {
+                              return (
+                                <tr key={index}>
+                                  <td colSpan={3} style={{ color: 'red', padding: 16, textAlign: 'center' }}>
+                                    <Typography color="error">Dữ liệu sản phẩm không hợp lệ</Typography>
+                                  </td>
+                                </tr>
+                              )
+                            }
+
                             return (
                               <ProductItem
                                 key={index}
@@ -1064,8 +1120,8 @@ const Payment = () => {
                                 variant={variant}
                                 quantity={item.quantity || 1}
                                 image={variant.color?.image}
-                                color={variant.color?.name}
-                                size={variant.size?.name}
+                                color={variant.color?.name || item.color}
+                                size={variant.size?.name || item.size}
                                 getFinalPrice={getFinalPrice}
                                 productId={variant.product || variant.productId}
                                 navigate={navigate}
@@ -1212,7 +1268,7 @@ const Payment = () => {
                           fontSize: '0.9rem'
                         }}
                       >
-                        {totalSavings.toLocaleString('vi-VN')} ₫
+                        {totalSavings.toLocaleString('vi-VN')}₫
                       </Typography>
                     </PriceRow>
                   )}
@@ -1240,7 +1296,7 @@ const Payment = () => {
                             fontWeight: 600
                           }}
                         >
-                          {`${shippingPrice.toLocaleString('vi-VN')} ₫`}
+                          {`${shippingPrice.toLocaleString('vi-VN')}₫`}
                         </Typography>
                       )}
                     </Typography>
@@ -1249,14 +1305,14 @@ const Payment = () => {
                   <PriceRow>
                     <Typography>Giảm giá:</Typography>
                     <Typography fontWeight={600} color="red">
-                      {discount.toLocaleString('vi-VN')} ₫
+                      {discount.toLocaleString('vi-VN')}₫
                     </Typography>
                   </PriceRow>
 
                   <PriceRow isTotal>
                     <Typography fontWeight={700}>Tổng cộng:</Typography>
                     <Typography fontSize={'1.2rem'} fontWeight={700}>
-                      {totalFeeShipping.toLocaleString('vi-VN')} ₫
+                      {totalFeeShipping.toLocaleString('vi-VN')}₫
                     </Typography>
                   </PriceRow>
                 </Box>
@@ -1294,6 +1350,7 @@ const Payment = () => {
         onClose={handleCloseAddressModal}
         onConfirm={handleAddressConfirm}
         onUpdateAddresses={handleAddressListUpdated}
+        showSnackbar={showSnackbar}
       />
 
       {/* Snackbar thông báo */}
@@ -1343,7 +1400,7 @@ const Payment = () => {
           <Typography variant="body2" color="text.secondary">
             Tổng thanh toán:{' '}
             <strong style={{ fontSize: '1.2rem' }}>
-              {totalFeeShipping.toLocaleString('vi-VN')} ₫
+              {totalFeeShipping.toLocaleString('vi-VN')}₫
             </strong>
           </Typography>
 

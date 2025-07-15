@@ -5,7 +5,7 @@ import { API_ROOT } from '~/utils/constants.js'
 // Lấy danh sách mã giảm giá
 export const getDiscounts = async () => {
   try {
-    const response = await AuthorizedAxiosInstance.get(`${API_ROOT}/v1/coupons`)
+    const response = await AuthorizedAxiosInstance.get(`${API_ROOT}/v1/coupons?status=true&destroy=false`)
     const coupons = response.data
     return { discounts: coupons.data, total: coupons.length } // vì API trả về mảng
   } catch (error) {

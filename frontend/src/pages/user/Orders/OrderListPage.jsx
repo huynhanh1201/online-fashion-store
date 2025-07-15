@@ -21,6 +21,8 @@ import {
   DialogActions,
   DialogContentText,
   Skeleton,
+  Breadcrumbs,
+  Link
 } from '@mui/material'
 import {
   KeyboardArrowDown,
@@ -33,7 +35,8 @@ import {
   Visibility,
   Warning,
   Sync,
-  RateReview
+  RateReview,
+  NavigateNext
 } from '@mui/icons-material'
 import ScheduleIcon from '@mui/icons-material/Schedule';
 import { getOrders, getOrderItems } from '~/services/orderService'
@@ -229,6 +232,7 @@ const OrderRow = ({ order, onOrderUpdate, onOrderCancelled, onReorder, reorderLo
   const [cancelling, setCancelling] = useState(false)
   const [reviewedProducts, setReviewedProducts] = useState(new Set())
   const [reviewsLoading, setReviewsLoading] = useState(true)
+  const [itemsError, setItemsError] = useState(null)
   const navigate = useNavigate()
   const currentUser = useSelector(selectCurrentUser)
 
@@ -246,14 +250,36 @@ const OrderRow = ({ order, onOrderUpdate, onOrderCancelled, onReorder, reorderLo
     return str.toUpperCase()
   }
 
+  // Tính giá thực tế của từng variant dựa trên tỷ lệ từ order.total
+  const getActualItemPrice = (item) => {
+    if (!order?.total || !items?.length) return item.subtotal || 0
+
+    // Tính tổng subtotal gốc của tất cả items
+    const totalOriginalSubtotal = items.reduce((sum, orderItem) => sum + (orderItem.subtotal || 0), 0)
+
+    // Nếu tổng subtotal gốc = 0, trả về subtotal gốc
+    if (totalOriginalSubtotal === 0) return item.subtotal || 0
+
+    // Tính tổng tiền hàng thực tế từ order.total
+    const totalProductsPrice = order.total - (order.shippingFee || 0) + (order.discountAmount || 0)
+
+    // Tính giá thực tế dựa trên tỷ lệ
+    const actualPrice = ((item.subtotal || 0) / totalOriginalSubtotal) * totalProductsPrice
+
+    return Math.round(actualPrice)
+  }
+
 
   useEffect(() => {
     const fetchItems = async () => {
       try {
+        setItemsError(null)
         const res = await getOrderItems(order._id)
-        setItems(res)
+        setItems(res || [])
       } catch (err) {
         console.error('Lỗi khi lấy sản phẩm:', err)
+        setItemsError(err.message || 'Không thể tải thông tin sản phẩm')
+        setItems([])
       } finally {
         setLoadingItems(false)
       }
@@ -432,37 +458,14 @@ const OrderRow = ({ order, onOrderUpdate, onOrderCancelled, onReorder, reorderLo
                   </Box>
 
                   <Box textAlign="right">
-                    {item.variantId?.discountPrice > 0 ? (
-                      <Box display="flex" flexDirection="column" alignItems="flex-end" gap={0.5}>
-                        <Typography
-                          fontWeight={700}
-                          fontSize="1.2rem"
-                          color="var(--primary-color)"
-                        >
-                          {(item.price - item.variantId.discountPrice)?.toLocaleString('vi-VN')}₫
-                        </Typography>
-                        <Box display="flex" alignItems="center" gap={1}>
-                          <Typography
-                            variant="body2"
-                            sx={{
-                              textDecoration: 'line-through',
-                              color: 'text.secondary',
-                              fontSize: '0.9rem'
-                            }}
-                          >
-                            {item.price?.toLocaleString('vi-VN')}₫
-                          </Typography>
-                        </Box>
-                      </Box>
-                    ) : (
-                      <Typography
-                        fontWeight={700}
-                        fontSize="1.2rem"
-                        color="var(--primary-color)"
-                      >
-                        {item.price?.toLocaleString('vi-VN')}₫
-                      </Typography>
-                    )}
+                    {/* Hiển thị giá thực tế đã trả dựa trên tỷ lệ từ order.total */}
+                    <Typography
+                      fontWeight={700}
+                      fontSize="1.2rem"
+                      color="var(--primary-color)"
+                    >
+                      {getActualItemPrice(item).toLocaleString('vi-VN')}₫
+                    </Typography>
                   </Box>
                 </Box>
               </Box>
@@ -819,6 +822,48 @@ const OrderListPage = () => {
         },
       }
     }}>
+      {/* Breadcrumb */}
+      <Box
+        sx={{
+          bottom: { xs: '20px', sm: '30px', md: '40px' },
+          left: { xs: '20px', sm: '30px', md: '40px' },
+          right: { xs: '20px', sm: '30px', md: '40px' },
+          maxWidth: '1800px',
+          margin: '0 auto',
+          mb: 2
+        }}
+      >
+        <Breadcrumbs
+          separator={<NavigateNext fontSize='small' />}
+          aria-label='breadcrumb'
+        >
+          <Link
+            underline='hover'
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              color: '#007bff',
+              textDecoration: 'none',
+              '&:hover': {
+                color: 'primary.main'
+              }
+            }}
+            href='/'
+          >
+            Trang chủ
+          </Link>
+          <Typography
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              color: 'text.primary',
+              fontWeight: 500
+            }}
+          >
+           Đơn hàng
+          </Typography>
+        </Breadcrumbs>
+      </Box>
       {/* Header */}
       <Box mb={4}>
         <Typography

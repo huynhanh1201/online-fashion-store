@@ -2,7 +2,7 @@ import React from 'react'
 import {
   getPermissions,
   getPermissionById
-} from '~/services/admin/PermissionService.js'
+} from '~/services/admin/permissionService.js'
 
 const usePermission = () => {
   const [permissions, setPermissions] = React.useState([])

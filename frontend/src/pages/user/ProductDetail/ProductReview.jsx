@@ -266,7 +266,7 @@ const ProductReview = ({ productId, avgRating = 0 }) => {
         maxWidth="md"
         fullWidth
       >
-        <DialogContent sx={{ p: 0, position: 'relative' }}>
+        <DialogContent sx={{ p: 0, position: 'relative', margin: 0, display: 'flex' }}>
           <IconButton
             onClick={handleCloseModal}
             sx={{
@@ -292,7 +292,9 @@ const ProductReview = ({ productId, avgRating = 0 }) => {
                 width: '100%',
                 height: 'auto',
                 maxHeight: '80vh',
-                objectFit: 'contain'
+                objectFit: 'contain',
+                display: 'block',
+                margin: 0
               }}
             />
           )}
@@ -305,8 +307,27 @@ const ProductReview = ({ productId, avgRating = 0 }) => {
         onClose={handleCloseModal}
         maxWidth="md"
         fullWidth
+        PaperProps={{
+          sx: {
+            m: 0,
+            overflow: 'hidden',
+            '& .MuiDialogContent-root': {
+              p: '0 !important',
+              m: '0 !important',
+              paddingBottom: '0 !important'
+            }
+          }
+        }}
       >
-        <DialogContent sx={{ p: 0, position: 'relative' }}>
+        <DialogContent sx={{
+          p: '0 !important',
+          position: 'relative',
+          margin: '0 !important',
+          display: 'block',
+          lineHeight: 0,
+          fontSize: 0,
+          overflow: 'hidden'
+        }}>
           <IconButton
             onClick={handleCloseModal}
             sx={{
@@ -324,14 +345,23 @@ const ProductReview = ({ productId, avgRating = 0 }) => {
             <CloseIcon />
           </IconButton>
           {selectedVideo && (
-            <video
+            <Box
+              component="video"
               src={selectedVideo}
               controls
               autoPlay
-              style={{
+              sx={{
                 width: '100%',
                 height: 'auto',
-                maxHeight: '80vh'
+                maxHeight: '80vh',
+                display: 'block',
+                margin: 0,
+                padding: 0,
+                border: 'none',
+                outline: 'none',
+                verticalAlign: 'top',
+                lineHeight: 0,
+                marginBottom: '-1px'
               }}
             />
           )}

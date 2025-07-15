@@ -5,13 +5,13 @@ import ChatBot from './ChatBot/ChatBot'
 import Contact from './Contact/Contact'
 import Content from './Contents/Content.jsx'
 import ProductContent from './ProductContent/ProductContent.jsx'
-import { BlogHome } from './BlogHome'
+import BlogHome from './BlogHome/BlogHome'
 const UserHome = () => {
   return (
     <>
       <Slider />
       <Contact />
-      <ChatBot></ChatBot>
+      <ChatBot />
       <Content />
       <ProductContent />
       <BlogHome />

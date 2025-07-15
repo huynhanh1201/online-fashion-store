@@ -10,12 +10,14 @@ import {
   Divider,
   Box,
   IconButton,
-  Autocomplete
+  Autocomplete,
+  CircularProgress
 } from '@mui/material'
 import CloseIcon from '@mui/icons-material/Close'
 import {
   addShippingAddress,
-  updateShippingAddress
+  updateShippingAddress,
+  getShippingAddresses
 } from '~/services/addressService'
 import addressGHNService from '~/services/addressGHNService'
 import {
@@ -54,8 +56,47 @@ export default function AddAddressModal({
     district: false,
     ward: false
   })
+  const [isCheckingDuplicate, setIsCheckingDuplicate] = useState(false)
 
   const isEditMode = !!addressToEdit
+
+  // Hàm kiểm tra trùng lặp địa chỉ
+  const checkAddressDuplicate = async (addressData) => {
+    try {
+      const { addresses } = await getShippingAddresses()
+
+      // Nếu đang edit, loại bỏ địa chỉ hiện tại khỏi danh sách kiểm tra
+      const addressesToCheck = isEditMode
+        ? addresses.filter(addr => addr._id !== addressToEdit._id)
+        : addresses
+
+      // Kiểm tra trùng lặp dựa trên các thông tin chính
+      const isDuplicate = addressesToCheck.some(addr => {
+        // Kiểm tra null/undefined trước khi so sánh
+        if (!addr || !addressData) return false
+        
+        const isSameFullName = (addr.fullName || '').toLowerCase().trim() === (addressData.fullName || '').toLowerCase().trim()
+        const isSamePhone = (addr.phone || '').trim() === (addressData.phone || '').trim()
+        const isSameAddress = (addr.address || '').toLowerCase().trim() === (addressData.address || '').toLowerCase().trim()
+        const isSameWard = (addr.ward || '').toLowerCase().trim() === (addressData.ward || '').toLowerCase().trim()
+        const isSameDistrict = (addr.district || '').toLowerCase().trim() === (addressData.district || '').toLowerCase().trim()
+        const isSameCity = (addr.city || '').toLowerCase().trim() === (addressData.city || '').toLowerCase().trim()
+
+        // Địa chỉ được coi là trùng lặp nếu:
+        // 1. Cùng tên, cùng số điện thoại, và cùng địa chỉ chi tiết + phường/xã + quận/huyện + tỉnh/thành
+        // 2. Hoặc cùng số điện thoại và cùng địa chỉ đầy đủ
+        return (
+          (isSameFullName && isSamePhone && isSameAddress && isSameWard && isSameDistrict && isSameCity) ||
+          (isSamePhone && isSameAddress && isSameWard && isSameDistrict && isSameCity)
+        )
+      })
+
+      return isDuplicate
+    } catch (error) {
+      console.error('Lỗi khi kiểm tra trùng lặp địa chỉ:', error)
+      return false // Nếu có lỗi, cho phép thêm địa chỉ
+    }
+  }
 
   // Hàm xử lý thay đổi input
   const handleChange = (field) => (event) => {
@@ -88,7 +129,7 @@ export default function AddAddressModal({
     }))
   }
 
-  // Reset form khi mở Chart
+  // Reset form khi mở Modal
   useEffect(() => {
     if (open) {
       setFormData({
@@ -107,10 +148,11 @@ export default function AddAddressModal({
         district: false,
         ward: false
       })
+      setIsCheckingDuplicate(false)
     }
   }, [open, addressToEdit])
 
-  // Gọi API tỉnh/thành khi Chart mở
+  // Gọi API tỉnh/thành khi Modal mở
   useEffect(() => {
     if (!open) return
 
@@ -281,6 +323,16 @@ export default function AddAddressModal({
       wardId: formData.ward // Mã định danh phường/xã
     }
 
+    // Kiểm tra trùng lặp địa chỉ
+    setIsCheckingDuplicate(true)
+    const isDuplicate = await checkAddressDuplicate(addressData)
+    setIsCheckingDuplicate(false)
+
+    if (isDuplicate) {
+      showSnackbar?.('Địa chỉ đã tồn tại! Vui lòng kiểm tra lại thông tin hoặc chọn địa chỉ khác.', 'error')
+      return
+    }
+
     try {
       if (isEditMode) {
         const updated = await updateShippingAddress(
@@ -310,6 +362,8 @@ export default function AddAddressModal({
         error.message ||
         'Không thể xử lý địa chỉ!'
       showSnackbar?.(`Lỗi: ${errorMessage}`, 'error')
+    } finally {
+      setIsCheckingDuplicate(false)
     }
   }
 
@@ -487,6 +541,7 @@ export default function AddAddressModal({
           <Button
             onClick={handleSubmit}
             variant='contained'
+            disabled={isCheckingDuplicate}
             sx={{
               background: 'var(--primary-color)',
               borderRadius: 2,
@@ -498,10 +553,21 @@ export default function AddAddressModal({
               '&:hover': {
                 background: '#153056',
                 boxShadow: '0 6px 20px rgba(26, 60, 123, 0.6)'
+              },
+              '&:disabled': {
+                backgroundColor: '#cccccc',
+                color: '#666666',
               }
             }}
           >
-            {isEditMode ? 'Lưu' : 'Thêm'}
+            {isCheckingDuplicate ? (
+              <>
+                <CircularProgress size={20} sx={{ mr: 1 }} />
+                Đang kiểm tra...
+              </>
+            ) : (
+              isEditMode ? 'Lưu' : 'Thêm'
+            )}
           </Button>
         </DialogActions>
       )}
