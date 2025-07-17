@@ -256,17 +256,17 @@ const Blog = () => {
                       '&:hover': {
                         transform: 'translateY(-8px)',
                         '& .article-card': {
-                          boxShadow: (theme) => theme.shadows[8]
+                          boxShadow: (theme) => theme.shadows[8],
                         },
                         '& .article-image': {
-                          transform: 'scale(1.05)'
-                        }
-                      }
+                          transform: 'scale(1.02)', // Reduced scale to minimize cropping
+                        },
+                      },
                     }}
                     onClick={() => navigate(`/blog/${article.id}`)}
                   >
                     <Box
-                      className='article-card'
+                      className="article-card"
                       sx={{
                         display: 'flex',
                         flexDirection: 'column',
@@ -275,27 +275,45 @@ const Blog = () => {
                         overflow: 'hidden',
                         transition: 'all 0.3s ease',
                         boxShadow: (theme) => theme.shadows[2],
-                        height: '100%'
+                        height: '100%',
                       }}
                     >
                       {/* Image Section */}
                       <Box
                         sx={{
-                          height: { xs: 320, sm: 380, md: 420 }, // Increased height for taller images
+                          aspectRatio: '16/9', // Standard aspect ratio for better image fit
                           position: 'relative',
-                          overflow: 'hidden'
+                          overflow: 'hidden',
+                          width: '100%',
+                          backgroundColor: 'grey.100', // Fallback background for broken images
                         }}
                       >
                         <Box
-                          component='img'
-                          className='article-image'
-                          src={optimizeCloudinaryUrl(article.image)}
+                          component="img"
+                          className="article-image"
+                          src={
+                            article.image
+                              ? optimizeCloudinaryUrl(article.image, {
+                                width: 600, // Optimize for display size
+                                height: 337, // Match 16:9 aspect ratio (600 * 9/16 ≈ 337)
+                                crop: 'fill', // Cloudinary crop mode
+                                quality: 'auto',
+                                fetch_format: 'auto',
+                              })
+                              : '/path/to/fallback-image.jpg' // Fallback image
+                          }
                           alt={article.title}
                           sx={{
                             width: '100%',
                             height: '100%',
-                            objectFit: 'cover',
-                            transition: 'transform 0.3s ease'
+                            objectFit: 'contain', // Changed to 'contain' to avoid cropping
+                            objectPosition: 'center',
+                            transition: 'transform 0.3s ease',
+                            display: 'block',
+                            backgroundColor: 'transparent',
+                          }}
+                          onError={(e) => {
+                            e.target.src = '/path/to/fallback-image.jpg'; // Handle broken images
                           }}
                         />
 
@@ -321,22 +339,22 @@ const Blog = () => {
                         </Box>
                       </Box>
 
-                      {/* Content Section */}
+                      {/* Content Section (unchanged) */}
                       <Box
                         sx={{
                           p: { xs: 2.5, sm: 3 },
                           display: 'flex',
                           flexDirection: 'column',
-                          flex: 1
+                          flex: 1,
                         }}
                       >
                         <Typography
-                          variant='h6'
+                          variant="h6"
                           sx={{
                             fontSize: {
                               xs: '1rem',
                               sm: '1.125rem',
-                              md: '1.25rem'
+                              md: '1.25rem',
                             },
                             fontWeight: 700,
                             color: 'text.primary',
@@ -346,14 +364,14 @@ const Blog = () => {
                             WebkitLineClamp: 3,
                             WebkitBoxOrient: 'vertical',
                             overflow: 'hidden',
-                            minHeight: { xs: 60, sm: 66, md: 72 }
+                            minHeight: { xs: 60, sm: 66, md: 72 },
                           }}
                         >
                           {article.title}
                         </Typography>
 
                         <Typography
-                          variant='body2'
+                          variant="body2"
                           sx={{
                             fontSize: { xs: '0.875rem', sm: '0.9375rem' },
                             color: 'text.secondary',
@@ -363,7 +381,7 @@ const Blog = () => {
                             WebkitLineClamp: 4,
                             WebkitBoxOrient: 'vertical',
                             overflow: 'hidden',
-                            flex: 1
+                            flex: 1,
                           }}
                         >
                           {article.subtitle}
@@ -378,21 +396,21 @@ const Blog = () => {
                             mt: 'auto',
                             pt: 2,
                             borderTop: 1,
-                            borderColor: 'divider'
+                            borderColor: 'divider',
                           }}
                         >
                           <Typography
-                            variant='caption'
+                            variant="caption"
                             sx={{
                               color: 'text.disabled',
-                              fontWeight: 500
+                              fontWeight: 500,
                             }}
                           >
                             {article.date}
                           </Typography>
 
                           <Typography
-                            variant='body2'
+                            variant="body2"
                             sx={{
                               color: 'primary.main',
                               fontWeight: 600,
@@ -400,11 +418,11 @@ const Blog = () => {
                               alignItems: 'center',
                               gap: 0.5,
                               '&:hover': {
-                                color: 'primary.dark'
-                              }
+                                color: 'primary.dark',
+                              },
                             }}
                           >
-                            Đọc thêm →
+                            Đọc thêm
                           </Typography>
                         </Box>
                       </Box>
@@ -450,7 +468,7 @@ const Blog = () => {
                   }
                 }}
               >
-                {loadingMore ? 'Đang tải...' : 'Xem thêm ›'}
+                {loadingMore ? 'Đang tải...' : 'Xem thêm'}
               </Box>
             </Box>
           )}
