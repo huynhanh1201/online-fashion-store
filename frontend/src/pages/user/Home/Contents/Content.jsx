@@ -355,7 +355,7 @@ const Content = () => {
   {products.length > 0 && (
     <div style={{ textAlign: 'center', marginBottom: '32px' }}>
       <Link to='/productnews'>
-        <button className='cta-button'>Xem tất cả ›</button>
+        <button className='cta-button'>Xem tất cả</button>
       </Link>
     </div>
   )}
