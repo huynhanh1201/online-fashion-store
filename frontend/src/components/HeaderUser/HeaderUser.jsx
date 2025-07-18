@@ -147,7 +147,7 @@ const HeaderUser = () => {
               </Box>
 
               {/* Auth Buttons */}
-              <Box sx={{ flexShrink: 0 }}>
+              <Box sx={{ flexShrink: 0,ml:1 }}>
                 <AuthButtons />
               </Box>
 
