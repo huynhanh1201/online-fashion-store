@@ -24,7 +24,11 @@ import {
   FormControlLabel,
   Alert,
   CircularProgress,
-  Skeleton
+  Skeleton,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions
 } from '@mui/material'
 import {
   Add as AddIcon,
@@ -61,6 +65,8 @@ const DisplayManagement = () => {
   const [openModal, setOpenModal] = useState(false)
   const [bannerToEdit, setBannerToEdit] = useState(null)
   const [bannerIndexToEdit, setBannerIndexToEdit] = useState(null)
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
+  const [bannerToDelete, setBannerToDelete] = useState(null)
 
   const { hasPermission } = usePermissions()
 
@@ -98,15 +104,20 @@ const DisplayManagement = () => {
     setOpenModal(true)
   }
 
-  // Handle delete banner
-  const handleDeleteBanner = async (index) => {
-    if (window.confirm('Bạn có chắc chắn muốn xóa banner này?')) {
-      try {
-        await deleteBanner(index)
-        fetchBanners()
-      } catch (error) {
-        setError(error.message)
-      }
+  const handleDeleteBanner = (banner, index) => {
+    setBannerToDelete({ banner, index })
+    setDeleteDialogOpen(true)
+  }
+
+  const confirmDeleteBanner = async () => {
+    if (!bannerToDelete) return
+    try {
+      await deleteBanner(bannerToDelete.index)
+      fetchBanners()
+      setDeleteDialogOpen(false)
+      setBannerToDelete(null)
+    } catch (error) {
+      setError(error.message)
     }
   }
 
@@ -549,7 +560,7 @@ const DisplayManagement = () => {
                               <Tooltip title='Xóa'>
                                 <IconButton
                                   size='small'
-                                  onClick={() => handleDeleteBanner(index)}
+                                  onClick={() => handleDeleteBanner(banner, index)}
                                   sx={{
                                     color: '#ef4444',
                                     '&:hover': { backgroundColor: '#fee2e2' }
@@ -627,6 +638,17 @@ const DisplayManagement = () => {
           bannerIndex={bannerIndexToEdit}
         />
       </Box>
+      {/* Modal xác nhận xóa banner */}
+      <Dialog open={deleteDialogOpen} onClose={() => setDeleteDialogOpen(false)}>
+        <DialogTitle>Xác nhận xóa banner</DialogTitle>
+        <DialogContent>
+          <Typography>Bạn có chắc chắn muốn xóa banner <b>{bannerToDelete?.banner?.title}</b> không?</Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setDeleteDialogOpen(false)}>Hủy</Button>
+          <Button color="error" onClick={confirmDeleteBanner} variant="contained">Xóa</Button>
+        </DialogActions>
+      </Dialog>
     </RouteGuard >
   )
 }
