@@ -233,7 +233,7 @@ const Content = () => {
               : category.link || '#'
             }
             className='category-card'
-            style={{ textDecoration: 'none', color: 'inherit' }}
+            style={{ textDecoration: 'none', color: 'inherit', maxWidth:'420px', width:'100%' }}
           >
             <div
               className='category-image'
@@ -241,13 +241,14 @@ const Content = () => {
                 backgroundImage: featuredCategoriesLoading || featuredCategories.length === 0
                   ? `url(${category.imageUrl})`
                   : `url(${optimizeCloudinaryUrl(category.imageUrl, {
-                      width: 400,
+                      width: 480,
                       height: 300,
                       quality: 'auto',
                       format: 'auto'
                     })})`,
-                backgroundSize: 'cover',
+                backgroundSize: 'contain',
                 backgroundPosition: 'center',
+                backgroundRepeat:'no-repeat',
                 position: 'relative'
               }}
             >
@@ -256,7 +257,7 @@ const Content = () => {
               {!featuredCategoriesLoading && featuredCategories.length > 0 && (
                 <div style={{
                   position: 'absolute',
-                  bottom: '20px',
+                  top: '40px',
                   left: '20px',
                   right: '20px',
                   color: 'white',
