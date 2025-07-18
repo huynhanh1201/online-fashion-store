@@ -670,18 +670,14 @@ const BlogDetail = () => {
                     color: 'text.primary',
                     wordWrap: 'break-word',
                     overflowWrap: 'break-word',
-                    maxWidth: '100%',
                     '& img': {
                       width: '100%',
-                      maxWidth: '100%',
                       height: 'auto',
-                      maxHeight: { xs: '540px', sm: '650px', md: '800px' },
                       display: 'block',
                       margin: '1rem 0',
-                      objectFit: 'contain', // Changed to 'contain' to avoid cropping
+                      objectFit: 'contain',
                       objectPosition: 'center',
                       border: 'none',
-                      borderRadius: '4px', // Optional: slight rounding for aesthetics
                     },
                     '& p': { mb: 3 },
                     '& h1, & h2, & h3, & h4, & h5, & h6': {
@@ -714,7 +710,8 @@ const BlogDetail = () => {
                     },
                     '& code': {
                       fontSize: { xs: '0.8rem', md: '0.9rem' }
-                    }
+                    },
+
                   }}
                   dangerouslySetInnerHTML={{ __html: processedContent || currentBlog.content }}
                 />
