@@ -715,7 +715,46 @@ const BlogDetail = () => {
                   }}
                   dangerouslySetInnerHTML={{ __html: processedContent || currentBlog.content }}
                 />
-                {/* ... rest of CardContent (tags section unchanged) ... */}
+
+                {/* Tags Section */}
+                {currentBlog.tags && currentBlog.tags.length > 0 && (
+                  <Box sx={{ mt: 4, pt: 3, borderTop: '1px solid', borderColor: 'grey.200' }}>
+                    <Typography
+                      variant="h6"
+                      sx={{
+                        fontSize: '1.1rem',
+                        fontWeight: 600,
+                        mb: 2,
+                        color: 'text.primary'
+                      }}
+                    >
+                      Thẻ bài viết
+                    </Typography>
+                    <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+                      {currentBlog.tags.map((tag, index) => (
+                        <Chip
+                          key={index}
+                          label={tag}
+                          variant="outlined"
+                          size="small"
+                          sx={{
+                            borderColor: 'primary.main',
+                            color: 'primary.main',
+                            fontSize: '0.8rem',
+                            fontWeight: 500,
+                            transition: 'all 0.2s ease',
+                            '&:hover': {
+                              backgroundColor: 'primary.main',
+                              color: 'white',
+                              transform: 'translateY(-1px)',
+                              boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+                            }
+                          }}
+                        />
+                      ))}
+                    </Box>
+                  </Box>
+                )}
               </CardContent>
             </Box>
 
