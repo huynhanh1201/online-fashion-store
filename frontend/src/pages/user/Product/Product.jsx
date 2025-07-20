@@ -140,8 +140,8 @@ const Product = () => {
 
       // Map sort option to API sort parameter (chỉ cho backend sort)
       const backendSortMap = {
-        nameAsc: 'name_asc',
-        nameDesc: 'name_desc'
+        nameAsc: 'name_desc',
+        nameDesc: 'name_asc'
       }
 
       const params = {
@@ -325,13 +325,13 @@ const Product = () => {
             backgroundImage: bannerLoading
               ? 'none'
               : productBanner
-              ? `url(${optimizeCloudinaryUrl(productBanner.imageUrl, {
+                ? `url(${optimizeCloudinaryUrl(productBanner.imageUrl, {
                   width: 1800,
                   height: 400,
                   quality: 'auto',
                   format: 'auto'
                 })})`
-              : 'url(https://www.rcuw.org/wp-content/themes/champion/images/SM-placeholder.png)',
+                : 'url(https://www.rcuw.org/wp-content/themes/champion/images/SM-placeholder.png)',
             backgroundSize: 'cover',
             backgroundPosition: 'center',
             borderRadius: '8px',
@@ -360,7 +360,7 @@ const Product = () => {
             display: 'flex',
             flexDirection: 'column',
             justifyContent: 'center',
-            alignItems: { xs: 'center'},
+            alignItems: { xs: 'center' },
             p: { xs: 2, md: 4 },
             minHeight: { xs: 180, md: 400 }
           }}
@@ -508,7 +508,7 @@ const Product = () => {
                 </div>
               ))}
             </div>
-            <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4, mb: 2 , alignItems: 'center'}}>
+            <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4, mb: 2, alignItems: 'center' }}>
               <Pagination
                 count={totalPages}
                 page={page}
