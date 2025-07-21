@@ -466,9 +466,18 @@ const Payment = () => {
 
       // Kiểm tra và xử lý districtId
       let districtId = address.districtId
+
+      // Nếu districtId là string và không thể parse thành số, có thể là tên district
       if (typeof districtId === 'string' && isNaN(parseInt(districtId, 10))) {
         console.error('districtId không phải là số:', districtId)
-        throw new Error('Thông tin địa chỉ không hợp lệ. Vui lòng chọn lại địa chỉ.')
+        console.error('Địa chỉ đầy đủ:', address)
+        throw new Error('Thông tin địa chỉ không hợp lệ. Vui lòng chỉnh sửa lại địa chỉ để cập nhật thông tin mới nhất.')
+      }
+
+      // Đảm bảo districtId là số
+      const numericDistrictId = parseInt(districtId, 10)
+      if (isNaN(numericDistrictId)) {
+        throw new Error('Mã quận/huyện không hợp lệ. Vui lòng chỉnh sửa lại địa chỉ.')
       }
 
       const payload = {
@@ -476,7 +485,7 @@ const Payment = () => {
           variantId: item.variantId,
           quantity: item.quantity,
         })),
-        to_district_id: parseInt(districtId, 10),
+        to_district_id: numericDistrictId,
         to_ward_code: address.wardId,
       }
 
