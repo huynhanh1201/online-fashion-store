@@ -120,10 +120,10 @@ export default function AddAddressModal({
         field === 'fullName'
           ? !value.trim() || value.trim().length < 3
           : field === 'phone'
-          ? !value.trim() || !/^(0[3|5|7|8|9])[0-9]{8}$/.test(value.trim())
-          : field === 'address'
-          ? !value.trim() || value.trim().length < 5
-          : !value,
+            ? !value.trim() || !/^(0[3|5|7|8|9])[0-9]{8}$/.test(value.trim())
+            : field === 'address'
+              ? !value.trim() || value.trim().length < 5
+              : !value,
     }));
   };
 
@@ -311,8 +311,7 @@ export default function AddAddressModal({
   const handleSubmit = async () => {
     const errors = {
       fullName: !formData.fullName.trim() || formData.fullName.trim().length < 3,
-      phone:
-        !formData.phone.trim() || !/^(0[3|5|7|8|9])[0-9]{8}$/.test(formData.phone.trim()),
+      phone: !formData.phone.trim() || !/^(0[3|5|7|8|9])[0-9]{8}$/.test(formData.phone.trim()),
       address: !formData.address.trim() || formData.address.trim().length < 5,
       city: !formData.city,
       district: !formData.district,
@@ -325,25 +324,30 @@ export default function AddAddressModal({
     }
 
     // Lấy tên và mã định danh từ các danh sách
-    const cityName = provinces.find((p) => p.code === formData.city)?.name || '';
-    const districtName = districts.find((d) => d.code === formData.district)?.name || '';
-    const wardName = wards.find((w) => w.code === formData.ward)?.name || '';
+    const city = provinces.find((p) => p.code === formData.city);
+    const district = districts.find((d) => d.code === formData.district);
+    const ward = wards.find((w) => w.code === formData.ward);
+
+    const cityName = city?.name || '';
+    const districtName = district?.name || '';
+    const wardName = ward?.name || '';
 
     const addressData = {
       fullName: formData.fullName.trim(),
       phone: formData.phone.trim(),
       address: formData.address.trim(),
       city: cityName,
-      cityId: parseInt(formData.city, 10),
+      cityId: formData.city, // Giữ nguyên chuỗi
       district: districtName,
-      districtId: parseInt(formData.district, 10),
+      districtId: formData.district, // Giữ nguyên chuỗi
       ward: wardName,
-      wardId: parseInt(formData.ward, 10),
+      wardId: formData.ward, // Giữ nguyên chuỗi
     };
 
-    // Kiểm tra ID hợp lệ
-    if (isNaN(addressData.cityId) || isNaN(addressData.districtId) || isNaN(addressData.wardId)) {
-      showSnackbar?.('Mã tỉnh/thành, quận/huyện hoặc phường/xã không hợp lệ!', 'error');
+    // Kiểm tra dữ liệu hợp lệ
+    if (!cityName || !districtName || !wardName || !formData.city || !formData.district || !formData.ward) {
+      console.error('Invalid address data:', addressData);
+      showSnackbar?.('Thông tin địa chỉ không hợp lệ! Vui lòng kiểm tra lại.', 'error');
       return;
     }
 
