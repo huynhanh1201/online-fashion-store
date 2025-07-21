@@ -98,59 +98,66 @@ const addressGHNService = {
     }
   },
 };
- const fetchShippingPrice = async (address, items) => {
-    if (!address || !items?.length) {
-      console.warn('fetchShippingPrice: Thiếu address hoặc items', { address, items })
-      setShippingPrice(0)
-      return
-    }
-
-    try {
-      setShippingPriceLoading(true)
-
-      // Tạo payload theo format mới
-      const payload = {
-        cartItems: items.map(item => ({
-          variantId: item.variantId,
-          quantity: item.quantity
-        })),
-        to_district_id: parseInt(address.districtId, 10),
-        to_ward_code: address.wardId
-      }
-
-      console.log('fetchShippingPrice payload:', payload)
-
-      const response = await fetch('http://localhost:8017/v1/deliveries/calculate-fee', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(payload),
-      })
-
-      if (!response.ok) {
-        throw new Error(`Lỗi từ API: ${response.status} - ${response.statusText}`)
-      }
-
-      const data = await response.json()
-      console.log('fetchShippingPrice response:', data)
-
-      const fee = data?.totalFeeShipping
-      if (typeof fee !== 'number' || fee <= 0) {
-        throw new Error('Phí vận chuyển không hợp lệ hoặc bằng 0')
-      }
-
-      setShippingPrice(fee)
-    } catch (error) {
-      console.error('Lỗi tính phí vận chuyển:', error.message)
-      setShippingPrice(0)
-      setSnackbar({
-        open: true,
-        severity: 'error',
-        message: `Không thể tính phí vận chuyển: ${error.message}`,
-      })
-    } finally {
-      setShippingPriceLoading(false)
-    }
+const fetchShippingPrice = async (address, items) => {
+  if (!address || !items?.length) {
+    console.warn('fetchShippingPrice: Thiếu address hoặc items', { address, items })
+    setShippingPrice(0)
+    return
   }
+
+  try {
+    setShippingPriceLoading(true)
+
+    // Kiểm tra và xử lý districtId
+    let districtId = address.districtId
+    if (typeof districtId === 'string' && isNaN(parseInt(districtId, 10))) {
+      console.error('districtId không phải là số:', districtId)
+      throw new Error('Thông tin địa chỉ không hợp lệ. Vui lòng chọn lại địa chỉ.')
+    }
+
+    // Tạo payload theo format mới
+    const payload = {
+      cartItems: items.map(item => ({
+        variantId: item.variantId,
+        quantity: item.quantity
+      })),
+      to_district_id: parseInt(districtId, 10),
+      to_ward_code: address.wardId
+    }
+
+    console.log('fetchShippingPrice payload:', payload)
+
+    const response = await fetch('http://localhost:8017/v1/deliveries/calculate-fee', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(payload),
+    })
+
+    if (!response.ok) {
+      throw new Error(`Lỗi từ API: ${response.status} - ${response.statusText}`)
+    }
+
+    const data = await response.json()
+    console.log('fetchShippingPrice response:', data)
+
+    const fee = data?.totalFeeShipping
+    if (typeof fee !== 'number' || fee <= 0) {
+      throw new Error('Phí vận chuyển không hợp lệ hoặc bằng 0')
+    }
+
+    setShippingPrice(fee)
+  } catch (error) {
+    console.error('Lỗi tính phí vận chuyển:', error.message)
+    setShippingPrice(0)
+    setSnackbar({
+      open: true,
+      severity: 'error',
+      message: `Không thể tính phí vận chuyển: ${error.message}`,
+    })
+  } finally {
+    setShippingPriceLoading(false)
+  }
+}
 export default addressGHNService;

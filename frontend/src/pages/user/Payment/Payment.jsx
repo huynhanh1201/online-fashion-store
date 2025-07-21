@@ -464,12 +464,19 @@ const Payment = () => {
     try {
       setShippingPriceLoading(true)
 
+      // Kiểm tra và xử lý districtId
+      let districtId = address.districtId
+      if (typeof districtId === 'string' && isNaN(parseInt(districtId, 10))) {
+        console.error('districtId không phải là số:', districtId)
+        throw new Error('Thông tin địa chỉ không hợp lệ. Vui lòng chọn lại địa chỉ.')
+      }
+
       const payload = {
         cartItems: items.map(item => ({
           variantId: item.variantId,
           quantity: item.quantity,
         })),
-        to_district_id: parseInt(address.districtId, 10),
+        to_district_id: parseInt(districtId, 10),
         to_ward_code: address.wardId,
       }
 
