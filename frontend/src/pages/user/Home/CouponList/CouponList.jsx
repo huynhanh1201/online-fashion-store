@@ -118,9 +118,9 @@ const CouponList = ({ onCouponSelect }) => {
   }
 
   return (
-    <div className='coupon-container'>
-      <div className='coupon-wrapper' ref={containerRef}>
-        <div className='coupon-scroll-wrapper' style={{display:'flex',alignItems:'center',gap:'8px',position:'relative'}}>
+    <div className='coupon-container' style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width: '100%' }}>
+      <div className='coupon-wrapper' ref={containerRef} style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+        <div className='coupon-scroll-wrapper' style={{display:'flex',alignItems:'center',gap:'8px',position:'relative', justifyContent:'center'}}>
           <button
             className={`scroll-btn left${!showLeftArrow ? ' disabled' : ''}`}
             onClick={scrollLeft}
@@ -129,7 +129,7 @@ const CouponList = ({ onCouponSelect }) => {
           >
             {'<'}
           </button>
-          <div className='coupon-grid-scroll' ref={scrollRef} style={{flex:'1 1 0',minWidth:'0',overflowX:'auto',display:'flex',gap:'16px',scrollBehavior:'smooth',width:'auto',whiteSpace:'nowrap'}}>
+          <div className='coupon-grid-scroll' ref={scrollRef} style={{flex:'1 1 0',minWidth:'0',overflowX:'auto',display:'flex',gap:'16px',scrollBehavior:'smooth',width:'auto',whiteSpace:'nowrap', justifyContent:'center', alignItems:'center'}}>
             {coupons.map((coupon) => {
               const isPercent = coupon.type === 'percent'
               const isFreeShip =
