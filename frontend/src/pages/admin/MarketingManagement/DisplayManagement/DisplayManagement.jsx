@@ -136,7 +136,7 @@ const DisplayManagement = () => {
   }, [])
 
   const formatDate = (dateString) => {
-    if (!dateString) return 'N/A'
+    if (!dateString) return 'Không giới hạn'
     return new Date(dateString).toLocaleDateString('vi-VN')
   }
 
