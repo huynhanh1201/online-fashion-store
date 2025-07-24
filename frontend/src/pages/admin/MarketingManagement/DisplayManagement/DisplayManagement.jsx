@@ -205,12 +205,6 @@ const DisplayManagement = () => {
       icon: <VisibilityIcon />,
       color: '#2e7d32'
     },
-    {
-      title: 'Đang hoạt động',
-      value: banners.filter((b) => isBannerActive(b)).length,
-      icon: <CalendarIcon />,
-      color: '#ed6c02'
-    }
   ]
 
   // Loading skeleton
