@@ -83,38 +83,6 @@ const FooterPreview = ({ logo, about, socialLinks, stores, fanpageImage }) => {
                 <span style={{ fontSize: 16, marginRight: 8 }}>✉️</span> {about[0].email}
               </Typography>
             )}
-            <Typography sx={{ mb: 1, fontWeight: 500 }}>ĐĂNG KÝ NHẬN TIN</Typography>
-            <Typography variant='caption'>Hãy là người đầu tiên nhận khuyến mãi lớn!</Typography>
-            <Box sx={{ mt: 1, display: 'flex', gap: 1 }}>
-              <Box
-                sx={{ 
-                  bgcolor: 'white', 
-                  borderRadius: '4px', 
-                  flex: 1,
-                  px: 2,
-                  py: 1,
-                  fontSize: 15,
-                  color: '#333'
-                }}
-              >
-                Nhập địa chỉ email
-              </Box>
-              <Box
-                sx={{ 
-                  bgcolor: 'var(--primary-color)', 
-                  color: 'white', 
-                  width: '100px',
-                  px: 2,
-                  py: 1,
-                  borderRadius: 1,
-                  textAlign: 'center',
-                  fontSize: 14,
-                  fontWeight: 500
-                }}
-              >
-                ĐĂNG KÝ
-              </Box>
-            </Box>
           </Box>
 
           {/* Cột 3: Danh sách cửa hàng */}

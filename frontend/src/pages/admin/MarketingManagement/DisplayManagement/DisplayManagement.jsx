@@ -204,7 +204,7 @@ const DisplayManagement = () => {
       value: banners.filter((banner) => banner.visible).length,
       icon: <VisibilityIcon />,
       color: '#2e7d32'
-    },
+    }
   ]
 
   // Loading skeleton
