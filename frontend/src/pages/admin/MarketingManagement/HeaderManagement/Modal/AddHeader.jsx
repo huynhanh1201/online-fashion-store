@@ -496,7 +496,7 @@ const AddHeader = ({ open, onClose, onSuccess }) => {
                 }}
               >
                 <CloudUploadIcon sx={{ color: '#3b82f6', fontSize: 20 }} />
-                Top Banners
+                Thông báo cuộn
               </Typography>
 
               <Box
@@ -565,16 +565,16 @@ const AddHeader = ({ open, onClose, onSuccess }) => {
                               variant='body2'
                               sx={{ color: '#1e293b', fontWeight: 500 }}
                             >
-                              Hiển thị Banner {index + 1}
+                              Thông báo cuộn {index + 1}
                             </Typography>
                           }
                         />
                         <TextField
-                          label={`Nội dung Banner ${index + 1}`}
+                          label={`Nội dung Thông báo cuộn  ${index + 1}`}
                           value={banner.text}
                           fullWidth
                           error={validationErrors.some((err) =>
-                            err.includes(`Banner ${index + 1}`)
+                            err.includes(`Thông báo cuộn ${index + 1}`)
                           )}
                           onChange={(e) =>
                             handleBannerChange(index, 'text', e.target.value)
@@ -586,7 +586,7 @@ const AddHeader = ({ open, onClose, onSuccess }) => {
                             }
                           }}
                         />
-                        <Tooltip title='Xóa banner'>
+                        <Tooltip title='Xóa thông báo cuộn'>
                           <IconButton
                             onClick={() => handleDeleteBanner(index)}
                             sx={{
@@ -621,7 +621,7 @@ const AddHeader = ({ open, onClose, onSuccess }) => {
                   }
                 }}
               >
-                Thêm Banner
+                Thêm thông báo cuộn
               </Button>
             </Box>
           </Stack>
