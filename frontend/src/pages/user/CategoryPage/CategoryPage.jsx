@@ -326,22 +326,6 @@ const CategoryPage = () => {
           )}
         </Box>
       </Box>
-      {/* Title dưới banner */}
-      <Box sx={{ textAlign: 'center', mt: 3, mb: 3 }}>
-        <Typography
-          variant='h2'
-          sx={{
-            color: 'var(--text-color)',
-            fontSize: { xs: '2rem', sm: '3rem', md: '4rem' },
-            fontWeight: 'bold',
-            textShadow: '2px 2px 4px rgba(0,0,0,0.05)',
-            mb: 2,
-            lineHeight: 1.1
-          }}
-        >
-          {category.name}
-        </Typography>
-      </Box>
 
       {/* Products Section */}
       <Box sx={{ p: 2, maxWidth: '1800px', mx: 'auto' }}>

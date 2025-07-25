@@ -407,7 +407,7 @@ const HeaderManagement = () => {
               }
             }}
           >
-            <Tab label='Logo & Nội dung thông báo chạy' />
+            <Tab label='Logo & Nội dung thông báo cuộn' />
             <Tab label='Chỉnh sửa Menu mở rộng' />
             <Tab label='Chỉnh sửa menu danh mục' />
           </Tabs>
@@ -482,7 +482,7 @@ const HeaderManagement = () => {
                       <TableCell
                         sx={{ fontWeight: 700, color: '#334155', py: 2 }}
                       >
-                        Top Banner
+                        Thông báo cuộn
                       </TableCell>
                       <TableCell
                         sx={{ fontWeight: 700, color: '#334155', py: 2 }}

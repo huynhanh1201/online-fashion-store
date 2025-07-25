@@ -113,6 +113,7 @@ function App() {
       <Route path='login' element={<Login />} />
       <Route path='register' element={<Register />} />
       <Route path='/account/verification' element={<AccountVerification />} />
+      <Route path='searchresult' element={<SearchResult />} />
 
       {/*Customer*/}
       <Route path='/' element={<UserLayout />}>
@@ -144,7 +145,6 @@ function App() {
           <Route path='profile' element={<Profile />} />
           <Route path='orders' element={<Order />} />
           <Route path='order-detail/:orderId' element={<OrderDetail />} />
-          <Route path='searchresult' element={<SearchResult />} />
         </Route>
         <Route index element={<UserHome />} />
       </Route>

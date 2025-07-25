@@ -99,30 +99,6 @@ function Footer() {
                 <EmailIcon sx={{ fontSize: 16, mr: 1 }} /> {a.email}
               </Typography>
             ))}
-            <Typography sx={{ mb: 1, fontWeight: 500 }}>ĐĂNG KÝ NHẬN TIN</Typography>
-            <Typography variant='caption'>Hãy là người đầu tiên nhận khuyến mãi lớn!</Typography>
-            <Box sx={{ mt: 1, display: 'flex', gap: 1 }}>
-              <TextField
-                placeholder='Nhập địa chỉ email'
-                variant='outlined'
-                fullWidth
-                sx={{ bgcolor: 'white', borderRadius: '4px', '& input': { fontSize: 15 } }}
-              />
-              <Button 
-                size='small' 
-                sx={{ 
-                  bgcolor: 'var(--accent-color)', 
-                  color: 'white', 
-                  width: '100px',
-                  '&:hover': {
-                    bgcolor: 'var(--primary-color)'
-                  }
-                }} 
-                variant='contained'
-              >
-                ĐĂNG KÝ
-              </Button>
-            </Box>
           </Box>
 
           {/* Cột 2: Chính sách + Hỗ trợ */}

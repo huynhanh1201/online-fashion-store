@@ -83,10 +83,13 @@ export default function PolicyManagement() {
       setError('')
       setLoading(true)
       const response = await getPolicies({ page: 1, limit: 100 })
-      // Filter policies: chỉ lấy destroy = false và status = active
+      console.log('Raw response from API:', response)
+      console.log('Policies data:', response.policies)
+      // Filter policies: chỉ lấy destroy = false và type = 'policy'
       const filteredPolicies = response.policies.filter(policy =>
-        policy.destroy === false && policy.status === 'active'
+        policy.destroy === false && policy.type === 'policy'
       )
+      console.log('Filtered policies:', filteredPolicies)
       setPolicies(filteredPolicies)
     } catch (error) {
       setError('Không thể tải danh sách chính sách')
@@ -192,6 +195,8 @@ export default function PolicyManagement() {
   // Thống kê
   const totalPolicies = policies.length
   const activePolicies = policies.filter(p => p.status === 'active').length
+  const draftPolicies = policies.filter(p => p.status === 'draft').length
+  const archivedPolicies = policies.filter(p => p.status === 'archived').length
 
   // Lấy danh sách loại chính sách đã có
   const existingTypes = policies.map(p => p.category)
@@ -257,8 +262,18 @@ export default function PolicyManagement() {
             value: activePolicies,
             icon: <GavelIcon />,
             color: '#2e7d32'
+          }, {
+            title: 'Bản nháp',
+            value: draftPolicies,
+            icon: <GavelIcon />,
+            color: '#ed6c02'
+          }, {
+            title: 'Lưu trữ',
+            value: archivedPolicies,
+            icon: <GavelIcon />,
+            color: '#9c27b0'
           }].map((item, index) => (
-            <Grid item xs={12} sm={6} md={4} key={index}>
+            <Grid item xs={12} sm={6} md={3} key={index}>
               <Card
                 sx={{
                   display: 'flex',
@@ -376,7 +391,9 @@ export default function PolicyManagement() {
                     <LoadingSkeleton key={index} />
                   ))
                 ) : policies.length > 0 ? (
-                  policies.map((policy) => (
+                  policies.map((policy) => {
+                    console.log('Rendering policy:', policy)
+                    return (
                     <TableRow
                       key={policy._id}
                       sx={{
@@ -400,8 +417,18 @@ export default function PolicyManagement() {
                       </TableCell>
                       <TableCell sx={{ py: 2 }}>
                         <Chip
-                          label={policy.status === 'active' ? 'Hoạt động' : policy.status}
-                          color={policy.status === 'active' ? 'success' : 'default'}
+                          label={
+                            policy.status === 'active' ? 'Hoạt động' :
+                            policy.status === 'draft' ? 'Bản nháp' :
+                            policy.status === 'archived' ? 'Lưu trữ' :
+                            policy.status
+                          }
+                          color={
+                            policy.status === 'active' ? 'success' :
+                            policy.status === 'draft' ? 'warning' :
+                            policy.status === 'archived' ? 'secondary' :
+                            'default'
+                          }
                           size="small"
                         />
                       </TableCell>
@@ -431,7 +458,8 @@ export default function PolicyManagement() {
                         </Stack>
                       </TableCell>
                     </TableRow>
-                  ))
+                    )
+                  })
                 ) : (
                   <TableRow>
                     <TableCell colSpan={4} sx={{ textAlign: 'center', py: 4 }}>

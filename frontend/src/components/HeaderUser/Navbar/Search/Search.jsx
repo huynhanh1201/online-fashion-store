@@ -173,7 +173,31 @@ const Search = () => {
       />
 
       {showInput && (suggestions.length > 0 || errorMessage) && (
-        <SuggestionList>
+        <Box
+          sx={{
+            position: 'absolute',
+            top: 'calc(100% + 16px)',
+            right: 0,
+            width: 320,
+            background: '#fff',
+            border: '1.5px solid #1976d2',
+            borderRadius: 3,
+            boxShadow: '0 8px 32px rgba(25, 118, 210, 0.18)',
+            zIndex: 99,
+            p: 0,
+            mt: 1,
+            minHeight: 60,
+            maxHeight: 400,
+            overflowY: 'auto',
+            display: 'flex',
+            flexDirection: 'column'
+          }}
+        >
+          <Box sx={{ px: 2, py: 1, borderBottom: '1px solid #e3e3e3', background: '#f5faff' }}>
+            <Typography variant="subtitle2" color="primary" fontWeight={700}>
+              Gợi ý sản phẩm
+            </Typography>
+          </Box>
           {errorMessage ? (
             <Typography
               variant='body2'
@@ -233,7 +257,7 @@ const Search = () => {
               </StyledListItem>
             ))
           )}
-        </SuggestionList>
+        </Box>
       )}
     </SearchWrapper>
   )

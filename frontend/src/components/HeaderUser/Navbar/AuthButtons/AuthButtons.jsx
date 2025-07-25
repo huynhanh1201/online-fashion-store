@@ -109,9 +109,12 @@ const AuthButtons = () => {
   }
 
   return (
-    <div style={{ display: 'flex', gap: '8px' }}>
+    <div style={{ display: 'flex' }}>
       {!currentUser ? (
         <>
+          <StyledButtonRegister component={Link} to='/Register'>
+            Đăng ký
+          </StyledButtonRegister>
           <StyledButtonLogin component={Link} to='/login'>
             Đăng nhập
           </StyledButtonLogin>

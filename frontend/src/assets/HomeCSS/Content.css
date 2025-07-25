@@ -18,6 +18,7 @@
     gap: 16px;
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     margin-bottom: 32px;
+    place-items: center; 
 }
 
 .category-card {
@@ -26,17 +27,19 @@
     overflow: hidden;
     transition: transform 0.2s ease;
     margin-bottom: 16px;
+    border: 1.5px solid #e0e0e0;
+    box-shadow: 0 4px 16px rgba(60, 60, 60, 0.08), 0 1.5px 4px rgba(0,0,0,0.04);
 }
 .category-card:hover {
     transform: translateY(-4px);
 }
 
 .category-image {
-    height: 200px;
+    height: 250px;
     position: relative;
     display: flex;
     align-items: flex-end;
-    border-radius: 12px 12px 0 0;
+    border-radius: 12px !important;
 }
 
 /* Voucher Grid */
