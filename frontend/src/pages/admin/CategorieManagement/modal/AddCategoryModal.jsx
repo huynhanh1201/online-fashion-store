@@ -21,7 +21,7 @@ import { useForm } from 'react-hook-form'
 import StyleAdmin from '~/assets/StyleAdmin.jsx'
 import { CloudinaryCategory, URI } from '~/utils/constants'
 import useCategories from '~/hooks/admin/useCategories.js'
-
+import { getProducts } from '~/services/admin/productService'
 const uploadToCloudinary = async (file, folder = CloudinaryCategory) => {
   const formData = new FormData()
   formData.append('file', file)
@@ -53,9 +53,49 @@ const AddCategoryModal = ({ open, onClose, onAdded, onSave }) => {
   const [bannerPreview, setBannerPreview] = useState('')
   const bannerInputRef = useRef()
   const { categories, fetchCategories } = useCategories()
+  const [filteredCategories, setFilteredCategories] = useState([])
+
   useEffect(() => {
     fetchCategories(1, 100000)
   }, [])
+  useEffect(() => {
+    const loadFilteredCategories = async () => {
+      const rootCategories = categories.filter((cat) => cat.parent === null)
+
+      const results = await Promise.all(
+        rootCategories.map(async (category) => {
+          try {
+            const { products, total } = await getProducts({
+              page: 1,
+              limit: 1,
+              categoryId: category._id
+            })
+
+            if (
+              Array.isArray(products) &&
+              products.length === 0 &&
+              total === 0
+            ) {
+              return category
+            }
+          } catch (error) {
+            console.error(
+              'Lỗi khi kiểm tra sản phẩm danh mục:',
+              category._id,
+              error
+            )
+          }
+
+          return null
+        })
+      )
+
+      setFilteredCategories(results.filter(Boolean))
+    }
+
+    loadFilteredCategories()
+  }, [categories])
+
   const handleImageChange = (e) => {
     const file = e.target.files[0]
     if (file) {
@@ -128,10 +168,6 @@ const AddCategoryModal = ({ open, onClose, onAdded, onSave }) => {
     onClose()
   }
 
-  const filteredCategories = categories.filter(
-    (category) => category.parent === null
-  )
-
   return (
     <Dialog
       open={open}
@@ -164,8 +200,7 @@ const AddCategoryModal = ({ open, onClose, onAdded, onSave }) => {
                   borderRadius={2}
                   position='relative'
                   sx={{
-                    backgroundColor: '#fafafa',
-                    cursor: 'pointer',
+                    backgroundColor: '#ccc',
                     width: 350,
                     height: 331
                   }}
@@ -179,7 +214,7 @@ const AddCategoryModal = ({ open, onClose, onAdded, onSave }) => {
                         style={{
                           width: '100%',
                           height: '100%',
-                          objectFit: 'cover',
+                          objectFit: 'contain',
                           borderRadius: 8
                         }}
                       />
@@ -246,8 +281,7 @@ const AddCategoryModal = ({ open, onClose, onAdded, onSave }) => {
                   borderRadius={2}
                   position='relative'
                   sx={{
-                    backgroundColor: '#fafafa',
-                    cursor: 'pointer',
+                    backgroundColor: '#ccc',
                     width: 350,
                     height: 331
                   }}
@@ -263,7 +297,7 @@ const AddCategoryModal = ({ open, onClose, onAdded, onSave }) => {
                         style={{
                           width: '100%',
                           height: '100%',
-                          objectFit: 'cover',
+                          objectFit: 'contain',
                           borderRadius: 8
                         }}
                       />

@@ -72,7 +72,7 @@ const WarehouseSlipsTab = () => {
     date: new Date(),
     profitType: 'Import',
     warehouseId: '',
-    partnerCode: '',
+    partnerId: '',
     partnerName: '',
     note: ''
   })
@@ -87,25 +87,26 @@ const WarehouseSlipsTab = () => {
     fetchBatches()
     setModalType(type)
     setNewSlipData({
-      ...newSlipData,
-      slipId: '',
+      ...initialSlipData,
       profitType: type === 'input' ? 'Import' : 'Export'
     })
     setOpenModal(true)
   }
 
+  const initialSlipData = {
+    slipId: '',
+    date: new Date(),
+    profitType: 'Import',
+    warehouseId: '',
+    partnerId: '',
+    partnerName: '',
+    note: ''
+  }
+
   const handleCloseModal = () => {
     setOpenModal(false)
     setModalType('input')
-    setNewSlipData({
-      slipId: '',
-      date: new Date(),
-      profitType: 'Import',
-      warehouseId: '',
-      partnerCode: '',
-      partnerName: '',
-      note: ''
-    })
+    setNewSlipData(initialSlipData)
     setItems([{ variantId: '', lot: '', quantity: '', unit: '', note: '' }])
   }
 
@@ -176,11 +177,11 @@ const WarehouseSlipsTab = () => {
 
     return {
       ...slip,
-      warehouse: warehouseName || 'N/A',
+      warehouse: warehouseName || 'Không có dữ liệu',
       type: slip.type === 'import' ? 'Nhập' : 'Xuất',
       createdAtFormatted: new Date(slip.createdAt).toLocaleDateString('vi-VN'),
       itemCount: slip.items.length,
-      createdByName: slip.createdBy?.name || 'N/A'
+      createdByName: slip.createdBy?.name || 'Không có dữ liệu'
     }
   })
   const warehouseSlipColumns = [
@@ -203,7 +204,12 @@ const WarehouseSlipsTab = () => {
       pr: 14,
       format: (value) => `${value.toLocaleString('vi-VN')}`
     },
-    { id: 'createdByName', label: 'Người tạo', minWidth: 150, align: 'start' },
+    {
+      id: 'createdByName',
+      label: 'Người tạo phiếu',
+      minWidth: 150,
+      align: 'start'
+    },
     { id: 'createdAtFormatted', label: 'Ngày thực hiện', minWidth: 150 },
     { id: 'action', label: 'Hành động', minWidth: 130, align: 'start' }
   ]
@@ -266,7 +272,7 @@ const WarehouseSlipsTab = () => {
                                 flex: 1,
                                 display: 'flex',
                                 alignItems: 'center',
-                                backgroundColor: '#093FB4', //093FB4
+                                backgroundColor: '#4CAF50', //093FB4
                                 color: '#fff'
                               }}
                             >

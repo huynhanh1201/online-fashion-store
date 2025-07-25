@@ -113,9 +113,9 @@ export default function FilterBlog({
         }}
         options={[
           { label: 'Tất cả', value: '' },
-          { label: 'Nháp', value: 'pending' },
-          { label: 'Đã duyệt', value: 'approved' },
-          { label: 'Không duyệt', value: 'rejected' }
+          { label: 'Nháp', value: 'draft' },
+          { label: 'Đã xuất bản', value: 'published' },
+          { label: 'Lưu trữ', value: 'archived' }
         ]}
         sx={{ width: 160 }}
       />

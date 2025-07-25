@@ -64,6 +64,7 @@ const useVariants = () => {
           // Mặc định giống newest
           updated = [result, ...prev].slice(0, ROWS_PER_PAGE)
         }
+        setTotalPages((prev) => prev + 1)
 
         return updated
       })

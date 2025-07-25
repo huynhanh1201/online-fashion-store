@@ -335,13 +335,15 @@ const PartnersTab = () => {
                       rawValue = (page - 1) * ROWS_PER_PAGE + index + 1
                       break
                     case 'name':
-                      rawValue = row.name ? capitalizeWords(row.name) : '—'
+                      rawValue = row.name
+                        ? capitalizeWords(row.name)
+                        : 'Không có dữ liệu'
                       break
                     case 'phone':
-                      rawValue = row.contact?.phone || '—'
+                      rawValue = row.contact?.phone || 'Không có dữ liệu'
                       break
                     case 'email':
-                      rawValue = row.contact?.email || '—'
+                      rawValue = row.contact?.email || 'Không có dữ liệu'
                       break
                     case 'address':
                       rawValue =
@@ -352,7 +354,7 @@ const PartnersTab = () => {
                           row.address?.city
                         ]
                           .filter(Boolean)
-                          .join(', ') || '—'
+                          .join(', ') || 'Không có dữ liệu'
                       break
                     case 'bank':
                       rawValue = row.bankInfo?.accountNumber
@@ -360,7 +362,7 @@ const PartnersTab = () => {
                         : '—'
                       break
                     default:
-                      rawValue = row[col.id] ?? '—'
+                      rawValue = row[col.id] ?? 'Không có dữ liệu'
                   }
 
                   let content = rawValue

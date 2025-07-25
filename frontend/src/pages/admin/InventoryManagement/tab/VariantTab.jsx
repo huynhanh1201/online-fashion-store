@@ -214,12 +214,12 @@ const VariantsTab = () => {
       pr: 4,
       format: (value) => `${value.toLocaleString('vi-VN')}₫`
     },
-    // {
-    //   id: 'destroy',
-    //   label: 'Trạng thái biến thể',
-    //   minWidth: 150,
-    //   align: 'start'
-    // },
+    {
+      id: 'status',
+      label: 'Trạng thái biến thể',
+      minWidth: 150,
+      align: 'start'
+    },
     // {
     //   id: 'createdAt',
     //   label: 'Ngày tạo',
@@ -399,6 +399,28 @@ const VariantsTab = () => {
                           <Chip
                             label={rawValue === 0 ? 'Hết hàng' : 'Còn hàng'}
                             color={rawValue === 0 ? 'error' : 'success'}
+                            size='large'
+                            sx={{ width: 127, fontWeight: 800 }}
+                          />
+                        )
+                      }
+                      if (id === 'status') {
+                        content = (
+                          <Chip
+                            label={
+                              row.status === 'draft'
+                                ? 'Bản nháp'
+                                : row.status === 'active'
+                                  ? 'Hoạt động'
+                                  : 'Không hoạt động'
+                            }
+                            color={
+                              row.status === 'draft'
+                                ? 'default'
+                                : row.status === 'active'
+                                  ? 'success'
+                                  : 'error'
+                            }
                             size='large'
                             sx={{ width: 127, fontWeight: 800 }}
                           />

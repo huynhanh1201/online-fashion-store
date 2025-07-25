@@ -61,7 +61,7 @@ export default function DiscountRow({
             content = discount.code?.toUpperCase() || '—'
             break
           case 'type':
-            content = discount.type === 'fixed' ? 'Cố định' : 'Phần trăm'
+            content = discount.type === 'fixed' ? 'Giảm theo số tiền' : 'Giảm theo phần trăm'
             break
           case 'amount':
             content =
@@ -84,7 +84,7 @@ export default function DiscountRow({
                 label={discount.isActive ? 'Đang hoạt động' : 'Ngừng hoạt động'}
                 color={discount.isActive ? 'success' : 'error'}
                 size='large'
-                sx={{ width: '127px', fontWeight: '800' }}
+                sx={{ width: '130px', fontWeight: '800' }}
               />
             )
             break

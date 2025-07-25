@@ -98,7 +98,7 @@ export default function ModalUploadImage({ open, onClose, onUpload }) {
             mx: 'auto',
             mb: 2,
             cursor: preview ? 'default' : 'pointer',
-            backgroundColor: '#fafafa'
+            backgroundColor: '#ccc'
           }}
           onClick={preview ? undefined : handleClickSelect}
         >
@@ -107,7 +107,7 @@ export default function ModalUploadImage({ open, onClose, onUpload }) {
               <img
                 src={preview}
                 alt='preview'
-                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                style={{ width: '100%', height: '100%', objectFit: 'contain' }}
               />
               <Box
                 sx={{

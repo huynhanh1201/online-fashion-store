@@ -43,7 +43,6 @@ const userSchema = new Schema(
     // Vai trò người dùng: 'user' hoặc 'HeaderAdmin'
     role: {
       type: String,
-      enum: ['owner', 'technical_admin', 'staff', 'customer'],
       default: 'customer'
     },
 
@@ -68,6 +67,11 @@ const userSchema = new Schema(
     // Xác thực email
     verifyToken: {
       type: String
+    },
+
+    roleId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Role'
     }
   },
   {
@@ -77,9 +81,15 @@ const userSchema = new Schema(
 )
 
 // Gắn plugin kiểm tra liên kết
-// userSchema.plugin(refIntegrityPlugin, {
-//   references: [{ model: 'ShippingAddress', foreignField: 'userId' }]
-// })
+userSchema.plugin(refIntegrityPlugin, {
+  references: [
+    { model: 'WarehouseSlip', foreignField: 'createdBy._id' },
+    { model: 'Order', foreignField: 'userId' },
+    { model: 'InventoryLog', foreignField: 'createdBy._id' },
+    { model: 'Blog', foreignField: 'author.id' },
+    { model: 'Review', foreignField: 'userId' }
+  ]
+})
 
 // Tạo Model
 export const UserModel = model('User', userSchema)

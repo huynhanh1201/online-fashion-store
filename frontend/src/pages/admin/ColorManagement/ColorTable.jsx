@@ -49,7 +49,7 @@ const ColorTable = ({
       align: 'left',
       width: 130,
       maxWidth: 130,
-      pl: '20px'
+      pl: '14px'
     }
   ]
 

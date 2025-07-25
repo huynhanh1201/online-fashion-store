@@ -68,7 +68,18 @@ const formatDateTime = (dateString) => {
 export default function ViewPartnerModal({ open, onClose, partner }) {
   if (!partner) return null
   return (
-    <Dialog open={open} onClose={onClose} fullWidth maxWidth='sm'>
+    <Dialog
+      open={open}
+      onClose={onClose}
+      maxWidth='md'
+      sx={{
+        '& .MuiDialog-paper': {
+          width: 'auto', // Chiều rộng theo nội dung
+          maxWidth: 'md', // Giới hạn không vượt quá md
+          minWidth: 500 // (tuỳ chọn) đảm bảo không quá nhỏ
+        }
+      }}
+    >
       <DialogTitle>Thông tin đối tác</DialogTitle>
       <DialogContent dividers sx={{ py: 0 }}>
         <Table>

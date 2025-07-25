@@ -126,7 +126,7 @@ const updateWebsiteConfig = async (websiteConfigId, reqBody) => {
 const deleteWebsiteConfig = async (websiteConfigId) => {
   // eslint-disable-next-line no-useless-catch
   try {
-    const websiteConfigDeleted = await WebsiteConfigModel.findOneAndUpdate(
+    const websiteConfigDeleted = await WebsiteConfigModel.updateOne(
       { _id: websiteConfigId },
       { destroy: true },
       { new: true }

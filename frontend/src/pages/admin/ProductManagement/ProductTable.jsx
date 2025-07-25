@@ -217,15 +217,15 @@ const ProductTable = ({
       align: 'start'
     },
     { id: 'moreVariants', label: 'Biến thể', minWidth: 100, align: 'start' },
-    { id: 'exportPrice', label: 'Giá bán', minWidth: 100, align: 'right' },
-    {
-      id: 'importPrice',
-      label: 'Giá nhập',
-      minWidth: 150,
-      align: 'right',
-      pr: 7
-    },
+    { id: 'exportPrice', label: 'Giá bán', minWidth: 150, align: 'right', pr: 6 },
     { id: 'description', label: 'Mô tả', minWidth: 150, align: 'start' },
+    {
+      id: 'status',
+      label: 'Trạng thái',
+      minWidth: 150,
+      align: 'start'
+    },
+
     // { id: 'status', label: 'Trạng thái', minWidth: 130, align: 'start' },
     { id: 'action', label: 'Hành động', minWidth: 130, align: 'start' }
   ]

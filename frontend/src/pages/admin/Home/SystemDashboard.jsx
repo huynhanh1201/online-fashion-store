@@ -219,7 +219,7 @@ export default function SystemDashboard({
           mb={2}
         >
           <Typography variant='h5' fontWeight='bold'>
-            Lợi nhuận theo tháng
+            Biểu đồ lợi nhuận theo tháng
           </Typography>
           <Select
             size='small'

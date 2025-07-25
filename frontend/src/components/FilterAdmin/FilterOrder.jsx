@@ -14,10 +14,7 @@ import SearchWithSuggestions from '~/components/FilterAdmin/common/SearchWithSug
 import FilterByPrice from '~/components/FilterAdmin/common/FilterByPrice'
 import FilterSelect from '~/components/FilterAdmin/common/FilterSelect.jsx'
 export default function FilterOrder({
-  onFilter,
-  users = [],
-  loading,
-  fetchOrders
+  onFilter
 }) {
   const [keyword, setKeyword] = useState('')
   const [inputValue, setInputValue] = useState('')
@@ -42,9 +39,9 @@ export default function FilterOrder({
     }
   }, [keyword, userId, status, sort, paymentMethod, paymentStatus])
 
-  const handleSearch = () => {
-    setKeyword(inputValue)
-  }
+  // const handleSearch = () => {
+  //   setKeyword(inputValue)
+  // }
 
   const handleApplyTimeFilter = (selected) => {
     setSelectedFilter(selected)
@@ -168,11 +165,14 @@ export default function FilterOrder({
         onChange={setStatus}
         options={[
           { label: 'Tất cả', value: '' },
+          { label: 'Đang chờ', value: 'Pending' },
           { label: 'Đang xử lý', value: 'Processing' },
-          { label: 'Đã xuất kho', value: 'Shipped' },
           { label: 'Đang vận chuyển', value: 'Shipping' },
-          { label: 'Đã giao hàng', value: 'Delivered' },
-          { label: 'Đã hủy', value: 'Cancelled' }
+          { label: 'Đã gửi hàng', value: 'Shipped' },
+          { label: 'Đã giao', value: 'Delivered' },
+          { label: 'Đã hủy', value: 'Cancelled' },
+          { label: 'Thất bại', value: 'Failed' }
+
         ]}
         sx={{ width: 200 }}
       />

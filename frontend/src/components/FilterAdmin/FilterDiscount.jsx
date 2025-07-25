@@ -164,8 +164,8 @@ export default function FilterDiscount({ onFilter, loading }) {
         onChange={setType}
         options={[
           { label: 'Tất cả', value: '' },
-          { label: 'Giảm theo %', value: 'percent' },
-          { label: 'Giảm theo giá', value: 'fixed' }
+          { label: 'Giảm theo phần trăm', value: 'percent' },
+          { label: 'Giảm theo số tiền', value: 'fixed' }
         ]}
       />
       {/*<FilterByPrice*/}

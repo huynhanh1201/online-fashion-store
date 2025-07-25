@@ -36,8 +36,8 @@ const RoleTable = ({
 }) => {
   const columns = [
     { id: 'index', label: 'STT', align: 'center', width: 50 },
-    { id: 'label', label: 'Tên vai trò', align: 'left', minWidth: 200 },
-    { id: 'name', label: 'Tên định danh', align: 'left', minWidth: 200 },
+    { id: 'label', label: 'Tên hiển thị', align: 'left', minWidth: 200 },
+    { id: 'name', label: 'Tên vai trò', align: 'left', minWidth: 200 },
     {
       id: 'permissionCount',
       label: 'Số quyền',
@@ -53,7 +53,7 @@ const RoleTable = ({
       align: 'left',
       width: 130,
       maxWidth: 130,
-      pl: '20px'
+      pl: '12px'
     }
   ]
   const { hasPermission } = usePermissions()

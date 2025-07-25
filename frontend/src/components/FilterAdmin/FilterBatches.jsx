@@ -5,7 +5,6 @@ import FilterSelect from '~/components/FilterAdmin/common/FilterSelect'
 import FilterByTime from '~/components/FilterAdmin/common/FilterByTime'
 import SearchWithSuggestions from '~/components/FilterAdmin/common/SearchWithSuggestions'
 import useVariants from '~/hooks/admin/Inventory/useVariants.js'
-import useWarehouses from '~/hooks/admin/Inventory/useWarehouses.js'
 import useBatches from '~/hooks/admin/Inventory/useBatches.js'
 export default function FilterBatches({ onFilter, loading }) {
   const [keyword, setKeyword] = useState('')
@@ -131,23 +130,24 @@ export default function FilterBatches({ onFilter, loading }) {
     onFilter({ sort: 'newest' })
     // fetchData?.()
   }
-  const uniqueVariants = variants.filter(
-    (v, index, self) => self.findIndex((x) => x.name === v.name) === index
-  )
+  // const uniqueVariants = variants.filter(
+  //   (v, index, self) => self.findIndex((x) => x.name === v.name) === index
+  // )
+  // console.log('uniqueVariants', uniqueVariants)
   return (
     <Box display='flex' flexWrap='wrap' gap={2} mb={2} justifyContent='end'>
-      <FilterSelect
-        label='Biến thể'
-        value={variantId}
-        onChange={setVariantId}
-        options={[
-          { label: 'Tất cả', value: '' },
-          ...uniqueVariants.map((v) => ({
-            label: v.name,
-            value: v._id
-          }))
-        ]}
-      />
+      {/*<FilterSelect*/}
+      {/*  label='Biến thể'*/}
+      {/*  value={variantId}*/}
+      {/*  onChange={setVariantId}*/}
+      {/*  options={[*/}
+      {/*    { label: 'Tất cả', value: '' },*/}
+      {/*    ...uniqueVariants.map((v) => ({*/}
+      {/*      label: v.name,*/}
+      {/*      value: v._id*/}
+      {/*    }))*/}
+      {/*  ]}*/}
+      {/*/>*/}
       {/*<FilterSelect*/}
       {/*  label='Kho'*/}
       {/*  value={warehouseId}*/}
