@@ -98,8 +98,8 @@ const NewProducts = () => {
 
       // Map sort option to API sort parameter (chỉ cho backend sort)
       const backendSortMap = {
-        nameAsc: 'name_asc',
-        nameDesc: 'name_desc'
+        nameAsc: 'name_desc',
+        nameDesc: 'name_asc'
       }
 
       const params = {

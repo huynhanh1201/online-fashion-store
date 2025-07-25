@@ -1,11 +1,12 @@
 import { useState, useEffect, useCallback } from 'react'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import { getProductById } from '~/services/productService'
 import { getDiscounts } from '~/services/discountService'
 import { addToCart, getCart } from '~/services/cartService'
 import { getProductVariants } from '~/services/variantService'
 import { setCartItems, setTempCart } from '~/redux/cart/cartSlice'
+import { selectCurrentUser } from '~/redux/user/userSlice'
 
 const useProductDetail = (productId) => {
   const [product, setProduct] = useState(null)
@@ -32,6 +33,7 @@ const useProductDetail = (productId) => {
 
   const dispatch = useDispatch()
   const navigate = useNavigate()
+  const currentUser = useSelector(selectCurrentUser)
 
   // Format currency
   const formatCurrencyShort = (value) => {
@@ -247,6 +249,16 @@ const useProductDetail = (productId) => {
   const handleAddToCart = async (productId) => {
     if (isAdding[productId] || !product) return
 
+    // Kiểm tra đăng nhập
+    if (!currentUser) {
+      setSnackbar({
+        open: true,
+        severity: 'warning',
+        message: 'Vui lòng đăng nhập để thêm sản phẩm vào giỏ hàng!'
+      })
+      return
+    }
+
     if (!selectedVariant) {
       setSnackbar({
         open: true,
@@ -335,6 +347,16 @@ const useProductDetail = (productId) => {
   // Handle buy now
   const handleBuyNow = () => {
     if (!product) return
+
+    // Kiểm tra đăng nhập
+    if (!currentUser) {
+      setSnackbar({
+        open: true,
+        severity: 'warning',
+        message: 'Vui lòng đăng nhập để mua sản phẩm!'
+      })
+      return
+    }
 
     if (variants.length > 0 && !selectedVariant) {
       setSnackbar({

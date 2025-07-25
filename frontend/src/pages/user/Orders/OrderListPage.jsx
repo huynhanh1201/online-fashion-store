@@ -392,85 +392,145 @@ const OrderRow = ({ order, onOrderUpdate, onOrderCancelled, onReorder, reorderLo
             <CircularProgress size={40} />
           </Box>
         ) : (
-          <Stack spacing={2}>
-            {items.map((item, i) => (
-              <Box
-                key={i}
-                sx={{
-                  p: 2,
-                  borderRadius: 2,
-                  backgroundColor: 'grey.50',
-                  border: '1px solid',
-                  borderColor: 'grey.200',
-                  cursor: 'pointer',
-                  transition: 'all 0.2s ease',
-                  '&:hover': {
-                    backgroundColor: 'grey.100',
-                    borderColor: 'var(--primary-color)',
-                    transform: 'translateX(4px)'
-                  }
-                }}
-                onClick={() => navigate(`/order-detail/${order._id}`)}
-              >
-                <Box display="flex" justifyContent="space-between" alignItems="center">
-                  <Box display="flex" alignItems="center" gap={2}>
-                    <Avatar
-                      src={optimizeCloudinaryUrl(item.color?.image) || '/images/default.jpg'}
-                      alt={item.name}
-                      sx={{
-                        width: 80,
-                        height: 80,
-                        borderRadius: 2,
-                        border: '2px solid white',
-                        boxShadow: '0 4px 8px rgba(0,0,0,0.1)'
-                      }}
-                      variant="rounded"
-                    />
-                    <Box>
-                      <Typography
-                        fontWeight={600}
-                        fontSize="1.1rem"
+          <Box sx={{ position: 'relative' }}>
+            <Stack spacing={2}>
+              {items.slice(0, 3).map((item, i) => (
+                <Box
+                  key={i}
+                  sx={{
+                    p: 2,
+                    borderRadius: 2,
+                    backgroundColor: 'grey.50',
+                    border: '1px solid',
+                    borderColor: 'grey.200',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s ease',
+                    '&:hover': {
+                      backgroundColor: 'grey.100',
+                      borderColor: 'var(--primary-color)',
+                      transform: 'translateX(4px)'
+                    }
+                  }}
+                  onClick={() => navigate(`/order-detail/${order._id}`)}
+                >
+                  <Box display="flex" justifyContent="space-between" alignItems="center">
+                    <Box display="flex" alignItems="center" gap={2}>
+                      <Avatar
+                        src={optimizeCloudinaryUrl(item.color?.image) || '/images/default.jpg'}
+                        alt={item.name}
                         sx={{
-                          mb: 0.5,
-                          overflow: 'hidden',
-                          textOverflow: 'ellipsis',
-                          whiteSpace: 'nowrap',
-                          maxWidth: { xs: '150px', sm: '200px', md: '250px' }
+                          width: 80,
+                          height: 80,
+                          borderRadius: 2,
+                          border: '2px solid white',
+                          boxShadow: '0 4px 8px rgba(0,0,0,0.1)'
                         }}
-                        title={capitalizeFirstLetter(item.name)}
-                      >
-                        {capitalizeFirstLetter(item.name)}
-                      </Typography>
-                      <Typography
-                        variant="body2"
-                        color="text.secondary"
-                        sx={{ mb: 0.5 }}
-                      >
-                        Phân loại hàng: {capitalizeFirstLetter(item.color?.name)}, {formatSize(item.size)}
-                      </Typography>
-                      <Chip
-                        label={`Số lượng: ${item.quantity}`}
-                        size="small"
-                        variant="outlined"
-                        sx={{ fontSize: '0.7rem', height: 20 }}
+                        variant="rounded"
                       />
+                      <Box>
+                        <Typography
+                          fontWeight={600}
+                          fontSize="1.1rem"
+                          sx={{
+                            mb: 0.5,
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            whiteSpace: 'nowrap',
+                            maxWidth: { xs: '150px', sm: '200px', md: '250px' }
+                          }}
+                          title={capitalizeFirstLetter(item.name)}
+                        >
+                          {capitalizeFirstLetter(item.name)}
+                        </Typography>
+                        <Typography
+                          variant="body2"
+                          color="text.secondary"
+                          sx={{ mb: 0.5 }}
+                        >
+                          Phân loại hàng: {capitalizeFirstLetter(item.color?.name)}, {formatSize(item.size)}
+                        </Typography>
+                        <Chip
+                          label={`Số lượng: ${item.quantity}`}
+                          size="small"
+                          variant="outlined"
+                          sx={{ fontSize: '0.7rem', height: 20 }}
+                        />
+                      </Box>
+                    </Box>
+
+                    <Box textAlign="right">
+                      {/* Hiển thị giá thực tế đã trả dựa trên tỷ lệ từ order.total */}
+                      <Typography
+                        fontWeight={700}
+                        fontSize="1.2rem"
+                        color="var(--primary-color)"
+                      >
+                        {getActualItemPrice(item).toLocaleString('vi-VN')}₫
+                      </Typography>
                     </Box>
                   </Box>
-
-                  <Box textAlign="right">
-                    {/* Hiển thị giá thực tế đã trả dựa trên tỷ lệ từ order.total */}
-                    <Typography
-                      fontWeight={700}
-                      fontSize="1.2rem"
-                      color="var(--primary-color)"
-                    >
-                      {getActualItemPrice(item).toLocaleString('vi-VN')}₫
-                    </Typography>
-                  </Box>
                 </Box>
+              ))}
+            </Stack>
+
+            {/* Fade overlay and "View Details" button when there are more than 3 items */}
+            {items.length > 3 && (
+              <Box
+                sx={{
+                  position: 'absolute',
+                  bottom: 0,
+                  left: 0,
+                  right: 0,
+                  height: 120,
+                  background: 'linear-gradient(to bottom, transparent 0%, rgba(255, 255, 255, 0.7) 40%, rgba(255, 255, 255, 0.95) 100%)',
+                  display: 'flex',
+                  alignItems: 'flex-end',
+                  justifyContent: 'center',
+                  pb: 2,
+                  zIndex: 10,
+                  pointerEvents: 'none'
+                }}
+              >
+                <Button
+                  variant="contained"
+                  startIcon={<Visibility />}
+                  onClick={() => navigate(`/order-detail/${order._id}`)}
+                  sx={{
+                    borderRadius: 3,
+                    textTransform: 'none',
+                    fontWeight: 600,
+                    backgroundColor: 'var(--primary-color)',
+                    color: 'white',
+                    px: 4,
+                    py: 1.5,
+                    boxShadow: '0 6px 20px rgba(26, 60, 123, 0.4)',
+                    pointerEvents: 'auto',
+                    '&:hover': {
+                      backgroundColor: 'var(--primary-color)',
+                      transform: 'translateY(-3px)',
+                      boxShadow: '0 8px 25px rgba(26, 60, 123, 0.5)'
+                    },
+                    transition: 'all 0.3s ease',
+                    '&::before': {
+                      content: '""',
+                      position: 'absolute',
+                      top: -8,
+                      left: '50%',
+                      transform: 'translateX(-50%)',
+                      width: 0,
+                      height: 0,
+                      borderLeft: '6px solid transparent',
+                      borderRight: '6px solid transparent',
+                      borderBottom: '8px solid var(--primary-color)',
+                      opacity: 0.7
+                    }
+                  }}
+                >
+                  Xem chi tiết đơn hàng
+                </Button>
               </Box>
-            ))}
-          </Stack>
+            )}
+          </Box>
         )}
 
         {/* Footer: Total + Actions */}
@@ -860,7 +920,7 @@ const OrderListPage = () => {
               fontWeight: 500
             }}
           >
-           Đơn hàng
+            Đơn hàng
           </Typography>
         </Breadcrumbs>
       </Box>

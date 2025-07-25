@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Box, Typography } from '@mui/material'
+import { Box, Typography, Breadcrumbs, Link } from '@mui/material'
+import { NavigateNext } from '@mui/icons-material'
 import useBlog from '~/hooks/useBlog.js'
 import { optimizeCloudinaryUrl } from '~/utils/cloudinary'
 
@@ -116,24 +117,72 @@ const Blog = () => {
           minHeight: '100vh'
         }}
       >
+
         {/* Container với width và padding giống BlogHome.jsx */}
         <Box
           sx={{
             width: '100%',
             maxWidth: '96vw',
             margin: '0 auto',
-            padding: {
-              xs: '40px 16px 24px',
-              sm: '48px 16px 24px',
-              md: '64px 16px 24px'
+            pt: {
+              xs: 2,  // Tăng padding-top để tránh header
+              sm: 2,
+              md: 2
+            },
+            px: {
+              xs: 2,
+              sm: 2,
+              md: 2
+            },
+            pb: {
+              xs: 3,
+              sm: 3,
+              md: 3
             }
           }}
         >
+          <Breadcrumbs
+            separator={<NavigateNext fontSize='small' />}
+            aria-label='breadcrumb'
+            sx={{
+              mb: 2,
+            }}
+          >
+            <Link
+              underline='hover'
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                color: '#007bff',
+                textDecoration: 'none',
+                fontSize: { xs: '0.875rem', sm: '1rem' },
+                fontWeight: 500,
+                transition: 'color 0.2s ease',
+                '&:hover': {
+                  color: '#0056b3',
+                  textDecoration: 'underline'
+                }
+              }}
+              href='/'
+            >
+              Trang chủ
+            </Link>
+            <Typography
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                color: 'text.primary',
+                fontWeight: 500,
+              }}
+            >
+              Tin thời trang
+            </Typography>
+          </Breadcrumbs>
           {/* Header Section */}
           <Box
             sx={{
               textAlign: 'center',
-              mb: { xs: 4, sm: 5, md: 6 }
+              mb: { xs: 3, sm: 4, md: 5 }
             }}
           >
             <Typography
@@ -256,17 +305,17 @@ const Blog = () => {
                       '&:hover': {
                         transform: 'translateY(-8px)',
                         '& .article-card': {
-                          boxShadow: (theme) => theme.shadows[8]
+                          boxShadow: (theme) => theme.shadows[8],
                         },
                         '& .article-image': {
-                          transform: 'scale(1.05)'
-                        }
-                      }
+                          transform: 'scale(1.02)', // Reduced scale to minimize cropping
+                        },
+                      },
                     }}
                     onClick={() => navigate(`/blog/${article.id}`)}
                   >
                     <Box
-                      className='article-card'
+                      className="article-card"
                       sx={{
                         display: 'flex',
                         flexDirection: 'column',
@@ -275,32 +324,50 @@ const Blog = () => {
                         overflow: 'hidden',
                         transition: 'all 0.3s ease',
                         boxShadow: (theme) => theme.shadows[2],
-                        height: '100%'
+                        height: '100%',
                       }}
                     >
                       {/* Image Section */}
                       <Box
                         sx={{
-                          height: { xs: 320, sm: 380, md: 420 }, // Increased height for taller images
+                          aspectRatio: '16/9', // Standard aspect ratio for better image fit
                           position: 'relative',
-                          overflow: 'hidden'
+                          overflow: 'hidden',
+                          width: '100%',
+                          backgroundColor: 'grey.100', // Fallback background for broken images
                         }}
                       >
                         <Box
-                          component='img'
-                          className='article-image'
-                          src={optimizeCloudinaryUrl(article.image)}
+                          component="img"
+                          className="article-image"
+                          src={
+                            article.image
+                              ? optimizeCloudinaryUrl(article.image, {
+                                width: 600, // Optimize for display size
+                                height: 337, // Match 16:9 aspect ratio (600 * 9/16 ≈ 337)
+                                crop: 'fill', // Cloudinary crop mode
+                                quality: 'auto',
+                                fetch_format: 'auto',
+                              })
+                              : '/path/to/fallback-image.jpg' // Fallback image
+                          }
                           alt={article.title}
                           sx={{
                             width: '100%',
                             height: '100%',
-                            objectFit: 'cover',
-                            transition: 'transform 0.3s ease'
+                            objectFit: 'contain', // Changed to 'contain' to avoid cropping
+                            objectPosition: 'center',
+                            transition: 'transform 0.3s ease',
+                            display: 'block',
+                            backgroundColor: 'transparent',
+                          }}
+                          onError={(e) => {
+                            e.target.src = '/path/to/fallback-image.jpg'; // Handle broken images
                           }}
                         />
 
                         {/* Category Tag */}
-                        <Box
+                        {/* <Box
                           sx={{
                             position: 'absolute',
                             top: 12,
@@ -318,42 +385,41 @@ const Blog = () => {
                           }}
                         >
                           {article.category}
-                        </Box>
+                        </Box> */}
                       </Box>
 
-                      {/* Content Section */}
+                      {/* Content Section (unchanged) */}
                       <Box
                         sx={{
                           p: { xs: 2.5, sm: 3 },
                           display: 'flex',
                           flexDirection: 'column',
-                          flex: 1
+                          flex: 1,
                         }}
                       >
                         <Typography
-                          variant='h6'
+                          variant="h6"
                           sx={{
                             fontSize: {
                               xs: '1rem',
                               sm: '1.125rem',
-                              md: '1.25rem'
+                              md: '1.25rem',
                             },
                             fontWeight: 700,
                             color: 'text.primary',
-                            mb: 1.5,
                             lineHeight: 1.4,
                             display: '-webkit-box',
                             WebkitLineClamp: 3,
                             WebkitBoxOrient: 'vertical',
                             overflow: 'hidden',
-                            minHeight: { xs: 60, sm: 66, md: 72 }
+                            minHeight: { xs: 60, sm: 66, md: 72 },
                           }}
                         >
                           {article.title}
                         </Typography>
 
                         <Typography
-                          variant='body2'
+                          variant="body2"
                           sx={{
                             fontSize: { xs: '0.875rem', sm: '0.9375rem' },
                             color: 'text.secondary',
@@ -363,7 +429,7 @@ const Blog = () => {
                             WebkitLineClamp: 4,
                             WebkitBoxOrient: 'vertical',
                             overflow: 'hidden',
-                            flex: 1
+                            flex: 1,
                           }}
                         >
                           {article.subtitle}
@@ -378,21 +444,21 @@ const Blog = () => {
                             mt: 'auto',
                             pt: 2,
                             borderTop: 1,
-                            borderColor: 'divider'
+                            borderColor: 'divider',
                           }}
                         >
                           <Typography
-                            variant='caption'
+                            variant="caption"
                             sx={{
                               color: 'text.disabled',
-                              fontWeight: 500
+                              fontWeight: 500,
                             }}
                           >
                             {article.date}
                           </Typography>
 
                           <Typography
-                            variant='body2'
+                            variant="body2"
                             sx={{
                               color: 'primary.main',
                               fontWeight: 600,
@@ -400,11 +466,11 @@ const Blog = () => {
                               alignItems: 'center',
                               gap: 0.5,
                               '&:hover': {
-                                color: 'primary.dark'
-                              }
+                                color: 'primary.dark',
+                              },
                             }}
                           >
-                            Đọc thêm →
+                            Đọc thêm
                           </Typography>
                         </Box>
                       </Box>
@@ -450,7 +516,7 @@ const Blog = () => {
                   }
                 }}
               >
-                {loadingMore ? 'Đang tải...' : 'Xem thêm ›'}
+                {loadingMore ? 'Đang tải...' : 'Xem thêm'}
               </Box>
             </Box>
           )}

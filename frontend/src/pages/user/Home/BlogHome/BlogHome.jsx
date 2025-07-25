@@ -83,7 +83,6 @@ const BlogHome = () => {
             }
           }}
         >
-
           {/* Loading State */}
           {loading && (
             <Box
@@ -161,7 +160,7 @@ const BlogHome = () => {
                           boxShadow: (theme) => theme.shadows[8]
                         },
                         '& .article-image': {
-                          transform: 'scale(1.05)'
+                          transform: 'scale(1.02)' // Reduced scale to minimize cropping
                         }
                       }
                     }}
@@ -183,26 +182,44 @@ const BlogHome = () => {
                       {/* Image Section */}
                       <Box
                         sx={{
-                          height: { xs: 320, sm: 380, md: 420 }, // Increased height for taller images
+                          aspectRatio: '16/9', // Standard aspect ratio for better image fit
                           position: 'relative',
-                          overflow: 'hidden'
+                          overflow: 'hidden',
+                          width: '100%',
+                          backgroundColor: 'grey.100', // Fallback background for broken images
                         }}
                       >
                         <Box
                           component='img'
                           className='article-image'
-                          src={optimizeCloudinaryUrl(article.image)}
+                          src={
+                            article.image
+                              ? optimizeCloudinaryUrl(article.image, {
+                                width: 600, // Optimize for display size
+                                height: 337, // Match 16:9 aspect ratio (600 * 9/16 ≈ 337)
+                                crop: 'fill', // Cloudinary crop mode
+                                quality: 'auto',
+                                fetch_format: 'auto',
+                              })
+                              : '/path/to/fallback-image.jpg' // Fallback image
+                          }
                           alt={article.title}
                           sx={{
                             width: '100%',
                             height: '100%',
-                            objectFit: 'cover',
-                            transition: 'transform 0.3s ease'
+                            objectFit: 'contain', // Changed to 'contain' to avoid cropping
+                            objectPosition: 'center',
+                            transition: 'transform 0.3s ease',
+                            display: 'block',
+                            backgroundColor: 'transparent',
+                          }}
+                          onError={(e) => {
+                            e.target.src = '/path/to/fallback-image.jpg'; // Handle broken images
                           }}
                         />
 
                         {/* Category Tag */}
-                        <Box
+                        {/* <Box
                           sx={{
                             position: 'absolute',
                             top: 12,
@@ -220,7 +237,7 @@ const BlogHome = () => {
                           }}
                         >
                           {article.category}
-                        </Box>
+                        </Box> */}
                       </Box>
 
                       {/* Content Section */}
@@ -242,7 +259,6 @@ const BlogHome = () => {
                             },
                             fontWeight: 700,
                             color: 'text.primary',
-                            mb: 1.5,
                             lineHeight: 1.4,
                             display: '-webkit-box',
                             WebkitLineClamp: 3,
@@ -306,7 +322,7 @@ const BlogHome = () => {
                               }
                             }}
                           >
-                            Đọc thêm →
+                            Đọc thêm
                           </Typography>
                         </Box>
                       </Box>
@@ -350,7 +366,7 @@ const BlogHome = () => {
                 }}
                 onClick={() => navigate('/blog')}
               >
-                Xem tất cả ›
+                Xem tất cả
               </Box>
             </Box>
           )}
