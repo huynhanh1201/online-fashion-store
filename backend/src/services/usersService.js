@@ -28,7 +28,9 @@ const getUserList = async (queryString) => {
     validatePagination(page, limit)
 
     // Xử lý thông tin Filter
-    const filter = {}
+    const filter = {
+      role: { $ne: 'customer' }
+    }
 
     if (role) filter.role = role
 
@@ -218,7 +220,7 @@ const updatePasswordProfile = async (userId, reqBody) => {
 const restoreUser = async (userId) => {
   // eslint-disable-next-line no-useless-catch
   try {
-    const user = await UserModel.updateOne(
+    const user = await UserModel.findOneAndUpdate(
       { _id: userId },
       {
         destroy: false

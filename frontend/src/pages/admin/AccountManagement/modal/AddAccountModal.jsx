@@ -21,6 +21,7 @@ const AddAccountModal = ({ open, onClose, onSave, roles }) => {
     handleSubmit,
     reset,
     watch,
+    setValue,
     formState: { isSubmitting }
   } = useForm({
     defaultValues: {
@@ -28,7 +29,8 @@ const AddAccountModal = ({ open, onClose, onSave, roles }) => {
       email: '',
       password: '',
       confirmPassword: '',
-      role: ''
+      role: '',
+      roleId: ''
     }
   })
   const [showPassword, setShowPassword] = useState(false)
@@ -47,7 +49,8 @@ const AddAccountModal = ({ open, onClose, onSave, roles }) => {
         email: '',
         password: '',
         confirmPassword: '',
-        role: ''
+        role: '',
+        roleId: ''
       })
     }
   }, [open, reset])
@@ -60,6 +63,7 @@ const AddAccountModal = ({ open, onClose, onSave, roles }) => {
   const roleOptions = roles
     .filter((role) => role.name !== 'customer')
     .map((role) => ({
+      id: role._id,
       name: role.name,
       label: role.label || role.name
     }))
@@ -82,7 +86,7 @@ const AddAccountModal = ({ open, onClose, onSave, roles }) => {
             name='name'
             control={control}
             rules={{
-              required: 'Họ và tên là bắt buộc',
+              required: 'Tên tài khoản là bắt buộc',
               minLength: {
                 value: 3,
                 message: 'Họ và tên phải có ít nhất 3 ký tự'
@@ -100,7 +104,7 @@ const AddAccountModal = ({ open, onClose, onSave, roles }) => {
                 {...field}
                 label={
                   <>
-                    Tên <span style={{ color: 'red' }}>*</span>
+                    Tên tài khoản <span style={{ color: 'red' }}>*</span>
                   </>
                 }
                 fullWidth
@@ -240,11 +244,12 @@ const AddAccountModal = ({ open, onClose, onSave, roles }) => {
               <Autocomplete
                 options={roleOptions}
                 getOptionLabel={(option) => option.label}
-                isOptionEqualToValue={(option, value) =>
-                  option.name === value?.name
-                }
+                isOptionEqualToValue={(option, value) => option.name === value}
                 value={roleOptions.find((r) => r.name === field.value) || null}
-                onChange={(_, selected) => field.onChange(selected?.name || '')}
+                onChange={(_, selected) => {
+                  field.onChange(selected?.name || '')
+                  setValue('roleId', selected?.id || '') // cập nhật roleId
+                }}
                 renderInput={(params) => (
                   <TextField
                     {...params}

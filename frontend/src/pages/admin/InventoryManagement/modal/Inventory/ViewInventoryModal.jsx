@@ -20,9 +20,16 @@ const ViewInventoryModal = ({ open, onClose, inventory }) => {
     <Dialog
       open={open}
       onClose={onClose}
-      maxWidth='sm'
-      fullWidth
-      sx={{ padding: '16px 24px' }}
+      maxWidth='md' // Giới hạn tối đa
+      // Bỏ fullWidth để tự co theo nội dung
+      sx={{
+        '& .MuiDialog-paper': {
+          width: 'auto', // Chiều rộng theo nội dung
+          maxWidth: 'md', // Giới hạn không vượt quá md
+          minWidth: 600, // (tuỳ chọn) đảm bảo không quá nhỏ
+        },
+          padding: '16px 24px'
+      }}
       BackdropProps={{
         sx: StyleAdmin.OverlayModal
       }}
@@ -74,7 +81,7 @@ const ViewInventoryModal = ({ open, onClose, inventory }) => {
                 </TableRow>
 
                 <TableRow>
-                  <TableCell>
+                  <TableCell sx={{ width: 200 }}>
                     <strong>Trạng thái tồn kho</strong>
                   </TableCell>
                   <TableCell>

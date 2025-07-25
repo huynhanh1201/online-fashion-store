@@ -73,8 +73,15 @@ const ViewReviewModal = ({ open, onClose, review, onApprove }) => {
       <Dialog
         open={open}
         onClose={onClose}
-        fullWidth
         maxWidth='xl'
+        sx={{
+          '& .MuiDialog-paper': {
+            width: 'auto',
+            maxWidth: 'xl',
+            minWidth: 800 // (tuỳ chọn) đảm bảo không quá nhỏ
+          },
+          padding: '16px 24px'
+        }}
         BackdropProps={{ sx: StyleAdmin.OverlayModal }}
       >
         <Box>
@@ -243,7 +250,7 @@ const ViewReviewModal = ({ open, onClose, review, onApprove }) => {
               )}
 
               {/* Nội dung đánh giá */}
-              <Box mt={2}>
+              <Box mt={2} sx={{pl: 2}}>
                 <Typography fontWeight='bold' mb={1}>
                   Nội dung đánh giá
                 </Typography>
@@ -307,7 +314,7 @@ const ViewReviewModal = ({ open, onClose, review, onApprove }) => {
           </IconButton>
         </Box>
         <Divider />
-        <Dialog open={mediaPreview.open} onClose={closeMedia} maxWidth='xl'>
+        <Dialog open={mediaPreview.open} onClose={closeMedia} maxWidth='xl' >
           <Box
             display='flex'
             justifyContent='space-between'

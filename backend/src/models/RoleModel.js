@@ -1,4 +1,5 @@
 import mongoose from 'mongoose'
+import { refIntegrityPlugin } from '~/plugins/refIntegrityPlugin'
 const { Schema, model } = mongoose
 
 const roleSchema = new Schema(
@@ -28,6 +29,11 @@ const roleSchema = new Schema(
     timestamps: true
   }
 )
+
+// Gắn plugin kiểm tra liên kết
+roleSchema.plugin(refIntegrityPlugin, {
+  references: [{ model: 'User', foreignField: 'roleId' }]
+})
 
 // Tạo Model
 export const RoleModel = model('Role', roleSchema)

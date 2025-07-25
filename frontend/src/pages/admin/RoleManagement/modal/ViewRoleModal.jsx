@@ -120,7 +120,7 @@ const ViewRoleModal = ({ open, onClose, p, role }) => {
               <Grid item size={4} xs={12} md={4}>
                 <Paper
                   variant='outlined'
-                  sx={{ p: 1, maxHeight: 400, overflowY: 'auto' }}
+                  sx={{ maxHeight: 400, overflowY: 'auto' }}
                 >
                   {p
                     .filter((groupItem) =>
@@ -132,7 +132,6 @@ const ViewRoleModal = ({ open, onClose, p, role }) => {
                       const groupSelectedCount = groupItem.permissions.filter(
                         (perm) => selectedPermissions.includes(perm.key)
                       ).length
-                      console.log('groupItem', groupItem)
                       return (
                         <Box
                           key={groupItem.group}
@@ -144,8 +143,8 @@ const ViewRoleModal = ({ open, onClose, p, role }) => {
                             p: 1,
                             borderBottom: '1px solid #eee',
                             backgroundColor:
-                              idx === selectedGroupIndex
-                                ? '#f5f5f5'
+                              groupItem.group === selectedGroupName
+                                ? '#ccc'
                                 : 'transparent'
                           }}
                           onClick={() => setSelectedGroupName(groupItem.group)}

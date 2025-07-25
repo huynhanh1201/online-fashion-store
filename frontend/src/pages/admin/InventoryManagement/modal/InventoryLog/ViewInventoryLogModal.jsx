@@ -20,7 +20,7 @@ const ViewInventoryLogModal = ({ open, onClose, log }) => {
   if (!log) return null
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth='md' fullWidth>
+    <Dialog open={open} onClose={onClose} maxWidth='md' sx={{ width: '100%', minWidth: '600px' }}>
       <DialogTitle>
         Thông tin lịch sử phiếu {log.type === 'in' ? 'nhập' : 'xuất'} kho
       </DialogTitle>

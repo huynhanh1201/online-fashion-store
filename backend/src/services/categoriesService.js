@@ -280,7 +280,7 @@ const getCategoriesWithProducts = async () => {
 const restoreCategory = async (categoryId) => {
   // eslint-disable-next-line no-useless-catch
   try {
-    const categoryUpdated = await CategoryModel.updateOne(
+    const categoryUpdated = await CategoryModel.findOneAndUpdate(
       { _id: categoryId },
       {
         destroy: false

@@ -40,7 +40,7 @@ export default function EditPartnerModal({
       setValue('phone', partner.contact?.phone || '')
       setValue('email', partner.contact?.email || '')
     }
-  }, [partner, setValue])
+  }, [partner, setValue, open])
 
   const onSubmit = (data) => {
     const { type, phone, email } = data
@@ -148,15 +148,10 @@ export default function EditPartnerModal({
             </Grid>
             <Grid item size={12} xs={12} sm={6}>
               <TextField
-                label={
-                  <>
-                    Email <span style={{ color: 'red' }}>*</span>
-                  </>
-                }
+                label={<>Email</>}
                 type='email'
                 fullWidth
                 {...register('email', {
-                  required: 'Email là bắt buộc',
                   pattern: {
                     value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
                     message: 'Email không đúng định dạng'

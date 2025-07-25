@@ -147,12 +147,12 @@ variantSchema.plugin(refIntegrityPlugin, {
     {
       model: 'WarehouseSlip',
       foreignField: 'variantId'
-    },
-
-    {
-      model: 'CartItem',
-      foreignField: 'variantId'
     }
+
+    // {
+    //   model: 'CartItem',
+    //   foreignField: 'variantId'
+    // }
   ]
 })
 

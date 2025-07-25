@@ -42,7 +42,7 @@ const createPartner = async (reqBody) => {
       type: reqBody.type,
       contact: {
         phone: reqBody.contact?.phone,
-        email: reqBody.contact?.email,
+        email: reqBody.contact?.email || null,
         website: reqBody.contact?.website || null
       },
       taxCode: reqBody.taxCode || null,
@@ -204,7 +204,7 @@ const deletePartner = async (partnerId) => {
 const restorePartner = async (partnerId) => {
   // eslint-disable-next-line no-useless-catch
   try {
-    const partnerDeleted = await PartnerModel.updateOne(
+    const partnerDeleted = await PartnerModel.findOneAndUpdate(
       { _id: partnerId },
       { destroy: false },
       { new: true }

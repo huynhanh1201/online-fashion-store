@@ -326,7 +326,7 @@ const restoreVariant = async (variantId) => {
   // eslint-disable-next-line no-useless-catch
   try {
     // Xóa mềm khi không còn Variant
-    const variantUpdated = await VariantModel.updateOne(
+    const variantUpdated = await VariantModel.findOneAndUpdate(
       {
         _id: variantId
       },

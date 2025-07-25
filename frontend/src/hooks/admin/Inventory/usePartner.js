@@ -107,7 +107,11 @@ const usePartner = () => {
 
   const removePartner = async (id) => {
     try {
-      await deletePartner(id)
+      const remove = await deletePartner(id)
+      if (!remove) {
+        console.error('Không thể xóa đối tác')
+        return false
+      }
       setPartners((prev) => prev.filter((partner) => partner._id !== id))
       setTotal((prev) => prev - 1)
       return true

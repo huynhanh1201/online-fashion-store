@@ -487,169 +487,169 @@ const BlogModal = ({
               }}
             >
               {/* Left Column: Category & Brand */}
-              <Box sx={{ flex: 1 }}>
-                <Paper
-                  sx={{
-                    p: isMobile ? 2 : 2.5,
-                    borderRadius: '8px',
-                    border: '1px solid #e8ecef',
-                    boxShadow: '0 2px 8px rgba(0, 31, 93, 0.06)',
-                    height: 'fit-content'
-                  }}
-                >
-                  <Typography
-                    variant='subtitle1'
-                    sx={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: 1,
-                      color: '#1a202c',
-                      fontWeight: 600,
-                      mb: 2,
-                      fontSize: isMobile ? '1rem' : '1.1rem'
-                    }}
-                  >
-                    <TagIcon sx={{ color: '#0052cc', fontSize: 20 }} />
-                    Phân loại & Thương hiệu
-                  </Typography>
+              {/*<Box sx={{ flex: 1 }}>*/}
+              {/*  <Paper*/}
+              {/*    sx={{*/}
+              {/*      p: isMobile ? 2 : 2.5,*/}
+              {/*      borderRadius: '8px',*/}
+              {/*      border: '1px solid #e8ecef',*/}
+              {/*      boxShadow: '0 2px 8px rgba(0, 31, 93, 0.06)',*/}
+              {/*      height: 'fit-content'*/}
+              {/*    }}*/}
+              {/*  >*/}
+              {/*    <Typography*/}
+              {/*      variant='subtitle1'*/}
+              {/*      sx={{*/}
+              {/*        display: 'flex',*/}
+              {/*        alignItems: 'center',*/}
+              {/*        gap: 1,*/}
+              {/*        color: '#1a202c',*/}
+              {/*        fontWeight: 600,*/}
+              {/*        mb: 2,*/}
+              {/*        fontSize: isMobile ? '1rem' : '1.1rem'*/}
+              {/*      }}*/}
+              {/*    >*/}
+              {/*      <TagIcon sx={{ color: '#0052cc', fontSize: 20 }} />*/}
+              {/*      Phân loại & Thương hiệu*/}
+              {/*    </Typography>*/}
 
-                  <Stack spacing={2}>
-                    <Controller
-                      name='category'
-                      control={control}
-                      render={({ field }) => (
-                        <Autocomplete
-                          options={categories}
-                          freeSolo
-                          value={field.value ?? ''}
-                          onChange={(_, newValue) =>
-                            field.onChange(newValue ?? '')
-                          }
-                          onInputChange={(_, newInputValue) =>
-                            field.onChange(newInputValue)
-                          }
-                          renderInput={(params) => (
-                            <TextField
-                              {...params}
-                              label='Chuyên mục *'
-                              variant='outlined'
-                              helperText='Chọn hoặc nhập chuyên mục'
-                              sx={getInputStyles(theme)}
-                            />
-                          )}
-                        />
-                      )}
-                    />
+              {/*    <Stack spacing={2}>*/}
+              {/*      <Controller*/}
+              {/*        name='category'*/}
+              {/*        control={control}*/}
+              {/*        render={({ field }) => (*/}
+              {/*          <Autocomplete*/}
+              {/*            options={categories}*/}
+              {/*            freeSolo*/}
+              {/*            value={field.value ?? ''}*/}
+              {/*            onChange={(_, newValue) =>*/}
+              {/*              field.onChange(newValue ?? '')*/}
+              {/*            }*/}
+              {/*            onInputChange={(_, newInputValue) =>*/}
+              {/*              field.onChange(newInputValue)*/}
+              {/*            }*/}
+              {/*            renderInput={(params) => (*/}
+              {/*              <TextField*/}
+              {/*                {...params}*/}
+              {/*                label='Chuyên mục *'*/}
+              {/*                variant='outlined'*/}
+              {/*                helperText='Chọn hoặc nhập chuyên mục'*/}
+              {/*                sx={getInputStyles(theme)}*/}
+              {/*              />*/}
+              {/*            )}*/}
+              {/*          />*/}
+              {/*        )}*/}
+              {/*      />*/}
 
-                    <Controller
-                      name='brand'
-                      control={control}
-                      render={({ field }) => (
-                        <Autocomplete
-                          options={brands}
-                          freeSolo
-                          value={field.value ?? ''}
-                          onChange={(_, newValue) =>
-                            field.onChange(newValue ?? '')
-                          }
-                          onInputChange={(_, newInputValue) =>
-                            field.onChange(newInputValue)
-                          }
-                          renderInput={(params) => (
-                            <TextField
-                              {...params}
-                              label='Thương hiệu'
-                              variant='outlined'
-                              helperText='Chọn hoặc nhập thương hiệu'
-                              sx={getInputStyles(theme)}
-                            />
-                          )}
-                        />
-                      )}
-                    />
-                  </Stack>
-                </Paper>
+              {/*      <Controller*/}
+              {/*        name='brand'*/}
+              {/*        control={control}*/}
+              {/*        render={({ field }) => (*/}
+              {/*          <Autocomplete*/}
+              {/*            options={brands}*/}
+              {/*            freeSolo*/}
+              {/*            value={field.value ?? ''}*/}
+              {/*            onChange={(_, newValue) =>*/}
+              {/*              field.onChange(newValue ?? '')*/}
+              {/*            }*/}
+              {/*            onInputChange={(_, newInputValue) =>*/}
+              {/*              field.onChange(newInputValue)*/}
+              {/*            }*/}
+              {/*            renderInput={(params) => (*/}
+              {/*              <TextField*/}
+              {/*                {...params}*/}
+              {/*                label='Thương hiệu'*/}
+              {/*                variant='outlined'*/}
+              {/*                helperText='Chọn hoặc nhập thương hiệu'*/}
+              {/*                sx={getInputStyles(theme)}*/}
+              {/*              />*/}
+              {/*            )}*/}
+              {/*          />*/}
+              {/*        )}*/}
+              {/*      />*/}
+              {/*    </Stack>*/}
+              {/*  </Paper>*/}
 
-                {/* Left Column: Tags */}
-                <Box sx={{ flex: 1, mt: 3 }}>
-                  <Paper
-                    sx={{
-                      p: isMobile ? 2 : 2.5,
-                      borderRadius: '8px',
-                      border: '1px solid #e8ecef',
-                      boxShadow: '0 2px 8px rgba(0, 31, 93, 0.06)',
-                      height: 'fit-content'
-                    }}
-                  >
-                    <Typography
-                      variant='subtitle1'
-                      sx={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: 1,
-                        color: '#1a202c',
-                        fontWeight: 600,
-                        mb: 2,
-                        fontSize: isMobile ? '1rem' : '1.1rem'
-                      }}
-                    >
-                      <TagIcon sx={{ color: '#0052cc', fontSize: 20 }} />
-                      Thẻ
-                    </Typography>
+              {/*  /!* Left Column: Tags *!/*/}
+              {/*  <Box sx={{ flex: 1, mt: 3 }}>*/}
+              {/*    <Paper*/}
+              {/*      sx={{*/}
+              {/*        p: isMobile ? 2 : 2.5,*/}
+              {/*        borderRadius: '8px',*/}
+              {/*        border: '1px solid #e8ecef',*/}
+              {/*        boxShadow: '0 2px 8px rgba(0, 31, 93, 0.06)',*/}
+              {/*        height: 'fit-content'*/}
+              {/*      }}*/}
+              {/*    >*/}
+              {/*      <Typography*/}
+              {/*        variant='subtitle1'*/}
+              {/*        sx={{*/}
+              {/*          display: 'flex',*/}
+              {/*          alignItems: 'center',*/}
+              {/*          gap: 1,*/}
+              {/*          color: '#1a202c',*/}
+              {/*          fontWeight: 600,*/}
+              {/*          mb: 2,*/}
+              {/*          fontSize: isMobile ? '1rem' : '1.1rem'*/}
+              {/*        }}*/}
+              {/*      >*/}
+              {/*        <TagIcon sx={{ color: '#0052cc', fontSize: 20 }} />*/}
+              {/*        Thẻ*/}
+              {/*      </Typography>*/}
 
-                    <Controller
-                      name='tags'
-                      control={control}
-                      render={({ field }) => (
-                        <Autocomplete
-                          multiple
-                          freeSolo
-                          options={[]} // nếu có gợi ý thì thêm vào
-                          value={field.value || []}
-                          inputValue={currentTagInput}
-                          onInputChange={(_, newInputValue) =>
-                            setCurrentTagInput(newInputValue)
-                          }
-                          onChange={(_, newValue) => {
-                            field.onChange(newValue)
-                            setCurrentTagInput('')
-                          }}
-                          renderTags={(value, getTagProps) =>
-                            value.map((option, index) => (
-                              <Chip
-                                variant='filled'
-                                size='small'
-                                label={option}
-                                {...getTagProps({ index })}
-                                key={index}
-                                sx={{
-                                  backgroundColor: '#e3f2fd',
-                                  color: '#0052cc',
-                                  fontWeight: 500,
-                                  '& .MuiChip-deleteIcon': {
-                                    color: '#0052cc',
-                                    '&:hover': { color: '#003d99' }
-                                  }
-                                }}
-                              />
-                            ))
-                          }
-                          renderInput={(params) => (
-                            <TextField
-                              {...params}
-                              label='Thẻ'
-                              placeholder='Nhập tên thể và nhấn Enter'
-                              helperText='VD: thời trang, xu hướng'
-                              variant='outlined'
-                              sx={getInputStyles()}
-                            />
-                          )}
-                        />
-                      )}
-                    />
-                  </Paper>
-                </Box>
-              </Box>
+              {/*      <Controller*/}
+              {/*        name='tags'*/}
+              {/*        control={control}*/}
+              {/*        render={({ field }) => (*/}
+              {/*          <Autocomplete*/}
+              {/*            multiple*/}
+              {/*            freeSolo*/}
+              {/*            options={[]} // nếu có gợi ý thì thêm vào*/}
+              {/*            value={field.value || []}*/}
+              {/*            inputValue={currentTagInput}*/}
+              {/*            onInputChange={(_, newInputValue) =>*/}
+              {/*              setCurrentTagInput(newInputValue)*/}
+              {/*            }*/}
+              {/*            onChange={(_, newValue) => {*/}
+              {/*              field.onChange(newValue)*/}
+              {/*              setCurrentTagInput('')*/}
+              {/*            }}*/}
+              {/*            renderTags={(value, getTagProps) =>*/}
+              {/*              value.map((option, index) => (*/}
+              {/*                <Chip*/}
+              {/*                  variant='filled'*/}
+              {/*                  size='small'*/}
+              {/*                  label={option}*/}
+              {/*                  {...getTagProps({ index })}*/}
+              {/*                  key={index}*/}
+              {/*                  sx={{*/}
+              {/*                    backgroundColor: '#e3f2fd',*/}
+              {/*                    color: '#0052cc',*/}
+              {/*                    fontWeight: 500,*/}
+              {/*                    '& .MuiChip-deleteIcon': {*/}
+              {/*                      color: '#0052cc',*/}
+              {/*                      '&:hover': { color: '#003d99' }*/}
+              {/*                    }*/}
+              {/*                  }}*/}
+              {/*                />*/}
+              {/*              ))*/}
+              {/*            }*/}
+              {/*            renderInput={(params) => (*/}
+              {/*              <TextField*/}
+              {/*                {...params}*/}
+              {/*                label='Thẻ'*/}
+              {/*                placeholder='Nhập tên thể và nhấn Enter'*/}
+              {/*                helperText='VD: thời trang, xu hướng'*/}
+              {/*                variant='outlined'*/}
+              {/*                sx={getInputStyles()}*/}
+              {/*              />*/}
+              {/*            )}*/}
+              {/*          />*/}
+              {/*        )}*/}
+              {/*      />*/}
+              {/*    </Paper>*/}
+              {/*  </Box>*/}
+              {/*</Box>*/}
 
               {/* Right Column: Cover Image */}
               <Box sx={{ flex: 1 }}>

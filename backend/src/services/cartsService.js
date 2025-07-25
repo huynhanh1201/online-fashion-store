@@ -32,7 +32,7 @@ const createCart = async (reqJwtDecoded, reqBody) => {
     // Nếu có giỏ hàng, cập nhật các item trong giỏ hàng
     // Biến thể đã tồn tại
 
-    const updateItemExists = await CartModel.updateOne(
+    const updateItemExists = await CartModel.findOneAndUpdate(
       {
         userId, // nếu bạn đã biết _id của cart
         cartItems: {
@@ -145,7 +145,7 @@ const deleteItemCart = async (userId, reqBody) => {
 const deleteCart = async (userId) => {
   // eslint-disable-next-line no-useless-catch
   try {
-    const updatedCart = await CartModel.findOneAndUpdate(
+    const updatedCart = await CartModel.updateOne(
       {
         userId
       },

@@ -13,12 +13,12 @@ export default function ViewDescriptionModal({ open, onClose, product }) {
     <Dialog
       open={open}
       onClose={onClose}
-      maxWidth='lg' // Adjusted to a smaller maxWidth
-      fullWidth
+      maxWidth='xl' // Adjusted to a smaller maxWidth
+      sx={{ '& .MuiDialog-paper': { width: 'auto', maxWidth: 'xl', minWidth: 600 } }}
       PaperProps={{
         sx: {
           marginTop: '50px',
-          maxHeight: '80vh', // Reduced maxHeight for a more compact view
+          maxHeight: '90vh', // Reduced maxHeight for a more compact view
           display: 'flex',
           flexDirection: 'column'
         }
@@ -73,7 +73,7 @@ export default function ViewDescriptionModal({ open, onClose, product }) {
           dangerouslySetInnerHTML={{ __html: product?.description || '' }}
         />
       </DialogContent>
-      <DialogActions sx={{ padding: '8px 16px' }}>
+      <DialogActions sx={{ padding: '16px 24px' }}>
         {' '}
         {/* Reduced padding for a more compact button area */}
         <Button

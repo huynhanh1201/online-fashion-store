@@ -128,7 +128,7 @@ const updatePermission = async (permissionId, reqBody) => {
 const deletePermission = async (permissionId) => {
   // eslint-disable-next-line no-useless-catch
   try {
-    const permissionDeleted = await PermissionModel.findOneAndUpdate(
+    const permissionDeleted = await PermissionModel.updateOne(
       { _id: permissionId },
       { destroy: true },
       { new: true }

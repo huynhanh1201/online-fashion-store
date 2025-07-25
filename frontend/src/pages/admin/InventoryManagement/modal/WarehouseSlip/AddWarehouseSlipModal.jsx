@@ -136,13 +136,14 @@ export default function AddWarehouseSlipModal({
         return false
       }
       if (!newSlipData.partnerId) {
-        setErrorMessage('Vui lòng chọn nhà cung cấp!')
+        setErrorMessage('Vui lòng chọn đối tác!')
         return false
       }
       if (!items || items.length === 0) {
         setErrorMessage('Vui lòng thêm ít nhất một sản phẩm!')
         return false
       }
+
       if (
         items.some(
           (item) => !item.variantId || !item.quantity || item.quantity <= 0
@@ -187,12 +188,12 @@ export default function AddWarehouseSlipModal({
         note: newSlipData.note || ''
       }
       await addWarehouseSlip(formattedData, filter)
-      setErrorMessage(
-        `Tạo phiếu ${type === 'input' ? 'nhập' : 'xuất'} kho thành công!`
-      )
+
       setSnackbarOpen(true)
       if (onCloseStock) onCloseStock('updated')
       onClose()
+      setSnackbarOpen(false) // 🛠 reset
+      setErrorMessage('') // 🛠 reset
     } catch (error) {
       setErrorMessage(
         `Lỗi khi tạo phiếu ${type === 'input' ? 'nhập' : 'xuất'} kho: ${error.message}`
@@ -331,13 +332,13 @@ export default function AddWarehouseSlipModal({
                 <Grid item size={4} sm={6} md={4}>
                   <FormControl fullWidth>
                     <InputLabel id='partner-label'>
-                      Nhà cung cấp <span style={{ color: 'red' }}>*</span>
+                      Đối tác <span style={{ color: 'red' }}>*</span>
                     </InputLabel>
                     <Select
                       labelId='partner-label'
                       label={
                         <>
-                          Nhà cung cấp <span style={{ color: 'red' }}>*</span>
+                          Đối tác <span style={{ color: 'red' }}>*</span>
                         </>
                       }
                       value={newSlipData.partnerId || ''}
@@ -349,7 +350,7 @@ export default function AddWarehouseSlipModal({
                         </MenuItem>
                       ))}
                       <MenuItem onClick={() => setOpenAddDialog(true)}>
-                        Thêm nhà cung cấp
+                        Thêm đối tác
                       </MenuItem>
                     </Select>
                   </FormControl>
@@ -392,15 +393,27 @@ export default function AddWarehouseSlipModal({
                 <Table stickyHeader size='small'>
                   <TableHead>
                     <TableRow>
-                      <TableCell sx={{ width: 60, textAlign: 'center' }}>
+                      <TableCell
+                        sx={{
+                          width: 60,
+                          textAlign: 'center',
+                          backgroundColor: 'transparent'
+                        }}
+                      >
                         STT
                       </TableCell>
-                      <TableCell>Tên sản phẩm</TableCell>
-                      <TableCell>
+                      <TableCell sx={{ backgroundColor: 'transparent' }}>
+                        Tên sản phẩm
+                      </TableCell>
+                      <TableCell sx={{ backgroundColor: 'transparent' }}>
                         SL {type === 'input' ? 'nhập' : 'xuất'}
                       </TableCell>
-                      <TableCell>Đơn vị</TableCell>
-                      <TableCell>Thao tác</TableCell>
+                      <TableCell sx={{ backgroundColor: 'transparent' }}>
+                        Đơn vị
+                      </TableCell>
+                      <TableCell sx={{ backgroundColor: 'transparent' }}>
+                        Thao tác
+                      </TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>

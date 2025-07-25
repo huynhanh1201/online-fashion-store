@@ -38,10 +38,15 @@ export default function LowStockAlertCard({
   ])
   const [modalType, setModalType] = useState('input')
 
-  const handleOpenModal = (item, warehouseId) => {
-    fetchWarehouses(1, 100000, { status: false })
-    fetchVariants(1, 100000, { status: false })
-    fetchPartner(1, 100000, { status: false })
+  const handleOpenModal = async (item, warehouseId) => {
+    // Đợi tất cả gọi fetch xong
+    await Promise.all([
+      fetchWarehouses(1, 100000, { status: false }),
+      fetchVariants(1, 100000, { status: false }),
+      fetchPartner(1, 100000, { status: false })
+    ])
+
+    // Sau khi chắc chắn đã có dữ liệu → gán
     setModalType('input')
     setNewSlipData({
       slipId: '',

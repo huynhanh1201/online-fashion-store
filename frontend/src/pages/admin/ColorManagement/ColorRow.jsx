@@ -18,8 +18,8 @@ const formatDateTime = (isoString) => {
 const styles = {
   groupIcon: {
     display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: 'start',
+    alignItems: 'start',
     gap: 1,
     width: '130px'
   },

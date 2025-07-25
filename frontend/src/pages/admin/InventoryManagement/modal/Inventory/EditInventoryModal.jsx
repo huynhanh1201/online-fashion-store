@@ -28,7 +28,8 @@ const EditInventoryModal = ({
   useEffect(() => {
     if (inventory) {
       setFormData({
-        minQuantity: Number(inventory.minQuantity ?? 0),
+        minQuantity:
+          inventory.minQuantity === 0 ? '' : (inventory.minQuantity ?? ''),
         importPrice: Number(inventory.importPrice ?? 0),
         exportPrice: Number(inventory.exportPrice ?? 0),
         status: inventory.status ?? 'in-stock',
@@ -41,21 +42,22 @@ const EditInventoryModal = ({
     const { name, value } = e.target
     setFormData((prev) => ({
       ...prev,
-      [name]:
-        name === 'minQuantity' ||
-        name === 'importPrice' ||
-        name === 'exportPrice'
-          ? Number(value) || 0 // Chuyển đổi sang số, mặc định 0 nếu giá trị không hợp lệ
-          : value // Giữ nguyên cho status
+      [name]: ['minQuantity', 'importPrice', 'exportPrice'].includes(name)
+        ? value === ''
+          ? ''
+          : Number(value)
+        : value
     }))
   }
 
   const handleSubmit = async () => {
-    // Kiểm tra dữ liệu trước khi gửi
     const payload = {
-      minQuantity: Number(formData.minQuantity),
-      importPrice: Number(formData.importPrice),
-      exportPrice: Number(formData.exportPrice),
+      minQuantity:
+        formData.minQuantity === '' ? 0 : Number(formData.minQuantity),
+      importPrice:
+        formData.importPrice === '' ? 0 : Number(formData.importPrice),
+      exportPrice:
+        formData.exportPrice === '' ? 0 : Number(formData.exportPrice),
       status: formData.status
     }
 
@@ -84,11 +86,20 @@ const EditInventoryModal = ({
           margin='dense'
           label='Ngưỡng cảnh báo'
           name='minQuantity'
-          type='number'
-          value={formData.minQuantity === 0 ? 0 : formData.minQuantity}
-          onChange={handleChange}
+          type='text'
+          value={formatCurrency(formData.minQuantity)}
+          onChange={(e) =>
+            handleChange({
+              target: {
+                name: 'minQuantity',
+                value: parseCurrency(e.target.value)
+              }
+            })
+          }
           fullWidth
+          inputProps={{ inputMode: 'numeric' }} // Hiển thị bàn phím số trên thiết bị di động
         />
+
         {/*<TextField*/}
         {/*  margin='dense'*/}
         {/*  label='Giá nhập (đ)'*/}

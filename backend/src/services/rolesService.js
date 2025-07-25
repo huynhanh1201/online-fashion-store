@@ -136,7 +136,7 @@ const updateRole = async (roleId, reqBody) => {
 const deleteRole = async (roleId) => {
   // eslint-disable-next-line no-useless-catch
   try {
-    const roleDeleted = await RoleModel.findOneAndUpdate(
+    const roleDeleted = await RoleModel.updateOne(
       { _id: roleId },
       { destroy: true },
       { new: true }

@@ -44,16 +44,6 @@ function WarehouseStatisticTab() {
     fetchStatistics()
   }, [])
 
-  // Kiểm tra quyền truy cập thống kê
-  // if (!hasPermission('statistics:read')) {
-  //   return (
-  //     <Box sx={{ p: 3, textAlign: 'center' }}>
-  //       <Typography variant='h6' color='error'>
-  //         Bạn không có quyền truy cập thống kê kho hàng
-  //       </Typography>
-  //     </Box>
-  //   )
-  // }
 
   return (
     <div
