@@ -145,7 +145,7 @@ const updateReview = async (reviewId, reqBody, jwtDecoded) => {
 const deleteReview = async (reviewId) => {
   // eslint-disable-next-line no-useless-catch
   try {
-    const reviewDeleted = await ReviewModel.findOneAndUpdate(
+    const reviewDeleted = await ReviewModel.updateOne(
       { _id: reviewId },
       { destroy: true },
       { new: true }

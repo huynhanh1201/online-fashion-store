@@ -374,7 +374,7 @@ const restoreProduct = async (productId) => {
   // eslint-disable-next-line no-useless-catch
   try {
     // Xóa mềm khi không còn Variant
-    const productUpdated = await ProductModel.updateOne(
+    const productUpdated = await ProductModel.findOneAndUpdate(
       {
         _id: productId
       },

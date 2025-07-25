@@ -10,7 +10,6 @@ import {
   Grid
 } from '@mui/material'
 import { useForm, Controller } from 'react-hook-form'
-import { toast } from 'react-toastify'
 const AddPartnerModal = ({ open, onClose, addPartner, onSave }) => {
   const {
     register,
@@ -133,15 +132,10 @@ const AddPartnerModal = ({ open, onClose, addPartner, onSave }) => {
             </Grid>
             <Grid item size={12} xs={12} sm={6}>
               <TextField
-                label={
-                  <>
-                    Email <span style={{ color: 'red' }}>*</span>
-                  </>
-                }
+                label={<>Email</>}
                 type='email'
                 fullWidth
                 {...register('email', {
-                  required: 'Email là bắt buộc',
                   pattern: {
                     value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
                     message: 'Email không đúng định dạng'

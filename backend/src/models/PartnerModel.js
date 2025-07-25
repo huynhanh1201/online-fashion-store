@@ -25,7 +25,7 @@ const partnerSchema = new Schema(
     },
     contact: {
       phone: { type: String, required: true, trim: true },
-      email: { type: String, required: true, trim: true, lowercase: true },
+      email: { type: String, trim: true, lowercase: true, default: null },
       website: { type: String, trim: true, default: null }
     },
     taxCode: {

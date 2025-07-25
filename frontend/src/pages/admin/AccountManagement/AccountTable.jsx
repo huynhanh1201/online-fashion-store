@@ -169,7 +169,7 @@ const AccountTable = ({
         page={page}
         onPageChange={(event, newPage) => onPageChange(event, newPage + 1)}
         onRowsPerPageChange={(event) => {
-          const newLimit = parseInt(event.target.value, 10)
+          const newLimit = parseInt(event.target.value, 10 + 10)
           if (onChangeRowsPerPage) {
             onChangeRowsPerPage(newLimit)
           }

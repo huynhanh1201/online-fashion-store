@@ -172,7 +172,7 @@ const EditRoleModal = ({ open, onClose, onSubmit, p, defaultValues }) => {
             <Grid item size={4} xs={12} md={4}>
               <Paper
                 variant='outlined'
-                sx={{ p: 1, maxHeight: 400, overflowY: 'auto' }}
+                sx={{  maxHeight: 400, overflowY: 'auto' }}
               >
                 {p.map((groupItem, idx) => {
                   const groupSelectedCount = groupItem.permissions.filter(
@@ -189,7 +189,7 @@ const EditRoleModal = ({ open, onClose, onSubmit, p, defaultValues }) => {
                         p: 1,
                         borderBottom: '1px solid #eee',
                         backgroundColor:
-                          idx === selectedGroupIndex ? '#f5f5f5' : 'transparent'
+                          idx === selectedGroupIndex ? '#ccc' : 'transparent'
                       }}
                       onClick={() => setSelectedGroupIndex(idx)}
                     >

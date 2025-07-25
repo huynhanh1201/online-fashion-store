@@ -69,8 +69,8 @@ export default function ChartDashboard({ data }) {
               />
               <RechartsTooltip content={<Tooltip />} />
               <Legend />
-              <Bar dataKey='Xuất' fill='#4CAF50' barSize={25} />
-              <Bar dataKey='Nhập' fill='#F44336' barSize={25} />
+              <Bar dataKey='Xuất' fill='#F44336' barSize={25} />
+              <Bar dataKey='Nhập' fill='#4CAF50' barSize={25} />
               <Bar dataKey='Chênh lệch' fill='#2196F3' barSize={20} />
             </BarChart>
           </ResponsiveContainer>

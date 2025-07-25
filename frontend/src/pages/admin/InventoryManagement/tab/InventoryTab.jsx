@@ -701,6 +701,9 @@ const InventoryTab = () => {
                         />
                       )
                     }
+                    if (col.id === 'quantity' || col.id === 'minQuantity') {
+                      content = rawValue?.toLocaleString('vi-VN')
+                    }
                     if (col.id === 'action') {
                       content = (
                         <Stack

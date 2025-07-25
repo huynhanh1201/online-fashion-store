@@ -183,31 +183,31 @@ export default function FilterVariant({
         ]}
       />
 
-      <FilterSelect
-        label='Màu sắc'
-        value={colorName}
-        onChange={setColorName}
-        options={[
-          { label: 'Tất cả', value: '' },
-          ...colors.map((p) => ({
-            label: p.name,
-            value: p.name
-          }))
-        ]}
-      />
+      {/*<FilterSelect*/}
+      {/*  label='Màu sắc'*/}
+      {/*  value={colorName}*/}
+      {/*  onChange={setColorName}*/}
+      {/*  options={[*/}
+      {/*    { label: 'Tất cả', value: '' },*/}
+      {/*    ...colors.map((p) => ({*/}
+      {/*      label: p.name,*/}
+      {/*      value: p.name*/}
+      {/*    }))*/}
+      {/*  ]}*/}
+      {/*/>*/}
 
-      <FilterSelect
-        label='Kích cỡ'
-        value={sizeName}
-        onChange={setSizeName}
-        options={[
-          { label: 'Tất cả', value: '' },
-          ...sizes.map((p) => ({
-            label: p.name,
-            value: p.name
-          }))
-        ]}
-      />
+      {/*<FilterSelect*/}
+      {/*  label='Kích cỡ'*/}
+      {/*  value={sizeName}*/}
+      {/*  onChange={setSizeName}*/}
+      {/*  options={[*/}
+      {/*    { label: 'Tất cả', value: '' },*/}
+      {/*    ...sizes.map((p) => ({*/}
+      {/*      label: p.name,*/}
+      {/*      value: p.name*/}
+      {/*    }))*/}
+      {/*  ]}*/}
+      {/*/>*/}
 
       {/*<FilterSelect*/}
       {/*  label='Giá riêng'*/}

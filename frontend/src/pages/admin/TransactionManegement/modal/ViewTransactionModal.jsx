@@ -47,7 +47,6 @@ const ViewTransactionModal = ({ open, onClose, transaction }) => {
       maxWidth='lg'
       PaperProps={{
         sx: {
-          minHeight: '63vh',
           maxHeight: '90vh',
           display: 'flex',
           flexDirection: 'column'
@@ -105,7 +104,7 @@ const ViewTransactionModal = ({ open, onClose, transaction }) => {
                 <TableCell>
                   {transaction.orderId?.total
                     ? `${transaction.orderId.total.toLocaleString('vi-VN')}₫`
-                    : 'Không có thông tin'}
+                    : '0₫'}
                 </TableCell>
               </TableRow>
 

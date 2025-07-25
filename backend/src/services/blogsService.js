@@ -148,7 +148,7 @@ const updateBlog = async (blogId, reqBody) => {
 const deleteBlog = async (blogId) => {
   // eslint-disable-next-line no-useless-catch
   try {
-    const blogDeleted = await BlogModel.findOneAndUpdate(
+    const blogDeleted = await BlogModel.updateOne(
       { _id: blogId },
       { destroy: true },
       { new: true }

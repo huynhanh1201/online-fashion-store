@@ -60,9 +60,9 @@ const CouponSchema = new Schema(
 )
 
 // Gắn plugin kiểm tra liên kết
-// CouponSchema.plugin(refIntegrityPlugin, {
-//   references: [{ model: 'Order', foreignField: 'couponId' }]
-// })
+CouponSchema.plugin(refIntegrityPlugin, {
+  references: [{ model: 'Order', foreignField: 'couponId' }]
+})
 
 // Tạo Model
 export const CouponModel = model('Coupon', CouponSchema)

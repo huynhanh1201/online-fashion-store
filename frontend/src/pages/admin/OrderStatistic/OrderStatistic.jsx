@@ -36,7 +36,6 @@ const OrderStatistic = ({ stats = {}, financeStatistics, year, setYear }) => {
   const {
     orderStats: {
       totalOrders = 0,
-      totalRevenue = 0,
       totalShipping = 0,
       totalDiscountAmount = 0
     } = {},
@@ -62,7 +61,7 @@ const OrderStatistic = ({ stats = {}, financeStatistics, year, setYear }) => {
     labels: monthlyLabels,
     datasets: [
       {
-        label: `Doanh thu tháng (${selectedYear})`,
+        label: `Tổng lợi nhuận theo tháng (${selectedYear})`,
         data: monthlyProfitData,
         borderColor: '#42A5F5',
         backgroundColor: 'rgba(66, 165, 245, 0.2)',
@@ -391,7 +390,7 @@ const OrderStatistic = ({ stats = {}, financeStatistics, year, setYear }) => {
               mb={2}
             >
               <Typography variant='h5' fontWeight='bold'>
-                Lợi nhuận theo tháng
+                Biểu đồ lợi nhuận theo tháng
               </Typography>
               <Select
                 size='small'

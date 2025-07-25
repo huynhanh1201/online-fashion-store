@@ -17,11 +17,8 @@ const DeleteVariantModal = ({ open, onClose, variant, deleteVariant }) => {
     try {
       await deleteVariant(variant._id, 'delete')
       onClose()
-      onClose()
     } catch (error) {
-      toast.error(
-        `Xóa biến thể thất bại: ${error?.message || 'Đã xảy ra lỗi không xác định'}`
-      )
+      onClose()
     }
   }
 

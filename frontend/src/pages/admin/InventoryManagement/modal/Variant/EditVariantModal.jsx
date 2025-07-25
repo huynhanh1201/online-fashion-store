@@ -138,7 +138,6 @@ const EditVariantModal = ({
         return
       }
       await onUpdateVariant(updatedVariant, 'edit', variant._id)
-      toast.success('Cập nhật biến thể thành công')
       onClose()
     } catch (error) {
       console.error('Error updating variant:', error)

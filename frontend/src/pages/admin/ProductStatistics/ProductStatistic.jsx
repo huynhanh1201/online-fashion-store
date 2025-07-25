@@ -60,6 +60,7 @@ const ProductStatistics = ({ stats }) => {
 
   const chartOptions = {
     responsive: true,
+    maintainAspectRatio: false,
     plugins: {
       tooltip: {
         callbacks: {
@@ -70,7 +71,10 @@ const ProductStatistics = ({ stats }) => {
     scales: {
       y: {
         beginAtZero: true,
-        title: { display: true, text: 'Số lượng sản phẩm' }
+        title: { display: true, text: 'Số lượng sản phẩm' },
+        ticks: {
+          precision: 0 // ✅ hiển thị số nguyên, không có .0
+        }
       },
       x: {
         title: { display: true, text: 'Danh mục' }
@@ -160,7 +164,14 @@ const ProductStatistics = ({ stats }) => {
         >
           Phân bố sản phẩm theo danh mục
         </Typography>
-        <Box mt={5} position='relative'>
+        <Box
+          mt={5}
+          position='relative'
+          sx={{
+            height: 480, // ✅ Chiều cao cố định để biểu đồ hiển thị chính xác
+            width: '100%' // ✅ Chiều rộng 100% theo Box cha
+          }}
+        >
           <Bar data={chartData} options={chartOptions} />
           {totalPages > 1 && (
             <Box

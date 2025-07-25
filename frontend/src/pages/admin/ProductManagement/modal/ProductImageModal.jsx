@@ -14,11 +14,17 @@ const ProductImageModal = ({ open, onClose, imageSrc, productName }) => {
     <Dialog
       open={open}
       onClose={onClose}
-      maxWidth='md'
-      fullWidth
+      maxWidth='xl'
+      sx={{
+        '& .MuiDialog-paper': {
+          width: 'auto', // Chiều rộng theo nội dung
+          maxWidth: 'xl', // Giới hạn không vượt quá md
+          minWidth: 600 // (tuỳ chọn) đảm bảo không quá nhỏ
+        }
+      }}
       PaperProps={{
         sx: {
-          maxHeight: '80vh',
+          maxHeight: '90vh',
           display: 'flex',
           flexDirection: 'column'
         }
@@ -45,14 +51,17 @@ const ProductImageModal = ({ open, onClose, imageSrc, productName }) => {
       </DialogTitle>
       <Divider />
       {/* ===== EditContent ===== */}
-      <DialogContent>
+      <DialogContent
+        sx={{ flex: 1, display: 'flex', justifyContent: 'center', p: 0 }}
+      >
         <img
-          src={optimizeCloudinaryUrl(imageSrc)}
+          src={imageSrc}
           alt={productName}
           style={{
             width: '100%',
             height: '500px',
-            objectFit: 'contain'
+            objectFit: 'contain',
+            backgroundColor: '#ccc'
           }}
         />
       </DialogContent>

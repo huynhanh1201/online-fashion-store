@@ -162,8 +162,7 @@ const EditCategoryModal = ({ open, onClose, category, onSave }) => {
                 borderRadius={2}
                 position='relative'
                 sx={{
-                  backgroundColor: '#fafafa',
-                  cursor: 'pointer',
+                  backgroundColor: '#ccc',
                   width: 350,
                   height: 331
                 }}
@@ -177,7 +176,7 @@ const EditCategoryModal = ({ open, onClose, category, onSave }) => {
                       style={{
                         width: '100%',
                         height: '100%',
-                        objectFit: 'cover',
+                        objectFit: 'contain',
                         borderRadius: 8
                       }}
                     />
@@ -243,8 +242,7 @@ const EditCategoryModal = ({ open, onClose, category, onSave }) => {
                 borderRadius={2}
                 position='relative'
                 sx={{
-                  backgroundColor: '#fafafa',
-                  cursor: 'pointer',
+                  backgroundColor: '#ccc',
                   width: 350,
                   height: 331
                 }}
@@ -258,7 +256,7 @@ const EditCategoryModal = ({ open, onClose, category, onSave }) => {
                       style={{
                         width: '100%',
                         height: '100%',
-                        objectFit: 'cover',
+                        objectFit: 'contain',
                         borderRadius: 8
                       }}
                     />
