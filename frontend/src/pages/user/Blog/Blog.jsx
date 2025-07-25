@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Box, Typography } from '@mui/material'
+import { Box, Typography, Breadcrumbs, Link } from '@mui/material'
+import { NavigateNext } from '@mui/icons-material'
 import useBlog from '~/hooks/useBlog.js'
 import { optimizeCloudinaryUrl } from '~/utils/cloudinary'
 
@@ -116,24 +117,72 @@ const Blog = () => {
           minHeight: '100vh'
         }}
       >
+
         {/* Container với width và padding giống BlogHome.jsx */}
         <Box
           sx={{
             width: '100%',
             maxWidth: '96vw',
             margin: '0 auto',
-            padding: {
-              xs: '40px 16px 24px',
-              sm: '48px 16px 24px',
-              md: '64px 16px 24px'
+            pt: {
+              xs: 2,  // Tăng padding-top để tránh header
+              sm: 2,
+              md: 2
+            },
+            px: {
+              xs: 2,
+              sm: 2,
+              md: 2
+            },
+            pb: {
+              xs: 3,
+              sm: 3,
+              md: 3
             }
           }}
         >
+          <Breadcrumbs
+            separator={<NavigateNext fontSize='small' />}
+            aria-label='breadcrumb'
+            sx={{
+              mb: 2,
+            }}
+          >
+            <Link
+              underline='hover'
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                color: '#007bff',
+                textDecoration: 'none',
+                fontSize: { xs: '0.875rem', sm: '1rem' },
+                fontWeight: 500,
+                transition: 'color 0.2s ease',
+                '&:hover': {
+                  color: '#0056b3',
+                  textDecoration: 'underline'
+                }
+              }}
+              href='/'
+            >
+              Trang chủ
+            </Link>
+            <Typography
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                color: 'text.primary',
+                fontWeight: 500,
+              }}
+            >
+              Tin thời trang
+            </Typography>
+          </Breadcrumbs>
           {/* Header Section */}
           <Box
             sx={{
               textAlign: 'center',
-              mb: { xs: 4, sm: 5, md: 6 }
+              mb: { xs: 3, sm: 4, md: 5 }
             }}
           >
             <Typography

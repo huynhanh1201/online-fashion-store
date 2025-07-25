@@ -51,7 +51,7 @@ export const getPublicBlogById = async (blogId) => {
 // Lấy blogs mới nhất
 export const getLatestBlogs = async (limit = 10) => {
   try {
-    const url = `${API_ROOT}/v1/blogs?limit=${limit}&sort=-createdAt&status=published&destroy=false`
+    const url = `${API_ROOT}/v1/blogs?limit=${limit}&sort=newest&status=published&destroy=false`
     const response = await AuthorizedAxiosInstance.get(url)
     console.log('API getLatestBlogs response:', response.data)
 

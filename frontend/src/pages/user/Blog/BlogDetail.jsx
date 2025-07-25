@@ -197,8 +197,8 @@ const TableOfContents = ({ headings, isMobile }) => {
       <List
         dense
         sx={{
-          maxHeight: isMobile ? 'none' : 'calc(100vh - 200px)', // Dynamic height based on viewport
-          overflowY: isMobile ? 'visible' : 'auto',
+          maxHeight: isMobile ? '200px' : 'calc(100vh - 450px)', // Much shorter height
+          overflowY: 'auto',
           overflowX: 'hidden', // Prevent horizontal overflow
           px: 1, // Add padding to prevent edge overflow
           '&::-webkit-scrollbar': {
@@ -502,7 +502,7 @@ const BlogDetail = () => {
                 }}
                 href={`/blog`}
               >
-                Bài viết
+                Tin thời trang
               </Link>
               <Typography
                 sx={{
@@ -512,7 +512,7 @@ const BlogDetail = () => {
                   fontWeight: 500
                 }}
               >
-                Tin thời trang
+                Chi tiết bài viết
               </Typography>
             </Breadcrumbs>
           </Box>
@@ -767,7 +767,7 @@ const BlogDetail = () => {
                   top: { lg: '120px' },
                   alignSelf: { lg: 'flex-start' },
                   height: { lg: 'fit-content' },
-                  maxHeight: { lg: 'calc(100vh - 140px)' },
+                  maxHeight: { lg: 'calc(100vh - 400px)' },
                   // Align TOC with title section
                   mt: {
                     xs: 0,
