@@ -70,7 +70,7 @@ const EditProductModal = ({ open, onClose, onSave, product }) => {
   const [productImagePreview, setProductImagePreview] = useState(
     product.imageUrls || []
   )
-  const { categories, fetchCategories, loading, update } = useCategories()
+  const { categories, fetchCategories, loading, add } = useCategories()
   function getSelectableCategories(categories) {
     // const parentIds = categories
     //   .filter((cat) => cat.parent && typeof cat.parent === 'object')
@@ -125,16 +125,13 @@ const EditProductModal = ({ open, onClose, onSave, product }) => {
     }
   }, [open, reset, product])
   const handEditCategory = async (category) => {
-    const newCategory = await update(category) // category trả về từ add()
+    const newCategory = await add(category) // category trả về từ add()
 
     // Gọi lại danh sách nếu cần thiết
     fetchCategories(1, 100000)
 
     // ✅ Đặt category mới làm giá trị cho select
-    setValue('categoryId', {
-      id: newCategory._id,
-      name: newCategory.name
-    })
+    setValue('categoryId', newCategory._id) // chỉ set id
 
     setCategoryOpen(false) // Đóng Chart
   }

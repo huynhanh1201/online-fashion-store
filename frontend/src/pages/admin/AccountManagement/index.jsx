@@ -1,7 +1,7 @@
 import React from 'react'
 import AccountTable from './AccountTable.jsx'
 
-import useUsers from '~/hooks/admin/useUsers'
+import useAccount from '~/hooks/admin/useAccount.js'
 import useRoles from '~/hooks/admin/useRoles.js'
 import usePermissions from '~/hooks/usePermissions'
 import { PermissionWrapper, RouteGuard } from '~/components/PermissionGuard'
@@ -32,7 +32,6 @@ const AccountManagement = () => {
 
   const {
     users,
-    totalPages,
     fetchUsers,
     Loading,
     removeUser,
@@ -41,7 +40,7 @@ const AccountManagement = () => {
     ROWS_PER_PAGE,
     setROWS_PER_PAGE,
     Restore
-  } = useUsers()
+  } = useAccount()
 
   const { hasPermission } = usePermissions()
 
@@ -52,7 +51,24 @@ const AccountManagement = () => {
   React.useEffect(() => {
     fetchUsers(page, ROWS_PER_PAGE, filters)
   }, [page, ROWS_PER_PAGE, filters])
-  const filterUser = users.filter((user) => user?.role !== 'customer')
+  // Lọc bỏ role === 'customer'
+  const filteredUsers = React.useMemo(
+    () => users.filter((user) => user?.role !== 'customer'),
+    [users]
+  )
+
+  // Tính lại số trang dựa trên số lượng user đã lọc
+  const filteredTotalPages = React.useMemo(
+    () => Math.ceil(filteredUsers.length / ROWS_PER_PAGE),
+    [filteredUsers, ROWS_PER_PAGE]
+  )
+
+  // Lấy danh sách user theo trang hiện tại
+  const usersToShow = React.useMemo(() => {
+    const startIndex = (page - 1) * ROWS_PER_PAGE
+    return filteredUsers.slice(startIndex, startIndex + ROWS_PER_PAGE)
+  }, [filteredUsers, page, ROWS_PER_PAGE])
+
   const handleOpenModal = (type, user = null) => {
     setSelectedUser(user)
     setModalType(type)
@@ -92,14 +108,14 @@ const AccountManagement = () => {
   return (
     <RouteGuard requiredPermissions={['admin:access', 'account:use']}>
       <AccountTable
-        users={filterUser}
+        users={usersToShow}
         loading={Loading}
         handleOpenModal={handleOpenModal}
         onFilters={handleFilter}
         fetchUsers={fetchUsers}
         page={page - 1}
         rowsPerPage={ROWS_PER_PAGE}
-        total={totalPages}
+        total={filteredUsers.length}
         onPageChange={handleChangePage}
         onChangeRowsPerPage={(newLimit) => {
           setPage(1)

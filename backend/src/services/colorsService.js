@@ -128,7 +128,7 @@ const updateColor = async (colorId, reqBody) => {
 const deleteColor = async (colorId) => {
   // eslint-disable-next-line no-useless-catch
   try {
-    const colorDeleted = await ColorModel.findOneAndUpdate(
+    const colorDeleted = await ColorModel.updateOne(
       { _id: colorId },
       { destroy: true },
       { new: true }

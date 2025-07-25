@@ -16,7 +16,7 @@ import {
 
 const ViewBatchModal = ({ open, onClose, batch }) => {
   if (!batch) return null
-  const variantName = batch?.variantId?.name
+  const variantName = batch?.variantId?.name || 'Không có dữ liệu'
 
   const formatDate = (dateString) => {
     if (!dateString) return 'Không có thông tin'
@@ -24,15 +24,17 @@ const ViewBatchModal = ({ open, onClose, batch }) => {
     return date.toLocaleString('vi-VN', {
       day: '2-digit',
       month: '2-digit',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-      second: '2-digit'
+      year: 'numeric'
     })
   }
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth='sm' fullWidth>
+    <Dialog
+      open={open}
+      onClose={onClose}
+      maxWidth='md'
+      sx={{ width: '100%', minWidth: '600px' }}
+    >
       <DialogTitle>Thông tin lô Hàng</DialogTitle>
       <Divider />
       <DialogContent sx={{ py: 0 }}>
@@ -42,14 +44,14 @@ const ViewBatchModal = ({ open, onClose, batch }) => {
               <TableCell>
                 <strong>Mã lô hàng</strong>
               </TableCell>
-              <TableCell>{batch.batchCode || 'N/A'}</TableCell>
+              <TableCell>{batch.batchCode || 'Không có dữ liệu'}</TableCell>
             </TableRow>
             <TableRow>
               <TableCell>
                 <strong>Tên sản phẩm</strong>
               </TableCell>
               <TableCell>
-                {(batch?.variantId?.name ?? 'N/A')
+                {variantName
                   .split(' ')
                   .map(
                     (word) =>

@@ -347,7 +347,8 @@ const AddVariantModal = ({
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              overflow: 'hidden'
+              overflow: 'hidden',
+              pointerEvents: productId ? 'auto' : 'none'
             }}
             onClick={() => !colorImage && fileInputRef.current?.click()}
           >
@@ -431,7 +432,7 @@ const AddVariantModal = ({
             sx={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 2 }}
           >
             {/* Sản phẩm */}
-            <FormControl fullWidth error={!!errors.productId}>
+            {/* <FormControl fullWidth error={!!errors.productId}>
               <InputLabel>
                 Sản phẩm <span style={{ color: 'red' }}>* </span>
               </InputLabel>
@@ -486,7 +487,46 @@ const AddVariantModal = ({
                   {errors.productId.message}
                 </p>
               )}
+            </FormControl> */}
+            <FormControl fullWidth error={!!errors.productId}>
+              <Controller
+                name='productId'
+                control={control}
+                rules={{
+                  required: 'Vui lòng chọn sản phẩm',
+                  validate: (value) =>
+                    /^[0-9a-fA-F]{24}$/.test(value) ||
+                    'ID sản phẩm không hợp lệ'
+                }}
+                render={({ field }) => (
+                  <Autocomplete
+                    options={products}
+                    getOptionLabel={(option) => option.name || ''}
+                    isOptionEqualToValue={(option, value) =>
+                      option._id === value._id
+                    }
+                    onChange={(_, selectedOption) => {
+                      field.onChange(selectedOption ? selectedOption._id : '')
+                    }}
+                    value={products.find((p) => p._id === field.value) || null}
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        label={
+                          <>
+                            Sản phẩm <span style={{ color: 'red' }}>*</span>
+                          </>
+                        }
+                        error={!!errors.productId}
+                        helperText={errors.productId?.message}
+                      />
+                    )}
+                    noOptionsText='Không tìm thấy sản phẩm'
+                  />
+                )}
+              />
             </FormControl>
+
             <Box sx={{ display: 'flex', gap: 2 }}>
               {/* Màu sắc */}
               <FormControl fullWidth error={!!errors.color}>

@@ -49,6 +49,11 @@ export default function CategoryRow({
             <TableCell
               key={column.id}
               align='center'
+              onClick={
+                permissions.canView
+                  ? () => handleOpenModal('view', category)
+                  : null
+              }
               sx={{
                 ...styles.cellPadding,
                 display: 'flex',
@@ -61,14 +66,15 @@ export default function CategoryRow({
             >
               {category.image ? (
                 <img
-                  src={optimizeCloudinaryUrl(category.image)}
+                  src={category.image}
                   alt='Ảnh danh mục'
                   style={{
                     width: 40,
                     height: 40,
-                    objectFit: 'cover',
+                    objectFit: 'contain',
                     borderRadius: 8,
-                    border: '1px solid #ccc'
+                    border: '1px solid #ccc',
+                    cursor: permissions.canView ? 'pointer' : 'default'
                   }}
                 />
               ) : (

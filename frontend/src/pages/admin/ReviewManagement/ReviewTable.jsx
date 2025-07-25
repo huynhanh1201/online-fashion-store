@@ -34,7 +34,7 @@ const ReviewTable = ({
   const columns = [
     { id: 'index', label: 'STT', align: 'center', width: 50 },
     { id: 'product', label: 'Sản phẩm', align: 'left', minWidth: 200 },
-    { id: 'user', label: 'Người dùng', align: 'left', minWidth: 150 },
+    { id: 'user', label: 'Người đánh giá', align: 'left', minWidth: 150 },
     { id: 'rating', label: 'Số sao', align: 'right', minWidth: 200, pr: 10 },
     {
       id: 'moderationStatus',

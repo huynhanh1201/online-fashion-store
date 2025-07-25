@@ -21,6 +21,7 @@ const ViewWarehouseSlipModal = ({ open, onClose, slip }) => {
   if (!slip) return null
   const warehouseName = slip.warehouseId?.name || 'Không có kho hàng'
   const partnerName = slip.partnerId?.name || 'Không có đối tác'
+  const createdByName = slip.createdBy?.name || 'Không có người tạo'
   return (
     <Dialog
       open={open}
@@ -90,6 +91,20 @@ const ViewWarehouseSlipModal = ({ open, onClose, slip }) => {
               </TableCell>
               <TableCell>
                 {partnerName
+                  .split(' ')
+                  .map(
+                    (word) =>
+                      word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+                  )
+                  .join(' ') || 'N/A'}
+              </TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell>
+                <strong>Người tạo phiếu</strong>
+              </TableCell>
+              <TableCell>
+                {createdByName
                   .split(' ')
                   .map(
                     (word) =>

@@ -70,6 +70,7 @@ function DiscountManagement() {
         await add(data, filters)
       } else if (type === 'edit') {
         await update(id, data)
+        fetchDiscounts(page, ROWS_PER_PAGE, filters)
       } else if (type === 'delete') {
         await remove(data)
       } else if (type === 'restore') {

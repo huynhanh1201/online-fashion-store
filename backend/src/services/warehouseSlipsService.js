@@ -164,7 +164,7 @@ const updateWarehouseSlip = async (warehouseSlipId, reqBody) => {
 const deleteWarehouseSlip = async (warehouseSlipId) => {
   // eslint-disable-next-line no-useless-catch
   try {
-    const warehouseSlipDeleted = await WarehouseSlipModel.findOneAndUpdate(
+    const warehouseSlipDeleted = await WarehouseSlipModel.updateOne(
       { _id: warehouseSlipId },
       { destroy: true },
       { new: true }
@@ -286,7 +286,7 @@ const importStockWarehouseSlip = async (reqBody, jwtDecoded, session) => {
         console.log('existingInventory: ', existingInventory)
 
         // Cập nhật quantity cho biến thể
-        await VariantModel.updateOne(
+        await VariantModel.findOneAndUpdate(
           { _id: existingInventory.variantId },
           {
             quantity: existingInventory.quantity
@@ -316,7 +316,7 @@ const importStockWarehouseSlip = async (reqBody, jwtDecoded, session) => {
         )
 
         // Cập nhật quantity cho biến thể
-        await VariantModel.updateOne(
+        await VariantModel.findOneAndUpdate(
           { _id: newInventory.variantId },
           {
             quantity: newInventory.quantity
@@ -533,7 +533,7 @@ const exportStockWarehouseSlip = async (reqBody, jwtDecoded, session) => {
       const updatedInventory = await existingInventory.save({ session })
 
       // Cập nhật quantity cho biến thể
-      await VariantModel.updateOne(
+      await VariantModel.findOneAndUpdate(
         { _id: updatedInventory.variantId },
         {
           quantity: updatedInventory.quantity

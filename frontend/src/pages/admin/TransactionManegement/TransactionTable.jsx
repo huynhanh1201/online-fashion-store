@@ -181,7 +181,7 @@ const TransactionTable = ({
                 alignItems='start'
                 sx={{ minHeight: 76.5 }}
               >
-                <Typography variant='h6' fontWeight={800} minWidth={250}>
+                <Typography variant='h6' fontWeight={800} minWidth={200}>
                   Danh sách giao dịch
                 </Typography>
                 <FilterTransaction

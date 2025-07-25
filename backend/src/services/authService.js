@@ -10,9 +10,10 @@ import { env } from '~/config/environment'
 import { pickUser } from '~/utils/formatters'
 import { WEBSITE_DOMAIN } from '~/utils/constants'
 import { BrevoProvider } from '~/providers/BrevoProvider'
+import { RoleModel } from '~/models/RoleModel'
 
 const register = async (reqBody) => {
-  const { name, email, password: rawPassword, avatarUrl, role } = reqBody
+  let { name, email, password: rawPassword, avatarUrl, role, roleId } = reqBody
 
   // Chuẩn hóa email và tên
   const normalizedEmail = email.trim().toLowerCase()
@@ -27,6 +28,11 @@ const register = async (reqBody) => {
   // Băm mật khẩu
   const hashedPassword = await password.hash(rawPassword)
 
+  if (!roleId) {
+    const getRole = await RoleModel.findOne({ name: 'customer' })
+    roleId = getRole._id
+  }
+
   // Tạo user mới
   const newUser = {
     name: normalizedName,
@@ -34,6 +40,7 @@ const register = async (reqBody) => {
     password: hashedPassword,
     avatarUrl,
     role: role || 'customer',
+    roleId: roleId,
     slug: slugify(normalizedName, { lower: true }),
     destroy: false,
     verifyToken: uuidv4()

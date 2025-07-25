@@ -154,7 +154,7 @@ const applyCouponToCart = async (
     }
 
     if (validateCoupon.valid && couponCode) {
-      await CouponModel.updateOne(
+      await CouponModel.findOneAndUpdate(
         { code: couponCode },
         { $inc: { usedCount: 1 } }
       ).session(session)
@@ -170,7 +170,11 @@ const calculatedSubtotal = (cartItems, variantMap) => {
 
     if (variant) {
       return (
-        acc + item.quantity * (variant.discountPrice ? variant.exportPrice - variant.discountPrice : variant.exportPrice)
+        acc +
+        item.quantity *
+          (variant.discountPrice
+            ? variant.exportPrice - variant.discountPrice
+            : variant.exportPrice)
       )
     }
     return acc

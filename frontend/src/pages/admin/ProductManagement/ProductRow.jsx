@@ -197,8 +197,20 @@ const ProductRow = ({
             return (
               <TableCell key={id} align={align} sx={styles.cellPadding}>
                 <Chip
-                  label={product.destroy ? 'Ngừng bán' : 'Đang bán'}
-                  color={product.destroy ? 'error' : 'success'}
+                  label={
+                    product.status === 'draft'
+                      ? 'Bản nháp'
+                      : product.status === 'active'
+                        ? 'Hoạt động'
+                        : 'Không hoạt động'
+                  }
+                  color={
+                    product.status === 'draft'
+                      ? 'default'
+                      : product.status === 'active'
+                        ? 'success'
+                        : 'error'
+                  }
                   size='large'
                   sx={{ width: '120px', fontWeight: '800' }}
                 />
@@ -230,7 +242,7 @@ const ProductRow = ({
               <TableCell
                 key={id}
                 align={align}
-                sx={{ ...styles.cellPadding, pr: 7 }}
+                sx={{ ...styles.cellPadding, pr: 6 }}
               >
                 {product.importPrice?.toLocaleString('vi-VN') + '₫'}
               </TableCell>
@@ -239,7 +251,7 @@ const ProductRow = ({
 
           if (id === 'exportPrice') {
             return (
-              <TableCell key={id} align={align} sx={styles.cellPadding}>
+              <TableCell key={id} align={align} sx={{ ...styles.cellPadding, pr: 6 }}>
                 {product.exportPrice?.toLocaleString('vi-VN') + '₫'}
               </TableCell>
             )

@@ -31,10 +31,10 @@ export const refIntegrityPlugin = (schema, { references = [] }) => {
   })
 
   // Hook: Model.findOneAndDelete() hoặc findByIdAndDelete()
-  schema.pre('findOneAndDelete', async function () {
-    const doc = await this.model.findOne(this.getQuery())
-    if (doc) await checkReferences(doc)
-  })
+  // schema.pre('findOneAndDelete', async function () {
+  //   const doc = await this.model.findOne(this.getQuery())
+  //   if (doc) await checkReferences(doc)
+  // })
 
   // Hook: chặn update nếu cần (optional)
   // schema.pre('findOneAndUpdate', async function () {

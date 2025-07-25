@@ -41,7 +41,9 @@ const register = async (req, res, next) => {
       .min(1) // Chuỗi tối thiểu 3 ký tự
       .max(50) // Chuỗi tối đa 50 ký tự
       .trim() // Loại bỏ khoảng trắng đầu/cuối trước khi validate
-      .strict() // Không cho phép ký tự không hợp lệ
+      .strict(), // Không cho phép ký tự không hợp lệ
+
+    roleId: Joi.string().length(24).hex().allow(null, '') // ID role phải là chuỗi 24 ký tự hex, có thể null
   })
 
   try {

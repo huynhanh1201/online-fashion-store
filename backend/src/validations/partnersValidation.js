@@ -25,7 +25,7 @@ const partner = async (req, res, next) => {
         .trim()
         .pattern(/^(?:\+84|0)(?:3[2-9]|5[2689]|7[06-9]|8[1-689]|9[0-9])\d{7}$/)
         .required(), // Bạn có thể dùng regex để kiểm tra định dạng SĐT VN nếu muốn
-      email: Joi.string().trim().lowercase().email().required(),
+      email: Joi.string().trim().lowercase().email().allow(null, ''),
       website: Joi.string().uri().trim().optional().allow(null, '')
     }).required(),
 

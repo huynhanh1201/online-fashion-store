@@ -22,12 +22,14 @@ const EditAccountModal = ({ open, onClose, user, onSave, roles }) => {
     control,
     handleSubmit,
     reset,
+    setValue,
     formState: { isSubmitting }
   } = useForm({
     defaultValues: {
       name: '',
       password: '',
-      role: ''
+      role: '',
+      roleId: ''
     }
   })
   const [showPassword, setShowPassword] = useState(false)
@@ -35,18 +37,21 @@ const EditAccountModal = ({ open, onClose, user, onSave, roles }) => {
 
   useEffect(() => {
     if (open && user) {
+      const selectedRole = roles.find((r) => r.name === user.role)
       reset({
         name: user.name || '',
         password: '',
-        role: user.role || ''
+        role: user.role || '',
+        roleId: selectedRole?._id || ''
       })
     }
-  }, [open, user, reset])
+  }, [open, user, reset, roles])
 
   const onSubmit = async (data) => {
     const payload = {
       name: data.name,
-      role: data.role
+      role: data.role,
+      roleId: data.roleId
     }
 
     // Chỉ gửi mật khẩu nếu được nhập
@@ -61,6 +66,7 @@ const EditAccountModal = ({ open, onClose, user, onSave, roles }) => {
   const roleOptions = roles
     .filter((role) => role.name !== 'customer')
     .map((role) => ({
+      id: role._id,
       name: role.name,
       label: role.label || role.name
     }))
@@ -166,7 +172,10 @@ const EditAccountModal = ({ open, onClose, user, onSave, roles }) => {
                   option.name === value?.name
                 }
                 value={roleOptions.find((r) => r.name === field.value) || null}
-                onChange={(_, selected) => field.onChange(selected?.name || '')}
+                onChange={(_, selected) => {
+                  field.onChange(selected?.name || '')
+                  setValue('roleId', selected?.id || '') // ← Cập nhật roleId khi chọn
+                }}
                 renderInput={(params) => (
                   <TextField
                     {...params}
@@ -180,7 +189,6 @@ const EditAccountModal = ({ open, onClose, user, onSave, roles }) => {
                     helperText={fieldState.error?.message}
                     sx={StyleAdmin.InputCustom}
                     onFocus={(event) => {
-                      // Hủy hành vi select toàn bộ khi focus
                       const input = event.target
                       requestAnimationFrame(() => {
                         input.setSelectionRange?.(

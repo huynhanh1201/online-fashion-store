@@ -7,7 +7,11 @@ import {
   Button,
   Typography,
   Box,
-  Divider
+  Divider,
+  Table,
+  TableBody,
+  TableRow,
+  TableCell
 } from '@mui/material'
 import AddPhotoAlternateIcon from '@mui/icons-material/AddPhotoAlternate'
 import StyleAdmin from '~/assets/StyleAdmin.jsx'
@@ -30,8 +34,7 @@ const ViewCategoryModal = ({ open, onClose, category }) => {
     <Dialog
       open={open}
       onClose={onClose}
-      fullWidth
-      maxWidth='lg'
+      maxWidth='xl'
       BackdropProps={{ sx: StyleAdmin.OverlayModal }}
     >
       <DialogTitle>Thông tin danh mục sản phẩm</DialogTitle>
@@ -43,11 +46,11 @@ const ViewCategoryModal = ({ open, onClose, category }) => {
             gap={3}
             flexDirection={{ xs: 'column', sm: 'row' }}
           >
+            {/* Ảnh danh mục */}
             <Box sx={{ display: 'flex', flexDirection: 'column' }}>
               <Typography variant='subtitle2' fontWeight='bold' mb={1}>
                 Ảnh danh mục
               </Typography>
-              {/* Ảnh bên trái */}
               <Box
                 display='flex'
                 flexDirection='column'
@@ -55,21 +58,21 @@ const ViewCategoryModal = ({ open, onClose, category }) => {
                 justifyContent='center'
                 border='2px dashed #ccc'
                 borderRadius={2}
-                // minHeight={200}
+                position='relative'
                 sx={{
-                  backgroundColor: '#fafafa',
+                  backgroundColor: '#ccc',
                   width: 350,
                   height: 331
                 }}
               >
                 {category.image ? (
                   <img
-                    src={optimizeCloudinaryUrl(category.image)}
+                    src={category.image}
                     alt='Ảnh danh mục'
                     style={{
                       width: '100%',
-                      maxHeight: '100%',
-                      objectFit: 'cover',
+                      height: '100%',
+                      objectFit: 'contain',
                       borderRadius: 8
                     }}
                   />
@@ -83,32 +86,31 @@ const ViewCategoryModal = ({ open, onClose, category }) => {
                 )}
               </Box>
             </Box>
+            {/* Ảnh quảng cáo */}
             <Box sx={{ display: 'flex', flexDirection: 'column' }}>
               <Typography variant='subtitle2' fontWeight='bold' mb={1}>
                 Ảnh quảng cáo
               </Typography>
-              {/* Ảnh banner (nếu có) */}
               <Box
                 display='flex'
-                flexDirection='column'
                 alignItems='center'
                 justifyContent='center'
                 border='2px dashed #ccc'
                 borderRadius={2}
                 sx={{
-                  backgroundColor: '#fafafa',
+                  backgroundColor: '#ccc',
                   width: 350,
                   height: 331
                 }}
               >
                 {category.banner ? (
                   <img
-                    src={optimizeCloudinaryUrl(category.banner)}
+                    src={category.image}
                     alt='Ảnh banner'
                     style={{
                       width: '100%',
                       height: '100%',
-                      objectFit: 'cover',
+                      objectFit: 'contain',
                       borderRadius: 8
                     }}
                   />
@@ -116,7 +118,7 @@ const ViewCategoryModal = ({ open, onClose, category }) => {
                   <Box textAlign='center' color='#999'>
                     <ImageNotSupportedIcon fontSize='large' />
                     <Typography fontSize={14} mt={1}>
-                      Không có ảnh quản cáo
+                      Không có ảnh quảng cáo
                     </Typography>
                   </Box>
                 )}
@@ -124,50 +126,55 @@ const ViewCategoryModal = ({ open, onClose, category }) => {
             </Box>
 
             {/* Thông tin bên phải */}
-            <Box flex={1} mt={1}>
-              <Box mb={2}>
-                <Typography variant='subtitle2' fontWeight='bold'>
-                  Tên danh mục
-                </Typography>
-                <Typography>{category.name || '—'}</Typography>
-              </Box>
-              {category?.parent?.name && (
-                <Box mb={2}>
-                  <Typography variant='subtitle2' fontWeight='bold'>
-                    Tên danh mục cha
-                  </Typography>
-                  <Typography>{category?.parent?.name || '—'}</Typography>
-                </Box>
-              )}
+            <Table size='small'>
+              <TableBody>
+                <TableRow>
+                  <TableCell sx={{ width: 200, fontWeight: 700 }}>
+                    Tên danh mục
+                  </TableCell>
+                  <TableCell>{category?.name || '—'}</TableCell>
+                </TableRow>
 
-              <Box mb={2}>
-                <Typography variant='subtitle2' fontWeight='bold'>
-                  Mô tả
-                </Typography>
-                <Typography
-                  sx={{
-                    whiteSpace: 'pre-line',
-                    wordBreak: 'break-word'
-                  }}
-                >
-                  {category.description || 'Không có mô tả'}
-                </Typography>
-              </Box>
+                {category?.parent?.name && (
+                  <TableRow>
+                    <TableCell sx={{ width: 200, fontWeight: 700 }}>
+                      Tên danh mục cha
+                    </TableCell>
+                    <TableCell>{category?.parent?.name || '—'}</TableCell>
+                  </TableRow>
+                )}
 
-              <Box mb={2}>
-                <Typography variant='subtitle2' fontWeight='bold'>
-                  Ngày tạo
-                </Typography>
-                <Typography>{formatDate(category.createdAt)}</Typography>
-              </Box>
+                <TableRow>
+                  <TableCell sx={{ width: 200, fontWeight: 700 }}>
+                    Mô tả
+                  </TableCell>
+                  <TableCell>
+                    <Typography
+                      sx={{
+                        whiteSpace: 'pre-line',
+                        wordBreak: 'break-word'
+                      }}
+                    >
+                      {category?.description || 'Không có mô tả'}
+                    </Typography>
+                  </TableCell>
+                </TableRow>
 
-              <Box>
-                <Typography variant='subtitle2' fontWeight='bold'>
-                  Ngày cập nhật
-                </Typography>
-                <Typography>{formatDate(category.updatedAt)}</Typography>
-              </Box>
-            </Box>
+                <TableRow>
+                  <TableCell sx={{ width: 200, fontWeight: 700 }}>
+                    Ngày tạo
+                  </TableCell>
+                  <TableCell>{formatDate(category?.createdAt)}</TableCell>
+                </TableRow>
+
+                <TableRow>
+                  <TableCell sx={{ width: 200, fontWeight: 700 }}>
+                    Ngày cập nhật
+                  </TableCell>
+                  <TableCell>{formatDate(category?.updatedAt)}</TableCell>
+                </TableRow>
+              </TableBody>
+            </Table>
           </Box>
         ) : (
           <Typography>Không có dữ liệu danh mục</Typography>

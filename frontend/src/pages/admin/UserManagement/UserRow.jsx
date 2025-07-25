@@ -185,7 +185,7 @@ export default function UserRow({
                           onClick={() => handleOpenModal('restore', user)}
                           size='small'
                         >
-                          <RestartAltIcon color='var(--primary-color)' />
+                          <RestartAltIcon color='success' />
                         </IconButton>
                       </Tooltip>
                     )

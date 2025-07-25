@@ -129,11 +129,16 @@ const ViewProductModal = ({ open, onClose, product }) => {
       open={open}
       onClose={onClose}
       maxWidth='xxl'
-      fullWidth
+      sx={{
+        '& .MuiDialog-paper': {
+          width: 'auto', // Chiều rộng theo nội dung
+          maxWidth: 'xxl', // Giới hạn không vượt quá md
+          minWidth: 1100 // (tuỳ chọn) đảm bảo không quá nhỏ
+        }
+      }}
       PaperProps={{
         sx: {
           maxHeight: '95vh',
-          minHeight: '95vh',
           backgroundColor: 'var(--surface-color)'
         },
         ...StyleAdmin.InputCustom
@@ -150,7 +155,7 @@ const ViewProductModal = ({ open, onClose, product }) => {
           Đóng
         </Button>
       </DialogActions>
-      <DialogContent dividers sx={{ overflowY: 'auto' }}>
+      <DialogContent dividers sx={{ overflowY: 'auto', pt: 0 }}>
         <TabContext value={tabIndex}>
           {/*<Tabs*/}
           {/*  value={tabIndex}*/}
@@ -176,12 +181,13 @@ const ViewProductModal = ({ open, onClose, product }) => {
                     alt='Ảnh sản phẩm'
                     sx={{
                       width: '400px',
-                      height: '340px',
+                      height: '320px',
                       objectFit: 'contain',
                       backgroundColor: '#ccc',
                       borderRadius: 2,
                       border: '1px solid #ccc',
                       mb: 1,
+                      mt: 2,
                       display: 'flex',
                       justifyContent: 'center',
                       alignItems: 'center'
@@ -312,7 +318,13 @@ const ViewProductModal = ({ open, onClose, product }) => {
                                   ? 'Hoạt động'
                                   : 'Không hoạt dộng'
                             }
-                            color='primary'
+                            color={
+                              product.status === 'draft'
+                                ? 'default'
+                                : product.status === 'active'
+                                  ? 'success'
+                                  : 'error'
+                            }
                             size='large'
                             sx={{ width: '127px', fontWeight: '800' }}
                           />

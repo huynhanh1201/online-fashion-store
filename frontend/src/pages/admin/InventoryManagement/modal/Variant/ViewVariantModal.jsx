@@ -43,9 +43,15 @@ const ViewVariantModal = ({ open, onClose, variant }) => {
     <Dialog
       open={open}
       onClose={onClose}
-      maxWidth='lg'
-      fullWidth
-      sx={{ padding: '16px 24px' }}
+      maxWidth='xl'
+      sx={{
+        '& .MuiDialog-paper': {
+          width: 'auto', // Chiều rộng theo nội dung
+          maxWidth: 'xl', // Giới hạn không vượt quá md
+          minWidth: 1400 // (tuỳ chọn) đảm bảo không quá nhỏ
+        },
+        padding: '16px 24px'
+      }}
       BackdropProps={{
         sx: StyleAdmin.OverlayModal
       }}
@@ -69,9 +75,9 @@ const ViewVariantModal = ({ open, onClose, variant }) => {
                   alt='color'
                   sx={{
                     width: 470,
-                    height: 552,
+                    height: 609,
                     objectFit: 'contain',
-                    backgroundColor: '#f5f5f5',
+                    backgroundColor: '#ccc',
                     borderRadius: 2,
                     border: '1px solid #ccc'
                   }}
@@ -160,7 +166,7 @@ const ViewVariantModal = ({ open, onClose, variant }) => {
                 </TableRow>
                 <TableRow>
                   <TableCell>
-                    <strong>Trạng thái biến thể</strong>
+                    <strong>Trạng thái biến thể trong kho</strong>
                   </TableCell>
                   <TableCell>
                     <Chip
@@ -196,6 +202,31 @@ const ViewVariantModal = ({ open, onClose, variant }) => {
                   <TableCell>{formatDate(variant.updatedAt)}</TableCell>
                 </TableRow>
               </TableBody>
+              <TableRow>
+                <TableCell>
+                  <strong>Trạng thái biến thể</strong>
+                </TableCell>
+                <TableCell>
+                  <Chip
+                    label={
+                      variant.status === 'draft'
+                        ? 'Bản nháp'
+                        : variant.status === 'active'
+                          ? 'Hoạt động'
+                          : 'Không hoạt động'
+                    }
+                    color={
+                      variant.status === 'draft'
+                        ? 'default'
+                        : variant.status === 'active'
+                          ? 'success'
+                          : 'error'
+                    }
+                    size='large'
+                    sx={{ width: 127, fontWeight: 800 }}
+                  />
+                </TableCell>
+              </TableRow>
             </Table>
           </Grid>
         </Grid>

@@ -309,7 +309,7 @@ export default function AdminDrawer({
           },
           {
             permission: 'inventory:use',
-            label: 'Quản lý kho',
+            label: 'Quản lý tồn kho',
             path: '/admin/inventory-management'
           },
           {
@@ -421,13 +421,14 @@ export default function AdminDrawer({
           sx={{
             display: 'flex',
             alignItems: 'center',
+            justifyContent: 'center',
             px: 2,
             py: 0.4,
             cursor: 'pointer',
-            userSelect: 'none'
+            userSelect: 'none', height: 62
           }}
         >
-          <img
+          {/* <img
             src={logoSmall}
             alt={'logo'}
             style={{
@@ -437,7 +438,8 @@ export default function AdminDrawer({
               pointerEvents: 'none',
               userSelect: 'none'
             }}
-          />
+          /> */}
+          <p style={{ fontSize: 25, fontWeight: 900 }}>FS</p>
         </Box>
 
         <Divider sx={{ my: 0 }} />
