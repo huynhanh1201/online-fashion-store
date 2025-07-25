@@ -12,11 +12,16 @@ export const getPolicies = async (filter) => {
     const response = await AuthorizedAxiosInstance.get(
       `${API_ROOT}/v1/blogs?${queryString}`
     )
+    
+    // Debug: Kiểm tra dữ liệu trả về
+    console.log('API Query String:', queryString)
+    console.log('API Raw Response:', response.data)
+    
     return {
       policies: response.data.data || [],
-      total: response.data.meta.total || 0,
-      totalPages: response.data.totalPages || 0,
-      currentPage: response.data.currentPage || 1
+      total: response.data.meta?.total || 0,
+      totalPages: response.data.meta?.totalPages || 0,
+      currentPage: response.data.meta?.currentPage || 1
     }
   } catch (error) {
     console.error('Lỗi khi lấy danh sách policy:', error)

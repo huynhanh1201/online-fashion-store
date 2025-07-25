@@ -92,6 +92,19 @@ const predefinedThemes = {
   }
 }
 
+// Bổ sung map việt hóa cho các nhãn màu
+const COLOR_LABELS = {
+  primary: 'Màu chính',
+  secondary: 'Màu phụ',
+  accent: 'Màu nhấn',
+  success: 'Thành công',
+  warning: 'Cảnh báo',
+  error: 'Lỗi',
+  info: 'Thông tin',
+  background: 'Nền',
+  text: 'Chữ'
+}
+
 // Styled components
 const ColorPreview = styled(Box)(({ color }) => ({
   width: 40,
@@ -122,6 +135,7 @@ const ThemeCard = styled(Card)(({ selected, theme }) => ({
 const ThemeManagement = () => {
   const { currentTheme, updateTheme, resetTheme } = useTheme()
   const [selectedPreset, setSelectedPreset] = useState(null)
+  const [pendingTheme, setPendingTheme] = useState(currentTheme)
   const [previewMode, setPreviewMode] = useState(false)
   const [showAdvanced, setShowAdvanced] = useState(false)
   const [snackbar, setSnackbar] = useState({
@@ -131,7 +145,7 @@ const ThemeManagement = () => {
   })
   const { hasPermission } = usePermissions()
 
-  // Sync selected preset with current theme on load or when theme changes
+  // Sync selected preset and pendingTheme with current theme on load or when theme changes
   useEffect(() => {
     const matchingPresetKey = Object.entries(predefinedThemes).find(
       ([key, preset]) =>
@@ -142,29 +156,31 @@ const ThemeManagement = () => {
 
     if (matchingPresetKey) {
       setSelectedPreset(matchingPresetKey)
+      setPendingTheme(predefinedThemes[matchingPresetKey])
     } else {
       setSelectedPreset(null) // It's a custom theme
+      setPendingTheme(currentTheme)
     }
   }, [currentTheme])
 
-
   const handlePresetSelect = (presetKey) => {
     const preset = predefinedThemes[presetKey]
-    updateTheme(preset)
+    setPendingTheme(preset)
     setSelectedPreset(presetKey)
     setSnackbar({
       open: true,
-      message: `Đã áp dụng theme ${preset.name}!`,
-      severity: 'success'
+      message: `Đã chọn theme ${preset.name}. Nhấn Lưu để áp dụng!`,
+      severity: 'info'
     })
   }
 
   const handleColorChange = (colorKey, value) => {
-    updateTheme({ [colorKey]: value })
+    setPendingTheme((prev) => ({ ...prev, [colorKey]: value }))
     setSelectedPreset(null) // Deselect preset on custom change
   }
 
   const handleSaveTheme = () => {
+    updateTheme(pendingTheme)
     setSnackbar({
       open: true,
       message: 'Chủ đề đã được lưu thành công!',
@@ -174,7 +190,6 @@ const ThemeManagement = () => {
 
   const handleResetTheme = () => {
     resetTheme()
-    // handlePresetSelect('modernBlue'); // Let useEffect handle selection
     setSnackbar({
       open: true,
       message: 'Theme đã được reset về mặc định!',
@@ -290,14 +305,14 @@ const ThemeManagement = () => {
                   </AccordionSummary>
                   <AccordionDetails>
                     <Grid container spacing={2}>
-                      {Object.entries(currentTheme).map(([key, value]) => (
+                      {Object.entries(pendingTheme).map(([key, value]) => (
                         <Grid item xs={12} sm={6} key={key}>
                           <Box
                             sx={{ display: 'flex', alignItems: 'center', gap: 1 }}
                           >
                             <ColorPreview color={value} />
                             <TextField
-                              label={key.charAt(0).toUpperCase() + key.slice(1)}
+                              label={COLOR_LABELS[key] || (key.charAt(0).toUpperCase() + key.slice(1))}
                               value={value}
                               onChange={(e) =>
                                 handleColorChange(key, e.target.value)
@@ -322,12 +337,10 @@ const ThemeManagement = () => {
                   {['primary', 'secondary', 'accent'].map((colorKey) => (
                     <Grid item xs={12} sm={4} key={colorKey}>
                       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                        <ColorPreview color={currentTheme[colorKey]} />
+                        <ColorPreview color={pendingTheme[colorKey]} />
                         <TextField
-                          label={
-                            colorKey.charAt(0).toUpperCase() + colorKey.slice(1)
-                          }
-                          value={currentTheme[colorKey]}
+                          label={COLOR_LABELS[colorKey] || (colorKey.charAt(0).toUpperCase() + colorKey.slice(1))}
+                          value={pendingTheme[colorKey]}
                           onChange={(e) =>
                             handleColorChange(colorKey, e.target.value)
                           }
@@ -386,104 +399,6 @@ const ThemeManagement = () => {
               </Card>
             </Grid>
           )}
-          {/* Theme Preview */}
-          <Grid item xs={12}>
-            <Card>
-              <CardContent>
-                <Typography
-                  variant='h6'
-                  sx={{ mb: 2, display: 'flex', alignItems: 'center' }}
-                >
-                  <ColorLens sx={{ mr: 1 }} />
-                  Xem trước chủ đề
-                </Typography>
-                <Paper sx={{ p: 3, background: currentTheme.background }}>
-                  <Grid container spacing={2}>
-                    <Grid item xs={12} sm={6} md={3}>
-                      <Box sx={{ textAlign: 'center' }}>
-                        <Box
-                          sx={{
-                            width: 60,
-                            height: 60,
-                            borderRadius: 2,
-                            backgroundColor: currentTheme.primary,
-                            mx: 'auto',
-                            mb: 1
-                          }}
-                        />
-                        <Typography
-                          variant='body2'
-                          sx={{ color: currentTheme.text }}
-                        >
-                          Primary
-                        </Typography>
-                      </Box>
-                    </Grid>
-                    <Grid item xs={12} sm={6} md={3}>
-                      <Box sx={{ textAlign: 'center' }}>
-                        <Box
-                          sx={{
-                            width: 60,
-                            height: 60,
-                            borderRadius: 2,
-                            backgroundColor: currentTheme.secondary,
-                            mx: 'auto',
-                            mb: 1
-                          }}
-                        />
-                        <Typography
-                          variant='body2'
-                          sx={{ color: currentTheme.text }}
-                        >
-                          Secondary
-                        </Typography>
-                      </Box>
-                    </Grid>
-                    <Grid item xs={12} sm={6} md={3}>
-                      <Box sx={{ textAlign: 'center' }}>
-                        <Box
-                          sx={{
-                            width: 60,
-                            height: 60,
-                            borderRadius: 2,
-                            backgroundColor: currentTheme.accent,
-                            mx: 'auto',
-                            mb: 1
-                          }}
-                        />
-                        <Typography
-                          variant='body2'
-                          sx={{ color: currentTheme.text }}
-                        >
-                          Accent
-                        </Typography>
-                      </Box>
-                    </Grid>
-                    <Grid item xs={12} sm={6} md={3}>
-                      <Box sx={{ textAlign: 'center' }}>
-                        <Box
-                          sx={{
-                            width: 60,
-                            height: 60,
-                            borderRadius: 2,
-                            backgroundColor: currentTheme.success,
-                            mx: 'auto',
-                            mb: 1
-                          }}
-                        />
-                        <Typography
-                          variant='body2'
-                          sx={{ color: currentTheme.text }}
-                        >
-                          Success
-                        </Typography>
-                      </Box>
-                    </Grid>
-                  </Grid>
-                </Paper>
-              </CardContent>
-            </Card>
-          </Grid>
         </Grid>
 
         <Snackbar

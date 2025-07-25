@@ -134,8 +134,8 @@ const Slider = () => {
           xs: '200px',    // Mobile
           sm: '300px',    // Tablet
           md: '400px',    // Small desktop
-          lg: '500px',    // Large desktop
-          xl: '622px'     // Extra large desktop
+          lg: '600px',    // Large desktop
+          xl: '722px'     // Extra large desktop
         },
         overflow: 'hidden'
       }}

@@ -42,9 +42,9 @@ export const refIntegrityPlugin = (schema, { references = [] }) => {
   //   if (doc) await checkReferences(doc)
   // })
 
-  // Hook: chặn update nếu cần (optional)
-  schema.pre('updateOne', async function () {
-    const doc = await this.model.findOne(this.getQuery())
-    if (doc) await checkReferences(doc)
-  })
+  // // Hook: chặn update nếu cần (optional)
+  // schema.pre('updateOne', async function () {
+  //   const doc = await this.model.findOne(this.getQuery())
+  //   if (doc) await checkReferences(doc)
+  // })
 }

@@ -25,11 +25,14 @@ const ProductHorizontalScroll = ({ products = [], defaultCardsPerRow = 5, gap = 
 
   // Xác định số card trên mỗi hàng dựa vào chiều rộng màn hình
   const getCardsPerRow = () => {
-    if (windowWidth > 900) {
+    if (windowWidth > 1300) {
       return defaultCardsPerRow // 5 cards on desktop
     }
+    if (windowWidth > 900) {
+      return 3
+    }
     if (windowWidth > 600) {
-      return 3 // 3 cards on tablet
+      return 2 // 3 cards on tablet
     }
     return 2 // 2 cards on mobile (like the reference image)
   }

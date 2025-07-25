@@ -233,7 +233,7 @@ const Content = () => {
               : category.link || '#'
             }
             className='category-card'
-            style={{ textDecoration: 'none', color: 'inherit' }}
+            style={{ textDecoration: 'none', color: 'inherit', maxWidth:'400px', width:'100%' }}
           >
             <div
               className='category-image'
@@ -241,13 +241,14 @@ const Content = () => {
                 backgroundImage: featuredCategoriesLoading || featuredCategories.length === 0
                   ? `url(${category.imageUrl})`
                   : `url(${optimizeCloudinaryUrl(category.imageUrl, {
-                      width: 400,
+                      width: 480,
                       height: 300,
                       quality: 'auto',
                       format: 'auto'
                     })})`,
                 backgroundSize: 'cover',
                 backgroundPosition: 'center',
+                backgroundRepeat:'no-repeat',
                 position: 'relative'
               }}
             >
@@ -256,16 +257,17 @@ const Content = () => {
               {!featuredCategoriesLoading && featuredCategories.length > 0 && (
                 <div style={{
                   position: 'absolute',
-                  bottom: '20px',
+                  top: '50px',
                   left: '20px',
                   right: '20px',
                   color: 'white',
-                  zIndex: 2
+                  zIndex: 2,
+                  maxWidth:'50%',
+                  width:'100%'
                 }}>
                   <h3 style={{
-                    margin: 0,
-                    fontSize: '1.2rem',
-                    fontWeight: 'bold',
+                    fontSize: '35px',
+                    fontWeight: '600',
                     textShadow: '2px 2px 4px rgba(0,0,0,0.7)'
                   }}>
                     {category.name}
@@ -355,7 +357,7 @@ const Content = () => {
   {products.length > 0 && (
     <div style={{ textAlign: 'center', marginBottom: '32px' }}>
       <Link to='/productnews'>
-        <button className='cta-button'>Xem tất cả ›</button>
+        <button className='cta-button'>Xem tất cả</button>
       </Link>
     </div>
   )}

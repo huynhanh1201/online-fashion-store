@@ -211,7 +211,7 @@ const ProductContent = () => {
                   }}
                   onClick={() => navigate(`/productbycategory/${activeCategory._id}`)}
                 >
-                  Xem tất cả ›
+                  Xem tất cả
                 </Box>
               </Box>
             )}

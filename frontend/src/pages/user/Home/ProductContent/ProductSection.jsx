@@ -25,25 +25,31 @@ const styles = {
     width: '100%',
     height: '100%',
     objectFit: 'cover',
-    borderRadius: '10px'
+    objectPosition: 'center center',
+    borderRadius: '10px',
   },
   bannerText: {
     position: 'absolute',
-    top: '150px',
-    left: '70px',
+    bottom: '10px',      // thay vì top
+    left: '10px',        // cách mép trái 30px
     color: 'white',
-    textShadow: '0 2px 4px rgba(0,0,0,0.5)'
+    textShadow: '0 2px 4px rgba(0,0,0,0.5)',
+    zIndex: 2,
+    maxWidth: '80%'      // giúp text không bị tràn
   },
   bannerTitle: {
     margin: '0 0 8px 0',
-    fontSize: '50px',
-    fontWeight: '1000'
+    fontSize: '36px',     // giảm lại chút cho phù hợp vị trí
+    fontWeight: 700,
+    lineHeight: '1.2'
   },
   bannerDesc: {
     margin: '0',
     fontSize: '14px',
-    opacity: '0.9'
-  },
+    opacity: 0.9,
+    lineHeight: '1.4'
+  }
+,
   productItem: {
     width: '100%'
   },
@@ -153,12 +159,12 @@ const ProductSection = ({
               />
               <div style={{
                 ...styles.bannerText,
-                top: isMobile ? 40 : 150,
-                left: isMobile ? 20 : 70,
+                top: isMobile ? 40 : 30,
+                left: isMobile ? 20 : 10,
               }}>
                 <h2 style={{
                   ...styles.bannerTitle,
-                  fontSize: isMobile ? 24 : 50,
+                  fontSize: isMobile ? 24 : 35,
                   marginBottom: isMobile ? 4 : 8
                 }}>
                   {bannerTitle || 'Danh mục sản phẩm'}
