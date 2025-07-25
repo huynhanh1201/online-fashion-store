@@ -536,8 +536,6 @@ const BlogDetail = () => {
             }}>
               {/* Article Header */}
               <CardContent sx={{ p: 0, mb: 3, mt: 0 }}>
-                {/* Category */}
-
 
                 {/* Title */}
                 <Typography
@@ -554,7 +552,7 @@ const BlogDetail = () => {
                 >
                   {currentBlog.title}
                 </Typography>
-                <Chip
+                {/* <Chip
                   label={currentBlog.category}
                   size="small"
                   sx={{
@@ -564,7 +562,7 @@ const BlogDetail = () => {
                     fontWeight: 600,
                     fontSize: '0.75rem'
                   }}
-                />
+                /> */}
                 {/* Subtitle */}
                 {(currentBlog.excerpt ||
                   currentBlog.subtitle ||
@@ -716,7 +714,7 @@ const BlogDetail = () => {
                   dangerouslySetInnerHTML={{ __html: processedContent || currentBlog.content }}
                 />
 
-                {/* Tags Section */}
+                {/* Tags Section
                 {currentBlog.tags && currentBlog.tags.length > 0 && (
                   <Box sx={{ mt: 4, pt: 3, borderTop: '1px solid', borderColor: 'grey.200' }}>
                     <Typography
@@ -754,7 +752,7 @@ const BlogDetail = () => {
                       ))}
                     </Box>
                   </Box>
-                )}
+                )} */}
               </CardContent>
             </Box>
 

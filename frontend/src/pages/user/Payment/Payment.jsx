@@ -21,8 +21,11 @@ import {
   Card,
   CardContent,
   Paper,
-  Chip
+  Chip,
+  Breadcrumbs,
+  Link,
 } from '@mui/material'
+import { NavigateNext } from '@mui/icons-material'
 import { styled } from '@mui/system'
 import { ChooseAddressModal } from './Modal/ChooseAddressModal'
 import { useAddress } from '~/hooks/useAddress'
@@ -827,6 +830,52 @@ const Payment = () => {
 
   return (
     <StyledContainer maxWidth={false}>
+      <Breadcrumbs
+        separator={<NavigateNext fontSize='small' />}
+        aria-label='breadcrumb'
+        sx={{ mb: 3 }}
+      >
+        <Link
+          underline='hover'
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            color: '#007bff',
+            textDecoration: 'none',
+            '&:hover': {
+              color: 'primary.main'
+            }
+          }}
+          href='/'
+        >
+          Trang chủ
+        </Link>
+        <Link
+          underline='hover'
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            color: '#007bff',
+            textDecoration: 'none',
+            '&:hover': {
+              color: 'primary.main'
+            }
+          }}
+          href={`/cart`}
+        >
+          Giỏ hàng
+        </Link>
+        <Typography
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            color: 'text.primary',
+            fontWeight: 500
+          }}
+        >
+         Thanh toán đơn hàng
+        </Typography>
+      </Breadcrumbs>
       {cartLoading ? (
         <Box sx={{
           display: 'flex',

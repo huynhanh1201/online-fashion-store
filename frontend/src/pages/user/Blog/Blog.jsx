@@ -318,7 +318,7 @@ const Blog = () => {
                         />
 
                         {/* Category Tag */}
-                        <Box
+                        {/* <Box
                           sx={{
                             position: 'absolute',
                             top: 12,
@@ -336,7 +336,7 @@ const Blog = () => {
                           }}
                         >
                           {article.category}
-                        </Box>
+                        </Box> */}
                       </Box>
 
                       {/* Content Section (unchanged) */}
@@ -358,7 +358,6 @@ const Blog = () => {
                             },
                             fontWeight: 700,
                             color: 'text.primary',
-                            mb: 1.5,
                             lineHeight: 1.4,
                             display: '-webkit-box',
                             WebkitLineClamp: 3,
