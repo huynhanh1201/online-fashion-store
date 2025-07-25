@@ -524,13 +524,15 @@ const CouponList = ({ onCouponSelect }) => {
           background: #fff;
           border-radius: 12px 0 0 12px;
           max-width: 480px;
-          width: 95vw;
+          width: 90vw;
           height: 100vh;
           overflow-y: auto;
           box-shadow: -4px 0 32px rgba(0,0,0,0.18);
           padding: 32px 18px 24px 18px;
           position: relative;
           animation: slideInDrawer 0.25s cubic-bezier(.4,0,.2,1);
+          justify-content: center;
+          align-items: center;
         }
         @keyframes slideInDrawer {
           from {
@@ -560,6 +562,8 @@ const CouponList = ({ onCouponSelect }) => {
           display: flex;
           flex-direction: column;
           gap: 0;
+          justify-content: center;
+          align-items: center;
         }
         @media (max-width: 600px) {
           .coupon-drawer {
