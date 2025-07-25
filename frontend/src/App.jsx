@@ -113,7 +113,6 @@ function App() {
       <Route path='login' element={<Login />} />
       <Route path='register' element={<Register />} />
       <Route path='/account/verification' element={<AccountVerification />} />
-      <Route path='searchresult' element={<SearchResult />} />
 
       {/*Customer*/}
       <Route path='/' element={<UserLayout />}>
@@ -122,6 +121,7 @@ function App() {
         <Route path='blog' element={<Blog />} />
         <Route path='/blog/:blogId' element={<BlogDetail />} />
         <Route path='/category/:slug' element={<CategoryPage />} />
+        <Route path='searchresult' element={<SearchResult />} />
 
         <Route
           path='productbycategory/:categoryId'

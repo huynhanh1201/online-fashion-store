@@ -21,8 +21,11 @@ import {
   Card,
   CardContent,
   Paper,
-  Chip
+  Chip,
+  Breadcrumbs,
+  Link,
 } from '@mui/material'
+import { NavigateNext } from '@mui/icons-material'
 import { styled } from '@mui/system'
 import { ChooseAddressModal } from './Modal/ChooseAddressModal'
 import { useAddress } from '~/hooks/useAddress'
@@ -464,12 +467,28 @@ const Payment = () => {
     try {
       setShippingPriceLoading(true)
 
+      // Kiểm tra và xử lý districtId
+      let districtId = address.districtId
+
+      // Nếu districtId là string và không thể parse thành số, có thể là tên district
+      if (typeof districtId === 'string' && isNaN(parseInt(districtId, 10))) {
+        console.error('districtId không phải là số:', districtId)
+        console.error('Địa chỉ đầy đủ:', address)
+        throw new Error('Thông tin địa chỉ không hợp lệ. Vui lòng chỉnh sửa lại địa chỉ để cập nhật thông tin mới nhất.')
+      }
+
+      // Đảm bảo districtId là số
+      const numericDistrictId = parseInt(districtId, 10)
+      if (isNaN(numericDistrictId)) {
+        throw new Error('Mã quận/huyện không hợp lệ. Vui lòng chỉnh sửa lại địa chỉ.')
+      }
+
       const payload = {
         cartItems: items.map(item => ({
           variantId: item.variantId,
           quantity: item.quantity,
         })),
-        to_district_id: parseInt(address.districtId, 10),
+        to_district_id: numericDistrictId,
         to_ward_code: address.wardId,
       }
 
@@ -811,6 +830,52 @@ const Payment = () => {
 
   return (
     <StyledContainer maxWidth={false}>
+      <Breadcrumbs
+        separator={<NavigateNext fontSize='small' />}
+        aria-label='breadcrumb'
+        sx={{ mb: 3 }}
+      >
+        <Link
+          underline='hover'
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            color: '#007bff',
+            textDecoration: 'none',
+            '&:hover': {
+              color: 'primary.main'
+            }
+          }}
+          href='/'
+        >
+          Trang chủ
+        </Link>
+        <Link
+          underline='hover'
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            color: '#007bff',
+            textDecoration: 'none',
+            '&:hover': {
+              color: 'primary.main'
+            }
+          }}
+          href={`/cart`}
+        >
+          Giỏ hàng
+        </Link>
+        <Typography
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            color: 'text.primary',
+            fontWeight: 500
+          }}
+        >
+         Thanh toán đơn hàng
+        </Typography>
+      </Breadcrumbs>
       {cartLoading ? (
         <Box sx={{
           display: 'flex',

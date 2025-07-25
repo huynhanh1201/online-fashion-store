@@ -114,11 +114,11 @@ const ReviewButtonComponent = ({
         textTransform: 'none',
         fontWeight: 600,
         color: 'var(--primary-color)',
-        borderColor: 'success.main',
+        borderColor: 'var(--primary-color)',
         '&:hover': {
           color: '#fff',
           backgroundColor: 'var(--accent-color)',
-          borderColor: 'success.main'
+          borderColor: 'var(--primary-color) '
         }
       } : {
         backgroundColor: 'var(--primary-color)',

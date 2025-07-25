@@ -197,8 +197,8 @@ const TableOfContents = ({ headings, isMobile }) => {
       <List
         dense
         sx={{
-          maxHeight: isMobile ? 'none' : 'calc(100vh - 200px)', // Dynamic height based on viewport
-          overflowY: isMobile ? 'visible' : 'auto',
+          maxHeight: isMobile ? '200px' : 'calc(100vh - 450px)', // Much shorter height
+          overflowY: 'auto',
           overflowX: 'hidden', // Prevent horizontal overflow
           px: 1, // Add padding to prevent edge overflow
           '&::-webkit-scrollbar': {
@@ -502,7 +502,7 @@ const BlogDetail = () => {
                 }}
                 href={`/blog`}
               >
-                Bài viết
+                Tin thời trang
               </Link>
               <Typography
                 sx={{
@@ -512,7 +512,7 @@ const BlogDetail = () => {
                   fontWeight: 500
                 }}
               >
-                Tin thời trang
+                Chi tiết bài viết
               </Typography>
             </Breadcrumbs>
           </Box>
@@ -536,8 +536,6 @@ const BlogDetail = () => {
             }}>
               {/* Article Header */}
               <CardContent sx={{ p: 0, mb: 3, mt: 0 }}>
-                {/* Category */}
-
 
                 {/* Title */}
                 <Typography
@@ -554,7 +552,7 @@ const BlogDetail = () => {
                 >
                   {currentBlog.title}
                 </Typography>
-                <Chip
+                {/* <Chip
                   label={currentBlog.category}
                   size="small"
                   sx={{
@@ -564,7 +562,7 @@ const BlogDetail = () => {
                     fontWeight: 600,
                     fontSize: '0.75rem'
                   }}
-                />
+                /> */}
                 {/* Subtitle */}
                 {(currentBlog.excerpt ||
                   currentBlog.subtitle ||
@@ -636,26 +634,32 @@ const BlogDetail = () => {
                     )}
                     <CardMedia
                       component="img"
-                      height={{ xs: 480, sm: 600, md: 750 }}
-                      image={optimizeCloudinaryUrl(currentBlog.coverImage || currentBlog.thumbnail || currentBlog.image)}
+                      image={optimizeCloudinaryUrl(currentBlog.coverImage || currentBlog.thumbnail || currentBlog.image, {
+                        width: 1500,
+                        height: 750,
+                        quality: 'auto:good',
+                        format: 'webp',
+                        crop: 'fit'
+                      })}
                       alt={currentBlog.title}
                       sx={{
-                        objectFit: 'cover',
+                        objectFit: 'contain', // không bị zoom
                         opacity: imageLoaded ? 1 : 0,
                         transition: 'opacity 0.3s ease',
                         width: '100%',
                         height: { xs: '480px', sm: '600px', md: '750px' },
+                        backgroundColor: 'grey.100', // nền xám nếu hình có khoảng trống
                         borderRadius: 0
                       }}
                       onLoad={() => setImageLoaded(true)}
                       onError={() => setImageLoaded(true)}
                     />
+
                   </Box>
                 )}
 
               {/* Article Content Container */}
               <CardContent sx={{ p: 0 }}>
-
                 {/* Content */}
                 <Box
                   sx={{
@@ -664,16 +668,14 @@ const BlogDetail = () => {
                     color: 'text.primary',
                     wordWrap: 'break-word',
                     overflowWrap: 'break-word',
-                    maxWidth: '100%',
                     '& img': {
-                      width: '100% !important',
-                      maxWidth: '100% !important',
-                      height: 'auto !important',
-                      maxHeight: { xs: '540px', sm: '650px', md: '800px' },
+                      width: '100%',
+                      height: 'auto',
                       display: 'block',
                       margin: '1rem 0',
-                      objectFit: 'cover',
-                      border: 'none'
+                      objectFit: 'contain',
+                      objectPosition: 'center',
+                      border: 'none',
                     },
                     '& p': { mb: 3 },
                     '& h1, & h2, & h3, & h4, & h5, & h6': {
@@ -706,35 +708,51 @@ const BlogDetail = () => {
                     },
                     '& code': {
                       fontSize: { xs: '0.8rem', md: '0.9rem' }
-                    }
+                    },
+
                   }}
                   dangerouslySetInnerHTML={{ __html: processedContent || currentBlog.content }}
                 />
 
-                {/* Tags */}
+                {/* Tags Section
                 {currentBlog.tags && currentBlog.tags.length > 0 && (
-                  <Box sx={{ mt: 4, borderTop: 1, borderColor: 'divider', pt: 3 }}>
-                    <Typography variant="subtitle2" sx={{ mb: 1.5, color: 'text.secondary' }}>
-                      Thẻ:
+                  <Box sx={{ mt: 4, pt: 3, borderTop: '1px solid', borderColor: 'grey.200' }}>
+                    <Typography
+                      variant="h6"
+                      sx={{
+                        fontSize: '1.1rem',
+                        fontWeight: 600,
+                        mb: 2,
+                        color: 'text.primary'
+                      }}
+                    >
+                      Thẻ bài viết
                     </Typography>
-                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+                    <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
                       {currentBlog.tags.map((tag, index) => (
                         <Chip
                           key={index}
-                          label={`#${tag}`}
-                          size="small"
+                          label={tag}
                           variant="outlined"
+                          size="small"
                           sx={{
-                            bgcolor: 'grey.50',
-                            color: 'text.secondary',
-                            borderColor: 'grey.300',
-                            fontSize: '0.75rem'
+                            borderColor: 'primary.main',
+                            color: 'primary.main',
+                            fontSize: '0.8rem',
+                            fontWeight: 500,
+                            transition: 'all 0.2s ease',
+                            '&:hover': {
+                              backgroundColor: 'primary.main',
+                              color: 'white',
+                              transform: 'translateY(-1px)',
+                              boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+                            }
                           }}
                         />
                       ))}
                     </Box>
                   </Box>
-                )}
+                )} */}
               </CardContent>
             </Box>
 
@@ -749,7 +767,7 @@ const BlogDetail = () => {
                   top: { lg: '120px' },
                   alignSelf: { lg: 'flex-start' },
                   height: { lg: 'fit-content' },
-                  maxHeight: { lg: 'calc(100vh - 140px)' },
+                  maxHeight: { lg: 'calc(100vh - 400px)' },
                   // Align TOC with title section
                   mt: {
                     xs: 0,
