@@ -8,10 +8,14 @@ import { OrderModel } from '~/models/OrderModel'
 import { CouponModel } from '~/models/CouponModel'
 import { UserModel } from '~/models/UserModel'
 import { OrderItemModel } from '~/models/OrderItemModel'
+import { inventoriesService } from '~/services/inventoriesService'
 
 const getInventoryStatistics = async () => {
   // eslint-disable-next-line no-useless-catch
   try {
+    // Cập nhật trạng thái của tồn kho
+    await inventoriesService.updateStatusInventoryAll()
+
     // Thống kê kho
     const warehouseStatsPromise = InventoryModel.aggregate([
       { $match: { destroy: false } },
