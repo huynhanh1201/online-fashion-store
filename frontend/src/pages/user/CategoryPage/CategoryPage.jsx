@@ -280,7 +280,7 @@ const CategoryPage = () => {
   }
 
   return (
-    <Box sx={{ minHeight: '100vh', py:1 }}>
+    <Box sx={{ minHeight: '100vh', py: 1 }}>
       <Breadcrumbs
         separator={<NavigateNextIcon fontSize='small' />}
         aria-label='breadcrumb'

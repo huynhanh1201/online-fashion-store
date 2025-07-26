@@ -107,7 +107,7 @@ const ProductDetail = () => {
         px: 0,
         justifyContent: 'center',
         alignItems: 'center',
-        maxWidth: '1450px',
+        maxWidth: '97vw',
         width: '100%',
         mx: 'auto'
       }}

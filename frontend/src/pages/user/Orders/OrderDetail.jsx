@@ -21,7 +21,7 @@ import {
   DialogActions,
   DialogContentText,
   Breadcrumbs,
-  Link
+  Link,
 } from '@mui/material'
 import { useParams, useNavigate } from 'react-router-dom'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack'
@@ -58,13 +58,12 @@ const ReviewButtonComponent = ({
   setSelectedProduct,
   setOpenReviewModal,
   setOpenViewReviewModal,
-  checkProductReview
+  checkProductReview,
 }) => {
   const [checking, setChecking] = useState(false)
   const [isReviewed, setIsReviewed] = useState(null) // null = chưa xác định, true/false = đã xác định
 
   useEffect(() => {
-    // Chỉ cập nhật khi không đang loading
     if (!reviewsLoading) {
       const productIdString = product.productId?.toString() || product.productId
       const wasReviewed = reviewedProducts.has(productIdString)
@@ -72,64 +71,61 @@ const ReviewButtonComponent = ({
     }
   }, [reviewedProducts, product.productId, reviewsLoading])
 
-  // Kiểm tra và xử lý click đánh giá
   const handleReviewClick = async () => {
     const productIdString = product.productId?.toString() || product.productId
     setSelectedProduct(product)
 
     if (!isReviewed && !checking && isReviewed !== null) {
       setChecking(true)
-
-      // Double-check với server để đảm bảo chính xác theo orderId cụ thể
       const hasReview = await checkProductReview(productIdString)
-
       if (hasReview) {
-        // Nếu đã có đánh giá cho đơn hàng này, cập nhật state và hiển thị modal xem đánh giá
         setIsReviewed(true)
-        setReviewedProducts(prev => new Set([...prev, productIdString]))
+        setReviewedProducts((prev) => new Set([...prev, productIdString]))
         setOpenViewReviewModal(true)
       } else {
-        // Nếu chưa có đánh giá cho đơn hàng này, mở modal để đánh giá
         setOpenReviewModal(true)
       }
       setChecking(false)
     } else if (isReviewed) {
-      // Nếu đã đánh giá, mở modal xem đánh giá
       setOpenViewReviewModal(true)
     }
   }
 
-  // Hiển thị loading khi đang fetch hoặc chưa xác định trạng thái
   if (reviewsLoading || !isOrderCompleted || !currentUser || isReviewed === null) {
-    return (reviewsLoading || isReviewed === null) && isOrderCompleted && currentUser ? <CircularProgress size={20} /> : null
+    return (reviewsLoading || isReviewed === null) && isOrderCompleted && currentUser ? (
+      <CircularProgress size={20} />
+    ) : null
   }
 
   return (
     <Button
       variant={isReviewed ? 'outlined' : 'contained'}
-      size="medium"
+      size="small"
       disabled={checking || isReviewed === null}
-      sx={isReviewed ? {
+      sx={{
         borderRadius: 2,
         textTransform: 'none',
         fontWeight: 600,
-        color: 'var(--primary-color)',
-        borderColor: 'var(--primary-color)',
-        '&:hover': {
-          color: '#fff',
-          backgroundColor: 'var(--accent-color)',
-          borderColor: 'var(--primary-color) '
-        }
-      } : {
-        backgroundColor: 'var(--primary-color)',
-        color: '#fff',
-        borderRadius: 2,
-        textTransform: 'none',
-        fontWeight: 600,
-        '&:hover': {
-          backgroundColor: 'var(--accent-color)',
-          boxShadow: '0 4px 12px rgba(26, 60, 123, 0.3)'
-        },
+        fontSize: { xs: '0.75rem', sm: '0.875rem' },
+        px: { xs: 1.5, sm: 2 },
+        ...(isReviewed
+          ? {
+            color: 'var(--primary-color)',
+            borderColor: 'var(--primary-color)',
+            '&:hover': {
+              color: '#fff',
+              backgroundColor: 'var(--accent-color)',
+              borderColor: 'var(--primary-color)',
+            },
+          }
+          : {
+            backgroundColor: 'var(--primary-color)',
+            color: '#fff',
+            '&:hover': {
+              backgroundColor: 'var(--accent-color)',
+              boxShadow: '0 4px 12px rgba(26, 60, 123, 0.3)',
+            },
+          }),
       }}
       onClick={(e) => {
         e.stopPropagation()
@@ -148,42 +144,52 @@ const CancelOrderModal = ({ open, onClose, onConfirm, order, loading }) => {
     <Dialog
       open={open}
       onClose={onClose}
-      maxWidth="sm"
+      maxWidth="xs"
       fullWidth
       PaperProps={{
         sx: {
           borderRadius: 3,
-          boxShadow: '0 10px 40px rgba(0,0,0,0.1)'
-        }
+          boxShadow: '0 10px 40px rgba(0,0,0,0.1)',
+          width: { xs: '90vw', sm: '400px' },
+        },
       }}
     >
-      <DialogTitle sx={{ pb: 1 }}>
+      <DialogTitle sx={{ pb: 1, px: { xs: 2, sm: 3 } }}>
         <Box display="flex" alignItems="center" gap={2}>
           <Box
             sx={{
-              p: 1.5,
+              p: 1,
               borderRadius: '50%',
               backgroundColor: 'error.50',
               display: 'flex',
               alignItems: 'center',
-              justifyContent: 'center'
+              justifyContent: 'center',
             }}
           >
-            <Warning sx={{ color: 'error.main', fontSize: 28 }} />
+            <Warning sx={{ color: 'error.main', fontSize: { xs: 24, sm: 28 } }} />
           </Box>
           <Box>
-            <Typography variant="h6" fontWeight="600" color="text.primary">
+            <Typography
+              variant="h6"
+              fontWeight="600"
+              color="text.primary"
+              sx={{ fontSize: { xs: '1rem', sm: '1.25rem' } }}
+            >
               Xác nhận hủy đơn hàng
             </Typography>
-            <Typography variant="body2" color="text.secondary">
+            <Typography
+              variant="body2"
+              color="text.secondary"
+              sx={{ fontSize: { xs: '0.8rem', sm: '0.875rem' } }}
+            >
               Đơn hàng #{order?.code}
             </Typography>
           </Box>
         </Box>
       </DialogTitle>
 
-      <DialogContent sx={{ py: 2 }}>
-        <DialogContentText sx={{ fontSize: '1rem', color: 'text.primary' }}>
+      <DialogContent sx={{ py: 2, px: { xs: 2, sm: 3 } }}>
+        <DialogContentText sx={{ fontSize: { xs: '0.875rem', sm: '1rem' }, color: 'text.primary' }}>
           Bạn có chắc chắn muốn hủy đơn hàng này không?
           <br />
           <Typography
@@ -192,7 +198,8 @@ const CancelOrderModal = ({ open, onClose, onConfirm, order, loading }) => {
               fontWeight: 600,
               color: 'error.main',
               mt: 1,
-              display: 'block'
+              display: 'block',
+              fontSize: { xs: '0.8rem', sm: '0.9rem' },
             }}
           >
             Hành động này không thể hoàn tác!
@@ -200,7 +207,7 @@ const CancelOrderModal = ({ open, onClose, onConfirm, order, loading }) => {
         </DialogContentText>
       </DialogContent>
 
-      <DialogActions sx={{ p: 3, pt: 1 }}>
+      <DialogActions sx={{ p: { xs: 2, sm: 3 }, pt: 1, flexDirection: { xs: 'column', sm: 'row' }, gap: 1 }}>
         <Button
           onClick={onClose}
           variant="outlined"
@@ -209,7 +216,9 @@ const CancelOrderModal = ({ open, onClose, onConfirm, order, loading }) => {
             borderRadius: 2,
             textTransform: 'none',
             fontWeight: 600,
-            px: 3
+            px: { xs: 2, sm: 3 },
+            fontSize: { xs: '0.75rem', sm: '0.875rem' },
+            width: { xs: '100%', sm: 'auto' },
           }}
         >
           Không, giữ lại
@@ -224,8 +233,10 @@ const CancelOrderModal = ({ open, onClose, onConfirm, order, loading }) => {
             borderRadius: 2,
             textTransform: 'none',
             fontWeight: 600,
-            px: 3,
-            boxShadow: '0 4px 12px rgba(211, 47, 47, 0.3)'
+            px: { xs: 2, sm: 3 },
+            fontSize: { xs: '0.75rem', sm: '0.875rem' },
+            width: { xs: '100%', sm: 'auto' },
+            boxShadow: '0 4px 12px rgba(211, 47, 47, 0.3)',
           }}
         >
           {loading ? 'Đang hủy...' : 'Có, hủy đơn'}
@@ -247,15 +258,13 @@ const OrderDetail = () => {
   const [snackbarOpen, setSnackbarOpen] = useState(false)
   const [openReviewModal, setOpenReviewModal] = useState(false)
   const [openViewReviewModal, setOpenViewReviewModal] = useState(false)
-  const [reviewedProducts, setReviewedProducts] = useState(new Set())     // Track which products are reviewed
+  const [reviewedProducts, setReviewedProducts] = useState(new Set())
   const [selectedProduct, setSelectedProduct] = useState(null)
   const [openCancelModal, setOpenCancelModal] = useState(false)
   const [cancelling, setCancelling] = useState(false)
   const [reorderLoading, setReorderLoading] = useState(false)
-  const [reviewsLoading, setReviewsLoading] = useState(true) // Loading state for reviews
+  const [reviewsLoading, setReviewsLoading] = useState(true)
 
-  // Function to check if a specific product has been reviewed for THIS ORDER
-  // Kiểm tra chính xác theo orderID để đảm bảo không duplicate review trong cùng 1 đơn hàng
   const checkProductReview = async (productId) => {
     if (!currentUser?._id || !orderId || !productId) {
       return false
@@ -263,17 +272,13 @@ const OrderDetail = () => {
 
     try {
       const reviews = await getUserReviewForProduct(currentUser._id, productId, orderId)
-
-      // Kiểm tra chính xác orderId trong từng review để đảm bảo chính xác
-      const hasReviewForThisOrder = reviews && reviews.some(review => {
+      const hasReviewForThisOrder = reviews && reviews.some((review) => {
         const reviewOrderId = review.orderId?.toString() || review.orderId
-        // Lấy productId từ object hoặc string
         const reviewProductId = review.productId?._id || review.productId?.id || review.productId
         const currentOrderId = orderId?.toString() || orderId
         const currentProductId = productId?.toString() || productId
         return reviewOrderId === currentOrderId && (reviewProductId?.toString() || reviewProductId) === currentProductId
       })
-
       return hasReviewForThisOrder
     } catch (error) {
       console.error('Error checking product review:', error)
@@ -283,7 +288,6 @@ const OrderDetail = () => {
 
   useEffect(() => {
     const fetchUserReviews = async () => {
-      // Chỉ fetch khi có đầy đủ thông tin cần thiết
       if (!currentUser?._id || !orderId || !order) {
         setReviewsLoading(false)
         return
@@ -292,32 +296,27 @@ const OrderDetail = () => {
       setReviewsLoading(true)
       try {
         const reviews = await getUserReviews(currentUser._id)
-
-        // Check which products in this order have been reviewed
-        // Filter theo chính xác orderID để tránh conflict với review từ order khác
         const reviewedProductsInOrder = reviews
           .filter((review) => {
-            // Đảm bảo so sánh chính xác orderId (có thể là string hoặc ObjectId)
             const reviewOrderId = review.orderId?.toString() || review.orderId
             const currentOrderId = orderId?.toString() || orderId
             return reviewOrderId === currentOrderId
           })
           .map((review) => {
-            // Lấy productId từ object hoặc string
             const productId = review.productId?._id || review.productId?.id || review.productId
             return productId?.toString() || productId
           })
-
         setReviewedProducts(new Set(reviewedProductsInOrder))
       } catch (err) {
         console.error('Lỗi khi lấy đánh giá người dùng:', err)
-        setReviewedProducts(new Set()) // Set empty set on error
+        setReviewedProducts(new Set())
       } finally {
         setReviewsLoading(false)
       }
     }
     fetchUserReviews()
-  }, [currentUser, orderId, order]) // Thêm order vào dependencies
+  }, [currentUser, orderId, order])
+
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'auto' })
   }, [])
@@ -327,12 +326,9 @@ const OrderDetail = () => {
   if (!order) return <Typography>Không tìm thấy đơn hàng</Typography>
 
   const [label, color] = statusLabels[order.status] || ['Không xác định', 'default']
-  // Tính tổng tiền hàng chính xác từ order.total
-  // Đây là cách duy nhất để có giá thực tế đã trả, tránh sử dụng discount hiện tại
   const totalProductsPrice = order.total - (order.shippingFee || 0) + (order.discountAmount || 0)
   const formatPrice = (val) => (typeof val === 'number' ? val.toLocaleString('vi-VN') + '₫' : '0₫')
 
-  // Helper functions for formatting color and size
   const capitalizeFirstLetter = (str) => {
     if (!str) return ''
     return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase()
@@ -343,21 +339,13 @@ const OrderDetail = () => {
     return str.toUpperCase()
   }
 
-  // Tính giá thực tế của từng variant dựa trên tỷ lệ
   const getActualVariantPrice = (variant) => {
-    // Tính tổng subtotal gốc của tất cả items
     const totalOriginalSubtotal = items.reduce((sum, item) => sum + (item.subtotal || 0), 0)
-
-    // Nếu tổng subtotal gốc = 0, trả về 0 để tránh chia cho 0
     if (totalOriginalSubtotal === 0) return 0
-
-    // Tính giá thực tế dựa trên tỷ lệ
     const actualPrice = ((variant.subtotal || 0) / totalOriginalSubtotal) * totalProductsPrice
-
     return Math.round(actualPrice)
   }
 
-  // Group items by product ID to handle variants
   const productGroups = items.reduce((groups, item) => {
     const productId = item.productId?._id
     if (!productId) return groups
@@ -374,197 +362,156 @@ const OrderDetail = () => {
 
     groups[productId].variants.push(item)
     groups[productId].totalQuantity += item.quantity
-    // Tính giá thực tế dựa trên tỷ lệ từ order.total
     const actualVariantPrice = getActualVariantPrice(item)
     groups[productId].totalPrice += actualVariantPrice
     return groups
   }, {})
 
   const uniqueProducts = Object.values(productGroups)
-  const isOrderCompleted = order.status === 'Delivered'
-  const isOrderCancellable = ['Pending', 'Processing'].includes(order.status) && order.paymentStatus !== 'paid'
+  const isOrderCompleted = order.status === 'Delivered';
+  const isOrderCancellable = ['Pending', 'Processing'].includes(order.status) && order.paymentStatus !== 'paid';
 
   const handleCancelOrder = async () => {
-    setCancelling(true)
+    setCancelling(true);
     try {
-      await cancelOrder(orderId)
-      setOpenCancelModal(false)
-      // Refresh page or navigate back to orders list
-      navigate('/orders')
+      await cancelOrder(orderId);
+      setOpenCancelModal(false);
+      navigate('/orders');
     } catch (error) {
-      console.error('Lỗi khi hủy đơn hàng:', error)
-      // You can show a snackbar or toast here instead of alert
+      console.error('Lỗi khi hủy đơn hàng:', error);
     } finally {
-      setCancelling(false)
+      setCancelling(false);
     }
-  }
+  };
 
   const handleCloseModal = () => {
-    setOpenReviewModal(false)
-    setSelectedProduct(null)
-  }
+    setOpenReviewModal(false);
+    setSelectedProduct(null);
+  };
 
   const handleCloseViewReviewModal = () => {
-    setOpenViewReviewModal(false)
-    setSelectedProduct(null)
-  }
+    setOpenViewReviewModal(false);
+    setSelectedProduct(null);
+  };
 
   const handleSubmitReview = async (reviewData) => {
     try {
-      const productId = selectedProduct?.productId?.toString() || selectedProduct?.productId
-
-      // Kiểm tra đầy đủ trước khi gửi đánh giá
+      const productId = selectedProduct?.productId?.toString() || selectedProduct?.productId;
       if (!productId || !orderId || !currentUser?._id) {
-        console.error('Thiếu thông tin cần thiết để đánh giá.')
-        handleCloseModal()
-        return
+        console.error('Thiếu thông tin cần thiết để đánh giá.');
+        handleCloseModal();
+        return;
       }
 
-      // Double-check với server trước khi gửi đánh giá theo orderId cụ thể
-      const hasExistingReview = await checkProductReview(productId)
+      const hasExistingReview = await checkProductReview(productId);
       if (hasExistingReview) {
-        console.error(`Sản phẩm ${productId} đã được đánh giá trong đơn hàng ${orderId}.`)
-        // Cập nhật state và đóng modal
-        setReviewedProducts(prev => new Set([...prev, productId]))
-        setSnackbarOpen(true)
-        handleCloseModal()
-        return
+        console.error(`Sản phẩm ${productId} đã được đánh giá trong đơn hàng ${orderId}.`);
+        setReviewedProducts((prev) => new Set([...prev, productId]));
+        setSnackbarOpen(true);
+        handleCloseModal();
+        return;
       }
 
-      // Kiểm tra state local
       if (reviewedProducts.has(productId)) {
-        console.error('Sản phẩm này đã được đánh giá.')
-        setSnackbarOpen(true)
-        handleCloseModal()
-        return
+        console.error('Sản phẩm này đã được đánh giá.');
+        setSnackbarOpen(true);
+        handleCloseModal();
+        return;
       }
 
-      // Gửi đánh giá với payload đầy đủ
-      const result = await createReview(reviewData)
-
+      const result = await createReview(reviewData);
       if (result) {
-        // Mark this specific product as reviewed ngay lập tức
-        console.log('handleSubmitReview: Review submitted successfully, updating state for productId:', productId)
-        setReviewedProducts(prev => {
-          const newSet = new Set([...prev, productId])
-          console.log('handleSubmitReview: Updated reviewedProducts:', newSet)
-          return newSet
-        })
-        handleCloseModal()
-        setSnackbarOpen(true)
+        console.log('handleSubmitReview: Review submitted successfully, updating state for productId:', productId);
+        setReviewedProducts((prev) => {
+          const newSet = new Set([...prev, productId]);
+          console.log('handleSubmitReview: Updated reviewedProducts:', newSet);
+          return newSet;
+        });
+        handleCloseModal();
+        setSnackbarOpen(true);
       }
     } catch (error) {
-      console.error('Lỗi gửi đánh giá:', error)
-      // Hiển thị lỗi cho user nếu cần
+      console.error('Lỗi gửi đánh giá:', error);
       if (error?.message?.includes('đã được đánh giá') || error?.message?.includes('already reviewed')) {
-        // Nếu server báo đã được đánh giá, cập nhật state
-        const productId = selectedProduct?.productId
+        const productId = selectedProduct?.productId;
         if (productId) {
-          setReviewedProducts(prev => new Set([...prev, productId]))
+          setReviewedProducts((prev) => new Set([...prev, productId]));
         }
       }
-      handleCloseModal()
+      handleCloseModal();
     }
-  }
+  };
 
-  // Handle reorder - logic đồng bộ với OrderListPage: nếu có trong giỏ thì bỏ qua, nếu hết hàng thì gửi quantity = 0
   const handleReorder = async () => {
     try {
-      setReorderLoading(true)
-
-      // Lặp qua từng sản phẩm trong đơn hàng
+      setReorderLoading(true);
       for (let i = 0; i < items.length; i++) {
-        const item = items[i]
-        const variantId = typeof item.variantId === 'object' ? item.variantId._id : item.variantId
-
+        const item = items[i];
+        const variantId = typeof item.variantId === 'object' ? item.variantId._id : item.variantId;
         if (!variantId) {
-          console.warn('Variant ID not found for item:', item)
-          continue
+          console.warn('Variant ID not found for item:', item);
+          continue;
         }
 
         try {
-          // Kiểm tra số lượng tồn kho của variant trước
-          const variantInfo = await getVariantById(variantId)
-
+          const variantInfo = await getVariantById(variantId);
           if (!variantInfo) {
-            console.warn('Variant not found for ID:', variantId)
-            continue
+            console.warn('Variant not found for ID:', variantId);
+            continue;
           }
 
-          // Kiểm tra số lượng tồn kho
-          const availableQuantity = variantInfo.quantity || 0
-
-          let quantityToAdd = 1 // Mặc định thêm 1
-
-          // Nếu hết hàng thì gửi quantity = 0 để hiển thị "hết hàng" trong cart
+          const availableQuantity = variantInfo.quantity || 0;
+          let quantityToAdd = 1;
           if (availableQuantity <= 0) {
-            quantityToAdd = 0
-            console.log(`Item ${item.productId?.name || item.name} is out of stock, adding with quantity = 0`)
-            // Thêm vào giỏ hàng với quantity = 0
+            quantityToAdd = 0;
+            console.log(`Item ${item.productId?.name || item.name} is out of stock, adding with quantity = 0`);
             await addToCart({
               variantId: variantId,
-              quantity: quantityToAdd
-            })
-            continue
+              quantity: quantityToAdd,
+            });
+            continue;
           }
 
-          // Kiểm tra xem sản phẩm đã có trong giỏ hàng chưa
-          const currentCartItem = cart?.cartItems?.find(cartItem => {
-            const cartVariantId = typeof cartItem.variantId === 'object'
-              ? cartItem.variantId._id
-              : cartItem.variantId
-            return cartVariantId === variantId
-          })
+          const currentCartItem = cart?.cartItems?.find((cartItem) => {
+            const cartVariantId = typeof cartItem.variantId === 'object' ? cartItem.variantId._id : cartItem.variantId;
+            return cartVariantId === variantId;
+          });
 
-          const currentQuantityInCart = currentCartItem?.quantity || 0
-
-          // Nếu đã có trong giỏ hàng và đạt số lượng tối đa thì BỎ QUA
+          const currentQuantityInCart = currentCartItem?.quantity || 0;
           if (currentCartItem && currentQuantityInCart >= availableQuantity) {
-            console.log(`Item ${item.productId?.name || item.name} reached max quantity in cart (${currentQuantityInCart}/${availableQuantity}), skipping`)
-            continue
-          }
-          // Nếu đã có trong giỏ hàng nhưng chưa đạt tối đa
-          else if (currentCartItem) {
-            // Tính toán số lượng có thể thêm
-            const canAdd = availableQuantity - currentQuantityInCart
-            quantityToAdd = Math.min(1, canAdd) // Chỉ thêm tối đa 1 hoặc số lượng còn lại
-            console.log(`Item ${item.productId?.name || item.name} already in cart (${currentQuantityInCart}), adding ${quantityToAdd} more`)
-          }
-          // Sản phẩm chưa có trong giỏ hàng
-          else {
-            console.log(`Adding new item ${item.productId?.name || item.name} to cart`)
+            console.log(
+              `Item ${item.productId?.name || item.name} reached max quantity in cart (${currentQuantityInCart}/${availableQuantity}), skipping`
+            );
+            continue;
+          } else if (currentCartItem) {
+            const canAdd = availableQuantity - currentQuantityInCart;
+            quantityToAdd = Math.min(1, canAdd);
+            console.log(`Item ${item.productId?.name || item.name} already in cart (${currentQuantityInCart}), adding ${quantityToAdd} more`);
+          } else {
+            console.log(`Adding new item ${item.productId?.name || item.name} to cart`);
           }
 
-          // Thêm vào giỏ hàng
           await addToCart({
             variantId: variantId,
-            quantity: quantityToAdd
-          })
+            quantity: quantityToAdd,
+          });
         } catch (error) {
-          console.error(`Error adding item ${i + 1} to cart:`, error)
+          console.error(`Error adding item ${i + 1} to cart:`, error);
         }
 
-        // Add small delay between requests to avoid overwhelming the server
         if (i < items.length - 1) {
-          await new Promise(resolve => setTimeout(resolve, 200))
+          await new Promise((resolve) => setTimeout(resolve, 200));
         }
       }
 
-      // Lưu danh sách variantId từ reorder vào Redux để cart tự động chọn
       const reorderVariantIds = items
-        .map(item => typeof item.variantId === 'object' ? item.variantId._id : item.variantId)
-        .filter(id => id) // Lọc bỏ các id không hợp lệ
-
-      dispatch(setReorderVariantIds(reorderVariantIds))
-
-      // Force refresh cart data before navigating
-      await refreshCart({ silent: true })
-
-      // Chuyển đến giỏ hàng luôn
+        .map((item) => (typeof item.variantId === 'object' ? item.variantId._id : item.variantId))
+        .filter((id) => id);
+      dispatch(setReorderVariantIds(reorderVariantIds));
+      await refreshCart({ silent: true });
       setTimeout(() => {
         navigate('/cart')
       }, 300)
-
     } catch (err) {
       console.error('Lỗi khi mua lại:', err)
     } finally {
@@ -572,55 +519,53 @@ const OrderDetail = () => {
     }
   }
 
-  // Handle click on product to navigate to product detail page
   const handleProductClick = (productId) => {
     navigate(`/productdetail/${productId}`)
   }
 
   return (
-    <Box sx={{ width: '96vw', maxWidth: '1800px', margin: '0 auto', p: 3, minHeight: '70vh' }}>
+    <Box
+      sx={{
+        width: '100%',
+        maxWidth: { xs: '100vw', sm: '96vw', md: '1800px' },
+        margin: '0 auto',
+        p: { xs: 1, sm: 2, md: 3 },
+        minHeight: '70vh',
+      }}
+    >
       {/* Breadcrumb */}
       <Box
         sx={{
-          bottom: { xs: '20px', sm: '30px', md: '40px' },
-          left: { xs: '20px', sm: '30px', md: '40px' },
-          right: { xs: '20px', sm: '30px', md: '40px' },
-          maxWidth: '1800px',
-          margin: '0 auto',
-          mb: 2
+          px: { xs: 1, sm: 2, md: 3 },
+          mb: 2,
         }}
       >
-        <Breadcrumbs
-          separator={<NavigateNext fontSize='small' />}
-          aria-label='breadcrumb'
-        >
+        <Breadcrumbs separator={<NavigateNext fontSize="small" />} aria-label="breadcrumb">
           <Link
-            underline='hover'
+            underline="hover"
             sx={{
               display: 'flex',
               alignItems: 'center',
               color: '#007bff',
               textDecoration: 'none',
-              '&:hover': {
-                color: 'primary.main'
-              }
+              fontSize: { xs: '0.8rem', sm: '0.9rem' },
+              '&:hover': { color: 'primary.main' },
             }}
-            href='/'
+            href="/"
           >
             Trang chủ
           </Link>
           <Link
-            underline='hover'
+            underline="hover"
             sx={{
               display: 'flex',
               alignItems: 'center',
               color: '#007bff',
               textDecoration: 'none',
-              '&:hover': {
-                color: 'primary.main'
-              }
+              fontSize: { xs: '0.8rem', sm: '0.9rem' },
+              '&:hover': { color: 'primary.main' },
             }}
-            href={`/orders`}
+            href="/orders"
           >
             Đơn hàng
           </Link>
@@ -629,7 +574,8 @@ const OrderDetail = () => {
               display: 'flex',
               alignItems: 'center',
               color: 'text.primary',
-              fontWeight: 500
+              fontWeight: 500,
+              fontSize: { xs: '0.8rem', sm: '0.9rem' },
             }}
           >
             Chi tiết đơn hàng
@@ -643,23 +589,24 @@ const OrderDetail = () => {
           border: '1px solid rgba(0,0,0,0.05)',
         }}
       >
-        <CardContent sx={{ p: 3 }}>
-          {/* Header - similar to OrderListPage */}
-          <Box display="flex" alignItems="center" mb={3}>
-            <IconButton
-              onClick={() => navigate(-1)}
-              aria-label="Quay lại"
-            >
-              <ArrowBackIcon />
+        <CardContent sx={{ p: { xs: 1.5, sm: 2, md: 3 } }}>
+          {/* Header */}
+          <Box display="flex" alignItems="center" mb={2} flexWrap="wrap" gap={1}>
+            <IconButton onClick={() => navigate(-1)} aria-label="Quay lại" size="small">
+              <ArrowBackIcon fontSize="small" />
             </IconButton>
             <Typography
               variant="h6"
               fontWeight="600"
-              sx={{ color: 'var(--primary-color)' }}
+              sx={{ color: 'var(--primary-color)', fontSize: { xs: '1rem', sm: '1.25rem' } }}
             >
               #{order.code}
             </Typography>
-            <Typography variant="body2" color="text.secondary" ml={2}>
+            <Typography
+              variant="body2"
+              color="text.secondary"
+              sx={{ ml: 1, fontSize: { xs: '0.75rem', sm: '0.875rem' } }}
+            >
               {new Date(order.createdAt).toLocaleDateString('vi-VN')}
             </Typography>
             <Chip
@@ -668,8 +615,8 @@ const OrderDetail = () => {
               sx={{
                 ml: 'auto',
                 fontWeight: 600,
-                fontSize: '0.75rem',
-                height: 32
+                fontSize: { xs: '0.65rem', sm: '0.75rem' },
+                height: { xs: 28, sm: 32 },
               }}
             />
           </Box>
@@ -677,41 +624,57 @@ const OrderDetail = () => {
           {/* Shipping Address Section */}
           <Box
             sx={{
-              p: 2,
+              p: { xs: 1, sm: 1.5, md: 2 },
               borderRadius: 2,
               backgroundColor: 'grey.50',
               border: '1px solid',
               borderColor: 'grey.200',
-              mb: 3
+              mb: 2,
             }}
           >
-            <Typography variant="h6" fontWeight="600" color="var(--primary-color)" gutterBottom>
+            <Typography
+              variant="h6"
+              fontWeight="600"
+              color="var(--primary-color)"
+              gutterBottom
+              sx={{ fontSize: { xs: '1rem', sm: '1.25rem' } }}
+            >
               Địa Chỉ Nhận Hàng
             </Typography>
-            <Stack spacing={1}>
-              <Typography fontWeight="600" fontSize="1.1rem">
+            <Stack spacing={0.5}>
+              <Typography
+                fontWeight="600"
+                sx={{ fontSize: { xs: '0.9rem', sm: '1rem', md: '1.1rem' } }}
+              >
                 {order.shippingAddress?.fullName}
               </Typography>
-              <Typography color="text.secondary">
+              <Typography
+                color="text.secondary"
+                sx={{ fontSize: { xs: '0.8rem', sm: '0.875rem' } }}
+              >
                 (+84) {order.shippingAddress?.phone}
               </Typography>
-              <Typography color="text.secondary">
-                {order.shippingAddress?.address}, {order.shippingAddress?.ward}, {order.shippingAddress?.district}, {order.shippingAddress?.city}
+              <Typography
+                color="text.secondary"
+                sx={{ fontSize: { xs: '0.8rem', sm: '0.875rem' } }}
+              >
+                {order.shippingAddress?.address}, {order.shippingAddress?.ward},{' '}
+                {order.shippingAddress?.district}, {order.shippingAddress?.city}
               </Typography>
               {order.note && (
                 <Typography
                   color="text.secondary"
                   fontStyle="italic"
                   sx={{
+                    fontSize: { xs: '0.75rem', sm: '0.875rem' },
                     wordBreak: 'break-word',
-                    wordWrap: 'break-word',
                     whiteSpace: 'pre-wrap',
                     maxWidth: '100%',
                     overflow: 'hidden',
                     display: '-webkit-box',
                     WebkitLineClamp: 3,
                     WebkitBoxOrient: 'vertical',
-                    lineHeight: 1.5
+                    lineHeight: 1.5,
                   }}
                 >
                   Ghi chú: {order.note}
@@ -720,15 +683,15 @@ const OrderDetail = () => {
             </Stack>
           </Box>
 
-          {/* Products Section - similar to OrderListPage */}
-          <Stack spacing={2}>
+          {/* Products Section */}
+          <Stack spacing={1.5}>
             {uniqueProducts.map((product, index) => (
               <Box key={product.productId}>
                 {product.variants.map((variant, variantIndex) => (
                   <Box key={variant._id}>
                     <Box
                       sx={{
-                        p: 2,
+                        p: { xs: 1, sm: 1.5, md: 2 },
                         borderRadius: 2,
                         backgroundColor: 'grey.50',
                         border: '1px solid',
@@ -738,63 +701,74 @@ const OrderDetail = () => {
                         '&:hover': {
                           backgroundColor: 'grey.50',
                           borderColor: 'var(--primary-color)',
-                          transform: 'translateX(4px)'
-                        }
+                          transform: 'translateX(4px)',
+                        },
                       }}
                       onClick={() => handleProductClick(product.productId)}
                     >
-                      <Box display="flex" justifyContent="space-between" alignItems="center">
-                        <Box display="flex" alignItems="center" gap={2}>
+                      <Box
+                        display="flex"
+                        justifyContent="space-between"
+                        alignItems="center"
+                        flexDirection={{ xs: 'column', sm: 'row' }}
+                        gap={1}
+                      >
+                        <Box display="flex" alignItems="center" gap={1.5} width="100%">
                           <Avatar
                             src={optimizeCloudinaryUrl(variant?.color?.image) || '/images/default.jpg'}
                             alt={variant.name}
                             sx={{
-                              width: 80,
-                              height: 80,
+                              width: { xs: 60, sm: 70, md: 80 },
+                              height: { xs: 60, sm: 70, md: 80 },
                               borderRadius: 2,
                               border: '2px solid white',
-                              boxShadow: '0 4px 8px rgba(0,0,0,0.1)'
+                              boxShadow: '0 4px 8px rgba(0,0,0,0.1)',
+                              objectFit: 'cover',
                             }}
                             variant="rounded"
                           />
-                          <Box>
+                          <Box flexGrow={1}>
                             <Typography
                               fontWeight={600}
-                              fontSize="1.1rem"
                               sx={{
+                                fontSize: { xs: '0.9rem', sm: '1rem', md: '1.1rem' },
                                 mb: 0.5,
                                 overflow: 'hidden',
                                 textOverflow: 'ellipsis',
                                 whiteSpace: 'nowrap',
-                                maxWidth: { xs: '150px', sm: '200px', md: '250px' }
+                                maxWidth: { xs: '250px', sm: '250px', md: '400px', lg: '500px' }
+
                               }}
                               title={product.productName}
                             >
                               {product.productName}
                             </Typography>
-
                             <Typography
                               variant="body2"
                               color="text.secondary"
-                              sx={{ mb: 0.5 }}
+                              sx={{ mb: 0.5, fontSize: { xs: '0.75rem', sm: '0.8rem' } }}
                             >
-                              Phân loại hàng: {capitalizeFirstLetter(variant.color?.name)}, {formatSize(variant.size)}
+                              Phân loại hàng: {capitalizeFirstLetter(variant.color?.name)},{' '}
+                              {formatSize(variant.size)}
                             </Typography>
                             <Chip
                               label={`Số lượng: ${variant.quantity}`}
                               size="small"
                               variant="outlined"
-                              sx={{ fontSize: '0.7rem', height: 20 }}
+                              sx={{
+                                fontSize: { xs: '0.65rem', sm: '0.7rem' },
+                                height: { xs: 18, sm: 20 },
+                              }}
                             />
                           </Box>
                         </Box>
-
-                        <Box textAlign="right">
-                          {/* Hiển thị giá thực tế đã trả dựa trên tỷ lệ từ order.total */}
+                        <Box textAlign={{ xs: 'right' }}>
                           <Typography
                             fontWeight={700}
-                            fontSize="1.2rem"
-                            color="var(--primary-color)"
+                            sx={{
+                              fontSize: { xs: '1rem', sm: '1.1rem', md: '1.2rem' },
+                              color: 'var(--primary-color)',
+                            }}
                           >
                             {formatPrice(getActualVariantPrice(variant))}
                           </Typography>
@@ -806,9 +780,13 @@ const OrderDetail = () => {
                     )}
                   </Box>
                 ))}
-
-                {/* Action Buttons */}
-                <Box display="flex" justifyContent="flex-end" gap={2} mt={2}>
+                <Box
+                  display="flex"
+                  justifyContent="flex-end"
+                  gap={1}
+                  mt={1}
+                  flexDirection={{ xs: 'column', sm: 'row' }}
+                >
                   <ReviewButtonComponent
                     product={product}
                     reviewedProducts={reviewedProducts}
@@ -822,58 +800,97 @@ const OrderDetail = () => {
                     checkProductReview={checkProductReview}
                   />
                 </Box>
-
-                {index < uniqueProducts.length - 1 && <Divider sx={{ my: 3 }} />}
+                {index < uniqueProducts.length - 1 && <Divider sx={{ my: 2 }} />}
               </Box>
             ))}
           </Stack>
 
-          {/* Order Summary - similar to OrderListPage style */}
-          <Divider sx={{ my: 3 }} />
-
+          {/* Order Summary */}
+          <Divider sx={{ my: 2 }} />
           <Box
             sx={{
-              p: 2,
+              p: { xs: 1, sm: 1.5, md: 2 },
               borderRadius: 2,
               backgroundColor: 'primary.50',
             }}
           >
-            <Typography variant="h6" fontWeight="600" mb={2}>
+            <Typography
+              variant="h6"
+              fontWeight="600"
+              mb={1.5}
+              sx={{ fontSize: { xs: '1rem', sm: '1.25rem' } }}
+            >
               Tóm tắt đơn hàng
             </Typography>
-
-            <Stack spacing={1.5}>
+            <Stack spacing={1}>
               <Box display="flex" justifyContent="space-between">
-                <Typography>Tổng tiền hàng:</Typography>
-                <Typography fontWeight={600}>{formatPrice(totalProductsPrice)}</Typography>
+                <Typography sx={{ fontSize: { xs: '0.8rem', sm: '0.9rem' } }}>
+                  Tổng tiền hàng:
+                </Typography>
+                <Typography
+                  fontWeight={600}
+                  sx={{ fontSize: { xs: '0.8rem', sm: '0.9rem' } }}
+                >
+                  {formatPrice(totalProductsPrice)}
+                </Typography>
               </Box>
               <Box display="flex" justifyContent="space-between">
-                <Typography>Phí vận chuyển:</Typography>
-                <Typography fontWeight={600}>{formatPrice(order.shippingFee || 0)}</Typography>
+                <Typography sx={{ fontSize: { xs: '0.8rem', sm: '0.9rem' } }}>
+                  Phí vận chuyển:
+                </Typography>
+                <Typography
+                  fontWeight={600}
+                  sx={{ fontSize: { xs: '0.8rem', sm: '0.9rem' } }}
+                >
+                  {formatPrice(order.shippingFee || 0)}
+                </Typography>
               </Box>
               <Box display="flex" justifyContent="space-between">
-                <Typography>Giảm giá:</Typography>
-                <Typography fontWeight={600} color={order.couponId ? 'error' : 'inherit'}>
+                <Typography sx={{ fontSize: { xs: '0.8rem', sm: '0.9rem' } }}>
+                  Giảm giá:
+                </Typography>
+                <Typography
+                  fontWeight={600}
+                  color={order.couponId ? 'error' : 'inherit'}
+                  sx={{ fontSize: { xs: '0.8rem', sm: '0.9rem' } }}
+                >
                   {formatPrice(order.discountAmount || 0)}
                 </Typography>
               </Box>
               <Divider />
               <Box display="flex" justifyContent="space-between" alignItems="center">
-                <Typography variant="h6" fontWeight="600">
+                <Typography
+                  variant="h6"
+                  fontWeight="600"
+                  sx={{ fontSize: { xs: '1rem', sm: '1.25rem' } }}
+                >
                   Tổng cộng:
                 </Typography>
                 <Typography
                   variant="h5"
                   fontWeight="700"
-                  sx={{ color: 'var(--primary-color)' }}
+                  sx={{
+                    color: 'var(--primary-color)',
+                    fontSize: { xs: '1.25rem', sm: '1.5rem' },
+                  }}
                 >
                   {formatPrice(order.total)}
                 </Typography>
               </Box>
               <Box display="flex" justifyContent="space-between" mt={1}>
-                <Typography fontWeight="600">Phương thức thanh toán:</Typography>
-                <Typography fontWeight={600}>
-                  {order.paymentMethod?.toLowerCase() === 'cod' ? 'Thanh toán khi nhận hàng (COD)' : 'VNPay'}
+                <Typography
+                  fontWeight="600"
+                  sx={{ fontSize: { xs: '0.8rem', sm: '0.9rem' } }}
+                >
+                  Phương thức thanh toán:
+                </Typography>
+                <Typography
+                  fontWeight="600"
+                  sx={{ fontSize: { xs: '0.8rem', sm: '0.9rem' } }}
+                >
+                  {order.paymentMethod?.toLowerCase() === 'cod'
+                    ? 'Thanh toán khi nhận hàng (COD)'
+                    : 'VNPay'}
                 </Typography>
               </Box>
             </Stack>
@@ -883,20 +900,37 @@ const OrderDetail = () => {
 
       {/* Cancel Order Button */}
       {isOrderCancellable && (
-        <Card sx={{
-          mt: 2,
-          px: 3,
-          borderRadius: 3,
-          boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
-          border: '1px solid rgba(255, 152, 0, 0.2)'
-        }}>
+        <Card
+          sx={{
+            mt: 2,
+            px: { xs: 1.5, sm: 2, md: 3 },
+            borderRadius: 3,
+            boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
+            border: '1px solid rgba(255, 152, 0, 0.2)',
+          }}
+        >
           <CardContent>
-            <Box display="flex" justifyContent="space-between" alignItems="center">
-              <Box>
-                <Typography variant="h6" fontWeight="600" color="var(--primary-color)">
+            <Box
+              display="flex"
+              justifyContent="space-between"
+              alignItems="center"
+              flexDirection={{ xs: 'column', sm: 'row' }}
+              gap={1}
+            >
+              <Box textAlign={{ xs: 'center', sm: 'left' }}>
+                <Typography
+                  variant="h6"
+                  fontWeight="600"
+                  color="var(--primary-color)"
+                  sx={{ fontSize: { xs: '1rem', sm: '1.25rem' } }}
+                >
                   Hủy đơn hàng
                 </Typography>
-                <Typography variant="body2" color="text.secondary">
+                <Typography
+                  variant="body2"
+                  color="text.secondary"
+                  sx={{ fontSize: { xs: '0.75rem', sm: '0.875rem' } }}
+                >
                   Bạn có thể hủy đơn hàng này vì chưa thanh toán
                 </Typography>
               </Box>
@@ -907,7 +941,10 @@ const OrderDetail = () => {
                 sx={{
                   borderRadius: 2,
                   textTransform: 'none',
-                  fontWeight: 600
+                  fontWeight: 600,
+                  fontSize: { xs: '0.75rem', sm: '0.875rem' },
+                  px: { xs: 1.5, sm: 2 },
+                  width: { xs: '100%', sm: 'auto' },
                 }}
                 onClick={() => setOpenCancelModal(true)}
               >
@@ -918,22 +955,39 @@ const OrderDetail = () => {
         </Card>
       )}
 
-      {/* Reorder Button - for completed, failed, or cancelled orders */}
+      {/* Reorder Button */}
       {(order?.status === 'Delivered' || order?.status === 'Failed' || order?.status === 'Cancelled') && (
-        <Card sx={{
-          mt: 2,
-          px: 3,
-          borderRadius: 3,
-          boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
-          border: '1px solid rgba(26, 60, 123, 0.2)'
-        }}>
+        <Card
+          sx={{
+            mt: 2,
+            px: { xs: 1.5, sm: 2, md: 3 },
+            borderRadius: 3,
+            boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
+            border: '1px solid rgba(26, 60, 123, 0.2)',
+          }}
+        >
           <CardContent>
-            <Box display="flex" justifyContent="space-between" alignItems="center">
-              <Box>
-                <Typography variant="h6" fontWeight="600" color="var(--primary-color)">
+            <Box
+              display="flex"
+              justifyContent="space-between"
+              alignItems="center"
+              flexDirection={{ xs: 'column', sm: 'row' }}
+              gap={1}
+            >
+              <Box textAlign={{ xs: 'center', sm: 'left' }}>
+                <Typography
+                  variant="h6"
+                  fontWeight="600"
+                  color="var(--primary-color)"
+                  sx={{ fontSize: { xs: '1rem', sm: '1.25rem' } }}
+                >
                   Mua lại đơn hàng
                 </Typography>
-                <Typography variant="body2" color="text.secondary">
+                <Typography
+                  variant="body2"
+                  color="text.secondary"
+                  sx={{ fontSize: { xs: '0.75rem', sm: '0.875rem' } }}
+                >
                   Thêm tất cả sản phẩm từ đơn hàng này vào giỏ hàng
                 </Typography>
               </Box>
@@ -946,8 +1000,11 @@ const OrderDetail = () => {
                   borderRadius: 2,
                   textTransform: 'none',
                   fontWeight: 600,
+                  fontSize: { xs: '0.75rem', sm: '0.875rem' },
+                  px: { xs: 1.5, sm: 2 },
+                  width: { xs: '100%', sm: 'auto' },
                   boxShadow: '0 4px 12px rgba(25, 118, 210, 0.3)',
-                  opacity: reorderLoading ? 0.7 : 1
+                  opacity: reorderLoading ? 0.7 : 1,
                 }}
               >
                 {reorderLoading ? 'Đang thêm vào giỏ...' : 'Mua lại'}
@@ -963,7 +1020,7 @@ const OrderDetail = () => {
         autoHideDuration={4000}
         onClose={() => setSnackbarOpen(false)}
         anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
-        sx={{ mt: 12 }}
+        sx={{ mt: { xs: 8, sm: 10, md: 12 } }}
       >
         <Alert
           onClose={() => setSnackbarOpen(false)}
@@ -971,7 +1028,8 @@ const OrderDetail = () => {
           sx={{
             width: '100%',
             borderRadius: 2,
-            fontWeight: 600
+            fontWeight: 600,
+            fontSize: { xs: '0.75rem', sm: '0.875rem' },
           }}
         >
           Cảm ơn bạn đã đánh giá!
@@ -988,7 +1046,6 @@ const OrderDetail = () => {
         orderId={orderId}
       />
 
-      {/* View Review Modal */}
       <ViewReviewModal
         open={openViewReviewModal}
         onClose={handleCloseViewReviewModal}
@@ -998,7 +1055,6 @@ const OrderDetail = () => {
         productName={selectedProduct?.productName}
       />
 
-      {/* Cancel Order Modal */}
       <CancelOrderModal
         open={openCancelModal}
         onClose={() => setOpenCancelModal(false)}

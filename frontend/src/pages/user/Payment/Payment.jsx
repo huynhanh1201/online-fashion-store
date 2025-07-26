@@ -271,8 +271,10 @@ const ProductItem = ({ name, variant, quantity, image, color, size, getFinalPric
   if (!name || typeof quantity !== 'number') {
     return (
       <tr>
-        <td colSpan={3} style={{ color: 'red', padding: 16, textAlign: 'center' }}>
-          <Typography color="error">Lỗi: Dữ liệu sản phẩm không hợp lệ.</Typography>
+        <td colSpan={3} style={{ color: 'red', padding: 8, textAlign: 'center' }}>
+          <Typography color="error" sx={{ fontSize: { xs: '0.85rem', sm: '0.95rem' } }}>
+            Lỗi: Dữ liệu sản phẩm không hợp lệ.
+          </Typography>
         </td>
       </tr>
     )
@@ -294,25 +296,41 @@ const ProductItem = ({ name, variant, quantity, image, color, size, getFinalPric
   return (
     <tr>
       <td>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, cursor: 'pointer' }} onClick={handleProductClick}>
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: { xs: 'column', sm: 'row' },
+            alignItems: { xs: 'flex-start', sm: 'center' },
+            gap: 1.5,
+            cursor: 'pointer',
+          }}
+          onClick={handleProductClick}
+        >
           <Box
             component="img"
             src={optimizeCloudinaryUrl(image) || 'https://via.placeholder.com/64'}
             alt={name}
             sx={{
-              width: 64,
-              height: 64,
+              width: { xs: 48, sm: 64 },
+              height: { xs: 48, sm: 64 },
               borderRadius: 2,
               objectFit: 'cover',
               boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
               transition: 'transform 0.2s ease',
               '&:hover': {
                 transform: 'scale(1.05)',
-              }
+              },
             }}
           />
           <Box>
-            <Typography fontWeight={600} sx={{ mb: 0.5, '&:hover': { color: 'var(--primary-color)' } }}>
+            <Typography
+              fontWeight={600}
+              sx={{
+                mb: 0.5,
+                fontSize: { xs: '0.9rem', sm: '1rem' },
+                '&:hover': { color: 'var(--primary-color)' },
+              }}
+            >
               {truncatedName}
             </Typography>
             <Box sx={{ display: 'flex', gap: 1, mb: 1 }}>
@@ -320,33 +338,37 @@ const ProductItem = ({ name, variant, quantity, image, color, size, getFinalPric
                 label={capitalizeFirstLetter(color) || 'Chưa chọn màu'}
                 size="small"
                 variant="outlined"
-                sx={{ fontSize: '0.75rem' }}
+                sx={{ fontSize: { xs: '0.7rem', sm: '0.75rem' } }}
               />
               <Chip
                 label={formatSize(size) || 'Chưa chọn kích cỡ'}
                 size="small"
                 variant="outlined"
-                sx={{ fontSize: '0.75rem' }}
+                sx={{ fontSize: { xs: '0.7rem', sm: '0.75rem' } }}
               />
             </Box>
           </Box>
         </Box>
       </td>
       <td style={{ textAlign: 'center' }}>
-        <Typography fontWeight={600} sx={{ mb: 0.5 }}>
+        <Typography fontWeight={600} sx={{ mb: 0.5, fontSize: { xs: '0.9rem', sm: '1rem' } }}>
           {quantity}
         </Typography>
       </td>
       <td style={{ textAlign: 'right' }}>
         <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 0.5 }}>
-          <Typography fontWeight={600} color="var(--primary-color)" sx={{ fontSize: '1rem' }}>
+          <Typography
+            fontWeight={600}
+            color="var(--primary-color)"
+            sx={{ fontSize: { xs: '0.9rem', sm: '1rem' } }}
+          >
             {(finalPrice * quantity).toLocaleString('vi-VN')}₫
           </Typography>
           {hasDiscount && (
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, flexWrap: 'wrap', justifyContent: 'flex-end' }}>
               <Typography
                 sx={{
-                  fontSize: '1rem',
+                  fontSize: { xs: '0.85rem', sm: '0.95rem' },
                   color: 'text.secondary',
                   textDecoration: 'line-through',
                 }}
@@ -456,7 +478,9 @@ const Payment = () => {
       setShippingPrice(0)
     }
   }, [selectedAddress])
-
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'auto' })
+  }, [])
   const fetchShippingPrice = async (address, items) => {
     if (!address || !items?.length) {
       console.warn('fetchShippingPrice: Thiếu address hoặc items', { address, items })
@@ -873,7 +897,7 @@ const Payment = () => {
             fontWeight: 500
           }}
         >
-         Thanh toán đơn hàng
+          Thanh toán đơn hàng
         </Typography>
       </Breadcrumbs>
       {cartLoading ? (
