@@ -10,6 +10,7 @@ export const getProducts = async (params = {}) => {
       page = 1,
       limit = 1000,
       sort = '',
+      filterTypeDate = '',
       filters = {} // thêm filters nếu cần mở rộng sau này
     } = params
 
@@ -18,6 +19,7 @@ export const getProducts = async (params = {}) => {
       page,
       limit,
       ...(sort && { sort }),
+      ...(filterTypeDate && { filterTypeDate }),
       destroy: false,
       status: 'active',
       ...filters // cho phép mở rộng lọc thêm nếu cần
@@ -42,7 +44,6 @@ export const getProducts = async (params = {}) => {
   }
 }
 
-
 // Lấy danh sách sản phẩm theo danh mục
 export const getProductsByCategory = async (
   categoryId,
@@ -64,12 +65,12 @@ export const getProductsByCategory = async (
     let products = Array.isArray(response.data)
       ? response.data
       : response.data.products || response.data || []
-    
+
     // Filter sản phẩm ở client-side: chỉ lấy status = active và destroy = false
     products = products.filter(product => 
       product.status === 'active' && product.destroy === false
     )
-    
+
     const total = products.length
     return {
       products,
@@ -89,14 +90,14 @@ export const getProductById = async (productId) => {
     const response = await AuthorizedAxiosInstance.get(
       `${API_ROOT}/v1/products/${productId}`
     )
-    
+
     const product = response.data || {}
-    
+
     // Filter sản phẩm ở client-side: chỉ lấy status = active và destroy = false
     if (product.status !== 'active' || product.destroy === true) {
       return {}
     }
-    
+
     return product
   } catch (error) {
     console.error('Lỗi khi lấy sản phẩm:', error.response?.data || error)

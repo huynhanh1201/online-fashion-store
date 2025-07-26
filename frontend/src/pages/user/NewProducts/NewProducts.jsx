@@ -19,6 +19,7 @@ import ProductCard from '~/components/ProductCards/ProductCards'
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward'
 import NavigateNextIcon from '@mui/icons-material/NavigateNext'
 import HomeIcon from '@mui/icons-material/Home'
+import Inventory2OutlinedIcon from '@mui/icons-material/Inventory2Outlined'
 import { getProducts } from '~/services/productService'
 
 const ITEMS_PER_PAGE = 15
@@ -71,7 +72,6 @@ const SortMenuItem = styled('div')(({ theme }) => ({
 }))
 
 const sortOptions = [
-  { value: 'createdAtDesc', label: 'Sản phẩm mới nhất' },
   { value: 'priceAsc', label: 'Giá tăng dần' },
   { value: 'priceDesc', label: 'Giá giảm dần' },
   { value: 'nameAsc', label: 'Sản phẩm từ A-Z' },
@@ -96,56 +96,47 @@ const NewProducts = () => {
       setLoading(true)
       setError(null)
 
-      // Map sort option to API sort parameter (chỉ cho backend sort)
+      // Các sort hỗ trợ backend
       const backendSortMap = {
-        nameAsc: 'name_desc',
-        nameDesc: 'name_asc'
+        nameAsc: 'name_asc',
+        nameDesc: 'name_desc',
       }
 
+      // Nếu đang chọn sort theo giá => không gửi sort lên backend
+      const isPriceSort = sortOption === 'priceAsc' || sortOption === 'priceDesc'
+
       const params = {
-        page,
-        limit: ITEMS_PER_PAGE,
-        sort: backendSortMap[sortOption] || ''
+        page: Number(page),
+        limit: Number(ITEMS_PER_PAGE),
+        sort: isPriceSort ? 'newest' : backendSortMap[sortOption] || 'newest',
+        filterTypeDate: 'this_week',
+        destroy: false,
+        status: 'active'
       }
 
       console.log('Fetching products with params:', params)
 
       const response = await getProducts(params)
-      console.log('API Response:', response)
 
-      if (!response) {
-        throw new Error('Không nhận được phản hồi từ server')
+      if (!response || !Array.isArray(response.products)) {
+        throw new Error('Lỗi dữ liệu từ server')
       }
 
-      if (!Array.isArray(response.products)) {
-        console.error('Products không phải là array:', response.products)
-        throw new Error('Dữ liệu sản phẩm không hợp lệ')
-      }
+      let fetchedProducts = [...response.products]
+      const totalProducts = response.total || fetchedProducts.length
+      const totalPages = Math.ceil(totalProducts / ITEMS_PER_PAGE) || 1
 
-      let sortedProducts = [...response.products]
-
-      // Lọc sản phẩm tạo trong 7 ngày gần nhất
-      const now = new Date()
-      const sevenDaysAgo = new Date(now)
-      sevenDaysAgo.setDate(now.getDate() - 7)
-      sortedProducts = sortedProducts.filter(p => {
-        const createdAt = new Date(p.createdAt)
-        return createdAt >= sevenDaysAgo && createdAt <= now
-      })
-
-      // Client-side sorting cho giá và ngày tạo
+      // Sort theo giá ở phía client
       if (sortOption === 'priceAsc') {
-        sortedProducts.sort((a, b) => (a.exportPrice || 0) - (b.exportPrice || 0))
+        fetchedProducts.sort((a, b) => (a.exportPrice || 0) - (b.exportPrice || 0))
       } else if (sortOption === 'priceDesc') {
-        sortedProducts.sort((a, b) => (b.exportPrice || 0) - (a.exportPrice || 0))
-      } else if (sortOption === 'createdAtDesc') {
-        sortedProducts.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+        fetchedProducts.sort((a, b) => (b.exportPrice || 0) - (a.exportPrice || 0))
       }
 
-      setProducts(sortedProducts)
-      setTotalPages(response.totalPages)
+      setProducts(fetchedProducts)
+      setTotalPages(totalPages)
     } catch (error) {
-      console.error('Chi tiết lỗi:', error)
+      console.error('Lỗi fetch sản phẩm:', error)
       setError(
         error.message ||
         'Không thể tải danh sách sản phẩm. Vui lòng thử lại sau.'
@@ -156,6 +147,8 @@ const NewProducts = () => {
       setLoading(false)
     }
   }
+
+
 
   // Scroll to top on component mount
   useEffect(() => {
@@ -232,7 +225,7 @@ const NewProducts = () => {
     sortOptions.find((opt) => opt.value === sortOption) || sortOptions[0]
 
   return (
-    <Box sx={{ minHeight: '100vh' }}>
+    <Box sx={{ minHeight: '70vh' }}>
       <Box
         sx={{
           bottom: { xs: '20px', sm: '30px', md: '40px' },
@@ -365,9 +358,15 @@ const NewProducts = () => {
               </Typography>
             </Box>
           ) : products.length === 0 ? (
-            <Typography sx={{ textAlign: 'center', mt: 10 }}>
-              Không có sản phẩm nào.
-            </Typography>
+            <Box sx={{ textAlign: 'center', mt: 10 }}>
+              <Inventory2OutlinedIcon sx={{ fontSize: 80, color: '#ccc', mb: 2 }} />
+              <Typography variant="h6" sx={{ color: '#666', mb: 1 }}>
+                Sản phẩm mới chưa được thêm
+              </Typography>
+              <Typography variant="body2" sx={{ color: '#999' }}>
+                Hiện tại chưa có sản phẩm mới nào trong 7 ngày gần đây
+              </Typography>
+            </Box>
           ) : (
             <>
               <div className='product-grid'>

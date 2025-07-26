@@ -126,7 +126,7 @@ const Menu = ({ headerRef }) => {
     const parentCategories = categories.filter(cat => parentIds.includes(cat._id) && !cat.destroy)
     // Lấy các danh mục gốc (không có parent) nhưng có sản phẩm
     const rootCategoriesWithProducts = categories.filter(cat => !cat.parent && !cat.destroy && Array.isArray(cat.products) && cat.products.length > 0)
-    
+
     const allItems = [
       // Luôn hiển thị "Sản phẩm" và "Hàng mới"
       { label: 'Sản phẩm', url: '/product', hasMegaMenu: true },
@@ -134,9 +134,9 @@ const Menu = ({ headerRef }) => {
       // Thêm các menu từ config nếu có
       ...(menuConfig?.mainMenu
         ? menuConfig.mainMenu
-            .filter(item => item.visible && (!item.children || item.children.length === 0))
-            .sort((a, b) => (a.order || 0) - (b.order || 0))
-            .map(item => ({ label: item.label, url: item.url }))
+          .filter(item => item.visible && (!item.children || item.children.length === 0))
+          .sort((a, b) => (a.order || 0) - (b.order || 0))
+          .map(item => ({ label: item.label, url: item.url }))
         : []),
       // Thêm các danh mục parent thực sự có children có sản phẩm
       ...parentCategories.map(cat => ({ label: cat.name, url: `/productbycategory/${cat._id}`, category: cat })),
@@ -144,7 +144,7 @@ const Menu = ({ headerRef }) => {
       ...rootCategoriesWithProducts.map(cat => ({ label: cat.name, url: `/productbycategory/${cat._id}`, category: cat })),
       { label: 'Tin thời trang', url: '/blog' }
     ]
-    
+
     const rows = []
     for (let i = 0; i < allItems.length; i += itemsPerRow) {
       rows.push(allItems.slice(i, i + itemsPerRow))
@@ -284,9 +284,9 @@ const Menu = ({ headerRef }) => {
     if (!parentCategory || !parentCategory._id) {
       return []
     }
-    return categories.filter(cat => 
-      !cat.destroy && 
-      cat.parent && 
+    return categories.filter(cat =>
+      !cat.destroy &&
+      cat.parent &&
       (typeof cat.parent === 'object' ? cat.parent._id : cat.parent) === parentCategory._id
     )
   }
@@ -391,7 +391,7 @@ const Menu = ({ headerRef }) => {
                       href={item.url}
                       active={
                         (item.hasMegaMenu && (productMenuOpen || isDrawerHovered)) ||
-                        (item.category && hoveredCategory?._id === item.category._id)
+                          (item.category && hoveredCategory?._id === item.category._id)
                           ? true
                           : undefined
                       }
@@ -410,11 +410,11 @@ const Menu = ({ headerRef }) => {
                       sx={{
                         position: 'absolute',
                         top: '100%',
-                        left: '50%',
+                        left: 0,
                         marginTop: '15px',
                         transform: hoveredCategory?._id === item.category._id
-                          ? 'translateX(-50%) translateY(0) scaleY(1)'
-                          : 'translateX(-50%) translateY(-10px) scaleY(0.95)',
+                          ? 'translateY(0) scaleY(1)'
+                          : 'translateY(-10px) scaleY(0.95)',
                         opacity: hoveredCategory?._id === item.category._id ? 1 : 0,
                         pointerEvents: hoveredCategory?._id === item.category._id ? 'auto' : 'none',
                         bgcolor: 'white',
@@ -424,13 +424,13 @@ const Menu = ({ headerRef }) => {
                         zIndex: 1500,
                         border: '1px solid #e2e8f0',
                         transition: 'opacity 0.3s ease, transform 0.3s ease',
-                        transformOrigin: 'top center',
+                        transformOrigin: 'top left',
                         '&::before': {
                           content: '""',
                           position: 'absolute',
                           top: '-5px',
-                          left: '50%',
-                          transform: 'translateX(-50%)',
+                          left: '20px',
+                          transform: 'none',
                           width: '20px',
                           height: '5px',
                           background: 'transparent'
@@ -593,11 +593,11 @@ const Menu = ({ headerRef }) => {
                 .map((item, idx) => (
                   <Box
                     key={item.label + idx}
-                    sx={{ 
-                      display: 'flex', 
-                      flexDirection: 'column', 
-                      gap: 1, 
-                      alignItems: 'start', 
+                    sx={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: 1,
+                      alignItems: 'start',
                       textAlign: 'start',
                       width: megamenuSettings.columnWidth === 'auto' ? 'auto' : megamenuSettings.columnWidth
                     }}
@@ -618,12 +618,12 @@ const Menu = ({ headerRef }) => {
                       {item.label}
                       <Box
                         sx={{
-                         height: '4px',
-                         bgcolor: 'var(--primary-color)',
-                         margin: '0 auto',
+                          height: '4px',
+                          bgcolor: 'var(--primary-color)',
+                          margin: '0 auto',
                           mb: 1.2
-                          }}
-                          />
+                        }}
+                      />
                     </Typography>
                     {item.children && item.children.length > 0 ? (
                       item.children
@@ -686,10 +686,10 @@ const Menu = ({ headerRef }) => {
               ].map((item, idx) => (
                 <Box
                   key={item.label + idx}
-                  sx={{ 
-                    display: 'flex', 
-                    flexDirection: 'column', 
-                    gap: 1, 
+                  sx={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: 1,
                     textAlign: 'start',
                     width: megamenuSettings.columnWidth === 'auto' ? 'auto' : megamenuSettings.columnWidth
                   }}
@@ -706,13 +706,13 @@ const Menu = ({ headerRef }) => {
                   >
                     {item.label}
                     <Box
-                        sx={{
-                         height: '4px',
-                         bgcolor: 'var(--primary-color)',
-                         margin: '0 auto',
-                          mb: 1.2
-                          }}
-                          />
+                      sx={{
+                        height: '4px',
+                        bgcolor: 'var(--primary-color)',
+                        margin: '0 auto',
+                        mb: 1.2
+                      }}
+                    />
                   </Typography>
                   {item.children.map((child, i) => (
                     <Button

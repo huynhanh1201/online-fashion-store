@@ -391,7 +391,9 @@ const Product = () => {
 
 
 
-      <ProductCategories />
+      <Box sx={{ width: '100%', maxWidth: '1800px', mx: 'auto', px: 2 }}>
+        <ProductCategories />
+      </Box>
       <Box sx={{ p: 2, maxWidth: '1800px', mx: 'auto' }}>
         <Box
           sx={{

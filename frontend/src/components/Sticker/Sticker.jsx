@@ -20,21 +20,14 @@ const Sticker = ({
   const getStickerInfo = (product) => {
     if (!product) return null
 
-    const now = new Date()
-    const createdAt = product.createdAt ? new Date(product.createdAt) : now
-    const daysSinceCreation = Math.floor((now - createdAt) / (1000 * 60 * 60 * 24))
-    const soldCount = product.soldCount || 0
-    
-    // Tính discount percentage từ firstVariantDiscountPrice
     const originalPrice = product?.exportPrice || 0
-    const firstVariantDiscount = product?.firstVariantDiscountPrice || 0
-    
-    // Đảm bảo discount không vượt quá giá gốc
-    const actualDiscount = Math.min(firstVariantDiscount, originalPrice)
-    const discountPercentage = originalPrice > 0 ? Math.round((actualDiscount / originalPrice) * 100) : 0
+    const discountPrice = product?.firstVariantDiscountPrice
 
-    // Ưu tiên hiển thị "Giảm giá" nếu có discount >= 20%
-    if (discountPercentage >= 20 && actualDiscount > 0) {
+    if (
+      discountPrice != null &&
+      discountPrice > 0 &&
+      discountPrice < originalPrice
+    ) {
       return {
         text: 'Giảm giá',
         background: 'linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%)',
@@ -42,21 +35,21 @@ const Sticker = ({
       }
     }
 
-    // Nếu không có discount đủ lớn, kiểm tra sản phẩm mới
-    if (daysSinceCreation <= 7 && daysSinceCreation >= 0) {
-      return {
-        text: 'Mới',
-        background: 'linear-gradient(135deg,rgb(45, 78, 128) 0%,rgb(44, 94, 187) 100%)',
-        color: 'white'
-      }
-    }
+    if (product.createdAt) {
+      const createdAtTime = new Date(product.createdAt).getTime()
 
-    // Cuối cùng kiểm tra sản phẩm hot
-    if (soldCount > 100) {
-      return {
-        text: 'Hot',
-        background: 'linear-gradient(135deg,rgb(233, 84, 26) 0%,rgb(255, 30, 0) 100%)',
-        color: 'white'
+      const now = new Date()
+      const endOfToday = new Date(now.setHours(23, 59, 59, 999)).getTime()
+      const sevenDaysAgo = new Date(now.setDate(now.getDate() - 7))
+      sevenDaysAgo.setHours(0, 0, 0, 0)
+      const sevenDaysAgoTime = sevenDaysAgo.getTime()
+
+      if (createdAtTime >= sevenDaysAgoTime && createdAtTime <= endOfToday) {
+        return {
+          text: 'Mới',
+          background: 'linear-gradient(135deg,rgb(45, 78, 128) 0%,rgb(44, 94, 187) 100%)',
+          color: 'white'
+        }
       }
     }
 
@@ -101,4 +94,3 @@ const Sticker = ({
 }
 
 export default Sticker
-  

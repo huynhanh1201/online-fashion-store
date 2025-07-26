@@ -42,9 +42,13 @@ const ProductCategories = () => {
         <Grid
           container
           direction='row'
-          justifyContent='flex-start'
+          justifyContent={{ xs: 'center', md: 'flex-start' }}
           alignItems='center'
-          sx={{ marginTop: '50px', gap: '100px' }}
+          sx={{
+            marginTop: '50px',
+            gap: { xs: '20px', sm: '40px', md: '60px', lg: '100px' },
+            flexWrap: 'wrap'
+          }}
         >
           {[1, 2, 3].map((index) => (
             <Box key={index} sx={{ textAlign: 'center' }}>
@@ -69,14 +73,18 @@ const ProductCategories = () => {
 
   return (
     <Box
-      sx={{ padding: '5px', borderRadius: '20px', margin: '30px', gap: '50px' }}
+      sx={{ padding: '5px', borderRadius: '20px', margin: '10px', gap: '30px' }}
     >
       <Grid
         container
         direction='row'
-        justifyContent='flex-start'
+        justifyContent={{ xs: 'center', md: 'flex-start' }}
         alignItems='center'
-        sx={{ marginTop: '50px', gap: '100px' }}
+        sx={{
+          marginTop: '2px',
+          gap: { xs: '20px', sm: '30px', md: '40px', lg: '50px' },
+          flexWrap: 'wrap'
+        }}
       >
         {categories.map((category, index) => (
           <Box

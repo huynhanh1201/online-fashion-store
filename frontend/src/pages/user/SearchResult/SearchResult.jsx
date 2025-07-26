@@ -2,11 +2,10 @@ import React, { useState, useEffect } from 'react'
 import { useLocation } from 'react-router-dom'
 import { getProducts } from '~/services/productService'
 import ProductCard from '~/components/ProductCards/ProductCards.jsx'
+import '~/assets/HomeCSS/Content.css'
 import {
   Box,
   Grid,
-  Snackbar,
-  Alert,
   Typography,
   CircularProgress,
   styled,
@@ -15,8 +14,6 @@ import {
   Link,
   PaginationItem
 } from '@mui/material'
-import { useDispatch } from 'react-redux'
-import { setCartItems } from '~/redux/cart/cartSlice'
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward'
 import SortByAlphaIcon from '@mui/icons-material/SortByAlpha'
 import NavigateNextIcon from '@mui/icons-material/NavigateNext'
@@ -128,12 +125,10 @@ const styles = {
 }
 
 export default function SearchResults() {
-  const dispatch = useDispatch()
   const [products, setProducts] = useState([])
   const [filteredProducts, setFilteredProducts] = useState([])
   const [sortOption, setSortOption] = useState('')
-  const [snackbar, setSnackbar] = useState(null)
-  const [isAdding, setIsAdding] = useState({})
+
   const [loading, setLoading] = useState(true)
   const [errorMessage, setErrorMessage] = useState('')
   const [sortMenuOpen, setSortMenuOpen] = useState(false)
@@ -154,10 +149,15 @@ export default function SearchResults() {
             _id: p._id,
             name: p.name,
             exportPrice: p.exportPrice || 0,
+            firstVariantDiscountPrice: p.firstVariantDiscountPrice || 0,
+            createdAt: p.createdAt,
+            soldCount: p.soldCount || 0,
+            avgRating: p.avgRating || 0,
             reviews: p.reviews || Math.floor(Math.random() * 1000) + 100,
-            image: p.image?.[0] || '/fallback.jpg',
+            image: p.image || ['/fallback.jpg'],
             category: p.category || 'Không xác định',
-            brand: p.brand || 'Không xác định'
+            brand: p.brand || 'Không xác định',
+            quantity: p.quantity || 0
           }))
 
         if (filtered.length === 0) {
@@ -212,7 +212,9 @@ export default function SearchResults() {
     setFilteredProducts(sortedProducts)
     setPage(1) // Reset to first page when sorting changes
   }, [products, sortOption])
-
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'auto' })
+  }, [])
   const handlePageChange = (event, value) => {
     setPage(value)
     window.scrollTo({ top: 0, behavior: 'smooth' })
@@ -225,44 +227,7 @@ export default function SearchResults() {
 
   const totalPages = Math.ceil(filteredProducts.length / ITEMS_PER_PAGE) || 1;
 
-  const handleAddToCart = async (product) => {
-    if (isAdding[product._id]) return
-    setIsAdding((prev) => ({ ...prev, [product._id]: true }))
 
-    try {
-      const updatedCart = await getCart()
-      const existingItem = updatedCart?.cartItems?.find(
-        (item) => item.productId._id === product._id
-      )
-      const currentQty = existingItem?.quantity || 0
-      const maxQty = product.quantity || 10
-
-      if (currentQty >= maxQty) {
-        setSnackbar({
-          type: 'warning',
-          message: 'Bạn đã thêm tối đa số lượng tồn kho!'
-        })
-        return
-      }
-
-      const res = await addToCart({
-        cartItems: [{ productId: product._id, quantity: 1 }]
-      })
-
-      dispatch(setCartItems(res?.cartItems || updatedCart?.cartItems || []))
-      setSnackbar({
-        type: 'success',
-        message: 'Thêm sản phẩm vào giỏ hàng thành công!'
-      })
-    } catch (error) {
-      console.error('Thêm vào giỏ hàng lỗi:', error)
-      setSnackbar({ type: 'error', message: 'Thêm sản phẩm thất bại!' })
-    } finally {
-      setTimeout(() => {
-        setIsAdding((prev) => ({ ...prev, [product._id]: false }))
-      }, 500)
-    }
-  }
 
   // For closing menu on outside click
   React.useEffect(() => {
@@ -293,7 +258,7 @@ export default function SearchResults() {
         <Breadcrumbs
           separator={<NavigateNextIcon fontSize='small' />}
           aria-label='breadcrumb'
-          sx={{ p:1 }}
+          sx={{ p: 1 }}
         >
           <Link
             underline='hover'
@@ -416,8 +381,7 @@ export default function SearchResults() {
                 <Grid key={product._id}>
                   <ProductCard
                     product={product}
-                    handleAddToCart={handleAddToCart}
-                    isAdding={!!isAdding[product._id]}
+                    isFlashSale={false}
                   />
                 </Grid>
               ))}
@@ -458,23 +422,6 @@ export default function SearchResults() {
           </>
         )}
       </main>
-
-      {snackbar && (
-        <Snackbar
-          open
-          autoHideDuration={3000}
-          onClose={() => setSnackbar(null)}
-          anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-        >
-          <Alert
-            severity={snackbar.type}
-            onClose={() => setSnackbar(null)}
-            sx={{ width: '100%' }}
-          >
-            {snackbar.message}
-          </Alert>
-        </Snackbar>
-      )}
     </div>
   )
 }

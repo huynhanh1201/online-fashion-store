@@ -156,7 +156,6 @@ const Blog = () => {
                 color: '#007bff',
                 textDecoration: 'none',
                 fontSize: { xs: '0.875rem', sm: '1rem' },
-                fontWeight: 500,
                 transition: 'color 0.2s ease',
                 '&:hover': {
                   color: '#0056b3',

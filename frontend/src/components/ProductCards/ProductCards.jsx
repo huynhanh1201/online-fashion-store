@@ -85,7 +85,7 @@ const ProductCard = ({ product, isFlashSale = false }) => {
         }}
       >
         {/* Sticker component */}
-        <Sticker 
+        <Sticker
           product={product}
           top={10}
           right={10}
@@ -93,7 +93,7 @@ const ProductCard = ({ product, isFlashSale = false }) => {
           fontWeight={700}
           padding="4px 12px 4px 8px"
         />
-        
+
         <div style={styles.productImage}>
           {/* Ảnh chính */}
           <img
@@ -127,23 +127,13 @@ const ProductCard = ({ product, isFlashSale = false }) => {
             {truncateProductName(product.name)}
           </h3>
           <div style={styles.priceRow}>
-            {isFlashSale && product.flashPrice ? (
+            {priceInfo.originalDiscountPrice > 0 ? (
               <>
                 <span style={styles.flashSalePrice}>
-                  {product.flashPrice.toLocaleString('vi-VN')}₫
+                  {priceInfo.discountPrice.toLocaleString('vi-VN')}₫
                 </span>
                 <span style={styles.originalPrice}>
-                  {product.exportPrice.toLocaleString('vi-VN')}₫
-                </span>
-                <span style={styles.flashSaleBadge}>Flash Sale</span>
-              </>
-            ) : priceInfo.originalDiscountPrice > 0 ? (
-              <>
-                <span style={styles.currentPrice}>
-                  {priceInfo.discountPrice.toLocaleString()}₫
-                </span>
-                <span style={styles.originalPrice}>
-                  {priceInfo.price.toLocaleString()}₫
+                  {priceInfo.price.toLocaleString('vi-VN')}₫
                 </span>
                 <span style={styles.discountBadge}>-{Math.round((priceInfo.originalDiscountPrice / priceInfo.price) * 100)}%</span>
               </>
