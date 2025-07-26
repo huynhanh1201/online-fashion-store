@@ -74,7 +74,7 @@ const BlogHome = () => {
         <Box
           sx={{
             width: '100%',
-            maxWidth: '96vw',
+            maxWidth: '97vw',
             margin: '0 auto',
             padding: {
               xs: '24px 16px',
