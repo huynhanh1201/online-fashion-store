@@ -926,29 +926,32 @@ const Payment = () => {
                 <SectionTitle>Địa chỉ nhận hàng</SectionTitle>
                 <AddressCard elevation={0}>
                   {selectedAddress ? (
-                    <Box display="flex" alignItems="center" justifyContent="space-between">
-                      <Box>
+                    <Box display="flex" alignItems="flex-start" justifyContent="space-between" flexDirection={{ xs: 'column', sm: 'row' }}>
+                      <Box sx={{ flex: 1, textAlign: 'left' }}>
                         <Typography
                           variant="h6"
                           sx={{
                             fontWeight: 700,
                             color: 'var(--primary-color)',
-                            mb: 1
+                            mb: 1,
+                            fontSize: { xs: '1rem', sm: '1.2rem' },
                           }}
                         >
                           {selectedAddress.fullName} • (+84) {selectedAddress.phone}
                         </Typography>
-                        <Typography sx={{ color: '#666', lineHeight: 1.6 }}>
+                        <Typography sx={{ color: '#666', lineHeight: 1.6, fontSize: { xs: '0.85rem', sm: '0.95rem' } }}>
                           {selectedAddress.address}, {selectedAddress.ward}, {selectedAddress.district}, {selectedAddress.city}
                         </Typography>
                       </Box>
-                      <ChangeAddressButton onClick={handleOpenAddressModal}>
-                        Thay Đổi
-                      </ChangeAddressButton>
+                      <Box sx={{ ml: { xs: 0, sm: 2 }, mt: { xs: 2, sm: 0 } }}>
+                        <ChangeAddressButton onClick={handleOpenAddressModal}>
+                          Thay Đổi
+                        </ChangeAddressButton>
+                      </Box>
                     </Box>
                   ) : (
                     <Box sx={{ textAlign: 'center', py: 2 }}>
-                      <Typography sx={{ mb: 2, color: '#666' }}>
+                      <Typography sx={{ mb: 2, color: '#666', fontSize: { xs: '0.85rem', sm: '0.95rem' } }}>
                         Chưa có địa chỉ giao hàng
                       </Typography>
                       <PrimaryButton onClick={handleOpenAddressModal}>
@@ -959,7 +962,6 @@ const Payment = () => {
                 </AddressCard>
               </CardContent>
             </StyledCard>
-
             {/* Ghi chú đơn hàng */}
             <StyledCard>
               <CardContent>
