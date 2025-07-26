@@ -58,6 +58,12 @@ const SectionTitle = styled(Typography)(({ theme }) => ({
   color: 'var(--primary-color)',
   position: 'relative',
   paddingLeft: theme.spacing(2),
+  [theme.breakpoints.down('md')]: {
+    fontSize: '1.2rem',
+  },
+  [theme.breakpoints.down('sm')]: {
+    fontSize: '1.1rem',
+  },
   '&::before': {
     content: '""',
     position: 'absolute',
@@ -68,6 +74,9 @@ const SectionTitle = styled(Typography)(({ theme }) => ({
     height: '24px',
     backgroundColor: 'var(--primary-color)',
     borderRadius: '2px',
+    [theme.breakpoints.down('sm')]: {
+      height: '20px',
+    }
   }
 }))
 
@@ -90,6 +99,9 @@ const AddressCard = styled(Paper)(({ theme }) => ({
   background: 'linear-gradient(135deg, #ffffff 0%, #f8f9ff 100%)',
   marginBottom: theme.spacing(3),
   transition: 'all 0.3s ease',
+  [theme.breakpoints.down('sm')]: {
+    padding: theme.spacing(2),
+  },
   '&:hover': {
     borderColor: 'var(--primary-color)',
     boxShadow: '0 4px 20px rgba(26, 60, 123, 0.1)',
@@ -106,6 +118,9 @@ const PaymentMethodCard = styled(Paper)(({ selected, theme }) => ({
     ? 'linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%)'
     : '#ffffff',
   cursor: 'pointer',
+  [theme.breakpoints.down('sm')]: {
+    padding: theme.spacing(2),
+  },
   '&:hover': {
     borderColor: 'var(--primary-color)',
     boxShadow: '0 4px 16px rgba(26, 60, 123, 0.1)',
@@ -120,6 +135,9 @@ const ShippingCard = styled(Paper)(({ theme }) => ({
   marginBottom: theme.spacing(2),
   background: 'linear-gradient(135deg, #e8f5e8 0%, #f0f8ff 100%)',
   boxShadow: '0 4px 16px rgba(26, 60, 123, 0.1)',
+  [theme.breakpoints.down('sm')]: {
+    padding: theme.spacing(2),
+  },
 }))
 
 const StyledTextField = styled(TextField)(({ theme }) => ({
@@ -157,6 +175,10 @@ const StyledButton = styled(Button)(({ theme }) => ({
   textTransform: 'none',
   boxShadow: '0 4px 16px rgba(26, 60, 123, 0.2)',
   transition: 'all 0.3s ease',
+  [theme.breakpoints.down('sm')]: {
+    fontSize: '0.9rem',
+    padding: theme.spacing(1.2, 2.5),
+  },
   '&:hover': {
     boxShadow: '0 6px 24px rgba(26, 60, 123, 0.3)',
     transform: 'translateY(-2px)',
@@ -184,6 +206,10 @@ const ChangeAddressButton = styled(Typography)(({ theme }) => ({
   borderRadius: '8px',
   border: '1px solid var(--primary-color)',
   transition: 'all 0.3s ease',
+  [theme.breakpoints.down('sm')]: {
+    fontSize: '0.85rem',
+    padding: theme.spacing(0.8, 1.5),
+  },
   '&:hover': {
     backgroundColor: 'var(--primary-color)',
     color: '#ffffff',
@@ -203,6 +229,10 @@ const ProductTable = styled('table')(({ theme }) => ({
       fontWeight: 600,
       color: 'var(--primary-color)',
       border: 'none',
+      [theme.breakpoints.down('sm')]: {
+        padding: theme.spacing(1.5),
+        fontSize: '0.9rem',
+      },
       '&:first-of-type': {
         borderTopLeftRadius: '8px',
         borderBottomLeftRadius: '8px',
@@ -224,6 +254,9 @@ const ProductTable = styled('table')(({ theme }) => ({
     '& td': {
       padding: theme.spacing(2),
       border: 'none',
+      [theme.breakpoints.down('sm')]: {
+        padding: theme.spacing(1.5),
+      },
       '&:first-of-type': {
         borderTopLeftRadius: '8px',
         borderBottomLeftRadius: '8px',
@@ -254,6 +287,10 @@ const PriceRow = styled(Box)(({ theme, isTotal }) => ({
   fontWeight: isTotal ? 700 : 400,
   color: isTotal ? 'var(--primary-color)' : '#333',
   borderBottom: isTotal ? 'none' : '1px solid #f0f0f0',
+  [theme.breakpoints.down('sm')]: {
+    fontSize: isTotal ? '1.1rem' : '0.9rem',
+    padding: theme.spacing(1.2, 0),
+  },
 }))
 
 // Helper functions for formatting color and size
@@ -866,6 +903,7 @@ const Payment = () => {
             alignItems: 'center',
             color: '#007bff',
             textDecoration: 'none',
+            fontSize: { xs: '0.85rem', sm: '0.95rem' },
             '&:hover': {
               color: 'primary.main'
             }
@@ -881,6 +919,7 @@ const Payment = () => {
             alignItems: 'center',
             color: '#007bff',
             textDecoration: 'none',
+            fontSize: { xs: '0.85rem', sm: '0.95rem' },
             '&:hover': {
               color: 'primary.main'
             }
@@ -894,7 +933,8 @@ const Payment = () => {
             display: 'flex',
             alignItems: 'center',
             color: 'text.primary',
-            fontWeight: 500
+            fontWeight: 500,
+            fontSize: { xs: '0.85rem', sm: '0.95rem' }
           }}
         >
           Thanh toán đơn hàng
@@ -1006,13 +1046,14 @@ const Payment = () => {
                             sx={{ height: 40, borderRadius: 1 }}
                           />
                           <Box>
-                            <Typography fontWeight={600} sx={{ mb: 0.5 }}>
+                            <Typography fontWeight={600} sx={{ mb: 0.5, fontSize: { xs: '0.9rem', sm: '1rem' } }}>
                               Giao hàng nhanh (GHN)
                             </Typography>
                             <Typography
                               variant="body2"
                               color="text.secondary"
-                              component="span" // hoặc "span"
+                              component="span"
+                              sx={{ fontSize: { xs: '0.8rem', sm: '0.875rem' } }}
                             >
                               Phí vận chuyển:{' '}
                               {shippingPriceLoading ? (
@@ -1077,10 +1118,10 @@ const Payment = () => {
                             sx={{ height: 40, borderRadius: 1 }}
                           />
                           <Box>
-                            <Typography fontWeight={600}>
+                            <Typography fontWeight={600} sx={{ fontSize: { xs: '0.9rem', sm: '1rem' } }}>
                               Thanh toán khi nhận hàng (COD)
                             </Typography>
-                            <Typography variant="body2" color="text.secondary">
+                            <Typography variant="body2" color="text.secondary" sx={{ fontSize: { xs: '0.8rem', sm: '0.875rem' } }}>
                               Thanh toán bằng tiền mặt khi nhận hàng
                             </Typography>
                           </Box>
@@ -1229,6 +1270,7 @@ const Payment = () => {
 
                 {/* Ưu đãi */}
                 <SectionTitle>Mã giảm giá</SectionTitle>
+
                 <Box sx={{ mb: 3 }}>
                   <StyledTextField
                     fullWidth
@@ -1252,16 +1294,6 @@ const Payment = () => {
                   >
                     {voucherLoading ? 'Đang áp dụng...' : voucherApplied ? 'Đã áp dụng' : 'Áp dụng mã'}
                   </PrimaryButton>
-
-                  {/* {discountMessage && (
-                    <Typography
-                      variant="body2"
-                      color={discount > 0 ? 'success.main' : 'error'}
-                      sx={{ mt: 1, textAlign: 'flex-start' }}
-                    >
-                      {discountMessage}
-                    </Typography>
-                  )} */}
                 </Box>
 
                 {/* Danh sách coupon */}
@@ -1276,6 +1308,7 @@ const Payment = () => {
                   >
                     Mã giảm giá có sẵn
                   </Typography>
+
                   {couponLoading ? (
                     <Box display="flex" justifyContent="center" py={2}>
                       <CircularProgress size={24} />
@@ -1291,34 +1324,45 @@ const Payment = () => {
                   ) : (
                     <Box
                       sx={{
-                        maxWidth: 500,
-                        overflowX: 'auto',
                         display: 'flex',
+                        overflowX: 'auto',
+                        gap: 1,
+                        maxWidth: '500px',
                         mx: 'auto',
-                        gap: 2,
                         pb: 2,
-                        paddingBottom: '12px',
+                        // Tối đa hiển thị 3 thẻ: mỗi cái ~320px + gap
+                        width: {
+                          xs: '100%',
+                          sm: 'calc(320px * 3 + 32px)', // 3 item + 2 gaps (2*16px)
+                        },
                         '&::-webkit-scrollbar': {
-                          height: '8px'
+                          height: 8,
                         },
                         '&::-webkit-scrollbar-track': {
                           background: '#f1f1f1',
-                          borderRadius: '4px',
+                          borderRadius: 4,
                         },
                         '&::-webkit-scrollbar-thumb': {
                           background: 'var(--primary-color)',
-                          borderRadius: '4px',
+                          borderRadius: 4,
                           '&:hover': {
                             background: 'var(--accent-color)',
                           },
-                        }
+                        },
                       }}
                     >
                       {coupons.map(coupon => (
-                        <Box key={coupon._id}>
+                        <Box
+                          key={coupon._id}
+                          sx={{
+                            flexShrink: 0,
+                            width: { xs: 300, sm: 300, md: 320 },
+                          }}
+                        >
                           <CouponItem
                             coupon={coupon}
                             onCopy={handleCouponSelect}
+                            copiedCode={voucherInput}
                             formatCurrencyShort={formatCurrencyShort}
                             disabled={!coupon.isApplicable}
                           />
@@ -1327,6 +1371,8 @@ const Payment = () => {
                     </Box>
                   )}
                 </Box>
+
+
 
                 <Divider sx={{ my: 3 }} />
 
