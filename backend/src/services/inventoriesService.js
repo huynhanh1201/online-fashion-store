@@ -3,12 +3,16 @@ import getDateRange from '~/utils/getDateRange'
 import validatePagination from '~/utils/validatePagination'
 import ApiError from '~/utils/ApiError'
 import { StatusCodes } from 'http-status-codes'
+import { VariantModel } from '~/models/VariantModel'
 
 const handleCreateInventory = async () => {
   return 'Empty'
 }
 
 const getInventoryList = async (queryString) => {
+  // Cập nhật trạng thái của tồn kho
+  await updateStatusInventoryAll()
+
   let {
     limit = 10,
     page = 1,
@@ -109,18 +113,22 @@ const getInventory = async (inventoryId) => {
     const result = await InventoryModel.findOne({
       _id: inventoryId,
       destroy: false
-    })
-      .populate([
-        {
-          path: 'variantId',
-          select: 'name sku color size'
-        },
-        {
-          path: 'warehouseId',
-          select: 'name'
-        }
-      ])
-      .lean()
+    }).populate([
+      {
+        path: 'variantId',
+        select: 'name sku color size'
+      },
+      {
+        path: 'warehouseId',
+        select: 'name'
+      }
+    ])
+
+    if (result.quantity === 0) result.status = 'out-of-stock'
+    else if (result.quantity < result.minQuantity) result.status = 'low-stock'
+    else result.status = 'in-stock'
+
+    await result.save()
 
     return result
   } catch (err) {
@@ -162,10 +170,33 @@ const deleteInventory = async (inventoryId) => {
   }
 }
 
+const updateStatusInventoryAll = async () => {
+  await InventoryModel.updateMany(
+    { quantity: 0 },
+    { $set: { status: 'out-of-stock' } }
+  )
+
+  await InventoryModel.updateMany(
+    {
+      quantity: { $gt: 0 },
+      $expr: { $lte: ['$quantity', '$minQuantity'] }
+    },
+    { $set: { status: 'low-stock' } }
+  )
+
+  await InventoryModel.updateMany(
+    {
+      $expr: { $gt: ['$quantity', '$minQuantity'] }
+    },
+    { $set: { status: 'in-stock' } }
+  )
+}
+
 export const inventoriesService = {
   getInventoryList,
   getInventory,
   updateInventory,
   deleteInventory,
-  handleCreateInventory
+  handleCreateInventory,
+  updateStatusInventoryAll
 }
