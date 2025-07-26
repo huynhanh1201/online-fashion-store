@@ -263,14 +263,14 @@ const Product = () => {
     sortOptions.find((opt) => opt.value === sortOption) || sortOptions[0]
 
   return (
-    <Box sx={{ minHeight: '100vh' }}>
+    <Box sx={{ minHeight: '70vh' }}>
       <Box
         sx={{
           bottom: { xs: '20px', sm: '30px', md: '40px' },
           left: { xs: '20px', sm: '30px', md: '40px' },
           right: { xs: '20px', sm: '30px', md: '40px' },
           padding: '12px',
-          maxWidth: '1800px',
+          maxWidth: '97vw',
           margin: '0 auto'
         }}
       >
@@ -307,7 +307,7 @@ const Product = () => {
         </Breadcrumbs>
       </Box>
 
-      <Box sx={{ width: '100%', maxWidth: '1800px', mx: 'auto', px: 2 }}>
+      <Box sx={{ width: '100%', maxWidth: '97vw', mx: 'auto', px: 2 }}>
         {/* Banner Section - 50% Image + 50% Title */}
         <Box
           sx={{
@@ -389,12 +389,10 @@ const Product = () => {
         </Box>
       </Box>
 
-
-
-      <Box sx={{ width: '100%', maxWidth: '1800px', mx: 'auto', px: 2 }}>
+      <Box sx={{ width: '100%', maxWidth: '97vw', mx: 'auto', px: 2 }}>
         <ProductCategories />
       </Box>
-      <Box sx={{ p: 2, maxWidth: '1800px', mx: 'auto' }}>
+      <Box sx={{ p: 2, maxWidth: '97vw', mx: 'auto' }}>
         <Box
           sx={{
             display: 'flex',

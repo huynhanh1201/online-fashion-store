@@ -302,21 +302,19 @@ const Content = () => {
               <div
                 className="category-image"
                 style={{
+                  aspectRatio: '4 / 3',
+                  width: '100%',
                   backgroundImage:
                     featuredCategoriesLoading || featuredCategories.length === 0
                       ? `url(${category.imageUrl})`
                       : `url(${optimizeCloudinaryUrl(category.imageUrl, {
-                        width: 480,
-                        height: 300,
                         quality: 'auto',
                         format: 'auto',
                         crop: 'fit'
                       })})`,
                   backgroundSize: 'cover',
                   backgroundPosition: 'center',
-                  backgroundRepeat: 'no-repeat',
                   position: 'relative',
-                  height: '220px', // 🔽 nhỏ lại cho bố cục 4 cột
                   borderRadius: '8px',
                   overflow: 'hidden',
                 }}
@@ -427,21 +425,21 @@ const Content = () => {
         />
         {(() => {
           // Lọc sản phẩm mới trong 7 ngày để kiểm tra có hiển thị nút "Xem tất cả" không
-          const now = new Date();
-          const sevenDaysAgo = new Date(now);
-          sevenDaysAgo.setDate(now.getDate() - 7);
+          const now = new Date()
+          const sevenDaysAgo = new Date(now)
+          sevenDaysAgo.setDate(now.getDate() - 7)
           const newProducts = products.filter(product => {
-            const createdAt = new Date(product.createdAt);
-            return createdAt >= sevenDaysAgo && createdAt <= now;
-          });
+            const createdAt = new Date(product.createdAt)
+            return createdAt >= sevenDaysAgo && createdAt <= now
+          })
 
           return newProducts.length > 0 && (
-            <div style={{ textAlign: 'center', marginBottom: '32px' }}>
+            <div style={{ textAlign: 'center', marginBottom: '32px', marginTop: '32px' }}>
               <Link to="/productnews">
-                <button className="cta-button">Xem tất cả</button>
+                <button className="cta-button" >Xem tất cả</button>
               </Link>
             </div>
-          );
+          )
         })()}
       </Box>
     </>

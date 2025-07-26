@@ -68,7 +68,7 @@ const SortMenuItem = styled('div')(({ theme }) => ({
 }))
 
 const sortOptions = [
-  { value: '', label: 'Mặc định' },
+  { value: '', label: 'Sản phẩm nổi bật' },
   { value: 'priceAsc', label: 'Giá tăng dần' },
   { value: 'priceDesc', label: 'Giá giảm dần' },
   { value: 'nameAsc', label: 'Sản phẩm từ A-Z' },
@@ -78,8 +78,8 @@ const sortOptions = [
 const styles = {
   container: {
     margin: '0 auto',
-    maxWidth: '1800px',
-    minHeight: '100vh',
+    maxWidth: '96vw',
+    minHeight: '80vh',
     fontFamily:
       '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif'
   },
@@ -87,7 +87,7 @@ const styles = {
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
-    padding: '16px',
+
     marginBottom: '2rem'
   },
   headerContent: {

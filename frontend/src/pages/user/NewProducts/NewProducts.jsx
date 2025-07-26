@@ -72,6 +72,7 @@ const SortMenuItem = styled('div')(({ theme }) => ({
 }))
 
 const sortOptions = [
+  { value: 'featured', label: 'Sản phẩm nổi bật' },
   { value: 'priceAsc', label: 'Giá tăng dần' },
   { value: 'priceDesc', label: 'Giá giảm dần' },
   { value: 'nameAsc', label: 'Sản phẩm từ A-Z' },
@@ -232,7 +233,7 @@ const NewProducts = () => {
           left: { xs: '20px', sm: '30px', md: '40px' },
           right: { xs: '20px', sm: '30px', md: '40px' },
           padding: '12px',
-          maxWidth: '1800px',
+          maxWidth: '96vw',
           margin: '0 auto'
         }}
       >
@@ -268,7 +269,7 @@ const NewProducts = () => {
           </Typography>
         </Breadcrumbs>
       </Box>
-      <Box sx={{ p: 2, maxWidth: '1800px', mx: 'auto' }}>
+      <Box sx={{ p: 2, maxWidth: '96vw', mx: 'auto' }}>
         <Box
           sx={{
             display: 'flex',

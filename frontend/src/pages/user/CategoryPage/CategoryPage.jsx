@@ -284,7 +284,7 @@ const CategoryPage = () => {
       <Breadcrumbs
         separator={<NavigateNextIcon fontSize='small' />}
         aria-label='breadcrumb'
-        sx={{ p: 1 }}
+        sx={{ pt: 2, width: '100%', maxWidth: '95vw', mx: 'auto' }}
       >
         <Link
           underline='hover'
@@ -363,7 +363,7 @@ const CategoryPage = () => {
       </Box>
 
       {/* Products Section */}
-      <Box sx={{ p: 2, maxWidth: '1800px', mx: 'auto' }}>
+      <Box sx={{ p: 2, maxWidth: '96vw', mx: 'auto' }}>
         {/* Sort Controls */}
         <Box
           sx={{

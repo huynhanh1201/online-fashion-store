@@ -356,7 +356,7 @@ const BlogHome = () => {
                 display: 'flex',
                 justifyContent: 'center',
                 alignItems: 'center',
-                mt: { xs: 4, sm: 5, md: 6 }
+                mb: { xs: 4, sm: 5, md: 6 }
               }}
             >
               <Box

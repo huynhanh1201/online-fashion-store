@@ -162,13 +162,13 @@ const ProductSection = ({
                 top: isMobile ? 40 : 30,
                 left: isMobile ? 20 : 10,
               }}>
-                <h2 style={{
+                {/* <h2 style={{
                   ...styles.bannerTitle,
                   fontSize: isMobile ? 24 : 35,
                   marginBottom: isMobile ? 4 : 8
                 }}>
                   {bannerTitle || 'Danh mục sản phẩm'}
-                </h2>
+                </h2> */}
                 {bannerDesc && <p style={{ ...styles.bannerDesc, fontSize: isMobile ? 12 : 14 }}>{bannerDesc}</p>}
               </div>
             </div>

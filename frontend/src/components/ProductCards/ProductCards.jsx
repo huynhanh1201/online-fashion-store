@@ -299,7 +299,7 @@ const styles = {
     fontWeight: '500'
   },
   flashSalePrice: {
-    fontSize: '22px',
+    fontSize: '18px',
     fontWeight: '900',
     color: '#e53935',
     marginRight: '8px',

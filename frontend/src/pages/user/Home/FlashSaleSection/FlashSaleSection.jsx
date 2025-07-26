@@ -17,27 +17,27 @@ const FlashSaleSection = () => {
   // Calculate initial products to show based on screen size
   const getInitialProductCount = () => {
     const { width } = screenSize
-    
+
     // Calculate how many cards can fit in one row based on screen width
     // Assuming each card is approximately 290px wide with 10px gap
     const cardWidth = 290
     const gap = 10
     const containerPadding = 64 // 32px on each side
     const availableWidth = width - containerPadding
-    
+
     // Calculate cards per row
     const cardsPerRow = Math.floor(availableWidth / (cardWidth + gap))
-    
+
     // Return 2 rows worth of products (minimum 4, maximum 12)
     const productCount = Math.max(4, Math.min(12, cardsPerRow * 2))
-    
+
     return productCount
   }
 
   // Handle window resize with debounce
   useEffect(() => {
     let timeoutId
-    
+
     const handleResize = () => {
       clearTimeout(timeoutId)
       timeoutId = setTimeout(() => {
@@ -107,33 +107,33 @@ const FlashSaleSection = () => {
           setLoading(false)
           return
         }
-        
+
         const { products: allProducts = [] } = await getProducts({
           page: 1,
           limit: 1000
         })
-        
+
         const enrichedCampaigns = await Promise.all(
           campaignsData.map(async (campaign) => {
             // Kiểm tra xem Flash Sale có đang hoạt động không
             const now = new Date()
             const startTime = new Date(campaign.startTime)
             const endTime = new Date(campaign.endTime)
-            
+
             // Chỉ hiển thị Flash Sale đang hoạt động hoặc sắp diễn ra
             if (now > endTime) {
               return null // Flash Sale đã hết hạn
             }
-            
+
             const joinedProducts = (campaign.products || [])
               .map((item) => {
                 const prod = allProducts.find((p) => p._id === item.productId)
                 if (!prod) return null
-                
+
                 // Tính toán giá Flash Sale = giá gốc - giá giảm
                 // item.flashPrice là giá giảm (discountPrice), không phải giá Flash Sale
                 const flashSalePrice = Math.max(0, item.originalPrice - item.flashPrice)
-                
+
                 return {
                   ...prod,
                   exportPrice: item.originalPrice, // Giá gốc tại thời điểm flash sale
@@ -143,7 +143,7 @@ const FlashSaleSection = () => {
                 }
               })
               .filter(Boolean)
-              
+
             return {
               ...campaign,
               products: joinedProducts,
@@ -152,7 +152,7 @@ const FlashSaleSection = () => {
             }
           })
         )
-        
+
         // Lọc bỏ các campaign null (đã hết hạn)
         const activeCampaigns = enrichedCampaigns.filter(campaign => campaign !== null)
         setCampaigns(activeCampaigns)
@@ -253,111 +253,111 @@ const FlashSaleSection = () => {
       {campaigns
         .filter(campaign => campaign.status === 'active' && campaign.products.length > 0)
         .map((campaign) => (
-        <section key={campaign.id} style={styles.flashSale} className="flash-sale-section">
-          <div style={styles.flashSaleHeader} className="flash-sale-header">
-            <h2 style={styles.flashSaleTitle} className="flash-sale-title">
-              {campaign.title}
-              {campaign.status === 'upcoming' && (
-                <span style={{ 
-                  fontSize: '14px', 
-                  opacity: 0.9, 
-                  marginLeft: '12px',
-                  background: 'rgba(255, 255, 255, 0.2)',
-                  padding: '4px 12px',
-                  borderRadius: '20px',
-                  fontWeight: '600',
-                  border: '1px solid rgba(255, 255, 255, 0.3)'
-                }} className="upcoming-badge">
-                  🔜 Sắp diễn ra
-                </span>
-              )}
-            </h2>
-            <div style={styles.countdown} className="flash-sale-countdown">
-              {campaign.status === 'upcoming' 
-                ? 'Sắp diễn ra' 
-                : campaign.countdown || 'Đang tải...'
-              }
+          <section key={campaign.id} style={{ ...styles.flashSale, marginTop: '24px' }} className="flash-sale-section">
+            <div style={styles.flashSaleHeader} className="flash-sale-header">
+              <h2 style={styles.flashSaleTitle} className="flash-sale-title">
+                {campaign.title}
+                {campaign.status === 'upcoming' && (
+                  <span style={{
+                    fontSize: '14px',
+                    opacity: 0.9,
+                    marginLeft: '12px',
+                    background: 'rgba(255, 255, 255, 0.2)',
+                    padding: '4px 12px',
+                    borderRadius: '20px',
+                    fontWeight: '600',
+                    border: '1px solid rgba(255, 255, 255, 0.3)'
+                  }} className="upcoming-badge">
+                    🔜 Sắp diễn ra
+                  </span>
+                )}
+              </h2>
+              <div style={styles.countdown} className="flash-sale-countdown">
+                {campaign.status === 'upcoming'
+                  ? 'Sắp diễn ra'
+                  : campaign.countdown || 'Đang tải...'
+                }
+              </div>
             </div>
-          </div>
 
-          <div className='product-grid'>
-            {(() => {
-              const initialCount = getInitialProductCount()
-              const isExpanded = expandedCampaigns[campaign.id]
-              const productsToShow = isExpanded 
-                ? campaign.products 
-                : campaign.products.slice(0, initialCount)
-              const hasMoreProducts = campaign.products.length > initialCount
+            <div className='product-grid'>
+              {(() => {
+                const initialCount = getInitialProductCount()
+                const isExpanded = expandedCampaigns[campaign.id]
+                const productsToShow = isExpanded
+                  ? campaign.products
+                  : campaign.products.slice(0, initialCount)
+                const hasMoreProducts = campaign.products.length > initialCount
 
-              return (
-                <>
-                  {productsToShow.map((product) => (
-                    <div key={product._id} style={styles.flashSaleCard} className="flash-sale-card">
-                      <ProductCard 
-                        product={{
-                          ...product,
-                          // Đảm bảo giá hiển thị đúng
-                          exportPrice: product.exportPrice, // Giá gốc
-                          flashPrice: product.flashPrice, // Giá Flash Sale (đã tính toán)
-                          originalFlashPrice: product.originalFlashPrice // Giá giảm gốc
-                        }} 
-                        isFlashSale={true} 
-                      />
-                    </div>
-                  ))}
-                  
-                  {/* Show "Xem thêm" button if there are more products */}
-                  {hasMoreProducts && !isExpanded && (
-                    <div style={styles.viewMoreContainer} className="view-more-container">
-                      <button 
-                        style={styles.viewMoreButton}
-                        className="view-more-button"
-                        onClick={() => toggleExpanded(campaign.id)}
-                        onMouseEnter={(e) => {
-                          e.target.style.backgroundColor = 'rgba(255, 255, 255, 0.15)'
-                          e.target.style.transform = 'translateY(-2px)'
-                          e.target.style.boxShadow = '0 6px 20px rgba(0, 0, 0, 0.2)'
-                        }}
-                        onMouseLeave={(e) => {
-                          e.target.style.backgroundColor = 'rgba(255, 255, 255, 0.1)'
-                          e.target.style.transform = 'translateY(0)'
-                          e.target.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.1)'
-                        }}
-                      >
-                        Xem thêm {campaign.products.length - initialCount} sản phẩm ›
-                      </button>
-                    </div>
-                  )}
-                  
-                  {/* Show "Thu gọn" button if expanded */}
-                  {hasMoreProducts && isExpanded && (
-                    <div style={styles.viewMoreContainer} className="view-more-container">
-                      <button 
-                        style={styles.viewMoreButton}
-                        className="view-more-button"
-                        onClick={() => toggleExpanded(campaign.id)}
-                        onMouseEnter={(e) => {
-                          e.target.style.backgroundColor = 'rgba(255, 255, 255, 0.15)'
-                          e.target.style.transform = 'translateY(-2px)'
-                          e.target.style.boxShadow = '0 6px 20px rgba(0, 0, 0, 0.2)'
-                        }}
-                        onMouseLeave={(e) => {
-                          e.target.style.backgroundColor = 'rgba(255, 255, 255, 0.1)'
-                          e.target.style.transform = 'translateY(0)'
-                          e.target.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.1)'
-                        }}
-                      >
-                        Thu gọn ›
-                      </button>
-                    </div>
-                  )}
-                </>
-              )
-            })()}
-          </div>
+                return (
+                  <>
+                    {productsToShow.map((product) => (
+                      <div key={product._id} style={styles.flashSaleCard} className="flash-sale-card">
+                        <ProductCard
+                          product={{
+                            ...product,
+                            // Đảm bảo giá hiển thị đúng
+                            exportPrice: product.exportPrice, // Giá gốc
+                            flashPrice: product.flashPrice, // Giá Flash Sale (đã tính toán)
+                            originalFlashPrice: product.originalFlashPrice // Giá giảm gốc
+                          }}
+                          isFlashSale={true}
+                        />
+                      </div>
+                    ))}
 
-          {/* CSS for responsive design and theme integration */}
-          <style jsx>{`
+                    {/* Show "Xem thêm" button if there are more products */}
+                    {hasMoreProducts && !isExpanded && (
+                      <div style={styles.viewMoreContainer} className="view-more-container">
+                        <button
+                          style={styles.viewMoreButton}
+                          className="view-more-button"
+                          onClick={() => toggleExpanded(campaign.id)}
+                          onMouseEnter={(e) => {
+                            e.target.style.backgroundColor = 'rgba(255, 255, 255, 0.15)'
+                            e.target.style.transform = 'translateY(-2px)'
+                            e.target.style.boxShadow = '0 6px 20px rgba(0, 0, 0, 0.2)'
+                          }}
+                          onMouseLeave={(e) => {
+                            e.target.style.backgroundColor = 'rgba(255, 255, 255, 0.1)'
+                            e.target.style.transform = 'translateY(0)'
+                            e.target.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.1)'
+                          }}
+                        >
+                          Xem thêm {campaign.products.length - initialCount} sản phẩm ›
+                        </button>
+                      </div>
+                    )}
+
+                    {/* Show "Thu gọn" button if expanded */}
+                    {hasMoreProducts && isExpanded && (
+                      <div style={styles.viewMoreContainer} className="view-more-container">
+                        <button
+                          style={styles.viewMoreButton}
+                          className="view-more-button"
+                          onClick={() => toggleExpanded(campaign.id)}
+                          onMouseEnter={(e) => {
+                            e.target.style.backgroundColor = 'rgba(255, 255, 255, 0.15)'
+                            e.target.style.transform = 'translateY(-2px)'
+                            e.target.style.boxShadow = '0 6px 20px rgba(0, 0, 0, 0.2)'
+                          }}
+                          onMouseLeave={(e) => {
+                            e.target.style.backgroundColor = 'rgba(255, 255, 255, 0.1)'
+                            e.target.style.transform = 'translateY(0)'
+                            e.target.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.1)'
+                          }}
+                        >
+                          Thu gọn ›
+                        </button>
+                      </div>
+                    )}
+                  </>
+                )
+              })()}
+            </div>
+
+            {/* CSS for responsive design and theme integration */}
+            <style jsx>{`
             .flash-sale-section {
               background: linear-gradient(135deg, var(--primary-color) 0%, var(--accent-color) 100%) !important;
               box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15) !important;
@@ -436,8 +436,8 @@ const FlashSaleSection = () => {
               box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2) !important;
             }
           `}</style>
-        </section>
-      ))}
+          </section>
+        ))}
     </>
   )
 }
