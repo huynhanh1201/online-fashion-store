@@ -90,7 +90,7 @@ const SizeGuide = () => {
           sx: {
             borderRadius: 2,
             mt: 7,
-            maxHeight: '70vh',
+            maxHeight: '95vh',
             bgcolor: 'white'
           }
         }}
@@ -120,7 +120,7 @@ const SizeGuide = () => {
 
         <DialogContent sx={{ px: 2, py: 1 }}>
           {/* Dropdown chọn loại sản phẩm */}
-          <FormControl sx={{ mb: 3, minWidth: 200 }}>
+          <FormControl sx={{ mb: 3, minWidth: 200, mt: 1 }}>
             <InputLabel>Loại sản phẩm</InputLabel>
             <Select
               value={selectedType}

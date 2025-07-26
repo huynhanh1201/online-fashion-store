@@ -71,7 +71,7 @@ const ProductReview = ({ productId, avgRating = 0 }) => {
       const reviewsData = response.data || []
       // API đã filter những review đã được duyệt (moderationStatus=approved)
 
-      setReviews(prev => [...prev, ...reviewsData])
+      setReviews((prev) => [...prev, ...reviewsData])
       setCurrentPage(nextPage)
     } catch (err) {
       console.error('Lỗi khi tải thêm đánh giá:', err)
@@ -79,8 +79,6 @@ const ProductReview = ({ productId, avgRating = 0 }) => {
       setLoading(false)
     }
   }
-
-
 
   const handleImageClick = (imageUrl) => {
     setSelectedImage(imageUrl)
@@ -97,12 +95,19 @@ const ProductReview = ({ productId, avgRating = 0 }) => {
 
   return (
     <Box sx={{ maxWidth: '100%', mt: 1 }}>
-      <Typography variant='h5' gutterBottom sx={{ color: '#1A3C7B', fontWeight: 600 }}>
+      <Typography
+        variant='h5'
+        gutterBottom
+        sx={{ color: '#1A3C7B', fontWeight: 600 }}
+      >
         Đánh giá & nhận xét
       </Typography>
 
       <Box display='flex' alignItems='center' gap={1} mb={2}>
-        <Typography variant='subtitle1' sx={{ color: '#1A3C7B', fontWeight: 600, fontSize: '3.4rem' }}>
+        <Typography
+          variant='subtitle1'
+          sx={{ color: '#1A3C7B', fontWeight: 600, fontSize: '3.4rem' }}
+        >
           {avgRating}
         </Typography>
         <Rating value={Number(avgRating)} precision={0.1} readOnly />
@@ -111,50 +116,72 @@ const ProductReview = ({ productId, avgRating = 0 }) => {
         </Typography>
       </Box>
 
-
-      <Divider />
       <List>
         {reviews.map((review) => (
           <React.Fragment key={review._id}>
-            <ListItem disablePadding alignItems='flex-start'>
+            <Divider />
+            <ListItem disablePadding alignItems='flex-start' sx={{ mt: 3 }}>
               <ListItemAvatar>
                 <Avatar src={review.userId?.avatarUrl || '/default.jpg'} />
               </ListItemAvatar>
               <ListItemText
                 primary={
-                  <Box display='flex' alignItems='center' gap={1} flexWrap='wrap'>
-                    <Typography variant='subtitle1' fontWeight='bold' sx={{ color: '#1A3C7B' }}>
+                  <Box
+                    display='flex'
+                    alignItems='center'
+                    gap={1}
+                    flexWrap='wrap'
+                  >
+                    <Typography
+                      variant='subtitle1'
+                      fontWeight='bold'
+                      sx={{ color: '#1A3C7B' }}
+                    >
                       {review.userId?.name || 'Ẩn danh'}
                     </Typography>
                     {review.isVerified && (
                       <Chip
                         icon={<VerifiedIcon />}
-                        label="Đã mua hàng"
-                        size="small"
-                        color="success"
-                        variant="outlined"
+                        label='Đã mua hàng'
+                        size='small'
+                        color='success'
+                        variant='outlined'
                       />
                     )}
-
                   </Box>
                 }
                 secondary={
                   <React.Fragment>
-                    <Rating value={review.rating} readOnly size='small' sx={{ color: '#faaf00', mb: 1 }} />
-                    <Typography variant='body2' color='text.primary' sx={{ mb: 1 }} component="div">
+                    <Rating
+                      value={review.rating}
+                      readOnly
+                      size='small'
+                      sx={{ color: '#faaf00', mb: 1 }}
+                    />
+                    <Typography
+                      variant='body2'
+                      color='text.primary'
+                      sx={{ mb: 1 }}
+                      component='div'
+                    >
                       {review.comment}
                     </Typography>
 
                     {/* Hiển thị media đánh giá (video đầu tiên + ảnh) */}
-                    {((review.videos && review.videos.length > 0) || (review.images && review.images.length > 0)) && (
+                    {((review.videos && review.videos.length > 0) ||
+                      (review.images && review.images.length > 0)) && (
                       <Box sx={{ mb: 2 }}>
-                        <Typography variant='caption' color='text.secondary' sx={{ mb: 1, display: 'block' }}>
+                        <Typography
+                          variant='caption'
+                          color='text.secondary'
+                          sx={{ mb: 1, display: 'block' }}
+                        >
                           Ảnh và video đánh giá:
                         </Typography>
                         <Grid container spacing={1}>
                           {/* Hiển thị video đầu tiên nếu có */}
                           {review.videos && review.videos.length > 0 && (
-                            <Grid item key="video-0">
+                            <Grid item key='video-0'>
                               <Box
                                 sx={{
                                   position: 'relative',
@@ -168,7 +195,9 @@ const ProductReview = ({ productId, avgRating = 0 }) => {
                                     opacity: 0.8
                                   }
                                 }}
-                                onClick={() => handleVideoClick(review.videos[0])}
+                                onClick={() =>
+                                  handleVideoClick(review.videos[0])
+                                }
                               >
                                 <video
                                   src={review.videos[0]}
@@ -193,34 +222,37 @@ const ProductReview = ({ productId, avgRating = 0 }) => {
                                     justifyContent: 'center'
                                   }}
                                 >
-                                  <PlayArrowIcon sx={{ color: 'white', fontSize: 20 }} />
+                                  <PlayArrowIcon
+                                    sx={{ color: 'white', fontSize: 20 }}
+                                  />
                                 </Box>
                               </Box>
                             </Grid>
                           )}
 
                           {/* Hiển thị tất cả ảnh */}
-                          {review.images && review.images.map((image, index) => (
-                            <Grid item key={`image-${index}`}>
-                              <Box
-                                component='img'
-                                src={optimizeCloudinaryUrl(image)}
-                                alt={`Review image ${index + 1}`}
-                                sx={{
-                                  width: 80,
-                                  height: 80,
-                                  objectFit: 'cover',
-                                  borderRadius: 1,
-                                  cursor: 'pointer',
-                                  border: '1px solid #ddd',
-                                  '&:hover': {
-                                    opacity: 0.8
-                                  }
-                                }}
-                                onClick={() => handleImageClick(image)}
-                              />
-                            </Grid>
-                          ))}
+                          {review.images &&
+                            review.images.map((image, index) => (
+                              <Grid item key={`image-${index}`}>
+                                <Box
+                                  component='img'
+                                  src={optimizeCloudinaryUrl(image)}
+                                  alt={`Review image ${index + 1}`}
+                                  sx={{
+                                    width: 80,
+                                    height: 80,
+                                    objectFit: 'cover',
+                                    borderRadius: 1,
+                                    cursor: 'pointer',
+                                    border: '1px solid #ddd',
+                                    '&:hover': {
+                                      opacity: 0.8
+                                    }
+                                  }}
+                                  onClick={() => handleImageClick(image)}
+                                />
+                              </Grid>
+                            ))}
                         </Grid>
                       </Box>
                     )}
@@ -235,14 +267,13 @@ const ProductReview = ({ productId, avgRating = 0 }) => {
             {/* <Divider variant='inset' component='li' /> */}
           </React.Fragment>
         ))}
-
       </List>
 
       {/* Nút xem thêm */}
       {currentPage < totalPages && (
-        <Box display="flex" justifyContent="center" mt={3} mb={2}>
+        <Box display='flex' justifyContent='center' mt={3} mb={2}>
           <Button
-            variant="outlined"
+            variant='outlined'
             onClick={loadMoreReviews}
             disabled={loading}
             sx={{
@@ -263,10 +294,12 @@ const ProductReview = ({ productId, avgRating = 0 }) => {
       <Dialog
         open={!!selectedImage}
         onClose={handleCloseModal}
-        maxWidth="md"
+        maxWidth='md'
         fullWidth
       >
-        <DialogContent sx={{ p: 0, position: 'relative', margin: 0, display: 'flex' }}>
+        <DialogContent
+          sx={{ p: 0, position: 'relative', margin: 0, display: 'flex' }}
+        >
           <IconButton
             onClick={handleCloseModal}
             sx={{
@@ -287,7 +320,7 @@ const ProductReview = ({ productId, avgRating = 0 }) => {
             <Box
               component='img'
               src={selectedImage}
-              alt="Review image"
+              alt='Review image'
               sx={{
                 width: '100%',
                 height: 'auto',
@@ -305,7 +338,7 @@ const ProductReview = ({ productId, avgRating = 0 }) => {
       <Dialog
         open={!!selectedVideo}
         onClose={handleCloseModal}
-        maxWidth="md"
+        maxWidth='md'
         fullWidth
         PaperProps={{
           sx: {
@@ -319,15 +352,17 @@ const ProductReview = ({ productId, avgRating = 0 }) => {
           }
         }}
       >
-        <DialogContent sx={{
-          p: '0 !important',
-          position: 'relative',
-          margin: '0 !important',
-          display: 'block',
-          lineHeight: 0,
-          fontSize: 0,
-          overflow: 'hidden'
-        }}>
+        <DialogContent
+          sx={{
+            p: '0 !important',
+            position: 'relative',
+            margin: '0 !important',
+            display: 'block',
+            lineHeight: 0,
+            fontSize: 0,
+            overflow: 'hidden'
+          }}
+        >
           <IconButton
             onClick={handleCloseModal}
             sx={{
@@ -346,7 +381,7 @@ const ProductReview = ({ productId, avgRating = 0 }) => {
           </IconButton>
           {selectedVideo && (
             <Box
-              component="video"
+              component='video'
               src={selectedVideo}
               controls
               autoPlay
@@ -367,7 +402,6 @@ const ProductReview = ({ productId, avgRating = 0 }) => {
           )}
         </DialogContent>
       </Dialog>
-
     </Box>
   )
 }

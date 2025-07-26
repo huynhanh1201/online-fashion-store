@@ -11,7 +11,6 @@ const ProductDescription = ({ description, productId, product }) => {
 
   return (
     <Box>
-
       <Tabs value={tabIndex} onChange={handleChange}>
         <Tab label='Mô tả sản phẩm' />
         <Tab label='Đánh giá' />
@@ -20,12 +19,12 @@ const ProductDescription = ({ description, productId, product }) => {
       <DialogContent dividers>
         {tabIndex === 0 && (
           <Box
-            className="content-selectable"
+            className='content-selectable'
             sx={{
               width: '100%',
               '& img': {
-                width: '873px !important',
-                height: '873px !important',
+                width: '100% !important',
+                height: '100% !important',
                 display: 'block',
                 margin: '8px auto',
                 borderRadius: '6px',
@@ -65,8 +64,12 @@ const ProductDescription = ({ description, productId, product }) => {
           />
         )}
 
-        {tabIndex === 1 && <ProductReview productId={productId} avgRating={product?.avgRating || 0} />}
-
+        {tabIndex === 1 && (
+          <ProductReview
+            productId={productId}
+            avgRating={product?.avgRating || 0}
+          />
+        )}
       </DialogContent>
     </Box>
   )

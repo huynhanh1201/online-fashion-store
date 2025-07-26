@@ -1,7 +1,7 @@
-import ProductCard from '~/components/ProductCards/ProductCards.jsx'
 import React, { useState, useEffect } from 'react'
 import { CircularProgress, Typography } from '@mui/material'
 import { Link } from 'react-router-dom'
+import ProductCard from '~/components/ProductCards/ProductCards.jsx'
 
 const styles = {
   section: {
@@ -26,20 +26,20 @@ const styles = {
     height: '100%',
     objectFit: 'cover',
     objectPosition: 'center center',
-    borderRadius: '10px',
+    borderRadius: '10px'
   },
   bannerText: {
     position: 'absolute',
-    bottom: '10px',      // thay vì top
-    left: '10px',        // cách mép trái 30px
+    bottom: '10px',
+    left: '10px',
     color: 'white',
     textShadow: '0 2px 4px rgba(0,0,0,0.5)',
     zIndex: 2,
-    maxWidth: '80%'      // giúp text không bị tràn
+    maxWidth: '80%'
   },
   bannerTitle: {
     margin: '0 0 8px 0',
-    fontSize: '36px',     // giảm lại chút cho phù hợp vị trí
+    fontSize: '36px',
     fontWeight: 700,
     lineHeight: '1.2'
   },
@@ -48,8 +48,7 @@ const styles = {
     fontSize: '14px',
     opacity: 0.9,
     lineHeight: '1.4'
-  }
-,
+  },
   productItem: {
     width: '100%'
   },
@@ -86,9 +85,14 @@ const ProductGrid = ({ children }) => {
   }
 
   const mediaStyles = `
-    @media (max-width: 1200px) {
+  @media (max-width: 1400px) {
       .product-grid-dynamic {
         grid-template-columns: repeat(3, 1fr) !important;
+      }
+    }
+    @media (max-width: 1200px) {
+      .product-grid-dynamic {
+        grid-template-columns: repeat(2, 1fr) !important;
       }
     }
     @media (max-width: 900px) {
@@ -96,7 +100,7 @@ const ProductGrid = ({ children }) => {
         grid-template-columns: repeat(2, 1fr) !important;
       }
     }
-    @media (max-width: 600px) {
+    @media (max-width: 680px) {
       .product-grid-dynamic {
         grid-template-columns: repeat(1, 1fr) !important;
       }
@@ -121,28 +125,67 @@ const ProductSection = ({
   loading,
   error
 }) => {
-  const [isMobile, setIsMobile] = useState(window.innerWidth < 900)
+  const [screenSize, setScreenSize] = useState('desktop')
 
   useEffect(() => {
-    const handleResize = () => setIsMobile(window.innerWidth < 900)
+    const handleResize = () => {
+      const width = window.innerWidth
+      if (width < 600) {
+        setScreenSize('mobile')
+      } else if (width < 900) {
+        setScreenSize('tablet')
+      } else if (width < 1200) {
+        setScreenSize('laptop')
+      } else if (width < 1400) {
+        setScreenSize('laptop-lage')
+      } else if (width < 1700) {
+        setScreenSize('desktop')
+      }
+    }
+
+    handleResize()
     window.addEventListener('resize', handleResize)
     return () => window.removeEventListener('resize', handleResize)
   }, [])
+
+  let visibleCount = 4
+  if (screenSize === 'mobile') visibleCount = 1
+  else if (screenSize === 'tablet') visibleCount = 2
+  else if (screenSize === 'laptop') visibleCount = 2
+  else if (screenSize === 'laptop-lage') visibleCount = 3
+  else if (screenSize === 'desktop') visibleCount = 4
 
   return (
     <div style={styles.section}>
       <div
         style={{
           display: 'grid',
-          gridTemplateColumns: isMobile ? '1fr' : '290px 1fr',
-          gap: isMobile ? '16px' : '20px',
-          alignItems: isMobile ? 'stretch' : 'center', 
+          gridTemplateColumns:
+            screenSize === 'tablet' || screenSize === 'mobile'
+              ? '1fr'
+              : '290px 1fr',
+          gap: screenSize === 'mobile' ? '16px' : '20px',
+          alignItems: screenSize === 'mobile' ? 'stretch' : 'center'
         }}
       >
-        {/* Banner cho category hiện tại */}
         {products && products[0]?.categoryId ? (
-          <Link to={`/productbycategory/${products[0].categoryId}`} style={{ textDecoration: 'none' }}>
-            <div style={{ ...styles.banner, height: isMobile ? 220 : 523, cursor: 'pointer' }}>
+          <Link
+            to={`/productbycategory/${products[0].categoryId}`}
+            style={{
+              textDecoration: 'none',
+              display:
+                screenSize === 'tablet' || screenSize === 'mobile'
+                  ? 'none'
+                  : 'block'
+            }}
+          >
+            <div
+              style={{
+                ...styles.banner,
+                height: screenSize === 'mobile' ? 220 : 523,
+                cursor: 'pointer'
+              }}
+            >
               <img
                 src={
                   bannerImg
@@ -150,31 +193,51 @@ const ProductSection = ({
                     : 'https://placehold.co/500x440?text=No+Category+Image'
                 }
                 alt={bannerTitle || 'Banner'}
-                style={{ ...styles.bannerImg, height: isMobile ? 220 : '100%' }}
+                style={{
+                  ...styles.bannerImg,
+                  height: screenSize === 'mobile' ? 220 : '100%'
+                }}
                 onError={(e) => {
                   console.error('Banner image failed to load:', e.target.src)
-                  e.target.src =
-                    'https://placehold.co/500x440?text=Image+Error'
+                  e.target.src = 'https://placehold.co/500x440?text=Image+Error'
                 }}
               />
-              <div style={{
-                ...styles.bannerText,
-                top: isMobile ? 40 : 30,
-                left: isMobile ? 20 : 10,
-              }}>
-                <h2 style={{
-                  ...styles.bannerTitle,
-                  fontSize: isMobile ? 24 : 35,
-                  marginBottom: isMobile ? 4 : 8
-                }}>
+              <div
+                style={{
+                  ...styles.bannerText,
+                  top: screenSize === 'mobile' ? 40 : 30,
+                  left: screenSize === 'mobile' ? 20 : 10
+                }}
+              >
+                <h2
+                  style={{
+                    ...styles.bannerTitle,
+                    fontSize: screenSize === 'mobile' ? 24 : 35,
+                    marginBottom: screenSize === 'mobile' ? 4 : 8
+                  }}
+                >
                   {bannerTitle || 'Danh mục sản phẩm'}
                 </h2>
-                {bannerDesc && <p style={{ ...styles.bannerDesc, fontSize: isMobile ? 12 : 14 }}>{bannerDesc}</p>}
+                {bannerDesc && (
+                  <p
+                    style={{
+                      ...styles.bannerDesc,
+                      fontSize: screenSize === 'mobile' ? 12 : 14
+                    }}
+                  >
+                    {bannerDesc}
+                  </p>
+                )}
               </div>
             </div>
           </Link>
         ) : (
-          <div style={{ ...styles.banner, height: isMobile ? 220 : 523 }}>
+          <div
+            style={{
+              ...styles.banner,
+              height: screenSize === 'mobile' ? 220 : 523
+            }}
+          >
             <img
               src={
                 bannerImg
@@ -182,26 +245,41 @@ const ProductSection = ({
                   : 'https://placehold.co/500x440?text=No+Category+Image'
               }
               alt={bannerTitle || 'Banner'}
-              style={{ ...styles.bannerImg, height: isMobile ? 220 : '100%' }}
+              style={{
+                ...styles.bannerImg,
+                height: screenSize === 'mobile' ? 220 : '100%'
+              }}
               onError={(e) => {
                 console.error('Banner image failed to load:', e.target.src)
-                e.target.src =
-                  'https://placehold.co/500x440?text=Image+Error'
+                e.target.src = 'https://placehold.co/500x440?text=Image+Error'
               }}
             />
-            <div style={{
-              ...styles.bannerText,
-              top: isMobile ? 40 : 150,
-              left: isMobile ? 20 : 70,
-            }}>
-              <h2 style={{
-                ...styles.bannerTitle,
-                fontSize: isMobile ? 24 : 50,
-                marginBottom: isMobile ? 4 : 8
-              }}>
+            <div
+              style={{
+                ...styles.bannerText,
+                top: screenSize === 'mobile' ? 40 : 150,
+                left: screenSize === 'mobile' ? 20 : 70
+              }}
+            >
+              <h2
+                style={{
+                  ...styles.bannerTitle,
+                  fontSize: screenSize === 'mobile' ? 24 : 50,
+                  marginBottom: screenSize === 'mobile' ? 4 : 8
+                }}
+              >
                 {bannerTitle || 'Danh mục sản phẩm'}
               </h2>
-              {bannerDesc && <p style={{ ...styles.bannerDesc, fontSize: isMobile ? 12 : 14 }}>{bannerDesc}</p>}
+              {bannerDesc && (
+                <p
+                  style={{
+                    ...styles.bannerDesc,
+                    fontSize: screenSize === 'mobile' ? 12 : 14
+                  }}
+                >
+                  {bannerDesc}
+                </p>
+              )}
             </div>
           </div>
         )}
@@ -224,8 +302,7 @@ const ProductSection = ({
         {/* Products */}
         {!loading && !error && products && products.length > 0 ? (
           <ProductGrid>
-            {products.slice(0, 4).map((product) => {
-              // Xử lý ảnh sản phẩm
+            {products.slice(0, visibleCount).map((product) => {
               let productImage =
                 'https://placehold.co/500x440?text=No+Category+Image'
 

@@ -20,7 +20,8 @@ import Menu from './Navbar/Menu/Menu'
 import AuthButtons from './Navbar/AuthButtons/AuthButtons'
 
 const StyledAppBar = styled(AppBar)(({ theme }) => ({
-  background: 'linear-gradient(90deg, var(--background-color) 0%, var(--surface-color) 100%)',
+  background:
+    'linear-gradient(90deg, var(--background-color) 0%, var(--surface-color) 100%)',
   color: 'var(--text-color)',
   top: 40,
   position: 'fixed',
@@ -49,11 +50,7 @@ const HeaderUser = () => {
     <>
       <Topbar />
       <StyledAppBar>
-        <Container
-          maxWidth='100%'
-          ref={headerRef}
-          sx={{ overflow: 'visible' }}
-        >
+        <Container maxWidth='100%' ref={headerRef} sx={{ overflow: 'visible' }}>
           <Toolbar
             disableGutters
             sx={{
@@ -71,7 +68,7 @@ const HeaderUser = () => {
               sx={{
                 display: 'flex',
                 alignItems: 'center',
-                flexShrink: 0,
+                flexShrink: 0
               }}
             >
               <IconButton
@@ -90,13 +87,13 @@ const HeaderUser = () => {
               <Typography
                 variant='h6'
                 noWrap
-                className="no-select"
+                className='no-select'
                 sx={{
                   fontSize: { xs: '0.9rem', sm: '1.1rem', md: '1.25rem' },
                   cursor: 'pointer',
                   userSelect: 'none',
                   overflow: 'hidden',
-                  textOverflow: 'ellipsis',
+                  textOverflow: 'ellipsis'
                 }}
               >
                 <Logo href='/'>Logo</Logo>
@@ -105,7 +102,7 @@ const HeaderUser = () => {
 
             {/* Center Section - Desktop Menu */}
             <Box
-              className="no-select"
+              className='no-select'
               sx={{
                 display: { xs: 'none', md: 'flex' },
                 flexGrow: 1,
@@ -133,9 +130,11 @@ const HeaderUser = () => {
               {/* Search Component - Hide on very small screens */}
               <Box
                 sx={{
-                  display: { xs: 'none', sm: 'block', },
-                  mr:-2,
-                  mt:1
+                  display: { xs: 'none', sm: 'block' },
+                  flex: 1,
+                  minWidth: 0,
+                  mr: -3,
+                  maxWidth: 400
                 }}
               >
                 <Search />
@@ -147,7 +146,7 @@ const HeaderUser = () => {
               </Box>
 
               {/* Auth Buttons */}
-              <Box sx={{ flexShrink: 0,ml:1 }}>
+              <Box sx={{ flexShrink: 0, ml: 1 }}>
                 <AuthButtons />
               </Box>
 

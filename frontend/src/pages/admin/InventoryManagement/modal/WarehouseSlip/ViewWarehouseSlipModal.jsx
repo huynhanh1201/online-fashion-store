@@ -65,8 +65,7 @@ const ViewWarehouseSlipModal = ({ open, onClose, slip }) => {
                   sx={{
                     width: '120px',
                     fontWeight: '800',
-                    backgroundColor:
-                      slip.type === 'Nhập' && 'var(--primary-color)'
+                    backgroundColor: slip.type === 'Nhập' && '#4CAF50'
                   }}
                 />
               </TableCell>
@@ -113,21 +112,21 @@ const ViewWarehouseSlipModal = ({ open, onClose, slip }) => {
                   .join(' ') || 'N/A'}
               </TableCell>
             </TableRow>
-            <TableRow>
-              <TableCell>
-                <strong>Trạng thái phiếu kho</strong>
-              </TableCell>
-              <TableCell>
-                <Chip
-                  label={
-                    slip.status === 'pending' ? 'Đang xử lý' : 'Hoàn thành'
-                  }
-                  color={slip.status === 'pending' ? 'warning' : 'success'}
-                  size='large'
-                  sx={{ width: '120px', fontWeight: '800' }}
-                />
-              </TableCell>
-            </TableRow>
+            {/*<TableRow>*/}
+            {/*  <TableCell>*/}
+            {/*    <strong>Trạng thái phiếu kho</strong>*/}
+            {/*  </TableCell>*/}
+            {/*  <TableCell>*/}
+            {/*    <Chip*/}
+            {/*      label={*/}
+            {/*        slip.status === 'pending' ? 'Đang xử lý' : 'Hoàn thành'*/}
+            {/*      }*/}
+            {/*      color={slip.status === 'pending' ? 'warning' : 'success'}*/}
+            {/*      size='large'*/}
+            {/*      sx={{ width: '120px', fontWeight: '800' }}*/}
+            {/*    />*/}
+            {/*  </TableCell>*/}
+            {/*</TableRow>*/}
             <TableRow>
               <TableCell>
                 <strong>Ngày tạo</strong>

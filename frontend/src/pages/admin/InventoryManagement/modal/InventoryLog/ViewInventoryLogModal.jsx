@@ -20,7 +20,12 @@ const ViewInventoryLogModal = ({ open, onClose, log }) => {
   if (!log) return null
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth='md' sx={{ width: '100%', minWidth: '600px' }}>
+    <Dialog
+      open={open}
+      onClose={onClose}
+      maxWidth='md'
+      sx={{ width: '100%', minWidth: '600px' }}
+    >
       <DialogTitle>
         Thông tin lịch sử phiếu {log.type === 'in' ? 'nhập' : 'xuất'} kho
       </DialogTitle>
@@ -76,7 +81,7 @@ const ViewInventoryLogModal = ({ open, onClose, log }) => {
                   sx={{
                     width: '120px',
                     fontWeight: '800',
-                    backgroundColor: log.type === 'in' && 'var(--primary-color)'
+                    backgroundColor: log.type === 'in' && '#4CAF50'
                   }}
                 />
               </TableCell>
