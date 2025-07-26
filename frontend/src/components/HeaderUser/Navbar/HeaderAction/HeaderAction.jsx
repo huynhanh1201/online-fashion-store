@@ -147,16 +147,19 @@ const HeaderAction = () => {
           position: 'absolute',
           top: '100%',
           right: 0,
-          transform: open ? 'translateY(0) scaleY(1)' : 'translateY(0) scaleY(0)',
+          transform: open
+            ? 'translateY(0) scaleY(1)'
+            : 'translateY(0) scaleY(0)',
           transformOrigin: 'top',
-          minWidth: 160,
+          minWidth: 230,
           zIndex: 1400,
           backgroundColor: 'white',
           borderRadius: '20px',
           padding: open ? '10px' : '0',
           boxShadow: '0 4px 10px rgba(0,0,0,0.1)',
           overflow: 'hidden',
-          transition: 'transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), padding 0.2s ease, opacity 0.4s ease',
+          transition:
+            'transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), padding 0.2s ease, opacity 0.4s ease',
           opacity: open ? 1 : 0,
           pointerEvents: open ? 'auto' : 'none'
         }}
@@ -214,25 +217,15 @@ const HeaderAction = () => {
                   />
                 </Typography>
               </Button>
-              <Button
-                onClick={handleClose}
-                component={Link}
-                to='/profile'
-                sx={{
-                  fontWeight: '300',
-                  padding: '12px 16px',
-                  justifyContent: 'flex-start',
-                  textTransform: 'none',
-                  color: 'text.primary',
-                  '&:hover': {
-                    backgroundColor: 'rgba(0, 0, 0, 0.04)'
-                  }
-                }}
-              >
-                Trang cá nhân
-              </Button>
+              <Box sx={{ width: '100%' }}>
+                <hr
+                  style={{
+                    border: 0,
+                    borderTop: '1px solid #eee'
+                  }}
+                />
+              </Box>
               {hasPermission('admin:access') && (
-
                 <Button
                   onClick={handleClose}
                   component={Link}
@@ -251,12 +244,37 @@ const HeaderAction = () => {
                   Trang quản trị
                 </Button>
               )}
-              <Box sx={{ width: '100%', padding: '5px' }}>
+              <Box sx={{ width: '100%' }}>
                 <hr
                   style={{
                     border: 0,
-                    borderTop: '1px solid #eee',
-                    margin: '0 0 8px 0'
+                    borderTop: '1px solid #eee'
+                  }}
+                />
+              </Box>
+              <Button
+                onClick={handleClose}
+                component={Link}
+                to='/profile'
+                sx={{
+                  fontWeight: '300',
+                  padding: '12px 16px',
+                  justifyContent: 'flex-start',
+                  textTransform: 'none',
+                  color: 'text.primary',
+                  '&:hover': {
+                    backgroundColor: 'rgba(0, 0, 0, 0.04)'
+                  }
+                }}
+              >
+                Trang cá nhân
+              </Button>
+
+              <Box sx={{ width: '100%' }}>
+                <hr
+                  style={{
+                    border: 0,
+                    borderTop: '1px solid #eee'
                   }}
                 />
               </Box>
@@ -293,11 +311,18 @@ const HeaderAction = () => {
               '&:hover': {
                 backgroundColor: 'rgba(0, 0, 0, 0.04)'
               }
-            }
-            }
+            }}
           >
             Giỏ hàng
           </Button>
+          <Box sx={{ width: '100%' }}>
+            <hr
+              style={{
+                border: 0,
+                borderTop: '1px solid #eee'
+              }}
+            />
+          </Box>
           <Button
             onClick={handleClose}
             component={Link}
@@ -311,17 +336,15 @@ const HeaderAction = () => {
               '&:hover': {
                 backgroundColor: 'rgba(0, 0, 0, 0.04)'
               }
-            }
-            }
+            }}
           >
             Thông tin đơn hàng
           </Button>
-          <Box sx={{ width: '100%', padding: '5px' }}>
+          <Box sx={{ width: '100%' }}>
             <hr
               style={{
                 border: 0,
-                borderTop: '1px solid #eee',
-                margin: '0 0 8px 0'
+                borderTop: '1px solid #eee'
               }}
             />
           </Box>
@@ -336,8 +359,7 @@ const HeaderAction = () => {
               '&:hover': {
                 backgroundColor: 'rgba(0, 0, 0, 0.04)'
               }
-            }
-            }
+            }}
           >
             <span style={{ display: 'flex', alignItems: 'center' }}>
               <svg

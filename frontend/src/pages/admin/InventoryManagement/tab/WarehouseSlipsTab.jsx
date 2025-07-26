@@ -415,8 +415,7 @@ const WarehouseSlipsTab = () => {
                           sx={{
                             width: 120,
                             fontWeight: 800,
-                            backgroundColor:
-                              row.type === 'Nhập' && 'var(--primary-color)'
+                            backgroundColor: row.type === 'Nhập' && '#4CAF50'
                           }}
                         />
                       )

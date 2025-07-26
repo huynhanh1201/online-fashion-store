@@ -19,7 +19,8 @@ const Content = () => {
   const [middleBanners, setMiddleBanners] = useState([])
   const [bannerLoading, setBannerLoading] = useState(true)
   const [featuredCategories, setFeaturedCategories] = useState([])
-  const [featuredCategoriesLoading, setFeaturedCategoriesLoading] = useState(true)
+  const [featuredCategoriesLoading, setFeaturedCategoriesLoading] =
+    useState(true)
   const [serviceHighlights, setServiceHighlights] = useState([])
   const [serviceHighlightsLoading, setServiceHighlightsLoading] = useState(true)
   const [screenSize, setScreenSize] = useState({
@@ -350,7 +351,10 @@ const Content = () => {
 
       </div>
 
-      <CouponList />
+      <Box sx={{ width: 'auto' }}>
+        <CouponList />
+      </Box>
+
       <div className="content-container">
         {/* Middle Banners Section */}
         {!bannerLoading && middleBanners.length > 0 && (
