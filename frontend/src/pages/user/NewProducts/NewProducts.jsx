@@ -157,6 +157,11 @@ const NewProducts = () => {
     }
   }
 
+  // Scroll to top on component mount
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'auto' })
+  }, [])
+
   // Fetch products when page or sort changes
   useEffect(() => {
     console.log('Effect triggered - page:', page, 'sortOption:', sortOption)
@@ -241,6 +246,7 @@ const NewProducts = () => {
         <Breadcrumbs
           separator={<NavigateNextIcon fontSize='small' />}
           aria-label='breadcrumb'
+          sx={{ my: 1 }}
         >
           <Link
             underline='hover'
@@ -377,40 +383,40 @@ const NewProducts = () => {
               </div>
 
               <Box
-                sx={{ display: 'flex', justifyContent: 'center', mt: 4, mb: 2 , alignItems: 'center'}}
+                sx={{ display: 'flex', justifyContent: 'center', mt: 4, mb: 2, alignItems: 'center' }}
               >
 
-<Pagination
-  count={totalPages}
-  page={page}
-  onChange={handlePageChange}
-  boundaryCount={1}
-  siblingCount={1}
-  shape="rounded"
-  size="small"
-  color="primary"
-  renderItem={(item) => {
-    if (item.type === 'start-ellipsis' || item.type === 'end-ellipsis') {
-      return (
-        <span
-          style={{
-            padding: '8px 12px',
-            fontWeight: 'bold',
-            color: '#999',
-            fontSize: '1rem',
-            display: 'inline-flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}
-        >
-          ...
-        </span>
-         )
-    }
+                <Pagination
+                  count={totalPages}
+                  page={page}
+                  onChange={handlePageChange}
+                  boundaryCount={1}
+                  siblingCount={1}
+                  shape="rounded"
+                  size="small"
+                  color="primary"
+                  renderItem={(item) => {
+                    if (item.type === 'start-ellipsis' || item.type === 'end-ellipsis') {
+                      return (
+                        <span
+                          style={{
+                            padding: '8px 12px',
+                            fontWeight: 'bold',
+                            color: '#999',
+                            fontSize: '1rem',
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                          }}
+                        >
+                          ...
+                        </span>
+                      )
+                    }
 
-         return <PaginationItem {...item} />
-         }}
-                 />
+                    return <PaginationItem {...item} />
+                  }}
+                />
 
               </Box>
             </>

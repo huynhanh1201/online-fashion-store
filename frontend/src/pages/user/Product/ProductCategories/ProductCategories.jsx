@@ -17,13 +17,13 @@ const ProductCategories = () => {
     try {
       setLoading(true)
       setError('')
-      
+
       const response = await getCategories({})
       const categoryData = response.categories || []
-      
+
       // Filter out categories that are marked as destroyed (hidden)
       const activeCategories = categoryData.filter(category => category.destroy === false && (!category.parent || category.parent === null))
-      
+
       setCategories(activeCategories)
     } catch (err) {
       console.error('Error fetching categories:', err)
@@ -42,7 +42,7 @@ const ProductCategories = () => {
         <Grid
           container
           direction='row'
-          justifyContent='center'
+          justifyContent='flex-start'
           alignItems='center'
           sx={{ marginTop: '50px', gap: '100px' }}
         >
@@ -74,7 +74,7 @@ const ProductCategories = () => {
       <Grid
         container
         direction='row'
-        justifyContent='center'
+        justifyContent='flex-start'
         alignItems='center'
         sx={{ marginTop: '50px', gap: '100px' }}
       >
@@ -94,7 +94,7 @@ const ProductCategories = () => {
             <Box
               component='img'
               src={
-                category.image 
+                category.image
                   ? optimizeCloudinaryUrl(category.image, { width: 100, height: 100 })
                   : 'https://www.rcuw.org/wp-content/themes/champion/images/SM-placeholder.png'
               }

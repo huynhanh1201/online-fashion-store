@@ -1,18 +1,21 @@
 import React, { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
-import { 
-  Box, 
-  Typography, 
-  Grid, 
-  CircularProgress, 
-  Alert, 
-  Container, 
+import {
+  Box,
+  Typography,
+  Grid,
+  CircularProgress,
+  Alert,
+  Container,
   Divider,
   Snackbar,
   Pagination,
   styled,
-  PaginationItem
+  PaginationItem,
+  Breadcrumbs,
+  Link
 } from '@mui/material'
+import NavigateNextIcon from '@mui/icons-material/NavigateNext'
 import { getCategoryBySlug } from '~/services/categoryService'
 import { getProductsByCategory } from '~/services/productService'
 import ProductCard from '~/components/ProductCards/ProductCards'
@@ -228,10 +231,10 @@ const CategoryPage = () => {
 
   if (loading) {
     return (
-      <Box 
-        display="flex" 
-        justifyContent="center" 
-        alignItems="center" 
+      <Box
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
         minHeight="80vh"
         sx={{ backgroundColor: 'var(--surface-color)' }}
       >
@@ -243,10 +246,10 @@ const CategoryPage = () => {
   if (error) {
     return (
       <Container maxWidth="xl" sx={{ py: 8 }}>
-        <Alert 
-          severity="error" 
-          sx={{ 
-            maxWidth: 600, 
+        <Alert
+          severity="error"
+          sx={{
+            maxWidth: 600,
             mx: 'auto',
             borderRadius: 2,
             boxShadow: '0 4px 20px rgba(0,0,0,0.1)'
@@ -261,10 +264,10 @@ const CategoryPage = () => {
   if (!category) {
     return (
       <Container maxWidth="xl" sx={{ py: 8 }}>
-        <Alert 
+        <Alert
           severity="warning"
-          sx={{ 
-            maxWidth: 600, 
+          sx={{
+            maxWidth: 600,
             mx: 'auto',
             borderRadius: 2,
             boxShadow: '0 4px 20px rgba(0,0,0,0.1)'
@@ -277,7 +280,38 @@ const CategoryPage = () => {
   }
 
   return (
-    <Box sx={{ minHeight: '100vh' }}>
+    <Box sx={{ minHeight: '100vh', py:1 }}>
+      <Breadcrumbs
+        separator={<NavigateNextIcon fontSize='small' />}
+        aria-label='breadcrumb'
+        sx={{ p: 1 }}
+      >
+        <Link
+          underline='hover'
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            color: '#007bff',
+            textDecoration: 'none',
+            '&:hover': {
+              color: 'primary.main'
+            }
+          }}
+          href='/'
+        >
+          Trang chủ
+        </Link>
+        <Typography
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            color: 'text.primary',
+            fontWeight: 500
+          }}
+        >
+          Danh mục {category.name}
+        </Typography>
+      </Breadcrumbs>
       {/* Category Banner Section */}
       <Box
         sx={{
@@ -285,15 +319,16 @@ const CategoryPage = () => {
           height: { xs: '200px', sm: '300px', md: '400px' },
           position: 'relative',
           mb: 4,
-          backgroundImage: category.banner 
+          backgroundImage: category.banner
             ? `url(${optimizeCloudinaryUrl(category.banner, { width: 1920, height: 400 })})`
             : category.image
-            ? `url(${optimizeCloudinaryUrl(category.image, { width: 1920, height: 400 })})`
-            : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+              ? `url(${optimizeCloudinaryUrl(category.image, { width: 1920, height: 400 })})`
+              : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
           backgroundSize: 'cover',
           backgroundPosition: 'center',
         }}
       >
+
         <Box
           sx={{
             position: 'absolute',
@@ -420,7 +455,7 @@ const CategoryPage = () => {
               </div>
 
               {/* Pagination */}
-              <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4, mb: 2 , alignItems: 'center'}}>
+              <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4, mb: 2, alignItems: 'center' }}>
                 <Pagination
                   count={Math.ceil(filteredProducts.length / ITEMS_PER_PAGE) || 1}
                   page={page}

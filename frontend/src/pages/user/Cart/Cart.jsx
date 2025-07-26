@@ -909,7 +909,7 @@ const Cart = () => {
                                   sm: '0.9rem',
                                   md: '1rem',
                                 },
-                                maxWidth: { xs: '150px', sm: '200px', md: '250px' },
+                                maxWidth: { xs: '200px', sm: '300px', md: '500px' },
                                 whiteSpace: 'nowrap',
                                 overflow: 'hidden',
                                 textOverflow: 'ellipsis',

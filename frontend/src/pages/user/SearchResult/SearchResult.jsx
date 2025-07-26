@@ -293,6 +293,7 @@ export default function SearchResults() {
         <Breadcrumbs
           separator={<NavigateNextIcon fontSize='small' />}
           aria-label='breadcrumb'
+          sx={{ p:1 }}
         >
           <Link
             underline='hover'
@@ -318,7 +319,7 @@ export default function SearchResults() {
               fontWeight: 500
             }}
           >
-           Kết quả tìm kiếm
+            Kết quả tìm kiếm
           </Typography>
         </Breadcrumbs>
       </Box>
@@ -422,7 +423,7 @@ export default function SearchResults() {
               ))}
             </div>
 
-            <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4, mb: 2 , alignItems: 'center'}}>
+            <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4, mb: 2, alignItems: 'center' }}>
               <Pagination
                 count={totalPages}
                 page={page}

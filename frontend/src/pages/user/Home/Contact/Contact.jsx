@@ -4,9 +4,9 @@ import {
   IconButton,
   Fade
 } from '@mui/material'
-import { 
-  Email, 
-  Phone, 
+import {
+  Email,
+  Phone,
   WhatsApp,
   Help,
   Chat
@@ -70,7 +70,7 @@ const Contact = () => {
         <img
           src="https://cdn.iconscout.com/icon/free/png-512/free-phone-icon-download-in-svg-png-gif-file-formats--call-logo-app-for-ios-store-apps-apple-watch-pack-user-interface-icons-1100768.png?f=webp&w=256"
           alt="Zalo"
-          style={{ width: 40, height: 40}}
+          style={{ width: 40, height: 40 }}
         />
       ),
       title: 'Liên hệ : 0346896599',
@@ -83,20 +83,20 @@ const Contact = () => {
         <img
           src="https://hidosport.vn/wp-content/uploads/2023/09/zalo-icon.png"
           alt="Zalo"
-          style={{ width: 40, height: 40}}
+          style={{ width: 40, height: 40 }}
         />
       ),
       title: 'Zalo',
       action: 'https://zalo.me/0346896599',
       delay: 200
     },
-    
+
     {
       icon: (
         <img
           src="https://1000logos.net/wp-content/uploads/2021/11/Messenger-Logo.png"
           alt="Zalo"
-          style={{ width: 80, height: 40}}
+          style={{ width: 80, height: 40 }}
         />
       ),
       title: 'Messenger',
@@ -107,7 +107,7 @@ const Contact = () => {
   ]
 
   return (
-    <Box sx={{ position: 'fixed', bottom: 100, right: 20, zIndex: 1000 }} className="contact-area">
+    <Box sx={{ position: 'fixed', bottom: 30, right: 20, zIndex: 1000 }} className="contact-area">
       {/* Sub Icons - Hiển thị khi click vào icon chính */}
       {showSubIcons && (
         <Box sx={{ mb: 2 }}>
@@ -143,7 +143,7 @@ const Contact = () => {
                   sx={{
                     position: 'absolute',
                     right: 60,
-                    top: '50%',
+                    top: '20%',
                     transform: 'translateY(-50%)',
                     background: 'rgba(0,0,0,0.8)',
                     color: 'white',

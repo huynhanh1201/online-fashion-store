@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from 'react'
 import ProductCard from './ProductCards'
+import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew'
+import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos'
+
 
 const ProductHorizontalScroll = ({ products = [], defaultCardsPerRow = 5, gap = 20 }) => {
   const [startIdx, setStartIdx] = useState(0)
@@ -68,7 +71,7 @@ const ProductHorizontalScroll = ({ products = [], defaultCardsPerRow = 5, gap = 
           disabled={startIdx === 0}
           aria-label='Cuộn trái'
         >
-          {'<'}
+          <ArrowBackIosNewIcon fontSize="medium" />
         </button>
       )}
       <div className='slide-list'>
@@ -100,7 +103,7 @@ const ProductHorizontalScroll = ({ products = [], defaultCardsPerRow = 5, gap = 
           disabled={startIdx + cardsPerRow >= products.length}
           aria-label='Cuộn phải'
         >
-          {'>'}
+          <ArrowForwardIosIcon fontSize="medium" />
         </button>
       )}
       <style>{`

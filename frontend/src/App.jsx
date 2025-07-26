@@ -113,10 +113,10 @@ function App() {
       <Route path='login' element={<Login />} />
       <Route path='register' element={<Register />} />
       <Route path='/account/verification' element={<AccountVerification />} />
-      <Route path='searchresult' element={<SearchResult />} />
 
       {/*Customer*/}
       <Route path='/' element={<UserLayout />}>
+        <Route path='searchresult' element={<SearchResult />} />
         <Route path='product' element={<Product />} />
         <Route path='/productdetail/:productId' element={<ProductDetail />} />
         <Route path='blog' element={<Blog />} />

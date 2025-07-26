@@ -8,8 +8,11 @@ import {
   CircularProgress,
   styled,
   Pagination,
-  PaginationItem
+  PaginationItem,
+  Breadcrumbs,
+  Link
 } from '@mui/material'
+import NavigateNextIcon from '@mui/icons-material/NavigateNext'
 import { addToCart, getCart } from '~/services/cartService'
 import useProducts from '~/hooks/useProducts'
 import { useDispatch } from 'react-redux'
@@ -102,19 +105,19 @@ const ProductbyCategory = () => {
     const fetchCategoryAndChildren = async () => {
       try {
         setLoadingCategory(true)
-        
+
         // Fetch parent category
         const response = await getCategoryById(categoryId)
         setCategory(response)
-        
+
         // Fetch child categories
         const children = await getChildCategories(categoryId)
         setChildCategories(children)
-        
+
         // Create array of all category IDs (parent + children)
         const categoryIds = [categoryId, ...children.map(child => child._id)]
         setAllCategoryIds(categoryIds)
-        
+
       } catch (error) {
         console.error('Error fetching category:', error)
       } finally {
@@ -126,6 +129,11 @@ const ProductbyCategory = () => {
       fetchCategoryAndChildren()
     }
   }, [categoryId])
+
+  // Scroll to top on component mount
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'auto' })
+  }, [])
 
   useEffect(() => {
     fetchProducts()
@@ -254,15 +262,46 @@ const ProductbyCategory = () => {
 
   return (
     <Box sx={{ minHeight: '100vh' }}>
+      <Breadcrumbs
+        separator={<NavigateNextIcon fontSize='small' />}
+        aria-label='breadcrumb'
+        sx={{ p: 2 }}
+      >
+        <Link
+          underline='hover'
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            color: '#007bff',
+            textDecoration: 'none',
+            '&:hover': {
+              color: 'primary.main'
+            }
+          }}
+          href='/'
+        >
+          Trang chủ
+        </Link>
+        <Typography
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            color: 'text.primary',
+            fontWeight: 500
+          }}
+        >
+          Danh mục {category?.name || 'Sản phẩm'}
+        </Typography>
+      </Breadcrumbs>
       <Box
         sx={{
           width: '100%',
           height: { xs: '200px', sm: '300px', md: '400px' },
-          backgroundImage: category?.banner 
+          backgroundImage: category?.banner
             ? `url(${optimizeCloudinaryUrl(category.banner, { width: 1920, height: 400 })})`
             : category?.image
-            ? `url(${optimizeCloudinaryUrl(category.image, { width: 1920, height: 400 })})`
-            : 'url(https://file.hstatic.net/1000360022/collection/ao-thun_cd23d8082c514c839615e1646371ba71.jpg)',
+              ? `url(${optimizeCloudinaryUrl(category.image, { width: 1920, height: 400 })})`
+              : 'url(https://file.hstatic.net/1000360022/collection/ao-thun_cd23d8082c514c839615e1646371ba71.jpg)',
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           position: 'relative',
@@ -369,38 +408,38 @@ const ProductbyCategory = () => {
                 ))}
               </div>
 
-              <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4, mb: 2 , alignItems: 'center'}}>
-              <Pagination
-                count={totalPages}
-                page={page}
-                onChange={handlePageChange}
-                boundaryCount={1}
-                siblingCount={1}
-                shape="rounded"
-                size="small"
-                color="primary"
-                renderItem={(item) => {
-                  if (item.type === 'start-ellipsis' || item.type === 'end-ellipsis') {
-                    return (
-                      <span
-                        style={{
-                          padding: '8px 12px',
-                          fontWeight: 'bold',
-                          color: '#999',
-                          fontSize: '1rem',
-                          display: 'inline-flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                        }}
-                      >
-                        ...
-                      </span>
-                    )
-                  }
-                  return <PaginationItem {...item} />
-                }}
-              />
-            </Box>
+              <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4, mb: 2, alignItems: 'center' }}>
+                <Pagination
+                  count={totalPages}
+                  page={page}
+                  onChange={handlePageChange}
+                  boundaryCount={1}
+                  siblingCount={1}
+                  shape="rounded"
+                  size="small"
+                  color="primary"
+                  renderItem={(item) => {
+                    if (item.type === 'start-ellipsis' || item.type === 'end-ellipsis') {
+                      return (
+                        <span
+                          style={{
+                            padding: '8px 12px',
+                            fontWeight: 'bold',
+                            color: '#999',
+                            fontSize: '1rem',
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                          }}
+                        >
+                          ...
+                        </span>
+                      )
+                    }
+                    return <PaginationItem {...item} />
+                  }}
+                />
+              </Box>
             </>
           )}
         </Box>

@@ -97,7 +97,7 @@ const Blog = () => {
       title: title.length > 60 ? title.substring(0, 60) + '...' : title,
       subtitle: subtitle.length > 80 ? subtitle.substring(0, 80) + '...' : subtitle,
       category: blogData.category || 'Tip',
-      image: blogData.coverImage || blogData.thumbnail || blogData.image || '',
+      image: blogData.coverImage,
       date: blogData.publishedAt
         ? new Date(blogData.publishedAt).toLocaleDateString('vi-VN')
         : new Date(blogData.createdAt).toLocaleDateString('vi-VN'),
@@ -337,34 +337,50 @@ const Blog = () => {
                           backgroundColor: 'grey.100', // Fallback background for broken images
                         }}
                       >
-                        <Box
-                          component="img"
-                          className="article-image"
-                          src={
-                            article.image
-                              ? optimizeCloudinaryUrl(article.image, {
-                                width: 600, // Optimize for display size
-                                height: 337, // Match 16:9 aspect ratio (600 * 9/16 ≈ 337)
-                                crop: 'fill', // Cloudinary crop mode
-                                quality: 'auto',
-                                fetch_format: 'auto',
-                              })
-                              : '/path/to/fallback-image.jpg' // Fallback image
-                          }
-                          alt={article.title}
-                          sx={{
-                            width: '100%',
-                            height: '100%',
-                            objectFit: 'contain', // Changed to 'contain' to avoid cropping
-                            objectPosition: 'center',
-                            transition: 'transform 0.3s ease',
-                            display: 'block',
-                            backgroundColor: 'transparent',
-                          }}
-                          onError={(e) => {
-                            e.target.src = '/path/to/fallback-image.jpg'; // Handle broken images
-                          }}
-                        />
+                        {article.image ? (
+                          <Box
+                            component="img"
+                            className="article-image"
+                            src={optimizeCloudinaryUrl(article.image, {
+                              width: 600, // Optimize for display size
+                              height: 337, // Match 16:9 aspect ratio (600 * 9/16 ≈ 337)
+                              crop: 'fill', // Cloudinary crop mode
+                              quality: 'auto',
+                              fetch_format: 'auto',
+                            })}
+                            alt={article.title}
+                            sx={{
+                              width: '100%',
+                              height: '100%',
+                              objectFit: 'contain', // Changed to 'contain' to avoid cropping
+                              objectPosition: 'center',
+                              transition: 'transform 0.3s ease',
+                              display: 'block',
+                              backgroundColor: 'transparent',
+                            }}
+                            onError={(e) => {
+                              // Hide the image when error occurs to prevent infinite loop
+                              e.target.style.display = 'none';
+                            }}
+                          />
+                        ) : (
+                          // Placeholder when no image available
+                          <Box
+                            sx={{
+                              width: '100%',
+                              height: '100%',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              backgroundColor: 'grey.200',
+                              color: 'grey.500',
+                            }}
+                          >
+                            <Typography variant="body2">
+                              Không có ảnh
+                            </Typography>
+                          </Box>
+                        )}
 
                         {/* Category Tag */}
                         {/* <Box
