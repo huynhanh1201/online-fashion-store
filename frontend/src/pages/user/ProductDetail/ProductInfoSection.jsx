@@ -49,7 +49,9 @@ const VariantBox = styled(Box)(({ selected }) => ({
   cursor: 'pointer',
   gap: 10,
   '&:hover': {
-    backgroundColor: selected ? 'var(--primary-color)20' : 'var(--surface-color)',
+    backgroundColor: selected
+      ? 'var(--primary-color)20'
+      : 'var(--surface-color)',
     borderColor: selected ? 'var(--primary-color)' : '#bdbdbd'
   }
 }))
@@ -91,7 +93,12 @@ const ProductInfoSection = ({
         fontWeight={700}
         sx={{ wordBreak: 'break-word', whiteSpace: 'pre-wrap', mb: 1 }}
       >
-        {product?.name}
+        {product?.name
+          .split(' ')
+          .map(
+            (word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+          )
+          .join(' ') || 'Không có tên sản phẩm'}
       </Typography>
       <Typography
         variant='body2'
@@ -309,9 +316,7 @@ const ProductInfoSection = ({
             onClick={() =>
               setQuantity((q) => {
                 const maxQuantity =
-                  selectedVariant?.quantity ??
-                  product?.quantity ??
-                  0
+                  selectedVariant?.quantity ?? product?.quantity ?? 0
                 return q < maxQuantity ? q + 1 : q
               })
             }
@@ -321,10 +326,7 @@ const ProductInfoSection = ({
           </IconButton>
           {selectedColor && selectedSize && (
             <Typography color='text.secondary' sx={{ fontSize: 13 }}>
-              Kho:{' '}
-              {selectedVariant?.quantity ??
-                product?.quantity ??
-                0}
+              Kho: {selectedVariant?.quantity ?? product?.quantity ?? 0}
             </Typography>
           )}
         </Box>
@@ -338,10 +340,7 @@ const ProductInfoSection = ({
           variant='contained'
           disabled={
             isAdding ||
-            quantity >
-            (selectedVariant?.quantity ??
-              product?.quantity ??
-              0)
+            quantity > (selectedVariant?.quantity ?? product?.quantity ?? 0)
           }
           onClick={() => handleAddToCart(product._id)}
           sx={{
