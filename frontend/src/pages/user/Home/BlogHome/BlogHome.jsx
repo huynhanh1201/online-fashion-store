@@ -74,7 +74,7 @@ const BlogHome = () => {
         <Box
           sx={{
             width: '100%',
-            maxWidth: '96vw',
+            maxWidth: '97vw',
             margin: '0 auto',
             padding: {
               xs: '24px 16px',
@@ -189,34 +189,50 @@ const BlogHome = () => {
                           backgroundColor: 'grey.100', // Fallback background for broken images
                         }}
                       >
-                        <Box
-                          component='img'
-                          className='article-image'
-                          src={
-                            article.image
-                              ? optimizeCloudinaryUrl(article.image, {
-                                width: 600, // Optimize for display size
-                                height: 337, // Match 16:9 aspect ratio (600 * 9/16 ≈ 337)
-                                crop: 'fill', // Cloudinary crop mode
-                                quality: 'auto',
-                                fetch_format: 'auto',
-                              })
-                              : '/path/to/fallback-image.jpg' // Fallback image
-                          }
-                          alt={article.title}
-                          sx={{
-                            width: '100%',
-                            height: '100%',
-                            objectFit: 'contain', // Changed to 'contain' to avoid cropping
-                            objectPosition: 'center',
-                            transition: 'transform 0.3s ease',
-                            display: 'block',
-                            backgroundColor: 'transparent',
-                          }}
-                          onError={(e) => {
-                            e.target.src = '/path/to/fallback-image.jpg'; // Handle broken images
-                          }}
-                        />
+                        {article.image ? (
+                          <Box
+                            component='img'
+                            className='article-image'
+                            src={optimizeCloudinaryUrl(article.image, {
+                              width: 600, // Optimize for display size
+                              height: 337, // Match 16:9 aspect ratio (600 * 9/16 ≈ 337)
+                              crop: 'fill', // Cloudinary crop mode
+                              quality: 'auto',
+                              fetch_format: 'auto',
+                            })}
+                            alt={article.title}
+                            sx={{
+                              width: '100%',
+                              height: '100%',
+                              objectFit: 'contain', // Changed to 'contain' to avoid cropping
+                              objectPosition: 'center',
+                              transition: 'transform 0.3s ease',
+                              display: 'block',
+                              backgroundColor: 'transparent',
+                            }}
+                            onError={(e) => {
+                              // Hide the image when error occurs to prevent infinite loop
+                              e.target.style.display = 'none';
+                            }}
+                          />
+                        ) : (
+                          // Placeholder when no image available
+                          <Box
+                            sx={{
+                              width: '100%',
+                              height: '100%',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              backgroundColor: 'grey.200',
+                              color: 'grey.500',
+                            }}
+                          >
+                            <Typography variant="body2">
+                              Không có ảnh
+                            </Typography>
+                          </Box>
+                        )}
 
                         {/* Category Tag */}
                         {/* <Box
@@ -340,7 +356,7 @@ const BlogHome = () => {
                 display: 'flex',
                 justifyContent: 'center',
                 alignItems: 'center',
-                mt: { xs: 4, sm: 5, md: 6 }
+                mb: { xs: 4, sm: 5, md: 6 }
               }}
             >
               <Box

@@ -511,8 +511,8 @@ const Cart = () => {
       <Container
         maxWidth={false}
         sx={{
-          width: '96vw',
-          maxWidth: '1800px',
+          width: '100%',
+          maxWidth: '96vw',
           margin: '0 auto',
           height: '70vh',
           display: 'flex',
@@ -544,8 +544,8 @@ const Cart = () => {
     <Container
       maxWidth={false}
       sx={{
-        width: '96vw',
-        maxWidth: '1800px',
+        width: '100%',
+        maxWidth: '97vw',
         margin: '0 auto',
         minHeight: '70vh',
         mt: { xs: 10, md: 16 },
@@ -909,7 +909,7 @@ const Cart = () => {
                                   sm: '0.9rem',
                                   md: '1rem',
                                 },
-                                maxWidth: { xs: '150px', sm: '200px', md: '250px' },
+                                maxWidth: { xs: '200px', sm: '300px', md: '500px' },
                                 whiteSpace: 'nowrap',
                                 overflow: 'hidden',
                                 textOverflow: 'ellipsis',

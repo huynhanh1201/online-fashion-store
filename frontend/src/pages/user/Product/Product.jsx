@@ -188,6 +188,11 @@ const Product = () => {
     }
   }
 
+  // Scroll to top on component mount
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'auto' })
+  }, [])
+
   // Fetch products when page or sort changes
   useEffect(() => {
     console.log('Effect triggered - page:', page, 'sortOption:', sortOption)
@@ -258,20 +263,21 @@ const Product = () => {
     sortOptions.find((opt) => opt.value === sortOption) || sortOptions[0]
 
   return (
-    <Box sx={{ minHeight: '100vh' }}>
+    <Box sx={{ minHeight: '70vh' }}>
       <Box
         sx={{
           bottom: { xs: '20px', sm: '30px', md: '40px' },
           left: { xs: '20px', sm: '30px', md: '40px' },
           right: { xs: '20px', sm: '30px', md: '40px' },
           padding: '12px',
-          maxWidth: '1800px',
+          maxWidth: '97vw',
           margin: '0 auto'
         }}
       >
         <Breadcrumbs
           separator={<NavigateNextIcon fontSize='small' />}
           aria-label='breadcrumb'
+          sx={{ my: 1 }}
         >
           <Link
             underline='hover'
@@ -301,76 +307,92 @@ const Product = () => {
         </Breadcrumbs>
       </Box>
 
-      {/* Product Banner Section */}
-      <Box
-        sx={{
-          width: '100%',
-          height: { xs: '200px', sm: '300px', md: '500px' },
-          position: 'relative',
-          mb: 4,
-          backgroundImage: bannerLoading
-            ? 'none'
-            : productBanner?.imageUrl
-              ? `url(${optimizeCloudinaryUrl(productBanner.imageUrl, { width: 1920, height: 400 })})`
-              : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-          backgroundSize: 'contain',
-          backgroundRepeat: 'no-repeat',
-          backgroundPosition: 'center',
-          overflow: 'hidden',
-          px: 0,
-          maxWidth: '1800px',
-          margin: '0 auto'
-        }}
-      >
-        {bannerLoading ? (
-          <Skeleton
-            variant="rectangular"
-            width="100%"
-            height="100%"
-            sx={{ borderRadius: 0, minHeight: { xs: 200, md: 400 } }}
-          />
-        ) : null}
-      </Box>
-      {/* Title & Description dưới banner */}
-      <Box sx={{ textAlign: 'center', mt: 3, mb: 3 }}>
-        <Typography
-          variant="h2"
-          fontWeight={800}
+      <Box sx={{ width: '100%', maxWidth: '97vw', mx: 'auto', px: 2 }}>
+        {/* Banner Section - 50% Image + 50% Title */}
+        <Box
           sx={{
-            fontSize: { xs: '2rem', sm: '2.5rem', md: '3.5rem' },
-            background: 'linear-gradient(90deg, #1A3C7B 0%, #1976d2 100%)',
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
-            backgroundClip: 'text',
-            textShadow: '2px 2px 8px rgba(26,60,123,0.08)',
-            justifyContent: 'center',
-            letterSpacing: '-1px',
-            lineHeight: 1.1,
-            textAlign: 'center'
+            display: 'flex',
+            flexDirection: { xs: 'column', md: 'row' },
+            alignItems: 'center',
+            gap: { xs: 3, md: 4 },
+            mb: 6
           }}
         >
-          {productBanner?.title || 'Tất cả sản phẩm'}
-        </Typography>
-        {productBanner?.description && (
-          <Typography
-            variant="h5"
+          {/* Banner Image - 50% */}
+          <Box
             sx={{
-              color: 'text.secondary',
-              fontWeight: 400,
-              fontSize: { xs: '1rem', md: '1.2rem' },
-              lineHeight: 1.6,
-              textAlign: 'center',
-              maxWidth: 600,
-              mx: 'auto'
+              width: { xs: '100%', md: '50%' },
+              height: { xs: '250px', sm: '300px', md: '400px' },
+              position: 'relative',
+              backgroundImage: bannerLoading
+                ? 'none'
+                : productBanner?.imageUrl
+                  ? `url(${optimizeCloudinaryUrl(productBanner.imageUrl, { width: 1920, height: 400, crop: 'fit' })})`
+                  : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+              backgroundSize: 'cover',
+              backgroundRepeat: 'no-repeat',
+              backgroundPosition: 'center',
+              borderRadius: 2,
+              overflow: 'hidden',
             }}
           >
-            {productBanner.description}
-          </Typography>
-        )}
+            {bannerLoading && (
+              <Skeleton
+                variant="rectangular"
+                width="100%"
+                height="100%"
+                sx={{
+                  borderRadius: 2,
+                }}
+              />
+            )}
+          </Box>
+
+          {/* Title & Description - 50% */}
+          <Box sx={{
+            width: { xs: '100%', md: '50%' },
+            textAlign: 'center',
+            px: { xs: 0, md: 3 }
+          }}>
+            <Typography
+              variant="h2"
+              fontWeight={800}
+              sx={{
+                fontSize: { xs: '1.8rem', sm: '2.2rem', md: '2.8rem', lg: '3.2rem' },
+                background: 'linear-gradient(90deg, #1A3C7B 0%, #1976d2 100%)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                backgroundClip: 'text',
+                textShadow: '2px 2px 8px rgba(26,60,123,0.08)',
+                letterSpacing: '-0.5px',
+                lineHeight: 1.2,
+                mb: 2
+              }}
+            >
+              {productBanner?.title || 'Tất cả sản phẩm'}
+            </Typography>
+
+            {productBanner?.description && (
+              <Typography
+                variant="h6"
+                sx={{
+                  color: 'text.secondary',
+                  fontWeight: 400,
+                  fontSize: { xs: '0.95rem', md: '1.1rem' },
+                  lineHeight: 1.6
+                }}
+              >
+                {productBanner.description}
+              </Typography>
+            )}
+          </Box>
+        </Box>
       </Box>
 
-      <ProductCategories />
-      <Box sx={{ p: 2, maxWidth: '1800px', mx: 'auto' }}>
+      <Box sx={{ width: '100%', maxWidth: '97vw', mx: 'auto', px: 2 }}>
+        <ProductCategories />
+      </Box>
+      <Box sx={{ p: 2, maxWidth: '97vw', mx: 'auto' }}>
         <Box
           sx={{
             display: 'flex',
@@ -475,7 +497,7 @@ const Product = () => {
                 </div>
               ))}
             </div>
-            <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4, mb: 2 , alignItems: 'center'}}>
+            <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4, mb: 2, alignItems: 'center' }}>
               <Pagination
                 count={totalPages}
                 page={page}

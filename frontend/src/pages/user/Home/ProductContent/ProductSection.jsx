@@ -209,7 +209,7 @@ const ProductSection = ({
                   left: screenSize === 'mobile' ? 20 : 10
                 }}
               >
-                <h2
+                {/* <h2
                   style={{
                     ...styles.bannerTitle,
                     fontSize: screenSize === 'mobile' ? 24 : 35,
@@ -217,7 +217,7 @@ const ProductSection = ({
                   }}
                 >
                   {bannerTitle || 'Danh mục sản phẩm'}
-                </h2>
+                </h2> */}
                 {bannerDesc && (
                   <p
                     style={{

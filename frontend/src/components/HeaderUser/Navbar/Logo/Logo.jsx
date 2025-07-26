@@ -60,15 +60,15 @@ const Logo = () => {
         }}
       >
         <LogoImage
-  src={optimizeCloudinaryUrl(logoData.imageUrl, {
-    width: 400,        // gấp đôi so với kích thước hiển thị
-    height: 80,
-    quality: 'auto',
-    format: 'auto'
-  })}
-  style={{ width: 200, height: 40 }} // hoặc trong styled component
-  alt={logoData.alt || 'Logo'}
-/>
+          src={optimizeCloudinaryUrl(logoData.imageUrl, {
+            width: 400,        // gấp đôi so với kích thước hiển thị
+            height: 80,
+            quality: 'auto',
+            format: 'auto'
+          })}
+          style={{ width: 200, height: 40 }} // hoặc trong styled component
+          alt={logoData.alt || 'Logo'}
+        />
 
       </Box>
     )

@@ -151,12 +151,9 @@ const Menu = ({ headerRef }) => {
       // Thêm các menu từ config nếu có
       ...(menuConfig?.mainMenu
         ? menuConfig.mainMenu
-            .filter(
-              (item) =>
-                item.visible && (!item.children || item.children.length === 0)
-            )
-            .sort((a, b) => (a.order || 0) - (b.order || 0))
-            .map((item) => ({ label: item.label, url: item.url }))
+          .filter(item => item.visible && (!item.children || item.children.length === 0))
+          .sort((a, b) => (a.order || 0) - (b.order || 0))
+          .map(item => ({ label: item.label, url: item.url }))
         : []),
       // Thêm các danh mục parent thực sự có children có sản phẩm
       ...parentCategories.map((cat) => ({
@@ -318,12 +315,10 @@ const Menu = ({ headerRef }) => {
     if (!parentCategory || !parentCategory._id) {
       return []
     }
-    return categories.filter(
-      (cat) =>
-        !cat.destroy &&
-        cat.parent &&
-        (typeof cat.parent === 'object' ? cat.parent._id : cat.parent) ===
-          parentCategory._id
+    return categories.filter(cat =>
+      !cat.destroy &&
+      cat.parent &&
+      (typeof cat.parent === 'object' ? cat.parent._id : cat.parent) === parentCategory._id
     )
   }
 
@@ -466,10 +461,8 @@ const Menu = ({ headerRef }) => {
                     <StyledButton
                       href={item.url}
                       active={
-                        (item.hasMegaMenu &&
-                          (productMenuOpen || isDrawerHovered)) ||
-                        (item.category &&
-                          hoveredCategory?._id === item.category._id)
+                        (item.hasMegaMenu && (productMenuOpen || isDrawerHovered)) ||
+                          (item.category && hoveredCategory?._id === item.category._id)
                           ? true
                           : undefined
                       }
@@ -492,18 +485,13 @@ const Menu = ({ headerRef }) => {
                       sx={{
                         position: 'absolute',
                         top: '100%',
-                        left: '50%',
+                        left: 0,
                         marginTop: '15px',
-                        transform:
-                          hoveredCategory?._id === item.category._id
-                            ? 'translateX(-50%) translateY(0) scaleY(1)'
-                            : 'translateX(-50%) translateY(-10px) scaleY(0.95)',
-                        opacity:
-                          hoveredCategory?._id === item.category._id ? 1 : 0,
-                        pointerEvents:
-                          hoveredCategory?._id === item.category._id
-                            ? 'auto'
-                            : 'none',
+                        transform: hoveredCategory?._id === item.category._id
+                          ? 'translateY(0) scaleY(1)'
+                          : 'translateY(-10px) scaleY(0.95)',
+                        opacity: hoveredCategory?._id === item.category._id ? 1 : 0,
+                        pointerEvents: hoveredCategory?._id === item.category._id ? 'auto' : 'none',
                         bgcolor: 'white',
                         boxShadow: '0px 8px 32px rgba(0, 0, 0, 0.12)',
                         minWidth: 200,
@@ -511,13 +499,13 @@ const Menu = ({ headerRef }) => {
                         zIndex: 1500,
                         border: '1px solid #e2e8f0',
                         transition: 'opacity 0.3s ease, transform 0.3s ease',
-                        transformOrigin: 'top center',
+                        transformOrigin: 'top left',
                         '&::before': {
                           content: '""',
                           position: 'absolute',
                           top: '-5px',
-                          left: '50%',
-                          transform: 'translateX(-50%)',
+                          left: '20px',
+                          transform: 'none',
                           width: '20px',
                           height: '5px',
                           background: 'transparent'
@@ -805,6 +793,7 @@ const Menu = ({ headerRef }) => {
                       display: 'flex',
                       flexDirection: 'column',
                       gap: 1,
+                      alignItems: 'start',
                       textAlign: 'start',
                       width:
                         megamenuSettings.columnWidth === 'auto'

@@ -11,7 +11,7 @@ const UserHome = () => {
     <>
       <Slider />
       <Contact />
-      <ChatBot />
+      {/* <ChatBot /> */}
       <Content />
       <ProductContent />
       <BlogHome />

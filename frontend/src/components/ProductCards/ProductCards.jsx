@@ -133,23 +133,13 @@ const ProductCard = ({ product, isFlashSale = false }) => {
             {product.name}
           </h3>
           <div style={styles.priceRow}>
-            {isFlashSale && product.flashPrice ? (
+            {priceInfo.originalDiscountPrice > 0 ? (
               <>
                 <span style={styles.flashSalePrice}>
-                  {product.flashPrice.toLocaleString('vi-VN')}₫
+                  {priceInfo.discountPrice.toLocaleString('vi-VN')}₫
                 </span>
                 <span style={styles.originalPrice}>
-                  {product.exportPrice.toLocaleString('vi-VN')}₫
-                </span>
-                <span style={styles.flashSaleBadge}>Flash Sale</span>
-              </>
-            ) : priceInfo.originalDiscountPrice > 0 ? (
-              <>
-                <span style={styles.currentPrice}>
-                  {priceInfo.discountPrice.toLocaleString()}₫
-                </span>
-                <span style={styles.originalPrice}>
-                  {priceInfo.price.toLocaleString()}₫
+                  {priceInfo.price.toLocaleString('vi-VN')}₫
                 </span>
                 <span style={styles.discountBadge}>
                   -
@@ -322,7 +312,7 @@ const styles = {
     fontWeight: '500'
   },
   flashSalePrice: {
-    fontSize: '22px',
+    fontSize: '18px',
     fontWeight: '900',
     color: '#e53935',
     marginRight: '8px'

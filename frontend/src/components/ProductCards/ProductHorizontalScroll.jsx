@@ -2,8 +2,9 @@ import React, { useState, useEffect } from 'react'
 import ProductCard from './ProductCards'
 
 const ProductHorizontalScroll = ({ products = [], defaultCardsPerRow = 5, gap = 20 }) => {
-  const [startIdx, setStartIdx] = useState(0)
+  const [showAll, setShowAll] = useState(false)
   const [windowWidth, setWindowWidth] = useState(window.innerWidth)
+  const [initialDisplayCount, setInitialDisplayCount] = useState(5) // Hiển thị 10 sản phẩm ban đầu (2 hàng)
 
   // Theo dõi chiều rộng màn hình
   useEffect(() => {
@@ -32,140 +33,112 @@ const ProductHorizontalScroll = ({ products = [], defaultCardsPerRow = 5, gap = 
       return 3
     }
     if (windowWidth > 600) {
-      return 2 // 3 cards on tablet
+      return 2 // 2 cards on tablet
     }
-    return 2 // 2 cards on mobile (like the reference image)
+    return 2 // 2 cards on mobile
   }
 
   const cardsPerRow = getCardsPerRow()
 
-  // Xử lý khi resize làm index bị lỗi
+  // Cập nhật số lượng hiển thị ban đầu dựa trên cardsPerRow
   useEffect(() => {
-    if (startIdx + cardsPerRow > newProducts.length) {
-      setStartIdx(Math.max(0, newProducts.length - cardsPerRow))
-    }
-  }, [windowWidth, newProducts.length, cardsPerRow, startIdx])
+    setInitialDisplayCount(cardsPerRow * 1 ) // Hiển thị 2 hàng ban đầu
+  }, [cardsPerRow])
 
-  const handleNext = () => {
-    if (startIdx + cardsPerRow < newProducts.length) {
-      setStartIdx(startIdx + 1)
-    }
-  }
-  const handlePrev = () => {
-    if (startIdx > 0) {
-      setStartIdx(startIdx - 1)
-    }
+  // Xác định số sản phẩm hiển thị
+  const displayCount = showAll ? newProducts.length : initialDisplayCount
+  const visibleProducts = newProducts.slice(0, displayCount)
+
+  const handleShowMore = () => {
+    setShowAll(true)
   }
 
-  const visibleProducts = newProducts.slice(startIdx, startIdx + cardsPerRow)
+  const handleShowLess = () => {
+    setShowAll(false)
+  }
+
+  // Nếu không có sản phẩm mới, ẩn component hoàn toàn
+  if (newProducts.length === 0) {
+    return null
+  }
 
   return (
-    <div className='slide-container'>
-      {products.length > cardsPerRow && (
-        <button
-          className={`scroll-btn left${startIdx === 0 ? ' disabled' : ''}`}
-          onClick={handlePrev}
-          disabled={startIdx === 0}
-          aria-label='Cuộn trái'
-        >
-          {'<'}
-        </button>
-      )}
-      <div className='slide-list'>
-        <div
-          className='slide-track'
-          style={{
-            display: 'flex',
-            gap: gap,
-            transform: `translateX(0)`,
-            transition: 'transform 0.4s cubic-bezier(.4,1.3,.6,1)',
-            width: '100%'
-          }}
-        >
-          {visibleProducts.map((product) => (
-            <div
-              key={product._id || product.id}
-              className='slide-item'
-              style={{ flex: `0 0 calc((100% - ${(cardsPerRow - 1) * gap}px) / ${cardsPerRow})`, maxWidth: `calc((100% - ${(cardsPerRow - 1) * gap}px) / ${cardsPerRow})` }}
-            >
-              <ProductCard product={product} style={{ width: '100%' }} />
-            </div>
-          ))}
-        </div>
+    <div className='products-grid-container'>
+      <div className='products-grid'>
+        {visibleProducts.map((product) => (
+          <div
+            key={product._id || product.id}
+            className='product-item'
+          >
+            <ProductCard product={product} />
+          </div>
+        ))}
       </div>
-      {products.length > cardsPerRow && (
-        <button
-          className={`scroll-btn right${startIdx + cardsPerRow >= products.length ? ' disabled' : ''}`}
-          onClick={handleNext}
-          disabled={startIdx + cardsPerRow >= products.length}
-          aria-label='Cuộn phải'
-        >
-          {'>'}
-        </button>
-      )}
       <style>{`
-        .slide-container {
+        .products-grid-container {
+          width: 95vw;
+        }
+        
+        .products-grid {
+          display: grid;
+          grid-template-columns: repeat(${cardsPerRow}, 1fr);
+          gap: ${gap}px;
+          margin-bottom: 20px;
+        }
+        
+        .product-item {
           width: 100%;
-          padding: 0 0 24px 0;
+        }
+        
+        .show-more-container {
           display: flex;
-          align-items: center;
-          gap: 10px;
-          position: relative;
-        }
-        .slide-list {
-          flex: 1;
-          overflow: hidden;
-          padding: 0 36px;
-        }
-        .slide-track {
-          display: flex;
-          width: 100%;
-          transition: transform 0.4s cubic-bezier(.4,1.3,.6,1);
-        }
-        .slide-item {
-          box-sizing: border-box;
-          transition: flex 0.3s ease, max-width 0.3s ease;
-        }
-        .scroll-btn {
-          position: absolute;
-          top: 50%;
-          transform: translateY(-50%);
-          z-index: 3;
-          background: rgba(255,255,255,0.7);
-          color: var(--primary-color);
-          border: none;
-          border-radius: 50%;
-          width: 44px;
-          height: 44px;
-          font-size: 28px;
-          cursor: pointer;
-          transition: all 0.2s;
-          box-shadow: 0 2px 8px rgba(59,130,246,0.13);
-          display: flex;
-          align-items: center;
           justify-content: center;
-          backdrop-filter: blur(4px);
-          opacity: 1;
+          margin-top: 20px;
         }
-        .scroll-btn.left { left: 0; }
-        .scroll-btn.right { right: 0; }
-        .scroll-btn:disabled,
-        .scroll-btn.disabled {
-          opacity: 0;
-          pointer-events: none;
+        
+        .show-more-btn {
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          color: white;
+          border: none;
+          padding: 12px 24px;
+          border-radius: 25px;
+          font-size: 16px;
+          font-weight: 600;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
         }
-        .scroll-btn:hover:not(:disabled) {
-          background: rgba(255,255,255,0.95);
-          color: var(--accent-color);
+        
+        .show-more-btn:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
         }
-        @media (max-width: 600px) {
-          .scroll-btn {
-            width: 36px;
-            height: 36px;
-            font-size: 22px;
+        
+        .show-more-btn:active {
+          transform: translateY(0);
+        }
+        
+        @media (max-width: 1300px) {
+          .products-grid {
+            grid-template-columns: repeat(3, 1fr);
           }
-           .slide-list {
-            padding: 0 12px;
+        }
+        
+        @media (max-width: 900px) {
+          .products-grid {
+            grid-template-columns: repeat(2, 1fr);
+          }
+        }
+        
+        @media (max-width: 600px) {
+          .products-grid {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+          }
+          
+          .show-more-btn {
+            padding: 10px 20px;
+            font-size: 14px;
           }
         }
       `}</style>
