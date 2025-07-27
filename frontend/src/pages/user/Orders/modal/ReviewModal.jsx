@@ -45,7 +45,6 @@ const uploadToCloudinary = async (file, folder = CloudinaryImageFolder) => {
   const isVideo = file.type.startsWith('video/')
   const resourceType = isVideo ? 'video' : 'image'
 
-  // Tạo URL động theo loại file
   const uploadURL = `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/${resourceType}/upload`
 
   console.log('Uploading to Cloudinary:', {
@@ -74,14 +73,10 @@ const uploadToCloudinary = async (file, folder = CloudinaryImageFolder) => {
   return data.secure_url
 }
 
-// Function to generate video thumbnail from Cloudinary URL
 const getVideoThumbnail = (videoUrl) => {
   if (!videoUrl) return null
-  // Convert video URL to thumbnail URL
-  // Example: https://res.cloudinary.com/demo/video/upload/v1234/folder/video.mp4
-  // To: https://res.cloudinary.com/demo/video/upload/so_0,w_200,h_120,c_fill,f_jpg/v1234/folder/video.jpg
   return videoUrl
-    .replace('/video/upload/', '/video/upload/so_0,w_200,h_120,c_fill,f_jpg/')
+    .replace('/video/upload/', '/video/upload/so_0,w_200,h_150,c_fill,f_jpg/')
     .replace(/\.(mp4|webm|ogg)$/, '.jpg')
 }
 
@@ -99,7 +94,7 @@ const ReviewModal = ({
   const [images, setImages] = useState([])
   const [videos, setVideos] = useState([])
   const [uploading, setUploading] = useState(false)
-  const [submitting, setSubmitting] = useState(false) // State for submit loading
+  const [submitting, setSubmitting] = useState(false)
   const [snackbar, setSnackbar] = useState({
     open: false,
     message: '',
@@ -108,7 +103,6 @@ const ReviewModal = ({
   const inputRef = useRef(null)
   const imageInputRef = useRef(null)
   const videoInputRef = useRef(null)
-
 
   const capitalizeFirstLetter = (str) => {
     if (!str) return ''
@@ -119,15 +113,14 @@ const ReviewModal = ({
     if (!str) return ''
     return str.toUpperCase()
   }
-  // Constants for file limits
+
   const MAX_IMAGES = 5
   const MAX_VIDEOS = 2
-  const MAX_IMAGE_SIZE = 5 * 1024 * 1024 // 5MB
-  const MAX_VIDEO_SIZE = 10 * 1024 * 1024 // 50MB
+  const MAX_IMAGE_SIZE = 5 * 1024 * 1024
+  const MAX_VIDEO_SIZE = 10 * 1024 * 1024
   const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp']
   const ALLOWED_VIDEO_TYPES = ['video/mp4', 'video/webm', 'video/ogg']
 
-  // Snackbar helper function
   const showSnackbar = (message, severity = 'info') => {
     setSnackbar({ open: true, message, severity })
   }
@@ -145,17 +138,15 @@ const ReviewModal = ({
       setImages([])
       setVideos([])
       setUploading(false)
-      setSubmitting(false) // Reset submit loading
+      setSubmitting(false)
       setSnackbar({ open: false, message: '', severity: 'info' })
     }
   }, [open])
 
-  // Handle comment change
   const handleCommentChange = (e) => {
     setComment(e.target.value)
   }
 
-  // Handle image upload
   const handleImageUpload = async (event) => {
     const files = Array.from(event.target.files)
 
@@ -187,27 +178,23 @@ const ReviewModal = ({
     setUploading(true)
 
     try {
-      // Upload từng file lên Cloudinary
       const uploadPromises = validFiles.map(async (file) => {
         try {
-          // Tạo preview trước
           const preview = await new Promise((resolve) => {
             const reader = new FileReader()
             reader.onload = (e) => resolve(e.target.result)
             reader.readAsDataURL(file)
           })
 
-          // Upload lên Cloudinary
           const cloudinaryUrl = await uploadToCloudinary(
             file,
             CloudinaryImageFolder
           )
 
-          // Thêm vào danh sách với URL từ Cloudinary
           const newImage = {
             id: Date.now() + Math.random(),
             url: cloudinaryUrl,
-            preview: preview, // Giữ preview để hiển thị ngay
+            preview: preview,
             name: file.name,
             size: file.size
           }
@@ -246,11 +233,9 @@ const ReviewModal = ({
       setUploading(false)
     }
 
-    // Reset input
     event.target.value = ''
   }
 
-  // Handle video upload
   const handleVideoUpload = async (event) => {
     const files = Array.from(event.target.files)
 
@@ -282,16 +267,13 @@ const ReviewModal = ({
     setUploading(true)
 
     try {
-      // Upload từng file lên Cloudinary
       const uploadPromises = validFiles.map(async (file) => {
         try {
-          // Upload lên Cloudinary
           const cloudinaryUrl = await uploadToCloudinary(
             file,
             CloudinaryVideoFolder
           )
 
-          // Thêm vào danh sách với URL từ Cloudinary
           const newVideo = {
             id: Date.now() + Math.random(),
             url: cloudinaryUrl,
@@ -333,21 +315,17 @@ const ReviewModal = ({
       setUploading(false)
     }
 
-    // Reset input
     event.target.value = ''
   }
 
-  // Remove image
   const removeImage = (id) => {
     setImages((prev) => prev.filter((img) => img.id !== id))
   }
 
-  // Remove video
   const removeVideo = (id) => {
     setVideos((prev) => prev.filter((vid) => vid.id !== id))
   }
 
-  // Format file size
   const formatFileSize = (bytes) => {
     if (bytes === 0) return '0 Bytes'
     const k = 1024
@@ -388,26 +366,25 @@ const ReviewModal = ({
       fullWidth
       PaperProps={{
         sx: {
-          maxHeight: { xs: '70vh', sm: '80vh', md: '70vh' }, // Responsive maxHeight
-          width: { xs: '95%', sm: '90%', md: '80%' }, // Responsive width
-          m: { xs: 1, sm: 2 }, // Margin nhỏ hơn trên mobile
+          maxHeight: { xs: '80vh', sm: '85vh', md: '90vh' },
+          width: { xs: '95%', sm: '90%', md: '80%' },
+          m: { xs: 1, sm: 2 },
         }
       }}
     >
       <DialogTitle sx={{
         fontWeight: 'bold',
-        fontSize: { xs: '1.2rem', sm: '1.4rem' }, // Giảm font size trên mobile
+        fontSize: { xs: '1.1rem', sm: '1.3rem', md: '1.5rem' },
         pb: 1
       }}>
         Đánh Giá Sản Phẩm
       </DialogTitle>
 
-      <DialogContent sx={{ p: { xs: 2, sm: 3 } }}> {/* Giảm padding trên mobile */}
-        {/* Product Display */}
+      <DialogContent sx={{ p: { xs: 2, sm: 3, md: 4 } }}>
         {orderItems?.length > 0 && (
           <Box
             sx={{
-              maxHeight: { xs: 150, sm: 200 }, // Giảm chiều cao trên mobile
+              maxHeight: { xs: 120, sm: 160, md: 200 },
               overflowY: 'auto',
               mb: 2,
               pr: 1
@@ -422,7 +399,7 @@ const ReviewModal = ({
                   gap: 1.5,
                   backgroundColor: 'grey.50',
                   borderRadius: 2,
-                  p: { xs: 1, sm: 2 }, // Giảm padding trên mobile
+                  p: { xs: 1, sm: 1.5, md: 2 },
                   mb: 1,
                   border: '1px solid',
                   borderColor: 'grey.200'
@@ -432,25 +409,25 @@ const ReviewModal = ({
                   src={
                     item?.color?.image
                       ? optimizeCloudinaryUrl(item.color.image, {
-                        width: 48, // Giảm kích thước ảnh trên mobile
+                        width: 48,
                         height: 48
                       })
                       : '/default.jpg'
                   }
                   variant='rounded'
-                  sx={{ width: { xs: 48, sm: 64 }, height: { xs: 48, sm: 64 } }}
+                  sx={{ width: { xs: 40, sm: 48, md: 56 }, height: { xs: 40, sm: 48, md: 56 } }}
                 />
                 <Box>
                   <Typography
                     fontWeight={600}
-                    fontSize={{ xs: '0.9rem', sm: '1rem' }} // Giảm font size
+                    fontSize={{ xs: '0.85rem', sm: '0.95rem', md: '1rem' }}
                   >
                     {capitalizeFirstLetter(item?.name) || 'Sản phẩm'}
                   </Typography>
                   <Typography
                     variant="body2"
                     color="text.secondary"
-                    sx={{ mb: 0.5, fontSize: { xs: '0.8rem', sm: '0.875rem' } }}
+                    sx={{ mb: 0.5, fontSize: { xs: '0.75rem', sm: '0.85rem', md: '0.875rem' } }}
                   >
                     Phân loại hàng: {capitalizeFirstLetter(item.color?.name)}, {formatSize(item.size)}
                   </Typography>
@@ -458,7 +435,7 @@ const ReviewModal = ({
                     label={`Số lượng: ${item.quantity}`}
                     size="small"
                     variant="outlined"
-                    sx={{ fontSize: { xs: '0.65rem', sm: '0.7rem' }, height: 18 }}
+                    sx={{ fontSize: { xs: '0.6rem', sm: '0.65rem', md: '0.7rem' }, height: { xs: 16, sm: 18 } }}
                   />
                 </Box>
               </Box>
@@ -468,14 +445,13 @@ const ReviewModal = ({
 
         <Divider sx={{ mb: 2 }} />
 
-        {/* Rating Section */}
         <Box mb={2}>
           <Typography
             variant='h6'
             fontWeight='600'
             color='var(--primary-color)'
             gutterBottom
-            fontSize={{ xs: '1rem', sm: '1.25rem' }}
+            fontSize={{ xs: '0.95rem', sm: '1.1rem', md: '1.25rem' }}
           >
             Chất lượng sản phẩm
           </Typography>
@@ -488,20 +464,19 @@ const ReviewModal = ({
           <Typography
             variant='body2'
             color='text.secondary'
-            fontSize={{ xs: '0.8rem', sm: '0.875rem' }}
+            fontSize={{ xs: '0.75rem', sm: '0.85rem', md: '0.875rem' }}
           >
             Vui lòng đánh giá từ 1-5 sao
           </Typography>
         </Box>
 
-        {/* Comment Section */}
         <Box mb={2}>
           <Typography
             variant='h6'
             fontWeight='600'
             color='var(--primary-color)'
             gutterBottom
-            fontSize={{ xs: '1rem', sm: '1.25rem' }}
+            fontSize={{ xs: '0.95rem', sm: '1.1rem', md: '1.25rem' }}
           >
             Nhận xét của bạn
           </Typography>
@@ -516,40 +491,37 @@ const ReviewModal = ({
             variant='outlined'
             helperText={`${comment.length}/500 ký tự`}
             inputProps={{ maxLength: 500 }}
-            sx={{ fontSize: { xs: '0.9rem', sm: '1rem' } }}
+            sx={{ fontSize: { xs: '0.85rem', sm: '0.95rem', md: '1rem' } }}
           />
         </Box>
 
-        {/* Media Upload Section */}
         <Box>
           <Typography
             variant='h6'
             fontWeight='600'
             color='var(--primary-color)'
             gutterBottom
-            fontSize={{ xs: '1rem', sm: '1.25rem' }}
+            fontSize={{ xs: '0.95rem', sm: '1.1rem', md: '1.25rem' }}
           >
             Thêm ảnh và video (không bắt buộc)
           </Typography>
 
-          {/* Upload Progress */}
           {uploading && (
             <Box mb={2}>
               <LinearProgress />
               <Typography
                 variant='caption'
                 color='text.secondary'
-                fontSize={{ xs: '0.75rem', sm: '0.875rem' }}
+                fontSize={{ xs: '0.7rem', sm: '0.8rem', md: '0.875rem' }}
               >
                 Đang tải lên...
               </Typography>
             </Box>
           )}
 
-          {/* Upload Buttons */}
           <Stack
-            direction={{ xs: 'column', sm: 'row' }} // Stack dọc trên mobile
-            spacing={2}
+            direction={{ xs: 'column', sm: 'row' }}
+            spacing={1.5}
             mb={2}
           >
             <input
@@ -577,7 +549,8 @@ const ReviewModal = ({
                 disabled={images.length >= MAX_IMAGES || uploading}
                 sx={{
                   textTransform: 'none',
-                  fontSize: { xs: '0.8rem', sm: '0.875rem' }
+                  fontSize: { xs: '0.75rem', sm: '0.85rem', md: '0.875rem' },
+                  ml: { xs: 0, sm: 1 }
                 }}
               >
                 Thêm ảnh ({images.length}/{MAX_IMAGES})
@@ -592,7 +565,7 @@ const ReviewModal = ({
                 disabled={videos.length >= MAX_VIDEOS || uploading}
                 sx={{
                   textTransform: 'none',
-                  fontSize: { xs: '0.8rem', sm: '0.875rem' }
+                  fontSize: { xs: '0.75rem', sm: '0.85rem', md: '0.875rem' }
                 }}
               >
                 Thêm video ({videos.length}/{MAX_VIDEOS})
@@ -600,32 +573,30 @@ const ReviewModal = ({
             </Tooltip>
           </Stack>
 
-          {/* Media Preview */}
-          <Grid container spacing={1.5}> {/* Giảm spacing trên mobile */}
-            {/* Images */}
+          <Grid container spacing={{ xs: 1, sm: 1.5, md: 2 }} sx={{ justifyContent: { xs: 'center', sm: 'flex-start' } }}>
             {images.map((image) => (
               <Grid item xs={6} sm={4} md={3} key={image.id}>
                 <Card sx={{
                   position: 'relative',
-                  width: { xs: '100%', sm: 180 } // Full width trên mobile
+                  width: '100%',
+                  aspectRatio: '4 / 3',
+                  maxWidth: { xs: '150px', sm: '180px', md: '200px' }
                 }}>
                   <CardMedia
                     component='img'
-                    width='100%'
-                    height={{ xs: 100, sm: 120 }} // Giảm chiều cao trên mobile
                     image={
                       image.url
                         ? optimizeCloudinaryUrl(image.url, {
-                          width: 180,
-                          height: 120
+                          width: 200,
+                          height: 150
                         })
                         : image.preview
                     }
                     alt={image.name}
                     sx={{
-                      objectFit: 'cover',
                       width: '100%',
-                      height: { xs: 100, sm: 120 }
+                      height: '100%',
+                      objectFit: 'cover'
                     }}
                   />
                   <IconButton
@@ -645,7 +616,7 @@ const ReviewModal = ({
                     <Typography
                       variant='caption'
                       noWrap
-                      fontSize={{ xs: '0.75rem', sm: '0.875rem' }}
+                      fontSize={{ xs: '0.7rem', sm: '0.8rem', md: '0.875rem' }}
                     >
                       {image.name}
                     </Typography>
@@ -653,7 +624,7 @@ const ReviewModal = ({
                       variant='caption'
                       display='block'
                       color='text.secondary'
-                      fontSize={{ xs: '0.75rem', sm: '0.875rem' }}
+                      fontSize={{ xs: '0.7rem', sm: '0.8rem', md: '0.875rem' }}
                     >
                       {formatFileSize(image.size)}
                     </Typography>
@@ -662,42 +633,39 @@ const ReviewModal = ({
               </Grid>
             ))}
 
-            {/* Videos */}
             {videos.map((video) => (
               <Grid item xs={6} sm={4} md={3} key={video.id}>
                 <Card sx={{
                   position: 'relative',
-                  width: { xs: '100%', sm: 180 }
+                  width: '100%',
+                  aspectRatio: '4 / 3',
+                  maxWidth: { xs: '150px', sm: '180px', md: '200px' }
                 }}>
                   {video.url ? (
                     <CardMedia
-                      component='img'
-                      width='100%'
-                      height={{ xs: 100, sm: 120 }}
+                      component="img"
                       image={getVideoThumbnail(video.url)}
                       alt={video.name}
                       sx={{
-                        objectFit: 'cover',
-                        position: 'relative',
                         width: '100%',
-                        height: { xs: 100, sm: 120 }
+                        height: '100%',
+                        objectFit: 'cover'
                       }}
                     />
                   ) : (
                     <Box
                       sx={{
                         width: '100%',
-                        height: { xs: 100, sm: 120 },
+                        height: '100%',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        backgroundColor: 'grey.100'
+                        backgroundColor: 'grey.100',
                       }}
                     >
-                      <Videocam sx={{ fontSize: { xs: 32, sm: 40 }, color: 'grey.500' }} />
+                      <Videocam sx={{ fontSize: { xs: 28, sm: 32, md: 40 }, color: 'grey.500' }} />
                     </Box>
                   )}
-                  {/* Video play overlay */}
                   {video.url && (
                     <Box
                       sx={{
@@ -707,14 +675,14 @@ const ReviewModal = ({
                         transform: 'translate(-50%, -50%)',
                         backgroundColor: 'rgba(0,0,0,0.6)',
                         borderRadius: '50%',
-                        width: 40,
-                        height: 40,
+                        width: { xs: 32, sm: 36, md: 40 },
+                        height: { xs: 32, sm: 36, md: 40 },
                         display: 'flex',
                         alignItems: 'center',
-                        justifyContent: 'center'
+                        justifyContent: 'center',
                       }}
                     >
-                      <Videocam sx={{ fontSize: 24, color: 'white' }} />
+                      <Videocam sx={{ fontSize: { xs: 20, sm: 22, md: 24 }, color: 'white' }} />
                     </Box>
                   )}
                   <IconButton
@@ -734,7 +702,7 @@ const ReviewModal = ({
                     <Typography
                       variant='caption'
                       noWrap
-                      fontSize={{ xs: '0.75rem', sm: '0.875rem' }}
+                      fontSize={{ xs: '0.7rem', sm: '0.8rem', md: '0.875rem' }}
                     >
                       {video.name}
                     </Typography>
@@ -742,7 +710,7 @@ const ReviewModal = ({
                       variant='caption'
                       display='block'
                       color='text.secondary'
-                      fontSize={{ xs: '0.75rem', sm: '0.875rem' }}
+                      fontSize={{ xs: '0.7rem', sm: '0.8rem', md: '0.875rem' }}
                     >
                       {formatFileSize(video.size)}
                     </Typography>
@@ -752,38 +720,31 @@ const ReviewModal = ({
             ))}
           </Grid>
 
-          {/* Upload Guidelines */}
           <Alert severity='info' sx={{ mt: 2 }}>
             <Typography
-              variant='body2'
-              fontSize={{ xs: '0.8rem', sm: '0.875rem' }}
+              variant='subtitle2'
+              sx={{ fontWeight: 600, fontSize: { xs: '0.75rem', sm: '0.85rem', md: '0.875rem' }, mb: 1 }}
             >
-              <strong>Hướng dẫn:</strong>
+              Hướng dẫn:
             </Typography>
-            <ul
-              style={{
-                margin: '4px 0',
-                paddingLeft: '20px',
-                fontSize: { xs: '0.75rem', sm: '0.875rem' }
-              }}
-            >
+            <Box component="ul" sx={{ pl: 2, m: 0, fontSize: { xs: '0.7rem', sm: '0.8rem', md: '0.875rem' } }}>
               <li>Ảnh: JPG, PNG, WebP - Tối đa 5MB/ảnh</li>
               <li>Video: MP4, WebM, OGG - Tối đa 10MB/video</li>
               <li>Chỉ upload ảnh/video liên quan đến sản phẩm</li>
               <li>Không upload nội dung nhạy cảm hoặc vi phạm</li>
-            </ul>
+            </Box>
           </Alert>
         </Box>
       </DialogContent>
 
-      <DialogActions sx={{ px: { xs: 2, sm: 3 }, pb: 2, pt: 1 }}>
+      <DialogActions sx={{ px: { xs: 2, sm: 3, md: 4 }, pb: 2, pt: 1 }}>
         <Button
           onClick={onClose}
           color='inherit'
           variant='outlined'
           sx={{
             textTransform: 'none',
-            fontSize: { xs: '0.8rem', sm: '0.875rem' }
+            fontSize: { xs: '0.75rem', sm: '0.85rem', md: '0.875rem' }
           }}
         >
           Hủy bỏ
@@ -797,26 +758,25 @@ const ReviewModal = ({
           sx={{
             textTransform: 'none',
             fontWeight: 600,
-            fontSize: { xs: '0.8rem', sm: '0.875rem' }
+            fontSize: { xs: '0.75rem', sm: '0.85rem', md: '0.875rem' }
           }}
         >
           {submitting ? 'Đang gửi...' : uploading ? 'Đang tải...' : 'Gửi đánh giá'}
         </Button>
       </DialogActions>
 
-      {/* Snackbar for notifications */}
       <Snackbar
         open={snackbar.open}
         autoHideDuration={4000}
         onClose={handleCloseSnackbar}
         anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
-        sx={{ mt: { xs: 8, sm: 12 } }} // Điều chỉnh vị trí trên mobile
+        sx={{ mt: { xs: 6, sm: 8, md: 12 } }}
       >
         <Alert
           onClose={handleCloseSnackbar}
           severity={snackbar.severity}
           variant='filled'
-          sx={{ width: '100%', fontSize: { xs: '0.8rem', sm: '0.875rem' } }}
+          sx={{ width: '100%', fontSize: { xs: '0.75rem', sm: '0.85rem', md: '0.875rem' } }}
         >
           {snackbar.message}
         </Alert>

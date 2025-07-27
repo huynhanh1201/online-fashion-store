@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react'
 import {
   Dialog,
   DialogTitle,
@@ -12,22 +12,22 @@ import {
   IconButton,
   Autocomplete,
   CircularProgress,
-} from '@mui/material';
-import CloseIcon from '@mui/icons-material/Close';
+} from '@mui/material'
+import CloseIcon from '@mui/icons-material/Close'
 import {
   addShippingAddress,
   updateShippingAddress,
   getShippingAddresses,
-} from '~/services/addressService';
-import addressGHNService from '~/services/addressGHNService';
+} from '~/services/addressService'
+import addressGHNService from '~/services/addressGHNService'
 import {
   Person as PersonIcon,
   Phone as PhoneIcon,
   Edit as EditIcon,
   Add as AddIcon,
   Home as HomeIcon,
-} from '@mui/icons-material';
-import LocationOnIcon from '@mui/icons-material/LocationOn';
+} from '@mui/icons-material'
+import LocationOnIcon from '@mui/icons-material/LocationOn'
 
 export default function AddAddressModal({
   open,
@@ -37,9 +37,9 @@ export default function AddAddressModal({
   viewOnly = false,
   showSnackbar,
 }) {
-  const [provinces, setProvinces] = useState([]);
-  const [districts, setDistricts] = useState([]);
-  const [wards, setWards] = useState([]);
+  const [provinces, setProvinces] = useState([])
+  const [districts, setDistricts] = useState([])
+  const [wards, setWards] = useState([])
   const [formData, setFormData] = useState({
     fullName: '',
     phone: '',
@@ -47,7 +47,7 @@ export default function AddAddressModal({
     city: '',
     district: '',
     ward: '',
-  });
+  })
   const [formErrors, setFormErrors] = useState({
     fullName: false,
     phone: false,
@@ -55,63 +55,63 @@ export default function AddAddressModal({
     city: false,
     district: false,
     ward: false,
-  });
-  const [isCheckingDuplicate, setIsCheckingDuplicate] = useState(false);
+  })
+  const [isCheckingDuplicate, setIsCheckingDuplicate] = useState(false)
 
-  const isEditMode = !!addressToEdit;
+  const isEditMode = !!addressToEdit
 
   // Hàm kiểm tra trùng lặp địa chỉ
   const checkAddressDuplicate = async (addressData) => {
     try {
-      const { addresses } = await getShippingAddresses();
+      const { addresses } = await getShippingAddresses()
       const addressesToCheck = isEditMode
         ? addresses.filter((addr) => addr._id !== addressToEdit._id)
-        : addresses;
+        : addresses
 
       const isDuplicate = addressesToCheck.some((addr) => {
-        if (!addr || !addressData) return false;
+        if (!addr || !addressData) return false
 
         const isSameFullName =
           (addr.fullName || '').toLowerCase().trim() ===
-          (addressData.fullName || '').toLowerCase().trim();
-        const isSamePhone = (addr.phone || '').trim() === (addressData.phone || '').trim();
+          (addressData.fullName || '').toLowerCase().trim()
+        const isSamePhone = (addr.phone || '').trim() === (addressData.phone || '').trim()
         const isSameAddress =
           (addr.address || '').toLowerCase().trim() ===
-          (addressData.address || '').toLowerCase().trim();
+          (addressData.address || '').toLowerCase().trim()
         const isSameWard =
-          (addr.ward || '').toLowerCase().trim() === (addressData.ward || '').toLowerCase().trim();
+          (addr.ward || '').toLowerCase().trim() === (addressData.ward || '').toLowerCase().trim()
         const isSameDistrict =
           (addr.district || '').toLowerCase().trim() ===
-          (addressData.district || '').toLowerCase().trim();
+          (addressData.district || '').toLowerCase().trim()
         const isSameCity =
-          (addr.city || '').toLowerCase().trim() === (addressData.city || '').toLowerCase().trim();
+          (addr.city || '').toLowerCase().trim() === (addressData.city || '').toLowerCase().trim()
 
         return (
           (isSameFullName && isSamePhone && isSameAddress && isSameWard && isSameDistrict && isSameCity) ||
           (isSamePhone && isSameAddress && isSameWard && isSameDistrict && isSameCity)
-        );
-      });
+        )
+      })
 
-      return isDuplicate;
+      return isDuplicate
     } catch (error) {
-      console.error('Lỗi khi kiểm tra trùng lặp địa chỉ:', error);
-      return false;
+      console.error('Lỗi khi kiểm tra trùng lặp địa chỉ:', error)
+      return false
     }
-  };
+  }
 
   // Hàm xử lý thay đổi input
   const handleChange = (field) => (event) => {
-    const value = event.target.value;
-    setFormData((prev) => ({ ...prev, [field]: value }));
+    const value = event.target.value
+    setFormData((prev) => ({ ...prev, [field]: value }))
 
     if (field === 'city') {
-      setFormData((prev) => ({ ...prev, district: '', ward: '' }));
-      setDistricts([]);
-      setWards([]);
+      setFormData((prev) => ({ ...prev, district: '', ward: '' }))
+      setDistricts([])
+      setWards([])
     }
     if (field === 'district') {
-      setFormData((prev) => ({ ...prev, ward: '' }));
-      setWards([]);
+      setFormData((prev) => ({ ...prev, ward: '' }))
+      setWards([])
     }
 
     setFormErrors((prev) => ({
@@ -124,8 +124,8 @@ export default function AddAddressModal({
             : field === 'address'
               ? !value.trim() || value.trim().length < 5
               : !value,
-    }));
-  };
+    }))
+  }
 
   // Reset form khi mở Modal
   useEffect(() => {
@@ -137,7 +137,7 @@ export default function AddAddressModal({
         city: '',
         district: '',
         ward: '',
-      });
+      })
       setFormErrors({
         fullName: false,
         phone: false,
@@ -145,83 +145,83 @@ export default function AddAddressModal({
         city: false,
         district: false,
         ward: false,
-      });
-      setProvinces([]);
-      setDistricts([]);
-      setWards([]);
-      setIsCheckingDuplicate(false);
+      })
+      setProvinces([])
+      setDistricts([])
+      setWards([])
+      setIsCheckingDuplicate(false)
     }
-  }, [open, addressToEdit]);
+  }, [open, addressToEdit])
 
   // Gọi API tỉnh/thành khi Modal mở
   useEffect(() => {
-    if (!open) return;
+    if (!open) return
 
     const fetchProvinces = async () => {
       try {
-        const provinces = await addressGHNService.getProvinces();
-        setProvinces(provinces);
+        const provinces = await addressGHNService.getProvinces()
+        setProvinces(provinces)
       } catch (error) {
-        console.error('Lỗi khi tải tỉnh/thành:', error);
-        showSnackbar?.(error.message, 'error');
+        console.error('Lỗi khi tải tỉnh/thành:', error)
+        showSnackbar?.(error.message, 'error')
       }
-    };
+    }
 
-    fetchProvinces();
-  }, [open, showSnackbar]);
+    fetchProvinces()
+  }, [open, showSnackbar])
 
   // Gọi API quận/huyện khi tỉnh/thành thay đổi
   useEffect(() => {
     if (!formData.city) {
-      setDistricts([]);
-      setWards([]);
-      setFormData((prev) => ({ ...prev, district: '', ward: '' }));
-      return;
+      setDistricts([])
+      setWards([])
+      setFormData((prev) => ({ ...prev, district: '', ward: '' }))
+      return
     }
 
     const fetchDistricts = async () => {
       try {
-        const districts = await addressGHNService.getDistricts(formData.city);
-        setDistricts(districts); // Sửa lỗi từ setDistrict thành setDistricts
+        const districts = await addressGHNService.getDistricts(formData.city)
+        setDistricts(districts)    // Sửa lỗi từ setDistrict thành setDistricts
         if (!isEditMode) {
-          setFormData((prev) => ({ ...prev, district: '', ward: '' }));
+          setFormData((prev) => ({ ...prev, district: '', ward: '' }))
         }
       } catch (error) {
-        console.error('Lỗi khi tải quận/huyện:', error);
-        showSnackbar?.(error.message, 'error');
+        console.error('Lỗi khi tải quận/huyện:', error)
+        showSnackbar?.(error.message, 'error')
       }
-    };
+    }
 
-    fetchDistricts();
-  }, [formData.city, isEditMode, showSnackbar]);
+    fetchDistricts()
+  }, [formData.city, isEditMode, showSnackbar])
 
   // Gọi API phường/xã khi quận/huyện thay đổi
   useEffect(() => {
     if (!formData.district) {
-      setWards([]);
-      setFormData((prev) => ({ ...prev, ward: '' }));
-      return;
+      setWards([])
+      setFormData((prev) => ({ ...prev, ward: '' }))
+      return
     }
 
     const fetchWards = async () => {
       try {
-        const wards = await addressGHNService.getWards(formData.district);
-        setWards(wards);
+        const wards = await addressGHNService.getWards(formData.district)
+        setWards(wards)
         if (!isEditMode) {
-          setFormData((prev) => ({ ...prev, ward: '' }));
+          setFormData((prev) => ({ ...prev, ward: '' }))
         }
       } catch (error) {
-        console.error('Lỗi khi tải phường/xã:', error);
-        showSnackbar?.(error.message, 'error');
+        console.error('Lỗi khi tải phường/xã:', error)
+        showSnackbar?.(error.message, 'error')
       }
-    };
+    }
 
-    fetchWards();
-  }, [formData.district, isEditMode, showSnackbar]);
+    fetchWards()
+  }, [formData.district, isEditMode, showSnackbar])
 
   // Load dữ liệu khi chỉnh sửa
   useEffect(() => {
-    if (!open || !isEditMode || !addressToEdit || provinces.length === 0) return;
+    if (!open || !isEditMode || !addressToEdit || provinces.length === 0) return
 
     const loadLocationCodes = async () => {
       try {
@@ -230,33 +230,33 @@ export default function AddAddressModal({
           (p) =>
             p.name === addressToEdit.city ||
             String(p.code) === String(addressToEdit.city)
-        );
-        const cityCode = city?.code ? String(city.code) : '';
+        )
+        const cityCode = city?.code ? String(city.code) : ''
         if (!cityCode) {
-          throw new Error('Không tìm thấy tỉnh/thành');
+          throw new Error('Không tìm thấy tỉnh/thành')
         }
-        setFormData((prev) => ({ ...prev, city: cityCode }));
+        setFormData((prev) => ({ ...prev, city: cityCode }))
 
         // Gọi API quận/huyện
-        const districts = await addressGHNService.getDistricts(cityCode);
-        setDistricts(districts);
+        const districts = await addressGHNService.getDistricts(cityCode)
+        setDistricts(districts)
 
         // Tìm DistrictID từ district name hoặc code
         const district = districts.find(
           (d) =>
             d.name === addressToEdit.district ||
             String(d.code) === String(addressToEdit.district)
-        );
-        const districtCode = district?.code ? String(district.code) : '';
+        )
+        const districtCode = district?.code ? String(district.code) : ''
         if (!districtCode) {
-          console.error('District not found:', addressToEdit.district, districts);
-          throw new Error('Không tìm thấy quận/huyện');
+          console.error('District not found:', addressToEdit.district, districts)
+          throw new Error('Không tìm thấy quận/huyện')
         }
-        setFormData((prev) => ({ ...prev, district: districtCode }));
+        setFormData((prev) => ({ ...prev, district: districtCode }))
 
         // Gọi API phường/xã
-        const wards = await addressGHNService.getWards(districtCode);
-        setWards(wards);
+        const wards = await addressGHNService.getWards(districtCode)
+        setWards(wards)
 
         // Tìm WardCode từ ward name hoặc code
         if (addressToEdit.ward) {
@@ -264,10 +264,10 @@ export default function AddAddressModal({
             (w) =>
               w.name === addressToEdit.ward ||
               String(w.code) === String(addressToEdit.ward)
-          );
-          const wardCode = ward?.code ? String(ward.code) : '';
+          )
+          const wardCode = ward?.code ? String(ward.code) : ''
           if (!wardCode) {
-            console.error('Ward not found:', addressToEdit.ward, wards);
+            console.error('Ward not found:', addressToEdit.ward, wards)
           }
           setFormData((prev) => ({
             ...prev,
@@ -277,7 +277,7 @@ export default function AddAddressModal({
             city: cityCode,
             district: districtCode,
             ward: wardCode,
-          }));
+          }))
         } else {
           setFormData((prev) => ({
             ...prev,
@@ -287,7 +287,7 @@ export default function AddAddressModal({
             city: cityCode,
             district: districtCode,
             ward: '',
-          }));
+          }))
         }
 
         setFormErrors({
@@ -297,15 +297,15 @@ export default function AddAddressModal({
           city: false,
           district: false,
           ward: false,
-        });
+        })
       } catch (error) {
-        console.error('Lỗi khi tải thông tin địa chỉ:', error);
-        showSnackbar?.(error.message, 'error');
+        console.error('Lỗi khi tải thông tin địa chỉ:', error)
+        showSnackbar?.(error.message, 'error')
       }
-    };
+    }
 
-    loadLocationCodes();
-  }, [open, isEditMode, addressToEdit, provinces, showSnackbar]);
+    loadLocationCodes()
+  }, [open, isEditMode, addressToEdit, provinces, showSnackbar])
 
   // Xử lý submit
   const handleSubmit = async () => {
@@ -316,21 +316,21 @@ export default function AddAddressModal({
       city: !formData.city,
       district: !formData.district,
       ward: !formData.ward,
-    };
-    setFormErrors(errors);
+    }
+    setFormErrors(errors)
     if (Object.values(errors).some(Boolean)) {
-      showSnackbar?.('Vui lòng điền đầy đủ và đúng thông tin địa chỉ!', 'error');
-      return;
+      showSnackbar?.('Vui lòng điền đầy đủ và đúng thông tin địa chỉ!', 'error')
+      return
     }
 
     // Lấy tên và mã định danh từ các danh sách
-    const city = provinces.find((p) => p.code === formData.city);
-    const district = districts.find((d) => d.code === formData.district);
-    const ward = wards.find((w) => w.code === formData.ward);
+    const city = provinces.find((p) => p.code === formData.city)
+    const district = districts.find((d) => d.code === formData.district)
+    const ward = wards.find((w) => w.code === formData.ward)
 
-    const cityName = city?.name || '';
-    const districtName = district?.name || '';
-    const wardName = ward?.name || '';
+    const cityName = city?.name || ''
+    const districtName = district?.name || ''
+    const wardName = ward?.name || ''
 
     const addressData = {
       fullName: formData.fullName.trim(),
@@ -342,67 +342,79 @@ export default function AddAddressModal({
       districtId: formData.district, // Giữ nguyên chuỗi
       ward: wardName,
       wardId: formData.ward, // Giữ nguyên chuỗi
-    };
+    }
 
     // Kiểm tra dữ liệu hợp lệ
     if (!cityName || !districtName || !wardName || !formData.city || !formData.district || !formData.ward) {
-      console.error('Invalid address data:', addressData);
-      showSnackbar?.('Thông tin địa chỉ không hợp lệ! Vui lòng kiểm tra lại.', 'error');
-      return;
+      console.error('Invalid address data:', addressData)
+      showSnackbar?.('Thông tin địa chỉ không hợp lệ! Vui lòng kiểm tra lại.', 'error')
+      return
     }
 
-    console.log('Submitting addressData:', addressData);
+    console.log('Submitting addressData:', addressData)
 
-    setIsCheckingDuplicate(true);
-    const isDuplicate = await checkAddressDuplicate(addressData);
-    setIsCheckingDuplicate(false);
+    setIsCheckingDuplicate(true)
+    const isDuplicate = await checkAddressDuplicate(addressData)
+    setIsCheckingDuplicate(false)
 
     if (isDuplicate) {
       showSnackbar?.(
         'Địa chỉ đã tồn tại! Vui lòng kiểm tra lại thông tin hoặc chọn địa chỉ khác.',
         'error'
-      );
-      return;
+      )
+      return
     }
 
     try {
       if (isEditMode) {
-        const updated = await updateShippingAddress(addressToEdit._id, addressData);
-        console.log('Update response:', updated);
+        const updated = await updateShippingAddress(addressToEdit._id, addressData)
+        console.log('Update response:', updated)
         if (updated && updated._id) {
-          showSnackbar?.('Sửa địa chỉ thành công!');
-          onSuccess?.({ ...addressData, _id: addressToEdit._id });
-          onClose();
+          showSnackbar?.('Sửa địa chỉ thành công!')
+          onSuccess?.({ ...addressData, _id: addressToEdit._id })
+          onClose()
         } else {
-          showSnackbar?.('Không thể sửa địa chỉ!', 'error');
+          showSnackbar?.('Không thể sửa địa chỉ!', 'error')
         }
       } else {
-        const added = await addShippingAddress(addressData);
-        console.log('Add response:', added);
+        const added = await addShippingAddress(addressData)
+        console.log('Add response:', added)
         if (added && added._id) {
-          showSnackbar?.('Thêm địa chỉ thành công!');
-          onSuccess?.(added);
-          onClose();
+          showSnackbar?.('Thêm địa chỉ thành công!')
+          onSuccess?.(added)
+          onClose()
         } else {
-          showSnackbar?.('Không thể thêm địa chỉ!', 'error');
+          showSnackbar?.('Không thể thêm địa chỉ!', 'error')
         }
       }
     } catch (error) {
-      console.error('API error:', error.response?.data || error.message);
+      console.error('API error:', error.response?.data || error.message)
       const errorMessage =
-        error.response?.data?.message || error.message || 'Không thể xử lý địa chỉ!';
-      showSnackbar?.(`Lỗi: ${errorMessage}`, 'error');
+        error.response?.data?.message || error.message || 'Không thể xử lý địa chỉ!'
+      showSnackbar?.(`Lỗi: ${errorMessage}`, 'error')
     } finally {
-      setIsCheckingDuplicate(false);
+      setIsCheckingDuplicate(false)
     }
-  };
+  }
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
-      <DialogTitle sx={{ m: 0, p: 2 }}>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, color: 'var(--primary-color)' }}>
-          <LocationOnIcon sx={{ color: 'var(--primary-color)' }} />
-          <Typography variant="h6">
+    <Dialog
+      open={open}
+      onClose={onClose}
+      maxWidth="sm"
+      fullWidth
+      PaperProps={{
+        sx: {
+          margin: { xs: 1, sm: 3 },
+          maxHeight: { xs: '95vh', sm: '90vh' },
+          borderRadius: { xs: 2, sm: 3 }
+        }
+      }}
+    >
+      <DialogTitle sx={{ m: 0, p: { xs: 1.5, sm: 2 } }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 0.5, sm: 1 }, color: 'var(--primary-color)' }}>
+          <LocationOnIcon sx={{ color: 'var(--primary-color)', fontSize: { xs: 20, sm: 24 } }} />
+          <Typography variant="h6" sx={{ fontSize: { xs: '1.1rem', sm: '1.25rem' } }}>
             {viewOnly ? 'Xem địa chỉ' : isEditMode ? 'Chỉnh sửa địa chỉ' : 'Thêm địa chỉ mới'}
           </Typography>
         </Box>
@@ -411,16 +423,17 @@ export default function AddAddressModal({
           onClick={onClose}
           sx={{
             position: 'absolute',
-            right: 8,
-            top: 8,
+            right: { xs: 4, sm: 8 },
+            top: { xs: 4, sm: 8 },
             color: (theme) => theme.palette.grey[500],
+            padding: { xs: 0.5, sm: 1 }
           }}
         >
           <CloseIcon />
         </IconButton>
       </DialogTitle>
       <Divider />
-      <DialogContent dividers>
+      <DialogContent dividers sx={{ p: { xs: 1.5, sm: 2 } }}>
         {viewOnly ? (
           <Box>
             <Typography variant="subtitle1">
@@ -435,7 +448,7 @@ export default function AddAddressModal({
             </Typography>
           </Box>
         ) : (
-          <Box component="form" noValidate autoComplete="off" sx={{ display: 'grid', gap: 2 }}>
+          <Box component="form" noValidate autoComplete="off" sx={{ display: 'grid', gap: { xs: 1.5, sm: 2 } }}>
             <TextField
               label="Họ và tên"
               fullWidth
@@ -450,9 +463,9 @@ export default function AddAddressModal({
               fullWidth
               value={formData.phone}
               onChange={(e) => {
-                const onlyDigits = e.target.value.replace(/\D/g, '');
+                const onlyDigits = e.target.value.replace(/\D/g, '')
                 if (onlyDigits.length <= 11) {
-                  handleChange('phone')({ target: { value: onlyDigits } });
+                  handleChange('phone')({ target: { value: onlyDigits } })
                 }
               }}
               error={formErrors.phone}
@@ -468,7 +481,7 @@ export default function AddAddressModal({
               onChange={(event, newValue) => {
                 handleChange('city')({
                   target: { value: newValue?.code || '' },
-                });
+                })
               }}
               noOptionsText="Không có kết quả"
               disabled={viewOnly}
@@ -488,7 +501,7 @@ export default function AddAddressModal({
               onChange={(event, newValue) => {
                 handleChange('district')({
                   target: { value: newValue?.code || '' },
-                });
+                })
               }}
               noOptionsText="Không có kết quả"
               disabled={viewOnly || !formData.city || districts.length === 0}
@@ -508,7 +521,7 @@ export default function AddAddressModal({
               onChange={(event, newValue) => {
                 handleChange('ward')({
                   target: { value: newValue?.code || '' },
-                });
+                })
               }}
               noOptionsText="Không có kết quả"
               disabled={viewOnly || !formData.district || wards.length === 0}
@@ -534,15 +547,17 @@ export default function AddAddressModal({
         )}
       </DialogContent>
       {!viewOnly && (
-        <DialogActions sx={{ p: 3, backgroundColor: 'white', gap: 2 }}>
+        <DialogActions sx={{ p: { xs: 2, sm: 3 }, backgroundColor: 'white', gap: { xs: 1, sm: 2 }, flexDirection: { xs: 'column', sm: 'row' } }}>
           <Button
             onClick={onClose}
             sx={{
               color: '#64748b',
               textTransform: 'none',
               fontWeight: 600,
-              px: 3,
-              py: 1,
+              px: { xs: 2, sm: 3 },
+              py: { xs: 0.8, sm: 1 },
+              width: { xs: '100%', sm: 'auto' },
+              fontSize: { xs: '0.9rem', sm: '1rem' },
               '&:hover': {
                 backgroundColor: '#f1f5f9',
               },
@@ -557,8 +572,10 @@ export default function AddAddressModal({
             sx={{
               background: 'var(--primary-color)',
               borderRadius: 2,
-              px: 4,
-              py: 1,
+              px: { xs: 3, sm: 4 },
+              py: { xs: 0.8, sm: 1 },
+              width: { xs: '100%', sm: 'auto' },
+              fontSize: { xs: '0.9rem', sm: '1rem' },
               textTransform: 'none',
               fontWeight: 600,
               boxShadow: '0 4px 15px rgba(26, 60, 123, 0.4)',
@@ -586,5 +603,5 @@ export default function AddAddressModal({
         </DialogActions>
       )}
     </Dialog>
-  );
+  )
 }
