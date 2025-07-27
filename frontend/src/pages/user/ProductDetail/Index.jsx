@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { Container, Grid, Typography, Button, Box } from '@mui/material'
-import { useParams, Link as RouterLink } from 'react-router-dom'
+import { useParams, Link } from 'react-router-dom'
 import useProductDetail from '~/hooks/useProductDetail'
 import ProductImageSection from './ProductImageSection'
 import ProductInfoSection from './ProductInfoSection'
@@ -151,8 +151,8 @@ const ProductDetail = () => {
                 color: 'primary.main'
               }
             }}
-            component={RouterLink}
-            to={'/product'}
+            component={Link}
+            to='/product'
             // href='/product'
           >
             Sản phẩm
