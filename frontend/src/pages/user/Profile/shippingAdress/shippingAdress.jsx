@@ -13,7 +13,8 @@ import ConfirmDeleteDialog from './ConfirmDeleteDialog'
 import { GHN_TOKEN_API } from '~/utils/constants'
 
 // Regex kiểm tra số điện thoại Việt Nam (di động và bàn)
-const VN_PHONE_REGEX = /^(0(3[2-9]|5[2-9]|7[0-9]|8[1-9]|9[0-9])[0-9]{7}|0(2[0-9]{8,9}))$/;
+const VN_PHONE_REGEX =
+  /^(0(3[2-9]|5[2-9]|7[0-9]|8[1-9]|9[0-9])[0-9]{7}|0(2[0-9]{8,9}))$/
 
 function ShippingAddress({ showSnackbar }) {
   const [addresses, setAddresses] = useState([])
@@ -40,7 +41,7 @@ function ShippingAddress({ showSnackbar }) {
     district: false,
     ward: false
   })
-  const [duplicateError, setDuplicateError] = useState('');
+  const [duplicateError, setDuplicateError] = useState('')
 
   // Fetch provinces
   useEffect(() => {
@@ -227,15 +228,17 @@ function ShippingAddress({ showSnackbar }) {
     }
     const fullAddress = `${address}, ${wardName}, ${districtName}, ${cityName}`
 
-    const isDuplicate = addresses.some(addr => {
-      if (addr._id === editAddressId) return false;
-      return Object.keys(addressData).every(key => addr[key] === addressData[key]);
-    });
+    const isDuplicate = addresses.some((addr) => {
+      if (addr._id === editAddressId) return false
+      return Object.keys(addressData).every(
+        (key) => addr[key] === addressData[key]
+      )
+    })
     if (isDuplicate) {
-      setDuplicateError('Địa chỉ này đã tồn tại!');
-      return;
+      setDuplicateError('Địa chỉ này đã tồn tại!')
+      return
     } else {
-      setDuplicateError('');
+      setDuplicateError('')
     }
 
     try {
@@ -433,7 +436,6 @@ function ShippingAddress({ showSnackbar }) {
     }
   }
 
-
   const handleFormChange = (field, value) => {
     setFormData((prev) => ({ ...prev, [field]: value }))
     setFormErrors((prev) => ({
@@ -469,7 +471,28 @@ function ShippingAddress({ showSnackbar }) {
             mb: 2
           }}
         >
-          <Typography variant='h6'>Danh sách địa chỉ giao hàng</Typography>
+          <Typography
+            variant='h6'
+            sx={{
+              display: {
+                xs: 'none',
+                sm: 'inline-block'
+              }
+            }}
+          >
+            Danh sách địa chỉ giao hàng
+          </Typography>
+          <Typography
+            variant='h6'
+            sx={{
+              display: {
+                xs: 'inline-block',
+                sm: 'none'
+              }
+            }}
+          >
+            Địa chỉ giao hàng
+          </Typography>
           <Button
             variant='contained'
             startIcon={<AddIcon />}
@@ -487,7 +510,7 @@ function ShippingAddress({ showSnackbar }) {
               setOpenAddressDialog(true)
             }}
           >
-            Thêm địa chỉ
+            Thêm
           </Button>
         </Box>
         <Divider sx={{ mb: 2 }} />
@@ -511,7 +534,7 @@ function ShippingAddress({ showSnackbar }) {
             district: '',
             ward: ''
           })
-          setDuplicateError('');
+          setDuplicateError('')
         }}
         editAddressId={editAddressId}
         formData={formData}

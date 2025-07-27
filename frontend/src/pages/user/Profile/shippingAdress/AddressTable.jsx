@@ -1,11 +1,5 @@
 import React from 'react'
-import {
-  Box,
-  Typography,
-  Button,
-  Chip,
-  Stack
-} from '@mui/material'
+import { Box, Typography, Button, Chip, Stack } from '@mui/material'
 
 function AddressList({ addresses, onEdit, onDelete }) {
   if (addresses.length === 0) {
@@ -28,25 +22,47 @@ function AddressList({ addresses, onEdit, onDelete }) {
             position: 'relative'
           }}
         >
-          <Box display='flex' justifyContent='space-between' alignItems='center'>
+          <Box
+            display='flex'
+            justifyContent='space-between'
+            alignItems='center'
+          >
             <Box>
               <Typography fontWeight={600}>
-                {addr.fullName}{' '}
+                {addr.fullName}
                 <Typography
                   component='span'
                   variant='body2'
                   color='text.secondary'
-                  sx={{ ml: 1 }}
+                  sx={{
+                    ml: {
+                      xs: 0, // từ 0–599px: xuống dòng
+                      sm: 1 // từ 600px trở lên: nằm cùng dòng
+                    },
+                    mt: {
+                      xs: 0.5, // từ 0–599px: xuống dòng
+                      sm: 0 // từ 600px trở lên: nằm cùng dòng
+                    },
+                    whiteSpace: 'nowrap',
+                    display: {
+                      xs: 'block', // từ 0–599px: xuống dòng
+                      sm: 'inline' // từ 600px trở lên: nằm cùng dòng
+                    }
+                  }}
                 >
                   (+84) {addr.phone.replace(/^0/, '')}
                 </Typography>
               </Typography>
             </Box>
-            <Box>
+            <Box sx={{ whiteSpace: 'nowrap' }}>
               <Button
                 size='small'
                 onClick={() => onEdit(addr)}
-                sx={{ textTransform: 'none', color: 'primary.main', fontWeight: 500 }}
+                sx={{
+                  textTransform: 'none',
+                  color: 'primary.main',
+                  fontWeight: 500
+                }}
               >
                 Cập nhật
               </Button>

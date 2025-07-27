@@ -83,7 +83,7 @@ function AddressDialog({
   // Update field errors when formData changes
   useEffect(() => {
     const newFieldErrors = {}
-    
+
     // Validate each field
     newFieldErrors.fullName = validateFullName(formData.fullName)
     newFieldErrors.phone = validatePhone(formData.phone)
@@ -91,8 +91,14 @@ function AddressDialog({
     newFieldErrors.city = validateLocation(formData.city, 'Tỉnh/Thành phố')
     newFieldErrors.district = validateLocation(formData.district, 'Quận/Huyện')
     newFieldErrors.ward = validateLocation(formData.ward, 'Phường/Xã')
-    newFieldErrors.cityId = validateLocationId(formData.cityId, 'Tỉnh/Thành phố')
-    newFieldErrors.districtId = validateLocationId(formData.districtId, 'Quận/Huyện')
+    newFieldErrors.cityId = validateLocationId(
+      formData.cityId,
+      'Tỉnh/Thành phố'
+    )
+    newFieldErrors.districtId = validateLocationId(
+      formData.districtId,
+      'Quận/Huyện'
+    )
     newFieldErrors.wardId = validateLocationId(formData.wardId, 'Phường/Xã')
 
     setFieldErrors(newFieldErrors)
@@ -100,45 +106,54 @@ function AddressDialog({
 
   // Handle field blur to mark as touched
   const handleFieldBlur = (fieldName) => {
-    setFieldTouched(prev => ({ ...prev, [fieldName]: true }))
+    setFieldTouched((prev) => ({ ...prev, [fieldName]: true }))
   }
 
   // Check if form is complete
   const isFormComplete = () => {
-    return formData.fullName && 
-           formData.phone && 
-           formData.address && 
-           formData.city && 
-           formData.district && 
-           formData.ward &&
-           formData.cityId &&
-           formData.districtId &&
-           formData.wardId &&
-           !formErrors.fullName &&
-           !formErrors.phone &&
-           !formErrors.address &&
-           !formErrors.city &&
-           !formErrors.district &&
-           !formErrors.ward &&
-           !formErrors.cityId &&
-           !formErrors.districtId &&
-           !formErrors.wardId &&
-           !fieldErrors.fullName &&
-           !fieldErrors.phone &&
-           !fieldErrors.address &&
-           !fieldErrors.city &&
-           !fieldErrors.district &&
-           !fieldErrors.ward &&
-           !fieldErrors.cityId &&
-           !fieldErrors.districtId &&
-           !fieldErrors.wardId
+    return (
+      formData.fullName &&
+      formData.phone &&
+      formData.address &&
+      formData.city &&
+      formData.district &&
+      formData.ward &&
+      formData.cityId &&
+      formData.districtId &&
+      formData.wardId &&
+      !formErrors.fullName &&
+      !formErrors.phone &&
+      !formErrors.address &&
+      !formErrors.city &&
+      !formErrors.district &&
+      !formErrors.ward &&
+      !formErrors.cityId &&
+      !formErrors.districtId &&
+      !formErrors.wardId &&
+      !fieldErrors.fullName &&
+      !fieldErrors.phone &&
+      !fieldErrors.address &&
+      !fieldErrors.city &&
+      !fieldErrors.district &&
+      !fieldErrors.ward &&
+      !fieldErrors.cityId &&
+      !fieldErrors.districtId &&
+      !fieldErrors.wardId
+    )
   }
 
   // Get completion percentage
   const getCompletionPercentage = () => {
-    const requiredFields = ['fullName', 'phone', 'address', 'city', 'district', 'ward']
-    const completedFields = requiredFields.filter(field => 
-      formData[field] && !formErrors[field] && !fieldErrors[field]
+    const requiredFields = [
+      'fullName',
+      'phone',
+      'address',
+      'city',
+      'district',
+      'ward'
+    ]
+    const completedFields = requiredFields.filter(
+      (field) => formData[field] && !formErrors[field] && !fieldErrors[field]
     )
     return Math.round((completedFields.length / requiredFields.length) * 100)
   }
@@ -148,7 +163,7 @@ function AddressDialog({
     const hasError = formErrors[fieldName] || fieldErrors[fieldName]
     const hasValue = formData[fieldName]
     const isTouched = fieldTouched[fieldName]
-    
+
     // Only show error if field has been touched or has a value
     if (hasError && (hasValue || isTouched)) return 'error'
     if (hasValue && !hasError) return 'success'
@@ -160,7 +175,7 @@ function AddressDialog({
     const hasError = formErrors[fieldName] || fieldErrors[fieldName]
     const hasValue = formData[fieldName]
     const isTouched = fieldTouched[fieldName]
-    
+
     // Only show error message if field has been touched or has a value
     if (hasError && (hasValue || isTouched)) {
       return formErrors[fieldName] || fieldErrors[fieldName]
@@ -171,23 +186,23 @@ function AddressDialog({
   // Get field end adornment
   const getFieldEndAdornment = (fieldName) => {
     const status = getFieldStatus(fieldName)
-    
+
     if (status === 'error') {
       return (
-        <InputAdornment position="end">
-          <ErrorIcon color="error" fontSize="small" />
+        <InputAdornment position='end'>
+          <ErrorIcon color='error' fontSize='small' />
         </InputAdornment>
       )
     }
-    
+
     if (status === 'success') {
       return (
-        <InputAdornment position="end">
-          <CheckCircleOutlineIcon color="success" fontSize="small" />
+        <InputAdornment position='end'>
+          <CheckCircleOutlineIcon color='success' fontSize='small' />
         </InputAdornment>
       )
     }
-    
+
     return null
   }
 
@@ -200,24 +215,35 @@ function AddressDialog({
       maxWidth='sm'
     >
       <DialogTitle>
-        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <Typography variant="h6">
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between'
+          }}
+        >
+          <Typography variant='h6'>
             {editAddressId ? 'Sửa địa chỉ' : 'Thêm địa chỉ mới'}
           </Typography>
-          <Chip 
+          <Chip
             label={`${getCompletionPercentage()}% hoàn thành`}
             color={getCompletionPercentage() === 100 ? 'success' : 'default'}
-            size="small"
-            icon={getCompletionPercentage() === 100 ? <CheckCircleIcon /> : <InfoIcon />}
+            size='small'
+            icon={
+              getCompletionPercentage() === 100 ? (
+                <CheckCircleIcon />
+              ) : (
+                <InfoIcon />
+              )
+            }
           />
         </Box>
       </DialogTitle>
       <DialogContent>
-
         {/* Hiển thị lỗi trùng địa chỉ nếu có */}
         {duplicateError && (
-          <Alert severity="error" sx={{ mb: 2 }}>
-            <Typography variant="body2" fontWeight={500}>
+          <Alert severity='error' sx={{ mb: 2 }}>
+            <Typography variant='body2' fontWeight={500}>
               {duplicateError}
             </Typography>
           </Alert>
@@ -232,7 +258,7 @@ function AddressDialog({
           onBlur={() => handleFieldBlur('fullName')}
           error={getFieldStatus('fullName') === 'error'}
           helperText={getFieldHelperText('fullName')}
-          placeholder="Nhập họ và tên đầy đủ"
+          placeholder='Nhập họ và tên đầy đủ'
           InputProps={{
             endAdornment: getFieldEndAdornment('fullName')
           }}
@@ -246,7 +272,7 @@ function AddressDialog({
           onBlur={() => handleFieldBlur('phone')}
           error={getFieldStatus('phone') === 'error'}
           helperText={getFieldHelperText('phone')}
-          placeholder="VD: 0912345678"
+          placeholder='VD: 0912345678'
           InputProps={{
             endAdornment: getFieldEndAdornment('phone'),
             inputProps: {
@@ -266,7 +292,7 @@ function AddressDialog({
             onFormChange('districtId', '')
             onFormChange('ward', '')
             onFormChange('wardId', '')
-            setFieldTouched(prev => ({ ...prev, city: true }))
+            setFieldTouched((prev) => ({ ...prev, city: true }))
           }}
           onBlur={() => handleFieldBlur('city')}
           renderInput={(params) => (
@@ -276,7 +302,7 @@ function AddressDialog({
               label='Tỉnh/Thành phố'
               error={getFieldStatus('city') === 'error'}
               helperText={getFieldHelperText('city')}
-              placeholder="Chọn tỉnh/thành phố"
+              placeholder='Chọn tỉnh/thành phố'
               InputProps={{
                 ...params.InputProps,
                 endAdornment: (
@@ -299,7 +325,7 @@ function AddressDialog({
             onFormChange('districtId', newValue ? newValue.code : '')
             onFormChange('ward', '')
             onFormChange('wardId', '')
-            setFieldTouched(prev => ({ ...prev, district: true }))
+            setFieldTouched((prev) => ({ ...prev, district: true }))
           }}
           onBlur={() => handleFieldBlur('district')}
           renderInput={(params) => (
@@ -309,7 +335,7 @@ function AddressDialog({
               label='Quận/Huyện'
               error={getFieldStatus('district') === 'error'}
               helperText={getFieldHelperText('district')}
-              placeholder="Chọn quận/huyện"
+              placeholder='Chọn quận/huyện'
               disabled={!formData.city}
               InputProps={{
                 ...params.InputProps,
@@ -332,7 +358,7 @@ function AddressDialog({
           onChange={(event, newValue) => {
             onFormChange('ward', newValue ? newValue.code : '')
             onFormChange('wardId', newValue ? newValue.code : '')
-            setFieldTouched(prev => ({ ...prev, ward: true }))
+            setFieldTouched((prev) => ({ ...prev, ward: true }))
           }}
           onBlur={() => handleFieldBlur('ward')}
           renderInput={(params) => (
@@ -342,7 +368,7 @@ function AddressDialog({
               label='Phường/Xã'
               error={getFieldStatus('ward') === 'error'}
               helperText={getFieldHelperText('ward')}
-              placeholder="Chọn phường/xã"
+              placeholder='Chọn phường/xã'
               disabled={!formData.district}
               InputProps={{
                 ...params.InputProps,
@@ -367,7 +393,7 @@ function AddressDialog({
           onBlur={() => handleFieldBlur('address')}
           error={getFieldStatus('address') === 'error'}
           helperText={getFieldHelperText('address')}
-          placeholder="VD: 123 Đường ABC, Phường XYZ"
+          placeholder='VD: 123 Đường ABC, Phường XYZ'
           InputProps={{
             endAdornment: getFieldEndAdornment('address')
           }}
@@ -375,16 +401,16 @@ function AddressDialog({
 
         {/* Additional information */}
         <Box sx={{ mt: 2, p: 2, bgcolor: 'grey.50', borderRadius: 1 }}>
-          <Typography variant="body2" color="text.secondary">
+          <Typography variant='body2' color='text.secondary'>
             <strong>Lưu ý:</strong>
           </Typography>
-          <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+          <Typography variant='body2' color='text.secondary' sx={{ mt: 1 }}>
             • Địa chỉ sẽ được sử dụng làm địa chỉ giao hàng mặc định
           </Typography>
-          <Typography variant="body2" color="text.secondary">
+          <Typography variant='body2' color='text.secondary'>
             • Bạn có thể thêm nhiều địa chỉ khác nhau cho các mục đích khác nhau
           </Typography>
-          <Typography variant="body2" color="text.secondary">
+          <Typography variant='body2' color='text.secondary'>
             • Thông tin sẽ được bảo mật và chỉ sử dụng cho mục đích giao hàng
           </Typography>
         </Box>
@@ -393,14 +419,24 @@ function AddressDialog({
         <Button onClick={onClose} sx={{ textTransform: 'none' }}>
           Hủy
         </Button>
-        <Button
-          onClick={onSave}
-          variant='contained'
-          sx={{ textTransform: 'none' }}
-          disabled={!isFormComplete()}
-        >
-          {editAddressId ? 'Lưu' : 'Thêm'}
-        </Button>
+        {editAddressId ? (
+          <Button
+            onClick={onSave}
+            variant='contained'
+            sx={{ textTransform: 'none' }}
+          >
+            Lưu
+          </Button>
+        ) : (
+          <Button
+            onClick={onSave}
+            variant='contained'
+            sx={{ textTransform: 'none' }}
+            disabled={!isFormComplete()}
+          >
+            Thêm
+          </Button>
+        )}
       </DialogActions>
     </Dialog>
   )

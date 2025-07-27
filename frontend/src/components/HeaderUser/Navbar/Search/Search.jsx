@@ -317,7 +317,7 @@ const StyledListItem = styled(ListItem)({
   }
 })
 
-const Search = () => {
+const Search = ({ onclose }) => {
   const wrapperRef = useRef(null)
   const [showSuggestions, setShowSuggestions] = useState(false)
 
@@ -370,7 +370,11 @@ const Search = () => {
 
   useEffect(() => {
     const handleClickOutside = (e) => {
-      if (wrapperRef.current && !wrapperRef.current.contains(e.target)) {
+      if (
+        showSuggestions && // Chỉ xử lý khi đang mở
+        wrapperRef.current &&
+        !wrapperRef.current.contains(e.target)
+      ) {
         setShowSuggestions(false)
       }
     }
@@ -397,6 +401,7 @@ const Search = () => {
       navigate(`/searchresult?search=${encodeURIComponent(searchText.trim())}`)
       setSuggestions([])
       setErrorMessage('')
+      onclose()
     }
   }
 
@@ -414,10 +419,20 @@ const Search = () => {
           width: '320px',
           maxWidth: '100%',
           '@media (max-width:1222px)': {
-            width: '220px'
+            width: '220px',
+            minWidth: '220px'
           },
-          '@media (max-width:900px)': {
-            width: '100%'
+          '@media (max-width:600px)': {
+            width: '320px',
+            minWidth: '320px'
+          },
+          '@media (max-width:500px)': {
+            width: '220px',
+            minWidth: '220px'
+          },
+          '@media (max-width:400px)': {
+            width: '100%',
+            minWidth: 0
           }
         }}
         placeholder={placeholder}
@@ -451,7 +466,14 @@ const Search = () => {
               width: '400px'
             },
             '@media (max-width:600px)': {
-              width: '300px'
+              position: 'fixed',
+              top: '100px', // cách top tuỳ theo vị trí bạn muốn
+              width: 'calc(100vw - 32px)',
+              left: '50%',
+              transform: 'translateX(-50%)',
+              right: 'auto',
+              zIndex: 1300, // cao hơn các header nếu cần
+              maxHeight: 520
             },
             background: '#fff',
             border: '1.5px solid #1976d2',

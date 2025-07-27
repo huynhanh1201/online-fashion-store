@@ -53,7 +53,7 @@ const getMegaMenuColumns = (categories) => {
   }))
 }
 
-const Menu = ({ headerRef }) => {
+const Menu = ({ headerRef, currentUser }) => {
   const [productMenuOpen, setProductMenuOpen] = useState(false)
   const [isDrawerHovered, setIsDrawerHovered] = useState(false)
   const [isClosing, setIsClosing] = useState(false)
@@ -108,10 +108,23 @@ const Menu = ({ headerRef }) => {
   useEffect(() => {
     function updateItemsPerRow() {
       const width = menuContainerRef.current?.offsetWidth || window.innerWidth
-      if (width > 1600) setItemsPerRow(7)
-      else if (width > 1110) setItemsPerRow(5)
-      else if (width > 1020) setItemsPerRow(4)
-      else setItemsPerRow(3)
+      if (currentUser) {
+        if (width >= 1600) setItemsPerRow(8)
+        else if (width >= 1500) setItemsPerRow(7)
+        else if (width >= 1400) setItemsPerRow(6)
+        else if (width >= 1190) setItemsPerRow(4)
+        else if (width >= 1020) setItemsPerRow(3)
+        else if (width >= 920) setItemsPerRow(2)
+        else setItemsPerRow(2)
+      } else {
+        if (width >= 1600) setItemsPerRow(7)
+        else if (width >= 1500) setItemsPerRow(6)
+        else if (width >= 1400) setItemsPerRow(5)
+        else if (width >= 1300) setItemsPerRow(4)
+        else if (width >= 1100) setItemsPerRow(3)
+        else if (width >= 990) setItemsPerRow(3)
+        else setItemsPerRow(2)
+      }
     }
     updateItemsPerRow()
     window.addEventListener('resize', updateItemsPerRow)
@@ -151,9 +164,12 @@ const Menu = ({ headerRef }) => {
       // Thêm các menu từ config nếu có
       ...(menuConfig?.mainMenu
         ? menuConfig.mainMenu
-          .filter(item => item.visible && (!item.children || item.children.length === 0))
-          .sort((a, b) => (a.order || 0) - (b.order || 0))
-          .map(item => ({ label: item.label, url: item.url }))
+            .filter(
+              (item) =>
+                item.visible && (!item.children || item.children.length === 0)
+            )
+            .sort((a, b) => (a.order || 0) - (b.order || 0))
+            .map((item) => ({ label: item.label, url: item.url }))
         : []),
       // Thêm các danh mục parent thực sự có children có sản phẩm
       ...parentCategories.map((cat) => ({
@@ -315,10 +331,12 @@ const Menu = ({ headerRef }) => {
     if (!parentCategory || !parentCategory._id) {
       return []
     }
-    return categories.filter(cat =>
-      !cat.destroy &&
-      cat.parent &&
-      (typeof cat.parent === 'object' ? cat.parent._id : cat.parent) === parentCategory._id
+    return categories.filter(
+      (cat) =>
+        !cat.destroy &&
+        cat.parent &&
+        (typeof cat.parent === 'object' ? cat.parent._id : cat.parent) ===
+          parentCategory._id
     )
   }
 
@@ -461,8 +479,10 @@ const Menu = ({ headerRef }) => {
                     <StyledButton
                       href={item.url}
                       active={
-                        (item.hasMegaMenu && (productMenuOpen || isDrawerHovered)) ||
-                          (item.category && hoveredCategory?._id === item.category._id)
+                        (item.hasMegaMenu &&
+                          (productMenuOpen || isDrawerHovered)) ||
+                        (item.category &&
+                          hoveredCategory?._id === item.category._id)
                           ? true
                           : undefined
                       }
@@ -487,11 +507,16 @@ const Menu = ({ headerRef }) => {
                         top: '100%',
                         left: 0,
                         marginTop: '15px',
-                        transform: hoveredCategory?._id === item.category._id
-                          ? 'translateY(0) scaleY(1)'
-                          : 'translateY(-10px) scaleY(0.95)',
-                        opacity: hoveredCategory?._id === item.category._id ? 1 : 0,
-                        pointerEvents: hoveredCategory?._id === item.category._id ? 'auto' : 'none',
+                        transform:
+                          hoveredCategory?._id === item.category._id
+                            ? 'translateY(0) scaleY(1)'
+                            : 'translateY(-10px) scaleY(0.95)',
+                        opacity:
+                          hoveredCategory?._id === item.category._id ? 1 : 0,
+                        pointerEvents:
+                          hoveredCategory?._id === item.category._id
+                            ? 'auto'
+                            : 'none',
                         bgcolor: 'white',
                         boxShadow: '0px 8px 32px rgba(0, 0, 0, 0.12)',
                         minWidth: 200,
@@ -576,7 +601,7 @@ const Menu = ({ headerRef }) => {
         </Box>
         {/* 2 arrow ngoài cùng bên phải, nhỏ lại */}
         {shouldShowArrows && (
-          <Box sx={{ display: 'flex', flexDirection: 'row', ml: 0.5 }}>
+          <Box sx={{ display: 'flex', flexDirection: 'row', ml: 0.5, mr: 2 }}>
             <Button
               onClick={() => navigateRow('left')}
               disabled={!canNavigateLeft}
