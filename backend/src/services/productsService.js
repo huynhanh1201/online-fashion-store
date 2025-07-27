@@ -94,7 +94,8 @@ const getProductList = async (reqQuery) => {
       filterTypeDate,
       startDate,
       endDate,
-      destroy
+      destroy,
+      sortPrice
     } = reqQuery
 
     validatePagination(page, limit)
@@ -148,7 +149,9 @@ const getProductList = async (reqQuery) => {
       name_asc: { name: 1 },
       name_desc: { name: -1 },
       newest: { createdAt: -1 },
-      oldest: { createdAt: 1 }
+      oldest: { createdAt: 1 },
+      price_desc: { exportPrice: -1 },
+      price_asc: { exportPrice: 1 }
     }
 
     let sortField = {}
