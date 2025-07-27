@@ -120,7 +120,7 @@ export default function AddAddressModal({
         field === 'fullName'
           ? !value.trim() || value.trim().length < 3
           : field === 'phone'
-            ? !value.trim() || !/^(0[3|5|7|8|9])[0-9]{8}$/.test(value.trim())
+            ? !value.trim() || !/^0\d{9,10}$/.test(value.trim())
             : field === 'address'
               ? !value.trim() || value.trim().length < 5
               : !value,
@@ -311,7 +311,7 @@ export default function AddAddressModal({
   const handleSubmit = async () => {
     const errors = {
       fullName: !formData.fullName.trim() || formData.fullName.trim().length < 3,
-      phone: !formData.phone.trim() || !/^(0[3|5|7|8|9])[0-9]{8}$/.test(formData.phone.trim()),
+      phone: !formData.phone.trim() || !/^0\d{9,10}$/.test(formData.phone.trim()),
       address: !formData.address.trim() || formData.address.trim().length < 5,
       city: !formData.city,
       district: !formData.district,
