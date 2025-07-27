@@ -86,6 +86,10 @@ const StyledCard = styled(Card)(({ theme }) => ({
   border: '1px solid rgba(26, 60, 123, 0.1)',
   marginBottom: theme.spacing(3),
   transition: 'all 0.3s ease',
+  [theme.breakpoints.down('sm')]: {
+    marginBottom: theme.spacing(2),
+    borderRadius: '12px',
+  },
   '&:hover': {
     boxShadow: '0 12px 40px rgba(26, 60, 123, 0.15)',
     transform: 'translateY(-2px)',
@@ -119,7 +123,8 @@ const PaymentMethodCard = styled(Paper)(({ selected, theme }) => ({
     : '#ffffff',
   cursor: 'pointer',
   [theme.breakpoints.down('sm')]: {
-    padding: theme.spacing(2),
+    padding: theme.spacing(1.5),
+    marginBottom: theme.spacing(1.5),
   },
   '&:hover': {
     borderColor: 'var(--primary-color)',
@@ -136,7 +141,8 @@ const ShippingCard = styled(Paper)(({ theme }) => ({
   background: 'linear-gradient(135deg, #e8f5e8 0%, #f0f8ff 100%)',
   boxShadow: '0 4px 16px rgba(26, 60, 123, 0.1)',
   [theme.breakpoints.down('sm')]: {
-    padding: theme.spacing(2),
+    padding: theme.spacing(1.5),
+    marginBottom: theme.spacing(1.5),
   },
 }))
 
@@ -954,7 +960,7 @@ const Payment = () => {
           display="flex"
           flexDirection={{ xs: 'column', md: 'row' }}
           alignItems="flex-start"
-          gap={3}
+          gap={{ xs: 2, md: 3 }}
         >
           <Box
             flex={{ xs: '1 1 100%', md: 2 }}
@@ -983,7 +989,7 @@ const Payment = () => {
                           {selectedAddress.address}, {selectedAddress.ward}, {selectedAddress.district}, {selectedAddress.city}
                         </Typography>
                       </Box>
-                      <Box sx={{ ml: { xs: 0, sm: 2 }, mt: { xs: 2, sm: 0 }, alignSelf:  {xs: 'flex-start', sm: 'center' } }}>
+                      <Box sx={{ ml: { xs: 0, sm: 2 }, mt: { xs: 2, sm: 0 }, alignSelf: { xs: 'flex-start', sm: 'center' } }}>
                         <ChangeAddressButton onClick={handleOpenAddressModal}>
                           Thay Đổi
                         </ChangeAddressButton>
@@ -1038,12 +1044,12 @@ const Payment = () => {
                         />
                       }
                       label={
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 1.5, sm: 2 } }}>
                           <Box
                             component="img"
                             src="https://cdn.haitrieu.com/wp-content/uploads/2022/05/Logo-GHN-Slogan-VN.png"
                             alt="GHN"
-                            sx={{ height: 40, borderRadius: 1 }}
+                            sx={{ height: { xs: 32, sm: 40 }, borderRadius: 1 }}
                           />
                           <Box>
                             <Typography fontWeight={600} sx={{ mb: 0.5, fontSize: { xs: '0.9rem', sm: '1rem' } }}>
@@ -1110,12 +1116,12 @@ const Payment = () => {
                         }} />
                       }
                       label={
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 1.5, sm: 2 } }}>
                           <Box
                             component="img"
                             src="https://file.hstatic.net/1000360022/file/img_payment_method_5_23d8b98ee8c7456bab146250bedbc1a4.png"
                             alt="COD"
-                            sx={{ height: 40, borderRadius: 1 }}
+                            sx={{ height: { xs: 32, sm: 40 }, borderRadius: 1 }}
                           />
                           <Box>
                             <Typography fontWeight={600} sx={{ fontSize: { xs: '0.9rem', sm: '1rem' } }}>
@@ -1146,18 +1152,18 @@ const Payment = () => {
                         }} />
                       }
                       label={
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 1.5, sm: 2 } }}>
                           <Box
                             component="img"
                             src="https://file.hstatic.net/1000360022/file/img_payment_method_4_7fdbf4cdf59647e684a29799683114f7.png"
                             alt="VNPAY"
-                            sx={{ height: 40, borderRadius: 1 }}
+                            sx={{ height: { xs: 32, sm: 40 }, borderRadius: 1 }}
                           />
                           <Box>
-                            <Typography fontWeight={600}>
+                            <Typography fontWeight={600} sx={{ fontSize: { xs: '0.9rem', sm: '1rem' } }}>
                               Ví điện tử VNPAY
                             </Typography>
-                            <Typography variant="body2" color="text.secondary">
+                            <Typography variant="body2" color="text.secondary" sx={{ fontSize: { xs: '0.8rem', sm: '0.875rem' } }}>
                               Thanh toán trực tuyến qua VNPAY
                             </Typography>
                           </Box>
