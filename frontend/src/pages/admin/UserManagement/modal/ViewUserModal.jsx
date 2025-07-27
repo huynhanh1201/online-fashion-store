@@ -89,7 +89,16 @@ const ViewUserModal = ({ open, onClose, user }) => {
                     <TableCell sx={{ fontWeight: 'bold', width: '30%' }}>
                       Tên khách hàng
                     </TableCell>
-                    <TableCell>{user.name || '—'}</TableCell>
+                    <TableCell>
+                      {user.name
+                        .split(' ')
+                        .map(
+                          (word) =>
+                            word.charAt(0).toUpperCase() +
+                            word.slice(1).toLowerCase()
+                        )
+                        .join(' ') || '—'}
+                    </TableCell>
                   </TableRow>
 
                   <TableRow>

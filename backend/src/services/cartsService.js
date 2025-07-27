@@ -31,8 +31,7 @@ const createCart = async (reqJwtDecoded, reqBody) => {
 
     // Nếu có giỏ hàng, cập nhật các item trong giỏ hàng
     // Biến thể đã tồn tại
-
-    const updateItemExists = await CartModel.findOneAndUpdate(
+    const updateItemExists = await CartModel.updateOne(
       {
         userId, // nếu bạn đã biết _id của cart
         cartItems: {
@@ -112,6 +111,7 @@ const updateItemCart = async (userId, reqBody) => {
 
     return itemCart
   } catch (err) {
+    console.log(err)
     throw err
   }
 }
