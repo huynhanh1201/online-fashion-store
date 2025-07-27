@@ -51,11 +51,6 @@ import { optimizeCloudinaryUrl } from '~/utils/cloudinary'
 import { getDiscounts } from '~/services/discountService'
 import SuggestionProducts from './SuggestionProducts'
 
-// =======================Huynh Anh===================
-import { Link as RouterLink } from 'react-router-dom'
-import Link from '@mui/material/Link'
-//===================================================
-
 const Cart = () => {
   const { cart, loading, deleteItem, clearCart, updateItem } = useCart()
 
