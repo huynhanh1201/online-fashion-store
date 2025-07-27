@@ -84,7 +84,8 @@ const Menu = ({ headerRef }) => {
           getCategories(1, 100),
           getMenuConfig()
         ])
-        const categories = categoriesResponse.categories?.data || categoriesResponse || []
+        const categories =
+          categoriesResponse.categories?.data || categoriesResponse || []
         setCategories(categories)
         setMenuConfig(menuResponse?.content || null)
       } catch (error) {
@@ -108,8 +109,8 @@ const Menu = ({ headerRef }) => {
     function updateItemsPerRow() {
       const width = menuContainerRef.current?.offsetWidth || window.innerWidth
       if (width > 1600) setItemsPerRow(7)
-      else if (width > 1100) setItemsPerRow(5)
-      else if (width > 700) setItemsPerRow(4)
+      else if (width > 1110) setItemsPerRow(5)
+      else if (width > 1020) setItemsPerRow(4)
       else setItemsPerRow(3)
     }
     updateItemsPerRow()
@@ -119,14 +120,30 @@ const Menu = ({ headerRef }) => {
 
   const getMenuRows = () => {
     // Lấy tất cả danh mục con có sản phẩm
-    const childCategoriesWithProduct = categories.filter(cat => cat.parent && !cat.destroy)
+    const childCategoriesWithProduct = categories.filter(
+      (cat) => cat.parent && !cat.destroy
+    )
     // Lấy danh sách parentId từ các danh mục con có sản phẩm
-    const parentIds = [...new Set(childCategoriesWithProduct.map(cat => typeof cat.parent === 'object' ? cat.parent._id : cat.parent))]
+    const parentIds = [
+      ...new Set(
+        childCategoriesWithProduct.map((cat) =>
+          typeof cat.parent === 'object' ? cat.parent._id : cat.parent
+        )
+      )
+    ]
     // Lấy các danh mục parent thực sự có children có sản phẩm
-    const parentCategories = categories.filter(cat => parentIds.includes(cat._id) && !cat.destroy)
+    const parentCategories = categories.filter(
+      (cat) => parentIds.includes(cat._id) && !cat.destroy
+    )
     // Lấy các danh mục gốc (không có parent) nhưng có sản phẩm
-    const rootCategoriesWithProducts = categories.filter(cat => !cat.parent && !cat.destroy && Array.isArray(cat.products) && cat.products.length > 0)
-    
+    const rootCategoriesWithProducts = categories.filter(
+      (cat) =>
+        !cat.parent &&
+        !cat.destroy &&
+        Array.isArray(cat.products) &&
+        cat.products.length > 0
+    )
+
     const allItems = [
       // Luôn hiển thị "Sản phẩm" và "Hàng mới"
       { label: 'Sản phẩm', url: '/product', hasMegaMenu: true },
@@ -134,17 +151,25 @@ const Menu = ({ headerRef }) => {
       // Thêm các menu từ config nếu có
       ...(menuConfig?.mainMenu
         ? menuConfig.mainMenu
-            .filter(item => item.visible && (!item.children || item.children.length === 0))
-            .sort((a, b) => (a.order || 0) - (b.order || 0))
-            .map(item => ({ label: item.label, url: item.url }))
+          .filter(item => item.visible && (!item.children || item.children.length === 0))
+          .sort((a, b) => (a.order || 0) - (b.order || 0))
+          .map(item => ({ label: item.label, url: item.url }))
         : []),
       // Thêm các danh mục parent thực sự có children có sản phẩm
-      ...parentCategories.map(cat => ({ label: cat.name, url: `/productbycategory/${cat._id}`, category: cat })),
+      ...parentCategories.map((cat) => ({
+        label: cat.name,
+        url: `/productbycategory/${cat._id}`,
+        category: cat
+      })),
       // Thêm các danh mục gốc có sản phẩm
-      ...rootCategoriesWithProducts.map(cat => ({ label: cat.name, url: `/productbycategory/${cat._id}`, category: cat })),
+      ...rootCategoriesWithProducts.map((cat) => ({
+        label: cat.name,
+        url: `/productbycategory/${cat._id}`,
+        category: cat
+      })),
       { label: 'Tin thời trang', url: '/blog' }
     ]
-    
+
     const rows = []
     for (let i = 0; i < allItems.length; i += itemsPerRow) {
       rows.push(allItems.slice(i, i + itemsPerRow))
@@ -162,11 +187,11 @@ const Menu = ({ headerRef }) => {
     if (direction === 'left' && canNavigateLeft) {
       setSlideDirection('right')
       setPrevRow(currentRow)
-      setCurrentRow(prev => prev - 1)
+      setCurrentRow((prev) => prev - 1)
     } else if (direction === 'right' && canNavigateRight) {
       setSlideDirection('left')
       setPrevRow(currentRow)
-      setCurrentRow(prev => prev + 1)
+      setCurrentRow((prev) => prev + 1)
     }
   }
 
@@ -268,7 +293,13 @@ const Menu = ({ headerRef }) => {
     const chain = []
     let current = category
     while (current && current.parent) {
-      const parent = allCategories.find(cat => cat._id === (typeof current.parent === 'object' ? current.parent._id : current.parent))
+      const parent = allCategories.find(
+        (cat) =>
+          cat._id ===
+          (typeof current.parent === 'object'
+            ? current.parent._id
+            : current.parent)
+      )
       if (parent) {
         chain.unshift(parent)
         current = parent
@@ -284,23 +315,25 @@ const Menu = ({ headerRef }) => {
     if (!parentCategory || !parentCategory._id) {
       return []
     }
-    return categories.filter(cat => 
-      !cat.destroy && 
-      cat.parent && 
+    return categories.filter(cat =>
+      !cat.destroy &&
+      cat.parent &&
       (typeof cat.parent === 'object' ? cat.parent._id : cat.parent) === parentCategory._id
     )
   }
 
   // Get megamenu settings from config
   const getMegamenuSettings = () => {
-    return menuConfig?.settings?.megamenuSettings || {
-      maxColumns: 4,
-      columnWidth: 'auto',
-      showIcons: false,
-      animationDuration: 350,
-      showCategoryImages: false,
-      enableHoverEffects: true
-    }
+    return (
+      menuConfig?.settings?.megamenuSettings || {
+        maxColumns: 4,
+        columnWidth: 'auto',
+        showIcons: false,
+        animationDuration: 350,
+        showCategoryImages: false,
+        enableHoverEffects: true
+      }
+    )
   }
 
   const megamenuSettings = getMegamenuSettings()
@@ -308,7 +341,10 @@ const Menu = ({ headerRef }) => {
   // Get number of columns for megamenu based on settings
   const getMegamenuColumns = () => {
     if (menuConfig?.mainMenu && menuConfig.mainMenu.length > 0) {
-      return Math.min(menuConfig.mainMenu.filter(item => item.visible).length, megamenuSettings.maxColumns)
+      return Math.min(
+        menuConfig.mainMenu.filter((item) => item.visible).length,
+        megamenuSettings.maxColumns
+      )
     }
     // Khi không có menu config, hiển thị 1 cột cho menu "Sản phẩm" mặc định
     return 1
@@ -326,13 +362,38 @@ const Menu = ({ headerRef }) => {
         gap: 2,
         width: '100%',
         maxWidth: '1400px',
-        zIndex: 1400, // Thêm z-index cho container chính
+        zIndex: 1400 // Thêm z-index cho container chính
       }}
     >
       {/* Menu container với arrow ngoài cùng bên phải, menu item luôn căn giữa và rộng rãi */}
-      <Box sx={{ display: 'flex', alignItems: 'center', flex: 1, minWidth: 0, justifyContent: 'center', position: 'relative', width: '100%', maxWidth: '1400px', mx: 'auto', height: 56, overflow: 'visible' }}>
+      <Box
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          flex: 1,
+          minWidth: 0,
+          justifyContent: 'center',
+          position: 'relative',
+          width: '100%',
+          maxWidth: '1400px',
+          mx: 'auto',
+          height: 56,
+          overflow: 'visible'
+        }}
+      >
         {/* Menu item */}
-        <Box sx={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', minWidth: 0, overflow: 'visible', width: '100%', maxWidth: '1400px' }}>
+        <Box
+          sx={{
+            flex: 1,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            minWidth: 0,
+            overflow: 'visible',
+            width: '100%',
+            maxWidth: '1400px'
+          }}
+        >
           <Slide
             direction={slideDirection}
             in={isInitialized}
@@ -352,20 +413,32 @@ const Menu = ({ headerRef }) => {
                 left: 0,
                 right: 0,
                 top: 0,
-                maxWidth: '1400px',
+                maxWidth: '1400px'
               }}
             >
               {menuRows[currentRow]?.map((item, index) => (
                 <Box
                   key={item.label + index}
-                  sx={{ display: 'inline-flex', position: 'relative', zIndex: 1410 }}
-                  onMouseEnter={() => item.category && handleCategoryEnter(item.category)}
+                  sx={{
+                    display: 'inline-flex',
+                    position: 'relative',
+                    zIndex: 1410
+                  }}
+                  onMouseEnter={() =>
+                    item.category && handleCategoryEnter(item.category)
+                  }
                   onMouseLeave={() => item.category && handleCategoryLeave()}
                 >
                   {item.isNew ? (
                     <Badge
                       badgeContent={
-                        <span style={{ fontSize: '10px', fontWeight: 700, color: 'red' }}>
+                        <span
+                          style={{
+                            fontSize: '10px',
+                            fontWeight: 700,
+                            color: 'red'
+                          }}
+                        >
                           MỚI
                         </span>
                       }
@@ -378,26 +451,28 @@ const Menu = ({ headerRef }) => {
                           minWidth: 0,
                           height: 'auto',
                           background: 'none',
-                          borderRadius: 0,
+                          borderRadius: 0
                         }
                       }}
                     >
-                      <StyledButton href={item.url}>
-                        {item.label}
-                      </StyledButton>
+                      <StyledButton href={item.url}>{item.label}</StyledButton>
                     </Badge>
                   ) : (
                     <StyledButton
                       href={item.url}
                       active={
                         (item.hasMegaMenu && (productMenuOpen || isDrawerHovered)) ||
-                        (item.category && hoveredCategory?._id === item.category._id)
+                          (item.category && hoveredCategory?._id === item.category._id)
                           ? true
                           : undefined
                       }
                       ref={item.hasMegaMenu ? productButtonRef : null}
-                      onMouseEnter={item.hasMegaMenu ? handleProductEnter : undefined}
-                      onMouseLeave={item.hasMegaMenu ? handleProductLeave : undefined}
+                      onMouseEnter={
+                        item.hasMegaMenu ? handleProductEnter : undefined
+                      }
+                      onMouseLeave={
+                        item.hasMegaMenu ? handleProductLeave : undefined
+                      }
                     >
                       {item.label}
                     </StyledButton>
@@ -410,11 +485,11 @@ const Menu = ({ headerRef }) => {
                       sx={{
                         position: 'absolute',
                         top: '100%',
-                        left: '50%',
+                        left: 0,
                         marginTop: '15px',
                         transform: hoveredCategory?._id === item.category._id
-                          ? 'translateX(-50%) translateY(0) scaleY(1)'
-                          : 'translateX(-50%) translateY(-10px) scaleY(0.95)',
+                          ? 'translateY(0) scaleY(1)'
+                          : 'translateY(-10px) scaleY(0.95)',
                         opacity: hoveredCategory?._id === item.category._id ? 1 : 0,
                         pointerEvents: hoveredCategory?._id === item.category._id ? 'auto' : 'none',
                         bgcolor: 'white',
@@ -424,13 +499,13 @@ const Menu = ({ headerRef }) => {
                         zIndex: 1500,
                         border: '1px solid #e2e8f0',
                         transition: 'opacity 0.3s ease, transform 0.3s ease',
-                        transformOrigin: 'top center',
+                        transformOrigin: 'top left',
                         '&::before': {
                           content: '""',
                           position: 'absolute',
                           top: '-5px',
-                          left: '50%',
-                          transform: 'translateX(-50%)',
+                          left: '20px',
+                          transform: 'none',
                           width: '20px',
                           height: '5px',
                           background: 'transparent'
@@ -440,12 +515,14 @@ const Menu = ({ headerRef }) => {
                       <Box
                         sx={{
                           display: 'flex',
-                          flexDirection: 'column',
+                          flexDirection: 'column'
                         }}
                       >
                         {(() => {
                           if (!item.category) return null
-                          const childCategories = getChildCategories(item.category)
+                          const childCategories = getChildCategories(
+                            item.category
+                          )
                           return childCategories.length > 0 ? (
                             childCategories.map((child) => (
                               <Button
@@ -467,7 +544,7 @@ const Menu = ({ headerRef }) => {
                                   transition: 'all 0.2s ease',
                                   '&:hover': {
                                     color: '#1976d2',
-                                    background: '#f8fafc',
+                                    background: '#f8fafc'
                                   }
                                 }}
                               >
@@ -476,7 +553,7 @@ const Menu = ({ headerRef }) => {
                             ))
                           ) : (
                             <Typography
-                              component="div"
+                              component='div'
                               sx={{
                                 color: 'text.secondary',
                                 fontSize: '0.95rem',
@@ -517,7 +594,13 @@ const Menu = ({ headerRef }) => {
                 }
               }}
             >
-              <ChevronLeft sx={{ fontSize: 20, color: canNavigateLeft ? '#1A3C7B' : '#ccc', fontWeight: canNavigateLeft ? 700 : 400 }} />
+              <ChevronLeft
+                sx={{
+                  fontSize: 20,
+                  color: canNavigateLeft ? '#1A3C7B' : '#ccc',
+                  fontWeight: canNavigateLeft ? 700 : 400
+                }}
+              />
             </Button>
             <Button
               onClick={() => navigateRow('right')}
@@ -536,7 +619,13 @@ const Menu = ({ headerRef }) => {
                 }
               }}
             >
-              <ChevronRight sx={{ fontSize: 20, color: canNavigateRight ? '#1A3C7B' : '#ccc', fontWeight: canNavigateRight ? 700 : 400 }} />
+              <ChevronRight
+                sx={{
+                  fontSize: 20,
+                  color: canNavigateRight ? '#1A3C7B' : '#ccc',
+                  fontWeight: canNavigateRight ? 700 : 400
+                }}
+              />
             </Button>
           </Box>
         )}
@@ -583,27 +672,137 @@ const Menu = ({ headerRef }) => {
               opacity: productMenuOpen ? 1 : 0,
               transition: `opacity ${megamenuSettings.animationDuration}ms ease`,
               justifyItems: 'start',
-              justifyContent: 'start',
+              justifyContent: 'start'
             }}
           >
-            {menuConfig?.mainMenu && menuConfig.mainMenu.length > 0 ? (
-              menuConfig.mainMenu
-                .filter(item => item.visible)
-                .sort((a, b) => (a.order || 0) - (b.order || 0))
-                .map((item, idx) => (
+            {menuConfig?.mainMenu && menuConfig.mainMenu.length > 0
+              ? menuConfig.mainMenu
+                  .filter((item) => item.visible)
+                  .sort((a, b) => (a.order || 0) - (b.order || 0))
+                  .map((item, idx) => (
+                    <Box
+                      key={item.label + idx}
+                      sx={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: 1,
+                        alignItems: 'start',
+                        textAlign: 'start',
+                        width:
+                          megamenuSettings.columnWidth === 'auto'
+                            ? 'auto'
+                            : megamenuSettings.columnWidth
+                      }}
+                    >
+                      <Typography
+                        component='div'
+                        sx={{
+                          fontWeight: 'bold',
+                          mb: 1.2,
+                          textTransform: 'uppercase',
+                          fontSize: '1.08rem',
+                          textAlign: 'left'
+                        }}
+                      >
+                        {megamenuSettings.showIcons && item.icon && (
+                          <span style={{ marginRight: '8px' }}>
+                            {item.icon}
+                          </span>
+                        )}
+                        {item.label}
+                        <Box
+                          sx={{
+                            height: '4px',
+                            bgcolor: 'var(--primary-color)',
+                            margin: '0 auto',
+                            mb: 1.2
+                          }}
+                        />
+                      </Typography>
+                      {item.children && item.children.length > 0 ? (
+                        item.children
+                          .filter((child) => child.visible)
+                          .sort((a, b) => (a.order || 0) - (b.order || 0))
+                          .map((child, i) => (
+                            <Button
+                              key={child.label + i}
+                              href={child.url}
+                              sx={{
+                                justifyContent: 'start',
+                                textAlign: 'left',
+                                color: '#222',
+                                fontWeight: 400,
+                                fontSize: '1.05rem',
+                                px: 0,
+                                minWidth: 0,
+                                background: 'none',
+                                textTransform: 'none !important',
+                                boxShadow: 'none',
+                                '&:hover': {
+                                  color: '#1976d2',
+                                  background:
+                                    megamenuSettings.enableHoverEffects
+                                      ? 'rgba(25, 118, 210, 0.04)'
+                                      : 'none',
+                                  transform: megamenuSettings.enableHoverEffects
+                                    ? 'translateY(-2px)'
+                                    : 'none',
+                                  transition:
+                                    megamenuSettings.enableHoverEffects
+                                      ? 'all 0.2s ease'
+                                      : 'none'
+                                }
+                              }}
+                            >
+                              {megamenuSettings.showIcons && child.icon && (
+                                <span style={{ marginRight: '8px' }}>
+                                  {child.icon}
+                                </span>
+                              )}
+                              {child.label}
+                            </Button>
+                          ))
+                      ) : (
+                        <Typography
+                          component='div'
+                          sx={{
+                            color: 'text.secondary',
+                            fontSize: '0.95rem',
+                            fontStyle: 'italic',
+                            textAlign: 'center'
+                          }}
+                        >
+                          Chưa có danh mục
+                        </Typography>
+                      )}
+                    </Box>
+                  ))
+              : // Hiển thị menu "Sản phẩm" mặc định khi không có menu config
+                [
+                  {
+                    label: 'Sản phẩm',
+                    children: [
+                      { label: 'Tất cả sản phẩm', url: '/product' },
+                      { label: 'Sản phẩm mới', url: '/productnews' }
+                    ]
+                  }
+                ].map((item, idx) => (
                   <Box
                     key={item.label + idx}
-                    sx={{ 
-                      display: 'flex', 
-                      flexDirection: 'column', 
-                      gap: 1, 
-                      alignItems: 'start', 
+                    sx={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: 1,
+                      alignItems: 'start',
                       textAlign: 'start',
-                      width: megamenuSettings.columnWidth === 'auto' ? 'auto' : megamenuSettings.columnWidth
+                      width:
+                        megamenuSettings.columnWidth === 'auto'
+                          ? 'auto'
+                          : megamenuSettings.columnWidth
                     }}
                   >
                     <Typography
-                      component="div"
+                      component='div'
                       sx={{
                         fontWeight: 'bold',
                         mb: 1.2,
@@ -612,141 +811,53 @@ const Menu = ({ headerRef }) => {
                         textAlign: 'left'
                       }}
                     >
-                      {megamenuSettings.showIcons && item.icon && (
-                        <span style={{ marginRight: '8px' }}>{item.icon}</span>
-                      )}
                       {item.label}
                       <Box
                         sx={{
-                         height: '4px',
-                         bgcolor: 'var(--primary-color)',
-                         margin: '0 auto',
+                          height: '4px',
+                          bgcolor: 'var(--primary-color)',
+                          margin: '0 auto',
                           mb: 1.2
-                          }}
-                          />
+                        }}
+                      />
                     </Typography>
-                    {item.children && item.children.length > 0 ? (
-                      item.children
-                        .filter(child => child.visible)
-                        .sort((a, b) => (a.order || 0) - (b.order || 0))
-                        .map((child, i) => (
-                          <Button
-                            key={child.label + i}
-                            href={child.url}
-                            sx={{
-                              justifyContent: 'start',
-                              textAlign: 'left',
-                              color: '#222',
-                              fontWeight: 400,
-                              fontSize: '1.05rem',
-                              px: 0,
-                              minWidth: 0,
-                              background: 'none',
-                              textTransform: 'none !important',
-                              boxShadow: 'none',
-                              '&:hover': {
-                                color: '#1976d2',
-                                background: megamenuSettings.enableHoverEffects ? 'rgba(25, 118, 210, 0.04)' : 'none',
-                                transform: megamenuSettings.enableHoverEffects ? 'translateY(-2px)' : 'none',
-                                transition: megamenuSettings.enableHoverEffects ? 'all 0.2s ease' : 'none'
-                              }
-                            }}
-                          >
-                            {megamenuSettings.showIcons && child.icon && (
-                              <span style={{ marginRight: '8px' }}>{child.icon}</span>
-                            )}
-                            {child.label}
-                          </Button>
-                        ))
-                    ) : (
-                      <Typography
-                        component="div"
+                    {item.children.map((child, i) => (
+                      <Button
+                        key={child.label + i}
+                        href={child.url}
                         sx={{
-                          color: 'text.secondary',
-                          fontSize: '0.95rem',
-                          fontStyle: 'italic',
-                          textAlign: 'center'
+                          justifyContent: 'start',
+                          textAlign: 'left',
+                          color: '#222',
+                          fontWeight: 400,
+                          fontSize: '16px',
+                          textTransform: 'none !important',
+                          px: 0,
+                          minWidth: 0,
+                          background: 'none',
+                          boxShadow: 'none',
+                          '&:hover': {
+                            color: '#1976d2',
+                            background: megamenuSettings.enableHoverEffects
+                              ? 'rgba(25, 118, 210, 0.04)'
+                              : 'none',
+                            transform: megamenuSettings.enableHoverEffects
+                              ? 'translateY(-2px)'
+                              : 'none',
+                            transition: megamenuSettings.enableHoverEffects
+                              ? 'all 0.2s ease'
+                              : 'none'
+                          }
                         }}
                       >
-                        Chưa có danh mục
-                      </Typography>
-                    )}
+                        {child.label}
+                      </Button>
+                    ))}
                   </Box>
-                ))
-            ) : (
-              // Hiển thị menu "Sản phẩm" mặc định khi không có menu config
-              [
-                {
-                  label: 'Sản phẩm',
-                  children: [
-                    { label: 'Tất cả sản phẩm', url: '/product' },
-                    { label: 'Sản phẩm mới', url: '/productnews' }
-                  ]
-                }
-              ].map((item, idx) => (
-                <Box
-                  key={item.label + idx}
-                  sx={{ 
-                    display: 'flex', 
-                    flexDirection: 'column', 
-                    gap: 1, 
-                    textAlign: 'start',
-                    width: megamenuSettings.columnWidth === 'auto' ? 'auto' : megamenuSettings.columnWidth
-                  }}
-                >
-                  <Typography
-                    component="div"
-                    sx={{
-                      fontWeight: 'bold',
-                      mb: 1.2,
-                      textTransform: 'uppercase',
-                      fontSize: '1.08rem',
-                      textAlign: 'left'
-                    }}
-                  >
-                    {item.label}
-                    <Box
-                        sx={{
-                         height: '4px',
-                         bgcolor: 'var(--primary-color)',
-                         margin: '0 auto',
-                          mb: 1.2
-                          }}
-                          />
-                  </Typography>
-                  {item.children.map((child, i) => (
-                    <Button
-                      key={child.label + i}
-                      href={child.url}
-                      sx={{
-                        justifyContent: 'start',
-                        textAlign: 'left',
-                        color: '#222',
-                        fontWeight: 400,
-                        fontSize: '16px',
-                        textTransform: 'none !important',
-                        px: 0,
-                        minWidth: 0,
-                        background: 'none',
-                        boxShadow: 'none',
-                        '&:hover': {
-                          color: '#1976d2',
-                          background: megamenuSettings.enableHoverEffects ? 'rgba(25, 118, 210, 0.04)' : 'none',
-                          transform: megamenuSettings.enableHoverEffects ? 'translateY(-2px)' : 'none',
-                          transition: megamenuSettings.enableHoverEffects ? 'all 0.2s ease' : 'none'
-                        }
-                      }}
-                    >
-                      {child.label}
-                    </Button>
-                  ))}
-                </Box>
-              ))
-            )}
+                ))}
           </Box>
         </Box>
       )}
-
     </Box>
   )
 }

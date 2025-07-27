@@ -35,6 +35,13 @@ const ViewCategoryModal = ({ open, onClose, category }) => {
       open={open}
       onClose={onClose}
       maxWidth='xl'
+      sx={{
+        '& .MuiDialog-paper': {
+          width: 'auto', // Chiều rộng theo nội dung
+          maxWidth: 'xl', // Giới hạn không vượt quá md
+          minWidth: 1200 // (tuỳ chọn) đảm bảo không quá nhỏ
+        }
+      }}
       BackdropProps={{ sx: StyleAdmin.OverlayModal }}
     >
       <DialogTitle>Thông tin danh mục sản phẩm</DialogTitle>
@@ -129,26 +136,78 @@ const ViewCategoryModal = ({ open, onClose, category }) => {
             <Table size='small'>
               <TableBody>
                 <TableRow>
-                  <TableCell sx={{ width: 200, fontWeight: 700 }}>
+                  <TableCell
+                    sx={{
+                      width: 200,
+                      fontWeight: 700,
+                      height: 50,
+                      padding: '8px 16px',
+                      lineHeight: '50px'
+                    }}
+                  >
                     Tên danh mục
                   </TableCell>
-                  <TableCell>{category?.name || '—'}</TableCell>
+                  <TableCell
+                    sx={{
+                      height: 50,
+                      padding: '8px 16px',
+                      lineHeight: '50px'
+                    }}
+                  >
+                    {category?.name
+                      .split(' ')
+                      .map(
+                        (word) =>
+                          word.charAt(0).toUpperCase() +
+                          word.slice(1).toLowerCase()
+                      )
+                      .join(' ') || '—'}
+                  </TableCell>
                 </TableRow>
 
                 {category?.parent?.name && (
                   <TableRow>
-                    <TableCell sx={{ width: 200, fontWeight: 700 }}>
+                    <TableCell
+                      sx={{
+                        width: 200,
+                        fontWeight: 700,
+                        height: 50,
+                        padding: '8px 16px',
+                        lineHeight: '50px'
+                      }}
+                    >
                       Tên danh mục cha
                     </TableCell>
-                    <TableCell>{category?.parent?.name || '—'}</TableCell>
+                    <TableCell
+                      sx={{
+                        height: 50,
+                        padding: '8px 16px',
+                        lineHeight: '50px'
+                      }}
+                    >
+                      {category?.parent?.name || '—'}
+                    </TableCell>
                   </TableRow>
                 )}
 
                 <TableRow>
-                  <TableCell sx={{ width: 200, fontWeight: 700 }}>
+                  <TableCell
+                    sx={{
+                      width: 200,
+                      fontWeight: 700,
+                      height: 50,
+                      padding: '8px 16px',
+                      lineHeight: '50px'
+                    }}
+                  >
                     Mô tả
                   </TableCell>
-                  <TableCell>
+                  <TableCell
+                    sx={{
+                      height: 50,
+                      padding: '8px 16px'
+                    }}
+                  >
                     <Typography
                       sx={{
                         whiteSpace: 'pre-line',
@@ -161,17 +220,49 @@ const ViewCategoryModal = ({ open, onClose, category }) => {
                 </TableRow>
 
                 <TableRow>
-                  <TableCell sx={{ width: 200, fontWeight: 700 }}>
+                  <TableCell
+                    sx={{
+                      width: 200,
+                      fontWeight: 700,
+                      height: 50,
+                      padding: '8px 16px',
+                      lineHeight: '50px'
+                    }}
+                  >
                     Ngày tạo
                   </TableCell>
-                  <TableCell>{formatDate(category?.createdAt)}</TableCell>
+                  <TableCell
+                    sx={{
+                      height: 50,
+                      padding: '8px 16px',
+                      lineHeight: '50px'
+                    }}
+                  >
+                    {formatDate(category?.createdAt)}
+                  </TableCell>
                 </TableRow>
 
                 <TableRow>
-                  <TableCell sx={{ width: 200, fontWeight: 700 }}>
+                  <TableCell
+                    sx={{
+                      width: 200,
+                      fontWeight: 700,
+                      height: 50,
+                      padding: '8px 16px',
+                      lineHeight: '50px'
+                    }}
+                  >
                     Ngày cập nhật
                   </TableCell>
-                  <TableCell>{formatDate(category?.updatedAt)}</TableCell>
+                  <TableCell
+                    sx={{
+                      height: 50,
+                      padding: '8px 16px',
+                      lineHeight: '50px'
+                    }}
+                  >
+                    {formatDate(category?.updatedAt)}
+                  </TableCell>
                 </TableRow>
               </TableBody>
             </Table>

@@ -116,6 +116,7 @@ function App() {
 
       {/*Customer*/}
       <Route path='/' element={<UserLayout />}>
+        <Route path='searchresult' element={<SearchResult />} />
         <Route path='product' element={<Product />} />
         <Route path='/productdetail/:productId' element={<ProductDetail />} />
         <Route path='blog' element={<Blog />} />

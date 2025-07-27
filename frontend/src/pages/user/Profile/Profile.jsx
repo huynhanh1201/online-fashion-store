@@ -351,14 +351,14 @@ const Profile = () => {
               >
                 Đổi mật khẩu
               </Button>
-              <Button
+              {/* <Button
                 fullWidth
                 variant='text'
                 sx={{ mt: 1, color: '#1976d2', textTransform: 'none' }}
                 onClick={handleOpenForgotDialog}
               >
                 Quên mật khẩu?
-              </Button>
+              </Button> */}
             </>
           )}
         </Box>

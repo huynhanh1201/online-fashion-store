@@ -276,7 +276,7 @@ const ProductDetail = () => {
         />
       </Box>
 
-      <Box sx={{ mt: 3 }}>
+      <Box sx={{ mt: 3, mb: 3 }}>
         <RelatedProducts
           currentProductId={product?._id}
           categoryId={product?.categoryId?._id || product?.categoryId}

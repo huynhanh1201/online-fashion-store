@@ -425,7 +425,8 @@ export default function AdminDrawer({
             px: 2,
             py: 0.4,
             cursor: 'pointer',
-            userSelect: 'none', height: 62
+            userSelect: 'none',
+            height: 62
           }}
         >
           {/* <img
@@ -439,7 +440,7 @@ export default function AdminDrawer({
               userSelect: 'none'
             }}
           /> */}
-          <p style={{ fontSize: 25, fontWeight: 900 }}>FS</p>
+          <p style={{ fontSize: 25, fontWeight: 900, color: '#1b3982' }}>FS</p>
         </Box>
 
         <Divider sx={{ my: 0 }} />

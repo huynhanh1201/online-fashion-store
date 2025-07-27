@@ -23,10 +23,10 @@ const ProductCard = ({ product, isFlashSale = false }) => {
   const inStock = quantity > 0
 
   // Hàm xử lý tên sản phẩm
-  const truncateProductName = (name) => {
-    if (!name) return ''
-    return name.length > 17 ? name.substring(0, 20) + '...' : name
-  }
+  // const truncateProductName = (name) => {
+  //   if (!name) return ''
+  //   return name.length > 17 ? name.substring(0, 20) + '...' : name
+  // }
 
   // Hàm render 5 sao rating
   const renderStars = (rating) => {
@@ -38,17 +38,23 @@ const ProductCard = ({ product, isFlashSale = false }) => {
       if (i <= fullStars) {
         // Sao đầy
         stars.push(
-          <span key={i} style={styles.starFilled}>★</span>
+          <span key={i} style={styles.starFilled}>
+            ★
+          </span>
         )
       } else if (i === fullStars + 1 && hasHalfStar) {
         // Sao nửa (hiển thị như sao đầy cho đơn giản)
         stars.push(
-          <span key={i} style={styles.starFilled}>★</span>
+          <span key={i} style={styles.starFilled}>
+            ★
+          </span>
         )
       } else {
         // Sao rỗng
         stars.push(
-          <span key={i} style={styles.starEmpty}>★</span>
+          <span key={i} style={styles.starEmpty}>
+            ★
+          </span>
         )
       }
     }
@@ -85,15 +91,15 @@ const ProductCard = ({ product, isFlashSale = false }) => {
         }}
       >
         {/* Sticker component */}
-        <Sticker 
+        <Sticker
           product={product}
           top={10}
           right={10}
-          fontSize="12px"
+          fontSize='12px'
           fontWeight={700}
-          padding="4px 12px 4px 8px"
+          padding='4px 12px 4px 8px'
         />
-        
+
         <div style={styles.productImage}>
           {/* Ảnh chính */}
           <img
@@ -106,7 +112,7 @@ const ProductCard = ({ product, isFlashSale = false }) => {
               position: 'absolute',
               transition: 'opacity 0.4s ease'
             }}
-            loading="lazy"
+            loading='lazy'
           />
           {/* Ảnh hover (ảnh thứ 2 hoặc ảnh 1 nếu không có) */}
           <img
@@ -119,33 +125,29 @@ const ProductCard = ({ product, isFlashSale = false }) => {
               position: 'absolute',
               transition: 'opacity 0.7s ease'
             }}
-            loading="lazy"
+            loading='lazy'
           />
         </div>
         <div style={styles.productInfo}>
           <h3 style={styles.productName} title={product.name}>
-            {truncateProductName(product.name)}
+            {product.name}
           </h3>
           <div style={styles.priceRow}>
-            {isFlashSale && product.flashPrice ? (
+            {priceInfo.originalDiscountPrice > 0 ? (
               <>
                 <span style={styles.flashSalePrice}>
-                  {product.flashPrice.toLocaleString('vi-VN')}₫
+                  {priceInfo.discountPrice.toLocaleString('vi-VN')}₫
                 </span>
                 <span style={styles.originalPrice}>
-                  {product.exportPrice.toLocaleString('vi-VN')}₫
+                  {priceInfo.price.toLocaleString('vi-VN')}₫
                 </span>
-                <span style={styles.flashSaleBadge}>Flash Sale</span>
-              </>
-            ) : priceInfo.originalDiscountPrice > 0 ? (
-              <>
-                <span style={styles.currentPrice}>
-                  {priceInfo.discountPrice.toLocaleString()}₫
+                <span style={styles.discountBadge}>
+                  -
+                  {Math.round(
+                    (priceInfo.originalDiscountPrice / priceInfo.price) * 100
+                  )}
+                  %
                 </span>
-                <span style={styles.originalPrice}>
-                  {priceInfo.price.toLocaleString()}₫
-                </span>
-                <span style={styles.discountBadge}>-{Math.round((priceInfo.originalDiscountPrice / priceInfo.price) * 100)}%</span>
               </>
             ) : (
               <span style={styles.currentPrice}>
@@ -166,7 +168,6 @@ const ProductCard = ({ product, isFlashSale = false }) => {
   )
 }
 
-
 const styles = {
   productCardLink: {
     textDecoration: 'none',
@@ -181,6 +182,7 @@ const styles = {
     transition: 'all 0.3s ease',
     border: '2px solid #f0f0f0',
     height: '100%',
+    flex: 1,
     display: 'flex',
     flexDirection: 'column',
     position: 'relative',
@@ -244,6 +246,7 @@ const styles = {
     gap: '8px'
   },
   productName: {
+    maxWidth: '95%',
     fontSize: '16px',
     fontWeight: '500',
     color: '#333',
@@ -251,7 +254,7 @@ const styles = {
     overflow: 'hidden',
     textOverflow: 'ellipsis',
     display: '-webkit-box',
-    WebkitLineClamp: 2,
+    WebkitLineClamp: 1,
     WebkitBoxOrient: 'vertical',
     margin: 0,
     padding: 0
@@ -276,7 +279,7 @@ const styles = {
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginTop: 'auto',
+    marginTop: 'auto'
   },
   rating: {
     display: 'flex',
@@ -309,10 +312,10 @@ const styles = {
     fontWeight: '500'
   },
   flashSalePrice: {
-    fontSize: '22px',
+    fontSize: '18px',
     fontWeight: '900',
     color: '#e53935',
-    marginRight: '8px',
+    marginRight: '8px'
   },
   flashSaleBadge: {
     background: 'linear-gradient(90deg, #ff9800 0%, #ff3d00 100%)',
@@ -325,7 +328,7 @@ const styles = {
     letterSpacing: '1px',
     textTransform: 'uppercase',
     boxShadow: '0 2px 8px rgba(255,61,0,0.15)'
-  },
+  }
 }
 
 export default ProductCard

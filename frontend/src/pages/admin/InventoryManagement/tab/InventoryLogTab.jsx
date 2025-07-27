@@ -246,8 +246,7 @@ const InventoryLogTab = () => {
                           sx={{
                             width: 120,
                             fontWeight: 800,
-                            backgroundColor:
-                              row.type === 'in' && 'var(--primary-color)'
+                            backgroundColor: row.type === 'in' && '#4CAF50'
                           }}
                           color={row.type === 'in' ? 'success' : 'error'}
                         />
@@ -260,7 +259,7 @@ const InventoryLogTab = () => {
                         <Typography
                           sx={{
                             fontWeight: 900,
-                            color: row.type === 'in' ? 'green' : 'red'
+                            color: row.type === 'in' ? '#4CAF50' : 'red'
                           }}
                         >
                           {rawValue !== undefined

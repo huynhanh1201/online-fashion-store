@@ -321,6 +321,7 @@ const BlogDetail = () => {
   const isMobile = useMediaQuery(theme.breakpoints.down('md'))
 
   const [imageLoaded, setImageLoaded] = React.useState(false)
+  const [imageError, setImageError] = React.useState(false)
   const [headings, setHeadings] = React.useState([])
   const [processedContent, setProcessedContent] = React.useState('')
   const featuredImageRef = React.useRef(null)
@@ -332,6 +333,7 @@ const BlogDetail = () => {
   React.useEffect(() => {
     if (blogId) {
       setImageLoaded(false) // Reset image loading state
+      setImageError(false) // Reset image error state
       fetchBlogById(blogId)
     }
   }, [blogId, fetchBlogById])
@@ -612,7 +614,7 @@ const BlogDetail = () => {
                 currentBlog.thumbnail ||
                 currentBlog.image) && (
                   <Box ref={featuredImageRef} sx={{ position: 'relative', mb: 3 }}>
-                    {!imageLoaded && (
+                    {!imageLoaded && !imageError && (
                       <Box
                         sx={{
                           position: 'absolute',
@@ -632,28 +634,55 @@ const BlogDetail = () => {
                         </Typography>
                       </Box>
                     )}
-                    <CardMedia
-                      component="img"
-                      image={optimizeCloudinaryUrl(currentBlog.coverImage || currentBlog.thumbnail || currentBlog.image, {
-                        width: 1500,
-                        height: 750,
-                        quality: 'auto:good',
-                        format: 'webp',
-                        crop: 'fit'
-                      })}
-                      alt={currentBlog.title}
-                      sx={{
-                        objectFit: 'contain', // không bị zoom
-                        opacity: imageLoaded ? 1 : 0,
-                        transition: 'opacity 0.3s ease',
-                        width: '100%',
-                        height: { xs: '480px', sm: '600px', md: '750px' },
-                        backgroundColor: 'grey.100', // nền xám nếu hình có khoảng trống
-                        borderRadius: 0
-                      }}
-                      onLoad={() => setImageLoaded(true)}
-                      onError={() => setImageLoaded(true)}
-                    />
+
+                    {imageError ? (
+                      // Placeholder when image failed to load
+                      <Box
+                        sx={{
+                          width: '100%',
+                          height: { xs: '480px', sm: '600px', md: '750px' },
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          backgroundColor: 'grey.200',
+                          color: 'grey.500',
+                          borderRadius: 0
+                        }}
+                      >
+                        <Typography variant="body1">
+                          Không thể tải ảnh
+                        </Typography>
+                      </Box>
+                    ) : (
+                      <CardMedia
+                        component="img"
+                        image={optimizeCloudinaryUrl(currentBlog.coverImage || currentBlog.thumbnail || currentBlog.image, {
+                          width: 1500,
+                          height: 750,
+                          quality: 'auto:good',
+                          format: 'webp',
+                          crop: 'fit'
+                        })}
+                        alt={currentBlog.title}
+                        sx={{
+                          objectFit: 'contain', // không bị zoom
+                          opacity: imageLoaded ? 1 : 0,
+                          transition: 'opacity 0.3s ease',
+                          width: '100%',
+                          height: { xs: '480px', sm: '600px', md: '750px' },
+                          backgroundColor: 'grey.100', // nền xám nếu hình có khoảng trống
+                          borderRadius: 0
+                        }}
+                        onLoad={() => {
+                          setImageLoaded(true)
+                          setImageError(false)
+                        }}
+                        onError={() => {
+                          setImageLoaded(true)
+                          setImageError(true)
+                        }}
+                      />
+                    )}
 
                   </Box>
                 )}
