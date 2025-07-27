@@ -649,7 +649,7 @@ const Cart = () => {
                 color: 'primary.main'
               }
             }}
-            component={RouterLink}
+            component={Link}
             to='/product'
           >
             Sản phẩm
