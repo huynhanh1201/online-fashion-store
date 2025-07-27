@@ -408,7 +408,7 @@ const OrderRow = ({ order, onOrderUpdate, onOrderCancelled, onReorder, reorderLo
                     display="flex"
                     justifyContent="space-between"
                     alignItems="center"
-                    flexDirection={{ xs: 'column', sm: 'row' }}
+
                     gap={1}
                   >
                     <Box display="flex" alignItems="center" gap={1.5} width="100%">
@@ -434,7 +434,7 @@ const OrderRow = ({ order, onOrderUpdate, onOrderCancelled, onReorder, reorderLo
                             overflow: 'hidden',
                             textOverflow: 'ellipsis',
                             whiteSpace: 'nowrap',
-                            maxWidth: { xs: '200px', sm: '250px', md: '400px', lg: '500px' }
+                            maxWidth: { xs: '200px', sm: '300px', md: '400px', lg: '500px' }
                           }}
                           title={capitalizeFirstLetter(item.name)}
                         >
@@ -458,7 +458,7 @@ const OrderRow = ({ order, onOrderUpdate, onOrderCancelled, onReorder, reorderLo
                         />
                       </Box>
                     </Box>
-                    <Box textAlign={{ xs: 'center', sm: 'right' }}>
+                    <Box sx={{ alignSelf: { xs: 'flex-end', sm: 'center' }, ml: { xs: 0, sm: 1 } }}>
                       <Typography
                         fontWeight={700}
                         sx={{

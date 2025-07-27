@@ -736,7 +736,7 @@ const OrderDetail = () => {
                                 overflow: 'hidden',
                                 textOverflow: 'ellipsis',
                                 whiteSpace: 'nowrap',
-                                maxWidth: { xs: '250px', sm: '250px', md: '400px', lg: '500px' }
+                                maxWidth: { xs: '300px', sm: '250px', md: '400px', lg: '500px' }
 
                               }}
                               title={product.productName}
@@ -762,7 +762,7 @@ const OrderDetail = () => {
                             />
                           </Box>
                         </Box>
-                        <Box textAlign={{ xs: 'right' }}>
+                        <Box textAlign={{ xs: 'right', sm: 'right' }} sx={{ alignSelf: { xs: 'flex-end', sm: 'center' }, ml: { xs: 0, sm: 1 } }}>
                           <Typography
                             fontWeight={700}
                             sx={{

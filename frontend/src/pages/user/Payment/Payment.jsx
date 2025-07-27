@@ -983,7 +983,7 @@ const Payment = () => {
                           {selectedAddress.address}, {selectedAddress.ward}, {selectedAddress.district}, {selectedAddress.city}
                         </Typography>
                       </Box>
-                      <Box sx={{ ml: { xs: 0, sm: 2 }, mt: { xs: 2, sm: 0 } }}>
+                      <Box sx={{ ml: { xs: 0, sm: 2 }, mt: { xs: 2, sm: 0 }, alignSelf:  {xs: 'flex-start', sm: 'center' } }}>
                         <ChangeAddressButton onClick={handleOpenAddressModal}>
                           Thay Đổi
                         </ChangeAddressButton>
