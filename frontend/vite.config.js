@@ -9,6 +9,7 @@ export default defineConfig({
     alias: [{ find: '~', replacement: '/src' }]
   },
   define: {
+    'process.env': process.env,
     global: 'window'
   }
 })

@@ -4,7 +4,8 @@ import { env } from '~/config/environment'
 export const WHITELIST_DOMAINS = [
   'http://localhost:8017',
   'http://localhost:5174',
-  'http://localhost:5173'
+  'http://localhost:5173',
+  'https://online-fashion-store-iota.vercel.app/'
 ]
 
 export const WEBSITE_DOMAIN =
