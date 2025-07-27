@@ -10,7 +10,7 @@ import SnackbarAlert from './SnackbarAlert'
 import RelatedProducts from './RelatedProducts'
 import { getCategoryById } from '~/services/categoryService'
 import Breadcrumbs from '@mui/material/Breadcrumbs'
-import { Link } from '@mui/material'
+// import { Link } from '@mui/material'
 import NavigateNextIcon from '@mui/icons-material/NavigateNext'
 
 const ProductDetail = () => {
@@ -141,7 +141,7 @@ const ProductDetail = () => {
           >
             Trang chủ
           </Link>
-          <Link
+          <Button
             sx={{
               display: 'flex',
               alignItems: 'center',
@@ -151,10 +151,12 @@ const ProductDetail = () => {
                 color: 'primary.main'
               }
             }}
-            href='/product'
+            component={RouterLink}
+            to={'/product'}
+            // href='/product'
           >
             Sản phẩm
-          </Link>
+          </Button>
           <Link
             sx={{
               display: 'flex',
