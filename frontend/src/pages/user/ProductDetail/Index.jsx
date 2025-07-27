@@ -10,7 +10,6 @@ import SnackbarAlert from './SnackbarAlert'
 import RelatedProducts from './RelatedProducts'
 import { getCategoryById } from '~/services/categoryService'
 import Breadcrumbs from '@mui/material/Breadcrumbs'
-// import { Link } from '@mui/material'
 import NavigateNextIcon from '@mui/icons-material/NavigateNext'
 
 import { useNavigate } from 'react-router-dom'
@@ -130,22 +129,27 @@ const ProductDetail = () => {
           separator={<NavigateNextIcon fontSize='small' />}
           aria-label='breadcrumb'
         >
-          <Link
-            underline='hover'
+          <Button
+            component={Link}
+            to='/'
             sx={{
               display: 'flex',
               alignItems: 'center',
               color: '#007bff',
               textDecoration: 'none',
+              minWidth: 0,
+              p: 0,
               '&:hover': {
-                color: 'primary.main'
+                color: 'primary.main',
+                background: 'none'
               }
             }}
-            href='/'
           >
             Trang chủ
-          </Link>
+          </Button>
           <Button
+            component={Link}
+            to='/product'
             sx={{
               display: 'flex',
               alignItems: 'center',
@@ -155,27 +159,27 @@ const ProductDetail = () => {
                 color: 'primary.main'
               }
             }}
-            onClick={() => {
-              navigate('/admin')
-            }}
-            // href='/product'
           >
             Sản phẩm
           </Button>
-          <Link
+          <Button
+            component={Link}
+            to={`/productbycategory/${category?._id}`}
             sx={{
               display: 'flex',
               alignItems: 'center',
               color: '#007bff',
               textDecoration: 'none',
+              minWidth: 0,
+              p: 0,
               '&:hover': {
-                color: 'primary.main'
+                color: 'primary.main',
+                background: 'none'
               }
             }}
-            href={`/productbycategory/${category?._id}`}
           >
             {category?.name}
-          </Link>
+          </Button>
           <Typography
             sx={{
               display: 'flex',

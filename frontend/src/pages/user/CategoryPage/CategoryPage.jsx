@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { useParams } from 'react-router-dom'
+import { useParams, Link } from 'react-router-dom'
 import {
   Box,
   Typography,
@@ -13,7 +13,7 @@ import {
   styled,
   PaginationItem,
   Breadcrumbs,
-  Link
+  Button
 } from '@mui/material'
 import NavigateNextIcon from '@mui/icons-material/NavigateNext'
 import { getCategoryBySlug } from '~/services/categoryService'
@@ -297,21 +297,24 @@ const CategoryPage = () => {
         aria-label='breadcrumb'
         sx={{ pt: 2, width: '100%', maxWidth: '95vw', mx: 'auto' }}
       >
-        <Link
-          underline='hover'
+        <Button
+          component={Link}
+          to='/'
           sx={{
             display: 'flex',
             alignItems: 'center',
             color: '#007bff',
             textDecoration: 'none',
+            minWidth: 0,
+            p: 0,
             '&:hover': {
-              color: 'primary.main'
+              color: 'primary.main',
+              background: 'none'
             }
           }}
-          href='/'
         >
           Trang chủ
-        </Link>
+        </Button>
         <Typography
           sx={{
             display: 'flex',

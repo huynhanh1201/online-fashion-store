@@ -387,14 +387,6 @@ const Menu = ({ headerRef, currentUser }) => {
     >
       {/* Menu container với arrow ngoài cùng bên phải, menu item luôn căn giữa và rộng rãi */}
 
-      <Button component={Link} to='/admin'>
-        Test trang admin
-      </Button>
-
-      <Button component={Link} to='/product'>
-        Test trang sản phẩm
-      </Button>
-
       <Box
         sx={{
           display: 'flex',
@@ -484,11 +476,12 @@ const Menu = ({ headerRef, currentUser }) => {
                         }
                       }}
                     >
-                      <StyledButton href={item.url}>{item.label}</StyledButton>
+                      <StyledButton component={Link} to={item.url}>{item.label}</StyledButton>
                     </Badge>
                   ) : (
                     <StyledButton
-                      href={item.url}
+                      component={Link}
+                      to={item.url}
                       active={
                         (item.hasMegaMenu &&
                           (productMenuOpen || isDrawerHovered)) ||
@@ -563,7 +556,8 @@ const Menu = ({ headerRef, currentUser }) => {
                             childCategories.map((child) => (
                               <Button
                                 key={child._id}
-                                href={`/category/${child.slug}`}
+                                component={Link}
+                                to={`/category/${child.slug}`}
                                 sx={{
                                   justifyContent: 'flex-start',
                                   textAlign: 'left',
@@ -775,7 +769,8 @@ const Menu = ({ headerRef, currentUser }) => {
                     .map((child, i) => (
                       <Button
                         key={child.label + i}
-                        href={child.url}
+                        component={Link}
+                        to={child.url}
                         sx={{
                           justifyContent: 'start',
                           textAlign: 'left',

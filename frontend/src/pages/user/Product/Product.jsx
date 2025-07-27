@@ -9,9 +9,9 @@ import {
   styled,
   Pagination,
   Breadcrumbs,
-  Link,
   Skeleton,
-  PaginationItem
+  PaginationItem,
+  Button
 } from '@mui/material'
 import { addToCart, getCart } from '~/services/cartService'
 import { useDispatch } from 'react-redux'
@@ -23,6 +23,7 @@ import { getProducts } from '~/services/productService'
 import ProductCategories from './ProductCategories/ProductCategories'
 import { getBanners } from '~/services/admin/webConfig/bannerService.js'
 import { optimizeCloudinaryUrl } from '~/utils/cloudinary.js'
+import { Link } from 'react-router-dom'
 
 const ITEMS_PER_PAGE = 15
 
@@ -281,21 +282,24 @@ const Product = () => {
           aria-label='breadcrumb'
           sx={{ my: 1 }}
         >
-          <Link
-            underline='hover'
+          <Button
+            component={Link}
+            to='/'
             sx={{
               display: 'flex',
               alignItems: 'center',
               color: '#007bff',
               textDecoration: 'none',
+              minWidth: 0,
+              p: 0,
               '&:hover': {
-                color: 'primary.main'
+                color: 'primary.main',
+                background: 'none'
               }
             }}
-            href='/'
           >
             Trang chủ
-          </Link>
+          </Button>
           <Typography
             sx={{
               display: 'flex',

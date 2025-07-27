@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { useLocation } from 'react-router-dom'
+import { useLocation, Link } from 'react-router-dom'
 import { getProducts } from '~/services/productService'
 import ProductCard from '~/components/ProductCards/ProductCards.jsx'
 import '~/assets/HomeCSS/Content.css'
@@ -11,7 +11,7 @@ import {
   styled,
   Pagination,
   Breadcrumbs,
-  Link,
+  Button,
   PaginationItem
 } from '@mui/material'
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward'
@@ -231,16 +231,19 @@ export default function SearchResults() {
           aria-label='breadcrumb'
           sx={{ p: 1 }}
         >
-          <Link
-            underline='hover'
-            href='/'
+          <Button
+            component={Link}
+            to='/'
             sx={{
               color: '#007bff',
-              '&:hover': { color: 'primary.main' }
+              textDecoration: 'none',
+              minWidth: 0,
+              p: 0,
+              '&:hover': { color: 'primary.main', background: 'none' }
             }}
           >
             Trang chủ
-          </Link>
+          </Button>
           <Typography sx={{ color: 'text.primary', fontWeight: 500 }}>
             Kết quả tìm kiếm
           </Typography>

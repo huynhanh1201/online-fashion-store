@@ -3,6 +3,7 @@ import { Button, Box } from '@mui/material'
 import { styled } from '@mui/system'
 import { getHeaderConfig } from '~/services/admin/webConfig/headerService'
 import { optimizeCloudinaryUrl } from '~/utils/cloudinary.js'
+import { Link } from 'react-router-dom'
 
 const LogoButton = styled(Button)(({ theme }) => ({
   fontWeight: 700,
@@ -74,7 +75,7 @@ const Logo = () => {
     )
   }
 
-  return <LogoButton href='/'>{logoData?.text || 'FASHIONSTORE™'}</LogoButton>
+  return <LogoButton component={Link} to='/'>{logoData?.text || 'FASHIONSTORE™'}</LogoButton>
 }
 
 export default Logo

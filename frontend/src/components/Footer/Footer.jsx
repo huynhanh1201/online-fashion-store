@@ -19,6 +19,7 @@ import SearchIcon from '@mui/icons-material/Search'
 import LinkIcon from '@mui/icons-material/Link'
 import { getFooterConfig } from '~/services/admin/webConfig/footerService.js'
 import { getAllPolicies } from '~/services/policyService.js'
+import { Link } from 'react-router-dom'
 
 function Footer() {
   const [footer, setFooter] = useState(null)
@@ -110,8 +111,8 @@ function Footer() {
               {policies.map((policy) => (
                 <Typography
                   key={policy._id}
-                  component='a'
-                  href={`/policy#${policy.category}`}
+                  component={Link}
+                  to={`/policy#${policy.category}`}
                   sx={{ color: 'inherit', textDecoration: 'none', cursor: 'pointer', '&:hover': { textDecoration: 'underline' } }}
                 >
                   {policy.title}

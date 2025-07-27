@@ -14,6 +14,7 @@ import RemoveIcon from '@mui/icons-material/Remove'
 import LocalOfferIcon from '@mui/icons-material/LocalOffer'
 import { optimizeCloudinaryUrl } from '~/utils/cloudinary'
 import SizeGuide from './SizeGuide/SizeGuide.jsx'
+import { Link } from 'react-router-dom'
 
 const PriceTypography = styled(Typography)({
   color: 'var(--error-color)',

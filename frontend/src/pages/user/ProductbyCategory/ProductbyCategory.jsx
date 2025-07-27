@@ -10,7 +10,7 @@ import {
   Pagination,
   PaginationItem,
   Breadcrumbs,
-  Link
+  Button
 } from '@mui/material'
 import NavigateNextIcon from '@mui/icons-material/NavigateNext'
 import { addToCart, getCart } from '~/services/cartService'
@@ -19,7 +19,7 @@ import { useDispatch } from 'react-redux'
 import { setCartItems } from '~/redux/cart/cartSlice'
 import ProductCard from '~/components/ProductCards/ProductCards'
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward'
-import { useParams } from 'react-router-dom'
+import { useParams, Link } from 'react-router-dom'
 import { getCategoryById, getChildCategories } from '~/services/categoryService'
 import { optimizeCloudinaryUrl } from '~/utils/cloudinary.js'
 
@@ -256,21 +256,24 @@ const ProductbyCategory = () => {
         aria-label='breadcrumb'
         sx={{ pt: 2, width: '100%', maxWidth: '95vw', mx: 'auto' }}
       >
-        <Link
-          underline='hover'
+        <Button
+          component={Link}
+          to='/'
           sx={{
             display: 'flex',
             alignItems: 'center',
             color: '#007bff',
             textDecoration: 'none',
+            minWidth: 0,
+            p: 0,
             '&:hover': {
-              color: 'primary.main'
+              color: 'primary.main',
+              background: 'none'
             }
           }}
-          href='/'
         >
           Trang chủ
-        </Link>
+        </Button>
         <Typography
           sx={{
             display: 'flex',

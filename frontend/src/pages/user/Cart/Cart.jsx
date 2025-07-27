@@ -22,9 +22,9 @@ import {
   CardContent,
   Grid,
   Tooltip,
-  Breadcrumbs,
-  Link
+  Breadcrumbs
 } from '@mui/material'
+import { Link } from 'react-router-dom'
 import {
   Delete,
   Add,
@@ -618,21 +618,6 @@ const Cart = () => {
           separator={<NavigateNext fontSize='small' />}
           aria-label='breadcrumb'
         >
-          <Link
-            underline='hover'
-            sx={{
-              display: 'flex',
-              alignItems: 'center',
-              color: '#007bff',
-              textDecoration: 'none',
-              '&:hover': {
-                color: 'primary.main'
-              }
-            }}
-            href='/'
-          >
-            Trang chủ
-          </Link>
           <Button
             underline='hover'
             sx={{
@@ -644,9 +629,24 @@ const Cart = () => {
                 color: 'primary.main'
               }
             }}
-            onClick={() => navigate('/product')}
-            // component={Link}
-            // to='/product'
+            component={Link}
+            to='/'
+          >
+            Trang chủ
+          </Button>
+          <Button
+            underline='hover'
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              color: '#007bff',
+              textDecoration: 'none',
+              '&:hover': {
+                color: 'primary.main'
+              }
+            }}
+            component={Link}
+            to='/product'
           >
             Sản phẩm
           </Button>

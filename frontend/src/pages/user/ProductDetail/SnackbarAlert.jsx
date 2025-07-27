@@ -2,8 +2,8 @@ import React from 'react'
 import { Snackbar, Alert, Box, Typography, Button } from '@mui/material'
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart'
 import { optimizeCloudinaryUrl } from '~/utils/cloudinary'
-
 import { Link } from 'react-router-dom'
+
 
 const SnackbarAlert = ({
   open,
