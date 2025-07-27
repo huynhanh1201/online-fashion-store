@@ -89,7 +89,16 @@ const ViewAccountModal = ({ open, onClose, user, roles }) => {
                     <TableCell sx={{ fontWeight: 'bold', width: '30%' }}>
                       Tên tài khoản
                     </TableCell>
-                    <TableCell>{user.name || '—'}</TableCell>
+                    <TableCell>
+                      {user.name
+                        .split(' ')
+                        .map(
+                          (word) =>
+                            word.charAt(0).toUpperCase() +
+                            word.slice(1).toLowerCase()
+                        )
+                        .join(' ') || '—'}
+                    </TableCell>
                   </TableRow>
 
                   <TableRow>

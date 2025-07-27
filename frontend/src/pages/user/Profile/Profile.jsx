@@ -34,7 +34,6 @@ import { useDispatch } from 'react-redux'
 import { updateUserAPI } from '~/redux/user/userSlice'
 import { URI, CLOUD_FOLDER } from '~/utils/constants'
 
-
 const uploadToCloudinary = async (file) => {
   const formData = new FormData()
   formData.append('file', file)
@@ -53,7 +52,7 @@ function validatePassword(pw) {
     /[A-Z]/.test(pw) &&
     /[0-9]/.test(pw) &&
     /[^A-Za-z0-9]/.test(pw)
-  );
+  )
 }
 
 const Profile = () => {
@@ -79,11 +78,11 @@ const Profile = () => {
     confirm: false
   })
   const [openForgotDialog, setOpenForgotDialog] = useState(false)
-  
+
   // Thêm state để theo dõi giá trị gốc
   const [originalName, setOriginalName] = useState('')
   const [originalAvatarUrl, setOriginalAvatarUrl] = useState('')
-  
+
   const dispatch = useDispatch()
 
   const handleTabChange = (_, newValue) => setTab(newValue)
@@ -156,11 +155,11 @@ const Profile = () => {
       setName(result.name)
       setAvatarPreview(result.avatarUrl || '')
       setAvatarFile(null)
-      
+
       // Cập nhật giá trị gốc sau khi cập nhật thành công
       setOriginalName(result.name || '')
       setOriginalAvatarUrl(result.avatarUrl || '')
-      
+
       dispatch(updateUserAPI(result))
       showSnackbar('Cập nhật thành công!')
     } else {
@@ -180,7 +179,10 @@ const Profile = () => {
     }
 
     if (!validatePassword(newPassword)) {
-      showSnackbar('Mật khẩu mới phải có tối thiểu 8 ký tự, gồm chữ thường, chữ hoa, số và ký tự đặc biệt.', 'error')
+      showSnackbar(
+        'Mật khẩu mới phải có tối thiểu 8 ký tự, gồm chữ thường, chữ hoa, số và ký tự đặc biệt.',
+        'error'
+      )
       return
     }
 
@@ -243,7 +245,7 @@ const Profile = () => {
         console.error('Lỗi khi tải thông tin hồ sơ:', error)
         showSnackbar(
           error.message ||
-          'Không thể tải thông tin hồ sơ. Vui lòng thử lại sau.',
+            'Không thể tải thông tin hồ sơ. Vui lòng thử lại sau.',
           'error'
         )
         // Reset các giá trị về mặc định
@@ -370,7 +372,7 @@ const Profile = () => {
 
       <Dialog
         open={openPasswordDialog}
-        onClose={() => { }}
+        onClose={() => {}}
         disableEscapeKeyDown
         fullWidth
         maxWidth='xs'
@@ -448,7 +450,9 @@ const Profile = () => {
         <DialogTitle>Quên mật khẩu</DialogTitle>
         <DialogContent>
           <Typography gutterBottom>
-            Nếu bạn quên mật khẩu, vui lòng sử dụng chức năng "Quên mật khẩu" tại trang đăng nhập hoặc liên hệ bộ phận hỗ trợ để được cấp lại mật khẩu mới.
+            Nếu bạn quên mật khẩu, vui lòng sử dụng chức năng "Quên mật khẩu"
+            tại trang đăng nhập hoặc liên hệ bộ phận hỗ trợ để được cấp lại mật
+            khẩu mới.
           </Typography>
           <Button
             variant='contained'
@@ -463,7 +467,9 @@ const Profile = () => {
           </Button>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleCloseForgotDialog} color='secondary'>Đóng</Button>
+          <Button onClick={handleCloseForgotDialog} color='secondary'>
+            Đóng
+          </Button>
         </DialogActions>
       </Dialog>
 

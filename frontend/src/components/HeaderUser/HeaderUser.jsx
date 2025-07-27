@@ -89,6 +89,9 @@ const HeaderUser = () => {
                 noWrap
                 className='no-select'
                 sx={{
+                  display: currentUser
+                    ? { xs: 'none', sm: 'flex' }
+                    : { xs: 'none', sm: 'flex' },
                   fontSize: { xs: '0.9rem', sm: '1.1rem', md: '1.25rem' },
                   cursor: 'pointer',
                   userSelect: 'none',
@@ -112,7 +115,7 @@ const HeaderUser = () => {
                 overflow: 'visible'
               }}
             >
-              <Menu headerRef={headerRef} />
+              <Menu headerRef={headerRef} currentUser={currentUser || ''} />
             </Box>
 
             {/* Right Section - Search & Actions */}
@@ -120,29 +123,23 @@ const HeaderUser = () => {
               sx={{
                 display: 'flex',
                 alignItems: 'center',
-                gap: { xs: 0.5, sm: 1, md: 1.5 },
+                gap: currentUser ? 1.5 : 3,
                 justifyContent: 'flex-end',
                 flexShrink: 0,
                 minWidth: '270px',
-                maxWidth: { xs: '50%', sm: '40%', md: 'none' }
+                maxWidth: { xs: '50%', sm: '40%' }
               }}
             >
               {/* Search Component - Hide on very small screens */}
               <Box
                 sx={{
-                  display: { xs: 'none', sm: 'block' },
                   flex: 1,
-                  minWidth: 0,
                   mr: -3,
-                  maxWidth: 400
+                  maxWidth: 400,
+                  minWidth: { xl: 0, lg: '45%' }
                 }}
               >
-                <Search />
-              </Box>
-
-              {/* Search Icon for mobile */}
-              <Box sx={{ display: { xs: 'block', sm: 'none' } }}>
-                <Search compact />
+                <Search onclose={handleDrawerToggle} />
               </Box>
 
               {/* Auth Buttons */}
