@@ -14,7 +14,7 @@ import {
 } from '@mui/material'
 import NavigateNextIcon from '@mui/icons-material/NavigateNext'
 import { addToCart, getCart } from '~/services/cartService'
-import useProducts from '~/hooks/useProducts'
+import { getProducts } from '~/services/productService'
 import { useDispatch } from 'react-redux'
 import { setCartItems } from '~/redux/cart/cartSlice'
 import ProductCard from '~/components/ProductCards/ProductCards'
@@ -83,15 +83,13 @@ const sortOptions = [
 const ProductbyCategory = () => {
   const { categoryId } = useParams()
   const dispatch = useDispatch()
-  const {
-    products: allProducts,
-    fetchProducts,
-    loading: loadingProducts,
-    error: errorProducts
-  } = useProducts(1, 1000)
-
-  const [filteredProducts, setFilteredProducts] = useState([])
   const [sortOption, setSortOption] = useState('featured')
+
+  const [products, setProducts] = useState([])
+  const [loadingProducts, setLoadingProducts] = useState(false)
+  const [errorProducts, setErrorProducts] = useState(null)
+  const [totalPages, setTotalPages] = useState(1)
+
   const [snackbar, setSnackbar] = useState(null)
   const [isAdding, setIsAdding] = useState({})
   const [page, setPage] = useState(1)
@@ -101,6 +99,7 @@ const ProductbyCategory = () => {
   const [childCategories, setChildCategories] = useState([])
   const [allCategoryIds, setAllCategoryIds] = useState([])
 
+  // Fetch category and children
   useEffect(() => {
     const fetchCategoryAndChildren = async () => {
       try {
@@ -130,72 +129,69 @@ const ProductbyCategory = () => {
     }
   }, [categoryId])
 
+  // Fetch products with backend sorting and category filtering
+  const fetchProducts = async () => {
+    try {
+      setLoadingProducts(true)
+      setErrorProducts(null)
+
+      // Map sort option to API sort parameter
+      const backendSortMap = {
+        nameAsc: 'name_asc',
+        nameDesc: 'name_desc',
+        priceAsc: 'price_asc',
+        priceDesc: 'price_desc',
+      }
+
+      const params = {
+        page: Number(page),
+        limit: Number(ITEMS_PER_PAGE),
+        sort: backendSortMap[sortOption] || 'newest',
+        // Add category filter - backend sẽ filter theo categoryIds
+        categoryIds: allCategoryIds.length > 0 ? allCategoryIds.join(',') : categoryId
+      }
+
+      console.log('Fetching products with params:', params)
+
+      const response = await getProducts(params)
+      console.log('API Response:', response)
+
+      const fetchedProducts = response.products || []
+      const total = response.total || fetchedProducts.length
+      const calculatedTotalPages = Math.ceil(total / ITEMS_PER_PAGE) || 1
+
+      if (!Array.isArray(fetchedProducts)) {
+        console.error('Products không phải là array:', fetchedProducts)
+        throw new Error('Dữ liệu sản phẩm không hợp lệ')
+      }
+
+      // Backend đã xử lý sorting và filtering, không cần client-side processing
+      setProducts(fetchedProducts)
+      setTotalPages(calculatedTotalPages)
+    } catch (error) {
+      console.error('Chi tiết lỗi:', error)
+      setErrorProducts(
+        error.message ||
+        'Không thể tải danh sách sản phẩm. Vui lòng thử lại sau.'
+      )
+      setProducts([])
+      setTotalPages(1)
+    } finally {
+      setLoadingProducts(false)
+    }
+  }
+
   // Scroll to top on component mount
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'auto' })
   }, [])
 
+  // Fetch products when dependencies change
   useEffect(() => {
-    fetchProducts()
-  }, [])
-
-  useEffect(() => {
-    if (!allProducts.length && !loadingProducts) return
-
-    let sortedProducts = [...allProducts]
-
-    if (allCategoryIds.length > 0) {
-      // Lọc sản phẩm theo tất cả categoryIds (parent + children)
-      sortedProducts = sortedProducts.filter((product) => {
-        const productCategoryId = product.categoryId?._id || product.categoryId
-        return allCategoryIds.includes(productCategoryId)
-      })
-
-      // Sắp xếp sản phẩm
-      switch (sortOption) {
-        case 'priceAsc':
-          sortedProducts.sort(
-            (a, b) => (a.exportPrice || 0) - (b.exportPrice || 0)
-          )
-          break
-        case 'priceDesc':
-          sortedProducts.sort(
-            (a, b) => (b.exportPrice || 0) - (a.exportPrice || 0)
-          )
-          break
-        case 'nameAsc':
-          sortedProducts.sort((a, b) =>
-            (a.name || '').localeCompare(b.name || '')
-          )
-          break
-        case 'nameDesc':
-          sortedProducts.sort((a, b) =>
-            (b.name || '').localeCompare(a.name || '')
-          )
-          break
-        default:
-          // Sắp xếp theo ngày tạo mới nhất
-          sortedProducts.sort(
-            (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
-          )
-          break
-      }
-
-      console.log(
-        'Chi tiết sản phẩm sau khi lọc:',
-        sortedProducts.map((p) => ({
-          id: p._id,
-          name: p.name,
-          categoryId: p.categoryId?._id || p.categoryId,
-          price: p.exportPrice,
-          createdAt: p.createdAt
-        }))
-      )
+    if (allCategoryIds.length > 0 || categoryId) {
+      fetchProducts()
     }
-
-    setFilteredProducts(sortedProducts)
-    setPage(1)
-  }, [allProducts, sortOption, allCategoryIds, loadingProducts])
+  }, [sortOption, page, allCategoryIds, categoryId])
 
   const handleAddToCart = async (product) => {
     if (isAdding[product._id]) return
@@ -240,13 +236,6 @@ const ProductbyCategory = () => {
     setPage(value)
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
-
-  const paginatedProducts = filteredProducts.slice(
-    (page - 1) * ITEMS_PER_PAGE,
-    page * ITEMS_PER_PAGE
-  )
-
-  const totalPages = Math.ceil(filteredProducts.length / ITEMS_PER_PAGE) || 1;
 
   React.useEffect(() => {
     if (!sortMenuOpen) return
@@ -389,7 +378,7 @@ const ProductbyCategory = () => {
             <Typography sx={{ textAlign: 'center', mt: 10 }} color='error'>
               Lỗi khi tải sản phẩm: {errorProducts.message || errorProducts}
             </Typography>
-          ) : filteredProducts.length === 0 ? (
+          ) : products.length === 0 ? (
             <Typography sx={{ textAlign: 'center', mt: 10 }}>
               Không tìm thấy sản phẩm nào trong danh mục này. Vui lòng kiểm tra
               danh mục hoặc thử lại sau.
@@ -397,7 +386,7 @@ const ProductbyCategory = () => {
           ) : (
             <>
               <div className='product-grid'>
-                {filteredProducts.map((product) => (
+                {products.map((product) => (
                   <div key={product._id}>
                     <ProductCard
                       product={product}

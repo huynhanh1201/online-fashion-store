@@ -640,7 +640,7 @@ const BlogDetail = () => {
                       <Box
                         sx={{
                           width: '100%',
-                          height: { xs: '480px', sm: '600px', md: '750px' },
+                          // height: { xs: '480px', sm: '600px', md: '750px' },
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'center',
@@ -669,7 +669,7 @@ const BlogDetail = () => {
                           opacity: imageLoaded ? 1 : 0,
                           transition: 'opacity 0.3s ease',
                           width: '100%',
-                          height: { xs: '480px', sm: '600px', md: '750px' },
+                          // height: { xs: '480px', sm: '600px', md: '750px' },
                           backgroundColor: 'grey.100', // nền xám nếu hình có khoảng trống
                           borderRadius: 0
                         }}

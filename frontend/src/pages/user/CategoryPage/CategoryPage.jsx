@@ -17,7 +17,7 @@ import {
 } from '@mui/material'
 import NavigateNextIcon from '@mui/icons-material/NavigateNext'
 import { getCategoryBySlug } from '~/services/categoryService'
-import { getProductsByCategory } from '~/services/productService'
+import { getProducts } from '~/services/productService'
 import ProductCard from '~/components/ProductCards/ProductCards'
 import { optimizeCloudinaryUrl } from '~/utils/cloudinary.js'
 import { addToCart, getCart } from '~/services/cartService'
@@ -87,7 +87,6 @@ const CategoryPage = () => {
   const dispatch = useDispatch()
   const [category, setCategory] = useState(null)
   const [products, setProducts] = useState([])
-  const [filteredProducts, setFilteredProducts] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [sortOption, setSortOption] = useState('featured')
@@ -95,9 +94,11 @@ const CategoryPage = () => {
   const [isAdding, setIsAdding] = useState({})
   const [page, setPage] = useState(1)
   const [sortMenuOpen, setSortMenuOpen] = useState(false)
+  const [totalPages, setTotalPages] = useState(1)
 
+  // Fetch category data
   useEffect(() => {
-    const fetchCategoryAndProducts = async () => {
+    const fetchCategory = async () => {
       try {
         setLoading(true)
         setError('')
@@ -110,63 +111,78 @@ const CategoryPage = () => {
         }
 
         setCategory(categoryData)
-
-        // Fetch products in this category
-        const productsData = await getProductsByCategory(categoryData._id, 1, 100)
-        setProducts(productsData.products || [])
-
       } catch (err) {
-        console.error('Lỗi khi tải dữ liệu:', err)
-        setError('Có lỗi xảy ra khi tải dữ liệu')
+        console.error('Lỗi khi tải danh mục:', err)
+        setError('Có lỗi xảy ra khi tải danh mục')
       } finally {
         setLoading(false)
       }
     }
 
     if (slug) {
-      fetchCategoryAndProducts()
+      fetchCategory()
     }
   }, [slug])
 
-  // Sort products when products or sortOption changes
-  useEffect(() => {
-    if (!products.length) return
+  // Fetch products with backend sorting
+  const fetchProducts = async () => {
+    if (!category?._id) return
 
-    let sortedProducts = [...products]
+    try {
+      setLoading(true)
+      setError('')
 
-    // Sort products
-    switch (sortOption) {
-      case 'priceAsc':
-        sortedProducts.sort(
-          (a, b) => (a.exportPrice || 0) - (b.exportPrice || 0)
-        )
-        break
-      case 'priceDesc':
-        sortedProducts.sort(
-          (a, b) => (b.exportPrice || 0) - (a.exportPrice || 0)
-        )
-        break
-      case 'nameAsc':
-        sortedProducts.sort((a, b) =>
-          (a.name || '').localeCompare(b.name || '')
-        )
-        break
-      case 'nameDesc':
-        sortedProducts.sort((a, b) =>
-          (b.name || '').localeCompare(a.name || '')
-        )
-        break
-      default:
-        // Sort by creation date (newest first)
-        sortedProducts.sort(
-          (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
-        )
-        break
+      // Map sort option to API sort parameter
+      const backendSortMap = {
+        nameAsc: 'name_asc',
+        nameDesc: 'name_desc',
+        priceAsc: 'price_asc',
+        priceDesc: 'price_desc',
+      }
+
+      const params = {
+        page: Number(page),
+        limit: Number(ITEMS_PER_PAGE),
+        sort: backendSortMap[sortOption] || 'newest',
+        // Add category filter
+        categoryId: category._id
+      }
+
+      console.log('Fetching products with params:', params)
+
+      const response = await getProducts(params)
+      console.log('API Response:', response)
+
+      const fetchedProducts = response.products || []
+      const total = response.total || fetchedProducts.length
+      const calculatedTotalPages = Math.ceil(total / ITEMS_PER_PAGE) || 1
+
+      if (!Array.isArray(fetchedProducts)) {
+        console.error('Products không phải là array:', fetchedProducts)
+        throw new Error('Dữ liệu sản phẩm không hợp lệ')
+      }
+
+      // Backend đã xử lý sorting và filtering, không cần client-side processing
+      setProducts(fetchedProducts)
+      setTotalPages(calculatedTotalPages)
+    } catch (err) {
+      console.error('Lỗi khi tải sản phẩm:', err)
+      setError('Có lỗi xảy ra khi tải sản phẩm')
+      setProducts([])
+      setTotalPages(1)
+    } finally {
+      setLoading(false)
     }
+  }
 
-    setFilteredProducts(sortedProducts)
-    setPage(1)
-  }, [products, sortOption])
+  // Fetch products when dependencies change
+  useEffect(() => {
+    if (category?._id) {
+      fetchProducts()
+    }
+  }, [category, sortOption, page])
+
+
 
   const handleAddToCart = async (product) => {
     if (isAdding[product._id]) return
@@ -211,11 +227,6 @@ const CategoryPage = () => {
     setPage(value)
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
-
-  const paginatedProducts = filteredProducts.slice(
-    (page - 1) * ITEMS_PER_PAGE,
-    page * ITEMS_PER_PAGE
-  )
 
   useEffect(() => {
     if (!sortMenuOpen) return
@@ -435,7 +446,7 @@ const CategoryPage = () => {
 
         {/* Products Grid */}
         <Box sx={{ flexGrow: 1 }}>
-          {filteredProducts.length === 0 ? (
+          {products.length === 0 ? (
             <Typography sx={{ textAlign: 'center', mt: 10 }}>
               Không tìm thấy sản phẩm nào trong danh mục này. Vui lòng kiểm tra
               danh mục hoặc thử lại sau.
@@ -443,7 +454,7 @@ const CategoryPage = () => {
           ) : (
             <>
               <div className='product-grid'>
-                {paginatedProducts.map((product) => (
+                {products.map((product) => (
                   <div key={product._id}>
                     <ProductCard
                       product={product}
@@ -457,7 +468,7 @@ const CategoryPage = () => {
               {/* Pagination */}
               <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4, mb: 2, alignItems: 'center' }}>
                 <Pagination
-                  count={Math.ceil(filteredProducts.length / ITEMS_PER_PAGE) || 1}
+                  count={totalPages}
                   page={page}
                   onChange={handlePageChange}
                   boundaryCount={1}
