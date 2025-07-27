@@ -155,6 +155,7 @@ function App() {
       <Route element={<AdminProtectedRoute user={currentUser} />}>
         <Route path='/admin' element={<AdminLayout />}>
           <Route index element={<AdminHome />} />
+
           <Route path='user-management' element={<UserManagement />} />
           <Route path='account-management' element={<AccountManagement />} />
           <Route path='account-statistic' element={<AccountDashboard />} />

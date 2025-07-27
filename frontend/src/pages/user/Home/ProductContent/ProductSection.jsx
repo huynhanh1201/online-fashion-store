@@ -130,15 +130,15 @@ const ProductSection = ({
   useEffect(() => {
     const handleResize = () => {
       const width = window.innerWidth
-      if (width < 600) {
+      if (width <= 600) {
         setScreenSize('mobile')
-      } else if (width < 900) {
+      } else if (width <= 900) {
         setScreenSize('tablet')
-      } else if (width < 1200) {
+      } else if (width <= 1200) {
         setScreenSize('laptop')
-      } else if (width < 1400) {
+      } else if (width <= 1400) {
         setScreenSize('laptop-lage')
-      } else if (width < 1700) {
+      } else if (width <= 1700) {
         setScreenSize('desktop')
       }
     }
@@ -218,7 +218,7 @@ const ProductSection = ({
                 >
                   {bannerTitle || 'Danh mục sản phẩm'}
                 </h2> */}
-                {bannerDesc && (
+                {/* {bannerDesc && (
                   <p
                     style={{
                       ...styles.bannerDesc,
@@ -227,7 +227,7 @@ const ProductSection = ({
                   >
                     {bannerDesc}
                   </p>
-                )}
+                )} */}
               </div>
             </div>
           </Link>

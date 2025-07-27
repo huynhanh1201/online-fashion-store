@@ -1,7 +1,11 @@
 import React, { useState, useEffect } from 'react'
 import ProductCard from './ProductCards'
 
-const ProductHorizontalScroll = ({ products = [], defaultCardsPerRow = 5, gap = 20 }) => {
+const ProductHorizontalScroll = ({
+  products = [],
+  defaultCardsPerRow = 5,
+  gap = 20
+}) => {
   const [showAll, setShowAll] = useState(false)
   const [windowWidth, setWindowWidth] = useState(window.innerWidth)
   const [initialDisplayCount, setInitialDisplayCount] = useState(5) // Hiển thị 10 sản phẩm ban đầu (2 hàng)
@@ -16,18 +20,21 @@ const ProductHorizontalScroll = ({ products = [], defaultCardsPerRow = 5, gap = 
   }, [])
 
   // Lọc sản phẩm mới trong 7 ngày gần nhất
-  const now = new Date();
-  const sevenDaysAgo = new Date(now);
-  sevenDaysAgo.setDate(now.getDate() - 7);
-  const newProducts = products.filter(product => {
-    const createdAt = new Date(product.createdAt);
-    return createdAt >= sevenDaysAgo && createdAt <= now;
-  });
+  const now = new Date()
+  const sevenDaysAgo = new Date(now)
+  sevenDaysAgo.setDate(now.getDate() - 7)
+  const newProducts = products.filter((product) => {
+    const createdAt = new Date(product.createdAt)
+    return createdAt >= sevenDaysAgo && createdAt <= now
+  })
 
   // Xác định số card trên mỗi hàng dựa vào chiều rộng màn hình
   const getCardsPerRow = () => {
     if (windowWidth > 1300) {
       return defaultCardsPerRow // 5 cards on desktop
+    }
+    if (windowWidth > 1400) {
+      return 4 // 5 cards on desktop
     }
     if (windowWidth > 900) {
       return 3
@@ -42,7 +49,7 @@ const ProductHorizontalScroll = ({ products = [], defaultCardsPerRow = 5, gap = 
 
   // Cập nhật số lượng hiển thị ban đầu dựa trên cardsPerRow
   useEffect(() => {
-    setInitialDisplayCount(cardsPerRow * 1 ) // Hiển thị 2 hàng ban đầu
+    setInitialDisplayCount(cardsPerRow * 1) // Hiển thị 2 hàng ban đầu
   }, [cardsPerRow])
 
   // Xác định số sản phẩm hiển thị
@@ -66,10 +73,7 @@ const ProductHorizontalScroll = ({ products = [], defaultCardsPerRow = 5, gap = 
     <div className='products-grid-container'>
       <div className='products-grid'>
         {visibleProducts.map((product) => (
-          <div
-            key={product._id || product.id}
-            className='product-item'
-          >
+          <div key={product._id || product.id} className='product-item'>
             <ProductCard product={product} />
           </div>
         ))}
@@ -118,6 +122,12 @@ const ProductHorizontalScroll = ({ products = [], defaultCardsPerRow = 5, gap = 
           transform: translateY(0);
         }
         
+        @media (max-width: 1400px) {
+          .products-grid {
+            grid-template-columns: repeat(4, 1fr);
+          }
+        }
+        
         @media (max-width: 1300px) {
           .products-grid {
             grid-template-columns: repeat(3, 1fr);
@@ -130,9 +140,9 @@ const ProductHorizontalScroll = ({ products = [], defaultCardsPerRow = 5, gap = 
           }
         }
         
-        @media (max-width: 600px) {
+        @media (max-width: 680px) {
           .products-grid {
-            grid-template-columns: repeat(2, 1fr);
+            grid-template-columns: repeat(1, 1fr);
             gap: 10px;
           }
           
@@ -146,4 +156,4 @@ const ProductHorizontalScroll = ({ products = [], defaultCardsPerRow = 5, gap = 
   )
 }
 
-export default ProductHorizontalScroll 
+export default ProductHorizontalScroll

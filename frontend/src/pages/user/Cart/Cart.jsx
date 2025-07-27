@@ -23,7 +23,7 @@ import {
   Grid,
   Tooltip,
   Breadcrumbs,
-  Link,
+  Link
 } from '@mui/material'
 import {
   Delete,
@@ -34,10 +34,10 @@ import {
   LocalOffer,
   Payment,
   ArrowForward,
-  NavigateNext,
+  NavigateNext
 } from '@mui/icons-material'
 import { useCart } from '~/hooks/useCarts'
-import { useNavigate } from 'react-router-dom'
+import { Navigate, useNavigate } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import {
   setSelectedItems as setSelectedItemsAction,
@@ -45,7 +45,7 @@ import {
   removeTempQuantity,
   clearReorderVariantIds,
   setAppliedCoupon,
-  clearAppliedCoupon,
+  clearAppliedCoupon
 } from '~/redux/cart/cartSlice'
 import { optimizeCloudinaryUrl } from '~/utils/cloudinary'
 import { getDiscounts } from '~/services/discountService'
@@ -65,7 +65,9 @@ const Cart = () => {
   const [deleteMode, setDeleteMode] = useState('')
   const [itemToDelete, setItemToDelete] = useState(null)
   const tempQuantities = useSelector((state) => state.cart.tempQuantities || {})
-  const reorderVariantIds = useSelector((state) => state.cart.reorderVariantIds || [])
+  const reorderVariantIds = useSelector(
+    (state) => state.cart.reorderVariantIds || []
+  )
   const [processingVariantId, setProcessingVariantId] = useState(null)
   const [hasAutoSelected, setHasAutoSelected] = useState(false)
   const [outOfStockAlert, setOutOfStockAlert] = useState(false)
@@ -78,7 +80,7 @@ const Cart = () => {
 
     // Cleanup timers on unmount
     return () => {
-      Object.values(updateTimers).forEach(timer => {
+      Object.values(updateTimers).forEach((timer) => {
         if (timer) clearTimeout(timer)
       })
     }
@@ -87,11 +89,18 @@ const Cart = () => {
   // Revalidate selected items when cart data changes to handle race conditions
   useEffect(() => {
     if (selectedItems.length > 0 && cartItems.length > 0) {
-      const validSelectedItems = selectedItems.filter(selected => {
-        const item = cartItems.find(cartItem =>
-          (cartItem.variant?._id || cartItem.variantId?._id || cartItem.variantId) === selected.variantId
+      const validSelectedItems = selectedItems.filter((selected) => {
+        const item = cartItems.find(
+          (cartItem) =>
+            (cartItem.variant?._id ||
+              cartItem.variantId?._id ||
+              cartItem.variantId) === selected.variantId
         )
-        return item && item.quantity > 0 && (item.variant?.quantity === undefined || item.variant.quantity > 0)
+        return (
+          item &&
+          item.quantity > 0 &&
+          (item.variant?.quantity === undefined || item.variant.quantity > 0)
+        )
       })
 
       // If any selected items are now invalid, update the selection
@@ -100,7 +109,9 @@ const Cart = () => {
         dispatch(setSelectedItemsAction(validSelectedItems))
 
         if (validSelectedItems.length < selectedItems.length) {
-          setOutOfStockMessage('Một số sản phẩm đã chọn hiện đã hết hàng và đã được bỏ chọn')
+          setOutOfStockMessage(
+            'Một số sản phẩm đã chọn hiện đã hết hàng và đã được bỏ chọn'
+          )
           setOutOfStockAlert(true)
         }
       }
@@ -116,17 +127,21 @@ const Cart = () => {
       })
       setCartItems(sortedItems)
 
-      const outOfStockItems = sortedItems.filter(item => item.quantity === 0)
+      const outOfStockItems = sortedItems.filter((item) => item.quantity === 0)
       if (outOfStockItems.length > 0) {
-        setOutOfStockMessage('Một số sản phẩm trong giỏ hàng đã hết hàng và không thể chọn để thanh toán')
+        setOutOfStockMessage(
+          'Một số sản phẩm trong giỏ hàng đã hết hàng và không thể chọn để thanh toán'
+        )
         setOutOfStockAlert(true)
-        setSelectedItems(prev => {
-          const filteredItems = prev.filter(selected =>
-            !outOfStockItems.some(outOfStock =>
-              outOfStock.variant?._id === selected.variantId ||
-              outOfStock.variantId?._id === selected.variantId ||
-              outOfStock.variantId === selected.variantId
-            )
+        setSelectedItems((prev) => {
+          const filteredItems = prev.filter(
+            (selected) =>
+              !outOfStockItems.some(
+                (outOfStock) =>
+                  outOfStock.variant?._id === selected.variantId ||
+                  outOfStock.variantId?._id === selected.variantId ||
+                  outOfStock.variantId === selected.variantId
+              )
           )
           dispatch(setSelectedItemsAction(filteredItems))
           return filteredItems
@@ -136,15 +151,20 @@ const Cart = () => {
   }, [cart, dispatch])
 
   useEffect(() => {
-    if (cartItems.length > 0 && reorderVariantIds.length > 0 && !hasAutoSelected) {
+    if (
+      cartItems.length > 0 &&
+      reorderVariantIds.length > 0 &&
+      !hasAutoSelected
+    ) {
       const reorderSelectedItems = cartItems
-        .filter(item => {
-          const variantId = item.variant?._id || item.variantId?._id || item.variantId
+        .filter((item) => {
+          const variantId =
+            item.variant?._id || item.variantId?._id || item.variantId
           const isMatch = reorderVariantIds.includes(variantId)
           const hasStock = item.quantity > 0
           return isMatch && hasStock
         })
-        .map(item => ({
+        .map((item) => ({
           variantId: item.variant?._id || item.variantId?._id || item.variantId,
           quantity: item.quantity
         }))
@@ -166,7 +186,7 @@ const Cart = () => {
         const res = await getDiscounts()
         if (Array.isArray(res.discounts) && res.discounts.length > 0) {
           setCoupons(
-            res.discounts.sort((a, b) => a.minOrderValue - b.minOrderValue),
+            res.discounts.sort((a, b) => a.minOrderValue - b.minOrderValue)
           )
         }
       } catch (error) {
@@ -180,27 +200,31 @@ const Cart = () => {
   }, [hasFetchedCoupons])
 
   // Lọc ra các sản phẩm có thể chọn (không hết hàng)
-  const selectableItems = cartItems.filter(item => item.quantity > 0)
+  const selectableItems = cartItems.filter((item) => item.quantity > 0)
 
   // Tính toán các sản phẩm có thể chọn đã được chọn
-  const selectedSelectableItems = selectedItems.filter(selected =>
-    selectableItems.some(item =>
-      (item.variant?._id || item.variantId?._id || item.variantId) === selected.variantId
+  const selectedSelectableItems = selectedItems.filter((selected) =>
+    selectableItems.some(
+      (item) =>
+        (item.variant?._id || item.variantId?._id || item.variantId) ===
+        selected.variantId
     )
   )
 
   const allSelected =
-    selectableItems.length > 0 && selectedSelectableItems.length === selectableItems.length
+    selectableItems.length > 0 &&
+    selectedSelectableItems.length === selectableItems.length
   const someSelected =
-    selectedSelectableItems.length > 0 && selectedSelectableItems.length < selectableItems.length
+    selectedSelectableItems.length > 0 &&
+    selectedSelectableItems.length < selectableItems.length
 
   const handleSelectAll = () => {
     const newSelected = allSelected
       ? []
       : selectableItems.map((item) => ({
-        variantId: item.variant?._id || item.variantId?._id || item.variantId,
-        quantity: item.quantity,
-      }))
+          variantId: item.variant?._id || item.variantId?._id || item.variantId,
+          quantity: item.quantity
+        }))
 
     setSelectedItems(newSelected)
     dispatch(setSelectedItemsAction(newSelected))
@@ -212,7 +236,9 @@ const Cart = () => {
     const exists = selectedItems.some((i) => i.variantId === variantId)
 
     // Kiểm tra tình trạng hết hàng trước khi cho phép select
-    const isOutOfStock = item.quantity === 0 || (variant?.quantity !== undefined && variant.quantity === 0)
+    const isOutOfStock =
+      item.quantity === 0 ||
+      (variant?.quantity !== undefined && variant.quantity === 0)
 
     // Nếu sản phẩm hết hàng và đang cố gắng select (không phải unselect), thì không cho phép
     if (!exists && isOutOfStock) {
@@ -230,9 +256,7 @@ const Cart = () => {
   }
 
   const formatPrice = (val) =>
-    typeof val === 'number'
-      ? val.toLocaleString('vi-VN') + '₫'
-      : '0₫'
+    typeof val === 'number' ? val.toLocaleString('vi-VN') + '₫' : '0₫'
 
   const handleMouseDown = (variantId, delta) => {
     // Prevent multiple operations on same variant
@@ -264,7 +288,7 @@ const Cart = () => {
       if (existingItem) {
         // Nếu đã được chọn, chỉ cập nhật số lượng
         newSelectedItems = prev.map((i) =>
-          i.variantId === variantId ? { ...i, quantity: newQty } : i,
+          i.variantId === variantId ? { ...i, quantity: newQty } : i
         )
       } else {
         // Nếu chưa được chọn, thêm vào danh sách đã chọn
@@ -297,13 +321,13 @@ const Cart = () => {
 
         setCartItems((prev) =>
           prev.map((i) =>
-            i.variant._id === variantId ? { ...i, quantity: tempQty } : i,
-          ),
+            i.variant._id === variantId ? { ...i, quantity: tempQty } : i
+          )
         )
 
         setSelectedItems((prev) => {
           const newSelectedItems = prev.map((i) =>
-            i.variantId === variantId ? { ...i, quantity: tempQty } : i,
+            i.variantId === variantId ? { ...i, quantity: tempQty } : i
           )
           // Cập nhật Redux store
           dispatch(setSelectedItemsAction(newSelectedItems))
@@ -318,7 +342,7 @@ const Cart = () => {
         setOutOfStockAlert(true)
       } finally {
         setProcessingVariantId(null)
-        setUpdateTimers(prev => {
+        setUpdateTimers((prev) => {
           const newTimers = { ...prev }
           delete newTimers[variantId]
           return newTimers
@@ -326,7 +350,7 @@ const Cart = () => {
       }
     }, 500)
 
-    setUpdateTimers(prev => ({
+    setUpdateTimers((prev) => ({
       ...prev,
       [variantId]: timer
     }))
@@ -337,10 +361,10 @@ const Cart = () => {
       const res = await deleteItem({ variantId })
       if (res) {
         setCartItems((prev) =>
-          prev.filter((item) => item.variant._id !== variantId),
+          prev.filter((item) => item.variant._id !== variantId)
         )
         setSelectedItems((prev) =>
-          prev.filter((i) => i.variantId !== variantId),
+          prev.filter((i) => i.variantId !== variantId)
         )
       }
     } catch (error) {
@@ -349,7 +373,7 @@ const Cart = () => {
   }
 
   const selectedCartItems = cartItems.filter((item) =>
-    selectedItems.some((selected) => selected.variantId === item.variant._id),
+    selectedItems.some((selected) => selected.variantId === item.variant._id)
   )
 
   // Helper function to get final price (exportPrice minus discountPrice)
@@ -373,7 +397,7 @@ const Cart = () => {
 
     // Chỉ tính tiết kiệm nếu có discountPrice
     if (variant.discountPrice && variant.discountPrice > 0) {
-      return sum + (variant.discountPrice * qty)
+      return sum + variant.discountPrice * qty
     }
     return sum
   }, 0)
@@ -405,8 +429,10 @@ const Cart = () => {
 
     // Kiểm tra xem có sản phẩm đã chọn nào hết hàng không
     const selectedCartItems = cartItems.filter((item) =>
-      selectedItems.some((selected) =>
-        (item.variant?._id || item.variantId?._id || item.variantId) === selected.variantId
+      selectedItems.some(
+        (selected) =>
+          (item.variant?._id || item.variantId?._id || item.variantId) ===
+          selected.variantId
       )
     )
 
@@ -417,22 +443,33 @@ const Cart = () => {
       return
     }
 
-    const hasOutOfStockSelected = selectedCartItems.some(item =>
-      item.quantity === 0 || (item.variant?.quantity !== undefined && item.variant.quantity === 0)
+    const hasOutOfStockSelected = selectedCartItems.some(
+      (item) =>
+        item.quantity === 0 ||
+        (item.variant?.quantity !== undefined && item.variant.quantity === 0)
     )
 
     if (hasOutOfStockSelected) {
       // Tự động loại bỏ các sản phẩm hết hàng khỏi danh sách đã chọn
-      const validSelectedItems = selectedItems.filter(selected => {
-        const item = cartItems.find(cartItem =>
-          (cartItem.variant?._id || cartItem.variantId?._id || cartItem.variantId) === selected.variantId
+      const validSelectedItems = selectedItems.filter((selected) => {
+        const item = cartItems.find(
+          (cartItem) =>
+            (cartItem.variant?._id ||
+              cartItem.variantId?._id ||
+              cartItem.variantId) === selected.variantId
         )
-        return item && item.quantity > 0 && (item.variant?.quantity === undefined || item.variant.quantity > 0)
+        return (
+          item &&
+          item.quantity > 0 &&
+          (item.variant?.quantity === undefined || item.variant.quantity > 0)
+        )
       })
 
       setSelectedItems(validSelectedItems)
       dispatch(setSelectedItemsAction(validSelectedItems))
-      setOutOfStockMessage('Đã loại bỏ các sản phẩm hết hàng khỏi danh sách thanh toán')
+      setOutOfStockMessage(
+        'Đã loại bỏ các sản phẩm hết hàng khỏi danh sách thanh toán'
+      )
       setOutOfStockAlert(true)
 
       // Nếu sau khi loại bỏ không còn sản phẩm nào, không cho phép thanh toán
@@ -454,10 +491,12 @@ const Cart = () => {
     const applicableCoupon = getApplicableCoupon()
     if (applicableCoupon) {
       const discountAmount = calculateDiscount(applicableCoupon, totalPrice)
-      dispatch(setAppliedCoupon({
-        coupon: applicableCoupon,
-        discount: discountAmount
-      }))
+      dispatch(
+        setAppliedCoupon({
+          coupon: applicableCoupon,
+          discount: discountAmount
+        })
+      )
     } else {
       // Xóa mã giảm giá cũ nếu không có mã nào áp dụng được
       dispatch(clearAppliedCoupon())
@@ -465,7 +504,6 @@ const Cart = () => {
 
     navigate('/payment')
   }
-
 
   const calculateDiscount = (coupon, total) => {
     if (!coupon || total < coupon.minOrderValue) return 0
@@ -489,7 +527,9 @@ const Cart = () => {
   const getNextCoupon = () => {
     if (!coupons.length) return null
 
-    const sorted = [...coupons].sort((a, b) => a.minOrderValue - b.minOrderValue)
+    const sorted = [...coupons].sort(
+      (a, b) => a.minOrderValue - b.minOrderValue
+    )
     const applicable = getApplicableCoupon()
 
     if (!applicable) {
@@ -518,7 +558,7 @@ const Cart = () => {
           display: 'flex',
           justifyContent: 'center',
           alignItems: 'center',
-          mt: 10,
+          mt: 10
         }}
       >
         <Box
@@ -528,11 +568,21 @@ const Cart = () => {
             textAlign: 'center',
             borderRadius: 2,
             width: '100%',
-            maxWidth: 500,
+            maxWidth: 500
           }}
         >
-          <ShoppingCart sx={{ fontSize: 60, color: 'var(--primary-color)', mb: 2, opacity: 0.7 }} />
-          <Typography variant="h5" sx={{ fontWeight: 600, color: 'var(--primary-color)' }}>
+          <ShoppingCart
+            sx={{
+              fontSize: 60,
+              color: 'var(--primary-color)',
+              mb: 2,
+              opacity: 0.7
+            }}
+          />
+          <Typography
+            variant='h5'
+            sx={{ fontWeight: 600, color: 'var(--primary-color)' }}
+          >
             Đang tải giỏ hàng...
           </Typography>
         </Box>
@@ -550,7 +600,7 @@ const Cart = () => {
         minHeight: '70vh',
         mt: { xs: 10, md: 16 },
         mb: { xs: 3, md: 5 },
-        px: { xs: 2, sm: 3, md: 4 },
+        px: { xs: 2, sm: 3, md: 4 }
       }}
     >
       {/* Breadcrumb */}
@@ -583,7 +633,7 @@ const Cart = () => {
           >
             Trang chủ
           </Link>
-          <Link
+          <Button
             underline='hover'
             sx={{
               display: 'flex',
@@ -594,10 +644,12 @@ const Cart = () => {
                 color: 'primary.main'
               }
             }}
-            href={`/product`}
+            onClick={() => navigate('/product')}
+            // component={Link}
+            // to='/product'
           >
             Sản phẩm
-          </Link>
+          </Button>
           <Typography
             sx={{
               display: 'flex',
@@ -623,25 +675,32 @@ const Cart = () => {
         }}
       >
         <Box
-          display="flex"
-          justifyContent="space-between"
-          alignItems="center"
-          flexWrap="wrap"
+          display='flex'
+          justifyContent='space-between'
+          alignItems='center'
+          flexWrap='wrap'
           gap={2}
         >
-          <Box display="flex" alignItems="center" gap={1.5}>
-            <ShoppingCart sx={{ fontSize: 28, color: 'var(--primary-color)' }} />
+          <Box display='flex' alignItems='center' gap={1.5}>
+            <ShoppingCart
+              sx={{ fontSize: 28, color: 'var(--primary-color)' }}
+            />
             <Typography
-              variant="h5"
-              sx={{ fontWeight: 700, color: 'var(--primary-color)', letterSpacing: 0.5 }}
+              variant='h5'
+              sx={{
+                fontWeight: 700,
+                color: 'var(--primary-color)',
+                letterSpacing: 0.5,
+                fontSize: { xs: '1.25rem', md: '1.5rem' }
+              }}
             >
-              Giỏ hàng của bạn
+              Giỏ hàng
             </Typography>
           </Box>
           <Chip
             label={`${cartItems.length} Sản phẩm`}
-            color="primary"
-            variant="outlined"
+            color='primary'
+            variant='outlined'
             sx={{ fontWeight: 600, borderRadius: 6, px: 1.5 }}
           />
         </Box>
@@ -650,11 +709,12 @@ const Cart = () => {
       {/* Coupon notification */}
       <Box
         sx={{
-          maxHeight: coupons.length > 0 && selectedItems.length > 0 ? '200px' : 0,
+          maxHeight:
+            coupons.length > 0 && selectedItems.length > 0 ? '200px' : 0,
           overflow: 'hidden',
           transition: 'all 0.3s ease-in-out',
           opacity: coupons.length > 0 && selectedItems.length > 0 ? 1 : 0,
-          mb: coupons.length > 0 && selectedItems.length > 0 ? 1 : 0,
+          mb: coupons.length > 0 && selectedItems.length > 0 ? 1 : 0
         }}
       >
         <Paper
@@ -662,13 +722,13 @@ const Cart = () => {
           sx={{
             p: 1,
             borderRadius: 2,
-            border: '1px dashed var(--primary-color)',
+            border: '1px dashed var(--primary-color)'
           }}
         >
-          <Box display="flex" alignItems="center" gap={1.5} flexWrap="wrap">
+          <Box display='flex' alignItems='center' gap={1.5} flexWrap='wrap'>
             <LocalOffer sx={{ color: 'var(--primary-color)', fontSize: 24 }} />
             <Typography
-              variant="body2"
+              variant='body2'
               sx={{ color: 'var(--primary-color)', fontWeight: 500, flex: 1 }}
             >
               {(() => {
@@ -681,17 +741,18 @@ const Cart = () => {
                     return (
                       <>
                         Bạn đang được giảm
-                        <Box component="span" sx={{ fontWeight: 600, mx: 0.5 }}>
+                        <Box component='span' sx={{ fontWeight: 600, mx: 0.5 }}>
                           {formatPrice(discountAmount)}
                         </Box>
                         , chỉ cần mua thêm
-                        <Box component="span" sx={{ fontWeight: 600, mx: 0.5 }}>
+                        <Box component='span' sx={{ fontWeight: 600, mx: 0.5 }}>
                           {formatPrice(nextCoupon.minOrderValue - totalPrice)}
                         </Box>
                         để nhận mã giảm
-                        <Box component="span" sx={{ fontWeight: 600, mx: 0.5 }}>
+                        <Box component='span' sx={{ fontWeight: 600, mx: 0.5 }}>
                           {nextDiscountText}
-                        </Box>{''}
+                        </Box>
+                        {''}
                         🎉!
                       </>
                     )
@@ -699,9 +760,10 @@ const Cart = () => {
                   return (
                     <>
                       Đơn hàng của bạn đã đạt mức giảm cao nhất:{''}
-                      <Box component="span" sx={{ fontWeight: 600, mx: 0.5 }}>
+                      <Box component='span' sx={{ fontWeight: 600, mx: 0.5 }}>
                         {formatPrice(discountAmount)}
-                      </Box>{''}
+                      </Box>
+                      {''}
                       🎉
                     </>
                   )
@@ -715,11 +777,11 @@ const Cart = () => {
                   return (
                     <>
                       Chỉ cần mua thêm
-                      <Box component="span" sx={{ fontWeight: 600, mx: 0.5 }}>
+                      <Box component='span' sx={{ fontWeight: 600, mx: 0.5 }}>
                         {formatPrice(first.minOrderValue - totalPrice)}
                       </Box>
                       để nhận mã giảm
-                      <Box component="span" sx={{ fontWeight: 600, mx: 0.5 }}>
+                      <Box component='span' sx={{ fontWeight: 600, mx: 0.5 }}>
                         {discountText}
                       </Box>
                       !
@@ -733,17 +795,14 @@ const Cart = () => {
         </Paper>
       </Box>
 
-
-
       {/* Cart items */}
       <Box
-        display="flex"
+        display='flex'
         flexDirection={{ xs: 'column', md: 'row' }}
-        alignItems="flex-start"
+        alignItems='flex-start'
         gap={3}
         sx={{
-          position: 'relative',
-
+          position: 'relative'
         }}
       >
         <Box
@@ -755,7 +814,7 @@ const Cart = () => {
             sx={{
               borderRadius: 2,
               overflow: 'hidden',
-              boxShadow: '0 4px 20px rgba(0,0,0,0.05)',
+              boxShadow: '0 4px 20px rgba(0,0,0,0.05)'
             }}
           >
             {cartItems.length === 0 ? (
@@ -766,21 +825,27 @@ const Cart = () => {
                   display: 'flex',
                   flexDirection: 'column',
                   alignItems: 'center',
-                  gap: 2,
+                  gap: 2
                 }}
               >
                 <ShoppingCart sx={{ fontSize: 80, color: '#ccc' }} />
                 <Typography
-                  variant="h5"
+                  variant='h5'
                   sx={{ color: 'text.secondary', fontWeight: 500 }}
                 >
                   Giỏ hàng của bạn đang trống
                 </Typography>
                 <Button
-                  variant="contained"
+                  variant='contained'
                   onClick={() => navigate('/')}
                   startIcon={<ArrowForward />}
-                  sx={{ mt: 2, borderRadius: 6, px: 4, color: '#fff', backgroundColor: 'var(--primary-color)' }}
+                  sx={{
+                    mt: 2,
+                    borderRadius: 6,
+                    px: 4,
+                    color: '#fff',
+                    backgroundColor: 'var(--primary-color)'
+                  }}
                 >
                   Tiếp tục mua sắm
                 </Button>
@@ -794,33 +859,33 @@ const Cart = () => {
                     backgroundColor: 'var(--primary-color)10',
                     display: 'flex',
                     alignItems: 'center',
-                    gap: 2,
+                    gap: 2
                   }}
                 >
                   <Checkbox
                     indeterminate={someSelected}
                     checked={allSelected}
                     onChange={handleSelectAll}
-                    color="primary"
+                    color='primary'
                     sx={{ p: 1, alignSelf: 'center' }}
                   />
                   <Typography
                     sx={{
                       fontWeight: 600,
-                      fontSize: { xs: '0.9rem', sm: '1rem' },
+                      fontSize: { xs: '0.9rem', sm: '1rem' }
                     }}
                   >
                     Chọn tất cả
                   </Typography>
                   <Box sx={{ flexGrow: 1 }} />
-                  <Tooltip title="Xóa tất cả">
+                  <Tooltip title='Xóa tất cả'>
                     <IconButton
-                      color="error"
+                      color='error'
                       onClick={() => {
                         setDeleteMode('all')
                         setConfirmClearOpen(true)
                       }}
-                      size="small"
+                      size='small'
                     >
                       <DeleteForever />
                     </IconButton>
@@ -834,7 +899,9 @@ const Cart = () => {
 
                   // Kiểm tra xem sản phẩm có hết hàng không (quantity = 0)
                   // Check cả item.quantity và variant.quantity để đảm bảo chính xác
-                  const isOutOfStock = item.quantity === 0 || (variant.quantity !== undefined && variant.quantity === 0)
+                  const isOutOfStock =
+                    item.quantity === 0 ||
+                    (variant.quantity !== undefined && variant.quantity === 0)
 
                   return (
                     <React.Fragment key={item._id}>
@@ -846,18 +913,21 @@ const Cart = () => {
                           gap: 2,
                           flexWrap: { xs: 'wrap', sm: 'nowrap' },
                           opacity: isOutOfStock ? 0.6 : 1, // Làm mờ sản phẩm hết hàng
-                          backgroundColor: isOutOfStock ? '#f5f5f5' : 'transparent',
+                          backgroundColor: isOutOfStock
+                            ? '#f5f5f5'
+                            : 'transparent'
                         }}
                       >
                         {/* Checkbox */}
                         <Checkbox
-                          checked={selectedItems.some((i) => i.variantId === variant._id)}
+                          checked={selectedItems.some(
+                            (i) => i.variantId === variant._id
+                          )}
                           onChange={() => handleSelect(item)}
-                          color="primary"
+                          color='primary'
                           disabled={isOutOfStock} // Disable checkbox khi hết hàng
                           sx={{ p: 1, alignSelf: 'center' }}
                         />
-
 
                         {/* Product Image */}
                         <Box
@@ -867,9 +937,9 @@ const Cart = () => {
                               setSelectedItemsAction([
                                 {
                                   variantId: variant._id,
-                                  quantity: item.quantity,
-                                },
-                              ]),
+                                  quantity: item.quantity
+                                }
+                              ])
                             )
                             navigate(`/productdetail/${variant.productId}`)
                           }}
@@ -879,13 +949,13 @@ const Cart = () => {
                               optimizeCloudinaryUrl(variant.color?.image) ||
                               '/default.jpg'
                             }
-                            variant="square"
+                            variant='square'
                             sx={{
                               width: { xs: 60, sm: 80, md: 100 },
                               height: { xs: 60, sm: 80, md: 100 },
                               borderRadius: 2,
                               objectFit: 'cover',
-                              boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+                              boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
                             }}
                           />
                         </Box>
@@ -897,22 +967,32 @@ const Cart = () => {
                             minWidth: 0,
                             display: 'flex',
                             flexDirection: 'column',
-                            gap: 1,
+                            gap: 1
                           }}
                         >
-                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                          <Box
+                            sx={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: 1
+                            }}
+                          >
                             <Typography
                               fontWeight={600}
                               sx={{
                                 fontSize: {
                                   xs: '0.8rem',
                                   sm: '0.9rem',
-                                  md: '1rem',
+                                  md: '1rem'
                                 },
-                                maxWidth: { xs: '200px', sm: '300px', md: '500px' },
+                                maxWidth: {
+                                  xs: '200px',
+                                  sm: '300px',
+                                  md: '500px'
+                                },
                                 whiteSpace: 'nowrap',
                                 overflow: 'hidden',
-                                textOverflow: 'ellipsis',
+                                textOverflow: 'ellipsis'
                               }}
                               title={variant.name}
                             >
@@ -920,41 +1000,52 @@ const Cart = () => {
                             </Typography>
                             {isOutOfStock && (
                               <Chip
-                                size="small"
-                                label="Hết hàng"
+                                size='small'
+                                label='Hết hàng'
                                 sx={{
                                   fontSize: '0.75rem',
                                   backgroundColor: '#ff5722',
                                   color: 'white',
                                   fontWeight: 600,
                                   '& .MuiChip-label': {
-                                    px: 1,
-                                  },
+                                    px: 1
+                                  }
                                 }}
                               />
                             )}
                           </Box>
 
-                          <Box display="flex" gap={1} flexWrap="wrap">
+                          <Box display='flex' gap={1} flexWrap='wrap'>
                             <Chip
-                              size="small"
-                              label={capitalizeFirstLetter(variant.color?.name) || 'Không rõ'}
+                              size='small'
+                              label={
+                                capitalizeFirstLetter(variant.color?.name) ||
+                                'Không rõ'
+                              }
                               sx={{ fontSize: '0.75rem' }}
                             />
                             <Chip
-                              size="small"
-                              label={formatSize(variant.size?.name) || 'Không rõ'}
+                              size='small'
+                              label={
+                                formatSize(variant.size?.name) || 'Không rõ'
+                              }
                               sx={{ fontSize: '0.75rem' }}
                             />
                           </Box>
-                          <Box display="flex" alignItems="center" gap={1} flexWrap="wrap">
-                            {variant.discountPrice && variant.discountPrice > 0 ? (
+                          <Box
+                            display='flex'
+                            alignItems='center'
+                            gap={1}
+                            flexWrap='wrap'
+                          >
+                            {variant.discountPrice &&
+                            variant.discountPrice > 0 ? (
                               <>
                                 <Typography
                                   sx={{
                                     fontWeight: 700,
                                     color: '#d32f2f',
-                                    fontSize: { xs: '0.9rem', sm: '1rem' },
+                                    fontSize: { xs: '0.9rem', sm: '1rem' }
                                   }}
                                 >
                                   {formatPrice(getFinalPrice(variant))}
@@ -964,19 +1055,19 @@ const Cart = () => {
                                     fontWeight: 500,
                                     color: 'text.secondary',
                                     fontSize: { xs: '0.8rem', sm: '0.9rem' },
-                                    textDecoration: 'line-through',
+                                    textDecoration: 'line-through'
                                   }}
                                 >
                                   {formatPrice(variant.exportPrice)}
                                 </Typography>
                                 <Chip
-                                  size="small"
+                                  size='small'
                                   label={`-${Math.round((variant.discountPrice / variant.exportPrice) * 100)}%`}
                                   sx={{
                                     backgroundColor: '#ff5722',
                                     color: 'white',
                                     fontSize: '0.7rem',
-                                    height: 18,
+                                    height: 18
                                   }}
                                 />
                               </>
@@ -985,7 +1076,7 @@ const Cart = () => {
                                 sx={{
                                   fontWeight: 700,
                                   color: '#d32f2f',
-                                  fontSize: { xs: '0.9rem', sm: '1rem' },
+                                  fontSize: { xs: '0.9rem', sm: '1rem' }
                                 }}
                               >
                                 {formatPrice(variant.exportPrice)}
@@ -1006,78 +1097,78 @@ const Cart = () => {
                           {/* Quantity controls - chỉ hiện khi không hết hàng */}
 
                           <Box
-                            display="flex"
-                            alignItems="center"
+                            display='flex'
+                            alignItems='center'
                             onMouseLeave={() => handleMouseLeave(variant._id)}
                             sx={{
                               border: '1px solid #e0e0e0',
                               borderRadius: 1,
-                              overflow: 'hidden',
+                              overflow: 'hidden'
                             }}
                           >
                             <IconButton
-                              size="small"
+                              size='small'
                               onMouseDown={() =>
                                 handleMouseDown(variant._id, -1)
                               }
                               disabled={
                                 processingVariantId === variant._id ||
                                 isOutOfStock ||
-                                (tempQuantities[variant._id] ?? item.quantity) <=
-                                1
+                                (tempQuantities[variant._id] ??
+                                  item.quantity) <= 1
                               }
                               sx={{ borderRadius: 0, p: 0.5 }}
                             >
-                              <Remove fontSize="small" />
+                              <Remove fontSize='small' />
                             </IconButton>
                             <TextField
                               value={
                                 tempQuantities[variant._id] ?? item.quantity
                               }
-                              size="small"
+                              size='small'
                               sx={{
                                 width: 40,
                                 '& .MuiOutlinedInput-root': {
-                                  '& fieldset': { border: 'none' },
-                                },
+                                  '& fieldset': { border: 'none' }
+                                }
                               }}
                               inputProps={{
                                 style: {
                                   textAlign: 'center',
                                   padding: '4px',
                                   fontWeight: 600,
-                                  fontSize: '0.9rem',
+                                  fontSize: '0.9rem'
                                 },
-                                readOnly: true,
+                                readOnly: true
                               }}
                             />
                             <IconButton
-                              size="small"
+                              size='small'
                               onMouseDown={() =>
                                 handleMouseDown(variant._id, 1)
                               }
                               disabled={
                                 processingVariantId === variant._id ||
                                 isOutOfStock ||
-                                (tempQuantities[variant._id] ?? item.quantity) >=
-                                (variant.quantity || 99)
+                                (tempQuantities[variant._id] ??
+                                  item.quantity) >= (variant.quantity || 99)
                               }
                               sx={{ borderRadius: 0, p: 0.5 }}
                             >
-                              <Add fontSize="small" />
+                              <Add fontSize='small' />
                             </IconButton>
                           </Box>
 
                           <IconButton
-                            color="error"
+                            color='error'
                             onClick={() => {
                               setDeleteMode('single')
                               setItemToDelete(variant)
                               setConfirmClearOpen(true)
                             }}
-                            size="small"
+                            size='small'
                           >
-                            <Delete fontSize="small" />
+                            <Delete fontSize='small' />
                           </IconButton>
                         </Box>
                       </Box>
@@ -1099,7 +1190,7 @@ const Cart = () => {
             top: { md: '120px' },
             alignSelf: { md: 'flex-start' },
             height: { md: 'fit-content' },
-            maxHeight: { md: 'calc(100vh - 48px)' },
+            maxHeight: { md: 'calc(100vh - 48px)' }
           }}
         >
           <Card
@@ -1112,20 +1203,20 @@ const Cart = () => {
               overflowY: { md: 'auto' },
               transition: 'all 0.3s ease-in-out',
               '&:hover': {
-                boxShadow: '0 8px 30px rgba(0,0,0,0.1)',
-              },
+                boxShadow: '0 8px 30px rgba(0,0,0,0.1)'
+              }
             }}
           >
             <CardContent sx={{ bgcolor: '#fff', p: { xs: 3, sm: 4 } }}>
               <Typography
-                variant="h6"
+                variant='h6'
                 sx={{ fontWeight: 700, mb: 3, color: 'var(--primary-color)' }}
               >
                 Tóm tắt đơn hàng
               </Typography>
               <Box sx={{ mb: 2 }}>
-                <Box display="flex" justifyContent="space-between" mb={1}>
-                  <Typography color="text.secondary">
+                <Box display='flex' justifyContent='space-between' mb={1}>
+                  <Typography color='text.secondary'>
                     Tạm tính ({selectedItems.length} sản phẩm):
                   </Typography>
                   <Typography fontWeight={500}>
@@ -1133,9 +1224,9 @@ const Cart = () => {
                   </Typography>
                 </Box>
                 {totalSavings > 0 && (
-                  <Box display="flex" justifyContent="space-between" mb={1}>
+                  <Box display='flex' justifyContent='space-between' mb={1}>
                     <Typography
-                      variant="body2"
+                      variant='body2'
                       sx={{
                         color: 'var(--success-color)',
                         fontSize: '0.85rem',
@@ -1145,7 +1236,7 @@ const Cart = () => {
                       Tiết kiệm được:
                     </Typography>
                     <Typography
-                      variant="body2"
+                      variant='body2'
                       sx={{
                         fontWeight: 600,
                         color: 'var(--success-color)',
@@ -1157,20 +1248,20 @@ const Cart = () => {
                   </Box>
                 )}
                 {applicableCoupon && (
-                  <Box display="flex" justifyContent="space-between" mb={1}>
-                    <Typography color="text.secondary">Giảm giá:</Typography>
-                    <Typography fontWeight={500} color="error">
+                  <Box display='flex' justifyContent='space-between' mb={1}>
+                    <Typography color='text.secondary'>Giảm giá:</Typography>
+                    <Typography fontWeight={500} color='error'>
                       -{formatPrice(discountAmount)}
                     </Typography>
                   </Box>
                 )}
                 <Divider sx={{ my: 2 }} />
-                <Box display="flex" justifyContent="space-between">
+                <Box display='flex' justifyContent='space-between'>
                   <Typography fontWeight={700}>Tổng cộng:</Typography>
                   <Typography
                     fontWeight={700}
                     sx={{ color: 'var(--primary-color)' }}
-                    fontSize="1.2rem"
+                    fontSize='1.2rem'
                   >
                     {formatPrice(totalPrice - discountAmount)}
                   </Typography>
@@ -1178,8 +1269,8 @@ const Cart = () => {
               </Box>
               <Button
                 fullWidth
-                variant="contained"
-                size="large"
+                variant='contained'
+                size='large'
                 startIcon={<Payment />}
                 sx={{
                   mt: 2,
@@ -1188,12 +1279,12 @@ const Cart = () => {
                   fontWeight: 600,
                   backgroundColor: 'var(--primary-color)',
                   '&:hover': {
-                    backgroundColor: 'var(--accent-color)',
+                    backgroundColor: 'var(--accent-color)'
                   },
                   '&:disabled': {
                     backgroundColor: '#ccc',
-                    color: '#666',
-                  },
+                    color: '#666'
+                  }
                 }}
                 disabled={selectedItems.length === 0}
                 onClick={handleCheckout}
@@ -1202,13 +1293,13 @@ const Cart = () => {
               </Button>
               <Button
                 fullWidth
-                variant="outlined"
-                size="large"
+                variant='outlined'
+                size='large'
                 sx={{
                   mt: 2,
                   py: 1.5,
                   borderRadius: 2,
-                  fontWeight: 600,
+                  fontWeight: 600
                 }}
                 onClick={() => navigate('/')}
               >
@@ -1227,7 +1318,7 @@ const Cart = () => {
         open={confirmClearOpen}
         onClose={() => setConfirmClearOpen(false)}
         PaperProps={{
-          sx: { borderRadius: 2 },
+          sx: { borderRadius: 2 }
         }}
       >
         <DialogTitle sx={{ fontWeight: 600 }}>
@@ -1242,15 +1333,15 @@ const Cart = () => {
         </DialogContent>
         <DialogActions sx={{ p: 2 }}>
           <Button
-            variant="outlined"
+            variant='outlined'
             onClick={() => setConfirmClearOpen(false)}
             sx={{ borderRadius: 6 }}
           >
             Hủy
           </Button>
           <Button
-            variant="contained"
-            color="error"
+            variant='contained'
+            color='error'
             sx={{ borderRadius: 6 }}
             onClick={() => {
               if (deleteMode === 'single') {
@@ -1274,7 +1365,7 @@ const Cart = () => {
         anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
       >
         <Alert
-          severity="warning"
+          severity='warning'
           onClose={() => setOutOfStockAlert(false)}
           sx={{ borderRadius: 2 }}
         >
@@ -1285,4 +1376,4 @@ const Cart = () => {
   )
 }
 
-export default Cart   
+export default Cart

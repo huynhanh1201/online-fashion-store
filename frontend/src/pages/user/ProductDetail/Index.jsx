@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { Container, Grid, Typography, Button, Box } from '@mui/material'
-import { useParams, Link as RouterLink } from 'react-router-dom'
+import { useParams, Link } from 'react-router-dom'
 import useProductDetail from '~/hooks/useProductDetail'
 import ProductImageSection from './ProductImageSection'
 import ProductInfoSection from './ProductInfoSection'
@@ -10,13 +10,17 @@ import SnackbarAlert from './SnackbarAlert'
 import RelatedProducts from './RelatedProducts'
 import { getCategoryById } from '~/services/categoryService'
 import Breadcrumbs from '@mui/material/Breadcrumbs'
-import { Link } from '@mui/material'
+// import { Link } from '@mui/material'
 import NavigateNextIcon from '@mui/icons-material/NavigateNext'
+
+import { useNavigate } from 'react-router-dom'
 
 const ProductDetail = () => {
   const { productId } = useParams()
   const [isViewingThumbnails, setIsViewingThumbnails] = useState(false)
   const [category, setCategory] = useState(null)
+
+  const navigate = useNavigate()
 
   const {
     product,
@@ -107,7 +111,7 @@ const ProductDetail = () => {
         px: 0,
         justifyContent: 'center',
         alignItems: 'center',
-        maxWidth: '1450px',
+        maxWidth: '97vw',
         width: '100%',
         mx: 'auto'
       }}
@@ -141,7 +145,7 @@ const ProductDetail = () => {
           >
             Trang chủ
           </Link>
-          <Link
+          <Button
             sx={{
               display: 'flex',
               alignItems: 'center',
@@ -151,10 +155,13 @@ const ProductDetail = () => {
                 color: 'primary.main'
               }
             }}
-            href='/product'
+            onClick={() => {
+              navigate('/admin')
+            }}
+            // href='/product'
           >
             Sản phẩm
-          </Link>
+          </Button>
           <Link
             sx={{
               display: 'flex',

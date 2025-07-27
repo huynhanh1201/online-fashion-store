@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react'
+import { Box, Typography } from '@mui/material'
 import ProductCard from '~/components/ProductCards/ProductCards'
 import { getProducts } from '~/services/productService'
 import '~/assets/HomeCSS/Content.css'
@@ -27,21 +28,55 @@ export default function SuggestionProducts({ limit = 5 }) {
   }, [limit])
 
   return (
-    <div className='related-products-container'>
-      <h2 style={{ fontWeight: 'bold', marginBottom: '15px' }}>Có thể bạn sẽ thích</h2>
+    <Box className="related-products-container" sx={{ px: { xs: 1, sm: 2 }, py: 3 }}>
+      <Typography
+        variant="h5"
+        sx={{
+          fontWeight: 'bold',
+          mb: 2,
+          fontSize: { xs: '1.2rem', sm: '1.5rem', md: '1.8rem' },
+        }}
+      >
+        Có thể bạn sẽ thích
+      </Typography>
       {loading ? (
-        <p>Đang tải...</p>
+        <Typography>Đang tải...</Typography>
       ) : error ? (
-        <p>{error}</p>
+        <Typography color="error">{error}</Typography>
       ) : suggestedProducts.length > 0 ? (
-        <section className='product-grid'>
+        <Box
+          className="product-grid"
+          sx={{
+            display: 'grid',
+            gridTemplateColumns: {
+              xs: '1fr', // 1 column on mobile
+              sm: 'repeat(2, 1fr)', // 2 columns on small screens
+              md: 'repeat(3, 1fr)', // 3 columns on medium screens
+              lg: 'repeat(5, 1fr)', // 5 columns on large screens
+            },
+            gap: { xs: 1, sm: 2, md: 3 }, // Smaller gap on mobile
+          }}
+        >
           {suggestedProducts.map((product) => (
-            <ProductCard key={product._id} product={product} />
+            <Box
+              key={product._id}
+              sx={{
+                minHeight: {
+                  xs: '220px', // Smaller height on mobile
+                  sm: '260px', // Medium height on small screens
+                  md: '300px', // Larger height on medium screens
+                },
+                maxWidth: '100%',
+                overflow: 'hidden',
+              }}
+            >
+              <ProductCard product={product} />
+            </Box>
           ))}
-        </section>
+        </Box>
       ) : (
-        <p>Không có sản phẩm gợi ý.</p>
+        <Typography>Không có sản phẩm gợi ý.</Typography>
       )}
-    </div>
+    </Box>
   )
 }

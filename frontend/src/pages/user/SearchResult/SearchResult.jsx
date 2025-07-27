@@ -15,13 +15,11 @@ import {
   PaginationItem
 } from '@mui/material'
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward'
-import SortByAlphaIcon from '@mui/icons-material/SortByAlpha'
 import NavigateNextIcon from '@mui/icons-material/NavigateNext'
 
 const ITEMS_PER_PAGE = 10
 
-// Custom styled button to mimic the dropdown in the image
-const SortDropdownButton = styled('button')(({ theme }) => ({
+const SortDropdownButton = styled('button')({
   border: '1px solid #222',
   background: '#fff',
   borderRadius: 0,
@@ -39,9 +37,9 @@ const SortDropdownButton = styled('button')(({ theme }) => ({
   '&:hover, &:focus': {
     border: '1.5px solid #111'
   }
-}))
+})
 
-const SortMenu = styled('div')(({ theme }) => ({
+const SortMenu = styled('div')({
   position: 'absolute',
   top: '110%',
   right: 0,
@@ -51,9 +49,9 @@ const SortMenu = styled('div')(({ theme }) => ({
   minWidth: 180,
   zIndex: 10,
   boxShadow: '0 2px 8px rgba(0,0,0,0.08)'
-}))
+})
 
-const SortMenuItem = styled('div')(({ theme }) => ({
+const SortMenuItem = styled('div')({
   padding: '10px 18px',
   fontSize: 14,
   cursor: 'pointer',
@@ -65,7 +63,7 @@ const SortMenuItem = styled('div')(({ theme }) => ({
     color: '#1976d2',
     fontWeight: 600
   }
-}))
+})
 
 const sortOptions = [
   { value: '', label: 'Sản phẩm nổi bật' },
@@ -87,7 +85,6 @@ const styles = {
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
-
     marginBottom: '2rem'
   },
   headerContent: {
@@ -128,23 +125,39 @@ export default function SearchResults() {
   const [products, setProducts] = useState([])
   const [filteredProducts, setFilteredProducts] = useState([])
   const [sortOption, setSortOption] = useState('')
-
   const [loading, setLoading] = useState(true)
   const [errorMessage, setErrorMessage] = useState('')
   const [sortMenuOpen, setSortMenuOpen] = useState(false)
   const [page, setPage] = useState(1)
   const location = useLocation()
 
-  // Lấy truy vấn tìm kiếm từ URL
   const query = new URLSearchParams(location.search).get('search') || ''
 
   useEffect(() => {
     const fetchProducts = async () => {
       setLoading(true)
       try {
-        const { products: allProducts } = await getProducts(1, 20)
+        const backendSortMap = {
+          priceAsc: 'price_asc',
+          priceDesc: 'price_desc',
+          nameAsc: 'name_asc',
+          nameDesc: 'name_desc',
+          '': ''
+        }
+
+        const params = {
+          page: 1,
+          limit: 1000,
+          sort: backendSortMap[sortOption] || 'newest',
+          filters: {}
+        }
+
+        const { products: allProducts } = await getProducts(params)
+
         const filtered = allProducts
-          .filter((p) => p.name.toLowerCase().includes(query.toLowerCase()))
+          .filter((p) =>
+            p.name?.toLowerCase().includes(query.toLowerCase())
+          )
           .map((p) => ({
             _id: p._id,
             name: p.name,
@@ -179,42 +192,12 @@ export default function SearchResults() {
 
     const debounce = setTimeout(fetchProducts, 300)
     return () => clearTimeout(debounce)
-  }, [query])
+  }, [query, sortOption])
 
-  // Sắp xếp
-  useEffect(() => {
-    let sortedProducts = [...products]
-    switch (sortOption) {
-      case 'priceAsc':
-        sortedProducts.sort(
-          (a, b) => (a.exportPrice || 0) - (b.exportPrice || 0)
-        )
-        break
-      case 'priceDesc':
-        sortedProducts.sort(
-          (a, b) => (b.exportPrice || 0) - (a.exportPrice || 0)
-        )
-        break
-      case 'nameAsc':
-        sortedProducts.sort((a, b) =>
-          (a.name || '').localeCompare(b.name || '')
-        )
-        break
-      case 'nameDesc':
-        sortedProducts.sort((a, b) =>
-          (b.name || '').localeCompare(a.name || '')
-        )
-        break
-      default:
-        break
-    }
-
-    setFilteredProducts(sortedProducts)
-    setPage(1) // Reset to first page when sorting changes
-  }, [products, sortOption])
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'auto' })
   }, [])
+
   const handlePageChange = (event, value) => {
     setPage(value)
     window.scrollTo({ top: 0, behavior: 'smooth' })
@@ -225,12 +208,10 @@ export default function SearchResults() {
     page * ITEMS_PER_PAGE
   )
 
-  const totalPages = Math.ceil(filteredProducts.length / ITEMS_PER_PAGE) || 1;
+  const totalPages = Math.ceil(filteredProducts.length / ITEMS_PER_PAGE) || 1
 
-
-
-  // For closing menu on outside click
-  React.useEffect(() => {
+  // Close sort menu on outside click
+  useEffect(() => {
     if (!sortMenuOpen) return
     const handleClick = (e) => {
       if (!e.target.closest('.sort-dropdown-root')) setSortMenuOpen(false)
@@ -239,22 +220,12 @@ export default function SearchResults() {
     return () => window.removeEventListener('mousedown', handleClick)
   }, [sortMenuOpen])
 
-  // Get label for current sort option
   const currentSort =
     sortOptions.find((opt) => opt.value === sortOption) || sortOptions[0]
 
   return (
     <div style={styles.container}>
-      <Box
-        sx={{
-          bottom: { xs: '20px', sm: '30px', md: '40px' },
-          left: { xs: '20px', sm: '30px', md: '40px' },
-          right: { xs: '20px', sm: '30px', md: '40px' },
-          padding: '12px',
-          maxWidth: '1800px',
-          margin: '0 auto'
-        }}
-      >
+      <Box sx={{ maxWidth: '1800px', margin: '0 auto', padding: '12px' }}>
         <Breadcrumbs
           separator={<NavigateNextIcon fontSize='small' />}
           aria-label='breadcrumb'
@@ -262,28 +233,15 @@ export default function SearchResults() {
         >
           <Link
             underline='hover'
-            sx={{
-              maxWidth: '1800px',
-              display: 'flex',
-              alignItems: 'center',
-              color: '#007bff',
-              textDecoration: 'none',
-              '&:hover': {
-                color: 'primary.main'
-              }
-            }}
             href='/'
+            sx={{
+              color: '#007bff',
+              '&:hover': { color: 'primary.main' }
+            }}
           >
             Trang chủ
           </Link>
-          <Typography
-            sx={{
-              display: 'flex',
-              alignItems: 'center',
-              color: 'text.primary',
-              fontWeight: 500
-            }}
-          >
+          <Typography sx={{ color: 'text.primary', fontWeight: 500 }}>
             Kết quả tìm kiếm
           </Typography>
         </Breadcrumbs>
@@ -295,17 +253,14 @@ export default function SearchResults() {
               Kết quả tìm kiếm cho: "{query || 'Tất cả'}"
             </h2>
             <p style={styles.resultsCount}>
-              Tìm thấy {products.length} sản phẩm phù hợp
+              Tìm thấy {filteredProducts.length} sản phẩm phù hợp
             </p>
           </div>
           <div style={styles.sortContainer}>
-            {/* Custom Dropdown Sort Button */}
             <Box className='sort-dropdown-root' sx={{ position: 'relative' }}>
               <SortDropdownButton
                 onClick={() => setSortMenuOpen((open) => !open)}
                 tabIndex={0}
-                aria-haspopup='listbox'
-                aria-expanded={sortMenuOpen}
               >
                 <span style={{ fontWeight: 400 }}>{currentSort.label}</span>
                 <Box sx={{ display: 'flex', alignItems: 'center', ml: 'auto' }}>
@@ -317,24 +272,13 @@ export default function SearchResults() {
                     }}
                   >
                     <span
-                      style={{
-                        lineHeight: 1,
-                        fontSize: 15,
-                        fontWeight: 700,
-                        marginBottom: -2
-                      }}
+                      style={{ fontSize: 15, fontWeight: 700, marginBottom: -2 }}
                     >
                       A
                     </span>
-                    <span
-                      style={{ lineHeight: 1, fontSize: 15, fontWeight: 700 }}
-                    >
-                      Z
-                    </span>
+                    <span style={{ fontSize: 15, fontWeight: 700 }}>Z</span>
                   </span>
-                  <ArrowDownwardIcon
-                    sx={{ fontSize: 20, marginBottom: '-2px' }}
-                  />
+                  <ArrowDownwardIcon sx={{ fontSize: 20 }} />
                 </Box>
               </SortDropdownButton>
               {sortMenuOpen && (
@@ -345,6 +289,7 @@ export default function SearchResults() {
                       onClick={() => {
                         setSortOption(opt.value)
                         setSortMenuOpen(false)
+                        setPage(1)
                       }}
                       style={{
                         fontWeight: sortOption === opt.value ? 600 : 400,
@@ -370,7 +315,7 @@ export default function SearchResults() {
           <Typography sx={{ textAlign: 'center', mt: 10 }} color='error'>
             {errorMessage}
           </Typography>
-        ) : products.length === 0 ? (
+        ) : filteredProducts.length === 0 ? (
           <Typography sx={{ textAlign: 'center', mt: 10 }}>
             Không có sản phẩm nào.
           </Typography>
@@ -379,44 +324,25 @@ export default function SearchResults() {
             <div className='product-grid'>
               {paginatedProducts.map((product) => (
                 <Grid key={product._id}>
-                  <ProductCard
-                    product={product}
-                    isFlashSale={false}
-                  />
+                  <ProductCard product={product} isFlashSale={false} />
                 </Grid>
               ))}
             </div>
-
-            <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4, mb: 2, alignItems: 'center' }}>
+            <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
               <Pagination
                 count={totalPages}
                 page={page}
                 onChange={handlePageChange}
-                boundaryCount={1}
-                siblingCount={1}
-                shape="rounded"
-                size="small"
-                color="primary"
-                renderItem={(item) => {
-                  if (item.type === 'start-ellipsis' || item.type === 'end-ellipsis') {
-                    return (
-                      <span
-                        style={{
-                          padding: '8px 12px',
-                          fontWeight: 'bold',
-                          color: '#999',
-                          fontSize: '1rem',
-                          display: 'inline-flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                        }}
-                      >
-                        ...
-                      </span>
-                    )
-                  }
-                  return <PaginationItem {...item} />
-                }}
+                shape='rounded'
+                color='primary'
+                size='small'
+                renderItem={(item) =>
+                  item.type === 'start-ellipsis' || item.type === 'end-ellipsis' ? (
+                    <span style={{ padding: '8px 12px', color: '#999' }}>...</span>
+                  ) : (
+                    <PaginationItem {...item} />
+                  )
+                }
               />
             </Box>
           </>

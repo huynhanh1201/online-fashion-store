@@ -81,7 +81,7 @@ const MobileDrawer = ({ open, onClose }) => {
   const navigate = useNavigate()
   const [categories, setCategories] = useState([])
   const [openDropdown, setOpenDropdown] = useState(null)
-
+  const [allCategories, setAllCategories] = useState([])
   // Logic lấy gợi ý tìm kiếm
   useEffect(() => {
     if (searchText.trim() === '') {
@@ -126,38 +126,57 @@ const MobileDrawer = ({ open, onClose }) => {
     }
   }, [open])
 
-  // Xử lý gửi tìm kiếm
-  const handleSubmit = (e) => {
-    e.preventDefault()
-    if (searchText.trim()) {
-      navigate(`/searchresult?search=${encodeURIComponent(searchText.trim())}`)
-      setSearchText('')
-      setSuggestions([])
-      setErrorMessage('')
-      onClose() // Đóng drawer
-    }
-  }
-
-  // Xử lý chọn gợi ý
-  const handleSuggestionClick = (productId) => {
-    setSearchText('')
-    navigate(`/productdetail/${productId}`)
-    setSuggestions([])
-    setErrorMessage('')
-    onClose() // Đóng drawer
-  }
-
   useEffect(() => {
     const fetchCategories = async () => {
       try {
         const res = await getCategories(1, 100)
-        setCategories(res.categories?.data || res.categories || [])
-      } catch (e) {
+        const allCategories = res.categories?.data || res.categories || []
+
+        // Lọc danh mục con có parent và chưa bị xoá
+        const childCategoriesWithProduct = allCategories.filter(
+          (cat) => cat.parent && !cat.destroy
+        )
+
+        const parentIds = [
+          ...new Set(
+            childCategoriesWithProduct.map((cat) =>
+              typeof cat.parent === 'object' ? cat.parent._id : cat.parent
+            )
+          )
+        ]
+
+        const parentCategories = allCategories.filter(
+          (cat) => parentIds.includes(cat._id) && !cat.destroy
+        )
+
+        const rootCategoriesWithProducts = allCategories.filter(
+          (cat) =>
+            !cat.parent &&
+            !cat.destroy &&
+            Array.isArray(cat.products) &&
+            cat.products.length > 0
+        )
+
+        setCategories([...parentCategories, ...rootCategoriesWithProducts])
+
+        setAllCategories(allCategories) // dùng cho getChildCategories
+      } catch {
         setCategories([])
       }
     }
+
     if (open) fetchCategories()
   }, [open])
+  const getChildCategories = (parentCategory) => {
+    if (!parentCategory || !parentCategory._id) return []
+    return allCategories.filter(
+      (cat) =>
+        !cat.destroy &&
+        cat.parent &&
+        (typeof cat.parent === 'object' ? cat.parent._id : cat.parent) ===
+          parentCategory._id
+    )
+  }
 
   const handleDropdown = (idx) => {
     setOpenDropdown(openDropdown === idx ? null : idx)
@@ -169,187 +188,207 @@ const MobileDrawer = ({ open, onClose }) => {
       open={open}
       onClose={onClose}
       ModalProps={{
-        keepMounted: true // Cải thiện hiệu năng mobile
+        keepMounted: true, // Cải thiện hiệu năng mobile
+        disableEnforceFocus: true
       }}
       sx={{
         display: { xs: 'block', md: 'none' },
         '& .MuiDrawer-paper': {
           boxSizing: 'border-box',
-          width: 280,
-          zIndex: 1300
+          width: '80%',
+          zIndex: 1
         }
       }}
     >
       <Box
         sx={{
-          width: 280,
+          width: '100%',
           p: 2,
           display: 'flex',
           flexDirection: 'column',
-          gap: 2,
+          gap: 1,
           mt: 12
         }}
       >
-        <Typography variant='h6' sx={{ fontWeight: 900 }}>
+        <Typography variant='h6' sx={{ fontWeight: 900, mt: 1 }}>
           <Box>Menu</Box>
         </Typography>
 
-        <SearchWrapper component='form' onSubmit={handleSubmit}>
-          <SearchInput
-            inputRef={inputRef}
-            placeholder='Tìm kiếm sản phẩm...'
-            value={searchText}
-            onChange={(e) => setSearchText(e.target.value)}
-          />
-
-          {(suggestions.length > 0 || errorMessage) && (
-            <SuggestionList>
-              {errorMessage ? (
-                <Typography
-                  variant='body2'
-                  color='error'
-                  textAlign='center'
-                  sx={{ py: 2, px: 2 }}
-                >
-                  {errorMessage}
-                </Typography>
-              ) : (
-                suggestions.map((product, index) => (
-                  <StyledListItem
-                    key={product._id}
-                    onClick={() => handleSuggestionClick(product._id)}
-                    sx={{
-                      animation: `fadeIn 0.3s ease ${index * 0.05}s`,
-                      '@keyframes fadeIn': {
-                        from: { opacity: 0, transform: 'translateY(5px)' },
-                        to: { opacity: 1, transform: 'translateY(0)' }
-                      }
-                    }}
-                  >
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                      <img
-                        src={product.image?.[0] || '/fallback.jpg'}
-                        alt={product.name}
-                        onError={(e) => {
-                          e.target.onerror = null
-                          e.target.src = '/fallback.jpg'
-                        }}
-                        style={{
-                          width: 48,
-                          height: 48,
-                          objectFit: 'cover',
-                          borderRadius: 8,
-                          flexShrink: 0
-                        }}
-                      />
-                      <Box sx={{ flex: 1, overflow: 'hidden' }}>
-                        <Typography
-                          variant='subtitle2'
-                          fontWeight={600}
-                          noWrap
-                          sx={{ maxWidth: '200px' }}
-                        >
-                          {product.name}
-                        </Typography>
-                        <Typography
-                          variant='body2'
-                          color='primary'
-                          fontWeight={500}
-                        >
-                          {(product.exportPrice ?? 0).toLocaleString()} VND
-                        </Typography>
-                      </Box>
-                    </Box>
-                  </StyledListItem>
-                ))
-              )}
-            </SuggestionList>
-          )}
-        </SearchWrapper>
-
-        <Divider />
-
         <List>
+          <Divider />
           {/* Sản phẩm */}
-          <ListItem button onClick={() => { navigate('/product'); onClose() }}>
-            <ListItemText primary="Sản phẩm" />
-          </ListItem>
-          {/* Hàng mới với badge New */}
-          <ListItem button onClick={() => { navigate('/productnews'); onClose() }}>
+          <ListItem
+            button
+            onClick={() => {
+              navigate('/product')
+              onClose()
+            }}
+          >
             <ListItemText
               primary={
                 <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                  Hàng Mới
-                  <span style={{ color: 'red', fontWeight: 700, marginLeft: 6, fontSize: 13 }}>New</span>
+                  Sản phẩm
                 </Box>
               }
             />
           </ListItem>
+          <Divider />
+          {/* Hàng mới với badge New */}
+          <ListItem
+            button
+            onClick={() => {
+              navigate('/productnews')
+              onClose()
+            }}
+          >
+            <ListItemText
+              primary={
+                <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                  Hàng Mới
+                  <span
+                    style={{
+                      color: 'red',
+                      fontWeight: 700,
+                      marginLeft: 6,
+                      fontSize: 13
+                    }}
+                  >
+                    New
+                  </span>
+                </Box>
+              }
+            />
+          </ListItem>
+          <Divider />
           {/* Danh mục động từ API */}
-          {categories.map((cat, idx) => (
-            <React.Fragment key={cat._id}>
-              <ListItem
-                button
-                onClick={() => {
-                  if (cat.children && cat.children.length > 0) {
-                    handleDropdown(idx)
-                  } else {
-                    navigate(`/productbycategory/${cat._id}`)
-                    onClose()
-                  }
-                }}
-                sx={{
-                  color: cat.color || 'inherit',
-                  fontWeight: cat.bold ? 700 : 400,
-                  ...(cat.name === 'OUTLET' && { color: 'red', fontWeight: 700 }),
-                }}
-              >
-                <ListItemText
-                  primary={
-                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                      {/* Nếu là OUTLET, in đậm đỏ và có giảm giá nếu có */}
-                      {cat.name === 'OUTLET' ? (
-                        <>
-                          {cat.discount && (
-                            <span style={{ color: 'red', fontWeight: 700, marginRight: 4 }}>{cat.discount}</span>
-                          )}
-                          OUTLET
-                        </>
-                      ) : (
-                        cat.name
-                      )}
-                      {/* Nếu có children, hiển thị dấu > */}
-                      {cat.children && cat.children.length > 0 && (
-                        <IconButton size="small" sx={{ ml: 1 }} onClick={e => { e.stopPropagation(); handleDropdown(idx) }}>
-                          {openDropdown === idx ? <ExpandLessIcon /> : <ExpandMoreIcon />}
-                        </IconButton>
-                      )}
-                    </Box>
-                  }
-                />
-              </ListItem>
-              {/* Submenu nếu có */}
-              {cat.children && cat.children.length > 0 && (
-                <Collapse in={openDropdown === idx} timeout="auto" unmountOnExit>
-                  <List component="div" disablePadding>
-                    {cat.children.map((child) => (
-                      <ListItem
-                        button
-                        key={child._id}
-                        sx={{ pl: 4 }}
-                        onClick={() => {
-                          navigate(`/productbycategory/${child._id}`)
-                          onClose()
-                        }}
-                      >
-                        <ListItemText primary={child.name} />
-                      </ListItem>
-                    ))}
-                  </List>
-                </Collapse>
-              )}
-            </React.Fragment>
-          ))}
+          {categories.map((cat, idx) => {
+            const children = getChildCategories(cat)
+            const hasChildren = children.length > 0
+
+            return (
+              <React.Fragment key={cat._id}>
+                <ListItem
+                  button
+                  onClick={() => {
+                    if (hasChildren) {
+                      handleDropdown(idx)
+                    } else {
+                      navigate(`/productbycategory/${cat._id}`)
+                      onClose()
+                    }
+                  }}
+                  sx={{
+                    height: 48,
+                    color: cat.color || 'inherit',
+                    fontWeight: cat.bold ? 700 : 400,
+                    ...(cat.name === 'OUTLET' && {
+                      color: 'red',
+                      fontWeight: 700
+                    })
+                  }}
+                >
+                  <ListItemText
+                    primary={
+                      <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                        {cat.name === 'OUTLET' ? (
+                          <>
+                            {cat.discount && (
+                              <span
+                                style={{
+                                  color: 'red',
+                                  fontWeight: 700,
+                                  marginRight: 4
+                                }}
+                              >
+                                {cat.discount}
+                              </span>
+                            )}
+                            OUTLET
+                          </>
+                        ) : (
+                          cat.name
+                        )}
+                        {hasChildren && (
+                          <IconButton
+                            size='small'
+                            sx={{ ml: 1 }}
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              handleDropdown(idx)
+                            }}
+                          >
+                            {openDropdown === idx ? (
+                              <ExpandLessIcon />
+                            ) : (
+                              <ExpandMoreIcon />
+                            )}
+                          </IconButton>
+                        )}
+                      </Box>
+                    }
+                  />
+                </ListItem>
+
+                {hasChildren && (
+                  <Collapse
+                    in={openDropdown === idx}
+                    timeout='auto'
+                    unmountOnExit
+                  >
+                    <List component='div' disablePadding>
+                      {children.map((child) => (
+                        <React.Fragment key={child._id}>
+                          <Divider />
+                          <ListItem
+                            button
+                            sx={{
+                              pl: 4,
+                              height: 48
+                            }}
+                            onClick={() => {
+                              navigate(`/productbycategory/${child._id}`)
+                              onClose()
+                            }}
+                          >
+                            <ListItemText
+                              primary={child.name}
+                              primaryTypographyProps={{
+                                noWrap: true,
+                                sx: {
+                                  overflow: 'hidden',
+                                  textOverflow: 'ellipsis',
+                                  whiteSpace: 'nowrap',
+                                  maxWidth: '100%'
+                                }
+                              }}
+                            />
+                          </ListItem>
+                        </React.Fragment>
+                      ))}
+                    </List>
+                  </Collapse>
+                )}
+
+                <Divider />
+              </React.Fragment>
+            )
+          })}
+          <ListItem
+            button
+            onClick={() => {
+              navigate('/blog')
+              onClose()
+            }}
+          >
+            <ListItemText
+              primary={
+                <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                  Tin tức
+                </Box>
+              }
+            />
+          </ListItem>
+          <Divider />
         </List>
       </Box>
     </Drawer>

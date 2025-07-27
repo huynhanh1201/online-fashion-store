@@ -16,12 +16,12 @@ import {
   Grid,
   Card,
   CardMedia,
-  Backdrop
+  Backdrop,
 } from '@mui/material'
 import {
   Close as CloseIcon,
   PlayArrow as PlayArrowIcon,
-  Videocam as VideocamIcon
+  Videocam as VideocamIcon,
 } from '@mui/icons-material'
 import { getUserReviewForProduct } from '~/services/reviewService'
 import { optimizeCloudinaryUrl } from '~/utils/cloudinary'
@@ -42,15 +42,17 @@ const ViewReviewModal = ({ open, onClose, userId, productId, orderId, productNam
         console.log('Response from getUserReviewForProduct:', response, 'for orderId:', orderId)
 
         if (response && response.length > 0) {
-          // Tìm review chính xác theo orderId thay vì lấy review đầu tiên
-          const reviewForOrder = response.find(review => review.orderId === orderId)
+          const reviewForOrder = response.find((review) => review.orderId === orderId)
           if (reviewForOrder) {
             console.log('Found review for orderId:', orderId, reviewForOrder)
             setReviewData(reviewForOrder)
           } else {
-            // Nếu không tìm thấy review của đơn hàng này, có thể lấy review đầu tiên
-            // nhưng log cảnh báo để debug
-            console.warn('Không tìm thấy review cho orderId:', orderId, 'Available reviews:', response.map(r => ({ id: r.id, orderId: r.orderId })))
+            console.warn(
+              'Không tìm thấy review cho orderId:',
+              orderId,
+              'Available reviews:',
+              response.map((r) => ({ id: r.id, orderId: r.orderId }))
+            )
             setReviewData(response[0])
           }
         }
@@ -87,17 +89,9 @@ const ViewReviewModal = ({ open, onClose, userId, productId, orderId, productNam
       month: 'long',
       day: 'numeric',
       hour: '2-digit',
-      minute: '2-digit'
+      minute: '2-digit',
     })
   }
-
-  // const getVideoThumbnail = (videoUrl) => {
-  //   // Tạo thumbnail từ video URL (Cloudinary)
-  //   if (videoUrl.includes('cloudinary')) {
-  //     return videoUrl.replace('/video/upload/', '/video/upload/so_auto/')
-  //   }
-  //   return videoUrl
-  // }
 
   return (
     <Dialog
@@ -107,78 +101,113 @@ const ViewReviewModal = ({ open, onClose, userId, productId, orderId, productNam
       fullWidth
       PaperProps={{
         sx: {
-          borderRadius: 3,
-          boxShadow: '0 10px 40px rgba(0,0,0,0.1)'
-        }
+          borderRadius: { xs: 2, sm: 3 },
+          boxShadow: '0 10px 40px rgba(0,0,0,0.1)',
+          m: { xs: 1, sm: 2 },
+          maxHeight: { xs: '85vh', sm: '85vh', md: '80vh' },
+          width: { xs: '95%', sm: '90%', md: '80%' },
+        },
       }}
     >
-      <DialogTitle sx={{ pb: 2, position: 'relative' }}>
-        <Typography variant="h6" fontWeight="600" color="var(--primary-color)">
+      <DialogTitle
+        sx={{
+          pb: 2,
+          position: 'relative',
+          px: { xs: 2, sm: 3, md: 4 },
+        }}
+      >
+        <Typography
+          variant="subtitle1"
+          fontWeight="600"
+          color="var(--primary-color)"
+          sx={{
+            fontSize: { xs: '1rem', sm: '1.15rem', md: '1.25rem' },
+            lineHeight: 1.2,
+          }}
+        >
           Đánh giá của bạn
         </Typography>
-        <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
+        <Typography
+          variant="body2"
+          color="text.secondary"
+          sx={{ mt: 0.5, fontSize: { xs: '0.7rem', sm: '0.8rem', md: '0.875rem' } }}
+        >
           {productName}
         </Typography>
         <Button
           onClick={handleClose}
           sx={{
             position: 'absolute',
-            right: 8,
-            top: 8,
+            right: { xs: 4, sm: 8 },
+            top: { xs: 4, sm: 8 },
             minWidth: 'auto',
-            p: 1
+            p: { xs: 0.5, sm: 1 },
           }}
         >
-          <CloseIcon />
+          <CloseIcon sx={{ fontSize: { xs: 18, sm: 22, md: 24 } }} />
         </Button>
       </DialogTitle>
 
-      <DialogContent sx={{ py: 2 }}>
+      <DialogContent sx={{ py: { xs: 1, sm: 2, md: 3 }, px: { xs: 2, sm: 3, md: 4 } }}>
         {loading ? (
           <Box display="flex" justifyContent="center" alignItems="center" minHeight="200px">
-            <CircularProgress />
+            <CircularProgress size={32} />
           </Box>
         ) : reviewData ? (
-          <Stack spacing={3}>
-            {/* Rating và thời gian */}
+          <Stack spacing={{ xs: 1.5, sm: 2, md: 3 }}>
             <Box>
-              <Box display="flex" alignItems="center" gap={2} mb={1}>
+              <Box display="flex" alignItems="center" gap={{ xs: 1, sm: 1.5, md: 2 }} mb={1}>
                 <Rating
                   value={reviewData.rating}
                   readOnly
                   size="large"
                   sx={{
                     '& .MuiRating-iconFilled': {
-                      color: '#ffc107'
-                    }
+                      color: '#ffc107',
+                    },
+                    fontSize: { xs: '1.1rem', sm: '1.3rem', md: '1.5rem' },
                   }}
                 />
-                <Typography variant="h6" fontWeight="600" color="var(--primary-color)">
+                <Typography
+                  variant="h6"
+                  fontWeight="600"
+                  color="var(--primary-color)"
+                  sx={{ fontSize: { xs: '0.9rem', sm: '1.1rem', md: '1.25rem' } }}
+                >
                   {reviewData.rating}/5
                 </Typography>
               </Box>
-              <Typography variant="body2" color="text.secondary">
+              <Typography
+                variant="body2"
+                color="text.secondary"
+                sx={{ fontSize: { xs: '0.7rem', sm: '0.8rem', md: '0.875rem' } }}
+              >
                 Đánh giá vào {formatDate(reviewData.createdAt)}
               </Typography>
             </Box>
 
             <Divider />
 
-            {/* Nội dung đánh giá */}
             {reviewData.comment && (
               <Box>
-                <Typography variant="subtitle1" fontWeight="600" mb={1}>
+                <Typography
+                  variant="subtitle1"
+                  fontWeight="600"
+                  mb={1}
+                  sx={{ fontSize: { xs: '0.85rem', sm: '0.95rem', md: '1rem' } }}
+                >
                   Nhận xét:
                 </Typography>
                 <Typography
                   variant="body1"
                   sx={{
                     backgroundColor: 'grey.50',
-                    p: 2,
+                    p: { xs: 1, sm: 1.5, md: 2 },
                     borderRadius: 2,
                     border: '1px solid',
                     borderColor: 'grey.200',
-                    lineHeight: 1.6
+                    lineHeight: 1.6,
+                    fontSize: { xs: '0.8rem', sm: '0.9rem', md: '1rem' },
                   }}
                 >
                   {reviewData.comment}
@@ -186,75 +215,98 @@ const ViewReviewModal = ({ open, onClose, userId, productId, orderId, productNam
               </Box>
             )}
 
-            {/* Media đánh giá */}
             {((reviewData.images && reviewData.images.length > 0) ||
               (reviewData.videos && reviewData.videos.length > 0)) && (
                 <Box>
-                  <Typography variant="subtitle1" fontWeight="600" mb={2}>
-                    Ảnh & Video của bạn ({(reviewData.images?.length || 0) + (reviewData.videos?.length || 0)}):
+                  <Typography
+                    variant="subtitle1"
+                    fontWeight="600"
+                    mb={2}
+                    sx={{ fontSize: { xs: '0.85rem', sm: '0.95rem', md: '1rem' } }}
+                  >
+                    Ảnh & Video của bạn (
+                    {(reviewData.images?.length || 0) + (reviewData.videos?.length || 0)}):
                   </Typography>
-                  <Grid container spacing={2}>
-                    {/* Hiển thị ảnh */}
+                  <Grid
+                    container
+                    spacing={{ xs: 1, sm: 1.5, md: 2 }}
+                    sx={{ justifyContent: { xs: 'center', sm: 'flex-start' } }}
+                  >
                     {reviewData.images?.map((image, index) => (
-                      <Grid item xs={6} sm={4} md={3} key={`image-${index}`}>
+                      <Grid
+                        item
+                        xs={6}
+                        sm={4}
+                        md={3}
+                        key={`image-${index}`}
+                      >
                         <Card
                           sx={{
                             position: 'relative',
                             cursor: 'pointer',
                             '&:hover': {
                               transform: 'scale(1.02)',
-                              boxShadow: 3
+                              boxShadow: 3,
                             },
-                            transition: 'all 0.2s ease'
+                            transition: 'all 0.2s ease',
+                            aspectRatio: '4/3',
+                            width: '100%',
+                            maxWidth: { xs: '150px', sm: '180px', md: '200px' },
+                            overflow: 'hidden',
                           }}
                           onClick={() => handleImageClick(image)}
                         >
                           <CardMedia
                             component="img"
-                            width="180"
-                            height="120"
                             image={optimizeCloudinaryUrl(image, {
-                              width: 180,
-                              height: 120
+                              width: 200,
+                              height: 150,
+                              crop: 'fill',
                             })}
                             alt={`Đánh giá ${index + 1}`}
                             sx={{
                               objectFit: 'cover',
-                              width: 180,
-                              height: 120
+                              width: '100%',
+                              height: '100%',
                             }}
                           />
                         </Card>
                       </Grid>
                     ))}
 
-                    {/* Hiển thị video */}
                     {reviewData.videos?.map((video, index) => (
-                      <Grid item xs={6} sm={4} md={3} key={`video-${index}`}>
+                      <Grid
+                        item
+                        xs={6}
+                        sm={4}
+                        md={3}
+                        key={`video-${index}`}
+                      >
                         <Card
                           sx={{
                             position: 'relative',
                             cursor: 'pointer',
                             '&:hover': {
                               transform: 'scale(1.02)',
-                              boxShadow: 3
+                              boxShadow: 3,
                             },
-                            transition: 'all 0.2s ease'
+                            transition: 'all 0.2s ease',
+                            aspectRatio: '4/3',
+                            width: '100%',
+                            maxWidth: { xs: '150px', sm: '180px', md: '200px' },
+                            overflow: 'hidden',
                           }}
                         >
                           <CardMedia
                             component="video"
-                            width="180"
-                            height="120"
                             src={video}
                             controls
                             sx={{
                               objectFit: 'cover',
-                              width: 180,
-                              height: 120
+                              width: '100%',
+                              height: '100%',
                             }}
                           />
-                          {/* Video overlay icon */}
                           <Box
                             sx={{
                               position: 'absolute',
@@ -266,11 +318,15 @@ const ViewReviewModal = ({ open, onClose, userId, productId, orderId, productNam
                               py: 0.5,
                               display: 'flex',
                               alignItems: 'center',
-                              gap: 0.5
+                              gap: 0.5,
                             }}
                           >
-                            <VideocamIcon sx={{ fontSize: 16, color: 'white' }} />
-                            <Typography variant="caption" color="white">
+                            <VideocamIcon sx={{ fontSize: { xs: 12, sm: 14, md: 16 }, color: 'white' }} />
+                            <Typography
+                              variant="caption"
+                              color="white"
+                              sx={{ fontSize: { xs: '0.6rem', sm: '0.7rem', md: '0.75rem' } }}
+                            >
                               Video
                             </Typography>
                           </Box>
@@ -281,42 +337,28 @@ const ViewReviewModal = ({ open, onClose, userId, productId, orderId, productNam
                 </Box>
               )}
 
-            {/* Trạng thái đánh giá */}
             <Box display="flex" gap={1}>
               <Chip
                 label="Đã đánh giá"
                 color="success"
                 size="small"
-                sx={{ fontWeight: 600 }}
+                sx={{ fontWeight: 600, fontSize: { xs: '0.65rem', sm: '0.7rem', md: '0.75rem' } }}
               />
-              {/* {reviewData.moderationStatus && (
-                <Chip
-                  label={
-                    reviewData.moderationStatus === 'approved' ? 'Đã duyệt' :
-                      reviewData.moderationStatus === 'pending' ? 'Chờ duyệt' :
-                        'Bị từ chối'
-                  }
-                  color={
-                    reviewData.moderationStatus === 'approved' ? 'success' :
-                      reviewData.moderationStatus === 'pending' ? 'warning' :
-                        'error'
-                  }
-                  size="small"
-                  variant="outlined"
-                />
-              )} */}
             </Box>
           </Stack>
         ) : (
           <Box display="flex" justifyContent="center" alignItems="center" minHeight="200px">
-            <Typography color="text.secondary">
+            <Typography
+              color="text.secondary"
+              sx={{ fontSize: { xs: '0.8rem', sm: '0.9rem', md: '1rem' } }}
+            >
               Không tìm thấy đánh giá của bạn cho sản phẩm này
             </Typography>
           </Box>
         )}
       </DialogContent>
 
-      <DialogActions sx={{ p: 3, pt: 1 }}>
+      <DialogActions sx={{ p: { xs: 2, sm: 2, md: 2 }, pt: 1 }}>
         <Button
           onClick={handleClose}
           variant="contained"
@@ -325,22 +367,23 @@ const ViewReviewModal = ({ open, onClose, userId, productId, orderId, productNam
             borderRadius: 2,
             textTransform: 'none',
             fontWeight: 600,
-            px: 3,
+            px: { xs: 2, sm: 2.5, md: 3 },
+            py: { xs: 0.5, sm: 0.75, md: 1 },
+            fontSize: { xs: '0.75rem', sm: '0.85rem', md: '0.875rem' },
             '&:hover': {
-              backgroundColor: 'var(--accent-color)'
-            }
+              backgroundColor: 'var(--accent-color)',
+            },
           }}
         >
           Đóng
         </Button>
       </DialogActions>
 
-      {/* Image Lightbox */}
       <Backdrop
         sx={{
           color: '#fff',
           zIndex: (theme) => theme.zIndex.drawer + 2,
-          backgroundColor: 'rgba(0, 0, 0, 0.9)'
+          backgroundColor: 'rgba(0, 0, 0, 0.9)',
         }}
         open={lightboxOpen}
         onClick={handleCloseLightbox}
@@ -348,49 +391,29 @@ const ViewReviewModal = ({ open, onClose, userId, productId, orderId, productNam
         <Box
           sx={{
             position: 'relative',
-            maxWidth: '90vw',
-            maxHeight: '90vh',
+            maxWidth: { xs: '90vw', sm: '85vw', md: '80vw' },
+            maxHeight: { xs: '90vh', sm: '85vh', md: '80vh' },
             display: 'flex',
             alignItems: 'center',
-            justifyContent: 'center'
+            justifyContent: 'center',
           }}
         >
           {selectedImage && (
-            <>
-              <img
-                src={optimizeCloudinaryUrl(selectedImage, {
-                  width: 1200,
-                  height: 800,
-                  quality: 'auto'
-                })}
-                alt="Xem ảnh lớn"
-                style={{
-                  maxWidth: '100%',
-                  maxHeight: '100%',
-                  objectFit: 'contain',
-                  borderRadius: 8
-                }}
-              />
-              {/* <Button
-                onClick={handleCloseLightbox}
-                sx={{
-                  position: 'absolute',
-                  top: -10,
-                  right: -10,
-                  minWidth: 'auto',
-                  width: 40,
-                  height: 40,
-                  borderRadius: '50%',
-                  backgroundColor: 'rgba(255, 255, 255, 0.9)',
-                  color: 'black',
-                  '&:hover': {
-                    backgroundColor: 'rgba(255, 255, 255, 1)'
-                  }
-                }}
-              >
-                <CloseIcon />
-              </Button> */}
-            </>
+            <img
+              src={optimizeCloudinaryUrl(selectedImage, {
+                width: 1200,
+                height: 800,
+                quality: 'auto',
+                crop: 'fit',
+              })}
+              alt="Xem ảnh lớn"
+              style={{
+                maxWidth: '100%',
+                maxHeight: '100%',
+                objectFit: 'contain',
+                borderRadius: { xs: 4, sm: 6, md: 8 },
+              }}
+            />
           )}
         </Box>
       </Backdrop>
@@ -398,4 +421,4 @@ const ViewReviewModal = ({ open, onClose, userId, productId, orderId, productNam
   )
 }
 
-export default ViewReviewModal
+export default ViewReviewModal    

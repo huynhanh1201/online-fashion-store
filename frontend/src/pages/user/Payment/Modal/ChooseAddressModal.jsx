@@ -90,29 +90,29 @@ export const ChooseAddressModal = ({
         maxWidth='md'
         PaperProps={{
           sx: {
-            maxHeight: '60vh',
-            borderRadius: 3,
-            boxShadow: '0 20px 40px rgba(0,0,0,0.1)'
+            maxHeight: { xs: '95vh', sm: '60vh' },
+            borderRadius: { xs: 2, sm: 3 },
+            boxShadow: '0 20px 40px rgba(0,0,0,0.1)',
+            margin: { xs: 1, sm: 3 }
           }
         }}
       >
         <DialogTitle
           sx={{
             m: 0,
-            p: 3,
-
+            p: { xs: 2, sm: 3 },
             color: 'var(--primary-color)',
             position: 'relative',
             display: 'flex',
             alignItems: 'center',
-            gap: 2
+            gap: { xs: 1, sm: 2 }
           }}
         >
-          <LocationIcon sx={{ fontSize: 28 }} />
+          <LocationIcon sx={{ fontSize: { xs: 24, sm: 28 } }} />
           <Typography
             variant='h6'
             component='div'
-            sx={{ flexGrow: 1, fontWeight: 600 }}
+            sx={{ flexGrow: 1, fontWeight: 600, fontSize: { xs: '1.1rem', sm: '1.25rem' } }}
           >
             Chọn địa chỉ giao hàng
           </Typography>
@@ -135,7 +135,7 @@ export const ChooseAddressModal = ({
           sx={{
             p: 0,
             backgroundColor: '#f8fafc',
-            minHeight: '300px'
+            minHeight: { xs: '250px', sm: '300px' }
           }}
         >
           {loading ? (
@@ -189,7 +189,7 @@ export const ChooseAddressModal = ({
               </Button>
             </Box>
           ) : (
-            <Box sx={{ p: 2 }}>
+            <Box sx={{ p: { xs: 1.5, sm: 2 } }}>
               <RadioGroup
                 value={selectedId}
                 onChange={(e) => setSelectedId(e.target.value)}

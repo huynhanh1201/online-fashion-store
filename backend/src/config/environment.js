@@ -1,5 +1,19 @@
 /* eslint-disable */
-import 'dotenv/config'
+// import 'dotenv/config'
+
+// Deploy
+import dotenv from 'dotenv'
+import path from 'path'
+
+// Auto chọn file .env tương ứng môi trường
+const envPath =
+  process.env.NODE_ENV === 'production'
+    ? '/etc/secrets/.env' // đường dẫn Render mount
+    : path.resolve(process.cwd(), '.env') // local dev
+
+dotenv.config({ path: envPath })
+
+// =======================================================
 
 export const env = {
   MONGODB_URI: process.env.MONGODB_URI,

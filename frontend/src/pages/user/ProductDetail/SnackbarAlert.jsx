@@ -3,7 +3,16 @@ import { Snackbar, Alert, Box, Typography, Button } from '@mui/material'
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart'
 import { optimizeCloudinaryUrl } from '~/utils/cloudinary'
 
-const SnackbarAlert = ({ open, onClose, severity, message, variantImage, productName }) => (
+import { Link } from 'react-router-dom'
+
+const SnackbarAlert = ({
+  open,
+  onClose,
+  severity,
+  message,
+  variantImage,
+  productName
+}) => (
   <Snackbar
     open={open}
     autoHideDuration={6000}
@@ -20,13 +29,18 @@ const SnackbarAlert = ({ open, onClose, severity, message, variantImage, product
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
           <img
             src={optimizeCloudinaryUrl(variantImage)}
-            alt="Product"
-            style={{ width: 50, height: 50, objectFit: 'cover', borderRadius: '6px' }}
-            onError={e => (e.target.src = '/default.jpg')}
+            alt='Product'
+            style={{
+              width: 50,
+              height: 50,
+              objectFit: 'cover',
+              borderRadius: '6px'
+            }}
+            onError={(e) => (e.target.src = '/default.jpg')}
           />
           <Box>
             <Typography
-              variant="body2"
+              variant='body2'
               fontWeight={600}
               sx={{
                 overflow: 'hidden',
@@ -37,22 +51,25 @@ const SnackbarAlert = ({ open, onClose, severity, message, variantImage, product
             >
               {productName}
             </Typography>
-            <Typography variant="caption">
-              {message}
-            </Typography>
+            <Typography variant='caption'>{message}</Typography>
           </Box>
           <Button
-            variant="contained"
-            size="small"
+            component={Link}
+            to='/cart'
+            variant='contained'
+            size='small'
             startIcon={<ShoppingCartIcon />}
-            onClick={() => (window.location.href = '/cart')}
-            sx={{ ml: 2, backgroundColor: 'var(--surface-color)', color: 'var(--primary-color)' }}
+            sx={{
+              ml: 2,
+              backgroundColor: 'var(--surface-color)',
+              color: 'var(--primary-color)'
+            }}
           >
             Xem giỏ hàng
           </Button>
         </Box>
       ) : (
-        <Typography variant="body2">{message}</Typography>
+        <Typography variant='body2'>{message}</Typography>
       )}
     </Alert>
   </Snackbar>
