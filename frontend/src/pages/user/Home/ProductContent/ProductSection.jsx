@@ -218,7 +218,7 @@ const ProductSection = ({
                 >
                   {bannerTitle || 'Danh mục sản phẩm'}
                 </h2> */}
-                {bannerDesc && (
+                {/* {bannerDesc && (
                   <p
                     style={{
                       ...styles.bannerDesc,
@@ -227,7 +227,7 @@ const ProductSection = ({
                   >
                     {bannerDesc}
                   </p>
-                )}
+                )} */}
               </div>
             </div>
           </Link>

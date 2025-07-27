@@ -22,8 +22,9 @@ export const getProducts = async (params = {}) => {
       ...(filterTypeDate && { filterTypeDate }),
       destroy: false,
       status: 'active',
-      ...filters // cho phép mở rộng lọc thêm nếu cần
+      ...filters
     })
+
 
     const url = `${API_ROOT}/v1/products?${queryParams.toString()}`
 
@@ -67,7 +68,7 @@ export const getProductsByCategory = async (
       : response.data.products || response.data || []
 
     // Filter sản phẩm ở client-side: chỉ lấy status = active và destroy = false
-    products = products.filter(product => 
+    products = products.filter(product =>
       product.status === 'active' && product.destroy === false
     )
 

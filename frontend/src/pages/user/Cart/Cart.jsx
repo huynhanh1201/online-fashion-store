@@ -633,9 +633,9 @@ const Cart = () => {
             <ShoppingCart sx={{ fontSize: 28, color: 'var(--primary-color)' }} />
             <Typography
               variant="h5"
-              sx={{ fontWeight: 700, color: 'var(--primary-color)', letterSpacing: 0.5 }}
+              sx={{ fontWeight: 700, color: 'var(--primary-color)', letterSpacing: 0.5, fontSize: { xs: '1.25rem', md: '1.5rem' } }}
             >
-              Giỏ hàng của bạn
+              Giỏ hàng
             </Typography>
           </Box>
           <Chip

@@ -97,19 +97,17 @@ const NewProducts = () => {
       setLoading(true)
       setError(null)
 
-      // Các sort hỗ trợ backend
       const backendSortMap = {
         nameAsc: 'name_asc',
         nameDesc: 'name_desc',
+        priceAsc: 'price_asc',
+        priceDesc: 'price_desc',
       }
-
-      // Nếu đang chọn sort theo giá => không gửi sort lên backend
-      const isPriceSort = sortOption === 'priceAsc' || sortOption === 'priceDesc'
 
       const params = {
         page: Number(page),
         limit: Number(ITEMS_PER_PAGE),
-        sort: isPriceSort ? 'newest' : backendSortMap[sortOption] || 'newest',
+        sort: backendSortMap[sortOption] || 'newest',
         filterTypeDate: 'this_week',
         destroy: false,
         status: 'active'
@@ -123,24 +121,16 @@ const NewProducts = () => {
         throw new Error('Lỗi dữ liệu từ server')
       }
 
-      let fetchedProducts = [...response.products]
+      const fetchedProducts = [...response.products]
       const totalProducts = response.total || fetchedProducts.length
       const totalPages = Math.ceil(totalProducts / ITEMS_PER_PAGE) || 1
-
-      // Sort theo giá ở phía client
-      if (sortOption === 'priceAsc') {
-        fetchedProducts.sort((a, b) => (a.exportPrice || 0) - (b.exportPrice || 0))
-      } else if (sortOption === 'priceDesc') {
-        fetchedProducts.sort((a, b) => (b.exportPrice || 0) - (a.exportPrice || 0))
-      }
 
       setProducts(fetchedProducts)
       setTotalPages(totalPages)
     } catch (error) {
       console.error('Lỗi fetch sản phẩm:', error)
       setError(
-        error.message ||
-        'Không thể tải danh sách sản phẩm. Vui lòng thử lại sau.'
+        error.message || 'Không thể tải danh sách sản phẩm. Vui lòng thử lại sau.'
       )
       setProducts([])
       setTotalPages(1)
@@ -148,6 +138,7 @@ const NewProducts = () => {
       setLoading(false)
     }
   }
+
 
 
 
