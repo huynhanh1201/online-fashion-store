@@ -17,6 +17,8 @@ import { getMenuConfig } from '~/services/admin/webConfig/headerService.js'
 import { useTheme } from '@mui/material/styles'
 import { ChevronLeft, ChevronRight } from '@mui/icons-material'
 
+import { Link } from 'react-router-dom'
+
 const StyledButton = styled(Button)(({ theme, active }) => ({
   color: 'var(--text-color)',
   fontWeight: 450,
@@ -384,6 +386,15 @@ const Menu = ({ headerRef, currentUser }) => {
       }}
     >
       {/* Menu container với arrow ngoài cùng bên phải, menu item luôn căn giữa và rộng rãi */}
+
+      <Button component={Link} to='/admin'>
+        Test trang admin
+      </Button>
+
+      <Button component={Link} to='/product'>
+        Test trang sản phẩm
+      </Button>
+
       <Box
         sx={{
           display: 'flex',
@@ -664,7 +675,9 @@ const Menu = ({ headerRef, currentUser }) => {
             position: 'fixed',
             top: '105px',
             left: '50%',
-            transform: productMenuOpen ? 'translateX(-50%) scaleY(1)' : 'translateX(-50%) scaleY(0)',
+            transform: productMenuOpen
+              ? 'translateX(-50%) scaleY(1)'
+              : 'translateX(-50%) scaleY(0)',
             transformOrigin: 'top',
             width: '100%',
             maxWidth: '1700px',
@@ -704,16 +717,18 @@ const Menu = ({ headerRef, currentUser }) => {
             }}
           >
             {(menuConfig?.mainMenu?.length > 0
-              ? menuConfig.mainMenu.filter(item => item.visible).sort((a, b) => (a.order || 0) - (b.order || 0))
+              ? menuConfig.mainMenu
+                  .filter((item) => item.visible)
+                  .sort((a, b) => (a.order || 0) - (b.order || 0))
               : [
-                {
-                  label: 'Sản phẩm',
-                  children: [
-                    { label: 'Tất cả sản phẩm', url: '/product' },
-                    { label: 'Sản phẩm mới', url: '/productnews' }
-                  ]
-                }
-              ]
+                  {
+                    label: 'Sản phẩm',
+                    children: [
+                      { label: 'Tất cả sản phẩm', url: '/product' },
+                      { label: 'Sản phẩm mới', url: '/productnews' }
+                    ]
+                  }
+                ]
             ).map((item, idx) => (
               <Box
                 key={item.label + idx}
@@ -722,11 +737,14 @@ const Menu = ({ headerRef, currentUser }) => {
                   flexDirection: 'column',
                   gap: 1,
                   alignItems: 'start',
-                  width: megamenuSettings.columnWidth === 'auto' ? 'auto' : megamenuSettings.columnWidth
+                  width:
+                    megamenuSettings.columnWidth === 'auto'
+                      ? 'auto'
+                      : megamenuSettings.columnWidth
                 }}
               >
                 <Typography
-                  component="div"
+                  component='div'
                   sx={{
                     fontWeight: 'bold',
                     mb: 1.2,
@@ -752,7 +770,7 @@ const Menu = ({ headerRef, currentUser }) => {
 
                 {item.children?.length > 0 ? (
                   item.children
-                    .filter(child => child.visible)
+                    .filter((child) => child.visible)
                     .sort((a, b) => (a.order || 0) - (b.order || 0))
                     .map((child, i) => (
                       <Button
@@ -774,20 +792,26 @@ const Menu = ({ headerRef, currentUser }) => {
                             background: megamenuSettings.enableHoverEffects
                               ? 'rgba(25, 118, 210, 0.04)'
                               : 'none',
-                            transform: megamenuSettings.enableHoverEffects ? 'translateY(-2px)' : 'none',
-                            transition: megamenuSettings.enableHoverEffects ? 'all 0.2s ease' : 'none'
+                            transform: megamenuSettings.enableHoverEffects
+                              ? 'translateY(-2px)'
+                              : 'none',
+                            transition: megamenuSettings.enableHoverEffects
+                              ? 'all 0.2s ease'
+                              : 'none'
                           }
                         }}
                       >
                         {megamenuSettings.showIcons && child.icon && (
-                          <span style={{ marginRight: '8px' }}>{child.icon}</span>
+                          <span style={{ marginRight: '8px' }}>
+                            {child.icon}
+                          </span>
                         )}
                         {child.label}
                       </Button>
                     ))
                 ) : (
                   <Typography
-                    component="div"
+                    component='div'
                     sx={{
                       color: 'text.secondary',
                       fontSize: '0.95rem',
@@ -802,8 +826,6 @@ const Menu = ({ headerRef, currentUser }) => {
             ))}
           </Box>
         </Box>
-
-
       )}
     </Box>
   )
