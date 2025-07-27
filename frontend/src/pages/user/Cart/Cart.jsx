@@ -37,7 +37,7 @@ import {
   NavigateNext
 } from '@mui/icons-material'
 import { useCart } from '~/hooks/useCarts'
-import { useNavigate } from 'react-router-dom'
+import { Navigate, useNavigate } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import {
   setSelectedItems as setSelectedItemsAction,
@@ -638,7 +638,7 @@ const Cart = () => {
           >
             Trang chủ
           </Link>
-          <Link
+          <Button
             underline='hover'
             sx={{
               display: 'flex',
@@ -649,11 +649,12 @@ const Cart = () => {
                 color: 'primary.main'
               }
             }}
-            component={Link}
-            to='/product'
+            onClick={() => navigate('/product')}
+            // component={Link}
+            // to='/product'
           >
             Sản phẩm
-          </Link>
+          </Button>
           <Typography
             sx={{
               display: 'flex',
