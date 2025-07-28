@@ -1,7 +1,7 @@
 let apiRoot = ''
 
 if (process.env.BUILD_MODE === 'dev') {
-  apiRoot = 'http://localhost:8017'
+  apiRoot = 'https://sunny-rhino-partly.ngrok-free.app'
 }
 
 if (process.env.BUILD_MODE === 'prod') {
