@@ -1,6 +1,6 @@
 import React from 'react'
 import { Box, Typography, Button } from '@mui/material'
-
+import { Link } from 'react-router-dom'
 const NotFound = () => {
   return (
     <Box
@@ -42,9 +42,10 @@ const NotFound = () => {
           bạn đang tìm kiếm!
         </Typography>
         <Button
+          component={Link}
           variant='contained'
           color='primary'
-          href='/'
+          to='/'
           sx={{ textTransform: 'none', fontWeight: 'bold' }}
         >
           Trở về trang chủ

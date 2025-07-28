@@ -85,9 +85,7 @@ const ProductInfoSection = ({
   const currentPrice = getCurrentPrice()
 
   return (
-    <Box
-      sx={{ display: 'flex', flexDirection: 'column', gap: 1, maxWidth: 670 }}
-    >
+    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
       <Typography
         variant='h5'
         fontWeight={700}

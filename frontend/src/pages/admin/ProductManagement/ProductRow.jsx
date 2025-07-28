@@ -153,6 +153,8 @@ const ProductRow = ({
                 sx={{
                   ...styles.cellPadding,
                   cursor: product.categoryId ? 'pointer' : 'default',
+                  maxWidth: 200,
+                  display: 'table-cell',
                   // color: product.categoryId ? '#1976d2' : 'inherit',
                   '&:hover': product.categoryId
                     ? { textDecoration: 'none' }
@@ -178,7 +180,8 @@ const ProductRow = ({
                 align={align}
                 sx={{
                   ...styles.cellPadding,
-                  cursor: 'pointer'
+                  cursor: 'pointer',
+                  color: '#1976d2'
                 }}
                 onClick={() => {
                   if (product._id) {
@@ -212,7 +215,7 @@ const ProductRow = ({
                         : 'error'
                   }
                   size='large'
-                  sx={{ width: '120px', fontWeight: '800' }}
+                  sx={{ width: '127px', fontWeight: '800' }}
                 />
               </TableCell>
             )
@@ -251,7 +254,11 @@ const ProductRow = ({
 
           if (id === 'exportPrice') {
             return (
-              <TableCell key={id} align={align} sx={{ ...styles.cellPadding, pr: 6 }}>
+              <TableCell
+                key={id}
+                align={align}
+                sx={{ ...styles.cellPadding, pr: 6 }}
+              >
                 {product.exportPrice?.toLocaleString('vi-VN') + '₫'}
               </TableCell>
             )

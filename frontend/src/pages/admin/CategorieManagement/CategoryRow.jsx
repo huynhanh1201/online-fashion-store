@@ -5,7 +5,6 @@ import BorderColorIcon from '@mui/icons-material/BorderColor'
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever'
 import Chip from '@mui/material/Chip'
 import ImageNotSupportedIcon from '@mui/icons-material/ImageNotSupported'
-import { optimizeCloudinaryUrl } from '~/utils/cloudinary.js'
 import Tooltip from '@mui/material/Tooltip'
 import { useNavigate } from 'react-router-dom'
 import RestartAltIcon from '@mui/icons-material/RestartAlt'
@@ -171,7 +170,11 @@ export default function CategoryRow({
             <TableCell
               key={column.id}
               align={column.align}
-              sx={{ ...styles.cellPadding, cursor: 'pointer' }}
+              sx={{
+                ...styles.cellPadding,
+                cursor: 'pointer',
+                color: '#1976d2'
+              }}
               onClick={() => {
                 if (category._id) {
                   navigate(

@@ -3,7 +3,7 @@ import { Button, Box } from '@mui/material'
 import { styled } from '@mui/system'
 import { getHeaderConfig } from '~/services/admin/webConfig/headerService'
 import { optimizeCloudinaryUrl } from '~/utils/cloudinary.js'
-
+import { Link } from 'react-router-dom'
 const LogoButton = styled(Button)(({ theme }) => ({
   fontWeight: 700,
   color: '#03235e',
@@ -48,8 +48,9 @@ const Logo = () => {
   if (logoData?.imageUrl && logoData?.visible !== false) {
     return (
       <Box
-        component='a'
-        href='/'
+        // component='a'
+        component={Link}
+        to='/'
         sx={{
           display: 'flex',
           alignItems: 'center',
@@ -61,7 +62,7 @@ const Logo = () => {
       >
         <LogoImage
           src={optimizeCloudinaryUrl(logoData.imageUrl, {
-            width: 400,        // gấp đôi so với kích thước hiển thị
+            width: 400, // gấp đôi so với kích thước hiển thị
             height: 80,
             quality: 'auto',
             format: 'auto'
@@ -69,12 +70,15 @@ const Logo = () => {
           style={{ width: 200, height: 40 }} // hoặc trong styled component
           alt={logoData.alt || 'Logo'}
         />
-
       </Box>
     )
   }
 
-  return <LogoButton href='/'>{logoData?.text || 'FASHIONSTORE™'}</LogoButton>
+  return (
+    <LogoButton component={Link} to='/'>
+      {logoData?.text || 'FASHIONSTORE™'}
+    </LogoButton>
+  )
 }
 
 export default Logo
