@@ -14,7 +14,7 @@ import {
 } from '@mui/material'
 import NavigateNextIcon from '@mui/icons-material/NavigateNext'
 import { addToCart, getCart } from '~/services/cartService'
-import { getProductsByMultipleCategories } from '~/services/productService'
+import { getProductsByMultipleCategories, getProductsByCategory } from '~/services/productService'
 import { useDispatch } from 'react-redux'
 import { setCartItems } from '~/redux/cart/cartSlice'
 import ProductCard from '~/components/ProductCards/ProductCards'
@@ -139,71 +139,80 @@ const ProductbyCategory = () => {
         nameAsc: 'name_asc',
         nameDesc: 'name_desc',
         priceAsc: 'price_asc',
-        priceDesc: 'price_desc'
+        priceDesc: 'price_desc',
+        featured: 'newest'
       }
+      const sortParam = backendSortMap[sortOption] || 'newest'
 
-      const params = {
-        page: Number(page),
-        limit: Number(ITEMS_PER_PAGE),
-        sort: backendSortMap[sortOption] || 'newest',
-        // Add category filter - backend sẽ filter theo categoryIds
-        categoryIds:
-          allCategoryIds.length > 0 ? allCategoryIds.join(',') : categoryId
-      }
-      // Sử dụng categoryIds array hoặc chỉ categoryId nếu không có children
-      const categoryIdsToUse = allCategoryIds.length > 0 ? allCategoryIds : [categoryId]
-
-      console.log('Fetching products for categories:', categoryIdsToUse)
-
-      const response = await getProductsByMultipleCategories(
-        categoryIdsToUse,
-        Number(page),
-        Number(ITEMS_PER_PAGE)
-      )
-      console.log('API Response:', response)
-
-      const fetchedProducts = response.products || []
-      const total = response.total || 0
-      const totalPages = response.totalPages || 1
-
-      if (!Array.isArray(fetchedProducts)) {
-        console.error('Products không phải là array:', fetchedProducts)
-        throw new Error('Dữ liệu sản phẩm không hợp lệ')
-      }
-
-      // Apply client-side sorting since getProductsByMultipleCategories doesn't support backend sorting
-      let sortedProducts = [...fetchedProducts]
-      switch (sortOption) {
-        case 'nameAsc':
-          sortedProducts.sort((a, b) => a.name.localeCompare(b.name))
-          break
-        case 'nameDesc':
-          sortedProducts.sort((a, b) => b.name.localeCompare(a.name))
-          break
-        case 'priceAsc':
-          sortedProducts.sort((a, b) => {
-            // Sử dụng exportPrice hoặc firstVariantDiscountPrice nếu có
-            const priceA = a.firstVariantDiscountPrice > 0 ? a.firstVariantDiscountPrice : a.exportPrice
-            const priceB = b.firstVariantDiscountPrice > 0 ? b.firstVariantDiscountPrice : b.exportPrice
-            return priceA - priceB
+      if (allCategoryIds.length === 1) {
+        // Nếu chỉ có 1 category, gọi API như CategoryPage.jsx
+        const response = await getProductsByCategory(
+          allCategoryIds[0],
+          Number(page),
+          Number(ITEMS_PER_PAGE),
+          sortParam
+        )
+        const fetchedProducts = response.products || []
+        const total = response.total || 0
+        const totalPages = response.totalPages || 1
+        setProducts(fetchedProducts)
+        setTotalPages(totalPages)
+      } else if (allCategoryIds.length > 1) {
+        // Nếu có nhiều category, gọi song song các API với limit nhỏ (ví dụ 20)
+        const limitPerCategory = ITEMS_PER_PAGE * 2 // lấy dư để sort client-side
+        const allPromises = allCategoryIds.map(catId =>
+          getProductsByCategory(catId, 1, limitPerCategory, sortParam)
+        )
+        const allResults = await Promise.all(allPromises)
+        // Merge, loại trùng
+        const allProducts = []
+        const seen = new Set()
+        allResults.forEach(result => {
+          (result.products || []).forEach(product => {
+            if (!seen.has(product._id)) {
+              seen.add(product._id)
+              allProducts.push(product)
+            }
           })
-          break
-        case 'priceDesc':
-          sortedProducts.sort((a, b) => {
-            // Sử dụng exportPrice hoặc firstVariantDiscountPrice nếu có
-            const priceA = a.firstVariantDiscountPrice > 0 ? a.firstVariantDiscountPrice : a.exportPrice
-            const priceB = b.firstVariantDiscountPrice > 0 ? b.firstVariantDiscountPrice : b.exportPrice
-            return priceB - priceA
-          })
-          break
-        case 'featured':
-        default:
-          // Keep original order (featured/newest first)
-          break
+        })
+        // Sort client-side theo sortOption
+        let sortedProducts = [...allProducts]
+        switch (sortOption) {
+          case 'nameAsc':
+            sortedProducts.sort((a, b) => a.name.localeCompare(b.name))
+            break
+          case 'nameDesc':
+            sortedProducts.sort((a, b) => b.name.localeCompare(a.name))
+            break
+          case 'priceAsc':
+            sortedProducts.sort((a, b) => {
+              const priceA = a.firstVariantDiscountPrice > 0 ? a.firstVariantDiscountPrice : a.exportPrice
+              const priceB = b.firstVariantDiscountPrice > 0 ? b.firstVariantDiscountPrice : b.exportPrice
+              return priceA - priceB
+            })
+            break
+          case 'priceDesc':
+            sortedProducts.sort((a, b) => {
+              const priceA = a.firstVariantDiscountPrice > 0 ? a.firstVariantDiscountPrice : a.exportPrice
+              const priceB = b.firstVariantDiscountPrice > 0 ? b.firstVariantDiscountPrice : b.exportPrice
+              return priceB - priceA
+            })
+            break
+          case 'featured':
+          default:
+            break
+        }
+        // Phân trang client-side
+        const total = sortedProducts.length
+        const totalPages = Math.ceil(total / ITEMS_PER_PAGE)
+        const startIdx = (page - 1) * ITEMS_PER_PAGE
+        const paginated = sortedProducts.slice(startIdx, startIdx + ITEMS_PER_PAGE)
+        setProducts(paginated)
+        setTotalPages(totalPages)
+      } else {
+        setProducts([])
+        setTotalPages(1)
       }
-
-      setProducts(sortedProducts)
-      setTotalPages(totalPages)
     } catch (error) {
       console.error('Chi tiết lỗi:', error)
       setErrorProducts(

@@ -30,7 +30,11 @@ import { useOrder } from '~/hooks/useOrder'
 import { useCart } from '~/hooks/useCarts'
 import ReviewModal from './modal/ReviewModal'
 import ViewReviewModal from './modal/ViewReviewModal'
-import { createReview, getUserReviews, getUserReviewForProduct } from '~/services/reviewService'
+import {
+  createReview,
+  getUserReviews,
+  getUserReviewForProduct
+} from '~/services/reviewService'
 import { getVariantById } from '~/services/variantService'
 import { useSelector, useDispatch } from 'react-redux'
 import { selectCurrentUser } from '~/redux/user/userSlice'
@@ -43,7 +47,7 @@ const statusLabels = {
   Shipping: ['Đang giao hàng', 'primary'],
   Delivered: ['Đã giao', 'success'],
   Cancelled: ['Đã hủy', 'error'],
-  Failed: ['Thanh toán thất bại', 'error'],
+  Failed: ['Thanh toán thất bại', 'error']
 }
 
 // Review Button Component with fallback check
@@ -57,7 +61,7 @@ const ReviewButtonComponent = ({
   setSelectedProduct,
   setOpenReviewModal,
   setOpenViewReviewModal,
-  checkProductReview,
+  checkProductReview
 }) => {
   const [checking, setChecking] = useState(false)
   const [isReviewed, setIsReviewed] = useState(null) // null = chưa xác định, true/false = đã xác định
@@ -90,8 +94,15 @@ const ReviewButtonComponent = ({
     }
   }
 
-  if (reviewsLoading || !isOrderCompleted || !currentUser || isReviewed === null) {
-    return (reviewsLoading || isReviewed === null) && isOrderCompleted && currentUser ? (
+  if (
+    reviewsLoading ||
+    !isOrderCompleted ||
+    !currentUser ||
+    isReviewed === null
+  ) {
+    return (reviewsLoading || isReviewed === null) &&
+      isOrderCompleted &&
+      currentUser ? (
       <CircularProgress size={20} />
     ) : null
   }
@@ -99,7 +110,7 @@ const ReviewButtonComponent = ({
   return (
     <Button
       variant={isReviewed ? 'outlined' : 'contained'}
-      size="small"
+      size='small'
       disabled={checking || isReviewed === null}
       sx={{
         borderRadius: 2,
@@ -109,22 +120,22 @@ const ReviewButtonComponent = ({
         px: { xs: 1.5, sm: 2 },
         ...(isReviewed
           ? {
-            color: 'var(--primary-color)',
-            borderColor: 'var(--primary-color)',
-            '&:hover': {
-              color: '#fff',
-              backgroundColor: 'var(--accent-color)',
+              color: 'var(--primary-color)',
               borderColor: 'var(--primary-color)',
-            },
-          }
+              '&:hover': {
+                color: '#fff',
+                backgroundColor: 'var(--accent-color)',
+                borderColor: 'var(--primary-color)'
+              }
+            }
           : {
-            backgroundColor: 'var(--primary-color)',
-            color: '#fff',
-            '&:hover': {
-              backgroundColor: 'var(--accent-color)',
-              boxShadow: '0 4px 12px rgba(26, 60, 123, 0.3)',
-            },
-          }),
+              backgroundColor: 'var(--primary-color)',
+              color: '#fff',
+              '&:hover': {
+                backgroundColor: 'var(--accent-color)',
+                boxShadow: '0 4px 12px rgba(26, 60, 123, 0.3)'
+              }
+            })
       }}
       onClick={(e) => {
         e.stopPropagation()
@@ -132,7 +143,13 @@ const ReviewButtonComponent = ({
       }}
       startIcon={checking ? <CircularProgress size={16} /> : null}
     >
-      {checking ? 'Kiểm tra...' : isReviewed === null ? 'Đang tải...' : isReviewed ? 'Xem đánh giá' : 'Đánh giá'}
+      {checking
+        ? 'Kiểm tra...'
+        : isReviewed === null
+          ? 'Đang tải...'
+          : isReviewed
+            ? 'Xem đánh giá'
+            : 'Đánh giá'}
     </Button>
   )
 }
@@ -143,18 +160,18 @@ const CancelOrderModal = ({ open, onClose, onConfirm, order, loading }) => {
     <Dialog
       open={open}
       onClose={onClose}
-      maxWidth="xs"
+      maxWidth='xs'
       fullWidth
       PaperProps={{
         sx: {
           borderRadius: 3,
           boxShadow: '0 10px 40px rgba(0,0,0,0.1)',
-          width: { xs: '90vw', sm: '400px' },
-        },
+          width: { xs: '90vw', sm: '400px' }
+        }
       }}
     >
       <DialogTitle sx={{ pb: 1, px: { xs: 2, sm: 3 } }}>
-        <Box display="flex" alignItems="center" gap={2}>
+        <Box display='flex' alignItems='center' gap={2}>
           <Box
             sx={{
               p: 1,
@@ -162,23 +179,25 @@ const CancelOrderModal = ({ open, onClose, onConfirm, order, loading }) => {
               backgroundColor: 'error.50',
               display: 'flex',
               alignItems: 'center',
-              justifyContent: 'center',
+              justifyContent: 'center'
             }}
           >
-            <Warning sx={{ color: 'error.main', fontSize: { xs: 24, sm: 28 } }} />
+            <Warning
+              sx={{ color: 'error.main', fontSize: { xs: 24, sm: 28 } }}
+            />
           </Box>
           <Box>
             <Typography
-              variant="h6"
-              fontWeight="600"
-              color="text.primary"
+              variant='h6'
+              fontWeight='600'
+              color='text.primary'
               sx={{ fontSize: { xs: '1rem', sm: '1.25rem' } }}
             >
               Xác nhận hủy đơn hàng
             </Typography>
             <Typography
-              variant="body2"
-              color="text.secondary"
+              variant='body2'
+              color='text.secondary'
               sx={{ fontSize: { xs: '0.8rem', sm: '0.875rem' } }}
             >
               Đơn hàng #{order?.code}
@@ -188,17 +207,22 @@ const CancelOrderModal = ({ open, onClose, onConfirm, order, loading }) => {
       </DialogTitle>
 
       <DialogContent sx={{ py: 2, px: { xs: 2, sm: 3 } }}>
-        <DialogContentText sx={{ fontSize: { xs: '0.875rem', sm: '1rem' }, color: 'text.primary' }}>
+        <DialogContentText
+          sx={{
+            fontSize: { xs: '0.875rem', sm: '1rem' },
+            color: 'text.primary'
+          }}
+        >
           Bạn có chắc chắn muốn hủy đơn hàng này không?
           <br />
           <Typography
-            component="span"
+            component='span'
             sx={{
               fontWeight: 600,
               color: 'error.main',
               mt: 1,
               display: 'block',
-              fontSize: { xs: '0.8rem', sm: '0.9rem' },
+              fontSize: { xs: '0.8rem', sm: '0.9rem' }
             }}
           >
             Hành động này không thể hoàn tác!
@@ -206,10 +230,17 @@ const CancelOrderModal = ({ open, onClose, onConfirm, order, loading }) => {
         </DialogContentText>
       </DialogContent>
 
-      <DialogActions sx={{ p: { xs: 2, sm: 3 }, pt: 1, flexDirection: { xs: 'column', sm: 'row' }, gap: 1 }}>
+      <DialogActions
+        sx={{
+          p: { xs: 2, sm: 3 },
+          pt: 1,
+          flexDirection: { xs: 'column', sm: 'row' },
+          gap: 1
+        }}
+      >
         <Button
           onClick={onClose}
-          variant="outlined"
+          variant='outlined'
           disabled={loading}
           sx={{
             borderRadius: 2,
@@ -217,15 +248,15 @@ const CancelOrderModal = ({ open, onClose, onConfirm, order, loading }) => {
             fontWeight: 600,
             px: { xs: 2, sm: 3 },
             fontSize: { xs: '0.75rem', sm: '0.875rem' },
-            width: { xs: '100%', sm: 'auto' },
+            width: { xs: '100%', sm: 'auto' }
           }}
         >
           Không, giữ lại
         </Button>
         <Button
           onClick={onConfirm}
-          variant="contained"
-          color="error"
+          variant='contained'
+          color='error'
           disabled={loading}
           startIcon={loading ? <CircularProgress size={16} /> : <Cancel />}
           sx={{
@@ -235,7 +266,7 @@ const CancelOrderModal = ({ open, onClose, onConfirm, order, loading }) => {
             px: { xs: 2, sm: 3 },
             fontSize: { xs: '0.75rem', sm: '0.875rem' },
             width: { xs: '100%', sm: 'auto' },
-            boxShadow: '0 4px 12px rgba(211, 47, 47, 0.3)',
+            boxShadow: '0 4px 12px rgba(211, 47, 47, 0.3)'
           }}
         >
           {loading ? 'Đang hủy...' : 'Có, hủy đơn'}
@@ -270,14 +301,25 @@ const OrderDetail = () => {
     }
 
     try {
-      const reviews = await getUserReviewForProduct(currentUser._id, productId, orderId)
-      const hasReviewForThisOrder = reviews && reviews.some((review) => {
-        const reviewOrderId = review.orderId?.toString() || review.orderId
-        const reviewProductId = review.productId?._id || review.productId?.id || review.productId
-        const currentOrderId = orderId?.toString() || orderId
-        const currentProductId = productId?.toString() || productId
-        return reviewOrderId === currentOrderId && (reviewProductId?.toString() || reviewProductId) === currentProductId
-      })
+      const reviews = await getUserReviewForProduct(
+        currentUser._id,
+        productId,
+        orderId
+      )
+      const hasReviewForThisOrder =
+        reviews &&
+        reviews.some((review) => {
+          const reviewOrderId = review.orderId?.toString() || review.orderId
+          const reviewProductId =
+            review.productId?._id || review.productId?.id || review.productId
+          const currentOrderId = orderId?.toString() || orderId
+          const currentProductId = productId?.toString() || productId
+          return (
+            reviewOrderId === currentOrderId &&
+            (reviewProductId?.toString() || reviewProductId) ===
+              currentProductId
+          )
+        })
       return hasReviewForThisOrder
     } catch (error) {
       console.error('Error checking product review:', error)
@@ -302,7 +344,8 @@ const OrderDetail = () => {
             return reviewOrderId === currentOrderId
           })
           .map((review) => {
-            const productId = review.productId?._id || review.productId?.id || review.productId
+            const productId =
+              review.productId?._id || review.productId?.id || review.productId
             return productId?.toString() || productId
           })
         setReviewedProducts(new Set(reviewedProductsInOrder))
@@ -321,12 +364,22 @@ const OrderDetail = () => {
   }, [])
 
   if (loading) return <CircularProgress />
-  if (error) return <Typography color="error">Lỗi: {error.message || 'Có lỗi xảy ra'}</Typography>
+  if (error)
+    return (
+      <Typography color='error'>
+        Lỗi: {error.message || 'Có lỗi xảy ra'}
+      </Typography>
+    )
   if (!order) return <Typography>Không tìm thấy đơn hàng</Typography>
 
-  const [label, color] = statusLabels[order.status] || ['Không xác định', 'default']
-  const totalProductsPrice = order.total - (order.shippingFee || 0) + (order.discountAmount || 0)
-  const formatPrice = (val) => (typeof val === 'number' ? val.toLocaleString('vi-VN') + '₫' : '0₫')
+  const [label, color] = statusLabels[order.status] || [
+    'Không xác định',
+    'default'
+  ]
+  const totalProductsPrice =
+    order.total - (order.shippingFee || 0) + (order.discountAmount || 0)
+  const formatPrice = (val) =>
+    typeof val === 'number' ? val.toLocaleString('vi-VN') + '₫' : '0₫'
 
   const capitalizeFirstLetter = (str) => {
     if (!str) return ''
@@ -339,9 +392,13 @@ const OrderDetail = () => {
   }
 
   const getActualVariantPrice = (variant) => {
-    const totalOriginalSubtotal = items.reduce((sum, item) => sum + (item.subtotal || 0), 0)
+    const totalOriginalSubtotal = items.reduce(
+      (sum, item) => sum + (item.subtotal || 0),
+      0
+    )
     if (totalOriginalSubtotal === 0) return 0
-    const actualPrice = ((variant.subtotal || 0) / totalOriginalSubtotal) * totalProductsPrice
+    const actualPrice =
+      ((variant.subtotal || 0) / totalOriginalSubtotal) * totalProductsPrice
     return Math.round(actualPrice)
   }
 
@@ -355,7 +412,7 @@ const OrderDetail = () => {
         productName: item.productId?.name || 'Không xác định',
         variants: [],
         totalQuantity: 0,
-        totalPrice: 0,
+        totalPrice: 0
       }
     }
 
@@ -367,147 +424,170 @@ const OrderDetail = () => {
   }, {})
 
   const uniqueProducts = Object.values(productGroups)
-  const isOrderCompleted = order.status === 'Delivered';
-  const isOrderCancellable = ['Pending', 'Processing'].includes(order.status) && order.paymentStatus !== 'paid';
+  const isOrderCompleted = order.status === 'Delivered'
+  const isOrderCancellable =
+    ['Pending', 'Processing'].includes(order.status) &&
+    order.paymentStatus !== 'paid'
 
   const handleCancelOrder = async () => {
-    setCancelling(true);
+    setCancelling(true)
     try {
-      await cancelOrder(orderId);
-      setOpenCancelModal(false);
-      navigate('/orders');
+      await cancelOrder(orderId)
+      setOpenCancelModal(false)
+      navigate('/orders')
     } catch (error) {
-      console.error('Lỗi khi hủy đơn hàng:', error);
+      console.error('Lỗi khi hủy đơn hàng:', error)
     } finally {
-      setCancelling(false);
+      setCancelling(false)
     }
-  };
+  }
 
   const handleCloseModal = () => {
-    setOpenReviewModal(false);
-    setSelectedProduct(null);
-  };
+    setOpenReviewModal(false)
+    setSelectedProduct(null)
+  }
 
   const handleCloseViewReviewModal = () => {
-    setOpenViewReviewModal(false);
-    setSelectedProduct(null);
-  };
+    setOpenViewReviewModal(false)
+    setSelectedProduct(null)
+  }
 
   const handleSubmitReview = async (reviewData) => {
     try {
-      const productId = selectedProduct?.productId?.toString() || selectedProduct?.productId;
+      const productId =
+        selectedProduct?.productId?.toString() || selectedProduct?.productId
       if (!productId || !orderId || !currentUser?._id) {
-        console.error('Thiếu thông tin cần thiết để đánh giá.');
-        handleCloseModal();
-        return;
+        console.error('Thiếu thông tin cần thiết để đánh giá.')
+        handleCloseModal()
+        return
       }
 
-      const hasExistingReview = await checkProductReview(productId);
+      const hasExistingReview = await checkProductReview(productId)
       if (hasExistingReview) {
-        console.error(`Sản phẩm ${productId} đã được đánh giá trong đơn hàng ${orderId}.`);
-        setReviewedProducts((prev) => new Set([...prev, productId]));
-        setSnackbarOpen(true);
-        handleCloseModal();
-        return;
+        console.error(
+          `Sản phẩm ${productId} đã được đánh giá trong đơn hàng ${orderId}.`
+        )
+        setReviewedProducts((prev) => new Set([...prev, productId]))
+        setSnackbarOpen(true)
+        handleCloseModal()
+        return
       }
 
       if (reviewedProducts.has(productId)) {
-        console.error('Sản phẩm này đã được đánh giá.');
-        setSnackbarOpen(true);
-        handleCloseModal();
-        return;
+        console.error('Sản phẩm này đã được đánh giá.')
+        setSnackbarOpen(true)
+        handleCloseModal()
+        return
       }
 
-      const result = await createReview(reviewData);
+      const result = await createReview(reviewData)
       if (result) {
-        console.log('handleSubmitReview: Review submitted successfully, updating state for productId:', productId);
         setReviewedProducts((prev) => {
-          const newSet = new Set([...prev, productId]);
-          console.log('handleSubmitReview: Updated reviewedProducts:', newSet);
-          return newSet;
-        });
-        handleCloseModal();
-        setSnackbarOpen(true);
+          const newSet = new Set([...prev, productId])
+          console.log('handleSubmitReview: Updated reviewedProducts:', newSet)
+          return newSet
+        })
+        handleCloseModal()
+        setSnackbarOpen(true)
       }
     } catch (error) {
-      console.error('Lỗi gửi đánh giá:', error);
-      if (error?.message?.includes('đã được đánh giá') || error?.message?.includes('already reviewed')) {
-        const productId = selectedProduct?.productId;
+      console.error('Lỗi gửi đánh giá:', error)
+      if (
+        error?.message?.includes('đã được đánh giá') ||
+        error?.message?.includes('already reviewed')
+      ) {
+        const productId = selectedProduct?.productId
         if (productId) {
-          setReviewedProducts((prev) => new Set([...prev, productId]));
+          setReviewedProducts((prev) => new Set([...prev, productId]))
         }
       }
-      handleCloseModal();
+      handleCloseModal()
     }
-  };
+  }
 
   const handleReorder = async () => {
     try {
-      setReorderLoading(true);
+      setReorderLoading(true)
       for (let i = 0; i < items.length; i++) {
-        const item = items[i];
-        const variantId = typeof item.variantId === 'object' ? item.variantId._id : item.variantId;
+        const item = items[i]
+        const variantId =
+          typeof item.variantId === 'object'
+            ? item.variantId._id
+            : item.variantId
         if (!variantId) {
-          console.warn('Variant ID not found for item:', item);
-          continue;
+          console.warn('Variant ID not found for item:', item)
+          continue
         }
 
         try {
-          const variantInfo = await getVariantById(variantId);
+          const variantInfo = await getVariantById(variantId)
           if (!variantInfo) {
-            console.warn('Variant not found for ID:', variantId);
-            continue;
+            console.warn('Variant not found for ID:', variantId)
+            continue
           }
 
-          const availableQuantity = variantInfo.quantity || 0;
-          let quantityToAdd = 1;
+          const availableQuantity = variantInfo.quantity || 0
+          let quantityToAdd = 1
           if (availableQuantity <= 0) {
-            quantityToAdd = 0;
-            console.log(`Item ${item.productId?.name || item.name} is out of stock, adding with quantity = 0`);
+            quantityToAdd = 0
+            console.log(
+              `Item ${item.productId?.name || item.name} is out of stock, adding with quantity = 0`
+            )
             await addToCart({
               variantId: variantId,
-              quantity: quantityToAdd,
-            });
-            continue;
+              quantity: quantityToAdd
+            })
+            continue
           }
 
           const currentCartItem = cart?.cartItems?.find((cartItem) => {
-            const cartVariantId = typeof cartItem.variantId === 'object' ? cartItem.variantId._id : cartItem.variantId;
-            return cartVariantId === variantId;
-          });
+            const cartVariantId =
+              typeof cartItem.variantId === 'object'
+                ? cartItem.variantId._id
+                : cartItem.variantId
+            return cartVariantId === variantId
+          })
 
-          const currentQuantityInCart = currentCartItem?.quantity || 0;
+          const currentQuantityInCart = currentCartItem?.quantity || 0
           if (currentCartItem && currentQuantityInCart >= availableQuantity) {
             console.log(
               `Item ${item.productId?.name || item.name} reached max quantity in cart (${currentQuantityInCart}/${availableQuantity}), skipping`
-            );
-            continue;
+            )
+            continue
           } else if (currentCartItem) {
-            const canAdd = availableQuantity - currentQuantityInCart;
-            quantityToAdd = Math.min(1, canAdd);
-            console.log(`Item ${item.productId?.name || item.name} already in cart (${currentQuantityInCart}), adding ${quantityToAdd} more`);
+            const canAdd = availableQuantity - currentQuantityInCart
+            quantityToAdd = Math.min(1, canAdd)
+            console.log(
+              `Item ${item.productId?.name || item.name} already in cart (${currentQuantityInCart}), adding ${quantityToAdd} more`
+            )
           } else {
-            console.log(`Adding new item ${item.productId?.name || item.name} to cart`);
+            console.log(
+              `Adding new item ${item.productId?.name || item.name} to cart`
+            )
           }
 
           await addToCart({
             variantId: variantId,
-            quantity: quantityToAdd,
-          });
+            quantity: quantityToAdd
+          })
         } catch (error) {
-          console.error(`Error adding item ${i + 1} to cart:`, error);
+          console.error(`Error adding item ${i + 1} to cart:`, error)
         }
 
         if (i < items.length - 1) {
-          await new Promise((resolve) => setTimeout(resolve, 200));
+          await new Promise((resolve) => setTimeout(resolve, 200))
         }
       }
 
       const reorderVariantIds = items
-        .map((item) => (typeof item.variantId === 'object' ? item.variantId._id : item.variantId))
-        .filter((id) => id);
-      dispatch(setReorderVariantIds(reorderVariantIds));
-      await refreshCart({ silent: true });
+        .map((item) =>
+          typeof item.variantId === 'object'
+            ? item.variantId._id
+            : item.variantId
+        )
+        .filter((id) => id)
+      dispatch(setReorderVariantIds(reorderVariantIds))
+      await refreshCart({ silent: true })
       setTimeout(() => {
         navigate('/cart')
       }, 300)
@@ -529,45 +609,48 @@ const OrderDetail = () => {
         maxWidth: { xs: '100vw', sm: '96vw', md: '1800px' },
         margin: '0 auto',
         p: { xs: 1, sm: 2, md: 3 },
-        minHeight: '70vh',
+        minHeight: '70vh'
       }}
     >
       {/* Breadcrumb */}
       <Box
         sx={{
           px: { xs: 1, sm: 2, md: 3 },
-          mb: 2,
+          mb: 2
         }}
       >
-        <Breadcrumbs separator={<NavigateNext fontSize="small" />} aria-label="breadcrumb">
+        <Breadcrumbs
+          separator={<NavigateNext fontSize='small' />}
+          aria-label='breadcrumb'
+        >
           <Button
             component={Link}
-            to="/"
+            to='/'
             sx={{
               display: 'flex',
               alignItems: 'center',
               color: '#007bff',
               textDecoration: 'none',
               fontSize: { xs: '0.8rem', sm: '0.9rem' },
-              '&:hover': { color: 'primary.main' },
+              '&:hover': { color: 'primary.main' }
             }}
           >
-            <ArrowBackIcon fontSize="small" />
+            <ArrowBackIcon fontSize='small' />
             Trang chủ
           </Button>
           <Button
             component={Link}
-            to="/orders"
+            to='/orders'
             sx={{
               display: 'flex',
               alignItems: 'center',
               color: '#007bff',
               textDecoration: 'none',
               fontSize: { xs: '0.8rem', sm: '0.9rem' },
-              '&:hover': { color: 'primary.main' },
+              '&:hover': { color: 'primary.main' }
             }}
           >
-            <NavigateNext fontSize="small" />
+            <NavigateNext fontSize='small' />
             Đơn hàng
           </Button>
           <Typography
@@ -576,7 +659,7 @@ const OrderDetail = () => {
               alignItems: 'center',
               color: 'text.primary',
               fontWeight: 500,
-              fontSize: { xs: '0.8rem', sm: '0.9rem' },
+              fontSize: { xs: '0.8rem', sm: '0.9rem' }
             }}
           >
             Chi tiết đơn hàng
@@ -587,25 +670,38 @@ const OrderDetail = () => {
         sx={{
           borderRadius: 3,
           boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
-          border: '1px solid rgba(0,0,0,0.05)',
+          border: '1px solid rgba(0,0,0,0.05)'
         }}
       >
         <CardContent sx={{ p: { xs: 1.5, sm: 2, md: 3 } }}>
           {/* Header */}
-          <Box display="flex" alignItems="center" mb={2} flexWrap="wrap" gap={1}>
-            <IconButton onClick={() => navigate(-1)} aria-label="Quay lại" size="small">
-              <ArrowBackIcon fontSize="small" />
+          <Box
+            display='flex'
+            alignItems='center'
+            mb={2}
+            flexWrap='wrap'
+            gap={1}
+          >
+            <IconButton
+              onClick={() => navigate(-1)}
+              aria-label='Quay lại'
+              size='small'
+            >
+              <ArrowBackIcon fontSize='small' />
             </IconButton>
             <Typography
-              variant="h6"
-              fontWeight="600"
-              sx={{ color: 'var(--primary-color)', fontSize: { xs: '1rem', sm: '1.25rem' } }}
+              variant='h6'
+              fontWeight='600'
+              sx={{
+                color: 'var(--primary-color)',
+                fontSize: { xs: '1rem', sm: '1.25rem' }
+              }}
             >
               #{order.code}
             </Typography>
             <Typography
-              variant="body2"
-              color="text.secondary"
+              variant='body2'
+              color='text.secondary'
               sx={{ ml: 1, fontSize: { xs: '0.75rem', sm: '0.875rem' } }}
             >
               {new Date(order.createdAt).toLocaleDateString('vi-VN')}
@@ -617,7 +713,7 @@ const OrderDetail = () => {
                 ml: 'auto',
                 fontWeight: 600,
                 fontSize: { xs: '0.65rem', sm: '0.75rem' },
-                height: { xs: 28, sm: 32 },
+                height: { xs: 28, sm: 32 }
               }}
             />
           </Box>
@@ -630,13 +726,13 @@ const OrderDetail = () => {
               backgroundColor: 'grey.50',
               border: '1px solid',
               borderColor: 'grey.200',
-              mb: 2,
+              mb: 2
             }}
           >
             <Typography
-              variant="h6"
-              fontWeight="600"
-              color="var(--primary-color)"
+              variant='h6'
+              fontWeight='600'
+              color='var(--primary-color)'
               gutterBottom
               sx={{ fontSize: { xs: '1rem', sm: '1.25rem' } }}
             >
@@ -644,19 +740,19 @@ const OrderDetail = () => {
             </Typography>
             <Stack spacing={0.5}>
               <Typography
-                fontWeight="600"
+                fontWeight='600'
                 sx={{ fontSize: { xs: '0.9rem', sm: '1rem', md: '1.1rem' } }}
               >
                 {order.shippingAddress?.fullName}
               </Typography>
               <Typography
-                color="text.secondary"
+                color='text.secondary'
                 sx={{ fontSize: { xs: '0.8rem', sm: '0.875rem' } }}
               >
                 (+84) {order.shippingAddress?.phone}
               </Typography>
               <Typography
-                color="text.secondary"
+                color='text.secondary'
                 sx={{ fontSize: { xs: '0.8rem', sm: '0.875rem' } }}
               >
                 {order.shippingAddress?.address}, {order.shippingAddress?.ward},{' '}
@@ -664,8 +760,8 @@ const OrderDetail = () => {
               </Typography>
               {order.note && (
                 <Typography
-                  color="text.secondary"
-                  fontStyle="italic"
+                  color='text.secondary'
+                  fontStyle='italic'
                   sx={{
                     fontSize: { xs: '0.75rem', sm: '0.875rem' },
                     wordBreak: 'break-word',
@@ -675,7 +771,7 @@ const OrderDetail = () => {
                     display: '-webkit-box',
                     WebkitLineClamp: 3,
                     WebkitBoxOrient: 'vertical',
-                    lineHeight: 1.5,
+                    lineHeight: 1.5
                   }}
                 >
                   Ghi chú: {order.note}
@@ -702,21 +798,29 @@ const OrderDetail = () => {
                         '&:hover': {
                           backgroundColor: 'grey.50',
                           borderColor: 'var(--primary-color)',
-                          transform: 'translateX(4px)',
-                        },
+                          transform: 'translateX(4px)'
+                        }
                       }}
                       onClick={() => handleProductClick(product.productId)}
                     >
                       <Box
-                        display="flex"
-                        justifyContent="space-between"
-                        alignItems="center"
+                        display='flex'
+                        justifyContent='space-between'
+                        alignItems='center'
                         flexDirection={{ xs: 'column', sm: 'row' }}
                         gap={1}
                       >
-                        <Box display="flex" alignItems="center" gap={1.5} width="100%">
+                        <Box
+                          display='flex'
+                          alignItems='center'
+                          gap={1.5}
+                          width='100%'
+                        >
                           <Avatar
-                            src={optimizeCloudinaryUrl(variant?.color?.image) || '/images/default.jpg'}
+                            src={
+                              optimizeCloudinaryUrl(variant?.color?.image) ||
+                              '/images/default.jpg'
+                            }
                             alt={variant.name}
                             sx={{
                               width: { xs: 60, sm: 70, md: 80 },
@@ -724,51 +828,73 @@ const OrderDetail = () => {
                               borderRadius: 2,
                               border: '2px solid white',
                               boxShadow: '0 4px 8px rgba(0,0,0,0.1)',
-                              objectFit: 'cover',
+                              objectFit: 'cover'
                             }}
-                            variant="rounded"
+                            variant='rounded'
                           />
                           <Box flexGrow={1}>
                             <Typography
                               fontWeight={600}
                               sx={{
-                                fontSize: { xs: '0.9rem', sm: '1rem', md: '1.1rem' },
+                                fontSize: {
+                                  xs: '0.9rem',
+                                  sm: '1rem',
+                                  md: '1.1rem'
+                                },
                                 mb: 0.5,
                                 overflow: 'hidden',
                                 textOverflow: 'ellipsis',
                                 whiteSpace: 'nowrap',
-                                maxWidth: { xs: '300px', sm: '250px', md: '400px', lg: '500px' }
-
+                                maxWidth: {
+                                  xs: '300px',
+                                  sm: '250px',
+                                  md: '400px',
+                                  lg: '500px'
+                                }
                               }}
                               title={product.productName}
                             >
                               {product.productName}
                             </Typography>
                             <Typography
-                              variant="body2"
-                              color="text.secondary"
-                              sx={{ mb: 0.5, fontSize: { xs: '0.75rem', sm: '0.8rem' } }}
+                              variant='body2'
+                              color='text.secondary'
+                              sx={{
+                                mb: 0.5,
+                                fontSize: { xs: '0.75rem', sm: '0.8rem' }
+                              }}
                             >
-                              Phân loại hàng: {capitalizeFirstLetter(variant.color?.name)},{' '}
+                              Phân loại hàng:{' '}
+                              {capitalizeFirstLetter(variant.color?.name)},{' '}
                               {formatSize(variant.size)}
                             </Typography>
                             <Chip
                               label={`Số lượng: ${variant.quantity}`}
-                              size="small"
-                              variant="outlined"
+                              size='small'
+                              variant='outlined'
                               sx={{
                                 fontSize: { xs: '0.65rem', sm: '0.7rem' },
-                                height: { xs: 18, sm: 20 },
+                                height: { xs: 18, sm: 20 }
                               }}
                             />
                           </Box>
                         </Box>
-                        <Box textAlign={{ xs: 'right', sm: 'right' }} sx={{ alignSelf: { xs: 'flex-end', sm: 'center' }, ml: { xs: 0, sm: 1 } }}>
+                        <Box
+                          textAlign={{ xs: 'right', sm: 'right' }}
+                          sx={{
+                            alignSelf: { xs: 'flex-end', sm: 'center' },
+                            ml: { xs: 0, sm: 1 }
+                          }}
+                        >
                           <Typography
                             fontWeight={700}
                             sx={{
-                              fontSize: { xs: '1rem', sm: '1.1rem', md: '1.2rem' },
-                              color: 'var(--primary-color)',
+                              fontSize: {
+                                xs: '1rem',
+                                sm: '1.1rem',
+                                md: '1.2rem'
+                              },
+                              color: 'var(--primary-color)'
                             }}
                           >
                             {formatPrice(getActualVariantPrice(variant))}
@@ -782,8 +908,8 @@ const OrderDetail = () => {
                   </Box>
                 ))}
                 <Box
-                  display="flex"
-                  justifyContent="flex-end"
+                  display='flex'
+                  justifyContent='flex-end'
                   gap={1}
                   mt={1}
                   flexDirection={{ xs: 'column', sm: 'row' }}
@@ -801,7 +927,9 @@ const OrderDetail = () => {
                     checkProductReview={checkProductReview}
                   />
                 </Box>
-                {index < uniqueProducts.length - 1 && <Divider sx={{ my: 2 }} />}
+                {index < uniqueProducts.length - 1 && (
+                  <Divider sx={{ my: 2 }} />
+                )}
               </Box>
             ))}
           </Stack>
@@ -812,19 +940,19 @@ const OrderDetail = () => {
             sx={{
               p: { xs: 1, sm: 1.5, md: 2 },
               borderRadius: 2,
-              backgroundColor: 'primary.50',
+              backgroundColor: 'primary.50'
             }}
           >
             <Typography
-              variant="h6"
-              fontWeight="600"
+              variant='h6'
+              fontWeight='600'
               mb={1.5}
               sx={{ fontSize: { xs: '1rem', sm: '1.25rem' } }}
             >
               Tóm tắt đơn hàng
             </Typography>
             <Stack spacing={1}>
-              <Box display="flex" justifyContent="space-between">
+              <Box display='flex' justifyContent='space-between'>
                 <Typography sx={{ fontSize: { xs: '0.8rem', sm: '0.9rem' } }}>
                   Tổng tiền hàng:
                 </Typography>
@@ -835,7 +963,7 @@ const OrderDetail = () => {
                   {formatPrice(totalProductsPrice)}
                 </Typography>
               </Box>
-              <Box display="flex" justifyContent="space-between">
+              <Box display='flex' justifyContent='space-between'>
                 <Typography sx={{ fontSize: { xs: '0.8rem', sm: '0.9rem' } }}>
                   Phí vận chuyển:
                 </Typography>
@@ -846,7 +974,7 @@ const OrderDetail = () => {
                   {formatPrice(order.shippingFee || 0)}
                 </Typography>
               </Box>
-              <Box display="flex" justifyContent="space-between">
+              <Box display='flex' justifyContent='space-between'>
                 <Typography sx={{ fontSize: { xs: '0.8rem', sm: '0.9rem' } }}>
                   Giảm giá:
                 </Typography>
@@ -859,34 +987,38 @@ const OrderDetail = () => {
                 </Typography>
               </Box>
               <Divider />
-              <Box display="flex" justifyContent="space-between" alignItems="center">
+              <Box
+                display='flex'
+                justifyContent='space-between'
+                alignItems='center'
+              >
                 <Typography
-                  variant="h6"
-                  fontWeight="600"
+                  variant='h6'
+                  fontWeight='600'
                   sx={{ fontSize: { xs: '1rem', sm: '1.25rem' } }}
                 >
                   Tổng cộng:
                 </Typography>
                 <Typography
-                  variant="h5"
-                  fontWeight="700"
+                  variant='h5'
+                  fontWeight='700'
                   sx={{
                     color: 'var(--primary-color)',
-                    fontSize: { xs: '1.25rem', sm: '1.5rem' },
+                    fontSize: { xs: '1.25rem', sm: '1.5rem' }
                   }}
                 >
                   {formatPrice(order.total)}
                 </Typography>
               </Box>
-              <Box display="flex" justifyContent="space-between" mt={1}>
+              <Box display='flex' justifyContent='space-between' mt={1}>
                 <Typography
-                  fontWeight="600"
+                  fontWeight='600'
                   sx={{ fontSize: { xs: '0.8rem', sm: '0.9rem' } }}
                 >
                   Phương thức thanh toán:
                 </Typography>
                 <Typography
-                  fontWeight="600"
+                  fontWeight='600'
                   sx={{ fontSize: { xs: '0.8rem', sm: '0.9rem' } }}
                 >
                   {order.paymentMethod?.toLowerCase() === 'cod'
@@ -907,37 +1039,37 @@ const OrderDetail = () => {
             px: { xs: 1.5, sm: 2, md: 3 },
             borderRadius: 3,
             boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
-            border: '1px solid rgba(255, 152, 0, 0.2)',
+            border: '1px solid rgba(255, 152, 0, 0.2)'
           }}
         >
           <CardContent>
             <Box
-              display="flex"
-              justifyContent="space-between"
-              alignItems="center"
+              display='flex'
+              justifyContent='space-between'
+              alignItems='center'
               flexDirection={{ xs: 'column', sm: 'row' }}
               gap={1}
             >
               <Box textAlign={{ xs: 'center', sm: 'left' }}>
                 <Typography
-                  variant="h6"
-                  fontWeight="600"
-                  color="var(--primary-color)"
+                  variant='h6'
+                  fontWeight='600'
+                  color='var(--primary-color)'
                   sx={{ fontSize: { xs: '1rem', sm: '1.25rem' } }}
                 >
                   Hủy đơn hàng
                 </Typography>
                 <Typography
-                  variant="body2"
-                  color="text.secondary"
+                  variant='body2'
+                  color='text.secondary'
                   sx={{ fontSize: { xs: '0.75rem', sm: '0.875rem' } }}
                 >
                   Bạn có thể hủy đơn hàng này vì chưa thanh toán
                 </Typography>
               </Box>
               <Button
-                variant="outlined"
-                color="error"
+                variant='outlined'
+                color='error'
                 startIcon={<Cancel />}
                 sx={{
                   borderRadius: 2,
@@ -945,7 +1077,7 @@ const OrderDetail = () => {
                   fontWeight: 600,
                   fontSize: { xs: '0.75rem', sm: '0.875rem' },
                   px: { xs: 1.5, sm: 2 },
-                  width: { xs: '100%', sm: 'auto' },
+                  width: { xs: '100%', sm: 'auto' }
                 }}
                 onClick={() => setOpenCancelModal(true)}
               >
@@ -957,43 +1089,47 @@ const OrderDetail = () => {
       )}
 
       {/* Reorder Button */}
-      {(order?.status === 'Delivered' || order?.status === 'Failed' || order?.status === 'Cancelled') && (
+      {(order?.status === 'Delivered' ||
+        order?.status === 'Failed' ||
+        order?.status === 'Cancelled') && (
         <Card
           sx={{
             mt: 2,
             px: { xs: 1.5, sm: 2, md: 3 },
             borderRadius: 3,
             boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
-            border: '1px solid rgba(26, 60, 123, 0.2)',
+            border: '1px solid rgba(26, 60, 123, 0.2)'
           }}
         >
           <CardContent>
             <Box
-              display="flex"
-              justifyContent="space-between"
-              alignItems="center"
+              display='flex'
+              justifyContent='space-between'
+              alignItems='center'
               flexDirection={{ xs: 'column', sm: 'row' }}
               gap={1}
             >
               <Box textAlign={{ xs: 'center', sm: 'left' }}>
                 <Typography
-                  variant="h6"
-                  fontWeight="600"
-                  color="var(--primary-color)"
+                  variant='h6'
+                  fontWeight='600'
+                  color='var(--primary-color)'
                   sx={{ fontSize: { xs: '1rem', sm: '1.25rem' } }}
                 >
                   Mua lại đơn hàng
                 </Typography>
                 <Typography
-                  variant="body2"
-                  color="text.secondary"
+                  variant='body2'
+                  color='text.secondary'
                   sx={{ fontSize: { xs: '0.75rem', sm: '0.875rem' } }}
                 >
                   Thêm tất cả sản phẩm từ đơn hàng này vào giỏ hàng
                 </Typography>
               </Box>
               <Button
-                startIcon={reorderLoading ? <CircularProgress size={16} /> : <Replay />}
+                startIcon={
+                  reorderLoading ? <CircularProgress size={16} /> : <Replay />
+                }
                 disabled={reorderLoading}
                 onClick={handleReorder}
                 sx={{
@@ -1005,7 +1141,7 @@ const OrderDetail = () => {
                   px: { xs: 1.5, sm: 2 },
                   width: { xs: '100%', sm: 'auto' },
                   boxShadow: '0 4px 12px rgba(25, 118, 210, 0.3)',
-                  opacity: reorderLoading ? 0.7 : 1,
+                  opacity: reorderLoading ? 0.7 : 1
                 }}
               >
                 {reorderLoading ? 'Đang thêm vào giỏ...' : 'Mua lại'}
@@ -1025,12 +1161,12 @@ const OrderDetail = () => {
       >
         <Alert
           onClose={() => setSnackbarOpen(false)}
-          severity="success"
+          severity='success'
           sx={{
             width: '100%',
             borderRadius: 2,
             fontWeight: 600,
-            fontSize: { xs: '0.75rem', sm: '0.875rem' },
+            fontSize: { xs: '0.75rem', sm: '0.875rem' }
           }}
         >
           Cảm ơn bạn đã đánh giá!

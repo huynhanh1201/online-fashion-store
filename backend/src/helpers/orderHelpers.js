@@ -414,6 +414,8 @@ const handlePaymentByVnpay = (reqBody, order, ipAddr) => {
     const paymentUrl =
       vnpUrl + '?' + querystring.stringify(sortedParams, { encode: false })
 
+    console.log('==============> paymentUrl: ', paymentUrl)
+
     return paymentUrl
   }
 }

@@ -78,8 +78,8 @@ const sortOptions = [
   { value: 'featured', label: 'Sản phẩm nổi bật' },
   { value: 'priceAsc', label: 'Giá tăng dần' },
   { value: 'priceDesc', label: 'Giá giảm dần' },
-  { value: 'nameAsc', label: 'Sản phẩm từ A-Z' },
-  { value: 'nameDesc', label: 'Sản phẩm từ Z-A' }
+  { value: 'nameDesc', label: 'Sản phẩm từ A-Z' },
+  { value: 'nameAsc', label: 'Sản phẩm từ Z-A' }
 ]
 
 // Helper to generate pagination items with ellipsis
@@ -146,7 +146,7 @@ const Product = () => {
         priceAsc: 'price_asc',
         priceDesc: 'price_desc'
       }
-
+      
       const params = {
         page: Number(page),
         limit: Number(ITEMS_PER_PAGE),
