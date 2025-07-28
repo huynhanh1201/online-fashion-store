@@ -230,7 +230,7 @@ export default function SearchResults() {
           aria-label='breadcrumb'
         >
           <Link
-            underline='hover'
+
             sx={{
               display: 'flex',
               alignItems: 'center',
@@ -368,7 +368,7 @@ export default function SearchResults() {
                 size='small'
                 renderItem={(item) =>
                   item.type === 'start-ellipsis' ||
-                  item.type === 'end-ellipsis' ? (
+                    item.type === 'end-ellipsis' ? (
                     <span style={{ padding: '8px 12px', color: '#999' }}>
                       ...
                     </span>
