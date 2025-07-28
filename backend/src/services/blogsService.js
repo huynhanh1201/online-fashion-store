@@ -9,8 +9,6 @@ const createBlog = async (reqBody, jwtDecoded) => {
   try {
     const user = await UserModel.findById(jwtDecoded._id)
 
-    console.log(user)
-
     const newBlog = {
       title: reqBody.title,
       excerpt: reqBody.excerpt,

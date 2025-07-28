@@ -129,7 +129,7 @@ const createOrder = async (userId, reqBody, ipAddr, jwtDecoded) => {
         cartItemPromise,
         createDeliveryOrderPromise
       ])
-      console.log('>>>>>Here...')
+
       // Cập nhật mã ghnOrderCode
       await OrderModel.findOneAndUpdate(
         { _id: order._id },
@@ -162,9 +162,11 @@ const createOrder = async (userId, reqBody, ipAddr, jwtDecoded) => {
 
     // Commit transaction
     await session.commitTransaction()
-
+    console.log('OrderSevice paymentUrl: 0')
     // Xử lý thanh toán VNPAY
     const paymentUrl = orderHelpers.handlePaymentByVnpay(reqBody, order, ipAddr)
+
+    console.log('OrderSevice paymentUrl: ', paymentUrl)
 
     return paymentUrl || order
   } catch (err) {
