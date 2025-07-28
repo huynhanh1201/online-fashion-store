@@ -129,7 +129,7 @@ const createOrder = async (userId, reqBody, ipAddr, jwtDecoded) => {
         cartItemPromise,
         createDeliveryOrderPromise
       ])
-      console.log('>>>>>Here...')
+
       // Cập nhật mã ghnOrderCode
       await OrderModel.findOneAndUpdate(
         { _id: order._id },
