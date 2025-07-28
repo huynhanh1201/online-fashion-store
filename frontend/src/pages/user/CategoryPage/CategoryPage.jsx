@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { useParams, Link } from 'react-router-dom'
+import { useParams, useNavigate } from 'react-router-dom'
 import {
   Box,
   Typography,
@@ -13,9 +13,9 @@ import {
   styled,
   PaginationItem,
   Breadcrumbs,
-  Button
+  Link
 } from '@mui/material'
-import NavigateNextIcon from '@mui/icons-material/NavigateNext'
+import NavigateNext from '@mui/icons-material/NavigateNext'
 import { getCategoryBySlug } from '~/services/categoryService'
 import { getProductsByCategory } from '~/services/productService'
 import ProductCard from '~/components/ProductCards/ProductCards'
@@ -95,7 +95,7 @@ const CategoryPage = () => {
   const [page, setPage] = useState(1)
   const [sortMenuOpen, setSortMenuOpen] = useState(false)
   const [totalPages, setTotalPages] = useState(1)
-
+  const navigate = useNavigate()
   // Fetch category data
   useEffect(() => {
     const fetchCategory = async () => {
@@ -223,7 +223,9 @@ const CategoryPage = () => {
     setPage(value)
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
-
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'auto' })
+  }, [])
   useEffect(() => {
     if (!sortMenuOpen) return
     const handleClick = (e) => {
@@ -289,11 +291,11 @@ const CategoryPage = () => {
   return (
     <Box sx={{ minHeight: '100vh', py: 1 }}>
       <Breadcrumbs
-        separator={<NavigateNextIcon fontSize='small' />}
+        separator={<NavigateNext fontSize='small' />}
         aria-label='breadcrumb'
-        sx={{ pt: 2, width: '100%', maxWidth: '95vw', mx: 'auto' }}
+        sx={{ px: 3, py: 1, mb: 2 }}
       >
-        <Button
+        <Link
           component={Link}
           to='/'
           sx={{
@@ -304,13 +306,17 @@ const CategoryPage = () => {
             minWidth: 0,
             p: 0,
             '&:hover': {
-              color: 'primary.main',
-              background: 'none'
-            }
+              color: 'primary.main'
+            },
+            cursor: 'pointer'
           }}
+          onClick={() => navigate('/')}
+        // component={Link}
+        // to='/product'
         >
           Trang chủ
-        </Button>
+        </Link>
+
         <Typography
           sx={{
             display: 'flex',
@@ -318,8 +324,7 @@ const CategoryPage = () => {
             color: 'text.primary',
             fontWeight: 500
           }}
-        >
-          Danh mục {category.name}
+        > {category ? category.name : 'Danh mục sản phẩm'}
         </Typography>
       </Breadcrumbs>
       {/* Category Banner Section */}
@@ -340,8 +345,8 @@ const CategoryPage = () => {
         <img
           src={optimizeCloudinaryUrl(
             category?.banner ||
-              category?.image ||
-              'https://file.hstatic.net/1000360022/collection/ao-thun_cd23d8082c514c839615e1646371ba71.jpg',
+            category?.image ||
+            'https://file.hstatic.net/1000360022/collection/ao-thun_cd23d8082c514c839615e1646371ba71.jpg',
             { width: 1920, height: 400 }
           )}
           alt='category banner'

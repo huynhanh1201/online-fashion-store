@@ -16,9 +16,9 @@ import {
   Skeleton,
   useTheme,
   useMediaQuery,
-  Breadcrumbs
+  Breadcrumbs,
+  Link
 } from '@mui/material'
-import { Link } from 'react-router-dom'
 import { ArrowBack, NavigateNext } from '@mui/icons-material'
 import useBlog from '~/hooks/useBlog.js'
 import { optimizeCloudinaryUrl } from '~/utils/cloudinary'
@@ -476,7 +476,7 @@ const BlogDetail = () => {
               separator={<NavigateNext fontSize='small' />}
               aria-label='breadcrumb'
             >
-              <Button
+              <Link
                 component={Link}
                 to='/'
                 sx={{
@@ -486,13 +486,16 @@ const BlogDetail = () => {
                   textDecoration: 'none',
                   '&:hover': {
                     color: 'primary.main'
-                  }
+                  },
+                  cursor: 'pointer'
                 }}
+                onClick={() => navigate('/')}
+              // component={Link}
+              // to='/product'
               >
-                <NavigateNext fontSize='small' />
                 Trang chủ
-              </Button>
-              <Button
+              </Link>
+              <Link
                 component={Link}
                 to={`/blog`}
                 sx={{
@@ -502,12 +505,15 @@ const BlogDetail = () => {
                   textDecoration: 'none',
                   '&:hover': {
                     color: 'primary.main'
-                  }
+                  },
+                  cursor: 'pointer'
                 }}
+                onClick={() => navigate('/blog')}
+              // component={Link}
+              // to='/product'
               >
-                <NavigateNext fontSize='small' />
                 Tin thời trang
-              </Button>
+              </Link>
               <Typography
                 sx={{
                   display: 'flex',

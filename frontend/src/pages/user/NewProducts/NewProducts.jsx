@@ -17,10 +17,11 @@ import { useDispatch } from 'react-redux'
 import { setCartItems } from '~/redux/cart/cartSlice'
 import ProductCard from '~/components/ProductCards/ProductCards'
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward'
-import NavigateNextIcon from '@mui/icons-material/NavigateNext'
+import NavigateNext from '@mui/icons-material/NavigateNext'
 import HomeIcon from '@mui/icons-material/Home'
 import Inventory2OutlinedIcon from '@mui/icons-material/Inventory2Outlined'
 import { getProducts } from '~/services/productService'
+import { useNavigate } from 'react-router-dom'
 
 const ITEMS_PER_PAGE = 15
 
@@ -90,7 +91,7 @@ const NewProducts = () => {
   const [snackbar, setSnackbar] = useState(null)
   const [isAdding, setIsAdding] = useState({})
   const [sortMenuOpen, setSortMenuOpen] = useState(false)
-
+  const navigate = useNavigate()
   // Fetch products with pagination and sorting
   const fetchProducts = async () => {
     try {
@@ -108,9 +109,9 @@ const NewProducts = () => {
         page: Number(page),
         limit: Number(ITEMS_PER_PAGE),
         sort: backendSortMap[sortOption] || 'newest',
-        filterTypeDate: 'this_week',
         destroy: false,
-        status: 'active'
+        status: 'active',
+        label: 'new'
       }
 
       console.log('Fetching products with params:', params)
@@ -138,8 +139,6 @@ const NewProducts = () => {
       setLoading(false)
     }
   }
-
-
 
 
   // Scroll to top on component mount
@@ -229,9 +228,8 @@ const NewProducts = () => {
         }}
       >
         <Breadcrumbs
-          separator={<NavigateNextIcon fontSize='small' />}
+          separator={<NavigateNext fontSize='small' />}
           aria-label='breadcrumb'
-          sx={{ my: 1 }}
         >
           <Link
             underline='hover'
@@ -242,9 +240,12 @@ const NewProducts = () => {
               textDecoration: 'none',
               '&:hover': {
                 color: 'primary.main'
-              }
+              },
+              cursor: 'pointer'
             }}
-            href='/'
+            onClick={() => navigate('/')}
+          // component={Link}
+          // to='/product'
           >
             Trang chủ
           </Link>
@@ -256,7 +257,7 @@ const NewProducts = () => {
               fontWeight: 500
             }}
           >
-            Hàng mới
+           Hàng mới
           </Typography>
         </Breadcrumbs>
       </Box>

@@ -21,8 +21,11 @@ import {
   DialogActions,
   DialogContentText,
   Breadcrumbs,
+  Link,
+  Skeleton,
+  Container
 } from '@mui/material'
-import { useParams, useNavigate, Link } from 'react-router-dom'
+import { useParams, useNavigate } from 'react-router-dom'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack'
 import { Cancel, Warning, Replay, NavigateNext } from '@mui/icons-material'
 import { useOrderDetail } from '~/hooks/useOrderDetail'
@@ -48,6 +51,108 @@ const statusLabels = {
   Delivered: ['Đã giao', 'success'],
   Cancelled: ['Đã hủy', 'error'],
   Failed: ['Thanh toán thất bại', 'error']
+}
+
+// Loading Component
+const OrderDetailSkeleton = () => {
+  return (
+    <Container maxWidth="lg" sx={{ py: 4 }}>
+      {/* Header Skeleton */}
+      <Box sx={{ mb: 4 }}>
+        <Skeleton variant="text" width={200} height={40} sx={{ mb: 2 }} />
+        <Skeleton variant="text" width={300} height={24} />
+      </Box>
+
+      {/* Order Info Card Skeleton */}
+      <Paper
+        elevation={0}
+        sx={{
+          p: 3,
+          mb: 3,
+          borderRadius: 3,
+          border: '1px solid',
+          borderColor: 'divider'
+        }}
+      >
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+          <Skeleton variant="text" width={150} height={32} />
+          <Skeleton variant="rectangular" width={100} height={32} sx={{ borderRadius: 2 }} />
+        </Box>
+
+        <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' }, gap: 3 }}>
+          <Box>
+            <Skeleton variant="text" width={120} height={24} sx={{ mb: 1 }} />
+            <Skeleton variant="text" width={200} height={20} sx={{ mb: 2 }} />
+            <Skeleton variant="text" width={100} height={24} sx={{ mb: 1 }} />
+            <Skeleton variant="text" width={150} height={20} />
+          </Box>
+          <Box>
+            <Skeleton variant="text" width={140} height={24} sx={{ mb: 1 }} />
+            <Skeleton variant="text" width={180} height={20} sx={{ mb: 2 }} />
+            <Skeleton variant="text" width={120} height={24} sx={{ mb: 1 }} />
+            <Skeleton variant="text" width={160} height={20} />
+          </Box>
+        </Box>
+      </Paper>
+
+      {/* Products Skeleton */}
+      <Paper
+        elevation={0}
+        sx={{
+          p: 3,
+          mb: 3,
+          borderRadius: 3,
+          border: '1px solid',
+          borderColor: 'divider'
+        }}
+      >
+        <Skeleton variant="text" width={150} height={28} sx={{ mb: 3 }} />
+
+        {[1, 2, 3].map((item) => (
+          <Box key={item} sx={{ mb: 3, pb: 3, borderBottom: '1px solid', borderColor: 'divider' }}>
+            <Box sx={{ display: 'flex', gap: 2, mb: 2 }}>
+              <Skeleton variant="rectangular" width={80} height={80} sx={{ borderRadius: 2 }} />
+              <Box sx={{ flex: 1 }}>
+                <Skeleton variant="text" width="70%" height={24} sx={{ mb: 1 }} />
+                <Skeleton variant="text" width="50%" height={20} sx={{ mb: 1 }} />
+                <Skeleton variant="text" width="40%" height={20} />
+              </Box>
+              <Box sx={{ textAlign: 'right' }}>
+                <Skeleton variant="text" width={80} height={24} sx={{ mb: 1 }} />
+                <Skeleton variant="text" width={60} height={20} />
+              </Box>
+            </Box>
+          </Box>
+        ))}
+      </Paper>
+
+      {/* Order Summary Skeleton */}
+      <Paper
+        elevation={0}
+        sx={{
+          p: 3,
+          borderRadius: 3,
+          border: '1px solid',
+          borderColor: 'divider'
+        }}
+      >
+        <Skeleton variant="text" width={120} height={28} sx={{ mb: 3 }} />
+
+        {[1, 2, 3, 4].map((item) => (
+          <Box key={item} sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
+            <Skeleton variant="text" width={150} height={20} />
+            <Skeleton variant="text" width={100} height={20} />
+          </Box>
+        ))}
+
+        <Divider sx={{ my: 2 }} />
+        <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+          <Skeleton variant="text" width={100} height={24} />
+          <Skeleton variant="text" width={120} height={24} />
+        </Box>
+      </Paper>
+    </Container>
+  )
 }
 
 // Review Button Component with fallback check
@@ -103,7 +208,15 @@ const ReviewButtonComponent = ({
     return (reviewsLoading || isReviewed === null) &&
       isOrderCompleted &&
       currentUser ? (
-      <CircularProgress size={20} />
+      <Skeleton
+        variant="rectangular"
+        width={100}
+        height={32}
+        sx={{
+          borderRadius: 2,
+          animation: 'pulse 1.5s ease-in-out infinite'
+        }}
+      />
     ) : null
   }
 
@@ -120,28 +233,38 @@ const ReviewButtonComponent = ({
         px: { xs: 1.5, sm: 2 },
         ...(isReviewed
           ? {
-              color: 'var(--primary-color)',
-              borderColor: 'var(--primary-color)',
-              '&:hover': {
-                color: '#fff',
-                backgroundColor: 'var(--accent-color)',
-                borderColor: 'var(--primary-color)'
-              }
-            }
-          : {
-              backgroundColor: 'var(--primary-color)',
+            color: 'var(--primary-color)',
+            borderColor: 'var(--primary-color)',
+            '&:hover': {
               color: '#fff',
-              '&:hover': {
-                backgroundColor: 'var(--accent-color)',
-                boxShadow: '0 4px 12px rgba(26, 60, 123, 0.3)'
-              }
-            })
+              backgroundColor: 'var(--accent-color)',
+              borderColor: 'var(--primary-color)'
+            }
+          }
+          : {
+            backgroundColor: 'var(--primary-color)',
+            color: '#fff',
+            '&:hover': {
+              backgroundColor: 'var(--accent-color)',
+              boxShadow: '0 4px 12px rgba(26, 60, 123, 0.3)'
+            }
+          })
       }}
       onClick={(e) => {
         e.stopPropagation()
         handleReviewClick()
       }}
-      startIcon={checking ? <CircularProgress size={16} /> : null}
+      startIcon={checking ? (
+        <CircularProgress
+          size={16}
+          sx={{
+            color: 'inherit',
+            '& .MuiCircularProgress-circle': {
+              strokeLinecap: 'round'
+            }
+          }}
+        />
+      ) : null}
     >
       {checking
         ? 'Kiểm tra...'
@@ -258,7 +381,17 @@ const CancelOrderModal = ({ open, onClose, onConfirm, order, loading }) => {
           variant='contained'
           color='error'
           disabled={loading}
-          startIcon={loading ? <CircularProgress size={16} /> : <Cancel />}
+          startIcon={loading ? (
+            <CircularProgress
+              size={16}
+              sx={{
+                color: 'inherit',
+                '& .MuiCircularProgress-circle': {
+                  strokeLinecap: 'round'
+                }
+              }}
+            />
+          ) : <Cancel />}
           sx={{
             borderRadius: 2,
             textTransform: 'none',
@@ -317,7 +450,7 @@ const OrderDetail = () => {
           return (
             reviewOrderId === currentOrderId &&
             (reviewProductId?.toString() || reviewProductId) ===
-              currentProductId
+            currentProductId
           )
         })
       return hasReviewForThisOrder
@@ -363,14 +496,75 @@ const OrderDetail = () => {
     window.scrollTo({ top: 0, behavior: 'auto' })
   }, [])
 
-  if (loading) return <CircularProgress />
+  if (loading) return <OrderDetailSkeleton />
   if (error)
     return (
-      <Typography color='error'>
-        Lỗi: {error.message || 'Có lỗi xảy ra'}
-      </Typography>
+      <Container maxWidth="lg" sx={{ py: 4 }}>
+        <Paper
+          elevation={0}
+          sx={{
+            p: 4,
+            textAlign: 'center',
+            borderRadius: 3,
+            border: '1px solid',
+            borderColor: 'error.light',
+            backgroundColor: 'error.50'
+          }}
+        >
+          <Box sx={{ mb: 2 }}>
+            <Warning sx={{ fontSize: 48, color: 'error.main', mb: 2 }} />
+          </Box>
+          <Typography variant="h6" color='error.main' sx={{ mb: 1, fontWeight: 600 }}>
+            Có lỗi xảy ra
+          </Typography>
+          <Typography color='error.dark'>
+            {error.message || 'Không thể tải thông tin đơn hàng'}
+          </Typography>
+          <Button
+            variant="contained"
+            color="error"
+            sx={{ mt: 3, borderRadius: 2 }}
+            onClick={() => window.location.reload()}
+          >
+            Thử lại
+          </Button>
+        </Paper>
+      </Container>
     )
-  if (!order) return <Typography>Không tìm thấy đơn hàng</Typography>
+  if (!order)
+    return (
+      <Container maxWidth="lg" sx={{ py: 4 }}>
+        <Paper
+          elevation={0}
+          sx={{
+            p: 4,
+            textAlign: 'center',
+            borderRadius: 3,
+            border: '1px solid',
+            borderColor: 'warning.light',
+            backgroundColor: 'warning.50'
+          }}
+        >
+          <Box sx={{ mb: 2 }}>
+            <Warning sx={{ fontSize: 48, color: 'warning.main', mb: 2 }} />
+          </Box>
+          <Typography variant="h6" color='warning.main' sx={{ mb: 1, fontWeight: 600 }}>
+            Không tìm thấy đơn hàng
+          </Typography>
+          <Typography color='warning.dark'>
+            Đơn hàng bạn đang tìm kiếm không tồn tại hoặc đã bị xóa
+          </Typography>
+          <Button
+            variant="contained"
+            color="warning"
+            sx={{ mt: 3, borderRadius: 2 }}
+            onClick={() => navigate('/orders')}
+          >
+            Quay lại danh sách đơn hàng
+          </Button>
+        </Paper>
+      </Container>
+    )
 
   const [label, color] = statusLabels[order.status] || [
     'Không xác định',
@@ -606,7 +800,7 @@ const OrderDetail = () => {
     <Box
       sx={{
         width: '100%',
-        maxWidth: { xs: '100vw', sm: '96vw', md: '1800px' },
+        maxWidth: { xs: '100vw', sm: '96vw', md: '96vw' },
         margin: '0 auto',
         p: { xs: 1, sm: 2, md: 3 },
         minHeight: '70vh'
@@ -615,7 +809,7 @@ const OrderDetail = () => {
       {/* Breadcrumb */}
       <Box
         sx={{
-          px: { xs: 1, sm: 2, md: 3 },
+          px: 1,
           mb: 2
         }}
       >
@@ -623,7 +817,7 @@ const OrderDetail = () => {
           separator={<NavigateNext fontSize='small' />}
           aria-label='breadcrumb'
         >
-          <Button
+          <Link
             component={Link}
             to='/'
             sx={{
@@ -631,14 +825,18 @@ const OrderDetail = () => {
               alignItems: 'center',
               color: '#007bff',
               textDecoration: 'none',
-              fontSize: { xs: '0.8rem', sm: '0.9rem' },
-              '&:hover': { color: 'primary.main' }
+              '&:hover': {
+                color: 'primary.main'
+              },
+              cursor: 'pointer'
             }}
+            onClick={() => navigate('/')}
+          // component={Link}
+          // to='/product'
           >
-            <ArrowBackIcon fontSize='small' />
             Trang chủ
-          </Button>
-          <Button
+          </Link>
+          <Link
             component={Link}
             to='/orders'
             sx={{
@@ -646,20 +844,23 @@ const OrderDetail = () => {
               alignItems: 'center',
               color: '#007bff',
               textDecoration: 'none',
-              fontSize: { xs: '0.8rem', sm: '0.9rem' },
-              '&:hover': { color: 'primary.main' }
+              '&:hover': {
+                color: 'primary.main'
+              },
+              cursor: 'pointer'
             }}
+            onClick={() => navigate('/orders')}
+          // component={Link}
+          // to='/product'
           >
-            <NavigateNext fontSize='small' />
             Đơn hàng
-          </Button>
+          </Link>
           <Typography
             sx={{
               display: 'flex',
               alignItems: 'center',
               color: 'text.primary',
-              fontWeight: 500,
-              fontSize: { xs: '0.8rem', sm: '0.9rem' }
+              fontWeight: 500
             }}
           >
             Chi tiết đơn hàng
@@ -1092,64 +1293,74 @@ const OrderDetail = () => {
       {(order?.status === 'Delivered' ||
         order?.status === 'Failed' ||
         order?.status === 'Cancelled') && (
-        <Card
-          sx={{
-            mt: 2,
-            px: { xs: 1.5, sm: 2, md: 3 },
-            borderRadius: 3,
-            boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
-            border: '1px solid rgba(26, 60, 123, 0.2)'
-          }}
-        >
-          <CardContent>
-            <Box
-              display='flex'
-              justifyContent='space-between'
-              alignItems='center'
-              flexDirection={{ xs: 'column', sm: 'row' }}
-              gap={1}
-            >
-              <Box textAlign={{ xs: 'center', sm: 'left' }}>
-                <Typography
-                  variant='h6'
-                  fontWeight='600'
-                  color='var(--primary-color)'
-                  sx={{ fontSize: { xs: '1rem', sm: '1.25rem' } }}
-                >
-                  Mua lại đơn hàng
-                </Typography>
-                <Typography
-                  variant='body2'
-                  color='text.secondary'
-                  sx={{ fontSize: { xs: '0.75rem', sm: '0.875rem' } }}
-                >
-                  Thêm tất cả sản phẩm từ đơn hàng này vào giỏ hàng
-                </Typography>
-              </Box>
-              <Button
-                startIcon={
-                  reorderLoading ? <CircularProgress size={16} /> : <Replay />
-                }
-                disabled={reorderLoading}
-                onClick={handleReorder}
-                sx={{
-                  color: 'var(--primary-color)',
-                  borderRadius: 2,
-                  textTransform: 'none',
-                  fontWeight: 600,
-                  fontSize: { xs: '0.75rem', sm: '0.875rem' },
-                  px: { xs: 1.5, sm: 2 },
-                  width: { xs: '100%', sm: 'auto' },
-                  boxShadow: '0 4px 12px rgba(25, 118, 210, 0.3)',
-                  opacity: reorderLoading ? 0.7 : 1
-                }}
+          <Card
+            sx={{
+              mt: 2,
+              px: { xs: 1.5, sm: 2, md: 3 },
+              borderRadius: 3,
+              boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
+              border: '1px solid rgba(26, 60, 123, 0.2)'
+            }}
+          >
+            <CardContent>
+              <Box
+                display='flex'
+                justifyContent='space-between'
+                alignItems='center'
+                flexDirection={{ xs: 'column', sm: 'row' }}
+                gap={1}
               >
-                {reorderLoading ? 'Đang thêm vào giỏ...' : 'Mua lại'}
-              </Button>
-            </Box>
-          </CardContent>
-        </Card>
-      )}
+                <Box textAlign={{ xs: 'center', sm: 'left' }}>
+                  <Typography
+                    variant='h6'
+                    fontWeight='600'
+                    color='var(--primary-color)'
+                    sx={{ fontSize: { xs: '1rem', sm: '1.25rem' } }}
+                  >
+                    Mua lại đơn hàng
+                  </Typography>
+                  <Typography
+                    variant='body2'
+                    color='text.secondary'
+                    sx={{ fontSize: { xs: '0.75rem', sm: '0.875rem' } }}
+                  >
+                    Thêm tất cả sản phẩm từ đơn hàng này vào giỏ hàng
+                  </Typography>
+                </Box>
+                <Button
+                  startIcon={
+                    reorderLoading ? (
+                      <CircularProgress
+                        size={16}
+                        sx={{
+                          color: 'inherit',
+                          '& .MuiCircularProgress-circle': {
+                            strokeLinecap: 'round'
+                          }
+                        }}
+                      />
+                    ) : <Replay />
+                  }
+                  disabled={reorderLoading}
+                  onClick={handleReorder}
+                  sx={{
+                    color: 'var(--primary-color)',
+                    borderRadius: 2,
+                    textTransform: 'none',
+                    fontWeight: 600,
+                    fontSize: { xs: '0.75rem', sm: '0.875rem' },
+                    px: { xs: 1.5, sm: 2 },
+                    width: { xs: '100%', sm: 'auto' },
+                    boxShadow: '0 4px 12px rgba(25, 118, 210, 0.3)',
+                    opacity: reorderLoading ? 0.7 : 1
+                  }}
+                >
+                  {reorderLoading ? 'Đang thêm vào giỏ...' : 'Mua lại'}
+                </Button>
+              </Box>
+            </CardContent>
+          </Card>
+        )}
 
       {/* Enhanced Snackbar */}
       <Snackbar

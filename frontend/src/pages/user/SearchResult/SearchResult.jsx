@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { useLocation, Link } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { getProducts } from '~/services/productService'
 import ProductCard from '~/components/ProductCards/ProductCards.jsx'
 import '~/assets/HomeCSS/Content.css'
@@ -12,10 +12,11 @@ import {
   Pagination,
   Breadcrumbs,
   Button,
-  PaginationItem
+  PaginationItem,
+  Link
 } from '@mui/material'
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward'
-import NavigateNextIcon from '@mui/icons-material/NavigateNext'
+import NavigateNext from '@mui/icons-material/NavigateNext'
 
 const ITEMS_PER_PAGE = 10
 
@@ -130,7 +131,7 @@ export default function SearchResults() {
   const [sortMenuOpen, setSortMenuOpen] = useState(false)
   const [page, setPage] = useState(1)
   const location = useLocation()
-
+  const navigate = useNavigate()
   const query = new URLSearchParams(location.search).get('search') || ''
 
   useEffect(() => {
@@ -225,25 +226,36 @@ export default function SearchResults() {
     <div style={styles.container}>
       <Box sx={{ maxWidth: '1800px', margin: '0 auto', padding: '12px' }}>
         <Breadcrumbs
-          separator={<NavigateNextIcon fontSize='small' />}
+          separator={<NavigateNext fontSize='small' />}
           aria-label='breadcrumb'
-          sx={{ p: 1 }}
         >
-          <Button
-            component={Link}
-            to='/'
+          <Link
+
             sx={{
+              display: 'flex',
+              alignItems: 'center',
               color: '#007bff',
               textDecoration: 'none',
-              minWidth: 0,
-              p: 0,
-              '&:hover': { color: 'primary.main', background: 'none' }
+              '&:hover': {
+                color: 'primary.main'
+              },
+              cursor: 'pointer'
             }}
+            onClick={() => navigate('/')}
+          // component={Link}
+          // to='/product'
           >
             Trang chủ
-          </Button>
-          <Typography sx={{ color: 'text.primary', fontWeight: 500 }}>
-            Kết quả tìm kiếm
+          </Link>
+          <Typography
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              color: 'text.primary',
+              fontWeight: 500
+            }}
+          >
+            Sản phẩm tìm kiếm
           </Typography>
         </Breadcrumbs>
       </Box>
@@ -356,7 +368,7 @@ export default function SearchResults() {
                 size='small'
                 renderItem={(item) =>
                   item.type === 'start-ellipsis' ||
-                  item.type === 'end-ellipsis' ? (
+                    item.type === 'end-ellipsis' ? (
                     <span style={{ padding: '8px 12px', color: '#999' }}>
                       ...
                     </span>

@@ -10,7 +10,8 @@ import {
   Pagination,
   PaginationItem,
   Breadcrumbs,
-  Button
+  Button,
+  Link
 } from '@mui/material'
 import NavigateNextIcon from '@mui/icons-material/NavigateNext'
 import { addToCart, getCart } from '~/services/cartService'
@@ -19,7 +20,7 @@ import { useDispatch } from 'react-redux'
 import { setCartItems } from '~/redux/cart/cartSlice'
 import ProductCard from '~/components/ProductCards/ProductCards'
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward'
-import { useParams, Link } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 import { getCategoryById, getChildCategories } from '~/services/categoryService'
 import { optimizeCloudinaryUrl } from '~/utils/cloudinary.js'
 
@@ -98,7 +99,9 @@ const ProductbyCategory = () => {
   const [loadingCategory, setLoadingCategory] = useState(true)
   const [childCategories, setChildCategories] = useState([])
   const [allCategoryIds, setAllCategoryIds] = useState([])
-
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'auto' })
+  }, [])
   // Fetch category and children
   useEffect(() => {
     const fetchCategoryAndChildren = async () => {
@@ -217,7 +220,7 @@ const ProductbyCategory = () => {
       console.error('Chi tiết lỗi:', error)
       setErrorProducts(
         error.message ||
-          'Không thể tải danh sách sản phẩm. Vui lòng thử lại sau.'
+        'Không thể tải danh sách sản phẩm. Vui lòng thử lại sau.'
       )
       setProducts([])
       setTotalPages(1)
@@ -360,8 +363,8 @@ const ProductbyCategory = () => {
         <img
           src={optimizeCloudinaryUrl(
             category?.banner ||
-              category?.image ||
-              'https://file.hstatic.net/1000360022/collection/ao-thun_cd23d8082c514c839615e1646371ba71.jpg',
+            category?.image ||
+            'https://file.hstatic.net/1000360022/collection/ao-thun_cd23d8082c514c839615e1646371ba71.jpg',
             { width: 1920, height: 400 }
           )}
           alt='banner'

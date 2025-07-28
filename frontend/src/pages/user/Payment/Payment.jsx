@@ -23,6 +23,7 @@ import {
   Paper,
   Chip,
   Breadcrumbs,
+  Link
 } from '@mui/material'
 import { NavigateNext } from '@mui/icons-material'
 import { styled } from '@mui/system'
@@ -33,7 +34,7 @@ import { useCart } from '~/hooks/useCarts'
 import { useOrder } from '~/hooks/useOrder'
 import { useSelector, useDispatch } from 'react-redux'
 import { clearTempCart, clearAppliedCoupon } from '~/redux/cart/cartSlice'
-import { useLocation, useNavigate, Link } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import CouponItem from '~/components/Coupon/CouponItem'
 import { getDiscounts } from '~/services/discountService'
 import { optimizeCloudinaryUrl } from '~/utils/cloudinary'
@@ -898,10 +899,10 @@ const Payment = () => {
     <StyledContainer maxWidth={false}>
       <Breadcrumbs
         separator={<NavigateNext fontSize='small' />}
+        sx={{ mb: 2 }}
         aria-label='breadcrumb'
-        sx={{ mb: 3 }}
       >
-        <Button
+        <Link
           component={Link}
           to='/'
           sx={{
@@ -909,15 +910,18 @@ const Payment = () => {
             alignItems: 'center',
             color: '#007bff',
             textDecoration: 'none',
-            fontSize: { xs: '0.85rem', sm: '0.95rem' },
             '&:hover': {
               color: 'primary.main'
-            }
+            },
+            cursor: 'pointer',
           }}
+          onClick={() => navigate('/')}
+        // component={Link}
+        // to='/product'
         >
           Trang chủ
-        </Button>
-        <Button
+        </Link>
+        <Link
           component={Link}
           to={`/cart`}
           sx={{
@@ -925,24 +929,26 @@ const Payment = () => {
             alignItems: 'center',
             color: '#007bff',
             textDecoration: 'none',
-            fontSize: { xs: '0.85rem', sm: '0.95rem' },
             '&:hover': {
               color: 'primary.main'
-            }
+            },
+            cursor: 'pointer'
           }}
+          onClick={() => navigate('/cart')}
+        // component={Link}
+        // to='/product'
         >
           Giỏ hàng
-        </Button>
+        </Link>
         <Typography
           sx={{
             display: 'flex',
             alignItems: 'center',
             color: 'text.primary',
-            fontWeight: 500,
-            fontSize: { xs: '0.85rem', sm: '0.95rem' }
+            fontWeight: 500
           }}
         >
-          Thanh toán đơn hàng
+          Thanh toán
         </Typography>
       </Breadcrumbs>
       {cartLoading ? (

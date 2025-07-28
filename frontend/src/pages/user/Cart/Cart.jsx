@@ -22,9 +22,9 @@ import {
   CardContent,
   Grid,
   Tooltip,
-  Breadcrumbs
+  Breadcrumbs,
+  Link
 } from '@mui/material'
-import { Link } from 'react-router-dom'
 import {
   Delete,
   Add,
@@ -222,9 +222,9 @@ const Cart = () => {
     const newSelected = allSelected
       ? []
       : selectableItems.map((item) => ({
-          variantId: item.variant?._id || item.variantId?._id || item.variantId,
-          quantity: item.quantity
-        }))
+        variantId: item.variant?._id || item.variantId?._id || item.variantId,
+        quantity: item.quantity
+      }))
 
     setSelectedItems(newSelected)
     dispatch(setSelectedItemsAction(newSelected))
@@ -618,24 +618,26 @@ const Cart = () => {
           separator={<NavigateNext fontSize='small' />}
           aria-label='breadcrumb'
         >
-          <Button
-            underline='hover'
+          <Link
             sx={{
               display: 'flex',
               alignItems: 'center',
               color: '#007bff',
               textDecoration: 'none',
+              minWidth: 0,
+              p: 0,
               '&:hover': {
                 color: 'primary.main'
-              }
+              },
+              cursor: 'pointer'
             }}
-            component={Link}
-            to='/'
+            onClick={() => navigate('/')}
+          // component={Link}
+          // to='/product'
           >
             Trang chủ
-          </Button>
-          <Button
-            underline='hover'
+          </Link>
+          <Link
             sx={{
               display: 'flex',
               alignItems: 'center',
@@ -643,13 +645,15 @@ const Cart = () => {
               textDecoration: 'none',
               '&:hover': {
                 color: 'primary.main'
-              }
+              },
+              cursor: 'pointer'
             }}
-            component={Link}
-            to='/product'
+            onClick={() => navigate('/product')}
+          // component={Link}
+          // to='/product'
           >
             Sản phẩm
-          </Button>
+          </Link>
           <Typography
             sx={{
               display: 'flex',
@@ -1039,7 +1043,7 @@ const Cart = () => {
                             flexWrap='wrap'
                           >
                             {variant.discountPrice &&
-                            variant.discountPrice > 0 ? (
+                              variant.discountPrice > 0 ? (
                               <>
                                 <Typography
                                   sx={{

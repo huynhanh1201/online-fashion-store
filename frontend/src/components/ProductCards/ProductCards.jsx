@@ -1,12 +1,13 @@
 import React from 'react'
 import { optimizeCloudinaryUrl } from '~/utils/cloudinary'
 import Sticker from '~/components/Sticker/Sticker'
-import { Link } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 
 const ProductCard = ({ product, isFlashSale = false }) => {
   if (!product || !product.image) {
     return <div style={styles.productCard}>No image available</div>
   }
+  const navigate = useNavigate()
 
   const images = Array.isArray(product.image) ? product.image : [product.image]
   const imageUrl1 = optimizeCloudinaryUrl(images[0])
@@ -72,12 +73,16 @@ const ProductCard = ({ product, isFlashSale = false }) => {
 
   const priceInfo = calculateDisplayPrice()
 
+  const handleCardClick = () => {
+    navigate(`/productdetail/${product._id}`)
+  }
+
   return (
-    <Link
-      to={`/productdetail/${product._id}`}
+    <div
       style={styles.productCardLink}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
+      onClick={handleCardClick}
     >
       <div
         style={{
@@ -159,7 +164,7 @@ const ProductCard = ({ product, isFlashSale = false }) => {
           </div>
         </div>
       </div>
-    </Link>
+    </div>
   )
 }
 
@@ -168,7 +173,8 @@ const styles = {
     textDecoration: 'none',
     color: 'inherit',
     display: 'block',
-    transition: 'transform 0.2s ease-in-out'
+    transition: 'transform 0.2s ease-in-out',
+    cursor: 'pointer'
   },
   productCard: {
     background: 'white',

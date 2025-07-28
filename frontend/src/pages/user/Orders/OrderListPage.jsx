@@ -22,6 +22,7 @@ import {
   DialogContentText,
   Skeleton,
   Breadcrumbs,
+  Link
 } from '@mui/material'
 import {
   KeyboardArrowDown,
@@ -41,7 +42,7 @@ import ErrorIcon from '@mui/icons-material/Error'
 import { getOrders, getOrderItems } from '~/services/orderService'
 import { getVariantById } from '~/services/variantService'
 import { useOrder } from '~/hooks/useOrder'
-import { useNavigate, Link } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { useSelector, useDispatch } from 'react-redux'
 import { selectCurrentUser } from '~/redux/user/userSlice'
 import { useCart } from '~/hooks/useCarts'
@@ -219,7 +220,17 @@ const CancelOrderModal = ({ open, onClose, onConfirm, order, loading }) => {
           variant="contained"
           color="error"
           disabled={loading}
-          startIcon={loading ? <CircularProgress size={16} /> : <Cancel />}
+          startIcon={loading ? (
+            <CircularProgress
+              size={16}
+              sx={{
+                color: 'inherit',
+                '& .MuiCircularProgress-circle': {
+                  strokeLinecap: 'round'
+                }
+              }}
+            />
+          ) : <Cancel />}
           sx={{
             borderRadius: 2,
             textTransform: 'none',
@@ -379,7 +390,15 @@ const OrderRow = ({ order, onOrderUpdate, onOrderCancelled, onReorder, reorderLo
         </Box>
         {loadingItems ? (
           <Box display="flex" justifyContent="center" py={2}>
-            <CircularProgress size={30} />
+            <CircularProgress
+              size={30}
+              sx={{
+                color: 'var(--primary-color)',
+                '& .MuiCircularProgress-circle': {
+                  strokeLinecap: 'round'
+                }
+              }}
+            />
           </Box>
         ) : (
           <Box sx={{ position: 'relative' }}>
@@ -588,7 +607,17 @@ const OrderRow = ({ order, onOrderUpdate, onOrderCancelled, onReorder, reorderLo
               </Button>
               {(order.status === 'Delivered' || order.status === 'Failed' || order.status === 'Cancelled') && (
                 <Button
-                  startIcon={reorderLoading ? <CircularProgress size={16} /> : <Replay />}
+                  startIcon={reorderLoading ? (
+                    <CircularProgress
+                      size={16}
+                      sx={{
+                        color: 'inherit',
+                        '& .MuiCircularProgress-circle': {
+                          strokeLinecap: 'round'
+                        }
+                      }}
+                    />
+                  ) : <Replay />}
                   onClick={() => onReorder && onReorder(items)}
                   disabled={reorderLoading}
                   sx={{
@@ -810,20 +839,65 @@ const OrderListPage = () => {
         maxWidth={false}
         sx={{
           width: '100%',
-          maxWidth: { xs: '100vw', sm: '96vw', md: '1800px' },
+          maxWidth: { xs: '95vw', sm: '96vw', md: '96vw' },
           margin: '0 auto',
+          height: '70vh',
           py: { xs: 2, sm: 3, md: 4 }
         }}
       >
-        <Box display="flex" flexDirection="column" alignItems="center" gap={2}>
-          <CircularProgress size={40} />
-          <Typography
-            variant="h6"
-            color="text.secondary"
-            sx={{ fontSize: { xs: '1rem', sm: '1.25rem' } }}
+        <Box display="flex" flexDirection="column" alignItems="center" gap={3}>
+          <Box
+            sx={{
+              position: 'relative',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}
           >
-            Đang tải đơn hàng...
-          </Typography>
+            <CircularProgress
+              size={50}
+              thickness={4}
+              sx={{
+                color: 'var(--primary-color)',
+                '& .MuiCircularProgress-circle': {
+                  strokeLinecap: 'round'
+                }
+              }}
+            />
+            <Box
+              sx={{
+                position: 'absolute',
+                top: '50%',
+                left: '50%',
+                transform: 'translate(-50%, -50%)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+              }}
+            >
+              <ShoppingBag sx={{ color: 'var(--primary-color)', fontSize: 20 }} />
+            </Box>
+          </Box>
+          <Box textAlign="center">
+            <Typography
+              variant="h6"
+              color="text.primary"
+              sx={{
+                fontSize: { xs: '1rem', sm: '1.25rem' },
+                fontWeight: 600,
+                mb: 0.5
+              }}
+            >
+              Đang tải đơn hàng...
+            </Typography>
+            <Typography
+              variant="body2"
+              color="text.secondary"
+              sx={{ fontSize: { xs: '0.875rem', sm: '1rem' } }}
+            >
+              Vui lòng chờ trong giây lát
+            </Typography>
+          </Box>
         </Box>
       </Container>
     )
@@ -834,7 +908,7 @@ const OrderListPage = () => {
       maxWidth={false}
       sx={{
         width: '100%',
-        maxWidth: { xs: '100vw', sm: '96vw', md: '1800px' },
+        maxWidth: { xs: '100vw', sm: '96vw', md: '96vw' },
         margin: '0 auto',
         py: { xs: 2, sm: 3, md: 4 },
         minHeight: '70vh',
@@ -846,29 +920,33 @@ const OrderListPage = () => {
       }}
     >
       <Box sx={{ mb: 2 }}>
-        <Breadcrumbs separator={<NavigateNext fontSize="small" />} aria-label="breadcrumb">
-          <Button
-            component={Link}
-            to="/"
+        <Breadcrumbs
+          separator={<NavigateNext fontSize='small' />}
+          aria-label='breadcrumb'
+        >
+          <Link
             sx={{
               display: 'flex',
               alignItems: 'center',
               color: '#007bff',
               textDecoration: 'none',
-              fontSize: { xs: '0.8rem', sm: '0.9rem' },
-              '&:hover': { color: 'primary.main' }
+              '&:hover': {
+                color: 'primary.main'
+              },
+              cursor: 'pointer'
             }}
+            onClick={() => navigate('/')}
+          // component={Link}
+          // to='/product'
           >
-            <ShoppingBag sx={{ fontSize: { xs: 16, sm: 18 }, mr: 0.5 }} />
             Trang chủ
-          </Button>
+          </Link>
           <Typography
             sx={{
               display: 'flex',
               alignItems: 'center',
               color: 'text.primary',
-              fontWeight: 500,
-              fontSize: { xs: '0.8rem', sm: '0.9rem' }
+              fontWeight: 500
             }}
           >
             Đơn hàng
@@ -1046,7 +1124,17 @@ const OrderListPage = () => {
                   size="large"
                   onClick={loadMoreOrders}
                   disabled={loadingMore}
-                  startIcon={loadingMore ? <CircularProgress size={16} /> : <KeyboardArrowDown />}
+                  startIcon={loadingMore ? (
+                    <CircularProgress
+                      size={16}
+                      sx={{
+                        color: 'inherit',
+                        '& .MuiCircularProgress-circle': {
+                          strokeLinecap: 'round'
+                        }
+                      }}
+                    />
+                  ) : <KeyboardArrowDown />}
                   sx={{
                     borderRadius: 3,
                     textTransform: 'none',

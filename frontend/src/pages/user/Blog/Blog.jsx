@@ -144,25 +144,22 @@ const Blog = () => {
           <Breadcrumbs
             separator={<NavigateNext fontSize='small' />}
             aria-label='breadcrumb'
-            sx={{
-              mb: 2,
-            }}
           >
             <Link
-              underline='hover'
+
               sx={{
                 display: 'flex',
                 alignItems: 'center',
                 color: '#007bff',
                 textDecoration: 'none',
-                fontSize: { xs: '0.875rem', sm: '1rem' },
-                transition: 'color 0.2s ease',
                 '&:hover': {
-                  color: '#0056b3',
-                  textDecoration: 'underline'
-                }
+                  color: 'primary.main'
+                },
+                cursor: 'pointer'
               }}
-              href='/'
+              onClick={() => navigate('/')}
+            // component={Link}
+            // to='/product'
             >
               Trang chủ
             </Link>
@@ -171,7 +168,7 @@ const Blog = () => {
                 display: 'flex',
                 alignItems: 'center',
                 color: 'text.primary',
-                fontWeight: 500,
+                fontWeight: 500
               }}
             >
               Tin thời trang
