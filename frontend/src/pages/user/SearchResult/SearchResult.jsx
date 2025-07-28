@@ -69,7 +69,7 @@ const sortOptions = [
   { value: '', label: 'Sản phẩm nổi bật' },
   { value: 'priceAsc', label: 'Giá tăng dần' },
   { value: 'priceDesc', label: 'Giá giảm dần' },
-  { value: 'nameAsc', label: 'Sản phẩm từ A-Z' },
+  { value: 'nameDesc', label: 'Sản phẩm từ A-Z' },
   { value: 'nameAsc', label: 'Sản phẩm từ Z-A' }
 ]
 const styles = {

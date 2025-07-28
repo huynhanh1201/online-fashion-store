@@ -8,7 +8,6 @@ import generateSequentialCode from '~/utils/generateSequentialCode'
 import { VariantModel } from '~/models/VariantModel'
 import validatePagination from '~/utils/validatePagination'
 import getDateRange from '~/utils/getDateRange'
-import dayjs from 'dayjs'
 
 const createProduct = async (reqBody) => {
   // eslint-disable-next-line no-useless-catch
@@ -83,9 +82,6 @@ const createProduct = async (reqBody) => {
 const getProductList = async (reqQuery) => {
   // eslint-disable-next-line no-useless-catch
   try {
-    // Cập nhật label mới cho sản phẩm
-    await updateLabelProductAll()
-
     let {
       page = 1,
       limit = 10,
@@ -99,7 +95,7 @@ const getProductList = async (reqQuery) => {
       startDate,
       endDate,
       destroy,
-      label
+      sortPrice
     } = reqQuery
 
     validatePagination(page, limit)
@@ -112,8 +108,6 @@ const getProductList = async (reqQuery) => {
 
       filter.destroy = destroy
     }
-
-    if (label) filter.label = label
 
     if (status) filter.status = status
 
@@ -445,22 +439,6 @@ const restoreProduct = async (productId) => {
   } catch (err) {
     throw err
   }
-}
-
-const updateLabelProductAll = async () => {
-  const sevenDaysAgo = dayjs().subtract(7, 'day').toDate()
-
-  // Gán label 'new' cho sản phẩm tạo trong 7 ngày gần đây
-  await ProductModel.updateMany(
-    { createdAt: { $gte: sevenDaysAgo } },
-    { $set: { label: 'new' } }
-  )
-
-  // Gỡ label 'new' cho sản phẩm đã quá 7 ngày
-  await ProductModel.updateMany(
-    { createdAt: { $lt: sevenDaysAgo }, label: 'new' },
-    { $unset: { label: '' } }
-  )
 }
 
 export const productsService = {

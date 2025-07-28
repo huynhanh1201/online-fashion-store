@@ -143,7 +143,6 @@ const ProductDetail = () => {
                 background: 'none'
               }
             }}
-            to='/'
           >
             Trang chủ
           </Button>
@@ -159,10 +158,6 @@ const ProductDetail = () => {
                 color: 'primary.main'
               }
             }}
-            onClick={() => {
-              navigate('/admin')
-            }}
-            // href='/product'
           >
             Sản phẩm
           </Button>
@@ -181,7 +176,6 @@ const ProductDetail = () => {
                 background: 'none'
               }
             }}
-            to={`/productbycategory/${category?._id}`}
           >
             {category?.name}
           </Button>
