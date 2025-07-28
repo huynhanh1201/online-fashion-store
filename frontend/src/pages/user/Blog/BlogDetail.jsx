@@ -477,7 +477,8 @@ const BlogDetail = () => {
               aria-label='breadcrumb'
             >
               <Link
-                underline='hover'
+                component={Link}
+                to='/'
                 sx={{
                   display: 'flex',
                   alignItems: 'center',
@@ -495,7 +496,8 @@ const BlogDetail = () => {
                 Trang chủ
               </Link>
               <Link
-                underline='hover'
+                component={Link}
+                to={`/blog`}
                 sx={{
                   display: 'flex',
                   alignItems: 'center',

@@ -9,9 +9,10 @@ import {
   styled,
   Pagination,
   Breadcrumbs,
-  Link,
   Skeleton,
-  PaginationItem
+  PaginationItem,
+  Button,
+  Link
 } from '@mui/material'
 import { addToCart, getCart } from '~/services/cartService'
 import { useDispatch } from 'react-redux'
@@ -78,8 +79,8 @@ const sortOptions = [
   { value: 'featured', label: 'Sản phẩm nổi bật' },
   { value: 'priceAsc', label: 'Giá tăng dần' },
   { value: 'priceDesc', label: 'Giá giảm dần' },
-  { value: 'nameAsc', label: 'Sản phẩm từ A-Z' },
-  { value: 'nameDesc', label: 'Sản phẩm từ Z-A' }
+  { value: 'nameDesc', label: 'Sản phẩm từ A-Z' },
+  { value: 'nameAsc', label: 'Sản phẩm từ Z-A' }
 ]
 
 // Helper to generate pagination items with ellipsis
@@ -147,7 +148,7 @@ const Product = () => {
         priceAsc: 'price_asc',
         priceDesc: 'price_desc'
       }
-
+      
       const params = {
         page: Number(page),
         limit: Number(ITEMS_PER_PAGE),
@@ -283,12 +284,15 @@ const Product = () => {
           aria-label='breadcrumb'
         >
           <Link
-            underline='hover'
+            component={Link}
+            to='/'
             sx={{
               display: 'flex',
               alignItems: 'center',
               color: '#007bff',
               textDecoration: 'none',
+              minWidth: 0,
+              p: 0,
               '&:hover': {
                 color: 'primary.main'
               },

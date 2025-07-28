@@ -11,8 +11,9 @@ import {
   styled,
   Pagination,
   Breadcrumbs,
-  Link,
-  PaginationItem
+  Button,
+  PaginationItem,
+  Link
 } from '@mui/material'
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward'
 import NavigateNext from '@mui/icons-material/NavigateNext'
@@ -69,17 +70,17 @@ const sortOptions = [
   { value: '', label: 'Sản phẩm nổi bật' },
   { value: 'priceAsc', label: 'Giá tăng dần' },
   { value: 'priceDesc', label: 'Giá giảm dần' },
-  { value: 'nameAsc', label: 'Sản phẩm từ A-Z' },
-  { value: 'nameDesc', label: 'Sản phẩm từ Z-A' }
+  { value: 'nameDesc', label: 'Sản phẩm từ A-Z' },
+  { value: 'nameAsc', label: 'Sản phẩm từ Z-A' }
 ]
-
 const styles = {
   container: {
     margin: '0 auto',
     maxWidth: '96vw',
-    minHeight: '80vh',
+    minHeight: '100vh', // Đảm bảo luôn đủ chiều cao để có scrollbar
     fontFamily:
-      '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif'
+      '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
+    overflowY: 'auto' // Đảm bảo có scrollbar khi cần
   },
   header: {
     display: 'flex',
@@ -155,9 +156,7 @@ export default function SearchResults() {
         const { products: allProducts } = await getProducts(params)
 
         const filtered = allProducts
-          .filter((p) =>
-            p.name?.toLowerCase().includes(query.toLowerCase())
-          )
+          .filter((p) => p.name?.toLowerCase().includes(query.toLowerCase()))
           .map((p) => ({
             _id: p._id,
             name: p.name,
@@ -196,7 +195,7 @@ export default function SearchResults() {
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'auto' })
-  }, [])
+  }, [query])
 
   const handlePageChange = (event, value) => {
     setPage(value)
@@ -286,7 +285,11 @@ export default function SearchResults() {
                     }}
                   >
                     <span
-                      style={{ fontSize: 15, fontWeight: 700, marginBottom: -2 }}
+                      style={{
+                        fontSize: 15,
+                        fontWeight: 700,
+                        marginBottom: -2
+                      }}
                     >
                       A
                     </span>
@@ -342,7 +345,9 @@ export default function SearchResults() {
                 </Grid>
               ))}
             </div>
-            <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
+            <Box
+              sx={{ display: 'flex', justifyContent: 'center', mt: 4, mb: 4 }}
+            >
               <Pagination
                 count={totalPages}
                 page={page}
@@ -351,8 +356,11 @@ export default function SearchResults() {
                 color='primary'
                 size='small'
                 renderItem={(item) =>
-                  item.type === 'start-ellipsis' || item.type === 'end-ellipsis' ? (
-                    <span style={{ padding: '8px 12px', color: '#999' }}>...</span>
+                  item.type === 'start-ellipsis' ||
+                  item.type === 'end-ellipsis' ? (
+                    <span style={{ padding: '8px 12px', color: '#999' }}>
+                      ...
+                    </span>
                   ) : (
                     <PaginationItem {...item} />
                   )

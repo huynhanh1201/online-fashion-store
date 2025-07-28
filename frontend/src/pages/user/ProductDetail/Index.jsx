@@ -130,12 +130,15 @@ const ProductDetail = () => {
           aria-label='breadcrumb'
         >
           <Link
-            underline='hover'
+            component={Link}
+            to='/'
             sx={{
               display: 'flex',
               alignItems: 'center',
               color: '#007bff',
               textDecoration: 'none',
+              minWidth: 0,
+              p: 0,
               '&:hover': {
                 color: 'primary.main'
               },
@@ -148,12 +151,14 @@ const ProductDetail = () => {
             Trang chủ
           </Link>
           <Link
-            underline='hover'
+
             sx={{
               display: 'flex',
               alignItems: 'center',
               color: '#007bff',
               textDecoration: 'none',
+              minWidth: 0,
+              p: 0,
               '&:hover': {
                 color: 'primary.main'
               },

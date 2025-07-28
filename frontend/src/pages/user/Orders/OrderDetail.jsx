@@ -818,7 +818,8 @@ const OrderDetail = () => {
           aria-label='breadcrumb'
         >
           <Link
-            underline='hover'
+            component={Link}
+            to='/'
             sx={{
               display: 'flex',
               alignItems: 'center',
@@ -836,7 +837,8 @@ const OrderDetail = () => {
             Trang chủ
           </Link>
           <Link
-            underline='hover'
+            component={Link}
+            to='/orders'
             sx={{
               display: 'flex',
               alignItems: 'center',

@@ -26,6 +26,7 @@ import {
 } from '@mui/icons-material'
 import { getReviews } from '~/services/reviewService'
 import { optimizeCloudinaryUrl } from '~/utils/cloudinary'
+import { Link } from 'react-router-dom'
 
 const ProductReview = ({ productId, avgRating = 0 }) => {
   const [reviews, setReviews] = useState([])

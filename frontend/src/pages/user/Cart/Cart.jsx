@@ -619,12 +619,13 @@ const Cart = () => {
           aria-label='breadcrumb'
         >
           <Link
-            underline='hover'
             sx={{
               display: 'flex',
               alignItems: 'center',
               color: '#007bff',
               textDecoration: 'none',
+              minWidth: 0,
+              p: 0,
               '&:hover': {
                 color: 'primary.main'
               },
@@ -634,10 +635,9 @@ const Cart = () => {
           // component={Link}
           // to='/product'
           >
-           Trang chủ
+            Trang chủ
           </Link>
           <Link
-            underline='hover'
             sx={{
               display: 'flex',
               alignItems: 'center',

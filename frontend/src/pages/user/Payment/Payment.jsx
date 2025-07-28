@@ -23,7 +23,7 @@ import {
   Paper,
   Chip,
   Breadcrumbs,
-  Link,
+  Link
 } from '@mui/material'
 import { NavigateNext } from '@mui/icons-material'
 import { styled } from '@mui/system'
@@ -903,7 +903,8 @@ const Payment = () => {
         aria-label='breadcrumb'
       >
         <Link
-          underline='hover'
+          component={Link}
+          to='/'
           sx={{
             display: 'flex',
             alignItems: 'center',
@@ -921,7 +922,8 @@ const Payment = () => {
           Trang chủ
         </Link>
         <Link
-          underline='hover'
+          component={Link}
+          to={`/cart`}
           sx={{
             display: 'flex',
             alignItems: 'center',

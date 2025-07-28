@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useCallback } from 'react'
 import {
   Box,
   Grid,
@@ -10,11 +10,12 @@ import {
   Pagination,
   PaginationItem,
   Breadcrumbs,
+  Button,
   Link
 } from '@mui/material'
-import NavigateNext from '@mui/icons-material/NavigateNext'
+import NavigateNextIcon from '@mui/icons-material/NavigateNext'
 import { addToCart, getCart } from '~/services/cartService'
-import { getProducts } from '~/services/productService'
+import { getProductsByMultipleCategories, getProductsByCategory } from '~/services/productService'
 import { useDispatch } from 'react-redux'
 import { setCartItems } from '~/redux/cart/cartSlice'
 import ProductCard from '~/components/ProductCards/ProductCards'
@@ -22,7 +23,6 @@ import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward'
 import { useParams } from 'react-router-dom'
 import { getCategoryById, getChildCategories } from '~/services/categoryService'
 import { optimizeCloudinaryUrl } from '~/utils/cloudinary.js'
-import { useNavigate } from 'react-router-dom'
 
 const ITEMS_PER_PAGE = 12
 
@@ -99,8 +99,9 @@ const ProductbyCategory = () => {
   const [loadingCategory, setLoadingCategory] = useState(true)
   const [childCategories, setChildCategories] = useState([])
   const [allCategoryIds, setAllCategoryIds] = useState([])
-
-  const navigate = useNavigate()
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'auto' })
+  }, [])
   // Fetch category and children
   useEffect(() => {
     const fetchCategoryAndChildren = async () => {
@@ -130,8 +131,8 @@ const ProductbyCategory = () => {
     }
   }, [categoryId])
 
-  // Fetch products with backend sorting and category filtering
-  const fetchProducts = async () => {
+  // Fetch products with multiple categories support
+  const fetchProducts = useCallback(async () => {
     try {
       setLoadingProducts(true)
       setErrorProducts(null)
@@ -141,35 +142,80 @@ const ProductbyCategory = () => {
         nameAsc: 'name_asc',
         nameDesc: 'name_desc',
         priceAsc: 'price_asc',
-        priceDesc: 'price_desc'
+        priceDesc: 'price_desc',
+        featured: 'newest'
       }
+      const sortParam = backendSortMap[sortOption] || 'newest'
 
-      const params = {
-        page: Number(page),
-        limit: Number(ITEMS_PER_PAGE),
-        sort: backendSortMap[sortOption] || 'newest',
-        // Add category filter - backend sẽ filter theo categoryIds
-        categoryIds:
-          allCategoryIds.length > 0 ? allCategoryIds.join(',') : categoryId
+      if (allCategoryIds.length === 1) {
+        // Nếu chỉ có 1 category, gọi API như CategoryPage.jsx
+        const response = await getProductsByCategory(
+          allCategoryIds[0],
+          Number(page),
+          Number(ITEMS_PER_PAGE),
+          sortParam
+        )
+        const fetchedProducts = response.products || []
+        const total = response.total || 0
+        const totalPages = response.totalPages || 1
+        setProducts(fetchedProducts)
+        setTotalPages(totalPages)
+      } else if (allCategoryIds.length > 1) {
+        // Nếu có nhiều category, gọi song song các API với limit nhỏ (ví dụ 20)
+        const limitPerCategory = ITEMS_PER_PAGE * 2 // lấy dư để sort client-side
+        const allPromises = allCategoryIds.map(catId =>
+          getProductsByCategory(catId, 1, limitPerCategory, sortParam)
+        )
+        const allResults = await Promise.all(allPromises)
+        // Merge, loại trùng
+        const allProducts = []
+        const seen = new Set()
+        allResults.forEach(result => {
+          (result.products || []).forEach(product => {
+            if (!seen.has(product._id)) {
+              seen.add(product._id)
+              allProducts.push(product)
+            }
+          })
+        })
+        // Sort client-side theo sortOption
+        let sortedProducts = [...allProducts]
+        switch (sortOption) {
+          case 'nameAsc':
+            sortedProducts.sort((a, b) => a.name.localeCompare(b.name))
+            break
+          case 'nameDesc':
+            sortedProducts.sort((a, b) => b.name.localeCompare(a.name))
+            break
+          case 'priceAsc':
+            sortedProducts.sort((a, b) => {
+              const priceA = a.firstVariantDiscountPrice > 0 ? a.firstVariantDiscountPrice : a.exportPrice
+              const priceB = b.firstVariantDiscountPrice > 0 ? b.firstVariantDiscountPrice : b.exportPrice
+              return priceA - priceB
+            })
+            break
+          case 'priceDesc':
+            sortedProducts.sort((a, b) => {
+              const priceA = a.firstVariantDiscountPrice > 0 ? a.firstVariantDiscountPrice : a.exportPrice
+              const priceB = b.firstVariantDiscountPrice > 0 ? b.firstVariantDiscountPrice : b.exportPrice
+              return priceB - priceA
+            })
+            break
+          case 'featured':
+          default:
+            break
+        }
+        // Phân trang client-side
+        const total = sortedProducts.length
+        const totalPages = Math.ceil(total / ITEMS_PER_PAGE)
+        const startIdx = (page - 1) * ITEMS_PER_PAGE
+        const paginated = sortedProducts.slice(startIdx, startIdx + ITEMS_PER_PAGE)
+        setProducts(paginated)
+        setTotalPages(totalPages)
+      } else {
+        setProducts([])
+        setTotalPages(1)
       }
-
-      console.log('Fetching products with params:', params)
-
-      const response = await getProducts(params)
-      console.log('API Response:', response)
-
-      const fetchedProducts = response.products || []
-      const total = response.total || fetchedProducts.length
-      const calculatedTotalPages = Math.ceil(total / ITEMS_PER_PAGE) || 1
-
-      if (!Array.isArray(fetchedProducts)) {
-        console.error('Products không phải là array:', fetchedProducts)
-        throw new Error('Dữ liệu sản phẩm không hợp lệ')
-      }
-
-      // Backend đã xử lý sorting và filtering, không cần client-side processing
-      setProducts(fetchedProducts)
-      setTotalPages(calculatedTotalPages)
     } catch (error) {
       console.error('Chi tiết lỗi:', error)
       setErrorProducts(
@@ -181,7 +227,7 @@ const ProductbyCategory = () => {
     } finally {
       setLoadingProducts(false)
     }
-  }
+  }, [allCategoryIds, categoryId, page, sortOption, ITEMS_PER_PAGE])
 
   // Scroll to top on component mount
   useEffect(() => {
@@ -193,7 +239,7 @@ const ProductbyCategory = () => {
     if (allCategoryIds.length > 0 || categoryId) {
       fetchProducts()
     }
-  }, [sortOption, page, allCategoryIds, categoryId])
+  }, [sortOption, page, allCategoryIds, categoryId, fetchProducts])
 
   const handleAddToCart = async (product) => {
     if (isAdding[product._id]) return
@@ -254,9 +300,9 @@ const ProductbyCategory = () => {
   return (
     <Box sx={{ minHeight: '100vh' }}>
       <Breadcrumbs
-        separator={<NavigateNext fontSize='small' />}
+        separator={<NavigateNextIcon fontSize='small' />}
         aria-label='breadcrumb'
-        sx={{ p: { xs: 1, md: 2 }, mb: 2 }}
+        sx={{ pt: 2, width: '100%', maxWidth: '95vw', mx: 'auto' }}
       >
         <Link
           underline='hover'
@@ -267,12 +313,9 @@ const ProductbyCategory = () => {
             textDecoration: 'none',
             '&:hover': {
               color: 'primary.main'
-            },
-            cursor: 'pointer'
+            }
           }}
-          onClick={() => navigate('/')}
-        // component={Link}
-        // to='/product'
+          href='/'
         >
           Trang chủ
         </Link>
@@ -284,7 +327,7 @@ const ProductbyCategory = () => {
             fontWeight: 500
           }}
         >
-          {category ? category.name : 'Danh mục sản phẩm'}
+          Danh mục {category?.name || 'Sản phẩm'}
         </Typography>
       </Breadcrumbs>
       {/*<Box*/}
