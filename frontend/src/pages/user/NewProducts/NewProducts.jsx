@@ -108,9 +108,9 @@ const NewProducts = () => {
         page: Number(page),
         limit: Number(ITEMS_PER_PAGE),
         sort: backendSortMap[sortOption] || 'newest',
-        filterTypeDate: 'this_week',
         destroy: false,
-        status: 'active'
+        status: 'active',
+        label: 'new'
       }
 
       console.log('Fetching products with params:', params)
