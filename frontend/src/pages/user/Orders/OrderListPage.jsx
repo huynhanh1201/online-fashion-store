@@ -220,7 +220,17 @@ const CancelOrderModal = ({ open, onClose, onConfirm, order, loading }) => {
           variant="contained"
           color="error"
           disabled={loading}
-          startIcon={loading ? <CircularProgress size={16} /> : <Cancel />}
+          startIcon={loading ? (
+            <CircularProgress
+              size={16}
+              sx={{
+                color: 'inherit',
+                '& .MuiCircularProgress-circle': {
+                  strokeLinecap: 'round'
+                }
+              }}
+            />
+          ) : <Cancel />}
           sx={{
             borderRadius: 2,
             textTransform: 'none',
@@ -380,7 +390,15 @@ const OrderRow = ({ order, onOrderUpdate, onOrderCancelled, onReorder, reorderLo
         </Box>
         {loadingItems ? (
           <Box display="flex" justifyContent="center" py={2}>
-            <CircularProgress size={30} />
+            <CircularProgress
+              size={30}
+              sx={{
+                color: 'var(--primary-color)',
+                '& .MuiCircularProgress-circle': {
+                  strokeLinecap: 'round'
+                }
+              }}
+            />
           </Box>
         ) : (
           <Box sx={{ position: 'relative' }}>
@@ -589,7 +607,17 @@ const OrderRow = ({ order, onOrderUpdate, onOrderCancelled, onReorder, reorderLo
               </Button>
               {(order.status === 'Delivered' || order.status === 'Failed' || order.status === 'Cancelled') && (
                 <Button
-                  startIcon={reorderLoading ? <CircularProgress size={16} /> : <Replay />}
+                  startIcon={reorderLoading ? (
+                    <CircularProgress
+                      size={16}
+                      sx={{
+                        color: 'inherit',
+                        '& .MuiCircularProgress-circle': {
+                          strokeLinecap: 'round'
+                        }
+                      }}
+                    />
+                  ) : <Replay />}
                   onClick={() => onReorder && onReorder(items)}
                   disabled={reorderLoading}
                   sx={{
@@ -813,18 +841,63 @@ const OrderListPage = () => {
           width: '100%',
           maxWidth: { xs: '95vw', sm: '96vw', md: '96vw' },
           margin: '0 auto',
+          height: '70vh',
           py: { xs: 2, sm: 3, md: 4 }
         }}
       >
-        <Box display="flex" flexDirection="column" alignItems="center" gap={2}>
-          <CircularProgress size={40} />
-          <Typography
-            variant="h6"
-            color="text.secondary"
-            sx={{ fontSize: { xs: '1rem', sm: '1.25rem' } }}
+        <Box display="flex" flexDirection="column" alignItems="center" gap={3}>
+          <Box
+            sx={{
+              position: 'relative',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}
           >
-            Đang tải đơn hàng...
-          </Typography>
+            <CircularProgress
+              size={50}
+              thickness={4}
+              sx={{
+                color: 'var(--primary-color)',
+                '& .MuiCircularProgress-circle': {
+                  strokeLinecap: 'round'
+                }
+              }}
+            />
+            <Box
+              sx={{
+                position: 'absolute',
+                top: '50%',
+                left: '50%',
+                transform: 'translate(-50%, -50%)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+              }}
+            >
+              <ShoppingBag sx={{ color: 'var(--primary-color)', fontSize: 20 }} />
+            </Box>
+          </Box>
+          <Box textAlign="center">
+            <Typography
+              variant="h6"
+              color="text.primary"
+              sx={{
+                fontSize: { xs: '1rem', sm: '1.25rem' },
+                fontWeight: 600,
+                mb: 0.5
+              }}
+            >
+              Đang tải đơn hàng...
+            </Typography>
+            <Typography
+              variant="body2"
+              color="text.secondary"
+              sx={{ fontSize: { xs: '0.875rem', sm: '1rem' } }}
+            >
+              Vui lòng chờ trong giây lát
+            </Typography>
+          </Box>
         </Box>
       </Container>
     )
@@ -1052,7 +1125,17 @@ const OrderListPage = () => {
                   size="large"
                   onClick={loadMoreOrders}
                   disabled={loadingMore}
-                  startIcon={loadingMore ? <CircularProgress size={16} /> : <KeyboardArrowDown />}
+                  startIcon={loadingMore ? (
+                    <CircularProgress
+                      size={16}
+                      sx={{
+                        color: 'inherit',
+                        '& .MuiCircularProgress-circle': {
+                          strokeLinecap: 'round'
+                        }
+                      }}
+                    />
+                  ) : <KeyboardArrowDown />}
                   sx={{
                     borderRadius: 3,
                     textTransform: 'none',

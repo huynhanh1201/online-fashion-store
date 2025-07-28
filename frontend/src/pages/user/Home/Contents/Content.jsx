@@ -5,7 +5,7 @@ import { getProducts } from '~/services/productService.js'
 import FlashSaleSection from '~/pages/user/Home/FlashSaleSection/FlashSaleSection.jsx'
 import CouponList from '~/pages/user/Home/CouponList/CouponList.jsx'
 import { Box } from '@mui/material'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { getBanners } from '~/services/admin/webConfig/bannerService.js'
 import { getFeaturedCategories } from '~/services/admin/webConfig/featuredcategoryService.js'
 import { getServiceHighlights } from '~/services/admin/webConfig/highlightedService.js'
@@ -13,6 +13,7 @@ import { optimizeCloudinaryUrl } from '~/utils/cloudinary.js'
 import ProductHorizontalScroll from '~/components/ProductCards/ProductHorizontalScroll'
 
 const Content = () => {
+  const navigate = useNavigate()
   const [products, setProducts] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
@@ -290,15 +291,23 @@ const Content = () => {
           }}
         >
           {categories.map((category, index) => (
-            <a
+            <div
               key={index}
-              href={
-                featuredCategoriesLoading || featuredCategories.length === 0
+              className="category-card"
+              style={{
+                textDecoration: 'none',
+                color: 'inherit',
+                width: '100%',
+                cursor: 'pointer'
+              }}
+              onClick={() => {
+                const link = featuredCategoriesLoading || featuredCategories.length === 0
                   ? category.link
                   : category.link || '#'
-              }
-              className="category-card"
-              style={{ textDecoration: 'none', color: 'inherit', width: '100%' }}
+                if (link && link !== '#') {
+                  navigate(link)
+                }
+              }}
             >
               <div
                 className="category-image"
@@ -345,7 +354,7 @@ const Content = () => {
                   </div>
                 )}
               </div>
-            </a>
+            </div>
           ))}
         </div>
 
@@ -361,49 +370,34 @@ const Content = () => {
           <div className="middle-banners-section">
             {middleBanners.map((banner, index) => (
               <div key={banner._id || index} className="middle-banner">
-                {banner.link ? (
-                  <a
-                    href={banner.link}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    style={{ textDecoration: 'none', color: 'inherit' }}
-                  >
-                    <img
-                      src={optimizeCloudinaryUrl(banner.imageUrl, {
-                        width: 1200,
-                        height: 400,
-                        quality: 'auto',
-                        format: 'auto',
-                      })}
-                      alt={banner.title || `Banner ${index + 1}`}
-                      style={{
-                        width: '100%',
-                        height: 'auto',
-                        maxHeight: '400px',
-                        objectFit: 'cover',
-                        borderRadius: '8px',
-                        cursor: 'pointer',
-                      }}
-                    />
-                  </a>
-                ) : (
-                  <img
-                    src={optimizeCloudinaryUrl(banner.imageUrl, {
-                      width: 1200,
-                      height: 400,
-                      quality: 'auto',
-                      format: 'auto',
-                    })}
-                    alt={banner.title || `Banner ${index + 1}`}
-                    style={{
-                      width: '100%',
-                      height: 'auto',
-                      maxHeight: '400px',
-                      objectFit: 'cover',
-                      borderRadius: '8px',
-                    }}
-                  />
-                )}
+                <img
+                  src={optimizeCloudinaryUrl(banner.imageUrl, {
+                    width: 1200,
+                    height: 400,
+                    quality: 'auto',
+                    format: 'auto',
+                  })}
+                  alt={banner.title || `Banner ${index + 1}`}
+                  style={{
+                    width: '100%',
+                    height: 'auto',
+                    maxHeight: '400px',
+                    objectFit: 'cover',
+                    borderRadius: '8px',
+                    cursor: banner.link ? 'pointer' : 'default',
+                  }}
+                  onClick={() => {
+                    if (banner.link) {
+                      // Check if it's an external link
+                      if (banner.link.startsWith('http://') || banner.link.startsWith('https://')) {
+                        window.open(banner.link, '_blank', 'noopener,noreferrer')
+                      } else {
+                        // Internal link, use navigate
+                        navigate(banner.link)
+                      }
+                    }
+                  }}
+                />
               </div>
             ))}
           </div>

@@ -21,7 +21,9 @@ import {
   DialogActions,
   DialogContentText,
   Breadcrumbs,
-  Link
+  Link,
+  Skeleton,
+  Container
 } from '@mui/material'
 import { useParams, useNavigate } from 'react-router-dom'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack'
@@ -49,6 +51,108 @@ const statusLabels = {
   Delivered: ['Đã giao', 'success'],
   Cancelled: ['Đã hủy', 'error'],
   Failed: ['Thanh toán thất bại', 'error']
+}
+
+// Loading Component
+const OrderDetailSkeleton = () => {
+  return (
+    <Container maxWidth="lg" sx={{ py: 4 }}>
+      {/* Header Skeleton */}
+      <Box sx={{ mb: 4 }}>
+        <Skeleton variant="text" width={200} height={40} sx={{ mb: 2 }} />
+        <Skeleton variant="text" width={300} height={24} />
+      </Box>
+
+      {/* Order Info Card Skeleton */}
+      <Paper
+        elevation={0}
+        sx={{
+          p: 3,
+          mb: 3,
+          borderRadius: 3,
+          border: '1px solid',
+          borderColor: 'divider'
+        }}
+      >
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+          <Skeleton variant="text" width={150} height={32} />
+          <Skeleton variant="rectangular" width={100} height={32} sx={{ borderRadius: 2 }} />
+        </Box>
+
+        <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' }, gap: 3 }}>
+          <Box>
+            <Skeleton variant="text" width={120} height={24} sx={{ mb: 1 }} />
+            <Skeleton variant="text" width={200} height={20} sx={{ mb: 2 }} />
+            <Skeleton variant="text" width={100} height={24} sx={{ mb: 1 }} />
+            <Skeleton variant="text" width={150} height={20} />
+          </Box>
+          <Box>
+            <Skeleton variant="text" width={140} height={24} sx={{ mb: 1 }} />
+            <Skeleton variant="text" width={180} height={20} sx={{ mb: 2 }} />
+            <Skeleton variant="text" width={120} height={24} sx={{ mb: 1 }} />
+            <Skeleton variant="text" width={160} height={20} />
+          </Box>
+        </Box>
+      </Paper>
+
+      {/* Products Skeleton */}
+      <Paper
+        elevation={0}
+        sx={{
+          p: 3,
+          mb: 3,
+          borderRadius: 3,
+          border: '1px solid',
+          borderColor: 'divider'
+        }}
+      >
+        <Skeleton variant="text" width={150} height={28} sx={{ mb: 3 }} />
+
+        {[1, 2, 3].map((item) => (
+          <Box key={item} sx={{ mb: 3, pb: 3, borderBottom: '1px solid', borderColor: 'divider' }}>
+            <Box sx={{ display: 'flex', gap: 2, mb: 2 }}>
+              <Skeleton variant="rectangular" width={80} height={80} sx={{ borderRadius: 2 }} />
+              <Box sx={{ flex: 1 }}>
+                <Skeleton variant="text" width="70%" height={24} sx={{ mb: 1 }} />
+                <Skeleton variant="text" width="50%" height={20} sx={{ mb: 1 }} />
+                <Skeleton variant="text" width="40%" height={20} />
+              </Box>
+              <Box sx={{ textAlign: 'right' }}>
+                <Skeleton variant="text" width={80} height={24} sx={{ mb: 1 }} />
+                <Skeleton variant="text" width={60} height={20} />
+              </Box>
+            </Box>
+          </Box>
+        ))}
+      </Paper>
+
+      {/* Order Summary Skeleton */}
+      <Paper
+        elevation={0}
+        sx={{
+          p: 3,
+          borderRadius: 3,
+          border: '1px solid',
+          borderColor: 'divider'
+        }}
+      >
+        <Skeleton variant="text" width={120} height={28} sx={{ mb: 3 }} />
+
+        {[1, 2, 3, 4].map((item) => (
+          <Box key={item} sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
+            <Skeleton variant="text" width={150} height={20} />
+            <Skeleton variant="text" width={100} height={20} />
+          </Box>
+        ))}
+
+        <Divider sx={{ my: 2 }} />
+        <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+          <Skeleton variant="text" width={100} height={24} />
+          <Skeleton variant="text" width={120} height={24} />
+        </Box>
+      </Paper>
+    </Container>
+  )
 }
 
 // Review Button Component with fallback check
@@ -104,7 +208,15 @@ const ReviewButtonComponent = ({
     return (reviewsLoading || isReviewed === null) &&
       isOrderCompleted &&
       currentUser ? (
-      <CircularProgress size={20} />
+      <Skeleton
+        variant="rectangular"
+        width={100}
+        height={32}
+        sx={{
+          borderRadius: 2,
+          animation: 'pulse 1.5s ease-in-out infinite'
+        }}
+      />
     ) : null
   }
 
@@ -142,7 +254,17 @@ const ReviewButtonComponent = ({
         e.stopPropagation()
         handleReviewClick()
       }}
-      startIcon={checking ? <CircularProgress size={16} /> : null}
+      startIcon={checking ? (
+        <CircularProgress
+          size={16}
+          sx={{
+            color: 'inherit',
+            '& .MuiCircularProgress-circle': {
+              strokeLinecap: 'round'
+            }
+          }}
+        />
+      ) : null}
     >
       {checking
         ? 'Kiểm tra...'
@@ -259,7 +381,17 @@ const CancelOrderModal = ({ open, onClose, onConfirm, order, loading }) => {
           variant='contained'
           color='error'
           disabled={loading}
-          startIcon={loading ? <CircularProgress size={16} /> : <Cancel />}
+          startIcon={loading ? (
+            <CircularProgress
+              size={16}
+              sx={{
+                color: 'inherit',
+                '& .MuiCircularProgress-circle': {
+                  strokeLinecap: 'round'
+                }
+              }}
+            />
+          ) : <Cancel />}
           sx={{
             borderRadius: 2,
             textTransform: 'none',
@@ -364,14 +496,75 @@ const OrderDetail = () => {
     window.scrollTo({ top: 0, behavior: 'auto' })
   }, [])
 
-  if (loading) return <CircularProgress />
+  if (loading) return <OrderDetailSkeleton />
   if (error)
     return (
-      <Typography color='error'>
-        Lỗi: {error.message || 'Có lỗi xảy ra'}
-      </Typography>
+      <Container maxWidth="lg" sx={{ py: 4 }}>
+        <Paper
+          elevation={0}
+          sx={{
+            p: 4,
+            textAlign: 'center',
+            borderRadius: 3,
+            border: '1px solid',
+            borderColor: 'error.light',
+            backgroundColor: 'error.50'
+          }}
+        >
+          <Box sx={{ mb: 2 }}>
+            <Warning sx={{ fontSize: 48, color: 'error.main', mb: 2 }} />
+          </Box>
+          <Typography variant="h6" color='error.main' sx={{ mb: 1, fontWeight: 600 }}>
+            Có lỗi xảy ra
+          </Typography>
+          <Typography color='error.dark'>
+            {error.message || 'Không thể tải thông tin đơn hàng'}
+          </Typography>
+          <Button
+            variant="contained"
+            color="error"
+            sx={{ mt: 3, borderRadius: 2 }}
+            onClick={() => window.location.reload()}
+          >
+            Thử lại
+          </Button>
+        </Paper>
+      </Container>
     )
-  if (!order) return <Typography>Không tìm thấy đơn hàng</Typography>
+  if (!order)
+    return (
+      <Container maxWidth="lg" sx={{ py: 4 }}>
+        <Paper
+          elevation={0}
+          sx={{
+            p: 4,
+            textAlign: 'center',
+            borderRadius: 3,
+            border: '1px solid',
+            borderColor: 'warning.light',
+            backgroundColor: 'warning.50'
+          }}
+        >
+          <Box sx={{ mb: 2 }}>
+            <Warning sx={{ fontSize: 48, color: 'warning.main', mb: 2 }} />
+          </Box>
+          <Typography variant="h6" color='warning.main' sx={{ mb: 1, fontWeight: 600 }}>
+            Không tìm thấy đơn hàng
+          </Typography>
+          <Typography color='warning.dark'>
+            Đơn hàng bạn đang tìm kiếm không tồn tại hoặc đã bị xóa
+          </Typography>
+          <Button
+            variant="contained"
+            color="warning"
+            sx={{ mt: 3, borderRadius: 2 }}
+            onClick={() => navigate('/orders')}
+          >
+            Quay lại danh sách đơn hàng
+          </Button>
+        </Paper>
+      </Container>
+    )
 
   const [label, color] = statusLabels[order.status] || [
     'Không xác định',
@@ -658,7 +851,7 @@ const OrderDetail = () => {
           // component={Link}
           // to='/product'
           >
-           Đơn hàng
+            Đơn hàng
           </Link>
           <Typography
             sx={{
@@ -1134,7 +1327,17 @@ const OrderDetail = () => {
                 </Box>
                 <Button
                   startIcon={
-                    reorderLoading ? <CircularProgress size={16} /> : <Replay />
+                    reorderLoading ? (
+                      <CircularProgress
+                        size={16}
+                        sx={{
+                          color: 'inherit',
+                          '& .MuiCircularProgress-circle': {
+                            strokeLinecap: 'round'
+                          }
+                        }}
+                      />
+                    ) : <Replay />
                   }
                   disabled={reorderLoading}
                   onClick={handleReorder}
