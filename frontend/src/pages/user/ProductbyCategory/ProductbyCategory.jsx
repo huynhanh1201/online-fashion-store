@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useCallback } from 'react'
 import {
   Box,
   Grid,
@@ -14,7 +14,7 @@ import {
 } from '@mui/material'
 import NavigateNextIcon from '@mui/icons-material/NavigateNext'
 import { addToCart, getCart } from '~/services/cartService'
-import { getProducts } from '~/services/productService'
+import { getProductsByMultipleCategories } from '~/services/productService'
 import { useDispatch } from 'react-redux'
 import { setCartItems } from '~/redux/cart/cartSlice'
 import ProductCard from '~/components/ProductCards/ProductCards'
@@ -129,45 +129,56 @@ const ProductbyCategory = () => {
     }
   }, [categoryId])
 
-  // Fetch products with backend sorting and category filtering
-  const fetchProducts = async () => {
+  // Fetch products with multiple categories support
+  const fetchProducts = useCallback(async () => {
     try {
       setLoadingProducts(true)
       setErrorProducts(null)
 
-      // Map sort option to API sort parameter
-      const backendSortMap = {
-        nameAsc: 'name_asc',
-        nameDesc: 'name_desc',
-        priceAsc: 'price_asc',
-        priceDesc: 'price_desc',
-      }
+      // Sử dụng categoryIds array hoặc chỉ categoryId nếu không có children
+      const categoryIdsToUse = allCategoryIds.length > 0 ? allCategoryIds : [categoryId]
 
-      const params = {
-        page: Number(page),
-        limit: Number(ITEMS_PER_PAGE),
-        sort: backendSortMap[sortOption] || 'newest',
-        // Add category filter - backend sẽ filter theo categoryIds
-        categoryIds: allCategoryIds.length > 0 ? allCategoryIds.join(',') : categoryId
-      }
+      console.log('Fetching products for categories:', categoryIdsToUse)
 
-      console.log('Fetching products with params:', params)
-
-      const response = await getProducts(params)
+      const response = await getProductsByMultipleCategories(
+        categoryIdsToUse,
+        Number(page),
+        Number(ITEMS_PER_PAGE)
+      )
       console.log('API Response:', response)
 
       const fetchedProducts = response.products || []
-      const total = response.total || fetchedProducts.length
-      const calculatedTotalPages = Math.ceil(total / ITEMS_PER_PAGE) || 1
+      const total = response.total || 0
+      const totalPages = response.totalPages || 1
 
       if (!Array.isArray(fetchedProducts)) {
         console.error('Products không phải là array:', fetchedProducts)
         throw new Error('Dữ liệu sản phẩm không hợp lệ')
       }
 
-      // Backend đã xử lý sorting và filtering, không cần client-side processing
-      setProducts(fetchedProducts)
-      setTotalPages(calculatedTotalPages)
+      // Apply client-side sorting since getProductsByMultipleCategories doesn't support backend sorting
+      let sortedProducts = [...fetchedProducts]
+      switch (sortOption) {
+        case 'nameAsc':
+          sortedProducts.sort((a, b) => a.name.localeCompare(b.name))
+          break
+        case 'nameDesc':
+          sortedProducts.sort((a, b) => b.name.localeCompare(a.name))
+          break
+        case 'priceAsc':
+          sortedProducts.sort((a, b) => a.price - b.price)
+          break
+        case 'priceDesc':
+          sortedProducts.sort((a, b) => b.price - a.price)
+          break
+        case 'featured':
+        default:
+          // Keep original order (featured/newest first)
+          break
+      }
+
+      setProducts(sortedProducts)
+      setTotalPages(totalPages)
     } catch (error) {
       console.error('Chi tiết lỗi:', error)
       setErrorProducts(
@@ -179,7 +190,7 @@ const ProductbyCategory = () => {
     } finally {
       setLoadingProducts(false)
     }
-  }
+  }, [allCategoryIds, categoryId, page, sortOption, ITEMS_PER_PAGE])
 
   // Scroll to top on component mount
   useEffect(() => {
@@ -191,7 +202,7 @@ const ProductbyCategory = () => {
     if (allCategoryIds.length > 0 || categoryId) {
       fetchProducts()
     }
-  }, [sortOption, page, allCategoryIds, categoryId])
+  }, [sortOption, page, allCategoryIds, categoryId, fetchProducts])
 
   const handleAddToCart = async (product) => {
     if (isAdding[product._id]) return

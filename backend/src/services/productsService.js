@@ -244,7 +244,8 @@ const getProduct = async (productId) => {
   try {
     const result = await ProductModel.findById({
       _id: productId,
-      destroy: false
+      destroy: false,
+      status: 'active'
     })
       .populate({
         path: 'categoryId',
@@ -316,14 +317,25 @@ const deleteProduct = async (productId) => {
   }
 }
 
-const getListProductOfCategory = async (categoryId) => {
+const getListProductOfCategory = async (categoryId, options = {}) => {
   // eslint-disable-next-line no-useless-catch
   try {
+    const { page = 1, limit = 10 } = options
+    const skip = (page - 1) * limit
+
+    // Get total count first
+    const totalCount = await ProductModel.countDocuments({
+      categoryId: new mongoose.Types.ObjectId(categoryId),
+      destroy: false,
+      status: 'active'
+    })
+
     const ListProduct = await ProductModel.aggregate([
       {
         $match: {
           categoryId: new mongoose.Types.ObjectId(categoryId),
-          destroy: false
+          destroy: false,
+          status: 'active'
         }
       },
       {
@@ -350,10 +362,17 @@ const getListProductOfCategory = async (categoryId) => {
             $ifNull: [{ $arrayElemAt: ['$firstVariant.discountPrice', 0] }, 0]
           }
         }
-      }
+      },
+      { $skip: skip },
+      { $limit: parseInt(limit) }
     ])
 
-    return ListProduct
+    return {
+      products: ListProduct,
+      total: totalCount,
+      totalPages: Math.ceil(totalCount / limit),
+      currentPage: parseInt(page)
+    }
   } catch (err) {
     throw err
   }
