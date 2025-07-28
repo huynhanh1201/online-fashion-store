@@ -4,8 +4,8 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite --host",
-    "build": "vite build",
+    "dev": "cross-env BUILD_MODE=dev vite --host",
+    "build": "cross-env BUILD_MODE=prod vite build",
     "lint": "eslint .",
     "preview": "vite preview"
   },
@@ -35,6 +35,7 @@
     "@tiptap/starter-kit": "^2.22.3",
     "axios": "^1.9.0",
     "chart.js": "^4.5.0",
+    "cross-env": "^7.0.3",
     "date-fns": "4.1.0",
     "dayjs": "^1.11.13",
     "draft-js": "^0.11.7",
