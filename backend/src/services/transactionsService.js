@@ -12,6 +12,8 @@ const vnpayIPN = async (req) => {
   const session = await mongoose.startSession()
 
   try {
+    console.log('req: >>>>', req)
+
     const vnp_Params = { ...req.query }
     const isValid = verifyChecksum(vnp_Params)
 
@@ -66,21 +68,22 @@ const vnpayIPN = async (req) => {
       const variantMap = new Map(Object.entries(variantObjMap))
 
       // Cập nhật trạng thái đơn hàng
-      const orderPromise = OrderModel.findOneAndUpdate(
+      const orderPromise = await OrderModel.findOneAndUpdate(
         { _id: orderId },
         { status: 'Processing', paymentStatus: 'Completed' }
       ).session(session)
 
       // Tạo phiếu xuất kho
-      const warehouseSlipPromise = orderHelpers.createWarehouseSlipFromOrder(
-        jwtDecoded,
-        cartItems,
-        session,
-        'export'
-      )
+      const warehouseSlipPromise =
+        await orderHelpers.createWarehouseSlipFromOrder(
+          jwtDecoded,
+          cartItems,
+          session,
+          'export'
+        )
 
       // Tạo giao dịch thanh toán
-      const transactionPromise = orderHelpers.handleCreateTransaction(
+      const transactionPromise = await orderHelpers.handleCreateTransaction(
         reqBody,
         order,
         transactionInfo,
@@ -96,13 +99,13 @@ const vnpayIPN = async (req) => {
       // )
 
       // Xử lý tất cả promise song song
-      const [warehouseSlip, orderData, transaction, orderItems] =
-        await Promise.all([
-          warehouseSlipPromise,
-          orderPromise,
-          transactionPromise
-          // orderItemsPromise
-        ])
+      // const [warehouseSlip, orderData, transaction, orderItems] =
+      //   await Promise.all([
+      //     warehouseSlipPromise,
+      //     orderPromise,
+      //     transactionPromise
+      //     // orderItemsPromise
+      //   ])
 
       // Tạo đơn hàng vận chuyển (GHN)
       // const createDeliveryOrder = await deliveriesService.createDeliveryOrder(
