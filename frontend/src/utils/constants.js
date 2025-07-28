@@ -1,11 +1,12 @@
 let apiRoot = ''
 
 if (process.env.BUILD_MODE === 'dev') {
-  apiRoot = 'http://localhost:8017'
+  apiRoot = 'https://sunny-rhino-partly.ngrok-free.app'
 }
 
 if (process.env.BUILD_MODE === 'prod') {
-  apiRoot = 'https://api-fashion-store.onrender.com'
+  // apiRoot = 'https://api-fashion-store.onrender.com'
+  apiRoot = 'https://sunny-rhino-partly.ngrok-free.app'
 }
 
 // export const API_ROOT = 'http://localhost:8017'
