@@ -140,8 +140,6 @@ const NewProducts = () => {
   }
 
 
-
-
   // Scroll to top on component mount
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'auto' })
