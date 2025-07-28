@@ -72,7 +72,6 @@ const sortOptions = [
   { value: 'nameAsc', label: 'Sản phẩm từ A-Z' },
   { value: 'nameAsc', label: 'Sản phẩm từ Z-A' }
 ]
-nameAsc
 const styles = {
   container: {
     margin: '0 auto',
@@ -156,9 +155,7 @@ export default function SearchResults() {
         const { products: allProducts } = await getProducts(params)
 
         const filtered = allProducts
-          .filter((p) =>
-            p.name?.toLowerCase().includes(query.toLowerCase())
-          )
+          .filter((p) => p.name?.toLowerCase().includes(query.toLowerCase()))
           .map((p) => ({
             _id: p._id,
             name: p.name,
@@ -276,7 +273,11 @@ export default function SearchResults() {
                     }}
                   >
                     <span
-                      style={{ fontSize: 15, fontWeight: 700, marginBottom: -2 }}
+                      style={{
+                        fontSize: 15,
+                        fontWeight: 700,
+                        marginBottom: -2
+                      }}
                     >
                       A
                     </span>
@@ -332,7 +333,9 @@ export default function SearchResults() {
                 </Grid>
               ))}
             </div>
-            <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 , mb:4}}>
+            <Box
+              sx={{ display: 'flex', justifyContent: 'center', mt: 4, mb: 4 }}
+            >
               <Pagination
                 count={totalPages}
                 page={page}
@@ -341,8 +344,11 @@ export default function SearchResults() {
                 color='primary'
                 size='small'
                 renderItem={(item) =>
-                  item.type === 'start-ellipsis' || item.type === 'end-ellipsis' ? (
-                    <span style={{ padding: '8px 12px', color: '#999' }}>...</span>
+                  item.type === 'start-ellipsis' ||
+                  item.type === 'end-ellipsis' ? (
+                    <span style={{ padding: '8px 12px', color: '#999' }}>
+                      ...
+                    </span>
                   ) : (
                     <PaginationItem {...item} />
                   )
