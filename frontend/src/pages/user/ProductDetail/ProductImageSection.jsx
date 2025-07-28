@@ -80,8 +80,8 @@ const MainImageContainer = styled(Box)(() => ({
     left: 0,
     right: 0,
     bottom: 0,
-    background:
-      'linear-gradient(45deg, transparent 49%, rgba(255,255,255,0.1) 50%, transparent 51%)',
+    // background:
+    //   'linear-gradient(45deg, transparent 49%, rgba(255,255,255,0.1) 50%, transparent 51%)',
     pointerEvents: 'none',
     zIndex: 1
   }
