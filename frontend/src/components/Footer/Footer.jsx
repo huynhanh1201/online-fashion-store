@@ -19,7 +19,7 @@ import SearchIcon from '@mui/icons-material/Search'
 import LinkIcon from '@mui/icons-material/Link'
 import { getFooterConfig } from '~/services/admin/webConfig/footerService.js'
 import { getAllPolicies } from '~/services/policyService.js'
-
+import { Link } from 'react-router-dom'
 function Footer() {
   const [footer, setFooter] = useState(null)
   const [loading, setLoading] = useState(true)
@@ -46,7 +46,7 @@ function Footer() {
         const all = await getAllPolicies()
         // Chỉ lấy active, không destroy
         setPolicies(
-          all.filter(p => p.status === 'active' && p.destroy === false)
+          all.filter((p) => p.status === 'active' && p.destroy === false)
         )
       } catch {
         setPolicies([])
@@ -59,12 +59,12 @@ function Footer() {
 
   return (
     <Box
-      sx={{ 
-        bgcolor: 'var(--primary-color)', 
-        color: 'white', 
-        pt: 6, 
-        pb: 3, 
-        fontSize: 14 
+      sx={{
+        bgcolor: 'var(--primary-color)',
+        color: 'white',
+        pt: 6,
+        pb: 3,
+        fontSize: 14
       }}
     >
       <Container maxWidth='1450px'>
@@ -84,21 +84,51 @@ function Footer() {
           <Box sx={{ flex: 1, minWidth: 220 }}>
             {footer?.logo && (
               <Box sx={{ mb: 1 }}>
-                <img src={footer.logo} alt='logo' style={{ maxWidth: '200px', width:'100%',maxHeight:'100px', height: '100%', borderRadius: 8, background: '#fff', padding: 4, objectFit:'cover' }} />
+                <img
+                  src={footer.logo}
+                  alt='logo'
+                  style={{
+                    maxWidth: '200px',
+                    width: '100%',
+                    maxHeight: '100px',
+                    height: '100%',
+                    borderRadius: 8,
+                    background: '#fff',
+                    padding: 4,
+                    objectFit: 'cover'
+                  }}
+                />
               </Box>
             )}
             {/* Show all phone numbers */}
-            {footer?.about?.filter(a => a.phone).map((a, idx) => (
-              <Typography key={`phone-${idx}`} variant='body2' sx={{ display: 'flex', alignItems: 'center', mb: 1, fontWeight: 700 }}>
-                <PhoneIcon sx={{ fontSize: 16, mr: 1 }} /> {a.phone}
-              </Typography>
-            ))}
+            {footer?.about
+              ?.filter((a) => a.phone)
+              .map((a, idx) => (
+                <Typography
+                  key={`phone-${idx}`}
+                  variant='body2'
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    mb: 1,
+                    fontWeight: 700
+                  }}
+                >
+                  <PhoneIcon sx={{ fontSize: 16, mr: 1 }} /> {a.phone}
+                </Typography>
+              ))}
             {/* Show all emails */}
-            {footer?.about?.filter(a => a.email).map((a, idx) => (
-              <Typography key={`email-${idx}`} variant='body2' sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-                <EmailIcon sx={{ fontSize: 16, mr: 1 }} /> {a.email}
-              </Typography>
-            ))}
+            {footer?.about
+              ?.filter((a) => a.email)
+              .map((a, idx) => (
+                <Typography
+                  key={`email-${idx}`}
+                  variant='body2'
+                  sx={{ display: 'flex', alignItems: 'center', mb: 1 }}
+                >
+                  <EmailIcon sx={{ fontSize: 16, mr: 1 }} /> {a.email}
+                </Typography>
+              ))}
           </Box>
 
           {/* Cột 2: Chính sách + Hỗ trợ */}
@@ -110,9 +140,15 @@ function Footer() {
               {policies.map((policy) => (
                 <Typography
                   key={policy._id}
-                  component='a'
-                  href={`/policy#${policy.category}`}
-                  sx={{ color: 'inherit', textDecoration: 'none', cursor: 'pointer', '&:hover': { textDecoration: 'underline' } }}
+                  // component='a'
+                  component={Link}
+                  to={`/policy#${policy.category}`}
+                  sx={{
+                    color: 'inherit',
+                    textDecoration: 'none',
+                    cursor: 'pointer',
+                    '&:hover': { textDecoration: 'underline' }
+                  }}
                 >
                   {policy.title}
                 </Typography>
@@ -148,15 +184,26 @@ function Footer() {
               </Typography>
               {footer?.fanpageImage && (
                 <Box sx={{ mb: 2, display: 'flex', justifyContent: 'start' }}>
-                  <img src={footer.fanpageImage} alt='fanpage' style={{ width: 300, height: 'auto', borderRadius: 8, background: '#fff', padding: 4 }} />
+                  <img
+                    src={footer.fanpageImage}
+                    alt='fanpage'
+                    style={{
+                      width: 300,
+                      height: 'auto',
+                      borderRadius: 8,
+                      background: '#fff',
+                      padding: 4
+                    }}
+                  />
                 </Box>
               )}
               <Stack spacing={1}>
                 {footer?.socialLinks?.map((s, idx) => (
                   <Box
                     key={idx}
-                    component='a'
-                    href={s.link}
+                    // component='a'
+                    component={Link}
+                    to={s.link}
                     target='_blank'
                     rel='noopener'
                     sx={{

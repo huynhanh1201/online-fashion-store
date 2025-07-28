@@ -410,6 +410,7 @@ const Search = ({ onclose }) => {
     navigate(`/productdetail/${id}`)
     setSuggestions([])
     setShowSuggestions(false)
+    onclose()
   }
 
   return (

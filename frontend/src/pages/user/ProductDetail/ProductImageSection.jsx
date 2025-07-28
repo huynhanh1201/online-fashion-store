@@ -91,13 +91,14 @@ const ThumbnailContainer = styled(Box)(() => ({
   display: 'flex',
   flexDirection: 'column',
   gap: 12,
-  marginRight: 20,
   overflowY: 'auto',
   padding: '8px 0',
+  paddingRight: 10,
+  marginRight: 10,
   background:
     'linear-gradient(to bottom, rgba(255,255,255,0.8), rgba(248,249,250,0.8))',
   boxShadow: '0 2px 12px rgba(0, 0, 0, 0.05)',
-  maxHeight: 420,
+  maxHeight: 520,
   '&::-webkit-scrollbar': {
     width: 8
   },
@@ -163,9 +164,8 @@ const ProductImageSection = ({
     <>
       <Box
         sx={{
-          width: { xs: '100%', md: 550 },
-          height: { xs: 'auto', md: 600 },
-          mb: 6,
+          width: { xs: '100%' },
+          height: { xs: 'auto', md: 550 },
           p: { xs: 1, sm: 2, md: 2 },
           display: 'flex',
           flexDirection: { xs: 'column', md: 'row' },
