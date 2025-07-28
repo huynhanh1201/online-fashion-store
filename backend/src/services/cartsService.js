@@ -111,7 +111,6 @@ const updateItemCart = async (userId, reqBody) => {
 
     return itemCart
   } catch (err) {
-    console.log(err)
     throw err
   }
 }

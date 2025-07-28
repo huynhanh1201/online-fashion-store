@@ -3,6 +3,9 @@ import { transactionsService } from '~/services/transactionsService'
 // Thanh toán VNPAY
 const vnpayIPN = async (req, res, next) => {
   try {
+    res.setHeader('Access-Control-Allow-Origin', '*') // hoặc chỉ định cụ thể VNPAY
+    console.log('💰 Callback VNPAY:', req.query)
+
     const result = await transactionsService.vnpayIPN(req)
 
     res.status(200).json(result)

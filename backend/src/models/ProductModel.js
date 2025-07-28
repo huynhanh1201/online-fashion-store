@@ -103,6 +103,11 @@ const productSchema = new Schema(
       type: Number,
       min: 0,
       default: 0
+    },
+
+    label: {
+      type: String,
+      default: null
     }
   },
   {
