@@ -69,8 +69,8 @@ const sortOptions = [
   { value: '', label: 'Sản phẩm nổi bật' },
   { value: 'priceAsc', label: 'Giá tăng dần' },
   { value: 'priceDesc', label: 'Giá giảm dần' },
-  { value: 'nameAsc', label: 'Sản phẩm từ A-Z' },
-  { value: 'nameDesc', label: 'Sản phẩm từ Z-A' }
+  { value: 'nameDesc', label: 'Sản phẩm từ A-Z' },
+  { value: 'nameAsc', label: 'Sản phẩm từ Z-A' }
 ]
 
 const styles = {
@@ -331,7 +331,7 @@ export default function SearchResults() {
                 </Grid>
               ))}
             </div>
-            <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
+            <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 , mb:4}}>
               <Pagination
                 count={totalPages}
                 page={page}
