@@ -11,7 +11,8 @@ export const getProducts = async (params = {}) => {
       limit = 1000,
       sort = '',
       filterTypeDate = '',
-      filters = {} // thêm filters nếu cần mở rộng sau này
+      filters = {},
+      label = 'null'
     } = params
 
     // Tạo query string cho lọc
@@ -20,6 +21,7 @@ export const getProducts = async (params = {}) => {
       limit,
       ...(sort && { sort }),
       ...(filterTypeDate && { filterTypeDate }),
+      ...(label && label !== 'null' && { label }),
       destroy: false,
       status: 'active',
       ...filters
