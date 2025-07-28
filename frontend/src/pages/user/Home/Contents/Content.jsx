@@ -290,9 +290,9 @@ const Content = () => {
           }}
         >
           {categories.map((category, index) => (
-            <a
+            <Link
               key={index}
-              href={
+              to={
                 featuredCategoriesLoading || featuredCategories.length === 0
                   ? category.link
                   : category.link || '#'
@@ -345,7 +345,7 @@ const Content = () => {
                   </div>
                 )}
               </div>
-            </a>
+            </Link>
           ))}
         </div>
 
@@ -362,8 +362,8 @@ const Content = () => {
             {middleBanners.map((banner, index) => (
               <div key={banner._id || index} className="middle-banner">
                 {banner.link ? (
-                  <a
-                    href={banner.link}
+                  <Link
+                    to={banner.link}
                     target="_blank"
                     rel="noopener noreferrer"
                     style={{ textDecoration: 'none', color: 'inherit' }}
@@ -385,7 +385,7 @@ const Content = () => {
                         cursor: 'pointer',
                       }}
                     />
-                  </a>
+                  </Link>
                 ) : (
                   <img
                     src={optimizeCloudinaryUrl(banner.imageUrl, {

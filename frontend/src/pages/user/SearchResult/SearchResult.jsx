@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { useLocation } from 'react-router-dom'
+import { useLocation, Link } from 'react-router-dom'
 import { getProducts } from '~/services/productService'
 import ProductCard from '~/components/ProductCards/ProductCards.jsx'
 import '~/assets/HomeCSS/Content.css'
@@ -11,7 +11,7 @@ import {
   styled,
   Pagination,
   Breadcrumbs,
-  Link,
+  Button,
   PaginationItem
 } from '@mui/material'
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward'
@@ -69,17 +69,17 @@ const sortOptions = [
   { value: '', label: 'Sản phẩm nổi bật' },
   { value: 'priceAsc', label: 'Giá tăng dần' },
   { value: 'priceDesc', label: 'Giá giảm dần' },
-  { value: 'nameAsc', label: 'Sản phẩm từ A-Z' },
-  { value: 'nameDesc', label: 'Sản phẩm từ Z-A' }
+  { value: 'nameDesc', label: 'Sản phẩm từ A-Z' },
+  { value: 'nameAsc', label: 'Sản phẩm từ Z-A' }
 ]
-
 const styles = {
   container: {
     margin: '0 auto',
     maxWidth: '96vw',
-    minHeight: '80vh',
+    minHeight: '100vh', // Đảm bảo luôn đủ chiều cao để có scrollbar
     fontFamily:
-      '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif'
+      '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
+    overflowY: 'auto' // Đảm bảo có scrollbar khi cần
   },
   header: {
     display: 'flex',
@@ -194,7 +194,7 @@ export default function SearchResults() {
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'auto' })
-  }, [])
+  }, [query])
 
   const handlePageChange = (event, value) => {
     setPage(value)
@@ -229,16 +229,19 @@ export default function SearchResults() {
           aria-label='breadcrumb'
           sx={{ p: 1 }}
         >
-          <Link
-            underline='hover'
-            href='/'
+          <Button
+            component={Link}
+            to='/'
             sx={{
               color: '#007bff',
-              '&:hover': { color: 'primary.main' }
+              textDecoration: 'none',
+              minWidth: 0,
+              p: 0,
+              '&:hover': { color: 'primary.main', background: 'none' }
             }}
           >
             Trang chủ
-          </Link>
+          </Button>
           <Typography sx={{ color: 'text.primary', fontWeight: 500 }}>
             Kết quả tìm kiếm
           </Typography>
@@ -264,7 +267,7 @@ export default function SearchResults() {
             </p>
           </Box>
 
-          <Box sx={{ flexShrink: 0, marginLeft: 'auto' }}>
+          <Box sx={{ flexShrink: 0, ml: 'auto' }}>
             <Box className='sort-dropdown-root' sx={{ position: 'relative' }}>
               <SortDropdownButton
                 onClick={() => setSortMenuOpen((open) => !open)}
@@ -342,7 +345,7 @@ export default function SearchResults() {
               ))}
             </div>
             <Box
-              sx={{ display: 'flex', justifyContent: 'center', mt: 4, mb: 3 }}
+              sx={{ display: 'flex', justifyContent: 'center', mt: 4, mb: 4 }}
             >
               <Pagination
                 count={totalPages}

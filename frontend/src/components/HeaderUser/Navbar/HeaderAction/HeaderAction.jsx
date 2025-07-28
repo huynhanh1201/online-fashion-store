@@ -10,7 +10,7 @@ import {
 import PersonIcon from '@mui/icons-material/Person'
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart'
 import CheckCircleIcon from '@mui/icons-material/CheckCircle'
-import { Link, useNavigate } from 'react-router-dom'
+import { useNavigate, Link } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import {
   logoutUserAPI,

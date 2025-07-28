@@ -49,37 +49,92 @@ export const getProducts = async (params = {}) => {
 export const getProductsByCategory = async (
   categoryId,
   page = 1,
-  limit = 10
+  limit = 10,
+  sort = ''
 ) => {
   try {
     if (typeof categoryId !== 'string' || !categoryId) {
       throw new Error('categoryId phải là chuỗi không rỗng')
     }
-    const url = `${API_ROOT}/v1/products/category/${categoryId}?page=${page}&limit=${limit}`
+    
+    const params = new URLSearchParams({
+      page: page.toString(),
+      limit: limit.toString()
+    })
+    
+    if (sort) {
+      params.append('sort', sort)
+    }
+    
+    const url = `${API_ROOT}/v1/products/category/${categoryId}?${params.toString()}`
     const response = await AuthorizedAxiosInstance.get(url)
     console.log(
       `API getProductsByCategory response (${categoryId}):`,
       response.data
     )
 
-    // Xử lý response là mảng trực tiếp hoặc object
-    let products = Array.isArray(response.data)
-      ? response.data
-      : response.data.products || response.data || []
+    // Backend đã trả về object với products, total, totalPages
+    const { products = [], total = 0, totalPages = 1, currentPage = 1 } = response.data
 
-    // Filter sản phẩm ở client-side: chỉ lấy status = active và destroy = false
-    products = products.filter(product =>
-      product.status === 'active' && product.destroy === false
-    )
-
-    const total = products.length
     return {
       products,
-      total
+      total,
+      totalPages,
+      currentPage
     }
   } catch (error) {
     console.error(`Lỗi khi lấy sản phẩm theo danh mục ${categoryId}:`, error)
-    return { products: [], total: 0 }
+    return { products: [], total: 0, totalPages: 1, currentPage: 1 }
+  }
+}
+
+// Lấy danh sách sản phẩm theo nhiều danh mục (parent + children)
+export const getProductsByMultipleCategories = async (
+  categoryIds,
+  page = 1,
+  limit = 10
+) => {
+  try {
+    if (!Array.isArray(categoryIds) || categoryIds.length === 0) {
+      throw new Error('categoryIds phải là mảng không rỗng')
+    }
+
+    // Lấy tất cả sản phẩm từ tất cả category (không phân trang ở API level)
+    const allPromises = categoryIds.map(categoryId => 
+      getProductsByCategory(categoryId, 1, 1000) // Lấy tất cả sản phẩm từ mỗi category
+    )
+
+    const allResults = await Promise.all(allPromises)
+    
+    // Merge tất cả sản phẩm và loại bỏ duplicate
+    const allProducts = []
+    const seenProductIds = new Set()
+    
+    allResults.forEach(result => {
+      result.products.forEach(product => {
+        if (!seenProductIds.has(product._id)) {
+          seenProductIds.add(product._id)
+          allProducts.push(product)
+        }
+      })
+    })
+
+    // Tính toán pagination cho toàn bộ danh sách
+    const total = allProducts.length
+    const totalPages = Math.ceil(total / limit)
+    const startIndex = (page - 1) * limit
+    const endIndex = startIndex + limit
+    const paginatedProducts = allProducts.slice(startIndex, endIndex)
+
+    return {
+      products: paginatedProducts,
+      total,
+      totalPages,
+      currentPage: page
+    }
+  } catch (error) {
+    console.error(`Lỗi khi lấy sản phẩm theo nhiều danh mục:`, error)
+    return { products: [], total: 0, totalPages: 1, currentPage: page }
   }
 }
 
@@ -92,14 +147,8 @@ export const getProductById = async (productId) => {
       `${API_ROOT}/v1/products/${productId}`
     )
 
-    const product = response.data || {}
-
-    // Filter sản phẩm ở client-side: chỉ lấy status = active và destroy = false
-    if (product.status !== 'active' || product.destroy === true) {
-      return {}
-    }
-
-    return product
+    // Backend đã filter destroy: false, không cần filter client-side
+    return response.data || {}
   } catch (error) {
     console.error('Lỗi khi lấy sản phẩm:', error.response?.data || error)
     return {}

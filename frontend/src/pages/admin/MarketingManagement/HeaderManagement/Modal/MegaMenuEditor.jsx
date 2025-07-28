@@ -564,26 +564,10 @@ const MegaMenuEditor = ({ open, onClose, onSuccess, initialData = null }) => {
           </Grid>
           <Grid item xs={12} sm={6}>
             <FormControl fullWidth>
-              <InputLabel>Chiều rộng cột</InputLabel>
-              <Select
-                value={megamenuSettings.columnWidth}
-                onChange={(e) =>
-                  setMegamenuSettings((prev) => ({
-                    ...prev,
-                    columnWidth: e.target.value
-                  }))
-                }
-                label='Chiều rộng cột'
-              >
-                <MenuItem value='auto'>Tự động</MenuItem>
-                <MenuItem value='200px'>200px</MenuItem>
-                <MenuItem value='250px'>250px</MenuItem>
-                <MenuItem value='300px'>300px</MenuItem>
-              </Select>
             </FormControl>
           </Grid>
           <Grid item xs={12} sm={6}>
-            <FormControlLabel
+            {/* <FormControlLabel
               control={
                 <Switch
                   checked={megamenuSettings.showIcons}
@@ -596,10 +580,10 @@ const MegaMenuEditor = ({ open, onClose, onSuccess, initialData = null }) => {
                 />
               }
               label='Hiển thị icon'
-            />
+            /> */}
           </Grid>
           <Grid item xs={12} sm={6}>
-            <FormControlLabel
+            {/* <FormControlLabel
               control={
                 <Switch
                   checked={megamenuSettings.showCategoryImages}
@@ -612,7 +596,7 @@ const MegaMenuEditor = ({ open, onClose, onSuccess, initialData = null }) => {
                 />
               }
               label='Hiển thị ảnh danh mục'
-            />
+            /> */}
           </Grid>
           <Grid item xs={12} sm={6}>
             <FormControlLabel

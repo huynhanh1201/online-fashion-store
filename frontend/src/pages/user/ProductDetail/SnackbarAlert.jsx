@@ -4,6 +4,7 @@ import ShoppingCartIcon from '@mui/icons-material/ShoppingCart'
 import { Link } from 'react-router-dom'
 import { optimizeCloudinaryUrl } from '~/utils/cloudinary'
 
+
 const SnackbarAlert = ({
   open,
   onClose,

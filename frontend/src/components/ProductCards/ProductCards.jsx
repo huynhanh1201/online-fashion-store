@@ -1,12 +1,7 @@
 import React from 'react'
 import { optimizeCloudinaryUrl } from '~/utils/cloudinary'
 import Sticker from '~/components/Sticker/Sticker'
-
-const Link = ({ to, children, ...props }) => (
-  <a href={to} {...props}>
-    {children}
-  </a>
-)
+import { Link } from 'react-router-dom'
 
 const ProductCard = ({ product, isFlashSale = false }) => {
   if (!product || !product.image) {

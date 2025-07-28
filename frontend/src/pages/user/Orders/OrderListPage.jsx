@@ -22,7 +22,6 @@ import {
   DialogContentText,
   Skeleton,
   Breadcrumbs,
-  Link
 } from '@mui/material'
 import {
   KeyboardArrowDown,
@@ -42,7 +41,7 @@ import ErrorIcon from '@mui/icons-material/Error'
 import { getOrders, getOrderItems } from '~/services/orderService'
 import { getVariantById } from '~/services/variantService'
 import { useOrder } from '~/hooks/useOrder'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, Link } from 'react-router-dom'
 import { useSelector, useDispatch } from 'react-redux'
 import { selectCurrentUser } from '~/redux/user/userSlice'
 import { useCart } from '~/hooks/useCarts'
@@ -848,8 +847,9 @@ const OrderListPage = () => {
     >
       <Box sx={{ mb: 2 }}>
         <Breadcrumbs separator={<NavigateNext fontSize="small" />} aria-label="breadcrumb">
-          <Link
-            underline="hover"
+          <Button
+            component={Link}
+            to="/"
             sx={{
               display: 'flex',
               alignItems: 'center',
@@ -858,10 +858,10 @@ const OrderListPage = () => {
               fontSize: { xs: '0.8rem', sm: '0.9rem' },
               '&:hover': { color: 'primary.main' }
             }}
-            href="/"
           >
+            <ShoppingBag sx={{ fontSize: { xs: 16, sm: 18 }, mr: 0.5 }} />
             Trang chủ
-          </Link>
+          </Button>
           <Typography
             sx={{
               display: 'flex',

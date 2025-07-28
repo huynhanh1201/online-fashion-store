@@ -118,6 +118,7 @@ import { useEffect, useState } from 'react'
 import { Button } from '@mui/material'
 import ProductCard from '~/components/ProductCards/ProductCards'
 import { getProducts, getProductsByCategory } from '~/services/productService'
+import { Link } from 'react-router-dom'
 
 const RelatedProductSection = ({ categoryId, currentProductId }) => {
   const [relatedProducts, setRelatedProducts] = useState([])
