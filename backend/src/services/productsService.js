@@ -98,7 +98,8 @@ const getProductList = async (reqQuery) => {
       filterTypeDate,
       startDate,
       endDate,
-      destroy
+      destroy,
+      label
     } = reqQuery
 
     validatePagination(page, limit)
@@ -111,6 +112,8 @@ const getProductList = async (reqQuery) => {
 
       filter.destroy = destroy
     }
+
+    if (label) filter.label = label
 
     if (status) filter.status = status
 
