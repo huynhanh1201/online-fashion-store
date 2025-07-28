@@ -17,7 +17,7 @@ import {
 } from '@mui/material'
 import NavigateNext from '@mui/icons-material/NavigateNext'
 import { getCategoryBySlug } from '~/services/categoryService'
-import { getProducts } from '~/services/productService'
+import { getProductsByCategory } from '~/services/productService'
 import ProductCard from '~/components/ProductCards/ProductCards'
 import { optimizeCloudinaryUrl } from '~/utils/cloudinary.js'
 import { addToCart, getCart } from '~/services/cartService'
@@ -137,34 +137,32 @@ const CategoryPage = () => {
         nameAsc: 'name_asc',
         nameDesc: 'name_desc',
         priceAsc: 'price_asc',
-        priceDesc: 'price_desc'
+        priceDesc: 'price_desc',
+        featured: 'newest'
       }
 
-      const params = {
-        page: Number(page),
-        limit: Number(ITEMS_PER_PAGE),
-        sort: backendSortMap[sortOption] || 'newest',
-        // Add category filter
-        categoryId: category._id
-      }
+      const sortParam = backendSortMap[sortOption] || 'newest'
 
-      console.log('Fetching products with params:', params)
-
-      const response = await getProducts(params)
+      const response = await getProductsByCategory(
+        category._id,
+        Number(page),
+        Number(ITEMS_PER_PAGE),
+        sortParam
+      )
       console.log('API Response:', response)
 
       const fetchedProducts = response.products || []
-      const total = response.total || fetchedProducts.length
-      const calculatedTotalPages = Math.ceil(total / ITEMS_PER_PAGE) || 1
+      const total = response.total || 0
+      const totalPages = response.totalPages || 1
 
       if (!Array.isArray(fetchedProducts)) {
         console.error('Products không phải là array:', fetchedProducts)
         throw new Error('Dữ liệu sản phẩm không hợp lệ')
       }
 
-      // Backend đã xử lý sorting và filtering, không cần client-side processing
+      // Backend đã xử lý sorting, không cần client-side processing
       setProducts(fetchedProducts)
-      setTotalPages(calculatedTotalPages)
+      setTotalPages(totalPages)
     } catch (err) {
       console.error('Lỗi khi tải sản phẩm:', err)
       setError('Có lỗi xảy ra khi tải sản phẩm')
@@ -225,7 +223,9 @@ const CategoryPage = () => {
     setPage(value)
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
-
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'auto' })
+  }, [])
   useEffect(() => {
     if (!sortMenuOpen) return
     const handleClick = (e) => {
@@ -296,12 +296,15 @@ const CategoryPage = () => {
         sx={{ px: 3, py: 1, mb: 2 }}
       >
         <Link
-          underline='hover'
+          component={Link}
+          to='/'
           sx={{
             display: 'flex',
             alignItems: 'center',
             color: '#007bff',
             textDecoration: 'none',
+            minWidth: 0,
+            p: 0,
             '&:hover': {
               color: 'primary.main'
             },
