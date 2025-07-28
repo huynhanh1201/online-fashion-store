@@ -1,4 +1,4 @@
-let apiRoot = ''
+let apiRoot = 'https://sunny-rhino-partly.ngrok-free.app'
 
 if (process.env.BUILD_MODE === 'dev') {
   apiRoot = 'https://sunny-rhino-partly.ngrok-free.app'
