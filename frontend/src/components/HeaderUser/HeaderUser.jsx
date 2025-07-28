@@ -139,7 +139,7 @@ const HeaderUser = () => {
                   minWidth: { xl: 0, lg: '45%' }
                 }}
               >
-                <Search onclose={handleDrawerToggle} />
+                <Search onclose={handleDrawerToggle} mobileOpen={mobileOpen} />
               </Box>
 
               {/* Auth Buttons */}

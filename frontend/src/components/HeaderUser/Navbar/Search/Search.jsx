@@ -317,7 +317,7 @@ const StyledListItem = styled(ListItem)({
   }
 })
 
-const Search = ({ onclose }) => {
+const Search = ({ onclose, mobileOpen }) => {
   const wrapperRef = useRef(null)
   const location = useLocation()
   const [showSuggestions, setShowSuggestions] = useState(false)
@@ -329,12 +329,13 @@ const Search = ({ onclose }) => {
   const navigate = useNavigate()
 
   useEffect(() => {
-    // Reset toàn bộ khi route thay đổi
-    setSearchText('')
-    setSuggestions([])
-    setShowSuggestions(false)
-    setErrorMessage('')
-    document.body.style.overflow = ''
+    if (location.pathname !== '/searchresult') {
+      setSearchText('')
+      setSuggestions([])
+      setShowSuggestions(false)
+      setErrorMessage('')
+      document.body.style.overflow = ''
+    }
   }, [location.pathname])
 
   useEffect(() => {
@@ -408,21 +409,31 @@ const Search = ({ onclose }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault()
-    if (searchText.trim()) {
-      navigate(`/searchresult?search=${encodeURIComponent(searchText.trim())}`)
-      setSuggestions([])
-      setErrorMessage('')
-      onclose()
+    const trimmed = searchText.trim()
+    if (trimmed) {
+      const nextUrl = `/searchresult?search=${encodeURIComponent(trimmed)}`
+      const currentUrl = location.pathname + location.search
+      if (nextUrl !== currentUrl) {
+        navigate(nextUrl)
+        setSuggestions([])
+        setErrorMessage('')
+        if (mobileOpen) onclose?.()
+      }
     }
     document.body.style.overflow = 'auto'
   }
 
   const handleSuggestionClick = (id) => {
-    setSearchText('')
-    navigate(`/productdetail/${id}`)
-    setSuggestions([])
-    setShowSuggestions(false)
-    onclose()
+    const nextUrl = `/productdetail/${id}`
+    const currentUrl = location.pathname + location.search
+
+    if (nextUrl !== currentUrl) {
+      setSearchText('')
+      navigate(nextUrl)
+      setSuggestions([])
+      setShowSuggestions(false)
+      if (mobileOpen) onclose?.()
+    }
   }
 
   return (
