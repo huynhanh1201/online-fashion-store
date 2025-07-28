@@ -21,9 +21,8 @@ import {
   DialogActions,
   DialogContentText,
   Breadcrumbs,
-  Link
 } from '@mui/material'
-import { useParams, useNavigate } from 'react-router-dom'
+import { useParams, useNavigate, Link } from 'react-router-dom'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack'
 import { Cancel, Warning, Replay, NavigateNext } from '@mui/icons-material'
 import { useOrderDetail } from '~/hooks/useOrderDetail'
@@ -624,8 +623,9 @@ const OrderDetail = () => {
           separator={<NavigateNext fontSize='small' />}
           aria-label='breadcrumb'
         >
-          <Link
-            underline='hover'
+          <Button
+            component={Link}
+            to='/'
             sx={{
               display: 'flex',
               alignItems: 'center',
@@ -634,12 +634,13 @@ const OrderDetail = () => {
               fontSize: { xs: '0.8rem', sm: '0.9rem' },
               '&:hover': { color: 'primary.main' }
             }}
-            href='/'
           >
+            <ArrowBackIcon fontSize='small' />
             Trang chủ
-          </Link>
-          <Link
-            underline='hover'
+          </Button>
+          <Button
+            component={Link}
+            to='/orders'
             sx={{
               display: 'flex',
               alignItems: 'center',
@@ -648,10 +649,10 @@ const OrderDetail = () => {
               fontSize: { xs: '0.8rem', sm: '0.9rem' },
               '&:hover': { color: 'primary.main' }
             }}
-            href='/orders'
           >
+            <NavigateNext fontSize='small' />
             Đơn hàng
-          </Link>
+          </Button>
           <Typography
             sx={{
               display: 'flex',

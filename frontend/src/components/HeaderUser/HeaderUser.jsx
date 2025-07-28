@@ -18,6 +18,7 @@ import MobileDrawer from './Navbar/MobileDrawer/MobileDrawer'
 import Topbar from '../HeaderUser/Topbar/Topbar'
 import Menu from './Navbar/Menu/Menu'
 import AuthButtons from './Navbar/AuthButtons/AuthButtons'
+import { Link } from 'react-router-dom'
 
 const StyledAppBar = styled(AppBar)(({ theme }) => ({
   background:
@@ -99,7 +100,7 @@ const HeaderUser = () => {
                   textOverflow: 'ellipsis'
                 }}
               >
-                <Logo href='/'>Logo</Logo>
+                <Logo component={Link} to='/'>Logo</Logo>
               </Typography>
             </Box>
 

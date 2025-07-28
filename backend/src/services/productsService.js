@@ -8,7 +8,6 @@ import generateSequentialCode from '~/utils/generateSequentialCode'
 import { VariantModel } from '~/models/VariantModel'
 import validatePagination from '~/utils/validatePagination'
 import getDateRange from '~/utils/getDateRange'
-import dayjs from 'dayjs'
 
 const createProduct = async (reqBody) => {
   // eslint-disable-next-line no-useless-catch
@@ -83,9 +82,6 @@ const createProduct = async (reqBody) => {
 const getProductList = async (reqQuery) => {
   // eslint-disable-next-line no-useless-catch
   try {
-    // Cập nhật label mới cho sản phẩm
-    await updateLabelProductAll()
-
     let {
       page = 1,
       limit = 10,
@@ -99,7 +95,7 @@ const getProductList = async (reqQuery) => {
       startDate,
       endDate,
       destroy,
-      label
+      sortPrice
     } = reqQuery
 
     validatePagination(page, limit)
@@ -112,8 +108,6 @@ const getProductList = async (reqQuery) => {
 
       filter.destroy = destroy
     }
-
-    if (label) filter.label = label
 
     if (status) filter.status = status
 
@@ -250,7 +244,8 @@ const getProduct = async (productId) => {
   try {
     const result = await ProductModel.findById({
       _id: productId,
-      destroy: false
+      destroy: false,
+      status: 'active'
     })
       .populate({
         path: 'categoryId',
@@ -322,14 +317,40 @@ const deleteProduct = async (productId) => {
   }
 }
 
-const getListProductOfCategory = async (categoryId) => {
+const getListProductOfCategory = async (categoryId, options = {}) => {
   // eslint-disable-next-line no-useless-catch
   try {
-    const ListProduct = await ProductModel.aggregate([
+    const { page = 1, limit = 10, sort } = options
+    const skip = (page - 1) * limit
+
+    // Get total count first
+    const totalCount = await ProductModel.countDocuments({
+      categoryId: new mongoose.Types.ObjectId(categoryId),
+      destroy: false,
+      status: 'active'
+    })
+
+    // Define sort options
+    const sortMap = {
+      name_asc: { name: 1 },
+      name_desc: { name: -1 },
+      newest: { createdAt: -1 },
+      oldest: { createdAt: 1 },
+      price_desc: { exportPrice: -1 },
+      price_asc: { exportPrice: 1 }
+    }
+
+    let sortField = {}
+    if (sort && sortMap[sort]) {
+      sortField = sortMap[sort]
+    }
+
+    const aggregationPipeline = [
       {
         $match: {
           categoryId: new mongoose.Types.ObjectId(categoryId),
-          destroy: false
+          destroy: false,
+          status: 'active'
         }
       },
       {
@@ -357,9 +378,26 @@ const getListProductOfCategory = async (categoryId) => {
           }
         }
       }
-    ])
+    ]
 
-    return ListProduct
+    // Add sort stage if specified
+    if (Object.keys(sortField).length > 0) {
+      aggregationPipeline.push({ $sort: sortField })
+    }
+
+    aggregationPipeline.push(
+      { $skip: skip },
+      { $limit: parseInt(limit) }
+    )
+
+    const ListProduct = await ProductModel.aggregate(aggregationPipeline)
+
+    return {
+      products: ListProduct,
+      total: totalCount,
+      totalPages: Math.ceil(totalCount / limit),
+      currentPage: parseInt(page)
+    }
   } catch (err) {
     throw err
   }
@@ -401,22 +439,6 @@ const restoreProduct = async (productId) => {
   } catch (err) {
     throw err
   }
-}
-
-const updateLabelProductAll = async () => {
-  const sevenDaysAgo = dayjs().subtract(7, 'day').toDate()
-
-  // Gán label 'new' cho sản phẩm tạo trong 7 ngày gần đây
-  await ProductModel.updateMany(
-    { createdAt: { $gte: sevenDaysAgo } },
-    { $set: { label: 'new' } }
-  )
-
-  // Gỡ label 'new' cho sản phẩm đã quá 7 ngày
-  await ProductModel.updateMany(
-    { createdAt: { $lt: sevenDaysAgo }, label: 'new' },
-    { $unset: { label: '' } }
-  )
 }
 
 export const productsService = {

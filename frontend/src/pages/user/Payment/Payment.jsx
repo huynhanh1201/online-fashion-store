@@ -23,7 +23,6 @@ import {
   Paper,
   Chip,
   Breadcrumbs,
-  Link,
 } from '@mui/material'
 import { NavigateNext } from '@mui/icons-material'
 import { styled } from '@mui/system'
@@ -34,7 +33,7 @@ import { useCart } from '~/hooks/useCarts'
 import { useOrder } from '~/hooks/useOrder'
 import { useSelector, useDispatch } from 'react-redux'
 import { clearTempCart, clearAppliedCoupon } from '~/redux/cart/cartSlice'
-import { useLocation, useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate, Link } from 'react-router-dom'
 import CouponItem from '~/components/Coupon/CouponItem'
 import { getDiscounts } from '~/services/discountService'
 import { optimizeCloudinaryUrl } from '~/utils/cloudinary'
@@ -902,8 +901,9 @@ const Payment = () => {
         aria-label='breadcrumb'
         sx={{ mb: 3 }}
       >
-        <Link
-          underline='hover'
+        <Button
+          component={Link}
+          to='/'
           sx={{
             display: 'flex',
             alignItems: 'center',
@@ -914,12 +914,12 @@ const Payment = () => {
               color: 'primary.main'
             }
           }}
-          href='/'
         >
           Trang chủ
-        </Link>
-        <Link
-          underline='hover'
+        </Button>
+        <Button
+          component={Link}
+          to={`/cart`}
           sx={{
             display: 'flex',
             alignItems: 'center',
@@ -930,10 +930,9 @@ const Payment = () => {
               color: 'primary.main'
             }
           }}
-          href={`/cart`}
         >
           Giỏ hàng
-        </Link>
+        </Button>
         <Typography
           sx={{
             display: 'flex',

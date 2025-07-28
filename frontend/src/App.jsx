@@ -122,6 +122,7 @@ function App() {
         <Route path='blog' element={<Blog />} />
         <Route path='/blog/:blogId' element={<BlogDetail />} />
         <Route path='/category/:slug' element={<CategoryPage />} />
+        <Route path='searchresult' element={<SearchResult />} />
 
         <Route
           path='productbycategory/:categoryId'
