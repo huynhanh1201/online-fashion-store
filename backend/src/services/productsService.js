@@ -406,9 +406,16 @@ const restoreProduct = async (productId) => {
 const updateLabelProductAll = async () => {
   const sevenDaysAgo = dayjs().subtract(7, 'day').toDate()
 
+  // Gán label 'new' cho sản phẩm tạo trong 7 ngày gần đây
   await ProductModel.updateMany(
     { createdAt: { $gte: sevenDaysAgo } },
     { $set: { label: 'new' } }
+  )
+
+  // Gỡ label 'new' cho sản phẩm đã quá 7 ngày
+  await ProductModel.updateMany(
+    { createdAt: { $lt: sevenDaysAgo }, label: 'new' },
+    { $unset: { label: '' } }
   )
 }
 
