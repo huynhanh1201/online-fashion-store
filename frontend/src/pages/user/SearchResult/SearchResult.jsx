@@ -260,16 +260,26 @@ export default function SearchResults() {
         </Breadcrumbs>
       </Box>
       <main style={{ padding: '0 1.5rem' }}>
-        <div style={styles.header}>
-          <div style={styles.resultsHeader}>
+        <Box
+          sx={{
+            display: 'flex',
+            flexWrap: 'wrap',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            gap: 2,
+            mb: 4
+          }}
+        >
+          <Box sx={{ flex: '1 1 auto', minWidth: 0 }}>
             <h2 style={styles.resultsTitle}>
               Kết quả tìm kiếm cho: "{query || 'Tất cả'}"
             </h2>
             <p style={styles.resultsCount}>
               Tìm thấy {filteredProducts.length} sản phẩm phù hợp
             </p>
-          </div>
-          <div style={styles.sortContainer}>
+          </Box>
+
+          <Box sx={{ flexShrink: 0, ml: 'auto' }}>
             <Box className='sort-dropdown-root' sx={{ position: 'relative' }}>
               <SortDropdownButton
                 onClick={() => setSortMenuOpen((open) => !open)}
@@ -298,6 +308,7 @@ export default function SearchResults() {
                   <ArrowDownwardIcon sx={{ fontSize: 20 }} />
                 </Box>
               </SortDropdownButton>
+
               {sortMenuOpen && (
                 <SortMenu>
                   {sortOptions.map((opt) => (
@@ -320,8 +331,8 @@ export default function SearchResults() {
                 </SortMenu>
               )}
             </Box>
-          </div>
-        </div>
+          </Box>
+        </Box>
 
         {loading ? (
           <Box sx={{ textAlign: 'center', mt: 10 }}>

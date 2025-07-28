@@ -61,7 +61,8 @@ const HeaderUser = () => {
               minHeight: { xs: 56, sm: 64, md: 72 },
               width: '100%',
               position: 'relative',
-              overflow: 'visible'
+              overflow: 'visible',
+              py: { xs: 1.5, sm: 1.5, md: 1 }
             }}
           >
             {/* Left Section - Logo & Menu Button */}
@@ -100,7 +101,9 @@ const HeaderUser = () => {
                   textOverflow: 'ellipsis'
                 }}
               >
-                <Logo component={Link} to='/'>Logo</Logo>
+                <Logo component={Link} to='/'>
+                  Logo
+                </Logo>
               </Typography>
             </Box>
 
@@ -140,7 +143,7 @@ const HeaderUser = () => {
                   minWidth: { xl: 0, lg: '45%' }
                 }}
               >
-                <Search onclose={handleDrawerToggle} />
+                <Search onclose={handleDrawerToggle} mobileOpen={mobileOpen} />
               </Box>
 
               {/* Auth Buttons */}
