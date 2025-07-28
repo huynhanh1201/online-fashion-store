@@ -121,22 +121,22 @@ const ReviewButtonComponent = ({
         px: { xs: 1.5, sm: 2 },
         ...(isReviewed
           ? {
-              color: 'var(--primary-color)',
-              borderColor: 'var(--primary-color)',
-              '&:hover': {
-                color: '#fff',
-                backgroundColor: 'var(--accent-color)',
-                borderColor: 'var(--primary-color)'
-              }
-            }
-          : {
-              backgroundColor: 'var(--primary-color)',
+            color: 'var(--primary-color)',
+            borderColor: 'var(--primary-color)',
+            '&:hover': {
               color: '#fff',
-              '&:hover': {
-                backgroundColor: 'var(--accent-color)',
-                boxShadow: '0 4px 12px rgba(26, 60, 123, 0.3)'
-              }
-            })
+              backgroundColor: 'var(--accent-color)',
+              borderColor: 'var(--primary-color)'
+            }
+          }
+          : {
+            backgroundColor: 'var(--primary-color)',
+            color: '#fff',
+            '&:hover': {
+              backgroundColor: 'var(--accent-color)',
+              boxShadow: '0 4px 12px rgba(26, 60, 123, 0.3)'
+            }
+          })
       }}
       onClick={(e) => {
         e.stopPropagation()
@@ -318,7 +318,7 @@ const OrderDetail = () => {
           return (
             reviewOrderId === currentOrderId &&
             (reviewProductId?.toString() || reviewProductId) ===
-              currentProductId
+            currentProductId
           )
         })
       return hasReviewForThisOrder
@@ -607,7 +607,7 @@ const OrderDetail = () => {
     <Box
       sx={{
         width: '100%',
-        maxWidth: { xs: '100vw', sm: '96vw', md: '1800px' },
+        maxWidth: { xs: '100vw', sm: '96vw', md: '96vw' },
         margin: '0 auto',
         p: { xs: 1, sm: 2, md: 3 },
         minHeight: '70vh'
@@ -616,7 +616,7 @@ const OrderDetail = () => {
       {/* Breadcrumb */}
       <Box
         sx={{
-          px: { xs: 1, sm: 2, md: 3 },
+          px: 1,
           mb: 2
         }}
       >
@@ -631,10 +631,14 @@ const OrderDetail = () => {
               alignItems: 'center',
               color: '#007bff',
               textDecoration: 'none',
-              fontSize: { xs: '0.8rem', sm: '0.9rem' },
-              '&:hover': { color: 'primary.main' }
+              '&:hover': {
+                color: 'primary.main'
+              },
+              cursor: 'pointer'
             }}
-            href='/'
+            onClick={() => navigate('/')}
+          // component={Link}
+          // to='/product'
           >
             Trang chủ
           </Link>
@@ -645,20 +649,23 @@ const OrderDetail = () => {
               alignItems: 'center',
               color: '#007bff',
               textDecoration: 'none',
-              fontSize: { xs: '0.8rem', sm: '0.9rem' },
-              '&:hover': { color: 'primary.main' }
+              '&:hover': {
+                color: 'primary.main'
+              },
+              cursor: 'pointer'
             }}
-            href='/orders'
+            onClick={() => navigate('/orders')}
+          // component={Link}
+          // to='/product'
           >
-            Đơn hàng
+           Đơn hàng
           </Link>
           <Typography
             sx={{
               display: 'flex',
               alignItems: 'center',
               color: 'text.primary',
-              fontWeight: 500,
-              fontSize: { xs: '0.8rem', sm: '0.9rem' }
+              fontWeight: 500
             }}
           >
             Chi tiết đơn hàng
@@ -1091,64 +1098,64 @@ const OrderDetail = () => {
       {(order?.status === 'Delivered' ||
         order?.status === 'Failed' ||
         order?.status === 'Cancelled') && (
-        <Card
-          sx={{
-            mt: 2,
-            px: { xs: 1.5, sm: 2, md: 3 },
-            borderRadius: 3,
-            boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
-            border: '1px solid rgba(26, 60, 123, 0.2)'
-          }}
-        >
-          <CardContent>
-            <Box
-              display='flex'
-              justifyContent='space-between'
-              alignItems='center'
-              flexDirection={{ xs: 'column', sm: 'row' }}
-              gap={1}
-            >
-              <Box textAlign={{ xs: 'center', sm: 'left' }}>
-                <Typography
-                  variant='h6'
-                  fontWeight='600'
-                  color='var(--primary-color)'
-                  sx={{ fontSize: { xs: '1rem', sm: '1.25rem' } }}
-                >
-                  Mua lại đơn hàng
-                </Typography>
-                <Typography
-                  variant='body2'
-                  color='text.secondary'
-                  sx={{ fontSize: { xs: '0.75rem', sm: '0.875rem' } }}
-                >
-                  Thêm tất cả sản phẩm từ đơn hàng này vào giỏ hàng
-                </Typography>
-              </Box>
-              <Button
-                startIcon={
-                  reorderLoading ? <CircularProgress size={16} /> : <Replay />
-                }
-                disabled={reorderLoading}
-                onClick={handleReorder}
-                sx={{
-                  color: 'var(--primary-color)',
-                  borderRadius: 2,
-                  textTransform: 'none',
-                  fontWeight: 600,
-                  fontSize: { xs: '0.75rem', sm: '0.875rem' },
-                  px: { xs: 1.5, sm: 2 },
-                  width: { xs: '100%', sm: 'auto' },
-                  boxShadow: '0 4px 12px rgba(25, 118, 210, 0.3)',
-                  opacity: reorderLoading ? 0.7 : 1
-                }}
+          <Card
+            sx={{
+              mt: 2,
+              px: { xs: 1.5, sm: 2, md: 3 },
+              borderRadius: 3,
+              boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
+              border: '1px solid rgba(26, 60, 123, 0.2)'
+            }}
+          >
+            <CardContent>
+              <Box
+                display='flex'
+                justifyContent='space-between'
+                alignItems='center'
+                flexDirection={{ xs: 'column', sm: 'row' }}
+                gap={1}
               >
-                {reorderLoading ? 'Đang thêm vào giỏ...' : 'Mua lại'}
-              </Button>
-            </Box>
-          </CardContent>
-        </Card>
-      )}
+                <Box textAlign={{ xs: 'center', sm: 'left' }}>
+                  <Typography
+                    variant='h6'
+                    fontWeight='600'
+                    color='var(--primary-color)'
+                    sx={{ fontSize: { xs: '1rem', sm: '1.25rem' } }}
+                  >
+                    Mua lại đơn hàng
+                  </Typography>
+                  <Typography
+                    variant='body2'
+                    color='text.secondary'
+                    sx={{ fontSize: { xs: '0.75rem', sm: '0.875rem' } }}
+                  >
+                    Thêm tất cả sản phẩm từ đơn hàng này vào giỏ hàng
+                  </Typography>
+                </Box>
+                <Button
+                  startIcon={
+                    reorderLoading ? <CircularProgress size={16} /> : <Replay />
+                  }
+                  disabled={reorderLoading}
+                  onClick={handleReorder}
+                  sx={{
+                    color: 'var(--primary-color)',
+                    borderRadius: 2,
+                    textTransform: 'none',
+                    fontWeight: 600,
+                    fontSize: { xs: '0.75rem', sm: '0.875rem' },
+                    px: { xs: 1.5, sm: 2 },
+                    width: { xs: '100%', sm: 'auto' },
+                    boxShadow: '0 4px 12px rgba(25, 118, 210, 0.3)',
+                    opacity: reorderLoading ? 0.7 : 1
+                  }}
+                >
+                  {reorderLoading ? 'Đang thêm vào giỏ...' : 'Mua lại'}
+                </Button>
+              </Box>
+            </CardContent>
+          </Card>
+        )}
 
       {/* Enhanced Snackbar */}
       <Snackbar

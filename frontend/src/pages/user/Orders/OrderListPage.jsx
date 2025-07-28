@@ -811,7 +811,7 @@ const OrderListPage = () => {
         maxWidth={false}
         sx={{
           width: '100%',
-          maxWidth: { xs: '100vw', sm: '96vw', md: '1800px' },
+          maxWidth: { xs: '95vw', sm: '96vw', md: '96vw' },
           margin: '0 auto',
           py: { xs: 2, sm: 3, md: 4 }
         }}
@@ -835,7 +835,7 @@ const OrderListPage = () => {
       maxWidth={false}
       sx={{
         width: '100%',
-        maxWidth: { xs: '100vw', sm: '96vw', md: '1800px' },
+        maxWidth: { xs: '100vw', sm: '96vw', md: '96vw' },
         margin: '0 auto',
         py: { xs: 2, sm: 3, md: 4 },
         minHeight: '70vh',
@@ -847,18 +847,25 @@ const OrderListPage = () => {
       }}
     >
       <Box sx={{ mb: 2 }}>
-        <Breadcrumbs separator={<NavigateNext fontSize="small" />} aria-label="breadcrumb">
+        <Breadcrumbs
+          separator={<NavigateNext fontSize='small' />}
+          aria-label='breadcrumb'
+        >
           <Link
-            underline="hover"
+            underline='hover'
             sx={{
               display: 'flex',
               alignItems: 'center',
               color: '#007bff',
               textDecoration: 'none',
-              fontSize: { xs: '0.8rem', sm: '0.9rem' },
-              '&:hover': { color: 'primary.main' }
+              '&:hover': {
+                color: 'primary.main'
+              },
+              cursor: 'pointer'
             }}
-            href="/"
+            onClick={() => navigate('/')}
+          // component={Link}
+          // to='/product'
           >
             Trang chủ
           </Link>
@@ -867,8 +874,7 @@ const OrderListPage = () => {
               display: 'flex',
               alignItems: 'center',
               color: 'text.primary',
-              fontWeight: 500,
-              fontSize: { xs: '0.8rem', sm: '0.9rem' }
+              fontWeight: 500
             }}
           >
             Đơn hàng

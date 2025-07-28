@@ -18,11 +18,12 @@ import { useDispatch } from 'react-redux'
 import { setCartItems } from '~/redux/cart/cartSlice'
 import ProductCard from '~/components/ProductCards/ProductCards'
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward'
-import NavigateNextIcon from '@mui/icons-material/NavigateNext'
+import NavigateNext from '@mui/icons-material/NavigateNext'
 import { getProducts } from '~/services/productService'
 import ProductCategories from './ProductCategories/ProductCategories'
 import { getBanners } from '~/services/admin/webConfig/bannerService.js'
 import { optimizeCloudinaryUrl } from '~/utils/cloudinary.js'
+import { useNavigate } from 'react-router-dom'
 
 const ITEMS_PER_PAGE = 15
 
@@ -111,6 +112,7 @@ const Product = () => {
   const [sortMenuOpen, setSortMenuOpen] = useState(false)
   const [productBanner, setProductBanner] = useState(null)
   const [bannerLoading, setBannerLoading] = useState(true)
+  const navigate = useNavigate()
 
   // Fetch product banner
   useEffect(() => {
@@ -277,9 +279,8 @@ const Product = () => {
         }}
       >
         <Breadcrumbs
-          separator={<NavigateNextIcon fontSize='small' />}
+          separator={<NavigateNext fontSize='small' />}
           aria-label='breadcrumb'
-          sx={{ my: 1 }}
         >
           <Link
             underline='hover'
@@ -290,9 +291,12 @@ const Product = () => {
               textDecoration: 'none',
               '&:hover': {
                 color: 'primary.main'
-              }
+              },
+              cursor: 'pointer'
             }}
-            href='/'
+            onClick={() => navigate('/')}
+          // component={Link}
+          // to='/product'
           >
             Trang chủ
           </Link>

@@ -899,8 +899,8 @@ const Payment = () => {
     <StyledContainer maxWidth={false}>
       <Breadcrumbs
         separator={<NavigateNext fontSize='small' />}
+        sx={{ mb: 2 }}
         aria-label='breadcrumb'
-        sx={{ mb: 3 }}
       >
         <Link
           underline='hover'
@@ -909,12 +909,14 @@ const Payment = () => {
             alignItems: 'center',
             color: '#007bff',
             textDecoration: 'none',
-            fontSize: { xs: '0.85rem', sm: '0.95rem' },
             '&:hover': {
               color: 'primary.main'
-            }
+            },
+            cursor: 'pointer',
           }}
-          href='/'
+          onClick={() => navigate('/')}
+        // component={Link}
+        // to='/product'
         >
           Trang chủ
         </Link>
@@ -925,12 +927,14 @@ const Payment = () => {
             alignItems: 'center',
             color: '#007bff',
             textDecoration: 'none',
-            fontSize: { xs: '0.85rem', sm: '0.95rem' },
             '&:hover': {
               color: 'primary.main'
-            }
+            },
+            cursor: 'pointer'
           }}
-          href={`/cart`}
+          onClick={() => navigate('/cart')}
+        // component={Link}
+        // to='/product'
         >
           Giỏ hàng
         </Link>
@@ -939,11 +943,10 @@ const Payment = () => {
             display: 'flex',
             alignItems: 'center',
             color: 'text.primary',
-            fontWeight: 500,
-            fontSize: { xs: '0.85rem', sm: '0.95rem' }
+            fontWeight: 500
           }}
         >
-          Thanh toán đơn hàng
+          Thanh toán
         </Typography>
       </Breadcrumbs>
       {cartLoading ? (

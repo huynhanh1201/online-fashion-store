@@ -222,9 +222,9 @@ const Cart = () => {
     const newSelected = allSelected
       ? []
       : selectableItems.map((item) => ({
-          variantId: item.variant?._id || item.variantId?._id || item.variantId,
-          quantity: item.quantity
-        }))
+        variantId: item.variant?._id || item.variantId?._id || item.variantId,
+        quantity: item.quantity
+      }))
 
     setSelectedItems(newSelected)
     dispatch(setSelectedItemsAction(newSelected))
@@ -627,13 +627,16 @@ const Cart = () => {
               textDecoration: 'none',
               '&:hover': {
                 color: 'primary.main'
-              }
+              },
+              cursor: 'pointer'
             }}
-            href='/'
+            onClick={() => navigate('/')}
+          // component={Link}
+          // to='/product'
           >
-            Trang chủ
+           Trang chủ
           </Link>
-          <Button
+          <Link
             underline='hover'
             sx={{
               display: 'flex',
@@ -642,14 +645,15 @@ const Cart = () => {
               textDecoration: 'none',
               '&:hover': {
                 color: 'primary.main'
-              }
+              },
+              cursor: 'pointer'
             }}
             onClick={() => navigate('/product')}
-            // component={Link}
-            // to='/product'
+          // component={Link}
+          // to='/product'
           >
             Sản phẩm
-          </Button>
+          </Link>
           <Typography
             sx={{
               display: 'flex',
@@ -1039,7 +1043,7 @@ const Cart = () => {
                             flexWrap='wrap'
                           >
                             {variant.discountPrice &&
-                            variant.discountPrice > 0 ? (
+                              variant.discountPrice > 0 ? (
                               <>
                                 <Typography
                                   sx={{

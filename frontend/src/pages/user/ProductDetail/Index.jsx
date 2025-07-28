@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
-import { Container, Grid, Typography, Button, Box } from '@mui/material'
-import { useParams, Link } from 'react-router-dom'
+import { Container, Grid, Typography, Button, Box, Link } from '@mui/material'
+import { useParams } from 'react-router-dom'
 import useProductDetail from '~/hooks/useProductDetail'
 import ProductImageSection from './ProductImageSection'
 import ProductInfoSection from './ProductInfoSection'
@@ -11,15 +11,15 @@ import RelatedProducts from './RelatedProducts'
 import { getCategoryById } from '~/services/categoryService'
 import Breadcrumbs from '@mui/material/Breadcrumbs'
 // import { Link } from '@mui/material'
-import NavigateNextIcon from '@mui/icons-material/NavigateNext'
+import NavigateNext from '@mui/icons-material/NavigateNext'
 
 import { useNavigate } from 'react-router-dom'
 const ProductDetail = () => {
   const { productId } = useParams()
   const [isViewingThumbnails, setIsViewingThumbnails] = useState(false)
   const [category, setCategory] = useState(null)
-
   const navigate = useNavigate()
+
 
   const {
     product,
@@ -126,7 +126,7 @@ const ProductDetail = () => {
         }}
       >
         <Breadcrumbs
-          separator={<NavigateNextIcon fontSize='small' />}
+          separator={<NavigateNext fontSize='small' />}
           aria-label='breadcrumb'
         >
           <Link
@@ -138,13 +138,17 @@ const ProductDetail = () => {
               textDecoration: 'none',
               '&:hover': {
                 color: 'primary.main'
-              }
+              },
+              cursor: 'pointer'
             }}
-            to='/'
+            onClick={() => navigate('/')}
+          // component={Link}
+          // to='/product'
           >
             Trang chủ
           </Link>
-          <Button
+          <Link
+            underline='hover'
             sx={{
               display: 'flex',
               alignItems: 'center',
@@ -152,28 +156,14 @@ const ProductDetail = () => {
               textDecoration: 'none',
               '&:hover': {
                 color: 'primary.main'
-              }
+              },
+              cursor: 'pointer'
             }}
-            onClick={() => {
-              navigate('/product')
-            }}
-            // href='/product'
+            onClick={() => navigate('/product')}
+          // component={Link}
+          // to='/product'
           >
             Sản phẩm
-          </Button>
-          <Link
-            sx={{
-              display: 'flex',
-              alignItems: 'center',
-              color: '#007bff',
-              textDecoration: 'none',
-              '&:hover': {
-                color: 'primary.main'
-              }
-            }}
-            to={`/productbycategory/${category?._id}`}
-          >
-            {category?.name}
           </Link>
           <Typography
             sx={{

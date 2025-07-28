@@ -12,7 +12,7 @@ import {
   Breadcrumbs,
   Link
 } from '@mui/material'
-import NavigateNextIcon from '@mui/icons-material/NavigateNext'
+import NavigateNext from '@mui/icons-material/NavigateNext'
 import { addToCart, getCart } from '~/services/cartService'
 import { getProducts } from '~/services/productService'
 import { useDispatch } from 'react-redux'
@@ -22,6 +22,7 @@ import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward'
 import { useParams } from 'react-router-dom'
 import { getCategoryById, getChildCategories } from '~/services/categoryService'
 import { optimizeCloudinaryUrl } from '~/utils/cloudinary.js'
+import { useNavigate } from 'react-router-dom'
 
 const ITEMS_PER_PAGE = 12
 
@@ -99,6 +100,7 @@ const ProductbyCategory = () => {
   const [childCategories, setChildCategories] = useState([])
   const [allCategoryIds, setAllCategoryIds] = useState([])
 
+  const navigate = useNavigate()
   // Fetch category and children
   useEffect(() => {
     const fetchCategoryAndChildren = async () => {
@@ -172,7 +174,7 @@ const ProductbyCategory = () => {
       console.error('Chi tiết lỗi:', error)
       setErrorProducts(
         error.message ||
-          'Không thể tải danh sách sản phẩm. Vui lòng thử lại sau.'
+        'Không thể tải danh sách sản phẩm. Vui lòng thử lại sau.'
       )
       setProducts([])
       setTotalPages(1)
@@ -252,9 +254,9 @@ const ProductbyCategory = () => {
   return (
     <Box sx={{ minHeight: '100vh' }}>
       <Breadcrumbs
-        separator={<NavigateNextIcon fontSize='small' />}
+        separator={<NavigateNext fontSize='small' />}
         aria-label='breadcrumb'
-        sx={{ pt: 2, width: '100%', maxWidth: '95vw', mx: 'auto' }}
+        sx={{ p: { xs: 1, md: 2 }, mb: 2 }}
       >
         <Link
           underline='hover'
@@ -265,9 +267,12 @@ const ProductbyCategory = () => {
             textDecoration: 'none',
             '&:hover': {
               color: 'primary.main'
-            }
+            },
+            cursor: 'pointer'
           }}
-          href='/'
+          onClick={() => navigate('/')}
+        // component={Link}
+        // to='/product'
         >
           Trang chủ
         </Link>
@@ -279,7 +284,7 @@ const ProductbyCategory = () => {
             fontWeight: 500
           }}
         >
-          Danh mục {category?.name || 'Sản phẩm'}
+          {category ? category.name : 'Danh mục sản phẩm'}
         </Typography>
       </Breadcrumbs>
       {/*<Box*/}
@@ -315,8 +320,8 @@ const ProductbyCategory = () => {
         <img
           src={optimizeCloudinaryUrl(
             category?.banner ||
-              category?.image ||
-              'https://file.hstatic.net/1000360022/collection/ao-thun_cd23d8082c514c839615e1646371ba71.jpg',
+            category?.image ||
+            'https://file.hstatic.net/1000360022/collection/ao-thun_cd23d8082c514c839615e1646371ba71.jpg',
             { width: 1920, height: 400 }
           )}
           alt='banner'

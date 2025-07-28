@@ -485,9 +485,12 @@ const BlogDetail = () => {
                   textDecoration: 'none',
                   '&:hover': {
                     color: 'primary.main'
-                  }
+                  },
+                  cursor: 'pointer'
                 }}
-                href='/'
+                onClick={() => navigate('/')}
+              // component={Link}
+              // to='/product'
               >
                 Trang chủ
               </Link>
@@ -500,9 +503,12 @@ const BlogDetail = () => {
                   textDecoration: 'none',
                   '&:hover': {
                     color: 'primary.main'
-                  }
+                  },
+                  cursor: 'pointer'
                 }}
-                href={`/blog`}
+                onClick={() => navigate('/blog')}
+              // component={Link}
+              // to='/product'
               >
                 Tin thời trang
               </Link>
