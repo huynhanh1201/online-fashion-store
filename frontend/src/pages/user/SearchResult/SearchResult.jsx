@@ -69,17 +69,18 @@ const sortOptions = [
   { value: '', label: 'Sản phẩm nổi bật' },
   { value: 'priceAsc', label: 'Giá tăng dần' },
   { value: 'priceDesc', label: 'Giá giảm dần' },
-  { value: 'nameDesc', label: 'Sản phẩm từ A-Z' },
+  { value: 'nameAsc', label: 'Sản phẩm từ A-Z' },
   { value: 'nameAsc', label: 'Sản phẩm từ Z-A' }
 ]
-
+nameAsc
 const styles = {
   container: {
     margin: '0 auto',
     maxWidth: '96vw',
-    minHeight: '80vh',
+    minHeight: '100vh', // Đảm bảo luôn đủ chiều cao để có scrollbar
     fontFamily:
-      '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif'
+      '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
+    overflowY: 'auto' // Đảm bảo có scrollbar khi cần
   },
   header: {
     display: 'flex',
@@ -196,7 +197,7 @@ export default function SearchResults() {
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'auto' })
-  }, [])
+  }, [query])
 
   const handlePageChange = (event, value) => {
     setPage(value)
