@@ -14,7 +14,6 @@ import Breadcrumbs from '@mui/material/Breadcrumbs'
 import NavigateNextIcon from '@mui/icons-material/NavigateNext'
 
 import { useNavigate } from 'react-router-dom'
-
 const ProductDetail = () => {
   const { productId } = useParams()
   const [isViewingThumbnails, setIsViewingThumbnails] = useState(false)
@@ -141,7 +140,7 @@ const ProductDetail = () => {
                 color: 'primary.main'
               }
             }}
-            href='/'
+            to='/'
           >
             Trang chủ
           </Link>
@@ -156,7 +155,7 @@ const ProductDetail = () => {
               }
             }}
             onClick={() => {
-              navigate('/admin')
+              navigate('/product')
             }}
             // href='/product'
           >
@@ -172,7 +171,7 @@ const ProductDetail = () => {
                 color: 'primary.main'
               }
             }}
-            href={`/productbycategory/${category?._id}`}
+            to={`/productbycategory/${category?._id}`}
           >
             {category?.name}
           </Link>
