@@ -114,9 +114,8 @@ const ProductbyCategory = () => {
         setChildCategories(children)
 
         // Create array of all category IDs (parent + children)
-        const categoryIds = [categoryId, ...children.map(child => child._id)]
+        const categoryIds = [categoryId, ...children.map((child) => child._id)]
         setAllCategoryIds(categoryIds)
-
       } catch (error) {
         console.error('Error fetching category:', error)
       } finally {
@@ -135,6 +134,22 @@ const ProductbyCategory = () => {
       setLoadingProducts(true)
       setErrorProducts(null)
 
+      // Map sort option to API sort parameter
+      const backendSortMap = {
+        nameAsc: 'name_asc',
+        nameDesc: 'name_desc',
+        priceAsc: 'price_asc',
+        priceDesc: 'price_desc'
+      }
+
+      const params = {
+        page: Number(page),
+        limit: Number(ITEMS_PER_PAGE),
+        sort: backendSortMap[sortOption] || 'newest',
+        // Add category filter - backend sẽ filter theo categoryIds
+        categoryIds:
+          allCategoryIds.length > 0 ? allCategoryIds.join(',') : categoryId
+      }
       // Sử dụng categoryIds array hoặc chỉ categoryId nếu không có children
       const categoryIdsToUse = allCategoryIds.length > 0 ? allCategoryIds : [categoryId]
 
@@ -166,10 +181,20 @@ const ProductbyCategory = () => {
           sortedProducts.sort((a, b) => b.name.localeCompare(a.name))
           break
         case 'priceAsc':
-          sortedProducts.sort((a, b) => a.price - b.price)
+          sortedProducts.sort((a, b) => {
+            // Sử dụng exportPrice hoặc firstVariantDiscountPrice nếu có
+            const priceA = a.firstVariantDiscountPrice > 0 ? a.firstVariantDiscountPrice : a.exportPrice
+            const priceB = b.firstVariantDiscountPrice > 0 ? b.firstVariantDiscountPrice : b.exportPrice
+            return priceA - priceB
+          })
           break
         case 'priceDesc':
-          sortedProducts.sort((a, b) => b.price - a.price)
+          sortedProducts.sort((a, b) => {
+            // Sử dụng exportPrice hoặc firstVariantDiscountPrice nếu có
+            const priceA = a.firstVariantDiscountPrice > 0 ? a.firstVariantDiscountPrice : a.exportPrice
+            const priceB = b.firstVariantDiscountPrice > 0 ? b.firstVariantDiscountPrice : b.exportPrice
+            return priceB - priceA
+          })
           break
         case 'featured':
         default:
@@ -183,7 +208,7 @@ const ProductbyCategory = () => {
       console.error('Chi tiết lỗi:', error)
       setErrorProducts(
         error.message ||
-        'Không thể tải danh sách sản phẩm. Vui lòng thử lại sau.'
+          'Không thể tải danh sách sản phẩm. Vui lòng thử lại sau.'
       )
       setProducts([])
       setTotalPages(1)
@@ -267,24 +292,21 @@ const ProductbyCategory = () => {
         aria-label='breadcrumb'
         sx={{ pt: 2, width: '100%', maxWidth: '95vw', mx: 'auto' }}
       >
-        <Button
-          component={Link}
-          to='/'
+        <Link
+          underline='hover'
           sx={{
             display: 'flex',
             alignItems: 'center',
             color: '#007bff',
             textDecoration: 'none',
-            minWidth: 0,
-            p: 0,
             '&:hover': {
-              color: 'primary.main',
-              background: 'none'
+              color: 'primary.main'
             }
           }}
+          href='/'
         >
           Trang chủ
-        </Button>
+        </Link>
         <Typography
           sx={{
             display: 'flex',
@@ -296,21 +318,50 @@ const ProductbyCategory = () => {
           Danh mục {category?.name || 'Sản phẩm'}
         </Typography>
       </Breadcrumbs>
+      {/*<Box*/}
+      {/*  sx={{*/}
+      {/*    width: '100%',*/}
+      {/*    height: { xs: '200px', sm: '300px', md: '400px' },*/}
+      {/*    backgroundImage: category?.banner*/}
+      {/*      ? `url(${optimizeCloudinaryUrl(category.banner, { width: 1920, height: 400 })})`*/}
+      {/*      : category?.image*/}
+      {/*        ? `url(${optimizeCloudinaryUrl(category.image, { width: 1920, height: 400 })})`*/}
+      {/*        : 'url(https://file.hstatic.net/1000360022/collection/ao-thun_cd23d8082c514c839615e1646371ba71.jpg)',*/}
+      {/*    backgroundSize: 'cover',*/}
+      {/*    backgroundPosition: 'center',*/}
+      {/*    position: 'relative',*/}
+      {/*    mb: 4*/}
+      {/*  }}*/}
+      {/*>*/}
+      {/*</Box>*/}
       <Box
         sx={{
+          display: { xs: 'none', sm: 'none', md: 'block' },
           width: '100%',
-          height: { xs: '200px', sm: '300px', md: '400px' },
-          backgroundImage: category?.banner
-            ? `url(${optimizeCloudinaryUrl(category.banner, { width: 1920, height: 400 })})`
-            : category?.image
-              ? `url(${optimizeCloudinaryUrl(category.image, { width: 1920, height: 400 })})`
-              : 'url(https://file.hstatic.net/1000360022/collection/ao-thun_cd23d8082c514c839615e1646371ba71.jpg)',
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
+          height: {
+            md: '200px',
+            lg: '300px',
+            xl: 'auto'
+          },
           position: 'relative',
+          overflow: 'hidden',
           mb: 4
         }}
       >
+        <img
+          src={optimizeCloudinaryUrl(
+            category?.banner ||
+              category?.image ||
+              'https://file.hstatic.net/1000360022/collection/ao-thun_cd23d8082c514c839615e1646371ba71.jpg',
+            { width: 1920, height: 400 }
+          )}
+          alt='banner'
+          style={{
+            width: '100%',
+            height: '100%',
+            objectFit: 'contain'
+          }}
+        />
       </Box>
 
       <Box sx={{ p: 2, maxWidth: '96vw', mx: 'auto' }}>
@@ -411,18 +462,29 @@ const ProductbyCategory = () => {
                 ))}
               </div>
 
-              <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4, mb: 2, alignItems: 'center' }}>
+              <Box
+                sx={{
+                  display: 'flex',
+                  justifyContent: 'center',
+                  mt: 4,
+                  mb: 2,
+                  alignItems: 'center'
+                }}
+              >
                 <Pagination
                   count={totalPages}
                   page={page}
                   onChange={handlePageChange}
                   boundaryCount={1}
                   siblingCount={1}
-                  shape="rounded"
-                  size="small"
-                  color="primary"
+                  shape='rounded'
+                  size='small'
+                  color='primary'
                   renderItem={(item) => {
-                    if (item.type === 'start-ellipsis' || item.type === 'end-ellipsis') {
+                    if (
+                      item.type === 'start-ellipsis' ||
+                      item.type === 'end-ellipsis'
+                    ) {
                       return (
                         <span
                           style={{
@@ -432,7 +494,7 @@ const ProductbyCategory = () => {
                             fontSize: '1rem',
                             display: 'inline-flex',
                             alignItems: 'center',
-                            justifyContent: 'center',
+                            justifyContent: 'center'
                           }}
                         >
                           ...

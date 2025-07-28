@@ -200,9 +200,11 @@ const ProductDetail = () => {
         sx={{
           alignItems: 'flex-start',
           flexWrap: 'nowrap',
-          '@media (max-width: 1100px)': {
+          gap: 0,
+          '@media (max-width: 850px)': {
             flexWrap: 'wrap',
-            spacing: 2
+            spacing: 2,
+            justifyContent: 'start'
           }
         }}
       >

@@ -65,9 +65,9 @@ const deleteProduct = async (req, res, next) => {
 const getListProductOfCategory = async (req, res, next) => {
   try {
     const categoryId = req.params.categoryId
-    const { page = 1, limit = 10 } = req.query
+    const { page = 1, limit = 10, sort } = req.query
 
-    const result = await productsService.getListProductOfCategory(categoryId, { page, limit })
+    const result = await productsService.getListProductOfCategory(categoryId, { page, limit, sort })
 
     res.status(StatusCodes.OK).json(result)
   } catch (err) {

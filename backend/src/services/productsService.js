@@ -320,7 +320,7 @@ const deleteProduct = async (productId) => {
 const getListProductOfCategory = async (categoryId, options = {}) => {
   // eslint-disable-next-line no-useless-catch
   try {
-    const { page = 1, limit = 10 } = options
+    const { page = 1, limit = 10, sort } = options
     const skip = (page - 1) * limit
 
     // Get total count first
@@ -330,7 +330,22 @@ const getListProductOfCategory = async (categoryId, options = {}) => {
       status: 'active'
     })
 
-    const ListProduct = await ProductModel.aggregate([
+    // Define sort options
+    const sortMap = {
+      name_asc: { name: 1 },
+      name_desc: { name: -1 },
+      newest: { createdAt: -1 },
+      oldest: { createdAt: 1 },
+      price_desc: { exportPrice: -1 },
+      price_asc: { exportPrice: 1 }
+    }
+
+    let sortField = {}
+    if (sort && sortMap[sort]) {
+      sortField = sortMap[sort]
+    }
+
+    const aggregationPipeline = [
       {
         $match: {
           categoryId: new mongoose.Types.ObjectId(categoryId),
@@ -362,10 +377,20 @@ const getListProductOfCategory = async (categoryId, options = {}) => {
             $ifNull: [{ $arrayElemAt: ['$firstVariant.discountPrice', 0] }, 0]
           }
         }
-      },
+      }
+    ]
+
+    // Add sort stage if specified
+    if (Object.keys(sortField).length > 0) {
+      aggregationPipeline.push({ $sort: sortField })
+    }
+
+    aggregationPipeline.push(
       { $skip: skip },
       { $limit: parseInt(limit) }
-    ])
+    )
+
+    const ListProduct = await ProductModel.aggregate(aggregationPipeline)
 
     return {
       products: ListProduct,

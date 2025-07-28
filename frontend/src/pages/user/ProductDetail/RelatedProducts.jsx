@@ -122,7 +122,7 @@ import { Link } from 'react-router-dom'
 
 const RelatedProductSection = ({ categoryId, currentProductId }) => {
   const [relatedProducts, setRelatedProducts] = useState([])
-  const [visibleCount, setVisibleCount] = useState(12)
+  const [visibleCount, setVisibleCount] = useState(10)
   const [categoryPage, setCategoryPage] = useState(1)
   const [fallbackPage, setFallbackPage] = useState(1)
   const [loading, setLoading] = useState(false)
@@ -167,11 +167,7 @@ const RelatedProductSection = ({ categoryId, currentProductId }) => {
             limit: count
           })
 
-          const filteredFallback = fallbackProducts.filter(
-            (p) =>
-              p._id !== currentProductId &&
-              !combined.some((item) => item._id === p._id)
-          )
+          const filteredFallback = fallbackProducts
 
           if (filteredFallback.length === 0) break
 
@@ -186,9 +182,11 @@ const RelatedProductSection = ({ categoryId, currentProductId }) => {
       setCategoryPage(tempCategoryPage)
       setFallbackPage(tempFallbackPage)
       setRelatedProducts(combined)
-
+      console.log('relatedProducts.length', relatedProducts.length)
+      console.log('combined.length', combined.length)
+      console.log('foundNew', foundNew)
       // ✅ cập nhật hasMore dựa trên thực tế
-      setHasMore(foundNew && combined.length > relatedProducts.length)
+      setHasMore(foundNew && combined.length >= relatedProducts.length)
     } catch (err) {
       console.error('Lỗi khi tải sản phẩm gợi ý:', err)
     } finally {
@@ -200,15 +198,15 @@ const RelatedProductSection = ({ categoryId, currentProductId }) => {
   useEffect(() => {
     if (categoryId && currentProductId) {
       setRelatedProducts([])
-      setVisibleCount(12)
+      setVisibleCount(10)
       setCategoryPage(1)
       setFallbackPage(1)
-      fetchMoreProducts(12)
+      fetchMoreProducts(10)
     }
   }, [categoryId, currentProductId])
 
   const handleLoadMore = () => {
-    const nextCount = 8
+    const nextCount = 10
     setVisibleCount((prev) => prev + nextCount)
     fetchMoreProducts(nextCount)
   }

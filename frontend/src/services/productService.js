@@ -49,13 +49,24 @@ export const getProducts = async (params = {}) => {
 export const getProductsByCategory = async (
   categoryId,
   page = 1,
-  limit = 10
+  limit = 10,
+  sort = ''
 ) => {
   try {
     if (typeof categoryId !== 'string' || !categoryId) {
       throw new Error('categoryId phải là chuỗi không rỗng')
     }
-    const url = `${API_ROOT}/v1/products/category/${categoryId}?page=${page}&limit=${limit}`
+    
+    const params = new URLSearchParams({
+      page: page.toString(),
+      limit: limit.toString()
+    })
+    
+    if (sort) {
+      params.append('sort', sort)
+    }
+    
+    const url = `${API_ROOT}/v1/products/category/${categoryId}?${params.toString()}`
     const response = await AuthorizedAxiosInstance.get(url)
     console.log(
       `API getProductsByCategory response (${categoryId}):`,

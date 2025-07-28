@@ -132,12 +132,22 @@ const CategoryPage = () => {
       setLoading(true)
       setError('')
 
-      console.log('Fetching products for category:', category._id)
+      // Map sort option to API sort parameter
+      const backendSortMap = {
+        nameAsc: 'name_asc',
+        nameDesc: 'name_desc',
+        priceAsc: 'price_asc',
+        priceDesc: 'price_desc',
+        featured: 'newest'
+      }
+
+      const sortParam = backendSortMap[sortOption] || 'newest'
 
       const response = await getProductsByCategory(
         category._id,
         Number(page),
-        Number(ITEMS_PER_PAGE)
+        Number(ITEMS_PER_PAGE),
+        sortParam
       )
       console.log('API Response:', response)
 
@@ -150,28 +160,8 @@ const CategoryPage = () => {
         throw new Error('Dữ liệu sản phẩm không hợp lệ')
       }
 
-      // Apply client-side sorting since getProductsByCategory doesn't support backend sorting
-      let sortedProducts = [...fetchedProducts]
-      switch (sortOption) {
-        case 'nameAsc':
-          sortedProducts.sort((a, b) => a.name.localeCompare(b.name))
-          break
-        case 'nameDesc':
-          sortedProducts.sort((a, b) => b.name.localeCompare(a.name))
-          break
-        case 'priceAsc':
-          sortedProducts.sort((a, b) => a.price - b.price)
-          break
-        case 'priceDesc':
-          sortedProducts.sort((a, b) => b.price - a.price)
-          break
-        case 'featured':
-        default:
-          // Keep original order (featured/newest first)
-          break
-      }
-
-      setProducts(sortedProducts)
+      // Backend đã xử lý sorting, không cần client-side processing
+      setProducts(fetchedProducts)
       setTotalPages(totalPages)
     } catch (err) {
       console.error('Lỗi khi tải sản phẩm:', err)
@@ -189,8 +179,6 @@ const CategoryPage = () => {
       fetchProducts()
     }
   }, [category, sortOption, page])
-
-
 
   const handleAddToCart = async (product) => {
     if (isAdding[product._id]) return
@@ -251,10 +239,10 @@ const CategoryPage = () => {
   if (loading) {
     return (
       <Box
-        display="flex"
-        justifyContent="center"
-        alignItems="center"
-        minHeight="80vh"
+        display='flex'
+        justifyContent='center'
+        alignItems='center'
+        minHeight='80vh'
         sx={{ backgroundColor: 'var(--surface-color)' }}
       >
         <CircularProgress size={60} thickness={3} />
@@ -264,9 +252,9 @@ const CategoryPage = () => {
 
   if (error) {
     return (
-      <Container maxWidth="xl" sx={{ py: 8 }}>
+      <Container maxWidth='xl' sx={{ py: 8 }}>
         <Alert
-          severity="error"
+          severity='error'
           sx={{
             maxWidth: 600,
             mx: 'auto',
@@ -282,9 +270,9 @@ const CategoryPage = () => {
 
   if (!category) {
     return (
-      <Container maxWidth="xl" sx={{ py: 8 }}>
+      <Container maxWidth='xl' sx={{ py: 8 }}>
         <Alert
-          severity="warning"
+          severity='warning'
           sx={{
             maxWidth: 600,
             mx: 'auto',
@@ -337,51 +325,32 @@ const CategoryPage = () => {
       {/* Category Banner Section */}
       <Box
         sx={{
+          display: { xs: 'none', sm: 'none', md: 'block' },
           width: '100%',
-          height: { xs: '200px', sm: '300px', md: '400px' },
+          height: {
+            md: '200px',
+            lg: '300px',
+            xl: 'auto'
+          },
           position: 'relative',
-          mb: 4,
-          backgroundImage: category.banner
-            ? `url(${optimizeCloudinaryUrl(category.banner, { width: 1920, height: 400 })})`
-            : category.image
-              ? `url(${optimizeCloudinaryUrl(category.image, { width: 1920, height: 400 })})`
-              : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
+          overflow: 'hidden',
+          mb: 4
         }}
       >
-
-        <Box
-          sx={{
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            flexDirection: 'column',
-            textAlign: 'center',
-            px: 3,
-          }}
-        >
-          {category.description && (
-            <Typography
-              variant="h6"
-              sx={{
-                color: 'rgba(255,255,255,0.9)',
-                maxWidth: '800px',
-                lineHeight: 1.6,
-                fontSize: { xs: '1rem', md: '1.2rem' },
-                textShadow: '1px 1px 2px rgba(0,0,0,0.5)',
-                fontWeight: 300,
-              }}
-            >
-              {category.description}
-            </Typography>
+        <img
+          src={optimizeCloudinaryUrl(
+            category?.banner ||
+              category?.image ||
+              'https://file.hstatic.net/1000360022/collection/ao-thun_cd23d8082c514c839615e1646371ba71.jpg',
+            { width: 1920, height: 400 }
           )}
-        </Box>
+          alt='category banner'
+          style={{
+            width: '100%',
+            height: '100%',
+            objectFit: 'cover'
+          }}
+        />
       </Box>
 
       {/* Products Section */}
@@ -477,18 +446,29 @@ const CategoryPage = () => {
               </div>
 
               {/* Pagination */}
-              <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4, mb: 2, alignItems: 'center' }}>
+              <Box
+                sx={{
+                  display: 'flex',
+                  justifyContent: 'center',
+                  mt: 4,
+                  mb: 2,
+                  alignItems: 'center'
+                }}
+              >
                 <Pagination
                   count={totalPages}
                   page={page}
                   onChange={handlePageChange}
                   boundaryCount={1}
                   siblingCount={1}
-                  shape="rounded"
-                  size="small"
-                  color="primary"
+                  shape='rounded'
+                  size='small'
+                  color='primary'
                   renderItem={(item) => {
-                    if (item.type === 'start-ellipsis' || item.type === 'end-ellipsis') {
+                    if (
+                      item.type === 'start-ellipsis' ||
+                      item.type === 'end-ellipsis'
+                    ) {
                       return (
                         <span
                           style={{
@@ -498,7 +478,7 @@ const CategoryPage = () => {
                             fontSize: '1rem',
                             display: 'inline-flex',
                             alignItems: 'center',
-                            justifyContent: 'center',
+                            justifyContent: 'center'
                           }}
                         >
                           ...

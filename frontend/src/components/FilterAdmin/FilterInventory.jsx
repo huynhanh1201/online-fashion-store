@@ -356,7 +356,7 @@ export default function FilterInventory({ onFilter, loading }) {
         options={[
           { label: 'Tất cả', value: '' },
           { label: 'Còn hàng', value: 'in-stock' },
-          { label: 'Sắp hết hàng', value: 'low-stock' },
+          { label: 'Cảnh báo', value: 'low-stock' },
           { label: 'Hết hàng', value: 'out-of-stock' }
         ]}
       />
