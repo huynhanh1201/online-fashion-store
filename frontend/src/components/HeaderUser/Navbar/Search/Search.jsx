@@ -276,7 +276,7 @@ import {
 } from '@mui/material'
 import SearchIcon from '@mui/icons-material/Search'
 import { styled } from '@mui/system'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 import { getProducts } from '~/services/productService'
 
 const removeVietnameseAccents = (str) =>
@@ -319,6 +319,7 @@ const StyledListItem = styled(ListItem)({
 
 const Search = ({ onclose }) => {
   const wrapperRef = useRef(null)
+  const location = useLocation()
   const [showSuggestions, setShowSuggestions] = useState(false)
 
   const [placeholder, setPlaceholder] = useState('Sản phẩm')
@@ -326,6 +327,16 @@ const Search = ({ onclose }) => {
   const [suggestions, setSuggestions] = useState([])
   const [errorMessage, setErrorMessage] = useState('')
   const navigate = useNavigate()
+
+  useEffect(() => {
+    // Reset toàn bộ khi route thay đổi
+    setSearchText('')
+    setSuggestions([])
+    setShowSuggestions(false)
+    setErrorMessage('')
+    document.body.style.overflow = ''
+  }, [location.pathname])
+
   useEffect(() => {
     const handleResize = () => {
       if (window.innerWidth <= 800) {
@@ -403,6 +414,7 @@ const Search = ({ onclose }) => {
       setErrorMessage('')
       onclose()
     }
+    document.body.style.overflow = 'auto'
   }
 
   const handleSuggestionClick = (id) => {
