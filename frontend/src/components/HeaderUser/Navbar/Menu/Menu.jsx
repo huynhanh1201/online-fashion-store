@@ -387,14 +387,6 @@ const Menu = ({ headerRef, currentUser }) => {
     >
       {/* Menu container với arrow ngoài cùng bên phải, menu item luôn căn giữa và rộng rãi */}
 
-      <Button component={Link} to='/admin'>
-        Test trang admin
-      </Button>
-
-      <Button component={Link} to='/product'>
-        Test trang sản phẩm
-      </Button>
-
       <Box
         sx={{
           display: 'flex',
