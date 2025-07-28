@@ -15,11 +15,6 @@ export const corsOptions = {
       return callback(null, true)
     }
 
-    // ✅ Cho phép các request không có Origin (VD: VNPAY, Postman)
-    if (!origin) {
-      return callback(null, true)
-    }
-
     // Ngược lại thì hiện tại code chúng ta đang làm còn 1 trường hợp là:
     // env.BUILD_MODE === 'prod'
 
