@@ -328,7 +328,8 @@ const CategoryPage = () => {
           width: '100%',
           height: {
             md: '200px',
-            lg: '300px'
+            lg: '300px',
+            xl: 'auto'
           },
           position: 'relative',
           overflow: 'hidden',
