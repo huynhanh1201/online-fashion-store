@@ -325,19 +325,6 @@ const ProductbyCategory = () => {
             objectFit: 'contain'
           }}
         />
-        <Typography
-          sx={{
-            position: 'absolute',
-            top: '50%',
-            left: '50%',
-            transform: 'translate(-50%, -50%)',
-            color: '#fff',
-            fontSize: { xs: '1.5rem', sm: '2rem', md: '2.5rem' },
-            zIndex: 1
-          }}
-        >
-          {category?.name}
-        </Typography>
       </Box>
 
       <Box sx={{ p: 2, maxWidth: '96vw', mx: 'auto' }}>

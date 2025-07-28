@@ -16,7 +16,9 @@ import { getCategories } from '~/services/categoryService'
 import { getMenuConfig } from '~/services/admin/webConfig/headerService.js'
 import { useTheme } from '@mui/material/styles'
 import { ChevronLeft, ChevronRight } from '@mui/icons-material'
+
 import { Link } from 'react-router-dom'
+
 const StyledButton = styled(Button)(({ theme, active }) => ({
   color: 'var(--text-color)',
   fontWeight: 450,
@@ -134,27 +136,27 @@ const Menu = ({ headerRef, currentUser }) => {
   const getMenuRows = () => {
     // Lấy tất cả danh mục con có sản phẩm
     const childCategoriesWithProduct = categories.filter(
-        (cat) => cat.parent && !cat.destroy
+      (cat) => cat.parent && !cat.destroy
     )
     // Lấy danh sách parentId từ các danh mục con có sản phẩm
     const parentIds = [
       ...new Set(
-          childCategoriesWithProduct.map((cat) =>
-              typeof cat.parent === 'object' ? cat.parent._id : cat.parent
-          )
+        childCategoriesWithProduct.map((cat) =>
+          typeof cat.parent === 'object' ? cat.parent._id : cat.parent
+        )
       )
     ]
     // Lấy các danh mục parent thực sự có children có sản phẩm
     const parentCategories = categories.filter(
-        (cat) => parentIds.includes(cat._id) && !cat.destroy
+      (cat) => parentIds.includes(cat._id) && !cat.destroy
     )
     // Lấy các danh mục gốc (không có parent) nhưng có sản phẩm
     const rootCategoriesWithProducts = categories.filter(
-        (cat) =>
-            !cat.parent &&
-            !cat.destroy &&
-            Array.isArray(cat.products) &&
-            cat.products.length > 0
+      (cat) =>
+        !cat.parent &&
+        !cat.destroy &&
+        Array.isArray(cat.products) &&
+        cat.products.length > 0
     )
 
     const allItems = [
@@ -163,14 +165,14 @@ const Menu = ({ headerRef, currentUser }) => {
       { label: 'Hàng mới', url: '/productnews', isNew: true },
       // Thêm các menu từ config nếu có
       ...(menuConfig?.mainMenu
-          ? menuConfig.mainMenu
-              .filter(
-                  (item) =>
-                      item.visible && (!item.children || item.children.length === 0)
-              )
-              .sort((a, b) => (a.order || 0) - (b.order || 0))
-              .map((item) => ({ label: item.label, url: item.url }))
-          : []),
+        ? menuConfig.mainMenu
+            .filter(
+              (item) =>
+                item.visible && (!item.children || item.children.length === 0)
+            )
+            .sort((a, b) => (a.order || 0) - (b.order || 0))
+            .map((item) => ({ label: item.label, url: item.url }))
+        : []),
       // Thêm các danh mục parent thực sự có children có sản phẩm
       ...parentCategories.map((cat) => ({
         label: cat.name,
@@ -281,12 +283,12 @@ const Menu = ({ headerRef, currentUser }) => {
 
     const handleOutsideClick = (event) => {
       if (
-          menuRef.current &&
-          !menuRef.current.contains(event.target) &&
-          categoryMenuRef.current &&
-          !categoryMenuRef.current.contains(event.target) &&
-          headerRef.current &&
-          !headerRef.current.contains(event.target)
+        menuRef.current &&
+        !menuRef.current.contains(event.target) &&
+        categoryMenuRef.current &&
+        !categoryMenuRef.current.contains(event.target) &&
+        headerRef.current &&
+        !headerRef.current.contains(event.target)
       ) {
         setIsClosing(true)
         setProductMenuOpen(false)
@@ -310,11 +312,11 @@ const Menu = ({ headerRef, currentUser }) => {
     let current = category
     while (current && current.parent) {
       const parent = allCategories.find(
-          (cat) =>
-              cat._id ===
-              (typeof current.parent === 'object'
-                  ? current.parent._id
-                  : current.parent)
+        (cat) =>
+          cat._id ===
+          (typeof current.parent === 'object'
+            ? current.parent._id
+            : current.parent)
       )
       if (parent) {
         chain.unshift(parent)
@@ -332,25 +334,25 @@ const Menu = ({ headerRef, currentUser }) => {
       return []
     }
     return categories.filter(
-        (cat) =>
-            !cat.destroy &&
-            cat.parent &&
-            (typeof cat.parent === 'object' ? cat.parent._id : cat.parent) ===
-            parentCategory._id
+      (cat) =>
+        !cat.destroy &&
+        cat.parent &&
+        (typeof cat.parent === 'object' ? cat.parent._id : cat.parent) ===
+          parentCategory._id
     )
   }
 
   // Get megamenu settings from config
   const getMegamenuSettings = () => {
     return (
-        menuConfig?.settings?.megamenuSettings || {
-          maxColumns: 4,
-          columnWidth: 'auto',
-          showIcons: false,
-          animationDuration: 350,
-          showCategoryImages: false,
-          enableHoverEffects: true
-        }
+      menuConfig?.settings?.megamenuSettings || {
+        maxColumns: 4,
+        columnWidth: 'auto',
+        showIcons: false,
+        animationDuration: 350,
+        showCategoryImages: false,
+        enableHoverEffects: true
+      }
     )
   }
 
