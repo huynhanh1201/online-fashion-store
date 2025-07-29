@@ -18,7 +18,7 @@ export const refIntegrityPlugin = (schema, { references = [] }) => {
       if (count > 0) {
         throw new apiError(
           StatusCodes.UNPROCESSABLE_ENTITY,
-          `${doc.constructor.modelName} đang bị liên kết bởi ${model} qua field '${foreignField}' (${count} bản ghi)`
+          `Dữ lệu đang bị liên kết. Không thể xóa!`
         )
       }
     }
@@ -42,9 +42,9 @@ export const refIntegrityPlugin = (schema, { references = [] }) => {
   //   if (doc) await checkReferences(doc)
   // })
 
-  // // Hook: chặn update nếu cần (optional)
-  // schema.pre('updateOne', async function () {
-  //   const doc = await this.model.findOne(this.getQuery())
-  //   if (doc) await checkReferences(doc)
-  // })
+  // Hook: chặn update nếu cần (optional)
+  schema.pre('updateOne', async function () {
+    const doc = await this.model.findOne(this.getQuery())
+    if (doc) await checkReferences(doc)
+  })
 }

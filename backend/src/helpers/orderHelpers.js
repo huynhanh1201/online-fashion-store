@@ -268,17 +268,15 @@ const handleCreateOrderItems = async (
   const orderItems = cartItems.map((item) => {
     const variant = variantMap.get(item.variantId.toString())
 
-    console.log(variant)
-
     return {
       orderId: order._id,
       productId: variant.productId,
       color: variant.color,
       size: variant.size.name,
       name: variant.name,
-      price: variant.exportPrice,
+      price: variant.exportPrice - variant.discountPrice,
       quantity: item.quantity,
-      subtotal: variant.exportPrice * item.quantity,
+      subtotal: (variant.exportPrice - variant.discountPrice) * item.quantity,
       variantId: variant._id
     }
   })
