@@ -278,7 +278,7 @@ const OrderRow = ({ order, onOrderUpdate, onOrderCancelled, onReorder, reorderLo
     const totalOriginalSubtotal = items.reduce((sum, orderItem) => sum + (orderItem.subtotal || 0), 0)
     if (totalOriginalSubtotal === 0) return item.subtotal || 0
     const totalProductsPrice = order.total - (order.shippingFee || 0) + (order.discountAmount || 0)
-    const actualPrice = ((item.subtotal || 0) / totalOriginalSubtotal) 
+    const actualPrice = ((item.subtotal || 0) / totalOriginalSubtotal) * totalProductsPrice
     return Math.round(actualPrice)
   }
 
