@@ -26,7 +26,7 @@ const shippingAddress = async (req, res, next) => {
       .required(), // :contentReference[oaicite:1]{index.jsx=1}
 
     address: Joi.string() // chuỗi ký tự
-      .min(5)
+      .min(1)
       .max(200)
       .required(),
 
