@@ -524,7 +524,7 @@ const MegaMenuEditor = ({ open, onClose, onSuccess, initialData = null }) => {
         onClick={() => handleAddItem(type)}
         sx={{ mt: 1, fontWeight: 600 }}
       >
-        Thêm menu
+        Thêm cột
       </Button>
     </Box>
   )
