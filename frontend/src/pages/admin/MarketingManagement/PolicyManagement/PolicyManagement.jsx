@@ -299,7 +299,7 @@ export default function PolicyManagement() {
                     bottom: 0,
                   }}
                 />
-                <CardContent sx={{ pl: 4, py: 2, width: '20vw', backgroundColor: '#f5f5f5' }}>
+                <CardContent sx={{ pl: 4, py: 2, width: '15vw', backgroundColor: '#f5f5f5' }}>
                   <Typography variant="body1" color="text.secondary" sx={{ mb: 0.5,fontWeight: 'bold' , fontSize: '20px'}}>
                     {item.title}
                   </Typography>

@@ -96,10 +96,17 @@ const PolicyModal = ({
         toast.error('Vui lòng chọn loại chính sách')
         return
       }
-      // Nếu ở chế độ thêm mới, kiểm tra loại đã tồn tại
+      // Kiểm tra loại đã tồn tại
       if (!isEditMode && existingTypes.includes(data.type)) {
         setTypeError('Loại chính sách này đã tồn tại, vui lòng chọn loại khác hoặc chỉnh sửa chính sách hiện có.')
         toast.error('Loại chính sách này đã tồn tại, chỉ có thể chỉnh sửa!')
+        setSaving(false)
+        return
+      }
+      // Nếu ở chế độ chỉnh sửa, kiểm tra loại đã tồn tại (trừ chính sách hiện tại)
+      if (isEditMode && policyData && existingTypes.includes(data.type) && data.type !== policyData.type) {
+        setTypeError('Loại chính sách này đã tồn tại, vui lòng chọn loại khác.')
+        toast.error('Loại chính sách này đã tồn tại!')
         setSaving(false)
         return
       }
@@ -189,21 +196,36 @@ const PolicyModal = ({
                       backgroundColor: 'white'
                     }}
                   >
-                    {POLICY_TYPES.map((type) => (
-                      <MenuItem
-                        key={type.value}
-                        value={type.value}
-                        disabled={mode === 'add' && existingTypes.includes(type.value)}
-                      >
-                        {type.label}
-                      </MenuItem>
-                    ))}
+                    {POLICY_TYPES.map((type) => {
+                      const isDisabled = (mode === 'add' && existingTypes.includes(type.value)) ||
+                        (mode === 'edit' && policyData && existingTypes.includes(type.value) && type.value !== policyData.type)
+                      
+                      return (
+                        <MenuItem
+                          key={type.value}
+                          value={type.value}
+                          disabled={isDisabled}
+                        >
+                          {type.label}
+                          {isDisabled && (
+                            <Typography variant="caption" color="text.secondary" sx={{ ml: 1, fontStyle: 'italic' }}>
+                              (Đã tồn tại)
+                            </Typography>
+                          )}
+                        </MenuItem>
+                      )
+                    })}
                   </Select>
                 )}
               />
               {(errors.type || typeError) && (
                 <Typography variant="caption" color="error" sx={{ mt: 0.5, ml: 1.5 }}>
                   {errors.type?.message || typeError}
+                </Typography>
+              )}
+              {isEditMode && (
+                <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, ml: 1.5 }}>
+                  * Khi chỉnh sửa, bạn chỉ có thể thay đổi loại chính sách sang loại chưa được sử dụng
                 </Typography>
               )}
             </FormControl>

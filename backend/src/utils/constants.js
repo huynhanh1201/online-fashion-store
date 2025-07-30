@@ -2,7 +2,8 @@ import { env } from '~/config/environment'
 
 // Những domain nào được phép gọi API từ backend
 export const WHITELIST_DOMAINS = [
-  'https://online-fashion-store-iota.vercel.app'
+  'https://online-fashion-store-iota.vercel.app',
+  'http://localhost:5173'
 ]
 
 export const WEBSITE_DOMAIN =
