@@ -710,7 +710,7 @@ const HeaderManagement = () => {
                       <TableCell
                         sx={{ fontWeight: 700, color: '#334155', py: 2 }}
                       >
-                        Thành phần
+                        Số lượng thành phần
                       </TableCell>
                     </TableRow>
                   </TableHead>
