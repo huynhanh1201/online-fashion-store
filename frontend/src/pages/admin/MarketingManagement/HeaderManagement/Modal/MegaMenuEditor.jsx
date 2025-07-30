@@ -386,7 +386,7 @@ const MegaMenuEditor = ({ open, onClose, onSuccess, initialData = null }) => {
               color='text.secondary'
               sx={{ fontFamily: 'monospace' }}
             >
-              {item.url || 'Tiêu đề menu (không có link)'}
+              {item.url || ''}
             </Typography>
             <IconButton
               size='small'
@@ -436,7 +436,7 @@ const MegaMenuEditor = ({ open, onClose, onSuccess, initialData = null }) => {
               onClick={() => handleAddSubmenu(type, index)}
               sx={{ ml: 1 }}
             >
-              + Submenu
+              + Thành phần
             </Button>
           </Stack>
           {/* Submenu */}
@@ -640,12 +640,12 @@ const MegaMenuEditor = ({ open, onClose, onSuccess, initialData = null }) => {
           <Alert severity='info' sx={{ mb: 2 }}>
             <Typography variant='body2'>
               <strong>Megamenu Editor:</strong> Chỉnh sửa menu sẽ hiển thị khi
-              hover vào "Sản phẩm". Menu chính sẽ trở thành tiêu đề cột, submenu
-              sẽ hiển thị bên dưới.
+              hover vào "Sản phẩm". Menu chính sẽ trở thành tiêu đề cột, thành
+              phần sẽ hiển thị bên dưới.
               <br />
               <b>Lưu ý:</b> Menu "Sản phẩm" sẽ luôn hiển thị trong header. Các
-              menu khác có thể có hoặc không có submenu. Menu chính chỉ cần tên,
-              URL chỉ cần thiết cho submenu.
+              menu khác có thể có hoặc không có thành phần. Cột chỉ cần tên, URL
+              chỉ cần thiết cho thành phần.
             </Typography>
           </Alert>
 
@@ -656,7 +656,7 @@ const MegaMenuEditor = ({ open, onClose, onSuccess, initialData = null }) => {
             sx={{ mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}
           >
             <CategoryIcon />
-            Quản lý Menu Items
+            Quản lý thành phần menu mở rộng
           </Typography>
           {renderTreeMenu('mainMenu')}
         </>
@@ -698,7 +698,7 @@ const MegaMenuEditor = ({ open, onClose, onSuccess, initialData = null }) => {
           </Stack>
         </DialogTitle>
 
-        <DialogContent sx={{ pb: 2, p: 0 }}>
+        <DialogContent sx={{ pb: 2, p: 0, height: '100%' }}>
           {error && (
             <Alert severity='error' sx={{ m: 2 }}>
               {error}
@@ -726,7 +726,7 @@ const MegaMenuEditor = ({ open, onClose, onSuccess, initialData = null }) => {
             </Tabs>
           </Box>
 
-          <Box sx={{ p: 2, height: 'calc(90vh - 200px)', overflow: 'auto' }}>
+          <Box sx={{ p: 2, height: 'calc(95vh - 300px)', overflow: 'auto' }}>
             {renderTabContent()}
           </Box>
         </DialogContent>
@@ -764,7 +764,7 @@ const MegaMenuEditor = ({ open, onClose, onSuccess, initialData = null }) => {
       >
         <DialogTitle>
           <Typography variant='h6' sx={{ fontWeight: 600 }}>
-            {editingSubIndex >= 0 ? 'Chỉnh sửa submenu' : 'Chỉnh sửa menu item'}
+            {editingSubIndex >= 0 ? 'Chỉnh sửa thành phần' : 'Chỉnh sửa cột'}
           </Typography>
         </DialogTitle>
 
