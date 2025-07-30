@@ -170,8 +170,8 @@ const ViewVariantModal = ({ open, onClose, variant }) => {
                   </TableCell>
                   <TableCell>
                     <Chip
-                      label={variant.destroy ? 'Đã huỷ' : 'Còn hàng'}
-                      color={variant.destroy ? 'error' : 'success'}
+                      label={variant.quantity === 0 ? 'Hết hàng' : 'Còn hàng'}
+                      color={variant.quantity === 0 ? 'error' : 'success'}
                       size='large'
                       sx={{ width: '127px', fontWeight: '800' }}
                     />

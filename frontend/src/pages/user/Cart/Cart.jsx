@@ -617,6 +617,7 @@ const Cart = () => {
         <Breadcrumbs
           separator={<NavigateNext fontSize='small' />}
           aria-label='breadcrumb'
+          sx={{ py: { xs: 2, md: 0 } }}
         >
           <Link
             sx={{

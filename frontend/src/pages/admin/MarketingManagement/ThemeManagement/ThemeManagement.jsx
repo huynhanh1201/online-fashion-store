@@ -148,31 +148,25 @@ const ThemeManagement = () => {
   const { hasPermission } = usePermissions()
 
   // Sync selected preset and pendingTheme with current theme on load or when theme changes
+  const firstLoadDone = React.useRef(false)
+
   useEffect(() => {
-    if (isLoading) return // Đợi load xong
-    
-    // Sync preset
+    if (isLoading) return // Đang load thì bỏ qua
+
+    // Đồng bộ preset
     const matchingPresetKey = Object.entries(predefinedThemes).find(
       ([key, preset]) =>
         preset.primary === currentTheme.primary &&
         preset.secondary === currentTheme.secondary &&
         preset.accent === currentTheme.accent
     )?.[0]
-  
+
     if (matchingPresetKey) {
       setSelectedPreset(matchingPresetKey)
       setPendingTheme(predefinedThemes[matchingPresetKey])
     } else {
       setSelectedPreset(null)
       setPendingTheme(currentTheme)
-    }
-  
-    if (currentTheme) {
-      setSnackbar({
-        open: true,
-        message: 'Đã tải chủ đề từ cơ sở dữ liệu thành công!',
-        severity: 'success'
-      })
     }
   }, [currentTheme, isLoading])
 
@@ -190,7 +184,7 @@ const ThemeManagement = () => {
   const handleColorChange = (colorKey, value) => {
     setPendingTheme((prev) => ({ ...prev, [colorKey]: value }))
     setSelectedPreset(null) // Deselect preset on custom change
-    
+
     // Show notification for custom color changes
     if (!snackbar.open) {
       setSnackbar({
@@ -245,7 +239,16 @@ const ThemeManagement = () => {
   if (isLoading) {
     return (
       <RouteGuard requiredPermissions={['admin:access', 'theme:use']}>
-        <Box sx={{ p: 3, maxWidth: 1200, display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '50vh' }}>
+        <Box
+          sx={{
+            p: 3,
+            maxWidth: 1200,
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            minHeight: '50vh'
+          }}
+        >
           <CircularProgress size={60} />
         </Box>
       </RouteGuard>
@@ -278,7 +281,8 @@ const ThemeManagement = () => {
                   Trạng thái chủ đề
                 </Typography>
                 <Typography variant='body2' color='text.secondary'>
-                  Chủ đề sẽ được lưu vào cơ sở dữ liệu và áp dụng cho toàn bộ website
+                  Chủ đề sẽ được lưu vào cơ sở dữ liệu và áp dụng cho toàn bộ
+                  website
                 </Typography>
               </Box>
               <Chip
@@ -323,9 +327,13 @@ const ThemeManagement = () => {
                             <ColorPreview color={theme.accent} />
                           </Box>
                           <Chip
-                            label={selectedPreset === key ? 'Đang chọn' : 'Chọn'}
+                            label={
+                              selectedPreset === key ? 'Đang chọn' : 'Chọn'
+                            }
                             size='small'
-                            color={selectedPreset === key ? 'primary' : 'default'}
+                            color={
+                              selectedPreset === key ? 'primary' : 'default'
+                            }
                             variant={
                               selectedPreset === key ? 'filled' : 'outlined'
                             }
@@ -356,18 +364,27 @@ const ThemeManagement = () => {
                   onChange={() => setShowAdvanced(!showAdvanced)}
                 >
                   <AccordionSummary expandIcon={<ExpandMore />}>
-                    <Typography variant='subtitle2'>Màu sắc nâng cao</Typography>
+                    <Typography variant='subtitle2'>
+                      Màu sắc nâng cao
+                    </Typography>
                   </AccordionSummary>
                   <AccordionDetails>
                     <Grid container spacing={2}>
                       {Object.entries(pendingTheme).map(([key, value]) => (
                         <Grid item xs={12} sm={6} key={key}>
                           <Box
-                            sx={{ display: 'flex', alignItems: 'center', gap: 1 }}
+                            sx={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: 1
+                            }}
                           >
                             <ColorPreview color={value} />
                             <TextField
-                              label={COLOR_LABELS[key] || (key.charAt(0).toUpperCase() + key.slice(1))}
+                              label={
+                                COLOR_LABELS[key] ||
+                                key.charAt(0).toUpperCase() + key.slice(1)
+                              }
                               value={value}
                               onChange={(e) =>
                                 handleColorChange(key, e.target.value)
@@ -391,10 +408,15 @@ const ThemeManagement = () => {
                 <Grid container spacing={2}>
                   {['primary', 'secondary', 'accent'].map((colorKey) => (
                     <Grid item xs={12} sm={4} key={colorKey}>
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                      <Box
+                        sx={{ display: 'flex', alignItems: 'center', gap: 1 }}
+                      >
                         <ColorPreview color={pendingTheme[colorKey]} />
                         <TextField
-                          label={COLOR_LABELS[colorKey] || (colorKey.charAt(0).toUpperCase() + colorKey.slice(1))}
+                          label={
+                            COLOR_LABELS[colorKey] ||
+                            colorKey.charAt(0).toUpperCase() + colorKey.slice(1)
+                          }
                           value={pendingTheme[colorKey]}
                           onChange={(e) =>
                             handleColorChange(colorKey, e.target.value)
@@ -423,10 +445,11 @@ const ThemeManagement = () => {
                     Thao tác
                   </Typography>
                   <Stack direction='row' spacing={2} flexWrap='wrap' useFlexGap>
-
                     <Button
                       variant='contained'
-                      startIcon={saving ? <CircularProgress size={20} /> : <Save />}
+                      startIcon={
+                        saving ? <CircularProgress size={20} /> : <Save />
+                      }
                       onClick={handleSaveTheme}
                       disabled={saving || isLoading}
                       sx={{
@@ -440,7 +463,9 @@ const ThemeManagement = () => {
 
                     <Button
                       variant='outlined'
-                      startIcon={saving ? <CircularProgress size={20} /> : <Refresh />}
+                      startIcon={
+                        saving ? <CircularProgress size={20} /> : <Refresh />
+                      }
                       onClick={handleResetTheme}
                       disabled={saving || isLoading}
                       sx={{

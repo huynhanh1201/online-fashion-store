@@ -530,6 +530,7 @@ const InventoryTab = () => {
   const handleSave = async (inventory, type, inventoryId) => {
     if (type === 'edit') {
       await updateInventoryById(inventoryId, inventory)
+      fetchInventories(page, rowsPerPage, filter)
     } else if (type === 'delete') {
       await deleteInventoryById(inventory)
     }

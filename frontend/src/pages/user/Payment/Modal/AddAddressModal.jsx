@@ -122,7 +122,7 @@ export default function AddAddressModal({
           : field === 'phone'
             ? !value.trim() || !/^0\d{9,10}$/.test(value.trim())
             : field === 'address'
-              ? !value.trim() || value.trim().length < 5
+              ? !value.trim() || value.trim().length < 1
               : !value,
     }))
   }
@@ -312,7 +312,7 @@ export default function AddAddressModal({
     const errors = {
       fullName: !formData.fullName.trim() || formData.fullName.trim().length < 3,
       phone: !formData.phone.trim() || !/^0\d{9,10}$/.test(formData.phone.trim()),
-      address: !formData.address.trim() || formData.address.trim().length < 5,
+      address: !formData.address.trim(),
       city: !formData.city,
       district: !formData.district,
       ward: !formData.ward,
@@ -540,7 +540,7 @@ export default function AddAddressModal({
               value={formData.address}
               onChange={handleChange('address')}
               error={formErrors.address}
-              helperText={formErrors.address ? 'Địa chỉ phải ít nhất 5 ký tự' : ''}
+              helperText={formErrors.address ? 'Địa chỉ không được bỏ trống' : ''}
               disabled={viewOnly}
             />
           </Box>
