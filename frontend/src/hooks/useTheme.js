@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
+import { getCurrentTheme, saveThemeConfig, resetThemeConfig, getDefaultTheme } from '~/services/admin/webConfig/themeService'
 
 // Default theme colors
 const defaultColors = {
@@ -18,19 +19,27 @@ const defaultColors = {
 export const useTheme = () => {
   const [currentTheme, setCurrentTheme] = useState(defaultColors)
   const [isLoaded, setIsLoaded] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
 
-  // Load theme from localStorage
+  // Load theme from API
   useEffect(() => {
-    try {
-      const savedTheme = localStorage.getItem('customTheme')
-      if (savedTheme) {
-        const parsedTheme = JSON.parse(savedTheme)
-        setCurrentTheme({ ...defaultColors, ...parsedTheme })
+    const loadTheme = async () => {
+      try {
+        setIsLoading(true)
+        const savedTheme = await getCurrentTheme()
+        const mergedTheme = { ...defaultColors, ...savedTheme }
+        setCurrentTheme(mergedTheme)
+      } catch (error) {
+        console.error('Error loading theme from API:', error)
+        // Fallback to default theme if API fails
+        setCurrentTheme(defaultColors)
+      } finally {
+        setIsLoading(false)
+        setIsLoaded(true)
       }
-    } catch (error) {
-      console.error('Error loading theme:', error)
     }
-    setIsLoaded(true)
+
+    loadTheme()
   }, [])
 
   // Apply theme to document
@@ -50,24 +59,44 @@ export const useTheme = () => {
   }, [])
 
   // Update theme
-  const updateTheme = useCallback((newTheme) => {
-    const updatedTheme = { ...currentTheme, ...newTheme }
-    setCurrentTheme(updatedTheme)
-    applyTheme(updatedTheme)
-    
-    // Save to localStorage
+  const updateTheme = useCallback(async (newTheme) => {
     try {
-      localStorage.setItem('customTheme', JSON.stringify(updatedTheme))
+      setIsLoading(true)
+      const updatedTheme = { ...currentTheme, ...newTheme }
+      
+      // Save to API
+      await saveThemeConfig(updatedTheme)
+      
+      // Update local state
+      setCurrentTheme(updatedTheme)
+      applyTheme(updatedTheme)
     } catch (error) {
-      console.error('Error saving theme:', error)
+      console.error('Error saving theme to API:', error)
+      throw error
+    } finally {
+      setIsLoading(false)
     }
   }, [currentTheme, applyTheme])
 
   // Reset theme to default
-  const resetTheme = useCallback(() => {
-    setCurrentTheme(defaultColors)
-    applyTheme(defaultColors)
-    localStorage.removeItem('customTheme')
+  const resetTheme = useCallback(async () => {
+    try {
+      setIsLoading(true)
+      
+      // Reset in API
+      await resetThemeConfig()
+      
+      // Update local state
+      const defaultTheme = getDefaultTheme()
+      const mergedTheme = { ...defaultColors, ...defaultTheme }
+      setCurrentTheme(mergedTheme)
+      applyTheme(mergedTheme)
+    } catch (error) {
+      console.error('Error resetting theme:', error)
+      throw error
+    } finally {
+      setIsLoading(false)
+    }
   }, [applyTheme])
 
   // Apply current theme when it changes
@@ -82,7 +111,8 @@ export const useTheme = () => {
     updateTheme,
     resetTheme,
     applyTheme,
-    isLoaded
+    isLoaded,
+    isLoading
   }
 }
 

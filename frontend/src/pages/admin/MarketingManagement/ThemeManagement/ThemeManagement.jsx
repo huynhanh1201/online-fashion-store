@@ -19,7 +19,8 @@ import {
   Paper,
   Accordion,
   AccordionSummary,
-  AccordionDetails
+  AccordionDetails,
+  CircularProgress
 } from '@mui/material'
 import {
   Palette,
@@ -133,11 +134,12 @@ const ThemeCard = styled(Card)(({ selected, theme }) => ({
 }))
 
 const ThemeManagement = () => {
-  const { currentTheme, updateTheme, resetTheme } = useTheme()
+  const { currentTheme, updateTheme, resetTheme, isLoading } = useTheme()
   const [selectedPreset, setSelectedPreset] = useState(null)
   const [pendingTheme, setPendingTheme] = useState(currentTheme)
   const [previewMode, setPreviewMode] = useState(false)
   const [showAdvanced, setShowAdvanced] = useState(false)
+  const [saving, setSaving] = useState(false)
   const [snackbar, setSnackbar] = useState({
     open: false,
     message: '',
@@ -147,21 +149,32 @@ const ThemeManagement = () => {
 
   // Sync selected preset and pendingTheme with current theme on load or when theme changes
   useEffect(() => {
+    if (isLoading) return // Đợi load xong
+    
+    // Sync preset
     const matchingPresetKey = Object.entries(predefinedThemes).find(
       ([key, preset]) =>
         preset.primary === currentTheme.primary &&
         preset.secondary === currentTheme.secondary &&
         preset.accent === currentTheme.accent
     )?.[0]
-
+  
     if (matchingPresetKey) {
       setSelectedPreset(matchingPresetKey)
       setPendingTheme(predefinedThemes[matchingPresetKey])
     } else {
-      setSelectedPreset(null) // It's a custom theme
+      setSelectedPreset(null)
       setPendingTheme(currentTheme)
     }
-  }, [currentTheme])
+  
+    if (currentTheme) {
+      setSnackbar({
+        open: true,
+        message: 'Đã tải chủ đề từ cơ sở dữ liệu thành công!',
+        severity: 'success'
+      })
+    }
+  }, [currentTheme, isLoading])
 
   const handlePresetSelect = (presetKey) => {
     const preset = predefinedThemes[presetKey]
@@ -169,7 +182,7 @@ const ThemeManagement = () => {
     setSelectedPreset(presetKey)
     setSnackbar({
       open: true,
-      message: `Đã chọn theme ${preset.name}. Nhấn Lưu để áp dụng!`,
+      message: `Đã chọn theme ${preset.name}. Nhấn "Lưu chủ đề" để lưu vào cơ sở dữ liệu!`,
       severity: 'info'
     })
   }
@@ -177,24 +190,66 @@ const ThemeManagement = () => {
   const handleColorChange = (colorKey, value) => {
     setPendingTheme((prev) => ({ ...prev, [colorKey]: value }))
     setSelectedPreset(null) // Deselect preset on custom change
+    
+    // Show notification for custom color changes
+    if (!snackbar.open) {
+      setSnackbar({
+        open: true,
+        message: 'Đã thay đổi màu sắc. Nhấn "Lưu chủ đề" để lưu thay đổi!',
+        severity: 'info'
+      })
+    }
   }
 
-  const handleSaveTheme = () => {
-    updateTheme(pendingTheme)
-    setSnackbar({
-      open: true,
-      message: 'Chủ đề đã được lưu thành công!',
-      severity: 'success'
-    })
+  const handleSaveTheme = async () => {
+    try {
+      setSaving(true)
+      await updateTheme(pendingTheme)
+      setSnackbar({
+        open: true,
+        message: 'Chủ đề đã được lưu thành công!',
+        severity: 'success'
+      })
+    } catch (error) {
+      setSnackbar({
+        open: true,
+        message: 'Không thể lưu chủ đề. Vui lòng thử lại!',
+        severity: 'error'
+      })
+    } finally {
+      setSaving(false)
+    }
   }
 
-  const handleResetTheme = () => {
-    resetTheme()
-    setSnackbar({
-      open: true,
-      message: 'Theme đã được reset về mặc định!',
-      severity: 'info'
-    })
+  const handleResetTheme = async () => {
+    try {
+      setSaving(true)
+      await resetTheme()
+      setSnackbar({
+        open: true,
+        message: 'Theme đã được reset về mặc định!',
+        severity: 'info'
+      })
+    } catch (error) {
+      setSnackbar({
+        open: true,
+        message: 'Không thể reset theme. Vui lòng thử lại!',
+        severity: 'error'
+      })
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  // Show loading state while theme is being loaded
+  if (isLoading) {
+    return (
+      <RouteGuard requiredPermissions={['admin:access', 'theme:use']}>
+        <Box sx={{ p: 3, maxWidth: 1200, display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '50vh' }}>
+          <CircularProgress size={60} />
+        </Box>
+      </RouteGuard>
+    )
   }
 
   return (
@@ -208,7 +263,7 @@ const ThemeManagement = () => {
           Quản lý Chủ đề & Màu sắc
         </Typography>
 
-        {/* Preview Mode Toggle */}
+        {/* Theme Status */}
         <Card sx={{ mb: 3 }}>
           <CardContent>
             <Box
@@ -220,14 +275,14 @@ const ThemeManagement = () => {
             >
               <Box>
                 <Typography variant='h6' sx={{ mb: 1 }}>
-                  Chế độ xem trước
+                  Trạng thái chủ đề
                 </Typography>
                 <Typography variant='body2' color='text.secondary'>
-                  Chủ đề sẽ được áp dụng ngay lập tức khi bạn thay đổi màu sắc
+                  Chủ đề sẽ được lưu vào cơ sở dữ liệu và áp dụng cho toàn bộ website
                 </Typography>
               </Box>
               <Chip
-                label='Đang hoạt động'
+                label='Đã lưu vào API'
                 color='success'
                 variant='filled'
                 icon={<Visibility />}
@@ -371,28 +426,30 @@ const ThemeManagement = () => {
 
                     <Button
                       variant='contained'
-                      startIcon={<Save />}
+                      startIcon={saving ? <CircularProgress size={20} /> : <Save />}
                       onClick={handleSaveTheme}
+                      disabled={saving || isLoading}
                       sx={{
                         minWidth: 120,
                         backgroundColor: 'var(--primary-color)',
                         color: '#fff'
                       }}
                     >
-                      Lưu chủ đề
+                      {saving ? 'Đang lưu...' : 'Lưu chủ đề'}
                     </Button>
 
                     <Button
                       variant='outlined'
-                      startIcon={<Refresh />}
+                      startIcon={saving ? <CircularProgress size={20} /> : <Refresh />}
                       onClick={handleResetTheme}
+                      disabled={saving || isLoading}
                       sx={{
                         minWidth: 120,
                         color: 'var(--primary-color)',
                         borderColor: 'var(--primary-color)'
                       }}
                     >
-                      Khôi phục
+                      {saving ? 'Đang reset...' : 'Khôi phục'}
                     </Button>
                   </Stack>
                 </CardContent>
