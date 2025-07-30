@@ -17,7 +17,15 @@ import {
   Tab,
   Divider
 } from '@mui/material'
-import { Add as AddIcon, Remove as RemoveIcon, AddPhotoAlternate, CloudUpload as CloudUploadIcon, Delete as DeleteIcon, Visibility as VisibilityIcon, Edit as EditIcon } from '@mui/icons-material'
+import {
+  Add as AddIcon,
+  Remove as RemoveIcon,
+  AddPhotoAlternate,
+  CloudUpload as CloudUploadIcon,
+  Delete as DeleteIcon,
+  Visibility as VisibilityIcon,
+  Edit as EditIcon
+} from '@mui/icons-material'
 import {
   getFooterConfig,
   createFooterConfig,
@@ -25,26 +33,30 @@ import {
 } from '~/services/admin/webConfig/footerService'
 import { uploadImageToCloudinary } from '~/utils/cloudinary.js'
 import { CLOUD_FOLDER } from '~/utils/constants.js'
+import { Link } from 'react-router-dom'
+import LocationOnIcon from '@mui/icons-material/LocationOn'
+import PhoneIcon from '@mui/icons-material/Phone'
 
 const defaultAbout = { phone: '', email: '' }
 const defaultSocialLink = { name: '', image: '', link: '' }
 const defaultStore = { name: '', address: '' }
-const defaultFanpageImage = '';
+const defaultFanpageImage = ''
 
 // Preview Component
 const FooterPreview = ({ logo, about, socialLinks, stores, fanpageImage }) => {
   return (
-    <Box sx={{ 
-      bgcolor: 'var(--primary-color)', 
-      color: 'white', 
-      pt: 6, 
-      pb: 3, 
-      fontSize: 14,
-      borderRadius: 2,
-      minHeight: 400,
-      fontFamily: 'Arial, sans-serif'
-    }}>
-    
+    <Box
+      sx={{
+        bgcolor: 'var(--primary-color)',
+        color: 'white',
+        pt: 6,
+        pb: 3,
+        fontSize: 14,
+        borderRadius: 2,
+        minHeight: 400,
+        fontFamily: 'Arial, sans-serif'
+      }}
+    >
       <Box sx={{ maxWidth: '1450px', mx: 'auto', px: 2 }}>
         <Box
           sx={{
@@ -52,37 +64,74 @@ const FooterPreview = ({ logo, about, socialLinks, stores, fanpageImage }) => {
             flexDirection: { xs: 'column', md: 'row' },
             justifyContent: 'space-between',
             flexWrap: 'wrap',
-            gap: 4,
             mb: 4,
-            justifyItems: 'center',
-            padding: '20px'
+            justifyItems: 'center'
           }}
         >
           {/* Cột 1: Logo + Đăng ký nhận tin + Thông tin liên hệ */}
           <Box sx={{ flex: 1, minWidth: 220 }}>
             {logo && (
               <Box sx={{ mb: 1 }}>
-                <img 
-                  src={logo} 
-                  alt='logo' 
-                  style={{ 
-                    width: 120, 
-                    height: 'auto', 
-                    borderRadius: 8, 
-                    background: '#fff', 
-                    padding: 4 
-                  }} 
+                <img
+                  src={logo}
+                  alt='logo'
+                  style={{
+                    width: 120,
+                    height: 'auto',
+                    borderRadius: 8,
+                    background: '#fff',
+                    padding: 4
+                  }}
                 />
               </Box>
             )}
             <Typography variant='h6' sx={{ fontWeight: 700, mb: 1 }}>
-              {about?.[0]?.phone ? `Hotline: ${about[0].phone}` : 'FASHIONSTORE'}
+              {about?.[0]?.phone ? (
+                <>
+                  <PhoneIcon sx={{ fontSize: 16, mr: 1 }} />
+                  {about[0].phone}
+                </>
+              ) : (
+                'FASHIONSTORE'
+              )}
             </Typography>
+
             {about?.[0]?.email && (
-              <Typography variant='body2' sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                <span style={{ fontSize: 16, marginRight: 8 }}>✉️</span> {about[0].email}
+              <Typography
+                variant='body2'
+                sx={{ display: 'flex', alignItems: 'center', mb: 2 }}
+              >
+                <span style={{ fontSize: 16, marginRight: 8 }}>✉️</span>{' '}
+                {about[0].email}
               </Typography>
             )}
+          </Box>
+          <Box sx={{ flex: 1, minWidth: 180 }}>
+            <Typography variant='subtitle1' sx={{ fontWeight: 600, mb: 1 }}>
+              HỖ TRỢ KHÁCH HÀNG
+            </Typography>
+            <Stack spacing={0.5}>
+              <Typography
+                sx={{
+                  color: 'inherit',
+                  textDecoration: 'none',
+                  cursor: 'pointer',
+                  '&:hover': { textDecoration: 'underline' }
+                }}
+              >
+                Chính sách đổi trả
+              </Typography>
+              <Typography
+                sx={{
+                  color: 'inherit',
+                  textDecoration: 'none',
+                  cursor: 'pointer',
+                  '&:hover': { textDecoration: 'underline' }
+                }}
+              >
+                Chính sách bảo mật
+              </Typography>
+            </Stack>
           </Box>
 
           {/* Cột 3: Danh sách cửa hàng */}
@@ -94,7 +143,7 @@ const FooterPreview = ({ logo, about, socialLinks, stores, fanpageImage }) => {
               {stores.map((store, idx) => (
                 <Box key={idx} sx={{ mb: 1 }}>
                   <Typography sx={{ display: 'flex', alignItems: 'center' }}>
-                    <span style={{ fontSize: 16, marginRight: 8 }}>📍</span>
+                    <LocationOnIcon sx={{ fontSize: 16, mr: 1 }} />
                     <strong>{store.name}</strong>
                   </Typography>
                   <Typography variant='body2' sx={{ ml: 3 }}>
@@ -113,7 +162,17 @@ const FooterPreview = ({ logo, about, socialLinks, stores, fanpageImage }) => {
               </Typography>
               {fanpageImage && (
                 <Box sx={{ mb: 2, display: 'flex', justifyContent: 'start' }}>
-                  <img src={fanpageImage} alt='fanpage' style={{ width: 300, height: 'auto', borderRadius: 8, background: '#fff', padding: 4 }} />
+                  <img
+                    src={fanpageImage}
+                    alt='fanpage'
+                    style={{
+                      width: 275,
+                      height: 'auto',
+                      borderRadius: 8,
+                      background: '#fff',
+                      padding: 4
+                    }}
+                  />
                 </Box>
               )}
               <Stack spacing={1}>
@@ -172,27 +231,38 @@ const FooterPreview = ({ logo, about, socialLinks, stores, fanpageImage }) => {
       </Box>
 
       {/* Empty State */}
-      {!logo && (!about || about.every(a => !a.phone && !a.email)) && 
-       (!stores || stores.every(s => !s.name && !s.address)) && 
-       (!socialLinks || socialLinks.every(s => !s.name && !s.image)) && (
-        <Box sx={{ 
-          textAlign: 'center', 
-          py: 8, 
-          color: '#9ca3af' 
-        }}>
-          <Typography variant="h6" sx={{ mb: 1 }}>
-            Chưa có nội dung
-          </Typography>
-          <Typography variant="body2">
-            Hãy thêm thông tin để xem preview
-          </Typography>
-        </Box>
-      )}
+      {!logo &&
+        (!about || about.every((a) => !a.phone && !a.email)) &&
+        (!stores || stores.every((s) => !s.name && !s.address)) &&
+        (!socialLinks || socialLinks.every((s) => !s.name && !s.image)) && (
+          <Box
+            sx={{
+              textAlign: 'center',
+              py: 8,
+              color: '#9ca3af'
+            }}
+          >
+            <Typography variant='h6' sx={{ mb: 1 }}>
+              Chưa có nội dung
+            </Typography>
+            <Typography variant='body2'>
+              Hãy thêm thông tin để xem preview
+            </Typography>
+          </Box>
+        )}
     </Box>
   )
 }
 
-const AddFooterModal = ({ open, onClose, onSuccess, footerConfig, mode = 'add', initialData = null, footerIndex = null }) => {
+const AddFooterModal = ({
+  open,
+  onClose,
+  onSuccess,
+  footerConfig,
+  mode = 'add',
+  initialData = null,
+  footerIndex = null
+}) => {
   const [logo, setLogo] = useState('')
   const [fanpageImage, setFanpageImage] = useState(defaultFanpageImage)
   const [fanpageImagePreview, setFanpageImagePreview] = useState('')
@@ -218,8 +288,14 @@ const AddFooterModal = ({ open, onClose, onSuccess, footerConfig, mode = 'add', 
       setFanpageImage(initialData.fanpageImage || '')
       setFanpageImagePreview(initialData.fanpageImage || '')
       setAbout(initialData.about?.length ? initialData.about : [defaultAbout])
-      setSocialLinks(initialData.socialLinks?.length ? initialData.socialLinks : [defaultSocialLink])
-      setStores(initialData.stores?.length ? initialData.stores : [defaultStore])
+      setSocialLinks(
+        initialData.socialLinks?.length
+          ? initialData.socialLinks
+          : [defaultSocialLink]
+      )
+      setStores(
+        initialData.stores?.length ? initialData.stores : [defaultStore]
+      )
       setStatus(initialData.status || 'Đang sử dụng')
     } else if (mode === 'add') {
       resetForm()
@@ -253,14 +329,22 @@ const AddFooterModal = ({ open, onClose, onSuccess, footerConfig, mode = 'add', 
     setAbout(about.map((a, i) => (i === idx ? { ...a, [field]: value } : a)))
   }
 
-  const handleAddSocialLink = () => setSocialLinks([...socialLinks, { ...defaultSocialLink, id: `temp-${Date.now()}` }])
-  const handleRemoveSocialLink = (idx) => setSocialLinks(socialLinks.filter((_, i) => i !== idx))
+  const handleAddSocialLink = () =>
+    setSocialLinks([
+      ...socialLinks,
+      { ...defaultSocialLink, id: `temp-${Date.now()}` }
+    ])
+  const handleRemoveSocialLink = (idx) =>
+    setSocialLinks(socialLinks.filter((_, i) => i !== idx))
   const handleSocialLinkChange = (idx, field, value) => {
-    setSocialLinks(socialLinks.map((s, i) => (i === idx ? { ...s, [field]: value } : s)))
+    setSocialLinks(
+      socialLinks.map((s, i) => (i === idx ? { ...s, [field]: value } : s))
+    )
   }
 
   const handleAddStore = () => setStores([...stores, defaultStore])
-  const handleRemoveStore = (idx) => setStores(stores.filter((_, i) => i !== idx))
+  const handleRemoveStore = (idx) =>
+    setStores(stores.filter((_, i) => i !== idx))
   const handleStoreChange = (idx, field, value) => {
     setStores(stores.map((s, i) => (i === idx ? { ...s, [field]: value } : s)))
   }
@@ -356,21 +440,27 @@ const AddFooterModal = ({ open, onClose, onSuccess, footerConfig, mode = 'add', 
     if (!logo) errors.logo = 'Logo không được để trống.'
     // About
     about.forEach((a, i) => {
-      if (!a.phone) errors[`about_phone_${i}`] = 'Số điện thoại không được để trống.'
+      if (!a.phone)
+        errors[`about_phone_${i}`] = 'Số điện thoại không được để trống.'
       if (!a.email) errors[`about_email_${i}`] = 'Email không được để trống.'
-      else if (!/^\S+@\S+\.\S+$/.test(a.email)) errors[`about_email_${i}`] = 'Email không hợp lệ.'
+      else if (!/^\S+@\S+\.\S+$/.test(a.email))
+        errors[`about_email_${i}`] = 'Email không hợp lệ.'
     })
     // Store
     stores.forEach((s, i) => {
-      if (!s.name) errors[`store_name_${i}`] = 'Tên cửa hàng không được để trống.'
-      if (!s.address) errors[`store_address_${i}`] = 'Địa chỉ cửa hàng không được để trống.'
+      if (!s.name)
+        errors[`store_name_${i}`] = 'Tên cửa hàng không được để trống.'
+      if (!s.address)
+        errors[`store_address_${i}`] = 'Địa chỉ cửa hàng không được để trống.'
     })
     // Social
     socialLinks.forEach((s, i) => {
-      if (!s.name) errors[`social_name_${i}`] = 'Tên mạng xã hội không được để trống.'
+      if (!s.name)
+        errors[`social_name_${i}`] = 'Tên mạng xã hội không được để trống.'
       if (!s.image) errors[`social_image_${i}`] = 'Icon không được để trống.'
       if (!s.link) errors[`social_link_${i}`] = 'Link không được để trống.'
-      else if (!/^https?:\/\//.test(s.link)) errors[`social_link_${i}`] = 'Link phải bắt đầu bằng http(s)://'
+      else if (!/^https?:\/\//.test(s.link))
+        errors[`social_link_${i}`] = 'Link phải bắt đầu bằng http(s)://'
     })
     return errors
   }
@@ -432,28 +522,26 @@ const AddFooterModal = ({ open, onClose, onSuccess, footerConfig, mode = 'add', 
   }
 
   return (
-    <Dialog open={open} onClose={handleClose} maxWidth='lg' fullWidth sx={{ zIndex: 15000, maxHeight: '95vh', mt:5 }}>
+    <Dialog
+      open={open}
+      onClose={handleClose}
+      maxWidth='lg'
+      fullWidth
+      sx={{ zIndex: 15000, maxHeight: '95vh', mt: 5 }}
+    >
       <DialogTitle>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
           Thêm nội dung chân trang mới
         </Box>
       </DialogTitle>
-      
-      <Tabs 
-        value={activeTab} 
+
+      <Tabs
+        value={activeTab}
         onChange={(e, newValue) => setActiveTab(newValue)}
         sx={{ px: 3, borderBottom: 1, borderColor: 'divider' }}
       >
-        <Tab 
-          icon={<EditIcon />} 
-          label="Chỉnh sửa" 
-          iconPosition="start"
-        />
-        <Tab 
-          icon={<VisibilityIcon />} 
-          label="Xem trước" 
-          iconPosition="start"
-        />
+        <Tab icon={<EditIcon />} label='Chỉnh sửa' iconPosition='start' />
+        <Tab icon={<VisibilityIcon />} label='Xem trước' iconPosition='start' />
       </Tabs>
 
       <DialogContent sx={{ maxHeight: '95vh', overflowY: 'auto', p: 0 }}>
@@ -465,11 +553,20 @@ const AddFooterModal = ({ open, onClose, onSuccess, footerConfig, mode = 'add', 
         {activeTab === 0 && (
           <Box sx={{ p: { xs: 1, md: 4 } }}>
             {/* Section: Logo & Fanpage */}
-            <Typography variant='h6' sx={{ fontWeight: 700, mb: 2 }}>Logo & Ảnh Fanpage</Typography>
-            <Stack direction={{ xs: 'column', md: 'row' }} spacing={3} alignItems='flex-start' mb={3}>
+            <Typography variant='h6' sx={{ fontWeight: 700, mb: 2 }}>
+              Logo & Ảnh Fanpage
+            </Typography>
+            <Stack
+              direction={{ xs: 'column', md: 'row' }}
+              spacing={3}
+              alignItems='flex-start'
+              mb={3}
+            >
               {/* Logo */}
               <Box flex={1}>
-                <Typography variant='subtitle1' sx={{ fontWeight: 600, mb: 1 }}>Logo</Typography>
+                <Typography variant='subtitle1' sx={{ fontWeight: 600, mb: 1 }}>
+                  Logo
+                </Typography>
                 <Card
                   sx={{
                     border: '2px dashed #d1d5db',
@@ -480,7 +577,7 @@ const AddFooterModal = ({ open, onClose, onSuccess, footerConfig, mode = 'add', 
                     minHeight: 140,
                     display: 'flex',
                     alignItems: 'center',
-                    justifyContent: 'center',
+                    justifyContent: 'center'
                   }}
                 >
                   {logo || logoPreview ? (
@@ -488,12 +585,29 @@ const AddFooterModal = ({ open, onClose, onSuccess, footerConfig, mode = 'add', 
                       <img
                         src={logoPreview || logo}
                         alt='logo preview'
-                        style={{ width: 100, height: 100, objectFit: 'contain', borderRadius: 8, border: '1px solid #e5e7eb', background: '#fff' }}
+                        style={{
+                          width: 100,
+                          height: 100,
+                          objectFit: 'contain',
+                          borderRadius: 8,
+                          border: '1px solid #e5e7eb',
+                          background: '#fff'
+                        }}
                       />
                       <Tooltip title='Xóa logo'>
                         <IconButton
-                          onClick={() => { setLogo(''); setLogoPreview('') }}
-                          sx={{ position: 'absolute', top: -8, right: -8, backgroundColor: '#ef4444', color: 'white', '&:hover': { backgroundColor: '#dc2626' } }}
+                          onClick={() => {
+                            setLogo('')
+                            setLogoPreview('')
+                          }}
+                          sx={{
+                            position: 'absolute',
+                            top: -8,
+                            right: -8,
+                            backgroundColor: '#ef4444',
+                            color: 'white',
+                            '&:hover': { backgroundColor: '#dc2626' }
+                          }}
                           size='small'
                         >
                           <DeleteIcon fontSize='small' />
@@ -502,11 +616,23 @@ const AddFooterModal = ({ open, onClose, onSuccess, footerConfig, mode = 'add', 
                     </Box>
                   ) : (
                     <Box
-                      sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', py: 3, cursor: 'pointer' }}
+                      sx={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        py: 3,
+                        cursor: 'pointer'
+                      }}
                       onClick={() => logoInputRef.current?.click()}
                     >
-                      <CloudUploadIcon sx={{ fontSize: 48, color: '#9ca3af', mb: 2 }} />
-                      <Typography variant='body2' color='text.secondary' sx={{ mb: 1 }}>
+                      <CloudUploadIcon
+                        sx={{ fontSize: 48, color: '#9ca3af', mb: 2 }}
+                      />
+                      <Typography
+                        variant='body2'
+                        color='text.secondary'
+                        sx={{ mb: 1 }}
+                      >
                         {logoUploading ? 'Đang tải lên...' : 'Nhấp để tải logo'}
                       </Typography>
                       <Typography variant='caption' color='text.secondary'>
@@ -528,7 +654,9 @@ const AddFooterModal = ({ open, onClose, onSuccess, footerConfig, mode = 'add', 
               </Box>
               {/* Fanpage Image */}
               <Box flex={1}>
-                <Typography variant='subtitle1' sx={{ fontWeight: 600, mb: 1 }}>Ảnh Fanpage</Typography>
+                <Typography variant='subtitle1' sx={{ fontWeight: 600, mb: 1 }}>
+                  Ảnh Fanpage
+                </Typography>
                 <Card
                   sx={{
                     border: '2px dashed #d1d5db',
@@ -539,7 +667,7 @@ const AddFooterModal = ({ open, onClose, onSuccess, footerConfig, mode = 'add', 
                     minHeight: 140,
                     display: 'flex',
                     alignItems: 'center',
-                    justifyContent: 'center',
+                    justifyContent: 'center'
                   }}
                 >
                   {fanpageImage || fanpageImagePreview ? (
@@ -547,12 +675,26 @@ const AddFooterModal = ({ open, onClose, onSuccess, footerConfig, mode = 'add', 
                       <img
                         src={fanpageImagePreview || fanpageImage}
                         alt='fanpage preview'
-                        style={{ width: 120, height: 120, objectFit: 'contain', borderRadius: 8, border: '1px solid #e5e7eb', background: '#fff' }}
+                        style={{
+                          width: 120,
+                          height: 120,
+                          objectFit: 'contain',
+                          borderRadius: 8,
+                          border: '1px solid #e5e7eb',
+                          background: '#fff'
+                        }}
                       />
                       <Tooltip title='Xóa ảnh fanpage'>
                         <IconButton
                           onClick={handleRemoveFanpageImage}
-                          sx={{ position: 'absolute', top: -8, right: -8, backgroundColor: '#ef4444', color: 'white', '&:hover': { backgroundColor: '#dc2626' } }}
+                          sx={{
+                            position: 'absolute',
+                            top: -8,
+                            right: -8,
+                            backgroundColor: '#ef4444',
+                            color: 'white',
+                            '&:hover': { backgroundColor: '#dc2626' }
+                          }}
                           size='small'
                         >
                           <DeleteIcon fontSize='small' />
@@ -561,12 +703,26 @@ const AddFooterModal = ({ open, onClose, onSuccess, footerConfig, mode = 'add', 
                     </Box>
                   ) : (
                     <Box
-                      sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', py: 3, cursor: 'pointer' }}
+                      sx={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        py: 3,
+                        cursor: 'pointer'
+                      }}
                       onClick={() => fanpageImageInputRef.current?.click()}
                     >
-                      <CloudUploadIcon sx={{ fontSize: 48, color: '#9ca3af', mb: 2 }} />
-                      <Typography variant='body2' color='text.secondary' sx={{ mb: 1 }}>
-                        {fanpageImageUploading ? 'Đang tải lên...' : 'Nhấp để tải ảnh fanpage'}
+                      <CloudUploadIcon
+                        sx={{ fontSize: 48, color: '#9ca3af', mb: 2 }}
+                      />
+                      <Typography
+                        variant='body2'
+                        color='text.secondary'
+                        sx={{ mb: 1 }}
+                      >
+                        {fanpageImageUploading
+                          ? 'Đang tải lên...'
+                          : 'Nhấp để tải ảnh fanpage'}
                       </Typography>
                       <Typography variant='caption' color='text.secondary'>
                         JPG, PNG, WebP (tối đa 5MB)
@@ -588,84 +744,233 @@ const AddFooterModal = ({ open, onClose, onSuccess, footerConfig, mode = 'add', 
             </Stack>
             <Divider sx={{ my: 4 }} />
             {/* Section: About */}
-            <Typography variant='h6' sx={{ fontWeight: 700, mb: 2 }}>Giới thiệu</Typography>
+            <Typography variant='h6' sx={{ fontWeight: 700, mb: 2 }}>
+              Giới thiệu
+            </Typography>
             <Stack spacing={2} mb={3}>
               {about.map((a, idx) => (
-                <Box key={idx} sx={{ p: 2, borderRadius: 2, bgcolor: '#fff', boxShadow: '0 1px 4px #e0e7ef33' }}>
-                  <Stack spacing={1} direction={{ xs: 'column', md: 'row' }} alignItems='center'>
-                    <TextField label='Số điện thoại' value={a.phone} onChange={e => handleAboutChange(idx, 'phone', e.target.value)} size='small' fullWidth error={!!fieldErrors[`about_phone_${idx}`]} helperText={fieldErrors[`about_phone_${idx}`]} />
-                    <TextField label='Email' value={a.email} onChange={e => handleAboutChange(idx, 'email', e.target.value)} size='small' fullWidth error={!!fieldErrors[`about_email_${idx}`]} helperText={fieldErrors[`about_email_${idx}`]} />
+                <Box
+                  key={idx}
+                  sx={{
+                    p: 2,
+                    borderRadius: 2,
+                    bgcolor: '#fff',
+                    boxShadow: '0 1px 4px #e0e7ef33'
+                  }}
+                >
+                  <Stack
+                    spacing={1}
+                    direction={{ xs: 'column', md: 'row' }}
+                    alignItems='center'
+                  >
+                    <TextField
+                      label='Số điện thoại'
+                      value={a.phone}
+                      onChange={(e) =>
+                        handleAboutChange(idx, 'phone', e.target.value)
+                      }
+                      size='small'
+                      fullWidth
+                      error={!!fieldErrors[`about_phone_${idx}`]}
+                      helperText={fieldErrors[`about_phone_${idx}`]}
+                    />
+                    <TextField
+                      label='Email'
+                      value={a.email}
+                      onChange={(e) =>
+                        handleAboutChange(idx, 'email', e.target.value)
+                      }
+                      size='small'
+                      fullWidth
+                      error={!!fieldErrors[`about_email_${idx}`]}
+                      helperText={fieldErrors[`about_email_${idx}`]}
+                    />
                     {about.length > 1 && (
-                      <IconButton onClick={() => handleRemoveAbout(idx)}><RemoveIcon /></IconButton>
+                      <IconButton onClick={() => handleRemoveAbout(idx)}>
+                        <RemoveIcon />
+                      </IconButton>
                     )}
                   </Stack>
                 </Box>
               ))}
             </Stack>
-            <Button startIcon={<AddIcon />} onClick={handleAddAbout} size='small' sx={{ mt: 1, mb: 3, width: { xs: '100%', md: 'auto' } }}>Thêm dòng giới thiệu</Button>
+            <Button
+              startIcon={<AddIcon />}
+              onClick={handleAddAbout}
+              size='small'
+              sx={{ mt: 1, mb: 3, width: { xs: '100%', md: 'auto' } }}
+            >
+              Thêm dòng giới thiệu
+            </Button>
             <Divider sx={{ my: 4 }} />
             {/* Section: Social Links */}
-            <Typography variant='h6' sx={{ fontWeight: 700, mb: 2 }}>Mạng xã hội</Typography>
+            <Typography variant='h6' sx={{ fontWeight: 700, mb: 2 }}>
+              Mạng xã hội
+            </Typography>
             <Stack spacing={2} mb={3}>
               {socialLinks.map((s, idx) => (
-                <Box key={idx} sx={{ p: 2, borderRadius: 2, bgcolor: '#fff', boxShadow: '0 1px 4px #e0e7ef33' }}>
-                  <Stack spacing={1} direction={{ xs: 'column', md: 'row' }} alignItems='center'>
+                <Box
+                  key={idx}
+                  sx={{
+                    p: 2,
+                    borderRadius: 2,
+                    bgcolor: '#fff',
+                    boxShadow: '0 1px 4px #e0e7ef33'
+                  }}
+                >
+                  <Stack
+                    spacing={1}
+                    direction={{ xs: 'column', md: 'row' }}
+                    alignItems='center'
+                  >
                     <Box>
                       <input
-                        accept="image/*,.svg"
+                        accept='image/*,.svg'
                         style={{ display: 'none' }}
                         id={`social-icon-uploader-${idx}`}
-                        type="file"
+                        type='file'
                         onChange={(e) => handleSocialIconUpload(e, idx)}
                       />
                       <label htmlFor={`social-icon-uploader-${idx}`}>
-                        <Button component="span" variant="outlined" disabled={socialIconLoadingIndex === idx} sx={{ minWidth: 40, height: 40, p: 0, borderRadius: '50%' }}>
+                        <Button
+                          component='span'
+                          variant='outlined'
+                          disabled={socialIconLoadingIndex === idx}
+                          sx={{
+                            minWidth: 40,
+                            height: 40,
+                            p: 0,
+                            borderRadius: '50%'
+                          }}
+                        >
                           {socialIconLoadingIndex === idx ? (
                             <CircularProgress size={20} />
                           ) : s.image ? (
-                            <img src={s.image} alt="icon" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }} />
+                            <img
+                              src={s.image}
+                              alt='icon'
+                              style={{
+                                width: '100%',
+                                height: '100%',
+                                objectFit: 'cover',
+                                borderRadius: '50%'
+                              }}
+                            />
                           ) : (
                             <AddPhotoAlternate />
                           )}
                         </Button>
                       </label>
                     </Box>
-                    <TextField label='Tên mạng xã hội' value={s.name} onChange={e => handleSocialLinkChange(idx, 'name', e.target.value)} size='small' sx={{ minWidth: 120 }} error={!!fieldErrors[`social_name_${idx}`]} helperText={fieldErrors[`social_name_${idx}`]} fullWidth />
-                    <TextField label='Link' value={s.link} onChange={e => handleSocialLinkChange(idx, 'link', e.target.value)} size='small' fullWidth error={!!fieldErrors[`social_link_${idx}`]} helperText={fieldErrors[`social_link_${idx}`]} />
+                    <TextField
+                      label='Tên mạng xã hội'
+                      value={s.name}
+                      onChange={(e) =>
+                        handleSocialLinkChange(idx, 'name', e.target.value)
+                      }
+                      size='small'
+                      sx={{ minWidth: 120 }}
+                      error={!!fieldErrors[`social_name_${idx}`]}
+                      helperText={fieldErrors[`social_name_${idx}`]}
+                      fullWidth
+                    />
+                    <TextField
+                      label='Link'
+                      value={s.link}
+                      onChange={(e) =>
+                        handleSocialLinkChange(idx, 'link', e.target.value)
+                      }
+                      size='small'
+                      fullWidth
+                      error={!!fieldErrors[`social_link_${idx}`]}
+                      helperText={fieldErrors[`social_link_${idx}`]}
+                    />
                     {socialLinks.length > 1 && (
-                      <IconButton onClick={() => handleRemoveSocialLink(idx)}><RemoveIcon /></IconButton>
+                      <IconButton onClick={() => handleRemoveSocialLink(idx)}>
+                        <RemoveIcon />
+                      </IconButton>
                     )}
                   </Stack>
                 </Box>
               ))}
             </Stack>
-            <Button startIcon={<AddIcon />} onClick={handleAddSocialLink} size='small' sx={{ mt: 1, mb: 3, width: { xs: '100%', md: 'auto' } }}>Thêm mạng xã hội</Button>
+            <Button
+              startIcon={<AddIcon />}
+              onClick={handleAddSocialLink}
+              size='small'
+              sx={{ mt: 1, mb: 3, width: { xs: '100%', md: 'auto' } }}
+            >
+              Thêm mạng xã hội
+            </Button>
             <Divider sx={{ my: 4 }} />
             {/* Section: Stores */}
-            <Typography variant='h6' sx={{ fontWeight: 700, mb: 2 }}>Hệ thống cửa hàng</Typography>
+            <Typography variant='h6' sx={{ fontWeight: 700, mb: 2 }}>
+              Hệ thống cửa hàng
+            </Typography>
             <Stack spacing={2} mb={3}>
               {stores.map((s, idx) => (
-                <Box key={idx} sx={{ p: 2, borderRadius: 2, bgcolor: '#fff', boxShadow: '0 1px 4px #e0e7ef33' }}>
-                  <Stack spacing={1} direction={{ xs: 'column', md: 'row' }} alignItems='center'>
-                    <TextField label='Tên cửa hàng' value={s.name} onChange={e => handleStoreChange(idx, 'name', e.target.value)} size='small' fullWidth error={!!fieldErrors[`store_name_${idx}`]} helperText={fieldErrors[`store_name_${idx}`]} />
-                    <TextField label='Địa chỉ cửa hàng' value={s.address} onChange={e => handleStoreChange(idx, 'address', e.target.value)} size='small' fullWidth error={!!fieldErrors[`store_address_${idx}`]} helperText={fieldErrors[`store_address_${idx}`]} />
+                <Box
+                  key={idx}
+                  sx={{
+                    p: 2,
+                    borderRadius: 2,
+                    bgcolor: '#fff',
+                    boxShadow: '0 1px 4px #e0e7ef33'
+                  }}
+                >
+                  <Stack
+                    spacing={1}
+                    direction={{ xs: 'column', md: 'row' }}
+                    alignItems='center'
+                  >
+                    <TextField
+                      label='Tên cửa hàng'
+                      value={s.name}
+                      onChange={(e) =>
+                        handleStoreChange(idx, 'name', e.target.value)
+                      }
+                      size='small'
+                      fullWidth
+                      error={!!fieldErrors[`store_name_${idx}`]}
+                      helperText={fieldErrors[`store_name_${idx}`]}
+                    />
+                    <TextField
+                      label='Địa chỉ cửa hàng'
+                      value={s.address}
+                      onChange={(e) =>
+                        handleStoreChange(idx, 'address', e.target.value)
+                      }
+                      size='small'
+                      fullWidth
+                      error={!!fieldErrors[`store_address_${idx}`]}
+                      helperText={fieldErrors[`store_address_${idx}`]}
+                    />
                     {stores.length > 1 && (
-                      <IconButton onClick={() => handleRemoveStore(idx)}><RemoveIcon /></IconButton>
+                      <IconButton onClick={() => handleRemoveStore(idx)}>
+                        <RemoveIcon />
+                      </IconButton>
                     )}
                   </Stack>
                 </Box>
               ))}
             </Stack>
-            <Button startIcon={<AddIcon />} onClick={handleAddStore} size='small' sx={{ mt: 1, mb: 3, width: { xs: '100%', md: 'auto' } }}>Thêm địa chỉ cửa hàng</Button>
+            <Button
+              startIcon={<AddIcon />}
+              onClick={handleAddStore}
+              size='small'
+              sx={{ mt: 1, mb: 3, width: { xs: '100%', md: 'auto' } }}
+            >
+              Thêm địa chỉ cửa hàng
+            </Button>
           </Box>
         )}
 
         {activeTab === 1 && (
           <Box sx={{ p: 3 }}>
-            <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
+            <Typography variant='h6' sx={{ mb: 2, fontWeight: 600 }}>
               Xem trước Footer
             </Typography>
-            <FooterPreview 
+            <FooterPreview
               logo={logo || logoPreview}
               about={about}
               socialLinks={socialLinks}
@@ -673,16 +978,21 @@ const AddFooterModal = ({ open, onClose, onSuccess, footerConfig, mode = 'add', 
               fanpageImage={fanpageImage}
             />
             <Box sx={{ mt: 2, p: 2, bgcolor: '#f8fafc', borderRadius: 2 }}>
-              <Typography variant="body2" color="text.secondary">
-                💡 <strong>Mẹo:</strong> Chuyển về tab "Chỉnh sửa" để thay đổi nội dung và xem kết quả ngay tại đây
+              <Typography variant='body2' color='text.secondary'>
+                💡 <strong>Mẹo:</strong> Chuyển về tab "Chỉnh sửa" để thay đổi
+                nội dung và xem kết quả ngay tại đây
               </Typography>
             </Box>
           </Box>
         )}
       </DialogContent>
       <DialogActions>
-        <Button onClick={handleClose} disabled={loading}>Hủy</Button>
-        <Button onClick={handleSubmit} variant='contained' disabled={loading}>{loading ? 'Đang lưu...' : 'Lưu'}</Button>
+        <Button onClick={handleClose} disabled={loading}>
+          Hủy
+        </Button>
+        <Button onClick={handleSubmit} variant='contained' disabled={loading}>
+          {loading ? 'Đang lưu...' : 'Lưu'}
+        </Button>
       </DialogActions>
     </Dialog>
   )
