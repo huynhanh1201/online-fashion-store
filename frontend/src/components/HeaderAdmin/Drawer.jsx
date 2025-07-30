@@ -163,11 +163,6 @@ export default function AdminDrawer({
             path: '/admin/display-management'
           },
           {
-            permission: 'flashSale:use',
-            label: 'Khuyến mãi',
-            path: '/admin/flashsale-management'
-          },
-          {
             permission: 'headerContent:use',
             label: 'Nội dung đầu trang',
             path: '/admin/header-management'
@@ -188,19 +183,24 @@ export default function AdminDrawer({
             path: '/admin/service-highlight-management'
           },
           {
-            permission: 'theme:use',
-            label: 'Chủ đề',
-            path: '/admin/theme-management'
+            permission: 'policy:use',
+            label: 'Chính sách website',
+            path: '/admin/policy-management'
           },
+          // {
+          //   permission: 'flashSale:use',
+          //   label: 'Khuyến mãi',
+          //   path: '/admin/flashsale-management'
+          // },
           {
             permission: 'blog:use',
             label: 'Nội dung bài viết',
             path: '/admin/blog-management'
           },
           {
-            permission: 'policy:use',
-            label: 'Chính sách website',
-            path: '/admin/policy-management'
+            permission: 'theme:use',
+            label: 'Chủ đề',
+            path: '/admin/theme-management'
           }
         ]
       },

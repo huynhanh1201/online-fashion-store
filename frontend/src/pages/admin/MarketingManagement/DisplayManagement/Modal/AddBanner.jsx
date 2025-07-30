@@ -26,7 +26,10 @@ import {
   Delete as DeleteIcon,
   CloudUpload as CloudUploadIcon
 } from '@mui/icons-material'
-import { addBanner, updateBanner } from '~/services/admin/webConfig/bannerService.js'
+import {
+  addBanner,
+  updateBanner
+} from '~/services/admin/webConfig/bannerService.js'
 import { URI, CLOUD_FOLDER } from '~/utils/constants.js'
 import { optimizeCloudinaryUrl } from '~/utils/cloudinary.js'
 
@@ -67,7 +70,7 @@ const AddBanner = ({ open, onClose, onSuccess, initialData, bannerIndex }) => {
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
   const [imagePreview, setImagePreview] = useState('')
-  
+
   const imageInputRef = useRef(null)
 
   useEffect(() => {
@@ -124,7 +127,7 @@ const AddBanner = ({ open, onClose, onSuccess, initialData, bannerIndex }) => {
 
       // Upload to Cloudinary
       const imageUrl = await uploadToCloudinary(file)
-      
+
       // Update form
       setForm((prev) => ({ ...prev, imageUrl }))
 
@@ -182,7 +185,7 @@ const AddBanner = ({ open, onClose, onSuccess, initialData, bannerIndex }) => {
       const errors = validateForm()
       if (errors.length > 0) {
         setError(errors.join(', '))
-        setLoading(false)
+        setLoading(false) // Cho phép nhập lại nếu lỗi
         return
       }
 
@@ -196,31 +199,39 @@ const AddBanner = ({ open, onClose, onSuccess, initialData, bannerIndex }) => {
       }
 
       if (result) {
-        setSuccess(initialData ? 'Cập nhật banner thành công!' : 'Thêm banner thành công!')
+        setSuccess(
+          initialData
+            ? 'Cập nhật banner thành công!'
+            : 'Thêm banner thành công!'
+        )
         if (onSuccess) onSuccess(result)
+
+        // Đóng modal sau khi lưu
         setTimeout(() => {
+          setLoading(false) // Enable lại khi modal đóng
           onClose()
         }, 1500)
+      } else {
+        setLoading(false)
       }
     } catch (error) {
       setError(error.message)
-    } finally {
-      setLoading(false)
+      setLoading(false) // Cho phép nhập lại khi lỗi
     }
   }
 
   return (
-    <Dialog 
-      open={open} 
-      onClose={onClose} 
-      maxWidth='md' 
+    <Dialog
+      open={open}
+      onClose={onClose}
+      maxWidth='md'
       fullWidth
       sx={{
         '& .MuiDialog-paper': {
           borderRadius: 3,
           boxShadow: '0 4px 24px rgba(0, 0, 0, 0.06)',
           border: '1px solid #e2e8f0',
-          maxHeight:'90vh',
+          maxHeight: '90vh'
         }
       }}
     >
@@ -236,13 +247,13 @@ const AddBanner = ({ open, onClose, onSuccess, initialData, bannerIndex }) => {
       >
         {initialData ? 'Chỉnh sửa Banner' : 'Thêm Banner mới'}
       </DialogTitle>
-      
+
       <DialogContent dividers sx={{ backgroundColor: '#f8fafc', py: 3 }}>
         {error && (
-          <Alert 
-            severity="error" 
-            sx={{ 
-              mb: 3, 
+          <Alert
+            severity='error'
+            sx={{
+              mb: 3,
               borderRadius: 2,
               backgroundColor: alpha(theme.palette.error.main, 0.08),
               border: `1px solid ${alpha(theme.palette.error.main, 0.3)}`
@@ -253,10 +264,10 @@ const AddBanner = ({ open, onClose, onSuccess, initialData, bannerIndex }) => {
         )}
 
         {success && (
-          <Alert 
-            severity="success" 
-            sx={{ 
-              mb: 3, 
+          <Alert
+            severity='success'
+            sx={{
+              mb: 3,
               borderRadius: 2,
               backgroundColor: alpha(theme.palette.success.main, 0.08),
               border: `1px solid ${alpha(theme.palette.success.main, 0.3)}`
@@ -268,14 +279,17 @@ const AddBanner = ({ open, onClose, onSuccess, initialData, bannerIndex }) => {
 
         {/* Image Upload Section - Full Width */}
         <Box sx={{ mb: 2 }}>
-          <Typography variant="h6" sx={{ mb: 2, fontWeight: 600, color: '#1e293b' }}>
+          <Typography
+            variant='h6'
+            sx={{ mb: 2, fontWeight: 600, color: '#1e293b' }}
+          >
             Hình ảnh Banner
           </Typography>
-          
+
           {imagePreview ? (
-            <Card 
-              sx={{ 
-                position: 'relative', 
+            <Card
+              sx={{
+                position: 'relative',
                 width: '100%',
                 borderRadius: 2,
                 border: '1px solid #e2e8f0',
@@ -287,10 +301,13 @@ const AddBanner = ({ open, onClose, onSuccess, initialData, bannerIndex }) => {
               }}
             >
               <CardMedia
-                component="img"
-                height="300"
-                image={optimizeCloudinaryUrl(imagePreview, { width: 900, height: 300 })}
-                alt="Banner preview"
+                component='img'
+                height='300'
+                image={optimizeCloudinaryUrl(imagePreview, {
+                  width: 900,
+                  height: 300
+                })}
+                alt='Banner preview'
                 sx={{ objectFit: 'cover', width: '100%' }}
               />
               <Box
@@ -302,16 +319,16 @@ const AddBanner = ({ open, onClose, onSuccess, initialData, bannerIndex }) => {
                   borderRadius: 1
                 }}
               >
-                <Tooltip title="Xóa ảnh">
+                <Tooltip title='Xóa ảnh'>
                   <IconButton
-                    size="small"
+                    size='small'
                     onClick={handleRemoveImage}
                     sx={{
                       color: '#ef4444',
                       '&:hover': { backgroundColor: '#fee2e2' }
                     }}
                   >
-                    <DeleteIcon fontSize="small" />
+                    <DeleteIcon fontSize='small' />
                   </IconButton>
                 </Tooltip>
               </Box>
@@ -338,28 +355,40 @@ const AddBanner = ({ open, onClose, onSuccess, initialData, bannerIndex }) => {
               onClick={() => imageInputRef.current?.click()}
             >
               <CloudUploadIcon sx={{ fontSize: 48, color: '#3b82f6', mb: 2 }} />
-              <Typography variant="body1" sx={{ color: '#1e293b', fontWeight: 600, mb: 1 }}>
+              <Typography
+                variant='body1'
+                sx={{ color: '#1e293b', fontWeight: 600, mb: 1 }}
+              >
                 Click để upload ảnh banner
               </Typography>
-              <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'center' }}>
+              <Typography
+                variant='body2'
+                color='text.secondary'
+                sx={{ textAlign: 'center' }}
+              >
                 JPG, PNG, WebP • Tối đa 5MB
               </Typography>
             </Box>
           )}
-          
+
           {uploadingImage && (
-            <Stack direction="row" alignItems="center" spacing={1} sx={{ mt: 2 }}>
+            <Stack
+              direction='row'
+              alignItems='center'
+              spacing={1}
+              sx={{ mt: 2 }}
+            >
               <CircularProgress size={20} sx={{ color: '#3b82f6' }} />
-              <Typography variant="body2" sx={{ color: '#1e293b' }}>
+              <Typography variant='body2' sx={{ color: '#1e293b' }}>
                 Đang upload...
               </Typography>
             </Stack>
           )}
-          
+
           <input
             ref={imageInputRef}
-            type="file"
-            accept="image/jpeg,image/png,image/webp"
+            type='file'
+            accept='image/jpeg,image/png,image/webp'
             hidden
             onChange={handleImageUpload}
           />
@@ -367,10 +396,13 @@ const AddBanner = ({ open, onClose, onSuccess, initialData, bannerIndex }) => {
 
         {/* Form Fields Section - Full Width */}
         <Box>
-          <Typography variant="h6" sx={{ mb: 3, fontWeight: 600, color: '#1e293b' }}>
+          <Typography
+            variant='h6'
+            sx={{ mb: 3, fontWeight: 600, color: '#1e293b' }}
+          >
             Thông tin Banner
           </Typography>
-          
+
           <Stack spacing={3}>
             {/* Title */}
             <TextField
@@ -379,7 +411,7 @@ const AddBanner = ({ open, onClose, onSuccess, initialData, bannerIndex }) => {
               onChange={(e) => handleChange('title', e.target.value)}
               fullWidth
               required
-              placeholder="Nhập tiêu đề banner"
+              placeholder='Nhập tiêu đề banner'
               sx={{
                 '& .MuiOutlinedInput-root': {
                   borderRadius: 2,
@@ -394,7 +426,7 @@ const AddBanner = ({ open, onClose, onSuccess, initialData, bannerIndex }) => {
               value={form.subtitle}
               onChange={(e) => handleChange('subtitle', e.target.value)}
               fullWidth
-              placeholder="Nhập phụ đề (không bắt buộc)"
+              placeholder='Nhập phụ đề (không bắt buộc)'
               sx={{
                 '& .MuiOutlinedInput-root': {
                   borderRadius: 2,
@@ -409,8 +441,8 @@ const AddBanner = ({ open, onClose, onSuccess, initialData, bannerIndex }) => {
               value={form.link}
               onChange={(e) => handleChange('link', e.target.value)}
               fullWidth
-              placeholder="/khuyen-mai/summer"
-              helperText="URL mà người dùng sẽ được chuyển đến khi click vào banner (không bắt buộc)"
+              placeholder='/khuyen-mai/summer'
+              helperText='URL mà người dùng sẽ được chuyển đến khi click vào banner (không bắt buộc)'
               sx={{
                 '& .MuiOutlinedInput-root': {
                   borderRadius: 2,
@@ -458,7 +490,10 @@ const AddBanner = ({ open, onClose, onSuccess, initialData, bannerIndex }) => {
 
             {/* Date Range */}
             <Box>
-              <Typography variant="subtitle2" sx={{ mb: 2, fontWeight: 600, color: '#374151' }}>
+              <Typography
+                variant='subtitle2'
+                sx={{ mb: 2, fontWeight: 600, color: '#374151' }}
+              >
                 Thời gian hiển thị (không bắt buộc)
               </Typography>
               <Grid container spacing={2}>
@@ -500,7 +535,13 @@ const AddBanner = ({ open, onClose, onSuccess, initialData, bannerIndex }) => {
         </Box>
       </DialogContent>
 
-      <DialogActions sx={{ p: 2, backgroundColor: '#f8fafc', borderTop: '1px solid #e2e8f0' }}>
+      <DialogActions
+        sx={{
+          p: 2,
+          backgroundColor: '#f8fafc',
+          borderTop: '1px solid #e2e8f0'
+        }}
+      >
         <Button
           onClick={onClose}
           disabled={loading}
@@ -518,7 +559,7 @@ const AddBanner = ({ open, onClose, onSuccess, initialData, bannerIndex }) => {
         >
           Hủy
         </Button>
-        <Button 
+        <Button
           variant='contained'
           onClick={handleSave}
           disabled={loading || uploadingImage}

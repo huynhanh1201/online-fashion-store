@@ -19,7 +19,8 @@ import {
   Paper,
   Accordion,
   AccordionSummary,
-  AccordionDetails
+  AccordionDetails,
+  CircularProgress
 } from '@mui/material'
 import {
   Palette,
@@ -133,11 +134,12 @@ const ThemeCard = styled(Card)(({ selected, theme }) => ({
 }))
 
 const ThemeManagement = () => {
-  const { currentTheme, updateTheme, resetTheme } = useTheme()
+  const { currentTheme, updateTheme, resetTheme, isLoading } = useTheme()
   const [selectedPreset, setSelectedPreset] = useState(null)
   const [pendingTheme, setPendingTheme] = useState(currentTheme)
   const [previewMode, setPreviewMode] = useState(false)
   const [showAdvanced, setShowAdvanced] = useState(false)
+  const [saving, setSaving] = useState(false)
   const [snackbar, setSnackbar] = useState({
     open: false,
     message: '',
@@ -146,7 +148,12 @@ const ThemeManagement = () => {
   const { hasPermission } = usePermissions()
 
   // Sync selected preset and pendingTheme with current theme on load or when theme changes
+  const firstLoadDone = React.useRef(false)
+
   useEffect(() => {
+    if (isLoading) return // Đang load thì bỏ qua
+
+    // Đồng bộ preset
     const matchingPresetKey = Object.entries(predefinedThemes).find(
       ([key, preset]) =>
         preset.primary === currentTheme.primary &&
@@ -158,10 +165,10 @@ const ThemeManagement = () => {
       setSelectedPreset(matchingPresetKey)
       setPendingTheme(predefinedThemes[matchingPresetKey])
     } else {
-      setSelectedPreset(null) // It's a custom theme
+      setSelectedPreset(null)
       setPendingTheme(currentTheme)
     }
-  }, [currentTheme])
+  }, [currentTheme, isLoading])
 
   const handlePresetSelect = (presetKey) => {
     const preset = predefinedThemes[presetKey]
@@ -169,7 +176,7 @@ const ThemeManagement = () => {
     setSelectedPreset(presetKey)
     setSnackbar({
       open: true,
-      message: `Đã chọn theme ${preset.name}. Nhấn Lưu để áp dụng!`,
+      message: `Đã chọn theme ${preset.name}. Nhấn "Lưu chủ đề" để lưu vào cơ sở dữ liệu!`,
       severity: 'info'
     })
   }
@@ -177,24 +184,75 @@ const ThemeManagement = () => {
   const handleColorChange = (colorKey, value) => {
     setPendingTheme((prev) => ({ ...prev, [colorKey]: value }))
     setSelectedPreset(null) // Deselect preset on custom change
+
+    // Show notification for custom color changes
+    if (!snackbar.open) {
+      setSnackbar({
+        open: true,
+        message: 'Đã thay đổi màu sắc. Nhấn "Lưu chủ đề" để lưu thay đổi!',
+        severity: 'info'
+      })
+    }
   }
 
-  const handleSaveTheme = () => {
-    updateTheme(pendingTheme)
-    setSnackbar({
-      open: true,
-      message: 'Chủ đề đã được lưu thành công!',
-      severity: 'success'
-    })
+  const handleSaveTheme = async () => {
+    try {
+      setSaving(true)
+      await updateTheme(pendingTheme)
+      setSnackbar({
+        open: true,
+        message: 'Chủ đề đã được lưu thành công!',
+        severity: 'success'
+      })
+    } catch (error) {
+      setSnackbar({
+        open: true,
+        message: 'Không thể lưu chủ đề. Vui lòng thử lại!',
+        severity: 'error'
+      })
+    } finally {
+      setSaving(false)
+    }
   }
 
-  const handleResetTheme = () => {
-    resetTheme()
-    setSnackbar({
-      open: true,
-      message: 'Theme đã được reset về mặc định!',
-      severity: 'info'
-    })
+  const handleResetTheme = async () => {
+    try {
+      setSaving(true)
+      await resetTheme()
+      setSnackbar({
+        open: true,
+        message: 'Theme đã được reset về mặc định!',
+        severity: 'info'
+      })
+    } catch (error) {
+      setSnackbar({
+        open: true,
+        message: 'Không thể reset theme. Vui lòng thử lại!',
+        severity: 'error'
+      })
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  // Show loading state while theme is being loaded
+  if (isLoading) {
+    return (
+      <RouteGuard requiredPermissions={['admin:access', 'theme:use']}>
+        <Box
+          sx={{
+            p: 3,
+            maxWidth: 1200,
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            minHeight: '50vh'
+          }}
+        >
+          <CircularProgress size={60} />
+        </Box>
+      </RouteGuard>
+    )
   }
 
   return (
@@ -208,7 +266,7 @@ const ThemeManagement = () => {
           Quản lý Chủ đề & Màu sắc
         </Typography>
 
-        {/* Preview Mode Toggle */}
+        {/* Theme Status */}
         <Card sx={{ mb: 3 }}>
           <CardContent>
             <Box
@@ -220,14 +278,15 @@ const ThemeManagement = () => {
             >
               <Box>
                 <Typography variant='h6' sx={{ mb: 1 }}>
-                  Chế độ xem trước
+                  Trạng thái chủ đề
                 </Typography>
                 <Typography variant='body2' color='text.secondary'>
-                  Chủ đề sẽ được áp dụng ngay lập tức khi bạn thay đổi màu sắc
+                  Chủ đề sẽ được lưu vào cơ sở dữ liệu và áp dụng cho toàn bộ
+                  website
                 </Typography>
               </Box>
               <Chip
-                label='Đang hoạt động'
+                label='Đã lưu vào API'
                 color='success'
                 variant='filled'
                 icon={<Visibility />}
@@ -268,9 +327,13 @@ const ThemeManagement = () => {
                             <ColorPreview color={theme.accent} />
                           </Box>
                           <Chip
-                            label={selectedPreset === key ? 'Đang chọn' : 'Chọn'}
+                            label={
+                              selectedPreset === key ? 'Đang chọn' : 'Chọn'
+                            }
                             size='small'
-                            color={selectedPreset === key ? 'primary' : 'default'}
+                            color={
+                              selectedPreset === key ? 'primary' : 'default'
+                            }
                             variant={
                               selectedPreset === key ? 'filled' : 'outlined'
                             }
@@ -301,18 +364,27 @@ const ThemeManagement = () => {
                   onChange={() => setShowAdvanced(!showAdvanced)}
                 >
                   <AccordionSummary expandIcon={<ExpandMore />}>
-                    <Typography variant='subtitle2'>Màu sắc nâng cao</Typography>
+                    <Typography variant='subtitle2'>
+                      Màu sắc nâng cao
+                    </Typography>
                   </AccordionSummary>
                   <AccordionDetails>
                     <Grid container spacing={2}>
                       {Object.entries(pendingTheme).map(([key, value]) => (
                         <Grid item xs={12} sm={6} key={key}>
                           <Box
-                            sx={{ display: 'flex', alignItems: 'center', gap: 1 }}
+                            sx={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: 1
+                            }}
                           >
                             <ColorPreview color={value} />
                             <TextField
-                              label={COLOR_LABELS[key] || (key.charAt(0).toUpperCase() + key.slice(1))}
+                              label={
+                                COLOR_LABELS[key] ||
+                                key.charAt(0).toUpperCase() + key.slice(1)
+                              }
                               value={value}
                               onChange={(e) =>
                                 handleColorChange(key, e.target.value)
@@ -336,10 +408,15 @@ const ThemeManagement = () => {
                 <Grid container spacing={2}>
                   {['primary', 'secondary', 'accent'].map((colorKey) => (
                     <Grid item xs={12} sm={4} key={colorKey}>
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                      <Box
+                        sx={{ display: 'flex', alignItems: 'center', gap: 1 }}
+                      >
                         <ColorPreview color={pendingTheme[colorKey]} />
                         <TextField
-                          label={COLOR_LABELS[colorKey] || (colorKey.charAt(0).toUpperCase() + colorKey.slice(1))}
+                          label={
+                            COLOR_LABELS[colorKey] ||
+                            colorKey.charAt(0).toUpperCase() + colorKey.slice(1)
+                          }
                           value={pendingTheme[colorKey]}
                           onChange={(e) =>
                             handleColorChange(colorKey, e.target.value)
@@ -368,31 +445,36 @@ const ThemeManagement = () => {
                     Thao tác
                   </Typography>
                   <Stack direction='row' spacing={2} flexWrap='wrap' useFlexGap>
-
                     <Button
                       variant='contained'
-                      startIcon={<Save />}
+                      startIcon={
+                        saving ? <CircularProgress size={20} /> : <Save />
+                      }
                       onClick={handleSaveTheme}
+                      disabled={saving || isLoading}
                       sx={{
                         minWidth: 120,
                         backgroundColor: 'var(--primary-color)',
                         color: '#fff'
                       }}
                     >
-                      Lưu chủ đề
+                      {saving ? 'Đang lưu...' : 'Lưu chủ đề'}
                     </Button>
 
                     <Button
                       variant='outlined'
-                      startIcon={<Refresh />}
+                      startIcon={
+                        saving ? <CircularProgress size={20} /> : <Refresh />
+                      }
                       onClick={handleResetTheme}
+                      disabled={saving || isLoading}
                       sx={{
                         minWidth: 120,
                         color: 'var(--primary-color)',
                         borderColor: 'var(--primary-color)'
                       }}
                     >
-                      Khôi phục
+                      {saving ? 'Đang reset...' : 'Khôi phục'}
                     </Button>
                   </Stack>
                 </CardContent>

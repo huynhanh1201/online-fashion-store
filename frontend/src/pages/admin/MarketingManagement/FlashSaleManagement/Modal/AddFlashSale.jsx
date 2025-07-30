@@ -40,7 +40,10 @@ import {
   getFlashSaleCampaigns,
   updateFlashSaleCampaign
 } from '~/services/admin/webConfig/flashsaleService'
-import { getProductVariants, updateProductVariantsDiscountPrice } from '~/services/admin/variantService'
+import {
+  getProductVariants,
+  updateProductVariantsDiscountPrice
+} from '~/services/admin/variantService'
 
 const AddFlashSale = ({ open, onClose, onSave, initialData }) => {
   const theme = useTheme()
@@ -63,11 +66,12 @@ const AddFlashSale = ({ open, onClose, onSave, initialData }) => {
   const [allProducts, setAllProducts] = useState([])
   const [existingCampaigns, setExistingCampaigns] = useState([])
   const [productVariants, setProductVariants] = useState({})
+  const [usedProductIds, setUsedProductIds] = useState(new Set())
   const suggestionRefs = useRef({})
   const inputRefs = useRef({})
 
   // Xác định chế độ chỉnh sửa
-  const isEditMode = !!initialData;
+  const isEditMode = !!initialData
 
   // Khởi tạo form khi dialog mở, tự động tạo ID nếu là mới
   useEffect(() => {
@@ -101,7 +105,10 @@ const AddFlashSale = ({ open, onClose, onSave, initialData }) => {
                 const variants = await getProductVariants(p.productId)
                 return { productId: p.productId, variants }
               } catch (err) {
-                console.error(`Lỗi khi lấy biến thể cho sản phẩm ${p.productId}:`, err)
+                console.error(
+                  `Lỗi khi lấy biến thể cho sản phẩm ${p.productId}:`,
+                  err
+                )
                 return { productId: p.productId, variants: [] }
               }
             })
@@ -135,23 +142,35 @@ const AddFlashSale = ({ open, onClose, onSave, initialData }) => {
     } else {
       // Reset biến thể khi đóng modal
       setProductVariants({})
+      setUsedProductIds(new Set())
     }
   }, [open, initialData])
 
   // Lấy danh sách sản phẩm và chiến dịch hiện tại khi component mount
   useEffect(() => {
-    const fetchAllProducts = async () => {
+    const fetchAllProductsAndCampaigns = async () => {
       try {
         const { products } = await getProducts({ page: 1, limit: 1000 })
         setAllProducts(products)
         const campaigns = await getFlashSaleCampaigns()
         setExistingCampaigns(campaigns.map((c) => c.id))
+
+        // Collect all product IDs used in other campaigns
+        const usedIds = new Set()
+        campaigns.forEach((campaign) => {
+          if (campaign.id !== initialData?.id) {
+            campaign.products.forEach((product) => {
+              usedIds.add(product.productId)
+            })
+          }
+        })
+        setUsedProductIds(usedIds)
       } catch (err) {
         console.error('Lỗi khi lấy danh sách sản phẩm hoặc chiến dịch:', err)
       }
     }
-    fetchAllProducts()
-  }, [])
+    fetchAllProductsAndCampaigns()
+  }, [initialData])
 
   // Xử lý click ngoài để đóng danh sách gợi ý
   useEffect(() => {
@@ -199,26 +218,36 @@ const AddFlashSale = ({ open, onClose, onSave, initialData }) => {
   }
 
   // Xử lý thay đổi giá Flash Sale với debounce và tối ưu API calls
-  const handleFlashPriceChange = useCallback(async (index, field, value) => {
-    const updated = [...form.products]
-    // Store the raw numeric value for calculations
-    const numericValue = parseFormattedNumber(value)
-    updated[index][field] = numericValue
-    setForm((prev) => ({ ...prev, products: updated }))
-    clearMessages()
+  const handleFlashPriceChange = useCallback(
+    async (index, field, value) => {
+      const updated = [...form.products]
+      // Store the raw numeric value for calculations
+      const numericValue = parseFormattedNumber(value)
+      updated[index][field] = numericValue
+      setForm((prev) => ({ ...prev, products: updated }))
+      clearMessages()
 
-    const product = updated[index]
+      const product = updated[index]
 
-    // Validate input immediately
-    if (product._id && numericValue && !isNaN(numericValue) && Number(numericValue) > 0) {
-      const flashSalePrice = Number(numericValue)
-      
-      if (flashSalePrice >= product.originalPrice) {
-        setWarning(`Giá Flash Sale phải thấp hơn giá gốc (${product.originalPrice.toLocaleString()} VND)`)
-        return
+      // Validate input immediately
+      if (
+        product._id &&
+        numericValue &&
+        !isNaN(numericValue) &&
+        Number(numericValue) > 0
+      ) {
+        const flashSalePrice = Number(numericValue)
+
+        if (flashSalePrice >= product.originalPrice) {
+          setWarning(
+            `Giá Flash Sale phải thấp hơn giá gốc (${product.originalPrice.toLocaleString()} VND)`
+          )
+          return
+        }
       }
-    }
-  }, [form.products])
+    },
+    [form.products]
+  )
 
   const handleAddProduct = () => {
     setForm((prev) => ({
@@ -246,10 +275,15 @@ const AddFlashSale = ({ open, onClose, onSave, initialData }) => {
 
     // Xóa thông tin biến thể của sản phẩm bị xóa
     if (removedProduct._id) {
-      setProductVariants(prev => {
+      setProductVariants((prev) => {
         const newVariants = { ...prev }
         delete newVariants[removedProduct._id]
         return newVariants
+      })
+      setUsedProductIds((prev) => {
+        const newSet = new Set(prev)
+        newSet.delete(removedProduct._id)
+        return newSet
       })
     }
 
@@ -273,8 +307,10 @@ const AddFlashSale = ({ open, onClose, onSave, initialData }) => {
     setSuggestionLoading(true)
     try {
       const filtered = allProducts
-        .filter((product) =>
-          product.name.toLowerCase().includes(searchText.toLowerCase())
+        .filter(
+          (product) =>
+            product.name.toLowerCase().includes(searchText.toLowerCase()) &&
+            !usedProductIds.has(product._id)
         )
         .slice(0, 5)
       setProductSuggestions(filtered)
@@ -304,7 +340,7 @@ const AddFlashSale = ({ open, onClose, onSave, initialData }) => {
 
   // Xử lý thay đổi tên sản phẩm với debounce
   const handleProductNameChange = (index, value) => {
-    if (form.products[index].isDisabled) return // Không cho thay đổi nếu sản phẩm bị vô hiệu hóa
+    if (form.products[index].isDisabled) return
     handleProductChange(index, 'productName', value)
     handleProductChange(index, '_id', '')
 
@@ -327,56 +363,44 @@ const AddFlashSale = ({ open, onClose, onSave, initialData }) => {
   const handleProductSelect = async (index, product) => {
     const prod = allProducts.find((p) => p._id === product._id)
     if (prod) {
-      const existingProductIndex = [
-        ...form.products,
-        ...(initialData?.products || []).map((p) => ({ _id: p.productId }))
-      ].findIndex((p) => p._id === prod._id)
+      if (usedProductIds.has(prod._id)) {
+        setWarning(
+          `Sản phẩm "${prod.name}" đã được sử dụng trong một chiến dịch Flash Sale khác.`
+        )
+        return
+      }
 
-      let updatedProducts = [...form.products]
+      const existingProductIndex = form.products.findIndex(
+        (p, i) => p._id === prod._id && i !== index
+      )
 
       if (existingProductIndex !== -1) {
-        setWarning(
-          `Sản phẩm "${prod.name}" (ID: ${prod._id}) đã tồn tại trong chiến dịch.`
-        )
-        if (existingProductIndex >= form.products.length) {
-          updatedProducts[index] = {
-            _id: prod._id,
-            productName: prod.name,
-            originalPrice: prod.exportPrice || prod.price || 0,
-            flashPrice:
-              form.products[index]?.flashPrice ||
-              initialData.products[existingProductIndex - form.products.length]
-                ?.flashPrice ||
-              '',
-            image: prod.image || [],
-            isDisabled: true
-          }
-        } else {
-          return
-        }
-      } else {
-        updatedProducts[index] = {
-          _id: prod._id,
-          productName: prod.name,
-          originalPrice: prod.exportPrice || prod.price || 0,
-          flashPrice: form.products[index]?.flashPrice || '',
-          image: prod.image || [],
-          isDisabled: false
-        }
+        setWarning(`Sản phẩm "${prod.name}" đã được thêm vào chiến dịch này.`)
+        return
+      }
 
-        // Load biến thể của sản phẩm mới được chọn
-        try {
-          const variants = await getProductVariants(prod._id)
-          setProductVariants(prev => ({
-            ...prev,
-            [prod._id]: variants
-          }))
-        } catch (err) {
-          console.error('Lỗi khi lấy biến thể sản phẩm:', err)
-        }
+      const updatedProducts = [...form.products]
+      updatedProducts[index] = {
+        _id: prod._id,
+        productName: prod.name,
+        originalPrice: prod.exportPrice || prod.price || 0,
+        flashPrice: form.products[index]?.flashPrice || '',
+        image: prod.image || [],
+        isDisabled: false
+      }
+
+      try {
+        const variants = await getProductVariants(prod._id)
+        setProductVariants((prev) => ({
+          ...prev,
+          [prod._id]: variants
+        }))
+      } catch (err) {
+        console.error('Lỗi khi lấy biến thể sản phẩm:', err)
       }
 
       setForm((prev) => ({ ...prev, products: updatedProducts }))
+      setUsedProductIds((prev) => new Set([...prev, prod._id]))
     }
     setShowSuggestions((prev) => ({ ...prev, [index]: false }))
     setProductSuggestions([])
@@ -463,7 +487,7 @@ const AddFlashSale = ({ open, onClose, onSave, initialData }) => {
     try {
       let cleanedForm = {
         ...form,
-        id: initialData?.id || generateUniqueId(), // Sử dụng ID hiện có nếu chỉnh sửa, không thì tạo mới
+        id: initialData?.id || generateUniqueId(),
         startTime: new Date(form.startTime).toISOString(),
         endTime: new Date(form.endTime).toISOString(),
         products: form.products
@@ -491,11 +515,21 @@ const AddFlashSale = ({ open, onClose, onSave, initialData }) => {
       // Cập nhật discountPrice cho tất cả biến thể của sản phẩm trước khi lưu flash sale
       const updatePromises = cleanedForm.products.map(async (product) => {
         try {
-          await updateProductVariantsDiscountPrice(product.productId, product.flashPrice)
-          console.log(`Đã cập nhật discountPrice cho sản phẩm ${product.productId} thành ${product.flashPrice}`)
+          await updateProductVariantsDiscountPrice(
+            product.productId,
+            product.flashPrice
+          )
+          console.log(
+            `Đã cập nhật discountPrice cho sản phẩm ${product.productId} thành ${product.flashPrice}`
+          )
         } catch (err) {
-          console.error(`Lỗi khi cập nhật discountPrice cho sản phẩm ${product.productId}:`, err)
-          throw new Error(`Không thể cập nhật giá cho sản phẩm ${product.productId}: ${err.message}`)
+          console.error(
+            `Lỗi khi cập nhật discountPrice cho sản phẩm ${product.productId}:`,
+            err
+          )
+          throw new Error(
+            `Không thể cập nhật giá cho sản phẩm ${product.productId}: ${err.message}`
+          )
         }
       })
 
@@ -504,12 +538,12 @@ const AddFlashSale = ({ open, onClose, onSave, initialData }) => {
 
       if (initialData) {
         await updateFlashSaleCampaign(cleanedForm.id, cleanedForm)
-        setSuccess('Cập nhật chiến dịch Flash Sale thành công!')
       } else {
         await createFlashSale(cleanedForm)
-        setSuccess('Tạo chiến dịch Flash Sale thành công!')
       }
 
+      // Only set success and trigger onSave after successful save
+      setSuccess('Tạo chiến dịch Flash Sale thành công!')
       onSave(cleanedForm)
       setTimeout(() => {
         onClose()
@@ -518,11 +552,14 @@ const AddFlashSale = ({ open, onClose, onSave, initialData }) => {
       console.error('Chi tiết lỗi:', err)
       setError(
         err.response?.data?.message ||
-        err.message ||
-        'Có lỗi xảy ra khi lưu chiến dịch Flash Sale.'
+          err.message ||
+          'Có lỗi xảy ra khi lưu chiến dịch Flash Sale.'
       )
     } finally {
-      setLoading(false)
+      // Only enable the Save button if the operation was successful
+      if (!success) {
+        setLoading(false)
+      }
     }
   }
 
@@ -537,8 +574,8 @@ const AddFlashSale = ({ open, onClose, onSave, initialData }) => {
           borderRadius: 3,
           boxShadow: '0 4px 24px rgba(0, 0, 0, 0.06)',
           border: '1px solid #e2e8f0',
-          maxHeight:'90vh',
-          maxWidth:'70vw'
+          maxHeight: '90vh',
+          maxWidth: '70vw'
         }
       }}
     >
@@ -659,7 +696,7 @@ const AddFlashSale = ({ open, onClose, onSave, initialData }) => {
                 label='Thời gian bắt đầu *'
                 type='datetime-local'
                 value={form.startTime}
-                onChange={e => handleChange('startTime', e.target.value)}
+                onChange={(e) => handleChange('startTime', e.target.value)}
                 InputLabelProps={{ shrink: true }}
                 required
                 sx={{
@@ -706,7 +743,6 @@ const AddFlashSale = ({ open, onClose, onSave, initialData }) => {
               Sản phẩm Flash Sale
             </Typography>
 
-            {/* Thông báo về việc cập nhật biến thể */}
             <Alert
               severity='info'
               icon={<InfoIcon />}
@@ -718,7 +754,8 @@ const AddFlashSale = ({ open, onClose, onSave, initialData }) => {
               }}
             >
               <Typography variant='body2'>
-                <strong>Lưu ý:</strong> Khi lưu chương trình sẽ cập nhật lại giá giảm cho sản phẩm. Hãy cân nhắc thêm đúng thời điểm.
+                <strong>Lưu ý:</strong> Khi lưu chương trình sẽ cập nhật lại giá
+                giảm cho sản phẩm. Hãy cân nhắc thêm đúng thời điểm.
               </Typography>
             </Alert>
 
@@ -751,7 +788,8 @@ const AddFlashSale = ({ open, onClose, onSave, initialData }) => {
                     p: 2,
                     borderRadius: 2,
                     border: '1px solid #e2e8f0',
-                    backgroundColor: isEditMode && product.isDisabled ? '#f1f5f9' : '#fff',
+                    backgroundColor:
+                      isEditMode && product.isDisabled ? '#f1f5f9' : '#fff',
                     transition: 'all 0.3s ease',
                     '&:hover': {
                       boxShadow: `0 4px 16px ${alpha(theme.palette.primary.main, 0.2)}`
@@ -805,9 +843,10 @@ const AddFlashSale = ({ open, onClose, onSave, initialData }) => {
                           sx={{
                             '& .MuiOutlinedInput-root': {
                               borderRadius: 2,
-                              backgroundColor: isEditMode && product.isDisabled
-                                ? '#e2e8f0'
-                                : '#fff'
+                              backgroundColor:
+                                isEditMode && product.isDisabled
+                                  ? '#e2e8f0'
+                                  : '#fff'
                             }
                           }}
                         />
@@ -817,7 +856,11 @@ const AddFlashSale = ({ open, onClose, onSave, initialData }) => {
                       <TextField
                         fullWidth
                         label='Giá gốc *'
-                        value={product.originalPrice ? formatNumber(product.originalPrice) : ''}
+                        value={
+                          product.originalPrice
+                            ? formatNumber(product.originalPrice)
+                            : ''
+                        }
                         InputProps={{ readOnly: true }}
                         required
                         disabled={isEditMode && product.isDisabled}
@@ -828,9 +871,10 @@ const AddFlashSale = ({ open, onClose, onSave, initialData }) => {
                         sx={{
                           '& .MuiOutlinedInput-root': {
                             borderRadius: 2,
-                            backgroundColor: isEditMode && product.isDisabled
-                              ? '#e2e8f0'
-                              : '#fff'
+                            backgroundColor:
+                              isEditMode && product.isDisabled
+                                ? '#e2e8f0'
+                                : '#fff'
                           }
                         }}
                       />
@@ -842,7 +886,11 @@ const AddFlashSale = ({ open, onClose, onSave, initialData }) => {
                           label='Giá giảm *'
                           value={formatNumber(product.flashPrice)}
                           onChange={(e) =>
-                            handleFlashPriceChange(index, 'flashPrice', e.target.value)
+                            handleFlashPriceChange(
+                              index,
+                              'flashPrice',
+                              e.target.value
+                            )
                           }
                           required
                           disabled={isEditMode && product.isDisabled}
@@ -853,7 +901,10 @@ const AddFlashSale = ({ open, onClose, onSave, initialData }) => {
                           sx={{
                             '& .MuiOutlinedInput-root': {
                               borderRadius: 2,
-                              backgroundColor: isEditMode && product.isDisabled ? '#e2e8f0' : '#fff'
+                              backgroundColor:
+                                isEditMode && product.isDisabled
+                                  ? '#e2e8f0'
+                                  : '#fff'
                             }
                           }}
                         />
@@ -889,7 +940,10 @@ const AddFlashSale = ({ open, onClose, onSave, initialData }) => {
                           sx={{
                             color: '#ef4444',
                             '&:hover': { backgroundColor: '#fee2e2' },
-                            display: isEditMode && product.isDisabled ? 'none' : 'inline-flex'
+                            display:
+                              isEditMode && product.isDisabled
+                                ? 'none'
+                                : 'inline-flex'
                           }}
                         >
                           <DeleteIcon />
@@ -899,33 +953,56 @@ const AddFlashSale = ({ open, onClose, onSave, initialData }) => {
                   </Grid>
 
                   {/* Hiển thị thông tin biến thể */}
-                  {productVariants[product._id] && productVariants[product._id].length > 0 && (
-                    <div className="mt-2 p-3 bg-gray-50 rounded-lg">
-                      <div className="flex items-center justify-between mb-2">
-                        <span className="text-sm font-medium text-gray-700">
-                          Biến thể sẽ được cập nhật khi lưu ({productVariants[product._id].length} biến thể):
-                        </span>
+                  {productVariants[product._id] &&
+                    productVariants[product._id].length > 0 && (
+                      <div className='mt-2 p-3 bg-gray-50 rounded-lg'>
+                        <div className='flex items-center justify-between mb-2'>
+                          <span className='text-sm font-medium text-gray-700'>
+                            Biến thể sẽ được cập nhật khi lưu (
+                            {productVariants[product._id].length} biến thể):
+                          </span>
+                        </div>
+                        <div className='space-y-1'>
+                          {productVariants[product._id].map(
+                            (variant, vIndex) => (
+                              <div
+                                key={vIndex}
+                                className='text-xs text-gray-600 flex justify-between'
+                              >
+                                <span>
+                                  {variant.color?.name || 'N/A'} -{' '}
+                                  {variant.size?.name || 'N/A'} - {variant.sku}
+                                </span>
+                                <span className='font-medium'>
+                                  {variant.originalPrice?.toLocaleString()} VND
+                                  →{' '}
+                                  {form.products[index].flashPrice
+                                    ? Number(
+                                        form.products[index].flashPrice
+                                      ).toLocaleString()
+                                    : '...'}{' '}
+                                  VND
+                                </span>
+                              </div>
+                            )
+                          )}
+                        </div>
+                        <div className='mt-2 text-xs text-gray-500'>
+                          <p>
+                            • Giá ban đầu:{' '}
+                            {product.originalPrice?.toLocaleString()} VND
+                          </p>
+                          <p>
+                            • Giá Flash Sale sẽ thay thế hoàn toàn giá hiện tại
+                          </p>
+                          <p>
+                            • Khi lưu chiến dịch, tất cả biến thể sẽ được cập
+                            nhật giá Flash Sale
+                          </p>
+                          <p>• Khi hết thời gian, giá sẽ trở về giá ban đầu</p>
+                        </div>
                       </div>
-                      <div className="space-y-1">
-                        {productVariants[product._id].map((variant, vIndex) => (
-                          <div key={vIndex} className="text-xs text-gray-600 flex justify-between">
-                            <span>
-                              {variant.color?.name || 'N/A'} - {variant.size?.name || 'N/A'} - {variant.sku}
-                            </span>
-                            <span className="font-medium">
-                              {variant.originalPrice?.toLocaleString()} VND → {form.products[index].flashPrice ? Number(form.products[index].flashPrice).toLocaleString() : '...'} VND
-                            </span>
-                          </div>
-                        ))}
-                      </div>
-                      <div className="mt-2 text-xs text-gray-500">
-                        <p>• Giá ban đầu: {product.originalPrice?.toLocaleString()} VND</p>
-                        <p>• Giá Flash Sale sẽ thay thế hoàn toàn giá hiện tại</p>
-                        <p>• Khi lưu chiến dịch, tất cả biến thể sẽ được cập nhật giá Flash Sale</p>
-                        <p>• Khi hết thời gian, giá sẽ trở về giá ban đầu</p>
-                      </div>
-                    </div>
-                  )}
+                    )}
                 </Card>
               ))}
             </Box>
@@ -983,7 +1060,8 @@ const AddFlashSale = ({ open, onClose, onSave, initialData }) => {
           disabled={
             loading ||
             form.products.length === 0 ||
-            form.products.some((p) => !p._id)
+            form.products.some((p) => !p._id) ||
+            success // Disable button if save was successful
           }
           startIcon={loading ? <CircularProgress size={20} /> : null}
           sx={{
