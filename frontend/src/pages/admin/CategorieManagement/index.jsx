@@ -6,9 +6,15 @@ import { PermissionWrapper, RouteGuard } from '~/components/PermissionGuard'
 import { useLocation } from 'react-router-dom'
 
 // Lazy load các Chart
-const AddCategoryModal = React.lazy(() => import('./modal/AddCategoryModal'))
-const ViewCategoryModal = React.lazy(() => import('./modal/ViewCategoryModal'))
-const EditCategoryModal = React.lazy(() => import('./modal/EditCategoryModal'))
+const AddCategoryModal = React.lazy(
+  () => import('~/pages/admin/CategorieManagement/modal/AddCategoryModal')
+)
+const ViewCategoryModal = React.lazy(
+  () => import('~/pages/admin/CategorieManagement/modal/ViewCategoryModal')
+)
+const EditCategoryModal = React.lazy(
+  () => import('~/pages/admin/CategorieManagement/modal/EditCategoryModal')
+)
 const DeleteCategoryModal = React.lazy(
   () => import('./modal/DeleteCategoryModal')
 )

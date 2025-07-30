@@ -428,12 +428,6 @@ function ViewOrderModal({
                   {orderDetails.map((item) => {
                     const ProductName =
                       item.name || item?.productId?.name || 'không có tên'
-                    const itemPrice =
-                      Number(item?.variantId?.discountPrice) > 0
-                        ? Number(item?.price) -
-                          Number(item?.variantId?.discountPrice)
-                        : Number(item?.price || 0)
-
                     return (
                       <TableRow key={item._id}>
                         <TableCell>
@@ -449,7 +443,7 @@ function ViewOrderModal({
                           {item.quantity.toLocaleString('vi-VN')}
                         </TableCell>
                         <TableCell align='right'>
-                          {itemPrice.toLocaleString('vi-VN')}₫
+                          {item.price.toLocaleString('vi-VN')}₫
                         </TableCell>
                         <TableCell align='right'>
                           {item.subtotal.toLocaleString('vi-VN')}₫
