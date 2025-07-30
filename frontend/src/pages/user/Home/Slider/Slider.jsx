@@ -1,5 +1,11 @@
 import React, { useState, useEffect } from 'react'
-import { Box, IconButton, useTheme, useMediaQuery, Skeleton } from '@mui/material'
+import {
+  Box,
+  IconButton,
+  useTheme,
+  useMediaQuery,
+  Skeleton
+} from '@mui/material'
 import { ArrowForward, ArrowBack } from '@mui/icons-material'
 import { getBanners } from '~/services/admin/webConfig/bannerService.js'
 import { optimizeCloudinaryUrl } from '~/utils/cloudinary.js'
@@ -9,7 +15,7 @@ const Slider = () => {
   const [banners, setBanners] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
-  
+
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
   const isTablet = useMediaQuery(theme.breakpoints.down('md'))
@@ -20,11 +26,11 @@ const Slider = () => {
       setError('')
       const allBanners = await getBanners()
       // Filter banners with position 'hero' and visible = true
-      const today = new Date().setHours(0,0,0,0)
-      const heroBanners = allBanners.filter(banner => {
-        if (banner.position !== 'hero' || banner.visible !== true) return false;
-        if (!banner.endDate) return true; // Nếu không có endDate thì luôn hiển thị
-        const end = new Date(banner.endDate).setHours(23,59,59,999)
+      const today = new Date().setHours(0, 0, 0, 0)
+      const heroBanners = allBanners.filter((banner) => {
+        if (banner.position !== 'hero' || banner.visible !== true) return false
+        if (!banner.endDate) return true // Nếu không có endDate thì luôn hiển thị
+        const end = new Date(banner.endDate).setHours(23, 59, 59, 999)
         return end >= today
       })
       setBanners(heroBanners)
@@ -44,7 +50,7 @@ const Slider = () => {
     if (banners.length > 0) {
       const interval = setInterval(() => {
         setCurrentIndex((prev) => (prev + 1) % banners.length)
-      }, 3000)
+      }, 5000)
       return () => clearInterval(interval)
     }
   }, [banners.length])
@@ -81,9 +87,9 @@ const Slider = () => {
         }}
       >
         <Skeleton
-          variant="rectangular"
-          width="100%"
-          height="100%"
+          variant='rectangular'
+          width='100%'
+          height='100%'
           sx={{ borderRadius: 0 }}
         />
       </Box>
@@ -112,9 +118,9 @@ const Slider = () => {
         }}
       >
         <Box
-          component="img"
-          src="https://www.rcuw.org/wp-content/themes/champion/images/SM-placeholder.png"
-          alt="default-banner"
+          component='img'
+          src='https://www.rcuw.org/wp-content/themes/champion/images/SM-placeholder.png'
+          alt='default-banner'
           sx={{
             width: '100%',
             height: '100%',
@@ -131,11 +137,11 @@ const Slider = () => {
         position: 'relative',
         width: '100%',
         height: {
-          xs: '200px',    // Mobile
-          sm: '300px',    // Tablet
-          md: '400px',    // Small desktop
-          lg: '600px',    // Large desktop
-          xl: '722px'     // Extra large desktop
+          xs: '200px', // Mobile
+          sm: '300px', // Tablet
+          md: '400px', // Small desktop
+          lg: '600px', // Large desktop
+          xl: '722px' // Extra large desktop
         },
         overflow: 'hidden'
       }}
@@ -153,12 +159,16 @@ const Slider = () => {
           <Box
             key={banner._id || index}
             component='img'
-            src={banner.imageUrl ? optimizeCloudinaryUrl(banner.imageUrl, { 
-              width: 2048, 
-              height: 813,
-              quality: 'auto',
-              format: 'auto'
-            }) : undefined}
+            src={
+              banner.imageUrl
+                ? optimizeCloudinaryUrl(banner.imageUrl, {
+                    width: 2048,
+                    height: 813,
+                    quality: 'auto',
+                    format: 'auto'
+                  })
+                : undefined
+            }
             alt={banner.title || `slide-${index}`}
             sx={{
               width: `${100 / banners.length}%`,
@@ -231,9 +241,10 @@ const Slider = () => {
                 width: { xs: '8px', sm: '12px' },
                 height: { xs: '8px', sm: '12px' },
                 borderRadius: '50%',
-                backgroundColor: index === currentIndex 
-                  ? 'rgba(255, 255, 255, 0.9)' 
-                  : 'rgba(255, 255, 255, 0.4)',
+                backgroundColor:
+                  index === currentIndex
+                    ? 'rgba(255, 255, 255, 0.9)'
+                    : 'rgba(255, 255, 255, 0.4)',
                 cursor: 'pointer',
                 transition: 'all 0.3s ease',
                 '&:hover': {

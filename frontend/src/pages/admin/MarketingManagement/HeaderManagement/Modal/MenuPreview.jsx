@@ -1,19 +1,27 @@
 import React from 'react'
-import {
-  Box,
-  Typography,
-  Button,
-  Stack
-} from '@mui/material'
+import { Box, Typography, Button, Stack } from '@mui/material'
 
-const MenuPreview = ({ menuData }) => {
+const MenuPreview = ({ menuData, megamenuSettings }) => {
   // Lọc các main menu có visible và có children > 0
   const mainMenus = (menuData.mainMenu || [])
-    .filter(item => item.visible && item.children && item.children.length > 0)
+    .filter((item) => item.visible && item.children && item.children.length > 0)
     .sort((a, b) => (a.order || 0) - (b.order || 0))
 
+  // Áp dụng số cột tối đa từ megamenuSettings
+  const maxColumns = megamenuSettings?.maxColumns || 4
+  const columnWidth = megamenuSettings?.columnWidth || 'auto'
+  const enableHoverEffects = megamenuSettings?.enableHoverEffects ?? true
+  const animationDuration = megamenuSettings?.animationDuration || 350
+
   return (
-    <Box sx={{ p: 2, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+    <Box
+      sx={{
+        p: 2,
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center'
+      }}
+    >
       <Box
         sx={{
           borderRadius: '0 0 16px 16px',
@@ -23,22 +31,28 @@ const MenuPreview = ({ menuData }) => {
           boxShadow: '0px 4px 10px rgba(0,0,0,0.10)',
           overflowX: 'auto',
           display: 'grid',
-          gridTemplateColumns: `repeat(${mainMenus.length || 1}, 1fr)`,
+          gridTemplateColumns: `repeat(${Math.min(mainMenus.length, maxColumns)}, 1fr)`,
           gap: 6,
           width: '100%',
           maxWidth: 1400,
-          mx: 'auto'
+          mx: 'auto',
+          ...(columnWidth !== 'auto' && { gridAutoColumns: columnWidth })
         }}
       >
         {mainMenus.map((item, idx) => {
-          const visibleChildren = (item.children || []).filter(child => child.visible)
+          const visibleChildren = (item.children || []).filter(
+            (child) => child.visible
+          )
           return (
-            <Box key={item.label + idx} sx={{ 
-              display: 'flex', 
-              flexDirection: 'column', 
-              gap: 1, 
-              justifyContent: 'center',
-            }}>
+            <Box
+              key={item.label + idx}
+              sx={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 1,
+                justifyContent: 'center'
+              }}
+            >
               {/* Tiêu đề cột */}
               <Typography
                 sx={{
@@ -68,12 +82,16 @@ const MenuPreview = ({ menuData }) => {
                       textAlign: 'center',
                       py: 0.5,
                       borderRadius: 1,
-                      transition: 'all 0.2s',
-                      '&:hover': {
-                        color: '#1976d2',
-                        background: 'none',
-                        transform: 'translateY(-2px)'
-                      }
+                      transition: enableHoverEffects
+                        ? `all ${animationDuration}ms`
+                        : 'none',
+                      ...(enableHoverEffects && {
+                        '&:hover': {
+                          color: '#1976d2',
+                          background: 'none',
+                          transform: 'translateY(-2px)'
+                        }
+                      })
                     }}
                   >
                     {child.label || 'Chưa có tên'}
@@ -96,13 +114,25 @@ const MenuPreview = ({ menuData }) => {
           )
         })}
       </Box>
-      <Box sx={{ mt: 3, p: 2, backgroundColor: '#f3f4f6', borderRadius: 2, textAlign: 'center', maxWidth: 600 }}>
-        <Typography variant="body2" color="text.secondary">
-          <strong>Lưu ý:</strong> Đây là minh họa cấu trúc menu. Menu thực tế sẽ được hiển thị theo thiết kế của website.
+      <Box
+        sx={{
+          mt: 3,
+          p: 2,
+          backgroundColor: '#f3f4f6',
+          borderRadius: 2,
+          textAlign: 'center',
+          maxWidth: 600
+        }}
+      >
+        <Typography variant='body2' color='text.secondary'>
+          <strong>Lưu ý:</strong> Đây là minh họa cấu trúc menu. Menu thực tế sẽ
+          được hiển thị theo thiết kế của website với các cài đặt: {maxColumns}{' '}
+          cột, hiệu ứng hover: {enableHoverEffects ? 'bật' : 'tắt'}, thời gian
+          animation: {animationDuration}ms.
         </Typography>
       </Box>
     </Box>
   )
 }
 
-export default MenuPreview 
+export default MenuPreview

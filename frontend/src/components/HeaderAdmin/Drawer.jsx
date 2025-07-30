@@ -183,19 +183,19 @@ export default function AdminDrawer({
             path: '/admin/service-highlight-management'
           },
           {
-            permission: 'blog:use',
-            label: 'Nội dung bài viết',
-            path: '/admin/blog-management'
-          },
-          {
             permission: 'policy:use',
             label: 'Chính sách website',
             path: '/admin/policy-management'
           },
+          // {
+          //   permission: 'flashSale:use',
+          //   label: 'Khuyến mãi',
+          //   path: '/admin/flashsale-management'
+          // },
           {
-            permission: 'flashSale:use',
-            label: 'Khuyến mãi',
-            path: '/admin/flashsale-management'
+            permission: 'blog:use',
+            label: 'Nội dung bài viết',
+            path: '/admin/blog-management'
           },
           {
             permission: 'theme:use',

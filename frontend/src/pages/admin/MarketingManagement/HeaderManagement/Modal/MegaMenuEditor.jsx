@@ -93,7 +93,7 @@ const MegaMenuEditor = ({ open, onClose, onSuccess, initialData = null }) => {
     }
   }, [initialData])
 
-  // Fetch categories when Chart opens
+  // Fetch categories when Dialog opens
   useEffect(() => {
     if (open) {
       fetchCategories()
@@ -161,7 +161,7 @@ const MegaMenuEditor = ({ open, onClose, onSuccess, initialData = null }) => {
       [type]: [...(prev[type] || []), newItem]
     }))
 
-    // Open edit Chart for the new item
+    // Open edit Dialog for the new item
     setEditingItem(newItem)
     setEditingType(type)
     setEditingIndex(menuData[type]?.length || 0)
@@ -237,12 +237,12 @@ const MegaMenuEditor = ({ open, onClose, onSuccess, initialData = null }) => {
 
     // Normalize label: capitalize only the first letter of the whole string, rest lowercase
     const normalizeLabel = (label) =>
-      label.charAt(0).toUpperCase() + label.slice(1).toLowerCase();
+      label.charAt(0).toUpperCase() + label.slice(1).toLowerCase()
 
     const normalizedItem = {
       ...editingItem,
       label: normalizeLabel(editingItem.label)
-    };
+    }
 
     setMenuData((prev) => {
       const newData = { ...prev }
@@ -305,7 +305,7 @@ const MegaMenuEditor = ({ open, onClose, onSuccess, initialData = null }) => {
       )
     }))
 
-    // Open edit Chart for the new submenu item
+    // Open edit Dialog for the new submenu item
     setEditingItem(newSubItem)
     setEditingType(type)
     setEditingIndex(index)
@@ -563,8 +563,7 @@ const MegaMenuEditor = ({ open, onClose, onSuccess, initialData = null }) => {
             </FormControl>
           </Grid>
           <Grid item xs={12} sm={6}>
-            <FormControl fullWidth>
-            </FormControl>
+            <FormControl fullWidth></FormControl>
           </Grid>
           <Grid item xs={12} sm={6}>
             {/* <FormControlLabel
@@ -666,6 +665,7 @@ const MegaMenuEditor = ({ open, onClose, onSuccess, initialData = null }) => {
       return (
         <MenuPreview
           menuData={{ mainMenu: menuData.mainMenu }}
+          megamenuSettings={megamenuSettings}
           categories={categories}
         />
       )
@@ -877,7 +877,7 @@ const MegaMenuEditor = ({ open, onClose, onSuccess, initialData = null }) => {
                   <br />
                   <strong>Lưu ý:</strong> Chỉ hiển thị danh mục có sản phẩm. Khi
                   chọn danh mục, URL sẽ được tự động điền theo định dạng
-                  category/slug. Tên menu có thể tùy chỉnh theo ý muốn.
+                  category/slug. Tên menu có thể tùy chỉnh theo multitude.
                 </Typography>
               </Alert>
             )}
