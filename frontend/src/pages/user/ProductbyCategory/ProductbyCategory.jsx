@@ -15,7 +15,10 @@ import {
 } from '@mui/material'
 import NavigateNextIcon from '@mui/icons-material/NavigateNext'
 import { addToCart, getCart } from '~/services/cartService'
-import { getProductsByMultipleCategories, getProductsByCategory } from '~/services/productService'
+import {
+  getProductsByMultipleCategories,
+  getProductsByCategory
+} from '~/services/productService'
 import { useDispatch } from 'react-redux'
 import { setCartItems } from '~/redux/cart/cartSlice'
 import ProductCard from '~/components/ProductCards/ProductCards'
@@ -163,15 +166,15 @@ const ProductbyCategory = () => {
       } else if (allCategoryIds.length > 1) {
         // Nếu có nhiều category, gọi song song các API với limit nhỏ (ví dụ 20)
         const limitPerCategory = ITEMS_PER_PAGE * 2 // lấy dư để sort client-side
-        const allPromises = allCategoryIds.map(catId =>
+        const allPromises = allCategoryIds.map((catId) =>
           getProductsByCategory(catId, 1, limitPerCategory, sortParam)
         )
         const allResults = await Promise.all(allPromises)
         // Merge, loại trùng
         const allProducts = []
         const seen = new Set()
-        allResults.forEach(result => {
-          (result.products || []).forEach(product => {
+        allResults.forEach((result) => {
+          ;(result.products || []).forEach((product) => {
             if (!seen.has(product._id)) {
               seen.add(product._id)
               allProducts.push(product)
@@ -189,15 +192,27 @@ const ProductbyCategory = () => {
             break
           case 'priceAsc':
             sortedProducts.sort((a, b) => {
-              const priceA = a.firstVariantDiscountPrice > 0 ? a.firstVariantDiscountPrice : a.exportPrice
-              const priceB = b.firstVariantDiscountPrice > 0 ? b.firstVariantDiscountPrice : b.exportPrice
+              const priceA =
+                a.firstVariantDiscountPrice > 0
+                  ? a.firstVariantDiscountPrice
+                  : a.exportPrice
+              const priceB =
+                b.firstVariantDiscountPrice > 0
+                  ? b.firstVariantDiscountPrice
+                  : b.exportPrice
               return priceA - priceB
             })
             break
           case 'priceDesc':
             sortedProducts.sort((a, b) => {
-              const priceA = a.firstVariantDiscountPrice > 0 ? a.firstVariantDiscountPrice : a.exportPrice
-              const priceB = b.firstVariantDiscountPrice > 0 ? b.firstVariantDiscountPrice : b.exportPrice
+              const priceA =
+                a.firstVariantDiscountPrice > 0
+                  ? a.firstVariantDiscountPrice
+                  : a.exportPrice
+              const priceB =
+                b.firstVariantDiscountPrice > 0
+                  ? b.firstVariantDiscountPrice
+                  : b.exportPrice
               return priceB - priceA
             })
             break
@@ -209,7 +224,10 @@ const ProductbyCategory = () => {
         const total = sortedProducts.length
         const totalPages = Math.ceil(total / ITEMS_PER_PAGE)
         const startIdx = (page - 1) * ITEMS_PER_PAGE
-        const paginated = sortedProducts.slice(startIdx, startIdx + ITEMS_PER_PAGE)
+        const paginated = sortedProducts.slice(
+          startIdx,
+          startIdx + ITEMS_PER_PAGE
+        )
         setProducts(paginated)
         setTotalPages(totalPages)
       } else {
@@ -220,7 +238,7 @@ const ProductbyCategory = () => {
       console.error('Chi tiết lỗi:', error)
       setErrorProducts(
         error.message ||
-        'Không thể tải danh sách sản phẩm. Vui lòng thử lại sau.'
+          'Không thể tải danh sách sản phẩm. Vui lòng thử lại sau.'
       )
       setProducts([])
       setTotalPages(1)
@@ -363,8 +381,8 @@ const ProductbyCategory = () => {
         <img
           src={optimizeCloudinaryUrl(
             category?.banner ||
-            category?.image ||
-            'https://file.hstatic.net/1000360022/collection/ao-thun_cd23d8082c514c839615e1646371ba71.jpg',
+              category?.image ||
+              'https://www.rcuw.org/wp-content/themes/champion/images/SM-placeholder.png',
             { width: 1920, height: 400 }
           )}
           alt='banner'

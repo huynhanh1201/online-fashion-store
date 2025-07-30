@@ -311,8 +311,8 @@ const CategoryPage = () => {
             cursor: 'pointer'
           }}
           onClick={() => navigate('/')}
-        // component={Link}
-        // to='/product'
+          // component={Link}
+          // to='/product'
         >
           Trang chủ
         </Link>
@@ -324,7 +324,9 @@ const CategoryPage = () => {
             color: 'text.primary',
             fontWeight: 500
           }}
-        > {category ? category.name : 'Danh mục sản phẩm'}
+        >
+          {' '}
+          {category ? category.name : 'Danh mục sản phẩm'}
         </Typography>
       </Breadcrumbs>
       {/* Category Banner Section */}
@@ -345,8 +347,8 @@ const CategoryPage = () => {
         <img
           src={optimizeCloudinaryUrl(
             category?.banner ||
-            category?.image ||
-            'https://file.hstatic.net/1000360022/collection/ao-thun_cd23d8082c514c839615e1646371ba71.jpg',
+              category?.image ||
+              'https://www.rcuw.org/wp-content/themes/champion/images/SM-placeholder.png',
             { width: 1920, height: 400 }
           )}
           alt='category banner'
