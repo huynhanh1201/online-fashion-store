@@ -59,10 +59,37 @@ const createVariant = async (reqBody) => {
 
       status: reqBody.status,
 
-      discountPrice: reqBody.discountPrice || 0
+      discountPrice: reqBody.discountPrice || 0,
+
+      finalSalePrice:
+        (reqBody.overridePrice ? reqBody.exportPrice : product.exportPrice) -
+        (reqBody.discountPrice || 0)
     }
 
     const variants = await VariantModel.create(newVariant)
+
+    const cheapestVariant = await VariantModel.findOne({
+      productId: reqBody.productId
+    })
+      .sort({ finalSalePrice: 1 }) // tăng dần → cái rẻ nhất đứng đầu
+      .lean() // optional: nếu không cần document đầy đủ từ mongoose
+
+    if (cheapestVariant) {
+      await ProductModel.findOneAndUpdate(
+        { _id: reqBody.productId }, // điều kiện tìm product
+        {
+          $set: {
+            minSalePriceVariant: {
+              variantId: cheapestVariant._id,
+              exportPrice: cheapestVariant.exportPrice,
+              discountPrice: cheapestVariant.discountPrice || 0,
+              finalSalePrice: cheapestVariant.finalSalePrice
+            }
+          }
+        },
+        { new: true } // Trả về bản ghi đã update
+      )
+    }
 
     return variants
   } catch (err) {

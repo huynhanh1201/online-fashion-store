@@ -126,6 +126,12 @@ const variantSchema = new Schema(
       type: Number,
       default: 0,
       min: 0
+    },
+
+    finalSalePrice: {
+      type: Number,
+      default: 0,
+      min: 0
     }
   },
   {
