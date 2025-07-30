@@ -192,38 +192,44 @@ const AddFeaturedCategory = ({
     setLoading(true)
     setError('')
     setSuccess('')
-    setValidationErrors([])
 
     try {
       // Validate form
-      const errors = validateFeaturedCategoryContent([form])
+      const errors = validateForm()
       if (errors.length > 0) {
-        setValidationErrors(errors)
+        setError(errors.join(', '))
+        setLoading(false) // Cho phép nhập lại nếu lỗi
         return
       }
 
       let result
-      if (editIndex !== null) {
-        // Update existing featured category
-        result = await updateFeaturedCategory(editIndex, form)
+      if (initialData && bannerIndex !== undefined) {
+        // Update existing banner
+        result = await updateBanner(bannerIndex, form)
       } else {
-        // Add new featured category
-        result = await addFeaturedCategory(form)
+        // Add new banner
+        result = await addBanner(form)
       }
 
-      setSuccess(
-        editIndex !== null ? 'Cập nhật thành công!' : 'Thêm thành công!'
-      )
+      if (result) {
+        setSuccess(
+          initialData
+            ? 'Cập nhật banner thành công!'
+            : 'Thêm banner thành công!'
+        )
+        if (onSuccess) onSuccess(result)
 
-      // Call success callback after a short delay
-      setTimeout(() => {
-        onSuccess(result)
-        handleClose()
-      }, 1000)
+        // Đóng modal sau khi lưu
+        setTimeout(() => {
+          setLoading(false) // Enable lại khi modal đóng
+          onClose()
+        }, 1500)
+      } else {
+        setLoading(false)
+      }
     } catch (error) {
       setError(error.message)
-    } finally {
-      setLoading(false)
+      setLoading(false) // Cho phép nhập lại khi lỗi
     }
   }
 

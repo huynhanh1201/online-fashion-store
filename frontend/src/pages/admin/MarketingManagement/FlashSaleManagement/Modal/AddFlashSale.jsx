@@ -66,7 +66,7 @@ const AddFlashSale = ({ open, onClose, onSave, initialData }) => {
   const [allProducts, setAllProducts] = useState([])
   const [existingCampaigns, setExistingCampaigns] = useState([])
   const [productVariants, setProductVariants] = useState({})
-  const [usedProductIds, setUsedProductIds] = useState(new Set()) // Track used product IDs
+  const [usedProductIds, setUsedProductIds] = useState(new Set())
   const suggestionRefs = useRef({})
   const inputRefs = useRef({})
 
@@ -159,7 +159,6 @@ const AddFlashSale = ({ open, onClose, onSave, initialData }) => {
         const usedIds = new Set()
         campaigns.forEach((campaign) => {
           if (campaign.id !== initialData?.id) {
-            // Exclude current campaign in edit mode
             campaign.products.forEach((product) => {
               usedIds.add(product.productId)
             })
@@ -281,6 +280,11 @@ const AddFlashSale = ({ open, onClose, onSave, initialData }) => {
         delete newVariants[removedProduct._id]
         return newVariants
       })
+      setUsedProductIds((prev) => {
+        const newSet = new Set(prev)
+        newSet.delete(removedProduct._id)
+        return newSet
+      })
     }
 
     clearMessages()
@@ -306,7 +310,7 @@ const AddFlashSale = ({ open, onClose, onSave, initialData }) => {
         .filter(
           (product) =>
             product.name.toLowerCase().includes(searchText.toLowerCase()) &&
-            !usedProductIds.has(product._id) // Exclude products already in other campaigns
+            !usedProductIds.has(product._id)
         )
         .slice(0, 5)
       setProductSuggestions(filtered)
@@ -336,7 +340,7 @@ const AddFlashSale = ({ open, onClose, onSave, initialData }) => {
 
   // Xử lý thay đổi tên sản phẩm với debounce
   const handleProductNameChange = (index, value) => {
-    if (form.products[index].isDisabled) return // Không cho thay đổi nếu sản phẩm bị vô hiệu hóa
+    if (form.products[index].isDisabled) return
     handleProductChange(index, 'productName', value)
     handleProductChange(index, '_id', '')
 
@@ -359,7 +363,6 @@ const AddFlashSale = ({ open, onClose, onSave, initialData }) => {
   const handleProductSelect = async (index, product) => {
     const prod = allProducts.find((p) => p._id === product._id)
     if (prod) {
-      // Check if product is already in any campaign
       if (usedProductIds.has(prod._id)) {
         setWarning(
           `Sản phẩm "${prod.name}" đã được sử dụng trong một chiến dịch Flash Sale khác.`
@@ -367,7 +370,6 @@ const AddFlashSale = ({ open, onClose, onSave, initialData }) => {
         return
       }
 
-      // Check if product is already in current form
       const existingProductIndex = form.products.findIndex(
         (p, i) => p._id === prod._id && i !== index
       )
@@ -387,7 +389,6 @@ const AddFlashSale = ({ open, onClose, onSave, initialData }) => {
         isDisabled: false
       }
 
-      // Load biến thể của sản phẩm mới được chọn
       try {
         const variants = await getProductVariants(prod._id)
         setProductVariants((prev) => ({
@@ -537,12 +538,12 @@ const AddFlashSale = ({ open, onClose, onSave, initialData }) => {
 
       if (initialData) {
         await updateFlashSaleCampaign(cleanedForm.id, cleanedForm)
-        setSuccess('Cập nhật chiến dịch Flash Sale thành công!')
       } else {
         await createFlashSale(cleanedForm)
-        setSuccess('Tạo chiến dịch Flash Sale thành công!')
       }
 
+      // Only set success and trigger onSave after successful save
+      setSuccess('Tạo chiến dịch Flash Sale thành công!')
       onSave(cleanedForm)
       setTimeout(() => {
         onClose()
@@ -555,7 +556,10 @@ const AddFlashSale = ({ open, onClose, onSave, initialData }) => {
           'Có lỗi xảy ra khi lưu chiến dịch Flash Sale.'
       )
     } finally {
-      setLoading(false)
+      // Only enable the Save button if the operation was successful
+      if (!success) {
+        setLoading(false)
+      }
     }
   }
 
@@ -1056,7 +1060,8 @@ const AddFlashSale = ({ open, onClose, onSave, initialData }) => {
           disabled={
             loading ||
             form.products.length === 0 ||
-            form.products.some((p) => !p._id)
+            form.products.some((p) => !p._id) ||
+            success // Disable button if save was successful
           }
           startIcon={loading ? <CircularProgress size={20} /> : null}
           sx={{
