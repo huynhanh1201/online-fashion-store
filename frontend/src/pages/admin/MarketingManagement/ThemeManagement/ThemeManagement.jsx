@@ -257,7 +257,7 @@ const ThemeManagement = () => {
 
   return (
     <RouteGuard requiredPermissions={['admin:access', 'theme:use']}>
-      <Box sx={{ p: 3, maxWidth: 1200 }}>
+      <Box sx={{ p: 3, maxWidth: '100%' }}>
         <Typography
           variant='h4'
           sx={{ mb: 3, fontWeight: 700, color: 'text.primary' }}
