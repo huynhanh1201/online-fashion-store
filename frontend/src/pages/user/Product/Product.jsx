@@ -29,7 +29,7 @@ import { useNavigate } from 'react-router-dom'
 const ITEMS_PER_PAGE = 15
 
 // Custom styled button to mimic the dropdown in the image
-const SortDropdownButton = styled('button')(({ }) => ({
+const SortDropdownButton = styled('button')(({}) => ({
   border: '1px solid #222',
   background: '#fff',
   borderRadius: 0,
@@ -85,19 +85,19 @@ const sortOptions = [
 
 // Helper to generate pagination items with ellipsis
 function getPaginationItems(current, total) {
-  const pages = [];
+  const pages = []
   if (total <= 7) {
-    for (let i = 1; i <= total; i++) pages.push(i);
-    return pages;
+    for (let i = 1; i <= total; i++) pages.push(i)
+    return pages
   }
   if (current <= 4) {
-    pages.push(1, 2, 3, 4, '...', total);
+    pages.push(1, 2, 3, 4, '...', total)
   } else if (current >= total - 3) {
-    pages.push(1, '...', total - 3, total - 2, total - 1, total);
+    pages.push(1, '...', total - 3, total - 2, total - 1, total)
   } else {
-    pages.push(1, '...', current - 1, current, current + 1, '...', total);
+    pages.push(1, '...', current - 1, current, current + 1, '...', total)
   }
-  return pages;
+  return pages
 }
 
 const Product = () => {
@@ -121,8 +121,8 @@ const Product = () => {
       try {
         const allBanners = await getBanners()
         // Filter banner with position 'product' and visible = true
-        const productBanner = allBanners.find(banner =>
-          banner.position === 'product' && banner.visible === true
+        const productBanner = allBanners.find(
+          (banner) => banner.position === 'product' && banner.visible === true
         )
         setProductBanner(productBanner)
       } catch (error) {
@@ -148,7 +148,7 @@ const Product = () => {
         priceAsc: 'price_asc',
         priceDesc: 'price_desc'
       }
-      
+
       const params = {
         page: Number(page),
         limit: Number(ITEMS_PER_PAGE),
@@ -173,9 +173,13 @@ const Product = () => {
 
       // Client-side sorting cho giá
       if (sortOption === 'priceAsc') {
-        sortedProducts.sort((a, b) => (a.exportPrice || 0) - (b.exportPrice || 0))
+        sortedProducts.sort(
+          (a, b) => (a.exportPrice || 0) - (b.exportPrice || 0)
+        )
       } else if (sortOption === 'priceDesc') {
-        sortedProducts.sort((a, b) => (b.exportPrice || 0) - (a.exportPrice || 0))
+        sortedProducts.sort(
+          (a, b) => (b.exportPrice || 0) - (a.exportPrice || 0)
+        )
       }
 
       setProducts(sortedProducts)
@@ -184,7 +188,7 @@ const Product = () => {
       console.error('Chi tiết lỗi:', error)
       setError(
         error.message ||
-        'Không thể tải danh sách sản phẩm. Vui lòng thử lại sau.'
+          'Không thể tải danh sách sản phẩm. Vui lòng thử lại sau.'
       )
       setProducts([])
       setTotalPages(1)
@@ -299,8 +303,8 @@ const Product = () => {
               cursor: 'pointer'
             }}
             onClick={() => navigate('/')}
-          // component={Link}
-          // to='/product'
+            // component={Link}
+            // to='/product'
           >
             Trang chủ
           </Link>
@@ -343,32 +347,39 @@ const Product = () => {
               backgroundRepeat: 'no-repeat',
               backgroundPosition: 'center',
               borderRadius: 2,
-              overflow: 'hidden',
+              overflow: 'hidden'
             }}
           >
             {bannerLoading && (
               <Skeleton
-                variant="rectangular"
-                width="100%"
-                height="100%"
+                variant='rectangular'
+                width='100%'
+                height='100%'
                 sx={{
-                  borderRadius: 2,
+                  borderRadius: 2
                 }}
               />
             )}
           </Box>
 
           {/* Title & Description - 50% */}
-          <Box sx={{
-            width: { xs: '100%', md: '50%' },
-            textAlign: 'center',
-            px: { xs: 0, md: 3 }
-          }}>
+          <Box
+            sx={{
+              width: { xs: '100%', md: '50%' },
+              textAlign: 'center',
+              px: { xs: 0, md: 3 }
+            }}
+          >
             <Typography
-              variant="h2"
+              variant='h2'
               fontWeight={800}
               sx={{
-                fontSize: { xs: '1.8rem', sm: '2.2rem', md: '2.8rem', lg: '3.2rem' },
+                fontSize: {
+                  xs: '1.8rem',
+                  sm: '2.2rem',
+                  md: '2.8rem',
+                  lg: '3.2rem'
+                },
                 background: 'linear-gradient(90deg, #1A3C7B 0%, #1976d2 100%)',
                 WebkitBackgroundClip: 'text',
                 WebkitTextFillColor: 'transparent',
@@ -379,12 +390,18 @@ const Product = () => {
                 mb: 2
               }}
             >
-              {productBanner?.title || 'Tất cả sản phẩm'}
+              {productBanner?.title
+                .split(' ')
+                .map(
+                  (word) =>
+                    word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+                )
+                .join(' ') || 'Tất cả sản phẩm'}
             </Typography>
 
             {productBanner?.description && (
               <Typography
-                variant="h6"
+                variant='h6'
                 sx={{
                   color: 'text.secondary',
                   fontWeight: 400,
@@ -507,18 +524,29 @@ const Product = () => {
                 </div>
               ))}
             </div>
-            <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4, mb: 2, alignItems: 'center' }}>
+            <Box
+              sx={{
+                display: 'flex',
+                justifyContent: 'center',
+                mt: 4,
+                mb: 2,
+                alignItems: 'center'
+              }}
+            >
               <Pagination
                 count={totalPages}
                 page={page}
                 onChange={handlePageChange}
                 boundaryCount={1}
                 siblingCount={1}
-                shape="rounded"
-                size="small"
-                color="primary"
+                shape='rounded'
+                size='small'
+                color='primary'
                 renderItem={(item) => {
-                  if (item.type === 'start-ellipsis' || item.type === 'end-ellipsis') {
+                  if (
+                    item.type === 'start-ellipsis' ||
+                    item.type === 'end-ellipsis'
+                  ) {
                     return (
                       <span
                         style={{
@@ -528,7 +556,7 @@ const Product = () => {
                           fontSize: '1rem',
                           display: 'inline-flex',
                           alignItems: 'center',
-                          justifyContent: 'center',
+                          justifyContent: 'center'
                         }}
                       >
                         ...
