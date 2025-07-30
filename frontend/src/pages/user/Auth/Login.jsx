@@ -67,7 +67,9 @@ function Login() {
         setLoadingBanner(true)
         const banners = await getUserBanners()
         // Tìm banner cho vị trí login
-        const loginBanner = banners.find(banner => banner.position === 'login')
+        const loginBanner = banners.find(
+          (banner) => banner.position === 'login'
+        )
         setBackgroundBanner(loginBanner)
       } catch (error) {
         console.error('Lỗi khi lấy banner:', error)
@@ -115,7 +117,7 @@ function Login() {
         minHeight: '100vh',
         alignItems: 'center',
         justifyContent: 'center',
-        backgroundImage: backgroundBanner?.imageUrl 
+        backgroundImage: backgroundBanner?.imageUrl
           ? `url("${optimizeCloudinaryUrl(backgroundBanner.imageUrl, { width: 1920, height: 1080 })}")`
           : 'url("https://png.pngtree.com/background/20230426/original/pngtree-an-image-of-a-clothing-store-picture-image_2490513.jpg")',
         backgroundRepeat: 'no-repeat',
@@ -285,23 +287,23 @@ function Login() {
               </Button>
             </CardActions>
 
-            <Grid item xs={12}>
-              <Typography
-                align='center'
-                sx={{ mt: 1.5, color: '#666', fontSize: '0.9rem' }}
-              >
-                <a
-                  href='/forgot-password'
-                  style={{
-                    color: '#1976d2',
-                    textDecoration: 'none',
-                    fontWeight: 500
-                  }}
-                >
-                  Quên mật khẩu?
-                </a>
-              </Typography>
-            </Grid>
+            {/*<Grid item xs={12}>*/}
+            {/*  <Typography*/}
+            {/*    align='center'*/}
+            {/*    sx={{ mt: 1.5, color: '#666', fontSize: '0.9rem' }}*/}
+            {/*  >*/}
+            {/*    <a*/}
+            {/*      href='/forgot-password'*/}
+            {/*      style={{*/}
+            {/*        color: '#1976d2',*/}
+            {/*        textDecoration: 'none',*/}
+            {/*        fontWeight: 500*/}
+            {/*      }}*/}
+            {/*    >*/}
+            {/*      Quên mật khẩu?*/}
+            {/*    </a>*/}
+            {/*  </Typography>*/}
+            {/*</Grid>*/}
 
             <Grid item xs={12}>
               <Typography
@@ -322,26 +324,26 @@ function Login() {
               </Typography>
             </Grid>
 
-            <Grid item xs={12}>
-              <Box
-                sx={{
-                  mt: 2,
-                  display: 'flex',
-                  justifyContent: 'center',
-                  gap: 2
-                }}
-              >
-                <SocialButton variant='outlined'>
-                  <Facebook sx={{ color: '#3b5998' }} />
-                </SocialButton>
-                <SocialButton variant='outlined'>
-                  <Google sx={{ color: '#db4437' }} />
-                </SocialButton>
-                <SocialButton variant='outlined'>
-                  <GitHub sx={{ color: '#333333' }} />
-                </SocialButton>
-              </Box>
-            </Grid>
+            {/*<Grid item xs={12}>*/}
+            {/*  <Box*/}
+            {/*    sx={{*/}
+            {/*      mt: 2,*/}
+            {/*      display: 'flex',*/}
+            {/*      justifyContent: 'center',*/}
+            {/*      gap: 2*/}
+            {/*    }}*/}
+            {/*  >*/}
+            {/*    <SocialButton variant='outlined'>*/}
+            {/*      <Facebook sx={{ color: '#3b5998' }} />*/}
+            {/*    </SocialButton>*/}
+            {/*    <SocialButton variant='outlined'>*/}
+            {/*      <Google sx={{ color: '#db4437' }} />*/}
+            {/*    </SocialButton>*/}
+            {/*    <SocialButton variant='outlined'>*/}
+            {/*      <GitHub sx={{ color: '#333333' }} />*/}
+            {/*    </SocialButton>*/}
+            {/*  </Box>*/}
+            {/*</Grid>*/}
           </MuiCard>
         </Zoom>
       </form>

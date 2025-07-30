@@ -112,7 +112,7 @@ const ViewCategoryModal = ({ open, onClose, category }) => {
               >
                 {category.banner ? (
                   <img
-                    src={category.image}
+                    src={category.banner}
                     alt='Ảnh banner'
                     style={{
                       width: '100%',
