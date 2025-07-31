@@ -57,7 +57,9 @@ const ProductDetail = () => {
   const selectedColorObj = availableColors?.find(
     (color) => color.name === selectedColor
   )
-
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'auto' })
+  }, [])
   useEffect(() => {
     const fetchCategory = async () => {
       console.log('>>> product.category:', product?.category)

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react'
 import {
   Box,
   Container,
@@ -25,7 +25,7 @@ import {
   Breadcrumbs,
   Link,
   Collapse,
-} from '@mui/material';
+} from '@mui/material'
 import {
   Delete,
   Add,
@@ -37,10 +37,10 @@ import {
   ArrowForward,
   NavigateNext,
   ExpandMore,
-} from '@mui/icons-material';
-import { useCart } from '~/hooks/useCarts';
-import { Navigate, useNavigate } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
+} from '@mui/icons-material'
+import { useCart } from '~/hooks/useCarts'
+import { Navigate, useNavigate } from 'react-router-dom'
+import { useDispatch, useSelector } from 'react-redux'
 import {
   setSelectedItems as setSelectedItemsAction,
   setTempQuantity,
@@ -48,52 +48,52 @@ import {
   clearReorderVariantIds,
   setAppliedCoupon,
   clearAppliedCoupon,
-} from '~/redux/cart/cartSlice';
-import { optimizeCloudinaryUrl } from '~/utils/cloudinary';
-import { getDiscounts } from '~/services/discountService';
-import SuggestionProducts from './SuggestionProducts';
+} from '~/redux/cart/cartSlice'
+import { optimizeCloudinaryUrl } from '~/utils/cloudinary'
+import { getDiscounts } from '~/services/discountService'
+import SuggestionProducts from './SuggestionProducts'
 
 const Cart = () => {
-  const { cart, loading, deleteItem, clearCart, updateItem } = useCart();
-  const [selectedItems, setSelectedItems] = useState([]);
-  const [cartItems, setCartItems] = useState([]);
-  const [showMaxQuantityAlert, setShowMaxQuantityAlert] = useState(false);
-  const [confirmClearOpen, setConfirmClearOpen] = useState(false);
-  const [coupons, setCoupons] = useState([]);
-  const [hasFetchedCoupons, setHasFetchedCoupons] = useState(false);
-  const navigate = useNavigate();
-  const dispatch = useDispatch();
-  const [deleteMode, setDeleteMode] = useState('');
-  const [itemToDelete, setItemToDelete] = useState(null);
-  const tempQuantities = useSelector((state) => state.cart.tempQuantities || {});
-  const reorderVariantIds = useSelector((state) => state.cart.reorderVariantIds || []);
-  const [processingVariantId, setProcessingVariantId] = useState(null);
-  const [hasAutoSelected, setHasAutoSelected] = useState(false);
-  const [outOfStockAlert, setOutOfStockAlert] = useState(false);
-  const [outOfStockMessage, setOutOfStockMessage] = useState('');
-  const [updateTimers, setUpdateTimers] = useState({});
-  const [expandedProducts, setExpandedProducts] = useState({});
+  const { cart, loading, deleteItem, clearCart, updateItem } = useCart()
+  const [selectedItems, setSelectedItems] = useState([])
+  const [cartItems, setCartItems] = useState([])
+  const [showMaxQuantityAlert, setShowMaxQuantityAlert] = useState(false)
+  const [confirmClearOpen, setConfirmClearOpen] = useState(false)
+  const [coupons, setCoupons] = useState([])
+  const [hasFetchedCoupons, setHasFetchedCoupons] = useState(false)
+  const navigate = useNavigate()
+  const dispatch = useDispatch()
+  const [deleteMode, setDeleteMode] = useState('')
+  const [itemToDelete, setItemToDelete] = useState(null)
+  const tempQuantities = useSelector((state) => state.cart.tempQuantities || {})
+  const reorderVariantIds = useSelector((state) => state.cart.reorderVariantIds || [])
+  const [processingVariantId, setProcessingVariantId] = useState(null)
+  const [hasAutoSelected, setHasAutoSelected] = useState(false)
+  const [outOfStockAlert, setOutOfStockAlert] = useState(false)
+  const [outOfStockMessage, setOutOfStockMessage] = useState('')
+  const [updateTimers, setUpdateTimers] = useState({})
+  const [expandedProducts, setExpandedProducts] = useState({})
 
   useEffect(() => {
-    window.scrollTo({ top: 0, behavior: 'auto' });
-    setHasAutoSelected(false);
+    window.scrollTo({ top: 0, behavior: 'auto' })
+    setHasAutoSelected(false)
 
     return () => {
       Object.values(updateTimers).forEach((timer) => {
-        if (timer) clearTimeout(timer);
-      });
-    };
-  }, []);
+        if (timer) clearTimeout(timer)
+      })
+    }
+  }, [])
 
   useEffect(() => {
     if (cartItems.length > 0) {
-      const newExpandedProducts = {};
+      const newExpandedProducts = {}
       Object.keys(groupedCartItems).forEach((productId) => {
-        newExpandedProducts[productId] = true;
-      });
-      setExpandedProducts(newExpandedProducts);
+        newExpandedProducts[productId] = true
+      })
+      setExpandedProducts(newExpandedProducts)
     }
-  }, [cartItems.length]);
+  }, [cartItems.length])
 
   useEffect(() => {
     if (selectedItems.length > 0 && cartItems.length > 0) {
@@ -101,37 +101,37 @@ const Cart = () => {
         const item = cartItems.find(
           (cartItem) =>
             (cartItem.variantId?._id || cartItem.variantId) === selected.variantId
-        );
+        )
         return (
           item &&
           item.quantity > 0 &&
           (item.variantId?.quantity === undefined || item.variantId.quantity > 0) &&
           item.variantId?.status !== 'inactive'
-        );
-      });
+        )
+      })
 
       if (validSelectedItems.length < selectedItems.length) {
-        setSelectedItems(validSelectedItems);
-        dispatch(setSelectedItemsAction(validSelectedItems));
+        setSelectedItems(validSelectedItems)
+        dispatch(setSelectedItemsAction(validSelectedItems))
       }
     }
-  }, [cartItems, selectedItems, dispatch]);
+  }, [cartItems, selectedItems, dispatch])
 
   useEffect(() => {
     if (cart?.cartItems) {
       const sortedItems = [...cart.cartItems].sort((a, b) => {
-        if (a.quantity > 0 && b.quantity === 0) return -1;
-        if (a.quantity === 0 && b.quantity > 0) return 1;
-        return 0;
-      });
-      setCartItems(sortedItems);
+        if (a.quantity > 0 && b.quantity === 0) return -1
+        if (a.quantity === 0 && b.quantity > 0) return 1
+        return 0
+      })
+      setCartItems(sortedItems)
 
-      const outOfStockItems = sortedItems.filter((item) => item.quantity === 0);
+      const outOfStockItems = sortedItems.filter((item) => item.quantity === 0)
       if (outOfStockItems.length > 0) {
         setOutOfStockMessage(
           'Một số sản phẩm trong giỏ hàng đã hết hàng và không thể chọn để thanh toán'
-        );
-        setOutOfStockAlert(true);
+        )
+        setOutOfStockAlert(true)
         setSelectedItems((prev) => {
           const filteredItems = prev.filter(
             (selected) =>
@@ -140,71 +140,71 @@ const Cart = () => {
                   outOfStock.variantId?._id === selected.variantId ||
                   outOfStock.variantId === selected.variantId
               )
-          );
-          dispatch(setSelectedItemsAction(filteredItems));
-          return filteredItems;
-        });
+          )
+          dispatch(setSelectedItemsAction(filteredItems))
+          return filteredItems
+        })
       }
     }
-  }, [cart, dispatch]);
+  }, [cart, dispatch])
 
   useEffect(() => {
     if (cartItems.length > 0 && reorderVariantIds.length > 0 && !hasAutoSelected) {
       const reorderSelectedItems = cartItems
         .filter((item) => {
-          const variantId = item.variantId?._id || item.variantId;
-          const isMatch = reorderVariantIds.includes(variantId);
-          const hasStock = item.quantity > 0;
-          return isMatch && hasStock;
+          const variantId = item.variantId?._id || item.variantId
+          const isMatch = reorderVariantIds.includes(variantId)
+          const hasStock = item.quantity > 0
+          return isMatch && hasStock
         })
         .map((item) => ({
           variantId: item.variantId?._id || item.variantId,
           quantity: item.quantity,
-        }));
+        }))
 
       if (reorderSelectedItems.length > 0) {
-        setSelectedItems(reorderSelectedItems);
-        dispatch(setSelectedItemsAction(reorderSelectedItems));
-        setHasAutoSelected(true);
-        dispatch(clearReorderVariantIds());
+        setSelectedItems(reorderSelectedItems)
+        dispatch(setSelectedItemsAction(reorderSelectedItems))
+        setHasAutoSelected(true)
+        dispatch(clearReorderVariantIds())
       }
     }
-  }, [cartItems, reorderVariantIds, hasAutoSelected, dispatch]);
+  }, [cartItems, reorderVariantIds, hasAutoSelected, dispatch])
 
   useEffect(() => {
-    if (hasFetchedCoupons) return;
+    if (hasFetchedCoupons) return
 
     const fetchCoupons = async () => {
       try {
-        const res = await getDiscounts();
+        const res = await getDiscounts()
         if (Array.isArray(res.discounts) && res.discounts.length > 0) {
-          setCoupons(res.discounts.sort((a, b) => a.minOrderValue - b.minOrderValue));
+          setCoupons(res.discounts.sort((a, b) => a.minOrderValue - b.minOrderValue))
         }
       } catch (error) {
       } finally {
-        setHasFetchedCoupons(true);
+        setHasFetchedCoupons(true)
       }
-    };
+    }
 
-    fetchCoupons();
-  }, [hasFetchedCoupons]);
+    fetchCoupons()
+  }, [hasFetchedCoupons])
 
   const selectableItems = cartItems.filter(
     (item) => item.quantity > 0 && item.variantId?.status !== 'inactive'
-  );
+  )
 
   const selectedSelectableItems = selectedItems.filter((selected) =>
     selectableItems.some(
       (item) => (item.variantId?._id || item.variantId) === selected.variantId
     )
-  );
+  )
 
   const allSelected =
     selectableItems.length > 0 &&
-    selectedSelectableItems.length === selectableItems.length;
+    selectedSelectableItems.length === selectableItems.length
   const someSelected =
     selectedSelectableItems.length > 0 &&
-    selectedSelectableItems.length < selectableItems.length;
+    selectedSelectableItems.length < selectableItems.length
 
   const handleSelectAll = () => {
     const newSelected = allSelected
@@ -212,377 +212,377 @@ const Cart = () => {
       : selectableItems.map((item) => ({
         variantId: item.variantId?._id || item.variantId,
         quantity: item.quantity,
-      }));
+      }))
 
-    setSelectedItems(newSelected);
-    dispatch(setSelectedItemsAction(newSelected));
-  };
+    setSelectedItems(newSelected)
+    dispatch(setSelectedItemsAction(newSelected))
+  }
 
   const handleSelect = (item) => {
-    const variantId = item.variantId?._id || item.variantId;
-    const variant = item.variantId;
-    const exists = selectedItems.some((i) => i.variantId === variantId);
+    const variantId = item.variantId?._id || item.variantId
+    const variant = item.variantId
+    const exists = selectedItems.some((i) => i.variantId === variantId)
 
     const isOutOfStock =
       item.quantity === 0 ||
-      (variant?.quantity !== undefined && variant.quantity === 0);
-    const isInactive = variant?.status === 'inactive' || variant?.productId?.status === 'inactive';
+      (variant?.quantity !== undefined && variant.quantity === 0)
+    const isInactive = variant?.status === 'inactive' || variant?.productId?.status === 'inactive'
 
     if (!exists && (isOutOfStock || isInactive)) {
       setOutOfStockMessage(
         isInactive
           ? 'Sản phẩm này đã ngừng bán và không thể chọn'
           : 'Sản phẩm này đã hết hàng và không thể chọn'
-      );
-      setOutOfStockAlert(true);
-      return;
+      )
+      setOutOfStockAlert(true)
+      return
     }
 
     const newSelected = exists
       ? selectedItems.filter((i) => i.variantId !== variantId)
-      : [...selectedItems, { variantId, quantity: item.quantity }];
+      : [...selectedItems, { variantId, quantity: item.quantity }]
 
-    setSelectedItems(newSelected);
-    dispatch(setSelectedItemsAction(newSelected));
-  };
+    setSelectedItems(newSelected)
+    dispatch(setSelectedItemsAction(newSelected))
+  }
 
   const formatPrice = (val) =>
-    typeof val === 'number' ? val.toLocaleString('vi-VN') + '₫' : '0₫';
+    typeof val === 'number' ? val.toLocaleString('vi-VN') + '₫' : '0₫'
 
   const handleMouseDown = (variantId, delta) => {
-    if (processingVariantId === variantId) return;
+    if (processingVariantId === variantId) return
 
-    const item = cartItems.find((i) => i.variantId._id === variantId);
-    if (!item) return;
+    const item = cartItems.find((i) => i.variantId._id === variantId)
+    if (!item) return
 
-    if (item.quantity === 0 || item.variantId?.status === 'inactive' || item.variantId?.productId?.status === 'inactive') return;
+    if (item.quantity === 0 || item.variantId?.status === 'inactive' || item.variantId?.productId?.status === 'inactive') return
 
-    const current = tempQuantities[variantId] ?? item.quantity;
-    const max = item.variantId.quantity || 99;
+    const current = tempQuantities[variantId] ?? item.quantity
+    const max = item.variantId.quantity || 99
 
     if (delta > 0 && current >= max) {
-      setShowMaxQuantityAlert(true);
-      return;
+      setShowMaxQuantityAlert(true)
+      return
     }
 
-    const newQty = Math.min(Math.max(current + delta, 1), max);
-    dispatch(setTempQuantity({ variantId, quantity: newQty }));
+    const newQty = Math.min(Math.max(current + delta, 1), max)
+    dispatch(setTempQuantity({ variantId, quantity: newQty }))
 
     setSelectedItems((prev) => {
-      const existingItem = prev.find((i) => i.variantId === variantId);
-      let newSelectedItems;
+      const existingItem = prev.find((i) => i.variantId === variantId)
+      let newSelectedItems
       if (existingItem) {
         newSelectedItems = prev.map((i) =>
           i.variantId === variantId ? { ...i, quantity: newQty } : i
-        );
+        )
       } else {
-        newSelectedItems = [...prev, { variantId, quantity: newQty }];
+        newSelectedItems = [...prev, { variantId, quantity: newQty }]
       }
-      dispatch(setSelectedItemsAction(newSelectedItems));
-      return newSelectedItems;
-    });
-  };
+      dispatch(setSelectedItemsAction(newSelectedItems))
+      return newSelectedItems
+    })
+  }
 
   const handleMouseLeave = async (variantId) => {
-    const item = cartItems.find((i) => i.variantId._id === variantId);
-    const tempQty = tempQuantities[variantId];
+    const item = cartItems.find((i) => i.variantId._id === variantId)
+    const tempQty = tempQuantities[variantId]
 
-    if (!item || tempQty === undefined || tempQty === item.quantity) return;
+    if (!item || tempQty === undefined || tempQty === item.quantity) return
 
     if (updateTimers[variantId]) {
-      clearTimeout(updateTimers[variantId]);
+      clearTimeout(updateTimers[variantId])
     }
 
     const timer = setTimeout(async () => {
       try {
-        setProcessingVariantId(variantId);
-        const delta = tempQty - item.quantity;
-        await updateItem(variantId, { quantity: delta });
+        setProcessingVariantId(variantId)
+        const delta = tempQty - item.quantity
+        await updateItem(variantId, { quantity: delta })
 
         setCartItems((prev) =>
           prev.map((i) =>
             i.variantId._id === variantId ? { ...i, quantity: tempQty } : i
           )
-        );
+        )
 
         setSelectedItems((prev) => {
           const newSelectedItems = prev.map((i) =>
             i.variantId === variantId ? { ...i, quantity: tempQty } : i
-          );
-          dispatch(setSelectedItemsAction(newSelectedItems));
-          return newSelectedItems;
-        });
+          )
+          dispatch(setSelectedItemsAction(newSelectedItems))
+          return newSelectedItems
+        })
 
-        dispatch(removeTempQuantity(variantId));
+        dispatch(removeTempQuantity(variantId))
       } catch (err) {
-        console.error('Error updating quantity:', err);
-        setOutOfStockMessage('Không thể cập nhật số lượng sản phẩm');
-        setOutOfStockAlert(true);
+        console.error('Error updating quantity:', err)
+        setOutOfStockMessage('Không thể cập nhật số lượng sản phẩm')
+        setOutOfStockAlert(true)
       } finally {
-        setProcessingVariantId(null);
+        setProcessingVariantId(null)
         setUpdateTimers((prev) => {
-          const newTimers = { ...prev };
-          delete newTimers[variantId];
-          return newTimers;
-        });
+          const newTimers = { ...prev }
+          delete newTimers[variantId]
+          return newTimers
+        })
       }
-    }, 500);
+    }, 500)
 
     setUpdateTimers((prev) => ({
       ...prev,
       [variantId]: timer,
-    }));
-  };
+    }))
+  }
 
   const handleRemove = async ({ variantId }) => {
     try {
-      const res = await deleteItem({ variantId });
+      const res = await deleteItem({ variantId })
       if (res) {
         setCartItems((prev) =>
           prev.filter((item) => item.variantId._id !== variantId)
-        );
+        )
         setSelectedItems((prev) =>
           prev.filter((i) => i.variantId !== variantId)
-        );
+        )
       }
     } catch (error) {
     }
-  };
+  }
 
   const selectedCartItems = cartItems.filter((item) =>
     selectedItems.some((selected) => selected.variantId === item.variantId._id)
-  );
+  )
 
   const getFinalPrice = (variant) => {
-    const basePrice = variant.exportPrice || 0;
-    const discount = variant.discountPrice || 0;
-    return Math.max(basePrice - discount, 0);
-  };
+    const basePrice = variant.exportPrice || 0
+    const discount = variant.discountPrice || 0
+    return Math.max(basePrice - discount, 0)
+  }
 
   const totalPrice = selectedCartItems.reduce((sum, item) => {
-    const selected = selectedItems.find((i) => i.variantId === item.variantId._id);
-    const qty = selected?.quantity || item.quantity;
-    return sum + getFinalPrice(item.variantId) * qty;
-  }, 0);
+    const selected = selectedItems.find((i) => i.variantId === item.variantId._id)
+    const qty = selected?.quantity || item.quantity
+    return sum + getFinalPrice(item.variantId) * qty
+  }, 0)
 
   const totalSavings = selectedCartItems.reduce((sum, item) => {
-    const selected = selectedItems.find((i) => i.variantId === item.variantId._id);
-    const qty = selected?.quantity || item.quantity;
-    const variant = item.variantId;
+    const selected = selectedItems.find((i) => i.variantId === item.variantId._id)
+    const qty = selected?.quantity || item.quantity
+    const variant = item.variantId
 
     if (variant.discountPrice && variant.discountPrice > 0) {
-      return sum + variant.discountPrice * qty;
+      return sum + variant.discountPrice * qty
     }
-    return sum;
-  }, 0);
+    return sum
+  }, 0)
 
   const capitalizeFirstLetter = (str) => {
-    if (!str) return '';
-    return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
-  };
+    if (!str) return ''
+    return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase()
+  }
 
   const formatSize = (str) => {
-    if (!str) return '';
-    return str.toUpperCase();
-  };
+    if (!str) return ''
+    return str.toUpperCase()
+  }
 
   const groupedCartItems = cartItems.reduce((groups, item) => {
-    const productId = item.variantId?.productId?._id;
-    if (!productId) return groups;
+    const productId = item.variantId?.productId?._id
+    if (!productId) return groups
 
     if (!groups[productId]) {
       groups[productId] = {
         productId,
         productName: item.variantId?.name || 'Sản phẩm không rõ',
         variants: [],
-      };
+      }
     }
 
-    groups[productId].variants.push(item);
-    return groups;
-  }, {});
+    groups[productId].variants.push(item)
+    return groups
+  }, {})
 
   const handleAccordionToggle = (productId) => {
     setExpandedProducts((prev) => ({
       ...prev,
       [productId]: !prev[productId],
-    }));
-  };
+    }))
+  }
 
   const isProductFullySelected = (productId) => {
-    const productGroup = groupedCartItems[productId];
-    if (!productGroup) return false;
+    const productGroup = groupedCartItems[productId]
+    if (!productGroup) return false
 
     const selectableVariants = productGroup.variants.filter(
       (item) => item.quantity > 0 && item.variantId?.status !== 'inactive' && item.variantId?.productId?.status !== 'inactive'
-    );
+    )
     const selectedVariants = selectableVariants.filter((item) =>
       selectedItems.some((selected) => selected.variantId === item.variantId?._id)
-    );
+    )
 
-    return selectableVariants.length > 0 && selectedVariants.length === selectableVariants.length;
-  };
+    return selectableVariants.length > 0 && selectedVariants.length === selectableVariants.length
+  }
 
   const isProductPartiallySelected = (productId) => {
-    const productGroup = groupedCartItems[productId];
-    if (!productGroup) return false;
+    const productGroup = groupedCartItems[productId]
+    if (!productGroup) return false
 
     const selectableVariants = productGroup.variants.filter(
       (item) => item.quantity > 0 && item.variantId?.status !== 'inactive' && item.variantId?.productId?.status !== 'inactive'
-    );
+    )
     const selectedVariants = selectableVariants.filter((item) =>
       selectedItems.some((selected) => selected.variantId === item.variantId?._id)
-    );
+    )
 
-    return selectedVariants.length > 0 && selectedVariants.length < selectableVariants.length;
-  };
+    return selectedVariants.length > 0 && selectedVariants.length < selectableVariants.length
+  }
 
   const handleProductGroupSelect = (productId) => {
-    const productGroup = groupedCartItems[productId];
-    if (!productGroup) return;
+    const productGroup = groupedCartItems[productId]
+    if (!productGroup) return
 
     const selectableVariants = productGroup.variants.filter(
       (item) => item.quantity > 0 && item.variantId?.status !== 'inactive' && item.variantId?.productId?.status !== 'inactive'
-    );
+    )
     const isFullySelected = selectableVariants.every((item) =>
       selectedItems.some((selected) => selected.variantId === item.variantId?._id)
-    );
+    )
 
-    let newSelected = [...selectedItems];
+    let newSelected = [...selectedItems]
     if (isFullySelected) {
       newSelected = selectedItems.filter(
         (selected) =>
           !selectableVariants.some((item) => selected.variantId === item.variantId?._id)
-      );
+      )
     } else {
       const variantsToAdd = selectableVariants
         .filter((item) => !selectedItems.some((selected) => selected.variantId === item.variantId?._id))
         .map((item) => ({
           variantId: item.variantId?._id,
           quantity: item.quantity,
-        }));
-      newSelected = [...selectedItems, ...variantsToAdd];
+        }))
+      newSelected = [...selectedItems, ...variantsToAdd]
     }
 
-    setSelectedItems(newSelected);
-    dispatch(setSelectedItemsAction(newSelected));
-  };
+    setSelectedItems(newSelected)
+    dispatch(setSelectedItemsAction(newSelected))
+  }
 
   const handleClearCart = async () => {
-    await clearCart();
-    setCartItems([]);
-    setSelectedItems([]);
-    setConfirmClearOpen(false);
-  };
+    await clearCart()
+    setCartItems([])
+    setSelectedItems([])
+    setConfirmClearOpen(false)
+  }
 
   const handleCheckout = () => {
     if (selectedItems.length === 0) {
-      setOutOfStockMessage('Vui lòng chọn ít nhất một sản phẩm để thanh toán');
-      setOutOfStockAlert(true);
-      return;
+      setOutOfStockMessage('Vui lòng chọn ít nhất một sản phẩm để thanh toán')
+      setOutOfStockAlert(true)
+      return
     }
 
     const selectedCartItems = cartItems.filter((item) =>
       selectedItems.some((selected) => item.variantId?._id === selected.variantId)
-    );
+    )
 
     if (selectedCartItems.length === 0) {
-      setOutOfStockMessage('Không tìm thấy sản phẩm đã chọn trong giỏ hàng');
-      setOutOfStockAlert(true);
-      return;
+      setOutOfStockMessage('Không tìm thấy sản phẩm đã chọn trong giỏ hàng')
+      setOutOfStockAlert(true)
+      return
     }
 
     const hasOutOfStockSelected = selectedCartItems.some(
       (item) =>
         item.quantity === 0 ||
         (item.variantId?.quantity !== undefined && item.variantId.quantity === 0)
-    );
+    )
 
     if (hasOutOfStockSelected) {
       const validSelectedItems = selectedItems.filter((selected) => {
         const item = cartItems.find(
           (cartItem) => cartItem.variantId?._id === selected.variantId
-        );
+        )
         return (
           item &&
           item.quantity > 0 &&
           (item.variantId?.quantity === undefined || item.variantId.quantity > 0) &&
           item.variantId?.status !== 'inactive' &&
           item.variantId?.productId?.status !== 'inactive'
-        );
-      });
+        )
+      })
 
-      setSelectedItems(validSelectedItems);
-      dispatch(setSelectedItemsAction(validSelectedItems));
-      setOutOfStockMessage('Đã loại bỏ các sản phẩm hết hàng khỏi danh sách thanh toán');
-      setOutOfStockAlert(true);
+      setSelectedItems(validSelectedItems)
+      dispatch(setSelectedItemsAction(validSelectedItems))
+      setOutOfStockMessage('Đã loại bỏ các sản phẩm hết hàng khỏi danh sách thanh toán')
+      setOutOfStockAlert(true)
 
       if (validSelectedItems.length === 0) {
-        setOutOfStockMessage('Tất cả sản phẩm đã chọn đều hết hàng');
-        setOutOfStockAlert(true);
-        return;
+        setOutOfStockMessage('Tất cả sản phẩm đã chọn đều hết hàng')
+        setOutOfStockAlert(true)
+        return
       }
     }
 
     if (totalPrice <= 0) {
-      setOutOfStockMessage('Tổng tiền phải lớn hơn 0');
-      setOutOfStockAlert(true);
-      return;
+      setOutOfStockMessage('Tổng tiền phải lớn hơn 0')
+      setOutOfStockAlert(true)
+      return
     }
 
-    const applicableCoupon = getApplicableCoupon();
+    const applicableCoupon = getApplicableCoupon()
     if (applicableCoupon) {
-      const discountAmount = calculateDiscount(applicableCoupon, totalPrice);
+      const discountAmount = calculateDiscount(applicableCoupon, totalPrice)
       dispatch(
         setAppliedCoupon({
           coupon: applicableCoupon,
           discount: discountAmount,
         })
-      );
+      )
     } else {
-      dispatch(clearAppliedCoupon());
+      dispatch(clearAppliedCoupon())
     }
 
-    navigate('/payment');
-  };
+    navigate('/payment')
+  }
 
   const calculateDiscount = (coupon, total) => {
-    if (!coupon || total < coupon.minOrderValue) return 0;
+    if (!coupon || total < coupon.minOrderValue) return 0
     return coupon.type === 'percent'
       ? Math.floor((total * coupon.amount) / 100)
-      : coupon.amount;
-  };
+      : coupon.amount
+  }
 
   const getApplicableCoupon = () => {
-    const validCoupons = coupons.filter((c) => totalPrice >= c.minOrderValue);
-    if (validCoupons.length === 0) return null;
+    const validCoupons = coupons.filter((c) => totalPrice >= c.minOrderValue)
+    if (validCoupons.length === 0) return null
 
     return validCoupons.reduce((best, current) => {
-      const bestDiscount = calculateDiscount(best, totalPrice);
-      const currentDiscount = calculateDiscount(current, totalPrice);
-      return currentDiscount > bestDiscount ? current : best;
-    });
-  };
+      const bestDiscount = calculateDiscount(best, totalPrice)
+      const currentDiscount = calculateDiscount(current, totalPrice)
+      return currentDiscount > bestDiscount ? current : best
+    })
+  }
 
   const getNextCoupon = () => {
-    if (!coupons.length) return null;
+    if (!coupons.length) return null
 
-    const sorted = [...coupons].sort((a, b) => a.minOrderValue - b.minOrderValue);
-    const applicable = getApplicableCoupon();
+    const sorted = [...coupons].sort((a, b) => a.minOrderValue - b.minOrderValue)
+    const applicable = getApplicableCoupon()
 
     if (!applicable) {
-      return sorted.find((c) => totalPrice < c.minOrderValue) || null;
+      return sorted.find((c) => totalPrice < c.minOrderValue) || null
     }
 
-    const next = sorted.find((c) => c.minOrderValue > applicable.minOrderValue);
-    return next || null;
-  };
+    const next = sorted.find((c) => c.minOrderValue > applicable.minOrderValue)
+    return next || null
+  }
 
-  const applicableCoupon = getApplicableCoupon();
-  const nextCoupon = getNextCoupon();
+  const applicableCoupon = getApplicableCoupon()
+  const nextCoupon = getNextCoupon()
   const discountAmount = applicableCoupon
     ? calculateDiscount(applicableCoupon, totalPrice)
-    : 0;
+    : 0
 
   if (loading) {
     return (
@@ -625,7 +625,7 @@ const Cart = () => {
           </Typography>
         </Box>
       </Container>
-    );
+    )
   }
 
   return (
@@ -766,7 +766,7 @@ const Cart = () => {
                     const nextDiscountText =
                       nextCoupon.type === 'percent'
                         ? `${nextCoupon.amount}%`
-                        : formatPrice(nextCoupon.amount);
+                        : formatPrice(nextCoupon.amount)
                     return (
                       <>
                         Bạn đang được giảm
@@ -783,7 +783,7 @@ const Cart = () => {
                         </Box>
                         🎉!
                       </>
-                    );
+                    )
                   }
                   return (
                     <>
@@ -793,14 +793,14 @@ const Cart = () => {
                       </Box>
                       🎉
                     </>
-                  );
+                  )
                 }
-                const first = coupons[0];
+                const first = coupons[0]
                 if (first) {
                   const discountText =
                     first.type === 'percent'
                       ? `${first.amount}%`
-                      : formatPrice(first.amount);
+                      : formatPrice(first.amount)
                   return (
                     <>
                       Chỉ cần mua thêm
@@ -813,9 +813,9 @@ const Cart = () => {
                       </Box>
                       !
                     </>
-                  );
+                  )
                 }
-                return null;
+                return null
               })()}
             </Typography>
           </Box>
@@ -903,8 +903,8 @@ const Cart = () => {
                     <IconButton
                       color='error'
                       onClick={() => {
-                        setDeleteMode('all');
-                        setConfirmClearOpen(true);
+                        setDeleteMode('all')
+                        setConfirmClearOpen(true)
                       }}
                       size='small'
                     >
@@ -915,21 +915,21 @@ const Cart = () => {
                 <Divider />
 
                 {Object.values(groupedCartItems).map((productGroup) => {
-                  const { productId, productName, variants } = productGroup;
-                  const isExpanded = expandedProducts[productId] || false;
-                  const isFullySelected = isProductFullySelected(productId);
-                  const isPartiallySelected = isProductPartiallySelected(productId);
-                  const firstVariant = variants[0]?.variantId;
-                  if (!firstVariant) return null;
+                  const { productId, productName, variants } = productGroup
+                  const isExpanded = expandedProducts[productId] || false
+                  const isFullySelected = isProductFullySelected(productId)
+                  const isPartiallySelected = isProductPartiallySelected(productId)
+                  const firstVariant = variants[0]?.variantId
+                  if (!firstVariant) return null
 
-                  const isProductInactive = firstVariant.productId?.status === 'inactive';
+                  const isProductInactive = firstVariant.productId?.status === 'inactive'
                   const selectableVariants = variants.filter(
                     (item) =>
                       item.quantity > 0 &&
                       item.variantId?.status !== 'inactive' &&
                       !isProductInactive
-                  );
-                  const outOfStockVariants = variants.filter((item) => item.quantity === 0);
+                  )
+                  const outOfStockVariants = variants.filter((item) => item.quantity === 0)
 
                   return (
                     <React.Fragment key={productId}>
@@ -956,7 +956,7 @@ const Cart = () => {
                           sx={{ cursor: isProductInactive ? 'not-allowed' : 'pointer' }}
                           onClick={() => {
                             if (!isProductInactive) {
-                              navigate(`/productdetail/${productId}`);
+                              navigate(`/productdetail/${productId}`)
                             }
                           }}
                         >
@@ -1015,14 +1015,14 @@ const Cart = () => {
                       </Box>
                       <Collapse in={isExpanded} timeout='auto' unmountOnExit>
                         {variants.map((item) => {
-                          const variant = item.variantId;
-                          if (!variant) return null;
+                          const variant = item.variantId
+                          if (!variant) return null
 
                           const isOutOfStock =
                             item.quantity === 0 ||
-                            (variant.quantity !== undefined && variant.quantity === 0);
-                          const isVariantInactive = variant.status === 'inactive';
-                          const isDisabled = isOutOfStock || isVariantInactive || isProductInactive;
+                            (variant.quantity !== undefined && variant.quantity === 0)
+                          const isVariantInactive = variant.status === 'inactive'
+                          const isDisabled = isOutOfStock || isVariantInactive || isProductInactive
 
                           return (
                             <React.Fragment key={item._id}>
@@ -1056,8 +1056,8 @@ const Cart = () => {
                                             quantity: item.quantity,
                                           },
                                         ])
-                                      );
-                                      navigate(`/productdetail/${variant.productId._id}`);
+                                      )
+                                      navigate(`/productdetail/${variant.productId._id}`)
                                     }
                                   }}
                                 >
@@ -1233,9 +1233,9 @@ const Cart = () => {
                                   <IconButton
                                     color='error'
                                     onClick={() => {
-                                      setDeleteMode('single');
-                                      setItemToDelete(variant);
-                                      setConfirmClearOpen(true);
+                                      setDeleteMode('single')
+                                      setItemToDelete(variant)
+                                      setConfirmClearOpen(true)
                                     }}
                                     size='small'
                                   >
@@ -1245,12 +1245,12 @@ const Cart = () => {
                               </Box>
                               <Divider />
                             </React.Fragment>
-                          );
+                          )
                         })}
                       </Collapse>
                       <Divider sx={{ borderWidth: 2, borderColor: '#e0e0e0' }} />
                     </React.Fragment>
-                  );
+                  )
                 })}
               </>
             )}
@@ -1407,11 +1407,11 @@ const Cart = () => {
             sx={{ borderRadius: 6 }}
             onClick={() => {
               if (deleteMode === 'single') {
-                handleRemove({ variantId: itemToDelete._id });
+                handleRemove({ variantId: itemToDelete._id })
               } else {
-                handleClearCart();
+                handleClearCart()
               }
-              setConfirmClearOpen(false);
+              setConfirmClearOpen(false)
             }}
           >
             Xoá
@@ -1434,7 +1434,7 @@ const Cart = () => {
         </Alert>
       </Snackbar>
     </Container>
-  );
-};
+  )
+}
 
-export default Cart;
+export default Cart        
