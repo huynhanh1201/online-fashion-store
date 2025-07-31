@@ -209,7 +209,9 @@ const updateVariant = async (variantId, reqBody) => {
       destroy: reqBody.destroy,
       overridePackageSize: reqBody.overridePackageSize,
       packageSize: reqBody.packageSize,
-      status: reqBody.status
+      status: reqBody.status,
+
+      finalSalePrice: reqBody.exportPrice - (reqBody.discountPrice || 0)
     }
 
     // Nếu có ảnh color mới
