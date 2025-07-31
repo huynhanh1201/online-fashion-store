@@ -68,6 +68,7 @@ const createVariant = async (reqBody) => {
 
     const variants = await VariantModel.create(newVariant)
 
+    // Cập nhật minSalePriceVariant cho product
     const cheapestVariant = await VariantModel.findOne({
       productId: reqBody.productId
     })
@@ -226,6 +227,30 @@ const updateVariant = async (variantId, reqBody) => {
       { $set: updateOps },
       { new: true }
     )
+
+    // Cập nhật minSalePriceVariant cho product
+    const cheapestVariant = await VariantModel.findOne({
+      productId: updatedVariant.productId
+    })
+      .sort({ finalSalePrice: 1 }) // tăng dần → cái rẻ nhất đứng đầu
+      .lean() // optional: nếu không cần document đầy đủ từ mongoose
+
+    if (cheapestVariant) {
+      await ProductModel.findOneAndUpdate(
+        { _id: reqBody.productId }, // điều kiện tìm product
+        {
+          $set: {
+            minSalePriceVariant: {
+              variantId: cheapestVariant._id,
+              exportPrice: cheapestVariant.exportPrice,
+              discountPrice: cheapestVariant.discountPrice || 0,
+              finalSalePrice: cheapestVariant.finalSalePrice
+            }
+          }
+        },
+        { new: true } // Trả về bản ghi đã update
+      )
+    }
 
     return updatedVariant
   } catch (err) {

@@ -286,6 +286,30 @@ const updateProduct = async (productId, reqBody) => {
       )
     }
 
+    // Cập nhật minSalePriceVariant cho product
+    const cheapestVariant = await VariantModel.findOne({
+      productId: productId
+    })
+      .sort({ finalSalePrice: 1 }) // tăng dần → cái rẻ nhất đứng đầu
+      .lean() // optional: nếu không cần document đầy đủ từ mongoose
+
+    if (cheapestVariant) {
+      await ProductModel.findOneAndUpdate(
+        { _id: reqBody.productId }, // điều kiện tìm product
+        {
+          $set: {
+            minSalePriceVariant: {
+              variantId: cheapestVariant._id,
+              exportPrice: cheapestVariant.exportPrice,
+              discountPrice: cheapestVariant.discountPrice || 0,
+              finalSalePrice: cheapestVariant.finalSalePrice
+            }
+          }
+        },
+        { new: true } // Trả về bản ghi đã update
+      )
+    }
+
     return updatedProduct
   } catch (err) {
     throw err
