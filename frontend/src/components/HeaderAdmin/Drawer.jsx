@@ -39,7 +39,6 @@ import usePermissions from '~/hooks/usePermissions'
 import useRoles from '~/hooks/admin/useRoles.js'
 import LogoutButton from '~/components/modals/Logout.jsx'
 import logo from '~/assets/img/logo.jpg'
-import logoSmall from '~/assets/img/logo-mini.png'
 export default function AdminDrawer({
   open,
   profile,
@@ -61,7 +60,9 @@ export default function AdminDrawer({
   const toggleInventory = () => setOpenInventory(!openInventory)
   const toggleContent = () => setOpenContent(!openContent)
   const currentPath = location.pathname
-
+  const [tokenUpdated, setTokenUpdated] = React.useState(
+    localStorage.getItem('accessToken')
+  )
   const isActive = (path) => {
     const normalizedPath = path.endsWith('/') ? path.slice(0, -1) : path
     const current = currentPath.endsWith('/')
@@ -99,6 +100,8 @@ export default function AdminDrawer({
   const dispatch = useDispatch()
   const handleLogout = () => {
     dispatch(logoutUserAPI())
+    localStorage.removeItem('accessToken')
+    setTokenUpdated(null)
     onClose()
   }
 
