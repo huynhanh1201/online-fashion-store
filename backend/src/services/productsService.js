@@ -94,8 +94,7 @@ const getProductList = async (reqQuery) => {
       filterTypeDate,
       startDate,
       endDate,
-      destroy,
-      sortPrice
+      destroy
     } = reqQuery
 
     validatePagination(page, limit)
@@ -150,8 +149,8 @@ const getProductList = async (reqQuery) => {
       name_desc: { name: -1 },
       newest: { createdAt: -1 },
       oldest: { createdAt: 1 },
-      price_desc: { exportPrice: -1 },
-      price_asc: { exportPrice: 1 }
+      price_desc: { 'minSalePriceVariant.finalSalePrice': -1 },
+      price_asc: { 'minSalePriceVariant.finalSalePrice': 1 }
     }
 
     let sortField = {}
@@ -385,10 +384,7 @@ const getListProductOfCategory = async (categoryId, options = {}) => {
       aggregationPipeline.push({ $sort: sortField })
     }
 
-    aggregationPipeline.push(
-      { $skip: skip },
-      { $limit: parseInt(limit) }
-    )
+    aggregationPipeline.push({ $skip: skip }, { $limit: parseInt(limit) })
 
     const ListProduct = await ProductModel.aggregate(aggregationPipeline)
 

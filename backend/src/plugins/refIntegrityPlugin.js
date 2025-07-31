@@ -18,7 +18,7 @@ export const refIntegrityPlugin = (schema, { references = [] }) => {
       if (count > 0) {
         throw new apiError(
           StatusCodes.UNPROCESSABLE_ENTITY,
-          `Dữ lệu đang bị liên kết. Không thể xóa!`
+          `Dữ lệu đang liên kết. Không thể xóa!`
         )
       }
     }
