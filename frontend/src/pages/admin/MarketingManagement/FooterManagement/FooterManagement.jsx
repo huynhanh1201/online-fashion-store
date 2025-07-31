@@ -138,7 +138,6 @@ const FooterManagement = () => {
                       <TableCell>Giới thiệu</TableCell>
                       <TableCell>Cửa hàng</TableCell>
                       <TableCell>Mạng xã hội</TableCell>
-                      <TableCell>Trạng thái</TableCell>
                       <TableCell align='right'>Thao tác</TableCell>
                     </TableRow>
                   </TableHead>
@@ -183,17 +182,6 @@ const FooterManagement = () => {
                             <Typography variant='body2'>{s.name}</Typography>
                           </Box>
                         ))}
-                      </TableCell>
-                      <TableCell>
-                        <Chip
-                          label={existingFooter.status}
-                          color={
-                            existingFooter.status === 'Đang sử dụng'
-                              ? 'success'
-                              : 'default'
-                          }
-                          size='small'
-                        />
                       </TableCell>
                       <TableCell align='right'>
                         {hasPermission('footerContent:update') && (

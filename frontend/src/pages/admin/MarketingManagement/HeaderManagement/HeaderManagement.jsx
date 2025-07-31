@@ -75,6 +75,7 @@ const HeaderManagement = () => {
   const [refreshing, setRefreshing] = useState(false)
   const [activeTab, setActiveTab] = useState(0)
   const [expandedCategories, setExpandedCategories] = useState(new Set())
+  const [expandedMenus, setExpandedMenus] = useState(new Set()) // New state for menu expansion
   const { hasPermission } = usePermissions()
 
   // Fetch header data
@@ -157,6 +158,19 @@ const HeaderManagement = () => {
         newSet.delete(categoryId)
       } else {
         newSet.add(categoryId)
+      }
+      return newSet
+    })
+  }
+
+  // Toggle expanded state for a menu
+  const handleToggleMenuExpanded = (menuIndex) => {
+    setExpandedMenus((prev) => {
+      const newSet = new Set(prev)
+      if (newSet.has(menuIndex)) {
+        newSet.delete(menuIndex)
+      } else {
+        newSet.add(menuIndex)
       }
       return newSet
     })
@@ -311,7 +325,7 @@ const HeaderManagement = () => {
         {/* Header */}
         <Box sx={{ mb: 4 }}>
           <Typography
-            variant='h4'
+            variante='h4'
             sx={{
               fontWeight: 700,
               color: '#1e293b',
@@ -556,7 +570,7 @@ const HeaderManagement = () => {
                         </TableCell>
                         {hasPermission('headerContent:update') && (
                           <TableCell sx={{ py: 2 }}>
-                            <Stack direction='row' spacing={1}>
+                            <Stack header='row' spacing={1}>
                               <Tooltip title='Chỉnh sửa'>
                                 <IconButton
                                   size='small'
@@ -734,145 +748,190 @@ const HeaderManagement = () => {
                         </TableRow>
                       ))
                     ) : menuData?.content?.mainMenu ? (
-                      // Render mainMenu và submenu dạng cây
+                      // Render mainMenu with expandable submenus
                       menuData.content.mainMenu.length > 0 ? (
-                        menuData.content.mainMenu.map((item, index) => [
-                          // Main menu row
-                          <TableRow
-                            key={`main-${index}`}
-                            sx={{
-                              backgroundColor: '#f8fafc',
-                              '&:hover': { backgroundColor: '#e0e7ef' },
-                              '&:last-child td, &:last-child th': { border: 0 }
-                            }}
-                          >
-                            <TableCell sx={{ py: 2 }}>
-                              <Typography
-                                variant='body2'
-                                sx={{ fontWeight: 700 }}
-                              >
-                                {index + 1}
-                              </Typography>
-                            </TableCell>
-                            <TableCell sx={{ py: 2 }}>
-                              <Stack
-                                direction='row'
-                                alignItems='center'
-                                spacing={1}
-                              >
-                                <MenuIcon
-                                  sx={{
-                                    color: 'var(--primary-color)',
-                                    fontSize: 18
-                                  }}
-                                />
-                                <Typography
-                                  variant='body2'
-                                  sx={{ fontWeight: 700, color: '#1e293b' }}
-                                >
-                                  {item.label}
-                                </Typography>
-                                {!item.visible && (
-                                  <VisibilityOffIcon
-                                    sx={{
-                                      color: 'var(--error-color)',
-                                      fontSize: 16
-                                    }}
-                                  />
-                                )}
-                              </Stack>
-                            </TableCell>
-                            <TableCell sx={{ py: 2 }}>
-                              <Typography
-                                variant='body2'
+                        menuData.content.mainMenu
+                          .map((item, index) => {
+                            const isExpanded = expandedMenus.has(index)
+                            return [
+                              // Main menu row
+                              <TableRow
+                                key={`main-${index}`}
                                 sx={{
-                                  fontFamily: 'monospace',
-                                  color: 'var(--primary-color)',
-                                  fontWeight: 500
+                                  backgroundColor: '#f8fafc',
+                                  '&:hover': { backgroundColor: '#e0e7ef' },
+                                  '&:last-child td, &:last-child th': {
+                                    border: 0
+                                  }
                                 }}
                               >
-                                {item.url || '—'}
-                              </Typography>
-                            </TableCell>
-                            <TableCell sx={{ py: 2 }}>
-                              <Typography
-                                variant='body2'
-                                sx={{ fontWeight: 600 }}
-                              >
-                                {item.children ? item.children.length : 0}
-                              </Typography>
-                            </TableCell>
-                          </TableRow>,
-                          // Submenu rows
-                          ...(item.children && item.children.length > 0
-                            ? item.children.map((child, childIdx) => (
-                                <TableRow
-                                  key={`sub-${index}-${childIdx}`}
-                                  sx={{
-                                    backgroundColor: '#f1f5f9',
-                                    '&:hover': { backgroundColor: '#e0e7ef' },
-                                    '&:last-child td, &:last-child th': {
-                                      border: 0
-                                    }
-                                  }}
-                                >
-                                  <TableCell sx={{ py: 2 }}>
-                                    <Typography
-                                      variant='body2'
+                                <TableCell sx={{ py: 2 }}>
+                                  <Stack
+                                    direction='row'
+                                    alignItems='center'
+                                    spacing={1}
+                                  >
+                                    <IconButton
+                                      size='small'
+                                      onClick={() =>
+                                        handleToggleMenuExpanded(index)
+                                      }
+                                      disabled={
+                                        !item.children ||
+                                        item.children.length === 0
+                                      }
                                       sx={{
-                                        fontWeight: 500,
-                                        color: '#64748b',
-                                        pl: 8.75
-                                      }}
-                                    >
-                                      ↳ {childIdx + 1}
-                                    </Typography>
-                                  </TableCell>
-                                  <TableCell sx={{ py: 2, pl: 4 }}>
-                                    <Stack
-                                      direction='row'
-                                      alignItems='center'
-                                      spacing={1}
-                                    >
-                                      <MenuIcon
-                                        sx={{ color: '#64748b', fontSize: 16 }}
-                                      />
-                                      <Typography
-                                        variant='body2'
-                                        sx={{
-                                          fontWeight: 500,
-                                          color: '#334155'
-                                        }}
-                                      >
-                                        {child.label}
-                                      </Typography>
-                                      {!child.visible && (
-                                        <VisibilityOffIcon
-                                          sx={{
-                                            color: 'var(--error-color)',
-                                            fontSize: 16
-                                          }}
-                                        />
-                                      )}
-                                    </Stack>
-                                  </TableCell>
-                                  <TableCell sx={{ py: 2 }}>
-                                    <Typography
-                                      variant='body2'
-                                      sx={{
-                                        fontFamily: 'monospace',
                                         color: 'var(--primary-color)',
-                                        fontWeight: 500
+                                        '&:hover': {
+                                          backgroundColor: '#3b82f620'
+                                        },
+                                        transform: isExpanded
+                                          ? 'rotate(180deg)'
+                                          : 'rotate(0deg)',
+                                        transition: 'transform 0.2s ease'
                                       }}
                                     >
-                                      {child.url || '—'}
+                                      <ExpandMoreIcon />
+                                    </IconButton>
+                                    <Typography
+                                      variant='body2'
+                                      sx={{ fontWeight: 700 }}
+                                    >
+                                      {index + 1}
                                     </Typography>
-                                  </TableCell>
-                                  <TableCell sx={{ py: 2 }}>—</TableCell>
-                                </TableRow>
-                              ))
-                            : [])
-                        ])
+                                  </Stack>
+                                </TableCell>
+                                <TableCell sx={{ py: 2 }}>
+                                  <Stack
+                                    direction='row'
+                                    alignItems='center'
+                                    spacing={1}
+                                  >
+                                    <MenuIcon
+                                      sx={{
+                                        color: 'var(--primary-color)',
+                                        fontSize: 18
+                                      }}
+                                    />
+                                    <Typography
+                                      variant='body2'
+                                      sx={{ fontWeight: 700, color: '#1e293b' }}
+                                    >
+                                      {item.label}
+                                    </Typography>
+                                    {!item.visible && (
+                                      <VisibilityOffIcon
+                                        sx={{
+                                          color: 'var(--error-color)',
+                                          fontSize: 16
+                                        }}
+                                      />
+                                    )}
+                                  </Stack>
+                                </TableCell>
+                                <TableCell sx={{ py: 2 }}>
+                                  <Typography
+                                    variant='body2'
+                                    sx={{
+                                      fontFamily: 'monospace',
+                                      color: 'var(--primary-color)',
+                                      fontWeight: 500
+                                    }}
+                                  >
+                                    {item.url || '—'}
+                                  </Typography>
+                                </TableCell>
+                                <TableCell sx={{ py: 2 }}>
+                                  <Typography
+                                    variant='body2'
+                                    sx={{ fontWeight: 600 }}
+                                  >
+                                    {item.children ? item.children.length : 0}
+                                  </Typography>
+                                </TableCell>
+                              </TableRow>,
+                              // Submenu rows (only if expanded)
+                              ...(isExpanded &&
+                              item.children &&
+                              item.children.length > 0
+                                ? item.children.map((child, childIdx) => (
+                                    <TableRow
+                                      key={`sub-${index}-${childIdx}`}
+                                      sx={{
+                                        backgroundColor: '#f1f5f9',
+                                        borderLeft: '4px solid #e2e8f0',
+                                        '&:hover': {
+                                          backgroundColor: '#e0e7ef',
+                                          borderLeft:
+                                            '4px solid var(--primary-color)'
+                                        },
+                                        '&:last-child td, &:last-child th': {
+                                          border: 0
+                                        }
+                                      }}
+                                    >
+                                      <TableCell sx={{ py: 2 }}>
+                                        <Typography
+                                          variant='body2'
+                                          sx={{
+                                            fontWeight: 500,
+                                            color: '#64748b',
+                                            pl: 8.75
+                                          }}
+                                        >
+                                          ↳ {childIdx + 1}
+                                        </Typography>
+                                      </TableCell>
+                                      <TableCell sx={{ py: 2, pl: 4 }}>
+                                        <Stack
+                                          direction='row'
+                                          alignItems='center'
+                                          spacing={1}
+                                        >
+                                          <MenuIcon
+                                            sx={{
+                                              color: '#64748b',
+                                              fontSize: 16
+                                            }}
+                                          />
+                                          <Typography
+                                            variant='body2'
+                                            sx={{
+                                              fontWeight: 500,
+                                              color: '#334155'
+                                            }}
+                                          >
+                                            {child.label}
+                                          </Typography>
+                                          {!child.visible && (
+                                            <VisibilityOffIcon
+                                              sx={{
+                                                color: 'var(--error-color)',
+                                                fontSize: 16
+                                              }}
+                                            />
+                                          )}
+                                        </Stack>
+                                      </TableCell>
+                                      <TableCell sx={{ py: 2 }}>
+                                        <Typography
+                                          variant='body2'
+                                          sx={{
+                                            fontFamily: 'monospace',
+                                            color: 'var(--primary-color)',
+                                            fontWeight: 500
+                                          }}
+                                        >
+                                          {child.url || '—'}
+                                        </Typography>
+                                      </TableCell>
+                                      <TableCell sx={{ py: 2 }}>—</TableCell>
+                                    </TableRow>
+                                  ))
+                                : [])
+                            ]
+                          })
+                          .flat()
                       ) : (
                         <TableRow>
                           <TableCell
@@ -1060,9 +1119,6 @@ const HeaderManagement = () => {
                           </TableCell>
                           <TableCell>
                             <Skeleton variant='text' width='50%' />
-                          </TableCell>
-                          <TableCell>
-                            <Skeleton variant='text' width={30} />
                           </TableCell>
                           <TableCell>
                             <Skeleton
