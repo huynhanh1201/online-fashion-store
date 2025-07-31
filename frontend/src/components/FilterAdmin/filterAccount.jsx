@@ -107,9 +107,6 @@ export default function FilterAccount({ onFilter, loading, roles }) {
           { label: 'Đã xóa', value: 'true' }
         ]}
       />
-
-      <FilterSelect value={sort} onChange={setSort} />
-
       <FilterSelect
         label='Vai trò'
         value={role}
@@ -126,6 +123,7 @@ export default function FilterAccount({ onFilter, loading, roles }) {
         ]}
         sx={{ width: 160 }}
       />
+      <FilterSelect value={sort} onChange={setSort} />
 
       <FilterByTime
         label='Lọc theo ngày tạo'

@@ -144,16 +144,32 @@ export default function AddWarehouseSlipModal({
         return false
       }
 
-      if (
-        items.some(
-          (item) => !item.variantId || !item.quantity || item.quantity <= 0
-        )
-      ) {
-        setErrorMessage(
-          'Vui lòng điền đầy đủ thông tin sản phẩm (biến thể và số lượng)!'
-        )
+      const hasMissingVariant = items.some((item) => !item.variantId)
+      const hasMissingQuantity = items.some(
+        (item) =>
+          item.quantity === undefined ||
+          item.quantity === null ||
+          item.quantity === ''
+      )
+      const hasInvalidQuantity = items.some(
+        (item) => Number(item.quantity) <= 0
+      )
+
+      if (hasMissingVariant) {
+        setErrorMessage('Vui lòng chọn biến thể sản phẩm!')
         return false
       }
+
+      if (hasMissingQuantity) {
+        setErrorMessage('Vui lòng nhập số lượng sản phẩm!')
+        return false
+      }
+
+      if (hasInvalidQuantity) {
+        setErrorMessage('Số lượng sản phẩm phải lớn hơn 0!')
+        return false
+      }
+
       // Kiểm tra biến thể có destroy: true
       if (
         variants &&
@@ -198,7 +214,7 @@ export default function AddWarehouseSlipModal({
       setErrorMessage(
         `Lỗi khi tạo phiếu ${type === 'input' ? 'nhập' : 'xuất'} kho: ${error.message}`
       )
-      setSnackbarOpen(true)
+      setSnackbarOpen(false)
     }
   }
 
@@ -455,6 +471,7 @@ export default function AddWarehouseSlipModal({
                             onChange={handleItemChange(index, 'quantity')}
                             fullWidth
                             size='small'
+                            inputProps={{ min: 0 }}
                           />
                         </TableCell>
                         <TableCell sx={{ minWidth: 100 }}>
@@ -526,7 +543,7 @@ export default function AddWarehouseSlipModal({
             setSnackbarOpen(false)
             setErrorMessage('')
           }}
-          anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+          anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
         >
           <Alert
             onClose={() => {

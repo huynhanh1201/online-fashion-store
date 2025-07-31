@@ -155,7 +155,7 @@ const ProductRow = ({
                   cursor: product.categoryId ? 'pointer' : 'default',
                   maxWidth: 200,
                   display: 'table-cell',
-                  // color: product.categoryId ? '#1976d2' : 'inherit',
+                  color: product.categoryId ? '#1976d2' : 'inherit',
                   '&:hover': product.categoryId
                     ? { textDecoration: 'none' }
                     : undefined

@@ -314,7 +314,7 @@ export default function AdminDrawer({
           },
           {
             permission: 'warehouseSlip:use',
-            label: 'Quản lý xuất/nhập kho',
+            label: 'Quản lý phiếu kho',
             path: '/admin/warehouse-slips-management'
           },
           {

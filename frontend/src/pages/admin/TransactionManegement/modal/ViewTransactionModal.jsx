@@ -84,7 +84,9 @@ const ViewTransactionModal = ({ open, onClose, transaction }) => {
                 <TableCell sx={{ fontWeight: 'bold' }}>
                   Phương thức thanh toán
                 </TableCell>
-                <TableCell>{transaction.method}</TableCell>
+                <TableCell>
+                  {transaction.method === 'COD' ? 'COD' : 'VNPay'}
+                </TableCell>
               </TableRow>
 
               <TableRow>

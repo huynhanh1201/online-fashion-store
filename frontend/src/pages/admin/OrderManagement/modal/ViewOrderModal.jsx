@@ -271,7 +271,10 @@ function ViewOrderModal({
                           label={renderStatusLabel(order.status)}
                           color={renderStatusChip(order.status).props.color}
                           size='large'
-                          sx={{ width: '137px', fontWeight: '800' }}
+                          sx={{
+                            width: '137px',
+                            fontWeight: '800'
+                          }}
                         />
                         {getNextStatus(order.status) && (
                           <>
@@ -282,11 +285,11 @@ function ViewOrderModal({
                               )}
                               variant='contained'
                               size='large'
-                              sx={{ width: '137px', fontWeight: '800' }}
-                              color={
-                                renderStatusChip(getNextStatus(order?.status))
-                                  .props.color
-                              }
+                              sx={{
+                                width: '137px',
+                                fontWeight: '800'
+                              }}
+                              color='default'
                               onClick={handleNextStatus}
                             />
                           </>

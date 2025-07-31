@@ -193,7 +193,7 @@ export default function FilterBatches({ onFilter, loading }) {
         ]}
       />
       <FilterByTime
-        label='Ngày tạo lô hàng'
+        label='Lọc thời gian tạo'
         selectedFilter={selectedFilter}
         setSelectedFilter={setSelectedFilter}
         startDate={startDate}

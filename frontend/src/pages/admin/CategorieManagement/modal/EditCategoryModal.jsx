@@ -20,6 +20,7 @@ import { useForm } from 'react-hook-form'
 import StyleAdmin from '~/assets/StyleAdmin.jsx'
 import { CloudinaryCategory, URI } from '~/utils/constants'
 import useCategories from '~/hooks/admin/useCategories'
+import { getProducts } from '~/services/admin/productService.js'
 const uploadToCloudinary = async (file, folder = CloudinaryCategory) => {
   const formData = new FormData()
   formData.append('file', file)
@@ -52,10 +53,59 @@ const EditCategoryModal = ({ open, onClose, category, onSave }) => {
   const [bannerFile, setBannerFile] = useState(null)
   const [bannerPreview, setBannerPreview] = useState('')
   const bannerInputRef = useRef()
+  const [filteredCategories, setFilteredCategories] = useState([])
   const { categories, fetchCategories } = useCategories()
   useEffect(() => {
     fetchCategories(1, 100000)
   }, [])
+  useEffect(() => {
+    const loadFilteredCategories = async () => {
+      const rootCategories = categories.filter((cat) => cat.parent === null)
+
+      // Lấy danh sách ID của các parent đang được dùng làm cha
+      const usedParentIds = new Set(
+        categories
+          .filter((cat) => cat.parent) // chỉ lấy danh mục có parent
+          .map((cat) => String(cat.parent)) // convert về string để so sánh dễ hơn
+      )
+
+      const results = await Promise.all(
+        rootCategories.map(async (category) => {
+          try {
+            const { products, total } = await getProducts({
+              page: 1,
+              limit: 1,
+              categoryId: category._id
+            })
+
+            const isNotUsedAsParent = !usedParentIds.has(String(category._id))
+
+            if (
+              Array.isArray(products) &&
+              products.length === 0 &&
+              total === 0 &&
+              isNotUsedAsParent
+            ) {
+              return category
+            }
+          } catch (error) {
+            console.error(
+              'Lỗi khi kiểm tra sản phẩm danh mục:',
+              category._id,
+              error
+            )
+          }
+
+          return null
+        })
+      )
+
+      setFilteredCategories(results.filter(Boolean))
+    }
+
+    loadFilteredCategories()
+  }, [categories])
+
   useEffect(() => {
     if (open && category) {
       reset({
@@ -128,9 +178,6 @@ const EditCategoryModal = ({ open, onClose, category, onSave }) => {
       console.log('Lỗi khi lưu danh mục:', error)
     }
   }
-  const filteredCategories = categories.filter(
-    (category) => category.parent === null
-  )
   return (
     <Dialog
       open={open}
@@ -360,7 +407,7 @@ const EditCategoryModal = ({ open, onClose, category, onSave }) => {
                         }
                       }
                     }}
-                    label='Danh mục cha (không bắt buộc)'
+                    label='Nhóm danh mục (không bắt buộc)'
                     margin='normal'
                     onFocus={(event) => {
                       // Hủy hành vi select toàn bộ khi focus

@@ -4,7 +4,10 @@ import { toast } from 'react-toastify'
 import { filterDate } from '~/utils/constants.js'
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown'
 import dayjs from 'dayjs'
-
+import { DatePicker } from '@mui/x-date-pickers/DatePicker'
+import { LocalizationProvider } from '@mui/x-date-pickers'
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns'
+import customVi from '~/components/DateInput/CustomVi.jsx'
 const FilterByTime = ({
   onApply,
   selectedFilter,
@@ -59,7 +62,7 @@ const FilterByTime = ({
         sx={{
           textTransform: 'none',
           justifyContent: 'space-between',
-          minWidth: 150,
+          minWidth: 170,
           height: 34,
           fontSize: '0.75rem',
           color: '#00000099',
@@ -104,29 +107,46 @@ const FilterByTime = ({
         </Box>
 
         {selectedFilter === 'custom' && (
-          <Box mt={2} display='flex' flexDirection='column' gap={2}>
-            <TextField
-              type='date'
-              label='Từ ngày'
-              InputLabelProps={{ shrink: true }}
-              value={startDate}
-              onChange={(e) => setStartDate(e.target.value)}
-              size='small'
-            />
-            <TextField
-              type='date'
-              label='Đến ngày'
-              InputLabelProps={{ shrink: true }}
-              value={endDate}
-              onChange={(e) => setEndDate(e.target.value)}
-              size='small'
-            />
-            <Box display='flex' justifyContent='flex-end'>
-              <Button variant='contained' size='small' onClick={handleApply}>
-                Áp dụng
-              </Button>
+          <LocalizationProvider
+            dateAdapter={AdapterDateFns}
+            adapterLocale={customVi}
+          >
+            <Box mt={2} display='flex' flexDirection='column' gap={2}>
+              <DatePicker
+                label='Từ ngày'
+                value={startDate ? dayjs(startDate).toDate() : null}
+                onChange={(date) =>
+                  setStartDate(date ? dayjs(date).format('YYYY-MM-DD') : '')
+                }
+                format='dd/MM/yyyy'
+                slotProps={{
+                  textField: {
+                    fullWidth: true,
+                    size: 'small'
+                  }
+                }}
+              />
+              <DatePicker
+                label='Đến ngày'
+                value={endDate ? dayjs(endDate).toDate() : null}
+                onChange={(date) =>
+                  setEndDate(date ? dayjs(date).format('YYYY-MM-DD') : '')
+                }
+                format='dd/MM/yyyy'
+                slotProps={{
+                  textField: {
+                    fullWidth: true,
+                    size: 'small'
+                  }
+                }}
+              />
+              <Box display='flex' justifyContent='flex-end'>
+                <Button variant='contained' size='small' onClick={handleApply}>
+                  Áp dụng
+                </Button>
+              </Box>
             </Box>
-          </Box>
+          </LocalizationProvider>
         )}
       </Menu>
     </>

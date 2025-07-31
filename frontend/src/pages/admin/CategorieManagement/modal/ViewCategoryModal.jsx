@@ -176,7 +176,7 @@ const ViewCategoryModal = ({ open, onClose, category }) => {
                         lineHeight: '50px'
                       }}
                     >
-                      Tên danh mục cha
+                      Tên nhóm danh mục
                     </TableCell>
                     <TableCell
                       sx={{
