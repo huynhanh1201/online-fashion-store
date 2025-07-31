@@ -82,7 +82,7 @@ const ProductDetail = () => {
 
   if (isLoading) {
     return (
-      <Container maxWidth='lg' sx={{ py: 4, mt: 20, textAlign: 'center' }}>
+      <Container maxWidth='lg' sx={{ py: 4, mt: 20, minHeight: '70vh', textAlign: 'center' }}>
         <Typography variant='h6'>Đang tải...</Typography>
       </Container>
     )
