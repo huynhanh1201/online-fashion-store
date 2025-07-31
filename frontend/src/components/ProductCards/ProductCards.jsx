@@ -314,8 +314,8 @@ const styles = {
   },
   flashSalePrice: {
     fontSize: '18px',
-    fontWeight: '900',
-    color: '#e53935',
+    fontWeight: '700',
+    color: '#ff6b6b',
     marginRight: '8px'
   },
   flashSaleBadge: {

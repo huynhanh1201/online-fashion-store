@@ -23,7 +23,11 @@ import {
   Grid,
   Tooltip,
   Breadcrumbs,
-  Link
+  Link,
+  Accordion,
+  AccordionSummary,
+  AccordionDetails,
+  Collapse
 } from '@mui/material'
 import {
   Delete,
@@ -34,7 +38,9 @@ import {
   LocalOffer,
   Payment,
   ArrowForward,
-  NavigateNext
+  NavigateNext,
+  ExpandMore,
+  ExpandLess
 } from '@mui/icons-material'
 import { useCart } from '~/hooks/useCarts'
 import { Navigate, useNavigate } from 'react-router-dom'
@@ -73,6 +79,7 @@ const Cart = () => {
   const [outOfStockAlert, setOutOfStockAlert] = useState(false)
   const [outOfStockMessage, setOutOfStockMessage] = useState('')
   const [updateTimers, setUpdateTimers] = useState({}) // For debouncing quantity updates
+  const [expandedProducts, setExpandedProducts] = useState({}) // For accordion state
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'auto' })
@@ -85,6 +92,17 @@ const Cart = () => {
       })
     }
   }, [])
+
+  // Auto-expand product groups when cart items change
+  useEffect(() => {
+    if (cartItems.length > 0) {
+      const newExpandedProducts = {}
+      Object.keys(groupedCartItems).forEach(productId => {
+        newExpandedProducts[productId] = true // Auto-expand all groups initially
+      })
+      setExpandedProducts(newExpandedProducts)
+    }
+  }, [cartItems.length]) // Only run when cart items count changes
 
   // Revalidate selected items when cart data changes to handle race conditions
   useEffect(() => {
@@ -411,6 +429,95 @@ const Cart = () => {
     return str.toUpperCase()
   }
 
+  // Nhóm lại các sp có cùng biến thể
+  const groupedCartItems = cartItems.reduce((groups, item) => {
+    const productId = item.variant?.productId
+    if (!productId) return groups
+
+    if (!groups[productId]) {
+      groups[productId] = {
+        productId,
+        productName: item.variant?.name || 'Sản phẩm không rõ',
+        variants: []
+      }
+    }
+
+    groups[productId].variants.push(item)
+    return groups
+  }, {})
+
+  const handleAccordionToggle = (productId) => {
+    setExpandedProducts(prev => ({
+      ...prev,
+      [productId]: !prev[productId]
+    }))
+  }
+
+  const isProductFullySelected = (productId) => {
+    const productGroup = groupedCartItems[productId]
+    if (!productGroup) return false
+
+    const selectableVariants = productGroup.variants.filter(item => item.quantity > 0)
+    const selectedVariants = selectableVariants.filter(item =>
+      selectedItems.some(selected =>
+        selected.variantId === (item.variant?._id || item.variantId?._id || item.variantId)
+      )
+    )
+
+    return selectableVariants.length > 0 && selectedVariants.length === selectableVariants.length
+  }
+
+  // Check if some variants of a product are selected
+  const isProductPartiallySelected = (productId) => {
+    const productGroup = groupedCartItems[productId]
+    if (!productGroup) return false
+
+    const selectableVariants = productGroup.variants.filter(item => item.quantity > 0)
+    const selectedVariants = selectableVariants.filter(item =>
+      selectedItems.some(selected =>
+        selected.variantId === (item.variant?._id || item.variantId?._id || item.variantId)
+      )
+    )
+
+    return selectedVariants.length > 0 && selectedVariants.length < selectableVariants.length
+  }
+
+  // Handle product group selection
+  const handleProductGroupSelect = (productId) => {
+    const productGroup = groupedCartItems[productId]
+    if (!productGroup) return
+
+    const selectableVariants = productGroup.variants.filter(item => item.quantity > 0)
+    const isFullySelected = isProductFullySelected(productId)
+
+    if (isFullySelected) {
+      // Unselect all variants of this product
+      const newSelected = selectedItems.filter(selected =>
+        !selectableVariants.some(item =>
+          selected.variantId === (item.variant?._id || item.variantId?._id || item.variantId)
+        )
+      )
+      setSelectedItems(newSelected)
+      dispatch(setSelectedItemsAction(newSelected))
+    } else {
+      // Select all selectable variants of this product
+      const variantsToAdd = selectableVariants
+        .filter(item =>
+          !selectedItems.some(selected =>
+            selected.variantId === (item.variant?._id || item.variantId?._id || item.variantId)
+          )
+        )
+        .map(item => ({
+          variantId: item.variant?._id || item.variantId?._id || item.variantId,
+          quantity: item.quantity
+        }))
+
+      const newSelected = [...selectedItems, ...variantsToAdd]
+      setSelectedItems(newSelected)
+      dispatch(setSelectedItemsAction(newSelected))
+    }
+  }
+
   const handleClearCart = async () => {
     await clearCart()
     setCartItems([])
@@ -703,7 +810,7 @@ const Cart = () => {
             </Typography>
           </Box>
           <Chip
-            label={`${cartItems.length} Sản phẩm`}
+            label={`${Object.keys(groupedCartItems).length} Sản phẩm (${cartItems.length} phân loại)`}
             color='primary'
             variant='outlined'
             sx={{ fontWeight: 600, borderRadius: 6, px: 1.5 }}
@@ -898,66 +1005,58 @@ const Cart = () => {
                 </Box>
                 <Divider />
 
-                {cartItems.map((item) => {
-                  const variant = item.variant
-                  if (!variant) return null
+                {Object.values(groupedCartItems).map((productGroup) => {
+                  const { productId, productName, variants } = productGroup
+                  const isExpanded = expandedProducts[productId] || false
+                  const isFullySelected = isProductFullySelected(productId)
+                  const isPartiallySelected = isProductPartiallySelected(productId)
 
-                  // Kiểm tra xem sản phẩm có hết hàng không (quantity = 0)
-                  // Check cả item.quantity và variant.quantity để đảm bảo chính xác
-                  const isOutOfStock =
-                    item.quantity === 0 ||
-                    (variant.quantity !== undefined && variant.quantity === 0)
+                  // Get first variant for product image and basic info
+                  const firstVariant = variants[0]?.variant
+                  if (!firstVariant) return null
+
+                  // Count selectable variants
+                  const selectableVariants = variants.filter(item => item.quantity > 0)
+                  const outOfStockVariants = variants.filter(item => item.quantity === 0)
 
                   return (
-                    <React.Fragment key={item._id}>
+                    <React.Fragment key={productId}>
+                      {/* Product Group Header */}
                       <Box
                         sx={{
                           p: { xs: 2, sm: 2 },
                           display: 'flex',
                           alignItems: 'center',
                           gap: 2,
-                          flexWrap: { xs: 'wrap', sm: 'nowrap' },
-                          opacity: isOutOfStock ? 0.6 : 1, // Làm mờ sản phẩm hết hàng
-                          backgroundColor: isOutOfStock
-                            ? '#f5f5f5'
-                            : 'transparent'
+                          backgroundColor: '#f8f9fa',
+                          borderLeft: '4px solid var(--primary-color)'
                         }}
                       >
-                        {/* Checkbox */}
+                        
+                        {/* Group Checkbox */}
                         <Checkbox
-                          checked={selectedItems.some(
-                            (i) => i.variantId === variant._id
-                          )}
-                          onChange={() => handleSelect(item)}
+                          checked={isFullySelected}
+                          indeterminate={isPartiallySelected}
+                          onChange={() => handleProductGroupSelect(productId)}
                           color='primary'
-                          disabled={isOutOfStock} // Disable checkbox khi hết hàng
-                          sx={{ p: 1, alignSelf: 'center' }}
+                          disabled={selectableVariants.length === 0}
+                          sx={{ p: 1 }}
                         />
 
                         {/* Product Image */}
                         <Box
                           sx={{ cursor: 'pointer' }}
-                          onClick={() => {
-                            dispatch(
-                              setSelectedItemsAction([
-                                {
-                                  variantId: variant._id,
-                                  quantity: item.quantity
-                                }
-                              ])
-                            )
-                            navigate(`/productdetail/${variant.productId}`)
-                          }}
+                          onClick={() => navigate(`/productdetail/${productId}`)}
                         >
                           <Avatar
                             src={
-                              optimizeCloudinaryUrl(variant.color?.image) ||
+                              optimizeCloudinaryUrl(firstVariant.color?.image) ||
                               '/default.jpg'
                             }
                             variant='square'
                             sx={{
-                              width: { xs: 60, sm: 80, md: 100 },
-                              height: { xs: 60, sm: 80, md: 100 },
+                              width: { xs: 50, sm: 60, md: 70 },
+                              height: { xs: 50, sm: 60, md: 70 },
                               borderRadius: 2,
                               objectFit: 'cover',
                               boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
@@ -966,218 +1065,291 @@ const Cart = () => {
                         </Box>
 
                         {/* Product Info */}
-                        <Box
-                          sx={{
-                            flex: 1,
-                            minWidth: 0,
-                            display: 'flex',
-                            flexDirection: 'column',
-                            gap: 1
-                          }}
-                        >
-                          <Box
+                        <Box sx={{ flex: 1, minWidth: 0 }}>
+                          <Typography
+                            fontWeight={700}
                             sx={{
-                              display: 'flex',
-                              alignItems: 'center',
-                              gap: 1
+                              fontSize: { xs: '0.9rem', sm: '1rem', md: '1.1rem' },
+                              color: 'var(--primary-color)',
+                              mb: 0.5
                             }}
                           >
-                            <Typography
-                              fontWeight={600}
-                              sx={{
-                                fontSize: {
-                                  xs: '0.8rem',
-                                  sm: '0.9rem',
-                                  md: '1rem'
-                                },
-                                maxWidth: {
-                                  xs: '200px',
-                                  sm: '300px',
-                                  md: '500px'
-                                },
-                                whiteSpace: 'nowrap',
-                                overflow: 'hidden',
-                                textOverflow: 'ellipsis'
-                              }}
-                              title={variant.name}
-                            >
-                              {capitalizeFirstLetter(variant.name)}
-                            </Typography>
-                            {isOutOfStock && (
-                              <Chip
-                                size='small'
-                                label='Hết hàng'
-                                sx={{
-                                  fontSize: '0.75rem',
-                                  backgroundColor: '#ff5722',
-                                  color: 'white',
-                                  fontWeight: 600,
-                                  '& .MuiChip-label': {
-                                    px: 1
-                                  }
-                                }}
-                              />
-                            )}
-                          </Box>
-
-                          <Box display='flex' gap={1} flexWrap='wrap'>
-                            <Chip
-                              size='small'
-                              label={
-                                capitalizeFirstLetter(variant.color?.name) ||
-                                'Không rõ'
-                              }
-                              sx={{ fontSize: '0.75rem' }}
-                            />
-                            <Chip
-                              size='small'
-                              label={
-                                formatSize(variant.size?.name) || 'Không rõ'
-                              }
-                              sx={{ fontSize: '0.75rem' }}
-                            />
-                          </Box>
-                          <Box
-                            display='flex'
-                            alignItems='center'
-                            gap={1}
-                            flexWrap='wrap'
+                            {capitalizeFirstLetter(productName)}
+                          </Typography>
+                          <Typography
+                            variant='body2'
+                            sx={{ color: 'text.secondary' }}
                           >
-                            {variant.discountPrice &&
-                              variant.discountPrice > 0 ? (
-                              <>
-                                <Typography
-                                  sx={{
-                                    fontWeight: 700,
-                                    color: '#d32f2f',
-                                    fontSize: { xs: '0.9rem', sm: '1rem' }
-                                  }}
-                                >
-                                  {formatPrice(getFinalPrice(variant))}
-                                </Typography>
-                                <Typography
-                                  sx={{
-                                    fontWeight: 500,
-                                    color: 'text.secondary',
-                                    fontSize: { xs: '0.8rem', sm: '0.9rem' },
-                                    textDecoration: 'line-through'
-                                  }}
-                                >
-                                  {formatPrice(variant.exportPrice)}
-                                </Typography>
-                                <Chip
-                                  size='small'
-                                  label={`-${Math.round((variant.discountPrice / variant.exportPrice) * 100)}%`}
-                                  sx={{
-                                    backgroundColor: '#ff5722',
-                                    color: 'white',
-                                    fontSize: '0.7rem',
-                                    height: 18
-                                  }}
-                                />
-                              </>
-                            ) : (
-                              <Typography
+                            {variants.length} phân loại hàng
+                            {selectableVariants.length < variants.length &&
+                              ` (${outOfStockVariants.length} hết hàng)`
+                            }
+                          </Typography>
+                        </Box>
+
+                        {/* Expand/Collapse Button */}
+                        <IconButton
+                          onClick={() => handleAccordionToggle(productId)}
+                          sx={{
+                            color: 'var(--primary-color)',
+                            transform: isExpanded ? 'rotate(180deg)' : 'rotate(0deg)',
+                            transition: 'transform 0.3s ease'
+                          }}
+                        >
+                          <ExpandMore />
+                        </IconButton>
+                      </Box>
+
+                      {/* Variants List */}
+                      <Collapse in={isExpanded} timeout="auto" unmountOnExit>
+                        {variants.map((item) => {
+                          const variant = item.variant
+                          if (!variant) return null
+
+                          const isOutOfStock =
+                            item.quantity === 0 ||
+                            (variant.quantity !== undefined && variant.quantity === 0)
+
+                          return (
+                            <React.Fragment key={item._id}>
+                              <Box
                                 sx={{
-                                  fontWeight: 700,
-                                  color: '#d32f2f',
-                                  fontSize: { xs: '0.9rem', sm: '1rem' }
+                                  p: { xs: 2, sm: 2 },
+                                  pl: { xs: 4, sm: 6 }, // Indent variants
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  gap: 2,
+                                  flexWrap: { xs: 'wrap', sm: 'nowrap' },
+                                  opacity: isOutOfStock ? 0.6 : 1,
+                                  backgroundColor: isOutOfStock ? '#f5f5f5' : 'transparent'
                                 }}
                               >
-                                {formatPrice(variant.exportPrice)}
-                              </Typography>
-                            )}
-                          </Box>
-                        </Box>
+                                {/* Variant Checkbox */}
+                                <Checkbox
+                                  checked={selectedItems.some(
+                                    (i) => i.variantId === variant._id
+                                  )}
+                                  onChange={() => handleSelect(item)}
+                                  color='primary'
+                                  disabled={isOutOfStock}
+                                  sx={{ p: 1, alignSelf: 'center' }}
+                                />
 
-                        {/* Quantity and Delete */}
-                        <Box
-                          sx={{
-                            display: 'flex',
-                            flexDirection: 'column',
-                            alignItems: 'flex-end',
-                            gap: 1.5
-                          }}
-                        >
-                          {/* Quantity controls - chỉ hiện khi không hết hàng */}
+                                {/* Variant Image */}
+                                <Box
+                                  sx={{ cursor: 'pointer' }}
+                                  onClick={() => {
+                                    dispatch(
+                                      setSelectedItemsAction([
+                                        {
+                                          variantId: variant._id,
+                                          quantity: item.quantity
+                                        }
+                                      ])
+                                    )
+                                    navigate(`/productdetail/${variant.productId}`)
+                                  }}
+                                >
+                                  <Avatar
+                                    src={
+                                      optimizeCloudinaryUrl(variant.color?.image) ||
+                                      '/default.jpg'
+                                    }
+                                    variant='square'
+                                    sx={{
+                                      width: { xs: 50, sm: 60, md: 80 },
+                                      height: { xs: 50, sm: 60, md: 80 },
+                                      borderRadius: 2,
+                                      objectFit: 'cover',
+                                      boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
+                                    }}
+                                  />
+                                </Box>
 
-                          <Box
-                            display='flex'
-                            alignItems='center'
-                            onMouseLeave={() => handleMouseLeave(variant._id)}
-                            sx={{
-                              border: '1px solid #e0e0e0',
-                              borderRadius: 1,
-                              overflow: 'hidden'
-                            }}
-                          >
-                            <IconButton
-                              size='small'
-                              onMouseDown={() =>
-                                handleMouseDown(variant._id, -1)
-                              }
-                              disabled={
-                                processingVariantId === variant._id ||
-                                isOutOfStock ||
-                                (tempQuantities[variant._id] ??
-                                  item.quantity) <= 1
-                              }
-                              sx={{ borderRadius: 0, p: 0.5 }}
-                            >
-                              <Remove fontSize='small' />
-                            </IconButton>
-                            <TextField
-                              value={
-                                tempQuantities[variant._id] ?? item.quantity
-                              }
-                              size='small'
-                              sx={{
-                                width: 40,
-                                '& .MuiOutlinedInput-root': {
-                                  '& fieldset': { border: 'none' }
-                                }
-                              }}
-                              inputProps={{
-                                style: {
-                                  textAlign: 'center',
-                                  padding: '4px',
-                                  fontWeight: 600,
-                                  fontSize: '0.9rem'
-                                },
-                                readOnly: true
-                              }}
-                            />
-                            <IconButton
-                              size='small'
-                              onMouseDown={() =>
-                                handleMouseDown(variant._id, 1)
-                              }
-                              disabled={
-                                processingVariantId === variant._id ||
-                                isOutOfStock ||
-                                (tempQuantities[variant._id] ??
-                                  item.quantity) >= (variant.quantity || 99)
-                              }
-                              sx={{ borderRadius: 0, p: 0.5 }}
-                            >
-                              <Add fontSize='small' />
-                            </IconButton>
-                          </Box>
+                                {/* Variant Info */}
+                                <Box
+                                  sx={{
+                                    flex: 1,
+                                    minWidth: 0,
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    gap: 1
+                                  }}
+                                >
+                                  <Box
+                                    display='flex'
+                                    alignItems='center'
+                                    gap={1}
+                                    flexWrap='wrap'
+                                  >
+                                    {variant.discountPrice && variant.discountPrice > 0 ? (
+                                      <>
+                                        <Typography
+                                          sx={{
+                                            fontWeight: 700,
+                                            color: '#d32f2f',
+                                            fontSize: { xs: '0.9rem', sm: '1rem' }
+                                          }}
+                                        >
+                                          {formatPrice(getFinalPrice(variant))}
+                                        </Typography>
+                                        <Typography
+                                          sx={{
+                                            fontWeight: 500,
+                                            color: 'text.secondary',
+                                            fontSize: { xs: '0.8rem', sm: '0.9rem' },
+                                            textDecoration: 'line-through'
+                                          }}
+                                        >
+                                          {formatPrice(variant.exportPrice)}
+                                        </Typography>
+                                        <Chip
+                                          size='small'
+                                          label={`-${Math.round((variant.discountPrice / variant.exportPrice) * 100)}%`}
+                                          sx={{
+                                            display: { xs: 'none', sm: 'inline-block' }, // Ẩn khi xs, hiện khi sm trở lên
+                                            backgroundColor: '#ff5722',
+                                            color: 'white',
+                                            fontSize: '0.7rem',
+                                            height: 18
+                                          }}
+                                        />
+                                      </>
+                                    ) : (
+                                      <Typography
+                                        sx={{
+                                          fontWeight: 700,
+                                          color: '#d32f2f',
+                                          fontSize: { xs: '0.9rem', sm: '1rem' }
+                                        }}
+                                      >
+                                        {formatPrice(variant.exportPrice)}
+                                      </Typography>
+                                    )}
+                                  </Box>
+                                  <Box display='flex' gap={1} flexWrap='wrap' alignItems='center'>
+                                    <Chip
+                                      size='small'
+                                      label={
+                                        capitalizeFirstLetter(variant.color?.name) ||
+                                        'Không rõ'
+                                      }
+                                      sx={{ fontSize: '0.75rem' }}
+                                    />
+                                    <Chip
+                                      size='small'
+                                      label={
+                                        formatSize(variant.size?.name) || 'Không rõ'
+                                      }
+                                      sx={{ fontSize: '0.75rem' }}
+                                    />
+                                    {isOutOfStock && (
+                                      <Chip
+                                        size='small'
+                                        label='Hết hàng'
+                                        sx={{
+                                          fontSize: '0.75rem',
+                                          backgroundColor: '#ff5722',
+                                          color: 'white',
+                                          fontWeight: 600
+                                        }}
+                                      />
+                                    )}
+                                  </Box>
 
-                          <IconButton
-                            color='error'
-                            onClick={() => {
-                              setDeleteMode('single')
-                              setItemToDelete(variant)
-                              setConfirmClearOpen(true)
-                            }}
-                            size='small'
-                          >
-                            <Delete fontSize='small' />
-                          </IconButton>
-                        </Box>
-                      </Box>
-                      <Divider />
+
+                                </Box>
+
+                                {/* Quantity and Delete */}
+                                <Box
+                                  sx={{
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    alignItems: 'flex-end',
+                                    gap: 1.5
+                                  }}
+                                >
+                                  <Box
+                                    display='flex'
+                                    alignItems='center'
+                                    onMouseLeave={() => handleMouseLeave(variant._id)}
+                                    sx={{
+                                      border: '1px solid #e0e0e0',
+                                      borderRadius: 1,
+                                      overflow: 'hidden'
+                                    }}
+                                  >
+                                    <IconButton
+                                      size='small'
+                                      onMouseDown={() =>
+                                        handleMouseDown(variant._id, -1)
+                                      }
+                                      disabled={
+                                        processingVariantId === variant._id ||
+                                        isOutOfStock ||
+                                        (tempQuantities[variant._id] ?? item.quantity) <= 1
+                                      }
+                                      sx={{ borderRadius: 0, p: 0.5 }}
+                                    >
+                                      <Remove fontSize='small' />
+                                    </IconButton>
+                                    <TextField
+                                      value={
+                                        tempQuantities[variant._id] ?? item.quantity
+                                      }
+                                      size='small'
+                                      sx={{
+                                        width: 40,
+                                        '& .MuiOutlinedInput-root': {
+                                          '& fieldset': { border: 'none' }
+                                        }
+                                      }}
+                                      inputProps={{
+                                        style: {
+                                          textAlign: 'center',
+                                          padding: '4px',
+                                          fontWeight: 600,
+                                          fontSize: '0.9rem'
+                                        },
+                                        readOnly: true
+                                      }}
+                                    />
+                                    <IconButton
+                                      size='small'
+                                      onMouseDown={() =>
+                                        handleMouseDown(variant._id, 1)
+                                      }
+                                      disabled={
+                                        processingVariantId === variant._id ||
+                                        isOutOfStock ||
+                                        (tempQuantities[variant._id] ?? item.quantity) >=
+                                        (variant.quantity || 99)
+                                      }
+                                      sx={{ borderRadius: 0, p: 0.5 }}
+                                    >
+                                      <Add fontSize='small' />
+                                    </IconButton>
+                                  </Box>
+
+                                  <IconButton
+                                    color='error'
+                                    onClick={() => {
+                                      setDeleteMode('single')
+                                      setItemToDelete(variant)
+                                      setConfirmClearOpen(true)
+                                    }}
+                                    size='small'
+                                  >
+                                    <Delete fontSize='small' />
+                                  </IconButton>
+                                </Box>
+                              </Box>
+                              <Divider />
+                            </React.Fragment>
+                          )
+                        })}
+                      </Collapse>
+                      <Divider sx={{ borderWidth: 2, borderColor: '#e0e0e0' }} />
                     </React.Fragment>
                   )
                 })}

@@ -54,7 +54,6 @@ export default function SuggestionProducts({ limit = 5 }) {
               md: 'repeat(3, 1fr)', // 3 columns on medium screens
               lg: 'repeat(5, 1fr)', // 5 columns on large screens
             },
-            gap: { xs: 1, sm: 2, md: 3 }, // Smaller gap on mobile
           }}
         >
           {suggestedProducts.map((product) => (

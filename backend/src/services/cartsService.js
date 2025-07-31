@@ -71,7 +71,7 @@ const getItemCartList = async (userId) => {
       .populate({
         path: 'cartItems.variantId',
         select:
-          'productId color size name importPrice exportPrice discountPrice quantity'
+          'productId color size name importPrice exportPrice discountPrice quantity status'
       })
       .lean() // sau populate mới gọi lean
 
