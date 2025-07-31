@@ -106,7 +106,6 @@ export default function FilterReview({ onFilter, reviews = [], loading }) {
           { label: 'Đã xóa', value: 'true' }
         ]}
       />
-      <FilterSelect value={sort} onChange={setSort} />
 
       <FilterSelect
         label='Trạng thái kiểm duyệt'
@@ -121,11 +120,12 @@ export default function FilterReview({ onFilter, reviews = [], loading }) {
           { label: 'Đã duyệt', value: 'approved' },
           { label: 'Từ chối', value: 'rejected' }
         ]}
-        sx={{ width: 160 }}
+        sx={{ width: 170 }}
       />
+      <FilterSelect value={sort} onChange={setSort} />
 
       <FilterByTime
-        label='Lọc theo thời gian đánh giá'
+        label='Lọc thời gian tạo'
         selectedFilter={selectedFilter}
         setSelectedFilter={setSelectedFilter}
         onSelectFilter={handleSelectFilter}

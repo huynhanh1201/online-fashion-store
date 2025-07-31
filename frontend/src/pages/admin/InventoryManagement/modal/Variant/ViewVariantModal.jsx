@@ -75,7 +75,7 @@ const ViewVariantModal = ({ open, onClose, variant }) => {
                   alt='color'
                   sx={{
                     width: 470,
-                    height: 609,
+                    height: 654,
                     objectFit: 'contain',
                     backgroundColor: '#ccc',
                     borderRadius: 2,
@@ -163,6 +163,14 @@ const ViewVariantModal = ({ open, onClose, variant }) => {
                     <strong>Giá giảm cho biến thể</strong>
                   </TableCell>
                   <TableCell>{formattedPrice}</TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell>
+                    <strong>Giá bán hiển thị</strong>
+                  </TableCell>
+                  <TableCell>
+                    {formatCurrency(variant?.finalSalePrice)}
+                  </TableCell>
                 </TableRow>
                 <TableRow>
                   <TableCell>

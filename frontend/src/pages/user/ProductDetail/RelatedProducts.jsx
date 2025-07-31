@@ -134,7 +134,7 @@ const RelatedProductSection = ({ categoryId, currentProductId }) => {
       let combined = [...relatedProducts]
       let tempCategoryPage = categoryPage
       let tempFallbackPage = fallbackPage
-      let foundNew = false
+      let newAddedCount = 0
 
       // Ưu tiên lấy từ danh mục
       while (combined.length < visibleCount + count) {
@@ -144,22 +144,25 @@ const RelatedProductSection = ({ categoryId, currentProductId }) => {
           count
         )
 
+        if (!categoryProducts || categoryProducts.length === 0) break
+
         const filtered = categoryProducts.filter(
           (p) =>
             p._id !== currentProductId &&
             !combined.some((item) => item._id === p._id)
         )
 
-        if (filtered.length === 0) break
-
-        if (filtered.length > 0) foundNew = true
+        if (filtered.length === 0) {
+          tempCategoryPage++
+          continue
+        }
 
         combined = [...combined, ...filtered]
+        newAddedCount += filtered.length
         tempCategoryPage++
-        if (filtered.length < count) break
       }
 
-      // Nếu chưa đủ, lấy tiếp từ tất cả
+      // Nếu vẫn chưa đủ, lấy từ fallback (tất cả sản phẩm)
       if (combined.length < visibleCount + count) {
         while (combined.length < visibleCount + count) {
           const { products: fallbackProducts } = await getProducts({
@@ -167,15 +170,22 @@ const RelatedProductSection = ({ categoryId, currentProductId }) => {
             limit: count
           })
 
-          const filteredFallback = fallbackProducts
+          if (!fallbackProducts || fallbackProducts.length === 0) break
 
-          if (filteredFallback.length === 0) break
+          const filteredFallback = fallbackProducts.filter(
+            (p) =>
+              p._id !== currentProductId &&
+              !combined.some((item) => item._id === p._id)
+          )
 
-          if (filteredFallback.length > 0) foundNew = true
+          if (filteredFallback.length === 0) {
+            tempFallbackPage++
+            continue
+          }
 
           combined = [...combined, ...filteredFallback]
+          newAddedCount += filteredFallback.length
           tempFallbackPage++
-          if (filteredFallback.length < count) break
         }
       }
 
@@ -184,9 +194,10 @@ const RelatedProductSection = ({ categoryId, currentProductId }) => {
       setRelatedProducts(combined)
       console.log('relatedProducts.length', relatedProducts.length)
       console.log('combined.length', combined.length)
-      console.log('foundNew', foundNew)
-      // ✅ cập nhật hasMore dựa trên thực tế
-      setHasMore(foundNew && combined.length >= relatedProducts.length)
+      console.log('newAddedCount', newAddedCount)
+
+      // ✅ cập nhật hasMore dựa trên số lượng mới được thêm
+      setHasMore(newAddedCount > 0)
     } catch (err) {
       console.error('Lỗi khi tải sản phẩm gợi ý:', err)
     } finally {

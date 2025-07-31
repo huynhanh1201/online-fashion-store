@@ -180,13 +180,13 @@ const VariantsTab = () => {
       align: 'center'
     },
     { id: 'sku', label: 'Mã biến thể', minWidth: 100 },
-    { id: 'name', label: 'Tên biến thể', minWidth: 250 },
-    { id: 'color', label: 'Màu sắc', minWidth: 150 },
-    { id: 'size.name', label: 'Kích thước', minWidth: 150 },
+    { id: 'name', label: 'Tên biến thể', minWidth: 230 },
+    { id: 'color', label: 'Màu sắc', minWidth: 120 },
+    { id: 'size.name', label: 'Kích thước', minWidth: 120 },
     {
       id: 'quantity',
       label: 'Trạng thái trong kho',
-      minWidth: 100,
+      minWidth: 150,
       align: 'right'
     },
     // {
@@ -208,8 +208,16 @@ const VariantsTab = () => {
     {
       id: 'discountPrice',
       label: 'Giảm giá cho biến thế',
-      minWidth: 230,
-      maxWidth: 230,
+      minWidth: 170,
+      maxWidth: 170,
+      align: 'right',
+      format: (value) => `${value.toLocaleString('vi-VN')}₫`
+    },
+    {
+      id: 'finalSalePrice',
+      label: 'Giá bán hiển thị',
+      minWidth: 180,
+      maxWidth: 180,
       align: 'right',
       pr: 4,
       format: (value) => `${value.toLocaleString('vi-VN')}₫`
@@ -510,7 +518,7 @@ const VariantsTab = () => {
                             ...(id === 'sku' || id === 'name'
                               ? { maxWidth: 150, cursor: 'pointer' } // Ẩn tràn nếu mã hoặc tên dài
                               : {}),
-                            ...(id === 'discountPrice' && { pr: column.pr }),
+                            ...(id === 'finalSalePrice' && { pr: column.pr }),
                             ...(id === 'sku' ||
                               (id === 'name' &&
                                 hasPermission('variant:read') && {

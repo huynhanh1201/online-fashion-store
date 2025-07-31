@@ -112,20 +112,20 @@ export default function FilterTransaction({ onFilter, loading }) {
   return (
     <Box display='flex' flexWrap='wrap' gap={2} mb={2} justifyContent='end'>
       <FilterSelect
-        sx={{ minWidth: 220 }}
-        label='Phương thức thanh toán'
+        sx={{ minWidth: 160 }}
+        label='Hình thức thanh toán'
         value={method}
         onChange={(val) => {
           setMethod(val)
         }}
         options={[
           { label: 'Tất cả', value: '' },
-          { label: 'Tiền mặt', value: 'COD' },
-          { label: 'VNPay', value: 'vnpay' }
+          { label: 'Khi nhận hàng', value: 'COD' },
+          { label: 'Trực tuyến', value: 'vnpay' }
         ]}
       />
       <FilterSelect
-        sx={{ minWidth: 190 }}
+        sx={{ minWidth: 155 }}
         label='Trạng thái giao dịch'
         value={status}
         onChange={(val) => {
@@ -158,7 +158,7 @@ export default function FilterTransaction({ onFilter, loading }) {
         ]}
       />
       <FilterByTime
-        label='Thời gian tạo'
+        label='Lọc thời gian tạo'
         selectedFilter={selectedFilter}
         setSelectedFilter={setSelectedFilter}
         startDate={startDate}

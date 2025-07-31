@@ -96,6 +96,48 @@ const CategoryPage = () => {
   const [sortMenuOpen, setSortMenuOpen] = useState(false)
   const [totalPages, setTotalPages] = useState(1)
   const navigate = useNavigate()
+  const sortProductsClientSide = (products, sortOption) => {
+    const sortedProducts = [...products] // tạo bản sao để tránh mutate
+    switch (sortOption) {
+      case 'nameAsc':
+        sortedProducts.sort((a, b) => a.name.localeCompare(b.name))
+        break
+      case 'nameDesc':
+        sortedProducts.sort((a, b) => b.name.localeCompare(a.name))
+        break
+      case 'priceAsc':
+        sortedProducts.sort((a, b) => {
+          const priceA =
+            a.minSalePriceVariant?.finalSalePrice > 0
+              ? a.minSalePriceVariant.finalSalePrice
+              : a.exportPrice
+          const priceB =
+            b.minSalePriceVariant?.finalSalePrice > 0
+              ? b.minSalePriceVariant.finalSalePrice
+              : b.exportPrice
+          return priceA - priceB
+        })
+        break
+      case 'priceDesc':
+        sortedProducts.sort((a, b) => {
+          const priceA =
+            a.minSalePriceVariant?.finalSalePrice > 0
+              ? a.minSalePriceVariant.finalSalePrice
+              : a.exportPrice
+          const priceB =
+            b.minSalePriceVariant?.finalSalePrice > 0
+              ? b.minSalePriceVariant.finalSalePrice
+              : b.exportPrice
+          return priceB - priceA
+        })
+        break
+      case 'featured':
+      default:
+        break
+    }
+    return sortedProducts
+  }
+
   // Fetch category data
   useEffect(() => {
     const fetchCategory = async () => {
@@ -132,36 +174,24 @@ const CategoryPage = () => {
       setLoading(true)
       setError('')
 
-      // Map sort option to API sort parameter
-      const backendSortMap = {
-        nameAsc: 'name_asc',
-        nameDesc: 'name_desc',
-        priceAsc: 'price_asc',
-        priceDesc: 'price_desc',
-        featured: 'newest'
-      }
-
-      const sortParam = backendSortMap[sortOption] || 'newest'
-
       const response = await getProductsByCategory(
         category._id,
         Number(page),
         Number(ITEMS_PER_PAGE),
-        sortParam
+        sortOption
       )
-      console.log('API Response:', response)
 
-      const fetchedProducts = response.products || []
-      const total = response.total || 0
+      let fetchedProducts = response.products || []
       const totalPages = response.totalPages || 1
 
       if (!Array.isArray(fetchedProducts)) {
-        console.error('Products không phải là array:', fetchedProducts)
         throw new Error('Dữ liệu sản phẩm không hợp lệ')
       }
 
-      // Backend đã xử lý sorting, không cần client-side processing
-      setProducts(fetchedProducts)
+      // ✅ Sort lại ở frontend dù backend có sắp xếp
+      const sorted = sortProductsClientSide(fetchedProducts, sortOption)
+
+      setProducts(sorted)
       setTotalPages(totalPages)
     } catch (err) {
       console.error('Lỗi khi tải sản phẩm:', err)
@@ -504,7 +534,7 @@ const CategoryPage = () => {
               open
               autoHideDuration={3000}
               onClose={() => setSnackbar(null)}
-              anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+              anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
             >
               <Alert
                 severity={snackbar.type}

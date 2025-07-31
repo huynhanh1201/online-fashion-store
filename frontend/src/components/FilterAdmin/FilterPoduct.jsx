@@ -307,13 +307,7 @@ export default function FilterProduct({
           { label: 'Đã xóa', value: 'true' }
         ]}
       />
-      <FilterSelect
-        value={sort}
-        onChange={(value) => {
-          setSort(value)
-          applyFilters(selectedFilter, startDate, endDate)
-        }}
-      />
+
       <FilterSelect
         label='Chọn danh mục'
         value={category}
@@ -354,7 +348,13 @@ export default function FilterProduct({
         ]}
         sx={{ minWidth: 160 }}
       />
-
+      <FilterSelect
+        value={sort}
+        onChange={(value) => {
+          setSort(value)
+          applyFilters(selectedFilter, startDate, endDate)
+        }}
+      />
       <FilterByTime
         label='Lọc thời gian tạo'
         selectedFilter={selectedFilter}

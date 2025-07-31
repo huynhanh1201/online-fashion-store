@@ -34,8 +34,8 @@ const CategoryTable = ({
   onPageChange,
   onChangeRowsPerPage,
   permissions,
-  initialSearch,
-  filters
+  filters,
+  isParentCategory
 }) => {
   const columns = [
     { id: 'index', label: 'STT', align: 'center', width: 50 },
@@ -118,7 +118,6 @@ const CategoryTable = ({
                     categories={categories}
                     fetchCategories={fetchCategories}
                     loading={loading}
-                    initialSearch={initialSearch}
                   />
                 </Box>
               </TableCell>
@@ -161,6 +160,7 @@ const CategoryTable = ({
                   handleOpenModal={handleOpenModal}
                   permissions={permissions}
                   filters={filters}
+                  isParentCategory={isParentCategory}
                 />
               ))
             ) : (

@@ -47,13 +47,7 @@ const WarehousesTab = () => {
     loadingWarehouse,
     totalWarehouse
   } = useWarehouses()
-  const activeWarehouses = warehouses.filter(
-    (warehouse) => warehouse.destroy === false
-  )
 
-  // Điều kiện: Chỉ cho phép bấm nút nếu activeWarehouses.length <= 1 và có quyền tạo
-  const shouldShowAddButton =
-    activeWarehouses.length === 0 && hasPermission('warehouse:create')
   const warehouseColumns = [
     {
       id: 'index',
@@ -80,11 +74,17 @@ const WarehousesTab = () => {
   const [selectedWarehouse, setSelectedWarehouse] = useState(null)
   const [page, setPage] = useState(1) // State cho trang hiện tại
   const [rowsPerPage, setRowsPerPage] = useState(10) // State cho số dòng mỗi trang
-
+  const [showButton, setShowButton] = useState(false) // State để kiểm soát hiển thị nút Thêm
   useEffect(() => {
-    fetchWarehouses(page, rowsPerPage)
+    fetchWarehouses(page, rowsPerPage, { status: false })
   }, [page, rowsPerPage])
-
+  useEffect(() => {
+    if (warehouses.length === 0 && hasPermission('warehouse:create')) {
+      setShowButton(true)
+    } else {
+      setShowButton(false)
+    }
+  }, [warehouses])
   const handleAddWarehouse = () => {
     setOpenAddModal(true)
   }
@@ -141,270 +141,16 @@ const WarehousesTab = () => {
     setRowsPerPage(newLimit)
   }
 
-  if (shouldShowAddButton)
-    return (
-      <Paper
-        sx={{ border: '1px solid #ccc', width: '100%', overflow: 'hidden' }}
-      >
-        <TableContainer sx={{ backgroundColor: '#fff' }}>
-          <Table stickyHeader aria-label='warehouses table'>
-            <TableHead>
-              <TableRow>
-                <TableCell
-                  colSpan={warehouseColumns.length}
-                  sx={{ backgroundColor: '#fff' }}
-                >
-                  <Box
-                    sx={{
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      alignItems: 'start'
-                    }}
-                  >
-                    <Box
-                      sx={{
-                        display: 'flex',
-                        flexDirection: 'column',
-                        gap: 1,
-                        minWidth: 250,
-                        minHeight: 76.5
-                      }}
-                    >
-                      <Typography variant='h6' sx={{ fontWeight: '800' }}>
-                        Danh Sách Kho Hàng
-                      </Typography>
-                      <Button
-                        variant='contained'
-                        color='primary'
-                        onClick={handleAddWarehouse}
-                        startIcon={<AddIcon />}
-                        sx={{
-                          textTransform: 'none',
-                          width: 100,
-                          display: 'flex',
-                          alignItems: 'center',
-                          backgroundColor: 'var(--primary-color)',
-                          color: '#fff'
-                        }}
-                      >
-                        Thêm
-                      </Button>
-                    </Box>
-                    {/*<FilterWarehouse*/}
-                    {/*  loading={loadingWarehouse}*/}
-                    {/*  onFilter={handleFilter}*/}
-                    {/*  warehouses={warehouses}*/}
-                    {/*  fetchWarehouses={fetchWarehouses}*/}
-                    {/*/>*/}
-                  </Box>
-                </TableCell>
-              </TableRow>
-              <TableRow>
-                {warehouseColumns.map((col) => (
-                  <TableCell
-                    key={col.id}
-                    align={col.align || 'left'}
-                    sx={{
-                      minWidth: col.minWidth,
-                      width: col.width,
-                      ...(col.maxWidth && { maxWidth: col.maxWidth }),
-                      ...(col.id === 'action' && {
-                        width: '130px',
-                        maxWidth: '130px',
-                        paddingLeft: '20px'
-                      }),
-                      px: 1
-                    }}
-                  >
-                    {col.label}
-                  </TableCell>
-                ))}
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {loadingWarehouse ? (
-                <TableRow>
-                  <TableCell colSpan={warehouseColumns.length} align='center'>
-                    Đang tải danh sách kho...
-                  </TableCell>
-                </TableRow>
-              ) : warehouses.length === 0 ? (
-                <TableNoneData
-                  col={warehouseColumns.length}
-                  message='Không có dữ liệu kho hàng.'
-                />
-              ) : (
-                warehouses.map((row, index) => (
-                  <TableRow hover key={index} sx={{ backgroundColor: '#fff' }}>
-                    {warehouseColumns.map((col) => {
-                      const rawValue = row[col.id]
-                      let content = rawValue ?? '—'
-                      const capitalizeWords = (text) =>
-                        (text || '')
-                          .toLowerCase()
-                          .split(' ')
-                          .filter(Boolean)
-                          .map(
-                            (word) =>
-                              word.charAt(0).toUpperCase() + word.slice(1)
-                          )
-                          .join(' ')
-
-                      if (col.id === 'index') {
-                        content = (page - 1) * rowsPerPage + index + 1
-                      }
-                      if (col.id === 'name') {
-                        content = capitalizeWords(rawValue)
-                      }
-                      if (col.format) {
-                        content = col.format(rawValue)
-                      }
-
-                      if (col.id === 'destroy') {
-                        content = (
-                          <Chip
-                            label={rawValue ? 'Không hoạt động' : 'Hoạt động'}
-                            color={rawValue ? 'error' : 'success'}
-                            size='large'
-                            sx={{ width: 127, fontWeight: 800 }}
-                          />
-                        )
-                      }
-
-                      if (col.id === 'action') {
-                        content = (
-                          <Stack
-                            direction='row'
-                            spacing={1}
-                            justifyContent='start'
-                          >
-                            {hasPermission('warehouse:read') && (
-                              <Tooltip title='Xem'>
-                                <IconButton
-                                  onClick={() => handleViewWarehouse(row)}
-                                  size='small'
-                                >
-                                  <RemoveRedEyeIcon color='primary' />
-                                </IconButton>
-                              </Tooltip>
-                            )}
-                            {hasPermission('warehouse:update') && (
-                              <Tooltip title='Sửa'>
-                                <IconButton
-                                  onClick={() => handleEditWarehouse(row)}
-                                  size='small'
-                                >
-                                  <BorderColorIcon color='warning' />
-                                </IconButton>
-                              </Tooltip>
-                            )}
-                            {hasPermission('warehouse:delete') && (
-                              <Tooltip title='Ẩn'>
-                                <IconButton
-                                  onClick={() => handleDeleteWarehouse(row)}
-                                  size='small'
-                                >
-                                  <VisibilityOffIcon color='error' />
-                                </IconButton>
-                              </Tooltip>
-                            )}
-                          </Stack>
-                        )
-                      }
-
-                      return (
-                        <TableCell
-                          key={col.id}
-                          align={col.align || 'left'}
-                          sx={{
-                            py: 0,
-                            px: 1,
-                            height: 55,
-                            whiteSpace: 'nowrap',
-                            overflow: 'hidden',
-                            textOverflow: 'ellipsis',
-                            backgroundColor: '#fff',
-                            ...(col.maxWidth && { maxWidth: col.maxWidth })
-                          }}
-                          title={
-                            typeof content === 'string' ? content : undefined
-                          }
-                        >
-                          {content}
-                        </TableCell>
-                      )
-                    })}
-                  </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
-        </TableContainer>
-
-        <TablePagination
-          sx={{ background: '#fff' }}
-          rowsPerPageOptions={[10, 25, 100]}
-          component='div'
-          count={totalWarehouse || 0}
-          rowsPerPage={rowsPerPage}
-          page={page - 1}
-          onPageChange={(event, newPage) =>
-            handleChangePage(event, newPage + 1)
-          } // truyền lại đúng logic cho parent
-          onRowsPerPageChange={(event) => {
-            const newLimit = parseInt(event.target.value, 10)
-            if (onChangeRowsPerPage) {
-              onChangeRowsPerPage(newLimit)
-            }
-          }}
-          labelRowsPerPage='Số dòng mỗi trang'
-          labelDisplayedRows={({ from, to, count }) => {
-            const totalPages = Math.max(1, Math.ceil(count / rowsPerPage))
-            return `${from}–${to} trên ${count} | Trang ${page} / ${totalPages}`
-          }}
-          ActionsComponent={TablePaginationActions}
-        />
-
-        <ViewWarehouseModal
-          open={openViewModal}
-          onClose={() => setOpenViewModal(false)}
-          warehouse={selectedWarehouse}
-        />
-
-        <Suspense fallback={<div>Loading...</div>}>
-          {openAddModal && shouldShowAddButton && (
-            <AddWarehouseModal
-              open={openAddModal}
-              onClose={handleCloseAddModal}
-              onSave={handleSave}
-            />
-          )}
-          {openEditModal && (
-            <EditWarehouseModal
-              open={openEditModal}
-              onClose={handleCloseEditModal}
-              warehouse={selectedWarehouse}
-              onSave={handleSave}
-            />
-          )}
-        </Suspense>
-
-        <DeleteWarehouseModal
-          open={openDeleteModal}
-          onClose={handleCloseDeleteModal}
-          warehouse={selectedWarehouse}
-          onSave={handleSave}
-        />
-      </Paper>
-    )
-
   return (
     <Paper sx={{ border: '1px solid #ccc', width: '100%', overflow: 'hidden' }}>
-      <TableContainer>
+      <TableContainer sx={{ backgroundColor: '#fff' }}>
         <Table stickyHeader aria-label='warehouses table'>
           <TableHead>
             <TableRow>
-              <TableCell colSpan={warehouseColumns.length}>
+              <TableCell
+                colSpan={warehouseColumns.length}
+                sx={{ backgroundColor: '#fff' }}
+              >
                 <Box
                   sx={{
                     display: 'flex',
@@ -424,6 +170,24 @@ const WarehousesTab = () => {
                     <Typography variant='h6' sx={{ fontWeight: '800' }}>
                       Danh Sách Kho Hàng
                     </Typography>
+                    {showButton && (
+                      <Button
+                        variant='contained'
+                        color='primary'
+                        onClick={handleAddWarehouse}
+                        startIcon={<AddIcon />}
+                        sx={{
+                          textTransform: 'none',
+                          width: 100,
+                          display: 'flex',
+                          alignItems: 'center',
+                          backgroundColor: 'var(--primary-color)',
+                          color: '#fff'
+                        }}
+                      >
+                        Thêm
+                      </Button>
+                    )}
                   </Box>
                   {/*<FilterWarehouse*/}
                   {/*  loading={loadingWarehouse}*/}
@@ -470,7 +234,7 @@ const WarehousesTab = () => {
               />
             ) : (
               warehouses.map((row, index) => (
-                <TableRow hover key={index}>
+                <TableRow hover key={index} sx={{ backgroundColor: '#fff' }}>
                   {warehouseColumns.map((col) => {
                     const rawValue = row[col.id]
                     let content = rawValue ?? '—'
@@ -550,12 +314,6 @@ const WarehousesTab = () => {
                       <TableCell
                         key={col.id}
                         align={col.align || 'left'}
-                        onClick={
-                          (col.id === 'code' ||
-                            (col.id === 'name' &&
-                              hasPermission('warehouse:read'))) &&
-                          (() => handleViewWarehouse(row))
-                        }
                         sx={{
                           py: 0,
                           px: 1,
@@ -564,12 +322,7 @@ const WarehousesTab = () => {
                           overflow: 'hidden',
                           textOverflow: 'ellipsis',
                           backgroundColor: '#fff',
-                          ...(col.maxWidth && { maxWidth: col.maxWidth }),
-                          ...((col.id === 'code' ||
-                            (col.id === 'name' &&
-                              hasPermission('warehouse:read'))) && {
-                            cursor: 'pointer'
-                          })
+                          ...(col.maxWidth && { maxWidth: col.maxWidth })
                         }}
                         title={
                           typeof content === 'string' ? content : undefined
@@ -615,7 +368,7 @@ const WarehousesTab = () => {
       />
 
       <Suspense fallback={<div>Loading...</div>}>
-        {openAddModal && shouldShowAddButton && (
+        {openAddModal && showButton && (
           <AddWarehouseModal
             open={openAddModal}
             onClose={handleCloseAddModal}

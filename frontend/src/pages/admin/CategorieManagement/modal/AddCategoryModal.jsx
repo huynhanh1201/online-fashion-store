@@ -395,7 +395,7 @@ const AddCategoryModal = ({ open, onClose, onAdded, onSave }) => {
                         }
                       }
                     }}
-                    label='Danh mục cha (không bắt buộc)'
+                    label='Nhóm danh mục (không bắt buộc)'
                     margin='normal'
                   />
                 )}

@@ -395,7 +395,7 @@ export default function FilterInventoryLog({ onFilter, loading }) {
       />
 
       <FilterByTime
-        label='Ngày tạo phiếu'
+        label='Lọc thời gian tạo'
         selectedFilter={selectedFilter}
         setSelectedFilter={setSelectedFilter}
         onSelectFilter={handleSelectFilter}

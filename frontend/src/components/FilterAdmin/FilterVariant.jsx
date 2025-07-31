@@ -169,7 +169,6 @@ export default function FilterVariant({
           { label: 'Đã xóa', value: 'true' }
         ]}
       />
-      <FilterSelect value={sort} onChange={setSort} />
       <FilterSelect
         label='Sản phẩm'
         value={productId}
@@ -249,9 +248,10 @@ export default function FilterVariant({
       {/*  setPriceMax={setExportPriceMax}*/}
       {/*  onApply={() => applyFilters()}*/}
       {/*/>*/}
+      <FilterSelect value={sort} onChange={setSort} />
 
       <FilterByTime
-        label='Ngày tạo biến thể'
+        label='Lọc thời gian tạo'
         selectedFilter={selectedFilter}
         setSelectedFilter={setSelectedFilter}
         startDate={startDate}
