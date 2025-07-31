@@ -259,7 +259,7 @@ const DisplayManagement = () => {
             Quản lý ảnh quảng cáo & Hiển thị
           </Typography>
           <Typography variant='body1' color='text.secondary'>
-            Quản lý và theo dõi hiệu suất các ảnh quảng cáo trên website
+            Quản lý các ảnh quảng cáo trên website
           </Typography>
         </Box>
 
@@ -290,7 +290,7 @@ const DisplayManagement = () => {
                   border: 'none',
                   background: '#fafbfc',
                   minHeight: 90,
-                  position: 'relative',
+                  position: 'relative'
                 }}
               >
                 {/* Thanh màu bên trái */}
@@ -303,18 +303,35 @@ const DisplayManagement = () => {
                     position: 'absolute',
                     left: 0,
                     top: 0,
-                    bottom: 0,
+                    bottom: 0
                   }}
                 />
-                <CardContent sx={{ pl: 4, py: 2, width: '20vw', backgroundColor: '#f5f5f5' }}>
-                  <Typography variant="body1" color="text.secondary" sx={{ mb: 0.5,fontWeight: 'bold' , fontSize: '20px'}}>
+                <CardContent
+                  sx={{
+                    pl: 4,
+                    py: 2,
+                    width: '20vw',
+                    backgroundColor: '#f5f5f5'
+                  }}
+                >
+                  <Typography
+                    variant='body1'
+                    color='text.secondary'
+                    sx={{ mb: 0.5, fontWeight: 'bold', fontSize: '20px' }}
+                  >
                     {item.title}
                   </Typography>
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                    <Box sx={{ color: item.color || '#22c55e', fontSize: 28, fontWeight: 700 }}>
+                    <Box
+                      sx={{
+                        color: item.color || '#22c55e',
+                        fontSize: 28,
+                        fontWeight: 700
+                      }}
+                    >
                       {item.icon}
                     </Box>
-                    <Typography variant="h5" sx={{ fontWeight: 700, ml: 1 }}>
+                    <Typography variant='h5' sx={{ fontWeight: 700, ml: 1 }}>
                       {loading ? <Skeleton width={40} /> : item.value}
                     </Typography>
                   </Box>
@@ -416,14 +433,18 @@ const DisplayManagement = () => {
                     return (
                       <TableRow key={index}>
                         <TableCell sx={{ py: 2 }}>
-                          <Stack direction='row' spacing={2} alignItems='center'>
+                          <Stack
+                            direction='row'
+                            spacing={2}
+                            alignItems='center'
+                          >
                             <Avatar
                               src={
                                 banner.imageUrl
                                   ? optimizeCloudinaryUrl(banner.imageUrl, {
-                                    width: 60,
-                                    height: 40
-                                  })
+                                      width: 60,
+                                      height: 40
+                                    })
                                   : undefined
                               }
                               sx={{
@@ -540,7 +561,9 @@ const DisplayManagement = () => {
                               <Tooltip title='Chỉnh sửa'>
                                 <IconButton
                                   size='small'
-                                  onClick={() => handleEditBanner(banner, index)}
+                                  onClick={() =>
+                                    handleEditBanner(banner, index)
+                                  }
                                   sx={{
                                     color: '#3b82f6',
                                     '&:hover': { backgroundColor: '#dbeafe' }
@@ -554,7 +577,9 @@ const DisplayManagement = () => {
                               <Tooltip title='Xóa'>
                                 <IconButton
                                   size='small'
-                                  onClick={() => handleDeleteBanner(banner, index)}
+                                  onClick={() =>
+                                    handleDeleteBanner(banner, index)
+                                  }
                                   sx={{
                                     color: '#ef4444',
                                     '&:hover': { backgroundColor: '#fee2e2' }
@@ -633,17 +658,29 @@ const DisplayManagement = () => {
         />
       </Box>
       {/* Modal xác nhận xóa banner */}
-      <Dialog open={deleteDialogOpen} onClose={() => setDeleteDialogOpen(false)}>
+      <Dialog
+        open={deleteDialogOpen}
+        onClose={() => setDeleteDialogOpen(false)}
+      >
         <DialogTitle>Xác nhận xóa banner</DialogTitle>
         <DialogContent>
-          <Typography>Bạn có chắc chắn muốn xóa banner <b>{bannerToDelete?.banner?.title}</b> không?</Typography>
+          <Typography>
+            Bạn có chắc chắn muốn xóa banner{' '}
+            <b>{bannerToDelete?.banner?.title}</b> không?
+          </Typography>
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setDeleteDialogOpen(false)}>Hủy</Button>
-          <Button color="error" onClick={confirmDeleteBanner} variant="contained">Xóa</Button>
+          <Button
+            color='error'
+            onClick={confirmDeleteBanner}
+            variant='contained'
+          >
+            Xóa
+          </Button>
         </DialogActions>
       </Dialog>
-    </RouteGuard >
+    </RouteGuard>
   )
 }
 

@@ -10,9 +10,7 @@ import {
   Chip,
   Divider
 } from '@mui/material'
-import {
-  Close as CloseIcon
-} from '@mui/icons-material'
+import { Close as CloseIcon } from '@mui/icons-material'
 
 const POLICY_LABELS = {
   terms_of_service: 'Điều khoản sử dụng',
@@ -42,18 +40,14 @@ const STATUS_COLORS = {
   draft: 'warning'
 }
 
-const ViewPolicyModal = ({
-  open,
-  onClose,
-  policy
-}) => {
+const ViewPolicyModal = ({ open, onClose, policy }) => {
   if (!policy) return null
 
   return (
     <Dialog
       open={open}
       onClose={onClose}
-      maxWidth="md"
+      maxWidth='md'
       fullWidth
       PaperProps={{
         sx: {
@@ -62,15 +56,17 @@ const ViewPolicyModal = ({
         }
       }}
     >
-      <DialogTitle sx={{ 
-        m: 0, 
-        p: 2, 
-        display: 'flex', 
-        justifyContent: 'space-between', 
-        alignItems: 'center',
-        borderBottom: '1px solid #e0e0e0'
-      }}>
-        <Typography variant="h6" component="div">
+      <DialogTitle
+        sx={{
+          m: 0,
+          p: 2,
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          borderBottom: '1px solid #e0e0e0'
+        }}
+      >
+        <Typography variant='h6' component='div'>
           Chi tiết chính sách
         </Typography>
         <Button
@@ -88,25 +84,25 @@ const ViewPolicyModal = ({
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
           {/* Header Info */}
           <Box>
-            <Typography variant="h5" component="h1" gutterBottom>
+            <Typography variant='h5' component='h1' gutterBottom>
               {policy.title}
             </Typography>
-            
-            <Box display="flex" gap={2} flexWrap="wrap" mb={2}>
+
+            <Box display='flex' gap={2} flexWrap='wrap' mb={2}>
               <Chip
                 label={POLICY_LABELS[policy.type] || policy.type}
                 color={POLICY_COLORS[policy.type] || 'default'}
-                size="small"
+                size='small'
               />
               <Chip
                 label={STATUS_LABELS[policy.status] || policy.status}
                 color={STATUS_COLORS[policy.status] || 'default'}
-                size="small"
+                size='small'
               />
             </Box>
 
             {policy.description && (
-              <Typography variant="body1" color="text.secondary" paragraph>
+              <Typography variant='body1' color='text.secondary' paragraph>
                 {policy.description}
               </Typography>
             )}
@@ -116,7 +112,7 @@ const ViewPolicyModal = ({
 
           {/* Content */}
           <Box>
-            <Typography variant="h6" gutterBottom>
+            <Typography variant='h6' gutterBottom>
               Nội dung chính sách
             </Typography>
             <Box
@@ -127,7 +123,22 @@ const ViewPolicyModal = ({
                 backgroundColor: '#fafafa',
                 minHeight: '300px',
                 maxHeight: '500px',
-                overflow: 'auto'
+                overflow: 'auto',
+                '& img': {
+                  maxWidth: '100%',
+                  height: 'auto',
+                  display: 'block',
+                  margin: '0 auto'
+                },
+                '& table': {
+                  width: '100%',
+                  borderCollapse: 'collapse',
+                  wordBreak: 'break-word'
+                },
+                '& table td, & table th': {
+                  border: '1px solid #ccc',
+                  padding: '4px'
+                }
               }}
               dangerouslySetInnerHTML={{ __html: policy.content }}
             />
@@ -135,20 +146,22 @@ const ViewPolicyModal = ({
 
           {/* Metadata */}
           <Divider />
-          
+
           <Box>
-            <Typography variant="subtitle2" color="text.secondary" gutterBottom>
+            <Typography variant='subtitle2' color='text.secondary' gutterBottom>
               Thông tin chi tiết
             </Typography>
-            <Box display="flex" flexDirection="column" gap={1}>
-              <Typography variant="body2">
-                <strong>Ngày tạo:</strong> {new Date(policy.createdAt).toLocaleDateString('vi-VN')}
+            <Box display='flex' flexDirection='column' gap={1}>
+              <Typography variant='body2'>
+                <strong>Ngày tạo:</strong>{' '}
+                {new Date(policy.createdAt).toLocaleDateString('vi-VN')}
               </Typography>
-              <Typography variant="body2">
-                <strong>Cập nhật lần cuối:</strong> {new Date(policy.updatedAt).toLocaleDateString('vi-VN')}
+              <Typography variant='body2'>
+                <strong>Cập nhật lần cuối:</strong>{' '}
+                {new Date(policy.updatedAt).toLocaleDateString('vi-VN')}
               </Typography>
               {policy.createdBy && (
-                <Typography variant="body2">
+                <Typography variant='body2'>
                   <strong>Người tạo:</strong> {policy.createdBy}
                 </Typography>
               )}
@@ -158,10 +171,7 @@ const ViewPolicyModal = ({
       </DialogContent>
 
       <DialogActions sx={{ p: 3, borderTop: '1px solid #e0e0e0' }}>
-        <Button
-          onClick={onClose}
-          variant="outlined"
-        >
+        <Button onClick={onClose} variant='outlined'>
           Đóng
         </Button>
       </DialogActions>
@@ -169,4 +179,4 @@ const ViewPolicyModal = ({
   )
 }
 
-export default ViewPolicyModal 
+export default ViewPolicyModal
