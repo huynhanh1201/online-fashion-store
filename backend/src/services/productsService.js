@@ -295,7 +295,7 @@ const updateProduct = async (productId, reqBody) => {
 
     if (cheapestVariant) {
       await ProductModel.findOneAndUpdate(
-        { _id: reqBody.productId }, // điều kiện tìm product
+        { _id: cheapestVariant.productId }, // điều kiện tìm product
         {
           $set: {
             minSalePriceVariant: {

@@ -30,11 +30,10 @@ const CategoryManagement = () => {
   const { hasPermission } = usePermissions()
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
-  const searchFromUrl = queryParams.get('search') || ''
+  const categoryIdFromUrl = queryParams.get('categoryId')
   const [filters, setFilters] = React.useState(() => ({
     destroy: 'false',
-    sort: 'newest',
-    ...(searchFromUrl ? { search: searchFromUrl } : {})
+    sort: 'newest'
   }))
 
   const {
@@ -48,20 +47,24 @@ const CategoryManagement = () => {
     remove,
     setROWS_PER_PAGE,
     ROWS_PER_PAGE,
-    Restore
+    Restore,
+    fetchById
   } = useCategories()
   React.useEffect(() => {
-    if (searchFromUrl) {
-      // Xoá `search` khỏi URL sau khi đã đưa vào filters
+    if (categoryIdFromUrl) {
+      fetchById(categoryIdFromUrl)
+    } else {
+      fetchCategories(page, ROWS_PER_PAGE, filters)
+    }
+  }, [page, ROWS_PER_PAGE, filters, categoryIdFromUrl])
+  React.useEffect(() => {
+    if (categoryIdFromUrl) {
+      // Xoá categoryId khỏi URL nếu cần sau khi fetch xong
       const newParams = new URLSearchParams(location.search)
-      newParams.delete('search')
+      newParams.delete('categoryId')
       window.history.replaceState({}, '', `${location.pathname}?${newParams}`)
     }
   }, [])
-  React.useEffect(() => {
-    fetchCategories(page, ROWS_PER_PAGE, filters)
-  }, [page, ROWS_PER_PAGE, filters])
-
   const handleChangePage = (event, value) => setPage(value)
 
   const handleOpenModal = (type, category) => {
@@ -124,7 +127,6 @@ const CategoryManagement = () => {
           canView: hasPermission('category:read'),
           canRestore: hasPermission('category:restore')
         }}
-        initialSearch={searchFromUrl}
         filters={filters}
       />
 

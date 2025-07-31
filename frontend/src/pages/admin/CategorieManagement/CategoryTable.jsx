@@ -34,7 +34,6 @@ const CategoryTable = ({
   onPageChange,
   onChangeRowsPerPage,
   permissions,
-  initialSearch,
   filters
 }) => {
   const columns = [
@@ -118,7 +117,6 @@ const CategoryTable = ({
                     categories={categories}
                     fetchCategories={fetchCategories}
                     loading={loading}
-                    initialSearch={initialSearch}
                   />
                 </Box>
               </TableCell>

@@ -394,6 +394,9 @@ const EditCategoryModal = ({ open, onClose, category, onSave }) => {
                   (c) => c._id !== category._id
                 )}
                 getOptionLabel={(option) => option.name || ''}
+                isOptionEqualToValue={(option, value) =>
+                  option.name === value?.name
+                }
                 value={parentCategory}
                 onChange={(e, value) => setParentCategory(value)}
                 renderInput={(params) => (

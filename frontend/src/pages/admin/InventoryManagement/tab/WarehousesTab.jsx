@@ -76,7 +76,7 @@ const WarehousesTab = () => {
   const [rowsPerPage, setRowsPerPage] = useState(10) // State cho số dòng mỗi trang
   const [showButton, setShowButton] = useState(false) // State để kiểm soát hiển thị nút Thêm
   useEffect(() => {
-    fetchWarehouses(page, rowsPerPage, { destroy: false })
+    fetchWarehouses(page, rowsPerPage, { status: false })
   }, [page, rowsPerPage])
   useEffect(() => {
     if (warehouses.length === 0 && hasPermission('warehouse:create')) {

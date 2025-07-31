@@ -1,5 +1,12 @@
 import React from 'react'
-import { TableCell, TableRow, IconButton, Stack } from '@mui/material'
+import {
+  TableCell,
+  TableRow,
+  IconButton,
+  Stack,
+  Typography,
+  Box
+} from '@mui/material'
 import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye'
 import BorderColorIcon from '@mui/icons-material/BorderColor'
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever'
@@ -124,8 +131,41 @@ export default function CategoryRow({
                 cursor: permissions.canView ? 'pointer' : 'default'
               }}
             >
-              {category[column.id] ||
-                (column.id === 'name' ? 'Không có tên' : 'Không có mô tả')}
+              {column.id === 'name' ? (
+                <Box>
+                  <Typography
+                    variant='caption'
+                    color='text.secondary'
+                    sx={{
+                      display: 'flex',
+                      alignItems: 'end',
+                      justifyContent: 'end',
+                      lineHeight: 1,
+                      // backgroundColor: 'red',
+                      color: '#f00',
+                      fontSize: '10px',
+                      fontWeight: '800',
+                      // width: 50,
+                      // height: 20,
+                      borderRadius: 3
+                    }}
+                  >
+                    Nhóm
+                  </Typography>
+                  <Typography
+                    variant='body2'
+                    sx={{
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      whiteSpace: 'nowrap'
+                    }}
+                  >
+                    {category[column.id] || 'Không có tên'}
+                  </Typography>
+                </Box>
+              ) : (
+                category[column.id] || 'Không có mô tả'
+              )}
             </TableCell>
           )
         }

@@ -163,7 +163,7 @@ const ProductRow = ({
                 onClick={() => {
                   if (product.categoryId) {
                     navigate(
-                      `/admin/categorie-management?search=${encodeURIComponent(formattedName)}`
+                      `/admin/categorie-management?categoryId=${product.categoryId._id}`
                     )
                   }
                 }}
