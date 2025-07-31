@@ -14,7 +14,7 @@ import Zoom from '@mui/material/Zoom'
 import Alert from '@mui/material/Alert'
 import { useForm } from 'react-hook-form'
 import ArrowBack from '@mui/icons-material/ArrowBack'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, Link } from 'react-router-dom'
 import Visibility from '@mui/icons-material/Visibility'
 import VisibilityOff from '@mui/icons-material/VisibilityOff'
 
@@ -22,6 +22,7 @@ import { registerUserAPI } from '~/apis'
 import { toast } from 'react-toastify'
 import { getUserBanners } from '~/services/bannerService'
 import { optimizeCloudinaryUrl } from '~/utils/cloudinary'
+import { getRedirectPath } from '~/utils/redirectUtils'
 
 function Register() {
   const {
@@ -268,8 +269,8 @@ function Register() {
                 sx={{ mt: 1, color: '#666', fontSize: '0.9rem' }}
               >
                 Bạn đã có tài khoản?{' '}
-                <a
-                  href='/login'
+                <Link
+                  to='/login'
                   style={{
                     color: '#1976d2',
                     textDecoration: 'none',
@@ -277,7 +278,7 @@ function Register() {
                   }}
                 >
                   Đăng nhập ngay
-                </a>
+                </Link>
               </Typography>
             </Grid>
           </MuiCard>

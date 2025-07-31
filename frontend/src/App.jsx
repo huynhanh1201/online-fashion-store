@@ -1,7 +1,8 @@
-import { Routes, Route, Navigate, Outlet } from 'react-router-dom'
+import { Routes, Route, Navigate, Outlet, useLocation } from 'react-router-dom'
 import { useSelector } from 'react-redux'
 import './assets/scrollbar.css'
 import { selectCurrentUser } from '~/redux/user/userSlice'
+import { saveRedirectPath } from '~/utils/redirectUtils'
 
 // Trang người dùng
 
@@ -75,7 +76,11 @@ import usePermissions from '~/hooks/usePermissions'
 
 // Giải pháp Clean Code trong việc xác định các route nào cần đăng nhập tài khoản xong thì mới được truy cập
 const ProtectedRoute = ({ user }) => {
+  const location = useLocation()
+
   if (!user) {
+    // Lưu đường dẫn hiện tại để redirect sau khi đăng nhập
+    saveRedirectPath(location.pathname + location.search)
     return <Navigate to='/login' replace={true} />
   }
 
@@ -85,9 +90,12 @@ const ProtectedRoute = ({ user }) => {
 // Protected route cho Admin - ngăn customer truy cập
 const AdminProtectedRoute = ({ user }) => {
   const { canAccessAdmin, isInitialized } = usePermissions()
+  const location = useLocation()
 
   // Nếu chưa đăng nhập, redirect về login
   if (!user) {
+    // Lưu đường dẫn hiện tại để redirect sau khi đăng nhập
+    saveRedirectPath(location.pathname + location.search)
     return <Navigate to='/login' replace={true} />
   }
 

@@ -24,7 +24,7 @@ import {
 import ArrowBack from '@mui/icons-material/ArrowBack'
 import { styled } from '@mui/system'
 import { useDispatch } from 'react-redux'
-import { useNavigate, useSearchParams } from 'react-router-dom'
+import { useNavigate, useSearchParams, Link } from 'react-router-dom'
 import { loginUserAPI } from '~/redux/user/userSlice'
 import { getProfileUser } from '~/services/userService'
 import { logoutUserAPI } from '~/redux/user/userSlice'
@@ -32,6 +32,7 @@ import CheckCircleOutline from '@mui/icons-material/CheckCircleOutline'
 import InfoOutlined from '@mui/icons-material/InfoOutlined'
 import { getUserBanners } from '~/services/bannerService'
 import { optimizeCloudinaryUrl } from '~/utils/cloudinary'
+import { redirectToSavedPath, getRedirectPath } from '~/utils/redirectUtils'
 const SocialButton = styled(Button)({
   padding: '8px',
   borderRadius: '50%',
@@ -103,7 +104,8 @@ function Login() {
         navigate('/login')
         return
       }
-      navigate('/')
+      // Redirect về trang đã lưu hoặc trang chủ
+      redirectToSavedPath(navigate, '/')
     } catch (error) {
       toast.error(error || 'Đăng nhập thất bại')
     }
@@ -311,8 +313,8 @@ function Login() {
                 sx={{ mt: 1, color: '#666', fontSize: '0.9rem' }}
               >
                 Bạn chưa có tài khoản?{' '}
-                <a
-                  href='/Register'
+                <Link
+                  to='/Register'
                   style={{
                     color: '#1976d2',
                     textDecoration: 'none',
@@ -320,7 +322,7 @@ function Login() {
                   }}
                 >
                   Đăng ký ngay
-                </a>
+                </Link>
               </Typography>
             </Grid>
 
