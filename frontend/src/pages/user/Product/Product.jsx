@@ -29,7 +29,7 @@ import { useNavigate } from 'react-router-dom'
 const ITEMS_PER_PAGE = 15
 
 // Custom styled button to mimic the dropdown in the image
-const SortDropdownButton = styled('button')(({}) => ({
+const SortDropdownButton = styled('button')(({ }) => ({
   border: '1px solid #222',
   background: '#fff',
   borderRadius: 0,
@@ -169,26 +169,13 @@ const Product = () => {
         throw new Error('Dữ liệu sản phẩm không hợp lệ')
       }
 
-      let sortedProducts = [...products]
-
-      // Client-side sorting cho giá
-      if (sortOption === 'priceAsc') {
-        sortedProducts.sort(
-          (a, b) => (a.exportPrice || 0) - (b.exportPrice || 0)
-        )
-      } else if (sortOption === 'priceDesc') {
-        sortedProducts.sort(
-          (a, b) => (b.exportPrice || 0) - (a.exportPrice || 0)
-        )
-      }
-
-      setProducts(sortedProducts)
+      setProducts(products)
       setTotalPages(totalPages)
     } catch (error) {
       console.error('Chi tiết lỗi:', error)
       setError(
         error.message ||
-          'Không thể tải danh sách sản phẩm. Vui lòng thử lại sau.'
+        'Không thể tải danh sách sản phẩm. Vui lòng thử lại sau.'
       )
       setProducts([])
       setTotalPages(1)
@@ -303,8 +290,8 @@ const Product = () => {
               cursor: 'pointer'
             }}
             onClick={() => navigate('/')}
-            // component={Link}
-            // to='/product'
+          // component={Link}
+          // to='/product'
           >
             Trang chủ
           </Link>

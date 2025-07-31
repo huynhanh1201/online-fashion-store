@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react'
 import { Button, Menu, MenuItem, Typography } from '@mui/material'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { styled } from '@mui/system'
 import { useDispatch, useSelector } from 'react-redux'
 import { logoutUserAPI, selectCurrentUser } from '~/redux/user/userSlice'
 import { getProfileUser } from '~/services/userService'
 import { toast } from 'react-toastify'
+import { saveRedirectPath } from '~/utils/redirectUtils'
 
 const StyledButtonRegister = styled(Button)(({ theme }) => ({
   color: 'var(--text-color)',
@@ -67,6 +68,7 @@ const StyledTypography = styled(Typography)(({ theme }) => ({
 const AuthButtons = () => {
   const dispatch = useDispatch()
   const navigate = useNavigate()
+  const location = useLocation()
   const currentUser = useSelector(selectCurrentUser)
   const [tokenUpdated, setTokenUpdated] = useState(
     localStorage.getItem('accessToken')
@@ -108,6 +110,11 @@ const AuthButtons = () => {
     return `${name.slice(0, 12)}...`
   }
 
+  const handleAuthClick = (authType) => {
+    // Lưu đường dẫn hiện tại trước khi chuyển đến trang auth
+    saveRedirectPath(location.pathname + location.search)
+  }
+
   return (
     <div style={{ display: 'flex' }}>
       {!currentUser ? (
@@ -115,11 +122,16 @@ const AuthButtons = () => {
           <StyledButtonRegister
             component={Link}
             to='/Register'
+            onClick={() => handleAuthClick('register')}
             sx={{ display: { xs: 'none', sm: 'none', lg: 'flex' } }}
           >
             Đăng ký
           </StyledButtonRegister>
-          <StyledButtonLogin component={Link} to='/login'>
+          <StyledButtonLogin 
+            component={Link} 
+            to='/login'
+            onClick={() => handleAuthClick('login')}
+          >
             Đăng nhập
           </StyledButtonLogin>
         </>
