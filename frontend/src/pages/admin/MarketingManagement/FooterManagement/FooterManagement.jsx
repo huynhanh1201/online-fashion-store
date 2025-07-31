@@ -105,8 +105,7 @@ const FooterManagement = () => {
             Quản lý nội dung chân trang
           </Typography>
           <Typography variant='body1' color='text.secondary'>
-            Cấu hình và quản lý nội dung chân trang cho website. Chỉ có thể tồn
-            tại một cấu hình duy nhất.
+            Cấu hình và quản lý nội dung chân trang cho website
           </Typography>
         </Box>
 
