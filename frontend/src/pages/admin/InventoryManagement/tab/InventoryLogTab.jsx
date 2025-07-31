@@ -136,7 +136,7 @@ const InventoryLogTab = () => {
                     }}
                   >
                     <Typography variant='h6' sx={{ fontWeight: '800' }}>
-                      Danh Sách Lịch Sử Xuất Nhập Kho
+                      Danh Sách nhật ký Kho
                     </Typography>
                   </Box>
                   <FilterInventoryLog

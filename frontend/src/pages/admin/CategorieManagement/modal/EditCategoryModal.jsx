@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react'
+import React, { useEffect, useState, useRef, useMemo } from 'react'
 import {
   Dialog,
   DialogTitle,
@@ -20,6 +20,7 @@ import { useForm } from 'react-hook-form'
 import StyleAdmin from '~/assets/StyleAdmin.jsx'
 import { CloudinaryCategory, URI } from '~/utils/constants'
 import useCategories from '~/hooks/admin/useCategories'
+import { getProducts } from '~/services/admin/productService.js'
 const uploadToCloudinary = async (file, folder = CloudinaryCategory) => {
   const formData = new FormData()
   formData.append('file', file)
@@ -52,10 +53,59 @@ const EditCategoryModal = ({ open, onClose, category, onSave }) => {
   const [bannerFile, setBannerFile] = useState(null)
   const [bannerPreview, setBannerPreview] = useState('')
   const bannerInputRef = useRef()
+  const [filteredCategories, setFilteredCategories] = useState([])
   const { categories, fetchCategories } = useCategories()
   useEffect(() => {
     fetchCategories(1, 100000)
   }, [])
+  useEffect(() => {
+    const loadFilteredCategories = async () => {
+      const rootCategories = categories.filter((cat) => cat.parent === null)
+
+      // Lấy danh sách ID của các parent đang được dùng làm cha
+      const usedParentIds = new Set(
+        categories
+          .filter((cat) => cat.parent) // chỉ lấy danh mục có parent
+          .map((cat) => String(cat.parent)) // convert về string để so sánh dễ hơn
+      )
+
+      const results = await Promise.all(
+        rootCategories.map(async (category) => {
+          try {
+            const { products, total } = await getProducts({
+              page: 1,
+              limit: 1,
+              categoryId: category._id
+            })
+
+            const isNotUsedAsParent = !usedParentIds.has(String(category._id))
+
+            if (
+              Array.isArray(products) &&
+              products.length === 0 &&
+              total === 0 &&
+              isNotUsedAsParent
+            ) {
+              return category
+            }
+          } catch (error) {
+            console.error(
+              'Lỗi khi kiểm tra sản phẩm danh mục:',
+              category._id,
+              error
+            )
+          }
+
+          return null
+        })
+      )
+
+      setFilteredCategories(results.filter(Boolean))
+    }
+
+    loadFilteredCategories()
+  }, [categories])
+
   useEffect(() => {
     if (open && category) {
       reset({
@@ -128,9 +178,19 @@ const EditCategoryModal = ({ open, onClose, category, onSave }) => {
       console.log('Lỗi khi lưu danh mục:', error)
     }
   }
-  const filteredCategories = categories.filter(
-    (category) => category.parent === null
-  )
+
+  // ✅ Dùng useMemo để tính realParentIds mỗi khi categories thay đổi
+  const realParentIds = useMemo(() => {
+    return new Set(
+      categories
+        .map((c) => (typeof c.parent === 'object' ? c.parent?._id : c.parent)) // lấy _id nếu parent là object
+        .filter(Boolean) // loại bỏ null/undefined
+    )
+  }, [categories])
+  function isParentCategory(categoryId) {
+    return categoryId && !realParentIds.has(categoryId.toString())
+  }
+
   return (
     <Dialog
       open={open}
@@ -342,45 +402,52 @@ const EditCategoryModal = ({ open, onClose, category, onSave }) => {
                 error={!!errors.name}
                 helperText={errors.name?.message}
               />
-              <Autocomplete
-                options={filteredCategories.filter(
-                  (c) => c._id !== category._id
-                )}
-                getOptionLabel={(option) => option.name || ''}
-                value={parentCategory}
-                onChange={(e, value) => setParentCategory(value)}
-                renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    MenuProps={{
-                      PaperProps: {
-                        sx: {
-                          maxHeight: 300,
-                          overflowY: 'auto'
+              {isParentCategory(category._id) && (
+                <Autocomplete
+                  options={filteredCategories.filter(
+                    (c) => c._id !== category._id
+                  )}
+                  getOptionLabel={(option) => option.name || ''}
+                  isOptionEqualToValue={(option, value) =>
+                    option.name === value?.name
+                  }
+                  value={parentCategory}
+                  onChange={(e, value) => setParentCategory(value)}
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      MenuProps={{
+                        PaperProps: {
+                          sx: {
+                            maxHeight: 300,
+                            overflowY: 'auto'
+                          }
                         }
-                      }
-                    }}
-                    label='Danh mục cha (không bắt buộc)'
-                    margin='normal'
-                    onFocus={(event) => {
-                      // Hủy hành vi select toàn bộ khi focus
-                      const input = event.target
-                      requestAnimationFrame(() => {
-                        input.setSelectionRange?.(
-                          input.value.length,
-                          input.value.length
-                        )
-                      })
-                    }}
-                  />
-                )}
-              />
+                      }}
+                      label='Nhóm danh mục (không bắt buộc)'
+                      margin='normal'
+                      onFocus={(event) => {
+                        // Hủy hành vi select toàn bộ khi focus
+                        const input = event.target
+                        requestAnimationFrame(() => {
+                          input.setSelectionRange?.(
+                            input.value.length,
+                            input.value.length
+                          )
+                        })
+                      }}
+                    />
+                  )}
+                />
+              )}
+
               <TextField
                 label='Mô tả (không bắt buộc)'
                 fullWidth
                 margin='normal'
                 multiline
-                rows={6}
+                sx={{ mt: isParentCategory(category._id) ? 2 : 3 }}
+                rows={isParentCategory(category._id) ? 6 : 9}
                 {...register('description', {
                   maxLength: {
                     value: 500,

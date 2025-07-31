@@ -102,7 +102,7 @@ export default function FilterPartner({ onFilter, loading }) {
       />
 
       <FilterByTime
-        label='Ngày tạo đối tác '
+        label='Lọc thời gian tạo'
         selectedFilter={selectedFilter}
         setSelectedFilter={setSelectedFilter}
         startDate={startDate}

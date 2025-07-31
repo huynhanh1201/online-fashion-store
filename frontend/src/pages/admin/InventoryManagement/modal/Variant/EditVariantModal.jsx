@@ -522,7 +522,7 @@ const EditVariantModal = ({
               </Box>
             </Box>
             {/*Trạng thái sản phẩm*/}
-            <Grid item size={12}>
+            <Grid item xs={12}>
               <Box>
                 <Typography variant='h6'>Trạng thái biến thể</Typography>
                 <Box sx={{ display: 'flex', gap: 1, mt: 1 }}>
@@ -530,27 +530,36 @@ const EditVariantModal = ({
                     { label: 'Bản nháp', value: 'draft' },
                     { label: 'Hoạt động', value: 'active' },
                     { label: 'Không hoạt động', value: 'inactive' }
-                  ].map((item) => {
-                    const isSelected = watch('status') === item.value
-                    return (
-                      <Chip
-                        key={item.value}
-                        label={item.label}
-                        onClick={() => setValue('status', item.value)}
-                        variant={isSelected ? 'filled' : 'outlined'}
-                        clickable
-                        sx={{
-                          ...(isSelected && {
-                            backgroundColor: 'var(--primary-color)',
-                            color: '#fff',
-                            '&:hover': {
-                              backgroundColor: 'var(--primary-color)'
-                            }
-                          })
-                        }}
-                      />
-                    )
-                  })}
+                  ]
+                    .filter((item) => {
+                      const currentStatus = watch('status')
+                      return !(
+                        currentStatus &&
+                        currentStatus !== 'draft' &&
+                        item.value === 'draft'
+                      )
+                    })
+                    .map((item) => {
+                      const isSelected = watch('status') === item.value
+                      return (
+                        <Chip
+                          key={item.value}
+                          label={item.label}
+                          onClick={() => setValue('status', item.value)}
+                          variant={isSelected ? 'filled' : 'outlined'}
+                          clickable
+                          sx={{
+                            ...(isSelected && {
+                              backgroundColor: 'var(--primary-color)',
+                              color: '#fff',
+                              '&:hover': {
+                                backgroundColor: 'var(--primary-color)'
+                              }
+                            })
+                          }}
+                        />
+                      )
+                    })}
                 </Box>
               </Box>
             </Grid>

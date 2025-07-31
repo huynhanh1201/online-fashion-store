@@ -56,7 +56,8 @@ const ReviewRow = ({
       {columns.map((column) => {
         let value = ''
         if (column.id === 'index') value = index
-        else if (column.id === 'user') value = review?.userId?.name
+        else if (column.id === 'user')
+          value = review?.userId?.name || 'Không xác định'
         else if (column.id === 'product') {
           value = review?.productId?.name || 'không có tên sản phẩm'
           return (

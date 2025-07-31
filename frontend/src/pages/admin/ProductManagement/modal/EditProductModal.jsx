@@ -492,7 +492,7 @@ const EditProductModal = ({ open, onClose, onSave, product }) => {
             />
           </Grid>
           {/*Trạng thái sản phẩm*/}
-          <Grid item size={12}>
+          <Grid item xs={12}>
             <Box>
               <Typography variant='h6'>Trạng thái sản phẩm</Typography>
               <Box sx={{ display: 'flex', gap: 1, mt: 1 }}>
@@ -500,27 +500,40 @@ const EditProductModal = ({ open, onClose, onSave, product }) => {
                   { label: 'Bản nháp', value: 'draft' },
                   { label: 'Hoạt động', value: 'active' },
                   { label: 'Không hoạt động', value: 'inactive' }
-                ].map((item) => {
-                  const isSelected = watch('status') === item.value
-                  return (
-                    <Chip
-                      key={item.value}
-                      label={item.label}
-                      onClick={() => setValue('status', item.value)}
-                      variant={isSelected ? 'filled' : 'outlined'}
-                      clickable
-                      sx={{
-                        ...(isSelected && {
-                          backgroundColor: 'var(--primary-color)',
-                          color: '#fff',
-                          '&:hover': {
-                            backgroundColor: 'var(--primary-color)'
-                          }
-                        })
-                      }}
-                    />
-                  )
-                })}
+                ]
+                  // Lọc: nếu đang là active hoặc inactive thì ẩn draft
+                  .filter((item) => {
+                    const currentStatus = watch('status')
+                    if (
+                      (currentStatus === 'active' ||
+                        currentStatus === 'inactive') &&
+                      item.value === 'draft'
+                    ) {
+                      return false
+                    }
+                    return true
+                  })
+                  .map((item) => {
+                    const isSelected = watch('status') === item.value
+                    return (
+                      <Chip
+                        key={item.value}
+                        label={item.label}
+                        onClick={() => setValue('status', item.value)}
+                        variant={isSelected ? 'filled' : 'outlined'}
+                        clickable
+                        sx={{
+                          ...(isSelected && {
+                            backgroundColor: 'var(--primary-color)',
+                            color: '#fff',
+                            '&:hover': {
+                              backgroundColor: 'var(--primary-color)'
+                            }
+                          })
+                        }}
+                      />
+                    )
+                  })}
               </Box>
             </Box>
           </Grid>

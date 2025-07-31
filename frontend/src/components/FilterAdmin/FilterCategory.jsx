@@ -16,9 +16,9 @@ import SearchWithSuggestions from '~/components/FilterAdmin/common/SearchWithSug
 import FilterSelect from '~/components/FilterAdmin/common/FilterSelect.jsx'
 import dayjs from 'dayjs'
 import useCategories from '~/hooks/admin/useCategories.js'
-export default function FilterCategory({ onFilter, loading, initialSearch }) {
-  const [keyword, setKeyword] = useState(initialSearch)
-  const [inputValue, setInputValue] = useState(initialSearch)
+export default function FilterCategory({ onFilter, loading }) {
+  const [keyword, setKeyword] = useState('')
+  const [inputValue, setInputValue] = useState('')
   const [selectedFilter, setSelectedFilter] = useState('')
   const [startDate, setStartDate] = useState(dayjs().format('YYYY-MM-DD'))
   const [endDate, setEndDate] = useState(dayjs().format('YYYY-MM-DD'))

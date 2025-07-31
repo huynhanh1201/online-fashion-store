@@ -347,7 +347,7 @@ export default function FilterInventory({ onFilter, loading }) {
       {/*/>*/}
 
       <FilterSelect
-        label='Trạng thái kho'
+        label='Trạng thái tồn kho'
         value={status}
         onChange={(val) => {
           setStatus(val)
@@ -390,7 +390,7 @@ export default function FilterInventory({ onFilter, loading }) {
 
       <Box sx={{ display: 'flex', gap: 2 }}>
         <FilterByTime
-          label='Ngày tạo'
+          label='Lọc thời gian tạo'
           selectedFilter={selectedFilter}
           setSelectedFilter={setSelectedFilter}
           onSelectFilter={handleSelectFilter}

@@ -35,7 +35,10 @@ export const getCategoryById = async (categoryId) => {
     const response = await AuthorizedAxiosInstance.get(
       `${API_ROOT}/v1/categories/${categoryId}`
     )
-    return response.data
+    return {
+      categories: response.data,
+      total: 1 // Vì mỗi ID chỉ trả về một danh mục, nên total là 1
+    }
   } catch (error) {
     console.error('Lỗi khi lấy thông tin danh mục:', error)
     return null

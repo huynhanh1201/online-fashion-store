@@ -193,25 +193,26 @@ const ProductbyCategory = () => {
           case 'priceAsc':
             sortedProducts.sort((a, b) => {
               const priceA =
-                a.firstVariantDiscountPrice > 0
-                  ? a.firstVariantDiscountPrice
+                a.minSalePriceVariant?.finalSalePrice > 0
+                  ? a.minSalePriceVariant.finalSalePrice
                   : a.exportPrice
               const priceB =
-                b.firstVariantDiscountPrice > 0
-                  ? b.firstVariantDiscountPrice
+                b.minSalePriceVariant?.finalSalePrice > 0
+                  ? b.minSalePriceVariant.finalSalePrice
                   : b.exportPrice
               return priceA - priceB
             })
             break
+
           case 'priceDesc':
             sortedProducts.sort((a, b) => {
               const priceA =
-                a.firstVariantDiscountPrice > 0
-                  ? a.firstVariantDiscountPrice
+                a.minSalePriceVariant?.finalSalePrice > 0
+                  ? a.minSalePriceVariant.finalSalePrice
                   : a.exportPrice
               const priceB =
-                b.firstVariantDiscountPrice > 0
-                  ? b.firstVariantDiscountPrice
+                b.minSalePriceVariant?.finalSalePrice > 0
+                  ? b.minSalePriceVariant.finalSalePrice
                   : b.exportPrice
               return priceB - priceA
             })
