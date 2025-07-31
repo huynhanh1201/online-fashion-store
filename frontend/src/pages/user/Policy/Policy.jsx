@@ -9,6 +9,7 @@ import {
   CircularProgress,
   Alert
 } from '@mui/material'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { getAllPolicies } from '~/services/policyService'
 
 const tabLabels = [
@@ -36,7 +37,25 @@ const PolicyPage = () => {
   const [error, setError] = useState(null)
   const isMobile = useMediaQuery('(max-width:900px)')
 
-  const handleTabChange = (event, newValue) => setTab(newValue)
+  const location = useLocation()
+  const navigate = useNavigate()
+
+  // Đồng bộ tab khi hash trên URL thay đổi
+  useEffect(() => {
+    const hash = location.hash.replace('#', '')
+    if (hash) {
+      const index = policyTypes.indexOf(hash)
+      if (index !== -1) {
+        setTab(index)
+      }
+    }
+  }, [location.hash])
+
+  // Khi đổi tab, cập nhật hash trong URL
+  const handleTabChange = (event, newValue) => {
+    setTab(newValue)
+    navigate(`/policy#${policyTypes[newValue]}`)
+  }
 
   // Load policies khi component mount
   useEffect(() => {
@@ -44,14 +63,14 @@ const PolicyPage = () => {
       try {
         setLoading(true)
         const policiesData = await getAllPolicies()
-        
-        // Filter policies theo type và chỉ lấy active, non-destroyed
-        const filteredPolicies = policiesData.filter(policy => 
-          policy.destroy === false && 
-          policy.status === 'active' &&
-          policyTypes.includes(policy.category)
+
+        const filteredPolicies = policiesData.filter(
+          (policy) =>
+            policy.destroy === false &&
+            policy.status === 'active' &&
+            policyTypes.includes(policy.category)
         )
-        
+
         setPolicies(filteredPolicies)
       } catch (error) {
         console.error('Lỗi khi tải chính sách:', error)
@@ -64,13 +83,10 @@ const PolicyPage = () => {
     fetchPolicies()
   }, [])
 
-  // Tìm policy theo tab hiện tại
-  const getCurrentPolicy = () => {
-    const currentType = policyTypes[tab]
-    return policies.find(policy => policy.category === currentType)
-  }
-
-  const currentPolicy = getCurrentPolicy()
+  // Lấy policy hiện tại
+  const currentPolicy = policies.find(
+    (policy) => policy.category === policyTypes[tab]
+  )
 
   if (loading) {
     return (
@@ -99,7 +115,7 @@ const PolicyPage = () => {
           mx: 'auto'
         }}
       >
-        <Alert severity="error" sx={{ mb: 2 }}>
+        <Alert severity='error' sx={{ mb: 2 }}>
           {error}
         </Alert>
       </Box>
@@ -111,7 +127,7 @@ const PolicyPage = () => {
       sx={{
         px: { xs: 1, sm: 2, md: 4 },
         py: { xs: 2, md: 6 },
-        maxWidth: '1400px',
+        maxWidth: '100%',
         mx: 'auto',
         minHeight: '100vh'
       }}
@@ -127,9 +143,9 @@ const PolicyPage = () => {
         }}
       >
         {/* Tabs Sidebar */}
-        <Box 
-          sx={{ 
-            minWidth: isMobile ? '100%' : 260, 
+        <Box
+          sx={{
+            minWidth: isMobile ? '100%' : 260,
             maxWidth: isMobile ? '100%' : 260,
             mb: isMobile ? 2 : 0,
             flexShrink: 0
@@ -175,7 +191,7 @@ const PolicyPage = () => {
               }
             }}
           >
-            {tabLabels.map((label, idx) => (
+            {tabLabels.map((label) => (
               <Tab key={label} label={label} />
             ))}
           </Tabs>
@@ -190,14 +206,14 @@ const PolicyPage = () => {
             alignItems: 'flex-start',
             justifyContent: 'flex-start',
             width: '100%',
-            minWidth: 0, // Prevent flex item from overflowing
+            minWidth: 0,
             overflow: 'hidden'
           }}
         >
           {currentPolicy ? (
-            <Box 
-              sx={{ 
-                width: '100%', 
+            <Box
+              sx={{
+                width: '100%',
                 maxWidth: '100%',
                 textAlign: 'left',
                 overflow: 'hidden'
@@ -215,14 +231,14 @@ const PolicyPage = () => {
               >
                 {currentPolicy.title}
               </Typography>
-              
+
               {currentPolicy.excerpt && (
-                <Typography 
-                  variant='h6' 
-                  color="text.secondary"
-                  gutterBottom 
-                  sx={{ 
-                    mt: 2, 
+                <Typography
+                  variant='h6'
+                  color='text.secondary'
+                  gutterBottom
+                  sx={{
+                    mt: 2,
                     textAlign: 'left',
                     wordBreak: 'break-word',
                     overflowWrap: 'break-word'
@@ -231,9 +247,9 @@ const PolicyPage = () => {
                   {currentPolicy.excerpt}
                 </Typography>
               )}
-              
-              <Box 
-                sx={{ 
+
+              <Box
+                sx={{
                   mt: 4,
                   width: '100%',
                   overflow: 'hidden',
@@ -288,9 +304,9 @@ const PolicyPage = () => {
               />
             </Box>
           ) : (
-            <Box 
-              sx={{ 
-                width: '100%', 
+            <Box
+              sx={{
+                width: '100%',
                 maxWidth: '100%',
                 textAlign: 'left',
                 overflow: 'hidden'
@@ -308,16 +324,17 @@ const PolicyPage = () => {
               >
                 {tabLabels[tab]}
               </Typography>
-              <Typography 
-                variant='h6' 
-                color="text.secondary"
-                sx={{ 
+              <Typography
+                variant='h6'
+                color='text.secondary'
+                sx={{
                   mt: 3,
                   wordBreak: 'break-word',
                   overflowWrap: 'break-word'
                 }}
               >
-                Nội dung chính sách này đang được cập nhật. Vui lòng quay lại sau.
+                Nội dung chính sách này đang được cập nhật. Vui lòng quay lại
+                sau.
               </Typography>
             </Box>
           )}
