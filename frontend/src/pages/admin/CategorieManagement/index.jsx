@@ -101,7 +101,17 @@ const CategoryManagement = () => {
       setFilters(newFilters)
     }
   }
+  const realParentIds = React.useMemo(() => {
+    return new Set(
+      categories
+        .map((c) => (typeof c.parent === 'object' ? c.parent?._id : c.parent))
+        .filter(Boolean)
+    )
+  }, [categories])
 
+  const isParentCategory = (categoryId) => {
+    return categoryId && !realParentIds.has(categoryId.toString())
+  }
   return (
     <RouteGuard requiredPermissions={['admin:access', 'category:use']}>
       <CategoryTable
@@ -128,6 +138,7 @@ const CategoryManagement = () => {
           canRestore: hasPermission('category:restore')
         }}
         filters={filters}
+        isParentCategory={isParentCategory}
       />
 
       <React.Suspense fallback={<></>}>
@@ -154,6 +165,7 @@ const CategoryManagement = () => {
               onClose={handleCloseModal}
               category={selectedCategory}
               onSave={handleSave}
+              isParentCategory={isParentCategory}
             />
           )}
         </PermissionWrapper>

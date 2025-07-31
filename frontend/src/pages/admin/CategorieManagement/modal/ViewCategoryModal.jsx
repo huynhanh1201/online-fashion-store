@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useMemo } from 'react'
 import {
   Dialog,
   DialogTitle,
@@ -16,7 +16,7 @@ import {
 import AddPhotoAlternateIcon from '@mui/icons-material/AddPhotoAlternate'
 import StyleAdmin from '~/assets/StyleAdmin.jsx'
 import ImageNotSupportedIcon from '@mui/icons-material/ImageNotSupported'
-import { optimizeCloudinaryUrl } from '~/utils/cloudinary.js'
+import useCategories from '~/hooks/admin/useCategories'
 const ViewCategoryModal = ({ open, onClose, category }) => {
   const formatDate = (dateString) => {
     if (!dateString) return 'Không có thông tin'
@@ -30,6 +30,20 @@ const ViewCategoryModal = ({ open, onClose, category }) => {
       second: '2-digit'
     })
   }
+  const { categories, fetchCategories } = useCategories()
+
+  useEffect(() => {
+    fetchCategories(1, 100000, { destroy: 'false' })
+  }, [])
+
+  // ✅ Dùng useMemo để tính realParentIds mỗi khi categories thay đổi
+  const realParentIds = useMemo(() => {
+    return new Set(
+      categories
+        .map((c) => c.parent?._id || c.parent) // dùng _id nếu parent là object, hoặc chính parent nếu là string
+        .filter(Boolean)
+    )
+  }, [categories])
   return (
     <Dialog
       open={open}
@@ -151,44 +165,47 @@ const ViewCategoryModal = ({ open, onClose, category }) => {
                     sx={{
                       height: 50,
                       padding: '8px 16px',
-                      lineHeight: '50px'
+                      lineHeight: '50px',
+                      position: 'relative',
+                      whiteSpace: 'nowrap',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis'
                     }}
                   >
-                    {category?.name
-                      .split(' ')
-                      .map(
-                        (word) =>
-                          word.charAt(0).toUpperCase() +
-                          word.slice(1).toLowerCase()
-                      )
-                      .join(' ') || '—'}
+                    <Box sx={{ display: 'inline-block', position: 'relative' }}>
+                      {(category?.name || '')
+                        .split(' ')
+                        .map(
+                          (word) =>
+                            word.charAt(0).toUpperCase() +
+                            word.slice(1).toLowerCase()
+                        )
+                        .join(' ') || 'Không có dữ liệu'}
+
+                      {category?._id &&
+                        realParentIds.has(category._id.toString()) && (
+                          <Box
+                            sx={{
+                              position: 'absolute',
+                              top: 0,
+                              right: -10,
+                              width: 20,
+                              height: 20,
+                              color: '#f00',
+                              fontSize: '10px',
+                              fontWeight: 700,
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              borderRadius: '50%'
+                            }}
+                          >
+                            Nhóm
+                          </Box>
+                        )}
+                    </Box>
                   </TableCell>
                 </TableRow>
-
-                {category?.parent?.name && (
-                  <TableRow>
-                    <TableCell
-                      sx={{
-                        width: 200,
-                        fontWeight: 700,
-                        height: 50,
-                        padding: '8px 16px',
-                        lineHeight: '50px'
-                      }}
-                    >
-                      Tên nhóm danh mục
-                    </TableCell>
-                    <TableCell
-                      sx={{
-                        height: 50,
-                        padding: '8px 16px',
-                        lineHeight: '50px'
-                      }}
-                    >
-                      {category?.parent?.name || '—'}
-                    </TableCell>
-                  </TableRow>
-                )}
 
                 <TableRow>
                   <TableCell

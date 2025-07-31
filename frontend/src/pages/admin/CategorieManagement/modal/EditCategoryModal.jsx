@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react'
+import React, { useEffect, useState, useRef, useMemo } from 'react'
 import {
   Dialog,
   DialogTitle,
@@ -178,6 +178,19 @@ const EditCategoryModal = ({ open, onClose, category, onSave }) => {
       console.log('Lỗi khi lưu danh mục:', error)
     }
   }
+
+  // ✅ Dùng useMemo để tính realParentIds mỗi khi categories thay đổi
+  const realParentIds = useMemo(() => {
+    return new Set(
+      categories
+        .map((c) => (typeof c.parent === 'object' ? c.parent?._id : c.parent)) // lấy _id nếu parent là object
+        .filter(Boolean) // loại bỏ null/undefined
+    )
+  }, [categories])
+  function isParentCategory(categoryId) {
+    return categoryId && !realParentIds.has(categoryId.toString())
+  }
+
   return (
     <Dialog
       open={open}
@@ -389,48 +402,52 @@ const EditCategoryModal = ({ open, onClose, category, onSave }) => {
                 error={!!errors.name}
                 helperText={errors.name?.message}
               />
-              <Autocomplete
-                options={filteredCategories.filter(
-                  (c) => c._id !== category._id
-                )}
-                getOptionLabel={(option) => option.name || ''}
-                isOptionEqualToValue={(option, value) =>
-                  option.name === value?.name
-                }
-                value={parentCategory}
-                onChange={(e, value) => setParentCategory(value)}
-                renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    MenuProps={{
-                      PaperProps: {
-                        sx: {
-                          maxHeight: 300,
-                          overflowY: 'auto'
+              {isParentCategory(category._id) && (
+                <Autocomplete
+                  options={filteredCategories.filter(
+                    (c) => c._id !== category._id
+                  )}
+                  getOptionLabel={(option) => option.name || ''}
+                  isOptionEqualToValue={(option, value) =>
+                    option.name === value?.name
+                  }
+                  value={parentCategory}
+                  onChange={(e, value) => setParentCategory(value)}
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      MenuProps={{
+                        PaperProps: {
+                          sx: {
+                            maxHeight: 300,
+                            overflowY: 'auto'
+                          }
                         }
-                      }
-                    }}
-                    label='Nhóm danh mục (không bắt buộc)'
-                    margin='normal'
-                    onFocus={(event) => {
-                      // Hủy hành vi select toàn bộ khi focus
-                      const input = event.target
-                      requestAnimationFrame(() => {
-                        input.setSelectionRange?.(
-                          input.value.length,
-                          input.value.length
-                        )
-                      })
-                    }}
-                  />
-                )}
-              />
+                      }}
+                      label='Nhóm danh mục (không bắt buộc)'
+                      margin='normal'
+                      onFocus={(event) => {
+                        // Hủy hành vi select toàn bộ khi focus
+                        const input = event.target
+                        requestAnimationFrame(() => {
+                          input.setSelectionRange?.(
+                            input.value.length,
+                            input.value.length
+                          )
+                        })
+                      }}
+                    />
+                  )}
+                />
+              )}
+
               <TextField
                 label='Mô tả (không bắt buộc)'
                 fullWidth
                 margin='normal'
                 multiline
-                rows={6}
+                sx={{ mt: isParentCategory(category._id) ? 2 : 3 }}
+                rows={isParentCategory(category._id) ? 6 : 9}
                 {...register('description', {
                   maxLength: {
                     value: 500,
