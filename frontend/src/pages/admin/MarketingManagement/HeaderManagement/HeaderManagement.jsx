@@ -449,11 +449,6 @@ const HeaderManagement = () => {
                       >
                         Thông báo cuộn
                       </TableCell>
-                      <TableCell
-                        sx={{ fontWeight: 700, color: '#334155', py: 2 }}
-                      >
-                        Trạng thái
-                      </TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
@@ -519,13 +514,6 @@ const HeaderManagement = () => {
                                 />
                               </Box>
                             )}
-                            <Typography
-                              variant='caption'
-                              color='text.secondary'
-                              sx={{ fontFamily: 'monospace' }}
-                            >
-                              {headerData._id}
-                            </Typography>
                           </Box>
                         </TableCell>
                         <TableCell sx={{ py: 2 }}>
@@ -557,35 +545,6 @@ const HeaderManagement = () => {
                             </Typography>
                           )}
                         </TableCell>
-                        <TableCell sx={{ py: 2 }}>
-                          <Chip
-                            label={getStatusText(headerData.status)}
-                            color={getStatusColor(headerData.status)}
-                            size='small'
-                            sx={{
-                              fontWeight: 600,
-                              borderRadius: 2
-                            }}
-                          />
-                        </TableCell>
-                        {hasPermission('headerContent:update') && (
-                          <TableCell sx={{ py: 2 }}>
-                            <Stack header='row' spacing={1}>
-                              <Tooltip title='Chỉnh sửa'>
-                                <IconButton
-                                  size='small'
-                                  sx={{
-                                    color: 'var(--primary-color)',
-                                    '&:hover': { backgroundColor: '#dbeafe' }
-                                  }}
-                                  onClick={() => setOpenModal(true)}
-                                >
-                                  <EditIcon fontSize='small' />
-                                </IconButton>
-                              </Tooltip>
-                            </Stack>
-                          </TableCell>
-                        )}
                       </TableRow>
                     ) : (
                       // No data
