@@ -257,7 +257,7 @@ const ThemeManagement = () => {
 
   return (
     <RouteGuard requiredPermissions={['admin:access', 'theme:use']}>
-      <Box sx={{ p: 3, maxWidth: 1200 }}>
+      <Box sx={{ p: 3, maxWidth: '100%' }}>
         <Typography
           variant='h4'
           sx={{ mb: 3, fontWeight: 700, color: 'text.primary' }}
@@ -265,35 +265,6 @@ const ThemeManagement = () => {
           <Palette sx={{ mr: 1, verticalAlign: 'middle' }} />
           Quản lý Chủ đề & Màu sắc
         </Typography>
-
-        {/* Theme Status */}
-        <Card sx={{ mb: 3 }}>
-          <CardContent>
-            <Box
-              sx={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between'
-              }}
-            >
-              <Box>
-                <Typography variant='h6' sx={{ mb: 1 }}>
-                  Trạng thái chủ đề
-                </Typography>
-                <Typography variant='body2' color='text.secondary'>
-                  Chủ đề sẽ được lưu vào cơ sở dữ liệu và áp dụng cho toàn bộ
-                  website
-                </Typography>
-              </Box>
-              <Chip
-                label='Đã lưu vào API'
-                color='success'
-                variant='filled'
-                icon={<Visibility />}
-              />
-            </Box>
-          </CardContent>
-        </Card>
 
         <Grid container spacing={3}>
           {/* Predefined Themes */}
