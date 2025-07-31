@@ -52,10 +52,45 @@ const register = async (reqBody) => {
   // Gửi email xác thực
   const verificationLink = `${WEBSITE_DOMAIN}/account/verification?email=${normalizedEmail}&token=${newUser.verifyToken}`
   const subject = 'Online Shop Store: Vui lòng xác thực tài khoản của bạn.'
+  //   const htmlContent = `
+  //   <h3>Đây là liên kết xác thực tài khoản của bạn. Vui lòng click vào liên kiết bên dưới:</h3>
+  //   <a href="${verificationLink}">${verificationLink}</a>
+  //   <p>Trân trọng,<br/>- Online Shop Store -</p>
+  // `
+
   const htmlContent = `
-  <h3>Đây là liên kết xác thực tài khoản của bạn. Vui lòng click vào liên kiết bên dưới:</h3>
-  <a href="${verificationLink}">${verificationLink}</a>
-  <p>Trân trọng,<br/>- Online Shop Store -</p>
+  <div style="max-width: 600px; margin: auto; font-family: Arial, sans-serif; background-color: #f8f9fa; padding: 20px; border-radius: 8px; border: 1px solid #ddd;">
+    <div style="text-align: center; padding-bottom: 20px;">
+      <h2 style="color: #343a40;">Xác Thực Tài Khoản</h2>
+    </div>
+    <p style="font-size: 16px; color: #212529;">
+      Xin chào 👋,
+    </p>
+    <p style="font-size: 16px; color: #212529;">
+      Cảm ơn bạn đã đăng ký tài khoản tại <strong>Online Shop Store</strong>.<br/>
+      Vui lòng nhấn vào nút bên dưới để xác thực tài khoản của bạn:
+    </p>
+
+    <div style="text-align: center; margin: 30px 0;">
+      <a href="${verificationLink}" 
+         style="background-color: #007bff; color: white; text-decoration: none; padding: 12px 24px; border-radius: 5px; font-size: 16px; display: inline-block;">
+        Xác Thực Ngay
+      </a>
+    </div>
+
+    <p style="font-size: 14px; color: #6c757d;">
+      Hoặc bạn có thể sao chép liên kết sau và dán vào trình duyệt nếu nút không hoạt động:
+      <br/>
+      <a href="${verificationLink}" style="color: #007bff;">${verificationLink}</a>
+    </p>
+
+    <hr style="border: none; border-top: 1px solid #dee2e6; margin: 30px 0;" />
+
+    <p style="font-size: 14px; color: #6c757d; text-align: center;">
+      Trân trọng,<br/>
+      <strong>Online Shop Store</strong>
+    </p>
+  </div>
 `
 
   if (role) {

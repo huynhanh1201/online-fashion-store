@@ -3,6 +3,7 @@ import validatePagination from '~/utils/validatePagination'
 import getDateRange from '~/utils/getDateRange'
 import ApiError from '~/utils/ApiError'
 import { StatusCodes } from 'http-status-codes'
+import { InventoryModel } from '~/models/InventoryModel'
 
 const createCoupon = async (reqBody) => {
   // eslint-disable-next-line no-useless-catch
@@ -30,6 +31,11 @@ const createCoupon = async (reqBody) => {
 const getCouponList = async (queryString) => {
   // eslint-disable-next-line no-useless-catch
   try {
+    await CouponModel.updateMany(
+      { $expr: { $gte: ['$usedCount', '$usageLimit'] } },
+      { $set: { isActive: false } }
+    )
+
     let {
       page = 1,
       limit = 10,
