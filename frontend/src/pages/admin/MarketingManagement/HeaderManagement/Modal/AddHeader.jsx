@@ -455,8 +455,8 @@ const AddHeader = ({ open, onClose, onSuccess }) => {
                 <TextField
                   label={
                     form.logo.imageUrl
-                      ? 'Logo alt text *'
-                      : 'Logo alt text (tùy chọn)'
+                      ? 'Văn bản thay thế Logo *'
+                      : 'Văn bản thay thế Logo (tùy chọn)'
                   }
                   value={form.logo.alt}
                   fullWidth
@@ -468,7 +468,7 @@ const AddHeader = ({ open, onClose, onSuccess }) => {
                   disabled={!form.logo.imageUrl}
                   helperText={
                     !form.logo.imageUrl
-                      ? 'Vui lòng upload logo trước khi nhập alt text'
+                      ? 'Vui lòng upload logo trước khi nhập văn bản thay thế Logo'
                       : ''
                   }
                   sx={{
