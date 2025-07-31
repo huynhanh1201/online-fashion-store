@@ -8,6 +8,7 @@ import generateSequentialCode from '~/utils/generateSequentialCode'
 import { VariantModel } from '~/models/VariantModel'
 import validatePagination from '~/utils/validatePagination'
 import getDateRange from '~/utils/getDateRange'
+import { InventoryModel } from '~/models/InventoryModel'
 
 const createProduct = async (reqBody) => {
   // eslint-disable-next-line no-useless-catch
@@ -82,6 +83,9 @@ const createProduct = async (reqBody) => {
 const getProductList = async (reqQuery) => {
   // eslint-disable-next-line no-useless-catch
   try {
+    // Căp nhật label new cho Product
+    await updateLabelProductAll()
+
     let {
       page = 1,
       limit = 10,
@@ -459,6 +463,32 @@ const restoreProduct = async (productId) => {
   } catch (err) {
     throw err
   }
+}
+
+const updateLabelProductAll = async () => {
+  const now = new Date()
+  const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000) // 7 ngày trước
+
+  // 1. Gắn label 'new' cho sản phẩm tạo trong 7 ngày qua
+  await ProductModel.updateMany(
+    {
+      createdAt: { $gte: sevenDaysAgo } // từ 7 ngày gần nhất tới nay
+    },
+    {
+      $set: { label: 'new' }
+    }
+  )
+
+  // 2. Gỡ label 'new' cho sản phẩm đã quá 7 ngày
+  await ProductModel.updateMany(
+    {
+      createdAt: { $lt: sevenDaysAgo }, // cũ hơn 7 ngày
+      label: 'new' // chỉ những sản phẩm đang có label 'new'
+    },
+    {
+      $unset: { label: '' } // gỡ field label
+    }
+  )
 }
 
 export const productsService = {

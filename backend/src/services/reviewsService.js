@@ -151,7 +151,9 @@ const deleteReview = async (reviewId) => {
       { new: true }
     )
 
-    await updateProductRating(reviewDeleted.productId)
+    const reviewInfo = await ReviewModel.findOne({ _id: reviewId })
+
+    await updateProductRating(reviewInfo.productId)
 
     return reviewDeleted
   } catch (err) {
