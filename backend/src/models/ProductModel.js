@@ -108,6 +108,31 @@ const productSchema = new Schema(
     label: {
       type: String,
       default: null
+    },
+
+    minSalePriceVariant: {
+      variantId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Variant',
+        default: null
+      },
+      exportPrice: {
+        type: Number,
+        required: true,
+        min: 0,
+        default: 0
+      },
+      discountPrice: {
+        type: Number,
+        default: 0,
+        min: 0
+      },
+      finalSalePrice: {
+        type: Number,
+        required: true,
+        min: 0,
+        default: 0
+      }
     }
   },
   {

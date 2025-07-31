@@ -8,6 +8,7 @@ import generateSequentialCode from '~/utils/generateSequentialCode'
 import { VariantModel } from '~/models/VariantModel'
 import validatePagination from '~/utils/validatePagination'
 import getDateRange from '~/utils/getDateRange'
+import { InventoryModel } from '~/models/InventoryModel'
 
 const createProduct = async (reqBody) => {
   // eslint-disable-next-line no-useless-catch
@@ -82,6 +83,9 @@ const createProduct = async (reqBody) => {
 const getProductList = async (reqQuery) => {
   // eslint-disable-next-line no-useless-catch
   try {
+    // Căp nhật label new cho Product
+    await updateLabelProductAll()
+
     let {
       page = 1,
       limit = 10,
@@ -94,8 +98,7 @@ const getProductList = async (reqQuery) => {
       filterTypeDate,
       startDate,
       endDate,
-      destroy,
-      sortPrice
+      destroy
     } = reqQuery
 
     validatePagination(page, limit)
@@ -150,8 +153,8 @@ const getProductList = async (reqQuery) => {
       name_desc: { name: -1 },
       newest: { createdAt: -1 },
       oldest: { createdAt: 1 },
-      price_desc: { exportPrice: -1 },
-      price_asc: { exportPrice: 1 }
+      price_desc: { 'minSalePriceVariant.finalSalePrice': -1 },
+      price_asc: { 'minSalePriceVariant.finalSalePrice': 1 }
     }
 
     let sortField = {}
@@ -287,6 +290,30 @@ const updateProduct = async (productId, reqBody) => {
       )
     }
 
+    // Cập nhật minSalePriceVariant cho product
+    const cheapestVariant = await VariantModel.findOne({
+      productId: productId
+    })
+      .sort({ finalSalePrice: 1 }) // tăng dần → cái rẻ nhất đứng đầu
+      .lean() // optional: nếu không cần document đầy đủ từ mongoose
+
+    if (cheapestVariant) {
+      await ProductModel.findOneAndUpdate(
+        { _id: reqBody.productId }, // điều kiện tìm product
+        {
+          $set: {
+            minSalePriceVariant: {
+              variantId: cheapestVariant._id,
+              exportPrice: cheapestVariant.exportPrice,
+              discountPrice: cheapestVariant.discountPrice || 0,
+              finalSalePrice: cheapestVariant.finalSalePrice
+            }
+          }
+        },
+        { new: true } // Trả về bản ghi đã update
+      )
+    }
+
     return updatedProduct
   } catch (err) {
     throw err
@@ -385,10 +412,7 @@ const getListProductOfCategory = async (categoryId, options = {}) => {
       aggregationPipeline.push({ $sort: sortField })
     }
 
-    aggregationPipeline.push(
-      { $skip: skip },
-      { $limit: parseInt(limit) }
-    )
+    aggregationPipeline.push({ $skip: skip }, { $limit: parseInt(limit) })
 
     const ListProduct = await ProductModel.aggregate(aggregationPipeline)
 
@@ -439,6 +463,32 @@ const restoreProduct = async (productId) => {
   } catch (err) {
     throw err
   }
+}
+
+const updateLabelProductAll = async () => {
+  const now = new Date()
+  const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000) // 7 ngày trước
+
+  // 1. Gắn label 'new' cho sản phẩm tạo trong 7 ngày qua
+  await ProductModel.updateMany(
+    {
+      createdAt: { $gte: sevenDaysAgo } // từ 7 ngày gần nhất tới nay
+    },
+    {
+      $set: { label: 'new' }
+    }
+  )
+
+  // 2. Gỡ label 'new' cho sản phẩm đã quá 7 ngày
+  await ProductModel.updateMany(
+    {
+      createdAt: { $lt: sevenDaysAgo }, // cũ hơn 7 ngày
+      label: 'new' // chỉ những sản phẩm đang có label 'new'
+    },
+    {
+      $unset: { label: '' } // gỡ field label
+    }
+  )
 }
 
 export const productsService = {

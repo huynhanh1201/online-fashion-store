@@ -12,6 +12,7 @@
     "build": "npm run clean && npm run build-babel",
     "production": "npm run build && cross-env BUILD_MODE=prod node ./build/src/server.js",
     "dev": "cross-env BUILD_MODE=dev NODE_OPTIONS='--disable-warning=DEP0040' nodemon --exec babel-node  ./src/server.js",
+    "dev:wsl": "cross-env BUILD_MODE=dev NODE_OPTIONS='--disable-warning=DEP0040' nodemon --legacy-watch --exec babel-node ./src/server.js",
     "seed:all": "node src/seeders/seedAll.js",
     "start": "yarn production"
   },
