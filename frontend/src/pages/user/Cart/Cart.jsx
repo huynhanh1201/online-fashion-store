@@ -1159,6 +1159,18 @@ const Cart = () => {
                                         }}
                                       />
                                     )}
+                                    {isVariantInactive && !isProductInactive && (
+                                      <Chip
+                                        size='small'
+                                        label='Ngừng bán'
+                                        sx={{
+                                          fontSize: '0.75rem',
+                                          backgroundColor: '#9e9e9e',
+                                          color: 'white',
+                                          fontWeight: 600,
+                                        }}
+                                      />
+                                    )}
                                   </Box>
                                 </Box>
                                 <Box
