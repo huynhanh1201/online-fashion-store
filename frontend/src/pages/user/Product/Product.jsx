@@ -29,7 +29,7 @@ import { useNavigate } from 'react-router-dom'
 const ITEMS_PER_PAGE = 15
 
 // Custom styled button to mimic the dropdown in the image
-const SortDropdownButton = styled('button')(({ }) => ({
+const SortDropdownButton = styled('button')(({}) => ({
   border: '1px solid #222',
   background: '#fff',
   borderRadius: 0,
@@ -168,6 +168,43 @@ const Product = () => {
         console.error('Products không phải là array:', products)
         throw new Error('Dữ liệu sản phẩm không hợp lệ')
       }
+      switch (sortOption) {
+        case 'nameAsc':
+          products.sort((a, b) => a.name.localeCompare(b.name))
+          break
+        case 'nameDesc':
+          products.sort((a, b) => b.name.localeCompare(a.name))
+          break
+        case 'priceAsc':
+          products.sort((a, b) => {
+            const priceA =
+              a.minSalePriceVariant?.finalSalePrice > 0
+                ? a.minSalePriceVariant.finalSalePrice
+                : a.exportPrice
+            const priceB =
+              b.minSalePriceVariant?.finalSalePrice > 0
+                ? b.minSalePriceVariant.finalSalePrice
+                : b.exportPrice
+            return priceA - priceB
+          })
+          break
+        case 'priceDesc':
+          products.sort((a, b) => {
+            const priceA =
+              a.minSalePriceVariant?.finalSalePrice > 0
+                ? a.minSalePriceVariant.finalSalePrice
+                : a.exportPrice
+            const priceB =
+              b.minSalePriceVariant?.finalSalePrice > 0
+                ? b.minSalePriceVariant.finalSalePrice
+                : b.exportPrice
+            return priceB - priceA
+          })
+          break
+        case 'featured':
+        default:
+          break
+      }
 
       setProducts(products)
       setTotalPages(totalPages)
@@ -175,7 +212,7 @@ const Product = () => {
       console.error('Chi tiết lỗi:', error)
       setError(
         error.message ||
-        'Không thể tải danh sách sản phẩm. Vui lòng thử lại sau.'
+          'Không thể tải danh sách sản phẩm. Vui lòng thử lại sau.'
       )
       setProducts([])
       setTotalPages(1)
@@ -290,8 +327,8 @@ const Product = () => {
               cursor: 'pointer'
             }}
             onClick={() => navigate('/')}
-          // component={Link}
-          // to='/product'
+            // component={Link}
+            // to='/product'
           >
             Trang chủ
           </Link>
