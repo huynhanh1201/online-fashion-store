@@ -122,6 +122,15 @@ const styles = {
   }
 }
 
+function removeVietnameseTones(str) {
+  return str
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/đ/g, 'd')
+    .replace(/Đ/g, 'D')
+    .toLowerCase()
+}
+
 export default function SearchResults() {
   const [products, setProducts] = useState([])
   const [filteredProducts, setFilteredProducts] = useState([])
@@ -154,9 +163,14 @@ export default function SearchResults() {
         }
 
         const { products: allProducts } = await getProducts(params)
-
-        const filtered = allProducts
-          .filter((p) => p.name?.toLowerCase().includes(query.toLowerCase()))
+        console.log('All products fetched:', allProducts)
+        // Lọc theo tên
+        let filtered = allProducts
+          .filter((p) =>
+            removeVietnameseTones(p.name || '').includes(
+              removeVietnameseTones(query.trim())
+            )
+          )
           .map((p) => ({
             _id: p._id,
             name: p.name,
@@ -169,8 +183,51 @@ export default function SearchResults() {
             image: p.image || ['/fallback.jpg'],
             category: p.category || 'Không xác định',
             brand: p.brand || 'Không xác định',
-            quantity: p.quantity || 0
+            quantity: p.quantity || 0,
+            minSalePriceVariant: p.minSalePriceVariant || nul
           }))
+        console.log('Filtered products:', filtered)
+        // Sắp xếp ở frontend
+        switch (sortOption) {
+          case 'nameAsc':
+            filtered.sort((a, b) => a.name.localeCompare(b.name))
+            break
+          case 'nameDesc':
+            filtered.sort((a, b) => b.name.localeCompare(a.name))
+            break
+          case 'priceAsc':
+            filtered.sort((a, b) => {
+              const priceA =
+                a.minSalePriceVariant?.finalSalePrice > 0
+                  ? a.minSalePriceVariant.finalSalePrice
+                  : a.exportPrice
+              const priceB =
+                b.minSalePriceVariant?.finalSalePrice > 0
+                  ? b.minSalePriceVariant.finalSalePrice
+                  : b.exportPrice
+              return priceA - priceB
+            })
+            break
+          case 'priceDesc':
+            filtered.sort((a, b) => {
+              const priceA =
+                a.minSalePriceVariant?.finalSalePrice > 0
+                  ? a.minSalePriceVariant.finalSalePrice
+                  : a.exportPrice
+              const priceB =
+                b.minSalePriceVariant?.finalSalePrice > 0
+                  ? b.minSalePriceVariant.finalSalePrice
+                  : b.exportPrice
+              return priceB - priceA
+            })
+            break
+          case 'newest':
+          default:
+            filtered.sort(
+              (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+            )
+            break
+        }
 
         if (filtered.length === 0) {
           setProducts([])
@@ -230,7 +287,6 @@ export default function SearchResults() {
           aria-label='breadcrumb'
         >
           <Link
-
             sx={{
               display: 'flex',
               alignItems: 'center',
@@ -242,8 +298,8 @@ export default function SearchResults() {
               cursor: 'pointer'
             }}
             onClick={() => navigate('/')}
-          // component={Link}
-          // to='/product'
+            // component={Link}
+            // to='/product'
           >
             Trang chủ
           </Link>
@@ -368,7 +424,7 @@ export default function SearchResults() {
                 size='small'
                 renderItem={(item) =>
                   item.type === 'start-ellipsis' ||
-                    item.type === 'end-ellipsis' ? (
+                  item.type === 'end-ellipsis' ? (
                     <span style={{ padding: '8px 12px', color: '#999' }}>
                       ...
                     </span>
