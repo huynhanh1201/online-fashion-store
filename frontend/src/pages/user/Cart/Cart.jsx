@@ -101,14 +101,18 @@ const Cart = () => {
         const item = cartItems.find(
           (cartItem) =>
             (cartItem.variantId?._id || cartItem.variantId) === selected.variantId
-        );
+        )
+        if (!item) return false
+
+        const actualQty = tempQuantities[selected.variantId] ?? item.quantity
+
         return (
-          item &&
-          item.quantity > 0 &&
+          actualQty > 0 &&
           (item.variantId?.quantity === undefined || item.variantId.quantity > 0) &&
           item.variantId?.status !== 'inactive'
-        );
-      });
+        )
+      })
+
 
       if (validSelectedItems.length < selectedItems.length) {
         setSelectedItems(validSelectedItems);
@@ -118,35 +122,34 @@ const Cart = () => {
   }, [cartItems, selectedItems, dispatch]);
 
   useEffect(() => {
-    if (cart?.cartItems) {
-      const sortedItems = [...cart.cartItems].sort((a, b) => {
-        if (a.quantity > 0 && b.quantity === 0) return -1;
-        if (a.quantity === 0 && b.quantity > 0) return 1;
-        return 0;
-      });
-      setCartItems(sortedItems);
+    const updated = cartItems
+      .map((item) => {
+        const variantId = item.variantId._id || item.variantId
+        const actualQty = tempQuantities[variantId] ?? item.quantity
 
-      const outOfStockItems = sortedItems.filter((item) => item.quantity === 0);
-      if (outOfStockItems.length > 0) {
-        setOutOfStockMessage(
-          'Một số sản phẩm trong giỏ hàng đã hết hàng và không thể chọn để thanh toán'
-        );
-        setOutOfStockAlert(true);
-        setSelectedItems((prev) => {
-          const filteredItems = prev.filter(
-            (selected) =>
-              !outOfStockItems.some(
-                (outOfStock) =>
-                  outOfStock.variantId?._id === selected.variantId ||
-                  outOfStock.variantId === selected.variantId
-              )
-          );
-          dispatch(setSelectedItemsAction(filteredItems));
-          return filteredItems;
-        });
-      }
-    }
-  }, [cart, dispatch]);
+        return {
+          variantId,
+          quantity: actualQty
+        }
+      })
+      .filter((item) => {
+        const cartItem = cartItems.find(
+          (ci) => (ci.variantId._id || ci.variantId) === item.variantId
+        )
+        const variant = cartItem?.variantId
+
+        return (
+          item.quantity > 0 &&
+          variant?.status !== 'inactive' &&
+          variant?.productId?.status !== 'inactive'
+        )
+      })
+
+    setSelectedItems(updated)
+    dispatch(setSelectedItemsAction(updated))
+  }, [cartItems, tempQuantities])
+
+
 
   useEffect(() => {
     if (cartItems.length > 0 && reorderVariantIds.length > 0 && !hasAutoSelected) {
