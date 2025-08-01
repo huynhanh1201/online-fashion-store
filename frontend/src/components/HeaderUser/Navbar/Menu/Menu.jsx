@@ -30,8 +30,8 @@ const StyledButton = styled(Button)(({ theme, active }) => ({
   overflow: 'hidden',
   textOverflow: 'ellipsis',
   whiteSpace: 'nowrap',
-  textAlign: 'left',              // 👈 Thêm dòng này
-  justifyContent: 'flex-start',   // 👈 Và dòng này
+  textAlign: 'left',
+  justifyContent: 'flex-start',
 
   '&::after': {
     content: '""',
