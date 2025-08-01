@@ -22,7 +22,9 @@ import {
   DialogContentText,
   Skeleton,
   Breadcrumbs,
-  Link
+  Link,
+  Snackbar,
+  Alert,
 } from '@mui/material'
 import {
   KeyboardArrowDown,
@@ -58,7 +60,7 @@ const statusLabels = {
   Shipping: ['Đang giao hàng', 'primary', <LocalShipping key="shipping" />],
   Delivered: ['Đã giao', 'success', <CheckCircle key="delivered" />],
   Cancelled: ['Đã hủy', 'error', <Cancel key="cancelled" />],
-  Failed: ['Thất bại', 'error', <ErrorIcon key="failed" />]
+  Failed: ['Thất bại', 'error', <ErrorIcon key="failed" />],
 }
 
 // Skeleton Loading Component
@@ -68,7 +70,7 @@ const OrderSkeleton = () => (
       mb: 2,
       borderRadius: 3,
       boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
-      border: '1px solid rgba(0,0,0,0.05)'
+      border: '1px solid rgba(0,0,0,0.05)',
     }}
   >
     <CardContent sx={{ p: { xs: 1.5, sm: 2, md: 3 } }}>
@@ -85,7 +87,7 @@ const OrderSkeleton = () => (
           borderRadius: 2,
           backgroundColor: 'grey.50',
           border: '1px solid',
-          borderColor: 'grey.200'
+          borderColor: 'grey.200',
         }}
       >
         <Box
@@ -117,7 +119,7 @@ const OrderSkeleton = () => (
           sx={{
             p: { xs: 1, sm: 1.5, md: 2 },
             borderRadius: 2,
-            backgroundColor: 'primary.50'
+            backgroundColor: 'primary.50',
           }}
         >
           <Skeleton variant="text" width={60} height={20} />
@@ -144,8 +146,8 @@ const CancelOrderModal = ({ open, onClose, onConfirm, order, loading }) => {
         sx: {
           borderRadius: 3,
           boxShadow: '0 10px 40px rgba(0,0,0,0.1)',
-          width: { xs: '90vw', sm: '400px' }
-        }
+          width: { xs: '90vw', sm: '400px' },
+        },
       }}
     >
       <DialogTitle sx={{ pb: 1, px: { xs: 2, sm: 3 } }}>
@@ -157,7 +159,7 @@ const CancelOrderModal = ({ open, onClose, onConfirm, order, loading }) => {
               backgroundColor: 'error.50',
               display: 'flex',
               alignItems: 'center',
-              justifyContent: 'center'
+              justifyContent: 'center',
             }}
           >
             <Warning sx={{ color: 'error.main', fontSize: { xs: 24, sm: 28 } }} />
@@ -192,7 +194,7 @@ const CancelOrderModal = ({ open, onClose, onConfirm, order, loading }) => {
               color: 'error.main',
               mt: 1,
               display: 'block',
-              fontSize: { xs: '0.8rem', sm: '0.9rem' }
+              fontSize: { xs: '0.8rem', sm: '0.9rem' },
             }}
           >
             Hành động này không thể hoàn tác!
@@ -210,7 +212,7 @@ const CancelOrderModal = ({ open, onClose, onConfirm, order, loading }) => {
             fontWeight: 600,
             px: { xs: 2, sm: 3 },
             fontSize: { xs: '0.75rem', sm: '0.875rem' },
-            width: { xs: '100%', sm: 'auto' }
+            width: { xs: '100%', sm: 'auto' },
           }}
         >
           Không, giữ lại
@@ -220,17 +222,21 @@ const CancelOrderModal = ({ open, onClose, onConfirm, order, loading }) => {
           variant="contained"
           color="error"
           disabled={loading}
-          startIcon={loading ? (
-            <CircularProgress
-              size={16}
-              sx={{
-                color: 'inherit',
-                '& .MuiCircularProgress-circle': {
-                  strokeLinecap: 'round'
-                }
-              }}
-            />
-          ) : <Cancel />}
+          startIcon={
+            loading ? (
+              <CircularProgress
+                size={16}
+                sx={{
+                  color: 'inherit',
+                  '& .MuiCircularProgress-circle': {
+                    strokeLinecap: 'round',
+                  },
+                }}
+              />
+            ) : (
+              <Cancel />
+            )
+          }
           sx={{
             borderRadius: 2,
             textTransform: 'none',
@@ -238,7 +244,7 @@ const CancelOrderModal = ({ open, onClose, onConfirm, order, loading }) => {
             px: { xs: 2, sm: 3 },
             fontSize: { xs: '0.75rem', sm: '0.875rem' },
             width: { xs: '100%', sm: 'auto' },
-            boxShadow: '0 4px 12px rgba(211, 47, 47, 0.3)'
+            boxShadow: '0 4px 12px rgba(211, 47, 47, 0.3)',
           }}
         >
           {loading ? 'Đang hủy...' : 'Có, hủy đơn'}
@@ -355,8 +361,8 @@ const OrderRow = ({ order, onOrderUpdate, onOrderCancelled, onReorder, reorderLo
           boxShadow: isRecentlyUpdated
             ? '0 12px 40px rgba(26, 60, 123, 0.25)'
             : '0 8px 30px rgba(0,0,0,0.12)',
-          transform: isRecentlyUpdated ? 'scale(1.01) translateY(-2px)' : 'translateY(-2px)'
-        }
+          transform: isRecentlyUpdated ? 'scale(1.01) translateY(-2px)' : 'translateY(-2px)',
+        },
       }}
     >
       <CardContent sx={{ p: { xs: 1.5, sm: 2, md: 3 } }}>
@@ -395,8 +401,8 @@ const OrderRow = ({ order, onOrderUpdate, onOrderCancelled, onReorder, reorderLo
               sx={{
                 color: 'var(--primary-color)',
                 '& .MuiCircularProgress-circle': {
-                  strokeLinecap: 'round'
-                }
+                  strokeLinecap: 'round',
+                },
               }}
             />
           </Box>
@@ -417,8 +423,8 @@ const OrderRow = ({ order, onOrderUpdate, onOrderCancelled, onReorder, reorderLo
                     '&:hover': {
                       backgroundColor: 'grey.100',
                       borderColor: 'var(--primary-color)',
-                      transform: 'translateX(4px)'
-                    }
+                      transform: 'translateX(4px)',
+                    },
                   }}
                   onClick={() => navigate(`/order-detail/${order._id}`)}
                 >
@@ -426,7 +432,6 @@ const OrderRow = ({ order, onOrderUpdate, onOrderCancelled, onReorder, reorderLo
                     display="flex"
                     justifyContent="space-between"
                     alignItems="center"
-
                     gap={1}
                   >
                     <Box display="flex" alignItems="center" gap={1.5} width="100%">
@@ -439,7 +444,7 @@ const OrderRow = ({ order, onOrderUpdate, onOrderCancelled, onReorder, reorderLo
                           borderRadius: 2,
                           border: '2px solid white',
                           boxShadow: '0 4px 8px rgba(0,0,0,0.1)',
-                          objectFit: 'cover'
+                          objectFit: 'cover',
                         }}
                         variant="rounded"
                       />
@@ -452,7 +457,7 @@ const OrderRow = ({ order, onOrderUpdate, onOrderCancelled, onReorder, reorderLo
                             overflow: 'hidden',
                             textOverflow: 'ellipsis',
                             whiteSpace: 'nowrap',
-                            maxWidth: { xs: '200px', sm: '300px', md: '400px', lg: '500px' }
+                            maxWidth: { xs: '200px', sm: '300px', md: '400px', lg: '500px' },
                           }}
                           title={capitalizeFirstLetter(item.name)}
                         >
@@ -471,7 +476,7 @@ const OrderRow = ({ order, onOrderUpdate, onOrderCancelled, onReorder, reorderLo
                           variant="outlined"
                           sx={{
                             fontSize: { xs: '0.65rem', sm: '0.7rem' },
-                            height: { xs: 18, sm: 20 }
+                            height: { xs: 18, sm: 20 },
                           }}
                         />
                       </Box>
@@ -481,7 +486,7 @@ const OrderRow = ({ order, onOrderUpdate, onOrderCancelled, onReorder, reorderLo
                         fontWeight={700}
                         sx={{
                           fontSize: { xs: '1rem', sm: '1.1rem', md: '1.2rem' },
-                          color: 'var(--primary-color)'
+                          color: 'var(--primary-color)',
                         }}
                       >
                         {getActualItemPrice(item).toLocaleString('vi-VN')}₫
@@ -506,7 +511,7 @@ const OrderRow = ({ order, onOrderUpdate, onOrderCancelled, onReorder, reorderLo
                   justifyContent: 'center',
                   pb: { xs: 1, sm: 2 },
                   zIndex: 10,
-                  pointerEvents: 'none'
+                  pointerEvents: 'none',
                 }}
               >
                 <Button
@@ -528,7 +533,7 @@ const OrderRow = ({ order, onOrderUpdate, onOrderCancelled, onReorder, reorderLo
                     '&:hover': {
                       backgroundColor: 'var(--primary-color)',
                       transform: 'translateY(-3px)',
-                      boxShadow: '0 8px 25px rgba(26, 60, 123, 0.5)'
+                      boxShadow: '0 8px 25px rgba(26, 60, 123, 0.5)',
                     },
                     transition: 'all 0.3s ease',
                     '&::before': {
@@ -542,8 +547,8 @@ const OrderRow = ({ order, onOrderUpdate, onOrderCancelled, onReorder, reorderLo
                       borderLeft: '6px solid transparent',
                       borderRight: '6px solid transparent',
                       borderBottom: '8px solid var(--primary-color)',
-                      opacity: 0.7
-                    }
+                      opacity: 0.7,
+                    },
                   }}
                 >
                   Xem chi tiết đơn hàng
@@ -562,7 +567,7 @@ const OrderRow = ({ order, onOrderUpdate, onOrderCancelled, onReorder, reorderLo
               sx={{
                 p: { xs: 1, sm: 1.5, md: 2 },
                 borderRadius: 2,
-                backgroundColor: 'primary.50'
+                backgroundColor: 'primary.50',
               }}
             >
               <Typography
@@ -577,7 +582,7 @@ const OrderRow = ({ order, onOrderUpdate, onOrderCancelled, onReorder, reorderLo
                 fontWeight="700"
                 sx={{
                   color: 'var(--primary-color)',
-                  fontSize: { xs: '1.25rem', sm: '1.5rem' }
+                  fontSize: { xs: '1.25rem', sm: '1.5rem' },
                 }}
               >
                 {order.total?.toLocaleString('vi-VN')}₫
@@ -600,24 +605,28 @@ const OrderRow = ({ order, onOrderUpdate, onOrderCancelled, onReorder, reorderLo
                   color: 'var(--primary-color)',
                   fontSize: { xs: '0.75rem', sm: '0.875rem' },
                   px: { xs: 1.5, sm: 2 },
-                  width: { xs: '100%', sm: 'auto' }
+                  width: { xs: '100%', sm: 'auto' },
                 }}
               >
                 Xem chi tiết
               </Button>
               {(order.status === 'Delivered' || order.status === 'Failed' || order.status === 'Cancelled') && (
                 <Button
-                  startIcon={reorderLoading ? (
-                    <CircularProgress
-                      size={16}
-                      sx={{
-                        color: 'inherit',
-                        '& .MuiCircularProgress-circle': {
-                          strokeLinecap: 'round'
-                        }
-                      }}
-                    />
-                  ) : <Replay />}
+                  startIcon={
+                    reorderLoading ? (
+                      <CircularProgress
+                        size={16}
+                        sx={{
+                          color: 'inherit',
+                          '& .MuiCircularProgress-circle': {
+                            strokeLinecap: 'round',
+                          },
+                        }}
+                      />
+                    ) : (
+                      <Replay />
+                    )
+                  }
                   onClick={() => onReorder && onReorder(items)}
                   disabled={reorderLoading}
                   sx={{
@@ -629,7 +638,7 @@ const OrderRow = ({ order, onOrderUpdate, onOrderCancelled, onReorder, reorderLo
                     px: { xs: 1.5, sm: 2 },
                     width: { xs: '100%', sm: 'auto' },
                     boxShadow: '0 4px 12px rgba(25, 118, 210, 0.3)',
-                    opacity: reorderLoading ? 0.7 : 1
+                    opacity: reorderLoading ? 0.7 : 1,
                   }}
                 >
                   {reorderLoading ? 'Đang thêm vào giỏ...' : 'Mua lại'}
@@ -647,7 +656,7 @@ const OrderRow = ({ order, onOrderUpdate, onOrderCancelled, onReorder, reorderLo
                     fontWeight: 600,
                     fontSize: { xs: '0.75rem', sm: '0.875rem' },
                     px: { xs: 1.5, sm: 2 },
-                    width: { xs: '100%', sm: 'auto' }
+                    width: { xs: '100%', sm: 'auto' },
                   }}
                 >
                   Hủy đơn
@@ -680,6 +689,11 @@ const OrderListPage = () => {
   const [hasMore, setHasMore] = useState(true)
   const [isInitialized, setIsInitialized] = useState(false)
   const [recentlyUpdatedOrderId, setRecentlyUpdatedOrderId] = useState(null)
+  const [notification, setNotification] = useState({
+    open: false,
+    message: '',
+    severity: 'info',
+  })
 
   const currentUser = useSelector(selectCurrentUser)
   const userId = currentUser?._id
@@ -714,6 +728,11 @@ const OrderListPage = () => {
       }
     } catch (error) {
       console.error('Lỗi khi lấy đơn hàng:', error)
+      setNotification({
+        open: true,
+        message: 'Đã xảy ra lỗi khi tải đơn hàng.',
+        severity: 'error',
+      })
     } finally {
       if (isTabSwitch) {
         setTabLoading(false)
@@ -764,68 +783,108 @@ const OrderListPage = () => {
   const handleReorder = async (items, orderId) => {
     try {
       setReorderLoading(orderId)
+      const skippedItems = []
+      const validVariantIds = []
+
       for (let i = 0; i < items.length; i++) {
         const item = items[i]
         const variantId = typeof item.variantId === 'object' ? item.variantId._id : item.variantId
         if (!variantId) {
           console.warn('Variant ID not found for item:', item)
+          skippedItems.push({ name: item.name, reason: 'Mã sản phẩm hết hàng hoặc ngừng bán' })
           continue
         }
+
         try {
           const variantInfo = await getVariantById(variantId)
           if (!variantInfo) {
             console.warn('Variant not found for ID:', variantId)
+            skippedItems.push({ name: item.name, reason: 'Sản phẩm không tồn tại' })
             continue
           }
+
           const availableQuantity = variantInfo.quantity || 0
-          let quantityToAdd = 1
-          if (availableQuantity <= 0) {
-            quantityToAdd = 0
-            console.log(`Item ${item.name} is out of stock, adding with quantity = 0`)
-            await addToCart({
-              variantId: variantId,
-              quantity: quantityToAdd
+          const isActive = variantInfo.status !== 'inactive' && variantInfo.productId?.status !== 'inactive'
+
+          if (availableQuantity <= 0 || !isActive) {
+            console.log(`Item ${item.name} is ${availableQuantity <= 0 ? 'out of stock' : 'inactive'}`)
+            skippedItems.push({
+              name: item.name,
+              reason: availableQuantity <= 0 ? 'Hết hàng' : 'Ngừng bán',
             })
             continue
           }
+
           const currentCartItem = cart?.cartItems?.find((cartItem) => {
             const cartVariantId = typeof cartItem.variantId === 'object' ? cartItem.variantId._id : cartItem.variantId
             return cartVariantId === variantId
           })
           const currentQuantityInCart = currentCartItem?.quantity || 0
-          if (currentCartItem && currentQuantityInCart >= availableQuantity) {
+
+          if (currentQuantityInCart >= availableQuantity) {
             console.log(
               `Item ${item.name} reached max quantity in cart (${currentQuantityInCart}/${availableQuantity}), skipping`
             )
+            skippedItems.push({
+              name: item.name,
+              reason: `Đã đạt số lượng tối đa trong giỏ (${availableQuantity})`,
+            })
             continue
-          } else if (currentCartItem) {
-            const canAdd = availableQuantity - currentQuantityInCart
-            quantityToAdd = Math.min(1, canAdd)
-            console.log(`Item ${item.name} already in cart (${currentQuantityInCart}), adding ${quantityToAdd} more`)
-          } else {
-            console.log(`Adding new item ${item.name} to cart`)
           }
+
+          const quantityToAdd = Math.min(item.quantity || 1, availableQuantity - currentQuantityInCart)
+          console.log(`Adding item ${item.name} to cart with quantity ${quantityToAdd}`)
           await addToCart({
             variantId: variantId,
-            quantity: quantityToAdd
+            quantity: quantityToAdd,
           })
+
+          validVariantIds.push(variantId)
         } catch (error) {
           console.error(`Error adding item ${i + 1} to cart:`, error)
+          skippedItems.push({ name: item.name, reason: 'Lỗi khi thêm vào giỏ hàng' })
         }
+
         if (i < items.length - 1) {
           await new Promise((resolve) => setTimeout(resolve, 200))
         }
       }
-      const reorderVariantIds = items
-        .map((item) => (typeof item.variantId === 'object' ? item.variantId._id : item.variantId))
-        .filter((id) => id)
-      dispatch(setReorderVariantIds(reorderVariantIds))
+
+      // Dispatch only valid variant IDs for reordering
+      dispatch(setReorderVariantIds(validVariantIds))
       await refreshCart({ silent: true })
-      setTimeout(() => {
-        navigate('/cart')
-      }, 300)
+
+      // Show notification for skipped items
+      if (skippedItems.length > 0) {
+        const message = skippedItems
+          .map((item) => `Sản phẩm "${item.name}": ${item.reason}`)
+          .join(' ')
+        setNotification({ open: true, message, severity: 'warning' })
+      }
+
+      if (validVariantIds.length > 0) {
+        setNotification({
+          open: true,
+          message: 'Đã thêm sản phẩm vào giỏ hàng.',
+          severity: 'success',
+        })
+        setTimeout(() => {
+          navigate('/cart')
+        }, 300)
+      } else {
+        setNotification({
+          open: true,
+          message: 'Sản phẩm ngưng bán hoặc hết hàng',
+          severity: 'error',
+        })
+      }
     } catch (err) {
-      console.error('Lỗi khi mua lại:', err)
+      console.error('Lỗi khi thêm sản phẩm vào giỏ hàng:', err)
+      setNotification({
+        open: true,
+        message: 'Đã xảy ra lỗi khi mua lại đơn hàng.',
+        severity: 'error',
+      })
     } finally {
       setReorderLoading(null)
     }
@@ -842,7 +901,7 @@ const OrderListPage = () => {
           maxWidth: { xs: '95vw', sm: '96vw', md: '96vw' },
           margin: '0 auto',
           height: '70vh',
-          py: { xs: 2, sm: 3, md: 4 }
+          py: { xs: 2, sm: 3, md: 4 },
         }}
       >
         <Box display="flex" flexDirection="column" alignItems="center" gap={3}>
@@ -851,7 +910,7 @@ const OrderListPage = () => {
               position: 'relative',
               display: 'flex',
               alignItems: 'center',
-              justifyContent: 'center'
+              justifyContent: 'center',
             }}
           >
             <CircularProgress
@@ -860,8 +919,8 @@ const OrderListPage = () => {
               sx={{
                 color: 'var(--primary-color)',
                 '& .MuiCircularProgress-circle': {
-                  strokeLinecap: 'round'
-                }
+                  strokeLinecap: 'round',
+                },
               }}
             />
             <Box
@@ -872,7 +931,7 @@ const OrderListPage = () => {
                 transform: 'translate(-50%, -50%)',
                 display: 'flex',
                 alignItems: 'center',
-                justifyContent: 'center'
+                justifyContent: 'center',
               }}
             >
               <ShoppingBag sx={{ color: 'var(--primary-color)', fontSize: 20 }} />
@@ -885,7 +944,7 @@ const OrderListPage = () => {
               sx={{
                 fontSize: { xs: '1rem', sm: '1.25rem' },
                 fontWeight: 600,
-                mb: 0.5
+                mb: 0.5,
               }}
             >
               Đang tải đơn hàng...
@@ -915,15 +974,27 @@ const OrderListPage = () => {
         '& @keyframes pulse': {
           '0%': { opacity: 1 },
           '50%': { opacity: 0.4 },
-          '100%': { opacity: 1 }
-        }
+          '100%': { opacity: 1 },
+        },
       }}
     >
-      <Box sx={{ mb: 2 }}>
-        <Breadcrumbs
-          separator={<NavigateNext fontSize='small' />}
-          aria-label='breadcrumb'
+      <Snackbar
+        open={notification.open}
+        autoHideDuration={6000}
+        onClose={() => setNotification({ ...notification, open: false })}
+        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+        sx={{ zIndex: 1500 }}
+      >
+        <Alert
+          onClose={() => setNotification({ ...notification, open: false })}
+          severity={notification.severity}
+          sx={{ borderRadius: 2, boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}
         >
+          {notification.message}
+        </Alert>
+      </Snackbar>
+      <Box sx={{ mb: 2 }}>
+        <Breadcrumbs separator={<NavigateNext fontSize="small" />} aria-label="breadcrumb">
           <Link
             sx={{
               display: 'flex',
@@ -931,13 +1002,11 @@ const OrderListPage = () => {
               color: '#007bff',
               textDecoration: 'none',
               '&:hover': {
-                color: 'primary.main'
+                color: 'primary.main',
               },
-              cursor: 'pointer'
+              cursor: 'pointer',
             }}
             onClick={() => navigate('/')}
-          // component={Link}
-          // to='/product'
           >
             Trang chủ
           </Link>
@@ -946,7 +1015,7 @@ const OrderListPage = () => {
               display: 'flex',
               alignItems: 'center',
               color: 'text.primary',
-              fontWeight: 500
+              fontWeight: 500,
             }}
           >
             Đơn hàng
@@ -963,7 +1032,7 @@ const OrderListPage = () => {
             backgroundClip: 'text',
             WebkitBackgroundClip: 'text',
             WebkitTextFillColor: 'transparent',
-            fontSize: { xs: '1.5rem', sm: '2rem', md: '2.25rem' }
+            fontSize: { xs: '1.5rem', sm: '2rem', md: '2.25rem' },
           }}
         >
           Đơn hàng của tôi
@@ -981,7 +1050,7 @@ const OrderListPage = () => {
         sx={{
           borderRadius: 3,
           mb: 3,
-          overflow: 'hidden'
+          overflow: 'hidden',
         }}
       >
         <Tabs
@@ -991,7 +1060,7 @@ const OrderListPage = () => {
           sx={{
             '& .MuiTabs-flexContainer': {
               display: 'flex',
-              justifyContent: 'space-between'
+              justifyContent: 'space-between',
             },
             '& .MuiTab-root': {
               textTransform: 'none',
@@ -1005,14 +1074,14 @@ const OrderListPage = () => {
               transition: 'all 0.2s ease',
               '&:hover': {
                 backgroundColor: 'rgba(26, 60, 123, 0.04)',
-                color: 'var(--primary-color)'
-              }
+                color: 'var(--primary-color)',
+              },
             },
             '& .MuiTabs-indicator': {
               height: 3,
               borderRadius: '3px 3px 0 0',
-              transition: 'all 0.3s ease'
-            }
+              transition: 'all 0.3s ease',
+            },
           }}
         >
           {Object.keys(statusLabels).map((status) => {
@@ -1039,7 +1108,7 @@ const OrderListPage = () => {
                         lineHeight: 1.1,
                         textAlign: 'center',
                         fontWeight: 'inherit',
-                        display: { xs: 'none', sm: 'inline' }
+                        display: { xs: 'none', sm: 'inline' },
                       }}
                     >
                       {label}
@@ -1052,117 +1121,119 @@ const OrderListPage = () => {
           })}
         </Tabs>
       </Paper>
-      {
-        tabLoading ? (
-          <Stack spacing={2}>
-            {[1, 2, 3].map((_, index) => (
-              <OrderSkeleton key={index} />
-            ))}
-          </Stack>
-        ) : filteredOrders.length === 0 ? (
-          <Paper
-            sx={{
-              p: { xs: 3, sm: 4, md: 6 },
-              textAlign: 'center',
-              borderRadius: 3,
-              border: '2px dashed',
-              borderColor: 'grey.300',
-              opacity: 0,
-              animation: 'fadeIn 0.3s ease-in-out forwards',
-              '@keyframes fadeIn': {
-                '0%': { opacity: 0, transform: 'translateY(10px)' },
-                '100%': { opacity: 1, transform: 'translateY(0)' }
-              }
-            }}
+      {tabLoading ? (
+        <Stack spacing={2}>
+          {[1, 2, 3].map((_, index) => (
+            <OrderSkeleton key={index} />
+          ))}
+        </Stack>
+      ) : filteredOrders.length === 0 ? (
+        <Paper
+          sx={{
+            p: { xs: 3, sm: 4, md: 6 },
+            textAlign: 'center',
+            borderRadius: 3,
+            border: '2px dashed',
+            borderColor: 'grey.300',
+            opacity: 0,
+            animation: 'fadeIn 0.3s ease-in-out forwards',
+            '@keyframes fadeIn': {
+              '0%': { opacity: 0, transform: 'translateY(10px)' },
+              '100%': { opacity: 1, transform: 'translateY(0)' },
+            },
+          }}
+        >
+          <ShoppingBag sx={{ fontSize: { xs: 60, sm: 80 }, color: 'grey.400', mb: 2 }} />
+          <Typography
+            variant="h6"
+            color="text.secondary"
+            mb={1}
+            sx={{ fontSize: { xs: '1rem', sm: '1.25rem' } }}
           >
-            <ShoppingBag sx={{ fontSize: { xs: 60, sm: 80 }, color: 'grey.400', mb: 2 }} />
-            <Typography
-              variant="h6"
-              color="text.secondary"
-              mb={1}
-              sx={{ fontSize: { xs: '1rem', sm: '1.25rem' } }}
-            >
-              Không có đơn hàng nào
-            </Typography>
-            <Typography
-              variant="body2"
-              color="text.secondary"
-              sx={{ fontSize: { xs: '0.8rem', sm: '0.875rem' } }}
-            >
-              {selectedTab === 'All'
-                ? 'Bạn chưa có đơn hàng nào. Hãy bắt đầu mua sắm!'
-                : `Không có đơn hàng nào trong trạng thái "${statusLabels[selectedTab][0]}"`}
-            </Typography>
-          </Paper>
-        ) : (
-          <Stack
-            spacing={2}
-            sx={{
-              opacity: 0,
-              animation: 'fadeIn 0.3s ease-in-out forwards',
-              '@keyframes fadeIn': {
-                '0%': { opacity: 0, transform: 'translateY(10px)' },
-                '100%': { opacity: 1, transform: 'translateY(0)' }
-              }
-            }}
+            Không có đơn hàng nào
+          </Typography>
+          <Typography
+            variant="body2"
+            color="text.secondary"
+            sx={{ fontSize: { xs: '0.8rem', sm: '0.875rem' } }}
           >
-            {filteredOrders.map((order) => (
-              <OrderRow
-                key={order._id}
-                order={order}
-                onOrderUpdate={handleOrderUpdate}
-                onOrderCancelled={handleOrderCancelled}
-                onReorder={(items) => handleReorder(items, order._id)}
-                reorderLoading={reorderLoading === order._id}
-                isRecentlyUpdated={recentlyUpdatedOrderId === order._id}
-              />
-            ))}
-            {hasMore && filteredOrders.length > 0 && (
-              <Box display="flex" justifyContent="center" mt={3}>
-                <Button
-                  variant="outlined"
-                  size="large"
-                  onClick={loadMoreOrders}
-                  disabled={loadingMore}
-                  startIcon={loadingMore ? (
+            {selectedTab === 'All'
+              ? 'Bạn chưa có đơn hàng nào. Hãy bắt đầu mua sắm!'
+              : `Không có đơn hàng nào trong trạng thái "${statusLabels[selectedTab][0]}"`}
+          </Typography>
+        </Paper>
+      ) : (
+        <Stack
+          spacing={2}
+          sx={{
+            opacity: 0,
+            animation: 'fadeIn 0.3s ease-in-out forwards',
+            '@keyframes fadeIn': {
+              '0%': { opacity: 0, transform: 'translateY(10px)' },
+              '100%': { opacity: 1, transform: 'translateY(0)' },
+            },
+          }}
+        >
+          {filteredOrders.map((order) => (
+            <OrderRow
+              key={order._id}
+              order={order}
+              onOrderUpdate={handleOrderUpdate}
+              onOrderCancelled={handleOrderCancelled}
+              onReorder={(items) => handleReorder(items, order._id)}
+              reorderLoading={reorderLoading === order._id}
+              isRecentlyUpdated={recentlyUpdatedOrderId === order._id}
+            />
+          ))}
+          {hasMore && filteredOrders.length > 0 && (
+            <Box display="flex" justifyContent="center" mt={3}>
+              <Button
+                variant="outlined"
+                size="large"
+                onClick={loadMoreOrders}
+                disabled={loadingMore}
+                startIcon={
+                  loadingMore ? (
                     <CircularProgress
                       size={16}
                       sx={{
                         color: 'inherit',
                         '& .MuiCircularProgress-circle': {
-                          strokeLinecap: 'round'
-                        }
+                          strokeLinecap: 'round',
+                        },
                       }}
                     />
-                  ) : <KeyboardArrowDown />}
-                  sx={{
-                    borderRadius: 3,
-                    textTransform: 'none',
-                    fontWeight: 600,
-                    px: { xs: 2, sm: 3, md: 4 },
-                    py: { xs: 1, sm: 1.5 },
-                    fontSize: { xs: '0.75rem', sm: '0.875rem' },
-                    width: { xs: '100%', sm: 'auto' },
-                    border: '2px solid',
-                    borderColor: 'var(--primary-color)',
-                    color: 'var(--primary-color)',
-                    '&:hover': {
-                      backgroundColor: 'var(--primary-color)',
-                      color: 'white',
-                      transform: 'translateY(-2px)',
-                      boxShadow: '0 4px 12px rgba(26, 60, 123, 0.3)'
-                    },
-                    transition: 'all 0.3s ease'
-                  }}
-                >
-                  {loadingMore ? 'Đang tải...' : 'Xem thêm đơn hàng'}
-                </Button>
-              </Box>
-            )}
-          </Stack>
-        )
-      }
-    </Container >
+                  ) : (
+                    <KeyboardArrowDown />
+                  )
+                }
+                sx={{
+                  borderRadius: 3,
+                  textTransform: 'none',
+                  fontWeight: 600,
+                  px: { xs: 2, sm: 3, md: 4 },
+                  py: { xs: 1, sm: 1.5 },
+                  fontSize: { xs: '0.75rem', sm: '0.875rem' },
+                  width: { xs: '100%', sm: 'auto' },
+                  border: '2px solid',
+                  borderColor: 'var(--primary-color)',
+                  color: 'var(--primary-color)',
+                  '&:hover': {
+                    backgroundColor: 'var(--primary-color)',
+                    color: 'white',
+                    transform: 'translateY(-2px)',
+                    boxShadow: '0 4px 12px rgba(26, 60, 123, 0.3)',
+                  },
+                  transition: 'all 0.3s ease',
+                }}
+              >
+                {loadingMore ? 'Đang tải...' : 'Xem thêm đơn hàng'}
+              </Button>
+            </Box>
+          )}
+        </Stack>
+      )}
+    </Container>
   )
 }
 

@@ -418,7 +418,11 @@ const OrderDetail = () => {
   const currentUser = useSelector(selectCurrentUser)
   const dispatch = useDispatch()
 
-  const [snackbarOpen, setSnackbarOpen] = useState(false)
+  const [notification, setNotification] = useState({
+    open: false,
+    message: '',
+    severity: 'info'
+  })
   const [openReviewModal, setOpenReviewModal] = useState(false)
   const [openViewReviewModal, setOpenViewReviewModal] = useState(false)
   const [reviewedProducts, setReviewedProducts] = useState(new Set())
@@ -631,6 +635,11 @@ const OrderDetail = () => {
       navigate('/orders')
     } catch (error) {
       console.error('Lỗi khi hủy đơn hàng:', error)
+      setNotification({
+        open: true,
+        message: 'Đã xảy ra lỗi khi hủy đơn hàng.',
+        severity: 'error'
+      })
     } finally {
       setCancelling(false)
     }
@@ -652,6 +661,11 @@ const OrderDetail = () => {
         selectedProduct?.productId?.toString() || selectedProduct?.productId
       if (!productId || !orderId || !currentUser?._id) {
         console.error('Thiếu thông tin cần thiết để đánh giá.')
+        setNotification({
+          open: true,
+          message: 'Thiếu thông tin để gửi đánh giá.',
+          severity: 'error'
+        })
         handleCloseModal()
         return
       }
@@ -662,14 +676,22 @@ const OrderDetail = () => {
           `Sản phẩm ${productId} đã được đánh giá trong đơn hàng ${orderId}.`
         )
         setReviewedProducts((prev) => new Set([...prev, productId]))
-        setSnackbarOpen(true)
+        setNotification({
+          open: true,
+          message: 'Sản phẩm này đã được đánh giá.',
+          severity: 'warning'
+        })
         handleCloseModal()
         return
       }
 
       if (reviewedProducts.has(productId)) {
         console.error('Sản phẩm này đã được đánh giá.')
-        setSnackbarOpen(true)
+        setNotification({
+          open: true,
+          message: 'Sản phẩm này đã được đánh giá.',
+          severity: 'warning'
+        })
         handleCloseModal()
         return
       }
@@ -681,8 +703,12 @@ const OrderDetail = () => {
           console.log('handleSubmitReview: Updated reviewedProducts:', newSet)
           return newSet
         })
+        setNotification({
+          open: true,
+          message: 'Cảm ơn bạn đã đánh giá!',
+          severity: 'success'
+        })
         handleCloseModal()
-        setSnackbarOpen(true)
       }
     } catch (error) {
       console.error('Lỗi gửi đánh giá:', error)
@@ -694,6 +720,17 @@ const OrderDetail = () => {
         if (productId) {
           setReviewedProducts((prev) => new Set([...prev, productId]))
         }
+        setNotification({
+          open: true,
+          message: 'Sản phẩm này đã được đánh giá.',
+          severity: 'warning'
+        })
+      } else {
+        setNotification({
+          open: true,
+          message: 'Đã xảy ra lỗi khi gửi đánh giá.',
+          severity: 'error'
+        })
       }
       handleCloseModal()
     }
@@ -702,14 +739,17 @@ const OrderDetail = () => {
   const handleReorder = async () => {
     try {
       setReorderLoading(true)
+      const skippedItems = []
+      const validVariantIds = []
+
       for (let i = 0; i < items.length; i++) {
         const item = items[i]
-        const variantId =
-          typeof item.variantId === 'object'
-            ? item.variantId._id
-            : item.variantId
+        const variantId = typeof item.variantId === 'object' ? item.variantId._id : item.variantId
+        const productName = item.productId?.name || item.name || 'Sản phẩm không xác định'
+
         if (!variantId) {
           console.warn('Variant ID not found for item:', item)
+          skippedItems.push({ name: productName, reason: 'Mã sản phẩm hết hàng hoặc ngừng bán' })
           continue
         }
 
@@ -717,55 +757,50 @@ const OrderDetail = () => {
           const variantInfo = await getVariantById(variantId)
           if (!variantInfo) {
             console.warn('Variant not found for ID:', variantId)
+            skippedItems.push({ name: productName, reason: 'Sản phẩm không tồn tại' })
             continue
           }
 
           const availableQuantity = variantInfo.quantity || 0
-          let quantityToAdd = 1
-          if (availableQuantity <= 0) {
-            quantityToAdd = 0
-            console.log(
-              `Item ${item.productId?.name || item.name} is out of stock, adding with quantity = 0`
-            )
-            await addToCart({
-              variantId: variantId,
-              quantity: quantityToAdd
+          const isActive = variantInfo.status !== 'inactive' && variantInfo.productId?.status !== 'inactive'
+
+          if (availableQuantity <= 0 || !isActive) {
+            console.log(`Item ${productName} is ${availableQuantity <= 0 ? 'out of stock' : 'inactive'}`)
+            skippedItems.push({
+              name: productName,
+              reason: availableQuantity <= 0 ? 'Hết hàng' : 'Ngừng bán'
             })
             continue
           }
 
           const currentCartItem = cart?.cartItems?.find((cartItem) => {
-            const cartVariantId =
-              typeof cartItem.variantId === 'object'
-                ? cartItem.variantId._id
-                : cartItem.variantId
+            const cartVariantId = typeof cartItem.variantId === 'object' ? cartItem.variantId._id : cartItem.variantId
             return cartVariantId === variantId
           })
-
           const currentQuantityInCart = currentCartItem?.quantity || 0
-          if (currentCartItem && currentQuantityInCart >= availableQuantity) {
+
+          if (currentQuantityInCart >= availableQuantity) {
             console.log(
-              `Item ${item.productId?.name || item.name} reached max quantity in cart (${currentQuantityInCart}/${availableQuantity}), skipping`
+              `Item ${productName} reached max quantity in cart (${currentQuantityInCart}/${availableQuantity}), skipping`
             )
+            skippedItems.push({
+              name: productName,
+              reason: `Đã đạt số lượng tối đa trong giỏ (${availableQuantity})`
+            })
             continue
-          } else if (currentCartItem) {
-            const canAdd = availableQuantity - currentQuantityInCart
-            quantityToAdd = Math.min(1, canAdd)
-            console.log(
-              `Item ${item.productId?.name || item.name} already in cart (${currentQuantityInCart}), adding ${quantityToAdd} more`
-            )
-          } else {
-            console.log(
-              `Adding new item ${item.productId?.name || item.name} to cart`
-            )
           }
 
+          const quantityToAdd = Math.min(item.quantity || 1, availableQuantity - currentQuantityInCart)
+          console.log(`Adding item ${productName} to cart with quantity ${quantityToAdd}`)
           await addToCart({
             variantId: variantId,
             quantity: quantityToAdd
           })
+
+          validVariantIds.push(variantId)
         } catch (error) {
-          console.error(`Error adding item ${i + 1} to cart:`, error)
+          console.error(`Error adding item ${productName} to cart:`, error)
+          skippedItems.push({ name: productName, reason: 'Lỗi khi thêm vào giỏ hàng' })
         }
 
         if (i < items.length - 1) {
@@ -773,20 +808,43 @@ const OrderDetail = () => {
         }
       }
 
-      const reorderVariantIds = items
-        .map((item) =>
-          typeof item.variantId === 'object'
-            ? item.variantId._id
-            : item.variantId
-        )
-        .filter((id) => id)
-      dispatch(setReorderVariantIds(reorderVariantIds))
+      dispatch(setReorderVariantIds(validVariantIds))
       await refreshCart({ silent: true })
-      setTimeout(() => {
-        navigate('/cart')
-      }, 300)
+
+      if (skippedItems.length > 0) {
+        const message = skippedItems
+          .map((item) => `Sản phẩm "${item.name}": ${item.reason}`)
+          .join('; ')
+        setNotification({
+          open: true,
+          message,
+          severity: 'warning'
+        })
+      }
+
+      if (validVariantIds.length > 0) {
+        setNotification({
+          open: true,
+          message: 'Đã thêm sản phẩm hợp lệ vào giỏ hàng.',
+          severity: 'success'
+        })
+        setTimeout(() => {
+          navigate('/cart')
+        }, 300)
+      } else {
+        setNotification({
+          open: true,
+          message: 'Sản phẩm ngưng bán hoặc hết hàng.',
+          severity: 'error'
+        })
+      }
     } catch (err) {
       console.error('Lỗi khi mua lại:', err)
+      setNotification({
+        open: true,
+        message: 'Đã xảy ra lỗi khi mua lại đơn hàng.',
+        severity: 'error'
+      })
     } finally {
       setReorderLoading(false)
     }
@@ -806,6 +864,29 @@ const OrderDetail = () => {
         minHeight: '70vh'
       }}
     >
+      {/* Snackbar */}
+      <Snackbar
+        open={notification.open}
+        autoHideDuration={6000}
+        onClose={() => setNotification({ ...notification, open: false })}
+        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+        sx={{ zIndex: 1500, mt: { xs: 8, sm: 10, md: 12 } }}
+      >
+        <Alert
+          onClose={() => setNotification({ ...notification, open: false })}
+          severity={notification.severity}
+          sx={{
+            width: '100%',
+            borderRadius: 2,
+            fontWeight: 600,
+            fontSize: { xs: '0.75rem', sm: '0.875rem' },
+            boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
+          }}
+        >
+          {notification.message}
+        </Alert>
+      </Snackbar>
+
       {/* Breadcrumb */}
       <Box
         sx={{
@@ -818,8 +899,6 @@ const OrderDetail = () => {
           aria-label='breadcrumb'
         >
           <Link
-            component={Link}
-            to='/'
             sx={{
               display: 'flex',
               alignItems: 'center',
@@ -831,14 +910,10 @@ const OrderDetail = () => {
               cursor: 'pointer'
             }}
             onClick={() => navigate('/')}
-          // component={Link}
-          // to='/product'
           >
             Trang chủ
           </Link>
           <Link
-            component={Link}
-            to='/orders'
             sx={{
               display: 'flex',
               alignItems: 'center',
@@ -850,8 +925,6 @@ const OrderDetail = () => {
               cursor: 'pointer'
             }}
             onClick={() => navigate('/orders')}
-          // component={Link}
-          // to='/product'
           >
             Đơn hàng
           </Link>
@@ -1361,28 +1434,6 @@ const OrderDetail = () => {
             </CardContent>
           </Card>
         )}
-
-      {/* Enhanced Snackbar */}
-      <Snackbar
-        open={snackbarOpen}
-        autoHideDuration={4000}
-        onClose={() => setSnackbarOpen(false)}
-        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
-        sx={{ mt: { xs: 8, sm: 10, md: 12 } }}
-      >
-        <Alert
-          onClose={() => setSnackbarOpen(false)}
-          severity='success'
-          sx={{
-            width: '100%',
-            borderRadius: 2,
-            fontWeight: 600,
-            fontSize: { xs: '0.75rem', sm: '0.875rem' }
-          }}
-        >
-          Cảm ơn bạn đã đánh giá!
-        </Alert>
-      </Snackbar>
 
       <ReviewModal
         open={openReviewModal}
