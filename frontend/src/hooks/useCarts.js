@@ -105,21 +105,16 @@ export const useCart = () => {
     try {
       const payload = { variantId, ...data }
       const updated = await updateCartItem(payload)
-      if (Array.isArray(updated?.cartItems)) {
-        const normalizedItems = updated.cartItems.map((item) => ({
-          ...item,
-          variantId: typeof item.variantId === 'object' ? item.variantId : { _id: item.variantId },
-        }))
-        dispatch(setCartItems(normalizedItems))
-        return { success: true, cartItems: normalizedItems }
+
+      // Làm mới giỏ hàng từ server bất kể API trả về gì
+      const result = await fetchCart({ silent: true })
+      if (result.success) {
+        return { success: true, cartItems: result.cartItems }
       } else {
-        const result = await fetchCart({ silent: true })
-        return result.success
-          ? { success: true, cartItems: result.cartItems }
-          : { success: false, message: 'Invalid update response' }
+        throw new Error(result.message || 'Failed to fetch updated cart')
       }
     } catch (error) {
-      console.error('Error updating cart item:', error?.response || error)
+      console.error('Error updating cart item:', error)
       const result = await fetchCart({ silent: true })
       const message = error?.response?.data?.message || 'Failed to update cart item'
       return { success: false, message }
