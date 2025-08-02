@@ -454,8 +454,8 @@ const InventoryTab = () => {
     },
     { id: 'warehouse', label: 'Kho hàng', minWidth: 150, maxWidth: 150 },
 
-    { id: 'variantName', label: 'Tên sản phẩm', minWidth: 200, maxWidth: 200 },
-    { id: 'sku', label: 'Mã biến thể', minWidth: 200, maxWidth: 200 },
+    { id: 'variantName', label: 'Tên sản phẩm', minWidth: 200, maxWidth: 150 },
+    { id: 'sku', label: 'Mã biến thể', minWidth: 200, maxWidth: 150 },
     {
       id: 'quantity',
       label: 'Số lượng tồn',
@@ -493,7 +493,7 @@ const InventoryTab = () => {
     {
       id: 'action',
       label: 'Hành động',
-      minWidth: 150,
+      minWidth: 130,
       align: 'start'
     }
   ]
