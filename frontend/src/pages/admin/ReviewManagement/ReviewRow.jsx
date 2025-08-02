@@ -53,19 +53,20 @@ const ReviewRow = ({
   }
   const [showRestoreIcon, setShowRestoreIcon] = useState(false)
 
+  const destroyValue = filter?.destroy
   useEffect(() => {
-    if (filter.destroy === 'true') {
+    if (destroyValue === 'true') {
+      setShowRestoreIcon(false)
+
       const timer = setTimeout(() => {
-        setShowRestoreIcon(true)
+        setShowRestoreIcon(false)
       }, 1000)
 
-      return () => {
-        clearTimeout(timer)
-      }
+      return () => clearTimeout(timer)
     } else {
       setShowRestoreIcon(true)
     }
-  }, [filter.destroy])
+  }, [destroyValue])
   return (
     <TableRow hover role='checkbox' tabIndex={-1}>
       {columns.map((column) => {
