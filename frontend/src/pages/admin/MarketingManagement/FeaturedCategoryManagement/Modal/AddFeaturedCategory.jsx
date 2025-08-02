@@ -357,7 +357,6 @@ const AddFeaturedCategory = ({
               renderInput={(params) => (
                 <TextField
                   {...params}
-                  label='Chọn danh mục'
                   fullWidth
                   required
                   placeholder='Tìm kiếm danh mục có sản phẩm...'
