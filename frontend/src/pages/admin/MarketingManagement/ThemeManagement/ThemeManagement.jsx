@@ -7,30 +7,18 @@ import {
   Grid,
   Button,
   TextField,
-  Switch,
-  FormControlLabel,
   Divider,
   Alert,
   Snackbar,
-  IconButton,
-  Tooltip,
   Chip,
   Stack,
-  Paper,
-  Accordion,
-  AccordionSummary,
-  AccordionDetails,
   CircularProgress
 } from '@mui/material'
 import {
   Palette,
-  ColorLens,
   Brush,
   Save,
   Refresh,
-  ExpandMore,
-  Visibility,
-  VisibilityOff,
   AutoAwesome,
   Settings
 } from '@mui/icons-material'
@@ -39,71 +27,51 @@ import useTheme from '~/hooks/useTheme'
 import { RouteGuard } from '~/components/PermissionGuard'
 import usePermissions from '~/hooks/usePermissions'
 
-// Predefined color schemes
+// Predefined color schemes (thêm màu mới)
 const predefinedThemes = {
   modernBlue: {
-    name: 'Modern Blue',
+    name: 'Modern Blue (Mặc định)',
     primary: '#1A3C7B',
     secondary: '#2360cf',
-    accent: '#093d9c',
-    success: '#059669',
-    warning: '#d97706',
-    error: '#dc2626',
-    info: '#0891b2'
+    accent: '#093d9c'
   },
-  elegantPurple: {
-    name: 'Elegant Purple',
-    primary: '#7c3aed',
-    secondary: '#8b5cf6',
-    accent: '#5b21b6',
-    success: '#059669',
-    warning: '#d97706',
-    error: '#dc2626',
-    info: '#0891b2'
+  elegantBeige: {
+    name: 'Elegant Beige',
+    primary: '#C8B6A6', // Beige nhạt
+    secondary: '#EDE0D4', // Màu kem
+    accent: '#A68A64' // Nâu nhạt
   },
-  warmOrange: {
-    name: 'Warm Orange',
-    primary: '#f97316',
-    secondary: '#fb923c',
-    accent: '#ea580c',
-    success: '#059669',
-    warning: '#d97706',
-    error: '#dc2626',
-    info: '#0891b2'
+  blushPink: {
+    name: 'Blush Pink',
+    primary: '#FFC1CC', // Hồng pastel
+    secondary: '#FFDDE1', // Hồng nhạt
+    accent: '#FF8FA3' // Hồng đậm hơn
   },
-  professionalGreen: {
-    name: 'Professional Green',
-    primary: '#059669',
-    secondary: '#10b981',
-    accent: '#047857',
-    success: '#059669',
-    warning: '#d97706',
-    error: '#dc2626',
-    info: '#0891b2'
+  oliveGreen: {
+    name: 'Olive Green',
+    primary: '#6B705C', // Xanh olive tối
+    secondary: '#A5A58D', // Olive nhạt
+    accent: '#B7B7A4' // Be xám
   },
-  sophisticatedGray: {
-    name: 'Sophisticated Gray',
-    primary: '#374151',
-    secondary: '#6b7280',
-    accent: '#1f2937',
-    success: '#059669',
-    warning: '#d97706',
-    error: '#dc2626',
-    info: '#0891b2'
+  warmSand: {
+    name: 'Warm Sand',
+    primary: '#E6B17E', // Màu cát ấm
+    secondary: '#F5DEB3', // Cát nhạt
+    accent: '#D4A373' // Cam đất
+  },
+  charcoalGray: {
+    name: 'Charcoal Gray',
+    primary: '#333333', // Xám than
+    secondary: '#555555', // Xám đậm
+    accent: '#777777' // Xám trung tính
   }
 }
 
-// Bổ sung map việt hóa cho các nhãn màu
+// Map tiếng Việt cho label màu
 const COLOR_LABELS = {
   primary: 'Màu chính',
   secondary: 'Màu phụ',
-  accent: 'Màu nhấn',
-  success: 'Thành công',
-  warning: 'Cảnh báo',
-  error: 'Lỗi',
-  info: 'Thông tin',
-  background: 'Nền',
-  text: 'Chữ'
+  accent: 'Màu nhấn'
 }
 
 // Styled components
@@ -137,8 +105,6 @@ const ThemeManagement = () => {
   const { currentTheme, updateTheme, resetTheme, isLoading } = useTheme()
   const [selectedPreset, setSelectedPreset] = useState(null)
   const [pendingTheme, setPendingTheme] = useState(currentTheme)
-  const [previewMode, setPreviewMode] = useState(false)
-  const [showAdvanced, setShowAdvanced] = useState(false)
   const [saving, setSaving] = useState(false)
   const [snackbar, setSnackbar] = useState({
     open: false,
@@ -147,15 +113,10 @@ const ThemeManagement = () => {
   })
   const { hasPermission } = usePermissions()
 
-  // Sync selected preset and pendingTheme with current theme on load or when theme changes
-  const firstLoadDone = React.useRef(false)
-
   useEffect(() => {
-    if (isLoading) return // Đang load thì bỏ qua
-
-    // Đồng bộ preset
+    if (isLoading) return
     const matchingPresetKey = Object.entries(predefinedThemes).find(
-      ([key, preset]) =>
+      ([, preset]) =>
         preset.primary === currentTheme.primary &&
         preset.secondary === currentTheme.secondary &&
         preset.accent === currentTheme.accent
@@ -183,9 +144,7 @@ const ThemeManagement = () => {
 
   const handleColorChange = (colorKey, value) => {
     setPendingTheme((prev) => ({ ...prev, [colorKey]: value }))
-    setSelectedPreset(null) // Deselect preset on custom change
-
-    // Show notification for custom color changes
+    setSelectedPreset(null)
     if (!snackbar.open) {
       setSnackbar({
         open: true,
@@ -204,7 +163,7 @@ const ThemeManagement = () => {
         message: 'Chủ đề đã được lưu thành công!',
         severity: 'success'
       })
-    } catch (error) {
+    } catch {
       setSnackbar({
         open: true,
         message: 'Không thể lưu chủ đề. Vui lòng thử lại!',
@@ -224,7 +183,7 @@ const ThemeManagement = () => {
         message: 'Theme đã được reset về mặc định!',
         severity: 'info'
       })
-    } catch (error) {
+    } catch {
       setSnackbar({
         open: true,
         message: 'Không thể reset theme. Vui lòng thử lại!',
@@ -235,7 +194,6 @@ const ThemeManagement = () => {
     }
   }
 
-  // Show loading state while theme is being loaded
   if (isLoading) {
     return (
       <RouteGuard requiredPermissions={['admin:access', 'theme:use']}>
@@ -268,7 +226,7 @@ const ThemeManagement = () => {
 
         <Grid container spacing={3}>
           {/* Predefined Themes */}
-          <Grid item xs={12} md={6}>
+          <Grid item xs={12}>
             <Card>
               <CardContent>
                 <Typography
@@ -280,7 +238,7 @@ const ThemeManagement = () => {
                 </Typography>
                 <Grid container spacing={2}>
                   {Object.entries(predefinedThemes).map(([key, theme]) => (
-                    <Grid item xs={12} sm={6} key={key}>
+                    <Grid item xs={12} sm={6} md={4} key={key}>
                       <ThemeCard
                         selected={selectedPreset === key}
                         onClick={() => handlePresetSelect(key)}
@@ -318,8 +276,8 @@ const ThemeManagement = () => {
             </Card>
           </Grid>
 
-          {/* Custom Color Editor */}
-          <Grid item xs={12} md={6}>
+          {/* Basic Colors */}
+          <Grid item xs={12}>
             <Card>
               <CardContent>
                 <Typography
@@ -329,53 +287,7 @@ const ThemeManagement = () => {
                   <Brush sx={{ mr: 1 }} />
                   Tùy chỉnh màu sắc
                 </Typography>
-
-                <Accordion
-                  expanded={showAdvanced}
-                  onChange={() => setShowAdvanced(!showAdvanced)}
-                >
-                  <AccordionSummary expandIcon={<ExpandMore />}>
-                    <Typography variant='subtitle2'>
-                      Màu sắc nâng cao
-                    </Typography>
-                  </AccordionSummary>
-                  <AccordionDetails>
-                    <Grid container spacing={2}>
-                      {Object.entries(pendingTheme).map(([key, value]) => (
-                        <Grid item xs={12} sm={6} key={key}>
-                          <Box
-                            sx={{
-                              display: 'flex',
-                              alignItems: 'center',
-                              gap: 1
-                            }}
-                          >
-                            <ColorPreview color={value} />
-                            <TextField
-                              label={
-                                COLOR_LABELS[key] ||
-                                key.charAt(0).toUpperCase() + key.slice(1)
-                              }
-                              value={value}
-                              onChange={(e) =>
-                                handleColorChange(key, e.target.value)
-                              }
-                              size='small'
-                              fullWidth
-                            />
-                          </Box>
-                        </Grid>
-                      ))}
-                    </Grid>
-                  </AccordionDetails>
-                </Accordion>
-
                 <Divider sx={{ my: 2 }} />
-
-                {/* Basic Colors */}
-                <Typography variant='subtitle2' sx={{ mb: 2 }}>
-                  Màu sắc cơ bản
-                </Typography>
                 <Grid container spacing={2}>
                   {['primary', 'secondary', 'accent'].map((colorKey) => (
                     <Grid item xs={12} sm={4} key={colorKey}>
@@ -384,10 +296,7 @@ const ThemeManagement = () => {
                       >
                         <ColorPreview color={pendingTheme[colorKey]} />
                         <TextField
-                          label={
-                            COLOR_LABELS[colorKey] ||
-                            colorKey.charAt(0).toUpperCase() + colorKey.slice(1)
-                          }
+                          label={COLOR_LABELS[colorKey]}
                           value={pendingTheme[colorKey]}
                           onChange={(e) =>
                             handleColorChange(colorKey, e.target.value)
@@ -403,7 +312,7 @@ const ThemeManagement = () => {
             </Card>
           </Grid>
 
-          {/* Action Buttons */}
+          {/* Action Buttons (dời xuống cuối) */}
           {hasPermission('theme:update') && (
             <Grid item xs={12}>
               <Card>
