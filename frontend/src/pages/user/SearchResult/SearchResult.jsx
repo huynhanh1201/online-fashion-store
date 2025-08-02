@@ -184,7 +184,7 @@ export default function SearchResults() {
             category: p.category || 'Không xác định',
             brand: p.brand || 'Không xác định',
             quantity: p.quantity || 0,
-            minSalePriceVariant: p.minSalePriceVariant || nul
+            minSalePriceVariant: p.minSalePriceVariant || null
           }))
         console.log('Filtered products:', filtered)
         // Sắp xếp ở frontend
