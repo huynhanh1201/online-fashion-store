@@ -220,7 +220,7 @@ const VariantsTab = () => {
       maxWidth: 180,
       align: 'right',
       pr: 4,
-      format: (value) => `${value.toLocaleString('vi-VN')}₫`
+      format: (Me) => `${(Me ?? 0).toLocaleString('vi-VN')}₫`
     },
     {
       id: 'status',
