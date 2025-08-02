@@ -262,7 +262,10 @@ const ViewProductModal = ({ open, onClose, product }) => {
                         </TableCell>
                       </TableRow>
                       <TableRow sx={{ height: 50 }}>
-                        <TableCell variant='head' sx={{ fontWeight: 500 }}>
+                        <TableCell
+                          variant='head'
+                          sx={{ fontWeight: 500, fontSize: '16px' }}
+                        >
                           Giá
                         </TableCell>
                         <TableCell sx={{ fontSize: '16px' }}>
@@ -270,7 +273,10 @@ const ViewProductModal = ({ open, onClose, product }) => {
                         </TableCell>
                       </TableRow>
                       <TableRow sx={{ height: 50 }}>
-                        <TableCell variant='head' sx={{ fontWeight: 500 }}>
+                        <TableCell
+                          variant='head'
+                          sx={{ fontWeight: 500, fontSize: '16px' }}
+                        >
                           Danh mục
                         </TableCell>
                         <TableCell sx={{ fontSize: '16px' }}>

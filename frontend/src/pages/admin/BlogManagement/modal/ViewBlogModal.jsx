@@ -140,18 +140,6 @@ const ViewBlogModal = ({ open, onClose, blog, isMobile }) => {
           <Table size='small'>
             <TableBody>
               <TableRow>
-                <TableCell sx={{ width: 400, fontWeight: 700 }}>
-                  Danh mục
-                </TableCell>
-                <TableCell>{blog?.category || 'Chưa phân loại'}</TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell sx={{ width: 400, fontWeight: 700 }}>
-                  Thương hiệu
-                </TableCell>
-                <TableCell>{blog?.brand || 'Không có'}</TableCell>
-              </TableRow>
-              <TableRow>
                 <TableCell sx={{ width: 400, fontWeight: 700 }}>Slug</TableCell>
                 <TableCell>{blog?.slug || 'Không có'}</TableCell>
               </TableRow>

@@ -126,7 +126,7 @@ const RelatedProductSection = ({ categoryId, currentProductId }) => {
   const [categoryPage, setCategoryPage] = useState(1)
   const [fallbackPage, setFallbackPage] = useState(1)
   const [loading, setLoading] = useState(false)
-  const [hasMore, setHasMore] = useState(true)
+  const [hasMore, setHasMore] = useState(false)
 
   const fetchMoreProducts = async (count) => {
     setLoading(true)
@@ -195,9 +195,11 @@ const RelatedProductSection = ({ categoryId, currentProductId }) => {
       console.log('relatedProducts.length', relatedProducts.length)
       console.log('combined.length', combined.length)
       console.log('newAddedCount', newAddedCount)
-
-      // ✅ cập nhật hasMore dựa trên số lượng mới được thêm
-      setHasMore(newAddedCount > 0)
+      if (newAddedCount < count) {
+        setHasMore(false)
+      } else {
+        setHasMore(true)
+      }
     } catch (err) {
       console.error('Lỗi khi tải sản phẩm gợi ý:', err)
     } finally {
