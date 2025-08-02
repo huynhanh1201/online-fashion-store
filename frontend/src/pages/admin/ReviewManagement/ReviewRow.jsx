@@ -54,7 +54,7 @@ const ReviewRow = ({
   const [showRestoreIcon, setShowRestoreIcon] = useState(false)
 
   useEffect(() => {
-    if (filters.destroy === 'true') {
+    if (filter.destroy === 'true') {
       const timer = setTimeout(() => {
         setShowRestoreIcon(true)
       }, 1000)
@@ -65,7 +65,7 @@ const ReviewRow = ({
     } else {
       setShowRestoreIcon(true)
     }
-  }, [filters.destroy])
+  }, [filter.destroy])
   return (
     <TableRow hover role='checkbox' tabIndex={-1}>
       {columns.map((column) => {
