@@ -16,7 +16,7 @@ import {
   Tooltip,
   useTheme
 } from '@mui/material'
-import { 
+import {
   Delete as DeleteIcon,
   CloudUpload as CloudUploadIcon,
   Close as CloseIcon
@@ -50,7 +50,12 @@ const uploadToCloudinary = async (file) => {
   return data.secure_url
 }
 
-const AddServiceHighlight = ({ open, onClose, onSuccess, editIndex = null }) => {
+const AddServiceHighlight = ({
+  open,
+  onClose,
+  onSuccess,
+  editIndex = null
+}) => {
   const theme = useTheme()
   const [form, setForm] = useState({
     title: '',
@@ -64,7 +69,7 @@ const AddServiceHighlight = ({ open, onClose, onSuccess, editIndex = null }) => 
   const [validationErrors, setValidationErrors] = useState([])
   const [uploadingImage, setUploadingImage] = useState(false)
   const [imagePreview, setImagePreview] = useState('')
-  
+
   const imageInputRef = useRef(null)
 
   useEffect(() => {
@@ -129,7 +134,7 @@ const AddServiceHighlight = ({ open, onClose, onSuccess, editIndex = null }) => 
 
       // Upload to Cloudinary
       const imageUrl = await uploadToCloudinary(file)
-      
+
       // Update form
       setForm((prev) => ({
         ...prev,
@@ -186,14 +191,15 @@ const AddServiceHighlight = ({ open, onClose, onSuccess, editIndex = null }) => 
         result = await addServiceHighlight(form)
       }
 
-      setSuccess(editIndex !== null ? 'Cập nhật thành công!' : 'Thêm thành công!')
-      
+      setSuccess(
+        editIndex !== null ? 'Cập nhật thành công!' : 'Thêm thành công!'
+      )
+
       // Call success callback after a short delay
       setTimeout(() => {
         onSuccess(result)
         handleClose()
       }, 1000)
-
     } catch (error) {
       setError(error.message)
     } finally {
@@ -211,13 +217,15 @@ const AddServiceHighlight = ({ open, onClose, onSuccess, editIndex = null }) => 
   }
 
   const isEditMode = editIndex !== null
-  const title = isEditMode ? 'Chỉnh sửa dịch vụ nổi bật' : 'Thêm dịch vụ nổi bật'
+  const title = isEditMode
+    ? 'Chỉnh sửa dịch vụ nổi bật'
+    : 'Thêm dịch vụ nổi bật'
 
   return (
-    <Dialog 
-      open={open} 
+    <Dialog
+      open={open}
       onClose={handleClose}
-      maxWidth="md"
+      maxWidth='md'
       fullWidth
       PaperProps={{
         sx: {
@@ -226,16 +234,18 @@ const AddServiceHighlight = ({ open, onClose, onSuccess, editIndex = null }) => 
         }
       }}
     >
-      <DialogTitle sx={{ 
-        pb: 1,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between'
-      }}>
-        <Typography variant="h5" sx={{ fontWeight: 700, color: '#1e293b' }}>
+      <DialogTitle
+        sx={{
+          pb: 1,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between'
+        }}
+      >
+        <Typography variant='h5' sx={{ fontWeight: 700, color: '#1e293b' }}>
           {title}
         </Typography>
-        <IconButton onClick={handleClose} size="small">
+        <IconButton onClick={handleClose} size='small'>
           <CloseIcon />
         </IconButton>
       </DialogTitle>
@@ -249,28 +259,28 @@ const AddServiceHighlight = ({ open, onClose, onSuccess, editIndex = null }) => 
           <Stack spacing={3}>
             {/* Error Alert */}
             {error && (
-              <Alert severity="error" onClose={() => setError('')}>
+              <Alert severity='error' onClose={() => setError('')}>
                 {error}
               </Alert>
             )}
 
             {/* Success Alert */}
             {success && (
-              <Alert severity="success" onClose={() => setSuccess('')}>
+              <Alert severity='success' onClose={() => setSuccess('')}>
                 {success}
               </Alert>
             )}
 
             {/* Validation Errors */}
             {validationErrors.length > 0 && (
-              <Alert severity="error">
-                <Typography variant="body2" sx={{ fontWeight: 600, mb: 1 }}>
+              <Alert severity='error'>
+                <Typography variant='body2' sx={{ fontWeight: 600, mb: 1 }}>
                   Vui lòng sửa các lỗi sau:
                 </Typography>
                 <ul style={{ margin: 0, paddingLeft: 20 }}>
                   {validationErrors.map((error, index) => (
                     <li key={index}>
-                      <Typography variant="body2">{error}</Typography>
+                      <Typography variant='body2'>{error}</Typography>
                     </li>
                   ))}
                 </ul>
@@ -279,12 +289,11 @@ const AddServiceHighlight = ({ open, onClose, onSuccess, editIndex = null }) => 
 
             {/* Form Fields */}
             <TextField
-              label="Tiêu đề dịch vụ"
               value={form.title}
               onChange={(e) => handleChange('title', e.target.value)}
               fullWidth
               required
-              placeholder="Nhập tiêu đề dịch vụ (ví dụ: Miễn phí vận chuyển)"
+              placeholder='Nhập tiêu đề dịch vụ (ví dụ: Miễn phí vận chuyển)'
               sx={{
                 '& .MuiOutlinedInput-root': {
                   borderRadius: 2
@@ -293,12 +302,12 @@ const AddServiceHighlight = ({ open, onClose, onSuccess, editIndex = null }) => 
             />
 
             <TextField
-              label="Mô tả dịch vụ"
+              label='Mô tả dịch vụ'
               value={form.subtitle}
               onChange={(e) => handleChange('subtitle', e.target.value)}
               fullWidth
               required
-              placeholder="Nhập mô tả dịch vụ (ví dụ: Đơn hàng trên 500K)"
+              placeholder='Nhập mô tả dịch vụ (ví dụ: Đơn hàng trên 500K)'
               sx={{
                 '& .MuiOutlinedInput-root': {
                   borderRadius: 2
@@ -308,10 +317,13 @@ const AddServiceHighlight = ({ open, onClose, onSuccess, editIndex = null }) => 
 
             {/* Image Upload Section */}
             <Box>
-              <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 2, color: '#374151' }}>
+              <Typography
+                variant='subtitle1'
+                sx={{ fontWeight: 600, mb: 2, color: '#374151' }}
+              >
                 Icon dịch vụ
               </Typography>
-              
+
               <Card
                 sx={{
                   border: '2px dashed #d1d5db',
@@ -329,8 +341,11 @@ const AddServiceHighlight = ({ open, onClose, onSuccess, editIndex = null }) => 
                   <Box>
                     <Box sx={{ position: 'relative', display: 'inline-block' }}>
                       <img
-                        src={optimizeCloudinaryUrl(imagePreview, { width: 100, height: 100 })}
-                        alt="Preview"
+                        src={optimizeCloudinaryUrl(imagePreview, {
+                          width: 100,
+                          height: 100
+                        })}
+                        alt='Preview'
                         style={{
                           width: 100,
                           height: 100,
@@ -339,7 +354,7 @@ const AddServiceHighlight = ({ open, onClose, onSuccess, editIndex = null }) => 
                           border: '1px solid #e5e7eb'
                         }}
                       />
-                      <Tooltip title="Xóa hình ảnh">
+                      <Tooltip title='Xóa hình ảnh'>
                         <IconButton
                           onClick={handleRemoveImage}
                           sx={{
@@ -352,13 +367,17 @@ const AddServiceHighlight = ({ open, onClose, onSuccess, editIndex = null }) => 
                               backgroundColor: '#dc2626'
                             }
                           }}
-                          size="small"
+                          size='small'
                         >
-                          <DeleteIcon fontSize="small" />
+                          <DeleteIcon fontSize='small' />
                         </IconButton>
                       </Tooltip>
                     </Box>
-                    <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: 'block' }}>
+                    <Typography
+                      variant='caption'
+                      color='text.secondary'
+                      sx={{ mt: 1, display: 'block' }}
+                    >
                       Icon đã được tải lên
                     </Typography>
                   </Box>
@@ -373,11 +392,17 @@ const AddServiceHighlight = ({ open, onClose, onSuccess, editIndex = null }) => 
                     }}
                     onClick={() => imageInputRef.current?.click()}
                   >
-                    <CloudUploadIcon sx={{ fontSize: 48, color: '#9ca3af', mb: 2 }} />
-                    <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                    <CloudUploadIcon
+                      sx={{ fontSize: 48, color: '#9ca3af', mb: 2 }}
+                    />
+                    <Typography
+                      variant='body2'
+                      color='text.secondary'
+                      sx={{ mb: 1 }}
+                    >
                       {uploadingImage ? 'Đang tải lên...' : 'Nhấp để tải icon'}
                     </Typography>
-                    <Typography variant="caption" color="text.secondary">
+                    <Typography variant='caption' color='text.secondary'>
                       JPG, PNG, WebP (tối đa 5MB)
                     </Typography>
                     {uploadingImage && (
@@ -389,8 +414,8 @@ const AddServiceHighlight = ({ open, onClose, onSuccess, editIndex = null }) => 
 
               <input
                 ref={imageInputRef}
-                type="file"
-                accept="image/*"
+                type='file'
+                accept='image/*'
                 onChange={handleImageUpload}
                 style={{ display: 'none' }}
               />
@@ -402,7 +427,7 @@ const AddServiceHighlight = ({ open, onClose, onSuccess, editIndex = null }) => 
       <DialogActions sx={{ p: 3, pt: 1 }}>
         <Button
           onClick={handleClose}
-          variant="outlined"
+          variant='outlined'
           sx={{
             borderRadius: 2,
             textTransform: 'none',
@@ -413,7 +438,7 @@ const AddServiceHighlight = ({ open, onClose, onSuccess, editIndex = null }) => 
         </Button>
         <Button
           onClick={handleSave}
-          variant="contained"
+          variant='contained'
           disabled={loading || uploadingImage}
           startIcon={loading ? <CircularProgress size={16} /> : null}
           sx={{
@@ -426,11 +451,11 @@ const AddServiceHighlight = ({ open, onClose, onSuccess, editIndex = null }) => 
             }
           }}
         >
-          {loading ? 'Đang lưu...' : (isEditMode ? 'Cập nhật' : 'Thêm mới')}
+          {loading ? 'Đang lưu...' : isEditMode ? 'Cập nhật' : 'Thêm mới'}
         </Button>
       </DialogActions>
     </Dialog>
   )
 }
 
-export default AddServiceHighlight 
+export default AddServiceHighlight
