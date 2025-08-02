@@ -16,7 +16,6 @@ import {
   CardMedia,
   Tooltip,
   useTheme,
-  alpha,
   Autocomplete
 } from '@mui/material'
 import {
@@ -188,6 +187,28 @@ const AddFeaturedCategory = ({
     setValidationErrors([])
   }
 
+  // Validation function
+  const validateForm = () => {
+    const errors = []
+
+    if (!form.name.trim()) {
+      errors.push('Tên danh mục là bắt buộc')
+    }
+
+    if (!form.imageUrl) {
+      errors.push('Hình ảnh danh mục là bắt buộc')
+    }
+
+    if (!form.link.trim()) {
+      errors.push('Link danh mục là bắt buộc')
+    } else if (!form.link.startsWith('category/')) {
+      errors.push('Link phải bắt đầu bằng "category/"')
+    }
+
+    setValidationErrors(errors)
+    return errors
+  }
+
   const handleSave = async () => {
     setLoading(true)
     setError('')
@@ -198,38 +219,38 @@ const AddFeaturedCategory = ({
       const errors = validateForm()
       if (errors.length > 0) {
         setError(errors.join(', '))
-        setLoading(false) // Cho phép nhập lại nếu lỗi
+        setLoading(false)
         return
       }
 
       let result
-      if (initialData && bannerIndex !== undefined) {
-        // Update existing banner
-        result = await updateBanner(bannerIndex, form)
+      if (editIndex !== null) {
+        // Update existing featured category
+        result = await updateFeaturedCategory(editIndex, form)
       } else {
-        // Add new banner
-        result = await addBanner(form)
+        // Add new featured category
+        result = await addFeaturedCategory(form)
       }
 
       if (result) {
         setSuccess(
-          initialData
-            ? 'Cập nhật banner thành công!'
-            : 'Thêm banner thành công!'
+          editIndex !== null
+            ? 'Cập nhật danh mục nổi bật thành công!'
+            : 'Thêm danh mục nổi bật thành công!'
         )
         if (onSuccess) onSuccess(result)
 
-        // Đóng modal sau khi lưu
+        // Close modal after saving
         setTimeout(() => {
-          setLoading(false) // Enable lại khi modal đóng
+          setLoading(false)
           onClose()
         }, 1500)
       } else {
         setLoading(false)
       }
     } catch (error) {
-      setError(error.message)
-      setLoading(false) // Cho phép nhập lại khi lỗi
+      setError(error.message || 'Đã xảy ra lỗi khi lưu danh mục')
+      setLoading(false)
     }
   }
 

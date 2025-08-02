@@ -678,7 +678,7 @@ const HeaderManagement = () => {
                       <TableCell
                         sx={{ fontWeight: 700, color: '#334155', py: 2 }}
                       >
-                        URL
+                        Đường dẫn
                       </TableCell>
                       <TableCell
                         sx={{ fontWeight: 700, color: '#334155', py: 2 }}
