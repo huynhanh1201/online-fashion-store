@@ -133,7 +133,7 @@ const BlogHome = () => {
           {!loading && mainArticles.length > 0 && (
             <Box
               sx={{
-                mb: { xs: 4, sm: 6, md: 8 }
+                mb: { xs: 4, sm: 5, md: 6 }
               }}
             >
               {/* Grid container */}
@@ -356,7 +356,7 @@ const BlogHome = () => {
                 display: 'flex',
                 justifyContent: 'center',
                 alignItems: 'center',
-                mb: { xs: 4, sm: 5, md: 6 }
+                mb: { xs: 2, sm: 3, md: 4 }
               }}
             >
               <Box
