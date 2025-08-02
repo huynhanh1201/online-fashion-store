@@ -179,7 +179,7 @@ const ProductInfoSection = ({
           {coupons.slice(0, 3).map((coupon) => (
             <VoucherChip
               key={coupon.code}
-              label={`VOUCHER ${coupon.type === 'percent' ? `${coupon.amount}%` : `${coupon.amount.toLocaleString('vi-VN')}₫`}`}
+              label={`MÃ GIẢM ${coupon.type === 'percent' ? `${coupon.amount}%` : `${coupon.amount.toLocaleString('vi-VN')}₫`}`}
               onClick={() => setOpenVoucherDrawer(true)}
               sx={{ mr: 0.5, mb: 0.5 }}
             />

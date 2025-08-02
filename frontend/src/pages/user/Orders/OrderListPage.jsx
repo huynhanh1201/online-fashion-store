@@ -836,7 +836,7 @@ const OrderListPage = () => {
           console.log(`Adding item ${item.name} to cart with quantity ${quantityToAdd}`)
           await addToCart({
             variantId: variantId,
-            quantity: quantityToAdd,
+            quantity: 1,
           })
 
           validVariantIds.push(variantId)

@@ -50,7 +50,7 @@ const VoucherDrawer = ({
             <VoucherCard key={coupon.code}>
               <Box sx={{ flex: 1 }}>
                 <Typography variant='subtitle2' color='text.secondary'>
-                  VOUCHER
+                  MÃ GIẢM
                 </Typography>
                 <Typography
                   variant='h6'

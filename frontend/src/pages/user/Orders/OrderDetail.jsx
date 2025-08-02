@@ -790,11 +790,9 @@ const OrderDetail = () => {
             continue
           }
 
-          const quantityToAdd = Math.min(item.quantity || 1, availableQuantity - currentQuantityInCart)
-          console.log(`Adding item ${productName} to cart with quantity ${quantityToAdd}`)
           await addToCart({
             variantId: variantId,
-            quantity: quantityToAdd
+            quantity: 1
           })
 
           validVariantIds.push(variantId)
