@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from 'react'
+import React, { useEffect, useState } from 'react'
 import {
   TableCell,
   TableRow,
@@ -15,7 +15,6 @@ import DeleteForeverIcon from '@mui/icons-material/DeleteForever'
 import ImageNotSupportedIcon from '@mui/icons-material/ImageNotSupported'
 import RestartAltIcon from '@mui/icons-material/RestartAlt'
 import { useNavigate } from 'react-router-dom'
-import useCategories from '~/hooks/admin/useCategories'
 
 const styles = {
   groupIcon: {
@@ -50,12 +49,21 @@ export default function CategoryRow({
   isParentCategory
 }) {
   const navigate = useNavigate()
-  const { categories, fetchCategories } = useCategories()
+  const [showRestoreIcon, setShowRestoreIcon] = useState(false)
 
   useEffect(() => {
-    fetchCategories(1, 100000, { destroy: 'false' })
-  }, [])
+    if (filters.destroy === 'true') {
+      const timer = setTimeout(() => {
+        setShowRestoreIcon(true)
+      }, 1000)
 
+      return () => {
+        clearTimeout(timer)
+      }
+    } else {
+      setShowRestoreIcon(true)
+    }
+  }, [filters.destroy])
   return (
     <TableRow hover role='checkbox' tabIndex={-1}>
       {columns.map((column) => {
@@ -162,7 +170,8 @@ export default function CategoryRow({
                       pl: 0,
                       pr: !isParentCategory(category._id) ? 5 : 0,
                       position: 'relative',
-                      height: 'auto'
+                      height: '19px',
+                      mt: '19px'
                     }}
                   >
                     {category[column.id] || 'Không có tên'}
@@ -172,7 +181,7 @@ export default function CategoryRow({
                         component='span'
                         sx={{
                           position: 'absolute',
-                          top: -4,
+                          top: -5,
                           right: 7,
                           color: '#f00',
                           fontSize: '10px',
@@ -277,7 +286,7 @@ export default function CategoryRow({
                   </Tooltip>
                 )}
 
-                {filters.destroy === 'true' ? (
+                {showRestoreIcon === false ? (
                   permissions.canRestore && (
                     <Tooltip title='Khôi phục'>
                       <IconButton

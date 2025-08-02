@@ -88,7 +88,6 @@ export default function FilterPartner({ onFilter, loading }) {
           { label: 'Đã xóa', value: 'true' }
         ]}
       />
-      <FilterSelect value={sort} onChange={setSort} />
       <FilterSelect
         label='Kiểu đối tác'
         value={type}
@@ -100,6 +99,7 @@ export default function FilterPartner({ onFilter, loading }) {
           { label: 'Ncc & Khách hàng', value: 'both' }
         ]}
       />
+      <FilterSelect value={sort} onChange={setSort} />
 
       <FilterByTime
         label='Lọc thời gian tạo'

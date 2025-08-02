@@ -61,22 +61,30 @@ function AddressDialog({
 
   const validateAddress = (value) => {
     if (!value) return 'Địa chỉ là bắt buộc'
-    if (value.length < 5) return 'Địa chỉ phải có ít nhất 5 ký tự'
+    if (value.length < 1) return 'Địa chỉ phải có ít nhất 1 ký tự'
     if (value.length > 200) return 'Địa chỉ không được quá 200 ký tự'
     return ''
   }
 
+  // const validateLocation = (value, fieldName) => {
+  //   if (!value) return `${fieldName} là bắt buộc`
+  //   if (value.length < 2) return `${fieldName} phải có ít nhất 2 ký tự`
+  //   if (value.length > 100) return `${fieldName} không được quá 100 ký tự`
+  //   return ''
+  // }
+  //
+  // const validateLocationId = (value, fieldName) => {
+  //   if (!value) return `${fieldName} ID là bắt buộc`
+  //   if (value.length < 2) return `${fieldName} ID phải có ít nhất 2 ký tự`
+  //   if (value.length > 100) return `${fieldName} ID không được quá 100 ký tự`
+  //   return ''
+  // }
   const validateLocation = (value, fieldName) => {
     if (!value) return `${fieldName} là bắt buộc`
-    if (value.length < 2) return `${fieldName} phải có ít nhất 2 ký tự`
-    if (value.length > 100) return `${fieldName} không được quá 100 ký tự`
     return ''
   }
-
   const validateLocationId = (value, fieldName) => {
     if (!value) return `${fieldName} ID là bắt buộc`
-    if (value.length < 2) return `${fieldName} ID phải có ít nhất 2 ký tự`
-    if (value.length > 100) return `${fieldName} ID không được quá 100 ký tự`
     return ''
   }
 
@@ -424,6 +432,7 @@ function AddressDialog({
             onClick={onSave}
             variant='contained'
             sx={{ textTransform: 'none' }}
+            disabled={getCompletionPercentage() !== 100}
           >
             Lưu
           </Button>

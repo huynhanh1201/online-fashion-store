@@ -179,8 +179,8 @@ const VariantsTab = () => {
       width: 50,
       align: 'center'
     },
-    { id: 'sku', label: 'Mã biến thể', minWidth: 100 },
-    { id: 'name', label: 'Tên biến thể', minWidth: 230 },
+    { id: 'sku', label: 'Mã biến thể', minWidth: 100, maxWidth: 130 },
+    { id: 'name', label: 'Tên biến thể', minWidth: 200, maxWidth: 200 },
     { id: 'color', label: 'Màu sắc', minWidth: 120 },
     { id: 'size.name', label: 'Kích thước', minWidth: 120 },
     {
@@ -526,7 +526,7 @@ const VariantsTab = () => {
                                 }))
                           }}
                         >
-                          {content}
+                          {content || '—'}
                         </TableCell>
                       )
                     })}

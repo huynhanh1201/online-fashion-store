@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import {
   TableRow,
   TableCell,
@@ -51,6 +51,21 @@ const ReviewRow = ({
       background: '#fff'
     }
   }
+  const [showRestoreIcon, setShowRestoreIcon] = useState(false)
+
+  useEffect(() => {
+    if (filters.destroy === 'true') {
+      const timer = setTimeout(() => {
+        setShowRestoreIcon(true)
+      }, 1000)
+
+      return () => {
+        clearTimeout(timer)
+      }
+    } else {
+      setShowRestoreIcon(true)
+    }
+  }, [filters.destroy])
   return (
     <TableRow hover role='checkbox' tabIndex={-1}>
       {columns.map((column) => {
@@ -121,7 +136,7 @@ const ReviewRow = ({
                     </IconButton>
                   </Tooltip>
                 )}
-                {filter.destroy === 'true'
+                {showRestoreIcon === false
                   ? permissions.canRestore && (
                       <Tooltip title='Khôi phục'>
                         <IconButton

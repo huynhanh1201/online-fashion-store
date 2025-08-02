@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { Stack, IconButton, TableCell, TableRow } from '@mui/material'
 import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye'
 import BorderColorIcon from '@mui/icons-material/BorderColor'
@@ -47,6 +47,22 @@ export default function SizeRow({
   permissions = {},
   filters
 }) {
+  const [showRestoreIcon, setShowRestoreIcon] = useState(false)
+
+  useEffect(() => {
+    if (filters.destroy === 'true') {
+      const timer = setTimeout(() => {
+        setShowRestoreIcon(true)
+      }, 1000)
+
+      return () => {
+        clearTimeout(timer)
+      }
+    } else {
+      setShowRestoreIcon(true)
+    }
+  }, [filters.destroy])
+
   return (
     <TableRow hover>
       {columns.map(({ id, align }) => {
@@ -80,7 +96,7 @@ export default function SizeRow({
                   </IconButton>
                 </Tooltip>
               )}
-              {filters.destroy === 'true' ? (
+              {showRestoreIcon === false ? (
                 permissions.canRestore && (
                   <Tooltip title='Khôi phục'>
                     <IconButton
