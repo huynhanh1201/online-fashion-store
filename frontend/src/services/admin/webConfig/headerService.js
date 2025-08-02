@@ -7,17 +7,17 @@ export const getHeaderConfig = async () => {
     const response = await AuthorizedAxiosInstance.get(
       `${API_ROOT}/v1/website-configs`
     )
-    
+
     // API trả về cấu trúc { data: [...], meta: {...} }
     const websiteConfigs = response.data.data || response.data
-    
+
     const header = websiteConfigs.find((item) => item.key === 'header')
     return header || null
   } catch (error) {
     console.error('Lỗi khi lấy cấu hình header:', error)
     throw new Error(
-      error.response?.data?.message || 
-      'Không thể tải cấu hình header. Vui lòng thử lại.'
+      error.response?.data?.message ||
+        'Không thể tải cấu hình header. Vui lòng thử lại.'
     )
   }
 }
@@ -26,7 +26,7 @@ export const updateHeaderConfig = async (content) => {
   try {
     // Trước tiên lấy header config hiện tại để lấy ID
     const currentHeader = await getHeaderConfig()
-    
+
     if (!currentHeader?._id) {
       throw new Error('Không tìm thấy cấu hình header để cập nhật')
     }
@@ -38,7 +38,7 @@ export const updateHeaderConfig = async (content) => {
       content,
       status: 'active'
     }
-    
+
     const response = await AuthorizedAxiosInstance.patch(
       `${API_ROOT}/v1/website-configs/${currentHeader._id}`,
       payload
@@ -47,9 +47,9 @@ export const updateHeaderConfig = async (content) => {
   } catch (error) {
     console.error('Lỗi khi cập nhật cấu hình header:', error)
     throw new Error(
-      error.response?.data?.message || 
-      error.message ||
-      'Không thể cập nhật cấu hình header. Vui lòng thử lại.'
+      error.response?.data?.message ||
+        error.message ||
+        'Không thể cập nhật cấu hình header. Vui lòng thử lại.'
     )
   }
 }
@@ -63,7 +63,7 @@ export const createHeaderConfig = async (content) => {
       content,
       status: 'active'
     }
-    
+
     const response = await AuthorizedAxiosInstance.post(
       `${API_ROOT}/v1/website-configs`,
       payload
@@ -72,9 +72,9 @@ export const createHeaderConfig = async (content) => {
   } catch (error) {
     console.error('Lỗi khi tạo cấu hình header:', error)
     throw new Error(
-      error.response?.data?.message || 
-      error.message ||
-      'Không thể tạo cấu hình header. Vui lòng thử lại.'
+      error.response?.data?.message ||
+        error.message ||
+        'Không thể tạo cấu hình header. Vui lòng thử lại.'
     )
   }
 }
@@ -83,7 +83,7 @@ export const createHeaderConfig = async (content) => {
 export const saveHeaderConfig = async (content) => {
   try {
     const existingHeader = await getHeaderConfig()
-    
+
     if (existingHeader) {
       return await updateHeaderConfig(content)
     } else {
@@ -101,15 +101,15 @@ export const getMenuConfig = async () => {
     const response = await AuthorizedAxiosInstance.get(
       `${API_ROOT}/v1/website-configs`
     )
-    
+
     const websiteConfigs = response.data.data || response.data
     const menu = websiteConfigs.find((item) => item.key === 'menu')
     return menu || null
   } catch (error) {
     console.error('Lỗi khi lấy cấu hình menu:', error)
     throw new Error(
-      error.response?.data?.message || 
-      'Không thể tải cấu hình menu. Vui lòng thử lại.'
+      error.response?.data?.message ||
+        'Không thể tải cấu hình menu. Vui lòng thử lại.'
     )
   }
 }
@@ -118,7 +118,7 @@ export const updateMenuConfig = async (content) => {
   try {
     // Trước tiên lấy menu config hiện tại để lấy ID
     const currentMenu = await getMenuConfig()
-    
+
     if (!currentMenu?._id) {
       throw new Error('Không tìm thấy cấu hình menu để cập nhật')
     }
@@ -130,7 +130,7 @@ export const updateMenuConfig = async (content) => {
       content,
       status: 'active'
     }
-    
+
     const response = await AuthorizedAxiosInstance.patch(
       `${API_ROOT}/v1/website-configs/${currentMenu._id}`,
       payload
@@ -139,9 +139,9 @@ export const updateMenuConfig = async (content) => {
   } catch (error) {
     console.error('Lỗi khi cập nhật cấu hình menu:', error)
     throw new Error(
-      error.response?.data?.message || 
-      error.message ||
-      'Không thể cập nhật cấu hình menu. Vui lòng thử lại.'
+      error.response?.data?.message ||
+        error.message ||
+        'Không thể cập nhật cấu hình menu. Vui lòng thử lại.'
     )
   }
 }
@@ -155,7 +155,7 @@ export const createMenuConfig = async (content) => {
       content,
       status: 'active'
     }
-    
+
     const response = await AuthorizedAxiosInstance.post(
       `${API_ROOT}/v1/website-configs`,
       payload
@@ -164,9 +164,9 @@ export const createMenuConfig = async (content) => {
   } catch (error) {
     console.error('Lỗi khi tạo cấu hình menu:', error)
     throw new Error(
-      error.response?.data?.message || 
-      error.message ||
-      'Không thể tạo cấu hình menu. Vui lòng thử lại.'
+      error.response?.data?.message ||
+        error.message ||
+        'Không thể tạo cấu hình menu. Vui lòng thử lại.'
     )
   }
 }
@@ -201,7 +201,7 @@ export const validateMenuContent = (content) => {
     } else {
       content.mainMenu.forEach((item, index) => {
         if (!item.label?.trim()) {
-          errors.push(`Menu item ${index + 1} thiếu label`)
+          errors.push(`cột  ${index + 1} thiếu thành phần`)
         }
         // URL is optional for main menu items (they can be just titles)
         // if (!item.url?.trim()) {
@@ -214,47 +214,17 @@ export const validateMenuContent = (content) => {
         if (item.children) {
           item.children.forEach((subItem, subIndex) => {
             if (!subItem.label?.trim()) {
-              errors.push(`Submenu item ${subIndex + 1} của menu ${index + 1} thiếu label`)
+              errors.push(
+                `Submenu item ${subIndex + 1} của menu ${index + 1} thiếu label`
+              )
             }
             if (!subItem.url?.trim()) {
-              errors.push(`Submenu item ${subIndex + 1} của menu ${index + 1} thiếu URL`)
+              errors.push(
+                `Submenu item ${subIndex + 1} của menu ${index + 1} thiếu URL`
+              )
             }
           })
         }
-      })
-    }
-  }
-
-  // Validate mobile menu
-  if (content.mobileMenu) {
-    if (!Array.isArray(content.mobileMenu)) {
-      errors.push('Mobile menu phải là một mảng')
-    } else {
-      content.mobileMenu.forEach((item, index) => {
-        if (!item.label?.trim()) {
-          errors.push(`Mobile menu item ${index + 1} thiếu label`)
-        }
-        // URL is optional for mobile menu items
-        // if (!item.url?.trim()) {
-        //   errors.push(`Mobile menu item ${index + 1} thiếu URL`)
-        // }
-      })
-    }
-  }
-
-  // Validate footer menu
-  if (content.footerMenu) {
-    if (!Array.isArray(content.footerMenu)) {
-      errors.push('Footer menu phải là một mảng')
-    } else {
-      content.footerMenu.forEach((item, index) => {
-        if (!item.label?.trim()) {
-          errors.push(`Footer menu item ${index + 1} thiếu label`)
-        }
-        // URL is optional for footer menu items
-        // if (!item.url?.trim()) {
-        //   errors.push(`Footer menu item ${index + 1} thiếu URL`)
-        // }
       })
     }
   }
@@ -311,7 +281,7 @@ export const getDefaultMenuStructure = () => {
 export const saveMenuConfig = async (content) => {
   try {
     const existingMenu = await getMenuConfig()
-    
+
     if (existingMenu) {
       return await updateMenuConfig(content)
     } else {

@@ -28,10 +28,17 @@ import {
 } from '@mui/icons-material'
 import {
   addBanner,
-  updateBanner
+  updateBanner,
+  getBanners
 } from '~/services/admin/webConfig/bannerService.js'
 import { URI, CLOUD_FOLDER } from '~/utils/constants.js'
 import { optimizeCloudinaryUrl } from '~/utils/cloudinary.js'
+import dayjs from 'dayjs'
+import 'dayjs/locale/vi'
+import customVi from '~/components/DateInput/CustomVi.jsx'
+import { LocalizationProvider } from '@mui/x-date-pickers'
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns'
+import { DatePicker } from '@mui/x-date-pickers/DatePicker'
 
 // Upload function to Cloudinary
 const uploadToCloudinary = async (file) => {
@@ -53,18 +60,20 @@ const uploadToCloudinary = async (file) => {
   return data.secure_url
 }
 
+const defaultForm = {
+  imageUrl: '',
+  title: '',
+  subtitle: '',
+  link: '',
+  position: 'hero',
+  visible: true,
+  startDate: '',
+  endDate: ''
+}
+
 const AddBanner = ({ open, onClose, onSuccess, initialData, bannerIndex }) => {
   const theme = useTheme()
-  const [form, setForm] = useState({
-    imageUrl: '',
-    title: '',
-    subtitle: '',
-    link: '',
-    position: 'hero',
-    visible: true,
-    startDate: '',
-    endDate: ''
-  })
+  const [form, setForm] = useState(defaultForm)
   const [loading, setLoading] = useState(false)
   const [uploadingImage, setUploadingImage] = useState(false)
   const [error, setError] = useState('')
@@ -79,16 +88,7 @@ const AddBanner = ({ open, onClose, onSuccess, initialData, bannerIndex }) => {
         setForm({ ...initialData })
         setImagePreview(initialData.imageUrl || '')
       } else {
-        setForm({
-          imageUrl: '',
-          title: '',
-          subtitle: '',
-          link: '',
-          position: 'hero',
-          visible: true,
-          startDate: '',
-          endDate: ''
-        })
+        setForm(defaultForm)
         setImagePreview('')
       }
       setError('')
@@ -185,8 +185,29 @@ const AddBanner = ({ open, onClose, onSuccess, initialData, bannerIndex }) => {
       const errors = validateForm()
       if (errors.length > 0) {
         setError(errors.join(', '))
-        setLoading(false) // Cho phép nhập lại nếu lỗi
+        setLoading(false)
         return
+      }
+
+      // Check if adding a new banner (not updating an existing one)
+      if (!initialData) {
+        // Fetch existing banners to check for position conflicts
+        const existingBanners = await getBanners()
+        const restrictedPositions = ['product', 'login']
+
+        // Check if a banner already exists for the selected position
+        if (restrictedPositions.includes(form.position)) {
+          const bannerExists = existingBanners.some(
+            (banner) => banner.position === form.position
+          )
+          if (bannerExists) {
+            setError(
+              `Không thể thêm banner mới. Đã tồn tại banner ở vị trí "${form.position === 'product' ? 'Banner sản phẩm' : 'Banner đăng nhập và đăng ký'}". Vui lòng chỉnh sửa banner hiện có.`
+            )
+            setLoading(false)
+            return
+          }
+        }
       }
 
       let result
@@ -206,9 +227,8 @@ const AddBanner = ({ open, onClose, onSuccess, initialData, bannerIndex }) => {
         )
         if (onSuccess) onSuccess(result)
 
-        // Đóng modal sau khi lưu
         setTimeout(() => {
-          setLoading(false) // Enable lại khi modal đóng
+          setLoading(false)
           onClose()
         }, 1500)
       } else {
@@ -216,7 +236,7 @@ const AddBanner = ({ open, onClose, onSuccess, initialData, bannerIndex }) => {
       }
     } catch (error) {
       setError(error.message)
-      setLoading(false) // Cho phép nhập lại khi lỗi
+      setLoading(false)
     }
   }
 
@@ -277,7 +297,7 @@ const AddBanner = ({ open, onClose, onSuccess, initialData, bannerIndex }) => {
           </Alert>
         )}
 
-        {/* Image Upload Section - Full Width */}
+        {/* Image Upload Section */}
         <Box sx={{ mb: 2 }}>
           <Typography
             variant='h6'
@@ -394,7 +414,7 @@ const AddBanner = ({ open, onClose, onSuccess, initialData, bannerIndex }) => {
           />
         </Box>
 
-        {/* Form Fields Section - Full Width */}
+        {/* Form Fields Section */}
         <Box>
           <Typography
             variant='h6'
@@ -404,7 +424,6 @@ const AddBanner = ({ open, onClose, onSuccess, initialData, bannerIndex }) => {
           </Typography>
 
           <Stack spacing={3}>
-            {/* Title */}
             <TextField
               label='Tiêu đề *'
               value={form.title}
@@ -420,7 +439,6 @@ const AddBanner = ({ open, onClose, onSuccess, initialData, bannerIndex }) => {
               }}
             />
 
-            {/* Subtitle */}
             <TextField
               label='Phụ đề'
               value={form.subtitle}
@@ -435,7 +453,6 @@ const AddBanner = ({ open, onClose, onSuccess, initialData, bannerIndex }) => {
               }}
             />
 
-            {/* Link */}
             <TextField
               label='Link điều hướng'
               value={form.link}
@@ -451,7 +468,6 @@ const AddBanner = ({ open, onClose, onSuccess, initialData, bannerIndex }) => {
               }}
             />
 
-            {/* Position */}
             <TextField
               select
               label='Vị trí hiển thị'
@@ -471,7 +487,6 @@ const AddBanner = ({ open, onClose, onSuccess, initialData, bannerIndex }) => {
               <MenuItem value='login'>Banner đăng nhập và đăng ký</MenuItem>
             </TextField>
 
-            {/* Visibility */}
             <FormControlLabel
               control={
                 <Checkbox
@@ -488,7 +503,7 @@ const AddBanner = ({ open, onClose, onSuccess, initialData, bannerIndex }) => {
               label='Hiển thị banner'
             />
 
-            {/* Date Range */}
+            {/* Date Range with DatePicker */}
             <Box>
               <Typography
                 variant='subtitle2'
@@ -496,40 +511,53 @@ const AddBanner = ({ open, onClose, onSuccess, initialData, bannerIndex }) => {
               >
                 Thời gian hiển thị (không bắt buộc)
               </Typography>
-              <Grid container spacing={2}>
-                <Grid item xs={12} sm={6}>
-                  <TextField
-                    type='date'
-                    label='Ngày bắt đầu'
-                    value={form.startDate}
-                    onChange={(e) => handleChange('startDate', e.target.value)}
-                    fullWidth
-                    InputLabelProps={{ shrink: true }}
-                    sx={{
-                      '& .MuiOutlinedInput-root': {
-                        borderRadius: 2,
-                        backgroundColor: '#fff'
+              <LocalizationProvider
+                dateAdapter={AdapterDateFns}
+                adapterLocale={customVi}
+              >
+                <Grid container spacing={2}>
+                  <Grid item xs={12} sm={6}>
+                    <DatePicker
+                      label='Ngày bắt đầu'
+                      value={
+                        form.startDate ? dayjs(form.startDate).toDate() : null
                       }
-                    }}
-                  />
-                </Grid>
-                <Grid item xs={12} sm={6}>
-                  <TextField
-                    type='date'
-                    label='Ngày kết thúc'
-                    value={form.endDate}
-                    onChange={(e) => handleChange('endDate', e.target.value)}
-                    fullWidth
-                    InputLabelProps={{ shrink: true }}
-                    sx={{
-                      '& .MuiOutlinedInput-root': {
-                        borderRadius: 2,
-                        backgroundColor: '#fff'
+                      onChange={(date) =>
+                        handleChange(
+                          'startDate',
+                          date ? dayjs(date).format('YYYY-MM-DD') : ''
+                        )
                       }
-                    }}
-                  />
+                      format='dd/MM/yyyy'
+                      slotProps={{
+                        textField: {
+                          fullWidth: true,
+                          size: 'small'
+                        }
+                      }}
+                    />
+                  </Grid>
+                  <Grid item xs={12} sm={6}>
+                    <DatePicker
+                      label='Ngày kết thúc'
+                      value={form.endDate ? dayjs(form.endDate).toDate() : null}
+                      onChange={(date) =>
+                        handleChange(
+                          'endDate',
+                          date ? dayjs(date).format('YYYY-MM-DD') : ''
+                        )
+                      }
+                      format='dd/MM/yyyy'
+                      slotProps={{
+                        textField: {
+                          fullWidth: true,
+                          size: 'small'
+                        }
+                      }}
+                    />
+                  </Grid>
                 </Grid>
-              </Grid>
+              </LocalizationProvider>
             </Box>
           </Stack>
         </Box>

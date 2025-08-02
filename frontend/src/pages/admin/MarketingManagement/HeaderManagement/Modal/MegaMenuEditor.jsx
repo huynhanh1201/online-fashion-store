@@ -10,21 +10,15 @@ import {
   Typography,
   IconButton,
   Stack,
-  Chip,
   FormControl,
   InputLabel,
+  Switch,
   Select,
   MenuItem,
-  Switch,
   FormControlLabel,
   Accordion,
   AccordionSummary,
   AccordionDetails,
-  List,
-  ListItem,
-  ListItemText,
-  ListItemSecondaryAction,
-  Divider,
   Alert,
   CircularProgress,
   Autocomplete,
@@ -41,9 +35,6 @@ import {
   Delete as DeleteIcon,
   Edit as EditIcon,
   ExpandMore as ExpandMoreIcon,
-  DragIndicator as DragIcon,
-  Visibility as VisibilityIcon,
-  VisibilityOff as VisibilityOffIcon,
   Preview as PreviewIcon,
   Settings as SettingsIcon,
   Category as CategoryIcon,
@@ -62,13 +53,16 @@ const MegaMenuEditor = ({ open, onClose, onSuccess, initialData = null }) => {
   const [error, setError] = useState('')
   const [menuData, setMenuData] = useState(getDefaultMenuStructure())
   const [editingItem, setEditingItem] = useState(null)
-  const [editingType, setEditingType] = useState('') // 'main', 'mobile', 'footer'
+  const [editingType, setEditingType] = useState('')
   const [editingIndex, setEditingIndex] = useState(-1)
   const [editingSubIndex, setEditingSubIndex] = useState(-1)
   const [categories, setCategories] = useState([])
   const [categoriesLoading, setCategoriesLoading] = useState(false)
-  const [urlType, setUrlType] = useState('manual') // 'manual' or 'category'
-  const [activeTab, setActiveTab] = useState(0) // 0: Editor, 1: Preview
+  const [urlType, setUrlType] = useState('manual')
+  const [activeTab, setActiveTab] = useState(0)
+  const [modalError, setModalError] = useState('')
+  const [pendingDelete, setPendingDelete] = useState(null)
+
   const [megamenuSettings, setMegamenuSettings] = useState({
     maxColumns: 4,
     columnWidth: 'auto',
@@ -93,7 +87,6 @@ const MegaMenuEditor = ({ open, onClose, onSuccess, initialData = null }) => {
     }
   }, [initialData])
 
-  // Fetch categories when Dialog opens
   useEffect(() => {
     if (open) {
       fetchCategories()
@@ -112,19 +105,32 @@ const MegaMenuEditor = ({ open, onClose, onSuccess, initialData = null }) => {
     }
   }
 
+  const validateMenuContentCustom = (menuData) => {
+    const errors = validateMenuContent(menuData)
+    const customErrors = []
+
+    menuData.mainMenu.forEach((item, index) => {
+      if (!item.children || item.children.length === 0) {
+        customErrors.push(
+          `Cột "${item.label || `Cột ${index + 1}`}" chưa có thành phần`
+        )
+      }
+    })
+
+    return [...errors, ...customErrors]
+  }
+
   const handleSave = async () => {
     try {
       setLoading(true)
       setError('')
 
-      // Validate menu content
-      const errors = validateMenuContent(menuData)
+      const errors = validateMenuContentCustom(menuData)
       if (errors.length > 0) {
         setError(errors.join('\n'))
         return
       }
 
-      // Cập nhật megamenu settings
       const updatedMenuData = {
         ...menuData,
         settings: {
@@ -147,21 +153,18 @@ const MegaMenuEditor = ({ open, onClose, onSuccess, initialData = null }) => {
     const newItem = {
       label: '',
       url: '',
-      visible: true,
-      order: menuData[type]?.length + 1 || 1
+      visible: true
     }
 
     if (type === 'mainMenu') {
       newItem.children = []
     }
 
-    // Add the new item to the list temporarily
     setMenuData((prev) => ({
       ...prev,
       [type]: [...(prev[type] || []), newItem]
     }))
 
-    // Open edit Dialog for the new item
     setEditingItem(newItem)
     setEditingType(type)
     setEditingIndex(menuData[type]?.length || 0)
@@ -169,25 +172,21 @@ const MegaMenuEditor = ({ open, onClose, onSuccess, initialData = null }) => {
   }
 
   const handleCancelEdit = () => {
-    // If we're editing a newly added item that hasn't been saved properly, remove it
-    if (
-      editingItem &&
-      (!editingItem.label.trim() ||
-        (editingSubIndex >= 0 && !editingItem.url.trim()))
-    ) {
+    if (editingItem) {
       setMenuData((prev) => {
         const newData = { ...prev }
 
         if (editingSubIndex >= 0) {
-          // Remove incomplete submenu item
-          newData[editingType][editingIndex].children.splice(editingSubIndex, 1)
+          if (!editingItem.label.trim() || !editingItem.url.trim()) {
+            newData[editingType][editingIndex].children.splice(
+              editingSubIndex,
+              1
+            )
+          }
         } else {
-          // Remove incomplete main item
-          newData[editingType].splice(editingIndex, 1)
-          // Reorder remaining items
-          newData[editingType].forEach((item, idx) => {
-            item.order = idx + 1
-          })
+          if (!editingItem.label.trim()) {
+            newData[editingType].splice(editingIndex, 1)
+          }
         }
 
         return newData
@@ -198,7 +197,7 @@ const MegaMenuEditor = ({ open, onClose, onSuccess, initialData = null }) => {
     setEditingType('')
     setEditingIndex(-1)
     setEditingSubIndex(-1)
-    setError('')
+    setModalError('')
     setUrlType('manual')
   }
 
@@ -215,7 +214,6 @@ const MegaMenuEditor = ({ open, onClose, onSuccess, initialData = null }) => {
     setEditingIndex(index)
     setEditingSubIndex(subIndex)
 
-    // Set URL type to category for submenu items (no manual option)
     if (subIndex >= 0) {
       setUrlType('category')
     } else {
@@ -225,17 +223,15 @@ const MegaMenuEditor = ({ open, onClose, onSuccess, initialData = null }) => {
 
   const handleSaveItem = () => {
     if (!editingItem.label.trim()) {
-      setError('Tên menu không được để trống')
+      setModalError('Tên menu không được để trống')
       return
     }
 
-    // URL is required for submenu items and must be selected from categories
     if (editingSubIndex >= 0 && !editingItem.url.trim()) {
-      setError('Vui lòng chọn danh mục có sản phẩm cho submenu')
+      setModalError('Vui lòng chọn danh mục có sản phẩm cho submenu')
       return
     }
 
-    // Normalize label: capitalize only the first letter of the whole string, rest lowercase
     const normalizeLabel = (label) =>
       label.charAt(0).toUpperCase() + label.slice(1).toLowerCase()
 
@@ -248,11 +244,9 @@ const MegaMenuEditor = ({ open, onClose, onSuccess, initialData = null }) => {
       const newData = { ...prev }
 
       if (editingSubIndex >= 0) {
-        // Editing submenu item
         newData[editingType][editingIndex].children[editingSubIndex] =
           normalizedItem
       } else {
-        // Editing main item
         newData[editingType][editingIndex] = normalizedItem
       }
 
@@ -263,39 +257,45 @@ const MegaMenuEditor = ({ open, onClose, onSuccess, initialData = null }) => {
     setEditingType('')
     setEditingIndex(-1)
     setEditingSubIndex(-1)
-    setError('')
+    setModalError('')
     setUrlType('category')
   }
 
   const handleDeleteItem = (type, index, subIndex = -1) => {
-    setMenuData((prev) => {
-      const newData = { ...prev }
+    setPendingDelete({ type, index, subIndex })
+  }
 
-      if (subIndex >= 0) {
-        // Delete submenu item
-        newData[type][index].children.splice(subIndex, 1)
-      } else {
-        // Delete main item
-        newData[type].splice(index, 1)
-        // Reorder remaining items
-        newData[type].forEach((item, idx) => {
-          item.order = idx + 1
-        })
-      }
+  const confirmDeleteItem = () => {
+    if (pendingDelete) {
+      setMenuData((prev) => {
+        const newData = { ...prev }
 
-      return newData
-    })
+        if (pendingDelete.subIndex >= 0) {
+          newData[pendingDelete.type][pendingDelete.index].children.splice(
+            pendingDelete.subIndex,
+            1
+          )
+        } else {
+          newData[pendingDelete.type].splice(pendingDelete.index, 1)
+        }
+
+        return newData
+      })
+      setPendingDelete(null)
+    }
+  }
+
+  const cancelDeleteItem = () => {
+    setPendingDelete(null)
   }
 
   const handleAddSubmenu = (type, index) => {
     const newSubItem = {
       label: '',
       url: '',
-      visible: true,
-      order: (menuData[type][index].children?.length || 0) + 1
+      visible: true
     }
 
-    // Add the new submenu item to the list temporarily
     setMenuData((prev) => ({
       ...prev,
       [type]: prev[type].map((item, idx) =>
@@ -305,7 +305,6 @@ const MegaMenuEditor = ({ open, onClose, onSuccess, initialData = null }) => {
       )
     }))
 
-    // Open edit Dialog for the new submenu item
     setEditingItem(newSubItem)
     setEditingType(type)
     setEditingIndex(index)
@@ -317,219 +316,202 @@ const MegaMenuEditor = ({ open, onClose, onSuccess, initialData = null }) => {
     if (category) {
       setEditingItem((prev) => ({
         ...prev,
-        url: `category/${category.slug}`
-        // Don't automatically set the label - let user customize the menu name
+        url: `category/${category.slug}`,
+        label: category.name // Tự động điền tên danh mục vào label
       }))
     }
   }
 
-  // Đổi vị trí menu item lên/xuống
-  const moveMenuItem = (type, index, direction, subIndex = -1) => {
-    setMenuData((prev) => {
-      const newData = { ...prev }
-      if (subIndex >= 0) {
-        // Submenu
-        const arr = newData[type][index].children
-        if (
-          (direction === 'up' && subIndex === 0) ||
-          (direction === 'down' && subIndex === arr.length - 1)
-        )
-          return prev
-        const swapWith = direction === 'up' ? subIndex - 1 : subIndex + 1
-        ;[arr[subIndex], arr[swapWith]] = [arr[swapWith], arr[subIndex]]
-        arr.forEach((item, idx) => (item.order = idx + 1))
-      } else {
-        // Main menu
-        const arr = newData[type]
-        if (
-          (direction === 'up' && index === 0) ||
-          (direction === 'down' && index === arr.length - 1)
-        )
-          return prev
-        const swapWith = direction === 'up' ? index - 1 : index + 1
-        ;[arr[index], arr[swapWith]] = [arr[swapWith], arr[index]]
-        arr.forEach((item, idx) => (item.order = idx + 1))
-      }
-      return newData
-    })
-  }
-
-  // Hiển thị menu dạng cây lồng nhau
   const renderTreeMenu = (type) => (
     <Box>
       {menuData[type]?.length === 0 && (
         <Typography
-          sx={{ color: 'text.secondary', fontStyle: 'italic', mb: 2 }}
+          sx={{ color: 'text.secondary', fontStyle: 'italic', mb: 2, p: 2 }}
         >
-          Chưa có menu nào. Nhấn "Thêm menu" để bắt đầu.
+          Chưa có menu nào. Nhấn "Thêm cột" để bắt đầu.
         </Typography>
       )}
       {menuData[type]?.map((item, index) => (
-        <Box
+        <Accordion
           key={index}
           sx={{
-            border: '1px solid #e0e0e0',
-            borderRadius: 2,
-            p: 2,
-            mb: 2,
+            mb: 1,
             boxShadow: '0 2px 8px 0 rgba(60,72,88,.06)',
-            background: item.visible ? '#fff' : '#f3f4f6',
-            opacity: item.visible ? 1 : 0.6
+            borderRadius: 2,
+            '&:before': { display: 'none' }
           }}
         >
-          <Stack direction='row' alignItems='center' spacing={1}>
-            <Typography variant='subtitle1' sx={{ fontWeight: 600, flex: 1 }}>
-              {item.label || 'Chưa có tên'}
-            </Typography>
-            <Typography
-              variant='caption'
-              color='text.secondary'
-              sx={{ fontFamily: 'monospace' }}
-            >
-              {item.url || ''}
-            </Typography>
-            <IconButton
-              size='small'
-              onClick={() => moveMenuItem(type, index, 'up')}
-            >
-              <ExpandMoreIcon sx={{ transform: 'rotate(-90deg)' }} />
-            </IconButton>
-            <IconButton
-              size='small'
-              onClick={() => moveMenuItem(type, index, 'down')}
-            >
-              <ExpandMoreIcon sx={{ transform: 'rotate(90deg)' }} />
-            </IconButton>
-            <IconButton
-              size='small'
-              onClick={() => handleEditItem(type, index)}
-              sx={{ color: '#3b82f6' }}
-            >
-              <EditIcon />
-            </IconButton>
-            <IconButton
-              size='small'
-              onClick={() => handleDeleteItem(type, index)}
-              sx={{ color: '#ef4444' }}
-            >
-              <DeleteIcon />
-            </IconButton>
-            <FormControlLabel
-              control={
-                <Switch
-                  checked={item.visible}
-                  onChange={(e) =>
-                    setMenuData((prev) => {
-                      const arr = [...prev[type]]
-                      arr[index].visible = e.target.checked
-                      return { ...prev, [type]: arr }
-                    })
-                  }
-                />
+          <AccordionSummary
+            expandIcon={<ExpandMoreIcon />}
+            sx={{
+              background: item.visible ? '#fff' : '#f3f4f6',
+              borderRadius: 2,
+              '& .MuiAccordionSummary-content': {
+                alignItems: 'center',
+                justifyContent: 'space-between'
               }
-              label={item.visible ? 'Hiện' : 'Ẩn'}
-              sx={{ ml: 1 }}
-            />
+            }}
+          >
+            <Stack direction='row' alignItems='center' spacing={2} flex={1}>
+              <Typography
+                variant='subtitle1'
+                sx={{
+                  fontWeight: 600,
+                  color: item.visible ? 'text.primary' : 'text.secondary'
+                }}
+              >
+                {item.label || 'Chưa có tên'}
+              </Typography>
+              <Typography
+                variant='caption'
+                sx={{ fontFamily: 'monospace', color: 'text.secondary' }}
+              >
+                {item.url || 'Chưa có URL'}
+              </Typography>
+            </Stack>
+            <Stack direction='row' alignItems='center' spacing={1}>
+              <IconButton
+                size='small'
+                onClick={(e) => {
+                  e.stopPropagation()
+                  handleEditItem(type, index)
+                }}
+                sx={{ color: '#3b82f6' }}
+              >
+                <EditIcon />
+              </IconButton>
+              <IconButton
+                size='small'
+                onClick={(e) => {
+                  e.stopPropagation()
+                  handleDeleteItem(type, index)
+                }}
+                sx={{ color: '#ef4444' }}
+              >
+                <DeleteIcon />
+              </IconButton>
+              <FormControlLabel
+                control={
+                  <Switch
+                    checked={item.visible}
+                    onChange={(e) => {
+                      e.stopPropagation()
+                      setMenuData((prev) => {
+                        const arr = [...prev[type]]
+                        arr[index].visible = e.target.checked
+                        return { ...prev, [type]: arr }
+                      })
+                    }}
+                  />
+                }
+                label={item.visible ? 'Hiện' : 'Ẩn'}
+                sx={{ ml: 1 }}
+                onClick={(e) => e.stopPropagation()}
+              />
+            </Stack>
+          </AccordionSummary>
+          <AccordionDetails sx={{ background: '#fafafa', p: 2 }}>
+            {item.children && item.children.length > 0 ? (
+              <Box sx={{ ml: 2 }}>
+                {item.children.map((sub, subIdx) => (
+                  <Box
+                    key={subIdx}
+                    sx={{
+                      borderLeft: '2px solid #e0e0e0',
+                      pl: 2,
+                      py: 1,
+                      mb: 1,
+                      background: sub.visible ? '#fff' : '#f3f4f6',
+                      borderRadius: 1,
+                      opacity: sub.visible ? 1 : 0.8
+                    }}
+                  >
+                    <Stack direction='row' alignItems='center' spacing={2}>
+                      <Typography
+                        variant='body2'
+                        sx={{
+                          fontWeight: 500,
+                          flex: 1,
+                          color: sub.visible ? 'text.primary' : 'text.secondary'
+                        }}
+                      >
+                        {sub.label || 'Chưa có tên'}
+                      </Typography>
+                      <Typography
+                        variant='caption'
+                        sx={{
+                          fontFamily: 'monospace',
+                          color: 'text.secondary'
+                        }}
+                      >
+                        {sub.url || 'Chưa có URL'}
+                      </Typography>
+                      <IconButton
+                        size='small'
+                        onClick={() => handleEditItem(type, index, subIdx)}
+                        sx={{ color: '#3b82f6' }}
+                      >
+                        <EditIcon fontSize='small' />
+                      </IconButton>
+                      <IconButton
+                        size='small'
+                        onClick={() => handleDeleteItem(type, index, subIdx)}
+                        sx={{ color: '#ef4444' }}
+                      >
+                        <DeleteIcon fontSize='small' />
+                      </IconButton>
+                      <FormControlLabel
+                        control={
+                          <Switch
+                            checked={sub.visible}
+                            onChange={() =>
+                              setMenuData((prev) => {
+                                const arr = [...prev[type]]
+                                arr[index].children[subIdx].visible =
+                                  !arr[index].children[subIdx].visible
+                                return { ...prev, [type]: arr }
+                              })
+                            }
+                          />
+                        }
+                        label={sub.visible ? 'Hiện' : 'Ẩn'}
+                        sx={{ ml: 1 }}
+                      />
+                    </Stack>
+                  </Box>
+                ))}
+              </Box>
+            ) : (
+              <Typography
+                variant='body2'
+                color='text.secondary'
+                sx={{ fontStyle: 'italic' }}
+              >
+                Chưa có thành phần. Nhấn "Thêm thành phần" để thêm.
+              </Typography>
+            )}
             <Button
               size='small'
               variant='outlined'
               onClick={() => handleAddSubmenu(type, index)}
-              sx={{ ml: 1 }}
+              sx={{ mt: 2 }}
             >
-              + Thành phần
+              + Thêm thành phần
             </Button>
-          </Stack>
-          {/* Submenu */}
-          {item.children && item.children.length > 0 && (
-            <Box sx={{ mt: 2, ml: 4 }}>
-              {item.children.map((sub, subIdx) => (
-                <Box
-                  key={subIdx}
-                  sx={{
-                    border: '1px solid #e0e0e0',
-                    borderRadius: 2,
-                    p: 1.5,
-                    mb: 1,
-                    background: sub.visible ? '#fafafa' : '#f3f4f6',
-                    opacity: sub.visible ? 1 : 0.6
-                  }}
-                >
-                  <Stack direction='row' alignItems='center' spacing={1}>
-                    <Typography
-                      variant='body2'
-                      sx={{ fontWeight: 500, flex: 1 }}
-                    >
-                      {sub.label || 'Chưa có tên'}
-                    </Typography>
-                    <Typography
-                      variant='caption'
-                      color='text.secondary'
-                      sx={{ fontFamily: 'monospace' }}
-                    >
-                      {sub.url || 'Chưa có URL'}
-                    </Typography>
-                    <IconButton
-                      size='small'
-                      onClick={() => moveMenuItem(type, index, 'up', subIdx)}
-                    >
-                      <ExpandMoreIcon sx={{ transform: 'rotate(-90deg)' }} />
-                    </IconButton>
-                    <IconButton
-                      size='small'
-                      onClick={() => moveMenuItem(type, index, 'down', subIdx)}
-                    >
-                      <ExpandMoreIcon sx={{ transform: 'rotate(90deg)' }} />
-                    </IconButton>
-                    <IconButton
-                      size='small'
-                      onClick={() => handleEditItem(type, index, subIdx)}
-                      sx={{ color: '#3b82f6' }}
-                    >
-                      <EditIcon fontSize='small' />
-                    </IconButton>
-                    <IconButton
-                      size='small'
-                      onClick={() => handleDeleteItem(type, index, subIdx)}
-                      sx={{ color: '#ef4444' }}
-                    >
-                      <DeleteIcon fontSize='small' />
-                    </IconButton>
-                    <FormControlLabel
-                      control={
-                        <Switch
-                          checked={sub.visible}
-                          onChange={(e) =>
-                            setMenuData((prev) => {
-                              const arr = [...prev[type]]
-                              arr[index].children[subIdx].visible =
-                                e.target.checked
-                              return { ...prev, [type]: arr }
-                            })
-                          }
-                        />
-                      }
-                      label={sub.visible ? 'Hiện' : 'Ẩn'}
-                      sx={{ ml: 1 }}
-                    />
-                  </Stack>
-                </Box>
-              ))}
-            </Box>
-          )}
-        </Box>
+          </AccordionDetails>
+        </Accordion>
       ))}
       <Button
         startIcon={<AddIcon />}
         variant='contained'
         onClick={() => handleAddItem(type)}
-        sx={{ mt: 1, fontWeight: 600 }}
+        sx={{ mt: 2, fontWeight: 600 }}
       >
         Thêm cột
       </Button>
     </Box>
   )
 
-  // Render Megamenu Settings
   const renderMegamenuSettings = () => (
     <Card sx={{ mb: 3 }}>
       <CardContent>
@@ -561,41 +543,6 @@ const MegaMenuEditor = ({ open, onClose, onSuccess, initialData = null }) => {
                 <MenuItem value={6}>6 cột</MenuItem>
               </Select>
             </FormControl>
-          </Grid>
-          <Grid item xs={12} sm={6}>
-            <FormControl fullWidth></FormControl>
-          </Grid>
-          <Grid item xs={12} sm={6}>
-            {/* <FormControlLabel
-              control={
-                <Switch
-                  checked={megamenuSettings.showIcons}
-                  onChange={(e) =>
-                    setMegamenuSettings((prev) => ({
-                      ...prev,
-                      showIcons: e.target.checked
-                    }))
-                  }
-                />
-              }
-              label='Hiển thị icon'
-            /> */}
-          </Grid>
-          <Grid item xs={12} sm={6}>
-            {/* <FormControlLabel
-              control={
-                <Switch
-                  checked={megamenuSettings.showCategoryImages}
-                  onChange={(e) =>
-                    setMegamenuSettings((prev) => ({
-                      ...prev,
-                      showCategoryImages: e.target.checked
-                    }))
-                  }
-                />
-              }
-              label='Hiển thị ảnh danh mục'
-            /> */}
           </Grid>
           <Grid item xs={12} sm={6}>
             <FormControlLabel
@@ -752,7 +699,6 @@ const MegaMenuEditor = ({ open, onClose, onSuccess, initialData = null }) => {
         </DialogActions>
       </Dialog>
 
-      {/* Edit Item Modal */}
       <Dialog
         open={!!editingItem}
         onClose={handleCancelEdit}
@@ -769,90 +715,94 @@ const MegaMenuEditor = ({ open, onClose, onSuccess, initialData = null }) => {
         </DialogTitle>
 
         <DialogContent sx={{ pt: 2 }}>
+          {modalError && (
+            <Alert severity='error' sx={{ mb: 2 }}>
+              {modalError}
+            </Alert>
+          )}
           <Stack spacing={3}>
-            <TextField
-              label='Tên menu'
-              value={editingItem?.label || ''}
-              onChange={(e) =>
-                setEditingItem((prev) => ({ ...prev, label: e.target.value }))
-              }
-              fullWidth
-              required
-            />
-
-            {/* Category Selection for Submenu Items */}
-            {editingSubIndex >= 0 && (
-              <Autocomplete
-                options={categories}
-                getOptionLabel={(option) =>
-                  `${option.name} (${option.productCount} sản phẩm)`
-                }
-                loading={categoriesLoading}
-                value={
-                  categories.find(
-                    (cat) => `category/${cat.slug}` === editingItem?.url
-                  ) || null
-                }
-                onChange={(event, newValue) => handleCategorySelect(newValue)}
-                renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    label='Chọn danh mục có sản phẩm'
-                    required
-                    helperText='Chọn danh mục có sản phẩm để tự động lấy URL. Tên menu có thể tùy chỉnh riêng.'
-                    InputProps={{
-                      ...params.InputProps,
-                      endAdornment: (
-                        <>
-                          {categoriesLoading ? (
-                            <CircularProgress color='inherit' size={20} />
-                          ) : null}
-                          {params.InputProps.endAdornment}
-                        </>
-                      )
-                    }}
-                  />
-                )}
-                renderOption={(props, option) => (
-                  <Box component='li' {...props}>
-                    <Stack>
-                      <Typography variant='body2' sx={{ fontWeight: 600 }}>
-                        {option.name}
-                      </Typography>
-                      <Typography variant='caption' color='text.secondary'>
-                        {option.productCount} sản phẩm • Link: category/
-                        {option.slug}
-                      </Typography>
-                      {option.parent && (
-                        <Typography
-                          variant='caption'
-                          color='text.secondary'
-                          sx={{ fontStyle: 'italic' }}
-                        >
-                          Danh mục con của: {option.parent.name}
+            {editingSubIndex >= 0 ? (
+              <>
+                <Autocomplete
+                  options={categories}
+                  getOptionLabel={(option) =>
+                    `${option.name} (${option.productCount} sản phẩm)`
+                  }
+                  loading={categoriesLoading}
+                  value={
+                    categories.find(
+                      (cat) => `category/${cat.slug}` === editingItem?.url
+                    ) || null
+                  }
+                  onChange={(event, newValue) => handleCategorySelect(newValue)}
+                  disableClearable // Ngăn xóa lựa chọn
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      label='Chọn danh mục có sản phẩm'
+                      required
+                      helperText='Chọn danh mục có sản phẩm để tự động lấy URL và tên mặc định. Tên menu có thể tùy chỉnh.'
+                      InputProps={{
+                        ...params.InputProps,
+                        endAdornment: (
+                          <>
+                            {categoriesLoading ? (
+                              <CircularProgress color='inherit' size={20} />
+                            ) : null}
+                            {params.InputProps.endAdornment}
+                          </>
+                        )
+                      }}
+                    />
+                  )}
+                  renderOption={(props, option) => (
+                    <Box component='li' {...props}>
+                      <Stack>
+                        <Typography variant='body2' sx={{ fontWeight: 600 }}>
+                          {option.name}
                         </Typography>
-                      )}
-                    </Stack>
-                  </Box>
-                )}
-                noOptionsText='Không tìm thấy danh mục có sản phẩm nào'
+                        <Typography variant='caption' color='text.secondary'>
+                          {option.productCount} sản phẩm • Link: category/
+                          {option.slug}
+                        </Typography>
+                        {option.parent && (
+                          <Typography
+                            variant='caption'
+                            color='text.secondary'
+                            sx={{ fontStyle: 'italic' }}
+                          >
+                            Danh mục con của: {option.parent.name}
+                          </Typography>
+                        )}
+                      </Stack>
+                    </Box>
+                  )}
+                  noOptionsText='Không tìm thấy danh mục có sản phẩm nào'
+                />
+                <TextField
+                  label='Tên menu'
+                  value={editingItem?.label || ''}
+                  onChange={(e) =>
+                    setEditingItem((prev) => ({
+                      ...prev,
+                      label: e.target.value
+                    }))
+                  }
+                  fullWidth
+                  required
+                />
+              </>
+            ) : (
+              <TextField
+                label='Tên menu'
+                value={editingItem?.label || ''}
+                onChange={(e) =>
+                  setEditingItem((prev) => ({ ...prev, label: e.target.value }))
+                }
+                fullWidth
+                required
               />
             )}
-
-            <TextField
-              label='Thứ tự hiển thị'
-              type='number'
-              value={editingItem?.order || 1}
-              onChange={(e) =>
-                setEditingItem((prev) => ({
-                  ...prev,
-                  order: parseInt(e.target.value) || 1
-                }))
-              }
-              fullWidth
-              inputProps={{ min: 1 }}
-              helperText='Thứ tự hiển thị trong menu (số nhỏ hơn sẽ hiển thị trước)'
-            />
 
             <FormControlLabel
               control={
@@ -876,8 +826,8 @@ const MegaMenuEditor = ({ open, onClose, onSuccess, initialData = null }) => {
                   cột trong megamenu khi hover vào menu cha.
                   <br />
                   <strong>Lưu ý:</strong> Chỉ hiển thị danh mục có sản phẩm. Khi
-                  chọn danh mục, URL sẽ được tự động điền theo định dạng
-                  category/slug. Tên menu có thể tùy chỉnh theo multitude.
+                  chọn danh mục, URL và tên mặc định sẽ được tự động điền. Tên
+                  menu có thể tùy chỉnh theo ý muốn.
                 </Typography>
               </Alert>
             )}
@@ -897,6 +847,41 @@ const MegaMenuEditor = ({ open, onClose, onSuccess, initialData = null }) => {
             }}
           >
             Lưu
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog
+        open={!!pendingDelete}
+        onClose={cancelDeleteItem}
+        maxWidth='sm'
+        fullWidth
+        PaperProps={{
+          sx: { borderRadius: 3 }
+        }}
+      >
+        <DialogTitle>
+          <Typography variant='h6' sx={{ fontWeight: 600 }}>
+            Xác nhận xóa
+          </Typography>
+        </DialogTitle>
+        <DialogContent>
+          <Typography>
+            Bạn có chắc muốn xóa{' '}
+            {pendingDelete?.subIndex >= 0 ? 'thành phần' : 'cột'} này?
+          </Typography>
+        </DialogContent>
+        <DialogActions sx={{ p: 3, pt: 1 }}>
+          <Button onClick={cancelDeleteItem}>Hủy</Button>
+          <Button
+            variant='contained'
+            onClick={confirmDeleteItem}
+            sx={{
+              backgroundColor: '#ef4444',
+              '&:hover': { backgroundColor: '#dc2626' }
+            }}
+          >
+            Xóa
           </Button>
         </DialogActions>
       </Dialog>
