@@ -272,7 +272,6 @@ const NewProducts = () => {
           aria-label='breadcrumb'
         >
           <Link
-            underline='hover'
             sx={{
               display: 'flex',
               alignItems: 'center',

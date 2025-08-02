@@ -289,22 +289,20 @@ const Cart = () => {
 
     if (!item || tempQty === undefined || tempQty === item.quantity) return
 
-    if (updateTimers[variantId]) {
-      clearTimeout(updateTimers[variantId])
-    }
+    try {
+      setProcessingVariantId(variantId)
+      const delta = tempQty - item.quantity
+      const result = await updateItem(variantId, { quantity: delta })
 
-    const timer = setTimeout(async () => {
-      try {
-        setProcessingVariantId(variantId)
-        const delta = tempQty - item.quantity
-        await updateItem(variantId, { quantity: delta })
-
+      if (result.success) {
+        // Cập nhật cartItems cục bộ
         setCartItems((prev) =>
           prev.map((i) =>
             i.variantId._id === variantId ? { ...i, quantity: tempQty } : i
           )
         )
 
+        // Cập nhật selectedItems
         setSelectedItems((prev) => {
           const newSelectedItems = prev.map((i) =>
             i.variantId === variantId ? { ...i, quantity: tempQty } : i
@@ -313,25 +311,21 @@ const Cart = () => {
           return newSelectedItems
         })
 
-        dispatch(removeTempQuantity(variantId))
-      } catch (err) {
-        console.error('Error updating quantity:', err)
-        setOutOfStockMessage('Không thể cập nhật số lượng sản phẩm')
-        setOutOfStockAlert(true)
-      } finally {
-        setProcessingVariantId(null)
-        setUpdateTimers((prev) => {
-          const newTimers = { ...prev }
-          delete newTimers[variantId]
-          return newTimers
-        })
+        // Làm mới dữ liệu từ server
+        // await cart
+      } else {
+        throw new Error(result.message || 'Failed to update item')
       }
-    }, 500)
 
-    setUpdateTimers((prev) => ({
-      ...prev,
-      [variantId]: timer,
-    }))
+      dispatch(removeTempQuantity(variantId))
+    } catch (err) {
+      console.error('Error updating quantity:', err)
+      setOutOfStockMessage(err.message || 'Không thể cập nhật số lượng sản phẩm')
+      setOutOfStockAlert(true)
+      dispatch(removeTempQuantity(variantId))
+    } finally {
+      setProcessingVariantId(null)
+    }
   }
 
   const handleRemove = async ({ variantId }) => {
@@ -1165,6 +1159,18 @@ const Cart = () => {
                                         }}
                                       />
                                     )}
+                                    {isVariantInactive && !isProductInactive && (
+                                      <Chip
+                                        size='small'
+                                        label='Ngừng bán'
+                                        sx={{
+                                          fontSize: '0.75rem',
+                                          backgroundColor: '#9e9e9e',
+                                          color: 'white',
+                                          fontWeight: 600,
+                                        }}
+                                      />
+                                    )}
                                   </Box>
                                 </Box>
                                 <Box
@@ -1437,4 +1443,4 @@ const Cart = () => {
   )
 }
 
-export default Cart        
+export default Cart

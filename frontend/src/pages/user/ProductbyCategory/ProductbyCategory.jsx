@@ -324,7 +324,6 @@ const ProductbyCategory = () => {
         sx={{ pt: 2, width: '100%', maxWidth: '95vw', mx: 'auto' }}
       >
         <Link
-          underline='hover'
           sx={{
             display: 'flex',
             alignItems: 'center',
