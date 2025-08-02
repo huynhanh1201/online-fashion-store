@@ -192,7 +192,7 @@ const TableOfContents = ({ headings, isMobile }) => {
       }}
     >
       <Typography variant="h6" sx={{ m: 2, mb: 1, fontWeight: 600, color: 'primary.main' }}>
-        Nội dung bài viết
+        Danh mục tiêu đề bài viết
       </Typography>
       <List
         dense
