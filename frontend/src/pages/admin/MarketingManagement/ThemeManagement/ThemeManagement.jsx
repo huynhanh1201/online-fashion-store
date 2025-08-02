@@ -30,40 +30,52 @@ import usePermissions from '~/hooks/usePermissions'
 // Predefined color schemes (thêm màu mới)
 const predefinedThemes = {
   modernBlue: {
-    name: 'Modern Blue (Mặc định)',
+    name: 'Modern Blue',
     primary: '#1A3C7B',
     secondary: '#2360cf',
     accent: '#093d9c'
   },
   elegantBeige: {
     name: 'Elegant Beige',
-    primary: '#C8B6A6', // Beige nhạt
-    secondary: '#EDE0D4', // Màu kem
-    accent: '#A68A64' // Nâu nhạt
+    primary: '#C8B6A6',
+    secondary: '#EDE0D4',
+    accent: '#A68A64'
   },
   blushPink: {
     name: 'Blush Pink',
-    primary: '#FFC1CC', // Hồng pastel
-    secondary: '#FFDDE1', // Hồng nhạt
-    accent: '#FF8FA3' // Hồng đậm hơn
+    primary: '#FFC1CC',
+    secondary: '#FFDDE1',
+    accent: '#FF8FA3'
   },
   oliveGreen: {
     name: 'Olive Green',
-    primary: '#6B705C', // Xanh olive tối
-    secondary: '#A5A58D', // Olive nhạt
-    accent: '#B7B7A4' // Be xám
+    primary: '#6B705C',
+    secondary: '#A5A58D',
+    accent: '#B7B7A4'
   },
   warmSand: {
     name: 'Warm Sand',
-    primary: '#E6B17E', // Màu cát ấm
-    secondary: '#F5DEB3', // Cát nhạt
-    accent: '#D4A373' // Cam đất
+    primary: '#E6B17E',
+    secondary: '#F5DEB3',
+    accent: '#D4A373'
   },
   charcoalGray: {
     name: 'Charcoal Gray',
-    primary: '#333333', // Xám than
-    secondary: '#555555', // Xám đậm
-    accent: '#777777' // Xám trung tính
+    primary: '#333333',
+    secondary: '#555555',
+    accent: '#777777'
+  },
+  lavenderMist: {
+    name: 'Lavender Mist',
+    primary: '#CDB4DB',
+    secondary: '#E8DFF5',
+    accent: '#B5838D'
+  },
+  terracottaClay: {
+    name: 'Terracotta Clay',
+    primary: '#9C6644',
+    secondary: '#CC7351',
+    accent: '#B5651D'
   }
 }
 
@@ -224,7 +236,7 @@ const ThemeManagement = () => {
           Quản lý Chủ đề & Màu sắc
         </Typography>
 
-        <Grid container spacing={3}>
+        <Grid>
           {/* Predefined Themes */}
           <Grid item xs={12}>
             <Card>
