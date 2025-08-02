@@ -1,4 +1,4 @@
-import React from 'react'
+import { React, useEffect } from 'react'
 import {
   Box,
   Typography,
@@ -84,7 +84,9 @@ const ProductInfoSection = ({
   getCurrentPrice
 }) => {
   const currentPrice = getCurrentPrice()
-
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'auto' })
+  }, [])
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
       <Typography

@@ -287,7 +287,9 @@ const OrderRow = ({ order, onOrderUpdate, onOrderCancelled, onReorder, reorderLo
     const actualPrice = ((item.subtotal || 0) / totalOriginalSubtotal) * totalProductsPrice
     return Math.round(actualPrice)
   }
-
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'auto' })
+  }, [])
   useEffect(() => {
     const fetchItems = async () => {
       try {
