@@ -81,9 +81,9 @@ const WarehouseSlipsTab = () => {
   ])
 
   const handleOpenModal = (type) => {
-    fetchPartners(1, 100000, { status: false })
-    fetchWarehouses(1, 10, { status: false })
-    fetchVariants(1, 100000, { status: false })
+    fetchPartners(1, 100000, { destroy: false })
+    fetchWarehouses(1, 10, { destroy: false })
+    fetchVariants(1, 100000, { destroy: false })
     fetchBatches()
     setModalType(type)
     setNewSlipData({
@@ -210,7 +210,13 @@ const WarehouseSlipsTab = () => {
       minWidth: 150,
       align: 'start'
     },
-    { id: 'createdAtFormatted', label: 'Ngày thực hiện', minWidth: 150 },
+    {
+      id: 'createdAtFormatted',
+      label: 'Ngày thực hiện',
+      minWidth: 150,
+      align: 'start',
+      format: (value) => new Date(value).toLocaleDateString('vi-VN')
+    },
     { id: 'action', label: 'Hành động', minWidth: 130, align: 'start' }
   ]
 
@@ -362,10 +368,7 @@ const WarehouseSlipsTab = () => {
                         rawValue = index + 1 + (page - 1) * ROWS_PER_PAGE
                         break
                       case 'createdAtFormatted': {
-                        const date = new Date(row.createdAt)
-                        rawValue = isNaN(date.getTime())
-                          ? '—'
-                          : date.toLocaleDateString('vi-VN')
+                        rawValue = row?.date
                         break
                       }
                       case 'warehouse': {

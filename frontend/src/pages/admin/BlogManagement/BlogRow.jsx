@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import {
   TableRow,
   TableCell,
@@ -53,7 +53,21 @@ const BlogRow = ({
       year: 'numeric'
     })
   const { hasPermission } = usePermissions()
+  const [showRestoreIcon, setShowRestoreIcon] = useState(false)
 
+  useEffect(() => {
+    if (filters.destroy === 'true') {
+      const timer = setTimeout(() => {
+        setShowRestoreIcon(true)
+      }, 1000)
+
+      return () => {
+        clearTimeout(timer)
+      }
+    } else {
+      setShowRestoreIcon(true)
+    }
+  }, [filters.destroy])
   return (
     <TableRow hover role='checkbox' tabIndex={-1}>
       <TableCell align='center' sx={{ ...styles.cellPadding, width: 50 }}>
@@ -124,7 +138,7 @@ const BlogRow = ({
               </IconButton>
             </Tooltip>
           )}
-          {filters.destroy === 'true' ? (
+          {showRestoreIcon === false ? (
             hasPermission('blog:restore') && (
               <Tooltip title='Khôi phục'>
                 <IconButton size='small' onClick={() => onRestore(blog)}>
