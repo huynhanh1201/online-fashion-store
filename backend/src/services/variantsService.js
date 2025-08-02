@@ -77,7 +77,7 @@ const createVariant = async (reqBody) => {
 
     if (cheapestVariant) {
       await ProductModel.findOneAndUpdate(
-        { _id: reqBody.productId }, // điều kiện tìm product
+        { _id: cheapestVariant.productId }, // điều kiện tìm product
         {
           $set: {
             minSalePriceVariant: {
@@ -237,9 +237,11 @@ const updateVariant = async (variantId, reqBody) => {
       .sort({ finalSalePrice: 1 }) // tăng dần → cái rẻ nhất đứng đầu
       .lean() // optional: nếu không cần document đầy đủ từ mongoose
 
+    console.log(cheapestVariant)
+
     if (cheapestVariant) {
       await ProductModel.findOneAndUpdate(
-        { _id: reqBody.productId }, // điều kiện tìm product
+        { _id: cheapestVariant.productId }, // điều kiện tìm product
         {
           $set: {
             minSalePriceVariant: {

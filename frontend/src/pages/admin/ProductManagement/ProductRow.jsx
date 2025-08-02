@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { TableRow, TableCell, IconButton, Stack, Chip } from '@mui/material'
 import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye'
 import BorderColorIcon from '@mui/icons-material/BorderColor'
@@ -44,7 +44,21 @@ const ProductRow = ({
   const navigate = useNavigate()
   const handleImageClick = () => setOpenImage(true)
   const handleClose = () => setOpenImage(false)
+  const [showRestoreIcon, setShowRestoreIcon] = useState(false)
 
+  useEffect(() => {
+    if (filters.destroy === 'true') {
+      const timer = setTimeout(() => {
+        setShowRestoreIcon(true)
+      }, 1000)
+
+      return () => {
+        clearTimeout(timer)
+      }
+    } else {
+      setShowRestoreIcon(true)
+    }
+  }, [filters.destroy])
   return (
     <>
       <TableRow hover>
@@ -96,7 +110,7 @@ const ProductRow = ({
                 }
                 sx={{
                   ...styles.cellPadding,
-                  maxWidth: 200,
+                  maxWidth: 150,
                   display: 'table-cell',
                   cursor: permissions.canView ? 'pointer' : 'default'
                 }}
@@ -155,7 +169,7 @@ const ProductRow = ({
                   cursor: product.categoryId ? 'pointer' : 'default',
                   maxWidth: 200,
                   display: 'table-cell',
-                  // color: product.categoryId ? '#1976d2' : 'inherit',
+                  color: product.categoryId ? '#1976d2' : 'inherit',
                   '&:hover': product.categoryId
                     ? { textDecoration: 'none' }
                     : undefined
@@ -163,7 +177,7 @@ const ProductRow = ({
                 onClick={() => {
                   if (product.categoryId) {
                     navigate(
-                      `/admin/categorie-management?search=${encodeURIComponent(formattedName)}`
+                      `/admin/categorie-management?categoryId=${product.categoryId._id}`
                     )
                   }
                 }}
@@ -278,7 +292,7 @@ const ProductRow = ({
                       </IconButton>
                     </Tooltip>
                   )}
-                  {filters.destroy === 'true' ? (
+                  {showRestoreIcon === false ? (
                     permissions.canRestore && (
                       <Tooltip title='Khôi phục'>
                         <IconButton

@@ -4,7 +4,7 @@ import ProductCard from './ProductCards'
 const ProductHorizontalScroll = ({
   products = [],
   defaultCardsPerRow = 5,
-  gap = 20
+  gap = 5
 }) => {
   const [showAll, setShowAll] = useState(false)
   const [windowWidth, setWindowWidth] = useState(window.innerWidth)

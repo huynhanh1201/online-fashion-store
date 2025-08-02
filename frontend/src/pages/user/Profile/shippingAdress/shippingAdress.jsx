@@ -199,7 +199,7 @@ function ShippingAddress({ showSnackbar }) {
     const errors = {
       fullName: !fullName.trim() || fullName.trim().length < 3,
       phone: !phone.trim() || !VN_PHONE_REGEX.test(phone.trim()),
-      address: !address.trim() || address.trim().length < 5,
+      address: !address.trim() || address.trim().length < 1,
       city: !city,
       district: !district,
       ward: !ward
@@ -270,24 +270,28 @@ function ShippingAddress({ showSnackbar }) {
           return
         }
       }
-      setFormData({
-        fullName: '',
-        phone: '',
-        address: '',
-        city: '',
-        district: '',
-        ward: ''
-      })
-      setFormErrors({
-        fullName: false,
-        phone: false,
-        address: false,
-        city: false,
-        district: false,
-        ward: false
-      })
-      setOpenAddressDialog(false)
-      setEditAddressId(null)
+      setOpenAddressDialog(false) // Đóng dialog trước ngay lập tức
+
+      // Delay reset sau khi dialog đóng
+      setTimeout(() => {
+        setFormData({
+          fullName: '',
+          phone: '',
+          address: '',
+          city: '',
+          district: '',
+          ward: ''
+        })
+        setFormErrors({
+          fullName: false,
+          phone: false,
+          address: false,
+          city: false,
+          district: false,
+          ward: false
+        })
+        setEditAddressId(null)
+      }, 200) // delay 200ms để tránh render trống trước khi đóng
     } catch (error) {
       const errorMessage =
         error.response?.data?.message ||
@@ -446,7 +450,7 @@ function ShippingAddress({ showSnackbar }) {
           : field === 'phone'
             ? !value.trim() || !VN_PHONE_REGEX.test(value.trim())
             : field === 'address'
-              ? !value.trim() || value.trim().length < 5
+              ? !value.trim() || value.trim().length < 1
               : !value
     }))
   }

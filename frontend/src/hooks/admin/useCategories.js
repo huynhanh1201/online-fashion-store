@@ -111,11 +111,13 @@ const useCategories = () => {
 
   const fetchById = async (id) => {
     try {
-      const category = await getCategoryById(id)
-      return category
+      const { categories } = await getCategoryById(id)
+      setCategories(categories ? [categories] : [])
+      setTotalPages(1) // vì chỉ có 1 kết quả
     } catch (err) {
-      console.error('Error fetching category by ID:', err)
-      return null
+      console.error('Error fetching category by id:', err)
+      setloading(false)
+      return { categories: [], total: 0 }
     }
   }
 

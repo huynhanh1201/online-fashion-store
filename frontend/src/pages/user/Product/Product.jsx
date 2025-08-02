@@ -168,21 +168,45 @@ const Product = () => {
         console.error('Products không phải là array:', products)
         throw new Error('Dữ liệu sản phẩm không hợp lệ')
       }
-
-      let sortedProducts = [...products]
-
-      // Client-side sorting cho giá
-      if (sortOption === 'priceAsc') {
-        sortedProducts.sort(
-          (a, b) => (a.exportPrice || 0) - (b.exportPrice || 0)
-        )
-      } else if (sortOption === 'priceDesc') {
-        sortedProducts.sort(
-          (a, b) => (b.exportPrice || 0) - (a.exportPrice || 0)
-        )
+      switch (sortOption) {
+        case 'nameAsc':
+          products.sort((a, b) => a.name.localeCompare(b.name))
+          break
+        case 'nameDesc':
+          products.sort((a, b) => b.name.localeCompare(a.name))
+          break
+        case 'priceAsc':
+          products.sort((a, b) => {
+            const priceA =
+              a.minSalePriceVariant?.finalSalePrice > 0
+                ? a.minSalePriceVariant.finalSalePrice
+                : a.exportPrice
+            const priceB =
+              b.minSalePriceVariant?.finalSalePrice > 0
+                ? b.minSalePriceVariant.finalSalePrice
+                : b.exportPrice
+            return priceA - priceB
+          })
+          break
+        case 'priceDesc':
+          products.sort((a, b) => {
+            const priceA =
+              a.minSalePriceVariant?.finalSalePrice > 0
+                ? a.minSalePriceVariant.finalSalePrice
+                : a.exportPrice
+            const priceB =
+              b.minSalePriceVariant?.finalSalePrice > 0
+                ? b.minSalePriceVariant.finalSalePrice
+                : b.exportPrice
+            return priceB - priceA
+          })
+          break
+        case 'featured':
+        default:
+          break
       }
 
-      setProducts(sortedProducts)
+      setProducts(products)
       setTotalPages(totalPages)
     } catch (error) {
       console.error('Chi tiết lỗi:', error)

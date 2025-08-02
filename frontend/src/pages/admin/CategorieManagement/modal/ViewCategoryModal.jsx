@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useMemo } from 'react'
 import {
   Dialog,
   DialogTitle,
@@ -16,7 +16,7 @@ import {
 import AddPhotoAlternateIcon from '@mui/icons-material/AddPhotoAlternate'
 import StyleAdmin from '~/assets/StyleAdmin.jsx'
 import ImageNotSupportedIcon from '@mui/icons-material/ImageNotSupported'
-import { optimizeCloudinaryUrl } from '~/utils/cloudinary.js'
+import useCategories from '~/hooks/admin/useCategories'
 const ViewCategoryModal = ({ open, onClose, category }) => {
   const formatDate = (dateString) => {
     if (!dateString) return 'Không có thông tin'
@@ -30,6 +30,20 @@ const ViewCategoryModal = ({ open, onClose, category }) => {
       second: '2-digit'
     })
   }
+  const { categories, fetchCategories } = useCategories()
+
+  useEffect(() => {
+    fetchCategories(1, 100000, { destroy: 'false' })
+  }, [])
+
+  // ✅ Dùng useMemo để tính realParentIds mỗi khi categories thay đổi
+  const realParentIds = useMemo(() => {
+    return new Set(
+      categories
+        .map((c) => c.parent?._id || c.parent) // dùng _id nếu parent là object, hoặc chính parent nếu là string
+        .filter(Boolean)
+    )
+  }, [categories])
   return (
     <Dialog
       open={open}
@@ -46,231 +60,282 @@ const ViewCategoryModal = ({ open, onClose, category }) => {
     >
       <DialogTitle>Thông tin danh mục sản phẩm</DialogTitle>
       <Divider />
-      <DialogContent sx={{ maxHeight: '69vh' }}>
+      <DialogContent sx={{ maxHeight: '69vh', overflowY: 'auto' }}>
         {category ? (
           <Box
             display='flex'
             gap={3}
-            flexDirection={{ xs: 'column', sm: 'row' }}
+            flexDirection={{ xs: 'column', md: 'row' }}
+            alignItems='flex-start'
           >
-            {/* Ảnh danh mục */}
-            <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-              <Typography variant='subtitle2' fontWeight='bold' mb={1}>
-                Ảnh danh mục
-              </Typography>
-              <Box
-                display='flex'
-                flexDirection='column'
-                alignItems='center'
-                justifyContent='center'
-                border='2px dashed #ccc'
-                borderRadius={2}
-                position='relative'
-                sx={{
-                  backgroundColor: '#ccc',
-                  width: 350,
-                  height: 331
-                }}
-              >
-                {category.image ? (
-                  <img
-                    src={category.image}
-                    alt='Ảnh danh mục'
-                    style={{
-                      width: '100%',
-                      height: '100%',
-                      objectFit: 'contain',
-                      borderRadius: 8
-                    }}
-                  />
-                ) : (
-                  <Box textAlign='center' color='#999'>
-                    <ImageNotSupportedIcon fontSize='large' />
-                    <Typography fontSize={14} mt={1}>
-                      Không có ảnh
-                    </Typography>
-                  </Box>
-                )}
+            {/* Cột ảnh */}
+            <Box display='flex' flexDirection='row' gap={2}>
+              {/* Ảnh danh mục */}
+              <Box>
+                <Typography variant='subtitle2' fontWeight='bold' mb={1}>
+                  Ảnh danh mục
+                </Typography>
+                <Box
+                  display='flex'
+                  alignItems='center'
+                  justifyContent='center'
+                  border='2px dashed #ccc'
+                  borderRadius={2}
+                  sx={{
+                    backgroundColor: '#ccc',
+                    width: 350,
+                    height: 331,
+                    overflow: 'hidden'
+                  }}
+                >
+                  {category.image ? (
+                    <img
+                      src={category.image}
+                      alt='Ảnh danh mục'
+                      style={{
+                        width: '100%',
+                        height: '100%',
+                        objectFit: 'contain',
+                        borderRadius: 8
+                      }}
+                    />
+                  ) : (
+                    <Box textAlign='center' color='#999'>
+                      <ImageNotSupportedIcon fontSize='large' />
+                      <Typography fontSize={14} mt={1}>
+                        Không có ảnh
+                      </Typography>
+                    </Box>
+                  )}
+                </Box>
               </Box>
-            </Box>
-            {/* Ảnh quảng cáo */}
-            <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-              <Typography variant='subtitle2' fontWeight='bold' mb={1}>
-                Ảnh quảng cáo
-              </Typography>
-              <Box
-                display='flex'
-                alignItems='center'
-                justifyContent='center'
-                border='2px dashed #ccc'
-                borderRadius={2}
-                sx={{
-                  backgroundColor: '#ccc',
-                  width: 350,
-                  height: 331
-                }}
-              >
-                {category.banner ? (
-                  <img
-                    src={category.banner}
-                    alt='Ảnh banner'
-                    style={{
-                      width: '100%',
-                      height: '100%',
-                      objectFit: 'contain',
-                      borderRadius: 8
-                    }}
-                  />
-                ) : (
-                  <Box textAlign='center' color='#999'>
-                    <ImageNotSupportedIcon fontSize='large' />
-                    <Typography fontSize={14} mt={1}>
-                      Không có ảnh quảng cáo
-                    </Typography>
-                  </Box>
-                )}
+
+              {/* Ảnh quảng cáo */}
+              <Box>
+                <Typography variant='subtitle2' fontWeight='bold' mb={1}>
+                  Ảnh quảng cáo
+                </Typography>
+                <Box
+                  display='flex'
+                  alignItems='center'
+                  justifyContent='center'
+                  border='2px dashed #ccc'
+                  borderRadius={2}
+                  sx={{
+                    backgroundColor: '#ccc',
+                    width: 350,
+                    height: 331,
+                    overflow: 'hidden'
+                  }}
+                >
+                  {category.banner ? (
+                    <img
+                      src={category.banner}
+                      alt='Ảnh banner'
+                      style={{
+                        width: '100%',
+                        height: '100%',
+                        objectFit: 'contain',
+                        borderRadius: 8
+                      }}
+                    />
+                  ) : (
+                    <Box textAlign='center' color='#999'>
+                      <ImageNotSupportedIcon fontSize='large' />
+                      <Typography fontSize={14} mt={1}>
+                        Không có ảnh quảng cáo
+                      </Typography>
+                    </Box>
+                  )}
+                </Box>
               </Box>
             </Box>
 
-            {/* Thông tin bên phải */}
-            <Table size='small'>
-              <TableBody>
-                <TableRow>
-                  <TableCell
-                    sx={{
-                      width: 200,
-                      fontWeight: 700,
-                      height: 50,
-                      padding: '8px 16px',
-                      lineHeight: '50px'
-                    }}
-                  >
-                    Tên danh mục
-                  </TableCell>
-                  <TableCell
-                    sx={{
-                      height: 50,
-                      padding: '8px 16px',
-                      lineHeight: '50px'
-                    }}
-                  >
-                    {category?.name
-                      .split(' ')
-                      .map(
-                        (word) =>
-                          word.charAt(0).toUpperCase() +
-                          word.slice(1).toLowerCase()
-                      )
-                      .join(' ') || '—'}
-                  </TableCell>
-                </TableRow>
-
-                {category?.parent?.name && (
-                  <TableRow>
+            {/* Bảng thông tin */}
+            <Box flex={1} overflow='auto' mt={3}>
+              <Table size='small'>
+                <TableBody>
+                  <TableRow sx={{ height: 50 }}>
                     <TableCell
                       sx={{
                         width: 200,
                         fontWeight: 700,
-                        height: 50,
                         padding: '8px 16px',
-                        lineHeight: '50px'
+                        height: 50,
+                        lineHeight: '34px',
+                        whiteSpace: 'nowrap'
                       }}
                     >
-                      Tên danh mục cha
+                      Tên danh mục
                     </TableCell>
                     <TableCell
                       sx={{
-                        height: 50,
                         padding: '8px 16px',
-                        lineHeight: '50px'
+                        height: 50,
+                        lineHeight: '34px',
+                        position: 'relative'
                       }}
                     >
-                      {category?.parent?.name || '—'}
+                      <Box
+                        sx={{ display: 'inline-block', position: 'relative' }}
+                      >
+                        {(category?.name || '')
+                          .split(' ')
+                          .map(
+                            (word) =>
+                              word.charAt(0).toUpperCase() +
+                              word.slice(1).toLowerCase()
+                          )
+                          .join(' ') || 'Không có dữ liệu'}
+                        {category?._id &&
+                          realParentIds.has(category._id.toString()) && (
+                            <Box
+                              sx={{
+                                position: 'absolute',
+                                top: -7,
+                                right: -10,
+                                width: 20,
+                                height: 20,
+                                color: '#f00',
+                                fontSize: '10px',
+                                fontWeight: 700,
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                borderRadius: '50%'
+                              }}
+                            >
+                              Nhóm
+                            </Box>
+                          )}
+                      </Box>
                     </TableCell>
                   </TableRow>
-                )}
 
-                <TableRow>
-                  <TableCell
-                    sx={{
-                      width: 200,
-                      fontWeight: 700,
-                      height: 50,
-                      padding: '8px 16px',
-                      lineHeight: '50px'
-                    }}
-                  >
-                    Mô tả
-                  </TableCell>
-                  <TableCell
-                    sx={{
-                      height: 50,
-                      padding: '8px 16px'
-                    }}
-                  >
-                    <Typography
+                  {category?.parent && (
+                    <TableRow sx={{ height: 50 }}>
+                      <TableCell
+                        sx={{
+                          width: 200,
+                          fontWeight: 700,
+                          padding: '8px 16px',
+                          height: 50,
+                          lineHeight: '34px',
+                          whiteSpace: 'nowrap'
+                        }}
+                      >
+                        Tên nhóm danh mục
+                      </TableCell>
+                      <TableCell
+                        sx={{
+                          padding: '8px 16px',
+                          height: 50,
+                          lineHeight: '34px'
+                        }}
+                      >
+                        {(category?.parent?.name || '')
+                          .split(' ')
+                          .map(
+                            (word) =>
+                              word.charAt(0).toUpperCase() +
+                              word.slice(1).toLowerCase()
+                          )
+                          .join(' ') || 'Không có dữ liệu'}
+                      </TableCell>
+                    </TableRow>
+                  )}
+
+                  <TableRow sx={{ height: 50 }}>
+                    <TableCell
                       sx={{
-                        whiteSpace: 'pre-line',
-                        wordBreak: 'break-word'
+                        width: 200,
+                        fontWeight: 700,
+                        padding: '8px 16px',
+                        height: 50,
+                        lineHeight: '34px',
+                        whiteSpace: 'nowrap'
                       }}
                     >
-                      {category?.description || 'Không có mô tả'}
-                    </Typography>
-                  </TableCell>
-                </TableRow>
+                      Mô tả
+                    </TableCell>
+                    <TableCell
+                      sx={{
+                        padding: '8px 16px',
+                        height: 50,
+                        lineHeight: '34px',
+                        overflow: 'hidden',
+                        whiteSpace: 'nowrap',
+                        textOverflow: 'ellipsis'
+                      }}
+                    >
+                      <Typography
+                        sx={{
+                          whiteSpace: 'nowrap',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis'
+                        }}
+                      >
+                        {category?.description || 'Không có mô tả'}
+                      </Typography>
+                    </TableCell>
+                  </TableRow>
 
-                <TableRow>
-                  <TableCell
-                    sx={{
-                      width: 200,
-                      fontWeight: 700,
-                      height: 50,
-                      padding: '8px 16px',
-                      lineHeight: '50px'
-                    }}
-                  >
-                    Ngày tạo
-                  </TableCell>
-                  <TableCell
-                    sx={{
-                      height: 50,
-                      padding: '8px 16px',
-                      lineHeight: '50px'
-                    }}
-                  >
-                    {formatDate(category?.createdAt)}
-                  </TableCell>
-                </TableRow>
+                  <TableRow sx={{ height: 50 }}>
+                    <TableCell
+                      sx={{
+                        width: 200,
+                        fontWeight: 700,
+                        padding: '8px 16px',
+                        height: 50,
+                        lineHeight: '34px',
+                        whiteSpace: 'nowrap'
+                      }}
+                    >
+                      Ngày tạo
+                    </TableCell>
+                    <TableCell
+                      sx={{
+                        padding: '8px 16px',
+                        height: 50,
+                        lineHeight: '34px'
+                      }}
+                    >
+                      {formatDate(category?.createdAt)}
+                    </TableCell>
+                  </TableRow>
 
-                <TableRow>
-                  <TableCell
-                    sx={{
-                      width: 200,
-                      fontWeight: 700,
-                      height: 50,
-                      padding: '8px 16px',
-                      lineHeight: '50px'
-                    }}
-                  >
-                    Ngày cập nhật
-                  </TableCell>
-                  <TableCell
-                    sx={{
-                      height: 50,
-                      padding: '8px 16px',
-                      lineHeight: '50px'
-                    }}
-                  >
-                    {formatDate(category?.updatedAt)}
-                  </TableCell>
-                </TableRow>
-              </TableBody>
-            </Table>
+                  <TableRow sx={{ height: 50 }}>
+                    <TableCell
+                      sx={{
+                        width: 200,
+                        fontWeight: 700,
+                        padding: '8px 16px',
+                        height: 50,
+                        lineHeight: '34px',
+                        whiteSpace: 'nowrap'
+                      }}
+                    >
+                      Ngày cập nhật
+                    </TableCell>
+                    <TableCell
+                      sx={{
+                        padding: '8px 16px',
+                        height: 50,
+                        lineHeight: '34px'
+                      }}
+                    >
+                      {formatDate(category?.updatedAt)}
+                    </TableCell>
+                  </TableRow>
+                </TableBody>
+              </Table>
+            </Box>
           </Box>
         ) : (
           <Typography>Không có dữ liệu danh mục</Typography>
         )}
       </DialogContent>
+
       <Divider />
       <DialogActions sx={{ padding: '16px 24px' }}>
         <Button

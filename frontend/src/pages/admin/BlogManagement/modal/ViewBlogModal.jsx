@@ -113,24 +113,24 @@ const ViewBlogModal = ({ open, onClose, blog, isMobile }) => {
           </Box>
         </Box>
         {/* Tags */}
-        <Box mb={2}>
-          <Typography fontWeight={600}>Thẻ (tags):</Typography>
-          {blog?.tags && blog?.tags.length > 0 ? (
-            <Box sx={{ mt: 1, display: 'flex', gap: 1, flexWrap: 'wrap' }}>
-              {blog?.tags.map((tag, i) => (
-                <Chip key={i} label={tag} />
-              ))}
-            </Box>
-          ) : (
-            <Typography
-              variant='body2'
-              fontStyle='italic'
-              color='text.secondary'
-            >
-              Không có thẻ
-            </Typography>
-          )}
-        </Box>
+        {/*<Box mb={2}>*/}
+        {/*  <Typography fontWeight={600}>Thẻ (tags):</Typography>*/}
+        {/*  {blog?.tags && blog?.tags.length > 0 ? (*/}
+        {/*    <Box sx={{ mt: 1, display: 'flex', gap: 1, flexWrap: 'wrap' }}>*/}
+        {/*      {blog?.tags.map((tag, i) => (*/}
+        {/*        <Chip key={i} label={tag} />*/}
+        {/*      ))}*/}
+        {/*    </Box>*/}
+        {/*  ) : (*/}
+        {/*    <Typography*/}
+        {/*      variant='body2'*/}
+        {/*      fontStyle='italic'*/}
+        {/*      color='text.secondary'*/}
+        {/*    >*/}
+        {/*      Không có thẻ*/}
+        {/*    </Typography>*/}
+        {/*  )}*/}
+        {/*</Box>*/}
 
         {/* Thông tin thêm */}
         <Box mb={3}>
@@ -139,18 +139,6 @@ const ViewBlogModal = ({ open, onClose, blog, isMobile }) => {
           </Typography>
           <Table size='small'>
             <TableBody>
-              <TableRow>
-                <TableCell sx={{ width: 400, fontWeight: 700 }}>
-                  Danh mục
-                </TableCell>
-                <TableCell>{blog?.category || 'Chưa phân loại'}</TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell sx={{ width: 400, fontWeight: 700 }}>
-                  Thương hiệu
-                </TableCell>
-                <TableCell>{blog?.brand || 'Không có'}</TableCell>
-              </TableRow>
               <TableRow>
                 <TableCell sx={{ width: 400, fontWeight: 700 }}>Slug</TableCell>
                 <TableCell>{blog?.slug || 'Không có'}</TableCell>
@@ -163,18 +151,18 @@ const ViewBlogModal = ({ open, onClose, blog, isMobile }) => {
                   {blog?.status && (
                     <Chip
                       label={
-                        blog.status === 'draft'
-                          ? 'Bản nháp'
-                          : blog.status === 'published'
-                            ? 'Đã xuất bản'
-                            : 'Đã lưu trữ'
+                        blog.status === 'published'
+                          ? 'Đã xuất bản'
+                          : blog.status === 'draft'
+                            ? 'Bản nháp'
+                            : 'Lưu trữ'
                       }
                       color={
-                        blog.status === 'draft'
-                          ? 'default'
-                          : blog.status === 'published'
-                            ? 'success'
-                            : 'error'
+                        blog.status === 'published'
+                          ? 'success'
+                          : blog.status === 'draft'
+                            ? 'warning'
+                            : 'default'
                       }
                       size='large'
                       sx={{ width: '127px', fontWeight: '800' }}

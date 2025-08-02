@@ -13,7 +13,8 @@ import {
   TableRow,
   TableCell,
   Chip,
-  Divider
+  Divider,
+  Box
 } from '@mui/material'
 import StyleAdmin from '~/assets/StyleAdmin.jsx'
 
@@ -26,12 +27,14 @@ const ViewWarehouseSlipModal = ({ open, onClose, slip }) => {
     <Dialog
       open={open}
       onClose={onClose}
-      maxWidth='md'
-      fullWidth
+      maxWidth='lg'
       sx={{
         '& .MuiDialog-paper': {
           maxHeight: '95%',
-          mb: 2.4
+          mb: 2.4,
+          width: 'auto', // Chiều rộng theo nội dung
+          maxWidth: 'lg', // Giới hạn không vượt quá md
+          minWidth: 900 // (tuỳ chọn) đảm bảo không quá nhỏ
         }
       }}
       BackdropProps={{
@@ -172,27 +175,64 @@ const ViewWarehouseSlipModal = ({ open, onClose, slip }) => {
             {slip.items.length > 0 ? (
               slip.items.map((item, index) => {
                 const variantName = item.variantId?.name || 'Không có tên'
+                const formattedName = variantName
+                  .split(' ')
+                  .map(
+                    (word) =>
+                      word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+                  )
+                  .join(' ')
+
                 return (
                   <TableRow key={index}>
+                    {/* Mã biến thể */}
                     <TableCell>
-                      {item.variantId.sku || 'Không có mã biến thể'}
+                      <Box
+                        sx={{
+                          maxWidth: 150,
+                          whiteSpace: 'nowrap',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis'
+                        }}
+                      >
+                        {item.variantId.sku || 'Không có mã biến thể'}
+                      </Box>
                     </TableCell>
+
+                    {/* Tên sản phẩm */}
                     <TableCell>
-                      {variantName
-                        .split(' ')
-                        .map(
-                          (word) =>
-                            word.charAt(0).toUpperCase() +
-                            word.slice(1).toLowerCase()
-                        )
-                        .join(' ')}
+                      <Box
+                        sx={{
+                          maxWidth: 450,
+                          whiteSpace: 'nowrap',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis'
+                        }}
+                      >
+                        {formattedName}
+                      </Box>
                     </TableCell>
+
+                    {/* Số lượng */}
                     <TableCell align='right'>
                       {item.quantity
                         ? `${Number(item.quantity).toLocaleString('vi-VN')}`
                         : 0}
                     </TableCell>
-                    <TableCell>{item.unit || 'cái'}</TableCell>
+
+                    {/* Đơn vị */}
+                    <TableCell>
+                      <Box
+                        sx={{
+                          maxWidth: 100,
+                          whiteSpace: 'nowrap',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis'
+                        }}
+                      >
+                        {item.unit || 'cái'}
+                      </Box>
+                    </TableCell>
                   </TableRow>
                 )
               })

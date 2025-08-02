@@ -80,7 +80,7 @@ const styles = {
 const ProductGrid = ({ children }) => {
   const gridStyles = {
     display: 'grid',
-    gap: '20px',
+    gap: '5px',
     gridTemplateColumns: 'repeat(4, 1fr)'
   }
 

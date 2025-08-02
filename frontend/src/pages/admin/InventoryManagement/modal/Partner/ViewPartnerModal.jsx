@@ -114,7 +114,9 @@ export default function ViewPartnerModal({ open, onClose, partner }) {
               <TableCell>
                 <strong>Email</strong>
               </TableCell>
-              <TableCell>{partner.contact?.email || '---'}</TableCell>
+              <TableCell>
+                {partner.contact?.email || 'Không có dữ liệu'}
+              </TableCell>
             </TableRow>
             <TableRow>
               <TableCell>

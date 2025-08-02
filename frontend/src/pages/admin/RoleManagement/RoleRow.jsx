@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { TableCell, TableRow, IconButton, Stack, Chip } from '@mui/material'
 import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye'
 import BorderColorIcon from '@mui/icons-material/BorderColor'
@@ -48,6 +48,21 @@ export default function RoleRow({
   filters
 }) {
   const { hasPermission } = usePermissions()
+  const [showRestoreIcon, setShowRestoreIcon] = useState(false)
+
+  useEffect(() => {
+    if (filters.destroy === 'true') {
+      const timer = setTimeout(() => {
+        setShowRestoreIcon(true)
+      }, 1000)
+
+      return () => {
+        clearTimeout(timer)
+      }
+    } else {
+      setShowRestoreIcon(true)
+    }
+  }, [filters.destroy])
   return (
     <TableRow hover role='checkbox' tabIndex={-1}>
       {columns.map((column) => {
@@ -155,7 +170,7 @@ export default function RoleRow({
                     </IconButton>
                   </Tooltip>
                 )}
-                {filters.destroy === 'true' ? (
+                {showRestoreIcon === false ? (
                   hasPermission('role:restore') && (
                     <Tooltip title='Khôi phục'>
                       <IconButton

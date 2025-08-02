@@ -57,7 +57,9 @@ const ProductDetail = () => {
   const selectedColorObj = availableColors?.find(
     (color) => color.name === selectedColor
   )
-
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'auto' })
+  }, [])
   useEffect(() => {
     const fetchCategory = async () => {
       console.log('>>> product.category:', product?.category)
@@ -82,7 +84,7 @@ const ProductDetail = () => {
 
   if (isLoading) {
     return (
-      <Container maxWidth='lg' sx={{ py: 4, mt: 20, textAlign: 'center' }}>
+      <Container maxWidth='lg' sx={{ py: 4, mt: 20, minHeight: '70vh', textAlign: 'center' }}>
         <Typography variant='h6'>Đang tải...</Typography>
       </Container>
     )

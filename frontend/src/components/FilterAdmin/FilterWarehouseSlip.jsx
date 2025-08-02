@@ -158,7 +158,7 @@ export default function FilterWarehouseSlip({ onFilter, loading }) {
         ]}
       />
       <FilterByTime
-        label='Ngày tạo phiếu'
+        label='Lọc thời gian tạo'
         selectedFilter={selectedFilter}
         setSelectedFilter={setSelectedFilter}
         startDate={startDate}

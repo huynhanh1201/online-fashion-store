@@ -10,7 +10,7 @@ import {
 import PersonIcon from '@mui/icons-material/Person'
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart'
 import CheckCircleIcon from '@mui/icons-material/CheckCircle'
-import { useNavigate, Link } from 'react-router-dom'
+import { useNavigate, Link, useLocation } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import {
   logoutUserAPI,
@@ -22,12 +22,14 @@ import { toast } from 'react-toastify'
 import { useCart } from '~/hooks/useCarts'
 import { optimizeCloudinaryUrl } from '~/utils/cloudinary'
 import usePermissions from '~/hooks/usePermissions'
+import { saveRedirectPath } from '~/utils/redirectUtils'
 
 const HeaderAction = () => {
   const [anchorEl, setAnchorEl] = useState(null)
   const open = Boolean(anchorEl)
   const dispatch = useDispatch()
   const navigate = useNavigate()
+  const location = useLocation()
   const currentUser = useSelector(selectCurrentUser)
   const menuRef = useRef(null) // Reference to the menu element
 
@@ -281,7 +283,11 @@ const HeaderAction = () => {
             </>
           ) : (
             <Button
-              onClick={handleClose}
+              onClick={() => {
+                handleClose()
+                // Lưu đường dẫn hiện tại trước khi chuyển đến trang đăng nhập
+                saveRedirectPath(location.pathname + location.search)
+              }}
               component={Link}
               to='/login'
               sx={{

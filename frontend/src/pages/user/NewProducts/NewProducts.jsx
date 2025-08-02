@@ -102,7 +102,7 @@ const NewProducts = () => {
         nameAsc: 'name_asc',
         nameDesc: 'name_desc',
         priceAsc: 'price_asc',
-        priceDesc: 'price_desc',
+        priceDesc: 'price_desc'
       }
 
       const params = {
@@ -122,7 +122,47 @@ const NewProducts = () => {
         throw new Error('Lỗi dữ liệu từ server')
       }
 
-      const fetchedProducts = [...response.products]
+      let fetchedProducts = [...response.products] // tạo bản sao để sort
+
+      // Xử lý sort ở frontend
+      switch (sortOption) {
+        case 'nameAsc':
+          fetchedProducts.sort((a, b) => a.name.localeCompare(b.name))
+          break
+        case 'nameDesc':
+          fetchedProducts.sort((a, b) => b.name.localeCompare(a.name))
+          break
+        case 'priceAsc':
+          fetchedProducts.sort((a, b) => {
+            const priceA =
+              a.minSalePriceVariant?.finalSalePrice > 0
+                ? a.minSalePriceVariant.finalSalePrice
+                : a.exportPrice
+            const priceB =
+              b.minSalePriceVariant?.finalSalePrice > 0
+                ? b.minSalePriceVariant.finalSalePrice
+                : b.exportPrice
+            return priceA - priceB
+          })
+          break
+        case 'priceDesc':
+          fetchedProducts.sort((a, b) => {
+            const priceA =
+              a.minSalePriceVariant?.finalSalePrice > 0
+                ? a.minSalePriceVariant.finalSalePrice
+                : a.exportPrice
+            const priceB =
+              b.minSalePriceVariant?.finalSalePrice > 0
+                ? b.minSalePriceVariant.finalSalePrice
+                : b.exportPrice
+            return priceB - priceA
+          })
+          break
+        case 'featured':
+        default:
+          // Không sort, giữ nguyên
+          break
+      }
       const totalProducts = response.total || fetchedProducts.length
       const totalPages = Math.ceil(totalProducts / ITEMS_PER_PAGE) || 1
 
@@ -131,7 +171,8 @@ const NewProducts = () => {
     } catch (error) {
       console.error('Lỗi fetch sản phẩm:', error)
       setError(
-        error.message || 'Không thể tải danh sách sản phẩm. Vui lòng thử lại sau.'
+        error.message ||
+          'Không thể tải danh sách sản phẩm. Vui lòng thử lại sau.'
       )
       setProducts([])
       setTotalPages(1)
@@ -139,7 +180,6 @@ const NewProducts = () => {
       setLoading(false)
     }
   }
-
 
   // Scroll to top on component mount
   useEffect(() => {
@@ -244,8 +284,8 @@ const NewProducts = () => {
               cursor: 'pointer'
             }}
             onClick={() => navigate('/')}
-          // component={Link}
-          // to='/product'
+            // component={Link}
+            // to='/product'
           >
             Trang chủ
           </Link>
@@ -257,7 +297,7 @@ const NewProducts = () => {
               fontWeight: 500
             }}
           >
-           Hàng mới
+            Hàng mới
           </Typography>
         </Breadcrumbs>
       </Box>
@@ -352,11 +392,13 @@ const NewProducts = () => {
             </Box>
           ) : products.length === 0 ? (
             <Box sx={{ textAlign: 'center', mt: 10 }}>
-              <Inventory2OutlinedIcon sx={{ fontSize: 80, color: '#ccc', mb: 2 }} />
-              <Typography variant="h6" sx={{ color: '#666', mb: 1 }}>
+              <Inventory2OutlinedIcon
+                sx={{ fontSize: 80, color: '#ccc', mb: 2 }}
+              />
+              <Typography variant='h6' sx={{ color: '#666', mb: 1 }}>
                 Sản phẩm mới chưa được thêm
               </Typography>
-              <Typography variant="body2" sx={{ color: '#999' }}>
+              <Typography variant='body2' sx={{ color: '#999' }}>
                 Hiện tại chưa có sản phẩm mới nào trong 7 ngày gần đây
               </Typography>
             </Box>
@@ -375,20 +417,28 @@ const NewProducts = () => {
               </div>
 
               <Box
-                sx={{ display: 'flex', justifyContent: 'center', mt: 4, mb: 2, alignItems: 'center' }}
+                sx={{
+                  display: 'flex',
+                  justifyContent: 'center',
+                  mt: 4,
+                  mb: 2,
+                  alignItems: 'center'
+                }}
               >
-
                 <Pagination
                   count={totalPages}
                   page={page}
                   onChange={handlePageChange}
                   boundaryCount={1}
                   siblingCount={1}
-                  shape="rounded"
-                  size="small"
-                  color="primary"
+                  shape='rounded'
+                  size='small'
+                  color='primary'
                   renderItem={(item) => {
-                    if (item.type === 'start-ellipsis' || item.type === 'end-ellipsis') {
+                    if (
+                      item.type === 'start-ellipsis' ||
+                      item.type === 'end-ellipsis'
+                    ) {
                       return (
                         <span
                           style={{
@@ -398,7 +448,7 @@ const NewProducts = () => {
                             fontSize: '1rem',
                             display: 'inline-flex',
                             alignItems: 'center',
-                            justifyContent: 'center',
+                            justifyContent: 'center'
                           }}
                         >
                           ...
@@ -409,7 +459,6 @@ const NewProducts = () => {
                     return <PaginationItem {...item} />
                   }}
                 />
-
               </Box>
             </>
           )}

@@ -19,11 +19,10 @@ export default function FilterUser({ onFilter, loading, roles }) {
   const { users, fetchUsers } = useUsers()
 
   useEffect(() => {
-    fetchUsers(1, 100000, { destroy: destroy, sort: sort })
+    fetchUsers(1, 100000, { destroy: destroy, sort: sort, role: role })
   }, [destroy, sort])
 
   const filterUser = users.filter((user) => user?.role === 'customer')
-
   useEffect(() => {
     applyFilters(selectedFilter, startDate, endDate)
     hasMounted.current = true

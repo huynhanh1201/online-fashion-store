@@ -101,20 +101,20 @@ const TransactionRow = ({ transaction, index, onView, onEdit, onDelete }) => {
               </IconButton>
             </Tooltip>
           )}
-          {hasPermission('payment:update') && (
-            <Tooltip title='Sửa'>
-              <IconButton onClick={() => onEdit(transaction)} size='small'>
-                <BorderColorIcon color='warning' />
-              </IconButton>
-            </Tooltip>
-          )}
-          {hasPermission('payment:delete') && (
-            <Tooltip title='Ẩn'>
-              <IconButton onClick={() => onDelete(transaction)} size='small'>
-                <VisibilityOffIcon color='error' />
-              </IconButton>
-            </Tooltip>
-          )}
+          {/*{hasPermission('payment:update') && (*/}
+          {/*  <Tooltip title='Sửa'>*/}
+          {/*    <IconButton onClick={() => onEdit(transaction)} size='small'>*/}
+          {/*      <BorderColorIcon color='warning' />*/}
+          {/*    </IconButton>*/}
+          {/*  </Tooltip>*/}
+          {/*)}*/}
+          {/*{hasPermission('payment:delete') && (*/}
+          {/*  <Tooltip title='Ẩn'>*/}
+          {/*    <IconButton onClick={() => onDelete(transaction)} size='small'>*/}
+          {/*      <VisibilityOffIcon color='error' />*/}
+          {/*    </IconButton>*/}
+          {/*  </Tooltip>*/}
+          {/*)}*/}
         </Stack>
       </TableCell>
     </TableRow>

@@ -331,10 +331,10 @@ const Content = () => {
                     featuredCategoriesLoading || featuredCategories.length === 0
                       ? `url(${category.imageUrl})`
                       : `url(${optimizeCloudinaryUrl(category.imageUrl, {
-                          quality: 'auto',
-                          format: 'auto',
-                          crop: 'fit'
-                        })})`,
+                        quality: 'auto',
+                        format: 'auto',
+                        crop: 'fit'
+                      })})`,
                   backgroundSize: 'cover',
                   backgroundPosition: 'center',
                   position: 'relative',

@@ -13,9 +13,7 @@ import FilterByTime from '~/components/FilterAdmin/common/FilterByTime'
 import SearchWithSuggestions from '~/components/FilterAdmin/common/SearchWithSuggestions'
 import FilterByPrice from '~/components/FilterAdmin/common/FilterByPrice'
 import FilterSelect from '~/components/FilterAdmin/common/FilterSelect.jsx'
-export default function FilterOrder({
-  onFilter
-}) {
+export default function FilterOrder({ onFilter }) {
   const [keyword, setKeyword] = useState('')
   const [inputValue, setInputValue] = useState('')
 
@@ -172,7 +170,6 @@ export default function FilterOrder({
           { label: 'Đã giao', value: 'Delivered' },
           { label: 'Đã hủy', value: 'Cancelled' },
           { label: 'Thất bại', value: 'Failed' }
-
         ]}
         sx={{ width: 200 }}
       />
@@ -209,7 +206,7 @@ export default function FilterOrder({
       />
       <Box sx={{ display: 'flex', gap: 2 }}>
         <FilterByTime
-          label='Thời gian đặt hàng'
+          label='Lọc thời gian tạo'
           selectedFilter={selectedFilter}
           setSelectedFilter={setSelectedFilter}
           startDate={startDate}

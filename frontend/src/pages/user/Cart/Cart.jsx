@@ -23,7 +23,8 @@ import {
   Grid,
   Tooltip,
   Breadcrumbs,
-  Link
+  Link,
+  Collapse,
 } from '@mui/material'
 import {
   Delete,
@@ -34,7 +35,8 @@ import {
   LocalOffer,
   Payment,
   ArrowForward,
-  NavigateNext
+  NavigateNext,
+  ExpandMore,
 } from '@mui/icons-material'
 import { useCart } from '~/hooks/useCarts'
 import { Navigate, useNavigate } from 'react-router-dom'
@@ -45,7 +47,7 @@ import {
   removeTempQuantity,
   clearReorderVariantIds,
   setAppliedCoupon,
-  clearAppliedCoupon
+  clearAppliedCoupon,
 } from '~/redux/cart/cartSlice'
 import { optimizeCloudinaryUrl } from '~/utils/cloudinary'
 import { getDiscounts } from '~/services/discountService'
@@ -53,7 +55,6 @@ import SuggestionProducts from './SuggestionProducts'
 
 const Cart = () => {
   const { cart, loading, deleteItem, clearCart, updateItem } = useCart()
-
   const [selectedItems, setSelectedItems] = useState([])
   const [cartItems, setCartItems] = useState([])
   const [showMaxQuantityAlert, setShowMaxQuantityAlert] = useState(false)
@@ -65,20 +66,18 @@ const Cart = () => {
   const [deleteMode, setDeleteMode] = useState('')
   const [itemToDelete, setItemToDelete] = useState(null)
   const tempQuantities = useSelector((state) => state.cart.tempQuantities || {})
-  const reorderVariantIds = useSelector(
-    (state) => state.cart.reorderVariantIds || []
-  )
+  const reorderVariantIds = useSelector((state) => state.cart.reorderVariantIds || [])
   const [processingVariantId, setProcessingVariantId] = useState(null)
   const [hasAutoSelected, setHasAutoSelected] = useState(false)
   const [outOfStockAlert, setOutOfStockAlert] = useState(false)
   const [outOfStockMessage, setOutOfStockMessage] = useState('')
-  const [updateTimers, setUpdateTimers] = useState({}) // For debouncing quantity updates
+  const [updateTimers, setUpdateTimers] = useState({})
+  const [expandedProducts, setExpandedProducts] = useState({})
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'auto' })
     setHasAutoSelected(false)
 
-    // Cleanup timers on unmount
     return () => {
       Object.values(updateTimers).forEach((timer) => {
         if (timer) clearTimeout(timer)
@@ -86,34 +85,34 @@ const Cart = () => {
     }
   }, [])
 
-  // Revalidate selected items when cart data changes to handle race conditions
+  useEffect(() => {
+    if (cartItems.length > 0) {
+      const newExpandedProducts = {}
+      Object.keys(groupedCartItems).forEach((productId) => {
+        newExpandedProducts[productId] = true
+      })
+      setExpandedProducts(newExpandedProducts)
+    }
+  }, [cartItems.length])
+
   useEffect(() => {
     if (selectedItems.length > 0 && cartItems.length > 0) {
       const validSelectedItems = selectedItems.filter((selected) => {
         const item = cartItems.find(
           (cartItem) =>
-            (cartItem.variant?._id ||
-              cartItem.variantId?._id ||
-              cartItem.variantId) === selected.variantId
+            (cartItem.variantId?._id || cartItem.variantId) === selected.variantId
         )
         return (
           item &&
           item.quantity > 0 &&
-          (item.variant?.quantity === undefined || item.variant.quantity > 0)
+          (item.variantId?.quantity === undefined || item.variantId.quantity > 0) &&
+          item.variantId?.status !== 'inactive'
         )
       })
 
-      // If any selected items are now invalid, update the selection
       if (validSelectedItems.length < selectedItems.length) {
         setSelectedItems(validSelectedItems)
         dispatch(setSelectedItemsAction(validSelectedItems))
-
-        if (validSelectedItems.length < selectedItems.length) {
-          setOutOfStockMessage(
-            'Một số sản phẩm đã chọn hiện đã hết hàng và đã được bỏ chọn'
-          )
-          setOutOfStockAlert(true)
-        }
       }
     }
   }, [cartItems, selectedItems, dispatch])
@@ -138,7 +137,6 @@ const Cart = () => {
             (selected) =>
               !outOfStockItems.some(
                 (outOfStock) =>
-                  outOfStock.variant?._id === selected.variantId ||
                   outOfStock.variantId?._id === selected.variantId ||
                   outOfStock.variantId === selected.variantId
               )
@@ -151,22 +149,17 @@ const Cart = () => {
   }, [cart, dispatch])
 
   useEffect(() => {
-    if (
-      cartItems.length > 0 &&
-      reorderVariantIds.length > 0 &&
-      !hasAutoSelected
-    ) {
+    if (cartItems.length > 0 && reorderVariantIds.length > 0 && !hasAutoSelected) {
       const reorderSelectedItems = cartItems
         .filter((item) => {
-          const variantId =
-            item.variant?._id || item.variantId?._id || item.variantId
+          const variantId = item.variantId?._id || item.variantId
           const isMatch = reorderVariantIds.includes(variantId)
           const hasStock = item.quantity > 0
           return isMatch && hasStock
         })
         .map((item) => ({
-          variantId: item.variant?._id || item.variantId?._id || item.variantId,
-          quantity: item.quantity
+          variantId: item.variantId?._id || item.variantId,
+          quantity: item.quantity,
         }))
 
       if (reorderSelectedItems.length > 0) {
@@ -185,12 +178,9 @@ const Cart = () => {
       try {
         const res = await getDiscounts()
         if (Array.isArray(res.discounts) && res.discounts.length > 0) {
-          setCoupons(
-            res.discounts.sort((a, b) => a.minOrderValue - b.minOrderValue)
-          )
+          setCoupons(res.discounts.sort((a, b) => a.minOrderValue - b.minOrderValue))
         }
       } catch (error) {
-        // Handle error silently
       } finally {
         setHasFetchedCoupons(true)
       }
@@ -199,15 +189,13 @@ const Cart = () => {
     fetchCoupons()
   }, [hasFetchedCoupons])
 
-  // Lọc ra các sản phẩm có thể chọn (không hết hàng)
-  const selectableItems = cartItems.filter((item) => item.quantity > 0)
+  const selectableItems = cartItems.filter(
+    (item) => item.quantity > 0 && item.variantId?.status !== 'inactive'
+  )
 
-  // Tính toán các sản phẩm có thể chọn đã được chọn
   const selectedSelectableItems = selectedItems.filter((selected) =>
     selectableItems.some(
-      (item) =>
-        (item.variant?._id || item.variantId?._id || item.variantId) ===
-        selected.variantId
+      (item) => (item.variantId?._id || item.variantId) === selected.variantId
     )
   )
 
@@ -222,8 +210,8 @@ const Cart = () => {
     const newSelected = allSelected
       ? []
       : selectableItems.map((item) => ({
-        variantId: item.variant?._id || item.variantId?._id || item.variantId,
-        quantity: item.quantity
+        variantId: item.variantId?._id || item.variantId,
+        quantity: item.quantity,
       }))
 
     setSelectedItems(newSelected)
@@ -231,18 +219,21 @@ const Cart = () => {
   }
 
   const handleSelect = (item) => {
-    const variantId = item.variant?._id || item.variantId?._id || item.variantId
-    const variant = item.variant
+    const variantId = item.variantId?._id || item.variantId
+    const variant = item.variantId
     const exists = selectedItems.some((i) => i.variantId === variantId)
 
-    // Kiểm tra tình trạng hết hàng trước khi cho phép select
     const isOutOfStock =
       item.quantity === 0 ||
       (variant?.quantity !== undefined && variant.quantity === 0)
+    const isInactive = variant?.status === 'inactive' || variant?.productId?.status === 'inactive'
 
-    // Nếu sản phẩm hết hàng và đang cố gắng select (không phải unselect), thì không cho phép
-    if (!exists && isOutOfStock) {
-      setOutOfStockMessage('Sản phẩm này đã hết hàng và không thể chọn')
+    if (!exists && (isOutOfStock || isInactive)) {
+      setOutOfStockMessage(
+        isInactive
+          ? 'Sản phẩm này đã ngừng bán và không thể chọn'
+          : 'Sản phẩm này đã hết hàng và không thể chọn'
+      )
       setOutOfStockAlert(true)
       return
     }
@@ -259,17 +250,15 @@ const Cart = () => {
     typeof val === 'number' ? val.toLocaleString('vi-VN') + '₫' : '0₫'
 
   const handleMouseDown = (variantId, delta) => {
-    // Prevent multiple operations on same variant
     if (processingVariantId === variantId) return
 
-    const item = cartItems.find((i) => i.variant._id === variantId)
+    const item = cartItems.find((i) => i.variantId._id === variantId)
     if (!item) return
 
-    // Kiểm tra xem sản phẩm có hết hàng không
-    if (item.quantity === 0) return
+    if (item.quantity === 0 || item.variantId?.status === 'inactive' || item.variantId?.productId?.status === 'inactive') return
 
     const current = tempQuantities[variantId] ?? item.quantity
-    const max = item.variant.quantity || 99
+    const max = item.variantId.quantity || 99
 
     if (delta > 0 && current >= max) {
       setShowMaxQuantityAlert(true)
@@ -277,42 +266,33 @@ const Cart = () => {
     }
 
     const newQty = Math.min(Math.max(current + delta, 1), max)
-
     dispatch(setTempQuantity({ variantId, quantity: newQty }))
 
-    // Tự động select sản phẩm khi tăng giảm số lượng
     setSelectedItems((prev) => {
       const existingItem = prev.find((i) => i.variantId === variantId)
-
       let newSelectedItems
       if (existingItem) {
-        // Nếu đã được chọn, chỉ cập nhật số lượng
         newSelectedItems = prev.map((i) =>
           i.variantId === variantId ? { ...i, quantity: newQty } : i
         )
       } else {
-        // Nếu chưa được chọn, thêm vào danh sách đã chọn
         newSelectedItems = [...prev, { variantId, quantity: newQty }]
       }
-
-      // Cập nhật Redux store
       dispatch(setSelectedItemsAction(newSelectedItems))
       return newSelectedItems
     })
   }
 
   const handleMouseLeave = async (variantId) => {
-    const item = cartItems.find((i) => i.variant._id === variantId)
+    const item = cartItems.find((i) => i.variantId._id === variantId)
     const tempQty = tempQuantities[variantId]
 
     if (!item || tempQty === undefined || tempQty === item.quantity) return
 
-    // Clear existing timer for this variant
     if (updateTimers[variantId]) {
       clearTimeout(updateTimers[variantId])
     }
 
-    // Debounce the update
     const timer = setTimeout(async () => {
       try {
         setProcessingVariantId(variantId)
@@ -321,7 +301,7 @@ const Cart = () => {
 
         setCartItems((prev) =>
           prev.map((i) =>
-            i.variant._id === variantId ? { ...i, quantity: tempQty } : i
+            i.variantId._id === variantId ? { ...i, quantity: tempQty } : i
           )
         )
 
@@ -329,7 +309,6 @@ const Cart = () => {
           const newSelectedItems = prev.map((i) =>
             i.variantId === variantId ? { ...i, quantity: tempQty } : i
           )
-          // Cập nhật Redux store
           dispatch(setSelectedItemsAction(newSelectedItems))
           return newSelectedItems
         })
@@ -337,7 +316,6 @@ const Cart = () => {
         dispatch(removeTempQuantity(variantId))
       } catch (err) {
         console.error('Error updating quantity:', err)
-        // Show error message to user
         setOutOfStockMessage('Không thể cập nhật số lượng sản phẩm')
         setOutOfStockAlert(true)
       } finally {
@@ -352,7 +330,7 @@ const Cart = () => {
 
     setUpdateTimers((prev) => ({
       ...prev,
-      [variantId]: timer
+      [variantId]: timer,
     }))
   }
 
@@ -361,46 +339,43 @@ const Cart = () => {
       const res = await deleteItem({ variantId })
       if (res) {
         setCartItems((prev) =>
-          prev.filter((item) => item.variant._id !== variantId)
+          prev.filter((item) => item.variantId._id !== variantId)
         )
         setSelectedItems((prev) =>
           prev.filter((i) => i.variantId !== variantId)
         )
       }
     } catch (error) {
-      // Handle error silently
     }
   }
 
   const selectedCartItems = cartItems.filter((item) =>
-    selectedItems.some((selected) => selected.variantId === item.variant._id)
+    selectedItems.some((selected) => selected.variantId === item.variantId._id)
   )
 
-  // Helper function to get final price (exportPrice minus discountPrice)
   const getFinalPrice = (variant) => {
     const basePrice = variant.exportPrice || 0
     const discount = variant.discountPrice || 0
-    return Math.max(basePrice - discount, 0) // Đảm bảo giá không âm
+    return Math.max(basePrice - discount, 0)
   }
 
   const totalPrice = selectedCartItems.reduce((sum, item) => {
-    const selected = selectedItems.find((i) => i.variantId === item.variant._id)
+    const selected = selectedItems.find((i) => i.variantId === item.variantId._id)
     const qty = selected?.quantity || item.quantity
-    return sum + getFinalPrice(item.variant) * qty
+    return sum + getFinalPrice(item.variantId) * qty
   }, 0)
 
-  // Tính tổng tiết kiệm từ các sản phẩm đã giảm giá
   const totalSavings = selectedCartItems.reduce((sum, item) => {
-    const selected = selectedItems.find((i) => i.variantId === item.variant._id)
+    const selected = selectedItems.find((i) => i.variantId === item.variantId._id)
     const qty = selected?.quantity || item.quantity
-    const variant = item.variant
+    const variant = item.variantId
 
-    // Chỉ tính tiết kiệm nếu có discountPrice
     if (variant.discountPrice && variant.discountPrice > 0) {
       return sum + variant.discountPrice * qty
     }
     return sum
   }, 0)
+
   const capitalizeFirstLetter = (str) => {
     if (!str) return ''
     return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase()
@@ -411,6 +386,88 @@ const Cart = () => {
     return str.toUpperCase()
   }
 
+  const groupedCartItems = cartItems.reduce((groups, item) => {
+    const productId = item.variantId?.productId?._id
+    if (!productId) return groups
+
+    if (!groups[productId]) {
+      groups[productId] = {
+        productId,
+        productName: item.variantId?.name || 'Sản phẩm không rõ',
+        variants: [],
+      }
+    }
+
+    groups[productId].variants.push(item)
+    return groups
+  }, {})
+
+  const handleAccordionToggle = (productId) => {
+    setExpandedProducts((prev) => ({
+      ...prev,
+      [productId]: !prev[productId],
+    }))
+  }
+
+  const isProductFullySelected = (productId) => {
+    const productGroup = groupedCartItems[productId]
+    if (!productGroup) return false
+
+    const selectableVariants = productGroup.variants.filter(
+      (item) => item.quantity > 0 && item.variantId?.status !== 'inactive' && item.variantId?.productId?.status !== 'inactive'
+    )
+    const selectedVariants = selectableVariants.filter((item) =>
+      selectedItems.some((selected) => selected.variantId === item.variantId?._id)
+    )
+
+    return selectableVariants.length > 0 && selectedVariants.length === selectableVariants.length
+  }
+
+  const isProductPartiallySelected = (productId) => {
+    const productGroup = groupedCartItems[productId]
+    if (!productGroup) return false
+
+    const selectableVariants = productGroup.variants.filter(
+      (item) => item.quantity > 0 && item.variantId?.status !== 'inactive' && item.variantId?.productId?.status !== 'inactive'
+    )
+    const selectedVariants = selectableVariants.filter((item) =>
+      selectedItems.some((selected) => selected.variantId === item.variantId?._id)
+    )
+
+    return selectedVariants.length > 0 && selectedVariants.length < selectableVariants.length
+  }
+
+  const handleProductGroupSelect = (productId) => {
+    const productGroup = groupedCartItems[productId]
+    if (!productGroup) return
+
+    const selectableVariants = productGroup.variants.filter(
+      (item) => item.quantity > 0 && item.variantId?.status !== 'inactive' && item.variantId?.productId?.status !== 'inactive'
+    )
+    const isFullySelected = selectableVariants.every((item) =>
+      selectedItems.some((selected) => selected.variantId === item.variantId?._id)
+    )
+
+    let newSelected = [...selectedItems]
+    if (isFullySelected) {
+      newSelected = selectedItems.filter(
+        (selected) =>
+          !selectableVariants.some((item) => selected.variantId === item.variantId?._id)
+      )
+    } else {
+      const variantsToAdd = selectableVariants
+        .filter((item) => !selectedItems.some((selected) => selected.variantId === item.variantId?._id))
+        .map((item) => ({
+          variantId: item.variantId?._id,
+          quantity: item.quantity,
+        }))
+      newSelected = [...selectedItems, ...variantsToAdd]
+    }
+
+    setSelectedItems(newSelected)
+    dispatch(setSelectedItemsAction(newSelected))
+  }
+
   const handleClearCart = async () => {
     await clearCart()
     setCartItems([])
@@ -418,25 +475,17 @@ const Cart = () => {
     setConfirmClearOpen(false)
   }
 
-  // Validation trước khi thanh toán để đảm bảo không có sản phẩm hết hàng
   const handleCheckout = () => {
-    // Kiểm tra có sản phẩm được chọn không
     if (selectedItems.length === 0) {
       setOutOfStockMessage('Vui lòng chọn ít nhất một sản phẩm để thanh toán')
       setOutOfStockAlert(true)
       return
     }
 
-    // Kiểm tra xem có sản phẩm đã chọn nào hết hàng không
     const selectedCartItems = cartItems.filter((item) =>
-      selectedItems.some(
-        (selected) =>
-          (item.variant?._id || item.variantId?._id || item.variantId) ===
-          selected.variantId
-      )
+      selectedItems.some((selected) => item.variantId?._id === selected.variantId)
     )
 
-    // Kiểm tra sản phẩm đã chọn có tồn tại trong giỏ hàng không
     if (selectedCartItems.length === 0) {
       setOutOfStockMessage('Không tìm thấy sản phẩm đã chọn trong giỏ hàng')
       setOutOfStockAlert(true)
@@ -446,33 +495,28 @@ const Cart = () => {
     const hasOutOfStockSelected = selectedCartItems.some(
       (item) =>
         item.quantity === 0 ||
-        (item.variant?.quantity !== undefined && item.variant.quantity === 0)
+        (item.variantId?.quantity !== undefined && item.variantId.quantity === 0)
     )
 
     if (hasOutOfStockSelected) {
-      // Tự động loại bỏ các sản phẩm hết hàng khỏi danh sách đã chọn
       const validSelectedItems = selectedItems.filter((selected) => {
         const item = cartItems.find(
-          (cartItem) =>
-            (cartItem.variant?._id ||
-              cartItem.variantId?._id ||
-              cartItem.variantId) === selected.variantId
+          (cartItem) => cartItem.variantId?._id === selected.variantId
         )
         return (
           item &&
           item.quantity > 0 &&
-          (item.variant?.quantity === undefined || item.variant.quantity > 0)
+          (item.variantId?.quantity === undefined || item.variantId.quantity > 0) &&
+          item.variantId?.status !== 'inactive' &&
+          item.variantId?.productId?.status !== 'inactive'
         )
       })
 
       setSelectedItems(validSelectedItems)
       dispatch(setSelectedItemsAction(validSelectedItems))
-      setOutOfStockMessage(
-        'Đã loại bỏ các sản phẩm hết hàng khỏi danh sách thanh toán'
-      )
+      setOutOfStockMessage('Đã loại bỏ các sản phẩm hết hàng khỏi danh sách thanh toán')
       setOutOfStockAlert(true)
 
-      // Nếu sau khi loại bỏ không còn sản phẩm nào, không cho phép thanh toán
       if (validSelectedItems.length === 0) {
         setOutOfStockMessage('Tất cả sản phẩm đã chọn đều hết hàng')
         setOutOfStockAlert(true)
@@ -480,25 +524,22 @@ const Cart = () => {
       }
     }
 
-    // Kiểm tra tổng tiền
     if (totalPrice <= 0) {
       setOutOfStockMessage('Tổng tiền phải lớn hơn 0')
       setOutOfStockAlert(true)
       return
     }
 
-    // Lưu thông tin mã giảm giá được áp dụng vào Redux store
     const applicableCoupon = getApplicableCoupon()
     if (applicableCoupon) {
       const discountAmount = calculateDiscount(applicableCoupon, totalPrice)
       dispatch(
         setAppliedCoupon({
           coupon: applicableCoupon,
-          discount: discountAmount
+          discount: discountAmount,
         })
       )
     } else {
-      // Xóa mã giảm giá cũ nếu không có mã nào áp dụng được
       dispatch(clearAppliedCoupon())
     }
 
@@ -507,7 +548,6 @@ const Cart = () => {
 
   const calculateDiscount = (coupon, total) => {
     if (!coupon || total < coupon.minOrderValue) return 0
-
     return coupon.type === 'percent'
       ? Math.floor((total * coupon.amount) / 100)
       : coupon.amount
@@ -527,9 +567,7 @@ const Cart = () => {
   const getNextCoupon = () => {
     if (!coupons.length) return null
 
-    const sorted = [...coupons].sort(
-      (a, b) => a.minOrderValue - b.minOrderValue
-    )
+    const sorted = [...coupons].sort((a, b) => a.minOrderValue - b.minOrderValue)
     const applicable = getApplicableCoupon()
 
     if (!applicable) {
@@ -558,7 +596,7 @@ const Cart = () => {
           display: 'flex',
           justifyContent: 'center',
           alignItems: 'center',
-          mt: 10
+          mt: 10,
         }}
       >
         <Box
@@ -568,7 +606,7 @@ const Cart = () => {
             textAlign: 'center',
             borderRadius: 2,
             width: '100%',
-            maxWidth: 500
+            maxWidth: 500,
           }}
         >
           <ShoppingCart
@@ -576,7 +614,7 @@ const Cart = () => {
               fontSize: 60,
               color: 'var(--primary-color)',
               mb: 2,
-              opacity: 0.7
+              opacity: 0.7,
             }}
           />
           <Typography
@@ -600,10 +638,9 @@ const Cart = () => {
         minHeight: '70vh',
         mt: { xs: 10, md: 16 },
         mb: { xs: 3, md: 5 },
-        px: { xs: 2, sm: 3, md: 4 }
+        px: { xs: 2, sm: 3, md: 4 },
       }}
     >
-      {/* Breadcrumb */}
       <Box
         sx={{
           bottom: { xs: '20px', sm: '30px', md: '40px' },
@@ -611,7 +648,7 @@ const Cart = () => {
           right: { xs: '20px', sm: '30px', md: '40px' },
           maxWidth: '1800px',
           margin: '0 auto',
-          mb: 2
+          mb: 2,
         }}
       >
         <Breadcrumbs
@@ -627,14 +664,10 @@ const Cart = () => {
               textDecoration: 'none',
               minWidth: 0,
               p: 0,
-              '&:hover': {
-                color: 'primary.main'
-              },
-              cursor: 'pointer'
+              '&:hover': { color: 'primary.main' },
+              cursor: 'pointer',
             }}
             onClick={() => navigate('/')}
-          // component={Link}
-          // to='/product'
           >
             Trang chủ
           </Link>
@@ -644,14 +677,10 @@ const Cart = () => {
               alignItems: 'center',
               color: '#007bff',
               textDecoration: 'none',
-              '&:hover': {
-                color: 'primary.main'
-              },
-              cursor: 'pointer'
+              '&:hover': { color: 'primary.main' },
+              cursor: 'pointer',
             }}
             onClick={() => navigate('/product')}
-          // component={Link}
-          // to='/product'
           >
             Sản phẩm
           </Link>
@@ -660,7 +689,7 @@ const Cart = () => {
               display: 'flex',
               alignItems: 'center',
               color: 'text.primary',
-              fontWeight: 500
+              fontWeight: 500,
             }}
           >
             Giỏ hàng
@@ -668,7 +697,6 @@ const Cart = () => {
         </Breadcrumbs>
       </Box>
 
-      {/* Header */}
       <Paper
         elevation={0}
         sx={{
@@ -676,7 +704,7 @@ const Cart = () => {
           mb: 2,
           borderRadius: 2,
           background: 'linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%)',
-          boxShadow: '0 4px 20px rgba(0,0,0,0.05)'
+          boxShadow: '0 4px 20px rgba(0,0,0,0.05)',
         }}
       >
         <Box
@@ -687,23 +715,21 @@ const Cart = () => {
           gap={2}
         >
           <Box display='flex' alignItems='center' gap={1.5}>
-            <ShoppingCart
-              sx={{ fontSize: 28, color: 'var(--primary-color)' }}
-            />
+            <ShoppingCart sx={{ fontSize: 28, color: 'var(--primary-color)' }} />
             <Typography
               variant='h5'
               sx={{
                 fontWeight: 700,
                 color: 'var(--primary-color)',
                 letterSpacing: 0.5,
-                fontSize: { xs: '1.25rem', md: '1.5rem' }
+                fontSize: { xs: '1.25rem', md: '1.5rem' },
               }}
             >
               Giỏ hàng
             </Typography>
           </Box>
           <Chip
-            label={`${cartItems.length} Sản phẩm`}
+            label={`${Object.keys(groupedCartItems).length} Sản phẩm (${cartItems.length} phân loại)`}
             color='primary'
             variant='outlined'
             sx={{ fontWeight: 600, borderRadius: 6, px: 1.5 }}
@@ -711,15 +737,13 @@ const Cart = () => {
         </Box>
       </Paper>
 
-      {/* Coupon notification */}
       <Box
         sx={{
-          maxHeight:
-            coupons.length > 0 && selectedItems.length > 0 ? '200px' : 0,
+          maxHeight: coupons.length > 0 && selectedItems.length > 0 ? '200px' : 0,
           overflow: 'hidden',
           transition: 'all 0.3s ease-in-out',
           opacity: coupons.length > 0 && selectedItems.length > 0 ? 1 : 0,
-          mb: coupons.length > 0 && selectedItems.length > 0 ? 1 : 0
+          mb: coupons.length > 0 && selectedItems.length > 0 ? 1 : 0,
         }}
       >
         <Paper
@@ -727,7 +751,7 @@ const Cart = () => {
           sx={{
             p: 1,
             borderRadius: 2,
-            border: '1px dashed var(--primary-color)'
+            border: '1px dashed var(--primary-color)',
           }}
         >
           <Box display='flex' alignItems='center' gap={1.5} flexWrap='wrap'>
@@ -757,18 +781,16 @@ const Cart = () => {
                         <Box component='span' sx={{ fontWeight: 600, mx: 0.5 }}>
                           {nextDiscountText}
                         </Box>
-                        {''}
                         🎉!
                       </>
                     )
                   }
                   return (
                     <>
-                      Đơn hàng của bạn đã đạt mức giảm cao nhất:{''}
+                      Đơn hàng của bạn đã đạt mức giảm cao nhất:{' '}
                       <Box component='span' sx={{ fontWeight: 600, mx: 0.5 }}>
                         {formatPrice(discountAmount)}
                       </Box>
-                      {''}
                       🎉
                     </>
                   )
@@ -800,26 +822,20 @@ const Cart = () => {
         </Paper>
       </Box>
 
-      {/* Cart items */}
       <Box
         display='flex'
         flexDirection={{ xs: 'column', md: 'row' }}
         alignItems='flex-start'
         gap={3}
-        sx={{
-          position: 'relative'
-        }}
+        sx={{ position: 'relative' }}
       >
-        <Box
-          flex={{ xs: '1 1 100%', md: 2 }}
-          width={{ xs: '100%', md: 'auto' }}
-        >
+        <Box flex={{ xs: '1 1 100%', md: 2 }} width={{ xs: '100%', md: 'auto' }}>
           <Paper
             elevation={2}
             sx={{
               borderRadius: 2,
               overflow: 'hidden',
-              boxShadow: '0 4px 20px rgba(0,0,0,0.05)'
+              boxShadow: '0 4px 20px rgba(0,0,0,0.05)',
             }}
           >
             {cartItems.length === 0 ? (
@@ -830,7 +846,7 @@ const Cart = () => {
                   display: 'flex',
                   flexDirection: 'column',
                   alignItems: 'center',
-                  gap: 2
+                  gap: 2,
                 }}
               >
                 <ShoppingCart sx={{ fontSize: 80, color: '#ccc' }} />
@@ -849,7 +865,7 @@ const Cart = () => {
                     borderRadius: 6,
                     px: 4,
                     color: '#fff',
-                    backgroundColor: 'var(--primary-color)'
+                    backgroundColor: 'var(--primary-color)',
                   }}
                 >
                   Tiếp tục mua sắm
@@ -864,7 +880,7 @@ const Cart = () => {
                     backgroundColor: 'var(--primary-color)10',
                     display: 'flex',
                     alignItems: 'center',
-                    gap: 2
+                    gap: 2,
                   }}
                 >
                   <Checkbox
@@ -877,7 +893,7 @@ const Cart = () => {
                   <Typography
                     sx={{
                       fontWeight: 600,
-                      fontSize: { xs: '0.9rem', sm: '1rem' }
+                      fontSize: { xs: '0.9rem', sm: '1rem' },
                     }}
                   >
                     Chọn tất cả
@@ -898,286 +914,341 @@ const Cart = () => {
                 </Box>
                 <Divider />
 
-                {cartItems.map((item) => {
-                  const variant = item.variant
-                  if (!variant) return null
+                {Object.values(groupedCartItems).map((productGroup) => {
+                  const { productId, productName, variants } = productGroup
+                  const isExpanded = expandedProducts[productId] || false
+                  const isFullySelected = isProductFullySelected(productId)
+                  const isPartiallySelected = isProductPartiallySelected(productId)
+                  const firstVariant = variants[0]?.variantId
+                  if (!firstVariant) return null
 
-                  // Kiểm tra xem sản phẩm có hết hàng không (quantity = 0)
-                  // Check cả item.quantity và variant.quantity để đảm bảo chính xác
-                  const isOutOfStock =
-                    item.quantity === 0 ||
-                    (variant.quantity !== undefined && variant.quantity === 0)
+                  const isProductInactive = firstVariant.productId?.status === 'inactive'
+                  const selectableVariants = variants.filter(
+                    (item) =>
+                      item.quantity > 0 &&
+                      item.variantId?.status !== 'inactive' &&
+                      !isProductInactive
+                  )
+                  const outOfStockVariants = variants.filter((item) => item.quantity === 0)
 
                   return (
-                    <React.Fragment key={item._id}>
+                    <React.Fragment key={productId}>
                       <Box
                         sx={{
                           p: { xs: 2, sm: 2 },
                           display: 'flex',
                           alignItems: 'center',
                           gap: 2,
-                          flexWrap: { xs: 'wrap', sm: 'nowrap' },
-                          opacity: isOutOfStock ? 0.6 : 1, // Làm mờ sản phẩm hết hàng
-                          backgroundColor: isOutOfStock
-                            ? '#f5f5f5'
-                            : 'transparent'
+                          backgroundColor: isProductInactive ? '#f5f5f5' : '#f8f9fa',
+                          borderLeft: '4px solid var(--primary-color)',
+                          opacity: isProductInactive ? 0.6 : 1,
                         }}
                       >
-                        {/* Checkbox */}
                         <Checkbox
-                          checked={selectedItems.some(
-                            (i) => i.variantId === variant._id
-                          )}
-                          onChange={() => handleSelect(item)}
+                          checked={isFullySelected}
+                          indeterminate={isPartiallySelected}
+                          onChange={() => handleProductGroupSelect(productId)}
                           color='primary'
-                          disabled={isOutOfStock} // Disable checkbox khi hết hàng
-                          sx={{ p: 1, alignSelf: 'center' }}
+                          disabled={selectableVariants.length === 0 || isProductInactive}
+                          sx={{ p: 1 }}
                         />
-
-                        {/* Product Image */}
                         <Box
-                          sx={{ cursor: 'pointer' }}
+                          sx={{ cursor: isProductInactive ? 'not-allowed' : 'pointer' }}
                           onClick={() => {
-                            dispatch(
-                              setSelectedItemsAction([
-                                {
-                                  variantId: variant._id,
-                                  quantity: item.quantity
-                                }
-                              ])
-                            )
-                            navigate(`/productdetail/${variant.productId}`)
+                            if (!isProductInactive) {
+                              navigate(`/productdetail/${productId}`)
+                            }
                           }}
                         >
                           <Avatar
-                            src={
-                              optimizeCloudinaryUrl(variant.color?.image) ||
-                              '/default.jpg'
-                            }
+                            src={optimizeCloudinaryUrl(firstVariant.color?.image) || '/default.jpg'}
                             variant='square'
                             sx={{
-                              width: { xs: 60, sm: 80, md: 100 },
-                              height: { xs: 60, sm: 80, md: 100 },
+                              width: { xs: 50, sm: 60, md: 70 },
+                              height: { xs: 50, sm: 60, md: 70 },
                               borderRadius: 2,
                               objectFit: 'cover',
-                              boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
+                              boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
                             }}
                           />
                         </Box>
-
-                        {/* Product Info */}
-                        <Box
-                          sx={{
-                            flex: 1,
-                            minWidth: 0,
-                            display: 'flex',
-                            flexDirection: 'column',
-                            gap: 1
-                          }}
-                        >
-                          <Box
+                        <Box sx={{ flex: 1, minWidth: 0 }}>
+                          <Typography
+                            fontWeight={700}
                             sx={{
-                              display: 'flex',
-                              alignItems: 'center',
-                              gap: 1
+                              fontSize: { xs: '0.9rem', sm: '1rem', md: '1.1rem' },
+                              color: 'var(--primary-color)',
+                              mb: 0.5,
                             }}
                           >
-                            <Typography
-                              fontWeight={600}
-                              sx={{
-                                fontSize: {
-                                  xs: '0.8rem',
-                                  sm: '0.9rem',
-                                  md: '1rem'
-                                },
-                                maxWidth: {
-                                  xs: '200px',
-                                  sm: '300px',
-                                  md: '500px'
-                                },
-                                whiteSpace: 'nowrap',
-                                overflow: 'hidden',
-                                textOverflow: 'ellipsis'
-                              }}
-                              title={variant.name}
-                            >
-                              {capitalizeFirstLetter(variant.name)}
+                            {capitalizeFirstLetter(productName)}
+                          </Typography>
+                          <Box display='flex' gap={1} flexWrap='wrap' alignItems='center'>
+                            <Typography variant='body2' sx={{ color: 'text.secondary' }}>
+                              {variants.length} phân loại hàng
+                              {selectableVariants.length < variants.length}
                             </Typography>
-                            {isOutOfStock && (
+                            {isProductInactive && (
                               <Chip
                                 size='small'
-                                label='Hết hàng'
+                                label='Ngừng bán'
                                 sx={{
                                   fontSize: '0.75rem',
-                                  backgroundColor: '#ff5722',
+                                  backgroundColor: '#9e9e9e',
                                   color: 'white',
                                   fontWeight: 600,
-                                  '& .MuiChip-label': {
-                                    px: 1
-                                  }
                                 }}
                               />
                             )}
                           </Box>
-
-                          <Box display='flex' gap={1} flexWrap='wrap'>
-                            <Chip
-                              size='small'
-                              label={
-                                capitalizeFirstLetter(variant.color?.name) ||
-                                'Không rõ'
-                              }
-                              sx={{ fontSize: '0.75rem' }}
-                            />
-                            <Chip
-                              size='small'
-                              label={
-                                formatSize(variant.size?.name) || 'Không rõ'
-                              }
-                              sx={{ fontSize: '0.75rem' }}
-                            />
-                          </Box>
-                          <Box
-                            display='flex'
-                            alignItems='center'
-                            gap={1}
-                            flexWrap='wrap'
-                          >
-                            {variant.discountPrice &&
-                              variant.discountPrice > 0 ? (
-                              <>
-                                <Typography
-                                  sx={{
-                                    fontWeight: 700,
-                                    color: '#d32f2f',
-                                    fontSize: { xs: '0.9rem', sm: '1rem' }
-                                  }}
-                                >
-                                  {formatPrice(getFinalPrice(variant))}
-                                </Typography>
-                                <Typography
-                                  sx={{
-                                    fontWeight: 500,
-                                    color: 'text.secondary',
-                                    fontSize: { xs: '0.8rem', sm: '0.9rem' },
-                                    textDecoration: 'line-through'
-                                  }}
-                                >
-                                  {formatPrice(variant.exportPrice)}
-                                </Typography>
-                                <Chip
-                                  size='small'
-                                  label={`-${Math.round((variant.discountPrice / variant.exportPrice) * 100)}%`}
-                                  sx={{
-                                    backgroundColor: '#ff5722',
-                                    color: 'white',
-                                    fontSize: '0.7rem',
-                                    height: 18
-                                  }}
-                                />
-                              </>
-                            ) : (
-                              <Typography
-                                sx={{
-                                  fontWeight: 700,
-                                  color: '#d32f2f',
-                                  fontSize: { xs: '0.9rem', sm: '1rem' }
-                                }}
-                              >
-                                {formatPrice(variant.exportPrice)}
-                              </Typography>
-                            )}
-                          </Box>
                         </Box>
-
-                        {/* Quantity and Delete */}
-                        <Box
+                        <IconButton
+                          onClick={() => handleAccordionToggle(productId)}
                           sx={{
-                            display: 'flex',
-                            flexDirection: 'column',
-                            alignItems: 'flex-end',
-                            gap: 1.5
+                            color: 'var(--primary-color)',
+                            transform: isExpanded ? 'rotate(180deg)' : 'rotate(0deg)',
+                            transition: 'transform 0.3s ease',
                           }}
                         >
-                          {/* Quantity controls - chỉ hiện khi không hết hàng */}
-
-                          <Box
-                            display='flex'
-                            alignItems='center'
-                            onMouseLeave={() => handleMouseLeave(variant._id)}
-                            sx={{
-                              border: '1px solid #e0e0e0',
-                              borderRadius: 1,
-                              overflow: 'hidden'
-                            }}
-                          >
-                            <IconButton
-                              size='small'
-                              onMouseDown={() =>
-                                handleMouseDown(variant._id, -1)
-                              }
-                              disabled={
-                                processingVariantId === variant._id ||
-                                isOutOfStock ||
-                                (tempQuantities[variant._id] ??
-                                  item.quantity) <= 1
-                              }
-                              sx={{ borderRadius: 0, p: 0.5 }}
-                            >
-                              <Remove fontSize='small' />
-                            </IconButton>
-                            <TextField
-                              value={
-                                tempQuantities[variant._id] ?? item.quantity
-                              }
-                              size='small'
-                              sx={{
-                                width: 40,
-                                '& .MuiOutlinedInput-root': {
-                                  '& fieldset': { border: 'none' }
-                                }
-                              }}
-                              inputProps={{
-                                style: {
-                                  textAlign: 'center',
-                                  padding: '4px',
-                                  fontWeight: 600,
-                                  fontSize: '0.9rem'
-                                },
-                                readOnly: true
-                              }}
-                            />
-                            <IconButton
-                              size='small'
-                              onMouseDown={() =>
-                                handleMouseDown(variant._id, 1)
-                              }
-                              disabled={
-                                processingVariantId === variant._id ||
-                                isOutOfStock ||
-                                (tempQuantities[variant._id] ??
-                                  item.quantity) >= (variant.quantity || 99)
-                              }
-                              sx={{ borderRadius: 0, p: 0.5 }}
-                            >
-                              <Add fontSize='small' />
-                            </IconButton>
-                          </Box>
-
-                          <IconButton
-                            color='error'
-                            onClick={() => {
-                              setDeleteMode('single')
-                              setItemToDelete(variant)
-                              setConfirmClearOpen(true)
-                            }}
-                            size='small'
-                          >
-                            <Delete fontSize='small' />
-                          </IconButton>
-                        </Box>
+                          <ExpandMore />
+                        </IconButton>
                       </Box>
-                      <Divider />
+                      <Collapse in={isExpanded} timeout='auto' unmountOnExit>
+                        {variants.map((item) => {
+                          const variant = item.variantId
+                          if (!variant) return null
+
+                          const isOutOfStock =
+                            item.quantity === 0 ||
+                            (variant.quantity !== undefined && variant.quantity === 0)
+                          const isVariantInactive = variant.status === 'inactive'
+                          const isDisabled = isOutOfStock || isVariantInactive || isProductInactive
+
+                          return (
+                            <React.Fragment key={item._id}>
+                              <Box
+                                sx={{
+                                  p: { xs: 2, sm: 2 },
+                                  pl: { xs: 4, sm: 6 },
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  gap: 2,
+                                  flexWrap: { xs: 'wrap', sm: 'nowrap' },
+                                  opacity: isDisabled ? 0.6 : 1,
+                                  backgroundColor: isDisabled ? '#f5f5f5' : 'transparent',
+                                }}
+                              >
+                                <Checkbox
+                                  checked={selectedItems.some((i) => i.variantId === variant._id)}
+                                  onChange={() => handleSelect(item)}
+                                  color='primary'
+                                  disabled={isDisabled}
+                                  sx={{ p: 1, alignSelf: 'center' }}
+                                />
+                                <Box
+                                  sx={{ cursor: isDisabled ? 'not-allowed' : 'pointer' }}
+                                  onClick={() => {
+                                    if (!isDisabled) {
+                                      dispatch(
+                                        setSelectedItemsAction([
+                                          {
+                                            variantId: variant._id,
+                                            quantity: item.quantity,
+                                          },
+                                        ])
+                                      )
+                                      navigate(`/productdetail/${variant.productId._id}`)
+                                    }
+                                  }}
+                                >
+                                  <Avatar
+                                    src={optimizeCloudinaryUrl(variant.color?.image) || '/default.jpg'}
+                                    variant='square'
+                                    sx={{
+                                      width: { xs: 50, sm: 60, md: 80 },
+                                      height: { xs: 50, sm: 60, md: 80 },
+                                      borderRadius: 2,
+                                      objectFit: 'cover',
+                                      boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+                                    }}
+                                  />
+                                </Box>
+                                <Box
+                                  sx={{
+                                    flex: 1,
+                                    minWidth: 0,
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    gap: 1,
+                                  }}
+                                >
+                                  <Box display='flex' alignItems='center' gap={1} flexWrap='wrap'>
+                                    {variant.discountPrice && variant.discountPrice > 0 ? (
+                                      <>
+                                        <Typography
+                                          sx={{
+                                            fontWeight: 700,
+                                            color: '#d32f2f',
+                                            fontSize: { xs: '0.9rem', sm: '1rem' },
+                                          }}
+                                        >
+                                          {formatPrice(getFinalPrice(variant))}
+                                        </Typography>
+                                        <Typography
+                                          sx={{
+                                            fontWeight: 500,
+                                            color: 'text.secondary',
+                                            fontSize: { xs: '0.8rem', sm: '0.9rem' },
+                                            textDecoration: 'line-through',
+                                          }}
+                                        >
+                                          {formatPrice(variant.exportPrice)}
+                                        </Typography>
+                                        <Chip
+                                          size='small'
+                                          label={`-${Math.round(
+                                            (variant.discountPrice / variant.exportPrice) * 100
+                                          )}%`}
+                                          sx={{
+                                            display: { xs: 'none', sm: 'inline-block' },
+                                            backgroundColor: '#ff5722',
+                                            color: 'white',
+                                            fontSize: '0.7rem',
+                                            height: 18,
+                                          }}
+                                        />
+                                      </>
+                                    ) : (
+                                      <Typography
+                                        sx={{
+                                          fontWeight: 700,
+                                          color: '#d32f2f',
+                                          fontSize: { xs: '0.9rem', sm: '1rem' },
+                                        }}
+                                      >
+                                        {formatPrice(variant.exportPrice)}
+                                      </Typography>
+                                    )}
+                                  </Box>
+                                  <Box display='flex' gap={1} flexWrap='wrap' alignItems='center'>
+                                    <Chip
+                                      size='small'
+                                      label={capitalizeFirstLetter(variant.color?.name) || 'Không rõ'}
+                                      sx={{ fontSize: '0.75rem' }}
+                                    />
+                                    <Chip
+                                      size='small'
+                                      label={formatSize(variant.size?.name) || 'Không rõ'}
+                                      sx={{ fontSize: '0.75rem' }}
+                                    />
+                                    {isOutOfStock && (
+                                      <Chip
+                                        size='small'
+                                        label='Hết hàng'
+                                        sx={{
+                                          fontSize: '0.75rem',
+                                          backgroundColor: '#ff5722',
+                                          color: 'white',
+                                          fontWeight: 600,
+                                        }}
+                                      />
+                                    )}
+                                    {isVariantInactive && isProductInactive && (
+                                      <Chip
+                                        size='small'
+                                        label='Ngừng bán'
+                                        sx={{
+                                          fontSize: '0.75rem',
+                                          backgroundColor: '#9e9e9e',
+                                          color: 'white',
+                                          fontWeight: 600,
+                                        }}
+                                      />
+                                    )}
+                                  </Box>
+                                </Box>
+                                <Box
+                                  sx={{
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    alignItems: 'flex-end',
+                                    gap: 1.5,
+                                  }}
+                                >
+                                  <Box
+                                    display='flex'
+                                    alignItems='center'
+                                    onMouseLeave={() => handleMouseLeave(variant._id)}
+                                    sx={{
+                                      border: '1px solid #e0e0e0',
+                                      borderRadius: 1,
+                                      overflow: 'hidden',
+                                    }}
+                                  >
+                                    <IconButton
+                                      size='small'
+                                      onMouseDown={() => handleMouseDown(variant._id, -1)}
+                                      disabled={
+                                        processingVariantId === variant._id ||
+                                        isDisabled ||
+                                        (tempQuantities[variant._id] ?? item.quantity) <= 1
+                                      }
+                                      sx={{ borderRadius: 0, p: 0.5 }}
+                                    >
+                                      <Remove fontSize='small' />
+                                    </IconButton>
+                                    <TextField
+                                      value={tempQuantities[variant._id] ?? item.quantity}
+                                      size='small'
+                                      sx={{
+                                        width: 40,
+                                        '& .MuiOutlinedInput-root': {
+                                          '& fieldset': { border: 'none' },
+                                        },
+                                      }}
+                                      inputProps={{
+                                        style: {
+                                          textAlign: 'center',
+                                          padding: '4px',
+                                          fontWeight: 600,
+                                          fontSize: '0.9rem',
+                                        },
+                                        readOnly: true,
+                                      }}
+                                    />
+                                    <IconButton
+                                      size='small'
+                                      onMouseDown={() => handleMouseDown(variant._id, 1)}
+                                      disabled={
+                                        processingVariantId === variant._id ||
+                                        isDisabled ||
+                                        (tempQuantities[variant._id] ?? item.quantity) >=
+                                        (variant.quantity || 99)
+                                      }
+                                      sx={{ borderRadius: 0, p: 0.5 }}
+                                    >
+                                      <Add fontSize='small' />
+                                    </IconButton>
+                                  </Box>
+                                  <IconButton
+                                    color='error'
+                                    onClick={() => {
+                                      setDeleteMode('single')
+                                      setItemToDelete(variant)
+                                      setConfirmClearOpen(true)
+                                    }}
+                                    size='small'
+                                  >
+                                    <Delete fontSize='small' />
+                                  </IconButton>
+                                </Box>
+                              </Box>
+                              <Divider />
+                            </React.Fragment>
+                          )
+                        })}
+                      </Collapse>
+                      <Divider sx={{ borderWidth: 2, borderColor: '#e0e0e0' }} />
                     </React.Fragment>
                   )
                 })}
@@ -1185,8 +1256,6 @@ const Cart = () => {
             )}
           </Paper>
         </Box>
-
-        {/* Order summary */}
         <Box
           flex={{ xs: '1 1 100%', md: 1 }}
           width={{ xs: '100%', md: 'auto' }}
@@ -1195,7 +1264,7 @@ const Cart = () => {
             top: { md: '120px' },
             alignSelf: { md: 'flex-start' },
             height: { md: 'fit-content' },
-            maxHeight: { md: 'calc(100vh - 48px)' }
+            maxHeight: { xs: 'auto', md: 'calc(100vh - 48px)' },
           }}
         >
           <Card
@@ -1207,9 +1276,7 @@ const Cart = () => {
               maxHeight: { xs: 'auto', md: '100%' },
               overflowY: { md: 'auto' },
               transition: 'all 0.3s ease-in-out',
-              '&:hover': {
-                boxShadow: '0 8px 30px rgba(0,0,0,0.1)'
-              }
+              '&:hover': { boxShadow: '0 8px 30px rgba(0,0,0,0.1)' },
             }}
           >
             <CardContent sx={{ bgcolor: '#fff', p: { xs: 3, sm: 4 } }}>
@@ -1224,9 +1291,7 @@ const Cart = () => {
                   <Typography color='text.secondary'>
                     Tạm tính ({selectedItems.length} sản phẩm):
                   </Typography>
-                  <Typography fontWeight={500}>
-                    {formatPrice(totalPrice)}
-                  </Typography>
+                  <Typography fontWeight={500}>{formatPrice(totalPrice)}</Typography>
                 </Box>
                 {totalSavings > 0 && (
                   <Box display='flex' justifyContent='space-between' mb={1}>
@@ -1235,7 +1300,7 @@ const Cart = () => {
                       sx={{
                         color: 'var(--success-color)',
                         fontSize: '0.85rem',
-                        fontStyle: 'italic'
+                        fontStyle: 'italic',
                       }}
                     >
                       Tiết kiệm được:
@@ -1245,7 +1310,7 @@ const Cart = () => {
                       sx={{
                         fontWeight: 600,
                         color: 'var(--success-color)',
-                        fontSize: '0.85rem'
+                        fontSize: '0.85rem',
                       }}
                     >
                       {formatPrice(totalSavings)}
@@ -1283,13 +1348,8 @@ const Cart = () => {
                   borderRadius: 2,
                   fontWeight: 600,
                   backgroundColor: 'var(--primary-color)',
-                  '&:hover': {
-                    backgroundColor: 'var(--accent-color)'
-                  },
-                  '&:disabled': {
-                    backgroundColor: '#ccc',
-                    color: '#666'
-                  }
+                  '&:hover': { backgroundColor: 'var(--accent-color)' },
+                  '&:disabled': { backgroundColor: '#ccc', color: '#666' },
                 }}
                 disabled={selectedItems.length === 0}
                 onClick={handleCheckout}
@@ -1304,7 +1364,7 @@ const Cart = () => {
                   mt: 2,
                   py: 1.5,
                   borderRadius: 2,
-                  fontWeight: 600
+                  fontWeight: 600,
                 }}
                 onClick={() => navigate('/')}
               >
@@ -1315,16 +1375,13 @@ const Cart = () => {
         </Box>
       </Box>
 
-      {/* Dialogs and Alerts */}
       <Box sx={{ mt: 4 }}>
         <SuggestionProducts />
       </Box>
       <Dialog
         open={confirmClearOpen}
         onClose={() => setConfirmClearOpen(false)}
-        PaperProps={{
-          sx: { borderRadius: 2 }
-        }}
+        PaperProps={{ sx: { borderRadius: 2 } }}
       >
         <DialogTitle sx={{ fontWeight: 600 }}>
           {deleteMode === 'single' ? 'Xóa sản phẩm' : 'Xóa giỏ hàng'}
@@ -1362,7 +1419,6 @@ const Cart = () => {
         </DialogActions>
       </Dialog>
 
-      {/* Snackbar for out of stock alert */}
       <Snackbar
         open={outOfStockAlert}
         autoHideDuration={6000}
@@ -1381,4 +1437,4 @@ const Cart = () => {
   )
 }
 
-export default Cart
+export default Cart        
