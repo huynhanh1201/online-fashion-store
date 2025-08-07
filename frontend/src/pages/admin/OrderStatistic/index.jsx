@@ -13,7 +13,7 @@ function OrderDashboard() {
 
   const currentYear = new Date().getFullYear()
   const [year, setYear] = useState(currentYear.toString())
-
+  console.log('OrderDashboard: currentYear', currentYear)
   useEffect(() => {
     fetchOrdersStatistics()
   }, [])

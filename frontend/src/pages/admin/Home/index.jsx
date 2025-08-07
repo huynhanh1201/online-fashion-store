@@ -69,6 +69,8 @@ const AdminHome = () => {
           productStatistics={productStatistics}
           orderStatistics={orderStatistics}
           financeStatistics={financeStatistics}
+          year={year}
+          setYear={setYear}
         />
       </RouteGuard>
     )

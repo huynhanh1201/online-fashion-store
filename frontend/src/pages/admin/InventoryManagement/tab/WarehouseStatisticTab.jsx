@@ -37,14 +37,12 @@ function WarehouseStatisticTab() {
   const { partners, fetchPartners, createNewPartner } = usePartner()
   const { createNewWarehouseSlip } = useWarehouseSlips()
 
-  const { warehouseStatistics, loading, fetchStatistics } =
+  const { warehouseStatistics, loading, year, fetchStatistics } =
     useInventoryStatistics()
 
   React.useEffect(() => {
     fetchStatistics()
   }, [])
-
-
   return (
     <div
       className='tab-content'
@@ -70,7 +68,11 @@ function WarehouseStatisticTab() {
         >
           Biến Động Tồn Kho Theo Thời Gian
         </Typography>
-        <ChartDashboard data={warehouseStatistics} loading={loading} />
+        <ChartDashboard
+          data={warehouseStatistics}
+          year={year}
+          onYearChange={(newYear) => fetchStatistics(newYear)}
+        />
       </Box>
       <Box sx={{ ...styles.BoxCard, pb: 0 }}>
         <Typography

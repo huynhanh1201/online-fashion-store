@@ -141,7 +141,7 @@ const AccountManagement = () => {
           />
         )}
 
-        <PermissionWrapper requiredPermissions={['user:create']}>
+        <PermissionWrapper requiredPermissions={['account:create']}>
           {modalType === 'add' && (
             <AddAccountModal
               open
@@ -152,7 +152,7 @@ const AccountManagement = () => {
           )}
         </PermissionWrapper>
 
-        <PermissionWrapper requiredPermissions={['user:update']}>
+        <PermissionWrapper requiredPermissions={['account:update']}>
           {modalType === 'edit' && selectedUser && (
             <EditAccountModal
               open
@@ -164,7 +164,7 @@ const AccountManagement = () => {
           )}
         </PermissionWrapper>
 
-        <PermissionWrapper requiredPermissions={['user:delete']}>
+        <PermissionWrapper requiredPermissions={['account:delete']}>
           {modalType === 'delete' && selectedUser && (
             <DeleteAccountModal
               open
@@ -174,7 +174,7 @@ const AccountManagement = () => {
             />
           )}
         </PermissionWrapper>
-        <PermissionWrapper requiredPermissions={['user:restore']}>
+        <PermissionWrapper requiredPermissions={['account:restore']}>
           {modalType === 'restore' && selectedUser && (
             <RestoreAccountModal
               open
