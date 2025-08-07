@@ -226,9 +226,9 @@ export default function SystemDashboard({
             value={selectedYear}
             onChange={(e) => setSelectedYear(e.target.value)}
           >
-            {Array.from({ length: new Date().getFullYear() - 2025 + 1 }).map(
+            {Array.from({ length: new Date().getFullYear() - 2020 + 1 }).map(
               (_, i) => {
-                const yearOption = 2025 + i
+                const yearOption = 2020 + i
                 return (
                   <MenuItem key={yearOption} value={yearOption.toString()}>
                     {yearOption}
