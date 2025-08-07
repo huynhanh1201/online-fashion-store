@@ -50,32 +50,6 @@ export default function InventorySummaryCard({ data, loading }) {
     }
   ]
 
-  if (loading) {
-    return (
-      <Grid container spacing={2}>
-        {Array.from({ length: 4 }).map((_, index) => (
-          <Grid item xs={6} md={4} key={index}>
-            <Box
-              sx={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 2,
-                p: 2,
-                height: '100px',
-                backgroundColor: '#f5f5f5',
-                borderRadius: 2
-              }}
-            >
-              <Typography variant='h6' color='text.secondary'>
-                Đang tải dữ liệu...
-              </Typography>
-            </Box>
-          </Grid>
-        ))}
-      </Grid>
-    )
-  }
-
   return (
     <Grid container spacing={2}>
       {summaryItems.map((item, index) => (
@@ -96,6 +70,24 @@ export default function InventorySummaryCard({ data, loading }) {
               <Typography variant='h6' color='text.secondary' sx={{ mb: 1 }}>
                 {item.label}
               </Typography>
+              {/*{loading ? (*/}
+              {/*  <Typography*/}
+              {/*    variant='h5'*/}
+              {/*    fontWeight='bold'*/}
+              {/*    sx={{ display: 'flex', alignItems: 'center', gap: 1 }}*/}
+              {/*  >*/}
+              {/*    Đang tải dữ liệu...*/}
+              {/*  </Typography>*/}
+              {/*) : (*/}
+              {/*  <Typography*/}
+              {/*    variant='h5'*/}
+              {/*    fontWeight='bold'*/}
+              {/*    sx={{ display: 'flex', alignItems: 'center', gap: 1 }}*/}
+              {/*  >*/}
+              {/*    {item.icon}*/}
+              {/*    {item.value}*/}
+              {/*  </Typography>*/}
+              {/*)}*/}
               <Typography
                 variant='h5'
                 fontWeight='bold'

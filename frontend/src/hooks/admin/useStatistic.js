@@ -15,12 +15,13 @@ export const useInventoryStatistics = () => {
   const [productStatistics, setProductStatistics] = useState([])
   const [loading, setLoading] = useState(true)
   const [financeStatistics, setFinanceStatistics] = useState([])
-
-  const fetchStatistics = async () => {
+  const [year, setYear] = useState(new Date().getFullYear())
+  const fetchStatistics = async (targetYear = year) => {
     setLoading(true)
     try {
-      const data = await getInventoryStatistics()
+      const data = await getInventoryStatistics(targetYear)
       setWarehouseStatistics(data)
+      setYear(targetYear)
     } catch (error) {
       console.error('Error fetching inventory statistics:', error)
     } finally {
@@ -93,7 +94,9 @@ export const useInventoryStatistics = () => {
     setProductStatistics,
     setStatistics,
     financeStatistics,
-    setFinanceStatistics
+    setFinanceStatistics,
+    year,
+    setYear
   }
 }
 
