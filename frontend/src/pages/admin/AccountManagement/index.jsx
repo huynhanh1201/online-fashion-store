@@ -122,10 +122,10 @@ const AccountManagement = () => {
           setROWS_PER_PAGE(newLimit)
         }}
         permissions={{
-          canAdd: hasPermission('user:create'),
-          canEdit: hasPermission('user:update'),
-          canDelete: hasPermission('user:delete'),
-          canView: hasPermission('user:read')
+          canAdd: hasPermission('account:create'),
+          canEdit: hasPermission('account:update'),
+          canDelete: hasPermission('account:delete'),
+          canView: hasPermission('account:read')
         }}
         roles={roles}
         filters={filters}
@@ -141,7 +141,7 @@ const AccountManagement = () => {
           />
         )}
 
-        <PermissionWrapper requiredPermissions={['user:create']}>
+        <PermissionWrapper requiredPermissions={['account:create']}>
           {modalType === 'add' && (
             <AddAccountModal
               open
@@ -152,7 +152,7 @@ const AccountManagement = () => {
           )}
         </PermissionWrapper>
 
-        <PermissionWrapper requiredPermissions={['user:update']}>
+        <PermissionWrapper requiredPermissions={['account:update']}>
           {modalType === 'edit' && selectedUser && (
             <EditAccountModal
               open
@@ -160,11 +160,15 @@ const AccountManagement = () => {
               user={selectedUser}
               onSave={handleSave}
               roles={roles}
+              permissions={{
+                canEditRole: hasPermission('account:create')
+              }
+              }
             />
           )}
         </PermissionWrapper>
 
-        <PermissionWrapper requiredPermissions={['user:delete']}>
+        <PermissionWrapper requiredPermissions={['account:delete']}>
           {modalType === 'delete' && selectedUser && (
             <DeleteAccountModal
               open
@@ -174,7 +178,7 @@ const AccountManagement = () => {
             />
           )}
         </PermissionWrapper>
-        <PermissionWrapper requiredPermissions={['user:restore']}>
+        <PermissionWrapper requiredPermissions={['account:restore']}>
           {modalType === 'restore' && selectedUser && (
             <RestoreAccountModal
               open

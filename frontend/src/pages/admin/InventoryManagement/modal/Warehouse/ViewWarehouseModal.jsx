@@ -33,7 +33,7 @@ export default function ViewWarehouseModal({ open, onClose, warehouse }) {
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth='sm' fullWidth>
-      <DialogTitle sx={{ pl: 5 }}>Thông tin kho hàng</DialogTitle>
+      <DialogTitle>Thông tin kho hàng</DialogTitle>
       <Divider />
       <DialogContent sx={{ py: 0 }}>
         <Table>

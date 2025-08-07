@@ -249,7 +249,7 @@ const Cart = () => {
   const formatPrice = (val) =>
     typeof val === 'number' ? val.toLocaleString('vi-VN') + '₫' : '0₫'
 
-  const handleMouseDown = (variantId, delta) => {
+  const handleQuantityChange = (variantId, delta) => {
     if (processingVariantId === variantId) return
 
     const item = cartItems.find((i) => i.variantId._id === variantId)
@@ -260,12 +260,26 @@ const Cart = () => {
     const current = tempQuantities[variantId] ?? item.quantity
     const max = item.variantId.quantity || 99
 
+    // Kiểm tra giới hạn trước khi tính toán
     if (delta > 0 && current >= max) {
       setShowMaxQuantityAlert(true)
       return
     }
 
-    const newQty = Math.min(Math.max(current + delta, 1), max)
+    if (delta < 0 && current <= 1) {
+      return // Không cho phép giảm xuống dưới 1
+    }
+
+    // Tính toán số lượng mới với kiểm tra nghiêm ngặt
+    let newQty = current + delta
+
+    // Đảm bảo newQty trong khoảng hợp lệ
+    if (newQty < 1) newQty = 1
+    if (newQty > max) newQty = max
+
+    // Kiểm tra lần cuối để đảm bảo không có số âm
+    if (newQty < 1) return
+
     dispatch(setTempQuantity({ variantId, quantity: newQty }))
 
     setSelectedItems((prev) => {
@@ -289,6 +303,12 @@ const Cart = () => {
 
     if (!item || tempQty === undefined || tempQty === item.quantity) return
 
+    // Đảm bảo tempQty không âm
+    if (tempQty < 1) {
+      dispatch(removeTempQuantity(variantId))
+      return
+    }
+
     try {
       setProcessingVariantId(variantId)
       const delta = tempQty - item.quantity
@@ -311,8 +331,8 @@ const Cart = () => {
           return newSelectedItems
         })
 
-        // Làm mới dữ liệu từ server
-        // await cart
+        // Làm mới dữ liệu từ server để cập nhật badge
+        // result.cartItems đã được cập nhật trong useCart hook
       } else {
         throw new Error(result.message || 'Failed to update item')
       }
@@ -322,7 +342,15 @@ const Cart = () => {
       console.error('Error updating quantity:', err)
       setOutOfStockMessage(err.message || 'Không thể cập nhật số lượng sản phẩm')
       setOutOfStockAlert(true)
+      // Reset về số lượng ban đầu khi có lỗi
       dispatch(removeTempQuantity(variantId))
+      setSelectedItems((prev) => {
+        const newSelectedItems = prev.map((i) =>
+          i.variantId === variantId ? { ...i, quantity: item.quantity } : i
+        )
+        dispatch(setSelectedItemsAction(newSelectedItems))
+        return newSelectedItems
+      })
     } finally {
       setProcessingVariantId(null)
     }
@@ -1193,7 +1221,7 @@ const Cart = () => {
                                   >
                                     <IconButton
                                       size='small'
-                                      onMouseDown={() => handleMouseDown(variant._id, -1)}
+                                      onMouseDown={() => handleQuantityChange(variant._id, -1)}
                                       disabled={
                                         processingVariantId === variant._id ||
                                         isDisabled ||
@@ -1224,7 +1252,7 @@ const Cart = () => {
                                     />
                                     <IconButton
                                       size='small'
-                                      onMouseDown={() => handleMouseDown(variant._id, 1)}
+                                      onMouseDown={() => handleQuantityChange(variant._id, 1)}
                                       disabled={
                                         processingVariantId === variant._id ||
                                         isDisabled ||

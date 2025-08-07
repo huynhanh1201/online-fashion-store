@@ -357,7 +357,7 @@ const ProductInfoSection = ({
             isAdding ? <CircularProgress size={18} color='inherit' /> : null
           }
         >
-          {isAdding ? 'Đang thêm...' : 'Thêm vào giỏ'}
+          {isAdding ? 'Đang thêm...' : 'Thêm vào giỏ hàng'}
         </Button>
 
         <Button

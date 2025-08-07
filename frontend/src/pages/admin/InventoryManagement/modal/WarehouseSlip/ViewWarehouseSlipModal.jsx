@@ -41,7 +41,7 @@ const ViewWarehouseSlipModal = ({ open, onClose, slip }) => {
         sx: StyleAdmin.OverlayModal
       }}
     >
-      <DialogTitle sx={{ pl: 5 }}>
+      <DialogTitle>
         Thông tin phiếu {slip.type === 'Nhập' ? 'nhập' : 'xuất'} kho
       </DialogTitle>
       <Divider />
