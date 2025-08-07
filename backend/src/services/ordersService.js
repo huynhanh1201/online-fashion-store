@@ -13,6 +13,7 @@ import { deliveriesService } from '~/services/deliveriesService'
 import { warehouseSlipsService } from '~/services/warehouseSlipsService'
 import { OrderItemModel } from '~/models/OrderItemModel'
 import { WarehouseModel } from '~/models/WarehouseModel'
+import {PaymentTransactionModel} from "~/models/PaymentTransactionModel";
 
 const createOrder = async (userId, reqBody, ipAddr, jwtDecoded) => {
   // eslint-disable-next-line no-useless-catch
@@ -280,9 +281,22 @@ const updateOrder = async (jwtDecoded, orderId, reqBody) => {
       .select('status')
       .lean()
 
+    const infoUpdate = {
+      ...reqBody
+    }
+
+    if(reqBody.status === 'Delivered'){
+      infoUpdate.isDelivered = true
+      infoUpdate.paymentStatus = 'Completed'
+
+      await PaymentTransactionModel.findOneAndUpdate({orderId},{
+        status: "Completed"
+      })
+    }
+
     const updatedOrder = await OrderModel.findOneAndUpdate(
       { _id: orderId },
-      reqBody,
+      infoUpdate,
       {
         new: true,
         runValidators: true

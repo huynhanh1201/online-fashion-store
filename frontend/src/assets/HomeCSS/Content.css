@@ -118,7 +118,7 @@
 /* Product Grid */
 .product-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    grid-template-columns: repeat(5, 1fr);
     gap: 5px;
     min-width: 250px;
     margin-bottom: 32px;
@@ -126,6 +126,7 @@
 
 .productDetail-grid {
     grid-template-columns:repeat(auto-fit, minmax(350px, 1fr));
+    /*grid-template-columns: repeat(5, 1fr);*/
 }
 
 .product-card {
@@ -313,6 +314,9 @@
         padding: 20px 12px;
     }
 
+    /*.product-grid {*/
+    /*    grid-template-columns: repeat(4, 1fr);*/
+    /*}*/
 }
 
 @media (max-width: 1300px) {
@@ -320,13 +324,19 @@
         padding: 20px 12px;
     }
 
+    /*.product-grid {*/
+    /*    grid-template-columns: repeat(3, 1fr);*/
+    /*}*/
 }
 
 @media (max-width: 1200px) {
     .content-container {
         padding: 20px 12px;
     }
-
+    
+    /*.product-grid {*/
+    /*    grid-template-columns: repeat(3, 1fr);*/
+    /*}*/
 }
 
 @media (max-width: 900px) {
@@ -334,33 +344,36 @@
         padding: 20px 12px;
     }
 
+    /*.product-grid {*/
+    /*    grid-template-columns: repeat(2, 1fr);*/
+    /*}*/
 }
 
 @media (max-width: 768px) {
     .content-container {
         padding: 16px 8px;
     }
-
+    
     .category-grid {
         grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
     }
-
+    
     .features-grid {
         flex-direction: column;
         gap: 10px;
     }
-
+    
     .feature-card {
         min-width: 0;
         padding: 10px 12px;
     }
 
-
+    
     .stitch-banner {
         min-height: 200px;
         padding: 24px 16px;
     }
-
+    
     .product-image {
         height: 280px;
     }
@@ -370,6 +383,10 @@
     .content-container {
         padding: 12px 8px;
     }
+
+    /*.product-grid {*/
+    /*    grid-template-columns: repeat(1, 1fr);*/
+    /*}*/
 }
 
 
@@ -377,36 +394,36 @@
     .content-container {
         padding: 12px 8px;
     }
-
+    
     .category-grid {
         grid-template-columns: 1fr;
     }
-
+    
     .features-grid {
         grid-template-columns: 1fr;
     }
-
+    
     .stitch-banner {
         min-height: 150px;
         padding: 16px 12px;
     }
-
+    
     .product-image {
         height: 200px;
     }
-
+    
     .product-name {
         font-size: 12px;
     }
-
+    
     .current-price {
         font-size: 14px;
     }
-
+    
     .original-price {
         font-size: 10px;
     }
-
+    
     .cta-button {
         padding: 8px 24px;
         font-size: 14px;
