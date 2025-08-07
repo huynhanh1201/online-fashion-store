@@ -97,19 +97,11 @@ const getInventoryStatistics = async (queryString) => {
     ])
 
     // Dữ liệu biến động tồn kho theo thời gian (nhập/xuất từng ngày)
-
-    // const startDate = new Date(queryString.year, 0, 1) // 0 = tháng 1
-    // const endDate = new Date(queryString.year, 11, 31, 23, 59, 59, 999) // 11 = tháng 12
-
-    const startDate = new Date(Date.UTC(queryString.year, 0, 1)); // 2024-01-01T00:00:00.000Z
-    const endDate = new Date(Date.UTC(queryString.year, 11, 31, 23, 59, 59, 999)); // 2024-12-31T23:59:59.999Z
-
-    console.log('startDate: ', startDate)
-    console.log('endDate: ', endDate)
+    const startDate = new Date(queryString.year, 0, 1) // 0 = tháng 1
+    const endDate = new Date(queryString.year, 11, 31, 23, 59, 59, 999) // 11 = tháng 12
 
     const stockMovementsPromise = InventoryLogModel.aggregate([
       {
-        // 🧠 Bước lọc theo năm truyền vào
         $match: {
           createdAt: {
             $gte: startDate,
@@ -180,6 +172,7 @@ const getInventoryStatistics = async (queryString) => {
       }
     ])
 
+
     // Xử lý chạy song song bằng Promise.all
     const [warehouseStats, lowStockCount, stockWarnings, stockMovements] =
       await Promise.all([
@@ -188,6 +181,7 @@ const getInventoryStatistics = async (queryString) => {
         stockWarningsPromise,
         stockMovementsPromise
       ])
+
 
     // Xử lý cấu trúc dữ liệu về dạng Hash map
     const warehouseStatsMap = convertArrToMap(warehouseStats, '_id')
@@ -480,11 +474,10 @@ const getFinanceStatistics = async (queryString) => {
       }
     ])
 
-    // const startDate = new Date(queryString.year, 0, 1) // 0 = tháng 1
-    // const endDate = new Date(queryString.year, 11, 31, 23, 59, 59, 999) // 11 = tháng 12
+    const startDate = new Date(queryString.year, 0, 1) // 0 = tháng 1
+    const endDate = new Date(queryString.year, 11, 31, 23, 59, 59, 999) // 11 = tháng 12
 
-    const startDate = new Date(Date.UTC(queryString.year, 0, 1)); // 2024-01-01T00:00:00.000Z
-    const endDate = new Date(Date.UTC(queryString.year, 11, 31, 23, 59, 59, 999)); // 2024-12-31T23:59:59.999Z
+
 
     const monthlyStatsPromise = OrderModel.aggregate([
       {
