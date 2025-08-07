@@ -747,9 +747,16 @@ const OrderListPage = () => {
 
   const loadMoreOrders = async () => {
     if (!hasMore || loadingMore) return
+
+    const scrollY = window.scrollY // Ghi nhớ vị trí hiện tại
     const nextPage = currentPage + 1
     await fetchOrders(nextPage, false, selectedTab)
+
+    setTimeout(() => {
+      window.scrollTo(0, scrollY) // Quay lại vị trí cũ
+    }, 100)
   }
+
 
   useEffect(() => {
     if (userId && !isInitialized) {

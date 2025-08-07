@@ -272,7 +272,8 @@ const Profile = () => {
         display: 'flex',
         flexDirection: isMobile ? 'column' : 'row',
         gap: 4,
-        alignItems: isMobile ? 'stretch' : 'flex-start'
+        alignItems: isMobile ? 'stretch' : 'flex-start',
+        height: '55vh',
       }}
     >
       <Paper
@@ -294,7 +295,16 @@ const Profile = () => {
           }}
         >
           {loading ? (
-            <Typography>Đang cập nhật ...</Typography>
+            <Box
+              sx={{
+                height: '40vh',
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+              }}
+            >
+              <Typography>Đang cập nhật ...</Typography>
+            </Box >
           ) : (
             <>
               <Box sx={{ textAlign: 'center', mb: 3 }}>

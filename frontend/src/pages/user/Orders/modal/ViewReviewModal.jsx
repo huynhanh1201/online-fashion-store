@@ -383,7 +383,7 @@ const ViewReviewModal = ({ open, onClose, userId, productId, orderId, productNam
         sx={{
           color: '#fff',
           zIndex: (theme) => theme.zIndex.drawer + 2,
-          backgroundColor: 'rgba(0, 0, 0, 0.9)',
+          backgroundColor: 'rgba(0, 0, 0, 0.6)',
         }}
         open={lightboxOpen}
         onClick={handleCloseLightbox}
