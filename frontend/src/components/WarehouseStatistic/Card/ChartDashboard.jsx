@@ -161,7 +161,7 @@ export default function ChartDashboard({ data, year, onYearChange }) {
               <InputLabel>Năm</InputLabel>
               <Select value={selectedYear} label='Năm' onChange={handleChange}>
                 {Array.from(
-                  { length: new Date().getFullYear() - 2025 + 1 },
+                  { length: new Date().getFullYear() - 2020 + 1 },
                   (_, i) => {
                     const yearOption = 2025 - i
                     return (
