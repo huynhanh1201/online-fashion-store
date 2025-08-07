@@ -30,7 +30,7 @@ const ProductHorizontalScroll = ({
 
   // Xác định số card trên mỗi hàng dựa vào chiều rộng màn hình
   const getCardsPerRow = () => {
-    if (windowWidth > 1300) {
+    if (windowWidth > 1500) {
       return defaultCardsPerRow // 5 cards on desktop
     }
     if (windowWidth > 1400) {
@@ -85,7 +85,7 @@ const ProductHorizontalScroll = ({
         
         .products-grid {
           display: grid;
-          grid-template-columns: repeat(${cardsPerRow}, 1fr);
+          grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
           gap: ${gap}px;
           margin-bottom: 20px;
         }
