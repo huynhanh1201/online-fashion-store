@@ -1,6 +1,7 @@
 import React from 'react'
 import AccountTable from './AccountTable.jsx'
 
+import useProfile from '~/hooks/useUserProfile.js'
 import useAccount from '~/hooks/admin/useAccount.js'
 import useRoles from '~/hooks/admin/useRoles.js'
 import usePermissions from '~/hooks/usePermissions'
@@ -42,10 +43,13 @@ const AccountManagement = () => {
     Restore
   } = useAccount()
 
+  const { profile, fetchProfile } = useProfile()
+
   const { hasPermission } = usePermissions()
 
   React.useEffect(() => {
     fetchRoles(1, 10000, { destroy: 'false' })
+    fetchProfile()
   }, [])
 
   React.useEffect(() => {
@@ -162,8 +166,8 @@ const AccountManagement = () => {
               roles={roles}
               permissions={{
                 canEditRole: hasPermission('account:create')
-              }
-              }
+              }}
+              profile={profile}
             />
           )}
         </PermissionWrapper>

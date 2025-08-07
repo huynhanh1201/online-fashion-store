@@ -259,7 +259,7 @@ import { useForm, Controller } from 'react-hook-form'
 import StyleAdmin from '~/assets/StyleAdmin.jsx'
 import usePermissions from '~/hooks/usePermissions'
 
-const EditAccountModal = ({ open, onClose, user, onSave, roles, permissions }) => {
+const EditAccountModal = ({ open, onClose, user, onSave, roles, permissions, profile }) => {
   const {
     control,
     handleSubmit,
@@ -308,8 +308,20 @@ const EditAccountModal = ({ open, onClose, user, onSave, roles, permissions }) =
     onClose()
   }
 
+  // const roleOptions = roles
+  //   .filter((role) => role.name !== 'customer')
+  //   .map((role) => ({
+  //     id: role._id,
+  //     name: role.name,
+  //     label: role.label || role.name
+  //   }))
+  
   const roleOptions = roles
-    .filter((role) => role.name !== 'customer')
+    .filter((role) => {
+      if (role.name === 'customer') return false
+      if (profile?.role === 'owner' && role.name === 'technical_admin') return false
+      return true
+    })
     .map((role) => ({
       id: role._id,
       name: role.name,
@@ -397,45 +409,52 @@ const EditAccountModal = ({ open, onClose, user, onSave, roles, permissions }) =
             )}
           />
 
-          {(hasPermission('account:technicalAdmin') || hasPermission('account:update')) && !isTechnician && (
-            <Controller
-              name='role'
-              control={control}
-              rules={{
-                required: 'Vai trò là bắt buộc, vui lòng chọn 1 vai trò phù hợp'
-              }}
-              render={({ field, fieldState }) => (
-                <Autocomplete
-                  options={roleOptions}
-                  getOptionLabel={(option) => option.label}
-                  isOptionEqualToValue={(option, value) =>
-                    option.name === value?.name
-                  }
-                  value={
-                    roleOptions.find((r) => r.name === field.value) || null
-                  }
-                  onChange={(_, selected) => {
-                    field.onChange(selected?.name || '')
-                    setValue('roleId', selected?.id || '')
-                  }}
-                  renderInput={(params) => (
-                    <TextField
-                      {...params}
-                      label={
-                        <>
-                          Vai trò <span style={{ color: 'red' }}>*</span>
-                        </>
-                      }
-                      margin='normal'
-                      error={!!fieldState.error}
-                      helperText={fieldState.error?.message}
-                      sx={StyleAdmin.InputCustom}
-                    />
-                  )}
-                />
-              )}
-            />
-          )}
+          {(
+            (
+              profile?.role === 'technical_admin' ||
+              ((hasPermission('account:technicalAdmin') || hasPermission('account:update')) &&
+                !(profile?.role === 'owner' && user?.role === 'technical_admin'))
+            )
+          ) && (
+              <Controller
+                name='role'
+                control={control}
+                rules={{
+                  required: 'Vai trò là bắt buộc, vui lòng chọn 1 vai trò phù hợp'
+                }}
+                render={({ field, fieldState }) => (
+                  <Autocomplete
+                    options={roleOptions}
+                    getOptionLabel={(option) => option.label}
+                    isOptionEqualToValue={(option, value) =>
+                      option.name === value?.name
+                    }
+                    value={
+                      roleOptions.find((r) => r.name === field.value) || null
+                    }
+                    onChange={(_, selected) => {
+                      field.onChange(selected?.name || '')
+                      setValue('roleId', selected?.id || '')
+                    }}
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        label={
+                          <>
+                            Vai trò <span style={{ color: 'red' }}>*</span>
+                          </>
+                        }
+                        margin='normal'
+                        error={!!fieldState.error}
+                        helperText={fieldState.error?.message}
+                        sx={StyleAdmin.InputCustom}
+                      />
+                    )}
+                  />
+                )}
+              />
+            )}
+
         </form>
       </DialogContent>
 
@@ -449,22 +468,21 @@ const EditAccountModal = ({ open, onClose, user, onSave, roles, permissions }) =
         >
           Đóng
         </Button>
-        {!isTechnician && (
-          <Button
-            type='submit'
-            form='edit-user-form'
-            variant='contained'
-            disabled={isSubmitting}
-            startIcon={isSubmitting ? <CircularProgress size={20} /> : null}
-            sx={{
-              backgroundColor: '#001f5d',
-              color: '#fff',
-              textTransform: 'none'
-            }}
-          >
-            {isSubmitting ? 'Đang lưu' : 'Lưu'}
-          </Button>
-        )}
+        <Button
+          type='submit'
+          form='edit-user-form'
+          variant='contained'
+          disabled={isSubmitting}
+          startIcon={isSubmitting ? <CircularProgress size={20} /> : null}
+          sx={{
+            backgroundColor: '#001f5d',
+            color: '#fff',
+            textTransform: 'none'
+          }}
+        >
+          {isSubmitting ? 'Đang lưu' : 'Lưu'}
+        </Button>
+
       </DialogActions>
     </Dialog>
   )
