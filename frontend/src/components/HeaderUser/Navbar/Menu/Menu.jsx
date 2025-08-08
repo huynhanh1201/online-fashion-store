@@ -729,7 +729,15 @@ const Menu = ({ headerRef, currentUser }) => {
             {(menuConfig?.mainMenu?.length > 0
               ? menuConfig.mainMenu
                 .filter((item) => item.visible)
-                .sort((a, b) => (a.order || 0) - (b.order || 0))
+                .sort((a, b) => {
+                  if (a.order != null && b.order != null) {
+                    return a.order - b.order;
+                  }
+                  if (a.order != null) return -1; // a có order, b không có → a đứng trước
+                  if (b.order != null) return 1;  // b có order, a không có → b đứng trước
+                  return 0; // cả hai không có order → giữ nguyên vị trí
+                })
+                
               : [
                 {
                   label: 'Sản phẩm',
