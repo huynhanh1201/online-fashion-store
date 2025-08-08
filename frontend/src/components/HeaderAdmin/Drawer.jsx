@@ -39,6 +39,7 @@ import usePermissions from '~/hooks/usePermissions'
 import useRoles from '~/hooks/admin/useRoles.js'
 import LogoutButton from '~/components/modals/Logout.jsx'
 import logo from '~/assets/img/logo.jpg'
+import { getHeaderConfig } from '~/services/admin/webConfig/headerService'
 export default function AdminDrawer({
   open,
   profile,
@@ -70,7 +71,22 @@ export default function AdminDrawer({
       : currentPath
     return current === normalizedPath
   }
+  const [logoData, setLogoData] = React.useState(null)
 
+  useEffect(() => {
+    const fetchLogo = async () => {
+      try {
+        const headerConfig = await getHeaderConfig()
+        if (headerConfig?.content?.logo) {
+          setLogoData(headerConfig.content.logo)
+        }
+      } catch (error) {
+        console.error('Lỗi khi lấy logo:', error)
+      }
+    }
+
+    fetchLogo()
+  }, [])
   useEffect(() => {
     fetchRoles()
   }, [])
@@ -259,7 +275,6 @@ export default function AdminDrawer({
             label: 'Quản lý đánh giá',
             path: '/admin/review-management'
           }
-
         ]
       },
       orderManagement: {
@@ -571,7 +586,7 @@ export default function AdminDrawer({
         }}
       >
         <img
-          src={logo}
+          src={logoData?.imageUrl ? logoData.imageUrl : logo}
           alt={'logo'}
           style={{
             width: '100%',
