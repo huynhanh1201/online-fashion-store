@@ -125,7 +125,7 @@ export default function DiscountRow({
                     </IconButton>
                   </Tooltip>
                 )}
-                {showRestoreIcon === false ? (
+                {discount.destroy ? (
                   permissions.canRestore && (
                     <Tooltip title='Khôi phục'>
                       <IconButton

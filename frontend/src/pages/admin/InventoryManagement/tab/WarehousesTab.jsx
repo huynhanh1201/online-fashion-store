@@ -367,7 +367,7 @@ const WarehousesTab = () => {
         warehouse={selectedWarehouse}
       />
 
-      <Suspense fallback={<div>Loading...</div>}>
+      <Suspense fallback={<></>}>
         {openAddModal && showButton && (
           <AddWarehouseModal
             open={openAddModal}

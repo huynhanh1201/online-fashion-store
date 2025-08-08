@@ -51,8 +51,6 @@ export default function ColorRow({
   const destroyValue = filters?.destroy
   useEffect(() => {
     if (destroyValue === 'true') {
-      setShowRestoreIcon(false)
-
       const timer = setTimeout(() => {
         setShowRestoreIcon(false)
       }, 1000)
@@ -137,7 +135,7 @@ export default function ColorRow({
                     </IconButton>
                   </Tooltip>
                 )}
-                {showRestoreIcon === false ? (
+                {color.destroy ? (
                   permissions.canRestore && (
                     <Tooltip title='Khôi phục'>
                       <IconButton

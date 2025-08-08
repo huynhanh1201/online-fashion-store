@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React from 'react'
 import {
   TableCell,
   TableRow,
@@ -53,26 +53,9 @@ export default function AccountRow({
   columns,
   handleOpenModal,
   permissions = {},
-  roles,
-  filters
+  roles
 }) {
   const { hasPermission } = usePermissions()
-  const [showRestoreIcon, setShowRestoreIcon] = useState(false)
-
-  const destroyValue = filters?.destroy
-  useEffect(() => {
-    if (destroyValue === 'true') {
-      setShowRestoreIcon(false)
-
-      const timer = setTimeout(() => {
-        setShowRestoreIcon(false)
-      }, 1000)
-
-      return () => clearTimeout(timer)
-    } else {
-      setShowRestoreIcon(true)
-    }
-  }, [destroyValue])
 
   return (
     <TableRow hover role='checkbox' tabIndex={-1}>
@@ -188,7 +171,7 @@ export default function AccountRow({
                     </IconButton>
                   </Tooltip>
                 )}
-                {showRestoreIcon === false ? (
+                {user.destroy ? (
                   hasPermission('account:restore') && (
                     <Tooltip title='Khôi phục'>
                       <IconButton

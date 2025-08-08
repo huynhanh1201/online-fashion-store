@@ -194,7 +194,7 @@ export default function UserRow({
                 {/*    </IconButton>*/}
                 {/*  </Tooltip>*/}
                 {/*)}*/}
-                {showRestoreIcon === false
+                {user.destroy
                   ? permissions.canRestore && (
                       <Tooltip title='Khôi phục'>
                         <IconButton

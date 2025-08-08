@@ -293,7 +293,7 @@ const ProductRow = ({
                       </IconButton>
                     </Tooltip>
                   )}
-                  {showRestoreIcon === false ? (
+                  {product.destroy ? (
                     permissions.canRestore && (
                       <Tooltip title='Khôi phục'>
                         <IconButton
