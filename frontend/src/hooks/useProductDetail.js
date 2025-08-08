@@ -248,7 +248,14 @@ const useProductDetail = (productId) => {
   // Handle add to cart
   const handleAddToCart = async (productId) => {
     if (isAdding[productId] || !product) return
-
+    if (product.status === 'inactive') {
+      setSnackbar({
+        open: true,
+        severity: 'warning',
+        message: 'Sản phẩm này hiện ngưng kinh doanh!'
+      })
+      return
+    }
     // Kiểm tra đăng nhập
     if (!currentUser) {
       setSnackbar({
@@ -348,6 +355,14 @@ const useProductDetail = (productId) => {
   const handleBuyNow = () => {
     if (!product) return
 
+    if (product.status === 'inactive') {
+      setSnackbar({
+        open: true,
+        severity: 'warning',
+        message: 'Sản phẩm này hiện ngưng kinh doanh!'
+      })
+      return
+    }
     // Kiểm tra đăng nhập
     if (!currentUser) {
       setSnackbar({

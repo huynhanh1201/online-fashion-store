@@ -348,6 +348,10 @@ export const roles = [
     name: 'staff',
     label: 'Nhân viên quản lý',
     permissions: [
+
+      // Variant
+      'variant:read',
+
       // Order
       'order:use',
       'order:read',
@@ -388,7 +392,10 @@ export const roles = [
       'batch:update',
 
       // Partner
-      'partner:create',
+      'partner:create', 
+      'partner:read',
+      'partner:use',
+
 
       // Admin access
       'admin:access'
