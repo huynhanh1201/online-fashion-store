@@ -94,10 +94,10 @@ const Blog = () => {
 
     return {
       id: blogData._id || blogData.id,
-      title: title.length > 60 ? title.substring(0, 60) + '...' : title,
-      subtitle: subtitle.length > 80 ? subtitle.substring(0, 80) + '...' : subtitle,
+      title: title.length > 60 ? title.substring(0, 100) + '...' : title,
+      subtitle: subtitle.length > 80 ? subtitle.substring(0, 140) + '...' : subtitle,
       category: blogData.category || 'Tip',
-      image: blogData.coverImage,
+      image: blogData.coverImage || blogData.thumbnail || blogData.image || '',
       date: blogData.publishedAt
         ? new Date(blogData.publishedAt).toLocaleDateString('vi-VN')
         : new Date(blogData.createdAt).toLocaleDateString('vi-VN'),

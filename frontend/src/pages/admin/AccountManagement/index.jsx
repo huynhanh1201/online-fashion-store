@@ -1,6 +1,7 @@
 import React from 'react'
 import AccountTable from './AccountTable.jsx'
 
+import useProfile from '~/hooks/useUserProfile.js'
 import useAccount from '~/hooks/admin/useAccount.js'
 import useRoles from '~/hooks/admin/useRoles.js'
 import usePermissions from '~/hooks/usePermissions'
@@ -42,10 +43,13 @@ const AccountManagement = () => {
     Restore
   } = useAccount()
 
+  const { profile, fetchProfile } = useProfile()
+
   const { hasPermission } = usePermissions()
 
   React.useEffect(() => {
     fetchRoles(1, 10000, { destroy: 'false' })
+    fetchProfile()
   }, [])
 
   React.useEffect(() => {
@@ -122,10 +126,10 @@ const AccountManagement = () => {
           setROWS_PER_PAGE(newLimit)
         }}
         permissions={{
-          canAdd: hasPermission('user:create'),
-          canEdit: hasPermission('user:update'),
-          canDelete: hasPermission('user:delete'),
-          canView: hasPermission('user:read')
+          canAdd: hasPermission('account:create'),
+          canEdit: hasPermission('account:update'),
+          canDelete: hasPermission('account:delete'),
+          canView: hasPermission('account:read')
         }}
         roles={roles}
         filters={filters}
@@ -160,6 +164,10 @@ const AccountManagement = () => {
               user={selectedUser}
               onSave={handleSave}
               roles={roles}
+              permissions={{
+                canEditRole: hasPermission('account:create')
+              }}
+              profile={profile}
             />
           )}
         </PermissionWrapper>

@@ -35,15 +35,8 @@ const HeaderAction = () => {
 
   const { hasPermission } = usePermissions()
 
-  // Lấy giỏ hàng từ Redux store
-  const cartItems = useSelector((state) => state.cart.cartItems)
-  const { refresh } = useCart()
-  const tempQuantities = useSelector((state) => state.cart.tempQuantities || {})
-  const cartCount = cartItems.reduce((sum, item) => {
-    const variantId = item.variant?._id || item.variantId
-    const tempQty = tempQuantities[variantId]
-    return sum + (tempQty !== undefined ? tempQty : item.quantity)
-  }, 0)
+  // Lấy giỏ hàng từ hook useCart
+  const { refresh, cartCount } = useCart()
 
   const [tokenUpdated, setTokenUpdated] = useState(
     localStorage.getItem('accessToken')

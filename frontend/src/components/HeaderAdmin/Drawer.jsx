@@ -238,16 +238,6 @@ export default function AdminDrawer({
             icon: <InventoryIcon />
           },
           {
-            permission: 'review:use',
-            label: 'Quản lý đánh giá',
-            path: '/admin/review-management'
-          },
-          {
-            permission: 'variant:use',
-            label: 'Quản lý biến thể',
-            path: '/admin/variant-management'
-          },
-          {
             permission: 'color:use',
             label: 'Quản lý màu sắc',
             path: '/admin/color-management',
@@ -258,7 +248,18 @@ export default function AdminDrawer({
             label: 'Quản lý kích thước',
             path: '/admin/size-management',
             icon: <StraightenIcon />
+          },
+          {
+            permission: 'variant:use',
+            label: 'Quản lý biến thể',
+            path: '/admin/variant-management'
+          },
+          {
+            permission: 'review:use',
+            label: 'Quản lý đánh giá',
+            path: '/admin/review-management'
           }
+
         ]
       },
       orderManagement: {

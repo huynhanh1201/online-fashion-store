@@ -13,6 +13,7 @@ export const useCart = () => {
   const [loading, setLoading] = useState(true)
   const dispatch = useDispatch()
   const cart = useSelector((state) => state.cart)
+  const tempQuantities = useSelector((state) => state.cart.tempQuantities || {})
 
   // Memoize isLoggedIn to avoid unnecessary re-renders
   const isLoggedIn = useMemo(() => {
@@ -152,7 +153,9 @@ export const useCart = () => {
 
   const selectedCartItems = cart.cartItems.filter((item) => item.selected)
   const cartCount = cart.cartItems.reduce((total, item) => {
-    const qty = Number(item.quantity) || 0
+    const variantId = typeof item.variantId === 'object' ? item.variantId._id : item.variantId
+    const tempQty = tempQuantities[variantId]
+    const qty = tempQty !== undefined ? tempQty : (Number(item.quantity) || 0)
     return total + (isNaN(qty) ? 0 : qty)
   }, 0)
 

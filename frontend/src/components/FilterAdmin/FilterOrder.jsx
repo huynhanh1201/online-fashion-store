@@ -163,7 +163,6 @@ export default function FilterOrder({ onFilter }) {
         onChange={setStatus}
         options={[
           { label: 'Tất cả', value: '' },
-          { label: 'Đang chờ', value: 'Pending' },
           { label: 'Đang xử lý', value: 'Processing' },
           { label: 'Đang vận chuyển', value: 'Shipping' },
           { label: 'Đã gửi hàng', value: 'Shipped' },

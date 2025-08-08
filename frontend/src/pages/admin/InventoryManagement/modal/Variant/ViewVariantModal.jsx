@@ -190,9 +190,9 @@ const ViewVariantModal = ({ open, onClose, variant }) => {
                     <strong>Kích thước đóng gói(DxRxC, Trọng lượng)</strong>
                   </TableCell>
                   <TableCell>
+                    {variant?.packageSize?.length} x{' '}
                     {variant?.packageSize?.width} x{' '}
-                    {variant?.packageSize?.height} x{' '}
-                    {variant?.packageSize?.length} cm,{' '}
+                    {variant?.packageSize?.height} cm,{' '}
                     {variant?.packageSize?.weight} gram
                   </TableCell>
                 </TableRow>
