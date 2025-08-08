@@ -141,6 +141,13 @@ const EditCategoryModal = ({ open, onClose, category, onSave }) => {
   }
 
   const handleClose = () => {
+    reset()
+    setImageFile(null)
+    setPreviewUrl('')
+    setParentCategory(null)
+  }
+
+  const close =() => {
     onClose()
     reset()
     setImageFile(null)
@@ -467,7 +474,7 @@ const EditCategoryModal = ({ open, onClose, category, onSave }) => {
           <Button
             color='error'
             variant='outlined'
-            onClick={handleClose}
+            onClick={close}
             sx={{ textTransform: 'none' }}
           >
             Hủy

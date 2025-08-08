@@ -52,8 +52,6 @@ export default function SizeRow({
   const destroyValue = filters?.destroy
   useEffect(() => {
     if (destroyValue === 'true') {
-      setShowRestoreIcon(false)
-
       const timer = setTimeout(() => {
         setShowRestoreIcon(false)
       }, 1000)
@@ -97,7 +95,7 @@ export default function SizeRow({
                   </IconButton>
                 </Tooltip>
               )}
-              {showRestoreIcon === false ? (
+              {size.destroy ? (
                 permissions.canRestore && (
                   <Tooltip title='Khôi phục'>
                     <IconButton

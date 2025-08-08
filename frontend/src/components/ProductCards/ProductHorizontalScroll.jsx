@@ -34,15 +34,22 @@ const ProductHorizontalScroll = ({
       return defaultCardsPerRow // 5 cards on desktop
     }
     if (windowWidth > 1400) {
-      return 4 // 5 cards on desktop
+      return 5 // 5 cards on desktop
+    }
+    if (windowWidth > 1200) {
+      return 4 // 4 cards on large desktop
     }
     if (windowWidth > 900) {
       return 3
     }
-    if (windowWidth > 600) {
-      return 2 // 2 cards on tablet
+    if (windowWidth > 680 && windowWidth <= 900) {
+      return 2 // 2 cards on small desktop
     }
-    return 2 // 2 cards on mobile
+    if (windowWidth > 680) {
+      return 1 // 2 cards on tablet
+    }
+
+    return 1 // 2 cards on mobile
   }
 
   const cardsPerRow = getCardsPerRow()
@@ -85,13 +92,15 @@ const ProductHorizontalScroll = ({
         
         .products-grid {
           display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+          grid-template-columns: repeat(${cardsPerRow}, minmax(240px, 1fr));
           gap: ${gap}px;
           margin-bottom: 20px;
+          justify-items: start; 
         }
         
         .product-item {
           width: 100%;
+          max-width: 360px;
         }
         
         .show-more-container {
@@ -122,30 +131,11 @@ const ProductHorizontalScroll = ({
           transform: translateY(0);
         }
         
-        @media (max-width: 1400px) {
-          .products-grid {
-            grid-template-columns: repeat(4, 1fr);
-          }
-        }
-        
-        @media (max-width: 1300px) {
-          .products-grid {
-            grid-template-columns: repeat(3, 1fr);
-          }
-        }
-        
-        @media (max-width: 900px) {
-          .products-grid {
-            grid-template-columns: repeat(2, 1fr);
-          }
-        }
         
         @media (max-width: 680px) {
-          .products-grid {
-            grid-template-columns: repeat(1, 1fr);
-            gap: 10px;
+          .product-item {
+            max-width: 100%;
           }
-          
           .show-more-btn {
             padding: 10px 20px;
             font-size: 14px;

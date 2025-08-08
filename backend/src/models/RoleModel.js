@@ -1,5 +1,5 @@
 import mongoose from 'mongoose'
-import { refIntegrityPlugin } from '~/plugins/refIntegrityPlugin'
+import { refIntegrityPlugin } from '../plugins/refIntegrityPlugin'
 const { Schema, model } = mongoose
 
 const roleSchema = new Schema(

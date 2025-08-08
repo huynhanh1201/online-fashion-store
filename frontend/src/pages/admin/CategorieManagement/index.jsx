@@ -82,7 +82,10 @@ const CategoryManagement = () => {
       if (type === 'add') {
         await add(data, filters)
       } else if (type === 'edit') {
-        await update(id, data)
+        const result = await update(id, data)
+        if (result !== null) {
+          handleCloseModal()
+        }
       } else if (type === 'delete') {
         await remove(data)
       } else if (type === 'restore') {
