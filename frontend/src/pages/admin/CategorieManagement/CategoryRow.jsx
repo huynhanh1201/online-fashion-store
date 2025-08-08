@@ -287,7 +287,7 @@ export default function CategoryRow({
                   </Tooltip>
                 )}
 
-                {showRestoreIcon === false ? (
+                {category.destroy ? (
                   permissions.canRestore && (
                     <Tooltip title='Khôi phục'>
                       <IconButton

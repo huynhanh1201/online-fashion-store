@@ -139,7 +139,7 @@ const BlogRow = ({
               </IconButton>
             </Tooltip>
           )}
-          {showRestoreIcon === false ? (
+          {blog.destroy ? (
             hasPermission('blog:restore') && (
               <Tooltip title='Khôi phục'>
                 <IconButton size='small' onClick={() => onRestore(blog)}>

@@ -171,7 +171,7 @@ export default function RoleRow({
                     </IconButton>
                   </Tooltip>
                 )}
-                {showRestoreIcon === false ? (
+                {role.destroy ? (
                   hasPermission('role:restore') && (
                     <Tooltip title='Khôi phục'>
                       <IconButton

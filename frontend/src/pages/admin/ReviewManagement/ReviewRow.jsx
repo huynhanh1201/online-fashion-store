@@ -137,7 +137,7 @@ const ReviewRow = ({
                     </IconButton>
                   </Tooltip>
                 )}
-                {showRestoreIcon === false
+                {review.destroy
                   ? permissions.canRestore && (
                       <Tooltip title='Khôi phục'>
                         <IconButton
