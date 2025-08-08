@@ -79,9 +79,10 @@ function Register() {
         minHeight: '100vh',
         alignItems: 'center',
         justifyContent: 'center',
-        backgroundImage: backgroundBanner?.imageUrl 
-          ? `url("${optimizeCloudinaryUrl(backgroundBanner.imageUrl, { width: 1920, height: 1080 })}")`
-          : 'url("https://png.pngtree.com/background/20230426/original/pngtree-an-image-of-a-clothing-store-picture-image_2490513.jpg")',
+        backgroundImage: backgroundBanner?.imageUrl
+  ? `url("${optimizeCloudinaryUrl(backgroundBanner.imageUrl, { width: 1920, height: 1080 })}?t=${Date.now()}")`
+  : 'url("https://png.pngtree.com/background/20230426/original/pngtree-an-image-of-a-clothing-store-picture-image_2490513.jpg")',
+
         backgroundRepeat: 'no-repeat',
         backgroundSize: 'cover',
         backgroundPosition: 'center',

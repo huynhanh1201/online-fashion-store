@@ -9,7 +9,7 @@ import validatePagination from '~/utils/validatePagination'
 import getDateRange from '~/utils/getDateRange'
 import { CategoryModel } from '~/models/CategoryModel'
 
-const getUserList = async (queryString) => {
+const getUserList = async (queryString, jwtDecoded) => {
   // eslint-disable-next-line no-useless-catch
   try {
     let {
@@ -31,6 +31,10 @@ const getUserList = async (queryString) => {
     const filter = {
       role: { $ne: 'customer' }
     }
+
+
+    if(jwtDecoded.role !== 'technical_admin') filter.role = { $nin: ["customer", "technical_admin"] }
+
 
     if (role) filter.role = role
 
@@ -139,9 +143,12 @@ const updateUser = async (userId, reqBody) => {
   }
 }
 
-const deleteUser = async (userId) => {
+const deleteUser = async (userId, jwtDecoded) => {
   // eslint-disable-next-line no-useless-catch
   try {
+
+    if(jwtDecoded._id === userId) throw new ApiError(StatusCodes.UNPROCESSABLE_ENTITY, 'Tài khoảng đang trong phiên đăng nhập. Không thể xóa!')
+
     const user = await UserModel.updateOne(
       { _id: userId },
       {
