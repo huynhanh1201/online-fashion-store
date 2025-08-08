@@ -1,10 +1,13 @@
 import AuthorizedAxiosInstance from '~/utils/authorizedAxios.js'
 import { API_ROOT } from '~/utils/constants.js'
 
-export const getInventoryStatistics = async () => {
+export const getInventoryStatistics = async (year = 2025) => {
   try {
     const response = await AuthorizedAxiosInstance.get(
-      `${API_ROOT}/v1/statistics/inventory`
+      `${API_ROOT}/v1/statistics/inventory`,
+      {
+        params: { year }
+      }
     )
     return response.data
   } catch (error) {

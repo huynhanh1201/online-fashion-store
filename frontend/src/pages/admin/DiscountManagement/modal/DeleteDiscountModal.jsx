@@ -40,14 +40,6 @@ const DeleteDiscountModal = ({ open, onClose, discount, onDelete }) => {
           Bạn có chắc muốn xoá mã giảm giá <strong>{discount.code}</strong> này
           không?
         </Typography>
-        {loading && (
-          <div style={{ textAlign: 'center', marginTop: '20px' }}>
-            <CircularProgress />
-            <Typography variant='body2' sx={{ mt: 2 }}>
-              Đang xoá...
-            </Typography>
-          </div>
-        )}
       </DialogContent>
       <Divider sx={{ my: 0 }} />
       <DialogActions sx={{ padding: '16px 24px' }}>

@@ -10,7 +10,7 @@ import { UserModel } from '~/models/UserModel'
 import { OrderItemModel } from '~/models/OrderItemModel'
 import { inventoriesService } from '~/services/inventoriesService'
 
-const getInventoryStatistics = async () => {
+const getInventoryStatistics = async (queryString) => {
   // eslint-disable-next-line no-useless-catch
   try {
     // Cập nhật trạng thái của tồn kho
@@ -97,8 +97,18 @@ const getInventoryStatistics = async () => {
     ])
 
     // Dữ liệu biến động tồn kho theo thời gian (nhập/xuất từng ngày)
+    const startDate = new Date(queryString.year, 0, 1) // 0 = tháng 1
+    const endDate = new Date(queryString.year, 11, 31, 23, 59, 59, 999) // 11 = tháng 12
+
     const stockMovementsPromise = InventoryLogModel.aggregate([
       {
+        $match: {
+          createdAt: {
+            $gte: startDate,
+            $lte: endDate
+          }
+        }
+      },{
         // Bước 1: Thêm trường tháng
         $addFields: {
           month: {
@@ -162,6 +172,7 @@ const getInventoryStatistics = async () => {
       }
     ])
 
+
     // Xử lý chạy song song bằng Promise.all
     const [warehouseStats, lowStockCount, stockWarnings, stockMovements] =
       await Promise.all([
@@ -170,6 +181,7 @@ const getInventoryStatistics = async () => {
         stockWarningsPromise,
         stockMovementsPromise
       ])
+
 
     // Xử lý cấu trúc dữ liệu về dạng Hash map
     const warehouseStatsMap = convertArrToMap(warehouseStats, '_id')
@@ -464,6 +476,8 @@ const getFinanceStatistics = async (queryString) => {
 
     const startDate = new Date(queryString.year, 0, 1) // 0 = tháng 1
     const endDate = new Date(queryString.year, 11, 31, 23, 59, 59, 999) // 11 = tháng 12
+
+
 
     const monthlyStatsPromise = OrderModel.aggregate([
       {
