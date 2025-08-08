@@ -224,6 +224,7 @@ export const roles = [
       'account:use',
       'account:read',
       'account:update',
+      'account:restore',
 
       'account:technicalAdmin',
 
