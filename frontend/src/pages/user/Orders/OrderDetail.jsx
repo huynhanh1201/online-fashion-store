@@ -1255,7 +1255,7 @@ const OrderDetail = () => {
                   color={order.couponId ? 'error' : 'inherit'}
                   sx={{ fontSize: { xs: '0.8rem', sm: '0.9rem' } }}
                 >
-                  {formatPrice(order.discountAmount || 0)}
+                  -{formatPrice(order.discountAmount || 0)}
                 </Typography>
               </Box>
               <Divider />

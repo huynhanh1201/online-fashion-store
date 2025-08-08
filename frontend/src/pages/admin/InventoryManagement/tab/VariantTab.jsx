@@ -452,7 +452,7 @@ const VariantsTab = () => {
                                 </IconButton>
                               </Tooltip>
                             )}
-                            {String(filter.destroy) === 'true' ? (
+                            {row.destroy ? (
                               hasPermission('variant:restore') && (
                                 <Tooltip title='Khôi phục'>
                                   <IconButton

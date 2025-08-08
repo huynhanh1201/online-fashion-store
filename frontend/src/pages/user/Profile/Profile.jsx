@@ -94,7 +94,9 @@ const Profile = () => {
       setAvatarPreview(URL.createObjectURL(file))
     }
   }
-
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'auto' })
+  }, [])
   const toggleShowPassword = (field) => {
     setShowPassword((prev) => ({ ...prev, [field]: !prev[field] }))
   }
@@ -245,7 +247,7 @@ const Profile = () => {
         console.error('Lỗi khi tải thông tin hồ sơ:', error)
         showSnackbar(
           error.message ||
-            'Không thể tải thông tin hồ sơ. Vui lòng thử lại sau.',
+          'Không thể tải thông tin hồ sơ. Vui lòng thử lại sau.',
           'error'
         )
         // Reset các giá trị về mặc định
@@ -270,7 +272,8 @@ const Profile = () => {
         display: 'flex',
         flexDirection: isMobile ? 'column' : 'row',
         gap: 4,
-        alignItems: isMobile ? 'stretch' : 'flex-start'
+        alignItems: isMobile ? 'stretch' : 'flex-start',
+        height: '55vh',
       }}
     >
       <Paper
@@ -292,7 +295,16 @@ const Profile = () => {
           }}
         >
           {loading ? (
-            <Typography>Đang cập nhật ...</Typography>
+            <Box
+              sx={{
+                height: '40vh',
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+              }}
+            >
+              <Typography>Đang cập nhật ...</Typography>
+            </Box >
           ) : (
             <>
               <Box sx={{ textAlign: 'center', mb: 3 }}>
@@ -372,7 +384,7 @@ const Profile = () => {
 
       <Dialog
         open={openPasswordDialog}
-        onClose={() => {}}
+        onClose={() => { }}
         disableEscapeKeyDown
         fullWidth
         maxWidth='xs'

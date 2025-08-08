@@ -49,19 +49,20 @@ export default function DiscountRow({
   const remaining = discount.usageLimit - discount.usedCount
   const [showRestoreIcon, setShowRestoreIcon] = useState(false)
 
+  const destroyValue = filters?.destroy
   useEffect(() => {
-    if (filters.destroy === 'true') {
+    if (destroyValue === 'true') {
+      setShowRestoreIcon(false)
+
       const timer = setTimeout(() => {
-        setShowRestoreIcon(true)
+        setShowRestoreIcon(false)
       }, 1000)
 
-      return () => {
-        clearTimeout(timer)
-      }
+      return () => clearTimeout(timer)
     } else {
       setShowRestoreIcon(true)
     }
-  }, [filters.destroy])
+  }, [destroyValue])
   return (
     <TableRow hover>
       {columns.map(({ id, align }) => {
@@ -124,7 +125,7 @@ export default function DiscountRow({
                     </IconButton>
                   </Tooltip>
                 )}
-                {showRestoreIcon === false ? (
+                {discount.destroy ? (
                   permissions.canRestore && (
                     <Tooltip title='Khôi phục'>
                       <IconButton

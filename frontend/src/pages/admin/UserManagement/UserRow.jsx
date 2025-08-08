@@ -56,19 +56,20 @@ export default function UserRow({
 }) {
   const [showRestoreIcon, setShowRestoreIcon] = useState(false)
 
+  const destroyValue = filters?.destroy
   useEffect(() => {
-    if (filters.destroy === 'true') {
+    if (destroyValue === 'true') {
+      setShowRestoreIcon(false)
+
       const timer = setTimeout(() => {
-        setShowRestoreIcon(true)
+        setShowRestoreIcon(false)
       }, 1000)
 
-      return () => {
-        clearTimeout(timer)
-      }
+      return () => clearTimeout(timer)
     } else {
       setShowRestoreIcon(true)
     }
-  }, [filters.destroy])
+  }, [destroyValue])
   return (
     <TableRow hover role='checkbox' tabIndex={-1}>
       {columns.map((column) => {
@@ -193,7 +194,7 @@ export default function UserRow({
                 {/*    </IconButton>*/}
                 {/*  </Tooltip>*/}
                 {/*)}*/}
-                {showRestoreIcon === false
+                {user.destroy
                   ? permissions.canRestore && (
                       <Tooltip title='Khôi phục'>
                         <IconButton

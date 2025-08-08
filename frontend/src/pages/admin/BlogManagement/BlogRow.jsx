@@ -55,19 +55,20 @@ const BlogRow = ({
   const { hasPermission } = usePermissions()
   const [showRestoreIcon, setShowRestoreIcon] = useState(false)
 
+  const destroyValue = filters?.destroy
   useEffect(() => {
-    if (filters.destroy === 'true') {
+    if (destroyValue === 'true') {
+      setShowRestoreIcon(false)
+
       const timer = setTimeout(() => {
-        setShowRestoreIcon(true)
+        setShowRestoreIcon(false)
       }, 1000)
 
-      return () => {
-        clearTimeout(timer)
-      }
+      return () => clearTimeout(timer)
     } else {
       setShowRestoreIcon(true)
     }
-  }, [filters.destroy])
+  }, [destroyValue])
   return (
     <TableRow hover role='checkbox' tabIndex={-1}>
       <TableCell align='center' sx={{ ...styles.cellPadding, width: 50 }}>
@@ -138,7 +139,7 @@ const BlogRow = ({
               </IconButton>
             </Tooltip>
           )}
-          {showRestoreIcon === false ? (
+          {blog.destroy ? (
             hasPermission('blog:restore') && (
               <Tooltip title='Khôi phục'>
                 <IconButton size='small' onClick={() => onRestore(blog)}>

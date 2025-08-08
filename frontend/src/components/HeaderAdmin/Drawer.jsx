@@ -39,6 +39,7 @@ import usePermissions from '~/hooks/usePermissions'
 import useRoles from '~/hooks/admin/useRoles.js'
 import LogoutButton from '~/components/modals/Logout.jsx'
 import logo from '~/assets/img/logo.jpg'
+import { getHeaderConfig } from '~/services/admin/webConfig/headerService'
 export default function AdminDrawer({
   open,
   profile,
@@ -70,7 +71,22 @@ export default function AdminDrawer({
       : currentPath
     return current === normalizedPath
   }
+  const [logoData, setLogoData] = React.useState(null)
 
+  useEffect(() => {
+    const fetchLogo = async () => {
+      try {
+        const headerConfig = await getHeaderConfig()
+        if (headerConfig?.content?.logo) {
+          setLogoData(headerConfig.content.logo)
+        }
+      } catch (error) {
+        console.error('Lỗi khi lấy logo:', error)
+      }
+    }
+
+    fetchLogo()
+  }, [])
   useEffect(() => {
     fetchRoles()
   }, [])
@@ -238,16 +254,6 @@ export default function AdminDrawer({
             icon: <InventoryIcon />
           },
           {
-            permission: 'review:use',
-            label: 'Quản lý đánh giá',
-            path: '/admin/review-management'
-          },
-          {
-            permission: 'variant:use',
-            label: 'Quản lý biến thể',
-            path: '/admin/variant-management'
-          },
-          {
             permission: 'color:use',
             label: 'Quản lý màu sắc',
             path: '/admin/color-management',
@@ -258,6 +264,16 @@ export default function AdminDrawer({
             label: 'Quản lý kích thước',
             path: '/admin/size-management',
             icon: <StraightenIcon />
+          },
+          {
+            permission: 'variant:use',
+            label: 'Quản lý biến thể',
+            path: '/admin/variant-management'
+          },
+          {
+            permission: 'review:use',
+            label: 'Quản lý đánh giá',
+            path: '/admin/review-management'
           }
         ]
       },
@@ -563,23 +579,40 @@ export default function AdminDrawer({
         sx={{
           display: 'flex',
           alignItems: 'center',
+          justifyContent: 'center',
           px: 2,
           pt: 0.7,
           cursor: 'pointer',
           userSelect: 'none'
         }}
       >
-        <img
-          src={logo}
-          alt={'logo'}
-          style={{
-            width: '100%',
-            height: 56,
-            objectFit: 'contain',
-            pointerEvents: 'none',
-            userSelect: 'none'
-          }}
-        />
+        {logoData?.imageUrl ? (
+          <img
+            src={logoData.imageUrl}
+            alt={'logo'}
+            style={{
+              width: '100%',
+              height: 56,
+              objectFit: 'contain',
+              pointerEvents: 'none',
+              userSelect: 'none'
+            }}
+          />
+        ) : (
+          <div
+            style={{
+              fontWeight: 700,
+              fontSize: 26,
+              height: 57,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: '#03235e'
+            }}
+          >
+            FASHIONSTORE™
+          </div>
+        )}
       </Box>
 
       <Divider sx={{ my: 0 }} />

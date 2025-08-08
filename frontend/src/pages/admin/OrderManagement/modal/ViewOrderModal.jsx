@@ -422,6 +422,8 @@ function ViewOrderModal({
                 <TableHead>
                   <TableRow>
                     <TableCell>Tên sản phẩm</TableCell>
+                    <TableCell align='right'>Kích thước</TableCell>
+                    <TableCell align='right'>Màu sắc</TableCell>
                     <TableCell align='right'>Số lượng</TableCell>
                     <TableCell align='right'>Đơn giá</TableCell>
                     <TableCell align='right'>Thành tiền</TableCell>
@@ -433,7 +435,12 @@ function ViewOrderModal({
                       item.name || item?.productId?.name || 'không có tên'
                     return (
                       <TableRow key={item._id}>
-                        <TableCell>
+                        <TableCell sx={{
+                          maxWidth: 400,
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                          whiteSpace: 'nowrap'
+                        }}>
                           {ProductName.split(' ')
                             .map(
                               (word) =>
@@ -441,6 +448,22 @@ function ViewOrderModal({
                                 word.slice(1).toLowerCase()
                             )
                             .join(' ') || 'Không có tên'}
+                        </TableCell>
+                        <TableCell align='right' sx={{
+                          maxWidth: 150,
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                          whiteSpace: 'nowrap'
+                        }}>
+                          {item.size || 'Không có kích thước'}
+                        </TableCell>
+                        <TableCell align='right' sx={{
+                          maxWidth: 150,
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                          whiteSpace: 'nowrap'
+                        }}>
+                          {item.color.name || 'Không có màu sắc'}
                         </TableCell>
                         <TableCell align='right'>
                           {item.quantity.toLocaleString('vi-VN')}

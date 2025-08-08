@@ -1,4 +1,4 @@
-import React from 'react'
+import { React, useEffect } from 'react'
 import {
   Box,
   Typography,
@@ -84,21 +84,26 @@ const ProductInfoSection = ({
   getCurrentPrice
 }) => {
   const currentPrice = getCurrentPrice()
-
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'auto' })
+  }, [])
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-      <Typography
-        variant='h5'
-        fontWeight={700}
-        sx={{ wordBreak: 'break-word', whiteSpace: 'pre-wrap', mb: 1 }}
-      >
-        {product?.name
-          .split(' ')
-          .map(
-            (word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
-          )
-          .join(' ') || 'Không có tên sản phẩm'}
-      </Typography>
+      <Box display='flex' alignItems='center' gap={1} flexWrap="wrap">
+        <Typography variant='h5' fontWeight={600}>
+          {product?.name}
+        </Typography>
+
+        {product?.status === 'inactive' && (
+          <Chip
+            label='Ngừng kinh doanh'
+            color='error'
+            size='small'
+            sx={{ fontWeight: 600 }}
+          />
+        )}
+      </Box>
+
       <Typography
         variant='body2'
         fontWeight={500}
@@ -355,7 +360,7 @@ const ProductInfoSection = ({
             isAdding ? <CircularProgress size={18} color='inherit' /> : null
           }
         >
-          {isAdding ? 'Đang thêm...' : 'Thêm vào giỏ'}
+          {isAdding ? 'Đang thêm...' : 'Thêm vào giỏ hàng'}
         </Button>
 
         <Button

@@ -382,7 +382,7 @@ const PartnersTab = () => {
                             </IconButton>
                           </Tooltip>
                         )}
-                        {String(filter.destroy) === 'true' ? (
+                        {row.destroy ? (
                           hasPermission('partner:restore') && (
                             <Tooltip title='Khôi phục'>
                               <IconButton

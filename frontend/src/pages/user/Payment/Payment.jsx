@@ -1266,7 +1266,7 @@ const Payment = () => {
                                 color={variant.color?.name || item.color}
                                 size={variant.size?.name || item.size}
                                 getFinalPrice={getFinalPrice}
-                                productId={variant.product || variant.productId}
+                                productId={variant.product?._id || variant.productId?._id || variant.productId}
                                 navigate={navigate}
                               />
                             )
@@ -1453,7 +1453,7 @@ const Payment = () => {
                   <PriceRow>
                     <Typography>Giảm giá:</Typography>
                     <Typography fontWeight={600} color="red">
-                      {discount.toLocaleString('vi-VN')}₫
+                      -{discount.toLocaleString('vi-VN')}₫
                     </Typography>
                   </PriceRow>
 

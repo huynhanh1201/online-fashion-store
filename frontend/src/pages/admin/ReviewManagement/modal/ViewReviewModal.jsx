@@ -166,17 +166,11 @@ const ViewReviewModal = ({ open, onClose, review, onApprove }) => {
                       <TableCell>{formatDate(review.moderatedAt)}</TableCell>
                     </TableRow>
                   )}
-                  <TableRow>
-                    <TableCell sx={{ fontWeight: 'bold' }}>
-                      Đánh giá xác thực
-                    </TableCell>
-                    <TableCell>{review.isVerified ? 'Có' : 'Không'}</TableCell>
-                  </TableRow>
                 </TableBody>
               </Table>
               {/* Ảnh và Video đánh giá */}
               {(review.images?.length > 0 || review.videos?.length > 0) && (
-                <Box mt={2}>
+                <Box mt={2} sx={{ pl: 2 }}>
                   <Typography fontWeight='bold' mb={1}>
                     Hình ảnh / Video đánh giá
                   </Typography>

@@ -45,14 +45,6 @@ const RestoreDiscountModal = ({ open, onClose, discount, onRestore }) => {
           Bạn có chắc muốn khôi phục mã{' '}
           <strong>{discount?.code || 'Không rõ'}</strong> này không?
         </Typography>
-        {loading && (
-          <div style={{ textAlign: 'center', marginTop: '20px' }}>
-            <CircularProgress />
-            <Typography variant='body2' sx={{ mt: 2 }}>
-              Đang khôi phục...
-            </Typography>
-          </div>
-        )}
       </DialogContent>
       <Divider sx={{ my: 0 }} />
       <DialogActions sx={{ padding: '16px 24px' }}>

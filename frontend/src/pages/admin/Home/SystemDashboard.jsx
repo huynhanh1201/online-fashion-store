@@ -45,10 +45,10 @@ export default function SystemDashboard({
   accountStatistics,
   productStatistics,
   loading,
-  orderStatistics
+  orderStatistics,
+  year,
+  setYear
 }) {
-  const currentYear = new Date().getFullYear()
-  const [selectedYear, setSelectedYear] = useState(currentYear.toString())
   const summaryItems = [
     {
       label: 'Tổng sản phẩm',
@@ -120,7 +120,7 @@ export default function SystemDashboard({
     labels: monthlyLabels,
     datasets: [
       {
-        label: `Tổng lợi nhuận theo tháng (${selectedYear})`,
+        label: `Tổng lợi nhuận theo tháng (${year})`,
         data: revenueData,
         borderColor: '#4CAF50',
         backgroundColor: 'rgba(76, 175, 80, 0.2)',
@@ -128,32 +128,6 @@ export default function SystemDashboard({
         tension: 0.4
       }
     ]
-  }
-
-  if (loading) {
-    return (
-      <Grid container spacing={2}>
-        {Array.from({ length: 6 }).map((_, index) => (
-          <Grid item xs={12} sm={6} md={4} lg={3} key={index}>
-            <Box
-              sx={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 2,
-                p: 2,
-                height: '150px',
-                backgroundColor: '#f5f5f5',
-                borderRadius: 2
-              }}
-            >
-              <Typography variant='h6' color='text.secondary'>
-                Đang tải dữ liệu...
-              </Typography>
-            </Box>
-          </Grid>
-        ))}
-      </Grid>
-    )
   }
 
   return (
@@ -223,12 +197,12 @@ export default function SystemDashboard({
           </Typography>
           <Select
             size='small'
-            value={selectedYear}
-            onChange={(e) => setSelectedYear(e.target.value)}
+            value={year}
+            onChange={(e) => setYear(e.target.value)}
           >
-            {Array.from({ length: new Date().getFullYear() - 2025 + 1 }).map(
+            {Array.from({ length: new Date().getFullYear() - 2020 + 1 }).map(
               (_, i) => {
-                const yearOption = 2025 + i
+                const yearOption = 2020 + i
                 return (
                   <MenuItem key={yearOption} value={yearOption.toString()}>
                     {yearOption}
