@@ -364,6 +364,7 @@ const DisplayManagement = () => {
                 borderRadius: 2,
                 textTransform: 'none',
                 fontSize: '1rem',
+                color: 'white',
                 fontWeight: 600,
                 background: 'var(--primary-color)',
                 boxShadow: '0 4px 16px rgba(59, 130, 246, 0.3)',

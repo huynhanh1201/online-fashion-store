@@ -96,3 +96,19 @@ export const RestoreProduct = async (id) => {
     return null
   }
 }
+export const getVariantsByProductId = async (productId) => {
+  try {
+    if (typeof productId !== 'string' || !productId) {
+      throw new Error('productId phải là chuỗi không rỗng')
+    }
+    const response = await AuthorizedAxiosInstance.get(
+      `${API_ROOT}/v1/variants`,
+      { params: { page: 1, limit: 100 } } // Lấy 100 biến thể để giảm số lần gọi
+    )
+    const variants = response.data.data || []
+    return variants.filter((variant) => variant.productId === productId)
+  } catch (error) {
+    console.error('Lỗi khi lấy danh sách biến thể:', error.response?.data || error)
+    return []
+  }
+}
