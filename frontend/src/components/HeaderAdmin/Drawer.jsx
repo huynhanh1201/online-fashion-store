@@ -579,23 +579,40 @@ export default function AdminDrawer({
         sx={{
           display: 'flex',
           alignItems: 'center',
+          justifyContent: 'center',
           px: 2,
           pt: 0.7,
           cursor: 'pointer',
           userSelect: 'none'
         }}
       >
-        <img
-          src={logoData?.imageUrl ? logoData.imageUrl : logo}
-          alt={'logo'}
-          style={{
-            width: '100%',
-            height: 56,
-            objectFit: 'contain',
-            pointerEvents: 'none',
-            userSelect: 'none'
-          }}
-        />
+        {logoData?.imageUrl ? (
+          <img
+            src={logoData.imageUrl}
+            alt={'logo'}
+            style={{
+              width: '100%',
+              height: 56,
+              objectFit: 'contain',
+              pointerEvents: 'none',
+              userSelect: 'none'
+            }}
+          />
+        ) : (
+          <div
+            style={{
+              fontWeight: 700,
+              fontSize: 26,
+              height: 57,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: '#03235e'
+            }}
+          >
+            FASHIONSTORE™
+          </div>
+        )}
       </Box>
 
       <Divider sx={{ my: 0 }} />
