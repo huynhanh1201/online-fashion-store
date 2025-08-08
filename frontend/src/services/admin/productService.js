@@ -41,7 +41,6 @@ export const getProductById = async (productId) => {
   }
 }
 
-// Cập nhật sản phẩm
 export const updateProduct = async (productId, updatedData) => {
   try {
     const response = await AuthorizedAxiosInstance.patch(
@@ -58,7 +57,6 @@ export const updateProduct = async (productId, updatedData) => {
   }
 }
 
-// Xoá sản phẩm
 export const deleteProduct = async (productId) => {
   try {
     const response = await AuthorizedAxiosInstance.delete(
@@ -71,7 +69,6 @@ export const deleteProduct = async (productId) => {
   }
 }
 
-// Thêm sản phẩm mới
 export const addProduct = async (data) => {
   try {
     const response = await AuthorizedAxiosInstance.post(
@@ -94,5 +91,24 @@ export const RestoreProduct = async (id) => {
   } catch (error) {
     console.error('Lỗi khi khôi phục sản phẩm:', error)
     return null
+  }
+}
+
+export const getVariantsByProductId = async (productId) => {
+  try {
+    if (typeof productId !== 'string' || !productId) {
+      throw new Error('productId phải là chuỗi không rỗng')
+    }
+    const response = await AuthorizedAxiosInstance.get(
+      `${API_ROOT}/v1/variants`,
+      { params: { productId, page: 1, limit: 100 } }
+    )
+    return response.data.data || []
+  } catch (error) {
+    console.error(
+      'Lỗi khi lấy danh sách biến thể:',
+      error.response?.data || error
+    )
+    return []
   }
 }

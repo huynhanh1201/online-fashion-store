@@ -329,6 +329,7 @@ export default function PolicyManagement() {
                 px: 3,
                 py: 1.5,
                 borderRadius: 2,
+                color: 'white',
                 textTransform: 'none',
                 fontSize: '1rem',
                 fontWeight: 600,
