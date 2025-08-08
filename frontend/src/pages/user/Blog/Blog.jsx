@@ -94,8 +94,8 @@ const Blog = () => {
 
     return {
       id: blogData._id || blogData.id,
-      title: title.length > 60 ? title.substring(0, 100) + '...' : title,
-      subtitle: subtitle.length > 80 ? subtitle.substring(0, 140) + '...' : subtitle,
+      title: title.length > 60 ? title.substring(0, 100) : title,
+      subtitle: subtitle.length > 80 ? subtitle.substring(0, 140) : subtitle,
       category: blogData.category || 'Tip',
       image: blogData.coverImage || blogData.thumbnail || blogData.image || '',
       date: blogData.publishedAt
@@ -323,122 +323,79 @@ const Blog = () => {
                         height: '100%',
                       }}
                     >
-                      {/* Image Section */}
+                      {/* Image */}
                       <Box
                         sx={{
-                          aspectRatio: '16/9', // Standard aspect ratio for better image fit
+                          aspectRatio: '16/9',
                           position: 'relative',
                           overflow: 'hidden',
                           width: '100%',
-                          backgroundColor: 'grey.100', // Fallback background for broken images
+                          backgroundColor: 'grey.100',
                         }}
                       >
-                        {article.image ? (
-                          <Box
-                            component="img"
-                            className="article-image"
-                            src={optimizeCloudinaryUrl(article.image, {
-                              width: 600, // Optimize for display size
-                              height: 337, // Match 16:9 aspect ratio (600 * 9/16 ≈ 337)
-                              crop: 'fill', // Cloudinary crop mode
-                              quality: 'auto',
-                              fetch_format: 'auto',
-                            })}
-                            alt={article.title}
-                            sx={{
-                              width: '100%',
-                              height: '100%',
-                              objectFit: 'contain', // Changed to 'contain' to avoid cropping
-                              objectPosition: 'center',
-                              transition: 'transform 0.3s ease',
-                              display: 'block',
-                              backgroundColor: 'transparent',
-                            }}
-                            onError={(e) => {
-                              // Hide the image when error occurs to prevent infinite loop
-                              e.target.style.display = 'none';
-                            }}
-                          />
-                        ) : (
-                          // Placeholder when no image available
-                          <Box
-                            sx={{
-                              width: '100%',
-                              height: '100%',
-                              display: 'flex',
-                              alignItems: 'center',
-                              justifyContent: 'center',
-                              backgroundColor: 'grey.200',
-                              color: 'grey.500',
-                            }}
-                          >
-                            <Typography variant="body2">
-                              Không có ảnh
-                            </Typography>
-                          </Box>
-                        )}
-
-                        {/* Category Tag */}
-                        {/* <Box
+                        <Box
+                          component="img"
+                          className="article-image"
+                          src={optimizeCloudinaryUrl(article.image, {
+                            width: 600,
+                            height: 337,
+                            crop: 'fill',
+                            quality: 'auto',
+                            fetch_format: 'auto',
+                          })}
+                          alt={article.title}
                           sx={{
-                            position: 'absolute',
-                            top: 12,
-                            left: 12,
-                            bgcolor: 'rgba(0, 0, 0, 0.8)',
-                            color: 'common.white',
-                            px: 1.5,
-                            py: 0.75,
-                            borderRadius: 2.5,
-                            typography: 'caption',
-                            fontWeight: 700,
-                            textTransform: 'uppercase',
-                            letterSpacing: '0.05em',
-                            backdropFilter: 'blur(4px)',
+                            width: '100%',
+                            height: '100%',
+                            objectFit: 'contain',
+                            objectPosition: 'center',
+                            transition: 'transform 0.3s ease',
+                            display: 'block',
+                            backgroundColor: 'transparent',
                           }}
-                        >
-                          {article.category}
-                        </Box> */}
+                          onError={(e) => {
+                            e.target.style.display = 'none'
+                          }}
+                        />
                       </Box>
 
-                      {/* Content Section (unchanged) */}
+                      {/* Content */}
                       <Box
                         sx={{
-                          p: { xs: 2.5, sm: 3 },
+                          p: { xs: 2, sm: 2.5 },
                           display: 'flex',
                           flexDirection: 'column',
                           flex: 1,
                         }}
                       >
+                        {/* Title */}
                         <Typography
                           variant="h6"
                           sx={{
-                            fontSize: {
-                              xs: '1rem',
-                              sm: '1.125rem',
-                              md: '1.25rem',
-                            },
+                            fontSize: { xs: '1rem', sm: '1.125rem' },
                             fontWeight: 700,
                             color: 'text.primary',
                             lineHeight: 1.4,
                             display: '-webkit-box',
-                            WebkitLineClamp: 3,
+                            WebkitLineClamp: 2,
                             WebkitBoxOrient: 'vertical',
                             overflow: 'hidden',
-                            minHeight: { xs: 60, sm: 66, md: 72 },
+                            minHeight: { xs: 48, sm: 54 },
                           }}
                         >
                           {article.title}
                         </Typography>
 
+                        {/* Subtitle */}
                         <Typography
                           variant="body2"
                           sx={{
-                            fontSize: { xs: '0.875rem', sm: '0.9375rem' },
+                            fontSize: { xs: '0.85rem', sm: '0.9rem' },
                             color: 'text.secondary',
-                            mb: 2,
-                            lineHeight: 1.6,
+                            mb: 1.5,
+                            lineHeight: 1.5,
                             display: '-webkit-box',
-                            WebkitLineClamp: 4,
+                            WebkitLineClamp: 3,
                             WebkitBoxOrient: 'vertical',
                             overflow: 'hidden',
                             flex: 1,
@@ -454,7 +411,7 @@ const Blog = () => {
                             justifyContent: 'space-between',
                             alignItems: 'center',
                             mt: 'auto',
-                            pt: 2,
+                            pt: 1.5,
                             borderTop: 1,
                             borderColor: 'divider',
                           }}
@@ -487,6 +444,7 @@ const Blog = () => {
                         </Box>
                       </Box>
                     </Box>
+
                   </Box>
                 ))}
               </Box>
