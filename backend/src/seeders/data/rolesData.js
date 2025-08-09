@@ -144,6 +144,7 @@ export const roles = [
       'account:create',
       'account:update',
       'account:delete',
+      'account:restore',
 
       // Banner
       'banner:use',
@@ -221,10 +222,12 @@ export const roles = [
       'user:update',
 
       // Account
+      'account:create',
       'account:use',
       'account:read',
       'account:update',
-
+      'account:delete',
+      'account:restore',
       'account:technicalAdmin',
 
       // Role
@@ -348,7 +351,6 @@ export const roles = [
     name: 'staff',
     label: 'Nhân viên quản lý',
     permissions: [
-
       // Variant
       'variant:read',
 
@@ -392,10 +394,9 @@ export const roles = [
       'batch:update',
 
       // Partner
-      'partner:create', 
+      'partner:create',
       'partner:read',
       'partner:use',
-
 
       // Admin access
       'admin:access'
