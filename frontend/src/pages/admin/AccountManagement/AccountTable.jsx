@@ -32,7 +32,8 @@ const AccountTable = ({
   total,
   roles,
   permissions = {},
-  filters
+  filters,
+  profile
 }) => {
   const columns = [
     { id: 'index', label: 'STT', align: 'center', width: 50 },
@@ -107,6 +108,7 @@ const AccountTable = ({
                     users={users}
                     loading={loading}
                     roles={roles}
+                    profile={profile}
                   />
                 </Box>
               </TableCell>

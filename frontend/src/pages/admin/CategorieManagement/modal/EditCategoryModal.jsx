@@ -141,13 +141,6 @@ const EditCategoryModal = ({ open, onClose, category, onSave }) => {
   }
 
   const handleClose = () => {
-    reset()
-    setImageFile(null)
-    setPreviewUrl('')
-    setParentCategory(null)
-  }
-
-  const close =() => {
     onClose()
     reset()
     setImageFile(null)

@@ -142,7 +142,9 @@ import {
   Box,
   TextField
 } from '@mui/material'
-import StyleAdmin, { readOnlyBottomBorderInputSx } from '~/assets/StyleAdmin.jsx'
+import StyleAdmin, {
+  readOnlyBottomBorderInputSx
+} from '~/assets/StyleAdmin.jsx'
 import { optimizeCloudinaryUrl } from '~/utils/cloudinary.js'
 import useProfile from '~/hooks/useUserProfile.js'
 
@@ -205,7 +207,7 @@ export default function ProfileModal({ open, onClose, profile, fetchProfile }) {
     <Dialog
       open={open}
       onClose={onClose}
-      maxWidth='xs'
+      maxWidth='sm'
       fullWidth
       PaperProps={{
         sx: {
@@ -232,7 +234,7 @@ export default function ProfileModal({ open, onClose, profile, fetchProfile }) {
         <Button
           variant='outlined'
           component='label'
-          sx={{ mb: 2 , borderColor:'#001f5d', color: '#001f5d'}}
+          sx={{ mb: 2, borderColor: '#001f5d', color: '#001f5d' }}
         >
           Chọn ảnh đại diện
           <input
@@ -274,7 +276,7 @@ export default function ProfileModal({ open, onClose, profile, fetchProfile }) {
               disableUnderline: false
             }}
             disabled
-            sx={{readOnlyBottomBorderInputSx, pointerEvents: 'none'}}
+            sx={{ readOnlyBottomBorderInputSx, pointerEvents: 'none' }}
           />
         </Box>
 

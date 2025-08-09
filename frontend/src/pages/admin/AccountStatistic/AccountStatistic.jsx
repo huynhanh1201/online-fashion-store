@@ -49,6 +49,7 @@ const AccountStatistics = ({ statistics = [] }) => {
 
   const chartOptions = {
     responsive: true,
+    maintainAspectRatio: false,
     plugins: {
       tooltip: {
         callbacks: {
@@ -125,11 +126,18 @@ const AccountStatistics = ({ statistics = [] }) => {
         <Box
           mt={5}
           sx={{
-            maxHeight: 450
+            height: 450,
+            display: 'flex', // bật flexbox
+            justifyContent: 'flex-start', // canh trái
+            alignItems: 'flex-start' // canh trên
           }}
         >
           {chartData?.datasets?.[0]?.data?.some((val) => val > 0) ? (
-            <Pie data={chartData} options={chartOptions} />
+            <Box sx={{ width: 400, height: '100%' }}>
+              {' '}
+              {/* khống chế kích thước để không full width */}
+              <Pie data={chartData} options={chartOptions} />
+            </Box>
           ) : (
             <Typography variant='h6' color='text.secondary'>
               Không có dữ liệu
