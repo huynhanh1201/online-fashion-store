@@ -15,7 +15,7 @@ import StyleAdmin from '~/assets/StyleAdmin.jsx'
 import { IconButton, InputAdornment } from '@mui/material'
 import { Visibility, VisibilityOff } from '@mui/icons-material'
 
-const AddAccountModal = ({ open, onClose, onSave, roles }) => {
+const AddAccountModal = ({ open, onClose, onSave, roles, profile }) => {
   const {
     control,
     handleSubmit,
@@ -60,8 +60,24 @@ const AddAccountModal = ({ open, onClose, onSave, roles }) => {
     onClose()
   }
 
+  // const roleOptions = roles
+  //   .filter((role) => role.name !== 'customer')
+  //   .map((role) => ({
+  //     id: role._id,
+  //     name: role.name,
+  //     label: role.label || role.name
+  //   }))
+
   const roleOptions = roles
-    .filter((role) => role.name !== 'customer')
+    .filter((role) => {
+      if (role.name === 'customer') return false
+      if (
+        role.name === 'technical_admin' &&
+        profile?.role !== 'technical_admin'
+      )
+        return false
+      return true
+    })
     .map((role) => ({
       id: role._id,
       name: role.name,

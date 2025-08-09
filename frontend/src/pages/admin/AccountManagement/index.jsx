@@ -132,6 +132,7 @@ const AccountManagement = () => {
           canView: hasPermission('account:read')
         }}
         roles={roles}
+        profile={profile}
         filters={filters}
       />
 
@@ -152,6 +153,7 @@ const AccountManagement = () => {
               onClose={handleCloseModal}
               onSave={handleSave}
               roles={roles}
+              profile={profile}
             />
           )}
         </PermissionWrapper>

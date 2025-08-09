@@ -7,7 +7,7 @@ import FilterSelect from '~/components/FilterAdmin/common/FilterSelect.jsx'
 import SearchWithSuggestions from '~/components/FilterAdmin/common/SearchWithSuggestions.jsx'
 import useUsers from '~/hooks/admin/useUsers.js'
 
-export default function FilterAccount({ onFilter, loading, roles }) {
+export default function FilterAccount({ onFilter, loading, roles, profile }) {
   const [keyword, setKeyword] = useState('')
   const [inputValue, setInputValue] = useState('')
   const [selectedFilter, setSelectedFilter] = useState('')
@@ -94,7 +94,12 @@ export default function FilterAccount({ onFilter, loading, roles }) {
     setDestroy('false')
     onFilter({ sort: 'newest', destroy: 'false' })
   }
-  const filterRoles = roles.filter((role) => role.name !== 'customer')
+  // const filterRoles = roles.filter((role) => role.name !== 'customer')
+const filterRoles = roles.filter(
+  (r) =>
+    r.name !== 'customer' &&
+    !(r.name === 'technical_admin' && profile.role !== 'technical_admin')
+)
 
   return (
     <Box display='flex' flexWrap='wrap' gap={2} mb={2} justifyContent='end'>
