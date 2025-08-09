@@ -58,6 +58,29 @@ const ProductStatistics = ({ stats }) => {
     ]
   }
 
+  // const chartOptions = {
+  //   responsive: true,
+  //   maintainAspectRatio: false,
+  //   plugins: {
+  //     tooltip: {
+  //       callbacks: {
+  //         label: (ctx) => `${ctx.dataset.label}: ${ctx.parsed.y} sản phẩm`
+  //       }
+  //     }
+  //   },
+  //   scales: {
+  //     y: {
+  //       beginAtZero: true,
+  //       title: { display: true, text: 'Số lượng sản phẩm' },
+  //       ticks: {
+  //         precision: 0 // ✅ hiển thị số nguyên, không có .0
+  //       }
+  //     },
+  //     x: {
+  //       title: { display: true, text: 'Danh mục' }
+  //     }
+  //   }
+  // }
   const chartOptions = {
     responsive: true,
     maintainAspectRatio: false,
@@ -71,13 +94,28 @@ const ProductStatistics = ({ stats }) => {
     scales: {
       y: {
         beginAtZero: true,
-        title: { display: true, text: 'Số lượng sản phẩm' },
+        title: {
+          display: true,
+          text: 'Số lượng sản phẩm',
+          font: { size: 14, weight: 'bold' },
+          color: '#333'
+        },
         ticks: {
-          precision: 0 // ✅ hiển thị số nguyên, không có .0
+          precision: 0
         }
       },
       x: {
-        title: { display: true, text: 'Danh mục' }
+        title: {
+          display: true,
+          text: 'Danh mục',
+          font: { size: 16, weight: 'bold' }, // ✅ kích thước & đậm
+          color: '#000', // ✅ màu chữ
+          padding: { top: 10 } // ✅ khoảng cách
+        },
+        ticks: {
+          font: { size: 14, weight: '500' },
+          color: '#555'
+        }
       }
     }
   }

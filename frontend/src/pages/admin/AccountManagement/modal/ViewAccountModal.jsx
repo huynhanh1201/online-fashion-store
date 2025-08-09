@@ -37,8 +37,7 @@ const ViewAccountModal = ({ open, onClose, user, roles }) => {
     <Dialog
       open={open}
       onClose={onClose}
-      fullWidth
-      maxWidth='md'
+      maxWidth='lg'
       BackdropProps={{ sx: StyleAdmin.OverlayModal }}
     >
       <DialogTitle>Thông tin tài khoản</DialogTitle>
@@ -86,7 +85,7 @@ const ViewAccountModal = ({ open, onClose, user, roles }) => {
               <Table>
                 <TableBody>
                   <TableRow>
-                    <TableCell sx={{ fontWeight: 'bold', width: '30%' }}>
+                    <TableCell sx={{ fontWeight: 'bold', width: '150px' }}>
                       Tên tài khoản
                     </TableCell>
                     <TableCell>
