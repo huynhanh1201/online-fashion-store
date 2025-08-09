@@ -95,11 +95,11 @@ export default function FilterAccount({ onFilter, loading, roles, profile }) {
     onFilter({ sort: 'newest', destroy: 'false' })
   }
   // const filterRoles = roles.filter((role) => role.name !== 'customer')
-const filterRoles = roles.filter(
-  (r) =>
-    r.name !== 'customer' &&
-    !(r.name === 'technical_admin' && profile.role !== 'technical_admin')
-)
+  const filterRoles = roles.filter(
+    (r) =>
+      r.name !== 'customer' &&
+      !(r.name === 'technical_admin' && profile.role === 'owner')
+  )
 
   return (
     <Box display='flex' flexWrap='wrap' gap={2} mb={2} justifyContent='end'>
