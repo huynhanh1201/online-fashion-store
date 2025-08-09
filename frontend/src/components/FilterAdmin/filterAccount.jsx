@@ -6,8 +6,8 @@ import FilterByTime from '~/components/FilterAdmin/common/FilterByTime.jsx'
 import FilterSelect from '~/components/FilterAdmin/common/FilterSelect.jsx'
 import SearchWithSuggestions from '~/components/FilterAdmin/common/SearchWithSuggestions.jsx'
 import useUsers from '~/hooks/admin/useUsers.js'
-
-export default function FilterAccount({ onFilter, loading, roles, profile }) {
+import useProfile from '~/hooks/useUserProfile.js'
+export default function FilterAccount({ onFilter, loading, roles }) {
   const [keyword, setKeyword] = useState('')
   const [inputValue, setInputValue] = useState('')
   const [selectedFilter, setSelectedFilter] = useState('')
@@ -18,6 +18,11 @@ export default function FilterAccount({ onFilter, loading, roles, profile }) {
   const [destroy, setDestroy] = useState('false')
   const hasMounted = useRef(false)
   const { users, fetchUsers } = useUsers()
+  const { profile, fetchProfile } = useProfile()
+
+  useEffect(() => {
+    fetchProfile()
+  }, [])
 
   useEffect(() => {
     fetchUsers(1, 100000, { destroy: destroy, sort: sort })
@@ -95,12 +100,13 @@ export default function FilterAccount({ onFilter, loading, roles, profile }) {
     onFilter({ sort: 'newest', destroy: 'false' })
   }
   // const filterRoles = roles.filter((role) => role.name !== 'customer')
-  const filterRoles = roles.filter(
-    (r) =>
+  const filterRoles = roles.filter((r) => {
+    if (!profile) return true // hoặc false tùy ý bạn muốn khi chưa có profile
+    return (
       r.name !== 'customer' &&
       !(r.name === 'technical_admin' && profile.role === 'owner')
-  )
-
+    )
+  })
   return (
     <Box display='flex' flexWrap='wrap' gap={2} mb={2} justifyContent='end'>
       <FilterSelect
