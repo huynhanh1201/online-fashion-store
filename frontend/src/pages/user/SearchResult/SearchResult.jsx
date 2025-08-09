@@ -67,7 +67,7 @@ const SortMenuItem = styled('div')({
 })
 
 const sortOptions = [
-  { value: '', label: 'Sản phẩm nổi bật' },
+  { value: '', label: 'Sản phẩm mới nhất' },
   { value: 'priceAsc', label: 'Giá tăng dần' },
   { value: 'priceDesc', label: 'Giá giảm dần' },
   { value: 'nameDesc', label: 'Sản phẩm từ A-Z' },
@@ -152,13 +152,14 @@ export default function SearchResults() {
           priceDesc: 'price_desc',
           nameAsc: 'name_asc',
           nameDesc: 'name_desc',
-          '': ''
+          '': 'newest'
         }
 
         const params = {
           page: 1,
           limit: 1000,
           sort: backendSortMap[sortOption] || 'newest',
+          destroy: false,
           filters: {}
         }
 
