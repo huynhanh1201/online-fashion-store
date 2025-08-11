@@ -67,7 +67,7 @@ const SortMenuItem = styled('div')({
 })
 
 const sortOptions = [
-  { value: '', label: 'Mặc định' },
+  { value: '', label: 'Sản phẩm mới nhất' },
   { value: 'priceAsc', label: 'Giá tăng dần' },
   { value: 'priceDesc', label: 'Giá giảm dần' },
   { value: 'nameDesc', label: 'Sản phẩm từ A-Z' },
@@ -299,8 +299,8 @@ export default function SearchResults() {
               cursor: 'pointer'
             }}
             onClick={() => navigate('/')}
-            // component={Link}
-            // to='/product'
+          // component={Link}
+          // to='/product'
           >
             Trang chủ
           </Link>
@@ -425,7 +425,7 @@ export default function SearchResults() {
                 size='small'
                 renderItem={(item) =>
                   item.type === 'start-ellipsis' ||
-                  item.type === 'end-ellipsis' ? (
+                    item.type === 'end-ellipsis' ? (
                     <span style={{ padding: '8px 12px', color: '#999' }}>
                       ...
                     </span>
