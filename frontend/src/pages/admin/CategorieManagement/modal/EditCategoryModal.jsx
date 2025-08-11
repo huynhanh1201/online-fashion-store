@@ -55,9 +55,11 @@ const EditCategoryModal = ({ open, onClose, category, onSave }) => {
   const bannerInputRef = useRef()
   const [filteredCategories, setFilteredCategories] = useState([])
   const { categories, fetchCategories } = useCategories()
+
   useEffect(() => {
     fetchCategories(1, 100000)
   }, [])
+
   useEffect(() => {
     const loadFilteredCategories = async () => {
       const rootCategories = categories.filter((cat) => cat.parent === null)
@@ -467,7 +469,7 @@ const EditCategoryModal = ({ open, onClose, category, onSave }) => {
           <Button
             color='error'
             variant='outlined'
-            onClick={close}
+            onClick={handleClose}
             sx={{ textTransform: 'none' }}
           >
             Hủy

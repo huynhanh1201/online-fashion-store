@@ -25,7 +25,7 @@ export default function InventorySummaryCard({ data, loading }) {
 
   const summaryItems = [
     {
-      label: 'Tổng số lượng tồn',
+      label: 'Tổng số lượng biến thể tồn kho',
       value: `${Number(totalStock).toLocaleString('vi-VN')}`,
       icon: <InventoryIcon color='primary' fontSize='large' />,
       color: '#4FC3F7'
