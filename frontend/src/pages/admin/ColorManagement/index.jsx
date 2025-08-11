@@ -1,16 +1,26 @@
 import React from 'react'
-import ColorTable from './ColorTable'
+import ColorTable from '~/pages/admin/ColorManagement/ColorTable'
 
 import useColors from '~/hooks/admin/useColor'
 import usePermissions from '~/hooks/usePermissions'
 import { PermissionWrapper, RouteGuard } from '~/components/PermissionGuard'
 
 // Lazy load các Chart
-const AddColorModal = React.lazy(() => import('./modal/AddColorModal'))
-const ViewColorModal = React.lazy(() => import('./modal/ViewColorModal'))
-const EditColorModal = React.lazy(() => import('./modal/EditColorModal'))
-const DeleteColorModal = React.lazy(() => import('./modal/DeleteColorModal'))
-const RestoreColorModal = React.lazy(() => import('./modal/RestoreColorModal'))
+const AddColorModal = React.lazy(
+  () => import('~/pages/admin/ColorManagement/modal/AddColorModal')
+)
+const ViewColorModal = React.lazy(
+  () => import('~/pages/admin/ColorManagement/modal/ViewColorModal')
+)
+const EditColorModal = React.lazy(
+  () => import('~/pages/admin/ColorManagement/modal/EditColorModal')
+)
+const DeleteColorModal = React.lazy(
+  () => import('~/pages/admin/ColorManagement/modal/DeleteColorModal')
+)
+const RestoreColorModal = React.lazy(
+  () => import('~/pages/admin/ColorManagement/modal/RestoreColorModal')
+)
 const ColorManagement = () => {
   const [page, setPage] = React.useState(1)
   const [selectedColor, setSelectedColor] = React.useState(null)

@@ -336,7 +336,7 @@ const ProductInfoSection = ({
         </Box>
 
         {/* Bên phải: Hướng dẫn chọn size */}
-        <SizeGuide />
+        {/* <SizeGuide /> */}
       </Box>
 
       <Box sx={{ display: 'flex', gap: 1, mb: 0.5 }}>

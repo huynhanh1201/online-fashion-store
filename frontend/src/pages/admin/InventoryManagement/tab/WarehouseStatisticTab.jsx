@@ -13,7 +13,6 @@ import usePartner from '~/hooks/admin/Inventory/usePartner.js'
 import useVariants from '~/hooks/admin/Inventory/useVariants.js'
 import useWarehouses from '~/hooks/admin/Inventory/useWarehouses.js'
 import useWarehouseSlips from '~/hooks/admin/Inventory/useWarehouseSlip.js'
-import usePermissions from '~/hooks/usePermissions'
 const styles = {
   header: {
     borderBottom: '1px solid #ccc',

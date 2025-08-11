@@ -5,18 +5,28 @@ import usePermissions from '~/hooks/usePermissions'
 import { RouteGuard, PermissionWrapper } from '~/components/PermissionGuard'
 
 // Lazy load modals
-const AddDiscountModal = React.lazy(() => import('./modal/AddDiscountModal'))
-const ViewDiscountModal = React.lazy(() => import('./modal/ViewDiscountModal'))
-const EditDiscountModal = React.lazy(() => import('./modal/EditDiscountModal'))
+const AddDiscountModal = React.lazy(
+  () => import('~/pages/admin/DiscountManagement/modal/AddDiscountModal')
+)
+const ViewDiscountModal = React.lazy(
+  () => import('~/pages/admin/DiscountManagement/modal/ViewDiscountModal')
+)
+const EditDiscountModal = React.lazy(
+  () => import('~/pages/admin/DiscountManagement/modal/EditDiscountModal')
+)
 const DeleteDiscountModal = React.lazy(
-  () => import('./modal/DeleteDiscountModal')
+  () => import('~/pages/admin/DiscountManagement/modal/DeleteDiscountModal')
 )
 const RestoreDiscountModal = React.lazy(
-  () => import('./modal/RestoreDiscountModal')
+  () => import('~/pages/admin/DiscountManagement/modal/RestoreDiscountModal')
 )
 
-const DiscountTable = React.lazy(() => import('./DiscountTable'))
-const DiscountPagination = React.lazy(() => import('./DiscountPagination'))
+const DiscountTable = React.lazy(
+  () => import('~/pages/admin/DiscountManagement/DiscountTable')
+)
+const DiscountPagination = React.lazy(
+  () => import('~/pages/admin/DiscountManagement/DiscountPagination')
+)
 
 function DiscountManagement() {
   const { hasPermission } = usePermissions()

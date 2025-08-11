@@ -7,11 +7,21 @@ import usePermissions from '~/hooks/usePermissions'
 import { PermissionWrapper, RouteGuard } from '~/components/PermissionGuard'
 
 // Lazy load các Chart
-const AddSizeModal = React.lazy(() => import('./modal/AddSizeModal'))
-const ViewSizeModal = React.lazy(() => import('./modal/ViewSizeModal'))
-const EditSizeModal = React.lazy(() => import('./modal/EditSizeModal'))
-const DeleteSizeModal = React.lazy(() => import('./modal/DeleteSizeModal'))
-const RestoreSizeModal = React.lazy(() => import('./modal/RestoreSizeModal'))
+const AddSizeModal = React.lazy(
+  () => import('~/pages/admin/SizeManagement/modal/AddSizeModal')
+)
+const ViewSizeModal = React.lazy(
+  () => import('~/pages/admin/SizeManagement/modal/ViewSizeModal')
+)
+const EditSizeModal = React.lazy(
+  () => import('~/pages/admin/SizeManagement/modal/EditSizeModal')
+)
+const DeleteSizeModal = React.lazy(
+  () => import('~/pages/admin/SizeManagement/modal/DeleteSizeModal')
+)
+const RestoreSizeModal = React.lazy(
+  () => import('~/pages/admin/SizeManagement/modal/RestoreSizeModal')
+)
 const SizeManagement = () => {
   const [page, setPage] = React.useState(1)
   const [filters, setFilters] = React.useState({

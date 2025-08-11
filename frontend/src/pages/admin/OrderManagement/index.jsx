@@ -1,11 +1,11 @@
 import React, { useEffect } from 'react'
 import Typography from '@mui/material/Typography'
 import { Box } from '@mui/material'
-import OrderTable from './OrderTable'
+import OrderTable from '~/pages/admin/OrderManagement/OrderTable'
 import OrderPagination from './OrderPagination'
-import ViewOrderModal from './modal/ViewOrderModal'
-import EditOrderModal from './modal/EditOrderModal' // import Chart sửa
-import DeleteOrderModal from './modal/DeleteOrderModal' // import Chart xoá
+import ViewOrderModal from '~/pages/admin/OrderManagement/modal/ViewOrderModal'
+import EditOrderModal from '~/pages/admin/OrderManagement/modal/EditOrderModal' // import Chart sửa
+import DeleteOrderModal from '~/pages/admin/OrderManagement/modal/DeleteOrderModal' // import Chart xoá
 import useOrder from '~/hooks/admin/useOrder'
 import useDiscounts from '~/hooks/admin/useDiscount'
 import useUsers from '~/hooks/admin/useUsers.js'

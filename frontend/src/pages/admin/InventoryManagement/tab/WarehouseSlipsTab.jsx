@@ -16,8 +16,8 @@ import {
   Chip
 } from '@mui/material'
 import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye'
-import AddWarehouseSlipModal from '../modal/WarehouseSlip/AddWarehouseSlipModal'
-import ViewWarehouseSlipModal from '../modal/WarehouseSlip/ViewWarehouseSlipModal'
+import AddWarehouseSlipModal from '~/pages/admin/InventoryManagement/modal/WarehouseSlip/AddWarehouseSlipModal'
+import ViewWarehouseSlipModal from '~/pages/admin/InventoryManagement/modal/WarehouseSlip/ViewWarehouseSlipModal'
 import FilterWarehouseSlip from '~/components/FilterAdmin/FilterWarehouseSlip.jsx'
 import useVariants from '~/hooks/admin/Inventory/useVariants.js'
 import useWarehouses from '~/hooks/admin/Inventory/useWarehouses.js'

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import OrderStatistic from './OrderStatistic.jsx'
+import OrderStatistic from '~/pages/admin/OrderStatistic/OrderStatistic.jsx'
 import useInventoryStatistics from '~/hooks/admin/useStatistic.js'
 import { RouteGuard } from '~/components/PermissionGuard'
 

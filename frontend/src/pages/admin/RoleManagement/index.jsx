@@ -9,11 +9,21 @@ import usePermission from '~/hooks/admin/usePermission.js'
 import { PermissionWrapper, RouteGuard } from '~/components/PermissionGuard'
 
 // Lazy load modals
-const AddRoleModal = React.lazy(() => import('./modal/AddRoleModal'))
-const ViewRoleModal = React.lazy(() => import('./modal/ViewRoleModal'))
-const EditRoleModal = React.lazy(() => import('./modal/EditRoleModal'))
-const DeleteRoleModal = React.lazy(() => import('./modal/DeleteRoleModal'))
-const RestoreRoleModal = React.lazy(() => import('./modal/RestoreRoleModal'))
+const AddRoleModal = React.lazy(
+  () => import('~/pages/admin/RoleManagement/modal/AddRoleModal')
+)
+const ViewRoleModal = React.lazy(
+  () => import('~/pages/admin/RoleManagement/modal/ViewRoleModal')
+)
+const EditRoleModal = React.lazy(
+  () => import('~/pages/admin/RoleManagement/modal/EditRoleModal')
+)
+const DeleteRoleModal = React.lazy(
+  () => import('~/pages/admin/RoleManagement/modal/DeleteRoleModal')
+)
+const RestoreRoleModal = React.lazy(
+  () => import('~/pages/admin/RoleManagement/modal/RestoreRoleModal')
+)
 const RoleManagement = () => {
   const [page, setPage] = React.useState(1)
   const [filters, setFilters] = React.useState({
