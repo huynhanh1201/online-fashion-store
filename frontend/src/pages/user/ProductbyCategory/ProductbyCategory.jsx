@@ -77,7 +77,7 @@ const SortMenuItem = styled('div')(({ theme }) => ({
 }))
 
 const sortOptions = [
-  { value: '', label: 'Mặc định' },
+  { value: '', label: 'Sản phẩm mới nhất' },
   { value: 'priceAsc', label: 'Giá tăng dần' },
   { value: 'priceDesc', label: 'Giá giảm dần' },
   { value: 'nameAsc', label: 'Sản phẩm từ A-Z' },
@@ -174,7 +174,7 @@ const ProductbyCategory = () => {
         const allProducts = []
         const seen = new Set()
         allResults.forEach((result) => {
-          ;(result.products || []).forEach((product) => {
+          ; (result.products || []).forEach((product) => {
             if (!seen.has(product._id)) {
               seen.add(product._id)
               allProducts.push(product)
@@ -239,7 +239,7 @@ const ProductbyCategory = () => {
       console.error('Chi tiết lỗi:', error)
       setErrorProducts(
         error.message ||
-          'Không thể tải danh sách sản phẩm. Vui lòng thử lại sau.'
+        'Không thể tải danh sách sản phẩm. Vui lòng thử lại sau.'
       )
       setProducts([])
       setTotalPages(1)
@@ -381,8 +381,8 @@ const ProductbyCategory = () => {
         <img
           src={optimizeCloudinaryUrl(
             category?.banner ||
-              category?.image ||
-              'https://www.rcuw.org/wp-content/themes/champion/images/SM-placeholder.png',
+            category?.image ||
+            'https://www.rcuw.org/wp-content/themes/champion/images/SM-placeholder.png',
             { width: 1920, height: 400 }
           )}
           alt='banner'

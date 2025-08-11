@@ -73,7 +73,7 @@ const SortMenuItem = styled('div')(({ theme }) => ({
 }))
 
 const sortOptions = [
-  { value: '', label: 'Mặc định' },
+  { value: '', label: 'Sản phẩm mới nhất' },
   { value: 'priceAsc', label: 'Giá tăng dần' },
   { value: 'priceDesc', label: 'Giá giảm dần' },
   { value: 'nameAsc', label: 'Sản phẩm từ A-Z' },

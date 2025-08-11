@@ -75,7 +75,7 @@ const SortMenuItem = styled('div')(({ theme }) => ({
 }))
 
 const sortOptions = [
-  { value: '', label: 'Mặc định' },
+  { value: '', label: 'Sản phẩm mới nhất' },
   { value: 'priceAsc', label: 'Giá tăng dần' },
   { value: 'priceDesc', label: 'Giá giảm dần' },
   { value: 'nameAsc', label: 'Sản phẩm từ A-Z' },
@@ -351,8 +351,8 @@ const CategoryPage = () => {
             cursor: 'pointer'
           }}
           onClick={() => navigate('/')}
-          // component={Link}
-          // to='/product'
+        // component={Link}
+        // to='/product'
         >
           Trang chủ
         </Link>
@@ -387,8 +387,8 @@ const CategoryPage = () => {
         <img
           src={optimizeCloudinaryUrl(
             category?.banner ||
-              category?.image ||
-              'https://www.rcuw.org/wp-content/themes/champion/images/SM-placeholder.png',
+            category?.image ||
+            'https://www.rcuw.org/wp-content/themes/champion/images/SM-placeholder.png',
             { width: 1920, height: 400 }
           )}
           alt='category banner'
