@@ -273,7 +273,8 @@ const Profile = () => {
         flexDirection: isMobile ? 'column' : 'row',
         gap: 4,
         alignItems: isMobile ? 'stretch' : 'flex-start',
-        height: '55vh',
+        height: { xs: 'auto', md: '70vh' },
+        maxHeight: 'auto',
       }}
     >
       <Paper

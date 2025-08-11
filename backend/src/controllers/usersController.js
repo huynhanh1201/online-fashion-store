@@ -5,9 +5,10 @@ import { usersService } from '~/services/usersService'
 const getUserList = async (req, res, next) => {
   try {
     const queryString = req.query
+    const jwtDecoded = req.jwtDecoded
 
     // Lấy danh sách user từ tầng Service chuyển qua
-    const result = await usersService.getUserList(queryString)
+    const result = await usersService.getUserList(queryString, jwtDecoded)
 
     // Có kết quả thì trả về Client
     res.status(StatusCodes.OK).json(result)
@@ -43,8 +44,9 @@ const updateUser = async (req, res, next) => {
 const deleteUser = async (req, res, next) => {
   try {
     const userId = req.params.userId
+    const jwtDecoded = req.jwtDecoded
 
-    const result = await usersService.deleteUser(userId)
+    const result = await usersService.deleteUser(userId,jwtDecoded)
 
     res.status(StatusCodes.OK).json(result)
   } catch (err) {

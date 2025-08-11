@@ -259,7 +259,15 @@ import { useForm, Controller } from 'react-hook-form'
 import StyleAdmin from '~/assets/StyleAdmin.jsx'
 import usePermissions from '~/hooks/usePermissions'
 
-const EditAccountModal = ({ open, onClose, user, onSave, roles, permissions, profile }) => {
+const EditAccountModal = ({
+  open,
+  onClose,
+  user,
+  onSave,
+  roles,
+  permissions,
+  profile
+}) => {
   const {
     control,
     handleSubmit,
@@ -315,11 +323,15 @@ const EditAccountModal = ({ open, onClose, user, onSave, roles, permissions, pro
   //     name: role.name,
   //     label: role.label || role.name
   //   }))
-  
+
   const roleOptions = roles
     .filter((role) => {
       if (role.name === 'customer') return false
-      if (profile?.role === 'owner' && role.name === 'technical_admin') return false
+      if (
+        role.name === 'technical_admin' &&
+        profile?.role !== 'technical_admin'
+      )
+        return false
       return true
     })
     .map((role) => ({
@@ -409,20 +421,66 @@ const EditAccountModal = ({ open, onClose, user, onSave, roles, permissions, pro
             )}
           />
 
-          {(
-            (
-              profile?.role === 'technical_admin' ||
-              ((hasPermission('account:technicalAdmin') || hasPermission('account:update')) &&
-                !(profile?.role === 'owner' && user?.role === 'technical_admin'))
-            )
-          ) && (
-              <Controller
-                name='role'
-                control={control}
-                rules={{
-                  required: 'Vai trò là bắt buộc, vui lòng chọn 1 vai trò phù hợp'
-                }}
-                render={({ field, fieldState }) => (
+          {/*{(profile?.role === 'technical_admin' ||*/}
+          {/*  ((hasPermission('account:technicalAdmin') ||*/}
+          {/*    hasPermission('account:update')) &&*/}
+          {/*    !(*/}
+          {/*      profile?.role === 'owner' && user?.role === 'technical_admin'*/}
+          {/*    ))) && (*/}
+          {/*  <Controller*/}
+          {/*    name='role'*/}
+          {/*    control={control}*/}
+          {/*    rules={{*/}
+          {/*      required: 'Vai trò là bắt buộc, vui lòng chọn 1 vai trò phù hợp'*/}
+          {/*    }}*/}
+          {/*    render={({ field, fieldState }) => (*/}
+          {/*      <Autocomplete*/}
+          {/*        options={roleOptions}*/}
+          {/*        getOptionLabel={(option) => option.label}*/}
+          {/*        isOptionEqualToValue={(option, value) =>*/}
+          {/*          option.name === value?.name*/}
+          {/*        }*/}
+          {/*        value={*/}
+          {/*          roleOptions.find((r) => r.name === field.value) || null*/}
+          {/*        }*/}
+          {/*        onChange={(_, selected) => {*/}
+          {/*          field.onChange(selected?.name || '')*/}
+          {/*          setValue('roleId', selected?.id || '')*/}
+          {/*        }}*/}
+          {/*        renderInput={(params) => (*/}
+          {/*          <TextField*/}
+          {/*            {...params}*/}
+          {/*            label={*/}
+          {/*              <>*/}
+          {/*                Vai trò <span style={{ color: 'red' }}>*</span>*/}
+          {/*              </>*/}
+          {/*            }*/}
+          {/*            margin='normal'*/}
+          {/*            error={!!fieldState.error}*/}
+          {/*            helperText={fieldState.error?.message}*/}
+          {/*            sx={StyleAdmin.InputCustom}*/}
+          {/*          />*/}
+          {/*        )}*/}
+          {/*      />*/}
+          {/*    )}*/}
+          {/*  />*/}
+          {/*)}*/}
+          {(profile?.role === 'technical_admin' ||
+            ((hasPermission('account:technicalAdmin') ||
+              hasPermission('account:update')) &&
+              !(
+                profile?.role === 'owner' && user?.role === 'technical_admin'
+              ))) && (
+            <Controller
+              name='role'
+              control={control}
+              rules={{
+                required: 'Vai trò là bắt buộc, vui lòng chọn 1 vai trò phù hợp'
+              }}
+              render={({ field, fieldState }) => {
+                const isSameUser = user?._id === profile?._id
+
+                return (
                   <Autocomplete
                     options={roleOptions}
                     getOptionLabel={(option) => option.label}
@@ -436,6 +494,7 @@ const EditAccountModal = ({ open, onClose, user, onSave, roles, permissions, pro
                       field.onChange(selected?.name || '')
                       setValue('roleId', selected?.id || '')
                     }}
+                    disabled={isSameUser} // Không cho sửa khi là chính mình
                     renderInput={(params) => (
                       <TextField
                         {...params}
@@ -445,16 +504,23 @@ const EditAccountModal = ({ open, onClose, user, onSave, roles, permissions, pro
                           </>
                         }
                         margin='normal'
-                        error={!!fieldState.error}
-                        helperText={fieldState.error?.message}
-                        sx={StyleAdmin.InputCustom}
+                        error={!!fieldState.error || isSameUser}
+                        helperText={
+                          isSameUser
+                            ? 'Bạn không thể thay đổi vai trò của chính mình'
+                            : fieldState.error?.message
+                        }
+                        sx={{
+                          ...StyleAdmin.InputCustom,
+                          pointerEvents: isSameUser ? 'none' : 'auto'
+                        }}
                       />
                     )}
                   />
-                )}
-              />
-            )}
-
+                )
+              }}
+            />
+          )}
         </form>
       </DialogContent>
 
@@ -482,7 +548,6 @@ const EditAccountModal = ({ open, onClose, user, onSave, roles, permissions, pro
         >
           {isSubmitting ? 'Đang lưu' : 'Lưu'}
         </Button>
-
       </DialogActions>
     </Dialog>
   )

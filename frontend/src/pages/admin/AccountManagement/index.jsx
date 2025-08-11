@@ -48,8 +48,8 @@ const AccountManagement = () => {
   const { hasPermission } = usePermissions()
 
   React.useEffect(() => {
-    fetchRoles(1, 10000, { destroy: 'false' })
     fetchProfile()
+    fetchRoles(1, 10000, { destroy: 'false' })
   }, [])
 
   React.useEffect(() => {
@@ -132,6 +132,7 @@ const AccountManagement = () => {
           canView: hasPermission('account:read')
         }}
         roles={roles}
+        profile={profile}
         filters={filters}
       />
 
@@ -152,6 +153,7 @@ const AccountManagement = () => {
               onClose={handleCloseModal}
               onSave={handleSave}
               roles={roles}
+              profile={profile}
             />
           )}
         </PermissionWrapper>
