@@ -16,9 +16,10 @@ const createRole = async (req, res, next) => {
 const getRoleList = async (req, res, next) => {
   try {
     const queryString = req.query
+    const jwtDecoded = req.jwtDecoded
 
     // Lấy danh sách Danh mục sản phẩm từ tầng Service chuyển qua
-    const result = await rolesService.getRoleList(queryString)
+    const result = await rolesService.getRoleList(queryString,jwtDecoded)
 
     // Có kết quả thì trả về Client
     res.status(StatusCodes.OK).json(result)
