@@ -23,7 +23,7 @@ const SnackbarAlert = ({
       autoHideDuration={6000}
       onClose={onClose}
       anchorOrigin={{
-        vertical: isMobile ? 'bottom' : 'top',
+        vertical: 'top',
         horizontal: isMobile ? 'center' : 'right'
       }}
       sx={{
@@ -43,7 +43,8 @@ const SnackbarAlert = ({
           alignItems: 'flex-start',
           minWidth: isMobile ? '300px' : '350px',
           maxWidth: isMobile ? 'calc(100vw - 32px)' : '450px',
-          padding: isMobile ? '8px 12px' : '16px'
+          padding: isMobile ? '8px 12px' : '16px',
+          top: isMobile ? '64px' : '80px',
         }}
       >
         {severity === 'success' ? (
