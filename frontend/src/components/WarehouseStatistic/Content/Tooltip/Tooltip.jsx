@@ -3,11 +3,6 @@ import { Typography } from '@mui/material'
 
 const Tooltip = ({ active, payload, label }) => {
   if (active && payload && payload.length) {
-    // Tìm giá trị Nhập và Xuất từ payload
-    const nhap = payload.find((p) => p.name === 'Nhập')?.value || 0
-    const xuat = payload.find((p) => p.name === 'Xuất')?.value || 0
-    const chenhLech = nhap - xuat
-
     return (
       <div
         style={{ background: '#fff', border: '1px solid #ccc', padding: 10 }}
@@ -18,10 +13,6 @@ const Tooltip = ({ active, payload, label }) => {
             {`${entry.name}: ${entry.value.toLocaleString('vi-VN')}`}
           </Typography>
         ))}
-
-        <Typography fontWeight='400' color='#FFB74D'>
-          Tổng: {chenhLech.toLocaleString('vi-VN')}
-        </Typography>
       </div>
     )
   }

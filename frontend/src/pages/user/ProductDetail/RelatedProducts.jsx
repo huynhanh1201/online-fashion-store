@@ -114,17 +114,171 @@
 //   )
 // }
 
+// import { useEffect, useState } from 'react'
+// import { Button } from '@mui/material'
+// import ProductCard from '~/components/ProductCards/ProductCards'
+// import { getProducts, getProductsByCategory } from '~/services/productService'
+// import { Link } from 'react-router-dom'
+
+// const RelatedProductSection = ({ categoryId, currentProductId }) => {
+//   const [relatedProducts, setRelatedProducts] = useState([])
+//   const [visibleCount, setVisibleCount] = useState(10)
+//   const [categoryPage, setCategoryPage] = useState(1)
+//   const [fallbackPage, setFallbackPage] = useState(1)
+//   const [loading, setLoading] = useState(false)
+//   const [hasMore, setHasMore] = useState(false)
+
+//   const fetchMoreProducts = async (count) => {
+//     setLoading(true)
+//     try {
+//       let combined = [...relatedProducts]
+//       let tempCategoryPage = categoryPage
+//       let tempFallbackPage = fallbackPage
+//       let newAddedCount = 0
+
+//       // Ưu tiên lấy từ danh mục
+//       while (combined.length < visibleCount + count) {
+//         const { products: categoryProducts } = await getProductsByCategory(
+//           categoryId,
+//           tempCategoryPage,
+//           count
+//         )
+
+//         if (!categoryProducts || categoryProducts.length === 0) break
+
+//         const filtered = categoryProducts.filter(
+//           (p) =>
+//             p._id !== currentProductId &&
+//             !combined.some((item) => item._id === p._id)
+//         )
+
+//         if (filtered.length === 0) {
+//           tempCategoryPage++
+//           continue
+//         }
+
+//         combined = [...combined, ...filtered]
+//         newAddedCount += filtered.length
+//         tempCategoryPage++
+//       }
+
+//       // Nếu vẫn chưa đủ, lấy từ fallback (tất cả sản phẩm)
+//       if (combined.length < visibleCount + count) {
+//         while (combined.length < visibleCount + count) {
+//           const { products: fallbackProducts } = await getProducts({
+//             page: tempFallbackPage,
+//             limit: count
+//           })
+
+//           if (!fallbackProducts || fallbackProducts.length === 0) break
+
+//           const filteredFallback = fallbackProducts.filter(
+//             (p) =>
+//               p._id !== currentProductId &&
+//               !combined.some((item) => item._id === p._id)
+//           )
+
+//           if (filteredFallback.length === 0) {
+//             tempFallbackPage++
+//             continue
+//           }
+
+//           combined = [...combined, ...filteredFallback]
+//           newAddedCount += filteredFallback.length
+//           tempFallbackPage++
+//         }
+//       }
+
+//       setCategoryPage(tempCategoryPage)
+//       setFallbackPage(tempFallbackPage)
+//       setRelatedProducts(combined)
+//       if (newAddedCount < count) {
+//         setHasMore(false)
+//       } else {
+//         setHasMore(true)
+//       }
+//     } catch (err) {
+//       console.error('Lỗi khi tải sản phẩm gợi ý:', err)
+//     } finally {
+//       setLoading(false)
+//     }
+//   }
+
+//   // Ban đầu: tải 4 sản phẩm
+//   useEffect(() => {
+//     if (categoryId && currentProductId) {
+//       setRelatedProducts([])
+//       setVisibleCount(10)
+//       setCategoryPage(1)
+//       setFallbackPage(1)
+//       fetchMoreProducts(10)
+//     }
+//   }, [categoryId, currentProductId])
+
+//   const handleLoadMore = () => {
+//     const nextCount = 10
+//     setVisibleCount((prev) => prev + nextCount)
+//     fetchMoreProducts(nextCount)
+//   }
+
+//   return (
+//     <>
+//       <div className='related-products-container'>
+//         <h2 style={{ fontWeight: 'bold', marginBottom: '15px' }}>
+//           Sản phẩm tương tự
+//         </h2>
+//         <section className='product-grid productDetail-grid'>
+//           {relatedProducts.slice(0, visibleCount).map((product) => (
+//             <ProductCard key={product._id} product={product} />
+//           ))}
+//         </section>
+//         {hasMore && (
+//           <div style={{ textAlign: 'center', marginTop: 16 }}>
+//             <Button
+//               variant='outlined'
+//               onClick={handleLoadMore}
+//               disabled={loading}
+//               sx={{
+//                 border: 1,
+//                 borderColor: 'grey.800',
+//                 color: 'grey.800',
+//                 bgcolor: 'transparent',
+//                 px: { xs: 2.5, sm: 3.5 },
+//                 py: { xs: 1, sm: 1.25 },
+//                 borderRadius: '50px',
+//                 typography: 'body2',
+//                 cursor: 'pointer',
+//                 transition: 'all 0.3s ease',
+//                 fontWeight: 500,
+//                 '&:hover': {
+//                   bgcolor: 'grey.800',
+//                   color: 'common.white',
+//                   transform: 'translateY(-1px)',
+//                   boxShadow: (theme) => theme.shadows[4]
+//                 }
+//               }}
+//             >
+//               {loading ? 'Đang tải...' : 'Xem thêm'}
+//             </Button>
+//           </div>
+//         )}
+//       </div>
+//     </>
+//   )
+// }
+
+// export default RelatedProductSection
+
+
 import { useEffect, useState } from 'react'
-import { Button } from '@mui/material'
+import { Button, Typography } from '@mui/material'
 import ProductCard from '~/components/ProductCards/ProductCards'
-import { getProducts, getProductsByCategory } from '~/services/productService'
-import { Link } from 'react-router-dom'
+import { getProductsByCategory } from '~/services/productService'
 
 const RelatedProductSection = ({ categoryId, currentProductId }) => {
   const [relatedProducts, setRelatedProducts] = useState([])
   const [visibleCount, setVisibleCount] = useState(10)
   const [categoryPage, setCategoryPage] = useState(1)
-  const [fallbackPage, setFallbackPage] = useState(1)
   const [loading, setLoading] = useState(false)
   const [hasMore, setHasMore] = useState(false)
 
@@ -132,15 +286,13 @@ const RelatedProductSection = ({ categoryId, currentProductId }) => {
     setLoading(true)
     try {
       let combined = [...relatedProducts]
-      let tempCategoryPage = categoryPage
-      let tempFallbackPage = fallbackPage
+      let tempPage = categoryPage
       let newAddedCount = 0
 
-      // Ưu tiên lấy từ danh mục
       while (combined.length < visibleCount + count) {
         const { products: categoryProducts } = await getProductsByCategory(
           categoryId,
-          tempCategoryPage,
+          tempPage,
           count
         )
 
@@ -153,53 +305,18 @@ const RelatedProductSection = ({ categoryId, currentProductId }) => {
         )
 
         if (filtered.length === 0) {
-          tempCategoryPage++
+          tempPage++
           continue
         }
 
         combined = [...combined, ...filtered]
         newAddedCount += filtered.length
-        tempCategoryPage++
+        tempPage++
       }
 
-      // Nếu vẫn chưa đủ, lấy từ fallback (tất cả sản phẩm)
-      if (combined.length < visibleCount + count) {
-        while (combined.length < visibleCount + count) {
-          const { products: fallbackProducts } = await getProducts({
-            page: tempFallbackPage,
-            limit: count
-          })
-
-          if (!fallbackProducts || fallbackProducts.length === 0) break
-
-          const filteredFallback = fallbackProducts.filter(
-            (p) =>
-              p._id !== currentProductId &&
-              !combined.some((item) => item._id === p._id)
-          )
-
-          if (filteredFallback.length === 0) {
-            tempFallbackPage++
-            continue
-          }
-
-          combined = [...combined, ...filteredFallback]
-          newAddedCount += filteredFallback.length
-          tempFallbackPage++
-        }
-      }
-
-      setCategoryPage(tempCategoryPage)
-      setFallbackPage(tempFallbackPage)
+      setCategoryPage(tempPage)
       setRelatedProducts(combined)
-      console.log('relatedProducts.length', relatedProducts.length)
-      console.log('combined.length', combined.length)
-      console.log('newAddedCount', newAddedCount)
-      if (newAddedCount < count) {
-        setHasMore(false)
-      } else {
-        setHasMore(true)
-      }
+      setHasMore(newAddedCount >= count)
     } catch (err) {
       console.error('Lỗi khi tải sản phẩm gợi ý:', err)
     } finally {
@@ -207,13 +324,11 @@ const RelatedProductSection = ({ categoryId, currentProductId }) => {
     }
   }
 
-  // Ban đầu: tải 4 sản phẩm
   useEffect(() => {
     if (categoryId && currentProductId) {
       setRelatedProducts([])
       setVisibleCount(10)
       setCategoryPage(1)
-      setFallbackPage(1)
       fetchMoreProducts(10)
     }
   }, [categoryId, currentProductId])
@@ -225,48 +340,54 @@ const RelatedProductSection = ({ categoryId, currentProductId }) => {
   }
 
   return (
-    <>
-      <div className='related-products-container'>
-        <h2 style={{ fontWeight: 'bold', marginBottom: '15px' }}>
-          Sản phẩm tương tự
-        </h2>
-        <section className='product-grid productDetail-grid'>
-          {relatedProducts.slice(0, visibleCount).map((product) => (
-            <ProductCard key={product._id} product={product} />
-          ))}
-        </section>
-        {hasMore && (
-          <div style={{ textAlign: 'center', marginTop: 16 }}>
-            <Button
-              variant='outlined'
-              onClick={handleLoadMore}
-              disabled={loading}
-              sx={{
-                border: 1,
-                borderColor: 'grey.800',
-                color: 'grey.800',
-                bgcolor: 'transparent',
-                px: { xs: 2.5, sm: 3.5 },
-                py: { xs: 1, sm: 1.25 },
-                borderRadius: '50px',
-                typography: 'body2',
-                cursor: 'pointer',
-                transition: 'all 0.3s ease',
-                fontWeight: 500,
-                '&:hover': {
-                  bgcolor: 'grey.800',
-                  color: 'common.white',
-                  transform: 'translateY(-1px)',
-                  boxShadow: (theme) => theme.shadows[4]
-                }
-              }}
-            >
-              {loading ? 'Đang tải...' : 'Xem thêm'}
-            </Button>
-          </div>
-        )}
-      </div>
-    </>
+    <div className='related-products-container'>
+      <h2 style={{ fontWeight: 'bold', marginBottom: '15px' }}>
+        Sản phẩm tương tự
+      </h2>
+
+      {relatedProducts.length === 0 && !loading ? (
+        <Typography variant='body2'>Không có sản phẩm tương tự</Typography>
+      ) : (
+        <>
+          <section className='product-grid productDetail-grid'>
+            {relatedProducts.slice(0, visibleCount).map((product) => (
+              <ProductCard key={product._id} product={product} />
+            ))}
+          </section>
+
+          {hasMore && (
+            <div style={{ textAlign: 'center', marginTop: 16 }}>
+              <Button
+                variant='outlined'
+                onClick={handleLoadMore}
+                disabled={loading}
+                sx={{
+                  border: 1,
+                  borderColor: 'grey.800',
+                  color: 'grey.800',
+                  bgcolor: 'transparent',
+                  px: { xs: 2.5, sm: 3.5 },
+                  py: { xs: 1, sm: 1.25 },
+                  borderRadius: '50px',
+                  typography: 'body2',
+                  cursor: 'pointer',
+                  transition: 'all 0.3s ease',
+                  fontWeight: 500,
+                  '&:hover': {
+                    bgcolor: 'grey.800',
+                    color: 'common.white',
+                    transform: 'translateY(-1px)',
+                    boxShadow: (theme) => theme.shadows[4]
+                  }
+                }}
+              >
+                {loading ? 'Đang tải...' : 'Xem thêm'}
+              </Button>
+            </div>
+          )}
+        </>
+      )}
+    </div>
   )
 }
 

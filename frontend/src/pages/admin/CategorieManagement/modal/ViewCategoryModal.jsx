@@ -272,7 +272,8 @@ const ViewCategoryModal = ({ open, onClose, category }) => {
                         sx={{
                           whiteSpace: 'nowrap',
                           overflow: 'hidden',
-                          textOverflow: 'ellipsis'
+                          textOverflow: 'ellipsis',
+                          fontSize: 14
                         }}
                       >
                         {category?.description || 'Không có mô tả'}

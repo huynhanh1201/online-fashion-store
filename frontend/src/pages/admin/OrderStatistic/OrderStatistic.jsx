@@ -49,10 +49,23 @@ const OrderStatistic = ({ stats = {}, financeStatistics, year, setYear }) => {
   } = stats
 
   const monthlyStats = financeStatistics?.revenueChart?.monthlyStats || []
+  // const monthlyLabels = Array.from({ length: 12 }, (_, i) => `Tháng ${i + 1}`)
+  // const monthlyProfitData = Array(12).fill(0)
+  // monthlyStats.forEach((stat) => {
+  //   monthlyProfitData[stat.month - 1] = stat.revenue || 0
+  // })
+
+  const currentYear = new Date().getFullYear()
+  const currentMonth = new Date().getMonth() + 1 // 1-12
+
   const monthlyLabels = Array.from({ length: 12 }, (_, i) => `Tháng ${i + 1}`)
-  const monthlyProfitData = Array(12).fill(0)
-  monthlyStats.forEach((stat) => {
-    monthlyProfitData[stat.month - 1] = stat.revenue || 0
+  const monthlyProfitData = monthlyLabels.map((_, i) => {
+    // Nếu là năm hiện tại và tháng này chưa tới → bỏ dữ liệu
+    if (year === currentYear.toString() && i + 1 > currentMonth) {
+      return null
+    }
+    const stat = monthlyStats.find((m) => Number(m.month) === i + 1)
+    return stat?.revenue || 0
   })
 
   const selectedYear = year || '2025'

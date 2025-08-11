@@ -360,11 +360,17 @@ export default function AddWarehouseSlipModal({
                       value={newSlipData.partnerId || ''}
                       onChange={handleChange('partnerId')}
                     >
-                      {partners.map((partner) => (
-                        <MenuItem key={partner._id} value={partner._id}>
-                          {partner.name}
-                        </MenuItem>
-                      ))}
+                      {partners
+                        .filter((partner) =>
+                          type === 'input'
+                            ? partner.type === 'supplier'
+                            : partner.type === 'customer'
+                        )
+                        .map((partner) => (
+                          <MenuItem key={partner._id} value={partner._id}>
+                            {partner.name}
+                          </MenuItem>
+                        ))}
                       <MenuItem onClick={() => setOpenAddDialog(true)}>
                         Thêm đối tác
                       </MenuItem>
@@ -401,7 +407,7 @@ export default function AddWarehouseSlipModal({
           <Paper variant='outlined'>
             <Box p={2} sx={{ minHeight: '295px' }}>
               <Typography fontWeight={600} mb={1}>
-                Danh sách sản phẩm {type === 'input' ? 'nhập' : 'xuất'}
+                Danh sách biến thể {type === 'input' ? 'nhập' : 'xuất'}
               </Typography>
               <TableContainer
                 sx={{ minHeight: '288px', overflow: 'auto', zIndex: 0 }}
@@ -419,7 +425,7 @@ export default function AddWarehouseSlipModal({
                         STT
                       </TableCell>
                       <TableCell sx={{ backgroundColor: 'transparent' }}>
-                        Tên sản phẩm
+                        Tên biến thể
                       </TableCell>
                       <TableCell sx={{ backgroundColor: 'transparent' }}>
                         SL {type === 'input' ? 'nhập' : 'xuất'}

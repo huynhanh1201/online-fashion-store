@@ -108,10 +108,41 @@ export default function SystemDashboard({
       color: '#F44336'
     }
   ]
+  // const monthlyLabels = Array.from({ length: 12 }, (_, i) => `Tháng ${i + 1}`)
+  // const monthlyStats = financeStatistics?.revenueChart?.monthlyStats || []
+
+  // const revenueData = monthlyLabels.map((_, i) => {
+  //   const stat = monthlyStats.find((m) => Number(m.month) === i + 1)
+  //   return stat?.revenue || 0
+  // })
+
+  // const currentYear = new Date().getFullYear()
+  // const currentMonth = new Date().getMonth() + 1 // từ 1–12
+
+  // // Nếu là năm hiện tại thì chỉ lấy tới tháng hiện tại
+  // const monthlyLabels = Array.from(
+  //   { length: year === currentYear.toString() ? currentMonth : 12 },
+  //   (_, i) => `Tháng ${i + 1}`
+  // )
+
+  // const monthlyStats = financeStatistics?.revenueChart?.monthlyStats || []
+
+  // const revenueData = monthlyLabels.map((_, i) => {
+  //   const stat = monthlyStats.find((m) => Number(m.month) === i + 1)
+  //   return stat?.revenue || 0
+  // })
+
+  const currentYear = new Date().getFullYear()
+  const currentMonth = new Date().getMonth() + 1 // từ 1–12
+
   const monthlyLabels = Array.from({ length: 12 }, (_, i) => `Tháng ${i + 1}`)
   const monthlyStats = financeStatistics?.revenueChart?.monthlyStats || []
 
   const revenueData = monthlyLabels.map((_, i) => {
+    // Nếu là năm hiện tại và tháng này chưa tới → không hiển thị dữ liệu
+    if (year === currentYear.toString() && i + 1 > currentMonth) {
+      return null // Chart.js sẽ bỏ trống điểm này
+    }
     const stat = monthlyStats.find((m) => Number(m.month) === i + 1)
     return stat?.revenue || 0
   })

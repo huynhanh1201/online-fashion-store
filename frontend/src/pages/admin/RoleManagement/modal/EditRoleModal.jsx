@@ -108,7 +108,7 @@ const EditRoleModal = ({ open, onClose, onSubmit, p, defaultValues }) => {
         </Button>
       </DialogActions>
       <DialogContent dividers sx={{ pt: 0 }}>
-        {/* <Controller
+        <Controller
           name='name'
           control={control}
           rules={{
@@ -132,52 +132,11 @@ const EditRoleModal = ({ open, onClose, onSubmit, p, defaultValues }) => {
                   Tên vai trò <span style={{ color: 'red' }}>*</span>
                 </>
               }
+              disabled
               error={!!errors.name}
               helperText={errors.name?.message}
             />
           )}
-        /> */}
-        <Controller
-          name='name'
-          control={control}
-          rules={{
-            required: 'Không được bỏ trống tên vai trò',
-            pattern: {
-              value: /^[a-zA-Z0-9_]+$/,
-              message: 'Tên chỉ chứa chữ cái, số và dấu gạch dưới'
-            },
-            maxLength: {
-              value: 50,
-              message: 'Tên vai trò không được quá 50 ký tự'
-            }
-          }}
-          render={({ field }) => {
-            const disabledRoles = [
-              'owner',
-              'technical_admin',
-              'customer',
-              'staff'
-            ]
-            const isDisabled = disabledRoles.includes(
-              field.value?.toLowerCase()
-            )
-
-            return (
-              <TextField
-                {...field}
-                fullWidth
-                margin='normal'
-                label={
-                  <>
-                    Tên vai trò <span style={{ color: 'red' }}>*</span>
-                  </>
-                }
-                error={!!errors.name}
-                helperText={errors.name?.message}
-                disabled={isDisabled}
-              />
-            )
-          }}
         />
 
         <Controller
