@@ -48,7 +48,7 @@ const ViewBatchModal = ({ open, onClose, batch }) => {
             </TableRow>
             <TableRow>
               <TableCell>
-                <strong>Tên sản phẩm</strong>
+                <strong>Tên biến thể</strong>
               </TableCell>
               <TableCell>
                 {variantName
@@ -62,7 +62,7 @@ const ViewBatchModal = ({ open, onClose, batch }) => {
             </TableRow>
             <TableRow>
               <TableCell>
-                <strong>Số lượng sản phẩm</strong>
+                <strong>Số lượng biến thể</strong>
               </TableCell>
               <TableCell>{batch.quantity ?? 'N/A'}</TableCell>
             </TableRow>

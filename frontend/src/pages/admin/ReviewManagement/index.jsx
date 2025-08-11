@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import ReviewTable from './ReviewTable'
+import ReviewTable from '~/pages/admin/ReviewManagement/ReviewTable'
 import useReviews from '~/hooks/admin/useReview'
 import ViewReviewModal from '~/pages/admin/ReviewManagement/modal/ViewReviewModal'
 import DeleteReviewModal from '~/pages/admin/ReviewManagement/modal/DeleteReviewModal'

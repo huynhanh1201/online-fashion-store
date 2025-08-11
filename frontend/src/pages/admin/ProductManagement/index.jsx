@@ -129,22 +129,30 @@
 import React from 'react'
 import Box from '@mui/material/Box'
 
-import ProductTable from './ProductTable'
+import ProductTable from '~/pages/admin/ProductManagement/ProductTable'
 
 import useProducts from '~/hooks/admin/useProducts'
 import useCategories from '~/hooks/admin/useCategories'
 import usePermissions from '~/hooks/usePermissions'
 import { PermissionWrapper, RouteGuard } from '~/components/PermissionGuard'
 import { useLocation } from 'react-router-dom'
-const AddProductModal = React.lazy(() => import('./modal/AddProductModal'))
-const EditProductModal = React.lazy(() => import('./modal/EditProductModal'))
+const AddProductModal = React.lazy(
+  () => import('~/pages/admin/ProductManagement/modal/AddProductModal')
+)
+const EditProductModal = React.lazy(
+  () => import('~/pages/admin/ProductManagement/modal/EditProductModal')
+)
 const DeleteProductModal = React.lazy(
   () => import('./modal/DeleteProductModal')
 )
-const ViewProductModal = React.lazy(() => import('./modal/ViewProductModal'))
-const ViewDesc = React.lazy(() => import('./modal/ViewDescriptionModal.jsx'))
+const ViewProductModal = React.lazy(
+  () => import('~/pages/admin/ProductManagement/modal/ViewProductModal')
+)
+const ViewDesc = React.lazy(
+  () => import('~/pages/admin/ProductManagement/modal/ViewDescriptionModal.jsx')
+)
 const RestoreProductModal = React.lazy(
-  () => import('./modal/RestoreProductModal.jsx')
+  () => import('~/pages/admin/ProductManagement/modal/RestoreProductModal.jsx')
 )
 import ViewDescriptionModal from '~/pages/admin/ProductManagement/modal/ViewDescriptionModal.jsx'
 import useColorPalettes from '~/hooks/admin/useColorPalettes.js'

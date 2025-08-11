@@ -15,9 +15,9 @@ import {
 } from '@mui/material'
 import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye'
 import BorderColorIcon from '@mui/icons-material/BorderColor'
-import EditBatchModal from '../modal/Batch/EditBatchModal.jsx'
-import ViewBatchModal from '../modal/Batch/ViewBatchModal.jsx'
-import DeleteBatchModal from '../modal/Batch/DeleteBatchModal.jsx'
+import EditBatchModal from '~/pages/admin/InventoryManagement/modal/Batch/EditBatchModal.jsx'
+import ViewBatchModal from '~/pages/admin/InventoryManagement/modal/Batch/ViewBatchModal.jsx'
+import DeleteBatchModal from '~/pages/admin/InventoryManagement/modal/Batch/DeleteBatchModal.jsx'
 import FilterBatches from '~/components/FilterAdmin/FilterBatches.jsx'
 import useBatches from '~/hooks/admin/Inventory/useBatches.js'
 import TablePaginationActions from '~/components/PaginationAdmin/TablePaginationActions.jsx'
@@ -64,11 +64,11 @@ const BatchesTab = () => {
       align: 'center'
     },
     { id: 'batchCode', label: 'Mã lô hàng ', minWidth: 120, maxWidth: 120 },
-    { id: 'variantName', label: 'Tên sản phẩm', minWidth: 200, maxWidth: 200 },
+    { id: 'variantName', label: 'Tên biến thể', minWidth: 200, maxWidth: 200 },
     { id: 'warehouseName', label: 'Kho hàng', minWidth: 100, maxWidth: 150 },
     {
       id: 'quantity',
-      label: 'Số lượng sản phẩm',
+      label: 'Số lượng biến thể',
       minWidth: 80,
       maxWidth: 120,
       align: 'right',

@@ -20,7 +20,7 @@ import {
   Chip
 } from '@mui/material'
 import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye'
-import ViewInventoryLogModal from '../modal/InventoryLog/ViewInventoryLogModal'
+import ViewInventoryLogModal from '~/pages/admin/InventoryManagement/modal/InventoryLog/ViewInventoryLogModal'
 import FilterInventoryLog from '~/components/FilterAdmin/FilterInventoryLog.jsx'
 import useInventoryLog from '~/hooks/admin/Inventory/useInventoryLogs.js'
 import TablePaginationActions from '~/components/PaginationAdmin/TablePaginationActions.jsx'
@@ -57,7 +57,7 @@ const InventoryLogTab = () => {
       width: 50,
       align: 'center'
     },
-    { id: 'variantName', label: 'Tên sản phẩm', minWidth: 150, maxWidth: 200 },
+    { id: 'variantName', label: 'Tên biến thể', minWidth: 150, maxWidth: 200 },
     // {
     //   id: 'createdByName',
     //   label: 'Người thực hiện',

@@ -17,11 +17,11 @@ import {
 import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye'
 import BorderColorIcon from '@mui/icons-material/BorderColor'
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever'
-import AddVariantModal from '../modal/Variant/AddVariantModal.jsx'
-import ViewVariantModal from '../modal/Variant/ViewVariantModal.jsx' // Thêm Chart mới
-import EditVariantModal from '../modal/Variant/EditVariantModal.jsx' // Thêm Chart mới
-import DeleteVariantModal from '../modal/Variant/DeleteVariantModal.jsx'
-import RestoreVariantModal from '../modal/Variant/RestoreVariantModal.jsx' // Thêm Chart mới
+import AddVariantModal from '~/pages/admin/InventoryManagement/modal/Variant/AddVariantModal.jsx'
+import ViewVariantModal from '~/pages/admin/InventoryManagement/modal/Variant/ViewVariantModal.jsx' // Thêm Chart mới
+import EditVariantModal from '~/pages/admin/InventoryManagement/modal/Variant/EditVariantModal.jsx' // Thêm Chart mới
+import DeleteVariantModal from '~/pages/admin/InventoryManagement/modal/Variant/DeleteVariantModal.jsx'
+import RestoreVariantModal from '~/pages/admin/InventoryManagement/modal/Variant/RestoreVariantModal.jsx' // Thêm Chart mới
 import AddIcon from '@mui/icons-material/Add'
 import FilterVariant from '~/components/FilterAdmin/FilterVariant.jsx'
 import useVariants from '~/hooks/admin/Inventory/useVariants.js'

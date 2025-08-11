@@ -1,5 +1,5 @@
 import React from 'react'
-import AccountTable from './AccountTable.jsx'
+import AccountTable from '~/pages/admin/AccountManagement/AccountTable.jsx'
 
 import useProfile from '~/hooks/useUserProfile.js'
 import useAccount from '~/hooks/admin/useAccount.js'
@@ -9,17 +9,19 @@ import { PermissionWrapper, RouteGuard } from '~/components/PermissionGuard'
 
 // Lazy load các Chart
 const ViewAccountModal = React.lazy(
-  () => import('./modal/ViewAccountModal.jsx')
+  () => import('~/pages/admin/AccountManagement/modal/ViewAccountModal.jsx')
 )
 const EditAccountModal = React.lazy(
-  () => import('./modal/EditAccountModal.jsx')
+  () => import('~/pages/admin/AccountManagement/modal/EditAccountModal.jsx')
 )
 const DeleteAccountModal = React.lazy(
-  () => import('./modal/DeleteAccountModal.jsx')
+  () => import('~/pages/admin/AccountManagement/modal/DeleteAccountModal.jsx')
 )
-const AddAccountModal = React.lazy(() => import('./modal/AddAccountModal.jsx'))
+const AddAccountModal = React.lazy(
+  () => import('~/pages/admin/AccountManagement/modal/AddAccountModal.jsx')
+)
 const RestoreAccountModal = React.lazy(
-  () => import('./modal/RestoreAccountModal.jsx')
+  () => import('~/pages/admin/AccountManagement/modal/RestoreAccountModal.jsx')
 )
 const AccountManagement = () => {
   const { roles, fetchRoles } = useRoles()

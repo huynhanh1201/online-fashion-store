@@ -1,5 +1,5 @@
 import React from 'react'
-import CategoryTable from './CategoryTable'
+import CategoryTable from '~/pages/admin/CategorieManagement/CategoryTable'
 import useCategories from '~/hooks/admin/useCategories'
 import usePermissions from '~/hooks/usePermissions'
 import { PermissionWrapper, RouteGuard } from '~/components/PermissionGuard'
@@ -16,10 +16,10 @@ const EditCategoryModal = React.lazy(
   () => import('~/pages/admin/CategorieManagement/modal/EditCategoryModal')
 )
 const DeleteCategoryModal = React.lazy(
-  () => import('./modal/DeleteCategoryModal')
+  () => import('~/pages/admin/CategorieManagement/modal/DeleteCategoryModal')
 )
 const RestoreCategoryModal = React.lazy(
-  () => import('./modal/RestoreCategoryModal')
+  () => import('~/pages/admin/CategorieManagement/modal/RestoreCategoryModal')
 )
 
 const CategoryManagement = () => {

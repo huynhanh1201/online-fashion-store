@@ -20,13 +20,19 @@ import BorderColorIcon from '@mui/icons-material/BorderColor'
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff'
 import AddIcon from '@mui/icons-material/Add'
 const AddWarehouseModal = React.lazy(
-  () => import('../modal/Warehouse/AddWarehouseModal.jsx')
+  () =>
+    import(
+      '~/pages/admin/InventoryManagement/modal/Warehouse/AddWarehouseModal.jsx'
+    )
 )
 const EditWarehouseModal = React.lazy(
-  () => import('../modal/Warehouse/EditWarehouseModal')
+  () =>
+    import(
+      '~/pages/admin/InventoryManagement/modal/Warehouse/EditWarehouseModal'
+    )
 )
-import ViewWarehouseModal from '../modal/Warehouse/ViewWarehouseModal.jsx'
-import DeleteWarehouseModal from '../modal/Warehouse/DeleteWarehouseModal.jsx' // Thêm Chart mới
+import ViewWarehouseModal from '~/pages/admin/InventoryManagement/modal/Warehouse/ViewWarehouseModal.jsx'
+import DeleteWarehouseModal from '~/pages/admin/InventoryManagement/modal/Warehouse/DeleteWarehouseModal.jsx' // Thêm Chart mới
 import Tooltip from '@mui/material/Tooltip'
 // import FilterWarehouse from '~/components/FilterAdmin/FilterWarehouse.jsx'
 import useWarehouses from '~/hooks/admin/Inventory/useWarehouses.js'

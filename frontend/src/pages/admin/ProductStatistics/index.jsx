@@ -1,4 +1,4 @@
-import ProductStatistics from './ProductStatistic.jsx'
+import ProductStatistics from '~/pages/admin/ProductStatistics/ProductStatistic.jsx'
 import React, { useEffect } from 'react'
 import useInventoryStatistics from '~/hooks/admin/useStatistic.js'
 import { RouteGuard } from '~/components/PermissionGuard'

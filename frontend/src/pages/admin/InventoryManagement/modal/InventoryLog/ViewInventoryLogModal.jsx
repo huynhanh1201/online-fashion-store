@@ -43,7 +43,7 @@ const ViewInventoryLogModal = ({ open, onClose, log }) => {
             </TableRow>
             <TableRow>
               <TableCell sx={{ minWidth: 200 }}>
-                <strong>Tên sản phẩm</strong>
+                <strong>Tên biến thể</strong>
               </TableCell>
               <TableCell>
                 {log.inventoryId?.variantId?.name

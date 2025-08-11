@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react'
-import AccountStatistics from './AccountStatistic'
+import AccountStatistics from '~/pages/admin/AccountStatistic/AccountStatistic.jsx'
 import useInventoryStatistics from '~/hooks/admin/useStatistic.js'
 import useRoles from '~/hooks/admin/useRoles.js'
 import { RouteGuard } from '~/components/PermissionGuard'

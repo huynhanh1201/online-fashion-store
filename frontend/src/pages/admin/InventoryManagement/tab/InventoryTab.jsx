@@ -397,9 +397,9 @@ import {
 import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye'
 import BorderColorIcon from '@mui/icons-material/BorderColor'
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff'
-import ViewInventoryModal from '../modal/Inventory/ViewInventoryModal.jsx'
-import EditInventoryModal from '../modal/Inventory/EditInventoryModal.jsx'
-import DeleteInventoryModal from '../modal/Inventory/DeleteInventoryModal.jsx'
+import ViewInventoryModal from '~/pages/admin/InventoryManagement/modal/Inventory/ViewInventoryModal.jsx'
+import EditInventoryModal from '~/pages/admin/InventoryManagement/modal/Inventory/EditInventoryModal.jsx'
+import DeleteInventoryModal from '~/pages/admin/InventoryManagement/modal/Inventory/DeleteInventoryModal.jsx'
 import FilterInventory from '~/components/FilterAdmin/FilterInventory.jsx'
 import useVariants from '~/hooks/admin/Inventory/useVariants.js'
 import useInventory from '~/hooks/admin/Inventory/useInventorys.js'
@@ -454,7 +454,7 @@ const InventoryTab = () => {
     },
     { id: 'warehouse', label: 'Kho hàng', minWidth: 150, maxWidth: 150 },
 
-    { id: 'variantName', label: 'Tên sản phẩm', minWidth: 200, maxWidth: 150 },
+    { id: 'variantName', label: 'Tên biến thể', minWidth: 200, maxWidth: 150 },
     { id: 'sku', label: 'Mã biến thể', minWidth: 200, maxWidth: 150 },
     {
       id: 'quantity',

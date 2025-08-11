@@ -1,5 +1,5 @@
 import React from 'react'
-import UserTable from './UserTable'
+import UserTable from '~/pages/admin/UserManagement/UserTable'
 
 import useUsers from '~/hooks/admin/useUsers'
 import useRoles from '~/hooks/admin/useRoles.js'
@@ -7,10 +7,18 @@ import usePermissions from '~/hooks/usePermissions'
 import { PermissionWrapper, RouteGuard } from '~/components/PermissionGuard'
 
 // Lazy load các Chart
-const ViewUserModal = React.lazy(() => import('./modal/ViewUserModal'))
-const EditUserModal = React.lazy(() => import('./modal/EditUserModal'))
-const DeleteUserModal = React.lazy(() => import('./modal/DeleteUserModal'))
-const RestoreUserModal = React.lazy(() => import('./modal/RestoreUserModal'))
+const ViewUserModal = React.lazy(
+  () => import('~/pages/admin/UserManagement/modal/ViewUserModal')
+)
+const EditUserModal = React.lazy(
+  () => import('~/pages/admin/UserManagement/modal/EditUserModal')
+)
+const DeleteUserModal = React.lazy(
+  () => import('~/pages/admin/UserManagement/modal/DeleteUserModal')
+)
+const RestoreUserModal = React.lazy(
+  () => import('~/pages/admin/UserManagement/modal/RestoreUserModal')
+)
 
 const UserManagement = () => {
   const { roles, fetchRoles } = useRoles()
