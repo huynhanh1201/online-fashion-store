@@ -388,8 +388,8 @@ const Content = () => {
               <div key={banner._id || index} className='middle-banner'>
                 <img
                   src={optimizeCloudinaryUrl(banner.imageUrl, {
-                    width: 1400,
-                    height: 500,
+                    width: 1200,
+                    height: 400,
                     quality: 'auto',
                     format: 'auto'
                   })}
