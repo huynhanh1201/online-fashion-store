@@ -3,7 +3,7 @@ import { URI, CLOUD_NAME, CloudinaryImageFolder, CLOUD_FOLDER } from './constant
 export function optimizeCloudinaryUrl(url, options = {}) {
   if (!url || typeof url !== 'string') return ''
 
-  const { width = 1500, height = 1500, quality = 'auto:good', format = 'webp', crop = 'fill' } = options
+  const { width = 1500, height = 1800, quality = 'auto:good', format = 'webp', crop = 'fill' } = options
 
   const parts = url.split('/upload/')
   if (parts.length !== 2) return url

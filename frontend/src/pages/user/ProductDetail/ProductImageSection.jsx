@@ -19,7 +19,7 @@ const ProductImage = styled('img')(() => ({
 const EnlargedImage = styled('img')(() => ({
   width: 'min(90vw, 700px)',
   height: 'min(90vh, 600px)',
-  objectFit: 'cover',
+  objectFit: 'contain',
   borderRadius: '8px',
   boxShadow: '0 8px 32px rgba(0, 0, 0, 0.2)'
 }))
@@ -178,7 +178,7 @@ const ProductImageSection = ({
             {displayImages.map((img, index) => (
               <Thumbnail
                 key={`${img}-${index}`}
-                src={optimizeCloudinaryUrl(img)}
+                src={optimizeCloudinaryUrl(img, {quality : 'auto'})}
                 alt={`thumb-${index}`}
                 selected={index === selectedImageIndex}
                 onClick={() => {
