@@ -202,11 +202,42 @@ const AddVariantModal = ({
     }
   }
 
+  // const handleSaveColor = async (data) => {
+  //   try {
+  //     const newColor = await createNewColor(data)
+  //     if (newColor?.name) {
+  //       setValue('color', newColor.name) // ✅ gán tên màu mới vào field 'color'
+  //     }
+  //   } catch (error) {
+  //     console.error('Lỗi khi thêm màu:', error)
+  //     toast.error('Lỗi khi thêm màu')
+  //   }
+  // }
+  //
+  // const handleSaveSize = async (data) => {
+  //   try {
+  //     const newSize = await createNewSize(data)
+  //     if (newSize?.name) {
+  //       setValue('size', newSize.name) // ✅ gán tên size mới vào field 'size'
+  //     }
+  //   } catch (error) {
+  //     console.error('Lỗi khi thêm kích thước:', error)
+  //     toast.error('Lỗi khi thêm kích thước')
+  //   }
+  // }
+
   const handleSaveColor = async (data) => {
     try {
       const newColor = await createNewColor(data)
       if (newColor?.name) {
-        setValue('color', newColor.name) // ✅ gán tên màu mới vào field 'color'
+        // Lấy danh sách màu hiện tại
+        const currentColors = getValues('color') || []
+
+        // Thêm màu mới vào danh sách
+        setValue('color', [...currentColors, newColor.name], {
+          shouldValidate: true,
+          shouldDirty: true
+        })
       }
     } catch (error) {
       console.error('Lỗi khi thêm màu:', error)
@@ -218,7 +249,11 @@ const AddVariantModal = ({
     try {
       const newSize = await createNewSize(data)
       if (newSize?.name) {
-        setValue('size', newSize.name) // ✅ gán tên size mới vào field 'size'
+        const currentSizes = getValues('size') || []
+        setValue('size', [...currentSizes, newSize.name], {
+          shouldValidate: true,
+          shouldDirty: true
+        })
       }
     } catch (error) {
       console.error('Lỗi khi thêm kích thước:', error)
