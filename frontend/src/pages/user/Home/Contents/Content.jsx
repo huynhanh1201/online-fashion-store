@@ -331,10 +331,10 @@ const Content = () => {
                     featuredCategoriesLoading || featuredCategories.length === 0
                       ? `url(${category.imageUrl})`
                       : `url(${optimizeCloudinaryUrl(category.imageUrl, {
-                        quality: 'auto',
-                        format: 'auto',
-                        crop: 'fit'
-                      })})`,
+                          quality: 'auto',
+                          format: 'auto',
+                          crop: 'fit'
+                        })})`,
                   backgroundSize: 'cover',
                   backgroundPosition: 'center',
                   position: 'relative',
@@ -388,17 +388,17 @@ const Content = () => {
               <div key={banner._id || index} className='middle-banner'>
                 <img
                   src={optimizeCloudinaryUrl(banner.imageUrl, {
-                    width: 1200,
-                    height: 400,
+                    width: 1400,
+                    height: 500,
                     quality: 'auto',
                     format: 'auto'
                   })}
                   alt={banner.title || `Banner ${index + 1}`}
                   style={{
                     width: '100%',
-                    height: 'auto',
-                    maxHeight: '400px',
-                    objectFit: 'cover',
+                    height: '100%',
+                    maxHeight: '600px',
+                    objectFit: 'contain',
                     borderRadius: '8px',
                     cursor: banner.link ? 'pointer' : 'default'
                   }}
