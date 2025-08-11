@@ -17,32 +17,32 @@ import CloseIcon from '@mui/icons-material/Close'
 
 const SizeGuide = () => {
   const [open, setOpen] = useState(false)
-  const [selectedType, setSelectedType] = useState('ao-hoodie')
+  const [selectedType, setSelectedType] = useState('ao-thun')
 
   const productTypes = [
     {
       value: 'ao-thun',
       label: 'Áo thun',
       image:
-        'https://routine-db.s3.amazonaws.com/prod/media/bang-size-ao-thun-nam-form-oversize-png-fohn.webp'
-    },
-    {
-      value: 'ao-hoodie',
-      label: 'Áo Hoodie',
-      image:
-        'https://5sfashion.vn/storage/upload/images/ckeditor/obS180XsdbMMyBPaonJC3zDbCyLodkyA8Itb98xF.jpg'
-    },
-    {
-      value: 'quan-jean',
-      label: 'Quần jean',
-      image:
-        'https://www.uniqlo.com/vn/vi/news/topics/2024102703/img/59T_241028KavPn5.png'
+        'https://product.hstatic.net/1000360022/product/bang_size_icon_summer_daze_atid0609_362b590b2bcf4c178383a50da92e5037_1024x1024.png'
     },
     {
       value: 'ao-so-mi',
       label: 'Áo sơ mi',
       image:
-        'https://bizweb.dktcdn.net/100/360/581/files/bang-size-ao-so-mi-cho-nam-theo-so.jpg?v=1700208115125'
+        'https://product.hstatic.net/1000360022/product/bang_size_icon_summer_daze_smid0320_2979ac6904ac4f448c897f68041d657c_1024x1024.png'
+    },
+    {
+      value: 'quan-short',
+      label: 'Quần short',
+      image:
+        'https://file.hstatic.net/1000360022/file/bang-size-quan-short-form-smart-fit_f4b77b8408d64694b970558b3c008149.jpg'
+    },
+    {
+      value: 'quan-jean',
+      label: 'Quần jean',
+      image:
+        'https://down-vn.img.susercontent.com/file/vn-11134201-7ras8-mamtcudrjetd8d.webp'
     }
   ]
 

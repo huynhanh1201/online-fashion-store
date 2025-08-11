@@ -6,6 +6,7 @@ const MenuPreview = ({ menuData, megamenuSettings }) => {
   const mainMenus = (menuData.mainMenu || [])
     .filter((item) => item.visible && item.children && item.children.length > 0)
     .sort((a, b) => (a.order || 0) - (b.order || 0))
+    .reverse()
 
   // Áp dụng số cột tối đa từ megamenuSettings
   const maxColumns = megamenuSettings?.maxColumns || 4
