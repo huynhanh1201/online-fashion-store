@@ -26,9 +26,9 @@ const ViewInventoryModal = ({ open, onClose, inventory }) => {
         '& .MuiDialog-paper': {
           width: 'auto', // Chiều rộng theo nội dung
           maxWidth: 'md', // Giới hạn không vượt quá md
-          minWidth: 600, // (tuỳ chọn) đảm bảo không quá nhỏ
+          minWidth: 600 // (tuỳ chọn) đảm bảo không quá nhỏ
         },
-          padding: '16px 24px'
+        padding: '16px 24px'
       }}
       BackdropProps={{
         sx: StyleAdmin.OverlayModal
@@ -60,7 +60,7 @@ const ViewInventoryModal = ({ open, onClose, inventory }) => {
                 </TableRow>
                 <TableRow>
                   <TableCell>
-                    <strong>Tên sản phẩm</strong>
+                    <strong>Tên biến thể</strong>
                   </TableCell>
                   <TableCell>
                     {inventory.variantId?.name

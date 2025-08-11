@@ -64,11 +64,11 @@ const BatchesTab = () => {
       align: 'center'
     },
     { id: 'batchCode', label: 'Mã lô hàng ', minWidth: 120, maxWidth: 120 },
-    { id: 'variantName', label: 'Tên sản phẩm', minWidth: 200, maxWidth: 200 },
+    { id: 'variantName', label: 'Tên biến thể', minWidth: 200, maxWidth: 200 },
     { id: 'warehouseName', label: 'Kho hàng', minWidth: 100, maxWidth: 150 },
     {
       id: 'quantity',
-      label: 'Số lượng sản phẩm',
+      label: 'Số lượng biến thể',
       minWidth: 80,
       maxWidth: 120,
       align: 'right',

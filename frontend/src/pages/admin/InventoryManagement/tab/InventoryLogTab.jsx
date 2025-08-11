@@ -57,7 +57,7 @@ const InventoryLogTab = () => {
       width: 50,
       align: 'center'
     },
-    { id: 'variantName', label: 'Tên sản phẩm', minWidth: 150, maxWidth: 200 },
+    { id: 'variantName', label: 'Tên biến thể', minWidth: 150, maxWidth: 200 },
     // {
     //   id: 'createdByName',
     //   label: 'Người thực hiện',

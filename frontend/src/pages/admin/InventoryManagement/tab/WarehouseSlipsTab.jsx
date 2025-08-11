@@ -198,7 +198,7 @@ const WarehouseSlipsTab = () => {
     { id: 'warehouse', label: 'Kho hàng', minWidth: 120, maxWidth: 180 },
     {
       id: 'itemCount',
-      label: 'Số lượng sản phẩm',
+      label: 'Số lượng biến thể',
       minWidth: 90,
       align: 'right',
       pr: 14,

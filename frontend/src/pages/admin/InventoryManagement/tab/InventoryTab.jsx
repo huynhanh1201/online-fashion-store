@@ -454,7 +454,7 @@ const InventoryTab = () => {
     },
     { id: 'warehouse', label: 'Kho hàng', minWidth: 150, maxWidth: 150 },
 
-    { id: 'variantName', label: 'Tên sản phẩm', minWidth: 200, maxWidth: 150 },
+    { id: 'variantName', label: 'Tên biến thể', minWidth: 200, maxWidth: 150 },
     { id: 'sku', label: 'Mã biến thể', minWidth: 200, maxWidth: 150 },
     {
       id: 'quantity',

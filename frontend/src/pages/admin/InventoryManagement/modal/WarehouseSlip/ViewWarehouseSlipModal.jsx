@@ -166,7 +166,7 @@ const ViewWarehouseSlipModal = ({ open, onClose, slip }) => {
           <TableHead>
             <TableRow>
               <TableCell>Mã biến thể</TableCell>
-              <TableCell>Tên sản phẩm</TableCell>
+              <TableCell>Tên biến thể</TableCell>
               <TableCell align='right'>Số lượng</TableCell>
               <TableCell>Đơn vị</TableCell>
             </TableRow>

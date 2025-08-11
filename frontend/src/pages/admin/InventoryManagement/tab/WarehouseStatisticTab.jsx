@@ -54,7 +54,7 @@ function WarehouseStatisticTab() {
           fontWeight='700'
           sx={styles.header}
         >
-          Thống kê kho hàng
+          Thống kê kho
         </Typography>
         <InventorySummaryCard data={warehouseStatistics} loading={loading} />
       </Box>
