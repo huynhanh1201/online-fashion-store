@@ -331,10 +331,10 @@ const Content = () => {
                     featuredCategoriesLoading || featuredCategories.length === 0
                       ? `url(${category.imageUrl})`
                       : `url(${optimizeCloudinaryUrl(category.imageUrl, {
-                        quality: 'auto',
-                        format: 'auto',
-                        crop: 'fit'
-                      })})`,
+                          quality: 'auto',
+                          format: 'auto',
+                          crop: 'fit'
+                        })})`,
                   backgroundSize: 'cover',
                   backgroundPosition: 'center',
                   position: 'relative',
@@ -396,9 +396,9 @@ const Content = () => {
                   alt={banner.title || `Banner ${index + 1}`}
                   style={{
                     width: '100%',
-                    height: 'auto',
-                    maxHeight: '400px',
-                    objectFit: 'cover',
+                    height: '100%',
+                    maxHeight: '600px',
+                    objectFit: 'contain',
                     borderRadius: '8px',
                     cursor: banner.link ? 'pointer' : 'default'
                   }}
