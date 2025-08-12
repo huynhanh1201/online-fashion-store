@@ -20,6 +20,7 @@ const ProductDetail = () => {
   const [category, setCategory] = useState(null)
   const navigate = useNavigate()
 
+  
 
   const {
     product,
