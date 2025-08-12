@@ -21,7 +21,7 @@ const createRole = async (reqBody) => {
   }
 }
 
-const getRoleList = async (queryString) => {
+const getRoleList = async (queryString,jwtDecoded) => {
   let {
     page = 1,
     limit = 10,
@@ -40,6 +40,14 @@ const getRoleList = async (queryString) => {
 
   // Xử lý thông tin Filter
   const filter = {}
+
+
+  //==========================
+
+  if(jwtDecoded.role !== 'technical_admin') filter.name = { $ne: 'technical_admin' }
+
+  //==========================
+
 
   if (destroy === 'true' || destroy === 'false') {
     destroy = JSON.parse(destroy)
