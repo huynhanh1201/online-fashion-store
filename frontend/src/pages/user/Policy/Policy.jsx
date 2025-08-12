@@ -15,7 +15,7 @@ import { getAllPolicies } from '~/services/policyService'
 const tabLabels = [
   'Điều khoản sử dụng',
   'Chính sách bảo mật',
-  'Chính sách member',
+  'Chính sách thành viên',
   'Chính sách đổi trả',
   'Chính sách vận chuyển',
   'Chính sách bảo hành'

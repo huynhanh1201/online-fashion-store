@@ -709,17 +709,15 @@ const BlogDetail = () => {
                       width: '100%',
                       height: 'auto',
                       display: 'block',
-                      margin: '1rem 0',
                       objectFit: 'contain',
                       objectPosition: 'center',
                       border: 'none',
                     },
-                    '& p': { mb: 3 },
+                    '& p': { mb: 0 },
                     '& h1, & h2, & h3, & h4, & h5, & h6': {
-                      mt: 4,
-                      mb: 3,
-                      wordWrap: 'break-word',
-                      fontSize: { xs: '1.1rem', md: '1.2rem' }
+                      // mt: 4,
+                      // mb: 3,
+                      wordWrap: 'break-word'
                     },
                     '& ul, & ol': { mb: 3, ml: 2 },
                     '& li': { mb: 1 },
