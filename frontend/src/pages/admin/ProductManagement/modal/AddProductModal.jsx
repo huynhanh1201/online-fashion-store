@@ -88,7 +88,7 @@ const AddProductModal = ({ open, onClose, onSuccess }) => {
   }, [open, reset])
 
   const handAddCategory = async (category) => {
-    const newCategory = await add(category) // category trả về từ add()
+    const newCategory = await add(category, {}, true) // category trả về từ add()
 
     // Gọi lại danh sách nếu cần thiết
     fetchCategories(1, 100000)

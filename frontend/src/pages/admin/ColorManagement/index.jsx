@@ -5,22 +5,12 @@ import useColors from '~/hooks/admin/useColor'
 import usePermissions from '~/hooks/usePermissions'
 import { PermissionWrapper, RouteGuard } from '~/components/PermissionGuard'
 
-// Lazy load các Chart
-const AddColorModal = React.lazy(
-  () => import('~/pages/admin/ColorManagement/modal/AddColorModal')
-)
-const ViewColorModal = React.lazy(
-  () => import('~/pages/admin/ColorManagement/modal/ViewColorModal')
-)
-const EditColorModal = React.lazy(
-  () => import('~/pages/admin/ColorManagement/modal/EditColorModal')
-)
-const DeleteColorModal = React.lazy(
-  () => import('~/pages/admin/ColorManagement/modal/DeleteColorModal')
-)
-const RestoreColorModal = React.lazy(
-  () => import('~/pages/admin/ColorManagement/modal/RestoreColorModal')
-)
+import AddColorModal from '~/pages/admin/ColorManagement/modal/AddColorModal'
+import ViewColorModal from '~/pages/admin/ColorManagement/modal/ViewColorModal'
+import EditColorModal from '~/pages/admin/ColorManagement/modal/EditColorModal'
+import DeleteColorModal from '~/pages/admin/ColorManagement/modal/DeleteColorModal'
+import RestoreColorModal from '~/pages/admin/ColorManagement/modal/RestoreColorModal'
+
 const ColorManagement = () => {
   const [page, setPage] = React.useState(1)
   const [selectedColor, setSelectedColor] = React.useState(null)
@@ -111,57 +101,47 @@ const ColorManagement = () => {
         filters={filters}
       />
 
-      <React.Suspense fallback={<></>}>
-        <PermissionWrapper requiredPermissions={['color:create']}>
-          {modalType === 'add' && (
-            <AddColorModal
-              open
-              onClose={handleCloseModal}
-              onAdded={handleSave}
-            />
-          )}
-        </PermissionWrapper>
+      <PermissionWrapper requiredPermissions={['color:create']}>
+        {modalType === 'add' && (
+          <AddColorModal open onClose={handleCloseModal} onAdded={handleSave} />
+        )}
+      </PermissionWrapper>
 
-        {modalType === 'view' && selectedColor && (
-          <ViewColorModal
+      {modalType === 'view' && selectedColor && (
+        <ViewColorModal open onClose={handleCloseModal} color={selectedColor} />
+      )}
+
+      <PermissionWrapper requiredPermissions={['color:update']}>
+        {modalType === 'edit' && selectedColor && (
+          <EditColorModal
             open
             onClose={handleCloseModal}
             color={selectedColor}
+            onSave={handleSave}
           />
         )}
+      </PermissionWrapper>
 
-        <PermissionWrapper requiredPermissions={['color:update']}>
-          {modalType === 'edit' && selectedColor && (
-            <EditColorModal
-              open
-              onClose={handleCloseModal}
-              color={selectedColor}
-              onSave={handleSave}
-            />
-          )}
-        </PermissionWrapper>
-
-        <PermissionWrapper requiredPermissions={['color:delete']}>
-          {modalType === 'delete' && selectedColor && (
-            <DeleteColorModal
-              open
-              onClose={handleCloseModal}
-              color={selectedColor}
-              onDelete={handleSave}
-            />
-          )}
-        </PermissionWrapper>
-        <PermissionWrapper requiredPermissions={['color:restore']}>
-          {modalType === 'restore' && selectedColor && (
-            <RestoreColorModal
-              open
-              onClose={handleCloseModal}
-              color={selectedColor}
-              onRestore={handleSave}
-            />
-          )}
-        </PermissionWrapper>
-      </React.Suspense>
+      <PermissionWrapper requiredPermissions={['color:delete']}>
+        {modalType === 'delete' && selectedColor && (
+          <DeleteColorModal
+            open
+            onClose={handleCloseModal}
+            color={selectedColor}
+            onDelete={handleSave}
+          />
+        )}
+      </PermissionWrapper>
+      <PermissionWrapper requiredPermissions={['color:restore']}>
+        {modalType === 'restore' && selectedColor && (
+          <RestoreColorModal
+            open
+            onClose={handleCloseModal}
+            color={selectedColor}
+            onRestore={handleSave}
+          />
+        )}
+      </PermissionWrapper>
     </RouteGuard>
   )
 }

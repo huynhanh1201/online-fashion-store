@@ -142,7 +142,7 @@ const WarehouseSlipsTab = () => {
   }
 
   const handleAddPartner = async (partnerData) => {
-    const newPartner = await createNewPartner(partnerData)
+    const newPartner = await createNewPartner(partnerData, {}, true)
     if (newPartner) {
       // ✅ Gán đối tượng mới được thêm vào Select
       setNewSlipData((prev) => ({

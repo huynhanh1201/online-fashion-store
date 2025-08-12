@@ -27,7 +27,7 @@ import { useParams } from 'react-router-dom'
 import { getCategoryById, getChildCategories } from '~/services/categoryService'
 import { optimizeCloudinaryUrl } from '~/utils/cloudinary.js'
 
-const ITEMS_PER_PAGE = 12
+const ITEMS_PER_PAGE = 15
 
 // Custom styled components
 const SortDropdownButton = styled('button')(({ theme }) => ({
@@ -174,7 +174,7 @@ const ProductbyCategory = () => {
         const allProducts = []
         const seen = new Set()
         allResults.forEach((result) => {
-          ; (result.products || []).forEach((product) => {
+          ;(result.products || []).forEach((product) => {
             if (!seen.has(product._id)) {
               seen.add(product._id)
               allProducts.push(product)
@@ -203,7 +203,6 @@ const ProductbyCategory = () => {
               return priceA - priceB
             })
             break
-
           case 'priceDesc':
             sortedProducts.sort((a, b) => {
               const priceA =
@@ -239,7 +238,7 @@ const ProductbyCategory = () => {
       console.error('Chi tiết lỗi:', error)
       setErrorProducts(
         error.message ||
-        'Không thể tải danh sách sản phẩm. Vui lòng thử lại sau.'
+          'Không thể tải danh sách sản phẩm. Vui lòng thử lại sau.'
       )
       setProducts([])
       setTotalPages(1)
@@ -381,8 +380,8 @@ const ProductbyCategory = () => {
         <img
           src={optimizeCloudinaryUrl(
             category?.banner ||
-            category?.image ||
-            'https://www.rcuw.org/wp-content/themes/champion/images/SM-placeholder.png',
+              category?.image ||
+              'https://www.rcuw.org/wp-content/themes/champion/images/SM-placeholder.png',
             { width: 1920, height: 400 }
           )}
           alt='banner'

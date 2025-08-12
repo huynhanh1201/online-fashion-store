@@ -6,22 +6,12 @@ import useSizes from '~/hooks/admin/useSize'
 import usePermissions from '~/hooks/usePermissions'
 import { PermissionWrapper, RouteGuard } from '~/components/PermissionGuard'
 
-// Lazy load các Chart
-const AddSizeModal = React.lazy(
-  () => import('~/pages/admin/SizeManagement/modal/AddSizeModal')
-)
-const ViewSizeModal = React.lazy(
-  () => import('~/pages/admin/SizeManagement/modal/ViewSizeModal')
-)
-const EditSizeModal = React.lazy(
-  () => import('~/pages/admin/SizeManagement/modal/EditSizeModal')
-)
-const DeleteSizeModal = React.lazy(
-  () => import('~/pages/admin/SizeManagement/modal/DeleteSizeModal')
-)
-const RestoreSizeModal = React.lazy(
-  () => import('~/pages/admin/SizeManagement/modal/RestoreSizeModal')
-)
+import AddSizeModal from '~/pages/admin/SizeManagement/modal/AddSizeModal'
+import ViewSizeModal from '~/pages/admin/SizeManagement/modal/ViewSizeModal'
+import EditSizeModal from '~/pages/admin/SizeManagement/modal/EditSizeModal'
+import DeleteSizeModal from '~/pages/admin/SizeManagement/modal/DeleteSizeModal'
+import RestoreSizeModal from '~/pages/admin/SizeManagement/modal/RestoreSizeModal'
+
 const SizeManagement = () => {
   const [page, setPage] = React.useState(1)
   const [filters, setFilters] = React.useState({
@@ -125,53 +115,47 @@ const SizeManagement = () => {
         filters={filters}
       />
 
-      <React.Suspense fallback={<></>}>
-        <PermissionWrapper requiredPermissions={['size:create']}>
-          {modalType === 'add' && (
-            <AddSizeModal
-              open
-              onClose={handleCloseModal}
-              onAdded={handleSave}
-            />
-          )}
-        </PermissionWrapper>
-
-        {modalType === 'view' && selectedSize && (
-          <ViewSizeModal open onClose={handleCloseModal} size={selectedSize} />
+      <PermissionWrapper requiredPermissions={['size:create']}>
+        {modalType === 'add' && (
+          <AddSizeModal open onClose={handleCloseModal} onAdded={handleSave} />
         )}
+      </PermissionWrapper>
 
-        <PermissionWrapper requiredPermissions={['size:update']}>
-          {modalType === 'edit' && selectedSize && (
-            <EditSizeModal
-              open
-              onClose={handleCloseModal}
-              size={selectedSize}
-              onSave={handleSave}
-            />
-          )}
-        </PermissionWrapper>
+      {modalType === 'view' && selectedSize && (
+        <ViewSizeModal open onClose={handleCloseModal} size={selectedSize} />
+      )}
 
-        <PermissionWrapper requiredPermissions={['size:delete']}>
-          {modalType === 'delete' && selectedSize && (
-            <DeleteSizeModal
-              open
-              onClose={handleCloseModal}
-              size={selectedSize}
-              onDelete={handleSave}
-            />
-          )}
-        </PermissionWrapper>
-        <PermissionWrapper requiredPermissions={['size:restore']}>
-          {modalType === 'restore' && selectedSize && (
-            <RestoreSizeModal
-              open
-              onClose={handleCloseModal}
-              size={selectedSize}
-              onRestored={handleSave}
-            />
-          )}
-        </PermissionWrapper>
-      </React.Suspense>
+      <PermissionWrapper requiredPermissions={['size:update']}>
+        {modalType === 'edit' && selectedSize && (
+          <EditSizeModal
+            open
+            onClose={handleCloseModal}
+            size={selectedSize}
+            onSave={handleSave}
+          />
+        )}
+      </PermissionWrapper>
+
+      <PermissionWrapper requiredPermissions={['size:delete']}>
+        {modalType === 'delete' && selectedSize && (
+          <DeleteSizeModal
+            open
+            onClose={handleCloseModal}
+            size={selectedSize}
+            onDelete={handleSave}
+          />
+        )}
+      </PermissionWrapper>
+      <PermissionWrapper requiredPermissions={['size:restore']}>
+        {modalType === 'restore' && selectedSize && (
+          <RestoreSizeModal
+            open
+            onClose={handleCloseModal}
+            size={selectedSize}
+            onRestored={handleSave}
+          />
+        )}
+      </PermissionWrapper>
     </RouteGuard>
   )
 }

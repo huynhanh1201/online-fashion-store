@@ -41,9 +41,9 @@ export default function LowStockAlertCard({
   const handleOpenModal = async (item, warehouseId) => {
     // Đợi tất cả gọi fetch xong
     await Promise.all([
-      fetchWarehouses(1, 100000, { status: false }),
-      fetchVariants(1, 100000, { status: false }),
-      fetchPartner(1, 100000, { status: false })
+      fetchWarehouses(1, 100000, { destroy: false }),
+      fetchVariants(1, 100000, { destroy: false }),
+      fetchPartner(1, 100000, { destroy: false })
     ])
 
     // Sau khi chắc chắn đã có dữ liệu → gán
@@ -114,7 +114,7 @@ export default function LowStockAlertCard({
   }
 
   const handleAddPartner = async (partnerData) => {
-    const newPartner = await addPartner(partnerData)
+    const newPartner = await addPartner(partnerData, {}, true)
     if (newPartner) {
       // ✅ Gán đối tượng mới được thêm vào Select
       setNewSlipData((prev) => ({

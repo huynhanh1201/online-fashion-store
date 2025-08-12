@@ -199,7 +199,8 @@ export default function AddWarehouseSlipModal({
         items: items.map((item) => ({
           variantId: item.variantId,
           quantity: parseInt(item.quantity),
-          unit: item.unit || 'cái'
+          // unit: item.unit || 'cái',
+          unit: item.unit && item.unit.trim() !== '' ? item.unit : 'cái'
         })),
         note: newSlipData.note || ''
       }
@@ -482,10 +483,19 @@ export default function AddWarehouseSlipModal({
                         </TableCell>
                         <TableCell sx={{ minWidth: 100 }}>
                           <TextField
-                            value={item.unit || 'cái'}
+                            value={item.unit || ''}
                             onChange={handleItemChange(index, 'unit')}
+                            placeholder='cái'
                             fullWidth
                             size='small'
+                            InputProps={{
+                              sx: {
+                                '& input::placeholder': {
+                                  color: '#000',
+                                  opacity: 1
+                                }
+                              }
+                            }}
                           />
                         </TableCell>
                         <TableCell sx={{ minWidth: 100, width: 100 }}>

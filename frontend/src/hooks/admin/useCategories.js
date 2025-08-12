@@ -41,7 +41,40 @@ const useCategories = () => {
     }
     setloading(false)
   }
-  const add = async (data, filters = {}) => {
+  // const add = async (data, filters = {}) => {
+  //   try {
+  //     const newCategory = await addCategory(data)
+  //     if (!newCategory) {
+  //       console.error('Failed to add category')
+  //       return null
+  //     }
+  //
+  //     setCategories((prev) => {
+  //       const sort = filters?.sort
+  //       let updated = [...prev]
+  //
+  //       if (sort === 'newest') {
+  //         updated = [newCategory, ...prev].slice(0, ROWS_PER_PAGE)
+  //       } else if (sort === 'oldest') {
+  //         if (prev.length < ROWS_PER_PAGE) {
+  //           updated = [...prev, newCategory]
+  //         }
+  //       } else {
+  //         updated = [newCategory, ...prev].slice(0, ROWS_PER_PAGE)
+  //       }
+  //
+  //       return updated
+  //     })
+  //
+  //     setTotalPages((prev) => prev + 1)
+  //     return newCategory
+  //   } catch (err) {
+  //     console.error('Error adding category:', err)
+  //     return null
+  //   }
+  // }
+
+  const add = async (data, filters = {}, addToProduct = false) => {
     try {
       const newCategory = await addCategory(data)
       if (!newCategory) {
@@ -49,25 +82,33 @@ const useCategories = () => {
         return null
       }
 
-      setCategories((prev) => {
-        const sort = filters?.sort
-        let updated = [...prev]
+      if (addToProduct) {
+        // ✅ Thêm thẳng vào mảng, không cắt giới hạn ROWS_PER_PAGE
+        setCategories((prev) => [...prev, newCategory])
+        fetchCategories(1, 1000, { destroy: 'false' })
+        return newCategory
+      } else {
+        // ⚡ Giữ nguyên logic phân trang
+        setCategories((prev) => {
+          const sort = filters?.sort
+          let updated = [...prev]
 
-        if (sort === 'newest') {
-          updated = [newCategory, ...prev].slice(0, ROWS_PER_PAGE)
-        } else if (sort === 'oldest') {
-          if (prev.length < ROWS_PER_PAGE) {
-            updated = [...prev, newCategory]
+          if (sort === 'newest') {
+            updated = [newCategory, ...prev].slice(0, ROWS_PER_PAGE)
+          } else if (sort === 'oldest') {
+            if (prev.length < ROWS_PER_PAGE) {
+              updated = [...prev, newCategory]
+            }
+          } else {
+            updated = [newCategory, ...prev].slice(0, ROWS_PER_PAGE)
           }
-        } else {
-          updated = [newCategory, ...prev].slice(0, ROWS_PER_PAGE)
-        }
 
-        return updated
-      })
+          return updated
+        })
 
-      setTotalPages((prev) => prev + 1)
-      return newCategory
+        setTotalPages((prev) => prev + 1)
+        return newCategory
+      }
     } catch (err) {
       console.error('Error adding category:', err)
       return null

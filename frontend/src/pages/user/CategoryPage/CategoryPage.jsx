@@ -25,7 +25,7 @@ import { useDispatch } from 'react-redux'
 import { setCartItems } from '~/redux/cart/cartSlice'
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward'
 
-const ITEMS_PER_PAGE = 12
+const ITEMS_PER_PAGE = 15
 
 // Custom styled components
 const SortDropdownButton = styled('button')(({ theme }) => ({
@@ -351,8 +351,8 @@ const CategoryPage = () => {
             cursor: 'pointer'
           }}
           onClick={() => navigate('/')}
-        // component={Link}
-        // to='/product'
+          // component={Link}
+          // to='/product'
         >
           Trang chủ
         </Link>
@@ -387,8 +387,8 @@ const CategoryPage = () => {
         <img
           src={optimizeCloudinaryUrl(
             category?.banner ||
-            category?.image ||
-            'https://www.rcuw.org/wp-content/themes/champion/images/SM-placeholder.png',
+              category?.image ||
+              'https://www.rcuw.org/wp-content/themes/champion/images/SM-placeholder.png',
             { width: 1920, height: 400 }
           )}
           alt='category banner'
