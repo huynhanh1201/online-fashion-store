@@ -232,13 +232,15 @@ const MegaMenuEditor = ({ open, onClose, onSuccess, initialData = null }) => {
       return
     }
 
-    const normalizeLabel = (label) =>
-      label.charAt(0).toUpperCase() + label.slice(1).toLowerCase()
+    // const normalizeLabel = (label) =>
+    //   label.charAt(0).toUpperCase() //+ label.slice(1).toLowerCase()
 
-    const normalizedItem = {
-      ...editingItem,
-      label: normalizeLabel(editingItem.label)
-    }
+    const normalizedItem = { ...editingItem }
+
+    // const normalizedItem = {
+    //   ...editingItem,
+    //   label: normalizeLabel(editingItem.label)
+    // }
 
     setMenuData((prev) => {
       const newData = { ...prev }
@@ -432,7 +434,7 @@ const MegaMenuEditor = ({ open, onClose, onSuccess, initialData = null }) => {
                         sx={{
                           fontWeight: 500,
                           flex: 1,
-                          color: sub.visible ? 'text.primary' : 'text.secondary'
+                          color: sub.visible ? 'text.primary' : 'text.secondary',
                         }}
                       >
                         {sub.label || 'Chưa có tên'}
