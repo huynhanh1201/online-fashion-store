@@ -59,11 +59,7 @@ const AddVariantModal = ({
   addVariant,
   products,
   formatCurrency,
-  parseCurrency,
-  colors,
-  sizes,
-  fetchSizes,
-  fetchColors
+  parseCurrency
 }) => {
   const {
     register,
@@ -93,8 +89,8 @@ const AddVariantModal = ({
       }
     }
   })
-  const { createNewColor } = useColor()
-  const { createNewSize } = useSize()
+  const { createNewColor, fetchColors, colors } = useColor()
+  const { createNewSize, fetchSizes, sizes } = useSize()
   const { addColorPalette } = useColorPalettes(watch('productId'))
   const { addSizePalette } = useSizePalettes(watch('productId'))
   const [openColorModal, setOpenColorModal] = useState(false)
@@ -106,6 +102,12 @@ const AddVariantModal = ({
   const overridePrice = watch('overridePrice')
   const productId = watch('productId') // Theo dõi productId để lấy giá sản phẩm
   const overridePackageSize = watch('overridePackageSize')
+
+  useEffect(() => {
+    fetchColors(1, 1000, { destroy: 'false' })
+    fetchSizes(1, 1000, { destroy: 'false' })
+  }, [])
+
   useEffect(() => {
     if (!productId) return
 
@@ -204,7 +206,7 @@ const AddVariantModal = ({
 
   const handleSaveColor = async (data) => {
     try {
-      const newColor = await createNewColor(data)
+      const newColor = await createNewColor(data, {}, true)
       if (newColor?.name) {
         setValue('color', newColor.name) // ✅ gán tên màu mới vào field 'color'
       }
@@ -216,7 +218,7 @@ const AddVariantModal = ({
 
   const handleSaveSize = async (data) => {
     try {
-      const newSize = await createNewSize(data)
+      const newSize = await createNewSize(data, {}, true)
       if (newSize?.name) {
         setValue('size', newSize.name) // ✅ gán tên size mới vào field 'size'
       }

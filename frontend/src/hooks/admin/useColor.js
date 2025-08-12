@@ -39,7 +39,44 @@ const useColors = () => {
     setLoading(false)
   }
 
-  const createNewColor = async (data, filters = {}) => {
+  // const createNewColor = async (data, filters = {}, addToVariant = false) => {
+  //   try {
+  //     const newColor = await addColor(data)
+  //     if (!newColor) {
+  //       console.error('Không thể thêm màu mới')
+  //       return null
+  //     }
+  //     if (addToVariant) {
+  //       setColors((prev) => [...prev, newColor])
+  //       return newColor
+  //     } else {
+  //       setColors((prev) => {
+  //         const sort = filters?.sort
+  //         let updated = [...prev]
+  //
+  //         if (sort === 'newest') {
+  //           updated = [newColor, ...prev].slice(0, ROWS_PER_PAGE)
+  //         } else if (sort === 'oldest') {
+  //           if (prev.length < ROWS_PER_PAGE) {
+  //             updated = [...prev, newColor]
+  //           }
+  //         } else {
+  //           updated = [newColor, ...prev].slice(0, ROWS_PER_PAGE)
+  //         }
+  //
+  //         return updated
+  //       })
+  //
+  //       setTotalPages((prev) => prev + 1)
+  //       return newColor
+  //     }
+  //   } catch (error) {
+  //     console.error('Lỗi khi thêm màu mới:', error)
+  //     return null
+  //   }
+  // }
+
+  const createNewColor = async (data, filters = {}, addToVariant = false) => {
     try {
       const newColor = await addColor(data)
       if (!newColor) {
@@ -47,25 +84,32 @@ const useColors = () => {
         return null
       }
 
-      setColors((prev) => {
-        const sort = filters?.sort
-        let updated = [...prev]
+      if (addToVariant) {
+        setColors((prev) => [...prev, newColor])
+        fetchColors(1, 10000, { destroy: 'false' })
+        return newColor
+      } else {
+        // ⚡ Giữ nguyên logic phân trang cũ
+        setColors((prev) => {
+          const sort = filters?.sort
+          let updated = [...prev]
 
-        if (sort === 'newest') {
-          updated = [newColor, ...prev].slice(0, ROWS_PER_PAGE)
-        } else if (sort === 'oldest') {
-          if (prev.length < ROWS_PER_PAGE) {
-            updated = [...prev, newColor]
+          if (sort === 'newest') {
+            updated = [newColor, ...prev].slice(0, ROWS_PER_PAGE)
+          } else if (sort === 'oldest') {
+            if (prev.length < ROWS_PER_PAGE) {
+              updated = [...prev, newColor]
+            }
+          } else {
+            updated = [newColor, ...prev].slice(0, ROWS_PER_PAGE)
           }
-        } else {
-          updated = [newColor, ...prev].slice(0, ROWS_PER_PAGE)
-        }
 
-        return updated
-      })
+          return updated
+        })
 
-      setTotalPages((prev) => prev + 1)
-      return newColor
+        setTotalPages((prev) => prev + 1)
+        return newColor
+      }
     } catch (error) {
       console.error('Lỗi khi thêm màu mới:', error)
       return null

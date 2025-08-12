@@ -52,7 +52,41 @@ const usePartner = () => {
     }
   }
 
-  const createNewPartner = async (data, filters = {}) => {
+  // const createNewPartner = async (data, filters = {}) => {
+  //   try {
+  //     const newPartner = await createPartner(data)
+  //     if (!newPartner) {
+  //       console.error('Không thể tạo đối tác mới')
+  //       return null
+  //     }
+  //
+  //     setPartners((prev) => {
+  //       const sort = filters?.sort
+  //       let updated = [...prev]
+  //
+  //       if (sort === 'newest') {
+  //         updated = [newPartner, ...prev].slice(0, ROWS_PER_PAGE)
+  //       } else if (sort === 'oldest') {
+  //         if (prev.length < ROWS_PER_PAGE) {
+  //           updated = [...prev, newPartner]
+  //         }
+  //         // Đủ 10 phần tử thì không thêm
+  //       } else {
+  //         updated = [newPartner, ...prev].slice(0, ROWS_PER_PAGE)
+  //       }
+  //
+  //       return updated
+  //     })
+  //
+  //     setTotal((prev) => prev + 1)
+  //     return newPartner
+  //   } catch (error) {
+  //     console.error('Lỗi khi tạo đối tác mới:', error)
+  //     return null
+  //   }
+  // }
+
+  const createNewPartner = async (data, filters = {}, addToVariant = false) => {
     try {
       const newPartner = await createPartner(data)
       if (!newPartner) {
@@ -60,26 +94,34 @@ const usePartner = () => {
         return null
       }
 
-      setPartners((prev) => {
-        const sort = filters?.sort
-        let updated = [...prev]
+      if (addToVariant) {
+        // ✅ Thêm trực tiếp, không cắt mảng
+        setPartners((prev) => [...prev, newPartner])
+        fetchPartners(1, 10000, { destroy: 'false' })
+        return newPartner
+      } else {
+        // ⚡ Thêm theo logic có sẵn
+        setPartners((prev) => {
+          const sort = filters?.sort
+          let updated = [...prev]
 
-        if (sort === 'newest') {
-          updated = [newPartner, ...prev].slice(0, ROWS_PER_PAGE)
-        } else if (sort === 'oldest') {
-          if (prev.length < ROWS_PER_PAGE) {
-            updated = [...prev, newPartner]
+          if (sort === 'newest') {
+            updated = [newPartner, ...prev].slice(0, ROWS_PER_PAGE)
+          } else if (sort === 'oldest') {
+            if (prev.length < ROWS_PER_PAGE) {
+              updated = [...prev, newPartner]
+            }
+            // Nếu đủ ROWS_PER_PAGE thì không thêm
+          } else {
+            updated = [newPartner, ...prev].slice(0, ROWS_PER_PAGE)
           }
-          // Đủ 10 phần tử thì không thêm
-        } else {
-          updated = [newPartner, ...prev].slice(0, ROWS_PER_PAGE)
-        }
 
-        return updated
-      })
+          return updated
+        })
 
-      setTotal((prev) => prev + 1)
-      return newPartner
+        setTotal((prev) => prev + 1)
+        return newPartner
+      }
     } catch (error) {
       console.error('Lỗi khi tạo đối tác mới:', error)
       return null

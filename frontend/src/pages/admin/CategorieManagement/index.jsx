@@ -5,22 +5,11 @@ import usePermissions from '~/hooks/usePermissions'
 import { PermissionWrapper, RouteGuard } from '~/components/PermissionGuard'
 import { useLocation } from 'react-router-dom'
 
-// Lazy load các Chart
-const AddCategoryModal = React.lazy(
-  () => import('~/pages/admin/CategorieManagement/modal/AddCategoryModal')
-)
-const ViewCategoryModal = React.lazy(
-  () => import('~/pages/admin/CategorieManagement/modal/ViewCategoryModal')
-)
-const EditCategoryModal = React.lazy(
-  () => import('~/pages/admin/CategorieManagement/modal/EditCategoryModal')
-)
-const DeleteCategoryModal = React.lazy(
-  () => import('~/pages/admin/CategorieManagement/modal/DeleteCategoryModal')
-)
-const RestoreCategoryModal = React.lazy(
-  () => import('~/pages/admin/CategorieManagement/modal/RestoreCategoryModal')
-)
+import AddCategoryModal from '~/pages/admin/CategorieManagement/modal/AddCategoryModal'
+import ViewCategoryModal from '~/pages/admin/CategorieManagement/modal/ViewCategoryModal'
+import EditCategoryModal from '~/pages/admin/CategorieManagement/modal/EditCategoryModal'
+import DeleteCategoryModal from '~/pages/admin/CategorieManagement/modal/DeleteCategoryModal'
+import RestoreCategoryModal from '~/pages/admin/CategorieManagement/modal/RestoreCategoryModal'
 
 const CategoryManagement = () => {
   const [page, setPage] = React.useState(1)
@@ -141,55 +130,53 @@ const CategoryManagement = () => {
         isParentCategory={isParentCategory}
       />
 
-      <React.Suspense fallback={<></>}>
-        <PermissionWrapper requiredPermissions={['category:create']}>
-          {modalType === 'add' && (
-            <AddCategoryModal
-              open
-              onClose={handleCloseModal}
-              onAdded={handleSave}
-            />
-          )}
-        </PermissionWrapper>
-        {modalType === 'view' && selectedCategory && (
-          <ViewCategoryModal
+      <PermissionWrapper requiredPermissions={['category:create']}>
+        {modalType === 'add' && (
+          <AddCategoryModal
+            open
+            onClose={handleCloseModal}
+            onAdded={handleSave}
+          />
+        )}
+      </PermissionWrapper>
+      {modalType === 'view' && selectedCategory && (
+        <ViewCategoryModal
+          open
+          onClose={handleCloseModal}
+          category={selectedCategory}
+        />
+      )}
+      <PermissionWrapper requiredPermissions={['category:update']}>
+        {modalType === 'edit' && selectedCategory && (
+          <EditCategoryModal
             open
             onClose={handleCloseModal}
             category={selectedCategory}
+            onSave={handleSave}
+            isParentCategory={isParentCategory}
           />
         )}
-        <PermissionWrapper requiredPermissions={['category:update']}>
-          {modalType === 'edit' && selectedCategory && (
-            <EditCategoryModal
-              open
-              onClose={handleCloseModal}
-              category={selectedCategory}
-              onSave={handleSave}
-              isParentCategory={isParentCategory}
-            />
-          )}
-        </PermissionWrapper>
-        <PermissionWrapper requiredPermissions={['category:delete']}>
-          {modalType === 'delete' && selectedCategory && (
-            <DeleteCategoryModal
-              open
-              onClose={handleCloseModal}
-              category={selectedCategory}
-              onDelete={handleSave}
-            />
-          )}
-        </PermissionWrapper>
-        <PermissionWrapper requiredPermissions={['category:restore']}>
-          {modalType === 'restore' && selectedCategory && (
-            <RestoreCategoryModal
-              open
-              onClose={handleCloseModal}
-              category={selectedCategory}
-              onRestore={handleSave}
-            />
-          )}
-        </PermissionWrapper>
-      </React.Suspense>
+      </PermissionWrapper>
+      <PermissionWrapper requiredPermissions={['category:delete']}>
+        {modalType === 'delete' && selectedCategory && (
+          <DeleteCategoryModal
+            open
+            onClose={handleCloseModal}
+            category={selectedCategory}
+            onDelete={handleSave}
+          />
+        )}
+      </PermissionWrapper>
+      <PermissionWrapper requiredPermissions={['category:restore']}>
+        {modalType === 'restore' && selectedCategory && (
+          <RestoreCategoryModal
+            open
+            onClose={handleCloseModal}
+            category={selectedCategory}
+            onRestore={handleSave}
+          />
+        )}
+      </PermissionWrapper>
     </RouteGuard>
   )
 }

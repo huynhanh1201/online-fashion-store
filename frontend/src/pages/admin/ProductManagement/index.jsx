@@ -136,24 +136,13 @@ import useCategories from '~/hooks/admin/useCategories'
 import usePermissions from '~/hooks/usePermissions'
 import { PermissionWrapper, RouteGuard } from '~/components/PermissionGuard'
 import { useLocation } from 'react-router-dom'
-const AddProductModal = React.lazy(
-  () => import('~/pages/admin/ProductManagement/modal/AddProductModal')
-)
-const EditProductModal = React.lazy(
-  () => import('~/pages/admin/ProductManagement/modal/EditProductModal')
-)
-const DeleteProductModal = React.lazy(
-  () => import('./modal/DeleteProductModal')
-)
-const ViewProductModal = React.lazy(
-  () => import('~/pages/admin/ProductManagement/modal/ViewProductModal')
-)
-const ViewDesc = React.lazy(
-  () => import('~/pages/admin/ProductManagement/modal/ViewDescriptionModal.jsx')
-)
-const RestoreProductModal = React.lazy(
-  () => import('~/pages/admin/ProductManagement/modal/RestoreProductModal.jsx')
-)
+import AddProductModal from '~/pages/admin/ProductManagement/modal/AddProductModal'
+import EditProductModal from '~/pages/admin/ProductManagement/modal/EditProductModal'
+import DeleteProductModal from './modal/DeleteProductModal'
+import ViewProductModal from '~/pages/admin/ProductManagement/modal/ViewProductModal'
+import ViewDesc from '~/pages/admin/ProductManagement/modal/ViewDescriptionModal.jsx'
+import RestoreProductModal from '~/pages/admin/ProductManagement/modal/RestoreProductModal.jsx'
+
 import ViewDescriptionModal from '~/pages/admin/ProductManagement/modal/ViewDescriptionModal.jsx'
 import useColorPalettes from '~/hooks/admin/useColorPalettes.js'
 import useSizePalettes from '~/hooks/admin/useSizePalettes.js'
@@ -293,67 +282,65 @@ const ProductManagement = () => {
         filters={filters}
       />
 
-      <React.Suspense fallback={<></>}>
-        <PermissionWrapper requiredPermissions={['product:create']}>
-          {modalType === 'add' && (
-            <AddProductModal
-              open
-              onClose={handleCloseModal}
-              onSuccess={handleSave}
-            />
-          )}
-        </PermissionWrapper>
+      <PermissionWrapper requiredPermissions={['product:create']}>
+        {modalType === 'add' && (
+          <AddProductModal
+            open
+            onClose={handleCloseModal}
+            onSuccess={handleSave}
+          />
+        )}
+      </PermissionWrapper>
 
-        {modalType === 'view' && selectedProduct && (
-          <ViewProductModal
+      {modalType === 'view' && selectedProduct && (
+        <ViewProductModal
+          open
+          onClose={handleCloseModal}
+          product={selectedProduct}
+          colorPalette={colorPalette}
+          sizePalette={sizePalette}
+        />
+      )}
+
+      <PermissionWrapper requiredPermissions={['product:update']}>
+        {modalType === 'edit' && selectedProduct && (
+          <EditProductModal
             open
             onClose={handleCloseModal}
             product={selectedProduct}
-            colorPalette={colorPalette}
-            sizePalette={sizePalette}
+            onSave={handleSave}
           />
         )}
+      </PermissionWrapper>
 
-        <PermissionWrapper requiredPermissions={['product:update']}>
-          {modalType === 'edit' && selectedProduct && (
-            <EditProductModal
-              open
-              onClose={handleCloseModal}
-              product={selectedProduct}
-              onSave={handleSave}
-            />
-          )}
-        </PermissionWrapper>
-
-        <PermissionWrapper requiredPermissions={['product:delete']}>
-          {modalType === 'delete' && selectedProduct && (
-            <DeleteProductModal
-              open
-              onClose={handleCloseModal}
-              product={selectedProduct}
-              onDelete={handleSave}
-            />
-          )}
-        </PermissionWrapper>
-
-        {modalType === 'viewDesc' && selectedProduct && (
-          <ViewDescriptionModal
+      <PermissionWrapper requiredPermissions={['product:delete']}>
+        {modalType === 'delete' && selectedProduct && (
+          <DeleteProductModal
             open
             onClose={handleCloseModal}
             product={selectedProduct}
+            onDelete={handleSave}
           />
         )}
-        <PermissionWrapper requiredPermissions={['product:restore']}>
-          {modalType === 'restore' && selectedProduct && (
-            <RestoreProductModal
-              open
-              onClose={handleCloseModal}
-              product={selectedProduct}
-              onRestore={handleSave}
-            />
-          )}
-        </PermissionWrapper>
-      </React.Suspense>
+      </PermissionWrapper>
+
+      {modalType === 'viewDesc' && selectedProduct && (
+        <ViewDescriptionModal
+          open
+          onClose={handleCloseModal}
+          product={selectedProduct}
+        />
+      )}
+      <PermissionWrapper requiredPermissions={['product:restore']}>
+        {modalType === 'restore' && selectedProduct && (
+          <RestoreProductModal
+            open
+            onClose={handleCloseModal}
+            product={selectedProduct}
+            onRestore={handleSave}
+          />
+        )}
+      </PermissionWrapper>
     </RouteGuard>
   )
 }

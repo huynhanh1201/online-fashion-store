@@ -18,7 +18,7 @@ import {
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward'
 import NavigateNext from '@mui/icons-material/NavigateNext'
 
-const ITEMS_PER_PAGE = 10
+const ITEMS_PER_PAGE = 15
 
 const SortDropdownButton = styled('button')({
   border: '1px solid #222',
@@ -299,8 +299,8 @@ export default function SearchResults() {
               cursor: 'pointer'
             }}
             onClick={() => navigate('/')}
-          // component={Link}
-          // to='/product'
+            // component={Link}
+            // to='/product'
           >
             Trang chủ
           </Link>
@@ -425,7 +425,7 @@ export default function SearchResults() {
                 size='small'
                 renderItem={(item) =>
                   item.type === 'start-ellipsis' ||
-                    item.type === 'end-ellipsis' ? (
+                  item.type === 'end-ellipsis' ? (
                     <span style={{ padding: '8px 12px', color: '#999' }}>
                       ...
                     </span>

@@ -125,7 +125,7 @@ const EditProductModal = ({ open, onClose, onSave, product }) => {
     }
   }, [open, reset, product])
   const handEditCategory = async (category) => {
-    const newCategory = await add(category) // category trả về từ add()
+    const newCategory = await add(category, {}, true) // category trả về từ add()
 
     // Gọi lại danh sách nếu cần thiết
     fetchCategories(1, 100000)

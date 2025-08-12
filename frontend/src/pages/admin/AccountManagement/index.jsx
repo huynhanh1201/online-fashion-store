@@ -7,22 +7,12 @@ import useRoles from '~/hooks/admin/useRoles.js'
 import usePermissions from '~/hooks/usePermissions'
 import { PermissionWrapper, RouteGuard } from '~/components/PermissionGuard'
 
-// Lazy load các Chart
-const ViewAccountModal = React.lazy(
-  () => import('~/pages/admin/AccountManagement/modal/ViewAccountModal.jsx')
-)
-const EditAccountModal = React.lazy(
-  () => import('~/pages/admin/AccountManagement/modal/EditAccountModal.jsx')
-)
-const DeleteAccountModal = React.lazy(
-  () => import('~/pages/admin/AccountManagement/modal/DeleteAccountModal.jsx')
-)
-const AddAccountModal = React.lazy(
-  () => import('~/pages/admin/AccountManagement/modal/AddAccountModal.jsx')
-)
-const RestoreAccountModal = React.lazy(
-  () => import('~/pages/admin/AccountManagement/modal/RestoreAccountModal.jsx')
-)
+import ViewAccountModal from '~/pages/admin/AccountManagement/modal/ViewAccountModal.jsx'
+import EditAccountModal from '~/pages/admin/AccountManagement/modal/EditAccountModal.jsx'
+import DeleteAccountModal from '~/pages/admin/AccountManagement/modal/DeleteAccountModal.jsx'
+import AddAccountModal from '~/pages/admin/AccountManagement/modal/AddAccountModal.jsx'
+import RestoreAccountModal from '~/pages/admin/AccountManagement/modal/RestoreAccountModal.jsx'
+
 const AccountManagement = () => {
   const { roles, fetchRoles } = useRoles()
   const [page, setPage] = React.useState(1)
@@ -138,65 +128,63 @@ const AccountManagement = () => {
         filters={filters}
       />
 
-      <React.Suspense fallback={<></>}>
-        {modalType === 'view' && selectedUser && (
-          <ViewAccountModal
+      {modalType === 'view' && selectedUser && (
+        <ViewAccountModal
+          open
+          onClose={handleCloseModal}
+          user={selectedUser}
+          roles={roles}
+        />
+      )}
+
+      <PermissionWrapper requiredPermissions={['account:create']}>
+        {modalType === 'add' && (
+          <AddAccountModal
+            open
+            onClose={handleCloseModal}
+            onSave={handleSave}
+            roles={roles}
+            profile={profile}
+          />
+        )}
+      </PermissionWrapper>
+
+      <PermissionWrapper requiredPermissions={['account:update']}>
+        {modalType === 'edit' && selectedUser && (
+          <EditAccountModal
             open
             onClose={handleCloseModal}
             user={selectedUser}
+            onSave={handleSave}
             roles={roles}
+            permissions={{
+              canEditRole: hasPermission('account:create')
+            }}
+            profile={profile}
           />
         )}
+      </PermissionWrapper>
 
-        <PermissionWrapper requiredPermissions={['account:create']}>
-          {modalType === 'add' && (
-            <AddAccountModal
-              open
-              onClose={handleCloseModal}
-              onSave={handleSave}
-              roles={roles}
-              profile={profile}
-            />
-          )}
-        </PermissionWrapper>
-
-        <PermissionWrapper requiredPermissions={['account:update']}>
-          {modalType === 'edit' && selectedUser && (
-            <EditAccountModal
-              open
-              onClose={handleCloseModal}
-              user={selectedUser}
-              onSave={handleSave}
-              roles={roles}
-              permissions={{
-                canEditRole: hasPermission('account:create')
-              }}
-              profile={profile}
-            />
-          )}
-        </PermissionWrapper>
-
-        <PermissionWrapper requiredPermissions={['account:delete']}>
-          {modalType === 'delete' && selectedUser && (
-            <DeleteAccountModal
-              open
-              onClose={handleCloseModal}
-              user={selectedUser}
-              onDelete={handleSave}
-            />
-          )}
-        </PermissionWrapper>
-        <PermissionWrapper requiredPermissions={['account:restore']}>
-          {modalType === 'restore' && selectedUser && (
-            <RestoreAccountModal
-              open
-              onClose={handleCloseModal}
-              user={selectedUser}
-              onRestore={handleSave}
-            />
-          )}
-        </PermissionWrapper>
-      </React.Suspense>
+      <PermissionWrapper requiredPermissions={['account:delete']}>
+        {modalType === 'delete' && selectedUser && (
+          <DeleteAccountModal
+            open
+            onClose={handleCloseModal}
+            user={selectedUser}
+            onDelete={handleSave}
+          />
+        )}
+      </PermissionWrapper>
+      <PermissionWrapper requiredPermissions={['account:restore']}>
+        {modalType === 'restore' && selectedUser && (
+          <RestoreAccountModal
+            open
+            onClose={handleCloseModal}
+            user={selectedUser}
+            onRestore={handleSave}
+          />
+        )}
+      </PermissionWrapper>
     </RouteGuard>
   )
 }

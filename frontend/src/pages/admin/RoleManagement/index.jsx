@@ -8,22 +8,12 @@ import usePermissions from '~/hooks/usePermissions'
 import usePermission from '~/hooks/admin/usePermission.js'
 import { PermissionWrapper, RouteGuard } from '~/components/PermissionGuard'
 
-// Lazy load modals
-const AddRoleModal = React.lazy(
-  () => import('~/pages/admin/RoleManagement/modal/AddRoleModal')
-)
-const ViewRoleModal = React.lazy(
-  () => import('~/pages/admin/RoleManagement/modal/ViewRoleModal')
-)
-const EditRoleModal = React.lazy(
-  () => import('~/pages/admin/RoleManagement/modal/EditRoleModal')
-)
-const DeleteRoleModal = React.lazy(
-  () => import('~/pages/admin/RoleManagement/modal/DeleteRoleModal')
-)
-const RestoreRoleModal = React.lazy(
-  () => import('~/pages/admin/RoleManagement/modal/RestoreRoleModal')
-)
+import AddRoleModal from '~/pages/admin/RoleManagement/modal/AddRoleModal'
+import ViewRoleModal from '~/pages/admin/RoleManagement/modal/ViewRoleModal'
+import EditRoleModal from '~/pages/admin/RoleManagement/modal/EditRoleModal'
+import DeleteRoleModal from '~/pages/admin/RoleManagement/modal/DeleteRoleModal'
+import RestoreRoleModal from '~/pages/admin/RoleManagement/modal/RestoreRoleModal'
+
 const RoleManagement = () => {
   const [page, setPage] = React.useState(1)
   const [filters, setFilters] = React.useState({
@@ -117,52 +107,50 @@ const RoleManagement = () => {
         filters={filters}
       />
 
-      <React.Suspense fallback={<></>}>
-        {modalType === 'add' && (
-          <AddRoleModal
-            open
-            onClose={handleCloseModal}
-            onSubmit={handleSave}
-            p={permissions}
-          />
-        )}
+      {modalType === 'add' && (
+        <AddRoleModal
+          open
+          onClose={handleCloseModal}
+          onSubmit={handleSave}
+          p={permissions}
+        />
+      )}
 
-        {modalType === 'view' && selectedRole && (
-          <ViewRoleModal
-            open
-            onClose={handleCloseModal}
-            role={selectedRole}
-            p={permissions}
-          />
-        )}
+      {modalType === 'view' && selectedRole && (
+        <ViewRoleModal
+          open
+          onClose={handleCloseModal}
+          role={selectedRole}
+          p={permissions}
+        />
+      )}
 
-        {modalType === 'edit' && selectedRole && (
-          <EditRoleModal
-            open
-            onClose={handleCloseModal}
-            onSubmit={handleSave}
-            p={permissions}
-            defaultValues={selectedRole}
-          />
-        )}
+      {modalType === 'edit' && selectedRole && (
+        <EditRoleModal
+          open
+          onClose={handleCloseModal}
+          onSubmit={handleSave}
+          p={permissions}
+          defaultValues={selectedRole}
+        />
+      )}
 
-        {modalType === 'delete' && selectedRole && (
-          <DeleteRoleModal
-            open
-            onClose={handleCloseModal}
-            role={selectedRole}
-            onSubmit={handleSave}
-          />
-        )}
-        {modalType === 'restore' && selectedRole && (
-          <RestoreRoleModal
-            open
-            onClose={handleCloseModal}
-            role={selectedRole}
-            onSubmit={handleSave}
-          />
-        )}
-      </React.Suspense>
+      {modalType === 'delete' && selectedRole && (
+        <DeleteRoleModal
+          open
+          onClose={handleCloseModal}
+          role={selectedRole}
+          onSubmit={handleSave}
+        />
+      )}
+      {modalType === 'restore' && selectedRole && (
+        <RestoreRoleModal
+          open
+          onClose={handleCloseModal}
+          role={selectedRole}
+          onSubmit={handleSave}
+        />
+      )}
     </RouteGuard>
   )
 }

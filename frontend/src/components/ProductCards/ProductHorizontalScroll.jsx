@@ -131,11 +131,13 @@ const ProductHorizontalScroll = ({
           transform: translateY(0);
         }
         
-        
-        @media (max-width: 680px) {
-          .product-item {
+        @media (max-width: 900px) {
+        .product-item {
             max-width: 100%;
           }
+        }
+        @media (max-width: 680px) {
+          
           .show-more-btn {
             padding: 10px 20px;
             font-size: 14px;

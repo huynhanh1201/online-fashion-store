@@ -70,32 +70,30 @@ const ReviewManagement = () => {
         filter={filter}
       />
 
-      <React.Suspense fallback={null}>
-        {modalType === 'view' && selectedReview && (
-          <ViewReviewModal
-            open
-            onClose={handleCloseModal}
-            review={selectedReview}
-            onApprove={handleSave}
-          />
-        )}
-        {modalType === 'delete' && selectedReview && (
-          <DeleteReviewModal
-            open
-            onClose={handleCloseModal}
-            review={selectedReview}
-            onDelete={handleSave}
-          />
-        )}
-        {modalType === 'restore' && selectedReview && (
-          <RestoreReviewModal
-            open
-            onClose={handleCloseModal}
-            review={selectedReview}
-            onRestore={handleSave}
-          />
-        )}
-      </React.Suspense>
+      {modalType === 'view' && selectedReview && (
+        <ViewReviewModal
+          open
+          onClose={handleCloseModal}
+          review={selectedReview}
+          onApprove={handleSave}
+        />
+      )}
+      {modalType === 'delete' && selectedReview && (
+        <DeleteReviewModal
+          open
+          onClose={handleCloseModal}
+          review={selectedReview}
+          onDelete={handleSave}
+        />
+      )}
+      {modalType === 'restore' && selectedReview && (
+        <RestoreReviewModal
+          open
+          onClose={handleCloseModal}
+          review={selectedReview}
+          onRestore={handleSave}
+        />
+      )}
     </RouteGuard>
   )
 }

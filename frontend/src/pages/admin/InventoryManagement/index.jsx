@@ -4,28 +4,23 @@ import usePermissions from '~/hooks/usePermissions'
 import { RouteGuard, PermissionWrapper } from '~/components/PermissionGuard'
 
 // Lazy load tabs
-const InventoryTab = React.lazy(() => import('./tab/InventoryTab'))
-const WarehousesTab = React.lazy(() => import('./tab/WarehousesTab'))
-const WarehouseSlipsTab = React.lazy(() => import('./tab/WarehouseSlipsTab'))
-const InventoryLogTab = React.lazy(() => import('./tab/InventoryLogTab'))
-const BatchesTab = React.lazy(() => import('./tab/BatchesTab'))
-const PartnersTab = React.lazy(() => import('./tab/PartnersTab'))
-const WarehouseStatisticTab = React.lazy(() => import('./tab/WarehouseStatisticTab'))
-
+import InventoryTab from './tab/InventoryTab'
+import WarehousesTab from './tab/WarehousesTab'
+import WarehouseSlipsTab from './tab/WarehouseSlipsTab'
+import InventoryLogTab from './tab/InventoryLogTab'
+import BatchesTab from './tab/BatchesTab'
+import PartnersTab from './tab/PartnersTab'
+import WarehouseStatisticTab from './tab/WarehouseStatisticTab'
 function TabPanel({ children, value, index, ...other }) {
   return (
     <div
-      role="tabpanel"
+      role='tabpanel'
       hidden={value !== index}
       id={`inventory-tabpanel-${index}`}
       aria-labelledby={`inventory-tab-${index}`}
       {...other}
     >
-      {value === index && (
-        <Box sx={{ p: 3 }}>
-          {children}
-        </Box>
-      )}
+      {value === index && <Box sx={{ p: 3 }}>{children}</Box>}
     </div>
   )
 }
@@ -42,31 +37,62 @@ function InventoryManagement() {
   const availableTabs = []
 
   if (hasPermission('inventory:read')) {
-    availableTabs.push({ label: 'Tồn kho', component: InventoryTab, permission: 'inventory:read' })
+    availableTabs.push({
+      label: 'Tồn kho',
+      component: InventoryTab,
+      permission: 'inventory:read'
+    })
   }
 
   if (hasPermission('warehouse:read')) {
-    availableTabs.push({ label: 'Kho hàng', component: WarehousesTab, permission: 'warehouse:read' })
+    availableTabs.push({
+      label: 'Kho hàng',
+      component: WarehousesTab,
+      permission: 'warehouse:read'
+    })
   }
 
   if (hasPermission('warehouseSlip:read')) {
-    availableTabs.push({ label: 'Phiếu kho', component: WarehouseSlipsTab, permission: 'warehouseSlip:read' })
+    availableTabs.push({
+      label: 'Phiếu kho',
+      component: WarehouseSlipsTab,
+      permission: 'warehouseSlip:read'
+    })
   }
 
   if (hasPermission('inventoryLog:read')) {
-    availableTabs.push({ label: 'Lịch sử tồn kho', component: InventoryLogTab, permission: 'inventoryLog:read' })
+    availableTabs.push({
+      label: 'Lịch sử tồn kho',
+      component: InventoryLogTab,
+      permission: 'inventoryLog:read'
+    })
   }
 
   if (hasPermission('batch:read')) {
-    availableTabs.push({ label: 'Lô hàng', component: BatchesTab, permission: 'batch:read' })
+    availableTabs.push({
+      label: 'Lô hàng',
+      component: BatchesTab,
+      permission: 'batch:read'
+    })
   }
 
   if (hasPermission('partner:read')) {
-    availableTabs.push({ label: 'Đối tác', component: PartnersTab, permission: 'partner:read' })
+    availableTabs.push({
+      label: 'Đối tác',
+      component: PartnersTab,
+      permission: 'partner:read'
+    })
   }
 
-  if (hasPermission('statisticsWarehouse:read') && hasPermission('warehouse:read')) {
-    availableTabs.push({ label: 'Thống kê kho', component: WarehouseStatisticTab, permission: 'statistics:read' })
+  if (
+    hasPermission('statisticsWarehouse:read') &&
+    hasPermission('warehouse:read')
+  ) {
+    availableTabs.push({
+      label: 'Thống kê kho',
+      component: WarehouseStatisticTab,
+      permission: 'statistics:read'
+    })
   }
 
   // Nếu không có quyền nào, hiển thị thông báo
@@ -74,7 +100,7 @@ function InventoryManagement() {
     return (
       <RouteGuard requiredPermissions={['admin:access']}>
         <Box sx={{ p: 3, textAlign: 'center' }}>
-          <Typography variant="h6" color="text.secondary">
+          <Typography variant='h6' color='text.secondary'>
             Bạn không có quyền truy cập vào bất kỳ chức năng quản lý kho nào.
           </Typography>
         </Box>
@@ -85,7 +111,12 @@ function InventoryManagement() {
   return (
     <RouteGuard requiredPermissions={['admin:access']}>
       <Box sx={{ width: '100%' }}>
-        <Typography variant="h4" component="h1" gutterBottom sx={{ p: 3, pb: 0 }}>
+        <Typography
+          variant='h4'
+          component='h1'
+          gutterBottom
+          sx={{ p: 3, pb: 0 }}
+        >
           Quản lý kho hàng
         </Typography>
 
@@ -93,7 +124,7 @@ function InventoryManagement() {
           <Tabs
             value={tabValue}
             onChange={handleTabChange}
-            aria-label="inventory management tabs"
+            aria-label='inventory management tabs'
             sx={{ px: 3 }}
           >
             {availableTabs.map((tab, index) => (
@@ -105,9 +136,7 @@ function InventoryManagement() {
         {availableTabs.map((tab, index) => (
           <TabPanel key={index} value={tabValue} index={index}>
             <PermissionWrapper requiredPermissions={[tab.permission]}>
-              <React.Suspense fallback={<div>Đang tải...</div>}>
-                <tab.component />
-              </React.Suspense>
+              <tab.component />
             </PermissionWrapper>
           </TabPanel>
         ))}

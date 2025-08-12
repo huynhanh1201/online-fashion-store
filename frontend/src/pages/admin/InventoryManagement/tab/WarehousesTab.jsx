@@ -19,18 +19,9 @@ import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye'
 import BorderColorIcon from '@mui/icons-material/BorderColor'
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff'
 import AddIcon from '@mui/icons-material/Add'
-const AddWarehouseModal = React.lazy(
-  () =>
-    import(
-      '~/pages/admin/InventoryManagement/modal/Warehouse/AddWarehouseModal.jsx'
-    )
-)
-const EditWarehouseModal = React.lazy(
-  () =>
-    import(
-      '~/pages/admin/InventoryManagement/modal/Warehouse/EditWarehouseModal'
-    )
-)
+import AddWarehouseModal from '~/pages/admin/InventoryManagement/modal/Warehouse/AddWarehouseModal.jsx'
+import EditWarehouseModal from '~/pages/admin/InventoryManagement/modal/Warehouse/EditWarehouseModal'
+
 import ViewWarehouseModal from '~/pages/admin/InventoryManagement/modal/Warehouse/ViewWarehouseModal.jsx'
 import DeleteWarehouseModal from '~/pages/admin/InventoryManagement/modal/Warehouse/DeleteWarehouseModal.jsx' // Thêm Chart mới
 import Tooltip from '@mui/material/Tooltip'

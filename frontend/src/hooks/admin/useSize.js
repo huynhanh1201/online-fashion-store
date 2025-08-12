@@ -39,7 +39,42 @@ const useSizes = () => {
     setLoading(false)
   }
 
-  const createNewSize = async (data, filters = {}) => {
+  // const createNewSize = async (data, filters = {}) => {
+  //   try {
+  //     const newSize = await addSize(data)
+  //     if (!newSize) {
+  //       console.error('Không thể thêm size mới')
+  //       return null
+  //     }
+  //
+  //     setSizes((prev) => {
+  //       const sort = filters?.sort
+  //       let updated = [...prev]
+  //
+  //       if (sort === 'newest') {
+  //         updated = [newSize, ...prev].slice(0, ROWS_PER_PAGE)
+  //       } else if (sort === 'oldest') {
+  //         if (prev.length < ROWS_PER_PAGE) {
+  //           updated = [...prev, newSize]
+  //         }
+  //         // Nếu đã đủ 10 thì không thêm
+  //       } else {
+  //         // Mặc định: xử lý như newest
+  //         updated = [newSize, ...prev].slice(0, ROWS_PER_PAGE)
+  //       }
+  //
+  //       return updated
+  //     })
+  //
+  //     setTotalPages((prev) => prev + 1)
+  //     return newSize
+  //   } catch (error) {
+  //     console.error('Lỗi khi thêm size mới:', error)
+  //     return null
+  //   }
+  // }
+
+  const createNewSize = async (data, filters = {}, addToVariant = false) => {
     try {
       const newSize = await addSize(data)
       if (!newSize) {
@@ -47,27 +82,36 @@ const useSizes = () => {
         return null
       }
 
-      setSizes((prev) => {
-        const sort = filters?.sort
-        let updated = [...prev]
+      if (addToVariant) {
+        // ✅ Thêm trực tiếp, không cắt mảng
+        setSizes((prev) => [...prev, newSize])
+        fetchSizes(1, 1000, { destroy: 'false' })
+        console.log(1)
+        return newSize
+      } else {
+        // ⚡ Giữ nguyên logic phân trang
+        console.log(2)
+        setSizes((prev) => {
+          const sort = filters?.sort
+          let updated = [...prev]
 
-        if (sort === 'newest') {
-          updated = [newSize, ...prev].slice(0, ROWS_PER_PAGE)
-        } else if (sort === 'oldest') {
-          if (prev.length < ROWS_PER_PAGE) {
-            updated = [...prev, newSize]
+          if (sort === 'newest') {
+            updated = [newSize, ...prev].slice(0, ROWS_PER_PAGE)
+          } else if (sort === 'oldest') {
+            if (prev.length < ROWS_PER_PAGE) {
+              updated = [...prev, newSize]
+            }
+            // Nếu đã đủ ROWS_PER_PAGE thì không thêm
+          } else {
+            updated = [newSize, ...prev].slice(0, ROWS_PER_PAGE)
           }
-          // Nếu đã đủ 10 thì không thêm
-        } else {
-          // Mặc định: xử lý như newest
-          updated = [newSize, ...prev].slice(0, ROWS_PER_PAGE)
-        }
 
-        return updated
-      })
+          return updated
+        })
 
-      setTotalPages((prev) => prev + 1)
-      return newSize
+        setTotalPages((prev) => prev + 1)
+        return newSize
+      }
     } catch (error) {
       console.error('Lỗi khi thêm size mới:', error)
       return null
