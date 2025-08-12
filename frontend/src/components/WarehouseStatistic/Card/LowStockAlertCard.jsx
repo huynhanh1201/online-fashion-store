@@ -164,7 +164,7 @@ export default function LowStockAlertCard({
                     <Typography color='text.secondary' fontSize={14}>
                       {item.quantity === 0
                         ? 'Hết hàng hoàn toàn'
-                        : `Còn lại: ${item.quantity} sản phẩm (Min: ${item.minQuantity})`}
+                        : `Còn lại: ${item.quantity} sản phẩm (Ngưỡng cảnh báo: ${item.minQuantity} sản phầm)`}
                     </Typography>
                   </Box>
                   {hasPermission('warehouseSlip:create') && (
