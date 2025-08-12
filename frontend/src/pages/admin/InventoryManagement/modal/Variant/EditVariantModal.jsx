@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import {
   Dialog,
   DialogTitle,
@@ -47,7 +47,8 @@ const EditVariantModal = ({
   variant,
   onUpdateVariant,
   formatCurrency,
-  parseCurrency
+  parseCurrency,
+  loadding
 }) => {
   const {
     register,
@@ -56,6 +57,7 @@ const EditVariantModal = ({
     reset,
     control,
     watch,
+    getValues,
     formState: { errors }
   } = useForm({
     defaultValues: {
@@ -74,7 +76,7 @@ const EditVariantModal = ({
       }
     }
   })
-
+  const [initialStatus] = useState(() => getValues('status'))
   const fileInputRef = useRef(null)
   const overridePrice = watch('overridePrice')
   const colorImage = watch('colorImage')
@@ -532,10 +534,9 @@ const EditVariantModal = ({
                     { label: 'Không hoạt động', value: 'inactive' }
                   ]
                     .filter((item) => {
-                      const currentStatus = watch('status')
                       return !(
-                        currentStatus &&
-                        currentStatus !== 'draft' &&
+                        initialStatus &&
+                        initialStatus !== 'draft' &&
                         item.value === 'draft'
                       )
                     })
@@ -583,6 +584,7 @@ const EditVariantModal = ({
               color: '#fff',
               textTransform: 'none'
             }}
+            disabled={loadding}
           >
             Cập nhật
           </Button>

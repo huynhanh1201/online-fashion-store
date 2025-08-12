@@ -135,8 +135,8 @@ const ViewWarehouseSlipModal = ({ open, onClose, slip }) => {
                 <strong>Ngày tạo</strong>
               </TableCell>
               <TableCell>
-                {slip.createdAt
-                  ? new Date(slip.createdAt).toLocaleString('vi-VN')
+                {slip.date
+                  ? new Date(slip.date).toLocaleString('vi-VN')
                   : 'N/A'}
               </TableCell>
             </TableRow>

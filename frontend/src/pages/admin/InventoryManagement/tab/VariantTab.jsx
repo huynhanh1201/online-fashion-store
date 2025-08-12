@@ -90,7 +90,7 @@ const VariantsTab = () => {
     }
   }, [])
   useEffect(() => {
-    fetchProducts(1, 100000, { destroy: 'false' })
+    fetchProducts(1, 100000, { destroy: 'false', sort: 'newest' })
     fetchColors(1, 100000, { destroy: 'false' })
     fetchSizes(1, 100000, { destroy: 'false' })
   }, [])
@@ -572,6 +572,7 @@ const VariantsTab = () => {
             sizes={sizes}
             fetchColors={fetchColors}
             fetchSizes={fetchSizes}
+            loadding={loadingVariant}
           />
         </PermissionWrapper>
 
@@ -591,6 +592,7 @@ const VariantsTab = () => {
             products={products}
             parseCurrency={parseCurrency}
             formatCurrency={formatCurrency}
+            loadding={loadingVariant}
           />
         </PermissionWrapper>
 

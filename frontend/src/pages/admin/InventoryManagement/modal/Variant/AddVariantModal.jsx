@@ -59,7 +59,8 @@ const AddVariantModal = ({
   addVariant,
   products,
   formatCurrency,
-  parseCurrency
+  parseCurrency,
+  loadding
 }) => {
   const {
     register,
@@ -181,7 +182,7 @@ const AddVariantModal = ({
 
   const handleCloseColorModal = async () => {
     setOpenColorModal(false)
-    await fetchColors()
+    await fetchColors(1, 1000, { destroy: 'false' })
   }
 
   const handleOpenSizeModal = () => {
@@ -190,7 +191,7 @@ const AddVariantModal = ({
 
   const handleCloseSizeModal = async () => {
     setOpenSizeModal(false)
-    await fetchSizes()
+    await fetchSizes(1, 1000, { destroy: 'false' })
   }
 
   const handleUploadImage = async (e) => {
@@ -208,7 +209,11 @@ const AddVariantModal = ({
     try {
       const newColor = await createNewColor(data, {}, true)
       if (newColor?.name) {
-        setValue('color', newColor.name) // ✅ gán tên màu mới vào field 'color'
+        // setValue('color', newColor.name) // ✅ gán tên màu mới vào field 'color'
+        setValue('color', newColor.name, {
+          shouldValidate: true,
+          shouldDirty: true
+        })
       }
     } catch (error) {
       console.error('Lỗi khi thêm màu:', error)
@@ -220,7 +225,11 @@ const AddVariantModal = ({
     try {
       const newSize = await createNewSize(data, {}, true)
       if (newSize?.name) {
-        setValue('size', newSize.name) // ✅ gán tên size mới vào field 'size'
+        // setValue('size', newSize.name) // ✅ gán tên size mới vào field 'size'
+        setValue('size', newSize.name, {
+          shouldValidate: true,
+          shouldDirty: true
+        })
       }
     } catch (error) {
       console.error('Lỗi khi thêm kích thước:', error)
@@ -980,6 +989,7 @@ const AddVariantModal = ({
               color: '#fff',
               textTransform: 'none'
             }}
+            disabled={loadding}
           >
             Thêm
           </Button>
