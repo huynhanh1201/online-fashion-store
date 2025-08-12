@@ -46,7 +46,8 @@ const getFinanceStatistics = async (req, res, next) => {
 
 const getUserStatistics = async (req, res, next) => {
   try {
-    const result = await statisticsService.getUserStatistics()
+    const jwtDecoded = req.jwtDecoded
+    const result = await statisticsService.getUserStatistics(jwtDecoded)
 
     res.status(StatusCodes.OK).json(result)
   } catch (err) {
