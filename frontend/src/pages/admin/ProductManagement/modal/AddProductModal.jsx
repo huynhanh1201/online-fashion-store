@@ -476,7 +476,7 @@ const AddProductModal = ({ open, onClose, onSuccess }) => {
                     <TextField
                       label={
                         <>
-                          Trọng lượng gói hàng (cm){' '}
+                          Trọng lượng gói hàng (gram){' '}
                           <span style={{ color: 'red' }}>*</span>
                         </>
                       }

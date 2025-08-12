@@ -86,11 +86,9 @@ const useSizes = () => {
         // ✅ Thêm trực tiếp, không cắt mảng
         setSizes((prev) => [...prev, newSize])
         fetchSizes(1, 1000, { destroy: 'false' })
-        console.log(1)
         return newSize
       } else {
         // ⚡ Giữ nguyên logic phân trang
-        console.log(2)
         setSizes((prev) => {
           const sort = filters?.sort
           let updated = [...prev]

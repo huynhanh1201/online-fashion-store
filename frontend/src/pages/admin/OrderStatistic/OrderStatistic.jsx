@@ -411,9 +411,9 @@ const OrderStatistic = ({ stats = {}, financeStatistics, year, setYear }) => {
                 onChange={(e) => setYear(e.target.value)}
               >
                 {Array.from({
-                  length: new Date().getFullYear() - 2020 + 1
+                  length: new Date().getFullYear() - 2024 + 1
                 }).map((_, i) => {
-                  const yearOption = 2020 + i
+                  const yearOption = 2024 + i
                   return (
                     <MenuItem key={yearOption} value={yearOption.toString()}>
                       {yearOption}
