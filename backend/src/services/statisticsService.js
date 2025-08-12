@@ -532,10 +532,20 @@ const getFinanceStatistics = async (queryString) => {
   }
 }
 
-const getUserStatistics = async () => {
+const getUserStatistics = async (jwtDecoded) => {
   // eslint-disable-next-line no-useless-catch
   try {
-    const userStatsPromise = UserModel.aggregate([
+
+    const filter = {}
+
+
+    //==========================
+
+    if(jwtDecoded.role !== 'technical_admin') filter.role = { $ne: 'technical_admin' }
+
+    const userStatsPromise = UserModel.aggregate([{
+      $match: filter
+    },
       {
         $group: {
           _id: '$role',
