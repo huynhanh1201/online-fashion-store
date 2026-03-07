@@ -18,7 +18,7 @@ export const corsOptions = {
     }
 
     // Ngược lại thì hiện tại code chúng ta đang làm còn 1 trường hợp là:
-    // env.BUILD_MODE === 'prod'
+    env.BUILD_MODE === 'prod'
 
     // Kiểm tra dem origin có phải là domain được chấp nhận hay không
     if (WHITELIST_DOMAINS.includes(origin)) {
